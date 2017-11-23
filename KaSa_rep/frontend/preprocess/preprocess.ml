@@ -2026,7 +2026,7 @@ let convert_scc_list_to_map parameters error internal_scc_decomposition =
   error, internal_scc_decomposition_map
 
 let dot_of_contact_map ?logger parameters error
-    handler contact_map scc_contact_map =
+    handler contact_map =
   let parameters_dot =
     match
       logger
@@ -2183,53 +2183,14 @@ let dot_of_contact_map ?logger parameters error
                        || (Ckappa_sig.compare_agent_name i i' = 0 &&
                            Ckappa_sig.compare_site_name j j' <= 0)
                        then
-                         let error, scc_decomposition_map =
-                           convert_scc_list_to_map parameters_dot
-                             error scc_contact_map
-                         in
                          let _ =
-                           match
-                             Ckappa_sig.PairAgentSite_map_and_set.Map.find_option_without_logs
-                               parameters_dot
-                               error
-                               ((i,j),(i',j'))
-                               scc_decomposition_map
-                           with
-                           | error, None ->
-                             let _ =
-                               Loggers.fprintf
-                                 (Remanent_parameters.get_logger parameters_dot)
-                                 "%s.%s -- %s.%s\n"
-                                 (Ckappa_sig.string_of_agent_name i)
-                                 (Ckappa_sig.string_of_site_name j)
-                                 (Ckappa_sig.string_of_agent_name i')
-                                 (Ckappa_sig.string_of_site_name j')
-                             in
-                             error
-                           | error, Some list ->
-                             (*only color to red if edges belong to the trivial scc*)
-                             let _ =
-                               List.iter (fun ((i,j),(i',j')) ->
-                                   if i = i' && j = j'
-                                   then
-                                   Loggers.fprintf
-                                     (Remanent_parameters.get_logger parameters_dot)
-                                     "%s.%s -- %s.%s [color=red]\n"
-                                     (Ckappa_sig.string_of_agent_name i)
-                                     (Ckappa_sig.string_of_site_name j)
-                                     (Ckappa_sig.string_of_agent_name i')
-                                     (Ckappa_sig.string_of_site_name j')
-                                   else
-                                     Loggers.fprintf
-                                       (Remanent_parameters.get_logger parameters_dot)
-                                       "%s.%s -- %s.%s \n"
-                                       (Ckappa_sig.string_of_agent_name i)
-                                       (Ckappa_sig.string_of_site_name j)
-                                       (Ckappa_sig.string_of_agent_name i')
-                                       (Ckappa_sig.string_of_site_name j')
-                                 ) list
-                             in
-                               error
+                           Loggers.fprintf
+                             (Remanent_parameters.get_logger parameters_dot)
+                             "%s.%s -- %s.%s\n"
+                             (Ckappa_sig.string_of_agent_name i)
+                             (Ckappa_sig.string_of_site_name j)
+                             (Ckappa_sig.string_of_agent_name i')
+                             (Ckappa_sig.string_of_site_name j')
                          in
                          error
                        else

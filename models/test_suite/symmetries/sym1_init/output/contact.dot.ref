@@ -12,5 +12,5 @@ subgraph cluster0 {
    0.2 [style = filled label = "z" shape =circle color = yellow size = "5"]
 label =  "A";  shape = rectangle; color = red
 } ; 
-0.2 -- 0.2 [color=red]
+0.2 -- 0.2
 }

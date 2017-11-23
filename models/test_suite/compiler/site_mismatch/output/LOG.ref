@@ -17,6 +17,12 @@ Generating the raw contact map...
 Compilation:Compilation:initial_states:0:
 Compilation:initial_states:0:mixture:
 Compilation:initial_states:0:mixture:agent_id_0:
+Generating the raw influence map...
+Quarks:Quarkify
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Refining the influence map...
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Reachability analysis...
 ------------------------------------------------------------
 every rule may be applied
@@ -40,16 +46,6 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-COMPUTE BRIDGE: 
- Graph: 
- Nodes: 
-SCC
-Generating the raw influence map...
-Quarks:Quarkify
-
-REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
-Refining the influence map...
-Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

@@ -2,6 +2,8 @@ Parsing high_res.ka...
 done
 Compiling...
 Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
 Reachability analysis...
 ------------------------------------------------------------
 every rule may be applied
@@ -27,8 +29,6 @@ A(y{p}[.]) => A(x{p}[.],y{p}[.])
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-Generating the raw influence map...
-Refining the influence map...
 execution finished without any exception
 Parsing high_res.ka...
 done
@@ -137,1014 +137,6 @@ Compilation:rules:4:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_mi
 Compilation:initial_states:0:
 Compilation:initial_states:0:mixture:
 Compilation:initial_states:0:mixture:agent_id_0:
-Reachability analysis...
-	Views in initial state:
-
-INTENSIONAL DESCRIPTION:
-Id=19
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=7
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=6
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( y{u} ,z{u} )
-
-	Views in initial state:
-
-INTENSIONAL DESCRIPTION:
-Id=23
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=22
-   Node(site_type:1<1)
-    Id=21
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=20
-       Node(site_type:2<1)
-        Id=13
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=12
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( x{u} ,z{u} ,w{u} )
-
-	Views in initial state:
-
-INTENSIONAL DESCRIPTION:
-Id=19
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=7
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=6
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( x{u} ,y{u} )
-
-
-	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
-		the precondition is satisfied
-
-		rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:) is applied for the first time
-
-		Updating the views for A(x{},z{},w{})
-
-INTENSIONAL DESCRIPTION:
-Id=25
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=24
-   Node(site_type:1<2)
-    Id=21
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=20
-       Node(site_type:2<1)
-        Id=13
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=12
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( x{p} ,z{u} ,w{u} )
-
-
-		Updating the views for A(x{},y{})
-
-INTENSIONAL DESCRIPTION:
-Id=9
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=7
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=6
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} )
-
-
-	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
-		the precondition is satisfied
-
-		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:) is applied for the first time
-
-		Updating the views for A(x{},z{},w{})
-
-		Updating the views for A(y{},z{})
-
-INTENSIONAL DESCRIPTION:
-Id=9
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=7
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=6
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( y{p} ,z{u} )
-
-
-		Updating the views for A(x{},y{})
-
-INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{p} )
-
-
-	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
-		the precondition is satisfied
-
-		rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:) is applied for the first time
-
-		Updating the views for A(x{},z{},w{})
-
-INTENSIONAL DESCRIPTION:
-Id=35
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=34
-   Node(site_type:1<2)
-    Id=15
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=14
-       Node(site_type:2<2)
-        Id=13
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=12
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( x{p} ,z{p} ,w{u} )
-		A( x{u} ,z{p} ,w{u} )
-
-
-		Updating the views for A(y{},z{})
-
-INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( y{p} ,z{p} )
-
-
-		Updating the views for A(x{},y{})
-
-	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
-		the precondition is satisfied
-
-		rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:) is applied for the first time
-
-		Updating the views for A(x{},z{},w{})
-
-INTENSIONAL DESCRIPTION:
-Id=44
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=43
-   Node(site_type:1<1)
-    Id=42
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=41
-       Node(site_type:2<2)
-        Id=40
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=39
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( x{u} ,z{p} ,w{p} )
-
-
-		Updating the views for A(y{},z{})
-
-		Updating the views for A(x{},y{})
-
-	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
-		the precondition is satisfied
-
-		rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:) is applied for the first time
-
-		Updating the views for A(x{},z{},w{})
-
-		Updating the views for A(y{},z{})
-
-INTENSIONAL DESCRIPTION:
-Id=54
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=53
-   Node(site_type:1<1)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( y{u} ,z{p} )
-
-
-		Updating the views for A(x{},y{})
-
-	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},z{},w{})
-
-INTENSIONAL DESCRIPTION:
-Id=61
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=60
-   Node(site_type:1<2)
-    Id=42
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=41
-       Node(site_type:2<2)
-        Id=40
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=39
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A( x{p} ,z{p} ,w{p} )
-
-
-		Updating the views for A(x{},y{})
-
-	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},z{},w{})
-
-		Updating the views for A(y{},z{})
-
-		Updating the views for A(x{},y{})
-
-	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},z{},w{})
-
-		Updating the views for A(y{},z{})
-
-		Updating the views for A(x{},y{})
-
-	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},z{},w{})
-
-		Updating the views for A(y{},z{})
-
-		Updating the views for A(x{},y{})
-
-	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},z{},w{})
-
-		Updating the views for A(y{},z{})
-
-		Updating the views for A(x{},y{})
-
-	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},z{},w{})
-
-		Updating the views for A(x{},y{})
-------------------------------------------------------------
-every rule may be applied
-------------------------------------------------------------
-every agent may occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-agent_type:0:A:cv_id:0
-Id=59
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=57
-   Node(site_type:1<2)
-    Id=48
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=47
-       Node(site_type:2<1)
-        Id=13
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=12
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=46
-         Node(site_type:2<2)
-          Id=45
-           Node(site_type:3<0)
-            Id=0
-             Leaf False 
-
-            Id=39
-             Node(site_type:3<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-agent_type:0:A:cv_id:1
-Id=52
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=31
-   Node(site_type:1<2)
-    Id=30
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-agent_type:0:A:cv_id:2
-Id=33
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=32
-   Node(site_type:1<1)
-    Id=7
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=6
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=31
-     Node(site_type:1<2)
-      Id=30
-       Node(site_type:2<0)
-        Id=0
-         Leaf False 
-
-        Id=10
-         Node(site_type:2<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=65
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=67
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=66
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=10
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:3<0)
-  Id=0
-   Leaf False 
-
-  Id=39
-   Node(site_type:3<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A() => [ A(y{u}[.]) v A(y{p}[.]) ]
-A() => [ A(x{u}[.]) v A(x{p}[.]) ]
-A() => [ A(z{u}[.]) v A(z{p}[.]) ]
-A() => [ A(w{u}[.]) v A(w{p}[.]) ]
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=65
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=67
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=66
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=10
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=48
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=47
-   Node(site_type:2<1)
-    Id=13
-     Node(site_type:3<0)
-      Id=0
-       Leaf False 
-
-      Id=12
-       Node(site_type:3<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=46
-     Node(site_type:2<2)
-      Id=45
-       Node(site_type:3<0)
-        Id=0
-         Leaf False 
-
-        Id=39
-         Node(site_type:3<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=71
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=70
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=69
-     Node(site_type:0<2)
-      Id=65
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=4
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(w{p}[.]) => A(w{p}[.],z{p}[.])
-A(y{p}[.]) => A(x{p}[.],y{p}[.])
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=65
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=67
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=66
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=10
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:3<0)
-  Id=0
-   Leaf False 
-
-  Id=39
-   Node(site_type:3<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=65
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=67
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=66
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=10
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=48
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=47
-   Node(site_type:2<1)
-    Id=13
-     Node(site_type:3<0)
-      Id=0
-       Leaf False 
-
-      Id=12
-       Node(site_type:3<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=46
-     Node(site_type:2<2)
-      Id=45
-       Node(site_type:3<0)
-        Id=0
-         Leaf False 
-
-        Id=39
-         Node(site_type:3<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=71
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=70
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=69
-     Node(site_type:0<2)
-      Id=65
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=4
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-COMPUTE BRIDGE: 
- Graph: 
- Nodes: 
-SCC
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -1249,6 +241,1010 @@ Influence_map:Inhibition_map:rule(0):'' A(x{u}[.])->A(x{p}[.]) -> rule(3):'' A(x
 Influence_map:Inhibition_map:rule(0):'' A(x{u}[.])->A(x{p}[.]) -> rule(4):'' A(x{u}[.],z{u}[.])->A(x{u}[.],z{p}[.])[0->0]
 Influence_map:Inhibition_map:rule(2):'' A(y{p}[.],z{u}[.])->A(y{p}[.],z{p}[.]) -> rule(4):'' A(x{u}[.],z{u}[.])->A(x{u}[.],z{p}[.])[0->0]
 Influence_map:Inhibition_map:rule(4):'' A(x{u}[.],z{u}[.])->A(x{u}[.],z{p}[.]) -> rule(2):'' A(y{p}[.],z{u}[.])->A(y{p}[.],z{p}[.])[0->0]
+Reachability analysis...
+	Views in initial state:
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=19
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=18
+Influence_map:   Node(site_type:1<1)
+Influence_map:    Id=7
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=6
+Influence_map:       Node(site_type:2<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( y{u} ,z{u} )
+
+	Views in initial state:
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=23
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=22
+Influence_map:   Node(site_type:1<1)
+Influence_map:    Id=21
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=20
+Influence_map:       Node(site_type:2<1)
+Influence_map:        Id=13
+Influence_map:         Node(site_type:3<0)
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:          Id=12
+Influence_map:           Node(site_type:3<1)
+Influence_map:            Id=1
+Influence_map:             Leaf True 
+
+Influence_map:            Id=0
+Influence_map:             Leaf False 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( x{u} ,z{u} ,w{u} )
+
+	Views in initial state:
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=19
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=18
+Influence_map:   Node(site_type:1<1)
+Influence_map:    Id=7
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=6
+Influence_map:       Node(site_type:2<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( x{u} ,y{u} )
+
+
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
+		the precondition is satisfied
+
+		rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:) is applied for the first time
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=25
+Influence_map: Node(site_type:1<1)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=24
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=21
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=20
+Influence_map:       Node(site_type:2<1)
+Influence_map:        Id=13
+Influence_map:         Node(site_type:3<0)
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:          Id=12
+Influence_map:           Node(site_type:3<1)
+Influence_map:            Id=1
+Influence_map:             Leaf True 
+
+Influence_map:            Id=0
+Influence_map:             Leaf False 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( x{p} ,z{u} ,w{u} )
+
+
+		Influence_map:Updating the views for A(x{},y{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=9
+Influence_map: Node(site_type:1<1)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=8
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=7
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=6
+Influence_map:       Node(site_type:2<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( x{p} ,y{u} )
+
+
+	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
+		the precondition is satisfied
+
+		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:) is applied for the first time
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+		Influence_map:Updating the views for A(y{},z{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=9
+Influence_map: Node(site_type:1<1)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=8
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=7
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=6
+Influence_map:       Node(site_type:2<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( y{p} ,z{u} )
+
+
+		Influence_map:Updating the views for A(x{},y{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=29
+Influence_map: Node(site_type:1<1)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=28
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=11
+Influence_map:     Node(site_type:2<1)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=10
+Influence_map:       Node(site_type:2<2)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( x{p} ,y{p} )
+
+
+	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
+		the precondition is satisfied
+
+		rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:) is applied for the first time
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=35
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=34
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=15
+Influence_map:     Node(site_type:2<1)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=14
+Influence_map:       Node(site_type:2<2)
+Influence_map:        Id=13
+Influence_map:         Node(site_type:3<0)
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:          Id=12
+Influence_map:           Node(site_type:3<1)
+Influence_map:            Id=1
+Influence_map:             Leaf True 
+
+Influence_map:            Id=0
+Influence_map:             Leaf False 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( x{p} ,z{p} ,w{u} )
+		Influence_map:A( x{u} ,z{p} ,w{u} )
+
+
+		Influence_map:Updating the views for A(y{},z{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=29
+Influence_map: Node(site_type:1<1)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=28
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=11
+Influence_map:     Node(site_type:2<1)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=10
+Influence_map:       Node(site_type:2<2)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( y{p} ,z{p} )
+
+
+		Influence_map:Updating the views for A(x{},y{})
+
+	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
+		the precondition is satisfied
+
+		rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:) is applied for the first time
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=44
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=43
+Influence_map:   Node(site_type:1<1)
+Influence_map:    Id=42
+Influence_map:     Node(site_type:2<1)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=41
+Influence_map:       Node(site_type:2<2)
+Influence_map:        Id=40
+Influence_map:         Node(site_type:3<1)
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:          Id=39
+Influence_map:           Node(site_type:3<2)
+Influence_map:            Id=1
+Influence_map:             Leaf True 
+
+Influence_map:            Id=0
+Influence_map:             Leaf False 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( x{u} ,z{p} ,w{p} )
+
+
+		Influence_map:Updating the views for A(y{},z{})
+
+		Influence_map:Updating the views for A(x{},y{})
+
+	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
+		the precondition is satisfied
+
+		rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:) is applied for the first time
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+		Influence_map:Updating the views for A(y{},z{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=54
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=53
+Influence_map:   Node(site_type:1<1)
+Influence_map:    Id=11
+Influence_map:     Node(site_type:2<1)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=10
+Influence_map:       Node(site_type:2<2)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( y{u} ,z{p} )
+
+
+		Influence_map:Updating the views for A(x{},y{})
+
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
+		the precondition is satisfied
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+Influence_map:INTENSIONAL DESCRIPTION:
+Influence_map:Id=61
+Influence_map: Node(site_type:1<1)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=60
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=42
+Influence_map:     Node(site_type:2<1)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=41
+Influence_map:       Node(site_type:2<2)
+Influence_map:        Id=40
+Influence_map:         Node(site_type:3<1)
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:          Id=39
+Influence_map:           Node(site_type:3<2)
+Influence_map:            Id=1
+Influence_map:             Leaf True 
+
+Influence_map:            Id=0
+Influence_map:             Leaf False 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+Influence_map:EXTENSIONAL DESCRIPTION:
+		Influence_map:A( x{p} ,z{p} ,w{p} )
+
+
+		Influence_map:Updating the views for A(x{},y{})
+
+	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
+		the precondition is satisfied
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+		Influence_map:Updating the views for A(y{},z{})
+
+		Influence_map:Updating the views for A(x{},y{})
+
+	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
+		the precondition is satisfied
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+		Influence_map:Updating the views for A(y{},z{})
+
+		Influence_map:Updating the views for A(x{},y{})
+
+	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
+		the precondition is satisfied
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+		Influence_map:Updating the views for A(y{},z{})
+
+		Influence_map:Updating the views for A(x{},y{})
+
+	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
+		the precondition is satisfied
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+		Influence_map:Updating the views for A(y{},z{})
+
+		Influence_map:Updating the views for A(x{},y{})
+
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
+		the precondition is satisfied
+
+		Influence_map:Updating the views for A(x{},z{},w{})
+
+		Influence_map:Updating the views for A(x{},y{})
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Influence_map:Id=59
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=57
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=48
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=47
+Influence_map:       Node(site_type:2<1)
+Influence_map:        Id=13
+Influence_map:         Node(site_type:3<0)
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:          Id=12
+Influence_map:           Node(site_type:3<1)
+Influence_map:            Id=1
+Influence_map:             Leaf True 
+
+Influence_map:            Id=0
+Influence_map:             Leaf False 
+
+Influence_map:        Id=46
+Influence_map:         Node(site_type:2<2)
+Influence_map:          Id=45
+Influence_map:           Node(site_type:3<0)
+Influence_map:            Id=0
+Influence_map:             Leaf False 
+
+Influence_map:            Id=39
+Influence_map:             Node(site_type:3<2)
+Influence_map:              Id=1
+Influence_map:               Leaf True 
+
+Influence_map:              Id=0
+Influence_map:               Leaf False 
+
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+agent_type:0:A:cv_id:1
+Influence_map:Id=52
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=31
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=30
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=10
+Influence_map:       Node(site_type:2<2)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+agent_type:0:A:cv_id:2
+Influence_map:Id=33
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=32
+Influence_map:   Node(site_type:1<1)
+Influence_map:    Id=7
+Influence_map:     Node(site_type:2<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=6
+Influence_map:       Node(site_type:2<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=31
+Influence_map:     Node(site_type:1<2)
+Influence_map:      Id=30
+Influence_map:       Node(site_type:2<0)
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:        Id=10
+Influence_map:         Node(site_type:2<2)
+Influence_map:          Id=1
+Influence_map:           Leaf True 
+
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=65
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=4
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=67
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=66
+Influence_map:   Node(site_type:0<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=30
+Influence_map: Node(site_type:2<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=10
+Influence_map:   Node(site_type:2<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=45
+Influence_map: Node(site_type:3<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=39
+Influence_map:   Node(site_type:3<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A() => [ A(y{u}[.]) v A(y{p}[.]) ]
+A() => [ A(x{u}[.]) v A(x{p}[.]) ]
+A() => [ A(z{u}[.]) v A(z{p}[.]) ]
+A() => [ A(w{u}[.]) v A(w{p}[.]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=65
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=4
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=67
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=66
+Influence_map:   Node(site_type:0<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=30
+Influence_map: Node(site_type:2<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=10
+Influence_map:   Node(site_type:2<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=48
+Influence_map: Node(site_type:2<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=47
+Influence_map:   Node(site_type:2<1)
+Influence_map:    Id=13
+Influence_map:     Node(site_type:3<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=12
+Influence_map:       Node(site_type:3<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=46
+Influence_map:     Node(site_type:2<2)
+Influence_map:      Id=45
+Influence_map:       Node(site_type:3<0)
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:        Id=39
+Influence_map:         Node(site_type:3<2)
+Influence_map:          Id=1
+Influence_map:           Leaf True 
+
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=71
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=70
+Influence_map:   Node(site_type:0<1)
+Influence_map:    Id=3
+Influence_map:     Node(site_type:1<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=2
+Influence_map:       Node(site_type:1<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=69
+Influence_map:     Node(site_type:0<2)
+Influence_map:      Id=65
+Influence_map:       Node(site_type:1<0)
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:        Id=4
+Influence_map:         Node(site_type:1<2)
+Influence_map:          Id=1
+Influence_map:           Leaf True 
+
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(w{p}[.]) => A(w{p}[.],z{p}[.])
+A(y{p}[.]) => A(x{p}[.],y{p}[.])
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=65
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=4
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=67
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=66
+Influence_map:   Node(site_type:0<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=30
+Influence_map: Node(site_type:2<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=10
+Influence_map:   Node(site_type:2<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=45
+Influence_map: Node(site_type:3<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=39
+Influence_map:   Node(site_type:3<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=65
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=4
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=67
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=66
+Influence_map:   Node(site_type:0<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=30
+Influence_map: Node(site_type:2<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=10
+Influence_map:   Node(site_type:2<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=48
+Influence_map: Node(site_type:2<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=47
+Influence_map:   Node(site_type:2<1)
+Influence_map:    Id=13
+Influence_map:     Node(site_type:3<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=12
+Influence_map:       Node(site_type:3<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=46
+Influence_map:     Node(site_type:2<2)
+Influence_map:      Id=45
+Influence_map:       Node(site_type:3<0)
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:        Id=39
+Influence_map:         Node(site_type:3<2)
+Influence_map:          Id=1
+Influence_map:           Leaf True 
+
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=71
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=70
+Influence_map:   Node(site_type:0<1)
+Influence_map:    Id=3
+Influence_map:     Node(site_type:1<0)
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+Influence_map:      Id=2
+Influence_map:       Node(site_type:1<1)
+Influence_map:        Id=1
+Influence_map:         Leaf True 
+
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:    Id=69
+Influence_map:     Node(site_type:0<2)
+Influence_map:      Id=65
+Influence_map:       Node(site_type:1<0)
+Influence_map:        Id=0
+Influence_map:         Leaf False 
+
+Influence_map:        Id=4
+Influence_map:         Node(site_type:1<2)
+Influence_map:          Id=1
+Influence_map:           Leaf True 
+
+Influence_map:          Id=0
+Influence_map:           Leaf False 
+
+Influence_map:      Id=0
+Influence_map:       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 Refining further the influence map...
 FST:
 Influence_map:

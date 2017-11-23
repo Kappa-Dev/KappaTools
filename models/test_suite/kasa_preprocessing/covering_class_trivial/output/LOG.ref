@@ -67,41 +67,6 @@ Compilation:rules:2:direct:
 Compilation:rules:2:direct:agent_id_0:
 Compilation:rules:2:reverse:
 Compilation:rules:2:reverse:agent_id_0:
-Reachability analysis...
-
-------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule r0 (File "covering_class_trivial.ka", line 7, characters 5-50:) will never be applied.
-rule r1 (File "covering_class_trivial.ka", line 8, characters 5-50:) will never be applied.
-rule r2 (File "covering_class_trivial.ka", line 9, characters 5-67:) will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
-COMPUTE BRIDGE: 
- Graph: 
- Nodes: 
-SCC
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -162,6 +127,37 @@ Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Inhibition_map:rule(0):'r0' A(x{u}[.],y{u}[.])->A(x{u}[.],y{p}[.]) -> rule(2):'r2' A(x{u}[.],y{u}[.],z{u}[.])->A(x{u}[.],y{u}[.],z{u}[.])[0->0]
 Influence_map:Inhibition_map:rule(1):'r1' A(x{u}[.],z{u}[.])->A(x{u}[.],z{p}[.]) -> rule(2):'r2' A(x{u}[.],y{u}[.],z{u}[.])->A(x{u}[.],y{u}[.],z{u}[.])[0->0]
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule r0 (File "covering_class_trivial.ka", line 7, characters 5-50:) will never be applied.
+rule r1 (File "covering_class_trivial.ka", line 8, characters 5-50:) will never be applied.
+rule r2 (File "covering_class_trivial.ka", line 9, characters 5-67:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+A cannot occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

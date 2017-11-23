@@ -1699,11 +1699,11 @@ let output_internal_contact_map ?logger
     get_internal_contact_map ~accuracy_level state in
   let state, handler = get_handler state in
   let error = get_errors state in
-  let state, scc_contact_map =
-    get_internal_scc_decomposition state in
+  (*let state, scc_contact_map =
+    get_internal_scc_decomposition state in*)
   let error =
     Preprocess.dot_of_contact_map
-      ?logger parameters error handler contact_map scc_contact_map
+      ?logger parameters error handler contact_map
   in
   set_errors error state
 

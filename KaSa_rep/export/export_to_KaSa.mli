@@ -66,8 +66,7 @@ sig
   val get_scc_decomposition :
     ?accuracy_level_cm:Public_data.accuracy_level ->
     ?accuracy_level_scc:Public_data.accuracy_level ->
-    state -> state *
-             internal_scc_decomposition
+    state -> state * internal_scc_decomposition
 
   val output_scc_decomposition :
     ?accuracy_level_cm:Public_data.accuracy_level ->
@@ -103,9 +102,11 @@ sig
 
   val dump_c_compil: state -> c_compilation -> state
 
-  val output_internal_contact_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
+  val output_internal_contact_map:
+    ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
-  val output_influence_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
+  val output_influence_map:
+    ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
   val output_local_influence_map: ?logger:Loggers.t ->
     ?accuracy_level:Public_data.accuracy_level ->
