@@ -156,9 +156,9 @@ and inline_comment acc = parse
   | '*' '/' { String.concat "" (List.rev acc) }
   | eof { String.concat "" (List.rev acc) }
   | '*' '\n' { Lexing.new_line lexbuf; inline_comment ("*\n"::acc) lexbuf }
-  | (('*' | '/')? '\"' [^'\n' '\"']+ (eof | '\n')) as x
-    { inline_comment (x::acc) lexbuf }
   | (('*' | '/')? '\"' [^'\n' '\"']+ '\"') as x
+    { inline_comment (x::acc) lexbuf }
+  | (('*' | '/')? '\"' [^'\n' '\"']+ (eof | '\n')) as x
     { raise (ExceptionDefn.Syntax_Error
       ("Unterminated string in comment: "^x,
        Locality.of_pos (Lexing.lexeme_start_p lexbuf)
