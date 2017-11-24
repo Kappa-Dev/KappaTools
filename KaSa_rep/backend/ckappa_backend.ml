@@ -571,7 +571,7 @@ struct
                  "%s"
                  (Remanent_parameters.get_site_sep_comma_symbol parameter)
            in
-           let () = Loggers.fprintf logger "%s3" site_string in
+           let () = Loggers.fprintf logger "%s" site_string in
            let () =
              match internal with
              | None -> ()

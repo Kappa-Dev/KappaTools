@@ -1656,18 +1656,18 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => A(t3[t.B])
-A() => [ A(z3[.]) v A(z3[x.C]) v A(z3[x.D]) ]
-B() => [ B(z3[.]) v B(z3[x.C]) v B(z3[x.D]) ]
-B() => B(t3[t.A])
-E() => E(t3[t.F])
-E() => [ E(z3[.]) v E(z3[x.C]) v E(z3[x.G]) ]
-F() => [ F(z3[x.D]) v F(z3[x.H]) ]
-F() => F(t3[t.E])
-C() => [ C(x3[z.A]) v C(x3[z.B]) v C(x3[z.E]) ]
-D() => [ D(x3[z.A]) v D(x3[z.B]) v D(x3[z.F]) ]
-G() => G(x3[z.E])
-H() => H(x3[z.F])
+A() => A(t[t.B])
+A() => [ A(z[.]) v A(z[x.C]) v A(z[x.D]) ]
+B() => [ B(z[.]) v B(z[x.C]) v B(z[x.D]) ]
+B() => B(t[t.A])
+E() => E(t[t.F])
+E() => [ E(z[.]) v E(z[x.C]) v E(z[x.G]) ]
+F() => [ F(z[x.D]) v F(z[x.H]) ]
+F() => F(t[t.E])
+C() => [ C(x[z.A]) v C(x[z.B]) v C(x[z.E]) ]
+D() => [ D(x[z.A]) v D(x[z.B]) v D(x[z.F]) ]
+G() => G(x[z.E])
+H() => H(x[z.F])
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1855,19 +1855,19 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(t3[1]),B(t3[1]) => 
+A(t[1]),B(t[1]) => 
 	[
-		  A(t3[1],z3[x.D]),B(t3[1],z3[x.D])
-		v A(t3[1],z3[x.C]),B(t3[1],z3[.])
-		v A(t3[1],z3[x.C]),B(t3[1],z3[x.C])
-		v A(t3[1],z3[.]),B(t3[1],z3[.])
-		v A(t3[1],z3[.]),B(t3[1],z3[x.C])
+		  A(t[1],z[x.D]),B(t[1],z[x.D])
+		v A(t[1],z[x.C]),B(t[1],z[.])
+		v A(t[1],z[x.C]),B(t[1],z[x.C])
+		v A(t[1],z[.]),B(t[1],z[.])
+		v A(t[1],z[.]),B(t[1],z[x.C])
 	]
-E(t3[1]),F(t3[1]) => 
+E(t[1]),F(t[1]) => 
 	[
-		  E(t3[1],z3[x.G]),F(t3[1],z3[x.H])
-		v E(t3[1],z3[x.C]),F(t3[1],z3[x.D])
-		v E(t3[1],z3[.]),F(t3[1],z3[x.D])
+		  E(t[1],z[x.G]),F(t[1],z[x.H])
+		v E(t[1],z[x.C]),F(t[1],z[x.D])
+		v E(t[1],z[.]),F(t[1],z[x.D])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -2235,35 +2235,35 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-H()=> [H(x3[z.F])]
-G()=> [G(x3[z.E])]
+H()=> [H(x[z.F])]
+G()=> [G(x[z.E])]
 D()=> [
-		  D(x3[z.A])
-		v D(x3[z.B])
-		v D(x3[z.F])]
+		  D(x[z.A])
+		v D(x[z.B])
+		v D(x[z.F])]
 C()=> [
-		  C(x3[z.A])
-		v C(x3[z.B])
-		v C(x3[z.E])]
-F()=> [F(t3[t.E])]
+		  C(x[z.A])
+		v C(x[z.B])
+		v C(x[z.E])]
+F()=> [F(t[t.E])]
 F()=> [
-		  F(z3[x.D])
-		v F(z3[x.H])]
+		  F(z[x.D])
+		v F(z[x.H])]
 E()=> [
-		  E(z3[.])
-		v E(z3[x.C])
-		v E(z3[x.G])]
-E()=> [E(t3[t.F])]
-B()=> [B(t3[t.A])]
+		  E(z[.])
+		v E(z[x.C])
+		v E(z[x.G])]
+E()=> [E(t[t.F])]
+B()=> [B(t[t.A])]
 B()=> [
-		  B(z3[.])
-		v B(z3[x.C])
-		v B(z3[x.D])]
+		  B(z[.])
+		v B(z[x.C])
+		v B(z[x.D])]
 A()=> [
-		  A(z3[.])
-		v A(z3[x.C])
-		v A(z3[x.D])]
-A()=> [A(t3[t.B])]
+		  A(z[.])
+		v A(z[x.C])
+		v A(z[x.D])]
+A()=> [A(t[t.B])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -2272,16 +2272,16 @@ A()=> [A(t3[t.B])]
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(t3[1]),B(t3[1])=> [
-		  A(t3[1],z3[x.D]),B(t3[1],z3[x.D])
-		v A(t3[1],z3[x.C]),B(t3[1],z3[.])
-		v A(t3[1],z3[x.C]),B(t3[1],z3[x.C])
-		v A(t3[1],z3[.]),B(t3[1],z3[.])
-		v A(t3[1],z3[.]),B(t3[1],z3[x.C])]
-E(t3[1]),F(t3[1])=> [
-		  E(t3[1],z3[x.G]),F(t3[1],z3[x.H])
-		v E(t3[1],z3[x.C]),F(t3[1],z3[x.D])
-		v E(t3[1],z3[.]),F(t3[1],z3[x.D])]
+A(t[1]),B(t[1])=> [
+		  A(t[1],z[x.D]),B(t[1],z[x.D])
+		v A(t[1],z[x.C]),B(t[1],z[.])
+		v A(t[1],z[x.C]),B(t[1],z[x.C])
+		v A(t[1],z[.]),B(t[1],z[.])
+		v A(t[1],z[.]),B(t[1],z[x.C])]
+E(t[1]),F(t[1])=> [
+		  E(t[1],z[x.G]),F(t[1],z[x.H])
+		v E(t[1],z[x.C]),F(t[1],z[x.D])
+		v E(t[1],z[.]),F(t[1],z[x.D])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

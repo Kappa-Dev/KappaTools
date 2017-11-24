@@ -16,28 +16,28 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-E() => [ E(x3) v E(x3!x.R) ]
-R() => [ R(n3) v R(n3!cr.R) ]
-R() => [ R(c3) v R(c3!c.R) ]
-R() => [ R(x3) v R(x3!x.E) ]
-R() => [ R(cr3) v R(cr3!n.R) ]
+E() => [ E(x) v E(x!x.R) ]
+R() => [ R(n) v R(n!cr.R) ]
+R() => [ R(c) v R(c!c.R) ]
+R() => [ R(x) v R(x!x.E) ]
+R() => [ R(cr) v R(cr!n.R) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 R() =>
    [
-	  R(c3,cr3,n3,x3!x.E)
-	v R(c3!c.R,cr3!n.R,n3,x3!x.E)
-	v R(c3!c.R,cr3,n3,x3!x.E)
-	v R(c3!c.R,cr3,n3!cr.R,x3!x.E)
-	v R(c3,cr3,n3,x3)
+	  R(c,cr,n,x!x.E)
+	v R(c!c.R,cr!n.R,n,x!x.E)
+	v R(c!c.R,cr,n,x!x.E)
+	v R(c!c.R,cr,n!cr.R,x!x.E)
+	v R(c,cr,n,x)
    ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-R(c3!c.R,cr3!n.R) => R(c3!1,cr3!2),R(c3!1,n3!2)
-R(c3!c.R,n3!cr.R) => R(c3!1,n3!2),R(c3!1,cr3!2)
+R(c!c.R,cr!n.R) => R(c!1,cr!2),R(c!1,n!2)
+R(c!c.R,n!cr.R) => R(c!1,n!2),R(c!1,cr!2)
 Some exceptions have been raised
 error: file_name: setMap.ml; message: line 669; exception:Not_found
 error: file_name: setMap.ml; message: line 669; exception:Not_found

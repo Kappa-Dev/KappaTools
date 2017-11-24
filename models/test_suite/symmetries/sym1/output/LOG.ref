@@ -1661,9 +1661,9 @@ Id=59
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y3{u}[.]) v A(y3{p}[.]) ]
-A() => [ A(x3{u}[.]) v A(x3{p}[.]) ]
-A() => [ A(z3{u}[.]) v A(z3{p}[.]) ]
+A() => [ A(y{u}[.]) v A(y{p}[.]) ]
+A() => [ A(x{u}[.]) v A(x{p}[.]) ]
+A() => [ A(z{u}[.]) v A(z{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1813,14 +1813,14 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(z3{u}[.])
-		v A(z3{p}[.])]
+		  A(z{u}[.])
+		v A(z{p}[.])]
 A()=> [
-		  A(x3{u}[.])
-		v A(x3{p}[.])]
+		  A(x{u}[.])
+		v A(x{p}[.])]
 A()=> [
-		  A(y3{u}[.])
-		v A(y3{p}[.])]
+		  A(y{u}[.])
+		v A(y{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

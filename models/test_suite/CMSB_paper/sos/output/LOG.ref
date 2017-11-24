@@ -15,65 +15,65 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-EGF() => [ EGF(r3) v EGF(r3!L.EGFR) ]
-EGFR() => [ EGFR(Y10923~u?) v EGFR(Y10923~p?) ]
-EGFR() => [ EGFR(Y11723~u?) v EGFR(Y11723~p?) ]
-EGFR() => [ EGFR(L3) v EGFR(L3!r.EGF) ]
-EGFR() => [ EGFR(CR3) v EGFR(CR3!CR.EGFR) ]
-EGFR() => EGFR(Y10163~u)
-EGFR() => [ EGFR(N3) v EGFR(N3!C.EGFR) ]
-EGFR() => [ EGFR(C3) v EGFR(C3!N.EGFR) ]
-EGFR() => [ EGFR(Y11723) v EGFR(Y11723!PTB.Shc) ]
-EGFR() => [ EGFR(Y10923) v EGFR(Y10923!SH2.Grb2) ]
-SoS() => [ SoS(PR3) v SoS(PR3!SH3n.Grb2) ]
-SoS() => SoS(S3~u)
-Shc() => Shc(PTB3~u?)
-Shc() => [ Shc(Y3) v Shc(Y3!SH2.Grb2) ]
-Shc() => [ Shc(PTB3) v Shc(PTB3!Y1172.EGFR) ]
-Shc() => [ Shc(Y3~u?) v Shc(Y3~p?) ]
-Grb2() => [ Grb2(SH23) v Grb2(SH23!Y.Shc) v Grb2(SH23!Y1092.EGFR) ]
-Grb2() => [ Grb2(SH3n3) v Grb2(SH3n3!PR.SoS) ]
-Grb2() => Grb2(SH23~u?)
+EGF() => [ EGF(r) v EGF(r!L.EGFR) ]
+EGFR() => [ EGFR(Y1092~u?) v EGFR(Y1092~p?) ]
+EGFR() => [ EGFR(Y1172~u?) v EGFR(Y1172~p?) ]
+EGFR() => [ EGFR(L) v EGFR(L!r.EGF) ]
+EGFR() => [ EGFR(CR) v EGFR(CR!CR.EGFR) ]
+EGFR() => EGFR(Y1016~u)
+EGFR() => [ EGFR(N) v EGFR(N!C.EGFR) ]
+EGFR() => [ EGFR(C) v EGFR(C!N.EGFR) ]
+EGFR() => [ EGFR(Y1172) v EGFR(Y1172!PTB.Shc) ]
+EGFR() => [ EGFR(Y1092) v EGFR(Y1092!SH2.Grb2) ]
+SoS() => [ SoS(PR) v SoS(PR!SH3n.Grb2) ]
+SoS() => SoS(S~u)
+Shc() => Shc(PTB~u?)
+Shc() => [ Shc(Y) v Shc(Y!SH2.Grb2) ]
+Shc() => [ Shc(PTB) v Shc(PTB!Y1172.EGFR) ]
+Shc() => [ Shc(Y~u?) v Shc(Y~p?) ]
+Grb2() => [ Grb2(SH2) v Grb2(SH2!Y.Shc) v Grb2(SH2!Y1092.EGFR) ]
+Grb2() => [ Grb2(SH3n) v Grb2(SH3n!PR.SoS) ]
+Grb2() => Grb2(SH2~u?)
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 EGFR() =>
    [
-	  EGFR(C3,CR3,L3!r.EGF,N3)
-	v EGFR(C3,CR3!CR.EGFR,L3!r.EGF,N3!C.EGFR)
-	v EGFR(C3,CR3!CR.EGFR,L3!r.EGF,N3)
-	v EGFR(C3!N.EGFR,CR3!CR.EGFR,L3!r.EGF,N3)
-	v EGFR(C3,CR3,L3,N3)
+	  EGFR(C,CR,L!r.EGF,N)
+	v EGFR(C,CR!CR.EGFR,L!r.EGF,N!C.EGFR)
+	v EGFR(C,CR!CR.EGFR,L!r.EGF,N)
+	v EGFR(C!N.EGFR,CR!CR.EGFR,L!r.EGF,N)
+	v EGFR(C,CR,L,N)
    ]
-EGFR(Y11723!PTB.Shc) => EGFR(Y11723~p!PTB.Shc)
-EGFR(Y10923!SH2.Grb2) => EGFR(Y10923~p!SH2.Grb2)
-Shc(Y3!SH2.Grb2) => Shc(Y3~p!SH2.Grb2)
+EGFR(Y1172!PTB.Shc) => EGFR(Y1172~p!PTB.Shc)
+EGFR(Y1092!SH2.Grb2) => EGFR(Y1092~p!SH2.Grb2)
+Shc(Y!SH2.Grb2) => Shc(Y~p!SH2.Grb2)
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-EGFR(CR3!1),EGFR(CR3!1) => 
+EGFR(CR!1),EGFR(CR!1) => 
 	[
-		  EGFR(CR3!1,N3!C.EGFR),EGFR(CR3!1,N3)
-		v EGFR(CR3!1,N3),EGFR(CR3!1,N3)
-		v EGFR(CR3!1,N3),EGFR(CR3!1,N3!C.EGFR)
+		  EGFR(CR!1,N!C.EGFR),EGFR(CR!1,N)
+		v EGFR(CR!1,N),EGFR(CR!1,N)
+		v EGFR(CR!1,N),EGFR(CR!1,N!C.EGFR)
 	]
-EGFR(CR3!1),EGFR(CR3!1) => 
+EGFR(CR!1),EGFR(CR!1) => 
 	[
-		  EGFR(C3!N.EGFR,CR3!1),EGFR(CR3!1,N3!C.EGFR)
-		v EGFR(C3,CR3!1),EGFR(CR3!1,N3)
+		  EGFR(C!N.EGFR,CR!1),EGFR(CR!1,N!C.EGFR)
+		v EGFR(C,CR!1),EGFR(CR!1,N)
 	]
-EGFR(CR3!1),EGFR(CR3!1) => 
+EGFR(CR!1),EGFR(CR!1) => 
 	[
-		  EGFR(C3!N.EGFR,CR3!1),EGFR(C3,CR3!1)
-		v EGFR(C3,CR3!1),EGFR(C3,CR3!1)
-		v EGFR(C3,CR3!1),EGFR(C3!N.EGFR,CR3!1)
+		  EGFR(C!N.EGFR,CR!1),EGFR(C,CR!1)
+		v EGFR(C,CR!1),EGFR(C,CR!1)
+		v EGFR(C,CR!1),EGFR(C!N.EGFR,CR!1)
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-EGFR(CR3!CR.EGFR,N3!C.EGFR) => EGFR(CR3!1,N3!2),EGFR(C3!2,CR3!1)
-EGFR(C3!N.EGFR,CR3!CR.EGFR) => EGFR(C3!2,CR3!1),EGFR(CR3!1,N3!2)
+EGFR(CR!CR.EGFR,N!C.EGFR) => EGFR(CR!1,N!2),EGFR(C!2,CR!1)
+EGFR(C!N.EGFR,CR!CR.EGFR) => EGFR(C!2,CR!1),EGFR(CR!1,N!2)
 Some exceptions have been raised
 error: file_name: setMap.ml; message: line 669; exception:Not_found
 error: file_name: setMap.ml; message: line 669; exception:Not_found

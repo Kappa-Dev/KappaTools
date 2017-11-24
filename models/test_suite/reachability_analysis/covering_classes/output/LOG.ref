@@ -2235,18 +2235,18 @@ Id=50
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y3{u}[#]) v A(y3{p}[#]) ]
-A() => [ A(x3[.]) v A(x3[x.B]) v A(x3[x.C]) ]
-A() => [ A(y3[.]) v A(y3[y.B]) v A(y3[y.C]) ]
-A() => [ A(x3{u}[#]) v A(x3{p}[#]) ]
-B() => [ B(y3{u}[#]) v B(y3{p}[#]) ]
-B() => [ B(x3[.]) v B(x3[x.A]) ]
-B() => [ B(y3[.]) v B(y3[y.A]) ]
-B() => [ B(x3{u}[#]) v B(x3{p}[#]) ]
-C() => [ C(y3{u}[#]) v C(y3{p}[#]) ]
-C() => [ C(x3[.]) v C(x3[x.A]) ]
-C() => [ C(y3[.]) v C(y3[y.A]) ]
-C() => [ C(x3{u}[#]) v C(x3{p}[#]) ]
+A() => [ A(y{u}[#]) v A(y{p}[#]) ]
+A() => [ A(x[.]) v A(x[x.B]) v A(x[x.C]) ]
+A() => [ A(y[.]) v A(y[y.B]) v A(y[y.C]) ]
+A() => [ A(x{u}[#]) v A(x{p}[#]) ]
+B() => [ B(y{u}[#]) v B(y{p}[#]) ]
+B() => [ B(x[.]) v B(x[x.A]) ]
+B() => [ B(y[.]) v B(y[y.A]) ]
+B() => [ B(x{u}[#]) v B(x{p}[#]) ]
+C() => [ C(y{u}[#]) v C(y{p}[#]) ]
+C() => [ C(x[.]) v C(x[x.A]) ]
+C() => [ C(y[.]) v C(y[y.A]) ]
+C() => [ C(x{u}[#]) v C(x{p}[#]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -2471,10 +2471,10 @@ Id=65
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(y3[y.A]) => B(y3{p}[y.A])
-B(x3[x.A]) => B(x3{p}[x.A])
-C(y3[y.A]) => C(y3{p}[y.A])
-C(x3[x.A]) => C(x3{p}[x.A])
+B(y[y.A]) => B(y{p}[y.A])
+B(x[x.A]) => B(x{p}[x.A])
+C(y[y.A]) => C(y{p}[y.A])
+C(x[x.A]) => C(x{p}[x.A])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -2885,51 +2885,51 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x3{u}[#])
-		v C(x3{p}[#])]
+		  C(x{u}[#])
+		v C(x{p}[#])]
 C()=> [
-		  C(y3[.])
-		v C(y3[y.A])]
+		  C(y[.])
+		v C(y[y.A])]
 C()=> [
-		  C(x3[.])
-		v C(x3[x.A])]
+		  C(x[.])
+		v C(x[x.A])]
 C()=> [
-		  C(y3{u}[#])
-		v C(y3{p}[#])]
+		  C(y{u}[#])
+		v C(y{p}[#])]
 B()=> [
-		  B(x3{u}[#])
-		v B(x3{p}[#])]
+		  B(x{u}[#])
+		v B(x{p}[#])]
 B()=> [
-		  B(y3[.])
-		v B(y3[y.A])]
+		  B(y[.])
+		v B(y[y.A])]
 B()=> [
-		  B(x3[.])
-		v B(x3[x.A])]
+		  B(x[.])
+		v B(x[x.A])]
 B()=> [
-		  B(y3{u}[#])
-		v B(y3{p}[#])]
+		  B(y{u}[#])
+		v B(y{p}[#])]
 A()=> [
-		  A(x3{u}[#])
-		v A(x3{p}[#])]
+		  A(x{u}[#])
+		v A(x{p}[#])]
 A()=> [
-		  A(y3[.])
-		v A(y3[y.B])
-		v A(y3[y.C])]
+		  A(y[.])
+		v A(y[y.B])
+		v A(y[y.C])]
 A()=> [
-		  A(x3[.])
-		v A(x3[x.B])
-		v A(x3[x.C])]
+		  A(x[.])
+		v A(x[x.B])
+		v A(x[x.C])]
 A()=> [
-		  A(y3{u}[#])
-		v A(y3{p}[#])]
+		  A(y{u}[#])
+		v A(y{p}[#])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-C(y3[y.A])=> [C(y3{p}[y.A])]
-B(y3[y.A])=> [B(y3{p}[y.A])]
-B(x3[x.A])=> [B(x3{p}[x.A])]
-C(x3[x.A])=> [C(x3{p}[x.A])]
+C(y[y.A])=> [C(y{p}[y.A])]
+B(y[y.A])=> [B(y{p}[y.A])]
+B(x[x.A])=> [B(x{p}[x.A])]
+C(x[x.A])=> [C(x{p}[x.A])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

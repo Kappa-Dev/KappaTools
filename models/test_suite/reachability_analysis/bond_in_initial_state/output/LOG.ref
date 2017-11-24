@@ -26,8 +26,8 @@ Reachability analysis...
 		B( x[][x.A] ,x{u} )
 
 
-		A(x3{u}[1]),B(x3{u}[1])
-		B(x3{u}[1]),A(x3{u}[1])			(rule B(x{u}[.]), B(x{u}[_]) -> B(x{u}[.]), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-50:)) should be investigated
+		A(x{u}[1]),B(x{u}[1])
+		B(x{u}[1]),A(x{u}[1])			(rule B(x{u}[.]), B(x{u}[_]) -> B(x{u}[.]), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-50:)) should be investigated
 			(rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:)) should be investigated
 
 	Applying rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:):
@@ -80,8 +80,8 @@ Reachability analysis...
 
 		Update information about potential sites across domain
 
-		B(x3{p}[1]),A(x3{u}[1])
-		A(x3{u}[1]),B(x3{p}[1])
+		B(x{p}[1]),A(x{u}[1])
+		A(x{u}[1]),B(x{p}[1])
 
 			(rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:)) should be investigated
 			(rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:)) should be investigated
@@ -131,10 +131,10 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => A(x3[x.B])
-A() => A(x3{u}[#])
-B() => [ B(x3{u}[#]) v B(x3{p}[#]) ]
-B() => [ B(x3[.]) v B(x3[x.A]) ]
+A() => A(x[x.B])
+A() => A(x{u}[#])
+B() => [ B(x{u}[#]) v B(x{p}[#]) ]
+B() => [ B(x[.]) v B(x[x.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:

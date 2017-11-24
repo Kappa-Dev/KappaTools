@@ -1049,9 +1049,9 @@ Id=71
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(z3[.]) v A(z3[z.A]) ]
-A() => [ A(t3[.]) v A(t3[t.A]) ]
-A() => [ A(z3{u}[#]) v A(z3{p}[#]) ]
+A() => [ A(z[.]) v A(z[z.A]) ]
+A() => [ A(t[.]) v A(t[t.A]) ]
+A() => [ A(z{u}[#]) v A(z{p}[#]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1111,19 +1111,19 @@ Id=75
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z3[z.A]) => A(t3[.],z3[z.A])
+A(z[z.A]) => A(t[.],z[z.A])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(z3[1]),A(z3[1]) => 
+A(z[1]),A(z[1]) => 
 	[
-		  A(z3{p}[1]),A(z3{p}[1])
-		v A(z3{u}[1]),A(z3{u}[1])
+		  A(z{p}[1]),A(z{p}[1])
+		v A(z{u}[1]),A(z{u}[1])
 	]
-A(t3[1]),A(t3[1]) => 
+A(t[1]),A(t[1]) => 
 	[
-		  A(t3[1],z3{p}[#]),A(t3[1],z3{p}[#])
-		v A(t3[1],z3{u}[#]),A(t3[1],z3{u}[#])
+		  A(t[1],z{p}[#]),A(t[1],z{p}[#])
+		v A(t[1],z{u}[#]),A(t[1],z{u}[#])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1232,29 +1232,29 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(z3{u}[#])
-		v A(z3{p}[#])]
+		  A(z{u}[#])
+		v A(z{p}[#])]
 A()=> [
-		  A(t3[.])
-		v A(t3[t.A])]
+		  A(t[.])
+		v A(t[t.A])]
 A()=> [
-		  A(z3[.])
-		v A(z3[z.A])]
+		  A(z[.])
+		v A(z[z.A])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z3[z.A])=> [A(t3[.],z3[z.A])]
+A(z[z.A])=> [A(t[.],z[z.A])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z3[1]),A(z3[1])=> [
-		  A(z3{p}[1]),A(z3{p}[1])
-		v A(z3{u}[1]),A(z3{u}[1])]
-A(t3[1]),A(t3[1])=> [
-		  A(t3[1],z3{p}[#]),A(t3[1],z3{p}[#])
-		v A(t3[1],z3{u}[#]),A(t3[1],z3{u}[#])]
+A(z[1]),A(z[1])=> [
+		  A(z{p}[1]),A(z{p}[1])
+		v A(z{u}[1]),A(z{u}[1])]
+A(t[1]),A(t[1])=> [
+		  A(t[1],z{p}[#]),A(t[1],z{p}[#])
+		v A(t[1],z{u}[#]),A(t[1],z{u}[#])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

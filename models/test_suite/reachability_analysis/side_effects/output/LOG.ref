@@ -1696,16 +1696,16 @@ Id=50
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(x3[.]) v A(x3[x.B]) v A(x3[x.C]) ]
-A() => [ A(x3{u}[#]) v A(x3{p}[#]) ]
-B() => [ B(x3[.]) v B(x3[x.A]) ]
-B() => [ B(x3{u}[#]) v B(x3{p}[#]) ]
-C() => [ C(x3[.]) v C(x3[x.A]) ]
-C() => [ C(x3{u}[#]) v C(x3{p}[#]) ]
-D() => [ D(x3[.]) v D(x3[x.E]) ]
-D() => [ D(x3{u}[#]) v D(x3{p}[#]) ]
-E() => [ E(x3[.]) v E(x3[x.D]) ]
-E() => [ E(x3{u}[#]) v E(x3{p}[#]) ]
+A() => [ A(x[.]) v A(x[x.B]) v A(x[x.C]) ]
+A() => [ A(x{u}[#]) v A(x{p}[#]) ]
+B() => [ B(x[.]) v B(x[x.A]) ]
+B() => [ B(x{u}[#]) v B(x{p}[#]) ]
+C() => [ C(x[.]) v C(x[x.A]) ]
+C() => [ C(x{u}[#]) v C(x{p}[#]) ]
+D() => [ D(x[.]) v D(x[x.E]) ]
+D() => [ D(x{u}[#]) v D(x{p}[#]) ]
+E() => [ E(x[.]) v E(x[x.D]) ]
+E() => [ E(x{u}[#]) v E(x{p}[#]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1900,10 +1900,10 @@ Id=58
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x3[x.A]) => B(x3{p}[x.A])
-C(x3{p}[#]) <=> C(x3[x.A])
-D(x3[x.E]) => D(x3{p}[x.E])
-E(x3[x.D]) => E(x3{p}[x.D])
+B(x[x.A]) => B(x{p}[x.A])
+C(x{p}[#]) <=> C(x[x.A])
+D(x[x.E]) => D(x{p}[x.E])
+E(x[x.D]) => E(x{p}[x.D])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -2254,44 +2254,44 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 E()=> [
-		  E(x3{u}[#])
-		v E(x3{p}[#])]
+		  E(x{u}[#])
+		v E(x{p}[#])]
 E()=> [
-		  E(x3[.])
-		v E(x3[x.D])]
+		  E(x[.])
+		v E(x[x.D])]
 D()=> [
-		  D(x3{u}[#])
-		v D(x3{p}[#])]
+		  D(x{u}[#])
+		v D(x{p}[#])]
 D()=> [
-		  D(x3[.])
-		v D(x3[x.E])]
+		  D(x[.])
+		v D(x[x.E])]
 C()=> [
-		  C(x3{u}[#])
-		v C(x3{p}[#])]
+		  C(x{u}[#])
+		v C(x{p}[#])]
 C()=> [
-		  C(x3[.])
-		v C(x3[x.A])]
+		  C(x[.])
+		v C(x[x.A])]
 B()=> [
-		  B(x3{u}[#])
-		v B(x3{p}[#])]
+		  B(x{u}[#])
+		v B(x{p}[#])]
 B()=> [
-		  B(x3[.])
-		v B(x3[x.A])]
+		  B(x[.])
+		v B(x[x.A])]
 A()=> [
-		  A(x3{u}[#])
-		v A(x3{p}[#])]
+		  A(x{u}[#])
+		v A(x{p}[#])]
 A()=> [
-		  A(x3[.])
-		v A(x3[x.B])
-		v A(x3[x.C])]
+		  A(x[.])
+		v A(x[x.B])
+		v A(x[x.C])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-D(x3[x.E])=> [D(x3{p}[x.E])]
-B(x3[x.A])=> [B(x3{p}[x.A])]
-C(x3{p}[#])=> [C(x3[x.A])]
-E(x3[x.D])=> [E(x3{p}[x.D])]
+D(x[x.E])=> [D(x{p}[x.E])]
+B(x[x.A])=> [B(x{p}[x.A])]
+C(x{p}[#])=> [C(x[x.A])]
+E(x[x.D])=> [E(x{p}[x.D])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

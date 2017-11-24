@@ -583,9 +583,9 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(x3{u}[.]) v A(x3{p}[.]) ]
-B() => [ B(x3{u}[.]) v B(x3{p}[.]) ]
-C() => [ C(x3{u}[.]) v C(x3{p}[.]) ]
+A() => [ A(x{u}[.]) v A(x{p}[.]) ]
+B() => [ B(x{u}[.]) v B(x{p}[.]) ]
+C() => [ C(x{u}[.]) v C(x{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -2259,14 +2259,14 @@ Influence_map:Inhibition_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x3{u}[.])
-		v C(x3{p}[.])]
+		  C(x{u}[.])
+		v C(x{p}[.])]
 B()=> [
-		  B(x3{u}[.])
-		v B(x3{p}[.])]
+		  B(x{u}[.])
+		v B(x{p}[.])]
 A()=> [
-		  A(x3{u}[.])
-		v A(x3{p}[.])]
+		  A(x{u}[.])
+		v A(x{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

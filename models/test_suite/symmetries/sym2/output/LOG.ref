@@ -924,8 +924,8 @@ Id=40
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y3[.]) v A(y3[x.A]) v A(y3[y.A]) ]
-A() => [ A(x3[.]) v A(x3[x.A]) v A(x3[y.A]) ]
+A() => [ A(y[.]) v A(y[x.A]) v A(y[y.A]) ]
+A() => [ A(x[.]) v A(x[x.A]) v A(x[y.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -970,8 +970,8 @@ Id=45
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x3[y.A]) => A(x3[y.A],y3[.])
-A(x3[x.A]) => A(x3[x.A],y3[.])
+A(x[y.A]) => A(x[y.A],y[.])
+A(x[x.A]) => A(x[x.A],y[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -1052,19 +1052,19 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(x3[.])
-		v A(x3[x.A])
-		v A(x3[y.A])]
+		  A(x[.])
+		v A(x[x.A])
+		v A(x[y.A])]
 A()=> [
-		  A(y3[.])
-		v A(y3[x.A])
-		v A(y3[y.A])]
+		  A(y[.])
+		v A(y[x.A])
+		v A(y[y.A])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(x3[x.A])=> [A(x3[x.A],y3[.])]
-A(x3[y.A])=> [A(x3[y.A],y3[.])]
+A(x[x.A])=> [A(x[x.A],y[.])]
+A(x[y.A])=> [A(x[y.A],y[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

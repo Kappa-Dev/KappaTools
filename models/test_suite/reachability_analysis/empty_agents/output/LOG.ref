@@ -275,7 +275,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D() => D(x3{u}[.])
+D() => D(x{u}[.])
 
 ------------------------------------------------------------
 * Relational properties:
@@ -334,7 +334,7 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-D()=> [D(x3{u}[.])]
+D()=> [D(x{u}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

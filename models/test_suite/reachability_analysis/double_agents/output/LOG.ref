@@ -1308,13 +1308,13 @@ Id=101
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y3{p}[.]) v A(y3{u}[.]) ]
-A() => [ A(x3[.]) v A(x3[x.B]) ]
-A() => [ A(x3{u}[#]) v A(x3{p}[#]) ]
-B() => [ B(y3{u}[.]) v B(y3{p}[.]) v B(y3{q}[.]) ]
-B() => [ B(x3[.]) v B(x3[x.A]) v B(x3[x.C]) ]
-B() => [ B(x3{p}[#]) v B(x3{q}[#]) v B(x3{u}[#]) ]
-C() => [ C(x3[.]) v C(x3[x.B]) ]
+A() => [ A(y{p}[.]) v A(y{u}[.]) ]
+A() => [ A(x[.]) v A(x[x.B]) ]
+A() => [ A(x{u}[#]) v A(x{p}[#]) ]
+B() => [ B(y{u}[.]) v B(y{p}[.]) v B(y{q}[.]) ]
+B() => [ B(x[.]) v B(x[x.A]) v B(x[x.C]) ]
+B() => [ B(x{p}[#]) v B(x{q}[#]) v B(x{u}[#]) ]
+C() => [ C(x[.]) v C(x[x.B]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1451,9 +1451,9 @@ Id=101
 EXTENSIONAL DESCRIPTION:
 B() =>
    [
-	  B(x3{u}[#],y3{u}[.])
-	v B(x3{q}[#],y3{q}[.])
-	v B(x3{p}[#],y3{p}[.])
+	  B(x{u}[#],y{u}[.])
+	v B(x{q}[#],y{q}[.])
+	v B(x{p}[#],y{p}[.])
    ]
 ------------------------------------------------------------
 * Properties in connected agents
@@ -1700,37 +1700,37 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x3[.])
-		v C(x3[x.B])]
+		  C(x[.])
+		v C(x[x.B])]
 B()=> [
-		  B(x3{p}[#])
-		v B(x3{q}[#])
-		v B(x3{u}[#])]
+		  B(x{p}[#])
+		v B(x{q}[#])
+		v B(x{u}[#])]
 B()=> [
-		  B(x3[.])
-		v B(x3[x.A])
-		v B(x3[x.C])]
+		  B(x[.])
+		v B(x[x.A])
+		v B(x[x.C])]
 B()=> [
-		  B(y3{u}[.])
-		v B(y3{p}[.])
-		v B(y3{q}[.])]
+		  B(y{u}[.])
+		v B(y{p}[.])
+		v B(y{q}[.])]
 A()=> [
-		  A(x3{u}[#])
-		v A(x3{p}[#])]
+		  A(x{u}[#])
+		v A(x{p}[#])]
 A()=> [
-		  A(x3[.])
-		v A(x3[x.B])]
+		  A(x[.])
+		v A(x[x.B])]
 A()=> [
-		  A(y3{p}[.])
-		v A(y3{u}[.])]
+		  A(y{p}[.])
+		v A(y{u}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(x3{u}[#],y3{u}[.])
-		v B(x3{q}[#],y3{q}[.])
-		v B(x3{p}[#],y3{p}[.])]
+		  B(x{u}[#],y{u}[.])
+		v B(x{q}[#],y{q}[.])
+		v B(x{p}[#],y{p}[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
