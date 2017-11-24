@@ -174,8 +174,8 @@ val empty_compil : parsing_compil
 
 val no_more_site_on_right : bool -> site list -> site list -> bool
 
-val split_mixture : mixture -> (mixture * mixture * mixture * mixture)
-(** @return [lhs,rhs,add,del] *)
+val split_mixture : mixture -> (mixture * mixture)
+(** @return (lhs,rhs) *)
 
 val implicit_signature : parsing_compil -> parsing_compil
 (** Infer agent signatures and tokens from init, rules and perturbations *)

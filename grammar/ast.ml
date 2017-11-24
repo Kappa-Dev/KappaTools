@@ -921,13 +921,13 @@ let implicit_signature r =
 
 let split_mixture m =
     List.fold_right
-      (fun ag (lhs,rhs,add,del as pack) ->
+      (fun ag (lhs,rhs as pack) ->
          match ag with
          | Absent _ -> pack
-         | Present (na,intf,modif) ->
+         | Present ((_,pos as na),intf,modif) ->
            match modif with
-           | Some Erase -> (lhs,rhs,add,Present (na,intf,None)::del)
-           | Some Create -> (lhs,rhs,Present (na,intf,None)::add,del)
+           | Some Erase -> (Absent pos::lhs,Present (na,intf,None)::rhs)
+           | Some Create -> (Present (na,intf,None)::lhs,Absent pos::rhs)
            | None ->
              let (intfl,intfr) =
                List.fold_left
@@ -952,8 +952,8 @@ let split_mixture m =
                              port_lnk_mod=None}::r)
                     | Counter _ -> (l,r)
                  ) ([],[]) intf in
-             (Present (na,intfl,None)::lhs,Present (na,intfr,None)::rhs,add,del)
-      ) m ([],[],[],[])
+             (Present (na,intfl,None)::lhs,Present (na,intfr,None)::rhs)
+      ) m ([],[])
 
 let compil_to_json c =
   let files =
