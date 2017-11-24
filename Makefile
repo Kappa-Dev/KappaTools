@@ -214,7 +214,7 @@ doc: $(MANGENREP) man/KaSim_manual.pdf
 doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 
 debug:
-	@+$(MAKE) EXTRAFLAGS="-tag debug" KappaLib.cma dev/db_printers.cma KaSim.byte KaDE.byte KaStor.byte WebSim.byte
+	@+$(MAKE) EXTRAFLAGS="-tag debug" KappaLib.cma dev/db_printers.cma KaSim.byte KaDE.byte KaStor.byte KaSa.byte
 
 profiling:
 	@+$(MAKE) EXTRAFLAGS="-pkg landmarks.ppx -pkg landmarks" OCAML_LANDMARKS="auto,allocation" all

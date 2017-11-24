@@ -91,7 +91,7 @@ val has_forbidden_char: t -> string -> bool
 val allocate_fresh_name: t -> string -> string -> string
 val allocate: t -> string -> unit
 
+val string_of_binding_type:
+  ?binding_type_symbol:string -> agent_name:string -> site_name:string -> string
 val print_binding_type:
-  t -> ?binding_type_symbol:string ->
-  agent_name:string ->
-  site_name:string -> unit
+  t -> ?binding_type_symbol:string -> agent_name:string -> site_name:string -> unit

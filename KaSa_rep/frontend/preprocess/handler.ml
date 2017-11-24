@@ -106,7 +106,7 @@ let translate_binding_type parameter error handler agent site =
     Remanent_parameters.get_at_symbol parameter
   in
   error,
-  Binding_type.string_of_binding_type
+  Loggers.string_of_binding_type
     ~binding_type_symbol
     ~agent_name
     ~site_name

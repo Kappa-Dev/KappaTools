@@ -48,7 +48,7 @@ let print_binding_state parameter error binding_state =
     in
     let error = print_site_name parameter error site_name in
     (*let _ =
-      Binding_type.print_binding_type Format.str_formatter
+      Loggers.print_binding_type (Remanent_parameters.get_logger parameter)
         agent_name site_name
     in*)
     error
