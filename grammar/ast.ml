@@ -223,7 +223,7 @@ let empty_compil =
 *)
 
 let print_link pr_port pr_type pr_annot f = function
-  | ANY_FREE -> Format.pp_print_string f "."
+  | ANY_FREE -> Format.pp_print_string f "#"
   | LNK_TYPE (p, a) -> Format.fprintf f "%a.%a" (pr_port a) p pr_type a
   | LNK_ANY -> Format.pp_print_string f "#"
   | LNK_FREE -> Format.pp_print_string f "."
