@@ -7,4 +7,6 @@
 #
 digraph G{
 "0:A()->." [shape="box" fillcolor="#87ceeb" style=filled];
+"1:.,.->A(x[1]),B(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:.,.->A(x[1]),B(x[1])" -> "0:A()->." [label="[0->0]" color="green"];
 }

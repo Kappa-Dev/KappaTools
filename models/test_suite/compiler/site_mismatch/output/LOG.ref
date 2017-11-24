@@ -63,4 +63,4 @@ every agent may occur in the model
 ------------------------------------------------------------
 
 Some exceptions have been raised
-error: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 787, File "crash.ka", line 4, characters 5-69:: missaligned rule: the rule is ignored; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 780, File "crash.ka", line 4, characters 5-69:: missaligned rule: the rule is ignored; exception:Exit

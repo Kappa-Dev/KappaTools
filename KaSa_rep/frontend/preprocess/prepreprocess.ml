@@ -921,9 +921,9 @@ let translate_compil parameters error compil =
          error,(alg,init)::list)
       (error,[])
       compil.Ast.init in
-  let error,perturbations_rev =
+  let error,perturbations_rev,rules_rev =
     List.fold_left
-      (fun (error,list) ((alarm,b,m,o),p) ->
+      (fun (error,list,rules_rev) ((alarm,b,m,o),p) ->
          let error,b' = match b with
            | None -> error,None
            | Some b ->
@@ -934,18 +934,19 @@ let translate_compil parameters error compil =
          let error,o' =
            bool_with_pos_with_option_map (refine_mixture parameters) error o
          in
-         let error,m' =
+         let error,m',rules_rev' =
            List.fold_left
-             (fun (error,list) m ->
+             (fun (error,list,rules_rev) m ->
                 match m with
                 | Ast.APPLY (a,(_,p as r)) ->
                   let error,a' = alg_with_pos_map (refine_mixture parameters) error a in
                   (match translate_rule error r with
-                   | error, None -> error,list
-                   | error, Some m' -> error,Ast.APPLY(a',(m',p))::list)
+                   | error, None -> error,list,rules_rev
+                   | error, Some m' ->
+                     error,Ast.APPLY(a',(m',p))::list,(None,(m',p))::rules_rev)
                 | Ast.UPDATE (x,y) ->
                   let error,y' = alg_with_pos_map (refine_mixture parameters) error y in
-                  error,(Ast.UPDATE (x,y'))::list
+                  error,(Ast.UPDATE (x,y'))::list,rules_rev
                 | Ast.STOP l ->
                   let error,l' =
                     List.fold_left
@@ -955,7 +956,7 @@ let translate_compil parameters error compil =
                       )
                       (error,[]) (List.rev l)
                   in
-                  error,(Ast.STOP l')::list
+                  error,(Ast.STOP l')::list,rules_rev
                 | Ast.SNAPSHOT l ->
                   let error,l' =
                     List.fold_left
@@ -965,16 +966,16 @@ let translate_compil parameters error compil =
                       )
                       (error,[]) (List.rev l)
                   in
-                  error,(Ast.SNAPSHOT l')::list
+                  error,(Ast.SNAPSHOT l')::list,rules_rev
                 | Ast.PRINT _ | Ast.FLUX _ | Ast.FLUXOFF _ | Ast.CFLOWMIX _
                 | Ast.PLOTENTRY | Ast.CFLOWLABEL _ | Ast.SPECIES_OF _ ->
-                  error,list (*to do*))
-             (error,[])
+                  error,list,rules_rev (*to do*))
+             (error,[],rules_rev)
              m
          in
-         error,((alarm,b',List.rev m',o'),p)::list
+         error,((alarm,b',List.rev m',o'),p)::list,rules_rev'
       )
-      (error,[])
+      (error,[],rules_rev)
       compil.Ast.perturbations
   in
   error,{
