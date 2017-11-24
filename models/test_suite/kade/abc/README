@@ -1,6 +1,6 @@
 #Command-line:
-"${KAPPABIN}"KaDE ../../cflows/abc/abc.ka  -d output -l 1 -p 0.1 || exit 0
-"${KAPPABIN}"KaDE ../../cflows/abc/abc.ka  -d output -l 1 -p 0.1 --octave-output oct.m || exit 0
+"${KAPPABIN}"KaDE ../../cflows/abc/abc.ka  -d output -l 1 -p 0.1 -syntax 4 || exit 0
+"${KAPPABIN}"KaDE ../../cflows/abc/abc.ka  -d output -l 1 -p 0.1 -syntax 4 --octave-output oct.m || exit 0
 "${KAPPABIN}"KaDE ../../cflows/abc/abc.ka  -d output -l 1 -p 0.1 -syntax 4 --ode-backend SBML || exit 0
 "${KAPPABIN}"KaDE ../../cflows/abc/abc.ka  -d output -l 1 -p 0.1 -syntax 4 --ode-backend SBML --sbml-output abc.xml || exit 0
 #This is the classical abc model.

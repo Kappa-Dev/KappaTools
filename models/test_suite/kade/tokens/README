@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaDE ../../compiler/tokens/tokens.ka -syntax 3 -d output -l 1 -p 0.1 || exit 0
-"${KAPPABIN}"KaDE ../../compiler/tokens/tokens.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
+"${KAPPABIN}"KaDE ../../compiler/tokens/tokens.ka -syntax 4 -d output -l 1 -p 0.1 || exit 0
+"${KAPPABIN}"KaDE ../../compiler/tokens/tokens.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
 
 #This is the classical abc model.
