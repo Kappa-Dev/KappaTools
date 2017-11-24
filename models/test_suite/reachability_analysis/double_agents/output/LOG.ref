@@ -473,28 +473,28 @@ Influence_map:Wake_up_map:rule(0):'r0' .,.->A(y{u}[.]),A(x{p}[.]) -> rule(4):'r4
 Influence_map:Wake_up_map:rule(1):'r1' .,.->B(x{u}[.]),B(y{p}[.]) -> rule(2):'r2' B(x{u}[.],y{u}[.])->B(x{q}[.],y{q}[.])[0->0]
 Influence_map:Wake_up_map:rule(1):'r1' .,.->B(x{u}[.]),B(y{p}[.]) -> rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->1];[1->1]
 Influence_map:Wake_up_map:rule(1):'r1' .,.->B(x{u}[.]),B(y{p}[.]) -> rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1])[0->1];[1->1]
-Influence_map:Wake_up_map:rule(1):'r1' .,.->B(x{u}[.]),B(y{p}[.]) -> rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,.[0->0];[1->0];[1->1];[1->2]
+Influence_map:Wake_up_map:rule(1):'r1' .,.->B(x{u}[.]),B(y{p}[.]) -> rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,.[0->0];[1->0];[1->1];[1->2]
 Influence_map:Wake_up_map:rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(4):'r4' A(x[_]),A()->A(x[.]),.[0->0]
-Influence_map:Wake_up_map:rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,.[1->1]
+Influence_map:Wake_up_map:rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,.[1->1]
 Influence_map:Wake_up_map:rule(4):'r4' A(x[_]),A()->A(x[.]),. -> rule(2):'r2' B(x{u}[.],y{u}[.])->B(x{q}[.],y{q}[.])[1*->0];[0*->0]
 Influence_map:Wake_up_map:rule(4):'r4' A(x[_]),A()->A(x[.]),. -> rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1])[1*->1];[0*->1];[0->0]
 Influence_map:Wake_up_map:rule(4):'r4' A(x[_]),A()->A(x[.]),. -> rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1])[1*->1];[0*->1]
 Influence_map:Wake_up_map:rule(5):'r5' .->C(x[.]) -> rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1])[0->0]
-Influence_map:Wake_up_map:rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1]) -> rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,.[1->2]
-Influence_map:Wake_up_map:rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,. -> rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1])[1*->0];[0*->0]
-Influence_map:Wake_up_map:rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,. -> rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1])[2*->0];[0*->0]
+Influence_map:Wake_up_map:rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1]) -> rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,.[1->2]
+Influence_map:Wake_up_map:rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,. -> rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1])[1*->0];[0*->0]
+Influence_map:Wake_up_map:rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,. -> rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1])[2*->0];[0*->0]
 Influence_map:Inhibition_map:rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(2):'r2' B(x{u}[.],y{u}[.])->B(x{q}[.],y{q}[.])[1->0]
 Influence_map:Inhibition_map:rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1])[1->1]
 Influence_map:Inhibition_map:rule(4):'r4' A(x[_]),A()->A(x[.]),. -> rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1])[1->0]
 Influence_map:Inhibition_map:rule(4):'r4' A(x[_]),A()->A(x[.]),. -> rule(4):'r4' A(x[_]),A()->A(x[.]),.[1->0]
-Influence_map:Inhibition_map:rule(4):'r4' A(x[_]),A()->A(x[.]),. -> rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,.[1*->1];[0*->1]
+Influence_map:Inhibition_map:rule(4):'r4' A(x[_]),A()->A(x[.]),. -> rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,.[1*->1];[0*->1]
 Influence_map:Inhibition_map:rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1]) -> rule(2):'r2' B(x{u}[.],y{u}[.])->B(x{q}[.],y{q}[.])[1->0]
 Influence_map:Inhibition_map:rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1]) -> rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1])[1->1]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,. -> rule(2):'r2' B(x{u}[.],y{u}[.])->B(x{q}[.],y{q}[.])[0->0]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,. -> rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->1]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,. -> rule(4):'r4' A(x[_]),A()->A(x[.]),.[1*->0];[0*->0]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,. -> rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1])[0->1]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,. -> rule(7):'r7' B(),B(x[A.x]),B(x[C.x])->.,.,.[0->1];[0->2];[1->0];[2->0]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,. -> rule(2):'r2' B(x{u}[.],y{u}[.])->B(x{q}[.],y{q}[.])[0->0]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,. -> rule(3):'r3' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->1]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,. -> rule(4):'r4' A(x[_]),A()->A(x[.]),.[1*->0];[0*->0]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,. -> rule(6):'r6' C(x[.]),B(x[.])->C(x[1]),B(x[1])[0->1]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,. -> rule(7):'r7' B(),B(x[x.A]),B(x[x.C])->.,.,.[0->1];[0->2];[1->0];[2->0]
 Reachability analysis...
 
 	Applying rule r0 (File "double_agents.ka", line 5, characters 5-37:):
@@ -518,7 +518,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] )
+		A( x[][.] )
 
 	Dealing with creation
 
@@ -632,8 +632,8 @@ Id=26
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,y{u} ,x[.] )
-		B( x{p} ,y{p} ,x[.] )
+		B( x{u} ,y{u} ,x[][.] )
+		B( x{p} ,y{p} ,x[][.] )
 
 
 	Applying rule r5 (File "double_agents.ka", line 10, characters 5-21:):
@@ -657,7 +657,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[.] )
+		C( x[][.] )
 
 
 	Applying rule r3 (File "double_agents.ka", line 8, characters 5-43:):
@@ -682,10 +682,10 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[B@x] )
+		A( x[][x.B] )
 
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=36
@@ -752,8 +752,8 @@ Id=36
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,y{u} ,x[A@x] )
-		B( x{p} ,y{p} ,x[A@x] )
+		B( x{u} ,y{u} ,x[][x.A] )
+		B( x{p} ,y{p} ,x[][x.A] )
 
 
 	Applying rule r4 (File "double_agents.ka", line 9, characters 5-33:):
@@ -785,10 +785,10 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[B@x] )
+		C( x[][x.B] )
 
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=53
@@ -855,8 +855,8 @@ Id=53
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,y{u} ,x[C@x] )
-		B( x{p} ,y{p} ,x[C@x] )
+		B( x{u} ,y{u} ,x[][x.C] )
+		B( x{p} ,y{p} ,x[][x.C] )
 
 
 	Applying rule r7 (File "double_agents.ka", line 12, characters 5-41:):
@@ -864,16 +864,16 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r7 (File "double_agents.ka", line 12, characters 5-41:) is applied for the first time
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 	Applying rule r2 (File "double_agents.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
 		rule r2 (File "double_agents.ka", line 7, characters 5-49:) is applied for the first time
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=68
@@ -910,7 +910,7 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{q} ,y{q} ,x[.] )
+		B( x{q} ,y{q} ,x[][.] )
 
 
 	Applying rule r0 (File "double_agents.ka", line 5, characters 5-37:):
@@ -927,7 +927,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[])
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=86
@@ -964,7 +964,7 @@ Id=86
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{q} ,y{q} ,x[A@x] )
+		B( x{q} ,y{q} ,x[][x.A] )
 
 
 	Applying rule r6 (File "double_agents.ka", line 11, characters 5-43:):
@@ -972,7 +972,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x[])
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=98
@@ -1009,7 +1009,7 @@ Id=98
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{q} ,y{q} ,x[C@x] )
+		B( x{q} ,y{q} ,x[][x.C] )
 
 
 	Applying rule r4 (File "double_agents.ka", line 9, characters 5-33:):
@@ -1020,14 +1020,14 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r7 (File "double_agents.ka", line 12, characters 5-41:):
 		the precondition is satisfied
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 	Applying rule r2 (File "double_agents.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 	Applying rule r5 (File "double_agents.ka", line 10, characters 5-21:):
 		the precondition is satisfied
@@ -1040,7 +1040,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[])
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 
 	Applying rule r0 (File "double_agents.ka", line 5, characters 5-37:):
 		the precondition is satisfied
@@ -1050,7 +1050,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x[])
 
-		Updating the views for B(x{},y{},x[])
+		Updating the views for B(x,y,x[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1308,13 +1308,13 @@ Id=101
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{p}[.]) v A(y{u}[.]) ]
-A() => [ A(x[.]) v A(x[B.x]) ]
-A() => [ A(x{u}[#]) v A(x{p}[#]) ]
-B() => [ B(y{u}[.]) v B(y{p}[.]) v B(y{q}[.]) ]
-B() => [ B(x[.]) v B(x[A.x]) v B(x[C.x]) ]
-B() => [ B(x{p}[#]) v B(x{q}[#]) v B(x{u}[#]) ]
-C() => [ C(x[.]) v C(x[B.x]) ]
+A() => [ A(y3{p}[.]) v A(y3{u}[.]) ]
+A() => [ A(x3[.]) v A(x3[x.B]) ]
+A() => [ A(x3{u}[#]) v A(x3{p}[#]) ]
+B() => [ B(y3{u}[.]) v B(y3{p}[.]) v B(y3{q}[.]) ]
+B() => [ B(x3[.]) v B(x3[x.A]) v B(x3[x.C]) ]
+B() => [ B(x3{p}[#]) v B(x3{q}[#]) v B(x3{u}[#]) ]
+C() => [ C(x3[.]) v C(x3[x.B]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1451,9 +1451,9 @@ Id=101
 EXTENSIONAL DESCRIPTION:
 B() =>
    [
-	  B(x{u}[#],y{u}[.])
-	v B(x{q}[#],y{q}[.])
-	v B(x{p}[#],y{p}[.])
+	  B(x3{u}[#],y3{u}[.])
+	v B(x3{q}[#],y3{q}[.])
+	v B(x3{p}[#],y3{p}[.])
    ]
 ------------------------------------------------------------
 * Properties in connected agents
@@ -1700,37 +1700,37 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x[.])
-		v C(x[B.x])]
+		  C(x3[.])
+		v C(x3[x.B])]
 B()=> [
-		  B(x{p}[#])
-		v B(x{q}[#])
-		v B(x{u}[#])]
+		  B(x3{p}[#])
+		v B(x3{q}[#])
+		v B(x3{u}[#])]
 B()=> [
-		  B(x[.])
-		v B(x[A.x])
-		v B(x[C.x])]
+		  B(x3[.])
+		v B(x3[x.A])
+		v B(x3[x.C])]
 B()=> [
-		  B(y{u}[.])
-		v B(y{p}[.])
-		v B(y{q}[.])]
+		  B(y3{u}[.])
+		v B(y3{p}[.])
+		v B(y3{q}[.])]
 A()=> [
-		  A(x{u}[#])
-		v A(x{p}[#])]
+		  A(x3{u}[#])
+		v A(x3{p}[#])]
 A()=> [
-		  A(x[.])
-		v A(x[B.x])]
+		  A(x3[.])
+		v A(x3[x.B])]
 A()=> [
-		  A(y{p}[.])
-		v A(y{u}[.])]
+		  A(y3{p}[.])
+		v A(y3{u}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(x{u}[#],y{u}[.])
-		v B(x{q}[#],y{q}[.])
-		v B(x{p}[#],y{p}[.])]
+		  B(x3{u}[#],y3{u}[.])
+		v B(x3{q}[#],y3{q}[.])
+		v B(x3{p}[#],y3{p}[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

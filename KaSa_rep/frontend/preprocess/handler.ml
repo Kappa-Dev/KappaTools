@@ -111,7 +111,6 @@ let translate_binding_type parameter error handler agent site =
     ~agent_name
     ~site_name
 
-
 let dual
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
     ?message:(message="")
@@ -242,17 +241,15 @@ let has_no_label parameters error compiled rule_id =
       rule_id
       rules
   in
-  match rule
-  with
+  match rule with
   | None ->
-    Exception.warn
-      parameters error __POS__ Exit
-      true
+    Exception.warn parameters error __POS__ Exit true
   | Some rule ->
     error,
-    match rule.Cckappa_sig.e_rule_label
-    with None -> true
-       | Some _ -> false
+    match rule.Cckappa_sig.e_rule_label with
+      None -> true
+    | Some _ -> false
+
 
 let info_of_rule
     parameters ?(with_rates=false) ?(original=false) error compiled (rule_id: Ckappa_sig.c_rule_id) =
@@ -264,8 +261,7 @@ let info_of_rule
       rule_id
       rules
   in
-  match rule
-  with
+  match rule with
   | None ->
     Exception.warn
       parameters error __POS__ Exit
@@ -318,8 +314,7 @@ let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id
       var_id
       vars
   in
-  match var
-  with
+  match var with
   | None  -> Exception.warn parameters error __POS__ Exit
                (("VAR " ^ (Ckappa_sig.string_of_rule_id var_id)),Locality.dummy,Public_data.Variable,"",var_id)
   | Some var  ->
@@ -350,8 +345,7 @@ let string_of_info ?with_rule:(with_rule=true)
     if not with_rule then "" else kind
   in
   let s =
-    match label, pos, ast, id
-    with
+    match label, pos, ast, id with
     | "","","",s
     | "","",s,_
     | "",s,"",_
@@ -453,25 +447,14 @@ let string_of_agent parameter error handler_kappa (agent_type:Ckappa_sig.c_agent
   | Some (agent_name, _, _) -> error, agent_name
 
 (*mapping site of type int to string*)
-(*let print_site_compact site = (*CHECK*)
-  match site with
-  | Ckappa_sig.Internal a -> a ^ "~"
-  | Ckappa_sig.Binding a -> a ^ "!"*)
-
-let print_site_compact parameters site = (*CHECK*)
+let print_site_compact parameter site =
   match site with
   | Ckappa_sig.Internal a ->
-    begin
-      match Remanent_parameters.get_syntax_version parameters with
-      | Ast.V4 -> a ^ (*"{"*) (Remanent_parameters.get_open_internal_state parameters)
-      | Ast.V3 -> a ^ (*"~"*) (Remanent_parameters.get_internal_state_symbol parameters)
-    end
+    a ^ (Remanent_parameters.get_internal_state_symbol parameter)
   | Ckappa_sig.Binding a ->
-    begin
-    match Remanent_parameters.get_syntax_version parameters with
-      | Ast.V4 -> a ^ (*"["*) (Remanent_parameters.get_open_binding_state parameters)
-      | Ast.V3 -> a ^ (*"!"*) (Remanent_parameters.get_bound_symbol parameters)
-    end
+    a ^ (Remanent_parameters.get_open_binding_state parameter) ^
+    (Remanent_parameters.get_bound_symbol parameter) ^
+    (Remanent_parameters.get_close_binding_state parameter)
 
 let string_of_site_aux
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
@@ -516,26 +499,7 @@ let string_of_site_update_views parameter error handler_kappa agent_type site_in
   let error, site_type =
     string_of_site_aux parameter error handler_kappa agent_type site_int
   in
-  match site_type with
-  | Ckappa_sig.Internal a ->
-    begin
-      match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 ->
-        error, (print_site_compact parameter site_type)
-               ^ (*"}"*)
-               (Remanent_parameters.get_close_internal_state parameter)
-      | Ast.V3 -> error, print_site_compact parameter site_type
-    end
-  | Ckappa_sig.Binding a ->
-    begin
-      match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 ->
-        error,
-        (print_site_compact parameter site_type)
-        ^
-        (*"]"*) (Remanent_parameters.get_close_binding_state parameter)
-      | Ast.V3 -> error, print_site_compact parameter site_type
-    end
+  error, print_site_compact parameter site_type
 
 let string_of_site_in_natural_language parameter error handler_kapp
     agent_type (site_int: Ckappa_sig.c_site_name) =
@@ -581,83 +545,40 @@ let string_of_site_contact_map
 
 (*mapping state of type int to string*)
 
-let print_state parameter error _handler_kappa state =
+let print_state parameter error handler state =
   match state with
   | Ckappa_sig.Internal a -> error, a
   | Ckappa_sig.Binding Ckappa_sig.C_Free ->
-    begin
-      match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 ->
-        error,
-        (*(Remanent_parameters.get_open_binding_state parameter) ^*)
-        (Remanent_parameters.get_free_symbol parameter) ^
-        (Remanent_parameters.get_close_binding_state parameter)
-          (*".]"*)
-      | Ast.V3 ->
-        error, "free" (*TODO*)
-    end
+    error,
+    (Remanent_parameters.get_open_binding_state parameter) ^
+    (Remanent_parameters.get_free_symbol parameter) ^
+    (Remanent_parameters.get_close_binding_state parameter)
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
-    begin
-      match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 ->
-        error, (Ckappa_sig.string_of_agent_name a)
-               ^
-               (Remanent_parameters.get_at_symbol parameter)
-                 (*"@" *)
-               ^
-               (Ckappa_sig.string_of_site_name b) ^
-               (*"]"*)
-               (Remanent_parameters.get_close_binding_state parameter)
-      | Ast.V3 ->
-        error, (Ckappa_sig.string_of_agent_name a)
-               ^
-               (*"@"*)
-               (Remanent_parameters.get_at_symbol parameter)
-               ^
-               (Ckappa_sig.string_of_site_name b)
-    end
+    let error, s = translate_binding_type parameter error handler a b in
+    error,
+    (Remanent_parameters.get_open_binding_state parameter) ^
+    s ^
+    (Remanent_parameters.get_close_binding_state parameter)
 
 let print_state_fully_deciphered parameter error handler_kappa state =
   match state with
   | Ckappa_sig.Internal a ->
-    begin
-      match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 -> error, a ^ (*"}"*) (Remanent_parameters.get_close_internal_state parameter)
-      | Ast.V3 -> error, a
-    end
+    error,
+    (Remanent_parameters.get_open_internal_state parameter) ^
+    a ^ (Remanent_parameters.get_close_internal_state parameter)
   | Ckappa_sig.Binding Ckappa_sig.C_Free ->
-    begin
-      match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 -> error,
-                  (Remanent_parameters.get_free_symbol parameter)^
-                  (Remanent_parameters.get_close_binding_state parameter)
-                  (*".]"*)
-      | Ast.V3 -> error, "free" (*TODO*)
-    end
+    error,
+    (Remanent_parameters.get_open_binding_state parameter) ^
+    (Remanent_parameters.get_free_symbol parameter) ^
+    (Remanent_parameters.get_close_binding_state parameter)
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (agent_name, b) ->
-    let error, ag =
-      string_of_agent parameter error handler_kappa agent_name in
-    let error, site =
-      string_of_site_contact_map
-        parameter error handler_kappa agent_name b
+    let error, s = translate_binding_type parameter error
+        handler_kappa agent_name b
     in
-    match Remanent_parameters.get_syntax_version parameter with
-    | Ast.V4 -> error, ag
-                       ^
-                       (Remanent_parameters.get_at_symbol parameter)
-                       (*"@"*)
-                       ^
-                       site
-                       ^
-                       (Remanent_parameters.get_close_binding_state parameter)
-                         (*"]"*)
-    | Ast.V3 ->
-      error, ag
-             ^
-             (*"@" *)
-             (Remanent_parameters.get_at_symbol parameter)
-             ^
-             site
+    error,
+    (Remanent_parameters.get_open_binding_state parameter) ^
+    s ^
+    (Remanent_parameters.get_close_binding_state parameter)
 
 let string_of_state_gen print_state parameter error handler_kappa agent_name site_name state =
   let error, state_dic =

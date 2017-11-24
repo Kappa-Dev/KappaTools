@@ -280,15 +280,15 @@ Influence_map:Wake_up_map:rule(1):'r2' A(x[.]),A(x[.])->A(x[1]),A(x[1]) -> rule(
 Influence_map:Wake_up_map:rule(2):'r3' A(x[1]),A(x[1])->A(x[.]),A(x[.]) -> rule(1):'r2' A(x[.]),A(x[.])->A(x[1]),A(x[1])[0->0];[0->1];[1->0];[1->1]
 Influence_map:Wake_up_map:rule(2):'r3' A(x[1]),A(x[1])->A(x[.]),A(x[.]) -> rule(3):'r4' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->0];[1->0]
 Influence_map:Wake_up_map:rule(3):'r4' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(0):'r1' A(x{u}[_])->A(x{p}[_])[0->0]
-Influence_map:Wake_up_map:rule(3):'r4' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(4):'r5' A(x[B.x])->A(x[.])[0->0]
-Influence_map:Wake_up_map:rule(4):'r5' A(x[B.x])->A(x[.]) -> rule(1):'r2' A(x[.]),A(x[.])->A(x[1]),A(x[1])[0->0];[0->1]
-Influence_map:Wake_up_map:rule(4):'r5' A(x[B.x])->A(x[.]) -> rule(3):'r4' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0*->1];[0->0]
+Influence_map:Wake_up_map:rule(3):'r4' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(4):'r5' A(x[x.B])->A(x[.])[0->0]
+Influence_map:Wake_up_map:rule(4):'r5' A(x[x.B])->A(x[.]) -> rule(1):'r2' A(x[.]),A(x[.])->A(x[1]),A(x[1])[0->0];[0->1]
+Influence_map:Wake_up_map:rule(4):'r5' A(x[x.B])->A(x[.]) -> rule(3):'r4' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0*->1];[0->0]
 Influence_map:Inhibition_map:rule(1):'r2' A(x[.]),A(x[.])->A(x[1]),A(x[1]) -> rule(1):'r2' A(x[.]),A(x[.])->A(x[1]),A(x[1])[0->1];[1->0]
 Influence_map:Inhibition_map:rule(1):'r2' A(x[.]),A(x[.])->A(x[1]),A(x[1]) -> rule(3):'r4' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->0];[1->0]
 Influence_map:Inhibition_map:rule(2):'r3' A(x[1]),A(x[1])->A(x[.]),A(x[.]) -> rule(0):'r1' A(x{u}[_])->A(x{p}[_])[0->0];[1->0]
 Influence_map:Inhibition_map:rule(2):'r3' A(x[1]),A(x[1])->A(x[.]),A(x[.]) -> rule(2):'r3' A(x[1]),A(x[1])->A(x[.]),A(x[.])[0->1];[1->0]
 Influence_map:Inhibition_map:rule(3):'r4' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(1):'r2' A(x[.]),A(x[.])->A(x[1]),A(x[1])[0->0];[0->1]
-Influence_map:Inhibition_map:rule(4):'r5' A(x[B.x])->A(x[.]) -> rule(0):'r1' A(x{u}[_])->A(x{p}[_])[0->0]
+Influence_map:Inhibition_map:rule(4):'r5' A(x[x.B])->A(x[.]) -> rule(0):'r1' A(x{u}[_])->A(x{p}[_])[0->0]
 Reachability analysis...
 
 ------------------------------------------------------------

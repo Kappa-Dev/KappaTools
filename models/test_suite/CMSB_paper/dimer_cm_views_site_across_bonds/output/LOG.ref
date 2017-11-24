@@ -16,36 +16,36 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-E() => [ E(x) v E(x!R.x) ]
-R() => [ R(c) v R(c!R.c) ]
-R() => [ R(n) v R(n!R.cr) ]
-R() => [ R(cr) v R(cr!R.n) ]
-R() => [ R(x) v R(x!E.x) ]
+E() => [ E(x3) v E(x3!x.R) ]
+R() => [ R(c3) v R(c3!c.R) ]
+R() => [ R(n3) v R(n3!cr.R) ]
+R() => [ R(cr3) v R(cr3!n.R) ]
+R() => [ R(x3) v R(x3!x.E) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 R() =>
    [
-	  R(c,cr,n,x!E.x)
-	v R(c!R.c,cr!R.n,n,x!E.x)
-	v R(c!R.c,cr,n,x!E.x)
-	v R(c!R.c,cr,n!R.cr,x!E.x)
-	v R(c,cr,n,x)
+	  R(c3,cr3,n3,x3!x.E)
+	v R(c3!c.R,cr3!n.R,n3,x3!x.E)
+	v R(c3!c.R,cr3,n3,x3!x.E)
+	v R(c3!c.R,cr3,n3!cr.R,x3!x.E)
+	v R(c3,cr3,n3,x3)
    ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-R(c!1),R(c!1) => 
+R(c3!1),R(c3!1) => 
 	[
-		  R(c!1,cr!R.n),R(c!1,cr)
-		v R(c!1,cr),R(c!1,cr)
-		v R(c!1,cr),R(c!1,cr!R.n)
+		  R(c3!1,cr3!n.R),R(c3!1,cr3)
+		v R(c3!1,cr3),R(c3!1,cr3)
+		v R(c3!1,cr3),R(c3!1,cr3!n.R)
 	]
-R(c!1),R(c!1) => 
+R(c3!1),R(c3!1) => 
 	[
-		  R(c!1,n!R.cr),R(c!1,n)
-		v R(c!1,n),R(c!1,n)
-		v R(c!1,n),R(c!1,n!R.cr)
+		  R(c3!1,n3!cr.R),R(c3!1,n3)
+		v R(c3!1,n3),R(c3!1,n3)
+		v R(c3!1,n3),R(c3!1,n3!cr.R)
 	]
 execution finished without any exception

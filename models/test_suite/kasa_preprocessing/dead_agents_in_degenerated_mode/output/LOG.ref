@@ -462,7 +462,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,x[.] )
+		A( x{u} ,x[][.] )
 
 	Views in initial state:
 
@@ -498,7 +498,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 12, characters 0-31:) is applied for the first time
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -525,7 +525,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,x[.] )
+		A( x{p} ,x[][.] )
 
 
 	Applying rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-31:):
@@ -533,21 +533,21 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-31:) is applied for the first time
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x,x[])
 
 	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
 		rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x,x[])
 
 	Applying rule B(x{u}[.]) -> B(x{p}[.]) (File "dead_agents.ka", line 11, characters 0-31:):
 		the precondition is satisfied
 
 		rule B(x{u}[.]) -> B(x{p}[.]) (File "dead_agents.ka", line 11, characters 0-31:) is applied for the first time
 
-		Updating the views for B(x{})
+		Updating the views for B(x)
 
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -572,7 +572,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule B(x{p}[.]) -> B(x{u}[.]) (File "dead_agents.ka", line 11, characters 0-31:) is applied for the first time
 
-		Updating the views for B(x{})
+		Updating the views for B(x)
 
 	Applying rule A(x{u}[_]) -> A(x{p}[.]) (File "dead_agents.ka", line 14, characters 0-28:):
 		the precondition is not satisfied yet
@@ -589,7 +589,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 12, characters 0-31:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x,x[])
 
 	Applying rule D(x[.]), . -> ., A(x{u}[.]) (File "dead_agents.ka", line 17, characters 0-29:):
 		the precondition is not satisfied yet
@@ -597,17 +597,17 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule B(x{u}[.]) -> B(x{p}[.]) (File "dead_agents.ka", line 11, characters 0-31:):
 		the precondition is satisfied
 
-		Updating the views for B(x{})
+		Updating the views for B(x)
 
 	Applying rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-31:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x,x[])
 
 	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x,x[])
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -744,9 +744,9 @@ Id=26
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => A(x[.])
-A() => [ A(x{u}[#]) v A(x{p}[#]) ]
-B() => [ B(x{u}[.]) v B(x{p}[.]) ]
+A() => A(x3[.])
+A() => [ A(x3{u}[#]) v A(x3{p}[#]) ]
+B() => [ B(x3{u}[.]) v B(x3{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -926,12 +926,12 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(x{u}[.])
-		v B(x{p}[.])]
+		  B(x3{u}[.])
+		v B(x3{p}[.])]
 A()=> [
-		  A(x{u}[#])
-		v A(x{p}[#])]
-A()=> [A(x[.])]
+		  A(x3{u}[#])
+		v A(x3{p}[#])]
+A()=> [A(x3[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

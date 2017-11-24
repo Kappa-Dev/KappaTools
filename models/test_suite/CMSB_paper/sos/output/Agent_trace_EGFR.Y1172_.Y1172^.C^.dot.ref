@@ -1,11 +1,11 @@
 digraph G{
 "Init_70" [label="" style="invis" width="0px" height="0px"];
-"Node_78" [label="EGFR(Y1172~u,Y1172!free,C!EGFR@N)"];
-"Node_77" [label="EGFR(Y1172~p,Y1172!Shc@PTB,C!free)"];
-"Node_75" [label="EGFR(Y1172~p,Y1172!free,C!free)"];
-"Node_74" [label="EGFR(Y1172~p,Y1172!Shc@PTB,C!EGFR@N)"];
-"Node_72" [label="EGFR(Y1172~p,Y1172!free,C!EGFR@N)"];
-"Node_70" [label="EGFR(Y1172~u,Y1172!free,C!free)"];
+"Node_78" [label="EGFR(Y1172~u,Y1172!,C!N.EGFR)"];
+"Node_77" [label="EGFR(Y1172~p,Y1172!PTB.Shc,C!)"];
+"Node_75" [label="EGFR(Y1172~p,Y1172!,C!)"];
+"Node_74" [label="EGFR(Y1172~p,Y1172!PTB.Shc,C!N.EGFR)"];
+"Node_72" [label="EGFR(Y1172~p,Y1172!,C!N.EGFR)"];
+"Node_70" [label="EGFR(Y1172~u,Y1172!,C!)"];
 "Node_75" -> "Node_70" [label="uY1172@R"];
 "Node_72" -> "Node_78" [label="uY1172@R"];
 "Node_78" -> "Node_72" [label="pY1172@R"];

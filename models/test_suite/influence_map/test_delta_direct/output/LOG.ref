@@ -450,40 +450,40 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . -> A(x{u}[.]), ., ., C(x{u}[.]) (File "test_delta.ka", line 1, characters 0-70:) is applied for the first time
 
-		Updating the views for A(x{})
+		Updating the views for A(x)
 
-		Updating the views for B(x{})
+		Updating the views for B(x)
 
-		Updating the views for B(x{})
+		Updating the views for B(x)
 
 	Applying rule A(x{u}[.]), ., ., C(x{u}[.]) -> A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . (File "test_delta.ka", line 1, characters 0-70:):
 		the precondition is satisfied
 
 		rule A(x{u}[.]), ., ., C(x{u}[.]) -> A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . (File "test_delta.ka", line 1, characters 0-70:) is applied for the first time
 
-		Updating the views for A(x{})
+		Updating the views for A(x)
 
-		Updating the views for C(x{})
+		Updating the views for C(x)
 
 	Applying rule A(x{u}[.]), C(x{p}[.]), ., . -> A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) (File "test_delta.ka", line 2, characters 0-70:):
 		the precondition is satisfied
 
 		rule A(x{u}[.]), C(x{p}[.]), ., . -> A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) (File "test_delta.ka", line 2, characters 0-70:) is applied for the first time
 
-		Updating the views for A(x{})
+		Updating the views for A(x)
 
-		Updating the views for C(x{})
+		Updating the views for C(x)
 
 	Applying rule A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) -> A(x{u}[.]), C(x{p}[.]), ., . (File "test_delta.ka", line 2, characters 0-70:):
 		the precondition is satisfied
 
 		rule A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) -> A(x{u}[.]), C(x{p}[.]), ., . (File "test_delta.ka", line 2, characters 0-70:) is applied for the first time
 
-		Updating the views for A(x{})
+		Updating the views for A(x)
 
-		Updating the views for B(x{})
+		Updating the views for B(x)
 
-		Updating the views for B(x{})
+		Updating the views for B(x)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -583,9 +583,9 @@ Id=8
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(x{u}[.]) v A(x{p}[.]) ]
-B() => [ B(x{u}[.]) v B(x{p}[.]) ]
-C() => [ C(x{u}[.]) v C(x{p}[.]) ]
+A() => [ A(x3{u}[.]) v A(x3{p}[.]) ]
+B() => [ B(x3{u}[.]) v B(x3{p}[.]) ]
+C() => [ C(x3{u}[.]) v C(x3{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -735,14 +735,14 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x{u}[.])
-		v C(x{p}[.])]
+		  C(x3{u}[.])
+		v C(x3{p}[.])]
 B()=> [
-		  B(x{u}[.])
-		v B(x{p}[.])]
+		  B(x3{u}[.])
+		v B(x3{p}[.])]
 A()=> [
-		  A(x{u}[.])
-		v A(x{p}[.])]
+		  A(x3{u}[.])
+		v A(x3{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

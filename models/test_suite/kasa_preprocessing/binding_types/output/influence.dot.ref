@@ -9,14 +9,14 @@ digraph G{
 "r0" [shape="box" fillcolor="#87ceeb" style=filled];
 "r0_op" [shape="box" fillcolor="#87ceeb" style=filled];
 "r1" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x])" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A])" [shape="box" fillcolor="#87ceeb" style=filled];
 "r0" -> "r0_op" [label="[0->0];[1->1]" color="green"];
 "r0_op" -> "r0" [label="[0->0];[1->1]" color="green"];
 "r0_op" -> "r1" [label="[0->0]" color="green"];
-"r0_op" -> "3:B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x])" [label="[1->0]" color="green"];
-"r1" -> "3:B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x])" [label="[1->1]" color="green"];
+"r0_op" -> "3:B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A])" [label="[1->0]" color="green"];
+"r1" -> "3:B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A])" [label="[1->1]" color="green"];
 "r0" -> "r1" [label="[0->0]" color="red" arrowhead="tee"];
-"r0" -> "3:B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x])" [label="[1->0]" color="red" arrowhead="tee"];
+"r0" -> "3:B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A])" [label="[1->0]" color="red" arrowhead="tee"];
 "r1" -> "r0" [label="[0->0]" color="red" arrowhead="tee"];
-"3:B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x])" -> "r0" [label="[0->1]" color="red" arrowhead="tee"];
+"3:B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A])" -> "r0" [label="[0->1]" color="red" arrowhead="tee"];
 }

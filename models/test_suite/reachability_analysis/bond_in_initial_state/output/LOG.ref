@@ -15,7 +15,7 @@ Reachability analysis...
 
 	Views in initial state:
 
-		A( x[B@x] )
+		A( x[][x.B] )
 
 	Views in initial state:
 
@@ -23,11 +23,11 @@ Reachability analysis...
 
 	Views in initial state:
 
-		B( x[A@x] ,x{u} )
+		B( x[][x.A] ,x{u} )
 
 
-		A(x{u}[1]),B(x{u}[1])
-		B(x{u}[1]),A(x{u}[1])			(rule B(x{u}[.]), B(x{u}[_]) -> B(x{u}[.]), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-50:)) should be investigated
+		A(x3{u}[1]),B(x3{u}[1])
+		B(x3{u}[1]),A(x3{u}[1])			(rule B(x{u}[.]), B(x{u}[_]) -> B(x{u}[.]), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-50:)) should be investigated
 			(rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:)) should be investigated
 
 	Applying rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:):
@@ -49,7 +49,7 @@ Reachability analysis...
 		Updating the views for A(x[])
 	Dealing with side effects
 
-		B( x[.] ,x{u} )
+		B( x[][.] ,x{u} )
 
 			(rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:)) should be investigated
 			(rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:)) should be investigated
@@ -72,16 +72,16 @@ Reachability analysis...
 
 		rule B(x{u}[.]), B(x{u}[_]) -> B(x{u}[.]), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-50:) is applied for the first time
 
-		Updating the views for B(x[],x{})
+		Updating the views for B(x[],x)
 
-		Updating the views for B(x[],x{})
+		Updating the views for B(x[],x)
 
-		B( x[A@x] ,x{p} )
+		B( x[][x.A] ,x{p} )
 
 		Update information about potential sites across domain
 
-		B(x{p}[1]),A(x{u}[1])
-		A(x{u}[1]),B(x{p}[1])
+		B(x3{p}[1]),A(x3{u}[1])
+		A(x3{u}[1]),B(x3{p}[1])
 
 			(rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:)) should be investigated
 			(rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:)) should be investigated
@@ -97,7 +97,7 @@ Reachability analysis...
 		Updating the views for A(x[])
 	Dealing with side effects
 
-		B( x[.] ,x{p} )
+		B( x[][.] ,x{p} )
 
 			(rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:)) should be investigated
 			(rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:)) should be investigated
@@ -107,14 +107,14 @@ Reachability analysis...
 
 		rule ., B(x{p}[.]) -> B(x{p}[.]), B(x{p}[.]) (File "initial_state.ka", line 5, characters 0-42:) is applied for the first time
 
-		Updating the views for B(x[],x{})
+		Updating the views for B(x[],x)
 
 	Applying rule B(x{u}[.]), B(x{u}[_]) -> B(x{u}[.]), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-50:):
 		the precondition is satisfied
 
-		Updating the views for B(x[],x{})
+		Updating the views for B(x[],x)
 
-		Updating the views for B(x[],x{})
+		Updating the views for B(x[],x)
 
 	Applying rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:):
 		the precondition is satisfied
@@ -131,10 +131,10 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => A(x[B.x])
-A() => A(x{u}[#])
-B() => [ B(x{u}[#]) v B(x{p}[#]) ]
-B() => [ B(x[.]) v B(x[A.x]) ]
+A() => A(x3[x.B])
+A() => A(x3{u}[#])
+B() => [ B(x3{u}[#]) v B(x3{p}[#]) ]
+B() => [ B(x3[.]) v B(x3[x.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:

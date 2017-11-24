@@ -254,7 +254,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) (File "creation.ka", line 2, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -289,7 +289,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{p}[.]) (File "creation.ka", line 3, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 INTENSIONAL DESCRIPTION:
 Id=16
@@ -330,7 +330,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.]), . -> ., D(x{u}[.]) (File "creation.ka", line 4, characters 0-40:) is applied for the first time
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -354,19 +354,19 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) (File "creation.ka", line 2, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{p}[.]) (File "creation.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule D(x{u}[.]) -> D(x{p}[.]) (File "creation.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
 		rule D(x{u}[.]) -> D(x{p}[.]) (File "creation.ka", line 5, characters 0-28:) is applied for the first time
 
-		Updating the views for D(x{})
+		Updating the views for D(x)
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -389,7 +389,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule A(x{p}[.] y{u}[.]), . -> ., D(x{u}[.]) (File "creation.ka", line 4, characters 0-40:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule . -> A(x{u}[.] y{u}[.]) (File "creation.ka", line 1, characters 0-27:):
 		the precondition is satisfied
@@ -397,17 +397,17 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule D(x{u}[.]) -> D(x{p}[.]) (File "creation.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for D(x{})
+		Updating the views for D(x)
 
 	Applying rule A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) (File "creation.ka", line 2, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{p}[.]) (File "creation.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -518,9 +518,9 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{u}[.]) v A(y{p}[.]) ]
-A() => [ A(x{u}[.]) v A(x{p}[.]) ]
-D() => [ D(x{u}[.]) v D(x{p}[.]) ]
+A() => [ A(y3{u}[.]) v A(y3{p}[.]) ]
+A() => [ A(x3{u}[.]) v A(x3{p}[.]) ]
+D() => [ D(x3{u}[.]) v D(x3{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -580,7 +580,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x{p}[.]) => A(x{p}[.],y{u}[.])
+A(x3{p}[.]) => A(x3{p}[.],y3{u}[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -691,19 +691,19 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 D()=> [
-		  D(x{u}[.])
-		v D(x{p}[.])]
+		  D(x3{u}[.])
+		v D(x3{p}[.])]
 A()=> [
-		  A(x{u}[.])
-		v A(x{p}[.])]
+		  A(x3{u}[.])
+		v A(x3{p}[.])]
 A()=> [
-		  A(y{u}[.])
-		v A(y{p}[.])]
+		  A(y3{u}[.])
+		v A(y3{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(x{p}[.])=> [A(x{p}[.],y{u}[.])]
+A(x3{p}[.])=> [A(x3{p}[.],y3{u}[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

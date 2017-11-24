@@ -171,7 +171,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] )
+		A( z[][.] )
 
 	Views in initial state:
 
@@ -266,7 +266,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[A@z] )
+		A( z[][z.A] )
 
 
 	Applying rule A(z[.]), A(z[.]) -> A(z[1]), A(z[1]) (File "sym_init2.ka", line 8, characters 0-38:):
@@ -376,9 +376,9 @@ Id=32
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{p}[.]) v A(y{u}[.]) ]
-A() => [ A(z[.]) v A(z[A.z]) ]
-A() => [ A(x{u}[.]) v A(x{p}[.]) ]
+A() => [ A(y3{p}[.]) v A(y3{u}[.]) ]
+A() => [ A(z3[.]) v A(z3[z.A]) ]
+A() => [ A(x3{u}[.]) v A(x3{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -431,17 +431,17 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(z[1]),A(z[1]) => 
+A(z3[1]),A(z3[1]) => 
 	[
-		  A(x{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{u}[.],z[1])
+		  A(x3{p}[.],z3[1]),A(y3{p}[.],z3[1])
+		v A(x3{u}[.],z3[1]),A(y3{p}[.],z3[1])
+		v A(x3{u}[.],z3[1]),A(y3{u}[.],z3[1])
 	]
-A(z[1]),A(z[1]) => 
+A(z3[1]),A(z3[1]) => 
 	[
-		  A(y{u}[.],z[1]),A(y{p}[.],z[1])
-		v A(y{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(y{p}[.],z[1]),A(y{u}[.],z[1])
+		  A(y3{u}[.],z3[1]),A(y3{p}[.],z3[1])
+		v A(y3{p}[.],z3[1]),A(y3{p}[.],z3[1])
+		v A(y3{p}[.],z3[1]),A(y3{u}[.],z3[1])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -540,14 +540,14 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(x{u}[.])
-		v A(x{p}[.])]
+		  A(x3{u}[.])
+		v A(x3{p}[.])]
 A()=> [
-		  A(z[.])
-		v A(z[A.z])]
+		  A(z3[.])
+		v A(z3[z.A])]
 A()=> [
-		  A(y{p}[.])
-		v A(y{u}[.])]
+		  A(y3{p}[.])
+		v A(y3{u}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -556,14 +556,14 @@ A()=> [
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z[1]),A(z[1])=> [
-		  A(x{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{u}[.],z[1])]
-A(z[1]),A(z[1])=> [
-		  A(y{u}[.],z[1]),A(y{p}[.],z[1])
-		v A(y{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(y{p}[.],z[1]),A(y{u}[.],z[1])]
+A(z3[1]),A(z3[1])=> [
+		  A(x3{p}[.],z3[1]),A(y3{p}[.],z3[1])
+		v A(x3{u}[.],z3[1]),A(y3{p}[.],z3[1])
+		v A(x3{u}[.],z3[1]),A(y3{u}[.],z3[1])]
+A(z3[1]),A(z3[1])=> [
+		  A(y3{u}[.],z3[1]),A(y3{p}[.],z3[1])
+		v A(y3{p}[.],z3[1]),A(y3{p}[.],z3[1])
+		v A(y3{p}[.],z3[1]),A(y3{u}[.],z3[1])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

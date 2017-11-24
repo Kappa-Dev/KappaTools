@@ -408,7 +408,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t{u} )
+		A( z[][.] ,t{u} )
 
 	Views in initial state:
 
@@ -447,7 +447,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{u} ,z[.] ,t{u} )
+		B( z{u} ,z[][.] ,t{u} )
 
 	Views in initial state:
 
@@ -476,7 +476,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[B@z] ,t{u} )
+		A( z[][z.B] ,t{u} )
 
 	Views in initial state:
 
@@ -515,7 +515,7 @@ Id=32
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{p} ,z[A@z] ,t{u} )
+		B( z{p} ,z[][z.A] ,t{u} )
 
 	Views in initial state:
 
@@ -544,7 +544,7 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[B@z] ,t{p} )
+		A( z[][z.B] ,t{p} )
 
 	Views in initial state:
 
@@ -583,7 +583,7 @@ Id=42
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{p} ,z[A@z] ,t{p} )
+		B( z{p} ,z[][z.A] ,t{p} )
 
 
 	Applying rule r0 (File "site_accross_bonds_domain_2.ka", line 9, characters 5-81:):
@@ -594,25 +594,25 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "site_accross_bonds_domain_2.ka", line 12, characters 5-75:) is applied for the first time
 
-		Updating the views for A(z[],t{})
+		Updating the views for A(z[],t)
 
-		Updating the views for B(z{},z[],t{})
+		Updating the views for B(z,z[],t)
 
 	Applying rule r4 (File "site_accross_bonds_domain_2.ka", line 13, characters 5-75:):
 		the precondition is satisfied
 
 		rule r4 (File "site_accross_bonds_domain_2.ka", line 13, characters 5-75:) is applied for the first time
 
-		Updating the views for A(z[],t{})
+		Updating the views for A(z[],t)
 
-		Updating the views for B(z{},z[],t{})
+		Updating the views for B(z,z[],t)
 
 	Applying rule r5 (File "site_accross_bonds_domain_2.ka", line 14, characters 5-33:):
 		the precondition is satisfied
 
 		rule r5 (File "site_accross_bonds_domain_2.ka", line 14, characters 5-33:) is applied for the first time
 
-		Updating the views for A(z[],t{})
+		Updating the views for A(z[],t)
 
 INTENSIONAL DESCRIPTION:
 Id=58
@@ -639,7 +639,7 @@ Id=58
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[B@z] ,t{q} )
+		A( z[][z.B] ,t{q} )
 
 
 	Applying rule r1 (File "site_accross_bonds_domain_2.ka", line 10, characters 5-33:):
@@ -647,7 +647,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r1 (File "site_accross_bonds_domain_2.ka", line 10, characters 5-33:) is applied for the first time
 
-		Updating the views for B(z{},z[],t{})
+		Updating the views for B(z,z[],t)
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -684,7 +684,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{p} ,z[.] ,t{u} )
+		B( z{p} ,z[][.] ,t{u} )
 
 
 	Applying rule r2 (File "site_accross_bonds_domain_2.ka", line 11, characters 5-33:):
@@ -692,40 +692,40 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r2 (File "site_accross_bonds_domain_2.ka", line 11, characters 5-33:) is applied for the first time
 
-		Updating the views for B(z{},z[],t{})
+		Updating the views for B(z,z[],t)
 
 	Applying rule r0 (File "site_accross_bonds_domain_2.ka", line 9, characters 5-81:):
 		the precondition is satisfied
 
 		rule r0 (File "site_accross_bonds_domain_2.ka", line 9, characters 5-81:) is applied for the first time
 
-		Updating the views for A(z[],t{})
+		Updating the views for A(z[],t)
 
-		Updating the views for B(z{},z[],t{})
+		Updating the views for B(z,z[],t)
 
 	Applying rule r3 (File "site_accross_bonds_domain_2.ka", line 12, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(z[],t{})
+		Updating the views for A(z[],t)
 
-		Updating the views for B(z{},z[],t{})
+		Updating the views for B(z,z[],t)
 
 	Applying rule r4 (File "site_accross_bonds_domain_2.ka", line 13, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(z[],t{})
+		Updating the views for A(z[],t)
 
-		Updating the views for B(z{},z[],t{})
+		Updating the views for B(z,z[],t)
 
 	Applying rule r5 (File "site_accross_bonds_domain_2.ka", line 14, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for A(z[],t{})
+		Updating the views for A(z[],t)
 
 	Applying rule r1 (File "site_accross_bonds_domain_2.ka", line 10, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for B(z{},z[],t{})
+		Updating the views for B(z,z[],t)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -926,11 +926,11 @@ Id=86
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t{u}[.]) v A(t{p}[.]) v A(t{q}[.]) ]
-A() => [ A(z[.]) v A(z[B.z]) ]
-B() => [ B(z[.]) v B(z[A.z]) ]
-B() => [ B(t{u}[.]) v B(t{p}[.]) ]
-B() => [ B(z{u}[#]) v B(z{p}[#]) ]
+A() => [ A(t3{u}[.]) v A(t3{p}[.]) v A(t3{q}[.]) ]
+A() => [ A(z3[.]) v A(z3[z.B]) ]
+B() => [ B(z3[.]) v B(z3[z.A]) ]
+B() => [ B(t3{u}[.]) v B(t3{p}[.]) ]
+B() => [ B(z3{u}[#]) v B(z3{p}[#]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1050,17 +1050,17 @@ Id=107
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z[.]) => A(t{u}[.],z[.])
-B(z[A.z]) => B(z{p}[A.z])
-B(z[.]) => B(t{u}[.],z[.])
+A(z3[.]) => A(t3{u}[.],z3[.])
+B(z3[z.A]) => B(z3{p}[z.A])
+B(z3[.]) => B(t3{u}[.],z3[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(z[1]),B(z[1]) => 
+A(z3[1]),B(z3[1]) => 
 	[
-		  A(t{q}[.],z[1]),B(t{p}[.],z[1])
-		v A(t{p}[.],z[1]),B(t{p}[.],z[1])
-		v A(t{u}[.],z[1]),B(t{u}[.],z[1])
+		  A(t3{q}[.],z3[1]),B(t3{p}[.],z3[1])
+		v A(t3{p}[.],z3[1]),B(t3{p}[.],z3[1])
+		v A(t3{u}[.],z3[1]),B(t3{u}[.],z3[1])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1259,36 +1259,36 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(z{u}[#])
-		v B(z{p}[#])]
+		  B(z3{u}[#])
+		v B(z3{p}[#])]
 B()=> [
-		  B(t{u}[.])
-		v B(t{p}[.])]
+		  B(t3{u}[.])
+		v B(t3{p}[.])]
 B()=> [
-		  B(z[.])
-		v B(z[A.z])]
+		  B(z3[.])
+		v B(z3[z.A])]
 A()=> [
-		  A(z[.])
-		v A(z[B.z])]
+		  A(z3[.])
+		v A(z3[z.B])]
 A()=> [
-		  A(t{u}[.])
-		v A(t{p}[.])
-		v A(t{q}[.])]
+		  A(t3{u}[.])
+		v A(t3{p}[.])
+		v A(t3{q}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-B(z[.])=> [B(t{u}[.],z[.])]
-B(z[A.z])=> [B(z{p}[A.z])]
-A(z[.])=> [A(t{u}[.],z[.])]
+B(z3[.])=> [B(t3{u}[.],z3[.])]
+B(z3[z.A])=> [B(z3{p}[z.A])]
+A(z3[.])=> [A(t3{u}[.],z3[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z[1]),B(z[1])=> [
-		  A(t{q}[.],z[1]),B(t{p}[.],z[1])
-		v A(t{p}[.],z[1]),B(t{p}[.],z[1])
-		v A(t{u}[.],z[1]),B(t{u}[.],z[1])]
+A(z3[1]),B(z3[1])=> [
+		  A(t3{q}[.],z3[1]),B(t3{p}[.],z3[1])
+		v A(t3{p}[.],z3[1]),B(t3{p}[.],z3[1])
+		v A(t3{u}[.],z3[1]),B(t3{u}[.],z3[1])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

@@ -1059,7 +1059,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -1104,7 +1104,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
 		the precondition is not satisfied yet
@@ -1123,7 +1123,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=29
@@ -1168,14 +1168,14 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 6, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=31
@@ -1220,7 +1220,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is not satisfied yet
@@ -1230,7 +1230,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -1278,7 +1278,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=27
@@ -1323,7 +1323,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 10, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=35
@@ -1368,28 +1368,28 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 13, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 13, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=37
@@ -1434,142 +1434,142 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 13, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 10, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 13, characters 0-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1661,9 +1661,9 @@ Id=59
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{u}[.]) v A(y{p}[.]) ]
-A() => [ A(x{u}[.]) v A(x{p}[.]) ]
-A() => [ A(z{u}[.]) v A(z{p}[.]) ]
+A() => [ A(y3{u}[.]) v A(y3{p}[.]) ]
+A() => [ A(x3{u}[.]) v A(x3{p}[.]) ]
+A() => [ A(z3{u}[.]) v A(z3{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1813,14 +1813,14 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(z{u}[.])
-		v A(z{p}[.])]
+		  A(z3{u}[.])
+		v A(z3{p}[.])]
 A()=> [
-		  A(x{u}[.])
-		v A(x{p}[.])]
+		  A(x3{u}[.])
+		v A(x3{p}[.])]
 A()=> [
-		  A(y{u}[.])
-		v A(y{p}[.])]
+		  A(y3{u}[.])
+		v A(y3{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

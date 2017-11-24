@@ -1,9 +1,9 @@
 digraph G{
 "Init_27" [label="" style="invis" width="0px" height="0px"];
-"Node_30" [label="A(x[.],y[B@y],z{u})"];
-"Node_29" [label="A(x[.],y[B@y],z{p})"];
-"Node_28" [label="A(x[C@a],y[B@y],z{p})"];
-"Node_27" [label="A(x[C@a],y[B@y],z{u})"];
+"Node_30" [label="A(x[][.],y[][y.B],z{u})"];
+"Node_29" [label="A(x[][.],y[][y.B],z{p})"];
+"Node_28" [label="A(x[][a.C],y[][y.B],z{p})"];
+"Node_27" [label="A(x[][a.C],y[][y.B],z{u})"];
 "Node_27" -> "Node_28" [label="2"];
 "Node_27" -> "Node_30" [label="0"];
 "Node_28" -> "Node_29" [label="0"];

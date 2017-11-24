@@ -41,16 +41,10 @@ let print_binding_state parameter error binding_state =
   with
   | Ckappa_sig.Free -> error
   | Ckappa_sig.Lnk_type (agent_name,site_name) -> (*CHANGE to binding_type*)
-    let error = print_agent_name parameter error agent_name in
-    let _ =
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "@@"
-    in
-    let error = print_site_name parameter error site_name in
-    (*let _ =
+    let () =
       Loggers.print_binding_type (Remanent_parameters.get_logger parameter)
         agent_name site_name
-    in*)
+    in
     error
 
 let print_link_state parameter error link =
@@ -123,17 +117,28 @@ let print_link_state parameter error link =
     error
   (*MOD:change ex: A(x!B@x) to A(x!x.B) as the input in kappa file*)
   | Ckappa_sig.LNK_TYPE ((agent_type,_),(site_type,_)) ->
+    let s =
+      Loggers.string_of_binding_type agent_type site_type
+    in
     let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "%s%s%s%s"
+        (Remanent_parameters.get_open_binding_state parameter)
+        (Remanent_parameters.get_bound_symbol parameter)
+        s
+        (Remanent_parameters.get_close_binding_state parameter)
+    in
+    (*let () =
       Loggers.fprintf
         (Remanent_parameters.get_logger parameter)
-        "%s%s%s%s%s%s"
+        "%s%s%s%s%s%s6"
         (Remanent_parameters.get_open_binding_state parameter)
         (Remanent_parameters.get_bound_symbol parameter)
         agent_type
         (Remanent_parameters.get_btype_sep_symbol parameter)
         site_type
         (Remanent_parameters.get_close_binding_state parameter)
-    in
+    in*)
     error
 
 let print_port parameter error port =

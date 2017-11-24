@@ -1,10 +1,10 @@
 digraph G{
 "Init_59" [label="" style="invis" width="0px" height="0px"];
-"Node_68" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!free,C!EGFR@N)"];
-"Node_65" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!EGFR@C,C!free)"];
-"Node_62" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!free,C!free)"];
-"Node_60" [label="EGFR(L!EGF@r,CR!free,N!free,C!free)"];
-"Node_59" [label="EGFR(L!free,CR!free,N!free,C!free)"];
+"Node_68" [label="EGFR(L!r.EGF,CR!CR.EGFR,N!,C!N.EGFR)"];
+"Node_65" [label="EGFR(L!r.EGF,CR!CR.EGFR,N!C.EGFR,C!)"];
+"Node_62" [label="EGFR(L!r.EGF,CR!CR.EGFR,N!,C!)"];
+"Node_60" [label="EGFR(L!r.EGF,CR!,N!,C!)"];
+"Node_59" [label="EGFR(L!,CR!,N!,C!)"];
 "Node_68" -> "Node_62" [label="R/int"];
 "Node_65" -> "Node_62" [label="R/int"];
 "Node_62" -> "Node_68" [label="R.int"];

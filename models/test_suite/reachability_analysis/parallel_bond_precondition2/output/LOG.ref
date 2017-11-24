@@ -375,7 +375,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t[.] )
+		A( z[][.] ,t[][.] )
 
 	Views in initial state:
 
@@ -423,7 +423,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[.] ,t[.] )
+		B( z[][.] ,t[][.] )
 
 	Views in initial state:
 
@@ -477,7 +477,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[B@z] ,t[.] )
+		A( z[][z.B] ,t[][.] )
 
 
 		Updating the views for B(z[],t[])
@@ -507,7 +507,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[A@z] ,t[.] )
+		B( z[][z.A] ,t[][.] )
 
 
 	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:):
@@ -542,7 +542,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[B@z] ,t[B@t] )
+		A( z[][z.B] ,t[][t.B] )
 
 
 		Updating the views for B(z[],t[])
@@ -572,7 +572,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[.] ,t[A@t] )
+		B( z[][.] ,t[][t.A] )
 
 
 	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 5-63:):
@@ -607,7 +607,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[A@z] ,t[A@t] )
+		B( z[][z.A] ,t[][t.A] )
 
 
 		Updating the views for A(z[],t[])
@@ -637,7 +637,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t[B@t] )
+		A( z[][.] ,t[][t.B] )
 
 
 	Applying rule r4 (File "parallel_bonds.ka", line 10, characters 5-41:):
@@ -844,12 +844,12 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(z[.]) v A(z[B.z]) ]
-A() => [ A(t[.]) v A(t[B.t]) ]
-A() => A(x{u}[.])
-B() => [ B(z[.]) v B(z[A.z]) ]
-B() => [ B(t[.]) v B(t[A.t]) ]
-B() => B(x{u}[.])
+A() => [ A(z3[.]) v A(z3[z.B]) ]
+A() => [ A(t3[.]) v A(t3[t.B]) ]
+A() => A(x3{u}[.])
+B() => [ B(z3[.]) v B(z3[z.A]) ]
+B() => [ B(t3[.]) v B(t3[t.A]) ]
+B() => B(x3{u}[.])
 
 ------------------------------------------------------------
 * Relational properties:
@@ -947,10 +947,10 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(t[1]),B(t[1]) => 
+A(t3[1]),B(t3[1]) => 
 	[
-		  A(t[1],z[B.z]),B(t[1],z[.])
-		v A(t[1],z[.]),B(t[1],z[A.z])
+		  A(t3[1],z3[z.B]),B(t3[1],z3[.])
+		v A(t3[1],z3[.]),B(t3[1],z3[z.A])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1140,20 +1140,20 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-B()=> [B(x{u}[.])]
+B()=> [B(x3{u}[.])]
 B()=> [
-		  B(t[.])
-		v B(t[A.t])]
+		  B(t3[.])
+		v B(t3[t.A])]
 B()=> [
-		  B(z[.])
-		v B(z[A.z])]
-A()=> [A(x{u}[.])]
+		  B(z3[.])
+		v B(z3[z.A])]
+A()=> [A(x3{u}[.])]
 A()=> [
-		  A(t[.])
-		v A(t[B.t])]
+		  A(t3[.])
+		v A(t3[t.B])]
 A()=> [
-		  A(z[.])
-		v A(z[B.z])]
+		  A(z3[.])
+		v A(z3[z.B])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -1162,9 +1162,9 @@ A()=> [
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(t[1]),B(t[1])=> [
-		  A(t[1],z[B.z]),B(t[1],z[.])
-		v A(t[1],z[.]),B(t[1],z[A.z])]
+A(t3[1]),B(t3[1])=> [
+		  A(t3[1],z3[z.B]),B(t3[1],z3[.])
+		v A(t3[1],z3[.]),B(t3[1],z3[z.A])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

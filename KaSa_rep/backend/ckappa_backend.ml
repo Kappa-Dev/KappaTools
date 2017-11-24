@@ -323,11 +323,13 @@ struct
             match internal_state_string_opt with
             | None -> old_state
             | Some x ->
-              begin
-                match Remanent_parameters.get_syntax_version parameter with
-                | Ast.V4 -> Some ("{"^x^"}")
-                | Ast.V3 -> Some ("~"^x)
-              end
+              let s =
+                (Remanent_parameters.get_open_internal_state parameter) ^
+                (Remanent_parameters.get_internal_state_symbol parameter) ^
+                x ^
+                (Remanent_parameters.get_close_internal_state parameter)
+              in
+              Some s
           in
           let error, new_binding_state =
             match
@@ -556,20 +558,20 @@ struct
       if bool then
         Loggers.fprintf logger "%s"
           (Remanent_parameters.get_site_sep_comma_symbol parameter)
-(* Quyen: use the symbol tab instead *)
     in
     let () = Loggers.fprintf logger "%s%s" agent_string
         (Remanent_parameters.get_agent_open_symbol parameter)
-    in (* Quyen: use the symbol tab instead *)
+    in
     let bool =
       Wrapped_modules.LoggedStringMap.fold
         (fun site_string (internal,binding) bool ->
            let () =
-             if bool then Loggers.fprintf logger
+             if bool then
+               Loggers.fprintf logger
                  "%s"
                  (Remanent_parameters.get_site_sep_comma_symbol parameter)
            in
-           let () = Loggers.fprintf logger "%s" site_string in
+           let () = Loggers.fprintf logger "%s3" site_string in
            let () =
              match internal with
              | None -> ()
@@ -583,63 +585,32 @@ struct
                  (Remanent_parameters.get_open_binding_state parameter)
                  (Remanent_parameters.get_free_symbol parameter)
                  (Remanent_parameters.get_close_binding_state parameter)
-               (*begin
-                 match Remanent_parameters.get_syntax_version parameter with
-                 | Ast.V4 -> Loggers.fprintf logger "[.]" (* Quyen: use the symbol tab instead *)
-                 | Ast.V3 -> ()
-               end*)
              | Some Wildcard ->
                Loggers.fprintf logger "%s%s%s"
                  (Remanent_parameters.get_open_binding_state parameter)
                  (Remanent_parameters.get_link_to_any parameter)
                  (Remanent_parameters.get_close_binding_state parameter)
-               (*begin
-                 match Remanent_parameters.get_syntax_version parameter with
-                 | Ast.V4 ->
-                   Loggers.fprintf logger "[#]" (* Quyen: use the symbol tab instead *)
-                 | Ast.V3 ->
-                   Loggers.fprintf logger "?" (* Quyen: use the symbol tab instead *)
-               end*)
              | Some Bound_to_unknown ->
                Loggers.fprintf logger "%s%s%s"
                  (Remanent_parameters.get_open_binding_state parameter)
                  (Remanent_parameters.get_link_to_some parameter)
                  (Remanent_parameters.get_close_binding_state parameter)
-               (*begin
-                 match Remanent_parameters.get_syntax_version parameter with
-                 | Ast.V4 ->
-                   Loggers.fprintf logger "[_]" (* Quyen: use the symbol tab instead *)
-                 | Ast.V3 ->
-                   Loggers.fprintf logger "!_" (* Quyen: use the symbol tab instead *)
-               end*)
              | Some (Bound_to int) ->
                Loggers.fprintf logger "%s%s%i%s"
                  (Remanent_parameters.get_open_binding_state parameter)
                  (Remanent_parameters.get_bound_symbol parameter)
                  int
                  (Remanent_parameters.get_close_binding_state parameter)
-               (*begin
-                 match Remanent_parameters.get_syntax_version parameter with
-                 | Ast.V4 ->
-                   Loggers.fprintf logger "[%i]" int (* Quyen: use the symbol tab instead *)
-                 | Ast.V3 ->
-                   Loggers.fprintf logger "!%i" int (* Quyen: use the symbol tab instead *)
-               end*)
              | Some (Binding_type (ag,st)) ->
-               Loggers.fprintf logger "%s%s%s%s%s%s"
+               let binding =
+                 Loggers.string_of_binding_type ag st
+               in
+               Loggers.fprintf logger
+                 "%s%s%s%s"
                  (Remanent_parameters.get_open_binding_state parameter)
                  (Remanent_parameters.get_bound_symbol parameter)
-                 ag
-                 (Remanent_parameters.get_btype_sep_symbol parameter)
-                 st
+                 binding
                  (Remanent_parameters.get_close_binding_state parameter)
-               (*begin
-                 match Remanent_parameters.get_syntax_version parameter with
-                 | Ast.V4 ->
-                   Loggers.fprintf logger "[%s.%s]" ag st (* Quyen: use the symbol tab instead *)
-                 | Ast.V3 ->
-                   Loggers.fprintf logger "!%s.%s" ag st (* Quyen: use the symbol tab instead *)
-               end*)
            in
            true
         ) site_map false
@@ -657,7 +628,7 @@ struct
            let () = Loggers.fprintf logger
                "%s"
                (Remanent_parameters.get_agent_close_symbol parameter)
-           in (* Quyen: use the symbol tab instead *)
+           in
            true
         )
         t.string_version
@@ -672,7 +643,9 @@ struct
     | [a] -> print logger parameter error kappa_handler a
     | _::_ ->
       begin
-        let () = Loggers.fprintf logger "[ " in
+        let () = Loggers.fprintf logger "%s "
+            (Remanent_parameters.get_open_binding_state parameter)
+        in
         let error,_ =
           List.fold_left
             (fun (error, bool) pattern ->
@@ -683,7 +656,9 @@ struct
                print logger parameter error kappa_handler pattern,true)
             (error, false)
             list in
-        let () = Loggers.fprintf logger " ]" in
+        let () = Loggers.fprintf logger " %s"
+            (Remanent_parameters.get_close_binding_state parameter)
+        in
         error
       end
 end

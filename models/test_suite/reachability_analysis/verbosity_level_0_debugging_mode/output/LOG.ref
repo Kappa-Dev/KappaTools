@@ -366,7 +366,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=35
@@ -411,7 +411,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -456,7 +456,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "../verbosity.ka", line 4, characters 0-60:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=48
@@ -501,7 +501,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=53
@@ -546,7 +546,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=59
@@ -591,7 +591,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 INTENSIONAL DESCRIPTION:
 Id=70
@@ -640,32 +640,32 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "../verbosity.ka", line 4, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 INTENSIONAL DESCRIPTION:
 Id=90
  Node(site_type:1<0)
@@ -845,29 +845,29 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(z{u}[.])
-		v A(z{q}[.])]
+		  A(z3{u}[.])
+		v A(z3{q}[.])]
 A()=> [
-		  A(x{u}[.])
-		v A(x{p}[.])
-		v A(x{o}[.])
-		v A(x{q}[.])]
+		  A(x3{u}[.])
+		v A(x3{p}[.])
+		v A(x3{o}[.])
+		v A(x3{q}[.])]
 A()=> [
-		  A(y{u}[.])
-		v A(y{p}[.])
-		v A(y{q}[.])]
+		  A(y3{u}[.])
+		v A(y3{p}[.])
+		v A(y3{q}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(x{q}[.],y{u}[.],z{u}[.])
-		v A(x{q}[.],y{q}[.],z{q}[.])
-		v A(x{q}[.],y{q}[.],z{u}[.])
-		v A(x{o}[.],y{p}[.],z{q}[.])
-		v A(x{p}[.],y{u}[.],z{u}[.])
-		v A(x{p}[.],y{p}[.],z{u}[.])
-		v A(x{u}[.],y{u}[.],z{u}[.])]
+		  A(x3{q}[.],y3{u}[.],z3{u}[.])
+		v A(x3{q}[.],y3{q}[.],z3{q}[.])
+		v A(x3{q}[.],y3{q}[.],z3{u}[.])
+		v A(x3{o}[.],y3{p}[.],z3{q}[.])
+		v A(x3{p}[.],y3{u}[.],z3{u}[.])
+		v A(x3{p}[.],y3{p}[.],z3{u}[.])
+		v A(x3{u}[.],y3{u}[.],z3{u}[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

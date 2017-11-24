@@ -11,12 +11,12 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => [ A(y[.]) v A(y[C.x]) ]
-A() => [ A(x[.]) v A(x[B.y]) ]
-B() => [ B(x[.]) v B(x[C.y]) ]
-B() => [ B(y[.]) v B(y[A.x]) ]
-C() => [ C(x[.]) v C(x[A.y]) ]
-C() => [ C(y[.]) v C(y[B.x]) ]
+A() => [ A(y3[.]) v A(y3[x.C]) ]
+A() => [ A(x3[.]) v A(x3[y.B]) ]
+B() => [ B(x3[.]) v B(x3[y.C]) ]
+B() => [ B(y3[.]) v B(y3[x.A]) ]
+C() => [ C(x3[.]) v C(x3[y.A]) ]
+C() => [ C(y3[.]) v C(y3[x.B]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -28,8 +28,8 @@ C() => [ C(y[.]) v C(y[B.x]) ]
 * Properties of pairs of bonds
 ------------------------------------------------------------
 Potential polymerization:
-(A,y[)--(C,x[); (C,y[)--(B,x[); (B,y[)--(A,x[); 
-(A,x[)--(B,y[); (B,x[)--(C,y[); (C,x[)--(A,y[); 
+(A,y[])--(C,x[]); (C,y[])--(B,x[]); (B,y[])--(A,x[]); 
+(A,x[])--(B,y[]); (B,x[])--(C,y[]); (C,x[])--(A,y[]); 
 Generating the raw influence map...
 Refining the influence map...
 execution finished without any exception

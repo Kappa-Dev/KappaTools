@@ -190,7 +190,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( t[.] )
+		A( t[][.] )
 
 	Views in initial state:
 
@@ -209,7 +209,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] )
+		A( z[][.] )
 
 	Views in initial state:
 
@@ -228,7 +228,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t[.] )
+		B( t[][.] )
 
 	Views in initial state:
 
@@ -247,7 +247,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[.] )
+		B( z[][.] )
 
 	Views in initial state:
 
@@ -266,7 +266,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( t[B@t] )
+		A( t[][t.B] )
 
 	Views in initial state:
 
@@ -285,7 +285,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[B@z] )
+		A( z[][z.B] )
 
 	Views in initial state:
 
@@ -304,7 +304,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t[A@t] )
+		B( t[][t.A] )
 
 	Views in initial state:
 
@@ -323,7 +323,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[A@z] )
+		B( z[][z.A] )
 
 
 	Applying rule A(t[_]) -> A(t[.]) (File "parallel_bonds.ka", line 8, characters 0-22:):
@@ -469,10 +469,10 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t[.]) v A(t[B.t]) ]
-A() => [ A(z[.]) v A(z[B.z]) ]
-B() => [ B(t[.]) v B(t[A.t]) ]
-B() => [ B(z[.]) v B(z[A.z]) ]
+A() => [ A(t3[.]) v A(t3[t.B]) ]
+A() => [ A(z3[.]) v A(z3[z.B]) ]
+B() => [ B(t3[.]) v B(t3[t.A]) ]
+B() => [ B(z3[.]) v B(z3[z.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -667,17 +667,17 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(z[.])
-		v B(z[A.z])]
+		  B(z3[.])
+		v B(z3[z.A])]
 B()=> [
-		  B(t[.])
-		v B(t[A.t])]
+		  B(t3[.])
+		v B(t3[t.A])]
 A()=> [
-		  A(z[.])
-		v A(z[B.z])]
+		  A(z3[.])
+		v A(z3[z.B])]
 A()=> [
-		  A(t[.])
-		v A(t[B.t])]
+		  A(t3[.])
+		v A(t3[t.B])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

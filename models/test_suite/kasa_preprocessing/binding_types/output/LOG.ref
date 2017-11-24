@@ -276,12 +276,12 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r0' A(x[.]),B(x{p}[.])->A(x[1]),B(x{p}[1]) -> rule(1):'r0_op' A(x[1]),B(x{p}[1])->A(x[.]),B(x{p}[.])[0->0];[1->1]
 Influence_map:Wake_up_map:rule(1):'r0_op' A(x[1]),B(x{p}[1])->A(x[.]),B(x{p}[.]) -> rule(0):'r0' A(x[.]),B(x{p}[.])->A(x[1]),B(x{p}[1])[0->0];[1->1]
 Influence_map:Wake_up_map:rule(1):'r0_op' A(x[1]),B(x{p}[1])->A(x[.]),B(x{p}[.]) -> rule(2):'r1' A(x[.]),C(x[.])->A(x[1]),C(x[1])[0->0]
-Influence_map:Wake_up_map:rule(1):'r0_op' A(x[1]),B(x{p}[1])->A(x[.]),B(x{p}[.]) -> rule(3):'' B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x])[1->0]
-Influence_map:Wake_up_map:rule(2):'r1' A(x[.]),C(x[.])->A(x[1]),C(x[1]) -> rule(3):'' B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x])[1->1]
+Influence_map:Wake_up_map:rule(1):'r0_op' A(x[1]),B(x{p}[1])->A(x[.]),B(x{p}[.]) -> rule(3):'' B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A])[1->0]
+Influence_map:Wake_up_map:rule(2):'r1' A(x[.]),C(x[.])->A(x[1]),C(x[1]) -> rule(3):'' B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A])[1->1]
 Influence_map:Inhibition_map:rule(0):'r0' A(x[.]),B(x{p}[.])->A(x[1]),B(x{p}[1]) -> rule(2):'r1' A(x[.]),C(x[.])->A(x[1]),C(x[1])[0->0]
-Influence_map:Inhibition_map:rule(0):'r0' A(x[.]),B(x{p}[.])->A(x[1]),B(x{p}[1]) -> rule(3):'' B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x])[1->0]
+Influence_map:Inhibition_map:rule(0):'r0' A(x[.]),B(x{p}[.])->A(x[1]),B(x{p}[1]) -> rule(3):'' B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A])[1->0]
 Influence_map:Inhibition_map:rule(2):'r1' A(x[.]),C(x[.])->A(x[1]),C(x[1]) -> rule(0):'r0' A(x[.]),B(x{p}[.])->A(x[1]),B(x{p}[1])[0->0]
-Influence_map:Inhibition_map:rule(3):'' B(x{p}[.]),C(x[A.x])->B(x{u}[.]),C(x[A.x]) -> rule(0):'r0' A(x[.]),B(x{p}[.])->A(x[1]),B(x{p}[1])[0->1]
+Influence_map:Inhibition_map:rule(3):'' B(x{p}[.]),C(x[x.A])->B(x{u}[.]),C(x[x.A]) -> rule(0):'r0' A(x[.]),B(x{p}[.])->A(x[1]),B(x{p}[1])[0->1]
 Reachability analysis...
 
 ------------------------------------------------------------

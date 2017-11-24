@@ -386,7 +386,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) (File "sym3.ka", line 1, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -421,7 +421,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{p}[.]) (File "sym3.ka", line 2, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -456,7 +456,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.] y{p}[.]) -> A(x{p}[.] y{p}[.]) (File "sym3.ka", line 3, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -491,14 +491,14 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "sym3.ka", line 4, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule A(w{u}[.] t{u}[.]) -> A(w{p}[.] t{u}[.]) (File "sym3.ka", line 5, characters 0-44:):
 		the precondition is satisfied
 
 		rule A(w{u}[.] t{u}[.]) -> A(w{p}[.] t{u}[.]) (File "sym3.ka", line 5, characters 0-44:) is applied for the first time
 
-		Updating the views for A(w{},t{})
+		Updating the views for A(w,t)
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -533,7 +533,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(w{u}[.] t{u}[.]) -> A(w{u}[.] t{p}[.]) (File "sym3.ka", line 6, characters 0-44:) is applied for the first time
 
-		Updating the views for A(w{},t{})
+		Updating the views for A(w,t)
 
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -568,7 +568,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(w{u}[.] t{p}[.]) -> A(w{p}[.] t{p}[.]) (File "sym3.ka", line 7, characters 0-44:) is applied for the first time
 
-		Updating the views for A(w{},t{})
+		Updating the views for A(w,t)
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -603,42 +603,42 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(w{p}[.] t{u}[.]) -> A(w{p}[.] t{p}[.]) (File "sym3.ka", line 8, characters 0-44:) is applied for the first time
 
-		Updating the views for A(w{},t{})
+		Updating the views for A(w,t)
 
 	Applying rule A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) (File "sym3.ka", line 1, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{p}[.]) (File "sym3.ka", line 2, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule A(x{u}[.] y{p}[.]) -> A(x{p}[.] y{p}[.]) (File "sym3.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "sym3.ka", line 4, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{})
+		Updating the views for A(x,y)
 
 	Applying rule A(w{u}[.] t{u}[.]) -> A(w{p}[.] t{u}[.]) (File "sym3.ka", line 5, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(w{},t{})
+		Updating the views for A(w,t)
 
 	Applying rule A(w{u}[.] t{u}[.]) -> A(w{u}[.] t{p}[.]) (File "sym3.ka", line 6, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(w{},t{})
+		Updating the views for A(w,t)
 
 	Applying rule A(w{u}[.] t{p}[.]) -> A(w{p}[.] t{p}[.]) (File "sym3.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(w{},t{})
+		Updating the views for A(w,t)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -759,10 +759,10 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{u}[.]) v A(y{p}[.]) ]
-A() => [ A(w{u}[.]) v A(w{p}[.]) ]
-A() => [ A(t{u}[.]) v A(t{p}[.]) ]
-A() => [ A(x{u}[.]) v A(x{p}[.]) ]
+A() => [ A(y3{u}[.]) v A(y3{p}[.]) ]
+A() => [ A(w3{u}[.]) v A(w3{p}[.]) ]
+A() => [ A(t3{u}[.]) v A(t3{p}[.]) ]
+A() => [ A(x3{u}[.]) v A(x3{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -957,17 +957,17 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(x{u}[.])
-		v A(x{p}[.])]
+		  A(x3{u}[.])
+		v A(x3{p}[.])]
 A()=> [
-		  A(t{u}[.])
-		v A(t{p}[.])]
+		  A(t3{u}[.])
+		v A(t3{p}[.])]
 A()=> [
-		  A(w{u}[.])
-		v A(w{p}[.])]
+		  A(w3{u}[.])
+		v A(w3{p}[.])]
 A()=> [
-		  A(y{u}[.])
-		v A(y{p}[.])]
+		  A(y3{u}[.])
+		v A(y3{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

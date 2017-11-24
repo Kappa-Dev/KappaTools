@@ -1,7 +1,7 @@
 digraph G{
 "Init_55" [label="" style="invis" width="0px" height="0px"];
-"Node_89" [label="SoS(S~u,PR!Grb2@SH3n)"];
-"Node_55" [label="SoS(S~u,PR!free)"];
+"Node_89" [label="SoS(S~u,PR!SH3n.Grb2)"];
+"Node_55" [label="SoS(S~u,PR!)"];
 "Node_89" -> "Node_55" [label="Grb2/SoS"];
 "Node_55" -> "Node_89" [label="Grb2.SoS"];
 "Init_55" -> "Node_55" [label=""];

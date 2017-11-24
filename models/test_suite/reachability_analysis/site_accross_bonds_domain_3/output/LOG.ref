@@ -837,7 +837,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[C@x] ,t[B@t] )
+		A( z[][x.C] ,t[][t.B] )
 
 	Dealing with creation
 
@@ -866,7 +866,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t[A@t] ,z[C@x] )
+		B( t[][t.A] ,z[][x.C] )
 
 	Dealing with creation
 
@@ -885,8 +885,8 @@ Id=10
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[B@z] )
-		C( x[A@z] )
+		C( x[][z.B] )
+		C( x[][z.A] )
 
 
 	Applying rule C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]), ., ., ., . -> ., ., ., ., D(x[1]), A(z[1] t[2]), B(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 10, characters 0-106:):
@@ -928,7 +928,7 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[D@x] ,t[B@t] )
+		A( z[][x.D] ,t[][t.B] )
 
 	Dealing with creation
 
@@ -957,7 +957,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t[A@t] ,z[D@x] )
+		B( t[][t.A] ,z[][x.D] )
 
 	Dealing with creation
 
@@ -976,8 +976,8 @@ Id=10
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x[B@z] )
-		D( x[A@z] )
+		D( x[][z.B] )
+		D( x[][z.A] )
 
 
 	Applying rule ., ., ., . -> C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 12, characters 0-56:):
@@ -1011,7 +1011,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[C@x] ,t[F@t] )
+		E( z[][x.C] ,t[][t.F] )
 
 	Dealing with creation
 
@@ -1040,7 +1040,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( t[E@t] ,z[D@x] )
+		F( t[][t.E] ,z[][x.D] )
 
 	Dealing with creation
 
@@ -1059,7 +1059,7 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[E@z] )
+		C( x[][z.E] )
 
 	Dealing with creation
 
@@ -1078,7 +1078,7 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x[F@z] )
+		D( x[][z.F] )
 
 
 	Applying rule C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]), ., ., ., . -> ., ., ., ., G(x[1]), E(z[1] t[2]), F(t[2] z[3]), H(x[3]) (File "site_accross_bonds_domain.ka", line 13, characters 0-106:):
@@ -1120,7 +1120,7 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[G@x] ,t[F@t] )
+		E( z[][x.G] ,t[][t.F] )
 
 	Dealing with creation
 
@@ -1149,7 +1149,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( t[E@t] ,z[H@x] )
+		F( t[][t.E] ,z[][x.H] )
 
 	Dealing with creation
 
@@ -1168,7 +1168,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		G( x[E@z] )
+		G( x[][z.E] )
 
 	Dealing with creation
 
@@ -1187,7 +1187,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		H( x[F@z] )
+		H( x[][z.F] )
 
 
 	Applying rule C() -> . (File "site_accross_bonds_domain.ka", line 11, characters 0-12:):
@@ -1221,7 +1221,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t[B@t] )
+		A( z[][.] ,t[][t.B] )
 
 	Dealing with side effects
 
@@ -1250,7 +1250,7 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t[A@t] ,z[.] )
+		B( t[][t.A] ,z[][.] )
 
 	Dealing with side effects
 
@@ -1279,7 +1279,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[.] ,t[F@t] )
+		E( z[][.] ,t[][t.F] )
 
 
 	Applying rule ., ., ., . -> C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]) (File "site_accross_bonds_domain.ka", line 9, characters 0-56:):
@@ -1656,18 +1656,18 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => A(t[B.t])
-A() => [ A(z[.]) v A(z[C.x]) v A(z[D.x]) ]
-B() => [ B(z[.]) v B(z[C.x]) v B(z[D.x]) ]
-B() => B(t[A.t])
-E() => E(t[F.t])
-E() => [ E(z[.]) v E(z[C.x]) v E(z[G.x]) ]
-F() => [ F(z[D.x]) v F(z[H.x]) ]
-F() => F(t[E.t])
-C() => [ C(x[A.z]) v C(x[B.z]) v C(x[E.z]) ]
-D() => [ D(x[A.z]) v D(x[B.z]) v D(x[F.z]) ]
-G() => G(x[E.z])
-H() => H(x[F.z])
+A() => A(t3[t.B])
+A() => [ A(z3[.]) v A(z3[x.C]) v A(z3[x.D]) ]
+B() => [ B(z3[.]) v B(z3[x.C]) v B(z3[x.D]) ]
+B() => B(t3[t.A])
+E() => E(t3[t.F])
+E() => [ E(z3[.]) v E(z3[x.C]) v E(z3[x.G]) ]
+F() => [ F(z3[x.D]) v F(z3[x.H]) ]
+F() => F(t3[t.E])
+C() => [ C(x3[z.A]) v C(x3[z.B]) v C(x3[z.E]) ]
+D() => [ D(x3[z.A]) v D(x3[z.B]) v D(x3[z.F]) ]
+G() => G(x3[z.E])
+H() => H(x3[z.F])
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1855,19 +1855,19 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(t[1]),B(t[1]) => 
+A(t3[1]),B(t3[1]) => 
 	[
-		  A(t[1],z[D.x]),B(t[1],z[D.x])
-		v A(t[1],z[C.x]),B(t[1],z[.])
-		v A(t[1],z[C.x]),B(t[1],z[C.x])
-		v A(t[1],z[.]),B(t[1],z[.])
-		v A(t[1],z[.]),B(t[1],z[C.x])
+		  A(t3[1],z3[x.D]),B(t3[1],z3[x.D])
+		v A(t3[1],z3[x.C]),B(t3[1],z3[.])
+		v A(t3[1],z3[x.C]),B(t3[1],z3[x.C])
+		v A(t3[1],z3[.]),B(t3[1],z3[.])
+		v A(t3[1],z3[.]),B(t3[1],z3[x.C])
 	]
-E(t[1]),F(t[1]) => 
+E(t3[1]),F(t3[1]) => 
 	[
-		  E(t[1],z[G.x]),F(t[1],z[H.x])
-		v E(t[1],z[C.x]),F(t[1],z[D.x])
-		v E(t[1],z[.]),F(t[1],z[D.x])
+		  E(t3[1],z3[x.G]),F(t3[1],z3[x.H])
+		v E(t3[1],z3[x.C]),F(t3[1],z3[x.D])
+		v E(t3[1],z3[.]),F(t3[1],z3[x.D])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -2235,35 +2235,35 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-H()=> [H(x[F.z])]
-G()=> [G(x[E.z])]
+H()=> [H(x3[z.F])]
+G()=> [G(x3[z.E])]
 D()=> [
-		  D(x[A.z])
-		v D(x[B.z])
-		v D(x[F.z])]
+		  D(x3[z.A])
+		v D(x3[z.B])
+		v D(x3[z.F])]
 C()=> [
-		  C(x[A.z])
-		v C(x[B.z])
-		v C(x[E.z])]
-F()=> [F(t[E.t])]
+		  C(x3[z.A])
+		v C(x3[z.B])
+		v C(x3[z.E])]
+F()=> [F(t3[t.E])]
 F()=> [
-		  F(z[D.x])
-		v F(z[H.x])]
+		  F(z3[x.D])
+		v F(z3[x.H])]
 E()=> [
-		  E(z[.])
-		v E(z[C.x])
-		v E(z[G.x])]
-E()=> [E(t[F.t])]
-B()=> [B(t[A.t])]
+		  E(z3[.])
+		v E(z3[x.C])
+		v E(z3[x.G])]
+E()=> [E(t3[t.F])]
+B()=> [B(t3[t.A])]
 B()=> [
-		  B(z[.])
-		v B(z[C.x])
-		v B(z[D.x])]
+		  B(z3[.])
+		v B(z3[x.C])
+		v B(z3[x.D])]
 A()=> [
-		  A(z[.])
-		v A(z[C.x])
-		v A(z[D.x])]
-A()=> [A(t[B.t])]
+		  A(z3[.])
+		v A(z3[x.C])
+		v A(z3[x.D])]
+A()=> [A(t3[t.B])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -2272,16 +2272,16 @@ A()=> [A(t[B.t])]
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(t[1]),B(t[1])=> [
-		  A(t[1],z[D.x]),B(t[1],z[D.x])
-		v A(t[1],z[C.x]),B(t[1],z[.])
-		v A(t[1],z[C.x]),B(t[1],z[C.x])
-		v A(t[1],z[.]),B(t[1],z[.])
-		v A(t[1],z[.]),B(t[1],z[C.x])]
-E(t[1]),F(t[1])=> [
-		  E(t[1],z[G.x]),F(t[1],z[H.x])
-		v E(t[1],z[C.x]),F(t[1],z[D.x])
-		v E(t[1],z[.]),F(t[1],z[D.x])]
+A(t3[1]),B(t3[1])=> [
+		  A(t3[1],z3[x.D]),B(t3[1],z3[x.D])
+		v A(t3[1],z3[x.C]),B(t3[1],z3[.])
+		v A(t3[1],z3[x.C]),B(t3[1],z3[x.C])
+		v A(t3[1],z3[.]),B(t3[1],z3[.])
+		v A(t3[1],z3[.]),B(t3[1],z3[x.C])]
+E(t3[1]),F(t3[1])=> [
+		  E(t3[1],z3[x.G]),F(t3[1],z3[x.H])
+		v E(t3[1],z3[x.C]),F(t3[1],z3[x.D])
+		v E(t3[1],z3[.]),F(t3[1],z3[x.D])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

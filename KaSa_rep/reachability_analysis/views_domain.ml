@@ -341,7 +341,6 @@ struct
     let potential_side_effects = get_potential_side_effects static in
     let log_info = get_log_info dynamic in
     let store_remanent_triple = get_remanent_triple static in
-    (*let store_new_index_pair_map = get_new_index_pair_map static in*)
     let error, (handler_bdu, log_info, result) =
       Bdu_static_views.scan_rule_set
         parameters
@@ -351,7 +350,6 @@ struct
         kappa_handler
         compiled
         potential_side_effects
-        (*store_new_index_pair_map*)
         store_remanent_triple
     in
     let dynamic = set_log_info log_info dynamic in
@@ -364,7 +362,6 @@ struct
       Bdu_static_views.scan_rule_set_pattern
         parameters
         error
-        (*store_new_index_pair_map*)
         store_remanent_triple
         compiled
     in
@@ -830,18 +827,6 @@ struct
                     Loggers.fprintf log
                       "%s%s " site_string state_string
                     in
-                      (*
-                      match Remanent_parameters.get_syntax_version parameters with
-                      | Ast.V4 ->
-                        Loggers.fprintf log
-                          "%s%s " site_string state_string
-                      | Ast.V3 ->
-                        let () = (*Print the information of views*)
-                          Loggers.fprintf log
-                            "%s%s " site_string state_string
-                        in
-                        ()
-                    in*)
                     error, true
                  )
                  (error, false) l
@@ -1139,7 +1124,6 @@ struct
 
   (*MOVE?*)
   let is_new_site_name parameters error cv_id site_name
-      (*store_new_index_pair_map*)
       site_correspondence =
     let error, site_correspondence =
       let rec aux list =
@@ -2494,7 +2478,7 @@ struct
   (************************************************************************)
 
   let build_bdu_test_pattern parameters error pattern
-      (*store_new_index_pair_map*) site_correspondence dynamic =
+       site_correspondence dynamic =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters error
       (fun parameters error _agent_id agent (dynamic, current_list) ->
@@ -2556,7 +2540,6 @@ struct
       build_bdu_test_pattern parameters error pattern
         site_correspondence dynamic
     in
-
     (*--------------------------------------------------*)
     let error, dynamic, bdu =
       List.fold_left (fun (error, dynamic, bdu) (agent_type, bdu_test) ->

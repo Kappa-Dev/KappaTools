@@ -20,7 +20,7 @@ Reachability analysis...
 
 		rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 		A( x{p} ,y{u} ,z{u} )
 
@@ -30,7 +30,7 @@ Reachability analysis...
 
 		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 		A( x{p} ,y{p} ,z{u} )
 
@@ -40,7 +40,7 @@ Reachability analysis...
 
 		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "../verbosity.ka", line 4, characters 0-60:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 		A( x{o} ,y{p} ,z{q} )
 
@@ -50,7 +50,7 @@ Reachability analysis...
 
 		rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 		A( x{q} ,y{u} ,z{u} )
 
@@ -60,7 +60,7 @@ Reachability analysis...
 
 		rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 		A( x{q} ,y{q} ,z{u} )
 
@@ -70,7 +70,7 @@ Reachability analysis...
 
 		rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 		A( x{q} ,y{q} ,z{q} )
 
@@ -84,32 +84,32 @@ Reachability analysis...
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "../verbosity.ka", line 4, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 	Applying rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},z{})
+		Updating the views for A(x,y,z)
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -121,22 +121,22 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => [ A(y{u}[.]) v A(y{p}[.]) v A(y{q}[.]) ]
-A() => [ A(x{u}[.]) v A(x{p}[.]) v A(x{o}[.]) v A(x{q}[.]) ]
-A() => [ A(z{u}[.]) v A(z{q}[.]) ]
+A() => [ A(y3{u}[.]) v A(y3{p}[.]) v A(y3{q}[.]) ]
+A() => [ A(x3{u}[.]) v A(x3{p}[.]) v A(x3{o}[.]) v A(x3{q}[.]) ]
+A() => [ A(z3{u}[.]) v A(z3{q}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 A() =>
    [
-	  A(x{q}[.],y{u}[.],z{u}[.])
-	v A(x{q}[.],y{q}[.],z{q}[.])
-	v A(x{q}[.],y{q}[.],z{u}[.])
-	v A(x{o}[.],y{p}[.],z{q}[.])
-	v A(x{p}[.],y{u}[.],z{u}[.])
-	v A(x{p}[.],y{p}[.],z{u}[.])
-	v A(x{u}[.],y{u}[.],z{u}[.])
+	  A(x3{q}[.],y3{u}[.],z3{u}[.])
+	v A(x3{q}[.],y3{q}[.],z3{q}[.])
+	v A(x3{q}[.],y3{q}[.],z3{u}[.])
+	v A(x3{o}[.],y3{p}[.],z3{q}[.])
+	v A(x3{p}[.],y3{u}[.],z3{u}[.])
+	v A(x3{p}[.],y3{p}[.],z3{u}[.])
+	v A(x3{u}[.],y3{u}[.],z3{u}[.])
    ]
 ------------------------------------------------------------
 * Properties in connected agents

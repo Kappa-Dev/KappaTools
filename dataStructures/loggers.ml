@@ -587,7 +587,6 @@ let rec allocate_fresh_name t name potential_suffix =
   else
     name
 
-
 let allocate t name =
   let () = t.idset := Mods.StringSet.add name (!(t.idset)) in
   ()
@@ -608,7 +607,6 @@ let dump_json logger json =
   in
   ()
 
-
 let line_to_json line =
   `Assoc ["line", JsonUtil.of_string line]
 
@@ -618,7 +616,6 @@ let line_of_json json =
   with
   | `Assoc ["line", `String s] -> s
   | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "line" ,json))
-
 
 let gen_iter iter list =
   let output = ref [] in

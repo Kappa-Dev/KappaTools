@@ -232,7 +232,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,y{u} ,x[.] )
+		A( x{u} ,y{u} ,x[][.] )
 
 
 	Applying rule x (File "bdu_ex.ka", line 8, characters 4-32:):
@@ -240,7 +240,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule x (File "bdu_ex.ka", line 8, characters 4-32:) is applied for the first time
 
-		Updating the views for A(x{},y{},x[])
+		Updating the views for A(x,y,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -277,7 +277,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,x[.] )
+		A( x{p} ,y{u} ,x[][.] )
 
 
 	Applying rule y (File "bdu_ex.ka", line 9, characters 4-49:):
@@ -285,7 +285,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule y (File "bdu_ex.ka", line 9, characters 4-49:) is applied for the first time
 
-		Updating the views for A(x{},y{},x[])
+		Updating the views for A(x,y,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=22
@@ -322,7 +322,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{p} ,x[.] )
+		A( x{p} ,y{p} ,x[][.] )
 
 
 	Applying rule bind (File "bdu_ex.ka", line 10, characters 7-45:):
@@ -330,7 +330,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule bind (File "bdu_ex.ka", line 10, characters 7-45:) is applied for the first time
 
-		Updating the views for A(x{},y{},x[])
+		Updating the views for A(x,y,x[])
 
 INTENSIONAL DESCRIPTION:
 Id=35
@@ -392,12 +392,12 @@ Id=35
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,x[A@x] )
-		A( x{p} ,y{p} ,x[A@x] )
-		A( x{u} ,y{u} ,x[A@x] )
+		A( x{p} ,y{u} ,x[][x.A] )
+		A( x{p} ,y{p} ,x[][x.A] )
+		A( x{u} ,y{u} ,x[][x.A] )
 
 
-		Updating the views for A(x{},y{},x[])
+		Updating the views for A(x,y,x[])
 
 	Applying rule create (File "bdu_ex.ka", line 7, characters 9-28:):
 		the precondition is satisfied
@@ -405,19 +405,19 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule x (File "bdu_ex.ka", line 8, characters 4-32:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},x[])
+		Updating the views for A(x,y,x[])
 
 	Applying rule y (File "bdu_ex.ka", line 9, characters 4-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},x[])
+		Updating the views for A(x,y,x[])
 
 	Applying rule bind (File "bdu_ex.ka", line 10, characters 7-45:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},y{},x[])
+		Updating the views for A(x,y,x[])
 
-		Updating the views for A(x{},y{},x[])
+		Updating the views for A(x,y,x[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -534,9 +534,9 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{u}[.]) v A(y{p}[.]) ]
-A() => [ A(x{u}[#]) v A(x{p}[#]) ]
-A() => [ A(x[.]) v A(x[A.x]) ]
+A() => [ A(y3{u}[.]) v A(y3{p}[.]) ]
+A() => [ A(x3{u}[#]) v A(x3{p}[#]) ]
+A() => [ A(x3[.]) v A(x3[x.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -596,7 +596,7 @@ Id=57
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y{p}[.]) => A(x{p}[#],y{p}[.])
+A(y3{p}[.]) => A(x3{p}[#],y3{p}[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -707,19 +707,19 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(x[.])
-		v A(x[A.x])]
+		  A(x3[.])
+		v A(x3[x.A])]
 A()=> [
-		  A(x{u}[#])
-		v A(x{p}[#])]
+		  A(x3{u}[#])
+		v A(x3{p}[#])]
 A()=> [
-		  A(y{u}[.])
-		v A(y{p}[.])]
+		  A(y3{u}[.])
+		v A(y3{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(y{p}[.])=> [A(x{p}[#],y{p}[.])]
+A(y3{p}[.])=> [A(x3{p}[#],y3{p}[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

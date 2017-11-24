@@ -11,31 +11,31 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-R() => [ R(z[.]) v R(z[R.y]) ]
-R() => [ R(y[.]) v R(y[R.z]) ]
-R() => [ R(x[.]) v R(x[R.x]) ]
+R() => [ R(z3[.]) v R(z3[y.R]) ]
+R() => [ R(y3[.]) v R(y3[z.R]) ]
+R() => [ R(x3[.]) v R(x3[x.R]) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-R(z[R.y]) => R(x[R.x],z[R.y])
-R(y[R.z]) => R(x[R.x],y[R.z])
+R(z3[y.R]) => R(x3[x.R],z3[y.R])
+R(y3[z.R]) => R(x3[x.R],y3[z.R])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-R(x[1]),R(x[1]) => 
+R(x3[1]),R(x3[1]) => 
 	[
-		  R(x[1],y[R.z]),R(x[1],z[R.y])
-		v R(x[1],y[.]),R(x[1],z[.])
+		  R(x3[1],y3[z.R]),R(x3[1],z3[y.R])
+		v R(x3[1],y3[.]),R(x3[1],z3[.])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-R(x[R.x],y[R.z]) => R(x[1],y[2]),R(x[1],z[2])
-R(x[R.x],z[R.y]) => R(x[1],z[2]),R(x[1],y[2])
+R(x3[x.R],y3[z.R]) => R(x3[1],y3[2]),R(x3[1],z3[2])
+R(x3[x.R],z3[y.R]) => R(x3[1],z3[2]),R(x3[1],y3[2])
 
 Potential polymerization:
-(R,x[)--(R,x[); (R,z[)--(R,y[); (R,y[)--(R,z[); 
+(R,x[])--(R,x[]); (R,z[])--(R,y[]); (R,y[])--(R,z[]); 
 Generating the raw influence map...
 Refining the influence map...
 execution finished without any exception

@@ -643,7 +643,7 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z{u} ,z[.] ,t[.] )
+		A( z{u} ,z[][.] ,t[][.] )
 
 
 	Applying rule r0 (File "product.ka", line 7, characters 5-75:):
@@ -657,7 +657,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r2 (File "product.ka", line 9, characters 5-43:) is applied for the first time
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=25
@@ -694,7 +694,7 @@ Id=25
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z{p} ,z[.] ,t[.] )
+		A( z{p} ,z[][.] ,t[][.] )
 
 
 	Applying rule r3 (File "product.ka", line 10, characters 5-43:):
@@ -702,14 +702,14 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "product.ka", line 10, characters 5-43:) is applied for the first time
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r4 (File "product.ka", line 11, characters 5-75:):
 		the precondition is satisfied
 
 		rule r4 (File "product.ka", line 11, characters 5-75:) is applied for the first time
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=40
@@ -746,17 +746,17 @@ Id=40
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z{u} ,z[A@z] ,t[.] )
+		A( z{u} ,z[][z.A] ,t[][.] )
 
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r5 (File "product.ka", line 12, characters 5-75:):
 		the precondition is satisfied
 
 		rule r5 (File "product.ka", line 12, characters 5-75:) is applied for the first time
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=29
@@ -793,17 +793,17 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z{u} ,z[.] ,t[A@t] )
+		A( z{u} ,z[][.] ,t[][t.A] )
 
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r6 (File "product.ka", line 13, characters 5-75:):
 		the precondition is satisfied
 
 		rule r6 (File "product.ka", line 13, characters 5-75:) is applied for the first time
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=52
@@ -840,17 +840,17 @@ Id=52
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z{p} ,z[A@z] ,t[.] )
+		A( z{p} ,z[][z.A] ,t[][.] )
 
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r7 (File "product.ka", line 14, characters 5-75:):
 		the precondition is satisfied
 
 		rule r7 (File "product.ka", line 14, characters 5-75:) is applied for the first time
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=31
@@ -887,10 +887,10 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z{p} ,z[.] ,t[A@t] )
+		A( z{p} ,z[][.] ,t[][t.A] )
 
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r8 (File "product.ka", line 15, characters 5-75:):
 		the precondition is not satisfied yet
@@ -904,40 +904,40 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r2 (File "product.ka", line 9, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r3 (File "product.ka", line 10, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r4 (File "product.ka", line 11, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r5 (File "product.ka", line 12, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r6 (File "product.ka", line 13, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 	Applying rule r7 (File "product.ka", line 14, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
-		Updating the views for A(z{},z[],t[])
+		Updating the views for A(z,z[],t[])
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -1049,9 +1049,9 @@ Id=71
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(z[.]) v A(z[A.z]) ]
-A() => [ A(t[.]) v A(t[A.t]) ]
-A() => [ A(z{u}[#]) v A(z{p}[#]) ]
+A() => [ A(z3[.]) v A(z3[z.A]) ]
+A() => [ A(t3[.]) v A(t3[t.A]) ]
+A() => [ A(z3{u}[#]) v A(z3{p}[#]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1111,19 +1111,19 @@ Id=75
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z[A.z]) => A(t[.],z[A.z])
+A(z3[z.A]) => A(t3[.],z3[z.A])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(z[1]),A(z[1]) => 
+A(z3[1]),A(z3[1]) => 
 	[
-		  A(z{p}[1]),A(z{p}[1])
-		v A(z{u}[1]),A(z{u}[1])
+		  A(z3{p}[1]),A(z3{p}[1])
+		v A(z3{u}[1]),A(z3{u}[1])
 	]
-A(t[1]),A(t[1]) => 
+A(t3[1]),A(t3[1]) => 
 	[
-		  A(t[1],z{p}[#]),A(t[1],z{p}[#])
-		v A(t[1],z{u}[#]),A(t[1],z{u}[#])
+		  A(t3[1],z3{p}[#]),A(t3[1],z3{p}[#])
+		v A(t3[1],z3{u}[#]),A(t3[1],z3{u}[#])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1232,29 +1232,29 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(z{u}[#])
-		v A(z{p}[#])]
+		  A(z3{u}[#])
+		v A(z3{p}[#])]
 A()=> [
-		  A(t[.])
-		v A(t[A.t])]
+		  A(t3[.])
+		v A(t3[t.A])]
 A()=> [
-		  A(z[.])
-		v A(z[A.z])]
+		  A(z3[.])
+		v A(z3[z.A])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z[A.z])=> [A(t[.],z[A.z])]
+A(z3[z.A])=> [A(t3[.],z3[z.A])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z[1]),A(z[1])=> [
-		  A(z{p}[1]),A(z{p}[1])
-		v A(z{u}[1]),A(z{u}[1])]
-A(t[1]),A(t[1])=> [
-		  A(t[1],z{p}[#]),A(t[1],z{p}[#])
-		v A(t[1],z{u}[#]),A(t[1],z{u}[#])]
+A(z3[1]),A(z3[1])=> [
+		  A(z3{p}[1]),A(z3{p}[1])
+		v A(z3{u}[1]),A(z3{u}[1])]
+A(t3[1]),A(t3[1])=> [
+		  A(t3[1],z3{p}[#]),A(t3[1],z3{p}[#])
+		v A(t3[1],z3{u}[#]),A(t3[1],z3{u}[#])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
