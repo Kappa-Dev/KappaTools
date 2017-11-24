@@ -926,8 +926,8 @@ let split_mixture m =
          | Absent _ -> pack
          | Present ((_,pos as na),intf,modif) ->
            match modif with
-           | Some Erase -> (Absent pos::lhs,Present (na,intf,None)::rhs)
-           | Some Create -> (Present (na,intf,None)::lhs,Absent pos::rhs)
+           | Some Create -> (Absent pos::lhs,Present (na,intf,None)::rhs)
+           | Some Erase -> (Present (na,intf,None)::lhs,Absent pos::rhs)
            | None ->
              let (intfl,intfr) =
                List.fold_left
