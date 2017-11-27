@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 13 2017>
+  * Last modification: Time-stamp: <Nov 27 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1494,6 +1494,9 @@ let get_internal_scc_decomposition
        ~log_title:("Decompose the contact map in strongly connected components")
        )
 
+let get_internal_scc_decomposition_map state =
+  Remanent_state.get_internal_scc_decomposition_map state
+
 (*internal contact map*)
 
 (*((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)*
@@ -1699,11 +1702,11 @@ let output_internal_contact_map ?logger
     get_internal_contact_map ~accuracy_level state in
   let state, handler = get_handler state in
   let error = get_errors state in
-  (*let state, scc_contact_map =
-    get_internal_scc_decomposition state in*)
+  let scc_contact_map =
+    Remanent_state.get_internal_scc_decomposition_map state in
   let error =
     Preprocess.dot_of_contact_map
-      ?logger parameters error handler contact_map
+      ?logger parameters error handler scc_contact_map contact_map
   in
   set_errors error state
 

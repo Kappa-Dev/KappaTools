@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 13 2017>
+  * Last modification: Time-stamp: <Nov 27 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -715,6 +715,8 @@ let set_internal_scc_decomposition accuracy accuracy' dec state =
      (Public_data.AccuracyMap.add accuracy' dec old)
      state.internal_scc_decomposition
   }
+
+let get_internal_scc_decomposition_map state = state.internal_scc_decomposition
 
 let get_internal_scc_decomposition accuracy accuracy' state =
   match

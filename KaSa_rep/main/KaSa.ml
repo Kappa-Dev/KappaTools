@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 13 2017>
+ * Last modification: Time-stamp: <Nov 27 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -36,36 +36,6 @@ let main () =
       state
   in
   let parameters = Export_to_KaSa.get_parameters state in
-  let state =
-    let bool, state  =
-      if (Remanent_parameters.get_do_contact_map parameters)
-      then
-        match Remanent_parameters.get_contact_map_accuracy_level parameters
-        with
-        | Remanent_parameters_sig.None
-        | Remanent_parameters_sig.Low ->
-          true,
-          Export_to_KaSa.output_internal_contact_map
-            ~accuracy_level:Public_data.Low state
-        | Remanent_parameters_sig.Medium
-        | Remanent_parameters_sig.High
-        | Remanent_parameters_sig.Full -> false, state
-      else false, state
-    in
-    if bool then state
-    else
-    if Remanent_parameters.get_trace parameters || Print_cckappa.trace
-    then
-      let state, c_compil = Export_to_KaSa.get_c_compilation state in
-      let parameters' =
-        Remanent_parameters.update_prefix  parameters "Compilation:" in
-      let state = Export_to_KaSa.set_parameters parameters' state in
-      let state = Export_to_KaSa.dump_c_compil state c_compil in
-      let state = Export_to_KaSa.set_parameters parameters state in
-      state
-    else
-      state
-  in
   (*-----------------------------------------------------------------------*)
   (*WORK IN PROCESS:*)
   let state =
@@ -99,7 +69,38 @@ let main () =
     else
       state
   in
-  (*-----------------------------------------------------------------------*)
+  (*--------------------------------------------------------------------*)
+  let state =
+    let bool, state  =
+      if (Remanent_parameters.get_do_contact_map parameters)
+      then
+        match Remanent_parameters.get_contact_map_accuracy_level parameters
+        with
+        | Remanent_parameters_sig.None
+        | Remanent_parameters_sig.Low ->
+          true,
+          Export_to_KaSa.output_internal_contact_map
+            ~accuracy_level:Public_data.Low state
+        | Remanent_parameters_sig.Medium
+        | Remanent_parameters_sig.High
+        | Remanent_parameters_sig.Full -> false, state
+      else false, state
+    in
+    if bool then state
+    else
+    if Remanent_parameters.get_trace parameters || Print_cckappa.trace
+    then
+      let state, c_compil = Export_to_KaSa.get_c_compilation state in
+      let parameters' =
+        Remanent_parameters.update_prefix  parameters "Compilation:" in
+      let state = Export_to_KaSa.set_parameters parameters' state in
+      let state = Export_to_KaSa.dump_c_compil state c_compil in
+      let state = Export_to_KaSa.set_parameters parameters state in
+      state
+    else
+      state
+  in
+(*-----------------------------------------------------------------------*)
   let state =
     if Remanent_parameters.get_do_influence_map parameters
     then

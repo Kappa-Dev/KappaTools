@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Nov 12 2017>
+   * Last modification: Time-stamp: <Nov 27 2017>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -2030,8 +2030,28 @@ let convert_scc_list_to_map parameters error internal_scc_decomposition =
   in
   error, internal_scc_decomposition_map
 
+let convert_scc_maps_into_set
+    parameters error scc_map =
+  Public_data.AccuracyMap.fold
+    (fun _ m error_set ->
+       Public_data.AccuracyMap.fold
+         (fun _ list error_set ->
+            List.fold_left
+              (
+                List.fold_left
+                  (fun (error, set) link ->
+                    Ckappa_sig.PairAgentSite_map_and_set.Set.add_when_not_in
+                      parameters error link set)
+                )
+              error_set list)
+         m error_set )
+    scc_map
+    (error,
+     Ckappa_sig.PairAgentSite_map_and_set.Set.empty)
+
+
 let dot_of_contact_map ?logger parameters error
-    handler contact_map =
+    handler scc_map contact_map =
   let parameters_dot =
     match
       logger
@@ -2039,6 +2059,7 @@ let dot_of_contact_map ?logger parameters error
     | None -> Remanent_parameters.open_contact_map_file parameters
     | Some logger -> Remanent_parameters.set_logger parameters logger
   in
+  let error, scc_set = convert_scc_maps_into_set parameters error scc_map in
   let _ =
     List.iter
       (fun x ->
@@ -2082,8 +2103,12 @@ let dot_of_contact_map ?logger parameters error
          let _ =
            Loggers.fprintf
              (Remanent_parameters.get_logger parameters_dot)
-             "subgraph cluster%s {\n"
+             "subgraph cluster%s {"
              (Ckappa_sig.string_of_agent_name i)
+         in
+         let () =
+           Loggers.print_newline
+             (Remanent_parameters.get_logger parameters_dot)
          in
          let n_sites,error =
            Ckappa_sig.Site_map_and_set.Map.fold
@@ -2169,7 +2194,6 @@ let dot_of_contact_map ?logger parameters error
          error)
       contact_map error
   in
-  (*TODO*)
   let error =
     Ckappa_sig.Agent_map_and_set.Map.fold
       (fun i site_map error ->
@@ -2188,14 +2212,29 @@ let dot_of_contact_map ?logger parameters error
                        || (Ckappa_sig.compare_agent_name i i' = 0 &&
                            Ckappa_sig.compare_site_name j j' <= 0)
                        then
+                         let color =
+                           let b =
+                             Ckappa_sig.PairAgentSite_map_and_set.Set.mem
+                               ((i,j),(i',j')) scc_set
+                           in
+                           if b
+                           then
+                             " [color=\"red\"]"
+                           else ""
+                         in
                          let _ =
                            Loggers.fprintf
                              (Remanent_parameters.get_logger parameters_dot)
-                             "%s.%s -- %s.%s\n"
+                             "%s.%s -- %s.%s%s"
                              (Ckappa_sig.string_of_agent_name i)
                              (Ckappa_sig.string_of_site_name j)
                              (Ckappa_sig.string_of_agent_name i')
                              (Ckappa_sig.string_of_site_name j')
+                             color
+                         in
+                         let _ =
+                           Loggers.print_newline
+                           (Remanent_parameters.get_logger parameters_dot)
                          in
                          error
                        else
