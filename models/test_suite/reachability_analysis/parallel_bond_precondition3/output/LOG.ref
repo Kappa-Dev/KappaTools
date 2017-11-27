@@ -402,7 +402,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t[.] )
+		A( z[][.] ,t[][.] )
 
 	Views in initial state:
 
@@ -421,7 +421,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} )
+		A( x{}{u} )
 
 	Views in initial state:
 
@@ -450,7 +450,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[.] ,t[.] )
+		B( z[][.] ,t[][.] )
 
 	Views in initial state:
 
@@ -469,7 +469,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} )
+		B( x{}{u} )
 
 
 	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:):
@@ -477,7 +477,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:) is applied for the first time
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -504,10 +504,10 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[z.B] ,t[.] )
+		A( z[][z.B] ,t[][.] )
 
 
-		Updating the views for B(z,t)
+		Updating the views for B(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -534,7 +534,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[z.A] ,t[.] )
+		B( z[][z.A] ,t[][.] )
 
 
 	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:):
@@ -542,7 +542,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:) is applied for the first time
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -569,10 +569,10 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[z.B] ,t[t.B] )
+		A( z[][z.B] ,t[][t.B] )
 
 
-		Updating the views for B(z,t)
+		Updating the views for B(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -599,7 +599,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[z.A] ,t[t.A] )
+		B( z[][z.A] ,t[][t.A] )
 
 
 	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:):
@@ -607,9 +607,9 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:) is applied for the first time
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
-		Updating the views for B(z,t)
+		Updating the views for B(z[],t[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -637,7 +637,7 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t[t.B] )
+		A( z[][.] ,t[][t.B] )
 
 	Dealing with side effects
 
@@ -666,7 +666,7 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[.] ,t[t.A] )
+		B( z[][.] ,t[][t.A] )
 
 
 	Applying rule r4 (File "parallel_bonds.ka", line 10, characters 5-41:):
@@ -674,30 +674,30 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r4 (File "parallel_bonds.ka", line 10, characters 5-41:) is applied for the first time
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
-		Updating the views for B(z,t)
+		Updating the views for B(z[],t[])
 
 	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
-		Updating the views for B(z,t)
+		Updating the views for B(z[],t[])
 
 	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
-		Updating the views for B(z,t)
+		Updating the views for B(z[],t[])
 
 	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:):
 		the precondition is satisfied
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
-		Updating the views for B(z,t)
+		Updating the views for B(z[],t[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

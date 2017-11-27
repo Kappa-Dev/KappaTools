@@ -522,7 +522,7 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,z[.] ,t[.] )
+		A( x{}{u} ,z[][.] ,t[][.] )
 
 	Views in initial state:
 
@@ -561,7 +561,7 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,z[.] ,t[.] )
+		B( x{}{u} ,z[][.] ,t[][.] )
 
 
 	Applying rule r0 (File "parallel_bonds.ka", line 7, characters 5-33:):
@@ -569,7 +569,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r0 (File "parallel_bonds.ka", line 7, characters 5-33:) is applied for the first time
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -606,7 +606,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,z[.] ,t[.] )
+		A( x{}{p} ,z[][.] ,t[][.] )
 
 
 	Applying rule r2 (File "parallel_bonds.ka", line 9, characters 5-95:):
@@ -617,7 +617,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "parallel_bonds.ka", line 10, characters 5-75:) is applied for the first time
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=32
@@ -654,10 +654,10 @@ Id=32
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,z[.] ,t[t.B] )
+		A( x{}{u} ,z[][.] ,t[][t.B] )
 
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=32
@@ -694,7 +694,7 @@ Id=32
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,z[.] ,t[t.A] )
+		B( x{}{u} ,z[][.] ,t[][t.A] )
 
 
 	Applying rule r4 (File "parallel_bonds.ka", line 11, characters 5-63:):
@@ -702,7 +702,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r4 (File "parallel_bonds.ka", line 11, characters 5-63:) is applied for the first time
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=45
@@ -739,10 +739,10 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,z[z.B] ,t[t.B] )
+		A( x{}{u} ,z[][z.B] ,t[][t.B] )
 
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=45
@@ -779,7 +779,7 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,z[z.A] ,t[t.A] )
+		B( x{}{u} ,z[][z.A] ,t[][t.A] )
 
 
 	Applying rule r5 (File "parallel_bonds.ka", line 12, characters 5-63:):
@@ -790,14 +790,14 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r6 (File "parallel_bonds.ka", line 13, characters 5-43:) is applied for the first time
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 	Applying rule r1 (File "parallel_bonds.ka", line 8, characters 5-33:):
 		the precondition is satisfied
 
 		rule r1 (File "parallel_bonds.ka", line 8, characters 5-33:) is applied for the first time
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=64
@@ -849,9 +849,9 @@ Id=64
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{p} ,z[.] ,t[t.A] )
-		B( x{p} ,z[.] ,t[.] )
-		B( x{p} ,z[z.A] ,t[t.A] )
+		B( x{}{p} ,z[][.] ,t[][t.A] )
+		B( x{}{p} ,z[][.] ,t[][.] )
+		B( x{}{p} ,z[][z.A] ,t[][t.A] )
 
 
 	Applying rule r7 (File "parallel_bonds.ka", line 14, characters 5-33:):
@@ -859,12 +859,12 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r7 (File "parallel_bonds.ka", line 14, characters 5-33:) is applied for the first time
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r0 (File "parallel_bonds.ka", line 7, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=74
@@ -901,8 +901,8 @@ Id=74
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,z[.] ,t[t.B] )
-		A( x{p} ,z[z.B] ,t[t.B] )
+		A( x{}{p} ,z[][.] ,t[][t.B] )
+		A( x{}{p} ,z[][z.B] ,t[][t.B] )
 
 
 	Applying rule r2 (File "parallel_bonds.ka", line 9, characters 5-95:):
@@ -910,7 +910,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r2 (File "parallel_bonds.ka", line 9, characters 5-95:) is applied for the first time
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=86
@@ -947,10 +947,10 @@ Id=86
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,z[z.B] ,t[.] )
+		A( x{}{p} ,z[][z.B] ,t[][.] )
 
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=86
@@ -987,46 +987,46 @@ Id=86
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{p} ,z[z.A] ,t[.] )
+		B( x{}{p} ,z[][z.A] ,t[][.] )
 
 
 	Applying rule r3 (File "parallel_bonds.ka", line 10, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r4 (File "parallel_bonds.ka", line 11, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r1 (File "parallel_bonds.ka", line 8, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r5 (File "parallel_bonds.ka", line 12, characters 5-63:):
 		the precondition is satisfied
 
 		rule r5 (File "parallel_bonds.ka", line 12, characters 5-63:) is applied for the first time
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r6 (File "parallel_bonds.ka", line 13, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 	Applying rule r7 (File "parallel_bonds.ka", line 14, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=108
@@ -1063,75 +1063,75 @@ Id=108
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,z[z.A] ,t[.] )
+		B( x{}{u} ,z[][z.A] ,t[][.] )
 
 
 	Applying rule r0 (File "parallel_bonds.ka", line 7, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 	Applying rule r2 (File "parallel_bonds.ka", line 9, characters 5-95:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r3 (File "parallel_bonds.ka", line 10, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r1 (File "parallel_bonds.ka", line 8, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r4 (File "parallel_bonds.ka", line 11, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r5 (File "parallel_bonds.ka", line 12, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r6 (File "parallel_bonds.ka", line 13, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
 	Applying rule r7 (File "parallel_bonds.ka", line 14, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r2 (File "parallel_bonds.ka", line 9, characters 5-95:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r3 (File "parallel_bonds.ka", line 10, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(x,z,t)
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r0 (File "parallel_bonds.ka", line 7, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for A(x,z,t)
+		Updating the views for A(x{},z[],t[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

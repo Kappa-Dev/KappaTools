@@ -12,8 +12,8 @@ every agent may occur in the model
 
 ------------------------------------------------------------
 The following transitions are separating:
-rule z (File "sep_transitions2.ka", line 6, characters 3-23:): A(xp,yu,zu) -> A(xp,yu,zp)
-rule z (File "sep_transitions2.ka", line 6, characters 3-23:): A(xu,yu,zu) -> A(xu,yu,zp)
+rule z (File "sep_transitions2.ka", line 6, characters 3-23:): A(x~p,y~u,z~u) -> A(x~p,y~u,z~p)
+rule z (File "sep_transitions2.ka", line 6, characters 3-23:): A(x~u,y~u,z~u) -> A(x~u,y~u,z~p)
 
 
 ------------------------------------------------------------

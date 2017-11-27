@@ -3,8 +3,8 @@ digraph G{
 "Init_22" [label="" style="invis" width="0px" height="0px"];
 "Final_22" [label="" style="invis" width="0px" height="0px"];
 "Final_23" [label="" style="invis" width="0px" height="0px"];
-"Node_23" [label="C(a[x.A],b{u})"];
-"Node_22" [label="C(a[x.B],b{u})"];
+"Node_23" [label="C(a[][x.A],b{}{u})"];
+"Node_22" [label="C(a[][x.B],b{}{u})"];
 "Init_23" -> "Node_23" [label=""];
 "Init_22" -> "Node_22" [label=""];
 "Node_22" -> "Final_22" [label="0"];

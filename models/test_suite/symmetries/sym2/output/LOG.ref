@@ -608,7 +608,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] ,y[.] )
+		A( x[][.] ,y[][.] )
 
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[1] y[.]), A(x[1] y[.]) (File "sym2.ka", line 1, characters 0-61:):
@@ -616,7 +616,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[1] y[.]), A(x[1] y[.]) (File "sym2.ka", line 1, characters 0-61:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -643,26 +643,26 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[x.A] ,y[.] )
+		A( x[][x.A] ,y[][.] )
 
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 1, characters 0-61:):
 		the precondition is satisfied
 
 		rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 1, characters 0-61:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[.] y[1]), A(x[1] y[.]) (File "sym2.ka", line 2, characters 0-61:):
 		the precondition is satisfied
 
 		rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[.] y[1]), A(x[1] y[.]) (File "sym2.ka", line 2, characters 0-61:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -689,10 +689,10 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] ,y[x.A] )
+		A( x[][.] ,y[][x.A] )
 
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -719,7 +719,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[y.A] ,y[.] )
+		A( x[][y.A] ,y[][.] )
 
 
 	Applying rule A(x[.] y[1]), A(x[1] y[.]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 2, characters 0-61:):
@@ -727,34 +727,34 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x[.] y[1]), A(x[1] y[.]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 2, characters 0-61:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[1] y[.]), A(x[.] y[1]) (File "sym2.ka", line 3, characters 0-61:):
 		the precondition is satisfied
 
 		rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[1] y[.]), A(x[.] y[1]) (File "sym2.ka", line 3, characters 0-61:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[1] y[.]), A(x[.] y[1]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 3, characters 0-61:):
 		the precondition is satisfied
 
 		rule A(x[1] y[.]), A(x[.] y[1]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 3, characters 0-61:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[.] y[1]), A(x[.] y[1]) (File "sym2.ka", line 4, characters 0-61:):
 		the precondition is satisfied
 
 		rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[.] y[1]), A(x[.] y[1]) (File "sym2.ka", line 4, characters 0-61:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 INTENSIONAL DESCRIPTION:
 Id=23
@@ -781,68 +781,68 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] ,y[y.A] )
+		A( x[][.] ,y[][y.A] )
 
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[1]), A(x[.] y[1]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 4, characters 0-61:):
 		the precondition is satisfied
 
 		rule A(x[.] y[1]), A(x[.] y[1]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 4, characters 0-61:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[1] y[.]), A(x[1] y[.]) (File "sym2.ka", line 1, characters 0-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 1, characters 0-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[.] y[1]), A(x[1] y[.]) (File "sym2.ka", line 2, characters 0-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[1]), A(x[1] y[.]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 2, characters 0-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[1] y[.]), A(x[.] y[1]) (File "sym2.ka", line 3, characters 0-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[1] y[.]), A(x[.] y[1]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 3, characters 0-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[.] y[1]), A(x[.] y[1]) (File "sym2.ka", line 4, characters 0-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

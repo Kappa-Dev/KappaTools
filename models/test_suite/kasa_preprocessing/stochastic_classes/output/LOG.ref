@@ -437,7 +437,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( y{u} )
+		B( y{}{u} )
 
 	Dealing with creation
 
@@ -456,7 +456,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} )
+		B( x{}{u} )
 
 
 	Applying rule r3 (File "stochastic_create.ka", line 10, characters 5-32:):
@@ -480,7 +480,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( y{u} )
+		D( y{}{u} )
 
 	Dealing with creation
 
@@ -499,7 +499,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x{u} )
+		D( x{}{u} )
 
 
 	Applying rule r6 (File "stochastic_create.ka", line 13, characters 5-24:):

@@ -26,10 +26,10 @@ B() => [ B(x[.]) v B(x[y.B]) ]
 * Properties of pairs of bonds
 ------------------------------------------------------------
 Potential polymerization:
-(B,y)--(B,x); 
-(B,x)--(B,y); 
-(A,y)--(A,x); 
-(A,x)--(A,y); 
+(B,y[])--(B,x[]); 
+(B,x[])--(B,y[]); 
+(A,y[])--(A,x[]); 
+(A,x[])--(A,y[]); 
 Generating the raw influence map...
 Refining the influence map...
 execution finished without any exception

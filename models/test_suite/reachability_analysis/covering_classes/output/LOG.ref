@@ -907,7 +907,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( y{u} ,y[.] )
+		A( y{}{u} ,y[][.] )
 
 	Dealing with creation
 
@@ -936,7 +936,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,x[.] )
+		A( x{}{u} ,x[][.] )
 
 
 	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-32:):
@@ -970,7 +970,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( y{u} ,y[.] )
+		B( y{}{u} ,y[][.] )
 
 	Dealing with creation
 
@@ -999,7 +999,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,x[.] )
+		B( x{}{u} ,x[][.] )
 
 
 	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-32:):
@@ -1033,7 +1033,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( y{u} ,y[.] )
+		C( y{}{u} ,y[][.] )
 
 	Dealing with creation
 
@@ -1062,7 +1062,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x{u} ,x[.] )
+		C( x{}{u} ,x[][.] )
 
 
 	Applying rule r3 (File "covering_classes.ka", line 4, characters 5-23:):
@@ -1073,7 +1073,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r4 (File "covering_classes.ka", line 5, characters 5-49:) is applied for the first time
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -1100,10 +1100,10 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,x[x.B] )
+		A( x{}{u} ,x[][x.B] )
 
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1130,7 +1130,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{p} ,x[x.A] )
+		B( x{}{p} ,x[][x.A] )
 
 
 	Applying rule r5 (File "covering_classes.ka", line 6, characters 5-71:):
@@ -1147,7 +1147,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r9 (File "covering_classes.ka", line 10, characters 5-49:) is applied for the first time
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -1174,10 +1174,10 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( y{u} ,y[y.B] )
+		A( y{}{u} ,y[][y.B] )
 
 
-		Updating the views for B(y,y)
+		Updating the views for B(y{},y[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1204,7 +1204,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( y{p} ,y[y.A] )
+		B( y{}{p} ,y[][y.A] )
 
 
 	Applying rule r10 (File "covering_classes.ka", line 11, characters 6-72:):
@@ -1233,7 +1233,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "covering_classes.ka", line 4, characters 5-23:) is applied for the first time
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1261,7 +1261,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( y{p} ,y[.] )
+		B( y{}{p} ,y[][.] )
 
 	Dealing with side effects
 
@@ -1290,22 +1290,22 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{p} ,x[.] )
+		B( x{}{p} ,x[][.] )
 
 
 	Applying rule r4 (File "covering_classes.ka", line 5, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
 	Applying rule r5 (File "covering_classes.ka", line 6, characters 5-71:):
 		the precondition is satisfied
 
 		rule r5 (File "covering_classes.ka", line 6, characters 5-71:) is applied for the first time
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -1332,12 +1332,12 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,x[x.C] )
+		A( x{}{u} ,x[][x.C] )
 
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1364,7 +1364,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x{p} ,x[x.A] )
+		C( x{}{p} ,x[][x.A] )
 
 
 	Applying rule r6 (File "covering_classes.ka", line 7, characters 5-55:):
@@ -1372,9 +1372,9 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r6 (File "covering_classes.ka", line 7, characters 5-55:) is applied for the first time
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=36
@@ -1401,7 +1401,7 @@ Id=36
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,x[x.C] )
+		A( x{}{p} ,x[][x.C] )
 
 
 	Applying rule r8 (File "covering_classes.ka", line 9, characters 5-23:):
@@ -1409,7 +1409,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r8 (File "covering_classes.ka", line 9, characters 5-23:) is applied for the first time
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1437,15 +1437,15 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x{p} ,x[.] )
+		C( x{}{p} ,x[][.] )
 
 
 	Applying rule r9 (File "covering_classes.ka", line 10, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
-		Updating the views for B(y,y)
+		Updating the views for B(y{},y[])
 
 	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-32:):
 		the precondition is satisfied
@@ -1455,7 +1455,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r7 (File "covering_classes.ka", line 8, characters 5-21:) is applied for the first time
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1483,7 +1483,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,x[.] )
+		A( x{}{p} ,x[][.] )
 
 
 	Applying rule r10 (File "covering_classes.ka", line 11, characters 6-72:):
@@ -1491,7 +1491,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r10 (File "covering_classes.ka", line 11, characters 6-72:) is applied for the first time
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -1518,12 +1518,12 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( y{u} ,y[y.C] )
+		A( y{}{u} ,y[][y.C] )
 
 
-		Updating the views for B(y,y)
+		Updating the views for B(y{},y[])
 
-		Updating the views for C(y,y)
+		Updating the views for C(y{},y[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1550,7 +1550,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( y{p} ,y[y.A] )
+		C( y{}{p} ,y[][y.A] )
 
 
 	Applying rule r11 (File "covering_classes.ka", line 12, characters 6-56:):
@@ -1558,9 +1558,9 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r11 (File "covering_classes.ka", line 12, characters 6-56:) is applied for the first time
 
-		Updating the views for C(y,y)
+		Updating the views for C(y{},y[])
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
 INTENSIONAL DESCRIPTION:
 Id=36
@@ -1587,7 +1587,7 @@ Id=36
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( y{p} ,y[y.C] )
+		A( y{}{p} ,y[][y.C] )
 
 
 	Applying rule r12 (File "covering_classes.ka", line 13, characters 6-22:):
@@ -1595,7 +1595,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r12 (File "covering_classes.ka", line 13, characters 6-22:) is applied for the first time
 
-		Updating the views for C(y,y)
+		Updating the views for C(y{},y[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1623,13 +1623,13 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( y{p} ,y[.] )
+		A( y{}{p} ,y[][.] )
 
 
 	Applying rule r3 (File "covering_classes.ka", line 4, characters 5-23:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1657,7 +1657,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( y{p} ,y[.] )
+		C( y{}{p} ,y[][.] )
 
 
 	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-32:):
@@ -1669,16 +1669,16 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r5 (File "covering_classes.ka", line 6, characters 5-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
 	Applying rule r4 (File "covering_classes.ka", line 5, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1705,22 +1705,22 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,x[x.B] )
+		A( x{}{p} ,x[][x.B] )
 
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
 	Applying rule r6 (File "covering_classes.ka", line 7, characters 5-55:):
 		the precondition is satisfied
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 	Applying rule r8 (File "covering_classes.ka", line 9, characters 5-23:):
 		the precondition is satisfied
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
 	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-32:):
 		the precondition is satisfied
@@ -1728,12 +1728,12 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r7 (File "covering_classes.ka", line 8, characters 5-21:):
 		the precondition is satisfied
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
 	Applying rule r9 (File "covering_classes.ka", line 10, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1760,45 +1760,45 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( y{p} ,y[y.B] )
+		A( y{}{p} ,y[][y.B] )
 
 
-		Updating the views for B(y,y)
+		Updating the views for B(y{},y[])
 
 	Applying rule r10 (File "covering_classes.ka", line 11, characters 6-72:):
 		the precondition is satisfied
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
-		Updating the views for B(y,y)
+		Updating the views for B(y{},y[])
 
-		Updating the views for C(y,y)
+		Updating the views for C(y{},y[])
 
 	Applying rule r11 (File "covering_classes.ka", line 12, characters 6-56:):
 		the precondition is satisfied
 
-		Updating the views for C(y,y)
+		Updating the views for C(y{},y[])
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
 	Applying rule r12 (File "covering_classes.ka", line 13, characters 6-22:):
 		the precondition is satisfied
 
-		Updating the views for C(y,y)
+		Updating the views for C(y{},y[])
 
 	Applying rule r3 (File "covering_classes.ka", line 4, characters 5-23:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 	Applying rule r5 (File "covering_classes.ka", line 6, characters 5-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
 	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-32:):
 		the precondition is satisfied
@@ -1806,9 +1806,9 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r4 (File "covering_classes.ka", line 5, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
 	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-32:):
 		the precondition is satisfied
@@ -1819,26 +1819,26 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r6 (File "covering_classes.ka", line 7, characters 5-55:):
 		the precondition is satisfied
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 	Applying rule r7 (File "covering_classes.ka", line 8, characters 5-21:):
 		the precondition is satisfied
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
 	Applying rule r8 (File "covering_classes.ka", line 9, characters 5-23:):
 		the precondition is satisfied
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
 	Applying rule r9 (File "covering_classes.ka", line 10, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(y,y)
+		Updating the views for A(y{},y[])
 
-		Updating the views for B(y,y)
+		Updating the views for B(y{},y[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

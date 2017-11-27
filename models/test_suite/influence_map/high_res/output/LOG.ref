@@ -269,7 +269,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( y{u} ,z{u} )
+		Influence_map:A( y{}{u} ,z{}{u} )
 
 	Views in initial state:
 
@@ -308,7 +308,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{u} ,z{u} ,w{u} )
+		Influence_map:A( x{}{u} ,z{}{u} ,w{}{u} )
 
 	Views in initial state:
 
@@ -337,7 +337,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{u} ,y{u} )
+		Influence_map:A( x{}{u} ,y{}{u} )
 
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
@@ -345,7 +345,7 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:) is applied for the first time
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=25
@@ -382,10 +382,10 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,z{u} ,w{u} )
+		Influence_map:A( x{}{p} ,z{}{u} ,w{}{u} )
 
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=9
@@ -412,7 +412,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,y{u} )
+		Influence_map:A( x{}{p} ,y{}{u} )
 
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
@@ -420,9 +420,9 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:) is applied for the first time
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
-		Influence_map:Updating the views for A(y,z)
+		Influence_map:Updating the views for A(y{},z{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=9
@@ -449,10 +449,10 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( y{p} ,z{u} )
+		Influence_map:A( y{}{p} ,z{}{u} )
 
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=29
@@ -479,7 +479,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,y{p} )
+		Influence_map:A( x{}{p} ,y{}{p} )
 
 
 	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
@@ -487,7 +487,7 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:) is applied for the first time
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=35
@@ -524,11 +524,11 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,z{p} ,w{u} )
-		Influence_map:A( x{u} ,z{p} ,w{u} )
+		Influence_map:A( x{}{p} ,z{}{p} ,w{}{u} )
+		Influence_map:A( x{}{u} ,z{}{p} ,w{}{u} )
 
 
-		Influence_map:Updating the views for A(y,z)
+		Influence_map:Updating the views for A(y{},z{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=29
@@ -555,17 +555,17 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( y{p} ,z{p} )
+		Influence_map:A( y{}{p} ,z{}{p} )
 
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:) is applied for the first time
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=44
@@ -602,21 +602,21 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{u} ,z{p} ,w{p} )
+		Influence_map:A( x{}{u} ,z{}{p} ,w{}{p} )
 
 
-		Influence_map:Updating the views for A(y,z)
+		Influence_map:Updating the views for A(y{},z{})
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
 		the precondition is satisfied
 
 		rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:) is applied for the first time
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
-		Influence_map:Updating the views for A(y,z)
+		Influence_map:Updating the views for A(y{},z{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=54
@@ -643,15 +643,15 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( y{u} ,z{p} )
+		Influence_map:A( y{}{u} ,z{}{p} )
 
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
 		the precondition is satisfied
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
 Influence_map:Id=61
@@ -688,53 +688,53 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,z{p} ,w{p} )
+		Influence_map:A( x{}{p} ,z{}{p} ,w{}{p} )
 
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
 		the precondition is satisfied
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
-		Influence_map:Updating the views for A(y,z)
+		Influence_map:Updating the views for A(y{},z{})
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
-		Influence_map:Updating the views for A(y,z)
+		Influence_map:Updating the views for A(y{},z{})
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
 		the precondition is satisfied
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
-		Influence_map:Updating the views for A(y,z)
+		Influence_map:Updating the views for A(y{},z{})
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
 		the precondition is satisfied
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
-		Influence_map:Updating the views for A(y,z)
+		Influence_map:Updating the views for A(y{},z{})
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
 		the precondition is satisfied
 
-		Influence_map:Updating the views for A(x,z,w)
+		Influence_map:Updating the views for A(x{},z{},w{})
 
-		Influence_map:Updating the views for A(x,y)
+		Influence_map:Updating the views for A(x{},y{})
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

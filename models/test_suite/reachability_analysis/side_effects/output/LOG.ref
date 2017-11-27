@@ -673,7 +673,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,x[.] )
+		A( x{}{u} ,x[][.] )
 
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 5-24:):
@@ -707,7 +707,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,x[.] )
+		B( x{}{u} ,x[][.] )
 
 
 	Applying rule r2 (File "side_effects.ka", line 3, characters 5-24:):
@@ -741,7 +741,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x{u} ,x[.] )
+		C( x{}{u} ,x[][.] )
 
 
 	Applying rule r3 (File "side_effects.ka", line 4, characters 5-24:):
@@ -775,7 +775,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x{u} ,x[.] )
+		D( x{}{u} ,x[][.] )
 
 
 	Applying rule r4 (File "side_effects.ka", line 5, characters 5-24:):
@@ -809,7 +809,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( x{u} ,x[.] )
+		E( x{}{u} ,x[][.] )
 
 
 	Applying rule r5 (File "side_effects.ka", line 6, characters 5-23:):
@@ -820,7 +820,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r6 (File "side_effects.ka", line 7, characters 5-49:) is applied for the first time
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -847,10 +847,10 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,x[x.B] )
+		A( x{}{u} ,x[][x.B] )
 
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -877,7 +877,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{p} ,x[x.A] )
+		B( x{}{p} ,x[][x.A] )
 
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 5-71:):
@@ -891,7 +891,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r10 (File "side_effects.ka", line 11, characters 6-56:) is applied for the first time
 
-		Updating the views for D(x,x)
+		Updating the views for D(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -918,10 +918,10 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x{p} ,x[x.E] )
+		D( x{}{p} ,x[][x.E] )
 
 
-		Updating the views for E(x,x)
+		Updating the views for E(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -948,7 +948,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( x{p} ,x[x.D] )
+		E( x{}{p} ,x[][x.D] )
 
 
 	Applying rule r11 (File "side_effects.ka", line 12, characters 6-28:):
@@ -956,7 +956,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r11 (File "side_effects.ka", line 12, characters 6-28:) is applied for the first time
 
-		Updating the views for D(x,x)
+		Updating the views for D(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -983,7 +983,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x{p} ,x[.] )
+		D( x{}{p} ,x[][.] )
 
 	Dealing with side effects
 
@@ -1012,7 +1012,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( x{p} ,x[.] )
+		E( x{}{p} ,x[][.] )
 
 
 	Applying rule r9 (File "side_effects.ka", line 10, characters 5-17:):
@@ -1040,7 +1040,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r5 (File "side_effects.ka", line 6, characters 5-23:) is applied for the first time
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1068,29 +1068,29 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{p} ,x[.] )
+		B( x{}{p} ,x[][.] )
 
 
 	Applying rule r6 (File "side_effects.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
 	Applying rule r10 (File "side_effects.ka", line 11, characters 6-56:):
 		the precondition is satisfied
 
-		Updating the views for D(x,x)
+		Updating the views for D(x{},x[])
 
-		Updating the views for E(x,x)
+		Updating the views for E(x{},x[])
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 5-71:):
 		the precondition is satisfied
 
 		rule r7 (File "side_effects.ka", line 8, characters 5-71:) is applied for the first time
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -1117,12 +1117,12 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,x[x.C] )
+		A( x{}{u} ,x[][x.C] )
 
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1149,7 +1149,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x{p} ,x[x.A] )
+		C( x{}{p} ,x[][x.A] )
 
 
 	Applying rule r8 (File "side_effects.ka", line 9, characters 5-55:):
@@ -1157,9 +1157,9 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r8 (File "side_effects.ka", line 9, characters 5-55:) is applied for the first time
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=36
@@ -1186,13 +1186,13 @@ Id=36
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,x[x.C] )
+		A( x{}{p} ,x[][x.C] )
 
 
 	Applying rule r11 (File "side_effects.ka", line 12, characters 6-28:):
 		the precondition is satisfied
 
-		Updating the views for D(x,x)
+		Updating the views for D(x{},x[])
 
 	Applying rule r4 (File "side_effects.ka", line 5, characters 5-24:):
 		the precondition is satisfied
@@ -1232,7 +1232,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,x[.] )
+		A( x{}{p} ,x[][.] )
 
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 5-24:):
@@ -1241,7 +1241,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r5 (File "side_effects.ka", line 6, characters 5-23:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 	Applying rule r0 (File "side_effects.ka", line 1, characters 5-24:):
 		the precondition is satisfied
@@ -1249,23 +1249,23 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r10 (File "side_effects.ka", line 11, characters 6-56:):
 		the precondition is satisfied
 
-		Updating the views for D(x,x)
+		Updating the views for D(x{},x[])
 
-		Updating the views for E(x,x)
+		Updating the views for E(x{},x[])
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 5-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
 	Applying rule r6 (File "side_effects.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1292,17 +1292,17 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,x[x.B] )
+		A( x{}{p} ,x[][x.B] )
 
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
 	Applying rule r8 (File "side_effects.ka", line 9, characters 5-55:):
 		the precondition is satisfied
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 	Applying rule r4 (File "side_effects.ka", line 5, characters 5-24:):
 		the precondition is satisfied
@@ -1310,7 +1310,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r11 (File "side_effects.ka", line 12, characters 6-28:):
 		the precondition is satisfied
 
-		Updating the views for D(x,x)
+		Updating the views for D(x{},x[])
 
 	Applying rule r3 (File "side_effects.ka", line 4, characters 5-24:):
 		the precondition is satisfied
@@ -1324,18 +1324,18 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r10 (File "side_effects.ka", line 11, characters 6-56:):
 		the precondition is satisfied
 
-		Updating the views for D(x,x)
+		Updating the views for D(x{},x[])
 
-		Updating the views for E(x,x)
+		Updating the views for E(x{},x[])
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 5-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x,x)
+		Updating the views for C(x{},x[])
 
 	Applying rule r0 (File "side_effects.ka", line 1, characters 5-24:):
 		the precondition is satisfied
@@ -1343,14 +1343,14 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r5 (File "side_effects.ka", line 6, characters 5-23:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
 	Applying rule r6 (File "side_effects.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x,x)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x,x)
+		Updating the views for B(x{},x[])
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 5-24:):
 		the precondition is satisfied

@@ -1,7 +1,7 @@
 digraph G{
 "Init_5" [label="" style="invis" width="0px" height="0px"];
-"Node_4" [label="A(xp)"];
-"Node_5" [label="A(xu)"];
+"Node_4" [label="A(x~p)"];
+"Node_5" [label="A(x~u)"];
 "Node_4" -> "Node_5" [label="a_op"];
 "Node_5" -> "Node_4" [label="a"];
 "Init_5" -> "Node_5" [label=""];

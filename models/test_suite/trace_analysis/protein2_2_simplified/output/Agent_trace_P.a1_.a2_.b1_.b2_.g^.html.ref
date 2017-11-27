@@ -22,16 +22,16 @@
   // Create a new directed graph
   var g = new dagreD3.graphlib.Graph().setGraph({});
   g.setNode(1, { label: "", style: "visibility:hidden", width: "0", height: "0" });
-  g.setNode(2, { label: "P(a1{p},a2{p},b1{p},b2{p},g[x.K])" });
-  g.setNode(3, { label: "P(a1{p},a2{p},b1{p},b2{p},g[.])" });
-  g.setNode(4, { label: "P(a2{p},b2{p},g[.])" });
-  g.setNode(5, { label: "P(a2{u},b2{p},g[.])" });
-  g.setNode(6, { label: "P(a2{p},b2{u},g[.])" });
-  g.setNode(7, { label: "P(a2{u},b2{u},g[.])" });
-  g.setNode(8, { label: "P(a1{p},b1{p},g[.])" });
-  g.setNode(9, { label: "P(a1{p},b1{u},g[.])" });
-  g.setNode(10, { label: "P(a1{u},b1{u},g[.])" });
-  g.setNode(11, { label: "P(a1{u},a2{u},b1{u},b2{u},g[.])" });
+  g.setNode(2, { label: "P(a1{}{p},a2{}{p},b1{}{p},b2{}{p},g[][x.K])" });
+  g.setNode(3, { label: "P(a1{}{p},a2{}{p},b1{}{p},b2{}{p},g[][.])" });
+  g.setNode(4, { label: "P(a2{}{p},b2{}{p},g[][.])" });
+  g.setNode(5, { label: "P(a2{}{u},b2{}{p},g[][.])" });
+  g.setNode(6, { label: "P(a2{}{p},b2{}{u},g[][.])" });
+  g.setNode(7, { label: "P(a2{}{u},b2{}{u},g[][.])" });
+  g.setNode(8, { label: "P(a1{}{p},b1{}{p},g[][.])" });
+  g.setNode(9, { label: "P(a1{}{p},b1{}{u},g[][.])" });
+  g.setNode(10, { label: "P(a1{}{u},b1{}{u},g[][.])" });
+  g.setNode(11, { label: "P(a1{}{u},a2{}{u},b1{}{u},b2{}{u},g[][.])" });
   g.setNode(12, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
   g.setNode(13, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
   g.setEdge(12,11,{  });

@@ -485,7 +485,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] ,y[.] )
+		A( x[][.] ,y[][.] )
 
 	Dealing with creation
 
@@ -504,7 +504,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( y{u} )
+		A( y{}{u} )
 
 	Dealing with creation
 
@@ -523,7 +523,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} )
+		A( x{}{u} )
 
 
 	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 5-32:):
@@ -557,7 +557,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[x.B] ,y[.] )
+		A( x[][x.B] ,y[][.] )
 
 	Dealing with creation
 
@@ -576,7 +576,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x[x.A] )
+		B( x[][x.A] )
 
 
 	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 5-34:):
@@ -610,7 +610,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] ,y[x.C] )
+		A( x[][.] ,y[][x.C] )
 
 	Dealing with creation
 
@@ -629,7 +629,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[y.A] )
+		C( x[][y.A] )
 
 
 	Applying rule r3 (File "bdu_analysis.ka", line 12, characters 5-17:):
@@ -653,7 +653,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x[.] )
+		B( x[][.] )
 
 	Dealing with side effects
 
@@ -672,7 +672,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[.] )
+		C( x[][.] )
 
 
 	Applying rule r4 (File "bdu_analysis.ka", line 13, characters 5-21:):
@@ -680,21 +680,21 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r4 (File "bdu_analysis.ka", line 13, characters 5-21:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:):
 		the precondition is satisfied
 
 		rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule r6 (File "bdu_analysis.ka", line 15, characters 5-44:):
 		the precondition is satisfied
 
 		rule r6 (File "bdu_analysis.ka", line 15, characters 5-44:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 INTENSIONAL DESCRIPTION:
 Id=27
@@ -721,19 +721,19 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[x.B] ,y[x.C] )
+		A( x[][x.B] ,y[][x.C] )
 
 
-		Updating the views for B(x)
+		Updating the views for B(x[])
 
 	Applying rule r7 (File "bdu_analysis.ka", line 16, characters 5-56:):
 		the precondition is satisfied
 
 		rule r7 (File "bdu_analysis.ka", line 16, characters 5-56:) is applied for the first time
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for C(x)
+		Updating the views for C(x[])
 
 	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 5-33:):
 		the precondition is satisfied
@@ -750,19 +750,19 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r4 (File "bdu_analysis.ka", line 13, characters 5-21:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
 	Applying rule r6 (File "bdu_analysis.ka", line 15, characters 5-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y)
+		Updating the views for A(x[],y[])
 
-		Updating the views for B(x)
+		Updating the views for B(x[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

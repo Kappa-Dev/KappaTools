@@ -12,7 +12,7 @@ every agent may occur in the model
 
 ------------------------------------------------------------
 The following transitions are separating:
-rule c (File "sep_transitions1.ka", line 5, characters 3-23:): A(zu) -> A(zp)
+rule c (File "sep_transitions1.ka", line 5, characters 3-23:): A(z~u) -> A(z~p)
 
 
 ------------------------------------------------------------

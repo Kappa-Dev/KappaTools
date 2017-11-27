@@ -1,7 +1,7 @@
 digraph G{
 "Init_22" [label="" style="invis" width="0px" height="0px"];
-"Node_21" [label="E(xx.R)"];
-"Node_22" [label="E(x)"];
+"Node_21" [label="E(x!x.R)"];
+"Node_22" [label="E(x!)"];
 "Node_21" -> "Node_22" [label="E/R"];
 "Node_22" -> "Node_21" [label="E.R"];
 "Init_22" -> "Node_22" [label=""];

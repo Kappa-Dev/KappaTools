@@ -501,7 +501,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,y{u} ,z{u} ,a{u} ,b{u} )
+		A( x{}{u} ,y{}{u} ,z{}{u} ,a{}{u} ,b{}{u} )
 
 
 	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 5, characters 0-51:):
@@ -514,7 +514,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.]) -> A(x{p}[.]) (File "essai.ka", line 6, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=49
@@ -571,7 +571,7 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,z{u} ,a{u} ,b{u} )
+		A( x{}{p} ,y{}{u} ,z{}{u} ,a{}{u} ,b{}{u} )
 
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "essai.ka", line 7, characters 0-44:):
@@ -579,7 +579,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "essai.ka", line 7, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=54
@@ -636,7 +636,7 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{p} ,z{u} ,a{u} ,b{u} )
+		A( x{}{p} ,y{}{p} ,z{}{u} ,a{}{u} ,b{}{u} )
 
 
 	Applying rule A(x{p}[.] y{u}[.] b{u}[.]) -> A(x{u}[.] y{u}[.] b{u}[.]) (File "essai.ka", line 8, characters 0-60:):
@@ -644,21 +644,21 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.] b{u}[.]) -> A(x{u}[.] y{u}[.] b{u}[.]) (File "essai.ka", line 8, characters 0-60:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(y{p}[.]) -> A(y{u}[.]) (File "essai.ka", line 9, characters 0-28:):
 		the precondition is satisfied
 
 		rule A(y{p}[.]) -> A(y{u}[.]) (File "essai.ka", line 9, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(z{u}[.]) -> A(z{p}[.]) (File "essai.ka", line 10, characters 0-28:):
 		the precondition is satisfied
 
 		rule A(z{u}[.]) -> A(z{p}[.]) (File "essai.ka", line 10, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=65
@@ -760,9 +760,9 @@ Id=65
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,z{p} ,a{u} ,b{u} )
-		A( x{p} ,y{p} ,z{p} ,a{u} ,b{u} )
-		A( x{u} ,y{u} ,z{p} ,a{u} ,b{u} )
+		A( x{}{p} ,y{}{u} ,z{}{p} ,a{}{u} ,b{}{u} )
+		A( x{}{p} ,y{}{p} ,z{}{p} ,a{}{u} ,b{}{u} )
+		A( x{}{u} ,y{}{u} ,z{}{p} ,a{}{u} ,b{}{u} )
 
 
 	Applying rule A(z{p}[.] a{u}[.]) -> A(z{p}[.] a{p}[.]) (File "essai.ka", line 11, characters 0-44:):
@@ -770,7 +770,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(z{p}[.] a{u}[.]) -> A(z{p}[.] a{p}[.]) (File "essai.ka", line 11, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=79
@@ -872,9 +872,9 @@ Id=79
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,z{p} ,a{p} ,b{u} )
-		A( x{p} ,y{p} ,z{p} ,a{p} ,b{u} )
-		A( x{u} ,y{u} ,z{p} ,a{p} ,b{u} )
+		A( x{}{p} ,y{}{u} ,z{}{p} ,a{}{p} ,b{}{u} )
+		A( x{}{p} ,y{}{p} ,z{}{p} ,a{}{p} ,b{}{u} )
+		A( x{}{u} ,y{}{u} ,z{}{p} ,a{}{p} ,b{}{u} )
 
 
 	Applying rule A(z{p}[.] a{u}[.] b{u}[.]) -> A(z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 12, characters 0-60:):
@@ -882,21 +882,21 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(z{p}[.] a{u}[.] b{u}[.]) -> A(z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 12, characters 0-60:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(a{p}[.]) -> A(a{u}[.]) (File "essai.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
 		rule A(a{p}[.]) -> A(a{u}[.]) (File "essai.ka", line 13, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{p}[.]) (File "essai.ka", line 14, characters 0-92:):
 		the precondition is satisfied
 
 		rule A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{p}[.]) (File "essai.ka", line 14, characters 0-92:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=98
@@ -953,7 +953,7 @@ Id=98
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{p} ,z{p} ,a{p} ,b{p} )
+		A( x{}{p} ,y{}{p} ,z{}{p} ,a{}{p} ,b{}{p} )
 
 
 	Applying rule A(b{p}[.]) -> A(b{u}[.]) (File "essai.ka", line 15, characters 0-28:):
@@ -961,7 +961,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(b{p}[.]) -> A(b{u}[.]) (File "essai.ka", line 15, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 5, characters 0-51:):
 		the precondition is satisfied
@@ -969,22 +969,22 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "essai.ka", line 6, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "essai.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(x{p}[.] y{u}[.] b{u}[.]) -> A(x{u}[.] y{u}[.] b{u}[.]) (File "essai.ka", line 8, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(y{p}[.]) -> A(y{u}[.]) (File "essai.ka", line 9, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=133
@@ -1041,28 +1041,28 @@ Id=133
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,z{p} ,a{p} ,b{p} )
+		A( x{}{p} ,y{}{u} ,z{}{p} ,a{}{p} ,b{}{p} )
 
 
 	Applying rule A(z{u}[.]) -> A(z{p}[.]) (File "essai.ka", line 10, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(z{p}[.] a{u}[.]) -> A(z{p}[.] a{p}[.]) (File "essai.ka", line 11, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(z{p}[.] a{u}[.] b{u}[.]) -> A(z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 12, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(a{p}[.]) -> A(a{u}[.]) (File "essai.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=167
@@ -1119,14 +1119,14 @@ Id=167
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,z{p} ,a{u} ,b{p} )
-		A( x{p} ,y{p} ,z{p} ,a{u} ,b{p} )
+		A( x{}{p} ,y{}{u} ,z{}{p} ,a{}{u} ,b{}{p} )
+		A( x{}{p} ,y{}{p} ,z{}{p} ,a{}{u} ,b{}{p} )
 
 
 	Applying rule A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{p}[.]) (File "essai.ka", line 14, characters 0-92:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 5, characters 0-51:):
 		the precondition is satisfied
@@ -1134,47 +1134,47 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "essai.ka", line 6, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "essai.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(x{p}[.] y{u}[.] b{u}[.]) -> A(x{u}[.] y{u}[.] b{u}[.]) (File "essai.ka", line 8, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(y{p}[.]) -> A(y{u}[.]) (File "essai.ka", line 9, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(b{p}[.]) -> A(b{u}[.]) (File "essai.ka", line 15, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(z{u}[.]) -> A(z{p}[.]) (File "essai.ka", line 10, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(z{p}[.] a{u}[.]) -> A(z{p}[.] a{p}[.]) (File "essai.ka", line 11, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(z{p}[.] a{u}[.] b{u}[.]) -> A(z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 12, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 	Applying rule A(a{p}[.]) -> A(a{u}[.]) (File "essai.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z,a,b)
+		Updating the views for A(x{},y{},z{},a{},b{})
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

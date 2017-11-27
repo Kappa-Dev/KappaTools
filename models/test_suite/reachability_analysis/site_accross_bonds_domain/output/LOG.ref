@@ -449,7 +449,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t{u} )
+		A( z[][.] ,t{}{u} )
 
 	Views in initial state:
 
@@ -488,7 +488,7 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{u} ,z[.] ,t{u} )
+		B( z{}{u} ,z[][.] ,t{}{u} )
 
 	Views in initial state:
 
@@ -517,7 +517,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[z.B] ,t{u} )
+		A( z[][z.B] ,t{}{u} )
 
 	Views in initial state:
 
@@ -556,7 +556,7 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{p} ,z[z.A] ,t{u} )
+		B( z{}{p} ,z[][z.A] ,t{}{u} )
 
 	Views in initial state:
 
@@ -585,7 +585,7 @@ Id=25
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[z.B] ,t{p} )
+		A( z[][z.B] ,t{}{p} )
 
 	Views in initial state:
 
@@ -624,7 +624,7 @@ Id=44
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{p} ,z[z.A] ,t{p} )
+		B( z{}{p} ,z[][z.A] ,t{}{p} )
 
 
 	Applying rule r0 (File "site_accross_bonds_domain.ka", line 9, characters 5-43:):
@@ -632,7 +632,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r0 (File "site_accross_bonds_domain.ka", line 9, characters 5-43:) is applied for the first time
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t{})
 
 INTENSIONAL DESCRIPTION:
 Id=38
@@ -659,7 +659,7 @@ Id=38
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t{p} )
+		A( z[][.] ,t{}{p} )
 
 
 	Applying rule r2 (File "site_accross_bonds_domain.ka", line 11, characters 5-81:):
@@ -670,25 +670,25 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r5 (File "site_accross_bonds_domain.ka", line 14, characters 5-75:) is applied for the first time
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t{})
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 	Applying rule r6 (File "site_accross_bonds_domain.ka", line 15, characters 5-75:):
 		the precondition is satisfied
 
 		rule r6 (File "site_accross_bonds_domain.ka", line 15, characters 5-75:) is applied for the first time
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t{})
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 	Applying rule r1 (File "site_accross_bonds_domain.ka", line 10, characters 5-49:):
 		the precondition is satisfied
 
 		rule r1 (File "site_accross_bonds_domain.ka", line 10, characters 5-49:) is applied for the first time
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 INTENSIONAL DESCRIPTION:
 Id=61
@@ -725,7 +725,7 @@ Id=61
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{u} ,z[.] ,t{p} )
+		B( z{}{u} ,z[][.] ,t{}{p} )
 
 
 	Applying rule r3 (File "site_accross_bonds_domain.ka", line 12, characters 5-33:):
@@ -733,7 +733,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "site_accross_bonds_domain.ka", line 12, characters 5-33:) is applied for the first time
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 INTENSIONAL DESCRIPTION:
 Id=72
@@ -770,8 +770,8 @@ Id=72
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{p} ,z[.] ,t{p} )
-		B( z{p} ,z[.] ,t{u} )
+		B( z{}{p} ,z[][.] ,t{}{p} )
+		B( z{}{p} ,z[][.] ,t{}{u} )
 
 
 	Applying rule r4 (File "site_accross_bonds_domain.ka", line 13, characters 5-33:):
@@ -779,45 +779,45 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r4 (File "site_accross_bonds_domain.ka", line 13, characters 5-33:) is applied for the first time
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 	Applying rule r0 (File "site_accross_bonds_domain.ka", line 9, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t{})
 
 	Applying rule r1 (File "site_accross_bonds_domain.ka", line 10, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 	Applying rule r2 (File "site_accross_bonds_domain.ka", line 11, characters 5-81:):
 		the precondition is satisfied
 
 		rule r2 (File "site_accross_bonds_domain.ka", line 11, characters 5-81:) is applied for the first time
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t{})
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 	Applying rule r5 (File "site_accross_bonds_domain.ka", line 14, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t{})
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 	Applying rule r6 (File "site_accross_bonds_domain.ka", line 15, characters 5-75:):
 		the precondition is satisfied
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t{})
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 
 	Applying rule r3 (File "site_accross_bonds_domain.ka", line 12, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for B(z,z,t)
+		Updating the views for B(z{},z[],t{})
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

@@ -837,7 +837,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[x.C] ,t[t.B] )
+		A( z[][x.C] ,t[][t.B] )
 
 	Dealing with creation
 
@@ -866,7 +866,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t[t.A] ,z[x.C] )
+		B( t[][t.A] ,z[][x.C] )
 
 	Dealing with creation
 
@@ -885,8 +885,8 @@ Id=10
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[z.B] )
-		C( x[z.A] )
+		C( x[][z.B] )
+		C( x[][z.A] )
 
 
 	Applying rule C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]), ., ., ., . -> ., ., ., ., D(x[1]), A(z[1] t[2]), B(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 10, characters 0-106:):
@@ -894,13 +894,13 @@ EXTENSIONAL DESCRIPTION:
 
 		rule C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]), ., ., ., . -> ., ., ., ., D(x[1]), A(z[1] t[2]), B(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 10, characters 0-106:) is applied for the first time
 
-		Updating the views for C(x)
+		Updating the views for C(x[])
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
-		Updating the views for B(t,z)
+		Updating the views for B(t[],z[])
 
-		Updating the views for C(x)
+		Updating the views for C(x[])
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -928,7 +928,7 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[x.D] ,t[t.B] )
+		A( z[][x.D] ,t[][t.B] )
 
 	Dealing with creation
 
@@ -957,7 +957,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t[t.A] ,z[x.D] )
+		B( t[][t.A] ,z[][x.D] )
 
 	Dealing with creation
 
@@ -976,8 +976,8 @@ Id=10
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x[z.B] )
-		D( x[z.A] )
+		D( x[][z.B] )
+		D( x[][z.A] )
 
 
 	Applying rule ., ., ., . -> C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 12, characters 0-56:):
@@ -1011,7 +1011,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[x.C] ,t[t.F] )
+		E( z[][x.C] ,t[][t.F] )
 
 	Dealing with creation
 
@@ -1040,7 +1040,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( t[t.E] ,z[x.D] )
+		F( t[][t.E] ,z[][x.D] )
 
 	Dealing with creation
 
@@ -1059,7 +1059,7 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[z.E] )
+		C( x[][z.E] )
 
 	Dealing with creation
 
@@ -1078,7 +1078,7 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x[z.F] )
+		D( x[][z.F] )
 
 
 	Applying rule C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]), ., ., ., . -> ., ., ., ., G(x[1]), E(z[1] t[2]), F(t[2] z[3]), H(x[3]) (File "site_accross_bonds_domain.ka", line 13, characters 0-106:):
@@ -1086,13 +1086,13 @@ EXTENSIONAL DESCRIPTION:
 
 		rule C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]), ., ., ., . -> ., ., ., ., G(x[1]), E(z[1] t[2]), F(t[2] z[3]), H(x[3]) (File "site_accross_bonds_domain.ka", line 13, characters 0-106:) is applied for the first time
 
-		Updating the views for C(x)
+		Updating the views for C(x[])
 
-		Updating the views for E(z,t)
+		Updating the views for E(z[],t[])
 
-		Updating the views for F(t,z)
+		Updating the views for F(t[],z[])
 
-		Updating the views for D(x)
+		Updating the views for D(x[])
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1120,7 +1120,7 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[x.G] ,t[t.F] )
+		E( z[][x.G] ,t[][t.F] )
 
 	Dealing with creation
 
@@ -1149,7 +1149,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( t[t.E] ,z[x.H] )
+		F( t[][t.E] ,z[][x.H] )
 
 	Dealing with creation
 
@@ -1168,7 +1168,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		G( x[z.E] )
+		G( x[][z.E] )
 
 	Dealing with creation
 
@@ -1187,7 +1187,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		H( x[z.F] )
+		H( x[][z.F] )
 
 
 	Applying rule C() -> . (File "site_accross_bonds_domain.ka", line 11, characters 0-12:):
@@ -1221,7 +1221,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t[t.B] )
+		A( z[][.] ,t[][t.B] )
 
 	Dealing with side effects
 
@@ -1250,7 +1250,7 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t[t.A] ,z[.] )
+		B( t[][t.A] ,z[][.] )
 
 	Dealing with side effects
 
@@ -1279,7 +1279,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[.] ,t[t.F] )
+		E( z[][.] ,t[][t.F] )
 
 
 	Applying rule ., ., ., . -> C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]) (File "site_accross_bonds_domain.ka", line 9, characters 0-56:):
@@ -1288,13 +1288,13 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]), ., ., ., . -> ., ., ., ., D(x[1]), A(z[1] t[2]), B(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 10, characters 0-106:):
 		the precondition is satisfied
 
-		Updating the views for C(x)
+		Updating the views for C(x[])
 
-		Updating the views for A(z,t)
+		Updating the views for A(z[],t[])
 
-		Updating the views for B(t,z)
+		Updating the views for B(t[],z[])
 
-		Updating the views for C(x)
+		Updating the views for C(x[])
 
 	Applying rule ., ., ., . -> C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 12, characters 0-56:):
 		the precondition is satisfied
@@ -1302,13 +1302,13 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]), ., ., ., . -> ., ., ., ., G(x[1]), E(z[1] t[2]), F(t[2] z[3]), H(x[3]) (File "site_accross_bonds_domain.ka", line 13, characters 0-106:):
 		the precondition is satisfied
 
-		Updating the views for C(x)
+		Updating the views for C(x[])
 
-		Updating the views for E(z,t)
+		Updating the views for E(z[],t[])
 
-		Updating the views for F(t,z)
+		Updating the views for F(t[],z[])
 
-		Updating the views for D(x)
+		Updating the views for D(x[])
 
 	Applying rule C() -> . (File "site_accross_bonds_domain.ka", line 11, characters 0-12:):
 		the precondition is satisfied

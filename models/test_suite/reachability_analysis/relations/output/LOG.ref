@@ -316,7 +316,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,y{u} ,z{u} )
+		A( x{}{u} ,y{}{u} ,z{}{u} )
 
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "relations.ka", line 2, characters 0-28:):
@@ -324,7 +324,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.]) -> A(x{p}[.]) (File "relations.ka", line 2, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 INTENSIONAL DESCRIPTION:
 Id=31
@@ -361,7 +361,7 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,z{u} )
+		A( x{}{p} ,y{}{u} ,z{}{u} )
 
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "relations.ka", line 3, characters 0-44:):
@@ -369,7 +369,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "relations.ka", line 3, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -406,7 +406,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{p} ,z{u} )
+		A( x{}{p} ,y{}{p} ,z{}{u} )
 
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "relations.ka", line 4, characters 0-60:):
@@ -414,7 +414,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "relations.ka", line 4, characters 0-60:) is applied for the first time
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 INTENSIONAL DESCRIPTION:
 Id=44
@@ -451,7 +451,7 @@ Id=44
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{o} ,y{p} ,z{q} )
+		A( x{}{o} ,y{}{p} ,z{}{q} )
 
 
 	Applying rule A(x{u}[.]) -> A(x{q}[.]) (File "relations.ka", line 5, characters 0-28:):
@@ -459,7 +459,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.]) -> A(x{q}[.]) (File "relations.ka", line 5, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 INTENSIONAL DESCRIPTION:
 Id=49
@@ -496,7 +496,7 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{q} ,y{u} ,z{u} )
+		A( x{}{q} ,y{}{u} ,z{}{u} )
 
 
 	Applying rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "relations.ka", line 6, characters 0-44:):
@@ -504,7 +504,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "relations.ka", line 6, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 INTENSIONAL DESCRIPTION:
 Id=55
@@ -541,7 +541,7 @@ Id=55
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{q} ,y{q} ,z{u} )
+		A( x{}{q} ,y{}{q} ,z{}{u} )
 
 
 	Applying rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "relations.ka", line 7, characters 0-44:):
@@ -549,7 +549,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "relations.ka", line 7, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 INTENSIONAL DESCRIPTION:
 Id=66
@@ -586,7 +586,7 @@ Id=66
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{q} ,y{q} ,z{q} )
+		A( x{}{q} ,y{}{q} ,z{}{q} )
 
 
 	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.]) (File "relations.ka", line 1, characters 0-35:):
@@ -595,32 +595,32 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "relations.ka", line 2, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "relations.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "relations.ka", line 4, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 	Applying rule A(x{u}[.]) -> A(x{q}[.]) (File "relations.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 	Applying rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "relations.ka", line 6, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 
 	Applying rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "relations.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x,y,z)
+		Updating the views for A(x{},y{},z{})
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
