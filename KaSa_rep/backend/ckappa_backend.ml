@@ -433,7 +433,7 @@ struct
     let error, site_string =
       Handler.string_of_site_contact_map parameter error kappa_handler agent_type site
     in
-    let error, (old_internal, old_binding) =
+    let error, (old_internal, _old_binding) =
       Wrapped_modules.LoggedStringMap.find_default_without_logs
         parameter error
         (None,None)
@@ -444,7 +444,7 @@ struct
       Wrapped_modules.LoggedStringMap.add_or_overwrite
         parameter error
         site_string
-        (None, Some (Bound_to bond_id))
+        (old_internal, Some (Bound_to bond_id))
         old_site_map
     in
     let error', string_version =
