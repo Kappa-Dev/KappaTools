@@ -367,7 +367,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{u} ,y{}{u} ,z{}{u} )
+		A( x{u} ,y{u} ,z{u} )
 
 			(rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:)) should be investigated
 			(rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:)) should be investigated
@@ -420,7 +420,7 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,y{}{u} ,z{}{u} )
+		A( x{p} ,y{u} ,z{u} )
 
 			(rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:)) should be investigated
 
@@ -466,7 +466,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,y{}{p} ,z{}{u} )
+		A( x{p} ,y{p} ,z{u} )
 
 			(rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:)) should be investigated
 
@@ -512,7 +512,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{o} ,y{}{p} ,z{}{q} )
+		A( x{o} ,y{p} ,z{q} )
 
 			(rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "../verbosity.ka", line 4, characters 0-60:)) should be investigated
 
@@ -558,7 +558,7 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{q} ,y{}{u} ,z{}{u} )
+		A( x{q} ,y{u} ,z{u} )
 
 			(rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:)) should be investigated
 
@@ -604,7 +604,7 @@ Id=59
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{q} ,y{}{q} ,z{}{u} )
+		A( x{q} ,y{q} ,z{u} )
 
 			(rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:)) should be investigated
 
@@ -650,7 +650,7 @@ Id=70
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{q} ,y{}{q} ,z{}{q} )
+		A( x{q} ,y{q} ,z{q} )
 
 			(rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:)) should be investigated
 

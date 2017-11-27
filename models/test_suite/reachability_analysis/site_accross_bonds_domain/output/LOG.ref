@@ -449,7 +449,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[][.] ,t{}{u} )
+		A( z[.] ,t{u} )
 
 	Views in initial state:
 
@@ -488,7 +488,7 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{}{u} ,z[][.] ,t{}{u} )
+		B( z{u} ,z[.] ,t{u} )
 
 	Views in initial state:
 
@@ -517,7 +517,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[][z.B] ,t{}{u} )
+		A( z[z.B] ,t{u} )
 
 	Views in initial state:
 
@@ -556,7 +556,7 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{}{p} ,z[][z.A] ,t{}{u} )
+		B( z{p} ,z[z.A] ,t{u} )
 
 	Views in initial state:
 
@@ -585,7 +585,7 @@ Id=25
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[][z.B] ,t{}{p} )
+		A( z[z.B] ,t{p} )
 
 	Views in initial state:
 
@@ -624,7 +624,7 @@ Id=44
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{}{p} ,z[][z.A] ,t{}{p} )
+		B( z{p} ,z[z.A] ,t{p} )
 
 
 	Applying rule r0 (File "site_accross_bonds_domain.ka", line 9, characters 5-43:):
@@ -659,7 +659,7 @@ Id=38
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[][.] ,t{}{p} )
+		A( z[.] ,t{p} )
 
 
 	Applying rule r2 (File "site_accross_bonds_domain.ka", line 11, characters 5-81:):
@@ -725,7 +725,7 @@ Id=61
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{}{u} ,z[][.] ,t{}{p} )
+		B( z{u} ,z[.] ,t{p} )
 
 
 	Applying rule r3 (File "site_accross_bonds_domain.ka", line 12, characters 5-33:):
@@ -770,8 +770,8 @@ Id=72
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z{}{p} ,z[][.] ,t{}{p} )
-		B( z{}{p} ,z[][.] ,t{}{u} )
+		B( z{p} ,z[.] ,t{p} )
+		B( z{p} ,z[.] ,t{u} )
 
 
 	Applying rule r4 (File "site_accross_bonds_domain.ka", line 13, characters 5-33:):

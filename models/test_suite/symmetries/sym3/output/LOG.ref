@@ -349,7 +349,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( w{}{u} ,t{}{u} )
+		A( w{u} ,t{u} )
 
 	Views in initial state:
 
@@ -378,7 +378,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{u} ,y{}{u} )
+		A( x{u} ,y{u} )
 
 
 	Applying rule A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) (File "sym3.ka", line 1, characters 0-44:):
@@ -413,7 +413,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,y{}{u} )
+		A( x{p} ,y{u} )
 
 
 	Applying rule A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{p}[.]) (File "sym3.ka", line 2, characters 0-44:):
@@ -448,7 +448,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{u} ,y{}{p} )
+		A( x{u} ,y{p} )
 
 
 	Applying rule A(x{u}[.] y{p}[.]) -> A(x{p}[.] y{p}[.]) (File "sym3.ka", line 3, characters 0-44:):
@@ -483,7 +483,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,y{}{p} )
+		A( x{p} ,y{p} )
 
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "sym3.ka", line 4, characters 0-44:):
@@ -525,7 +525,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( w{}{p} ,t{}{u} )
+		A( w{p} ,t{u} )
 
 
 	Applying rule A(w{u}[.] t{u}[.]) -> A(w{u}[.] t{p}[.]) (File "sym3.ka", line 6, characters 0-44:):
@@ -560,7 +560,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( w{}{u} ,t{}{p} )
+		A( w{u} ,t{p} )
 
 
 	Applying rule A(w{u}[.] t{p}[.]) -> A(w{p}[.] t{p}[.]) (File "sym3.ka", line 7, characters 0-44:):
@@ -595,7 +595,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( w{}{p} ,t{}{p} )
+		A( w{p} ,t{p} )
 
 
 	Applying rule A(w{p}[.] t{u}[.]) -> A(w{p}[.] t{p}[.]) (File "sym3.ka", line 8, characters 0-44:):

@@ -462,6 +462,11 @@ let print_site_compact parameter site = (*CHEK*)
     (Remanent_parameters.get_bound_symbol parameter) ^
     (Remanent_parameters.get_close_binding_state parameter)
 
+let print_site_compact_blank parameter site = (*CHEK*)
+  match site with
+  | Ckappa_sig.Internal a -> a
+  | Ckappa_sig.Binding a -> a
+
 let string_of_site_aux
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
     ?message:(message="")
@@ -499,6 +504,12 @@ let string_of_site parameter error handler_kappa agent_type site_int =
     string_of_site_aux parameter error handler_kappa agent_type site_int
   in
   error, print_site_compact parameter site_type
+
+  let string_of_site_blank parameter error handler_kappa agent_type site_int =
+    let error, site_type =
+      string_of_site_aux parameter error handler_kappa agent_type site_int
+    in
+    error, print_site_compact_blank parameter site_type
 
 (*this function used in views_domain*)
 let string_of_site_update_views parameter error handler_kappa agent_type site_int =

@@ -15,15 +15,15 @@ Reachability analysis...
 
 	Views in initial state:
 
-		A( x[][x.B] )
+		A( x[x.B] )
 
 	Views in initial state:
 
-		A( x{}{u} )
+		A( x{u} )
 
 	Views in initial state:
 
-		B( x[][x.A] ,x{}{u} )
+		B( x[x.A] ,x{u} )
 
 
 		A(x{u}[1]),B(x{u}[1])
@@ -49,7 +49,7 @@ Reachability analysis...
 		Updating the views for A(x[])
 	Dealing with side effects
 
-		B( x[][.] ,x{}{u} )
+		B( x[.] ,x{u} )
 
 			(rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:)) should be investigated
 			(rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:)) should be investigated
@@ -76,7 +76,7 @@ Reachability analysis...
 
 		Updating the views for B(x[],x{})
 
-		B( x[][x.A] ,x{}{p} )
+		B( x[x.A] ,x{p} )
 
 		Update information about potential sites across domain
 
@@ -97,7 +97,7 @@ Reachability analysis...
 		Updating the views for A(x[])
 	Dealing with side effects
 
-		B( x[][.] ,x{}{p} )
+		B( x[.] ,x{p} )
 
 			(rule ., . -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-32:)) should be investigated
 			(rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:)) should be investigated

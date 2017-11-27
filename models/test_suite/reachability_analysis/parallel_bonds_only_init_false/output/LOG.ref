@@ -237,7 +237,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[][.] ,t[][.] )
+		A( z[.] ,t[.] )
 
 			(rule r0 (File "parallel_bonds.ka", line 8, characters 5-63:)) should be investigated
 			(rule r1 (File "parallel_bonds.ka", line 9, characters 5-63:)) should be investigated
@@ -271,7 +271,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[][.] ,t[][.] )
+		B( z[.] ,t[.] )
 
 	Views in initial state:
 
@@ -300,7 +300,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[][z.B] ,t[][t.B] )
+		A( z[z.B] ,t[t.B] )
 
 	Views in initial state:
 
@@ -329,7 +329,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[][z.A] ,t[][.] )
+		B( z[z.A] ,t[.] )
 
 	Views in initial state:
 
@@ -358,7 +358,7 @@ Id=20
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[][.] ,t[][t.A] )
+		B( z[.] ,t[t.A] )
 
 
 		A(t[t.B],z[1]),B(t[.],z[1])
@@ -397,7 +397,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[][z.B] ,t[][.] )
+		A( z[z.B] ,t[.] )
 
 
 		Updating the views for B(z[],t[])
@@ -440,7 +440,7 @@ Id=20
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[][.] ,t[][t.B] )
+		A( z[.] ,t[t.B] )
 
 
 		Updating the views for B(z[],t[])

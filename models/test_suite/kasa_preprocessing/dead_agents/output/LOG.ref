@@ -452,7 +452,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{u} ,x[][.] )
+		A( x{u} ,x[.] )
 
 	Views in initial state:
 
@@ -471,7 +471,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{}{u} )
+		B( x{u} )
 
 
 	Applying rule D(x[.]), . -> ., A(x{u}[.]) (File "dead_agents.ka", line 17, characters 0-29:):
@@ -515,7 +515,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,x[][.] )
+		A( x{p} ,x[.] )
 
 
 	Applying rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-31:):
@@ -554,7 +554,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{}{p} )
+		B( x{p} )
 
 
 	Applying rule B(x{p}[.]) -> B(x{u}[.]) (File "dead_agents.ka", line 11, characters 0-31:):

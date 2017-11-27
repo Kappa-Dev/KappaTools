@@ -1051,7 +1051,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{u} ,y{}{u} ,z{}{u} )
+		A( x{u} ,y{u} ,z{u} )
 
 
 	Applying rule A(x{u}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
@@ -1096,7 +1096,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,y{}{u} ,z{}{u} )
+		A( x{p} ,y{u} ,z{u} )
 
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
@@ -1160,7 +1160,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,y{}{p} ,z{}{u} )
+		A( x{p} ,y{p} ,z{u} )
 
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
@@ -1212,7 +1212,7 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,y{}{u} ,z{}{p} )
+		A( x{p} ,y{u} ,z{p} )
 
 
 	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:):
@@ -1267,7 +1267,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{u} ,y{}{p} ,z{}{u} )
+		A( x{u} ,y{p} ,z{u} )
 
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
@@ -1315,7 +1315,7 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{u} ,y{}{u} ,z{}{p} )
+		A( x{u} ,y{u} ,z{p} )
 
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 10, characters 0-63:):
@@ -1360,7 +1360,7 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{u} ,y{}{p} ,z{}{p} )
+		A( x{u} ,y{p} ,z{p} )
 
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:):
@@ -1426,7 +1426,7 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{}{p} ,y{}{p} ,z{}{p} )
+		A( x{p} ,y{p} ,z{p} )
 
 
 	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 13, characters 0-63:):

@@ -795,7 +795,7 @@ struct
                     (*----------------------------------------------------*)
                     let error, site_string =
                       try
-                        Handler.string_of_site parameters error handler_kappa
+                        Handler.string_of_site_blank parameters error handler_kappa
                           agent_type site_type
                       with
                       | _ ->
