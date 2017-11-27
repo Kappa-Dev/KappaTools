@@ -22,8 +22,8 @@
   // Create a new directed graph
   var g = new dagreD3.graphlib.Graph().setGraph({});
   g.setNode(1, { label: "", style: "visibility:hidden", width: "0", height: "0" });
-  g.setNode(2, { label: "K(x[][g.P])" });
-  g.setNode(3, { label: "K(x[][.])" });
+  g.setNode(2, { label: "K(x[g.P])" });
+  g.setNode(3, { label: "K(x[.])" });
   g.setEdge(1,3,{ label: "" });
   g.setEdge(2,3,{ label: "P/K" });
   g.setEdge(3,2,{ label: "P.K" });

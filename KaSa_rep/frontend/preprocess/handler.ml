@@ -447,14 +447,21 @@ let string_of_agent parameter error handler_kappa (agent_type:Ckappa_sig.c_agent
   | Some (agent_name, _, _) -> error, agent_name
 
 (*mapping site of type int to string*)
-let print_site_compact parameter site =
+let print_site_compact parameter site = (*CHEK*)
   match site with
   | Ckappa_sig.Internal a ->
-    a ^ (Remanent_parameters.get_internal_state_symbol parameter)
+    a
+      (*^
+    (Remanent_parameters.get_open_internal_state parameter) ^
+    (Remanent_parameters.get_internal_state_symbol parameter) ^
+    (Remanent_parameters.get_close_internal_state parameter)*)
+
   | Ckappa_sig.Binding a ->
-    a ^ (Remanent_parameters.get_open_binding_state parameter) ^
+    a
+      (*^
+    (Remanent_parameters.get_open_binding_state parameter) ^
     (Remanent_parameters.get_bound_symbol parameter) ^
-    (Remanent_parameters.get_close_binding_state parameter)
+    (Remanent_parameters.get_close_binding_state parameter)*)
 
 let string_of_site_aux
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
@@ -556,16 +563,17 @@ let print_state parameter error handler state =
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
     let error, s = translate_binding_type parameter error handler a b in
     error,
-    (Remanent_parameters.get_open_binding_state parameter) ^
-    s ^
-    (Remanent_parameters.get_close_binding_state parameter)
+    (*(Remanent_parameters.get_open_binding_state parameter) ^*)
+    s (*^
+        (Remanent_parameters.get_close_binding_state parameter)*)
 
 let print_state_fully_deciphered parameter error handler_kappa state =
   match state with
   | Ckappa_sig.Internal a ->
     error,
     (Remanent_parameters.get_open_internal_state parameter) ^
-    a ^ (Remanent_parameters.get_close_internal_state parameter)
+    a
+    ^ (Remanent_parameters.get_close_internal_state parameter)
   | Ckappa_sig.Binding Ckappa_sig.C_Free ->
     error,
     (Remanent_parameters.get_open_binding_state parameter) ^

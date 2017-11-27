@@ -518,7 +518,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[][.] )
+		A( x[.] )
 
 	Dealing with creation
 
@@ -632,8 +632,8 @@ Id=26
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,y{u} ,x[][.] )
-		B( x{p} ,y{p} ,x[][.] )
+		B( x{u} ,y{u} ,x[.] )
+		B( x{p} ,y{p} ,x[.] )
 
 
 	Applying rule r5 (File "double_agents.ka", line 10, characters 5-21:):
@@ -657,7 +657,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[][.] )
+		C( x[.] )
 
 
 	Applying rule r3 (File "double_agents.ka", line 8, characters 5-43:):
@@ -665,7 +665,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "double_agents.ka", line 8, characters 5-43:) is applied for the first time
 
-		Updating the views for A(x[])
+		Updating the views for A(x)
 
 INTENSIONAL DESCRIPTION:
 Id=5
@@ -682,10 +682,10 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[][x.B] )
+		A( x[x.B] )
 
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 INTENSIONAL DESCRIPTION:
 Id=36
@@ -752,8 +752,8 @@ Id=36
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,y{u} ,x[][x.A] )
-		B( x{p} ,y{p} ,x[][x.A] )
+		B( x{u} ,y{u} ,x[x.A] )
+		B( x{p} ,y{p} ,x[x.A] )
 
 
 	Applying rule r4 (File "double_agents.ka", line 9, characters 5-33:):
@@ -761,14 +761,14 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r4 (File "double_agents.ka", line 9, characters 5-33:) is applied for the first time
 
-		Updating the views for A(x[])
+		Updating the views for A(x)
 
 	Applying rule r6 (File "double_agents.ka", line 11, characters 5-43:):
 		the precondition is satisfied
 
 		rule r6 (File "double_agents.ka", line 11, characters 5-43:) is applied for the first time
 
-		Updating the views for C(x[])
+		Updating the views for C(x)
 
 INTENSIONAL DESCRIPTION:
 Id=5
@@ -785,10 +785,10 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x[][x.B] )
+		C( x[x.B] )
 
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 INTENSIONAL DESCRIPTION:
 Id=53
@@ -855,8 +855,8 @@ Id=53
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} ,y{u} ,x[][x.C] )
-		B( x{p} ,y{p} ,x[][x.C] )
+		B( x{u} ,y{u} ,x[x.C] )
+		B( x{p} ,y{p} ,x[x.C] )
 
 
 	Applying rule r7 (File "double_agents.ka", line 12, characters 5-41:):
@@ -864,16 +864,16 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r7 (File "double_agents.ka", line 12, characters 5-41:) is applied for the first time
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 	Applying rule r2 (File "double_agents.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
 		rule r2 (File "double_agents.ka", line 7, characters 5-49:) is applied for the first time
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 INTENSIONAL DESCRIPTION:
 Id=68
@@ -910,7 +910,7 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{q} ,y{q} ,x[][.] )
+		B( x{q} ,y{q} ,x[.] )
 
 
 	Applying rule r0 (File "double_agents.ka", line 5, characters 5-37:):
@@ -925,9 +925,9 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r3 (File "double_agents.ka", line 8, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for A(x[])
+		Updating the views for A(x)
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 INTENSIONAL DESCRIPTION:
 Id=86
@@ -964,15 +964,15 @@ Id=86
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{q} ,y{q} ,x[][x.A] )
+		B( x{q} ,y{q} ,x[x.A] )
 
 
 	Applying rule r6 (File "double_agents.ka", line 11, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for C(x[])
+		Updating the views for C(x)
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 INTENSIONAL DESCRIPTION:
 Id=98
@@ -1009,25 +1009,25 @@ Id=98
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{q} ,y{q} ,x[][x.C] )
+		B( x{q} ,y{q} ,x[x.C] )
 
 
 	Applying rule r4 (File "double_agents.ka", line 9, characters 5-33:):
 		the precondition is satisfied
 
-		Updating the views for A(x[])
+		Updating the views for A(x)
 
 	Applying rule r7 (File "double_agents.ka", line 12, characters 5-41:):
 		the precondition is satisfied
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 	Applying rule r2 (File "double_agents.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 	Applying rule r5 (File "double_agents.ka", line 10, characters 5-21:):
 		the precondition is satisfied
@@ -1038,9 +1038,9 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r3 (File "double_agents.ka", line 8, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for A(x[])
+		Updating the views for A(x)
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 
 	Applying rule r0 (File "double_agents.ka", line 5, characters 5-37:):
 		the precondition is satisfied
@@ -1048,9 +1048,9 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r6 (File "double_agents.ka", line 11, characters 5-43:):
 		the precondition is satisfied
 
-		Updating the views for C(x[])
+		Updating the views for C(x)
 
-		Updating the views for B(x,y,x[])
+		Updating the views for B(x,y,x)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

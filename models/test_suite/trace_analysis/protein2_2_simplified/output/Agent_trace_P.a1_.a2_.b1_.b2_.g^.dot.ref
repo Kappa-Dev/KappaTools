@@ -1,15 +1,15 @@
 digraph G{
 "Init_27" [label="" style="invis" width="0px" height="0px"];
-"Node_44" [label="P(a1{p},a2{p},b1{p},b2{p},g[][x.K])"];
-"Node_40" [label="P(a1{p},a2{p},b1{p},b2{p},g[][.])"];
-"Node_37" [label="P(a2{p},b2{p},g[][.])"];
-"Node_36" [label="P(a2{u},b2{p},g[][.])"];
-"Node_34" [label="P(a2{p},b2{u},g[][.])"];
-"Node_33" [label="P(a2{u},b2{u},g[][.])"];
-"Node_32" [label="P(a1{p},b1{p},g[][.])"];
-"Node_30" [label="P(a1{p},b1{u},g[][.])"];
-"Node_29" [label="P(a1{u},b1{u},g[][.])"];
-"Node_27" [label="P(a1{u},a2{u},b1{u},b2{u},g[][.])"];
+"Node_44" [label="P(a1{p},a2{p},b1{p},b2{p},g[x.K])"];
+"Node_40" [label="P(a1{p},a2{p},b1{p},b2{p},g[.])"];
+"Node_37" [label="P(a2{p},b2{p},g[.])"];
+"Node_36" [label="P(a2{u},b2{p},g[.])"];
+"Node_34" [label="P(a2{p},b2{u},g[.])"];
+"Node_33" [label="P(a2{u},b2{u},g[.])"];
+"Node_32" [label="P(a1{p},b1{p},g[.])"];
+"Node_30" [label="P(a1{p},b1{u},g[.])"];
+"Node_29" [label="P(a1{u},b1{u},g[.])"];
+"Node_27" [label="P(a1{u},a2{u},b1{u},b2{u},g[.])"];
 "Node_44" -> "Node_40" [label="P/K"];
 "Node_40" -> "Node_44" [label="P.K"];
 "Node_36" -> "Node_33" [label="b2-"];

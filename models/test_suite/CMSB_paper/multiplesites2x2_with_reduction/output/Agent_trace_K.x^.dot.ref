@@ -1,7 +1,7 @@
 digraph G{
 "Init_23" [label="" style="invis" width="0px" height="0px"];
-"Node_22" [label="K(x!g.P)"];
-"Node_23" [label="K(x!)"];
+"Node_22" [label="K(xg.P)"];
+"Node_23" [label="K(x)"];
 "Node_22" -> "Node_23" [label="P/K"];
 "Node_23" -> "Node_22" [label="P.K"];
 "Init_23" -> "Node_23" [label=""];

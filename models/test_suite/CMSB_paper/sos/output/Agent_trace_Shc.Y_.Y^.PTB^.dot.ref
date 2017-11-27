@@ -1,11 +1,11 @@
 digraph G{
 "Init_90" [label="" style="invis" width="0px" height="0px"];
-"Node_98" [label="Shc(Y~u,Y!,PTB!Y1172.EGFR)"];
-"Node_97" [label="Shc(Y~p,Y!SH2.Grb2,PTB!)"];
-"Node_95" [label="Shc(Y~p,Y!,PTB!)"];
-"Node_94" [label="Shc(Y~p,Y!SH2.Grb2,PTB!Y1172.EGFR)"];
-"Node_92" [label="Shc(Y~p,Y!,PTB!Y1172.EGFR)"];
-"Node_90" [label="Shc(Y~u,Y!,PTB!)"];
+"Node_98" [label="Shc(Yu,Y,PTBY1172.EGFR)"];
+"Node_97" [label="Shc(Yp,YSH2.Grb2,PTB)"];
+"Node_95" [label="Shc(Yp,Y,PTB)"];
+"Node_94" [label="Shc(Yp,YSH2.Grb2,PTBY1172.EGFR)"];
+"Node_92" [label="Shc(Yp,Y,PTBY1172.EGFR)"];
+"Node_90" [label="Shc(Yu,Y,PTB)"];
 "Node_95" -> "Node_90" [label="uY@Shc"];
 "Node_92" -> "Node_98" [label="uY@Shc"];
 "Node_98" -> "Node_92" [label="pY@Shc"];

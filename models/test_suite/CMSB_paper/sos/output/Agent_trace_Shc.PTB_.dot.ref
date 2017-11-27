@@ -1,5 +1,5 @@
 digraph G{
 "Init_4" [label="" style="invis" width="0px" height="0px"];
-"Node_4" [label="Shc(PTB~u)"];
+"Node_4" [label="Shc(PTBu)"];
 "Init_4" -> "Node_4" [label=""];
 }

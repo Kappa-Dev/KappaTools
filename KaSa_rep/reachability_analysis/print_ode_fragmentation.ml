@@ -81,7 +81,7 @@ let print_internal_flow parameters _error _handler_kappa result =
   let store_result1, _store_result2 = result in
   if Remanent_parameters.get_do_ODE_flow_of_information parameters
   then
-    if Remanent_parameters.get_trace parameter
+    if Remanent_parameters.get_trace parameters
     then
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameters)

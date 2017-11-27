@@ -560,7 +560,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[][.] ,c[][.] )
+		A( x[.] ,c[.] )
 
 	Views in initial state:
 
@@ -579,7 +579,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x[][.] )
+		B( x[.] )
 
 	Views in initial state:
 
@@ -628,7 +628,7 @@ Id=43
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x1{u} ,x2{u} ,x1[][.] ,x2[][.] )
+		C( x1{u} ,x2{u} ,x1[.] ,x2[.] )
 
 
 	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
@@ -636,7 +636,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule a.b (File "abc.ka", line 10, characters 6-64:) is applied for the first time
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -663,10 +663,10 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[][x.B] ,c[][.] )
+		A( x[x.B] ,c[.] )
 
 
-		Updating the views for B(x[])
+		Updating the views for B(x)
 
 INTENSIONAL DESCRIPTION:
 Id=5
@@ -683,7 +683,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x[][x.A] )
+		B( x[x.A] )
 
 
 	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
@@ -691,16 +691,16 @@ EXTENSIONAL DESCRIPTION:
 
 		rule a.b_op (File "abc.ka", line 10, characters 6-64:) is applied for the first time
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
-		Updating the views for B(x[])
+		Updating the views for B(x)
 
 	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
 		rule ab.c (File "abc.ka", line 12, characters 7-71:) is applied for the first time
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
 INTENSIONAL DESCRIPTION:
 Id=51
@@ -727,10 +727,10 @@ Id=51
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[][x.B] ,c[][x1.C] )
+		A( x[x.B] ,c[x1.C] )
 
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
 INTENSIONAL DESCRIPTION:
 Id=61
@@ -777,7 +777,7 @@ Id=61
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x1{u} ,x2{u} ,x1[][c.A] ,x2[][.] )
+		C( x1{u} ,x2{u} ,x1[c.A] ,x2[.] )
 
 
 	Applying rule mod x1 (File "abc.ka", line 13, characters 9-64:):
@@ -785,7 +785,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule mod x1 (File "abc.ka", line 13, characters 9-64:) is applied for the first time
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
 INTENSIONAL DESCRIPTION:
 Id=29
@@ -832,17 +832,17 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x1{p} ,x2{u} ,x1[][.] ,x2[][.] )
+		C( x1{p} ,x2{u} ,x1[.] ,x2[.] )
 
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
 	Applying rule a.c (File "abc.ka", line 14, characters 6-88:):
 		the precondition is satisfied
 
 		rule a.c (File "abc.ka", line 14, characters 6-88:) is applied for the first time
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
 INTENSIONAL DESCRIPTION:
 Id=33
@@ -869,10 +869,10 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[][.] ,c[][x2.C] )
+		A( x[.] ,c[x2.C] )
 
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
 INTENSIONAL DESCRIPTION:
 Id=41
@@ -919,7 +919,7 @@ Id=41
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x1{p} ,x2{u} ,x1[][.] ,x2[][c.A] )
+		C( x1{p} ,x2{u} ,x1[.] ,x2[c.A] )
 
 
 	Applying rule mod x2 (File "abc.ka", line 15, characters 9-92:):
@@ -927,9 +927,9 @@ EXTENSIONAL DESCRIPTION:
 
 		rule mod x2 (File "abc.ka", line 15, characters 9-92:) is applied for the first time
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
 INTENSIONAL DESCRIPTION:
 Id=90
@@ -976,13 +976,13 @@ Id=90
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x1{p} ,x2{p} ,x1[][.] ,x2[][.] )
+		C( x1{p} ,x2{p} ,x1[.] ,x2[.] )
 
 
 	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
 INTENSIONAL DESCRIPTION:
 Id=105
@@ -1009,22 +1009,22 @@ Id=105
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[][x.B] ,c[][x2.C] )
+		A( x[x.B] ,c[x2.C] )
 
 
-		Updating the views for B(x[])
+		Updating the views for B(x)
 
 	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
 	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
 INTENSIONAL DESCRIPTION:
 Id=68
@@ -1051,52 +1051,52 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[][.] ,c[][x1.C] )
+		A( x[.] ,c[x1.C] )
 
 
-		Updating the views for B(x[])
+		Updating the views for B(x)
 
 	Applying rule mod x1 (File "abc.ka", line 13, characters 9-64:):
 		the precondition is satisfied
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
 	Applying rule a.c (File "abc.ka", line 14, characters 6-88:):
 		the precondition is satisfied
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
 	Applying rule mod x2 (File "abc.ka", line 15, characters 9-92:):
 		the precondition is satisfied
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
 	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
-		Updating the views for B(x[])
+		Updating the views for B(x)
 
 	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
-		Updating the views for C(x1,x2,x1[],x2[])
+		Updating the views for C(x1,x2,x1,x2)
 
 	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		Updating the views for A(x[],c[])
+		Updating the views for A(x,c)
 
-		Updating the views for B(x[])
+		Updating the views for B(x)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
