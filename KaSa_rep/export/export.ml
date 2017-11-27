@@ -1505,7 +1505,7 @@ let get_internal_scc_decomposition_map state =
 (*scc = ((string * string) * (string * string)) list list*)
 
 let translate_scc_decomposition state
-    (internal_scc:internal_scc_decomposition): Public_data.scc =
+    (internal_scc:internal_scc_decomposition) =
   let error = Remanent_state.get_errors state in
   let error, scc =
     List.fold_left (fun (error, store_result) list ->
@@ -1533,8 +1533,8 @@ let translate_scc_decomposition state
         error, store_list :: store_result
       ) (error, [[]]) internal_scc
   in
-  (*let state = set_errors error state in*)
-  scc
+  let state = set_errors error state in
+  state, scc
 
 let compute_map2_gen
     get
@@ -1555,7 +1555,7 @@ let compute_map2_gen
       ?accuracy_level_scc:(Some accuracy_level_scc)
       state
   in
-  let rep = convert state internal in
+  let state, rep = convert state internal in
   store accuracy_level_cm accuracy_level_scc rep state, rep
 
 let compute_scc_map

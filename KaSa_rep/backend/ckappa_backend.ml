@@ -322,14 +322,7 @@ struct
           let new_internal_state =
             match internal_state_string_opt with
             | None -> old_state
-            | Some x ->
-              let s =
-                (Remanent_parameters.get_open_internal_state parameter) ^
-                (Remanent_parameters.get_internal_state_symbol parameter) ^
-                x ^
-                (Remanent_parameters.get_close_internal_state parameter)
-              in
-              Some s
+            | Some x -> Some x
           in
           let error, new_binding_state =
             match
@@ -552,8 +545,7 @@ struct
         ~message:"incompatible binding states"
         Exit t
 
-  let print_aux logger parameter error kappa_handler
-      agent_string site_map bool =
+  let print_agent logger parameter error agent_string site_map bool =
     let () =
       if bool then
         Loggers.fprintf logger "%s"
@@ -562,7 +554,7 @@ struct
     let () = Loggers.fprintf logger "%s%s" agent_string
         (Remanent_parameters.get_agent_open_symbol parameter)
     in
-    let bool =
+    let _ =
       Wrapped_modules.LoggedStringMap.fold
         (fun site_string (internal,binding) bool ->
            let () =
@@ -575,7 +567,13 @@ struct
            let () =
              match internal with
              | None -> ()
-             | Some s -> Loggers.fprintf logger "%s" s
+             | Some s ->
+               Loggers.fprintf
+                 logger "%s%s%s%s"
+                 (Remanent_parameters.get_open_internal_state parameter)
+                 (Remanent_parameters.get_internal_state_symbol parameter)
+                 s
+                 (Remanent_parameters.get_close_internal_state parameter)
            in
            let () =
              match binding with
@@ -601,9 +599,13 @@ struct
                  (Remanent_parameters.get_bound_symbol parameter)
                  int
                  (Remanent_parameters.get_close_binding_state parameter)
-             | Some (Binding_type (ag,st)) ->
+             | Some (Binding_type (agent_name,site_name)) ->
+               let binding_type_symbol =
+                 Remanent_parameters.get_at_symbol parameter
+               in
                let binding =
-                 Loggers.string_of_binding_type ag st
+                 Public_data.string_of_binding_type
+                   ~binding_type_symbol ~agent_name ~site_name
                in
                Loggers.fprintf logger
                  "%s%s%s%s"
@@ -615,24 +617,25 @@ struct
            true
         ) site_map false
     in
-    bool
+    let () =
+      Loggers.fprintf logger
+        "%s"
+        (Remanent_parameters.get_agent_close_symbol parameter)
+    in
+    error
 
   let print logger parameter error kappa_handler t  =
-    let _bool =
+    let error,_ =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
-        (fun _ (agent_string, site_map) bool ->
-           let _bool =
-             print_aux logger parameter error kappa_handler
+        (fun _ (agent_string, site_map) (error,bool) ->
+           let error =
+             print_agent logger parameter error
                agent_string site_map bool
            in
-           let () = Loggers.fprintf logger
-               "%s"
-               (Remanent_parameters.get_agent_close_symbol parameter)
-           in
-           true
+           error, true
         )
         t.string_version
-        false
+        (error, false)
     in error
 
   (***************************************************************************)

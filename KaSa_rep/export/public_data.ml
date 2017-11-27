@@ -807,6 +807,26 @@ let binding_type = "binding type"
 let prop="property state"
 let bind="binding state"
 
+let binding_type_backend_symbol="."
+let free_backend_symbol = "."
+let wildcard_backend_symbol = "#"
+let bound_to_unknown_backend_symbol = "!_"
+let internal_state_introduction_backend_symbol = "~"
+let internal_state_delimiter_backend_symbol=","
+let binding_state_delimiter_backend_symbol=","
+let binding_state_opening_backend_symbol = "["
+let binding_state_closing_backend_symbol = "]"
+let internal_state_opening_backend_symbol = "{"
+let internal_state_closing_backend_symbol = "}"
+
+let string_of_binding_type
+    ?binding_type_symbol:(binding_type_symbol=".")
+    ~agent_name
+    ~site_name
+  =
+  Format.sprintf "%s%s%s" site_name binding_type_symbol agent_name
+
+
 let binding_state_light_of_json =
   function
   | `Assoc [s, `Null] when s = free -> Free

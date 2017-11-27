@@ -7,7 +7,7 @@ sig
 
   type binding_state =
     | Free | Wildcard | Bound_to_unknown
-    | Binding_type of string * string 
+    | Binding_type of string * string
     | Bound_to of bond_index
 
   val binding_state_to_json : binding_state -> Yojson.Basic.json
@@ -83,14 +83,13 @@ sig
     Cckappa_sig.kappa_handler ->
     t -> Exception.method_handler
 
-  val print_aux:
+  val print_agent:
     Loggers.t ->
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    Cckappa_sig.kappa_handler ->
     string ->
     (string option * binding_state option)
-      Wrapped_modules.LoggedStringMap.t -> bool -> bool
+      Wrapped_modules.LoggedStringMap.t -> bool -> Exception.method_handler  
 
   val print_list:
     Loggers.t ->

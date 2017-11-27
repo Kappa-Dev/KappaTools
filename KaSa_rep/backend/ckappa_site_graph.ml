@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 17th of November
-   * Last modification: Time-stamp: <Jul 19 2017>
+   * Last modification: Time-stamp: <Nov 27 2017>
    *
    * Site graph
    *
@@ -34,7 +34,7 @@ let print_internal_pattern_aux ?logger parameters error kappa_handler
     Loggers.fprintf logger
       "------------------------------------------------------------\n";
   in
-  List.fold_left (fun (error, bool) lemma ->
+  List.fold_left (fun (error, _) lemma ->
       let hyp = Public_data.get_hyp lemma in
       let refinement = Public_data.get_refinement lemma in
       let error =
@@ -102,16 +102,14 @@ let print_internal_pattern ?logger parameters error kappa_handler
 (***************************************************************************)
 
 let print_for_list logger parameter error kappa_handler t =
-  let _bool =
-    List.fold_left (fun bool (agent_string, site_map) ->
-        let _ =
-          Ckappa_backend.Ckappa_backend.print_aux logger parameter error
-            kappa_handler
+  let error, _ =
+    List.fold_left (fun (error, bool) (agent_string, site_map) ->
+        let error =
+          Ckappa_backend.Ckappa_backend.print_agent logger parameter error
             agent_string site_map bool
         in
-        let () = Loggers.fprintf logger ")" in
-        true
-      ) false t
+        error, true
+      ) (error, false) t
   in
   let () = Loggers.fprintf logger " " in
   error
@@ -134,7 +132,7 @@ let print_pattern_aux ?logger
     Loggers.fprintf logger
       "------------------------------------------------------------\n";
   in
-  List.fold_left (fun (error, bool) lemma ->
+  List.fold_left (fun (error, _) lemma ->
       let hyp = Public_data.get_hyp lemma in
       let refinement = Public_data.get_refinement lemma in
       let error =
@@ -144,14 +142,7 @@ let print_pattern_aux ?logger
       in
       let () = Loggers.fprintf logger " => [" in
       (*refinement*)
-      let error, b =(*TODO*)
-        (*match lemma.refinement with
-          | [] -> error, false
-          | [hyp] ->
-          print_for_list logger parameters error
-          kappa_handler
-            hyp, false
-          | _:: _ as l ->*)
+      let error, b =
         List.fold_left (fun (error, bool) hyp ->
             let () =
               Loggers.print_newline

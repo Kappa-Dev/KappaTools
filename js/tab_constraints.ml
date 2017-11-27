@@ -23,27 +23,56 @@ let parallel_bond = ref true
 let print_string s list = (Html.pcdata s)::list
 let print_newline list = print_string "\n" list
 let print_int i l = print_string (string_of_int i) l
+
+let print_single_binding_state a list =
+  print_string
+    Public_data.binding_state_opening_backend_symbol
+    (print_string
+       a
+       (
+         print_string
+           Public_data.binding_state_closing_backend_symbol list))
+
+let print_single_internal_state a list =
+  print_string
+    Public_data.internal_state_opening_backend_symbol
+    (print_string
+       a
+       (
+         print_string
+           Public_data.internal_state_closing_backend_symbol list))
+
 let print_site site list =
   let site_name, prop_opt, binding_opt = site in
   let list =
     match binding_opt with
-    | Some Public_data.Free | None -> print_string Public_data.free list
-    | Some Public_data.Wildcard -> print_string Public_data.wildcard list
-    | Some Public_data.Bound_to_unknown -> print_string Public_data.bound list
-    | Some (Public_data.Binding_type (ag,site)) ->
-      print_string "!"
-        (print_string ag (
-            print_string "." (
-              print_string site list)))
+    | Some Public_data.Free | None ->
+      print_single_binding_state
+           Public_data.free_backend_symbol list
+    | Some Public_data.Wildcard -> (*
+      print_single_binding_state
+        Public_data.wildcard_backend_symbol*) list
+    | Some Public_data.Bound_to_unknown ->
+      print_single_binding_state
+        Public_data.bound_to_unknown_backend_symbol list
+    | Some (Public_data.Binding_type (agent_name,site_name)) ->
+      let binding_type_symbol =
+        Public_data.binding_type_backend_symbol
+      in
+      print_single_binding_state
+           (Public_data.string_of_binding_type
+              ~binding_type_symbol ~agent_name ~site_name)
+           list
     | Some (Public_data.Bound_to i) ->
-      print_string "!"
-        (print_int i list)
+      print_single_binding_state
+        (string_of_int i)
+        list
   in
   let list =
     match prop_opt with
     | None -> list
     | Some a ->
-      print_string a list
+      print_single_internal_state a list
   in
   print_string site_name list
 

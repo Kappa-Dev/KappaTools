@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 23rd of 2011
- * Last modification: Time-stamp: <Nov 11 2017>
+ * Last modification: Time-stamp: <Nov 27 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -118,7 +118,7 @@ let print_link_state parameter error link =
   (*MOD:change ex: A(x!B@x) to A(x!x.B) as the input in kappa file*)
   | Ckappa_sig.LNK_TYPE ((agent_type,_),(site_type,_)) ->
     let s =
-      Loggers.string_of_binding_type agent_type site_type
+      Public_data.string_of_binding_type agent_type site_type
     in
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameter)

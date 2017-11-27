@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Nov 22 2017>
+   * Last modification: Time-stamp: <Nov 27 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -106,7 +106,7 @@ let translate_binding_type parameter error handler agent site =
     Remanent_parameters.get_at_symbol parameter
   in
   error,
-  Loggers.string_of_binding_type
+  Public_data.string_of_binding_type
     ~binding_type_symbol
     ~agent_name
     ~site_name

@@ -637,16 +637,9 @@ let of_json = JsonUtil.to_list ~error_msg:"line list" line_of_json
 let get_edge_map t = !(t.edges_map)
 let get_nodes t = !(t.nodes)
 
-let string_of_binding_type
-    ?binding_type_symbol:(binding_type_symbol=".")
-    ~agent_name
-    ~site_name
-  =
-  Format.sprintf "%s%s%s" site_name binding_type_symbol agent_name
-
 let print_binding_type
     t ?binding_type_symbol:(binding_type_symbol=".")
     ~agent_name ~site_name =
   fprintf t
     "%s"
-    (string_of_binding_type ~binding_type_symbol ~agent_name ~site_name)
+    (Public_data.string_of_binding_type ~binding_type_symbol ~agent_name ~site_name)

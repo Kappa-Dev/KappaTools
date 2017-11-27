@@ -18,6 +18,20 @@ val wildcard:string
 val influencemap: string
 val scc:string
 
+(* Backend *)
+val binding_type_backend_symbol: string
+val free_backend_symbol: string
+val wildcard_backend_symbol: string
+val bound_to_unknown_backend_symbol: string
+val internal_state_introduction_backend_symbol: string
+val internal_state_delimiter_backend_symbol: string
+val binding_state_delimiter_backend_symbol: string
+val binding_state_opening_backend_symbol: string
+val binding_state_closing_backend_symbol: string
+val internal_state_opening_backend_symbol: string
+val internal_state_closing_backend_symbol: string
+
+
 type accuracy_level = Low | Medium | High | Full
 val accuracy_levels : accuracy_level list
 val contact_map_accuracy_levels : accuracy_level list
@@ -170,3 +184,7 @@ val poly_constraints_list_of_json:
 val get_hyp: 'site_graph lemma -> 'site_graph
 
 val get_refinement: 'site_graph lemma -> 'site_graph list
+
+val string_of_binding_type:
+  ?binding_type_symbol:string -> agent_name:string ->
+  site_name:string -> string
