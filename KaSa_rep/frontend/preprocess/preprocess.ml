@@ -2003,33 +2003,6 @@ let export_contact_map parameters error handler =
 
 (**********************************************************)
 
-(*let convert_scc_list_to_set parameters error pair_list =
-  List.fold_left (fun (error, store_result) pair ->
-      let error, store_result =
-        Ckappa_sig.PairAgentSite_map_and_set.Set.add
-          parameters error
-          pair
-          store_result
-      in
-      error, store_result)
-    (error, Ckappa_sig.PairAgentSite_map_and_set.Set.empty) pair_list*)
-
-let convert_scc_list_to_map parameters error internal_scc_decomposition =
-  let error, internal_scc_decomposition_map =
-    List.fold_left (fun (error, store_result) pair_list ->
-        List.fold_left (fun (error, store_result) pair ->
-            Ckappa_sig.PairAgentSite_map_and_set.Map.add
-              parameters
-              error
-              pair
-              pair_list
-              store_result
-          ) (error, store_result) pair_list
-      ) (error, Ckappa_sig.PairAgentSite_map_and_set.Map.empty)
-      internal_scc_decomposition
-  in
-  error, internal_scc_decomposition_map
-
 let convert_scc_maps_into_set
     parameters error scc_map =
   Public_data.AccuracyMap.fold
@@ -2048,7 +2021,6 @@ let convert_scc_maps_into_set
     scc_map
     (error,
      Ckappa_sig.PairAgentSite_map_and_set.Set.empty)
-
 
 let dot_of_contact_map ?logger parameters error
     handler scc_map contact_map =
