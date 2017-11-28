@@ -347,7 +347,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} )
+		A(x{u})
 
 	Views in initial state:
 
@@ -366,7 +366,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} )
+		A(x{p})
 
 	Views in initial state:
 
@@ -385,7 +385,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{u} )
+		B(x{u})
 
 	Views in initial state:
 
@@ -404,7 +404,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x{p} )
+		B(x{p})
 
 	Views in initial state:
 
@@ -423,7 +423,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x{u} )
+		C(x{u})
 
 	Views in initial state:
 
@@ -442,7 +442,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x{p} )
+		C(x{p})
 
 
 	Applying rule A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . -> A(x{u}[.]), ., ., C(x{u}[.]) (File "test_delta.ka", line 1, characters 0-70:):

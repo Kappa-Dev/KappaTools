@@ -269,7 +269,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( y{u} ,z{u} )
+		Influence_map:A(y{u},z{u})
 
 	Views in initial state:
 
@@ -308,7 +308,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{u} ,z{u} ,w{u} )
+		Influence_map:A(x{u},z{u},w{u})
 
 	Views in initial state:
 
@@ -337,7 +337,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{u} ,y{u} )
+		Influence_map:A(x{u},y{u})
 
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
@@ -382,7 +382,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,z{u} ,w{u} )
+		Influence_map:A(x{p},z{u},w{u})
 
 
 		Influence_map:Updating the views for A(x{},y{})
@@ -412,7 +412,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,y{u} )
+		Influence_map:A(x{p},y{u})
 
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
@@ -449,7 +449,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( y{p} ,z{u} )
+		Influence_map:A(y{p},z{u})
 
 
 		Influence_map:Updating the views for A(x{},y{})
@@ -479,7 +479,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,y{p} )
+		Influence_map:A(x{p},y{p})
 
 
 	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
@@ -524,8 +524,8 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,z{p} ,w{u} )
-		Influence_map:A( x{u} ,z{p} ,w{u} )
+		Influence_map:A(x{p},z{p},w{u})
+		Influence_map:A(x{u},z{p},w{u})
 
 
 		Influence_map:Updating the views for A(y{},z{})
@@ -555,7 +555,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( y{p} ,z{p} )
+		Influence_map:A(y{p},z{p})
 
 
 		Influence_map:Updating the views for A(x{},y{})
@@ -602,7 +602,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{u} ,z{p} ,w{p} )
+		Influence_map:A(x{u},z{p},w{p})
 
 
 		Influence_map:Updating the views for A(y{},z{})
@@ -643,7 +643,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( y{u} ,z{p} )
+		Influence_map:A(y{u},z{p})
 
 
 		Influence_map:Updating the views for A(x{},y{})
@@ -688,7 +688,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A( x{p} ,z{p} ,w{p} )
+		Influence_map:A(x{p},z{p},w{p})
 
 
 		Influence_map:Updating the views for A(x{},y{})

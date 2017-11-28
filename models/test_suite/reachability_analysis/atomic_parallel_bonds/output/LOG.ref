@@ -173,7 +173,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t[.] )
+		A(z[.],t[.])
 
 	Views in initial state:
 
@@ -202,7 +202,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[.] ,t[.] )
+		B(z[.],t[.])
 
 
 	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 5-63:):
@@ -237,7 +237,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[z.B] ,t[t.B] )
+		A(z[z.B],t[t.B])
 
 
 		Updating the views for B(z[],t[])
@@ -267,7 +267,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[z.A] ,t[t.A] )
+		B(z[z.A],t[t.A])
 
 
 	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 5-63:):

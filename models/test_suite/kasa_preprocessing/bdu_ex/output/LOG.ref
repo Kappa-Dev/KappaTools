@@ -232,7 +232,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{u} ,y{u} ,x[.] )
+		A(x{u},y{u},x[.])
 
 
 	Applying rule x (File "bdu_ex.ka", line 8, characters 4-32:):
@@ -277,7 +277,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,x[.] )
+		A(x{p},y{u},x[.])
 
 
 	Applying rule y (File "bdu_ex.ka", line 9, characters 4-49:):
@@ -322,7 +322,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{p} ,x[.] )
+		A(x{p},y{p},x[.])
 
 
 	Applying rule bind (File "bdu_ex.ka", line 10, characters 7-45:):
@@ -392,9 +392,9 @@ Id=35
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x{p} ,y{u} ,x[x.A] )
-		A( x{p} ,y{p} ,x[x.A] )
-		A( x{u} ,y{u} ,x[x.A] )
+		A(x{p},y{u},x[x.A])
+		A(x{p},y{p},x[x.A])
+		A(x{u},y{u},x[x.A])
 
 
 		Updating the views for A(x{},y{},x[])

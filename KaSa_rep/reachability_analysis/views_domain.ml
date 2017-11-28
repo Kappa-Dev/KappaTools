@@ -797,36 +797,25 @@ struct
                       try
                         Handler.string_of_site
                           parameters error handler_kappa
-                          agent_type site_type
+                          ~state agent_type site_type
                       with
                       | _ ->
                         Exception.warn
                           parameters error __POS__ Exit
                           (Ckappa_sig.string_of_site_name site_type)
                     in
-                    let error, state_string =
-                      try
-                        Handler.string_of_state_fully_deciphered parameters
-                          error
-                          handler_kappa agent_type site_type state
-                      with
-                      | _ ->
-                        Exception.warn
-                          parameters error __POS__ Exit
-                          (Ckappa_sig.string_of_state_index state)
-                    in
-                    (*-----------------------------------------------------*)
+                      (*-----------------------------------------------------*)
                     let () =
                       if bool
                       then
                         Loggers.fprintf log ","
                       else
                         Loggers.fprintf log
-                          "\t\t%s%s( " prefix agent_string
+                          "\t\t%s%s(" prefix agent_string
                     in
                     let () =
                     Loggers.fprintf log
-                      "%s%s " site_string state_string
+                      "%s" site_string 
                     in
                     error, true
                  )

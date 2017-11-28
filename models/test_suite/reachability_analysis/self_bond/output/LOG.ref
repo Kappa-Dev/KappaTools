@@ -674,7 +674,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[.] ,t[.] )
+		A(z[.],t[.])
 
 	Views in initial state:
 
@@ -703,7 +703,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[.] ,t[.] )
+		B(z[.],t[.])
 
 	Views in initial state:
 
@@ -732,7 +732,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( z[.] ,t[.] )
+		C(z[.],t[.])
 
 	Views in initial state:
 
@@ -761,7 +761,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( z[.] ,t[.] )
+		D(z[.],t[.])
 
 	Views in initial state:
 
@@ -790,7 +790,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[.] ,t[.] )
+		E(z[.],t[.])
 
 	Views in initial state:
 
@@ -819,7 +819,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( z[.] ,t[.] )
+		F(z[.],t[.])
 
 
 	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 5-63:):
@@ -854,7 +854,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z[z.A] ,t[t.A] )
+		A(z[z.A],t[t.A])
 
 
 		Updating the views for A(z[],t[])
@@ -891,7 +891,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( z[z.F] ,t[z.F] )
+		F(z[z.F],t[z.F])
 
 
 		Updating the views for F(z[],t[])
@@ -921,7 +921,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( z[z.F] ,t[.] )
+		F(z[z.F],t[.])
 
 
 		Updating the views for F(z[],t[])
@@ -951,7 +951,7 @@ Id=25
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( z[t.F] ,t[.] )
+		F(z[t.F],t[.])
 
 
 	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 5-69:):
@@ -986,7 +986,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[z.E] ,t[t.E] )
+		E(z[z.E],t[t.E])
 
 
 		Updating the views for E(z[],t[])
@@ -1016,7 +1016,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[z.E] ,t[.] )
+		E(z[z.E],t[.])
 
 
 		Updating the views for E(z[],t[])
@@ -1046,7 +1046,7 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z[.] ,t[t.E] )
+		E(z[.],t[t.E])
 
 
 	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 5-69:):
@@ -1081,7 +1081,7 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( z[t.D] ,t[t.D] )
+		D(z[t.D],t[t.D])
 
 
 		Updating the views for D(z[],t[])
@@ -1111,7 +1111,7 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( z[.] ,t[z.D] )
+		D(z[.],t[z.D])
 
 
 		Updating the views for D(z[],t[])
@@ -1141,7 +1141,7 @@ Id=43
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( z[.] ,t[t.D] )
+		D(z[.],t[t.D])
 
 
 	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 5-69:):
@@ -1176,7 +1176,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( z[t.C] ,t[z.C] )
+		C(z[t.C],t[z.C])
 
 
 		Updating the views for C(z[],t[])
@@ -1206,7 +1206,7 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( z[.] ,t[z.C] )
+		C(z[.],t[z.C])
 
 
 		Updating the views for C(z[],t[])
@@ -1236,7 +1236,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( z[t.C] ,t[.] )
+		C(z[t.C],t[.])
 
 
 	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 5-63:):
@@ -1271,7 +1271,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z[t.B] ,t[z.B] )
+		B(z[t.B],t[z.B])
 
 
 		Updating the views for B(z[],t[])

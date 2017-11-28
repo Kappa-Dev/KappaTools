@@ -608,7 +608,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] ,y[.] )
+		A(x[.],y[.])
 
 
 	Applying rule A(x[.] y[.]), A(x[.] y[.]) -> A(x[1] y[.]), A(x[1] y[.]) (File "sym2.ka", line 1, characters 0-61:):
@@ -643,7 +643,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[x.A] ,y[.] )
+		A(x[x.A],y[.])
 
 
 		Updating the views for A(x[],y[])
@@ -689,7 +689,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] ,y[x.A] )
+		A(x[.],y[x.A])
 
 
 		Updating the views for A(x[],y[])
@@ -719,7 +719,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[y.A] ,y[.] )
+		A(x[y.A],y[.])
 
 
 	Applying rule A(x[.] y[1]), A(x[1] y[.]) -> A(x[.] y[.]), A(x[.] y[.]) (File "sym2.ka", line 2, characters 0-61:):
@@ -781,7 +781,7 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x[.] ,y[y.A] )
+		A(x[.],y[y.A])
 
 
 		Updating the views for A(x[],y[])
