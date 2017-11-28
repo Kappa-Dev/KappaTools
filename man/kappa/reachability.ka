@@ -4,10 +4,10 @@
 %init: 1 E()
 %init: 1 R()
 
-'E.R' E(x),R(x) -> E(x!1),R(x!1) @1
-'E/R' E(x!1),R(x!1,c) -> E(x),R(x,c) @1
-'R.R' R(x!_,c),R(x!_,c) -> R(x!_,c!1),R(x!_,c!1) @1
-'R/R' R(c!1,cr,n),R(c!1,cr,n) -> R(c,cr,n),R(c,cr,n) @1
-'R.int' R(c!1,cr,n),R(c!1,cr,n) -> R(c!1,cr!2,n),R(c!1,cr,n!2) @1
-'R/int' R(cr!1),R(n!1) -> R(cr),R(n) @1
-'obs' R(x,c,cr!_,n!_) -> R(x,c,cr,n) @1
+'E.R' E(x[.]),R(x[.]) -> E(x[1]),R(x[1]) @1
+'E/R' E(x[1]),R(x[1],c[.]) -> E(x[.]),R(x[.],c[.]) @1
+'R.R' R(x[_],c[.]),R(x[_],c[.]) -> R(x[_],c[1]),R(x[_],c[1]) @1
+'R/R' R(c[1],cr[.],n[.]),R(c[1],cr[.],n[.]) -> R(c[.],cr[.],n[.]),R(c[.],cr[.],n[.]) @1
+'R.int' R(c[1],cr[.],n[.]),R(c[1],cr[.],n[.]) -> R(c[1],cr[2],n[.]),R(c[1],cr[.],n[2]) @1
+'R/int' R(cr[1]),R(n[1]) -> R(cr[.]),R(n[.]) @1
+'obs' R(x[.],c[.],cr[_],n[_]) -> R(x[.],c[.],cr[.],n[.]) @1

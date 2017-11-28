@@ -74,6 +74,4 @@ EGFR(CR!1),EGFR(CR!1) =>
 ------------------------------------------------------------
 EGFR(CR!CR.EGFR,N!C.EGFR) => EGFR(CR!1,N!2),EGFR(C!2,CR!1)
 EGFR(C!N.EGFR,CR!CR.EGFR) => EGFR(C!2,CR!1),EGFR(CR!1,N!2)
-Some exceptions have been raised
-error: file_name: setMap.ml; message: line 669; exception:Not_found
-error: file_name: setMap.ml; message: line 669; exception:Not_found
+execution finished without any exception

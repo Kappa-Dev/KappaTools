@@ -53,6 +53,4 @@ R(c!1),R(c!1) =>
 ------------------------------------------------------------
 R(c!c.R,cr!n.R) => R(c!1,cr!2),R(c!1,n!2)
 R(c!c.R,n!cr.R) => R(c!1,n!2),R(c!1,cr!2)
-Some exceptions have been raised
-error: file_name: setMap.ml; message: line 669; exception:Not_found
-error: file_name: setMap.ml; message: line 669; exception:Not_found
+execution finished without any exception

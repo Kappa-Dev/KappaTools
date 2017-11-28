@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 22 2017>
+  * Last modification: Time-stamp: <Nov 28 2017>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -334,7 +334,7 @@ struct
           tuples_of_interest
       in
       let error, old =
-        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_default
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_default_without_logs
           parameter error
           []
           key
@@ -1345,7 +1345,7 @@ struct
   let stabilize _static dynamic error = error, dynamic, ()
 
   let print ?dead_rules static dynamic (error:Exception.method_handler) loggers =
-    let _ = dead_rules in 
+    let _ = dead_rules in
     let kappa_handler = get_kappa_handler static in
     let parameters = get_parameter static in
     let log = loggers in
