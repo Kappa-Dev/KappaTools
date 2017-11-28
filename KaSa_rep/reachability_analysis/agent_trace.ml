@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Jul 31 2017>
+  * Last modification: Time-stamp: <Nov 28 2017>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -193,20 +193,16 @@ let string_label_of_asso parameters error handler_kappa transition_system list =
            else
              string
          in
-         let error, site_string =
+         let error', site_string =
            Handler.string_of_site parameters error handler_kappa
-             transition_system.agent_type site_type
-         in
-         let error', state_string =
-           Handler.string_of_state_fully_deciphered parameters error
-             handler_kappa transition_system.agent_type site_type state
+             ~state transition_system.agent_type site_type
          in
          let error =
            Exception.check_point
              Exception.warn parameters error error' __POS__ Exit
          in
          error,
-         string^site_string^state_string,
+         string^site_string,
          true
       )
       (error,string,false) list

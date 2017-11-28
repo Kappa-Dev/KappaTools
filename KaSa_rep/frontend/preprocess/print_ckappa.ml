@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 23rd of 2011
- * Last modification: Time-stamp: <Nov 27 2017>
+ * Last modification: Time-stamp: <Nov 28 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -77,17 +77,22 @@ let print_link_state parameter error link =
         in
         error
       | Remanent_parameters_sig.Bound_type  ->
-          let () =
-            Loggers.fprintf
-              (Remanent_parameters.get_logger parameter)
-              "%s%s%s%s%s"
-              (Remanent_parameters.get_open_binding_state parameter)
-              (Remanent_parameters.get_bound_symbol parameter)
-              agent_name
-              (Remanent_parameters.get_at_symbol parameter)
-              site_name
-          in
-        error
+      let binding_type_symbol =
+        Remanent_parameters.get_btype_sep_symbol parameter
+      in
+      let s =
+        Public_data.string_of_binding_type
+          ~binding_type_symbol ~agent_name ~site_name
+      in
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "%s%s%s%s"
+          (Remanent_parameters.get_open_binding_state parameter)
+          (Remanent_parameters.get_bound_symbol parameter)
+          s
+          (Remanent_parameters.get_close_binding_state parameter)
+      in
+      error
     end
   | Ckappa_sig.FREE ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -115,10 +120,13 @@ let print_link_state parameter error link =
         (Remanent_parameters.get_close_binding_state parameter)
     in
     error
-  (*MOD:change ex: A(x!B@x) to A(x!x.B) as the input in kappa file*)
-  | Ckappa_sig.LNK_TYPE ((agent_type,_),(site_type,_)) ->
+  | Ckappa_sig.LNK_TYPE ((agent_name,_),(site_name,_)) ->
+    let binding_type_symbol =
+      Remanent_parameters.get_btype_sep_symbol parameter
+    in
     let s =
-      Public_data.string_of_binding_type agent_type site_type
+      Public_data.string_of_binding_type
+        ~binding_type_symbol ~agent_name ~site_name
     in
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -128,17 +136,6 @@ let print_link_state parameter error link =
         s
         (Remanent_parameters.get_close_binding_state parameter)
     in
-    (*let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameter)
-        "%s%s%s%s%s%s6"
-        (Remanent_parameters.get_open_binding_state parameter)
-        (Remanent_parameters.get_bound_symbol parameter)
-        agent_type
-        (Remanent_parameters.get_btype_sep_symbol parameter)
-        site_type
-        (Remanent_parameters.get_close_binding_state parameter)
-    in*)
     error
 
 let print_port parameter error port =

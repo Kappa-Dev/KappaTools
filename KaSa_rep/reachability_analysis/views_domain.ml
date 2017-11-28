@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 18 2017>
+   * Last modification: Time-stamp: <Nov 28 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -795,7 +795,8 @@ struct
                     (*----------------------------------------------------*)
                     let error, site_string =
                       try
-                        Handler.string_of_site_blank parameters error handler_kappa
+                        Handler.string_of_site
+                          parameters error handler_kappa
                           agent_type site_type
                       with
                       | _ ->

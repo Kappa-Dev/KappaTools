@@ -601,7 +601,7 @@ struct
                  (Remanent_parameters.get_close_binding_state parameter)
              | Some (Binding_type (agent_name,site_name)) ->
                let binding_type_symbol =
-                 Remanent_parameters.get_at_symbol parameter
+                 Remanent_parameters.get_btype_sep_symbol parameter
                in
                let binding =
                  Public_data.string_of_binding_type

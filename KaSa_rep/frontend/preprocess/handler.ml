@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Nov 27 2017>
+   * Last modification: Time-stamp: <Nov 28 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -446,101 +446,30 @@ let string_of_agent parameter error handler_kappa (agent_type:Ckappa_sig.c_agent
   | None -> Exception.warn parameter error __POS__ Exit ""
   | Some (agent_name, _, _) -> error, agent_name
 
-(*mapping site of type int to string*)
-let print_site_compact parameter site = (*CHEK*)
-  match site with
-  | Ckappa_sig.Internal a ->
+let print_site parameter ?state ?add_parentheses:(add_parentheses=false) site =
+  let state =
+    match state with
+    | None ->
+      if add_parentheses then Some ""
+      else state
+    | Some _ -> state
+  in
+  match site, state with
+  | Ckappa_sig.Internal a, Some state ->
     a
     ^
     (Remanent_parameters.get_open_internal_state parameter) ^
     (Remanent_parameters.get_internal_state_symbol parameter) ^
+    (state)^
     (Remanent_parameters.get_close_internal_state parameter)
-  | Ckappa_sig.Binding a ->
+  | Ckappa_sig.Binding a, Some state  ->
     a
     ^
     (Remanent_parameters.get_open_binding_state parameter) ^
-    (Remanent_parameters.get_bound_symbol parameter) ^
+    (Remanent_parameters.get_bound_symbol parameter)^
+    (state)^
     (Remanent_parameters.get_close_binding_state parameter)
-
-let print_site_compact_blank parameter site = (*CHEK*)
-  match site with
-  | Ckappa_sig.Internal a -> a
-  | Ckappa_sig.Binding a -> a
-
-let string_of_site_aux
-    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
-    ?message:(message="")
-    parameter error handler_kappa agent_name (site_int: Ckappa_sig.c_site_name) =
-  let error', sites_dic =
-    match
-      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
-        parameter
-        error
-        agent_name
-        handler_kappa.Cckappa_sig.sites
-    with
-    | error, None ->
-      Exception.warn parameter error __POS__ Exit
-        (Ckappa_sig.Dictionary_of_sites.init())
-    | error, Some i -> error, i
-  in
-  let error', site_type =
-    match
-      Ckappa_sig.Dictionary_of_sites.translate
-        parameter
-        error'
-        site_int
-        sites_dic
-    with
-    | error, None -> Exception.warn parameter error
-                       __POS__ Exit (Ckappa_sig.Internal "")
-    | error, Some (value, _, _) -> error, value
-  in
-  check_pos parameter ka_pos ml_pos message error error',
-  site_type
-
-let string_of_site parameter error handler_kappa agent_type site_int =
-  let error, site_type =
-    string_of_site_aux parameter error handler_kappa agent_type site_int
-  in
-  error, print_site_compact parameter site_type
-
-  let string_of_site_blank parameter error handler_kappa agent_type site_int =
-    let error, site_type =
-      string_of_site_aux parameter error handler_kappa agent_type site_int
-    in
-    error, print_site_compact_blank parameter site_type
-
-(*this function used in views_domain*)
-let string_of_site_update_views parameter error handler_kappa agent_type site_int =
-  let error, site_type =
-    string_of_site_aux parameter error handler_kappa agent_type site_int
-  in
-  error, print_site_compact parameter site_type
-
-let string_of_site_in_natural_language parameter error handler_kapp
-    agent_type (site_int: Ckappa_sig.c_site_name) =
-  let error, site_type =
-    string_of_site_aux parameter error handler_kapp
-      agent_type site_int
-  in
-  match
-    site_type
-  with
-  | Ckappa_sig.Internal x -> error, ("the internal state of site "^ x)
-  | Ckappa_sig.Binding x -> error, ("the binding state of site "^ x)
-
-let string_of_site_in_file_name parameter error handler_kapp
-    agent_type (site_int: Ckappa_sig.c_site_name) =
-  let error, site_type =
-    string_of_site_aux parameter error handler_kapp
-      agent_type site_int
-  in
-  match
-    site_type
-  with
-  | Ckappa_sig.Internal x -> error, (x^"_")
-  | Ckappa_sig.Binding x -> error, (x^"^")
+  | (Ckappa_sig.Binding a | Ckappa_sig.Internal a), None -> a
 
 (*print function for contact map*)
 
@@ -549,16 +478,6 @@ let print_site_contact_map site =
   | Ckappa_sig.Internal a -> a
   | Ckappa_sig.Binding a -> a
 
-let string_of_site_contact_map
-    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
-    ?message:(message="")
-    parameter error handler_kappa agent_name site_int =
-  let error, site_type =
-    string_of_site_aux
-      ~ml_pos ~ka_pos ~message
-      parameter error handler_kappa agent_name site_int
-  in
-  error, (print_site_contact_map site_type)
 
 (*mapping state of type int to string*)
 
@@ -567,15 +486,11 @@ let print_state parameter error handler state =
   | Ckappa_sig.Internal a -> error, a
   | Ckappa_sig.Binding Ckappa_sig.C_Free ->
     error,
-    (Remanent_parameters.get_open_binding_state parameter) ^
-    (Remanent_parameters.get_free_symbol parameter) ^
-    (Remanent_parameters.get_close_binding_state parameter)
+    Remanent_parameters.get_free_symbol parameter
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
     let error, s = translate_binding_type parameter error handler a b in
     error,
-    (Remanent_parameters.get_open_binding_state parameter) ^
-    s ^
-    (Remanent_parameters.get_close_binding_state parameter)
+    s
 
 let print_state_fully_deciphered parameter error handler_kappa state =
   match state with
@@ -631,6 +546,78 @@ let string_of_state = string_of_state_gen print_state
 
 let string_of_state_fully_deciphered =
   string_of_state_gen print_state_fully_deciphered
+
+
+let string_of_site_aux
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler_kappa ?state agent_name (site_int: Ckappa_sig.c_site_name) =
+  let error', site_type =
+    translate_site parameter error handler_kappa agent_name site_int
+  in
+  let error', state =
+    match state with
+    | None -> error', None
+    | Some a ->
+      let error', s =
+        string_of_state
+          parameter error' handler_kappa agent_name site_int a
+      in error', Some s
+  in
+  check_pos parameter ka_pos ml_pos message error error',
+  site_type,
+  state
+
+let string_of_site parameter error handler_kappa
+    ?state ?add_parentheses:(add_parentheses=false) agent_type site_int =
+  let error, site_type,state  =
+    string_of_site_aux parameter error handler_kappa ?state agent_type site_int
+  in
+  error, print_site parameter ?state ~add_parentheses site_type
+
+(*this function used in views_domain*)
+let string_of_site_update_views parameter error handler_kappa agent_type site_int =
+  let error, site_type, _ =
+    string_of_site_aux parameter error handler_kappa agent_type site_int
+  in
+  let add_parentheses = true in
+  error, print_site parameter ~add_parentheses site_type
+
+let string_of_site_in_natural_language parameter error handler_kapp
+    agent_type (site_int: Ckappa_sig.c_site_name) =
+  let error, site_type,_  =
+    string_of_site_aux parameter error handler_kapp
+      agent_type site_int
+  in
+  match
+    site_type
+  with
+  | Ckappa_sig.Internal x -> error, ("the internal state of site "^ x)
+  | Ckappa_sig.Binding x -> error, ("the binding state of site "^ x)
+
+let string_of_site_in_file_name parameter error handler_kapp
+    agent_type (site_int: Ckappa_sig.c_site_name) =
+  let error, site_type, _ =
+    string_of_site_aux parameter error handler_kapp
+      agent_type site_int
+  in
+  match
+    site_type
+  with
+  | Ckappa_sig.Internal x -> error, (x^"_")
+  | Ckappa_sig.Binding x -> error, (x^"^")
+
+let string_of_site_contact_map
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler_kappa agent_name site_int =
+  let error, site_type, _ =
+    string_of_site_aux
+      ~ml_pos ~ka_pos ~message
+      parameter error handler_kappa agent_name site_int
+  in
+  error, (print_site_contact_map site_type)
+
 
 let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple
@@ -825,11 +812,11 @@ let id_of_binding_type
             Misc_sa.const_unit
             state_dic
         with
-        | error, (bool, None) ->
+        | error, (_bool, None) ->
           Exception.warn
             parameter error __POS__
             Exit Ckappa_sig.dummy_state_index
-        | error, (bool, (Some (a,_,_,_))) ->
+        | error, (_bool, (Some (a,_,_,_))) ->
           error, a
     end
 
