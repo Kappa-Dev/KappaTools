@@ -629,9 +629,10 @@ let edit_notation_of_yojson filenames r =
   let mix_of_json = JsonUtil.to_list (agent_of_json filenames) in
   match r with
   | `Assoc l as x when List.length l < 3 ->
-    begin try {
-      mix = JsonUtil.to_list (agent_of_json filenames) (List.assoc "mix" l);
-      delta_token =JsonUtil.to_list
+    {
+      mix = mix_of_json (Yojson.Basic.Util.member "mix" x);
+      delta_token =
+        JsonUtil.to_list
           (JsonUtil.to_pair
              (Locality.annot_of_yojson ~filenames
                 (Alg_expr.e_of_yojson
@@ -639,9 +640,6 @@ let edit_notation_of_yojson filenames r =
              (string_annot_of_json filenames))
           (Yojson.Basic.Util.member "delta_token" x);
     }
-      with Not_found ->
-        raise (Yojson.Basic.Util.Type_error ("Incorrect AST edit_notation",x))
-    end
   | x ->
     raise (Yojson.Basic.Util.Type_error ("Incorrect AST edit_notation",x))
 
