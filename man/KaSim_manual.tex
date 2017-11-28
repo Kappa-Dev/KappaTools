@@ -1579,7 +1579,7 @@ There are five different areas of importance in the graphical interface:
 \begin{enumerate}
 \item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation).
 In expert mode, more options are available in the graphical interface.
-\item On the top center/right, some button allows for the selection of the tab. There are currently six sub-tabs available: \texttt{Actions}, \texttt{Output}, \texttt{Reachability analysis}, \texttt{Trace analysis}, \texttt{Contact map}, \texttt{Influence map}.
+\item On the top center/right, some button allows for the selection of the tab. There are currently six sub-tabs available: \texttt{Actions}, \texttt{Syntax}, \texttt{Output}, \texttt{Reachability analysis}, \texttt{Trace analysis}, \texttt{Contact map}, \texttt{Influence map}.
 
 \item In the center, the options of the selected sub-tab are displayed and can be tuned.
 
@@ -1607,15 +1607,31 @@ The following options are available:
 \item The button \texttt{-{}-reset-all} inactivates all the functionalities.
 \item The option \texttt{-{}-compute-contact-map} can be used to (des)activate the computation of the contact map.
 \item The option \texttt{-{}-compute-influence-map} can be used to (des)activate the computation of the influence map.
+\item The option \texttt{-{}-compute-potential-cycles} can be used to (des)activate the computation of the potential polymers.
 \item The option \texttt{-{}-compute-reachability-analysis} can be used to (des)activate the computation of the reachability analysis.
+\item The option \texttt{-{}-compute-symmetries} can be used to (des)activate the computation of pairs of equivalent sites.
 \item The option \texttt{-{}-compute-local-traces} can be used to (des)activate the computation of the trace analysis.
+\item The option \texttt{-{}-compute-separating-transitions} can be used to (des)activate the computation of the transitions that are non weakly reversible.
 \end{itemize}
+
+Lastly, a switch allows to select the version for Kappa syntax.
+
+\subsection{The sub-tab \texttt{Syntax}}
+
+\begin{figure}[htbp]
+  \centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_1.png}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Syntax}.}
+\label{fig:kasa:01}
+\end{figure}
+
+The sub-tab \texttt{Syntax} (see Fig.~\ref{fig:kasa:01}) contains the switch to select between the version 3 and the version 4 of Kappa syntax.
 
 \subsection{The sub-tab \texttt{Output}}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm]{img/kasa_1.png}
+\includegraphics[width=12cm]{img/kasa_2.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{output}.}
 \label{fig:kasa:1}
 \end{figure}
@@ -1630,7 +1646,7 @@ The following options are available:
 \item The field \texttt{-{}-output-contact-map} contains the name of the file for the contact map. If the file name does not end by it, the proper extension will be added to the file name.
 \item The field \texttt{-{}-output-influence-map-directory} can be used to set the repository where the output file for the influence map is written, if an influence map is requested. \KaSa~will create this repository, if it does not exist.
 \item The field \texttt{-{}-output-influence-map} contains the name of the file for the influence map. If the file name does not end by it, the proper extension will be added to the file name.
-\item The format for the influence map can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{-{}-influence-map-format}.
+\item The format for the influence map can be chosen among \texttt{DOT}, \texttt{DIM}, and \texttt{HTML} thanks to the option \texttt{-{}-influence-map-format}. In format \texttt{DIM}, the output of the influence map is a json file containing the support of the dynamic influence map that has been introduced in Sect.~\ref{sec:flux}.
 \item The field \texttt{-{}-output-local-traces-directory} can be used to set the repository where the output file for the result of trace analysis is written, if this analysis is requested. \KaSa~will create this repository, if it does not exist.
 \item The format for the local traces can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{-{}-local-traces-format}.
 
@@ -1643,7 +1659,7 @@ When a file already exists, it is overwritten without any warning.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm]{img/kasa_2.png}
+\includegraphics[width=12cm]{img/kasa_3.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Reachability\_analysis}.}
 \label{fig:kasa:2}
 \end{figure}
@@ -1668,13 +1684,13 @@ As an example, we consider the following model:
 %init: 1 E()
 %init: 1 R()
 
-'E.R' E(x),R(x) -> E(x!1),R(x!1) @1
-'E/R' E(x!1),R(x!1,c) -> E(x),R(x,c) @1
-'R.R' R(x!_,c),R(x!_,c) -> R(x!_,c!1),R(x!_,c!1) @1
-'R/R' R(c!1,cr,n),R(c!1,cr,n) -> R(c,cr,n),R(c,cr,n) @1
-'R.int' R(c!1,cr,n),R(c!1,cr,n) -> R(c!1,cr!2,n),R(c!1,cr,n!2) @1
-'R/int' R(cr!1),R(n!1) -> R(cr),R(n) @1
-'obs' R(x,c,cr!_,n!_) -> R(x,c,cr,n) @1
+'E.R' E(x[.]),R(x[.]) -> E(x[1]),R(x[1]) @1
+'E/R' E(x[1]),R(x[1],c[.]) -> E(x[.]),R(x[.],c[.]) @1
+'R.R' R(x[_],c[.]),R(x[_],c[.]) -> R(x[_],c[1]),R(x[_],c[1]) @1
+'R/R' R(c[1],cr[.],n[.]),R(c[1],cr[.],n[.]) -> R(c[.],cr[.],n[.]),R(c[.],cr[.],n[.]) @1
+'R.int' R(c[1],cr[.],n[.]),R(c[1],cr[.],n[.]) -> R(c[1],cr[2],n[.]),R(c[1],cr[.],n[2]) @1
+'R/int' R(cr[1]),R(n[1]) -> R(cr[.]),R(n[.]) @1
+'obs' R(x[.],c[.],cr[_],n[_]) -> R(x[.],c[.],cr[.],n[.]) @1
 \end{lstlisting}
 
 Typing the following command line:
@@ -1824,7 +1840,7 @@ The option \verb?--use-natural-language? can be used to switch on/off the transl
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm]{img/kasa_3.png}
+\includegraphics[width=12cm]{img/kasa_4.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Trace analysis}.}
 \label{fig:kasa:3}
 \end{figure}
@@ -1909,7 +1925,7 @@ Although the semantics of a coarse-grainged transition system is fully defined  
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm]{img/kasa_4.png}
+\includegraphics[width=12cm]{img/kasa_5.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Contact map}.}
 \label{fig:kasa:4}
 \end{figure}
@@ -1958,7 +1974,7 @@ The directory is assumed to exist. The file will be overwritten if it exists.  A
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm]{img/kasa_5.png}
+\includegraphics[width=12cm]{img/kasa_6.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Influence map}.}
 \label{fig:kasa:4}
 \end{figure}
