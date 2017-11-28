@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Nov 27 2017>
+   * Last modification: Time-stamp: <Nov 28 2017>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -2003,24 +2003,41 @@ let export_contact_map parameters error handler =
 
 (**********************************************************)
 
+let merge_set parameters error set_opt set =
+  match set_opt with
+  | None -> error,Some set
+  | Some set' ->
+    let error, set =
+      Ckappa_sig.PairAgentSite_map_and_set.Set.inter parameters error set set'
+    in
+    error,
+    Some set
+
 let convert_scc_maps_into_set
     parameters error scc_map =
-  Public_data.AccuracyMap.fold
-    (fun _ m error_set ->
-       Public_data.AccuracyMap.fold
-         (fun _ list error_set ->
-            List.fold_left
-              (
+  match
+    Public_data.AccuracyMap.fold
+      (fun _ m error_set ->
+         Public_data.AccuracyMap.fold
+           (fun _ list (error,set_opt) ->
+              let error, set =
                 List.fold_left
-                  (fun (error, set) link ->
-                    Ckappa_sig.PairAgentSite_map_and_set.Set.add_when_not_in
-                      parameters error link set)
-                )
-              error_set list)
-         m error_set )
-    scc_map
-    (error,
-     Ckappa_sig.PairAgentSite_map_and_set.Set.empty)
+                  (
+                    List.fold_left
+                      (fun (error, set) link ->
+                         Ckappa_sig.PairAgentSite_map_and_set.Set.add_when_not_in
+                           parameters error link set)
+                  )
+                  (error, Ckappa_sig.PairAgentSite_map_and_set.Set.empty)
+                  list
+              in
+              merge_set parameters error set_opt set)
+           m error_set )
+      scc_map
+      (error,None)
+  with
+  | error, None -> error, Ckappa_sig.PairAgentSite_map_and_set.Set.empty
+  | error, Some set -> error, set
 
 let dot_of_contact_map ?logger parameters error
     handler scc_map contact_map =

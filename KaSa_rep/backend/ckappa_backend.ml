@@ -336,7 +336,7 @@ struct
                 error, Some Wildcard
               else
                 error, old_binding
-            | _, Some x, _  -> error, binding_state_opt
+            | _, Some _, _  -> error, binding_state_opt
             | _, None, _ -> error, old_binding
           in
           let error, sitemap =
@@ -498,18 +498,6 @@ struct
         (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
         agent_id'
         t.views
-    in
-    let error, state_dic =
-      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-        parameter error
-        (agent_type,site)
-        kappa_handler.Cckappa_sig.states_dic
-    in
-    let error, state_dic' =
-      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-        parameter error
-        (agent_type',site')
-        kappa_handler.Cckappa_sig.states_dic
     in
     let error, state_id =
       Handler.id_of_binding_type

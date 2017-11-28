@@ -40,10 +40,13 @@ let print_binding_state parameter error binding_state =
   match binding_state
   with
   | Ckappa_sig.Free -> error
-  | Ckappa_sig.Lnk_type (agent_name,site_name) -> (*CHANGE to binding_type*)
+  | Ckappa_sig.Lnk_type (agent_name,site_name) ->
+    let binding_type_symbol =
+      Remanent_parameters.get_btype_sep_symbol parameter
+    in  
     let () =
       Loggers.print_binding_type (Remanent_parameters.get_logger parameter)
-        agent_name site_name
+        ~binding_type_symbol ~agent_name ~site_name
     in
     error
 
