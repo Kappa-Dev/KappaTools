@@ -16,9 +16,9 @@ C(a[_/.]) @ 2
 A(a[1] b[.] c[.])+, B(a[1] b[.] c[.])+ @ 10
 C(a{p}[.] b[.] c[.])+ @ 10
 
-/*0*/%mod: [true] do $TRACK B(a[1]), C(a{p}[1]) [true] repeat [false]
+/*0*/%mod: [true] do $TRACK B(a[1]), C(a{p}[1]) [true]; repeat [false]
 
 %init: 10 A(a[1] b[.] c[.]), B(a[1] b[.] c[.])
 %init: 10 C(a{u}[1] b[.] c[.]), C(a{p}[1] b[.] c[.])
 
-%mod: [E] = 12 do $STOP
+%mod: [E] = 12 do $STOP;

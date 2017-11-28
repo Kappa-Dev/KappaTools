@@ -17,6 +17,6 @@
 %init: 1 A()
 %init: 1 K() 
 
-%mod: [true] do $TRACK 'goal' [true]
+%mod: [true] do $TRACK 'goal' [true];
 
 %def: "displayCompression" "strong"

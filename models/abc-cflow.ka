@@ -38,12 +38,12 @@ A(x[.],c[.]),C(x1{p}[.],x2{p}[.]) @ 'mod_rate' //A modifies x2
 
 %mod: ([E] [mod] 1000 = 0) do
  $UPDATE 'snapshots' ('snapshots'+1) ;
- $SNAPSHOT ("snap".[int]([E]/1000).".ka")
+ $SNAPSHOT ("snap".[int]([E]/1000).".ka");
  repeat [true]
 
-%mod: [T]>5 do $ADD 10000 C()
-%mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
-%mod: [T]>10 && ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false])
+%mod: [T]>5 do $ADD 10000 C();
+%mod: [T]>10 do $TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp';
+%mod: [T]>10 && ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false];)
 
 
 %def: "cflowFileName" "abc-flow"

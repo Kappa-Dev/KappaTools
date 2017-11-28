@@ -4,4 +4,4 @@
 
 %init: 7 A(x[.])
 
-%mod: [true] do $PRINT ("At ".[E]." ".|A(x[_])|) > "stream.txt" repeat [true]
+%mod: [true] do $PRINT ("At ".[E]." ".|A(x[_])|) > "stream.txt"; repeat [true]

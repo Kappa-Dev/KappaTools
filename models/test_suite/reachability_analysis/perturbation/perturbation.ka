@@ -2,4 +2,4 @@
 
 A() -> . @ 1
 
-%mod: [true] do $ADD 1 A(x[1]),B(x[1])
+%mod: [true] do $ADD 1 A(x[1]),B(x[1]);

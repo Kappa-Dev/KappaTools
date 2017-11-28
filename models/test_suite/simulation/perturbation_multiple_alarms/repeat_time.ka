@@ -4,12 +4,12 @@
 A(a{u}[.]) -> A(a{p}[.]) @ 0.01
 A(a{p}[.]) -> A(a{u}[.]) @ 0.01
 
-%mod: alarm 1.0 do $SNAPSHOT "rt.ka" repeat [true]
+%mod: alarm 1.0 do $SNAPSHOT "rt.ka"; repeat [true]
 
 // this perturbation is only applied once at 1.2 time units
-%mod: alarm 1.2 do $DEL 10 A(a[.]{#})
+%mod: alarm 1.2 do $DEL 10 A(a[.]{#});
 
 // perturbations with the same alarm are applied in lexico-graphical order
-%mod: alarm 0.7 do $PRINT ("1st printing alarm at ".[T])
-%mod: alarm 0.7 do $PRINT ("2nd printing alarm at ".[T]) repeat [true]
-%mod: alarm 0.7 do $PRINT ("3rd printing alarm at ".[T]) repeat [true]
+%mod: alarm 0.7 do $PRINT ("1st printing alarm at ".[T]);
+%mod: alarm 0.7 do $PRINT "2nd printing alarm at ".[T]; repeat [true]
+%mod: alarm 0.7 do $PRINT "3rd printing alarm at ".[T]; repeat [true]

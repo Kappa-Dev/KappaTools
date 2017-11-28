@@ -8,7 +8,7 @@ A(a{p}[.]),B(a{p}[.]) -> /*could be inlined*/ A(a{u}[.]),B(a{u}[.]) @ 1
 %init: 1 B(a{u})
 
 
-%mod: [true] do $TRACK 'C' /*last noop rule*/ [true]
+%mod: [true] do $TRACK 'C' /*last noop rule*/ [true];
 
 %agent: A(a{u,p})
 %agent: B(a{u,p})

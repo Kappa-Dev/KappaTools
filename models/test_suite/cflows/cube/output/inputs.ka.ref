@@ -15,8 +15,8 @@
 'y--' A(x{u}[.] y{p/u}[.] z{p}[.]) @ 10
 'GOAL' A(x{p}[.] y{u}[.] z{p}[.])- @ 0
 
-/*0*/%mod: [true] do $TRACK A(x{p} y{u} z{p}) [true] repeat [false]
+/*0*/%mod: [true] do $TRACK A(x{p} y{u} z{p}) [true]; repeat [false]
 
 %init: 10000 A(x{u}[.] y{u}[.] z{u}[.])
 
-%mod: [E] = 30000 do $STOP
+%mod: [E] = 30000 do $STOP;

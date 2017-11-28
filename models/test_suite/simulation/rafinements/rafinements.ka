@@ -126,4 +126,4 @@ C(b[.],a[1]), A(c[1],b[2]), B(a[2],c[3]), C(b[3],a[4]), A(c[4],b[5]), B(a[5],c[6
 
 %init: 10000 A(), B(), C()
 
-%mod: alarm 2.0 do $STOP "final.ka"
+%mod: alarm 2.0 do $STOP "final.ka";

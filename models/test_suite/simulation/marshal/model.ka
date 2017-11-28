@@ -6,4 +6,4 @@
 %var: 'init' 100
 %init: 'init' A(x[1]), B(x[1])
 
-%mod: [false] do $STOP
+%mod: [false] do $STOP;

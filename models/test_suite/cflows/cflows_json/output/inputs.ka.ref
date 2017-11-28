@@ -20,10 +20,10 @@
 'A..B' A(a{p}[1/.]), B(a{p}[1/.]) @ 0.01
 'A.B.A' A(a{p}[./1]), B(a{p}[./1] b[./2]), A(a{p}[./2]) @ 0.01
 
-/*0*/%mod: [true] do $TRACK A(a{p}[.]), B(a{p}[.]) [true] repeat [false]
-/*1*/%mod: [true] do $TRACK A(a{p}[1]), B(a{p}[1] b[2]), A(a{p}[2]) [true] repeat [false]
+/*0*/%mod: [true] do $TRACK A(a{p}[.]), B(a{p}[.]) [true]; repeat [false]
+/*1*/%mod: [true] do $TRACK A(a{p}[1]), B(a{p}[1] b[2]), A(a{p}[2]) [true]; repeat [false]
 
 %init: 1000 A(a{u}[.])
 %init: 1000 B(a{u}[.] b[.])
 
-%mod: [E] = 98 do $STOP
+%mod: [E] = 98 do $STOP;

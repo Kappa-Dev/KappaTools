@@ -13,8 +13,8 @@
 
 /*0*/%mod: (|A(c{=4})| = 1) do $PRINTF "
 Counter c of agent A reached maximum
-"; $STOP "counter_perturbation.ka" repeat [false]
+"; $STOP "counter_perturbation.ka"; repeat [false]
 
 %init: 40 A(x{u}[.] c{=0})
 
-%mod: [E] = 4 do $STOP
+%mod: [E] = 4 do $STOP;

@@ -12,8 +12,8 @@ A(x[1] y[./1]), A(x[1] y[./1]) @ 1
 A(x[1/1] y[2/2]), A(x[1/2] y[2/1]) @ 1
 'GOAL' A(x[1/.]), A(y[1/.]) @ 1
 
-/*0*/%mod: [true] do $TRACK A(x[1]), A(y[1]) [true] repeat [false]
+/*0*/%mod: [true] do $TRACK A(x[1]), A(y[1]) [true]; repeat [false]
 
 %init: 8 A(x[.] y[.])
 
-%mod: [E] = 30 do $STOP
+%mod: [E] = 30 do $STOP;

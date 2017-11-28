@@ -10,4 +10,4 @@ A(x{#}) -> A(x{c}) @ 3
 A(x[.]{#}) -> A(x[.]{d}) @ 1
 'GOAL' A(x{d}) -> A(x{d}) @ 1
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];

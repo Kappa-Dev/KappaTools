@@ -9,5 +9,5 @@ A(x[_]) -> A(x[.]) @ 1
 
 %agent: A(x{u,p},y)
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];
 

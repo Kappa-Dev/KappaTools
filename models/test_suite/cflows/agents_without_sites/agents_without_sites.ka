@@ -15,4 +15,4 @@ B(),. -> .,C() @ 1
 // Initial conditions 
 %init: 10000 A()
 
-%mod: [true] do $TRACK 'C' [true]
+%mod: [true] do $TRACK 'C' [true];

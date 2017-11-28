@@ -12,9 +12,9 @@
 'B-' B(x[_])- @ 1
 'B+' B(x[.])+ @ 1
 
-/*0*/%mod: [true] do $TRACK A(x[1]), B(x[1]) [true] repeat [false]
+/*0*/%mod: [true] do $TRACK A(x[1]), B(x[1]) [true]; repeat [false]
 
 %init: 1000 B(x[.])
 %init: 1 A(x[.])
 
-%mod: [E] = 75 do $STOP
+%mod: [E] = 75 do $STOP;

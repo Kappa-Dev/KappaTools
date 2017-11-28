@@ -34,4 +34,4 @@
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
-%mod: alarm 10.0 do $ADD 10000 C()
+%mod: alarm 10.0 do $ADD 10000 C();

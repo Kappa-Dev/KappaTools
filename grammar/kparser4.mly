@@ -498,6 +498,12 @@ nonempty_print_expr:
     { ([Primitives.Str_pexpr (add_pos 1 $1)],end_pos 1,$2) }
   | alg_expr_up_to_if
     { let (a,pend,p) = $1 in ([Primitives.Alg_pexpr a],pend,p) }
+  | print_expr_list { $1 }
+  | OP_PAR annot print_expr_list CL_PAR annot
+    { let (v,_,an) = $3 in (v,end_pos 4,an @ $5) }
+  ;
+
+print_expr_list:
   | STRING annot DOT annot nonempty_print_expr
     { let (l,pend,p) = $5 in (Primitives.Str_pexpr ($1, rhs_pos 1)::l,pend,p) }
   | alg_expr_up_to_if DOT annot nonempty_print_expr
@@ -508,9 +514,7 @@ nonempty_print_expr:
 
 print_expr:
   | annot { ([],start_pos 1,$1) }
-  | annot STRING annot { ([Primitives.Str_pexpr ($2,rhs_pos 2)],end_pos 2,$3) }
-  | annot OP_PAR annot nonempty_print_expr CL_PAR annot
-    { let (v,_,an) = $4 in (v,end_pos 5,an @ $6) }
+  | annot nonempty_print_expr { $2 }
   ;
 
 effect:
@@ -537,14 +541,15 @@ effect:
         (Ast.FLUX (Primitives.RELATIVE,p),end_pos 6,$7)
       else raise (ExceptionDefn.Syntax_Error
                     ("Incorrect FLUX expression",rhs_pos 4)) }
-  | APPLY annot alg_expr rule_content AT
-  { let (rewrite,_,pend,an) = $4 in
-    let (v,_,_) = $3 in
-    Ast.APPLY(v,
-	({ Ast.rewrite; Ast.bidirectional = false;
-	   Ast.k_def=Alg_expr.const Nbr.zero;Ast.k_un=None;
-	   Ast.k_op=None; Ast.k_op_un=None},Locality.of_pos (start_pos 3) pend)),
-    pend,an
+  | APPLY annot alg_expr rule_content
+    { let (rewrite,_,pend,an) = $4 in
+      let (v,_,_) = $3 in
+      Ast.APPLY(v,
+	        ({ Ast.rewrite; Ast.bidirectional = false;
+	           Ast.k_def=Alg_expr.const Nbr.zero;Ast.k_un=None;
+	           Ast.k_op=None; Ast.k_op_un=None},
+                 Locality.of_pos (start_pos 3) pend)),
+      pend,an
     }
   | INTRO annot alg_expr pattern
     { let (m,pend,p) = $4 in
@@ -578,27 +583,23 @@ effect:
            { raise (ExceptionDefn.Syntax_Error
                       (add_pos 3 "Malformed perturbation instruction, I was \
 expecting '$DEL alg_expression kappa_expression'")) }
-/*
-  | ID annot LAR annot alg_expr
-    { let (n,pend,p) = $5 in (Ast.UPDATE_TOK (($1,rhs_pos 1),n),pend,p) }
-*/
   | SNAPSHOT print_expr { let (s,pend,p) = $2 in (Ast.SNAPSHOT s,pend,p) }
   | STOP print_expr { let (s,pend,p) = $2 in (Ast.STOP s,pend,p) }
   | PRINTF print_expr GREATER print_expr
     { let (f,pend,p) = $4 in let (c,_,_) = $2 in (Ast.PRINT (f,c),pend,p) }
   | PRINTF print_expr { let (c,pend,p) = $2 in (Ast.PRINT ([],c),pend,p) }
   | PLOTENTRY annot { (Ast.PLOTENTRY,end_pos 1,$2) }
-  | SPECIES_OF print_expr pattern boolean annot
+  | SPECIES_OF annot pattern boolean annot GREATER print_expr
     {
-      let (file,_,_) = $2 in
-      let (pat,pend,_) = $3 in
-      (Ast.SPECIES_OF ($4,file,(pat, Locality.of_pos (start_pos 3) pend)),
-       end_pos 4,$5) }
+      let (file,pend,p) = $7 in
+      let (pat,pendp,_) = $3 in
+      (Ast.SPECIES_OF ($4,file,(pat, Locality.of_pos (start_pos 3) pendp)),
+       pend,p) }
   ;
 
 effect_list:
   | OP_PAR annot effect_list CL_PAR annot { $3 }
-  | effect { let (e,pend,p) = $1 in ([e],pend,p) }
+  | effect SEMICOLON annot { let (e,_,_) = $1 in ([e],end_pos 2,$3) }
   | effect SEMICOLON annot effect_list
     { let (e,_,_) = $1 in let (l,pend,a) = $4 in (e::l,pend,a) }
   ;

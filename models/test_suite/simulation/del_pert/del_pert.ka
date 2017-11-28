@@ -4,5 +4,5 @@
 
 %init: 2 A()
 
-%mod: [T] > 1 do $ADD 1 A()
-%mod: [T] > 2 do $DEL 1 A()
+%mod: [T] > 1 do $ADD 1 A();
+%mod: [T] > 2 do $DEL 1 A();

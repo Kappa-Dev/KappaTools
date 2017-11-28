@@ -13,6 +13,6 @@ A(x[.]),B(x[.]) -> A(x[1]),B(x[1]) @ 1
 A(x[1]),B(x[1]),. -> A(x[1]),B(x[1]),C() @ 1
 
 %obs: 'goal' |C()|
-%mod: [T]<100 do $TRACK 'goal' [true]
+%mod: [T]<100 do $TRACK 'goal' [true];
 %def: "displayCompression" "none" "weak" "strong"
 %def: "dotCflows" "false"

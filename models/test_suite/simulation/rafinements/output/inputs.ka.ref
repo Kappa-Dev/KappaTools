@@ -118,8 +118,8 @@ A(c[./12] b[1]), B(a[1] c[2]), C(b[2] a[3]), A(c[3] b[4]), B(a[4] c[5]), C(b[5] 
 B(a[./12] c[1]), C(b[1] a[2]), A(c[2] b[3]), B(a[3] c[4]), C(b[4] a[5]), A(c[5] b[6]), B(a[6] c[7]), C(b[7] a[8]), A(c[8] b[9]), B(a[9] c[10]), C(b[10] a[11]), A(c[11] b[./12]) @ 100.
 C(b[./12] a[1]), A(c[1] b[2]), B(a[2] c[3]), C(b[3] a[4]), A(c[4] b[5]), B(a[5] c[6]), C(b[6] a[7]), A(c[7] b[8]), B(a[8] c[9]), C(b[9] a[10]), A(c[10] b[11]), B(a[11] c[./12]) @ 100.
 
-/*0*/%mod: alarm 2. ([T] > 0) do $STOP "final.ka" repeat [false]
+/*0*/%mod: alarm 2. ([T] > 0) do $STOP "final.ka"; repeat [false]
 
 %init: 10000 A(c[.] b[.]), B(a[.] c[.]), C(b[.] a[.])
 
-%mod: [E] = 141489 do $STOP
+%mod: [E] = 141489 do $STOP;

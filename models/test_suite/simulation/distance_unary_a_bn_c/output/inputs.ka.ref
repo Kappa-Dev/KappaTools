@@ -27,4 +27,4 @@
 %init: 100 B(a[.] b[.] b1[.] c[.])
 %init: 100 C(c{u}[.])
 
-%mod: [E] = 200 do $STOP
+%mod: [E] = 200 do $STOP;

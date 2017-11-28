@@ -8,7 +8,7 @@ C(a[_]) -> C(a[.]) @ 2
 
 %init: 2 (C(a{u}[1]),C(a{p}[1]))
 
-%mod: [true] do $TRACK 'C' [true]
+%mod: [true] do $TRACK 'C' [true];
 
 %agent: A(a,b)
 %agent: B(a)

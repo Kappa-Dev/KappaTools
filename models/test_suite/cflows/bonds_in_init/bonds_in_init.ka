@@ -16,8 +16,8 @@
 
 %def: "displayCompression" "none" "weak" "strong"
 
-%mod: [true] do $TRACK 'L' [true]
+%mod: [true] do $TRACK 'L' [true];
 
-// %mod: [T]>30 do $TRACK 'Sub3 total' [false]
+// %mod: [T]>30 do $TRACK 'Sub3 total' [false];
 // KaSim -i Trial_stories.ka -t 31 -p 31
 // dot cflow_Strongly_0.dot -Tpng -O

@@ -15,4 +15,4 @@ A(z[1],y[.]),K(x[1]) -> A(z[.],y[1]),K(x[1]) @ 1
 %agent: A(x,y,z)
 %agent: K(x)
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];

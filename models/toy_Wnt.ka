@@ -92,18 +92,9 @@ I can then obtain the rate of degradation.*/
 %init: 50 GSK()
 %init: 5000 Cat()
 
-%mod: [T] > 50 do $ADD 100 APC()
-%mod: [T] > 100 do $ADD 100 APC()
-%mod: [T] > 150 do $ADD 100 APC()
-%mod: [T] > 200 do $ADD 100 APC()
-%mod: [T] > 250 do $ADD 100 APC()
-%mod: [T] > 300 do $ADD 100 APC()
-%mod: [T] > 350 do $ADD 100 APC()
-%mod: [T] > 400 do $ADD 100 APC()
-%mod: [T] > 450 do $ADD 100 APC()
-%mod: [T] > 500 do $ADD 100 APC()
-%mod: [T] > 550 do $UPDATE 'r_APC\' 5
+%mod: alarm 50 [T] > 0 do $ADD 100 APC(); repeat [T] < 500
+%mod: alarm 550 do $UPDATE 'r_APC\' 5;
 //%def: "storeUnaryDistance" "true"
 
-%mod: [T] > 110 do $FLUX "lol.json" [true]
-%mod: [T] > 160 do $FLUX "lol.json" [false]
+%mod: [T] > 110 do $FLUX "lol.json" [true];
+%mod: [T] > 160 do $FLUX "lol.json" [false];

@@ -4,4 +4,4 @@
 A(a{u}[.]) -> A(a{p}[.]) @ 0.01
 A(a{p}[.]) -> A(a{u}[.]) @ 0.01
 
-%mod: alarm 1.0 [true] do $SNAPSHOT "rt.ka" repeat [true]
+%mod: alarm 1.0 [true] do $SNAPSHOT "rt.ka"; repeat [true]

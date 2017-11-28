@@ -14,4 +14,4 @@ A(x[x.K],y{u}[.]) -> A(x[x.K],y{p}[.]) @ 1
 %agent: A(x,y{u,p})
 %agent: K(x)
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];

@@ -194,7 +194,7 @@ let close_input ?event () =
       | None -> ()
       | Some event -> Format.fprintf
                         (Format.formatter_of_out_channel inputs)
-                        "@.%%mod: [E] = %i do $STOP@." event in
+                        "@.%%mod: [E] = %i do $STOP;@." event in
     close_out inputs
 
 let close ?event () =
@@ -239,4 +239,6 @@ let input_modifications env event mods =
     Format.fprintf
       (Format.formatter_of_out_channel inputs)
       "%%mod: [E] = %i do %a@."
-      event (Pp.list Pp.colon (Kappa_printer.modification ~env)) mods
+      event
+      (Pp.list ~trailing:Pp.colon Pp.colon (Kappa_printer.modification ~env))
+      mods

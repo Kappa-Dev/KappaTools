@@ -6,8 +6,8 @@
 'bb' B(b[.]), B(b[.]) -> B(b[1]), B(b[1]) @ 0.01
 'bc' B(c[.]), C(c[.]) -> B(c[1]), C(c[1]) @ 0.01
 
-%mod: [true] do $SPECIES_OF "species.ka" A(a[1]), B(a[1]) [true]
-%mod: [true] do $SPECIES_OF "species2.ka" A(a[1]), B(a[1]), B(c[2]), C(c[2]) [true]
+%mod: [true] do $SPECIES_OF A(a[1]), B(a[1]) [true] > "species.ka";
+%mod: [true] do $SPECIES_OF A(a[1]), B(a[1]), B(c[2]), C(c[2]) [true] > "species2.ka";
 
 %init: 100 A(a{u})
 %init: 100 B()

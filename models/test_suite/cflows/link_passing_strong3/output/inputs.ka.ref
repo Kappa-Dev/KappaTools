@@ -17,9 +17,9 @@ A(x[./1]), E(x[1/1]), C(x[1/.]) @ 1
 E(x[./1]), C(x[./1]) @ 1
 'GOAL' A(x[1/.]), E(x[1/.]) @ 1
 
-/*0*/%mod: [true] do $TRACK A(x[1]), E(x[1]) [true] repeat [false]
+/*0*/%mod: [true] do $TRACK A(x[1]), E(x[1]) [true]; repeat [false]
 
 %init: 10 A(x[.])
 %init: 10 E(x[.])
 
-%mod: [E] = 280 do $STOP
+%mod: [E] = 280 do $STOP;

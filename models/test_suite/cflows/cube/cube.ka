@@ -13,4 +13,4 @@
 
 %agent: A(x{u,p},y{u,p},z{u,p})
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];

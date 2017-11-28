@@ -34,13 +34,13 @@
 
 %var: 'counter' 0
 
-%mod: ([E] [mod] 10000 = 0) do 
-	( $SNAPSHOT ("snap".'counter'."_".[E].".dot");
-	$UPDATE 'counter' ('counter'+1) )
+%mod: ([E] [mod] 10000 = 0) do
+	$SNAPSHOT ("snap".'counter'."_".[E].".dot");
+	$UPDATE 'counter' ('counter'+1);
 	repeat [true]
 
-%mod: [T]>5 do $ADD 10000 C()
-%mod: [T]>10 do ( $TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
-%mod: ('Cpp' - 'cflow' = 10 ) do ($TRACK 'Cpp' [false])
+%mod: [T]>5 do $ADD 10000 C();
+%mod: [T]>10 do $TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp';
+%mod: ('Cpp' - 'cflow' = 10 ) do ($TRACK 'Cpp' [false];)
 
 %def: "displayCompression" "weak"

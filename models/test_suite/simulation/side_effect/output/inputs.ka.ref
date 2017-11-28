@@ -14,4 +14,4 @@
 %init: 0 A(x[.] y[.] b[.] c[.]), B(b[.] c[.]), C(b[.] c[.])
 %init: 1 A(x[1] y[.] b[2] c[4]), A(x[1] y[.] b[.] c[.]), B(b[2] c[3]), C(b[3] c[4])
 
-%mod: [E] = 1 do $STOP
+%mod: [E] = 1 do $STOP;

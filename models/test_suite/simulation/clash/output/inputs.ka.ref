@@ -13,4 +13,4 @@
 
 %init: 1 A(x[1]), A(x[1])
 
-%mod: [E] = 3 do $STOP
+%mod: [E] = 3 do $STOP;

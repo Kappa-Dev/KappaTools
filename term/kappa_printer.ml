@@ -176,14 +176,14 @@ let modification ?env f m =
          (fun _ -> Pattern.print ?domain ~with_id:false)) cc
   | Primitives.SPECIES (fn,cc,_) ->
     Format.fprintf
-      f "$SPECIES_OF %a @[%a@] [true]"
-      (print_expr ?env) fn
+      f "$SPECIES_OF @[%a@] [true] > %a"
       (Pp.array
          Pp.comma
          (fun _ -> Pattern.print ?domain ~with_id:false)) cc
+      (print_expr ?env) fn
   | Primitives.SPECIES_OFF fn ->
     Format.fprintf
-      f "$SPECIES_OFF %a [false]"
+      f "$SPECIES_OF [false] > %a"
       (print_expr ?env) fn
 
 let perturbation ?env f pert =
@@ -192,10 +192,10 @@ let perturbation ?env f pert =
     | None -> ()
     | Some n -> Format.fprintf f "alarm %a " Nbr.print n
   in
-  Format.fprintf f "%%mod: %t%a do %a repeat %a"
+  Format.fprintf f "%%mod: %t%a do %arepeat %a"
     aux_alarm
     (bool_expr ?env) (fst pert.Primitives.precondition)
-    (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
+    (Pp.list ~trailing:Pp.colon Pp.colon (modification ?env)) pert.Primitives.effect
     (bool_expr ?env) (fst pert.Primitives.repeat)
 
 let env f env =

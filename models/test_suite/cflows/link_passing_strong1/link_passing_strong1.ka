@@ -16,4 +16,4 @@ A(x[1]),B(x[1]) -> A(x[.]),B(x[.]) @ 1
 %agent: B(x)
 %agent: C(x)
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];

@@ -19,4 +19,4 @@ E(x[.]),C(x[.]) -> E(x[1]),C(x[1]) @ 1
 %agent: C(x)
 %agent: E(x)
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];

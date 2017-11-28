@@ -23,8 +23,8 @@
 'S..L..Z' S(l[1/.] z[2/.]), L(z[0/.] s[1/.]), Z(l[0/.] s[2/.]) @ 1
 'C' L(z[0] s[.])+, Z(l[0] s[.])+ @ 1
 
-/*0*/%mod: [true] do $TRACK L(z[.]) [true] repeat [false]
+/*0*/%mod: [true] do $TRACK L(z[.]) [true]; repeat [false]
 
 %init: 10 K(s[.] x{u}[.]), S(k[.] l[.] z[.] x{u}[.] y{u}[.])
 
-%mod: [E] = 703 do $STOP
+%mod: [E] = 703 do $STOP;

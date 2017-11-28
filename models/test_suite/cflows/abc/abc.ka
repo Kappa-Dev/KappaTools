@@ -32,9 +32,9 @@
 %init: 'n_ab' (A(x[.]),B(x[.]))
 %init: 'n_c' C(x1{u}[.],x2{u}[.])
 
-%mod: [true] do $TRACK 'Cuu' [true]
-%mod: [true] do $TRACK 'Cpu' [true]
-%mod: [true] do $TRACK 'Cpp' [true]
+%mod: [true] do $TRACK 'Cuu' [true];
+%mod: [true] do $TRACK 'Cpu' [true];
+%mod: [true] do $TRACK 'Cpp' [true];
 
-%mod: [true] do $FLUX "flux_map.dot" "absolute" [true]
-%mod: [E] = [Emax] - 1 do $FLUX "flux_map.dot" [false]; $DEL 10000 C(x1{p},x2{p})
+%mod: [true] do $FLUX "flux_map.dot" "absolute" [true];
+%mod: [E] = [Emax] - 1 do $FLUX "flux_map.dot" [false]; $DEL 10000 C(x1{p},x2{p});

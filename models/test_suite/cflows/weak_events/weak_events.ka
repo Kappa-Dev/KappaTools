@@ -14,6 +14,6 @@
 %init: 1000 B()
 %init: 1 A()
 
-%mod: [true] do $TRACK 'B-' [true]
+%mod: [true] do $TRACK 'B-' [true];
 
 

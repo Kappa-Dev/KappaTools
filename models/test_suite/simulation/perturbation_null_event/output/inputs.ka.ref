@@ -10,8 +10,8 @@
 'dimmer' A(x[./12]), A(x[./12]) @ 0.01
 'dimmer_op' A(x[12/.]), A(x[12/.]) @ 1
 
-/*0*/%mod: [true] do $PRINTF ("At ".[E]." ".|A(x[1]), A(x[1])|) > "stream.txt" repeat [true]
+/*0*/%mod: [true] do $PRINTF ("At ".[E]." ".|A(x[1]), A(x[1])|) > "stream.txt"; repeat [true]
 
 %init: 7 A(x[.])
 
-%mod: [E] = 25 do $STOP
+%mod: [E] = 25 do $STOP;

@@ -1,8 +1,8 @@
 %var: 'kd' 1.0E-12 //mol*L-1.
 %var: 'subunitC' 4E-7 //M
 
-//%mod:  [true] do $TRACK 'ABC' [true]
-//%mod:  [T]>2 do ($TRACK 'ABC' [false];$SNAPSHOT "snap1.ka";$STOP)
+//%mod:  [true] do $TRACK 'ABC' [true];
+//%mod:  [T]>2 do ($TRACK 'ABC' [false];$SNAPSHOT "snap1.ka";$STOP;)
 
 %def: "displayCompression" "weak"
 
@@ -50,4 +50,4 @@ C(b[3],a[.]),B(c[3],a[.]) -> C(a[.],b[.]),B(a[.],c[.]) @ 'koff'
 %obs: 'Monomers' ('A'+'B'+'C')/('nA'+'nB'+'nC')
 %obs: 'Dimers' 2*('AB'+'BC'+'AC')/('nA'+'nB'+'nC')
 %obs: 'Trimers' 3*('ABC')/('nA'+'nB'+'nC')
-//%mod: [E]=18000 do $SNAPSHOT "dotsnap.dot"
+//%mod: [E]=18000 do $SNAPSHOT "dotsnap.dot";

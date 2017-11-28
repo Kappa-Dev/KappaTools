@@ -76,5 +76,5 @@ A(c[.]),C(a[.]) <-> A(c[1]),C(a[1]) @ 'kon','koff'
 %var: 'tokenify' 0
 
 %mod: [T]>0.001 do (//$UPDATE 'on' 1 ;
-$UPDATE 'tokenify' INF)
-%mod: [true] do $FLUX "all.json" [true]
+$UPDATE 'tokenify' INF;)
+%mod: [true] do $FLUX "all.json" [true];

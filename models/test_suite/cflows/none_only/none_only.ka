@@ -32,8 +32,8 @@
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
-%mod: [T]>20 do ($ADD 10000 C(); $UPDATE 'n_c' |C()|)
-%mod: [T]>50 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
-%mod: (Cpp - 'cflow' > 9 && cflow >0) do $TRACK 'Cpp' [false]
+%mod: [T]>20 do ($ADD 10000 C(); $UPDATE 'n_c' |C()|;)
+%mod: [T]>50 do $TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp';
+%mod: (Cpp - 'cflow' > 9 && cflow >0) do $TRACK 'Cpp' [false];
 
 %def: "displayCompression" "none"

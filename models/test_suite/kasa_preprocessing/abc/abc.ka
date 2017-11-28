@@ -31,7 +31,6 @@
 %init: 'n_ab' (A(),B())
 %init: 'n_c' C()
 
-%mod: [true] do $TRACK 'Cuu' [true]
-%mod: [true] do $TRACK 'Cpu' [true]
-%mod: [true] do $TRACK 'Cpp' [true]
-
+%mod: [true] do $TRACK 'Cuu' [true];
+%mod: [true] do $TRACK 'Cpu' [true];
+%mod: [true] do $TRACK 'Cpp' [true];

@@ -13,4 +13,4 @@ A(x[1],z{u}[.]),K(x[1]) -> A(x[1],z{p}[.]),K(x[1]) @ 1
 %agent: K(x)
 
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];

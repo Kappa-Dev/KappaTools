@@ -11,8 +11,8 @@
 %obs: 'ApBp' |A(a{p}[.]), B(a{p}[.])|
 %obs: 'ABA' |A(a{p}[1]), B(a{p}[1],b[2]), A(a{p}[2])|
 
-%mod: [true] do $TRACK 'ApBp' [true]
-%mod: [true] do $TRACK 'ABA' [true]
+%mod: [true] do $TRACK 'ApBp' [true];
+%mod: [true] do $TRACK 'ABA' [true];
 
 %init: 1000 A(a{u}[.])
 %init: 1000 B(a{u}[.],b[.])

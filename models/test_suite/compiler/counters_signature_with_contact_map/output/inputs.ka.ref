@@ -14,15 +14,15 @@
 
 /*0*/%mod: (|B(c{=4})| = 1) do $PRINTF "
 Counter c of agent B reached maximum
-"; $STOP "counter_perturbation.ka" repeat [false]
+"; $STOP "counter_perturbation.ka"; repeat [false]
 /*1*/%mod: (|A(d{=3})| = 1) do $PRINTF "
 Counter d of agent A reached maximum
-"; $STOP "counter_perturbation.ka" repeat [false]
+"; $STOP "counter_perturbation.ka"; repeat [false]
 /*2*/%mod: (|A(c{=4})| = 1) do $PRINTF "
 Counter c of agent A reached maximum
-"; $STOP "counter_perturbation.ka" repeat [false]
+"; $STOP "counter_perturbation.ka"; repeat [false]
 
 %init: 10 A(x[.] c{=0} d{=1})
 %init: 10 B(x[.] c{=0})
 
-%mod: [E] = 39 do $STOP
+%mod: [E] = 39 do $STOP;

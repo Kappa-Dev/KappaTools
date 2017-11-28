@@ -28,7 +28,7 @@
 %token: Cpt
 %init: 0 Cpt
 
-%mod: |Cpt| = 1 do ($UPDATE 'sAT' 0.0 ; $UPDATE 'sGC' 0.0)
+%mod: |Cpt| = 1 do ($UPDATE 'sAT' 0.0 ; $UPDATE 'sGC' 0.0;)
 
 /* Section 2.4 Checking the DNA production */
 

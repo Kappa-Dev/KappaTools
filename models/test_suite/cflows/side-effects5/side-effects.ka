@@ -9,7 +9,7 @@ B(),. -> .,A() @ 1
 
 %init: 1 A(x[.]),B(x[.])
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];
 
 
 %agent: A(x)

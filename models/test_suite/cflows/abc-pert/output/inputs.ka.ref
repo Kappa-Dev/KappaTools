@@ -33,13 +33,13 @@
 'a.c' A(x[.] c[./1]), C(x1{p}[.] x2{u}[./1]) @ on_rate
 'mod x2' A(x[.] c[1/.]), C(x1{p}[.] x2{u/p}[1/.]) @ mod_rate
 
-/*0*/%mod: [true] do $PRINTF "first" > "example"; $PRINTF "last" > "example" repeat [false]
-/*1*/%mod: ([T] > 10) do $ADD 10000 C(x1{u}[.] x2{u}[.]); $UPDATE n_c C repeat [false]
-/*2*/%mod: ([T] > 20) do $TRACK C(x1{p} x2{p}) [true]; $UPDATE cflow Cpp repeat [false]
-/*3*/%mod: (((Cpp - cflow) > 9) && (cflow > 0)) do $TRACK C(x1{p} x2{p}) [false] repeat [false]
-/*4*/%mod: (([E] [mod] 2000) = 0) do $PLOTENTRY repeat [true]
+/*0*/%mod: [true] do $PRINTF "first" > "example"; $PRINTF "last" > "example"; repeat [false]
+/*1*/%mod: ([T] > 10) do $ADD 10000 C(x1{u}[.] x2{u}[.]); $UPDATE n_c C; repeat [false]
+/*2*/%mod: ([T] > 20) do $TRACK C(x1{p} x2{p}) [true]; $UPDATE cflow Cpp; repeat [false]
+/*3*/%mod: (((Cpp - cflow) > 9) && (cflow > 0)) do $TRACK C(x1{p} x2{p}) [false]; repeat [false]
+/*4*/%mod: (([E] [mod] 2000) = 0) do $PLOTENTRY; repeat [true]
 
 %init: n_ab A(x[.] c[.]), B(x[.])
 %init: n_c C(x1{u}[.] x2{u}[.])
 
-%mod: [E] = 100000 do $STOP
+%mod: [E] = 100000 do $STOP;

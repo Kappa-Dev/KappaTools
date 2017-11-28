@@ -24,7 +24,7 @@ You can go to a new line anytime anywhere, don't put `\`. For example:
 %mod: [T] > 500 do (
     $ADD 50 A() ;
     $DEL 20 B() ;
-    $SNAPSHOT "snap.ka"
+    $SNAPSHOT "snap.ka" ;
     )
 ```
 
@@ -116,6 +116,24 @@ is:
 [LHS] <-> [RHS] @ [binary rate] {unary rate}, [reverse rate]
 ```
 
+### every modification (perturbation action) ends by a semicolon
+
+Perturbations used to take a semi-colon separated list of modification
+as body. Now, every modification ends by a semi-colon. Said
+diferrently even the last (or only) modification of a perturbation
+ends by `;`.
+
+```
+%mod: |A(a)| < 100 do $SNAPSHOT "snap_at_".[T].".ka";
+```
+
+```
+%mod: |A(a)| < 100 do
+    $SNAPSHOT ("snap_at_".[T].".ka") ;
+    $PRINT (|A()|." present at time ".[T]) > "myfile.txt" ;
+    $ADD 10 A();
+```
+
 ### Repetitive perturbation syntax has changed
 Usage is now if _precondition_ do _modification(s)_ and repeat as long
 as _condition_.
@@ -136,25 +154,6 @@ $PRINTF "what you print" > "Where_you_print.txt"
 ```
 
 The `>` can be thought as the shell redirect operator.
-
-### Complex print expressions must be in parenthesis
-
-In modifications that take strings as arguments (e.g. `$SNAPSHOT`,
-`$FLUX`, `$PRINT`), as soon as the expression is more complex than a
-single string (i.e. it contains concatenations), it must be placed in
-parenthesis. E.g.
-```
-%mod: |A(a)| < 100 do $SNAPSHOT ("snap_at_".[T].".ka")
-```
-
-This stacks with the parenthesis for multi-effect perturbations.
-```
-%mod: |A(a)| < 100 do (
-    $SNAPSHOT ("snap_at_".[T].".ka") ;
-    $PRINT (|A()|." present at time ".[T]) > "myfile.txt" ;
-    $ADD 10 A()
-    )
-```
 
 ### Syntax for "observables" is no longer a special case
 
@@ -186,7 +185,7 @@ As a (more or less direct) consequence, you can write
 ```
 %init: "any algebraic expression" "mixture"
 
-$TRACK "pattern" [true]
+%mod: $TRACK "pattern" [true];
 ```
 
 

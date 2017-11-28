@@ -11,4 +11,4 @@
 
 %init: 100 A(x[.])
 
-%mod: [E] = 99 do $STOP
+%mod: [E] = 99 do $STOP;

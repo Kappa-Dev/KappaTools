@@ -7,7 +7,7 @@ A(x{b}[.]),B(x[.]) -> A(x{a}[1]),B(x[1]) @ 1
 %init: 1 A(x{a}[1]),B(x{b}[1])
 %init: 10 B(x{a}[.]) 
 
-%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL' [true];
 
 %agent: A(x{a,b})
 %agent: B(x{a,b})
