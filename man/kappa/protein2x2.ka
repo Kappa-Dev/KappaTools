@@ -1,16 +1,16 @@
-%agent: P(a1~u~p,a2~u~p,b1~u~p,b2~u~p,g)
+%agent: P(a1{u,p},a2{u,p},b1{u,p},b2{u,p},g)
 %agent: K(x)
 
 %init: 1 P()
 %init: 1 K()
 
-'a1+' P(a1~u) -> P(a1~p) @1
-'b1+' P(a1~p,b1~u) -> P(a1~p,b1~p) @1
-'a1-' P(a1~p,b1~u) -> P(a1~u,b1~u) @1
-'b1-' P(b1~p,g) -> P(b1~u,g) @1
-'a2+' P(a2~u) -> P(a2~p) @1
-'a2-' P(a2~p,g) -> P(a2~u,g) @1
-'b2+' P(a2~p,b2~u) -> P(a2~p,b2~p) @1
-'b2-' P(b2~p,g) -> P(b2~u,g) @1
-'P.K' P(a1~p,a2~p,b1~p,b2~p,g),K(x) -> P(a1~p,a2~p,b1~p,b2~p,g!1),K(x!1) @1
-'P/K' P(a1~p,a2~p,b1~p,b2~p,g!1),K(x!1) -> P(a1~p,a2~p,b1~p,b2~p,g),K(x) @1
+'a1+' P(a1{u}) -> P(a1{p}) @1
+'b1+' P(a1{p},b1{u}) -> P(a1{p},b1{p}) @1
+'a1-' P(a1{p},b1{u}) -> P(a1{u},b1{u}) @1
+'b1-' P(b1{p},g[.]) -> P(b1{u},g) @1
+'a2+' P(a2{u}) -> P(a2{p}) @1
+'a2-' P(a2{p},g) -> P(a2{u},g) @1
+'b2+' P(a2{p},b2{u}) -> P(a2{p},b2{p}) @1
+'b2-' P(b2{p},g) -> P(b2{u},g) @1
+'P.K' P(a1{p},a2{p},b1{p},b2{p},g[.]),K(x[.]) -> P(a1{p},a2{p},b1{p},b2{p},g[1]),K(x[1]) @1
+'P/K' P(a1{p},a2{p},b1{p},b2{p},g[1]),K(x[1]) -> P(a1{p},a2{p},b1{p},b2{p},g),K(x[.]) @1

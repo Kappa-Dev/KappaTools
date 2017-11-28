@@ -1609,9 +1609,10 @@ The following options are available:
 \item The option \texttt{-{}-compute-influence-map} can be used to (des)activate the computation of the influence map.
 \item The option \texttt{-{}-compute-potential-cycles} can be used to (des)activate the computation of the potential polymers.
 \item The option \texttt{-{}-compute-reachability-analysis} can be used to (des)activate the computation of the reachability analysis.
-\item The option \texttt{-{}-compute-symmetries} can be used to (des)activate the computation of pairs of equivalent sites.
+\item The option \texttt{-{}-compute-symmetries} can be used to (des)activate the computation of pairs of equivalent sites. Equivalent sites may be used to reduce the number of variables in the system of ordinary differential equations that is associated to a Kappa model (e.g.~see Sect.~\ref{sec:kade:ex}).
 \item The option \texttt{-{}-compute-local-traces} can be used to (des)activate the computation of the trace analysis.
-\item The option \texttt{-{}-compute-separating-transitions} can be used to (des)activate the computation of the transitions that are non weakly reversible.
+\item The option \texttt{-{}-compute-separating-transitions} can be used to (des)activate the computation of the transitions that are non weakly
+reversible. These are the transitions between two configurations of an agent, that are impossible to revert (even in several computation steps).
 \end{itemize}
 
 Lastly, a switch allows to select the version for Kappa syntax.
@@ -1850,19 +1851,22 @@ Thus the set of the local traces for a given agent can be described as a transit
 
 We consider the following example:
 \begin{lstlisting}[language=kappa]
-  %init: 1 P()
-  %init: 1 K()
+%agent: P(a1{u,p},a2{u,p},b1{u,p},b2{u,p},g)
+%agent: K(x)
 
-  'a1+' P(a1~u) -> P(a1~p) @1
-  'b1+' P(a1~p,b1~u) -> P(a1~p,b1~p) @1
-  'a1-' P(a1~p,b1~u) -> P(a1~u,b1~u) @1
-  'b1-' P(b1~p,g) -> P(b1~u,g) @1
-  'a2+' P(tab:siga2~u) -> P(a2~p) @1
-  'a2-' P(a2~p,g) -> P(a2~u,g) @1
-  'b2+' P(a2~p,b2~u) -> P(a2~p,b2~p) @1
-  'b2-' P(b2~p,g) -> P(b2~u,g) @1
-  'P.K' P(a1~p,a2~p,b1~p,b2~p,g),K(x) -> P(a1~p,a2~p,b1~p,b2~p,g!1),K(x!1) @1
-  'P/K' P(a1~p,a2~p,b1~p,b2~p,g!1),K(x!1) -> P(a1~p,a2~p,b1~p,b2~p,g),K(x) @1
+%init: 1 P()
+%init: 1 K()
+
+'a1+' P(a1{u}) -> P(a1{p}) @1
+'b1+' P(a1{p},b1{u}) -> P(a1{p},b1{p}) @1
+'a1-' P(a1{p},b1{u}) -> P(a1{u},b1{u}) @1
+'b1-' P(b1{p},g[.]) -> P(b1{u},g) @1
+'a2+' P(a2{u}) -> P(a2{p}) @1
+'a2-' P(a2{p},g) -> P(a2{u},g) @1
+'b2+' P(a2{p},b2{u}) -> P(a2{p},b2{p}) @1
+'b2-' P(b2{p},g) -> P(b2{u},g) @1
+'P.K' P(a1{p},a2{p},b1{p},b2{p},g[.]),K(x[.]) -> P(a1{p},a2{p},b1{p},b2{p},g[1]),K(x[1]) @1
+'P/K' P(a1{p},a2{p},b1{p},b2{p},g[1]),K(x[1]) -> P(a1{p},a2{p},b1{p},b2{p},g),K(x[.]) @1
 \end{lstlisting}
 
 Typing the following command line:
@@ -1958,7 +1962,30 @@ Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they
 \label{fig:abc-contact}
 \end{figure}
 
+The contact map may be refined with information about polymers.
+If the commmand line option \texttt{--compute-potential-cycles} is used, {\KaSa} computes the set of bonds the number of which may not be uniformly bounded in paths within bio-molecular species.
 
+
+We consider the following example:
+\begin{lstlisting}[language=kappa]
+%agent: A(x, y)
+%agent: B(x, y)
+%agent: C(x, y)
+
+A(x[.]),B(y[.]) -> A(x[1]),B(y[1]) @ 1
+B(x[.]),C(y[.]) -> B(x[1]),C(y[1]) @ 1
+C(x[.]),A(y[.]) -> C(x[1]),A(y[1]) @ 1
+
+%init: 10 A()
+%init: 10 B()
+%init: 10 C()
+\end{lstlisting}
+
+Typing the following command line:
+
+\begin{verbatim}
+KaSa protein2x2.ka --reset-all --compute-local-traces
+\end{verbatim}
 
 \section{Influence map}
 
@@ -2424,7 +2451,9 @@ will.
 
 
 \subsubsection{Equivalent sites}
+
 \label{sec:kade:ex}
+
 In BNGL, the interface of a given agent may include several occurrence of a given site name. These sites have exactly the same capabilities of interaction. This feature provides a convenient syntactic construction to describe models even more compactly, at the cost of having to deal with more complex structures (detecting embeddings between such site-graphs may be very difficult).
 
 In Kappa, the interface of every agent is made of pair-wisely distinct site names. Yet it may happen that some sites have exactly the same capabilities of interaction. {\KaDE} can infer this property and use it to derive a more compact system of differential equations \cite{Feret-MFPSXXVII,CAMPORESI201073,Feret201545}.
