@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Nov 12 2017>
+  * Last modification: Time-stamp: <Nov 29 2017>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -72,7 +72,7 @@ let internal_site_color = ref "green"
 let agent_shape_array = ref ([||]:string option array)
 let agent_color_array = ref ([||]:string option array)
 let agent_shape_def = ref "rectangle"
-let agent_color_def = ref "red"
+let agent_color_def = ref "blue"
 let link_color = ref "black"
 let influence_color = ref "red"
 let influence_arrow = ref "normal"

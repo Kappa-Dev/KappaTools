@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Apr 27 2017>
+   * Last modification: Time-stamp: <Nov 29 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -278,7 +278,7 @@ let project2 (x,y) = (project x,project y)
 (***************************************************************************)
 
 let print_site_across_domain
-    ?verbose:(verbose=true)
+    ?verbose:(_verbose=true)
     ?sparse: (sparse = false)
     ?final_result:(final_result = false)
     ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple mvbdu =
@@ -337,7 +337,6 @@ let print_site_across_domain
             let error =
               Ckappa_backend.Ckappa_backend.print
                 (Remanent_parameters.get_logger parameters) parameters error
-                kappa_handler
                 pattern
             in
             let () =
@@ -391,7 +390,7 @@ let print_site_across_domain
                      in
                      let error =
                        Ckappa_backend.Ckappa_backend.print
-                         (Remanent_parameters.get_logger parameters) parameters error kappa_handler
+                         (Remanent_parameters.get_logger parameters) parameters error
                          pattern
                      in
                      error, true

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 27 2017>
+  * Last modification: Time-stamp: <Nov 29 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -459,7 +459,7 @@ let annotate_triple (map:Public_data.scc Public_data.AccuracyMap.t):
 let annotate_map_triple
     (map:Public_data.scc Public_data.AccuracyMap.t Public_data.AccuracyMap.t)  =
   Public_data.AccuracyMap.fold
-    (fun x map l ->
+    (fun _ map l ->
        let map = annotate_triple map in
         map :: l
     ) map [[]]

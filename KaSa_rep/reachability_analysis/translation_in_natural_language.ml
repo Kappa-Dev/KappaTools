@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Jul 19 2017>
+ * Last modification: Time-stamp: <Nov 29 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -441,7 +441,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
               let error =
                 Ckappa_backend.Ckappa_backend.print
                   log
-                  parameters error handler_kappa
+                  parameters error
                   t
               in
               let () =
@@ -474,7 +474,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
                      in
                      let error =
                        Ckappa_backend.Ckappa_backend.print
-                         log parameters error handler_kappa
+                         log parameters error
                          t
                      in
                      error, true)
@@ -617,14 +617,14 @@ let rec print ?beginning_of_sentence:(beggining=true)
             in
             let error =
               Ckappa_backend.Ckappa_backend.print
-                (Remanent_parameters.get_logger parameters) parameters error handler_kappa
+                (Remanent_parameters.get_logger parameters) parameters error
                 t'
             in
             let () =
               Loggers.fprintf (Remanent_parameters.get_logger parameters) " <=> " in
             let error =
               Ckappa_backend.Ckappa_backend.print
-                (Remanent_parameters.get_logger parameters) parameters error handler_kappa
+                (Remanent_parameters.get_logger parameters) parameters error
                 t''
             in
             let () =
@@ -698,14 +698,14 @@ let rec print ?beginning_of_sentence:(beggining=true)
             in
             let error =
               Ckappa_backend.Ckappa_backend.print
-                (Remanent_parameters.get_logger parameters) parameters error handler_kappa
+                (Remanent_parameters.get_logger parameters) parameters error
                 t
             in
             let () =
               Loggers.fprintf (Remanent_parameters.get_logger parameters) " => " in
             let error =
               Ckappa_backend.Ckappa_backend.print
-                (Remanent_parameters.get_logger parameters) parameters error handler_kappa
+                (Remanent_parameters.get_logger parameters) parameters error
                 t'
             in
             let () =
@@ -836,7 +836,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
           begin
             let error =
               Ckappa_backend.Ckappa_backend.print
-                log parameters error handler_kappa
+                log parameters error
                 t
             in
             let prefix ="   " in
@@ -845,7 +845,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
             in
             let prefix' = prefix in
             let prefix ="\t" in
-            let error, bool =
+            let error, _bool =
               List.fold_left
                 (fun (error, bool) state_list ->
                    let () =
@@ -863,7 +863,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
                    in
                    let error =
                      Ckappa_backend.Ckappa_backend.print
-                      log parameters error handler_kappa
+                      log parameters error
                        t'
                    in
                    let () = Loggers.print_newline log in
@@ -1009,18 +1009,6 @@ let rec convert_views_internal_constraints_list_aux
             | Remanent_parameters_sig.Kappa
             | Remanent_parameters_sig.Raw ->
               (*hyp*)
-              let string_version =
-                Ckappa_backend.Ckappa_backend.get_string_version
-                  t
-              in
-              let error', site_graph =
-                Ckappa_site_graph.site_graph_to_list error string_version
-              in
-              let error =
-                Exception.check_point
-                  Exception.warn  parameters error error'
-                  __POS__ Exit
-              in
               (*-----------------------------------------------------*)
               let error'', refinement =
                 List.fold_left (fun (error, c_list) state ->
@@ -1033,19 +1021,6 @@ let rec convert_views_internal_constraints_list_aux
                         Exception.warn  parameters error error'
                         __POS__ Exit
                     in
-                    let string_version' =
-                      Ckappa_backend.Ckappa_backend.get_string_version
-                        t'
-                    in
-                    let error'', site_graph' =
-                      Ckappa_site_graph.site_graph_to_list error string_version'
-                    in
-                    let error =
-                      Exception.check_point
-                        Exception.warn  parameters error error''
-                        __POS__ Exit
-                    in
-                    (*error, site_graph' :: c_list*)
                     error, t' :: c_list
                   ) (error, []) state_list
               in
@@ -1095,18 +1070,6 @@ let rec convert_views_internal_constraints_list_aux
                 Exception.warn  parameters error error'
                 __POS__ Exit
             in
-            let string_version =
-              Ckappa_backend.Ckappa_backend.get_string_version
-                t'
-            in
-            let error'', site_graph =
-              Ckappa_site_graph.site_graph_to_list error string_version
-            in
-            let error =
-              Exception.check_point
-                Exception.warn  parameters error error''
-                __POS__ Exit
-            in
             (*--------------------------------------------------*)
             let error''', t'' =
               Ckappa_backend.Ckappa_backend.add_state
@@ -1119,19 +1082,6 @@ let rec convert_views_internal_constraints_list_aux
             let error =
               Exception.check_point
                 Exception.warn  parameters error error'''
-                __POS__ Exit
-            in
-            (*check*)
-            let string_version'' =
-              Ckappa_backend.Ckappa_backend.get_string_version
-                t''
-            in
-            let error'''', site_graph'' =
-              Ckappa_site_graph.site_graph_to_list error string_version''
-            in
-            let error =
-              Exception.check_point
-                Exception.warn  parameters error error''''
                 __POS__ Exit
             in
             (*--------------------------------------------------*)
@@ -1170,18 +1120,6 @@ let rec convert_views_internal_constraints_list_aux
                 Exception.warn  parameters error error'
                 __POS__ Exit
             in
-            let string_version =
-              Ckappa_backend.Ckappa_backend.get_string_version
-                t
-            in
-            let error'', site_graph =
-              Ckappa_site_graph.site_graph_to_list error string_version
-            in
-            let error =
-              Exception.check_point
-                Exception.warn  parameters error error''
-                __POS__ Exit
-            in
             (*--------------------------------------------------*)
             let error''', t' =
               Ckappa_backend.Ckappa_backend.add_state
@@ -1194,18 +1132,6 @@ let rec convert_views_internal_constraints_list_aux
             let error =
               Exception.check_point
                 Exception.warn  parameters error error'''
-                __POS__ Exit
-            in
-            let string_version' =
-              Ckappa_backend.Ckappa_backend.get_string_version
-                t'
-            in
-            let error'''', site_graph' =
-              Ckappa_site_graph.site_graph_to_list error string_version'
-            in
-            let error =
-              Exception.check_point
-                Exception.warn  parameters error error''''
                 __POS__ Exit
             in
             (*--------------------------------------------------*)
@@ -1275,19 +1201,6 @@ let rec convert_views_internal_constraints_list_aux
         | Remanent_parameters_sig.Raw ->
           begin
             let error, current_list =
-              let string_version =
-              Ckappa_backend.Ckappa_backend.get_string_version
-                t
-              in
-              let error', site_graph =
-                Ckappa_site_graph.site_graph_to_list error
-                string_version
-              in
-              let error =
-                Exception.check_point
-                  Exception.warn  parameters error error'
-                  __POS__ Exit
-              in
               let error'', refinement =
                 List.fold_left
                   (fun (error, current_list) state_list ->
@@ -1304,20 +1217,6 @@ let rec convert_views_internal_constraints_list_aux
                              Exception.warn  parameters error error'
                              __POS__ Exit
                          in
-                         let string_version' =
-                           Ckappa_backend.Ckappa_backend.get_string_version
-                             t'
-                         in
-                         let error'', site_graph' =
-                           Ckappa_site_graph.site_graph_to_list error
-                             string_version'
-                         in
-                         let error =
-                           Exception.check_point
-                             Exception.warn  parameters error error''
-                             __POS__ Exit
-                         in
-                         (*let refinement = site_graph' :: current_list in*)
                          error, t')
                          (error, t) state_list
                      in

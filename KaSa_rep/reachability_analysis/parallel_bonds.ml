@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 28 2017>
+  * Last modification: Time-stamp: <Nov 29 2017>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1132,14 +1132,14 @@ struct
           (fun parameters error x value store_result ->
              let error, store_result =
                Parallel_bonds_type.add_value_from_refined_tuple
-                 parameters error kappa_handler x value store_result
+                 parameters error x value store_result
              in
              error, store_result
           )
           (fun parameters error x value store_result ->
              let error, store_result =
                Parallel_bonds_type.add_value_from_refined_tuple
-                 parameters error kappa_handler
+                 parameters error
                  x value store_result
              in
              error, store_result
@@ -1148,7 +1148,7 @@ struct
              let new_value = Usual_domains.lub value1 value2 in
              let error, store_result =
                Parallel_bonds_type.add_value_from_refined_tuple
-                 parameters error kappa_handler
+                 parameters error 
                  x new_value store_result
              in
              error, store_result

@@ -1934,7 +1934,7 @@ Although the semantics of a coarse-grainged transition system is fully defined  
 \label{fig:kasa:4}
 \end{figure}
 
-The contact map of a model is an object that may help modelers checking the consistency of the rule set they use. The contact map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions.
+The contact map of a model is an object that may help modelers checking the consistency of the rule set they use. The contact map is \emph{statically} computed and does not depend on kinetic rates, nor the concentration of the bio-molecular species in initial state.
 
 
 Typing the following command line:
@@ -1962,15 +1962,81 @@ Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they
 \label{fig:abc-contact}
 \end{figure}
 
+
+There exist two accuracy levels for the contact map.
+At low level of accuracy, the inference of the contact map is purely syntactic. The contact map summarizes the bonds that may occur in the right hand side of rules and in the initial bio-molecular species.
+At high level of accuracy, the rules that are detected dead by the reachability analysis are not taken into account. Hence, only the bonds that may occur in the initial bio-molecular species, and in the rules that have not been proven dead by the static analysis are reported. As a matter of fact, the accuracy of the computation of the contact map at high level of resolution depends on the parameterization of the reachability analysis.
+
+Let us illustrate this on a simple example. The file \texttt{contact.ka} has the following content:
+\begin{lstlisting}[language=kappa]
+%agent: A(x{c,n},z)
+
+A(x{c}[.]) <-> A(x{n}[.]) @ 1,1
+A(x{c}[.]),A(x{c}[.]) -> A(x{c}[1]),A(x{c}[1]) @1
+A(x{n}[.]),A(x{n}[.]) -> A(x{n}[1]),A(x{n}[1]) @1
+A(x{c}[1]),A(x{c}[1]) <-> A(x{n}[1]),A(x{n}[1]) @1,1
+A(z[.]),A(x{c}[1],z[.]),A(x{n}[1]) -> A(z[2]),A(x{n}[1],z[2]),A(x{n}[1]) @1,1
+
+%init: 10 A()
+\end{lstlisting}
+
+Firstly we compute the low resolution contact map by using the following instruction:
+\begin{verbatim}
+KaSa contact.ka --reset-all --compute-contact-map \
+  --contact-map-accuracy-level Low
+\end{verbatim}
+
+We obtain the contact map that is drawed in Fig.~\ref{fig:cm-low-res}. We notice that the analysis reports a potential bond between the sites $x$ of any two agents of type $A$ and a potential bond between the sites $z$ of any two agents of type $A$. This is because such bonds occur in the right hand side of some rules of the model.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4cm]{generated_img/contact_map_low_res.png}
+\caption{Low resolution contact map for the model \texttt{contact.ka}}
+\label{fig:cm-low-res}
+\end{figure}
+
+Yet, bonds between two sites $z$ occur only in the last rule which turns out to be dead. Let us use the  high resolution contact map to check this property. We use the following instruction:
+\begin{verbatim}
+KaSa contact.ka --reset-all --compute-contact-map \
+  --contact-map-accuracy-level High
+\end{verbatim}
+
+We obtain the contact map that is drawed in Fig.~\ref{fig:cm-high-res}. We notice that the potential bond between sites $z$ of agents $A$ has diseapeared: the result of the analysis has been refined thanks to the constraints infered by the reachability analysis.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4cm]{generated_img/contact_map_high_res.png}
+\caption{High resolution contact map for the model \texttt{contact.ka}}
+\label{fig:cm-high-res}
+\end{figure}
+
+The proof that the last rule of the model in the file \texttt{contact.ka} is dead relies on the abstract domain that captures the potential relationships between states of sites in the pairs of agents that are connected by a bond. Let us compute the high resolution contact map without this abstract domain:
+\begin{verbatim}
+KaSa contact.ka --reset-all --compute-contact-map \
+  --contact-map-accuracy-level High --no-sites-across-bonds-domain
+\end{verbatim}
+We obtain the contact map that is given in Fig.~\ref{fig:cm-high-res-wo-rel}. The analysis has failed in proving that the last rule of the model is dead. As a matter of fact, the potential bond between sites $z$ of agents $A$ has not disappeared.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4cm]{generated_img/contact_map_high_res_wo_relations.png}
+\caption{High resolution contact map for the model \texttt{contact.ka} when the abstract domain for the relations among the states of sites in pairs of bound agents is disabled.}
+\label{fig:cm-high-res-wo-rel}
+\end{figure}
+
 The contact map may be refined with information about polymers.
 If the commmand line option \texttt{--compute-potential-cycles} is used, {\KaSa} computes the set of bonds the number of which may not be uniformly bounded in paths within bio-molecular species.
+
+TODO: section in progress...
 
 
 We consider the following example:
 \begin{lstlisting}[language=kappa]
-%agent: A(x, y)
-%agent: B(x, y)
-%agent: C(x, y)
+%agent: A(x,y)
+%agent: B(x,y)
+%agent: C(x,y)
 
 A(x[.]),B(y[.]) -> A(x[1]),B(y[1]) @ 1
 B(x[.]),C(y[.]) -> B(x[1]),C(y[1]) @ 1

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Nov 12 2017>
+  * Last modification: Time-stamp: <Nov 29 2017>
   * *
   * primitive to parse command-line options
   *
@@ -278,7 +278,7 @@ let options =
           Config.contact_map_accuracy_level)),
       "Tune the accuracy level of the contact map",
       [contact_map,6],
-      Expert;
+      Normal;
 
       "--polymer-detection-accuracy-level",
       (Choice
@@ -288,7 +288,7 @@ let options =
           Config.scc_accuracy_level)),
       "Tune the accuracy level of the detection of polymers",
       [contact_map,7],
-      Expert;
+      Normal;
 
       "--pure-contact",
       Bool Config.pure_contact,

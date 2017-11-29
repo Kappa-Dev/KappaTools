@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 22 2017>
+   * Last modification: Time-stamp: <Nov 29 2017>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -183,7 +183,7 @@ let project_away_ag_id_gen f parameters error big_store acc =
 let project_away_ag_id parameters kappa_handler error big_store acc =
   let f parameters error tuple value acc =
     Parallel_bonds_type.add_value
-      parameters error kappa_handler
+      parameters error 
       tuple
       (Usual_domains.Val value)
       acc

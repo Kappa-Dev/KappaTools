@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 27 2017>
+  * Last modification: Time-stamp: <Nov 29 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -238,7 +238,7 @@ let compute_env_init
          Remanent_state.state)
   =
   match Remanent_state.get_init state with
-  | Remanent_state.Compil compil ->
+  | Remanent_state.Compil _ ->
     state, None, None, None
   | Remanent_state.Files files ->
     let () = show_title state in

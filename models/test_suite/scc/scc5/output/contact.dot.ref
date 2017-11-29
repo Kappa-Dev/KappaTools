@@ -10,7 +10,7 @@ subgraph cluster0 {
    0.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
    0.1 [style = filled label = "y" shape =circle color = yellow size = "5"]
    0.2 [style = filled label = "z" shape =circle color = yellow size = "5"]
-label =  "R";  shape = rectangle; color = red
+label =  "R";  shape = rectangle; color = blue
 } ; 
 0.0 -- 0.0 [color="red"]
 0.1 -- 0.2 [color="red"]

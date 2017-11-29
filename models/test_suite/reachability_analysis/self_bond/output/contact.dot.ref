@@ -9,32 +9,32 @@ graph G{
 subgraph cluster0 {
    0.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
    0.1 [style = filled label = "t" shape =circle color = yellow size = "5"]
-label =  "A";  shape = rectangle; color = red
+label =  "A";  shape = rectangle; color = blue
 } ; 
 subgraph cluster1 {
    1.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
    1.1 [style = filled label = "t" shape =circle color = yellow size = "5"]
-label =  "B";  shape = rectangle; color = red
+label =  "B";  shape = rectangle; color = blue
 } ; 
 subgraph cluster2 {
    2.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
    2.1 [style = filled label = "t" shape =circle color = yellow size = "5"]
-label =  "C";  shape = rectangle; color = red
+label =  "C";  shape = rectangle; color = blue
 } ; 
 subgraph cluster3 {
    3.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
    3.1 [style = filled label = "t" shape =circle color = yellow size = "5"]
-label =  "D";  shape = rectangle; color = red
+label =  "D";  shape = rectangle; color = blue
 } ; 
 subgraph cluster4 {
    4.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
    4.1 [style = filled label = "t" shape =circle color = yellow size = "5"]
-label =  "E";  shape = rectangle; color = red
+label =  "E";  shape = rectangle; color = blue
 } ; 
 subgraph cluster5 {
    5.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
    5.1 [style = filled label = "t" shape =circle color = yellow size = "5"]
-label =  "F";  shape = rectangle; color = red
+label =  "F";  shape = rectangle; color = blue
 } ; 
 0.0 -- 0.0
 0.1 -- 0.1

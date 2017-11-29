@@ -9,38 +9,38 @@ graph G{
 subgraph cluster0 {
    0.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
    0.1 [style = filled label = "t" shape =circle color = yellow size = "5"]
-label =  "A";  shape = rectangle; color = red
+label =  "A";  shape = rectangle; color = blue
 } ; 
 subgraph cluster1 {
    1.0 [style = filled label = "t" shape =circle color = yellow size = "5"]
    1.1 [style = filled label = "z" shape =circle color = yellow size = "5"]
-label =  "B";  shape = rectangle; color = red
+label =  "B";  shape = rectangle; color = blue
 } ; 
 subgraph cluster2 {
    2.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
    2.1 [style = filled label = "t" shape =circle color = yellow size = "5"]
-label =  "E";  shape = rectangle; color = red
+label =  "E";  shape = rectangle; color = blue
 } ; 
 subgraph cluster3 {
    3.0 [style = filled label = "t" shape =circle color = yellow size = "5"]
    3.1 [style = filled label = "z" shape =circle color = yellow size = "5"]
-label =  "F";  shape = rectangle; color = red
+label =  "F";  shape = rectangle; color = blue
 } ; 
 subgraph cluster4 {
    4.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "C";  shape = rectangle; color = red
+label =  "C";  shape = rectangle; color = blue
 } ; 
 subgraph cluster5 {
    5.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "D";  shape = rectangle; color = red
+label =  "D";  shape = rectangle; color = blue
 } ; 
 subgraph cluster6 {
    6.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "G";  shape = rectangle; color = red
+label =  "G";  shape = rectangle; color = blue
 } ; 
 subgraph cluster7 {
    7.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "H";  shape = rectangle; color = red
+label =  "H";  shape = rectangle; color = blue
 } ; 
 0.0 -- 4.0
 0.0 -- 5.0

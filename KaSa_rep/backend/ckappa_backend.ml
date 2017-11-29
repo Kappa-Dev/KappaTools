@@ -612,7 +612,7 @@ struct
     in
     error
 
-  let print logger parameter error kappa_handler t  =
+  let print logger parameter error t  =
     let error,_ =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
         (fun _ (agent_string, site_map) (error,bool) ->
@@ -631,7 +631,7 @@ struct
   let print_list logger parameter error kappa_handler list =
     match list with
     | [] -> error
-    | [a] -> print logger parameter error kappa_handler a
+    | [a] -> print logger parameter error a
     | _::_ ->
       begin
         let () = Loggers.fprintf logger "%s "
@@ -644,7 +644,7 @@ struct
                  if bool then
                    Loggers.fprintf logger " v "
                in
-               print logger parameter error kappa_handler pattern,true)
+               print logger parameter error pattern,true)
             (error, false)
             list in
         let () = Loggers.fprintf logger " %s"

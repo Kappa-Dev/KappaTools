@@ -8,14 +8,14 @@
 graph G{ 
 subgraph cluster0 {
    0.0 [shape = plaintext label = ""]
-label =  "A";  shape = rectangle; color = red
+label =  "A";  shape = rectangle; color = blue
 } ; 
 subgraph cluster1 {
    1.0 [shape = plaintext label = ""]
-label =  "B";  shape = rectangle; color = red
+label =  "B";  shape = rectangle; color = blue
 } ; 
 subgraph cluster2 {
    2.0 [shape = plaintext label = ""]
-label =  "C";  shape = rectangle; color = red
+label =  "C";  shape = rectangle; color = blue
 } ; 
 }

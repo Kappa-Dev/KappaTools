@@ -80,7 +80,6 @@ sig
     Loggers.t ->
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    Cckappa_sig.kappa_handler ->
     t -> Exception.method_handler
 
   val print_agent:
@@ -89,7 +88,7 @@ sig
     Exception.method_handler ->
     string ->
     (string option * binding_state option)
-      Wrapped_modules.LoggedStringMap.t -> bool -> Exception.method_handler  
+      Wrapped_modules.LoggedStringMap.t -> bool -> Exception.method_handler
 
   val print_list:
     Loggers.t ->

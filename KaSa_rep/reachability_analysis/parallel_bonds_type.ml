@@ -290,7 +290,7 @@ let print_parallel_constraint
                   let error =
                     Ckappa_backend.Ckappa_backend.print
                       (Remanent_parameters.get_logger parameters) parameters
-                      error kappa_handler
+                      error
                       t_precondition
                   in
                   let () =
@@ -334,7 +334,6 @@ let print_parallel_constraint
               let error =
                 Ckappa_backend.Ckappa_backend.print
                   (Remanent_parameters.get_logger parameters) parameters error
-                  kappa_handler
                   t_same
               in
               let () =
@@ -355,7 +354,7 @@ let print_parallel_constraint
                   let error =
                     Ckappa_backend.Ckappa_backend.print
                       (Remanent_parameters.get_logger parameters) parameters
-                      error kappa_handler
+                      error
                       t_precondition
                   in
                   let () =
@@ -396,7 +395,7 @@ let print_parallel_constraint
                 let error =
                   Ckappa_backend.Ckappa_backend.print
                     (Remanent_parameters.get_logger parameters) parameters
-                    error kappa_handler
+                    error
                     t_distinct
                 in error
             in
@@ -428,7 +427,6 @@ let print_parallel_constraint
               let error =
                 Ckappa_backend.Ckappa_backend.print
                   (Remanent_parameters.get_logger parameters) parameters error
-                  kappa_handler
                   t_same
               in
               let () =
@@ -438,7 +436,6 @@ let print_parallel_constraint
               let error =
                 Ckappa_backend.Ckappa_backend.print
                   (Remanent_parameters.get_logger parameters) parameters error
-                  kappa_handler
                   t_distinct
               in
               let () =
@@ -456,7 +453,7 @@ let print_parallel_constraint
     in error
 
 (* add value used in parallel_bonds_static.ml, project_away_ag_id *)
-let add_value parameters error kappa_handler x value store_result =
+let add_value parameters error x value store_result =
   let error, old_value =
     match
       PairAgentSitesStates_map_and_set.Map.find_option_without_logs
@@ -539,8 +536,8 @@ let get_tuple (a,b) = project a, project b
 
 let project2 = snd
 
-let add_value_from_refined_tuple parameters error kappa_handler x =
-  add_value parameters error kappa_handler (project2 x)
+let add_value_from_refined_tuple parameters error x =
+  add_value parameters error (project2 x)
 
 let swap_sites_in_tuple (a,b,s,s',st,st') = (a,b,s',s,st',st)
 

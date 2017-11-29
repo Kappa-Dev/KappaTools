@@ -12,11 +12,11 @@ subgraph cluster0 {
    0.2 [style = filled label = "b1" shape =ellipse color = green size = "5"]
    0.3 [style = filled label = "b2" shape =ellipse color = green size = "5"]
    0.4 [style = filled label = "g" shape =circle color = yellow size = "5"]
-label =  "P";  shape = rectangle; color = red
+label =  "P";  shape = rectangle; color = blue
 } ; 
 subgraph cluster1 {
    1.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "K";  shape = rectangle; color = red
+label =  "K";  shape = rectangle; color = blue
 } ; 
 0.4 -- 1.0
 }

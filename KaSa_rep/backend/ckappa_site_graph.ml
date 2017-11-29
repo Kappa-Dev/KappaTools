@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 17th of November
-   * Last modification: Time-stamp: <Nov 27 2017>
+   * Last modification: Time-stamp: <Nov 29 2017>
    *
    * Site graph
    *
@@ -40,7 +40,6 @@ let print_internal_pattern_aux ?logger parameters error kappa_handler
       let error =
         Ckappa_backend.Ckappa_backend.print
           logger parameters error
-          kappa_handler
           hyp
       in
       let () = Loggers.fprintf logger "=> [" in
@@ -49,7 +48,6 @@ let print_internal_pattern_aux ?logger parameters error kappa_handler
         | [] -> error, false
         | [hyp] ->
           Ckappa_backend.Ckappa_backend.print logger parameters error
-            kappa_handler
             hyp, false
         | _::_ as l ->
           List.fold_left (fun (error, bool) hyp ->
@@ -64,7 +62,6 @@ let print_internal_pattern_aux ?logger parameters error kappa_handler
               in
               let error =
                 Ckappa_backend.Ckappa_backend.print logger parameters error
-                  kappa_handler
                   hyp
               in
               error, true
@@ -101,7 +98,7 @@ let print_internal_pattern ?logger parameters error kappa_handler
 
 (***************************************************************************)
 
-let print_for_list logger parameter error kappa_handler t =
+let print_for_list logger parameter error t =
   let error, _ =
     List.fold_left (fun (error, bool) (agent_string, site_map) ->
         let error =
@@ -115,7 +112,7 @@ let print_for_list logger parameter error kappa_handler t =
   error
 
 let print_pattern_aux ?logger
-    parameters error kappa_handler constraints_list
+    parameters error constraints_list
   =
   let logger =
     match
@@ -137,7 +134,6 @@ let print_pattern_aux ?logger
       let refinement = Public_data.get_refinement lemma in
       let error =
         print_for_list logger parameters error
-          kappa_handler
           hyp
       in
       let () = Loggers.fprintf logger " => [" in
@@ -154,7 +150,7 @@ let print_pattern_aux ?logger
                 (if bool  then "\t\tv " else "\t\t  ")
             in
             let error =
-              print_for_list logger parameters error kappa_handler hyp
+              print_for_list logger parameters error hyp
             in
             error, true
           ) (error, false) (List.rev refinement)
@@ -175,7 +171,7 @@ let print_pattern ?logger parameters error kappa_handler list =
   let error =
     List.fold_left (fun error pattern ->
         let error, _ =
-          print_pattern_aux ?logger parameters error kappa_handler pattern
+          print_pattern_aux ?logger parameters error pattern
         in
         let () = Loggers.print_newline logger' in
         error
