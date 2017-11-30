@@ -27,3 +27,8 @@ val connected_components_sum_of_ambiguous_rule :
 val patterns_of_mixture :
   (int list * (int * int) list) array array -> Signature.s ->
   Pattern.PreEnv.t -> Edges.t -> Pattern.PreEnv.t * Pattern.cc list
+
+val lkappa_of_elementary_rule :
+  Signature.s -> Pattern.Env.t -> Primitives.elementary_rule ->
+  LKappa.rule_mixture * Raw_mixture.t
+  (** @Return: [(r_mix,r_create)] *)

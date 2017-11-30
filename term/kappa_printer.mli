@@ -19,6 +19,9 @@ val print_expr_val :
 val elementary_rule :
   ?env:Model.t -> Format.formatter -> Primitives.elementary_rule -> unit
 
+val decompiled_rule :
+  full:bool -> Model.t -> Format.formatter -> Primitives.elementary_rule -> unit
+
 val modification :
   ?env:Model.t -> Format.formatter -> Primitives.modification -> unit
 

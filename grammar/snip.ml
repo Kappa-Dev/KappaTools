@@ -632,3 +632,186 @@ let patterns_of_mixture contact_map sigs pre_env e =
       (pre_env,[]) snap
   in
    (pre_env', acc)
+
+let aux_lkappa_of_pattern free_id p =
+  Pattern.fold
+    (fun ~pos ~agent_type intf (acc,lnk_pack) ->
+       let ra_ports =
+         Array.make
+           (Array.length intf)
+           (Locality.dummy_annot Ast.LNK_ANY,LKappa.Maintained) in
+       let ra_ints = Array.make (Array.length intf) LKappa.I_ANY in
+       let out = {
+         LKappa.ra_type = agent_type; LKappa.ra_erased = false;
+         LKappa.ra_syntax = None; LKappa.ra_ports; LKappa.ra_ints } in
+       let acc' = Mods.IntMap.add pos out acc in
+       let lnk_pack' = Tools.array_fold_lefti
+           (fun site (free_id, known_src as pack) (link,int) ->
+              let () = if int <> -1 then
+                  ra_ints.(site) <- LKappa.I_VAL_CHANGED (int,int) in
+              match link with
+              | Pattern.UnSpec -> pack
+              | Pattern.Free ->
+                let () = ra_ports.(site) <-
+                    (Locality.dummy_annot Ast.LNK_FREE,LKappa.Maintained) in
+                pack
+              | Pattern.Link (dst_a,dst_s) ->
+                let src_info = (site,agent_type) in
+                match Mods.Int2Map.find_option (dst_a,dst_s) known_src with
+                | Some (id,dst_info) ->
+                  let () = ra_ports.(site) <-
+                      (Locality.dummy_annot (Ast.LNK_VALUE (id,dst_info)),
+                       LKappa.Maintained) in
+                  let () = (Mods.IntMap.find_default out dst_a acc').
+                             LKappa.ra_ports.(dst_s) <-
+                      (Locality.dummy_annot (Ast.LNK_VALUE (id,src_info)),
+                       LKappa.Maintained) in
+                  pack
+                | None ->
+                  (succ free_id,
+                   Mods.Int2Map.add (pos,site) (free_id,src_info) known_src)
+           )
+           lnk_pack
+           intf in
+       (acc',lnk_pack'))
+    p
+    (Mods.IntMap.empty,(free_id,Mods.Int2Map.empty))
+
+let register_positive_transformations sigs mixs free_id transfs =
+  List.fold_left
+    (fun (fid,fr as pack) -> function
+       | Primitives.Transformation.NegativeWhatEver _
+       | Primitives.Transformation.NegativeInternalized _
+       | Primitives.Transformation.Agent (Matching.Agent.Existing _) ->
+         assert false
+       | Primitives.Transformation.Agent (Matching.Agent.Fresh (a_type,id)) ->
+         let si = Signature.arity sigs a_type in
+         let n = {
+           Raw_mixture.a_type;
+           Raw_mixture.a_ports = Array.make si Raw_mixture.FREE;
+           Raw_mixture.a_ints = Array.make si None;
+         } in
+         (fid,Mods.IntMap.add id n fr)
+       | Primitives.Transformation.PositiveInternalized
+           (Matching.Agent.Existing ((id,_),cc_id),s,i) ->
+         let () = match Mods.IntMap.find_option id mixs.(cc_id) with
+           | None -> assert false
+           | Some a -> match a.LKappa.ra_ints.(s) with
+             | LKappa.I_ANY_CHANGED _ | LKappa.I_ANY_ERASED
+             | LKappa.I_VAL_ERASED _ -> assert false
+             | LKappa.I_VAL_CHANGED (j,k) ->
+               let () = assert (j = k) in
+               a.LKappa.ra_ints.(s) <- LKappa.I_VAL_CHANGED (j,i)
+             | LKappa.I_ANY ->
+               a.LKappa.ra_ints.(s) <- LKappa.I_ANY_CHANGED i in
+         pack
+       | Primitives.Transformation.PositiveInternalized
+           (Matching.Agent.Fresh (_,id),s,i) ->
+         let () = match Mods.IntMap.find_option id fr with
+           | Some a -> a.Raw_mixture.a_ints.(s) <- Some i
+           | None -> () in
+         pack
+       | Primitives.Transformation.Freed (Matching.Agent.Fresh _,_) -> (fid,fr)
+       | Primitives.Transformation.Freed
+           (Matching.Agent.Existing ((id,_),cc_id),s) ->
+         let () = match Mods.IntMap.find_option id mixs.(cc_id) with
+           | Some a -> let (test,edit) = a.LKappa.ra_ports.(s) in
+             let () = assert (edit = LKappa.Maintained) in
+             a.LKappa.ra_ports.(s) <- (test, LKappa.Freed)
+           | None -> assert false in
+         pack
+       | Primitives.Transformation.Linked
+           ((Matching.Agent.Existing ((id1,_),cc_id1),s1),
+            (Matching.Agent.Existing ((id2,_),cc_id2),s2)) ->
+         let () = match Mods.IntMap.find_option id1 mixs.(cc_id1) with
+           | Some a -> let (test,edit) = a.LKappa.ra_ports.(s1) in
+             let () = assert (edit = LKappa.Maintained) in
+             a.LKappa.ra_ports.(s1) <- (test, LKappa.Linked fid)
+           | None -> assert false in
+         let () = match Mods.IntMap.find_option id2 mixs.(cc_id2) with
+           | Some a -> let (test,edit) = a.LKappa.ra_ports.(s2) in
+             let () = assert (edit = LKappa.Maintained) in
+             a.LKappa.ra_ports.(s2) <- (test, LKappa.Linked fid)
+           | None -> assert false in
+         (succ fid,fr)
+       | Primitives.Transformation.Linked
+           ((Matching.Agent.Fresh (_,id),s1),
+            (Matching.Agent.Existing ((eid,_),cc_id),s2)) |
+         Primitives.Transformation.Linked
+           ((Matching.Agent.Existing ((eid,_),cc_id),s2),
+            (Matching.Agent.Fresh (_,id),s1)) ->
+         let () = match Mods.IntMap.find_option id fr with
+           | Some a -> a.Raw_mixture.a_ports.(s1) <- Raw_mixture.VAL fid
+           | None -> assert false in
+         let () = match Mods.IntMap.find_option eid mixs.(cc_id) with
+           | Some a -> let (test,edit) = a.LKappa.ra_ports.(s2) in
+             let () = assert (edit = LKappa.Maintained) in
+             a.LKappa.ra_ports.(s2) <- (test, LKappa.Linked fid)
+           | None -> assert false in
+         (succ fid,fr)
+       | Primitives.Transformation.Linked
+           ((Matching.Agent.Fresh (_,id1),s1),
+            (Matching.Agent.Fresh (_,id2),s2)) ->
+         let () = match Mods.IntMap.find_option id1 fr with
+           | Some a -> a.Raw_mixture.a_ports.(s1) <- Raw_mixture.VAL fid
+           | None -> assert false in
+         let () = match Mods.IntMap.find_option id2 fr with
+           | Some a -> a.Raw_mixture.a_ports.(s2) <- Raw_mixture.VAL fid
+           | None -> assert false in
+         (succ fid,fr)
+    ) (free_id,Mods.IntMap.empty) transfs
+  |> snd
+
+let add_negative_transformations sigs mixs transfs =
+  List.iter
+    (function
+      | Primitives.Transformation.Agent (Matching.Agent.Fresh _)
+      | Primitives.Transformation.NegativeInternalized (Matching.Agent.Fresh _,_)
+      | Primitives.Transformation.PositiveInternalized _
+      | Primitives.Transformation.Linked ((Matching.Agent.Fresh _,_),_)
+      | Primitives.Transformation.Linked (_,(Matching.Agent.Fresh _,_))
+      | Primitives.Transformation.Freed (Matching.Agent.Fresh _,_) ->
+        assert false
+      | Primitives.Transformation.NegativeWhatEver _
+      | Primitives.Transformation.NegativeInternalized
+          (Matching.Agent.Existing _,_)
+      | Primitives.Transformation.Linked
+          ((Matching.Agent.Existing _,_),(Matching.Agent.Existing _,_))
+      | Primitives.Transformation.Freed (Matching.Agent.Existing _,_) ->
+        ()
+      | Primitives.Transformation.Agent (Matching.Agent.Existing ((id,_),cc_id)) ->
+        let ag = match Mods.IntMap.find_option id mixs.(cc_id) with
+          | None -> assert false
+          | Some a -> a in
+        mixs.(cc_id) <-
+          Mods.IntMap.add id (LKappa.agent_to_erased sigs ag) mixs.(cc_id)
+    ) transfs
+
+let lkappa_of_elementary_rule sigs domain r =
+  let nb_cc = Array.length r.Primitives.connected_components in
+  let mixs = Array.make nb_cc Mods.IntMap.empty in
+  let free_id =
+    Tools.array_fold_lefti
+      (fun cc_id free_id cc ->
+         let (out,(free_id',_)) = aux_lkappa_of_pattern
+             free_id (Pattern.Env.content (Pattern.Env.get domain cc)) in
+         let () = mixs.(cc_id) <- out in
+         free_id')
+      1
+      r.Primitives.connected_components in
+  let news = register_positive_transformations
+      sigs mixs free_id r.Primitives.inserted in
+  let () = add_negative_transformations
+      sigs mixs r.Primitives.removed in
+  let r_mix =
+    Array.fold_left
+      (fun a b -> Mods.IntMap.fold (fun _ x acc -> x::acc) b a) [] mixs
+    |> List.rev in
+  let r_created =Mods.IntMap.fold (fun _ x acc -> x::acc) news [] |> List.rev in
+  (r_mix,r_created)
+  (*{
+    LKappa.r_mix; LKappa.r_created; LKappa.r_editStyle = true;
+    LKappa.r_rate = r.Primitives.rate;
+    LKappa.r_un_rate = r.Primitives.unary_rate;
+    LKappa.r_delta_tokens = r.Primitives.delta_tokens;
+    }*)

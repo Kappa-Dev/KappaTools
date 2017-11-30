@@ -29,12 +29,6 @@ sig
   val print :
     ?sigs:Signature.s -> Format.formatter -> Instantiation.abstract t -> unit
 
-  val raw_mixture_of_fresh :
-    Signature.s -> Instantiation.abstract t list ->
-    (int * Raw_mixture.agent) list *
-    (Instantiation.abstract * Instantiation.site_name * int) list *
-    Instantiation.abstract t list
-
   val negative_transformations_of_actions :
     Signature.s ->
     (Instantiation.concrete Instantiation.site ->

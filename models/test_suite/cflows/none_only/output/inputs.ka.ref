@@ -32,7 +32,7 @@
 'a.c' A(x[.] c[./1]), C(x1{p}[#] x2{u}[./1]) @ on_rate
 'mod x2' A(x[.] c[1/.]), C(x1{p}[.] x2{u/p}[1/.]) @ mod_rate
 
-/*0*/%mod: ([T] > 20) do $ADD 10000 C(x1{u}[.] x2{u}[.]); $UPDATE n_c |C()|; repeat [false]
+/*0*/%mod: ([T] > 20) do $APPLY 10000 C(x1{u}[.] x2{u}[.])+; $UPDATE n_c |C()|; repeat [false]
 /*1*/%mod: ([T] > 50) do $TRACK C(x1{p} x2{p}) [true]; $UPDATE cflow Cpp; repeat [false]
 /*2*/%mod: (((Cpp - cflow) > 9) && (cflow > 0)) do $TRACK C(x1{p} x2{p}) [false]; repeat [false]
 

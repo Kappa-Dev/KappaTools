@@ -1348,16 +1348,13 @@ let minimal_env env contact_map =
          ))
     env contact_map
 
-let fold f_agent f_site cc acc =
+let fold f cc acc =
   Tools.array_fold_lefti
     (fun agent_type acc list_pos ->
        List.fold_left
          (fun acc pos ->
-             let acc',extra = f_agent ~pos ~agent_type acc in
-             Tools.array_fold_lefti
-               (fun site acc state -> f_site ~pos ~site extra state acc)
-               acc'
-               (Mods.IntMap.find_default [||] pos cc.nodes))
+            let intf = Mods.IntMap.find_default [||] pos cc.nodes in
+            f ~pos ~agent_type intf acc)
          acc
          list_pos)
     acc

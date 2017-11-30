@@ -215,9 +215,8 @@ let initial_inputs conf env contact_map init ~filename =
   let () = Format.fprintf inputs_form "@.@[<v>%a@]@."
       (Pp.list Pp.space
          (fun f (n,r) ->
-            let ins_fresh,_,_ =
-              Primitives.Transformation.raw_mixture_of_fresh
-                sigs r.Primitives.inserted in
+            let _,ins_fresh =
+              Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
             if ins_fresh = [] then
               Pp.list Pp.space (fun f (nb,tk) ->
                   Format.fprintf f "@[<h>%%init: %a %a@]"
@@ -229,7 +228,7 @@ let initial_inputs conf env contact_map init ~filename =
                 Format.fprintf f "@[<h>%%init: %a %a@]"
                   (Kappa_printer.alg_expr ~env) n
                   (Raw_mixture.print ~created:false ~sigs)
-                  (List.map snd ins_fresh))) init in
+                  ins_fresh)) init in
   inputsDesc := Some inputs
 
 let input_modifications env event mods =

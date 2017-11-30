@@ -5,7 +5,7 @@ digraph G{
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_4 [label="$ADD 10000 C(x1{u}[.] x2{u}[.])", shape=invhouse, style=filled, fillcolor = green] ;
+node_4 [label="$APPLY 10000 C(x1{u}[.] x2{u}[.])+", shape=invhouse, style=filled, fillcolor = green] ;
 node_7 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;

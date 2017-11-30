@@ -143,11 +143,10 @@ val embeddings_to_fully_specified : Env.t -> id -> cc -> Renaming.t list
 val size_of_cc : cc -> int
 
 val fold:
-  (pos:int -> agent_type:int -> 'a -> 'a * 'b) ->
-  (pos:int -> site:int -> 'b -> link * int -> 'a -> 'a) ->
-  cc ->
-  'a ->
-  'a
+  (pos:int -> agent_type:int -> (link * int) array -> 'a -> 'a) ->
+  cc -> 'a -> 'a
+(** USE WITH CARE: Break some abstraction. The array must not be
+   modified and internal state [-1] means unspecified *)
 
 val finalize : max_sharing:bool -> PreEnv.t -> Contact_map.t ->
                Env.t * PreEnv.stat

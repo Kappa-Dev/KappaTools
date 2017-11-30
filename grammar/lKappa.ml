@@ -548,26 +548,24 @@ let copy_rule_agent a =
       Option_util.map (fun _ -> Array.copy p, Array.copy i)
         a.ra_syntax;}
 
-let to_erased sigs x =
-  List.map
-    (fun r ->
-       let ports = Array.map (fun (a,_) -> a,Erased) r.ra_ports in
-       let ints =
-         Array.mapi (fun j -> function
-             | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_ERASED
-                                                         i
-             | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED ->
-               match Signature.default_internal_state r.ra_type j
-                       sigs with
-               | Some _ -> I_ANY_ERASED
-               | None -> I_ANY) r.ra_ints in
-       { ra_type = r.ra_type; ra_erased = true; ra_ports = ports;
-         ra_ints =ints;
-         ra_syntax =
-           match r.ra_syntax with
-           | None -> None
-           | Some _ -> Some (Array.copy ports,Array.copy ints);})
-    x
+let agent_to_erased sigs r =
+  let ra_ports = Array.map (fun (a,_) -> a,Erased) r.ra_ports in
+  let ra_ints =
+    Array.mapi (fun j -> function
+        | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_ERASED i
+        | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED ->
+          match Signature.default_internal_state r.ra_type j
+                  sigs with
+          | Some _ -> I_ANY_ERASED
+          | None -> I_ANY) r.ra_ints in {
+    ra_type = r.ra_type; ra_erased = true; ra_ports; ra_ints;
+    ra_syntax =
+      match r.ra_syntax with
+      | None -> None
+      | Some _ -> Some (Array.copy ra_ports,Array.copy ra_ints);
+  }
+
+let to_erased sigs x = List.map (agent_to_erased sigs) x
 
 let to_maintained x =
   List.map

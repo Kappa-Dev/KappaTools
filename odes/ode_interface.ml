@@ -214,27 +214,27 @@ let lift_embedding x =
 let species_to_positive_transformations cc =
   let _,tr =
     Pattern.fold
-      (fun ~pos ~agent_type (emb,g) ->
+      (fun ~pos ~agent_type intf (emb,g) ->
          let a = (pos,agent_type) in
          let g' = Primitives.Transformation.Agent a::g in
          let emb' = Mods.IntMap.add pos a emb in
-         ((emb',g'),a))
-      (fun ~pos ~site a (l,i) (emb',acc) ->
-         let _ = pos in
-         let acc' =
-           if i <> -1 then
-             Primitives.Transformation.PositiveInternalized (a,site,i)::acc
-           else acc in
-         (emb',
-          match l with
-          | Pattern.UnSpec
-          | Pattern.Free ->
-            Primitives.Transformation.Freed (a,site)::acc'
-          | Pattern.Link (x',s') ->
-            match Mods.IntMap.find_option x' emb' with
-            | None -> acc'
-            | Some ag' ->
-              Primitives.Transformation.Linked ((a,site),(ag',s'))::acc'))
+         emb',
+         Tools.array_fold_lefti
+           (fun site acc (l,i) ->
+              let acc' =
+                if i <> -1 then
+                  Primitives.Transformation.PositiveInternalized (a,site,i)::acc
+                else acc in
+              match l with
+              | Pattern.UnSpec
+              | Pattern.Free ->
+                Primitives.Transformation.Freed (a,site)::acc'
+              | Pattern.Link (x',s') ->
+                match Mods.IntMap.find_option x' emb' with
+                | None -> acc'
+                | Some ag' ->
+                  Primitives.Transformation.Linked ((a,site),(ag',s'))::acc')
+           g' intf)
       cc
       (Mods.IntMap.empty,[]) in
   List.rev tr
@@ -259,22 +259,22 @@ let find_all_embeddings compil species =
 let add_fully_specified_to_graph sigs graph cc =
   let e,g =
     Pattern.fold
-      (fun ~pos ~agent_type (emb,g) ->
+      (fun ~pos ~agent_type intf (emb,g) ->
          let a, g' = Edges.add_agent sigs agent_type g in
          let ag = (a,agent_type) in
          let emb' = Mods.IntMap.add pos ag emb in
-         ((emb',g'),ag))
-      (fun ~pos ~site (a,_ as ag) (l,i) (emb',acc) ->
-         let _ = pos in
-         let acc' =
-           if i <> -1 then Edges.add_internal a site i acc else acc in
-         (emb',
-          match l with
-          | Pattern.UnSpec | Pattern.Free -> Edges.add_free a site acc'
-          | Pattern.Link (x',s') ->
-            match Mods.IntMap.find_option x' emb' with
-            | None -> acc'
-            | Some ag' -> fst @@ Edges.add_link ag site ag' s' acc'))
+         emb',
+         Tools.array_fold_lefti
+           (fun site acc (l,i) ->
+              let acc' =
+                if i <> -1 then Edges.add_internal a site i acc else acc in
+              match l with
+              | Pattern.UnSpec | Pattern.Free -> Edges.add_free a site acc'
+              | Pattern.Link (x',s') ->
+                match Mods.IntMap.find_option x' emb' with
+                | None -> acc'
+                | Some ag' -> fst @@ Edges.add_link ag site ag' s' acc')
+           g' intf)
       cc (Mods.IntMap.empty,graph) in
   let r = Renaming.empty () in
   let out =
@@ -446,7 +446,9 @@ let token_vector_of_init = token_vector
 let print_rule_id log = Format.fprintf log "%i"
 
 let print_rule ?compil =
-  Kappa_printer.elementary_rule ?env:(environment_opt compil)
+  match compil with
+  | None -> Kappa_printer.elementary_rule ?env:None
+  | Some compil -> Kappa_printer.decompiled_rule ~full:true (environment compil)
 
 let print_rule_name ?compil f r =
   let env = environment_opt compil in

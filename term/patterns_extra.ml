@@ -296,10 +296,13 @@ let top_sort_mixture list =
 let parse pattern =
   let agent_list, site_list =
     Pattern.fold
-      (fun ~pos ~agent_type (agent_list, site_list) ->
-         (((pos, agent_type) :: agent_list, site_list),()))
-      (fun ~pos ~site () state (agent_list, site_list) ->
-         agent_list, (pos, site, state) :: site_list)
+      (fun ~pos ~agent_type intf (agent_list, site_list) ->
+         ((pos, agent_type) :: agent_list,
+          Tools.array_fold_lefti
+            (fun site site_list state ->
+               (pos, site, state) :: site_list)
+            site_list
+            intf))
       pattern ([], [])
   in
   let bond_map =

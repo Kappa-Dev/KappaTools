@@ -45,6 +45,7 @@ val not_enough_specified :
 val several_occurence_of_site : string -> string * Locality.t -> 'a
 val link_only_one_occurence : int -> Locality.t -> 'a
 
+val agent_to_erased : Signature.s -> rule_agent -> rule_agent
 val to_erased : Signature.s -> rule_mixture -> rule_mixture
 val to_maintained : rule_mixture -> rule_mixture
 val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t

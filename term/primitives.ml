@@ -80,49 +80,6 @@ module Transformation = struct
     | NegativeInternalized (n,s) ->
       NegativeInternalized (Matching.Agent.concretize inj2graph n,s)
 
-  let raw_mixture_of_fresh sigs l =
-    let (_,fresh,mixte,existings) =
-      List.fold_left
-        (fun (fid,fr,mi,ex) -> function
-           | (NegativeWhatEver _ | NegativeInternalized _ |
-              Agent (Matching.Agent.Existing _) |
-              Linked ((Matching.Agent.Existing _,_),(Matching.Agent.Existing _,_)) |
-              PositiveInternalized (Matching.Agent.Existing _,_,_) |
-              Freed (Matching.Agent.Existing _,_)  as x) -> (fid,fr,mi,x::ex)
-           | Agent (Matching.Agent.Fresh (a_type,id)) ->
-             let si = Signature.arity sigs a_type in
-             let n = {
-               Raw_mixture.a_type;
-               Raw_mixture.a_ports = Array.make si Raw_mixture.FREE;
-               Raw_mixture.a_ints = Array.make si None;
-             } in
-             (fid,Mods.IntMap.add id n fr,mi,ex)
-           | PositiveInternalized (Matching.Agent.Fresh (_,id),s,i) ->
-             let () = match Mods.IntMap.find_option id fr with
-               | Some a -> a.Raw_mixture.a_ints.(s) <- Some i
-               | None -> () in
-             (fid,fr,mi,ex)
-           | Freed (Matching.Agent.Fresh _,_) -> (fid,fr,mi,ex)
-           | Linked ((Matching.Agent.Fresh (_,id),s1),
-                      (Matching.Agent.Existing _ as a,s2)) |
-             Linked ((Matching.Agent.Existing _ as a,s2),
-                     (Matching.Agent.Fresh (_,id),s1)) ->
-             let () = match Mods.IntMap.find_option id fr with
-               | Some a -> a.Raw_mixture.a_ports.(s1) <- Raw_mixture.VAL fid
-               | None -> () in
-             (succ fid,fr,(a,s2,fid)::mi,ex)
-           | Linked ((Matching.Agent.Fresh (_,id1),s1),
-                     (Matching.Agent.Fresh (_,id2),s2)) ->
-             let () = match Mods.IntMap.find_option id1 fr with
-               | Some a -> a.Raw_mixture.a_ports.(s1) <- Raw_mixture.VAL fid
-               | None -> () in
-             let () = match Mods.IntMap.find_option id2 fr with
-               | Some a -> a.Raw_mixture.a_ports.(s2) <- Raw_mixture.VAL fid
-               | None -> () in
-             (succ fid,fr,mi,ex)
-        ) (1,Mods.IntMap.empty,[],[]) l in
-    (Mods.IntMap.bindings fresh,mixte,List.rev existings)
-
   let print ?sigs f = function
     | Agent p ->
       Format.fprintf f "@[%a@]" (Matching.Agent.print ?sigs) p

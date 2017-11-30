@@ -1028,7 +1028,7 @@ module Make (Instances:Instances_sig.S) = struct
         Format.printf
           "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
           (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
-          rule_id (Kappa_printer.elementary_rule ~env) rule
+          rule_id (Kappa_printer.decompiled_rule ~full:true env) rule
           (*Rule_interpreter.print_dist env graph rule_id*) in
     let apply_rule =
       if choice mod 2 = 1

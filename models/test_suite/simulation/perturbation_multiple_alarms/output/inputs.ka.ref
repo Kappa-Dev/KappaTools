@@ -11,7 +11,7 @@ A(a{u/p}[.]) @ 0.01
 A(a{p/u}[.]) @ 0.01
 
 /*0*/%mod: alarm 1. [true] do $SNAPSHOT "rt.ka"; repeat [true]
-/*1*/%mod: alarm 1.2 ([T] > 0) do $DEL 10 A(a[.]); repeat [false]
+/*1*/%mod: alarm 1.2 ([T] > 0) do $APPLY 10 A(a[.])-; repeat [false]
 /*2*/%mod: alarm 0.7 ([T] > 0) do $PRINTF ("1st printing alarm at ".[T]); repeat [false]
 /*3*/%mod: alarm 0.7 [true] do $PRINTF ("2nd printing alarm at ".[T]); repeat [true]
 /*4*/%mod: alarm 0.7 [true] do $PRINTF ("3rd printing alarm at ".[T]); repeat [true]

@@ -45,6 +45,35 @@ let print_expr_val alg_val f e =
       Nbr.print f (alg_val alg)
   in Pp.list (fun f -> Format.pp_print_cut f ()) aux f e
 
+let decompiled_rule ~full env f r =
+  let sigs = Model.signatures env in
+  let (r_mix,r_created) =
+    Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
+  let pr_alg f (a,_) = alg_expr ~env f a in
+  let pr_tok f (va,tok) =
+    Format.fprintf f "%a %a" pr_alg va (Model.print_token ~env) tok in
+  Format.fprintf f "%a%t%a%t%a%t"
+    (LKappa.print_rule_mixture sigs ~ltypes:false r_created) r_mix
+    (if r_mix <> [] && r_created <> [] then Pp.comma else Pp.empty)
+    (Raw_mixture.print ~created:true ~sigs) r_created
+
+    (if r.Primitives.delta_tokens <> []
+     then (fun f -> Format.fprintf f "|@ ") else Pp.empty)
+    (Pp.list Pp.comma pr_tok) r.Primitives.delta_tokens
+
+    (fun f -> if full then
+        Format.fprintf f " @@@ %a%t"
+          pr_alg r.Primitives.rate
+          (fun f ->
+             match r.Primitives.unary_rate with
+             | None -> ()
+             | Some (rate, dist) ->
+               Format.fprintf
+                 f " {%a%a}" pr_alg rate
+                 (Pp.option (fun f md ->
+                      Format.fprintf f ":%a" (alg_expr ~env) md))
+                 dist))
+
 let elementary_rule ?env f r =
   let domain,sigs = match env with
     | None -> None,None
@@ -53,9 +82,6 @@ let elementary_rule ?env f r =
   let pr_tok f (va,tok) =
     Format.fprintf f "%a %a" pr_alg va (Model.print_token ?env) tok in
   let pr_trans f t = Primitives.Transformation.print ?sigs f t in
-  let pr_mixte f (a,s,i) =
-    Format.fprintf f "@[%a.%a!%i@]"
-      (Matching.Agent.print ?sigs) a (Matching.Agent.print_site ?sigs a) s i in
   let boxed_cc i f cc =
     let () = Format.pp_open_box f 2 in
     let () = Format.pp_print_int f i in
@@ -63,30 +89,18 @@ let elementary_rule ?env f r =
     let () = Pattern.print ?domain ~with_id:true f cc in
     Format.pp_close_box f ()
   in
-  let ins_fresh,ins_mixte,ins_existing =
-    match sigs with
-    | None -> [],[],r.Primitives.inserted
-    | Some sigs ->
-      Primitives.Transformation.raw_mixture_of_fresh
-        sigs r.Primitives.inserted
-  in
   Format.fprintf
-    f "(ast: %i)@ @[@[%a%t%a@]%t@[%a@]@]@ -- @[%a@]@ ++ @[%a%a@]@ @@%a%t"
+    f "(ast: %i)@ @[@[%a@]%t@[%a@]@]@ -- @[%a@]@ ++ @[%a@]@ @@%a%t"
     r.Primitives.syntactic_rule
+
     (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
-    (if r.Primitives.connected_components <> [||] && ins_fresh <> []
-     then Pp.comma else Pp.empty)
-    (Raw_mixture.print ~created:true ?sigs)
-    (List.map snd ins_fresh)
     (if r.Primitives.delta_tokens <> []
      then (fun f -> Format.fprintf f "|@ ") else Pp.empty)
     (Pp.list Pp.comma pr_tok)
     r.Primitives.delta_tokens
 
     (Pp.list Pp.comma pr_trans) r.Primitives.removed
-
-    (Pp.list ~trailing:Pp.space Pp.comma pr_mixte) ins_mixte
-    (Pp.list Pp.comma pr_trans) ins_existing
+    (Pp.list Pp.comma pr_trans) r.Primitives.inserted
 
     pr_alg r.Primitives.rate
     (fun f ->
@@ -112,40 +126,11 @@ let modification ?env f m =
       Format.fprintf f "$PRINTF %a" (print_expr ?env) va
   | Primitives.PLOTENTRY -> Format.pp_print_string f "$PLOTENTRY"
   | Primitives.ITER_RULE ((n,_),rule) ->
-    if rule.Primitives.inserted = [] then
-      if rule.Primitives.connected_components = [||] then
-        match rule.Primitives.delta_tokens with
-        | [ va, id ] ->
-          Format.fprintf f "%a <- %a + |%a|"
-            (Model.print_token ?env) id
-            (fun f (a,_) -> alg_expr ?env f a) va
-            (Model.print_token ?env) id
-        | _ -> assert false
-      else
-        let boxed_cc _ =
-          Pattern.print ?domain ~with_id:false in
-        Format.fprintf f "$DEL %a %a" (alg_expr ?env) n
-          (Pp.array Pp.comma boxed_cc)
-          rule.Primitives.connected_components
-    else
-      begin
-        match env with
-        | None ->
-          Format.fprintf f "$APPLY %a %a" (alg_expr ?env) n
-            (elementary_rule ?env) rule
-        | Some env ->
-          let sigs = Model.signatures env in
-          let ins_fresh,_,ins_existing =
-            Primitives.Transformation.raw_mixture_of_fresh
-              sigs rule.Primitives.inserted in
-          if ins_existing = [] then
-            Format.fprintf f "$ADD %a %a" (alg_expr ~env) n
-              (Raw_mixture.print ~created:false ~sigs)
-              (List.map snd ins_fresh)
-          else
-            Format.fprintf f "$APPLY %a %a" (alg_expr ~env) n
-              (elementary_rule ~env) rule
-      end
+    Format.fprintf f "$APPLY %a %a" (alg_expr ?env) n
+      (match env with
+       | None -> elementary_rule ?env
+       | Some env -> decompiled_rule ~full:false env)
+      rule
   | Primitives.UPDATE (id,(va,_)) ->
     Format.fprintf f "$UPDATE %a %a"
       (Model.print_alg ?env) id (alg_expr ?env) va
