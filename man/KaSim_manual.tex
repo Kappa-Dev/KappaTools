@@ -1704,10 +1704,10 @@ When a file already exists, it is overwritten without any warning.
 \label{fig:kasa:2}
 \end{figure}
 
-Reachability analysis aimed at detecting statically properties about the bio-molecular species that can be formed in a model.
-Knowing whether, or not, a given bio-molecular species can be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08,Feret:SASB2016}, the abstraction consists in:
+Reachability analysis aimed at detecting statically properties about the bio-molecular species that may be formed in a model.
+Knowing whether, or not, a given bio-molecular species may be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08,Feret:SASB2016}, the abstraction consists in:
 \begin{enumerate}
-\item firstly, ignoring the number of occurrences of bio-molecular species (we assume that whenever a bio-molecular species can be formed, then it can be formed as many time as it could be necessary),
+\item firstly, ignoring the number of occurrences of bio-molecular species (we assume that whenever a bio-molecular species may be formed, then it may be formed as many time as it could be necessary),
 \item secondly, abstracting a bio-molecular species by the set of its properties.
 \end{enumerate}
 The analysis takes into account also the chemical species that may be introduced in a perturbation.
@@ -2130,7 +2130,7 @@ By default, the detection of polymers is using the result of the reachability an
   KaSa --reset-all --compute-potential-cycles scc_relations.ka
 \end{verbatim}
 produces the contact map that is drawed in Fig.~\ref{fig:scc-relations-high}.
-By default, the detection of polymers has used the result of the reachability analysis: since the bonds on the site $x$ and $y$ of each instance of the agent $A$ are mutually exclusive, no polymer can be formed.
+By default, the detection of polymers has used the result of the reachability analysis: since the bonds on the site $x$ and $y$ of each instance of the agent $A$ are mutually exclusive, no polymer may be formed.
 
 
 \begin{figure}[h]
@@ -2155,8 +2155,64 @@ In this case, {\KaSa} produces the contact map that is given in Fig.~\ref{fig:sc
 \label{fig:scc-relations-low}
 \end{figure}
 
+The detection of polymer at high resolution also depends on the accuracy of the reachability analysis. The file \texttt{scc\_dimer.ka} contains the following model:
+\begin{lstlisting}[language=kappa]
+%agent: R(x,y,z)
 
-To be continued... deal with asymetric dimerization that depends on the double bonds domain.
+R(x[.]),R(x[.]) -> R(x[1]),R(x[1]) @1
+R(x[1],y[.],z[.]),R(x[1],y[.],z[.]) -> R(x[1],y[2],z[.]),R(x[1],y[.],z[2]) @1
+
+%init: 10 R()
+\end{lstlisting}
+
+In this model, two agents of type $R$ may connect their sites $x$ together. Then, two agents connected via their sites $x$ may establish an asymetric bond between the site $y$ of the first one and the site $z$ of the second one.
+As a consequence, whenever an agent of type $R$ has several sites bound, these sites are necessarily bound to the same instance of the agent $R$. Thus, there can be no polymer.
+
+At low resolution, the detection of polymer fails in exploiting this property, and warns about potential polymers. Indeed, the following instruction:
+\begin{verbatim}
+KaSa --reset-all --compute-potential-cycles scc_dimer.ka \
+  --polymer-detection-accuracy-level Low
+\end{verbatim}
+produces the contact map that is drawed in Fig.~\ref{fig:scc-dimer-low}.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4cm]{generated_img/scc_dimer_contact_low.png}
+\caption{The contact map for the model \texttt{scc\_dimer.ka} with information about potential polymers at low resolution. The analysis fails in proving the lack of polymers (bonds are colored in red).}
+\label{fig:scc-dimer-low}
+\end{figure}
+
+At high level of resolution, the analysis for the detection of potential polymers successfully prove the lack of polymers. The following instruction:
+\begin{verbatim}
+KaSa --reset-all --compute-potential-cycles scc_dimer.ka
+\end{verbatim}
+produces the contact map that is given in Fig.~\ref{fig:scc-dimer-high}. The analysis has successfully proven the lack of polymers (no bond is colored in red).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4cm]{generated_img/scc_dimer_contact_high.png}
+\caption{The contact map for the model \texttt{scc\_dimer.ka} with information about potential polymers at high resolution. The analysis successfully proves the lack of polymers (no bond is colored in red).}
+\label{fig:scc-dimer-high}
+\end{figure}
+
+In order to illustrate that the accuracy of the analysis relies in this example on the capability for the analysis to exploit properties of double bonds. We disable the double bond domain. The following instruction:
+\begin{verbatim}
+KaSa --reset-all --compute-potential-cycles scc_dimer.ka \
+ --no-double-bonds-domain
+\end{verbatim}
+produces the contact map that is given in Fig.~\ref{fig:scc-dimer-high-no-double}. Without the capability to express and prove that whenever an agent of type $R$ is bound twice, it is necessarily bound twice to the same agent instance. The analysis fails in proving the absence of polymer. Thus, it warns about potential polymers, by drawing the edges in red.
+
+
+
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4cm]{generated_img/scc_dimer_contact_high_no_double_bonds.png}
+\caption{The contact map for the model \texttt{scc\_dimer.ka} with information about potential polymers at high resolution but without the analysis of double bonds. The analysis cannot infer the fact that whenever two sites of an agent $R$ are bound, they are necessarily bound to the same instance of an agent. Thus, it cannot infer the lack of polymers. (bonds are colored in red)}
+\label{fig:scc-dimer-high-no-double}
+\end{figure}
 
 \section{Influence map}
 
