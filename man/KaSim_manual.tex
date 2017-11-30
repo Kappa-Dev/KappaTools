@@ -131,6 +131,9 @@ downloadable software on main platforms. Intensive scientific usage
 should occurs by scripting around the command line tools or by using the
 Python client.
 
+%Quyen: \Kappa{} available online in the \texttt{Kappapp}, as well as its interactive model
+% developement. One can download the software on the main platforms.
+
 After a small teaser, this manual provides an exhaustive list of what
 can be done and how with the tools. \emph{It is not intended as a
   tutorial on rule-based modelling.}
@@ -183,29 +186,29 @@ A minimal \Kappa model looks like:
 
 \begin{lstlisting}[language=kappa]
 /* Signatures*/
-%agent: A(x c)             // Declaration of agent A
-%agent: B(x)               // Declaration of B
-%agent: C(x1{u p} x2{u p}) // Declaration of C with 2 modifiable sites
+%agent: A(x, c)             // Declaration of agent A
+%agent: B(x)               // Declaration of agent B
+%agent: C(x1{u p}, x2{u p}) // Declaration of agent C with 2 modifiable sites
 /* Variables */
 %var: 'on_rate'  1.0E-4 // per molecule per second
 %var: 'off_rate' 0.1    // per second
 %var: 'mod_rate' 1      // per second
 /* Rules */
 'a.b' A(x[.]),B(x[.]) <-> A(x[1]),B(x[1]) @ 'on_rate', 'off_rate'       //A and B bind and dissociate
-'ab.c' A(x[_] c[.]),C(x1{u}[.]) -> A(x[_] c[2]),C(x1{u}[2]) @ 'on_rate' //AB binds unphosphorilated C
+'ab.c' A(x[_], c[.]),C(x1{u}[.]) -> A(x[_], c[2]),C(x1{u}[2]) @ 'on_rate' //AB binds unphosphorilated C
 'mod x1' C(x1{u}[1]),A(c[1]) -> C(x1{p}[.]),A(c[.]) @ 'mod_rate'        //ABC modifies x1
-'a.c' A(x[.],c[.]) C(x1{p}[.] x2{u}[.]) ->
-      A(x[.],c[1]) C(x1{p][.] x2{u}[1]) @ 'on_rate'    //A binds x1_phos C on x2
-'mod x2' A(x[.] c[1]),C(x1{p}[.] x2{u}[1]) ->
-         A(x[.] c[.]),C(x1{p}[.] x2{p}[.]) @ mod_rate  //AC modifies x2
+'a.c' A(x[.],c[.]), C(x1{p}[.], x2{u}[.]) ->
+      A(x[.],c[1]), C(x1{p][.], x2{u}[1]) @ 'on_rate'    //A binds x1_phos C on x2
+'mod x2' A(x[.], c[1]),C(x1{p}[.], x2{u}[1]) ->
+         A(x[.], c[.]),C(x1{p}[.], x2{p}[.]) @ mod_rate  //AC modifies x2
 /* Observation */
 %obs: 'AB'  |A(x[x.B])|
-%obs: 'Cuu' |C(x1{u} x2{u})|
-%obs: 'Cpu' |C(x1{p} x2{u})|
-%obs: 'Cpp' |C(x1{p} x2{p})|
+%obs: 'Cuu' |C(x1{u}, x2{u})|
+%obs: 'Cpu' |C(x1{p}, x2{u})|
+%obs: 'Cpp' |C(x1{p}, x2{p})|
 /*Initial conditions */
 %init: 1000  A(),B()
-%init: 10000 C(x1{u} x2{u})
+%init: 10000 C(x1{u}, x2{u})
 \end{lstlisting}
 
 Lines 1-4 of this kappa file\index{Kappa file} contain
@@ -214,7 +217,7 @@ declarations\index{signature}\index{declaration}. Agents of type
 \ttt{C} have two sites \ttt{x1} and \ttt{x2} whose internal state may
 be \ttt{u} (unphosphorylated) or \ttt{p} (phosphorylated).
 %Recall that the default state of these sites is \ttt{u} (the first one).
-Line 8, rule \ttt{{\textquotesingle}ab.c{\textquotesingle}} binds an
+Line 11, rule \ttt{{\textquotesingle}ab.c{\textquotesingle}} binds an
 \ttt{A} connected to someone on site \ttt{x} to a \ttt{C}.
 
 %Quyen:It is not line 8. It is line 11
@@ -240,13 +243,9 @@ number of agents in the initial system).
 \item[\$] KaSim ABC.ka -u event -l 100000 -p 1000 -o abc.csv
 }}
 
-Plotting the content of the \ttt{abc.csv} file one notices that
+Plotting the content of the \ttt{abc.csv} file, one notices that
 nothing significantly interesting happens to the observables after
 250s. So we can now specify a meaningful time limit by running:
-
-%Quyen: Plotting the content of the file \ttt{abc.csv}, one notices that
-%nothing significantly interesting happens to the observables after
-%250s. We can now specify a meaningful time limit for this model by:
 
 \ttt{
 \ITE{
@@ -259,17 +258,17 @@ which produces the data points whose rendering is given in Fig.~\ref{fig:abc}.
 \begin{center}
 \includegraphics[width=12cm]{generated_img/plot-abc.png}
 \caption{Simulation of the ABC model: population of unmodified
-  \ttt{C}s (observable \ttt{Cuu} in red) drops rapidly and is
-  replaced, in a first step by simply modified \ttt{C}s (observable
-  \ttt{Cpu} in blue) which are in turn replaced by doubly modified
-  \ttt{C}s (observable \ttt{Cpp} in red). Note that the population of
+  \ttt{C}s (in red is the observable \ttt{Cuu}) drops rapidly and is
+  replaced, in a first step by simply modified \ttt{C}s (in blue is the observable
+  \ttt{Cpu}) which are in turn replaced by doubly modified
+  \ttt{C}s (in red is the observable \ttt{Cpp}). Note that, the population of
   \ttt{AB} complexes (observable \ttt{AB} in black) stabilizes
   slightly below 400 individuals after about 20s.}
 \label{fig:abc}
 \end{center}
 \end{figure}
 
-We will use varient of this model as a running example for the next chapter.
+We will use variant of this model as a running example for the next chapter.
 
 \chapter{The Kappa language}\label{chap:kappa}
 
@@ -289,7 +288,7 @@ Declarations can be: agent and token \emph{signatures}
 
 The KF\index{Kappa file}'s structure is quite flexible. Neither
 dividing into several sub-files nor the order of
-declaration\index{declaration}s matters (to the exception of
+declaration\index{declaration}s matters (for the exception of
 perturbations and variable declaration\index{declaration}s, see
 respectively Sections \ref{sec:mod} and \ref{sec:var} for details).
 
@@ -299,30 +298,24 @@ the rest of the line or by putting any text between the delimiters
 \ttt{/*} and \ttt{*/}.
 
 % TODO pirbo: better
-The following sections present formal grammars. Here are tips to read
+The following sections present formal grammars. Here are hints to read
 them.  Terminal symbols are written in (blue) typed font, and
 $\varepsilon$ stands for the empty list. An identifier \ttt{Id} can be
 any string generated by a regular expression of the type $\_^*\ [
   a\sep z\ A\sep Z][a\sep z\ A \sep Z\ 0\sep 9\ \_ \ -\ +]^*$.
 
-%Quyen: Here are hints to read them.
-
 \section{Sited-graph pattern: Kappa expression}
 
 The state of the system is represented in Kappa as a sited graph: a
-graph where edges use sites in nodes. You must think sites as
+graph where edges use sites in nodes. One must think sites as
 resources. At most one edge of the graph can use a site of a node
 (representing an agent in our case). Moreover, all the sites of an
 agent must have different names.
 
-%Quyen:One must think sites as resources.
-
 This leads to the property that an embedding between 2 sited graphs is
-completely defined by the image of one node. This is absolutly
-critical for the efficiency and We call this concept the
+completely defined by the image of one node. This is absolutely
+critical for the efficiency and we call this concept the
 \emph{rigidity of \Kappa{}}.
-
-%Quyen:This is absolutely critical for the efficiency and we call this concept the
 
 \begin{table}[ht!]
   \centering
@@ -356,30 +349,30 @@ skeletons (describe formally in Table \ref{tab:patterns}):
   \begin{center}
     \includegraphics{gkappa_img/syntax_agent.pdf}
   \end{center}
-  is written as \ttt{A(x[.] y\{p\}[.] z\{e0\}[.])}.
+  is written as \ttt{A(x[.], y\{p\}[.], z\{e0\}[.])}.
 \item When a site is a part of an edge, one assign an arbitrary
   positive integer identifier $n$ to this edge and one specify the
-  appartenance of the site to this edge by writing the linking state
+  appurtenance of the site to this edge by writing the linking state
   \ttt{[n]}. The following graph:
   \begin{center}
     \includegraphics{gkappa_img/syntax_ring.pdf}
   \end{center}
-  can be reprensented as \ttt{A(x[23] y[4]\{u\} z\{e1\}[.])},
-  \ttt{A(x[4] y\{u\}[95] z[.]\{e1\})},
-  \ttt{A(x[95] y\{u\}[23] z\{e1\}[.])}.
+  can be reprensented as \ttt{A(x[23], y[4]\{u\}, z\{e1\}[.])},
+  \ttt{A(x[4], y\{u\}[95], z\{e1\}[.])},
+  \ttt{A(x[95], y\{u\}[23], z\{e1\}[.])}.
 
   \Remark{Each link identifier appears exactly twice.}
 \end{itemize}
 
 \subsection{Patterns}
-\Kappa{} strength is to describe transformations by only mentionning (and
+\Kappa{} strength is to describe transformations by only mentioning (and
 storing) the relevant part of the subgraph required for that
 transformation to be possible. This is the \emph{don't care, don't
   write} (DCDW)\index{don't care don't write} principle which plays a
 key role in resisting combinatorial explosion when writing models.
 
 If a transformation occurs independently from the state of a site of
-an agent, don't mention it in the \emph{pattern} to match. The pattern
+an agent, do not mention it in the \emph{pattern} to match. The pattern
 A(x[.],z[.]) represents an agent of type A whose sites x and z are
 free but the sites y and z can be in any internal state and the site y
 can be linked or not to anything.
@@ -409,12 +402,12 @@ instruction: \lstinline[language=kappa]*%var: 'ab' |A(x[y.B]),B(y[x.A])|*,
 the variable \var{ab} will count the number of
 \ttt{A}s whose site \ttt{x} is connected to a site \ttt{y} of \ttt{B},
 plus the number of \ttt{B}s whose site \ttt{y} is connected to a site
-\ttt{x} of \ttt{A}. Note that this still includes the case
+\ttt{x} of \ttt{A}. Note that, this still includes the case
 \ttt{A(x[1]),B(y[1])}.
 
 \Remark{Transformations on semi-links and links type induce side
   effects (effect on unmentioned agents/unmentioned site of agent) and
-  can even don't make sense at all. What would mean to remove the link
+  can even do not make sense at all. What would mean to remove the link
   to A but not the link to B in the example above? Be careful when
   one use them.}
 
@@ -484,7 +477,7 @@ The last item of the list is an
 if-expression. \textit{boolean\_expression} are described in
 Table~\ref{tab:pert}. Think very carefully whether it is the correct
 thing to do before using it. Mechanistic conditions have to be
-expressed in rule bodies not in rule rates!
+expressed in rule bodies and not in rule rates!
 
 %%
 
@@ -505,8 +498,8 @@ expressed in rule bodies not in rule rates!
 %\ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-l} \\ &(note that if unset \ttt{Tmax}$=\infty$)\\
 %\ttt{[pp]} & the number of requested plotting interval set by the option \ttt{-p} \\
 
-\ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
-\ttt{|t|} & the concentration of token\ref{sec:hybrid} \ttt{t}\\
+\ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared by using the \ttt{\%var:} statement) \\
+\ttt{|t|} & the concentration of token \ref{sec:hybrid} \ttt{t}\\
 \ttt{|\textit{Kappa\_expression}|} & number of occurences of the pattern \textit{Kappa\_expression}\\
 \ttt{inf} & symbol for $\infty$ \\\\
 \toprule
@@ -564,9 +557,9 @@ There are two ways of specifying rules:
   \item following the chemical intuition (with the burden of a subtle
     before/after correspondance), by giving two {\it
       Kappa\_expression}s. The first one, called \emph{left hand
-      side}\index{left hand side} (LHS), represents what you need to
+      side}\index{left hand side} (LHS), represents what one need to
     apply the rule. The second, the \emph{right hand side}\index{right
-      hand side} (RHS), describes what you obtain once the rule is
+      hand side} (RHS), describes what one obtain once the rule is
     applied. In \Kappa{}, they are separated by an arrow $\rar$.
   \item by giving one {\it Kappa\_expression} with edition. The
     \Kappa{} expression still represents the necessary context for the
@@ -612,9 +605,9 @@ correctly reported on the right.
 \subsubsection*{A simple rule}
 With the signature\index{agent signature} of \ttt{A} defined in Section \ref{sec:sig}, the line
 \begin{lstlisting}[language=kappa]
-'A dimerization' A(x[.]),A(y[.]{p}) -> A(x[1]),A(y[1]{p}) @ 'gamma'
+'A dimerization' A(x[.]),A(y{p}[.]) -> A(x[1]),A(y{p}[1]) @ 'gamma'
 \end{lstlisting}
-declares a dimerization rule between two instances of agent \\ttt{A}
+declares a dimerization rule between two instances of agent \ttt{A}
 provided the second agent is phosphorylated on site \ttt{y} (this is the meaning of \ttt{p}).
 
 Remember that the identifier \ttt{[1]} of the bound is arbitrary and
@@ -626,7 +619,7 @@ influence on the triggering of this rule.
 In the RHS of a rule, the k-th agent must correspond to
 the (transformed) k-th agent of the LHS.
 
-If you want to create or delete agent, you must put a ghost agent
+If one want to create or delete agent, one must put a ghost agent
 (written with a dot) at their corresponding place on the left/right
 hand side of the rule.
 
@@ -634,7 +627,7 @@ Sticking with \ttt{A}'s signature\index{agent signature}, one can
 express that an unphosphoralated \ttt{A} can collapse if not linked to
 anyone (regardless of the state of z) by writing
 \begin{lstlisting}[language=kappa]
-'destroy A' A(x[.] y\{u\}[.] z[.]) -> . @ 'gamma'
+'destroy A' A(x[.], y{u}[.], z[.]) -> . @ 'gamma'
 \end{lstlisting}
 
 Similarly, the rule
@@ -665,7 +658,7 @@ The \ttt{A} in the graph that is matched to the second occurrence of
 \ttt{A} in the LHS will be deleted by the rule. As a consequence, all
 its sites will disappear together with the bonds that were pointing to
 them. For instance, when applied to the following graph: \ITE{
-\item[] $G=$\ttt{A(x[1],y\{p\}[.],z\{e2\}[.]), A(x[2] y\{u\}[.]
+\item[] $G=$\ttt{A(x[1],y\{p\}[.],z\{e2\}[.]), A(x[2], y\{u\}[.],
   z\{e0\}[1]), C(t[2])} } the above rule will result in a new graph
 $G' =\ttt{A(x[1],y\{p\}[.],z\{e2\}[.]),C(t[.])}$ where the site
 \ttt{t} of \ttt{C} is now free as side effect.
@@ -738,7 +731,7 @@ $a\geq0$ is the arity of the rule ({\ie}$2$ for a bimolecular rule).
 
 In a modelling context, the constant $k$ is typically expressed using
 \emph{molars} $M:=\mit{moles}\,l^{-1}$ (or variants thereof such as
-$\mu M$, $nM$), and seconds or minutes. If we chose molars and
+$\mu M$, $nM$), and seconds or minutes. If we choose molars and
 seconds, $k$' s unit is $\mathit{M}^{1-a}\mathit{s}^{-1}$, as follows
 from the relation \ref{stochrate}.
 
@@ -763,7 +756,7 @@ doubled in a diploid cell.
 E.\@ Coli cell: $V=10^{-15}l$, and ${\cal A}V=10^{8}$.
 
 A concentration of $1M$ in a yeast cell volume corresponds to $10^{8}$
-molecules; $10nM\approx 1$ molecule per cell.
+molecules; $10^{n}M\approx 1$ molecule per cell.
 \end{itemize}
 
 The table \ref{tab:kin_rates} lists typical ranges for deterministic
@@ -898,7 +891,7 @@ may also be bi-directional). A hybrid rule has the following form:
 \item[] {\it Kappa\_expression} | {\it token\_expression} $\rar$ {\it Kappa\_expression}  | {\it token\_expression }\ttt{@} {\it rate}
 }
 
-Token expressions follow the grammar of Table~\ref{tab:tokens}.
+Token expressions follow the grammar in Table~\ref{tab:tokens}.
 %%
 \begin{table}[ht!]
   \centering
@@ -913,7 +906,7 @@ Token expressions follow the grammar of Table~\ref{tab:tokens}.
 
 Using Kappa \imp{hybrid rules}, one may declare that an action has
 effects on the concentration of some particles of the system. For
-instance, a rule may consume atp, calcium ions etc. It would be a waste
+instance, a rule may consume atp, calcium ions, etc. It would be a waste
 of memory and time to use discrete agents to represent such
 particles. Instead one may declare tokens using
 declarations\index{declaration} of the form:
@@ -1075,7 +1068,7 @@ will print a line in the data file every 2.3 time unit of
 simulation whereas
 \lstinline[language=kappa]@%mod: |A()| > 1000 do $PLOTNOW repeat |B(x[_])| < |B(x[.])|@
 will do it every event where there is more than
-1000 A up to the first event where (there is more than 1000 A and)
+1000 A up to the first event where (there is more than 1000 A) and
 the number of \lstinline[language=kappa]@|B(x[_])|@ becomes bigger than the number of
 \lstinline[language=kappa]@|B(x[.])|@.
 
@@ -1108,7 +1101,7 @@ There are various ways one can use perturbations to study more deeply a given Ka
 \lstinline[language=kappa]*%mod:  [T]=25 do $ADD 10000 C()*.
 
 The modified Kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}).
-Running again a simulation (a bit longer) by entering in the command line:
+Run a simulation again (a bit longer) by entering in the command line:
 \ttt{
 \ITE{
 \item[\$] KaSim ABC-pert.ka -l 300 -p 0.3 -o abc2.out
@@ -1134,7 +1127,7 @@ will double the concentration of token \ttt{a} each time it gets below 100.
 Any variable between simple quotes can be updated during a simulation using a declaration\index{declaration} of the form:
 \lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 0.0!
 
-This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given in Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
+This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that, according to the grammar given in Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
 \lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 'k_on'/100!
 \noi will cause the on rate of all rules to decrease a hundred fold. Note that, it is possible to override the kinetic rate of a specific rule:  in our ABC example, the declaration\index{declaration}:
 \lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'a.b' inf!
