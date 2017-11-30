@@ -1416,7 +1416,7 @@ of the simulation.
 
 In our ABC example, adding the instruction:
 \lstinline[language=kappa]!%mod:  [true] do $TRACK 'Cpp' [true]!
-\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{{\textquotesingle}Cpp{\textquotesingle}}, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule applications ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r{\textquotesingle}} between two rule applications $\ttt{r}$ and $\ttt{{\textquotesingle}r{\textquotesingle}}$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show in Fig.~\ref{fig:cflow} an example of such causal flow.
+\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{{\textquotesingle}Cpp{\textquotesingle}}, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule applications ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r{\textquotesingle}} between two rule applications $\ttt{r}$ and $\ttt{r{\textquotesingle}}$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show in Fig.~\ref{fig:cflow} an example of such causal flow.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -1426,14 +1426,14 @@ In our ABC example, adding the instruction:
 \end{center}
 \end{figure}
 
-Causality analysis of the observable \ttt{Cpp} can be turned off at any time using a declaration\index{declaration} of the form:
+Causality analysis of the observable \ttt{Cpp} can be turned off at any time by using a declaration\index{declaration} of the form:
 \lstinline[language=kappa]!%mod:  [T]>25 do $TRACK 'Cpp' [false]!
 
-Each time \KaSim~detects a new occurrence of the observable that is being tracked, it will dump it's causal past as a graph using the dot format (see Fig.~\ref{fig:cflow} above). The name of the file in which the causal flow is stored can be set using the \texttt{\%def} instruction (see Section~\ref{sec:param}).
+Each time \KaSim~detects a new occurrence of the observable that is being tracked, it will dump its causal past as a graph using the dot format (see Fig.~\ref{fig:cflow} above). The name of the file in which the causal flow is stored can be set by using the \texttt{\%def} instruction (see Section~\ref{sec:param}).
 
 \subsubsection*{Compressing causal flows.}
 
-In general, pure causal flows\index{causal flow} will contain a lot of information that modelers may not wish to consider. Indeed in classical flows, causality (represented by an edge between to rule applications in the graph) is purely local. Therefore a sequence $a\rar b \rar c$ only implies that an instance of rule $a$ caused an instance of rule $b$ which in turn created an instance of the observable $c$. However, it does not imply that $a$ was "necessary" for $c$ to occur (for instance, $c$ might have been possible before $a$ but not after, and $b$ would be simply re-enabling $c$). It is possible to tell \KaSim~to retain only events that are more strongly related to the observable using two compression techniques (see Ref.~\cite{Dan_etal12} for formal details). Intuitively, in a \emph{weakly} compressed causal\index{weak compression} flow one has the additional property that if an event $e$ is a (possibly indirect) cause of the observable, then preventing $e$ from occurring would have prevented the rest of the causal flow to occur ({\ie}it is not possible to reconstruct a computation trace containing the observable with the events that remain in the causal flow). A \emph{strongly} compressed causal flow enjoys the same property with an additional level of compression obtained by considering different instances of the same rule to be indistinguishable\index{strong compression}. Note that causal flow compressions may be memory and computation demanding. For large systems it may be safer to start with weak compressions only.
+In general, pure causal flows\index{causal flow} will contain a lot of information that modelers may not wish to consider. Indeed in classical flows, causality (represented by an edge between to rule applications in the graph) is purely local. Therefore a sequence $a\rar b \rar c$ only implies that an instance of rule $a$ caused an instance of rule $b$ which in turn created an instance of the observable $c$. However, it does not imply that $a$ was "necessary" for $c$ to occur (for instance, $c$ might have been possible before $a$ but not after, and $b$ would be simply re-enabling $c$). It is possible to tell \KaSim~to retain only events that are more strongly related to the observable using two compression techniques (see Ref.~\cite{Dan_etal12} for formal details). Intuitively, in a \emph{weakly} compressed causal\index{weak compression} flow one has the additional property that if an event $e$ is a (possibly indirect) cause of the observable, then preventing $e$ from occurring would have prevented the rest of the causal flow to occur ({\ie}it is not possible to reconstruct a computation trace containing the observable with the events that remain in the causal flow). A \emph{strongly} compressed causal flow enjoys the same property with an additional level of compression obtained by considering different instances of the same rule to be indistinguishable\index{strong compression}. Note that, causal flow compressions may be memory and computation demanding. For large systems it may be safer to start with weak compressions only.
 
 The type of compression can be set using the \texttt{\%def} instruction (see Section~\ref{sec:param}). For instance:
 \lstinline[language=kappa]!%def: "displayCompression" "none" "weak" "strong"!
@@ -1446,13 +1446,13 @@ As an example, consider the computation of causal flows between $t=10$ and $t=20
 %mod: [T]>20 do $TRACK 'Cpp' [false]
 \end{lstlisting}
 
-The above declaration will ask \KaSim~to analyze each new occurrence of \var{Cpp} in that time interval. If $n$ new instances took place, then \KaSim~will have to compute $n$ causal flows. One may want to bound the number of computed flows to a certain value, say 10. One may do so using the combination of perturbations and variables given below:
+The above declaration will ask \KaSim~to analyze each new occurrence of \ttt{\var{Cpp}} in that time interval. If $n$ new instances took place, then \KaSim~will have to compute $n$ causal flows. One may want to bound the number of computed flows to a certain value, say 10. One may do so using the combination of perturbations and variables given below:
 \begin{lstlisting}[language=kappa]
 %var: 'x' 0
 %mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'x' 'Cpp')
 %mod: [T]>20 || ('x' > 0 && 'Cpp' - 'x' > 9) do $TRACK 'Cpp' [false]
 \end{lstlisting}
-The first line is a declaration of an $x$ variable that is initially set to 0. Note that the second line is a perturbation that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
+The first line is a declaration of an $x$ variable that is initially set to 0. Note that, the second line is a perturbation that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
 The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$).
 
 
@@ -1470,19 +1470,19 @@ The \emph{flux map}\index{flux map} is a powerful observation that tracks, on th
 %mod: [true] do $FLUX "flux.dot" [true]
 %mod: [T]>20 do $FLUX "flux.dot" [false]
 \end{lstlisting}
-The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produces a flux map that is shown in  Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
+The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that, the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produces a flux map that is shown in  Fig.~\ref{fig:flux}. Note that, flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
 
 \subsection{Print species of an observable}
-The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each time a new instance of the observable appears, the \emph{species} in which it occured is printed in a file. For example
+The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each time a new instance of the observable appears, the \emph{species} in which it occured is printed in a file. For example:
 {\begin{lstlisting}[language=kappa]
 %mod:$SPECIES_OF "species.ka" A(a!1), B(a!1) [true]
 \end{lstlisting}}
 prints in the file \ttt{"species.ka"} a new line for each new occurrence of \ttt{A(a!1), B(a!1)} with the time of occurrence and the species in which it occurred.
 
-Note that this perturbation can only be applied if the observable is a connected component.
+Note that, this perturbation can only be applied if the observable is a connected component.
 
 \section{Implicit signature}
-\KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{Kappa file}. Note that it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents.
+\KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{Kappa file}. Note that, it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents.
 
 \section{Simulation packages}
 
@@ -1490,7 +1490,7 @@ The simulation algorithm that is implemented in \KaSim~requires an initializatio
 \ttt{\ITE{
 \item [] KaSim abc.ka -l $n$ -make-sim abc.kasim
 }}
-will generate a standard simulation of the \ttt{abc.ka} model, but in addition, will create the simulation package \ttt{abc.kasim} (.kasim extension is not mandatory). This package is a binary file, {\ie}not human readable, that can be used as input of a new simulation using the command:
+will generate a standard simulation of the \ttt{abc.ka} model, but in addition, will create the simulation package \ttt{abc.kasim} (\ttt{.kasim} extension is not mandatory). This package is a binary file, {\ie}not human readable, that can be used as input of a new simulation using the command:
 \ttt{\ITE{
 \item [] KaSim -load-sim abc.kasim -l $k$
 }}
@@ -1837,7 +1837,7 @@ The option \verb?--compute-reachability-analysis? can be used to switch on/off t
 
 The option \verb?--enable-every-domain? can be used to switch on every abstract domain, whereas the option \verb?--disable-every-domain? can be used to switch off every abstract domain.
 
-The option \verb?--contact-map-domain? impacts the way side-effects are handled with during the analysis. In \verb?static? mode, we consider that every bond that occurs syntactically in the initial state, in the rhs of a rule, or in a introduction directive of a perturbation, may be released by side-effects.
+The option \verb?--contact-map-domain? impacts the way side-effects are handled with during the analysis. In \verb?static? mode, we consider that every bond that occurs syntactically in the initial state, in the RHS of a rule, or in a introduction directive of a perturbation, may be released by side-effects.
 In \verb?dynamic? mode, only the bond that has been encountered so far during the analysis are considered.
 
 The option \verb?--views-domain? can be used to switch on/off the views domains that combine the non-relational analysis and the relational analysis.
