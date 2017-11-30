@@ -1791,7 +1791,7 @@ In our example, when a \texttt{R} has its sites \texttt{cr} and \texttt{c} bound
 
 
 
-\begin{figure}[t]
+\begin{figure}[htbp]
 \input{generated_img/LOG_mute.txt}
 \caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Mute''.}
 \label{fig:reachability_mute}
@@ -1801,31 +1801,31 @@ In our example, when a \texttt{R} has its sites \texttt{cr} and \texttt{c} bound
 %\caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Low''.}
 %\label{fig:reachability_low}
 %\end{figure}
-\begin{figure}[t]
+\begin{figure}[htbp]
 \input{generated_img/LOG_medium_KO.txt}
 \caption{Reachability analysis: one rule that cannot be applied yet, according to the bio-molecular species already constructed.}
 \label{fig:reachability_medium_ko}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[htbp]
 \input{generated_img/LOG_medium_OK.txt}
 \caption{Reachability analysis: one rule successfully applied.}
 \label{fig:reachability_medium_ok}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[htbp]
 \input{generated_img/LOG_high_init.txt}
 \caption{Reachability analysis: extensional description of initial states.}
 \label{fig:reachability_high_init}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[htbp]
 \input{generated_img/LOG_high_rule.txt}
 \caption{Reachability analysis: extensional description of the new patterns  created when applying a rule.}
 \label{fig:reachability_high_rule}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[htbp]
 \input{generated_img/LOG_full.txt}
 \caption{Reachability analysis: discovering new patterns force the analysis to apply some rules again, until reaching a fix-point.}
 \label{fig:reachability_full}
@@ -1966,7 +1966,7 @@ Although the semantics of a coarse-grainged transition system is fully defined  
 
 \section{Contact map}
 
-\begin{figure}[htbp]
+\begin{figure}[h]
 \centering
 \includegraphics[width=12cm]{img/kasa_5.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Contact map}.}
@@ -2066,12 +2066,11 @@ We obtain the contact map that is given in Fig.~\ref{fig:cm-high-res-wo-rel}. Th
 \end{figure}
 
 The contact map may be refined with information about polymers.
-If the commmand line option \texttt{--compute-potential-cycles} is used, {\KaSa} computes the set of bonds the number of which may not be uniformly bounded in paths within bio-molecular species.
+When the commmand line option \texttt{--compute-potential-cycles} is used, {\KaSa} computes a superset of the bonds the number of occurences of which may not be uniformly bounded in paths within bio-molecular species. These bonds are then displayed in red in the contact map.
 
-TODO: section in progress...
+The computation of this subset is based on Tarjan's algorithm for the decomposition of a graph in strongly connected components \cite{Tarjan}. For this, we consider the graph of the potential succesion of bonds in bio-molecular species. The nodes of this graph are the oriented version of the potential bonds in the contact map (each potential bond is considered twice). Then there is an edge between two oriented bonds if the target of the first bond and the source of the second bond have the same agent type but different site names. Hence each edge is associated with a graph that is obtained by merging the graph associated to the source and the target of this edge, that is to say that each edge is associated with a graph made of three agents and two bonds (e.g.~see Fig.~\ref{fig:scc-graph}). We can notice that every path that may be repeated in bio-molecular species necessarily forms a cycle in this graph. The computation of all the elementary cycles in graph may be exponentially costly. Instead we compute the strongly connected components which can be done in linear time (with respect to the sum among the number of nodes and the number of edges in the graph). The computation of the strongly connected components is enough, since an edge belongs to a cycle if and only if it belongs to a non trivial strongly connected component.
 
-
-We consider the following example:
+The file \texttt{scc\_abc.ka} has the following content:
 \begin{lstlisting}[language=kappa]
 %agent: A(x,y)
 %agent: B(x,y)
@@ -2086,11 +2085,78 @@ C(x[.]),A(y[.]) -> C(x[1]),A(y[1]) @ 1
 %init: 10 C()
 \end{lstlisting}
 
-Typing the following command line:
+In this example, arbitrary long chains and arbitrary long rings of agents may be formed (the site $x$ of each $A$ is either free or bound to the site $y$ of a $B$;  the site $x$ of each $B$ is either free or bound to the site $y$ of a $C$; and the site $x$ of each $C$ is either free or bound to the site $y$ of a $A$).
 
+The graph that is associated to this model is given in Fig.~\ref{fig:scc-graph}.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=10cm]{img/graph.png}
+\caption{The graph about potential succession of bonds for the model \texttt{scc\_abc.ka}. Each bond in the model is encoded as a node. Each edge in the graph denotes a site-graph made of three agents.  }
+\label{fig:scc-graph}
+\end{figure}
+
+Typing the following command line:
 \begin{verbatim}
-KaSa protein2x2.ka --reset-all --compute-local-traces
+KaSa scc_abc.ka --reset-all --compute-potential-cycles
 \end{verbatim}
+will generate the contact map that is given Fig.~\ref{fig:cm-scc-abc}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4cm]{generated_img/scc_abc_contact.png}
+\caption{The contact map for the model \texttt{scc\_abc.ka} with information about potential polymers. Every bond is drawed in red, since the analysis cannot bound their number of occurrences in paths in reachable bio-molecular compounds.}
+\label{fig:cm-scc-abc}
+\end{figure}
+
+The accuracy of the detection of polymers may be tuned in two ways.
+Firstly, it is parameterized of the accuracy of the contact map. Secondly, it may be refined by the reachability analysis in order to discard the couple of bonds that cannot be present successively in reachable bio-molecular compounds.
+
+The file \texttt{scc\_relations.ka} contains the following model:
+\begin{lstlisting}[language=kappa]
+%agent: A(x,y)
+%agent: B(x,y)
+
+A(x[.],y[.]),B(y[.]) -> A(x[.],y[1]),B(y[1]) @1
+A(x[.],y[.]),B(x[.]) -> A(x[1],y[.]),B(x[1]) @1
+
+%init: 10 A()
+%init: 10 B()
+\end{lstlisting}
+
+In this model, the sites $x$ and $y$ of a given instance of the agent $A$ cannot be bound simultaneously. This prevents the formation of polymers.
+
+By default, the detection of polymers is using the result of the reachability analysis. Thus, the following instruction:
+\begin{verbatim}
+  KaSa --reset-all --compute-potential-cycles scc_relations.ka
+\end{verbatim}
+produces the contact map that is drawed in Fig.~\ref{fig:scc-relations-high}.
+By default, the detection of polymers has used the result of the reachability analysis: since the bonds on the site $x$ and $y$ of each instance of the agent $A$ are mutually exclusive, no polymer can be formed.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=4cm]{generated_img/scc_relations_contact_high.png}
+\caption{The contact map for the model \texttt{scc\_relations.ka} with information about potential polymers. Since the bonds on the sites of $A$ are mutually exclusive, no polymer may be formed. This is infered by the analysis (no bond is colored in red).}
+\label{fig:scc-relations-high}
+\end{figure}
+
+The refinement by the result of the reachability analysis can be disable by using the following instruction:
+\begin{verbatim}
+KaSa --reset-all --compute-potential-cycles \
+   --polymer-detection-accuracy-level Low scc_relations.ka
+\end{verbatim}
+In this case, {\KaSa} produces the contact map that is given in Fig.~\ref{fig:scc-relations-low}. The analysis does know that the bonds of the sites of each agent of type $A$ are mutually exclusive. The bonds are drawed in red to warn about the potential formation of polymers of the model (this is a false alarm).
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4cm]{generated_img/scc_relations_contact_low.png}
+\caption{The contact map for the model \texttt{scc\_relations.ka} with information about potential polymers. Since the bonds on the sites of $A$ are mutually exclusive, no polymer may be formed. This is infered by the analysis (no bond is colored in red).}
+\label{fig:scc-relations-low}
+\end{figure}
+
+
+To be continued... deal with asymetric dimerization that depends on the double bonds domain.
 
 \section{Influence map}
 
@@ -2102,13 +2168,13 @@ Typing the following command line:
 
 will produce a dot format file named \texttt{influence.dot}.
 The name of the output file and the directory can be changed thanks to the command line options \texttt{-{}-output-influence-map} and \texttt{-{}-output-directory}.
-The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the sub-tab \texttt{Influence map} of the graphical interface (see Fig.~\ref{fig:kasa:4}). Two formats are available for the output: influence map can be generated in DOT or HTML format. The format can be choosen thanks to the command line option \texttt{-{}-influence-map-format}.
+The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the sub-tab \texttt{Influence map} of the graphical interface (see Fig.~\ref{fig:kasa:5}). Two formats are available for the output: influence map can be generated in DOT or HTML format. The format can be choosen thanks to the command line option \texttt{-{}-influence-map-format}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm]{img/kasa_6.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Influence map}.}
-\label{fig:kasa:4}
+\label{fig:kasa:5}
 \end{figure}
 
 Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor the quantities in initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise they are made of a unique identifier allocated by \KaSa~followed by the Kappa definition of the rule/observable.
