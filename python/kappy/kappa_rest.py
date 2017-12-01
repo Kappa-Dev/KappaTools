@@ -158,7 +158,7 @@ class KappaRest(KappaApi):
         return self._get(sub_url)
 
     def simulation_DIN(self, DIN_id):
-        return self._get(self.in_project('simulation', 'fluxmaps', DIN_id))
+        return self._get(self.in_project('simulation', 'DIN', DIN_id))
 
     def simulation_log_messages(self):
         return self._get(self.in_project('simulation', 'logmessages'))
@@ -178,7 +178,7 @@ class KappaRest(KappaApi):
         return self._get(self.in_project('simulation', 'file_lines'))
 
     def simulation_DINs(self):
-        return self._get(self.in_project('simulation', 'fluxmaps'))
+        return self._get(self.in_project('simulation', 'DIN'))
 
     def simulation_snapshots(self):
         return self._get(self.in_project('simulation', 'snapshots'))

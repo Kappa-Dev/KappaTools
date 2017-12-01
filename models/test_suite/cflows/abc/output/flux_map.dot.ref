@@ -1,4 +1,4 @@
-digraph G{ label="Flux map" ; labelloc="t" ; node [shape=box,style=filled,fillcolor=lightskyblue]
+digraph G{ label="Dynamic influence network" ; labelloc="t" ; node [shape=box,style=filled,fillcolor=lightskyblue]
 "a.b" -> "a.b" [weight=73,label="-73.314",color=red3,arrowhead=tee];
 "a.b" -> "a.b_op" [weight=44,label="44.300",color=green3,arrowhead=normal];
 "a.b" -> "ab.c" [weight=427,label="427.228",color=green3,arrowhead=normal];

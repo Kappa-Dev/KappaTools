@@ -196,7 +196,7 @@ class KappaStd(KappaApi):
         return self._dispatch("SimulationDetailFileLine", file_line_id)
 
     def simulation_DIN(self, DIN_id):
-        return self._dispatch("SimulationDetailFluxMap", DIN_id)
+        return self._dispatch("SimulationDetailDIN", DIN_id)
 
     def simulation_log_messages(self):
         return self._dispatch("SimulationDetailLogMessage")
@@ -218,7 +218,7 @@ class KappaStd(KappaApi):
         return self._dispatch("SimulationCatalogFileLine")
 
     def simulation_DINs(self):
-        return self._dispatch("SimulationCatalogFluxMap")
+        return self._dispatch("SimulationCatalogDIN")
 
     def simulation_snapshots(self):
         return self._dispatch("SimulationCatalogSnapshot")
