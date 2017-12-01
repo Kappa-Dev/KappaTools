@@ -211,6 +211,7 @@ let print_html_flux_map desc flux =
        Format.fprintf
          f "stroke: #000;@ stroke-width: .5px;@ }@]@,</style>")
     (fun f ->
+       let () = Format.fprintf f "<div id=\"flux_container\"></div>@," in
        let () = Format.fprintf f "@[<hv 2><form>@," in
        let () = Format.fprintf f "@[<v 2><div class=\"form-group\">@," in
        let () =

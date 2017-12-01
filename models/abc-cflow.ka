@@ -48,4 +48,4 @@ A(x[.],c[.]),C(x1{p}[.],x2{p}[.]) @ 'mod_rate' //A modifies x2
 
 %def: "cflowFileName" "abc-flow"
 %def: "displayCompression" "none" "weak" "strong"
-%def: "dotCflows" "false"
+%def: "dotCflows" "html"

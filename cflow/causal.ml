@@ -590,6 +590,7 @@ let html_of_grid profiling compression_type cpt env enriched_grid =
            f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
        Format.fprintf f "@]@,</style>")
     (fun f ->
+       let () = Format.fprintf f "<svg width=\"960\"><g></g></svg>@," in
        let () = Format.fprintf f "<p>@[%t@]</p>@," profiling in
        Format.fprintf
          f "@[<v 2><script>@,%t@]@,</script>"

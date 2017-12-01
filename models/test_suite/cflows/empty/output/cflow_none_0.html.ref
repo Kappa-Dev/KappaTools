@@ -16,7 +16,7 @@
 <body>
   <div class="container">
   <h1>none compressed story number 0</h1>
-  <div id="flux_container"></div>
+  <svg width="960"><g></g></svg>
   <p><dl>
        <dt>Compression of</dt><dd>3 causal flows</dd>
        <dt>obtained in average at</dt><dd>4.570933E+00 t.u</dd>
