@@ -35,5 +35,5 @@
 %mod: [true] do $TRACK 'Cpu' [true];
 %mod: [true] do $TRACK 'Cpp' [true];
 
-%mod: [true] do $FLUX "flux_map.dot" [true];
-%mod: [E] = [Emax] - 1 do $FLUX "flux_map.dot" [false];
+%mod: [true] do $DIN "flux_map.dot" [true];
+%mod: [E] = [Emax] - 1 do $DIN "flux_map.dot" [false];

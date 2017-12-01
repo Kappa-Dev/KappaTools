@@ -33,8 +33,8 @@
 /*0*/%mod: [true] do $TRACK C(x1{u} x2{u}) [true]; repeat [false]
 /*1*/%mod: [true] do $TRACK C(x1{p} x2{u}) [true]; repeat [false]
 /*2*/%mod: [true] do $TRACK C(x1{p} x2{p}) [true]; repeat [false]
-/*3*/%mod: [true] do $FLUX "flux_map.dot" "absolute" [true]; repeat [false]
-/*4*/%mod: ([E] = 1999) do $FLUX "flux_map.dot" [false]; $APPLY 10000 C(x1{p}[#] x2{p}[#])-; repeat [false]
+/*3*/%mod: [true] do $DIN "flux_map.dot" "absolute" [true]; repeat [false]
+/*4*/%mod: ([E] = 1999) do $DIN "flux_map.dot" [false]; $APPLY 10000 C(x1{p}[#] x2{p}[#])-; repeat [false]
 
 %init: n_ab A(x[.] c[.]), B(x[.])
 %init: n_c C(x1{u}[.] x2{u}[.])

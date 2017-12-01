@@ -9,8 +9,8 @@
 %var: 'DIM_tick' 0
 %var: 'DIM_clock' 0
 %mod: [T] > 'DIM_clock' && 'DIM_tick' > 'DIM_length' - 1 do
- $FLUX "flux_".'DIM_tick' - 'DIM_length'.".json" [false]; repeat [true]
-%mod: [T] > 'DIM_clock' do $FLUX "flux_".'DIM_tick'.".json" [true];
+ $DIN "flux_".'DIM_tick' - 'DIM_length'.".json" [false]; repeat [true]
+%mod: [T] > 'DIM_clock' do $DIN "flux_".'DIM_tick'.".json" [true];
  repeat ('DIM_tick' + 'DIM_length' + 1) * 'DIM_beat' < [Tmax]
 %mod: [T] > 'DIM_clock' do
   $UPDATE 'DIM_clock' 'DIM_clock' + 'DIM_beat';

@@ -146,6 +146,10 @@ Beware: the second condition is the negation of the old until clause.
 I.e. it is a _repeat as long as_ rather than the old _repeat until this
 is true_.
 
+### $FLUX has become $DIN
+DIN stands for _Dynamic Influence Network_ which is a more accurate name
+for what this modification generates
+
 ### Syntax of $PRINTF has changed
 The new syntax allows one to redirect output to a file.
 

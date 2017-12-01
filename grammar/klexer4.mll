@@ -128,7 +128,7 @@ rule token = parse
     | "ADD" -> INTRO
     | "SNAPSHOT" -> SNAPSHOT
     | "STOP" -> STOP
-    | "FLUX" -> FLUX
+    | "DIN" -> FLUX
     | "TRACK" -> TRACK
     | "UPDATE" -> ASSIGN
     | "PRINT" -> PRINTF

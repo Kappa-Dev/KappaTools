@@ -96,5 +96,5 @@ I can then obtain the rate of degradation.*/
 %mod: alarm 550 do $UPDATE 'r_APC\' 5;
 //%def: "storeUnaryDistance" "true"
 
-%mod: [T] > 110 do $FLUX "lol.json" [true];
-%mod: [T] > 160 do $FLUX "lol.json" [false];
+%mod: [T] > 110 do $DIN "lol.json" [true];
+%mod: [T] > 160 do $DIN "lol.json" [false];

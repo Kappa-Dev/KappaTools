@@ -1039,7 +1039,7 @@ and syntactic sugar detailed below is provided.
     && | \textit{token\_name} \tcb{<-} \textit{algebraic\_expression} \\
     && | \tcb{\$SNAPSHOT} \textit{string\_expression}\\
     && | \tcb{\$STOP} \textit{string\_expression}\\
-	&& | \tcb{\$FLUX} \textit{string\_expression} \textit{boolean} \\
+	&& | \tcb{\$DIN} \textit{string\_expression} \textit{boolean} \\
     && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
     && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
     && | \tcb{\$PLOTENTRY} \\
@@ -1456,21 +1456,42 @@ The first line is a declaration of an $x$ variable that is initially set to 0. N
 The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$).
 
 
-\subsection{Dynamic influence map}
+\subsection{Dynamic influence network}\label{sec:flux}
 
 \begin{figure}[p] %  figure placement: here, top, bottom, or page
    \centering
 \includegraphics[width=15cm]{generated_img/flux.png}
-   \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. The \ttt{A} releasing rules \ttt{a..b} and \ttt{mod x2} are contributing very little to the activity of \ttt{a.c} which is a sign of an excess of free \ttt{A}s in the system at this time interval.}
+   \caption{Dynamic influence network of the \ttt{abc.ka} model, taken
+     from t=0 to t=20 time units. The \ttt{A} releasing rules
+     \ttt{a..b} and \ttt{mod x2} are contributing very little to the
+     activity of \ttt{a.c} which is a sign of an excess of free
+     \ttt{A}s in the system at this time interval.}
    \label{fig:flux}
 \end{figure}
 %%
-The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. It is dynamically generated and tracks effective impacts (positive or negative) at every rule application. The flux map can be computed using declaration\index{declaration}s of the form:
+The \emph{dynamic influence network (DIN)}\index{dynamic influence network}\index{DIN}
+is a powerful observation that tracks, on the fly, the influence that
+rule applications have on each others. It is dynamically generated and
+tracks effective impacts (positive or negative) at every rule
+application. The DIN can be computed using
+declaration\index{declaration}s of the form:
 \begin{lstlisting}[language=kappa]
-%mod: [true] do $FLUX "flux.dot" [true]
-%mod: [T]>20 do $FLUX "flux.dot" [false]
+%mod: [true] do $DIN "flux.dot" [true]
+%mod: [T]>20 do $DIN "flux.dot" [false]
 \end{lstlisting}
-The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that, the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produces a flux map that is shown in  Fig.~\ref{fig:flux}. Note that, flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
+The result is a graph where a positive edge between
+rules $r$ and $s$ (in green) indicates an overall positive
+contribution of $r$ over $s$. Otherwise, the sum of $r$ applications
+increased the activity\index{activity} of $s$. Conversely, a negative
+edge (in red) will indicate that $r$ had an overall negative impact on
+the activity\index{activity} of $s$. Note that, the importance of the
+influence between two rules can be observed by looking at the label on the
+edges that indicate the overall activity transfer (positive or
+negative) between the rules. The above declaration\index{declaration}
+produces the network shown in Fig.~\ref{fig:flux}. Note that,
+influence may vary during time, therefore the time or event limit of the
+simulation is of importance and will likely change the aspect of the
+produced map.
 
 \subsection{Print species of an observable}
 The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each time a new instance of the observable appears, the \emph{species} in which it occured is printed in a file. For example:
@@ -2233,7 +2254,7 @@ The directory is assumed to exist. The file will be overwritten if it exists.  A
 \label{fig:kasa:5}
 \end{figure}
 
-Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor the quantities in initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise they are made of a unique identifier allocated by \KaSa~followed by the Kappa definition of the rule/observable.
+Unlike the \emph{dynamic} influence network, the influence map is \emph{statically} computed and does not depend on kinetic rates nor the quantities in initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise they are made of a unique identifier allocated by \KaSa~followed by the Kappa definition of the rule/observable.
 Edges are decorated with the list of embeddings (separated by a semi-colon) allowing the identification of agents in both rules' right hand sides/left hand sides.
 More precisely, for positive influences,  the notation $[i\rar j]$ denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s right hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side and the notation $[i\star \rar j]$ denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side; for negative influences,  the notation $[i\rar j]$ denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s left hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side and the notation $[i\star \rar j]$ denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side;
  Observables have no influence, but they can be influenced by rules, if the rule can increase or decrease their value.

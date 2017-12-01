@@ -26,5 +26,5 @@
 %init: 1000 A(),B()
 %init: 10000 C() 
 
-%mod: [true] do $FLUX "flux.dot" [true]
-%mod: [T]>20 do $FLUX "flux.dot" [false]
+%mod: [true] do $DIN "flux.dot" [true]
+%mod: [T]>20 do $DIN "flux.dot" [false]

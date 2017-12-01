@@ -1,11 +1,11 @@
 \lstdefinelanguage{kappa}{
-	alsoletter={\%,:,-,<,>,@,/,!,~},
+	alsoletter={\%,:,-,<,>,@,/},
 	morekeywords=[1]{\%agent\:, \%token\:, \%var\:, \%obs\:},
 	morekeywords=[2]{\%init\:},
-	morekeywords=[3]{\%mod\:, \%def\:, \$ADD, \$DEL, \$SNAPSHOT, \$STOP, \$FLUX, \$TRACK, \$UPDATE, \$PLOTENTRY, \$PRINT},
-	morekeywords=[4]{->, <->, @, /!, /~, alarm, do, repeat},
+	morekeywords=[3]{\%mod\:, \%def\:, \$ADD, \$DEL, \$APPLY, \$SNAPSHOT, \$STOP, \$DIN, \$TRACK, \$UPDATE, \$PLOTENTRY, \$PRINT},
+	morekeywords=[4]{->, <->, @, alarm, do, repeat},
 	morestring=[b]{'},
-	morecomment=[l]{\#}
+	morecomment=[l]{//}
         morecomment=[n]{/*}{*/}
 }
 \lstset{	

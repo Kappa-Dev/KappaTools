@@ -27,5 +27,5 @@
 %init: 1000 A(),B()
 %init: 10000 C()
 
-%mod: [true] do $FLUX "flux.html" [true];
-%mod: [T]>20 do $FLUX "flux.html" [false];
+%mod: [true] do $DIN "flux.html" [true];
+%mod: [T]>20 do $DIN "flux.html" [false];

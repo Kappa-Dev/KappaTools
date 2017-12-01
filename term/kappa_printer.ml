@@ -140,13 +140,13 @@ let modification ?env f m =
     Format.fprintf f "$STOP %a" (print_expr ?env) fn
   | Primitives.FLUX (kind,fn) ->
     Format.fprintf
-      f "$FLUX %a %t[true]" (print_expr ?env) fn
+      f "$DIN %a %t[true]" (print_expr ?env) fn
       (fun f -> match kind with
          | Primitives.ABSOLUTE -> Format.fprintf f "\"absolute\" "
          | Primitives.RELATIVE -> ()
          | Primitives.PROBABILITY -> Format.fprintf f "\"probability\" ")
   | Primitives.FLUXOFF fn ->
-    Format.fprintf f "$FLUX %a [false]" (print_expr ?env) fn
+    Format.fprintf f "$DIN %a [false]" (print_expr ?env) fn
   | Primitives.CFLOW (_name,cc,_) ->
     Format.fprintf
       f "$TRACK @[%a@] [true]"

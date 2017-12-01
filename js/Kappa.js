@@ -8,7 +8,7 @@ CodeMirror.defineSimpleMode("Kappa", {
       {regex: /\/\/(.*)/, token: "comment"},
       {regex: /(\%agent:|\%def:|\%var:|\%plot:|\%obs:|\%init:|\%mod:|\%token:|do|repeat|alarm)\s/,
        token: "keyword"},
-      {regex: /(\$ADD|\$DEL|\$SNAPSHOT|\$STOP|\$FLUX|\$TRACK|\$UPDATE|\$PRINT)\b/,
+      {regex: /(\$ADD|\$DEL|\$SNAPSHOT|\$STOP|\$DIN|\$TRACK|\$UPDATE|\$PRINT)\b/,
        token: "variable-2"},
       {regex: /(\[not\]|\[log\]|\[sin\]|\[cos\]|\[tan\]|\[sqrt\]|\[mod\]|\[exp\]|\[int\]|INF)/,
        token: "atom"},
