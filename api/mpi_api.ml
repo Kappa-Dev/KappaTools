@@ -52,9 +52,9 @@ let on_message
   | `SimulationDetailFileLine file_line_id ->
     (manager#simulation_detail_file_line file_line_id) >>=
     (handler (fun result -> `SimulationDetailFileLine result))
-  | `SimulationDetailFluxMap flux_map_id ->
-    (manager#simulation_detail_flux_map flux_map_id) >>=
-    (handler (fun result -> `SimulationDetailFluxMap result))
+  | `SimulationDetailDIN din_id ->
+    (manager#simulation_detail_din din_id) >>=
+    (handler (fun result -> `SimulationDetailDIN result))
   | `SimulationDetailLogMessage ->
     manager#simulation_detail_log_message >>=
     (handler (fun result -> `SimulationDetailLogMessage result))
@@ -73,9 +73,9 @@ let on_message
   | `SimulationCatalogFileLine ->
     manager#simulation_catalog_file_line >>=
     (handler (fun result -> `SimulationCatalogFileLine result))
-  | `SimulationCatalogFluxMap ->
-    manager#simulation_catalog_flux_map >>=
-    (handler (fun result -> `SimulationCatalogFluxMap result))
+  | `SimulationCatalogDIN ->
+    manager#simulation_catalog_din >>=
+    (handler (fun result -> `SimulationCatalogDIN result))
   | `SimulationCatalogSnapshot ->
     manager#simulation_catalog_snapshot >>=
     (handler (fun result -> `SimulationCatalogSnapshot result))
@@ -225,13 +225,13 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
 
-    method simulation_detail_flux_map
-      (flux_map_id : Api_types_j.flux_map_id) :
-      Api_types_j.flux_map Api.result Lwt.t =
-      self#message (`SimulationDetailFluxMap flux_map_id) >>=
+    method simulation_detail_din
+      (flux_map_id : Api_types_t.din_id) :
+      Api_types_t.din Api.result Lwt.t =
+      self#message (`SimulationDetailDIN flux_map_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationDetailFluxMap flux_map ->
+            | `SimulationDetailDIN flux_map ->
               Lwt.return (Api_common.result_ok flux_map)
             | response ->
               Lwt.return
@@ -311,12 +311,12 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_catalog_flux_map :
-      Api_types_j.flux_map_catalog Api.result Lwt.t =
-      self#message `SimulationCatalogFluxMap >>=
+    method simulation_catalog_din :
+      Api_types_j.din_catalog Api.result Lwt.t =
+      self#message `SimulationCatalogDIN >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationCatalogFluxMap info ->
+            | `SimulationCatalogDIN info ->
               Lwt.return (Api_common.result_ok info)
             | response ->
               Lwt.return

@@ -83,30 +83,30 @@ val print_expr_of_yojson :
   (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> ('a,'b) Alg_expr.e print_expr
 
-type flux_kind = ABSOLUTE | RELATIVE | PROBABILITY
+type din_kind = ABSOLUTE | RELATIVE | PROBABILITY
 
-val flux_kind_to_yojson : flux_kind -> Yojson.Basic.json
-val flux_kind_of_yojson : Yojson.Basic.json -> flux_kind
+val din_kind_to_yojson : din_kind -> Yojson.Basic.json
+val din_kind_of_yojson : Yojson.Basic.json -> din_kind
 
-val write_flux_kind :
-  Bi_outbuf.t -> flux_kind -> unit
-  (** Output a JSON value of type {!flux_kind}. *)
+val write_din_kind :
+  Bi_outbuf.t -> din_kind -> unit
+  (** Output a JSON value of type {!din_kind}. *)
 
-val string_of_flux_kind :
-  ?len:int -> flux_kind -> string
-  (** Serialize a value of type {!flux_kind}
+val string_of_din_kind :
+  ?len:int -> din_kind -> string
+  (** Serialize a value of type {!din_kind}
       into a JSON string.
       @param len specifies the initial length
                  of the buffer used internally.
                  Default: 1024. *)
 
-val read_flux_kind :
-  Yojson.Safe.lexer_state -> Lexing.lexbuf -> flux_kind
-  (** Input JSON data of type {!flux_kind}. *)
+val read_din_kind :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> din_kind
+  (** Input JSON data of type {!din_kind}. *)
 
-val flux_kind_of_string :
-  string -> flux_kind
-  (** Deserialize JSON data of type {!flux_kind}. *)
+val din_kind_of_string :
+  string -> din_kind
+  (** Deserialize JSON data of type {!din_kind}. *)
 
 type modification =
   | ITER_RULE of alg_expr Locality.annot * elementary_rule
@@ -116,7 +116,7 @@ type modification =
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
   (** First string is the named used by the user *)
-  | DIN of flux_kind * alg_expr print_expr list
+  | DIN of din_kind * alg_expr print_expr list
   | DINOFF of alg_expr print_expr list
   | CFLOWOFF of string option * Pattern.id array
   | PLOTENTRY

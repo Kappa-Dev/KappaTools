@@ -60,7 +60,7 @@ type t =
     log_form : Format.formatter ;
     mutable plot : Data.plot ;
     mutable snapshots : Data.snapshot list ;
-    mutable flux_maps : Data.flux_map list ;
+    mutable dins : Data.din list ;
     mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Api_types_t.errors ;
@@ -82,7 +82,7 @@ let create_t ~log_form ~log_buffer ~contact_map
   pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
   plot = Data.init_plot env;
   snapshots = [];
-  flux_maps = [];
+  dins = [];
   species = Mods.StringMap.empty;
   files = Mods.StringMap.empty;
   error_messages = [];
@@ -100,7 +100,7 @@ let reinitialize random_state t =
   t.pause_condition <- Alg_expr.FALSE;
   t.plot <- Data.init_plot t.env ;
   t.snapshots <- [];
-  t.flux_maps <- [];
+  t.dins <- [];
   t.files <- Mods.StringMap.empty;
   t.error_messages <- [];
   t.graph <- Rule_interpreter.empty
@@ -201,7 +201,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                  | Data.Log s ->
                    Format.fprintf log_form "%s@." s
                  | Data.Snapshot _
-                 | Data.Flux _
+                 | Data.DIN _
                  | Data.Species _
                  | Data.DeltaActivities _
                  | Data.Plot _
@@ -250,8 +250,8 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
 
 let outputs (simulation : t) =
   function
-  | Data.Flux flux_map ->
-    simulation.flux_maps <- flux_map::simulation.flux_maps
+  | Data.DIN flux_map ->
+    simulation.dins <- flux_map::simulation.dins
   | Data.DeltaActivities _ -> assert false
   | Data.Plot new_observables ->
     simulation.plot <- Data.add_plot_line new_observables simulation.plot
@@ -279,7 +279,7 @@ let interactive_outputs formatter t = function
   | Data.Log s -> Format.fprintf formatter "%s@." s
   | Data.Print file_line when file_line.Data.file_line_name = None ->
     Format.fprintf formatter "%s@." file_line.Data.file_line_text
-  | Data.Flux _ | Data.DeltaActivities _ | Data.Plot _ | Data.Species _ |
+  | Data.DIN _ | Data.DeltaActivities _ | Data.Plot _ | Data.Species _ |
     Data.Print _ | Data.Snapshot _ | Data.TraceStep _ as v -> outputs t v
 
 let parse
@@ -583,8 +583,8 @@ let outputs
          Lwt.return (Result_util.ok {
              Api_types_t.simulation_output_plot =
                Some t.plot ;
-             Api_types_t.simulation_output_flux_maps =
-               t.flux_maps ;
+             Api_types_t.simulation_output_dins =
+               t.dins ;
              Api_types_t.simulation_output_file_lines =
                t.files ;
              Api_types_t.simulation_output_snapshots =

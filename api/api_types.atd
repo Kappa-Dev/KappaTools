@@ -75,10 +75,10 @@ type plot_parameter = plot_limit
 type plot <ocaml module="Data"> = abstract
 
 (* flux *)
-type flux_map_id = string
-type flux_map <ocaml module="Data"> = abstract
+type din_id = string
+type din <ocaml module="Data"> = abstract
 
-type flux_map_catalog = { flux_map_ids : flux_map_id list }
+type din_catalog = { din_ids : din_id list }
 
 (* file line *)
 type file_line <ocaml predef module="Data"> =
@@ -100,10 +100,10 @@ type simulation_state = [ Running
                         | Paused
                         | Stopped ]
 
-type ('plot,'flux_maps,'file_lines,'snapshots,'log_messages)
+type ('plot,'dins,'file_lines,'snapshots,'log_messages)
      simulation_output
      = { simulation_output_plot : 'plot ;
-         simulation_output_flux_maps : 'flux_maps ;
+         simulation_output_dins : 'dins ;
          simulation_output_file_lines : 'file_lines ;
          simulation_output_snapshots : 'snapshots;
          simulation_output_log_messages : 'log_messages; }

@@ -101,7 +101,7 @@ type ('pattern,'mixture,'id,'rule) modif_expr =
   | CFLOWLABEL of (bool * string Locality.annot)
   | CFLOWMIX of (bool * 'pattern Locality.annot)
   | DIN of
-      Primitives.flux_kind * ('pattern,'id) Alg_expr.e Primitives.print_expr list
+      Primitives.din_kind * ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | DINOFF of ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | SPECIES_OF of
       (bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
@@ -757,7 +757,7 @@ let modif_to_json filenames f_mix f_var = function
     `List [ `String "CFLOW"; `Bool b;
             Locality.annot_to_yojson ~filenames f_mix m ]
   | DIN (b,file) ->
-    `List [ `String "DIN"; Primitives.flux_kind_to_yojson b;
+    `List [ `String "DIN"; Primitives.din_kind_to_yojson b;
             JsonUtil.of_list
               (Primitives.print_expr_to_yojson ~filenames f_mix f_var) file]
   | DINOFF file ->
@@ -800,7 +800,7 @@ let modif_of_json filenames f_mix f_var = function
   | `List [ `String "CFLOW"; `Bool b; m ] ->
      CFLOWMIX (b, Locality.annot_of_yojson ~filenames f_mix m)
   | `List [ `String "DIN"; b; file ] ->
-    DIN (Primitives.flux_kind_of_yojson b,
+    DIN (Primitives.din_kind_of_yojson b,
           JsonUtil.to_list
             (Primitives.print_expr_of_yojson ~filenames f_mix f_var) file)
   | `List (`String "DINOFF" :: file) ->

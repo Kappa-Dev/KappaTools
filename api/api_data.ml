@@ -1,6 +1,6 @@
 type simulation_detail_output =
   (Api_types_t.plot option,
-   Api_types_t.flux_map list,
+   Api_types_t.din list,
    string list Mods.StringMap.t,
    Api_types_t.snapshot list,
    string)
@@ -35,8 +35,8 @@ let api_simulation_status
         (match detail.Api_types_t.simulation_output_plot with
         | None -> 0
         | Some plot -> List.length plot.Data.plot_series);
-      Api_types_t.simulation_output_flux_maps =
-        List.length detail.Api_types_t.simulation_output_flux_maps ;
+      Api_types_t.simulation_output_dins =
+        List.length detail.Api_types_t.simulation_output_dins ;
       Api_types_t.simulation_output_file_lines =
         Mods.StringMap.size detail.Api_types_t.simulation_output_file_lines ;
       Api_types_t.simulation_output_snapshots =

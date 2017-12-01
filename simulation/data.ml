@@ -103,79 +103,79 @@ let string_of_snapshot = JsonUtil.string_of_write write_snapshot
 let snapshot_of_string s =
   read_snapshot (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
-type flux_data = {
-  flux_name : string;
-  flux_kind : Primitives.flux_kind;
-  flux_start : float;
-  flux_hits : int array;
-  flux_fluxs : float array array;
+type din_data = {
+  din_name : string;
+  din_kind : Primitives.din_kind;
+  din_start : float;
+  din_hits : int array;
+  din_fluxs : float array array;
 }
-type flux_map = {
-  flux_rules : string array;
-  flux_data : flux_data;
-  flux_end : float;
+type din = {
+  din_rules : string array;
+  din_data : din_data;
+  din_end : float;
 }
 
-let write_flux_map ob f =
+let write_din ob f =
   let () = Bi_outbuf.add_char ob '{' in
   let () = JsonUtil.write_field
-      "flux_name" Yojson.Basic.write_string ob f.flux_data.flux_name in
+      "din_name" Yojson.Basic.write_string ob f.din_data.din_name in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field
-      "flux_kind" Primitives.write_flux_kind ob f.flux_data.flux_kind in
+      "din_kind" Primitives.write_din_kind ob f.din_data.din_kind in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field
-      "flux_start" Yojson.Basic.write_float ob f.flux_data.flux_start in
+      "din_start" Yojson.Basic.write_float ob f.din_data.din_start in
   let () = JsonUtil.write_comma ob in
-  let () = JsonUtil.write_field "flux_end"
-      Yojson.Basic.write_float ob f.flux_end in
+  let () = JsonUtil.write_field "din_end"
+      Yojson.Basic.write_float ob f.din_end in
   let () = JsonUtil.write_comma ob in
-  let () = JsonUtil.write_field "flux_rules"
-      (JsonUtil.write_array Yojson.Basic.write_string) ob f.flux_rules in
+  let () = JsonUtil.write_field "din_rules"
+      (JsonUtil.write_array Yojson.Basic.write_string) ob f.din_rules in
   let () = JsonUtil.write_comma ob in
-  let () = JsonUtil.write_field "flux_hits"
-      (JsonUtil.write_array Yojson.Basic.write_int) ob f.flux_data.flux_hits in
+  let () = JsonUtil.write_field "din_hits"
+      (JsonUtil.write_array Yojson.Basic.write_int) ob f.din_data.din_hits in
   let () = JsonUtil.write_comma ob in
-  let () = JsonUtil.write_field "flux_fluxs"
+  let () = JsonUtil.write_field "din_fluxs"
       (JsonUtil.write_array (JsonUtil.write_array Yojson.Basic.write_float))
-      ob f.flux_data.flux_fluxs in
+      ob f.din_data.din_fluxs in
   Bi_outbuf.add_char ob '}'
 
-let read_flux_map p lb =
+let read_din p lb =
   let
-    (flux_name,flux_kind,flux_start,flux_hits,flux_fluxs,flux_rules,flux_end) =
+    (din_name,din_kind,din_start,din_hits,din_fluxs,din_rules,din_end) =
     Yojson.Basic.read_fields
       (fun (n,k,s,h,f,r,e) key p lb ->
-         if key = "flux_name" then (Yojson.Basic.read_string p lb,k,s,h,f,r,e)
-         else if key = "flux_kind" then
-           (n,Primitives.read_flux_kind p lb,s,h,f,r,e)
-         else if key = "flux_start" then
+         if key = "din_name" then (Yojson.Basic.read_string p lb,k,s,h,f,r,e)
+         else if key = "din_kind" then
+           (n,Primitives.read_din_kind p lb,s,h,f,r,e)
+         else if key = "din_start" then
            (n,k,Yojson.Basic.read_number p lb,h,f,r,e)
-         else if key = "flux_hits" then
+         else if key = "din_hits" then
            (n,k,s,Yojson.Basic.read_array Yojson.Basic.read_int p lb,f,r,e)
-         else if key = "flux_fluxs" then
+         else if key = "din_fluxs" then
            (n,k,s,h,Yojson.Basic.read_array
               (Yojson.Basic.read_array Yojson.Basic.read_number) p lb,r,e)
-         else if key = "flux_end" then
+         else if key = "din_end" then
            (n,k,s,h,f,r,Yojson.Basic.read_number p lb)
-         else let () = assert (key = "flux_rules") in
+         else let () = assert (key = "din_rules") in
            (n,k,s,h,f,Yojson.Basic.read_array Yojson.Basic.read_string p lb,e))
       ("",Primitives.ABSOLUTE,nan,[||],[||],[||],nan) p lb in
-  { flux_rules;flux_end;
-    flux_data={ flux_name;flux_kind;flux_start;flux_hits;flux_fluxs } }
+  { din_rules;din_end;
+    din_data={ din_name;din_kind;din_start;din_hits;din_fluxs } }
 
-let string_of_flux_map = JsonUtil.string_of_write write_flux_map
+let string_of_din = JsonUtil.string_of_write write_din
 
-let flux_map_of_string s =
-  read_flux_map (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let din_of_string s =
+  read_din (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
-let print_dot_flux_map ?uuid desc flux =
+let print_dot_din ?uuid desc flux =
   let () = Format.fprintf desc "@[<v>%a"
       (Pp.option ~with_space:false
          (fun f x -> Format.fprintf f "// \"uuid\" : \"%i\",@," x))
          uuid in
   let () = Format.fprintf
-      desc "digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
+      desc "digraph G{ label=\"Dynamic influence network\" ; labelloc=\"t\" ; " in
   let () = Format.fprintf
       desc "node [shape=box,style=filled,fillcolor=lightskyblue]@," in
   let () =
@@ -192,13 +192,13 @@ let print_dot_flux_map ?uuid desc flux =
                 Format.fprintf
                   f
                   "@[<h>\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
-                  flux.flux_rules.(s)
-                  flux.flux_rules.(d)
+                  flux.din_rules.(s)
+                  flux.din_rules.(d)
                   (abs (int_of_float v)) v color arrowhead))
-      desc flux.flux_data.flux_fluxs in
+      desc flux.din_data.din_fluxs in
   Format.fprintf desc "}@]@."
 
-let print_html_flux_map desc flux =
+let print_html_din desc flux =
   Pp_html.graph_page
     (fun f -> Format.pp_print_string f "Dynamic influence map")
     ~subtitle:(fun f -> Format.pp_print_string
@@ -243,7 +243,7 @@ let print_html_flux_map desc flux =
 
        let () = Format.fprintf
            f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %s;@]@,"
-           (string_of_flux_map flux) in
+           (string_of_din flux) in
        let () = Format.fprintf f "var ids = {@[@," in
        let () = Format.fprintf f "\"beginTimeId\" : \"begin_time\",@ " in
        let () = Format.fprintf f "\"endTimeId\" : \"end_time\",@ " in
@@ -331,7 +331,7 @@ type file_line = {
 }
 
 type t =
-  | Flux of flux_map
+  | DIN of din
   | DeltaActivities of int * (int * (float * float)) list
   | Plot of Nbr.t array (** Must have length >= 1 (at least [T] or [E]) *)
   | Print of file_line

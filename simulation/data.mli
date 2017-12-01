@@ -14,17 +14,17 @@ type snapshot = {
   snapshot_tokens : (string * Nbr.t) array;
 }
 
-type flux_data = {
-  flux_name : string;
-  flux_kind : Primitives.flux_kind;
-  flux_start : float;
-  flux_hits : int array;
-  flux_fluxs : float array array;
+type din_data = {
+  din_name : string;
+  din_kind : Primitives.din_kind;
+  din_start : float;
+  din_hits : int array;
+  din_fluxs : float array array;
 }
-type flux_map = {
-  flux_rules : string array;
-  flux_data : flux_data;
-  flux_end : float;
+type din = {
+  din_rules : string array;
+  din_data : din_data;
+  din_end : float;
 }
 
 type file_line = {
@@ -33,7 +33,7 @@ type file_line = {
 }
 
 type t =
-  | Flux of flux_map
+  | DIN of din
   | DeltaActivities of int * (int * (float * float)) list
   | Plot of Nbr.t array (** Must have length >= 1 (at least [T] or [E]) *)
   | Print of file_line
@@ -66,25 +66,25 @@ val snapshot_of_string :
   string -> snapshot
   (** Deserialize JSON data of type {!snapshot}. *)
 
-val print_dot_flux_map : ?uuid: int -> Format.formatter -> flux_map -> unit
+val print_dot_din : ?uuid: int -> Format.formatter -> din -> unit
 
-val print_html_flux_map : Format.formatter -> flux_map -> unit
+val print_html_din : Format.formatter -> din -> unit
 
-val write_flux_map : Bi_outbuf.t -> flux_map -> unit
-  (** Output a JSON value of type {!flux_map}. *)
+val write_din : Bi_outbuf.t -> din -> unit
+  (** Output a JSON value of type {!din}. *)
 
-val string_of_flux_map : ?len:int -> flux_map -> string
-  (** Serialize a value of type {!flux_map}
+val string_of_din : ?len:int -> din -> string
+  (** Serialize a value of type {!din}
       into a JSON string.
       @param len specifies the initial length
                  of the buffer used internally.
                  Default: 1024. *)
 
-val read_flux_map : Yojson.Safe.lexer_state -> Lexing.lexbuf -> flux_map
-  (** Input JSON data of type {!flux_map}. *)
+val read_din : Yojson.Safe.lexer_state -> Lexing.lexbuf -> din
+  (** Input JSON data of type {!din}. *)
 
-val flux_map_of_string : string -> flux_map
-  (** Deserialize JSON data of type {!flux_map}. *)
+val din_of_string : string -> din
+  (** Deserialize JSON data of type {!din}. *)
 
 type plot = {
   plot_legend : string array;

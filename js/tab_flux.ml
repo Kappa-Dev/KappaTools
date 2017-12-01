@@ -11,40 +11,32 @@ module Html = Tyxml_js.Html5
 
 let tab_is_active, set_tab_is_active = React.S.create false
 
-let has_fluxmap
-    (simulation_info : Api_types_j.simulation_info option) :
-  bool =
-  match simulation_info with
-  | None -> false
-  | Some simulation_info ->
-    simulation_info.Api_types_j.simulation_info_output.Api_types_j.simulation_output_flux_maps > 0
-
-let flux_table, table_handle = ReactiveData.RList.create []
-let flux_header, set_flux_header = React.S.create []
-let flux =
-  let thead = React.S.map (fun x -> Html.thead x) flux_header in
+let din_table, table_handle = ReactiveData.RList.create []
+let din_header, set_din_header = React.S.create []
+let din =
+  let thead = React.S.map (fun x -> Html.thead x) din_header in
   Tyxml_js.R.Html5.tablex
     ~a:[Html.a_class
           ["table"; "table-condensed";"table-bordered"]]
-    ~thead flux_table
+    ~thead din_table
 
-let fill_table flux_map =
+let fill_table din =
   let open Data in
-  let all = flux_map.flux_data.flux_kind = Primitives.PROBABILITY in
+  let all = din.din_data.din_kind = Primitives.PROBABILITY in
   let header =
     Html.tr
       ((Html.th [Html.pcdata "affects"]) ::
        Array.fold_right
          (fun r acc -> Html.th [Html.pcdata r] :: acc)
-         flux_map.flux_rules []) in
+         din.din_rules []) in
   let body =
     Tools.array_fold_righti
       (fun i data acc ->
-         if all || flux_map.flux_data.flux_hits.(i) > 0 then
+         if all || din.din_data.din_hits.(i) > 0 then
            Html.tr
              (Html.th
-                [Html.pcdata (flux_map.flux_rules.(i)^" ("^
-                              string_of_int flux_map.flux_data.flux_hits.(i)^
+                [Html.pcdata (din.din_rules.(i)^" ("^
+                              string_of_int din.din_data.din_hits.(i)^
                               " hits)")] ::
               Array.fold_right
                 (fun v acc -> Html.td
@@ -54,57 +46,57 @@ let fill_table flux_map =
                     [Html.pcdata (string_of_float v)] :: acc)
                 data [])
            ::acc
-         else acc) flux_map.flux_data.flux_fluxs [] in
-  let () = set_flux_header [header] in
+         else acc) din.din_data.din_fluxs [] in
+  let () = set_din_header [header] in
   ReactiveData.RList.set table_handle [Html.tbody body]
 
-let update_flux_map fluxmap_id: unit =
+let update_din din_id: unit =
   State_simulation.when_ready
     ~label:__LOC__
-    (fun manager -> manager#simulation_detail_flux_map fluxmap_id >>=
+    (fun manager -> manager#simulation_detail_din din_id >>=
       (Api_common.result_map
-         ~ok:(fun _ (flux_map : Api_types_j.flux_map) ->
-             let () = fill_table flux_map in
+         ~ok:(fun _ (din : Api_types_t.din) ->
+             let () = fill_table din in
              Lwt.return (Api_common.result_ok ()))
          ~error:(fun result_code e ->
              let () = ReactiveData.RList.set table_handle [] in
            Lwt.return (Api_common.result_messages ~result_code e ))))
 
-let flux_list, flux_handle = ReactiveData.RList.create []
-let flux_select =
+let din_list, din_handle = ReactiveData.RList.create []
+let din_select =
   Tyxml_js.R.Html5.select
     ~a:[ Html.a_class ["form-control"] ]
-    flux_list
+    din_list
 
-let select_fluxmap () =
-  let fluxmap_id =
-    Js.to_string ((Tyxml_js.To_dom.of_select flux_select)##.value) in
-  update_flux_map fluxmap_id
+let select_din () =
+  let din_id =
+    Js.to_string ((Tyxml_js.To_dom.of_select din_select)##.value) in
+  update_din din_id
 
 let _ = React.S.map
     (fun _ ->
        State_simulation.with_simulation_info
          ~label:__LOC__
          ~stopped:(fun _ ->
-             let () = ReactiveData.RList.set flux_handle [] in
+             let () = ReactiveData.RList.set din_handle [] in
              let () = ReactiveData.RList.set table_handle [] in
              Lwt.return (Api_common.result_ok ()))
          ~initializing:(fun _ ->
-             let () = ReactiveData.RList.set flux_handle [] in
+             let () = ReactiveData.RList.set din_handle [] in
              let () = ReactiveData.RList.set table_handle [] in
              Lwt.return (Api_common.result_ok ()))
          ~ready:(fun manager _ ->
-           manager#simulation_catalog_flux_map >>=
+           manager#simulation_catalog_din >>=
            (Api_common.result_bind_lwt
-              ~ok:(fun (data : Api_types_t.flux_map_catalog) ->
+              ~ok:(fun (data : Api_types_t.din_catalog) ->
                   let () = ReactiveData.RList.set
-                      flux_handle
+                      din_handle
                       (List.rev_map
                          (fun id -> Html.option
                              ~a:[ Html.a_value id ]
                              (Html.pcdata id))
-                         data.Api_types_t.flux_map_ids) in
-                  let () = select_fluxmap () in
+                         data.Api_types_t.din_ids) in
+                  let () = select_din () in
                   Lwt.return (Api_common.result_ok ()))
            )
            ) ()
@@ -112,42 +104,42 @@ let _ = React.S.map
     (React.S.on
        tab_is_active State_simulation.dummy_model State_simulation.model)
 
-let export_current_flux_map to_string mime filename =
-  let fluxmap_id =
-    Js.to_string ((Tyxml_js.To_dom.of_select flux_select)##.value) in
+let export_current_din to_string mime filename =
+  let din_id =
+    Js.to_string ((Tyxml_js.To_dom.of_select din_select)##.value) in
   State_simulation.when_ready
     ~label:__LOC__
-    (fun manager -> manager#simulation_detail_flux_map fluxmap_id >>=
+    (fun manager -> manager#simulation_detail_din din_id >>=
       Api_common.result_bind_lwt
-        ~ok:(fun flux -> let data = to_string flux in
+        ~ok:(fun din -> let data = to_string din in
               let () = Common.saveFile ~data ~mime ~filename in
               Lwt.return (Api_common.result_ok  ())))
 
 let export_configuration = {
-  Widget_export.id = "flux-export";
+  Widget_export.id = "din-export";
   Widget_export.show = React.S.const true;
   Widget_export.handlers = [
     { Widget_export.suffix = "json";
       Widget_export.label = "json";
-      Widget_export.export = export_current_flux_map
-          (Data.string_of_flux_map ?len:None)
+      Widget_export.export = export_current_din
+          (Data.string_of_din ?len:None)
           "application/json";};
     { Widget_export.suffix = "dot";
       Widget_export.label = "dot";
-      Widget_export.export = export_current_flux_map
-          (Format.asprintf "@[%a@]" (Data.print_dot_flux_map ?uuid:None))
+      Widget_export.export = export_current_din
+          (Format.asprintf "@[%a@]" (Data.print_dot_din ?uuid:None))
           "text/vnd.graphviz";};
     { Widget_export.suffix = "html";
       Widget_export.label = "html";
-      Widget_export.export = export_current_flux_map
-          (Format.asprintf "@[%a@]" (Data.print_html_flux_map))
+      Widget_export.export = export_current_din
+          (Format.asprintf "@[%a@]" (Data.print_html_din))
           "text/html";};
   ];
 }
 
 let content () = [
   Html.div ~a:[Html.a_class ["flex_content"; "table-responsive"]]
-    [Html.form [flux_select]; flux; Widget_export.content export_configuration]
+    [Html.form [din_select]; din; Widget_export.content export_configuration]
 ]
 
 let navli () =
@@ -156,16 +148,16 @@ let navli () =
        match state with
        | None -> 0
        | Some state ->
-         state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_flux_maps)
+         state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_dins)
 
 let onload () =
   let () =
-    (Tyxml_js.To_dom.of_select flux_select)##.onchange :=
-      Dom.handler (fun _ -> let () = select_fluxmap () in Js._false) in
+    (Tyxml_js.To_dom.of_select din_select)##.onchange :=
+      Dom.handler (fun _ -> let () = select_din () in Js._false) in
   let () = Widget_export.onload export_configuration in
-  let () = Common.jquery_on "#navflux"
+  let () = Common.jquery_on "#navDIN"
       "shown.bs.tab" (fun _ -> set_tab_is_active true) in
-  Common.jquery_on "#navflux"
+  Common.jquery_on "#navDIN"
     "hide.bs.tab" (fun _ -> set_tab_is_active false)
 
 let onresize () : unit = ()

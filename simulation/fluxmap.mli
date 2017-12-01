@@ -8,13 +8,13 @@
 
 (** Flux map *)
 val create_flux :
-  Model.t -> Counter.t -> Primitives.flux_kind -> string -> Data.flux_data
-val stop_flux : Model.t -> Counter.t -> Data.flux_data -> Data.flux_map
+  Model.t -> Counter.t -> Primitives.din_kind -> string -> Data.din_data
+val stop_flux : Model.t -> Counter.t -> Data.din_data -> Data.din
 
-val incr_flux_flux : int -> int -> float -> Data.flux_data -> unit
+val incr_flux_flux : int -> int -> float -> Data.din_data -> unit
 (** [incr_flux_flux of_rule on_rule val flux] *)
 
-val incr_flux_hit : int -> Data.flux_data -> unit
+val incr_flux_hit : int -> Data.din_data -> unit
 
-val get_flux_name : Data.flux_data -> string
-val flux_has_name : string -> Data.flux_data -> bool
+val get_flux_name : Data.din_data -> string
+val flux_has_name : string -> Data.din_data -> bool

@@ -27,12 +27,12 @@ let close_desc () =
 
 let output_flux flux =
   Kappa_files.with_flux
-    flux.Data.flux_data.Data.flux_name
-    (if Filename.check_suffix flux.Data.flux_data.Data.flux_name ".html"
-     then Kappa_files.wrap_formatter (fun f -> Data.print_html_flux_map f flux)
-      else if Filename.check_suffix flux.Data.flux_data.Data.flux_name ".json"
-      then fun d -> JsonUtil.write_to_channel Data.write_flux_map d flux
-      else Kappa_files.wrap_formatter (fun f -> Data.print_dot_flux_map ~uuid f flux))
+    flux.Data.din_data.Data.din_name
+    (if Filename.check_suffix flux.Data.din_data.Data.din_name ".html"
+     then Kappa_files.wrap_formatter (fun f -> Data.print_html_din f flux)
+      else if Filename.check_suffix flux.Data.din_data.Data.din_name ".json"
+      then fun d -> JsonUtil.write_to_channel Data.write_din d flux
+      else Kappa_files.wrap_formatter (fun f -> Data.print_dot_din ~uuid f flux))
 
 let actsDescr = ref None
 let emptyActs = ref true
@@ -160,7 +160,7 @@ let print_species time f mixture =
 
 let go = function
   | Data.Snapshot s -> snapshot s
-  | Data.Flux f -> output_flux f
+  | Data.DIN f -> output_flux f
   | Data.DeltaActivities (r,flux) -> output_activities r flux
   | Data.Plot x -> plot_now x
   | Data.Print p ->

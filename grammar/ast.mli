@@ -99,7 +99,7 @@ type ('pattern,'mixture,'id,'rule) modif_expr =
   | CFLOWLABEL of (bool * string Locality.annot)
   | CFLOWMIX of (bool * 'pattern Locality.annot)
   | DIN of
-      Primitives.flux_kind * ('pattern,'id) Alg_expr.e Primitives.print_expr list
+      Primitives.din_kind * ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | DINOFF of ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | SPECIES_OF of
       (bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list

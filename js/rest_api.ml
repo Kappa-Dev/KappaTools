@@ -137,17 +137,17 @@ class manager
                Yojson.Safe.read_string
                (Yojson.Safe.init_lexer ()) (Lexing.from_string result) in
            (`SimulationDetailFileLine lines))
-    | `SimulationDetailFluxMap flux_map_id ->
+    | `SimulationDetailDIN flux_map_id ->
       send
         ?timeout
         (Format.sprintf
-           "%s/v2/projects/%s/simulation/fluxmaps/%s"
+           "%s/v2/projects/%s/simulation/DIN/%s"
            url
            project_id
            flux_map_id)
         `GET
         (fun result ->
-             (`SimulationDetailFluxMap (Mpi_message_j.flux_map_of_string result)))
+             (`SimulationDetailDIN (Mpi_message_j.din_of_string result)))
     | `SimulationDetailLogMessage ->
       send
         ?timeout
@@ -236,17 +236,17 @@ class manager
         (fun result ->
            (`SimulationCatalogFileLine
                         (Mpi_message_j.file_line_catalog_of_string result)))
-    | `SimulationCatalogFluxMap ->
+    | `SimulationCatalogDIN ->
       send
         ?timeout
         (Format.sprintf
-           "%s/v2/projects/%s/simulation/fluxmaps"
+           "%s/v2/projects/%s/simulation/DIN"
            url
            project_id)
         `GET
         (fun result ->
-           (`SimulationCatalogFluxMap
-                        (Mpi_message_j.flux_map_catalog_of_string result)))
+           (`SimulationCatalogDIN
+                        (Mpi_message_j.din_catalog_of_string result)))
     | `SimulationCatalogSnapshot ->
       send
         ?timeout

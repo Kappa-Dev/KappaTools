@@ -43,10 +43,10 @@ class type manager_file_line = object
   method simulation_detail_file_line : string -> string list result Lwt.t
 end
 
-class type manager_flux_map = object
-  method simulation_catalog_flux_map : Api_types_t.flux_map_catalog result Lwt.t
-  method simulation_detail_flux_map :
-    Api_types_t.flux_map_id -> Api_types_t.flux_map result Lwt.t
+class type manager_din = object
+  method simulation_catalog_din : Api_types_t.din_catalog result Lwt.t
+  method simulation_detail_din :
+    Api_types_t.din_id -> Api_types_t.din result Lwt.t
 end
 
 class type manager_log_message = object
@@ -88,7 +88,7 @@ class type manager_simulation = object
   method simulation_raw_trace : string result Lwt.t
 
   inherit manager_file_line
-  inherit manager_flux_map
+  inherit manager_din
   inherit manager_log_message
   inherit manager_plot
   inherit manager_snapshot

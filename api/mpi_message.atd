@@ -33,9 +33,9 @@ type file_id  <ocaml from="Api_types"> = abstract
 type file_line_detail <ocaml from="Api_types"> = abstract
 type file_line_catalog <ocaml from="Api_types"> = abstract
 
-type flux_map_id <ocaml from="Api_types"> = abstract
-type flux_map <ocaml from="Api_types"> = abstract
-type flux_map_catalog <ocaml from="Api_types"> = abstract
+type din_id <ocaml from="Api_types"> = abstract
+type din <ocaml from="Api_types"> = abstract
+type din_catalog <ocaml from="Api_types"> = abstract
 
 type log_message <ocaml from="Api_types"> = abstract
 
@@ -58,14 +58,14 @@ type request = [
                | SimulationContinue of string
                | SimulationDelete
                | SimulationDetailFileLine of string
-               | SimulationDetailFluxMap of flux_map_id
+               | SimulationDetailDIN of din_id
                | SimulationDetailLogMessage
                | SimulationDetailPlot of plot_parameter
                | SimulationDetailSnapshot of snapshot_id
                | SimulationInfo
 	       | SimulationEfficiency
                | SimulationCatalogFileLine
-               | SimulationCatalogFluxMap
+               | SimulationCatalogDIN
                | SimulationCatalogSnapshot
 	       | SimulationTrace
 	       | SimulationParameter
@@ -90,14 +90,14 @@ type response_content = [
    | FileUpdate of file_metadata
    | ProjectParse of project_parse
    | SimulationDetailFileLine of string list
-   | SimulationDetailFluxMap of flux_map
+   | SimulationDetailDIN of din
    | SimulationDetailLogMessage of log_message
    | SimulationDetailPlot of plot
    | SimulationDetailSnapshot of snapshot_detail
    | SimulationInfo of simulation_info
    | SimulationEfficiency of simulation_efficiency
    | SimulationCatalogFileLine of file_line_catalog
-   | SimulationCatalogFluxMap of flux_map_catalog
+   | SimulationCatalogDIN of din_catalog
    | SimulationCatalogSnapshot of snapshot_catalog
    | SimulationTrace of string
    | SimulationParameter of simulation_parameter

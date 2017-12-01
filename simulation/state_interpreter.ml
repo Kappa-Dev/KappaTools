@@ -14,7 +14,7 @@ type t = {
   mutable force_test_perturbations : int list;
   perturbations_not_done_yet : bool array;
   (* internal array for perturbate function (global to avoid useless alloc) *)
-  mutable flux: (Data.flux_data) list;
+  mutable flux: (Data.din_data) list;
   with_delta_activities : bool;
 }
 
@@ -126,7 +126,7 @@ let do_modification ~outputs env counter graph state extra modification =
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let () =
       if List.exists
-          (fun x -> Fluxmap.flux_has_name file x && x.Data.flux_kind = rel)
+          (fun x -> Fluxmap.flux_has_name file x && x.Data.din_kind = rel)
           state.flux
       then ExceptionDefn.warning
           (fun f ->
@@ -143,7 +143,7 @@ let do_modification ~outputs env counter graph state extra modification =
     let (these,others) =
       List.partition (Fluxmap.flux_has_name file) state.flux in
     let () = List.iter
-        (fun x -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
+        (fun x -> outputs (Data.DIN (Fluxmap.stop_flux env counter x)))
         these in
     let () = state.flux <- others in
     ((false, graph, state),extra)
@@ -259,7 +259,7 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
         List.iter
           (fun fl ->
              let () = Fluxmap.incr_flux_hit my_syntax_rd_id fl in
-             match fl.Data.flux_kind with
+             match fl.Data.din_kind with
              | Primitives.ABSOLUTE | Primitives.RELATIVE -> ()
              | Primitives.PROBABILITY ->
                List.iter
@@ -296,7 +296,7 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
              Fluxmap.incr_flux_flux syntax_rid syntax_rd_id
                (
                  let cand =
-                   match fl.Data.flux_kind with
+                   match fl.Data.din_kind with
                    | Primitives.ABSOLUTE -> new_act -. old_act
                    | Primitives.PROBABILITY ->
                      -. (old_act /. prev_activity)
@@ -452,6 +452,6 @@ let end_of_simulation ~outputs form env counter graph state =
                 Format.fprintf
                   f "Tracking DIN into \"%s\" was not stopped before end of simulation"
                   (Fluxmap.get_flux_name e)) in
-         outputs (Data.Flux (Fluxmap.stop_flux env counter e)))
+         outputs (Data.DIN (Fluxmap.stop_flux env counter e)))
       state.flux in
   ExceptionDefn.flush_warning form

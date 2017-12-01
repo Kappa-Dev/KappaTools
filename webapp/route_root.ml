@@ -372,7 +372,7 @@ let route
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
     { Webapp_common.path =
-        "/v2/projects/{projectid}/simulation/fluxmaps/{fluxmapsid}" ;
+        "/v2/projects/{projectid}/simulation/DIN/{fluxmapsid}" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `GET ; ] in
         fun ~context:context ->
@@ -380,10 +380,10 @@ let route
           | `GET ->
             let (project_id,fluxmaps_id) = field_ref context "fluxmapsid" in
             bind_projects
-              (fun manager -> manager#simulation_detail_flux_map fluxmaps_id)
+              (fun manager -> manager#simulation_detail_din fluxmaps_id)
               project_id projects >>=
             (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_flux_map
+               ~string_of_success:(Mpi_message_j.string_of_din
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -498,7 +498,7 @@ let route
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
     { Webapp_common.path =
-        "/v2/projects/{projectid}/simulation/fluxmaps" ;
+        "/v2/projects/{projectid}/simulation/DIN" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `GET ; ] in
         fun ~context:context ->
@@ -506,10 +506,10 @@ let route
           | `GET ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_catalog_flux_map)
+              (fun manager -> manager#simulation_catalog_din)
               project_id projects >>=
             (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_flux_map_catalog
+               ~string_of_success:(Mpi_message_j.string_of_din_catalog
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods

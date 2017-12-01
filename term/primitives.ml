@@ -285,33 +285,33 @@ let map_expr_print f x =
       | Str_pexpr _ as x -> x
       | Alg_pexpr e -> Alg_pexpr (f e)) x
 
-type flux_kind = ABSOLUTE | RELATIVE | PROBABILITY
+type din_kind = ABSOLUTE | RELATIVE | PROBABILITY
 
-let flux_kind_to_yojson = function
+let din_kind_to_yojson = function
   | ABSOLUTE -> `String "ABSOLUTE"
   | RELATIVE -> `String "RELATIVE"
   | PROBABILITY -> `String "PROBABILITY"
 
-let flux_kind_of_yojson = function
+let din_kind_of_yojson = function
   | `String "ABSOLUTE" -> ABSOLUTE
   | `String "RELATIVE" -> RELATIVE
   | `String "PROBABILITY" -> PROBABILITY
   | x -> raise
-           (Yojson.Basic.Util.Type_error ("Incorrect flux_kind",x))
+           (Yojson.Basic.Util.Type_error ("Incorrect din_kind",x))
 
-let write_flux_kind ob f =
-  Yojson.Basic.to_outbuf ob (flux_kind_to_yojson f)
+let write_din_kind ob f =
+  Yojson.Basic.to_outbuf ob (din_kind_to_yojson f)
 
-let string_of_flux_kind ?(len = 1024) x =
+let string_of_din_kind ?(len = 1024) x =
   let ob = Bi_outbuf.create len in
-  write_flux_kind ob x;
+  write_din_kind ob x;
   Bi_outbuf.contents ob
 
-let read_flux_kind p lb =
-  flux_kind_of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)
+let read_din_kind p lb =
+  din_kind_of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)
 
-let flux_kind_of_string s =
-  read_flux_kind (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let din_kind_of_string s =
+  read_din_kind (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
 type modification =
     ITER_RULE of alg_expr Locality.annot * elementary_rule
@@ -320,7 +320,7 @@ type modification =
   | STOP of alg_expr print_expr list
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
-  | DIN of flux_kind * alg_expr print_expr list
+  | DIN of din_kind * alg_expr print_expr list
   | DINOFF of alg_expr print_expr list
   | CFLOWOFF of string option * Pattern.id array
   | PLOTENTRY
@@ -376,7 +376,7 @@ let modification_to_yojson ~filenames = function
              "pattern", JsonUtil.of_array Pattern.id_to_yojson ids ]
   | DIN(kind,f) ->
     `Assoc [ "action", `String "DIN";
-             "kind", flux_kind_to_yojson kind;
+             "kind", din_kind_to_yojson kind;
              "file", `List (List.map (print_t_expr_to_yojson ~filenames) f) ]
   | DINOFF f ->
     JsonUtil.smart_assoc [
@@ -426,7 +426,7 @@ let modification_of_yojson ~filenames = function
   | `Assoc [ "kind", kind; "action", `String "DIN"; "file", `List f ]
   | `Assoc [ "file", `List f; "action", `String "DIN"; "kind", kind ]
   | `Assoc [ "file", `List f; "kind", kind; "action", `String "DIN" ] ->
-    DIN(flux_kind_of_yojson kind,
+    DIN(din_kind_of_yojson kind,
          List.map (print_t_expr_of_yojson ~filenames) f)
   | `Assoc [ "action", `String "UPDATE"; "var", `Int v; "value", e ]
   | `Assoc [ "var", `Int v; "action", `String "UPDATE"; "value", e ]

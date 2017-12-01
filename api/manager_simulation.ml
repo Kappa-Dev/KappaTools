@@ -72,29 +72,29 @@ class manager_file_line
 
 class manager_flux_map
     (project : Api_environment.project)
-    (system_process : Kappa_facade.system_process) : Api.manager_flux_map =
+    (system_process : Kappa_facade.system_process) : Api.manager_din =
   object(self)
     method private info_flux_map
         (detail : Api_data.simulation_detail_output) :
-      Api_types_j.flux_map_catalog Api.result =
-      let flux_maps : Api_types_j.flux_map list =
-        detail.Api_types_j.simulation_output_flux_maps in
+      Api_types_j.din_catalog Api.result =
+      let flux_maps : Api_types_j.din list =
+        detail.Api_types_j.simulation_output_dins in
       let flux_map_catalog =
-        { Api_types_j.flux_map_ids =
-            List.map (fun f -> f.Data.flux_data.Data.flux_name)
+        { Api_types_j.din_ids =
+            List.map (fun f -> f.Data.din_data.Data.din_name)
               flux_maps } in
       Api_common.result_ok flux_map_catalog
 
     method private get_flux_map
-      (flux_map_id : Api_types_j.flux_map_id)
+      (flux_map_id : Api_types_j.din_id)
       (detail : Api_data.simulation_detail_output) :
-      Api_types_j.flux_map Api.result =
-      let flux_maps_list : Api_types_j.flux_map list =
-        detail.Api_types_j.simulation_output_flux_maps
+      Api_types_j.din Api.result =
+      let flux_maps_list : Api_types_j.din list =
+        detail.Api_types_j.simulation_output_dins
       in
-      let flux_maps_eq : Api_types_j.flux_map -> bool =
+      let flux_maps_eq : Api_types_j.din -> bool =
         fun flux_map ->
-          flux_map_id = flux_map.Data.flux_data.Data.flux_name
+          flux_map_id = flux_map.Data.din_data.Data.din_name
       in
       try Api_common.result_ok (List.find flux_maps_eq flux_maps_list)
       with Not_found ->
@@ -102,13 +102,13 @@ class manager_flux_map
       Api_common.result_error_msg ~result_code:`Not_found m
 
 
-    method simulation_catalog_flux_map :
-      Api_types_j.flux_map_catalog Api.result Lwt.t =
+    method simulation_catalog_din :
+      Api_types_j.din_catalog Api.result Lwt.t =
       detail_projection ~project ~system_process ~projection:self#info_flux_map
 
-    method simulation_detail_flux_map
-        (flux_map_id : Api_types_j.flux_map_id) :
-      Api_types_j.flux_map Api.result Lwt.t =
+    method simulation_detail_din
+        (flux_map_id : Api_types_j.din_id) :
+      Api_types_j.din Api.result Lwt.t =
       detail_projection
         ~project ~system_process ~projection:(self#get_flux_map flux_map_id)
 
