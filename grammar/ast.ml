@@ -100,9 +100,9 @@ type ('pattern,'mixture,'id,'rule) modif_expr =
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Locality.annot)
   | CFLOWMIX of (bool * 'pattern Locality.annot)
-  | FLUX of
+  | DIN of
       Primitives.flux_kind * ('pattern,'id) Alg_expr.e Primitives.print_expr list
-  | FLUXOFF of ('pattern,'id) Alg_expr.e Primitives.print_expr list
+  | DINOFF of ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | SPECIES_OF of
       (bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
        * 'pattern Locality.annot)
@@ -756,12 +756,12 @@ let modif_to_json filenames f_mix f_var = function
   | CFLOWMIX (b,m) ->
     `List [ `String "CFLOW"; `Bool b;
             Locality.annot_to_yojson ~filenames f_mix m ]
-  | FLUX (b,file) ->
-    `List [ `String "FLUX"; Primitives.flux_kind_to_yojson b;
+  | DIN (b,file) ->
+    `List [ `String "DIN"; Primitives.flux_kind_to_yojson b;
             JsonUtil.of_list
               (Primitives.print_expr_to_yojson ~filenames f_mix f_var) file]
-  | FLUXOFF file ->
-    `List (`String "FLUXOFF" ::
+  | DINOFF file ->
+    `List (`String "DINOFF" ::
            List.map
              (Primitives.print_expr_to_yojson ~filenames f_mix f_var) file)
   | SPECIES_OF (b,l,m) ->
@@ -799,12 +799,12 @@ let modif_of_json filenames f_mix f_var = function
      CFLOWLABEL (b, string_annot_of_json filenames id)
   | `List [ `String "CFLOW"; `Bool b; m ] ->
      CFLOWMIX (b, Locality.annot_of_yojson ~filenames f_mix m)
-  | `List [ `String "FLUX"; b; file ] ->
-    FLUX (Primitives.flux_kind_of_yojson b,
+  | `List [ `String "DIN"; b; file ] ->
+    DIN (Primitives.flux_kind_of_yojson b,
           JsonUtil.to_list
             (Primitives.print_expr_of_yojson ~filenames f_mix f_var) file)
-  | `List (`String "FLUXOFF" :: file) ->
-    FLUXOFF (List.map
+  | `List (`String "DINOFF" :: file) ->
+    DINOFF (List.map
                (Primitives.print_expr_of_yojson ~filenames f_mix f_var) file)
   | `List [ `String "SPECIES_OF"; `Bool b; file; m ] ->
      SPECIES_OF
@@ -892,7 +892,7 @@ let sig_from_perts =
          (fun p -> function
             | APPLY (_,(r,_)) -> sig_from_rule p r
             | (UPDATE _ | STOP _ | SNAPSHOT _ | PRINT _ | PLOTENTRY |
-               CFLOWLABEL _ | CFLOWMIX _ | FLUX _ | FLUXOFF _ | SPECIES_OF _) ->
+               CFLOWLABEL _ | CFLOWMIX _ | DIN _ | DINOFF _ | SPECIES_OF _) ->
                p)
          acc p)
 

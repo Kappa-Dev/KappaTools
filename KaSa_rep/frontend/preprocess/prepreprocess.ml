@@ -646,7 +646,7 @@ let modif_map f_rule f_allowing_question_marks error alg =
   | Ast.CFLOWMIX (a,(mix,pos)) ->
     let error,mix' = f_allowing_question_marks error mix in
     error,Ast.CFLOWMIX(a,(mix',pos))
-  | Ast.FLUX (rel,list) ->
+  | Ast.DIN (rel,list) ->
     let error,list' =
       List.fold_left
         (fun (error,list) elt ->
@@ -654,8 +654,8 @@ let modif_map f_rule f_allowing_question_marks error alg =
            error,elt'::list)
         (error,[]) (List.rev list)
     in
-    error,Ast.FLUX (rel,list')
-  | Ast.FLUXOFF list ->
+    error,Ast.DIN (rel,list')
+  | Ast.DINOFF list ->
     let error,list' =
       List.fold_left
         (fun (error,list) elt ->
@@ -663,7 +663,7 @@ let modif_map f_rule f_allowing_question_marks error alg =
            error,elt'::list)
         (error,[]) (List.rev list)
     in
-    error,Ast.FLUXOFF list'
+    error,Ast.DINOFF list'
   | Ast.SPECIES_OF (a,list,(mix,pos)) ->
     let error,list' =
       List.fold_left
@@ -967,7 +967,7 @@ let translate_compil parameters error compil =
                       (error,[]) (List.rev l)
                   in
                   error,(Ast.SNAPSHOT l')::list,rules_rev
-                | Ast.PRINT _ | Ast.FLUX _ | Ast.FLUXOFF _ | Ast.CFLOWMIX _
+                | Ast.PRINT _ | Ast.DIN _ | Ast.DINOFF _ | Ast.CFLOWMIX _
                 | Ast.PLOTENTRY | Ast.CFLOWLABEL _ | Ast.SPECIES_OF _ ->
                   error,list,rules_rev (*to do*))
              (error,[],rules_rev)

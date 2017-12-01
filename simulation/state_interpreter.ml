@@ -122,7 +122,7 @@ let do_modification ~outputs env counter graph state extra modification =
   | Primitives.SPECIES_OFF fn ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val fn in
     ((false, Rule_interpreter.remove_tracked_species file graph, state),extra)
-  | Primitives.FLUX (rel,s) ->
+  | Primitives.DIN (rel,s) ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let () =
       if List.exists
@@ -131,14 +131,14 @@ let do_modification ~outputs env counter graph state extra modification =
       then ExceptionDefn.warning
           (fun f ->
              Format.fprintf
-               f "At t=%f, e=%i: tracking FLUX into \"%s\" was already on"
+               f "At t=%f, e=%i: tracking DIN into \"%s\" was already on"
                (Counter.current_time counter)
                (Counter.current_event counter) file)
     in
     let () = state.flux <-
         Fluxmap.create_flux env counter rel file::state.flux in
     ((false, graph, state),extra)
-  | Primitives.FLUXOFF s ->
+  | Primitives.DINOFF s ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let (these,others) =
       List.partition (Fluxmap.flux_has_name file) state.flux in
@@ -450,7 +450,7 @@ let end_of_simulation ~outputs form env counter graph state =
            ExceptionDefn.warning
              (fun f ->
                 Format.fprintf
-                  f "Tracking FLUX into \"%s\" was not stopped before end of simulation"
+                  f "Tracking DIN into \"%s\" was not stopped before end of simulation"
                   (Fluxmap.get_flux_name e)) in
          outputs (Data.Flux (Fluxmap.stop_flux env counter e)))
       state.flux in

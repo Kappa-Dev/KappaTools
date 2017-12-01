@@ -456,7 +456,7 @@ let scan_perts scan_mixt parameters =
               scan_mixt parameters remanent m
             | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _ | Ast.PLOTENTRY
             | Ast.PRINT _ | Ast.CFLOWLABEL _
-            | Ast.FLUXOFF _ | Ast.FLUX _ -> remanent
+            | Ast.DINOFF _ | Ast.DIN _ -> remanent
          ) remanent m)
 
 let scan_rules scan_mixt parameters a b =

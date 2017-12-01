@@ -272,14 +272,14 @@ let effects_of_modif
         ~compileModeOn contact_map domain ~origin ast in
     (domain',
      List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
-  | FLUX (rel,pexpr) ->
+  | DIN (rel,pexpr) ->
     let (domain',pexpr') =
       compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain pexpr in
-    (domain', (Primitives.FLUX (rel,pexpr'))::rev_effects)
-  | FLUXOFF pexpr ->
+    (domain', (Primitives.DIN (rel,pexpr'))::rev_effects)
+  | DINOFF pexpr ->
     let (domain',pexpr') =
       compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain pexpr in
-    (domain', (Primitives.FLUXOFF pexpr')::rev_effects)
+    (domain', (Primitives.DINOFF pexpr')::rev_effects)
   | Ast.PRINT (pexpr,print) ->
     let (domain',pexpr') =
       compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain pexpr in
@@ -366,7 +366,7 @@ let pert_of_result
               | Primitives.CFLOW _ | Primitives.SPECIES _ -> true
               | (Primitives.CFLOWOFF _ | Primitives.PRINT _ |
                  Primitives.UPDATE _ | Primitives.SNAPSHOT _
-                | Primitives.FLUX _ | Primitives.FLUXOFF _ |
+                | Primitives.DIN _ | Primitives.DINOFF _ |
                 Primitives.PLOTENTRY | Primitives.STOP _ |
                 Primitives.ITER_RULE _ | Primitives.SPECIES_OFF _ ) -> false)
             effects in
@@ -377,8 +377,8 @@ let pert_of_result
                Primitives.STOP _ | Primitives.ITER_RULE _ -> true
                | Primitives.CFLOW _ | Primitives.SPECIES _ |
                    Primitives.CFLOWOFF _ | Primitives.PRINT _ |
-                     Primitives.SNAPSHOT _ | Primitives.FLUX _ |
-                       Primitives.FLUXOFF _ | Primitives.PLOTENTRY |
+                     Primitives.SNAPSHOT _ | Primitives.DIN _ |
+                       Primitives.DINOFF _ | Primitives.PLOTENTRY |
                          Primitives.SPECIES_OFF _  -> false)
             effects in
         let repeat = match opt with

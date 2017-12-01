@@ -320,8 +320,8 @@ type modification =
   | STOP of alg_expr print_expr list
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
-  | FLUX of flux_kind * alg_expr print_expr list
-  | FLUXOFF of alg_expr print_expr list
+  | DIN of flux_kind * alg_expr print_expr list
+  | DINOFF of alg_expr print_expr list
   | CFLOWOFF of string option * Pattern.id array
   | PLOTENTRY
   | PRINT of alg_expr print_expr list * alg_expr print_expr list
@@ -374,13 +374,13 @@ let modification_to_yojson ~filenames = function
     `Assoc [ "action", `String "CFLOWOFF";
              "name", JsonUtil.of_option JsonUtil.of_string name;
              "pattern", JsonUtil.of_array Pattern.id_to_yojson ids ]
-  | FLUX(kind,f) ->
-    `Assoc [ "action", `String "FLUX";
+  | DIN(kind,f) ->
+    `Assoc [ "action", `String "DIN";
              "kind", flux_kind_to_yojson kind;
              "file", `List (List.map (print_t_expr_to_yojson ~filenames) f) ]
-  | FLUXOFF f ->
+  | DINOFF f ->
     JsonUtil.smart_assoc [
-      "action", `String "FLUXOFF";
+      "action", `String "DINOFF";
       "file", JsonUtil.of_list (print_t_expr_to_yojson ~filenames) f ]
   | PLOTENTRY -> `Assoc [ "action", `String "PLOTNOW" ]
   | PRINT(f,t) ->
@@ -420,13 +420,13 @@ let modification_of_yojson ~filenames = function
   | `Assoc [ "action", `String "PRINT"; "text", `List t ]
   | `Assoc [ "text", `List t; "action", `String "PRINT" ] ->
     PRINT([], List.map (print_t_expr_of_yojson ~filenames) t)
-  | `Assoc [ "action", `String "FLUX"; "file", `List f; "kind", kind ]
-  | `Assoc [ "kind", kind; "file", `List f; "action", `String "FLUX" ]
-  | `Assoc [ "action", `String "FLUX"; "kind", kind; "file", `List f ]
-  | `Assoc [ "kind", kind; "action", `String "FLUX"; "file", `List f ]
-  | `Assoc [ "file", `List f; "action", `String "FLUX"; "kind", kind ]
-  | `Assoc [ "file", `List f; "kind", kind; "action", `String "FLUX" ] ->
-    FLUX(flux_kind_of_yojson kind,
+  | `Assoc [ "action", `String "DIN"; "file", `List f; "kind", kind ]
+  | `Assoc [ "kind", kind; "file", `List f; "action", `String "DIN" ]
+  | `Assoc [ "action", `String "DIN"; "kind", kind; "file", `List f ]
+  | `Assoc [ "kind", kind; "action", `String "DIN"; "file", `List f ]
+  | `Assoc [ "file", `List f; "action", `String "DIN"; "kind", kind ]
+  | `Assoc [ "file", `List f; "kind", kind; "action", `String "DIN" ] ->
+    DIN(flux_kind_of_yojson kind,
          List.map (print_t_expr_of_yojson ~filenames) f)
   | `Assoc [ "action", `String "UPDATE"; "var", `Int v; "value", e ]
   | `Assoc [ "var", `Int v; "action", `String "UPDATE"; "value", e ]
@@ -446,12 +446,12 @@ let modification_of_yojson ~filenames = function
                  (alg_expr_of_yojson ~filenames) n,
                rule_of_yojson ~filenames r)
   | `Assoc [ "action", `String "PLOTNOW" ] -> PLOTENTRY
-  | `Assoc [ "action", `String "FLUXOFF"; "file", `List l ]
-  | `Assoc [ "file", `List l; "action", `String "FLUXOFF" ] ->
-    FLUXOFF (List.map (print_t_expr_of_yojson ~filenames) l)
-  | `Assoc [ "action", `String "FLUXOFF"; "file", `Null ]
-  | `Assoc [ "file", `Null; "action", `String "FLUXOFF" ]
-  | `Assoc [ "action", `String "FLUXOFF" ] -> FLUXOFF []
+  | `Assoc [ "action", `String "DINOFF"; "file", `List l ]
+  | `Assoc [ "file", `List l; "action", `String "DINOFF" ] ->
+    DINOFF (List.map (print_t_expr_of_yojson ~filenames) l)
+  | `Assoc [ "action", `String "DINOFF"; "file", `Null ]
+  | `Assoc [ "file", `Null; "action", `String "DINOFF" ]
+  | `Assoc [ "action", `String "DINOFF" ] -> DINOFF []
   | `Assoc [ "action", `String "SNAPSHOT"; "file", `List l ]
   | `Assoc [ "file", `List l; "action", `String "SNAPSHOT" ] ->
     SNAPSHOT (List.map (print_t_expr_of_yojson ~filenames) l)
@@ -585,7 +585,7 @@ let extract_connected_components_modification acc = function
       (extract_connected_components_expr acc e) r
   | UPDATE (_,e) -> extract_connected_components_expr acc e
   | SNAPSHOT p | STOP p | SPECIES_OFF p
-  | FLUX (_,p) | FLUXOFF p -> extract_connected_components_print acc p
+  | DIN (_,p) | DINOFF p -> extract_connected_components_print acc p
   | PRINT (fn,p) ->
     extract_connected_components_print
       (extract_connected_components_print acc p) fn
@@ -613,8 +613,8 @@ let map_expr_modification f = function
   | SNAPSHOT p -> SNAPSHOT (map_expr_print f p)
   | STOP p -> STOP (map_expr_print f p)
   | PRINT (fn,p) -> PRINT (map_expr_print f fn, map_expr_print f p)
-  | FLUX (b,p) -> FLUX (b,map_expr_print f p)
-  | FLUXOFF p -> FLUXOFF (map_expr_print f p)
+  | DIN (b,p) -> DIN (b,map_expr_print f p)
+  | DINOFF p -> DINOFF (map_expr_print f p)
   | (CFLOW _ | CFLOWOFF _ | SPECIES_OFF _ | PLOTENTRY) as x -> x
   | SPECIES (p,x,t) -> SPECIES ((map_expr_print f p),x,t)
 

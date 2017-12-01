@@ -170,7 +170,7 @@ perturbation_declaration:
 			  (fun effect ->
 			   match effect with
 			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
-			      | Ast.FLUX _ | Ast.FLUXOFF _
+			      | Ast.DIN _ | Ast.DINOFF _
 			      | Ast.SPECIES_OF _) -> true
 			   | (Ast.STOP _ | Ast.APPLY _
 			     | Ast.UPDATE _ | Ast.PRINT _
@@ -212,14 +212,14 @@ effect:
     | TRACK pattern boolean
 	    {Ast.CFLOWMIX ($3,($2,rhs_pos 2))}
     | FLUX nonempty_print_expr boolean
-	   {if $3 then Ast.FLUX (Primitives.RELATIVE,$2) else Ast.FLUXOFF $2}
+	   {if $3 then Ast.DIN (Primitives.RELATIVE,$2) else Ast.DINOFF $2}
     | FLUX nonempty_print_expr STRING boolean
-	   {if $4 && $3 = "absolute" then Ast.FLUX (Primitives.ABSOLUTE,$2)
+	   {if $4 && $3 = "absolute" then Ast.DIN (Primitives.ABSOLUTE,$2)
 	   else if $4 && $3 = "probability" then
-	     Ast.FLUX (Primitives.PROBABILITY,$2)
-	   else if $4 && $3 = "relative" then Ast.FLUX (Primitives.RELATIVE,$2)
+	     Ast.DIN (Primitives.PROBABILITY,$2)
+	   else if $4 && $3 = "relative" then Ast.DIN (Primitives.RELATIVE,$2)
 	     else raise (ExceptionDefn.Syntax_Error
-	       ("Incorrect FLUX expression",rhs_pos 3))}
+	       ("Incorrect DIN expression",rhs_pos 3))}
     | APPLY small_alg_expr rule_content
 		 { Ast.APPLY(
 		   $2,

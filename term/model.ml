@@ -185,7 +185,7 @@ let check_if_counter_is_filled_enough x =
        (function Primitives.STOP _ -> true
                | (Primitives.ITER_RULE _ | Primitives.UPDATE _ |
                   Primitives.SNAPSHOT _ | Primitives.CFLOW _ |
-                  Primitives.FLUX _ | Primitives.FLUXOFF _ |
+                  Primitives.DIN _ | Primitives.DINOFF _ |
                   Primitives.CFLOWOFF _ | Primitives.PLOTENTRY |
                   Primitives.PRINT _ | Primitives.SPECIES _ |
                   Primitives.SPECIES_OFF _ ) -> false) x.perturbations then

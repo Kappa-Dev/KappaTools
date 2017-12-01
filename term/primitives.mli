@@ -116,8 +116,8 @@ type modification =
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
   (** First string is the named used by the user *)
-  | FLUX of flux_kind * alg_expr print_expr list
-  | FLUXOFF of alg_expr print_expr list
+  | DIN of flux_kind * alg_expr print_expr list
+  | DINOFF of alg_expr print_expr list
   | CFLOWOFF of string option * Pattern.id array
   | PLOTENTRY
   | PRINT of alg_expr print_expr list * alg_expr print_expr list

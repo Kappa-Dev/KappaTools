@@ -529,25 +529,25 @@ effect:
       (Ast.CFLOWMIX ($4,(pat,Locality.of_pos (start_pos 3) epat)),end_pos 4, $5) }
   | FLUX annot nonempty_print_expr boolean annot
     { let (p,_,_) = $3 in
-      ((if $4 then Ast.FLUX (Primitives.RELATIVE,p) else Ast.FLUXOFF p),
+      ((if $4 then Ast.DIN (Primitives.RELATIVE,p) else Ast.DINOFF p),
        end_pos 4,$5) }
   | FLUX annot nonempty_print_expr STRING annot boolean annot
     { let (p,_,_) = $3 in
       if $6 && $4 = "absolute" then
-        (Ast.FLUX (Primitives.ABSOLUTE,p),end_pos 6,$7)
+        (Ast.DIN (Primitives.ABSOLUTE,p),end_pos 6,$7)
       else if $6 && $4 = "probability" then
-        (Ast.FLUX (Primitives.PROBABILITY,p),end_pos 6,$7)
+        (Ast.DIN (Primitives.PROBABILITY,p),end_pos 6,$7)
       else if $6 && $4 = "relative" then
-        (Ast.FLUX (Primitives.RELATIVE,p),end_pos 6,$7)
+        (Ast.DIN (Primitives.RELATIVE,p),end_pos 6,$7)
       else raise (ExceptionDefn.Syntax_Error
-                    ("Incorrect FLUX expression",rhs_pos 4)) }
+                    ("Incorrect DIN expression",rhs_pos 4)) }
   | APPLY annot alg_expr rule_content
     { let (rewrite,_,pend,an) = $4 in
       let (v,_,_) = $3 in
       Ast.APPLY(v,
-	        ({ Ast.rewrite; Ast.bidirectional = false;
-	           Ast.k_def=Alg_expr.const Nbr.zero;Ast.k_un=None;
-	           Ast.k_op=None; Ast.k_op_un=None},
+                ({ Ast.rewrite; Ast.bidirectional = false;
+                   Ast.k_def=Alg_expr.const Nbr.zero;Ast.k_un=None;
+                   Ast.k_op=None; Ast.k_op_un=None},
                  Locality.of_pos (start_pos 3) pend)),
       pend,an
     }

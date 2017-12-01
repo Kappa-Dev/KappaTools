@@ -1011,13 +1011,13 @@ let modif_expr_of_ast
     Ast.SNAPSHOT
       (List.map
          (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
-  | Ast.FLUX (rel,p) ->
-    Ast.FLUX
+  | Ast.DIN (rel,p) ->
+    Ast.DIN
       (rel,
        List.map
          (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
-  | Ast.FLUXOFF p ->
-    Ast.FLUXOFF
+  | Ast.DINOFF p ->
+    Ast.DINOFF
       (List.map
          (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
   | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_,_ ) as x) -> x,acc
