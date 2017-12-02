@@ -519,7 +519,7 @@ let rec complete_with_creation
       (Primitives.Transformation.Agent place::added) links_transf actions [] 0
 
 let incr_origin = function
-  | ( Operator.ALG _ | Operator.PERT _  as x) -> x
+  | ( Operator.ALG _ | Operator.MODIF _  as x) -> x
   | Operator.RULE i -> Operator.RULE (succ i)
 
 let connected_components_of_mixture created mix (env,origin) =

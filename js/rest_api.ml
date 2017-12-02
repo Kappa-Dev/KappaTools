@@ -278,18 +278,18 @@ class manager
         (fun result ->
            (`SimulationParameter
                         (Mpi_message_j.simulation_parameter_of_string result)))
-    | `SimulationPerturbation simulation_perturbation ->
+    | `SimulationIntervention simulation_intervention ->
       send
         ?timeout
         (Format.sprintf
-           "%s/v2/projects/%s/simulation/perturbation"
+           "%s/v2/projects/%s/simulation/intervention"
            url
            project_id)
         `PUT
-        ~data:(Api_types_j.string_of_simulation_perturbation
-                 simulation_perturbation)
+        ~data:(Api_types_j.string_of_simulation_intervention
+                 simulation_intervention)
         (fun result ->
-           `SimulationPerturbation
+           `SimulationIntervention
              (Yojson.Safe.read_string
                 (Yojson.Safe.init_lexer ()) (Lexing.from_string result)))
     | `SimulationStart simulation_parameter ->

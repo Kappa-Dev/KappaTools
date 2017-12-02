@@ -65,7 +65,7 @@ type simulation_parameter = {
   store_trace : bool ;
 } <ocaml field_prefix="simulation_">
 
-type simulation_perturbation = { perturbation_code : string }
+type simulation_intervention = { intervention_code : string }
 
 type plot_limit = { plot_limit_offset <json name="offset"> : int nullable ;
                     plot_limit_points <json name="nb_points"> : int nullable ; }

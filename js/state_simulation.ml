@@ -274,7 +274,7 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
          Lwt.return (Api_common.result_error_msg error_msg))
     ()
 
-let perturb_simulation (code : string) : string Api.result Lwt.t =
+let intervene_simulation (code : string) : string Api.result Lwt.t =
   with_simulation_info
     ~label:"perturb_simulation"
     ~stopped:
@@ -289,8 +289,8 @@ let perturb_simulation (code : string) : string Api.result Lwt.t =
          Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
       (fun manager _ ->
-        manager#simulation_perturbation
-          { Api_types_j.perturbation_code = code } >>=
+        manager#simulation_intervention
+          { Api_types_t.intervention_code = code } >>=
         (Api_common.result_bind_lwt
            ~ok:(fun out -> sync () >>=
                  Api_common.result_bind_lwt

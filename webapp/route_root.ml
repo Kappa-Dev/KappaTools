@@ -570,7 +570,7 @@ let route
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
     { Webapp_common.path =
-        "/v2/projects/{projectid}/simulation/perturbation" ;
+        "/v2/projects/{projectid}/simulation/intervention" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `PUT ; ] in
         fun ~context:context ->
@@ -578,9 +578,9 @@ let route
           | `PUT ->
             let project_id = project_ref context in
             (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
-            Api_types_j.simulation_perturbation_of_string >>= fun pert ->
+            Api_types_j.simulation_intervention_of_string >>= fun pert ->
             bind_projects
-              (fun manager -> manager#simulation_perturbation pert)
+              (fun manager -> manager#simulation_intervention pert)
               project_id projects >>=
             (Webapp_common.api_result_response
                ~string_of_success:(fun s -> Yojson.Safe.to_string (`String s)))

@@ -6,7 +6,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 8 (sub)observables 2 navigation steps
@@ -32,7 +32,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 8 (sub)observables 2 navigation steps
@@ -59,7 +59,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 8 (sub)observables 2 navigation steps
@@ -69,7 +69,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 8 (sub)observables 2 navigation steps
@@ -96,7 +96,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 8 (sub)observables 2 navigation steps
@@ -106,7 +106,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 8 (sub)observables 2 navigation steps
@@ -133,7 +133,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 8 (sub)observables 2 navigation steps
@@ -160,7 +160,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 8 (sub)observables 2 navigation steps

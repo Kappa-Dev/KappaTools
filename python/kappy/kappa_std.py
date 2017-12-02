@@ -226,9 +226,9 @@ class KappaStd(KappaApi):
     def simulation_pause(self):
         return self._dispatch("SimulationPause")
 
-    def simulation_perturbation(self, perturbation_code):
-        return self._dispatch("SimulationPerturbation",
-                              {"perturbation_code": perturbation_code})
+    def simulation_intervention(self, intervention_code):
+        return self._dispatch("SimulationIntervention",
+                              {"intervention_code": intervention_code})
 
     def simulation_start(self, simulation_parameter=None):
         if simulation_parameter is None:

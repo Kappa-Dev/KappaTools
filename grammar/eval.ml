@@ -244,7 +244,7 @@ let effects_of_modif
       | _ ->
         raise
           (ExceptionDefn.Malformed_Decl
-             ("Ambiguous rule in perturbation is impossible",pos)) in
+             ("Ambiguous rule in modifition is impossible",pos)) in
     (domain'',
      (Primitives.ITER_RULE (alg_pos, elem_rule))::rev_effects)
   | UPDATE ((i, _), alg_expr) ->
@@ -316,9 +316,9 @@ let effects_of_modifs
   domain',List.rev rev_effects
 
 let compile_modifications_no_track =
-  effects_of_modifs [] [] (Operator.PERT (-1))
+  effects_of_modifs [] [] (Operator.MODIF (-1))
 
-(* perturbations without pre and post, but with alarm are not applied
+(* interventions without pre and post, but with alarm are not applied
 at initialisation *)
 let pert_not_init = function
   | (Some _, None, None) ->
@@ -343,7 +343,7 @@ let pert_of_result
                raise (ExceptionDefn.Malformed_Decl
                         ("alarm has to be strictly greater than 0.0", pos)) else ()
           | None -> () in
-        let origin = Operator.PERT p_id in
+        let origin = Operator.MODIF p_id in
         let pre_expr' = pert_not_init (alarm,pre_expr,opt_post) in
         let (domain',pre) =
           compile_bool ?bwd_bisim ~compileModeOn ~origin contact_map domain pre_expr' in
@@ -537,7 +537,7 @@ let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?over
   let rule_nd = Array.of_list compiled_rules in
 
   pause @@ fun () ->
-  outputs (Data.Log "\t -perturbations");
+  outputs (Data.Log "\t -interventions");
   let (preenv,alg_deps'',pert,has_tracking) =
     pert_of_result
       result.variables result.rules alg_deps' ?bwd_bisim ~compileModeOn

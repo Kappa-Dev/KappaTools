@@ -6,4 +6,4 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let model_perturbation, set_model_perturbation = React.S.create ""
+let model_intervention, set_model_intervention = React.S.create ""

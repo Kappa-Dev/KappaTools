@@ -10,8 +10,8 @@ let msg_process_not_paused =
   "process not paused"
 let msg_observables_less_than_zero =
   "Plot observables must be greater than zero"
-let msg_missing_perturbation_context =
-  "Invalid runtime state missing missing perturbation context"
+let msg_missing_intervention_context =
+  "Invalid runtime state: missing intervention context"
 
 (**  System process
 
@@ -473,11 +473,11 @@ let stop
 let perturbation
     ~(system_process : system_process)
     ~(t : t)
-    ~(perturbation:Api_types_t.simulation_perturbation)
+    ~(perturbation:Api_types_t.simulation_intervention)
   : (string, Api_types_t.errors) Result.result Lwt.t =
   let () = ignore(system_process) in
   let lexbuf =
-    Lexing.from_string perturbation.Api_types_t.perturbation_code
+    Lexing.from_string perturbation.Api_types_t.intervention_code
   in
   Lwt.catch
     (fun () ->

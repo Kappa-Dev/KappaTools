@@ -307,8 +307,8 @@ class manager_simulation
            )
         )
 
-    method simulation_perturbation
-        (simulation_perturbation : Api_types_j.simulation_perturbation) :
+    method simulation_intervention
+        (simulation_perturbation : Api_types_j.simulation_intervention) :
       string Api.result Lwt.t =
       Model_storage.bind_simulation
         project

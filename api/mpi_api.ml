@@ -88,9 +88,9 @@ let on_message
   | `SimulationPause ->
     manager#simulation_pause >>=
     (handler (fun () -> `SimulationPause))
-  | `SimulationPerturbation simulation_perturbation ->
-    (manager#simulation_perturbation simulation_perturbation) >>=
-    (handler (fun s -> `SimulationPerturbation s))
+  | `SimulationIntervention simulation_intervention ->
+    (manager#simulation_intervention simulation_intervention) >>=
+    (handler (fun s -> `SimulationIntervention s))
   | `SimulationStart simulation_parameter ->
     (manager#simulation_start simulation_parameter) >>=
     (handler (fun result -> `SimulationStart result))
@@ -368,13 +368,13 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_perturbation
-      (simulation_perturbation : Api_types_j.simulation_perturbation) :
+    method simulation_intervention
+      (simulation_intervention : Api_types_j.simulation_intervention) :
       string Api.result Lwt.t =
-      self#message (`SimulationPerturbation simulation_perturbation) >>=
+      self#message (`SimulationIntervention simulation_intervention) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationPerturbation s ->
+            | `SimulationIntervention s ->
               Lwt.return (Api_common.result_ok s)
             | response ->
               Lwt.return

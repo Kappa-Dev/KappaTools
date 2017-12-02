@@ -14,7 +14,7 @@ type bin_bool_op = AND | OR
 type un_bool_op = NOT
 type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
-type rev_dep = ALG of int | RULE of int | PERT of int
+type rev_dep = ALG of int | RULE of int | MODIF of int
 
 let bin_alg_op_to_string = function
   | MULT -> "*"
@@ -134,17 +134,17 @@ let print_rev_dep f = function
   | ALG id ->
     Format.fprintf f "algebraic variable [%i]" id
   (*"variable '%a'" (Model.print_alg env) id*)
-  | PERT id -> Format.fprintf f "perturbation [%i]" id
+  | MODIF id -> Format.fprintf f "intervention [%i]" id
 
 let rev_dep_to_yojson = function
   | RULE id -> `List [ `String "RULE"; `Int id ]
   | ALG id -> `List [ `String "ALG"; `Int id ]
-  | PERT id -> `List [ `String "PERT"; `Int id ]
+  | MODIF id -> `List [ `String "MODIF"; `Int id ]
 
 let rev_dep_of_yojson = function
   | `List [ `String "RULE"; `Int id ] -> RULE id
   | `List [ `String "ALG"; `Int id ] -> ALG id
-  | `List [ `String "PERT"; `Int id ] -> PERT id
+  | `List [ `String "MODIF"; `Int id ] -> MODIF id
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect rev_dep",x))
 
 module DepSetMap = SetMap.Make (struct type t = rev_dep

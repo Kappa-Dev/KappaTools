@@ -806,7 +806,7 @@ module Make (Instances:Instances_sig.S) = struct
            | Operator.ALG j ->
              let () = recompute env counter state j in
              aux (Model.get_alg_reverse_dependencies env j) acc
-           | Operator.PERT p ->
+           | Operator.MODIF p ->
              (state,List_util.merge_uniq Mods.int_compare [p] perts)
            | Operator.RULE i ->
              let rule = Model.get_rule env i in

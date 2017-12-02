@@ -116,11 +116,13 @@ is:
 [LHS] <-> [RHS] @ [binary rate] {unary rate}, [reverse rate]
 ```
 
-### every modification (perturbation action) ends by a semicolon
+### Kappa speaks about intervention instead of perturbation
 
-Perturbations used to take a semi-colon separated list of modification
+### every modification (intervention action) ends by a semicolon
+
+Interventions used to take a semi-colon separated list of modification
 as body. Now, every modification ends by a semi-colon. Said
-diferrently even the last (or only) modification of a perturbation
+diferrently even the last (or only) modification of a intervention
 ends by `;`.
 
 ```
@@ -134,7 +136,7 @@ ends by `;`.
     $ADD 10 A();
 ```
 
-### Repetitive perturbation syntax has changed
+### Repetitive intervention syntax has changed
 Usage is now if _precondition_ do _modification(s)_ and repeat as long
 as _condition_.
 
@@ -225,9 +227,9 @@ filename.
 
 ## Ctrl-c does not kill the simulator
 
-Ctrl-c now pauses the simulation and launches a toplevel environment in
-which you can do modifications and perturbations interactively, and
-then (optionally) continue the simulation.
+Ctrl-c now pauses the simulation and launches a toplevel environment
+in which you can do modifications interactively, and then (optionally)
+continue the simulation.
 
 You can use `-mode batch` to get a Ctrl-c that does kill the simulator
 (and more generally to get a KaSim that never asks questions and assumes

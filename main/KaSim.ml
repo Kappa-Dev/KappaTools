@@ -331,7 +331,7 @@ let () =
           let () =
             Format.printf
               "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
-               @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
+               @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ intervention\
                @ effect@ to@ perform@ it@]@." in
           toplevel env graph state
         else
@@ -348,7 +348,7 @@ let () =
             let () =
               Format.printf
                 "@.@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
-                 @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
+                 @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ intervention\
                  @ effect@ to@ perform@ it@]@." in
             toplevel env graph' state' in
     Format.printf "Simulation ended@.";

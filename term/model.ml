@@ -16,7 +16,7 @@ type t = {
     (string Locality.annot option * LKappa.rule Locality.annot)
       array;
   rules : Primitives.elementary_rule array;
-  perturbations : Primitives.perturbation array;
+  interventions : Primitives.perturbation array;
   dependencies_in_time : Operator.DepSet.t;
   dependencies_in_event : Operator.DepSet.t;
   algs_reverse_dependencies : Operator.DepSet.t array;
@@ -25,11 +25,11 @@ type t = {
 }
 
 let init ~filenames domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
-    (ast_rules,rules) observables perturbations contact_map =
+    (ast_rules,rules) observables interventions contact_map =
   { filenames; domain; tokens; ast_rules; rules; algs; observables;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     dependencies_in_time = deps_in_t; dependencies_in_event = deps_in_e;
-    perturbations; contact_map;
+    interventions; contact_map;
   }
 
 let domain env = env.domain
@@ -48,7 +48,7 @@ let fold_rules f x env =
   Tools.array_fold_lefti (fun i x rule -> f i x rule) x env.rules
 
 let fold_perturbations f x env =
-  Tools.array_fold_lefti (fun i x p -> f i x p) x env.perturbations
+  Tools.array_fold_lefti (fun i x p -> f i x p) x env.interventions
 
 let get_rule env i = env.rules.(i)
 
@@ -88,8 +88,8 @@ let nb_algs env = NamedDecls.size env.algs
 let num_of_token str env = NamedDecls.elt_id ~kind:"token" env.tokens str
 let nb_tokens env = NamedDecls.size env.tokens
 
-let get_perturbation env i = env.perturbations.(i)
-let nb_perturbations env = Array.length env.perturbations
+let get_perturbation env i = env.interventions.(i)
+let nb_perturbations env = Array.length env.interventions
 
 let get_alg_reverse_dependencies env i = env.algs_reverse_dependencies.(i)
 let get_token_reverse_dependencies env i = env.tokens_reverse_dependencies.(i)
@@ -123,7 +123,7 @@ let print_ast_rule ?env f i =
   | None -> Format.fprintf f "__ast_rule_%i" i
   | Some env ->
     let sigs = signatures env in
-    if i = 0 then Format.pp_print_string f "Perturbations"
+    if i = 0 then Format.pp_print_string f "Interventions"
     else
       match env.ast_rules.(pred i) with
       | (Some (na,_),_) -> Format.pp_print_string f na
@@ -165,10 +165,10 @@ let print_kappa pr_alg pr_pert f env =
                ~full:true sigs (print_token ~env) (print_alg ~env))
             e))
     env.ast_rules
-    (fun f -> if env.perturbations <> [||] then Pp.space f)
+    (fun f -> if env.interventions <> [||] then Pp.space f)
     (Pp.array Pp.space (fun i f p ->
          Format.fprintf f "@[<h>/*%i*/%a@]" i (pr_pert env) p))
-    env.perturbations
+    env.interventions
 
 let print pr_alg pr_rule pr_pert f env =
   let () = print_kappa pr_alg pr_pert f env in
@@ -188,7 +188,7 @@ let check_if_counter_is_filled_enough x =
                   Primitives.DIN _ | Primitives.DINOFF _ |
                   Primitives.CFLOWOFF _ | Primitives.PLOTENTRY |
                   Primitives.PRINT _ | Primitives.SPECIES _ |
-                  Primitives.SPECIES_OFF _ ) -> false) x.perturbations then
+                  Primitives.SPECIES_OFF _ ) -> false) x.interventions then
     raise (ExceptionDefn.Malformed_Decl
              (Locality.dummy_annot
                 "There is no way for the simulation to stop."))
@@ -229,14 +229,14 @@ let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
         (Primitives.map_expr_rule
            (Alg_expr.propagate_constant
               ?max_time ?max_events updated_vars algs')) x.rules;
-    perturbations =
+    interventions =
       Array.map
         (Primitives.map_expr_perturbation
            (Alg_expr.propagate_constant
               ?max_time ?max_events updated_vars algs')
            (Alg_expr.propagate_constant_bool
               ?max_time ?max_events updated_vars algs'))
-        x.perturbations;
+        x.interventions;
     dependencies_in_time = x.dependencies_in_time;
     dependencies_in_event = x.dependencies_in_event;
     algs_reverse_dependencies = x.algs_reverse_dependencies;
@@ -278,9 +278,9 @@ let to_yojson env =
     "elementary_rules",
     JsonUtil.of_array (Primitives.rule_to_yojson ~filenames) env.rules;
     "contact_map", Contact_map.to_yojson (env.contact_map);
-    "perturbations",
+    "interventions",
     JsonUtil.of_array
-      (Primitives.perturbation_to_yojson ~filenames) env.perturbations;
+      (Primitives.perturbation_to_yojson ~filenames) env.interventions;
     "dependencies_in_time", Operator.depset_to_yojson env.dependencies_in_time;
     "dependencies_in_event", Operator.depset_to_yojson env.dependencies_in_event;
     "algs_reverse_dependencies",
@@ -335,10 +335,10 @@ let of_yojson = function
                 Tools.array_map_of_list
                   (Primitives.rule_of_yojson ~filenames) o
               | _ -> raise Not_found);
-          perturbations =
+          interventions =
             JsonUtil.to_array
               (Primitives.perturbation_of_yojson ~filenames)
-              (Yojson.Basic.Util.member "perturbations" x);
+              (Yojson.Basic.Util.member "interventions" x);
           dependencies_in_time =
             Operator.depset_of_yojson
               (Yojson.Basic.Util.member "dependencies_in_time" x);

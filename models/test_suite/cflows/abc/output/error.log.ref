@@ -90,11 +90,11 @@ Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x[1]), B/*2*/(x[1])
     [algebraic variable [3] rate_of_rule [1]] -> (-1(c[.])->() 7)
-  /*cc2*/ C/*3*/(x1{u} x2{u}) [algebraic variable [4] perturbation [0]] -> ()
-  /*cc3*/ C/*3*/(x1{p} x2{u}) [algebraic variable [5] perturbation [1]]
+  /*cc2*/ C/*3*/(x1{u} x2{u}) [algebraic variable [4] intervention [0]] -> ()
+  /*cc3*/ C/*3*/(x1{p} x2{u}) [algebraic variable [5] intervention [1]]
     -> (-3(x2[c.!A-1])->-3(x1[.])->-1(x[.])->() 12
        -3(x2[.])->-3(x1[.])->() 11)
-  /*cc4*/ C/*3*/(x1{p} x2{p}) [algebraic variable [6] perturbation [2]] -> ()
+  /*cc4*/ C/*3*/(x1{p} x2{p}) [algebraic variable [6] intervention [2]] -> ()
   /*cc5*/ A/*1*/(x[.]) [rate_of_rule [0]]
     -> (-1(c[x2.!C-3])->-3(x2{u})->-3(x1[.])->-3(x1{p})->() 12
        -1(c[.])->() 10)

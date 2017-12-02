@@ -6,7 +6,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 21 (sub)observables 37 navigation steps
@@ -32,7 +32,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 21 (sub)observables 37 navigation steps
@@ -58,7 +58,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 21 (sub)observables 37 navigation steps
@@ -84,7 +84,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 21 (sub)observables 37 navigation steps

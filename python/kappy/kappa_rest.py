@@ -194,9 +194,9 @@ class KappaRest(KappaApi):
         return self._put(self.in_project('simulation', 'pause'),
                          {'action': 'pause'})
 
-    def simulation_perturbation(self, perturbation_code):
-        return self._put(self.in_project('simulation', 'perturbation'),
-                         {'perturbation_code': perturbation_code})
+    def simulation_intervention(self, intervention_code):
+        return self._put(self.in_project('simulation', 'intervention'),
+                         {'intervention_code': intervention_code})
 
     def simulation_start(self, simulation_parameter=None):
         if simulation_parameter is None:

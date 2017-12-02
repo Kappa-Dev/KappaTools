@@ -29,7 +29,7 @@ Domain:
   /*cc1*/ A/*1*/(x[.]) [rate_of_rule [0]] -> ()
   /*cc2*/ A/*1*/(x[1] y[.]), A/*2*/(x[1] y[.]) [rate_of_rule [1]] -> ()
   /*cc3*/ A/*1*/(x[1] y[2]), A/*2*/(x[1] y[2]) [rate_of_rule [2]] -> ()
-  /*cc4*/ A/*1*/(x[1]), A/*2*/(y[1]) [rate_of_rule [3] perturbation [0]]
+  /*cc4*/ A/*1*/(x[1]), A/*2*/(y[1]) [rate_of_rule [3] intervention [0]]
     -> ()
   /*cc5*/ A/*1*/(x[1]), A/*2*/(x[1])
     -> (-2(y[.])->-1(y[.])->() 2 -2(y[y.1])->() 3)

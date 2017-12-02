@@ -411,7 +411,7 @@ let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
       Operator.DepSet.mem (Operator.ALG j) in_t ||
       Operator.DepSet.exists
         (function Operator.ALG k -> aux k
-                | (Operator.RULE _ | Operator.PERT _) -> false) deps.(j) in
+                | (Operator.RULE _ | Operator.MODIF _) -> false) deps.(j) in
     aux i
   | IF (cond,yes,no),_ ->
     bool_has_time_dep vars_deps cond ||

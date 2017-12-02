@@ -38,7 +38,7 @@ module FormPerturbation : Ui_common.Div = struct
     Html.button
       ~a:[ Html.a_button_type `Submit
          ; Html.a_class ["btn"; "btn-default" ] ]
-      [ Html.cdata "perturbation" ]
+      [ Html.cdata "intervention" ]
   let form = Html.form ~a:
       [Tyxml_js.R.Html.a_class
          (visible_on_states
@@ -56,13 +56,13 @@ module FormPerturbation : Ui_common.Div = struct
        (fun _ ->
           let model_perturbation : string = Js.to_string input_dom##.value in
           let () =
-            State_perturbation.set_model_perturbation model_perturbation in
+            State_perturbation.set_model_intervention model_perturbation in
           Js._true)
      in
 
      let () = form_dom##.onsubmit :=
          Dom.handler (fun _ ->
-             let () = Panel_settings_controller.perturb_simulation () in
+             let () = Panel_settings_controller.intervene_simulation () in
              Js._false) in
      let () = input_dom##.onchange := Dom.handler handler in
      ()

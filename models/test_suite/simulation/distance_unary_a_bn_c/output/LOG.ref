@@ -6,7 +6,7 @@ done
 + Building initial simulation conditions...
 	 -variable declarations
 	 -rules
-	 -perturbations
+	 -interventions
 	 -observables
 	 -update_domain construction
 	 18 (sub)observables 0 navigation steps

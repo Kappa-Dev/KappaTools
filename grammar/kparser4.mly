@@ -565,7 +565,7 @@ effect:
        pend,p) }
   | INTRO annot error
     { raise (ExceptionDefn.Syntax_Error
-               (add_pos 3 "Malformed perturbation instruction, I was expecting \
+               (add_pos 3 "Malformed intervention instruction, I was expecting \
 '$ADD alg_expression kappa_expression'")) }
   | DELETE annot alg_expr pattern
     { let (m,pend,p) = $4 in
@@ -581,7 +581,7 @@ effect:
        pend,p) }
   | DELETE annot error
            { raise (ExceptionDefn.Syntax_Error
-                      (add_pos 3 "Malformed perturbation instruction, I was \
+                      (add_pos 3 "Malformed intervention instruction, I was \
 expecting '$DEL alg_expression kappa_expression'")) }
   | SNAPSHOT print_expr { let (s,pend,p) = $2 in (Ast.SNAPSHOT s,pend,p) }
   | STOP print_expr { let (s,pend,p) = $2 in (Ast.STOP s,pend,p) }

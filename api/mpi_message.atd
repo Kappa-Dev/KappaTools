@@ -25,7 +25,7 @@ type project_parse <ocaml from="Api_types"> = abstract
 type project_parameter <ocaml from="Api_types"> = abstract
 
 type simulation_parameter <ocaml from="Api_types"> = abstract
-type simulation_perturbation  <ocaml from="Api_types"> = abstract
+type simulation_intervention  <ocaml from="Api_types"> = abstract
 type simulation_info <ocaml from="Api_types"> = abstract
 type simulation_efficiency <ocaml module="Counter.Efficiency" t="t"> = abstract
 type file_line  <ocaml from="Api_types"> = abstract
@@ -70,7 +70,7 @@ type request = [
 	       | SimulationTrace
 	       | SimulationParameter
                | SimulationPause
-               | SimulationPerturbation of simulation_perturbation
+               | SimulationIntervention of simulation_intervention
                | SimulationStart of simulation_parameter
                ]
 
@@ -104,7 +104,7 @@ type response_content = [
    | SimulationContinue
    | SimulationDelete
    | SimulationPause
-   | SimulationPerturbation of string
+   | SimulationIntervention of string
    | SimulationStart of simulation_artifact
 ]
 

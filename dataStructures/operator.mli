@@ -42,7 +42,7 @@ val compare_op_of_json : Yojson.Basic.json -> compare_op
 
 (** {6 Dependencies management} *)
 
-type rev_dep = ALG of int | RULE of int | PERT of int
+type rev_dep = ALG of int | RULE of int | MODIF of int
 module DepSet : SetMap.Set with type elt = rev_dep
 val print_rev_dep : Format.formatter -> rev_dep -> unit
 val rev_dep_to_yojson : rev_dep -> Yojson.Basic.json

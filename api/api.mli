@@ -74,8 +74,8 @@ class type manager_simulation = object
 
   method simulation_pause : unit result Lwt.t
 
-  method simulation_perturbation :
-    Api_types_t.simulation_perturbation -> string result Lwt.t
+  method simulation_intervention :
+    Api_types_t.simulation_intervention -> string result Lwt.t
 
   method simulation_continue : string -> unit result Lwt.t
 

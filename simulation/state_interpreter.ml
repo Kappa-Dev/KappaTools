@@ -31,7 +31,7 @@ let empty ~with_delta_activities env stopping_times =
            match dep with
            | Operator.ALG j ->
              aux (Model.get_alg_reverse_dependencies env j) perts
-           | Operator.PERT p ->
+           | Operator.MODIF p ->
              List_util.merge_uniq Mods.int_compare [p] perts
            | Operator.RULE _ -> perts)
     dep acc in

@@ -257,12 +257,12 @@ paths:
           description: OK
         default:
           $ref: '#/components/responses/Default'
-  '/projects/{project_id}/simulation/perturbation':
+  '/projects/{project_id}/simulation/intervention':
     put:
       tags:
         - simulation
-      summary: Execute a perturbation
-      description: the siulation must be paused
+      summary: Execute a intervention
+      description: the simulation must be paused
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
@@ -271,9 +271,9 @@ paths:
             schema:
               type: object
               required:
-                - perturbation_code
+                - intervention_code
               properties:
-                perturbation_code:
+                intervention_code:
                   type: string
       responses:
         '200':
@@ -385,11 +385,11 @@ paths:
           description: OK
         default:
           $ref: '#/components/responses/Default'
-  '/projects/{project_id}/simulation/fluxmaps':
+  '/projects/{project_id}/simulation/DIN':
     get:
       tags:
         - simulation
-      summary: List the dynamic influence map
+      summary: List the dynamic influence network
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       responses:
@@ -397,7 +397,7 @@ paths:
           description: OK
         default:
           $ref: '#/components/responses/Default'
-  '/projects/{project_id}/simulation/fluxmaps/{DIN_id}':
+  '/projects/{project_id}/simulation/DIN/{DIN_id}':
     get:
       tags:
         - simulation

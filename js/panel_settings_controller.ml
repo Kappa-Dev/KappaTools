@@ -58,14 +58,14 @@ let start_simulation () =
        >>= (fun _ -> Lwt.return_unit)
     )
 
-let perturb_simulation () =
+let intervene_simulation () =
   Common.async
     __LOC__
     (fun () ->
       let model_perturbation =
-        React.S.value State_perturbation.model_perturbation in
+        React.S.value State_perturbation.model_intervention in
       State_error.wrap
-        __LOC__ (State_simulation.perturb_simulation model_perturbation) >>=
+        __LOC__ (State_simulation.intervene_simulation model_perturbation) >>=
       Api_common.result_map
         ~ok:(fun _ message_text ->
             let () = State_error.add_error __LOC__ [{
