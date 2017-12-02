@@ -1,8 +1,8 @@
 %agent: A(x)
 %agent: D()
 
-%init: 10 A(x!1),A(x!1)
+%init: 10 A(x[1]),A(x[1])
 
--> D() @1
+. -> D() @1
 
-%obs: 'dimer' |A(x!1),A(x!1)| 
+%obs: 'dimer' |A(x[1]),A(x[1])| 
