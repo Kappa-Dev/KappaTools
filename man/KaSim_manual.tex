@@ -289,7 +289,7 @@ Declarations can be: agent and token \emph{signatures}
 The KF\index{Kappa file}'s structure is quite flexible. Neither
 dividing into several sub-files nor the order of
 declaration\index{declaration}s matters (for the exception of
-perturbations and variable declaration\index{declaration}s, see
+interventions and variable declaration\index{declaration}s, see
 respectively Sections \ref{sec:mod} and \ref{sec:var} for details).
 
 Comments\index{comments} works like in the C language. It can be used
@@ -835,7 +835,7 @@ result binding between freely floating agents will occur at rate
 \ttt{{\textquotesingle}k2{\textquotesingle}} while binding between
 agents that are part of the same complex will occur at rate
 \ttt{{\textquotesingle}k1{\textquotesingle}}. Line 21 contains a
-\emph{perturbation} that requires \KaSim~to stop the simulation after
+\emph{intervention} that requires \KaSim~to stop the simulation after
 10,000 events and output the list of molecular species present in the
 final mixture\index{mixture} as a \texttt{dot} file ({\eg}see Section~\ref{sec:mod})
 that we give in Figure~\ref{fig:species}.
@@ -994,7 +994,7 @@ Each intervention directive is splitted in 4 parts:
 \item[clock] When trying to intervene should be considered
 \item[condition] what is the condition under which the intervention is triggered
 \item[intervention] what are the interventions
-\item[repeatition] if the perturpation is triggered, under what
+\item[repeatition] if the intervention is triggered, under what
   condition should it be still tried afterward
 \end{description}
 
@@ -1026,7 +1026,7 @@ and syntactic sugar detailed below is provided.
 
 \begin{table}[htbp]
   \centering
-  \caption{Perturbation expressions.}
+  \caption{Intervention expressions.}
   \begin{tabular}{@{} lcl @{}}
     \textit{boolean\_expression} &::=& \textit{algebraic\_expression}\index{boolean expression} \tcb{rel} \textit{algebraic\_expression} \\
     && | (\textit{boolean\_expression} \tcb{||} \textit{boolean\_expression}) \\
@@ -1072,14 +1072,14 @@ will do it every event where there is more than
 the number of \lstinline[language=kappa]@|B(x[_])|@ becomes bigger than the number of
 \lstinline[language=kappa]@|B(x[.])|@.
 
-When the conditions of several perturbations that are tested at the
-same moment are satisfied simultanously, perturbations are triggered
+When the conditions of several interventions that are tested at the
+same moment are satisfied simultanously, interventions are triggered
 in the order in which they have been declared in the KF\index{Kappa
-  file}. A perturbation can only be fired once per event loop.
+  file}. A intervention can only be fired once per event loop.
 
 \subsection{shortcuts}
 If the repeat keyword and the repeat condition are ommited, it is assumed that it is
-\lstinline[language=kappa]!repeat [false]! aka a one-shot perturbation.
+\lstinline[language=kappa]!repeat [false]! aka a one-shot intervention.
 
 If the (pre)condition is ommited, it is considerated to be
 \lstinline[language=kappa]![true]! unless both conditions are ommited
@@ -1089,15 +1089,17 @@ and a clock is provided. In this case the implicit condition is
 is somehow a 'at' operator. It means ``do \texttt{effects} at [T] = 5.8''.
 
 \subsection{Model modification}
-\subsubsection{Adding or deleting agents during a simulation}
+\subsubsection{Applying a rule during a simulation}
 
-Continuing with the ABC model, the perturbation effect\index{effect}:
+\paragraph{Special cases: simply adding or deleting agents}
+
+Continuing with the ABC model, the intervention effect\index{effect}:
 \lstinline[language=kappa]*$ADD n C(x1~p)*
-will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (and the rest of its interface in the default state as specified line 4 of ABC.ka). Also the perturbation effect\index{effect}:
+will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (and the rest of its interface in the default state as specified line 4 of ABC.ka). Also the intervention effect\index{effect}:
 \lstinline[language=kappa]*$DEL |B(x!_)| B(x!_)*
 will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}.
 
-There are various ways one can use perturbations to study more deeply a given Kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the Kappa file in the following way: one sets the initial concentration of \ttt{C} to 0 by deleting line 22. Now one introduces \ttt{C}s after 25 t.u using the perturbation:
+There are various ways one can use interventions to study more deeply a given Kappa model. A basic illustration is the use of a simple intervention to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the Kappa file in the following way: one sets the initial concentration of \ttt{C} to 0 by deleting line 22. Now one introduces \ttt{C}s after 25 t.u using the intervention:
 \lstinline[language=kappa]*%mod:  [T]=25 do $ADD 10000 C()*.
 
 The modified Kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}).
@@ -1111,15 +1113,11 @@ one obtains the curve given in Fig.~\ref{fig:abc2}.
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=10cm]{generated_img/plot-abc2.png}
-\caption{Simulation of the ABC model with a perturbation: for t<25s, only \ttt{{\textquotesingle}a.b{\textquotesingle}} and \ttt{{\textquotesingle}a..b{\textquotesingle}} rules may apply. This enables the concentration of \ttt{{\textquotesingle}AB{\textquotesingle}} complexes to go to steady state, before introducing fresh \ttt{C}s at t=25s.}
+\caption{Simulation of the ABC model with a intervention: for t<25s, only \ttt{{\textquotesingle}a.b{\textquotesingle}} and \ttt{{\textquotesingle}a..b{\textquotesingle}} rules may apply. This enables the concentration of \ttt{{\textquotesingle}AB{\textquotesingle}} complexes to go to steady state, before introducing fresh \ttt{C}s at t=25s.}
 \label{fig:abc2}
 \end{center}
 \end{figure}
 
-\subsubsection{Changing the value of a token}
-The concentration of any token can be reset on the fly using a perturbation. For instance, the declaration\index{declaration}:
-\lstinline[language=kappa]!%mod: repeat (|a|<100 do a <- |a|*2) until [false]!
-will double the concentration of token \ttt{a} each time it gets below 100.
 
 
 \subsubsection{Updating kinetic rates on the fly}
@@ -1127,18 +1125,18 @@ will double the concentration of token \ttt{a} each time it gets below 100.
 Any variable between simple quotes can be updated during a simulation using a declaration\index{declaration} of the form:
 \lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 0.0!
 
-This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that, according to the grammar given in Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
+This intervention will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that, according to the grammar given in Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
 \lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 'k_on'/100!
 \noi will cause the on rate of all rules to decrease a hundred fold. Note that, it is possible to override the kinetic rate of a specific rule:  in our ABC example, the declaration\index{declaration}:
 \lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'a.b' inf!
 \noi will set the kinetic rate of rule \ttt{\var{a.b}}~to infinity.
 
 \subsubsection{Interrupt simulation}
-The perturbation \ttt{\$STOP} will interrupt the simulation. It
+The intervention \ttt{\$STOP} will interrupt the simulation. It
 returns the hand to the user if one run in interactive mode or
 terminates the run in batch mode.
 
-The perturbation \ttt{\$STOP "final\_state.ka"} will in addition
+The intervention \ttt{\$STOP "final\_state.ka"} will in addition
 produce a snapshot of the last mixture\index{mixture}.
 
 \subsection{Model immediate examination}
@@ -1182,7 +1180,7 @@ declaration\index{declaration}:
 which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends.
 
 Note that instead of producing Kappa files, one may use snapshot
-perturbations to produce an image of the mixture\index{mixture} in the
+interventions to produce an image of the mixture\index{mixture} in the
 dot/html format using the parameter by specifying the extention in the
 name skeleton
 (\lstinline[language=kappa]!%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
@@ -1387,7 +1385,7 @@ will generate a file \ttt{model.out} containing the trajectories of the observab
 \ITE{
 \item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -l 1.5 -p 0.0015}
 }
-will generate a file \ttt{data.csv} (default name) containing 1,000 data points of a simulation of 1.5 (arbitrary) time units of the model. The input Kappa file is split into four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} ({\eg}see Chapter~\ref{chap:kappa}). %The order in which the files are given does not matter.
+will generate a file \ttt{data.csv} (default name) containing 1,000 data points of a simulation of 1.5 (arbitrary) time units of the model. The input Kappa file is split into four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the interventions, \ttt{pert.ka} ({\eg}see Chapter~\ref{chap:kappa}). %The order in which the files are given does not matter.
 
 \section{Interactivity}
 Simulations are interruptible by sending a \verb:SIGINT: to the
@@ -1446,13 +1444,13 @@ As an example, consider the computation of causal flows between $t=10$ and $t=20
 %mod: [T]>20 do $TRACK 'Cpp' [false]
 \end{lstlisting}
 
-The above declaration will ask \KaSim~to analyze each new occurrence of \ttt{\var{Cpp}} in that time interval. If $n$ new instances took place, then \KaSim~will have to compute $n$ causal flows. One may want to bound the number of computed flows to a certain value, say 10. One may do so using the combination of perturbations and variables given below:
+The above declaration will ask \KaSim~to analyze each new occurrence of \ttt{\var{Cpp}} in that time interval. If $n$ new instances took place, then \KaSim~will have to compute $n$ causal flows. One may want to bound the number of computed flows to a certain value, say 10. One may do so using the combination of interventions and variables given below:
 \begin{lstlisting}[language=kappa]
 %var: 'x' 0
 %mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'x' 'Cpp')
 %mod: [T]>20 || ('x' > 0 && 'Cpp' - 'x' > 9) do $TRACK 'Cpp' [false]
 \end{lstlisting}
-The first line is a declaration of an $x$ variable that is initially set to 0. Note that, the second line is a perturbation that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
+The first line is a declaration of an $x$ variable that is initially set to 0. Note that, the second line is a intervention that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
 The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$).
 
 
@@ -1500,7 +1498,7 @@ The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each tim
 \end{lstlisting}}
 prints in the file \ttt{"species.ka"} a new line for each new occurrence of \ttt{A(a!1), B(a!1)} with the time of occurrence and the species in which it occurred.
 
-Note that, this perturbation can only be applied if the observable is a connected component.
+Note that, this intervention can only be applied if the observable is a connected component.
 
 \section{Implicit signature}
 \KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{Kappa file}. Note that, it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents.
@@ -1731,7 +1729,7 @@ Knowing whether, or not, a given bio-molecular species may be formed in a model 
 \item firstly, ignoring the number of occurrences of bio-molecular species (we assume that whenever a bio-molecular species may be formed, then it may be formed as many time as it could be necessary),
 \item secondly, abstracting a bio-molecular species by the set of its properties.
 \end{enumerate}
-The analysis takes into account also the chemical species that may be introduced in a perturbation.
+The analysis takes into account also the chemical species that may be introduced in a intervention.
 
 The classes of properties of interest are encoded in so called abstract domains, which can be independently enabled/disabled. The whole analysis can be understood as a mutual recursion between smaller analyses (one per abstract domain), that communicate information between each other at each step of the analysis. We took the same scheme of collaboration between abstract domains as in  \cite{CousotEtAl06-ASIAN}.
 % local views (that is to say that we focus on the relationships between the states of the sites within agents, but we abstract away any relationships between different agents within a bio-molecular species).
@@ -1858,7 +1856,7 @@ The option \verb?--compute-reachability-analysis? can be used to switch on/off t
 
 The option \verb?--enable-every-domain? can be used to switch on every abstract domain, whereas the option \verb?--disable-every-domain? can be used to switch off every abstract domain.
 
-The option \verb?--contact-map-domain? impacts the way side-effects are handled with during the analysis. In \verb?static? mode, we consider that every bond that occurs syntactically in the initial state, in the RHS of a rule, or in an introduction directive of a perturbation, may be released by side-effects.
+The option \verb?--contact-map-domain? impacts the way side-effects are handled with during the analysis. In \verb?static? mode, we consider that every bond that occurs syntactically in the initial state, in the RHS of a rule, or in an introduction directive of a intervention, may be released by side-effects.
 In \verb?dynamic? mode, only the bond that has been encountered so far during the analysis are considered.
 
 The option \verb?--views-domain? can be used to switch on/off the views domains that combine the non-relational analysis and the relational analysis.
@@ -2136,7 +2134,6 @@ Firstly, it is parameterized of the accuracy of the contact map. Secondly, it ma
 
 The file \texttt{scc\_relations.ka} contains the following model:
 \begin{lstlisting}[language=kappa]
-
 %agent: A(x,y)
 %agent: B(x,y)
 
@@ -2287,7 +2284,7 @@ The current implementation has the following limitations:
 \begin{itemize}
 \item Currently, only observables that are defined as patterns are taken into account.
 \item Not atomic observables which are defined as algebraic expressions are not taken into account yet. The observables are ignored.
-\item The influence map does not take into account indirect influences due to perturbations (which could arises when the application of a rule triggers a perturbation which would create some agents or increase/decrease the value of some variables).
+\item The influence map does not take into account indirect influences due to interventions (which could arises when the application of a rule triggers a intervention which would create some agents or increase/decrease the value of some variables).
 \item Token are not taken into yet. They are currently ignored.
 \item Positive/negative influence of time is not taken into account either.
 \end{itemize}
@@ -2302,7 +2299,7 @@ At low precision, an influence is detected if one rule change at least one bit o
 At medium precision, the analysis checks that both rules have a common context.
 
 At high precision, the analysis checks that such common context is realizable taking into account the species that have been declared as initial states
-and the potential introduction of species in perturbations. High resolution influence is parameterized by the accuracy of the reachability analysis.
+and the potential introduction of species in interventions. High resolution influence is parameterized by the accuracy of the reachability analysis.
 It may happen that a given context is infeasible, but that this is not detected by the analysis.
 
 Let us illustrate these three levels of accuracy by a case study.
@@ -2328,7 +2325,7 @@ The medium resolution influence map is given in Fig.~\ref{fig:medium-res}.
 Every arc corresponding to incompatible contexts has been removed.
 In our example, these are the arcs from the rule $3$ and the rule $5$ (in both direction). Despite the fact that the rule $3$ may phosphorylate the site \texttt{w} which is required to apply the rule $5$, no instance of the rule $5$ may be applied thanks to the application of the rule $3$ right after, because after the application of the rule $3$ the state of the site $x$ is necessarily unphosphorylated, whereas it has to be phosphorylated for the rule $5$ to be applied. The same kind of explanation holds to remove the arc from the rule $5$ to the rule $3$.
 
-There are some structural invariants in these models. We give in Fig.~\ref{fig:reachability_influence} the log of the computation of the high resolution contact map. It turns out that whenever the site \texttt{y} of an agent is phosphorylated, then the site \texttt{x} of this protein is phosphorylated as well. Thus we can deduce that the positive arc from the rules $2$ and $3$, and the negative arcs from the rules $2$ and $4$ (in both direction) are false positive unless we change the set of the species in the initial state or in the perturbations. Thus we obtain the high resolution influence map given in Fig.~\ref{fig:high-res}.
+There are some structural invariants in these models. We give in Fig.~\ref{fig:reachability_influence} the log of the computation of the high resolution contact map. It turns out that whenever the site \texttt{y} of an agent is phosphorylated, then the site \texttt{x} of this protein is phosphorylated as well. Thus we can deduce that the positive arc from the rules $2$ and $3$, and the negative arcs from the rules $2$ and $4$ (in both direction) are false positive unless we change the set of the species in the initial state or in the interventions. Thus we obtain the high resolution influence map given in Fig.~\ref{fig:high-res}.
 
 
 
