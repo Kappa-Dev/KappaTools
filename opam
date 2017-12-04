@@ -12,6 +12,7 @@ bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
 dev-repo: "https://github.com/Kappa-Dev/KaSim.git"
 
 depends : [
+  "num"
   "ocamlfind"
   "ocamlbuild" {build}
   "yojson"
