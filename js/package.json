@@ -1,6 +1,6 @@
 {
     "name": "Kappa",
-    "main": "index.html?host=file%3A%2F%2F..%2Fbin%2FKaSimAgent%3Flabel%3DLocal&level=debug",
+    "main": "index.html?host=file%3A%2F%2F..%2Fbin%2FKaSimAgent%3Flabel%3DLocal",
     "window": {
 	"min_width": 1024,
 	"min_height": 768
