@@ -327,13 +327,13 @@ let () =
               env counter graph' state' story_compression
           else
             toplevel env' graph' state' in
+        let toplevel_intro () =
+          Format.printf
+            "@[KaSim@ toplevel:@ type@ `$RUN@ (optionally@ followed@ by@ a\
+             @ pause@ criteria)@ ;` to@ launch@ the@ simulation@ or@ a@ intervention\
+             @ effect@ (followed by its `;`) to@ perform@ it@]@." in
         if cli_args.Run_cli_args.interactive then
-          let () =
-            Format.printf
-              "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
-               @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ intervention\
-               @ effect@ to@ perform@ it@]@." in
-          toplevel env graph state
+          let () = toplevel_intro () in toplevel env graph state
         else
           let (stop,graph',state') =
             interactive_loop
@@ -345,12 +345,7 @@ let () =
               ~outputs formatCflows cflowFile trace_file
               env counter graph' state' story_compression
           else
-            let () =
-              Format.printf
-                "@.@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
-                 @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ intervention\
-                 @ effect@ to@ perform@ it@]@." in
-            toplevel env graph' state' in
+            let () = toplevel_intro () in toplevel env graph' state' in
     Format.printf "Simulation ended@.";
     remove_trace ();
     Counter.print_efficiency Format.std_formatter counter ;

@@ -670,9 +670,9 @@ model:
   ;
 
 interactive_command:
-  | annot RUN annot EOF { Ast.RUN (Locality.dummy_annot Alg_expr.FALSE) }
-  | annot RUN annot bool_expr EOF { let (pause,_,_) = $4 in Ast.RUN pause }
-  | annot effect_list EOF { let(eff,_,_) = $2 in Ast.MODIFY eff }
+  | annot RUN annot SEMICOLON { Ast.RUN (Locality.dummy_annot Alg_expr.FALSE) }
+  | annot RUN annot bool_expr SEMICOLON { let (pause,_,_) = $4 in Ast.RUN pause }
+  | annot effect SEMICOLON { let (eff,_,_) = $2 in Ast.MODIFY [eff] }
   | annot EOF { Ast.QUIT }
   | error
     { raise (ExceptionDefn.Syntax_Error (add_pos 1 "Unrecognized command")) }
