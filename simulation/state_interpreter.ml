@@ -423,7 +423,7 @@ let a_loop
            | None ->
               (*set time for apply rule *)
               let () =
-                Counter.fill ~outputs counter ~dt (observables_values env graph) in
+                Counter.fill ~outputs counter ~dt (observables_values env graph') in
               let () = Counter.one_time_advance counter dt' in
 
               if stop then (stop,graph',state') else
