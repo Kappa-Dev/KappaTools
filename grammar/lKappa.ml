@@ -272,6 +272,7 @@ let print_intf_lhs ~ltypes sigs ag_ty f (ports,ints) =
         let () = Format.fprintf
             f "%t%a%a[%a]"
             (if empty then Pp.empty else Pp.space)
+            (* why a space and not a comma ? *)
             (Signature.print_site sigs ag_ty) i
             (print_internal_lhs sigs ag_ty i)
             ints.(i) (print_link_lhs ~ltypes sigs) ports.(i) in
@@ -294,6 +295,7 @@ let print_intf_rhs ~ltypes sigs ag_ty f (ports,ints) =
         let () = Format.fprintf
             f "%t%a%a[%a]"
             (if empty then Pp.empty else Pp.space)
+            (* why a space and not a comma ? *)
             (Signature.print_site sigs ag_ty) i
             (print_internal_rhs sigs ag_ty i)
             ints.(i) (print_link_rhs ~ltypes sigs) ports.(i) in
@@ -356,6 +358,7 @@ let print_rates sigs pr_tok pr_var f r =
                    pr_tok pr_var) md)) max_dist)
 
 let print_rule ~full sigs pr_tok pr_var f r =
+  (* It should depend whether we are in syntax Version 3 and syntax Version 4 *)
   Format.fprintf
     f "@[<h>%t%t%a%t@]"
     (fun f ->
