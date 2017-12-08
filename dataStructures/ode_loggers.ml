@@ -1011,7 +1011,11 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
       | Alg_expr.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
       | Alg_expr.CONST (Nbr.I64 n) -> Loggers.fprintf logger "%i" (Int64.to_int n)
       | Alg_expr.CONST (Nbr.F f) ->
-        if fst (modf f) = 0.
+        if (*fst (modf f) = 0.*)
+             (* No!!! *)
+             (* The float data-type contains more natural numbers than the int data type *)
+             (* Ex: int_of_float 6e23 = 0 *)
+          float_of_int (int_of_float f) = f 
         then
           Loggers.fprintf logger "%i" (int_of_float f)
         else
@@ -3044,7 +3048,7 @@ let launch_main logger =
   | Loggers.Maple
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph  | Loggers.Js_Graph 
+  | Loggers.Matrix | Loggers.HTML_Graph  | Loggers.Js_Graph
 
   | Loggers.HTML
   | Loggers.HTML_Tabular
