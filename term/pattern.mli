@@ -142,11 +142,17 @@ val embeddings_to_fully_specified : Env.t -> id -> cc -> Renaming.t list
 
 val size_of_cc : cc -> int
 
-val fold:
+val fold_by_type:
   (pos:int -> agent_type:int -> (link * int) array -> 'a -> 'a) ->
   cc -> 'a -> 'a
 (** USE WITH CARE: Break some abstraction. The array must not be
    modified and internal state [-1] means unspecified *)
+
+val fold:
+  (int ->  (link * int) array -> 'acc -> 'acc) ->
+  cc -> 'acc -> 'acc
+(** USE WITH CARE: Break some abstraction. The array must not be
+    modified and internal state [-1] means unspecified *)
 
 val finalize : max_sharing:bool -> PreEnv.t -> Contact_map.t ->
                Env.t * PreEnv.stat
@@ -158,3 +164,5 @@ val merge_on_inf : PreEnv.t -> Renaming.t -> t -> t ->
 val length : t -> int
 
 module Set : SetMap.Set with type elt=id
+
+val counter_value_cc: cc -> Mods.IntMap.elt * int -> int -> int

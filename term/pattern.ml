@@ -412,6 +412,10 @@ let rec counter_value nodes (nid,sid) count =
            | UnSpec | Free -> acc
            | Link (dn,di) -> counter_value nodes (dn,di) (acc+1)) count ag
 
+let counter_value_cc cc (nid,sid) count =
+  let nodes = cc.nodes in
+  counter_value nodes (nid,sid) count
+
 let dotcomma dotnet =
   if dotnet
   then (fun fmt -> Format.fprintf fmt ",")
@@ -1348,7 +1352,7 @@ let minimal_env env contact_map =
          ))
     env contact_map
 
-let fold f cc acc =
+let fold_by_type f cc acc =
   Tools.array_fold_lefti
     (fun agent_type acc list_pos ->
        List.fold_left
@@ -1360,6 +1364,7 @@ let fold f cc acc =
     acc
     cc.nodes_by_type
 
+let fold f cc acc = Mods.IntMap.fold f cc.nodes acc 
 let finalize ~max_sharing env contact_map =
   let env = minimal_env env contact_map in
   let si,complete_domain = PreEnv.saturate ~max_sharing env.PreEnv.domain in

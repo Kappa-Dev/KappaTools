@@ -295,7 +295,7 @@ let top_sort_mixture list =
 
 let parse pattern =
   let agent_list, site_list =
-    Pattern.fold
+    Pattern.fold_by_type 
       (fun ~pos ~agent_type intf (agent_list, site_list) ->
          ((pos, agent_type) :: agent_list,
           Tools.array_fold_lefti

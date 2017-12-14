@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 18 2017>
+  * Last modification: Time-stamp: <Dec 14 2017>
 *)
 
 module A = Odes.Make (Ode_interface)

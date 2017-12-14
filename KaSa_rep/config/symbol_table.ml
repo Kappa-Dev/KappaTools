@@ -23,6 +23,10 @@ type symbol_table =
     rev_arrow : string ;
     bi_arrow : string ;
     uni_arrow_nopoly : string ;
+    dotnet_site_sep : string ;
+    dotnet_agent_sep_comma : string ;
+    dotnet_agent_sep_dot : string ;
+    sotnet_agent_set_plus : string
   }
 
 let symbol_table_V3 =
@@ -49,7 +53,11 @@ let symbol_table_V3 =
     uni_arrow = "->" ;
     rev_arrow = "<-" ;
     bi_arrow = "<->" ;
-    uni_arrow_nopoly = "-!->"
+    uni_arrow_nopoly = "-!->" ;
+    dotnet_site_sep = ","  ;
+    dotnet_agent_sep_comma = ","  ;
+    dotnet_agent_sep_dot = "."  ;
+    sotnet_agent_set_plus = "+"
   }
 
 let symbol_table_V3_light =
@@ -79,5 +87,9 @@ let symbol_table_V4 =
     uni_arrow = "->" ;
     rev_arrow = "<-" ;
     bi_arrow = "<->" ;
-    uni_arrow_nopoly = "-!->"
+    uni_arrow_nopoly = "-!->" ;
+    dotnet_site_sep = ","  ;
+    dotnet_agent_sep_comma = ","  ;
+    dotnet_agent_sep_dot = "."  ;
+    sotnet_agent_set_plus = "+"  
   }

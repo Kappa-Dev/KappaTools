@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Sep 02 2017>
+  * Last modification: Time-stamp: <Dec 14 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -21,7 +21,8 @@ type compil =
     reaction_rate_convention: Remanent_parameters_sig.rate_convention option;
     show_reactions: bool ;
     count: Ode_args.count ;
-    compute_jacobian: bool
+    compute_jacobian: bool ;
+    symbol_table: Symbol_table.symbol_table
   }
 
 
@@ -126,6 +127,14 @@ let domain_opt = lift_opt domain
 
 let environment_opt = lift_opt environment
 
+let symbol_table compil =
+  compil.symbol_table
+
+let symbol_table_opt a =
+  match a with
+  | None -> Symbol_table.symbol_table_V4
+  | Some compil ->  symbol_table compil
+
 type mixture = Edges.t(* not necessarily connected, fully specified *)
 
 type chemical_species = Pattern.cc
@@ -160,11 +169,13 @@ let do_we_prompt_reactions compil =
 
 let print_chemical_species ?dotnet ?compil f =
   Format.fprintf f "@[<h>%a@]"
-    (Pattern.print_cc
+    (Kade_backend.Pattern.print_cc
        ?dotnet
        ?full_species:(Some true)
        ?sigs:(Option_util.map Model.signatures (environment_opt compil))
-       ?cc_id:None ~with_id:false)
+       ?cc_id:None
+       ~symbol_table:(symbol_table_opt compil)
+       ~with_id:false)
 
 let print_token ?compil fmt k =
   Format.fprintf fmt
@@ -213,7 +224,7 @@ let lift_embedding x =
 
 let species_to_positive_transformations cc =
   let _,tr =
-    Pattern.fold
+    Pattern.fold_by_type
       (fun ~pos ~agent_type intf (emb,g) ->
          let a = (pos,agent_type) in
          let g' = Primitives.Transformation.Agent a::g in
@@ -258,7 +269,7 @@ let find_all_embeddings compil species =
 
 let add_fully_specified_to_graph sigs graph cc =
   let e,g =
-    Pattern.fold
+    Pattern.fold_by_type
       (fun ~pos ~agent_type intf (emb,g) ->
          let a, g' = Edges.add_agent sigs agent_type g in
          let ag = (a,agent_type) in
@@ -584,6 +595,11 @@ let get_compil
     show_reactions = show_reactions ;
     count = count ;
     compute_jacobian = compute_jacobian ;
+    symbol_table =
+      match cli_args.Run_cli_args.syntaxVersion with
+      | Ast.V3 -> Symbol_table.symbol_table_V3
+      | Ast.V4 -> Symbol_table.symbol_table_V4
+
   }
 
 let empty_cc_cache compil =

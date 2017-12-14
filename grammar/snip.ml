@@ -634,7 +634,7 @@ let patterns_of_mixture contact_map sigs pre_env e =
    (pre_env', acc)
 
 let aux_lkappa_of_pattern free_id p =
-  Pattern.fold
+  Pattern.fold_by_type
     (fun ~pos ~agent_type intf (acc,lnk_pack) ->
        let ra_ports =
          Array.make
