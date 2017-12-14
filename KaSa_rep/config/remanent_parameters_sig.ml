@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Nov 12 2017>
+  * Last modification:  Time-stamp: <Dec 14 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -30,32 +30,6 @@ type rate_convention =
   | Biochemist
   | Common
 
-type symbol_table =
-  {
-    bound : string;
-    open_binding_state : string;
-    close_binding_state : string;
-    link_to_any : string;
-    link_to_some : string;
-    internal_state_symbol : string;
-    free : string;
-    open_internal_state : string;
-    close_internal_state : string;
-    at : string ;
-    agent_open : string ;
-    agent_close : string ;
-    site_sep_comma : string ;
-    btype_sep : string ;
-    agent_sep_comma : string ;
-    agent_sep_dot : string ;
-    agent_sep_plus : string ;
-    ghost_agent : string ;
-    show_ghost : bool ;
-    uni_arrow : string ;
-    rev_arrow : string ;
-    bi_arrow : string ;
-    uni_arrow_nopoly : string ;
-  }
 
 type influence_map_output =
   {
@@ -148,7 +122,7 @@ type marshalisable_parameters =
    prefix : string ;
    call_stack : string list;
    link_mode : link_mode ;
-   symbols : symbol_table ;
+   symbols : Symbol_table.symbol_table ;
    influence_map_output : influence_map_output ;
    contact_map_output : contact_map_output ;
    reachability_analysis_parameters: reachability_parameters ;
