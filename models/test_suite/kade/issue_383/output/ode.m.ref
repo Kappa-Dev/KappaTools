@@ -64,7 +64,7 @@ jackund=zeros(nrules,nodevar);
 t = 0.000000;
 
 init(5)=t;
-init(1)=10; % A(x{u}[.] y{u}[.])
+init(1)=10; % A(x{u}[.],y{u}[.])
 
 k(1)=1; % A(x{u}[.]) -> A(x{p}[.]) | |A()| d
 k(2)=1; % A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.])
@@ -175,10 +175,10 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); % A(x{u}[.] y{u}[.])
-Init(2) = init(2); % A(x{p}[.] y{u}[.])
+Init(1) = init(1); % A(x{u}[.],y{u}[.])
+Init(2) = init(2); % A(x{p}[.],y{u}[.])
 Init(3) = init(3); 
-Init(4) = init(4); % A(x{p}[.] y{p}[.])
+Init(4) = init(4); % A(x{p}[.],y{p}[.])
 Init(5) = init(5); % t
 end
 
@@ -200,13 +200,13 @@ stoc(1,1)=y(1)+y(2)+y(4);
 dydt=zeros(nodevar,1);
 
 % rule    : A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.])
-% reaction: A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.])
+% reaction: A(x{p}[.],y{u}[.]) -> A(x{p}[.],y{p}[.])
 
 dydt(2)=dydt(2)-k(2)*y(2);
 dydt(4)=dydt(4)+k(2)*y(2);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.]) | |A()| d
-% reaction: A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) | |A()| d
+% reaction: A(x{u}[.],y{u}[.]) -> A(x{p}[.],y{u}[.]) | |A()| d
 
 dydt(1)=dydt(1)-k(1)*y(1);
 dydt(2)=dydt(2)+k(1)*y(1);
@@ -244,13 +244,13 @@ jacstoc(1,1,4)=1;
 jac=sparse(nodevar,nodevar);
 
 % rule    : A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.])
-% reaction: A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.])
+% reaction: A(x{p}[.],y{u}[.]) -> A(x{p}[.],y{p}[.])
 
 jac(2,2)=jac(2,2)-k(2);
 jac(4,2)=jac(4,2)+k(2);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.]) | |A()| d
-% reaction: A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) | |A()| d
+% reaction: A(x{u}[.],y{u}[.]) -> A(x{p}[.],y{u}[.]) | |A()| d
 
 jac(1,1)=jac(1,1)-k(1);
 jac(2,1)=jac(2,1)+k(1);

@@ -64,7 +64,7 @@ jackund=zeros(nrules,nodevar);
 t = 0.000000;
 
 init(16)=t;
-init(1)=10; % A(x{u}[.] y{u}[.] z[.])
+init(1)=10; % A(x{u}[.],y{u}[.],z[.])
 var(3)=(init(2)+2*init(14)+2*init(6)+2*init(10)+init(15)+2*init(12)+2*init(13)+init(7)+2*init(9)+init(11))*init(13); % c
 var(2)=init(10); % b
 var(1)=init(2)+2*init(14)+2*init(6)+2*init(10)+init(15)+2*init(12)+2*init(13)+init(7)+2*init(9)+init(11); % a
@@ -179,21 +179,21 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); % A(x{u}[.] y{u}[.] z[.])
-Init(2) = init(2); % A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1])
-Init(3) = init(3); % A(x{u}[.] y{p}[.] z[.])
+Init(1) = init(1); % A(x{u}[.],y{u}[.],z[.])
+Init(2) = init(2); % A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1])
+Init(3) = init(3); % A(x{u}[.],y{p}[.],z[.])
 Init(4) = init(4); 
-Init(5) = init(5); % A(x{p}[.] y{u}[.] z[.])
-Init(6) = init(6); % A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
-Init(7) = init(7); % A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
-Init(8) = init(8); % A(x{p}[.] y{p}[.] z[.])
-Init(9) = init(9); % A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
-Init(10) = init(10); % A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
-Init(11) = init(11); % A(x{p}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
-Init(12) = init(12); % A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
-Init(13) = init(13); % A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
-Init(14) = init(14); % A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
-Init(15) = init(15); % A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+Init(5) = init(5); % A(x{p}[.],y{u}[.],z[.])
+Init(6) = init(6); % A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
+Init(7) = init(7); % A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
+Init(8) = init(8); % A(x{p}[.],y{p}[.],z[.])
+Init(9) = init(9); % A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
+Init(10) = init(10); % A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
+Init(11) = init(11); % A(x{p}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
+Init(12) = init(12); % A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
+Init(13) = init(13); % A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
+Init(14) = init(14); % A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
+Init(15) = init(15); % A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 Init(16) = init(16); % t
 end
 
@@ -218,268 +218,268 @@ stoc(3,1)=(y(2)+2*y(14)+2*y(6)+2*y(10)+y(15)+2*y(12)+2*y(13)+y(7)+2*y(9)+y(11))*
 dydt=zeros(nodevar,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 dydt(2)=dydt(2)-2*k(2)*y(2)/2;
 dydt(6)=dydt(6)+k(2)*y(2)/2;
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(2)=dydt(2)-2*k(3)*y(2)/2;
 dydt(14)=dydt(14)+k(3)*y(2)/2;
 dydt(4)=dydt(4)+k(3)*y(2)/2*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 dydt(2)=dydt(2)-2*k(2)*y(2)/2;
 dydt(6)=dydt(6)+k(2)*y(2)/2;
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(2)=dydt(2)-2*k(3)*y(2)/2;
 dydt(14)=dydt(14)+k(3)*y(2)/2;
 dydt(4)=dydt(4)+k(3)*y(2)/2*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(14)=dydt(14)-k(2)*y(14);
 dydt(10)=dydt(10)+k(2)*y(14);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 dydt(14)=dydt(14)-k(2)*y(14);
 dydt(13)=dydt(13)+k(2)*y(14);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(14)=dydt(14)-k(3)*y(14);
 dydt(15)=dydt(15)+2*k(3)*y(14);
 dydt(4)=dydt(4)+k(3)*y(14)*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(15)=dydt(15)-2*k(2)*y(15)/2;
 dydt(12)=dydt(12)+k(2)*y(15)/2;
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(15)=dydt(15)-2*k(2)*y(15)/2;
 dydt(12)=dydt(12)+k(2)*y(15)/2;
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{p}[.] z[.]) -> A(x{p}[.] y{p}[.] z[.])
+% reaction: A(x{u}[.],y{p}[.],z[.]) -> A(x{p}[.],y{p}[.],z[.])
 
 dydt(3)=dydt(3)-k(2)*y(3);
 dydt(8)=dydt(8)+k(2)*y(3);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{p}[.] z[.]) + A(x{u}[.] y{p}[.] z[.]) -> A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[.]) + A(x{u}[.],y{p}[.],z[.]) -> A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(3);
 dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(3);
 dydt(15)=dydt(15)+2/2*k(1)*y(3)*y(3);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{p}[.] z[.]) + A(x{p}[.] y{p}[.] z[.]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[.]) + A(x{p}[.],y{p}[.],z[.]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(8)=dydt(8)-1/2*k(1)*y(8)*y(3);
 dydt(3)=dydt(3)-1/2*k(1)*y(8)*y(3);
 dydt(12)=dydt(12)+1/2*k(1)*y(8)*y(3);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{p}[.] z[.]) + A(x{p}[.] y{u}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[.]) + A(x{p}[.],y{u}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 dydt(5)=dydt(5)-1/2*k(1)*y(5)*y(3);
 dydt(3)=dydt(3)-1/2*k(1)*y(5)*y(3);
 dydt(13)=dydt(13)+1/2*k(1)*y(5)*y(3);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{p}[.] z[.]) + A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[.]) + A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(3);
 dydt(3)=dydt(3)-1/2*k(1)*y(1)*y(3);
 dydt(14)=dydt(14)+1/2*k(1)*y(1)*y(3);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{u}[.] z[.]) + A(x{u}[.] y{p}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[.]) + A(x{u}[.],y{p}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(1);
 dydt(1)=dydt(1)-1/2*k(1)*y(3)*y(1);
 dydt(14)=dydt(14)+1/2*k(1)*y(3)*y(1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{u}[.] z[.]) + A(x{u}[.] y{p}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[.]) + A(x{u}[.],y{p}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(5);
 dydt(5)=dydt(5)-1/2*k(1)*y(3)*y(5);
 dydt(13)=dydt(13)+1/2*k(1)*y(3)*y(5);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{p}[.] z[.]) + A(x{u}[.] y{p}[.] z[.]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{p}[.],z[.]) + A(x{u}[.],y{p}[.],z[.]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(8);
 dydt(8)=dydt(8)-1/2*k(1)*y(3)*y(8);
 dydt(12)=dydt(12)+1/2*k(1)*y(3)*y(8);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(13)=dydt(13)-k(2)*y(13);
 dydt(9)=dydt(9)+k(2)*y(13);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(13)=dydt(13)-k(3)*y(13);
 dydt(12)=dydt(12)+k(3)*y(13);
 dydt(4)=dydt(4)+k(3)*y(13)*stoc(3,1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(6)=dydt(6)-k(3)*y(6);
 dydt(10)=dydt(10)+k(3)*y(6);
 dydt(4)=dydt(4)+k(3)*y(6)*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 dydt(6)=dydt(6)-k(2)*y(6);
 dydt(7)=dydt(7)+2*k(2)*y(6);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(6)=dydt(6)-k(3)*y(6);
 dydt(13)=dydt(13)+k(3)*y(6);
 dydt(4)=dydt(4)+k(3)*y(6)*stoc(3,1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(7)=dydt(7)-2*k(3)*y(7)/2;
 dydt(9)=dydt(9)+k(3)*y(7)/2;
 dydt(4)=dydt(4)+k(3)*y(7)/2*stoc(3,1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(7)=dydt(7)-2*k(3)*y(7)/2;
 dydt(9)=dydt(9)+k(3)*y(7)/2;
 dydt(4)=dydt(4)+k(3)*y(7)/2*stoc(3,1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) -> A(x{p}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) -> A(x{p}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(9)=dydt(9)-k(3)*y(9);
 dydt(11)=dydt(11)+2*k(3)*y(9);
 dydt(4)=dydt(4)+k(3)*y(9)*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) -> A(x{p}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) -> A(x{p}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(12)=dydt(12)-k(2)*y(12);
 dydt(11)=dydt(11)+2*k(2)*y(12);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(10)=dydt(10)-k(2)*y(10);
 dydt(9)=dydt(9)+k(2)*y(10);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(10)=dydt(10)-k(3)*y(10);
 dydt(12)=dydt(12)+k(3)*y(10);
 dydt(4)=dydt(4)+k(3)*y(10)*stoc(3,1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{p}[.] z[.]) + A(x{p}[.] y{p}[.] z[.]) -> A(x{p}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{p}[.],z[.]) + A(x{p}[.],y{p}[.],z[.]) -> A(x{p}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(8)=dydt(8)-1/2*k(1)*y(8)*y(8);
 dydt(8)=dydt(8)-1/2*k(1)*y(8)*y(8);
 dydt(11)=dydt(11)+2/2*k(1)*y(8)*y(8);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{p}[.] z[.]) + A(x{p}[.] y{u}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{p}[.],z[.]) + A(x{p}[.],y{u}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(5)=dydt(5)-1/2*k(1)*y(5)*y(8);
 dydt(8)=dydt(8)-1/2*k(1)*y(5)*y(8);
 dydt(9)=dydt(9)+1/2*k(1)*y(5)*y(8);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{p}[.] z[.]) + A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{p}[.],z[.]) + A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(8);
 dydt(8)=dydt(8)-1/2*k(1)*y(1)*y(8);
 dydt(10)=dydt(10)+1/2*k(1)*y(1)*y(8);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{u}[.] z[.]) + A(x{p}[.] y{p}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[.]) + A(x{p}[.],y{p}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(8)=dydt(8)-1/2*k(1)*y(8)*y(1);
 dydt(1)=dydt(1)-1/2*k(1)*y(8)*y(1);
 dydt(10)=dydt(10)+1/2*k(1)*y(8)*y(1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{u}[.] z[.]) + A(x{p}[.] y{p}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[.]) + A(x{p}[.],y{p}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 dydt(8)=dydt(8)-1/2*k(1)*y(8)*y(5);
 dydt(5)=dydt(5)-1/2*k(1)*y(8)*y(5);
 dydt(9)=dydt(9)+1/2*k(1)*y(8)*y(5);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[.]) -> A(x{p}[.] y{p}[.] z[.]) | |A(z[1]),A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[.]) -> A(x{p}[.],y{p}[.],z[.]) | |A(z[1]),A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(5)=dydt(5)-k(3)*y(5);
 dydt(8)=dydt(8)+k(3)*y(5);
 dydt(4)=dydt(4)+k(3)*y(5)*stoc(3,1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{u}[.] z[.]) + A(x{p}[.] y{u}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[.]) + A(x{p}[.],y{u}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 dydt(5)=dydt(5)-1/2*k(1)*y(5)*y(5);
 dydt(5)=dydt(5)-1/2*k(1)*y(5)*y(5);
 dydt(7)=dydt(7)+2/2*k(1)*y(5)*y(5);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{u}[.] z[.]) + A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[.]) + A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(5);
 dydt(5)=dydt(5)-1/2*k(1)*y(1)*y(5);
 dydt(6)=dydt(6)+1/2*k(1)*y(1)*y(5);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{u}[.] z[.]) + A(x{p}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[.]) + A(x{p}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 dydt(5)=dydt(5)-1/2*k(1)*y(5)*y(1);
 dydt(1)=dydt(1)-1/2*k(1)*y(5)*y(1);
 dydt(6)=dydt(6)+1/2*k(1)*y(5)*y(1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[.]) -> A(x{p}[.] y{u}[.] z[.])
+% reaction: A(x{u}[.],y{u}[.],z[.]) -> A(x{p}[.],y{u}[.],z[.])
 
 dydt(1)=dydt(1)-k(2)*y(1);
 dydt(5)=dydt(5)+k(2)*y(1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{p}[.] z[.]) | |A(z[1]),A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{p}[.],z[.]) | |A(z[1]),A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(1)=dydt(1)-k(3)*y(1);
 dydt(3)=dydt(3)+k(3)*y(1);
 dydt(4)=dydt(4)+k(3)*y(1)*stoc(3,1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{u}[.] z[.]) + A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[.]) + A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1])
 
 dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
 dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
@@ -548,13 +548,13 @@ jacstoc(3,1,15)=y(10)*2;
 jac=sparse(nodevar,nodevar);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 jac(2,2)=jac(2,2)-2*k(2)/2;
 jac(6,2)=jac(6,2)+k(2)/2;
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(2,2)=jac(2,2)-2*k(3)/2;
 jac(14,2)=jac(14,2)+k(3)/2;
@@ -571,13 +571,13 @@ jac(4,15)=jac(4,15)+k(3)*y(2)/2*jacstoc(3,1,15);
 jac(4,2)=jac(4,2)+k(3)*y(2)/2*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 jac(2,2)=jac(2,2)-2*k(2)/2;
 jac(6,2)=jac(6,2)+k(2)/2;
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(2,2)=jac(2,2)-2*k(3)/2;
 jac(14,2)=jac(14,2)+k(3)/2;
@@ -594,19 +594,19 @@ jac(4,15)=jac(4,15)+k(3)*y(2)/2*jacstoc(3,1,15);
 jac(4,2)=jac(4,2)+k(3)*y(2)/2*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(14,14)=jac(14,14)-k(2);
 jac(10,14)=jac(10,14)+k(2);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 jac(14,14)=jac(14,14)-k(2);
 jac(13,14)=jac(13,14)+k(2);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(14,14)=jac(14,14)-k(3);
 jac(15,14)=jac(15,14)+2*k(3);
@@ -623,25 +623,25 @@ jac(4,15)=jac(4,15)+k(3)*y(14)*jacstoc(3,1,15);
 jac(4,14)=jac(4,14)+k(3)*y(14)*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(15,15)=jac(15,15)-2*k(2)/2;
 jac(12,15)=jac(12,15)+k(2)/2;
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(15,15)=jac(15,15)-2*k(2)/2;
 jac(12,15)=jac(12,15)+k(2)/2;
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{p}[.] z[.]) -> A(x{p}[.] y{p}[.] z[.])
+% reaction: A(x{u}[.],y{p}[.],z[.]) -> A(x{p}[.],y{p}[.],z[.])
 
 jac(3,3)=jac(3,3)-k(2);
 jac(8,3)=jac(8,3)+k(2);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{p}[.] z[.]) + A(x{u}[.] y{p}[.] z[.]) -> A(x{u}[.] y{p}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[.]) + A(x{u}[.],y{p}[.],z[.]) -> A(x{u}[.],y{p}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 jac(3,3)=jac(3,3)-1/2*k(1)*y(3);
 jac(3,3)=jac(3,3)-1/2*k(1)*y(3);
@@ -651,7 +651,7 @@ jac(15,3)=jac(15,3)+2/2*k(1)*y(3);
 jac(15,3)=jac(15,3)+2/2*k(1)*y(3);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{p}[.] z[.]) + A(x{p}[.] y{p}[.] z[.]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[.]) + A(x{p}[.],y{p}[.],z[.]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(8,8)=jac(8,8)-1/2*k(1)*y(3);
 jac(8,3)=jac(8,3)-1/2*k(1)*y(8);
@@ -661,7 +661,7 @@ jac(12,8)=jac(12,8)+1/2*k(1)*y(3);
 jac(12,3)=jac(12,3)+1/2*k(1)*y(8);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{p}[.] z[.]) + A(x{p}[.] y{u}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[.]) + A(x{p}[.],y{u}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 jac(5,5)=jac(5,5)-1/2*k(1)*y(3);
 jac(5,3)=jac(5,3)-1/2*k(1)*y(5);
@@ -671,7 +671,7 @@ jac(13,5)=jac(13,5)+1/2*k(1)*y(3);
 jac(13,3)=jac(13,3)+1/2*k(1)*y(5);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{p}[.] z[.]) + A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[.]) + A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 jac(1,1)=jac(1,1)-1/2*k(1)*y(3);
 jac(1,3)=jac(1,3)-1/2*k(1)*y(1);
@@ -681,7 +681,7 @@ jac(14,1)=jac(14,1)+1/2*k(1)*y(3);
 jac(14,3)=jac(14,3)+1/2*k(1)*y(1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{u}[.] z[.]) + A(x{u}[.] y{p}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[.]) + A(x{u}[.],y{p}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 jac(3,3)=jac(3,3)-1/2*k(1)*y(1);
 jac(3,1)=jac(3,1)-1/2*k(1)*y(3);
@@ -691,7 +691,7 @@ jac(14,3)=jac(14,3)+1/2*k(1)*y(1);
 jac(14,1)=jac(14,1)+1/2*k(1)*y(3);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{u}[.] z[.]) + A(x{u}[.] y{p}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[.]) + A(x{u}[.],y{p}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1])
 
 jac(3,3)=jac(3,3)-1/2*k(1)*y(5);
 jac(3,5)=jac(3,5)-1/2*k(1)*y(3);
@@ -701,7 +701,7 @@ jac(13,3)=jac(13,3)+1/2*k(1)*y(5);
 jac(13,5)=jac(13,5)+1/2*k(1)*y(3);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{p}[.] z[.]) + A(x{u}[.] y{p}[.] z[.]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{p}[.],z[.]) + A(x{u}[.],y{p}[.],z[.]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(3,3)=jac(3,3)-1/2*k(1)*y(8);
 jac(3,8)=jac(3,8)-1/2*k(1)*y(3);
@@ -711,13 +711,13 @@ jac(12,3)=jac(12,3)+1/2*k(1)*y(8);
 jac(12,8)=jac(12,8)+1/2*k(1)*y(3);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(13,13)=jac(13,13)-k(2);
 jac(9,13)=jac(9,13)+k(2);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(13,13)=jac(13,13)-k(3);
 jac(12,13)=jac(12,13)+k(3);
@@ -734,7 +734,7 @@ jac(4,15)=jac(4,15)+k(3)*y(13)*jacstoc(3,1,15);
 jac(4,13)=jac(4,13)+k(3)*y(13)*stoc(3,1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(6,6)=jac(6,6)-k(3);
 jac(10,6)=jac(10,6)+k(3);
@@ -751,13 +751,13 @@ jac(4,15)=jac(4,15)+k(3)*y(6)*jacstoc(3,1,15);
 jac(4,6)=jac(4,6)+k(3)*y(6)*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 jac(6,6)=jac(6,6)-k(2);
 jac(7,6)=jac(7,6)+2*k(2);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{u}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{u}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(6,6)=jac(6,6)-k(3);
 jac(13,6)=jac(13,6)+k(3);
@@ -774,7 +774,7 @@ jac(4,15)=jac(4,15)+k(3)*y(6)*jacstoc(3,1,15);
 jac(4,6)=jac(4,6)+k(3)*y(6)*stoc(3,1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(7,7)=jac(7,7)-2*k(3)/2;
 jac(9,7)=jac(9,7)+k(3)/2;
@@ -791,7 +791,7 @@ jac(4,15)=jac(4,15)+k(3)*y(7)/2*jacstoc(3,1,15);
 jac(4,7)=jac(4,7)+k(3)*y(7)/2*stoc(3,1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(7,7)=jac(7,7)-2*k(3)/2;
 jac(9,7)=jac(9,7)+k(3)/2;
@@ -808,7 +808,7 @@ jac(4,15)=jac(4,15)+k(3)*y(7)/2*jacstoc(3,1,15);
 jac(4,7)=jac(4,7)+k(3)*y(7)/2*stoc(3,1);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) -> A(x{p}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) -> A(x{p}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(9,9)=jac(9,9)-k(3);
 jac(11,9)=jac(11,9)+2*k(3);
@@ -825,19 +825,19 @@ jac(4,15)=jac(4,15)+k(3)*y(9)*jacstoc(3,1,15);
 jac(4,9)=jac(4,9)+k(3)*y(9)*stoc(3,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) -> A(x{p}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) -> A(x{p}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(12,12)=jac(12,12)-k(2);
 jac(11,12)=jac(11,12)+2*k(2);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(10,10)=jac(10,10)-k(2);
 jac(9,10)=jac(9,10)+k(2);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) -> A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1]) | |A(z[1]), A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(10,10)=jac(10,10)-k(3);
 jac(12,10)=jac(12,10)+k(3);
@@ -854,7 +854,7 @@ jac(4,15)=jac(4,15)+k(3)*y(10)*jacstoc(3,1,15);
 jac(4,10)=jac(4,10)+k(3)*y(10)*stoc(3,1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{p}[.] z[.]) + A(x{p}[.] y{p}[.] z[.]) -> A(x{p}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{p}[.],z[.]) + A(x{p}[.],y{p}[.],z[.]) -> A(x{p}[.],y{p}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(8,8)=jac(8,8)-1/2*k(1)*y(8);
 jac(8,8)=jac(8,8)-1/2*k(1)*y(8);
@@ -864,7 +864,7 @@ jac(11,8)=jac(11,8)+2/2*k(1)*y(8);
 jac(11,8)=jac(11,8)+2/2*k(1)*y(8);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{p}[.] z[.]) + A(x{p}[.] y{u}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{p}[.],z[.]) + A(x{p}[.],y{u}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(5,5)=jac(5,5)-1/2*k(1)*y(8);
 jac(5,8)=jac(5,8)-1/2*k(1)*y(5);
@@ -874,7 +874,7 @@ jac(9,5)=jac(9,5)+1/2*k(1)*y(8);
 jac(9,8)=jac(9,8)+1/2*k(1)*y(5);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{p}[.] z[.]) + A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{p}[.],z[.]) + A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(1,1)=jac(1,1)-1/2*k(1)*y(8);
 jac(1,8)=jac(1,8)-1/2*k(1)*y(1);
@@ -884,7 +884,7 @@ jac(10,1)=jac(10,1)+1/2*k(1)*y(8);
 jac(10,8)=jac(10,8)+1/2*k(1)*y(1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{u}[.] z[.]) + A(x{p}[.] y{p}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[.]) + A(x{p}[.],y{p}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(8,8)=jac(8,8)-1/2*k(1)*y(1);
 jac(8,1)=jac(8,1)-1/2*k(1)*y(8);
@@ -894,7 +894,7 @@ jac(10,8)=jac(10,8)+1/2*k(1)*y(1);
 jac(10,1)=jac(10,1)+1/2*k(1)*y(8);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{u}[.] z[.]) + A(x{p}[.] y{p}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[.]) + A(x{p}[.],y{p}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{p}[.],z[1])
 
 jac(8,8)=jac(8,8)-1/2*k(1)*y(5);
 jac(8,5)=jac(8,5)-1/2*k(1)*y(8);
@@ -904,7 +904,7 @@ jac(9,8)=jac(9,8)+1/2*k(1)*y(5);
 jac(9,5)=jac(9,5)+1/2*k(1)*y(8);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{p}[.] y{u}[.] z[.]) -> A(x{p}[.] y{p}[.] z[.]) | |A(z[1]),A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{p}[.],y{u}[.],z[.]) -> A(x{p}[.],y{p}[.],z[.]) | |A(z[1]),A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(5,5)=jac(5,5)-k(3);
 jac(8,5)=jac(8,5)+k(3);
@@ -921,7 +921,7 @@ jac(4,15)=jac(4,15)+k(3)*y(5)*jacstoc(3,1,15);
 jac(4,5)=jac(4,5)+k(3)*y(5)*stoc(3,1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{u}[.] z[.]) + A(x{p}[.] y{u}[.] z[.]) -> A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[.]) + A(x{p}[.],y{u}[.],z[.]) -> A(x{p}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 jac(5,5)=jac(5,5)-1/2*k(1)*y(5);
 jac(5,5)=jac(5,5)-1/2*k(1)*y(5);
@@ -931,7 +931,7 @@ jac(7,5)=jac(7,5)+2/2*k(1)*y(5);
 jac(7,5)=jac(7,5)+2/2*k(1)*y(5);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{p}[.] y{u}[.] z[.]) + A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{p}[.],y{u}[.],z[.]) + A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 jac(1,1)=jac(1,1)-1/2*k(1)*y(5);
 jac(1,5)=jac(1,5)-1/2*k(1)*y(1);
@@ -941,7 +941,7 @@ jac(6,1)=jac(6,1)+1/2*k(1)*y(5);
 jac(6,5)=jac(6,5)+1/2*k(1)*y(1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{u}[.] z[.]) + A(x{p}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[.]) + A(x{p}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{p}[.],y{u}[.],z[1])
 
 jac(5,5)=jac(5,5)-1/2*k(1)*y(1);
 jac(5,1)=jac(5,1)-1/2*k(1)*y(5);
@@ -951,13 +951,13 @@ jac(6,5)=jac(6,5)+1/2*k(1)*y(1);
 jac(6,1)=jac(6,1)+1/2*k(1)*y(5);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.] z[.]) -> A(x{p}[.] y{u}[.] z[.])
+% reaction: A(x{u}[.],y{u}[.],z[.]) -> A(x{p}[.],y{u}[.],z[.])
 
 jac(1,1)=jac(1,1)-k(2);
 jac(5,1)=jac(5,1)+k(2);
 
 % rule    : A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]), A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{p}[.] z[.]) | |A(z[1]),A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
+% reaction: A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{p}[.],z[.]) | |A(z[1]),A(z[1]) , A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(1,1)=jac(1,1)-k(3);
 jac(3,1)=jac(3,1)+k(3);
@@ -974,7 +974,7 @@ jac(4,15)=jac(4,15)+k(3)*y(1)*jacstoc(3,1,15);
 jac(4,1)=jac(4,1)+k(3)*y(1)*stoc(3,1);
 
 % rule    : A(z[.]), A(z[.]) -> A(z[1]), A(z[1])
-% reaction: A(x{u}[.] y{u}[.] z[.]) + A(x{u}[.] y{u}[.] z[.]) -> A(x{u}[.] y{u}[.] z[1]), A(x{u}[.] y{u}[.] z[1])
+% reaction: A(x{u}[.],y{u}[.],z[.]) + A(x{u}[.],y{u}[.],z[.]) -> A(x{u}[.],y{u}[.],z[1]), A(x{u}[.],y{u}[.],z[1])
 
 jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
 jac(1,1)=jac(1,1)-1/2*k(1)*y(1);

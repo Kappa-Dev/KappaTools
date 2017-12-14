@@ -195,20 +195,20 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); % A(x{u}[.] y{u}[.])
-Init(2) = init(2); % B(x{u}[.] y{u}[.])
+Init(1) = init(1); % A(x{u}[.],y{u}[.])
+Init(2) = init(2); % B(x{u}[.],y{u}[.])
 Init(3) = init(3); 
-Init(4) = init(4); % B(x{u}[.] y{p}[.])
-Init(5) = init(5); % B(x{p}[.] y{u}[.])
-Init(6) = init(6); % C(x{u}[.] y{u}[.])
-Init(7) = init(7); % C(x{p}[.] y{u}[.])
-Init(8) = init(8); % D(x{u}[.] y{u}[.])
-Init(9) = init(9); % D(x{u}[.] y{p}[.])
-Init(10) = init(10); % D(x{p}[.] y{u}[.])
+Init(4) = init(4); % B(x{u}[.],y{p}[.])
+Init(5) = init(5); % B(x{p}[.],y{u}[.])
+Init(6) = init(6); % C(x{u}[.],y{u}[.])
+Init(7) = init(7); % C(x{p}[.],y{u}[.])
+Init(8) = init(8); % D(x{u}[.],y{u}[.])
+Init(9) = init(9); % D(x{u}[.],y{p}[.])
+Init(10) = init(10); % D(x{p}[.],y{u}[.])
 Init(11) = init(11); 
-Init(12) = init(12); % D(x{p}[.] y{p}[.])
-Init(13) = init(13); % B(x{p}[.] y{p}[.])
-Init(14) = init(14); % A(x{p}[.] y{u}[.])
+Init(12) = init(12); % D(x{p}[.],y{p}[.])
+Init(13) = init(13); % B(x{p}[.],y{p}[.])
+Init(14) = init(14); % A(x{p}[.],y{u}[.])
 Init(15) = init(15); % t
 end
 
@@ -229,211 +229,211 @@ global stoc
 dydt=zeros(nodevar,1);
 
 % rule    : A() -> A() | 1 a
-% reaction: A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) | 1 a
+% reaction: A(x{p}[.],y{u}[.]) -> A(x{p}[.],y{u}[.]) | 1 a
 
 dydt(14)=dydt(14)-k(16)*y(14);
 dydt(14)=dydt(14)+k(16)*y(14);
 dydt(3)=dydt(3)+k(16)*y(14)*stoc(16,1);
 
 % rule    : A(x{p}[.]) -> A(x{u}[.])
-% reaction: A(x{p}[.] y{u}[.]) -> A(x{u}[.] y{u}[.])
+% reaction: A(x{p}[.],y{u}[.]) -> A(x{u}[.],y{u}[.])
 
 dydt(14)=dydt(14)-k(2)*y(14);
 dydt(1)=dydt(1)+k(2)*y(14);
 
 % rule    : A() -> A() | 1 a
-% reaction: A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{u}[.]) | 1 a
+% reaction: A(x{u}[.],y{u}[.]) -> A(x{u}[.],y{u}[.]) | 1 a
 
 dydt(1)=dydt(1)-k(16)*y(1);
 dydt(1)=dydt(1)+k(16)*y(1);
 dydt(3)=dydt(3)+k(16)*y(1)*stoc(16,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.])
+% reaction: A(x{u}[.],y{u}[.]) -> A(x{p}[.],y{u}[.])
 
 dydt(1)=dydt(1)-k(1)*y(1);
 dydt(14)=dydt(14)+k(1)*y(1);
 
 % rule    : B(), . -> ., C(x{u}[.] y{u}[.])
-% reaction: B(x{u}[.] y{p}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: B(x{u}[.],y{p}[.]) -> C(x{u}[.],y{u}[.])
 
 dydt(4)=dydt(4)-k(18)*y(4);
 dydt(6)=dydt(6)+k(18)*y(4);
 
 % rule    : B(x{u}[.]) -> B(x{p}[.])
-% reaction: B(x{u}[.] y{p}[.]) -> B(x{p}[.] y{p}[.])
+% reaction: B(x{u}[.],y{p}[.]) -> B(x{p}[.],y{p}[.])
 
 dydt(4)=dydt(4)-k(3)*y(4);
 dydt(13)=dydt(13)+k(3)*y(4);
 
 % rule    : B(y{p}[.]) -> B(y{u}[.])
-% reaction: B(x{u}[.] y{p}[.]) -> B(x{u}[.] y{u}[.])
+% reaction: B(x{u}[.],y{p}[.]) -> B(x{u}[.],y{u}[.])
 
 dydt(4)=dydt(4)-k(6)*y(4);
 dydt(2)=dydt(2)+k(6)*y(4);
 
 % rule    : B(), . -> ., C(x{u}[.] y{u}[.])
-% reaction: B(x{p}[.] y{p}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: B(x{p}[.],y{p}[.]) -> C(x{u}[.],y{u}[.])
 
 dydt(13)=dydt(13)-k(18)*y(13);
 dydt(6)=dydt(6)+k(18)*y(13);
 
 % rule    : B(x{p}[.]) -> B(x{u}[.])
-% reaction: B(x{p}[.] y{p}[.]) -> B(x{u}[.] y{p}[.])
+% reaction: B(x{p}[.],y{p}[.]) -> B(x{u}[.],y{p}[.])
 
 dydt(13)=dydt(13)-k(4)*y(13);
 dydt(4)=dydt(4)+k(4)*y(13);
 
 % rule    : B(y{p}[.]) -> B(y{u}[.])
-% reaction: B(x{p}[.] y{p}[.]) -> B(x{p}[.] y{u}[.])
+% reaction: B(x{p}[.],y{p}[.]) -> B(x{p}[.],y{u}[.])
 
 dydt(13)=dydt(13)-k(6)*y(13);
 dydt(5)=dydt(5)+k(6)*y(13);
 
 % rule    : B(), . -> ., C(x{u}[.] y{u}[.])
-% reaction: B(x{p}[.] y{u}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: B(x{p}[.],y{u}[.]) -> C(x{u}[.],y{u}[.])
 
 dydt(5)=dydt(5)-k(18)*y(5);
 dydt(6)=dydt(6)+k(18)*y(5);
 
 % rule    : B(x{p}[.]) -> B(x{u}[.])
-% reaction: B(x{p}[.] y{u}[.]) -> B(x{u}[.] y{u}[.])
+% reaction: B(x{p}[.],y{u}[.]) -> B(x{u}[.],y{u}[.])
 
 dydt(5)=dydt(5)-k(4)*y(5);
 dydt(2)=dydt(2)+k(4)*y(5);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.])
-% reaction: B(x{p}[.] y{u}[.]) -> B(x{p}[.] y{p}[.])
+% reaction: B(x{p}[.],y{u}[.]) -> B(x{p}[.],y{p}[.])
 
 dydt(5)=dydt(5)-k(5)*y(5);
 dydt(13)=dydt(13)+k(5)*y(5);
 
 % rule    : C(), . -> ., D(x{u}[.] y{u}[.])
-% reaction: C(x{p}[.] y{u}[.]) -> D(x{u}[.] y{u}[.])
+% reaction: C(x{p}[.],y{u}[.]) -> D(x{u}[.],y{u}[.])
 
 dydt(7)=dydt(7)-k(19)*y(7);
 dydt(8)=dydt(8)+k(19)*y(7);
 
 % rule    : C(x{p}[.]) -> C(x{u}[.])
-% reaction: C(x{p}[.] y{u}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: C(x{p}[.],y{u}[.]) -> C(x{u}[.],y{u}[.])
 
 dydt(7)=dydt(7)-k(8)*y(7);
 dydt(6)=dydt(6)+k(8)*y(7);
 
 % rule    : D() -> D() | 1 b
-% reaction: D(x{u}[.] y{p}[.]) -> D(x{u}[.] y{p}[.]) | 1 b
+% reaction: D(x{u}[.],y{p}[.]) -> D(x{u}[.],y{p}[.]) | 1 b
 
 dydt(9)=dydt(9)-k(20)*y(9);
 dydt(9)=dydt(9)+k(20)*y(9);
 dydt(11)=dydt(11)+k(20)*y(9)*stoc(20,1);
 
 % rule    : D(x{u}[.]) -> D(x{p}[.])
-% reaction: D(x{u}[.] y{p}[.]) -> D(x{p}[.] y{p}[.])
+% reaction: D(x{u}[.],y{p}[.]) -> D(x{p}[.],y{p}[.])
 
 dydt(9)=dydt(9)-k(11)*y(9);
 dydt(12)=dydt(12)+k(11)*y(9);
 
 % rule    : D(y{p}[.]) -> D(y{u}[.])
-% reaction: D(x{u}[.] y{p}[.]) -> D(x{u}[.] y{u}[.])
+% reaction: D(x{u}[.],y{p}[.]) -> D(x{u}[.],y{u}[.])
 
 dydt(9)=dydt(9)-k(14)*y(9);
 dydt(8)=dydt(8)+k(14)*y(9);
 
 % rule    : D() -> D() | 1 b
-% reaction: D(x{p}[.] y{p}[.]) -> D(x{p}[.] y{p}[.]) | 1 b
+% reaction: D(x{p}[.],y{p}[.]) -> D(x{p}[.],y{p}[.]) | 1 b
 
 dydt(12)=dydt(12)-k(20)*y(12);
 dydt(12)=dydt(12)+k(20)*y(12);
 dydt(11)=dydt(11)+k(20)*y(12)*stoc(20,1);
 
 % rule    : D(x{p}[.]) -> D(x{u}[.])
-% reaction: D(x{p}[.] y{p}[.]) -> D(x{u}[.] y{p}[.])
+% reaction: D(x{p}[.],y{p}[.]) -> D(x{u}[.],y{p}[.])
 
 dydt(12)=dydt(12)-k(12)*y(12);
 dydt(9)=dydt(9)+k(12)*y(12);
 
 % rule    : D(y{p}[.]) -> D(y{u}[.])
-% reaction: D(x{p}[.] y{p}[.]) -> D(x{p}[.] y{u}[.])
+% reaction: D(x{p}[.],y{p}[.]) -> D(x{p}[.],y{u}[.])
 
 dydt(12)=dydt(12)-k(14)*y(12);
 dydt(10)=dydt(10)+k(14)*y(12);
 
 % rule    : D() -> D() | 1 b
-% reaction: D(x{p}[.] y{u}[.]) -> D(x{p}[.] y{u}[.]) | 1 b
+% reaction: D(x{p}[.],y{u}[.]) -> D(x{p}[.],y{u}[.]) | 1 b
 
 dydt(10)=dydt(10)-k(20)*y(10);
 dydt(10)=dydt(10)+k(20)*y(10);
 dydt(11)=dydt(11)+k(20)*y(10)*stoc(20,1);
 
 % rule    : D(x{p}[.]) -> D(x{u}[.])
-% reaction: D(x{p}[.] y{u}[.]) -> D(x{u}[.] y{u}[.])
+% reaction: D(x{p}[.],y{u}[.]) -> D(x{u}[.],y{u}[.])
 
 dydt(10)=dydt(10)-k(12)*y(10);
 dydt(8)=dydt(8)+k(12)*y(10);
 
 % rule    : D(y{u}[.]) -> D(y{p}[.])
-% reaction: D(x{p}[.] y{u}[.]) -> D(x{p}[.] y{p}[.])
+% reaction: D(x{p}[.],y{u}[.]) -> D(x{p}[.],y{p}[.])
 
 dydt(10)=dydt(10)-k(13)*y(10);
 dydt(12)=dydt(12)+k(13)*y(10);
 
 % rule    : D() -> D() | 1 b
-% reaction: D(x{u}[.] y{u}[.]) -> D(x{u}[.] y{u}[.]) | 1 b
+% reaction: D(x{u}[.],y{u}[.]) -> D(x{u}[.],y{u}[.]) | 1 b
 
 dydt(8)=dydt(8)-k(20)*y(8);
 dydt(8)=dydt(8)+k(20)*y(8);
 dydt(11)=dydt(11)+k(20)*y(8)*stoc(20,1);
 
 % rule    : D(x{u}[.]) -> D(x{p}[.])
-% reaction: D(x{u}[.] y{u}[.]) -> D(x{p}[.] y{u}[.])
+% reaction: D(x{u}[.],y{u}[.]) -> D(x{p}[.],y{u}[.])
 
 dydt(8)=dydt(8)-k(11)*y(8);
 dydt(10)=dydt(10)+k(11)*y(8);
 
 % rule    : D(y{u}[.]) -> D(y{p}[.])
-% reaction: D(x{u}[.] y{u}[.]) -> D(x{u}[.] y{p}[.])
+% reaction: D(x{u}[.],y{u}[.]) -> D(x{u}[.],y{p}[.])
 
 dydt(8)=dydt(8)-k(13)*y(8);
 dydt(9)=dydt(9)+k(13)*y(8);
 
 % rule    : C(), . -> ., D(x{u}[.] y{u}[.])
-% reaction: C(x{u}[.] y{u}[.]) -> D(x{u}[.] y{u}[.])
+% reaction: C(x{u}[.],y{u}[.]) -> D(x{u}[.],y{u}[.])
 
 dydt(6)=dydt(6)-k(19)*y(6);
 dydt(8)=dydt(8)+k(19)*y(6);
 
 % rule    : C(x{u}[.]) -> C(x{p}[.])
-% reaction: C(x{u}[.] y{u}[.]) -> C(x{p}[.] y{u}[.])
+% reaction: C(x{u}[.],y{u}[.]) -> C(x{p}[.],y{u}[.])
 
 dydt(6)=dydt(6)-k(7)*y(6);
 dydt(7)=dydt(7)+k(7)*y(6);
 
 % rule    : B(), . -> ., C(x{u}[.] y{u}[.])
-% reaction: B(x{u}[.] y{u}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: B(x{u}[.],y{u}[.]) -> C(x{u}[.],y{u}[.])
 
 dydt(2)=dydt(2)-k(18)*y(2);
 dydt(6)=dydt(6)+k(18)*y(2);
 
 % rule    : B(x{u}[.]) -> B(x{p}[.])
-% reaction: B(x{u}[.] y{u}[.]) -> B(x{p}[.] y{u}[.])
+% reaction: B(x{u}[.],y{u}[.]) -> B(x{p}[.],y{u}[.])
 
 dydt(2)=dydt(2)-k(3)*y(2);
 dydt(5)=dydt(5)+k(3)*y(2);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.])
-% reaction: B(x{u}[.] y{u}[.]) -> B(x{u}[.] y{p}[.])
+% reaction: B(x{u}[.],y{u}[.]) -> B(x{u}[.],y{p}[.])
 
 dydt(2)=dydt(2)-k(5)*y(2);
 dydt(4)=dydt(4)+k(5)*y(2);
 
 % rule    : . -> B(x{u}[.] y{u}[.]) | -(1) a
-% reaction:  -> B(x{u}[.] y{u}[.]) | -(1) a
+% reaction:  -> B(x{u}[.],y{u}[.]) | -(1) a
 
 dydt(2)=dydt(2)+k(17);
 dydt(3)=dydt(3)+k(17)*stoc(17,1);
 
 % rule    : . -> A(x{u}[.] y{u}[.])
-% reaction:  -> A(x{u}[.] y{u}[.])
+% reaction:  -> A(x{u}[.],y{u}[.])
 
 dydt(1)=dydt(1)+k(15);
 dydt(15)=1;
@@ -465,209 +465,209 @@ global jacstoc
 jac=sparse(nodevar,nodevar);
 
 % rule    : A() -> A() | 1 a
-% reaction: A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) | 1 a
+% reaction: A(x{p}[.],y{u}[.]) -> A(x{p}[.],y{u}[.]) | 1 a
 
 jac(14,14)=jac(14,14)-k(16);
 jac(14,14)=jac(14,14)+k(16);
 jac(3,14)=jac(3,14)+k(16)*y(14)*stoc(16,1);
 
 % rule    : A(x{p}[.]) -> A(x{u}[.])
-% reaction: A(x{p}[.] y{u}[.]) -> A(x{u}[.] y{u}[.])
+% reaction: A(x{p}[.],y{u}[.]) -> A(x{u}[.],y{u}[.])
 
 jac(14,14)=jac(14,14)-k(2);
 jac(1,14)=jac(1,14)+k(2);
 
 % rule    : A() -> A() | 1 a
-% reaction: A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{u}[.]) | 1 a
+% reaction: A(x{u}[.],y{u}[.]) -> A(x{u}[.],y{u}[.]) | 1 a
 
 jac(1,1)=jac(1,1)-k(16);
 jac(1,1)=jac(1,1)+k(16);
 jac(3,1)=jac(3,1)+k(16)*y(1)*stoc(16,1);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.])
+% reaction: A(x{u}[.],y{u}[.]) -> A(x{p}[.],y{u}[.])
 
 jac(1,1)=jac(1,1)-k(1);
 jac(14,1)=jac(14,1)+k(1);
 
 % rule    : B(), . -> ., C(x{u}[.] y{u}[.])
-% reaction: B(x{u}[.] y{p}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: B(x{u}[.],y{p}[.]) -> C(x{u}[.],y{u}[.])
 
 jac(4,4)=jac(4,4)-k(18);
 jac(6,4)=jac(6,4)+k(18);
 
 % rule    : B(x{u}[.]) -> B(x{p}[.])
-% reaction: B(x{u}[.] y{p}[.]) -> B(x{p}[.] y{p}[.])
+% reaction: B(x{u}[.],y{p}[.]) -> B(x{p}[.],y{p}[.])
 
 jac(4,4)=jac(4,4)-k(3);
 jac(13,4)=jac(13,4)+k(3);
 
 % rule    : B(y{p}[.]) -> B(y{u}[.])
-% reaction: B(x{u}[.] y{p}[.]) -> B(x{u}[.] y{u}[.])
+% reaction: B(x{u}[.],y{p}[.]) -> B(x{u}[.],y{u}[.])
 
 jac(4,4)=jac(4,4)-k(6);
 jac(2,4)=jac(2,4)+k(6);
 
 % rule    : B(), . -> ., C(x{u}[.] y{u}[.])
-% reaction: B(x{p}[.] y{p}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: B(x{p}[.],y{p}[.]) -> C(x{u}[.],y{u}[.])
 
 jac(13,13)=jac(13,13)-k(18);
 jac(6,13)=jac(6,13)+k(18);
 
 % rule    : B(x{p}[.]) -> B(x{u}[.])
-% reaction: B(x{p}[.] y{p}[.]) -> B(x{u}[.] y{p}[.])
+% reaction: B(x{p}[.],y{p}[.]) -> B(x{u}[.],y{p}[.])
 
 jac(13,13)=jac(13,13)-k(4);
 jac(4,13)=jac(4,13)+k(4);
 
 % rule    : B(y{p}[.]) -> B(y{u}[.])
-% reaction: B(x{p}[.] y{p}[.]) -> B(x{p}[.] y{u}[.])
+% reaction: B(x{p}[.],y{p}[.]) -> B(x{p}[.],y{u}[.])
 
 jac(13,13)=jac(13,13)-k(6);
 jac(5,13)=jac(5,13)+k(6);
 
 % rule    : B(), . -> ., C(x{u}[.] y{u}[.])
-% reaction: B(x{p}[.] y{u}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: B(x{p}[.],y{u}[.]) -> C(x{u}[.],y{u}[.])
 
 jac(5,5)=jac(5,5)-k(18);
 jac(6,5)=jac(6,5)+k(18);
 
 % rule    : B(x{p}[.]) -> B(x{u}[.])
-% reaction: B(x{p}[.] y{u}[.]) -> B(x{u}[.] y{u}[.])
+% reaction: B(x{p}[.],y{u}[.]) -> B(x{u}[.],y{u}[.])
 
 jac(5,5)=jac(5,5)-k(4);
 jac(2,5)=jac(2,5)+k(4);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.])
-% reaction: B(x{p}[.] y{u}[.]) -> B(x{p}[.] y{p}[.])
+% reaction: B(x{p}[.],y{u}[.]) -> B(x{p}[.],y{p}[.])
 
 jac(5,5)=jac(5,5)-k(5);
 jac(13,5)=jac(13,5)+k(5);
 
 % rule    : C(), . -> ., D(x{u}[.] y{u}[.])
-% reaction: C(x{p}[.] y{u}[.]) -> D(x{u}[.] y{u}[.])
+% reaction: C(x{p}[.],y{u}[.]) -> D(x{u}[.],y{u}[.])
 
 jac(7,7)=jac(7,7)-k(19);
 jac(8,7)=jac(8,7)+k(19);
 
 % rule    : C(x{p}[.]) -> C(x{u}[.])
-% reaction: C(x{p}[.] y{u}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: C(x{p}[.],y{u}[.]) -> C(x{u}[.],y{u}[.])
 
 jac(7,7)=jac(7,7)-k(8);
 jac(6,7)=jac(6,7)+k(8);
 
 % rule    : D() -> D() | 1 b
-% reaction: D(x{u}[.] y{p}[.]) -> D(x{u}[.] y{p}[.]) | 1 b
+% reaction: D(x{u}[.],y{p}[.]) -> D(x{u}[.],y{p}[.]) | 1 b
 
 jac(9,9)=jac(9,9)-k(20);
 jac(9,9)=jac(9,9)+k(20);
 jac(11,9)=jac(11,9)+k(20)*y(9)*stoc(20,1);
 
 % rule    : D(x{u}[.]) -> D(x{p}[.])
-% reaction: D(x{u}[.] y{p}[.]) -> D(x{p}[.] y{p}[.])
+% reaction: D(x{u}[.],y{p}[.]) -> D(x{p}[.],y{p}[.])
 
 jac(9,9)=jac(9,9)-k(11);
 jac(12,9)=jac(12,9)+k(11);
 
 % rule    : D(y{p}[.]) -> D(y{u}[.])
-% reaction: D(x{u}[.] y{p}[.]) -> D(x{u}[.] y{u}[.])
+% reaction: D(x{u}[.],y{p}[.]) -> D(x{u}[.],y{u}[.])
 
 jac(9,9)=jac(9,9)-k(14);
 jac(8,9)=jac(8,9)+k(14);
 
 % rule    : D() -> D() | 1 b
-% reaction: D(x{p}[.] y{p}[.]) -> D(x{p}[.] y{p}[.]) | 1 b
+% reaction: D(x{p}[.],y{p}[.]) -> D(x{p}[.],y{p}[.]) | 1 b
 
 jac(12,12)=jac(12,12)-k(20);
 jac(12,12)=jac(12,12)+k(20);
 jac(11,12)=jac(11,12)+k(20)*y(12)*stoc(20,1);
 
 % rule    : D(x{p}[.]) -> D(x{u}[.])
-% reaction: D(x{p}[.] y{p}[.]) -> D(x{u}[.] y{p}[.])
+% reaction: D(x{p}[.],y{p}[.]) -> D(x{u}[.],y{p}[.])
 
 jac(12,12)=jac(12,12)-k(12);
 jac(9,12)=jac(9,12)+k(12);
 
 % rule    : D(y{p}[.]) -> D(y{u}[.])
-% reaction: D(x{p}[.] y{p}[.]) -> D(x{p}[.] y{u}[.])
+% reaction: D(x{p}[.],y{p}[.]) -> D(x{p}[.],y{u}[.])
 
 jac(12,12)=jac(12,12)-k(14);
 jac(10,12)=jac(10,12)+k(14);
 
 % rule    : D() -> D() | 1 b
-% reaction: D(x{p}[.] y{u}[.]) -> D(x{p}[.] y{u}[.]) | 1 b
+% reaction: D(x{p}[.],y{u}[.]) -> D(x{p}[.],y{u}[.]) | 1 b
 
 jac(10,10)=jac(10,10)-k(20);
 jac(10,10)=jac(10,10)+k(20);
 jac(11,10)=jac(11,10)+k(20)*y(10)*stoc(20,1);
 
 % rule    : D(x{p}[.]) -> D(x{u}[.])
-% reaction: D(x{p}[.] y{u}[.]) -> D(x{u}[.] y{u}[.])
+% reaction: D(x{p}[.],y{u}[.]) -> D(x{u}[.],y{u}[.])
 
 jac(10,10)=jac(10,10)-k(12);
 jac(8,10)=jac(8,10)+k(12);
 
 % rule    : D(y{u}[.]) -> D(y{p}[.])
-% reaction: D(x{p}[.] y{u}[.]) -> D(x{p}[.] y{p}[.])
+% reaction: D(x{p}[.],y{u}[.]) -> D(x{p}[.],y{p}[.])
 
 jac(10,10)=jac(10,10)-k(13);
 jac(12,10)=jac(12,10)+k(13);
 
 % rule    : D() -> D() | 1 b
-% reaction: D(x{u}[.] y{u}[.]) -> D(x{u}[.] y{u}[.]) | 1 b
+% reaction: D(x{u}[.],y{u}[.]) -> D(x{u}[.],y{u}[.]) | 1 b
 
 jac(8,8)=jac(8,8)-k(20);
 jac(8,8)=jac(8,8)+k(20);
 jac(11,8)=jac(11,8)+k(20)*y(8)*stoc(20,1);
 
 % rule    : D(x{u}[.]) -> D(x{p}[.])
-% reaction: D(x{u}[.] y{u}[.]) -> D(x{p}[.] y{u}[.])
+% reaction: D(x{u}[.],y{u}[.]) -> D(x{p}[.],y{u}[.])
 
 jac(8,8)=jac(8,8)-k(11);
 jac(10,8)=jac(10,8)+k(11);
 
 % rule    : D(y{u}[.]) -> D(y{p}[.])
-% reaction: D(x{u}[.] y{u}[.]) -> D(x{u}[.] y{p}[.])
+% reaction: D(x{u}[.],y{u}[.]) -> D(x{u}[.],y{p}[.])
 
 jac(8,8)=jac(8,8)-k(13);
 jac(9,8)=jac(9,8)+k(13);
 
 % rule    : C(), . -> ., D(x{u}[.] y{u}[.])
-% reaction: C(x{u}[.] y{u}[.]) -> D(x{u}[.] y{u}[.])
+% reaction: C(x{u}[.],y{u}[.]) -> D(x{u}[.],y{u}[.])
 
 jac(6,6)=jac(6,6)-k(19);
 jac(8,6)=jac(8,6)+k(19);
 
 % rule    : C(x{u}[.]) -> C(x{p}[.])
-% reaction: C(x{u}[.] y{u}[.]) -> C(x{p}[.] y{u}[.])
+% reaction: C(x{u}[.],y{u}[.]) -> C(x{p}[.],y{u}[.])
 
 jac(6,6)=jac(6,6)-k(7);
 jac(7,6)=jac(7,6)+k(7);
 
 % rule    : B(), . -> ., C(x{u}[.] y{u}[.])
-% reaction: B(x{u}[.] y{u}[.]) -> C(x{u}[.] y{u}[.])
+% reaction: B(x{u}[.],y{u}[.]) -> C(x{u}[.],y{u}[.])
 
 jac(2,2)=jac(2,2)-k(18);
 jac(6,2)=jac(6,2)+k(18);
 
 % rule    : B(x{u}[.]) -> B(x{p}[.])
-% reaction: B(x{u}[.] y{u}[.]) -> B(x{p}[.] y{u}[.])
+% reaction: B(x{u}[.],y{u}[.]) -> B(x{p}[.],y{u}[.])
 
 jac(2,2)=jac(2,2)-k(3);
 jac(5,2)=jac(5,2)+k(3);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.])
-% reaction: B(x{u}[.] y{u}[.]) -> B(x{u}[.] y{p}[.])
+% reaction: B(x{u}[.],y{u}[.]) -> B(x{u}[.],y{p}[.])
 
 jac(2,2)=jac(2,2)-k(5);
 jac(4,2)=jac(4,2)+k(5);
 
 % rule    : . -> B(x{u}[.] y{u}[.]) | -(1) a
-% reaction:  -> B(x{u}[.] y{u}[.]) | -(1) a
+% reaction:  -> B(x{u}[.],y{u}[.]) | -(1) a
 
 
 % rule    : . -> A(x{u}[.] y{u}[.])
-% reaction:  -> A(x{u}[.] y{u}[.])
+% reaction:  -> A(x{u}[.],y{u}[.])
 
 end
 
