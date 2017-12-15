@@ -26,7 +26,7 @@ period=0.1;
 nonnegative=false;
 
 global nodevar
-nodevar=3;
+nodevar=4;
 global max_stoc_coef
 max_stoc_coef=1;
 nvar=6;
@@ -63,7 +63,7 @@ jackund=zeros(nrules,nodevar);
 
 t = 0.000000;
 
-init(3)=t;
+init(4)=t;
 init(2)=1;
 var(4)=init(2); % expo2_rate
 var(1)=10; % nT
@@ -184,7 +184,8 @@ Init=zeros(nodevar,1);
 
 Init(1) = init(1); % T()
 Init(2) = init(2); 
-Init(3) = init(3); % t
+Init(3) = init(3); % I()
+Init(4) = init(4); % t
 end
 
 
@@ -218,7 +219,7 @@ dydt(1)=dydt(1)+k(1)*y(1);
 % reaction:  ->  | 1 t
 
 dydt(2)=dydt(2)+k(2)*stoc(2,1);
-dydt(3)=1;
+dydt(4)=1;
 
 end
 
@@ -274,7 +275,7 @@ global nobs
 global var
 obs=zeros(nobs,1);
 
-t = y(3);
+t = y(4);
 var(4)=y(2); % expo2_rate
 var(3)=y(1); % T
 var(2)=y(2); % t
