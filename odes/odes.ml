@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 08 2017>
+  * Last modification: Time-stamp: <Dec 15 2017>
 *)
 
 let local_trace = false
@@ -757,7 +757,7 @@ struct
     else
       remanent
 
-  let initial_network ?max_size ~dotnet parameters compil network initial_states rules =
+  let initial_network ?max_size parameters compil network initial_states rules =
     let network =
       {network with has_empty_lhs = Some false}
     in
@@ -782,7 +782,7 @@ struct
            ([], network)
            initial_states) rules
     in
-    if dotnet
+    if I.do_we_allow_empty_lhs compil
     then
       match network.has_empty_lhs with
       | None ->
@@ -819,7 +819,7 @@ struct
     compare_reaction (fst a) (fst b)
 
 
-  let compute_reactions ?max_size ~smash_reactions ~dotnet parameters compil network rules initial_states =
+  let compute_reactions ?max_size ~smash_reactions parameters compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let cache = network.cache in
@@ -865,7 +865,7 @@ struct
     in
     let rules = List.rev rules_rev in
     let to_be_visited, network =
-      initial_network ?max_size ~dotnet
+      initial_network ?max_size
         parameters compil network initial_states rules
     in
     let network =
@@ -1624,7 +1624,7 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
-  let network_from_compil ?max_size ~dotnet ~smash_reactions ~ignore_obs parameters compil network =
+  let network_from_compil ?max_size ~smash_reactions ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let () = Format.printf "\t -initial states @." in
@@ -1635,7 +1635,7 @@ struct
       Format.printf "\t -saturating the set of molecular species @."
     in
     let network =
-      compute_reactions ?max_size ~dotnet ~smash_reactions parameters compil network rules initial_state
+      compute_reactions ?max_size ~smash_reactions parameters compil network rules initial_state
     in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
@@ -3076,10 +3076,10 @@ struct
                              (Mods.DynArray.get network.species_tab k))
                       ) k, Some "substance"
                   | Loggers.DOTNET ->
-                    let dotnet = true in
+                    let compil = I.to_dotnet compil in
                     (string_of_int k),
                     Format.asprintf "%a"
-                      (fun log k -> I.print_chemical_species ~dotnet ~compil
+                      (fun log k -> I.print_chemical_species ~compil
                         log
                         (fst (Mods.DynArray.get network.species_tab k))
                       ) k, Some ""

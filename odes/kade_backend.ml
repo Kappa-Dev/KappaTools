@@ -20,7 +20,6 @@ struct
       symbol_table.Symbol_table.close_internal_state
 
   let print_cc
-      ?dotnet:(dotnet=false)
       ?full_species:(full_species=false) ?sigs ?cc_id ~with_id ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) f cc =
         let print_intf (ag_i, _ as ag) link_ids neigh =
           snd
@@ -32,9 +31,8 @@ struct
                         f "%t%a%a"
                         (if not_empty then
                            (fun fmt -> Format.fprintf fmt "%s"
-                               (if dotnet then
-                                  symbol_table.Symbol_table.dotnet_site_sep
-                                else symbol_table.Symbol_table.site_sep_comma))
+                               symbol_table.Symbol_table.site_sep
+                              )
                          else Pp.empty)
                         (Agent.print_site ?sigs ag) p
                         (print_internal_state symbol_table ?sigs ag p)
@@ -43,9 +41,8 @@ struct
                       Format.fprintf
                         f "%t%a"
                         (if not_empty then
-                          (fun fmt -> Format.fprintf f "%s"
-                            (if dotnet then symbol_table.Symbol_table.dotnet_site_sep
-                             else symbol_table.Symbol_table.site_sep_comma))
+                           (fun fmt ->
+                              Format.fprintf fmt "%s"                              symbol_table.Symbol_table.site_sep)
                          else Pp.empty)
                         (Agent.print_site ?sigs ag) p in
                   match el with
@@ -101,17 +98,20 @@ struct
                      f "%t@[<h>%a%s"
                      (if not_empty
                       then
-                        begin
-                          if dotnet then
-                            (fun fmt -> Format.fprintf fmt ".")
-                          else Pp.comma
-                        end
+                        (fun fmt ->
+                           let () =
+                             Format.fprintf fmt "%s" symbol_table.Symbol_table.agent_sep_dot
+                           in
+                           if not symbol_table.Symbol_table.compact_agent_sep_dot then
+                             Format.fprintf fmt "@ ")
                       else Pp.empty)
                      (Agent.print ?sigs ~with_id) ag_x
                      symbol_table.Symbol_table.agent_open
                  in
                  let out = print_intf ag_x link_ids el in
-                 let () = Format.fprintf f "%s@]" symbol_table.Symbol_table.agent_close in
+                 let () =
+                   Format.fprintf f "%s@]" symbol_table.Symbol_table.agent_close
+                 in
                  true, out
                else not_empty,link_ids)
             cc (false, (1, Mods.Int2Map.empty))
@@ -321,7 +321,15 @@ let print_rule_mixture
         && not !Parameter.debugModeOn
         then aux_print some t
         else
-          let () = if some then Pp.comma f in
+          let () =
+            if some then
+              let () =
+                Format.fprintf f "%s" symbol_table.Symbol_table.agent_sep_comma
+              in
+              if not symbol_table.Symbol_table.compact_agent_sep_comma
+              then
+                Format.fprintf f "@ "
+          in
           let () = print_rule_agent sigs ~ltypes ~symbol_table
               incr_agents created_incr f h in
           aux_print true t in
@@ -428,7 +436,12 @@ struct
         else
           let () =
             if some then
-              Format.pp_print_string f symbol_table.Symbol_table.agent_sep_comma
+              let () =
+                Format.fprintf f "%s" symbol_table.Symbol_table.agent_sep_comma
+              in
+              if not symbol_table.Symbol_table.compact_agent_sep_comma
+                then
+                  Format.fprintf f "@ "
           in
           let () = print_agent created true ?sigs ~symbol_table incr_agents f h
         in
@@ -493,7 +506,8 @@ struct
       Format.fprintf f "%a %a" pr_alg va (Model.print_token ~env) tok in
     Format.fprintf f "%a%t%a%t%a%t"
       (LKappa.print_rule_mixture sigs ~ltypes:false r_created) r_mix
-      (if r_mix <> [] && r_created <> [] then Pp.comma else Pp.empty)
+      (if r_mix <> [] && r_created <> [] then
+         Pp.comma else Pp.empty)
       (Raw_mixture.print ~created:true ~sigs ~symbol_table) r_created
 
       (if r.Primitives.delta_tokens <> []

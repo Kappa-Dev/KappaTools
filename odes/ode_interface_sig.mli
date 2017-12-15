@@ -21,6 +21,9 @@ sig
   type init =
     ((connected_component array list,int) Alg_expr.e * rule) list
 
+  val do_we_allow_empty_lhs: compil -> bool
+  val to_dotnet: compil -> compil
+  val dont_allow_empty_lhs: compil -> compil
   val empty_cache: compil -> cache
 
   val get_init: compil -> init
@@ -40,12 +43,10 @@ sig
     ?compil:compil -> Format.formatter -> int -> unit
 
   val print_chemical_species:
-    ?dotnet:bool
-    -> ?compil:compil -> Format.formatter -> chemical_species -> unit
+    ?compil:compil -> Format.formatter -> chemical_species -> unit
 
   val print_canonic_species:
-    ?dotnet:bool
-    -> ?compil:compil -> Format.formatter -> canonic_species -> unit
+    ?compil:compil -> Format.formatter -> canonic_species -> unit
 
   val rule_rate_convention: compil ->
     Remanent_parameters_sig.rate_convention
@@ -153,6 +154,7 @@ sig
   val preprocess: Run_cli_args.t -> ast -> preprocessed_ast
 
   val get_compil:
+    dotnet:bool ->
     ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
     ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->

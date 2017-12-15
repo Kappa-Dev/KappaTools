@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Dec 14 2017>
+  * Last modification: Time-stamp: <Dec 15 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -449,7 +449,7 @@ let get_agent_sep_comma_symbol_1 symbol = symbol.Symbol_table.agent_sep_comma
 let get_agent_sep_plus_symbol_1 symbol = symbol.Symbol_table.agent_sep_plus
 let get_agent_sep_dot_symbol_1 symbol = symbol.Symbol_table.agent_sep_dot
 let get_btype_sep_symbol_1 symbol = symbol.Symbol_table.btype_sep
-let get_site_sep_comma_symbol_1 symbol = symbol.Symbol_table.site_sep_comma
+let get_site_sep_comma_symbol_1 symbol = symbol.Symbol_table.site_sep
 let get_ghost_agent_symbol_1 symbol = symbol.Symbol_table.ghost_agent
 let get_do_we_show_ghost_1 symbol = symbol.Symbol_table.show_ghost
 let get_uni_arrow_symbol_1 symbol = symbol.Symbol_table.uni_arrow

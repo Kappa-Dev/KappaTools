@@ -22,10 +22,17 @@ type compil =
     show_reactions: bool ;
     count: Ode_args.count ;
     compute_jacobian: bool ;
-    symbol_table: Symbol_table.symbol_table
+    symbol_table: Symbol_table.symbol_table;
+    allow_empty_lhs: bool;
   }
 
+let do_we_allow_empty_lhs compil = compil.allow_empty_lhs
 
+let to_dotnet compil =
+  {compil with symbol_table = Symbol_table.unbreakable_symbol_table_dotnet}
+
+let dont_allow_empty_lhs compil =
+  {compil with allow_empty_lhs = false}
 
 type cc_cache = Pattern.PreEnv.t
 
@@ -167,10 +174,9 @@ let do_we_count_in_embeddings compil =
 let do_we_prompt_reactions compil =
   compil.show_reactions
 
-let print_chemical_species ?dotnet ?compil f =
+let print_chemical_species ?compil f =
   Format.fprintf f "@[<h>%a@]"
     (Kade_backend.Pattern.print_cc
-       ?dotnet
        ?full_species:(Some true)
        ?sigs:(Option_util.map Model.signatures (environment_opt compil))
        ?cc_id:None
@@ -587,6 +593,7 @@ let to_ast x = x
 
 let preprocess cli_args ast = Cli_init.preprocess cli_args ast
 let get_compil
+    ~dotnet
     ?bwd_bisim
     ~rule_rate_convention ?reaction_rate_convention
     ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
@@ -594,7 +601,8 @@ let get_compil
     Cli_init.get_compilation_from_preprocessed_ast
       ?bwd_bisim cli_args preprocessed_ast
   in
-  {
+  let compil =
+    {
     environment = env ;
     contact_map = contact_map ;
     init = init ;
@@ -603,12 +611,17 @@ let get_compil
     show_reactions = show_reactions ;
     count = count ;
     compute_jacobian = compute_jacobian ;
+    allow_empty_lhs = true ;
     symbol_table =
       match cli_args.Run_cli_args.syntaxVersion with
-      | Ast.V3 -> Symbol_table.symbol_table_V3
-      | Ast.V4 -> Symbol_table.symbol_table_V4
-
+      | Ast.V3 -> Symbol_table.unbreakable_symbol_table_V3
+      | Ast.V4 -> Symbol_table.unbreakable_symbol_table_V4 ;
   }
+  in
+  if dotnet then
+    to_dotnet (dont_allow_empty_lhs compil)
+  else
+    compil
 
 let empty_cc_cache compil =
   Pattern.PreEnv.of_env (Model.domain compil.environment)

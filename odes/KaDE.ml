@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 14 2017>
+  * Last modification: Time-stamp: <Dec 15 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -238,6 +238,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         in
         let compil =
           A.get_compil
+            ~dotnet
             ~reaction_rate_convention ~rule_rate_convention
             ~show_reactions ~count ~compute_jacobian
             cli_args preprocessed_ast
@@ -262,7 +263,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             in
             let () = Format.printf "+ restart compilation to account for ~-equivalent patterns in algebraic expressions... @." in
             let compil =
-              A.get_compil ?bwd_bisim
+              A.get_compil ~dotnet ?bwd_bisim
                 ~reaction_rate_convention ~rule_rate_convention ~show_reactions ~count ~compute_jacobian
                 cli_args preprocessed_ast
             in
@@ -290,6 +291,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       else
         let compil =
           A.get_compil
+            ~dotnet
             ~reaction_rate_convention ~rule_rate_convention
             ~show_reactions ~count ~compute_jacobian
             cli_args preprocessed_ast
@@ -302,7 +304,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let network =
       A.network_from_compil
-        ?max_size ~dotnet ~smash_reactions ~ignore_obs parameters compil network
+        ?max_size ~smash_reactions ~ignore_obs parameters compil network
     in
     (*************************************************************)
     let out_channel =
