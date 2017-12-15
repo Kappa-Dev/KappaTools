@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 14 2017>
+  * Last modification: Time-stamp: <Dec 15 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -191,7 +191,10 @@ let nbr_automorphisms_in_chemical_species x =
 let compare_connected_component = Pattern.compare_canonicals
 
 let print_connected_component ?compil =
-  Pattern.print ?domain:(domain_opt compil) ~with_id:false
+  Kade_backend.Pattern.print
+    ?domain:(domain_opt compil)
+    ~symbol_table:(symbol_table_opt compil)
+    ~with_id:false
 
 let canonic_form x = x
 
@@ -458,8 +461,13 @@ let print_rule_id log = Format.fprintf log "%i"
 
 let print_rule ?compil =
   match compil with
-  | None -> Kappa_printer.elementary_rule ?env:None
-  | Some compil -> Kappa_printer.decompiled_rule ~full:true (environment compil)
+  | None ->
+    Kade_backend.Kappa_printer.elementary_rule
+      ?env:None ?symbol_table:None
+  | Some compil ->
+    Kade_backend.Kappa_printer.decompiled_rule
+      ~full:true (environment compil) ~symbol_table:(symbol_table compil)
+
 
 let print_rule_name ?compil f r =
   let env = environment_opt compil in

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Sep 02 2017>
+  * Last modification: Time-stamp: <Dec 15 2017>
 *)
 
 module type Interface =
@@ -33,7 +33,8 @@ sig
     connected_component -> connected_component -> int
 
   val print_connected_component :
-    ?compil:compil -> Format.formatter -> connected_component -> unit
+    ?compil:compil ->
+    Format.formatter -> connected_component -> unit
 
   val print_token :
     ?compil:compil -> Format.formatter -> int -> unit
