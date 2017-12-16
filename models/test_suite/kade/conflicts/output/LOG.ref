@@ -22,3 +22,5 @@ done
 	 -main function 
 	 -initial state 
 	 -ode system 
+	 -jacobian 
+	 -observables 

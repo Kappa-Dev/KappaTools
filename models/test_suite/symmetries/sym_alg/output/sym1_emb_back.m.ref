@@ -234,21 +234,21 @@ stoc(7,1)=y(8)/2;
 dydt=zeros(nodevar,1);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.]) | |A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{p},y{u},z[1]),A(x{p},y{p},z[1])| d
+% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{p} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(1)=dydt(1)-k(7)*y(1);
 dydt(11)=dydt(11)+k(7)*y(1);
 dydt(12)=dydt(12)+k(7)*y(1)*stoc(7,1);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.]) | |A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{u},y{p},z[1]),A(x{p},y{p},z[1])| d
+% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{u} y{p} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(1)=dydt(1)-k(6)*y(1);
 dydt(11)=dydt(11)+k(6)*y(1);
 dydt(12)=dydt(12)+k(6)*y(1)*stoc(6,1);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.]) | |A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{u},y{u},z[1]),A(x{p},y{p},z[1])| d
+% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 dydt(1)=dydt(1)-k(5)*y(1);
 dydt(11)=dydt(11)+k(5)*y(1);
@@ -476,7 +476,7 @@ jacstoc(7,1,8)=1;
 jac=sparse(nodevar,nodevar);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.]) | |A(x{p}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{p},y{u},z[1]),A(x{p},y{p},z[1])| d
+% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{p} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(1,1)=jac(1,1)-k(7);
 jac(11,1)=jac(11,1)+k(7);
@@ -484,7 +484,7 @@ jac(12,8)=jac(12,8)+k(7)*y(1)*jacstoc(7,1,8);
 jac(12,1)=jac(12,1)+k(7)*y(1)*stoc(7,1);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.]) | |A(x{u}[.] y{p}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{u},y{p},z[1]),A(x{p},y{p},z[1])| d
+% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{u} y{p} z[1]),A(x{p} y{p} z[1])| d
 
 jac(1,1)=jac(1,1)-k(6);
 jac(11,1)=jac(11,1)+k(6);
@@ -492,7 +492,7 @@ jac(12,8)=jac(12,8)+k(6)*y(1)*jacstoc(6,1,8);
 jac(12,1)=jac(12,1)+k(6)*y(1)*stoc(6,1);
 
 % rule    : B(y{u}[.]) -> B(y{p}[.]) | |A(x{u}[.] y{u}[.] z[1]), A(x{p}[.] y{p}[.] z[1])| d
-% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{u},y{u},z[1]),A(x{p},y{p},z[1])| d
+% reaction: B(y{u}[.]) -> B(y{p}[.]) | |A(x{u} y{u} z[1]),A(x{p} y{p} z[1])| d
 
 jac(1,1)=jac(1,1)-k(5);
 jac(11,1)=jac(11,1)+k(5);

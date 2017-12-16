@@ -37,7 +37,6 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <listOfSpecies>
 <species metaid="CMD8" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
 <species metaid="CMD9" id="t2" name="t" compartment="default" initialAmount="1" substanceUnits="substance"/>
-<species metaid="CMD10" id="3" name="I()" compartment="default" initialAmount="0" substanceUnits=""/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
@@ -51,10 +50,10 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <!-- reaction: T() -> T() + T() -->
 <reaction id="re1" name="expo" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD11" species="s1"/>
+<speciesReference metaid="CMD10" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD12" species="s1" stoichiometry="2"/>
+<speciesReference metaid="CMD11" species="s1" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -67,10 +66,10 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <!-- reaction:  ->  | 1 t -->
 <reaction id="re2" name="expo2" reversible="false" fast="false">
 <listOfProducts>
-<speciesReference metaid="CMD13" species="t2"/>
+<speciesReference metaid="CMD12" species="t2"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD14" species="t2"/>
+<modifierSpeciesReference metaid="CMD13" species="t2"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">

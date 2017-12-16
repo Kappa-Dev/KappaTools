@@ -28,6 +28,7 @@ end parameters
 
 begin species
  1 A() 0
+ 2 I() 0
 end species
 
 
@@ -40,3 +41,5 @@ begin reactions
 2 1 k1_
 # rule    : . -> A()
 #  -> A()
+3 2 1,2 k2_
+end reactions
