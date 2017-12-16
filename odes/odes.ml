@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 15 2017>
+  * Last modification: Time-stamp: <Dec 16 2017>
 *)
 
 let local_trace = false
@@ -782,7 +782,7 @@ struct
            ([], network)
            initial_states) rules
     in
-    if I.do_we_allow_empty_lhs compil
+    if not (I.do_we_allow_empty_lhs compil)
     then
       match network.has_empty_lhs with
       | None ->
