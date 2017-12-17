@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 15 2017>
+  * Last modification: Time-stamp: <Dec 17 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -140,7 +140,7 @@ let symbol_table compil =
 let symbol_table_opt a =
   match a with
   | None -> Symbol_table.symbol_table_V4
-  | Some compil ->  symbol_table compil
+  | Some compil -> symbol_table compil
 
 type mixture = Edges.t(* not necessarily connected, fully specified *)
 
