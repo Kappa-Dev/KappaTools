@@ -52,10 +52,12 @@ let fold_perturbations f x env =
 
 let get_rule env i = env.rules.(i)
 
-let get_ast_rule env i =
-  fst (snd (env.ast_rules.(i-1)))
+let get_ast_rule_with_label env i = env.ast_rules.(i-1)
 
-  let fold_ast_rules f x env =
+let get_ast_rule env i =
+  fst (snd (get_ast_rule_with_label env i))
+
+let fold_ast_rules f x env =
     Tools.array_fold_lefti (fun i x (_, _rule) ->
         let lkappa_rule = get_ast_rule env i in
         f i x lkappa_rule

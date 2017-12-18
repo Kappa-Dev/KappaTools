@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 17 2017>
+  * Last modification: Time-stamp: <Dec 18 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -414,7 +414,7 @@ let n_cc cache compil rule =
   let cache = set_rule_cache rule_cache cache in
   cache, arity
 
-let n_cc cache compil rule  =
+let n_cc cache compil rule =
   hash_rule_weight
     (fun cache rule ->
        let id = rule.Primitives.syntactic_rule in
