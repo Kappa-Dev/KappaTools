@@ -1,11 +1,96 @@
+module Utils =
+struct
+
+  let print_free_symbol f symbol_table  =
+    Format.fprintf f "%s"
+      symbol_table.Symbol_table.free
+
+  let print_bound_to_unknown_symbol f symbol_table =
+  Format.fprintf f "%s"
+    symbol_table.Symbol_table.link_to_some
+
+  let print_binding_state symbol_table pr_binding_state f binding_state =
+    Format.fprintf f "%s%a%s"
+      symbol_table.Symbol_table.open_binding_state
+      pr_binding_state binding_state
+      symbol_table.Symbol_table.close_binding_state
+
+  let print_bound symbol_table pr_bound f bound =
+    print_binding_state symbol_table
+      (fun f () ->
+         Format.fprintf f "%s%a"
+           symbol_table.Symbol_table.bound
+           pr_bound bound) f ()
+
+  let print_binding_type symbol_table pr_port pr_type p f a =
+    print_bound symbol_table
+      (fun f () ->
+         Format.fprintf f "%a%s%a"
+           pr_port p
+           symbol_table.Symbol_table.btype_sep
+           (pr_type a) p) f ()
+
+  let print_bound_to_unknown f symbol_table =
+    print_binding_state symbol_table
+      print_bound_to_unknown_symbol f symbol_table
+
+  let print_free_site f symbol_table =
+    print_binding_state symbol_table
+      print_free_symbol f symbol_table
+
+  let print_internal_state symbol_table pr_st f st =
+    Format.fprintf f "%s%s%a%s"
+      symbol_table.Symbol_table.open_internal_state
+      symbol_table.Symbol_table.internal_state_symbol
+      pr_st st
+      symbol_table.Symbol_table.close_internal_state
+
+  let print_internal_state_symbol_any f symbol_table =
+    Format.fprintf f "%s"
+      symbol_table.Symbol_table.internal_state_any
+
+  let print_internal_state_any f symbol_table =
+    Format.fprintf f "%s%a%s"
+      symbol_table.Symbol_table.open_internal_state
+      print_internal_state_symbol_any symbol_table
+      symbol_table.Symbol_table.close_internal_state
+
+  let print_space symbol_table f space =
+    Format.fprintf f
+      begin
+        match space, symbol_table.Symbol_table.breakable with
+        | Symbol_table.Space, true -> "@ "
+        | Symbol_table.Space, false -> " "
+        | Symbol_table.No_space, true -> "@,"
+        | Symbol_table.No_space, false -> ""
+      end
+
+  let print_separator symbol_table f (string,space) =
+    Format.fprintf f "%s%a"
+      string
+      (print_space symbol_table) space
+
+  let print_agent_sep_comma symbol_table f =
+    print_separator symbol_table f symbol_table.Symbol_table.agent_sep_comma
+
+  let print_agent_sep_dot symbol_table f =
+    print_separator symbol_table f symbol_table.Symbol_table.agent_sep_dot
+
+  let print_agent_sep_plus symbol_table f =
+    print_separator symbol_table f symbol_table.Symbol_table.agent_sep_plus
+
+  let print_site_sep symbol_table f =
+    print_separator symbol_table f symbol_table.Symbol_table.site_sep
+
+end
+
+
 module Pattern =
 struct
 
-  let print_free_site symbol_table fmt =
-    Format.fprintf fmt "%s%s%s"
-      symbol_table.Symbol_table.open_binding_state
-      symbol_table.Symbol_table.free
-      symbol_table.Symbol_table.close_binding_state
+  let print_free_site =
+    Utils.print_free_site
+
   let print_internal ?sigs (_,agent) site f id =
     match sigs with
     | Some sigs ->
@@ -13,11 +98,8 @@ struct
     | None -> Format.fprintf f "%i" id
 
   let print_internal_state symbol_table ?sigs ag p fmt st =
-    Format.fprintf fmt "%s%s%a%s"
-      symbol_table.Symbol_table.open_internal_state
-      symbol_table.Symbol_table.internal_state_symbol
-      (print_internal ?sigs ag p) st
-      symbol_table.Symbol_table.close_internal_state
+    Utils.print_internal_state
+      symbol_table (print_internal ?sigs ag p) fmt st
 
   let print_cc
       ?full_species:(full_species=false) ?sigs ?cc_id ~with_id ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) f cc =
@@ -30,9 +112,7 @@ struct
                     then Format.fprintf
                         f "%t%a%a"
                         (if not_empty then
-                           (fun fmt -> Format.fprintf fmt "%s"
-                               symbol_table.Symbol_table.site_sep
-                              )
+                           Utils.print_site_sep symbol_table
                          else Pp.empty)
                         (Agent.print_site ?sigs ag) p
                         (print_internal_state symbol_table ?sigs ag p)
@@ -41,8 +121,7 @@ struct
                       Format.fprintf
                         f "%t%a"
                         (if not_empty then
-                           (fun fmt ->
-                              Format.fprintf fmt "%s"                              symbol_table.Symbol_table.site_sep)
+                           Utils.print_site_sep symbol_table
                          else Pp.empty)
                         (Agent.print_site ?sigs ag) p in
                   match el with
@@ -50,12 +129,12 @@ struct
                     if st >= 0 then
                       let () =
                         if full_species then
-                          print_free_site symbol_table f
+                          print_free_site f symbol_table
                       in
                       (true,out)
                     else (not_empty,out)
                   | Pattern.Free ->
-                    let () = print_free_site symbol_table f in
+                    let () = print_free_site f symbol_table in
                     (true,out)
                   | Pattern.Link (dst_a,dst_p) ->
                     let dst_ty = Pattern.find_ty cc dst_a in
@@ -63,6 +142,7 @@ struct
                     && not(!Parameter.debugModeOn) then
                       let counter = Pattern.counter_value_cc cc (dst_a,dst_p) 0 in
                       let () = Format.fprintf f "{=%d}" counter in
+                      (* to do: add symbols in symbol table for counters *)
                       true,out
                     else
                       let i,out' =
@@ -74,11 +154,9 @@ struct
                           (free, (succ free,
                                   Mods.Int2Map.add (ag_i,p) free link_ids))
                       in
-                      let () = Format.fprintf f "%s%s%i%s"
-                          symbol_table.Symbol_table.open_binding_state
-                          symbol_table.Symbol_table.bound
-                          i
-                          symbol_table.Symbol_table.close_binding_state
+                      let () =
+                        Utils.print_bound symbol_table
+                          Format.pp_print_int f i
                       in
                       true, out')
                (false, link_ids) neigh)
@@ -98,12 +176,7 @@ struct
                      f "%t@[<h>%a%s"
                      (if not_empty
                       then
-                        (fun fmt ->
-                           let () =
-                             Format.fprintf fmt "%s" symbol_table.Symbol_table.agent_sep_dot
-                           in
-                           if not symbol_table.Symbol_table.compact_agent_sep_dot then
-                             Format.fprintf fmt "@ ")
+                        Utils.print_agent_sep_dot symbol_table
                       else Pp.empty)
                      (Agent.print ?sigs ~with_id) ag_x
                      symbol_table.Symbol_table.agent_open
@@ -141,16 +214,120 @@ struct
     | Ast.ANY_FREE | Ast.LNK_ANY ->
       Format.pp_print_string f symbol_table.Symbol_table.link_to_any
     | Ast.LNK_TYPE (p, a) ->
-      Format.fprintf f "%a%s%a" (pr_port a) p
-        symbol_table.Symbol_table.btype_sep pr_type a
+      Utils.print_binding_type symbol_table pr_port pr_type p f a
     | Ast.LNK_FREE ->
-      Format.pp_print_string f symbol_table.Symbol_table.free
+      Utils.print_free_site f symbol_table
     | Ast.LNK_SOME ->
-      Format.pp_print_string f symbol_table.Symbol_table.link_to_some
+      Utils.print_bound_to_unknown f symbol_table
+    | Ast.LNK_VALUE (_,a) ->
+      Utils.print_bound symbol_table
+        pr_annot f a
 
-    | Ast.LNK_VALUE (i,a) -> Format.fprintf f "%s%i%a"
-                               symbol_table.Symbol_table.bound i
-                               pr_annot a
+end
+
+
+module Raw_mixture =
+struct
+
+  include Raw_mixture
+  let print_link symbol_table incr_agents f = function
+    | Raw_mixture.FREE ->
+      Utils.print_free_site f symbol_table
+    | Raw_mixture.VAL i ->
+      try
+        let root = Raw_mixture.find incr_agents i in
+        let (counter,(_,is_counter)) = Mods.DynArray.get incr_agents.Raw_mixture.rank root
+        in
+        if (is_counter)&&not(!Parameter.debugModeOn) then
+          Format.fprintf f "{=%d}" counter
+          (* to do: add symbols in symbol table for counters *)
+        else
+          Utils.print_bound symbol_table Format.pp_print_int f i
+      with Invalid_argument _ ->
+          Utils.print_bound symbol_table Format.pp_print_int f i
+
+  let aux_pp_si sigs symbol_table a s f i =
+    match sigs with
+    | Some sigs ->
+      Format.fprintf f
+        "%a%a"
+        (Signature.print_site sigs a) s
+        (fun fmt id_opt ->
+           match id_opt with
+           | None -> ()
+           | Some i ->
+             Utils.print_internal_state
+               symbol_table
+               (Signature.print_internal_state sigs a s) fmt i )
+        i
+    | None ->
+      match i with
+      | Some i ->
+        Format.fprintf f
+                    "%i%a"
+                    s
+                    (Utils.print_internal_state symbol_table Format.pp_print_int)
+                       i
+
+      | None -> Format.pp_print_int f s
+
+  let print_intf with_link ?sigs
+      ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
+      incr_agents (ag_ty:int) f (ports,ints) =
+    let rec aux empty i =
+      if i < Array.length ports then
+        let () = Format.fprintf
+            f "%t%a%a"
+            (if empty then Pp.empty else Pp.space)
+            (aux_pp_si sigs symbol_table ag_ty i) ints.(i)
+            (if with_link
+             then print_link symbol_table incr_agents
+             else (fun _ _ -> ()))
+            ports.(i) in
+        aux false (succ i) in
+    aux true 0
+
+  let aux_pp_ag sigs f a =
+    match sigs with
+    | Some sigs -> Signature.print_agent sigs f a
+    | None -> Format.pp_print_int f a
+
+  let print_agent created link
+      ?sigs ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
+      incr_agents f ag =
+    Format.fprintf f "%a%s@[<h>%a@]%s%t"
+      (aux_pp_ag sigs) ag.Raw_mixture.a_type
+      symbol_table.Symbol_table.agent_open
+      (print_intf
+         link
+         ?sigs
+         ~symbol_table
+         incr_agents
+         ag.Raw_mixture.a_type)
+      (ag.Raw_mixture.a_ports, ag.Raw_mixture.a_ints)
+      symbol_table.Symbol_table.agent_close
+      (fun f -> if created then Format.pp_print_string f "+")
+      (* to do: add symbols for agent creation/degradation *)
+
+  let print ~created ?sigs
+      ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
+      f mix =
+    let incr_agents = Raw_mixture.union_find_counters sigs mix in
+    let rec aux_print some = function
+      | [] -> ()
+      | h::t ->
+        if Signature.is_counter_agent sigs h.Raw_mixture.a_type && not
+             !Parameter.debugModeOn
+        then aux_print some t
+        else
+          let () =
+            if some then
+              Utils.print_agent_sep_comma symbol_table f
+          in
+          let () = print_agent created true ?sigs ~symbol_table incr_agents f h
+          in
+          aux_print true t in
+    aux_print false mix
 
 end
 
@@ -194,11 +371,9 @@ struct
           f "{%a/%a}" (Signature.print_internal_state sigs ag_ty site) i
           (Signature.print_internal_state sigs ag_ty site) j
       else
-        Format.fprintf f "%s%s%a%s"
-          symbol_table.Symbol_table.open_internal_state
-          symbol_table.Symbol_table.internal_state_symbol (Signature.print_internal_state sigs ag_ty site) i
-          symbol_table.Symbol_table.close_internal_state
-    | LKappa.I_VAL_ERASED i ->
+        Pattern.print_internal_state symbol_table ~sigs
+          ((),ag_ty) site f i
+        | LKappa.I_VAL_ERASED i ->
       Format.fprintf
         f "{%a%t}" (Signature.print_internal_state sigs ag_ty site) i
         (fun f -> if show_erased then Format.pp_print_string f "--")
@@ -334,122 +509,206 @@ let print_rule_mixture
               incr_agents created_incr f h in
           aux_print true t in
     aux_print false mix
-end
 
-module Raw_mixture =
-struct
+let print_internal_lhs sigs symbol_table ag_ty site f = function
+  | LKappa.I_ANY -> ()
+  | (LKappa.I_ANY_CHANGED _ | LKappa.I_ANY_ERASED) ->
+    Format.pp_print_string f symbol_table.Symbol_table.internal_state_any
+  | (LKappa.I_VAL_CHANGED (i,_) | LKappa.I_VAL_ERASED i) ->
+    Pattern.print_internal_state
+      symbol_table ~sigs ((),ag_ty) site f i
+
+let print_internal_rhs sigs symbol_table ag_ty site f = function
+  | LKappa.I_ANY -> ()
+  | (LKappa.I_ANY_CHANGED j | LKappa.I_VAL_CHANGED (_,j)) ->
+  Pattern.print_internal_state
+    symbol_table ~sigs ((),ag_ty) site f j
+  | (LKappa.I_ANY_ERASED | LKappa.I_VAL_ERASED _) -> assert false
+
+let print_link_lhs ~ltypes sigs symbol_table f ((e,_),_) =
+  Format.fprintf f "%s%a%s"
+      symbol_table.Symbol_table.open_binding_state
+      (Ast.print_link
+         (Signature.print_site sigs)
+         (Signature.print_agent sigs)
+         (print_link_annot ~ltypes sigs symbol_table)
+         symbol_table) e
+      symbol_table.Symbol_table.close_binding_state
 
 
-  let print_link symbol_table incr_agents f = function
-    | Raw_mixture.FREE ->
-      Pattern.print_free_site symbol_table f
-    | Raw_mixture.VAL i ->
-      try
-        let root = Raw_mixture.find incr_agents i in
-        let (counter,(_,is_counter)) = Mods.DynArray.get incr_agents.Raw_mixture.rank root
-        in
-        if (is_counter)&&not(!Parameter.debugModeOn) then
-          Format.fprintf f "{=%d}" counter
-        else
-          Format.fprintf f "%s%s%i%s"
-            symbol_table.Symbol_table.open_binding_state
-            symbol_table.Symbol_table.bound
-            i
-            symbol_table.Symbol_table.close_binding_state
-      with Invalid_argument _ ->
-        Format.fprintf f "%s%s%i%s"
-          symbol_table.Symbol_table.open_binding_state
-          symbol_table.Symbol_table.bound
-          i
-          symbol_table.Symbol_table.close_binding_state
+let print_link_rhs ~ltypes sigs symbol_table f ((e,_),s) =
+  Format.fprintf f "%s%a%s"
+    symbol_table.Symbol_table.open_binding_state
+    begin
+      match s with
+      | LKappa.Linked i ->
+        Ast.print_link
+          (Signature.print_site sigs)
+          (Signature.print_agent sigs) (fun _ () -> ())
+          symbol_table f (Ast.LNK_VALUE (i,()))
+      | LKappa.Freed ->
+        Ast.print_link
+          (Signature.print_site sigs)
+          (Signature.print_agent sigs) (fun _ () -> ())
+          symbol_table f Ast.LNK_FREE
+  | LKappa.Maintained ->
+    Ast.print_link
+      (Signature.print_site sigs)
+      (Signature.print_agent sigs) (print_link_annot ~ltypes sigs symbol_table)
+      symbol_table
+      f e
+  | LKappa.Erased -> assert false
+    end
 
-  let aux_pp_si sigs symbol_table a s f i =
-    match sigs with
-    | Some sigs ->
-      Format.fprintf f
-        "%a%a"
-        (Signature.print_site sigs a) s
-        (fun fmt id_opt ->
-           match id_opt with
-           | None -> ()
-           | Some i ->
-             Signature.print_internal_state sigs a s fmt i)
-        i
-    | None ->
-      match i with
-      | Some i -> Format.fprintf f
-                    "%i%s%s%i%s"
-                    s
-                    symbol_table.Symbol_table.open_internal_state
-                    symbol_table.Symbol_table.internal_state_symbol
-                    i
-                    symbol_table.Symbol_table.close_internal_state
-      | None -> Format.pp_print_int f s
-
-  let print_intf with_link ?sigs
-      ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
-      incr_agents (ag_ty:int) f (ports,ints) =
-    let rec aux empty i =
-      if i < Array.length ports then
+let print_intf_lhs ~ltypes sigs symbol_table ag_ty f (ports,ints) =
+  let rec aux empty i =
+    if i < Array.length ports then
+      if (match ports.(i) with
+          | (((Ast.LNK_SOME | Ast.LNK_FREE | Ast.ANY_FREE |
+               Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
+          | (Ast.LNK_ANY, _), _ ->
+            match ints.(i) with
+            | (LKappa.I_ANY | LKappa.I_ANY_ERASED | LKappa.I_ANY_CHANGED _) -> false
+            | ( LKappa.I_VAL_CHANGED _ | LKappa.I_VAL_ERASED _) -> true) then
         let () = Format.fprintf
-            f "%t%a%a"
+            f "%t%a%a%a"
             (if empty then Pp.empty else Pp.space)
-            (aux_pp_si sigs symbol_table ag_ty i) ints.(i)
-            (if with_link
-             then print_link symbol_table incr_agents
-             else (fun _ _ -> ()))
-            ports.(i) in
-        aux false (succ i) in
-    aux true 0
+            (Signature.print_site sigs ag_ty) i
+            (print_internal_lhs sigs symbol_table ag_ty i)
+            ints.(i) (print_link_lhs ~ltypes sigs symbol_table) ports.(i) in
+        aux false (succ i)
+      else aux empty (succ i) in
+  aux true 0
 
-  let aux_pp_ag sigs f a =
-    match sigs with
-    | Some sigs -> Signature.print_agent sigs f a
-    | None -> Format.pp_print_int f a
+let print_intf_rhs ~ltypes sigs symbol_table ag_ty f (ports,ints) =
+  let rec aux empty i =
+    if i < Array.length ports then
+      if (match ports.(i) with
+          | (((Ast.LNK_SOME | Ast.LNK_FREE |  Ast.ANY_FREE |
+               Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
+          | ((Ast.LNK_ANY, _), (LKappa.Erased | LKappa.Freed | LKappa.Linked _)) -> true
+          | ((Ast.LNK_ANY, _), LKappa.Maintained) ->
+              match ints.(i) with
+            | LKappa.I_ANY -> false
+            | LKappa.I_VAL_CHANGED (i,j) -> i <> j
+            | (LKappa.I_ANY_ERASED | LKappa.I_ANY_CHANGED _ | LKappa.I_VAL_ERASED _) -> true
+        ) then
+        let () = Format.fprintf
+            f "%t%a%a%a"
+            (if empty then Pp.empty else Pp.space)
+            (Signature.print_site sigs ag_ty) i
+            (print_internal_rhs sigs symbol_table ag_ty i)
+            ints.(i) (print_link_rhs ~ltypes sigs symbol_table) ports.(i) in
+        aux false (succ i)
+      else aux empty (succ i) in
+  aux true 0
 
-  let print_agent created link
-      ?sigs ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
-      incr_agents f ag =
-    Format.fprintf f "%a%s@[<h>%a@]%s%t"
-      (aux_pp_ag sigs) ag.Raw_mixture.a_type
+let print_agent_lhs ~ltypes sigs symbol_table f ag =
+  Format.fprintf
+    f "%a%s@[<h>%a@]%s"
+    (Signature.print_agent sigs) ag.LKappa.ra_type
+    symbol_table.Symbol_table.agent_open
+    (print_intf_lhs ~ltypes sigs symbol_table ag.LKappa.ra_type) (ag.LKappa.ra_ports,ag.LKappa.ra_ints)
+    symbol_table.Symbol_table.agent_close
+
+let print_agent_rhs ~ltypes sigs symbol_table f ag =
+  if not ag.LKappa.ra_erased then
+    Format.fprintf
+      f "%a%s@[<h>%a@]%s" (Signature.print_agent sigs) ag.LKappa.ra_type
       symbol_table.Symbol_table.agent_open
-      (print_intf
-         link
-         ?sigs
-         ~symbol_table
-         incr_agents
-         ag.Raw_mixture.a_type)
-      (ag.Raw_mixture.a_ports, ag.Raw_mixture.a_ints)
+      (print_intf_rhs ~ltypes sigs symbol_table ag.LKappa.ra_type) (ag.LKappa.ra_ports,ag.LKappa.ra_ints)
       symbol_table.Symbol_table.agent_close
-      (fun f -> if created then Format.pp_print_string f "+")
 
-  let print ~created ?sigs
-      ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
-      f mix =
-    let incr_agents = Raw_mixture.union_find_counters sigs mix in
-    let rec aux_print some = function
-      | [] -> ()
-      | h::t ->
-        if Signature.is_counter_agent sigs h.Raw_mixture.a_type && not
-             !Parameter.debugModeOn
-        then aux_print some t
-        else
-          let () =
-            if some then
-              let () =
-                Format.fprintf f "%s" symbol_table.Symbol_table.agent_sep_comma
-              in
-              if not symbol_table.Symbol_table.compact_agent_sep_comma
-                then
-                  Format.fprintf f "@ "
+let print_rhs ~ltypes sigs symbol_table created f mix =
+  let rec aux empty = function
+    | [] ->
+      Format.fprintf f "%t%a"
+        (if empty || created = [] then Pp.empty else Pp.comma)
+        (Raw_mixture.print ~created:false ~sigs ~symbol_table) created
+    | h :: t ->
+      if h.LKappa.ra_erased
+      then
+        if symbol_table.Symbol_table.show_ghost then
+          let () = Format.fprintf f "%t%s"
+              (if empty then Pp.empty else Pp.comma)
+              symbol_table.Symbol_table.ghost_agent
           in
-          let () = print_agent created true ?sigs ~symbol_table incr_agents f h
-        in
-        aux_print true t in
-  aux_print false mix
+          aux false t
+        else aux false t
+      else
+        let () = Format.fprintf f "%t%a"
+            (if empty then Pp.empty else Pp.comma)
+            (print_agent_rhs ~ltypes sigs symbol_table) h in
+        aux false t in
+  aux true mix
+
+let print_rates sigs symbol_table pr_tok pr_var f r =
+  let ltypes = false in
+  Format.fprintf
+    f " @@ %a%t"
+    (Alg_expr.print
+       (fun f m -> Format.fprintf f "|%a|"
+           (print_rule_mixture sigs ~symbol_table ~ltypes []) m)
+       pr_tok pr_var) (fst r.LKappa.r_rate)
+    (fun f ->
+       match r.LKappa.r_un_rate with
+       | None -> ()
+       | Some ((ra,_),max_dist) ->
+         Format.fprintf
+           f " {%a%a}"
+           (Alg_expr.print
+              (fun f m -> Format.fprintf f "|%a|"
+                  (print_rule_mixture sigs ~symbol_table ~ltypes []) m)
+              pr_tok pr_var) ra
+           (Pp.option
+              (fun f (md,_) ->
+                 Format.fprintf f ":%a"
+                   (Alg_expr.print
+                      (fun f m -> Format.fprintf f "|%a|"
+                          (print_rule_mixture sigs ~symbol_table ~ltypes []) m)
+                      pr_tok pr_var) md)) max_dist)
+
+
+let print_rule ~full sigs
+    ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
+    pr_tok pr_var f r =
+  Format.fprintf
+    f "@[<h>%t%t%a%t@]"
+    (fun f ->
+       if full || r.LKappa.r_editStyle then
+         Format.fprintf f "%a%t%a"
+           (print_rule_mixture sigs ~ltypes:false ~symbol_table r.LKappa.r_created) r.LKappa.r_mix
+           (fun f -> if r.LKappa.r_mix <> [] && r.LKappa.r_created <> [] then Pp.comma f)
+           (Raw_mixture.print ~created:true ~sigs ~symbol_table)
+           r.LKappa.r_created
+       else Format.fprintf f "%a%t%a -> %a"
+           (Pp.list Pp.comma (print_agent_lhs ~ltypes:false sigs symbol_table)) r.LKappa.r_mix
+           (fun f -> if r.LKappa.r_mix <> [] && r.LKappa.r_created <> [] then Pp.comma f)
+           (Pp.list Pp.comma (fun f _ -> Format.pp_print_string f "."))
+           r.LKappa.r_created
+           (print_rhs ~ltypes:false sigs symbol_table r.LKappa.r_created) r.LKappa.r_mix)
+    (fun f ->
+       match r.LKappa.r_delta_tokens with [] -> ()
+                                 | _::_ -> Format.pp_print_string f " | ")
+    (Pp.list
+       Pp.comma
+       (fun f ((nb,_),tk) ->
+          Format.fprintf
+            f "%a %a"
+            (Alg_expr.print
+               (fun f m -> Format.fprintf
+                   f "|%a|"
+                   (print_rule_mixture sigs ~symbol_table ~ltypes:false []) m)
+               pr_tok pr_var) nb
+            pr_tok tk))
+    r.LKappa.r_delta_tokens
+    (fun f -> if full then print_rates sigs symbol_table pr_tok pr_var f r)
+
+
 end
 
-module Kappa_printer =
+
+(*module Kappa_printer =
 struct
 
   let cc_mix ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) =
@@ -505,9 +764,15 @@ struct
     let pr_tok f (va,tok) =
       Format.fprintf f "%a %a" pr_alg va (Model.print_token ~env) tok in
     Format.fprintf f "%a%t%a%t%a%t"
-      (LKappa.print_rule_mixture sigs ~ltypes:false r_created) r_mix
+      (LKappa.print_rule_mixture sigs ~symbol_table ~ltypes:false r_created) r_mix
       (if r_mix <> [] && r_created <> [] then
-         Pp.comma else Pp.empty)
+         (fun fmt ->
+            let () =
+              Format.fprintf fmt "%s" symbol_table.Symbol_table.agent_sep_dot
+            in
+            if not symbol_table.Symbol_table.compact_agent_sep_dot then
+              Format.fprintf fmt "@ ")
+           else Pp.empty)
       (Raw_mixture.print ~created:true ~sigs ~symbol_table) r_created
 
       (if r.Primitives.delta_tokens <> []
@@ -567,5 +832,22 @@ struct
                   Format.fprintf f ":%a" (alg_expr ?env ~symbol_table) md))
              dist)
 
+
+  end*)
+
+module Model =
+struct
+  let print_ast_rule
+      ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
+      f i =
+    match env with
+    | None -> Format.fprintf f "__ast_rule_%i" i
+    | Some env ->
+      let sigs = Model.signatures env in
+      if i = 0 then Format.pp_print_string f "Interventions"
+      else
+        let r = Model.get_ast_rule env i in
+        LKappa.print_rule ~full:false sigs ~symbol_table
+            (Model.print_token ~env) (Model.print_alg ~env) f r
 
 end

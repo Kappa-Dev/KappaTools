@@ -1,13 +1,13 @@
+type break_hint =
+    Space | No_space
+
 type symbol_table =
   {
     agent_open : string ;
     agent_close : string ;
-    agent_sep_comma : string ;
-    agent_sep_dot : string ;
-    agent_sep_plus : string ;
-    compact_agent_sep_comma: bool ;
-    compact_agent_sep_dot: bool ;
-    compact_agent_sep_plus: bool ;
+    agent_sep_comma : string * break_hint ;
+    agent_sep_dot : string * break_hint ;
+    agent_sep_plus : string * break_hint ;
     ghost_agent : string ;
     show_ghost : bool ;
     internal_state_symbol : string;
@@ -16,6 +16,7 @@ type symbol_table =
     open_internal_state_mod : string;
     close_internal_state_mod : string;
     internal_state_mod_symbol: string;
+    internal_state_any: string;
     open_binding_state : string;
     close_binding_state : string;
     open_binding_state_mod: string;
@@ -26,7 +27,7 @@ type symbol_table =
     link_to_any : string;
     link_to_some : string;
     at : string ;
-    site_sep : string ;
+    site_sep : string * break_hint;
     btype_sep : string ;
     uni_arrow : string ;
     rev_arrow : string ;
@@ -48,6 +49,7 @@ let symbol_table_V3 =
     open_internal_state_mod = "";
     close_internal_state_mod = "";
     internal_state_mod_symbol = "/";
+    internal_state_any = "";
     open_binding_state_mod = "";
     close_binding_state_mod = "";
     binding_state_mod_symbol = "";
@@ -55,14 +57,11 @@ let symbol_table_V3 =
     at = "." ;
     agent_open = "(" ;
     agent_close =  ")" ;
-    agent_sep_comma = "," ;
-    agent_sep_plus = "," ;
-    agent_sep_dot = "," ;
-    compact_agent_sep_comma = false ;
-    compact_agent_sep_plus = false ;
-    compact_agent_sep_dot = false ;
+    agent_sep_comma = (",",Space) ;
+    agent_sep_plus = (",",Space) ;
+    agent_sep_dot = (",",Space) ;
     btype_sep = ".";
-    site_sep = "," ;
+    site_sep = (",",No_space) ;
     ghost_agent = "." ;
     show_ghost = false ;
     uni_arrow = "->" ;
@@ -73,9 +72,17 @@ let symbol_table_V3 =
   }
 
 let lighten symbol_table =
-  {symbol_table with site_sep = " "}
+  {
+    symbol_table with
+    site_sep = " ",snd symbol_table.site_sep
+  }
+
 let to_dotnet symbol_table =
-  {symbol_table with agent_sep_plus = "+" ; agent_sep_dot = "."}
+  {
+    symbol_table with
+    agent_sep_plus = "+",snd symbol_table.agent_sep_plus ;
+    agent_sep_dot = ".",snd symbol_table.agent_sep_dot
+  }
 
 let symbol_table_V4 =
   {
@@ -87,6 +94,7 @@ let symbol_table_V4 =
     internal_state_symbol = "";
     open_internal_state = "{";
     close_internal_state = "}";
+    internal_state_any = "{#}";
     open_internal_state_mod = "";
     close_internal_state_mod = "";
     internal_state_mod_symbol = "/";
@@ -97,14 +105,11 @@ let symbol_table_V4 =
     at = "." ;
     agent_open = "(" ;
     agent_close =  ")" ;
-    agent_sep_comma = "," ;
-    agent_sep_plus = "," ;
-    agent_sep_dot = "," ;
-    compact_agent_sep_comma = false ;
-    compact_agent_sep_plus = false ;
-    compact_agent_sep_dot = false ;
+    agent_sep_comma = (",",Space) ;
+    agent_sep_plus = (",",Space) ;
+    agent_sep_dot = (",",Space) ;
     btype_sep = ".";
-    site_sep = "," ;
+    site_sep = (",",No_space) ;
     ghost_agent = "." ;
     show_ghost = true ;
     uni_arrow = "->" ;

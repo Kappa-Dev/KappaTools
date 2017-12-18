@@ -1,13 +1,13 @@
+type break_hint =
+    Space | No_space 
+
 type symbol_table =
   {
     agent_open : string ;
     agent_close : string ;
-    agent_sep_comma : string ;
-    agent_sep_dot : string ;
-    agent_sep_plus : string ;
-    compact_agent_sep_comma: bool ;
-    compact_agent_sep_dot: bool ;
-    compact_agent_sep_plus: bool ;
+    agent_sep_comma : string * break_hint ;
+    agent_sep_dot : string * break_hint ;
+    agent_sep_plus : string * break_hint ;
     ghost_agent : string ;
     show_ghost : bool ;
     internal_state_symbol : string;
@@ -16,6 +16,7 @@ type symbol_table =
     open_internal_state_mod : string;
     close_internal_state_mod : string;
     internal_state_mod_symbol: string;
+    internal_state_any: string;
     open_binding_state : string;
     close_binding_state : string;
     open_binding_state_mod: string;
@@ -26,13 +27,13 @@ type symbol_table =
     link_to_any : string;
     link_to_some : string;
     at : string ;
-    site_sep : string ;
+    site_sep : string * break_hint;
     btype_sep : string ;
     uni_arrow : string ;
     rev_arrow : string ;
     bi_arrow : string ;
     uni_arrow_nopoly : string ;
-    breakable: bool ;
+    breakable : bool ;
   }
 
 val symbol_table_V4: symbol_table

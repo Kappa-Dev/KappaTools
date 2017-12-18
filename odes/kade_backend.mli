@@ -13,7 +13,7 @@ sig
     Format.formatter -> Pattern.id -> unit
 end
 
-module Kappa_printer:
+(*module Kappa_printer:
 sig
   val decompiled_rule:
     full:bool ->
@@ -25,4 +25,9 @@ sig
     ?symbol_table:Symbol_table.symbol_table ->
     Format.formatter -> Primitives.elementary_rule -> unit
 
+  end*)
+
+module Model:
+sig
+  val print_ast_rule: ?env:Model.t -> ?symbol_table:Symbol_table.symbol_table -> Format.formatter -> int -> unit
 end

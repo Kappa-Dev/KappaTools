@@ -468,17 +468,18 @@ let print_rule_id log = Format.fprintf log "%i"
 let print_rule ?compil =
   match compil with
   | None ->
-    Kade_backend.Kappa_printer.elementary_rule
-      ?env:None ?symbol_table:None
+    (*Kade_backend.*)Kappa_printer.elementary_rule
+      ?env:None (*?symbol_table:None*)
   | Some compil ->
-    Kade_backend.Kappa_printer.decompiled_rule
-      ~full:true (environment compil) ~symbol_table:(symbol_table compil)
+    (*Kade_backend.*)Kappa_printer.decompiled_rule
+      ~full:true (environment compil) (*~symbol_table:(symbol_table compil)*)
 
 
 let print_rule_name ?compil f r =
   let env = environment_opt compil in
   let id = r.Primitives.syntactic_rule in
-  Model.print_ast_rule ?env f id
+  Kade_backend.Model.print_ast_rule
+    ?env ~symbol_table:(symbol_table_opt compil) f id
 
 let string_of_var_id ?compil ?init_mode logger r =
   let f logger r =
