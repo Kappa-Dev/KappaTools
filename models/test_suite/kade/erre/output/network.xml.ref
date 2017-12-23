@@ -124,9 +124,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- rule    : R(e[_],r[.]), R(e[_],r[.]) -> R(e[_],r[1]), R(e[_],r[1]) -->
 <!-- reaction: R(e[1],r[.]), E(r[1]) + R(e[1],r[.]), E(r[1]) -> R(e[1],r[2]), R(e[3],r[2]), E(r[1]), E(r[3]) -->
-<reaction id="re4" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<reaction id="re4" name="R(e[_],r[.]), R(e[_],r[.]) -> R(e[_],r[1]), R(e[_],r[1])" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD34" species="s6" stoichiometry="2"/>
 </listOfReactants>
@@ -142,9 +142,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : E(r[1]), R(e[1] r[.]) -> E(r[.]), R(e[.] r[.]) -->
+<!-- rule    : E(r[1]), R(e[1],r[.]) -> E(r[.]), R(e[.],r[.]) -->
 <!-- reaction: R(e[1],r[.]), E(r[1]) -> R(e[.],r[.]) + E(r[.]) -->
-<reaction id="re5" name="E(r[1]), R(e[1] r[.]) -> E(r[.]), R(e[.] r[.])" reversible="false" fast="false">
+<reaction id="re5" name="E(r[1]), R(e[1],r[.]) -> E(r[.]), R(e[.],r[.])" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD36" species="s6"/>
 </listOfReactants>

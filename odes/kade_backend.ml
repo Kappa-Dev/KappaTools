@@ -1,6 +1,9 @@
 module Utils =
 struct
 
+  let print_link_to_any_symbol f symbol_table =
+    Format.fprintf f "%s" symbol_table.Symbol_table.link_to_any
+
   let print_free_symbol f symbol_table  =
     Format.fprintf f "%s"
       symbol_table.Symbol_table.free
@@ -8,6 +11,20 @@ struct
   let print_bound_to_unknown_symbol f symbol_table =
   Format.fprintf f "%s"
     symbol_table.Symbol_table.link_to_some
+
+  let print_bound_symbol
+      symbol_table pr_bound f bound =
+    Format.fprintf f "%s%a"
+      symbol_table.Symbol_table.bound
+      pr_bound bound
+
+  let print_binding_type_symbol symbol_table pr_port pr_type p f a =
+    print_bound_symbol symbol_table
+      (fun f () ->
+         Format.fprintf f "%a%s%a"
+           (pr_port a) p
+           symbol_table.Symbol_table.btype_sep
+           pr_type p) f ()
 
   let print_binding_state symbol_table pr_binding_state f binding_state =
     Format.fprintf f "%s%a%s"
@@ -17,32 +34,27 @@ struct
 
   let print_bound symbol_table pr_bound f bound =
     print_binding_state symbol_table
-      (fun f () ->
-         Format.fprintf f "%s%a"
-           symbol_table.Symbol_table.bound
-           pr_bound bound) f ()
+      (fun f () -> print_bound_symbol symbol_table pr_bound f bound)
+      f ()
+
+  let print_binding_state_and_switch_symbol
+      symbol_table pr_binding_state binding_state pr_switch f switch =
+         Format.fprintf f "%a%a"
+           pr_binding_state binding_state
+           pr_switch switch
 
   let print_binding_state_and_switch
       symbol_table pr_binding_state binding_state pr_switch f switch =
     print_binding_state symbol_table
-      (fun f () ->
-         Format.fprintf f "%s%a%a"
-           symbol_table.Symbol_table.bound
-           pr_binding_state binding_state
-           pr_switch switch)
-      f ()
+      (fun f () -> print_binding_state_and_switch_symbol
+          symbol_table pr_binding_state
+          binding_state pr_switch f switch) f ()
 
   let print_binding_type symbol_table pr_port pr_type p f a =
-    print_bound symbol_table
-      (fun f () ->
-         Format.fprintf f "%a%s%a"
-           (pr_port a) p
-           symbol_table.Symbol_table.btype_sep
-           pr_type p) f ()
-
-  let print_bound_to_unknown f symbol_table =
     print_binding_state symbol_table
-      print_bound_to_unknown_symbol f symbol_table
+      (fun f () ->
+         print_binding_type_symbol symbol_table pr_port pr_type p f a)
+      f ()
 
   let print_free_site f symbol_table =
     print_binding_state symbol_table
@@ -222,16 +234,18 @@ struct
 
   let print_link pr_port pr_type pr_annot symbol_table f = function
     | Ast.ANY_FREE | Ast.LNK_ANY ->
-      Format.pp_print_string f symbol_table.Symbol_table.link_to_any
+      Utils.print_link_to_any_symbol f symbol_table
     | Ast.LNK_TYPE (p, a) ->
-      Utils.print_binding_type symbol_table pr_port pr_type p f a
+      Utils.print_binding_type_symbol symbol_table pr_port pr_type p f a
     | Ast.LNK_FREE ->
-      Utils.print_free_site f symbol_table
+      Utils.print_free_symbol f symbol_table
     | Ast.LNK_SOME ->
-      Utils.print_bound_to_unknown f symbol_table
-    | Ast.LNK_VALUE (_,a) ->
-      Utils.print_bound symbol_table
-        pr_annot f a
+      Utils.print_bound_to_unknown_symbol f symbol_table
+    | Ast.LNK_VALUE (i,a) ->
+      Utils.print_bound_symbol symbol_table
+        (fun fmt a ->
+           Format.fprintf fmt "%i%a" i pr_annot a)
+        f a
 
 end
 
