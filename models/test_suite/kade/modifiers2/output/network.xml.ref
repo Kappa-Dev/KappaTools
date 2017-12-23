@@ -47,7 +47,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : unbind -->
-<!-- reaction: U(x[1]), T(x[1]) -> U(x[.]) + T(x[.]) -->
+<!-- reaction: U(x[1]).T(x[1]) -> U(x[.]) + T(x[.]) -->
 <reaction id="re1" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD10" species="s3"/>
@@ -67,7 +67,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: U(x[.]) + T(x[.]) -> U(x[1]), T(x[1]) -->
+<!-- reaction: U(x[.]) + T(x[.]) -> U(x[1]).T(x[1]) -->
 <reaction id="re2" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD14" species="s1"/>

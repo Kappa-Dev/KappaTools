@@ -212,21 +212,21 @@ k(3)=var(1);
 dydt=zeros(nodevar,1);
 
 % rule    : A(x[.],y[.]), A(x[.],y[.]) -> A(x[.],y[1]), A(x[.],y[1])
-% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[.],y[1]), A(x[.],y[1])
+% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[.],y[1]).A(x[.],y[1])
 
 dydt(1)=dydt(1)-k(3)*y(1)*y(1);
 dydt(1)=dydt(1)-k(3)*y(1)*y(1);
 dydt(4)=dydt(4)+2*k(3)*y(1)*y(1);
 
 % rule    : A(x[.],y[.]), A(x[.],y[.]) -> A(x[1],y[.]), A(x[.],y[1])
-% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[1],y[.]), A(x[.],y[1])
+% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[1],y[.]).A(x[.],y[1])
 
 dydt(1)=dydt(1)-k(2)*y(1)*y(1);
 dydt(1)=dydt(1)-k(2)*y(1)*y(1);
 dydt(3)=dydt(3)+k(2)*y(1)*y(1);
 
 % rule    : A(x[.],y[.]), A(x[.],y[.]) -> A(x[1],y[.]), A(x[1],y[.])
-% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[1],y[.]), A(x[1],y[.])
+% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[1],y[.]).A(x[1],y[.])
 
 dydt(1)=dydt(1)-k(1)*y(1)*y(1);
 dydt(1)=dydt(1)-k(1)*y(1)*y(1);
@@ -283,7 +283,7 @@ jack(1,4)=jacvar(2,4);
 jac=sparse(nodevar,nodevar);
 
 % rule    : A(x[.],y[.]), A(x[.],y[.]) -> A(x[.],y[1]), A(x[.],y[1])
-% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[.],y[1]), A(x[.],y[1])
+% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[.],y[1]).A(x[.],y[1])
 
 jac(1,1)=jac(1,1)-k(3)*y(1);
 jac(1,1)=jac(1,1)-k(3)*y(1);
@@ -293,7 +293,7 @@ jac(4,1)=jac(4,1)+2*k(3)*y(1);
 jac(4,1)=jac(4,1)+2*k(3)*y(1);
 
 % rule    : A(x[.],y[.]), A(x[.],y[.]) -> A(x[1],y[.]), A(x[.],y[1])
-% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[1],y[.]), A(x[.],y[1])
+% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[1],y[.]).A(x[.],y[1])
 
 jac(1,1)=jac(1,1)-k(2)*y(1);
 jac(1,1)=jac(1,1)-k(2)*y(1);
@@ -303,7 +303,7 @@ jac(3,1)=jac(3,1)+k(2)*y(1);
 jac(3,1)=jac(3,1)+k(2)*y(1);
 
 % rule    : A(x[.],y[.]), A(x[.],y[.]) -> A(x[1],y[.]), A(x[1],y[.])
-% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[1],y[.]), A(x[1],y[.])
+% reaction: A(x[.],y[.]) + A(x[.],y[.]) -> A(x[1],y[.]).A(x[1],y[.])
 
 jac(1,1)=jac(1,1)-jack(1,1)*y(1)*y(1);
 jac(1,2)=jac(1,2)-jack(1,2)*y(1)*y(1);

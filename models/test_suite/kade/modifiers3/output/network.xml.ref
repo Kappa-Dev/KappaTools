@@ -66,7 +66,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: U(x[.],y{p}[.]) + T(x[.]) -> U(x[1],y{p}[.]), T(x[1]) -->
+<!-- reaction: U(x[.],y{p}[.]) + T(x[.]) -> U(x[1],y{p}[.]).T(x[1]) -->
 <reaction id="re2" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD15" species="s2"/>
@@ -90,7 +90,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : essai -->
-<!-- reaction: U(x[1],y{p}[.]), T(x[1]) -> T(x[.]) + T(x[.]) -->
+<!-- reaction: U(x[1],y{p}[.]).T(x[1]) -> T(x[.]) + T(x[.]) -->
 <reaction id="re3" name="essai" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD21" species="s5"/>
@@ -106,7 +106,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: U(x[1],y{p}[.]), T(x[1]) -> U(x[.],y{p}[.]) + T(x[.]) -->
+<!-- reaction: U(x[1],y{p}[.]).T(x[1]) -> U(x[.],y{p}[.]) + T(x[.]) -->
 <reaction id="re4" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD23" species="s5"/>
@@ -127,7 +127,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : essai -->
-<!-- reaction: U(x[1],y{u}[.]), T(x[1]) -> T(x[.]) + T(x[.]) -->
+<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + T(x[.]) -->
 <reaction id="re5" name="essai" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD28" species="s4"/>
@@ -143,7 +143,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: U(x[1],y{u}[.]), T(x[1]) -> U(x[.],y{u}[.]) + T(x[.]) -->
+<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[.],y{u}[.]) + T(x[.]) -->
 <reaction id="re6" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD30" species="s4"/>
@@ -164,7 +164,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : essai2 -->
-<!-- reaction: U(x[1],y{u}[.]), T(x[1]) -> U(x[1],y{p}[.]), T(x[1]) -->
+<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1]) -->
 <reaction id="re7" name="essai2" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD35" species="s4"/>
@@ -196,7 +196,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: U(x[.],y{u}[.]) + T(x[.]) -> U(x[1],y{u}[.]), T(x[1]) -->
+<!-- reaction: U(x[.],y{u}[.]) + T(x[.]) -> U(x[1],y{u}[.]).T(x[1]) -->
 <reaction id="re9" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD39" species="s1"/>
