@@ -110,6 +110,7 @@ end
 module Pattern =
 struct
 
+  type id = Pattern.id 
   let print_free_site =
     Utils.print_free_site
 
@@ -748,7 +749,7 @@ let print_rule ~full sigs
 end
 
 
-(*module Kappa_printer =
+module Kappa_printer =
 struct
 
   let cc_mix ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) =
@@ -806,13 +807,8 @@ struct
     Format.fprintf f "%a%t%a%t%a%t"
       (LKappa.print_rule_mixture sigs ~symbol_table ~ltypes:false r_created) r_mix
       (if r_mix <> [] && r_created <> [] then
-         (fun fmt ->
-            let () =
-              Format.fprintf fmt "%s" symbol_table.Symbol_table.agent_sep_dot
-            in
-            if not symbol_table.Symbol_table.compact_agent_sep_dot then
-              Format.fprintf fmt "@ ")
-           else Pp.empty)
+         (fun fmt -> Utils.print_agent_sep_dot symbol_table fmt)
+       else Pp.empty)
       (Raw_mixture.print ~created:true ~sigs ~symbol_table) r_created
 
       (if r.Primitives.delta_tokens <> []
@@ -873,7 +869,7 @@ struct
              dist)
 
 
-  end*)
+  end
 
 module Model =
 struct

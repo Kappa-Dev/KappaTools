@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 15 2017>
+  * Last modification: Time-stamp: <Dec 23 2017>
 *)
 
 module type Interface =
@@ -23,6 +23,7 @@ sig
 
   val do_we_allow_empty_lhs: compil -> bool
   val to_dotnet: compil -> compil
+  val with_dot_and_plus: compil -> compil
   val dont_allow_empty_lhs: compil -> compil
   val empty_cache: compil -> cache
 
@@ -56,6 +57,7 @@ sig
   val do_we_count_in_embeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
 
+  val symbol_table: compil -> Symbol_table.symbol_table 
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
 
   val canonic_form: chemical_species -> canonic_species

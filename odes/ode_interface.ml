@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 18 2017>
+  * Last modification: Time-stamp: <Dec 23 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -30,6 +30,13 @@ let do_we_allow_empty_lhs compil = compil.allow_empty_lhs
 
 let to_dotnet compil =
   {compil with symbol_table = Symbol_table.unbreakable_symbol_table_dotnet}
+
+let with_dot_and_plus compil =
+  {compil
+   with
+    symbol_table =
+      Symbol_table.with_dot_and_plus compil.symbol_table
+  }
 
 let dont_allow_empty_lhs compil =
   {compil with allow_empty_lhs = false}
@@ -468,11 +475,11 @@ let print_rule_id log = Format.fprintf log "%i"
 let print_rule ?compil =
   match compil with
   | None ->
-    (*Kade_backend.*)Kappa_printer.elementary_rule
-      ?env:None (*?symbol_table:None*)
+    Kade_backend.Kappa_printer.elementary_rule
+      ?env:None ?symbol_table:None
   | Some compil ->
-    (*Kade_backend.*)Kappa_printer.decompiled_rule
-      ~full:true (environment compil) (*~symbol_table:(symbol_table compil)*)
+    Kade_backend.Kappa_printer.decompiled_rule
+      ~full:true (environment compil) ~symbol_table:(symbol_table compil)
 
 
 let print_rule_name ?compil f r =
@@ -582,7 +589,10 @@ let get_obs_titles compil =
   Model.map_observables
     (fun x -> remove_escape_char
         (Format.asprintf "%a"
-           (Kappa_printer.alg_expr ~env) x))
+           (Kade_backend.Kappa_printer.alg_expr
+              ~env
+                ~symbol_table:(symbol_table compil)
+           ) x))
     env
 
 let get_preprocessed_ast cli_args =

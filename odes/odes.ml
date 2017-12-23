@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 16 2017>
+  * Last modification: Time-stamp: <Dec 23 2017>
 *)
 
 let local_trace = false
@@ -2517,10 +2517,15 @@ struct
                    ("rule    : "^rule_string)
                in
                let dump fmt list  =
+                 let compil = I.with_dot_and_plus compil in
                  let _ =
                    List.fold_left
                      (fun bool k ->
-                        let prefix = if bool then " + " else "" in
+                        let prefix = if bool then
+                            Kade_backend.Utils.print_agent_sep_plus
+                              (I.symbol_table compil)
+                          else Pp.empty
+                        in
                         let species_string =
                           Format.asprintf "%a"
                             (fun log id ->
@@ -2532,7 +2537,7 @@ struct
                             k
                         in
                         let () =
-                          Format.fprintf fmt "%s%s"
+                          Format.fprintf fmt "%t%s"
                             prefix
                             species_string
                         in
@@ -2889,13 +2894,21 @@ struct
                      ("rule    : "^rule_string)
                  in
                  let dump fmt list  =
+                   let compil = I.with_dot_and_plus compil in
                    let _ =
                      List.fold_left
                        (fun bool k ->
-                          let prefix = if bool then " + " else "" in
+                          let prefix  =
+                            if bool then
+                              Kade_backend.Utils.print_agent_sep_plus
+                                (I.symbol_table compil)
+                            else
+                              Pp.empty
+                          in
                           let species_string =
                             Format.asprintf "%a"
-                              (fun log id -> I.print_chemical_species
+                              (fun log id ->
+                                 I.print_chemical_species
                                   ~compil log
                                   (fst
                                      (Mods.DynArray.get
@@ -2903,7 +2916,7 @@ struct
                               k
                           in
                           let () =
-                            Format.fprintf fmt "%s%s"
+                            Format.fprintf fmt "%t%s"
                               prefix
                               species_string
                           in

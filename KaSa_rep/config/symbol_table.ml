@@ -80,8 +80,8 @@ let lighten symbol_table =
 let to_dotnet symbol_table =
   {
     symbol_table with
-    agent_sep_plus = "+",snd symbol_table.agent_sep_plus ;
-    agent_sep_dot = ".",snd symbol_table.agent_sep_dot
+    agent_sep_plus = " +",snd symbol_table.agent_sep_plus ;
+    agent_sep_dot = ".",No_space
   }
 
 let symbol_table_V4 =
@@ -128,3 +128,10 @@ let unbreakable_symbol_table_V4 = not_breakable symbol_table_V4
 
 let unbreakable_symbol_table_V3_light = not_breakable symbol_table_V3_light
 let unbreakable_symbol_table_dotnet = not_breakable symbol_table_dotnet
+
+let with_dot_and_plus symbol_table =
+  {symbol_table
+   with
+    agent_sep_plus = unbreakable_symbol_table_dotnet.agent_sep_plus ;
+    agent_sep_dot = unbreakable_symbol_table_dotnet.agent_sep_dot ;
+  }

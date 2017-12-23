@@ -1,5 +1,14 @@
+module Utils:
+sig
+
+  val  print_agent_sep_plus:
+    Symbol_table.symbol_table -> Format.formatter -> unit
+
+end
+
 module Pattern:
 sig
+  type id = Pattern.id
   val print_cc:
   ?full_species:bool ->
   ?sigs:Signature.s -> ?cc_id:Pattern.id -> with_id:bool ->
@@ -13,8 +22,14 @@ sig
     Format.formatter -> Pattern.id -> unit
 end
 
-(*module Kappa_printer:
+module Kappa_printer:
 sig
+  val alg_expr:
+    ?env:Model.t ->
+    ?symbol_table:Symbol_table.symbol_table ->
+    Format.formatter ->
+    (Pattern.id array list, int) Alg_expr.e -> unit
+
   val decompiled_rule:
     full:bool ->
     ?symbol_table:Symbol_table.symbol_table ->
@@ -25,7 +40,7 @@ sig
     ?symbol_table:Symbol_table.symbol_table ->
     Format.formatter -> Primitives.elementary_rule -> unit
 
-  end*)
+  end
 
 module Model:
 sig

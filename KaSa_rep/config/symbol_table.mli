@@ -1,5 +1,5 @@
 type break_hint =
-    Space | No_space 
+    Space | No_space
 
 type symbol_table =
   {
@@ -44,3 +44,5 @@ val unbreakable_symbol_table_V4: symbol_table
 val unbreakable_symbol_table_V3: symbol_table
 val unbreakable_symbol_table_V3_light: symbol_table
 val unbreakable_symbol_table_dotnet: symbol_table
+
+val with_dot_and_plus: symbol_table -> symbol_table 
