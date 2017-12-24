@@ -1,5 +1,5 @@
---- /Users/feret/KaSim/models/test_suite/kade/syntax4/output/LOG.ref	2017-12-24 07:29:41.000000000 +0100
-+++ -	2017-12-24 07:29:41.000000000 +0100
+--- /Users/feret/KaSim/models/test_suite/kade/syntax4/output/LOG.ref	2017-12-24 08:35:03.000000000 +0100
++++ -	2017-12-24 08:35:03.000000000 +0100
 @@ -50,3 +50,31 @@
  	 -ode system 
  	 -jacobian 

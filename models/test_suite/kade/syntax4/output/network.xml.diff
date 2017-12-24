@@ -1,5 +1,5 @@
---- /Users/feret/KaSim/models/test_suite/kade/syntax4/output/network.xml.ref	2017-12-24 07:29:42.000000000 +0100
-+++ -	2017-12-24 07:29:42.000000000 +0100
+--- /Users/feret/KaSim/models/test_suite/kade/syntax4/output/network.xml.ref	2017-12-24 08:35:03.000000000 +0100
++++ -	2017-12-24 08:35:03.000000000 +0100
 @@ -2028,9 +2028,9 @@
  </math>
  </kineticLaw>
