@@ -1,0 +1,3 @@
+#Command-line:
+"${KAPPABIN}"KaDE syntax3.ka -syntax 3 -d output -l 1 -p 0.01 || exit 0
+"${KAPPABIN}"KaDE syntax3.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
