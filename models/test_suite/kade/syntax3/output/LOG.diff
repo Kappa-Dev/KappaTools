@@ -1,0 +1,34 @@
+--- /Users/feret/KaSim/models/test_suite/kade/syntax3/output/LOG.ref	2017-12-24 07:29:42.000000000 +0100
++++ -	2017-12-24 07:29:42.000000000 +0100
+@@ -50,3 +50,31 @@
+ 	 -ode system 
+ 	 -jacobian 
+ 	 -observables 
++Parsing syntax3.ka...
++done
+++ simulation parameters
+++ Sanity checks
+++ Compiling...
+++ Building initial simulation conditions...
++	 -variable declarations
++	 -rules
++	 -interventions
++	 -observables
++	 -update_domain construction
++	 12 (sub)observables 8 navigation steps
++	 -initial conditions
+++ generate the network... 
++	 -initial states 
++	 -saturating the set of molecular species 
++	 -tokens 
++	 -variables 
++	 -observables 
++	 -check time homogeneity 
+++ exporting the network... 
++	 -main function 
++line 0, characters -1--1:DOTNET backend does not support non-constant rates for rules: cowardly replacing it with 1
++File "syntax3.ka", line 14, characters 9-10:DOTNET backend does not support non-constant rates for rules: cowardly replacing it with 1
++	 -initial state 
++	 -ode system 
++	 -jacobian 
++	 -observables 

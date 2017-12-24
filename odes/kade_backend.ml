@@ -110,7 +110,8 @@ end
 module Pattern =
 struct
 
-  type id = Pattern.id 
+  type id = Pattern.id
+
   let print_free_site =
     Utils.print_free_site
 
@@ -303,7 +304,7 @@ struct
       if i < Array.length ports then
         let () = Format.fprintf
             f "%t%a%a"
-            (if empty then Pp.empty else Pp.space)
+            (if empty then Pp.empty else (Utils.print_site_sep symbol_table))
             (aux_pp_si sigs symbol_table ag_ty i) ints.(i)
             (if with_link
              then print_link symbol_table incr_agents
@@ -719,13 +720,20 @@ let print_rule ~full sigs
        if full || r.LKappa.r_editStyle then
          Format.fprintf f "%a%t%a"
            (print_rule_mixture sigs ~ltypes:false ~symbol_table r.LKappa.r_created) r.LKappa.r_mix
-           (fun f -> if r.LKappa.r_mix <> [] && r.LKappa.r_created <> [] then Pp.comma f)
+           (fun f -> if r.LKappa.r_mix <> [] && r.LKappa.r_created <> [] then
+               (Utils.print_agent_sep_comma symbol_table)
+                 f)
            (Raw_mixture.print ~created:true ~sigs ~symbol_table)
            r.LKappa.r_created
        else Format.fprintf f "%a%t%a -> %a"
-           (Pp.list Pp.comma (print_agent_lhs ~ltypes:false sigs symbol_table)) r.LKappa.r_mix
-           (fun f -> if r.LKappa.r_mix <> [] && r.LKappa.r_created <> [] then Pp.comma f)
-           (Pp.list Pp.comma (fun f _ -> Format.pp_print_string f "."))
+           (Pp.list (Utils.print_agent_sep_comma symbol_table)
+              (print_agent_lhs ~ltypes:false sigs symbol_table)) r.LKappa.r_mix
+           (fun f -> if r.LKappa.r_mix <> [] && r.LKappa.r_created <> [] then (Utils.print_agent_sep_comma symbol_table) f)
+           (if symbol_table.Symbol_table.show_ghost
+            then
+              Pp.list (Utils.print_agent_sep_comma symbol_table)
+                (fun f _ -> Format.pp_print_string f  symbol_table.Symbol_table.ghost_agent)
+            else (fun f _ -> Pp.empty f))
            r.LKappa.r_created
            (print_rhs ~ltypes:false sigs symbol_table r.LKappa.r_created) r.LKappa.r_mix)
     (fun f ->
