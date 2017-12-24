@@ -2028,9 +2028,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : . -> R(e{u}[.] r[.]) -->
+<!-- rule    : . -> R(e{u}[.],r[.]) -->
 <!-- reaction:  -> R(e{u}[.],r[.]) -->
-<reaction id="re96" name=". -> R(e{u}[.] r[.])" reversible="false" fast="false">
+<reaction id="re96" name=". -> R(e{u}[.],r[.])" reversible="false" fast="false">
 <listOfProducts>
 <speciesReference metaid="CMD496" species="s3"/>
 </listOfProducts>

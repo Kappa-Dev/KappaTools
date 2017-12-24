@@ -1828,9 +1828,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : . -> R(e~u r) -->
+<!-- rule    :  -> R(e~u,r) -->
 <!-- reaction:  -> R(e~u,r) -->
-<reaction id="re84" name=". -> R(e~u r)" reversible="false" fast="false">
+<reaction id="re84" name=" -> R(e~u,r)" reversible="false" fast="false">
 <listOfProducts>
 <speciesReference metaid="CMD472" species="s3"/>
 </listOfProducts>
@@ -1839,9 +1839,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <ci> k4 </ci></math>
 </kineticLaw>
 </reaction>
-<!-- rule    : . -> E(r) -->
+<!-- rule    :  -> E(r) -->
 <!-- reaction:  -> E(r) -->
-<reaction id="re85" name=". -> E(r)" reversible="false" fast="false">
+<reaction id="re85" name=" -> E(r)" reversible="false" fast="false">
 <listOfProducts>
 <speciesReference metaid="CMD473" species="s2"/>
 </listOfProducts>
