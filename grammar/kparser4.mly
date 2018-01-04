@@ -107,14 +107,14 @@ internal_modif:
   ;
 
 site_link:
-  | annot link_states link_modif CL_BRA annot { ($2, $3) }
+  | annot link_states link_modif CL_BRA { ($2, $3) }
   | annot error
     { raise (ExceptionDefn.Syntax_Error
                ("invalid linking state or missing ']'",rhs_pos 4)) }
   ;
 
 site_internal:
-  | internal_states internal_modif CL_CUR annot { ($1, $2) }
+  | internal_states internal_modif CL_CUR { ($1, $2) }
   | error
     { raise (ExceptionDefn.Syntax_Error
                ("invalid internal state or missing '}'",rhs_pos 3)) }
@@ -140,24 +140,24 @@ site_counter:
   ;
 
 site:
-  | ID annot OP_BRA site_link OP_CUR annot site_internal
+  | ID annot OP_BRA site_link annot OP_CUR annot site_internal annot
     { let (port_lnk, port_lnk_mod) = $4 in
-      let (port_int, port_int_mod) = $7 in
+      let (port_int, port_int_mod) = $8 in
       Ast.Port
         { Ast.port_nme=($1,rhs_pos 1); Ast.port_int;
           Ast.port_lnk; Ast.port_int_mod; Ast.port_lnk_mod; } }
-  | ID annot OP_CUR annot site_internal OP_BRA site_link
+  | ID annot OP_CUR annot site_internal annot OP_BRA site_link annot
     { let (port_int, port_int_mod) = $5 in
-      let (port_lnk, port_lnk_mod) = $7 in
+      let (port_lnk, port_lnk_mod) = $8 in
       Ast.Port
         { Ast.port_nme=($1,rhs_pos 1); Ast.port_int;
           Ast.port_lnk; Ast.port_int_mod; Ast.port_lnk_mod; } }
-  | ID annot OP_BRA site_link
+  | ID annot OP_BRA site_link annot
     { let (port_lnk, port_lnk_mod) = $4 in
       Ast.Port
         { Ast.port_nme=($1,rhs_pos 1); Ast.port_int=[];
           Ast.port_lnk; Ast.port_int_mod=None; Ast.port_lnk_mod; } }
-  | ID annot OP_CUR annot site_internal
+  | ID annot OP_CUR annot site_internal annot
     { let (port_int, port_int_mod) = $5 in
       Ast.Port
         { Ast.port_nme=($1,rhs_pos 1);Ast.port_lnk=[];
@@ -174,6 +174,9 @@ site:
 
 interface:
   | { [] }
+  | error
+    { raise (ExceptionDefn.Syntax_Error
+               (add_pos 1 ("Malformed site expression"))) }
   | site interface { $1 :: $2 }
   | site COMMA annot interface { $1 :: $4 }
   ;
