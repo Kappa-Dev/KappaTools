@@ -600,15 +600,21 @@ expecting '$DEL alg_expression kappa_expression'")) }
        pend,p) }
   ;
 
+partial_effect_list:
+  | effect SEMICOLON annot { let (e,_,_) = $1 in ([e],end_pos 2,$3) }
+  | effect { let (e,p,a) = $1 in ([e],p,a) }
+  | effect SEMICOLON annot partial_effect_list
+    { let (e,_,_) = $1 in let (l,pend,a) = $4 in (e::l,pend,a) }
+
 effect_list:
-  | OP_PAR annot effect_list CL_PAR annot { $3 }
+  | OP_PAR annot partial_effect_list CL_PAR annot { $3 }
   | effect SEMICOLON annot { let (e,_,_) = $1 in ([e],end_pos 2,$3) }
   | effect SEMICOLON annot effect_list
     { let (e,_,_) = $1 in let (l,pend,a) = $4 in (e::l,pend,a) }
   ;
 
 standalone_effect_list:
-  | annot effect_list EOF { let (v,_,_) = $2 in v }
+  | annot partial_effect_list EOF { let (e,_,_) = $2 in e }
   | error
     { raise (ExceptionDefn.Syntax_Error (add_pos 1 "Problematic effect list")) }
   ;
