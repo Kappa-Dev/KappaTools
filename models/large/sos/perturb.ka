@@ -1,7 +1,7 @@
 %def: "displayCompression" "weak" "strong"
 
-%mod: alarm 10 do $TRACK 'sos recruited' [true];
-%mod: alarm 11 do $TRACK 'sos recruited' [false];
+//%mod: alarm 10 do $TRACK 'sos recruited' [true];
+//%mod: alarm 11 do $TRACK 'sos recruited' [false];
 
 %var: 'DIM_beat' 2 //s
 %var: 'DIM_length' 5 //clock beats

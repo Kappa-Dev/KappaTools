@@ -456,6 +456,28 @@ module ButtonTrace : Ui_common.Div = struct
     ()
 end
 
+module ButtonOutputs : Ui_common.Div = struct
+  let id = "panel_settings_outputs_button"
+  let button =
+  Html.button
+    ~a:[ Html.a_id id
+       ; Html.Unsafe.string_attrib "type" "button"
+       ; Html.a_class ["btn" ; "btn-default" ; ] ]
+    [ Html.cdata "All outputs" ]
+
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [button]
+
+  let onload () =
+    let button_dom = Tyxml_js.To_dom.of_button button in
+    let () = button_dom##.onclick :=
+        Dom.handler
+          (fun _ ->
+
+             Js._true)
+    in
+    ()
+end
+
 module ButtonContinue : Ui_common.Div = struct
   let id = "panel_settings_continue_button"
   let button =
@@ -788,7 +810,13 @@ let footer () =
              Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
-                    ~a_class:[ "col-md-2"; "col-xs-4" ]
+                    ~a_class:[ "col-md-2"; "col-xs-3" ]
+                     [ State_simulation.PAUSED ; ]) ]
+               (ButtonOutputs.content ());
+             Html.div
+               ~a:[ Tyxml_js.R.Html.a_class
+                    (visible_on_states
+                    ~a_class:[ "col-md-2"; "col-xs-3" ]
                      [ State_simulation.PAUSED ; ]) ]
                (ButtonTrace.content ());
              Html.div
@@ -800,12 +828,12 @@ let footer () =
              Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
-                    ~a_class:[ "col-xs-2" ]
+                    ~a_class:[ "col-xs-2"; "col-sm-1" ]
                     [ State_simulation.PAUSED ;
                       State_simulation.RUNNING ; ]) ]
                (ButtonClear.content ());
              Html.div
-               ~a:[ Html.a_class [ "col-md-1"; "col-xs-4" ] ]
+               ~a:[ Html.a_class [ "col-md-1"; "col-xs-3" ] ]
                ((DivStatusIndicator.content ())
                 @
                 [ Html.entity "nbsp" ; ]) ]{|
