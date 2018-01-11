@@ -11,7 +11,7 @@ module Html = Tyxml_js.Html5
 
 let tab_is_active, set_tab_is_active = React.S.create false
 let current_snapshot, set_current_snapshot =
-  React.S.create (None : Api_types_j.snapshot option)
+  React.S.create (None : Data.snapshot option)
 
 type display_format = Kappa | Graph
 let display_format_to_string =
@@ -45,9 +45,9 @@ let configuration_template
   let json_handler = Widget_export.export_json
       ~serialize_json:(fun () ->
           (match
-             (React.S.value current_snapshot : Api_types_j.snapshot option) with
+             (React.S.value current_snapshot : Data.snapshot option) with
           | None -> "null"
-          | Some s -> Api_types_j.string_of_snapshot s
+          | Some s -> Data.string_of_snapshot s
           )
         )
   in
@@ -56,12 +56,14 @@ let configuration_template
     ; Widget_export.label = "kappa"
     ; Widget_export.export =
         fun (filename : string) ->
-          let data = match
-              (React.S.value current_snapshot : Api_types_j.snapshot option) with
-          | None -> ""
-          | Some s -> Api_data.api_snapshot_kappa s in
+          let data =
+            Js.string
+              (match
+                 (React.S.value current_snapshot : Data.snapshot option) with
+              | None -> ""
+              | Some s -> Api_data.api_snapshot_kappa s) in
           Common.saveFile
-            ~data:data
+            ~data
             ~mime:"application/json"
             ~filename:filename
     }
@@ -71,12 +73,14 @@ let configuration_template
     ; Widget_export.label = "dot"
     ; Widget_export.export =
         fun (filename : string) ->
-          let data = match
-              (React.S.value current_snapshot : Api_types_j.snapshot option) with
-          | None -> ""
-          | Some s -> Api_data.api_snapshot_dot s in
+          let data =
+            Js.string
+              (match
+                 (React.S.value current_snapshot : Data.snapshot option) with
+              | None -> ""
+              | Some s -> Api_data.api_snapshot_dot s) in
           Common.saveFile
-            ~data:data
+            ~data
             ~mime:"text/vnd.graphviz"
             ~filename:filename
     }
@@ -114,15 +118,15 @@ let format_select_id = "format_select_id"
 
 let render_snapshot_graph
     (snapshot_js : Js_snapshot.snapshot Js.t)
-    (snapshot : Api_types_j.snapshot) : unit =
+    (snapshot : Data.snapshot) : unit =
   let () =
     Common.debug
       (Js.string
-         (Api_types_j.string_of_snapshot snapshot))
+         (Data.string_of_snapshot snapshot))
   in
   match React.S.value display_format with
   | Graph ->
-    let json : string = Api_types_j.string_of_snapshot snapshot in
+    let json : string = Data.string_of_snapshot snapshot in
     snapshot_js##setData (Js.string json)
   | Kappa -> ()
 
@@ -166,7 +170,7 @@ let select_snapshot () =
                   )
              ) >>=
              (Api_common.result_bind_lwt
-                ~ok:(fun (snapshot : Api_types_j.snapshot) ->
+                ~ok:(fun (snapshot : Data.snapshot) ->
                     let () = set_current_snapshot (Some snapshot) in
                     let () = render_snapshot_graph
                         snapshot_js
@@ -369,7 +373,7 @@ let onload () : unit =
       | None -> ()
       | Some snapshot -> render_snapshot_graph
                             (snapshot_js : Js_snapshot.snapshot Js.t)
-                            (snapshot : Api_types_j.snapshot))
+                            (snapshot : Data.snapshot))
     | None -> assert false
   in
   (* get initial value for display format *)

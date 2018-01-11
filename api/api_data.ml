@@ -23,7 +23,7 @@ let api_exception_errors
 let api_snapshot_dot (snapshot : Api_types_t.snapshot) =
   Format.asprintf "%a@." (Data.print_dot_snapshot ?uuid:None) snapshot
 
-let api_snapshot_kappa (snapshot : Api_types_t.snapshot) : string =
+let api_snapshot_kappa (snapshot : Data.snapshot) : string =
   Format.asprintf "%a@." (Data.print_snapshot ?uuid:None) snapshot
 
 let api_simulation_status

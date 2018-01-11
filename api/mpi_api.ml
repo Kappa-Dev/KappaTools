@@ -85,6 +85,9 @@ let on_message
   | `SimulationTrace ->
     manager#simulation_raw_trace >>=
     (handler (fun result -> `SimulationTrace result))
+  | `SimulationOutputsZip ->
+    manager#simulation_outputs_zip >>=
+    (handler (fun result -> `SimulationOutputsZip (Base64.encode result)))
   | `SimulationPause ->
     manager#simulation_pause >>=
     (handler (fun () -> `SimulationPause))
@@ -352,6 +355,17 @@ class virtual  manager_base () : manager_base_type =
         ~ok:(function
             | `SimulationTrace result ->
               Lwt.return (Api_common.result_ok result)
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response)))
+
+    method simulation_outputs_zip =
+      self#message `SimulationOutputsZip >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `SimulationOutputsZip result ->
+              Lwt.return (Api_common.result_ok (Base64.decode result))
             | response ->
               Lwt.return
                 (Api_common.result_error_exception

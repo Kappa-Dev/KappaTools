@@ -283,9 +283,10 @@ let onload () =
                      (State_file.get_file ()) >>=
                    (Api_common.result_map
                       ~ok:(fun _ (file : Api_types_j.file) ->
+                          let data = Js.string file.Api_types_j.file_content in
                           let () =
                             Common.saveFile
-                              ~data:file.Api_types_j.file_content
+                              ~data
                               ~mime:"application/octet-stream"
                               ~filename:file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
                           in

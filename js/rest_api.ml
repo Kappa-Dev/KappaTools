@@ -225,6 +225,15 @@ class manager
            project_id)
         `GET
         (fun s -> (`SimulationTrace s))
+    | `SimulationOutputsZip ->
+      send
+        ?timeout
+        (Format.sprintf
+           "%s/v2/projects/%s/simulation/outputs"
+           url
+           project_id)
+        `GET
+        (fun s -> (`SimulationOutputsZip s))
     | `SimulationCatalogFileLine ->
       send
         ?timeout

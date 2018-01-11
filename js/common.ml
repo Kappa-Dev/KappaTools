@@ -89,12 +89,12 @@ let plotSVG
     |]
 
 let saveFile
-    ~(data : string)
+    ~(data : 'a Js.t)
     ~(mime : string)
     ~(filename : string) : unit =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "saveFile")
-    [| Js.Unsafe.inject (Js.string data);
+    [| Js.Unsafe.inject data;
        Js.Unsafe.inject (Js.string mime);
        Js.Unsafe.inject (Js.string filename)
     |]

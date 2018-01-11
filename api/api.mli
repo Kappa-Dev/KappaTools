@@ -87,6 +87,8 @@ class type manager_simulation = object
 
   method simulation_raw_trace : string result Lwt.t
 
+  method simulation_outputs_zip : Bigbuffer.bigstring result Lwt.t
+
   inherit manager_file_line
   inherit manager_din
   inherit manager_log_message

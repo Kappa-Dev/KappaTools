@@ -97,11 +97,31 @@ let simulation_trace () =
            __LOC__
            manager#simulation_raw_trace >>=
          (Api_common.result_bind_lwt
-            ~ok:(fun data ->
+            ~ok:(fun data_string ->
+                let data = Js.string data_string in
                 let () =
                   Common.saveFile
                     ~data ~mime:"application/octet-stream"
                     ~filename:"trace.json" in
+                Lwt.return (Api_common.result_ok ()))
+         )
+      )
+
+let simulation_outputs () =
+  State_simulation.when_ready
+    ~label:__LOC__
+      (fun manager ->
+         State_error.wrap
+           __LOC__
+           manager#simulation_outputs_zip >>=
+         (Api_common.result_bind_lwt
+            ~ok:(fun data_bigstring ->
+                let data =
+                  Typed_array.Bigstring.to_arrayBuffer data_bigstring in
+                let () =
+                  Common.saveFile
+                    ~data ~mime:"application/zip"
+                    ~filename:"simulation_outputs.zip" in
                 Lwt.return (Api_common.result_ok ()))
          )
       )
