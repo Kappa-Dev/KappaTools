@@ -334,6 +334,21 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
+    { Webapp_common.path = "/v2/projects/{projectid}/simulation/outputs" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let project_id = project_ref context in
+            bind_projects
+              (fun manager -> manager#simulation_outputs_zip)
+              project_id projects >>=
+            (Webapp_common.api_result_response
+               ~string_of_success:(fun out -> Base64.encode out))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
     { Webapp_common.path =
         "/v2/projects/{projectid}/simulation/parameter" ;
       Webapp_common.operation =

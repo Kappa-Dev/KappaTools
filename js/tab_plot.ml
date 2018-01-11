@@ -45,7 +45,7 @@ let export_json filename =
             Api_types_j.plot_limit_points = None }) >>=
        (Api_common.result_bind_lwt
           ~ok:(fun (plot : Api_types_t.plot)  ->
-              let data = Data.string_of_plot plot in
+              let data = Js.string (Data.string_of_plot plot) in
               let () =
                 Common.saveFile ~data ~mime:"application/json" ~filename in
               Lwt.return (Api_common.result_ok ()))))
@@ -59,7 +59,8 @@ let export mime filename =
             Api_types_j.plot_limit_points = None }) >>=
        (Api_common.result_bind_lwt
           ~ok:(fun (plot : Api_types_t.plot)  ->
-              let data = Data.export_plot ~is_tsv:(mime="text/tsv") plot in
+              let data =
+                Js.string (Data.export_plot ~is_tsv:(mime="text/tsv") plot) in
               let () = Common.saveFile ~data ~mime ~filename in
               Lwt.return (Api_common.result_ok ()))))
 

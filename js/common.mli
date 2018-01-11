@@ -10,7 +10,7 @@ val jquery_on : string -> string -> 'a -> 'b
 val option_string : string option -> Js.js_string Js.t Js.opt
 val plotPNG : string -> string -> string -> string option -> 'a
 val plotSVG : string -> string -> string -> string option -> 'a
-val saveFile : data:string -> mime:string -> filename:string -> unit
+val saveFile : data:'a Js.t -> mime:string -> filename:string -> unit
 type meth = [ `DELETE | `GET | `HEAD | `OPTIONS | `PATCH | `POST | `PUT ]
 val method_to_string : meth -> string
 val ajax_request :

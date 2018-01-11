@@ -68,6 +68,7 @@ type request = [
                | SimulationCatalogDIN
                | SimulationCatalogSnapshot
 	       | SimulationTrace
+	       | SimulationOutputsZip
 	       | SimulationParameter
                | SimulationPause
                | SimulationIntervention of simulation_intervention
@@ -100,6 +101,7 @@ type response_content = [
    | SimulationCatalogDIN of din_catalog
    | SimulationCatalogSnapshot of snapshot_catalog
    | SimulationTrace of string
+   | SimulationOutputsZip of string
    | SimulationParameter of simulation_parameter
    | SimulationContinue
    | SimulationDelete

@@ -472,7 +472,7 @@ module ButtonOutputs : Ui_common.Div = struct
     let () = button_dom##.onclick :=
         Dom.handler
           (fun _ ->
-
+             let () = Panel_settings_controller.simulation_outputs () in
              Js._true)
     in
     ()
@@ -866,6 +866,7 @@ let onload () : unit =
   let () = ButtonPause.onload () in
   let () = ButtonContinue.onload () in
   let () = ButtonTrace.onload () in
+  let () = ButtonOutputs.onload () in
   let () = ButtonClear.onload () in
   let () = DivStatusIndicator.onload() in
   ()

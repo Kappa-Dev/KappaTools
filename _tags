@@ -34,5 +34,5 @@
 
 
 true : debug, bin_annot, safe_string
-true : package(str), package(num), package(unix), package(yojson)
-true : package(result)
+true : package(str), package(bigarray), package(num), package(unix)
+true : package(result), package(yojson)

@@ -111,7 +111,7 @@ let export_current_din to_string mime filename =
     ~label:__LOC__
     (fun manager -> manager#simulation_detail_din din_id >>=
       Api_common.result_bind_lwt
-        ~ok:(fun din -> let data = to_string din in
+        ~ok:(fun din -> let data = Js.string (to_string din) in
               let () = Common.saveFile ~data ~mime ~filename in
               Lwt.return (Api_common.result_ok  ())))
 

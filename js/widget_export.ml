@@ -182,9 +182,9 @@ let export_json
   ; label = "json"
   ; export =
       fun filename ->
-        let data : string = serialize_json () in
+        let data = Js.string (serialize_json ()) in
         Common.saveFile
-          ~data:data
+          ~data
           ~mime:"application/json"
           ~filename:filename
   }

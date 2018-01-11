@@ -283,6 +283,45 @@ class manager_simulation
            Lwt.return (Api_common.result_ok
                          (Kappa_facade.get_raw_trace t)))
 
+    method simulation_outputs_zip =
+      let projection t =
+        try
+          let filename = "simulation_outputs" in
+          let file = Fakezip.open_out (filename^".zip") in
+          let () = Fakezip.add_entry
+              t.Api_types_t.simulation_output_log_messages
+              file (filename^"/log.txt") in
+          let () =
+            match t.Api_types_t.simulation_output_plot with
+            | None -> ()
+            | Some plot ->
+              Fakezip.add_entry
+                (Data.export_plot ~is_tsv:false plot)
+                file (filename^"/data.csv") in
+          let () =
+            Mods.StringMap.iter
+              (fun name content ->
+                 Fakezip.add_entry (String.concat "\n" (List.rev content))
+                   file (filename^"/"^name))
+              t.Api_types_t.simulation_output_file_lines in
+          let () =
+            List.iter
+              (fun din ->
+                 Fakezip.add_entry (Data.string_of_din ?len:None din)
+                   file (filename^"/"^din.Data.din_data.Data.din_name))
+            t.Api_types_t.simulation_output_dins in
+          let () =
+            List.iter
+              (fun snapshot ->
+                 Fakezip.add_entry (Data.string_of_snapshot ?len:None snapshot)
+                   file (filename^"/"^snapshot.Data.snapshot_file))
+              t.Api_types_t.simulation_output_snapshots in
+          let out = Fakezip.close_out file in
+          Api_common.result_ok out
+        with Fakezip.Error (_,f,e) ->
+          Api_common.result_error_msg ("Zip error in "^f^": "^e) in
+      detail_projection ~project ~system_process ~projection
+
     method simulation_pause : unit Api.result Lwt.t =
       Model_storage.bind_simulation
         project
