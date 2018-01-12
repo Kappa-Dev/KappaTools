@@ -77,6 +77,7 @@ val reset : t -> unit
    For long-lived buffers that may have grown a lot, [reset] allows
    faster reclamation of the space used by the buffer. *)
 
+(*
 val add_utf_8_uchar : t -> Uchar.t -> unit
 (** [add_utf_8_uchar b u] appends the {{:https://tools.ietf.org/html/rfc3629}
     UTF-8} encoding of [u] at the end of buffer [b].
@@ -97,7 +98,6 @@ val add_utf_16be_uchar : t -> Uchar.t -> unit
 
     @since 4.06.0 *)
 
-(*
 val to_bytes : t -> bytes
 (** Return a copy of the current contents of the buffer.
     The buffer itself is unchanged.

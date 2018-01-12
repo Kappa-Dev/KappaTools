@@ -89,6 +89,7 @@ let add_char b c =
   BA.unsafe_set b.buffer pos c;
   b.position <- pos + 1
 
+(*
  let add_utf_8_uchar b u = match Uchar.to_int u with
  | u when u < 0 -> assert false
  | u when u <= 0x007F ->
@@ -166,6 +167,7 @@ let add_char b c =
      BA.unsafe_set b.buffer (pos + 3) (Char.unsafe_chr (lo lsr 8));
      b.position <- pos + 4
  | _ -> assert false
+*)
 
 let add_substring b s offset len =
   if offset < 0 || len < 0 || offset > String.length s - len
@@ -182,8 +184,8 @@ let add_subbytes b s offset len =
 
 let add_string b s = add_substring b s 0 (String.length s)
 
-
-(*let add_bytes b s = add_string b (Bytes.unsafe_to_string s)
+(*
+let add_bytes b s = add_string b (Bytes.unsafe_to_string s)
 
 let add_buffer b bs =
   add_subbytes b bs.buffer 0 bs.position
