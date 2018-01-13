@@ -1,4 +1,4 @@
-# Snapshot [Event: 200]
+// Snapshot [Event: 200]
 %def: "T0" "1.36303"
 
 %init: 2 /*6 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[4] b[2] c[5]), A(a{p}[4]), C(c[5]), C(c[3])
