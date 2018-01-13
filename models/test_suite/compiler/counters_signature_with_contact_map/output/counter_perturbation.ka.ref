@@ -1,4 +1,4 @@
-# Snapshot [Event: 39]
+// Snapshot [Event: 39]
 %def: "T0" "2.30101"
 
 %init: 1 /*2 agents*/ A(x[1] c{=3} d{=1}), B(x[1] c{=3})

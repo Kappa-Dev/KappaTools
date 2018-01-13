@@ -16,10 +16,10 @@ type snapshot = {
 
 let print_snapshot ?uuid f s =
   let () = Format.fprintf
-      f "@[<v># Snapshot [Event: %d]@,"(*", Time: %f"*)s.snapshot_event in
+      f "@[<v>// Snapshot [Event: %d]@,"(*", Time: %f"*)s.snapshot_event in
   Format.fprintf
     f "%a%%def: \"T0\" \"%g\"@,@,%a@,%a@]@."
-    (Pp.option ~with_space:false (fun f x -> Format.fprintf f "# \"uuid\" : \"%i\"@," x)) uuid
+    (Pp.option ~with_space:false (fun f x -> Format.fprintf f "// \"uuid\" : \"%i\"@," x)) uuid
     s.snapshot_time
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "%%init: %i /*%i agents*/ @[<h>%a@]" i
@@ -33,7 +33,7 @@ let print_snapshot ?uuid f s =
 
 let print_dot_snapshot ?uuid f s =
   let () = Format.fprintf
-      f "@[<v># Snapshot [Event: %d]@,"(*", Time: %f"*)s.snapshot_event in
+      f "@[<v>// Snapshot [Event: %d]@,"(*", Time: %f"*)s.snapshot_event in
   Format.fprintf
     f "%adigraph G{@,%a@,%a}@]@."
     (Pp.option ~with_space:false (fun f x -> Format.fprintf f "// \"uuid\" : \"%i\"@," x)) uuid

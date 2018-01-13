@@ -1,4 +1,4 @@
-# Snapshot [Event: 20000]
+// Snapshot [Event: 20000]
 digraph G{
 subgraph cluster0{
   counter0 [label = "264 instance(s)", shape=none];

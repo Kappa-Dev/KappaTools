@@ -1,4 +1,4 @@
-# Snapshot [Event: 1]
+// Snapshot [Event: 1]
 %def: "T0" "0.154278"
 
 %init: 1 /*2 agents*/ A(x[.] y[1] z[.]), B(x[1])

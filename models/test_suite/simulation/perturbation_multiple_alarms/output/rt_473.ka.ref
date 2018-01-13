@@ -1,4 +1,4 @@
-# Snapshot [Event: 473]
+// Snapshot [Event: 473]
 %def: "T0" "5"
 
 %init: 451 /*1 agents*/ A(a{p}[.])
