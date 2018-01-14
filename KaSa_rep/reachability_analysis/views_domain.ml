@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 28 2017>
+   * Last modification: Time-stamp: <Jan 14 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -54,6 +54,7 @@ struct
           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t option
     ;
       separating_edges: (string * Ckappa_sig.c_rule_id * string) list option ;
+      transition_system_length: int list option ;
     }
 
   type dynamic_information =
@@ -199,6 +200,16 @@ struct
       {
         (get_local_dynamic_information dynamic) with
         separating_edges = Some sep_edges
+      } dynamic
+
+  let get_transition_system_length dynamic =
+    (get_local_dynamic_information dynamic).transition_system_length
+
+  let set_transition_system_length lengths dynamic =
+    set_local_dynamic_information
+      {
+        (get_local_dynamic_information dynamic) with
+        transition_system_length = Some lengths
       } dynamic
 
   (** bdu analysis dynamic in local dynamic information*)
@@ -432,6 +443,7 @@ struct
             subviews = None ;
             ranges = None ;
             separating_edges = None ;
+            transition_system_length = None ;
           }}
     in
     let error, init_static, init_dynamic =
@@ -815,7 +827,7 @@ struct
                     in
                     let () =
                     Loggers.fprintf log
-                      "%s" site_string 
+                      "%s" site_string
                     in
                     error, true
                  )
@@ -3833,7 +3845,7 @@ struct
             site_correspondence
             (get_fixpoint_result dynamic)
         in
-        let error, log_info, handler, bridges =
+        let error, log_info, handler, bridges, transition_systems_length =
           Agent_trace.agent_trace parameters (get_log_info dynamic) error
             dead_rules handler (get_global_static_information static) handler_kappa compil
             output
@@ -3843,6 +3855,12 @@ struct
           with
           | None -> dynamic
           | Some bridges -> set_separating_transitions bridges dynamic
+        in
+        let dynamic =
+          match transition_systems_length with
+          | None -> dynamic
+          | Some transition_system_length ->
+            set_transition_system_length transition_system_length dynamic
         in
         error, set_mvbdu_handler handler (set_log_info log_info dynamic)
       else
@@ -4097,6 +4115,16 @@ struct
       in
       error, dynamic, kasa_state
 
+  let export_transition_system_length _static dynamic error kasa_state =
+    match dynamic.local.transition_system_length with
+    | None -> error, dynamic, kasa_state
+    | Some l ->
+      let kasa_state =
+        Remanent_state.set_transition_system_length l
+          kasa_state
+      in
+      error, dynamic, kasa_state
+
   let export static dynamic error kasa_state =
     (*export of contact map*)
     let error, dynamic, kasa_state =
@@ -4109,6 +4137,10 @@ struct
     in
     let error, dynamic, kasa_state =
       export_separating_edges
+        static dynamic error kasa_state
+    in
+    let error, dynamic, kasa_state =
+      export_transition_system_length
         static dynamic error kasa_state
     in
     error, dynamic, kasa_state

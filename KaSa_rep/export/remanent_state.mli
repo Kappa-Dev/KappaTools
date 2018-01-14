@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 27 2017>
+  * Last modification: Time-stamp: <Jan 14 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -198,7 +198,7 @@ val get_internal_scc_decomposition:
 
 val get_internal_scc_decomposition_map:
   ('static, 'compile) state -> internal_scc_decomposition Public_data.AccuracyMap.t Public_data.AccuracyMap.t
-    
+
 val set_internal_scc_decomposition:
   Public_data.accuracy_level  -> Public_data.accuracy_level ->
   internal_scc_decomposition ->
@@ -300,6 +300,13 @@ val set_separating_transitions:
 val get_separating_transitions:
   ('static, 'compile) state -> separating_transitions option
 
+val set_transition_system_length:
+  int list -> ('static, 'compile) state ->
+  ('static, 'compile) state
+
+val get_transition_system_length:
+  ('static, 'compile) state -> int list option
+
 val get_contact_map_map:
   ('static, 'compile) state -> Public_data.contact_map Public_data.AccuracyMap.t
 
@@ -335,4 +342,4 @@ val set_symmetries :
 val get_data:
   ('static, 'compile) state ->
   Cckappa_sig.kappa_handler option * Public_data.dead_rules option *
-  separating_transitions option
+  separating_transitions option * int list option

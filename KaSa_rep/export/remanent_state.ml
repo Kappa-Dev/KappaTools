@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 29 2017>
+  * Last modification: Time-stamp: <Jan 14 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -300,10 +300,12 @@ type ('static,'dynamic) state =
     constraints_list : constraints_list option;
     symmetric_sites : symmetric_sites Public_data.AccuracyMap.t;
     separating_transitions : separating_transitions option ;
+    transition_system_length : int list option ;
   }
 
 let get_data state =
-  state.handler, state.dead_rules, state.separating_transitions
+  state.handler, state.dead_rules, state.separating_transitions, state.transition_system_length
+
 
 let create_state ?errors ?env ?init_state ?reset parameters init =
   let error =
@@ -358,6 +360,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     constraints_list = None;
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
+    transition_system_length = None ;
   }
 
 (**************)
@@ -519,6 +522,10 @@ let add_separating_transitions state l =
   | Some list ->
     (separating_transitions,
      separating_transitions_to_json list)::l
+
+let get_transition_system_length state = state.transition_system_length
+let set_transition_system_length l state =
+  {state with transition_system_length = Some l}
 
 let to_json state =
   let l = [] in

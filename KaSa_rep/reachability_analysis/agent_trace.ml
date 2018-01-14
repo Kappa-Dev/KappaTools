@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Nov 28 2017>
+  * Last modification: Time-stamp: <Jan 14 2018>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1188,6 +1188,7 @@ let print logger parameters compil handler_kappa handler error transition_system
 let agent_trace
     parameters log_info error dead_rules handler static handler_kappa
     compil output =
+  let transition_system_length = [] in
   let bridges = [] in
   let error, low =
     Graphs.Nodearray.create parameters error 1
@@ -1255,12 +1256,12 @@ let agent_trace
       creation
   in
   let empty = Ckappa_sig.Views_intbdu.build_variables_list [] in
-  let error, (_, _, _, _, bridges, log_info) =
+  let error, (_, _, _, _, bridges, transition_system_length, log_info) =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters
       error
       (fun parameters error agent_type map
-        (pre,low,on_stack,scc, bridges,log_info) ->
+        (pre,low,on_stack,scc, bridges, transition_system_length, log_info) ->
          let error, support =
            Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs parameters error
              LabelMap.empty agent_type support
@@ -1282,7 +1283,8 @@ let agent_trace
              Exception.warn parameters error error' __POS__ Exit
          in
          Wrapped_modules.LoggedIntMap.fold
-           (fun _ mvbdu (error, (pre,low,on_stack,scc,bridges,log_info)) ->
+           (fun _ mvbdu
+             (error,(pre,low,on_stack,scc,bridges,transition_system_length,log_info)) ->
               try
                 begin
                   let sites =
@@ -1570,7 +1572,9 @@ let agent_trace
                       degradation
                       transition_system
                   in
-
+                  let transition_system_length =
+                    (List.length transition_system.edges)::transition_system_length
+                  in
                   let error, transition_system =
                     if Remanent_parameters.get_add_singular_macrostates
                         parameters
@@ -1701,14 +1705,15 @@ let agent_trace
                       graph bridges
                   in
                   error,
-                  (pre,low,on_stack,scc,bridges,log_info)
+                  (pre,low,on_stack,scc,bridges,transition_system_length,log_info)
                 end
-              with Sys.Break -> error, (pre,low,on_stack,scc,bridges,log_info)
+              with Sys.Break -> error,
+                                (pre,low,on_stack,scc,bridges,transition_system_length,log_info)
            )
            map
-           (error, (pre,low,on_stack,scc,bridges,log_info)))
+           (error, (pre,low,on_stack,scc,bridges,transition_system_length,log_info)))
       output
-      (pre,low,on_stack,scc,bridges,log_info)
+      (pre,low,on_stack,scc,bridges,transition_system_length,log_info)
   in
   let bridges =
     if Remanent_parameters.get_compute_separating_transitions parameters
@@ -1717,11 +1722,12 @@ let agent_trace
     else
       None
   in
+  let transition_system_length = Some transition_system_length in 
   match
     Ckappa_sig.Views_intbdu.export_handler error
   with
-  | error, Some h -> error, log_info, h, bridges
+  | error, Some h -> error, log_info, h, bridges, transition_system_length
   | error, None ->
     let error, h =
       Exception.warn parameters error __POS__ Exit handler in
-    error, log_info, h, bridges
+    error, log_info, h, bridges, transition_system_length

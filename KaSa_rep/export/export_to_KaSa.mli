@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Nov 13 2017>
+  * Last modification: Time-stamp: <Jan 14 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -121,7 +121,7 @@ sig
 
   val get_data:
     state ->
-    Cckappa_sig.kappa_handler option * Public_data.dead_rules option * Remanent_state.separating_transitions option
+    Cckappa_sig.kappa_handler option * Public_data.dead_rules option * Remanent_state.separating_transitions option * int list option
 end
 
 module Export:

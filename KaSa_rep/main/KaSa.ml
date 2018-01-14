@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 27 2017>
+ * Last modification: Time-stamp: <Jan 14 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -190,7 +190,7 @@ let main () =
     then
       let end_time = Sys.time () in
       let cpu_time = end_time -. start_time in
-      let handler, dead_rules, separating_transitions =
+      let handler, dead_rules, separating_transitions, transition_system_length  =
         Export_to_KaSa.get_data state
       in
       let () =
@@ -228,8 +228,50 @@ let main () =
         | Some l ->
           Loggers.fprintf
             (Remanent_parameters.get_logger parameters)
-            "; separating transitions: %i"
+            "; separating transitions: %i ;"
             (List.length l)
+      in
+      let () =
+        Loggers.print_newline
+          (Remanent_parameters.get_logger parameters)
+      in
+      let _ =
+        match
+          transition_system_length
+        with
+        | None -> ()
+        | Some l ->
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "transition system lengths: %a"
+              (fun fmt ->
+                 List.iter (Format.fprintf fmt "%i;")) l
+          in
+          let () =
+            Loggers.print_newline
+              (Remanent_parameters.get_logger parameters)
+          in
+          let sum,nbr,longest =
+            List.fold_left
+              (fun (sum,nbr,longest) i ->
+                 sum+i,
+                 succ nbr,
+                 max longest i)
+              (0,0,0) l
+          in
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "Average: %i; Longest: %i"
+              (int_of_float (ceil ((float_of_int sum)/.(float_of_int nbr))))
+              longest
+          in
+          let () =
+            Loggers.print_newline
+              (Remanent_parameters.get_logger parameters)
+          in
+          ()
       in
       let () =
         Loggers.fprintf
