@@ -196,7 +196,7 @@ let main () =
       let () =
         Loggers.fprintf
           (Remanent_parameters.get_logger parameters)
-          "CPU time: %g s." cpu_time
+          "TCCB CPU time: %g s." cpu_time
       in
       let () =
         match
@@ -244,7 +244,7 @@ let main () =
           let () =
             Loggers.fprintf
               (Remanent_parameters.get_logger parameters)
-              "transition system lengths: %a"
+              "TCCB transition system lengths: %a"
               (fun fmt ->
                  List.iter (Format.fprintf fmt "%i;")) l
           in
@@ -263,7 +263,7 @@ let main () =
           let () =
             Loggers.fprintf
               (Remanent_parameters.get_logger parameters)
-              "Total: %i; Average: %i; Longest: %i"
+              "TCCB Total: %i; Average: %i; Longest: %i"
               sum
               (int_of_float (ceil ((float_of_int sum)/.(float_of_int nbr))))
               longest
