@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Jan 14 2018>
+ * Last modification: Time-stamp: <Jan 15 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -263,7 +263,8 @@ let main () =
           let () =
             Loggers.fprintf
               (Remanent_parameters.get_logger parameters)
-              "Average: %i; Longest: %i"
+              "Total: %i; Average: %i; Longest: %i"
+              sum
               (int_of_float (ceil ((float_of_int sum)/.(float_of_int nbr))))
               longest
           in
