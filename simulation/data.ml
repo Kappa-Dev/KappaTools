@@ -22,7 +22,7 @@ let print_snapshot ?uuid f s =
     (Pp.option ~with_space:false (fun f x -> Format.fprintf f "// \"uuid\" : \"%i\"@," x)) uuid
     s.snapshot_time
     (Pp.list Pp.space (fun f (i,mix) ->
-         Format.fprintf f "%%init: %i /*%i agents*/ @[<h>%a@]" i
+         Format.fprintf f "@[<hov 2>%%init: %i /*%i agents*/ %a@]" i
            (Array.length mix)
            User_graph.print_cc mix))
     s.snapshot_agents
