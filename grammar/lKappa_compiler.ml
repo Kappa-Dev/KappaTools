@@ -988,7 +988,7 @@ let modif_expr_of_ast
     Ast.APPLY
       (alg_expr_of_ast ~syntax_version sigs tok algs nb,
        (assemble_rule
-          ~syntax_version:Ast.V4 ~r_editStyle
+          ~syntax_version ~r_editStyle
           sigs tok algs mix cmix rm_tok add_tok
           r.Ast.k_def r.Ast.k_un,pos)),
     acc
@@ -1097,7 +1097,7 @@ let name_and_purify_rule
           (ExceptionDefn.Malformed_Decl
              ("Rules in edit notation cannot be bidirectional",r_pos)) in
     let mix,created = annotate_edit_mixture
-        ~syntax_version:Ast.V4 ~is_rule:true sigs ~contact_map e.Ast.mix in
+        ~syntax_version ~is_rule:true sigs ~contact_map e.Ast.mix in
     (pack',acc'',
      (label_opt,true,mix,created,[],e.Ast.delta_token,k_def,k_un,r_pos)::rules)
   | Ast.Arrow a ->
