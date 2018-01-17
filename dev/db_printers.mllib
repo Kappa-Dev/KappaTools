@@ -3,6 +3,7 @@ Color
 
 Circular_buffers
 Infinite_buffers
+Public_data
 Loggers
 Ode_loggers_sig
 Graph_loggers
@@ -21,6 +22,7 @@ Exception
 Remanent_state_signature
 Remanent_parameters_sig
 Remanent_parameters
+Symbol_table
 
 Priority
 StoryProfiling
