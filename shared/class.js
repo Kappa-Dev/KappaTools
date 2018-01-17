@@ -183,6 +183,7 @@ class Node extends D3Object {
                 this.sites = [];
                 let siteData = {};
                 siteData.site_name = null;
+	        siteData.site_type = "port";
                 siteData.site_links = [];
                 siteData.site_states = [];
                 let site = new Site(siteData,this);
@@ -478,7 +479,7 @@ class DataStorage {
 
         // Compute a map from name to node.
         nodes.forEach(function(d) {
-            console.log(d);
+            //console.log(d);
             map[d.data.name] = d;
         });
 
