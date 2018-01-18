@@ -1,5 +1,5 @@
 "cflow" : include
-<{dataStructures,term,generated,grammar,simulation,siteGraphs,Error,main}/*.ml{,i}> : warn_A
+<{dataStructures,term,generated,grammar,simulation,siteGraphs,Error,main,agents}/*.ml{,i}> : warn_A
 "dataStructures" : include
 "term" : include
 "grammar" : include
@@ -10,6 +10,7 @@
 "generated" : include
 "util" : include
 "main" : include
+"agents" : include
 "KaSa_rep" : include
 "KaSa_rep/backend" : include
 "KaSa_rep/pipeline" : include
@@ -30,9 +31,8 @@
 "KaSa_rep/contact_map_scc" : include
 "odes/symmetries_analysis" : include
 
-
-
+<agents/*> : package(lwt.unix)
 
 true : debug, bin_annot, safe_string
 true : package(str), package(bigarray), package(num), package(unix)
-true : package(result), package(yojson)
+true : package(lwt), package(yojson)
