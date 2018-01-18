@@ -33,7 +33,8 @@ module type Cflow_handler =
           bound_on_itteration_number: int option ;
           time_independent: bool ;
           blacklist_events: bool ;
-          server: bool
+          server: bool ;
+          dump: string -> unit;
         }
 
     type handler =   (*handler to interpret abstract values*)
@@ -68,7 +69,7 @@ module type Cflow_handler =
     val set_debugging_mode: parameter -> bool -> parameter
     val get_debugging_mode: parameter -> bool
     val get_profiling_logger: parameter -> Loggers.t
-    val get_server_channel: parameter -> Loggers.t
+    val get_server_channel: parameter -> Loggers.t 
     val get_logger: parameter -> Loggers.t
     val set_logger: parameter -> Loggers.t -> parameter
     val get_out_channel: parameter -> Loggers.t
