@@ -46,7 +46,8 @@ sig
       logger_profiling : Loggers.t ;
       logger_out : Loggers.t ;
       logger_server: Loggers.t ;
-      json_buffer: Yojson.Basic.json Fifo.t ref option ;
+      json_buffer:
+        StoryProfiling.StoryStats.log_info Story_json.message Fifo.t ref option ;
       log_step : bool ;
       debug_mode : bool ;
       logger_step: Loggers.t ;
@@ -78,7 +79,8 @@ sig
   val set_first_story_per_obs: parameter -> parameter
   val set_all_stories_per_obs: parameter -> parameter
   val build_parameter: called_from:Remanent_parameters_sig.called_from ->
-    none:bool -> weak:bool -> strong:bool -> parameter
+    ?send_message:(string -> unit) -> none:bool -> weak:bool -> strong:bool ->
+    parameter
   val string_of_exn: exn -> string option
   val is_server_mode: parameter -> bool
   val set_compression_weak: parameter -> parameter
@@ -121,8 +123,10 @@ sig
   val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
   val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
   val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter
-  val push_json: parameter -> Yojson.Basic.json -> unit
-  val pop_json: parameter -> Yojson.Basic.json option
+  val push_json:
+    parameter -> StoryProfiling.StoryStats.log_info Story_json.message -> unit
+  val pop_json:
+    parameter -> StoryProfiling.StoryStats.log_info Story_json.message option
 end
 
 module Cflow_handler =
@@ -156,7 +160,8 @@ module Cflow_handler =
         logger_profiling: Loggers.t;
         logger_out : Loggers.t;
         logger_server : Loggers.t ;
-        json_buffer: Yojson.Basic.json Fifo.t ref option ;
+        json_buffer:
+          StoryProfiling.StoryStats.log_info Story_json.message Fifo.t ref option ;
         log_step : bool ;
         debug_mode: bool ;
         logger_step : Loggers.t ;
@@ -169,8 +174,12 @@ module Cflow_handler =
         dump: string -> unit ;
       }
 
-    let build_parameter ~called_from ~none ~weak ~strong =
-      let server,out_server,out_channel,out_channel_err,out_channel_profiling,log_step_channel,json_buffer,dump =
+    let build_parameter ~called_from
+        ?(send_message=fun x ->
+            Loggers.fprintf Loggers.dummy_txt_logger "%s" x;
+            Loggers.print_newline Loggers.dummy_txt_logger)
+        ~none ~weak ~strong =
+      let server,out_server,out_channel,out_channel_err,out_channel_profiling,log_step_channel =
         match
           called_from
         with
@@ -180,9 +189,7 @@ module Cflow_handler =
           Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
           Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
           Loggers.open_circular_buffer ~mode:Loggers.HTML (),
-          Loggers.open_circular_buffer ~mode:Loggers.HTML_Tabular (),
-          Some (ref Fifo.empty),
-          (fun x -> Printf.fprintf stdout "%s" x) (*to do: Pirbo*)
+          Loggers.open_circular_buffer ~mode:Loggers.HTML_Tabular ()
         | Remanent_parameters_sig.KaSa
         | Remanent_parameters_sig.KaSim
         | Remanent_parameters_sig.Internalised  ->
@@ -192,11 +199,7 @@ module Cflow_handler =
           Loggers.open_logger_from_formatter Format.err_formatter,
           Loggers.open_logger_from_formatter Format.err_formatter,
           Loggers.open_logger_from_formatter (Format.formatter_of_out_channel channel),
-          Loggers.open_logger_from_formatter Format.std_formatter,
-          None,
-          (fun x ->
-             Loggers.fprintf Loggers.dummy_txt_logger "%s" x;
-             Loggers.print_newline Loggers.dummy_txt_logger)
+          Loggers.open_logger_from_formatter Format.std_formatter
       in
       {
         server = server ;
@@ -210,7 +213,7 @@ module Cflow_handler =
         logger_out = out_channel ;
         logger_err = out_channel_err ;
         logger_profiling = out_channel_profiling ;
-        json_buffer = json_buffer ;
+        json_buffer = None ;
         compression_mode = {
           causal_trace = none;
           weak_compression = weak;
@@ -225,7 +228,7 @@ module Cflow_handler =
         bound_on_itteration_number = None ;
         time_independent = !Parameter.time_independent ;
         blacklist_events = !Parameter.blacklist_events ;
-        dump = dump ;
+        dump = send_message ;
       }
 
     let set_compression_weak p =
@@ -329,18 +332,18 @@ module Cflow_handler =
     let save_current_phase_title parameter x =
       parameter.kasa.Remanent_parameters_sig.save_current_phase_title x
 
-    let dump_json parameter json =
+    let dump_json parameter message =
       if
         is_server_mode parameter
       then
         parameter.dump
-          (Yojson.Basic.to_string json)
+          (Yojson.Basic.to_string (Story_json.message_to_json message))
 
     let save_progress_bar parameter x  =
       let (b,i,_j,n_stories) = x in
       let () =
         dump_json parameter
-          (Story_json.progress_bar_to_json
+          (Story_json.Progress
              { Story_json.bool = (if b then "true" else "false");
                Story_json.current = i;
                Story_json.total = n_stories })

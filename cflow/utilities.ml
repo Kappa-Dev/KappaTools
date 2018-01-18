@@ -656,10 +656,7 @@ let compress
     let () =
       S.PH.B.PB.CI.Po.K.H.push_json
         parameter
-        (Story_json.status_to_json
-           {
-             Story_json.phase=Story_json.Inprogress ;
-             Story_json.message="Start one causal compression" })
+        (Story_json.Phase (Story_json.Inprogress, "Start one causal compression"))
     in
     let error,log_info,trace = cut parameter ~shall_we_compute:we_shall handler log_info error trace
     in error,log_info,[trace]
@@ -671,12 +668,7 @@ let compress
     in
     let () =
       S.PH.B.PB.CI.Po.K.H.push_json
-        parameter
-        (Story_json.status_to_json
-           {
-             Story_json.phase=Story_json.Inprogress ;
-             Story_json.message=s })
-    in
+        parameter (Story_json.Phase (Story_json.Inprogress, s)) in
     let error, log_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun () -> size_of_pretrace trace)) log_info in
     let event_list = get_pretrace_of_trace trace in
     let error,log_info,blackboard = S.PH.B.import ?heuristic parameter handler log_info error event_list in

@@ -220,10 +220,9 @@ let compress_and_print
                     in
                     let () =
                       S.PH.B.PB.CI.Po.K.H.push_json parameter
-                        (Story_json.status_to_json {
-                            Story_json.phase=Story_json.Inprogress;
-                            Story_json.message="Start one causal compression"
-                          })
+                        (Story_json.Phase (Story_json.Inprogress,
+                                           "Start one causal compression"
+                                          ))
                     in
                     let error,log_info,trace_before_compression =
                       U.causal_prefix_of_an_observable_hit
@@ -383,10 +382,9 @@ let compress_and_print
                          (* we remove pseudo inverse events *)
                          let () =
                            S.PH.B.PB.CI.Po.K.H.push_json parameter
-                             (Story_json.status_to_json {
-                                 Story_json.phase=Story_json.Inprogress;
-                                 Story_json.message="Start collecting one new trace"
-                                      })
+                             (Story_json.Phase(Story_json.Inprogress,
+                                               "Start collecting one new trace"
+                                              ))
                          in
                          let error,log_info,trace =
                            U.remove_pseudo_inverse_events (do_not_log parameter)
@@ -448,10 +446,9 @@ let compress_and_print
                          (* we remove pseudo inverse events *)
                          let () =
                            S.PH.B.PB.CI.Po.K.H.push_json parameter
-                             (Story_json.status_to_json {
-                                 Story_json.phase=Story_json.Inprogress;
-                                 Story_json.message="Start collecting one new trace"
-                               })
+                             (Story_json.Phase(Story_json.Inprogress,
+                                               "Start collecting one new trace"
+                                              ))
                          in
                          let error,log_info,trace =
                            U.remove_pseudo_inverse_events
@@ -607,11 +604,7 @@ let compress_and_print
   in
   let () =
     S.PH.B.PB.CI.Po.K.H.push_json parameter
-      (Story_json.status_to_json {
-          Story_json.phase=Story_json.Success;
-          Story_json.message="Compression completed"
-        })
-  in
+      (Story_json.Phase (Story_json.Success,"Compression completed")) in
   let _ = StoryProfiling.StoryStats.close_logger (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) in
   let _ =
     Exception.print_for_KaSim (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error

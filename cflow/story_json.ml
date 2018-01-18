@@ -8,9 +8,9 @@ type story =
   | New of new_story
   | Same_as of int
 
-type one_compression =
+type 'a one_compression =
   {
-    log_info: StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list;
+    log_info: 'a Trace.Simulation_info.t list;
     story: story
   }
 
@@ -67,19 +67,19 @@ let story_of_json = function
   | `Assoc ["same_as", `Int int] -> Same_as int
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct story",x))
 
-let to_json one_compression =
+let to_json log_info_to_json one_compression =
   `Assoc
     [
       "log_info",
       `List
         (List.rev_map
-           (Trace.Simulation_info.to_json StoryProfiling.StoryStats.log_info_to_json)
+           (Trace.Simulation_info.to_json log_info_to_json)
            (List.rev one_compression.log_info));
       "story",
       story_to_json one_compression.story
     ]
 
-let of_json = function
+let of_json log_info_of_json = function
   | `Assoc l as x when List.length l = 2 ->
     begin
       try
@@ -91,7 +91,7 @@ let of_json = function
               | `List l ->
                 List.rev_map
                   (Trace.Simulation_info.of_json
-                     StoryProfiling.StoryStats.log_info_of_json)
+                     log_info_of_json)
                   (List.rev l)
               | _y ->
                 raise (Yojson.Basic.Util.Type_error ("Not a correct story computation",x))
@@ -187,3 +187,19 @@ let progress_bar_of_json = function
       | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct progress bar",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct progress bar",x))
+
+type 'a message =
+  | Phase of phase * string
+  | Progress of progress_bar
+  | Story of 'a one_compression
+
+let message_to_json = function
+  | Phase (p,m) -> `List [ `String "PHASE"; phase_to_json p; `String m ]
+  | Progress p -> `List [ `String "PROGRESS"; progress_bar_to_json p ]
+  | Story s -> `List [ `String "STORY"; to_json (fun _ -> `Null) s ]
+
+let message_of_json = function
+  | `List [ `String "PHASE"; p; `String m ] -> Phase (phase_of_json p, m)
+  | `List [ `String "PROGRESS"; p ] -> Progress (progress_bar_of_json p)
+  | `List [ `String "STORY"; s ] -> Story (of_json (fun _ -> ()) s)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid story message",x))

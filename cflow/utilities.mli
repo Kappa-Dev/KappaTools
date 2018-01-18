@@ -55,7 +55,8 @@ val fold_left_with_progress_bar: ?event:StoryProfiling.step_kind -> (('a,'b,'a) 
 
 (* Json interactions *)
 
-val pop_json: parameter -> Yojson.Basic.json option
+val pop_json:
+  parameter -> StoryProfiling.StoryStats.log_info Story_json.message option
 val profiling_state_to_json: parameter -> Yojson.Basic.json
 val error_list_to_json: parameter -> Yojson.Basic.json
 val computation_steps_to_json: parameter -> Yojson.Basic.json

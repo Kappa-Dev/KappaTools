@@ -7,8 +7,9 @@ type secret_parameter
 
 val init_secret_log_info : unit -> secret_log_info
 val build_parameter :
-  called_from:Remanent_parameters_sig.called_from -> none:bool -> weak:bool ->
-  strong:bool -> secret_parameter
+  called_from:Remanent_parameters_sig.called_from ->
+  ?send_message:(string -> unit) ->
+  none:bool -> weak:bool -> strong:bool -> secret_parameter
 
 (** {6 Use} *)
 val get_logger : secret_parameter -> Loggers.t

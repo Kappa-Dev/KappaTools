@@ -24,7 +24,8 @@ module type Cflow_handler =
           logger_profiling : Loggers.t ;
           logger_out : Loggers.t ;
           logger_server : Loggers.t ;
-          json_buffer: Yojson.Basic.json Fifo.t ref option ;
+          json_buffer:
+            StoryProfiling.StoryStats.log_info Story_json.message Fifo.t ref option ;
           log_step : bool ;
           debug_mode : bool ;
           logger_step: Loggers.t ;
@@ -56,7 +57,8 @@ module type Cflow_handler =
     val set_first_story_per_obs: parameter -> parameter
     val set_all_stories_per_obs: parameter -> parameter
     val build_parameter: called_from:Remanent_parameters_sig.called_from ->
-			 none:bool -> weak:bool -> strong:bool -> parameter
+      ?send_message:(string -> unit) -> none:bool -> weak:bool -> strong:bool ->
+      parameter
     val string_of_exn: exn -> string option
     val is_server_mode: parameter -> bool
     val set_compression_weak: parameter -> parameter
@@ -69,7 +71,7 @@ module type Cflow_handler =
     val set_debugging_mode: parameter -> bool -> parameter
     val get_debugging_mode: parameter -> bool
     val get_profiling_logger: parameter -> Loggers.t
-    val get_server_channel: parameter -> Loggers.t 
+    val get_server_channel: parameter -> Loggers.t
     val get_logger: parameter -> Loggers.t
     val set_logger: parameter -> Loggers.t -> parameter
     val get_out_channel: parameter -> Loggers.t
@@ -101,8 +103,10 @@ module type Cflow_handler =
     val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter
     (*  val dump_json: parameter -> Yojson.Basic.json -> unit*)
 
-    val push_json: parameter -> Yojson.Basic.json -> unit
-    val pop_json: parameter -> Yojson.Basic.json option
+    val push_json:
+      parameter -> StoryProfiling.StoryStats.log_info Story_json.message -> unit
+    val pop_json:
+      parameter -> StoryProfiling.StoryStats.log_info Story_json.message option
 
   end
 

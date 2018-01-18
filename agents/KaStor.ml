@@ -32,7 +32,11 @@ let options = [
    "Disable the use of time is story heuritics (for test suite)")
 ]
 
-let process_command _ _ = Lwt.return_unit
+let process_command delimiter text =
+  let () = Kastor_mpi.on_message
+      ~none:!none_compression ~weak:!weak_compression ~strong:!strong_compression
+      ~send_message:(fun x -> Format.printf "%s%c@?" x delimiter) text in
+  Lwt.return_unit
 
 let get_simulation fname =
   let env, steps = Trace.fold_trace_file
@@ -61,7 +65,8 @@ let main () =
       (!none_compression, !weak_compression, !strong_compression) in
     let parameter =
       Compression_main.build_parameter
-        ~called_from:Remanent_parameters_sig.KaSim ~none ~weak ~strong in
+        ~called_from:Remanent_parameters_sig.KaSim ?send_message:None
+        ~none ~weak ~strong in
     let () =
       Loggers.fprintf (Compression_main.get_logger parameter)
         "+ Loading trace@." in
