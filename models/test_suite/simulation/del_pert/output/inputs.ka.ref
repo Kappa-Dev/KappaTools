@@ -11,7 +11,7 @@
 'r_op' A(A1[1/.]), A(A2[1/.]) @ 0.1
 
 /*0*/%mod: ([T] > 1) do $APPLY 1 A(A1[.] A2{n}[.])+; repeat [false]
-/*1*/%mod: ([T] > 2) do $APPLY 1 A(A1[#] A2[#])-; repeat [false]
+/*1*/%mod: ([T] > 2) do $APPLY 1 A(A1[#] A2{#}[#])-; repeat [false]
 
 %init: 2 A(A1[.] A2{n}[.])
 

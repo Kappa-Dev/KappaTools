@@ -57,7 +57,9 @@ let print_rule_internal sigs ~show_erased ag_ty site f = function
   | I_ANY -> ()
   | I_ANY_CHANGED j ->
     Format.fprintf f "{#/%a}" (Signature.print_internal_state sigs ag_ty site) j
-  | I_ANY_ERASED -> if show_erased then Format.fprintf f "~--"
+  | I_ANY_ERASED ->
+    Format.fprintf f
+      "{#%t}" (fun f -> if show_erased then Format.pp_print_string f "--")
   | I_VAL_CHANGED (i,j) ->
     if i <> j then
       Format.fprintf
