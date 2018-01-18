@@ -21,7 +21,8 @@ type t = {
   mutable logFile : string option;
   mutable compileMode : bool;
   mutable maxSharing : bool;
-  mutable showEfficiency : bool
+  mutable showEfficiency : bool;
+  mutable timeIndependent : bool;
 }
 
 let default : t = {
@@ -38,6 +39,7 @@ let default : t = {
   compileMode = false;
   maxSharing = false;
   showEfficiency = false;
+  timeIndependent = false;
 }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
@@ -87,6 +89,9 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    Arg.String
      (fun traceFile -> t.traceFile <- Some traceFile),
    "file name for dumping the simulation trace") ;
+  ("--time-independent",
+   Arg.Unit (fun () -> t.timeIndependent <- true),
+   "Disable the use of time is story heuritics (for test suite)");
   ("-seed", Arg.Int (fun i -> t.seedValue <- Some i),
    "Seed for the random number generator") ;
   ("--print-efficiency",

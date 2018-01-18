@@ -15,25 +15,22 @@ let static_analysis = "Static analysis" , 5,Some Superarg.Expert
 let debug_mode = "Debug mode",6,Some Superarg.Expert
 
 type t = { mutable backtrace           : bool ;
-	   mutable debug               : bool ;
-	   mutable timeIndependent     : bool }
+	   mutable debug               : bool }
 
 type t_gui = {
   backtrace_gui : bool ref ;
   debug_gui : bool ref ;
-  timeIndependent_gui : bool ref ;
   version_gui : bool ref ;
   gluttony_gui : bool ref ;
 }
-let default : t = { backtrace = false ;
-		    debug = false;
-		    timeIndependent = false }
+let default : t = {
+  backtrace = false; debug = false;
+}
 
 let default_gui =
   {
     backtrace_gui = ref false ;
     debug_gui = ref false ;
-    timeIndependent_gui = ref false ;
     version_gui = ref false ;
     gluttony_gui = ref false
   }
@@ -58,14 +55,12 @@ let get_from_gui t_gui =
   {
     backtrace = !(t_gui.backtrace_gui) ;
     debug = !(t_gui.debug_gui) ;
-    timeIndependent = !(t_gui.timeIndependent_gui);
     }
 
 let copy_from_gui t_gui t =
   let t_tmp = get_from_gui t_gui in
   t.backtrace <- t_tmp.backtrace;
-  t.debug <- t_tmp.debug;
-  t.timeIndependent <- t_tmp.timeIndependent
+  t.debug <- t_tmp.debug
 
 let options_gen t t_gui : (string * Arg.spec * Superarg.spec * string *
                            (Superarg.category * Superarg.position) list * Superarg.level) list = [
@@ -87,11 +82,6 @@ let options_gen t t_gui : (string * Arg.spec * Superarg.spec * string *
      Superarg.Bool t_gui.gluttony_gui,
      "Lower gc activity for a faster but memory intensive simulation",
      [debug_mode,3],Superarg.Expert) ;
-    ("--time-independent",
-     Arg.Unit (fun () -> t.timeIndependent <- true),
-     Superarg.Bool t_gui.timeIndependent_gui,
-     "Disable the use of time is story heuritics (for test suite)",
-     [debug_mode,4],Superarg.Hidden;)
 ]
 
 let options t =

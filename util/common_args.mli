@@ -14,9 +14,10 @@ val model_reduction: Superarg.category
 val static_analysis: Superarg.category
 val debug_mode: Superarg.category
 
-type t = { mutable backtrace           : bool ;
-	   mutable debug               : bool;
-	   mutable timeIndependent     : bool }
+type t = {
+  mutable backtrace           : bool;
+  mutable debug               : bool;
+}
 
 type t_gui
 

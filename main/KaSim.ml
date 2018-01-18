@@ -121,7 +121,7 @@ let () =
     in
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
     let () =
-      Parameter.time_independent := common_args.Common_args.timeIndependent in
+      Parameter.time_independent := kasim_args.Kasim_args.timeIndependent in
 
     let abort =
       match cli_args.Run_cli_args.inputKappaFileNames with
