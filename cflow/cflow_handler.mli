@@ -33,7 +33,8 @@ module type Cflow_handler =
           bound_on_itteration_number: int option ;
           time_independent: bool ;
           blacklist_events: bool ;
-          server: bool
+          server: bool ;
+          json_delimiter: char ;
         }
 
     type handler =   (*handler to interpret abstract values*)
@@ -55,7 +56,8 @@ module type Cflow_handler =
     val set_first_story_per_obs: parameter -> parameter
     val set_all_stories_per_obs: parameter -> parameter
     val build_parameter: called_from:Remanent_parameters_sig.called_from ->
-			 none:bool -> weak:bool -> strong:bool -> parameter
+      json_delimiter:char -> none:bool -> weak:bool -> strong:bool ->
+      parameter
     val string_of_exn: exn -> string option
     val is_server_mode: parameter -> bool
     val set_compression_weak: parameter -> parameter

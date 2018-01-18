@@ -56,6 +56,7 @@ sig
       time_independent: bool ;
       blacklist_events: bool ;
       server: bool;
+      json_delimiter: char;
     }
 
   type handler =   (*handler to interpret abstract values*)
@@ -77,7 +78,7 @@ sig
   val set_first_story_per_obs: parameter -> parameter
   val set_all_stories_per_obs: parameter -> parameter
   val build_parameter: called_from:Remanent_parameters_sig.called_from ->
-    none:bool -> weak:bool -> strong:bool -> parameter
+    json_delimiter:char -> none:bool -> weak:bool -> strong:bool -> parameter
   val string_of_exn: exn -> string option
   val is_server_mode: parameter -> bool
   val set_compression_weak: parameter -> parameter
@@ -164,10 +165,11 @@ module Cflow_handler =
         bound_on_itteration_number: int option ;
         time_independent: bool ;
         blacklist_events: bool ;
-        server: bool
+        server: bool;
+        json_delimiter: char;
       }
 
-    let build_parameter ~called_from ~none ~weak ~strong =
+    let build_parameter ~called_from ~json_delimiter ~none ~weak ~strong =
       let server,out_server,out_channel,out_channel_err,out_channel_profiling,log_step_channel,json_buffer =
         match
           called_from
@@ -219,6 +221,7 @@ module Cflow_handler =
         bound_on_itteration_number = None ;
         time_independent = !Parameter.time_independent ;
         blacklist_events = !Parameter.blacklist_events ;
+        json_delimiter = json_delimiter ;
       }
 
     let set_compression_weak p =
@@ -317,6 +320,7 @@ module Cflow_handler =
 
     let is_server_mode parameter = parameter.server
     let get_server_channel parameter = parameter.logger_server
+    let get_json_delimiter parameter = parameter.json_delimiter
 
 
     let save_current_phase_title parameter x =
@@ -330,7 +334,11 @@ module Cflow_handler =
           Loggers.dump_json
           (get_server_channel parameter)
           json in
-        Loggers.print_newline (get_server_channel parameter)
+        Loggers.fprintf
+          (get_server_channel parameter)
+          "%c"
+          (get_json_delimiter parameter)
+
 
 
     let save_progress_bar parameter x  =

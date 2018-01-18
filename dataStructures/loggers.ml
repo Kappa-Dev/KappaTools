@@ -479,7 +479,7 @@ let flush_and_clean logger fmt =
     b:=Infinite_buffers.clean !b
 
 
-let fprintf logger = fprintf ~fprintnewline:false logger
+(*let fprintf logger = fprintf ~fprintnewline:false logger*)
 
 let get_ref ref =
   let i = !ref in
