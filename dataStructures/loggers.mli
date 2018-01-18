@@ -36,9 +36,7 @@ type t
 
 val refresh_id: t -> unit
 val get_encoding_format: t -> encoding
-val fprintf:
-  ?fprintnewline:bool -> t ->
-  ('a, Format.formatter, unit) format -> 'a
+val fprintf: t -> ('a, Format.formatter, unit) format -> 'a
 val print_newline: t -> unit
 val print_cell: t -> string -> unit
 val print_as_logger: t -> (Format.formatter -> unit) -> unit
