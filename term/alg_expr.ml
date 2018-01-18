@@ -396,16 +396,17 @@ and propagate_constant_bool
        | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _),_), _ ->
       COMPARE_OP (op,a',b'),pos
 
-let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
+let rec has_progress_dep ~only_time (in_t,_,_,deps as vars_deps) = function
   | (BIN_ALG_OP (_, a, b),_) ->
-    has_time_dep vars_deps a||has_time_dep vars_deps b
+    has_progress_dep ~only_time vars_deps a ||
+    has_progress_dep ~only_time vars_deps b
   | ((UN_ALG_OP (_, a) | DIFF_TOKEN (a,_) | DIFF_KAPPA_INSTANCE (a,_)),_) ->
-    has_time_dep vars_deps a
+    has_progress_dep ~only_time vars_deps a
   | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_) -> false
   | (STATE_ALG_OP Operator.TIME_VAR,_) -> true
-  | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
-                   Operator.NULL_EVENT_VAR | Operator.EMAX_VAR |
-                   Operator.TMAX_VAR),_) -> false
+  | (STATE_ALG_OP Operator.EVENT_VAR,_) -> not only_time
+  | (STATE_ALG_OP (Operator.CPUTIME | Operator.NULL_EVENT_VAR |
+                   Operator.EMAX_VAR | Operator.TMAX_VAR),_) -> false
   | (ALG_VAR i,_) ->
     let rec aux j =
       Operator.DepSet.mem (Operator.ALG j) in_t ||
@@ -414,17 +415,20 @@ let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
                 | (Operator.RULE _ | Operator.MODIF _) -> false) deps.(j) in
     aux i
   | IF (cond,yes,no),_ ->
-    bool_has_time_dep vars_deps cond ||
-    has_time_dep vars_deps yes||has_time_dep vars_deps no
+    bool_has_progress_dep ~only_time vars_deps cond ||
+    has_progress_dep ~only_time vars_deps yes ||
+    has_progress_dep ~only_time vars_deps no
 
-and bool_has_time_dep vars_deps = function
+and bool_has_progress_dep ~only_time vars_deps = function
   | (TRUE | FALSE), _ -> false
   | COMPARE_OP (_,a,b),_ ->
-    has_time_dep vars_deps a||has_time_dep vars_deps b
+    has_progress_dep ~only_time vars_deps a ||
+    has_progress_dep ~only_time vars_deps b
   | BIN_BOOL_OP (_,a,b),_ ->
-    bool_has_time_dep vars_deps a||bool_has_time_dep vars_deps b
+    bool_has_progress_dep ~only_time vars_deps a ||
+    bool_has_progress_dep ~only_time vars_deps b
   | UN_BOOL_OP (_,a),_ ->
-    bool_has_time_dep vars_deps a
+    bool_has_progress_dep ~only_time vars_deps a
 
 let rec is_equality_test_time vars_deps = function
   | TRUE | FALSE -> false
@@ -432,8 +436,11 @@ let rec is_equality_test_time vars_deps = function
   | BIN_BOOL_OP (_,(a,_),(b,_)) ->
      (is_equality_test_time vars_deps a)||(is_equality_test_time vars_deps b)
   | COMPARE_OP (op,a,b) ->
+    let only_time = true in
      match op with
-     | Operator.EQUAL when has_time_dep vars_deps a||has_time_dep vars_deps b ->
+       | Operator.EQUAL when
+           has_progress_dep ~only_time vars_deps a ||
+           has_progress_dep ~only_time vars_deps b ->
         true
      | (Operator.EQUAL | Operator.SMALLER | Operator.GREATER | Operator.DIFF) ->
         false

@@ -111,6 +111,11 @@ val setup_alg_vars_rev_dep :
 
 val has_mix : ?var_decls:('b -> ('c,'b) e) -> ('a,'b) e -> pervasives_bool
 
+val has_progress_dep : only_time:pervasives_bool ->
+    (Operator.DepSet.t * Operator.DepSet.t *
+     Operator.DepSet.t array * Operator.DepSet.t array) ->
+  ('a,int) e Locality.annot -> pervasives_bool
+
 val extract_connected_components : ('a,'b) e Locality.annot -> 'a list
 
 val extract_connected_components_bool : ('a,'b) bool Locality.annot -> 'a list
