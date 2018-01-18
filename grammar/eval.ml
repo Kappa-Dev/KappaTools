@@ -176,18 +176,19 @@ always considered as unary.") in
                         | None -> failwith "ugly Eval.rule_of_ast")),
   rules_l
 
-let obs_of_result ?bwd_bisim ~compileModeOn contact_map domain res =
-  let time =
-    Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR) in
-  match res.observables with
-  | [] -> domain,[time]
-  | _ :: _ ->
+let obs_of_result ?bwd_bisim ~compileModeOn contact_map domain alg_deps res =
+  let domain,out as pack =
     List.fold_left
       (fun (domain,cont) alg_expr ->
          let (domain',alg_pos) =
            compile_alg ?bwd_bisim ~compileModeOn contact_map domain alg_expr in
          domain',alg_pos :: cont)
-      (domain,[time]) res.observables
+      (domain,[]) res.observables in
+  if List.exists (Alg_expr.has_progress_dep ~only_time:false alg_deps) out then
+    pack
+  else
+    (domain,
+     out @ [Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)])
 
 let compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain ex =
   List.fold_right
@@ -546,7 +547,7 @@ let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?over
   pause @@ fun () ->
   outputs (Data.Log "\t -observables");
   let preenv,obs =
-    obs_of_result ?bwd_bisim ~compileModeOn contact_map preenv result in
+    obs_of_result ?bwd_bisim ~compileModeOn contact_map preenv alg_deps result in
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
   let domain,dom_stats = Pattern.finalize ~max_sharing preenv contact_map in
