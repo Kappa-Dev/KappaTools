@@ -1063,10 +1063,10 @@ The time based one syntax is \ttt{alarm} \textit{float}, it fires
 every amount of time unit given by the float (including at [T]=0).
 
 For example
-\lstinline[language=kappa]@%mod: alarm 2.3 [true] do $PLOTNOW repeat [true]@
+\lstinline[language=kappa]@%mod: alarm 2.3 [true] do $PLOTENTRY; repeat [true]@
 will print a line in the data file every 2.3 time unit of
 simulation whereas
-\lstinline[language=kappa]@%mod: |A()| > 1000 do $PLOTNOW repeat |B(x[_])| < |B(x[.])|@
+\lstinline[language=kappa]@%mod: |A()| > 1000 do $PLOTENTRY; repeat |B(x[_])| < |B(x[.])|@
 will do it every event where there is more than
 1000 A up to the first event where (there is more than 1000 A) and
 the number of \lstinline[language=kappa]@|B(x[_])|@ becomes bigger than the number of
@@ -1100,7 +1100,7 @@ will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (
 will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}.
 
 There are various ways one can use interventions to study more deeply a given Kappa model. A basic illustration is the use of a simple intervention to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the Kappa file in the following way: one sets the initial concentration of \ttt{C} to 0 by deleting line 22. Now one introduces \ttt{C}s after 25 t.u using the intervention:
-\lstinline[language=kappa]*%mod:  [T]=25 do $ADD 10000 C()*.
+\lstinline[language=kappa]*%mod:  [T]=25 do $ADD 10000 C();*.
 
 The modified Kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}).
 Run a simulation again (a bit longer) by entering in the command line:
@@ -1123,12 +1123,12 @@ one obtains the curve given in Fig.~\ref{fig:abc2}.
 \subsubsection{Updating kinetic rates on the fly}
 
 Any variable between simple quotes can be updated during a simulation using a declaration\index{declaration} of the form:
-\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 0.0!
+\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 0.0;!
 
 This intervention will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that, according to the grammar given in Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
-\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 'k_on'/100!
+\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 'k_on'/100;!
 \noi will cause the on rate of all rules to decrease a hundred fold. Note that, it is possible to override the kinetic rate of a specific rule:  in our ABC example, the declaration\index{declaration}:
-\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'a.b' inf!
+\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'a.b' inf;!
 \noi will set the kinetic rate of rule \ttt{\var{a.b}}~to infinity.
 
 \subsubsection{Interrupt simulation}
@@ -1158,7 +1158,7 @@ An alternative is to use the \ttt{\$SNAPSHOT} primitive
 that allows a user to export a snapshot of the mixture\index{mixture}
 at a given time point as a new (piece of) Kappa file.  For instance,
 the declaration\index{declaration}:
-\lstinline[language=kappa]*%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix"*
+\lstinline[language=kappa]*%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix";*
 will ask \KaSim~to export
 the mixture\index{mixture} the first time the percentage of null
 events reaches 90\%. The exported file will be named
@@ -1167,7 +1167,7 @@ snapshot was taken. One may also use a \textit{string\_expression} to
 construct any prefix using local variables.
 
 One may omit to define a prefix and simply type:
-\lstinline[language=kappa]!%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT!
+\lstinline[language=kappa]!%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT;!
 in which case the default prefix \ttt{snap.ka} will be used for naming snapshots.
 
 If the name already exists, a counter will be appended at the end of
@@ -1175,7 +1175,7 @@ the file to prevent overwriting. Snapshots can be performed multiple
 times, for instance every 1,000 events, using the
 declaration\index{declaration}:
 \begin{lstlisting}[language=kappa]
-%mod: ([E] [mod] 1000)=0 do $SNAPSHOT "abc.ka" repeat [true]
+%mod: ([E] [mod] 1000)=0 do $SNAPSHOT "abc.ka"; repeat [true]
 \end{lstlisting}
 which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends.
 
@@ -1183,7 +1183,7 @@ Note that instead of producing Kappa files, one may use snapshot
 interventions to produce an image of the mixture\index{mixture} in the
 dot/html format using the parameter by specifying the extention in the
 name skeleton
-(\lstinline[language=kappa]!%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
+(\lstinline[language=kappa]!%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot";!).
 
 \subsubsection{Printing values during a simulation}
 The effect \ttt{\$PRINT \textit{string\_expression}
@@ -1197,7 +1197,7 @@ computation to:
 For instance:
 \begin{lstlisting}[language=kappa]
 %mod: |A|<0 do
-    $PRINT ("Token A is: " . |A| . " at time=". [T]) > ("token_".[E].".dat")
+    $PRINT ("Token A is: " . |A| . " at time=". [T]) > ("token_".[E].".dat");
     repeat [true]
 \end{lstlisting}
 
@@ -1207,7 +1207,7 @@ its value gets below 0.
 
 \subsubsection{Add an entry in the output data}
 The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observables in the data file. For example,
-\lstinline[language=kappa]!%mod: repeat [E] [mod] 10 = 0 do $PLOTENTRY until [false]!
+\lstinline[language=kappa]!%mod: repeat [E] [mod] 10 = 0 do $PLOTENTRY; until [false]!
 will store the value of observables every 10 productive events.
 
 \chapter{The \Kappa{} tools}
@@ -1413,7 +1413,7 @@ of the simulation.
 \subsection{Causality analysis}\label{sec:cflows}
 
 In our ABC example, adding the instruction:
-\lstinline[language=kappa]!%mod:  [true] do $TRACK 'Cpp' [true]!
+\lstinline[language=kappa]!%mod:  [true] do $TRACK 'Cpp' [true];!
 \noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{{\textquotesingle}Cpp{\textquotesingle}}, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule applications ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r{\textquotesingle}} between two rule applications $\ttt{r}$ and $\ttt{r{\textquotesingle}}$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show in Fig.~\ref{fig:cflow} an example of such causal flow.
 
 \begin{figure}[htbp]
@@ -1425,7 +1425,7 @@ In our ABC example, adding the instruction:
 \end{figure}
 
 Causality analysis of the observable \ttt{Cpp} can be turned off at any time by using a declaration\index{declaration} of the form:
-\lstinline[language=kappa]!%mod:  [T]>25 do $TRACK 'Cpp' [false]!
+\lstinline[language=kappa]!%mod:  [T]>25 do $TRACK 'Cpp' [false];!
 
 Each time \KaSim~detects a new occurrence of the observable that is being tracked, it will dump its causal past as a graph using the dot format (see Fig.~\ref{fig:cflow} above). The name of the file in which the causal flow is stored can be set by using the \texttt{\%def} instruction (see Section~\ref{sec:param}).
 
@@ -1440,15 +1440,15 @@ will ask \KaSim~to output 3 versions of each computed causal flow, with all poss
 \subsubsection{Limit the number of flows}
 As an example, consider the computation of causal flows between $t=10$ and $t=20$ using the declarations:
 \begin{lstlisting}[language=kappa]
-%mod: [T]>10 do $TRACK 'Cpp' [true]
-%mod: [T]>20 do $TRACK 'Cpp' [false]
+%mod: [T]>10 do $TRACK 'Cpp' [true];
+%mod: [T]>20 do $TRACK 'Cpp' [false];
 \end{lstlisting}
 
 The above declaration will ask \KaSim~to analyze each new occurrence of \ttt{\var{Cpp}} in that time interval. If $n$ new instances took place, then \KaSim~will have to compute $n$ causal flows. One may want to bound the number of computed flows to a certain value, say 10. One may do so using the combination of interventions and variables given below:
 \begin{lstlisting}[language=kappa]
 %var: 'x' 0
 %mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'x' 'Cpp')
-%mod: [T]>20 || ('x' > 0 && 'Cpp' - 'x' > 9) do $TRACK 'Cpp' [false]
+%mod: [T]>20 || ('x' > 0 && 'Cpp' - 'x' > 9) do $TRACK 'Cpp' [false];
 \end{lstlisting}
 The first line is a declaration of an $x$ variable that is initially set to 0. Note that, the second line is a intervention that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
 The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$).
@@ -1474,8 +1474,8 @@ tracks effective impacts (positive or negative) at every rule
 application. The DIN can be computed using
 declaration\index{declaration}s of the form:
 \begin{lstlisting}[language=kappa]
-%mod: [true] do $DIN "flux.dot" [true]
-%mod: [T]>20 do $DIN "flux.dot" [false]
+%mod: [true] do $DIN "flux.dot" [true];
+%mod: [T]>20 do $DIN "flux.dot" [false];
 \end{lstlisting}
 The result is a graph where a positive edge between
 rules $r$ and $s$ (in green) indicates an overall positive
@@ -1494,7 +1494,7 @@ produced map.
 \subsection{Print species of an observable}
 The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each time a new instance of the observable appears, the \emph{species} in which it occured is printed in a file. For example:
 {\begin{lstlisting}[language=kappa]
-%mod:$SPECIES_OF "species.ka" A(a!1), B(a!1) [true]
+%mod:$SPECIES_OF "species.ka" A(a!1), B(a!1) [true];
 \end{lstlisting}}
 prints in the file \ttt{"species.ka"} a new line for each new occurrence of \ttt{A(a!1), B(a!1)} with the time of occurrence and the species in which it occurred.
 
