@@ -12,6 +12,7 @@ class type graph_logger =
     method clearData : unit Js.meth
   end;;
 
-let create_graph_logger (id : string) : graph_logger Js.t =
+let create_graph_logger (id : string) (on_click : Js.js_string Js.t -> unit)
+  : graph_logger Js.t =
   Js.Unsafe.new_obj (Js.Unsafe.variable "GraphLogger")
-    [| Js.Unsafe.inject (Js.string id) |]
+    [| Js.Unsafe.inject (Js.string id); Js.Unsafe.inject on_click |]

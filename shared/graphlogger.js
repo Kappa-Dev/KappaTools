@@ -32,15 +32,17 @@ function draw_curve(Ax, Ay, Bx, By, M) {
 }
 
 class GraphLogger {
-    constructor(id) {
+    constructor(id,onClick) {
 	this.id = "#"+id;
+	this.onNodeClick = onClick;
     }
 
     setData(json) {
 	var data = JSON.parse(json);
 	var topdiv = d3.select(this.id);
 
-	this.clearData();
+	var graphlogger = this
+	graphlogger.clearData();
 
 	let margin = { top: 5, right: 5, bottom: 5, left: 5 };
 	/* multiplying by a factor to account for flex display */
@@ -108,6 +110,7 @@ class GraphLogger {
 	node.append("circle")
 	    .attr("r", 5)
 	    .attr("fill",function(d) { return d.directives.fillcolor; })
+	    .on("click",function(d) { graphlogger.onNodeClick(JSON.stringify(d.directives.on_click)); })
 	/*	.call(d3.drag()
 		.on("start", dragstarted)
 		.on("drag", dragged)
