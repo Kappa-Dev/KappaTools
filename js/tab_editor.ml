@@ -26,10 +26,10 @@ let rightsubpanel () =
            )
        ]
     [Ui_common.navtabs "subnavtab"
-       [ "contact_map", (Tab_contact_map.navli ())
-       ; "influences", (Tab_influences.navli ())
-       ; "constraints", (Tab_constraints.navli ())
-       ; "polymers", (Tab_polymers.navli ())
+       [ "contact_map", None, (Tab_contact_map.navli ())
+       ; "influences",  None, (Tab_influences.navli ())
+       ; "constraints", None, (Tab_constraints.navli ())
+       ; "polymers",    None, (Tab_polymers.navli ())
        ];
      Ui_common.navcontent
        ~id:rightsubpanel_id

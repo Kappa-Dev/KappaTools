@@ -252,36 +252,37 @@ let version
   | (_,["dev"]) -> dev
   | _ -> prod
 
-let navli label active decorations =
+let navli label force_class decorations =
   let default_attributes =
     [ Html.a_id ("nav"^label)
-    ; Html.Unsafe.string_attrib "role" "presentation" ]
+    ; Html.a_role [ "presentation" ] ]
   in
   let attributes =
-    if active then
-      (Html.a_class ["active"])::default_attributes
-    else
-      default_attributes
+    match force_class with
+    | None -> default_attributes
+    | Some l ->
+      (Tyxml_js.R.Html5.a_class l)::default_attributes
   in
   let text =
     ReactiveData.RList.concat
       (ReactiveData.RList.singleton (Html.cdata label)) decorations in
   Html.li ~a:attributes
     [ Tyxml_js.R.Html.a ~a:[ Html.Unsafe.string_attrib "data-toggle" "tab"
-                           ; Html.Unsafe.string_attrib "role" "tab"
+                           ; Html.a_role ["tab"]
                            ; Html.Unsafe.string_attrib "aria-controls" label
                            ; Html.a_href ("#"^label) ]
         text
     ]
 
 let navtabs nav_tab_id = function
-  | [] -> Common.toss "ui_common.navtabs : missing tabs"
-  | (ti,l) :: t ->
+  | [] | (_, Some _, _) :: _ -> Common.toss "ui_common.navtabs : missing tabs"
+  | (ti,None,l) :: t ->
     Html.ul
       ~a:[ Html.a_id nav_tab_id
          ; Html.a_class ["nav";"nav-tabs"]
          ; Html.Unsafe.string_attrib "role" "tablist" ]
-      (navli ti true l :: List.map (fun (t,li) -> navli t false li) t)
+      (navli ti (Some (React.S.const ["active"])) l ::
+       List.map (fun (t,a_class,li) -> navli t a_class li) t)
 
 let onenavcontent label active classes content =
   Html.div
