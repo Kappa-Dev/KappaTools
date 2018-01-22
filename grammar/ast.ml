@@ -626,29 +626,24 @@ let arrow_notation_to_yojson filenames f_mix f_var r =
 
 let arrow_notation_of_yojson filenames f_mix f_var = function
   | `Assoc l as x when List.length l <= 4 ->
-    begin
-      try
-        {
-          lhs = f_mix (Yojson.Basic.Util.member "lhs" x);
-          rm_token =
-            JsonUtil.to_list
-              (JsonUtil.to_pair
-                 (Locality.annot_of_yojson
-                    ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var))
-                 (string_annot_of_json filenames))
-              (Yojson.Basic.Util.member "rm_token" x);
-          rhs = f_mix (Yojson.Basic.Util.member "rhs" x);
-          add_token =
-            JsonUtil.to_list
-              (JsonUtil.to_pair
-                 (Locality.annot_of_yojson
-                    ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var))
-                 (string_annot_of_json filenames))
-              (Yojson.Basic.Util.member "add_token" x);
-        }
-      with Not_found ->
-        raise (Yojson.Basic.Util.Type_error ("Incorrect AST arrow_notation",x))
-    end
+    {
+      lhs = f_mix (Yojson.Basic.Util.member "lhs" x);
+      rm_token =
+        JsonUtil.to_list
+          (JsonUtil.to_pair
+             (Locality.annot_of_yojson
+                ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var))
+             (string_annot_of_json filenames))
+          (Yojson.Basic.Util.member "rm_token" x);
+      rhs = f_mix (Yojson.Basic.Util.member "rhs" x);
+      add_token =
+        JsonUtil.to_list
+          (JsonUtil.to_pair
+             (Locality.annot_of_yojson
+                ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var))
+             (string_annot_of_json filenames))
+          (Yojson.Basic.Util.member "add_token" x);
+    }
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST arrow_notation",x))
 
 let edit_notation_to_yojson filenames r =

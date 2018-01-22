@@ -79,14 +79,18 @@ let to_yojson loc =
 
 let to_compact_yojson decls loc =
   `Assoc
-    [
-      ("file",
-       match Mods.StringMap.find_option loc.file decls with
-       | Some i -> `Int i
-       | None -> `String loc.file);
-      "from_pos", position_to_yojson loc.from_position;
-      "to_pos", position_to_yojson loc.to_position;
-    ]
+    ((if loc.from_position.line <> loc.to_position.line
+      then fun l -> ("eline", `Int loc.to_position.line) :: l
+      else fun l -> l)
+       [
+         ("file",
+          match Mods.StringMap.find_option loc.file decls with
+          | Some i -> `Int i
+          | None -> `String loc.file);
+         "bline", `Int loc.from_position.line;
+         "bchr", `Int loc.from_position.chr;
+         "echr", `Int loc.to_position.chr;
+       ])
 
 let position_of_json = function
   | `Assoc [ "line", `Int line; "chr", `Int  chr ] |
@@ -108,20 +112,34 @@ let of_yojson = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
 
 let of_compact_yojson decls = function
-  | `Assoc [ "file", file; "from_pos", fr; "to_pos", t ] |
-    `Assoc [ "file", file; "to_pos", t; "from_pos", fr ] |
-    `Assoc [ "from_pos", fr; "to_pos", t; "file", file ] |
-    `Assoc [ "to_pos", t; "from_pos", fr; "file", file ] |
-    `Assoc [ "from_pos", fr; "file", file; "to_pos", t ] |
-    `Assoc [ "to_pos", t; "file", file; "from_pos", fr ] ->
-    let file = match file with
-      | `String x -> x
-      | `Int i -> decls.(i)
-      | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x)) in {
-      file;
-      from_position = position_of_json fr;
-      to_position = position_of_json t
-    }
+  | `Assoc l as x when List.length l <= 5 ->
+    begin
+      try
+        let file = match List.assoc "file" l with
+          | `String x -> x
+          | `Int i -> decls.(i)
+          | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x)) in
+        let of_line = match List.assoc "bline" l with
+          | `Int i -> i
+          | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x)) in
+        let of_chr = match List.assoc "bchr" l with
+          | `Int i -> i
+          | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x)) in
+        let to_chr = match List.assoc "echr" l with
+          | `Int i -> i
+          | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x)) in
+        let to_line = match Yojson.Basic.Util.member "eline" x with
+          | `Null -> of_line
+          | `Int i -> i
+          | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x)) in
+        {
+          file;
+          from_position = { line = of_line; chr = of_chr };
+          to_position = { line = to_line; chr = to_chr };
+        }
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error ("Incorrect AST arrow_notation",x))
+    end
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
 
 let annot_to_yojson ?filenames f (x,l) =
