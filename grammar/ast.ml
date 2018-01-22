@@ -331,13 +331,13 @@ let port_to_json filenames p =
           Locality.annot_to_yojson ~filenames JsonUtil.of_int x) in
   let mod_i =JsonUtil.of_option
       (Locality.annot_to_yojson ~filenames JsonUtil.of_string) in
-  `Assoc [
+  JsonUtil.smart_assoc [
     "port_nme", string_annot_to_json filenames p.port_nme;
-    "port_int", `Assoc [
+    "port_int", JsonUtil.smart_assoc [
       "state", JsonUtil.of_list
         (string_option_annot_to_json filenames) p.port_int;
       "mod", mod_i p.port_int_mod];
-    "port_lnk", `Assoc [
+    "port_lnk", JsonUtil.smart_assoc [
       "state", JsonUtil.of_list
         (Locality.annot_to_yojson ~filenames
            (link_to_json
@@ -346,6 +346,55 @@ let port_to_json filenames p =
         p.port_lnk;
       "mod", mod_l p.port_lnk_mod]
   ]
+let build_port_of_json filenames n i l =
+  let mod_l = JsonUtil.to_option
+      (function
+        | `String "FREE" -> None
+        | x ->
+          Some
+            (Locality.annot_of_yojson
+               ~filenames (JsonUtil.to_int ?error_msg:None) x)) in
+  let mod_i = JsonUtil.to_option
+      (Locality.annot_of_yojson
+         ~filenames (JsonUtil.to_string ?error_msg:None)) in
+  let port_int,port_int_mod =
+    match i with
+    | `Assoc [] | `Null -> ([],None)
+    | `Assoc [ "state", i ] ->
+      (JsonUtil.to_list (string_option_annot_of_json filenames) i, None)
+    | `Assoc [ "mod", m ] -> ([], mod_i m)
+    | `Assoc [ "state", i; "mod", m ]
+    | `Assoc [ "mod", m; "state", i ] ->
+      (JsonUtil.to_list (string_option_annot_of_json filenames) i, mod_i m)
+    | _-> raise (Yojson.Basic.Util.Type_error ("Not internal states",i)) in
+  let port_lnk,port_lnk_mod =
+    match l with
+    | `Assoc [] | `Null -> ([],None)
+    | `Assoc [ "state", l ] ->
+      (JsonUtil.to_list
+         (Locality.annot_of_yojson
+            ~filenames
+            (link_of_json
+               (fun _ -> string_annot_of_json filenames)
+               (string_annot_of_json filenames)
+               (fun _ -> ()))) l,None)
+    | `Assoc [ "mod", m ] -> ([],mod_l m)
+    | `Assoc [ "state", l; "mod", m ]
+    | `Assoc [ "mod", m; "state", l ] ->
+      (JsonUtil.to_list
+         (Locality.annot_of_yojson
+            ~filenames
+            (link_of_json
+               (fun _ -> string_annot_of_json filenames)
+               (string_annot_of_json filenames)
+               (fun _ -> ()))) l,mod_l m)
+    | _ -> raise (Yojson.Basic.Util.Type_error ("Not link states",i)) in
+  Port
+    { port_nme = string_annot_of_json filenames n;
+      port_int; port_int_mod;
+      port_lnk; port_lnk_mod;
+    }
+
 let site_of_json filenames = function
   | `Assoc [ "count_nme", n; "count_test", t; "count_delta", d ] |
     `Assoc [ "count_nme", n; "count_delta", d; "count_test", t ] |
@@ -367,39 +416,14 @@ let site_of_json filenames = function
     `Assoc [ "port_lnk", l; "port_nme", n; "port_int", i ] |
     `Assoc [ "port_int", i; "port_lnk", l; "port_nme", n ] |
     `Assoc [ "port_lnk", l; "port_int", i; "port_nme", n ] ->
-    let mod_l = JsonUtil.to_option
-        (function
-          | `String "FREE" -> None
-          | x ->
-            Some
-              (Locality.annot_of_yojson
-                 ~filenames (JsonUtil.to_int ?error_msg:None) x)) in
-    let mod_i = JsonUtil.to_option
-        (Locality.annot_of_yojson
-           ~filenames (JsonUtil.to_string ?error_msg:None)) in
-    let port_int,port_int_mod =
-      match i with
-      | `Assoc [ "state", i; "mod", m ]
-      | `Assoc [ "mod", m; "state", i ] ->
-        (JsonUtil.to_list (string_option_annot_of_json filenames) i, mod_i m)
-      | _-> raise (Yojson.Basic.Util.Type_error ("Not internal states",i)) in
-    let port_lnk,port_lnk_mod =
-      match l with
-      | `Assoc [ "state", l; "mod", m ]
-      | `Assoc [ "mod", m; "state", l ] ->
-        (JsonUtil.to_list
-           (Locality.annot_of_yojson
-              ~filenames
-              (link_of_json
-                 (fun _ -> string_annot_of_json filenames)
-                 (string_annot_of_json filenames)
-                 (fun _ -> ()))) l,mod_l m)
-      | _ -> raise (Yojson.Basic.Util.Type_error ("Not link states",i)) in
-    Port
-      { port_nme = string_annot_of_json filenames n;
-        port_int; port_int_mod;
-        port_lnk; port_lnk_mod;
-      }
+    build_port_of_json filenames n i l
+  | `Assoc [ "port_nme", n; "port_int", i ] |
+    `Assoc [ "port_int", i; "port_nme", n ] ->
+    build_port_of_json filenames n i `Null
+  | `Assoc [ "port_nme", n; "port_lnk", l ] |
+    `Assoc [ "port_lnk", l; "port_nme", n ] ->
+    build_port_of_json filenames n `Null l
+  | `Assoc [ "port_nme", n ] -> build_port_of_json filenames n `Null `Null
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent",x))
 
 let site_to_json filenames = function
@@ -439,9 +463,10 @@ let agent_mod_of_yojson = function
 let agent_to_json filenames = function
   | Absent _ -> `Null
   | Present (na,l,m) ->
-    `Assoc [ "name", Locality.annot_to_yojson ~filenames JsonUtil.of_string na;
-             "sig", JsonUtil.of_list (site_to_json filenames) l;
-             "mod", (JsonUtil.of_option agent_mod_to_yojson) m]
+    JsonUtil.smart_assoc
+      [ "name", Locality.annot_to_yojson ~filenames JsonUtil.of_string na;
+        "sig", JsonUtil.of_list (site_to_json filenames) l;
+        "mod", (JsonUtil.of_option agent_mod_to_yojson) m]
 
 let agent_of_json filenames = function
   | `Null -> Absent Locality.dummy
@@ -455,6 +480,20 @@ let agent_of_json filenames = function
       (Locality.annot_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
        JsonUtil.to_list (site_of_json filenames) s,
        (JsonUtil.to_option agent_mod_of_yojson) m)
+  | `Assoc [ "name", n; "mod", m ]
+  | `Assoc [ "mod", m; "name", n ] ->
+    Present
+      (Locality.annot_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
+       [], (JsonUtil.to_option agent_mod_of_yojson) m)
+  | `Assoc [ "name", n; "sig", s ]
+  | `Assoc [ "sig", s; "name", n ] ->
+    Present
+      (Locality.annot_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
+       JsonUtil.to_list (site_of_json filenames) s, None)
+  | `Assoc [ "name", n ] ->
+    Present
+      (Locality.annot_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
+      [],None)
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent",x))
 
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
@@ -566,7 +605,7 @@ let print_ast_rule f r =
            (print_rates_one_dir r.k_op_un) a)
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
-  `Assoc [
+  JsonUtil.smart_assoc [
     "lhs", f_mix r.lhs;
     "rm_token",
     JsonUtil.of_list
@@ -590,22 +629,22 @@ let arrow_notation_of_yojson filenames f_mix f_var = function
     begin
       try
         {
-          lhs = f_mix (List.assoc "lhs" l);
+          lhs = f_mix (Yojson.Basic.Util.member "lhs" x);
           rm_token =
             JsonUtil.to_list
               (JsonUtil.to_pair
                  (Locality.annot_of_yojson
                     ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var))
                  (string_annot_of_json filenames))
-              (List.assoc "rm_token" l);
-          rhs = f_mix (List.assoc "rhs" l);
+              (Yojson.Basic.Util.member "rm_token" x);
+          rhs = f_mix (Yojson.Basic.Util.member "rhs" x);
           add_token =
             JsonUtil.to_list
               (JsonUtil.to_pair
                  (Locality.annot_of_yojson
                     ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var))
                  (string_annot_of_json filenames))
-              (List.assoc "add_token" l);
+              (Yojson.Basic.Util.member "add_token" x);
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Incorrect AST arrow_notation",x))
