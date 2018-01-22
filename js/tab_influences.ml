@@ -31,7 +31,12 @@ let prev_node_id = "previous"
 
 let display_id = "influence_map_display"
 let influence_map_text,set_influence_map_text = React.S.create None
-let influencemap = Js_graphlogger.create_graph_logger display_id
+let influencemap =
+  Js_graphlogger.create_graph_logger
+    display_id
+    (fun x -> set_origin
+        (Some (Public_data.refined_influence_node_of_json
+                 (Yojson.Basic.from_string (Js.to_string x)))))
 
 let total_input =
   Html.input ~a:[
