@@ -4,15 +4,15 @@ function fluxMap(configuration) {
     var that = this;
     this.configuration = configuration;
     this.selfInfluence = false;
-    this.flux = { "flux_start" : 0.0, "flux_end" : 0.0,
-		  "flux_kind" : "ABSOLUTE",
-		  "flux_rules" : [],
-		  "flux_hits" : [],
-		  "flux_fluxs" : [] };
+    this.flux = { "din_start" : 0.0, "din_end" : 0.0,
+		  "din_kind" : "ABSOLUTE",
+		  "din_rules" : [],
+		  "din_hits" : [],
+		  "din_fluxs" : [] };
 
     this.setFlux = function(flux){
-	if(!is_same(that.flux.flux_rules,flux.flux_rules)){
-	    that.selectedRules = flux.flux_rules.map(function (v,i) {return (i !== 0);});
+	if(!is_same(that.flux.din_rules,flux.din_rules)){
+	    that.selectedRules = flux.din_rules.map(function (v,i) {return (i !== 0);});
 	    that.flux = flux;
             that.render_controls();
 	} else {
@@ -44,9 +44,9 @@ function fluxMap(configuration) {
         var correction = document.getElementById(that.configuration.selectCorrectionId).value;
         if (that.selfInfluence || i !== j)
         {   if (correction === "hits")
-            {return (that.flux.flux_hits[i] === 0.) ? 0 : Math.abs(e) / that.flux.flux_hits[i];}
+            {return (that.flux.din_hits[i] === 0.) ? 0 : Math.abs(e) / that.flux.din_hits[i];}
             else if (correction === "time")
-            {return Math.abs(e) / (that.flux.flux_end - that.flux.flux_start);}
+            {return Math.abs(e) / (that.flux.din_end - that.flux.din_start);}
             else {return Math.abs(e);}
         }
         else {return 0;}
@@ -58,20 +58,20 @@ function fluxMap(configuration) {
                               .filter(function(d) { return d.source.index != i && d.target.index != i; })
                               .transition().style("opacity", opacity); }; };
 
+    var svg = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("#flux_container").append("svg");
     this.drawDIM = function(){
-        var matrix = that.flux.flux_fluxs
+        var matrix = that.flux.din_fluxs
             .map(function(a,i){return a.map(function (e,j)
                                             {return that.pointValue (i,j,e)})
                                .filter(that.filterRules);}).filter(that.filterRules),
-            rules = that.flux.flux_rules.filter(that.filterRules),
-            color = that.flux.flux_fluxs.map(function(a)
+            rules = that.flux.din_rules.filter(that.filterRules),
+            color = that.flux.din_fluxs.map(function(a)
                                    {return a.map(function (x) {return (x < 0) ? "#FF0000" : "#00FF00";})
                                     .filter(that.filterRules);}).filter(that.filterRules);
 	var width = configuration.width?configuration.width:960,
             height = configuration.height?configuration.height:700,
             innerRadius = Math.min(width, height) * .37,
 	    outerRadius = innerRadius + 8;
-        var svg = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("#flux_container").append("svg");
         svg.attr("width", width)
            .attr("height", height)
 	   .select("g")
@@ -159,7 +159,7 @@ function fluxMap(configuration) {
         var correction_select =
 	    document.getElementById(that.configuration.selectCorrectionId);
 	correction_select.value = "none";
-	if (that.flux.flux_kind !== "ABSOLUTE")
+	if (that.flux.din_kind !== "ABSOLUTE")
 	    correction_select.style.visibility="hidden";
 	else
 	    correction_select.style.visibility="visible";
@@ -174,16 +174,16 @@ function fluxMap(configuration) {
             box.addEventListener("change",function () { that.aClick(id);});
             boxbox.appendChild(box);
             boxbox.appendChild(document.createTextNode(
-		that.flux.flux_rules[id].concat(" (",that.flux.flux_hits[id]," occurences)")));
+		that.flux.din_rules[id].concat(" (",that.flux.din_hits[id]," occurences)")));
             group.appendChild(boxbox);
             rulesCheckboxes.appendChild(group);
         });
     };
 
     this.render_labels = function(){
-        d3.select("#"+that.configuration.beginTimeId).text(that.flux.flux_start);
-        d3.select("#"+that.configuration.endTimeId).text(that.flux.flux_end);
-        d3.select("#"+that.configuration.nbEventsId).text(that.flux.flux_hits.reduce(function (acc,v) {return acc + v;},0));
+        d3.select("#"+that.configuration.beginTimeId).text(that.flux.din_start);
+        d3.select("#"+that.configuration.endTimeId).text(that.flux.din_end);
+        d3.select("#"+that.configuration.nbEventsId).text(that.flux.din_hits.reduce(function (acc,v) {return acc + v;},0));
 
     };
     this.add_handlers = function(){
