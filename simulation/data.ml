@@ -203,7 +203,7 @@ let print_html_din desc flux =
     (fun f -> Format.pp_print_string f "Dynamic influence map")
     ~subtitle:(fun f -> Format.pp_print_string
                   f "between t = <span id=\"begin_time\"></span>s and t = <span id=\"end_time\"></span>s (<span id=\"nb_events\"></span> events)")
-    ["http://d3js.org/d3.v4.min.js"]
+    ["http://d3js.org/d3.v4.min.js";"https://code.jquery.com/jquery-3.3.1.min.js"]
     (fun f ->
        let () =
          Format.fprintf
