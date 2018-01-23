@@ -173,7 +173,7 @@ and recovery = parse
 
 {
   let rec aux_model err lex =
-  try (Kparser4.model token lex, List.rev err)
+  try let out = Kparser4.model token lex in (out, List.rev err)
   with ExceptionDefn.Syntax_Error e ->
     let () = recovery lex in
     aux_model (e::err) lex
