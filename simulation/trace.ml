@@ -235,9 +235,10 @@ let step_to_yojson = function
            Instantiation.event_to_json Agent.to_json y;
            Simulation_info.to_json (fun () -> `Null) z]
   | Init a ->
+    let rev_actions =
+      List.rev_map (Instantiation.action_to_json Agent.to_json) a in
     `List
-      [`String "Init";
-       `List (List.map (Instantiation.action_to_json Agent.to_json) a)]
+      [`String "Init"; `List (List.rev rev_actions)]
   | Obs (x,y,z) ->
     `List [`String "Obs";
            `String x;
@@ -258,7 +259,7 @@ let step_of_yojson = function
           Instantiation.event_of_json Agent.of_json y,
           Simulation_info.of_json (function _ -> ()) z)
   | `List [`String "Init"; `List l ] ->
-    Init (List.map (Instantiation.action_of_json Agent.of_json) l)
+    Init (List.rev (List.rev_map (Instantiation.action_of_json Agent.of_json) l))
   | `List [`String "Obs"; `String x; `List l; z] ->
     Obs (x,
          (List.map (function  `List ccl ->
