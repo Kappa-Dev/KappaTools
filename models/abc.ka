@@ -29,3 +29,5 @@
 
 %mod: [true] do $DIN "flux.html" [true];
 %mod: [T]>20 do $DIN "flux.html" [false];
+%mod: alarm 25 do $DIN "flux.json" [true];
+%mod: alarm 50 do $DIN "flux.json" [false];
