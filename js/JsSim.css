@@ -107,8 +107,6 @@ rect { stroke-width: 2; }
     overflow: auto;
 }
 .filename {
-    overflow: hidden;
-    text-overflow: ellipsis;
     padding: 6px 12px;
     margin-bottom: 0;
     font-size: 14px;
@@ -118,6 +116,11 @@ rect { stroke-width: 2; }
     white-space: nowrap;
     vertical-align: middle;
     border : 0px;
+}
+
+.oneliner {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .node-rect { stroke-width:2;
