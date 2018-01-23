@@ -55,7 +55,7 @@ let panel_heading =
        [toggle_button] in
   [%html {|<div class="row">
              <div id="|}panel_heading_group_id{|" class="col-md-10 btn-group">|} buttons{|</div>
-             <label class="col-md-2 filename">|}[ file_label ]{|</label>
+             <label class="col-md-2 oneliner filename">|}[ file_label ]{|</label>
             </div>|}]
 
 let codemirror_id = "code-mirror"

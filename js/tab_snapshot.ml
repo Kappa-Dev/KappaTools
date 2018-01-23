@@ -193,8 +193,7 @@ let select (snapshots : Api_types_j.snapshot_id list) =
                  | Some s -> s.Data.snapshot_file = snapshot_id)
              then [Html.a_selected ()]
              else [])
-         (Html.pcdata
-            (Ui_common.option_label snapshot_id)))
+         (Html.pcdata snapshot_id))
     snapshots
 
 let snapshot_class :
@@ -240,7 +239,7 @@ let xml () =
       ~a:[ Tyxml_js.R.Html.a_class
              (snapshot_class
                 ~empty:(fun () -> ["hidden"])
-                ~single:(fun _ -> ["visible"])
+                ~single:(fun _ -> ["oneliner"; "visible"])
                 ~multiple:(fun _ -> ["hidden"]))
          ]
       [ Tyxml_js.R.Html.pcdata
@@ -248,8 +247,7 @@ let xml () =
              (fun snapshot ->
                 match snapshot with
                 | None -> ""
-                | Some snapshot ->
-                  (Ui_common.option_label snapshot.Data.snapshot_file))
+                | Some snapshot -> snapshot.Data.snapshot_file)
              current_snapshot)
       ]
   in
