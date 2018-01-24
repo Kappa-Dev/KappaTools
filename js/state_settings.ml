@@ -12,6 +12,8 @@ let set_client_id (client_id : string) : unit = _client_id := client_id
 
 let synch, set_synch = React.S.create false
 
+let agent_coloring = new%js Js.array_empty
+
 let init () : unit Lwt.t =
   let client_ids = Common_state.url_args "client_id" in
   let synch = Common_state.url_args "synch" in

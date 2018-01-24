@@ -9,10 +9,11 @@
 class type snapshot =
   object
     method exportJSON  : Js.js_string Js.t -> unit Js.meth
-    method setData : Js.js_string Js.t -> (*int Js.Opt.t ->*) unit Js.meth
+    method setData : Js.js_string Js.t -> unit Js.meth
+    method redraw : unit Js.meth
     method clearData : unit Js.meth
-  end;;
+  end
 
-let create_snapshot (id : string) : snapshot Js.t =
+let create_snapshot (id : string) (coloring : unit Js.js_array Js.t) : snapshot Js.t =
   Js.Unsafe.new_obj (Js.Unsafe.variable "Snapshot")
-    [| Js.Unsafe.inject (Js.string id) |]
+    [| Js.Unsafe.inject (Js.string id); Js.Unsafe.inject coloring |]

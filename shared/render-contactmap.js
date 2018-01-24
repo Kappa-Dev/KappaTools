@@ -1,53 +1,51 @@
 /*jshint esversion: 6*/
 
 class Layout {
-    
-        constructor(contactMap, dimension, margin) {
-            this.contactMap = contactMap;
-            this.dimension = dimension;
-            this.margin = margin ||
-                { top: 10, right: 10,
-                bottom: 10, left: 10 };
-    
-        }
+    constructor(contactMap, dimension, margin) {
+        this.contactMap = contactMap;
+        this.dimension = dimension;
+        this.margin = margin ||
+            { top: 10, right: 10, bottom: 10, left: 10 };
     }
-    
-    
-    class ContactMap {
-        constructor(id) {
-            this.id = '#'+id;
-        }
-        setData(response) {
-            let map = this;
+}
+
+class ContactMap {
+    constructor(id,coloring) {
+        this.id = '#'+id;
+    }
+
+    redraw() {
+        let map = this;
         let root = d3.select(this.id);
-            map.data = new DataStorage(JSON.parse(response),0);
-            map.data.sortNodes();
-            map.data.sortSites();
-            let margin = { top: 10, right: 10,
-                   bottom: 10, left: 10 };
-    
-            let w = d3.select("#editor-panel").node().getBoundingClientRect().width - margin.left - margin.right;
-            let h = d3.select("#editor-panel").node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5 - 34 - 15;
-    
-            if (map.data) {
-            map.clearData();
-                let layout = new Layout(map, new Dimension(w, h), margin);
-                let renderer = new Render(root, layout);
-                renderer.generateLinks();
-                renderer.render();
-              }
-    
+        let margin = { top: 10, right: 10, bottom: 10, left: 10 };
+        let w = d3.select("#editor-panel").node().getBoundingClientRect().width - margin.left - margin.right;
+        let h = d3.select("#editor-panel").node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5 - 34 - 15;
+        if (map.data) {
+	    map.clearData();
+            let layout = new Layout(map, new Dimension(w, h), margin);
+            let renderer = new Render(root, layout);
+            renderer.generateLinks();
+            renderer.render();
         }
-    
-        clearData() {
-            d3.select(this.id).selectAll("svg").remove();
-            d3.select(this.id).select(".tooltip").remove();
-            d3.select(this.id).select(".toolbox").remove();
-           // d3.selectAll(".contact-tooltip").remove();
-        }
-    
     }
-    
+
+    setData(response) {
+        let map = this;
+        map.data = new DataStorage(JSON.parse(response),0);
+        map.data.sortNodes();
+        map.data.sortSites();
+
+	map.redraw();
+    }
+
+    clearData() {
+        d3.select(this.id).selectAll("svg").remove();
+        d3.select(this.id).select(".tooltip").remove();
+        d3.select(this.id).select(".toolbox").remove();
+        // d3.selectAll(".contact-tooltip").remove();
+    }
+}
+
     class Render {
         constructor(root, layout) {
             this.root = root;
@@ -1126,4 +1124,3 @@ class Layout {
             }
         }
     }
-    

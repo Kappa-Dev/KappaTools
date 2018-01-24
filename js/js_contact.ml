@@ -8,11 +8,12 @@
 
 class type contact_map =
   object
-    method setData : Js.js_string Js.t -> (*int Js.Opt.t ->*) unit Js.meth
+    method setData : Js.js_string Js.t -> unit Js.meth
+    method redraw : unit Js.meth
     method clearData : unit Js.meth
-  end;;
+  end
 
 let create_contact_map
-    (id : string) : contact_map Js.t =
+    (id : string) (coloring : unit Js.js_array Js.t) : contact_map Js.t =
   Js.Unsafe.new_obj (Js.Unsafe.variable "ContactMap")
-    [| Js.Unsafe.inject (Js.string id) |]
+    [| Js.Unsafe.inject (Js.string id); Js.Unsafe.inject coloring |]

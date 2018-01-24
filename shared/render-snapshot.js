@@ -4,47 +4,48 @@ class SnapLayout {
         this.snapshot = snapshot;
         this.dimension = dimension;
         this.margin = margin ||
-            { top: 10, right: 10,
-            bottom: 10, left: 10 };
-        
+            { top: 10, right: 10, bottom: 10, left: 10 };
     }
 }
 
-
 class Snapshot {
-    constructor(id) {
+    constructor(id,coloring) {
         this.id = "#"+id;
+	this.coloring = coloring;
     }
 
     setData(response) {
         let snapshot = this;
-        let root = d3.select(this.id);
         snapshot.data = new DataWareHouse(JSON.parse(response));
-            snapshot.clearData();
-            let margin = { top: 0, right: 10,
-            bottom: 10, left: 10 };
-            /* multiplying by a factor to account for flex display */     
-            let w = d3.select("#snapshot-map-display").node().getBoundingClientRect().width * 5/6 - margin.left - margin.right;   
-            let h = d3.select("#snapshot-map-display").node().getBoundingClientRect().height - margin.top - margin.bottom;
 
-            if (snapshot.data) {
-                let layout = new SnapLayout(snapshot, new Dimension(w, h), margin);
-                let renderer = new SnapRender(root, layout);
-                renderer.render();
-            }        
+	snapshot.redraw();
+    }
+
+    redraw() {
+        let snapshot = this;
+        let root = d3.select(this.id);
+        snapshot.clearData();
+        let margin = { top: 0, right: 10, bottom: 10, left: 10 };
+        /* multiplying by a factor to account for flex display */
+        let w = d3.select("#snapshot-map-display").node().getBoundingClientRect().width * 5/6 - margin.left - margin.right;
+        let h = d3.select("#snapshot-map-display").node().getBoundingClientRect().height - margin.top - margin.bottom;
+
+        if (snapshot.data) {
+            let layout = new SnapLayout(snapshot, new Dimension(w, h), margin);
+            let renderer = new SnapRender(root, layout, this.coloring);
+            renderer.render();
+        }
     }
 
     clearData() {
         d3.select(this.id).selectAll("svg").remove();
         d3.select(this.id).selectAll("div").remove();
         d3.selectAll(".snap-tooltip").remove();
-
     }
-
 }
 
 class SnapRender {
-    constructor(root, layout) {
+    constructor(root, layout, coloring) {
         let renderer = this;
         this.root = root;
         let width = layout.dimension.width;
@@ -112,7 +113,7 @@ class SnapRender {
         let svg = this.svg = container.append('g').attr("id", "snapshot");
         let data = this.layout.snapshot.data;
         data.generateTreeData();
-        this.coloring = {};
+        this.coloring = coloring;
         this.marking = {};
         this.tooltip = new SnapUIManager(this);
 

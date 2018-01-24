@@ -17,3 +17,9 @@ val init : unit -> unit Lwt.t
 
 val sync : unit -> unit Lwt.t
 (** to synch state of application with runtime *)
+
+val agent_coloring : unit Js.js_array Js.t
+(** In reality d3color Js.js_array Js.t.
+
+    It is visualizer responsability to fill/use it, we have it here
+   only to ensure consistency/sharing in between tabs *)

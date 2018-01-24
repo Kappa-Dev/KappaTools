@@ -104,10 +104,11 @@ let _ = React.S.l2
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 
+let contactmap : Js_contact.contact_map Js.t =
+  Js_contact.create_contact_map display_id State_settings.agent_coloring
+
 let onload () =
   let () = Widget_export.onload configuration in
-  let contactmap : Js_contact.contact_map Js.t =
-    Js_contact.create_contact_map display_id in
   let _ =
     React.S.map
       (function
@@ -130,4 +131,5 @@ let onload () =
       "#navcontact_map" "shown.bs.tab"
       (fun _ -> let () = tab_was_active := true in set_tab_is_active true) in
   ()
-let onresize () : unit = ()
+let onresize () : unit =
+  if React.S.value tab_is_active then contactmap##redraw

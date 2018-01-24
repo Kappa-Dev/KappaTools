@@ -130,9 +130,7 @@ let render_snapshot_graph
     snapshot_js##setData (Js.string json)
   | Kappa -> ()
 
-let select_snapshot () =
-  let snapshot_js : Js_snapshot.snapshot Js.t =
-    Js_snapshot.create_snapshot display_id in
+let select_snapshot snapshot_js =
   let index = Js.Opt.bind
       (Ui_common.document##getElementById (Js.string select_id))
       (fun dom ->
@@ -214,6 +212,9 @@ let snapshot_class :
       (React.S.on
          tab_is_active State_simulation.dummy_model State_simulation.model)
 
+let snapshot_js : Js_snapshot.snapshot Js.t =
+  Js_snapshot.create_snapshot display_id State_settings.agent_coloring
+
 let xml () =
   let list, handle = ReactiveData.RList.create [] in
   (* populate select *)
@@ -225,9 +226,9 @@ let xml () =
               manager#simulation_catalog_snapshot >>=
               (Api_common.result_bind_lwt
                  ~ok:(fun (data : Api_types_t.snapshot_catalog) ->
-                     let () = select_snapshot () in
                      let () = ReactiveData.RList.set
                          handle (select data.Api_types_t.snapshot_ids) in
+                     let () = select_snapshot snapshot_js in
                      Lwt.return (Api_common.result_ok ()))
               )
            )
@@ -357,14 +358,12 @@ let onload () : unit =
       onchange := Dom_html.handler
         (fun _ ->
            let () = Common.debug ("onchange") in
-           let () = select_snapshot () in Js._true)
+           let () = select_snapshot snapshot_js in Js._true)
   in
   let update_format () =
     let format_text : string = (Js.to_string format_select_dom##.value) in
     match string_to_display_format format_text with
     | Some format ->
-      let snapshot_js : Js_snapshot.snapshot Js.t =
-        Js_snapshot.create_snapshot display_id in
       let () =
         set_display_format format in
       (match React.S.value current_snapshot with
@@ -397,4 +396,5 @@ let onload () : unit =
   let () = Widget_export.onload (configuration_graph ()) in
   ()
 
-let onresize () : unit = ()
+let onresize () : unit =
+  if React.S.value tab_is_active then snapshot_js##redraw
