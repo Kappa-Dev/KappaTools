@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 15 2017>
+  * Last modification: Time-stamp: <Jan 25 2018>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -19,6 +19,21 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
   try
     let files = Ode_args.get_option options in
+    let files =
+      List.fold_left
+        (fun list elt -> elt::list)
+        !(cli_args_gui.Run_cli_args.inputKappaFileNames_gui)
+        files
+    in
+    let () =
+      match files with
+      | [] ->
+      Debug.tag
+        Format.std_formatter
+        ("No input file has been provided.");
+      exit 0
+      | _::_ -> ()
+    in
     let () = Common_args.copy_from_gui common_args_gui common_args in
     let () = Run_cli_args.copy_from_gui cli_args_gui cli_args in
     let () = cli_args.Run_cli_args.inputKappaFileNames <- files in
