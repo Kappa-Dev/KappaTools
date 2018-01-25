@@ -511,6 +511,22 @@ type location =
   | Direct of int
   | Side_effect of int
 
+let dump_location fmt = function
+  | Direct int -> Format.fprintf fmt "%i" int
+  | Side_effect int -> Format.fprintf fmt "%i*" int
+
+let dump_location_pair fmt (a,b) =
+  Format.fprintf fmt "(%a,%a)" dump_location a dump_location b
+
+let dump_location_pair_list fmt l =
+  Format.fprintf fmt "[%a]"
+    (Pp.list
+       (fun fmt -> Format.pp_print_string fmt ";")
+       dump_location_pair) l
+
+let string_of_label_list l =
+  Format.asprintf "%a" dump_location_pair_list l 
+
 type half_influence_map =
   location pair list InfluenceNodeMap.t InfluenceNodeMap.t
 

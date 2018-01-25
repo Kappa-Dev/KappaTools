@@ -222,11 +222,14 @@ let json_to_graph logger origin_short_opt influences_json =
            string_of_int (get_id_of_node_id source)
          in
          Public_data.InfluenceNodeMap.iter
-           (fun target _label ->
+           (fun target label_list ->
               let target_id =
                 string_of_int (get_id_of_node_id target)
               in
-              let label_string = "todo"
+              (*let label_string = "todo"
+                in*)
+              let label_string =
+                Public_data.string_of_label_list label_list
               in
               let directives = (Graph_loggers_sig.Label
                                   label_string)::directives in
