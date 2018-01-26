@@ -434,7 +434,7 @@ struct
             subviews = None ;
             ranges = None ;
             separating_edges = None ;
-            transition_system_length = None ; 
+            transition_system_length = None ;
           }}
     in
     let error, init_static, init_dynamic =
