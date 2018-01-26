@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jan 14 2018>
+   * Last modification: Time-stamp: <Jan 26 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -53,7 +53,8 @@ struct
         Ckappa_sig.Views_bdu.mvbdu Wrapped_modules.LoggedIntMap.t
           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t option
     ;
-      separating_edges: (string * Ckappa_sig.c_rule_id * string) list option ;
+      separating_edges:
+        (string * string) list Mods.IntMap.t option ;
       transition_system_length: int list option ;
     }
 
@@ -3673,26 +3674,35 @@ struct
         "------------------------------------------------------------" in
     let () = Loggers.print_newline log in
     let error, handler  =
-      match list with
-      | [] ->
+      if Mods.IntMap.is_empty list then
         let () = Loggers.fprintf log "There may be no separating transitions" in
         error, handler
-      | _::_ ->
+      else
         let () = Loggers.fprintf log "The following transitions are separating:" in
         let () = Loggers.print_newline log in
         let error =
-          List.fold_left
-            (fun error (s1,r_id,s2) ->
+          Mods.IntMap.fold
+            (fun r_id l error ->
                let error, r =
-                 Handler.string_of_rule parameters error compil r_id
+                 Handler.string_of_rule parameters error compil
+                   (Ckappa_sig.rule_id_of_int r_id)
                in
                let () =
-                 Loggers.fprintf log "%s: %s -> %s"
-                   r s1 s2
+                 Loggers.fprintf log "%s:" r
+               in
+               let error =
+                 List.fold_left
+                   (fun error (s1,s2) ->
+                      let () =
+                        Loggers.fprintf log "%s -> %s" s1 s2
+                      in
+                      let () = Loggers.print_newline log in
+                      error)
+                 error l
                in
                let () = Loggers.print_newline log in
                error)
-            error list
+            list error
         in
         let () = Loggers.print_newline log in
         error, handler

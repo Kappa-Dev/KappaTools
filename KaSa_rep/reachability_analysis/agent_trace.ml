@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Jan 14 2018>
+  * Last modification: Time-stamp: <Jan 26 2018>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -814,6 +814,7 @@ let add_singular parameters error transition_system =
                     if
                       Remanent_parameters.get_add_singular_microstates
                         parameters
+                      || Remanent_parameters.get_compute_separating_transitions parameters
                     then
                       let mvbdu_list =
                         Ckappa_sig.Views_intbdu.extensional_of_mvbdu mvbdu
@@ -1185,11 +1186,20 @@ let print logger parameters compil handler_kappa handler error transition_system
   let () = Graph_loggers.print_graph_foot logger in
   error
 
+let empty_bridge_set = Mods.IntMap.empty
+let add_bridge (a,b,c) set =
+  let b = Ckappa_sig.int_of_rule_id b in
+  let old =
+    Mods.IntMap.find_default
+      [] b set
+  in
+  Mods.IntMap.add b ((a,c)::old) set
+
 let agent_trace
     parameters log_info error dead_rules handler static handler_kappa
     compil output =
   let transition_system_length = [] in
-  let bridges = [] in
+  let bridges = empty_bridge_set in
   let error, low =
     Graphs.Nodearray.create parameters error 1
   in
@@ -1698,6 +1708,7 @@ let agent_trace
                     error, pre, low, on_stack, scc, bridges =
                     Graphs.add_bridges
                       ~low ~pre ~on_stack ~scc
+                      add_bridge
                       parameters error
                       (fun n -> n)
                       (fun e ->
@@ -1722,7 +1733,7 @@ let agent_trace
     else
       None
   in
-  let transition_system_length = Some transition_system_length in 
+  let transition_system_length = Some transition_system_length in
   match
     Ckappa_sig.Views_intbdu.export_handler error
   with

@@ -24,15 +24,16 @@ val add_bridges:
   ?pre:int Nodearray.t ->
   ?on_stack:bool Nodearray.t ->
   ?scc:int Nodearray.t ->
+  (('a*'b*'a) -> 'c -> 'c) ->
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   ('a -> string) ->
   ('b -> string) ->
   ('a, 'b) graph ->
-  ('a  * 'b * 'a) list ->
+  'c ->
   Exception.method_handler *
   int Nodearray.t * int Nodearray.t * bool Nodearray.t * int Nodearray.t *
-  ('a * 'b * 'a) list
+  'c
 
 val compute_scc :
   ?low:int Nodearray.t ->
