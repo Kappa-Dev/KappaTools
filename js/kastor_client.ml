@@ -75,20 +75,20 @@ let controller s = function
             }
           | None -> assert false
 
-let current_state,set_state = React.S.create ~eq:state_eq initial_state
+let receive update_state x =
+  update_state (Story_json.message_of_json (Yojson.Basic.from_string x))
 
-let receive x =
-  set_state (controller (React.S.value current_state)
-               (Story_json.message_of_json (Yojson.Basic.from_string x)))
+let init_state () =
+  let current_state,set_state = React.S.create ~eq:state_eq initial_state in
+  current_state, (fun x -> set_state (controller (React.S.value current_state)x))
 
-class virtual new_client =
+class virtual new_client ~post current_state =
   object(self)
-    method virtual post : string -> unit
     method virtual is_running : bool
 
-    method config ~none ~weak ~strong =
+    method config_story_computation ~none ~weak ~strong =
       if self#is_running then
-        let () = self#post
+        let () = post
             (Yojson.Basic.to_string
                (`List [ `String "CONFIG";
                         `Assoc [ "none", `Bool none;
@@ -97,10 +97,15 @@ class virtual new_client =
         Lwt.return_ok ()
       else
         Lwt.return_error "KaStor agent is dead"
-    method private raw_run trace_text =
+    method raw_launch_story_computation trace_text =
       if self#is_running then
-        let () = self#post ("[\"RUN\", "^trace_text^"]") in
+        let () = current_state := { initial_state with running = true } in
+        let () = post ("[\"RUN\", "^trace_text^"]") in
         Lwt.return_ok ()
       else
         Lwt.return_error "KaStor agent is dead"
+
+    method story_log = (React.S.value current_state).log
+    method story_is_computing = (React.S.value current_state).running
+    method story_progress = (React.S.value current_state).progress
   end

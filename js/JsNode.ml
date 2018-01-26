@@ -69,14 +69,17 @@ class manager
     (args : string list) : Api.concrete_manager =
   let sim_re = Re.compile (Re.str "KaSimAgent") in
   let sa_re = Re.compile (Re.str "KaSaAgent") in
-  let sim_command,sa_command =
+  let sim_command,sa_command,stor_command =
     if Re.execp sim_re command then
-      command, Re.replace_string  sim_re ~by:"KaSaAgent" command
+      command, Re.replace_string  sim_re ~by:"KaSaAgent" command,
+      Re.replace_string  sim_re ~by:"KaStor" command
     else if Re.execp sa_re command then
-      Re.replace_string sa_re ~by:"KaSimAgent" command, command
+      Re.replace_string sa_re ~by:"KaSimAgent" command, command,
+      Re.replace_string  sim_re ~by:"KaStor" command
     else
       failwith ("Unrecognized command: "^command) in
   let sa_mailbox = Kasa_client.new_mailbox () in
+  let stor_state,update_stor_state = Kastor_client.init_state () in
   let running_ref = ref true in
   let onClose () = running_ref := false in
   let sa_configuration : process_configuration Js.t  =
@@ -98,6 +101,25 @@ class manager
       (fun () ->
          let () = onClose () in
          failwith ("Launching '"^sa_command^"' failed"))
+      (fun x -> x) in
+  let stor_configuration : process_configuration Js.t  =
+    let rec onStdout =
+      let buffer = Buffer.create 512 in
+      fun msg ->
+        match Utility.split (Js.to_string msg) message_delimiter with
+        | (prefix,None) -> Buffer.add_string buffer prefix
+        | (prefix,Some suffix) ->
+          let () = Buffer.add_string buffer prefix in
+          let () = Kastor_client.receive update_stor_state (Buffer.contents buffer) in
+          let () = Buffer.reset buffer in
+          onStdout (Js.string suffix) in
+    create_process_configuration ~onStdout ~onClose stor_command args in
+  let stor_process =
+    Js.Opt.case
+      (spawn_process stor_configuration)
+      (fun () ->
+         let () = onClose () in
+         failwith ("Launching '"^stor_command^"' failed"))
       (fun x -> x) in
   object(self)
     val mutable sim_process : process Js.t option = None
@@ -143,6 +165,7 @@ class manager
 
     method terminate =
       let () = sa_process##kill in
+      let () = stor_process##kill in
       match sim_process with
       | Some process -> process##kill
       | None -> ()
@@ -159,5 +182,13 @@ class manager
         sa_mailbox
 
     method is_computing =
-      self#sim_is_computing || Kasa_client.is_computing sa_mailbox
+      self#sim_is_computing || Kasa_client.is_computing sa_mailbox ||
+      self#story_is_computing
+
+    inherit Kastor_client.new_client
+        ~post:(fun message_text ->
+            stor_process##write
+              (Js.string
+                 (Format.sprintf "%s%c" message_text message_delimiter)))
+        stor_state
   end

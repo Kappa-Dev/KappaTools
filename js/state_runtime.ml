@@ -97,6 +97,8 @@ let read_spec : string -> spec option =
 class embedded () : Api.concrete_manager =
   let kasa_worker = Worker.create "KaSaWorker.js" in
   let kasa_mailbox = Kasa_client.new_mailbox () in
+  let kastor_worker = Worker.create "KaStorWorker.js" in
+  let stor_state,update_stor_state = Kastor_client.init_state () in
   object
     initializer
       let () = kasa_worker##.onmessage :=
@@ -104,6 +106,13 @@ class embedded () : Api.concrete_manager =
              (fun (response_message : string Worker.messageEvent Js.t) ->
                 let response_text : string = response_message##.data in
                 let () = Kasa_client.receive kasa_mailbox response_text  in
+                Js._true
+             )) in
+      let () = kastor_worker##.onmessage :=
+          (Dom.handler
+             (fun (response_message : string Worker.messageEvent Js.t) ->
+                let response_text : string = response_message##.data in
+                let () = Kastor_client.receive update_stor_state response_text  in
                 Js._true
              )) in
       ()
@@ -120,6 +129,9 @@ class embedded () : Api.concrete_manager =
     inherit Kasa_client.new_client
         ~post:(fun message_text -> kasa_worker##postMessage(message_text))
         kasa_mailbox
+    inherit Kastor_client.new_client
+        ~post:(fun message_text -> kastor_worker##postMessage(message_text))
+        stor_state
     method is_running = true
     method terminate =
       let () = kasa_worker##terminate in

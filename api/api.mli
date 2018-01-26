@@ -129,6 +129,15 @@ class type virtual manager_static_analysis = object
     (Yojson.Basic.json,string) Lwt_result.t
 end
 
+class type manager_stories = object
+  method config_story_computation :
+    none:bool -> weak:bool -> strong:bool -> (unit,string) Lwt_result.t
+  method raw_launch_story_computation : string -> (unit,string) Lwt_result.t
+  method story_log : string list
+  method story_is_computing : bool
+  method story_progress : Story_json.progress_bar option
+end
+
 class type manager = object
   inherit manager_project
   inherit manager_file
@@ -138,6 +147,7 @@ end
 class type concrete_manager = object
   inherit manager
   inherit manager_static_analysis
+  inherit manager_stories
   method is_running : bool
   method terminate : unit
   method is_computing : bool

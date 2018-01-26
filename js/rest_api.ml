@@ -582,7 +582,7 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method  get_constraints_list =
+  method get_constraints_list =
     send
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/constraints" url project_id)
@@ -614,4 +614,15 @@ class manager
           | [] -> Lwt.return_error "Rest_api empty error")
 
   method is_computing = is_computing request_count
+
+  method config_story_computation ~none ~weak ~strong : (unit,string) Lwt_result.t =
+    let _dontcare = none || weak || strong in
+    Lwt.return_error "KaStor in not available through HTTP"
+
+  method raw_launch_story_computation (_:string) : (unit,string) Lwt_result.t =
+    Lwt.return_error "KaStor in not available through HTTP"
+
+  method story_log : string list = []
+  method story_is_computing = false
+  method story_progress : Story_json.progress_bar option = None
 end

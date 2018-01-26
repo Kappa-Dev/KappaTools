@@ -135,7 +135,7 @@ ounit: TestJsSim
 TestJsSim: TestJsSim.byte
 	./TestJsSim.byte
 
-site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js  site/KaSaWorker.js
+site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js  site/KaSaWorker.js site/KaStorWorker.js
 	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/JQUERY_VERSION/$(JQUERY_VERSION)/g" | sed "s/JQUERY_UI_VERSION/$(JQUERY_UI_VERSION)/g" |  sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" | sed "s/BOOTSTRAP_VERSION/$(BOOTSTRAP_VERSION)/g" > $@
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
@@ -221,7 +221,7 @@ profiling:
 
 all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE
 
-agents: bin/KaSimAgent bin/KaSaAgent
+agents: bin/KaSimAgent bin/KaSaAgent bin/KaStor
 
 kappalib: KappaLib.cma
 ifeq ($(OCAMLBEST),native)
@@ -284,7 +284,7 @@ KappaBin.zip:
 	mv KappaBin/nw.exe KappaBin/Kappapp.exe
 	mv _build/main/KaSim.native KappaBin/bin/KaSim.exe
 	mv _build/KaSa_rep/main/KaSa.native KappaBin/bin/KaSa.exe
-	mv _build/cflow/KaStor.native KappaBin/bin/KaStor.exe
+	mv _build/agents/KaStor.native KappaBin/bin/KaStor.exe
 	mv _build/odes/KaDE.native KappaBin/bin/KaDE.exe
 	mv _build/agents/KaSimAgent.native KappaBin/bin/KaSimAgent.exe
 	mv _build/agents/KaSaAgent.native KappaBin/bin/KaSaAgent.exe
