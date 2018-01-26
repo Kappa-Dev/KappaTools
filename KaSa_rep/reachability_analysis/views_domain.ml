@@ -3680,6 +3680,7 @@ struct
       else
         let () = Loggers.fprintf log "The following transitions are separating:" in
         let () = Loggers.print_newline log in
+        let () = Loggers.print_newline log in
         let error =
           Mods.IntMap.fold
             (fun r_id l error ->
@@ -3688,14 +3689,14 @@ struct
                    (Ckappa_sig.rule_id_of_int r_id)
                in
                let () =
-                 Loggers.fprintf log "%s:" r
+                 Loggers.fprintf log "  * %s:" r
                in
                let () = Loggers.print_newline log in
                let error =
                  List.fold_left
                    (fun error (s1,s2) ->
                       let () =
-                        Loggers.fprintf log "%s -> %s" s1 s2
+                        Loggers.fprintf log "      %s -> %s" s1 s2
                       in
                       let () = Loggers.print_newline log in
                       error)

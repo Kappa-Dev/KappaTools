@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jan 25 2018>
+  * Last modification: Time-stamp: <Jan 27 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1618,9 +1618,13 @@ let dump_internal_scc_decomposition
                 let () =
                   Loggers.fprintf
                     logger
-                    "(%s,%s)--(%s,%s); "
+                    "   (%s,%s)--(%s,%s); "
                     agent_name site_name agent_name' site_name'
-                in error
+                in
+                let () =
+                  Loggers.print_newline logger
+                in
+                error
              )
              error
              list
