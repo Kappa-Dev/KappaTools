@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Nov 13 2017>
+  * Last modification: Time-stamp: <Jan 25 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -43,6 +43,7 @@ module type Type =
       state -> (int,int) Public_data.influence_node option -> state * Yojson.Basic.json
 
     val get_dead_rules: state -> state * Yojson.Basic.json
+    val get_separating_transitions: state -> state * Yojson.Basic.json
 
     val get_constraints_list: state -> state * Yojson.Basic.json
     val get_errors: state -> Exception_without_parameter.method_handler

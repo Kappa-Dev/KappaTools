@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 29 2017>
+  * Last modification: Time-stamp: <Jan 25 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1937,6 +1937,20 @@ let get_dead_rules  =
     (*  ~dump:dump_raw_internal_contact_map *)
     Remanent_state.get_dead_rules
     compute_dead_rules
+
+let compute_separating_transitions _show_title state =
+  let parameters = get_parameters state in
+  let parameters' =
+    Remanent_parameters.set_compute_separating_transitions parameters true in
+  let state' = set_parameters parameters' state in
+  let state', _ = compute_reachability_result _show_title state' in
+  let state', _ = get_reachability_analysis state' in
+  let state = set_parameters parameters state' in
+  match
+    Remanent_state.get_separating_transitions state
+  with
+  | Some l -> state, l
+  | None -> assert false
 
 (******************************************************************)
 (*Dead agents*)

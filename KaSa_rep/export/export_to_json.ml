@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Nov 13 2017>
+  * Last modification: Time-stamp: <Jan 25 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -226,6 +226,10 @@ functor (A:Analyzer.Analyzer) ->
     let get_dead_rules state =
       let state, rules = get_dead_rules state in
       state, Public_data.dead_rules_to_json rules
+
+    let get_separating_transitions state =
+      let state, separating_transitions = get_separating_transitions state in
+      state, Public_data.separating_transtions_to_json separating_transitions
 
     let get_constraints_list state =
       get_constraints_list_to_json state

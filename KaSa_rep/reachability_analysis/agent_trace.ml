@@ -835,6 +835,7 @@ let add_singular parameters error transition_system =
                     if
                       Remanent_parameters.get_add_singular_macrostates
                         parameters
+                      || Remanent_parameters.get_compute_separating_transitions parameters
                     then
                       List.fold_left
                         (fun (error, transition_system) (_,hconsed) ->
@@ -1733,8 +1734,8 @@ let agent_trace
   match
     Ckappa_sig.Views_intbdu.export_handler error
   with
-  | error, Some h -> error, log_info, h, bridges
+  | error, Some h -> error, log_info, h, bridges, transition_system_length 
   | error, None ->
     let error, h =
       Exception.warn parameters error __POS__ Exit handler in
-    error, log_info, h, bridges
+    error, log_info, h, bridges, transition_system_length

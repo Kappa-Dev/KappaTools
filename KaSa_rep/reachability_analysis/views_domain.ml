@@ -434,6 +434,7 @@ struct
             subviews = None ;
             ranges = None ;
             separating_edges = None ;
+            transition_system_length = None ; 
           }}
     in
     let error, init_static, init_dynamic =
@@ -3679,6 +3680,7 @@ struct
                let () =
                  Loggers.fprintf log "%s:" r
                in
+               let () = Loggers.print_newline log in
                let error =
                  List.fold_left
                    (fun error (s1,s2) ->
@@ -3844,12 +3846,39 @@ struct
             site_correspondence
             (get_fixpoint_result dynamic)
         in
-        let error, log_info, handler, bridges =
-          Agent_trace.agent_trace parameters (get_log_info dynamic) error
-            dead_rules handler (get_global_static_information static) handler_kappa compil
-            output
+        let error, log_info, handler, bridges, transition_systems_length =
+          if Remanent_parameters.get_compute_separating_transitions parameters
+             &&
+             Remanent_parameters.get_use_macrotransitions_in_local_traces parameters
+          then
+            let parameters' =
+              Remanent_parameters.set_use_macrotransitions_in_local_traces
+                parameters
+                false
+            in
+            let error, log_info, handler, bridges, _ =
+              Agent_trace.agent_trace parameters' (get_log_info dynamic) error
+                dead_rules handler (get_global_static_information static) handler_kappa compil
+                output
+            in
+            let parameters' =
+              Remanent_parameters.set_compute_separating_transitions
+                parameters
+                false
+            in
+            let error, log_info, handler, _, transition_systems_length =
+              Agent_trace.agent_trace parameters' log_info error
+                dead_rules handler (get_global_static_information static) handler_kappa compil
+                output
+            in
+            error, log_info, handler, bridges, transition_systems_length
+          else
+            Agent_trace.agent_trace
+              parameters (get_log_info dynamic) error
+              dead_rules handler (get_global_static_information static) handler_kappa compil
+              output
         in
-        let dynamic =
+  let dynamic =
           match bridges
           with
           | None -> dynamic
