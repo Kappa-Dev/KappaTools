@@ -4,7 +4,11 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Dec 17 2017>
+<<<<<<< Updated upstream
+  * Last modification: Time-stamp: <Jan 26 2018>
+=======
+  * Last modification: Time-stamp: <Jan 25 2018>
+>>>>>>> Stashed changes
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -518,6 +522,12 @@ let get_backend_mode_1 r =
 let get_local_trace_format_1 r = r.Remanent_parameters_sig.format_for_local_traces
 let get_compute_local_traces_1 r = r.Remanent_parameters_sig.compute_local_traces
 let get_compute_separating_transitions_1 r = r.Remanent_parameters_sig.compute_separating_transitions
+let set_compute_separating_transitions_1 r b =
+  {r with
+   Remanent_parameters_sig.compute_separating_transitions = b}
+let set_use_macrotransition_in_local_traces_1 r b =
+  {r with
+  Remanent_parameters_sig.use_macrotransitions_in_local_traces = b}
 let get_show_rule_names_in_local_traces_1 r = r.Remanent_parameters_sig.show_rule_names_in_local_traces
 let get_use_macrotransitions_in_local_traces_1 r = r.Remanent_parameters_sig.use_macrotransitions_in_local_traces
 let get_ignore_trivial_losanges_1 r = r.Remanent_parameters_sig.ignore_trivial_losanges
@@ -720,6 +730,24 @@ let get_smash_relations = upgrade_from_reachability_map_field get_smash_relation
 let get_local_trace_format = upgrade_from_reachability_map_field get_local_trace_format_1
 let get_compute_local_traces = upgrade_from_reachability_map_field get_compute_local_traces_1
 let get_compute_separating_transitions = upgrade_from_reachability_map_field get_compute_separating_transitions_1
+let set_compute_separating_transitions_2 r b =
+  {r with
+   Remanent_parameters_sig.reachability_map_output =
+     set_compute_separating_transitions_1  r.Remanent_parameters_sig.reachability_map_output b}
+let set_use_macrotransition_in_local_traces_2 r b =
+  {r with
+   Remanent_parameters_sig.reachability_map_output =
+     set_use_macrotransition_in_local_traces_1 r.Remanent_parameters_sig.reachability_map_output b}
+
+let set_compute_separating_transitions r b =
+  {r with
+   Remanent_parameters_sig.marshalisable_parameters =
+     set_compute_separating_transitions_2 r.Remanent_parameters_sig.marshalisable_parameters b}
+let set_use_macrotransitions_in_local_traces r b =
+  {r with
+   Remanent_parameters_sig.marshalisable_parameters =
+     set_use_macrotransition_in_local_traces_2 r.Remanent_parameters_sig.marshalisable_parameters b}
+
 let get_show_rule_names_in_local_traces = upgrade_from_reachability_map_field get_show_rule_names_in_local_traces_1
 let get_use_macrotransitions_in_local_traces = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1
 let get_ignore_local_losanges = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1

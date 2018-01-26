@@ -141,7 +141,8 @@ type dead_rules = rule list
 val dead_rules_of_json : Yojson.Basic.json -> dead_rules
 val dead_rules_to_json : dead_rules -> Yojson.Basic.json
 
-type separating_transitions = (string * int (*rule_id*) * string) list
+type separating_transitions =
+  (string * string) list Mods.IntMap.t 
 
 val separating_transitions_of_json: Yojson.Basic.json -> separating_transitions
 
@@ -190,4 +191,4 @@ val string_of_binding_type:
   site_name:string -> string
 
 val string_of_label_list:
-  location pair list -> string  
+  location pair list -> string

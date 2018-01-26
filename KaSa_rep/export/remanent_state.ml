@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jan 14 2018>
+  * Last modification: Time-stamp: <Jan 26 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -69,15 +69,17 @@ let info_to_rule (s1,loc,direction,s2,id) =
 type dead_agents = Ckappa_sig.c_agent_name list
 
 type separating_transitions =
-  (string * Ckappa_sig.c_rule_id * string) list
+  (string  * string) list Mods.IntMap.t
 
 let separating_transitions_to_json =
-  JsonUtil.of_list
-    (JsonUtil.of_triple
-       ~lab1:"s1" ~lab2:"label" ~lab3:"s3"
+  JsonUtil.of_map
+    ~fold:Mods.IntMap.fold 
+    (fun x -> Ckappa_sig.rule_id_to_json (Ckappa_sig.rule_id_of_int x))
+    (JsonUtil.of_list
+       (JsonUtil.of_pair
+       ~lab1:"source" ~lab2:"target"
        JsonUtil.of_string
-       Ckappa_sig.rule_id_to_json
-       JsonUtil.of_string)
+       JsonUtil.of_string))
 
 (******************************************************************************)
 (*********************)

@@ -525,7 +525,7 @@ let dump_location_pair_list fmt l =
        dump_location_pair) l
 
 let string_of_label_list l =
-  Format.asprintf "%a" dump_location_pair_list l 
+  Format.asprintf "%a" dump_location_pair_list l
 
 type half_influence_map =
   location pair list InfluenceNodeMap.t InfluenceNodeMap.t
@@ -752,18 +752,26 @@ let dead_rules_of_json =
 (* dead agents *)
 (***************)
 
-type separating_transitions = (string * int (*rule_id*) * string) list
+type separating_transitions =
+  (string * string) list Mods.IntMap.t
+
+
 
 let separating_transitions_of_json =
-  JsonUtil.to_list
-    ~error_msg:"separating transitions"
-    (
-      JsonUtil.to_triple
-        ~error_msg:"transition"
-        ~lab1:"s1" ~lab2:"label" ~lab3:"s2"
-        (JsonUtil.to_string ?error_msg:None)
-        (JsonUtil.to_int ?error_msg:None)
-        (JsonUtil.to_string ?error_msg:None))
+  JsonUtil.to_map
+    ~add:Mods.IntMap.add
+    ~empty:Mods.IntMap.empty 
+    ~error_msg:"separaring transitions map"
+    (JsonUtil.to_int ~error_msg:"rule id")
+    (JsonUtil.to_list
+       ~error_msg:"separating transitions"
+       (
+         JsonUtil.to_pair
+           ~error_msg:"transition"
+           ~lab1:"s1" ~lab2:"s2"
+           (JsonUtil.to_string ?error_msg:None)
+           (JsonUtil.to_string ?error_msg:None))
+    )
 
 (***************)
 (* Constraints *)

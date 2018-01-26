@@ -835,6 +835,7 @@ let add_singular parameters error transition_system =
                     if
                       Remanent_parameters.get_add_singular_macrostates
                         parameters
+                      || Remanent_parameters.get_compute_separating_transitions parameters
                     then
                       List.fold_left
                         (fun (error, transition_system) (_,hconsed) ->

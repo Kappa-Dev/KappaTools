@@ -124,7 +124,7 @@ let main () =
   (*-----------------------------------------------------------------------*)
   let state =
     if Remanent_parameters.get_do_reachability_analysis parameters
-    || Remanent_parameters.get_compute_separating_transitions parameters 
+    || Remanent_parameters.get_compute_separating_transitions parameters
     then
       if Remanent_parameters.get_trace parameters then
         Export_to_KaSa.output_constraints_list state
@@ -227,10 +227,17 @@ let main () =
         with
         | None -> ()
         | Some l ->
+          let nr,nt =
+            Mods.IntMap.fold
+              (fun r l (nr,nt) ->
+                 nr+1,
+                 nt+List.length l)
+              l (0,0)
+          in
           Loggers.fprintf
             (Remanent_parameters.get_logger parameters)
-            "; separating transitions: %i ;"
-            (List.length l)
+            "; separating transitions: %i in %i rules ;"
+            nt nr
       in
       let () =
         Loggers.print_newline
