@@ -35,7 +35,10 @@ R(x[x.R],y[z.R]) => R(x[1],y[2]),R(x[1],z[2])
 R(x[x.R],z[y.R]) => R(x[1],z[2]),R(x[1],y[2])
 
 Potential polymerization:
-(R,x)--(R,x); (R,z)--(R,y); (R,y)--(R,z); 
+   (R,x)--(R,x); 
+   (R,z)--(R,y); 
+   (R,y)--(R,z); 
+
 Generating the raw influence map...
 Refining the influence map...
 execution finished without any exception
