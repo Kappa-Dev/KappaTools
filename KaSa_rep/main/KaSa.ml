@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 27 2017>
+ * Last modification: Time-stamp: <Feb 05 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -124,6 +124,7 @@ let main () =
   (*-----------------------------------------------------------------------*)
   let state =
     if Remanent_parameters.get_do_reachability_analysis parameters
+    || Remanent_parameters.get_compute_separating_transitions parameters
     then
       if Remanent_parameters.get_trace parameters then
         Export_to_KaSa.output_constraints_list state

@@ -290,7 +290,7 @@ let compute_scc
 
 let detect_bridges
     parameters error
-    graph string_of_n string_of_e scc bridges =
+    add graph string_of_n string_of_e scc bridges =
   Fixed_size_array.fold
     parameters
     error
@@ -341,7 +341,7 @@ let detect_bridges
                         Loggers.print_newline
                           (Remanent_parameters.get_logger parameters)
                     in
-                    error,(nstringi,label,nstringj)::bridges
+                    error,add (nstringi,label,nstringj) bridges
                 end)
            (error, bridges) l)
       graph.edges
@@ -349,7 +349,7 @@ let detect_bridges
 
 let add_bridges
     ?low ?pre ?on_stack ?scc
-    parameters error string_of_n string_of_e graph bridges
+    add parameters error string_of_n string_of_e graph bridges
   =
   let error, scc =
     match scc with
@@ -376,7 +376,7 @@ let add_bridges
       (error, 1, scc) scc_list
   in
   let error, bridges =
-    detect_bridges parameters error graph string_of_n string_of_e scc bridges
+    detect_bridges parameters error add graph string_of_n string_of_e scc bridges
   in
   let error, scc =
     Nodearray.free_all parameters error scc
