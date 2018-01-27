@@ -1956,6 +1956,13 @@ let compute_separating_transitions _show_title state =
   | Some l -> state, l
   | None -> assert false
 
+let get_separating_transitions =
+  get_gen
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Detecting separating transitions"
+    Remanent_state.get_separating_transitions
+    compute_separating_transitions
+
 (******************************************************************)
 (*Dead agents*)
 (******************************************************************)

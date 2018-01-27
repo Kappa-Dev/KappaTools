@@ -755,7 +755,17 @@ let dead_rules_of_json =
 type separating_transitions =
   (string * string) list Mods.IntMap.t
 
-
+let separating_transitions_to_json =
+  JsonUtil.of_map
+    ~fold:Mods.IntMap.fold
+    JsonUtil.of_int
+    (JsonUtil.of_list
+       (
+         JsonUtil.of_pair
+           ~lab1:"s1" ~lab2:"s2"
+           JsonUtil.of_string
+              JsonUtil.of_string)
+    )
 
 let separating_transitions_of_json =
   JsonUtil.to_map

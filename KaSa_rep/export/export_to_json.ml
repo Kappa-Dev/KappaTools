@@ -44,6 +44,8 @@ sig
 
   val get_dead_rules: state -> state * Yojson.Basic.json
 
+  val get_separating_transitions: state -> state * Yojson.Basic.json
+
   val get_constraints_list: state -> state * Yojson.Basic.json
 
   val get_errors: state -> Exception_without_parameter.method_handler
@@ -229,7 +231,7 @@ functor (A:Analyzer.Analyzer) ->
 
     let get_separating_transitions state =
       let state, separating_transitions = get_separating_transitions state in
-      state, Public_data.separating_transtions_to_json separating_transitions
+      state, Public_data.separating_transitions_to_json separating_transitions
 
     let get_constraints_list state =
       get_constraints_list_to_json state
