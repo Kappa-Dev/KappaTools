@@ -38,12 +38,12 @@ val update_roots :
 
 (** {6 Counting instances} *)
 
-val number_of_instances : t -> Pattern.id array -> int
-(** [number_of_instances state patterns] *)
+val number_of_instances : ?rule_id:int -> t -> Pattern.id array -> int
+(** [number_of_instances ?rule_id state patterns] *)
 
 val number_of_unary_instances_in_cc :
-  t -> Pattern.id * Pattern.id -> int -> int
-(** [number_of_unary_instances_in_cc state (pat1, pat2) cc] *)
+  ?rule_id:int -> t -> Pattern.id * Pattern.id -> int -> int
+(** [number_of_unary_instances_in_cc ?rule_id state (pat1, pat2) cc] *)
 
 
 (** {6 Picking instances} *)
