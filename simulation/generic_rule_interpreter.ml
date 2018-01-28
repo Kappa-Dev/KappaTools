@@ -61,8 +61,8 @@ module Make (Instances:Instances_sig.S) = struct
 
   let get_edges st = st.edges
 
-  let sum_instances_numbers insts l =
-    List.fold_left (fun ac x -> ac + Instances.number_of_instances insts x) 0 l
+  let sum_instances_numbers ?rule_id insts l =
+    List.fold_left (fun ac x -> ac + Instances.number_of_instances ?rule_id insts x) 0 l
 
   type result = Clash | Corrected | Blocked | Success of t
 
@@ -241,7 +241,7 @@ module Make (Instances:Instances_sig.S) = struct
     let pat2 = rule.Primitives.connected_components.(1) in
 
     let number_of_unary_instances_in_cc =
-      Instances.number_of_unary_instances_in_cc state.instances (pat1, pat2) in
+      Instances.number_of_unary_instances_in_cc ~rule_id state.instances (pat1, pat2) in
 
     let old_pack =
       Mods.IntMap.find_default
@@ -811,6 +811,7 @@ module Make (Instances:Instances_sig.S) = struct
            | Operator.RULE i ->
              let rule = Model.get_rule env i in
              let pattern_va = Instances.number_of_instances
+                 ~rule_id:i
                  state.instances rule.Primitives.connected_components in
              let () =
                store_activity store env counter state (2*i)

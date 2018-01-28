@@ -38,12 +38,12 @@ let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
 
 (** {6 Compute the number of instances } *)
 
-let number_of_instances st pats =
+let number_of_instances ?rule_id:_ st pats =
   Array.fold_left
     (fun acc pattern ->  acc * (Roots.number st.roots pattern)) 1 pats
 
 
-let number_of_unary_instances_in_cc st (pat1, pat2) = 
+let number_of_unary_instances_in_cc ?rule_id:_ st (pat1, pat2) = 
   let map1 = Roots.of_unary_pattern pat1 st.roots in
   let map2 = Roots.of_unary_pattern pat2 st.roots in
   fun cc -> 
