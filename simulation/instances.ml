@@ -54,7 +54,7 @@ let number_of_unary_instances_in_cc ?rule_id:_ st (pat1, pat2) =
 
 (* {6 Pick instances } *)
 
-let pick_unary_instance_in_cc st random_state (pat1, pat2) =
+let pick_unary_instance_in_cc ?rule_id:_ st random_state (pat1, pat2) =
   let map1 = Roots.of_unary_pattern pat1 st.roots in
   let map2 = Roots.of_unary_pattern pat2 st.roots in
   fun cc ->
@@ -71,7 +71,7 @@ let pick_unary_instance_in_cc st random_state (pat1, pat2) =
 
 (* We provide a custom monadic fold function to be 
    lazy in drawing random numbers *)
-let fold_picked_instance st random_state pats ~init f = 
+let fold_picked_instance ?rule_id:_ st random_state pats ~init f = 
   let rec aux i acc =
     if i >= Array.length pats then acc else
     match acc with
@@ -101,7 +101,7 @@ let process_excp =
 
 
 (* This is the legitimate and efficient version. *)
-let fold_instances ?excp st pats ~init f =
+let fold_instances ?rule_id:_ ?excp st pats ~init f =
 
   let sent_to_excp_root, excp_root = process_excp pats excp in
 
@@ -125,7 +125,7 @@ let map_fold2 map1 map2 ~init f =
     map1 map2 init
   |> snd
 
-let fold_unary_instances st (pat1, pat2) ~init f =
+let fold_unary_instances ?rule_id:_ st (pat1, pat2) ~init f =
   let map1 = Roots.of_unary_pattern pat1 st.roots in
   let map2 = Roots.of_unary_pattern pat2 st.roots in
   map_fold2 map1 map2 ~init (fun _ set1 set2 acc ->

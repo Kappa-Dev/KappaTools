@@ -49,14 +49,14 @@ val number_of_unary_instances_in_cc :
 (** {6 Picking instances} *)
 
 val pick_unary_instance_in_cc :
-  t -> Random.State.t -> Pattern.id * Pattern.id -> int -> int * int
+?rule_id:int -> t -> Random.State.t -> Pattern.id * Pattern.id -> int -> int * int
 (** [pick_unary_instance_in_cc state random_state (pat1, pat2) cc]
     Returns a pair of roots corresponding to [pat1] and [pat2] respectively.
     Optimized for currying before the [cc] argument.
     In case of failure, one of the resulting roots is set to [(-1)]. *)
 
 val fold_picked_instance :
-  t -> Random.State.t -> Pattern.id array ->
+  ?rule_id:int -> t -> Random.State.t -> Pattern.id array ->
   init:'a -> (int -> Pattern.id -> int -> 'a -> 'a option) -> 'a option
 (** [fold_picked_instances state random_state patterns ~init f]
     with [f pat_id_in_array pat corresponding_root acc].
@@ -69,14 +69,15 @@ val fold_picked_instance :
 (** {6 Enumerating instances} *)
 
 val fold_instances :
-  ?excp:(Pattern.id * int) ->
+  ?rule_id:int -> ?excp:(Pattern.id * int) ->
   t -> Pattern.id array -> init:'a -> (int array -> 'a -> 'a) -> 'a
 (** [fold_enumerated_instances state patterns ~init f]
     with [f roots acc].
     Folds through every rectangular instance of an array of patterns. *)
 
 val fold_unary_instances :
-  t -> Pattern.id * Pattern.id -> init:'a -> (int * int -> 'a -> 'a) -> 'a
+  ?rule_id:int -> t -> Pattern.id * Pattern.id -> 
+  init:'a -> (int * int -> 'a -> 'a) -> 'a
 (** [fold_unary_instances state (pat1, pat2) ~init f ]
     with [f (root1, root2) acc]. *)
 
