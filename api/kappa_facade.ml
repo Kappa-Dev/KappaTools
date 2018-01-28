@@ -215,10 +215,16 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                   ?max_time:None ?max_event:None
                   ~plot_period:(Counter.DT 1.) in
               let () = ExceptionDefn.flush_warning log_form in
-              let random_state =
+              let theSeed =
                 match conf.Configuration.seed with
-                | None -> Random.State.make_self_init ()
-                | Some theSeed -> Random.State.make [|theSeed|] in
+                | None ->
+                  let () = Random.self_init () in
+                  let out = Random.bits () in
+                  let () =
+                    Format.fprintf log_form "Random seed used: %i@." out in
+                  out
+                | Some theSeed -> theSeed in
+              let random_state = Random.State.make [|theSeed|] in
               let simulation =
                 create_t
                   ~contact_map ~log_form ~log_buffer ~ast ~env ~counter
