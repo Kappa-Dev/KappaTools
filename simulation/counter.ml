@@ -19,6 +19,7 @@ let default_progress = {
 module Efficiency : sig
   type t = {
     mutable consecutive : int;
+    mutable consecutive_blocked : int;
     mutable no_more_binary : int;
     mutable no_more_unary : int;
     mutable clashing_instance : int;
@@ -29,13 +30,16 @@ module Efficiency : sig
 
   val nb : t -> int
   val nb_consecutive : t -> int
+  val nb_consecutive_blocked : t -> int
   val print_detail : current_event:int -> Format.formatter -> t -> unit
   val reset_consecutive : t -> t
+  val reset_consecutive_blocked : t -> t
 
   val incr_no_more_binary : t -> t
   val incr_no_more_unary : t -> t
   val incr_clashing_instance : t -> t
   val incr_time_correction : t -> t
+  val incr_consecutive_blocked : t -> t
 
   val write_t : Bi_outbuf.t -> t -> unit
   val string_of_t : ?len:int -> t -> string
@@ -45,6 +49,7 @@ end =
   struct
     type t = {
       mutable consecutive : int;
+      mutable consecutive_blocked : int;
       mutable no_more_binary : int;
       mutable no_more_unary : int;
       mutable clashing_instance : int;
@@ -53,6 +58,7 @@ end =
 
     let init = {
       consecutive = 0;
+      consecutive_blocked = 0;
       no_more_binary = 0;
       no_more_unary = 0;
       clashing_instance = 0;
@@ -62,8 +68,13 @@ end =
     let nb t =
       t.no_more_binary + t.no_more_unary + t.clashing_instance + t.time_correction
     let nb_consecutive t = t.consecutive
+    let nb_consecutive_blocked t = t.consecutive_blocked
     let reset_consecutive t = let () = t.consecutive <- 0 in t
+    let reset_consecutive_blocked t = let () = t.consecutive_blocked <- 0 in t
 
+    let incr_consecutive_blocked t =
+      let () = t.consecutive_blocked <- succ t.consecutive_blocked in
+      t
     let incr_no_more_binary t =
       let () = t.no_more_binary <- succ t.no_more_binary in
       let () = t.consecutive <- succ t.consecutive in
@@ -105,6 +116,7 @@ end =
 
     let to_yojson t = `Assoc [
         "consecutive", `Int t.consecutive;
+        "consecutive_blocked", `Int t.consecutive_blocked;
         "no_more_binary", `Int t.no_more_binary;
         "no_more_unary", `Int t.no_more_unary;
         "clashing_instance", `Int t.clashing_instance;
@@ -116,6 +128,9 @@ end =
           consecutive =
             Yojson.Basic.Util.to_int
               (Yojson.Basic.Util.member "consecutive" x);
+          consecutive_blocked =
+              Yojson.Basic.Util.to_int
+                (Yojson.Basic.Util.member "consecutive_blocked" x);
           no_more_binary =
             Yojson.Basic.Util.to_int
               (Yojson.Basic.Util.member "no_more_binary" x);
@@ -167,6 +182,7 @@ let current_time c = c.time
 let current_event c = c.events
 let nb_null_event c = Efficiency.nb c.stat_null
 let consecutive_null_event c = Efficiency.nb_consecutive c.stat_null
+let consecutive_blocked c = Efficiency.nb_consecutive_blocked c.stat_null
 let one_time_advance c dt = c.time <- (c.time +. dt)
 let inc_stories c = c.stories <- (c.stories + 1)
 let inc_events c =c.events <- (c.events + 1)
@@ -178,6 +194,7 @@ let check_events c =
   match c.max_event with None -> true | Some max -> c.events < max
 let one_constructive_event c =
   let () = c.stat_null <- Efficiency.reset_consecutive c.stat_null in
+  let () = c.stat_null <- Efficiency.reset_consecutive_blocked c.stat_null in
   let () = inc_events c in
   check_time c && check_events c
 let one_no_more_binary_event c =
@@ -196,6 +213,10 @@ let one_time_correction_event c ti =
     let () = c.time <- ti in
     let () = c.stat_null <- Efficiency.incr_time_correction c.stat_null in
     check_time c && check_events c
+let one_blocked_event c =
+  let () = c.stat_null <- Efficiency.incr_consecutive_blocked c.stat_null in
+  check_time c && check_events c
+
 let get_efficiency c = c.stat_null
 let print_efficiency f c =
   Efficiency.print_detail ~current_event:(current_event c) f c.stat_null
