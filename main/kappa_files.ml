@@ -8,7 +8,6 @@
 
 let outputDirName = ref ""
 let marshalizedOutFile = ref ""
-let snapshotFileName = ref "snap"
 let cflowFileName = ref "cflow.dot"
 let branch_and_cut_engine_profilingName = ref "compression_status.txt"
 let tasks_profilingName = ref "profiling.html"
@@ -54,25 +53,13 @@ let overwrite_permission = ref false
 let path f =
   if Filename.is_implicit f then Filename.concat !outputDirName f else f
 
-let find_available_name name facultative ext =
-  let base = try Filename.chop_extension name
-      with Invalid_argument _ -> name in
-  if Sys.file_exists (path (base^ext)) then
-    let base' = if facultative <> "" then base^"_"^facultative else base in
-    if Sys.file_exists (path (base'^ext)) then
-      let v = ref 0 in
-      let () =
-        while Sys.file_exists (path (base'^"~"^(string_of_int !v)^ext))
-        do incr v; done
-      in base'^"~"^(string_of_int !v)^ext
-    else base'^ext
-  else base^ext
-
 let get_fresh_filename base_name concat_list facultative ext =
   let tmp_name = try Filename.chop_extension base_name
     with Invalid_argument _ -> base_name in
   let base_name = String.concat "_" (tmp_name::concat_list) in
-  find_available_name base_name facultative ext
+  Tools.find_available_name
+    ~already_there:(fun x -> Sys.file_exists (path x))
+    base_name ~facultative ~ext
 
 let open_out f =
   let x = path f in
@@ -101,7 +88,6 @@ let set name ext_opt =
     name:=fname
 
 let setOutputName () =
-  set snapshotFileName (Some "dot");
   set fluxFileName (Some "dot") ;
   set (get_odeFileName Loggers.Octave) (Some "m") ;
   set (get_odeFileName Loggers.Matlab) (Some "m") ;
@@ -192,7 +178,6 @@ let with_flux str f =
   with_channel (match str with "" -> !fluxFileName | _ -> str) f
 
 let with_snapshot str ext event f =
-  let str = if str="" then !snapshotFileName else str in
   let desc = open_out_fresh str (string_of_int event) ext in
   let () = f desc in
   close_out desc

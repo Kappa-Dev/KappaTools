@@ -67,4 +67,8 @@ val capitalize: string -> string
 val smash_duplicate_in_ordered_list:
   ('a -> 'a -> int) -> ('a * int) list -> ('a * int) list
 
+val find_available_name :
+  already_there:(string -> bool) ->
+  string -> facultative:string -> ext:string -> string
+
 val default_message_delimter : char

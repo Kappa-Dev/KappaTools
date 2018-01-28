@@ -304,4 +304,18 @@ let smash_duplicate_in_ordered_list p l =
   | [] -> []
   | (h,n)::t -> aux t n h []
 
+let find_available_name ~already_there name ~facultative ~ext =
+  let base = try Filename.chop_extension name
+      with Invalid_argument _ -> name in
+  if already_there (base^ext) then
+    let base' = if facultative <> "" then base^"_"^facultative else base in
+    if already_there (base'^ext) then
+      let v = ref 0 in
+      let () =
+        while already_there (base'^"~"^(string_of_int !v)^ext)
+        do incr v; done
+      in base'^"~"^(string_of_int !v)^ext
+    else base'^ext
+  else base^ext
+
 let default_message_delimter : char = '\x1e' (* "\t" *)

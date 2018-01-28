@@ -100,7 +100,9 @@ let do_modification ~outputs env counter graph state extra modification =
     let () = outputs (Data.Plot (observables_values env graph counter)) in
     ((false, graph, state),extra)
   | Primitives.SNAPSHOT pexpr  ->
-    let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
+    let file =
+      if pexpr = [] then "snap.ka"
+      else Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
     let () = outputs (Data.Snapshot
                         (Rule_interpreter.snapshot env counter file graph)) in
     ((false, graph, state),extra)

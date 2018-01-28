@@ -271,7 +271,14 @@ let outputs (simulation : t) =
             na (file_line.Data.file_line_text::lines) simulation.files
     end
   | Data.Snapshot snapshot ->
-    simulation.snapshots <- snapshot::simulation.snapshots
+    let already_there x =
+      List.exists (fun y -> x = y.Data.snapshot_file) simulation.snapshots in
+    let snapshot_file =
+      Tools.find_available_name
+        ~already_there snapshot.Data.snapshot_file
+        ~facultative:(string_of_int snapshot.Data.snapshot_event) ~ext:".ka" in
+    let snapshot' = { snapshot with Data.snapshot_file } in
+    simulation.snapshots <- snapshot'::simulation.snapshots
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.TraceStep st -> simulation.trace <- st :: simulation.trace
 
