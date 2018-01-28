@@ -86,7 +86,7 @@ class SnapUIManager {
         let renderer = this.renderer;
         let dataArray = Object.keys(renderer.coloring).map( (d) => {
             let tempObj = {};
-            tempObj[d] = renderer.coloring[d];
+            tempObj[d] = renderer.coloring[d].brighter(1.5);
             return tempObj;
         } );
         

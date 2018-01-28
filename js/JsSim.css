@@ -306,8 +306,9 @@ form {
     display: flex;
     flex-direction: row;
 }
+
 .snapshot-container {
-    flex: 4;
+    flex: 3;
 }
 
 .snapshot-legend {
@@ -326,4 +327,30 @@ form {
 .snapshot-links line {
     stroke:white;
     stroke-opacity: 0.6;
+}
+
+#snap-sidebar {
+    position: absolute !important;
+    display: flex;
+    padding-bottom: 10px;
+    height: 100%;
+    right: 0;
+    width: 25%;
+    background: white;
+}
+
+#sidebar-close-button {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: 3px;
+}
+
+#snap-contactmap {
+    flex: 1;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
