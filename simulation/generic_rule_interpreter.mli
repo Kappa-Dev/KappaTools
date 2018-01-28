@@ -43,7 +43,8 @@ module Make (Instances:Instances_sig.S) : sig
       [rule_id] is mandatory if the rule has an unary rate.*)
 
   val apply_rule :
-    outputs:(Data.t -> unit) -> maxConsecutiveClash:int ->
+    outputs:(Data.t -> unit) ->
+    ?maxConsecutiveBlocked:int -> maxConsecutiveClash:int ->
     Model.t -> Counter.t -> t -> int option * bool * t
   (** [apply_rule ~outputs ~maxConsecutiveClash ?is_blocked model counter st]
       Returns [(corresponding_syntactic_rule, is_final_step, new_state)].
