@@ -65,6 +65,7 @@ type t =
     mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Api_types_t.errors ;
     mutable trace : Trace.t ;
+    inputs : string;
     ast : Ast.parsing_compil;
     contact_map : Contact_map.t ;
     mutable env : Model.t ;
@@ -75,7 +76,7 @@ type t =
     mutable lastyield : float ;
   }
 
-let create_t ~log_form ~log_buffer ~contact_map
+let create_t ~log_form ~log_buffer ~contact_map ~inputs
     ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
     ~state ~init_l ~lastyield ~ast : t = {
   is_running = false; run_finalize = false; counter; log_buffer; log_form;
@@ -87,7 +88,7 @@ let create_t ~log_form ~log_buffer ~contact_map
   files = Mods.StringMap.empty;
   error_messages = [];
   trace = [];
-  ast; contact_map; env; graph; state; init_l;
+  inputs; ast; contact_map; env; graph; state; init_l;
   lastyield;
 }
 
@@ -225,9 +226,15 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                   out
                 | Some theSeed -> theSeed in
               let random_state = Random.State.make [|theSeed|] in
+              let inputs =
+                Format.asprintf "%a"
+                  (Data.print_initial_inputs
+                     ?uuid:None {conf with Configuration.seed = Some theSeed}
+                     env contact_map)
+              init_l in
               let simulation =
                 create_t
-                  ~contact_map ~log_form ~log_buffer ~ast ~env ~counter
+                  ~contact_map ~log_form ~log_buffer ~inputs ~ast ~env ~counter
                   ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
                   ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
                   ~graph:(Rule_interpreter.empty
@@ -602,6 +609,7 @@ let outputs
                t.files ;
              Api_types_t.simulation_output_snapshots =
                t.snapshots ;
+             Api_types_t.simulation_output_inputs = t.inputs ;
              Api_types_t.simulation_output_log_messages =
                Buffer.contents t.log_buffer ;
            }))

@@ -100,12 +100,13 @@ type simulation_state = [ Running
                         | Paused
                         | Stopped ]
 
-type ('plot,'dins,'file_lines,'snapshots,'log_messages)
+type ('plot,'dins,'file_lines,'snapshots,'inputs,'log_messages)
      simulation_output
      = { simulation_output_plot : 'plot ;
          simulation_output_dins : 'dins ;
          simulation_output_file_lines : 'file_lines ;
          simulation_output_snapshots : 'snapshots;
+         simulation_output_inputs : 'inputs;
          simulation_output_log_messages : 'log_messages; }
 
 type simulation_info_output =
@@ -113,6 +114,7 @@ type simulation_info_output =
       int,
       int,
       int,
+      unit,
       int)
      simulation_output
 

@@ -207,28 +207,8 @@ let close ?event () =
 let initial_inputs conf env contact_map init ~filename =
   let inputs = Kappa_files.open_out_fresh filename "" ".ka" in
   let inputs_form = Format.formatter_of_out_channel inputs in
-  let () = Format.fprintf inputs_form "// \"uuid\" : \"%i\"@." uuid in
-  let () = Format.fprintf inputs_form
-      "%a@.%a@." Configuration.print conf
-      (Kappa_printer.env_kappa contact_map) env in
-  let sigs = Model.signatures env in
-  let () = Format.fprintf inputs_form "@.@[<v>%a@]@."
-      (Pp.list Pp.space
-         (fun f (n,r) ->
-            let _,ins_fresh =
-              Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
-            if ins_fresh = [] then
-              Pp.list Pp.space (fun f (nb,tk) ->
-                  Format.fprintf f "@[<h>%%init: %a %a@]"
-                    (Kappa_printer.alg_expr ~env)
-                    (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
-                    (Model.print_token ~env) tk)
-                f r.Primitives.delta_tokens
-              else
-                Format.fprintf f "@[<h>%%init: %a %a@]"
-                  (Kappa_printer.alg_expr ~env) n
-                  (Raw_mixture.print ~created:false ~sigs)
-                  ins_fresh)) init in
+  let () =
+    Data.print_initial_inputs ~uuid conf env contact_map inputs_form init in
   inputsDesc := Some inputs
 
 let input_modifications env event mods =

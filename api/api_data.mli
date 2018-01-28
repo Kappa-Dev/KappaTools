@@ -3,6 +3,7 @@ type simulation_detail_output =
    Api_types_t.din list,
    string list Mods.StringMap.t,
    Api_types_t.snapshot list,
+   string,
    string)
     Api_types_t.simulation_output
 

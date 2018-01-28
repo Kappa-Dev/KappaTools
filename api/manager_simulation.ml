@@ -289,6 +289,9 @@ class manager_simulation
           let filename = "simulation_outputs" in
           let file = Fakezip.open_out (filename^".zip") in
           let () = Fakezip.add_entry
+              t.Api_types_t.simulation_output_inputs
+              file (filename^"/inputs.ka") in
+          let () = Fakezip.add_entry
               t.Api_types_t.simulation_output_log_messages
               file (filename^"/log.txt") in
           let () =

@@ -6,6 +6,32 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let print_initial_inputs ?uuid conf env contact_map inputs_form init =
+  let () = match uuid with
+    | None -> ()
+    | Some uuid -> Format.fprintf inputs_form "// \"uuid\" : \"%i\"@." uuid in
+  let () = Format.fprintf inputs_form
+      "%a@.%a@." Configuration.print conf
+      (Kappa_printer.env_kappa contact_map) env in
+  let sigs = Model.signatures env in
+  Format.fprintf inputs_form "@.@[<v>%a@]@."
+    (Pp.list Pp.space
+       (fun f (n,r) ->
+          let _,ins_fresh =
+            Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
+          if ins_fresh = [] then
+            Pp.list Pp.space (fun f (nb,tk) ->
+                Format.fprintf f "@[<h>%%init: %a %a@]"
+                  (Kappa_printer.alg_expr ~env)
+                  (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
+                  (Model.print_token ~env) tk)
+              f r.Primitives.delta_tokens
+          else
+            Format.fprintf f "@[<h>%%init: %a %a@]"
+              (Kappa_printer.alg_expr ~env) n
+              (Raw_mixture.print ~created:false ~sigs)
+              ins_fresh)) init
+
 type snapshot = {
   snapshot_file : string;
   snapshot_event : int;
