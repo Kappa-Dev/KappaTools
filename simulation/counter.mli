@@ -52,8 +52,8 @@ val reinitialize : t -> unit
 val current_simulation_info : t -> unit Trace.Simulation_info.t
 val next_story : t -> unit Trace.Simulation_info.t
 
-val fill :
-  outputs:(Data.t -> unit) -> t -> dt:float -> (t -> Nbr.t array) -> unit
+val fill : outputs:(t -> float -> unit) -> t -> dt:float -> unit
+val fake_time : t -> float -> t
 
 val one_time_advance : t -> float -> unit
 val one_constructive_event : t -> bool

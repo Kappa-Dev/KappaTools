@@ -371,7 +371,11 @@ let rec perturbate_until_first_backtrack
 let perturbate_with_backtrack ~outputs env counter graph state (ti,pe) =
   let continue = Counter.one_time_correction_event counter ti in
   let () =
-    Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
+    let outputs counter' time =
+      let cand =
+        observables_values env graph (Counter.fake_time counter' time) in
+      if Array.length cand > 1 then outputs (Data.Plot cand) in
+    Counter.fill ~outputs counter ~dt:0. in
   let stop,graph',state' =
     perturbate ~outputs env counter graph state [pe] in
   (not continue||stop,graph',state')
@@ -423,9 +427,13 @@ let a_loop
            | Some p ->
               perturbate_with_backtrack ~outputs env counter graph' state' p
            | None ->
-              (*set time for apply rule *)
-              let () =
-                Counter.fill ~outputs counter ~dt (observables_values env graph') in
+             (*set time for apply rule *)
+             let () =
+               let outputs counter' time =
+                 let cand =
+                   observables_values env graph (Counter.fake_time counter' time) in
+                 if Array.length cand > 1 then outputs (Data.Plot cand) in
+               Counter.fill ~outputs counter ~dt in
               let () = Counter.one_time_advance counter dt' in
 
               if stop then (stop,graph',state') else
@@ -434,7 +442,11 @@ let a_loop
 
       | _ ->
         let () =
-          Counter.fill ~outputs counter ~dt (observables_values env graph) in
+          let outputs counter' time =
+            let cand =
+              observables_values env graph (Counter.fake_time counter' time) in
+            if Array.length cand > 1 then outputs (Data.Plot cand) in
+          Counter.fill ~outputs counter ~dt in
         let () = Counter.one_time_advance counter dt in
         let (stop,graph',state' as pack) = perturbate
             ~outputs env counter graph state state.time_dependent_perts in
@@ -444,7 +456,11 @@ let a_loop
 
 let end_of_simulation ~outputs form env counter graph state =
   let () =
-    Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
+    let outputs counter' time =
+      let cand =
+        observables_values env graph (Counter.fake_time counter' time) in
+      if Array.length cand > 1 then outputs (Data.Plot cand) in
+    Counter.fill ~outputs counter ~dt:0. in
   let () =
     List.iter
       (fun e ->
