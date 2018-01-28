@@ -17,7 +17,15 @@ class Snapshot {
     setData(contact_map,response) {
         let snapshot = this;
         snapshot.data = new DataWareHouse(JSON.parse(response));
-	snapshot.contact_map = JSON.parse(contact_map);
+	snapshot.contact_map = JSON.parse(contact_map);// Beware: may be "null"
+
+	snapshot.contact_map_id_of_node_type = new Map();
+	if (snapshot.contact_map !== null) {
+	    snapshot.contact_map.forEach(function(node,id) {
+		snapshot.contact_map_id_of_node_type.set(node.node_type,id);
+	    });
+	}
+	console.log(snapshot.contact_map_id_of_node_type);
 
 	snapshot.redraw();
     }
