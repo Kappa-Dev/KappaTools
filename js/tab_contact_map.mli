@@ -7,3 +7,4 @@
 (******************************************************************************)
 
 include Ui_common.SubTab
+val contact_map_text : string option React.S.t

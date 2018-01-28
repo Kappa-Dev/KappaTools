@@ -127,7 +127,9 @@ let render_snapshot_graph
   match React.S.value display_format with
   | Graph ->
     let json : string = Data.string_of_snapshot snapshot in
-    snapshot_js##setData (Js.string json)
+    let contact_map =
+      Option_util.unsome "null" (React.S.value Tab_contact_map.contact_map_text) in
+    snapshot_js##setData ~contact_map:(Js.string contact_map) (Js.string json)
   | Kappa -> ()
 
 let select_snapshot snapshot_js =

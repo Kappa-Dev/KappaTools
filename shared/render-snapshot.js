@@ -14,9 +14,10 @@ class Snapshot {
 	this.coloring = coloring;
     }
 
-    setData(response) {
+    setData(contact_map,response) {
         let snapshot = this;
         snapshot.data = new DataWareHouse(JSON.parse(response));
+	snapshot.contact_map = JSON.parse(contact_map);
 
 	snapshot.redraw();
     }
