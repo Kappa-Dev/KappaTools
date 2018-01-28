@@ -49,6 +49,8 @@ let id_of_yojson = function
 
 module Set = Mods.IntSet
 
+module Map = Mods.IntMap
+
 module ObsMap = struct
   include Mods.DynArray
   let dummy x = make 0 x

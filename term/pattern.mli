@@ -165,4 +165,6 @@ val length : t -> int
 
 module Set : SetMap.Set with type elt=id
 
+module Map : SetMap.Map with type elt=id
+
 val counter_value_cc: cc -> Mods.IntMap.elt * int -> int -> int
