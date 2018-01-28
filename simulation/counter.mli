@@ -11,6 +11,7 @@
 module Efficiency : sig
     type t = {
       mutable consecutive : int;
+      mutable consecutive_blocked : int;
       mutable no_more_binary : int;
       mutable no_more_unary : int;
       mutable clashing_instance : int;
@@ -56,6 +57,7 @@ val fill : outputs:(t -> float -> unit) -> t -> dt:float -> unit
 val fake_time : t -> float -> t
 
 val one_time_advance : t -> float -> unit
+val one_blocked_event : t -> bool
 val one_constructive_event : t -> bool
 val one_clashing_instance_event : t -> bool
 val one_no_more_unary_event : t -> bool
@@ -82,6 +84,7 @@ val current_event : t -> int
 val current_story : t -> int
 val nb_null_event : t -> int
 val consecutive_null_event : t -> int
+val consecutive_blocked : t -> int
 
 val get_efficiency : t -> Efficiency.t
 val print_efficiency : Format.formatter -> t -> unit
