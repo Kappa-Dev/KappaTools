@@ -175,9 +175,9 @@ module Make (Instances:Instances_sig.S) = struct
         Matching.reconstruct domain edges matching i patterns.(i) root)
       (Some Matching.empty) instance
 
-  let all_injections ?excp ?unary_rate state_insts domain edges patterna =
+  let all_injections ?excp ?unary_rate ?rule_id state_insts domain edges patterna =
     let out =
-      Instances.fold_instances ?excp state_insts patterna ~init:[]
+      Instances.fold_instances ?excp ?rule_id state_insts patterna ~init:[]
         (fun instance acc ->
            match instance_to_matching domain edges instance patterna with
            | None -> acc
@@ -209,7 +209,7 @@ module Make (Instances:Instances_sig.S) = struct
   let pick_a_rule_instance state random_state domain edges ?rule_id rule =
     let from_patterns () =
       let pats = rule.Primitives.connected_components in
-      Instances.fold_picked_instance
+      Instances.fold_picked_instance ?rule_id
         state.instances random_state pats ~init:(Matching.empty,[])
         (fun id pattern root (inj, rev_roots) ->
            match Matching.reconstruct domain edges inj id pattern root with
@@ -225,7 +225,7 @@ module Make (Instances:Instances_sig.S) = struct
       | None -> from_patterns ()
 
   let adjust_rule_instances ~rule_id ?unary_rate state domain edges ccs rule =
-    let matches = all_injections ?unary_rate state.instances domain edges ccs in
+    let matches = all_injections ?unary_rate ~rule_id state.instances domain edges ccs in
     let matches =
       if state.events_to_block = None then matches
       else matches |> List.filter (fun (matching, _) ->
@@ -275,7 +275,7 @@ module Make (Instances:Instances_sig.S) = struct
       let pat1 = rule.Primitives.connected_components.(0) in
       let pat2 = rule.Primitives.connected_components.(1) in
       let pick_unary_instance_in_cc =
-        Instances.pick_unary_instance_in_cc
+        Instances.pick_unary_instance_in_cc ~rule_id
           state.instances random_state (pat1, pat2) in
       let cc_id = ValMap.random
           random_state
@@ -297,7 +297,7 @@ module Make (Instances:Instances_sig.S) = struct
   let adjust_unary_rule_instances ~rule_id ?max_distance state domain graph pats rule =
     let pattern1 = pats.(0) in let pattern2 = pats.(1) in
     let cands,len =
-      Instances.fold_unary_instances
+      Instances.fold_unary_instances ~rule_id
         state.instances (pattern1, pattern2) ~init:([], 0)
         (fun (root1, root2) (list,len as out) ->
            let inj1 = Matching.reconstruct
@@ -946,7 +946,7 @@ module Make (Instances:Instances_sig.S) = struct
            | None -> Some (loc,None)
            | Some d ->
              Some (loc,Some (max_dist_to_int counter state d))) in
-      match all_injections
+      match all_injections ?rule_id
               ?unary_rate state.instances (Model.domain env) state.edges
               rule.Primitives.connected_components with
       | [] ->
