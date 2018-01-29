@@ -10,32 +10,44 @@ class Layout {
 }
 
 class ContactMap {
-    constructor(id,coloring) {
-        this.id = '#'+id;
+    constructor(id, coloring) {
+        this.id = '#' + id;
+        this.coloring = coloring || [];
     }
 
-    redraw() {
+    redraw(id, tip = true) {
         let map = this;
         let root = d3.select(this.id);
         let margin = { top: 10, right: 10, bottom: 10, left: 10 };
-        let w = d3.select("#editor-panel").node().getBoundingClientRect().width - margin.left - margin.right;
-        let h = d3.select("#editor-panel").node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5 - 34 - 15;
+        let w = d3.select(id).node().getBoundingClientRect().width - margin.left - margin.right;
+        let h = d3.select(id).node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5 - 34 - 15;
         if (map.data) {
-	    map.clearData();
+	        map.clearData();
             let layout = new Layout(map, new Dimension(w, h), margin);
-            let renderer = new Render(root, layout);
+            let renderer = new Render(root, layout, tip, this.coloring, this.selection, this.nodemapping);
             renderer.generateLinks();
             renderer.render();
         }
     }
+
 
     setData(response) {
         let map = this;
         map.data = new DataStorage(JSON.parse(response),0);
         map.data.sortNodes();
         map.data.sortSites();
+	    map.redraw("#editor-panel");
+    }
 
-	map.redraw();
+    // for snapshot contact maps
+    setParsedData(data, id, selection, nodemapping) {
+        let map = this;
+        this.selection = selection;
+        this.nodemapping = nodemapping;
+        map.data = data;
+        map.data.sortNodes();
+        map.data.sortSites();
+        map.redraw(id, false);
     }
 
     clearData() {
@@ -47,13 +59,16 @@ class ContactMap {
 }
 
     class Render {
-        constructor(root, layout) {
+        constructor(root, layout, tip = true, coloring, selection, nodemapping) {
             this.root = root;
             let renderer = this;
             let width = layout.dimension.width;
             let height = layout.dimension.height;
             this.layout = layout;      
             this.centerZoom = true;
+            this.coloring = coloring;
+            this.selection = selection;
+            this.nodemapping = nodemapping;
     
             /* create svg to draw contact maps on */
             let svgWidth = width +
@@ -112,12 +127,12 @@ class ContactMap {
                     this.siteList.push(sites[key]);
                 }
             }
-    
-            let tip = this.tip = new UIManager(this);
-    
-             /* add behavior for reset zoom button */
-            d3.select("#resetZoomButton").on("click", reset);
-    
+            if (tip) {
+                let tip = this.tip = new UIManager(this);
+        
+                /* add behavior for reset zoom button */
+                d3.select("#resetZoomButton").on("click", reset);
+            }
             function reset() {
                 //console.log("reset");
                 container.transition().duration(750)
@@ -134,6 +149,8 @@ class ContactMap {
         }   
     
         render() {
+            console.log(this.selection);
+            console.log(this.nodemapping);
             this.width = this.layout.dimension.width;
             this.height = this.layout.dimension.height;
             this.radius = Math.min(this.width, this.height)/2;
@@ -417,7 +434,10 @@ class ContactMap {
             let siteNum = this.siteNum = this.siteList.length;
             for (let sIndex in this.siteList) {
                 let site = this.siteList[sIndex];
-                let textLength = this.radius/30 + this.svg.selectAll(".siteText").filter( function(d) { return d.data.id === site.id && d.data.agent.id === site.agent.id ;}).node().getComputedTextLength() + paddingSite;
+                let textLength = this.svg.selectAll(".siteText").filter( function(d) { return d.data.id === site.id && d.data.agent.id === site.agent.id ;}).node() ? 
+                    this.radius/30 + this.svg.selectAll(".siteText").filter( function(d) { return d.data.id === site.id && d.data.agent.id === site.agent.id ;}).node().getComputedTextLength() + paddingSite :
+                    this.radius/30 + paddingSite;
+    
                     let gState = this.svg.selectAll('.stateLink')
                         .data(this.siteList);
     
@@ -582,7 +602,7 @@ class ContactMap {
             
             
             let data = this.layout.contactMap.data;
-    
+            //console.log(data);
             let svg = this.svg;
             let gNode = svg.selectAll(".nodeArc")
                         .data(node(data.listNodes()))
@@ -601,8 +621,22 @@ class ContactMap {
                 //.attr("id", function(d,i) { return "nodeArc_" + i;})
                 .style("fill", (d,i) => { 
                     d.clicked = 0;
-                    d.data.color = d3.rgb(c20(i)).darker(1);
+                    if (renderer.coloring[d.data.label]) {
+                        d.data.color = renderer.coloring[d.data.label];
+                    }
+                    else {
+                        d.data.color = d3.rgb(c20(i)).darker(1);
+                        renderer.coloring[d.data.label] = d.data.color; 
+                    }
                     return d3.rgb(c20(i)).brighter(0.5);})
+                .style("opacity", (d,i) => {
+                    if (!this.nodemapping || !this.selection)
+                        return opacity.node_normal;
+                    if (i === this.nodemapping.get(this.selection.label)) {
+                        return opacity.node_normal;
+                    }
+                    return opacity.node_hidden;
+                })
                 .on("mouseover", mouseoverNode)
                 .on("mouseout", mouseoutNode);
             
@@ -779,8 +813,10 @@ class ContactMap {
                     .style("stroke", node.data.color.brighter())
                     .style("stroke-width", 8)
                     .style("stroke-opacity", opacity.line_highlight); 
-    
-                tip.showNode(node);
+                
+                if (renderer.tip) {
+                    tip.showNode(node);
+                }
             
             }
     
@@ -815,7 +851,9 @@ class ContactMap {
                 //targetSites = targetSites.map(function(d) { return data.getSite(d.parentId, d.id); });
                 renderer.resetLinksAndEdges();
     
-                tip.hide();
+                if (renderer.tip) {
+                    tip.hide();
+                }
             }
     /*
             function mouseoverInnerSite(d) {
@@ -881,7 +919,9 @@ class ContactMap {
             function mouseoverSite(d) {
                 let site = d;   
                 //console.log(this);
-                tip.showSite(site);
+                if (renderer.tip) {
+                    tip.showSite(site);
+                }
                 
                 renderer.adjustState(site, this, false, true, true); 
                 if(d.links.length > 0) {
@@ -935,7 +975,9 @@ class ContactMap {
     
             function mouseoutSite(d) {
                 let site = d;          
-                tip.hide(); 
+                if (renderer.tip) {
+                    tip.hide(); 
+                }
                 renderer.adjustState(site, this, true, true, false);   
                 if(d.links.length > 0) {
                     let event = this;

@@ -14,19 +14,17 @@ class Snapshot {
 	this.coloring = coloring;
     }
 
-    setData(contact_map,response) {
+    setData(contact_map, response) {
         let snapshot = this;
         snapshot.data = new DataWareHouse(JSON.parse(response));
-	snapshot.contact_map = JSON.parse(contact_map);// Beware: may be "null"
-
-	snapshot.contact_map_id_of_node_type = new Map();
-	if (snapshot.contact_map !== null) {
-	    snapshot.contact_map.forEach(function(node,id) {
-		snapshot.contact_map_id_of_node_type.set(node.node_type,id);
-	    });
-	}
-	console.log(snapshot.contact_map_id_of_node_type);
-
+        contact_map = JSON.parse(contact_map);// Beware: may be "null"
+        snapshot.node_mappings = new Map();
+        if (contact_map !== null) {
+            contact_map.forEach(function(node,id) {
+            snapshot.node_mappings.set(node.node_type,id);
+            });
+            snapshot.contact_map_data = new DataStorage(contact_map);
+        }
 	snapshot.redraw();
     }
 
@@ -60,6 +58,7 @@ class SnapRender {
         let width = layout.dimension.width;
         let height = layout.dimension.height;
         this.layout = layout;
+        this.isAtRoot = true;
 
         let svgWidth = width +
                             this.layout.margin.left +
@@ -98,18 +97,20 @@ class SnapRender {
 
     
         function zoomout () {
-            d3.select("#snap-form").selectAll("input")
-            .attr('disabled', null);
-            d3.select("#force-container").remove();
-            renderer.rerender();
-            d3.selectAll(".treeSpecies").filter(d => d.data.id === renderer.zoomId)
-                .transition()
-                    .duration(750)         
-                    .attr("transform", renderer.zoomTransform )           
-                .select("rect")
-                    .attr("width", d => { return renderer.zoomWidth; })
-                    .attr("height", d => { return renderer.zoomHeight; });
-            
+            if(!renderer.isAtRoot) {
+                d3.select("#snap-form").selectAll("input")
+                .attr('disabled', null);
+                d3.select("#force-container").remove();
+                renderer.rerender();
+                d3.selectAll(".treeSpecies").filter(d => d.data.id === renderer.zoomId)
+                    .transition()
+                        .duration(750)         
+                        .attr("transform", renderer.zoomTransform )           
+                    .select("rect")
+                        .attr("width", d => { return renderer.zoomWidth; })
+                        .attr("height", d => { return renderer.zoomHeight; });
+                renderer.isAtRoot = true;
+            }
             renderer.dblclicked = false;
 
         }
@@ -200,7 +201,7 @@ class SnapRender {
                     //d3.select(".legend-container").style("opacity", 0);
 
                 let element = d;
-                   console.log(element.data.id);
+                //console.log(element.data.id);
                    
                 let zoomDOM = d3.selectAll(".treeSpecies").filter(d => d.data.id === element.data.id).raise();
                     
@@ -217,8 +218,6 @@ class SnapRender {
                 renderer.zoomWidth = zoomDOM.select("rect").attr("width");
                 renderer.zoomTransform = zoomDOM.attr("transform");
 
-                
-
                 d3.selectAll(".treeSpecies").filter(d => d.data.id === element.data.id)
                 .transition()
                     .attr("transform", d => { let x = (layout.margin.left + layout.margin.right)/2;
@@ -232,18 +231,20 @@ class SnapRender {
                 renderer.dblclicked = true;
                 renderer.zoomId = element.data.id;
                 renderer.renderForceDirected(d.data, d.data.id, height, width);
-           
+                renderer.isAtRoot = false;
             }
+           
+
         }
         function mouseoverSpecies(d) {
             let species = d;
-            svg.selectAll(".treeRects").filter(d => d.parent.data.name === species.data.name).attr("fill", d => renderer.coloring[d.data.name].darker());
+            svg.selectAll(".treeRects").filter(d => d.parent.data.name === species.data.name).attr("fill", d => renderer.coloring[d.data.name].brighter(1.5).darker());
             renderer.tooltip.showSpecies(d);
         }
 
         function mouseoutSpecies(d) {
             let species = d;
-            svg.selectAll(".treeRects").filter(d => d.parent.data.name === species.data.name && renderer.marking[d.parent.data.name] !== 1 ).attr("fill", d => renderer.coloring[d.data.name]);           
+            svg.selectAll(".treeRects").filter(d => d.parent.data.name === species.data.name && renderer.marking[d.parent.data.name] !== 1 ).attr("fill", d => renderer.coloring[d.data.name].brighter(1.5));           
             renderer.tooltip.hideSpecies();
         }
 
@@ -261,9 +262,9 @@ class SnapRender {
             svg.selectAll(".treeRects").filter(d => d.parent.data.name === species.data.name)
                 .attr("fill", d => { 
                     if (renderer.marking[d.parent.data.name] === 1 ) {
-                        return renderer.coloring[d.data.name].darker();
+                        return renderer.coloring[d.data.name].brighter(1.5).darker();
                     }
-                    return renderer.coloring[d.data.name]; 
+                    return renderer.coloring[d.data.name].brighter(1.5); 
                 });  
             //console.log(renderer.marking);
         }
@@ -320,8 +321,8 @@ class SnapRender {
                             renderer.coloring[d.data.name] = d3.rgb(c20(Object.keys(renderer.coloring).length));
                         } 
                         if (renderer.marking[d.parent.data.name] === 1)
-                            return renderer.coloring[d.data.name].darker();
-                        return renderer.coloring[d.data.name]; });
+                            return renderer.coloring[d.data.name];
+                        return renderer.coloring[d.data.name].brighter(1.5); });
                     //.style('pointer-events', 'none');
 
             node.exit().remove();
@@ -393,7 +394,8 @@ class SnapRender {
             .data(nodeData)
             .enter().append("circle")
             .attr("r", radius)
-            .attr("fill", d => renderer.coloring[d.label] )
+            .attr("fill", d => renderer.coloring[d.label].brighter(1.5) )
+            .on("click", d => showContactSideBar(d))
             .call(d3.drag()
                 .on("start", dragstarted)
                 .on("drag", dragged)
@@ -436,10 +438,53 @@ class SnapRender {
             d.fx = null;
             d.fy = null;
         }
+
+        function showContactSideBar(nodeData) {
+            if (!renderer.sidebar) {
+                //console.log('show sidebar');
+                //console.log(nodeData)
+                let sidebar = d3.select(".render-container").append("div")
+                    .attr("id", "snap-sidebar");
+
+                let closeButton = sidebar.append("div")
+                    .attr("id", "sidebar-close-button")
+                    .on("click", hideContactSideBar);
+
+               sidebar.append("div") 
+                    .attr("id", "snap-contactmap");
+                
+                closeButton.append("svg")
+                    .attr("width", "15px")
+                    .attr("height", "80px")
+                    .attr("viewBox", "0 0 20 80")
+                .append("polyline")
+                    .attr("fill", "none")
+                    .attr("stroke", "#000000")
+                    .attr("stroke-width", 2)
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("points", "0.375,0 10,25 0.375,50" );               
+
+                renderer.sidebar = true;
+            }
+            else {
+                d3.select("#snap-contactmap").remove();
+                d3.select("#snap-sidebar").append("div") 
+                .attr("id", "snap-contactmap");
+            }
+            let snapContactMap = new ContactMap("snap-contactmap", renderer.coloring);
+            snapContactMap.setParsedData(renderer.layout.snapshot.contact_map_data, "#snap-sidebar", nodeData, renderer.layout.snapshot.node_mappings);
+            
+        }
+
+        function hideContactSideBar() {
+            renderer.sidebar = false;
+            d3.select("#snap-sidebar").remove();
+        }
     }
 
     removeNodes() {
         d3.selectAll(".treeNodes").remove();
     }
-
+    
 }
