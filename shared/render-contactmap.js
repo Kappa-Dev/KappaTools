@@ -22,9 +22,13 @@ class ContactMap {
         let w = d3.select(id).node().getBoundingClientRect().width - margin.left - margin.right;
         let h = d3.select(id).node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5 - 34 - 15;
         if (map.data) {
-	    map.clearData();
+	        map.clearData();
             let layout = new Layout(map, new Dimension(w, h), margin);
+<<<<<<< Updated upstream
             let renderer = new Render(root, layout, tip);
+=======
+            let renderer = new Render(root, layout, tip, this.coloring, this.selection, this.nodemapping);
+>>>>>>> Stashed changes
             renderer.generateLinks();
             renderer.render();
         }
@@ -36,7 +40,10 @@ class ContactMap {
         map.data = new DataStorage(JSON.parse(response),0);
         map.data.sortNodes();
         map.data.sortSites();
+	    map.redraw("#editor-panel");
+    }
 
+<<<<<<< Updated upstream
 	    map.redraw("#editor-panel");
     }
 
@@ -46,6 +53,16 @@ class ContactMap {
         map.data.sortNodes();
         map.data.sortSites();
 
+=======
+    // for snapshot contact maps
+    setParsedData(data, id, selection, nodemapping) {
+        let map = this;
+        this.selection = selection;
+        this.nodemapping = nodemapping;
+        map.data = data;
+        map.data.sortNodes();
+        map.data.sortSites();
+>>>>>>> Stashed changes
         map.redraw(id, false);
     }
 
@@ -58,13 +75,20 @@ class ContactMap {
 }
 
     class Render {
+<<<<<<< Updated upstream
         constructor(root, layout, tip = true) {
+=======
+        constructor(root, layout, tip = true, coloring, selection, nodemapping) {
+>>>>>>> Stashed changes
             this.root = root;
             let renderer = this;
             let width = layout.dimension.width;
             let height = layout.dimension.height;
             this.layout = layout;      
             this.centerZoom = true;
+            this.coloring = coloring;
+            this.selection = selection;
+            this.nodemapping = nodemapping;
     
             /* create svg to draw contact maps on */
             let svgWidth = width +
@@ -145,6 +169,8 @@ class ContactMap {
         }   
     
         render() {
+            console.log(this.selection);
+            console.log(this.nodemapping);
             this.width = this.layout.dimension.width;
             this.height = this.layout.dimension.height;
             this.radius = Math.min(this.width, this.height)/2;
@@ -596,7 +622,11 @@ class ContactMap {
             
             
             let data = this.layout.contactMap.data;
+<<<<<<< Updated upstream
             console.log(data);
+=======
+            //console.log(data);
+>>>>>>> Stashed changes
             let svg = this.svg;
             let gNode = svg.selectAll(".nodeArc")
                         .data(node(data.listNodes()))
@@ -615,6 +645,7 @@ class ContactMap {
                 //.attr("id", function(d,i) { return "nodeArc_" + i;})
                 .style("fill", (d,i) => { 
                     d.clicked = 0;
+<<<<<<< Updated upstream
                     if (renderer.layout.contactMap.coloring[d.data.label]) {
                         d.data.color = renderer.layout.contactMap.coloring[d.data.label];
                     }
@@ -623,7 +654,24 @@ class ContactMap {
                         renderer.layout.contactMap.coloring[d.data.label] = d.data.color; 
                     }
                     
+=======
+                    if (renderer.coloring[d.data.label]) {
+                        d.data.color = renderer.coloring[d.data.label];
+                    }
+                    else {
+                        d.data.color = d3.rgb(c20(i)).darker(1);
+                        renderer.coloring[d.data.label] = d.data.color; 
+                    }
+>>>>>>> Stashed changes
                     return d3.rgb(c20(i)).brighter(0.5);})
+                .style("opacity", (d,i) => {
+                    if (!this.nodemapping || !this.selection)
+                        return opacity.node_normal;
+                    if (i === this.nodemapping.get(this.selection.label)) {
+                        return opacity.node_normal;
+                    }
+                    return opacity.node_hidden;
+                })
                 .on("mouseover", mouseoverNode)
                 .on("mouseout", mouseoutNode);
             
