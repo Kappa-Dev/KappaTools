@@ -20,7 +20,7 @@ val merge_cc : t -> mod_ccs_cache -> (int * int) option -> t
 
 val update_roots :
   t -> bool -> Pattern.Set.t -> Edges.t ->
-  mod_ccs_cache -> Pattern.Set.elt -> int -> unit
+  mod_ccs_cache -> Pattern.id -> int -> unit
 
 val number : t -> Pattern.id -> int
 
