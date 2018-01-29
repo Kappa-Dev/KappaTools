@@ -62,6 +62,8 @@ class new_manager : Api.concrete_manager =
     method terminate =
       let () = sim_process#terminate in
       sa_process#terminate
+    method is_computing =
+      self#sim_is_computing || Kasa_client.is_computing sa_mailbox
   end
 
 let bind_projects f id projects =
