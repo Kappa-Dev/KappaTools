@@ -65,7 +65,8 @@ type t =
     mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Api_types_t.errors ;
     mutable trace : Trace.t ;
-    inputs : string;
+    inputs_buffer : Buffer.t;
+    inputs_form : Format.formatter;
     ast : Ast.parsing_compil;
     contact_map : Contact_map.t ;
     mutable env : Model.t ;
@@ -76,7 +77,7 @@ type t =
     mutable lastyield : float ;
   }
 
-let create_t ~log_form ~log_buffer ~contact_map ~inputs
+let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
     ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
     ~state ~init_l ~lastyield ~ast : t = {
   is_running = false; run_finalize = false; counter; log_buffer; log_form;
@@ -88,7 +89,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~inputs
   files = Mods.StringMap.empty;
   error_messages = [];
   trace = [];
-  inputs; ast; contact_map; env; graph; state; init_l;
+  inputs_buffer; inputs_form; ast; contact_map; env; graph; state; init_l;
   lastyield;
 }
 
@@ -175,6 +176,8 @@ let rec compile_file
 let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
+  let inputs_buffer = Buffer.create 512 in
+  let inputs_form = Format.formatter_of_buffer inputs_buffer in
   let post_parse ast =
     let (conf,_,_,_,_) =
       Configuration.parse ast.Ast.configurations in
@@ -226,15 +229,14 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                   out
                 | Some theSeed -> theSeed in
               let random_state = Random.State.make [|theSeed|] in
-              let inputs =
-                Format.asprintf "%a"
-                  (Data.print_initial_inputs
-                     ?uuid:None {conf with Configuration.seed = Some theSeed}
-                     env contact_map)
-              init_l in
+              let () =
+                Data.print_initial_inputs
+                  ?uuid:None {conf with Configuration.seed = Some theSeed}
+                  env contact_map inputs_form init_l in
               let simulation =
                 create_t
-                  ~contact_map ~log_form ~log_buffer ~inputs ~ast ~env ~counter
+                  ~contact_map ~log_form ~log_buffer ~inputs_buffer ~inputs_form
+                  ~ast ~env ~counter
                   ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
                   ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
                   ~graph:(Rule_interpreter.empty
@@ -513,10 +515,17 @@ let perturbation
                 ~outputs:(interactive_outputs log_form t)
                 ~max_sharing:false ~syntax_version:Ast.V4)
              t.contact_map t.env t.counter t.graph t.state e >>=
-           fun (_,(env',(_,graph'',state'))) ->
+           fun (e',(env',(_,graph'',state'))) ->
            let () = t.env <- env' in
            let () = t.graph <- graph'' in
            let () = t.state <- state' in
+           let () =
+             Format.fprintf
+               t.inputs_form "%%mod: [E] = %i do %a@."
+               (Counter.current_event t.counter)
+               (Pp.list ~trailing:Pp.colon Pp.colon
+                  (Kappa_printer.modification ~env:t.env))
+               e' in
            Lwt.return (Result_util.ok (Buffer.contents log_buffer))
          with ExceptionDefn.Syntax_Error (message,region) ->
            Lwt_result.fail [Api_data.api_message_errors ~region message])
@@ -609,7 +618,8 @@ let outputs
                t.files ;
              Api_types_t.simulation_output_snapshots =
                t.snapshots ;
-             Api_types_t.simulation_output_inputs = t.inputs ;
+             Api_types_t.simulation_output_inputs =
+               Buffer.contents t.inputs_buffer ;
              Api_types_t.simulation_output_log_messages =
                Buffer.contents t.log_buffer ;
            }))
