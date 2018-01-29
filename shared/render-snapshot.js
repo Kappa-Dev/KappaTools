@@ -201,11 +201,7 @@ class SnapRender {
                     //d3.select(".legend-container").style("opacity", 0);
 
                 let element = d;
-<<<<<<< Updated upstream
-                console.log(element.data.id);
-=======
                 //console.log(element.data.id);
->>>>>>> Stashed changes
                    
                 let zoomDOM = d3.selectAll(".treeSpecies").filter(d => d.data.id === element.data.id).raise();
                     
@@ -321,7 +317,6 @@ class SnapRender {
                     .attr("width", d => d.x1 - d.x0 )
                     .attr("height", d => d.y1 - d.y0 )
                     .attr("fill", (d, i) => { 
-                        console.log(d);
                         if (renderer.coloring[d.data.name] === undefined) {
                             renderer.coloring[d.data.name] = d3.rgb(c20(Object.keys(renderer.coloring).length));
                         } 
@@ -445,16 +440,9 @@ class SnapRender {
         }
 
         function showContactSideBar(nodeData) {
-<<<<<<< Updated upstream
-            console.log(nodeData);
-            if (!renderer.sidebar) {
-                console.log('show sidebar');
-                console.log(nodeData)
-=======
             if (!renderer.sidebar) {
                 //console.log('show sidebar');
                 //console.log(nodeData)
->>>>>>> Stashed changes
                 let sidebar = d3.select(".render-container").append("div")
                     .attr("id", "snap-sidebar");
 
@@ -484,13 +472,8 @@ class SnapRender {
                 d3.select("#snap-sidebar").append("div") 
                 .attr("id", "snap-contactmap");
             }
-<<<<<<< Updated upstream
-            let snapContactMap = new ContactMap("snap-contactmap");
-            snapContactMap.setParsedData(renderer.layout.snapshot.contact_map_data, "#snap-sidebar");
-=======
             let snapContactMap = new ContactMap("snap-contactmap", renderer.coloring);
             snapContactMap.setParsedData(renderer.layout.snapshot.contact_map_data, "#snap-sidebar", nodeData, renderer.layout.snapshot.node_mappings);
->>>>>>> Stashed changes
             
         }
 

@@ -24,11 +24,7 @@ class ContactMap {
         if (map.data) {
 	        map.clearData();
             let layout = new Layout(map, new Dimension(w, h), margin);
-<<<<<<< Updated upstream
-            let renderer = new Render(root, layout, tip);
-=======
             let renderer = new Render(root, layout, tip, this.coloring, this.selection, this.nodemapping);
->>>>>>> Stashed changes
             renderer.generateLinks();
             renderer.render();
         }
@@ -43,17 +39,6 @@ class ContactMap {
 	    map.redraw("#editor-panel");
     }
 
-<<<<<<< Updated upstream
-	    map.redraw("#editor-panel");
-    }
-
-    setParsedData(data, id) {
-        let map = this;
-        map.data = data;
-        map.data.sortNodes();
-        map.data.sortSites();
-
-=======
     // for snapshot contact maps
     setParsedData(data, id, selection, nodemapping) {
         let map = this;
@@ -62,7 +47,6 @@ class ContactMap {
         map.data = data;
         map.data.sortNodes();
         map.data.sortSites();
->>>>>>> Stashed changes
         map.redraw(id, false);
     }
 
@@ -75,11 +59,7 @@ class ContactMap {
 }
 
     class Render {
-<<<<<<< Updated upstream
-        constructor(root, layout, tip = true) {
-=======
         constructor(root, layout, tip = true, coloring, selection, nodemapping) {
->>>>>>> Stashed changes
             this.root = root;
             let renderer = this;
             let width = layout.dimension.width;
@@ -622,11 +602,7 @@ class ContactMap {
             
             
             let data = this.layout.contactMap.data;
-<<<<<<< Updated upstream
-            console.log(data);
-=======
             //console.log(data);
->>>>>>> Stashed changes
             let svg = this.svg;
             let gNode = svg.selectAll(".nodeArc")
                         .data(node(data.listNodes()))
@@ -645,16 +621,6 @@ class ContactMap {
                 //.attr("id", function(d,i) { return "nodeArc_" + i;})
                 .style("fill", (d,i) => { 
                     d.clicked = 0;
-<<<<<<< Updated upstream
-                    if (renderer.layout.contactMap.coloring[d.data.label]) {
-                        d.data.color = renderer.layout.contactMap.coloring[d.data.label];
-                    }
-                    else {
-                        d.data.color = d3.rgb(c20(i)).darker(1);
-                        renderer.layout.contactMap.coloring[d.data.label] = d.data.color; 
-                    }
-                    
-=======
                     if (renderer.coloring[d.data.label]) {
                         d.data.color = renderer.coloring[d.data.label];
                     }
@@ -662,7 +628,6 @@ class ContactMap {
                         d.data.color = d3.rgb(c20(i)).darker(1);
                         renderer.coloring[d.data.label] = d.data.color; 
                     }
->>>>>>> Stashed changes
                     return d3.rgb(c20(i)).brighter(0.5);})
                 .style("opacity", (d,i) => {
                     if (!this.nodemapping || !this.selection)
