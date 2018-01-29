@@ -91,12 +91,13 @@ module Make (Instances:Instances_sig.S) : sig
 
   (** {6 Blocking events} *)
 
-  type blocking_predicate =
+  type event_predicate =
     int option -> Matching.t ->
+    (Instantiation.concrete Instantiation.test) list ->
     (Instantiation.concrete Instantiation.action) list ->
     bool
 
-  val set_events_to_block : blocking_predicate option -> t -> t
+  val set_events_to_block : event_predicate option -> t -> t
 
   (** {6 Stories} *)
 
