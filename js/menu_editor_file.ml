@@ -178,7 +178,7 @@ let content () =
                 (Html.a_disabled ())
                 (React.S.map
                    (fun model ->
-                      match model.State_project.model_project_id with
+                      match model.State_project.model_current_id with
                       | Some _ -> false
                       | None -> true)
                    State_project.model

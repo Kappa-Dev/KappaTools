@@ -846,7 +846,7 @@ let content () =
            (React.S.bind
               State_project.model
               (fun model ->
-                 match model.State_project.model_project_id with
+                 match model.State_project.model_current_id with
                  | None -> React.S.const [ "hide" ]
                  | Some _ -> React.S.const [ "panel"; "panel-default" ]
               )

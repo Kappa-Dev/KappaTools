@@ -17,6 +17,8 @@ type parameters = {
 
 type a_project = {
   project_id : string;
+  project_is_computing : bool React.S.t;
+  project_watcher_cancel : bool ref;
   project_manager : Api.concrete_manager;
 }
 
@@ -28,15 +30,21 @@ type state = {
   project_parameters : parameters Mods.StringMap.t;
 }
 
+type project_model = {
+  model_project_id : string;
+  model_project_is_computing : bool React.S.t;
+}
+
 type model = {
-  model_project_id : string option ;
-  model_project_ids : string list ;
+  model_current_id : string option ;
+  model_catalog : project_model list ;
   model_project_version : int ;
   model_parameters : parameters ;
 }
 
 let project_equal a b = a.project_id = b.project_id
-let catalog_equal = List.for_all2 project_equal
+let catalog_equal x y =
+  try List.for_all2 project_equal x y with Invalid_argument _ -> false
 let state_equal a b =
   Option_util.equal project_equal a.project_current b.project_current &&
   a.project_version = b.project_version &&
@@ -44,6 +52,16 @@ let state_equal a b =
     (fun x y  -> compare x y = 0)
     a.project_parameters b.project_parameters &&
   catalog_equal a.project_catalog b.project_catalog
+
+let model_equal a b =
+  Option_util.equal String.equal a.model_current_id b.model_current_id &&
+  (try
+     List.for_all2
+       (fun x y -> x.model_project_id = y.model_project_id)
+       a.model_catalog b.model_catalog
+   with Invalid_argument _ -> false) &&
+  a.model_project_version = b.model_project_version &&
+  a.model_parameters = b.model_parameters
 
 let default_parameters = {
   plot_period = 1.;
@@ -111,6 +129,15 @@ let update_state me project_catalog default_parameters project_parameters =
            Lwt.return (Api_common.result_messages errors))
     )
 
+let computing_watcher manager setter =
+  let delay = 1. in
+  let cancelled = ref false in
+  let rec loop () =
+    let () = setter manager#is_computing in
+    if !cancelled then Lwt.return_unit else Lwt_js.sleep delay >>= loop in
+  let () = Lwt.async loop in
+  cancelled
+
 let add_project is_new project_id : unit Api.result Lwt.t =
   let catalog = (React.S.value state).project_catalog in
   (try
@@ -122,7 +149,11 @@ let add_project is_new project_id : unit Api.result Lwt.t =
      State_runtime.create_manager ~is_new project_id >>=
      (Api_common.result_bind_lwt
         ~ok:(fun project_manager ->
-            let me = {project_id; project_manager } in
+            let project_is_computing, set_computes = React.S.create true in
+            let project_watcher_cancel =
+              computing_watcher project_manager (set_computes ?step:None) in
+            let me = {project_id; project_manager;
+                      project_is_computing; project_watcher_cancel } in
             let default_parameters =
               (React.S.value state).default_parameters in
             let params =
@@ -138,24 +169,30 @@ let create_project project_id = add_project true project_id
 let set_project project_id = add_project false project_id
 
 let dummy_model = {
-  model_project_id = None;
-  model_project_ids = [];
+  model_current_id = None;
+  model_catalog = [];
   model_project_version = -1;
   model_parameters = default_parameters;
 }
 
 let model : model React.signal =
   React.S.map
+    ~eq:model_equal
     (fun state ->
-       let model_project_ids =
-         List.map (fun p -> p.project_id) state.project_catalog in
+       let model_catalog =
+         List.map
+           (fun p -> {
+                model_project_id = p.project_id;
+                model_project_is_computing = p.project_is_computing;
+              })
+           state.project_catalog in
        let model_parameters = match state.project_current with
          | None -> state.default_parameters
          | Some proj -> Mods.StringMap.find_default
            state.default_parameters proj.project_id state.project_parameters in
-       { model_project_id =
+       { model_current_id =
            Option_util.map (fun x -> x.project_id) state.project_current;
-         model_project_ids = model_project_ids ;
+         model_catalog;
          model_project_version = state.project_version ;
          model_parameters;
        })
@@ -200,6 +237,7 @@ let remove_project project_id =
         state.project_catalog in
     remove_files current.project_manager >>=
     (fun out' ->
+       let () = current.project_watcher_cancel := true in
        let project_catalog =
          List.filter (fun x -> x.project_id <> current.project_id)
            state.project_catalog in

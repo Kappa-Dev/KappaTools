@@ -336,7 +336,7 @@ let _ =
                Lwt_result.fail e) >>=
             fun out -> Lwt.return (Api_common.result_lift out)
          ))
-    (React.S.on tab_is_active
+    (React.S.on ~eq:State_project.model_equal tab_is_active
        State_project.dummy_model State_project.model)
     accuracy fwd bwd total origin
 

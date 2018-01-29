@@ -13,13 +13,19 @@ type parameters = {
   store_trace : bool;
 }
 
+type project_model = {
+  model_project_id : string;
+  model_project_is_computing : bool React.S.t;
+}
+
 type model = {
-  model_project_id : string option ;
-  model_project_ids : string list ;
+  model_current_id : string option ;
+  model_catalog : project_model list ;
   model_project_version : int ;
   model_parameters : parameters ;
 }
 
+val model_equal : model -> model -> bool
 val dummy_model : model
 val model : model React.signal
 

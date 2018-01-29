@@ -190,7 +190,7 @@ let content () =
               fun out -> Lwt.return (Api_common.result_lift out)
            )
       )
-      (React.S.on tab_is_active
+      (React.S.on ~eq:State_project.model_equal tab_is_active
          State_project.dummy_model State_project.model) in
   [ Tyxml_js.R.Html5.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]

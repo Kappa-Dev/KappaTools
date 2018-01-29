@@ -36,11 +36,12 @@ let content () =
              (fun model ->
                 let acc =
                   List.rev_map
-                    (fun project_id ->
+                    (fun {State_project.model_project_id;
+                          State_project.model_project_is_computing} ->
                        let li_class =
-                         if match model.State_project.model_project_id with
+                         if match model.State_project.model_current_id with
                            | Some current_project_id ->
-                             current_project_id = project_id
+                             current_project_id = model_project_id
                            | None -> false then
                            [ "active" ]
                          else
@@ -51,19 +52,28 @@ let content () =
                            Dom.handler
                              (fun event ->
                                 let () = Panel_projects_controller.close_project
-                                    project_id in
+                                    model_project_id in
                                 let () = Dom_html.stopPropagation event in
                                 Js._false) in
+                       let computing =
+                         let classes =
+                           React.S.map
+                             (fun b ->
+                                if b then ["glyphicon";"glyphicon-refresh"]
+                                else ["glyphicon";"glyphicon-ok"])
+                             model_project_is_computing in
+                         Html.span ~a:[Tyxml_js.R.Html5.a_class classes] [] in
                        let a_project =
-                         Html.a [ Html.cdata project_id; span_close] in
+                         Html.a
+                           [ computing; Html.cdata (" "^model_project_id); span_close] in
                        let () = (Tyxml_js.To_dom.of_a a_project)##.onclick :=
                            Dom.handler
                              (fun _ ->
                                 let () = Panel_projects_controller.set_project
-                                    project_id in
+                                    model_project_id in
                                 Js._true) in
                        Html.li ~a:[ Html.a_class li_class ] [a_project])
-                    model.State_project.model_project_ids in
+                    model.State_project.model_catalog in
                 List.rev_append acc [li_new; li_settings])
              State_project.model));
      Ui_common.create_modal
