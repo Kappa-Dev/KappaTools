@@ -54,7 +54,8 @@ let state_equal a b =
   catalog_equal a.project_catalog b.project_catalog
 
 let model_equal a b =
-  Option_util.equal String.equal a.model_current_id b.model_current_id &&
+  Option_util.equal
+    (fun x y -> String.compare x y = 0) a.model_current_id b.model_current_id &&
   (try
      List.for_all2
        (fun x y -> x.model_project_id = y.model_project_id)
