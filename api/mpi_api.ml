@@ -422,6 +422,8 @@ class type virtual manager_mpi_type =
     method private receive : string -> unit
 
     inherit Api.manager
+    method private sim_is_computing : bool
+
     method virtual is_running : bool
   end
 
@@ -464,5 +466,6 @@ class virtual manager () : manager_mpi_type =
         Lwt.return
           (Api_common.result_error_msg "Kappa has died")
 
+    method private sim_is_computing = not (IntMap.is_empty context.mailboxes)
     inherit manager_base ()
   end

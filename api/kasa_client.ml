@@ -20,10 +20,15 @@ let reply_of_string x =
 
 let receive mailbox x =
   match reply_of_string x with
-  | Some id, out -> Lwt.wakeup (Hashtbl.find mailbox id) out
+  | Some id, out ->
+    let thread = Hashtbl.find mailbox id in
+    let () = Hashtbl.remove mailbox id in
+    Lwt.wakeup thread out
   | None, _ -> ()
 
 let new_mailbox () = Hashtbl.create 2
+
+let is_computing mailbox = Hashtbl.length mailbox <> 0
 
 class virtual new_client ~post (mailbox : mailbox) :
   Api.manager_static_analysis =

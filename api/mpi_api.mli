@@ -22,6 +22,8 @@ class type virtual manager_mpi_type =
     method private receive : string -> unit
 
     inherit Api.manager
+    method private sim_is_computing : bool
+
     method virtual is_running : bool
   end
 

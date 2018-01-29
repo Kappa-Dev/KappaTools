@@ -12,8 +12,13 @@ exception TimeOut
 
 open Lwt.Infix
 
+let request_up v = incr v
+let request_down v = decr v
+let is_computing v = !v <> 0
+
 let send
     ?(timeout : float option)
+    request_count
     (url : string)
     (meth : Common.meth)
     ?(data : string option)
@@ -43,21 +48,24 @@ let send
         else
           let response = hydrate response_text in
           Api_common.result_ok response in
+    let () = request_down request_count in
     let () = Lwt.wakeup feeder result in ()
   in
+  let () = request_up request_count in
   let () = Common.ajax_request ~url ~meth ?timeout ?data ~handler in
   reply
 
 class manager
     ?(timeout:float option)
     ~url ~project_id =
+  let request_count = ref 0 in
   object(self)
-  method message :
+    method message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
     | `FileCreate file ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `POST
         ~data:(Api_types_j.string_of_file file)
@@ -65,27 +73,27 @@ class manager
            (`FileCreate (Mpi_message_j.file_metadata_of_string result)))
     | `FileDelete file_id ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `DELETE
         (fun _ -> `FileDelete)
     | `FileGet file_id ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `GET
         (fun result ->
            (`FileGet (Mpi_message_j.file_of_string result)))
     | `FileCatalog ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `GET
         (fun result ->
            (`FileCatalog (Mpi_message_j.file_catalog_of_string result)))
     | `FileUpdate (file_id,file_modification) ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `PUT
         ~data:(Api_types_j.string_of_file_modification file_modification)
@@ -93,7 +101,7 @@ class manager
              (`FileUpdate (Mpi_message_j.file_metadata_of_string result)))
     | `ProjectParse (overwrite) ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
         `POST
         ~data:(Yojson.Safe.to_string
@@ -106,7 +114,7 @@ class manager
              (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
     | `SimulationContinue pause_condition ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/continue"
            url project_id)
@@ -115,7 +123,7 @@ class manager
         (fun _ -> (`SimulationContinue))
     | `SimulationDelete ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation"
            url
@@ -124,7 +132,7 @@ class manager
         (fun _ -> (`SimulationDelete))
     | `SimulationDetailFileLine file_line_id ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/filelines/%s"
            url
@@ -139,7 +147,7 @@ class manager
            (`SimulationDetailFileLine lines))
     | `SimulationDetailDIN flux_map_id ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/DIN/%s"
            url
@@ -150,7 +158,7 @@ class manager
              (`SimulationDetailDIN (Mpi_message_j.din_of_string result)))
     | `SimulationDetailLogMessage ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/logmessages"
            url
@@ -174,7 +182,7 @@ class manager
                | Some plot_limit_points -> [("plot_limit_points",string_of_int plot_limit_points)])
              )) in
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/plot"
            url
@@ -185,7 +193,7 @@ class manager
              (`SimulationDetailPlot (Mpi_message_j.plot_of_string result)))
     | `SimulationDetailSnapshot snapshot_id ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/snapshots/%s"
            url
@@ -197,7 +205,7 @@ class manager
               (Mpi_message_j.snapshot_detail_of_string result)))
     | `SimulationInfo ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation"
            url
@@ -207,7 +215,7 @@ class manager
              (`SimulationInfo (Mpi_message_j.simulation_info_of_string result)))
     | `SimulationEfficiency ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/efficiency"
            url
@@ -218,7 +226,7 @@ class manager
                         (Mpi_message_j.simulation_efficiency_of_string result)))
     | `SimulationTrace ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/trace"
            url
@@ -227,7 +235,7 @@ class manager
         (fun s -> (`SimulationTrace s))
     | `SimulationOutputsZip ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/outputs"
            url
@@ -236,7 +244,7 @@ class manager
         (fun s -> (`SimulationOutputsZip s))
     | `SimulationCatalogFileLine ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/filelines"
            url
@@ -247,7 +255,7 @@ class manager
                         (Mpi_message_j.file_line_catalog_of_string result)))
     | `SimulationCatalogDIN ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/DIN"
            url
@@ -258,7 +266,7 @@ class manager
                         (Mpi_message_j.din_catalog_of_string result)))
     | `SimulationCatalogSnapshot ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/snapshots"
            url
@@ -269,7 +277,7 @@ class manager
                         (Mpi_message_j.snapshot_catalog_of_string result)))
     | `SimulationPause ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/pause"
            url
@@ -278,7 +286,7 @@ class manager
         (fun _ -> `SimulationPause)
     | `SimulationParameter ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/parameter"
            url
@@ -289,7 +297,7 @@ class manager
                         (Mpi_message_j.simulation_parameter_of_string result)))
     | `SimulationIntervention simulation_intervention ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation/intervention"
            url
@@ -303,7 +311,7 @@ class manager
                 (Yojson.Safe.init_lexer ()) (Lexing.from_string result)))
     | `SimulationStart simulation_parameter ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/simulation"
            url
@@ -319,14 +327,14 @@ class manager
   method rest_message = function
     | `EnvironmentInfo ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2" url)
         `GET
         (fun result ->
            (`EnvironmentInfo (Mpi_message_j.environment_info_of_string result)))
     | `ProjectCatalog ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects" url)
         `GET
         (fun result ->
@@ -337,14 +345,14 @@ class manager
            `ProjectCatalog projects)
     | `ProjectCreate project_parameter ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects" url)
         `POST
         ~data:(Api_types_j.string_of_project_parameter project_parameter)
         (fun _ -> `ProjectCreate)
     | `ProjectDelete project_id ->
       send
-        ?timeout
+        ?timeout request_count
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `DELETE
         (fun _ -> `ProjectDelete)
@@ -404,7 +412,7 @@ class manager
   method is_running = true (*TODO*)
   method init_static_analyser_raw data =
     send
-      ?timeout
+      ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses" url project_id)
       `PUT ~data
       (fun x ->
@@ -425,7 +433,7 @@ class manager
 
   method get_contact_map accuracy =
     send
-      ?timeout
+      ?timeout request_count
       (match accuracy with
        | Some accuracy ->
          Format.sprintf "%s/v2/projects/%s/analyses/contact_map?accuracy=%s"
@@ -442,7 +450,7 @@ class manager
 
   method get_influence_map accuracy =
     send
-      ?timeout
+      ?timeout request_count
       (match accuracy with
        | Some accuracy ->
          Format.sprintf "%s/v2/projects/%s/analyses/influence_map?accuracy=%s"
@@ -458,7 +466,7 @@ class manager
 
   method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
     send
-      ?timeout
+      ?timeout request_count
       (let s  =
          match accuracy with
          | Some accuracy ->
@@ -487,7 +495,7 @@ class manager
 
   method get_initial_node =
     send
-      ?timeout
+      ?timeout request_count
       (
        Format.sprintf
          "%s/v2/projects/%s/analyses/influence_map/initial_node"
@@ -504,7 +512,7 @@ class manager
 
   method get_next_node short_id_opt =
     send
-      ?timeout
+      ?timeout request_count
       (
         Format.sprintf
           "%s/v2/projects/%s/analyses/influence_map/next_node%s"
@@ -527,7 +535,7 @@ class manager
 
   method get_previous_node short_id_opt =
     send
-      ?timeout
+      ?timeout request_count
       (
         Format.sprintf
           "%s/v2/projects/%s/analyses/influence_map/previous_node%s"
@@ -550,7 +558,7 @@ class manager
 
   method get_dead_rules =
     send
-      ?timeout
+      ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/dead_rules" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
@@ -562,7 +570,7 @@ class manager
 
   method  get_constraints_list =
     send
-      ?timeout
+      ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/constraints" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
@@ -571,4 +579,6 @@ class manager
       ~error:(fun _ -> function
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
+
+  method is_computing = is_computing request_count
 end

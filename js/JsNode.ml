@@ -157,4 +157,7 @@ class manager
                     message_text
                     message_delimiter)))
         sa_mailbox
+
+    method is_computing =
+      self#sim_is_computing || Kasa_client.is_computing sa_mailbox
   end

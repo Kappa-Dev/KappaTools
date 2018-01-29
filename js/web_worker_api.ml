@@ -48,4 +48,7 @@ class manager () =
     method terminate =
       let () = sim_worker##terminate in
       kasa_worker##terminate
+
+    method is_computing =
+      self#sim_is_computing || Kasa_client.is_computing kasa_mailbox
   end

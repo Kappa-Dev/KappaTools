@@ -134,6 +134,7 @@ class type concrete_manager = object
   inherit manager_static_analysis
   method is_running : bool
   method terminate : unit
+  method is_computing : bool
 end
 
 class type rest_manager = object

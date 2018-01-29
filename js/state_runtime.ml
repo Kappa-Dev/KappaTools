@@ -124,6 +124,7 @@ class embedded () : Api.concrete_manager =
     method terminate =
       let () = kasa_worker##terminate in
       ()(*TODO*)
+    method is_computing = true (*TODO*)
   end
 
 let state , set_state =
