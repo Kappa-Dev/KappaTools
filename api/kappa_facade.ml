@@ -521,6 +521,13 @@ let perturbation
            let () = t.state <- state' in
            let () =
              Format.fprintf
+               t.log_form "%%mod: [E] = %i do %a@."
+               (Counter.current_event t.counter)
+               (Pp.list ~trailing:Pp.colon Pp.colon
+                  (Kappa_printer.modification ~env:t.env))
+               e' in
+           let () =
+             Format.fprintf
                t.inputs_form "%%mod: [E] = %i do %a@."
                (Counter.current_event t.counter)
                (Pp.list ~trailing:Pp.colon Pp.colon
