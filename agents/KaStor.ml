@@ -32,11 +32,11 @@ let options = [
    "Disable the use of time is story heuritics (for test suite)")
 ]
 
-let process_command delimiter text =
-  let () = Kastor_mpi.on_message
+let process_command delimiter =
+  let f = Kastor_mpi.on_message
       ~none:!none_compression ~weak:!weak_compression ~strong:!strong_compression
-      ~send_message:(fun x -> Format.printf "%s%c@?" x delimiter) text in
-  Lwt.return_unit
+      ~send_message:(fun x -> Format.printf "%s%c@?" x delimiter) in
+  fun text -> let () = f text in Lwt.return_unit
 
 let get_simulation fname =
   let env, steps = Trace.fold_trace_file

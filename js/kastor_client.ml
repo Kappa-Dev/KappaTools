@@ -18,8 +18,9 @@ type state = {
 let state_eq a b =
   a.running = b.running &&
   Option_util.equal (=) a.progress b.progress &&
-  List.for_all2 String.equal a.log b.log &&
-  Mods.IntMap.equal (=) a.stories b.stories
+  (try List.for_all2 (fun x y -> String.compare x y = 0) a.log b.log
+   with Invalid_argument _ -> false)
+  && Mods.IntMap.equal (=) a.stories b.stories
 
 let initial_state = {
   running = false;
@@ -108,4 +109,5 @@ class virtual new_client ~post current_state =
     method story_log = (React.S.value current_state).log
     method story_is_computing = (React.S.value current_state).running
     method story_progress = (React.S.value current_state).progress
+    method story_list = (React.S.value current_state).stories
   end

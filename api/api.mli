@@ -136,6 +136,9 @@ class type manager_stories = object
   method story_log : string list
   method story_is_computing : bool
   method story_progress : Story_json.progress_bar option
+  method story_list :
+    (unit Trace.Simulation_info.t list list * Graph_loggers_sig.graph)
+    Mods.IntMap.t
 end
 
 class type manager = object

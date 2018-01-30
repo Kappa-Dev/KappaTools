@@ -194,7 +194,7 @@ let node_of_json = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct node",x))
 
 let edge_of_json = function
-  | `Assoc l as x when List.length l = 2 ->
+  | `Assoc l as x when List.length l = 3 ->
     begin
       try
         id_of_json (List.assoc "source" l),

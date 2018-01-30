@@ -42,7 +42,7 @@ let navcontents () =
      ; "DIN",      [],      (Tab_flux.content ())
      ; "snapshot", [],      (Tab_snapshot.content ())
      ; "outputs",  [],      (Tab_outputs.content ())
-     ; "stories",  [],      (Tab_stories.content ())
+     ; "stories",  ["row"], (Tab_stories.content ())
      ; "about",    ["panel-scroll"],      (Tab_about.content ())
   ])
 
