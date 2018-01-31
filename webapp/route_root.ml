@@ -23,7 +23,10 @@ class new_manager : Api.concrete_manager =
   let sa_process = Lwt_process.open_process (sa_command,[|sa_command|]) in
   let sim_command = Re.replace_string re ~by:"KaSimAgent" Sys.argv.(0) in
   let sim_process = Lwt_process.open_process (sim_command,[|sim_command|]) in
+  let stor_command = Re.replace_string re ~by:"KaStor" Sys.argv.(0) in
+  let stor_process = Lwt_process.open_process (stor_command,[|stor_command|]) in
   let sa_mailbox = Kasa_client.new_mailbox () in
+  let stor_state,update_stor_state = Kastor_client.init_state () in
   object(self)
     initializer
       let () =
@@ -37,9 +40,17 @@ class new_manager : Api.concrete_manager =
           (Agent_common.serve
              sim_process#stdout Tools.default_message_delimter
              (fun r -> let () = self#receive r in Lwt.return_unit)) in
+      let () =
+        Lwt.ignore_result
+          (Agent_common.serve
+             stor_process#stdout Tools.default_message_delimter
+             (fun r ->
+                let () = Kastor_client.receive update_stor_state r in
+                Lwt.return_unit)) in
       ()
     method is_running =
       sim_process#state = Lwt_process.Running &&
+      stor_process#state = Lwt_process.Running &&
       sa_process#state = Lwt_process.Running
     method private sleep t = Lwt_unix.sleep t
     method private post_message message_text =
@@ -59,11 +70,22 @@ class new_manager : Api.concrete_manager =
                     Lwt_io.write_char f Tools.default_message_delimter)
                  sa_process#stdin))
         sa_mailbox
+    inherit Kastor_client.new_client
+        ~post:(fun message_text ->
+            Lwt.ignore_result
+              (Lwt_io.atomic
+                 (fun f ->
+                    Lwt_io.write f message_text >>= fun () ->
+                    Lwt_io.write_char f Tools.default_message_delimter)
+                 stor_process#stdin))
+        stor_state
     method terminate =
       let () = sim_process#terminate in
+      let () = stor_process#terminate in
       sa_process#terminate
     method is_computing =
-      self#sim_is_computing || Kasa_client.is_computing sa_mailbox
+      self#sim_is_computing || Kasa_client.is_computing sa_mailbox ||
+      self#story_is_computing
   end
 
 let bind_projects f id projects =

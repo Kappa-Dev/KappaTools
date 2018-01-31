@@ -129,7 +129,8 @@ class type virtual manager_static_analysis = object
     (Yojson.Basic.json,string) Lwt_result.t
 end
 
-class type manager_stories = object
+class type virtual manager_stories = object
+  method virtual is_running : bool
   method config_story_computation :
     none:bool -> weak:bool -> strong:bool -> (unit,string) Lwt_result.t
   method raw_launch_story_computation : string -> (unit,string) Lwt_result.t

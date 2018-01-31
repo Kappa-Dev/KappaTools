@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type state = {
+type state_t = {
   running : bool;
   progress : Story_json.progress_bar option;
   log : string list;
@@ -14,6 +14,8 @@ type state = {
     (unit Trace.Simulation_info.t list list * Graph_loggers_sig.graph)
       Mods.IntMap.t
 }
+
+type state = state_t ref
 
 let state_eq a b =
   a.running = b.running &&
@@ -80,8 +82,8 @@ let receive update_state x =
   update_state (Story_json.message_of_json (Yojson.Basic.from_string x))
 
 let init_state () =
-  let current_state,set_state = React.S.create ~eq:state_eq initial_state in
-  current_state, (fun x -> set_state (controller (React.S.value current_state)x))
+  let current_state = ref initial_state in
+  current_state, (fun x -> current_state := (controller (!current_state) x))
 
 class virtual new_client ~post current_state =
   object(self)
@@ -106,8 +108,8 @@ class virtual new_client ~post current_state =
       else
         Lwt.return_error "KaStor agent is dead"
 
-    method story_log = (React.S.value current_state).log
-    method story_is_computing = (React.S.value current_state).running
-    method story_progress = (React.S.value current_state).progress
-    method story_list = (React.S.value current_state).stories
+    method story_log = (!current_state).log
+    method story_is_computing = (!current_state).running
+    method story_progress = (!current_state).progress
+    method story_list = (!current_state).stories
   end
