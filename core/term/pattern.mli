@@ -69,6 +69,8 @@ module Env : sig
 
   val to_navigation : t -> id -> Navigation.abstract Navigation.t
 
+  val dump_to_extention_bases : Format.formatter -> t -> unit
+
   val print : noCounters:bool -> Format.formatter -> t -> unit
 
   val to_yojson : t -> Yojson.Basic.t

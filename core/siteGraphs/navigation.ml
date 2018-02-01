@@ -328,3 +328,43 @@ let concretize ~debugMode root graph nav =
            else None)
       (Some (Some root,[])) nav in
   Option_util.map (fun (_,l) -> List.rev l) out
+
+let get_abstract_id = function
+  | Existing i -> i
+  | Fresh (i,_) -> i
+
+let max_abstract_id x =
+  List.fold_left
+    (fun acc -> function
+       | (ag,_), ToNothing -> max acc (get_abstract_id ag)
+       | (ag,_), ToInternal _ -> max acc (get_abstract_id ag)
+       | (ag,_), ToNode(ag',_) ->
+         max (max acc (get_abstract_id ag)) (get_abstract_id ag'))
+    0 x
+
+let abstract_to_extention_base x =
+  let type_store = Hashtbl.create 2 in
+  let fresh_id = ref (max_abstract_id x) in
+  let get_ag = function
+    | Existing id -> id,Hashtbl.find type_store id
+    | Fresh (id,ty) ->
+      let ty' = succ ty in
+      let () = Hashtbl.replace type_store id ty' in
+      (id,ty') in
+  List.fold_left
+    (fun acc -> function
+       | (ag,s), ToNothing ->
+         let () = incr fresh_id in
+         let (id,ty) = get_ag ag in
+         ([id;succ s;ty],[!fresh_id;0;0])::acc
+       | (ag,s), ToInternal i ->
+         let () = incr fresh_id in
+         let (id,ty) = get_ag ag in
+         let pre = let t = i + ty in i + (t * succ t)/2 in
+         let ty' = let t = pre + s in s + (t * succ t)/2 in
+         ([id;-succ s;ty],[!fresh_id;0;-ty'])::acc
+       | (ag,s), ToNode (ag',s') ->
+         let (id,ty) = get_ag ag in
+         let (id',ty') = get_ag ag' in
+         ([id;succ s;ty],[id';succ s';ty'])::acc)
+    [] x

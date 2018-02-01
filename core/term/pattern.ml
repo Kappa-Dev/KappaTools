@@ -898,6 +898,7 @@ module Env : sig
   val print : noCounters:bool -> Format.formatter -> t -> unit
   val to_yojson : t -> Yojson.Basic.t
   val of_yojson : Yojson.Basic.t -> t
+  val dump_to_extention_bases : Format.formatter -> t -> unit
 end = struct
   type transition = {
     next: Navigation.abstract Navigation.t;
@@ -1083,6 +1084,25 @@ end = struct
       end
     | x ->
       raise (Yojson.Basic.Util.Type_error ("Incorrect update domain",x))
+
+  let dump_to_extention_bases form domain =
+    let pp_sep f = Format.pp_print_string f ";" in
+    let pp_int_list = Pp.list pp_sep Format.pp_print_int in
+    let fresh = ref 0 in
+    let () = Format.pp_open_vbox form 0 in
+    let () = Array.iter (fun p ->
+        if p.roots <> None then
+          let () = incr fresh in
+          let cc = p.content in
+          let nav = raw_to_navigation true cc.nodes_by_type cc.nodes in
+          Format.fprintf form "add [%a] as pat_%i@,"
+            (Pp.list pp_sep
+               (fun f (x,y) -> Format.fprintf f "([%a],[%a])"
+                   pp_int_list x pp_int_list y))
+            (Navigation.abstract_to_extention_base nav)
+            !fresh)
+        domain.domain in
+    Format.pp_close_box form ()
 
   let new_obs_map env f = Mods.DynArray.init env.max_obs f
 

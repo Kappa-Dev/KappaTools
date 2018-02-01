@@ -53,3 +53,5 @@ val imperative_edge_is_valid :
 
 val concretize :
   debugMode:bool -> Agent.t -> Edges.t -> abstract t -> int t option
+
+val abstract_to_extention_base : abstract t -> (int list * int list) list

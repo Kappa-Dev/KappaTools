@@ -236,7 +236,8 @@ let () =
     let deltaActivitiesFileName =
       conf.Configuration.deltaActivitiesFileName in
     let () =
-      if not kasim_args.Kasim_args.compileMode then
+      if not kasim_args.Kasim_args.compileMode &&
+         kasim_args.Kasim_args.buildBase = None then
         match kasim_args.Kasim_args.logFile with
         | None -> ()
         | Some filename ->
@@ -257,7 +258,8 @@ let () =
     Kappa_files.setCheckFileExists
       ~batchmode:cli_args.Run_cli_args.batchmode
       plot_file;
-    if not kasim_args.Kasim_args.compileMode then
+    if not kasim_args.Kasim_args.compileMode &&
+       kasim_args.Kasim_args.buildBase = None then
       Outputs.initialize deltaActivitiesFileName trace_file plotPack env;
 
     let outputs = Outputs.go in
@@ -289,6 +291,15 @@ let () =
           (Model.domain env)
           (Rule_interpreter.print env) graph
     in
+    let () =
+      match kasim_args.Kasim_args.buildBase with
+      | None -> ()
+      | Some file ->
+        Kappa_files.with_channel file
+          (Kappa_files.wrap_formatter
+             (fun f ->
+                Pattern.Env.dump_to_extention_bases f (Model.domain env))) in
+
     (*------------------------------------------------------------*)
     let () = match kasim_args.Kasim_args.domainOutputFile with
       | None -> ()
@@ -296,7 +307,8 @@ let () =
         Yojson.Basic.to_file (Kappa_files.path domainOutputFile)
           (Pattern.Env.to_yojson (Model.domain env)) in
     Outputs.flush_warning () ;
-    (if kasim_args.Kasim_args.compileMode
+    (if kasim_args.Kasim_args.compileMode ||
+        kasim_args.Kasim_args.buildBase <> None
      then let () = remove_trace () in exit 0
      else ());
 
