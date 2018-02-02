@@ -329,10 +329,10 @@ struct
             match
               parameter.PH.B.PB.CI.Po.K.H.current_compression_mode
             with
-            | None | Some PH.B.PB.CI.Po.K.H.Causal-> false,""
-            | Some PH.B.PB.CI.Po.K.H.Weak ->
+            | None | Some Story_json.Causal-> false,""
+            | Some Story_json.Weak ->
 	       Parameter.dump_grid_after_branching_during_weak_compression,Parameter.xlsweakFileName
-            | Some PH.B.PB.CI.Po.K.H.Strong ->
+            | Some Story_json.Strong ->
 	       Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName
           end
       in

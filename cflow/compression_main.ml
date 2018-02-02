@@ -79,6 +79,27 @@ let compress_and_print
   let strong_compression_on = S.PH.B.PB.CI.Po.K.H.get_strong_compression mode in
   let error = U.error_init in
   let handler = S.PH.B.PB.CI.Po.K.H.init_handler env in
+  let () =
+    S.PH.B.PB.CI.Po.K.H.push_json parameter
+      (Story_json.Phase (Story_json.Start,"Starting Compression")) in
+  let parameter_causal =
+    if causal_trace_on
+    then parameter
+    else
+        S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
+  in
+  let parameter_weak =
+    if weak_compression_on
+    then parameter
+    else
+        S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
+  in
+  let parameter_strong =
+    if strong_compression_on
+    then parameter
+    else
+        S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
+  in
   let error,log_info,table1 = U.create_story_table parameter handler log_info error in
   let error,log_info,table2 = U.create_story_table parameter handler log_info error in
   let error,log_info,table3 = U.create_story_table parameter handler log_info error in
@@ -138,6 +159,7 @@ let compress_and_print
           let error,log_info,causal_table =
             if causal_trace_on
             then
+              let parameter = parameter_causal in
               let () =
                 if log_step then
                   Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
@@ -219,6 +241,10 @@ let compress_and_print
                           "\t\t * causal compression @."
                     in
                     let () =
+                    if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter &&
+                      S.PH.B.PB.CI.Po.K.H.is_server_channel_on parameter
+                    then
+
                       S.PH.B.PB.CI.Po.K.H.push_json parameter
                         (Story_json.Phase (Story_json.Inprogress,
                                            "Start one causal compression"
@@ -263,7 +289,7 @@ let compress_and_print
               (Remanent_parameters.update_prefix
                  (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
                  "\t\t\t")
-              parameter
+              parameter_causal
           in
           let one_iteration_of_compression (log_info,error,event_list) =
             let error,log_info,event_list =
@@ -370,6 +396,7 @@ let compress_and_print
                 S.PH.B.PB.CI.Po.K.H.get_blacklist_events parameter
               then
                 begin
+                  let parameter = parameter_weak in
                   let blacklist = U.create_black_list (last_eid+1) in
                   let error,log_info,(_bl,causal_story_table,weak_story_table) =
                     Utilities_expert.fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
@@ -381,6 +408,9 @@ let compress_and_print
                       (fun parameter handler log_info error trace  ->
                          (* we remove pseudo inverse events *)
                          let () =
+                          if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter &&
+                            S.PH.B.PB.CI.Po.K.H.is_server_channel_on parameter
+                          then
                            S.PH.B.PB.CI.Po.K.H.push_json parameter
                              (Story_json.Phase(Story_json.Inprogress,
                                                "Start collecting one new trace"
@@ -436,6 +466,7 @@ let compress_and_print
               else
                 begin
                   let error,log_info,causal_story_table =
+                    let parameter = parameter_causal in
                     Utilities_expert.fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
                       parameter
                       ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
@@ -445,6 +476,9 @@ let compress_and_print
                       (fun parameter handler log_info error trace  ->
                          (* we remove pseudo inverse events *)
                          let () =
+                          if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter &&
+                            S.PH.B.PB.CI.Po.K.H.is_server_channel_on parameter
+                          then
                            S.PH.B.PB.CI.Po.K.H.push_json parameter
                              (Story_json.Phase(Story_json.Inprogress,
                                                "Start collecting one new trace"
@@ -482,6 +516,7 @@ let compress_and_print
                   let n_causal_stories = U.count_stories causal_story_table in
                   let error,log_info,weakly_story_table =
                     begin
+                      let parameter = parameter_weak in
                       let () =
                         Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
                           "\t - weak flow compression (%i)@."
@@ -523,6 +558,7 @@ let compress_and_print
             if strong_compression_on
             then
               begin
+                let parameter = parameter_strong in
                 let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in
                 let () =
                   Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)

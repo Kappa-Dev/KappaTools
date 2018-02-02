@@ -1744,7 +1744,7 @@ let import ?heuristic parameter handler log_info error list =
         parameter log_info error __POS__
         ~message:"Compression mode has not been set up"
         (Failure "Compression mode has not been set up.") (preblackboard,PB.zero_step_id,"None",false)
-    | Some PB.CI.Po.K.H.Strong ->
+    | Some Story_json.Strong ->
       let error,log_info,(preblackboard,int) =
         List.fold_left
           (fun (error,log_info,(preblackboard,int)) refined_event  ->
@@ -1753,7 +1753,7 @@ let import ?heuristic parameter handler log_info error list =
           list
       in
       error,log_info,(preblackboard,int,Parameter.xlsstrongFileName,Parameter.dump_grid_before_strong_compression)
-    | Some PB.CI.Po.K.H.Weak | Some PB.CI.Po.K.H.Causal ->
+    | Some Story_json.Weak | Some Story_json.Causal ->
       let error,log_info,(preblackboard,int) =
         List.fold_left
           (fun (error,log_info,(preblackboard,int)) refined_event  ->

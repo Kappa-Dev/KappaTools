@@ -652,23 +652,29 @@ let compress
     parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
   with
   | None -> error,log_info,[trace]
-  | Some S.PH.B.PB.CI.Po.K.H.Causal ->
+  | Some Story_json.Causal ->
     let () =
+    if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter &&
+      S.PH.B.PB.CI.Po.K.H.is_server_channel_on parameter
+    then
       S.PH.B.PB.CI.Po.K.H.push_json
         parameter
         (Story_json.Phase (Story_json.Inprogress, "Start one causal compression"))
     in
     let error,log_info,trace = cut parameter ~shall_we_compute:we_shall handler log_info error trace
     in error,log_info,[trace]
-  | Some (S.PH.B.PB.CI.Po.K.H.Weak | S.PH.B.PB.CI.Po.K.H.Strong) ->
+  | Some (Story_json.Weak | Story_json.Strong) ->
     let event,s = match parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
-      with Some S.PH.B.PB.CI.Po.K.H.Weak ->
+      with Some Story_json.Weak ->
         StoryProfiling.Weak_compression,"Start one weak compression"
          | _ -> StoryProfiling.Strong_compression,"Start one string compression"
     in
     let () =
-      S.PH.B.PB.CI.Po.K.H.push_json
-        parameter (Story_json.Phase (Story_json.Inprogress, s)) in
+      if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter &&
+        S.PH.B.PB.CI.Po.K.H.is_server_channel_on parameter
+      then
+        S.PH.B.PB.CI.Po.K.H.push_json
+          parameter (Story_json.Phase (Story_json.Inprogress, s)) in
     let error, log_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun () -> size_of_pretrace trace)) log_info in
     let event_list = get_pretrace_of_trace trace in
     let error,log_info,blackboard = S.PH.B.import ?heuristic parameter handler log_info error event_list in

@@ -2,7 +2,6 @@ module type Cflow_handler =
   sig
     type sort_algo_for_stories
     type compression_mode
-    type current_compression_mode = Weak | Strong | Causal
 
     val get_causal_trace : compression_mode -> bool
     val get_causal_trace_only : compression_mode -> bool
@@ -13,7 +12,7 @@ module type Cflow_handler =
     type parameter =
         {
           cache_size : int option ;
-          current_compression_mode: current_compression_mode option;
+          current_compression_mode: Story_json.current_compression_mode option;
           compression_mode : compression_mode ;
           priorities_weak: Priority.priorities ;
           priorities_strong : Priority.priorities ;
@@ -35,8 +34,11 @@ module type Cflow_handler =
           time_independent: bool ;
           blacklist_events: bool ;
           server: bool ;
+          is_server_channel_on: bool ;
           dump: string -> unit;
         }
+
+    val get_current_compression_mode : parameter -> Story_json.current_compression_mode option
 
     type handler =   (*handler to interpret abstract values*)
         {
@@ -72,6 +74,9 @@ module type Cflow_handler =
     val get_debugging_mode: parameter -> bool
     val get_profiling_logger: parameter -> Loggers.t
     val get_server_channel: parameter -> Loggers.t
+    val shut_down_server_channel: parameter -> parameter
+    val is_server_channel_on: parameter -> bool
+
     val get_logger: parameter -> Loggers.t
     val set_logger: parameter -> Loggers.t -> parameter
     val get_out_channel: parameter -> Loggers.t

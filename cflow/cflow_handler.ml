@@ -24,18 +24,19 @@ module type Cflow_handler =
 sig
   type sort_algo_for_stories
   type compression_mode
-  type current_compression_mode = Weak | Strong | Causal
 
   val get_causal_trace : compression_mode -> bool
   val get_causal_trace_only : compression_mode -> bool
   val get_weak_compression : compression_mode -> bool
   val get_strong_compression : compression_mode -> bool
 
+
+
   (** a struct which contains parameterizable options *)
   type parameter =
     {
       cache_size : int option ;
-      current_compression_mode: current_compression_mode option;
+      current_compression_mode: Story_json.current_compression_mode option;
       compression_mode : compression_mode ;
       priorities_weak: Priority.priorities ;
       priorities_strong : Priority.priorities ;
@@ -57,8 +58,11 @@ sig
       time_independent: bool ;
       blacklist_events: bool ;
       server: bool;
+      is_server_channel_on: bool;
       dump: string -> unit;
     }
+
+  val get_current_compression_mode : parameter -> Story_json.current_compression_mode option 
 
   type handler =   (*handler to interpret abstract values*)
     {
@@ -94,6 +98,9 @@ sig
   val get_debugging_mode: parameter -> bool
   val get_profiling_logger: parameter -> Loggers.t
   val get_server_channel: parameter -> Loggers.t
+  val shut_down_server_channel: parameter -> parameter
+  val is_server_channel_on: parameter -> bool
+
   val get_logger: parameter -> Loggers.t
   val set_logger: parameter -> Loggers.t -> parameter
   val get_out_channel: parameter -> Loggers.t
@@ -149,7 +156,7 @@ module Cflow_handler =
     type parameter =
       {
         cache_size : int option ;
-        current_compression_mode: current_compression_mode option;
+        current_compression_mode: Story_json.current_compression_mode option;
         compression_mode : compression_mode ;
         priorities_weak: Priority.priorities ;
         priorities_strong : Priority.priorities ;
@@ -171,8 +178,11 @@ module Cflow_handler =
         time_independent: bool ;
         blacklist_events: bool ;
         server: bool ;
+        is_server_channel_on: bool;
         dump: string -> unit ;
       }
+
+    let get_current_compression_mode parameter = parameter.current_compression_mode
 
     let build_parameter ~called_from
         ?(send_message=fun x ->
@@ -203,6 +213,7 @@ module Cflow_handler =
       in
       {
         server = server ;
+        is_server_channel_on = server ;
         current_compression_mode = None ;
         priorities_weak = Priority.weak ;
         priorities_strong = Priority.strong ;
@@ -232,11 +243,11 @@ module Cflow_handler =
       }
 
     let set_compression_weak p =
-      {p with current_compression_mode = Some Weak}
+      {p with current_compression_mode = Some Story_json.Weak}
     let set_compression_strong p =
-      {p with current_compression_mode = Some Strong}
+      {p with current_compression_mode = Some Story_json.Strong}
     let set_compression_none p =
-      {p with current_compression_mode = Some Causal}
+      {p with current_compression_mode = Some Story_json.Causal}
 
 
 
@@ -278,9 +289,9 @@ module Cflow_handler =
     let get_priorities parameter =
       match parameter.current_compression_mode with
       | None -> None
-      | Some Weak -> Some parameter.priorities_weak
-      | Some Strong -> Some parameter.priorities_strong
-      | Some Causal -> Some parameter.priorities_causal
+      | Some Story_json.Weak -> Some parameter.priorities_weak
+      | Some Story_json.Strong -> Some parameter.priorities_strong
+      | Some Story_json.Causal -> Some parameter.priorities_causal
 
     let set_first_story_per_obs parameter =
       {
@@ -327,8 +338,11 @@ module Cflow_handler =
 
     let is_server_mode parameter = parameter.server
     let get_server_channel parameter = parameter.logger_server
-
-
+    let shut_down_server_channel parameter =
+        {parameter with
+          logger_server= Loggers.dummy_txt_logger;
+          is_server_channel_on = false}
+    let is_server_channel_on parameter = parameter.is_server_channel_on
     let save_current_phase_title parameter x =
       parameter.kasa.Remanent_parameters_sig.save_current_phase_title x
 

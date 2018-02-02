@@ -152,10 +152,17 @@ let print_graph logger parameter _handler error id story_info graph =
       )
       graph.conflict_pred
   in
+  let current_compression_mode parameter =
+      match H.get_current_compression_mode parameter
+      with
+        | None -> Story_json.Causal
+        | Some x -> x
+  in
   let
     result =
     {
       Story_json.log_info = story_info ;
+      Story_json.story_mode = current_compression_mode parameter ;
       Story_json.story =
         Story_json.New
           {
@@ -730,7 +737,8 @@ module BucketTable =
             (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
             error table.fresh_id x table.array in
         let error =
-          if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
+          if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter &&
+             S.PH.B.PB.CI.Po.K.H.is_server_channel_on parameter
           then
             let error =
               print_graph
@@ -763,14 +771,25 @@ module BucketTable =
             (Failure "Unknown story id")
             table
         | Some (grid,graph,canonic,trace,info) ->
+          let current_compression_mode parameter =
+              match H.get_current_compression_mode parameter
+              with
+                | None -> Story_json.Causal
+                | Some x -> x
+          in
           let result =
             {
+              Story_json.story_mode = current_compression_mode parameter;
               Story_json.log_info = story_info ;
               Story_json.story = Story_json.Same_as id
             }
           in
           let () =
-            S.PH.B.PB.CI.Po.K.H.push_json parameter (Story_json.Story result) in
+            if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter &&
+              S.PH.B.PB.CI.Po.K.H.is_server_channel_on parameter
+            then
+              S.PH.B.PB.CI.Po.K.H.push_json parameter (Story_json.Story result)
+          in
           let error,array = Int_storage.Nearly_inf_Imperatif.set
               (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id
               (grid,graph,canonic,trace,story_info@info) table.array

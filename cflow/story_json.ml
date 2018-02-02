@@ -1,3 +1,6 @@
+type current_compression_mode = Weak | Strong | Causal
+
+
 type new_story =
   {
     id: int;
@@ -11,6 +14,7 @@ type story =
 type 'a one_compression =
   {
     log_info: 'a Trace.Simulation_info.t list;
+    story_mode: current_compression_mode;
     story: story
   }
 
@@ -67,6 +71,17 @@ let story_of_json = function
   | `Assoc ["same_as", `Int int] -> Same_as int
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct story",x))
 
+let story_mode_to_json = function
+| Causal -> `String "Causal"
+| Weak -> `String "Weak"
+| Strong -> `String "Strong"
+
+let story_mode_of_json = function
+| `String "Causal" -> Causal
+| `String "Weak" -> Weak
+| `String "Strong" -> Strong
+| x -> raise (Yojson.Basic.Util.Type_error ("Not a correct story mode",x))
+
 let to_json log_info_to_json one_compression =
   `Assoc
     [
@@ -75,12 +90,15 @@ let to_json log_info_to_json one_compression =
         (List.rev_map
            (Trace.Simulation_info.to_json log_info_to_json)
            (List.rev one_compression.log_info));
+      "story_mode",
+      story_mode_to_json one_compression.story_mode;
+
       "story",
       story_to_json one_compression.story
     ]
 
 let of_json log_info_of_json = function
-  | `Assoc l as x when List.length l = 2 ->
+  | `Assoc l as x when List.length l = 3 ->
     begin
       try
         {
@@ -98,7 +116,8 @@ let of_json log_info_of_json = function
             end
           ;
           story = story_of_json
-              (List.assoc "story" l)
+              (List.assoc "story" l) ;
+          story_mode = story_mode_of_json (List.assoc "story_mode" l);
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Not a correct story computation",x))
