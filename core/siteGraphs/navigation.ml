@@ -356,15 +356,15 @@ let abstract_to_extention_base x =
        | (ag,s), ToNothing ->
          let () = incr fresh_id in
          let (id,ty) = get_ag ag in
-         ([id;succ s;ty],[!fresh_id;0;0])::acc
+         ([id;2*succ s;ty],[!fresh_id;0;0])::acc
        | (ag,s), ToInternal i ->
          let () = incr fresh_id in
          let (id,ty) = get_ag ag in
          let pre = let t = i + ty in i + (t * succ t)/2 in
          let ty' = let t = pre + s in s + (t * succ t)/2 in
-         ([id;-succ s;ty],[!fresh_id;0;-ty'])::acc
+         ([id;1+2*succ s;ty],[!fresh_id;0;-ty'])::acc
        | (ag,s), ToNode (ag',s') ->
          let (id,ty) = get_ag ag in
          let (id',ty') = get_ag ag' in
-         ([id;succ s;ty],[id';succ s';ty'])::acc)
+         ([id;2*succ s;ty],[id';2*succ s';ty'])::acc)
     [] x
