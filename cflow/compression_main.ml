@@ -82,24 +82,6 @@ let compress_and_print
   let () =
     S.PH.B.PB.CI.Po.K.H.push_json parameter
       (Story_json.Phase (Story_json.Start,"Starting Compression")) in
-  let parameter_causal =
-    if causal_trace_on
-    then parameter
-    else
-        S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
-  in
-  let parameter_weak =
-    if weak_compression_on
-    then parameter
-    else
-        S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
-  in
-  let parameter_strong =
-    if strong_compression_on
-    then parameter
-    else
-        S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
-  in
   let error,log_info,table1 = U.create_story_table parameter handler log_info error in
   let error,log_info,table2 = U.create_story_table parameter handler log_info error in
   let error,log_info,table3 = U.create_story_table parameter handler log_info error in
@@ -127,6 +109,26 @@ let compress_and_print
         parameter
       end
   in
+  let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
+  let parameter_causal =
+    if causal_trace_on
+    then parameter
+    else
+      S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
+  in
+  let parameter_weak =
+    if weak_compression_on
+    then parameter
+    else
+      S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
+  in
+  let parameter_strong =
+    if strong_compression_on
+    then parameter
+    else
+      S.PH.B.PB.CI.Po.K.H.shut_down_server_channel parameter
+  in
+
   let empty_compression = error, log_info, table1,table2,table3,table4 in
   let step_list = U.trace_of_pretrace step_list in
   let error, log_info, causal,_trivial,weak,strong =
@@ -136,7 +138,6 @@ let compress_and_print
     then empty_compression
     else
       begin
-        let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
         let error,log_info,step_list = U.remove_events_after_last_obs parameter handler log_info error step_list in
         if not (U.has_obs step_list)
         then
@@ -511,8 +512,14 @@ let compress_and_print
                     U.flatten_story_table  parameter handler log_info error causal_story_table
                   in
                   let () = Cflow_js_interface.save_trivial_compression_table js_interface causal_story_table in
-                  let _ = print_newline () in
-                  let _ = print_newline () in
+                  let () =
+                    Loggers.print_newline
+                      (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+                  in
+                  let () =
+                    Loggers.print_newline
+                      (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+                  in
                   let n_causal_stories = U.count_stories causal_story_table in
                   let error,log_info,weakly_story_table =
                     begin
