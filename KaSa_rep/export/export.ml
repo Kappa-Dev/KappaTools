@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jan 27 2018>
+  * Last modification: Time-stamp: <Feb 05 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1955,6 +1955,13 @@ let compute_separating_transitions _show_title state =
   with
   | Some l -> state, l
   | None -> assert false
+
+  let get_separating_transitions =
+    get_gen
+      ~do_we_show_title:title_only_in_kasa
+      ~log_title:"Detecting separating transitions"
+      Remanent_state.get_separating_transitions
+      compute_separating_transitions
 
 (******************************************************************)
 (*Dead agents*)

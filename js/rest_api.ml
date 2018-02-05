@@ -562,7 +562,7 @@ class manager
 
   method get_non_weakly_reversible_transitions =
     send
-      ?timeout request_count
+      ?timeout 
       (Format.sprintf
          "%s/v2/projects/%s/analyses/non_weakly_reversible_transitions"
          url project_id)
