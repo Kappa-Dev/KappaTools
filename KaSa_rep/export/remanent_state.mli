@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jan 26 2018>
+  * Last modification: Time-stamp: <Feb 05 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -41,11 +41,7 @@ val info_to_rule:
   (string*Locality.t*Public_data.rule_direction*string*Ckappa_sig.c_rule_id)
   -> Public_data.rule
 
-type separating_transitions =
-  (string * string) list Mods.IntMap.t
-
-val separating_transitions_to_json:
-  separating_transitions -> Yojson.Basic.json
+type separating_transitions = Public_data.separating_transitions
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, Ckappa_sig.mixture, string, Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil

@@ -130,6 +130,13 @@ class virtual new_client ~post (mailbox : mailbox) :
       Lwt_result.bind_result
         (self#message post request)
             (fun x -> Result.Ok x)
+    method get_non_weakly_reversible_transitions =
+      let request =
+        `List [ `String "NON_WEAKLY_REVERSIBLE_TRANSITIONS" ]
+      in
+      Lwt_result.bind_result
+        (self#message post request)
+        (fun x -> Result.Ok x)
     method get_constraints_list =
       let request = `List [ `String "CONSTRAINTS" ] in
       Lwt_result.bind_result

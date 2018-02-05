@@ -568,6 +568,20 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
+  method get_non_weakly_reversible_transitions =
+    send
+      ?timeout request_count
+      (Format.sprintf
+         "%s/v2/projects/%s/analyses/non_weakly_reversible_transitions"
+         url project_id)
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
   method  get_constraints_list =
     send
       ?timeout request_count

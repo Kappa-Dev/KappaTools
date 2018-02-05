@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jan 27 2018>
+   * Last modification: Time-stamp: <Feb 05 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -4144,10 +4144,35 @@ struct
     in
     error, dynamic, kasa_state
 
-  let export_separating_edges _static dynamic error kasa_state =
+  let export_separating_edges static dynamic error kasa_state =
     match dynamic.local.separating_edges with
     | None -> error, dynamic, kasa_state
-    | Some l ->
+    | Some map ->
+      let compil = get_compil static in
+      let parameters = get_parameter static in
+      let hide_reverse_rule =
+        Remanent_parameters.get_hide_reverse_rule_without_label_from_dead_rules
+          parameters
+      in
+      let original = hide_reverse_rule in
+      let (error,l) =
+        Mods.IntMap.fold
+          (fun i c (error,l) ->
+             let i = Ckappa_sig.rule_id_of_int i in
+             let error, info =
+               Handler.info_of_rule ~original ~with_rates:false parameters error compil i
+             in
+             let error, b1 = Handler.is_reverse parameters error compil i in
+             let error, b2 = Handler.has_no_label parameters error compil i in
+             let rule = Remanent_state.info_to_rule info in
+             let rule =
+               if b1 && b2 && hide_reverse_rule
+               then Handler.hide rule
+               else rule
+             in
+             error, (rule,c)::l)
+          map (error,[])
+      in
       let kasa_state =
         Remanent_state.set_separating_transitions l
           kasa_state
