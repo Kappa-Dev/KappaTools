@@ -1079,7 +1079,7 @@ let add_un_variable k_un acc rate_var =
     (acc_un,Some (k',dist))
 
 let name_and_purify_rule
-    ~syntax_version sigs ~contact_map (label_opt,(r,r_pos)) (pack,acc,rules) =
+    ~syntax_version sigs ~contact_map (pack,acc,rules) (label_opt,(r,r_pos)) =
   let pack',label = give_rule_label
       r.Ast.bidirectional pack Ast.print_ast_rule r label_opt in
   let acc',k_def =
@@ -1101,7 +1101,13 @@ let name_and_purify_rule
     (pack',acc'',
      (label_opt,true,mix,created,[],e.Ast.delta_token,k_def,k_un,r_pos)::rules)
   | Ast.Arrow a ->
-    let acc''',rules' =
+    let mix,created =
+      annotate_lhs_with_diff
+        ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs in
+    let rules' =
+      (label_opt,false,mix,created,a.Ast.rm_token,a.Ast.add_token,k_def,k_un,r_pos)
+      ::rules in
+    let acc''',rules'' =
       match r.Ast.bidirectional,r.Ast.k_op with
       | true, Some k when Alg_expr.has_mix (fst k) ->
         let rate_var = (Ast.flip_label label)^"_rate" in
@@ -1113,7 +1119,7 @@ let name_and_purify_rule
         ((Locality.dummy_annot rate_var,k)::acc_un,
          (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
           false,mix,created,a.Ast.add_token,a.Ast.rm_token,
-          Locality.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules)
+          Locality.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules')
       | true, Some rate ->
         let rate_var_un = (Ast.flip_label label)^"_un_rate" in
         let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
@@ -1123,19 +1129,14 @@ let name_and_purify_rule
         (acc_un,
          (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
           false,mix,created,a.Ast.add_token,a.Ast.rm_token,
-          rate,k_op_un,r_pos)::rules)
-      | false, None -> (acc'',rules)
+          rate,k_op_un,r_pos)::rules')
+      | false, None -> (acc'',rules')
       | (false, Some _ | true, None) ->
         raise
           (ExceptionDefn.Malformed_Decl
              ("Incompatible arrow and kinectic rate for inverse definition",
               r_pos)) in
-    let mix,created =
-      annotate_lhs_with_diff
-        ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs in
-    (pack',acc''',
-     (label_opt,false,mix,created,a.Ast.rm_token,a.Ast.add_token,k_def,k_un,r_pos)
-   ::rules')
+    (pack',acc''',rules'')
 
 let create_t sites incr_info =
   let (aux,counters) =
@@ -1253,9 +1254,9 @@ let compil_of_ast ~syntax_version overwrite c =
                        (fun a k -> k::a) []
                        (Signature.internal_states_number i s sigs),[]))) in
   let ((_,rule_names),extra_vars,cleaned_rules) =
-    List.fold_right
+    List.fold_left
       (name_and_purify_rule ~syntax_version sigs ~contact_map)
-      c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
+      ((0,Mods.StringSet.empty),[],[]) c.Ast.rules in
   let alg_vars_over =
     List_util.rev_map_append
       (fun (x,v) -> (Locality.dummy_annot x,
@@ -1282,7 +1283,7 @@ let compil_of_ast ~syntax_version overwrite c =
       (Counters_compiler.counters_perturbations sigs c.Ast.signatures)@perts'
     else perts' in
   let rules =
-    List.map
+    List.rev_map
       (fun (label,r_editStyle,mix,created,rm_tk,add_tk,rate,un_rate,r_pos) ->
         let mix,created =
           Counters_compiler.remove_counter_rule sigs mix created in
