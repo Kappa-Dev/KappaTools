@@ -115,15 +115,28 @@ let init_non_weakly_reversible_transitions () =
                       (fun acc (rule,context_list) ->
                          if rule.Public_data.rule_hidden
                          then acc (* hint: reversible rule are always weakly reversible *)
-                          else
+                         else
+                           let plural,skip,tab =
+                             match context_list with
+                             | [] | [_] -> "",""," "
+                             | _::_ -> "s","\n","\t"
+                           in
                            let message_text =
-                             "Rule "^
+                             Format.asprintf
+                               "Rule %s may induce non wealky reversible events in the following context%s:%s%a"
+
                              (if rule.Public_data.rule_label <> ""
                               then (" '"^rule.Public_data.rule_label^"'")
                               else if rule.Public_data.rule_ast <> ""
                               then rule.Public_data.rule_ast
-                              else string_of_int rule.Public_data.rule_id)^
-                             "may induce non wealky reversible events"
+                              else string_of_int rule.Public_data.rule_id)
+                             plural
+                             skip
+                             ( Pp.list
+                                (fun fmt -> Format.fprintf fmt "%s" skip)
+                                (fun fmt (a,b) -> Format.fprintf fmt "%s%s -> %s " tab a b)
+                             )
+                             context_list
                            in
                            (* to do, add the potential contexts *)
                            {

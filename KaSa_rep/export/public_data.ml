@@ -771,6 +771,7 @@ let separating_transitions_of_json =
   JsonUtil.to_list
     ~error_msg:"separating transitions list"
     (JsonUtil.to_pair ~error_msg:"separating transition"
+       ~lab1:"rule" ~lab2:"potential-contexts"
        json_to_rule
        (JsonUtil.to_list
           ~error_msg:"separating transitions"

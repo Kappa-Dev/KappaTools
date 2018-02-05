@@ -205,7 +205,7 @@ let main () =
         with
         | None -> ()
         | Some l ->
-          Loggers.fprintf
+            Loggers.fprintf
             (Remanent_parameters.get_logger parameters)
             "; rules: %i"
             l.Cckappa_sig.nrules
@@ -227,6 +227,8 @@ let main () =
         with
         | None -> ()
         | Some l ->
+          let json = Public_data.separating_transitions_to_json l in
+          let l = Public_data.separating_transitions_of_json json in 
           let nr,nt =
             List.fold_left
               (fun (nr,nt) (r,l) ->
