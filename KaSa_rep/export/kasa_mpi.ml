@@ -129,6 +129,11 @@ let on_message post text =
     let state, rules = get_dead_rules !gState in
     let () = gState := state in
     send_response post id rules
+  | Some(id, (`List [ `String "NON_WEAKLY_REVERSIBLE_TRANSITIONS"]
+             | `String "NON_WEAKLY_REVERSIBLE_TRANSITIONS")) ->
+    let state, transitions = get_separating_transitions !gState in
+    let () = gState := state in
+    send_response post id transitions
   | Some(id, (`List [ `String "CONSTRAINTS" ] | `String "CONSTRAINTS")) ->
     let state, out = get_constraints_list !gState in
     let () = gState := state in
