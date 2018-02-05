@@ -65,7 +65,7 @@ t = 0.000000;
 
 init(16)=t;
 init(1)=20; % E(r!1), R(e~u!1,r!2), R(e~u!3,r!2), E(r!3)
-var(2)=init(1)+2*init(6)+init(7); % r1: E() ->  @ |E(r[1]), R(e[1] r[2]), R(r[2] e[3]), E(r[3])|_rate
+var(2)=init(1)+2*init(6)+init(7); % r7: E() ->  @ |E(r[1]), R(e[1] r[2]), R(r[2] e[3]), E(r[3])|_rate
 var(1)=init(2)+init(4)+init(5)+init(15)+init(10)+init(11)+init(9)+init(1)+2*init(6)+init(7); % d
 
 k(1)=1; % E(r), R(e) -> E(r!1), R(e!1)
@@ -212,7 +212,7 @@ global kun
 global kdun
 global stoc
 
-var(2)=y(1)+2*y(6)+y(7); % r1: E() ->  @ |E(r[1]), R(e[1] r[2]), R(r[2] e[3]), E(r[3])|_rate
+var(2)=y(1)+2*y(6)+y(7); % r7: E() ->  @ |E(r[1]), R(e[1] r[2]), R(r[2] e[3]), E(r[3])|_rate
 var(1)=y(2)+y(4)+y(5)+y(15)+y(10)+y(11)+y(9)+y(1)+2*y(6)+y(7); % d
 
 k(8)=var(2);
@@ -773,7 +773,7 @@ global jackun
 global jackund
 global jacstoc
 
-var(2)=y(1)+2*y(6)+y(7); % r1: E() ->  @ |E(r[1]), R(e[1] r[2]), R(r[2] e[3]), E(r[3])|_rate
+var(2)=y(1)+2*y(6)+y(7); % r7: E() ->  @ |E(r[1]), R(e[1] r[2]), R(r[2] e[3]), E(r[3])|_rate
 var(1)=y(2)+y(4)+y(5)+y(15)+y(10)+y(11)+y(9)+y(1)+2*y(6)+y(7); % d
 
 k(8)=var(2);
@@ -2029,7 +2029,7 @@ global var
 obs=zeros(nobs,1);
 
 t = y(16);
-var(2)=y(1)+2*y(6)+y(7); % r1: E() ->  @ |E(r[1]), R(e[1] r[2]), R(r[2] e[3]), E(r[3])|_rate
+var(2)=y(1)+2*y(6)+y(7); % r7: E() ->  @ |E(r[1]), R(e[1] r[2]), R(r[2] e[3]), E(r[3])|_rate
 var(1)=y(2)+y(4)+y(5)+y(15)+y(10)+y(11)+y(9)+y(1)+2*y(6)+y(7); % d
 
 obs(1)=t; % [T]
