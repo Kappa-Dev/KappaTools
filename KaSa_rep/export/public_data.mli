@@ -141,11 +141,10 @@ type dead_rules = rule list
 val dead_rules_of_json : Yojson.Basic.json -> dead_rules
 val dead_rules_to_json : dead_rules -> Yojson.Basic.json
 
-type separating_transitions =
-  (string * string) list Mods.IntMap.t 
+type separating_transitions = (rule * (string * string) list) list
 
 val separating_transitions_of_json: Yojson.Basic.json -> separating_transitions
-
+val separating_transitions_to_json: separating_transitions -> Yojson.Basic.json
 type 'site_graph lemma =
   {
     hyp : 'site_graph ;

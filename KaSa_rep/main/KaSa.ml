@@ -228,11 +228,11 @@ let main () =
         | None -> ()
         | Some l ->
           let nr,nt =
-            Mods.IntMap.fold
-              (fun r l (nr,nt) ->
+            List.fold_left
+              (fun (nr,nt) (r,l) ->
                  nr+1,
                  nt+List.length l)
-              l (0,0)
+              (0,0) l
           in
           Loggers.fprintf
             (Remanent_parameters.get_logger parameters)

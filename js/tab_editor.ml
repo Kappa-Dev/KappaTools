@@ -92,9 +92,49 @@ let init_dead_rules () =
                                Some rule.Public_data.rule_position;
                              Api_types_t.message_text;
                            } :: acc) [] list in
-                  let warnings = List.rev warnings in 
+                  let warnings = List.rev warnings in
                   State_error.add_error __LOC__ warnings)
                manager#get_dead_rules) >>=
+            fun out -> Lwt.return (Api_common.result_lift out)
+         )
+    )
+    State_project.model
+
+let init_non_weakly_reversible_transitions () =
+  React.S.l1
+    (fun _ ->
+       State_project.with_project
+         ~label:__LOC__
+         (fun (manager : Api.concrete_manager) ->
+            (Lwt_result.map
+               (fun non_weakly_reversible_transitions_json ->
+                  let list = Public_data.separating_transitions_of_json non_weakly_reversible_transitions_json
+                  in
+                  let warnings =
+                    List.fold_left
+                      (fun acc (rule,context_list) ->
+                         if rule.Public_data.rule_hidden
+                         then acc (* hint: reversible rule are always weakly reversible *)
+                          else
+                           let message_text =
+                             "Rule "^
+                             (if rule.Public_data.rule_label <> ""
+                              then (" '"^rule.Public_data.rule_label^"'")
+                              else if rule.Public_data.rule_ast <> ""
+                              then rule.Public_data.rule_ast
+                              else string_of_int rule.Public_data.rule_id)^
+                             "may induce non wealky reversible events"
+                           in
+                           (* to do, add the potential contexts *)
+                           {
+                             Api_types_t.message_severity = `Warning;
+                             Api_types_t.message_range =
+                               Some rule.Public_data.rule_position;
+                             Api_types_t.message_text;
+                           } :: acc) [] list in
+                  let warnings = List.rev warnings in
+                  State_error.add_error __LOC__ warnings)
+               manager#get_non_weakly_reversible_transitions) >>=
             fun out -> Lwt.return (Api_common.result_lift out)
          )
     )
@@ -103,6 +143,7 @@ let init_dead_rules () =
 let onload () =
   let () = Subpanel_editor.onload () in
   let _ = init_dead_rules () in
+  let _ = init_non_weakly_reversible_transitions () in
   let () = Tab_contact_map.onload () in
   let () = Tab_influences.onload () in
   let () = Tab_constraints.onload () in

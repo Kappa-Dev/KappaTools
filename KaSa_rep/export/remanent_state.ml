@@ -68,18 +68,7 @@ let info_to_rule (s1,loc,direction,s2,id) =
 
 type dead_agents = Ckappa_sig.c_agent_name list
 
-type separating_transitions =
-  (string  * string) list Mods.IntMap.t
-
-let separating_transitions_to_json =
-  JsonUtil.of_map
-    ~fold:Mods.IntMap.fold
-    (fun x -> Ckappa_sig.rule_id_to_json (Ckappa_sig.rule_id_of_int x))
-    (JsonUtil.of_list
-       (JsonUtil.of_pair
-       ~lab1:"source" ~lab2:"target"
-       JsonUtil.of_string
-       JsonUtil.of_string))
+type separating_transitions = Public_data.separating_transitions
 
 (******************************************************************************)
 (*********************)
@@ -520,7 +509,7 @@ let add_separating_transitions state l =
   | None -> l
   | Some list ->
     (separating_transitions,
-     separating_transitions_to_json list)::l
+     Public_data.separating_transitions_to_json list)::l
 
 let to_json state =
   let l = [] in

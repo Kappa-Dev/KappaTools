@@ -120,6 +120,8 @@ class type virtual manager_static_analysis = object
     (int,int) Public_data.influence_node option ->
     (Yojson.Basic.json,string) Lwt_result.t
   method get_dead_rules : (Yojson.Basic.json,string) Lwt_result.t
+  method get_non_weakly_reversible_transitions :
+    (Yojson.Basic.json,string) Lwt_result.t 
   method get_constraints_list : (Yojson.Basic.json,string) Lwt_result.t
 end
 

@@ -752,26 +752,35 @@ let dead_rules_of_json =
 (* dead agents *)
 (***************)
 
-type separating_transitions =
-  (string * string) list Mods.IntMap.t
+type separating_transitions = (rule * (string * string) list) list
 
-
+let separating_transitions_to_json =
+  JsonUtil.of_list
+    (JsonUtil.of_pair
+       ~lab1:"rule" ~lab2:"potential-contexts"
+       rule_to_json
+       (JsonUtil.of_list
+          (
+            JsonUtil.of_pair
+              ~lab1:"s1" ~lab2:"s2"
+              JsonUtil.of_string
+              JsonUtil.of_string)
+       ))
 
 let separating_transitions_of_json =
-  JsonUtil.to_map
-    ~add:Mods.IntMap.add
-    ~empty:Mods.IntMap.empty 
-    ~error_msg:"separaring transitions map"
-    (JsonUtil.to_int ~error_msg:"rule id")
-    (JsonUtil.to_list
-       ~error_msg:"separating transitions"
-       (
-         JsonUtil.to_pair
-           ~error_msg:"transition"
-           ~lab1:"s1" ~lab2:"s2"
-           (JsonUtil.to_string ?error_msg:None)
-           (JsonUtil.to_string ?error_msg:None))
-    )
+  JsonUtil.to_list
+    ~error_msg:"separating transitions list"
+    (JsonUtil.to_pair ~error_msg:"separating transition"
+       json_to_rule
+       (JsonUtil.to_list
+          ~error_msg:"separating transitions"
+          (
+            JsonUtil.to_pair
+              ~error_msg:"transition"
+              ~lab1:"s1" ~lab2:"s2"
+              (JsonUtil.to_string ?error_msg:None)
+              (JsonUtil.to_string ?error_msg:None))
+       ))
 
 (***************)
 (* Constraints *)

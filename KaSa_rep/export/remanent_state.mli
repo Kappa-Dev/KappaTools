@@ -41,11 +41,7 @@ val info_to_rule:
   (string*Locality.t*Public_data.rule_direction*string*Ckappa_sig.c_rule_id)
   -> Public_data.rule
 
-type separating_transitions =
-  (string * string) list Mods.IntMap.t
-
-val separating_transitions_to_json:
-  separating_transitions -> Yojson.Basic.json
+type separating_transitions = Public_data.separating_transitions
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, Ckappa_sig.mixture, string, Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
