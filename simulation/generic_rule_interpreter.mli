@@ -43,7 +43,8 @@ module Make (Instances:Instances_sig.S) : sig
       [rule_id] is mandatory if the rule has an unary rate.*)
 
   val apply_rule :
-    outputs:(Data.t -> unit) -> maxConsecutiveClash:int ->
+    outputs:(Data.t -> unit) ->
+    ?maxConsecutiveBlocked:int -> maxConsecutiveClash:int ->
     Model.t -> Counter.t -> t -> int option * bool * t
   (** [apply_rule ~outputs ~maxConsecutiveClash ?is_blocked model counter st]
       Returns [(corresponding_syntactic_rule, is_final_step, new_state)].
@@ -91,12 +92,13 @@ module Make (Instances:Instances_sig.S) : sig
 
   (** {6 Blocking events} *)
 
-  type blocking_predicate =
+  type event_predicate =
     int option -> Matching.t ->
+    (Instantiation.concrete Instantiation.test) list ->
     (Instantiation.concrete Instantiation.action) list ->
     bool
 
-  val set_events_to_block : blocking_predicate option -> t -> t
+  val set_events_to_block : event_predicate option -> t -> t
 
   (** {6 Stories} *)
 

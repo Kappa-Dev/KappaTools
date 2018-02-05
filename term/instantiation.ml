@@ -88,11 +88,14 @@ let concretize_action inj2graph = function
   | Free (pl,s) -> Free (Matching.Agent.concretize inj2graph pl,s)
   | Remove pl -> Remove (Matching.Agent.concretize inj2graph pl)
 
-let try_concretize_action inj2graph ag = 
-  try Some (concretize_action inj2graph ag)
+let try_concretize_action inj2graph actions =
+  try Some (concretize_action inj2graph actions)
   with Not_found -> None
   (* The action is dealing with a fresh agent *)
 
+let try_concretize_test inj2graph tests =
+  try Some (concretize_test inj2graph tests)
+  with Not_found -> None
 
 let concretize_event inj2graph e =
   {

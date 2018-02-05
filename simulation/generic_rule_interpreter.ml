@@ -13,9 +13,12 @@ type precomputed =
   }
 
 module Make (Instances:Instances_sig.S) = struct
-  type blocking_predicate =
+  
+  type event_predicate =
     int option -> Matching.t ->
-    (Instantiation.concrete Instantiation.action) list -> bool
+    (Instantiation.concrete Instantiation.test) list ->
+    (Instantiation.concrete Instantiation.action) list ->
+    bool
 
   type t =
     {
@@ -56,7 +59,7 @@ module Make (Instances:Instances_sig.S) = struct
          Instantiation.abstract Instantiation.test list list) list
           Pattern.ObsMap.t;
 
-      events_to_block : blocking_predicate option
+      events_to_block : event_predicate option
     }
 
   let get_edges st = st.edges
@@ -152,12 +155,21 @@ module Make (Instances:Instances_sig.S) = struct
     List_util.map_option
       (Instantiation.try_concretize_action inj) abstract_actions
 
+  let concrete_tests_for_incomplete_inj rule matching =
+    let abstract_tests =
+      rule.Primitives.instantiations.Instantiation.tests
+      |> List.concat in
+    let inj = (matching, Mods.IntMap.empty) in
+    List_util.map_option
+      (Instantiation.try_concretize_test inj) abstract_tests
+
   let is_blocked state ?rule_id rule matching =
     match state.events_to_block with
     | None -> false
     | Some to_block ->
       let actions = concrete_actions_for_incomplete_inj rule matching in
-      to_block rule_id matching actions
+      let tests = concrete_tests_for_incomplete_inj rule matching in
+      to_block rule_id matching tests actions
 
   let set_events_to_block predicate state =
     { state with
@@ -1019,7 +1031,9 @@ module Make (Instances:Instances_sig.S) = struct
         (Format.asprintf "%a" (Model.print_token ~env) i,x)) state.tokens;
   }
 
-  let apply_rule ~outputs ~maxConsecutiveClash env counter graph =
+  let apply_rule ~outputs ?maxConsecutiveBlocked ~maxConsecutiveClash 
+    env counter graph =
+
     let choice = pick_rule graph.random_state graph in
     let rule_id = choice/2 in
     let rule = Model.get_rule env rule_id in
@@ -1041,12 +1055,17 @@ module Make (Instances:Instances_sig.S) = struct
       (Some rule.Primitives.syntactic_rule,final_step,graph')
     | (Clash | Corrected | Blocked) as out ->
       let continue =
-        if out = Clash || out = Blocked then
+        if out = Clash then
           Counter.one_clashing_instance_event counter
+        else if out = Blocked then
+          Counter.one_blocked_event counter
         else if choice mod 2 = 1
         then Counter.one_no_more_unary_event counter
         else Counter.one_no_more_binary_event counter in
-      if Counter.consecutive_null_event counter < maxConsecutiveClash
+      if Counter.consecutive_null_event counter < maxConsecutiveClash &&
+         (match maxConsecutiveBlocked with
+            | None -> true
+            | Some n -> Counter.consecutive_blocked counter < n)
       then (None,not continue,graph)
       else
         (None,not continue,
