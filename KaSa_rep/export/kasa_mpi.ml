@@ -138,6 +138,27 @@ let on_message post text =
     let state, out = get_constraints_list !gState in
     let () = gState := state in
     send_response post id out
+  | Some(id, (`List [ `String "POLYMERS" ; acc_cm] )) ->
+    let accuracy_level_cm = Public_data.accuracy_of_json acc_cm in
+    let state, out =
+      get_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc:Public_data.Low !gState
+    in
+    let () = gState := state in
+    send_response post id out
+    | Some(id, (`List [ `String "POLYMERS" ; acc_cm ; acc_scc ] )) ->
+      let accuracy_level_cm = Public_data.accuracy_of_json acc_cm in
+      let accuracy_level_scc = Public_data.accuracy_of_json acc_scc in
+      let state, out =
+        get_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc !gState
+      in
+      let () = gState := state in
+        send_response post id out
+  | Some(id, (`List [ `String "POLYMERS" ; ] | `String "POLYMERS")) ->
+        let state, out =
+          get_scc_decomposition ~accuracy_level_cm:Public_data.Low ~accuracy_level_scc:Public_data.Low !gState
+        in
+        let () = gState := state in
+          send_response post id out
   | Some(id, x) ->
     send_exception
       post ~id (Yojson.Basic.Util.Type_error("Invalid KaSa request",x))

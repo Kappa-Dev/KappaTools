@@ -29,6 +29,7 @@ let rightsubpanel () =
        [ "contact_map", (Tab_contact_map.navli ())
        ; "influences", (Tab_influences.navli ())
        ; "constraints", (Tab_constraints.navli ())
+       ; "polymers", (Tab_polymers.navli ())
        ];
      Ui_common.navcontent
        ~id:rightsubpanel_id
@@ -36,6 +37,7 @@ let rightsubpanel () =
        [ "contact_map", [], (Tab_contact_map.content ())
        ; "influences",  [], (Tab_influences.content ())
        ; "constraints", [], (Tab_constraints.content ())
+       ; "polymers", [], (Tab_polymers.content ())
        ]]
 
 let content () =
@@ -58,11 +60,13 @@ let childs_hide b =
   if b then
     let () = Tab_contact_map.parent_hide () in
     let () = Tab_influences.parent_hide () in
-    Tab_constraints.parent_hide ()
+    let () = Tab_constraints.parent_hide () in
+    Tab_polymers.parent_hide ()
   else
     let () = Tab_contact_map.parent_shown () in
     let () = Tab_influences.parent_shown () in
-    Tab_constraints.parent_shown ()
+    let () = Tab_constraints.parent_shown () in
+    Tab_polymers.parent_shown ()
 
 let init_dead_rules () =
   React.S.l1
@@ -160,6 +164,7 @@ let onload () =
   let () = Tab_contact_map.onload () in
   let () = Tab_influences.onload () in
   let () = Tab_constraints.onload () in
+  let () = Tab_polymers.onload () in
   let _ = React.S.map childs_hide Subpanel_editor.editor_full in
   let () = Common.jquery_on
       "#naveditor" "hide.bs.tab" (fun _ -> childs_hide true) in
@@ -172,4 +177,5 @@ let onresize () : unit =
   let () = Tab_contact_map.onresize () in
   let () = Tab_influences.onresize () in
   let () = Tab_constraints.onresize () in
+  let () = Tab_polymers.onresize () in
   ()

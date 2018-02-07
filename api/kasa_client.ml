@@ -137,4 +137,23 @@ class virtual new_client ~post (mailbox : mailbox) :
       Lwt_result.bind_result
         (self#message post request)
         (fun x -> Result.Ok x)
+    method get_potential_polymers accuracy_cm accuracy_scc =
+      let request = `List ( `String "POLYMERS" ::   (
+         match accuracy_cm, accuracy_scc with
+           | None,None -> []
+           | Some a,None  -> [Public_data.accuracy_to_json a]
+           | Some a, Some b ->
+             [
+               Public_data.accuracy_to_json a;
+               Public_data.accuracy_to_json b
+             ]
+           | None, Some b ->
+             [
+               Public_data.accuracy_to_json Public_data.Low ;
+               Public_data.accuracy_to_json b
+             ] ))
+      in
+      Lwt_result.bind_result
+        (self#message post request)
+        (fun x -> Result.Ok x)
   end

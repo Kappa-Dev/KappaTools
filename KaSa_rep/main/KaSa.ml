@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Feb 05 2018>
+ * Last modification: Time-stamp: <Feb 07 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -65,7 +65,7 @@ let main () =
         Export_to_KaSa.output_scc_decomposition
           ~accuracy_level_cm ~accuracy_level_scc state
       in
-      state
+        state
     else
       state
   in
@@ -228,7 +228,7 @@ let main () =
         | None -> ()
         | Some l ->
           let json = Public_data.separating_transitions_to_json l in
-          let l = Public_data.separating_transitions_of_json json in 
+          let l = Public_data.separating_transitions_of_json json in
           let nr,nt =
             List.fold_left
               (fun (nr,nt) (r,l) ->

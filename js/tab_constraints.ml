@@ -20,96 +20,6 @@ let relational = ref true
 let site_accross = ref true
 let parallel_bond = ref true
 
-let print_string s list = (Html.pcdata s)::list
-let print_newline list = print_string "\n" list
-let print_int i l = print_string (string_of_int i) l
-
-let print_single_binding_state a list =
-  print_string
-    Public_data.binding_state_opening_backend_symbol
-    (print_string
-       a
-       (
-         print_string
-           Public_data.binding_state_closing_backend_symbol list))
-
-let print_single_internal_state a list =
-  print_string
-    Public_data.internal_state_opening_backend_symbol
-    (print_string
-       a
-       (
-         print_string
-           Public_data.internal_state_closing_backend_symbol list))
-
-let print_site site list =
-  let site_name, prop_opt, binding_opt = site in
-  let list =
-    match binding_opt with
-    | Some Public_data.Free | None ->
-      print_single_binding_state
-           Public_data.free_backend_symbol list
-    | Some Public_data.Wildcard -> (*
-      print_single_binding_state
-        Public_data.wildcard_backend_symbol*) list
-    | Some Public_data.Bound_to_unknown ->
-      print_single_binding_state
-        Public_data.bound_to_unknown_backend_symbol list
-    | Some (Public_data.Binding_type (agent_name,site_name)) ->
-      let binding_type_symbol =
-        Public_data.binding_type_backend_symbol
-      in
-      print_single_binding_state
-           (Public_data.string_of_binding_type
-              ~binding_type_symbol ~agent_name ~site_name)
-           list
-    | Some (Public_data.Bound_to i) ->
-      print_single_binding_state
-        (string_of_int i)
-        list
-  in
-  let list =
-    match prop_opt with
-    | None -> list
-    | Some a ->
-      print_single_internal_state a list
-  in
-  print_string site_name list
-
-let print_agent agent list =
-  let agent_name, interface = agent in
-  let list = print_string ")" list in
-  let list =
-    snd
-      (List.fold_left
-         (fun (b,list) site ->
-            let list =
-              if b then
-                print_string "," list
-              else
-                list
-            in
-            let list = print_site site list in
-            true,list)
-         (false,list) interface)
-  in
-  let list = (Html.pcdata "(")::list in
-  let list = (Html.pcdata agent_name)::list in
-  list
-
-let print_site_graph agent_list list =
-  snd (
-    List.fold_left
-      (fun (b,list) agent ->
-         let list =
-           if b then
-             print_string "," list
-           else list
-         in
-         true, print_agent agent list)
-    (false,list)
-    (List.rev agent_list))
-
 let content () =
   let constraints,set_constraints = ReactiveData.RList.create [] in
   let _ = React.S.l1
@@ -127,7 +37,7 @@ let content () =
                         [ Html.p
                             (List.fold_left
                                (fun list (a,b) ->
-                                  let list = print_newline list in
+                                  let list = Utility.print_newline list in
                                   let list =
                                     List.fold_left
                                       (fun list lemma ->
@@ -141,11 +51,11 @@ let content () =
                                          let list =              (
                                            match conclusion with
                                            | [site_graph] ->
-                                             print_site_graph site_graph
-                                               (print_newline list)
+                                             Utility.print_site_graph site_graph
+                                               (Utility.print_newline list)
                                            | _::_ | [] ->
-                                             let list = print_newline list in
-                                             let list = print_string " ]" list in
+                                             let list = Utility.print_newline list in
+                                             let list = Utility.print_string " ]" list in
                                              let list =
                                                (snd
                                               (
@@ -154,33 +64,33 @@ let content () =
                                                  (fun (bool,list) a ->
                                                     let list =
                                                       if bool then
-                                                        (print_string " v " list)
+                                                        (Utility.print_string " v " list)
                                                       else
                                                         list
                                                     in
                                                     let list =
-                                                      print_site_graph a list
+                                                      Utility.print_site_graph a list
                                                     in                          true,
                                                     list)
                                                  (false,list)
                                                  (List.rev conclusion)
                                               )) in
-                                             let list = print_string " [ " list
+                                             let list = Utility.print_string " [ " list
                                              in
                                              list)
                                          in
 
-                                         let list = print_string " =>  " list in
-                                         let list = print_site_graph hyp list in
+                                         let list = Utility.print_string " =>  " list in
+                                         let list = Utility.print_site_graph hyp list in
 
 
                                         list)
                                       list
                                       b
                     in
-                    let list = print_newline list in
-                    let list = print_newline list in
-                    let list = print_string a list in
+                    let list = Utility.print_newline list in
+                    let list = Utility.print_newline list in
+                    let list = Utility.print_string a list in
                                   list)
                                [] constraints)
 

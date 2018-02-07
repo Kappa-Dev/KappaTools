@@ -562,7 +562,7 @@ class manager
 
   method get_non_weakly_reversible_transitions =
     send
-      ?timeout 
+      ?timeout
       (Format.sprintf
          "%s/v2/projects/%s/analyses/non_weakly_reversible_transitions"
          url project_id)
@@ -585,4 +585,25 @@ class manager
       ~error:(fun _ -> function
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
+
+  method get_potential_polymers accuracy_cm accuracy_scc =
+    let options =
+      match accuracy_cm, accuracy_scc with
+      | None, None -> ""
+      | Some a, None -> "?accuracy_cm="^(Public_data.accuracy_to_string a)
+      | None, Some a -> "?accuracy_scc="^(Public_data.accuracy_to_string a)
+      | Some a, Some b -> "?accuracy_cm="^(Public_data.accuracy_to_string a)^"&accuracy_scc="^(Public_data.accuracy_to_string b)
+    in
+    send
+      ?timeout 
+      (Format.sprintf "%s/v2/projects/%s/analyses/potential_polymers%s" url project_id options )
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
+  method is_computing = is_computing request_count
 end
