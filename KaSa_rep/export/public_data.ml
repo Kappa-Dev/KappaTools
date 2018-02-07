@@ -66,6 +66,7 @@ type accuracy_level = Low | Medium | High | Full
 let accuracy_levels = [ Low; Medium; High; Full ]
 let contact_map_accuracy_levels = [ Low; High ]
 let influence_map_accuracy_levels = [ Low; Medium; High]
+let reduction_accuracy_levels = [Low; High]
 let accuracy_to_string = function
   | Low -> "low"
   | Medium -> "medium"
@@ -272,23 +273,48 @@ let contact_map_of_json =
 
 type scc = ((string * string) * (string * string)) list list
 
-let scc_pair_string_to_json (a,b) =
+let string_pair_to_json (a,b) =
   JsonUtil.of_pair
     ~lab1:agent ~lab2:sitename
     JsonUtil.of_string
     JsonUtil.of_string
     (a,b)
 
-let scc_pair_of_pair_to_json (a,b) =
+let string_pair_of_json (json:Yojson.Basic.json) : string * string  =
+  JsonUtil.to_pair ~lab1:agent ~lab2:sitename ~error_msg:"site"
+      (JsonUtil.to_string  ~error_msg:"agent name")
+      (JsonUtil.to_string ~error_msg:"site_name")
+      json
+
+let string_pair_pair_to_json (a,b) =
   JsonUtil.of_pair
-    scc_pair_string_to_json
-    scc_pair_string_to_json
+    string_pair_to_json
+    string_pair_to_json
     (a,b)
 
-let scc_pair_of_pair_of_list_to_json l =
+let string_pair_pair_of_json json : (string * string) * (string * string) =
+  JsonUtil.to_pair ~error_msg:"bond"
+    string_pair_of_json
+    string_pair_of_json
+    json
+
+let string_pair_pair_list_to_json l =
   JsonUtil.of_list
-    scc_pair_of_pair_to_json
+    string_pair_pair_to_json
     l
+
+let string_pair_pair_list_of_json json =
+  JsonUtil.to_list ~error_msg:"list_of_bonds"
+    string_pair_pair_of_json json
+
+let string_pair_pair_list_list_to_json l =
+  JsonUtil.of_list
+    string_pair_pair_list_to_json
+    l
+
+let string_pair_pair_list_list_of_json json =
+  JsonUtil.to_list ~error_msg:"list_of_lists_of_bonds"
+    string_pair_pair_list_of_json json
 
 let scc_to_json (cm_acc,scc_acc,scc) =
   `Assoc [
@@ -297,41 +323,33 @@ let scc_to_json (cm_acc,scc_acc,scc) =
       ~lab1:accuracy_cm ~lab2:accuracy_scc ~lab3:map
       accuracy_to_json
       accuracy_to_json
-      (JsonUtil.of_list
-         scc_pair_of_pair_of_list_to_json)
+      string_pair_pair_list_list_to_json
       (cm_acc, scc_acc, scc)
   ]
 
-let pair_of_json (json:Yojson.Basic.json) : string * string  =
-  let (agent_name, site_name) =
-    JsonUtil.to_pair ~lab1:agent ~lab2:site
-      (fun json_a -> JsonUtil.to_string json_a)
-      (fun json_b -> JsonUtil.to_string json_b)
-      json
-  in
-  (agent_name,site_name)
 
-let pair_of_pair_of_json json : (string * string) * (string * string) =
-  let (agent_name, site_name) =
-    pair_of_json
-      json
-  in
-  let (agent_name', site_name') =
-    pair_of_json
-      json
-  in
-  (agent_name, site_name), (agent_name', site_name')
+let scc_of_json =
+  function
+  | `Assoc l as x ->
+    begin
+      try
+        let json = List.assoc contactmapscc l in
+        JsonUtil.to_triple
+          ~lab1:accuracy_cm ~lab2:accuracy_scc ~lab3:map
+          ~error_msg:"scc decomposition"
+          accuracy_of_json
+          accuracy_of_json
+          string_pair_pair_list_list_of_json
+          json
+      with
+      | _ ->
+        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "scc decomposition",x))
 
-let list_of_pair_of_json json =
-  JsonUtil.to_list ~error_msg:"site graph"
-    pair_of_pair_of_json json
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "scc decomposition",x))
 
-let scc_of_json json =
-  let scc =
-    JsonUtil.to_list ~error_msg:"scc"
-      list_of_pair_of_json json
-  in
-  Low, Low, scc
+
 
 (******************************************************************************)
 

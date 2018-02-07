@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jan 27 2018>
+  * Last modification: Time-stamp: <Feb 07 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1507,27 +1507,32 @@ let get_internal_scc_decomposition_map state =
 let translate_scc_decomposition state
     (internal_scc:internal_scc_decomposition) =
   let error = Remanent_state.get_errors state in
+  let parameters = get_parameters state in
+  let state, handler = get_handler state in
   let error, scc =
     List.fold_left (fun (error, store_result) list ->
         let error, store_list =
           List.fold_left (fun (error, store_result) ((ag,st),(ag',st')) ->
-              let error, store_result =
-                let agent =
-                  Ckappa_sig.string_of_agent_name ag
-                in
-                let site =
-                  Ckappa_sig.string_of_site_name st
-                in
-                let agent' =
-                  Ckappa_sig.string_of_agent_name ag'
-                in
-                let site' =
-                  Ckappa_sig.string_of_site_name st'
-                in
-                let pair = ((agent, site), (agent', site')) in
-                error, pair :: store_result
+              let error,agent =
+                Handler.translate_agent
+                  ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+                  parameters error handler ag
               in
-              error, store_result
+              let error,site =
+                Handler.translate_site parameters error handler ag st
+              in
+              let site = simplify_site site in
+              let error,agent' =
+                Handler.translate_agent
+                  ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+                  parameters error handler ag'
+              in
+              let error,site' =
+                Handler.translate_site parameters error handler ag' st'
+              in
+              let site' = simplify_site site' in
+              let pair = ((agent, site), (agent', site')) in
+              error, pair :: store_result
             ) (error, []) list
         in
         error, store_list :: store_result

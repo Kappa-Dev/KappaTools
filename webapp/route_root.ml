@@ -775,4 +775,20 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/potential_polymers" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let project_id = project_ref context in
+            tmp_bind_projects
+              (fun manager -> manager#get_potential_polymers)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
   ]

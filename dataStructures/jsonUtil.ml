@@ -152,7 +152,7 @@ let to_triple
     ?error_msg:(error_msg=build_msg "triple")
     of_json1 of_json2 of_json3 =
   function
-  | `Assoc l as x when List.length l = 2 ->
+  | `Assoc l as x when List.length l = 3 ->
     begin
       try
         of_json1 (List.assoc lab1 l),
