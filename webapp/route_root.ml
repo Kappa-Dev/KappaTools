@@ -784,7 +784,7 @@ let route
           | `GET ->
             let project_id = project_ref context in
             tmp_bind_projects
-              (fun manager -> manager#get_potential_polymers)
+              (fun manager -> manager#get_potential_polymers (Some Public_data.High) (Some Public_data.High)) (*TO DO make it tunable *)
               project_id projects >>=
             Webapp_common.result_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
