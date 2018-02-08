@@ -595,7 +595,7 @@ class manager
       | Some a, Some b -> "?accuracy_cm="^(Public_data.accuracy_to_string a)^"&accuracy_scc="^(Public_data.accuracy_to_string b)
     in
     send
-      ?timeout 
+      ?timeout
       (Format.sprintf "%s/v2/projects/%s/analyses/potential_polymers%s" url project_id options )
       `GET
       (fun x -> Yojson.Basic.from_string x)
@@ -605,5 +605,4 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method is_computing = is_computing request_count
 end
