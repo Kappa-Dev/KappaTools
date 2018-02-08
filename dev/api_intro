@@ -46,6 +46,8 @@ This library that proposes different implementations for arrays can be found in 
 {!modules: Int_storage}
 The library to deal with multi-valued decision diagrams is in KaSa_rep/data_structures/mvbdu/
 {!modules: Mvbdu_wrapper}
+The library that deals with affine relationships (taken from Pi-S.A.) is in KaSa_rep/data_structures/affine_arithemtics
+{!modules: tools_aff header config_aff working_list_aff fractions intervalles intertab matrices mat_intes occur1 }
 
 The code of the static analyser is in KaSa_rep/reachability_analysis/
 {!modules: Analyzer Analyzer_headers Composite_domain Communication Analyzer_domain_sig Product Usual_domains}
