@@ -667,7 +667,7 @@ let compress
     let event,s = match parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
       with Some Story_json.Weak ->
         StoryProfiling.Weak_compression,"Start one weak compression"
-         | _ -> StoryProfiling.Strong_compression,"Start one string compression"
+         | _ -> StoryProfiling.Strong_compression,"Start one strong compression"
     in
     let () =
       if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter &&
