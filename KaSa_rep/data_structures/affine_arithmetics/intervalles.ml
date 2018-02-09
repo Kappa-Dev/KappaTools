@@ -1,7 +1,7 @@
 open Fraction;;
 open Hashtbl;;
 open Header;;
-open Working_list_aff;;
+open Working_list_imperative;;
 
 
 
@@ -27,6 +27,7 @@ let trans_convexe i t =
                             | a -> a) in
     {inf=ffmax inff (Frac {num=0;den=1});sup=supf};;
 
+let zero = {inf= Frac Fraction.zero; sup=Frac Fraction.zero}
 
 let union_convexe  t1 t2 =
    let n=Array.length t1 in
@@ -53,7 +54,7 @@ let wide_union_convexe t1 t2 =
 
 let wide_en_place t1 t2 =
   let n=Array.length t1 in
-  let l=Working_list_aff.new_working_list hashnumber in
+  let l=Working_list_imperative.make hashnumber in
   let changed=(ref false) in
   for i=0 to (n-1) do
     changed:=false;
@@ -73,8 +74,8 @@ let wide_en_place t1 t2 =
 
 		else (changed:=true;t2.(i).sup))
 	      else (t1.(i).sup))} in
-    if (!changed) then (l.Working_list_aff.push i;t1.(i)<-rep) else ()
-  done;l.list () ;;
+    if (!changed) then (Working_list_imperative.push i l;t1.(i)<-rep) else ()
+  done;Working_list_imperative.list l ;;
 
 
 let cap_inter i1 i2 =
@@ -136,11 +137,18 @@ let contient_zero i =
 
 
 
-let string_of_intervalle i =
+let string_of_intervalle parameters i =
     match i with
-      _ when i.sup=Infinity -> ("[|"^(string_of_int(trunc (i.inf)))^";"^
-(Config_aff.st_inf)^"|[")
+        _ when i.sup=Infinity ->
+        ((Remanent_parameters.get_open_int_interval_inclusive_symbol parameters )^
+         (string_of_int(trunc (i.inf)))^
+         (Remanent_parameters.get_int_interval_separator_symbol parameters)^
+         (Remanent_parameters.get_plus_infinity_symbol  parameters )^
+         (Remanent_parameters.get_close_int_interval_infinity_symbol parameters ))
    |  _ when trunc(i.inf)=trunc(i.sup)    -> string_of_int(trunc(i.inf))
-   |  _ -> "[|"^(string_of_int(trunc
-(i.inf)))^";"^(string_of_int(trunc(i.sup)))^"|]"
-    ;;
+   |  _ ->
+     (Remanent_parameters.get_open_int_interval_inclusive_symbol parameters )^
+     (string_of_int(trunc i.inf))^
+     (Remanent_parameters.get_int_interval_separator_symbol parameters)^
+     (string_of_int(trunc(i.sup)))^
+     (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters )

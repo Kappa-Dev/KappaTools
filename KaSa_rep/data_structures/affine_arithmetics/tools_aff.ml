@@ -1,13 +1,16 @@
-open Hashtbl;;
-open List;;
-open Config_aff;;
-open Unix;;
-open Working_list_aff;;
+open Hashtbl
+open List
+open Working_list_imperative
 
-let t_int x = if tra then (print_int x);;
-let t_string x = if tra then (print_string x ;print_newline());;
+let trace = ref false
 
-let trace = ref false ;;
+let t_int parameters x =
+  if Remanent_parameters.get_trace parameters || !trace
+  then Loggers.fprintf (Remanent_parameters.get_logger parameters) "%i" x
+
+let t_string parameters x =
+  if Remanent_parameters.get_trace parameters || !trace
+  then Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x
 
 let comp_pair (a,b) (x,y)  =
     match (a<x,a=x,b<y) with true,_,_   -> (-1)
@@ -26,18 +29,17 @@ let rec true_map x y =
 		|     [] -> [] ;;
 
 
-let max_of_list liste =
-    let rec aux liste sol =
-        match liste with [] -> sol
-                 | a::b -> aux b (max sol a)
-    in match liste with [] -> raise Exit
-                  | t::q -> aux q t;;
+let max_of_list parameters error list =
+  match list with
+  | [] ->
+    Exception.warn
+      parameters error __POS__
+      Exit  None
+  | t::q ->
+    error, Some (List.fold_left max t q)
 
-let sum_list liste =
-    let rec aux liste sol =
-        match liste with [] -> sol
-                  |  t::q -> aux q (sol+t)
-    in aux liste 0 ;;
+let sum_list list =
+  List.fold_left (fun a b -> a+b) 0 list
 
 
 
@@ -82,23 +84,34 @@ let rec forall p l=
                         else false
                | []   -> true ;;
 
-let rec correspondance ancien nouveau x=
-        match ancien,nouveau with a::b,p::q ->
-              (if a=x then p else (correspondance b q x))
-                               |[],[] -> x
-                               |_ -> raise Exit;;
+let rec correspondance parameters error ancien nouveau x=
+  match ancien,nouveau with
+  | a::_,p::_ when a=x -> error, Some p
+  | _::b,_::q -> correspondance parameters error b q x
+  | [],[] -> error, Some x
+  |_ ->
+    Exception.warn parameters error __POS__ Exit None
 
 
-let transfert ancien nouveau liste =
-    let rec aux l =
-        match l with [] ->[]
-                   | a::b ->(correspondance ancien nouveau  a)::(aux b)
+let transfert parameters error ancien nouveau liste =
+    let rec aux parameters error l =
+        match l with [] -> error, []
+                   | a::b ->
+                     let error, h =
+                       correspondance parameters error ancien nouveau a
+                     in
+                     let error, tl =
+                       aux parameters error b
+                     in
+                     error, h::tl
     in
-    aux liste;;
+    aux parameters error liste;;
 
-let tr ancien nouveau id =
-    match (transfert ancien nouveau [id]) with [res]->res
-                                          |_ -> raise Exit;;
+let tr parameters error ancien nouveau id =
+  match (transfert parameters error ancien nouveau [id])
+  with error, [res]-> error,res
+     | error, _ ->
+       Exception.warn parameters error __POS__ Exit None
 
 
 let paire_of_list liste1 liste2 rep =
@@ -123,7 +136,7 @@ let union_list p liste1 liste2 =
                        | a::b,[]   -> aux b [] (a::sol)
                        | [],a::b   -> aux b [] (a::sol)
                        | [],[]     -> (rev sol)
-     in aux liste1 liste2 [];;
+     in aux liste1 liste2 []
 
 
 
@@ -134,37 +147,37 @@ let intersec_list p liste1 liste2 =
                                       (if (p a t) then aux b liste2 sol
                                        else aux liste1 q sol)
                       |  _         -> (rev sol)
-    in aux liste1 liste2 [];;
+    in aux liste1 liste2 []
 
 let ajoute t liste =
     let rec aux liste rep =
         match liste with a::b-> aux b ((concat t a)::rep)
                  | [] -> rep
     in
-    aux (rev liste) [] ;;
+    aux (rev liste) []
 
 let flat_map f l =
     let rec aux l rep =
         match l with a::b -> aux b ((f a)@rep)
                   |   []  -> rep
-    in aux (rev l) [];;
+    in aux (rev l) []
 
 let flat_map_zip f l =
   let rec aux l rep1 rep2 =
     match l with a::b -> let (c,d)=f a in
                          aux b (c@rep1) (d@rep2)
     |  [] ->rep1,rep2
-  in aux (rev l) [] [] ;;
+  in aux (rev l) [] []
 
 
 let produit_list liste1 liste2 =
-    flat_map (fun x->ajoute  x liste2) liste1 ;;
+    flat_map (fun x->ajoute  x liste2) liste1
 
 
 
 let rec mix_list liste =
     match liste with [] -> [[]]
-             |  t::q -> produit_list t (mix_list q);;
+             |  t::q -> produit_list t (mix_list q)
 
 
 let insert_list p x liste1 =
@@ -176,80 +189,77 @@ let insert_list p x liste1 =
         match reste with a::b -> if (p a x) then (aux b (a::vue))
                                  else (vide (x::vue) reste)
                       | []    -> vide (x::vue) []
-    in aux liste1 [];;
+    in aux liste1 []
 
 
 let list_of_table h =
     let liste=ref [] in
-    (Hashtbl.iter (fun a->fun b->(liste:=(a,b)::(!liste))) h;
-    !liste);;
+    (Hashtbl.iter
+       (fun a->fun b->(liste:=(a,b)::(!liste)))
+       h ;
+    !liste)
 
 let copy_table h =
   let rep = Hashtbl.create 1 in
   (Hashtbl.iter (fun a->fun b->(Hashtbl.add rep a b)) h;
-  rep);;
+  rep)
 
 
 let insert_sort p l k =
     let rec aux l rep =
-        match l with t::q when (p t k) -> aux q (t::rep)
-	          |  t::q when t=k -> concat (List.rev rep) l
-                  |   _           -> concat (List.rev rep) (k::l)
+      match l with
+      | t::q when (p t k) -> aux q (t::rep)
+      |  t::q when t=k -> concat (List.rev rep) l
+      |   _           -> concat (List.rev rep) (k::l)
     in aux l []
 
 
 let merge p l k =
-     let rec aux l1 l2 rep =
-         match l1,l2 with t::q,a::b when p t a -> aux q l2 (t::rep)
-                       |  t::q,a::b when p a t -> aux (t::q) b (a::rep)
-                       |  t::q,a::b           -> aux q b (t::rep)
-                       |  t::q, []           -> aux q l2 (t::rep)
-		       |   [] ,a::b         -> aux l1 b (a::rep)
-                       |   _                -> (List.rev rep)
-    in aux l k [] ;;
+  let rec aux l1 l2 rep =
+    match l1,l2
+    with t::q,a::b when p t a -> aux q l2 (t::rep)
+       |  t::q,a::b when p a t -> aux (t::q) b (a::rep)
+       |  t::q,a::b           -> aux q b (t::rep)
+       |  t::q, []           -> aux q l2 (t::rep)
+       |   [] ,a::b         -> aux l1 b (a::rep)
+       |   _                -> (List.rev rep)
+  in aux l k []
 
-let fusion=merge;;
+let fusion=merge
 
 let sub_list p l k =
     let rec aux l rep =
         match l with t::q when t=k -> concat (List.rev rep) q
 	           | t::q when p t k -> aux q (t::rep)
 		   |  _   -> concat (List.rev rep) l
-    in aux l [] ;;
+    in aux l []
 
 let vide f l =
     let rec aux l rep =
         match l with t::q when (f t) -> aux q rep
                   |  t::q -> aux q (t::rep)
                   |   _   -> (List.rev rep)
-    in aux l [] ;;
+    in aux l []
 
-let filtre f l  = vide (fun x->not (f x)) l ;;
-
-let ti=ref 0. ;;
-
-let time_pro () = ((times ()).tms_utime) ;;
-
-let is_time_out () = if ((int_of_float(time_pro ()))> Config_aff.time_out)
-                  then (affiche_time_out ())
-                  else ();;
-
+let filtre f l  = vide (fun x->not (f x)) l
 
 
 let rev l =
   let rec aux res sol =
     match res with [] -> sol
     |  a::b -> aux b (a::sol)
-	 in aux l [];;
+	 in aux l []
 
 
 
-let flap_map f l =
-  let n=new_working_list hashnumber in
+let flap_map parameters _error f l =
+  let n=Working_list_imperative.make
+      (Remanent_parameters.get_empty_hashtbl_size parameters) in
   let rec aux l =
-    match l with t::q -> (n.push (f t);aux q)
+    match l with t::q -> (Working_list_imperative.push (f t) n;aux q)
     |  [] -> ()
-  in List.iter aux l;n.list ();;
+  in List.iter aux l;
+  Working_list_imperative.list n
 
 
 let map_list (f:'a->'b) (l:'a list) =
@@ -258,8 +268,10 @@ let map_list (f:'a->'b) (l:'a list) =
     |   a::b -> (try (let r = (f a) in (aux b (r::rep)))  with _ -> (aux b rep))
   in aux (List.rev l) [] ;;
 
-let compte_list l =
-  let a=Hashtbl.create Config_aff.hashnumber in
+let compte_list parameters error l =
+  let a=
+    Hashtbl.create (Remanent_parameters.get_empty_hashtbl_size parameters)
+  in
   let get x =
     try (Hashtbl.find a x)  with _ -> 0 in
   let inc x =

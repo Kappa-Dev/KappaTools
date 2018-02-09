@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Jan 26 2018>
+  * Last modification: Time-stamp: <Feb 08 2018>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -174,3 +174,15 @@ val save_progress_bar:
 val reset_progress_bar: Remanent_parameters_sig.parameters -> unit -> unit
 val save_current_phase_title: Remanent_parameters_sig.parameters -> string -> unit
 val reset_current_phase_title: Remanent_parameters_sig.parameters -> unit -> unit
+
+val get_empty_hashtbl_size: Remanent_parameters_sig.parameters -> int
+
+val get_open_int_interval_inclusive_symbol: Remanent_parameters_sig.parameters -> string
+val get_open_int_interval_exclusive_symbol: Remanent_parameters_sig.parameters -> string
+val get_open_int_interval_infinity_symbol: Remanent_parameters_sig.parameters -> string
+val get_close_int_interval_inclusive_symbol: Remanent_parameters_sig.parameters -> string
+val get_close_int_interval_exclusive_symbol: Remanent_parameters_sig.parameters -> string
+val get_close_int_interval_infinity_symbol: Remanent_parameters_sig.parameters -> string
+val get_plus_infinity_symbol: Remanent_parameters_sig.parameters -> string
+val get_minus_infinity_symbol: Remanent_parameters_sig.parameters -> string
+val get_int_interval_separator_symbol: Remanent_parameters_sig.parameters -> string

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Dec 14 2017>
+  * Last modification:  Time-stamp: <Mar 01 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -140,6 +140,7 @@ type marshalisable_parameters =
    short_version: string ;
    tk_interface: bool ;
    html_mode: bool ;
+   empty_hashtbl_size: int ;
   }
 
 type parameters =

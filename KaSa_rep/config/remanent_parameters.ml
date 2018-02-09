@@ -4,11 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-<<<<<<< Updated upstream
-  * Last modification: Time-stamp: <Jan 26 2018>
-=======
-  * Last modification: Time-stamp: <Jan 25 2018>
->>>>>>> Stashed changes
+  * Last modification: Time-stamp: <Mar 01 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -397,7 +393,8 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
           Remanent_parameters_sig.view_accuracy_level =
             fetch_accuracy_level Config.view_accuracy_level ;
           Remanent_parameters_sig.called_from = called_from ;
-          Remanent_parameters_sig.html_mode = html_mode ;
+        Remanent_parameters_sig.html_mode = html_mode ;
+        Remanent_parameters_sig.empty_hashtbl_size = 1 ;
       } ;
     Remanent_parameters_sig.save_error_list = (fun _ -> ());
     Remanent_parameters_sig.save_progress_bar = (fun _ -> ());
@@ -464,6 +461,25 @@ let get_uni_arrow_symbol_1 symbol = symbol.Symbol_table.uni_arrow
 let get_rev_arrow_symbol_1 symbol = symbol.Symbol_table.rev_arrow
 let get_bi_arrow_symbol_1 symbol = symbol.Symbol_table.bi_arrow
 let get_uni_arrow_no_poly_symbol_1 symbol = symbol.Symbol_table.uni_arrow_nopoly
+
+let get_open_int_interval_inclusive_symbol_1 symbol =
+  symbol.Symbol_table.open_int_interval_inclusive
+let get_open_int_interval_exclusive_symbol_1 symbol =
+  symbol.Symbol_table.open_int_interval_exclusive
+let get_open_int_interval_infinity_symbol_1 symbol =
+  symbol.Symbol_table.open_int_interval_infinity
+let get_close_int_interval_inclusive_symbol_1 symbol =
+  symbol.Symbol_table.close_int_interval_inclusive
+let get_close_int_interval_exclusive_symbol_1 symbol =
+  symbol.Symbol_table.close_int_interval_exclusive
+let get_close_int_interval_infinity_symbol_1 symbol =
+  symbol.Symbol_table.close_int_interval_infinity
+let get_plus_infinity_symbol_1 symbol =
+  symbol.Symbol_table.plus_infinity
+let get_minus_infinity_symbol_1 symbol =
+  symbol.Symbol_table.minus_infinity
+let get_int_interval_separator_symbol_1 symbol =
+  symbol.Symbol_table.int_interval_separator
 
 (*Influence*)
 let get_im_format_1            influence = influence.Remanent_parameters_sig.im_format
@@ -545,6 +561,8 @@ let get_compute_symmetries_1 marshalisable =
   marshalisable.Remanent_parameters_sig.do_symmetries_analysis
 let get_rate_convention_1 marshalisable =
   marshalisable.Remanent_parameters_sig.rate_convention
+let get_empty_hashtbl_size_1 marshalisable =
+  marshalisable.Remanent_parameters_sig.empty_hashtbl_size
 
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
@@ -646,6 +664,7 @@ let get_contact_map_accuracy_level = upgrade_from_marshal_field get_contact_map_
 let get_scc_accuracy_level = upgrade_from_marshal_field get_scc_accuracy_level_1
 let get_influence_map_accuracy_level = upgrade_from_marshal_field get_influence_map_accuracy_level_1
 let get_view_accuracy_level = upgrade_from_marshal_field get_view_accuracy_level_1
+let get_empty_hashtbl_size = upgrade_from_marshal_field get_empty_hashtbl_size_1
 
 let upgrade_from_influence_map_field f = compose f get_influence_map
 let upgrade_from_contact_map_field f = compose f get_contact_map
@@ -678,6 +697,15 @@ let get_uni_arrow_symbol = upgrade_from_symbols_field get_uni_arrow_symbol_1
 let get_rev_arrow_symbol = upgrade_from_symbols_field get_rev_arrow_symbol_1
 let get_bi_arrow_symbol = upgrade_from_symbols_field get_bi_arrow_symbol_1
 let get_uni_arrow_no_poly_symbol = upgrade_from_symbols_field get_uni_arrow_no_poly_symbol_1
+let get_open_int_interval_inclusive_symbol = upgrade_from_symbols_field get_open_int_interval_inclusive_symbol_1
+let get_open_int_interval_exclusive_symbol = upgrade_from_symbols_field get_open_int_interval_exclusive_symbol_1
+let get_open_int_interval_infinity_symbol = upgrade_from_symbols_field get_open_int_interval_infinity_symbol_1
+let get_close_int_interval_inclusive_symbol = upgrade_from_symbols_field get_close_int_interval_inclusive_symbol_1
+let get_close_int_interval_exclusive_symbol = upgrade_from_symbols_field get_close_int_interval_exclusive_symbol_1
+let get_close_int_interval_infinity_symbol = upgrade_from_symbols_field get_close_int_interval_infinity_symbol_1
+let get_plus_infinity_symbol = upgrade_from_symbols_field get_plus_infinity_symbol_1
+let get_minus_infinity_symbol = upgrade_from_symbols_field get_minus_infinity_symbol_1
+let get_int_interval_separator_symbol = upgrade_from_symbols_field get_int_interval_separator_symbol_1
 
 
 let get_im_format = upgrade_from_influence_map_field get_im_format_1

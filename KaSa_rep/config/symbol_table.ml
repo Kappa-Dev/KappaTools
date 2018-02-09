@@ -1,6 +1,7 @@
 type break_hint =
     Space | No_space
 
+
 type symbol_table =
   {
     agent_open : string ;
@@ -34,6 +35,15 @@ type symbol_table =
     bi_arrow : string ;
     uni_arrow_nopoly : string ;
     breakable : bool ;
+    open_int_interval_inclusive : string ;
+    open_int_interval_exclusive : string ;
+    open_int_interval_infinity : string ;
+    close_int_interval_inclusive : string ;
+    close_int_interval_exclusive : string ;
+    close_int_interval_infinity : string ;
+    int_interval_separator : string ;
+    plus_infinity : string ;
+    minus_infinity : string ;
   }
 
 let symbol_table_V3 =
@@ -69,6 +79,15 @@ let symbol_table_V3 =
     bi_arrow = "<->" ;
     uni_arrow_nopoly = "-!->" ;
     breakable = true ;
+    open_int_interval_inclusive = "[" ;
+    open_int_interval_exclusive = "]" ;
+    open_int_interval_infinity = "]" ;
+    plus_infinity = "oo" ;
+    minus_infinity = "-oo" ;
+    close_int_interval_inclusive = "]" ;
+    close_int_interval_exclusive = "[" ;
+    close_int_interval_infinity = "[" ;
+    int_interval_separator = " .. "
   }
 
 let lighten symbol_table =
@@ -117,6 +136,15 @@ let symbol_table_V4 =
     bi_arrow = "<->" ;
     uni_arrow_nopoly = "-!->" ;
     breakable = true ;
+    open_int_interval_inclusive = "[" ;
+    open_int_interval_exclusive = "]" ;
+    open_int_interval_infinity = "]" ;
+    plus_infinity = "oo" ;
+    minus_infinity = "-oo" ;
+    close_int_interval_inclusive = "]" ;
+    close_int_interval_exclusive = "[" ;
+    close_int_interval_infinity = "[" ;
+    int_interval_separator = " .. "
   }
 
 let not_breakable symbol_table = {symbol_table with breakable = false}
