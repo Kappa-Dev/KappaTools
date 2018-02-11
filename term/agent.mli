@@ -25,6 +25,9 @@ val print_internal :
 
 val rename : Renaming.t -> t -> t
 
+val json_dictionnary : string
+val write_json : Bi_outbuf.t -> t -> unit
+val read_json : Yojson.Basic.lexer_state -> Lexing.lexbuf -> t
 val to_json : t -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> t
 

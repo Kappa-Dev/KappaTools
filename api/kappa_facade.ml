@@ -636,11 +636,29 @@ let outputs
 let efficiency t = Counter.get_efficiency t.counter
 
 let get_raw_trace t =
-  Yojson.Basic.to_string
-    (`Assoc [
-        "model", Model.to_yojson t.env;
-        "trace", `List (List.rev_map Trace.step_to_yojson t.trace);
-      ])
+  JsonUtil.string_of_write
+    (fun ob t ->
+       let () = Bi_outbuf.add_char ob '{' in
+       let () = JsonUtil.write_field
+           "dict" (fun ob () ->
+               let () = Bi_outbuf.add_char ob '{' in
+               let () = Bi_outbuf.add_string ob Agent.json_dictionnary in
+               let () = JsonUtil.write_comma ob in
+               let () = Bi_outbuf.add_string ob Instantiation.json_dictionnary in
+               let () = JsonUtil.write_comma ob in
+               let () = Bi_outbuf.add_string
+                   ob Trace.Simulation_info.json_dictionnary in
+               let () = JsonUtil.write_comma ob in
+               let () = Bi_outbuf.add_string ob Trace.json_dictionnary in
+               Bi_outbuf.add_char ob '}'
+             ) ob () in
+       let () = JsonUtil.write_comma ob in
+       let () = JsonUtil.write_field
+           "model" Yojson.Basic.write_json ob (Model.to_yojson t.env) in
+       let () = JsonUtil.write_comma ob in
+       let () = JsonUtil.write_field "trace" Trace.write_json ob (List.rev t.trace) in
+       Bi_outbuf.add_char ob '}'
+    ) t
 
 let get_raw_ast t =
   Yojson.Basic.to_string (Ast.compil_to_json t.ast)

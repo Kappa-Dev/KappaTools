@@ -413,56 +413,177 @@ let print_concrete_binding_state ?sigs f = function
        | Some sigs -> Signature.print_site sigs ag
        | None -> Format.pp_print_int) s
 
-let binding_type_to_json (ty,s) = `Assoc ["type", `Int ty; "site", `Int s]
+let json_dictionnary =
+  "\"binding_type\":{\"type\":0,\"site\":1},\
+   \"quark\":{\"agent\":0,\"site\":1},\
+   \"test\":[\"Is_here\",\"Has_Internal\",\"Is_Free\",\"Is_Bound\",\"Has_Binding_type\",\"Is_Bound_to\"],\
+   \"actions\":[\"Create\",\"Mod_internal\",\"Bind\",\"Bind_to\",\"Free\",\"Remove\"],\
+   \"binding_state\":[\"ANY\",\"FREE\",\"BOUND\",\"BOUND_TYPE\",\"BOUND_to\"],\
+   \"event\":{\"tests\":0,\"actions\":1,\"side_effect_src\":2,\"side_effect_dst\":3,\"connectivity_tests\":4}"
+
+let write_binding_type ob a =
+  JsonUtil.write_compact_pair Yojson.Basic.write_int Yojson.Basic.write_int ob a
+let read_binding_type p lb =
+  JsonUtil.read_compact_pair Yojson.Basic.read_int Yojson.Basic.read_int p lb
+let binding_type_to_json (ty,s) = `List [`Int ty; `Int s]
 let binding_type_of_json = function
-  | `Assoc ["type", `Int ty; "site", `Int s]
-  | `Assoc ["site", `Int s; "type", `Int ty] -> (ty,s)
+  | `List [`Int ty; `Int s] -> (ty,s)
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a binding_type",x))
 
-let quark_to_json f (ag,s) = `Assoc ["agent", f ag; "site", `Int s]
+let write_quark f ob a =
+  JsonUtil.write_compact_pair f Yojson.Basic.write_int ob a
+let read_quark f p lb =
+  JsonUtil.read_compact_pair f Yojson.Basic.read_int p lb
+let quark_to_json f (ag,s) = `List [f ag; `Int s]
 let quark_of_json f = function
-  | `Assoc ["agent", ag; "site", `Int s]
-  | `Assoc ["site", `Int s; "agent", ag] -> (f ag,s)
+  | `List [ag; `Int s] -> (f ag,s)
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect quark",x))
 
+let write_test f ob t =
+  JsonUtil.write_sequence ob
+    (match t with
+     | Is_Here a ->
+       [ (fun o -> Yojson.Basic.write_int o 0); (fun o -> f o a) ]
+     | Has_Internal (s,i) ->
+       [ (fun o -> Yojson.Basic.write_int o 1);
+         (fun o -> write_quark f o s);
+         (fun o -> Yojson.Basic.write_int o i) ]
+     | Is_Free s ->
+       [ (fun o -> Yojson.Basic.write_int o 2); (fun o -> write_quark f o s) ]
+     | Is_Bound s ->
+       [ (fun o -> Yojson.Basic.write_int o 3); (fun o -> write_quark f o s) ]
+     | Has_Binding_type (s,b) ->
+       [ (fun ob -> Yojson.Basic.write_int ob 4);
+         (fun ob -> write_quark f ob s);
+         (fun ob ->  write_binding_type ob b) ]
+     | Is_Bound_to (s1,s2) ->
+       [ (fun ob ->  Yojson.Basic.write_int ob 5);
+         (fun ob -> write_quark f ob s1);
+         (fun ob -> write_quark f ob s2) ])
+
+let read_test f st b =
+  JsonUtil.read_variant Yojson.Basic.read_int
+    (fun st b -> function
+       | 0 ->
+         let y = JsonUtil.read_next_item f st b in
+         Is_Here y
+       | 1 ->
+         let s = JsonUtil.read_next_item (read_quark f) st b in
+         let i = JsonUtil.read_next_item Yojson.Basic.read_int st b in
+         Has_Internal (s,i)
+       | 2 ->
+         let s = JsonUtil.read_next_item (read_quark f) st b in
+         Is_Free s
+       | 3 ->
+         let s = JsonUtil.read_next_item (read_quark f) st b in
+         Is_Bound s
+       | 4 ->
+         let s = JsonUtil.read_next_item (read_quark f) st b in
+         let bi = JsonUtil.read_next_item read_binding_type st b in
+         Has_Binding_type (s, bi)
+       | 5 ->
+         let s1 = JsonUtil.read_next_item (read_quark f) st b in
+         let s2 = JsonUtil.read_next_item (read_quark f) st b in
+         Is_Bound_to (s1, s2)
+       | _ -> Yojson.json_error "Wrong test" (*st b*))
+    st b
+
 let test_to_json f = function
-  | Is_Here a -> `List [`String "Is_Here"; f a]
+  | Is_Here a -> `List [`Int 0; f a]
   | Has_Internal (s,i) ->
-    `List [`String "Has_Internal"; quark_to_json f s; `Int i]
-  | Is_Free s -> `List [`String "Is_Free"; quark_to_json f s]
-  | Is_Bound s -> `List [`String "Is_Bound"; quark_to_json f s]
+    `List [`Int 1; quark_to_json f s; `Int i]
+  | Is_Free s -> `List [`Int 2; quark_to_json f s]
+  | Is_Bound s -> `List [`Int 3; quark_to_json f s]
   | Has_Binding_type (s,b) ->
-    `List [`String "Has_Binding_type";quark_to_json f s;binding_type_to_json b]
+    `List [`Int 4;quark_to_json f s;binding_type_to_json b]
   | Is_Bound_to (s1,s2) ->
-    `List [`String "Is_Bound_to"; quark_to_json f s1; quark_to_json f s2]
+    `List [`Int 5; quark_to_json f s1; quark_to_json f s2]
 let test_of_json f = function
-  | `List [`String "Is_Here"; a] -> Is_Here (f a)
-  | `List [`String "Has_Internal"; s; `Int i] ->
+  | `List [`Int 0; a] -> Is_Here (f a)
+  | `List [`Int 1; s; `Int i] ->
     Has_Internal (quark_of_json f s,i)
-  | `List [`String "Is_Free"; s] -> Is_Free (quark_of_json f s)
-  | `List [`String "Is_Bound"; s] -> Is_Bound (quark_of_json f s)
-  | `List [`String "Has_Binding_type"; s; b] ->
+  | `List [`Int 2; s] -> Is_Free (quark_of_json f s)
+  | `List [`Int 3; s] -> Is_Bound (quark_of_json f s)
+  | `List [`Int 4; s; b] ->
     Has_Binding_type (quark_of_json f s, binding_type_of_json b)
-  | `List [`String "Is_Bound_to"; s1; s2] ->
+  | `List [`Int 5; s1; s2] ->
     Is_Bound_to (quark_of_json f s1, quark_of_json f s2)
   | x -> raise (Yojson.Basic.Util.Type_error ("Wrong test",x))
 
+let write_action f ob a =
+  JsonUtil.write_sequence ob
+    (match a with
+     | Create (ag,info) ->
+       [ (fun o -> Yojson.Basic.write_int o 0);
+         (fun o -> f o ag);
+         (fun o -> JsonUtil.write_list
+             (JsonUtil.write_compact_pair
+                Yojson.Basic.write_int
+                (JsonUtil.write_option Yojson.Basic.write_int)) o info) ]
+     | Mod_internal (s,i) ->
+       [ (fun o -> Yojson.Basic.write_int o 1);
+         (fun o -> write_quark f o s);
+         (fun o -> Yojson.Basic.write_int o i) ]
+     | Bind (s1,s2) ->
+       [ (fun o -> Yojson.Basic.write_int o 2);
+         (fun o -> write_quark f o s1);
+         (fun o -> write_quark f o s2) ]
+     | Bind_to (s1,s2) ->
+       [ (fun o -> Yojson.Basic.write_int o 3);
+         (fun o -> write_quark f o s1);
+         (fun o -> write_quark f o s2) ]
+     | Free s ->
+       [ (fun o -> Yojson.Basic.write_int o 4); (fun o -> write_quark f o s) ]
+     | Remove a ->
+       [ (fun o -> Yojson.Basic.write_int o 5); (fun o -> f o a) ])
+
+let read_action f st b =
+  JsonUtil.read_variant Yojson.Basic.read_int
+    (fun st b -> function
+       | 0 ->
+         let ag = JsonUtil.read_next_item f st b in
+         let info =
+           JsonUtil.read_next_item
+             (Yojson.Basic.read_list
+                (JsonUtil.read_compact_pair
+                   Yojson.Basic.read_int
+                   (JsonUtil.read_option Yojson.Basic.read_int))) st b in
+         Create (ag,info)
+       | 1 ->
+         let s = JsonUtil.read_next_item (read_quark f) st b in
+         let i = JsonUtil.read_next_item Yojson.Basic.read_int st b in
+         Mod_internal (s,i)
+       | 2 ->
+         let s1 = JsonUtil.read_next_item (read_quark f) st b in
+         let s2 = JsonUtil.read_next_item (read_quark f) st b in
+         Bind (s1,s2)
+       | 3 ->
+         let s1 = JsonUtil.read_next_item (read_quark f) st b in
+         let s2 = JsonUtil.read_next_item (read_quark f) st b in
+         Bind_to (s1,s2)
+       | 4 ->
+         let s = JsonUtil.read_next_item (read_quark f) st b in Free s
+       | 5 ->
+         let a = JsonUtil.read_next_item f st b in Remove a
+       | _ -> Yojson.json_error "Wrong action" (*st b*))
+    st b
+
 let action_to_json f = function
   | Create (ag,info) ->
-    `List [`String "Create"; f ag;
+    `List [`Int 0; f ag;
            `List (List.map (fun (s,i) ->
                `List (`Int s ::
                       (match i with None -> [] | Some i -> [`Int i]))) info)]
   | Mod_internal (s,i) ->
-    `List [`String "Mod_internal"; quark_to_json f s; `Int i]
+    `List [`Int 1; quark_to_json f s; `Int i]
   | Bind (s1,s2) ->
-    `List [`String "Bind"; quark_to_json f s1; quark_to_json f s2]
+    `List [`Int 2; quark_to_json f s1; quark_to_json f s2]
   | Bind_to (s1,s2) ->
-    `List [`String "Bind_to"; quark_to_json f s1; quark_to_json f s2]
-  | Free s -> `List [`String "Free"; quark_to_json f s]
-  | Remove a -> `List [`String "Remove"; f a]
+    `List [`Int 3; quark_to_json f s1; quark_to_json f s2]
+  | Free s -> `List [`Int 4; quark_to_json f s]
+  | Remove a -> `List [`Int 5; f a]
 let action_of_json f = function
-  | `List [`String "Create"; ag; `List info] ->
+  | `List [`Int 0; ag; `List info] ->
     Create (f ag,
             List.map (function
                 | `List [ `Int s ] -> (s,None)
@@ -470,76 +591,117 @@ let action_of_json f = function
                 | x -> raise (Yojson.Basic.Util.Type_error
                                 ("Invalid action info",x))
               ) info)
-  | `List [`String "Mod_internal"; s; `Int i] ->
+  | `List [`Int 1; s; `Int i] ->
     Mod_internal (quark_of_json f s, i)
-  | `List [`String "Bind"; s1; s2] ->
+  | `List [`Int 2; s1; s2] ->
     Bind (quark_of_json f s1, quark_of_json f s2)
-  | `List [`String "Bind_to"; s1; s2] ->
+  | `List [`Int 3; s1; s2] ->
     Bind_to (quark_of_json f s1, quark_of_json f s2)
-  | `List [`String "Free"; s] -> Free (quark_of_json f s)
-  | `List [`String "Remove"; a] -> Remove (f a)
+  | `List [`Int 4; s] -> Free (quark_of_json f s)
+  | `List [`Int 5; a] -> Remove (f a)
   | x -> raise (Yojson.Basic.Util.Type_error ("Wrong action",x))
 
+let write_binding_state f ob bf =
+  JsonUtil.write_sequence ob
+    (match bf with
+     | ANY -> [ (fun o -> Yojson.Basic.write_int o 0) ]
+     | FREE -> [ (fun o -> Yojson.Basic.write_int o 1) ]
+     | BOUND -> [ (fun o -> Yojson.Basic.write_int o 2) ]
+     | BOUND_TYPE b ->
+       [ (fun o -> Yojson.Basic.write_int o 3);
+         (fun o -> write_binding_type o b) ]
+     | BOUND_to s ->
+       [ (fun o -> Yojson.Basic.write_int o 4);
+         (fun o -> write_quark f o s) ])
+
+let read_binding_state f st b =
+  JsonUtil.read_variant Yojson.Basic.read_int
+    (fun st b -> function
+       | 0 -> ANY
+       | 1 -> FREE
+       | 2 -> BOUND
+       | 3 ->
+         let b = JsonUtil.read_next_item read_binding_type st b in
+         BOUND_TYPE b
+       | 4 ->
+         let s = JsonUtil.read_next_item (read_quark f) st b in
+         BOUND_to s
+       | _ -> Yojson.json_error "Wrong binding state" (*st b*))
+    st b
+
 let binding_state_to_json f = function
-  | ANY -> `String "ANY"
-  | FREE -> `String "FREE"
-  | BOUND -> `String "BOUND"
-  | BOUND_TYPE b -> binding_type_to_json b
-  | BOUND_to s -> quark_to_json f s
+  | ANY -> `List [ `Int 0 ]
+  | FREE -> `List [ `Int 1 ]
+  | BOUND -> `List [ `Int 2 ]
+  | BOUND_TYPE b -> `List [ `Int 3; binding_type_to_json b ]
+  | BOUND_to s -> `List [`Int 4; quark_to_json f s ]
 let binding_state_of_json f = function
-  | `String "ANY" -> ANY
-  | `String "FREE" -> FREE
-  | `String "BOUND" -> BOUND
-  | `Assoc ["type", `Int ty; "site", `Int s]
-  | `Assoc ["site", `Int s; "type", `Int ty] -> BOUND_TYPE (ty,s)
-  | `Assoc ["agent", ag; "site", `Int s]
-  | `Assoc ["site", `Int s; "agent", ag] -> BOUND_to (f ag,s)
+  | `List [`Int 0] -> ANY
+  | `List [`Int 1] -> FREE
+  | `List [`Int 2] -> BOUND
+  | `List [`Int 3; `Assoc ["type", `Int ty; "site", `Int s]]
+  | `List [`Int 3; `Assoc ["site", `Int s; "type", `Int ty]] ->
+    BOUND_TYPE (ty,s)
+  | `List [`Int 4; `Assoc ["agent", ag; "site", `Int s]]
+  | `List [`Int 4;`Assoc ["site", `Int s; "agent", ag]] -> BOUND_to (f ag,s)
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect binding_state",x))
 
+let write_event f ob e =
+  JsonUtil.write_sequence ob
+    [ (fun o ->
+          JsonUtil.write_list (JsonUtil.write_list (write_test f)) o e.tests);
+      (fun o -> JsonUtil.write_list (write_action f) o e.actions);
+      (fun o ->
+         JsonUtil.write_list
+           (JsonUtil.write_compact_pair (write_quark f) (write_binding_state f))
+           o e.side_effects_src);
+      (fun o -> JsonUtil.write_list (write_quark f) o e.side_effects_dst);
+      (fun o -> JsonUtil.write_list (write_test f) o e.connectivity_tests) ]
+
+let read_event f st b =
+  JsonUtil.read_variant
+    (Yojson.Basic.read_list (Yojson.Basic.read_list (read_test f)))
+    (fun st b tests ->
+       let actions =
+         JsonUtil.read_next_item
+           (Yojson.Basic.read_list (read_action f)) st b in
+       let side_effects_src =
+         JsonUtil.read_next_item
+           (Yojson.Basic.read_list
+              (JsonUtil.read_compact_pair (read_quark f) (read_binding_state f)))
+           st b in
+       let side_effects_dst =
+         JsonUtil.read_next_item (Yojson.Basic.read_list (read_quark f)) st b in
+       let connectivity_tests =
+         JsonUtil.read_next_item (Yojson.Basic.read_list (read_test f)) st b in
+       {tests; actions; side_effects_src; side_effects_dst; connectivity_tests})
+    st b
+
 let event_to_json f e =
-  JsonUtil.smart_assoc [
-    "tests", `List
+  `List [
+    `List
       (List.map (fun cct -> `List (List.map (test_to_json f) cct)) e.tests);
-    "actions", `List (List.map (action_to_json f) e.actions);
-    "side_effect_src",
+    `List (List.map (action_to_json f) e.actions);
     `List (List.map
              (fun (s,b) -> `List [quark_to_json f s; binding_state_to_json f b])
              e.side_effects_src);
-    "side_effect_dst", `List (List.map (quark_to_json f) e.side_effects_dst);
-    "connectivity_tests",
+    `List (List.map (quark_to_json f) e.side_effects_dst);
     `List (List.map (test_to_json f) e.connectivity_tests);
   ]
 let event_of_json f = function
-  | `Assoc l as x when List.length l <= 5 ->
-    begin
-      try {
-        tests =
-          (match Yojson.Basic.Util.member "tests" x
-           with `List l ->
-             List.map (function `List ccl -> List.map (test_of_json f) ccl
-                              | _ -> raise Not_found) l
-              | `Null -> []
-              | _ -> raise Not_found);
-        actions =
-          (match  Yojson.Basic.Util.member "actions" x
-           with `List l -> List.map (action_of_json f) l | `Null -> []
-              | _ -> raise Not_found);
-        side_effects_src =
-          (match  Yojson.Basic.Util.member "side_effect_src" x with
-           | `List l -> List.map (function
-               | `List [s;b] -> (quark_of_json f s, binding_state_of_json f b)
-               | _ -> raise Not_found) l
-           | `Null -> []
-           | _ -> raise Not_found);
-        side_effects_dst =
-          (match  Yojson.Basic.Util.member "side_effect_dst" x
-           with `List l -> List.map (quark_of_json f) l | `Null -> []
-              | _ -> raise Not_found);
-        connectivity_tests =
-          (match Yojson.Basic.Util.member "connectivity_tests" x
-           with `List l -> List.map (test_of_json f) l | `Null -> []
-              | _ -> raise Not_found);
-      }
+  | `List [ `List t; `List a; `List s_e_src; `List s_e_dst; `List c_t ] as x ->
+    begin try {
+      tests =
+        List.map (function `List ccl -> List.map (test_of_json f) ccl
+                         | _ -> raise Not_found) t;
+      actions = List.map (action_of_json f) a;
+      side_effects_src =
+        List.map (function
+            | `List [s;b] -> (quark_of_json f s, binding_state_of_json f b)
+            | _ -> raise Not_found) s_e_src;
+      side_effects_dst = List.map (quark_of_json f) s_e_dst;
+      connectivity_tests = List.map (test_of_json f) c_t;
+    }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Incorrect event",x))
     end

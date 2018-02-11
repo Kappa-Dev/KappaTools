@@ -22,6 +22,10 @@ let read_between_spaces f lex_st lex_buf =
   let () = Yojson.Basic.read_space lex_st lex_buf in
   x
 
+let read_next_item f st b =
+  let () = Yojson.Basic.read_comma st b in
+  read_between_spaces f st b
+
 let build_msg s = "Not a correct "^s
 let of_string (s:string) = `String s
 
@@ -80,24 +84,17 @@ let to_list ?error_msg:(error_msg=build_msg "list") of_json = function
   | `Null -> []
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
-let rec iter2_aux f_elt f_sep x = function
-    [] -> ()
-  | y :: l ->
-      f_sep x;
-      f_elt x y;
-      iter2_aux f_elt f_sep x l
-
-let iter2 f_elt f_sep x = function
-    [] -> ()
-  | y :: l ->
-      f_elt x y;
-      iter2_aux f_elt f_sep x l
-
 let write_comma ob = Bi_outbuf.add_char ob ','
+
+let rec iter2 f_elt x = function
+  | [] -> ()
+  | y :: l -> write_comma x; f_elt x y; iter2 f_elt x l
 
 let write_list f ob l =
   let () = Bi_outbuf.add_char ob '[' in
-  let () = iter2 f write_comma ob l in
+  let () = match l with
+    | [] -> ()
+    | y :: l -> f ob y; iter2 f ob l in
   Bi_outbuf.add_char ob ']'
 
 let of_array to_json a =
@@ -115,6 +112,27 @@ let write_array f ob l =
       (fun i -> let () = write_comma ob in f ob l.(succ i))
       (pred (Array.length l)) in
   Bi_outbuf.add_char ob ']'
+
+let rec iter_seq ob = function
+  | [] -> ()
+  | f::q ->
+    let () = write_comma ob in
+    let () = f ob in
+    iter_seq ob q
+
+let write_sequence ob l =
+  let () = Bi_outbuf.add_char ob '[' in
+  let () = match l with
+    | [] -> ()
+    | f::q -> let () = f ob in iter_seq ob q in
+  Bi_outbuf.add_char ob ']'
+
+let read_variant read_id read st b =
+  let () = Yojson.Basic.read_lbr st b in
+  let cst = read_between_spaces read_id st b in
+  let out = read st b cst in
+  let () = Yojson.Basic.read_rbr st b in
+  out
 
 let smart_assoc l =
   `Assoc (List.rev (List.fold_left (fun acc -> function

@@ -35,28 +35,39 @@ module Simulation_info = struct
     story_event = 0 ; profiling_info = a;
   }
 
+  let json_dictionnary =
+    "\"simulation_info\":{\"id\":0,\"time\":1,\"event\":2,\"profiling\":3}"
+
   let to_json f x =
-    JsonUtil.smart_assoc [
-      ("id",`Int x.story_id);
-      ("time",`Float x.story_time);
-      ("event",`Int x.story_event);
-      ("profiling",f x.profiling_info)]
+    `List [
+      `Int x.story_id;
+      `Float x.story_time;
+      `Int x.story_event;
+      f x.profiling_info ]
 
   let of_json f = function
-    | `Assoc l as x when List.length l <= 4 ->
-      begin
-        try
-          { story_id =
-              (match List.assoc "id" l with `Int i -> i | _ -> raise Not_found);
-            story_time = (match List.assoc "time" l
-                          with `Float i -> i | _ -> raise Not_found);
-            story_event = (match List.assoc "event" l
-                           with `Int i -> i | _ -> raise Not_found);
-            profiling_info = f (Yojson.Basic.Util.member "profiling" x)}
-        with Not_found ->
-          raise (Yojson.Basic.Util.Type_error ("Not a simulation_info",x))
-      end
+    | `List [ `Int story_id; `Float story_time; `Int story_event; info ] ->
+      { story_id; story_time; story_event; profiling_info = f info; }
     | x -> raise (Yojson.Basic.Util.Type_error ("Not a simulation_info",x))
+
+  let write_json f ob x =
+    JsonUtil.write_sequence ob
+      [ (fun o -> Yojson.Basic.write_int o x.story_id);
+        (fun o -> Yojson.Basic.write_float o x.story_time);
+        (fun o -> Yojson.Basic.write_int o x.story_event);
+        (fun o -> f o x.profiling_info) ]
+
+  let read_json f st b =
+    JsonUtil.read_variant
+      Yojson.Basic.read_int
+      (fun st b story_id ->
+         let story_time =
+           JsonUtil.read_next_item Yojson.Basic.read_number st b in
+         let story_event =
+           JsonUtil.read_next_item Yojson.Basic.read_int st b in
+         let profiling_info = JsonUtil.read_next_item f st b in
+         { story_id; story_time; story_event; profiling_info })
+      st b
 end
 
 type event_kind =
@@ -222,15 +233,89 @@ let print_label_of_step ?env f x =  match env with
       | Obs (x,_,_) -> Format.pp_print_string f x
       | Dummy _  -> ()
 
+let json_dictionnary =
+  "\"step\":[\"Subs\",\"Rule\",\"Pert\",\"Init\",\"Obs\",\"Dummy\"]"
+
+let write_step ob s =
+  JsonUtil.write_sequence ob
+    (match s with
+     | Subs (a,b) ->
+       [ (fun o -> Yojson.Basic.write_int o 0);
+         (fun o -> Yojson.Basic.write_int o a);
+         (fun o -> Yojson.Basic.write_int o b) ]
+     | Rule (x,y,z) ->
+       [ (fun o -> Yojson.Basic.write_int o 1);
+         (fun o -> Yojson.Basic.write_int o x);
+         (fun o -> Instantiation.write_event Agent.write_json o y);
+         (fun o -> Simulation_info.write_json Yojson.Basic.write_null o z) ]
+     | Pert (x,y,z) ->
+       [ (fun o -> Yojson.Basic.write_int o 2);
+         (fun o -> Yojson.Basic.write_string o x);
+         (fun o -> Instantiation.write_event Agent.write_json o y);
+         (fun o -> Simulation_info.write_json Yojson.Basic.write_null o z) ]
+     | Init a ->
+       [ (fun o -> Yojson.Basic.write_int o 3);
+         (fun o ->
+            JsonUtil.write_list (Instantiation.write_action Agent.write_json) o a) ]
+     | Obs (x,y,z) ->
+       [ (fun o -> Yojson.Basic.write_int o 4);
+         (fun o -> Yojson.Basic.write_string o x);
+         (fun o ->
+            JsonUtil.write_list
+              (JsonUtil.write_list (Instantiation.write_test Agent.write_json))
+              o y);
+         (fun o -> Simulation_info.write_json Yojson.Basic.write_null o z) ]
+     | Dummy _ -> [ (fun o -> Yojson.Basic.write_int o 5) ])
+let read_step st b =
+  JsonUtil.read_variant Yojson.Basic.read_int
+    (fun st b -> function
+       | 0 ->
+         let a = JsonUtil.read_next_item Yojson.Basic.read_int st b in
+         let b = JsonUtil.read_next_item Yojson.Basic.read_int st b in
+         Subs (a,b)
+       | 1 ->
+         let x = JsonUtil.read_next_item Yojson.Basic.read_int st b in
+         let y = JsonUtil.read_next_item
+             (Instantiation.read_event Agent.read_json) st b in
+         let z = JsonUtil.read_next_item
+             (Simulation_info.read_json Yojson.Basic.read_null) st b in
+         Rule (x,y,z)
+       | 2 ->
+         let x = JsonUtil.read_next_item Yojson.Basic.read_string st b in
+         let y = JsonUtil.read_next_item
+             (Instantiation.read_event Agent.read_json) st b in
+         let z = JsonUtil.read_next_item
+             (Simulation_info.read_json Yojson.Basic.read_null) st b in
+         Pert (x,y,z)
+       | 3 ->
+         let l = JsonUtil.read_next_item
+             (Yojson.Basic.read_list_rev
+                (Instantiation.read_action Agent.read_json))
+             st b in
+         Init (List.rev l)
+       | 4 ->
+         let x = JsonUtil.read_next_item Yojson.Basic.read_string st b in
+         let y = JsonUtil.read_next_item
+             (Yojson.Basic.read_list
+                (Yojson.Basic.read_list
+                   (Instantiation.read_test Agent.read_json)))
+             st b in
+         let z = JsonUtil.read_next_item
+             (Simulation_info.read_json Yojson.Basic.read_null) st b in
+         Obs (x,y,z)
+       | 5 -> Dummy ""
+       | _ -> raise (Yojson.json_error "Invalid step") (*st b*))
+    st b
+
 let step_to_yojson = function
-  | Subs (a,b) -> `List [`String "Subs"; `Int a; `Int b]
+  | Subs (a,b) -> `List [`Int 0; `Int a; `Int b]
   | Rule (x,y,z) ->
-    `List [`String "Rule";
+    `List [`Int 1;
            `Int x;
            Instantiation.event_to_json Agent.to_json y;
            Simulation_info.to_json (fun () -> `Null) z]
   | Pert (x,y,z) ->
-    `List [`String "Pert";
+    `List [`Int 2;
            `String x;
            Instantiation.event_to_json Agent.to_json y;
            Simulation_info.to_json (fun () -> `Null) z]
@@ -238,54 +323,24 @@ let step_to_yojson = function
     let rev_actions =
       List.rev_map (Instantiation.action_to_json Agent.to_json) a in
     `List
-      [`String "Init"; `List (List.rev rev_actions)]
+      [`Int 3; `List (List.rev rev_actions)]
   | Obs (x,y,z) ->
-    `List [`String "Obs";
+    `List [`Int 4;
            `String x;
            `List
              (List.map (fun z ->
                   `List (List.map (Instantiation.test_to_json Agent.to_json)
                            z)) y);
            Simulation_info.to_json (fun () -> `Null) z]
-  | Dummy _ -> `Null
-let step_of_yojson = function
-  | `List [`String "Subs"; `Int a; `Int b] -> Subs (a,b)
-  | `List [`String "Rule";`Int x;y;z] ->
-    Rule (x,
-          Instantiation.event_of_json Agent.of_json y,
-          Simulation_info.of_json (function _ -> ()) z)
-  | `List [`String "Pert";`String x;y;z] ->
-    Pert (x,
-          Instantiation.event_of_json Agent.of_json y,
-          Simulation_info.of_json (function _ -> ()) z)
-  | `List [`String "Init"; `List l ] ->
-    Init (List.rev (List.rev_map (Instantiation.action_of_json Agent.of_json) l))
-  | `List [`String "Obs"; `String x; `List l; z] ->
-    Obs (x,
-         (List.map (function  `List ccl ->
-              List.map (Instantiation.test_of_json Agent.of_json) ccl
-                            | _ as x ->
-                              raise (Yojson.Basic.Util.Type_error
-                                       ("Not a test list",x))) l),
-         Simulation_info.of_json (function _ -> ()) z)
-  | `Null -> Dummy ""
-  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect trace step",x))
+  | Dummy _ -> `List [ `Int 5 ]
 
-let to_yojson t = `List (List.rev_map step_to_yojson (List.rev t))
-let of_yojson = function
-  | `List l -> List.rev (List.rev_map step_of_yojson l)
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a trace",x))
-
-let write_step ob f =
-  Yojson.Basic.to_outbuf ob (step_to_yojson f)
+let write_json = JsonUtil.write_list write_step
+let read_json st b = List.rev (Yojson.Basic.read_list_rev read_step st b)
 
 let string_of_step ?(len = 1024) x =
   let ob = Bi_outbuf.create len in
   write_step ob x;
   Bi_outbuf.contents ob
-
-let read_step p lb =
-  step_of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)
 
 let step_of_string s =
   read_step (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
@@ -349,44 +404,53 @@ let side_effects_of_step = function
 let init_trace_file ~uuid env desc =
   let () = output_string desc "{\n\"uuid\" : \"" in
   let () = output_string desc (string_of_int uuid) in
-  let () = output_string desc "\",\n\"model\":" in
+  let () = output_string desc "\",\n\"dict\":{" in
+  let () = output_string desc Agent.json_dictionnary in
+  let () = output_string desc "," in
+  let () = output_string desc Instantiation.json_dictionnary in
+  let () = output_string desc "," in
+  let () = output_string desc Simulation_info.json_dictionnary in
+  let () = output_string desc "," in
+  let () = output_string desc json_dictionnary in
+  let () = output_string desc "},\n\"model\":" in
   let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
   output_string desc ",\n\"trace\":["
+
+let fold_trace f init lex_st lex_buf =
+  let () = Yojson.Basic.read_lcurl lex_st lex_buf in
+  let ident =
+    JsonUtil.read_between_spaces Yojson.Basic.read_ident lex_st lex_buf in
+  let ident' =
+    if ident = "uuid" then
+      let () =Yojson.Basic.read_colon lex_st lex_buf in
+      let _ =
+        JsonUtil.read_between_spaces Yojson.Basic.read_string lex_st lex_buf in
+      JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf
+    else ident in
+  let () = assert (ident' = "dict") in
+  let () = Yojson.Basic.read_colon lex_st lex_buf in
+  let () = JsonUtil.read_between_spaces Yojson.Basic.skip_json lex_st lex_buf in
+  let ident = JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf in
+  let () = assert (ident = "model") in
+  let () = Yojson.Basic.read_colon lex_st lex_buf in
+  let env = Model.of_yojson
+      (JsonUtil.read_between_spaces Yojson.Basic.read_json lex_st lex_buf) in
+  let ident = JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf in
+  let () = assert (ident = "trace") in
+  let () =Yojson.Basic.read_colon lex_st lex_buf in
+  let out =
+    JsonUtil.read_between_spaces
+      (Yojson.Basic.read_sequence
+         (fun acc x y -> f env acc (read_step x y))
+         (init env)) lex_st lex_buf in
+  let () = try Yojson.Basic.read_object_end lex_buf
+    with Yojson.End_of_object -> () in
+  (env,out)
 
 let fold_trace_file f init fname =
   let desc = open_in fname in
   let lex_buf = Lexing.from_channel desc in
   let lex_st = Yojson.init_lexer ~fname () in
-  let () =
-    JsonUtil.read_between_spaces Yojson.Basic.read_lcurl lex_st lex_buf in
-  let ident = Yojson.Basic.read_ident lex_st lex_buf in
-  let ident' =
-    if ident = "uuid" then
-      let () =
-        JsonUtil.read_between_spaces Yojson.Basic.read_colon lex_st lex_buf in
-      let _ = Yojson.Basic.read_string lex_st lex_buf in
-      let () =
-        JsonUtil.read_between_spaces Yojson.Basic.read_comma lex_st lex_buf in
-      Yojson.Basic.read_ident lex_st lex_buf
-    else ident in
-  let () = assert (ident' = "model") in
-  let () =
-    JsonUtil.read_between_spaces Yojson.Basic.read_colon lex_st lex_buf in
-  let env = Model.of_yojson
-      (Yojson.Basic.read_json lex_st lex_buf) in
-  let () =
-    JsonUtil.read_between_spaces Yojson.Basic.read_comma lex_st lex_buf in
-  let ident = Yojson.Basic.read_ident lex_st lex_buf in
-  let () = assert (ident = "trace") in
-  let () =
-    JsonUtil.read_between_spaces Yojson.Basic.read_colon lex_st lex_buf in
-  let out = Yojson.Basic.read_sequence
-      (fun acc x y ->
-         f env acc (step_of_yojson (Yojson.Basic.read_json x y)))
-      (init env) lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = try Yojson.Basic.read_object_end lex_buf
-    with Yojson.End_of_object -> () in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let out = JsonUtil.read_between_spaces (fold_trace f init) lex_st lex_buf in
   let () = close_in desc in
-  (env,out)
+  out

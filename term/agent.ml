@@ -37,10 +37,16 @@ let id (id,_) = id
 
 let compare (id1,_) (id2,_) = Mods.int_compare id1 id2
 
-let to_json (id,ty) = `Assoc ["id", `Int id; "type", `Int ty]
+let json_dictionnary = "\"agent\":{\"id\":0,\"type\":1}"
+
+let write_json ob a =
+  JsonUtil.write_compact_pair Yojson.Basic.write_int Yojson.Basic.write_int ob a
+let read_json p lb =
+  JsonUtil.read_compact_pair Yojson.Basic.read_int Yojson.Basic.read_int p lb
+
+let to_json (id,ty) = `List [ `Int id; `Int ty]
 let of_json = function
-  | `Assoc ["id", `Int id; "type", `Int ty]
-  | `Assoc ["type", `Int ty; "id", `Int id] -> (id,ty)
+  | `List [`Int id; `Int ty] ->  (id,ty)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
 
 module SetMap = SetMap.Make (struct

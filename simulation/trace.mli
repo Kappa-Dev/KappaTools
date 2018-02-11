@@ -26,6 +26,7 @@ module Simulation_info : sig
   val event : 'a t -> int
   val story_id : 'a t -> int
 
+  val json_dictionnary : string
   val to_json : ('a -> Yojson.Basic.json) -> 'a t -> Yojson.Basic.json
   val of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a t
 end
@@ -92,7 +93,8 @@ val print_label_of_step:
   ?env:Model.t -> Format.formatter -> step -> unit
 
 val step_to_yojson : step -> Yojson.Basic.json
-val step_of_yojson : Yojson.Basic.json -> step
+
+val json_dictionnary : string
 
 val write_step : Bi_outbuf.t -> step -> unit
   (** Output a JSON value of type {!step}. *)
@@ -110,10 +112,14 @@ val read_step :
 val step_of_string : string -> step
   (** Deserialize JSON data of type {!step}. *)
 
-val to_yojson : t -> Yojson.Basic.json
-val of_yojson : Yojson.Basic.json -> t
+val write_json : Bi_outbuf.t -> t -> unit
+val read_json : Yojson.Safe.lexer_state -> Lexing.lexbuf -> t
 
 val init_trace_file : uuid:int -> Model.t -> out_channel -> unit
+
+val fold_trace :
+  (Model.t -> 'a -> step -> 'a) -> (Model.t -> 'a) ->
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> (Model.t * 'a)
 
 val fold_trace_file :
   (Model.t -> 'a -> step -> 'a) -> (Model.t -> 'a) -> string -> (Model.t * 'a)

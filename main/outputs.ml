@@ -177,7 +177,7 @@ let go = function
       | Some d ->
         let () =
           if !traceNotEmpty then output_char d ',' else traceNotEmpty := true in
-        Yojson.Basic.to_channel d (Trace.step_to_yojson step)
+        JsonUtil.write_to_channel Trace.write_step d step
     end
   | Data.Species (file,time,mixture) ->
      let desc = get_desc file species_desc in
