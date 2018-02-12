@@ -4,11 +4,7 @@
  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2015, the 23th of Feburary
-<<<<<<< 9d19502c910420cc42bf5de36ec1126ff169633c
- * Last modification: Time-stamp: <Oct 27 2017>
-=======
- * Last modification: Time-stamp: <Aug 04 2016>
->>>>>>> continue to use project in apply rule
+ * Last modification: Time-stamp: <Feb 12 2018>
  *
  * Type definitions for the covering classes relations between the left hand site of a rule and its sites.
  *
@@ -34,6 +30,13 @@ type covering_classes =
    key(t): int; 'a t = infinite array of list(#id) *)
 
 type cv_id = int
+
+module Cv_id_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+    with type key = cv_id
+     and type dimension = int
+  )
 
 let dummy_cv_id = 0
 

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 02 2017>
+  * Last modification: Time-stamp: <Feb 12 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -83,7 +83,7 @@ sig
     (Ckappa_sig.c_rule_id,
      Communication.precondition, Communication.precondition option) binary
 
-  val maybe_reachable: (*TODO*)
+  val maybe_reachable:
     (Cckappa_sig.mixture,
      Communication.precondition, Communication.precondition option) binary
 
@@ -104,7 +104,7 @@ sig
     ) unary
 
   val print:
-    ?dead_rules:(Remanent_parameters_sig.parameters -> Exception.method_handler -> Ckappa_sig.c_rule_id -> Exception.method_handler * bool) 
+    ?dead_rules:(Remanent_parameters_sig.parameters -> Exception.method_handler -> Ckappa_sig.c_rule_id -> Exception.method_handler * bool)
     -> (Loggers.t, unit) unary
 
   val maybe_reachable:

@@ -4,7 +4,7 @@
  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2016, the 2th of March
- * Last modification: Time-stamp: <Oct 27 2017>
+ * Last modification: Time-stamp: <Feb 12 2018>
  *
  * Type definitions for the covering classes relations between the left hand site of a rule and its sites.
  *
@@ -14,6 +14,11 @@
 (****************************************************************************************)
 
 type cv_id
+
+module Cv_id_nearly_Inf_Int_storage_Imperatif:
+  Int_storage.Storage
+    with type key = cv_id
+     and type dimension = int
 
 val dummy_cv_id: cv_id
 

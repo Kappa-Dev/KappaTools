@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <May 05 2017>
+  * Last modification: Time-stamp: <Feb 12 2018>
   *
   *
   *
@@ -244,8 +244,7 @@ let list2set parameters error list =
 
 (****************************************************************************)
 
-let new_index_pair_map parameters error l = (*TODO*)
-  (*JF:  it should be computed only once *)
+let new_index_pair_map parameters error l =
   let rec aux acc k map1 map2 error =
     match acc with
     | [] -> error, (map1, map2)
