@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Feb 05 2018>
+   * Last modification: Time-stamp: <Feb 12 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -129,6 +129,9 @@ struct
 
   let get_covering_classes_id static =
     lift Analyzer_headers.get_covering_classes_id static
+
+  let get_site_correspondence_array static =
+    lift Analyzer_headers.get_site_correspondence static
 
   let get_remanent_triple static =
     lift Analyzer_headers.get_remanent_triple static
@@ -352,7 +355,7 @@ struct
     let handler_bdu = get_mvbdu_handler dynamic in
     let potential_side_effects = get_potential_side_effects static in
     let log_info = get_log_info dynamic in
-    let store_remanent_triple = get_remanent_triple static in
+    let remanent_triple = get_remanent_triple static in
     let error, (handler_bdu, log_info, result) =
       Bdu_static_views.scan_rule_set
         parameters
@@ -362,7 +365,7 @@ struct
         kappa_handler
         compiled
         potential_side_effects
-        store_remanent_triple
+        remanent_triple
     in
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
@@ -374,7 +377,7 @@ struct
       Bdu_static_views.scan_rule_set_pattern
         parameters
         error
-        store_remanent_triple
+        remanent_triple
         compiled
     in
     let static = set_domain_static_pattern result static in
@@ -557,7 +560,7 @@ struct
 
   (**************************************************************************)
 
-  let travel_in_site_correspondence parameters error cv_id site_correspondence =
+let travel_in_site_correspondence parameters error cv_id site_correspondence =
     let error, site_correspondence =
       let rec aux list =
         match list with
@@ -568,7 +571,8 @@ struct
     in
     error, site_correspondence
 
-  let get_site_correspondence parameters error agent_type site_correspondence =
+
+let get_site_correspondence parameters error agent_type site_correspondence =
     let error, site_correspondence =
       match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
               parameters
@@ -582,16 +586,51 @@ struct
     in
     error, site_correspondence
 
-  let get_list_of_sites_correspondence parameters error cv_id agent_type
-      site_correspondence =
-    let error, site_correspondence =
-      get_site_correspondence parameters error agent_type site_correspondence
-    in
-    let error, site_correspondence =
+let get_list_of_sites_correspondence parameters error agent_type cv_id
+    site_correspondence =
+  let error, site_correspondence =
+    get_site_correspondence parameters error agent_type site_correspondence
+  in
+  let error, site_correspondence =
       travel_in_site_correspondence parameters error cv_id site_correspondence
-    in
-    error, site_correspondence
+  in
+  error, site_correspondence
 
+
+let get_list_of_sites_correspondence_map parameters error agent_type cv_id
+      site_correspondence =
+    let error, cv_id_array_opt =
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+        parameters
+        error
+        agent_type site_correspondence
+    in
+    match cv_id_array_opt with
+    | None ->
+      Exception.warn
+        parameters error __POS__
+        Exit
+        (Ckappa_sig.Site_map_and_set.Map.empty,
+         Ckappa_sig.Site_map_and_set.Map.empty)
+    | Some cv_id_array ->
+      let error, pair_opt  =
+        Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.get
+          parameters
+          error
+          cv_id
+          cv_id_array
+      in
+      begin
+        match pair_opt with
+        | None ->
+          Exception.warn
+            parameters error __POS__
+            Exit
+            (Ckappa_sig.Site_map_and_set.Map.empty,
+             Ckappa_sig.Site_map_and_set.Map.empty)
+        | Some (map1,map2) ->
+          error, (map1,map2)
+    end
 
   let dump_cv_label static error bool (agent_type, cv_id) =
     (*TODO: put title*)
@@ -622,8 +661,8 @@ struct
       let error, site_correspondence =
         get_list_of_sites_correspondence parameters
           error
-          cv_id
           agent_type
+          cv_id
           site_correspondence
       in
       let () = Loggers.print_newline log in
@@ -717,7 +756,7 @@ struct
     =
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
-    let site_correspondence = get_remanent_triple static in
+    let site_correspondence = get_site_correspondence_array static in
     if local_trace
     || Remanent_parameters.get_dump_reachability_analysis_diff parameters
     || Remanent_parameters.get_trace parameters
@@ -741,17 +780,10 @@ struct
       in
       (*------------------------------------------------------------------*)
       (*list of sites in a covering class*)
-      let error, site_correspondence =
-        get_list_of_sites_correspondence parameters error
-          cv_id
+      let error, (_,map2) =
+        get_list_of_sites_correspondence_map parameters error
           agent_type
-          site_correspondence
-      in
-      (*------------------------------------------------------------------*)
-      (*build a pair of coresspondence map:
-        - map1: global -> local; map2: local -> global*)
-      let error, (_map1, map2) =
-        Common_map.new_index_pair_map parameters error
+          cv_id
           site_correspondence
       in
       (*-------------------------------------------------------------------*)
@@ -1090,25 +1122,9 @@ struct
   (*****************************************************************)
   (*MOVE in static?*)
 
-  let get_new_site_name parameters error cv_id site_name
+  let get_new_site_name parameters error site_name
       (*store_new_index_pair_map*)
-      site_correspondence =
-    let error, site_correspondence =
-      let rec aux list =
-        match list with
-        | [] ->
-          Exception.warn parameters error __POS__ Exit []
-        | (h, list, _) :: _ when h = cv_id -> error, list
-        | _ :: tail -> aux tail
-      in
-      aux site_correspondence
-    in
-    let error, (map1, _map2) =
-      Common_map.new_index_pair_map
-        parameters
-        error
-        site_correspondence
-    in
+      map1 =
     let error, new_site_name =
       match
         Ckappa_sig.Site_map_and_set.Map.find_option
@@ -1126,24 +1142,8 @@ struct
     error, new_site_name
 
   (*MOVE?*)
-  let is_new_site_name parameters error cv_id site_name
-      site_correspondence =
-    let error, site_correspondence =
-      let rec aux list =
-        match list with
-        | [] ->
-          Exception.warn parameters error __POS__ Exit []
-        | (h, list, _) :: _ when h = cv_id -> error, list
-        | _ :: tail -> aux tail
-      in
-      aux site_correspondence
-    in
-    let error, (map1, _map2) =
-      Common_map.new_index_pair_map
-        parameters
-        error
-        site_correspondence
-    in
+  let is_new_site_name parameters error site_name
+      map1  =
     match
       Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
         parameters
@@ -1165,10 +1165,17 @@ struct
     let error, dynamic, bdu =
       List.fold_left
         (fun (error, dynamic, bdu) cv_id ->
+           let error, (map1,_) =
+             get_list_of_sites_correspondence_map
+               parameters error
+               agent_type
+               cv_id
+               site_correspondence
+           in
            let error, new_site_name =
              get_new_site_name
-               parameters error cv_id site_name
-               site_correspondence
+               parameters error site_name
+               map1
            in
            (*--------------------------------------------------------------*)
            (* fetch the bdu for the agent type and the cv_id in
@@ -1293,7 +1300,7 @@ struct
       | error, Some a -> error, a
     in
     (*------------------------------------------------------------*)
-    let error, site_correspondence =
+    (*  let error, site_correspondence =
       match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
               parameters
               error
@@ -1303,7 +1310,7 @@ struct
       | error, None ->
         Exception.warn  parameters error __POS__ Exit []
       | error, Some l -> error, l
-    in
+        in*)
     (* compute the list of cv_id documenting site_name *)
     let error, cv_list =
       match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
@@ -1501,7 +1508,8 @@ struct
       parameters error dynamic kappa_handler path
       agent_type (*agent_type inside the pattern*)
       bdu_false bdu_true
-      site_correspondence store_covering_classes_id
+      site_correspondence site_correspondence_map
+      store_covering_classes_id
       fixpoint_result =
     (*get the information of the path,
       A - x - y - B - z
@@ -1601,13 +1609,20 @@ struct
           in
           let error, dynamic, bdu =
             List.fold_left (fun (error, dynamic, bdu) cv_id ->
+                let error, (map1,_) =
+                  get_list_of_sites_correspondence_map
+                    parameters
+                    error
+                    agent_type_in
+                    cv_id
+                    site_correspondence_map
+                in
                 let error,b =
                   is_new_site_name
                     parameters
                     error
-                    cv_id
                     site_in
-                    site_correspondence
+                    map1
                 in
                 let error, bdu_X =
                   match
@@ -1624,9 +1639,8 @@ struct
                   get_new_site_name
                     parameters
                     error
-                    cv_id
                     site_path
-                    site_correspondence
+                    map1
                 in
                 let error, handler, singleton =
                   Ckappa_sig.Views_bdu.build_variables_list
@@ -1643,9 +1657,8 @@ struct
                       get_new_site_name
                         parameters
                         error
-                        cv_id
                         site_in
-                        site_correspondence
+                        map1
                     in
                     let error, handler, mvbdu_B_y =
                       Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list
@@ -1730,7 +1743,8 @@ struct
       parameters error dynamic kappa_handler
       path agent_type
       aux rule
-      site_correspondence store_covering_classes_id
+      site_correspondence site_correspondence_map
+      store_covering_classes_id
       fixpoint_result bdu_false bdu_true
     =
     (*---------------------------------------------------------*)
@@ -1755,6 +1769,7 @@ struct
           bdu_false
           bdu_true
           site_correspondence
+          site_correspondence_map
           store_covering_classes_id
           fixpoint_result
       in
@@ -1846,7 +1861,7 @@ struct
   let compute_pattern_navigation
       parameters error kappa_handler
       aux dynamic path rule step bdu_false bdu_true
-      site_correspondence
+      site_correspondence site_correspondence_map
       store_covering_classes_id fixpoint_result =
     let error, agent =
       match
@@ -1896,6 +1911,7 @@ struct
                 bdu_false
                 bdu_true
                 site_correspondence
+                site_correspondence_map
                 store_covering_classes_id
                 fixpoint_result
             in
@@ -1966,6 +1982,7 @@ struct
                     bdu_false
                     bdu_true
                     site_correspondence
+                    site_correspondence_map
                     store_covering_classes_id
                     fixpoint_result
                 in
@@ -1995,6 +2012,7 @@ struct
                       bdu_false
                       bdu_true
                       site_correspondence
+                      site_correspondence_map
                       store_covering_classes_id
                       fixpoint_result
                   in
@@ -2018,6 +2036,7 @@ struct
                         parameters error dynamic
                         kappa_handler path agent_type aux rule
                         site_correspondence
+                        site_correspondence_map
                         store_covering_classes_id
                         fixpoint_result
                         bdu_false
@@ -2041,6 +2060,7 @@ struct
                         bdu_false
                         bdu_true
                         site_correspondence
+                        site_correspondence_map
                         store_covering_classes_id
                         fixpoint_result
                     in
@@ -2059,7 +2079,7 @@ struct
   let compute_precondition_enable
       error kappa_handler rule rule_id precondition
       bdu_false bdu_true dual_contact_map store_agent_name
-      site_correspondence
+      site_correspondence site_correspondence_map
       store_covering_classes_id fixpoint_result proj_bdu_test_restriction =
     let precondition =
       Communication.refine_information_about_state_of_sites_in_precondition
@@ -2113,6 +2133,7 @@ struct
                     bdu_false
                     bdu_true
                     site_correspondence
+                    site_correspondence_map
                     store_covering_classes_id
                     fixpoint_result
                 in
@@ -2141,7 +2162,7 @@ struct
                     bdu_false
                     bdu_true
                     store_covering_classes_id
-                    site_correspondence
+                    site_correspondence_map
                     fixpoint_result
                     proj_bdu_test_restriction
                 in
@@ -2196,6 +2217,7 @@ struct
     in
     let store_agent_name = get_agent_name static in
     let site_correspondence = get_remanent_triple static in
+    let site_correspondence_map = get_site_correspondence_array static in
     let store_covering_classes_id = get_covering_classes_id static in
     let error, proj_bdu_test_restriction =
       match
@@ -2232,6 +2254,7 @@ struct
           dual_contact_map
           store_agent_name
           site_correspondence
+          site_correspondence_map
           store_covering_classes_id
           fixpoint_result
           proj_bdu_test_restriction
@@ -2261,10 +2284,12 @@ struct
   (*Precondition inside pattern*)
   (***********************************************************)
 
-  let precondition_step_pattern parameters error step aux dynamic
-      path pattern kappa_handler bdu_false
-      bdu_true
-      site_correspondence store_covering_classes_id fixpoint_result
+  let precondition_step_pattern
+      parameters error step aux dynamic
+      path pattern kappa_handler
+      bdu_false bdu_true
+      site_correspondence site_correspondence_map
+      store_covering_classes_id fixpoint_result
     =
     let error, agent =
       match
@@ -2310,6 +2335,7 @@ struct
                 bdu_false
                 bdu_true
                 site_correspondence
+                site_correspondence_map
                 store_covering_classes_id
                 fixpoint_result
             in
@@ -2367,6 +2393,7 @@ struct
                     bdu_false
                     bdu_true
                     site_correspondence
+                    site_correspondence_map
                     store_covering_classes_id
                     fixpoint_result
                 in
@@ -2397,6 +2424,7 @@ struct
                       bdu_false
                       bdu_true
                       site_correspondence
+                      site_correspondence_map
                       store_covering_classes_id
                       fixpoint_result
                   in
@@ -2431,6 +2459,7 @@ struct
                           bdu_false
                           bdu_true
                           site_correspondence
+                          site_correspondence_map
                           store_covering_classes_id
                           fixpoint_result
                       in
@@ -2464,6 +2493,7 @@ struct
                         bdu_false
                         bdu_true
                         site_correspondence
+                        site_correspondence_map
                         store_covering_classes_id
                         fixpoint_result
                     in
@@ -2537,7 +2567,8 @@ struct
 
   let precondition_empty_aux parameters error path
       pattern dynamic bdu_false bdu_true
-      site_correspondence fixpoint_result cv_list
+      site_correspondence site_correspondence_map
+      fixpoint_result cv_list
     =
     let error, (dynamic, list) =
       build_bdu_test_pattern parameters error pattern
@@ -2548,12 +2579,15 @@ struct
       List.fold_left (fun (error, dynamic, bdu) (agent_type, bdu_test) ->
           List.fold_left (fun (error, dynamic, bdu) cv_id ->
               let site_name = path.Communication.site in
+              let error, (map1,_) =
+                get_list_of_sites_correspondence_map parameters error
+                  agent_type cv_id site_correspondence_map
+              in
               let error, new_site_name =
                 get_new_site_name
                   parameters error
-                  cv_id
                   site_name
-                  site_correspondence
+                  map1
               in
               let error, bdu_X =
                 match
@@ -2647,7 +2681,7 @@ struct
   let precondition_empty_pattern parameters error
       path pattern dynamic bdu_false bdu_true
       store_agent_name_from_pattern
-      site_correspondence
+      site_correspondence site_correspondence_map
       store_covering_classes_id fixpoint_result
     =
     let error, agent_type =
@@ -2702,6 +2736,7 @@ struct
         bdu_false
         bdu_true
         site_correspondence
+        site_correspondence_map
         fixpoint_result
         cv_list
     in
@@ -2721,6 +2756,9 @@ struct
     let dual_contact_map = get_store_dual_contact_map dynamic in
     let store_agent_name_from_pattern = get_agent_name_from_pattern static in
     let site_correspondence = get_remanent_triple static in
+    let site_correspondence_map =
+      get_site_correspondence_array static
+    in
     let store_covering_classes_id = get_covering_classes_id static in
     (*---------------------------------------------------------*)
     (* Why an arbitrary patterns would be stored in that map *)
@@ -2922,6 +2960,7 @@ struct
                       bdu_false
                       bdu_true
                       site_correspondence
+                      site_correspondence_map
                       store_covering_classes_id
                       fixpoint_result
                   in
@@ -2944,6 +2983,7 @@ struct
                       bdu_false bdu_true
                       store_agent_name_from_pattern
                       site_correspondence
+                      site_correspondence_map
                       store_covering_classes_id
                       fixpoint_result
                   in
@@ -3340,80 +3380,75 @@ struct
          let error, handler, list =
            decomposition parameters handler error bdu
          in
-         let error, site_correspondence =
-           get_list_of_sites_correspondence parameters error
-             cv_id
-             agent_type
-             site_correspondence
-         in
          let error, (_, map2) =
-           Common_map.new_index_pair_map
+           get_list_of_sites_correspondence_map
              parameters error
+             agent_type cv_id
              site_correspondence
          in
-       let rename_site parameters error site_type =
-         let error, site_type =
-           match
-             Ckappa_sig.Site_map_and_set.Map.find_option
-               parameters error
-               site_type
-               map2
-           with
-           | error, None -> Exception.warn  parameters error __POS__ Exit
-                              Ckappa_sig.dummy_site_name_minus1
-           | error, Some i -> error, i
+         let rename_site parameters error site_type =
+           let error, site_type =
+             match
+               Ckappa_sig.Site_map_and_set.Map.find_option
+                 parameters error
+                 site_type
+                 map2
+             with
+             | error, None -> Exception.warn  parameters error __POS__ Exit
+                                Ckappa_sig.dummy_site_name_minus1
+             | error, Some i -> error, i
+           in
+           error, site_type
          in
-         error, site_type
-       in
-       List.fold_left
-         (fun (error, handler, output) bdu ->
-            begin
-              let error, handler, lvar =
-                Ckappa_sig.Views_bdu.variables_list_of_mvbdu
-                  parameters handler error
-                  bdu
-              in
-              (*list: ckappa_sig.c_site_name list*)
-              let error, handler, list =
-                Ckappa_sig.Views_bdu.extensional_of_variables_list
-                  parameters handler error
-                  lvar
-              in
-              (*asso take (key * key) list *)
-              let error, asso =
-                List.fold_left
-                  (fun (error, list) i ->
-                     let error, new_name =
-                       rename_site parameters error i
-                     in
-                     error,(i, new_name) :: list)
-                  (error, [])
-                  (List.rev list)
-              in
-              let error, handler, hconsed_asso =
-                Ckappa_sig.Views_bdu.build_renaming_list
-                  parameters handler error asso
-              in
-              let error,handler,renamed_mvbdu =
-                Ckappa_sig.Views_bdu.mvbdu_rename
-                  parameters handler error bdu hconsed_asso
-              in
-              let error,handler,hconsed_vars =
-                Ckappa_sig.Views_bdu.variables_list_of_mvbdu
-                  parameters handler error renamed_mvbdu
-              in
-              let error, cv_map_opt =
-                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-                  parameters error agent_type output
-              in
-              let error,cv_map =
-                match
-                  cv_map_opt
-                with
-                | None ->
-                  error, Wrapped_modules.LoggedIntMap.empty
-                | Some map -> error, map
-              in
+         List.fold_left
+           (fun (error, handler, output) bdu ->
+              begin
+                let error, handler, lvar =
+                  Ckappa_sig.Views_bdu.variables_list_of_mvbdu
+                    parameters handler error
+                    bdu
+                in
+                (*list: ckappa_sig.c_site_name list*)
+                let error, handler, list =
+                  Ckappa_sig.Views_bdu.extensional_of_variables_list
+                    parameters handler error
+                    lvar
+                in
+                (*asso take (key * key) list *)
+                let error, asso =
+                  List.fold_left
+                    (fun (error, list) i ->
+                       let error, new_name =
+                         rename_site parameters error i
+                       in
+                       error,(i, new_name) :: list)
+                    (error, [])
+                    (List.rev list)
+                in
+                let error, handler, hconsed_asso =
+                  Ckappa_sig.Views_bdu.build_renaming_list
+                    parameters handler error asso
+                in
+                let error,handler,renamed_mvbdu =
+                  Ckappa_sig.Views_bdu.mvbdu_rename
+                    parameters handler error bdu hconsed_asso
+                in
+                let error,handler,hconsed_vars =
+                  Ckappa_sig.Views_bdu.variables_list_of_mvbdu
+                    parameters handler error renamed_mvbdu
+                in
+                let error, cv_map_opt =
+                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                    parameters error agent_type output
+                in
+                let error,cv_map =
+                  match
+                    cv_map_opt
+                  with
+                  | None ->
+                    error, Wrapped_modules.LoggedIntMap.empty
+                  | Some map -> error, map
+                in
                 let error, handler, cv_map' =
                   Ckappa_sig.Views_bdu.store_by_variables_list
                     Wrapped_modules.LoggedIntMap.find_default_without_logs
@@ -3426,7 +3461,7 @@ struct
                     hconsed_vars
                     renamed_mvbdu
                     cv_map
-              in
+                in
                 let error,output =
                   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
                     parameters error agent_type cv_map'
@@ -3544,14 +3579,10 @@ struct
                    Loggers.print_newline log
                in
                (*------------------------------------------------------------*)
-               let error, site_correspondence =
-                 get_list_of_sites_correspondence parameters error
-                   cv_id
+               let error, (_, map2)  =
+                 get_list_of_sites_correspondence_map parameters error
                    agent_type
-                   site_correspondence
-               in
-               let error,(_, map2) =
-                 Common_map.new_index_pair_map parameters error
+                   cv_id
                    site_correspondence
                in
                (*-----------------------------------------------------------*)
@@ -3798,7 +3829,7 @@ struct
   let print_fixpoint_result static dynamic error _loggers =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let store_remanent_triple = get_remanent_triple static in
+    let site_correspondence = get_site_correspondence_array static in
     let fixpoint_result = get_fixpoint_result dynamic in
     let handler = get_mvbdu_handler dynamic in
     let compil = get_compil static in
@@ -3823,7 +3854,7 @@ struct
           handler
           error
           kappa_handler
-          store_remanent_triple
+          site_correspondence
           fixpoint_result
       else error, handler
     in
@@ -3847,7 +3878,7 @@ struct
         let handler_kappa = get_kappa_handler static in
         let handler = get_mvbdu_handler dynamic in
         let compil = get_compil static in
-        let site_correspondence = get_remanent_triple static in
+        let site_correspondence = get_site_correspondence_array static in
         let error, handler, output =
           smash_map
             (fun _parameters handler error a -> error, handler, [a])
@@ -4132,7 +4163,7 @@ struct
   let export_views_properties static dynamic error kasa_state =
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
-    let site_correspondence = get_remanent_triple static in
+    let site_correspondence = get_site_correspondence_array static in
     let fixpoint_result = get_fixpoint_result dynamic in
     let error, dynamic, kasa_state =
       export_views_properties_aux
@@ -4217,7 +4248,7 @@ struct
     let handler = get_mvbdu_handler dynamic in
     let handler_kappa = get_kappa_handler static in
     let result = get_fixpoint_result dynamic in
-    let site_correspondence = get_remanent_triple static in
+    let site_correspondence = get_site_correspondence_array static in
     let error, handler, ranges =
       smash_map
         Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <May 05 2017>
+  * Last modification: Time-stamp: <Feb 12 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -114,7 +114,43 @@ type predicate_covering_classes =
         Covering_classes_type.Dictionary_of_List_sites.value *
         Ckappa_sig.Site_map_and_set.Set.t) list)
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
+
+    site_correspondence:
+      (Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t
+       * Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t)
+        Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.t
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
+
+
   }
+let new_index_pair_map parameters error l =
+  let rec aux acc k map1 map2 error =
+    match acc with
+    | [] -> error, (map1, map2)
+    | h :: tl ->
+      let error, map1 =
+        Ckappa_sig.Site_map_and_set.Map.add parameters error h k map1 in
+      let error, map2 =
+        Ckappa_sig.Site_map_and_set.Map.add parameters error k h map2 in
+      aux
+        tl
+        (Ckappa_sig.site_name_of_int ((Ckappa_sig.int_of_site_name k)+1))
+        map1
+        map2
+        error
+  in
+  let error', (map1, map2) =
+    aux
+      l
+      (Ckappa_sig.site_name_of_int 1)
+      Ckappa_sig.Site_map_and_set.Map.empty
+      Ckappa_sig.Site_map_and_set.Map.empty error
+  in
+  let error =
+    Exception.check_point
+      Exception.warn parameters error error' __POS__ Exit
+  in
+  error,(map1,map2)
 
 (***************************************************************************)
 (*COMMON VIEWS*)
@@ -187,6 +223,10 @@ let init_predicate_covering_classes parameters error =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
       parameters error 0
   in
+  let error, init_site_correspondence =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+      parameters error 0
+  in
   error,
   {
     store_covering_classes = init_covering_classes;
@@ -194,6 +234,7 @@ let init_predicate_covering_classes parameters error =
       Covering_classes_type.AgentCV_map_and_set.Map.empty;
     store_covering_classes_id = empty_agentsite;
     store_remanent_triple = init_remanent_triple;
+    site_correspondence = init_site_correspondence ;
   }
 
 let init_common_views parameters error =
@@ -1338,12 +1379,62 @@ let scan_predicate_covering_classes parameters error handler_kappa compil
   in
   (*------------------------------------------------------------------------*)
   let error, store_remanent_triple =
-    (* JF: it should be computed only once, not for each rule *)
     collect_remanent_triple
       parameters
       error
       store_covering_classes
       store_result.store_remanent_triple
+  in
+  let error, init_array =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+  in
+  let error, site_correspondence =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameters error
+      (fun parameters error ag list map ->
+         let error, array =
+           List.fold_left
+             (fun (error, array) (cv_id,list,_) ->
+                let rec aux acc k map1 map2 error =
+                  match acc with
+                  | [] -> error, (map1, map2)
+                  | h :: tl ->
+                    let error, map1 =
+                      Ckappa_sig.Site_map_and_set.Map.add
+                        parameters error h k map1
+                    in
+                    let error, map2 =
+                      Ckappa_sig.Site_map_and_set.Map.add
+                        parameters error k h map2
+                    in
+                    aux
+                      tl
+                      (Ckappa_sig.site_name_of_int
+                         ((Ckappa_sig.int_of_site_name k)+1))
+                      map1
+                      map2
+                      error
+                in
+                let error, (map1, map2) =
+                  aux
+                    list
+                    (Ckappa_sig.site_name_of_int 1)
+                    Ckappa_sig.Site_map_and_set.Map.empty
+                    Ckappa_sig.Site_map_and_set.Map.empty error
+                in
+                Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.set
+                  parameters error cv_id (map1,map2) array)
+             (Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.create
+                parameters error 0)
+             list
+         in
+         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+           parameters error
+           ag
+           array
+           map)
+      store_remanent_triple
+      init_array
   in
   error,
   {
@@ -1352,6 +1443,7 @@ let scan_predicate_covering_classes parameters error handler_kappa compil
       store_list_of_site_type_in_covering_classes;
     store_covering_classes_id = store_covering_classes_id;
     store_remanent_triple = store_remanent_triple;
+    site_correspondence = site_correspondence ;
   }
 
 (***************************************************************************)

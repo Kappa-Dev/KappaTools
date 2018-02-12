@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 02 2017>
+  * Last modification: Time-stamp: <Feb 12 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -391,6 +391,18 @@ let set_remanent_triple cv static =
     }
     static
 
+let get_site_correspondence static =
+  (get_predicate_covering_classes static).Common_static.site_correspondence
+
+let set_site_correspondence correspondence static =
+  set_predicate_covering_classes
+    {
+      (get_predicate_covering_classes static) with
+      Common_static.site_correspondence =
+        correspondence
+    }
+    static 
+
 (*let get_new_index_pair_map static =
   (get_common_views static).Common_static.store_new_index_pair_map
 
@@ -463,4 +475,4 @@ let initialize_global_information
   let error, static = scan_rule init_global_static error in
   error, static, init_dynamic
 
-let dummy_dead_rules _ error _ = error, false 
+let dummy_dead_rules _ error _ = error, false
