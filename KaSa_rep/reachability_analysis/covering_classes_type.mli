@@ -4,7 +4,7 @@
  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2016, the 2th of March
- * Last modification: Time-stamp: <Feb 12 2018>
+ * Last modification: Time-stamp: <Feb 13 2018>
  *
  * Type definitions for the covering classes relations between the left hand site of a rule and its sites.
  *
@@ -117,3 +117,27 @@ module Project2_modif: Map_wrapper.Projection
    and type elt_b = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
    and type 'a map_a = 'a Ckappa_sig.AgentsSite_map_and_set.Map.t
    and type 'a map_b = 'a Ckappa_sig.AgentSite_map_and_set.Map.t
+
+type predicate_covering_classes =
+  {
+    store_covering_classes_predicate:
+      remanent
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
+    store_list_of_site_type_in_covering_classes:
+      Ckappa_sig.c_site_name list
+        AgentCV_map_and_set.Map.t;
+    store_covering_classes_id :
+      cv_id list
+        Ckappa_sig.AgentSite_map_and_set.Map.t;
+    store_remanent_triple:
+      ((Dictionary_of_List_sites.key *
+        Dictionary_of_List_sites.value *
+        Ckappa_sig.Site_map_and_set.Set.t) list)
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
+
+    site_correspondence:
+      (Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t
+       * Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t)
+        Cv_id_nearly_Inf_Int_storage_Imperatif.t
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
+  }
