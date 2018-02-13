@@ -124,7 +124,7 @@ end =
       ]
 
     let of_yojson = function
-      | `Assoc l as x when List.length l = 5 -> {
+      | `Assoc l as x when List.length l = 6 -> {
           consecutive =
             Yojson.Basic.Util.to_int
               (Yojson.Basic.Util.member "consecutive" x);
