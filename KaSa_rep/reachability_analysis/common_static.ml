@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Feb 12 2018>
+  * Last modification: Time-stamp: <Feb 13 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -96,33 +96,8 @@ type binding_views =
 (***************************************************************************)
 (*COVERING CLASSES*)
 (***************************************************************************)
+    (*
 
-type predicate_covering_classes =
-  {
-    store_covering_classes:
-      Covering_classes_type.remanent
-        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
-    store_list_of_site_type_in_covering_classes:
-      Ckappa_sig.c_site_name list
-        Covering_classes_type.AgentCV_map_and_set.Map.t;
-    store_covering_classes_id :
-      Covering_classes_type.cv_id list
-        Ckappa_sig.AgentSite_map_and_set.Map.t;
-    (*rewrite/ change type of this function ?*)
-    store_remanent_triple:
-      ((Covering_classes_type.Dictionary_of_List_sites.key *
-        Covering_classes_type.Dictionary_of_List_sites.value *
-        Ckappa_sig.Site_map_and_set.Set.t) list)
-        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
-
-    site_correspondence:
-      (Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t
-       * Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t)
-        Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.t
-        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
-
-
-  }
 let new_index_pair_map parameters error l =
   let rec aux acc k map1 map2 error =
     match acc with
@@ -151,7 +126,7 @@ let new_index_pair_map parameters error l =
       Exception.warn parameters error error' __POS__ Exit
   in
   error,(map1,map2)
-
+*)
 (***************************************************************************)
 (*COMMON VIEWS*)
 (***************************************************************************)
@@ -175,7 +150,7 @@ type common_views =
     store_test_modif_map:
       Ckappa_sig.Rule_map_and_set.Set.t
         Ckappa_sig.AgentSite_map_and_set.Map.t;
-    store_predicate_covering_classes : predicate_covering_classes;
+    (*    store_predicate_covering_classes : predicate_covering_classes;*)
   }
 
 (*****************************************************************************)
@@ -214,33 +189,8 @@ let init_side_effect_views =
     store_potential_side_effects = (empty_agentrule, empty_agentrule);
   }
 
-let init_predicate_covering_classes parameters error =
-  let error, init_covering_classes =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
-      parameters error 0
-  in
-  let error, init_remanent_triple =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
-      parameters error 0
-  in
-  let error, init_site_correspondence =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
-      parameters error 0
-  in
-  error,
-  {
-    store_covering_classes = init_covering_classes;
-    store_list_of_site_type_in_covering_classes =
-      Covering_classes_type.AgentCV_map_and_set.Map.empty;
-    store_covering_classes_id = empty_agentsite;
-    store_remanent_triple = init_remanent_triple;
-    site_correspondence = init_site_correspondence ;
-  }
 
-let init_common_views parameters error =
-  let error, init_predicate_covering_classes =
-    init_predicate_covering_classes parameters error
-  in
+let init_common_views _parameters error =
   error,
   {
     store_agent_name = Ckappa_sig.RuleAgent_map_and_set.Map.empty;
@@ -253,7 +203,6 @@ let init_common_views parameters error =
     store_test_modification_sites =
       Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_test_modif_map = empty_agentsite;
-    store_predicate_covering_classes = init_predicate_covering_classes;
   }
 
 (****************************************************************************)
@@ -1255,242 +1204,6 @@ let collect_test_modification_sites
         error, store_result
     ) store_modification_map store_test_map store_result
 
-(***************************************************************************)
-(*COVERING CLASSES*)
-(***************************************************************************)
-
-let site_covering_classes parameters error covering_classes =
-  let error, store_result =
-    (*From sites return a list of covering_class_id*)
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-      parameters error
-      (fun _parameters error agent_type_cv remanent store_result ->
-         (*get a list of covering_class_id from remanent*)
-         let cv_dic = remanent.Covering_classes_type.store_dic in
-         (*fold a dictionary*)
-         let error, store_result =
-           Covering_classes_type.Dictionary_of_List_sites.fold
-             (fun list_of_site_type ((),()) cv_id (error, store_result) ->
-                (*get site_cv in value*)
-                List.fold_left (fun (_error, store_result) site_type_cv ->
-                    let error, store_result =
-                      Common_map.add_dependency_pair_sites_cv
-                        parameters error
-                        (agent_type_cv, site_type_cv)
-                        cv_id
-                        store_result
-                    in
-                    error, store_result
-                  ) (error, store_result) list_of_site_type
-             ) cv_dic (error, store_result)
-         in
-         error, store_result
-         (*REMARK: when it is folding inside a list, start with empty result,
-           because the add_link function has already called the old result.*)
-      ) covering_classes Ckappa_sig.AgentSite_map_and_set.Map.empty
-  in
-  let store_result =
-    Ckappa_sig.AgentSite_map_and_set.Map.map (fun x -> x) store_result
-  in
-  error, store_result
-
-let list_of_site_type_in_covering_class parameters error covering_classes =
-    let error, store_result =
-      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-        parameters
-        error
-        (fun parameters error agent_type_cv remenent store_result ->
-           let cv_dic = remenent.Covering_classes_type.store_dic in
-           Covering_classes_type.Dictionary_of_List_sites.fold
-             (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
-                let error, old =
-                  Common_map.get_pair_agent_cv parameters error
-                    (agent_type_cv, cv_id) store_result
-                in
-                let new_list = List.append list_of_site_type old in
-                let error, store_result =
-                  Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
-                    parameters
-                    error
-                    (agent_type_cv, cv_id)
-                    new_list
-                    store_result
-                in
-                error, store_result
-             ) cv_dic (error, store_result)
-        ) covering_classes Covering_classes_type.AgentCV_map_and_set.Map.empty
-    in
-    let store_result =
-      Covering_classes_type.AgentCV_map_and_set.Map.map (fun x -> x)
-        store_result
-    in
-    error, store_result
-
-let collect_remanent_triple parameters error store_remanent store_result =
-  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-    parameters error
-    (fun parameters error agent_type remanent store_result ->
-       let store_dic = remanent.Covering_classes_type.store_dic in
-       (*-----------------------------------------------------------------*)
-       let error, triple_list =
-         Covering_classes_type.Dictionary_of_List_sites.fold
-           (fun list _ cv_id (error, current_list) ->
-              let error, set = Common_map.list2set parameters error list in
-              let triple_list = (cv_id, list, set) :: current_list in
-              error, triple_list
-           ) store_dic (error, [])
-       in
-       (*--------------------------------------------------------*)
-       let error, store_result =
-         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-           parameters
-           error
-           agent_type
-           (List.rev triple_list)
-           store_result
-       in
-       error, store_result
-    ) store_remanent store_result
-
-let scan_predicate_covering_classes parameters error handler_kappa compil
-    store_result =
-  let error, store_covering_classes =
-    Covering_classes_main.covering_classes
-      parameters
-      error
-      handler_kappa
-      compil
-  in
-  (*-----------------------------------------------------------------------*)
-  let error, store_list_of_site_type_in_covering_classes =
-    list_of_site_type_in_covering_class
-      parameters
-      error
-      store_covering_classes
-  in
-  (*-----------------------------------------------------------------------*)
-  (*static information of covering classes: from sites -> covering_class id
-    list*)
-  let error, store_covering_classes_id =
-    site_covering_classes
-      parameters
-      error
-      store_covering_classes
-  in
-  (*------------------------------------------------------------------------*)
-  let error, store_remanent_triple =
-    collect_remanent_triple
-      parameters
-      error
-      store_covering_classes
-      store_result.store_remanent_triple
-  in
-  let error, init_array =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
-  in
-  let error, site_correspondence =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-      parameters error
-      (fun parameters error ag list map ->
-         let error, array =
-           List.fold_left
-             (fun (error, array) (cv_id,list,_) ->
-                let rec aux acc k map1 map2 error =
-                  match acc with
-                  | [] -> error, (map1, map2)
-                  | h :: tl ->
-                    let error, map1 =
-                      Ckappa_sig.Site_map_and_set.Map.add
-                        parameters error h k map1
-                    in
-                    let error, map2 =
-                      Ckappa_sig.Site_map_and_set.Map.add
-                        parameters error k h map2
-                    in
-                    aux
-                      tl
-                      (Ckappa_sig.site_name_of_int
-                         ((Ckappa_sig.int_of_site_name k)+1))
-                      map1
-                      map2
-                      error
-                in
-                let error, (map1, map2) =
-                  aux
-                    list
-                    (Ckappa_sig.site_name_of_int 1)
-                    Ckappa_sig.Site_map_and_set.Map.empty
-                    Ckappa_sig.Site_map_and_set.Map.empty error
-                in
-                Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.set
-                  parameters error cv_id (map1,map2) array)
-             (Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.create
-                parameters error 0)
-             list
-         in
-         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-           parameters error
-           ag
-           array
-           map)
-      store_remanent_triple
-      init_array
-  in
-  error,
-  {
-    store_covering_classes = store_covering_classes;
-    store_list_of_site_type_in_covering_classes =
-      store_list_of_site_type_in_covering_classes;
-    store_covering_classes_id = store_covering_classes_id;
-    store_remanent_triple = store_remanent_triple;
-    site_correspondence = site_correspondence ;
-  }
-
-(***************************************************************************)
-
-(*let new_index_pair_map parameters error store_remanent_triple =
-  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
-    error
-    (fun parameters error agent_type' triple_list (map1, map2) ->
-       (*JF:  it should be computed only once *)
-       let error, map1, map2 =
-       List.fold_left (fun (error, map1, map2) (cv_id, list, set) ->
-           let rec aux acc k map1 map2 error =
-             match acc with
-             | [] -> error, (map1, map2)
-             | h :: tl ->
-               let error, map1 =
-                 Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-                   parameters error h k map1
-               in
-               let error, map2 =
-                 Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-                   parameters error k h map2
-               in
-               aux tl
-                 (Ckappa_sig.site_name_of_int
-                    ((Ckappa_sig.int_of_site_name k)+1))
-                 map1
-                 map2
-                 error
-           in
-           let error', (map1, map2) =
-             aux list
-               (Ckappa_sig.site_name_of_int 1)
-               Ckappa_sig.Site_map_and_set.Map.empty
-               Ckappa_sig.Site_map_and_set.Map.empty
-               error
-           in
-           let error =
-             Exception.check_point
-               Exception.warn parameters error error' __POS__ Exit
-           in
-           error, map1, map2
-           ) (error, map1, map2) triple_list
-       in
-       error, (map1, map2)
-    ) store_remanent_triple (Ckappa_sig.Site_map_and_set.Map.empty,
-                             Ckappa_sig.Site_map_and_set.Map.empty)*)
 
 (***************************************************************************)
 (*RULE*)
@@ -1559,22 +1272,7 @@ let scan_rule parameter error handler_kappa rule_id rule compil store_result =
       parameter
       error
       store_test_modification_sites
-  in
-  (*--------------------------------------------------------------*)
-  let error, store_predicate_covering_classes =
-    scan_predicate_covering_classes
-      parameter error
-      handler_kappa
-      compil
-      store_result.store_predicate_covering_classes
-  in
-  (*--------------------------------------------------------------*)
-  (*let error, store_new_index_pair_map =
-    new_index_pair_map parameter
-      error
-      store_predicate_covering_classes.store_remanent_triple
-      (*store_result.store_new_index_pair_map*)
-  in*)
+      in
   (*--------------------------------------------------------------*)
   error,
   {
@@ -1587,9 +1285,7 @@ let scan_rule parameter error handler_kappa rule_id rule compil store_result =
     store_test = store_test;
     store_test_modification_sites = store_test_modification_sites;
     store_test_modif_map = store_test_modif_map;
-    store_predicate_covering_classes = store_predicate_covering_classes;
-    (*store_new_index_pair_map = store_new_index_pair_map*)
-  }
+    }
 
 (******************************************************************************)
 

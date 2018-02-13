@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Feb 12 2018>
+   * Last modification: Time-stamp: <Feb 13 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -31,10 +31,12 @@ struct
 
   type static_information =
     {
-      global_static_information : Analyzer_headers.global_static_information;
-      domain_static_information : Bdu_static_views.bdu_analysis_static;
-      domain_static_information_pattern :
+      global_static_information: Analyzer_headers.global_static_information;
+      domain_static_information: Bdu_static_views.bdu_analysis_static;
+      domain_static_information_pattern:
         Bdu_static_views.bdu_analysis_static_pattern;
+      domain_static_information_covering_class:
+        Covering_classes_type.predicate_covering_classes;
     }
 
   (*--------------------------------------------------------------------*)
@@ -121,20 +123,23 @@ struct
   let get_potential_side_effects static =
     lift Analyzer_headers.get_potential_side_effects static
 
+  let get_predicate_covering_classes static =
+    static.domain_static_information_covering_class
+
   let get_covering_classes static =
-    lift Analyzer_headers.get_covering_classes static
+    (get_predicate_covering_classes static).Covering_classes_type.store_covering_classes_predicate
 
   let get_list_of_site_type_in_covering_classes static =
-    lift Analyzer_headers.get_list_of_site_type_in_covering_classes static
+    (get_predicate_covering_classes static).Covering_classes_type.store_list_of_site_type_in_covering_classes
 
   let get_covering_classes_id static =
-    lift Analyzer_headers.get_covering_classes_id static
+    (get_predicate_covering_classes static).Covering_classes_type.store_covering_classes_id
 
   let get_site_correspondence_array static =
-    lift Analyzer_headers.get_site_correspondence static
+    (get_predicate_covering_classes static).Covering_classes_type.site_correspondence
 
   let get_remanent_triple static =
-    lift Analyzer_headers.get_remanent_triple static
+    (get_predicate_covering_classes static).Covering_classes_type.store_remanent_triple
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
@@ -420,6 +425,8 @@ struct
         (StoryProfiling.Domain_initialization domain_name)
         None log_info
     in
+    let compil = Analyzer_headers.get_cc_code static in
+    let handler_kappa = Analyzer_headers.get_kappa_handler static in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
     let error, init_bdu_analysis_static =
       Bdu_static_views.init_bdu_analysis_static parameters error
@@ -427,11 +434,15 @@ struct
     let init_bdu_analysis_static_pattern =
       Bdu_static_views.init_bdu_analysis_static_pattern
     in
+    let error, init_covering_class =
+      Covering_classes_main.scan_predicate_covering_classes parameters error handler_kappa compil
+    in
     let init_global_static =
       {
         global_static_information = static;
         domain_static_information = init_bdu_analysis_static;
         domain_static_information_pattern = init_bdu_analysis_static_pattern;
+        domain_static_information_covering_class = init_covering_class;
       }
     in
     let init_fixpoint = AgentCV_map_and_set.Map.empty in

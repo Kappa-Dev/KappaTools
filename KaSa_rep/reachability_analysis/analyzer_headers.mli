@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Feb 12 2018>
+  * Last modification: Time-stamp: <Feb 13 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -209,87 +209,6 @@ val set_project_modified_map :
     Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
-
-val get_covering_classes :
-  global_static_information ->
-  Covering_classes_type.remanent
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
-
-val set_covering_classes :
-Covering_classes_type.remanent
-  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t ->
-  global_static_information ->
-  global_static_information
-
-val get_list_of_site_type_in_covering_classes :
-  global_static_information ->
-  Ckappa_sig.c_site_name list
-    Covering_classes_type.AgentCV_map_and_set.Map.t
-
-val set_list_of_site_type_in_covering_classes :
-  Ckappa_sig.c_site_name list
-    Covering_classes_type.AgentCV_map_and_set.Map.t ->
-  global_static_information ->
-  global_static_information
-
-val get_covering_classes_id :
-  global_static_information ->
-  Covering_classes_type.cv_id list
-    Ckappa_sig.AgentSite_map_and_set.Map.t
-
-val set_covering_classes_id :
-  Covering_classes_type.cv_id list
-    Ckappa_sig.AgentSite_map_and_set.Map.t ->
-  global_static_information ->
-  global_static_information
-
-val get_remanent_triple :
-  global_static_information ->
-  ((Covering_classes_type.Dictionary_of_List_sites.key *
-    Covering_classes_type.Dictionary_of_List_sites.value *
-    Ckappa_sig.Site_map_and_set.Set.t) list)
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
-
-val set_remanent_triple :
-((Covering_classes_type.Dictionary_of_List_sites.key *
-  Covering_classes_type.Dictionary_of_List_sites.value *
-  Ckappa_sig.Site_map_and_set.Set.t) list)
-  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t ->
-  global_static_information ->
-  global_static_information
-
-val get_site_correspondence:
-  global_static_information ->
-  (Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t
-   * Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t)
-    Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.t
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
-
-val set_site_correspondence:
-  (Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t
-   * Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t)
-    Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.t
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
-  -> global_static_information
-  -> global_static_information
-
-
-
-
-
-(*val get_new_index_pair_map :
-  global_static_information ->
-  (Ckappa_sig.c_site_name
-     Ckappa_sig.Site_map_and_set.Map.t *
-   Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t)
-
-val set_new_index_pair_map :
-  (Ckappa_sig.c_site_name
-     Ckappa_sig.Site_map_and_set.Map.t *
-   Ckappa_sig.c_site_name
-     Ckappa_sig.Site_map_and_set.Map.t) ->
-  global_static_information ->
-  global_static_information*)
 
 val compute_initial_state:
   Exception.method_handler ->

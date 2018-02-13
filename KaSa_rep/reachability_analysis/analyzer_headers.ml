@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Feb 12 2018>
+  * Last modification: Time-stamp: <Feb 13 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -332,88 +332,7 @@ let set_test_modif_map sites static =
     }
     static
 
-(*****************************************************************************)
-(*COVERING CLASSES*)
-(*****************************************************************************)
-
-let get_predicate_covering_classes static =
-  (get_common_views static).Common_static.store_predicate_covering_classes
-
-let set_predicate_covering_classes sites static =
-  set_common_views
-    {
-      (get_common_views static) with
-      Common_static.store_predicate_covering_classes = sites
-    }
-    static
-
-let get_covering_classes static =
-  (get_predicate_covering_classes static).Common_static.store_covering_classes
-
-let set_covering_classes cv static =
-  set_predicate_covering_classes
-    {
-      (get_predicate_covering_classes static) with
-      Common_static.store_covering_classes = cv
-    }
-    static
-
-let get_list_of_site_type_in_covering_classes static =
-  (get_predicate_covering_classes static).Common_static.store_list_of_site_type_in_covering_classes
-
-let set_list_of_site_type_in_covering_classes cv static =
-  set_predicate_covering_classes
-    {
-      (get_predicate_covering_classes static) with
-      Common_static.store_list_of_site_type_in_covering_classes = cv
-    }
-    static
-
-let get_covering_classes_id static =
-  (get_predicate_covering_classes static).Common_static.store_covering_classes_id
-
-let set_covering_classes_id cv static =
-  set_predicate_covering_classes
-    {
-      (get_predicate_covering_classes static) with
-      Common_static.store_covering_classes_id = cv
-    }
-    static
-
-let get_remanent_triple static =
-  (get_predicate_covering_classes static).Common_static.store_remanent_triple
-
-let set_remanent_triple cv static =
-  set_predicate_covering_classes
-    {
-      (get_predicate_covering_classes static) with
-      Common_static.store_remanent_triple = cv
-    }
-    static
-
-let get_site_correspondence static =
-  (get_predicate_covering_classes static).Common_static.site_correspondence
-
-let set_site_correspondence correspondence static =
-  set_predicate_covering_classes
-    {
-      (get_predicate_covering_classes static) with
-      Common_static.site_correspondence =
-        correspondence
-    }
-    static 
-
-(*let get_new_index_pair_map static =
-  (get_common_views static).Common_static.store_new_index_pair_map
-
-let set_new_index_pair_map m static =
-  set_common_views
-    {
-      (get_common_views static) with
-      Common_static.store_new_index_pair_map = m
-    }
-    static*)
-
+  
 (*****************************************************************************)
 (*INITIAL STATES*)
 
