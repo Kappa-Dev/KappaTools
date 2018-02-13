@@ -730,6 +730,14 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters error
       (fun parameters error ag list map ->
+         let error, last_site =
+           Handler.last_site_of_agent parameters error handler_kappa ag
+         in
+         let size_map1 =
+           1+Ckappa_sig.int_of_site_name last_site in
+         let size_map2 =
+           1+(List.length list)
+         in
          let error, array =
            List.fold_left
              (fun (error, array) (cv_id,list,_) ->
@@ -738,11 +746,11 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
                   | [] -> error, (map1, map2)
                   | h :: tl ->
                     let error, map1 =
-                      Ckappa_sig.Site_map_and_set.Map.add
+                      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.set
                         parameters error h k map1
                     in
                     let error, map2 =
-                      Ckappa_sig.Site_map_and_set.Map.add
+                      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.set
                         parameters error k h map2
                     in
                     aux
@@ -753,12 +761,20 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
                       map2
                       error
                 in
+                let error, map1 =
+                  Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create
+                    parameters error size_map1
+                in
+                let error, map2 =
+                  Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create
+                    parameters error size_map2
+                in
                 let error, (map1, map2) =
                   aux
                     list
                     (Ckappa_sig.site_name_of_int 1)
-                    Ckappa_sig.Site_map_and_set.Map.empty
-                    Ckappa_sig.Site_map_and_set.Map.empty error
+                    map1 map2
+                    error
                 in
                 Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.set
                   parameters error cv_id (map1,map2) array)
