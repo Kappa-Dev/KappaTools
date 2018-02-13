@@ -64,7 +64,7 @@ type t =
     mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Api_types_t.errors ;
-    mutable trace : Trace.t ;
+    mutable trace : Bi_outbuf.t ;
     inputs_buffer : Buffer.t;
     inputs_form : Format.formatter;
     ast : Ast.parsing_compil;
@@ -88,7 +88,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
   species = Mods.StringMap.empty;
   files = Mods.StringMap.empty;
   error_messages = [];
-  trace = [];
+  trace = Bi_outbuf.create 1024;
   inputs_buffer; inputs_form; ast; contact_map; env; graph; state; init_l;
   lastyield;
 }
@@ -295,7 +295,11 @@ let outputs (simulation : t) =
     let snapshot' = { snapshot with Data.snapshot_file } in
     simulation.snapshots <- snapshot'::simulation.snapshots
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
-  | Data.TraceStep st -> simulation.trace <- st :: simulation.trace
+  | Data.TraceStep st ->
+    let () = Bi_outbuf.add_char simulation.trace
+        (if simulation.trace.Bi_outbuf.o_len = 0 &&
+            simulation.trace.Bi_outbuf.o_offs = 0 then '[' else ',') in
+    Trace.write_step simulation.trace st
 
 let interactive_outputs formatter t = function
   | Data.Log s -> Format.fprintf formatter "%s@." s
@@ -656,8 +660,9 @@ let get_raw_trace t =
        let () = JsonUtil.write_field
            "model" Yojson.Basic.write_json ob (Model.to_yojson t.env) in
        let () = JsonUtil.write_comma ob in
-       let () = JsonUtil.write_field "trace" Trace.write_json ob (List.rev t.trace) in
-       Bi_outbuf.add_char ob '}'
+       let () = JsonUtil.write_field
+           "trace" Bi_outbuf.add_string ob (Bi_outbuf.contents t.trace) in
+       Bi_outbuf.add_char2 ob ']' '}'
     ) t
 
 let get_raw_ast t =
