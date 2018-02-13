@@ -1209,7 +1209,7 @@ let collect_test_modification_sites
 (*RULE*)
 (***************************************************************************)
 
-let scan_rule parameter error handler_kappa rule_id rule compil store_result =
+let scan_rule parameter error handler_kappa rule_id rule store_result =
   (*-----------------------------------------------------------------------*)
   (*get agent_name*)
   let error, store_agent_name =
@@ -1306,7 +1306,6 @@ let scan_rule_set parameter error handler_kappa compil =
            handler_kappa
            rule_id
            rule.Cckappa_sig.e_rule_c_rule
-           compil
            store_result
       ) compil.Cckappa_sig.rules init_common_views
   in

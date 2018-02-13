@@ -618,11 +618,16 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
     in
     match cv_id_array_opt with
     | None ->
+      let error, map1 =
+        Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+      in
+      let error, map2 =
+        Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+      in
       Exception.warn
         parameters error __POS__
         Exit
-        (Ckappa_sig.Site_map_and_set.Map.empty,
-         Ckappa_sig.Site_map_and_set.Map.empty)
+        (map1,map2)
     | Some cv_id_array ->
       let error, pair_opt  =
         Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.get
@@ -634,11 +639,16 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       begin
         match pair_opt with
         | None ->
+          let error, map1 =
+            Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+          in
+          let error, map2 =
+            Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+          in
           Exception.warn
             parameters error __POS__
             Exit
-            (Ckappa_sig.Site_map_and_set.Map.empty,
-             Ckappa_sig.Site_map_and_set.Map.empty)
+            (map1,map2)
         | Some (map1,map2) ->
           error, (map1,map2)
     end
@@ -839,7 +849,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
                List.fold_left
                  (fun (error, bool) (site_type, state) ->
                     let error, site_type =
-                      match Ckappa_sig.Site_map_and_set.Map.find_option
+                      match Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.get
                               parameters error site_type map2
                       with
                       | error, None ->
@@ -1138,7 +1148,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       map1 =
     let error, new_site_name =
       match
-        Ckappa_sig.Site_map_and_set.Map.find_option
+        Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
           site_name
@@ -1156,7 +1166,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
   let is_new_site_name parameters error site_name
       map1  =
     match
-      Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
         parameters
         error
         site_name
@@ -1601,18 +1611,6 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
                 error
                 (agent_type_in, site_path)
                 store_covering_classes_id
-            with
-            | error, None ->
-              Exception.warn parameters error __POS__ Exit []
-            | error, Some l -> error, l
-          in
-          let error, site_correspondence =
-            match
-              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
-                parameters
-                error
-                agent_type_in
-                site_correspondence
             with
             | error, None ->
               Exception.warn parameters error __POS__ Exit []
@@ -3400,7 +3398,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
          let rename_site parameters error site_type =
            let error, site_type =
              match
-               Ckappa_sig.Site_map_and_set.Map.find_option
+               Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.get
                  parameters error
                  site_type
                  map2
@@ -3625,7 +3623,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
                       in
                       let rename_site parameters error site_type =
                         let error, site_type =
-                          match Ckappa_sig.Site_map_and_set.Map.find_option
+                          match Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.get
                                   parameters error site_type map2
                           with
                           | error, None ->
