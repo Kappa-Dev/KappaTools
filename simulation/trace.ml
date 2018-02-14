@@ -416,8 +416,7 @@ let init_trace_file ~uuid env desc =
   let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
   output_string desc ",\n\"trace\":["
 
-let fold_trace f init lex_st lex_buf =
-  let () = Yojson.Basic.read_lcurl lex_st lex_buf in
+let skip_trace_headers lex_st lex_buf =
   let ident =
     JsonUtil.read_between_spaces Yojson.Basic.read_ident lex_st lex_buf in
   let ident' =
@@ -429,7 +428,11 @@ let fold_trace f init lex_st lex_buf =
     else ident in
   let () = assert (ident' = "dict") in
   let () = Yojson.Basic.read_colon lex_st lex_buf in
-  let () = JsonUtil.read_between_spaces Yojson.Basic.skip_json lex_st lex_buf in
+  JsonUtil.read_between_spaces Yojson.Basic.skip_json lex_st lex_buf
+
+let fold_trace f init lex_st lex_buf =
+  let () = Yojson.Basic.read_lcurl lex_st lex_buf in
+  let () = skip_trace_headers lex_st lex_buf in
   let ident = JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf in
   let () = assert (ident = "model") in
   let () = Yojson.Basic.read_colon lex_st lex_buf in
@@ -454,3 +457,17 @@ let fold_trace_file f init fname =
   let out = JsonUtil.read_between_spaces (fold_trace f init) lex_st lex_buf in
   let () = close_in desc in
   out
+
+let get_env_from_file fname =
+  let desc = open_in fname in
+  let lex_buf = Lexing.from_channel desc in
+  let lex_st = Yojson.init_lexer ~fname () in
+  let () = Yojson.Basic.read_lcurl lex_st lex_buf in
+  let () = skip_trace_headers lex_st lex_buf in
+  let ident = JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf in
+  let () = assert (ident = "model") in
+  let () = Yojson.Basic.read_colon lex_st lex_buf in
+  let env = Model.of_yojson
+      (JsonUtil.read_between_spaces Yojson.Basic.read_json lex_st lex_buf) in
+  let () = close_in desc in
+  env
