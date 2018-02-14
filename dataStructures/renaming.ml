@@ -42,12 +42,14 @@ let rec compute k i =
     match i.delayed with
     | None -> special_val
     | Some (x,y) ->
-      let v' = compute k x in
-      if v' = special_val then special_val else
-        let v'' = compute v' y in
-        let o = if v'' = special_val then v' else v'' in
-        let () = i.immediate.(k) <- o in
-        o
+      if k >= Array.length x.immediate then special_val
+      else
+        let v' = compute k x in
+        if v' = special_val then special_val else
+          let v'' = compute v' y in
+          let o = if v'' = special_val then v' else v'' in
+          let () = i.immediate.(k) <- o in
+          o
 
 let force i =
   if i.delayed <> None then
