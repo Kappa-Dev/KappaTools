@@ -1088,11 +1088,15 @@ end = struct
   let dump_to_extention_bases form domain =
     let pp_sep f = Format.pp_print_string f ";" in
     let pp_int_list = Pp.list pp_sep Format.pp_print_int in
-    let fresh = ref 0 in
+    let all_elem =
+      Array.fold_left
+        (Array.fold_left
+           (List.fold_left
+              (fun acc (_,id) -> Mods.IntSet.add id acc)))
+        Mods.IntSet.empty domain.elementaries in
     let () = Format.pp_open_vbox form 0 in
-    let () = Array.iter (fun p ->
-        if p.roots <> None then
-          let () = incr fresh in
+    let () = Array.iteri (fun fresh p ->
+        if p.roots <> None || Mods.IntSet.mem fresh all_elem then
           let cc = p.content in
           let nav = raw_to_navigation true cc.nodes_by_type cc.nodes in
           Format.fprintf form "add [%a] as pat_%i@,"
@@ -1100,8 +1104,12 @@ end = struct
                (fun f (x,y) -> Format.fprintf f "([%a],[%a])"
                    pp_int_list x pp_int_list y))
             (Navigation.abstract_to_extention_base nav)
-            !fresh)
+            fresh)
         domain.domain in
+    let () = Mods.IntSet.iter
+        (fun id ->
+           Format.fprintf form "build (empty,pat_%i)@," id)
+        all_elem in
     Format.pp_close_box form ()
 
   let new_obs_map env f = Mods.DynArray.init env.max_obs f
