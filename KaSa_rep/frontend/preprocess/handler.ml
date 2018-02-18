@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Nov 28 2017>
+   * Last modification: Time-stamp: <Feb 18 2018>
    * *
    * Primitives to use a kappa handler
    *
@@ -99,7 +99,7 @@ let translate_binding_type parameter error handler agent site =
       translate_site parameter error handler agent site
     with
     | error, Ckappa_sig.Binding s -> error, s
-    | error, Ckappa_sig.Internal s ->
+    | error, (Ckappa_sig.Internal s | Ckappa_sig.Counter s) ->
       Exception.warn parameter error __POS__ Exit s
   in
   let binding_type_symbol =
@@ -135,7 +135,7 @@ let is_binding_site
       parameter error handler agent site
   in
   match site with
-  | Ckappa_sig.Internal _ -> error,false
+  | Ckappa_sig.Internal _ | Ckappa_sig.Counter _ -> error,false
   | Ckappa_sig.Binding _ -> error,true
 
 let is_internal_site
@@ -149,7 +149,20 @@ let is_internal_site
   in
   match site with
   | Ckappa_sig.Internal _ -> error,true
-  | Ckappa_sig.Binding _ -> error,false
+  | Ckappa_sig.Counter _ | Ckappa_sig.Binding _ -> error,false
+
+let is_counter
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler agent site =
+  let error,site =
+    translate_site
+      ~ml_pos ~ka_pos ~message
+      parameter error handler agent site
+  in
+  match site with
+  | Ckappa_sig.Counter _ -> error,true
+  | Ckappa_sig.Internal _ | Ckappa_sig.Binding _ -> error,false
 
 let last_site_of_agent
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
@@ -455,6 +468,12 @@ let print_site parameter ?state ?add_parentheses:(add_parentheses=false) site =
     | Some _ -> state
   in
   match site, state with
+  | Ckappa_sig.Counter a, Some state ->
+    a^
+    (Remanent_parameters.get_open_counterval parameter) ^
+    (Remanent_parameters.get_counterval_symbol parameter) ^
+    (state)^
+    (Remanent_parameters.get_close_counterval parameter)
   | Ckappa_sig.Internal a, Some state ->
     a
     ^
@@ -469,7 +488,7 @@ let print_site parameter ?state ?add_parentheses:(add_parentheses=false) site =
     (Remanent_parameters.get_bound_symbol parameter)^
     (state)^
     (Remanent_parameters.get_close_binding_state parameter)
-  | (Ckappa_sig.Binding a | Ckappa_sig.Internal a), None -> a
+  | (Ckappa_sig.Binding a | Ckappa_sig.Internal a | Ckappa_sig.Counter a), None -> a
 
 (*print function for contact map*)
 
@@ -477,13 +496,14 @@ let print_site_contact_map site =
   match site with
   | Ckappa_sig.Internal a -> a
   | Ckappa_sig.Binding a -> a
-
+  | Ckappa_sig.Counter a -> a
 
 (*mapping state of type int to string*)
 
 let print_state parameter error handler state =
   match state with
   | Ckappa_sig.Internal a -> error, a
+  | Ckappa_sig.Counter a -> error, string_of_int a
   | Ckappa_sig.Binding Ckappa_sig.C_Free ->
     error,
     Remanent_parameters.get_free_symbol parameter
@@ -497,8 +517,16 @@ let print_state_fully_deciphered parameter error handler_kappa state =
   | Ckappa_sig.Internal a ->
     error,
     (Remanent_parameters.get_open_internal_state parameter) ^
+    (Remanent_parameters.get_internal_state_symbol parameter) ^
     a
     ^ (Remanent_parameters.get_close_internal_state parameter)
+  | Ckappa_sig.Counter a ->
+    error,
+    (Remanent_parameters.get_open_counterval parameter)^
+    (Remanent_parameters.get_counterval_symbol parameter) ^
+    (string_of_int a)^
+    (Remanent_parameters.get_close_counterval parameter)
+
   | Ckappa_sig.Binding Ckappa_sig.C_Free ->
     error,
     (Remanent_parameters.get_open_binding_state parameter) ^
@@ -594,6 +622,7 @@ let string_of_site_in_natural_language parameter error handler_kapp
   with
   | Ckappa_sig.Internal x -> error, ("the internal state of site "^ x)
   | Ckappa_sig.Binding x -> error, ("the binding state of site "^ x)
+  | Ckappa_sig.Counter x -> error, ("the value of counter "^x)
 
 let string_of_site_in_file_name parameter error handler_kapp
     agent_type (site_int: Ckappa_sig.c_site_name) =
@@ -606,6 +635,7 @@ let string_of_site_in_file_name parameter error handler_kapp
   with
   | Ckappa_sig.Internal x -> error, (x^"_")
   | Ckappa_sig.Binding x -> error, (x^"^")
+  | Ckappa_sig.Counter x -> error, (x^"=")
 
 let string_of_site_contact_map
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
@@ -755,7 +785,7 @@ let has_a_binding_state parameter error kappa_handler agent_type site =
     translate_site parameter error kappa_handler agent_type site
   in
   match site with
-  | Ckappa_sig.Internal s ->
+  | Ckappa_sig.Internal s | Ckappa_sig.Counter s ->
     let new_site = Ckappa_sig.Binding s in
     let error, dic_opt =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get

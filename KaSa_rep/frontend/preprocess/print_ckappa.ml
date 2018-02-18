@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 23rd of 2011
- * Last modification: Time-stamp: <Nov 28 2017>
+ * Last modification: Time-stamp: <Feb 18 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -43,7 +43,7 @@ let print_binding_state parameter error binding_state =
   | Ckappa_sig.Lnk_type (agent_name,site_name) ->
     let binding_type_symbol =
       Remanent_parameters.get_btype_sep_symbol parameter
-    in  
+    in
     let () =
       Loggers.print_binding_type (Remanent_parameters.get_logger parameter)
         ~binding_type_symbol ~agent_name ~site_name
@@ -160,10 +160,71 @@ let print_port parameter error port =
   let error = print_link_state parameter error port.Ckappa_sig.port_lnk in
   error
 
+  let print_counter parameter error counter =
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "%s" counter.Ckappa_sig.count_nme
+    in
+    let _ =
+      match counter.Ckappa_sig.count_test with
+      | Some (Ckappa_sig.CEQ n) ->
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "%s%s%i%s"
+        (Remanent_parameters.get_open_counterceq parameter)
+        (Remanent_parameters.get_counterceq_symbol parameter)
+        n
+        (Remanent_parameters.get_close_counterceq parameter)
+
+      | Some (Ckappa_sig.CGTE n) ->
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "%s%s%i%s"
+          (Remanent_parameters.get_open_countercgte parameter)
+          (Remanent_parameters.get_countercgte_symbol parameter)
+          n
+          (Remanent_parameters.get_close_countercgte parameter)
+
+      | Some (Ckappa_sig.CVAR s) ->
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "%s%s%s%s"
+          (Remanent_parameters.get_open_countercvar parameter)
+          (Remanent_parameters.get_countercvar_symbol parameter)
+          s
+          (Remanent_parameters.get_close_countercvar parameter)
+      | Some Ckappa_sig.UNKNOWN
+      | None -> ()
+    in
+    let () =
+      match counter.Ckappa_sig.count_delta with
+      | Some 0 | None -> ()
+      | Some n when n>0 ->
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameter)
+          "%s%s%i%s"
+          (Remanent_parameters.get_open_counterdelta parameter)
+          (Remanent_parameters.get_counterdeltaplus_symbol parameter)
+          n
+          (Remanent_parameters.get_close_counterdelta parameter)
+
+      | Some n (*when n<0*) ->
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameter)
+          "%s%s%i%s"
+          (Remanent_parameters.get_open_counterdelta parameter)
+          (Remanent_parameters.get_counterdeltaminus_symbol parameter)
+          (- n)
+          (Remanent_parameters.get_close_countercvar parameter)
+    in
+    error
+
 let print_interface  parameter error interface =
   let rec aux error bool interface =
     match interface with
     | Ckappa_sig.EMPTY_INTF -> error
+    | Ckappa_sig.COUNTER_SEP (counter,interface) ->
+      let _ = Misc_sa.print_comma parameter bool
+          (Remanent_parameters.get_site_sep_comma_symbol parameter) in
+      let error = print_counter parameter error counter in
+      aux error true interface
     | Ckappa_sig.PORT_SEP (port,interface) ->
       let _ = Misc_sa.print_comma parameter bool
           (Remanent_parameters.get_site_sep_comma_symbol parameter) in

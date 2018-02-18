@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Feb 13 2018>
+   * Last modification: Time-stamp: <Mar 01 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -4004,6 +4004,8 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
                                  contact_map)
                           (error, contact_map) list_of_states
                       in
+                      error, (handler, contact_map)
+                    | Ckappa_sig.Counter _ ->
                       error, (handler, contact_map)
                     | Ckappa_sig.Binding _ ->
                       let error, contact_map =

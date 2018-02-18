@@ -146,6 +146,8 @@ let get_contact_map () =
     Remanent_parameters_sig.binding_site_color = !Config.binding_site_color ;
     Remanent_parameters_sig.internal_site_shape = !Config.internal_site_shape ;
     Remanent_parameters_sig.internal_site_color = !Config.internal_site_color ;
+    Remanent_parameters_sig.counter_site_shape = !Config.counter_site_shape ;
+    Remanent_parameters_sig.counter_site_color = !Config.counter_site_color ;
     Remanent_parameters_sig.agent_shape_array = !Config.agent_shape_array ;
     Remanent_parameters_sig.agent_color_array = !Config.agent_color_array ;
     Remanent_parameters_sig.agent_shape_def = !Config.agent_shape_def ;
@@ -480,6 +482,40 @@ let get_minus_infinity_symbol_1 symbol =
   symbol.Symbol_table.minus_infinity
 let get_int_interval_separator_symbol_1 symbol =
   symbol.Symbol_table.int_interval_separator
+let get_open_counterceq_1 symbol =
+  symbol.Symbol_table.open_counterceq
+let get_open_countercvar_1 symbol =
+  symbol.Symbol_table.open_countercvar
+let get_open_countercgte_1 symbol =
+  symbol.Symbol_table.open_countercgte
+let get_open_counterdelta_1 symbol =
+  symbol.Symbol_table.open_counterdelta
+let get_open_counterval_1 symbol =
+  symbol.Symbol_table.open_counterval
+
+let get_close_counterceq_1 symbol =
+  symbol.Symbol_table.close_counterceq
+let get_close_countercvar_1 symbol =
+  symbol.Symbol_table.close_countercvar
+let get_close_countercgte_1 symbol =
+  symbol.Symbol_table.close_countercgte
+let get_close_counterdelta_1 symbol =
+  symbol.Symbol_table.close_counterdelta
+let get_close_counterval_1 symbol =
+  symbol.Symbol_table.close_counterval
+
+let get_counterceq_symbol_1 symbol =
+  symbol.Symbol_table.counterceq_symbol
+let get_countercvar_symbol_1 symbol =
+  symbol.Symbol_table.countercvar_symbol
+let get_countercgte_symbol_1 symbol =
+  symbol.Symbol_table.countercgte_symbol
+let get_counterdeltaplus_symbol_1 symbol =
+  symbol.Symbol_table.counterdeltaplus_symbol
+let get_counterdeltaminus_symbol_1 symbol =
+  symbol.Symbol_table.counterdeltaminus_symbol
+let get_counterval_symbol_1 symbol =
+  symbol.Symbol_table.counterval_symbol
 
 (*Influence*)
 let get_im_format_1            influence = influence.Remanent_parameters_sig.im_format
@@ -505,6 +541,8 @@ let get_binding_site_shape_1  cm = cm.Remanent_parameters_sig.binding_site_shape
 let get_binding_site_color_1  cm = cm.Remanent_parameters_sig.binding_site_color
 let get_internal_site_shape_1 cm = cm.Remanent_parameters_sig.internal_site_shape
 let get_internal_site_color_1 cm = cm.Remanent_parameters_sig.internal_site_color
+let get_counter_site_shape_1 cm = cm.Remanent_parameters_sig.counter_site_shape
+let get_counter_site_color_1 cm = cm.Remanent_parameters_sig.counter_site_color
 let get_agent_shape_array_1   cm = cm.Remanent_parameters_sig.agent_shape_array
 let get_agent_color_array_1   cm = cm.Remanent_parameters_sig.agent_color_array
 let get_agent_shape_def_1     cm = cm.Remanent_parameters_sig.agent_shape_def
@@ -706,6 +744,33 @@ let get_close_int_interval_infinity_symbol = upgrade_from_symbols_field get_clos
 let get_plus_infinity_symbol = upgrade_from_symbols_field get_plus_infinity_symbol_1
 let get_minus_infinity_symbol = upgrade_from_symbols_field get_minus_infinity_symbol_1
 let get_int_interval_separator_symbol = upgrade_from_symbols_field get_int_interval_separator_symbol_1
+let get_open_counterceq = upgrade_from_symbols_field
+    get_open_counterceq_1
+let get_open_countercgte = upgrade_from_symbols_field
+    get_open_countercgte_1
+let get_open_countercvar = upgrade_from_symbols_field
+    get_open_countercvar_1
+let get_open_counterdelta = upgrade_from_symbols_field get_open_counterdelta_1
+let get_open_counterval = upgrade_from_symbols_field get_open_counterval_1
+
+let get_close_counterceq = upgrade_from_symbols_field
+    get_close_counterceq_1
+let get_close_countercgte = upgrade_from_symbols_field
+    get_close_countercgte_1
+let get_close_countercvar = upgrade_from_symbols_field
+    get_close_countercvar_1
+let get_close_counterdelta = upgrade_from_symbols_field get_close_counterdelta_1
+let get_close_counterval = upgrade_from_symbols_field get_close_counterval_1
+
+let get_counterceq_symbol = upgrade_from_symbols_field
+        get_counterceq_symbol_1
+let get_countercgte_symbol = upgrade_from_symbols_field
+        get_countercgte_symbol_1
+let get_countercvar_symbol = upgrade_from_symbols_field
+    get_countercvar_symbol_1
+let get_counterdeltaplus_symbol = upgrade_from_symbols_field get_counterdeltaplus_symbol_1
+let get_counterdeltaminus_symbol = upgrade_from_symbols_field get_counterdeltaminus_symbol_1
+let get_counterval_symbol = upgrade_from_symbols_field get_counterval_symbol_1
 
 
 let get_im_format = upgrade_from_influence_map_field get_im_format_1
@@ -731,6 +796,8 @@ let get_binding_site_shape = upgrade_from_contact_map_field get_binding_site_sha
 let get_binding_site_color = upgrade_from_contact_map_field get_binding_site_color_1
 let get_internal_site_shape = upgrade_from_contact_map_field get_internal_site_shape_1
 let get_internal_site_color = upgrade_from_contact_map_field get_internal_site_color_1
+let get_counter_site_shape = upgrade_from_contact_map_field get_counter_site_shape_1
+let get_counter_site_color = upgrade_from_contact_map_field get_counter_site_color_1
 let get_agent_shape_array = upgrade_from_contact_map_field get_agent_shape_array_1
 let get_agent_color_array = upgrade_from_contact_map_field get_agent_color_array_1
 let get_agent_shape_def = upgrade_from_contact_map_field get_agent_shape_def_1

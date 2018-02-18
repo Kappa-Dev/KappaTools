@@ -44,6 +44,22 @@ type symbol_table =
     int_interval_separator : string ;
     plus_infinity : string ;
     minus_infinity : string ;
+    open_counterceq: string ;
+    open_countercgte: string ;
+    open_countercvar: string ;
+    open_counterdelta: string ;
+    open_counterval: string ;
+    close_counterceq: string ;
+    close_countercgte: string ;
+    close_countercvar: string ;
+    close_counterdelta: string ;
+    close_counterval: string ;
+    counterceq_symbol: string ;
+    countercgte_symbol: string ;
+    countercvar_symbol: string ;
+    counterdeltaplus_symbol: string ;
+    counterdeltaminus_symbol: string ;
+    counterval_symbol: string ;
   }
 
 let symbol_table_V3 =
@@ -87,7 +103,23 @@ let symbol_table_V3 =
     close_int_interval_inclusive = "]" ;
     close_int_interval_exclusive = "[" ;
     close_int_interval_infinity = "[" ;
-    int_interval_separator = " .. "
+    int_interval_separator = " .. ";
+    open_counterceq = "";
+    open_countercgte = "";
+    open_countercvar = "";
+    open_counterdelta = "";
+    open_counterval = "";
+    close_counterceq = "";
+    close_countercgte = "";
+    close_countercvar = "";
+    close_counterdelta = "";
+    close_counterval = "";
+    counterceq_symbol = "=";
+    countercgte_symbol = ">=";
+    countercvar_symbol = ":";
+    counterval_symbol = ":=";
+    counterdeltaplus_symbol = "+";
+    counterdeltaminus_symbol = "+";
   }
 
 let lighten symbol_table =
@@ -144,7 +176,24 @@ let symbol_table_V4 =
     close_int_interval_inclusive = "]" ;
     close_int_interval_exclusive = "[" ;
     close_int_interval_infinity = "[" ;
-    int_interval_separator = " .. "
+    int_interval_separator = " .. " ;
+    open_counterceq = "";
+    open_countercgte = "";
+    open_countercvar = "";
+    open_counterdelta = "";
+    open_counterval = "";
+    close_counterceq = "";
+    close_countercgte = "";
+    close_countercvar = "";
+    close_counterdelta = "";
+    close_counterval = "";
+    counterceq_symbol = "=";
+    countercgte_symbol = ">=";
+    countercvar_symbol = ":";
+    counterval_symbol = ":=";
+    counterdeltaplus_symbol = "+";
+    counterdeltaminus_symbol = "+";
+
   }
 
 let not_breakable symbol_table = {symbol_table with breakable = false}

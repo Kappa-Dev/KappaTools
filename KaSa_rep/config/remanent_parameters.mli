@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Feb 08 2018>
+  * Last modification: Time-stamp: <Feb 18 2018>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -76,6 +76,22 @@ val get_close_internal_state: Remanent_parameters_sig.parameters -> string
 val get_free_symbol: Remanent_parameters_sig.parameters -> string
 val get_uni_arrow_symbol: Remanent_parameters_sig.parameters -> string
 val get_bi_arrow_symbol: Remanent_parameters_sig.parameters -> string
+val get_open_counterceq: Remanent_parameters_sig.parameters -> string
+val get_open_countercvar: Remanent_parameters_sig.parameters -> string
+val get_open_countercgte: Remanent_parameters_sig.parameters -> string
+val get_open_counterval: Remanent_parameters_sig.parameters -> string
+val get_close_counterceq: Remanent_parameters_sig.parameters -> string
+val get_close_countercvar: Remanent_parameters_sig.parameters -> string
+val get_close_countercgte: Remanent_parameters_sig.parameters -> string
+val get_close_counterval: Remanent_parameters_sig.parameters -> string
+val get_counterceq_symbol: Remanent_parameters_sig.parameters -> string
+val get_countercvar_symbol: Remanent_parameters_sig.parameters -> string
+val get_countercgte_symbol: Remanent_parameters_sig.parameters -> string
+val get_open_counterdelta: Remanent_parameters_sig.parameters -> string
+val get_close_counterdelta: Remanent_parameters_sig.parameters -> string
+val get_counterdeltaplus_symbol: Remanent_parameters_sig.parameters -> string
+val get_counterdeltaminus_symbol: Remanent_parameters_sig.parameters -> string
+val get_counterval_symbol: Remanent_parameters_sig.parameters -> string
 
 (** influence map *)
 val get_rule_shape: Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
@@ -96,6 +112,9 @@ val get_binding_site_color: Remanent_parameters_sig.parameters -> string
 val get_binding_site_shape: Remanent_parameters_sig.parameters -> string
 val get_internal_site_shape: Remanent_parameters_sig.parameters -> string
 val get_internal_site_color: Remanent_parameters_sig.parameters -> string
+val get_counter_site_shape: Remanent_parameters_sig.parameters -> string
+val get_counter_site_color: Remanent_parameters_sig.parameters -> string
+
 val get_agent_shape_array: Remanent_parameters_sig.parameters -> string option array
 
 val get_agent_color_array: Remanent_parameters_sig.parameters -> string option array

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Feb 12 2018>
+  * Last modification: Time-stamp: <Mar 01 2018>
   *
   *
   *
@@ -154,7 +154,7 @@ let add_triple_agents_site_rule parameters error
 
 let collect_projection_agent_id_from_triple parameters error store_result =
   Covering_classes_type.Project2_modif.monadic_proj_map
-    (fun parameters error (_agent_id, agent_type, site_type) ->
+    (fun _parameters error (_agent_id, agent_type, site_type) ->
        error, (agent_type, site_type))
     parameters
     error

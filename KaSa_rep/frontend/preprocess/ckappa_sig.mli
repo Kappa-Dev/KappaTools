@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 11 2017>
+ * Last modification: Time-stamp: <Feb 18 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -20,6 +20,8 @@ type position       = Locality.t
 type agent_name     = string
 type site_name      = string
 type internal_state = string
+type counter_name = string
+type counter_state = int
 
 (*****************************************************************************)
 
@@ -29,6 +31,7 @@ type c_state
 type c_rule_id
 type c_agent_id
 type c_link_value
+type c_counter_name
 
 (****************************************************************************)
 
@@ -123,6 +126,7 @@ and agent =
 and interface =
   | EMPTY_INTF
   | PORT_SEP of port * interface
+  | COUNTER_SEP of counter * interface
 
 and port =
   {
@@ -131,6 +135,16 @@ and port =
     port_lnk  : link;
     port_free : bool option
   }
+
+and counter =
+  {
+    count_nme : string;
+    count_test : counter_test option;
+    count_delta: int option
+  }
+
+and counter_test =
+  | CEQ of int | CGTE of int | CVAR of string | UNKNOWN
 
 and internal = string list
 
@@ -176,13 +190,14 @@ type 'pattern variable     = ('pattern,string) Ast.variable_def
 type ('agent,'pattern,'mixture,'rule) compil =
   ('agent, 'pattern, 'mixture, string, 'rule) Ast.compil
 
-type ('a,'b) site_type =
+type ('a,'b,'c) site_type =
   | Internal of 'a
   | Binding  of 'b
+  | Counter of 'c
 
-type site  = (site_name, site_name) site_type
+type site  = (site_name, site_name, site_name) site_type
 
-type state = (internal_state, binding_state) site_type
+type state = (internal_state, binding_state, counter_state) site_type
 
 val rename_link:
   Remanent_parameters_sig.parameters ->
@@ -223,6 +238,8 @@ val add_agent: Remanent_parameters_sig.parameters ->
 val add_site: Remanent_parameters_sig.parameters ->
   Exception.method_handler -> c_agent_id -> site_name -> mixture -> Exception.method_handler * mixture
 
+val add_counter: Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> c_agent_id -> counter_name -> mixture -> Exception.method_handler * mixture
 val add_internal_state: Remanent_parameters_sig.parameters ->
   Exception.method_handler -> c_agent_id -> site_name -> internal_state -> mixture -> Exception.method_handler * mixture
 
@@ -246,7 +263,7 @@ type c_binding_state =
   | C_Free
   | C_Lnk_type of c_agent_name * c_site_name
 
-type state' = (internal_state, c_binding_state) site_type
+type state' = (internal_state, c_binding_state, counter_state) site_type
 
 module Dictionary_of_States: Dictionary.Dictionary
   with type key = c_state

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Feb 07 2018>
+  * Last modification: Time-stamp: <Mar 01 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -396,6 +396,7 @@ let get_handler =
 
 let simplify_site site =
   match site with
+  | Ckappa_sig.Counter site_name
   | Ckappa_sig.Binding site_name
   | Ckappa_sig.Internal site_name -> site_name
 
@@ -1338,6 +1339,7 @@ let convert_contact_map show_title state contact_map =
                          error handler ag site state in
                      match state with
                      | Ckappa_sig.Internal state -> error, state::list
+                     | Ckappa_sig.Counter _
                      | Ckappa_sig.Binding _ ->
 
                        warn parameters error __POS__ Exit list)
@@ -1756,6 +1758,7 @@ let compute_raw_contact_map show_title state =
   (*----------------------------------------------------------------*)
   let add_internal_state (a,b) c sol =
     match c with
+    | Ckappa_sig.Counter _
     | Ckappa_sig.Binding _ -> sol
     | Ckappa_sig.Internal state ->
       let sol_a = Mods.StringSetMap.Map.find_default

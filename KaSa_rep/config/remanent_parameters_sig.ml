@@ -59,6 +59,8 @@ type contact_map_output =
     binding_site_color : string ;
     internal_site_shape : string ;
     internal_site_color : string ;
+    counter_site_shape : string ;
+    counter_site_color : string ;
     agent_shape_array : string option array ;
     agent_color_array : string option array ;
     agent_shape_def : string ;

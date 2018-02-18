@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 11 2017>
+ * Last modification: Time-stamp: <Feb 17 2018>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -167,17 +167,17 @@ let pop_entry parameters error id (map,set) =
     | None ->
       Exception.warn parameters error __POS__ Exit (None,map)
 
-let rec scan_interface parameters k agent interface ((error,a),set as remanent)=
+let rec scan_interface parameters k agent interface ((error,a),(set_sites,set_counters) as remanent)=
   match interface with
   | [] -> remanent
-  | Ast.Counter _::_ ->
-    (Exception.warn
-        parameters error __POS__
-        ~message:"Do not deal with counters yet"
-        Exit a,set)
+  | Ast.Counter counter::interface ->
+    let error, set_counters =
+      check_freshness parameters error "Counter" (fst counter.Ast.count_nme) set_counters
+    in
+    scan_interface parameters k agent interface ((error,a),(set_sites,set_counters))
   | Ast.Port port::interface ->
-    let error,set =
-      check_freshness parameters error "Site" (fst port.Ast.port_nme) set
+    let error,set_sites =
+      check_freshness parameters error "Site" (fst port.Ast.port_nme) set_sites
     in
     let remanent = error,a in
     scan_interface parameters k agent interface
@@ -191,13 +191,14 @@ let rec scan_interface parameters k agent interface ((error,a),set as remanent)=
               k
               remanent
           | [] | ((Ast.LNK_ANY | Ast.LNK_FREE | Ast.LNK_TYPE _ | Ast.LNK_SOME
-                  | Ast.ANY_FREE | Ast.LNK_VALUE (_,())),_) :: _ -> remanent),set)
+                  | Ast.ANY_FREE | Ast.LNK_VALUE (_,())),_) :: _ -> remanent),(set_sites,set_counters))
 
 let scan_agent parameters k ag remanent =
   match ag with
   | Ast.Absent _ -> remanent
   | Ast.Present ((name,_),intf,_modif) ->
-    fst (scan_interface parameters k name intf (remanent,Mods.StringSet.empty))
+    fst
+      (scan_interface parameters k name intf (remanent,(Mods.StringSet.empty,Mods.StringSet.empty)))
 
 let rec collect_binding_label
     parameters mixture f k remanent =
@@ -327,20 +328,63 @@ let translate_port is_signature parameters int_set port remanent =
     Ckappa_sig.port_free = is_free },
   remanent
 
-let rec translate_interface parameters is_signature int_set interface remanent =
+let translate_counter_test test =
+  match test with
+  | Ast.CEQ i -> Ckappa_sig.CEQ i
+  | Ast.CGTE i -> Ckappa_sig.CGTE i
+  | Ast.CVAR x -> Ckappa_sig.CVAR x
+
+let fst_opt a_opt =
+  match
+    a_opt
+  with
+  | None -> None
+  | Some (a,_) -> Some (translate_counter_test a)
+
+let translate_counter parameters error int_set counter =
+    let error,_ =
+      check_freshness parameters error "Counters"
+        (fst (counter.Ast.count_nme)) int_set
+    in
+    error, {
+      Ckappa_sig.count_nme= fst (counter.Ast.count_nme);
+      Ckappa_sig.count_test= fst_opt (counter.Ast.count_test) ;
+      Ckappa_sig.count_delta=
+        let a = fst counter.Ast.count_delta in
+        if a=0 then
+          None
+        else Some a
+    }
+
+let rec translate_interface parameters is_signature int_set_sites int_set_counters interface remanent =
   match interface with
   | [] -> Ckappa_sig.EMPTY_INTF,remanent
-  | Ast.Counter _::interface ->
-    translate_interface parameters is_signature int_set interface remanent
+  | Ast.Counter counter::interface ->
+    let error, a = remanent in
+    let error, counter =
+      translate_counter parameters error int_set_counters counter
+    in
+    let interface, remanent =
+      translate_interface
+        parameters is_signature int_set_sites int_set_counters interface
+        (error,a)
+    in
+    Ckappa_sig.COUNTER_SEP (counter, interface), remanent
   | Ast.Port port::interface ->
     let port,remanent =
-      translate_port is_signature parameters int_set port remanent in
+      translate_port is_signature parameters int_set_sites port remanent
+    in
     let interface,remanent =
-      translate_interface parameters is_signature int_set interface remanent in
+      translate_interface
+        parameters is_signature
+        int_set_sites int_set_counters
+        interface remanent
+    in
     Ckappa_sig.PORT_SEP (port,interface),remanent
 
 let translate_interface parameters is_signature =
-  translate_interface parameters is_signature Mods.StringSet.empty
+  translate_interface
+    parameters is_signature Mods.StringSet.empty Mods.StringSet.empty
 
 let translate_agent parameters is_signature ag remanent =
   match ag with
@@ -352,7 +396,6 @@ let translate_agent parameters is_signature ag remanent =
     Some {Ckappa_sig.ag_nme;
      Ckappa_sig.ag_intf = interface ;
      Ckappa_sig.ag_nme_pos;
-     (*     Ckappa_sig.ag_pos = position ;*)
     },
     remanent
 

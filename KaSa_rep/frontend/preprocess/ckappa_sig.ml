@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Feb 28 2018>
+ * Last modification: Time-stamp: <Mar 01 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -20,6 +20,8 @@ type position       = Locality.t
 type agent_name     = string
 type site_name      = string
 type internal_state = string
+type counter_name = string
+type counter_state = int
 
 type c_agent_name = int
 type c_agent_id   = int
@@ -27,10 +29,12 @@ type c_site_name  = int
 type c_state      = int
 type c_rule_id    = int
 type c_link_value  = int
+type c_counter_name = int
 
 type binding_state =
   | Free
   | Lnk_type of agent_name * site_name
+
 
 type mixture =
   | SKIP  of mixture
@@ -49,6 +53,7 @@ and agent =
 and interface =
   | EMPTY_INTF
   | PORT_SEP of port * interface
+  | COUNTER_SEP of counter * interface
 
 and port =
   {
@@ -58,6 +63,17 @@ and port =
     (*port_pos: position ;*)
     port_free : bool option
   }
+
+and counter =
+  {
+    count_nme : string;
+    count_test : counter_test option;
+    count_delta: int option
+  }
+
+and counter_test =
+  | CEQ of int | CGTE of int | CVAR of string | UNKNOWN
+
 
 and internal = string list
 
@@ -103,13 +119,14 @@ type 'pattern variable     = ('pattern,string) Ast.variable_def
 type ('agent,'pattern,'mixture,'rule) compil =
   ('agent, 'pattern, 'mixture, string, 'rule) Ast.compil
 
-type ('a, 'b) site_type =
+type ('a, 'b, 'c) site_type =
   | Internal of 'a
-  | Binding  of 'b
+  | Binding of 'b
+  | Counter of 'c
 
-type site = (site_name, site_name) site_type
+type site = (site_name, site_name, site_name) site_type
 
-type state = (internal_state, binding_state) site_type
+type state = (internal_state, binding_state, counter_state) site_type
 
 (****************************************************************************)
 
@@ -227,6 +244,9 @@ let rec rename_interface parameters error f interface =
     interface
   with
   | EMPTY_INTF -> error, EMPTY_INTF
+  | COUNTER_SEP (counter, interface)  ->
+    let error, interface = rename_interface parameters error f interface in
+    error, COUNTER_SEP (counter, interface)
   | PORT_SEP (port, interface) ->
     let error, port = rename_port parameters error f port in
     let error, interface = rename_interface parameters error f interface in
@@ -308,7 +328,7 @@ let rename_mixture parameters error f mixture =
           COMMA (agent,mixture)
       else
         let error, mixture = aux parameters error (pos+1) list_m dot plus in
-        error, SKIP mixture 
+        error, SKIP mixture
   in
   aux parameters error 0 list_m dot plus
 
@@ -353,10 +373,35 @@ let join_port parameters error port1 port2 =
   else
     Exception.warn parameters error __POS__ Exit port1
 
+let join_counter_test parameters error test1 test2 =
+  match test1,test2 with
+  | None, None -> error, None
+  | None, _ -> error, test2
+  | _,None -> error, test1
+  | Some a, Some b when a=b -> error, test1
+  | Some _, Some _ ->
+    Exception.warn parameters error __POS__ Exit test1
+
+let join_counter parameters error counter1 counter2 =
+  if counter1.count_nme = counter2.count_nme
+  && counter1.count_delta = counter2.count_delta
+  then
+    let error, test = join_counter_test parameters error counter1.count_test counter2.count_test in
+    error,
+    {
+      counter1
+      with
+        count_test=test
+    }
+  else
+    Exception.warn parameters error __POS__ Exit counter1
+
+type interface_elt = Port of port | Counter of counter
 let rev_list_of_interface x =
   let rec aux x output =
     match x with
-    | PORT_SEP (port, interface) -> aux interface (port::output)
+    | PORT_SEP (port, interface) -> aux interface (Port port::output)
+    | COUNTER_SEP (counter, interface) -> aux interface (Counter counter::output)
     | EMPTY_INTF -> output
   in
   aux x []
@@ -364,23 +409,33 @@ let rev_list_of_interface x =
 let rev_interface_of_list x =
   let rec aux list x =
     match list with [] -> x
-                  | t::q -> aux q (PORT_SEP(t,x))
+                  | Port t::q -> aux q (PORT_SEP(t,x))
+                  | Counter t::q -> aux q (COUNTER_SEP (t,x))
   in
   aux x EMPTY_INTF
 
 let list_of_interface x = List.rev (rev_list_of_interface x)
 
 let join_interface parameters error interface1 interface2 =
-  let rec collect interface map =
+  let rec collect interface map_ports map_counters =
     match interface with
-    | EMPTY_INTF -> map
+    | EMPTY_INTF -> map_ports, map_counters
+    | COUNTER_SEP (counter, interface) ->
+      let map_counters =
+        Mods.StringMap.add counter.count_nme counter map_counters
+      in
+      collect interface map_ports map_counters
     | PORT_SEP (port, interface) ->
-      let map = Mods.StringMap.add port.port_nme port map in
-      collect interface map
+      let map_ports = Mods.StringMap.add port.port_nme port map_ports in
+      collect interface map_ports map_counters
   in
-  let map1 = collect interface1 Mods.StringMap.empty in
-  let map2 = collect interface2 Mods.StringMap.empty in
-  let error, map3 =
+  let map_ports_1, map_counters_1 =
+    collect interface1 Mods.StringMap.empty Mods.StringMap.empty
+  in
+  let map_ports_2, map_counters_2 =
+    collect interface2 Mods.StringMap.empty Mods.StringMap.empty
+  in
+  let error, map_ports_3 =
     Mods.StringMap.monadic_fold2
       parameters error
       (fun parameters error key port1 port2 map ->
@@ -390,12 +445,36 @@ let join_interface parameters error interface1 interface2 =
          error, Mods.StringMap.add key port map)
       (fun _parameters error key port map ->
          error, Mods.StringMap.add key port map)
-      map1
-      map2
+      map_ports_1
+      map_ports_2
       Mods.StringMap.empty
   in
-  let list = Mods.StringMap.bindings map3 in
-  let list = List.rev_map snd list in
+  let error, map_counters_3 =
+    Mods.StringMap.monadic_fold2
+      parameters error
+      (fun parameters error key counter1 counter2 map ->
+         let error, counter = join_counter parameters error counter1 counter2 in
+         error, Mods.StringMap.add key counter map)
+      (fun _parameters error key counter map ->
+         error, Mods.StringMap.add key counter map)
+      (fun _parameters error key counter map ->
+         error, Mods.StringMap.add key counter map)
+      map_counters_1
+      map_counters_2
+      Mods.StringMap.empty
+  in
+  let list_ports = Mods.StringMap.bindings map_ports_3 in
+  let list_ports =
+    List.rev_map
+      (fun (_,a) -> Port a)
+      list_ports
+  in
+  let list_counters = Mods.StringMap.bindings map_counters_3 in
+  let list =
+    List.fold_left
+      (fun l (_,b) -> Counter b::l)
+      list_ports list_counters
+  in
   error, rev_interface_of_list list
 
 let join_agent parameters error agent1 agent2 =
@@ -564,8 +643,16 @@ let mod_agent_gen parameters error agent_id f mixture =
 let rec has_site x interface =
   match interface with
   | EMPTY_INTF -> false
+  | COUNTER_SEP (_,intf) -> has_site x intf
   | PORT_SEP (p,intf) ->
     if p.port_nme = x then true else has_site x intf
+
+let rec has_counter x interface =
+  match interface with
+  | EMPTY_INTF -> false
+  | PORT_SEP(_,intf) -> has_site x intf
+  | COUNTER_SEP (c,intf) ->
+    if c.count_nme = x then true else has_counter x intf
 
 let add_site parameters error agent_id site_name mixture =
   mod_agent_gen parameters error agent_id
@@ -584,12 +671,31 @@ let add_site parameters error agent_id site_name mixture =
          error, {agent with ag_intf = interface})
     mixture
 
+    let add_counter parameters error agent_id counter_name mixture =
+      mod_agent_gen parameters error agent_id
+        (fun _parameters error agent ->
+           if has_counter counter_name agent.ag_intf
+           then error, agent
+           else
+             let counter =
+               {
+                 count_nme = counter_name;
+                 count_test = None;
+                 count_delta = None;
+               } in
+             let interface = COUNTER_SEP (counter,agent.ag_intf) in
+             error, {agent with ag_intf = interface})
+        mixture
+
 let mod_site_gen parameters error agent_id site_name f mixture =
   mod_agent_gen parameters error agent_id
     (fun parameters error agent ->
        let rec aux interface =
          match interface with
          | EMPTY_INTF -> error, EMPTY_INTF
+         | COUNTER_SEP (counter,intf) ->
+           let error, intf = aux intf in
+           error, COUNTER_SEP (counter, intf)
          | PORT_SEP (port, intf)  ->
            if port.port_nme = site_name
            then
@@ -738,7 +844,7 @@ type c_binding_state =
   | C_Free
   | C_Lnk_type of c_agent_name * c_site_name
 
-type state' = (internal_state, c_binding_state) site_type
+type state' = (internal_state, c_binding_state, counter_state) site_type
 
 module State =
 struct

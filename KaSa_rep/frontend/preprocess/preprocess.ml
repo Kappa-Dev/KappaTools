@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Nov 28 2017>
+   * Last modification: Time-stamp: <Feb 18 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -188,6 +188,45 @@ let translate_agent_sig
   let rec aux interface error c_interface =
     match interface with
     | Ckappa_sig.EMPTY_INTF -> error,c_interface
+    | Ckappa_sig.COUNTER_SEP(counter,interface) ->
+      let error, c_interface =
+        let error, (bool, output) =
+          Ckappa_sig.Dictionary_of_sites.allocate_bool
+            parameters
+            error
+            Ckappa_sig.compare_unit_site_name
+            (Ckappa_sig.Counter counter.Ckappa_sig.count_nme)
+            ()
+            Misc_sa.const_unit
+            site_dic
+        in
+        let error, counter_name =
+          match bool, output with
+          | _, None
+          | true, _ ->
+            Exception.warn parameters error
+              __POS__
+              ~message:(agent.Ckappa_sig.ag_nme ^
+                        " " ^
+                        counter.Ckappa_sig.count_nme)
+              Exit (Ckappa_sig.dummy_site_name)
+          | _, Some (i,_,_,_) -> error, i
+        in
+        let error',c_interface =
+          Ckappa_sig.Site_map_and_set.Map.add
+            parameters
+            error
+            counter_name
+            {
+              Cckappa_sig.site_name = counter_name ;
+              Cckappa_sig.site_position = Locality.dummy ;     Cckappa_sig.site_state = [] ; (* to do *)
+              Cckappa_sig.site_free = None
+            } c_interface
+        in
+        let error =
+          Exception.check_point Exception.warn parameters error error' __POS__ Exit  in
+        error, c_interface
+        in aux interface error c_interface
     | Ckappa_sig.PORT_SEP(port,interface) ->
       let error,c_interface =
         match port.Ckappa_sig.port_int with
@@ -366,6 +405,16 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
         | Ckappa_sig.EMPTY_INTF -> error,
                                    bond_list, c_interface, question_marks,
                                    dead_sites, dead_state_sites, dead_link_sites
+        | Ckappa_sig.COUNTER_SEP (counter, interface) ->
+          let error, () =
+            Exception.warn parameters error
+              ~message:"counters todo"
+              __POS__ Exit ()
+          in
+          error,
+                                     bond_list, c_interface, question_marks,
+                                     dead_sites, dead_state_sites, dead_link_sites
+
         | Ckappa_sig.PORT_SEP (port, interface) ->
           let error, (c_interface, dead_sites, _dead_states_sites)  =
             match port.Ckappa_sig.port_int with
@@ -1974,6 +2023,7 @@ let export_contact_map parameters error handler =
            Handler.translate_site parameters error handler i j
          in
          match site with
+         | Ckappa_sig.Counter _
          | Ckappa_sig.Binding _ -> error, sol
          | Ckappa_sig.Internal _ ->
            Ckappa_sig.Dictionary_of_States.fold
@@ -2135,6 +2185,21 @@ let dot_of_contact_map ?logger parameters error
                       Loggers.print_newline
                         (Remanent_parameters.get_logger parameters_dot)
                     in ()
+                  | Ckappa_sig.Counter site_name ->
+                    let () =
+                      Loggers.fprintf
+                        (Remanent_parameters.get_logger parameters_dot)
+                        "   %s.%s [style = filled label = \"%s\" shape =%s color = %s size = \"5\"]"
+                        (Ckappa_sig.string_of_agent_name i)
+                        (Ckappa_sig.string_of_site_name j)
+                        site_name
+                        (Remanent_parameters.get_counter_site_shape parameters_dot)
+                        (Remanent_parameters.get_counter_site_color parameters_dot)
+                    in
+                    let () =
+                      Loggers.print_newline
+                        (Remanent_parameters.get_logger parameters_dot)
+                    in ()
                 in
                 (Ckappa_sig.next_site_name n,error))
              site_map (Ckappa_sig.dummy_site_name,error)
@@ -2193,7 +2258,8 @@ let dot_of_contact_map ?logger parameters error
               in
               let _ =
                 match site with
-                | Ckappa_sig.Internal _ -> error
+                | Ckappa_sig.Internal _
+                | Ckappa_sig.Counter _ -> error
                 | Ckappa_sig.Binding _ ->
                   List.fold_left
                     (fun error (i',j') ->

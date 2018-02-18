@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Nov 11 2017>
+  * Last modification: Time-stamp: <Feb 18 2018>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -13,7 +13,7 @@
   * under the terms of the GNU Library General Public License *)
 
 type site  =
-  (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
+  (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
 
 type state_dic = (unit, unit) Ckappa_sig.Dictionary_of_States.dictionary
 
@@ -76,7 +76,7 @@ module KaSim_Site_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
-         type t = (string, string) Ckappa_sig.site_type
+         type t = (string, string, string) Ckappa_sig.site_type
          let compare = compare
          let print _ _ = ()
        end))
@@ -86,7 +86,7 @@ type agent =
   | Agent of Ckappa_sig.c_state interval interface proper_agent
   | Dead_agent of
       Ckappa_sig.c_state interval interface proper_agent *
-      KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type)
+      KaSim_Site_map_and_set.Set.t * ((string, unit, unit) Ckappa_sig.site_type)
         Ckappa_sig.Site_map_and_set.Map.t  *
       Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
   (* agent with a site or state that never occur in the rhs or an initial

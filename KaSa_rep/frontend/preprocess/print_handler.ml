@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 17th of January
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Feb 18 2018>
  * *
  * Pretty printing of Ckappa handler
  *
@@ -22,6 +22,12 @@ let print_state parameters state =
     Loggers.fprintf
       (Remanent_parameters.get_logger parameters)
       "%s%s"
+      (Remanent_parameters.get_prefix parameters)
+      a
+  | Ckappa_sig.Counter a ->
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameters)
+      "%s%i"
       (Remanent_parameters.get_prefix parameters)
       a
   | Ckappa_sig.Binding Ckappa_sig.C_Free ->
@@ -45,6 +51,12 @@ let print_site parameters site =
       "%s%s(internal state)"
       (Remanent_parameters.get_prefix parameters)
       a
+  | Ckappa_sig.Counter a ->
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "%s%s(counter value)"
+          (Remanent_parameters.get_prefix parameters)
+          a
   | Ckappa_sig.Binding a ->
     Loggers.fprintf
       (Remanent_parameters.get_logger parameters)
@@ -57,6 +69,7 @@ let string_of_site _parameters site =
   with
   | Ckappa_sig.Internal a -> a^"(internal state)"
   | Ckappa_sig.Binding a -> a^"(binding state)"
+  | Ckappa_sig.Counter a -> a^" (counter value)"
 
 let print_handler parameters error handler =
   let log = (Remanent_parameters.get_logger parameters) in
@@ -226,6 +239,21 @@ let dot_of_contact_map ?loggers parameters (error:Exception.method_handler) hand
              (fun parameters_dot error j site () () ->
                 let _ =
                   match site with
+                  | Ckappa_sig.Counter site_name ->
+                  if not (Remanent_parameters.get_pure_contact parameters_dot)
+                  then
+                    let () =
+                      Loggers.fprintf
+                        (Remanent_parameters.get_logger parameters_dot)
+                        "   %s.%s [style = filled label = \"%s\" shape =%s color = %s size = \"5\"]"
+                        (Ckappa_sig.string_of_agent_name i)
+                        (Ckappa_sig.string_of_site_name j)
+                        site_name
+                        (Remanent_parameters.get_counter_site_shape parameters_dot)
+                        (Remanent_parameters.get_counter_site_color parameters_dot) in
+                    Loggers.print_newline (Remanent_parameters.get_logger parameters_dot)
+                  else
+                    ()
                   | Ckappa_sig.Internal site_name ->
                     if not (Remanent_parameters.get_pure_contact parameters_dot)
                     then

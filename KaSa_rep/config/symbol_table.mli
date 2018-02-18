@@ -43,6 +43,22 @@ type break_hint =
         int_interval_separator : string ;
         plus_infinity : string ;
         minus_infinity : string ;
+        open_counterceq: string ;
+        open_countercgte: string ;
+        open_countercvar: string ;
+        open_counterdelta: string ;
+        open_counterval: string ;
+        close_counterceq: string ;
+        close_countercgte: string ;
+        close_countercvar: string ;
+        close_counterdelta: string ;
+        close_counterval: string ;
+        counterceq_symbol: string ;
+        countercgte_symbol: string ;
+        countercvar_symbol: string ;
+        counterdeltaplus_symbol: string ;
+        counterdeltaminus_symbol: string ;
+        counterval_symbol: string ;
       }
 
 val symbol_table_V4: symbol_table

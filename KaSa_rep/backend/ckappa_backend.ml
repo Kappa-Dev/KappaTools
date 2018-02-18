@@ -132,12 +132,36 @@ struct
       views = views ;
       string_version = string_version }
 
-  let has_a_binding_state parameter error kappa_handler agent_type site =
+  let has_a_counter parameter error kappa_handler agent_type site =
     let error,site =
       Handler.translate_site parameter error kappa_handler agent_type site
     in
     match site with
     | Ckappa_sig.Internal s ->
+      let new_site = Ckappa_sig.Binding s in
+      let error, dic_opt =
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+          parameter error agent_type kappa_handler.Cckappa_sig.sites
+      in
+      begin
+        match dic_opt with
+        | None ->
+          Exception.warn parameter error __POS__ Exit false
+        | Some dic ->
+          Ckappa_sig.Dictionary_of_sites.member
+            parameter error new_site dic
+      end
+    | Ckappa_sig.Counter _
+    | Ckappa_sig.Binding _ ->
+      Exception.warn parameter error __POS__ Exit false
+
+  let has_a_binding_state parameter error kappa_handler agent_type site =
+    let error,site =
+      Handler.translate_site parameter error kappa_handler agent_type site
+    in
+    match site with
+    | Ckappa_sig.Internal s
+    | Ckappa_sig.Counter s ->
       let new_site = Ckappa_sig.Binding s in
       let error, dic_opt =
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
@@ -323,7 +347,7 @@ struct
             match internal_state_string_opt with
             | None -> old_state
             | Some x -> Some x
-          in
+          in (* to do: counters ? *)
           let error, new_binding_state =
             match
               internal_state_string_opt, binding_state_opt, old_binding
