@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Jan 26 2018>
+  * Last modification: Time-stamp: <Mar 01 2018>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -225,18 +225,28 @@ let add_node_from_mvbdu _parameters _handler_kappa error _agent_type _agent_stri
     with
       nodes = mvbdu::transition_system.nodes}
 
-let bdu_of_view test =
+let bdu_of_view parameters error test =
   let mvbdu_false = Ckappa_sig.Views_intbdu.mvbdu_false () in
   let mvbdu_true = Ckappa_sig.Views_intbdu.mvbdu_true () in
   List.fold_left
-    (fun mvbdu (site,state) ->
-       let lub =
-         Ckappa_sig.int_of_state_index
+    (fun (error, mvbdu) (site,state) ->
+       let error,lub =
+         match
            state.Cckappa_sig.site_state.Cckappa_sig.min
+         with
+         | Some a -> error, Ckappa_sig.int_of_state_index a
+         | None ->
+           Exception.warn parameters error __POS__ Exit
+             0
        in
-       let glb =
-         Ckappa_sig.int_of_state_index
+       let error, glb =
+         match
            state.Cckappa_sig.site_state.Cckappa_sig.max
+         with
+         | Some a -> error, Ckappa_sig.int_of_state_index a
+         | None ->
+           Exception.warn parameters error __POS__ Exit
+             0
        in
        let rec aux k mvbdu =
          if k>glb then mvbdu
@@ -247,17 +257,33 @@ let bdu_of_view test =
            aux (k+1) (Ckappa_sig.Views_intbdu.mvbdu_or mvbdu mvbdu')
        in
        let mvbdu' = aux lub mvbdu_false in
-       Ckappa_sig.Views_intbdu.mvbdu_and mvbdu mvbdu'
+       error, Ckappa_sig.Views_intbdu.mvbdu_and mvbdu mvbdu'
     )
-    mvbdu_true
+    (error, mvbdu_true)
     test
 
 let asso_of_view_in_list parameters error view =
   let error, list =
     List.fold_left
       (fun (error,list) (site,state) ->
-         let lub = state.Cckappa_sig.site_state.Cckappa_sig.min in
-         let glb = state.Cckappa_sig.site_state.Cckappa_sig.max in
+         let error,lub =
+           match
+             state.Cckappa_sig.site_state.Cckappa_sig.min
+           with
+           | Some a -> error, a
+           | None ->
+             Exception.warn parameters error __POS__ Exit
+               (Ckappa_sig.state_index_of_int 0)
+         in
+         let error, glb =
+           match
+             state.Cckappa_sig.site_state.Cckappa_sig.max
+           with
+           | Some a -> error,  a
+           | None ->
+             Exception.warn parameters error __POS__ Exit
+               (Ckappa_sig.state_index_of_int 0)
+         in
          if lub = glb
          then
            error, (site,lub)::list
@@ -376,7 +402,7 @@ let compute_full_support parameters error ag_id rule =
           parameters error __POS__
           Exit Nil
       | Some (list,list') ->
-        let list' = bdu_of_view list' in
+        let error, list' = bdu_of_view parameters error list' in
         error, Degradation (name, list, list')
     end
   | Some (list'',list''') ->
@@ -387,7 +413,7 @@ let compute_full_support parameters error ag_id rule =
       match test_opt with
       | None -> error, Creation (name,list'',list''')
       | Some (list,list') ->
-        let list' = bdu_of_view list' in
+        let error, list' = bdu_of_view parameters error list' in
         error, Mod (name,list,list',list'',list''')
     end
 

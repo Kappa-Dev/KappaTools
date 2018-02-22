@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Jan 23 2017>
+   * Last modification: Time-stamp: <Feb 22 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -66,14 +66,6 @@ type bdu_analysis_static =
 (***************************************************************************)
 
 let init_bdu_analysis_static parameters error =
-  let error, init_covering_classes =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
-      parameters error 0
-  in
-  let error, init_remanent_triple =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
-      parameters error 0
-  in
   let init_bdu_analysis_static =
     {
       store_proj_bdu_creation_restriction_map =
@@ -164,17 +156,19 @@ let get_pair_cv_map_with_missing_association_creation
           Ckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
             parameters error
             (fun site port m ->
-               if
-                 port.Cckappa_sig.site_state.Cckappa_sig.min =
+               match
+                 port.Cckappa_sig.site_state.Cckappa_sig.min,
                  port.Cckappa_sig.site_state.Cckappa_sig.max
-               then
+               with Some a, Some b when a=b
+                 ->
                  add_dependency_site
                    parameters
                    map_new_index_forward
                    site
-                   port.Cckappa_sig.site_state.Cckappa_sig.min
+                   a
                    m
-               else raise Exit)
+                  | Some _, Some _ | None,_ | _,None ->
+                    raise Exit)
             (fun site ->
                add_dependency_site
                  parameters
@@ -201,10 +195,6 @@ let collect_bdu_creation_restriction_map parameters handler error
     rule_id rule
     store_remanent_triple
     store_result =
-  let error, handler, bdu_false =
-    Ckappa_sig.Views_bdu.mvbdu_false
-      parameters handler error
-  in
   (*-----------------------------------------------------------------*)
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
     error
@@ -240,12 +230,11 @@ let collect_bdu_creation_restriction_map parameters handler error
                let error, handler, store_result  =
                  List.fold_left
                    (fun (error, handler, store_result) (cv_id,map_res) ->
-                      let error, pair_list =
+                      let pair_list =
                         Ckappa_sig.Site_map_and_set.Map.fold
-                          (fun site' state (error, current_list) ->
-                             let pair_list = (site', state) :: current_list in
-                             error, pair_list
-                          ) map_res (error, [])
+                          (fun site' state current_list ->
+                             (site', state) :: current_list )
+                           map_res []
                       in
                       let error, handler, bdu_creation =
                         Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list
@@ -260,7 +249,8 @@ let collect_bdu_creation_restriction_map parameters handler error
                           store_result
                       in
                       error, handler, store_result
-                   ) (error, handler, store_result) get_pair_list
+                   ) (error, handler, store_result)
+                   get_pair_list
                in
                error, (handler, store_result)
              else error, (handler, store_result)
@@ -422,8 +412,13 @@ let collect_modif_list_restriction_map
                     let error, pair_list =
                       Ckappa_sig.Site_map_and_set.Map.fold
                         (fun site' state (error, current_list) ->
-                           let pair_list = (site', state) :: current_list in
-                           error, pair_list
+                           match state with
+                           | Some state ->
+                             let pair_list = (site', state) :: current_list in
+                             error, pair_list
+                           | None ->
+                             Exception.warn parameters error __POS__ Exit
+                               current_list
                         ) map_res (error, [])
                     in
                     (*-------------------------------------------------------*)

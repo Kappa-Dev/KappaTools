@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Jul 11 2017>
+   * Last modification: Time-stamp: <Feb 22 2018>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -65,9 +65,9 @@ sig
   val mvbdu_of_sorted_association_list: ((key * value) list,mvbdu) unary
   val mvbdu_of_reverse_sorted_association_list: ((key * value) list,mvbdu) unary
   val mvbdu_of_hconsed_range: (hconsed_range_list,mvbdu) unary
-  val mvbdu_of_range_list: ((key * (value * value)) list,mvbdu) unary
-  val mvbdu_of_sorted_range_list: ((key * (value * value)) list,mvbdu) unary
-  val mvbdu_of_reverse_sorted_range_list: ((key * (value * value)) list,mvbdu) unary
+  val mvbdu_of_range_list: ((key * (value option * value option)) list,mvbdu) unary
+  val mvbdu_of_sorted_range_list: ((key * (value option * value option)) list,mvbdu) unary
+  val mvbdu_of_reverse_sorted_range_list: ((key * (value option * value option)) list,mvbdu) unary
 
   val mvbdu_rename: (mvbdu,hconsed_renaming_list,mvbdu) binary
 
@@ -83,9 +83,9 @@ sig
   val build_reverse_sorted_association_list: ((key * value) list,hconsed_association_list) unary
   val empty_association_list : hconsed_association_list constant
 
-  val build_range_list: ((key * (value * value)) list,hconsed_range_list) unary
-  val build_sorted_range_list: ((key * (value * value)) list,hconsed_range_list) unary
-  val build_reverse_sorted_range_list: ((key * (value * value)) list,hconsed_range_list) unary
+  val build_range_list: ((key * (value option * value option)) list,hconsed_range_list) unary
+  val build_sorted_range_list: ((key * (value option* value option)) list,hconsed_range_list) unary
+  val build_reverse_sorted_range_list: ((key * (value option* value option)) list,hconsed_range_list) unary
   val empty_range_list : hconsed_range_list constant
 
 
@@ -104,7 +104,7 @@ sig
   val nbr_variables: (hconsed_variables_list,int) unary
   val extensional_of_variables_list: (hconsed_variables_list,key list) unary
   val extensional_of_association_list: (hconsed_association_list,(key*value) list) unary
-  val extensional_of_range_list: (hconsed_range_list,(key*(value*value)) list) unary
+  val extensional_of_range_list: (hconsed_range_list,(key*(value option *value option)) list) unary
   val extensional_of_mvbdu: (mvbdu,(key * value) list list) unary
 
   val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
@@ -201,9 +201,9 @@ sig
   val mvbdu_of_sorted_association_list: (key * value) list -> mvbdu
   val mvbdu_of_reverse_sorted_association_list: (key * value) list -> mvbdu
   val mvbdu_of_hconsed_range: hconsed_range_list -> mvbdu
-  val mvbdu_of_range_list: (key * (value * value)) list -> mvbdu
-  val mvbdu_of_sorted_range_list: (key * (value * value)) list -> mvbdu
-  val mvbdu_of_reverse_sorted_range_list: (key * (value * value)) list -> mvbdu
+  val mvbdu_of_range_list: (key * (value option * value option)) list -> mvbdu
+  val mvbdu_of_sorted_range_list: (key * (value option * value option)) list -> mvbdu
+  val mvbdu_of_reverse_sorted_range_list: (key * (value option * value option)) list -> mvbdu
 
 
   val mvbdu_rename: mvbdu -> hconsed_renaming_list -> mvbdu
@@ -218,9 +218,9 @@ sig
   val build_reverse_sorted_association_list: (key * value) list -> hconsed_association_list
   val empty_association_list : unit -> hconsed_association_list
 
-  val build_range_list: (key * (value * value)) list ->  hconsed_range_list
-  val build_sorted_range_list: (key * (value * value)) list -> hconsed_range_list
-  val build_reverse_sorted_range_list: (key * (value * value)) list -> hconsed_range_list
+  val build_range_list: (key * (value option * value option)) list ->  hconsed_range_list
+  val build_sorted_range_list: (key * (value option * value option)) list -> hconsed_range_list
+  val build_reverse_sorted_range_list: (key * (value option * value option)) list -> hconsed_range_list
   val empty_range_list : unit -> hconsed_range_list
 
   val build_variables_list: key list ->  hconsed_variables_list
@@ -259,7 +259,7 @@ module Make (M:Nul)  =
     type value = int
     type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.range_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type mvbdu = bool Mvbdu_sig.mvbdu
-    type hconsed_range_list = (value * value) List_sig.list
+    type hconsed_range_list = (value option * value option) List_sig.list
     type hconsed_association_list = value List_sig.list
     type hconsed_variables_list = unit List_sig.list
     type hconsed_renaming_list = key List_sig.list
@@ -268,6 +268,20 @@ module Make (M:Nul)  =
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler -> Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
+
+    let lift0 pos f parameters handler error =
+      match
+        f parameters handler error parameters
+      with
+      | error,(handler,Some a) -> error,handler,a
+      | error,(handler,None) ->
+        let error, a =
+          Exception.warn_with_exn
+            parameters error pos Exit
+            (fun _ ->
+               failwith "Cannot recover from bugs in constant initilization")
+        in
+        error, handler, a
 
     let init,is_init,reset,get_handler =
       let used = ref None in
@@ -282,6 +296,13 @@ module Make (M:Nul)  =
         | None ->
           begin
             let error,handler = Boolean_mvbdu.init_remanent parameter error in
+            let error, handler, _ =
+              lift0 __POS__ Boolean_mvbdu.boolean_mvbdu_false parameter handler error
+            in
+            let error, handler, _ =
+              lift0 __POS__ Boolean_mvbdu.boolean_mvbdu_true parameter handler error
+            in
+
             let () = used := Some handler in
             error,handler
           end
@@ -324,19 +345,6 @@ module Make (M:Nul)  =
 
     let equal = Mvbdu_core.mvbdu_equal
     let equal_with_logs _p h e a b = e,h,equal a b
-    let lift0 pos f parameters handler error =
-      match
-        f parameters handler error parameters
-      with
-      | error,(handler,Some a) -> error,handler,a
-      | error,(handler,None) ->
-        let error, a =
-          Exception.warn_with_exn
-            parameters error pos Exit
-            (fun _ ->
-               failwith "Cannot recover from bugs in constant initilization")
-        in
-        error, handler, a
 
     let last_entry parameters handler error () =
       let error,int = Boolean_mvbdu.last_entry parameters handler error in
@@ -361,7 +369,7 @@ module Make (M:Nul)  =
         f (Boolean_mvbdu.association_list_allocate parameters) error parameters handler a
       in a,b,c
 
-    let lift1bisbis _string f parameters handler error a =
+    let lift1bisbis _string f parameters handler error (a:(int * (int option * int option)) list) =
         let a,(b,c) =
           f (Boolean_mvbdu.range_list_allocate parameters) error parameters handler a
         in a,b,c
@@ -530,7 +538,10 @@ module Make (M:Nul)  =
     let build_reverse_sorted_association_list =
       lift1ter __POS__ List_algebra.build_reversed_sorted_list
 
-    let build_range_list = lift1bisbis __POS__ List_algebra.build_list
+    let build_range_list =
+      lift1bisbis
+        __POS__
+        List_algebra.build_list
 
     let build_sorted_range_list =
       lift1terter __POS__ List_algebra.build_sorted_list

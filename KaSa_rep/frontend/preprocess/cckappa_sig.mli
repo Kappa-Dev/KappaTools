@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Feb 18 2018>
+  * Last modification: Time-stamp: <Feb 22 2018>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -36,7 +36,7 @@ type kappa_handler =
         Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t;
   }
 
-type 'a interval = {min:'a; max:'a}
+type 'a interval = {min:'a option; max:'a option}
 
 type 'state port =
   {
@@ -64,6 +64,8 @@ type site_address =
   }
 
 type bond = site_address * site_address
+
+type delta = int
 
 module Address_map_and_set: Map_wrapper.S_with_logs
   with type elt = site_address
@@ -113,13 +115,22 @@ type enriched_variable =
     e_variable : (mixture,string) Ast.variable_def
   }
 
+type counter_action =
+  {
+    precondition:Ckappa_sig.c_state interval;
+    postcondition: Ckappa_sig.c_state interval;
+    increment: delta
+  }
+
 type actions =
   {
     creation   : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name) list;
     remove     : (Ckappa_sig.c_agent_id * unit interface proper_agent * Ckappa_sig.c_site_name list) list;
     release    : bond list;
     bind       : bond list;
-    half_break : (site_address * (Ckappa_sig.c_state interval option)) list
+    half_break : (site_address * (Ckappa_sig.c_state interval option)) list;
+    translate : (site_address * counter_action) list ;
+    binder : (string * site_address) list ;
   }
 
 
@@ -204,11 +215,23 @@ val build_address: Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name -> site_address
 
-val max_state_index :
+val min_state_index:
   Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
 
-val min_state_index :
+val max_state_index:
   Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
+
+val max_state_index_option_min :
+  Ckappa_sig.c_state option -> Ckappa_sig.c_state option -> Ckappa_sig.c_state option
+
+val min_state_index_option_min :
+  Ckappa_sig.c_state option -> Ckappa_sig.c_state option -> Ckappa_sig.c_state option
+
+val max_state_index_option_max :
+  Ckappa_sig.c_state option -> Ckappa_sig.c_state option -> Ckappa_sig.c_state option
+
+val min_state_index_option_max :
+  Ckappa_sig.c_state option -> Ckappa_sig.c_state option -> Ckappa_sig.c_state option
 
 val rename_mixture: Remanent_parameters_sig.parameters ->
   Exception.method_handler ->

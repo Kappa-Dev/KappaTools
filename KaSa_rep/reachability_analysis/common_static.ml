@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Feb 13 2018>
+  * Last modification: Time-stamp: <Mar 01 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -302,7 +302,7 @@ let get_states_in_handler parameter error add handler state_op =
             (agent_type, site_type)
             handler
         in
-        error, (Ckappa_sig.dummy_state_index_1, last_entry)
+        error, (Some Ckappa_sig.dummy_state_index_1, Some last_entry)
       end
     | Some interval ->
       error,
@@ -422,6 +422,24 @@ let collect_potential_free_and_bind parameter error handler rule_id
 
 let get_potential_partner parameter error handler rule_id
     (agent_type, site_type) (state_min, state_max) store_result =
+  let error, state_min =
+    match
+      state_min
+    with
+    | None ->
+      Exception.warn parameter error __POS__ Exit Ckappa_sig.dummy_state_index
+    | Some i ->
+      error, i
+  in
+  let error, state_max =
+    match
+      state_max
+    with
+    | None ->
+      Exception.warn parameter error __POS__ Exit Ckappa_sig.dummy_state_index
+    | Some i ->
+      error, i
+  in
   let rec aux k (error, store_result) =
     if Ckappa_sig.compare_state_index k state_max > 0
     then
@@ -481,7 +499,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                 let error, store_result =
                   get_potential_partner parameter error handler rule_id
                     (agent_type, site_type)
-                    (Ckappa_sig.dummy_state_index_1, last_entry)
+                    (Some Ckappa_sig.dummy_state_index_1, Some last_entry)
                     store_result
                 in
                 error, store_result
@@ -670,16 +688,18 @@ let collect_agent_type_binding_state parameter error agent site_type =
       with
       | error, None ->
         Exception.warn
-          parameter error __POS__ Exit Ckappa_sig.dummy_state_index
+          parameter error __POS__ Exit (Ckappa_sig.dummy_state_index)
       | error, Some port ->
         let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
         let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
         (* It is a binding state *)
-        if state_min = state_max
-        then error, state_min
-        else
-        Exception.warn
-          parameter error __POS__ Exit Ckappa_sig.dummy_state_index
+        match state_min,state_max
+        with
+        | Some a, Some b when a=b ->
+          error, a
+        | None, _ | _, None | Some _, Some _ ->
+          Exception.warn
+            parameter error __POS__ Exit (Ckappa_sig.dummy_state_index)
     in
     error, (agent_type1, state1)
 
@@ -1011,9 +1031,13 @@ let collect_sites_from_agent_interface parameters error agent_id agent
        let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
        (*NOTE: state in modification is a singleton state*)
        let error, state =
-         if state_min = state_max
-         then error, state_min
-         else Exception.warn parameters error __POS__ Exit
+         match
+           state_min, state_max
+         with
+         | Some a, Some b when a=b ->
+           error, a
+         | None, _ | _, None | Some _, Some _ ->
+           Exception.warn parameters error __POS__ Exit
              Ckappa_sig.dummy_state_index
        in
        let error, store_result =

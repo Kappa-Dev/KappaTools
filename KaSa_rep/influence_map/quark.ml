@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 7th of March
- * Last modification: Time-stamp: <Nov 08 2017>
+ * Last modification: Time-stamp: <Feb 22 2018>
  *
  * Compute the influence relations between rules and sites.
  *
@@ -771,18 +771,24 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                  then
                    error, site_var, site_bound_var
                  else
-                 if interval.Cckappa_sig.min = max
-                 then
-                   let error, site_var =
-                     add_site_var parameter error var_id kasim_id agent_type site min site_var
-                   in
-                   error, site_var, site_bound_var
-                 else
+                   match min,max with
+                   | Some min, Some max when min =max ->
+                     let error, site_var =
+                       add_site_var parameter error var_id kasim_id agent_type
+                         site min site_var
+                     in
+                     error, site_var, site_bound_var
+                   | Some _, Some _  ->
                    let error, site_bound_var =
                      add_site_var parameter error var_id kasim_id agent_type site (Ckappa_sig.state_index_of_int 1) site_bound_var
                    in
                    error, site_var, site_bound_var
-
+                   | None, _ | _,None ->
+               let error, (site_var, site_bound_var) =
+                 Exception.warn
+                   parameter error __POS__ Exit (site_var, site_bound_var)
+               in
+               error, site_var, site_bound_var
               )
               agent.Cckappa_sig.agent_interface
               (error, site_var, site_bound_var)
@@ -970,11 +976,17 @@ let is_tested_and_not_question_mark parameter error agent_id site views =
     | None -> error, false
     | Some port ->
       let interval = port.Cckappa_sig.site_state in
-      let min = Ckappa_sig.int_of_state_index interval.Cckappa_sig.min in
-      let max = Ckappa_sig.int_of_state_index interval.Cckappa_sig.max in
-      if max = 0 || min > 0
-      then error, true
-      else error, false
+      match interval.Cckappa_sig.min, interval.Cckappa_sig.max with
+      | Some min, Some max ->
+        let min = Ckappa_sig.int_of_state_index  min in
+        let max = Ckappa_sig.int_of_state_index  max in
+        if max = 0 || min > 0
+        then error, true
+        else error, false
+      | None, Some _  | Some _ , None ->
+        Exception.warn parameter error __POS__ Exit true
+      | None, None ->
+        Exception.warn parameter error __POS__ Exit false
 
 let scan_rule parameter error handler rule_id rule quarks =
   let common_prefix =
@@ -998,7 +1010,7 @@ let scan_rule parameter error handler rule_id rule quarks =
   let site_bound_modif_plus = Quark_type.BoundSite.Set.empty in
   let site_bound_modif_minus = Quark_type.BoundSite.Set.empty in
   let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in
-  let error,(agent_test,site_test,_site_bound_test,dead_agents,dead_sites,dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus) = (*what is tested in the lhs*)
+  let error,(agent_test,site_test,_site_bound_test,_dead_agents,_dead_sites,_dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus) = (*what is tested in the lhs*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
@@ -1018,12 +1030,14 @@ let scan_rule parameter error handler rule_id rule quarks =
                   let max = interval.Cckappa_sig.max in
                   let min = interval.Cckappa_sig.min in
                   let error, binding_state = Handler.is_binding_site parameter error handler agent_type site in
+                  match min,max with
+                  | Some min, Some max ->
                   if (binding_state &&  port.Cckappa_sig.site_free = None)  (* The state is a wildcard, it should be ignored *)
                   || ((not binding_state) && min <> max)
                   then
                     error, site_test, site_bound_test
                   else
-                  if interval.Cckappa_sig.min = max
+                  if min = max
                   then
                     let error, site_test =
                       add_site parameter error rule_id kasim_id agent_type site min site_test
@@ -1034,6 +1048,7 @@ let scan_rule parameter error handler rule_id rule quarks =
                       add_bound_site_test parameter error rule_id kasim_id agent_type site site_bound_test
                     in
                     error, site_test, site_bound_test
+                  | None, _ | _,None -> error, site_test,site_bound_test
                )
                agent.Cckappa_sig.agent_interface
                (error,site_test,site_bound_test)
@@ -1251,15 +1266,22 @@ let scan_rule parameter error handler rule_id rule quarks =
               let min = interval.Cckappa_sig.min in
               let error, binding_state = Handler.is_binding_site parameter error handler agent_type site in
               let error, site_bound_modif_plus =
-                if binding_state
+                match min,max with
+                  Some min, Some _max ->
+                  if binding_state
                    &&
                    Ckappa_sig.compare_state_index
                      min Ckappa_sig.dummy_state_index > 0
-                then
-                  add_bound_site parameter error rule_id kasim_id agent_type site site_bound_modif_plus
+                  then
+                    add_bound_site parameter error rule_id kasim_id agent_type site site_bound_modif_plus
                 else
                   error, site_bound_modif_plus
+                | None, _ | _,None ->
+                  error, site_bound_modif_plus
               in
+              match min,max with
+              | Some min, Some max ->
+
               let rec aux k (error,site_modif_plus) =
                 if k>max
                 then
@@ -1269,8 +1291,12 @@ let scan_rule parameter error handler rule_id rule quarks =
                     (Ckappa_sig.next_state_index k)
                     (add_site parameter error rule_id kasim_id agent_type site k site_modif_plus)
               in
-              let error, site_modif_plus = aux interval.Cckappa_sig.min (error,site_modif_plus) in
+              let error, site_modif_plus = aux min (error,site_modif_plus) in
               error, (site_modif_plus, site_bound_modif_plus)
+              | None, _ | _,None ->
+                Exception.warn parameter error __POS__ Exit
+                  (site_modif_plus, site_bound_modif_plus)
+
            )
            agent.Cckappa_sig.agent_interface
            (error,(site_modif_plus,site_bound_modif_plus))
@@ -1300,6 +1326,8 @@ let scan_rule parameter error handler rule_id rule quarks =
               let interval = port.Cckappa_sig.site_state in
               let max = interval.Cckappa_sig.max in
               let min = interval.Cckappa_sig.min in
+              match min,max with
+              | Some min, Some max ->
               let error, binding_state = Handler.is_binding_site parameter error handler agent_type site in
               let error, site_bound_modif_minus =
                 if binding_state &&
@@ -1310,7 +1338,6 @@ let scan_rule parameter error handler rule_id rule quarks =
                 else
                   error, site_bound_modif_minus
               in
-              let interval = port.Cckappa_sig.site_state in
               let rec aux k (error,site_modif_minus) =
                 if k>max
                 then
@@ -1332,8 +1359,12 @@ let scan_rule parameter error handler rule_id rule quarks =
                     (Ckappa_sig.next_state_index k)
                     site_modif_minus
               in
-              let error, modif = aux interval.Cckappa_sig.min (error,site_modif_minus) in
+              let error, modif = aux min (error,site_modif_minus) in
               error, (modif, site_bound_modif_minus)
+              | None,_ | _,None ->
+                Exception.warn
+                  parameter error __POS__ Exit (site_modif_minus,site_bound_modif_minus)
+
            )
            agent.Cckappa_sig.agent_interface
            (error,
@@ -1377,7 +1408,16 @@ let scan_rule parameter error handler rule_id rule quarks =
                error,(Ckappa_sig.dummy_state_index_1,last_entry)
              end
            | Some interval ->
-             error,(interval.Cckappa_sig.min,interval.Cckappa_sig.max)
+             begin
+               match interval.Cckappa_sig.min,interval.Cckappa_sig.max
+               with
+               | Some min, Some max ->
+                 error,(min,max)
+               | None, _ | _,None ->
+                 Exception.warn parameter error __POS__ Exit
+                   (Ckappa_sig.dummy_state_index,
+                    Ckappa_sig.dummy_state_index)
+             end
          in
          let rec aux k (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) =
            if Ckappa_sig.compare_state_index k max > 0

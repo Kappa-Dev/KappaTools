@@ -65,7 +65,7 @@ struct
     {
       views:
         (Ckappa_sig.c_agent_name *
-         ((Ckappa_sig.c_state * Ckappa_sig.c_state))
+         ((Ckappa_sig.c_state option * Ckappa_sig.c_state option))
            Ckappa_sig.Site_map_and_set.Map.t) Ckappa_sig.Agent_id_map_and_set.Map.t ;
       fresh_agent_id: agent_id ;
       fresh_bond_id: bond_index ;
@@ -200,19 +200,30 @@ struct
             ~message:"undefined site"
             parameter error kappa_handler agent_type site
         in
-        let error, _ =
-          Handler.translate_state
-            ~ml_pos:(Some __POS__)
-            ~message:"undefined site state"
-            parameter error kappa_handler
-            agent_type site state_min
+        let error =
+          match state_min with
+          | Some state_min ->
+            let error, _ =
+              Handler.translate_state
+                ~ml_pos:(Some __POS__)
+                ~message:"undefined site state"
+                parameter error kappa_handler
+                agent_type site state_min
+            in error
+          | None -> error
         in
-        let error, _ =
-          Handler.translate_state
-            ~ml_pos:(Some __POS__)
-            ~message:"undefined site state"
-            parameter error kappa_handler
-            agent_type site state_max
+        let error =
+          match state_max with
+          | Some state_max ->
+            let error, _ =
+              Handler.translate_state
+                ~ml_pos:(Some __POS__)
+                ~message:"undefined site state"
+                parameter error kappa_handler
+                agent_type site state_max
+            in
+            error
+          | None -> error
         in
         let error, old_asso =
           Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
@@ -230,27 +241,23 @@ struct
             in
             error, (map, Some (state_min, state_max))
           | Some (old_min, old_max) ->
-            if Ckappa_sig.compare_state_index state_min old_max  <= 0
-            || Ckappa_sig.compare_state_index state_min old_max <= 0
+            if Ckappa_sig.compare_state_index_option_min old_min state_min <= 0
+            || Ckappa_sig.compare_state_index_option_max state_max old_max <= 0
             then
-              let new_min = Cckappa_sig.max_state_index state_min old_min in
-              let new_max = Cckappa_sig.min_state_index state_max old_max in
-              if new_min = old_min && new_max = old_max
-              then
-                error, (map, None)
-              else
-                let error', map =
-                  Ckappa_sig.Site_map_and_set.Map.overwrite
-                    parameter error
-                    site (new_min,new_max)
-                    map
-                in
-                let error =
-                  Exception.check_point
-                    Exception.warn
-                    parameter error error' __POS__ Exit
-                in
-                error, (map, Some (new_min, new_max))
+              let new_min = Cckappa_sig.max_state_index_option_min state_min old_min in
+              let new_max = Cckappa_sig.min_state_index_option_max state_max old_max in
+              let error', map =
+                Ckappa_sig.Site_map_and_set.Map.overwrite
+                  parameter error
+                  site (new_min,new_max)
+                  map
+              in
+              let error =
+                Exception.check_point
+                  Exception.warn
+                  parameter error error' __POS__ Exit
+              in
+              error, (map, Some (new_min, new_max))
             else
               Exception.warn
                 parameter error __POS__
@@ -272,8 +279,8 @@ struct
           in
           let error,
               (internal_state_string_opt, binding_state_opt) =
-            match state_min = state_max, is_binding_site with
-            | true, true ->
+            match state_min = state_max, is_binding_site, state_min with
+            | true, true, Some state_min ->
               if state_min = Ckappa_sig.dummy_state_index
               then
                 error, (None, Some Free)
@@ -300,10 +307,6 @@ struct
                     parameter error kappa_handler
                     agent_type'
                 in
-                (*let error, site_string' =
-                  Handler.translate_binding_type parameter error kappa_handler
-                    agent_type' site'
-                in*)
                 let error, site_string' =
                   Handler.string_of_site_contact_map
                     parameter error kappa_handler
@@ -311,18 +314,18 @@ struct
                 in
                 error,
                 (None, Some (Binding_type (agent_string',site_string')))
-            | true, false ->
+            | true, false, Some state_min ->
               let error, state_string =
                 Handler.string_of_state
                   parameter error kappa_handler
                   agent_type site state_min
               in
               error, (Some state_string, None)
-            | false, true ->
-              if state_min = Ckappa_sig.dummy_state_index
+            | false, true, _ | _, true, None->
+              if state_min = Some Ckappa_sig.dummy_state_index
               then error, (None, Some Wildcard)
               else error, (None, Some Bound_to_unknown)
-            | false,false ->
+            | false,false, _ | _, false, None ->
               begin
                 Exception.warn
                   parameter error __POS__
@@ -393,7 +396,7 @@ struct
   let add_state parameter error kappa_handler agent_id site
       state t =
     add_state_interv parameter error kappa_handler agent_id site
-      state state t
+      (Some state) (Some state) t
 
   let add_bound_to_unknown
       parameter error kappa_handler
@@ -411,7 +414,7 @@ struct
         agent_type site
     in
     add_state_interv parameter error kappa_handler agent_id site
-      Ckappa_sig.dummy_state_index_1 state_max t
+      (Some Ckappa_sig.dummy_state_index_1) (Some state_max) t
 
   let add_bond_to parameter error kappa_handler agent_id site bond_id t =
     let error, (agent_type, _) =

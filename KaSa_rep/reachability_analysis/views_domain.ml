@@ -1066,7 +1066,9 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
                                         event_list
                                     in
                                     error, (dynamic, event_list)
-                                  ) (error, (dynamic, event_list)) get_pair_list
+                                  )
+                     (error, (dynamic, event_list))
+                     get_pair_list
                  in
                  error, (dynamic, event_list)
                | error, None -> error, (dynamic, event_list)

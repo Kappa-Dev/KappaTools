@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 12th of August
-   * Last modification: Time-stamp: <Aug 18 2017>
+   * Last modification: Time-stamp: <Feb 20 2018>
    * *
    * Pretty printing of token library
    *
@@ -15,11 +15,11 @@
 let trace = false
 let local_trace = false
 
-let string_of_port port =
+let string_of_port parameters port =
   "[state_min:" ^
-    (Ckappa_sig.string_of_state_index port.Cckappa_sig.site_state.Cckappa_sig.min) ^
+    (Ckappa_sig.string_of_state_index_option_min parameters  port.Cckappa_sig.site_state.Cckappa_sig.min) ^
     ";state_max:" ^
-    (Ckappa_sig.string_of_state_index port.Cckappa_sig.site_state.Cckappa_sig.max) ^ "]"
+    (Ckappa_sig.string_of_state_index_option_max parameters  port.Cckappa_sig.site_state.Cckappa_sig.max) ^ "]"
 
 let print_kasim_site x =
   match
@@ -43,7 +43,7 @@ let print_agent parameters error _handler agent =
             "%ssite_type_%s->state:%s"
             (Remanent_parameters.get_prefix parameters)
             (Ckappa_sig.string_of_site_name a)
-            (string_of_port b)
+            (string_of_port parameters b)
           in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
           error)
@@ -96,7 +96,7 @@ let print_agent parameters error _handler agent =
           "%ssite_type_%s->state:%s"
           (Remanent_parameters.get_prefix parameters)
           (Ckappa_sig.string_of_site_name a)
-          (string_of_port b)
+          (string_of_port parameters b)
         in
 	let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
         error)
@@ -116,7 +116,7 @@ let print_diffagent parameters error _handler agent =
       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
         "%ssite_type_%s->state:%s" (Remanent_parameters.get_prefix parameters)
         (Ckappa_sig.string_of_site_name a)
-        (string_of_port b)
+        (string_of_port parameters b)
       in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
       error)

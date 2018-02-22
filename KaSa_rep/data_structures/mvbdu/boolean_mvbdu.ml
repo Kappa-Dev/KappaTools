@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 11th of March
-   * Last modification: Time-stamp: <Dec 31 2016>
+   * Last modification: Time-stamp: <Feb 21 2018>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -33,7 +33,7 @@ end
 
 module Range_List_Skeleton =
 struct
-  type t = (int * int) List_sig.skeleton
+  type t = (int option * int option) List_sig.skeleton
   let (compare:t->t->int) = compare
   let print _ _ = ()
 end
@@ -64,7 +64,7 @@ module D_Association_list_skeleton =
 module D_Range_list_skeleton =
   (Dictionary.Dictionary_of_Ord (Range_List_Skeleton):Dictionary.Dictionary
    with type key = int
-    and type value = (int * int) List_sig.skeleton)
+    and type value = (int option * int option) List_sig.skeleton)
 
 module D_Variables_list_skeleton =
   (Dictionary.Dictionary_of_Ord (Variables_List_Skeleton):Dictionary.Dictionary
@@ -109,7 +109,7 @@ type memo_tables =
     boolean_mvbdu_extensional_description_of_variables_list: int list Hash_1.t;
 
     boolean_mvbdu_extensional_description_of_association_list: (int * int) list Hash_1.t;
-    boolean_mvbdu_extensional_description_of_range_list: (int * (int*int)) list
+    boolean_mvbdu_extensional_description_of_range_list: (int * (int option *int option)) list
         Hash_1.t;
 
 
@@ -120,7 +120,7 @@ type memo_tables =
 
 type mvbdu_dic = (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) D_mvbdu_skeleton.dictionary
 type association_list_dic  = (int List_sig.cell, int List_sig.list) D_Association_list_skeleton.dictionary
-type range_list_dic = ((int * int) List_sig.cell, (int * int) List_sig.list)
+type range_list_dic = ((int option * int option) List_sig.cell, (int option * int option) List_sig.list)
 D_Range_list_skeleton.dictionary
 type variables_list_dic = (unit List_sig.cell, unit List_sig.list) D_Variables_list_skeleton.dictionary
 type handler   = (memo_tables, mvbdu_dic, association_list_dic, range_list_dic,variables_list_dic, bool, int) Memo_sig.handler
@@ -180,7 +180,7 @@ let split_memo error handler =
     "Boolean_mvbdu_extensional_description_of_association_list:",
     x.boolean_mvbdu_extensional_description_of_association_list;
   ],
-  [ (* _ -> (int * (int * int)) list *)
+  [ (* _ -> (int * (int option * int option)) list *)
     "Boolean_mvbdu_extensional_description_of_range_list:",
     x.boolean_mvbdu_extensional_description_of_range_list;
   ],
@@ -1026,8 +1026,9 @@ let extensional_description_of_association_list _parameters error handler list =
        })
     error handler list
 
-let extensional_description_of_range_list _parameters error handler list =
-  List_algebra.extensional_with_asso
+let extensional_description_of_range_list _parameters (error:Exception.method_handler) (handler:Remanent_parameters_sig.parameters)
+    (list:(memo_tables, 'a, 'b, 'c, 'd, 'e, 'f) Memo_sig.handler) (x:((int option * int option)) List_sig.list) =
+  (List_algebra.extensional_with_asso
     (fun parameter error handler x ->
        let error, output =
          Hash_1.unsafe_get parameter error
@@ -1050,7 +1051,7 @@ let extensional_description_of_range_list _parameters error handler list =
                           boolean_mvbdu_extensional_description_of_range_list = memo
                         }
        })
-    error handler list
+    error handler list x (*: int * (int option * int option) list *))
 
 
 let rec variables_of_mvbdu parameters error handler mvbdu =
@@ -1348,7 +1349,12 @@ let print_hash8 p error log =
           let log = Remanent_parameters.get_logger a in
           let prefix = a.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
           let () = Loggers.fprintf log "%s" prefix in
-          let () = List.iter (fun (a,(b,c)) -> Loggers.fprintf log "%i,[%i,%i];" a b c) c in
+          let () = List.iter (fun (a,(b,c)) -> Loggers.fprintf log "%i,[%s,%s];" a
+                                 (match b with None ->
+                                    Remanent_parameters.get_minus_infinity_symbol p
+                                             | Some b -> string_of_int b)
+                                 (match c with None ->
+                                    Remanent_parameters.get_plus_infinity_symbol p | Some b -> string_of_int b)) c in
           let () = Loggers.print_newline log in b)
         log
 

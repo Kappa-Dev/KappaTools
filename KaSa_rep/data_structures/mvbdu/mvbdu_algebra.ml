@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 8th or March
-   * Last modification: Time-stamp: <Dec 31 2016>
+   * Last modification: Time-stamp: <Feb 22 2018>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -471,72 +471,112 @@ let rec redefine_range allocate memoized_fun error parameters handler mvbdu_inpu
                     (fun () -> mvbdu_input)
                     branch_true
                 in
-                let error,depreciated =
-                  (memoized_fun.Memo_sig.f parameters error).Memo_sig.build_false
-                    list.List_sig.variable
-                    (snd list.List_sig.association)
+                let error, (handler, enriched_branch_true) =
+                  match snd list.List_sig.association with
+                  | Some ub ->
+                    let error,depreciated =
+                      (memoized_fun.Memo_sig.f parameters
+                         error).Memo_sig.build_false
+                        list.List_sig.variable
+                        ub
+                    in
+                    let error,(handler,branch_false) =
+                      generic_zeroary
+                        allocate
+                        handler
+                        depreciated
+                        error
+                        parameters
+                    in
+                    let error,branch_false =
+                      downgrade
+                        parameters
+                        error
+                        __POS__
+                        (fun () -> mvbdu_input)
+                        branch_false
+                    in
+                    let error,depreciated =
+                      (memoized_fun.Memo_sig.f parameters error).Memo_sig.build_true
+                        list.List_sig.variable
+                        ub
+                        branch_false
+                        branch_true
+                    in
+                    let error,(handler,enriched_branch_true) =
+                      generic_zeroary
+                        allocate
+                        handler
+                        depreciated
+                        error
+                        parameters
+                    in
+                    let error,enriched_branch_true =
+                      downgrade
+                        parameters
+                        error
+                        __POS__
+                        (fun () -> mvbdu_input)
+                        enriched_branch_true
+                    in
+                    error, (handler, enriched_branch_true)
+                  | None ->
+                    error, (handler, branch_true)
                 in
-                let error,(handler,branch_false) =
-                  generic_zeroary
-                    allocate
-                    handler
-                    depreciated
-                    error
-                    parameters
-                in
-                let error,branch_false =
-                  downgrade
-                    parameters
-                    error
-                    __POS__
-                    (fun () -> mvbdu_input)
-                    branch_false
-                in
-                let error,depreciated =
-                  (memoized_fun.Memo_sig.f parameters error).Memo_sig.build_true
-                    list.List_sig.variable
-                    (snd list.List_sig.association)
-                    branch_false
-                    branch_true
-                in
-                let error,(handler,enriched_branch_true) =
-                  generic_zeroary
-                    allocate
-                    handler
-                    depreciated
-                    error
-                    parameters
-                in
-                let error,enriched_branch_true =
-                  downgrade
-                    parameters
-                    error
-                    __POS__
-                    (fun () -> mvbdu_input)
-                    enriched_branch_true
-                in
-                let error,depreciated =
-                  (memoized_fun.Memo_sig.f parameters error).Memo_sig.build_true
-                    list.List_sig.variable
-                    (fst list.List_sig.association - 1)
-                    enriched_branch_true
-                    branch_false
-                in
-                let error,(handler,rep) =
-                  generic_zeroary
-                    allocate
-                    handler
-                    depreciated
-                    error
-                    parameters
-                in
-                let error,rep =
-                  downgrade
-                    parameters
-                    error
-                    __POS__
-                    (fun () -> mvbdu_input)
-                    rep
+                let error, (handler, rep) =
+                  match
+                    fst list.List_sig.association
+                  with
+                  | Some lb ->
+                    let error,depreciated =
+                      (memoized_fun.Memo_sig.f parameters
+                         error).Memo_sig.build_false
+                        list.List_sig.variable
+                        lb
+                    in
+                    let error,(handler,branch_false) =
+                      generic_zeroary
+                        allocate
+                        handler
+                        depreciated
+                        error
+                        parameters
+                    in
+                    let error,branch_false =
+                      downgrade
+                        parameters
+                        error
+                        __POS__
+                        (fun () -> mvbdu_input)
+                        branch_false
+                    in
+                    let error,depreciated =
+                      (memoized_fun.Memo_sig.f parameters
+                         error).Memo_sig.build_true
+                        list.List_sig.variable
+                        (lb - 1)
+                        enriched_branch_true
+                        branch_false
+                    in
+                    let error, (handler, rep) =
+                      generic_zeroary
+                        allocate
+                        handler
+                        depreciated
+                        error
+                        parameters
+                    in
+                    let error, rep =
+                      downgrade
+                        parameters
+                        error
+                        __POS__
+                        (fun () -> mvbdu_input)
+                        rep
+                    in
+                    error, (handler, rep)
+                  | None ->
+                    error, (handler, enriched_branch_true)
                 in
                 redefine_range
                   allocate

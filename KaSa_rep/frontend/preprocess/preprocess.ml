@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Feb 18 2018>
+   * Last modification: Time-stamp: <Feb 22 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -362,7 +362,7 @@ let translate_agent_sig
   }:Cckappa_sig.agent_sig)
 
 let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
-    (kasim_id:Ckappa_sig.c_agent_id) agent bond_list question_marks =
+    (kasim_id:Ckappa_sig.c_agent_id) agent bond_list question_marks delta =
   let error, (bool, output) =
     Ckappa_sig.Dictionary_of_agents.allocate_bool
       parameters
@@ -379,9 +379,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
       Exception.warn parameters error __POS__ Exit
         (Cckappa_sig.Unknown_agent (agent.Ckappa_sig.ag_nme, kasim_id))
     in
-    error, bond_list, question_marks, ag
+    error, bond_list, question_marks, delta, ag
   | true, _ ->
-    error, bond_list, question_marks,
+    error, bond_list, question_marks, delta,
     Cckappa_sig.Unknown_agent (agent.Ckappa_sig.ag_nme, kasim_id)
   | _ , Some (agent_name, _, _, _) ->
     begin
@@ -400,21 +400,91 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
       in
       let error, c_interface = error, Ckappa_sig.Site_map_and_set.Map.empty in
       let rec aux interface error bond_list
-          c_interface question_marks dead_sites dead_state_sites dead_link_sites =
+          c_interface question_marks dead_sites dead_state_sites dead_link_sites delta =
         match interface with
         | Ckappa_sig.EMPTY_INTF -> error,
                                    bond_list, c_interface, question_marks,
-                                   dead_sites, dead_state_sites, dead_link_sites
+                                   dead_sites, dead_state_sites, dead_link_sites,
+                                   delta
         | Ckappa_sig.COUNTER_SEP (counter, interface) ->
-          let error, () =
-            Exception.warn parameters error
-              ~message:"counters todo"
-              __POS__ Exit ()
+          begin
+          let error, (c_interface, dead_sites, _dead_states_sites, delta)  =
+            let error, (bool, output) =
+              Ckappa_sig.Dictionary_of_sites.allocate_bool
+                parameters
+                error
+                Ckappa_sig.compare_unit_site_name
+                (Ckappa_sig.Counter counter.Ckappa_sig.count_nme)
+                ()
+                Misc_sa.const_unit
+                site_dic
+            in
+            match bool, output with
+            | _, None ->
+              Exception.warn parameters error __POS__
+                ~message:(
+                  agent.Ckappa_sig.ag_nme ^ " " ^ counter.Ckappa_sig.count_nme)
+                Exit (c_interface, dead_sites, dead_state_sites, delta)
+            | true, _ ->
+              let error, dead_sites =
+                Cckappa_sig.KaSim_Site_map_and_set.Set.add
+                  parameters
+                  error
+                  (Ckappa_sig.Counter counter.Ckappa_sig.count_nme)
+                  dead_sites
+              in
+              error, (c_interface, dead_sites, dead_state_sites, delta)
+            | _, Some (site_name, _, _, _) ->
+              begin
+                let error, delta =
+                  match counter.Ckappa_sig.count_delta with
+                  | None | Some 0 -> error, delta
+                  | Some n ->
+                    Ckappa_sig.AgentsSite_map_and_set.Map.add
+                      parameters error
+                      (k,agent_name,site_name) n delta
+                in
+                let error,c_interface =
+                  Ckappa_sig.Site_map_and_set.Map.add
+                    parameters
+                    error
+                    site_name
+                    {
+                      Cckappa_sig.site_name = site_name ;
+                      Cckappa_sig.site_free = None;
+                      Cckappa_sig.site_position = Locality.dummy ;
+                      Cckappa_sig.site_state =
+                        begin
+                          match counter.Ckappa_sig.count_test with
+                          | Some (Ckappa_sig.CEQ i) ->
+                            {
+                              Cckappa_sig.min = Some (Ckappa_sig.state_index_of_int i);
+                              Cckappa_sig.max = Some
+                                  (Ckappa_sig.state_index_of_int i)
+                            }
+                          | Some (Ckappa_sig.CGTE i) ->
+                            {
+                              Cckappa_sig.min = Some (Ckappa_sig.state_index_of_int i);
+                              Cckappa_sig.max = None
+                            }
+                          | None | Some Ckappa_sig.UNKNOWN
+                          | Some (Ckappa_sig.CVAR _) ->
+                            {
+                              Cckappa_sig.min = None;
+                              Cckappa_sig.max = None
+                            }
+                        end
+                    }
+                    c_interface
+                in
+                error, (c_interface, dead_sites, dead_state_sites, delta)
+              end
           in
           error,
-                                     bond_list, c_interface, question_marks,
-                                     dead_sites, dead_state_sites, dead_link_sites
-
+          bond_list, c_interface, question_marks,
+          dead_sites, dead_state_sites, dead_link_sites,
+          delta
+        end
         | Ckappa_sig.PORT_SEP (port, interface) ->
           let error, (c_interface, dead_sites, _dead_states_sites)  =
             match port.Ckappa_sig.port_int with
@@ -499,8 +569,8 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                             Cckappa_sig.site_free = None ;
                             Cckappa_sig.site_state =
                               {
-                                Cckappa_sig.min = (internal:Ckappa_sig.c_state) ;
-                                Cckappa_sig.max = internal
+                                Cckappa_sig.min = Some (internal:Ckappa_sig.c_state) ;
+                                Cckappa_sig.max = Some internal
                               };
                           } c_interface in
                       let error =
@@ -572,8 +642,8 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                           Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                           Cckappa_sig.site_position = Locality.dummy ;
                           Cckappa_sig.site_state =
-                            {Cckappa_sig.min = state_min;
-                             Cckappa_sig.max = max}
+                            {Cckappa_sig.min = Some state_min;
+                             Cckappa_sig.max = Some max}
                         }
                         c_interface
                     in
@@ -612,8 +682,11 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         Cckappa_sig.site_position = Locality.dummy ;
                         Cckappa_sig.site_free = port.Ckappa_sig.port_free ;
                         Cckappa_sig.site_state =
-                          {Cckappa_sig.min = Ckappa_sig.dummy_state_index ;
-                           Cckappa_sig.max = Ckappa_sig.dummy_state_index }
+                          {Cckappa_sig.min =
+                             Some (Ckappa_sig.dummy_state_index) ;
+                           Cckappa_sig.max =
+                             Some (Ckappa_sig.dummy_state_index)
+                          }
                       }
                       c_interface
                   in
@@ -708,8 +781,11 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                               Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                               Cckappa_sig.site_position = Locality.dummy ;
                               Cckappa_sig.site_state =
-                                {Cckappa_sig.min = state_min ;
-                                 Cckappa_sig.max = max}
+                                {Cckappa_sig.min =
+                                   Some state_min ;
+                                 Cckappa_sig.max =
+                                   Some max
+                                }
                             }
                             c_interface
                         in
@@ -858,7 +934,12 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                                   Cckappa_sig.site_name = site_name ;
                                   Cckappa_sig.site_position = Locality.dummy ;
                                   Cckappa_sig.site_state =
-                                    {Cckappa_sig.min = i; Cckappa_sig.max = i}
+                                    {
+                                      Cckappa_sig.min =
+                                       Some i;
+                                      Cckappa_sig.max =
+                                       Some i
+                                    }
                                 }
                                 c_interface
                             in
@@ -988,7 +1069,12 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                           Cckappa_sig.site_name = site_name ;
                           Cckappa_sig.site_position = Locality.dummy ;
                           Cckappa_sig.site_state =
-                            {Cckappa_sig.min = i; Cckappa_sig.max = i}
+                            {
+                              Cckappa_sig.min =
+                                Some i;
+                              Cckappa_sig.max =
+                                Some i
+                            }
                         }
                         c_interface
                     in
@@ -1003,18 +1089,19 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
               end
 
           in aux interface error bond_list c_interface
-            question_marks dead_sites dead_state_sites dead_link_sites
+            question_marks dead_sites dead_state_sites dead_link_sites delta
       in
       let deadsites =  Cckappa_sig.KaSim_Site_map_and_set.Set.empty in
       let deadstate = Ckappa_sig.Site_map_and_set.Map.empty in
       let deadlink = Ckappa_sig.Site_map_and_set.Map.empty in
-      let error,bond_list,c_interface,question_marks, dead_sites, dead_state_sites,dead_link_sites =
+      let error,bond_list,c_interface,question_marks, dead_sites, dead_state_sites,dead_link_sites,delta =
         aux
           agent.Ckappa_sig.ag_intf
           error
-          bond_list c_interface question_marks deadsites deadstate deadlink
+          bond_list c_interface
+          question_marks deadsites deadstate deadlink delta
       in
-      error,bond_list,question_marks,
+      error,bond_list,question_marks,delta,
       if deadlink == dead_link_sites &&
          deadstate==dead_state_sites && deadsites == dead_sites
       then Cckappa_sig.Agent
@@ -1043,11 +1130,11 @@ let translate_mixture parameters error handler mixture =
   in
   let size = length_mixture mixture in
   let rec aux mixture error (k:Ckappa_sig.c_agent_id) (kasim_id:Ckappa_sig.c_agent_id)
-      bond_list questionmarks dot_list plus_list array =
+      bond_list questionmarks dot_list plus_list array delta =
     match mixture with
-    | Ckappa_sig.EMPTY_MIX -> error,bond_list,questionmarks,dot_list,plus_list,array
+    | Ckappa_sig.EMPTY_MIX -> error,bond_list,questionmarks,dot_list,plus_list,array,delta
     | Ckappa_sig.COMMA(agent,mixture) ->
-      let error,bond_list,questionmarks,view =
+      let error,bond_list,questionmarks,delta,view =
         translate_view
           parameters
           error
@@ -1057,6 +1144,7 @@ let translate_mixture parameters error handler mixture =
           agent
           bond_list
           questionmarks
+          delta
       in
       let error,array =
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
@@ -1076,9 +1164,10 @@ let translate_mixture parameters error handler mixture =
         dot_list
         plus_list
         array
+        delta
     | Ckappa_sig.DOT(id, agent, mixture) ->
       let dot_list = (k, id) :: dot_list in
-      let error,bond_list,questionmarks, view =
+      let error,bond_list,questionmarks, delta, view =
         translate_view
           parameters
           error
@@ -1088,6 +1177,7 @@ let translate_mixture parameters error handler mixture =
           agent
           bond_list
           questionmarks
+          delta
       in
       let error, array =
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
@@ -1105,9 +1195,10 @@ let translate_mixture parameters error handler mixture =
         dot_list
         plus_list
         array
+        delta
     | Ckappa_sig.PLUS(id, agent, mixture) ->
       let plus_list = (k, id) :: plus_list in
-      let error,bond_list,questionmarks,view =
+      let error,bond_list,questionmarks,delta,view =
         translate_view
           parameters
           error
@@ -1117,6 +1208,7 @@ let translate_mixture parameters error handler mixture =
           agent
           bond_list
           questionmarks
+          delta
       in
       let error,array =
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
@@ -1134,6 +1226,7 @@ let translate_mixture parameters error handler mixture =
         dot_list
         plus_list
         array
+        delta
     | Ckappa_sig.SKIP(mixture) ->
       let error,array =
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
@@ -1147,7 +1240,7 @@ let translate_mixture parameters error handler mixture =
         (Ckappa_sig.next_agent_id k)
         (if syntax_version = Ast.V3 then kasim_id
          else Ckappa_sig.next_agent_id kasim_id)
-        bond_list questionmarks dot_list plus_list array
+        bond_list questionmarks dot_list plus_list array delta
   in
   let error,array =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
@@ -1161,7 +1254,8 @@ let translate_mixture parameters error handler mixture =
       error
       size
   in
-  let error,bond_list,questionmarks,dot_list,plus_list,array =
+  let delta = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
+  let error,bond_list,questionmarks,dot_list,plus_list,array,delta =
     aux
       mixture
       error
@@ -1172,6 +1266,7 @@ let translate_mixture parameters error handler mixture =
       []
       []
       array
+      delta
   in
   error,
   {
@@ -1179,7 +1274,7 @@ let translate_mixture parameters error handler mixture =
     Cckappa_sig.dot = dot_list ;
     Cckappa_sig.plus = plus_list ;
     Cckappa_sig.bonds = bond_list ;
-    Cckappa_sig.c_mixture = mixture },questionmarks
+    Cckappa_sig.c_mixture = mixture },questionmarks,delta
 
 let clean_agent = Cckappa_sig.map_agent (fun _ -> ())
 
@@ -1376,16 +1471,163 @@ let check_freeness parameters lhs source (error, half_release_set) =
 let translate_rule parameters error handler rule =
   let label,(rule,position) = rule in
   let direction = rule.Ckappa_sig.interprete_delta in
-  let error,c_rule_lhs,question_marks_l = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
-  let error,c_rule_rhs,question_marks_r = translate_mixture parameters error handler rule.Ckappa_sig.rhs in
+  let error,c_rule_lhs,question_marks_l,delta_l = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
+  let error,c_rule_rhs,question_marks_r,delta_r = translate_mixture parameters error handler rule.Ckappa_sig.rhs in
+  let error, delta =
+    Ckappa_sig.AgentsSite_map_and_set.Map.map2
+      parameters error
+      (fun parameters error i -> error, i)
+      (fun parameters error i -> error, i)
+      (fun parameters error i j -> error,i+j)
+      delta_l
+      delta_r
+  in
   let error,c_rule_lhs = clean_question_marks parameters error question_marks_r c_rule_lhs in (* remove ? in the lhs when they occur in the rhs (according to the BNF, they have to occur in the lhs as well *)
   let error,filtered_question_marks_l = filter parameters error question_marks_l c_rule_rhs in
   let error,c_rule_lhs = clean_question_marks parameters error filtered_question_marks_l c_rule_lhs in (* remove ? that occur in the lhs in degraded agent *)
   let error,c_rule_rhs = clean_question_marks parameters error question_marks_r c_rule_rhs in (* remove ? that occurs in the rhs *)
-  let error,size = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.dimension parameters error c_rule_lhs.Cckappa_sig.views in
+  let error, counter_precondition =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameters error
+      (fun parameters error agent_id view counter_precondition ->
+         match view with
+         | Cckappa_sig.Agent ag  ->
+           let agent_type = ag.Cckappa_sig.agent_name in
+           Ckappa_sig.Site_map_and_set.Map.fold
+             (fun site port (error, counter_precondition) ->
+                let error, bool =
+                  Handler.is_counter parameters error
+                    handler
+                    agent_type site
+                in
+                if bool
+                then
+                  Ckappa_sig.AgentsSite_map_and_set.Map.add
+                    parameters error
+                    (agent_id,agent_type,site)
+                    port.Cckappa_sig.site_state
+                    counter_precondition
+                else
+                error, counter_precondition)
+             ag.Cckappa_sig.agent_interface
+             (error, counter_precondition)
+         | Cckappa_sig.Dead_agent _
+         | Cckappa_sig.Ghost
+         | Cckappa_sig.Unknown_agent _
+           ->
+           error, counter_precondition
+      )
+      c_rule_lhs.Cckappa_sig.views
+      Ckappa_sig.AgentsSite_map_and_set.Map.empty
+  in
+  let add1 delta b =
+    match b with
+    | None -> None
+    | Some i -> Some
+                  (Ckappa_sig.state_index_of_int
+                     ((Ckappa_sig.int_of_state_index i)+delta))
+  in
+  let add delta interval =
+    {
+      Cckappa_sig.min =
+        add1 delta interval.Cckappa_sig.min;
+      Cckappa_sig.max =
+        add1 delta interval.Cckappa_sig.max
+    }
+  in
+  let full_interval =
+    {Cckappa_sig.min = None;
+     Cckappa_sig.max = None}
+  in
+  let error, counter_map =
+    Ckappa_sig.AgentsSite_map_and_set.Map.map2
+      parameters error
+      (fun _parameters error i -> error,(i,i,0))
+      (fun _parameters error (i:int) -> error,(full_interval,full_interval,i))
+      (fun _parameters error i j -> error,(i,add j i,j))
+      counter_precondition
+      delta
+  in
+  let overwrite_counter_test parameters error site i c_mixture =
+    let agent_id, _, site_name = site in
+    let error, view =
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+        parameters error
+        agent_id
+        c_mixture.Cckappa_sig.views
+    in
+    match view
+    with
+    | Some Cckappa_sig.Agent ag ->
+      let error, old_port =
+        Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
+          parameters error
+          {
+            Cckappa_sig.site_name=site_name;
+            Cckappa_sig.site_position=Locality.dummy;
+            Cckappa_sig.site_free=None;
+            Cckappa_sig.site_state=
+              {
+                Cckappa_sig.min=None;
+                Cckappa_sig.max=None
+              }
+          }
+          site_name
+          ag.Cckappa_sig.agent_interface
+      in
+      let new_port =
+        {old_port with Cckappa_sig.site_state = i}
+      in
+      let error, new_interface =
+        Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+          parameters error site_name new_port ag.Cckappa_sig.agent_interface
+      in
+      let new_agent = {ag with Cckappa_sig.agent_interface = new_interface} in
+      let error, views =
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+          parameters error
+          agent_id
+          (Cckappa_sig.Agent new_agent)
+          c_mixture.Cckappa_sig.views
+      in
+      error, {c_mixture with Cckappa_sig.views = views}
+    | Some (Cckappa_sig.Ghost
+    | Cckappa_sig.Unknown_agent _
+           | Cckappa_sig.Dead_agent _) | None ->
+      Exception.warn parameters error __POS__ Exit c_mixture
+  in
+  let error, (c_rule_lhs, c_rule_rhs, translate) =
+    Ckappa_sig.AgentsSite_map_and_set.Map.fold
+      (fun
+        site (i,j,delta)
+        (error, (c_rule_lhs, c_rule_rhs, translate)) ->
+        let error, c_rule_lhs =
+          overwrite_counter_test parameters error site i c_rule_lhs
+        in
+        let error, c_rule_rhs =
+          overwrite_counter_test parameters error site j c_rule_rhs
+        in
+        let (agent_id,agent_type,site_name) = site in
+        error,
+        (c_rule_lhs,
+         c_rule_rhs,
+         ({Cckappa_sig.agent_type=agent_type;
+           Cckappa_sig.site=site_name;
+          Cckappa_sig.agent_index=agent_id},
+          {
+            Cckappa_sig.precondition=i;
+            Cckappa_sig.postcondition=j;
+            Cckappa_sig.increment=delta})::translate)
+      )
+      counter_map
+      (error, (c_rule_lhs, c_rule_rhs, []))
+  in
+  let error,size =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.dimension parameters error c_rule_lhs.Cckappa_sig.views in
   let error,direct = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error size in
   let error,reverse = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error size in
   let actions = Cckappa_sig.empty_actions in
+  let actions = {actions with Cckappa_sig.translate = translate } in
   let half_release_set = Cckappa_sig.Address_map_and_set.Set.empty in
   let full_release_set = Cckappa_sig.Address_map_and_set.Set.empty in
   let rec aux_agent (k:Ckappa_sig.c_agent_id)
@@ -1761,12 +2003,12 @@ let refine_rule parameters error handler rule =
 
 let lift_forbidding_question_marks parameters handler =
   (fun error x ->
-     let a,b,_ = translate_mixture parameters error handler  x
+     let a,b,_,_ = translate_mixture parameters error handler  x
      in a,b)
 
 let lift_allowing_question_marks parameters handler =
   (fun error x ->
-     let a,b,c = translate_mixture parameters error handler x in
+     let a,b,c,_ = translate_mixture parameters error handler x in
      clean_question_marks parameters a c b)
 
 
@@ -1782,7 +2024,7 @@ let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
 let translate_pert parameters error handler alg (mixture,pos') =
   (*  let mixture = c_mixture.Cckappa_sig.c_mixture in*)
-  let error,c_mixture,_ = translate_mixture parameters error handler mixture in
+  let error,c_mixture,_,_ = translate_mixture parameters error handler mixture in
   let error, c_alg = alg_with_pos_map (lift_allowing_question_marks parameters handler) error alg in
   translate_pert_init error alg c_alg mixture c_mixture pos'
 
@@ -1795,7 +2037,7 @@ let translate_init parameters error handler ((alg,pos_alg),init_t) =
     init_t
     with
     | Ast.INIT_MIX (mixture,pos') ->
-    let error,c_mixture,_ = translate_mixture parameters error handler mixture in
+    let error,c_mixture,_,_ = translate_mixture parameters error handler mixture in
     translate_pert_init error
       (alg,pos_alg) (c_alg,pos_alg) mixture c_mixture pos'
     | Ast.INIT_TOK _ -> (*TO DO*)

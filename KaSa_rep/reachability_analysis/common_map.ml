@@ -307,7 +307,7 @@ let collect_site_map_for_views ?init:(init=false) parameters handler error agent
         Ckappa_sig.Site_map_and_set.Map.add
           parameters error
           k
-          (Ckappa_sig.dummy_state_index ,Ckappa_sig.dummy_state_index)
+          (Some Ckappa_sig.dummy_state_index ,Some Ckappa_sig.dummy_state_index)
           output
       in
       aux (Ckappa_sig.pred_site_name k) output

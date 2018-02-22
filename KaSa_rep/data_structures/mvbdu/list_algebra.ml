@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Feb 21 2018>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -12,7 +12,9 @@
    * en Automatique.  All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let build_reversed_sorted_list_aux allocate parameters error handler list already =
+let build_reversed_sorted_list_aux
+    allocate
+    parameters error handler list already =
   List.fold_left
     (fun (error,(handler,already)) (var,asso) ->
        let error,output =
@@ -71,7 +73,6 @@ let build_sorted_list allocate parameters error handler list =
 let build_list allocate parameters error handler list =
   let sort (i,_) (j,_) = - (compare i j) in
   build_reversed_sorted_list allocate error parameters handler (List.sort sort list)
-
 
 let rec print_cell parameter cell =
   match cell with

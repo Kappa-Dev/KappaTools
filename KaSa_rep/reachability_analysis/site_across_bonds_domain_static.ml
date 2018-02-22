@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Apr 08 2017>
+   * Last modification: Time-stamp: <Feb 22 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -513,10 +513,10 @@ let collect_potential_tuple_pair_init
     (fun (x, y) (error, handler, store_result) ->
        let (agent_type, site_type1, site_type2, state1, pair_of_state2) = x in
        let (agent_type', site_type1', site_type2', state1', pair_of_state2') = y in
-         let pair_list =
-           [(Ckappa_sig.fst_site, pair_of_state2);
-            (Ckappa_sig.snd_site, pair_of_state2')]
-         in
+       let pair_list =
+         [(Ckappa_sig.fst_site, pair_of_state2);
+          (Ckappa_sig.snd_site, pair_of_state2')]
+       in
          let error, handler, mvbdu =
            Ckappa_sig.Views_bdu.mvbdu_of_range_list
              parameters

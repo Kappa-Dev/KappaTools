@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Feb 18 2018>
+ * Last modification: Time-stamp: <Feb 20 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -69,6 +69,12 @@ val string_of_site_name : c_site_name -> string
 val state_index_of_int: int -> c_state
 val int_of_state_index: c_state -> int
 val string_of_state_index : c_state -> string
+val string_of_state_index_option_min :
+  Remanent_parameters_sig.parameters ->
+  c_state option -> string
+val string_of_state_index_option_max :
+  Remanent_parameters_sig.parameters ->
+  c_state option -> string
 
 val int_of_rule_id : c_rule_id -> int
 val rule_id_of_int : int -> c_rule_id
@@ -92,6 +98,8 @@ val compare_agent_id: c_agent_id -> c_agent_id -> int
 val compare_rule_id: c_rule_id -> c_rule_id -> int
 val compare_site_name: c_site_name -> c_site_name -> int
 val compare_state_index: c_state -> c_state -> int
+val compare_state_index_option_min: c_state option -> c_state option -> int
+val compare_state_index_option_max: c_state option -> c_state option -> int
 val compare_agent_name: c_agent_name -> c_agent_name -> int
 
 val get_agent_shape: c_site_name -> Remanent_parameters_sig.parameters -> string
@@ -309,7 +317,7 @@ type kappa_handler =
         Int_storage.Nearly_inf_Imperatif.t
   }
 
-type 'a interval  = {min:'a; max:'a}
+type 'a interval  = {min:'a option; max:'a option}
 
 type c_port =
   {
@@ -557,7 +565,7 @@ module AgentsSite_map_and_set: Map_wrapper.S_with_logs
 module AgentsSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_id * c_agent_name * c_site_name * c_state
 
-type pair_of_states = c_state * c_state
+type pair_of_states = c_state option * c_state option
 
 module AgentsSitePState_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_id * c_agent_name * c_site_name * pair_of_states

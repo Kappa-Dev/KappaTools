@@ -191,6 +191,15 @@ let string_of_site_name (a: c_site_name) : string = string_of_int a
 let state_index_of_int (a:int) : c_state = a
 let int_of_state_index (a:c_state) : int = a
 let string_of_state_index (a:c_state) : string = string_of_int a
+let string_of_state_index_option_min parameters a =
+  match a with
+  | Some a -> string_of_state_index a
+  | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+let string_of_state_index_option_max parameters a =
+  match a with
+  | Some a -> string_of_state_index a
+  | None -> Remanent_parameters.get_plus_infinity_symbol parameters
+
 
 let int_of_rule_id (a: c_rule_id) : int = a
 let rule_id_of_int (a: int) : c_rule_id = a
@@ -919,7 +928,7 @@ type kappa_handler =
         Int_storage.Nearly_inf_Imperatif.t
   }
 
-type 'a interval  = {min:'a; max:'a}
+type 'a interval  = {min:'a option; max:'a option}
 
 type c_port =
   {
@@ -1050,6 +1059,21 @@ let compare_agent_id = compare
 let compare_site_name = compare
 let compare_state_index = compare
 let compare_agent_name = compare
+
+let compare_state_index_option_min a b =
+  match a,b with
+  | None, None -> 0
+  | None, _ -> -1
+  | _, None -> 1
+  | Some a, Some b -> compare_state_index a b
+
+let compare_state_index_option_max a b =
+  match a,b with
+  | None, None -> 0
+  | None, _ -> 1
+  | _, None -> -1
+  | Some a, Some b -> compare_state_index a b
+
 
 let compare_unit_agent_site _ _ = 0
 
@@ -1352,7 +1376,7 @@ module AgentsSiteState_map_and_set =
          let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d
        end))
 
-type pair_of_states = c_state * c_state
+type pair_of_states = c_state option * c_state option
 
 module AgentsSitePState_map_and_set =
   Map_wrapper.Make

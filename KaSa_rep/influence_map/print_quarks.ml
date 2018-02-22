@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 8th 2011.
- * Last modification: Time-stamp: <Aug 17 2017>
+ * Last modification: Time-stamp: <Feb 22 2018>
  * *
  * Pretty printing of influence map
  *
@@ -15,9 +15,19 @@
 let trace = false
 let local_trace = false
 
-let string_of_port port =
-  "["^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";"^
-  (string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
+let string_of_int_option_min parameters error a =
+  match a with
+  | Some a -> string_of_int a
+  | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+
+let string_of_int_option_max parameters error a  =
+  match a with
+  | Some a -> string_of_int a
+  | None -> Remanent_parameters.get_plus_infinity_symbol parameters
+
+let string_of_port parameters error port =
+  "["^(string_of_int_option_min parameters error  port.Cckappa_sig.site_state.Cckappa_sig.min)^";"^
+  (string_of_int_option_max parameters error port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
 
 let string_of_rule_var
     parameters error handler compilation

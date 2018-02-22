@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Jul 31 2017>
+   * Last modification: Time-stamp: <Feb 20 2018>
    *
    * Abstract domain to record live rules
    *
@@ -264,7 +264,13 @@ let may_be_modified parameters error rule path =
            let range = interval.Cckappa_sig.site_state in
            if range.Cckappa_sig.min = range.Cckappa_sig.max
            then
-             error,range.Cckappa_sig.min::list
+             match range.Cckappa_sig.min with
+             | None ->
+             Exception.warn
+               parameters error __POS__
+               Exit list
+             | Some a ->
+             error,a::list
            else
              Exception.warn
                parameters error __POS__
@@ -288,9 +294,14 @@ let may_get_free_by_side_effect parameters error static _precondition rule_id
   error, List.exists (fun (a,_) -> a=site_name) list
 
 let min_not_free interv =
-  if interv.Cckappa_sig.min = Ckappa_sig.dummy_state_index
-  then Ckappa_sig.dummy_state_index_1
-  else interv.Cckappa_sig.min
+  match interv.Cckappa_sig.min
+  with
+  | None -> Ckappa_sig.dummy_state_index_1
+  | Some min ->
+    if min = Ckappa_sig.dummy_state_index
+    then Ckappa_sig.dummy_state_index_1
+    else
+      min
 
 let check_state_compatibility parameters error kappa_handler
     cc
@@ -318,10 +329,17 @@ let check_state_compatibility parameters error kappa_handler
       match interval
       with
       | None -> error, true
+      | Some i when i.Cckappa_sig.site_state.Cckappa_sig.min = None ||
+                    i.Cckappa_sig.site_state.Cckappa_sig.max = None
+        -> Exception.warn parameters error __POS__ Exit true
       | Some i ->
         let interv = i.Cckappa_sig.site_state in
+        match interv.Cckappa_sig.min, interv.Cckappa_sig.max with
+        | None, _ | _, None ->
+          Exception.warn parameters error __POS__ Exit true
+        | Some min, Some max ->
         let rec aux error k =
-          if Ckappa_sig.compare_state_index k interv.Cckappa_sig.max > 0
+          if Ckappa_sig.compare_state_index k max > 0
           then
             error, false
           else
@@ -467,13 +485,27 @@ let rec post_condition error rule_id r precondition static dynamic path  =
 
                 | Some interval ->
                   let interval = interval.Cckappa_sig.site_state in
+                  let error, min =
+                    match interval.Cckappa_sig.min with
+                    | Some a -> error, a
+                    | None ->
+                      Exception.warn parameters error __POS__ Exit
+                        Ckappa_sig.dummy_state_index
+                  in
+                  let error, max =
+                    match interval.Cckappa_sig.max with
+                    | Some a -> error, a
+                    | None ->
+                      Exception.warn parameters error __POS__ Exit
+                        Ckappa_sig.dummy_state_index
+                  in
                   let list =
                     let rec aux k output =
-                      if Ckappa_sig.compare_state_index k interval.Cckappa_sig.min < 0
+                      if Ckappa_sig.compare_state_index k min < 0
                       then output
                       else aux (Ckappa_sig.pred_state_index k) (k::output)
                     in
-                    aux interval.Cckappa_sig.max []
+                    aux max []
                   in
                   error, (Usual_domains.Val list, None)
               end

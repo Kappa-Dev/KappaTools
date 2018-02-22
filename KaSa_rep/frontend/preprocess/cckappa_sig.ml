@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Feb 18 2018>
+  * Last modification: Time-stamp: <Feb 22 2018>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -34,7 +34,7 @@ type kappa_handler =
           Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t;
   }
 
-type 'a interval = {min:'a; max:'a}
+type 'a interval = {min:'a option; max:'a option}
 
 type 'state port =
   {
@@ -60,6 +60,8 @@ type site_address =
     site        : Ckappa_sig.c_site_name;
     agent_type  : Ckappa_sig.c_agent_name
   }
+
+type delta = int
 
 module Address_map_and_set =
   Map_wrapper.Make
@@ -125,13 +127,22 @@ type enriched_variable =
     e_variable : (mixture,string) Ast.variable_def
   }
 
+type counter_action =
+  {
+    precondition:Ckappa_sig.c_state interval;
+    postcondition: Ckappa_sig.c_state interval;
+    increment: delta
+  }
+
 type actions =
   {
     creation   : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name) list;
     remove     : (Ckappa_sig.c_agent_id * unit interface proper_agent * Ckappa_sig.c_site_name list) list;
     release    : bond list;
     bind       : bond list;
-    half_break : (site_address * (Ckappa_sig.c_state interval option)) list
+    half_break : (site_address * (Ckappa_sig.c_state interval option)) list ;
+    translate : (site_address * counter_action) list ;
+    binder: (string * site_address) list;
   }
 
 type rule =
@@ -202,7 +213,9 @@ let empty_actions =
     remove     = [];
     release    = [];
     bind       = [];
-    half_break = []
+    half_break = [];
+    translate = [];
+    binder = [];
   }
 
 let dummy_init parameters error =
@@ -669,8 +682,8 @@ let join_mixture parameters error f g mixture1 mixture2 =
 let empty_port site =
   let empty_interval =
     {
-      min = Ckappa_sig.dummy_state_index;
-      max = Ckappa_sig.dummy_state_index
+      min = Some Ckappa_sig.dummy_state_index;
+      max = Some Ckappa_sig.dummy_state_index
     }
   in
   let empty_port =
@@ -700,18 +713,35 @@ let max_state_index a b =
   then b else a
 
 let min_state_index a b =
-  if Ckappa_sig.compare_state_index a b <= 0
+    if Ckappa_sig.compare_state_index a b <= 0
+    then a else b
+
+let min_state_index_option_min a b =
+  if Ckappa_sig.compare_state_index_option_min a b <= 0
   then a else b
+
+let max_state_index_option_max a b =
+    if Ckappa_sig.compare_state_index_option_max a b <= 0
+    then b else a
+
+let max_state_index_option_min a b =
+  if Ckappa_sig.compare_state_index_option_min a b <= 0
+  then b else a
+
+let min_state_index_option_max a b =
+        if Ckappa_sig.compare_state_index_option_max a b <= 0
+        then a else b
+
 
 let add_port parameters error site state_min state_max port =
   let old_min = port.site_state.min in
   let old_max = port.site_state.max in
-  if Ckappa_sig.compare_state_index state_min old_max <= 0
+  if Ckappa_sig.compare_state_index_option_min state_min old_min <= 0
      ||
-     Ckappa_sig.compare_state_index state_min old_max <= 0
+     Ckappa_sig.compare_state_index_option_max old_max state_max <= 0
   then
-    let new_min = max_state_index state_min old_min in
-    let new_max = min_state_index state_max old_max in
+    let new_min = max_state_index_option_min state_min old_min in
+    let new_max = min_state_index_option_max state_max old_max in
     if new_min = old_min && new_max = old_max
     then
       error, port

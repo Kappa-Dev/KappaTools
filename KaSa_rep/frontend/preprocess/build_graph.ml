@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: November, the 12th of 2017
-  * Last modification: Time-stamp: <Nov 12 2017>
+  * Last modification: Time-stamp: <Feb 22 2018>
   * *
   * Primitives to build site graph in Cckappa
   *
@@ -54,8 +54,8 @@ let empty_port =
     Cckappa_sig.site_free = None ;
     Cckappa_sig.site_state =
       {
-        Cckappa_sig.min= Ckappa_sig.dummy_state_index ;
-        Cckappa_sig.max = Ckappa_sig.dummy_state_index
+        Cckappa_sig.min= Some Ckappa_sig.dummy_state_index ;
+        Cckappa_sig.max = Some Ckappa_sig.dummy_state_index
       }}
 
 let add_site parameters error handler cckappa_only agent_id site_name mixture =
@@ -92,8 +92,8 @@ let add_site parameters error handler cckappa_only agent_id site_name mixture =
         Cckappa_sig.site_free = None ;
         Cckappa_sig.site_state =
           {
-            Cckappa_sig.min= Ckappa_sig.dummy_state_index ;
-            Cckappa_sig.max = max_state_index
+            Cckappa_sig.min= Some Ckappa_sig.dummy_state_index ;
+            Cckappa_sig.max = Some max_state_index
           }}
     in
     let error', interface =
@@ -146,7 +146,7 @@ let add_state parameters error agent_id site_name state mixture =
         site_name
         ag.Cckappa_sig.agent_interface
     in
-    let site = {site with Cckappa_sig.site_state = {Cckappa_sig.min=state; Cckappa_sig.max=state}}
+    let site = {site with Cckappa_sig.site_state = {Cckappa_sig.min=Some state; Cckappa_sig.max=Some state}}
     in
     let error', agent_interface =
       Ckappa_sig.Site_map_and_set.Map.overwrite
