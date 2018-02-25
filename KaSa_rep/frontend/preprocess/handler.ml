@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Feb 18 2018>
+   * Last modification: Time-stamp: <Feb 25 2018>
    * *
    * Primitives to use a kappa handler
    *
@@ -542,33 +542,40 @@ let print_state_fully_deciphered parameter error handler_kappa state =
     (Remanent_parameters.get_close_binding_state parameter)
 
 let string_of_state_gen print_state parameter error handler_kappa agent_name site_name state =
-  let error, state_dic =
-    match
-      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-        parameter
-        error
-        (agent_name, site_name)
-        handler_kappa.Cckappa_sig.states_dic
-    with
-    | error, None ->
-      Exception.warn parameter error __POS__ Exit
-        (Ckappa_sig.Dictionary_of_States.init())
-    | error, Some i -> error, i
+  let error, b_counter =
+    is_counter parameter error handler_kappa agent_name site_name
   in
-  let error, value =
-    match
-      Ckappa_sig.Dictionary_of_States.translate
-        parameter
-        error
-        state
-        state_dic
-    with
-    | error, None ->
-      Exception.warn parameter error __POS__
-        Exit (Ckappa_sig.Internal "")
-    | error, Some (value, _, _) -> error, value
-  in
-  print_state parameter error handler_kappa value
+  if b_counter then
+    print_state parameter error handler_kappa
+      (Ckappa_sig.Counter (Ckappa_sig.int_of_state_index state))
+  else
+    let error, state_dic =
+      match
+        Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+          parameter
+          error
+          (agent_name, site_name)
+          handler_kappa.Cckappa_sig.states_dic
+      with
+      | error, None ->
+        Exception.warn parameter error __POS__ Exit
+          (Ckappa_sig.Dictionary_of_States.init())
+      | error, Some i -> error, i
+    in
+    let error, value =
+      match
+        Ckappa_sig.Dictionary_of_States.translate
+          parameter
+          error
+          state
+          state_dic
+      with
+      | error, None ->
+        Exception.warn parameter error __POS__
+          Exit (Ckappa_sig.Internal "")
+      | error, Some (value, _, _) -> error, value
+    in
+    print_state parameter error handler_kappa value
 
 let string_of_state = string_of_state_gen print_state
 

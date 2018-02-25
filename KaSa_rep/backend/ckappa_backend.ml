@@ -200,30 +200,37 @@ struct
             ~message:"undefined site"
             parameter error kappa_handler agent_type site
         in
-        let error =
-          match state_min with
-          | Some state_min ->
-            let error, _ =
-              Handler.translate_state
-                ~ml_pos:(Some __POS__)
-                ~message:"undefined site state"
-                parameter error kappa_handler
-                agent_type site state_min
-            in error
-          | None -> error
+        let error, b_counter  =
+          Handler.is_counter parameter error kappa_handler agent_type site
         in
         let error =
-          match state_max with
-          | Some state_max ->
-            let error, _ =
-              Handler.translate_state
-                ~ml_pos:(Some __POS__)
-                ~message:"undefined site state"
-                parameter error kappa_handler
-                agent_type site state_max
-            in
-            error
-          | None -> error
+          if b_counter then error
+          else
+            match state_min with
+            | Some state_min ->
+              let error, _ =
+                Handler.translate_state
+                  ~ml_pos:(Some __POS__)
+                  ~message:"undefined site state"
+                  parameter error kappa_handler
+                  agent_type site state_min
+              in error
+            | None -> error
+        in
+        let error =
+          if b_counter then error
+          else
+            match state_max with
+            | Some state_max ->
+              let error, _ =
+                Handler.translate_state
+                  ~ml_pos:(Some __POS__)
+                  ~message:"undefined site state"
+                  parameter error kappa_handler
+                  agent_type site state_max
+              in
+              error
+            | None -> error
         in
         let error, old_asso =
           Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
@@ -241,10 +248,16 @@ struct
             in
             error, (map, Some (state_min, state_max))
           | Some (old_min, old_max) ->
-            if Ckappa_sig.compare_state_index_option_min old_min state_min <= 0
-            || Ckappa_sig.compare_state_index_option_max state_max old_max <= 0
+            if
+              Ckappa_sig.compare_state_index_option_min old_min state_min <=
+              0
+              || Ckappa_sig.compare_state_index_option_max state_max old_max <=
+                 0
             then
-              let new_min = Cckappa_sig.max_state_index_option_min state_min old_min in
+              let new_min =
+                Cckappa_sig.max_state_index_option_min state_min
+                  old_min
+              in
               let new_max = Cckappa_sig.min_state_index_option_max state_max old_max in
               let error', map =
                 Ckappa_sig.Site_map_and_set.Map.overwrite
@@ -350,7 +363,7 @@ struct
             match internal_state_string_opt with
             | None -> old_state
             | Some x -> Some x
-          in (* to do: counters ? *)
+          in
           let error, new_binding_state =
             match
               internal_state_string_opt, binding_state_opt, old_binding
