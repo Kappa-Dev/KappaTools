@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 17th of January
-   * Last modification: Time-stamp: <Feb 18 2018>
+   * Last modification: Time-stamp: <Feb 25 2018>
    * *
    * Number agents, sites, states in ckappa represenations
    *
@@ -279,6 +279,16 @@ let declare_site_with_binding_states parameters =
     (fun x -> Ckappa_sig.Binding x)
     (fun x -> Ckappa_sig.Binding x)
 
+let declare_site_with_counter parameters (error,handler) ag site =
+  declare_site
+    create_internal_state_dictionary
+    parameters
+    (fun x -> Ckappa_sig.Counter x)
+    (fun x -> Ckappa_sig.Counter x)
+    (error,handler)
+    ag site
+    []
+
 let declare_dual parameter error handler ag site state ag' site' state'=
   let dual = handler.Cckappa_sig.dual in
   let error, dual =
@@ -310,8 +320,14 @@ let scan_agent parameters (error, handler) agent =
   let rec aux error interface handler =
     match interface with
     | Ckappa_sig.EMPTY_INTF -> error, handler
-    | Ckappa_sig.COUNTER_SEP (_, interface) ->
-      aux error interface handler
+    | Ckappa_sig.COUNTER_SEP (counter, interface) ->
+      let error, (handler, _, _c) =
+        declare_site_with_counter
+          parameters
+          (error, handler)
+          ag_id
+          counter.Ckappa_sig.count_nme
+      in aux error interface handler
     | Ckappa_sig.PORT_SEP (port, interface) ->
       let site_name = port.Ckappa_sig.port_nme in
       let error, handler =
