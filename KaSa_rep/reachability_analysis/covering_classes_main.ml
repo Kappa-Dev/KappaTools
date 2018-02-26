@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 23th of Feburary
-  * Last modification: Time-stamp: <Feb 13 2018>
+  * Last modification: Time-stamp: <Mar 01 2018>
   *
   * Compute the relations between the left hand site of a rule and its sites.
   *
@@ -18,20 +18,33 @@ let trace = false
 
 let compare_unit_covering_class_id _ _ = Covering_classes_type.dummy_cv_id
 
-let collect_modified_map parameters error diff_reverse store_modified_map =
+let collect_modified_map parameters error kappa_handler diff_reverse store_modified_map =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
     (fun parameters error _agent_id site_modif store_modified_map ->
-       (*if there is no modified sites then do nothing*)
-       if Ckappa_sig.Site_map_and_set.Map.is_empty site_modif.Cckappa_sig.agent_interface
-       then error, store_modified_map
-       else
-         let agent_type = site_modif.Cckappa_sig.agent_name in
-         let error', store_site =
-           Ckappa_sig.Site_map_and_set.Map.fold
-             (fun site _port (error,current_map) ->
-                (*store site map*)
+       let agent_type = site_modif.Cckappa_sig.agent_name in
+       let error, old_map =
+         match
+           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+             parameters
+             error
+             agent_type
+             store_modified_map
+         with
+         | error, None -> error, Ckappa_sig.Site_map_and_set.Map.empty
+         | error, Some m -> error, m
+       in
+       let error', new_map =
+         Ckappa_sig.Site_map_and_set.Map.fold
+           (fun site _port (error,current_map) ->
+              (*store site map*)
+              let error, b =
+                Handler.is_counter parameters error kappa_handler
+                  agent_type site
+              in
+              if b then error, current_map
+              else
                 let error,site_map =
-                  Ckappa_sig.Site_map_and_set.Map.add
+                  Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
                     parameters
                     error
                     site
@@ -39,53 +52,39 @@ let collect_modified_map parameters error diff_reverse store_modified_map =
                     current_map
                 in
                 error,site_map)
-             site_modif.Cckappa_sig.agent_interface
-             (error, Ckappa_sig.Site_map_and_set.Map.empty)
-         in
-         let error =
-           Exception.check_point
-             Exception.warn parameters error error' __POS__ Exit
-         in
-         (*compute site_map*)
-         let error, old_map =
-           match
-             Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-               parameters
-               error
-               agent_type
-               store_modified_map
-           with
-           | error, None -> error, Ckappa_sig.Site_map_and_set.Map.empty
-           | error, Some m -> error, m
-         in
-         (*store*)
-         let error,final_map =
-           Ckappa_sig.Site_map_and_set.Map.union
-             parameters
-             error
-             old_map
-             store_site
-         in
-         let error', store_modified_map =
+           site_modif.Cckappa_sig.agent_interface
+           (error, old_map)
+       in
+       let error =
+         Exception.check_point
+           Exception.warn parameters error error' __POS__ Exit
+       in
+       (*compute site_map*)
+       (*store*)
+       let error', store_modified_map =
+         if Ckappa_sig.Site_map_and_set.Map.is_empty new_map
+         then
+           error, store_modified_map
+         else
            Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
              parameters
              error
              agent_type
-             final_map
+             new_map
              store_modified_map
-         in
-         let error =
-           Exception.check_point
-             Exception.warn parameters error error' __POS__ Exit
-         in
-         error, store_modified_map
+       in
+       let error =
+         Exception.check_point
+           Exception.warn parameters error error' __POS__ Exit
+       in
+       error, store_modified_map
     ) diff_reverse
     store_modified_map
 
 (*-------------------------------------------------------------------------*)
 (*compute covering classes, site test and bdu*)
 
-let collect_covering_classes parameters error views diff_reverse store_result =
+let collect_covering_classes parameters error kappa_handler views diff_reverse store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       parameters error
@@ -102,11 +101,14 @@ let collect_covering_classes parameters error views diff_reverse store_result =
            | Cckappa_sig.Agent agent ->
              let agent_type = agent.Cckappa_sig.agent_name in
              (*get a list of sites from an interface at each rule*)
-             let site_list =
+             let error, site_list =
                Ckappa_sig.Site_map_and_set.Map.fold
-                 (fun site _ current_list ->
-                    site :: current_list
-                 ) agent.Cckappa_sig.agent_interface []
+                 (fun site _ (error, current_list) ->
+                    let error, b = Handler.is_counter parameters error kappa_handler agent_type site in
+                    if b then error, current_list
+                    else
+                      error, site :: current_list
+                 ) agent.Cckappa_sig.agent_interface (error, [])
              in
              (*compute covering_class*)
              match site_list with
@@ -150,13 +152,14 @@ let collect_covering_classes parameters error views diff_reverse store_result =
   site), then agent A has only one covering class: CV_1: y
 *)
 
-let scan_rule_covering_classes parameters error _handler rule classes =
+let scan_rule_covering_classes parameters error kappa_handler rule classes =
   (*----------------------------------------------------------------------*)
   (*compute modified map*)
   let error, store_modified_map =
     collect_modified_map
       parameters
       error
+      kappa_handler
       rule.Cckappa_sig.diff_reverse
       classes.Covering_classes_type.store_modified_map
   in
@@ -166,6 +169,7 @@ let scan_rule_covering_classes parameters error _handler rule classes =
     collect_covering_classes
       parameters
       error
+      kappa_handler
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       rule.Cckappa_sig.diff_reverse
       classes.Covering_classes_type.store_covering_classes
@@ -196,23 +200,29 @@ let scan_rule_set_covering_classes parameters error handler rules =
       (fun parameters error agent_type b init_class ->
          Ckappa_sig.Dictionary_of_sites.fold
            (fun _ _ b (error, init_class) ->
-              let error, l' =
-                match
-                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-                    parameters
-                    error
-                    agent_type
-                    init_class
-                with
-                | error,None -> error, [[b]]
-                | error,Some l -> error, [b]::l
+              let error, bool =
+                Handler.is_counter parameters error handler
+                  agent_type b
               in
-              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-                parameters
-                error
-                agent_type
-                l'
-                init_class
+              if bool then error, init_class
+              else
+                let error, l' =
+                  match
+                    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                      parameters
+                      error
+                      agent_type
+                      init_class
+                  with
+                  | error,None -> error, [[b]]
+                  | error,Some l -> error, [b]::l
+                in
+                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+                  parameters
+                  error
+                  agent_type
+                  l'
+                  init_class
            )
            b (error, init_class)
       )

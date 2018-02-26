@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Feb 22 2018>
+   * Last modification: Time-stamp: <Feb 26 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -129,30 +129,45 @@ let init_basic_static_information =
 (*collect a set of tuple pair (A.x.y, B.z.t) on the rhs*)
 (***************************************************************)
 
-let collect_tuple parameters error (agent_id, agent_type, site_type, state)
+let collect_tuple parameters error kappa_handler (agent_id, agent_type, site_type, state)
     views_set current_list =
-  let error, site_map =
-    Common_map.get_agent_id parameters error
-      agent_id Ckappa_sig.Site_map_and_set.Map.empty
-      views_set
+  let error, b =
+    Handler.is_counter parameters error kappa_handler agent_type site_type
   in
-  Ckappa_sig.Site_map_and_set.Map.fold
-    (fun site_type_v _pair_of_state_v (error, current_list) ->
-       if site_type <> site_type_v
-       then
-         let list =
-           (agent_type, site_type, site_type_v, state) ::
-           current_list
-         in
-         error, list
-       else
-         error, current_list)
-    site_map
-    (error, current_list)
+  if b then error,current_list
+  else
+    let error, site_map =
+      Common_map.get_agent_id parameters error
+        agent_id Ckappa_sig.Site_map_and_set.Map.empty
+        views_set
+    in
+    Ckappa_sig.Site_map_and_set.Map.fold
+      (fun site_type_v _pair_of_state_v (error, current_list) ->
+         if site_type <> site_type_v
+         then
+           let error, b =
+             Handler.is_counter parameters error kappa_handler agent_type site_type_v
+           in
+           if b then error,current_list
+           else
+             let list =
+               (agent_type, site_type, site_type_v, state) ::
+               current_list
+             in
+             error, list
+         else
+           error, current_list)
+      site_map
+      (error, current_list)
 
-let collect_tuples parameters error (agent_id, agent_type, site_type, state)
+let collect_tuples parameters error kappa_handler (agent_id, agent_type, site_type, state)
     views_set current_list =
-  let error, site_map =
+  let error, b =
+    Handler.is_counter parameters error kappa_handler agent_type site_type
+  in
+  if b then error,current_list
+  else
+    let error, site_map =
     Common_map.get_agent_id parameters error
       agent_id Ckappa_sig.Site_map_and_set.Map.empty
       views_set
@@ -161,11 +176,17 @@ let collect_tuples parameters error (agent_id, agent_type, site_type, state)
     (fun site_type_v pair_of_state_v (error, current_list) ->
        if site_type <> site_type_v
        then
-         let list =
-           (agent_type, site_type, site_type_v, state, pair_of_state_v) ::
-           current_list
+         let error, b =
+           Handler.is_counter parameters error kappa_handler agent_type
+             site_type_v
          in
-         error, list
+         if b then error,current_list
+         else
+           let list =
+             (agent_type, site_type, site_type_v, state, pair_of_state_v) ::
+             current_list
+           in
+           error, list
        else
          error, current_list)
     site_map
@@ -188,7 +209,7 @@ let store_set parameters error fst_list snd_list store_result =
 (*POTENTIAL TUPLE PAIR*)
 (***************************************************************)
 
-let collect_potential_tuple_pair parameters error
+let collect_potential_tuple_pair parameters error kappa_handler
     rule_id store_bonds_rhs store_views_rhs store_result =
   let error, bonds_set =
     Common_map.get_rule_id_map_and_set parameters error
@@ -203,8 +224,16 @@ let collect_potential_tuple_pair parameters error
   in
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
     (fun (x, y) (error, store_result) ->
-       let error, fst_list = collect_tuple parameters error x views_set [] in
-       let error, snd_list = collect_tuple parameters error y views_set [] in
+       let error, fst_list =
+         collect_tuple
+           parameters error kappa_handler
+           x views_set []
+       in
+       let error, snd_list =
+         collect_tuple
+           parameters error kappa_handler
+           y views_set []
+       in
        let error, store_result =
          List.fold_left (fun (error, store_result) x ->
              List.fold_left (fun (error, store_result) y ->
@@ -229,15 +258,19 @@ let collect_potential_tuple_pair_rule_rhs parameters error rule_id
       store_potential_tuple_pair_rhs
       store_result
 
-let build_potential_tuple_pair_set parameters error bonds_set views_map =
+let build_potential_tuple_pair_set parameters error kappa_handler bonds_set views_map =
   let error, tuple_set =
     Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
       (fun (x, y) (error, store_result) ->
          let error, fst_list =
-           collect_tuples parameters error x views_map []
+           collect_tuples
+             parameters error kappa_handler
+             x views_map []
          in
          let error, snd_list =
-           collect_tuples parameters error y views_map []
+           collect_tuples
+             parameters error kappa_handler
+             y views_map []
          in
          let error, store_result =
            store_set parameters error fst_list snd_list store_result
@@ -249,7 +282,7 @@ let build_potential_tuple_pair_set parameters error bonds_set views_map =
   in
   error, tuple_set
 
-let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
+let collect_potential_tuple_pair_lhs parameters error kappa_handler rule_id store_bonds_lhs
     store_views_lhs store_result =
   let error, bonds_lhs_set =
     Common_map.get_rule_id_map_and_set parameters error
@@ -264,7 +297,8 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
       store_views_lhs
   in
   let error, pair_set =
-    build_potential_tuple_pair_set parameters error
+    build_potential_tuple_pair_set
+      parameters error kappa_handler
       bonds_lhs_set views_lhs_map
   in
   (*add the set of tuple to rule_id map*)
@@ -279,8 +313,6 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
 
 let collect_partition_created_bonds_map parameters error
     store_potential_tuple_pair_set =
-  (*agent_type, site_type, site_type', state*)
-  (*set_a map_b*)
   Site_across_bonds_domain_type.Partition_created_bonds_map.monadic_partition_set
     (fun _parameters error (x, y) ->
        error,
@@ -289,7 +321,7 @@ let collect_partition_created_bonds_map parameters error
     )
     parameters
     error
-    store_potential_tuple_pair_set (*set_a*)
+    store_potential_tuple_pair_set
 
 let collect_partition_created_bonds_map_aux parameters error x
     tuple_set store_result =
@@ -350,7 +382,7 @@ let collect_rule_partition_aux parameters error rule_id
     map store_result =
   let error, store_result =
     Site_across_bonds_domain_type.AgentSite_map_and_set.Map.fold
-      (fun pair_site tuple_set (error, store_result) ->
+      (fun _pair_site tuple_set (error, store_result) ->
          let error', old_set =
            Common_map.get_rule_id_map_and_set parameters error
              rule_id
@@ -389,7 +421,6 @@ let collect_rule_partition_created_bonds_map_1 parameters error
       Ckappa_sig.Rule_map_and_set.Map.fold
         (fun rule_id tuple_set (error, store_result) ->
            let error, map1 =
-             (*set_a map_b*)
              Site_across_bonds_domain_type.Partition_modified_map.monadic_partition_set
                (fun _ error (x, _) ->
                   error, (Common_map.project_second_site_state x)
@@ -416,7 +447,6 @@ let collect_rule_partition_created_bonds_map_2 parameters error
     Ckappa_sig.Rule_map_and_set.Map.fold
       (fun rule_id tuple_set (error, store_result) ->
          let error, map2 =
-           (*set_a map_b*)
            Site_across_bonds_domain_type.Partition_modified_map.monadic_partition_set
              (fun _ error (_, y) ->
                 error, (Common_map.project_second_site_state y)

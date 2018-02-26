@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 19 2017>
+   * Last modification: Time-stamp: <Feb 25 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -397,7 +397,7 @@ struct
   (*RULE*)
   (***************************************************************************)
 
-  let scan_rule parameters error rule_id rule static =
+  let scan_rule parameters error kappa_handler rule_id rule static =
     (*------------------------------------------------------------*)
     (*collect potential tuple pair on the rhs views*)
     let store_views_rhs = get_views_rhs static in
@@ -405,7 +405,7 @@ struct
     let store_potential_tuple_pair = get_potential_tuple_pair static in
     let error, store_potential_tuple_pair =
       Site_across_bonds_domain_static.collect_potential_tuple_pair
-        parameters error
+        parameters error kappa_handler
         rule_id
         store_bonds_rhs
         store_views_rhs
@@ -440,7 +440,7 @@ struct
     in
     let error, store_potential_tuple_pair_lhs =
       Site_across_bonds_domain_static.collect_potential_tuple_pair_lhs
-        parameters error
+        parameters error kappa_handler
         rule_id
         store_bonds_lhs
         store_views_lhs
@@ -459,6 +459,7 @@ struct
   let scan_rules static dynamic error =
     let parameters = get_parameter static in
     let compil = get_compil static in
+    let kappa_handler = get_kappa_handler static in
     let error, static =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameters
@@ -466,7 +467,7 @@ struct
         (fun parameters error rule_id rule static ->
            let error, static =
              scan_rule
-               parameters error
+               parameters error kappa_handler
                rule_id
                rule.Cckappa_sig.e_rule_c_rule
                static
@@ -805,7 +806,7 @@ struct
     let handler = get_mvbdu_handler dynamic in
     let error, tuple_init =
       Site_across_bonds_domain_static.build_potential_tuple_pair_set
-        parameters error
+        parameters error kappa_handler
         store_bonds_init
         store_views_init
     in
@@ -950,7 +951,8 @@ struct
     in
     let error, tuple_set =
       Site_across_bonds_domain_static.build_potential_tuple_pair_set
-        parameters error bonds_lhs views_lhs
+        parameters error kappa_handler
+        bonds_lhs views_lhs
     in
     let store_potential_tuple_pair = get_potential_tuple_pair static in
     let tuple_set =
@@ -1423,7 +1425,7 @@ struct
                 | Cckappa_sig.Unknown_agent _
                 | Cckappa_sig.Dead_agent _ ->
                   error, dynamic, precondition, []
-                | Cckappa_sig.Agent agent ->
+                | Cckappa_sig.Agent _ ->
                   get_state_of_site_in_precondition_2
                     error static dynamic
                     (rule_id, rule)
@@ -1787,7 +1789,7 @@ struct
   (*APPLY A LIST OF EVENT*)
  (****************************************************************)
 
-  let apply_event_list static dynamic error _event_list  =
+  let apply_event_list _static dynamic error _event_list  =
     error, dynamic, []
 
   let stabilize _static dynamic error =
@@ -1923,6 +1925,7 @@ struct
   (****************************************************************)
 
   let print ?dead_rules static dynamic (error:Exception.method_handler) loggers =
+    let _ = dead_rules in 
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let handler = get_mvbdu_handler dynamic in
