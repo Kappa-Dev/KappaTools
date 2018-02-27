@@ -523,7 +523,14 @@ C cannot occur in the model
 ------------------------------------------------------------
 
 Some exceptions have been raised
+<<<<<<< HEAD
 error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1016; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1016; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 341; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 341; exception:Exit
+=======
+error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1054; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1054; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 331; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 331; exception:Exit
+>>>>>>> cab20d7... ignore counters in influence map

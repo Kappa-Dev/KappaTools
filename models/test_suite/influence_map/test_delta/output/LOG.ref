@@ -2280,4 +2280,14 @@ A()=> [
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
+<<<<<<< HEAD
 execution finished without any exception
+=======
+Some exceptions have been raised
+error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 495; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 648; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 495; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 648; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 495; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 648; exception:Exit
+>>>>>>> cab20d7... ignore counters in influence map

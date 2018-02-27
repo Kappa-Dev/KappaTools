@@ -634,13 +634,13 @@ let collect_potential_side_effects parameter error handler rule_id half_break
   in
   error, (store_result_free, store_result_bind)
 
-let scan_rule_side_effects_views parameter error handler_kappa rule_id rule
+let scan_rule_side_effects_views parameter error kappa_handler rule_id rule
     store_result =
   let error, store_side_effects =
     collect_side_effects
       parameter
       error
-      handler_kappa
+      kappa_handler
       rule_id
       rule.Cckappa_sig.actions.Cckappa_sig.half_break
       rule.Cckappa_sig.actions.Cckappa_sig.remove
@@ -652,7 +652,7 @@ let scan_rule_side_effects_views parameter error handler_kappa rule_id rule
     collect_potential_side_effects
       parameter
       error
-      handler_kappa
+      kappa_handler
       rule_id
       rule.Cckappa_sig.actions.Cckappa_sig.half_break
       rule.Cckappa_sig.actions.Cckappa_sig.remove
@@ -1022,34 +1022,38 @@ let scan_rule_test parameters handler error rule_id rule store_result =
 (*Modification*)
 (***************************************************************************)
 
-let collect_sites_from_agent_interface parameters error agent_id agent
-    store_result =
+let collect_sites_from_agent_interface parameters error kappa_handler agent_id agent store_result =
   let agent_type = agent.Cckappa_sig.agent_name in
   Ckappa_sig.Site_map_and_set.Map.fold
     (fun site_type port (error, store_result) ->
-       let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
-       let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
-       (*NOTE: state in modification is a singleton state*)
-       let error, state =
-         match
-           state_min, state_max
-         with
-         | Some a, Some b when a=b ->
-           error, a
-         | None, _ | _, None | Some _, Some _ ->
-           Exception.warn parameters error __POS__ Exit
-             Ckappa_sig.dummy_state_index
+       let error, b =
+         Handler.is_counter parameters error kappa_handler agent_type site_type
        in
-       let error, store_result =
-         Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
-           parameters error
-           (agent_id, agent_type, site_type, state)
-           store_result
-       in
-       error, store_result
+       if b then error, store_result
+       else
+         let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
+         let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
+         (*NOTE: state in modification is a singleton state*)
+         let error, state =
+           match
+             state_min, state_max
+           with
+           | Some a, Some b when a=b ->
+             error, a
+           | None, _ | _, None | Some _, Some _ ->
+             Exception.warn parameters error __POS__ Exit
+               Ckappa_sig.dummy_state_index
+         in
+         let error, store_result =
+           Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
+             parameters error
+             (agent_id, agent_type, site_type, state)
+             store_result
+         in
+         error, store_result
     ) agent.Cckappa_sig.agent_interface (error, store_result)
 
-let collect_modified_map parameter error rule_id rule store_result =
+let collect_modified_map parameter error kappa_handler rule_id rule store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
       error
@@ -1069,7 +1073,7 @@ let collect_modified_map parameter error rule_id rule store_result =
            in
            let error, new_set =
              collect_sites_from_agent_interface
-               parameter error
+               parameter error kappa_handler
                agent_id
                agent
                old_set
@@ -1148,10 +1152,10 @@ let store_project_modified_map parameter error rule_id store_modified_map
   in
   error, store_result
 
-let scan_rule_modification parameters error rule_id rule store_result =
+let scan_rule_modification parameters error kappa_handler rule_id rule store_result =
   let error, store_modified_map =
     collect_modified_map
-      parameters error
+      parameters error kappa_handler
       rule_id
       rule
       store_result.store_modified_map
@@ -1233,7 +1237,7 @@ let collect_test_modification_sites
 (*RULE*)
 (***************************************************************************)
 
-let scan_rule parameter error handler_kappa rule_id rule store_result =
+let scan_rule parameter error kappa_handler rule_id rule store_result =
   (*-----------------------------------------------------------------------*)
   (*get agent_name*)
   let error, store_agent_name =
@@ -1254,7 +1258,7 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
   (*------------------------------------------------------------------------*)
   let error, store_side_effects_views =
     scan_rule_side_effects_views
-      parameter error handler_kappa rule_id rule
+      parameter error kappa_handler rule_id rule
       store_result.store_side_effects_views
   in
   (*------------------------------------------------------------------------*)
@@ -1267,14 +1271,14 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
   (*------------------------------------------------------------------------*)
   let error, store_modification =
     scan_rule_modification
-      parameter error
+      parameter error kappa_handler
       rule_id
       rule
       store_result.store_modification
   in
   (*------------------------------------------------------------------------*)
   let error, store_test =
-    scan_rule_test parameter handler_kappa error
+    scan_rule_test parameter kappa_handler error
       rule_id
       rule
       store_result.store_test
@@ -1296,7 +1300,7 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       parameter
       error
       store_test_modification_sites
-      in
+  in
   (*--------------------------------------------------------------*)
   error,
   {
@@ -1318,7 +1322,7 @@ module Proj_agent_rule_to_rule =
     (Ckappa_sig.AgentRule_map_and_set)
     (Ckappa_sig.Rule_map_and_set)
 
-let scan_rule_set parameter error handler_kappa compil =
+let scan_rule_set parameter error kappa_handler compil =
   let error, init_common_views = init_common_views parameter error in
   let error, store_result =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
@@ -1327,7 +1331,7 @@ let scan_rule_set parameter error handler_kappa compil =
          scan_rule
            parameter
            error
-           handler_kappa
+           kappa_handler
            rule_id
            rule.Cckappa_sig.e_rule_c_rule
            store_result

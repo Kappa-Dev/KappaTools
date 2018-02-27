@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Feb 22 2018>
+   * Last modification: Time-stamp: <Feb 27 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -479,11 +479,8 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                 in
                 error, (c_interface, dead_sites, dead_state_sites, delta)
               end
-          in
-          error,
-          bond_list, c_interface, question_marks,
-          dead_sites, dead_state_sites, dead_link_sites,
-          delta
+          in aux interface error bond_list c_interface
+            question_marks dead_sites dead_state_sites dead_link_sites delta
         end
         | Ckappa_sig.PORT_SEP (port, interface) ->
           let error, (c_interface, dead_sites, _dead_states_sites)  =
@@ -1476,9 +1473,9 @@ let translate_rule parameters error handler rule =
   let error, delta =
     Ckappa_sig.AgentsSite_map_and_set.Map.map2
       parameters error
-      (fun parameters error i -> error, i)
-      (fun parameters error i -> error, i)
-      (fun parameters error i j -> error,i+j)
+      (fun _parameters error i -> error, i)
+      (fun _parameters error i -> error, i)
+      (fun _parameters error i j -> error,i+j)
       delta_l
       delta_r
   in
@@ -1486,15 +1483,107 @@ let translate_rule parameters error handler rule =
   let error,filtered_question_marks_l = filter parameters error question_marks_l c_rule_rhs in
   let error,c_rule_lhs = clean_question_marks parameters error filtered_question_marks_l c_rule_lhs in (* remove ? that occur in the lhs in degraded agent *)
   let error,c_rule_rhs = clean_question_marks parameters error question_marks_r c_rule_rhs in (* remove ? that occurs in the rhs *)
-  let error, counter_precondition =
+  let error, (counter_precondition, list_new, list_removed) =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
+      parameters error
+      (fun parameters error agent_id view1 view2  (counter_precondition, list_new, list_removed) ->
+      match view1, view2 with
+        | Cckappa_sig.Agent ag,
+          Cckappa_sig.Ghost  ->
+          let agent_type = ag.Cckappa_sig.agent_name in
+          let error, list_removed =
+            Ckappa_sig.Site_map_and_set.Map.fold
+              (fun site port (error, list_removed) ->
+                 let error, bool =
+                   Handler.is_counter parameters error
+                     handler
+                     agent_type site
+                 in
+                 if bool
+                 then
+                   error,
+                   (Cckappa_sig.build_address agent_id agent_type site,
+                    port.Cckappa_sig.site_state)::list_removed
+                 else
+                   error, list_removed)
+              ag.Cckappa_sig.agent_interface
+              (error, list_removed)
+          in
+          error, (counter_precondition, list_new, list_removed)
+
+        | Cckappa_sig.Ghost, Cckappa_sig.Agent ag  ->
+          let agent_type = ag.Cckappa_sig.agent_name in
+          let error, list_new =
+            Ckappa_sig.Site_map_and_set.Map.fold
+              (fun site port (error, list_new) ->
+                 let error, bool =
+                   Handler.is_counter
+                     parameters error handler
+                     agent_type site
+                 in
+                 if bool
+                 then
+                   match port.Cckappa_sig.site_state.Cckappa_sig.min,
+                         port.Cckappa_sig.site_state.Cckappa_sig.max
+                   with
+                   | Some a, Some b when a=b ->
+                     error,
+                     (Cckappa_sig.build_address agent_id agent_type site,
+                      a)
+                     ::list_new
+                   | Some _, Some _
+                   | None,_ | _,None ->
+                     Exception.warn parameters error __POS__ Exit list_new
+               else
+                 error, list_new)
+              ag.Cckappa_sig.agent_interface
+              (error, list_new)
+          in
+          error, (counter_precondition, list_new, list_removed)
+      | Cckappa_sig.Agent ag, Cckappa_sig.Agent _  ->
+        let agent_type = ag.Cckappa_sig.agent_name in
+        let error, counter_precondition =
+          Ckappa_sig.Site_map_and_set.Map.fold
+            (fun site port (error, counter_precondition) ->
+               let error, bool =
+                 Handler.is_counter parameters error
+                   handler
+                   agent_type site
+               in
+               if bool
+               then
+                 Ckappa_sig.AgentsSite_map_and_set.Map.add
+                   parameters error
+                   (agent_id,agent_type,site)
+                   port.Cckappa_sig.site_state
+                   counter_precondition
+               else
+                 error, counter_precondition)
+            ag.Cckappa_sig.agent_interface
+            (error, counter_precondition) in
+        error, (counter_precondition, list_new, list_removed)
+      | Cckappa_sig.Ghost, Cckappa_sig.Ghost
+      | (Cckappa_sig.Dead_agent _
+        | Cckappa_sig.Unknown_agent _),_
+      | _, (Cckappa_sig.Dead_agent _
+           | Cckappa_sig.Unknown_agent _)
+        ->
+        error, (counter_precondition, list_new, list_removed)
+      )
+      c_rule_lhs.Cckappa_sig.views
+      c_rule_rhs.Cckappa_sig.views
+      (Ckappa_sig.AgentsSite_map_and_set.Map.empty,
+       [],[])
+  in
+  let error, counter_postcondition =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters error
-      (fun parameters error agent_id view counter_precondition ->
+      (fun parameters error agent_id view counter_postcondition ->
          match view with
          | Cckappa_sig.Agent ag  ->
            let agent_type = ag.Cckappa_sig.agent_name in
            Ckappa_sig.Site_map_and_set.Map.fold
-             (fun site port (error, counter_precondition) ->
+             (fun site port (error, counter_postcondition) ->
                 let error, bool =
                   Handler.is_counter parameters error
                     handler
@@ -1506,18 +1595,18 @@ let translate_rule parameters error handler rule =
                     parameters error
                     (agent_id,agent_type,site)
                     port.Cckappa_sig.site_state
-                    counter_precondition
+                    counter_postcondition
                 else
-                error, counter_precondition)
+                error, counter_postcondition)
              ag.Cckappa_sig.agent_interface
-             (error, counter_precondition)
+             (error, counter_postcondition)
          | Cckappa_sig.Dead_agent _
          | Cckappa_sig.Ghost
          | Cckappa_sig.Unknown_agent _
            ->
-           error, counter_precondition
+           error, counter_postcondition
       )
-      c_rule_lhs.Cckappa_sig.views
+      c_rule_rhs.Cckappa_sig.views
       Ckappa_sig.AgentsSite_map_and_set.Map.empty
   in
   let add1 delta b =
@@ -1548,6 +1637,14 @@ let translate_rule parameters error handler rule =
       counter_precondition
       delta
   in
+  let error, counter_map =
+    Ckappa_sig.AgentsSite_map_and_set.Map.fold
+      (fun key i (error,map) ->
+        Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite parameters error
+          key (i,i,0) map)
+      counter_postcondition
+      (error,counter_map)
+  in
   let overwrite_counter_test parameters error site i c_mixture =
     let agent_id, _, site_name = site in
     let error, view =
@@ -1558,6 +1655,7 @@ let translate_rule parameters error handler rule =
     in
     match view
     with
+    | Some Cckappa_sig.Ghost -> error, c_mixture
     | Some Cckappa_sig.Agent ag ->
       let error, old_port =
         Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
@@ -1576,7 +1674,11 @@ let translate_rule parameters error handler rule =
           ag.Cckappa_sig.agent_interface
       in
       let new_port =
-        {old_port with Cckappa_sig.site_state = i}
+      match i.Cckappa_sig.min, i.Cckappa_sig.max with
+        | None, None -> old_port
+        | Some _, _ | _, Some _ -> (* The agent cannot have been created *)
+          { old_port with
+            Cckappa_sig.site_state = i}
       in
       let error, new_interface =
         Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
@@ -1591,9 +1693,8 @@ let translate_rule parameters error handler rule =
           c_mixture.Cckappa_sig.views
       in
       error, {c_mixture with Cckappa_sig.views = views}
-    | Some (Cckappa_sig.Ghost
-    | Cckappa_sig.Unknown_agent _
-           | Cckappa_sig.Dead_agent _) | None ->
+    | None | Some ( Cckappa_sig.Unknown_agent _
+           | Cckappa_sig.Dead_agent _) ->
       Exception.warn parameters error __POS__ Exit c_mixture
   in
   let error, (c_rule_lhs, c_rule_rhs, translate) =
@@ -1627,7 +1728,8 @@ let translate_rule parameters error handler rule =
   let error,direct = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error size in
   let error,reverse = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error size in
   let actions = Cckappa_sig.empty_actions in
-  let actions = {actions with Cckappa_sig.translate = translate } in
+  let actions = {actions with Cckappa_sig.translate_counters = translate ; removed_counters = list_removed ; new_counters = list_new }
+  in
   let half_release_set = Cckappa_sig.Address_map_and_set.Set.empty in
   let full_release_set = Cckappa_sig.Address_map_and_set.Set.empty in
   let rec aux_agent (k:Ckappa_sig.c_agent_id)

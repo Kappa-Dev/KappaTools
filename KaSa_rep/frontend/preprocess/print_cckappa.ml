@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 12th of August
-   * Last modification: Time-stamp: <Feb 20 2018>
+   * Last modification: Time-stamp: <Feb 27 2018>
    * *
    * Pretty printing of token library
    *
@@ -512,6 +512,99 @@ let print_created_agent parameters (index, agent_name) =
   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   ()
 
+let print_translate_counters parameters (site_address, action) =
+  let () =
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameters)
+      "%s(agent_id_%s,agent_type_%s,site_%s):(%s%s%s%s%s/%s%s%s%s%s,%s)"
+      (Remanent_parameters.get_prefix parameters)
+
+      (Ckappa_sig.string_of_agent_id site_address.Cckappa_sig.agent_index)
+      (Ckappa_sig.string_of_agent_name site_address.Cckappa_sig.agent_type)
+      (Ckappa_sig.string_of_site_name site_address.Cckappa_sig.site)
+
+      (match action.Cckappa_sig.precondition.Cckappa_sig.min with
+       | None -> Remanent_parameters.get_open_int_interval_exclusive_symbol parameters
+       | Some _ ->
+      Remanent_parameters.get_open_int_interval_inclusive_symbol parameters)
+      (match action.Cckappa_sig.precondition.Cckappa_sig.min with
+       | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+       | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
+      (Remanent_parameters.get_int_interval_separator_symbol parameters)
+      (match action.Cckappa_sig.precondition.Cckappa_sig.max with
+       | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+       | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
+      (match action.Cckappa_sig.precondition.Cckappa_sig.max with
+        | None -> Remanent_parameters.get_open_int_interval_inclusive_symbol parameters
+        | Some _ ->
+       Remanent_parameters.get_open_int_interval_exclusive_symbol parameters)
+
+       (match action.Cckappa_sig.postcondition.Cckappa_sig.min with
+        | None -> Remanent_parameters.get_open_int_interval_exclusive_symbol parameters
+        | Some _ ->
+          Remanent_parameters.get_open_int_interval_inclusive_symbol parameters)
+       (match action.Cckappa_sig.postcondition.Cckappa_sig.min with
+        | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+        | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
+       (Remanent_parameters.get_int_interval_separator_symbol parameters)
+       (match action.Cckappa_sig.postcondition.Cckappa_sig.max with
+        | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+        | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
+       (match action.Cckappa_sig.postcondition.Cckappa_sig.max with
+        | None -> Remanent_parameters.get_open_int_interval_inclusive_symbol parameters
+        | Some _ ->
+          Remanent_parameters.get_open_int_interval_exclusive_symbol parameters)
+       (if action.Cckappa_sig.increment = 0 then "-"
+        else string_of_int action.Cckappa_sig.increment)
+  in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  ()
+
+let print_removed_counters parameters (site_address, condition) =
+  let () =
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameters)
+      "%s(agent_id_%s,agent_type_%s,site_%s):(%s%s%s%s%s)--"
+      (Remanent_parameters.get_prefix parameters)
+
+      (Ckappa_sig.string_of_agent_id site_address.Cckappa_sig.agent_index)
+      (Ckappa_sig.string_of_agent_name site_address.Cckappa_sig.agent_type)
+      (Ckappa_sig.string_of_site_name site_address.Cckappa_sig.site)
+
+      (match condition.Cckappa_sig.min with
+       | None -> Remanent_parameters.get_open_int_interval_exclusive_symbol parameters
+       | Some _ ->
+         Remanent_parameters.get_open_int_interval_inclusive_symbol parameters)
+      (match condition.Cckappa_sig.min with
+       | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+       | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
+      (Remanent_parameters.get_int_interval_separator_symbol parameters)
+      (match condition.Cckappa_sig.max with
+       | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+       | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
+      (match condition.Cckappa_sig.max with
+       | None -> Remanent_parameters.get_open_int_interval_inclusive_symbol parameters
+       | Some _ ->
+         Remanent_parameters.get_open_int_interval_exclusive_symbol parameters)
+      in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  ()
+
+let print_new_counters parameters (site_address, state) =
+  let () =
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameters)
+      "%s(agent_id_%s,agent_type_%s,site_%s):(%s)++"
+      (Remanent_parameters.get_prefix parameters)
+
+      (Ckappa_sig.string_of_agent_id site_address.Cckappa_sig.agent_index)
+      (Ckappa_sig.string_of_agent_name site_address.Cckappa_sig.agent_type)
+      (Ckappa_sig.string_of_site_name site_address.Cckappa_sig.site)
+
+     (string_of_int (Ckappa_sig.int_of_state_index state))
+  in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  ()
 let print_actions parameters error _handler actions =
   let parameters_unbinding =  Remanent_parameters.update_prefix parameters "unbinding:" in
   let _ = List.iter (print_bond parameters_unbinding "....") (List.rev actions.Cckappa_sig.release) in
@@ -523,6 +616,22 @@ let print_actions parameters error _handler actions =
   let _ = List.iter (print_created_agent  parameters_creation) (List.rev actions.Cckappa_sig.creation) in
   let parameters_binding =  Remanent_parameters.update_prefix parameters "binding:" in
   let _ = List.iter (print_bond parameters_binding "----") (List.rev actions.Cckappa_sig.bind) in
+  let parameters_translate_counters = Remanent_parameters.update_prefix parameters "counters:" in
+  let _ =
+    List.iter
+      (print_translate_counters parameters_translate_counters)
+      (List.rev actions.Cckappa_sig.translate_counters)
+  in
+  let _ =
+    List.iter
+      (print_removed_counters parameters_translate_counters)
+      (List.rev actions.Cckappa_sig.removed_counters)
+  in
+  let _ =
+    List.iter
+      (print_new_counters parameters_translate_counters)
+      (List.rev actions.Cckappa_sig.new_counters)
+  in
   error
 
 let print_rule parameters error handler rule =
