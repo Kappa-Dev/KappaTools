@@ -1551,7 +1551,7 @@ let translate_rule parameters error handler rule =
               (error, list_new)
           in
           error, (counter_precondition, list_new, list_removed)
-        | Cckappa_sig.Agent ag, Cckappa_sig.Agent ag'  ->
+        | Cckappa_sig.Agent ag, Cckappa_sig.Agent _  ->
         let agent_type = ag.Cckappa_sig.agent_name in
         let error, counter_precondition =
           Ckappa_sig.Site_map_and_set.Map.fold

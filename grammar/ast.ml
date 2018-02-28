@@ -967,7 +967,9 @@ let split_mixture m =
                                 | Some None -> [Locality.dummy_annot LNK_FREE]
                                 | Some (Some (i,pos))-> [LNK_VALUE (i,()),pos]);
                              port_lnk_mod=None}::r)
-                    | Counter _ -> (l,r)
+                    | Counter c ->
+                      (Counter {c with count_delta = Locality.dummy_annot 0}::l,
+                       Counter {c with count_test = None}::r)
                  ) ([],[]) intf in
              (Present (na,intfl,None)::lhs,Present (na,intfr,None)::rhs)
       ) m ([],[])
