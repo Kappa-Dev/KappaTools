@@ -20,9 +20,12 @@ Signature:duals:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:
-Compilation:variables:0:Auu: Compilation:variables:1:
-Compilation:variables:1:Apu: Compilation:variables:2:
-Compilation:variables:2:App: Compilation:rules:0:
+Compilation:variables:0:Auu: 
+Compilation:variables:1:
+Compilation:variables:1:Apu: 
+Compilation:variables:2:
+Compilation:variables:2:App: 
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

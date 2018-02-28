@@ -152,7 +152,7 @@ let add_bond parameters error _i id_agent _agent site id_agent' agent' site' bon
     bond_list
 
 let translate_agent_sig
-    parameters error handler agent (kasim_id:Ckappa_sig.c_agent_id) =
+    parameters error handler agent (kasim_id:Ckappa_sig.c_agent_id) map =
   let error, (bool, output) =
     Ckappa_sig.Dictionary_of_agents.allocate_bool
       parameters
@@ -185,11 +185,11 @@ let translate_agent_sig
     | error, Some i -> error, i
   in
   let error, c_interface = error, Ckappa_sig.Site_map_and_set.Map.empty in
-  let rec aux interface error c_interface =
+  let rec aux interface error c_interface map =
     match interface with
-    | Ckappa_sig.EMPTY_INTF -> error,c_interface
+    | Ckappa_sig.EMPTY_INTF -> error,c_interface,map
     | Ckappa_sig.COUNTER_SEP(counter,interface) ->
-      let error, c_interface =
+      let error, c_interface, map =
         let error, (bool, output) =
           Ckappa_sig.Dictionary_of_sites.allocate_bool
             parameters
@@ -212,21 +212,41 @@ let translate_agent_sig
               Exit (Ckappa_sig.dummy_site_name)
           | _, Some (i,_,_,_) -> error, i
         in
-        let error',c_interface =
+        let (error',c_interface),test =
+          let test =
+            match
+              counter.Ckappa_sig.count_test
+            with
+            | Some (Ckappa_sig.CEQ i) -> [Ckappa_sig.state_index_of_int i]
+            | Some (Ckappa_sig.CGTE _)
+            | Some (Ckappa_sig.CVAR _ )
+            | Some Ckappa_sig.UNKNOWN
+            | None -> []
+          in
           Ckappa_sig.Site_map_and_set.Map.add
             parameters
             error
             counter_name
             {
               Cckappa_sig.site_name = counter_name ;
-              Cckappa_sig.site_position = Locality.dummy ;     Cckappa_sig.site_state = [] ; (* to do *)
+              Cckappa_sig.site_position = Locality.dummy ;
+              Cckappa_sig.site_state = test ;
               Cckappa_sig.site_free = None
-            } c_interface
+            } c_interface, test
         in
         let error =
           Exception.check_point Exception.warn parameters error error' __POS__ Exit  in
-        error, c_interface
-        in aux interface error c_interface
+        let error, map =
+          Ckappa_sig.AgentSite_map_and_set.Map.add
+            parameters error
+            (agent_name, counter_name)
+            (match test with
+             | [i] -> Some i
+             | [] | _::_::_ -> None)
+            map
+        in
+        error, c_interface, map
+        in aux interface error c_interface map
     | Ckappa_sig.PORT_SEP(port,interface) ->
       let error,c_interface =
         match port.Ckappa_sig.port_int with
@@ -350,16 +370,16 @@ let translate_agent_sig
           Exception.warn parameters error __POS__ Exit c_interface
         | Ckappa_sig.LNK_TYPE (_agent',_site')  ->
           Exception.warn parameters error __POS__ Exit c_interface
-      in aux interface error c_interface
+      in aux interface error c_interface map
   in
-  let error,c_interface = aux agent.Ckappa_sig.ag_intf error c_interface in
+  let error,c_interface,map = aux agent.Ckappa_sig.ag_intf error c_interface map in
   error,
   ({
     Cckappa_sig.agent_kasim_id = kasim_id ;
     Cckappa_sig.agent_name = agent_name ;
     Cckappa_sig.agent_interface = c_interface ;
     Cckappa_sig.agent_position = Locality.dummy ;
-  }:Cckappa_sig.agent_sig)
+  }:Cckappa_sig.agent_sig), map
 
 let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
     (kasim_id:Ckappa_sig.c_agent_id) agent bond_list question_marks delta =
@@ -2177,19 +2197,21 @@ let translate_perturb parameters error handler ((alarm,bool1,modif,bool2),pos2) 
   error,((alarm,bool1',modif',bool2'),pos2)
 
 let translate_c_compil parameters error handler compil =
-  let error,c_signatures =
+  let error,c_signatures,counter_default =
     List.fold_left
-      (fun (error,list) agent ->
-         let error,ag =
+      (fun (error,list,map) agent ->
+         let error,ag,map =
            translate_agent_sig
              parameters
              error
              handler
              agent
              Ckappa_sig.dummy_agent_id
+             map
          in
-         error,(ag::list))
-      (error,[]) compil.Ast.signatures in
+         error,(ag::list),map)
+      (error,[],Ckappa_sig.AgentSite_map_and_set.Map.empty) compil.Ast.signatures
+  in
   let error,c_variables =
     List.fold_left
       (fun (error,list) var ->
@@ -2260,6 +2282,7 @@ let translate_c_compil parameters error handler compil =
   {
     Cckappa_sig.variables = c_variables ;
     Cckappa_sig.signatures = c_signatures ;
+    Cckappa_sig.counter_default = counter_default ;
     Cckappa_sig.rules = c_rules ;
     Cckappa_sig.observables = c_observables ;
     Cckappa_sig.init = c_inits ;

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Feb 27 2018>
+  * Last modification: Time-stamp: <Feb 28 2018>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -194,6 +194,7 @@ type compil =
     (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures : (agent_sig (** position*)) Int_storage.Nearly_inf_Imperatif.t;
     (*agent signature declaration*)
+    counter_default: Ckappa_sig.c_state option Ckappa_sig.AgentSite_map_and_set.Map.t ;
     rules : enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
     (*rules (possibly named)*)
     observables :

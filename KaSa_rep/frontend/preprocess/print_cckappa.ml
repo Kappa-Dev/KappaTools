@@ -421,10 +421,50 @@ let print_variables parameters error handler var =
         (Remanent_parameters.get_logger parameters) "%s"
         (Remanent_parameters.get_prefix parameters)
       in
-      print_var parameters error handler var)
+      let error = print_var parameters error handler var in
+      let () =
+        Loggers.print_newline
+          (Remanent_parameters.get_logger parameters)
+      in error
+    )
     var
 
 let print_signatures _parameters error _handler _signature = error
+
+let print_default_counters parameters error _handler map =
+    if Ckappa_sig.AgentSite_map_and_set.Map.is_empty
+        map
+    then error
+    else
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "%s:"
+          (Remanent_parameters.get_prefix parameters)
+      in
+      let () =
+        Loggers.print_newline
+          (Remanent_parameters.get_logger parameters)
+      in
+      let () =
+        Ckappa_sig.AgentSite_map_and_set.Map.iter
+          (fun (a,s) state_opt ->
+             let () =
+               Loggers.fprintf
+               (Remanent_parameters.get_logger parameters)
+               "%s: %s.%s %s"
+               (Remanent_parameters.get_prefix parameters)
+               (Ckappa_sig.string_of_agent_name a)
+               (Ckappa_sig.string_of_site_name s)
+               (match state_opt with
+                | None -> ""
+                | Some a -> "->"^(Ckappa_sig.string_of_state_index a))
+             in
+             Loggers.print_newline
+               (Remanent_parameters.get_logger parameters)
+          )
+          map
+      in error
 
 let print_bond parameters relation (add1,add2) =
   let () = Loggers.fprintf
@@ -685,6 +725,8 @@ let print_compil parameters error handler compil =
   let error = print_variables parameters' error handler compil.Cckappa_sig.variables in
   let parameters' =  Remanent_parameters.update_prefix parameters "signature:" in
   let error = print_signatures parameters' error handler compil.Cckappa_sig.signatures in
+  let parameters' =  Remanent_parameters.update_prefix parameters "default_counters:" in
+  let error = print_default_counters parameters' error handler compil.Cckappa_sig.counter_default in
   let parameters' =  Remanent_parameters.update_prefix parameters "rules:" in
   let error = print_rules parameters' error handler compil.Cckappa_sig.rules in
   let parameters' =  Remanent_parameters.update_prefix parameters "observables:" in

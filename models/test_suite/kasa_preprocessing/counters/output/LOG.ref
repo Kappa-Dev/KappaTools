@@ -41,7 +41,12 @@ Signature:duals:1:1:1:agent_type:0,site_type:3,state_id:1
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:
-Compilation:variables:0:A1: Compilation:rules:0:
+Compilation:variables:0:A1: 
+Compilation:default_counters::
+Compilation:default_counters:: 0.1 ->0
+Compilation:default_counters:: 0.2 ->1
+Compilation:default_counters:: 1.0 ->0
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_3->state:[state_min:0;state_max:0]

@@ -67,15 +67,24 @@ Signature:duals:2:3:1:agent_type:0,site_type:1,state_id:2
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:
-Compilation:variables:0:on_rate: 0.000100 Compilation:variables:1:
-Compilation:variables:1:off_rate: 0.100000 Compilation:variables:2:
-Compilation:variables:2:mod_rate: 1 Compilation:variables:3:
-Compilation:variables:3:AB: Compilation:variables:4:
-Compilation:variables:4:Cuu: Compilation:variables:5:
-Compilation:variables:5:Cpu: Compilation:variables:6:
-Compilation:variables:6:Cpp: Compilation:variables:7:
-Compilation:variables:7:n_ab: 1000 Compilation:variables:8:
-Compilation:variables:8:n_c: 10000 Compilation:rules:0:
+Compilation:variables:0:on_rate: 0.000100 
+Compilation:variables:1:
+Compilation:variables:1:off_rate: 0.100000 
+Compilation:variables:2:
+Compilation:variables:2:mod_rate: 1 
+Compilation:variables:3:
+Compilation:variables:3:AB: 
+Compilation:variables:4:
+Compilation:variables:4:Cuu: 
+Compilation:variables:5:
+Compilation:variables:5:Cpu: 
+Compilation:variables:6:
+Compilation:variables:6:Cpp: 
+Compilation:variables:7:
+Compilation:variables:7:n_ab: 1000 
+Compilation:variables:8:
+Compilation:variables:8:n_c: 10000 
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

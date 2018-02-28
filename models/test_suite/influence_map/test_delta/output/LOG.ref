@@ -30,8 +30,10 @@ Signature:duals:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:
-Compilation:variables:0:qb: Compilation:variables:1:
-Compilation:variables:1:qc: Compilation:rules:0:
+Compilation:variables:0:qb: 
+Compilation:variables:1:
+Compilation:variables:1:qc: 
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
@@ -2280,14 +2282,4 @@ A()=> [
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-<<<<<<< HEAD
 execution finished without any exception
-=======
-Some exceptions have been raised
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 495; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 648; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 495; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 648; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 495; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 648; exception:Exit
->>>>>>> cab20d7... ignore counters in influence map
