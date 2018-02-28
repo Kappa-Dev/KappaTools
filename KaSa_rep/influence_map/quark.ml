@@ -100,7 +100,14 @@ let empty_quarks parameter error handler =
   in
   let error,dead_states = Quark_type.DeadSiteMap.create_biggest_key
       parameter error (n_agents,Ckappa_sig.dummy_site_name) in
-
+  let error, counter_test_geq = Quark_type.CounterMap.create_biggest_key
+      parameter error (n_agents,Ckappa_sig.dummy_site_name) in
+  let error, counter_test_leq = Quark_type.CounterMap.create_biggest_key
+          parameter error (n_agents,Ckappa_sig.dummy_site_name) in
+  let error, counter_delta_plus = Quark_type.CounterMap.create_biggest_key
+      parameter error (n_agents,Ckappa_sig.dummy_site_name) in
+  let error, counter_delta_minus = Quark_type.CounterMap.create_biggest_key
+      parameter error (n_agents,Ckappa_sig.dummy_site_name) in
   error,
   {
     Quark_type.dead_agent_plus = Quark_type.StringMap.empty ;
@@ -127,7 +134,11 @@ let empty_quarks parameter error handler =
     Quark_type.site_bound_var_plus = site_bound_var_plus;
     Quark_type.agent_var_plus = agent_var_plus ;
     Quark_type.site_var_plus = site_var_plus ;
-  }
+    Quark_type.counter_test_geq = counter_test_geq ;
+    Quark_type.counter_test_leq = counter_test_leq ;
+    Quark_type.counter_delta_plus = counter_delta_plus ;
+    Quark_type.counter_delta_minus = counter_delta_minus ;
+    }
 
 let member_generic get parameter error rule_id agent_id key map =
   let error, agent =
@@ -334,6 +345,28 @@ let add_site_var parameters error var_id agent_id agent_type site_type state =
     var_id
     agent_id
     (agent_type, (site_type, state))
+
+let add_counter string parameters error rule_id agent_id agent_type counter
+    map =
+    let _ = Misc_sa.trace parameters (fun () ->
+        "rule_id:" ^
+        (Ckappa_sig.string_of_rule_id rule_id) ^
+        ",agent_type:" ^
+        (Ckappa_sig.string_of_agent_name agent_type) ^
+        ",site_type:" ^
+        (Ckappa_sig.string_of_site_name counter) ^
+        string ^ "\n")
+    in
+    add_generic
+      Quark_type.CounterMap.unsafe_get
+      Quark_type.CounterMap.set
+      parameters
+      error
+      rule_id
+      agent_id
+      (agent_type, counter)
+      map
+
 
 let add_half_bond_breaking parameter error handler rule_id agent_id
     agent_type site k (site_modif_plus,site_modif_minus,site_bound_modif_minus) =
@@ -1010,6 +1043,11 @@ let scan_rule parameter error handler rule_id rule quarks =
   let site_modif_minus = quarks.Quark_type.site_modif_minus in
   let site_bound_modif_plus = Quark_type.BoundSite.Set.empty in
   let site_bound_modif_minus = Quark_type.BoundSite.Set.empty in
+  let counter_test_geq = quarks.Quark_type.counter_test_geq in
+  let counter_test_leq = quarks.Quark_type.counter_test_leq in
+  let counter_delta_plus = quarks.Quark_type.counter_delta_plus in
+  let counter_delta_minus = quarks.Quark_type.counter_delta_minus in
+
   let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in
   let error,(agent_test,site_test,_site_bound_test,_dead_agents,_dead_sites,_dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus) = (*what is tested in the lhs*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -1485,6 +1523,62 @@ let scan_rule parameter error handler rule_id rule quarks =
       (quarks.Quark_type.site_modif_bound_plus,site_bound_modif_plus)
       (quarks.Quark_type.site_modif_bound_minus,site_bound_modif_minus)
   in
+  let error, counter_test_geq, counter_test_leq, counter_delta_plus, counter_delta_minus =
+    List.fold_left
+      (fun
+        (error, counter_test_geq, counter_test_leq, counter_delta_plus, counter_delta_minus)
+        (site, action) ->
+        let pre = action.Cckappa_sig.precondition in
+        let delta = action.Cckappa_sig.increment in
+        let error, counter_test_geq =
+          match pre.Cckappa_sig.max with
+          | None -> error, counter_test_geq
+          | Some _ ->
+            add_counter ">="
+              parameter error
+              rule_id
+              (Ckappa_sig.int_of_agent_id site.Cckappa_sig.agent_index)  site.Cckappa_sig.agent_type                         site.Cckappa_sig.site
+              counter_test_geq
+        in
+        let error, counter_test_leq =
+          match pre.Cckappa_sig.min with
+          | None -> error, counter_test_leq
+          | Some _ ->
+            add_counter "<="
+              parameter error
+              rule_id
+              (Ckappa_sig.int_of_agent_id site.Cckappa_sig.agent_index)  site.Cckappa_sig.agent_type                         site.Cckappa_sig.site
+              counter_test_leq
+        in
+        let error, counter_delta_minus =
+          if delta < 0
+          then
+            add_counter "-="
+              parameter error
+              rule_id
+              (Ckappa_sig.int_of_agent_id site.Cckappa_sig.agent_index)  site.Cckappa_sig.agent_type                         site.Cckappa_sig.site
+              counter_delta_minus
+          else
+            error, counter_delta_minus
+        in
+        let error, counter_delta_plus =
+          if delta > 0
+          then
+            add_counter "+="
+              parameter error
+              rule_id
+              (Ckappa_sig.int_of_agent_id site.Cckappa_sig.agent_index)  site.Cckappa_sig.agent_type                         site.Cckappa_sig.site
+              counter_delta_plus
+          else
+            error, counter_delta_plus
+        in
+        (error, counter_test_geq, counter_test_leq, counter_delta_plus, counter_delta_minus))
+      (error, counter_test_geq, counter_test_leq, counter_delta_plus, counter_delta_minus)
+      rule.Cckappa_sig.actions.Cckappa_sig.translate_counters
+
+
+  in
+
   error,
   {quarks with
    Quark_type.agent_test = agent_test ;
@@ -1501,6 +1595,10 @@ let scan_rule parameter error handler rule_id rule quarks =
    Quark_type.site_modif_minus = site_modif_minus ;
    Quark_type.site_modif_bound_plus = site_bound_modif_plus ;
    Quark_type.site_modif_bound_minus = site_bound_modif_minus ;
+   Quark_type.counter_test_geq = counter_test_geq ;
+   Quark_type.counter_test_leq = counter_test_leq ;
+   Quark_type.counter_delta_plus = counter_delta_plus ;
+   Quark_type.counter_delta_minus = counter_delta_minus ;
   }
 
 let scan_rule_set parameter error handler rules =

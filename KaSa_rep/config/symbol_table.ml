@@ -98,7 +98,7 @@ let symbol_table_V3 =
     open_int_interval_inclusive = "[" ;
     open_int_interval_exclusive = "]" ;
     open_int_interval_infinity = "]" ;
-    plus_infinity = "oo" ;
+    plus_infinity = "+oo" ;
     minus_infinity = "-oo" ;
     close_int_interval_inclusive = "]" ;
     close_int_interval_exclusive = "[" ;
@@ -119,7 +119,7 @@ let symbol_table_V3 =
     countercvar_symbol = ":";
     counterval_symbol = ":=";
     counterdeltaplus_symbol = "+";
-    counterdeltaminus_symbol = "+";
+    counterdeltaminus_symbol = "-";
   }
 
 let lighten symbol_table =
@@ -171,7 +171,7 @@ let symbol_table_V4 =
     open_int_interval_inclusive = "[" ;
     open_int_interval_exclusive = "]" ;
     open_int_interval_infinity = "]" ;
-    plus_infinity = "oo" ;
+    plus_infinity = "+oo" ;
     minus_infinity = "-oo" ;
     close_int_interval_inclusive = "]" ;
     close_int_interval_exclusive = "[" ;
@@ -192,7 +192,7 @@ let symbol_table_V4 =
     countercvar_symbol = ":";
     counterval_symbol = ":=";
     counterdeltaplus_symbol = "+";
-    counterdeltaminus_symbol = "+";
+    counterdeltaminus_symbol = "-";
 
   }
 

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March the 10th of 2011
- * Last modification: Time-stamp: <Nov 08 2017>
+ * Last modification: Time-stamp: <Feb 27 2018>
  *
  * Compute the influence relations between rules and sites.
  *
@@ -61,6 +61,8 @@ let generic_add fold2_common agent_diag rule_diag parameters error _handler (n:i
          a
          map)
     a b c
+
+let generic_add_counter = generic_add
 
 let compute_influence_map parameters error handler quark_maps nrules =
   let wake_up_map =
@@ -413,7 +415,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
       parameters
       error
       handler
-      nrules
+      0
       quark_maps.Quark_type.dead_states
       quark_maps.Quark_type.dead_states_plus
       inhibition_map
@@ -426,9 +428,61 @@ let compute_influence_map parameters error handler quark_maps nrules =
       parameters
       error
       handler
-      nrules
+      0
       quark_maps.Quark_type.dead_states
       quark_maps.Quark_type.dead_states_minus
       wake_up_map
   in
-  error,wake_up_map,inhibition_map
+  let error, wake_up_map =
+    generic_add_counter
+      Quark_type.CounterMap.fold2_common
+      false
+      true
+      parameters
+      error
+      handler
+      0
+      quark_maps.Quark_type.counter_delta_plus
+      quark_maps.Quark_type.counter_test_leq
+      wake_up_map
+  in
+  let error, wake_up_map =
+    generic_add_counter
+      Quark_type.CounterMap.fold2_common
+      false
+      true
+      parameters
+      error
+      handler
+      0
+      quark_maps.Quark_type.counter_delta_minus
+      quark_maps.Quark_type.counter_test_geq
+      wake_up_map
+  in
+  let error, inhibition_map =
+    generic_add_counter
+      Quark_type.CounterMap.fold2_common
+      false
+      true
+      parameters
+      error
+      handler
+      0
+      quark_maps.Quark_type.counter_delta_minus
+      quark_maps.Quark_type.counter_test_leq
+      inhibition_map
+  in
+  let error, inhibition_map =
+    generic_add_counter
+      Quark_type.CounterMap.fold2_common
+      false
+      true
+      parameters
+      error
+      handler
+      0
+      quark_maps.Quark_type.counter_delta_plus
+      quark_maps.Quark_type.counter_test_geq
+      inhibition_map
+  in
+      error,wake_up_map,inhibition_map

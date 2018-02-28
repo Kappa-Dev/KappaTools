@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 12th of August
-   * Last modification: Time-stamp: <Feb 27 2018>
+   * Last modification: Time-stamp: <Feb 28 2018>
    * *
    * Pretty printing of token library
    *
@@ -532,7 +532,7 @@ let print_translate_counters parameters (site_address, action) =
        | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
       (Remanent_parameters.get_int_interval_separator_symbol parameters)
       (match action.Cckappa_sig.precondition.Cckappa_sig.max with
-       | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+       | None -> Remanent_parameters.get_plus_infinity_symbol parameters
        | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
       (match action.Cckappa_sig.precondition.Cckappa_sig.max with
         | None -> Remanent_parameters.get_open_int_interval_inclusive_symbol parameters
@@ -548,14 +548,19 @@ let print_translate_counters parameters (site_address, action) =
         | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
        (Remanent_parameters.get_int_interval_separator_symbol parameters)
        (match action.Cckappa_sig.postcondition.Cckappa_sig.max with
-        | None -> Remanent_parameters.get_minus_infinity_symbol parameters
+        | None -> Remanent_parameters.get_plus_infinity_symbol parameters
         | Some i -> string_of_int (Ckappa_sig.int_of_state_index i))
        (match action.Cckappa_sig.postcondition.Cckappa_sig.max with
         | None -> Remanent_parameters.get_open_int_interval_inclusive_symbol parameters
         | Some _ ->
           Remanent_parameters.get_open_int_interval_exclusive_symbol parameters)
        (if action.Cckappa_sig.increment = 0 then "-"
-        else string_of_int action.Cckappa_sig.increment)
+        else if action.Cckappa_sig.increment > 0 then
+          (Remanent_parameters.get_counterdeltaplus_symbol parameters)^
+          (string_of_int action.Cckappa_sig.increment)
+        else
+          (Remanent_parameters.get_counterdeltaminus_symbol parameters)^
+          (string_of_int (-action.Cckappa_sig.increment)))
   in
   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   ()

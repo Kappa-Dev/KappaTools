@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Feb 27 2018>
+   * Last modification: Time-stamp: <Feb 28 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -438,44 +438,53 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
               begin
                 let error, delta =
                   match counter.Ckappa_sig.count_delta with
-                  | None | Some 0 -> error, delta
+                  | None | Some 0 ->
+                    error, delta
                   | Some n ->
                     Ckappa_sig.AgentsSite_map_and_set.Map.add
                       parameters error
                       (k,agent_name,site_name) n delta
                 in
                 let error,c_interface =
-                  Ckappa_sig.Site_map_and_set.Map.add
-                    parameters
-                    error
-                    site_name
-                    {
-                      Cckappa_sig.site_name = site_name ;
-                      Cckappa_sig.site_free = None;
-                      Cckappa_sig.site_position = Locality.dummy ;
-                      Cckappa_sig.site_state =
-                        begin
-                          match counter.Ckappa_sig.count_test with
-                          | Some (Ckappa_sig.CEQ i) ->
-                            {
-                              Cckappa_sig.min = Some (Ckappa_sig.state_index_of_int i);
-                              Cckappa_sig.max = Some
-                                  (Ckappa_sig.state_index_of_int i)
-                            }
-                          | Some (Ckappa_sig.CGTE i) ->
-                            {
-                              Cckappa_sig.min = Some (Ckappa_sig.state_index_of_int i);
-                              Cckappa_sig.max = None
-                            }
-                          | None | Some Ckappa_sig.UNKNOWN
-                          | Some (Ckappa_sig.CVAR _) ->
-                            {
-                              Cckappa_sig.min = None;
-                              Cckappa_sig.max = None
-                            }
-                        end
-                    }
-                    c_interface
+                  match counter.Ckappa_sig.count_test with
+                  | Some (Ckappa_sig.CEQ _ ) | Some (Ckappa_sig.CGTE _ ) ->
+                    begin
+                      Ckappa_sig.Site_map_and_set.Map.add
+                        parameters
+                        error
+                        site_name
+                        {
+                          Cckappa_sig.site_name = site_name ;
+                          Cckappa_sig.site_free = None;
+                          Cckappa_sig.site_position = Locality.dummy ;
+                          Cckappa_sig.site_state =
+                            begin
+                              match counter.Ckappa_sig.count_test with
+                              | Some (Ckappa_sig.CEQ i) ->
+                                {
+                                  Cckappa_sig.min = Some
+                                      (Ckappa_sig.state_index_of_int i);
+                                  Cckappa_sig.max = Some
+                                      (Ckappa_sig.state_index_of_int i)
+                                }
+                              | Some (Ckappa_sig.CGTE i) ->
+                                {
+                                  Cckappa_sig.min = Some
+                                      (Ckappa_sig.state_index_of_int i);
+                                  Cckappa_sig.max = None
+                                }
+                              | None | Some Ckappa_sig.UNKNOWN
+                              | Some (Ckappa_sig.CVAR _) ->
+                                {
+                                  Cckappa_sig.min = None;
+                                  Cckappa_sig.max = None
+                                }
+                            end
+                        }
+                        c_interface
+                    end
+                  | None | Some Ckappa_sig.UNKNOWN
+                  | Some (Ckappa_sig.CVAR _) -> error, c_interface
                 in
                 error, (c_interface, dead_sites, dead_state_sites, delta)
               end
@@ -1483,7 +1492,9 @@ let translate_rule parameters error handler rule =
   let error,filtered_question_marks_l = filter parameters error question_marks_l c_rule_rhs in
   let error,c_rule_lhs = clean_question_marks parameters error filtered_question_marks_l c_rule_lhs in (* remove ? that occur in the lhs in degraded agent *)
   let error,c_rule_rhs = clean_question_marks parameters error question_marks_r c_rule_rhs in (* remove ? that occurs in the rhs *)
-  let error, (counter_precondition, list_new, list_removed) =
+  let error, (counter_precondition,
+              list_new,
+              list_removed) =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       parameters error
       (fun parameters error agent_id view1 view2  (counter_precondition, list_new, list_removed) ->
@@ -1540,7 +1551,7 @@ let translate_rule parameters error handler rule =
               (error, list_new)
           in
           error, (counter_precondition, list_new, list_removed)
-      | Cckappa_sig.Agent ag, Cckappa_sig.Agent _  ->
+        | Cckappa_sig.Agent ag, Cckappa_sig.Agent ag'  ->
         let agent_type = ag.Cckappa_sig.agent_name in
         let error, counter_precondition =
           Ckappa_sig.Site_map_and_set.Map.fold
@@ -1561,6 +1572,7 @@ let translate_rule parameters error handler rule =
                  error, counter_precondition)
             ag.Cckappa_sig.agent_interface
             (error, counter_precondition) in
+
         error, (counter_precondition, list_new, list_removed)
       | Cckappa_sig.Ghost, Cckappa_sig.Ghost
       | (Cckappa_sig.Dead_agent _
@@ -1568,46 +1580,12 @@ let translate_rule parameters error handler rule =
       | _, (Cckappa_sig.Dead_agent _
            | Cckappa_sig.Unknown_agent _)
         ->
-        error, (counter_precondition, list_new, list_removed)
+          error, (counter_precondition, list_new, list_removed)
       )
       c_rule_lhs.Cckappa_sig.views
       c_rule_rhs.Cckappa_sig.views
       (Ckappa_sig.AgentsSite_map_and_set.Map.empty,
        [],[])
-  in
-  let error, counter_postcondition =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-      parameters error
-      (fun parameters error agent_id view counter_postcondition ->
-         match view with
-         | Cckappa_sig.Agent ag  ->
-           let agent_type = ag.Cckappa_sig.agent_name in
-           Ckappa_sig.Site_map_and_set.Map.fold
-             (fun site port (error, counter_postcondition) ->
-                let error, bool =
-                  Handler.is_counter parameters error
-                    handler
-                    agent_type site
-                in
-                if bool
-                then
-                  Ckappa_sig.AgentsSite_map_and_set.Map.add
-                    parameters error
-                    (agent_id,agent_type,site)
-                    port.Cckappa_sig.site_state
-                    counter_postcondition
-                else
-                error, counter_postcondition)
-             ag.Cckappa_sig.agent_interface
-             (error, counter_postcondition)
-         | Cckappa_sig.Dead_agent _
-         | Cckappa_sig.Ghost
-         | Cckappa_sig.Unknown_agent _
-           ->
-           error, counter_postcondition
-      )
-      c_rule_rhs.Cckappa_sig.views
-      Ckappa_sig.AgentsSite_map_and_set.Map.empty
   in
   let add1 delta b =
     match b with
@@ -1637,14 +1615,22 @@ let translate_rule parameters error handler rule =
       counter_precondition
       delta
   in
-  let error, counter_map =
+  (*let error, counter_map =
     Ckappa_sig.AgentsSite_map_and_set.Map.fold
       (fun key i (error,map) ->
+         let error, old =
+           match
+             Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs
+               parameters error key map
+           with
+           | error, None -> error, 0
+           | error, Some (_,_,i) -> error, i
+         in
         Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite parameters error
-          key (i,i,0) map)
+          key (i,i,old) map)
       counter_postcondition
       (error,counter_map)
-  in
+    in*)
   let overwrite_counter_test parameters error site i c_mixture =
     let agent_id, _, site_name = site in
     let error, view =

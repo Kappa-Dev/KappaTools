@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2011, the 7th of March
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Feb 27 2018>
   *
   * Type definitions for the influence relations between rules and sites.
   *
@@ -38,6 +38,11 @@ module SiteMap =
     (Int_storage.Extend (Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif)
        (Ckappa_sig.State_index_quick_nearly_Inf_Int_storage_Imperatif))
 
+module CounterMap =
+  Int_storage.Extend
+    (Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif)
+       (Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif)
+
 module DeadSiteMap= Int_storage.Extend
   (Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif)
   (Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif)
@@ -50,6 +55,10 @@ type agents_quarks =
 type sites_quarks = Labels.label_set
   Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
   SiteMap.t
+
+type counters_quarks = Labels.label_set
+    Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
+    CounterMap.t
 
 type quarks =
   {
@@ -98,6 +107,11 @@ type quarks =
      site_modif_plus: sites_quarks ;
      agent_var_plus : agents_quarks ;
      site_var_plus : sites_quarks ;
+     counter_test_geq: counters_quarks ;
+     counter_test_leq: counters_quarks ;
+     counter_delta_plus: counters_quarks ;
+     counter_delta_minus: counters_quarks ;
+
   }
 
 type influence_map = Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
