@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 12 2017>
+ * Last modification: Time-stamp: <Feb 28 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -282,13 +282,13 @@ let rename_mixture parameters error f mixture =
         let opt1, dot =
           match dot
           with
-            (pos',pos'')::q when pos=pos' -> Some pos'', q
+          | (pos',pos'')::q when pos=pos' -> Some pos'', q
           | _ -> None, dot
         in
         let opt2, plus =
           match plus
           with
-            (pos',pos'')::q when pos=pos' -> Some pos'', q
+          | (pos',pos'')::q when pos=pos' -> Some pos'', q
           | _ -> None, plus
         in
         let error, mixture = aux parameters error (pos+1) tail dot plus in
@@ -306,7 +306,9 @@ let rename_mixture parameters error f mixture =
         | None, None ->
           error,
           COMMA (agent,mixture)
-      else aux parameters error (pos+1) list_m dot plus
+      else
+        let error, mixture = aux parameters error (pos+1) list_m dot plus in
+        error, SKIP mixture 
   in
   aux parameters error 0 list_m dot plus
 
@@ -404,7 +406,9 @@ let join_agent parameters error agent1 agent2 =
     in
     error, {agent1 with ag_intf = interface}
   else
-    Exception.warn parameters error __POS__ Exit dummy_agent
+    Exception.warn parameters error __POS__
+      ?message:(Some (agent1.ag_nme^ agent2.ag_nme))
+      Exit dummy_agent
 
 let rec join_mixture parameters error mixture1 mixture2 =
   match

@@ -2397,10 +2397,4 @@ Influence_map:Inhibition_map:rule(3):'' A(),.,B(),B()->A(),C(),.,. -> var(0):'qb
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-Some exceptions have been raised
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 407; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 631; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 407; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 631; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 407; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 631; exception:Exit
+execution finished without any exception
