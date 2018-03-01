@@ -797,7 +797,7 @@ module Make (Instances:Instances_sig.S) = struct
     let () = set_activity id act state in
     store syntax_id old_act act
 
-  let update_outdated_activities store env counter state =
+  let update_outdated_activities store env counter state known_perts =
     let () = assert (not state.outdated) in
     let deps,changed_connectivity = state.outdated_elements in
     let unary_rule_update modified_cc i state rule =
@@ -819,7 +819,7 @@ module Make (Instances:Instances_sig.S) = struct
              let () = recompute env counter state j in
              aux (Model.get_alg_reverse_dependencies env j) acc
            | Operator.MODIF p ->
-             (state,List_util.merge_uniq Mods.int_compare [p] perts)
+             (state,p::perts)
            | Operator.RULE i ->
              let rule = Model.get_rule env i in
              let pattern_va = Instances.number_of_instances
@@ -832,7 +832,7 @@ module Make (Instances:Instances_sig.S) = struct
              let state = pop_exact_matchings state i in
              (state,perts))
         dep acc in
-    let state',perts = aux deps (state,[]) in
+    let state',perts = aux deps (state,known_perts) in
     let state'' =
       if Hashtbl.length changed_connectivity = 0 then state'
       else Model.fold_rules (unary_rule_update changed_connectivity) state' env in

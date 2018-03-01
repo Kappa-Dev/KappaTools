@@ -71,14 +71,14 @@ let do_modification ~outputs env counter graph state extra modification =
         graph (Rule_interpreter.value_alg counter graph v) in
     let graph'',extra' =
       Rule_interpreter.update_outdated_activities
-        (fun _ _ _  -> ()) env counter graph' in
-    ((false,graph'',state),List_util.merge_uniq Mods.int_compare  extra' extra)
+        (fun _ _ _  -> ()) env counter graph' extra in
+    ((false,graph'',state), extra')
   | Primitives.UPDATE (i,(expr,_)) ->
     let graph' = Rule_interpreter.overwrite_var i counter graph expr in
     let graph'',extra' =
         Rule_interpreter.update_outdated_activities
-          (fun _ _ _  -> ()) env counter graph' in
-    ((false, graph'', state),List_util.merge_uniq Mods.int_compare  extra' extra)
+          (fun _ _ _  -> ()) env counter graph' extra in
+    ((false, graph'', state), extra')
   | Primitives.STOP pexpr ->
     let () = if pexpr <> [] then
         let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
@@ -173,22 +173,20 @@ let rec perturbate ~outputs env counter graph state = function
          counter graph (fst pert.Primitives.precondition) &&
          mod_alarm
     then
-      let (stop,graph,state as acc,extra) =
+      let (stop,graph,state as acc,tail') =
         List.fold_left (fun ((stop,graph,state),extra as acc) effect ->
             if stop then acc else
               do_modification ~outputs env counter graph state extra effect)
-          ((false,graph,state),[]) pert.Primitives.effect in
+          ((false,graph,state),tail) pert.Primitives.effect in
       let () = state.perturbations_not_done_yet.(i) <- false in
       let alive =
         Rule_interpreter.value_bool
            counter graph (fst pert.Primitives.repeat) in
       let () = if alive&&(pert.Primitives.alarm = None) then
-          state.force_test_perturbations <- List_util.merge_uniq
-              Mods.int_compare [i] state.force_test_perturbations in
+          state.force_test_perturbations <- i::state.force_test_perturbations in
       let () = state.perturbations_alive.(i) <- alive in
       if stop then acc else
-        perturbate ~outputs env counter graph state
-          (List_util.merge_uniq Mods.int_compare extra tail)
+        perturbate ~outputs env counter graph state tail'
     else
       perturbate ~outputs env counter graph state tail
 
@@ -235,7 +233,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
     (fun (_,graph,state0) ->
        let mid_graph,_ =
          Rule_interpreter.update_outdated_activities
-           (fun _ _ _  -> ()) env counter graph in
+           (fun _ _ _  -> ()) env counter graph [] in
        let everybody =
          let t  = Array.length state0.perturbations_alive in
          Tools.recti (fun l i -> i::l) [] t in
@@ -318,15 +316,14 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
                            ct) in 0.
                  | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
           l in
-    let graph'',extra_pert =
-      Rule_interpreter.update_outdated_activities
-        register_new_activity env counter graph' in
-    let () = finalize_registration syntax_rid in
     let force_tested = state.force_test_perturbations in
     let () = state.force_test_perturbations <- [] in
+    let graph'',extra_pert =
+      Rule_interpreter.update_outdated_activities
+        register_new_activity env counter graph' force_tested in
+    let () = finalize_registration syntax_rid in
     let (stop,graph''',state') =
-      perturbate ~outputs env counter graph'' state
-        (List.rev_append force_tested extra_pert) in
+      perturbate ~outputs env counter graph'' state extra_pert in
     let () =
       Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
         state.perturbations_not_done_yet in
