@@ -64,7 +64,7 @@ module Make (Instances:Instances_sig.S) : sig
   val overwrite_var : int -> Counter.t -> t -> Primitives.alg_expr -> t
   val update_outdated_activities :
     (int -> float -> float -> unit) ->
-    Model.t -> Counter.t -> t -> (t * int list)
+    Model.t -> Counter.t -> t -> int list -> (t * int list)
   (** Resynchronize the state after a rule application.
 
       It takes the function to store the new activities as an argument whose
@@ -74,7 +74,7 @@ module Make (Instances:Instances_sig.S) : sig
       pick a rule randomly), you can apply several rules in row before
       resynchronizing. (This is what initial state does.)
 
-      @returns the list of perturbations to try *)
+      takes the list of perturbations to be tried and returns it updated *)
 
   val snapshot: Model.t -> Counter.t -> string -> t -> Data.snapshot
 
