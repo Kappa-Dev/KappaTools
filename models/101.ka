@@ -1,0 +1,28 @@
+// Define agents
+%agent: DIYa(b)
+%agent: DIYb(a,c)
+%agent: DIYc(b)
+
+// Initial conditions
+%init: 10 DIYa(),DIYc()
+
+// Rules in chemical notation (LHS -> RHS)
+// Bind DIYa and DIYb
+DIYa(b[.]),DIYb(a[.]) -> DIYa(b[6]),DIYb(a[6]) @ 1
+// Unbind DIYa and DIYb
+DIYa(b[3]),DIYb(a[3]) -> DIYa(b[.]),DIYb(a[.]) @ 1
+
+// Rules in edit notation
+// Bind DIYc and DIYb
+DIYc(b[./1]),DIYb(c[./1]) @ 1
+// Unbind DIYc and DIYb
+DIYc(b[1/.]),DIYb(c[1/.]) @ 1
+
+// Produce DIYb from nothing
+. -> DIYb() @ 1
+
+// after 100 simulated seconds, stop and produce a snapshot called "T 100"
+%mod: alarm 50 do $STOP "T 50" ;
+
+// Measure amount of trimer
+%obs: 'Trimer' |DIYa(b[17]),DIYb(a[17],c[99]),DIYc(b[99])|
