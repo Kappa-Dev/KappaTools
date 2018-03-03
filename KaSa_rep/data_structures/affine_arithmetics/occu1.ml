@@ -1,40 +1,42 @@
-type trans = Pro of int | Trans of int*int*int | Transb of int * int *int ;;
-
+type trans =
+| Bool of Ckappa_sig.c_site_name * Ckappa_sig.c_state_index
+| Counter of Ckappa_sig.c_site_name
+| Affine_cst
 
 let p x y =
   match x,y with
-    Pro(-1),Pro(-1)-> 0
-  |   Pro (-1),_ -> 1
-  | _,Pro(-1) -> (-1)
-  | Pro a,Pro b -> b-a
-  | Pro a,_ -> (1)
-  |  _ ,Pro b -> (-1)
-  | Trans(x,y,z),Trans(a,b,c) when a<>x -> a-x
-  | Trans(x,y,z),Trans(a,b,c) when y<>b -> b-y
-  | Trans(x,y,z),Trans(a,b,c) -> c-z
-  |  Trans _ ,_ -> 1
-  | _,Trans _ -> (-1)
-  | Transb(x,y,z),Transb(a,b,c) when a<>x -> a-x
-  | Transb(x,y,z),Transb(a,b,c) when y<>b -> b-y
-  | Transb(x,y,z),Transb(a,b,c) -> c-z
+| Affine_cst, Affine_cst -> 0
+| _, Affine_cst -> -1
+| Affine_cst, _ -> 1
+| Counter c, Counter c' ->
+  Ckappa_sig.compare_site_name c c'
+| _, Counter _ -> -1
+| Counter _, _ -> 1
+| Bool (a,b), Bool (a',b') ->
+let cmp =
+Ckappa_sig.compare_site_name a a'
+in
+if cmp = 0 then Ckappa_sig.compare_state_index b b'
+else cmp
 
 let po x y = ((p x y)>0)
 
 let print_trans parameters x =
   match x with
-  | Pro(x) ->
+  | Affine_cst  ->
     let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "PRO%i" x
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "Affine constant" x
     in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
-  |  Trans(x,y,z) ->
+  | Counter c ->
     let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "TRANS%i%i%i" x y z
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "Counter_%i"
+        (Ckappa_sig.int_of_site_name c)
     in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
-
-  | Transb(x,y,z) ->
+  | Bool(a,b)  ->
     let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "TRANSB%i%i%i" x y z
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "Is_site_%i_in_state_%i"
+        (Ckappa_sig.int_of_site_name a) (Ckappa_sig.int_of_state_index b)
     in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
