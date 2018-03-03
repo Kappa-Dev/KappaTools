@@ -1,23 +1,20 @@
 type trans =
-| Bool of Ckappa_sig.c_site_name * Ckappa_sig.c_state_index
+| Bool of Ckappa_sig.c_site_name * Ckappa_sig.c_state
 | Counter of Ckappa_sig.c_site_name
 | Affine_cst
 
 let p x y =
   match x,y with
-| Affine_cst, Affine_cst -> 0
+| Affine_cst, Affine_cst -> 0
 | _, Affine_cst -> -1
 | Affine_cst, _ -> 1
-| Counter c, Counter c' ->
-  Ckappa_sig.compare_site_name c c'
+| Counter c, Counter c' -> Ckappa_sig.compare_site_name c c'
 | _, Counter _ -> -1
 | Counter _, _ -> 1
 | Bool (a,b), Bool (a',b') ->
-let cmp =
-Ckappa_sig.compare_site_name a a'
-in
-if cmp = 0 then Ckappa_sig.compare_state_index b b'
-else cmp
+  let cmp = Ckappa_sig.compare_site_name a a' in
+  if cmp = 0 then Ckappa_sig.compare_state_index b b'
+  else cmp
 
 let po x y = ((p x y)>0)
 
@@ -25,7 +22,8 @@ let print_trans parameters x =
   match x with
   | Affine_cst  ->
     let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "Affine constant" x
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameters) "Affine constant" 
     in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
   | Counter c ->

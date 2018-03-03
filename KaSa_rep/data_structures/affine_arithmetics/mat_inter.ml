@@ -279,7 +279,7 @@ posref j))) in
               (let k =
                  match Working_list_imperative.pop good_line
                  with
-                 |Some (k,_) -> k 
+                 |Some (k,_) -> k
                  | None -> raise Exit
                in
                begin
@@ -289,14 +289,14 @@ posref j))) in
                       let rec vide list somme  =
                         match list
                         with
-                        | (Pro (-1))::q ->
+                        | Affine_cst::q ->
                           vide q
                             (ffplus
                                (Frac({num=0;den=1}))
                                {num=(-1);den=1}
-                               (Frac((M.read_val posm k (Pro(-1))))))
+                               (Frac((M.read_val posm k Affine_cst))))
 
-                        | ((Pro _ | Trans _ | Transb _) as t)::q       ->
+                        | (Bool _ | Counter _ as t)::q       ->
                           let delta=(M.read_val posm k t) in
                           (match delta.num
                            with
@@ -323,8 +323,8 @@ posref j))) in
                       let rec vide2 l =
                         match l
                         with
-                        | (Pro(-1))::q -> vide2 q
-                        | ((Pro _ | Trans _ | Transb _) as t)::q ->
+                        | Affine_cst::q -> vide2 q
+                        | (Bool _ | Counter _ as t)::q ->
                           let delta=(M.read_val posm k t) in
                           (match delta.num with
                            | 0 -> vide2 q
@@ -353,13 +353,13 @@ posref j))) in
                     (let rec vide list somme  =
                        match list
                        with
-                         (Pro (-1))::q ->
+                         Affine_cst::q ->
                          vide q
                            (ffplus
                               (Frac({num=0;den=1}))
-                              {num=(-1);den=1} (Frac((M.read_val posm k (Pro (-1))))))
+                              {num=(-1);den=1} (Frac(M.read_val posm k Affine_cst)))
 
-                       |  ((Pro _ | Trans _ | Transb _) as t)::q       ->
+                       |  (Bool _ | Counter _ as t)::q       ->
                          let delta=(M.read_val posm k t) in
                          (match delta.num
                           with
@@ -391,8 +391,8 @@ posref j))) in
                      let rec vide2 l =
                        match l
                        with
-                       | (Pro(-1))::q -> vide2 q
-                       | ((Pro _ | Trans _ | Transb _) as t)::q ->
+                       | Affine_cst::q -> vide2 q
+                       | (Bool _ | Counter _ as t)::q ->
                          let delta=(M.read_val posm k t) in
                          (match delta.num with
                           | 0 -> vide2 q
@@ -422,13 +422,13 @@ posref j))) in
             with _ -> ()
           in
           for i=1 to (M.n_ligne posm) do
-            let rep=ref (Pro(-1)) in
+            let rep=ref Affine_cst in
             let error, line =M.get_line parameters error posm i in
             let k = M.get_trans_list line in
             let () = error_ref:=error in
             (List.iter
                (fun j->
-                  if p j (Pro(-1))>0 then
+                  if p j Affine_cst>0 then
                     (match
                        (((I.read inter j).sup),
                         ((M.read_val posm i j).num))
@@ -453,14 +453,14 @@ posref j))) in
           let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
           let rec cop_line (k,c) =
             match k with
-            | (Pro (-1))::q -> cop_line (q,c)
-            | [] | (Pro _ | Trans _ | Transb _)::_ ->
+            | Affine_cst::q -> cop_line (q,c)
+            | [] | (Bool _ | Counter _)::_ ->
               let nl=
                 Hashtbl.create
                   (Remanent_parameters.get_empty_hashtbl_size parameters)
               in
               (List.iter (fun x->(Hashtbl.add nl x (try (Hashtbl.find c x) with _ -> {num=0;den=1}))) k;
-               (k,nl,let a=(try (let a=(Hashtbl.find c (Pro (-1))) in
+               (k,nl,let a=(try (let a=(Hashtbl.find c Affine_cst) in
                                  (Frac{num=(-(a.num));den=a.den}))
                             with _ -> Frac{num=0;den=1}) in {inf=a;sup=a})) in
           cop_line (k,c) in
@@ -532,12 +532,12 @@ posref j))) in
                      if (l>fin) then (rep,wei)
                      else (
                        try (let cur=(M.pivot m l) in
-                            if ((cur<wei) || (wei=(Pro(-1))))
+                            if p cur wei < 0  || wei=Affine_cst
                             then (search_good_ligne (l+1) l cur)
                             else (search_good_ligne (1+l) rep wei)
                            ) with _ -> search_good_ligne (1+l) rep wei) in
-                   let new_ligne,wei=search_good_ligne deb (-1) (Pro(-1)) in
-                   if wei=(Pro (-1)) then aux (fin+1) else
+                   let new_ligne,wei=search_good_ligne deb (-1) Affine_cst in
+                   if wei=Affine_cst then aux (fin+1) else
                      begin
                        let col=M.pivot m new_ligne in
                        (let error =
@@ -585,7 +585,7 @@ posref j))) in
                  let nl=Hashtbl.create n in
                  (List.iter
                     (fun x->
-                       (if (x>(Pro (-1)))
+                       (if p x Affine_cst > 0
                         then (Hashtbl.add
                                 nl x
                                 (try
@@ -635,7 +635,7 @@ posref j))) in
         (List.iter (fun x -> Working_list_imperative.push x rep)
            ((M.get_all_key (p.mat)));
          List.iter (fun x -> Working_list_imperative.push x rep) ((I.clef (p.i)));
-         List.filter (fun x-> not(x=Occu1.Pro (-1))) (Working_list_imperative.list rep))
+         List.filter (fun x-> not(x=Affine_cst)) (Working_list_imperative.list rep))
 
 	let red2 mi = mi
 (*  (* try*) (  List.iter (fun (x:var) ->

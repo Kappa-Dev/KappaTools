@@ -351,7 +351,7 @@ let new_point parameters n =
       in
       let () =
         Loggers.print_newline    (Remanent_parameters.get_logger parameters)
-      in error 
+      in error
 
 
 
@@ -361,7 +361,7 @@ let new_point parameters n =
     let error =
       List.fold_left
         (fun error x->
-           if (not (Pro(-1)=x)) then
+           if (not (Affine_cst=x)) then
              (new_copy_ligne parameters error m
                 ([x],
                  (let h = Hashtbl.create n in
@@ -454,11 +454,16 @@ lrep))))
 	else ()
 
     let pivot m i =
-        if i>(!(m.nligne)) then failwith "compteur_pivot_1"
-                       else (match (find m.entry i) with (Pro (-1))::k::q -> k
-						     |   [Pro (-1)]  -> failwith "compteur_pivot_2"
-						     |   k::q -> k
-                                                     |   _    ->  failwith "compteur_pivot_3")
+      if i>(!(m.nligne))
+      then failwith "compteur_pivot_1"
+      else
+        (
+          match (find m.entry i)
+          with (Affine_cst)::k::q -> k
+             |   [Affine_cst]  -> failwith "compteur_pivot_2"
+             |   (Bool _ | Counter _  as k)::q -> k
+             |   []  ->  failwith "compteur_pivot_3"
+        )
 
 
     let normalise parameters (error:Exception.method_handler) m  =
@@ -469,13 +474,13 @@ lrep))))
                    if l>(!(m.nligne)) then (rep,wei)
                    else (
                      try (let cur=(pivot m l) in
-                          if (po cur wei) || (wei=(Pro(-1)))
+                          if po cur wei || wei=Affine_cst
                           then (search_good_ligne (l+1) l cur)
                           else (search_good_ligne (1+l) rep wei)
                          ) with _ -> search_good_ligne (1+l) rep wei) in
-                 let new_ligne,wei=search_good_ligne k (-1) (Pro(-1)) in
+                 let new_ligne,wei=search_good_ligne k (-1) Affine_cst in
                  let error =
-                   if wei=(Pro(-1)) then aux error ((!(m.nligne))+1) else
+                   if wei=Affine_cst then aux error ((!(m.nligne))+1) else
                    begin
                      let col=pivot m new_ligne in
                      let error =
@@ -503,14 +508,17 @@ lrep))))
            if i > (!(m.nligne)) then (error:Exception.method_handler)
            else
 
-            let rep=read_val m i (Pro (-1)) in
+            let rep=read_val m i Affine_cst in
             let r = read_val m i j in
             let error =
               set_val parameters error m i
-              (Pro (-1))
-              (fplus rep
-                 ((let f=(ffois r k) in {num=(-f.num);
-							       den=f.den})))
+                Affine_cst
+                (fplus rep
+                   ((let f=(ffois r k) in
+                     {
+                       num=(-f.num);
+                       den=f.den
+                     })))
             in
             aux error (i+1)
          in aux error 1
@@ -551,12 +559,14 @@ lrep))))
    let n2=n_ligne m2 in
    let n1=n_ligne m  in
    let avant k1 k2 =
-     match (try (pivot m k1) with _ -> (Pro (-1))),
-           (try (pivot m2 k2) with _ -> (Pro (-1)))
-     with (Pro (-1),Pro (-1)) -> true
-        | (Pro (-1),_) -> false
-        |  (_ ,Pro (-1)) -> true
-        |  (a,b)     -> (po a b) in
+     match (try (pivot m k1) with _ -> Affine_cst),
+           (try (pivot m2 k2) with _ -> Affine_cst)
+     with Affine_cst,Affine_cst -> true
+        | Affine_cst,_ -> false
+        | _ ,Affine_cst -> true
+        | (Bool _ | Counter _ as a),
+          (Bool _ | Counter _ as b)
+          -> (po a b) in
    let rec aux k1 k2 error =
      match (k2>n2),(k1>n1),(avant k1 k2)
      with
@@ -618,15 +628,19 @@ lrep))))
    in
    let forget_affine l =
      match l with
-     | (Pro(-1))::q -> q
-     |	_ -> l in
+     | Affine_cst::q -> q
+     | [] | (Bool _ | Counter _)::_-> l in
    let rec aux i error =
      if i > (!(m.nligne))
      then error
      else
        let error, (k, c) = get_line parameters error m i in
        let error = new_copy_ligne parameters error nm ((cop_line  (forget_affine k,c))) in
-       let () = o.set (pivot m i) (let f=(read_val m i (Pro(-1))) in {num=(-f.num);den=f.den}) in
+       let () =
+         o.set (pivot m i)
+           (let f=read_val m i Affine_cst in
+            {num=(-f.num);den=f.den})
+       in
        aux (i+1) error
    in
    let error = aux 1 error in
@@ -708,11 +722,11 @@ lrep))))
             r)) in
             let rec algo r sliste =
               match sliste  with
-                (Pro(-1))::squeue -> algo r squeue
-              |	 s::squeue ->
+                Affine_cst::squeue -> algo r squeue
+              |	(Bool _ | Counter _ as s)::squeue ->
                 let rprim = (traite s r )
                 in algo rprim squeue
-              |	[] -> ignore (traite  (Pro (-1)) r) in
+              |	[] -> ignore (traite  Affine_cst r) in
    error, (algo      1
       (let l=fusion (fun x->fun y->(po x y))
            (get_all_key ma) (get_all_key mb) in
