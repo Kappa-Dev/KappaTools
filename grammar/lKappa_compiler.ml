@@ -91,6 +91,8 @@ let annotate_dropped_agent
       (fun (lannot,pset) p ->
          let (_,p_pos as p_na) = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
+         let () = match Signature.counter_of_site p_id sign with
+           | Some _ -> LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
@@ -179,6 +181,8 @@ let annotate_created_agent
       (fun (pset,rannot) p ->
          let (_,p_pos as p_na) = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
+         let () = match Signature.counter_of_site p_id sign with
+           | Some _ -> LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
@@ -245,6 +249,8 @@ let annotate_edit_agent
   let scan_port (links_annot,pset) p =
     let (p_na,_) = p.Ast.port_nme in
     let p_id = Signature.num_of_site ~agent_name p.Ast.port_nme sign in
+    let () = match Signature.counter_of_site p_id sign with
+      | Some _ -> LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
     let pset' = Mods.IntSet.add p_id pset in
     let () = if pset == pset' then
         LKappa.several_occurence_of_site agent_name p.Ast.port_nme in

@@ -536,6 +536,12 @@ let several_occurence_of_site agent_name (na,pos) =
            ("Site '"^na^
             "' occurs more than once in this agent '"^agent_name^"'",pos))
 
+let counter_misused agent_name (na,pos) =
+  raise (ExceptionDefn.Malformed_Decl
+           ("Site '"^na^
+            "' occurs both as port and as counter in '"^agent_name^"'",pos))
+
+
 let link_only_one_occurence i pos =
   raise (ExceptionDefn.Malformed_Decl
            ("The link '"^string_of_int i^

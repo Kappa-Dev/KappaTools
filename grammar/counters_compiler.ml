@@ -563,6 +563,9 @@ let annotate_dropped_counters sign counts ra arity agent_name aux =
       (fun pset c ->
         let p_na = c.Ast.count_nme in
         let p_id = Signature.num_of_site ~agent_name p_na sign in
+        let () = match Signature.counter_of_site p_id sign with
+          | None -> LKappa.counter_misused agent_name c.Ast.count_nme
+          | Some _ -> () in
         let pset' = Mods.IntSet.add p_id pset in
         let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
@@ -586,6 +589,8 @@ let annotate_edit_counters
       (fun pset c ->
         let p_na = c.Ast.count_nme in
         let p_id = Signature.num_of_site ~agent_name p_na sign in
+        let () = match Signature.counter_of_site p_id sign with
+          | None -> LKappa.counter_misused agent_name c.Ast.count_nme | Some _ -> () in
         let pset' = Mods.IntSet.add p_id pset in
         let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
@@ -673,6 +678,9 @@ let annotate_created_counters
         (fun pset c ->
           let p_na = c.Ast.count_nme in
           let p_id = Signature.num_of_site ~agent_name p_na sign in
+          let () = match Signature.counter_of_site p_id sign with
+            | None -> LKappa.counter_misused agent_name c.Ast.count_nme
+            | Some _ -> () in
           let pset' = Mods.IntSet.add p_id pset in
           let () = if pset == pset' then
                      LKappa.several_occurence_of_site agent_name c.Ast.count_nme in

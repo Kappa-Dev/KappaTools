@@ -30,3 +30,11 @@ Parsing counter_erase_modify.ka...
 done
 + simulation parameters
 + Sanity checks
+Parsing counter_misused.ka...
+done
++ simulation parameters
++ Sanity checks
+Parsing port_misused.ka...
+done
++ simulation parameters
++ Sanity checks

@@ -43,6 +43,7 @@ val several_internal_states : Locality.t -> 'a
 val not_enough_specified :
   status:string -> side:string -> string -> string * Locality.t -> 'a
 val several_occurence_of_site : string -> string * Locality.t -> 'a
+val counter_misused : string -> string * Locality.t -> 'a
 val link_only_one_occurence : int -> Locality.t -> 'a
 
 val agent_to_erased : Signature.s -> rule_agent -> rule_agent

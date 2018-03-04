@@ -6,3 +6,5 @@
 "${KAPPABIN}"KaSim -seed 92067277 -d output var_not_spec.ka --compile -syntax 4 || true
 "${KAPPABIN}"KaSim -seed 92067277 -d output counter_not_declared.ka --compile -syntax 4 || true
 "${KAPPABIN}"KaSim -seed 92067277 -d output counter_erase_modify.ka --compile -syntax 4 || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output counter_misused.ka --compile -syntax 4 || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output port_misused.ka --compile -syntax 4 || true
