@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Feb 08 2018>
+ * Last modification: Time-stamp: <Mar 04 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -300,3 +300,4 @@ let main () =
   ()
 
 let () = main ()
+let _ = Counters_domain_static.compute_packs 

@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Feb 28 2018>
+   * Last modification: Time-stamp: <Mar 05 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -1400,7 +1400,19 @@ let clean_question_marks parameters error l mixture =
         let error,agent =
           match agent
           with
-          | Some Cckappa_sig.Unknown_agent _ | None | Some Cckappa_sig.Ghost ->
+          | Some Cckappa_sig.Ghost ->
+            begin
+              match Remanent_parameters.get_syntax_version parameters
+              with
+              | Ast.V3 ->
+                Exception.warn
+                  parameters error __POS__
+                  ~message:"question marks should not appear on the rhs or in introduction"
+                  Exit (Cckappa_sig.Ghost)
+              | Ast.V4 ->
+                error,Cckappa_sig.Ghost
+            end
+            | Some Cckappa_sig.Unknown_agent _ | None  ->
             Exception.warn
               parameters error __POS__
               ~message:"question marks should not appear on the rhs or in introduction"

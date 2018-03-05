@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Feb 17 2018>
+ * Last modification: Time-stamp: <Mar 05 2018>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -290,7 +290,13 @@ let translate_lnk_state parameters lnk_state remanent =
              pos),
           (error, (map, (snd remanent)))
     end
-  | [(Ast.LNK_FREE|Ast.ANY_FREE),_] | [] -> Ckappa_sig.FREE,remanent
+  | [(Ast.LNK_FREE|Ast.ANY_FREE),_]  -> Ckappa_sig.FREE,remanent
+  | [] ->
+    begin
+      match Remanent_parameters.get_syntax_version parameters with
+      | Ast.V3 -> Ckappa_sig.FREE, remanent
+      | Ast.V4 -> Ckappa_sig.LNK_ANY (Locality.dummy), remanent
+    end
   | [Ast.LNK_ANY,position] -> Ckappa_sig.LNK_ANY position,remanent
   | [Ast.LNK_SOME,position] -> Ckappa_sig.LNK_SOME position,remanent
   | [Ast.LNK_TYPE (x,y),_position] -> Ckappa_sig.LNK_TYPE (y,x),remanent

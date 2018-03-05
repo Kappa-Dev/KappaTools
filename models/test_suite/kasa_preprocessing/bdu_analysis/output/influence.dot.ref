@@ -22,6 +22,7 @@ digraph G{
 "r1" -> "r5" [label="[0->0]" color="green"];
 "r2" -> "r3" [label="[0->0]" color="green"];
 "r2" -> "r4" [label="[0->0]" color="green"];
+"r2" -> "r5" [label="[0->0]" color="green"];
 "r2" -> "r6" [label="[0->0]" color="green"];
 "r3" -> "r6" [label="[0*->1]" color="green"];
 "r3" -> "r7" [label="[0*->1]" color="green"];
