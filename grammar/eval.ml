@@ -177,7 +177,7 @@ always considered as unary.") in
   rules_l
 
 let obs_of_result ?bwd_bisim ~compileModeOn contact_map domain alg_deps res =
-  let domain,out as pack =
+  let domain,out =
     List.fold_left
       (fun (domain,cont) alg_expr ->
          let (domain',alg_pos) =
@@ -185,10 +185,11 @@ let obs_of_result ?bwd_bisim ~compileModeOn contact_map domain alg_deps res =
          domain',alg_pos :: cont)
       (domain,[]) res.observables in
   if List.exists (Alg_expr.has_progress_dep ~only_time:false alg_deps) out then
-    pack
+    (domain, List.rev out)
   else
     (domain,
-     out @ [Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)])
+     Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
+     :: List.rev out)
 
 let compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain ex =
   List.fold_right
@@ -559,7 +560,7 @@ let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?over
   let env =
     Model.init ~filenames:result.filenames domain tk_nd alg_nd alg_deps''
       (Array.of_list result.rules,rule_nd)
-      (Array.of_list (List.rev obs)) (Array.of_list pert) contact_map in
+      (Array.of_list obs) (Array.of_list pert) contact_map in
 
   outputs (Data.Log "\t -initial conditions");
   pause @@ fun () ->

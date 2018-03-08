@@ -1257,15 +1257,17 @@ let compil_of_ast ~syntax_version overwrite c =
     List.fold_left
       (name_and_purify_rule ~syntax_version sigs ~contact_map)
       ((0,Mods.StringSet.empty),[],[]) c.Ast.rules in
+  let not_overwritten acc l =
+    List.fold_left (fun acc ((x,_),_ as e) ->
+        if List.for_all (fun (x',_) -> x <> x') overwrite then e::acc else acc)
+      acc l in
   let alg_vars_over =
     List_util.rev_map_append
       (fun (x,v) -> (Locality.dummy_annot x,
                      Alg_expr.const v)) overwrite
-      (List.filter
-         (fun ((x,_),_) ->
-            List.for_all (fun (x',_) -> x <> x') overwrite)
-         (c.Ast.variables@extra_vars)) in
-  let algs =
+      (List.rev
+         (not_overwritten (not_overwritten [] c.Ast.variables) extra_vars)) in
+    let algs =
     (NamedDecls.create
        ~forbidden:rule_names (Array.of_list alg_vars_over)).NamedDecls.finder in
   let tk_nd = NamedDecls.create
