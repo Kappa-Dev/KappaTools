@@ -100,12 +100,7 @@ let annotate_dropped_agent
          let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
 
          let () = match p.Ast.port_int with
-           | [] ->
-             if syntax_version <> Ast.V3 &&
-                internals.(p_id) <> LKappa.I_ANY (*internal state exists*) then
-               LKappa.not_enough_specified
-                 ~status:"internal" ~side:"right" agent_name p_na
-           | [ None , _ ] -> ()
+           | [] | [ None , _ ] -> ()
            | [ Some va,pos ] ->
              internals.(p_id) <-
                LKappa.I_VAL_ERASED
