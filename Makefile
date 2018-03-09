@@ -140,7 +140,7 @@ site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js  s
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug -I js -I api \
+	-tag debug -I js -I api -pkg result \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<js/*> : package(atdgen), package(js_of_ocaml.tyxml), package(js_of_ocaml-lwt), package(lwt_react)" \
@@ -149,7 +149,7 @@ JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 
 TestJsSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug -I js -I api \
+	-tag debug -I js -I api -pkg result \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen), package(qcheck.ounit)" \
 	-tag-line "<js/*> : package(qcheck.ounit), package(atdgen), package(js_of_ocaml.ppx), package(lwt_react)" \
@@ -157,7 +157,7 @@ TestJsSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 
 %Worker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug -I js -I api \
+	-tag debug -I js -I api -pkg result \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<js/*> : package(atdgen), package(js_of_ocaml.ppx), package(js_of_ocaml-lwt)" \
@@ -165,7 +165,7 @@ TestJsSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 
 WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-I webapp -I api -I agents \
+	-I webapp -I api -I agents -pkg result \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<agents/*> : package(lwt.unix),package(atdgen)" \
@@ -173,7 +173,8 @@ WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.
 	$@
 
 %Agent.native %Agent.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I api -I agents \
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
+	-I api -I agents -pkg result \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt.unix),package(atdgen)" \
 	-tag-line "<agents/*> : package(lwt.unix),package(atdgen)" \
