@@ -23,6 +23,7 @@ DIYc(b[1/.]),DIYb(c[1/.]) @ 1
 
 // after 100 simulated seconds, stop and produce a snapshot called "T 100"
 %mod: alarm 50 do $STOP "T 50" ;
+%mod: alarm 2.3 do $PRINT [T]; repeat [true]
 
 // Measure amount of trimer
 %obs: 'Trimer' |DIYa(b[17]),DIYb(a[17],c[99]),DIYc(b[99])|

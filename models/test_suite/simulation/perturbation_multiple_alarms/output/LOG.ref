@@ -22,9 +22,17 @@ ____________________________________________________________
 3rd printing alarm at 0.7
 ########2nd printing alarm at 1.4
 3rd printing alarm at 1.4
-#################2nd printing alarm at 2.8
+########2nd printing alarm at 2.1
+3rd printing alarm at 2.1
+#########2nd printing alarm at 2.8
 3rd printing alarm at 2.8
-###########################
+########2nd printing alarm at 3.5
+3rd printing alarm at 3.5
+#########2nd printing alarm at 4.2
+3rd printing alarm at 4.2
+########2nd printing alarm at 4.9
+3rd printing alarm at 4.9
+##
 Simulation ended
 99.16% of event loops were productive. Null event cause:
 	Perturbation interrupting time advance: 100.00%
