@@ -16,7 +16,7 @@ depends : [
   "ocamlfind"
   "ocamlbuild" {build}
   "yojson"
-  "lwt"
+  "lwt" { >= "2.6.0" }
 ]
 
 depopts: [
