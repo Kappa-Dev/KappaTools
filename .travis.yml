@@ -81,15 +81,15 @@ before_install:
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then brew update ; brew install opam ; fi"
 
 install:
-  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.04.0 ; else opam init -a git://github.com/ocaml/opam-repository ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.06.1 ; else opam init -a git://github.com/ocaml/opam-repository ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then opam remote add cross-windows git://github.com/whitequark/opam-cross-windows ; fi"
   - eval $(opam config env) && opam install -y conf-which base-bytes #Hack so that opam choose a version of cppo & yojson recent enough
-  - opam install -y ocamlbuild yojson lwt
+  - opam install -y ocamlbuild num yojson lwt
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] || [ '$CHECKED' = windows ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then opam install -y atdgen cohttp-lwt-unix ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then pip install -v . nose ; fi"
-  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 atdgen-windows lwt-windows ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-windows lwt-windows ; fi"
 
 script:
   - make all
