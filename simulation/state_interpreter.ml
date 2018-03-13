@@ -354,10 +354,15 @@ let rec perturbate_until_first_backtrack
            | Some dti ->
               let dt' = dt -. dti in
               (*set time for perturbate *)
-              let () = Counter.one_time_advance counter dti in
-              let stop',graph',state' = perturbate
-                  ~outputs ~is_alarm:true env counter graph state [pe] in
-              stop',graph',state',dt' in
+              if Counter.one_time_advance counter dti then
+                let stop',graph',state' = perturbate
+                    ~outputs ~is_alarm:true env counter graph state [pe] in
+                let () = state'.perturbations_not_done_yet.(pe) <- true in
+                (* Argument to reset only pe and not all perts is "if
+                   you're not backtracking, nothing depends upon
+                   you"... We'd better get sure of that :-) *)
+                stop',graph',state',dt'
+              else true, graph, state, dt' in
 
          perturbate_until_first_backtrack
            env counter ~outputs (stop',graph',state',dt')
@@ -367,16 +372,20 @@ let rec perturbate_until_first_backtrack
      else (stop,graph,state,dt,None)
 
 let perturbate_with_backtrack ~outputs env counter graph state (ti,pe) =
-  let continue = Counter.one_time_correction_event counter ti in
-  let () =
-    let outputs counter' time =
-      let cand =
-        observables_values env graph (Counter.fake_time counter' time) in
-      if Array.length cand > 1 then outputs (Data.Plot cand) in
-    Counter.fill ~outputs counter ~dt:0. in
-  let stop,graph',state' =
-    perturbate ~outputs ~is_alarm:true env counter graph state [pe] in
-  (not continue||stop,graph',state')
+  if Counter.one_time_correction_event counter ti then
+    let () =
+      let outputs counter' time =
+        let cand =
+          observables_values env graph (Counter.fake_time counter' time) in
+        if Array.length cand > 1 then outputs (Data.Plot cand) in
+      Counter.fill ~outputs counter ~dt:0. in
+    let stop,graph',state' =
+      perturbate ~outputs ~is_alarm:true env counter graph state [pe] in
+    let () =
+      Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
+        state.perturbations_not_done_yet in
+    (stop,graph',state')
+    else (true,graph,state)
 
 let a_loop
     ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash env counter graph state =
@@ -432,9 +441,9 @@ let a_loop
                    observables_values env graph (Counter.fake_time counter' time) in
                  if Array.length cand > 1 then outputs (Data.Plot cand) in
                Counter.fill ~outputs counter ~dt in
-              let () = Counter.one_time_advance counter dt' in
+              let continue = Counter.one_time_advance counter dt' in
 
-              if stop then (stop,graph',state') else
+              if (not continue) || stop then (true,graph',state') else
                 one_rule ~outputs ~maxConsecutiveClash env counter graph' state'
          end
 
@@ -445,11 +454,11 @@ let a_loop
               observables_values env graph (Counter.fake_time counter' time) in
             if Array.length cand > 1 then outputs (Data.Plot cand) in
           Counter.fill ~outputs counter ~dt in
-        let () = Counter.one_time_advance counter dt in
-        let (stop,graph',state' as pack) = perturbate
+        let continue = Counter.one_time_advance counter dt in
+        let (stop,graph',state') = perturbate
             ~outputs ~is_alarm:false
             env counter graph state state.time_dependent_perts in
-        if stop then pack else
+        if (not continue)||stop then (true,graph',state') else
           one_rule ~outputs ~maxConsecutiveClash env counter graph' state' in
   out
 

@@ -23,4 +23,4 @@ Counter c of agent A reached maximum
 
 %init: 40 A(s1{u}[.] s2{u}[.] c{=0})
 
-%mod: [E] = 585 do $STOP;
+%mod: [E] = 584 do $STOP;

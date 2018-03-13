@@ -17,28 +17,28 @@ Done
 ____________________________________________________________
 ############################################################
 Simulation ended
-92.45% of event loops were productive. Null event cause:
+92.38% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%
 + Loading trace
 	- removing events occurring after the last observable: nothing has changed 
 + Producing causal compressions
 	- splitting initial events: nothing has changed 
-	- simplify the trace, 2702 events 
-		- start iteration 1, 2702 events remaining 
+	- simplify the trace, 2696 events 
+		- start iteration 1, 2696 events remaining 
 				- alpha-conversion
 				- detecting siphons: nothing has changed 
 				- alpha-conversion
-				- cutting concurrent events: -1929 events 
+				- cutting concurrent events: -1930 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 2, 773 events remaining 
+		- start iteration 2, 766 events remaining 
 				- alpha-conversion
 				- detecting siphons: nothing has changed 
 				- alpha-conversion
 				- cutting concurrent events: nothing has changed 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 773 events remaining 
+	- a fixpoint has been reached, 766 events remaining 
 	- blackboard generation 
-	- computing causal past of each observed events (604)
+	- computing causal past of each observed events (599)
 
 ____________________________________________________________
 ############################################################

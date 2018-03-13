@@ -27,4 +27,4 @@
 
 %init: 10 K(s[.] x{u}[.]), S(k[.] l[.] z[.] x{u}[.] y{u}[.])
 
-%mod: [E] = 703 do $STOP;
+%mod: [E] = 702 do $STOP;

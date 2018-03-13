@@ -56,7 +56,7 @@ val next_story : t -> unit Trace.Simulation_info.t
 val fill : outputs:(t -> float -> unit) -> t -> dt:float -> unit
 val fake_time : t -> float -> t
 
-val one_time_advance : t -> float -> unit
+val one_time_advance : t -> float -> bool
 val one_blocked_event : t -> bool
 val one_constructive_event : t -> bool
 val one_clashing_instance_event : t -> bool

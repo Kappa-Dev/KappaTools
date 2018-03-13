@@ -26,4 +26,4 @@
 %init: 1000 A(a{u}[.])
 %init: 1000 B(a{u}[.] b[.])
 
-%mod: [E] = 98 do $STOP;
+%mod: [E] = 97 do $STOP;

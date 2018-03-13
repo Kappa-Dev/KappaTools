@@ -31,4 +31,4 @@
 %init: 10 fE(c[.] s[.])
 %init: 10000 fS(c[.] e[.] s{o}[.])
 
-%mod: [E] = 3878 do $STOP;
+%mod: [E] = 3877 do $STOP;

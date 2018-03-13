@@ -23,4 +23,4 @@ A(x[1]), B(x[1]), C()+ @ 1
 %init: 10 B(x[.])
 %init: 1 A(x[.])
 
-%mod: [E] = 19 do $STOP;
+%mod: [E] = 18 do $STOP;

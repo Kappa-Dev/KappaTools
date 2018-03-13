@@ -14,4 +14,4 @@ A(a{p/u}[.]) @ 0.01
 
 %init: 10000 A(a{u}[.])
 
-%mod: [E] = 468 do $STOP;
+%mod: [E] = 467 do $STOP;

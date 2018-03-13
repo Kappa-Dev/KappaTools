@@ -183,15 +183,16 @@ let current_event c = c.events
 let nb_null_event c = Efficiency.nb c.stat_null
 let consecutive_null_event c = Efficiency.nb_consecutive c.stat_null
 let consecutive_blocked c = Efficiency.nb_consecutive_blocked c.stat_null
-let one_time_advance c dt = c.time <- (c.time +. dt)
 let inc_stories c = c.stories <- (c.stories + 1)
 let inc_events c =c.events <- (c.events + 1)
 let check_time c =
-  match c.max_time with None -> true | Some max -> c.time < max
+  match c.max_time with None -> true | Some max -> c.time <= max
 let check_output_time c ot =
   match c.max_time with None -> true | Some max -> ot <= max
 let check_events c =
   match c.max_event with None -> true | Some max -> c.events < max
+let one_time_advance c dt =
+  let () = c.time <- (c.time +. dt) in check_time c
 let one_constructive_event c =
   let () = c.stat_null <- Efficiency.reset_consecutive c.stat_null in
   let () = c.stat_null <- Efficiency.reset_consecutive_blocked c.stat_null in
