@@ -154,17 +154,13 @@ let do_modification ~outputs env counter graph state extra modification =
       state),
      extra)
 
-let rec perturbate ~outputs env counter graph state = function
+let rec perturbate ~outputs ~is_alarm env counter graph state = function
   | [] -> (false,graph,state)
   | i :: tail ->
     let pert = Model.get_perturbation env i in
     let mod_alarm = match pert.Primitives.alarm with
       | None -> true
-      | Some n ->
-         match Nbr.to_float n with
-         | None -> false
-         | Some f ->
-            mod_float (Counter.current_time counter) f = 0.0 in
+      | Some _ -> is_alarm in
     if state.perturbations_alive.(i) &&
        state.perturbations_not_done_yet.(i) &&
        Rule_interpreter.value_bool
@@ -184,9 +180,9 @@ let rec perturbate ~outputs env counter graph state = function
           state.force_test_perturbations <- i::state.force_test_perturbations in
       let () = state.perturbations_alive.(i) <- alive in
       if stop then acc else
-        perturbate ~outputs env counter graph state tail'
+        perturbate ~outputs ~is_alarm:false env counter graph state tail'
     else
-      perturbate ~outputs env counter graph state tail
+      perturbate ~outputs ~is_alarm:false env counter graph state tail
 
 let do_modifications ~outputs env counter graph state list =
   let (stop,graph,state as acc,extra) =
@@ -194,7 +190,8 @@ let do_modifications ~outputs env counter graph state list =
         if stop then acc else
           do_modification ~outputs env counter graph state extra effect)
       ((false,graph,state),[]) list in
-  if stop then acc else perturbate ~outputs env counter graph state extra
+  if stop then acc
+  else perturbate ~outputs ~is_alarm:false env counter graph state extra
 
 let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
   let mgraph =
@@ -222,7 +219,8 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
                              ~outputs env counter s (Trace.INIT creations_sort)
                              compiled_rule with
                      | Rule_interpreter.Success s -> s
-                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected | Rule_interpreter.Blocked) ->
+                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected
+                       | Rule_interpreter.Blocked) ->
                        raise (ExceptionDefn.Internal_Error
                                 (Locality.dummy_annot "Bugged initial rule")))
                   state value,state0))) (return (false,graph0,state0)) init_l in
@@ -232,10 +230,12 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
        let mid_graph,_ =
          Rule_interpreter.update_outdated_activities
            (fun _ _ _  -> ()) env counter graph [] in
-       let everybody =
-         let t  = Array.length state0.perturbations_alive in
-         Tools.recti (fun l i -> i::l) [] t in
-       let out = perturbate ~outputs env counter mid_graph state0 everybody in
+       let out =
+         Tools.array_fold_lefti (fun i (stop,graph,state as acc) _ ->
+             if stop then acc else
+               perturbate
+                 ~outputs ~is_alarm:true env counter graph state [i])
+       (false,mid_graph,state0) state0.perturbations_alive in
        let () =
          Array.iteri (fun i _ -> state0.perturbations_not_done_yet.(i) <- true)
            state0.perturbations_not_done_yet in
@@ -321,7 +321,8 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
         register_new_activity env counter graph' force_tested in
     let () = finalize_registration syntax_rid in
     let (stop,graph''',state') =
-      perturbate ~outputs env counter graph'' state extra_pert in
+      perturbate
+        ~outputs ~is_alarm:false env counter graph'' state extra_pert in
     let () =
       Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
         state.perturbations_not_done_yet in
@@ -352,8 +353,8 @@ let rec perturbate_until_first_backtrack
               let dt' = dt -. dti in
               (*set time for perturbate *)
               let () = Counter.one_time_advance counter dti in
-              let stop',graph',state' =
-                perturbate ~outputs env counter graph state [pe] in
+              let stop',graph',state' = perturbate
+                  ~outputs ~is_alarm:true env counter graph state [pe] in
               stop',graph',state',dt' in
 
          perturbate_until_first_backtrack
@@ -368,7 +369,7 @@ let perturbate_with_backtrack ~outputs env counter graph state (ti,pe) =
   let () =
     Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
   let stop,graph',state' =
-    perturbate ~outputs env counter graph state [pe] in
+    perturbate ~outputs ~is_alarm:true env counter graph state [pe] in
   (not continue||stop,graph',state')
 
 let a_loop
@@ -432,7 +433,8 @@ let a_loop
           Counter.fill ~outputs counter ~dt (observables_values env graph) in
         let () = Counter.one_time_advance counter dt in
         let (stop,graph',state' as pack) = perturbate
-            ~outputs env counter graph state state.time_dependent_perts in
+            ~outputs ~is_alarm:false
+            env counter graph state state.time_dependent_perts in
         if stop then pack else
           one_rule ~outputs ~maxConsecutiveClash env counter graph' state' in
   out
