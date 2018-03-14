@@ -56,7 +56,7 @@ endif
 
 .PHONY: all agents clean check build-tests doc clean_doc fetch_version debug
 .PHONY: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-.PHONY: profiling Kappapp.app kappalib install-lib KappaBin.zip
+.PHONY: profiling Kappapp.app kappalib install-lib KappaBin.zip Kappapp.tar.gz
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
@@ -237,6 +237,7 @@ clean_ide:
 	rm -rf ide/Kappa.iconset
 	rm -f ide/Kappa.icns ide/Info.plist
 	rm -rf Kappapp.app Kappapp.app.zip
+	rm -rf KappaBin KappaBin.zip Kappapp Kappapp.tar.gz
 	rm -rf site
 	rm -rf python/__pycache__/
 
@@ -252,7 +253,6 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc cl
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim KaStor bin/KaStor
 	rm -f KaDE bin/KaDE META KappaLib.cm*
-	rm -rf KappaBin KappaBin.zip
 	rm -rf generated
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
@@ -268,6 +268,22 @@ build-tests: bin/sanity_test
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete
 	rm -f grammar/kappaLexer.ml grammar/kappaParser.ml grammar/kappaParser.mli
+
+Kappapp.tar.gz:
+	+$(MAKE) clean
+	+$(MAKE) APP_EXT=local site/index.html
+	+$(MAKE) all agents
+	FILE=$$(mktemp -t nwjsXXXX); \
+	curl -LsS -o $$FILE https://dl.nwjs.io/v$(NWJS_VERSION)/nwjs-v$(NWJS_VERSION)-linux-x64.tar.gz && \
+	tar xzf $$FILE && rm -f $$FILE
+	mkdir Kappapp
+	mv nwjs-v$(NWJS_VERSION)-linux-x64/* Kappapp/
+	rmdir nwjs-v$(NWJS_VERSION)-linux-x64
+	mv Kappapp/nw Kappapp/kappapp
+	mv site Kappapp/package.nw
+	mv bin Kappapp/
+	tar czf $@ Kappapp
+	rm -r Kappapp
 
 KappaBin.zip:
 	+$(MAKE) clean
