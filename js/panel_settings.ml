@@ -117,7 +117,7 @@ let input =
         Html.a_id id;
         Html.a_class [ "form-control"];
         Html.a_placeholder "time units";
-        Html.Unsafe.string_attrib "min" (string_of_float epsilon_float);
+        Html.a_input_min (`Number 0);
         Tyxml_js.R.Html.a_value
           (React.S.map
              (fun m ->
@@ -138,10 +138,8 @@ let input =
              input_dom##.value := Js.string (string_of_float old_value) in
            try
              let new_value = (float_of_string value) in
-             if new_value > 0.0 then
-               State_project.set_plot_period new_value
-             else
-               reset_value ()
+             if new_value < 0. then reset_value ()
+             else State_project.set_plot_period new_value
          with | Not_found | Failure _ -> reset_value ()) in
     ()
 
