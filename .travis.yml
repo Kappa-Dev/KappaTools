@@ -97,7 +97,7 @@ script:
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make META kappalib ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then make agents bin/WebSim && cd python && nosetests -v ; fi"
-  - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
+  - sh -c "if [ '$CHECKED' = js ] ; then make Kappapp.tar.gz site/index.html ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then make Kappapp.app ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then make KappaBin.zip ; fi"
 
