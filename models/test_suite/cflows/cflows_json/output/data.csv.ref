@@ -1,8 +1,8 @@
 # Output of 'KaSim' 'json.ka' '-seed' '840540685' '-l' '5' '-d' 'output' '-trace' '/tmp/cflow-json-trace.json' '-syntax' '4'
-"[T]", "ApBp", "ABA"
-0., 0, 0
-1., 66, 0
-2., 36, 6
-3., 130, 6
-4., 78, 12
-5., 70, 15
+"[T]","ApBp","ABA"
+0.,0,0
+1.,66,0
+2.,36,6
+3.,130,6
+4.,78,12
+5.,70,15
