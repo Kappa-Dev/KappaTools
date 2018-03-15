@@ -355,6 +355,10 @@ let rec perturbate_until_first_backtrack
               let () = Counter.one_time_advance counter dti in
               let stop',graph',state' = perturbate
                   ~outputs ~is_alarm:true env counter graph state [pe] in
+              let () = state'.perturbations_not_done_yet.(pe) <- true in
+              (* Argument to reset only pe and not all perts is "if
+                 you're not backtracking, nothing depends upon
+                 you"... We'd better get sure of that :-) *)
               stop',graph',state',dt' in
 
          perturbate_until_first_backtrack
