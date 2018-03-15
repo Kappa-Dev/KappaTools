@@ -331,9 +331,8 @@ let string_of_plot = JsonUtil.string_of_write write_plot
 let plot_of_string s =
   read_plot (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
-let print_plot_sep is_tsv =
-  if is_tsv then fun f -> Format.pp_print_string f "\t"
-  else Pp.comma
+let print_plot_sep is_tsv f =
+  Format.pp_print_string f (if is_tsv then "\t" else ",")
 
 let print_plot_legend ~is_tsv f a =
   Format.fprintf f "@[<h>%a@]@."
