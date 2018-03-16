@@ -639,11 +639,8 @@ let binding_state_of_json f = function
   | `List [`Int 0] -> ANY
   | `List [`Int 1] -> FREE
   | `List [`Int 2] -> BOUND
-  | `List [`Int 3; `Assoc ["type", `Int ty; "site", `Int s]]
-  | `List [`Int 3; `Assoc ["site", `Int s; "type", `Int ty]] ->
-    BOUND_TYPE (ty,s)
-  | `List [`Int 4; `Assoc ["agent", ag; "site", `Int s]]
-  | `List [`Int 4;`Assoc ["site", `Int s; "agent", ag]] -> BOUND_to (f ag,s)
+  | `List [`Int 3; `List [`Int ty; `Int s]] -> BOUND_TYPE (ty,s)
+  | `List [`Int 4; `List [ag; `Int s]] -> BOUND_to (f ag,s)
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect binding_state",x))
 
 let write_event f ob e =
