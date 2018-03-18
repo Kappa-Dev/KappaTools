@@ -379,8 +379,8 @@ let () =
     let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
     exit 2
   | e ->
+    let s = Printexc.print_backtrace stderr in
+    let () = Format.eprintf "%s@." (Printexc.to_string e) in
     let () = Outputs.close () in
     let () = remove_trace () in
-    let s = Printexc.get_backtrace() in
-    let () = Format.eprintf "@.@[<v>%s@,%s@]@." (Printexc.to_string e) s in
     exit 3
