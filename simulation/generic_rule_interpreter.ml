@@ -100,19 +100,22 @@ module Make (Instances:Instances_sig.S) = struct
   let set_activity rule v state = Random_tree.add rule v state.activities
   let pick_rule rt state = fst (Random_tree.random rt state.activities)
 
-  let initial_activity env counter state =
+  let initial_activity ~outputs env counter state =
     Model.fold_rules
       (fun i () rule ->
          if Array.length rule.Primitives.connected_components = 0 then
            match Nbr.to_float @@ value_alg
                counter state (fst rule.Primitives.rate) with
            | None ->
-             ExceptionDefn.warning ~pos:(snd rule.Primitives.rate)
-               (fun f -> Format.fprintf f "Problematic rule rate replaced by 0")
+             outputs (Data.Warning
+                        (Some (snd rule.Primitives.rate),
+                         fun f ->
+                           Format.fprintf f
+                             "Problematic rule rate replaced by 0"))
            | Some rate -> set_activity (2*i) rate state)
       () env
 
-  let empty ~with_trace random_state env counter =
+  let empty ~outputs ~with_trace random_state env counter =
     let activity_tree = Random_tree.create (2*Model.nb_rules env) in
     let unary_patterns = Model.unary_patterns env in
     let always_outdated =
@@ -145,7 +148,7 @@ module Make (Instances:Instances_sig.S) = struct
         events_to_block = None;
       } in
     let () = Tools.iteri (recompute env counter cand) (Model.nb_algs env) in
-    let () = initial_activity env counter cand in
+    let () = initial_activity ~outputs env counter cand in
     cand
 
   let concrete_actions_for_incomplete_inj rule matching =
@@ -963,10 +966,12 @@ module Make (Instances:Instances_sig.S) = struct
               rule.Primitives.connected_components with
       | [] ->
         let () =
-          ExceptionDefn.warning
-            (fun f -> Format.fprintf f "At t=%f, %a does not apply (anymore)"
-                (Counter.current_time counter)
-                (Trace.print_event_kind ~env) event_kind) in
+          outputs
+            (Data.Warning
+               (None,
+                fun f -> Format.fprintf f "At t=%f, %a does not apply (anymore)"
+                    (Counter.current_time counter)
+                    (Trace.print_event_kind ~env) event_kind)) in
         None
       | l ->
         let (h,_) = List_util.random state.random_state l in
@@ -1084,15 +1089,17 @@ module Make (Instances:Instances_sig.S) = struct
         patterns in
     { state with outdated = false }
 
-  let add_tracked patterns name tests state =
+  let add_tracked ~outputs patterns name tests state =
     let () = assert (not state.outdated) in
     match state.story_machinery with
     | None ->
       let () =
-        ExceptionDefn.warning
-          (fun f -> Format.fprintf f
-              "Observable %s should be tracked but the trace is not stored"
-              name) in
+        outputs
+          (Data.Warning
+             (None,
+              fun f -> Format.fprintf f
+                  "Observable %s should be tracked but the trace is not stored"
+                  name)) in
       state
     | Some tpattern -> aux_add_tracked patterns name tests state tpattern
   let remove_tracked patterns name state =

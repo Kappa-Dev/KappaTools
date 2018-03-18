@@ -29,19 +29,3 @@ exception Unsatisfiable
 
 let warning_buffer:
       (Locality.t option*(Format.formatter -> unit)) list ref = ref []
-
-let warning ?pos msg =
-  warning_buffer :=(pos,msg)::!warning_buffer
-
-let deprecated ~pos entry msg =
-  warning ~pos (fun f -> Format.fprintf f "Deprecated %s syntax:@ %t" entry msg)
-
-let flush_warning f =
-  let l = List.rev !warning_buffer in
-  let () = warning_buffer := [] in
-  List.iter (fun (pos,msg) ->
-	     let pr f () = Format.fprintf f "Warning: @[%t@]" msg in
-	     match pos with
-	     | Some pos ->
-		Format.fprintf f "@[<v>%a@]@." (Locality.print_annot pr) ((),pos)
-	     | None -> Format.fprintf f "@[%a@]@." pr ()) l

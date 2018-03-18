@@ -116,7 +116,7 @@ let do_modification ~outputs env counter graph state extra modification =
           (Pp.array Pp.comma (fun _ -> Pattern.print ~domain ~with_id:false))
           cc in
     ((false,
-      Rule_interpreter.add_tracked cc name tests graph,
+      Rule_interpreter.add_tracked ~outputs cc name tests graph,
       state),
      extra)
   | Primitives.CFLOWOFF (name,cc) ->
@@ -130,13 +130,14 @@ let do_modification ~outputs env counter graph state extra modification =
       if List.exists
           (fun x -> Fluxmap.flux_has_name file x && x.Data.din_kind = rel)
           state.flux
-      then ExceptionDefn.warning
-          (fun f ->
-             Format.fprintf
-               f "At t=%f, e=%i: tracking DIN into \"%s\" was already on"
-               (Counter.current_time counter)
-               (Counter.current_event counter) file)
-    in
+      then outputs
+          (Data.Warning
+             (None,
+              fun f ->
+                Format.fprintf
+                  f "At t=%f, e=%i: tracking DIN into \"%s\" was already on"
+                  (Counter.current_time counter)
+                  (Counter.current_event counter) file)) in
     let () = state.flux <-
         Fluxmap.create_flux env counter rel file::state.flux in
     ((false, graph, state),extra)
@@ -271,10 +272,12 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
                        | (FP_nan | FP_infinite) ->
                          let () =
                            let ct = Counter.current_time counter in
-                           ExceptionDefn.warning
-                             (fun f -> Format.fprintf
-                                 f "An infinite (or NaN) activity variation has been ignored at t=%f"
-                                 ct) in 0.
+                           outputs
+                             (Data.Warning
+                                (None,
+                                 fun f -> Format.fprintf
+                                     f "An infinite (or NaN) activity variation has been ignored at t=%f"
+                                     ct)) in 0.
                        | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
                  !act_stack) l in
       act_stack := [] in
@@ -310,10 +313,12 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
                  | (FP_nan | FP_infinite) ->
                    let () =
                      let ct = Counter.current_time counter in
-                     ExceptionDefn.warning
-                       (fun f -> Format.fprintf
-                           f "An infinite (or NaN) activity variation has been ignored at t=%f"
-                           ct) in 0.
+                     outputs
+                       (Data.Warning
+                          (None,
+                           fun f -> Format.fprintf
+                               f "An infinite (or NaN) activity variation has been ignored at t=%f"
+                               ct)) in 0.
                  | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
           l in
     let force_tested = state.force_test_perturbations in
@@ -404,18 +409,21 @@ let a_loop
               (Data.Snapshot
                  (Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
         let () =
-          ExceptionDefn.warning
-            (fun f ->
-               Format.fprintf
-                 f "A deadlock was reached after %d events and %Es (Activity = %.5f)"
-                 (Counter.current_event counter)
-                 (Counter.current_time counter) activity) in
+          outputs
+            (Data.Warning
+               (None,
+                fun f ->
+                  Format.fprintf f
+                    "A deadlock was reached after %d events and %Es (Activity = %.5f)"
+                    (Counter.current_event counter)
+                    (Counter.current_time counter) activity)) in
         (true,graph,state)
       | (rt,ti,pe) :: tail ->
          let tail' = match rt with
            | None -> tail
            | Some n ->
-              List_util.merge_uniq compare_stops [(rt,(Nbr.add ti n),pe)] tail in
+             List_util.merge_uniq
+               compare_stops [(rt,(Nbr.add ti n),pe)] tail in
         let () = state.stopping_times <- tail' in
         perturbate_with_backtrack ~outputs env counter graph state (ti,pe)
 
@@ -437,8 +445,8 @@ let a_loop
              (*set time for apply rule *)
              let () =
                let outputs counter' time =
-                 let cand =
-                   observables_values env graph (Counter.fake_time counter' time) in
+                 let cand = observables_values
+                     env graph (Counter.fake_time counter' time) in
                  if Array.length cand > 1 then outputs (Data.Plot cand) in
                Counter.fill ~outputs counter ~dt in
               let continue = Counter.one_time_advance counter dt' in
@@ -462,22 +470,23 @@ let a_loop
           one_rule ~outputs ~maxConsecutiveClash env counter graph' state' in
   out
 
-let end_of_simulation ~outputs form env counter graph state =
+let end_of_simulation ~outputs env counter graph state =
   let () =
     let outputs counter' time =
       let cand =
         observables_values env graph (Counter.fake_time counter' time) in
       if Array.length cand > 1 then outputs (Data.Plot cand) in
     Counter.fill ~outputs counter ~dt:0. in
-  let () =
-    List.iter
-      (fun e ->
-         let () =
-           ExceptionDefn.warning
-             (fun f ->
-                Format.fprintf
-                  f "Tracking DIN into \"%s\" was not stopped before end of simulation"
-                  (Fluxmap.get_flux_name e)) in
-         outputs (Data.DIN (Fluxmap.stop_flux env counter e)))
-      state.flux in
-  ExceptionDefn.flush_warning form
+  List.iter
+    (fun e ->
+       let () =
+         outputs
+           (Data.Warning
+              (None,
+               fun f ->
+                 Format.fprintf
+                   f
+                   "Tracking DIN into \"%s\" was not stopped before end of simulation"
+                   (Fluxmap.get_flux_name e))) in
+       outputs (Data.DIN (Fluxmap.stop_flux env counter e)))
+    state.flux

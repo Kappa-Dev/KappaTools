@@ -18,7 +18,8 @@ module Make (Instances:Instances_sig.S) : sig
   (** {6 Initialisation} *)
 
   val empty :
-    with_trace:bool -> Random.State.t -> Model.t -> Counter.t -> t
+    outputs:(Data.t -> unit) ->with_trace:bool ->
+    Random.State.t -> Model.t -> Counter.t -> t
 
   (** {6 algebraic expression computation} *)
   (** [get_alg] is by default [Model.get_alg] but it is not hard
@@ -103,7 +104,7 @@ module Make (Instances:Instances_sig.S) : sig
   (** {6 Stories} *)
 
   val add_tracked :
-    Pattern.id array -> string ->
+    outputs:(Data.t -> unit) -> Pattern.id array -> string ->
     Instantiation.abstract Instantiation.test list list -> t -> t
   val remove_tracked : Pattern.id array -> string option -> t -> t
 

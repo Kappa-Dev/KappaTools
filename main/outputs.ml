@@ -158,6 +158,9 @@ let snapshot s =
 let print_species time f mixture =
   Format.fprintf f "%g: @[<h>%a@]@." time User_graph.print_cc mixture
 
+let warning_buffer:
+      (Locality.t option*(Format.formatter -> unit)) list ref = ref []
+
 let go = function
   | Data.Snapshot s -> snapshot s
   | Data.DIN f -> output_flux f
@@ -171,6 +174,7 @@ let go = function
     in
     Format.fprintf desc "%s@." p.Data.file_line_text
   | Data.Log s -> Format.printf "%s@." s
+  | Data.Warning (pos,msg) -> warning_buffer := (pos,msg)::!warning_buffer
   | Data.TraceStep step ->
     begin match !traceDescr with
       | None -> ()
@@ -184,6 +188,12 @@ let go = function
      print_species time desc mixture
 
 let inputsDesc = ref None
+
+let flush_warning () =
+  let l = List.rev !warning_buffer in
+  let () = warning_buffer := [] in
+  List.iter
+    (fun (pos,msg) -> Data.print_warning ?pos Format.err_formatter msg) l
 
 let close_input ?event () =
   match !inputsDesc with
@@ -201,6 +211,7 @@ let close ?event () =
   let () = close_plot () in
   let () = close_trace () in
   let () = close_activities () in
+  let () = flush_warning () in
   let () = close_input ?event () in
   close_desc ()
 

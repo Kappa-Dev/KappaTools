@@ -14,7 +14,8 @@ type preprocessed_ast =
   (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list option *
   float option
 
-let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
+let preprocess
+    ~warning ?(kasim_args=Kasim_args.default) cli_args ast =
   let () = Format.printf "+ simulation parameters@." in
   let conf, progressConf,
       story_compression, formatCflow, cflowFile =
@@ -23,7 +24,7 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
   let syntax_version = cli_args.Run_cli_args.syntaxVersion in
   let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
     LKappa_compiler.compil_of_ast
-      ~syntax_version
+      ~warning ~syntax_version
       kasim_args.Kasim_args.alg_var_overwrite ast in
   let overwrite_init,overwrite_t0 = match kasim_args.Kasim_args.initialMix with
     | None -> None,None
@@ -38,7 +39,7 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
         Configuration.parse compil.Ast.configurations in
       Some
         (LKappa_compiler.init_of_ast
-           ~syntax_version sigs_nd contact_map
+           ~warning ~syntax_version sigs_nd contact_map
            tk_nd.NamedDecls.finder alg_finder compil.Ast.init),
       conf.Configuration.initial in
   conf, progressConf,
@@ -58,13 +59,13 @@ let get_ast_from_cli_args cli_args =
     cli_args.Run_cli_args.inputKappaFileNames
 
 let get_preprocessed_ast_from_cli_args
-    ?(kasim_args=Kasim_args.default) cli_args =
+    ~warning ?(kasim_args=Kasim_args.default) cli_args =
   let ast =
     get_ast_from_list_of_files
       cli_args.Run_cli_args.syntaxVersion
       cli_args.Run_cli_args.inputKappaFileNames
   in
-  preprocess cli_args ~kasim_args ast
+  preprocess ~warning cli_args ~kasim_args ast
 
 let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
     ~max_sharing ?bwd_bisim ~compileModeOn preprocessed_ast
@@ -89,13 +90,13 @@ let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
  formatCflow, cflowFile,init_l),[],overwrite_t0
 
 let get_pack_from_marshalizedfile
-   kasim_args cli_args marshalized_file =
+   ~warning kasim_args cli_args marshalized_file =
   assert (marshalized_file <> "");
   try
     let d = open_in_bin marshalized_file in
     let () =
       if cli_args.Run_cli_args.inputKappaFileNames <> [] then
-        ExceptionDefn.warning
+        warning ~pos:Locality.dummy
           (fun f ->
              Format.pp_print_string
                f "Simulation package loaded, all kappa files are ignored") in
@@ -122,10 +123,11 @@ let get_pack_from_marshalizedfile
         Configuration.parse compil.Ast.configurations in
       let raw_inits =
         LKappa_compiler.init_of_ast
-          ~syntax_version:cli_args.Run_cli_args.syntaxVersion
+          ~warning ~syntax_version:cli_args.Run_cli_args.syntaxVersion
           (Model.signatures env) contact
           (Model.tokens_finder env) (Model.algs_finder env) compil.Ast.init in
-      let inits = Eval.compile_inits ?rescale:kasim_args.Kasim_args.rescale
+      let inits = Eval.compile_inits
+          ~warning ?rescale:kasim_args.Kasim_args.rescale
           ~compileModeOn:false contact env raw_inits in
       (conf,progress,env,contact,updated,compr,cflow,cflowfile,inits),
       alg_overwrite,conf'.Configuration.initial
@@ -138,8 +140,7 @@ let get_pack_from_marshalizedfile
     exit 1
 
 let get_compilation_from_pack
-    ?(unit=Kasim_args.Time)
-    cli_args pack =
+    ~warning ?(unit=Kasim_args.Time) cli_args pack =
     let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
          formatCflows, cflowFile, init_l),
         alg_overwrite,overwrite_t0 = pack in
@@ -159,7 +160,8 @@ let get_compilation_from_pack
          Option_util.unsome (Counter.DT 1.) conf.Configuration.plotPeriod)
     | Kasim_args.Event ->
       init_t_from_files,None,
-      Some (int_of_float (Option_util.unsome 0. cli_args.Run_cli_args.minValue)),
+      Some (int_of_float
+              (Option_util.unsome 0. cli_args.Run_cli_args.minValue)),
       Option_util.map int_of_float cli_args.Run_cli_args.maxValue,
       match cli_args.Run_cli_args.plotPeriod with
       | Some a -> Counter.DE (int_of_float (ceil a))
@@ -170,38 +172,35 @@ let get_compilation_from_pack
   let env =
     if cli_args.Run_cli_args.batchmode then
       Model.propagate_constant
-        ?max_time:(Counter.max_time counter)
+        ~warning ?max_time:(Counter.max_time counter)
         ?max_events:(Counter.max_events counter) updated_vars alg_overwrite env0
     else Model.overwrite_vars alg_overwrite env0 in
   (conf, progressConf, env, contact_map, updated_vars, story_compression,
    formatCflows, cflowFile, init_l),counter
 
 let get_compilation_from_preprocessed_ast
-    ?(unit=Kasim_args.Time)
-    ?(max_sharing=false)
-    ?bwd_bisim
-    ?(compileModeOn=false)
-    ?(kasim_args=Kasim_args.default)
-    cli_args preprocessed
-    =
+  ~warning ?(unit=Kasim_args.Time) ?(max_sharing=false) ?bwd_bisim
+    ?(compileModeOn=false) ?(kasim_args=Kasim_args.default)
+    cli_args preprocessed =
     let pack =
       get_pack_from_preprocessed_ast
       ~kasim_args ~max_sharing ?bwd_bisim ~compileModeOn
       preprocessed
     in
-    get_compilation_from_pack ~unit cli_args pack
+    get_compilation_from_pack ~warning ~unit cli_args pack
 
 let get_compilation
-       ?(unit=Kasim_args.Time) ?(max_sharing=false) ?bwd_bisim ?(compileModeOn=false)
-       ?(kasim_args=Kasim_args.default) cli_args =
+    ~warning ?(unit=Kasim_args.Time) ?(max_sharing=false) ?bwd_bisim
+    ?(compileModeOn=false) ?(kasim_args=Kasim_args.default) cli_args =
      let pack =
        match kasim_args.Kasim_args.marshalizedInFile with
        | "" ->
-         let preprocess = get_preprocessed_ast_from_cli_args cli_args in
+         let preprocess =
+           get_preprocessed_ast_from_cli_args ~warning cli_args in
          get_pack_from_preprocessed_ast
            ~kasim_args ~max_sharing ?bwd_bisim ~compileModeOn
            preprocess
        | marshalized_file ->
          get_pack_from_marshalizedfile
-           kasim_args cli_args marshalized_file in
-     get_compilation_from_pack ~unit cli_args pack
+           ~warning kasim_args cli_args marshalized_file in
+     get_compilation_from_pack ~warning ~unit cli_args pack

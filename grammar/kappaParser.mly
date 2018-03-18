@@ -144,13 +144,7 @@ perturbation_post:
   | REPEAT bool_expr {Some $2}
   | UNTIL bool_expr
    /* backward compatibility */
-	 {ExceptionDefn.deprecated
-	      ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
-				    (Parsing.symbol_end_pos ()))
-	      "perturbation"
-	      (fun f -> Format.pp_print_string
-			  f "use the 'repeat' construction");
-	    Some (add_pos (Alg_expr.UN_BOOL_OP (Operator.NOT,$2)))}
+	 { Some (add_pos (Alg_expr.UN_BOOL_OP (Operator.NOT,$2)))}
 
 
 perturbation_declaration:
@@ -160,38 +154,9 @@ perturbation_declaration:
     { ($1,None,$3,$4) }
     | REPEAT bool_expr DO effect_list UNTIL bool_expr
        /* backward compatibility */
-	   {ExceptionDefn.deprecated
-	      ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
-				    (Parsing.symbol_end_pos ()))
-	      "perturbation"
-	      (fun f -> Format.pp_print_string
-			  f "deprecated KaSim3 syntax");
-              let () = if List.exists
-			  (fun effect ->
-			   match effect with
-			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
-			      | Ast.DIN _ | Ast.DINOFF _
-			      | Ast.SPECIES_OF _) -> true
-			   | (Ast.STOP _ | Ast.APPLY _
-			     | Ast.UPDATE _ | Ast.PRINT _
-			     | Ast.SNAPSHOT _ | Ast.PLOTENTRY) -> false
-			  ) $4
-		     then
-		       ExceptionDefn.warning
-			 ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
-					       (Parsing.symbol_end_pos ()))
-			 (fun f ->
-			  Format.pp_print_string
-			    f "Perturbation need not be applied repeatedly") in
-	    (None,Some $2,$4,Some (add_pos (Alg_expr.UN_BOOL_OP (Operator.NOT,$6))))}
+	  { (None,Some $2,$4,Some (add_pos (Alg_expr.UN_BOOL_OP (Operator.NOT,$6))))}
      | perturbation_alarm bool_expr SET effect_list
-		{ExceptionDefn.deprecated
-		   ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
-					 (Parsing.symbol_end_pos ()))
-		   "perturbation"
-		   (fun f -> Format.pp_print_string
-			       f "'set' keyword is replaced by 'do'");
-		 ($1,Some $2,$4,None)} /*For backward compatibility*/
+		{ ($1,Some $2,$4,None)} /*For backward compatibility*/
     ;
 
 standalone_effect_list: effect_list EOF {$1}
@@ -292,15 +257,7 @@ boolean:
 
 variable_declaration:
     | LABEL non_empty_mixture
-	    {let () =
-	       ExceptionDefn.deprecated
-		~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
-				      (Parsing.symbol_end_pos ()))
-		 "variable"
-		 (fun f -> Format.pp_print_string
-			     f "use |kappa instance| instead.")
-	      in
-	      (($1,rhs_pos 1),(Alg_expr.KAPPA_INSTANCE $2,rhs_pos 2))}
+	   { (($1,rhs_pos 1),(Alg_expr.KAPPA_INSTANCE $2,rhs_pos 2))}
     | LABEL alg_expr {(($1,rhs_pos 1),$2)}
     | ID alg_expr {(($1,rhs_pos 1),$2)}
     | LABEL error
@@ -442,15 +399,7 @@ birate:
 
 rate:
     | alg_expr OP_CUR alg_with_radius CL_CUR {($1,Some $3)}
-    | alg_expr OP_PAR alg_with_radius CL_PAR {
-      ExceptionDefn.deprecated
-         ~pos:(Locality.of_pos (Parsing.rhs_start_pos 2)
-			       (Parsing.rhs_end_pos 4))
-	      "unimolecular rate"
-	      (fun f -> Format.pp_print_string
-			  f "use {} instead of ()");
-			  ($1,Some $3)
-    }
+    | alg_expr OP_PAR alg_with_radius CL_PAR { ($1,Some $3) }
     | alg_expr {($1,None)}
     | OP_CUR alg_with_radius CL_CUR
       {(Locality.dummy_annot (Alg_expr.CONST Nbr.zero),Some $2)}

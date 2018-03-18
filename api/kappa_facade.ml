@@ -93,7 +93,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
   lastyield;
 }
 
-let reinitialize random_state t =
+let reinitialize ~outputs random_state t =
   let () = Counter.reinitialize t.counter in
 (*  let () = Format.pp_print_flush t.log_form () in
     let () = Buffer.reset t.log_buffer in*)
@@ -106,7 +106,7 @@ let reinitialize random_state t =
   t.files <- Mods.StringMap.empty;
   t.error_messages <- [];
   t.graph <- Rule_interpreter.empty
-      ~with_trace:false
+      ~outputs ~with_trace:false
       random_state t.env t.counter;
   t.state <- State_interpreter.empty ~with_delta_activities:false t.env []
 
@@ -181,8 +181,10 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
   let post_parse ast =
     let (conf,_,_,_,_) =
       Configuration.parse ast.Ast.configurations in
+    let warning ~pos msg = Data.print_warning ~pos log_form msg in
     (Lwt.wrap2
-       (LKappa_compiler.compil_of_ast ~syntax_version:Ast.V4) overwrite ast) >>=
+       (LKappa_compiler.compil_of_ast
+          ~warning ~syntax_version:Ast.V4) overwrite ast) >>=
     (fun
       (sig_nd,
        contact_map,
@@ -198,27 +200,28 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
          let lastyield = Sys.time () in
          try (* exception raised by compile must have used Lwt.fail.
                 Something is wrong for now *)
+           let outputs = function
+             | Data.Log s ->
+               Format.fprintf log_form "%s@." s
+             | Data.Warning (pos,msg) ->
+               Data.print_warning ?pos log_form msg
+             | Data.Snapshot _
+             | Data.DIN _
+             | Data.Species _
+             | Data.DeltaActivities _
+             | Data.Plot _
+             | Data.TraceStep _
+             | Data.Print _ -> assert false in
            Eval.compile
              ~pause:(fun f -> Lwt.bind (yield ()) f)
              ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
-             ~outputs:(function
-                 | Data.Log s ->
-                   Format.fprintf log_form "%s@." s
-                 | Data.Snapshot _
-                 | Data.DIN _
-                 | Data.Species _
-                 | Data.DeltaActivities _
-                 | Data.Plot _
-                 | Data.TraceStep _
-                 | Data.Print _ -> assert false)
-             ~max_sharing:false sig_nd tk_nd contact_map result >>=
+             ~outputs ~max_sharing:false sig_nd tk_nd contact_map result >>=
            (fun (env,with_trace,init_l) ->
               let counter =
                 Counter.create
                   ~init_t:(0. : float) ~init_e:(0 : int)
                   ?max_time:None ?max_event:None
                   ~plot_period:(Counter.DT 1.) in
-              let () = ExceptionDefn.flush_warning log_form in
               let theSeed =
                 match conf.Configuration.seed with
                 | None ->
@@ -240,7 +243,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                   ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
                   ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
                   ~graph:(Rule_interpreter.empty
-                            ~with_trace
+                            ~outputs ~with_trace
                             random_state env counter)
                   ~state:(State_interpreter.empty ~with_delta_activities:false env [])
                   ~init_l ~lastyield
@@ -295,6 +298,7 @@ let outputs (simulation : t) =
     let snapshot' = { snapshot with Data.snapshot_file } in
     simulation.snapshots <- snapshot'::simulation.snapshots
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
+  | Data.Warning (pos,msg) -> Data.print_warning ?pos simulation.log_form msg
   | Data.TraceStep st ->
     let () = Bi_outbuf.add_char simulation.trace
         (if simulation.trace.Bi_outbuf.o_len = 0 &&
@@ -303,6 +307,7 @@ let outputs (simulation : t) =
 
 let interactive_outputs formatter t = function
   | Data.Log s -> Format.fprintf formatter "%s@." s
+  | Data.Warning (pos,msg) -> Data.print_warning ?pos formatter msg
   | Data.Print file_line when file_line.Data.file_line_name = None ->
     Format.fprintf formatter "%s@." file_line.Data.file_line_text
   | Data.DIN _ | Data.DeltaActivities _ | Data.Plot _ | Data.Species _ |
@@ -343,7 +348,7 @@ let time_yield
 
 let finalize_simulation ~(t : t) : unit =
   State_interpreter.end_of_simulation
-    ~outputs:(outputs t) t.log_form t.env t.counter t.graph t.state
+    ~outputs:(outputs t) t.env t.counter t.graph t.state
 
 let run_simulation
     ~(system_process : system_process) ~(t : t) stopped : unit Lwt.t =
@@ -380,12 +385,7 @@ let run_simulation
            Lwt.return_unit in
        (iter ()) >>=
        (fun () ->
-          let () =
-            if t.run_finalize then
-              finalize_simulation ~t:t
-            else
-              ExceptionDefn.flush_warning t.log_form
-          in
+          let () = if t.run_finalize then finalize_simulation ~t in
           Lwt.return_unit))
     (catch_error
        (fun e ->
@@ -415,10 +415,11 @@ let start
         match parameter.Api_types_t.simulation_seed with
         | None -> Random.State.make_self_init ()
         | Some seed -> Random.State.make [|seed|] in
-      let () = reinitialize random_state t in
+      let () = reinitialize random_state ~outputs:(outputs t) t in
       try
         let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
         Lwt.wrap4 (Evaluator.get_pause_criteria
+                     ~outputs:(outputs t)
                      ~max_sharing:false ~syntax_version:Ast.V4)
           t.contact_map t.env t.graph pause >>=
         fun (env',graph',b'') ->
@@ -447,7 +448,6 @@ let start
                    t.init_l >>=
                  (fun (stop,graph,state) ->
                     let () = t.graph <- graph; t.state <- state in
-                    let () = ExceptionDefn.flush_warning t.log_form in
                     let first_obs =
                       State_interpreter.observables_values
                         t.env graph t.counter in
@@ -557,6 +557,7 @@ let continue
          try
            let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
            Lwt.wrap4 (Evaluator.get_pause_criteria
+                        ~outputs:(outputs t)
                         ~max_sharing:false ~syntax_version:Ast.V4)
              t.contact_map t.env t.graph pause >>=
            fun (env',graph',b'') ->

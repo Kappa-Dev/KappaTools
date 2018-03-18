@@ -93,6 +93,7 @@ val of_yojson : Yojson.Basic.json -> t
 val check_if_counter_is_filled_enough : t -> unit
 val overwrite_vars : (int * Primitives.alg_expr) list -> t -> t
 val propagate_constant :
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?max_time:float -> ?max_events:int ->
   int list -> (int * Primitives.alg_expr) list -> t -> t
 (** [propagate_constant updated_vars overwrite_vars env] *)

@@ -249,7 +249,7 @@ let compute_env_init
     let () = cli.Run_cli_args.syntaxVersion <- syntax_version in
     let () = cli.Run_cli_args.inputKappaFileNames <- files in
     let (_,_,env, contactmap, _, _, _, _, init), _ =
-      Cli_init.get_compilation cli
+      Cli_init.get_compilation ~warning:(fun ~pos _msg -> ()) cli
     in
     let state =
       Remanent_state.set_init_state

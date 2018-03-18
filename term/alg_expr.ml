@@ -281,10 +281,13 @@ let setup_alg_vars_rev_dep toks vars =
   Tools.array_fold_lefti
     (fun i x (_,y) -> add_dep x (Operator.ALG i) y) (in_t,in_e,toks_d,out) vars
 
-let rec propagate_constant ?max_time ?max_events updated_vars vars = function
+let rec propagate_constant
+    ~warning ?max_time ?max_events updated_vars vars = function
   | BIN_ALG_OP (op,a,b),pos as x ->
-    (match propagate_constant ?max_time ?max_events updated_vars vars a,
-           propagate_constant ?max_time ?max_events updated_vars vars b with
+    (match propagate_constant
+             ~warning ?max_time ?max_events updated_vars vars a,
+           propagate_constant
+             ~warning ?max_time ?max_events updated_vars vars b with
     | (CONST c1,_),(CONST c2,_) -> CONST (Nbr.of_bin_alg_op op c1 c2),pos
     | ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
        | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _
@@ -294,14 +297,16 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
        | CONST _ | IF _),_ as b') ->
       if a == a' && b == b' then x else (BIN_ALG_OP (op,a',b'),pos))
   | UN_ALG_OP (op,a),pos as x ->
-    (match propagate_constant ?max_time ?max_events updated_vars vars a with
+    (match propagate_constant
+             ~warning ?max_time ?max_events updated_vars vars a with
      | CONST c,_ -> CONST (Nbr.of_un_alg_op op c),pos
      | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _
        | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _
        | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ as a' ->
     if a == a' then x else (UN_ALG_OP (op,a'),pos))
   | DIFF_TOKEN (a,t),pos as x ->
-    (match propagate_constant ?max_time ?max_events updated_vars vars a with
+    (match propagate_constant
+             ~warning ?max_time ?max_events updated_vars vars a with
      | CONST _,_ ->
        (* the derivative of a constant is zero *)
        CONST (Nbr.zero),pos
@@ -309,12 +314,14 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
        | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _),_ as a' ->
        if a == a' then x else (DIFF_TOKEN (a',t),pos))
   | DIFF_KAPPA_INSTANCE (a,m),pos as x ->
-    (match propagate_constant ?max_time ?max_events updated_vars vars a with
+    (match propagate_constant
+             ~warning ?max_time ?max_events updated_vars vars a with
      | CONST _,_ ->
        (* the derivative of a constant is zero *)
        CONST (Nbr.zero),pos
      | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _
-       | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ as a' ->
+       | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_
+       as a' ->
        if a == a' then x else (DIFF_KAPPA_INSTANCE (a',m),pos))
   | STATE_ALG_OP (Operator.EMAX_VAR),pos ->
     CONST
@@ -322,7 +329,7 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
        | Some n -> Nbr.I n
        | None ->
          let () =
-           ExceptionDefn.warning
+           warning
              ~pos (fun f -> Format.pp_print_string
                       f "[Emax] constant is evaluated to infinity") in
          Nbr.F infinity),pos
@@ -332,7 +339,7 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
          | Some t -> Nbr.F t
          | None ->
            let () =
-             ExceptionDefn.warning
+             warning
                ~pos (fun f -> Format.pp_print_string
                         f "[Tmax] constant is evaluated to infinity") in
            Nbr.F infinity),pos
@@ -348,20 +355,23 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
 
   | IF (cond,yes,no),pos ->
     match propagate_constant_bool
-            ?max_time ?max_events updated_vars vars cond with
+            ~warning ?max_time ?max_events updated_vars vars cond with
     | TRUE, _ ->
-      propagate_constant ?max_time ?max_events updated_vars vars yes
+      propagate_constant ~warning ?max_time ?max_events updated_vars vars yes
     | FALSE,_ ->
-      propagate_constant ?max_time ?max_events updated_vars vars no
+      propagate_constant ~warning ?max_time ?max_events updated_vars vars no
     | (BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_ as cond' ->
-      (IF (cond', propagate_constant ?max_time ?max_events updated_vars vars yes,
-           propagate_constant ?max_time ?max_events updated_vars vars no),pos)
+      (IF (cond',
+           propagate_constant
+             ~warning ?max_time ?max_events updated_vars vars yes,
+           propagate_constant
+             ~warning ?max_time ?max_events updated_vars vars no),pos)
 and propagate_constant_bool
-    ?max_time ?max_events updated_vars vars = function
+    ~warning ?max_time ?max_events updated_vars vars = function
   | (TRUE | FALSE),_ as x -> x
   | UN_BOOL_OP (op,a),pos ->
     begin match propagate_constant_bool
-                  ?max_time ?max_events updated_vars vars a, op with
+                  ~warning ?max_time ?max_events updated_vars vars a, op with
       | (TRUE,_), Operator.NOT -> FALSE,pos
       | (FALSE,_), Operator.NOT -> TRUE,pos
       | ((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_ as a'),_ ->
@@ -369,15 +379,16 @@ and propagate_constant_bool
     end
   | BIN_BOOL_OP (op,a,b),pos ->
     begin match propagate_constant_bool
-                  ?max_time ?max_events updated_vars vars a, op with
+                  ~warning ?max_time ?max_events updated_vars vars a, op with
       | (TRUE,_), Operator.OR -> TRUE,pos
       | (FALSE,_), Operator.AND -> FALSE,pos
       | (TRUE,_), Operator.AND
       | (FALSE,_), Operator.OR ->
-        propagate_constant_bool ?max_time ?max_events updated_vars vars b
+        propagate_constant_bool
+          ~warning ?max_time ?max_events updated_vars vars b
       | ((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_ as a'),_ ->
         match propagate_constant_bool
-                ?max_time ?max_events updated_vars vars b, op with
+                ~warning ?max_time ?max_events updated_vars vars b, op with
         | (TRUE,_), Operator.OR -> TRUE,pos
         | (FALSE,_), Operator.AND -> FALSE,pos
         | (TRUE,_), Operator.AND
@@ -386,8 +397,10 @@ and propagate_constant_bool
           BIN_BOOL_OP (op,a',b'),pos
     end
   | COMPARE_OP (op,a,b),pos ->
-    let a' = propagate_constant ?max_time ?max_events updated_vars vars a in
-    let b' = propagate_constant ?max_time ?max_events updated_vars vars b in
+    let a' = propagate_constant
+        ~warning ?max_time ?max_events updated_vars vars a in
+    let b' = propagate_constant
+        ~warning ?max_time ?max_events updated_vars vars b in
     match a',b' with
     | (CONST n1,_), (CONST n2,_) ->
       (if Nbr.of_compare_op op n1 n2 then TRUE,pos else FALSE,pos)

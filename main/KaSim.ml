@@ -62,7 +62,7 @@ let finalize
     ~outputs dotFormat cflow_file trace_file
     env counter graph state stories_compression =
   let () = State_interpreter.end_of_simulation
-      ~outputs  Format.err_formatter env counter graph state in
+      ~outputs env counter graph state in
   let () = Counter.complete_progress_bar counter in
   let () = Outputs.close ~event:(Counter.current_event counter) () in
   match trace_file,stories_compression with
@@ -136,8 +136,10 @@ let () =
     let cpu_time = Sys.time () in
     let (conf, progressConf, env, contact_map, _, story_compression,
          formatCflows, cflowFile, init_l as init_result),
-        counter = Cli_init.get_compilation
-        ~unit:kasim_args.Kasim_args.unit
+        counter =
+      let warning ~pos msg = Outputs.go (Data.Warning (Some pos,msg)) in
+      Cli_init.get_compilation
+        ~warning ~unit:kasim_args.Kasim_args.unit
         ~max_sharing:kasim_args.Kasim_args.maxSharing
         ~compileModeOn:kasim_args.Kasim_args.compileMode ~kasim_args cli_args in
     let () = if kasim_args.Kasim_args.showEfficiency then
@@ -253,7 +255,7 @@ let () =
       | Some domainOutputFile ->
         Yojson.Basic.to_file (Kappa_files.path domainOutputFile)
           (Pattern.Env.to_yojson (Model.domain env)) in
-    ExceptionDefn.flush_warning Format.err_formatter ;
+    Outputs.flush_warning () ;
     (if kasim_args.Kasim_args.compileMode
      then let () = remove_trace () in exit 0
      else ());
@@ -283,7 +285,7 @@ let () =
       else
         let lexbuf = Lexing.from_channel stdin in
         let rec toplevel env graph state =
-          let () = ExceptionDefn.flush_warning Format.err_formatter in
+          let () = Outputs.flush_warning () in
           let () = Format.printf "@.> @?" in
           let env',(stop,graph',state') =
             try
@@ -296,8 +298,9 @@ let () =
                     raise (ExceptionDefn.Malformed_Decl r) in
               match command with
               | Ast.RUN b ->
-                let env',graph',b'' = Evaluator.get_pause_criteria
-                    ~max_sharing:kasim_args.Kasim_args.maxSharing
+                let env',graph',b'' =
+                  Evaluator.get_pause_criteria
+                    ~outputs ~max_sharing:kasim_args.Kasim_args.maxSharing
                     ~syntax_version:(cli_args.Run_cli_args.syntaxVersion)
                     contact_map env graph b in
                 env',interactive_loop
@@ -353,13 +356,11 @@ let () =
   | ExceptionDefn.Malformed_Decl er ->
     let () = Outputs.close () in
     let () = remove_trace () in
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let () = Pp.error Format.pp_print_string er in
     exit 2
   | ExceptionDefn.Internal_Error er ->
     let () = Outputs.close () in
     let () = remove_trace () in
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let () =
       Pp.error
         (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
@@ -368,21 +369,18 @@ let () =
   | Sys.Break ->
     let () = Outputs.close () in
     let () = remove_trace () in
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let () =
       Format.eprintf "@.***Interrupted by user out of simulation loop***@." in
     exit 1
   | Invalid_argument msg ->
     let () = Outputs.close () in
     let () = remove_trace () in
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let s = Printexc.get_backtrace() in
     let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
     exit 2
   | e ->
     let () = Outputs.close () in
     let () = remove_trace () in
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let s = Printexc.get_backtrace() in
     let () = Format.eprintf "@.@[<v>%s@,%s@]@." (Printexc.to_string e) s in
     exit 3

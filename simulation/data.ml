@@ -350,6 +350,13 @@ let export_plot ~is_tsv plot =
                          (Pp.option (fun f -> Format.fprintf f "%e"))))
     (List.rev plot.plot_series)
 
+let print_warning ?pos f msg =
+  let pr f () = Format.fprintf f "Warning: @[%t@]" msg in
+  match pos with
+  | Some pos ->
+    Format.fprintf f "@[<v>%a@]@." (Locality.print_annot pr) ((),pos)
+  | None -> Format.fprintf f "@[%a@]@." pr ()
+
 type file_line = {
   file_line_name : string option;
   file_line_text : string;
@@ -364,3 +371,4 @@ type t =
   | Snapshot of snapshot
   | Log of string
   | Species of string * float * User_graph.connected_component
+  | Warning of Locality.t option*(Format.formatter -> unit)

@@ -41,6 +41,7 @@ type t =
   | Snapshot of snapshot
   | Log of string
   | Species of string * float * User_graph.connected_component
+  | Warning of Locality.t option*(Format.formatter -> unit)
 
 val print_snapshot : ?uuid: int -> Format.formatter -> snapshot -> unit
 
@@ -123,3 +124,6 @@ val print_initial_inputs :
   ?uuid:int -> Configuration.t -> Model.t -> Contact_map.t ->
   Format.formatter -> (Primitives.alg_expr * Primitives.elementary_rule) list ->
   unit
+
+val print_warning :
+  ?pos:Locality.t -> Format.formatter -> (Format.formatter -> unit) -> unit

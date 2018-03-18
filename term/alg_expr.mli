@@ -121,11 +121,13 @@ val extract_connected_components : ('a,'b) e Locality.annot -> 'a list
 val extract_connected_components_bool : ('a,'b) bool Locality.annot -> 'a list
 
 val propagate_constant :
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?max_time:float -> ?max_events:int -> int list ->
   (string Locality.annot * ('a,int) e Locality.annot) array ->
   ('a,int) e Locality.annot -> ('a,int) e Locality.annot
 
 val propagate_constant_bool :
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?max_time:float -> ?max_events:int -> int list ->
   (string Locality.annot * ('a,int) e Locality.annot) array ->
   ('a,int) bool Locality.annot -> ('a,int) bool Locality.annot

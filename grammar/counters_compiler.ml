@@ -161,7 +161,7 @@ let enumerate rules f =
                    | Some (s1,a1), Some s2 -> Some (s1^"__"^s2,a1),r') (f r) in
           enumerate_r@acc) [] rules)
 
-let remove_variable_in_counters rules signatures =
+let remove_variable_in_counters ~warning rules signatures =
   let counter_gte_delta c delta =
     let count_delta =
       {c with Ast.count_test=Some (Ast.CGTE (abs(delta)),Locality.dummy)} in
@@ -193,7 +193,7 @@ let remove_variable_in_counters rules signatures =
                            (snd c.Ast.count_nme))) in
           let () = if (v=0) then
                      let error = "Counter "^(fst c.Ast.count_nme)^":>0 always holds" in
-                     ExceptionDefn.warning
+                     warning
                        ~pos (fun f -> Format.pp_print_string f error) in
           [(Ast.Counter c,[])]
        | Some (Ast.CVAR x,a) ->
@@ -262,9 +262,10 @@ let with_counters c =
       mix in
   with_counters_mix c.Ast.signatures
 
-let compile c =
+let compile ~warning c =
   if (with_counters c) then
-    let rules = remove_variable_in_counters c.Ast.rules c.Ast.signatures in
+    let rules =
+      remove_variable_in_counters ~warning c.Ast.rules c.Ast.signatures in
     let () =
       if (!Parameter.debugModeOn) then
         let () = Format.printf "@.ast rules@." in

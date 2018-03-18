@@ -8,12 +8,14 @@
 
 let do_interactive_directives
     ~outputs ~max_sharing ~syntax_version contact_map env counter graph state e =
+  let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
   let contact_map' = Array.map Array.copy contact_map in
   let e',_ =
     List_util.fold_right_map
       (LKappa_compiler.modif_expr_of_ast
+         ~warning
          ~syntax_version (Model.signatures env) (Model.tokens_finder env)
          (Model.algs_finder env) contact_map') e [] in
   let () =
@@ -24,7 +26,7 @@ let do_interactive_directives
       raise (ExceptionDefn.Malformed_Decl
                (Locality.dummy_annot "Creating new link type is forbidden")) in
   let cc_preenv', e'' = Eval.compile_modifications_no_track
-      ~compileModeOn:false contact_map cc_preenv e' in
+      ~warning ~compileModeOn:false contact_map cc_preenv e' in
   let env',graph' =
     if cc_preenv == cc_preenv' then (env,graph)
     else
@@ -38,11 +40,14 @@ let do_interactive_directives
   (env',
    State_interpreter.do_modifications ~outputs env' counter graph' state e'')
 
-let get_pause_criteria ~max_sharing ~syntax_version contact_map env graph b =
+let get_pause_criteria
+    ~outputs ~max_sharing ~syntax_version contact_map env graph b =
+  let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
   let b' =
-    LKappa_compiler.bool_expr_of_ast ~syntax_version
+    LKappa_compiler.bool_expr_of_ast
+      ~warning ~syntax_version
       (Model.signatures env) (Model.tokens_finder env)
       (Model.algs_finder env) b in
   let cc_preenv',(b'',pos_b'' as bpos'') =

@@ -22,7 +22,7 @@ let add_link_contact_map ?contact_map sty sp dty dp =
     contact_map.(dty).(dp) <-
       di, List_util.merge_uniq Mods.int_pair_compare dl [sty,sp]
 
-let rule_induces_link_permutation ~pos ?dst_ty sigs sort site =
+let rule_induces_link_permutation ~warning ~pos ?dst_ty sigs sort site =
   let warning_for_counters =
     if Signature.is_counter_agent (Some sigs) sort then true
     else
@@ -31,7 +31,7 @@ let rule_induces_link_permutation ~pos ?dst_ty sigs sort site =
     | Some s -> Signature.is_counter_agent (Some sigs) s in
 
   if not(warning_for_counters) then
-  ExceptionDefn.warning
+  warning
     ~pos
     (fun f ->
       Format.fprintf
@@ -39,8 +39,9 @@ let rule_induces_link_permutation ~pos ?dst_ty sigs sort site =
         (Signature.print_site sigs sort) site
         (Signature.print_agent sigs) sort)
 
-let build_link sigs ?contact_map ~warn_on_swap pos i ag_ty p_id switch
-      (links_one,links_two) =
+let build_link
+    ?warn_on_swap sigs ?contact_map pos i ag_ty p_id switch
+    (links_one,links_two) =
   if Mods.IntMap.mem i links_two then
     raise (ExceptionDefn.Malformed_Decl
              ("This is the third occurence of link '"^string_of_int i
@@ -59,8 +60,12 @@ let build_link sigs ?contact_map ~warn_on_swap pos i ag_ty p_id switch
           | LKappa.Linked j ->
              let link_swap = (Some j <> dst_id) in
              let () =
-               if link_swap && warn_on_swap then
-                 rule_induces_link_permutation ~pos ~dst_ty sigs ag_ty p_id in
+               if link_swap then
+                 match warn_on_swap with
+                 | None -> ()
+                 | Some warning ->
+                   rule_induces_link_permutation
+                     ~warning ~pos ~dst_ty sigs ag_ty p_id in
              not(link_swap)
           | LKappa.Freed | LKappa.Erased | LKappa.Maintained -> false in
         ((Ast.LNK_VALUE (i,(dst_p,dst_ty)),pos),
@@ -75,7 +80,8 @@ let build_link sigs ?contact_map ~warn_on_swap pos i ag_ty p_id switch
                   pos))
 
 let annotate_dropped_agent
-    ~syntax_version ~r_editStyle sigs links_annot (agent_name, _ as ag_ty) intf counts =
+    ~warning ~syntax_version ~r_editStyle
+    sigs links_annot (agent_name, _ as ag_ty) intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -92,7 +98,8 @@ let annotate_dropped_agent
          let (_,p_pos as p_na) = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let () = match Signature.counter_of_site p_id sign with
-           | Some _ -> LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
+           | Some _ ->
+             LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
@@ -113,7 +120,7 @@ let annotate_dropped_agent
          | [Ast.LNK_SOME, pos_lnk] ->
            let (na,pos) = p.Ast.port_nme in
            let () =
-             ExceptionDefn.warning
+             warning
                ~pos
                (fun f ->
                   Format.fprintf
@@ -124,7 +131,7 @@ let annotate_dropped_agent
          | [Ast.LNK_TYPE (dst_p, dst_ty),pos_lnk] ->
            let (na,pos) = p.Ast.port_nme in
            let () =
-             ExceptionDefn.warning
+             warning
                ~pos
                (fun f ->
                   Format.fprintf
@@ -147,8 +154,9 @@ let annotate_dropped_agent
            (lannot,pset')
          | [Ast.LNK_VALUE (i,()), pos] ->
            let va,lannot' =
-             build_link sigs ~warn_on_swap:(not r_editStyle) pos i
-               ag_id p_id LKappa.Erased lannot in
+             let warn_on_swap = if r_editStyle then None else Some warning in
+             build_link
+               ?warn_on_swap sigs pos i ag_id p_id LKappa.Erased lannot in
            let () = ports.(p_id) <- va in (lannot',pset')
          | _::(_,pos)::_ ->
            raise (ExceptionDefn.Malformed_Decl
@@ -162,7 +170,8 @@ let annotate_dropped_agent
     sign counts ra arity agent_name None,lannot
 
 let annotate_created_agent
-    ~syntax_version ~r_editStyle sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
+    ~warning ~syntax_version ~r_editStyle
+    sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -177,7 +186,8 @@ let annotate_created_agent
          let (_,p_pos as p_na) = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let () = match Signature.counter_of_site p_id sign with
-           | Some _ -> LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
+           | Some _ ->
+             LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
@@ -201,7 +211,10 @@ let annotate_created_agent
              ~status:"linking" ~side:"left" agent_name p_na
          | [Ast.LNK_VALUE (i,()), pos] ->
            let () = ports.(p_id) <- Raw_mixture.VAL i in
-           let _,rannot' = build_link sigs ~warn_on_swap:(not r_editStyle)
+           let _,rannot' =
+             let warn_on_swap = if r_editStyle then None else Some warning in
+             build_link
+               ?warn_on_swap sigs
                ?contact_map pos i ag_id p_id LKappa.Freed rannot in
            pset',rannot'
          | [(Ast.ANY_FREE | Ast.LNK_FREE), _] | [] -> pset',rannot
@@ -210,7 +223,8 @@ let annotate_created_agent
   { Raw_mixture.a_type = ag_id;
     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
 
-let translate_modification sigs ?contact_map ag_id p_id
+let translate_modification
+    ~warning sigs ?contact_map ag_id p_id
     ?warn (lhs_links,rhs_links as links_annot) = function
   | None -> LKappa.Maintained,links_annot
   | Some x ->
@@ -218,7 +232,7 @@ let translate_modification sigs ?contact_map ag_id p_id
       match warn with
       | None -> ()
       | Some (na,pos) ->
-        ExceptionDefn.warning
+        warning
           ~pos
           (fun f ->
              Format.fprintf
@@ -229,23 +243,25 @@ let translate_modification sigs ?contact_map ag_id p_id
     | Some (j,pos_j) ->
       let _,rhs_links' =
         build_link
-          sigs ~warn_on_swap:false
+          ?warn_on_swap:None sigs
           ?contact_map pos_j j ag_id p_id LKappa.Freed rhs_links in
       LKappa.Linked j,(lhs_links,rhs_links')
 
 let annotate_edit_agent
-    ~syntax_version ~is_rule sigs ?contact_map (agent_name, _ as ag_ty)
+    ~warning ~syntax_version ~is_rule sigs ?contact_map (agent_name, _ as ag_ty)
     links_annot intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports = Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
+  let ports =
+    Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
   let internals = Array.make arity LKappa.I_ANY in
   let scan_port (links_annot,pset) p =
     let (p_na,_) = p.Ast.port_nme in
     let p_id = Signature.num_of_site ~agent_name p.Ast.port_nme sign in
     let () = match Signature.counter_of_site p_id sign with
-      | Some _ -> LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
+      | Some _ ->
+        LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
     let pset' = Mods.IntSet.add p_id pset in
     let () = if pset == pset' then
         LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
@@ -253,19 +269,19 @@ let annotate_edit_agent
       match p.Ast.port_lnk with
       | [Ast.LNK_SOME, pos as x] ->
         let (modif,links_annot') = translate_modification
-            ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
+            ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
             links_annot p.Ast.port_lnk_mod in
         let () = ports.(p_id) <- (x, modif) in
         links_annot'
       | [(Ast.LNK_ANY, pos)] ->
         let (modif,links_annot') = translate_modification
-            ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
+            ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
             links_annot p.Ast.port_lnk_mod in
         let () = ports.(p_id) <- ((Ast.ANY_FREE,pos), modif) in
         links_annot'
       | ([] | [Ast.ANY_FREE, _]) when syntax_version = Ast.V3 ->
         let (modif,links_annot') = translate_modification
-            ?warn:None sigs ?contact_map ag_id p_id
+            ~warning ?warn:None sigs ?contact_map ag_id p_id
             links_annot p.Ast.port_lnk_mod in
         let () = ports.(p_id) <- (Locality.dummy_annot Ast.LNK_FREE, modif) in
         links_annot'
@@ -275,24 +291,24 @@ let annotate_edit_agent
           ~status:"linking" ~side:"left" agent_name p.Ast.port_nme
       | [Ast.LNK_FREE, _] ->
         let (modif,links_annot') = translate_modification
-            ?warn:None sigs ?contact_map ag_id p_id
+            ~warning ?warn:None sigs ?contact_map ag_id p_id
             links_annot p.Ast.port_lnk_mod in
         let () = ports.(p_id) <- (Locality.dummy_annot Ast.LNK_FREE, modif) in
         links_annot'
       | [Ast.LNK_TYPE (dst_p,dst_ty), pos] ->
         let (modif,links_annot') = translate_modification
-            ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
+            ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
             links_annot p.Ast.port_lnk_mod in
         let () = ports.(p_id) <- build_l_type sigs pos dst_ty dst_p modif in
         links_annot'
       | [Ast.LNK_VALUE (i,()), pos] ->
         let (modif,(lhs_links,rhs_links)) = translate_modification
-            ?warn:None sigs ?contact_map ag_id p_id
+            ~warning ?warn:None sigs ?contact_map ag_id p_id
             links_annot p.Ast.port_lnk_mod in
         let va,lhs_links' =
           build_link
             sigs ?contact_map:(if is_rule then None else contact_map)
-            ~warn_on_swap:false pos i ag_id p_id modif lhs_links in
+            ?warn_on_swap:None pos i ag_id p_id modif lhs_links in
         let () = ports.(p_id) <- va in
         (lhs_links',rhs_links)
       | _::(_,pos)::_ ->
@@ -309,7 +325,7 @@ let annotate_edit_agent
       | [], Some (_,pos as va) ->
         let () =
           if syntax_version = Ast.V3 then
-            ExceptionDefn.warning
+            warning
               ~pos
               (fun f ->
                Format.fprintf
@@ -339,12 +355,13 @@ let annotate_edit_agent
     sigs ag_ty counts ra (add_link_contact_map ?contact_map),annot'
 
 let annotate_agent_with_diff
-    ~syntax_version sigs ?contact_map
+    ~warning ~syntax_version sigs ?contact_map
     (agent_name,_ as ag_ty) links_annot lp rp lc rc =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports = Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
+  let ports =
+    Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
   let internals = Array.make arity LKappa.I_ANY in
   let register_port_modif p_id lnk1 p' (lhs_links,rhs_links as links_annot) =
     let () =
@@ -374,7 +391,7 @@ let annotate_agent_with_diff
     | [Ast.LNK_SOME,pos_lnk], [(Ast.LNK_FREE|Ast.ANY_FREE),_] ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
-        ExceptionDefn.warning
+        warning
           ~pos
           (fun f ->
              Format.fprintf
@@ -385,7 +402,7 @@ let annotate_agent_with_diff
     | [Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk], [(Ast.LNK_FREE|Ast.ANY_FREE),_] ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
-        ExceptionDefn.warning
+        warning
           ~pos
           (fun f ->
              Format.fprintf
@@ -397,7 +414,7 @@ let annotate_agent_with_diff
     | [Ast.LNK_SOME,pos_lnk], [] when syntax_version = Ast.V3 ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
-        ExceptionDefn.warning
+        warning
           ~pos
           (fun f ->
              Format.fprintf
@@ -408,7 +425,7 @@ let annotate_agent_with_diff
     | [Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk], [] when syntax_version = Ast.V3 ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
-        ExceptionDefn.warning
+        warning
           ~pos
           (fun f ->
              Format.fprintf
@@ -432,24 +449,24 @@ let annotate_agent_with_diff
       links_annot
     | [Ast.LNK_VALUE (i,()),pos], [(Ast.LNK_FREE|Ast.ANY_FREE),_] ->
       let va,lhs_links' =
-        build_link sigs ~warn_on_swap:true pos i
+        build_link sigs ~warn_on_swap:warning pos i
           ag_id p_id LKappa.Freed lhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links)
     | [Ast.LNK_VALUE (i,()),pos], [] when syntax_version = Ast.V3 ->
       let va,lhs_links' =
-        build_link sigs ~warn_on_swap:true pos i
+        build_link sigs ~warn_on_swap:warning pos i
           ag_id p_id LKappa.Freed lhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links)
     | [Ast.LNK_ANY,pos_lnk], [Ast.LNK_VALUE (i,()),pos] ->
       let () = ports.(p_id) <- ((Ast.LNK_ANY,pos_lnk), LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ~warn_on_swap:true ?contact_map pos i
+        build_link sigs ~warn_on_swap:warning ?contact_map pos i
           ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_SOME,pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
-        ExceptionDefn.warning
+        warning
           ~pos
           (fun f ->
              Format.fprintf
@@ -458,13 +475,13 @@ let annotate_agent_with_diff
       let () = ports.(p_id) <-
           ((Ast.LNK_SOME,pos_lnk), LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ~warn_on_swap:true ?contact_map pos' i
+        build_link sigs ~warn_on_swap:warning ?contact_map pos' i
           ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
-        ExceptionDefn.warning
+        warning
           ~pos
           (fun f ->
              Format.fprintf
@@ -473,28 +490,28 @@ let annotate_agent_with_diff
       let () = ports.(p_id) <-
           build_l_type sigs pos_lnk dst_ty dst_p (LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ~warn_on_swap:true ?contact_map pos' i
+        build_link sigs ~warn_on_swap:warning ?contact_map pos' i
           ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [(Ast.LNK_FREE|Ast.ANY_FREE),_], [Ast.LNK_VALUE (i,()),pos] ->
       let () = ports.(p_id) <-
           (Locality.dummy_annot Ast.LNK_FREE, LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ~warn_on_swap:true ?contact_map pos i
+        build_link sigs ~warn_on_swap:warning ?contact_map pos i
           ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [], [Ast.LNK_VALUE (i,()),pos] when syntax_version = Ast.V3 ->
       let () = ports.(p_id) <-
           (Locality.dummy_annot Ast.LNK_FREE, LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ~warn_on_swap:true ?contact_map pos i
+        build_link sigs ~warn_on_swap:warning ?contact_map pos i
           ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_VALUE (i,()),pos_i], [Ast.LNK_VALUE (j,()),pos_j] ->
-      let va,lhs_links' = build_link sigs ~warn_on_swap:true pos_i i
+      let va,lhs_links' = build_link sigs ~warn_on_swap:warning pos_i i
           ag_id p_id (LKappa.Linked j) lhs_links in
       let _,rhs_links' =
-        build_link sigs ~warn_on_swap:true ?contact_map pos_j j
+        build_link sigs ~warn_on_swap:warning ?contact_map pos_j j
           ag_id p_id LKappa.Freed rhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links')
     | [(Ast.LNK_VALUE (_, ()) | Ast.LNK_FREE | Ast.ANY_FREE |
@@ -523,7 +540,7 @@ let annotate_agent_with_diff
     | [], [ Some va, vapos ] when syntax_version = Ast.V3 ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
-        ExceptionDefn.warning
+        warning
           ~pos
           (fun f ->
              Format.fprintf
@@ -587,7 +604,7 @@ although it is left unpecified in the left hand side"
   Counters_compiler.annotate_counters_with_diff
     sigs ag_ty lc rc ra (add_link_contact_map ?contact_map),annot'
 
-let refer_links_annot ?(r_editStyle:bool = false) sigs links_annot mix =
+let refer_links_annot ?warning sigs links_annot mix =
   List.iter
     (fun ra ->
        Array.iteri
@@ -599,11 +616,13 @@ let refer_links_annot ?(r_editStyle:bool = false) sigs links_annot mix =
                 | Some (dst_ty,dst_p,maintained) ->
                   let mods' = if maintained then LKappa.Maintained else mods in
                   let () = match mods' with
+                    | LKappa.Erased | LKappa.Freed | LKappa.Maintained -> ()
                     | LKappa.Linked _ ->
-                       if not(r_editStyle) then
-                         rule_induces_link_permutation
-                           ~pos ~dst_ty sigs ra.LKappa.ra_type i
-                    | LKappa.Erased | LKappa.Freed | LKappa.Maintained -> () in
+                      match warning with
+                      | None -> ()
+                      | Some warning ->
+                        rule_induces_link_permutation
+                           ~warning ~pos ~dst_ty sigs ra.LKappa.ra_type i in
                   ra.LKappa.ra_ports.(i) <-
                     ((Ast.LNK_VALUE (j,(dst_p,dst_ty)),pos),mods')
               end
@@ -620,14 +639,14 @@ let separate_sites ls =
   (List.rev a,b)
 
 let final_rule_sanity
-      ?(r_editStyle:bool = false) sigs
-      ((lhs_links_one,lhs_links_two),(rhs_links_one,_)) mix =
+      ?warning sigs ((lhs_links_one,lhs_links_two),(rhs_links_one,_)) mix =
   let () =
     match Mods.IntMap.root lhs_links_one with
     | None -> ()
     | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
   let () =
-    refer_links_annot ~r_editStyle sigs lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
+    refer_links_annot
+      ?warning sigs lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
   match Mods.IntMap.root rhs_links_one with
   | None -> ()
   | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos
@@ -641,7 +660,8 @@ Is responsible for the check that:
 - unique internal_state / site
 - links appear exactly twice
 *)
-let annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs =
+let annotate_lhs_with_diff_v3
+    ~warning sigs ?contact_map lhs rhs =
   let syntax_version=Ast.V3 in
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
@@ -660,7 +680,7 @@ let annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs =
       let (rag_p,rag_c) = separate_sites rag_s in
       let ra,links_annot' =
         annotate_agent_with_diff
-          ~syntax_version sigs ?contact_map
+          ~warning ~syntax_version sigs ?contact_map
           ag_ty links_annot lag_p rag_p lag_c rag_c in
       aux links_annot' (ra::acc) lt rt
     | (Ast.Present _ :: _ | [] as erased), added ->
@@ -675,7 +695,7 @@ let annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs =
                       | Ast.Present ((rag,_),rag_p,_) ->
                         String.compare lag rag = 0 &&
                         Ast.no_more_site_on_right false lag_p rag_p) added then
-                  ExceptionDefn.warning ~pos
+                  warning ~pos
                     (fun f ->
                        Format.fprintf
                          f "Rule induced deletion AND creation of the agent %s"
@@ -692,7 +712,8 @@ let annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs =
                let () = LKappa.forbid_modification pos modif in
                let intf,counts = separate_sites sites in
                let ra,lannot' = annotate_dropped_agent
-                   ~syntax_version ~r_editStyle:false sigs lannot na intf counts in
+                   ~warning ~syntax_version ~r_editStyle:false
+                   sigs lannot na intf counts in
                (ra::acc,lannot'))
           (acc,fst links_annot) erased in
       let cmix,rlinks =
@@ -706,38 +727,39 @@ let annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs =
              let () = LKappa.forbid_modification pos modif in
              let intf,counts = separate_sites sites in
              let rannot',x' = annotate_created_agent
-                 ~syntax_version ~r_editStyle:false sigs
+                 ~warning ~syntax_version ~r_editStyle:false sigs
                  ?contact_map rannot na intf in
              let x'' =
                Counters_compiler.annotate_created_counters
                  sigs na counts (add_link_contact_map ?contact_map) x' in
              x''::acc,rannot')
           ([],snd links_annot) added in
-      let () = final_rule_sanity sigs (llinks,rlinks) mix in
+      let () = final_rule_sanity ~warning sigs (llinks,rlinks) mix in
       List.rev mix, List.rev cmix in
   aux
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
     [] lhs rhs
 
-let annotate_lhs_with_diff_v4 sigs ?contact_map lhs rhs =
+let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
   let syntax_version = Ast.V4 in
   let rec aux links_annot mix cmix lhs rhs =
     match lhs,rhs with
     | [], [] ->
-      let () = final_rule_sanity sigs links_annot mix in
+      let () = final_rule_sanity ~warning sigs links_annot mix in
       List.rev mix, List.rev cmix
     | Ast.Absent _::lt, Ast.Absent _:: rt -> aux links_annot mix cmix lt rt
     | Ast.Present ((_,pos as ty),sites,lmod) :: lt, Ast.Absent _ :: rt ->
       let () = LKappa.forbid_modification pos lmod in
       let (intf,counts) = separate_sites sites in
       let ra,lannot' = annotate_dropped_agent
-          ~syntax_version ~r_editStyle:false sigs (fst links_annot) ty intf counts in
+          ~warning ~syntax_version ~r_editStyle:false
+          sigs (fst links_annot) ty intf counts in
       aux (lannot',snd links_annot) (ra::mix) cmix lt rt
     | Ast.Absent _ :: lt, Ast.Present ((_,pos as ty),sites,rmod) :: rt ->
       let () = LKappa.forbid_modification pos rmod in
       let (intf,counts) = separate_sites sites in
       let rannot',x' = annotate_created_agent
-          ~syntax_version ~r_editStyle:false sigs
+          ~warning ~syntax_version ~r_editStyle:false sigs
           ?contact_map (snd links_annot) ty intf in
       let x'' =
         Counters_compiler.annotate_created_counters
@@ -753,7 +775,7 @@ let annotate_lhs_with_diff_v4 sigs ?contact_map lhs rhs =
         let (rag_p,rag_c) = separate_sites rag_s in
         let ra,links_annot' =
           annotate_agent_with_diff
-            ~syntax_version sigs ?contact_map
+            ~warning ~syntax_version sigs ?contact_map
             ag_ty links_annot lag_p rag_p lag_c rag_c in
         aux links_annot' (ra::mix) cmix lt rt
       else
@@ -770,12 +792,13 @@ let annotate_lhs_with_diff_v4 sigs ?contact_map lhs rhs =
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
     [] [] lhs rhs
 
-let annotate_lhs_with_diff ~syntax_version sigs ?contact_map lhs rhs =
+let annotate_lhs_with_diff ~warning ~syntax_version sigs ?contact_map lhs rhs =
   match syntax_version with
-  | Ast.V3 -> annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs
-  | Ast.V4 -> annotate_lhs_with_diff_v4 sigs ?contact_map lhs rhs
+  | Ast.V3 -> annotate_lhs_with_diff_v3 ~warning sigs ?contact_map lhs rhs
+  | Ast.V4 -> annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs
 
-let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
+let annotate_edit_mixture
+    ~warning ~syntax_version ~is_rule sigs ?contact_map m =
   let links_annot,mix,cmix =
     List.fold_left
       (fun (lannot,acc,news) -> function
@@ -788,12 +811,12 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
          match modif with
          | None ->
            let a,lannot' = annotate_edit_agent
-               ~syntax_version ~is_rule sigs
+               ~warning ~syntax_version ~is_rule sigs
                ?contact_map ty lannot intf counts in
            (lannot',a::acc,news)
          | Some Ast.Create ->
            let rannot',x' = annotate_created_agent
-               ~syntax_version ~r_editStyle:true sigs
+               ~warning ~syntax_version ~r_editStyle:true sigs
                ?contact_map (snd lannot) ty intf in
            let x'' =
               Counters_compiler.annotate_created_counters
@@ -801,13 +824,13 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
            ((fst lannot,rannot'),acc,x''::news)
          | Some Ast.Erase ->
            let ra,lannot' = annotate_dropped_agent
-               ~syntax_version ~r_editStyle:true sigs
+               ~warning ~syntax_version ~r_editStyle:true sigs
                (fst lannot) ty intf counts in
            ((lannot',snd lannot),ra::acc,news))
       (((Mods.IntMap.empty,Mods.IntMap.empty),
         (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
       m in
-  let () = final_rule_sanity ~r_editStyle:true sigs links_annot mix in
+  let () = final_rule_sanity ?warning:None sigs links_annot mix in
   (List.rev mix, List.rev cmix)
 
 let give_rule_label bidirectional (id,set) printer r = function
@@ -829,14 +852,14 @@ let give_rule_label bidirectional (id,set) printer r = function
       else (id,set''),lab
     else (id,set'),lab
 
-let mixture_of_ast ~syntax_version sigs ?contact_map pos mix =
+let mixture_of_ast ~warning ~syntax_version sigs ?contact_map pos mix =
   match annotate_edit_mixture
-          ~syntax_version ~is_rule:false sigs ?contact_map mix with
+          ~warning ~syntax_version ~is_rule:false sigs ?contact_map mix with
   | r, [] -> fst (Counters_compiler.remove_counter_rule sigs r [])
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
 
-let raw_mixture_of_ast ~syntax_version sigs ?contact_map mix =
+let raw_mixture_of_ast ~warning ~syntax_version sigs ?contact_map mix =
   let created =
     List.map (function
         | Ast.Absent l -> Ast.Absent l
@@ -844,7 +867,7 @@ let raw_mixture_of_ast ~syntax_version sigs ?contact_map mix =
       mix in
   let (a,b) =
     annotate_edit_mixture
-      ~syntax_version ~is_rule:false sigs ?contact_map created in
+      ~warning ~syntax_version ~is_rule:false sigs ?contact_map created in
   snd (Counters_compiler.remove_counter_rule sigs a b)
 
 let convert_alg_var ?max_allowed_var algs lab pos =
@@ -872,11 +895,11 @@ let convert_token_name tk_nme tok pos =
              (tk_nme ^ " is not a declared token",pos))
 
 let rec alg_expr_of_ast
-    ~syntax_version sigs tok algs ?max_allowed_var (alg,pos) =
+    ~warning ~syntax_version sigs tok algs ?max_allowed_var (alg,pos) =
   ((match alg with
       | Alg_expr.KAPPA_INSTANCE ast ->
         Alg_expr.KAPPA_INSTANCE
-          (mixture_of_ast ~syntax_version sigs pos ast)
+          (mixture_of_ast ~warning ~syntax_version sigs pos ast)
       | Alg_expr.ALG_VAR lab ->
         Alg_expr.ALG_VAR (convert_alg_var ?max_allowed_var algs lab pos)
       | Alg_expr.TOKEN_ID tk_nme ->
@@ -884,86 +907,87 @@ let rec alg_expr_of_ast
       | Alg_expr.DIFF_KAPPA_INSTANCE(expr,ast) ->
         Alg_expr.DIFF_KAPPA_INSTANCE
           (alg_expr_of_ast
-             ~syntax_version sigs tok algs ?max_allowed_var expr,
-           mixture_of_ast ~syntax_version sigs pos ast)
+             ~warning ~syntax_version sigs tok algs ?max_allowed_var expr,
+           mixture_of_ast ~warning ~syntax_version sigs pos ast)
       | Alg_expr.DIFF_TOKEN(expr,tk_nme) ->
         Alg_expr.DIFF_TOKEN
           (alg_expr_of_ast
-             ~syntax_version sigs tok algs ?max_allowed_var expr,
+             ~warning ~syntax_version sigs tok algs ?max_allowed_var expr,
            convert_token_name tk_nme tok pos)
       | (Alg_expr.STATE_ALG_OP _ | Alg_expr.CONST _) as x -> x
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
         Alg_expr.BIN_ALG_OP
           (op,
            alg_expr_of_ast
-             ~syntax_version sigs tok algs ?max_allowed_var a,
+             ~warning ~syntax_version sigs tok algs ?max_allowed_var a,
            alg_expr_of_ast
-             ~syntax_version sigs tok algs ?max_allowed_var b)
+             ~warning ~syntax_version sigs tok algs ?max_allowed_var b)
       | Alg_expr.UN_ALG_OP (op,a) ->
         Alg_expr.UN_ALG_OP
           (op,alg_expr_of_ast
-             ~syntax_version sigs tok algs ?max_allowed_var a)
+             ~warning ~syntax_version sigs tok algs ?max_allowed_var a)
       | Alg_expr.IF (cond,yes,no) ->
         Alg_expr.IF
           (bool_expr_of_ast
-             ~syntax_version sigs tok algs ?max_allowed_var cond,
+             ~warning ~syntax_version sigs tok algs ?max_allowed_var cond,
            alg_expr_of_ast
-             ~syntax_version sigs tok algs ?max_allowed_var yes,
+             ~warning ~syntax_version sigs tok algs ?max_allowed_var yes,
            alg_expr_of_ast
-             ~syntax_version sigs tok algs ?max_allowed_var no)
+             ~warning ~syntax_version sigs tok algs ?max_allowed_var no)
     ),
    pos)
-and bool_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var = function
+and bool_expr_of_ast
+    ~warning ~syntax_version sigs tok algs ?max_allowed_var = function
   | (Alg_expr.TRUE | Alg_expr.FALSE),_ as x -> x
   | Alg_expr.BIN_BOOL_OP (op,x,y),pos ->
     Alg_expr.BIN_BOOL_OP
       (op, bool_expr_of_ast
-         ~syntax_version sigs tok algs ?max_allowed_var x,
+         ~warning ~syntax_version sigs tok algs ?max_allowed_var x,
        bool_expr_of_ast
-         ~syntax_version sigs tok algs ?max_allowed_var y),
+         ~warning ~syntax_version sigs tok algs ?max_allowed_var y),
     pos
   | Alg_expr.UN_BOOL_OP (op,x),pos ->
     Alg_expr.UN_BOOL_OP
       (op, bool_expr_of_ast
-         ~syntax_version sigs tok algs ?max_allowed_var x),
+         ~warning ~syntax_version sigs tok algs ?max_allowed_var x),
     pos
   | Alg_expr.COMPARE_OP (op,x,y),pos ->
     Alg_expr.COMPARE_OP
       (op,alg_expr_of_ast
-         ~syntax_version sigs tok algs ?max_allowed_var  x,
+         ~warning ~syntax_version sigs tok algs ?max_allowed_var  x,
        alg_expr_of_ast
-         ~syntax_version sigs tok algs ?max_allowed_var y),pos
+         ~warning ~syntax_version sigs tok algs ?max_allowed_var y),pos
 
-let print_expr_of_ast ~syntax_version sigs tok algs = function
+let print_expr_of_ast ~warning ~syntax_version sigs tok algs = function
   | Primitives.Str_pexpr _ as x -> x
   | Primitives.Alg_pexpr x ->
     Primitives.Alg_pexpr
-      (alg_expr_of_ast ~syntax_version sigs tok algs x)
+      (alg_expr_of_ast ~warning ~syntax_version sigs tok algs x)
 
-let assemble_rule ~syntax_version ~r_editStyle
+let assemble_rule ~warning ~syntax_version ~r_editStyle
     sigs tok algs r_mix r_created rm_tk add_tk rate un_rate =
   let tks =
     List.rev_map (fun (al,(tk,pos)) ->
-        (alg_expr_of_ast ~syntax_version sigs tok algs
+        (alg_expr_of_ast ~warning ~syntax_version sigs tok algs
            (Locality.dummy_annot (Alg_expr.UN_ALG_OP (Operator.UMINUS,al))),
          convert_token_name tk tok pos))
       rm_tk in
   let tks' =
     List_util.rev_map_append (fun (al,(tk,pos)) ->
-          (alg_expr_of_ast ~syntax_version sigs tok algs al,
+          (alg_expr_of_ast ~warning ~syntax_version sigs tok algs al,
            convert_token_name tk tok pos))
       add_tk tks in
   { LKappa.r_mix; r_created; r_editStyle;
     r_delta_tokens = List.rev tks';
-    r_rate = alg_expr_of_ast ~syntax_version sigs tok algs rate;
+    r_rate = alg_expr_of_ast ~warning ~syntax_version sigs tok algs rate;
     r_un_rate =
       let r_dist d =
         alg_expr_of_ast
-          ~syntax_version sigs tok algs ?max_allowed_var:None d in
+          ~warning ~syntax_version sigs tok algs ?max_allowed_var:None d in
       Option_util.map
         (fun (un_rate',dist) ->
            let un_rate'' =
-             alg_expr_of_ast ~syntax_version sigs tok algs
+             alg_expr_of_ast ~warning ~syntax_version sigs tok algs
                ?max_allowed_var:None un_rate' in
            match dist with
            | Some d -> (un_rate'', Some (r_dist d))
@@ -972,24 +996,25 @@ let assemble_rule ~syntax_version ~r_editStyle
   }
 
 let modif_expr_of_ast
-    ~syntax_version sigs tok algs contact_map modif acc =
+    ~warning ~syntax_version sigs tok algs contact_map modif acc =
   match modif with
   | Ast.APPLY(nb,(r,pos)) ->
     let (mix,cmix),rm_tok,add_tok,r_editStyle =
       match r.Ast.rewrite with
       | Ast.Edit e ->
         annotate_edit_mixture
-          ~syntax_version:Ast.V4 ~is_rule:true sigs ~contact_map e.Ast.mix,
+          ~warning ~syntax_version:Ast.V4 ~is_rule:true
+          sigs ~contact_map e.Ast.mix,
         [],e.Ast.delta_token,true
       | Ast.Arrow a ->
         annotate_lhs_with_diff
-          ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs,
+          ~warning ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs,
         a.Ast.rm_token,a.Ast.add_token,false in
     let mix,cmix = Counters_compiler.remove_counter_rule sigs mix cmix in
     Ast.APPLY
-      (alg_expr_of_ast ~syntax_version sigs tok algs nb,
+      (alg_expr_of_ast ~warning ~syntax_version sigs tok algs nb,
        (assemble_rule
-          ~syntax_version ~r_editStyle
+          ~warning ~syntax_version ~r_editStyle
           sigs tok algs mix cmix rm_tok add_tok
           r.Ast.k_def r.Ast.k_un,pos)),
     acc
@@ -1002,63 +1027,63 @@ let modif_expr_of_ast
                  ("Variable " ^ (lab ^ " is not defined"),pos)) in
     Ast.UPDATE
       ((i,pos),
-       alg_expr_of_ast ~syntax_version sigs tok algs how),
+       alg_expr_of_ast ~warning ~syntax_version sigs tok algs how),
     i::acc
   | Ast.STOP p ->
     Ast.STOP
       (List.map
-         (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
+         (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),acc
   | Ast.SNAPSHOT p ->
     Ast.SNAPSHOT
       (List.map
-         (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
+         (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),acc
   | Ast.DIN (rel,p) ->
     Ast.DIN
       (rel,
        List.map
-         (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
+         (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),acc
   | Ast.DINOFF p ->
     Ast.DINOFF
       (List.map
-         (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
+         (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),acc
   | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_,_ ) as x) -> x,acc
   | Ast.PRINT (p,p') ->
     Ast.PRINT
       (List.map
-         (print_expr_of_ast ~syntax_version sigs tok algs) p,
+         (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p,
        List.map
-         (print_expr_of_ast ~syntax_version sigs tok algs) p'),
+         (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p'),
     acc
   | Ast.CFLOWMIX (b,(m,pos)) ->
     Ast.CFLOWMIX
-      (b,(mixture_of_ast ~syntax_version sigs pos m,pos)),acc
+      (b,(mixture_of_ast ~warning ~syntax_version sigs pos m,pos)),acc
   | Ast.SPECIES_OF (b,p,(m,pos)) ->
     Ast.SPECIES_OF
       (b,List.map
-         (print_expr_of_ast ~syntax_version sigs tok algs) p,
-       (mixture_of_ast ~syntax_version sigs pos m,pos)),acc
+         (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p,
+       (mixture_of_ast ~warning ~syntax_version sigs pos m,pos)),acc
 
 let perturbation_of_ast
-    ~syntax_version sigs tok algs contact_map
+    ~warning ~syntax_version sigs tok algs contact_map
     ((alarm,pre,mods,post),pos) up_vars =
   let mods',up_vars' =
     List_util.fold_right_map
-      (modif_expr_of_ast ~syntax_version sigs tok algs contact_map)
+      (modif_expr_of_ast ~warning ~syntax_version sigs tok algs contact_map)
       mods up_vars in
   let max_allowed_var = None in
   ((alarm,
     Option_util.map
-      (bool_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var)
+      (bool_expr_of_ast ~warning ~syntax_version sigs tok algs ?max_allowed_var)
       pre,mods',
     Option_util.map
-      (bool_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var)
+      (bool_expr_of_ast ~warning ~syntax_version sigs tok algs ?max_allowed_var)
       post),pos),
   up_vars'
 
-let init_of_ast ~syntax_version sigs tok contact_map = function
+let init_of_ast ~warning ~syntax_version sigs tok contact_map = function
   | Ast.INIT_MIX (who,pos) ->
     Ast.INIT_MIX
-      (raw_mixture_of_ast ~syntax_version sigs ~contact_map who,pos)
+      (raw_mixture_of_ast ~warning ~syntax_version sigs ~contact_map who,pos)
   | Ast.INIT_TOK lab ->
     Ast.INIT_TOK
       (List.map (fun (lab,pos) ->
@@ -1080,7 +1105,8 @@ let add_un_variable k_un acc rate_var =
     (acc_un,Some (k',dist))
 
 let name_and_purify_rule
-    ~syntax_version sigs ~contact_map (pack,acc,rules) (label_opt,(r,r_pos)) =
+    ~warning ~syntax_version
+    sigs ~contact_map (pack,acc,rules) (label_opt,(r,r_pos)) =
   let pack',label = give_rule_label
       r.Ast.bidirectional pack Ast.print_ast_rule r label_opt in
   let acc',k_def =
@@ -1098,15 +1124,16 @@ let name_and_purify_rule
           (ExceptionDefn.Malformed_Decl
              ("Rules in edit notation cannot be bidirectional",r_pos)) in
     let mix,created = annotate_edit_mixture
-        ~syntax_version ~is_rule:true sigs ~contact_map e.Ast.mix in
+        ~warning ~syntax_version ~is_rule:true sigs ~contact_map e.Ast.mix in
     (pack',acc'',
      (label_opt,true,mix,created,[],e.Ast.delta_token,k_def,k_un,r_pos)::rules)
   | Ast.Arrow a ->
     let mix,created =
       annotate_lhs_with_diff
-        ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs in
+        ~warning ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs in
     let rules' =
-      (label_opt,false,mix,created,a.Ast.rm_token,a.Ast.add_token,k_def,k_un,r_pos)
+      (label_opt,false,mix,created,
+       a.Ast.rm_token,a.Ast.add_token,k_def,k_un,r_pos)
       ::rules in
     let acc''',rules'' =
       match r.Ast.bidirectional,r.Ast.k_op with
@@ -1116,17 +1143,18 @@ let name_and_purify_rule
         let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
         let mix,created =
           annotate_lhs_with_diff
-            ~syntax_version sigs ~contact_map a.Ast.rhs a.Ast.lhs in
+            ~warning ~syntax_version sigs ~contact_map a.Ast.rhs a.Ast.lhs in
         ((Locality.dummy_annot rate_var,k)::acc_un,
          (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
           false,mix,created,a.Ast.add_token,a.Ast.rm_token,
-          Locality.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules')
+          Locality.dummy_annot (Alg_expr.ALG_VAR rate_var),
+          k_op_un,r_pos)::rules')
       | true, Some rate ->
         let rate_var_un = (Ast.flip_label label)^"_un_rate" in
         let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
         let mix,created =
           annotate_lhs_with_diff
-            ~syntax_version sigs ~contact_map a.Ast.rhs a.Ast.lhs in
+            ~warning ~syntax_version sigs ~contact_map a.Ast.rhs a.Ast.lhs in
         (acc_un,
          (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
           false,mix,created,a.Ast.add_token,a.Ast.rm_token,
@@ -1229,14 +1257,15 @@ let create_sig l =
       l ([],[]) in
   Signature.create ~counters with_contact_map sigs
 
-let init_of_ast ~syntax_version sigs contact_map tok algs inits =
+let init_of_ast ~warning ~syntax_version sigs contact_map tok algs inits =
   List.map (fun (expr,ini) ->
-      alg_expr_of_ast ~syntax_version sigs tok algs expr,
-      init_of_ast ~syntax_version sigs tok contact_map ini)
+      alg_expr_of_ast ~warning ~syntax_version sigs tok algs expr,
+      init_of_ast ~warning ~syntax_version sigs tok contact_map ini)
     inits
 
-let compil_of_ast ~syntax_version overwrite c =
-  let (c,with_counters) = Counters_compiler.compile c in
+let compil_of_ast ~warning ~syntax_version overwrite c =
+  let (c,with_counters) =
+    Counters_compiler.compile ~warning c in
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
     then
@@ -1256,7 +1285,7 @@ let compil_of_ast ~syntax_version overwrite c =
                        (Signature.internal_states_number i s sigs),[]))) in
   let ((_,rule_names),extra_vars,cleaned_rules) =
     List.fold_left
-      (name_and_purify_rule ~syntax_version sigs ~contact_map)
+      (name_and_purify_rule ~warning ~syntax_version sigs ~contact_map)
       ((0,Mods.StringSet.empty),[],[]) c.Ast.rules in
   let not_overwritten acc l =
     List.fold_left (fun acc ((x,_),_ as e) ->
@@ -1279,7 +1308,7 @@ let compil_of_ast ~syntax_version overwrite c =
                sigs (add_link_contact_map ~contact_map) in
   let perts',updated_vars =
     List_util.fold_right_map
-      (perturbation_of_ast ~syntax_version sigs tok algs contact_map)
+      (perturbation_of_ast ~warning ~syntax_version sigs tok algs contact_map)
       c.Ast.perturbations [] in
   let perts'' =
     if with_counters then
@@ -1292,7 +1321,7 @@ let compil_of_ast ~syntax_version overwrite c =
           Counters_compiler.remove_counter_rule sigs mix created in
         label,
         (assemble_rule
-           ~syntax_version ~r_editStyle
+           ~warning ~syntax_version ~r_editStyle
            sigs tok algs mix created rm_tk add_tk rate un_rate,
          r_pos))
       cleaned_rules in
@@ -1303,16 +1332,16 @@ let compil_of_ast ~syntax_version overwrite c =
       List_util.mapi
         (fun i (lab,expr) ->
            (lab,alg_expr_of_ast
-              ~syntax_version ~max_allowed_var:(pred i)
+              ~warning ~syntax_version ~max_allowed_var:(pred i)
               sigs tok algs expr))
         alg_vars_over;
     Ast.rules;
     Ast.observables =
       List.map (fun expr ->
-          alg_expr_of_ast ~syntax_version sigs tok algs expr)
+          alg_expr_of_ast ~warning ~syntax_version sigs tok algs expr)
         c.Ast.observables;
     Ast.init =
-      init_of_ast ~syntax_version sigs contact_map tok algs c.Ast.init;
+      init_of_ast ~warning ~syntax_version sigs contact_map tok algs c.Ast.init;
     Ast.perturbations = perts'';
     Ast.volumes = c.Ast.volumes;
     Ast.tokens = c.Ast.tokens;

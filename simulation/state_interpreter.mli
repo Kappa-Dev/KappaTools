@@ -40,6 +40,6 @@ val a_loop :
 (** One event loop *)
 
 val end_of_simulation :
-  outputs:(Data.t -> unit) -> Format.formatter ->
+  outputs:(Data.t -> unit) ->
   Model.t -> Counter.t -> Rule_interpreter.t -> t -> unit
 (** What to do after stopping simulation. *)

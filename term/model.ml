@@ -203,7 +203,8 @@ let overwrite_vars alg_overwrite env =
       algs'.(i) <- (fst algs'.(i),Locality.dummy_annot v)) alg_overwrite in
   { env with algs = NamedDecls.create algs' }
 
-let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
+let propagate_constant
+    ~warning ?max_time ?max_events updated_vars alg_overwrite x =
   let algs' =
     Array.map (fun (x,y) -> (Locality.dummy_annot x,y))
       x.algs.NamedDecls.decls in
@@ -214,7 +215,7 @@ let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
       (fun i (na,v) ->
          algs'.(i) <-
            (na,Alg_expr.propagate_constant
-              ?max_time ?max_events updated_vars algs' v))
+              ~warning ?max_time ?max_events updated_vars algs' v))
       algs' in
   {
     filenames = x.filenames;
@@ -224,20 +225,20 @@ let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
     observables =
       Array.map
         (Alg_expr.propagate_constant
-           ?max_time ?max_events updated_vars algs') x.observables;
+           ~warning ?max_time ?max_events updated_vars algs') x.observables;
     ast_rules = x.ast_rules;
     rules =
       Array.map
         (Primitives.map_expr_rule
            (Alg_expr.propagate_constant
-              ?max_time ?max_events updated_vars algs')) x.rules;
+              ~warning ?max_time ?max_events updated_vars algs')) x.rules;
     interventions =
       Array.map
         (Primitives.map_expr_perturbation
            (Alg_expr.propagate_constant
-              ?max_time ?max_events updated_vars algs')
+              ~warning ?max_time ?max_events updated_vars algs')
            (Alg_expr.propagate_constant_bool
-              ?max_time ?max_events updated_vars algs'))
+              ~warning ?max_time ?max_events updated_vars algs'))
         x.interventions;
     dependencies_in_time = x.dependencies_in_time;
     dependencies_in_event = x.dependencies_in_event;

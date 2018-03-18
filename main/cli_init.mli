@@ -8,6 +8,7 @@
 type preprocessed_ast
 
 val get_compilation :
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?unit:Kasim_args.directive_unit -> ?max_sharing:bool ->
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   ?compileModeOn:bool -> ?kasim_args:Kasim_args.t -> Run_cli_args.t ->
@@ -23,13 +24,16 @@ val get_ast_from_cli_args:
   Run_cli_args.t -> Ast.parsing_compil
 
 val get_preprocessed_ast_from_cli_args:
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?kasim_args:Kasim_args.t -> Run_cli_args.t -> preprocessed_ast
 
 val preprocess:
-    ?kasim_args:Kasim_args.t -> Run_cli_args.t ->
-    Ast.parsing_compil -> preprocessed_ast
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  ?kasim_args:Kasim_args.t -> Run_cli_args.t ->
+  Ast.parsing_compil -> preprocessed_ast
 
 val get_compilation_from_preprocessed_ast :
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?unit:Kasim_args.directive_unit -> ?max_sharing:bool ->
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   ?compileModeOn:bool -> ?kasim_args:Kasim_args.t ->

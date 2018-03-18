@@ -393,16 +393,11 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     ()
   with
   | ExceptionDefn.Malformed_Decl er ->
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let () = Pp.error Format.pp_print_string er in
     exit 2
   | Sys_error msg ->
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let () = Format.eprintf "%s@." msg in
     exit 2
-  | e ->
-    let () = Format.pp_print_flush Format.err_formatter () in
-    raise e
 
 let () = main ~called_from:Remanent_parameters_sig.KaSa ()
 let _ = Affine_combinations.sum

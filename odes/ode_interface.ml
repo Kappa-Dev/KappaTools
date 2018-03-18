@@ -596,21 +596,25 @@ let get_obs_titles compil =
     env
 
 let get_preprocessed_ast cli_args =
-  Cli_init.get_preprocessed_ast_from_cli_args cli_args
+  let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
+  Cli_init.get_preprocessed_ast_from_cli_args ~warning cli_args
 let to_preprocessed_ast x = x
 
 let get_ast cli_args = Cli_init.get_ast_from_cli_args cli_args
 let to_ast x = x
 
-let preprocess cli_args ast = Cli_init.preprocess cli_args ast
+let preprocess cli_args ast =
+  let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
+  Cli_init.preprocess ~warning cli_args ast
 let get_compil
     ~dotnet
     ?bwd_bisim
     ~rule_rate_convention ?reaction_rate_convention
     ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
+  let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
   let (_,_,env, contact_map,  _, _, _, _, init), _ =
     Cli_init.get_compilation_from_preprocessed_ast
-      ?bwd_bisim cli_args preprocessed_ast
+      ~warning ?bwd_bisim cli_args preprocessed_ast
   in
   let compil =
     {

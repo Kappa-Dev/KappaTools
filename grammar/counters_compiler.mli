@@ -6,7 +6,9 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val compile : Ast.parsing_compil -> Ast.parsing_compil * bool
+val compile :
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  Ast.parsing_compil -> Ast.parsing_compil * bool
 
 val make_counter : int -> string -> Ast.counter
 
