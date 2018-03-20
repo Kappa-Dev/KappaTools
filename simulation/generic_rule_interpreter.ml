@@ -13,7 +13,6 @@ type precomputed =
   }
 
 module Make (Instances:Instances_sig.S) = struct
-  
   type event_predicate =
     int option -> Matching.t ->
     (Instantiation.concrete Instantiation.test) list ->

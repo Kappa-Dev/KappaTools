@@ -446,7 +446,7 @@ let a_loop
              let () =
                let outputs counter' time =
                  let cand = observables_values
-                     env graph (Counter.fake_time counter' time) in
+                     env graph' (Counter.fake_time counter' time) in
                  if Array.length cand > 1 then outputs (Data.Plot cand) in
                Counter.fill ~outputs counter ~dt in
               let continue = Counter.one_time_advance counter dt' in
