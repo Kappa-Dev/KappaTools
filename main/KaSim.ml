@@ -373,13 +373,13 @@ let () =
       Format.eprintf "@.***Interrupted by user out of simulation loop***@." in
     exit 1
   | Invalid_argument msg ->
+    let () = Printexc.print_backtrace stderr in
     let () = Outputs.close () in
     let () = remove_trace () in
-    let s = Printexc.get_backtrace() in
-    let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
+    let () = Format.eprintf "@.@[<v>***Runtime error %s***@]@." msg in
     exit 2
   | e ->
-    let s = Printexc.print_backtrace stderr in
+    let () = Printexc.print_backtrace stderr in
     let () = Format.eprintf "%s@." (Printexc.to_string e) in
     let () = Outputs.close () in
     let () = remove_trace () in

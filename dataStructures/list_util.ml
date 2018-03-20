@@ -40,11 +40,11 @@ let rec smart_map f = function
     if t' == t && q' == q then l else t' :: q'
   | l -> l
 
-let mapi f l =
-  let rec aux_mapi i = function
-    | [] -> []
-    | h :: q -> f i h :: aux_mapi (succ i) q in
-  aux_mapi 0 l
+let rev_mapi f l =
+  let rec aux_mapi i acc = function
+    | [] -> acc
+    | h :: q -> aux_mapi (pred i) (f i h :: acc) q in
+  aux_mapi (List.length l - 1) [] l
 
 let rec map_option f = function
   | [] -> []

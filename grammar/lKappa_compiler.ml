@@ -1287,19 +1287,27 @@ let compil_of_ast ~warning ~syntax_version overwrite c =
     List.fold_left
       (name_and_purify_rule ~warning ~syntax_version sigs ~contact_map)
       ((0,Mods.StringSet.empty),[],[]) c.Ast.rules in
-  let not_overwritten acc l =
-    List.fold_left (fun acc ((x,_),_ as e) ->
-        if List.for_all (fun (x',_) -> x <> x') overwrite then e::acc else acc)
-      acc l in
-  let alg_vars_over =
+  let overwrite_overwritten =
+    List.fold_left (fun (over,acc) ((x,_),_ as e) ->
+        match List.partition (fun (x',_) -> x = x') over with
+        | [], over' -> (over',e::acc)
+        | [ x,v ], over' ->
+          (over,(Locality.dummy_annot x,Alg_expr.const v)::acc)
+        | (x,_)::_::_, _ ->
+          raise (ExceptionDefn.Malformed_Decl
+                   ("variable '"^x^"' is overwritten more than once",
+                    Locality.dummy))) in
+  let overwrite',rev_algs =
+    overwrite_overwritten
+      (overwrite_overwritten (overwrite,[]) c.Ast.variables) extra_vars in
+  let rev_alg_vars_over =
     List_util.rev_map_append
-      (fun (x,v) -> (Locality.dummy_annot x,
-                     Alg_expr.const v)) overwrite
-      (List.rev
-         (not_overwritten (not_overwritten [] c.Ast.variables) extra_vars)) in
+      (fun (x,v) -> (Locality.dummy_annot x, Alg_expr.const v))
+      overwrite' rev_algs in
     let algs =
     (NamedDecls.create
-       ~forbidden:rule_names (Array.of_list alg_vars_over)).NamedDecls.finder in
+       ~forbidden:rule_names
+       (Tools.array_rev_of_list rev_alg_vars_over)).NamedDecls.finder in
   let tk_nd = NamedDecls.create
       (Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
@@ -1329,17 +1337,17 @@ let compil_of_ast ~warning ~syntax_version overwrite c =
   {
     Ast.filenames = c.Ast.filenames;
     Ast.variables =
-      List_util.mapi
+      List_util.rev_mapi
         (fun i (lab,expr) ->
            (lab,alg_expr_of_ast
               ~warning ~syntax_version ~max_allowed_var:(pred i)
               sigs tok algs expr))
-        alg_vars_over;
+        rev_alg_vars_over;
     Ast.rules;
     Ast.observables =
-      List.map (fun expr ->
+      List.rev_map (fun expr ->
           alg_expr_of_ast ~warning ~syntax_version sigs tok algs expr)
-        c.Ast.observables;
+        (List.rev c.Ast.observables);
     Ast.init =
       init_of_ast ~warning ~syntax_version sigs contact_map tok algs c.Ast.init;
     Ast.perturbations = perts'';

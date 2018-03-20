@@ -18,7 +18,7 @@ val fold_right_map :
   ('a -> 'b -> 'c * 'b) -> 'a list -> 'b -> 'c list * 'b
 val fold_left2 :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
-val mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
+val rev_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
 val map_option : ('a -> 'b option) -> 'a list -> 'b list
 val random : Random.State.t -> 'a list -> 'a
 
