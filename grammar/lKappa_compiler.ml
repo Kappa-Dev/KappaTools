@@ -1292,7 +1292,7 @@ let compil_of_ast ~warning ~syntax_version overwrite c =
         match List.partition (fun (x',_) -> x = x') over with
         | [], over' -> (over',e::acc)
         | [ x,v ], over' ->
-          (over,(Locality.dummy_annot x,Alg_expr.const v)::acc)
+          (over',(Locality.dummy_annot x,Alg_expr.const v)::acc)
         | (x,_)::_::_, _ ->
           raise (ExceptionDefn.Malformed_Decl
                    ("variable '"^x^"' is overwritten more than once",

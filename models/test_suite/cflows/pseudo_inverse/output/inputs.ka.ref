@@ -6,8 +6,8 @@
 
 %agent: A(x{a b c})
 
-%var:/*0*/ 'n_a' 1000
-%var:/*1*/ 'c' |A(x{c})|
+%var:/*0*/ 'c' |A(x{c})|
+%var:/*1*/ 'n_a' 1000
 %plot: [T]
 %plot: c
 
