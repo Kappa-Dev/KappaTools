@@ -8,10 +8,12 @@ type restriction =
     delta : Occu1.trans * int list ;
   }
 
-
 type static =
   {
     packs:
+      Ckappa_sig.Site_map_and_set.Set.t
+        Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif ;
+    backward_pointers:
       Ckappa_sig.Site_map_and_set.Set.t
         Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif ;
     rule_restrictions:
