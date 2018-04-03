@@ -29,7 +29,7 @@ let add_dependence parameters error
   in
   error, (packs, backward_dependences)
 
-let compute_packs parameters error compil =
+let compute_packs parameters error handler compil =
   let error, packs =
     Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0,0)
   in
@@ -48,35 +48,65 @@ let compute_packs parameters error compil =
              (fun
                (error, map) (site_address,_)
                ->
-                 let ag_id = site_address.Cckappa_sig.agent_index in
-                 if true (* the site is a counter *)
+                 let error, is_counter =
+                   Handler.is_counter
+                     parameters error handler site_address.Cckappa_sig.agent_type site_address.Cckappa_sig.site
+                 in
+                 if is_counter (* the site is a counter *)
                  then
+                   let ag_id = site_address.Cckappa_sig.agent_index in
                    let error, old =
                      Ckappa_sig.Agent_id_map_and_set.Map.find_default_without_logs
                      parameters error []
                      ag_id
                      map
-                 in
-                 let error, new_list =
-                   if true (* the site is a counter *)
-                   then
+                   in
+                   Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite
+                     parameters error ag_id (site_address.Cckappa_sig.site::old)
+                     map
 
-                 Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite
-                   parameters error ag_id (site_address::old)
-                   map
+                 else
+                   error, map
              )
              (error, Ckappa_sig.Agent_id_map_and_set.Map.empty)
              actions
          in
          let error, (packs, backward_dependences)  =
-           Ckappa_sig.Agent_id_map_and_set.Map.fold2
+           Ckappa_sig.Agent_id_map_and_set.Map.fold
              (fun
-               parameters error list_of_counters list_of_tested_sites
-               (packs, backward_dependences)
+               ag list_of_counters
+               (error, (packs, backward_dependences))
                ->
-                 error, (packs, backward_dependences))
-             agents_with counters
-             Ckappa_sig.Agent_id_map_and_set.Map.empty
+                 match
+                   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                     parameters error
+                     ag
+                     rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+                 with
+                 | error, None -> error, (packs, backward_dependences)
+                 | error, Some a ->
+                   begin
+                     match a with
+                     | Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _
+                     | Cckappa_sig.Unknown_agent _ ->
+                       error, (packs, backward_dependences)
+                     | Cckappa_sig.Agent ag ->
+                       let agent_name = ag.Cckappa_sig.agent_name in
+                       Ckappa_sig.Site_map_and_set.Map.fold
+                         (fun site _ (error, (packs, backward_dependences)) ->
+                            List.fold_left
+                              (fun (error, (packs, backward_dependences)) counter ->
+                                 add_dependence
+                                   parameters error
+                                   ~agent_name ~site ~counter ~packs ~backward_dependences)
+                              (error, (packs, backward_dependences))
+                              list_of_counters)
+                         ag.Cckappa_sig.agent_interface
+                         (error, (packs, backward_dependences))
+                   end
+             )
+             agents_with_counters
+             (error, (packs, backward_dependences))
          in
          error, (packs, backward_dependences)
       ) compil.Cckappa_sig.rules (packs, backward_dependences)
