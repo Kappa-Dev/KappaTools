@@ -49,6 +49,10 @@ case $1 in
         ' site/index.html > ${PLAYGROUND}/try/index.html
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
+        empty_or_create ${PLAYGROUND}/viz
+        cp viz/* ${PLAYGROUND}/viz/
+        scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
+            ${PLAYGROUND}/viz travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
         cp Kappapp.tar.gz ${PLAYGROUND}/binaries/
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy ${PLAYGROUND}/binaries/Kappapp.tar.gz \

@@ -34,8 +34,8 @@ class Snapshot {
         snapshot.clearData();
         let margin = { top: 0, right: 10, bottom: 10, left: 10 };
         /* multiplying by a factor to account for flex display */
-        let w = d3.select("#snapshot-map-display").node().getBoundingClientRect().width * 5/6 - margin.left - margin.right;
-        let h = d3.select("#snapshot-map-display").node().getBoundingClientRect().height - margin.top - margin.bottom;
+        let w = root.node().getBoundingClientRect().width * 5/6 - margin.left - margin.right;
+        let h = root.node().getBoundingClientRect().height - margin.top - margin.bottom;
 
         if (snapshot.data) {
             let layout = new SnapLayout(snapshot, new Dimension(w, h), margin);

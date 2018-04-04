@@ -1,0 +1,51 @@
+<!doctype html>
+
+<html>
+  <!--
+*****************************************************************************
+*  _  __ * The Kappa Language                                               *
+* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF *
+* | ' /  ********************************************************************
+* | . \  * This file is distributed under the terms of the                  *
+* |_|\_\ * GNU Lesser General Public License Version 3                      *
+*        *                                                                  *
+*****************************************************************************
+
+-->
+  <head>
+    <title>Kappa visualizer</title>
+    <meta charset="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+    <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+  </head>
+  <body class="flex-content">
+    <div class="container-fluid flex-content" id="main">
+    </div>
+    <script src="class.js"></script>
+    <script src="tooltip-snapshot.js"></script>
+    <script src="render-snapshot.js"></script>
+    <link rel="stylesheet" href="JsSim.css"></link>
+    <script>
+      snap = new Snapshot("main",[]);
+      snapReader = new FileReader();
+      snapReader.addEventListener("load",function (event) {
+      snap.setData("null",snapReader.result);
+      }, false);
+
+      // prevent default to allow drop
+      document.addEventListener("dragover", function( event ) {
+      event.preventDefault();
+      }, false);
+
+      document.addEventListener("drop", function (event) {
+      event.preventDefault();
+      data = event.dataTransfer.files[0];
+      if (data) snapReader.readAsText(data);
+      }, false);
+
+      window.addEventListener("resize", function (event) {
+      snap.redraw();
+      }, false);
+    </script>
+  </body>
+</html>

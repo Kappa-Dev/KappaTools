@@ -43,8 +43,8 @@ GENERATED=$(VERSION) \
 	  generated/api_types_t.ml generated/api_types_j.ml \
 	  generated/mpi_message_t.ml generated/mpi_message_j.ml
 
-RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) \
-		$(wildcard js/*.css) js/favicon.ico js/package.json
+RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) $(wildcard viz/*.js) \
+		$(wildcard viz/*.css) js/favicon.ico js/package.json
 
 APP_EXT?=cdn
 INDEX_HTML=js/use-$(APP_EXT).html
@@ -79,7 +79,7 @@ generated/mpi_message_t.ml: api/mpi_message.atd generated
 generated/mpi_message_j.ml: api/mpi_message.atd generated
 	atdgen -j -j-std -o generated/mpi_message api/mpi_message.atd
 
-$(RESOURCE): shared/flux.js shared/plot.js shared/common.js js/JsSim.css api/test_message.json
+$(RESOURCE): shared/flux.js shared/plot.js shared/common.js viz/JsSim.css api/test_message.json
 	./dev/generate-string.sh $^  > $@
 
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
@@ -136,7 +136,7 @@ TestJsSim: TestJsSim.byte
 	./TestJsSim.byte
 
 site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js  site/KaSaWorker.js site/KaStorWorker.js
-	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/JQUERY_VERSION/$(JQUERY_VERSION)/g" | sed "s/JQUERY_UI_VERSION/$(JQUERY_UI_VERSION)/g" |  sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" | sed "s/BOOTSTRAP_VERSION/$(BOOTSTRAP_VERSION)/g" > $@
+	cat $< | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/JQUERY_VERSION/$(JQUERY_VERSION)/g" | sed "s/JQUERY_UI_VERSION/$(JQUERY_UI_VERSION)/g" |  sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" | sed "s/BOOTSTRAP_VERSION/$(BOOTSTRAP_VERSION)/g" > $@
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \

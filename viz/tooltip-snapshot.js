@@ -102,7 +102,7 @@ class SnapUIManager {
         window.addEventListener("resize", resizeLegend);
         
         function resizeLegend() {
-            let legendHeight = d3.select("#snapshot-map-display").node().getBoundingClientRect().height;
+            let legendHeight = d3.select(this.rendrer.id).node().getBoundingClientRect().height;
             let legendSVG = d3.select(".snapshot-legend")
                 .style("height", legendHeight +"px");
         }
