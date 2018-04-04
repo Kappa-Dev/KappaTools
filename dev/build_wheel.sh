@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+VERSION=$1
+
+curl -L https://github.com/Kappa-Dev/KaSim/archive/v${VERSION}.tar.gz | tar xz
+cd KaSim-${VERSION}
+opam pin add -n -y .
+opam install --deps-only -y KaSim-4
+opam install -y atdgen
+
+## Copy/paste from https://github.com/pypa/python-manylinux-demo/blob/master/travis/build-wheels.sh
+
+# Compile wheels
+for PYBIN in /opt/python/*/bin; do
+    make clean
+    "${PYBIN}/pip" wheel . -w /io/wheelhouse/
+done
+
+# Bundle external shared libraries into the wheels
+for whl in /io/wheelhouse/*x86_64.whl; do
+    auditwheel repair "$whl" -w /io/wheelhouse/
+done
