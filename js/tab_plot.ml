@@ -138,7 +138,7 @@ let xml () =
                   ; Html.a_input_type `Checkbox
                   ] () in
   let export_controls =
-    Widget_export.content (configuration ())
+    Widget_export.inline_content (configuration ())
   in
   [%html {|
   <div class="navcontent-view flex-content">
@@ -160,19 +160,24 @@ let xml () =
              Log Y |}[plot_y_axis_log_checkbox]{|
         </div>
         <div class="col-sm-2" id="|}div_axis_select_id{|"></div>
-        <div class="col-sm-2">
-           <div class="input-group">
-              <span class="input-group-addon">Points</span>
-              |}[plot_points_input]{|
-           </div>
-        </div>
-        <div class="col-sm-2">
-           |}[plot_offset_input]{|
-
-        </div>
       </div>
   </div>
-  <div class="navcontent-controls"> |}[export_controls]{| </div> |}]
+  <div class="navcontent-controls">
+    <form class="form-inline" id=|}export_id{|>
+      |}export_controls{|
+      <div class="form-group">
+        <label class="sr-only" for=|}plot_points_input_id{|>Row to plot</label>
+        <div class="input-group">
+          <span class="input-group-addon">Points</span>
+          |}[plot_points_input]{|
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="sr-only" for=|}plot_offset_input_id{|>Selected window</label>
+        |}[plot_offset_input]{|
+      </div>
+    </form>
+    </div> |}]
 
 let content () : [> Html_types.div ] Html.elt list =
   [Ui_common.toggle_element (fun s -> has_plot s ) (xml ()) ]
@@ -240,6 +245,10 @@ let onload_plot_points_input
   let plot_points_input_dom : Dom_html.inputElement Js.t = Tyxml_js.To_dom.of_input plot_points_input in
   let js_point : Js.js_string Js.t = Js.string (string_of_int (React.S.value point)) in
   let () = plot_points_input_dom##.value := js_point in
+  let () = plot_points_input_dom##.onkeypress :=
+      Dom_html.handler
+        (fun ev ->
+           if ev##.keyCode = 13 then Js._false else Js._true) in
   let () = plot_points_input_dom##.onchange :=
       Dom_html.handler
         (fun _ ->

@@ -38,7 +38,7 @@ let export_form_id
     (configuration :  configuration) : string =
   Format.sprintf "export_%s_form" configuration.id
 
-let content
+let inline_content
     (configuration :  configuration) =
   let export_filename =
     Html.input
@@ -52,7 +52,8 @@ let content
     Html.button
       ~a:[ Html.a_id (export_button_id configuration)
          ; Html.Unsafe.string_attrib "role" "button"
-         ; Html.a_class ["btn";"btn-default";"pull-right"]
+         ; Html.a_class ["btn";"btn-default"]
+         ; Tyxml_js.R.filter_attrib (Html.a_disabled ()) (React.S.map not configuration.show)
          ]
       [ Html.cdata "export" ]
   in
@@ -62,31 +63,23 @@ let content
          [%html {|<option value="|}handler.label{|">|}(Html.cdata handler.label){|</option>|}])
       configuration.handlers
   in
-  let xml_div =
     [%html {|<div class="form-group">
-             <select class="form-control"
-             id="|}(export_format_id configuration){|">|}export_formats_select{|</select>
-										</div>
-										<div class="form-group">
-										<label class="checkbox-inline">
-										|}[export_filename]{|
-           </label>
-        </div>
-        <div class="form-group">
-           <label class="checkbox-inline">
-              |}[export_button]{|
-           </label>
-        </div>|}]
-  in
+             <select class="form-control" id="|}(export_format_id configuration){|">
+               |}export_formats_select{|
+             </select>
+             </div>
+             <div class="form-group">
+               <label for=|}(export_filename_id configuration){|></label>
+               |}[export_filename]{|
+             </div>
+             |}]@[export_button]
+
+let content configuration =
   Html.form
-    ~a:[
-      Html.a_id (export_form_id configuration);
-      Tyxml_js.R.Html.a_class
-        (React.S.map
-           (fun show -> "form-inline" :: if show then [] else ["hidden"])
-           configuration.show)
-    ]
-    xml_div
+    ~a:[Html.a_id (export_form_id configuration);
+        Html.a_class ["form-inline"];
+       ]
+    (inline_content configuration)
 
 let onload (configuration :  configuration) =
   let export_button : Dom_html.buttonElement Js.t =
@@ -96,12 +89,9 @@ let onload (configuration :  configuration) =
   let export_format : Dom_html.selectElement Js.t =
     Ui_common.id_dom (export_format_id configuration) in
   let export_button_toggle () : unit =
-    let filename : string =
-      Js.to_string (export_filename##.value)
-    in
     let is_disabled : bool Js.t =
       Js.bool
-        (String.length (String.trim filename) = 0)
+        (not (React.S.value configuration.show) || export_filename##.value##trim##.length = 0)
     in
     let () =
       export_button##.disabled := is_disabled

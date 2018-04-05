@@ -139,7 +139,8 @@ let export_configuration = {
 
 let content () = [
   Html.div ~a:[Html.a_class ["flex_content"; "table-responsive"]]
-    [Html.form [din_select]; din; Widget_export.content export_configuration]
+    [Html.form [din_select]; din;
+     Widget_export.content export_configuration]
 ]
 
 let navli () =

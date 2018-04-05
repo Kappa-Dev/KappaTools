@@ -59,11 +59,9 @@ let content () =
               [Html.pcdata "Accuracy"];
             Html.div ~a:[Html.a_class ["col-md-10"] ] [accuracy_chooser] ]
       ] in
-  let export_controls =
-    Widget_export.content configuration in
   [ accuracy_form;
     [%html {|<div id="|}display_id{|">|}[ Html.entity "nbsp" ]{|</div>|}];
-    export_controls ]
+    Widget_export.content configuration ]
 
 let extract_contact_map = function
   | `Assoc [ "contact map", `Assoc [ "accuracy", acc; "map", contact ] ] -> acc,contact

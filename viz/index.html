@@ -29,22 +29,22 @@
       snap = new Snapshot("main",[]);
       snapReader = new FileReader();
       snapReader.addEventListener("load",function (event) {
-      snap.setData("null",snapReader.result);
+        snap.setData("null",snapReader.result);
       }, false);
 
       // prevent default to allow drop
       document.addEventListener("dragover", function( event ) {
-      event.preventDefault();
+        event.preventDefault();
       }, false);
 
       document.addEventListener("drop", function (event) {
-      event.preventDefault();
-      data = event.dataTransfer.files[0];
-      if (data) snapReader.readAsText(data);
+        event.preventDefault();
+        data = event.dataTransfer.files[0];
+        if (data) snapReader.readAsText(data);
       }, false);
 
       window.addEventListener("resize", function (event) {
-      snap.redraw();
+        snap.redraw();
       }, false);
     </script>
   </body>

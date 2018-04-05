@@ -21,9 +21,9 @@ OCAMLBUILDFLAGS = $(EXTRAFLAGS)
 USE_TK?=0
 
 ifeq ($(DEBUG),1)
-JSOFOCAMLFLAGS = --debuginfo --pretty "+weak.js" "+nat.js"
+JSOFOCAMLFLAGS = --debuginfo --sourcemap --pretty "+nat.js"
 else
-JSOFOCAMLFLAGS = "+nat.js" "+weak.js"
+JSOFOCAMLFLAGS = "+nat.js"
 endif
 
 ifeq ($(USE_TK),1)

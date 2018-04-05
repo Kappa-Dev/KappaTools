@@ -280,7 +280,7 @@ let xml () =
         [ Widget_export.content (configuration_kappa ()) ] ;
       Html.div
         ~a:[ toggle_controls ~kappa:["hidden"] ~graph:["visible"] ; ]
-        [ Widget_export.content (configuration_graph ()) ] ]
+         [ Widget_export.content (configuration_graph ()) ] ]
   in
   let kappa_snapshot_display =
     Html.div
