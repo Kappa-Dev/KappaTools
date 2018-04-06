@@ -9,8 +9,7 @@
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
-let div_axis_select_id  = "plot-axis-select"
-let display_id = "plot-display"
+let div_display_id = "plot-main_div"
 let export_id = "plot-export"
 
 type offset = { offset_current : int ;
@@ -67,8 +66,8 @@ let export mime filename =
 let configuration () : Widget_export.configuration =
   { Widget_export.id = export_id
   ; Widget_export.handlers =
-      [ Widget_export.export_svg ~svg_div_id:display_id ()
-      ; Widget_export.export_png ~svg_div_id:display_id ()
+      [ Widget_export.export_svg ~svg_div_id:div_display_id ()
+      ; Widget_export.export_png ~svg_div_id:div_display_id ()
       ;  { Widget_export.suffix = "json"
         ; Widget_export.label = "json"
         ; Widget_export.export = export_json
@@ -121,47 +120,12 @@ let plot_offset_input =
                 ] ()
 
 let xml () =
-  let plot_show_legend =
-    Html.input ~a:[ Html.a_id "plot-show-legend"
-                  ; Html.a_input_type `Checkbox
-                  ; Html.a_class ["checkbox-control"]
-                  ; Html.Unsafe.string_attrib "checked" "true"
-                  ] () in
-  let plot_x_axis_log_checkbox =
-    Html.input ~a:[ Html.a_id "plot-x-axis-log-checkbox"
-                  ; Html.a_class ["checkbox-control"]
-                  ; Html.a_input_type `Checkbox
-                  ] () in
-  let plot_y_axis_log_checkbox =
-    Html.input ~a:[ Html.a_id "plot-y-axis-log-checkbox"
-                  ; Html.a_class ["checkbox-control"]
-                  ; Html.a_input_type `Checkbox
-                  ] () in
   let export_controls =
     Widget_export.inline_content (configuration ())
   in
   [%html {|
-  <div class="navcontent-view flex-content">
-      <div class="row">
-         <div id="plot-label-div" class="center-block display-header">
-            Plot
-         </div>
-      </div>
-      <div class="row flex-content">
-         <div id="|}display_id{|" class="col-sm-12 flex-content"> |}[ Html.entity "nbsp"]{|
-         </div>
-      </div>
-      <div id="plot-legend-div" class="row" >
-        <div class="col-sm-1">
-             |}[plot_show_legend]{| Legend
-        </div>
-        <div class="col-sm-2">
-             Log X |}[plot_x_axis_log_checkbox]{|
-             Log Y |}[plot_y_axis_log_checkbox]{|
-        </div>
-        <div class="col-sm-2" id="|}div_axis_select_id{|"></div>
-      </div>
-  </div>
+  <div class="navcontent-view flex-content" id="|}div_display_id{|"></div>
+
   <div class="navcontent-controls">
     <form class="form-inline" id=|}export_id{|>
       |}export_controls{|
@@ -281,18 +245,8 @@ let tab_is_active,set_tab_is_active = React.S.create false
 let onload () =
   let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
   let () = Widget_export.onload (configuration ()) in
-  let configuration : Js_plot.plot_configuration Js.t =
-    Js_plot.create_configuration
-      ~plot_div_id:display_id
-      ~plot_div_select_id:div_axis_select_id
-      ~plot_label_div_id:"plot-label-div"
-      ~plot_style_id:"plot-svg-style"
-      ~plot_show_legend_checkbox_id:"plot-show-legend"
-      ~plot_x_axis_log_checkbox_id:"plot-x-axis-log-checkbox"
-      ~plot_y_axis_log_checkbox_id:"plot-y-axis-log-checkbox"
-  in
   let plot : Js_plot.observable_plot Js.t =
-    Js_plot.create_observable_plot configuration in
+    Js_plot.create_observable_plot div_display_id in
   (* The elements size themselves using the div's if they are hidden
      it will default to size zero.  so they need to be sized when shown.
   *)

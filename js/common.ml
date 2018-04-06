@@ -63,10 +63,11 @@ let option_string (id : string option) =
     Some id -> Js.some (Js.string id)
   | None -> Js.null
 
-let plotPNG (plotDivId : string)
+let plotPNG
+    ?(plotStyleId : string option)
+    (plotDivId : string)
     (title:string)
-    (plotName : string)
-    (plotStyleId : string option) =
+    (plotName : string) =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "plotPNG")
     [| Js.Unsafe.inject (Js.string plotDivId);
@@ -76,10 +77,10 @@ let plotPNG (plotDivId : string)
     |]
 
 let plotSVG
+    ?(plotStyleId : string option)
     (plotDivId : string)
     (title:string)
-    (plotName : string)
-    (plotStyleId : string option) =
+    (plotName : string) =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "plotSVG")
     [| Js.Unsafe.inject (Js.string plotDivId);

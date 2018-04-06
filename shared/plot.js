@@ -1,7 +1,7 @@
 "use strict"
 
 
-function observable_plot(configuration){
+function observable_plot(mainDivId){
     var that = this;
     /* Mode to render observable.  These codes determine
      * how an observable in a plot is to be rendered.
@@ -38,16 +38,9 @@ function observable_plot(configuration){
 	}
     };
 
-
-    /* plotDivId                - div which plot is rendered on
-       plotLabelDivId           - div to place plot interval
-       plotStyleId              - style sheet for the plot need to export
-                                  plot
-       plotShowLegendCheckboxId - checkbox to toggle plot legend
-       plotXAxisLogCheckboxId   - checkbox to toggle log on x axis
-       plotYAxisLogCheckboxId   - checkbox to toggle log on y axis
-     */
-    this.configuration = configuration;
+    this.plotLabelDivId = "plot-label-div"          // div to place plot interval
+    this.plotDivAxisSelectId = "plot-axis-select"
+    this.plotDivId = "plot-display"
 
     /* This should be a list of objects of the form
        index  - there is an assumption of could be duplicated so
@@ -245,9 +238,9 @@ function observable_plot(configuration){
         y.domain(y_bounds);
 
         // Clear div first
-        d3.select("#"+that.configuration.plotDivId).html("");
+        d3.select("#"+that.plotDivId).html("");
         // Add svg element
-        var svg = d3.select("#"+that.configuration.plotDivId).append("svg")
+        var svg = d3.select("#"+that.plotDivId).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom);
         var svgDefs = createSVGDefs(svg);
@@ -398,7 +391,8 @@ function observable_plot(configuration){
                           .append("path")
                           .attr("class", "plot-line")
                           .attr("d", function(d) { return line(d.values); })
-                          .style("stroke", function(d) { return d.color; });
+                          .style("stroke", function(d) { return d.color; })
+			  .style("fill", "none");
                       break;
                   case that.modes.HIDDEN:
                       break;
@@ -412,7 +406,7 @@ function observable_plot(configuration){
         var legendRectSize = 12;
         var legendSpacing = 4;
         var legend = svg.selectAll('.legend')
-            .data(that.getTimeSeries())
+            .data(that.showLegend?that.getTimeSeries():[])
             .enter()
             .append('g')
             .attr('class', 'plot-legend')
@@ -477,61 +471,6 @@ function observable_plot(configuration){
     }
     this.renderPlot = wrap(this.renderPlot);
 
-    /* add select for the x-axis */
-    this.setupAxisSelect = function(){
-        var that = this;
-        /* check for the div to add the axis */
-        if(that.configuration.plotDivAxisSelectId){
-            // Clear div first
-            that.divAxisSelect = d3.select("#"+configuration.plotDivAxisSelectId);
-            that.divAxisSelect.html("");
-            /* Handler to update when the select changes */
-            var changeHandler = function(){
-                var index = parseInt(this.options[this.selectedIndex].value);
-                assert(typeof index !== 'undefined',"plot selection invalid");
-                that.state.forEach(function(state,i){
-                    if(state.mode == that.modes.XAXIS){
-                        state.mode = that.modes.DEFAULT;
-                    }
-                    if(i == index){
-                        state.mode = that.modes.XAXIS;
-                    }
-                });
-                // re-render plot
-                that.renderPlot();
-            }
-            that.divAxisSelect = that.divAxisSelect
-                .append("select")
-                .attr("class","form-control")
-                .on("change", changeHandler);
-            that.divAxisSelect
-                .selectAll('option')
-                .data([])
-                .enter()
-                .append('option');
-        }
-    }
-    this.setupAxisSelect = wrap(this.setupAxisSelect);
-
-    this.updateAxisSelect = function(){
-            that.divAxisSelect
-                .selectAll('option')
-                .remove();
-
-            that.divAxisSelect
-                .selectAll('option')
-                .data(that.state)
-                .enter().append("option")
-                .attr("value",function(d,i) { return i; })
-                .text(function(d) { return d.label; });
-            that.divAxisSelect
-                .selectAll('option')
-                .filter(function(d){ return d.mode == that.modes.XAXIS; })
-                .attr("selected","true");
-
-    }
-    this.updateAxisSelect = wrap(this.updateAxisSelect);
-
     this.renderAxisSelect = function(){
 	var reRender = true;
 	if(that.select){
@@ -542,9 +481,9 @@ function observable_plot(configuration){
 	}
 	if (reRender){
             /* check for the div to add the axis */
-            if(that.configuration.plotDivAxisSelectId){
+            if(that.plotDivAxisSelectId){
 		// Clear div first
-		var divAxisSelect = d3.select("#"+configuration.plotDivAxisSelectId);
+		var divAxisSelect = d3.select("#"+that.plotDivAxisSelectId);
 		divAxisSelect.html("");
 		/* Handler to update when the select changes */
 		var changeHandler = function(){
@@ -559,7 +498,7 @@ function observable_plot(configuration){
 			}
                     });
                     // re-render plot
-                that.renderPlot();
+                    that.renderPlot();
 		}
 		that.select = divAxisSelect.append("select")
                     .attr("class","form-control")
@@ -580,14 +519,14 @@ function observable_plot(configuration){
     /* add label for plot */
     this.renderLabel = function(){
         var that = this;
-        if(that.configuration.plotLabelDivId){
+        if(that.plotLabelDivId){
             if (that.start_time !== null){
                 var label =
                     "Plot between t = "
                     +that.formatTime(that.start_time)
                     +" and t = "
                     +that.formatTime(that.end_time);
-                d3.select("#"+configuration.plotLabelDivId)
+                d3.select("#"+that.plotLabelDivId)
                   .html(label);
             }
         }
@@ -640,27 +579,40 @@ function observable_plot(configuration){
     }
     this.handlePlotTSV = wrap(this.handlePlotTSV);
 
-    /* add checkbox handlers for display options */
-    this.addHandlers = function(){
-        function checkboxHandler(id,setter){
-            if(id){
-                setter(document.getElementById(id).checked);
-                var handler = function(){ setter(document.getElementById(id).checked);
-                                          that.render();};
-                d3.select("#"+id).on("change",handler);
-            }
-        }
-        checkboxHandler(configuration.plotShowLegendCheckboxId,that.setShowLegend);
-        checkboxHandler(configuration.plotXAxisLogCheckboxId,that.setXAxisLog);
-        checkboxHandler(configuration.plotYAxisLogCheckboxId,that.setYAxisLog);
-    }
     /* render plot */
     this.render = function(){
         that.renderPlot();
         that.renderLabel();
-        that.updateAxisSelect();
         that.renderAxisSelect();
     };
-    this.addHandlers();
-    this.setupAxisSelect();
+
+    this.initialContent = function(mainDivId){
+	var mainDiv = d3.select("#"+mainDivId);
+	mainDiv.append("div").attr("id",this.plotLabelDiv).html("Plot");
+	mainDiv.append("div").attr("id",that.plotDivId).attr("class","flex-content");
+	var legendForm = mainDiv.append("form").attr("id","plot-legend-div").attr("class","form-inline");
+	var showLegendDiv = legendForm.append("div").attr("class","checkbox").append("label");
+	showLegendDiv.append("input").attr("type","checkbox")
+	    .attr("checked","true").on("change",function () {
+		that.setShowLegend(d3.event.currentTarget.checked);
+		that.render();
+	    });
+	showLegendDiv.append("span").text(" Legend");
+	var logXDiv = legendForm.append("div").attr("class","checkbox").append("label");
+	logXDiv.text("Log X ");
+	logXDiv.append("input").attr("type","checkbox").on("change",function () {
+		that.setXAxisLog(d3.event.currentTarget.checked);
+		that.render();
+	    });;
+	var logYDiv = legendForm.append("div").attr("class","checkbox").append("label");
+	logYDiv.text("Log Y ");
+	logYDiv.append("input").attr("type","checkbox").on("change",function () {
+		that.setYAxisLog(d3.event.currentTarget.checked);
+		that.render();
+	    });;
+	legendForm.append("div").attr("id",that.plotDivAxisSelectId).attr("class","form-group")
+	    .append("select").attr("class","form-control");
+    };
+
+    this.initialContent(mainDivId);
 }

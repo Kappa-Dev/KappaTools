@@ -133,10 +133,8 @@ let onload (configuration :  configuration) =
   in
   ()
 
-let default_svg_style_id = "plot-svg-style"
-
 let export_svg
-    ?(svg_style_id = (Some default_svg_style_id))
+    ?svg_style_id
     ~(svg_div_id : string)
     () : handler =
   { suffix = "svg"
@@ -144,14 +142,14 @@ let export_svg
   ; export =
       fun filename ->
         Common.plotSVG
+          ?plotStyleId:svg_style_id
           svg_div_id
           filename
           filename
-          svg_style_id
   }
 
 let export_png
-    ?(svg_style_id = (Some default_svg_style_id))
+    ?svg_style_id
     ~(svg_div_id : string)
     () : handler =
   { suffix = "png"
@@ -159,10 +157,10 @@ let export_png
   ; export =
       fun filename ->
         Common.plotPNG
+          ?plotStyleId:svg_style_id
           svg_div_id
           filename
           filename
-          svg_style_id
   }
 
 let export_json

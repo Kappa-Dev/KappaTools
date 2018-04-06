@@ -8,43 +8,6 @@
 
 module ApiTypes = Api_types_j
 
-class type plot_configuration =
-  object
-    method plotDivId : Js.js_string Js.t Js.prop
-    method plotDivAxisSelectId : Js.js_string Js.t Js.prop
-    method plotLabelDivId:Js.js_string Js.t Js.prop
-    method plotStyleId : Js.js_string Js.t Js.prop
-    method plotShowLegendCheckboxId : Js.js_string Js.t Js.prop
-    method plotXAxisLogCheckboxId : Js.js_string Js.t Js.prop
-    method plotYAxisLogCheckboxId : Js.js_string Js.t Js.prop
-  end
-let constructor_configuration : plot_configuration Js.t Js.constr =
-  (Js.Unsafe.variable "Object")
-let create_configuration
-    ~(plot_div_id : string)
-    ~(plot_div_select_id : string)
-    ~(plot_label_div_id:string)
-    ~(plot_style_id : string)
-    ~(plot_show_legend_checkbox_id : string)
-    ~(plot_x_axis_log_checkbox_id : string)
-    ~(plot_y_axis_log_checkbox_id : string)
-  : plot_configuration Js.t  =
-  let configuration : plot_configuration Js.t =
-    new%js constructor_configuration in
-  let () =
-    configuration##.plotDivId := Js.string plot_div_id;
-    configuration##.plotDivAxisSelectId := Js.string plot_div_select_id;
-    configuration##.plotLabelDivId := Js.string plot_label_div_id;
-    configuration##.plotStyleId := Js.string plot_style_id;
-    configuration##.plotShowLegendCheckboxId :=
-      Js.string plot_show_legend_checkbox_id;
-    configuration##.plotXAxisLogCheckboxId :=
-      Js.string plot_x_axis_log_checkbox_id;
-    configuration##.plotYAxisLogCheckboxId :=
-      Js.string plot_y_axis_log_checkbox_id;
-    ()
-  in configuration
-
 class type plot_observable =
   object
     method time : float Js.prop
@@ -99,8 +62,6 @@ class type observable_plot =
     method setPlotName : Js.js_string Js.t -> unit Js.meth
   end;;
 
-let create_observable_plot
-    (configuration : plot_configuration Js.t)
-  : observable_plot Js.t =
+let create_observable_plot main_div_id : observable_plot Js.t =
   Js.Unsafe.new_obj (Js.Unsafe.variable "observable_plot")
-    [| Js.Unsafe.inject configuration |]
+    [| Js.Unsafe.inject (Js.string main_div_id) |]
