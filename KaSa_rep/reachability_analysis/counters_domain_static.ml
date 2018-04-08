@@ -73,7 +73,7 @@ let compute_packs parameters error handler compil =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameters
       error
-      (fun parameters error rule_id rule (packs, backward_dependences)  ->
+      (fun parameters error _rule_id rule (packs, backward_dependences)  ->
          let rule = rule.Cckappa_sig.e_rule_c_rule in
          let actions = rule.Cckappa_sig.actions.Cckappa_sig.translate_counters in
          let error, agents_with_counters =
@@ -434,7 +434,7 @@ let collect_updates parameters handler error ag_id agl diff_agr backward restric
         ag_id agent_restriction
         restriction
 
-let compute_rule_restrictions parameters error handler (packs, backward) compil =
+let compute_rule_restrictions parameters error handler (_packs, backward) compil =
   let error, rule_restrictions =
     Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.create
       parameters error 0
@@ -571,7 +571,7 @@ let compute_rule_restrictions parameters error handler (packs, backward) compil 
     compil.Cckappa_sig.rules
     rule_restrictions
 
-let compute_rule_creation parameters error handler (packs, backward) compil =
+let compute_rule_creation parameters error handler (packs, _backward) compil =
   let error, creation =
     Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
   in
