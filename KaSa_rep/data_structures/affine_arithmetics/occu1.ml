@@ -18,12 +18,21 @@ let p x y =
 
 let po x y = ((p x y)>0)
 
+let string_of_trans x =
+  match x with
+  | Affine_cst  ->
+    "Affine constant"
+  | Counter c ->
+  "Counter_"^(string_of_int (Ckappa_sig.int_of_site_name c))
+  | Bool(a,b)  ->
+    "Is_site_"^(string_of_int (Ckappa_sig.int_of_site_name a))^"_in_state_"^(string_of_int (Ckappa_sig.int_of_state_index b))
+
 let print_trans parameters x =
   match x with
   | Affine_cst  ->
     let () =
       Loggers.fprintf
-        (Remanent_parameters.get_logger parameters) "Affine constant" 
+        (Remanent_parameters.get_logger parameters) "Affine constant"
     in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
   | Counter c ->

@@ -2,7 +2,7 @@
    * int_storage.mli
    *
    * Creation:                      <2016-03-14 feret>
-   * Last modification: Time-stamp: <Nov 23 2016>
+   * Last modification: Time-stamp: <Apr 05 2018>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -19,6 +19,7 @@ type ('a,'b) unary = Remanent_parameters_sig.parameters -> Exception.method_hand
 type ('a,'b,'c) binary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * 'c
 type ('a,'b,'c,'d) ternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> Exception.method_handler * 'd
 type ('a,'b,'c,'d,'e) quaternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> Exception.method_handler * 'e
+type ('a,'b,'c,'d,'e,'f,'g) sexternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> 'e -> 'f -> Exception.method_handler * 'g
 
 type 'a unary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler
 type ('a,'b) binary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler
@@ -45,6 +46,8 @@ sig
   val iter:((key,'a) binary_no_output, 'a t) binary_no_output
   val fold_with_interruption: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
   val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
+  val fold2: ((key,'a,'c,'c) ternary,(key,'b,'c,'c) ternary,
+              (key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) sexternary
   val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
   val free_all: ('a t,'a t) unary
 end

@@ -2,7 +2,7 @@
    * int_storage.ml
    *
    * Creation:                      <2010-07-27 feret>
-   * Last modification: Time-stamp: <Mar 29 2017>
+   * Last modification: Time-stamp: <Apr 07 2018>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -19,6 +19,7 @@ type ('a,'b) unary = Remanent_parameters_sig.parameters -> Exception.method_hand
 type ('a,'b,'c) binary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * 'c
 type ('a,'b,'c,'d) ternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> Exception.method_handler * 'd
 type ('a,'b,'c,'d,'e) quaternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> Exception.method_handler * 'e
+type ('a,'b,'c,'d,'e,'f,'g) sexternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> 'e -> 'f -> Exception.method_handler * 'g
 
 type 'a unary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler
 type ('a,'b) binary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler
@@ -43,6 +44,8 @@ sig
   val iter:((key,'a) binary_no_output, 'a t) binary_no_output
   val fold_with_interruption: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
   val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
+  val fold2: ((key,'a,'c,'c) ternary,(key,'b,'c,'c) ternary,
+              (key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) sexternary
   val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
   val free_all: ('a t,'a t) unary
 end
@@ -124,10 +127,20 @@ module Int_storage_imperatif =
 
     let get parameters error key array =
       if key>array.size || key<0 then
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "130:%i\n" key
+        in
         invalid_arg parameters error __POS__ Exit None
       else
         match array.array.(key) with
-        | None -> invalid_arg parameters error __POS__ Exit None
+        | None ->
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "133:%i\n" key
+        in invalid_arg parameters error __POS__ Exit None
         | a -> error,a
 
     let free parameters error key array =
@@ -240,6 +253,24 @@ module Int_storage_imperatif =
       in
       aux 0  (error,init)
 
+    let fold2
+        parameter error f g h t1 t2 init =
+      let size = min t1.size t2.size in
+      let array1 = t1.array in
+      let array2 = t2.array in
+      let rec aux k remanent =
+        if k>size then remanent
+        else
+          let error,sol = remanent in
+          match array1.(k),array2.(k) with
+          | Some x1,None -> aux (k+1) (f parameter error k x1 sol)
+          | None,Some x2 -> aux (k+1) (g parameter error k x2 sol)
+          | Some x1,Some x2 ->
+            aux (k+1) (h parameter error k x1 x2 sol)
+          | None, None -> aux (k+1) (error, sol)
+      in
+      aux 0  (error,init)
+
     let free_all parameter error t =
       fold parameter error
         (fun parameter error a _ t -> free parameter error a t)
@@ -292,6 +323,7 @@ module Nearly_infinite_arrays =
               let print_site_f = Basic.print_site_f*)
       let iter = Basic.iter
       let fold = Basic.fold
+      let fold2 = Basic.fold2
       let fold_with_interruption = Basic.fold_with_interruption
       let fold2_common = Basic.fold2_common
       let free_all = Basic.free_all
@@ -463,6 +495,30 @@ module Extend =
           a
           c
 
+      let fold2 parameter error f g h a b c =
+        let error, c =
+          fold
+            parameter
+            error
+            (fun parameter error k a c ->
+               let error,get = unsafe_get parameter error k b in
+               match get with
+               | None -> f parameter error k a c
+               | Some b -> h parameter error k a b c)
+            a
+            c
+        in
+        fold
+          parameter
+          error
+          (fun parameter error k b c ->
+             let error,get = unsafe_get parameter error k a in
+             match get with
+             | None -> g parameter error k b c
+             | Some _ -> error, c)
+          b
+          c
+
       let free_all parameter error t =
         fold parameter error
           (fun parameter error a _ t -> free parameter error a t)
@@ -602,6 +658,30 @@ module Quick_key_list =
              | None -> (error,c)
              | Some b -> f parameter error k a b c)
           a
+          c
+
+      let fold2 parameter error f g h a b c =
+        let error, c =
+          fold
+            parameter
+            error
+            (fun parameter error k a c ->
+               let error,get = unsafe_get parameter error k b in
+               match get with
+               | None -> f parameter error k a c
+               | Some b -> h parameter error k a b c)
+            a
+            c
+        in
+        fold
+          parameter
+          error
+          (fun parameter error k b c ->
+             let error,get = unsafe_get parameter error k a in
+             match get with
+             | None -> g parameter error k b c
+             | Some _ -> error, c)
+          b
           c
 
     end:Storage with type key = Basic.key and type dimension = Basic.dimension)
