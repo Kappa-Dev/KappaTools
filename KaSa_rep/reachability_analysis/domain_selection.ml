@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of June
-  * Last modification: Time-stamp: <Apr 08 2017>
+  * Last modification: Time-stamp: <Apr 09 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -79,8 +79,37 @@ let select_domain
   let module With_parallel_bonds =
     (val with_parallel_bonds: Analyzer_domain_sig.Domain)
   in
+  let with_counters=
+    if Remanent_parameters.get_counters_analysis_1 parameters
+    then
+      match Remanent_parameters.get_counters_domain_1 parameters
+      with
+      | Remanent_parameters_sig.Mi ->
+        (module
+        Product.Product(Counters_domain.Domain_affine_equalities_and_intervalles)(With_parallel_bonds) :
+        Analyzer_domain_sig.Domain)
+      | Remanent_parameters_sig.Non_relational ->
+        (module
+          Product.Product(Counters_domain.Domain_non_relational)(With_parallel_bonds) :
+          Analyzer_domain_sig.Domain)
+      | Remanent_parameters_sig.Octagons->
+        (module
+          Product.Product(Counters_domain.Domain_octagons)(With_parallel_bonds) :
+          Analyzer_domain_sig.Domain)
+      | Remanent_parameters_sig.Abstract_multiset->
+        (module
+          Product.Product(Counters_domain.Domain_abstract_multisets)(With_parallel_bonds) :
+          Analyzer_domain_sig.Domain)
+
+
+    else
+      (module With_parallel_bonds)
+  in
+  let module With_counters =
+    (val with_counters: Analyzer_domain_sig.Domain)
+  in
   let comp =
-    (module Composite_domain.Make(With_parallel_bonds) : Composite_domain.Composite_domain)
+    (module Composite_domain.Make(With_counters) : Composite_domain.Composite_domain)
   in
   let module Comp = (val comp: Composite_domain.Composite_domain) in
   let main =

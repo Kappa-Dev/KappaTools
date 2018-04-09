@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Mar 01 2018>
+  * Last modification: Time-stamp: <Apr 09 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -283,12 +283,29 @@ let get_reachability_parameters () =
       !Config.with_site_across_bonds_analysis ;
     Remanent_parameters_sig.parallel_bonds =
       !Config.with_parallel_bonds_analysis ;
+    Remanent_parameters_sig.counters = !Config.with_counters_analysis;
+
     Remanent_parameters_sig.dynamic_contact_map =
-      match Tools.lowercase !Config.with_dynamic_contact_map
-      with
-      | "dynamic" -> true
-      | "static" -> false
-      | _ -> true
+      begin
+        match Tools.lowercase !Config.with_dynamic_contact_map
+        with
+        | "dynamic" -> true
+        | "static" -> false
+        | _ -> true;
+      end;
+    Remanent_parameters_sig.counter_domain =
+      begin
+        match
+          Tools.lowercase !Config.counter_analysis_domain
+        with
+        | "mi" -> Remanent_parameters_sig.Mi
+        | "octagon" | "oct" -> Remanent_parameters_sig.Octagons
+        | "abstract-multiset" | "am" -> Remanent_parameters_sig.Abstract_multiset
+        | "non-relational" | "nr" ->
+          Remanent_parameters_sig.Non_relational
+        | _ -> Remanent_parameters_sig.Mi
+      end ;
+
   }
 
 let open_tasks_profiling =
@@ -594,6 +611,8 @@ let get_site_across_bonds_analysis_1 r = r.Remanent_parameters_sig.site_across_b
 let get_parallel_bonds_analysis_1 r =
   r.Remanent_parameters_sig.parallel_bonds
 let get_dynamic_contact_map_1 r = r.Remanent_parameters_sig.dynamic_contact_map
+let get_counters_analysis_1 r = r.Remanent_parameters_sig.counters
+let get_counters_domain_1 r = r.Remanent_parameters_sig.counter_domain
 
 let get_compute_symmetries_1 marshalisable =
   marshalisable.Remanent_parameters_sig.do_symmetries_analysis
@@ -866,7 +885,13 @@ let get_site_across_bonds_analysis =
     get_site_across_bonds_analysis_1
 let get_dynamic_contact_map =
   upgrade_from_reachability_analysis_parameters_field get_dynamic_contact_map_1
+let get_counters_analysis =
+upgrade_from_reachability_analysis_parameters_field
+  get_counters_analysis_1
 
+let get_counters_domain =
+  upgrade_from_reachability_analysis_parameters_field
+    get_counters_domain_1 
 let get_do_reachability_analysis p =
   upgrade_from_marshal_field get_do_reachability_analysis_1 p
   || get_compute_local_traces p

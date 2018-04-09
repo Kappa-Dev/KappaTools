@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Nov 29 2017>
+  * Last modification: Time-stamp: <Apr 09 2018>
   * *
   * primitive to parse command-line options
   *
@@ -129,19 +129,27 @@ let options =
        "--views-domain",
       Bool Config.with_views_analysis,
           "enable local views analysis",
-          [reachability,4],Normal;
+       [reachability,4],Normal;
+      "--counters-domain",
+      Bool Config.with_counters_analysis,
+      "enable counter analysis",
+      [reachability,5],Normal;
+      "--counters-accuracy",
+      String Config.counter_analysis_domain,
+      "Abstract domain for counter analysis",
+      [reachability,6],Normal;
       "--double-bonds-domain",
       Bool Config.with_parallel_bonds_analysis,
       "enable double bonds analysis",
-      [reachability,5],Normal;
+      [reachability,7],Normal;
       "--sites-across-bonds-domain",
       Bool Config.with_site_across_bonds_analysis,
       "enable the analysis of the relation among the states of sites in connected agents",
-      [reachability,6],Normal;
+      [reachability,8],Normal;
       "--sites-accross-bonds-domain",
       Bool Config.with_site_across_bonds_analysis,
       "enable the analysis of the relation among the states of sites in connected agents",
-      [reachability,6],Hidden;
+      [reachability,8],Hidden;
 
       "--compute-symmetries",
       Bool Config.do_symmetries,
@@ -158,7 +166,7 @@ let options =
            [],
            Config.verbosity_level_for_reachability_analysis)),
       "Tune the verbosity level for the view analysis",
-      [reachability,7],
+      [reachability,9],
       Hidden;
 
       "--verbosity-level-for-reachability-analysis",
@@ -172,18 +180,18 @@ let options =
            [],
            Config.verbosity_level_for_reachability_analysis)),
       "Tune the verbosity level for the reachability analysis",
-      [reachability,8],
+      [reachability,10],
       Normal;
       "--hide-one-d-relations-from-cartesian-decomposition",
       Bool Config.hide_one_d_relations_from_cartesian_decomposition,
       "Filter out 1-d relations from the Cartesian decomposition",
-      [reachability,9],
+      [reachability,11],
       Developper;
 
       "--smash-relations",
       Bool Config.smash_relations,
       "Recombine relations to get a more precise & compact output",
-      [reachability,10],
+      [reachability,12],
       Developper;
 
       "--output-mode-for-reachability-analysis",
@@ -193,7 +201,7 @@ let options =
                ],[],
                Config.use_natural_language)),
       "post-process relation and output the result in the chosen format",
-      [reachability,11],
+      [reachability,13],
       Normal;
 
       "--compute-local-traces",

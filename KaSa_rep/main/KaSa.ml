@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Apr 07 2018>
+ * Last modification: Time-stamp: <Apr 09 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -102,20 +102,7 @@ let main () =
     else
       state
   in
-  (* TESTING COUNTERS *)
-  let state, compil = Export_to_KaSa.get_c_compilation state in
-  let state, handler = Export_to_KaSa.get_handler state in
   let error = Export_to_KaSa.get_errors state in
-  let error, static =
-    Counters_domain_static.compute_static
-      parameters
-      error
-      handler
-      compil
-  in
-  let error =
-    Counters_domain_type.print parameters handler error static
-  in
   let state = Export_to_KaSa.set_errors error state in
 
 
@@ -251,7 +238,7 @@ let main () =
           let l = Public_data.separating_transitions_of_json json in
           let nr,nt =
             List.fold_left
-              (fun (nr,nt) (r,l) ->
+              (fun (nr,nt) (_,l) ->
                  nr+1,
                  nt+List.length l)
               (0,0) l

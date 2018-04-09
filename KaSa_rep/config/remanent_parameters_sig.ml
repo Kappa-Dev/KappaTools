@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Mar 01 2018>
+  * Last modification:  Time-stamp: <Apr 09 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -23,6 +23,8 @@ type link_mode = Bound_indices | Site_address | Bound_type
 type graph_format = DOT | HTML | DIM
 
 type reachability_output = Raw | Natural_language | Kappa
+type counters_domain = Mi | Non_relational | Abstract_multiset | Octagons
+
 
 type rate_convention =
   | No_correction
@@ -101,6 +103,8 @@ type reachability_parameters =
     site_across_bonds: bool ;
     parallel_bonds: bool ;
     dynamic_contact_map: bool ;
+    counters: bool ;
+    counter_domain: counters_domain ;
   }
 
 type marshalisable_parameters =
