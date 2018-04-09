@@ -15,22 +15,94 @@
   <head>
     <title>Kappa visualizer</title>
     <meta charset="utf-8"></meta>
-    <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
   </head>
   <body class="flex-content">
-    <div class="container-fluid flex-content" id="main">
+    <div class="container">
+      <ul class="nav nav-tabs" role="tablist">
+	<li class="nav-item">
+	  <a class="nav-link" id="plot-tab" role="tab" data-toggle="tab" onclick="activate(this.id)" href="#plot">Plot</a>
+	</li>
+	<li class="nav-item">
+	  <a class="nav-link active" id="snap-tab" role="tab" data-toggle="tab" onclick="activate(this.id)" href="#snap">Snapshot</a>
+	</li>
+	<li class="nav-item">
+	  <a class="nav-link" id="contact-tab" role="tab" data-toggle="tab" onclick="activate(this.id)" href="#contact">Contact map</a>
+	</li>
+      </ul>
     </div>
+    <div class="container-fluid flex-content tab-content" id="main">
+      <div class="tab-pane" id="plot" role="tabpanel"></div>
+      <div class="tab-pane show active" id="snap" role="tabpanel"></div>
+      <div class="tab-pane" id="contact" role="tabpanel"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
     <script src="class.js"></script>
     <script src="tooltip-snapshot.js"></script>
     <script src="render-snapshot.js"></script>
+    <script src="common.js"></script>
+    <script src="plot.js"></script>
     <link rel="stylesheet" href="JsSim.css"></link>
     <script>
-      snap = new Snapshot("main",[]);
-      snapReader = new FileReader();
+      var modes = {
+      SNAPSHOT:0,
+      PLOT:1,
+      CONTACTMAP:2
+      };
+      var mode = modes.SNAPSHOT;
+
+      function activate(dstId) {
+      switch (dstId) {
+      case "snap-tab":
+      mode = modes.SNAPSHOT;
+      break;
+      case "plot-tab":
+      mode = modes.PLOT;
+      break;
+      case "contact-tab":
+      mode = modes.CONTACTMAP;
+      break;
+      default:
+      alert("Unknown mode "+dstId+" in activate handler");
+      break;
+      }
+      $("#"+dstId+" a").tab('show');
+      redraw();
+      }
+
+      var snap = new Snapshot("snap",[]);
+      var snapReader = new FileReader();
       snapReader.addEventListener("load",function (event) {
         snap.setData("null",snapReader.result);
       }, false);
+
+      var plot = new ObservablePlot("plot");
+      var plotReader = new FileReader();
+      plotReader.addEventListener("load",function (event) {
+        plot.setData(plotReader.result);
+      }, false);
+
+      var redraw = function () {
+      switch (mode) {
+      case modes.SNAPSHOT:
+      snap.redraw();
+      break;
+      case modes.PLOT:
+      plot.redraw();
+      break;
+      case modes.CONTACTMAP:
+      break;
+      default:
+      alert("Unknown mode "+mode+" in redraw handler");
+      break;
+      }
+      }
 
       // prevent default to allow drop
       document.addEventListener("dragover", function( event ) {
@@ -40,11 +112,23 @@
       document.addEventListener("drop", function (event) {
         event.preventDefault();
         data = event.dataTransfer.files[0];
-        if (data) snapReader.readAsText(data);
+      if (data) switch (mode) {
+      case modes.SNAPSHOT:
+      snapReader.readAsText(data);
+      break;
+      case modes.PLOT:
+      plotReader.readAsText(data);
+      break;
+      case modes.CONTACTMAP:
+      break;
+      default:
+      alert("Unknown mode "+mode+" in drop handler");
+      break;
+      };
       }, false);
 
       window.addEventListener("resize", function (event) {
-        snap.redraw();
+        redraw();
       }, false);
     </script>
   </body>

@@ -79,7 +79,7 @@ generated/mpi_message_t.ml: api/mpi_message.atd generated
 generated/mpi_message_j.ml: api/mpi_message.atd generated
 	atdgen -j -j-std -o generated/mpi_message api/mpi_message.atd
 
-$(RESOURCE): shared/flux.js shared/plot.js shared/common.js viz/JsSim.css api/test_message.json
+$(RESOURCE): shared/flux.js viz/common.js api/test_message.json
 	./dev/generate-string.sh $^  > $@
 
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated

@@ -110,14 +110,6 @@ function spawnProcess(param){
 	return failure(param,err.message);
     }
 }
-function commonUnload(){
-    stdsimProcesses.forEach(function(proccess){	try{ process.kill();  }
-						catch(error){} });
-
-}
-// http://stackoverflow.com/questions/9385778/window-unload-is-not-firing
-// https://api.jquery.com/unload/
-$(window).on('beforeunload', commonUnload);
 
 function jqueryOn(selector,event,handler){
     $(document.body).on(event,

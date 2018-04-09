@@ -1,7 +1,6 @@
 "use strict"
 
-
-function observable_plot(mainDivId){
+function ObservablePlot (mainDivId) {
     var that = this;
     /* Mode to render observable.  These codes determine
      * how an observable in a plot is to be rendered.
@@ -86,6 +85,7 @@ function observable_plot(mainDivId){
 
     this.timeLabel = "Time";
 
+    this.rawData = { legend:[], values:[] }
 
     this.setRawData = function(plot_text){
 	var plot = JSON.parse(plot_text);
@@ -95,9 +95,6 @@ function observable_plot(mainDivId){
 	    return { time: tmp, values: obs };
 	});
         that.rawData = plot;
-    }
-    this.getRawData = function(){
-        return that.rawData;
     }
 
     /* Update the plot data of the graph.  This is called
