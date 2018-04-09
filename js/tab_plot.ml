@@ -197,8 +197,8 @@ let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
       (manager#simulation_detail_plot (plot_parameter ())) >>=
       (Api_common.result_bind_lwt
          ~ok:(fun (plot : Api_types_t.plot)  ->
-             let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot in
-             let () = js_plot##setPlot(data) in
+             let data = Js.string (Data.string_of_plot plot) in
+             let () = js_plot##setData(data) in
              Lwt.return (Api_common.result_ok ())
            )
       )

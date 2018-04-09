@@ -53,14 +53,10 @@ let create_data ~(plot : ApiTypes.plot)
 
 class type observable_plot =
   object
-    method setPlot : plot_data Js.t -> unit Js.meth
-    method getPlot : (unit -> plot_data Js.t) Js.meth
-    method handlePlotPNG : unit -> unit Js.meth
-    method handlePlotSVG : unit -> unit Js.meth
-    method handlePlotTSV : unit -> unit Js.meth
-    method getPlotName : (unit -> Js.js_string Js.t) Js.meth
-    method setPlotName : Js.js_string Js.t -> unit Js.meth
-  end;;
+    method setData : Js.js_string Js.t -> unit Js.meth
+    method clearData : unit Js.meth
+    method redraw : unit Js.meth
+  end
 
 let create_observable_plot main_div_id : observable_plot Js.t =
   Js.Unsafe.new_obj (Js.Unsafe.variable "observable_plot")

@@ -8,8 +8,8 @@
 
 class type snapshot =
   object
-    method exportJSON  : Js.js_string Js.t -> unit Js.meth
-    method setData : contact_map : Js.js_string Js.t -> Js.js_string Js.t -> unit Js.meth
+    method setData :
+      contact_map : Js.js_string Js.t -> Js.js_string Js.t -> unit Js.meth
     method redraw : unit Js.meth
     method clearData : unit Js.meth
   end
