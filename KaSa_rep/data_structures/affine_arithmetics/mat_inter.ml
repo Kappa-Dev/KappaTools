@@ -14,7 +14,7 @@ sig
   val solve_inf:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> var list-> Exception.method_handler
+    prod -> var list-> Exception.method_handler * prod
 
   val create : Remanent_parameters_sig.parameters -> int -> prod
   val plonge :
@@ -39,11 +39,16 @@ sig
     Exception.method_handler ->
     prod -> var list -> Exception.method_handler * prod
 
+  val guard :
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod -> (var * Counters_domain_type.comparison_op * int) list -> Exception.method_handler * prod
+
   val solve_all :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->
-    Exception.method_handler
+    Exception.method_handler * prod
 
   val compt_of_var_list :
     Remanent_parameters_sig.parameters ->
@@ -61,11 +66,18 @@ sig
     Exception.method_handler ->
     prod->prod->
     Exception.method_handler * prod
+
   val is_vide: prod -> var->bool
   val string_of_pro:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod -> var  -> Exception.method_handler * string
+  val interval_of_pro:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod -> var -> Exception.method_handler *
+                   (Fraction.ffraction * Fraction.ffraction) option
+
 
   val is_infinite:prod->var->bool
   val union:
@@ -91,9 +103,15 @@ sig
     Exception.method_handler * prod
 
   val pushbool:
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> prod -> var ->
-  Exception.method_handler * prod
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler -> prod -> var ->
+    Exception.method_handler * prod
+
+  val translate:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod-> (var * int) list ->
+    Exception.method_handler * prod
 end
 
 module Mat_inter =
@@ -665,14 +683,14 @@ posref j))) in
 
    let solve_inf parameters error mi c =
      let rec aux k error  =
-       if k>5 then error
+       if k>5 then error, mi
        else
          let error, tmp=I.copy parameters error (mi.i) in
          let error = solve_inf parameters error mi c in
          let _ = red2 mi in
          (if I.equal tmp (mi.i)
           then
-            error
+            error, mi
           else aux (k+1) error)
      in
      aux 0 error
@@ -685,9 +703,15 @@ posref j))) in
       let classe=classe p l  in
       let error, i2=I.copy parameters error (p.i) in
       try
-	  (List.iter (fun j -> I.set i2 j (cap_inter (I.read i2 j) {inf=Frac{num=1;den=1};
-				       sup=Infinity})) l;
-	   solve_inf parameters error {mat=p.mat;i=i2} classe, false)
+        (
+          let () =
+            List.iter (fun j -> I.set i2 j (cap_inter (I.read i2 j)
+                                           {inf=Frac{num=1;den=1};
+                                            sup=Infinity})) l in
+         let error, _ =
+           solve_inf parameters error {mat=p.mat;i=i2} classe
+         in
+         error, false)
 
       with _ -> error, true
      end
@@ -703,10 +727,44 @@ posref j))) in
       List.iter (fun x->inc x) l;
       let error, i2=I.copy parameters error (p.i) in
       (List.iter (fun j -> I.set i2 j (cap_inter (I.read i2 j) {inf=Frac{num=(get j);den=1};
-				       sup=Infinity})) l;
-       solve_inf parameters error {mat=p.mat;i=i2} classe),
-	{mat=p.mat;i=i2}
-   end
+                                                                sup=Infinity})) l;
+       solve_inf parameters error {mat=p.mat;i=i2} classe)
+    end
+
+
+   let guard parameters error p l  =
+     let classe=classe p (List.rev_map (fun (a,_,_) -> a) (List.rev l))  in
+     let error, m2= M.copy parameters error (p.mat) in
+     let error, i2=I.copy parameters error (p.i) in
+     let () =
+         List.iter
+           (fun (j,cmp,i) ->
+              I.set i2
+                j
+                (cap_inter
+                   (I.read i2 j)
+                   (match cmp with
+                    | Counters_domain_type.EQ ->
+                      {inf= Frac{num=i;den=1};
+                       sup= Frac{num=i;den=1}}
+                    | Counters_domain_type.GT ->
+                      {inf= Frac{num=i+1;den=1};
+                       sup=Infinity}
+                    | Counters_domain_type.GTEQ ->
+                      {inf= Frac{num=i;den=1};
+                       sup=Infinity}
+                    | Counters_domain_type.LT ->
+                      {inf=Infinity;
+                       sup=
+                         Frac{num=i-1;den=1}}
+                    | Counters_domain_type.LTEQ ->
+                      {sup= Frac{num=i;den=1};
+                       inf=Infinity}
+                   ))) l
+     in
+     solve_inf parameters
+       error {mat=m2;i=i2} classe
+
 
    let double_here parameters error p l  =
        begin
@@ -757,11 +815,7 @@ posref j))) in
                   {inf=Frac{num=0;den=1};sup=Frac{num=0;den=1}}))
           l
       in
-      let error =
         solve_inf parameters error {mat=p.mat;i=i2} classe
-      in
-      error,
-      {mat=p.mat;i=i2}
 
    let gen_bin f_m f_i parameters error p q =
      let error, mat = f_m parameters error p.mat q.mat in
@@ -789,13 +843,32 @@ posref j))) in
 
    let solve_all parameters error m =
        solve_inf parameters error m (list_var parameters m)
+
+   let interval_of_pro parameters error m x =
+     error, I.read (m.i) x
+
    let string_of_pro parameters error m x =
-     error, Intervalles.string_of_intervalle parameters (I.read (m.i) x)
+     let error, interv = interval_of_pro parameters error m x in
+     error, Intervalles.string_of_intervalle parameters interv
+
+   let interval_of_pro parameters error m x =
+     let error, interv = interval_of_pro parameters error m x in
+     error, Some (interv.inf, interv.sup)
+
 
    let push parameters error m x f  =
      let _ =I.push (m.i) x f  in
      let error = M.push parameters error (m.mat) x f in
      error, m
+
+   let translate parameters error m l =
+     List.fold_left
+       (fun (error, m) (x,i) ->
+          push parameters error m x {num=i;den=1})
+       (error, m)
+       l  (* TO DO -> do more efficiently *)
+
+
 
   let copy parameters error m =
     let error, mat = M.copy parameters error m.mat in

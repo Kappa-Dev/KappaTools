@@ -8,7 +8,7 @@ sig
   val solve_inf:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> var list-> Exception.method_handler
+    prod -> var list-> Exception.method_handler * prod
 
   val create : Remanent_parameters_sig.parameters -> int -> prod
   val plonge :
@@ -33,11 +33,16 @@ sig
     Exception.method_handler ->
     prod -> var list -> Exception.method_handler * prod
 
+  val guard :
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod -> (var * Counters_domain_type.comparison_op * int) list -> Exception.method_handler * prod
+
   val solve_all :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->
-    Exception.method_handler
+    Exception.method_handler * prod
 
   val compt_of_var_list :
     Remanent_parameters_sig.parameters ->
@@ -55,11 +60,18 @@ sig
     Exception.method_handler ->
     prod->prod->
     Exception.method_handler * prod
+
   val is_vide: prod -> var->bool
   val string_of_pro:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod -> var  -> Exception.method_handler * string
+  val interval_of_pro:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod -> var -> Exception.method_handler *
+                   (Fraction.ffraction * Fraction.ffraction) option
+
 
   val is_infinite:prod->var->bool
   val union:
@@ -87,6 +99,12 @@ sig
   val pushbool:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler -> prod -> var ->
+    Exception.method_handler * prod
+
+  val translate:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod-> (var * int) list ->
     Exception.method_handler * prod
 end
 
