@@ -109,7 +109,6 @@ rect { stroke-width: 2; }
 .filename {
     padding: 6px 12px;
     margin-bottom: 0;
-    font-size: 14px;
     font-weight: 400;
     line-height: 1.42857143;
     text-align: center;
@@ -214,7 +213,6 @@ rect { stroke-width: 2; }
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 14px;
     outline:none;
     margin-top:10px;
     margin-right:10px;

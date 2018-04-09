@@ -26,6 +26,16 @@ let option_withtrace =
          (fun s -> s.State_project.model_parameters.State_project.store_trace)
          State_project.model);
   ] ()
+let decrease_font =
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Html.a_class [ "btn"; "btn-default"; "btn-sm" ]
+  ] [Html.pcdata "-"]
+let increase_font =
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Html.a_class [ "btn"; "btn-default"; "btn-lg" ]
+  ] [Html.pcdata "+"]
 
 let options_modal =
   Ui_common.create_modal
@@ -39,7 +49,12 @@ let options_modal =
               <div class="row">
                 <div class="col-md-offset-1 col-md-5 checkbox">
                   <label>|}[option_withtrace]{|Store trace</label>
-                </div></div>|}]
+                </div>
+              </div>
+              <div class="row">
+                   <div class="col-md-1"><label>Font size</label></div>
+                   <div class="col-md-5">|}[decrease_font; increase_font]{|</div>
+</div>|}]
     ~submit_label:"Save"
     ~submit:
       (Dom_html.handler
@@ -69,6 +84,24 @@ let options =
 let content () =
   [ options ; options_modal]
 
+
+let fontSizeParamId = Js.string "kappappFontSize"
+let initFontSize () =
+  Js.Optdef.case
+    Dom_html.window##.localStorage
+    (fun () -> 1.4)
+    (fun st ->
+       Js.Opt.case (st##getItem fontSizeParamId) (fun () -> 1.4) Js.parseFloat)
+
+let setFontSize v =
+  let v' = string_of_float v in
+  let () = Dom_html.document##.body##.style##.fontSize :=
+      Js.string (v'^"em") in
+  let () = Js.Optdef.iter
+      Dom_html.window##.localStorage
+      (fun st -> st##setItem fontSizeParamId (Js.string v')) in
+  ()
+
 let onload () =
   let () =
     (Tyxml_js.To_dom.of_button options)##.onclick :=
@@ -86,5 +119,23 @@ let onload () =
                ~id:("#"^simulation_options_modal_id)
                ~action:"show"
            in
+           Js._false) in
+  let currentFontSize = ref (initFontSize ()) in
+  let () = setFontSize !currentFontSize in
+  let () =
+    (Tyxml_js.To_dom.of_button increase_font)##.onclick :=
+      Dom_html.handler
+        (fun _ ->
+           let () = currentFontSize :=
+               min 3. (!currentFontSize +. 0.2) in
+           let () = setFontSize !currentFontSize in
+           Js._false) in
+  let () =
+    (Tyxml_js.To_dom.of_button decrease_font)##.onclick :=
+      Dom_html.handler
+        (fun _ ->
+           let () = currentFontSize :=
+               max 0.2 (!currentFontSize -. 0.2) in
+           let () = setFontSize !currentFontSize in
            Js._false) in
   ()
