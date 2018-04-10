@@ -571,6 +571,106 @@ let compute_rule_restrictions parameters error handler (_packs, backward) compil
     compil.Cckappa_sig.rules
     rule_restrictions
 
+
+let convert_view parameters error handler compil packs agent_type ag =
+  match
+    ag
+  with
+| (Some (Cckappa_sig.Ghost
+               | Cckappa_sig.Dead_agent _
+               | Cckappa_sig.Unknown_agent _)
+         | None) ->
+  Exception.warn parameters error __POS__ Exit []
+| Some (Cckappa_sig.Agent ag_r) ->
+  begin
+    match
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
+        parameters error
+        agent_type
+        packs
+    with
+    | error, None -> error, []
+    | error, Some agent_packs ->
+      let interface_r =
+        ag_r.Cckappa_sig.agent_interface
+      in
+      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.fold
+        parameters error
+        (fun parameters error counter site_set list ->
+           let error, interface =
+             Ckappa_sig.Site_map_and_set.Set.fold
+               (fun site (error,interface) ->
+                  let error, is_counter =
+                    Handler.is_counter
+                      parameters error handler agent_type site
+                  in
+                  let error, state =
+                    match
+                      Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+                        parameters error
+                        site
+                        interface_r
+                    with
+                    | error, None ->
+                      if is_counter
+                      then
+                        begin
+                          match
+                            Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+                          parameters error
+                          (agent_type,site)
+                          compil.Cckappa_sig.counter_default
+                          with
+                          | error, (None | Some None) -> error,  Ckappa_sig.state_index_of_int 0
+                          | error, Some (Some a) -> error, a
+                        end
+                      else error, Ckappa_sig.state_index_of_int 0
+                    | error, Some port ->
+                      match
+                        port.Cckappa_sig.site_state.Cckappa_sig.min,
+                        port.Cckappa_sig.site_state.Cckappa_sig.max
+                      with Some a, Some b when a=b ->
+                        error, a
+                         | (Some _ | None), (Some _ | None) ->
+                           Exception.warn parameters error __POS__
+                             Exit (Ckappa_sig.state_index_of_int 0)
+                  in
+                  if is_counter
+                  then
+                    error, (Occu1.Counter site,
+                            Ckappa_sig.int_of_state_index state)::interface
+                  else
+                    let error, last_state =
+                      Handler.last_state_of_site parameters error handler agent_type site
+                    in
+                    let rec aux k interface =
+                      if Ckappa_sig.compare_state_index k last_state > 0
+                      then interface
+                      else
+                        let pred = Occu1.Bool (site,k) in
+                        let interface =
+                          if k=state then
+                            (pred,1)::interface
+                          else
+                            (pred,0)::interface
+                        in
+                        aux (Ckappa_sig.next_state_index k) interface
+                    in
+                    error,
+                    aux
+                      (Ckappa_sig.state_index_of_int 0) interface
+
+               )
+               site_set
+               (error,[])
+           in
+           error,
+           ((agent_type, counter), interface)::list
+        )
+        agent_packs
+        []
+  end
+
 let compute_rule_creation parameters error handler (packs, _backward) compil =
   let error, creation =
     Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
@@ -594,114 +694,29 @@ let compute_rule_creation parameters error handler (packs, _backward) compil =
     let error, creation =
        List.fold_left
          (fun (error, creation) (ag_id, agent_type) ->
-              match
+            let error, ag_r =
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                   parameters error
                   ag_id
                   rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-              with
-              | error, (Some (Cckappa_sig.Ghost
-                             | Cckappa_sig.Dead_agent _
-                             | Cckappa_sig.Unknown_agent _)
-                       | None) ->
-                Exception.warn parameters error __POS__ Exit creation
-              | error, Some (Cckappa_sig.Agent ag_r) ->
-                begin
-                  match
-                    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
-                      parameters error
-                      agent_type
-                      packs
-                  with
-                  | error, None -> error, creation
-                  | error, Some agent_packs ->
-                    let interface_r =
-                      ag_r.Cckappa_sig.agent_interface
-                    in
-                    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.fold
-                      parameters error
-                      (fun parameters error counter site_set creation ->
-                         let error, interface =
-                           Ckappa_sig.Site_map_and_set.Set.fold
-                             (fun site (error,interface) ->
-                                let error, is_counter =
-                                  Handler.is_counter
-                                    parameters error handler agent_type site
-                                in
-                                let error, state =
-                                  match
-                                    Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-                                      parameters error
-                                      site
-                                      interface_r
-                                  with
-                                  | error, None ->
-                                    if is_counter
-                                    then
-                                      begin
-                                        match
-                                          Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-                                        parameters error
-                                        (agent_type,site)
-                                        compil.Cckappa_sig.counter_default
-                                        with
-                                        | error, (None | Some None) -> error,  Ckappa_sig.state_index_of_int 0
-                                        | error, Some (Some a) -> error, a
-                                      end
-                                    else error, Ckappa_sig.state_index_of_int 0
-                                  | error, Some port ->
-                                    match
-                                      port.Cckappa_sig.site_state.Cckappa_sig.min,
-                                      port.Cckappa_sig.site_state.Cckappa_sig.max
-                                    with Some a, Some b when a=b ->
-                                      error, a
-                                       | (Some _ | None), (Some _ | None) ->
-                                         Exception.warn parameters error __POS__
-                                           Exit (Ckappa_sig.state_index_of_int 0)
-                                in
-                                if is_counter
-                                then
-                                  error, (Occu1.Counter site,
-                                          Ckappa_sig.int_of_state_index state)::interface
-                                else
-                                  let error, last_state =
-                                    Handler.last_state_of_site parameters error handler agent_type site
-                                  in
-                                  let rec aux k interface =
-                                    if Ckappa_sig.compare_state_index k last_state > 0
-                                    then interface
-                                    else
-                                      let pred = Occu1.Bool (site,k) in
-                                      let interface =
-                                        if k=state then
-                                          (pred,1)::interface
-                                        else
-                                          (pred,0)::interface
-                                      in
-                                      aux (Ckappa_sig.next_state_index k) interface
-                                  in
-                                  error,
-                                  aux
-                                    (Ckappa_sig.state_index_of_int 0) interface
-
-                       )
-                       site_set
-                       (error,[])
-                         in
-                         let error, old =
-                           match
-                             Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
-                               parameters error (agent_type,counter) creation
-                           with
-                           | error, Some l -> error, l
-                           | error, None -> error, []
-                         in
-                         Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
-                           parameters error (agent_type,counter) (interface::old) creation
-                      )
-                      agent_packs
-                      creation
-                end
+            in
+            let error, list =
+              convert_view parameters error handler compil packs agent_type
+                ag_r
+            in
+            List.fold_left
+              (fun (error, creation) ((agent_type, counter), interface) ->
+                 let error, old =
+                   match
+                     Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
+                       parameters error (agent_type,counter) creation
+                   with
+                   | error, Some l -> error, l
+                   | error, None -> error, []
+                 in
+                 Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
+                   parameters error (agent_type,counter) (interface::old) creation)
+              (error, creation) list
          )
          (error, creation)
          rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.actions.Cckappa_sig.creation

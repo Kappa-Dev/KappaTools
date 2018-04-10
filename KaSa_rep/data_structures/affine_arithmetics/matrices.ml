@@ -120,7 +120,14 @@ val somme_affine:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler->
     matrice-> Exception.method_handler * matrice
-  end
+
+  val equal:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    matrice -> matrice ->
+    Exception.method_handler * bool
+
+end
 
 module Matrice =
   struct
@@ -785,4 +792,9 @@ let pushbool parameters (error:Exception.method_handler) m a =
   let error = normalise parameters error m in
   error, m
 
+let equal parameters error m1 m2 =
+  let error, m1=copy parameters error m1 in
+  let error, m2=copy parameters error m2 in
+  let error, union = union parameters error m1 m2 in
+  error, m2.nligne = union.nligne && m1.nligne =  union.nligne
 end

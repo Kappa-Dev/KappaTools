@@ -95,6 +95,11 @@ sig
     Exception.method_handler ->
     prod->prod->
     Exception.method_handler * (prod * var list)
+  val union_incr:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod->prod->
+    Exception.method_handler * (prod * var list)
 
   val push:
     Remanent_parameters_sig.parameters ->
@@ -112,6 +117,7 @@ sig
     Exception.method_handler ->
     prod-> (var * int) list ->
     Exception.method_handler * prod
+
 end
 
 module Mat_inter =
@@ -347,7 +353,7 @@ posref j))) in
                           (match delta.num with
                            | 0 -> vide2 q
                            | a when a>0 -> (vide2 q)
-                           | a  ->
+                           | _  ->
                              (
                               let s2=(ffplus sup delta (I.read inter t).inf) in
                               (
@@ -754,12 +760,12 @@ posref j))) in
                       {inf= Frac{num=i;den=1};
                        sup=Infinity}
                     | Counters_domain_type.LT ->
-                      {inf=Infinity;
+                      {inf=Minfinity;
                        sup=
                          Frac{num=i-1;den=1}}
                     | Counters_domain_type.LTEQ ->
                       {sup= Frac{num=i;den=1};
-                       inf=Infinity}
+                       inf=Minfinity}
                    ))) l
      in
      solve_inf parameters
@@ -833,18 +839,24 @@ posref j))) in
      let error, mat = M.plonge parameters error m.mat l in
      error, {m with mat}
 
-   let widen parameters error p q =
+   let bin_incr gen  parameters error p q =
      let n=(M.n_ligne (p.mat)) in
      let error, newm= M.union parameters error p.mat q.mat in
-     let error, i=I.wide_place parameters error p.i q.i in
+     (* to do, test if newm <> p.mat *)
+     let error, i= gen  parameters error p.i q.i in
      if ((n=(M.n_ligne (newm))) && i=[])  then
        error, ({mat=newm;i=p.i},[])
      else error, ({mat=newm;i=p.i},((list_var parameters p)))
+   let widen parameters error p q =
+     bin_incr I.wide_place parameters error p q
+   let union_incr parameters error p q =
+     bin_incr I.union_place parameters error p q
+
 
    let solve_all parameters error m =
        solve_inf parameters error m (list_var parameters m)
 
-   let interval_of_pro parameters error m x =
+   let interval_of_pro _parameters error m x =
      error, I.read (m.i) x
 
    let string_of_pro parameters error m x =

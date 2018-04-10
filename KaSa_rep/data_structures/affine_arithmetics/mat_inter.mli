@@ -89,6 +89,11 @@ sig
     Exception.method_handler ->
     prod->prod->
     Exception.method_handler * (prod * var list)
+  val union_incr:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod->prod->
+    Exception.method_handler * (prod * var list)
 
   val push:
     Remanent_parameters_sig.parameters ->
@@ -106,6 +111,7 @@ sig
     Exception.method_handler ->
     prod-> (var * int) list ->
     Exception.method_handler * prod
+
 end
 
-module Mat_int:Mat_inter
+module Mat_int:(Mat_inter with type var = Occu1.trans)

@@ -1,10 +1,10 @@
 type fraction={num:int;den:int}
 type ffraction=Frac of fraction| Infinity | Unknown | Minfinity
 
-let trunc a = 
-    match a with
-       Frac{num=x;den=y}->x/y
-     |  _                 -> raise Exit
+let trunc a =
+  match a with
+  | Frac{num=x;den=y}->x/y
+  | Infinity | Unknown | Minfinity               -> raise Exit
 
 let zero = {num=0;den=1}
 
@@ -41,14 +41,15 @@ let fdiv a b =
 
 let ffdiv a b =
   match (a,b) with
-    Frac(a),Frac(b)->Frac(fdiv a b)
+  | Frac(a),Frac(b)->Frac(fdiv a b)
   | Infinity,Frac(a) when a.num>0 -> Infinity
   | Infinity,Frac(a) when a.num<0 -> Minfinity
   | Minfinity,Frac(a) when a.num<0 -> Infinity
   | Minfinity,Frac(a) when a.num>0 -> Minfinity
   | Frac(a),Infinity -> Frac{num=0;den=1}
   | Frac(a),Minfinity -> Frac{num=0;den=1}
-  | _ -> Unknown
+  | (Unknown, _) | (_, Unknown)
+  | (Infinity | Minfinity ),(Infinity | Minfinity | Frac _)   -> Unknown
 
 
 let ffplus a i b =
@@ -73,24 +74,32 @@ let ffplus a i b =
 
 
 let ffmin a b =
-    match a,b with Unknown,_ | _,Unknown -> raise Exit
+  match a,b with
+  | Unknown,_
+  | _,Unknown -> raise Exit
   | Minfinity,_ | _,Infinity -> a
   | Frac(x),Frac(y) when ((fmoins x y).num<0) -> a
-  |  _ -> b
+  | (Infinity | Frac _),b -> b
 
 let ffinf  a b =
-    match a,b with Unknown,_ | _,Unknown -> raise Exit
+  match a,b with Unknown,_ | _,Unknown -> raise Exit
   | Minfinity,_ | _,Infinity -> true
   | Frac(x),Frac(y) when ((fmoins x y).num<0) -> true
-  |  _ -> false
+  | (Infinity | Frac _),_ -> false
 
 
 let ffmax a b =
     match a,b with Unknown,_ | _,Unknown -> raise Exit
   | Minfinity,_ | _,Infinity -> b
   | Frac(x),Frac(y) when ((fmoins x y).num<0) -> b
-  |  _ -> a
+  | (a, (Minfinity | Frac _)) -> a
 
 
 
 let fsup a b =if (finf a b) then b else a
+
+let string_of a =
+  if a.den = 1 then
+    string_of_int a.num
+  else
+    ("("^(string_of_int a.num)^"/"^(string_of_int a.den)^")")

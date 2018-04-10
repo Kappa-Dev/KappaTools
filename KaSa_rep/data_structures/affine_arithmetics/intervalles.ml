@@ -20,11 +20,21 @@ let sub_convexe a b =
     not ((ffinf (a.inf) (b.inf)) || (ffinf  (b.sup) (a.sup))) ;;
 
 let trans_convexe i t =
-    let inff = (match i.inf with Frac(a)->ffmax (Frac {num=0;den=1})
-                                                  (Frac (fplus a t))
-                            | a -> a) in
-    let supf = (match i.sup with Frac(a)->(Frac (fplus a t))
-                            | a -> a) in
+  let inff =
+    (match i.inf with
+     | Frac(a)->
+       ffmax (Frac {num=0;den=1})
+                  (Frac (fplus a t))
+
+     | Unknown | Infinity -> raise Exit
+     | Minfinity as a -> a)
+  in
+  let supf =
+    (match i.sup with
+     | Frac(a)->(Frac (fplus a t))
+     | Unknown | Minfinity -> raise Exit
+     | Infinity as a -> a)
+  in
     {inf=ffmax inff (Frac {num=0;den=1});sup=supf};;
 
 let zero = {inf= Frac Fraction.zero; sup=Frac Fraction.zero}
@@ -102,24 +112,30 @@ let iiplus i1 alpha i2 =
 let combinaison_lineaire_convexe ((l,resultat),s) =
     let resultat={num=(-1)*resultat.num;den=resultat.den} in
     let rec aux l sol =
-        match l with ((i,k)::q) when (k.num<0) ->
-                (match (ffplus sol k (s.(i).sup) ) with Unknown ->Minfinity
-                              | k -> aux q k )
-                | ((i,k)::q) when (k.num>0) ->
-                (match (ffplus sol k (s.(i).inf)) with Unknown ->Unknown
-                              | k -> aux q k )
-                | (i,k)::q -> aux q sol
-                | [] -> sol
+      match l with
+      | ((i,k)::q) when (k.num<0) ->
+        (match (ffplus sol k (s.(i).sup) ) with
+         | Unknown ->Minfinity
+         | (Infinity | Minfinity | Frac _) as k  -> aux q k )
+      | ((i,k)::q) when (k.num>0) ->
+        (match (ffplus sol k (s.(i).inf)) with
+         | Unknown -> Unknown
+         | (Infinity | Minfinity | Frac _) as k -> aux q k )
+      | (i,k)::q -> aux q sol
+      | [] -> sol
 
     in
     let inff=(aux l (Frac resultat)) in
     let rec aux l sol =
-        match l with ((i,k)::q) when (k.num<0) ->
-                 (match (ffplus sol k (s.(i).inf) ) with Unknown ->Infinity
-                              | k -> aux q k )
-                | ((i,k)::q) (*when (k.num>0)*) ->
-                (match (ffplus sol k (s.(i).sup) ) with Unknown ->Unknown
-                              | k -> aux q k )
+      match l with
+      | ((i,k)::q) when (k.num<0) ->
+        (match (ffplus sol k (s.(i).inf) ) with
+         | Unknown ->Infinity
+         | (Infinity | Minfinity | Frac _) as k -> aux q k )
+      | ((i,k)::q) (*when (k.num>0)*) ->
+        (match (ffplus sol k (s.(i).sup) ) with
+         | Unknown ->Unknown
+         | (Infinity | Minfinity | Frac _) as k -> aux q k )
                 | [] -> sol
     in
     let supf=(aux l (Frac resultat)) in
@@ -128,12 +144,17 @@ let combinaison_lineaire_convexe ((l,resultat),s) =
 
 
 let contient_zero i =
-    let aux1 () = (match i.inf with Infinity -> false
-                                | Frac a when a.num>0 -> false
-                                | _ -> true) in
-    match i.sup with Minfinity -> false
-                             | Frac a when a.num<0 -> false
-                             | _ -> aux1 ();;
+  let aux1 () =
+    (match i.inf with
+     | Infinity -> false
+     | Frac a when a.num>0 -> false
+     | Unknown -> raise Exit
+     | Minfinity | Frac _ -> true) in
+  match i.sup with
+  | Minfinity -> false
+  | Frac a when a.num<0 -> false
+  | Unknown -> raise Exit
+  | Infinity | Frac _ -> aux1 ();;
 
 
 

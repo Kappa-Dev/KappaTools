@@ -21,11 +21,21 @@ sig
     Exception.method_handler ->
     intervalle_tab -> intervalle_tab ->
     Exception.method_handler * var list
+  val union_place :
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    intervalle_tab -> intervalle_tab ->
+    Exception.method_handler * var list
   val union :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     intervalle_tab -> intervalle_tab ->
     Exception.method_handler * intervalle_tab
+  val inter :
+      Remanent_parameters_sig.parameters ->
+      Exception.method_handler ->
+      intervalle_tab -> intervalle_tab ->
+      Exception.method_handler * intervalle_tab
   val somme :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->

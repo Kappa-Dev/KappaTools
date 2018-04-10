@@ -107,6 +107,13 @@ val insert_0:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler->
   matrice-> Exception.method_handler * matrice
+
+val equal:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  matrice -> matrice ->
+  Exception.method_handler * bool
+
 end
 
-module Matrice: Matrice with type var = Occu1.trans 
+module Matrice: Matrice with type var = Occu1.trans

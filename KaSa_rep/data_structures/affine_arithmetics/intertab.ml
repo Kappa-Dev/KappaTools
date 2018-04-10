@@ -25,7 +25,17 @@ sig
     Exception.method_handler ->
     intervalle_tab -> intervalle_tab ->
     Exception.method_handler * var list
+  val union_place :
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    intervalle_tab -> intervalle_tab ->
+    Exception.method_handler * var list
   val union :
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    intervalle_tab -> intervalle_tab ->
+    Exception.method_handler * intervalle_tab
+  val inter :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     intervalle_tab -> intervalle_tab ->
@@ -146,6 +156,35 @@ module Tabinter =
          List.iter traite (clef t1);
          error, Working_list_imperative.list l)
 
+   let union_place parameters error t1 t2 =
+     let l=
+       Working_list_imperative.make
+         (Remanent_parameters.get_empty_hashtbl_size parameters)
+     in
+     let spe_push p = Working_list_imperative.push p l in
+     let changed=(ref false) in
+     let traite p =
+       let () = changed:=false in
+       let rep=
+         {
+           inf=
+             (
+               if (ffinf ((read t2 p).inf) ((read t1 p).inf))
+               then
+                 (changed:=true;Frac {num=0;den=1})
+               else ((read t1 p).inf));
+           sup=
+             (
+               if (ffinf ((read t1 p).sup) (read t2 p).sup)
+               then
+                 (changed:=true;(read t2 p).sup)
+               else ((read t1 p).sup))}
+       in
+       if (!changed) then (spe_push p;set t1 p rep) else ()
+     in (List.iter traite (clef t2);
+         List.iter traite (clef t1);
+         error, Working_list_imperative.list l)
+
 let somme parameters error t1 t2 =
   let l =
     Working_list_imperative.make
@@ -159,6 +198,20 @@ let somme parameters error t1 t2 =
       (fun x->set rep x  (iiplus (read t1 x) {num=1;den=1} (read t2 x))) (Working_list_imperative.list l)
   in
   error, rep
+
+  let inter parameters error t1 t2 =
+    let l =
+      Working_list_imperative.make
+        (Remanent_parameters.get_empty_hashtbl_size parameters)
+    in
+    let spe_push p = Working_list_imperative.push p l in
+    let () = List.iter spe_push (clef t1);List.iter spe_push  (clef t2) in
+    let rep = make (Remanent_parameters.get_empty_hashtbl_size parameters) in
+    let () =
+      List.iter
+        (fun x->set rep x  (cap_inter (read t1 x)  (read t2 x))) (Working_list_imperative.list l)
+    in
+    error, rep
 
  let union parameters error t1 t2 =
    let l =

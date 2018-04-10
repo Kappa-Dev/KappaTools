@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 09 2018>
+  * Last modification: Time-stamp: <Apr 10 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -21,7 +21,7 @@ let local_trace = false
 
 module Functor =
   functor
-    (MI: Mat_inter.Mat_inter)
+    (MI: Mat_inter.Mat_inter with type var = Occu1.trans)
     ->
     struct
 
@@ -223,17 +223,100 @@ module Functor =
   let complete_wake_up_relation static error wake_up = error, wake_up
 (* to do *)
 
+  let new_prod_gen bin static dynamic error agent_type counter prod event_list =
+    let local = dynamic.local in
+    let store_value = local.store_value in
+    let parameters = get_parameter static in
+    let (error, store_value), event_list =
+      match
+        Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
+          parameters error
+          (agent_type, counter)
+          store_value
+      with
+      | error, None ->
+        Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
+          parameters error
+          (agent_type, counter)
+          prod
+          store_value,
+        event_list
+      | error, Some old_prod ->
+        let error, old = MI.copy parameters error old_prod in
+        let error, (new_prod, var_list) = bin parameters error old_prod prod in
+        if var_list = []
+        then
+          (error, store_value), event_list
+        else
+          Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
+              parameters error
+              (agent_type, counter)
+              new_prod
+              store_value,
+            event_list (* to do, update event list *)
+    in
+    let local = {local with store_value} in
+    error, {dynamic with local}, event_list
 
-  let compute_value_init static dynamic error init_state =
-    error, dynamic
-
+  let new_union static dynamic error agent_type counter prod event_list =
+    new_prod_gen MI.union_incr static dynamic error agent_type counter prod event_list
+  let new_widen static dynamic error agent_type counter prod event_list =
+    new_prod_gen MI.widen static dynamic error agent_type counter prod event_list
   (*************************************************************)
 
   let add_initial_state static dynamic error species =
+    let parameters = get_parameter static in
+    let compil = get_compil static in
+    let kappa_handler = get_kappa_handler static in
+    let packs = get_packs static in
     let event_list = [] in
     (*parallel bonds in the initial states*)
-    let error, dynamic =
-      compute_value_init static dynamic error species
+    let error, (dynamic, event_list) =
+      let enriched_init = species.Cckappa_sig.e_init_c_mixture in
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+        parameters
+        error
+        (fun parameters error ag_id ag (dynamic, event_list) ->
+           match ag with
+           | Cckappa_sig.Ghost
+           | Cckappa_sig.Unknown_agent _
+           | Cckappa_sig.Dead_agent _ ->
+             Exception.warn
+               parameters error __POS__ Exit
+               (dynamic, event_list)
+           | Cckappa_sig.Agent ag ->
+           let agent_type = ag.Cckappa_sig.agent_name in
+           let error, assignements =
+             Counters_domain_static.convert_view
+               parameters error kappa_handler compil packs
+               agent_type (Some (Cckappa_sig.Agent ag))
+           in
+           let error, dynamic, event_list =
+           List.fold_left
+             (fun (error, dynamic, event_list)
+               ((agent_type, counter),assignement) ->
+               let list = List.rev_map fst assignement in
+               let error, prod =
+                 MI.compt_of_var_list
+                   parameters error
+                   list
+               in
+               let error, prod =
+                 List.fold_left
+                   (fun (error, prod) (v,delta) ->
+                      MI.push parameters error
+                        prod v {Fraction.num=delta;Fraction.den=1})
+                   (error, prod)
+                   assignement
+               in
+               new_union static dynamic error agent_type counter prod event_list)
+             (error, dynamic, event_list)
+             assignements
+           in
+           error, (dynamic, event_list)
+        )
+      enriched_init.Cckappa_sig.views
+      (dynamic, event_list)
     in
     error, dynamic, event_list
 
@@ -395,8 +478,76 @@ module Functor =
             "------------------------------------------------------------\n"
         in
         let store_value = get_value dynamic in
-        (* TODO *)
-        error
+        Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter
+          parameters error
+          (fun parameters error (agent_type, site) mi ->
+             let error, intervalle =
+               MI.interval_of_pro parameters error mi (Occu1.Counter site)
+             in
+             let error, agent_string =
+                 Handler.translate_agent
+                   parameters error
+                   kappa_handler
+                   agent_type
+             in
+             let error, site_string =
+                 Handler.translate_site
+                   parameters error kappa_handler
+                   agent_type site
+             in
+             let error, site_string =
+               match site_string with
+               | Ckappa_sig.Counter x -> error, x
+               | (Ckappa_sig.Internal _ | Ckappa_sig.Binding _ ) ->
+                 Exception.warn parameters error __POS__ Exit ""
+             in
+             let () =
+               match
+                 intervalle
+               with
+               | None
+               | Some (Fraction.Minfinity, Fraction.Infinity)
+                 -> ()
+               | Some (Fraction.Minfinity, Fraction.Frac f) ->
+                 let () =
+                   Loggers.fprintf
+                     (Remanent_parameters.get_logger parameters)
+                     "%s(%s<=%s)"
+                     agent_string
+                     site_string
+                     (Fraction.string_of f)
+                 in
+                 Loggers.print_newline
+                 (Remanent_parameters.get_logger parameters)
+
+               | Some (Fraction.Frac f, Fraction.Infinity) ->
+                 let () =
+                   Loggers.fprintf
+                     (Remanent_parameters.get_logger parameters)
+                     "%s(%s>=%s)"
+                     agent_string
+                     site_string
+                     (Fraction.string_of f)
+                 in
+                 Loggers.print_newline
+                   (Remanent_parameters.get_logger parameters)
+               | Some (Fraction.Frac f1, Fraction.Frac f2) ->
+                 let () =
+                   Loggers.fprintf
+                     (Remanent_parameters.get_logger parameters)
+                     "%s(%s>=%s<=%s)"
+                     agent_string
+                     site_string
+                     (Fraction.string_of f1)
+
+                     (Fraction.string_of f2)
+                 in
+                 Loggers.print_newline
+                   (Remanent_parameters.get_logger parameters)
+             in
+
+             error)
+          store_value
       else
         error
     in
