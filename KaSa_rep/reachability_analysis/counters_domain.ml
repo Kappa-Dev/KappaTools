@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 10 2018>
+  * Last modification: Time-stamp: <Apr 12 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -243,7 +243,7 @@ module Functor =
         event_list
       | error, Some old_prod ->
         let error, old = MI.copy parameters error old_prod in
-        let error, (new_prod, var_list) = bin parameters error old_prod prod in
+        let error, (new_prod, var_list) = bin parameters error old prod in
         if var_list = []
         then
           (error, store_value), event_list
@@ -305,7 +305,7 @@ module Functor =
                  List.fold_left
                    (fun (error, prod) (v,delta) ->
                       MI.push parameters error
-                        prod v {Fraction.num=delta;Fraction.den=1})
+                        prod v {Fraction.num=delta-1;Fraction.den=1})
                    (error, prod)
                    assignement
                in
@@ -327,9 +327,10 @@ module Functor =
 
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
       precondition =
-    let _parameters = get_parameter static in
+    let parameters = get_parameter static in
     (*-----------------------------------------------------------*)
-    let _store_value = get_value dynamic in
+    let store_value = get_value dynamic in
+
     let error, bool = error, true (* todo *)
     in
     if bool
@@ -349,42 +350,6 @@ module Functor =
     else
     error, dynamic, None
 
-  let discover_a_new_pair_of_modify_sites
-      parameters error packs backward list_of_sites modified_sites =
-    List.fold_left
-      (fun (error, modified_sites) (agent_type,site)  ->
-         match
-             Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get parameters error (agent_type,site) backward
-         with
-         | error, None -> error, modified_sites
-         | error, Some counter_set ->
-           begin
-             match
-               Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif
-                 .unsafe_get parameters error agent_type packs
-               with
-               | error, None -> error, modified_sites
-               | error, Some agent_pack ->
-                 begin
-                   Ckappa_sig.Site_map_and_set.Set.fold
-                     (fun counter (error, modified_sites) ->
-                          match
-                            Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
-                            parameters error counter agent_pack
-                        with
-                        | error, None -> error, modified_sites
-                        | error, Some site_set ->
-                          Ckappa_sig.Site_map_and_set.Set.fold
-                            (fun site (error, modified_sites) ->
-                               Communication.add_site parameters error agent_type site modified_sites)
-                            site_set
-                            (error, modified_sites))
-                     counter_set
-                     (error, modified_sites)
-                 end
-             end)
-      (error, modified_sites)
-      list_of_sites
 
 (*if it is not the first time it is apply then do not apply *)
 
@@ -405,6 +370,8 @@ module Functor =
     let error, modified_sites =
       Communication.init_sites_working_list parameters error
     in
+    let rule_restriction = get_rule_restriction static in
+    let rule_creation = get_rule_creation static in
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
     let error, rule = get_rule parameters error static rule_id in
@@ -435,8 +402,47 @@ module Functor =
         else
           ()
       in
+
       (* TODO -> regular *)
       (* TODO -> creation *)
+      let error, dynamic, event_list =
+        match
+          Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+            parameters error rule_id rule_creation
+        with
+        | error, None -> error, dynamic, event_list
+        | error, Some map ->
+          begin
+            let error, (dynamic, event_list) =
+              Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
+                parameters error
+                (fun parameters error (agent_type, counter) assignement_list (dynamic, event_list) ->
+                   List.fold_left
+                     (fun (error, (dyanmic, event_list)) assignement ->
+                        let list = List.rev_map fst assignement in
+                        let error, prod =
+                          MI.compt_of_var_list
+                            parameters error
+                            list
+                        in
+                        let error, prod =
+                          List.fold_left
+                            (fun (error, prod) (v,delta) ->
+                               MI.push parameters error
+                                 prod v {Fraction.num=delta-1;Fraction.den=1})
+                            (error, prod)
+                            assignement
+                        in
+                        let error, dynamic, event_list =
+                          new_union static dynamic error agent_type counter prod event_list
+                        in error, (dynamic, event_list))
+                     (error, (dynamic, event_list)) assignement_list)
+                map
+                (dynamic, event_list)
+            in
+            error, dynamic, event_list
+          end
+      in
       (* TODO -> side effect *)
       error, dynamic, (precondition, event_list)
 

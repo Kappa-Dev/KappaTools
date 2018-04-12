@@ -31,7 +31,7 @@
 'r12bis' ., . -> A(c{=1}), A(c{=2}) @ 1
 
 //not fully specified agent
-'r13' A(x{u}[.]), A(x[.])+ @ 1
+//'r13' A(x{u}[.]), A(x[.])+ @ 1
 
 //generates warning
 'get_zero' A(x{u}[.],c{>=0}) -> A(x{p}[.],c{+= 1}) @ 1
