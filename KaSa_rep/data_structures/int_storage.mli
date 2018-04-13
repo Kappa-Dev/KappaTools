@@ -2,7 +2,7 @@
    * int_storage.mli
    *
    * Creation:                      <2016-03-14 feret>
-   * Last modification: Time-stamp: <Apr 05 2018>
+   * Last modification: Time-stamp: <Apr 13 2018>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -49,6 +49,8 @@ sig
   val fold2: ((key,'a,'c,'c) ternary,(key,'b,'c,'c) ternary,
               (key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) sexternary
   val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
+
+  val for_all: ((key,'a,bool) binary,'a t,bool) binary 
   val free_all: ('a t,'a t) unary
 end
 

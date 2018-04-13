@@ -2,7 +2,7 @@
    * int_storage.ml
    *
    * Creation:                      <2010-07-27 feret>
-   * Last modification: Time-stamp: <Apr 07 2018>
+   * Last modification: Time-stamp: <Apr 13 2018>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -47,6 +47,8 @@ sig
   val fold2: ((key,'a,'c,'c) ternary,(key,'b,'c,'c) ternary,
               (key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) sexternary
   val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
+  val for_all: ((key,'a,bool) binary,'a t,bool) binary
+
   val free_all: ('a t,'a t) unary
 end
 
@@ -213,6 +215,25 @@ module Int_storage_imperatif =
       in
       aux 0  (error,init)
 
+    let for_all parameter error f t =
+      let size = t.size in
+      let array = t.array in
+      let rec aux k error =
+        if k>size then error, true
+        else
+          match array.(k) with
+          | None ->
+            aux (k+1) error
+          | Some x ->
+            let error, bool = f parameter error k x in
+            if bool
+            then
+              aux (k+1) error
+            else
+              error, false
+      in
+      aux 0 error
+
     let fold_with_interruption parameter error f t init =
       let size = t.size in
       let array = t.array in
@@ -326,6 +347,7 @@ module Nearly_infinite_arrays =
       let fold2 = Basic.fold2
       let fold_with_interruption = Basic.fold_with_interruption
       let fold2_common = Basic.fold2_common
+      let for_all = Basic.for_all
       let free_all = Basic.free_all
     end:Storage with type key = int and type dimension = int)
 
@@ -463,6 +485,17 @@ module Extend =
                (fun parameter error k' a' -> f parameter error (k,k') a')
                a
           )
+          a.matrix
+
+      let for_all parameter error f a =
+        Extension.for_all
+          parameter error
+          (fun parameter error k a ->
+             Underlying.for_all
+               parameter error
+               (fun parameter error k' a' ->
+                  f parameter error (k,k') a')
+               a)
           a.matrix
 
       let fold_gen fold1 fold2  parameter error f a b =
@@ -614,6 +647,29 @@ module Quick_key_list =
              | Some im -> f parameters error k im b)
           (error,b)
           (List.rev list)
+
+      let for_all parameters error f a =
+        let error,list = key_list parameters error a in
+        let rec aux l error =
+          match l with
+          | [] -> error, true
+          | h::t ->
+            begin
+              match
+                get parameters error h a
+              with
+              | error, None ->
+                let error, () = Exception.warn parameters error __POS__ Exit () in
+                aux t error
+              | error, Some data -> 
+                let error, bool = f parameters error h data in
+                if bool then
+                  aux t error
+                else
+                  error, false
+            end
+        in
+        aux list error
 
       let free_all parameter error t =
         let error, t =
