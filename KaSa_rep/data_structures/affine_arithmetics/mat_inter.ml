@@ -14,7 +14,7 @@ sig
   val solve_inf:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> var list-> Exception.method_handler * prod
+    prod -> var list-> Exception.method_handler * prod option
 
   val create : Remanent_parameters_sig.parameters -> int -> prod
   val plonge :
@@ -37,18 +37,18 @@ sig
   val all_here :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> var list -> Exception.method_handler * prod
+    prod -> var list -> Exception.method_handler * prod option
 
   val guard :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> (var * Counters_domain_type.comparison_op * int) list -> Exception.method_handler * prod
+    prod -> (var * Counters_domain_type.comparison_op * int) list -> Exception.method_handler * prod option
 
   val solve_all :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->
-    Exception.method_handler * prod
+    Exception.method_handler * prod option
 
   val compt_of_var_list :
     Remanent_parameters_sig.parameters ->
@@ -65,7 +65,7 @@ sig
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
-    Exception.method_handler * prod
+    Exception.method_handler * prod option
 
   val is_vide: prod -> var->bool
   val string_of_pro:
@@ -157,7 +157,7 @@ module Mat_inter =
       let solve_inf parameters error prod  l =
         let m = prod.mat in
         let inter =prod.i in
-        let error, m=M.copy parameters error m  in
+        let error, m= M.copy parameters error m  in
         let li=ref (List.filter (fun x->(is_infinite prod x)) l) in
         let nli=ref (1) in
         let error_ref = ref error in
@@ -198,7 +198,8 @@ posref j))) in
                               | [] -> aux_53 q
                  in aux3 l
               )
-          in (aux_53 l);
+          in
+          let () = aux_53 l in
 
 
           let lprob =
@@ -240,8 +241,6 @@ posref j))) in
                                             M.addligne posm size (ffois {num=(-1);den=1} (fdiv a b)) i1;
                raise Exit))
         done;done) with Exit -> ())) lprob;
-
-
 
           let n= Remanent_parameters.get_empty_hashtbl_size parameters in
           let pos=Hashtbl.create n in                     (* variable -> contraintes o� il apparait positivement*)
@@ -421,7 +420,7 @@ posref j))) in
                          (match delta.num with
                           | 0 -> vide2 q
                           | a when a<0 -> (vide2 q)
-                          | a  ->
+                          | _  ->
                             (let s2=
                                ffplus
                                  inf
@@ -474,7 +473,6 @@ posref j))) in
 	      (*t_i k;   t_s "\n";*)
           let error, (k,c)= M.get_line parameters (!error_ref) m k in
           let () = error_ref:=error in
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
           let rec cop_line (k,c) =
             match k with
             | Affine_cst::q -> cop_line (q,c)
@@ -548,7 +546,8 @@ posref j))) in
                           | delta when delta.num<0 ->
                             let new_i=cap_inter (I.read inter t) {inf=ffdiv (i.sup) (Frac delta);sup=ffdiv (i.inf) (Frac delta)} in
 	      (I.set inter t new_i)
-                          |  _                     -> () in
+                          |  _                     -> ()
+        in
         let reduit deb fin  =
           let rec aux k =
             (if k>fin then  (M.del_last_ligne nm)
@@ -567,23 +566,54 @@ posref j))) in
                        (let error =
                           M.swap parameters (!error_ref) nm k (new_ligne) in
                         error_ref:= error;
-                        let tmp=(Hashtbl.find aff (k))
+                        let tmp=
+                          try (Hashtbl.find aff (k)) with _ ->
+
+                            let error = !error_ref in
+                            let error, a  =
+                              Exception.warn parameters error __POS__ Exit  {inf=Fraction.Frac Fraction.zero;sup=Fraction.Frac Fraction.zero}
+                            in
+                            let () = error_ref:= error in
+                            a
+
                         in (Hashtbl.remove aff k;
-                            Hashtbl.add aff k (Hashtbl.find aff (new_ligne));
+                            Hashtbl.add aff k (
+                              try Hashtbl.find aff (new_ligne)
+                              with
+                                _ ->
+                                let error = !error_ref in
+                                let error, a =
+                                  Exception.warn parameters error __POS__ Exit
+                                    {inf=Fraction.Frac Fraction.zero;
+                                     sup=Fraction.Frac Fraction.zero}
+                                in
+                              let () = error_ref:= error in
+                              a
+                            );
 								  Hashtbl.remove aff new_ligne;
 								  Hashtbl.add aff new_ligne tmp);
                         let error =
                           M.mulligne parameters (!error_ref)
                             nm k (fdiv {num=1;den=1} (M.read_val m k col)) in
                           error_ref:= error;
-                          (let tmp=(Hashtbl.find aff k) in
+                          (let tmp=
+                             try
+                               (Hashtbl.find aff k)
+                             with _ ->
+                               let error = !error_ref in
+                               let error, a =
+                                 Exception.warn parameters error __POS__ Exit  {inf=Fraction.Frac Fraction.zero;sup=Fraction.Frac Fraction.zero}
+                               in
+                               let () = error_ref:= error in
+                               a
+                           in
 		                                                      (Hashtbl.remove aff k;
 								       Hashtbl.add aff k (iiplus {inf=Frac {num=0;den=1};
 											 sup=Frac{num=0;den=1}}
 		     (fdiv {num=1;den=1} (M.read_val nm k col)) tmp)));
 
-                  for i=deb  to fin do
-                    if i=k then ()
+                          for i=deb  to fin do
+                            if i=k then ()
                     else
                       (let alpha=ffois {num=(-1);den=1}
 
@@ -591,15 +621,35 @@ posref j))) in
                        M.addligne m i alpha  k;
                        let tmp=Hashtbl.find aff i in
                        (Hashtbl.remove aff i;
-                        Hashtbl.add aff i (iiplus tmp alpha (Hashtbl.find aff k))))
+                        Hashtbl.add aff i (iiplus tmp alpha (
+                            try Hashtbl.find aff k
+                            with _ ->
+                              let error = !error_ref in
+                              let error, a =
+                                Exception.warn parameters error __POS__ Exit  {inf=Fraction.Frac Fraction.zero;sup=Fraction.Frac Fraction.zero}
+                              in
+                              let () = error_ref:= error in
+                              a
+                          ))))
                   done;
                           aux (k+1))
                      end))  in
           aux deb
         in
         let reduce_pivot ligne =
-          let (error, ((k,c))),b =
-            (M.get_line parameters (!error_ref) nm ligne,Hashtbl.find aff ligne) in
+          let b =
+            try Hashtbl.find aff ligne
+            with _ ->
+              let error = !error_ref in
+              let error, a =
+                Exception.warn parameters error __POS__ Exit  {inf=Fraction.Frac Fraction.zero;sup=Fraction.Frac Fraction.zero}
+              in
+              let () = error_ref:= error in
+              a
+          in
+          let (error, ((k,c))) =
+            (M.get_line parameters (!error_ref) nm ligne)
+          in
           let () = error_ref:=error in
           ((*affiche_cons (k,c,b);*)
             match k
@@ -622,8 +672,9 @@ posref j))) in
                  (try (Hashtbl.remove c t) with _ -> ());
                  let i=(iiplus i {num=(-(delta.num));den=delta.den} (I.read inter t)) in
                  (Hashtbl.add aff ((M.n_ligne nm) +1) i;
-                  let error = M.new_copy_ligne parameters (!error_ref) nm (q,c)
-                  in
+                 let error = M.new_copy_ligne parameters (!error_ref) nm (q,c)
+                 in
+
                   let () = error_ref := error in () )))
             |  [] -> ())
         in
@@ -631,8 +682,9 @@ posref j))) in
         let fin=ref (M.n_ligne nm) in
         while (!deb)<((!fin)+1) do
           for i=(!deb) to (!fin) do
-            simplify_pivot i;
-            reduce_pivot i;
+            let () = simplify_pivot i in
+            let () = reduce_pivot i in
+            ()
           done;
           reduit ((!fin)+1) (M.n_ligne nm);
           deb:=(!fin+1);
@@ -643,7 +695,7 @@ posref j))) in
         done;
         !error_ref
 
-      let classe p l =
+      let classe p _l =
         M.get_all_key (p.mat)
       let create parameters n =
         {mat= (M.make parameters n);
@@ -687,8 +739,10 @@ posref j))) in
 
 
 
-   let solve_inf parameters error mi c =
+
+let solve_inf parameters error mi c =
      let rec aux k error  =
+       let error = affiche_mat parameters error mi in
        if k>5 then error, mi
        else
          let error, tmp=I.copy parameters error (mi.i) in
@@ -701,9 +755,15 @@ posref j))) in
      in
      aux 0 error
 
+let solve_inf parameters error mi c =
+  try
+    let error, mi = solve_inf parameters error mi c in
+    error, Some mi
+  with
+    Intervalle_vide -> error, None (*to do: propagate error *)
 
 
-   let exclusion parameters error p l  =
+let exclusion parameters error p l  =
     begin
       let _mat=p.mat in
       let classe=classe p l  in
@@ -833,7 +893,10 @@ posref j))) in
    let union parameters error p q =
      gen_bin M.union I.union parameters error p q
    let merge parameters error p q =
-     gen_bin M.merge I.merge parameters error p q
+     try let error, a  = gen_bin M.merge I.merge parameters error p q in
+       error, Some a
+     with
+       Intervalle_vide -> error, None
 
    let plonge parameters error m l =
      let error, mat = M.plonge parameters error m.mat l in
@@ -890,20 +953,23 @@ posref j))) in
   let pushbool parameters error m x  =
     let error, mc = copy parameters error m in
     let error, m1,b1 =
-      try
-        (let error, m1 = all_here parameters error mc [x]  in
-         error, m1,true)
-      with _ ->
-        let error, mc = copy parameters error m in
-        error, mc,false
+      let error, m1_opt = all_here parameters error mc [x]  in
+         match m1_opt with
+           Some m1 -> error, m1, true
+         | None ->
+         let error, mc = copy parameters error m in
+         error, mc,false
      in
      let error, mc = copy parameters error m in
      let (error, m2),b2 =
-       try (
-         let error, prod = not_here parameters error mc [x] in
+       let error, prod_opt = not_here parameters error mc [x] in
+       match prod_opt with
+       | Some prod ->
          push parameters error prod x
-           {Fraction.num=1;Fraction.den=1},true)
-       with _ -> (copy parameters error m),false in
+           {Fraction.num=1;Fraction.den=1},true
+       | None ->
+      (copy parameters error m),false
+     in
      if b1 then
        if b2 then
          union parameters error m1 m2

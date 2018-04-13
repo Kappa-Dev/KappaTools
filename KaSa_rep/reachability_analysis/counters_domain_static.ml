@@ -190,8 +190,8 @@ let add_test_in_agent_description
     parameters errors test counter agent_restriction =
     add_generic_in_agent_description
       parameters errors
-      (fun x -> x.Counters_domain_type.test)
-      (fun x y -> {y with Counters_domain_type.test = x})
+      (fun x -> x.Counters_domain_type.tests)
+      (fun x y -> {y with Counters_domain_type.tests = x})
       (fun a -> test::a)
       counter
       agent_restriction
@@ -200,8 +200,8 @@ let add_invertible_action_in_agent_description
     parameters errors action counter agent_restriction =
   add_generic_in_agent_description
     parameters errors
-    (fun x -> x.Counters_domain_type.invertible_assignment)
-    (fun x y -> {y with Counters_domain_type.invertible_assignment = x})
+    (fun x -> x.Counters_domain_type.invertible_assignments)
+    (fun x y -> {y with Counters_domain_type.invertible_assignments = x})
     (fun a -> action::a)
     counter
     agent_restriction
@@ -210,8 +210,8 @@ let add_non_invertible_action_in_agent_description
     parameters errors action counter agent_restriction =
       add_generic_in_agent_description
         parameters errors
-        (fun x -> x.Counters_domain_type.non_invertible_assignment)
-        (fun x y -> {y with Counters_domain_type.non_invertible_assignment = x})
+        (fun x -> x.Counters_domain_type.non_invertible_assignments)
+        (fun x y -> {y with Counters_domain_type.non_invertible_assignments = x})
         (fun a -> action::a)
         counter
         agent_restriction

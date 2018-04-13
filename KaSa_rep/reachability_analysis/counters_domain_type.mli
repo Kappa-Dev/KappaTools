@@ -2,9 +2,9 @@ type comparison_op = LTEQ | LT | GT | GTEQ | EQ
 
 type restriction =
   {
-    test: (Occu1.trans * comparison_op * int) list ;
-    invertible_assignment : (Occu1.trans * int) list ;
-    non_invertible_assignment : (Occu1.trans * int) list ;
+    tests: (Occu1.trans * comparison_op * int) list ;
+    invertible_assignments : (Occu1.trans * int) list ;
+    non_invertible_assignments : (Occu1.trans * int) list ;
   }
 
 val empty_restriction: restriction
@@ -31,7 +31,7 @@ type static =
 
 val print:
   Remanent_parameters_sig.parameters ->
-  Cckappa_sig.kappa_handler -> 
+  Cckappa_sig.kappa_handler ->
   Exception.method_handler ->
   static ->
   Exception.method_handler

@@ -8,7 +8,7 @@ sig
   val solve_inf:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> var list-> Exception.method_handler * prod
+    prod -> var list-> Exception.method_handler * prod option
 
   val create : Remanent_parameters_sig.parameters -> int -> prod
   val plonge :
@@ -31,18 +31,18 @@ sig
   val all_here :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> var list -> Exception.method_handler * prod
+    prod -> var list -> Exception.method_handler * prod option
 
   val guard :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> (var * Counters_domain_type.comparison_op * int) list -> Exception.method_handler * prod
+    prod -> (var * Counters_domain_type.comparison_op * int) list -> Exception.method_handler * prod option
 
   val solve_all :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->
-    Exception.method_handler * prod
+    Exception.method_handler * prod option
 
   val compt_of_var_list :
     Remanent_parameters_sig.parameters ->
@@ -59,7 +59,7 @@ sig
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
-    Exception.method_handler * prod
+    Exception.method_handler * prod option 
 
   val is_vide: prod -> var->bool
   val string_of_pro:

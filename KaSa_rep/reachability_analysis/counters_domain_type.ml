@@ -12,13 +12,13 @@ let string_of_var = Occu1.string_of_trans
 
 type restriction =
   {
-    test: (Occu1.trans * comparison_op * int) list ;
-    invertible_assignment : (Occu1.trans * int) list ;
-    non_invertible_assignment : (Occu1.trans * int) list ;
+    tests: (Occu1.trans * comparison_op * int) list ;
+    invertible_assignments : (Occu1.trans * int) list ;
+    non_invertible_assignments : (Occu1.trans * int) list ;
   }
 
 let empty_restriction =
-  {test=[];invertible_assignment=[];non_invertible_assignment=[]}
+  {tests=[];invertible_assignments=[];non_invertible_assignments=[]}
 
 type static =
   {
@@ -172,7 +172,7 @@ type static =
                      Loggers.print_newline (Remanent_parameters.get_logger parameters)
                    in
                    let () =
-                     if restriction.test = []
+                     if restriction.tests = []
                      then ()
                      else
                      let () =
@@ -188,7 +188,7 @@ type static =
                               (string_of_var var)
                               (string_of_op op)
                               int)
-                         restriction.test
+                         restriction.tests
                      in
                      let () =
                        Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -196,7 +196,7 @@ type static =
                      ()
                    in
                    let () =
-                     if restriction.invertible_assignment = []
+                     if restriction.invertible_assignments = []
                      then ()
                      else
                      let () =
@@ -213,7 +213,7 @@ type static =
                               (string_of_var var)
                               (if int>0 then "+=" else if int<0 then "-=" else "")
                               (if int>0 then int else -int))
-                         restriction.invertible_assignment
+                         restriction.invertible_assignments
                      in
                      let () =
                        Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -221,7 +221,7 @@ type static =
                      ()
                    in
                    let () =
-                     if restriction.non_invertible_assignment = []
+                     if restriction.non_invertible_assignments = []
                      then ()
                      else
                      let () =
@@ -236,7 +236,7 @@ type static =
                               "%s:=%i,"
                               (string_of_var var)
                               int)
-                         restriction.non_invertible_assignment
+                         restriction.non_invertible_assignments
                      in
                      let () =
                        Loggers.print_newline (Remanent_parameters.get_logger parameters)

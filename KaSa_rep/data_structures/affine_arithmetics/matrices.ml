@@ -295,8 +295,12 @@ let new_point parameters n =
       in
       let () =
         List.iter
-          (fun x-> Hashtbl.add tmp x (find cont x);
-                   add_entry m  x)
+          (fun x->
+             try
+               Hashtbl.add tmp x (find cont x);
+               add_entry m x
+             with Not_found -> ()
+          )
           ent in
       let () = Hashtbl.add m.content (!(m.nligne)) tmp in
       error

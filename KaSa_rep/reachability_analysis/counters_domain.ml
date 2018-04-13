@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 12 2018>
+  * Last modification: Time-stamp: <Apr 13 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -325,17 +325,98 @@ module Functor =
 
     (*************************************************************)
 
+    let restrict parameters error x test =
+      MI.guard parameters error x test
+    
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
       precondition =
     let parameters = get_parameter static in
+    let rule_restriction = get_rule_restriction static in
     (*-----------------------------------------------------------*)
-    let store_value = get_value dynamic in
-
-    let error, bool = error, true (* todo *)
-    in
-    if bool
-    then error, dynamic, Some precondition
-    else error, dynamic, None
+    let error, rule = get_rule parameters error static rule_id in
+    match rule with
+    | None ->
+      let error, () =
+        Exception.warn parameters error __POS__ Exit ()
+      in
+      error, dynamic, None
+    | Some rule ->
+      let parameters =
+        Remanent_parameters.update_prefix parameters "\t\t"
+      in
+      let dump_title () =
+        if local_trace ||
+           Remanent_parameters.get_dump_reachability_analysis_diff parameters
+        then
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "%sUpdate information about counters"
+              (Remanent_parameters.get_prefix parameters)
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          in
+          Loggers.print_newline (Remanent_parameters.get_logger parameters)
+        else
+          ()
+      in
+      let lhs =
+        rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
+      match
+        Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+            parameters error rule_id rule_restriction
+      with
+      | error, None -> error, dynamic, None
+      | error, Some map ->
+        let store_value = get_value dynamic in
+        let error, bool =
+          Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.for_all
+            parameters error
+            (fun parameters error agent_id pack_map
+              ->
+                let error, agent =
+                  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+                    parameters error agent_id lhs
+                in
+                let error, agent_type =
+                  match agent with
+                  | Some (Cckappa_sig.Agent ag) ->
+                    error, ag.Cckappa_sig.agent_name
+                  | None
+                  | Some
+                      (Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _ |
+                      Cckappa_sig.Unknown_agent _) ->
+                    Exception.warn parameters error __POS__ Exit
+                    Ckappa_sig.dummy_agent_name
+                in
+                Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.for_all
+                  parameters error
+                  (fun parameters error counter restriction  ->
+                     match
+                       Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                         parameters error
+                         (agent_type, counter)
+                         store_value
+                     with
+                     | error, None ->
+                       Exception.warn parameters error __POS__ Exit true
+                     | error, Some x ->
+                       let error, x' = MI.copy parameters error x in
+                       let error, x_opt =
+                         restrict parameters error x'
+                           restriction.Counters_domain_type.tests
+                       in
+                       match x_opt with
+                       | None -> error, false
+                       | Some _ -> error, true)
+                  pack_map
+            )
+            map
+        in
+        if bool
+        then error, dynamic, Some precondition
+        else error, dynamic, None
 
   (***********************************************************)
 
@@ -363,6 +444,25 @@ module Functor =
       else false
     | Usual_domains.Maybe -> false
 
+
+  let abstract_away parameters error x list =
+    error, x (* TO DO *)
+
+  let set parameters error x list =
+    error, x (* TO DO *)
+
+  let translate parameters error x list =
+    List.fold_left
+      (fun (error,x)  (v,delta) ->
+         try
+           MI.push parameters error x v {Fraction.num=delta;Fraction.den=1}
+         with
+           Not_found ->
+           Exception.warn parameters error __POS__ Exit x
+      )
+      (error, x)
+      list
+
   let apply_rule static dynamic error rule_id precondition =
     (*--------------------------------------------------------------*)
     let parameters = get_parameter static in
@@ -375,6 +475,11 @@ module Functor =
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
     let error, rule = get_rule parameters error static rule_id in
+    let first_application =
+      can_we_prove_this_is_not_the_first_application
+         precondition
+    in
+
     match rule with
     | None ->
       let error, () =
@@ -402,46 +507,136 @@ module Functor =
         else
           ()
       in
-
-      (* TODO -> regular *)
-      (* TODO -> creation *)
+      let lhs =
+        rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
+      (* regular updates *)
       let error, dynamic, event_list =
         match
           Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-            parameters error rule_id rule_creation
+            parameters error rule_id rule_restriction
         with
         | error, None -> error, dynamic, event_list
         | error, Some map ->
-          begin
-            let error, (dynamic, event_list) =
-              Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
-                parameters error
-                (fun parameters error (agent_type, counter) assignement_list (dynamic, event_list) ->
-                   List.fold_left
-                     (fun (error, (dyanmic, event_list)) assignement ->
-                        let list = List.rev_map fst assignement in
-                        let error, prod =
-                          MI.compt_of_var_list
-                            parameters error
-                            list
-                        in
-                        let error, prod =
-                          List.fold_left
-                            (fun (error, prod) (v,delta) ->
-                               MI.push parameters error
-                                 prod v {Fraction.num=delta-1;Fraction.den=1})
-                            (error, prod)
-                            assignement
-                        in
-                        let error, dynamic, event_list =
-                          new_union static dynamic error agent_type counter prod event_list
-                        in error, (dynamic, event_list))
-                     (error, (dynamic, event_list)) assignement_list)
-                map
-                (dynamic, event_list)
-            in
-            error, dynamic, event_list
-          end
+          let error, (dynamic, event_list) =
+            Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.fold
+              parameters error
+              (fun parameters error agent_id pack_map
+                (dynamic, event_list) ->
+                let error, agent =
+                  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get parameters error agent_id
+                    lhs
+                in
+                let error, agent_type =
+                  match agent with
+                  | Some (Cckappa_sig.Agent ag) ->
+                    error, ag.Cckappa_sig.agent_name
+                  | None
+                  | Some
+                      (Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _ | Cckappa_sig.Unknown_agent _) ->
+                    Exception.warn parameters error __POS__ Exit Ckappa_sig.dummy_agent_name
+                in
+                Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+                  parameters error
+                  (fun parameters error counter restriction (dynamic, event_list) ->
+                     let store_value = get_value dynamic in
+                     let error, x  =
+                       match
+                         Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                           parameters error
+                           (agent_type, counter)
+                           store_value
+                       with
+                       | error, None ->
+                         Exception.warn parameters error __POS__ Exit
+                           (MI.create parameters 0)
+                       | error, Some x -> error, x
+                     in
+                     let error, x' = MI.copy parameters error x in
+                     let error, x_opt =
+                       restrict parameters error x'
+                         restriction.Counters_domain_type.tests
+                     in
+                     let error, x =
+                       match x_opt with
+                       | None ->
+                         Exception.warn parameters error __POS__ Exit x'
+                       | Some x -> error, x
+                     in
+                     let error, x =
+                       abstract_away parameters error x
+                         restriction.Counters_domain_type.non_invertible_assignments
+                     in
+                     let error, x =
+                       set parameters error x
+                         restriction.Counters_domain_type.non_invertible_assignments
+                     in
+                     let error, x =
+                       translate parameters error x
+                         restriction.Counters_domain_type.invertible_assignments
+                     in
+                     let error, dynamic, event_list =
+                       if first_application then
+                         new_union
+                           static dynamic error
+                           agent_type counter x event_list
+                       else
+                         new_widen
+                           static dynamic error
+                           agent_type counter x event_list
+                     in
+                     error, (dynamic, event_list)
+                  )
+                  pack_map
+                  (dynamic, event_list)
+              )
+              map
+              (dynamic, event_list)
+          in
+          error, dynamic, event_list
+      in
+          (* creation *)
+      let error, dynamic, event_list =
+        if first_application
+        then
+          match
+            Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+              parameters error rule_id rule_creation
+          with
+          | error, None -> error, dynamic, event_list
+          | error, Some map ->
+            begin
+              let error, (dynamic, event_list) =
+                Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
+                  parameters error
+                  (fun parameters error (agent_type, counter) assignement_list
+                    (dynamic, event_list) ->
+                    List.fold_left
+                      (fun (error, (dynamic, event_list)) assignement ->
+                         let list = List.rev_map fst assignement in
+                         let error, prod =
+                           MI.compt_of_var_list
+                             parameters error
+                             list
+                         in
+                         let error, prod =
+                           List.fold_left
+                             (fun (error, prod) (v,delta) ->
+                                MI.push parameters error
+                                  prod v {Fraction.num=delta-1;Fraction.den=1})
+                             (error, prod)
+                             assignement
+                         in
+                         let error, dynamic, event_list =
+                           new_union static dynamic error agent_type counter
+                            prod event_list
+                         in error, (dynamic, event_list))
+                      (error, (dynamic, event_list)) assignement_list)
+                  map
+                  (dynamic, event_list)
+              in
+              error, dynamic, event_list
+            end
+        else  error, dynamic, event_list
       in
       (* TODO -> side effect *)
       error, dynamic, (precondition, event_list)
@@ -464,7 +659,32 @@ module Functor =
 
   (****************************************************************)
 
-  let stabilize _static dynamic error = error, dynamic, ()
+  let stabilize static dynamic error =
+    let store_value = get_value dynamic in
+    let parameters = get_parameter static in
+    let error, store_value =
+      Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
+        parameters
+        error
+        (fun parameters error k prod store ->
+           let error, prod_opt =
+             MI.solve_all parameters error prod
+           in
+           match prod_opt with
+           | None ->
+             Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.free parameters error
+               k
+               store
+           | Some a ->
+             Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error
+               k a
+               store
+        )
+        store_value
+        store_value
+    in
+    let dynamic = set_value store_value dynamic in
+    error, dynamic, ()
 
   let print ?dead_rules static dynamic (error:Exception.method_handler) loggers =
     let _ = dead_rules in
