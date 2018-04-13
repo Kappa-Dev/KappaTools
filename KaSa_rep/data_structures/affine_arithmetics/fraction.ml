@@ -72,6 +72,7 @@ let ffplus a i b =
                          | Frac a,Frac b -> Frac(fplus a b))
 
 
+let ffneg a = ffplus (Frac zero) {num = -1; den =1} a
 
 let ffmin a b =
   match a,b with

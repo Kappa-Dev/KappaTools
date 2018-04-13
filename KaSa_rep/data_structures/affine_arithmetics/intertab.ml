@@ -135,21 +135,27 @@ module Tabinter =
          {
            inf=
              (
-               if (ffinf ((read t2 p).inf) ((read t1 p).inf))
+               if ffinf ((read t2 p).inf) ((read t1 p).inf)
                then
-                 (changed:=true;Frac {num=0;den=1})
+                 if ffinf ((read t1 p).inf) (Fraction.ffneg (Frac !wide_max))
+                 then
+                   if (read t1 p).inf = Minfinity
+                   then Minfinity
+                   else
+                     (changed:=true;Minfinity )
+                 else
+                   (changed:=true;(read t2 p).inf)
                else ((read t1 p).inf));
            sup=
              (
-               if (ffinf ((read t1 p).sup) (read t2 p).sup)
+               if ffinf ((read t1 p).sup) (read t2 p).sup
                then
-                 (if (ffinf (Frac (!wide_max)) (read t1 p).sup)
-                  then
-                    (if (read t1 p).sup=Infinity
-                     then Infinity
-                     else (changed:=true;Infinity))
-
-                  else (changed:=true;(read t2 p).sup))
+                 if ffinf (Frac (!wide_max)) (read t1 p).sup
+                 then
+                   if (read t1 p).sup=Infinity
+                   then Infinity
+                   else (changed:=true;Infinity)
+                 else (changed:=true;(read t2 p).sup)
                else ((read t1 p).sup))} in
        if (!changed) then (spe_push p;set t1 p rep) else ()
      in (List.iter traite (clef t2);
