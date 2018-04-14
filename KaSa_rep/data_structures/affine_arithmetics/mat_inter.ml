@@ -94,12 +94,12 @@ sig
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
-    Exception.method_handler * (prod * var list)
+    Exception.method_handler * (prod * bool)
   val union_incr:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
-    Exception.method_handler * (prod * var list)
+    Exception.method_handler * (prod * bool)
 
   val push:
     Remanent_parameters_sig.parameters ->
@@ -918,8 +918,8 @@ let exclusion parameters error p l  =
      (* to do, test if newm <> p.mat *)
      let error, i= gen  parameters error p.i q.i in
      if ((n=(M.n_ligne (newm))) && i=[])  then
-       error, ({mat=newm;i=p.i},[])
-     else error, ({mat=newm;i=p.i},((list_var parameters p)))
+       error, ({mat=newm;i=p.i},false)
+     else error, ({mat=newm;i=p.i},true)
    let widen parameters error p q =
      bin_incr I.wide_place parameters error p q
    let union_incr parameters error p q =

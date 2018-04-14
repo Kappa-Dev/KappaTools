@@ -91,13 +91,13 @@ sig
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
-    Exception.method_handler * (prod * var list)
+    Exception.method_handler * (prod * bool)
 
   val union_incr:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
-    Exception.method_handler * (prod * var list)
+    Exception.method_handler * (prod * bool)
 
   val push:
     Remanent_parameters_sig.parameters ->
@@ -119,7 +119,7 @@ sig
   val abstract_away:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> var list -> 
+    prod -> var list ->
     Exception.method_handler * prod
 
 end

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 13 2018>
+  * Last modification: Time-stamp: <Apr 14 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -220,8 +220,98 @@ module Functor =
   (* fold over all the rules, all the tuples of interest, all the sites in
    these tuples, and apply the function Common_static.add_dependency_site_rule
    to update the wake_up relation *)
-  let complete_wake_up_relation static error wake_up = error, wake_up
-(* to do *)
+  let complete_wake_up_relation static error wake_up =
+    let parameters = get_parameter static in
+    let rule_restriction = get_rule_restriction static in
+    let packs = get_packs static in
+    Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameters error
+      (fun parameters error rule_id agent_map wake_up ->
+         let error, rule = get_rule parameters error static rule_id in
+         match rule with
+         | None ->
+           let error, () =
+             Exception.warn parameters error __POS__ Exit ()
+           in
+           error, wake_up
+         | Some rule ->
+           let lhs =
+             rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
+           Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.fold
+             parameters error
+             (fun parameters error agent_id counter_map wake_up ->
+                let error, agent =
+                  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+                    parameters error agent_id lhs
+                in
+                let error, agent_type =
+                  match agent with
+                  | Some (Cckappa_sig.Agent ag) ->
+                    error, ag.Cckappa_sig.agent_name
+                  | None
+                  | Some
+                      (Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _ |
+                       Cckappa_sig.Unknown_agent _) ->
+                    Exception.warn parameters error __POS__ Exit
+                      Ckappa_sig.dummy_agent_name
+                in
+                match
+                  Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+                    parameters error agent_type packs
+                with
+                | error, None ->
+                  Exception.warn parameters error __POS__ Exit wake_up
+                | error, Some pack_map ->
+                  Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+                    parameters error
+                     (fun parameters error counter _ wake_up ->
+                       match
+                         Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.get
+                           parameters error counter pack_map
+                       with
+                       | error, None -> error, wake_up
+                       | error, Some site_set ->
+                         Ckappa_sig.Site_map_and_set.Set.fold
+                           (fun site (error, wake_up) ->
+                              Common_static.add_dependency_site_rule
+                                parameters error agent_type site rule_id
+                                wake_up)
+                           site_set (error, wake_up))
+                     counter_map
+                     wake_up
+             )
+             agent_map
+             wake_up
+      )
+      rule_restriction
+      wake_up
+
+  let update_event_list static error agent_type counter event_list =
+    let parameters = get_parameter static in
+    let packs = get_packs static in
+    match
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+        parameters error
+        agent_type
+        packs
+    with
+    | error, None -> Exception.warn parameters error __POS__ Exit event_list
+    | error, Some a ->
+      match
+        Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.get
+          parameters error
+          counter
+          a
+      with
+      | error, None -> Exception.warn parameters error __POS__ Exit event_list
+      | error, Some a ->
+        Ckappa_sig.Site_map_and_set.Set.fold
+          (fun site (error, event_list) ->
+             error,
+             (Communication.Modified_sites (agent_type,site))::event_list)
+          a
+          (error, event_list)
+
 
   let new_prod_gen bin static dynamic error agent_type counter prod event_list =
     let local = dynamic.local in
@@ -235,25 +325,30 @@ module Functor =
           store_value
       with
       | error, None ->
+        let error, completed_event_list = update_event_list static error agent_type counter event_list in
         Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
           parameters error
           (agent_type, counter)
           prod
           store_value,
-        event_list
+        completed_event_list
       | error, Some old_prod ->
         let error, old = MI.copy parameters error old_prod in
         let error, (new_prod, var_list) = bin parameters error old prod in
-        if var_list = []
+        if var_list = false
         then
           (error, store_value), event_list
         else
+          let error, completed_event_list =
+            update_event_list static error agent_type
+              counter event_list
+          in
           Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
               parameters error
               (agent_type, counter)
               new_prod
               store_value,
-            event_list (* to do, update event list *)
+            completed_event_list
     in
     let local = {local with store_value} in
     error, {dynamic with local}, event_list
@@ -465,7 +560,7 @@ module Functor =
       MI.merge parameters error x prod
     with
     | error, None -> Exception.warn parameters error __POS__ Exit x
-    | error, Some a -> error, a 
+    | error, Some a -> error, a
 
   let translate parameters error x list =
     List.fold_left
@@ -483,9 +578,6 @@ module Functor =
     (*--------------------------------------------------------------*)
     let parameters = get_parameter static in
     let event_list = [] in
-    let error, modified_sites =
-      Communication.init_sites_working_list parameters error
-    in
     let rule_restriction = get_rule_restriction static in
     let rule_creation = get_rule_creation static in
     (*-----------------------------------------------------------*)
@@ -610,7 +702,7 @@ module Functor =
           in
           error, dynamic, event_list
       in
-          (* creation *)
+      (* creation *)
       let error, dynamic, event_list =
         if first_application
         then
@@ -733,13 +825,13 @@ module Functor =
                | (Ckappa_sig.Internal _ | Ckappa_sig.Binding _ ) ->
                  Exception.warn parameters error __POS__ Exit ""
              in
-             let () =
+             let error,() =
                match
                  intervalle
                with
                | None
                | Some (Fraction.Minfinity, Fraction.Infinity)
-                 -> ()
+                 -> error, ()
                | Some (Fraction.Minfinity, Fraction.Frac f) ->
                  let () =
                    Loggers.fprintf
@@ -749,7 +841,7 @@ module Functor =
                      site_string
                      (Fraction.string_of f)
                  in
-                 Loggers.print_newline
+                 error, Loggers.print_newline
                  (Remanent_parameters.get_logger parameters)
 
                | Some (Fraction.Frac f, Fraction.Infinity) ->
@@ -761,7 +853,7 @@ module Functor =
                      site_string
                      (Fraction.string_of f)
                  in
-                 Loggers.print_newline
+                 error, Loggers.print_newline
                    (Remanent_parameters.get_logger parameters)
                | Some (Fraction.Frac f1, Fraction.Frac f2) ->
                  let () =
@@ -774,10 +866,14 @@ module Functor =
 
                      (Fraction.string_of f2)
                  in
-                 Loggers.print_newline
+                 error, Loggers.print_newline
                    (Remanent_parameters.get_logger parameters)
+               | Some (Fraction.Unknown, _) | Some (_, Fraction.Unknown)
+               | Some (Fraction.Infinity, _) | Some (_, Fraction.Minfinity)
+                 ->
+                 Exception.warn parameters error __POS__ Exit
+                   ()
              in
-
              error)
           store_value
       else
