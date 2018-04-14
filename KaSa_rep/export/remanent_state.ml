@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Feb 05 2018>
+  * Last modification: Time-stamp: <Apr 15 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -77,15 +77,17 @@ type separating_transitions = Public_data.separating_transitions
 
 type interface =
   (string option (* internal state *) *
-   Ckappa_backend.Ckappa_backend.binding_state option (*binding state*) )
+   Ckappa_backend.Ckappa_backend.binding_state option (*binding state*) *
+   (int option * int option) option (*counter state*))
     Wrapped_modules.LoggedStringMap.t
 
 let interface_to_json =
   Wrapped_modules.LoggedStringMap.to_json
     ~lab_key:site ~lab_value:stateslist
     JsonUtil.of_string
-    (fun (internal_opt, binding_opt) ->
-       JsonUtil.of_pair ~lab1:Public_data.prop ~lab2:Public_data.bind
+    (fun (internal_opt, binding_opt, counter_opt) ->
+       JsonUtil.of_triple
+         ~lab1:Public_data.prop ~lab2:Public_data.bind ~lab3:Public_data.counter
          (fun internal_opt ->
             JsonUtil.of_option
               (fun internal_state ->
@@ -94,8 +96,16 @@ let interface_to_json =
          )
          (JsonUtil.of_option
             Ckappa_backend.Ckappa_backend.binding_state_to_json)
-        (internal_opt, binding_opt)
-    )
+         (fun counter_opt ->
+            JsonUtil.of_option
+              (JsonUtil.of_pair
+                 ~lab1:Public_data.inf ~lab2:Public_data.sup
+                 (JsonUtil.of_option JsonUtil.of_int)
+                 (JsonUtil.of_option JsonUtil.of_int))
+                 counter_opt
+         )
+         (internal_opt, binding_opt, counter_opt))
+
 
 let interface_of_json
       =
@@ -104,15 +114,25 @@ let interface_of_json
           (*json -> elt*)
         (fun json -> JsonUtil.to_string ~error_msg:site json)
           (*json -> 'value*)
-        (JsonUtil.to_pair
-           ~lab1:Public_data.prop ~lab2:Public_data.bind ~error_msg:"wrong binding state"
+        (JsonUtil.to_triple
+           ~lab1:Public_data.prop ~lab2:Public_data.bind
+           ~lab3:Public_data.counter
+           ~error_msg:"wrong binding state"
            (JsonUtil.to_option
               (JsonUtil.to_string ~error_msg:Public_data.prop)
 
            )
            (JsonUtil.to_option
               Ckappa_backend.Ckappa_backend.binding_state_of_json)
-        )
+           (JsonUtil.to_option
+              (JsonUtil.to_pair
+                 ~lab1:Public_data.inf
+                 ~lab2:Public_data.sup
+                 ~error_msg:"wrong counter state"
+                 (JsonUtil.to_option (JsonUtil.to_int ~error_msg:"wrong counter bound"))
+                 (JsonUtil.to_option (JsonUtil.to_int ~error_msg:"wrong counter bound"))
+              )
+           ))
 
 type agent =
   string * (* agent name *)

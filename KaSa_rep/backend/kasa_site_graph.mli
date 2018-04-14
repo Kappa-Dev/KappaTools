@@ -21,13 +21,13 @@ sig
 
   val get_string_version : t ->
     (string *
-     (string option * binding_state option)
+     (string option * binding_state option * (int option * int option) option)
        Wrapped_modules.LoggedStringMap.t)
       Ckappa_sig.Agent_id_map_and_set.Map.t
 
   val set_string_version : (*FIXME*)
     (string *
-     (string option * binding_state option) Wrapped_modules.LoggedStringMap.t)
+     (string option * binding_state option * (int option * int option) option) Wrapped_modules.LoggedStringMap.t)
       Ckappa_sig.Agent_id_map_and_set.Map.t -> t -> t
 
   val add_agent:
@@ -76,6 +76,18 @@ sig
     t ->
     Exception.method_handler * t
 
+  val add_counter_range:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    Cckappa_sig.kappa_handler ->
+    agent_id ->
+    Ckappa_sig.c_site_name ->
+    ?inf:int ->
+    ?sup:int ->
+    t ->
+    Exception.method_handler * t
+
+
   val print:
     Loggers.t ->
     Remanent_parameters_sig.parameters ->
@@ -87,7 +99,7 @@ sig
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     string ->
-    (string option * binding_state option)
+    (string option * binding_state option * (int option * int option) option)
       Wrapped_modules.LoggedStringMap.t -> bool -> Exception.method_handler
 
   val print_list:

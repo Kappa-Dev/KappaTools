@@ -9,6 +9,7 @@
 (* JSon labels *)
 val prop:string
 val bind:string
+val counter:string
 val domain_name:string
 val refinements_list:string
 val refinement_lemmas:string
@@ -17,6 +18,8 @@ val bound:string
 val wildcard:string
 val influencemap: string
 val scc:string
+val inf:string
+val sup:string 
 
 (* Backend *)
 val binding_type_backend_symbol: string

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Feb 05 2018>
+  * Last modification: Time-stamp: <Apr 15 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -80,7 +80,7 @@ type internal_constraints_list =
 
 type agent =
     string * (*agent name*)
-     (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
+    (string option *  Ckappa_backend.Ckappa_backend.binding_state option * (int option * int option) option)
        Wrapped_modules.LoggedStringMap.t
 
 type constraints_list = agent list Public_data.poly_constraints_list

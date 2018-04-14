@@ -58,7 +58,7 @@ struct
 
   type agent =
     (string *
-     (string option * binding_state option)
+     (string option * binding_state option * (int option * int option) option)
        Wrapped_modules.LoggedStringMap.t)
 
   type t =
@@ -291,12 +291,12 @@ struct
               agent_type site
           in
           let error,
-              (internal_state_string_opt, binding_state_opt) =
-            match state_min = state_max, is_binding_site, state_min with
-            | true, true, Some state_min ->
+              (internal_state_string_opt, binding_state_opt, counter_state_opt) =
+            match state_min = state_max, is_binding_site, b_counter, state_min with
+            | true, true, false, Some state_min ->
               if state_min = Ckappa_sig.dummy_state_index
               then
-                error, (None, Some Free)
+                error, (None, Some Free, None)
               else
                 let error, triple_opt =
                   Handler.dual
@@ -326,23 +326,26 @@ struct
                     agent_type' site'
                 in
                 error,
-                (None, Some (Binding_type (agent_string',site_string')))
-            | true, false, Some state_min ->
+                (None, Some (Binding_type (agent_string',site_string')), None)
+            | true, false, false, Some state_min ->
               let error, state_string =
                 Handler.string_of_state
                   parameter error kappa_handler
                   agent_type site state_min
               in
-              error, (Some state_string, None)
-            | false, true, _ | _, true, None->
+              error, (Some state_string, None, None)
+            | false, true, false, _ | _, true, false, None->
               if state_min = Some Ckappa_sig.dummy_state_index
-              then error, (None, Some Wildcard)
-              else error, (None, Some Bound_to_unknown)
-            | false,false, _ | _, false, None ->
+              then error, (None, Some Wildcard, None)
+              else error, (None, Some Bound_to_unknown, None)
+            | _, false, true, _ ->
+              error, (None, None, Some (state_min, state_max))
+            | false,false,false, _ | _, false,false, None
+            | _, true, true, _ ->
               begin
                 Exception.warn
                   parameter error __POS__
-                  Exit (None, None)
+                  Exit (None, None, None)
               end
           in
           let error, (agent_string, sitemap) =
@@ -352,10 +355,10 @@ struct
               agent_id
               t.string_version
           in
-          let error, (old_state,old_binding) =
+          let error, (old_state,old_binding,old_counter) =
             Wrapped_modules.LoggedStringMap.find_default_without_logs
               parameter error
-              (None,None)
+              (None,None,None)
               site_string
               sitemap
           in
@@ -363,6 +366,27 @@ struct
             match internal_state_string_opt with
             | None -> old_state
             | Some x -> Some x
+          in
+          let new_counter_state =
+            match counter_state_opt with
+            | None -> old_counter
+            | Some (inf, sup) ->
+              let inf =
+                match inf with
+                | None -> None
+                | Some a -> Some (Ckappa_sig.int_of_state_index a)
+              in
+              let sup =
+                match sup with
+                | None -> None
+                | Some a -> Some (Ckappa_sig.int_of_state_index a)
+              in
+              begin
+                match old_counter with
+                | None -> Some (inf,sup)
+                | Some (inf', sup') ->
+                  Some (max inf inf',min sup sup')
+              end
           in
           let error, new_binding_state =
             match
@@ -383,7 +407,7 @@ struct
             Wrapped_modules.LoggedStringMap.add_or_overwrite
               parameter error
               site_string
-              (new_internal_state,new_binding_state)
+              (new_internal_state,new_binding_state,new_counter_state)
               sitemap
           in
           let error', string_version =
@@ -410,6 +434,22 @@ struct
       state t =
     add_state_interv parameter error kappa_handler agent_id site
       (Some state) (Some state) t
+
+  let add_counter_range parameter error kappa_handler agent_id site ?inf ?sup t =
+    let inf =
+      match inf with
+      | None -> None
+      | Some i -> Some (Ckappa_sig.state_index_of_int i)
+    in
+    let sup =
+      match sup with
+      | None -> None
+      | Some i -> Some (Ckappa_sig.state_index_of_int i)
+    in
+    add_state_interv parameter error kappa_handler agent_id site
+      inf sup t
+
+
 
   let add_bound_to_unknown
       parameter error kappa_handler
@@ -473,10 +513,10 @@ struct
     let error, site_string =
       Handler.string_of_site_contact_map parameter error kappa_handler agent_type site
     in
-    let error, (old_internal, _old_binding) =
+    let error, (old_internal, _old_binding,old_counter) =
       Wrapped_modules.LoggedStringMap.find_default_without_logs
         parameter error
-        (None,None)
+        (None,None,None)
         site_string
         old_site_map
     in
@@ -484,7 +524,7 @@ struct
       Wrapped_modules.LoggedStringMap.add_or_overwrite
         parameter error
         site_string
-        (old_internal, Some (Bound_to bond_id))
+        (old_internal, Some (Bound_to bond_id), old_counter)
         old_site_map
     in
     let error', string_version =
@@ -584,7 +624,7 @@ struct
     in
     let _ =
       Wrapped_modules.LoggedStringMap.fold
-        (fun site_string (internal,binding) bool ->
+        (fun site_string (internal,binding,counter) bool ->
            let () =
              if bool then
                Loggers.fprintf logger
@@ -642,6 +682,35 @@ struct
                  binding
                  (Remanent_parameters.get_close_binding_state parameter)
            in
+           let () =
+             match counter with
+             | None | Some (None, None)
+               -> ()
+             | Some (None, Some i) ->
+               Loggers.fprintf logger
+                 ":%s%s%s%i%s"
+                 (Remanent_parameters.get_open_int_interval_infinity_symbol parameter)
+                 (Remanent_parameters.get_minus_infinity_symbol parameter)
+                 (Remanent_parameters.get_int_interval_separator_symbol parameter)
+                 i
+                 (Remanent_parameters.get_close_int_interval_inclusive_symbol parameter)
+             | Some (Some i, None) ->
+               Loggers.fprintf logger
+                 ":%s%i%s%s%s"
+                 (Remanent_parameters.get_open_int_interval_inclusive_symbol parameter)
+                 i
+                 (Remanent_parameters.get_int_interval_separator_symbol parameter)
+                 (Remanent_parameters.get_plus_infinity_symbol parameter)
+                 (Remanent_parameters.get_close_int_interval_infinity_symbol parameter)
+             | Some (Some i, Some j) ->
+               Loggers.fprintf logger
+                 ":%s%i%s%i%s"
+                 (Remanent_parameters.get_open_int_interval_inclusive_symbol parameter)
+                 i
+                 (Remanent_parameters.get_int_interval_separator_symbol parameter)
+                 j
+                 (Remanent_parameters.get_close_int_interval_inclusive_symbol parameter)
+           in
            true
         ) site_map false
     in
@@ -668,7 +737,7 @@ struct
 
   (***************************************************************************)
 
-  let print_list logger parameter error kappa_handler list =
+  let print_list logger parameter error _kappa_handler list =
     match list with
     | [] -> error
     | [a] -> print logger parameter error a

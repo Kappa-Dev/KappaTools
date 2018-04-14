@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 14 2018>
+  * Last modification: Time-stamp: <Apr 15 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -836,10 +836,14 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s:(-oo,%s])"
+                     "%s(%s:%s%s%s%s%s)"
                      agent_string
                      site_string
+                     (Remanent_parameters.get_open_int_interval_infinity_symbol parameters)
+                     (Remanent_parameters.get_minus_infinity_symbol parameters)
+                     (Remanent_parameters.get_int_interval_separator_symbol parameters)
                      (Fraction.string_of f)
+                     (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters)
                  in
                  error, Loggers.print_newline
                  (Remanent_parameters.get_logger parameters)
@@ -848,10 +852,14 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s:[%s,+oo))"
+                     "%s(%s:%s%s%s%s%s)"
                      agent_string
                      site_string
+                     (Remanent_parameters.get_open_int_interval_inclusive_symbol parameters)
                      (Fraction.string_of f)
+                     (Remanent_parameters.get_int_interval_separator_symbol parameters)
+                     (Remanent_parameters.get_plus_infinity_symbol parameters)
+                     (Remanent_parameters.get_close_int_interval_infinity_symbol parameters)
                  in
                  error, Loggers.print_newline
                    (Remanent_parameters.get_logger parameters)
@@ -859,12 +867,14 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s:[%s,%s])"
+                     "%s(%s:%s%s%s%s%s)"
                      agent_string
                      site_string
+                     (Remanent_parameters.get_open_int_interval_inclusive_symbol parameters)
                      (Fraction.string_of f1)
-
+                     (Remanent_parameters.get_int_interval_separator_symbol parameters)
                      (Fraction.string_of f2)
+                     (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters)
                  in
                  error, Loggers.print_newline
                    (Remanent_parameters.get_logger parameters)
@@ -901,10 +911,89 @@ module Functor =
           Exception.warn parameters error __POS__ Exit []
         | Some l -> error, l
       in
+      let error, current_list =
+        Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
+          parameters error
+          (fun parameters error (agent_type, site) mi current_list ->
+             let error, intervalle =
+               MI.interval_of_pro parameters error mi (Occu1.Counter site)
+             in
+             match intervalle with
+             | Some (Fraction.Minfinity, Fraction.Infinity) ->
+               error, current_list
+             | None
+             | Some (Fraction.Infinity, _ | _, Fraction.Minfinity
+                    | Fraction.Unknown , _ | _, Fraction.Unknown)
+               ->
+               Exception.warn parameters error __POS__ Exit current_list
+             | Some ((Fraction.Frac _ | Fraction.Minfinity) as inf,
+                     ((Fraction.Frac _ | Fraction.Infinity) as sup)) ->
+               let error, agent_string =
+                 Handler.translate_agent
+                   parameters error
+                   kappa_handler
+                   agent_type
+               in
+               let error, site_string =
+                 Handler.translate_site
+                   parameters error kappa_handler
+                   agent_type site
+               in
+               let error, site_string =
+                 match site_string with
+                 | Ckappa_sig.Counter x -> error, x
+                 | (Ckappa_sig.Internal _ | Ckappa_sig.Binding _ ) ->
+                   Exception.warn parameters error __POS__ Exit ""
+               in
+               let t = Ckappa_backend.Ckappa_backend.empty in
+               let error', agent_id, t =
+                 Ckappa_backend.Ckappa_backend.add_agent
+                   parameters error kappa_handler agent_type t
+               in
+               let error =
+                 Exception.check_point
+                   Exception.warn parameters error error'
+                   __POS__ Exit
+               in
+               let error, inf =
+                 match inf with
+                 | Fraction.Minfinity -> error, None
+                 | Fraction.Infinity | Fraction.Unknown ->
+                   Exception.warn parameters error __POS__ Exit None
+                 | Fraction.Frac _ ->
+                   error, Some (Fraction.floor_int inf)
+               in
+               let error, sup =
+                 match sup with
+                 | Fraction.Infinity -> error, None
+                 | Fraction.Minfinity | Fraction.Unknown ->
+                   Exception.warn parameters error __POS__ Exit None
+                 | Fraction.Frac _->
+                   error, Some (Fraction.cell_int sup)
+               in
+               let error', t' =
+                 Ckappa_backend.Ckappa_backend.add_counter_range
+                   parameters error kappa_handler agent_id site ?inf ?sup t
+               in
+               let error =
+                 Exception.check_point
+                   Exception.warn parameters error error'
+                   __POS__ Exit
+               in
+               error,
+               {
+                 Public_data.hyp = t;
+                 Public_data.refinement = [t'];
+               }::current_list)
+          store_value
+          current_list
+      in
       let pair_list =
-        (domain_name, List.rev current_list) :: internal_constraints_list in
-      let kasa_state =
-        Remanent_state.set_internal_constraints_list pair_list kasa_state in
+        (domain_name, List.rev current_list) :: internal_constraints_list
+      in
+           let kasa_state =
+             Remanent_state.set_internal_constraints_list pair_list kasa_state
+           in
       error, dynamic, kasa_state
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

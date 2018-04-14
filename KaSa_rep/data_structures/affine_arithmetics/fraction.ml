@@ -6,6 +6,31 @@ let trunc a =
   | Frac{num=x;den=y}->x/y
   | Infinity | Unknown | Minfinity               -> raise Exit
 
+let rec floor_int a  =
+  match a with
+  | Frac{num=x;den=y}->
+    begin
+      match x>=0,y>0 with
+    | true,true -> x/y
+    | false,false -> floor_int (Frac{num=(-x);den=(-y)})
+    | true,false -> - cell_int (Frac{num=x;den=(-y)})
+    | false,true -> - cell_int (Frac{num=(-x);den=y})
+    end
+  | Infinity | Unknown | Minfinity -> raise Exit
+and cell_int a  =
+  match a with
+  | Frac{num=x;den=y}->
+    begin
+      match x>=0,y>0 with
+      | true,true ->
+        let q = x/y in
+        if q*y = x then q else q+1
+    | false,false -> cell_int (Frac{num=(-x);den=(-y)})
+    | true,false -> - floor_int (Frac{num=x;den=(-y)})
+    | false,true -> - floor_int (Frac{num=(-x);den=y})
+    end
+ | Infinity | Unknown | Minfinity -> raise Exit
+
 let zero = {num=0;den=1}
 
 let pgcd a b =

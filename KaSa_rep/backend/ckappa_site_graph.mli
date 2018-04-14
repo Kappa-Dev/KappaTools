@@ -9,13 +9,15 @@ val site_graph_to_list :
   Exception.method_handler ->
   (string *
    (string option *
-    Ckappa_backend.Ckappa_backend.binding_state option)
+    Ckappa_backend.Ckappa_backend.binding_state option *
+    (int option * int option) option)
      Wrapped_modules.LoggedStringMap.t)
     Ckappa_sig.Agent_id_map_and_set.Map.t ->
   Exception.method_handler *
   (string *
    (string option *
-    Ckappa_backend.Ckappa_backend.binding_state option)
+    Ckappa_backend.Ckappa_backend.binding_state option *
+    (int option * int option) option)
      Wrapped_modules.LoggedStringMap.t) list
 
 val site_graph_list_to_list :
@@ -23,7 +25,7 @@ val site_graph_list_to_list :
   Ckappa_backend.Ckappa_backend.t list ->
   Exception.method_handler *
   (string *
-   (string option * Ckappa_backend.Ckappa_backend.binding_state option)
+   (string option * Ckappa_backend.Ckappa_backend.binding_state option * (int option * int option) option)
      Wrapped_modules.LoggedStringMap.t)
     list list
 

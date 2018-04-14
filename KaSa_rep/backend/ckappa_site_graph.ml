@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 17th of November
-   * Last modification: Time-stamp: <Nov 29 2017>
+   * Last modification: Time-stamp: <Apr 15 2018>
    *
    * Site graph
    *
@@ -16,7 +16,7 @@
 (***************************************************************************)
 
 
-let print_internal_pattern_aux ?logger parameters error kappa_handler
+let print_internal_pattern_aux ?logger parameters error _kappa_handler
     internal_constraints_list =
   let logger =
     match
@@ -160,7 +160,7 @@ let print_pattern_aux ?logger
       error, b
     ) (error, false) lemma_list
 
-let print_pattern ?logger parameters error kappa_handler list =
+let print_pattern ?logger parameters error _kappa_handler list =
   let logger' =
     match
       logger

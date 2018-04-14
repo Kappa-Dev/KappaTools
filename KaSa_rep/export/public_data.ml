@@ -57,7 +57,9 @@ let scc = "scc"
 let accuracy_cm = "accuracy_cm"
 let accuracy_scc = "accuracy_scc"
 let contactmapscc="contact map scc"
-
+let counter = "counter"
+let inf = "min"
+let sup = "max"
 (*******************)
 (* Accuracy levels *)
 (*******************)
