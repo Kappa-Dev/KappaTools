@@ -264,6 +264,23 @@ module Functor =
     new_prod_gen MI.widen static dynamic error agent_type counter prod event_list
   (*************************************************************)
 
+  let prod_of_assignement parameters error assignement =
+    let list = List.rev_map fst assignement in
+    let error, prod =
+      MI.compt_of_var_list
+        parameters error
+        list
+    in
+    let error, prod =
+      List.fold_left
+        (fun (error, prod) (v,delta) ->
+           MI.push parameters error
+             prod v {Fraction.num=delta-1;Fraction.den=1})
+        (error, prod)
+        assignement
+    in
+    error, prod
+
   let add_initial_state static dynamic error species =
     let parameters = get_parameter static in
     let compil = get_compil static in
@@ -295,19 +312,9 @@ module Functor =
            List.fold_left
              (fun (error, dynamic, event_list)
                ((agent_type, counter),assignement) ->
-               let list = List.rev_map fst assignement in
                let error, prod =
-                 MI.compt_of_var_list
-                   parameters error
-                   list
-               in
-               let error, prod =
-                 List.fold_left
-                   (fun (error, prod) (v,delta) ->
-                      MI.push parameters error
-                        prod v {Fraction.num=delta-1;Fraction.den=1})
-                   (error, prod)
-                   assignement
+                 prod_of_assignement
+                   parameters error assignement
                in
                new_union static dynamic error agent_type counter prod event_list)
              (error, dynamic, event_list)
@@ -327,7 +334,7 @@ module Functor =
 
     let restrict parameters error x test =
       MI.guard parameters error x test
-    
+
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
       precondition =
     let parameters = get_parameter static in
@@ -420,7 +427,7 @@ module Functor =
 
   (***********************************************************)
 
-  let maybe_reachable static dynamic error flag pattern precondition =
+  let maybe_reachable static dynamic error _flag _pattern precondition =
   (* non parallel bonds in a pattern can be maps to parallel ones through morphisms *)
   (* thus when the flag is Morphisms with ignore non parallel bonds *)
     let _parameters = get_parameter static in
@@ -446,10 +453,19 @@ module Functor =
 
 
   let abstract_away parameters error x list =
-    error, x (* TO DO *)
+    MI.abstract_away parameters error x
+      (List.rev_map fst (List.rev list))
 
   let set parameters error x list =
-    error, x (* TO DO *)
+    let error, prod =
+      prod_of_assignement
+        parameters error list
+    in
+    match
+      MI.merge parameters error x prod
+    with
+    | error, None -> Exception.warn parameters error __POS__ Exit x
+    | error, Some a -> error, a 
 
   let translate parameters error x list =
     List.fold_left
@@ -612,19 +628,9 @@ module Functor =
                     (dynamic, event_list) ->
                     List.fold_left
                       (fun (error, (dynamic, event_list)) assignement ->
-                         let list = List.rev_map fst assignement in
                          let error, prod =
-                           MI.compt_of_var_list
-                             parameters error
-                             list
-                         in
-                         let error, prod =
-                           List.fold_left
-                             (fun (error, prod) (v,delta) ->
-                                MI.push parameters error
-                                  prod v {Fraction.num=delta-1;Fraction.den=1})
-                             (error, prod)
-                             assignement
+                           prod_of_assignement
+                             parameters error assignement
                          in
                          let error, dynamic, event_list =
                            new_union static dynamic error agent_type counter

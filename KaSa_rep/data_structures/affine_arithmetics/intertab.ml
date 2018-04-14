@@ -57,6 +57,13 @@ sig
     Exception.method_handler ->
     intervalle_tab -> intervalle_tab ->
     Exception.method_handler * intervalle_tab
+
+  val abstract_away:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    intervalle_tab -> var list ->
+    Exception.method_handler * intervalle_tab
+
 end
 
 module Tabinter =
@@ -259,5 +266,16 @@ let pushbool i x =
 	set i x {inf=Frac{num=1;den=1};sup=Frac{num=1;den=1}};i
 
 let equal i1 i2 =
-    List.for_all (fun x-> (read i1 x)=(read i2 x)) ((clef i1)@(clef i2))
+  List.for_all (fun x-> (read i1 x)=(read i2 x)) ((clef i1)@(clef i2))
+
+let abstract_away _parameters (error,mat) key =
+  let () = set mat key {inf=Minfinity;sup=Infinity} in
+  error, mat
+
+let abstract_away parameters error mat key =
+  List.fold_left
+    (abstract_away parameters)
+    (error, mat)
+    key
+
 end

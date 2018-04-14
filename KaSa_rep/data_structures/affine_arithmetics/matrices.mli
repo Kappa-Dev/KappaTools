@@ -114,6 +114,12 @@ val equal:
   matrice -> matrice ->
   Exception.method_handler * bool
 
+val abstract_away:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  matrice -> var list ->
+  Exception.method_handler * matrice
+
 end
 
 module Matrice: Matrice with type var = Occu1.trans

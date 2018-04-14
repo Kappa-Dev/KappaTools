@@ -15,6 +15,7 @@
 
 //unfolding negative modif
 'r4' A(x{u}[.]) -> A(x{p}[.], c{-= 2}) @ 0.1
+'r4bis' A(x{u}[.]) -> A(x{p}[.], c{-= 2}) @ 0.1
 'r4_' A(x[1]), B(x[1]) -> A(x[.],c{-= 1}), B(x[.], c{-= 1}) @ 1
 
 //unfolding rule with test and modif

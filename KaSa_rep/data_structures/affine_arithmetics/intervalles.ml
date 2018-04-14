@@ -90,16 +90,15 @@ let wide_en_place t1 t2 =
 
 let cap_inter i1 i2 =
      let is={inf=ffmax (i1.inf) (i2.inf);sup=ffmin (i1.sup) (i2.sup)} in
-        if ffinf (is.sup) (is.inf) then (raise Intervalle_vide)
+        if ffinf (is.sup) (is.inf) then raise Intervalle_vide
 	    else is ;;
 
 let inter_convexe t1 t2 =
     let n=Array.length t1 in
     let ts=Array.make n  {inf=Frac{num=0;den=1} ;sup=Frac{num=0;den=1}} in
     for i=0 to (n-1) do
-        ts.(i)<-{inf=ffmax (t1.(i).inf) (t2.(i).inf);sup=ffmin (t1.(i).sup) (t2.(i).sup)};
-        if ffinf (ts.(i).sup) (ts.(i).inf) then (raise Intervalle_vide)
-     done;
+      ts.(i)<-cap_inter t1.(i) t2.(i)
+    done;
     ts;;
 
 let iiplus i1 alpha i2 =
@@ -121,7 +120,7 @@ let combinaison_lineaire_convexe ((l,resultat),s) =
         (match (ffplus sol k (s.(i).inf)) with
          | Unknown -> Unknown
          | (Infinity | Minfinity | Frac _) as k -> aux q k )
-      | (i,k)::q -> aux q sol
+      | _::q -> aux q sol
       | [] -> sol
 
     in
@@ -139,7 +138,7 @@ let combinaison_lineaire_convexe ((l,resultat),s) =
                 | [] -> sol
     in
     let supf=(aux l (Frac resultat)) in
-    if (ffinf supf inff) then (raise Intervalle_vide)  else {inf=inff;sup=supf};;
+    if (ffinf supf inff) then raise Intervalle_vide else {inf=inff;sup=supf};;
 
 
 

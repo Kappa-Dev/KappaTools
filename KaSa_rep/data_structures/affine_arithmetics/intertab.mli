@@ -56,6 +56,12 @@ sig
     intervalle_tab -> intervalle_tab ->
     Exception.method_handler * intervalle_tab
 
+  val abstract_away:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    intervalle_tab -> var list ->
+    Exception.method_handler * intervalle_tab
+
 end
 
 module Tabinter:Tabinter with type var = Occu1.trans

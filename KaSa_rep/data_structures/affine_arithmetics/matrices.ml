@@ -127,6 +127,11 @@ val somme_affine:
     matrice -> matrice ->
     Exception.method_handler * bool
 
+  val abstract_away:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    matrice -> var list ->
+    Exception.method_handler * matrice
 end
 
 module Matrice =
@@ -801,4 +806,21 @@ let equal parameters error m1 m2 =
   let error, m2=copy parameters error m2 in
   let error, union = union parameters error m1 m2 in
   error, m2.nligne = union.nligne && m1.nligne =  union.nligne
+
+let abstract_away parameters (error,matrice) var =
+  let error, matrice_copy = copy parameters error matrice in
+  let error =
+    push parameters error matrice_copy var {Fraction.num=1;Fraction.den=1}
+  in
+  let error, m = union parameters error matrice matrice_copy  in
+  let error = normalise parameters error m in
+  error, m
+
+let abstract_away parameters error matrice list =
+  List.fold_left
+    (abstract_away parameters)
+    (error, matrice)
+    list
+
+
 end

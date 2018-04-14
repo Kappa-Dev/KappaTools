@@ -118,6 +118,12 @@ sig
     prod-> (var * int) list ->
     Exception.method_handler * prod
 
+  val abstract_away:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod -> var list ->
+    Exception.method_handler * prod
+
 end
 
 module Mat_inter =
@@ -742,7 +748,7 @@ posref j))) in
 
 let solve_inf parameters error mi c =
      let rec aux k error  =
-       let error = affiche_mat parameters error mi in
+       (* let error = affiche_mat parameters error mi in*)
        if k>5 then error, mi
        else
          let error, tmp=I.copy parameters error (mi.i) in
@@ -802,7 +808,8 @@ let exclusion parameters error p l  =
      let classe=classe p (List.rev_map (fun (a,_,_) -> a) (List.rev l))  in
      let error, m2= M.copy parameters error (p.mat) in
      let error, i2=I.copy parameters error (p.i) in
-     let () =
+     try
+       let () =
          List.iter
            (fun (j,cmp,i) ->
               I.set i2
@@ -827,9 +834,12 @@ let exclusion parameters error p l  =
                       {sup= Frac{num=i;den=1};
                        inf=Minfinity}
                    ))) l
-     in
-     solve_inf parameters
-       error {mat=m2;i=i2} classe
+       in
+       solve_inf parameters
+         error {mat=m2;i=i2} classe
+     with
+     | Intervalle_vide -> error, None
+
 
 
    let double_here parameters error p l  =
@@ -976,6 +986,10 @@ let exclusion parameters error p l  =
 	   else error, m1
      else if b2 then error, m2 else error, m
 
+  let abstract_away parameters error m l =
+    let error, mat = M.abstract_away parameters error m.mat l in
+    let error, i = I.abstract_away parameters error m.i l in
+    error, {mat;i}
 
   end:Mat_inter with type var=Occu1.trans)
 

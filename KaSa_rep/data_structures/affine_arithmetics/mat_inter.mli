@@ -59,7 +59,7 @@ sig
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
-    Exception.method_handler * prod option 
+    Exception.method_handler * prod option
 
   val is_vide: prod -> var->bool
   val string_of_pro:
@@ -74,21 +74,25 @@ sig
 
 
   val is_infinite:prod->var->bool
+
   val union:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
     Exception.method_handler * prod
+
   val plus:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
     Exception.method_handler * prod
+
   val widen:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
     Exception.method_handler * (prod * var list)
+
   val union_incr:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
@@ -110,6 +114,12 @@ sig
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod-> (var * int) list ->
+    Exception.method_handler * prod
+
+  val abstract_away:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    prod -> var list -> 
     Exception.method_handler * prod
 
 end
