@@ -260,11 +260,11 @@ module Functor =
                       Ckappa_sig.dummy_agent_name
                 in
                 match
-                  Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+                  Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
                     parameters error agent_type packs
                 with
                 | error, None ->
-                  Exception.warn parameters error __POS__ Exit wake_up
+                  error, wake_up
                 | error, Some pack_map ->
                   Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.fold
                     parameters error
