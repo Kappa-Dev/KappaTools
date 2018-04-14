@@ -68,6 +68,10 @@ module Functor =
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
+  let get_potential_side_effects static =
+    lift Analyzer_headers.get_potential_side_effects_per_rule static
+
+
   let get_wake_up_relation static =
     lift Analyzer_headers.get_wake_up_relation static
 
@@ -583,6 +587,13 @@ module Functor =
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
     let error, rule = get_rule parameters error static rule_id in
+    let backward = get_backqard_pointers static in
+    let error, potential_side_effects =
+      Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
+        parameters error []
+        rule_id
+        (get_potential_side_effects static)
+    in
     let first_application =
       can_we_prove_this_is_not_the_first_application
          precondition
@@ -737,6 +748,61 @@ module Functor =
         else  error, dynamic, event_list
       in
       (* TODO -> side effect *)
+      let error, dynamic, event_list =
+        List.fold_left
+          (fun (error, dynamic, event_list) (agent,site,state) ->
+             match
+               Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
+                 parameters error
+                 (agent,site)
+                   backward
+               with
+               | error, None -> error, dynamic, event_list
+               | error, Some set ->
+                   Ckappa_sig.Site_map_and_set.Set.fold
+                     (fun counter (error,dynamic, event_list) ->
+                        let value = get_value dynamic in
+                        let guard = [Occu1.Bool (site, state),Counters_domain_type.EQ, 1] in
+                        let update = [Occu1.Bool (site, state),-1;
+                                      Occu1.Bool (site, Ckappa_sig.state_index_of_int 0),1] in
+                        let error, x  =
+                          match
+                            Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                              parameters error
+                              (agent, counter)
+                              value
+                          with
+                          | error, None ->
+                            Exception.warn parameters error __POS__ Exit
+                              (MI.create parameters 0)
+                          | error, Some x -> error, x
+                        in
+                        let error, x' = MI.copy parameters error x in
+                        let error, x_opt =
+                          restrict parameters error x'
+                                          guard
+                        in
+                        let error, x =
+                          match x_opt with
+                          | None ->
+                            Exception.warn parameters error __POS__ Exit x'
+                          | Some x -> error, x
+                        in
+                        let error, x =
+                          translate parameters error x
+                            update
+                        in
+                        let error, dynamic, event_list =
+                          new_union
+                            static dynamic error
+                            agent counter x event_list
+                        in
+                        error, dynamic, event_list)
+                     set
+                     (error, dynamic, event_list)
+          )
+          (error, dynamic, event_list) potential_side_effects
+      in
       error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
