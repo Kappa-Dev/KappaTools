@@ -836,7 +836,7 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s<=%s)"
+                     "%s(%s:(-oo,%s])"
                      agent_string
                      site_string
                      (Fraction.string_of f)
@@ -848,7 +848,7 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s>=%s)"
+                     "%s(%s:[%s,+oo))"
                      agent_string
                      site_string
                      (Fraction.string_of f)
@@ -859,7 +859,7 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s>=%s<=%s)"
+                     "%s(%s:[%s,%s])"
                      agent_string
                      site_string
                      (Fraction.string_of f1)
