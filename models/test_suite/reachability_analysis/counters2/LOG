@@ -1,0 +1,776 @@
+Kappa Static Analyzer (v4.0rc1-171-gacbcbdf9e) (without Tk interface)
+Analysis launched at 2018/04/16 00:19:45 (GMT-22) on macbook-pro-de-inria.home
+Parsing counters.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+	Views in initial state:
+
+		A(x5{u})
+
+	Views in initial state:
+
+		A(x4{u})
+
+	Views in initial state:
+
+		A(x3{u})
+
+	Views in initial state:
+
+		A(x2{u})
+
+	Views in initial state:
+
+		A(x1{u})
+
+	Views in initial state:
+
+		A(x{u})
+
+Update information about counters
+
+		 Agent: A ; Counter: c
+
+Is_site_7_in_state_1
+: 0
+Is_site_7_in_state_0
+: 1
+Is_site_6_in_state_1
+: 0
+Is_site_6_in_state_0
+: 1
+Is_site_5_in_state_1
+: 0
+Is_site_5_in_state_0
+: 1
+Is_site_4_in_state_1
+: 0
+Is_site_4_in_state_0
+: 1
+Is_site_3_in_state_1
+: 0
+Is_site_3_in_state_0
+: 1
+Counter_1
+: 0
+VAR Affine constant
+ Counter_1
+ Is_site_7_in_state_1
+ Is_site_7_in_state_0
+ Is_site_6_in_state_1
+ Is_site_6_in_state_0
+ Is_site_5_in_state_1
+ Is_site_5_in_state_0
+ Is_site_4_in_state_1
+ Is_site_4_in_state_0
+ Is_site_3_in_state_1
+ Is_site_3_in_state_0
+ ---
+Counter_1
+ num: 1 den: 1
+
+---
+Is_site_7_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_7_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_6_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_6_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_5_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_5_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_4_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_4_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_3_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_3_in_state_0
+ num: 1 den: 1
+
+
+
+
+	Applying rule A(x1{u}) -> A(x1{p} c{+=-1}) (File "counters.ka", line 3, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x1{u}) -> A(x1{p} c{+=-1}) (File "counters.ka", line 3, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x1{})
+
+		A(x1{p})
+
+		Update information about counters
+
+		 Agent: A ; Counter: c
+
+Affine constant
+: 0
+Counter_1
+: [-1 .. 0]
+Is_site_3_in_state_0
+: [0 .. 1]
+Is_site_3_in_state_1
+: [0 .. 1]
+Is_site_4_in_state_0
+: 1
+Is_site_4_in_state_1
+: 0
+Is_site_5_in_state_0
+: 1
+Is_site_5_in_state_1
+: 0
+Is_site_6_in_state_0
+: 1
+Is_site_6_in_state_1
+: 0
+Is_site_7_in_state_0
+: 1
+Is_site_7_in_state_1
+: 0
+VAR Affine constant
+ Counter_1
+ Is_site_7_in_state_1
+ Is_site_7_in_state_0
+ Is_site_6_in_state_1
+ Is_site_6_in_state_0
+ Is_site_5_in_state_1
+ Is_site_5_in_state_0
+ Is_site_4_in_state_1
+ Is_site_4_in_state_0
+ Is_site_3_in_state_1
+ Is_site_3_in_state_0
+ ---
+Affine constant
+ num: 1 den: 1
+Counter_1
+ num: 1 den: 1
+Is_site_3_in_state_0
+ num: -1 den: 1
+
+---
+Is_site_7_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_7_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_6_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_6_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_5_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_5_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_4_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_4_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_3_in_state_1
+ num: 1 den: 1
+Is_site_3_in_state_0
+ num: 1 den: 1
+
+
+
+
+	Applying rule A(x1{p}) -> A(x1{u} c{+=1}) (File "counters.ka", line 4, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x1{p}) -> A(x1{u} c{+=1}) (File "counters.ka", line 4, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x1{})
+
+	Applying rule A(x2{u}) -> A(x2{p} c{+=-1}) (File "counters.ka", line 5, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x2{u}) -> A(x2{p} c{+=-1}) (File "counters.ka", line 5, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x2{})
+
+		A(x2{p})
+
+		Update information about counters
+
+		 Agent: A ; Counter: c
+
+Is_site_7_in_state_1
+: 0
+Is_site_7_in_state_0
+: 1
+Is_site_6_in_state_1
+: 0
+Is_site_6_in_state_0
+: 1
+Is_site_5_in_state_1
+: 0
+Is_site_5_in_state_0
+: 1
+Is_site_4_in_state_1
+: [0 .. 1]
+Is_site_4_in_state_0
+: [0 .. 1]
+Is_site_3_in_state_1
+: [0 .. 1]
+Is_site_3_in_state_0
+: [0 .. 1]
+Counter_1
+: [-2 .. 0]
+Affine constant
+: 0
+VAR Affine constant
+ Counter_1
+ Is_site_7_in_state_1
+ Is_site_7_in_state_0
+ Is_site_6_in_state_1
+ Is_site_6_in_state_0
+ Is_site_5_in_state_1
+ Is_site_5_in_state_0
+ Is_site_4_in_state_1
+ Is_site_4_in_state_0
+ Is_site_3_in_state_1
+ Is_site_3_in_state_0
+ ---
+Affine constant
+ num: 2 den: 1
+Counter_1
+ num: 1 den: 1
+Is_site_4_in_state_0
+ num: -1 den: 1
+Is_site_3_in_state_0
+ num: -1 den: 1
+
+---
+Is_site_7_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_7_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_6_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_6_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_5_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_5_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_4_in_state_1
+ num: 1 den: 1
+Is_site_4_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_3_in_state_1
+ num: 1 den: 1
+Is_site_3_in_state_0
+ num: 1 den: 1
+
+
+
+
+	Applying rule A(x2{p}) -> A(x2{u} c{+=1}) (File "counters.ka", line 6, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x2{p}) -> A(x2{u} c{+=1}) (File "counters.ka", line 6, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x2{})
+
+	Applying rule A(x3{u}) -> A(x3{p} c{+=-1}) (File "counters.ka", line 7, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x3{u}) -> A(x3{p} c{+=-1}) (File "counters.ka", line 7, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x3{})
+
+		A(x3{p})
+
+		Update information about counters
+
+		 Agent: A ; Counter: c
+
+Affine constant
+: 0
+Counter_1
+: [-3 .. 0]
+Is_site_3_in_state_0
+: [0 .. 1]
+Is_site_3_in_state_1
+: [0 .. 1]
+Is_site_4_in_state_0
+: [0 .. 1]
+Is_site_4_in_state_1
+: [0 .. 1]
+Is_site_5_in_state_0
+: [0 .. 1]
+Is_site_5_in_state_1
+: [0 .. 1]
+Is_site_6_in_state_0
+: 1
+Is_site_6_in_state_1
+: 0
+Is_site_7_in_state_0
+: 1
+Is_site_7_in_state_1
+: 0
+VAR Affine constant
+ Counter_1
+ Is_site_7_in_state_1
+ Is_site_7_in_state_0
+ Is_site_6_in_state_1
+ Is_site_6_in_state_0
+ Is_site_5_in_state_1
+ Is_site_5_in_state_0
+ Is_site_4_in_state_1
+ Is_site_4_in_state_0
+ Is_site_3_in_state_1
+ Is_site_3_in_state_0
+ ---
+Affine constant
+ num: 3 den: 1
+Counter_1
+ num: 1 den: 1
+Is_site_5_in_state_0
+ num: -1 den: 1
+Is_site_4_in_state_0
+ num: -1 den: 1
+Is_site_3_in_state_0
+ num: -1 den: 1
+
+---
+Is_site_7_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_7_in_state_0
+ num: 1 den: 1
+
+---
+Is_site_6_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_6_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_5_in_state_1
+ num: 1 den: 1
+Is_site_5_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_4_in_state_1
+ num: 1 den: 1
+Is_site_4_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_3_in_state_1
+ num: 1 den: 1
+Is_site_3_in_state_0
+ num: 1 den: 1
+
+
+
+
+	Applying rule A(x3{p}) -> A(x3{u} c{+=1}) (File "counters.ka", line 8, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x3{p}) -> A(x3{u} c{+=1}) (File "counters.ka", line 8, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x3{})
+
+	Applying rule A(x4{u}) -> A(x4{p} c{+=-1}) (File "counters.ka", line 9, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x4{u}) -> A(x4{p} c{+=-1}) (File "counters.ka", line 9, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x4{})
+
+		A(x4{p})
+
+		Update information about counters
+
+		 Agent: A ; Counter: c
+
+Is_site_7_in_state_1
+: 0
+Is_site_7_in_state_0
+: 1
+Is_site_6_in_state_1
+: [0 .. 1]
+Is_site_6_in_state_0
+: [0 .. 1]
+Is_site_5_in_state_1
+: [0 .. 1]
+Is_site_5_in_state_0
+: [0 .. 1]
+Is_site_4_in_state_1
+: [0 .. 1]
+Is_site_4_in_state_0
+: [0 .. 1]
+Is_site_3_in_state_1
+: [0 .. 1]
+Is_site_3_in_state_0
+: [0 .. 1]
+Counter_1
+: [-4 .. 0]
+Affine constant
+: 0
+VAR Affine constant
+ Counter_1
+ Is_site_7_in_state_1
+ Is_site_7_in_state_0
+ Is_site_6_in_state_1
+ Is_site_6_in_state_0
+ Is_site_5_in_state_1
+ Is_site_5_in_state_0
+ Is_site_4_in_state_1
+ Is_site_4_in_state_0
+ Is_site_3_in_state_1
+ Is_site_3_in_state_0
+ ---
+Affine constant
+ num: 4 den: 1
+Counter_1
+ num: 1 den: 1
+Is_site_6_in_state_0
+ num: -1 den: 1
+Is_site_5_in_state_0
+ num: -1 den: 1
+Is_site_4_in_state_0
+ num: -1 den: 1
+Is_site_3_in_state_0
+ num: -1 den: 1
+
+---
+Is_site_7_in_state_1
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_7_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_6_in_state_1
+ num: 1 den: 1
+Is_site_6_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_5_in_state_1
+ num: 1 den: 1
+Is_site_5_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_4_in_state_1
+ num: 1 den: 1
+Is_site_4_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_3_in_state_1
+ num: 1 den: 1
+Is_site_3_in_state_0
+ num: 1 den: 1
+
+
+
+
+	Applying rule A(x4{p}) -> A(x4{u} c{+=1}) (File "counters.ka", line 10, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x4{p}) -> A(x4{u} c{+=1}) (File "counters.ka", line 10, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x4{})
+
+	Applying rule A(x5{u}) -> A(x5{p} c{+=-1}) (File "counters.ka", line 11, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x5{u}) -> A(x5{p} c{+=-1}) (File "counters.ka", line 11, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x5{})
+
+		A(x5{p})
+
+		Update information about counters
+
+		 Agent: A ; Counter: c
+
+Affine constant
+: 0
+Counter_1
+: [-5 .. 0]
+Is_site_3_in_state_0
+: [0 .. 1]
+Is_site_3_in_state_1
+: [0 .. 1]
+Is_site_4_in_state_0
+: [0 .. 1]
+Is_site_4_in_state_1
+: [0 .. 1]
+Is_site_5_in_state_0
+: [0 .. 1]
+Is_site_5_in_state_1
+: [0 .. 1]
+Is_site_6_in_state_0
+: [0 .. 1]
+Is_site_6_in_state_1
+: [0 .. 1]
+Is_site_7_in_state_0
+: [0 .. 1]
+Is_site_7_in_state_1
+: [0 .. 1]
+VAR Affine constant
+ Counter_1
+ Is_site_7_in_state_1
+ Is_site_7_in_state_0
+ Is_site_6_in_state_1
+ Is_site_6_in_state_0
+ Is_site_5_in_state_1
+ Is_site_5_in_state_0
+ Is_site_4_in_state_1
+ Is_site_4_in_state_0
+ Is_site_3_in_state_1
+ Is_site_3_in_state_0
+ ---
+Affine constant
+ num: 5 den: 1
+Counter_1
+ num: 1 den: 1
+Is_site_7_in_state_0
+ num: -1 den: 1
+Is_site_6_in_state_0
+ num: -1 den: 1
+Is_site_5_in_state_0
+ num: -1 den: 1
+Is_site_4_in_state_0
+ num: -1 den: 1
+Is_site_3_in_state_0
+ num: -1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_7_in_state_1
+ num: 1 den: 1
+Is_site_7_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_6_in_state_1
+ num: 1 den: 1
+Is_site_6_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_5_in_state_1
+ num: 1 den: 1
+Is_site_5_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_4_in_state_1
+ num: 1 den: 1
+Is_site_4_in_state_0
+ num: 1 den: 1
+
+---
+Affine constant
+ num: -1 den: 1
+Is_site_3_in_state_1
+ num: 1 den: 1
+Is_site_3_in_state_0
+ num: 1 den: 1
+
+
+
+
+	Applying rule A(x5{p}) -> A(x5{u} c{+=1}) (File "counters.ka", line 12, characters 0-30:):
+		the precondition is satisfied
+
+		rule A(x5{p}) -> A(x5{u} c{+=1}) (File "counters.ka", line 12, characters 0-30:) is applied for the first time
+
+		Updating the views for A(x5{})
+
+	Applying rule A(x1{u}) -> A(x1{p} c{+=-1}) (File "counters.ka", line 3, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x1{})
+
+	Applying rule A(x1{p}) -> A(x1{u} c{+=1}) (File "counters.ka", line 4, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x1{})
+
+	Applying rule A(x2{u}) -> A(x2{p} c{+=-1}) (File "counters.ka", line 5, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x2{})
+
+	Applying rule A(x2{p}) -> A(x2{u} c{+=1}) (File "counters.ka", line 6, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x2{})
+
+	Applying rule A(x3{u}) -> A(x3{p} c{+=-1}) (File "counters.ka", line 7, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x3{})
+
+	Applying rule A(x3{p}) -> A(x3{u} c{+=1}) (File "counters.ka", line 8, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x3{})
+
+	Applying rule A(x4{u}) -> A(x4{p} c{+=-1}) (File "counters.ka", line 9, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x4{})
+
+	Applying rule A(x4{p}) -> A(x4{u} c{+=1}) (File "counters.ka", line 10, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x4{})
+
+	Applying rule A(x5{u}) -> A(x5{p} c{+=-1}) (File "counters.ka", line 11, characters 0-30:):
+		the precondition is satisfied
+
+		Updating the views for A(x5{})
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+A() => [ A(x5{u}[.]) v A(x5{p}[.]) ]
+A() => [ A(x4{u}[.]) v A(x4{p}[.]) ]
+A() => [ A(x3{u}[.]) v A(x3{p}[.]) ]
+A() => [ A(x2{u}[.]) v A(x2{p}[.]) ]
+A() => [ A(x1{u}[.]) v A(x1{p}[.]) ]
+A() => A(x{u}[.])
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+A(c:[-5 .. 0])
+execution finished without any exception

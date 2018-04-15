@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaSa counters.ka  --output-directory output -syntax 4 || exit 0
+
+#c may range from 0 to 5.

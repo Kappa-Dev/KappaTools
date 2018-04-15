@@ -1,0 +1,33 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa counters.ka --output-directory output -syntax 4
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [style = filled label = "x1" shape =circle color = yellow size = "5"]
+   0.1 [style = filled label = "c" shape =house color = grey size = "5"]
+   0.2 [style = filled label = "d" shape =house color = grey size = "5"]
+   0.3 [style = filled label = "x2" shape =circle color = yellow size = "5"]
+   0.4 [style = filled label = "x3" shape =circle color = yellow size = "5"]
+   0.5 [style = filled label = "x4" shape =circle color = yellow size = "5"]
+   0.6 [style = filled label = "x5" shape =circle color = yellow size = "5"]
+label =  "A";  shape = rectangle; color = blue
+} ; 
+subgraph cluster1 {
+   1.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
+label =  "C";  shape = rectangle; color = blue
+} ; 
+subgraph cluster2 {
+   2.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
+label =  "B";  shape = rectangle; color = blue
+} ; 
+0.0 -- 1.0
+0.0 -- 2.0
+0.3 -- 2.0
+0.4 -- 2.0
+0.5 -- 2.0
+0.6 -- 2.0
+}
