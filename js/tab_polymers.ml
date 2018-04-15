@@ -14,7 +14,7 @@ let navli () = ReactiveData.RList.empty
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
-let site a = [a,None,Some (Public_data.Bound_to 1)]
+let site a = [a,None,Some (Public_data.Bound_to 1),None]
 
 let print_edge ((a,b),(c,d)) list =
   Utility.print_newline (Utility.print_site_graph [a,site b;c,site d] list)

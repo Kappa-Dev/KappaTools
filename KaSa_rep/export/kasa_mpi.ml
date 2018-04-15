@@ -13,6 +13,8 @@ module A =
         Remanent_parameters_sig.site_across_bonds = true;
         Remanent_parameters_sig.parallel_bonds = true;
         Remanent_parameters_sig.dynamic_contact_map = true;
+        Remanent_parameters_sig.counter_domain = Remanent_parameters_sig.Mi ;
+        Remanent_parameters_sig.counters = true ;
       } ())
 
 include Export_to_json.Export(A)

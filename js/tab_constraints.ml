@@ -92,7 +92,7 @@ let content () =
                     ~a:[Html.a_class [ "panel"; "panel-danger" ]] [title;content] in
                 Lwt.return [out]) >>= fun out ->
               let () = set_constraints_div out in Lwt.return (Api_common.result_ok ())
-           )
+         )
       )
       (React.S.on ~eq:State_project.model_equal tab_is_active
          State_project.dummy_model State_project.model) in

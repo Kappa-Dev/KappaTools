@@ -16,6 +16,7 @@ val print_string:
 val print_site_graph:
   (string Html.wrap *
    (string Html.wrap * string Html.wrap option *
-    Public_data.binding_state option)
+    Public_data.binding_state option *
+    (int option * int option) option)
      list)
     list -> ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list

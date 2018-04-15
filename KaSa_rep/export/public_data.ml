@@ -814,9 +814,7 @@ type binding_state =
     | Bound_to of int
     | Binding_type of string * string
 
-type agent =
-  string * (*agent name*)
-  (string * string option *  binding_state option) list
+type agent = string * (string * string option * binding_state option * (int option * int option) option) list
 
 type 'site_graph lemma =
   {
@@ -872,6 +870,15 @@ let binding_state_opening_backend_symbol = "["
 let binding_state_closing_backend_symbol = "]"
 let internal_state_opening_backend_symbol = "{"
 let internal_state_closing_backend_symbol = "}"
+let counter_state_opening_backend_symbol = "{"
+let counter_state_closing_backend_symbol = "}"
+let counter_state_range_backend_symbol = " .. "
+let open_interval_inclusive_symbol = "["
+let close_interval_inclusive_symbol = "]"
+let open_interval_exclusive_symbol = "]"
+let close_interval_exclusive_symbol = "["
+let plus_infinity_symbol = "+oo"
+let minus_infinity_symbol = "-oo"
 
 let string_of_binding_type
     ?binding_type_symbol:(binding_type_symbol=".")
@@ -905,23 +912,34 @@ let binding_state_light_of_json =
            (Yojson.Basic.Util.Type_error ("wrong binding state",x))
 
 
+let counter_state_light_of_json =
+  JsonUtil.to_pair
+    ~lab1:inf
+    ~lab2:sup
+    ~error_msg:"wrong counter state"
+    (JsonUtil.to_option (JsonUtil.to_int ~error_msg:counter))
+    (JsonUtil.to_option (JsonUtil.to_int ~error_msg:counter))
+
 let interface_light_of_json json
   =
   JsonUtil.to_map
     ~lab_key:site ~lab_value:stateslist ~error_msg:interface
     ~empty:[]
-    ~add:(fun k (a,b) list -> (k,a,b)::list)
+    ~add:(fun k (a,b,c) list -> (k,a,b,c)::list)
     (*json -> elt*)
     (fun json -> JsonUtil.to_string ~error_msg:site json)
     (*json -> 'value*)
-    (JsonUtil.to_pair
-       ~lab1:prop ~lab2:bind ~error_msg:"wrong binding state"
+    (JsonUtil.to_triple
+       ~lab1:prop ~lab2:bind ~lab3:counter
+       ~error_msg:"wrong binding state"
        (JsonUtil.to_option
           (JsonUtil.to_string ~error_msg:prop)
 
        )
        (JsonUtil.to_option
           binding_state_light_of_json)
+       (JsonUtil.to_option
+          counter_state_light_of_json)
     )
     json
 

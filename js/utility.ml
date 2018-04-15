@@ -42,8 +42,31 @@ let print_single_internal_state a list =
          print_string
            Public_data.internal_state_closing_backend_symbol list))
 
+let print_counter_interval (a,b) list =
+  let open_range, inf =
+    match a with
+    | None -> Public_data.open_interval_exclusive_symbol, Public_data.minus_infinity_symbol
+    | Some a -> Public_data.open_interval_inclusive_symbol, string_of_int a
+  in
+  let close_range, sup =
+    match b with
+    | None -> Public_data.close_interval_exclusive_symbol, Public_data.plus_infinity_symbol
+    | Some b -> Public_data.close_interval_inclusive_symbol, string_of_int b
+  in
+  print_string close_range
+    (print_string sup
+       (print_string Public_data.counter_state_range_backend_symbol
+          (print_string inf
+             (print_string open_range list))))
+
+let print_counter_state (a,b) list =
+  print_string
+    Public_data.counter_state_opening_backend_symbol
+    (print_counter_interval (a,b)
+       (print_string Public_data.counter_state_closing_backend_symbol list))
+
 let print_site site list =
-  let site_name, prop_opt, binding_opt = site in
+  let site_name, prop_opt, binding_opt, counter_opt = site in
   let list =
     match binding_opt with
     | Some Public_data.Free | None ->
@@ -67,6 +90,12 @@ let print_site site list =
       print_single_binding_state
         (string_of_int i)
         list
+  in
+  let list =
+    match counter_opt with
+    | None -> list
+    | Some a ->
+      print_counter_state a list
   in
   let list =
     match prop_opt with

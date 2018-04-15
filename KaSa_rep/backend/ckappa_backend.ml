@@ -137,8 +137,9 @@ struct
       Handler.translate_site parameter error kappa_handler agent_type site
     in
     match site with
-    | Ckappa_sig.Internal s ->
-      let new_site = Ckappa_sig.Binding s in
+    | Ckappa_sig.Internal s
+    | Ckappa_sig.Binding s ->
+      let new_site = Ckappa_sig.Counter s in
       let error, dic_opt =
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_type kappa_handler.Cckappa_sig.sites
@@ -151,8 +152,7 @@ struct
           Ckappa_sig.Dictionary_of_sites.member
             parameter error new_site dic
       end
-    | Ckappa_sig.Counter _
-    | Ckappa_sig.Binding _ ->
+    | Ckappa_sig.Counter _ ->
       Exception.warn parameter error __POS__ Exit false
 
   let has_a_binding_state parameter error kappa_handler agent_type site =

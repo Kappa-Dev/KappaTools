@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 01 2018>
+  * Last modification: Time-stamp: <Apr 15 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -2068,20 +2068,20 @@ let compute_constraints_list _show_title state =
       Remanent_state.get_constraints_list
       compute_constraints_list
 
-let output_internal_constraints_list ?logger state =
-  let state, constraints_list = get_internal_constraints_list state in
-  let parameters = Remanent_state.get_parameters state in
-  let error = Remanent_state.get_errors state in
-  let state, kappa_handler = get_handler state in
-  (*PRINT*)
-  let error =
-    Ckappa_site_graph.print_internal_pattern
-      ?logger parameters error
-      kappa_handler
-      constraints_list
-  in
-  let state = Remanent_state.set_errors error state in
-  state
+  let output_internal_constraints_list ?logger state =
+    let state, constraints_list = get_internal_constraints_list state in
+    let parameters = Remanent_state.get_parameters state in
+    let error = Remanent_state.get_errors state in
+    let state, kappa_handler = get_handler state in
+    (*PRINT*)
+    let error =
+      Ckappa_site_graph.print_internal_pattern
+        ?logger parameters error
+        kappa_handler
+        constraints_list
+    in
+    let state = Remanent_state.set_errors error state in
+    state
 
 let get_constraints_list_to_json state =
   let state, constraints_list =

@@ -19,7 +19,7 @@ val wildcard:string
 val influencemap: string
 val scc:string
 val inf:string
-val sup:string 
+val sup:string
 
 (* Backend *)
 val binding_type_backend_symbol: string
@@ -33,6 +33,15 @@ val binding_state_opening_backend_symbol: string
 val binding_state_closing_backend_symbol: string
 val internal_state_opening_backend_symbol: string
 val internal_state_closing_backend_symbol: string
+val counter_state_opening_backend_symbol: string
+val counter_state_closing_backend_symbol: string
+val counter_state_range_backend_symbol: string
+val open_interval_inclusive_symbol: string
+val close_interval_inclusive_symbol: string
+val open_interval_exclusive_symbol: string
+val close_interval_exclusive_symbol: string
+val plus_infinity_symbol: string
+val minus_infinity_symbol: string
 
 
 type accuracy_level = Low | Medium | High | Full
@@ -163,7 +172,7 @@ type binding_state =
   | Bound_to of int
   | Binding_type of string * string
 
-type agent = string * (string * string option * binding_state option) list
+type agent = string * (string * string option * binding_state option * (int option * int option) option) list
 
 val lemma_to_json:
   ('site_graph -> Yojson.Basic.json) -> 'site_graph lemma -> Yojson.Basic.json
