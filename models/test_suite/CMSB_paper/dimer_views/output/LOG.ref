@@ -33,4 +33,7 @@ R() =>
 	v R(c!c.R,cr,n!cr.R,x!x.E)
 	v R(c,cr,n,x)
    ]
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
 execution finished without any exception

@@ -53,8 +53,11 @@ let wide_union_convexe t1 t2 =
     let n=Array.length t1 in
     let ts=Array.make  n   {inf=Frac {num=0;den=1} ;sup=Frac{num=0;den=1}} in
     for i=0 to (n-1) do
-       ts.(i)<-{inf=(if (ffinf (t2.(i).inf) (t1.(i).inf)) then (Frac {num=0;den=1})
-                                                            else (t1.(i).inf));
+      ts.(i)<-{inf=(if (ffinf (t2.(i).inf) (t1.(i).inf)) then
+                      if (ffinf t2.(i).inf (Fraction.ffneg (Frac (!wide_max))))
+                      then Minfinity
+                      else t2.(i).inf
+                      else (t1.(i).inf));
                sup=(if (ffinf (t1.(i).sup) (t2.(i).sup)) then
                             (if (ffinf (Frac (!wide_max)) t2.(i).sup) then Infinity
                                                                  else t2.(i).sup)
@@ -70,10 +73,16 @@ let wide_en_place t1 t2 =
     changed:=false;
     let rep={inf=(
 	      if (ffinf (t2.(i).inf) (t1.(i).inf))
-	      then
-		(changed:=true;Frac {num=0;den=1})
-              else (t1.(i).inf));
-             sup=(
+       then
+         if (ffinf t2.(i).inf (Fraction.ffneg (Frac (!wide_max))))
+         then
+           if t1.(i).inf=Minfinity
+           then Minfinity
+           else (changed:=true;Minfinity)
+         else
+           (changed:=true;t2.(i).inf)
+       else (t1.(i).inf));
+       sup=(
 	      if (ffinf (t1.(i).sup) (t2.(i).sup))
 	      then
                 (if (ffinf (Frac (!wide_max)) t2.(i).sup)

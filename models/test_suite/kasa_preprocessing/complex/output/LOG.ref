@@ -507,6 +507,9 @@ C cannot occur in the model
 * Properties of pairs of bonds
 ------------------------------------------------------------
 ------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 
@@ -522,8 +525,14 @@ C cannot occur in the model
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
+------------------------------------------------------------
+* Export Counters to JSon (internal constraints_list):
+------------------------------------------------------------
+
 Some exceptions have been raised
 error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1044; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1044; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 331; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 331; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/counters_domain_static.ml; message: line 426; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/counters_domain_static.ml; message: line 426; exception:Exit

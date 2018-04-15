@@ -118,6 +118,9 @@ C cannot occur in the model
 * Properties of pairs of bonds
 ------------------------------------------------------------
 ------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 
@@ -131,6 +134,10 @@ C cannot occur in the model
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 execution finished without any exception

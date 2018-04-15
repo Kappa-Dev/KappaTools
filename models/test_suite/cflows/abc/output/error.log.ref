@@ -126,4 +126,5 @@ Intial graph;
   
 File "abc.ka", line 40, characters 12-18:
 Warning: [Emax] constant is evaluated to infinity
-Warning: At t=6.624768, $APPLY 10000 C(x1{p}[#] x2{p}[#])- does not apply (anymore)
+line 0, characters -1--1:
+Label 'on_rate' already defined

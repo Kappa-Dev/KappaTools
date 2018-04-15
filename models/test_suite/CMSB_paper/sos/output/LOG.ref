@@ -74,4 +74,7 @@ EGFR(CR!1),EGFR(CR!1) =>
 ------------------------------------------------------------
 EGFR(CR!CR.EGFR,N!C.EGFR) => EGFR(CR!1,N!2),EGFR(C!2,CR!1)
 EGFR(C!N.EGFR,CR!CR.EGFR) => EGFR(C!2,CR!1),EGFR(CR!1,N!2)
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
 execution finished without any exception

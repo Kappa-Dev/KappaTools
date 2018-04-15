@@ -198,7 +198,8 @@ module Mat_inter =
     	          | (_,posref,l) ->
                  let rec aux3 l =
                    match l with t::q ->
-                     let k=(fmoins {num=0;den=1} (fdiv  (M.read_val posm  t j) (M.read_val posm
+                     let k=(fmoins {num=0;den=1} (fdiv  (M.read_val posm  t j)
+                                                    (M.read_val posm
 posref j))) in
                      (M.addligne posm t k  posref;aux3 q)
                               | [] -> aux_53 q
@@ -365,7 +366,7 @@ posref j))) in
                                 (I.set inter t
                                    (cap_inter
                                       (I.read inter t)
-                                      {inf=(Frac {num=0;den=1});
+                                      {inf=Minfinity;
                                        sup=(ffdiv s2 (Frac(delta)))})
                                 );
                                 (solve t);vide2 q)))
@@ -435,7 +436,7 @@ posref j))) in
                              in
                              ((I.set inter t)
                                 (cap_inter (I.read inter (t))
-                                   {inf=(Frac {num=0;den=1});
+                                   {inf=Minfinity;
                                     sup=(ffdiv s2 (Frac(delta)))}
                                 ));
                              solve t;

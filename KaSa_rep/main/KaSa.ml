@@ -132,9 +132,8 @@ let main () =
   let state =
     if Remanent_parameters.get_do_reachability_analysis parameters
     || Remanent_parameters.get_compute_separating_transitions parameters
-    || true
     then
-      if Remanent_parameters.get_trace parameters || true then
+      if Remanent_parameters.get_trace parameters then
         Export_to_KaSa.output_constraints_list state
       else
         fst (Export_to_KaSa.get_reachability_analysis state)

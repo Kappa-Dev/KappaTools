@@ -184,7 +184,7 @@ module Tabinter =
              (
                if (ffinf ((read t2 p).inf) ((read t1 p).inf))
                then
-                 (changed:=true;Frac {num=0;den=1})
+                 (changed:=true;(read t2 p).inf)
                else ((read t1 p).inf));
            sup=
              (

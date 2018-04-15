@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 15 2018>
+  * Last modification: Time-stamp: <Apr 16 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -317,9 +317,10 @@ module Functor =
           (error, event_list)
 
 
-  let new_prod_gen bin static dynamic error agent_type counter prod event_list =
+  let new_prod_gen bin static dynamic error dump_title agent_type counter prod event_list =
     let local = dynamic.local in
     let store_value = local.store_value in
+    let kappa_handler = get_kappa_handler static in
     let parameters = get_parameter static in
     let (error, store_value), event_list =
       match
@@ -330,6 +331,39 @@ module Functor =
       with
       | error, None ->
         let error, completed_event_list = update_event_list static error agent_type counter event_list in
+        let error =
+          if Remanent_parameters.get_dump_reachability_analysis_diff parameters
+          then
+            let parameters = Remanent_parameters.update_prefix parameters  "\t\t"
+            in
+            let () = dump_title ()
+            in
+            let error, agent_string =
+              Handler.translate_agent parameters error kappa_handler agent_type
+            in
+            let error, counter_string =
+              match
+                Handler.translate_site parameters error kappa_handler agent_type counter
+              with
+              | error, Ckappa_sig.Counter x -> error, x
+              | error,(Ckappa_sig.Internal x | Ckappa_sig.Binding x) ->
+                Exception.warn parameters error __POS__ Exit x
+            in
+            let () =
+              Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                "%s Agent: %s ; Counter: %s"
+                (Remanent_parameters.get_prefix parameters)
+                agent_string
+                counter_string
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+            let error = MI.affiche_mat parameters error prod in
+            error
+          else
+            error
+        in
         Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
           parameters error
           (agent_type, counter)
@@ -343,6 +377,40 @@ module Functor =
         then
           (error, store_value), event_list
         else
+          let error =
+            if Remanent_parameters.get_dump_reachability_analysis_diff parameters
+            then
+              let parameters = Remanent_parameters.update_prefix parameters  "\t\t"
+              in
+              let () = dump_title ()
+              in
+              let error, agent_string =
+                Handler.translate_agent parameters error kappa_handler agent_type
+              in
+              let error, counter_string =
+                match
+                  Handler.translate_site parameters error kappa_handler agent_type counter
+                with
+                | error, Ckappa_sig.Counter x -> error, x
+                | error,(Ckappa_sig.Internal x | Ckappa_sig.Binding x) ->
+                  Exception.warn parameters error __POS__ Exit x
+              in
+              let () =
+                Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                  "%s Agent: %s ; Counter: %s"
+                  (Remanent_parameters.get_prefix parameters)
+                  agent_string
+                  counter_string
+              in
+              let () =
+                Loggers.print_newline (Remanent_parameters.get_logger parameters)
+              in
+              let error = MI.affiche_mat parameters error new_prod in
+              error
+            else
+              error
+          in
+
           let error, completed_event_list =
             update_event_list static error agent_type
               counter event_list
@@ -386,13 +454,30 @@ module Functor =
     let kappa_handler = get_kappa_handler static in
     let packs = get_packs static in
     let event_list = [] in
+    let dump_title () =
+      if local_trace ||
+         Remanent_parameters.get_dump_reachability_analysis_diff parameters
+      then
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "%sUpdate information about counters"
+            (Remanent_parameters.get_prefix parameters)
+        in
+        let () =
+          Loggers.print_newline (Remanent_parameters.get_logger parameters)
+        in
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      else
+        ()
+    in
     (*parallel bonds in the initial states*)
     let error, (dynamic, event_list) =
       let enriched_init = species.Cckappa_sig.e_init_c_mixture in
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameters
         error
-        (fun parameters error ag_id ag (dynamic, event_list) ->
+        (fun parameters error _ag_id ag (dynamic, event_list) ->
            match ag with
            | Cckappa_sig.Ghost
            | Cckappa_sig.Unknown_agent _
@@ -415,7 +500,7 @@ module Functor =
                  prod_of_assignement
                    parameters error assignement
                in
-               new_union static dynamic error agent_type counter prod event_list)
+               new_union static dynamic error dump_title agent_type counter prod event_list)
              (error, dynamic, event_list)
              assignements
            in
@@ -514,15 +599,23 @@ module Functor =
                            restriction.Counters_domain_type.tests
                        in
                        match x_opt with
-                       | None -> error, false
+                       | None ->
+                       let () = dump_title () in
+                       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                           "%sBot detected" (Remanent_parameters.get_prefix parameters)
+                       in
+                       let error = MI.affiche_mat parameters error x' in 
+                       error, false
                        | Some _ -> error, true)
                   pack_map
             )
             map
         in
         if bool
-        then error, dynamic, Some precondition
-        else error, dynamic, None
+        then
+          error, dynamic, Some precondition
+        else
+            error, dynamic, None
 
   (***********************************************************)
 
@@ -585,7 +678,6 @@ module Functor =
     let rule_restriction = get_rule_restriction static in
     let rule_creation = get_rule_creation static in
     (*-----------------------------------------------------------*)
-    let kappa_handler = get_kappa_handler static in
     let error, rule = get_rule parameters error static rule_id in
     let backward = get_backqard_pointers static in
     let error, potential_side_effects =
@@ -696,11 +788,11 @@ module Functor =
                      let error, dynamic, event_list =
                        if first_application then
                          new_union
-                           static dynamic error
+                           static dynamic error dump_title
                            agent_type counter x event_list
                        else
                          new_widen
-                           static dynamic error
+                           static dynamic error dump_title
                            agent_type counter x event_list
                      in
                      error, (dynamic, event_list)
@@ -736,7 +828,7 @@ module Functor =
                              parameters error assignement
                          in
                          let error, dynamic, event_list =
-                           new_union static dynamic error agent_type counter
+                           new_union static dynamic error dump_title agent_type counter
                             prod event_list
                          in error, (dynamic, event_list))
                       (error, (dynamic, event_list)) assignement_list)
@@ -794,7 +886,7 @@ module Functor =
                         in
                         let error, dynamic, event_list =
                           new_union
-                            static dynamic error
+                            static dynamic error dump_title
                             agent counter x event_list
                         in
                         error, dynamic, event_list)
@@ -1057,9 +1149,9 @@ module Functor =
       let pair_list =
         (domain_name, List.rev current_list) :: internal_constraints_list
       in
-           let kasa_state =
-             Remanent_state.set_internal_constraints_list pair_list kasa_state
-           in
+      let kasa_state =
+        Remanent_state.set_internal_constraints_list pair_list kasa_state
+      in
       error, dynamic, kasa_state
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

@@ -2002,6 +2002,9 @@ A(t[t.A],z[z.A]) => A(t[2],z[1]),A(t[2],z[1])
 B(t[z.B],z[t.B]) => [ B(t[2],z[1]),B(t[1],z[2]) v B(t[1],z[1]) ]
 C(t[z.C],z[t.C]) => C(t[2],z[1]),C(t[1]),C(z[2])
 E(t[t.E],z[z.E]) => E(t[2],z[1]),E(z[1]),E(t[2])
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 Id=52
  Node(site_type:1<0)
@@ -2481,5 +2484,9 @@ B(t[z.B],z[t.B])=> [
 		v B(t[1],z[1])]
 C(t[z.C],z[t.C])=> [C(t[2],z[1]),C(t[1]),C(z[2])]
 E(t[t.E],z[z.E])=> [E(t[2],z[1]),E(z[1]),E(t[2])]
+
+------------------------------------------------------------
+* Export Counters to JSon (internal constraints_list):
+------------------------------------------------------------
 
 execution finished without any exception

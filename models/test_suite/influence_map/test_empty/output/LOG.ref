@@ -279,6 +279,9 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
 Refining further the influence map...
 FST:
 Influence_map:
@@ -2397,6 +2400,10 @@ Influence_map:Inhibition_map:rule(3):'' A(),.,B(),B()->A(),C(),.,. -> var(0):'qb
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 execution finished without any exception

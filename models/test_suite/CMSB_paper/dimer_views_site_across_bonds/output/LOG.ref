@@ -48,4 +48,7 @@ R(c!1),R(c!1) =>
 		v R(c!1,n),R(c!1,n)
 		v R(c!1,n),R(c!1,n!cr.R)
 	]
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
 execution finished without any exception
