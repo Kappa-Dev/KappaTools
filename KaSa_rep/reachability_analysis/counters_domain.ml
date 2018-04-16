@@ -1115,23 +1115,6 @@ module Functor =
                Exception.warn parameters error __POS__ Exit current_list
              | Some ((Fraction.Frac _ | Fraction.Minfinity) as inf,
                      ((Fraction.Frac _ | Fraction.Infinity) as sup)) ->
-               let error, agent_string =
-                 Handler.translate_agent
-                   parameters error
-                   kappa_handler
-                   agent_type
-               in
-               let error, site_string =
-                 Handler.translate_site
-                   parameters error kappa_handler
-                   agent_type site
-               in
-               let error, site_string =
-                 match site_string with
-                 | Ckappa_sig.Counter x -> error, x
-                 | (Ckappa_sig.Internal _ | Ckappa_sig.Binding _ ) ->
-                   Exception.warn parameters error __POS__ Exit ""
-               in
                let t = Ckappa_backend.Ckappa_backend.empty in
                let error', agent_id, t =
                  Ckappa_backend.Ckappa_backend.add_agent
