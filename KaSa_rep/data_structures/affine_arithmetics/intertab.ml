@@ -111,14 +111,18 @@ module Tabinter =
        List.iter
          (fun x->
             let () =
-              Loggers.print_newline
-                (Remanent_parameters.get_logger parameters)
-            in
-            let () = Occu1.print_trans parameters x in
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters) ": %s"
-                (Intervalles.string_of_intervalle parameters (read t x))
+              if not (x = Occu1.Affine_cst)
+            then
+              let () =
+                Loggers.print_newline
+                  (Remanent_parameters.get_logger parameters)
+              in
+              let () = Occu1.print_trans parameters x in
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters) ": %s"
+                  (Intervalles.string_of_intervalle parameters (read t x))
+              in ()
             in ())
          (Working_list_imperative.list t.k)
      in

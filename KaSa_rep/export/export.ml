@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Apr 15 2018>
+  * Last modification: Time-stamp: <Apr 16 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -249,7 +249,7 @@ let compute_env_init
     let () = cli.Run_cli_args.syntaxVersion <- syntax_version in
     let () = cli.Run_cli_args.inputKappaFileNames <- files in
     let (_,_,env, contactmap, _, _, _, _, init), _ =
-      Cli_init.get_compilation ~warning:(fun ~pos _msg -> ()) cli
+      Cli_init.get_compilation ~warning:(fun ~pos _msg -> let _ = pos in ()) cli
     in
     let state =
       Remanent_state.set_init_state

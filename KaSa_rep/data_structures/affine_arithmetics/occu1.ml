@@ -30,20 +30,16 @@ let string_of_trans x =
 let print_trans parameters x =
   match x with
   | Affine_cst  ->
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters) "Affine constant"
-    in
-    Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    ()
   | Counter c ->
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameters) "Counter_%i"
         (Ckappa_sig.int_of_site_name c)
     in
-    Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    ()
   | Bool(a,b)  ->
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameters) "Is_site_%i_in_state_%i"
         (Ckappa_sig.int_of_site_name a) (Ckappa_sig.int_of_state_index b)
     in
-    Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    ()

@@ -147,13 +147,21 @@ let t_s parameters error x =
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
 
+let print_frac parameters f =
+  let () =
+    if f.den = 1 then
+      Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%i" f.num
+    else
+      Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "(%i/%i)" f.num f.den
+  in
+  ()
+
 let affiche_frac parameters f =
   if trace || Remanent_parameters.get_trace parameters then
-    let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters)
-        "num: %i; den: %i" f.num f.den
-    in
-    Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    print_frac parameters f 
+
 
 let affiche_int parameters i =
   if trace || Remanent_parameters.get_trace parameters then
@@ -161,29 +169,34 @@ let affiche_int parameters i =
       match i.inf with
        | Frac a->
          Loggers.fprintf (Remanent_parameters.get_logger parameters)
-           "INF:";
+           "%s"
+           (Remanent_parameters.get_open_int_interval_inclusive_symbol parameters);
          affiche_frac parameters a
        |  Minfinity ->
          Loggers.fprintf (Remanent_parameters.get_logger parameters)
-           "minf"
-       | Unknown ->
+           "%s%s"
+           (Remanent_parameters.get_open_int_interval_infinity_symbol parameters)
+           (Remanent_parameters.get_minus_infinity_symbol parameters)
+       | Unknown | Infinity ->
          Loggers.fprintf (Remanent_parameters.get_logger parameters)       "!U!"
-       |  Infinity ->
-         Loggers.fprintf (Remanent_parameters.get_logger parameters)
-           "inf"
     in
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameters)
-        "---"
+        "%s" (Remanent_parameters.get_int_interval_separator_symbol parameters)
     in
     let () =
       match i.sup with
-      | Frac a-> Loggers.fprintf (Remanent_parameters.get_logger parameters)
-        "INF:";
-        affiche_frac parameters a
-      | Infinity -> Loggers.fprintf (Remanent_parameters.get_logger parameters)
-        "inf"
-      | Unknown | Minfinity  -> ()
+      | Frac a->
+        affiche_frac parameters a;
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "%s" (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters)
+      | Infinity ->
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "%s%s"
+
+          (Remanent_parameters.get_plus_infinity_symbol parameters)
+          (Remanent_parameters.get_close_int_interval_infinity_symbol parameters)
+      | Unknown | Minfinity  ->  Loggers.fprintf (Remanent_parameters.get_logger parameters)       "!U!"
     in ()
 
 let affiche_inter = affiche_int
@@ -318,7 +331,7 @@ let new_point parameters n =
       let () =
         Loggers.fprintf
           (Remanent_parameters.get_logger parameters)
-          "VAR "
+          "Variables:"
       in
       let () =
         List.iter
@@ -327,7 +340,7 @@ let new_point parameters n =
              let () =
                Loggers.fprintf
                  (Remanent_parameters.get_logger parameters)
-                 " "
+                 ", "
              in
              ())
           ((get_all_key m))
@@ -339,32 +352,39 @@ let new_point parameters n =
             "---"
         in
         let () =
-          Loggers.print_newline    (Remanent_parameters.get_logger parameters)
+          Loggers.print_newline
+            (Remanent_parameters.get_logger parameters)
         in
-        let () =
-          List.iter
-            (fun x->
+        let _ =
+          List.fold_left
+            (fun b x->
+               let () =
+                 if b then
+                   Loggers.fprintf
+                     (Remanent_parameters.get_logger parameters)
+                     " + "
+               in
+               let () =
+                 let f = read_val m i x in
+                 if f.num=1 && f.den=1 && not (Occu1.Affine_cst=x)
+                 then ()
+                 else
+                   let () = affiche_frac parameters f in
+                   if  not (Occu1.Affine_cst=x)
+                   then
+                     Loggers.fprintf
+                       (Remanent_parameters.get_logger parameters) "."
+               in
                let () = print_trans parameters x in
-               let () =
-                 Loggers.fprintf
-                   (Remanent_parameters.get_logger parameters)
-                   " num: %i den: %i"
-                   (read_val m i x).num (read_val m i x).den
-               in
-               let () =
-                 Loggers.print_newline    (Remanent_parameters.get_logger parameters)
-               in
-               ())
+               true) false
             (find m.entry i)
         in
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) " = 0" in
         let () =
           Loggers.print_newline    (Remanent_parameters.get_logger parameters)
         in
         ()
       done;
-      let () =
-        Loggers.print_newline    (Remanent_parameters.get_logger parameters)
-      in
       let () =
         Loggers.print_newline    (Remanent_parameters.get_logger parameters)
       in error
@@ -475,7 +495,7 @@ lrep))))
       else
         (
           match (find m.entry i)
-          with (Affine_cst)::k::q -> k
+          with (Affine_cst)::k::_ -> k
              |   [Affine_cst]  -> failwith "compteur_pivot_2"
              |   (Bool _ | Counter _  as k)::q -> k
              |   []  ->  failwith "compteur_pivot_3"

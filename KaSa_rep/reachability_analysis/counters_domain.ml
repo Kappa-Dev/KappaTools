@@ -604,7 +604,7 @@ module Functor =
                        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
                            "%sBot detected" (Remanent_parameters.get_prefix parameters)
                        in
-                       let error = MI.affiche_mat parameters error x' in 
+                       let error = MI.affiche_mat parameters error x' in
                        error, false
                        | Some _ -> error, true)
                   pack_map
@@ -994,14 +994,20 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s:%s%s%s%s%s)"
+                     "%s%s%s => %s%s%s:%s%s%s%s%s%s"
                      agent_string
+                     (Remanent_parameters.get_agent_open_symbol parameters)
+                     (Remanent_parameters.get_agent_close_symbol parameters)
+                     agent_string
+                     (Remanent_parameters.get_agent_open_symbol parameters)
                      site_string
                      (Remanent_parameters.get_open_int_interval_infinity_symbol parameters)
                      (Remanent_parameters.get_minus_infinity_symbol parameters)
                      (Remanent_parameters.get_int_interval_separator_symbol parameters)
                      (Fraction.string_of f)
                      (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters)
+                     (Remanent_parameters.get_agent_close_symbol parameters)
+
                  in
                  error, Loggers.print_newline
                  (Remanent_parameters.get_logger parameters)
@@ -1010,14 +1016,20 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s:%s%s%s%s%s)"
+                     "%s%s%s => %s%s%s:%s%s%s%s%s%s"
                      agent_string
+                     (Remanent_parameters.get_agent_open_symbol parameters)
+                     (Remanent_parameters.get_agent_close_symbol parameters)
+                     agent_string
+                     (Remanent_parameters.get_agent_open_symbol parameters)
                      site_string
                      (Remanent_parameters.get_open_int_interval_inclusive_symbol parameters)
                      (Fraction.string_of f)
                      (Remanent_parameters.get_int_interval_separator_symbol parameters)
                      (Remanent_parameters.get_plus_infinity_symbol parameters)
                      (Remanent_parameters.get_close_int_interval_infinity_symbol parameters)
+(Remanent_parameters.get_agent_close_symbol parameters)
+
                  in
                  error, Loggers.print_newline
                    (Remanent_parameters.get_logger parameters)
@@ -1025,14 +1037,22 @@ module Functor =
                  let () =
                    Loggers.fprintf
                      (Remanent_parameters.get_logger parameters)
-                     "%s(%s:%s%s%s%s%s)"
+                     "%s%s%s => %s%s%s:%s%s%s%s%s%s"
                      agent_string
+                     (Remanent_parameters.get_agent_open_symbol parameters)
+                     (Remanent_parameters.get_agent_close_symbol parameters)
+
+                     agent_string
+                     (Remanent_parameters.get_agent_open_symbol parameters)
+
                      site_string
                      (Remanent_parameters.get_open_int_interval_inclusive_symbol parameters)
                      (Fraction.string_of f1)
                      (Remanent_parameters.get_int_interval_separator_symbol parameters)
                      (Fraction.string_of f2)
                      (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters)
+                     (Remanent_parameters.get_agent_close_symbol parameters)
+
                  in
                  error, Loggers.print_newline
                    (Remanent_parameters.get_logger parameters)
