@@ -33,5 +33,5 @@ B() => [ B(x[.]) v B(x[x1.A]) v B(x[x2.A]) v B(x[x3.A]) v B(x[x4.A]) v B(x[x5.A]
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-A(c:[-1 .. 5])
+A() => A(c{[-1 .. 5]})
 execution finished without any exception

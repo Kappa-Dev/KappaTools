@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Apr 09 2018>
+  * Last modification: Time-stamp: <Apr 16 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -499,6 +499,7 @@ let get_minus_infinity_symbol_1 symbol =
   symbol.Symbol_table.minus_infinity
 let get_int_interval_separator_symbol_1 symbol =
   symbol.Symbol_table.int_interval_separator
+let get_open_counter_state_1 symbol = symbol.Symbol_table.open_counter_state
 let get_open_counterceq_1 symbol =
   symbol.Symbol_table.open_counterceq
 let get_open_countercvar_1 symbol =
@@ -510,6 +511,7 @@ let get_open_counterdelta_1 symbol =
 let get_open_counterval_1 symbol =
   symbol.Symbol_table.open_counterval
 
+let get_close_counter_state_1 symbol = symbol.Symbol_table.close_counter_state
 let get_close_counterceq_1 symbol =
   symbol.Symbol_table.close_counterceq
 let get_close_countercvar_1 symbol =
@@ -763,6 +765,9 @@ let get_close_int_interval_infinity_symbol = upgrade_from_symbols_field get_clos
 let get_plus_infinity_symbol = upgrade_from_symbols_field get_plus_infinity_symbol_1
 let get_minus_infinity_symbol = upgrade_from_symbols_field get_minus_infinity_symbol_1
 let get_int_interval_separator_symbol = upgrade_from_symbols_field get_int_interval_separator_symbol_1
+
+let get_open_counter_state = upgrade_from_symbols_field
+    get_open_counter_state_1
 let get_open_counterceq = upgrade_from_symbols_field
     get_open_counterceq_1
 let get_open_countercgte = upgrade_from_symbols_field
@@ -772,6 +777,8 @@ let get_open_countercvar = upgrade_from_symbols_field
 let get_open_counterdelta = upgrade_from_symbols_field get_open_counterdelta_1
 let get_open_counterval = upgrade_from_symbols_field get_open_counterval_1
 
+let get_close_counter_state = upgrade_from_symbols_field
+    get_close_counter_state_1
 let get_close_counterceq = upgrade_from_symbols_field
     get_close_counterceq_1
 let get_close_countercgte = upgrade_from_symbols_field
@@ -891,7 +898,7 @@ upgrade_from_reachability_analysis_parameters_field
 
 let get_counters_domain =
   upgrade_from_reachability_analysis_parameters_field
-    get_counters_domain_1 
+    get_counters_domain_1
 let get_do_reachability_analysis p =
   upgrade_from_marshal_field get_do_reachability_analysis_1 p
   || get_compute_local_traces p

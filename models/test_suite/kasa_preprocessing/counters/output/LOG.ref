@@ -1366,27 +1366,11 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
 		Bot detected
-Affine constant
-: 0
-Counter_0
-: [-1 .. 0]
-Is_site_1_in_state_0
-: [0 .. 1]
-Is_site_1_in_state_1
-: [0 .. 1]
-VAR Affine constant
- Counter_0
- Is_site_1_in_state_1
- Is_site_1_in_state_0
- ---
-Affine constant
- num: -1 den: 1
-Is_site_1_in_state_1
- num: 1 den: 1
-Is_site_1_in_state_0
- num: 1 den: 1
-
-
+Counter_0: [-1 .. 0]
+Is_site_1_in_state_0: [0 .. 1]
+Is_site_1_in_state_1: [0 .. 1]
+Variables:, Counter_0, Is_site_1_in_state_1, Is_site_1_in_state_0, ---
+-1 + Is_site_1_in_state_1 + Is_site_1_in_state_0 = 0
 
 		the precondition is not satisfied yet
 
@@ -1529,27 +1513,11 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
 		Bot detected
-Is_site_1_in_state_1
-: [0 .. 1]
-Is_site_1_in_state_0
-: [0 .. 1]
-Counter_0
-: [-2 .. 0]
-Affine constant
-: 0
-VAR Affine constant
- Counter_0
- Is_site_1_in_state_1
- Is_site_1_in_state_0
- ---
-Affine constant
- num: -1 den: 1
-Is_site_1_in_state_1
- num: 1 den: 1
-Is_site_1_in_state_0
- num: 1 den: 1
-
-
+Is_site_1_in_state_1: [0 .. 1]
+Is_site_1_in_state_0: [0 .. 1]
+Counter_0: [-2 .. 0]
+Variables:, Counter_0, Is_site_1_in_state_1, Is_site_1_in_state_0, ---
+-1 + Is_site_1_in_state_1 + Is_site_1_in_state_0 = 0
 
 		the precondition is not satisfied yet
 
@@ -1668,8 +1636,6 @@ Is_site_1_in_state_0
 
 	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
 		Bot detected
-Is_site_1_in_state_1
-: [0 .. 1]
-Is_site_1_in_state_0
-: [0 .. 1]
+Is_site_1_in_state_1: [0 .. 1]
+Is_site_1_in_state_0: [0 .. 1]
 Counter_0

@@ -44,11 +44,13 @@ type symbol_table =
     int_interval_separator : string ;
     plus_infinity : string ;
     minus_infinity : string ;
+    open_counter_state : string ;
     open_counterceq: string ;
     open_countercgte: string ;
     open_countercvar: string ;
-    open_counterdelta: string ;
+    open_counterdelta: string;
     open_counterval: string ;
+    close_counter_state: string;
     close_counterceq: string ;
     close_countercgte: string ;
     close_countercvar: string ;
@@ -104,11 +106,13 @@ let symbol_table_V3 =
     close_int_interval_exclusive = "[" ;
     close_int_interval_infinity = "[" ;
     int_interval_separator = " .. ";
+    open_counter_state = "{";
     open_counterceq = "";
     open_countercgte = "";
     open_countercvar = "";
     open_counterdelta = "";
     open_counterval = "";
+    close_counter_state = "}";
     close_counterceq = "";
     close_countercgte = "";
     close_countercvar = "";
@@ -173,6 +177,7 @@ let symbol_table_V4 =
     open_int_interval_infinity = "]" ;
     plus_infinity = "+oo" ;
     minus_infinity = "-oo" ;
+    open_counter_state = "{" ;
     close_int_interval_inclusive = "]" ;
     close_int_interval_exclusive = "[" ;
     close_int_interval_infinity = "[" ;
@@ -182,6 +187,7 @@ let symbol_table_V4 =
     open_countercvar = "";
     open_counterdelta = "";
     open_counterval = "";
+    close_counter_state = "}" ;
     close_counterceq = "";
     close_countercgte = "";
     close_countercvar = "";

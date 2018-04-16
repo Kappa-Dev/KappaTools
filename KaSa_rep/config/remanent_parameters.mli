@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Apr 09 2018>
+  * Last modification: Time-stamp: <Apr 16 2018>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -76,10 +76,12 @@ val get_close_internal_state: Remanent_parameters_sig.parameters -> string
 val get_free_symbol: Remanent_parameters_sig.parameters -> string
 val get_uni_arrow_symbol: Remanent_parameters_sig.parameters -> string
 val get_bi_arrow_symbol: Remanent_parameters_sig.parameters -> string
+val get_open_counter_state: Remanent_parameters_sig.parameters -> string
 val get_open_counterceq: Remanent_parameters_sig.parameters -> string
 val get_open_countercvar: Remanent_parameters_sig.parameters -> string
 val get_open_countercgte: Remanent_parameters_sig.parameters -> string
 val get_open_counterval: Remanent_parameters_sig.parameters -> string
+val get_close_counter_state: Remanent_parameters_sig.parameters -> string 
 val get_close_counterceq: Remanent_parameters_sig.parameters -> string
 val get_close_countercvar: Remanent_parameters_sig.parameters -> string
 val get_close_countercgte: Remanent_parameters_sig.parameters -> string

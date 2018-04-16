@@ -43,11 +43,13 @@ type break_hint =
         int_interval_separator : string ;
         plus_infinity : string ;
         minus_infinity : string ;
+        open_counter_state : string ;
         open_counterceq: string ;
         open_countercgte: string ;
         open_countercvar: string ;
         open_counterdelta: string ;
         open_counterval: string ;
+        close_counter_state : string ; 
         close_counterceq: string ;
         close_countercgte: string ;
         close_countercvar: string ;
