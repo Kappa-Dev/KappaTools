@@ -159,7 +159,7 @@ module Mat_inter =
 
          (I.read (m.i) x).sup=Fraction.Infinity
 
-
+      (* improve this algorithm in the presence of -oo  ?? *)
       let solve_inf parameters error prod  l =
         let m = prod.mat in
         let inter =prod.i in
@@ -171,11 +171,11 @@ module Mat_inter =
           let l=(!li) in
           let error, posm=M.copy parameters (!error_ref) m  in
           let () = error_ref:=error in
-          let rec aux_53 liste =
+          let rec aux_174 liste =
             match liste
             with
             | [] -> ()
-            |  j::q when (not(is_infinite prod j)) -> aux_53 q
+            |  j::q when (not(is_infinite prod j)) -> aux_174 q
             | j::q ->
               (
                 let rec aux2 i pos neg lneg refpos =
@@ -194,7 +194,7 @@ module Mat_inter =
                 in
                 match  (aux2 1 false false [] (-1))
                 with
-                | (false,_,_) ->  aux_53 q
+                | (false,_,_) ->  aux_174 q
     	          | (_,posref,l) ->
                  let rec aux3 l =
                    match l with t::q ->
@@ -202,20 +202,20 @@ module Mat_inter =
                                                     (M.read_val posm
 posref j))) in
                      (M.addligne posm t k  posref;aux3 q)
-                              | [] -> aux_53 q
+                              | [] -> aux_174 q
                  in aux3 l
               )
           in
-          let () = aux_53 l in
+          let () = aux_174 l in
 
 
           let lprob =
             List.filter
-              (fun j -> (let rec aux_90 q =
+              (fun j -> (let rec aux_214 q =
                            if (M.read_val posm q j).num<0 then true
-                           else if q=1 then false
-                           else aux_90 (q-1)
-                          in aux_90 (M.n_ligne posm)))
+                           else if q<=2 then false
+                           else aux_214 (q-1)
+                          in aux_214 (M.n_ligne posm)))
                          (l)  in
           List.iter (fun j -> (try
                                  (let size = M.n_ligne posm in
