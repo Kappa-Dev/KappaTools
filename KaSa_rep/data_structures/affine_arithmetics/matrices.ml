@@ -142,7 +142,7 @@ let t_i parameters i =
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%i" i in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
 
-let t_s parameters error x =
+let t_s parameters _error x =
   if trace || Remanent_parameters.get_trace parameters then
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -160,7 +160,7 @@ let print_frac parameters f =
 
 let affiche_frac parameters f =
   if trace || Remanent_parameters.get_trace parameters then
-    print_frac parameters f 
+    print_frac parameters f
 
 
 let affiche_int parameters i =
@@ -345,6 +345,10 @@ let new_point parameters n =
              ())
           ((get_all_key m))
       in
+      let () =
+        Loggers.print_newline
+          (Remanent_parameters.get_logger parameters)
+      in
       for i=1 to (!(m.nligne)) do
         let ()=
           Loggers.fprintf
@@ -369,7 +373,7 @@ let new_point parameters n =
                  if f.num=1 && f.den=1 && not (Occu1.Affine_cst=x)
                  then ()
                  else
-                   let () = affiche_frac parameters f in
+                   let () = print_frac parameters f in
                    if  not (Occu1.Affine_cst=x)
                    then
                      Loggers.fprintf
@@ -497,7 +501,7 @@ lrep))))
           match (find m.entry i)
           with (Affine_cst)::k::_ -> k
              |   [Affine_cst]  -> failwith "compteur_pivot_2"
-             |   (Bool _ | Counter _  as k)::q -> k
+             |   (Bool _ | Counter _  as k)::_ -> k
              |   []  ->  failwith "compteur_pivot_3"
         )
 

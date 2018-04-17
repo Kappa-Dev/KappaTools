@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Mar 01 2018>
+  * Last modification: Time-stamp: <Apr 17 2018>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -319,7 +319,7 @@ type compute_full_support_output =
   | Degradation of (Ckappa_sig.c_agent_name * SiteSet.t * Ckappa_sig.Views_bdu.mvbdu)
   | Nil
 
-let compute_full_support parameters error ag_id rule =
+let compute_full_support parameters error handler ag_id rule =
   let test = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
   let diff = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_direct in
   let error', agent =
@@ -354,15 +354,23 @@ let compute_full_support parameters error ag_id rule =
         let error, list, list' =
           Ckappa_sig.Site_map_and_set.Map.fold
             (fun site state (error,list,list') ->
-               let error', list = SiteSet.add parameters error site list in
-               let error =
-                 Exception.check_point
-                   Exception.warn
-                   parameters error error'
-                   __POS__
-                   Exit
+               let error, b_counter =
+                 Handler.is_counter parameters error handler
+                   v.Cckappa_sig.agent_name site
                in
-               error, list,(site,state)::list')
+               if not b_counter
+               then
+                 let error', list = SiteSet.add parameters error site list in
+                 let error =
+                   Exception.check_point
+                     Exception.warn
+                     parameters error error'
+                     __POS__
+                     Exit
+                 in
+                 error, list,(site,state)::list'
+               else
+            error, list, list')
             v.Cckappa_sig.agent_interface
             (error, SiteSet.empty,[])
         in
@@ -417,7 +425,7 @@ let compute_full_support parameters error ag_id rule =
         error, Mod (name,list,list',list'',list''')
     end
 
-let build_support parameters error rules dead_rules =
+let build_support parameters error handler rules dead_rules =
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
     parameters error
     (fun parameters error r_id rule (map, creation, degradation) ->
@@ -428,7 +436,7 @@ let build_support parameters error rules dead_rules =
            parameters error
            (fun parameters error ag_id _  (map, creation, degradation) ->
               match
-                compute_full_support parameters error ag_id rule
+                compute_full_support parameters error handler ag_id rule
               with
               | error, Nil->
                 error, (map, creation, degradation)
@@ -1247,7 +1255,7 @@ let agent_trace
       parameters error static dead_rules
   in
   let error, (support, creation, degradation) =
-    build_support parameters error rules dead_rules
+    build_support parameters error handler_kappa rules dead_rules
   in
   let error, init =
     Int_storage.Nearly_inf_Imperatif.fold

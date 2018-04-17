@@ -1365,13 +1365,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x[])
 
 	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
-		Bot detected
-Counter_0: [-1 .. 0]
-Is_site_1_in_state_0: [0 .. 1]
-Is_site_1_in_state_1: [0 .. 1]
-Variables:, Counter_0, Is_site_1_in_state_1, Is_site_1_in_state_0, ---
--1 + Is_site_1_in_state_1 + Is_site_1_in_state_0 = 0
-
 		the precondition is not satisfied yet
 
 	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
@@ -1512,13 +1505,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x[])
 
 	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
-		Bot detected
-Is_site_1_in_state_1: [0 .. 1]
-Is_site_1_in_state_0: [0 .. 1]
-Counter_0: [-2 .. 0]
-Variables:, Counter_0, Is_site_1_in_state_1, Is_site_1_in_state_0, ---
--1 + Is_site_1_in_state_1 + Is_site_1_in_state_0 = 0
-
 		the precondition is not satisfied yet
 
 	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
@@ -1635,7 +1621,377 @@ Variables:, Counter_0, Is_site_1_in_state_1, Is_site_1_in_state_0, ---
 		Updating the views for B(x[])
 
 	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
-		Bot detected
-Is_site_1_in_state_1: [0 .. 1]
-Is_site_1_in_state_0: [0 .. 1]
-Counter_0
+		the precondition is not satisfied yet
+
+	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+		the precondition is satisfied
+
+	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},x[])
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:) will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Id=26
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:1<2)
+    Id=14
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+agent_type:1:B:cv_id:0
+Id=17
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=29
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=28
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=31
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A() => [ A(x{u}[#]) v A(x{p}[#]) ]
+A() => [ A(x[.]) v A(x[x.B]) ]
+B() => [ B(x[.]) v B(x[x.A]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=29
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=28
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=31
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+A() => A(d{[1 .. 4]})
+B() => B(c{]-oo .. 0]})
+INTENSIONAL DESCRIPTION:
+Id=29
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=28
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=31
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=29
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=28
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=31
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+------------------------------------------------------------
+* Export Views domain - non relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+B()=> [
+		  B(x[.])
+		v B(x[x.A])]
+A()=> [
+		  A(x[.])
+		v A(x[x.B])]
+A()=> [
+		  A(x{u}[#])
+		v A(x{p}[#])]
+
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Counters to JSon (internal constraints_list):
+------------------------------------------------------------
+A()=> [A(d[.]:[1 .. 4])]
+B()=> [B(c[.]:]-oo .. 0])]
+
+execution finished without any exception

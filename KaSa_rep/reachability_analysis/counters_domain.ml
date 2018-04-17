@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 16 2018>
+  * Last modification: Time-stamp: <Apr 17 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -600,12 +600,18 @@ module Functor =
                        in
                        match x_opt with
                        | None ->
-                       let () = dump_title () in
-                       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                           "%sBot detected" (Remanent_parameters.get_prefix parameters)
-                       in
-                       let error = MI.affiche_mat parameters error x' in
-                       error, false
+                         if local_trace ||
+                            Remanent_parameters.get_dump_reachability_analysis_diff parameters
+                         then
+                           let () = dump_title () in
+                           let () = Loggers.fprintf
+                               (Remanent_parameters.get_logger parameters)
+                               "%sBot detected" (Remanent_parameters.get_prefix parameters)
+                           in
+                           let error = MI.affiche_mat parameters error x' in
+                           error, false
+                         else
+                           error, false 
                        | Some _ -> error, true)
                   pack_map
             )

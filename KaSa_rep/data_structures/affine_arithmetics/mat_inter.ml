@@ -935,7 +935,7 @@ let exclusion parameters error p l  =
 
    let string_of_pro parameters error m x =
      let error, interv = interval_of_pro parameters error m x in
-     error, Intervalles.string_of_intervalle parameters interv
+    Intervalles.string_of_intervalle parameters error interv
 
    let interval_of_pro parameters error m x =
      let error, interv = interval_of_pro parameters error m x in

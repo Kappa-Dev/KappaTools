@@ -71,8 +71,8 @@ let ffdiv a b =
   | Infinity,Frac(a) when a.num<0 -> Minfinity
   | Minfinity,Frac(a) when a.num<0 -> Infinity
   | Minfinity,Frac(a) when a.num>0 -> Minfinity
-  | Frac(a),Infinity -> Frac{num=0;den=1}
-  | Frac(a),Minfinity -> Frac{num=0;den=1}
+  | Frac(_),Infinity -> Frac{num=0;den=1}
+  | Frac(_),Minfinity -> Frac{num=0;den=1}
   | (Unknown, _) | (_, Unknown)
   | (Infinity | Minfinity ),(Infinity | Minfinity | Frac _)   -> Unknown
 

@@ -166,18 +166,27 @@ let contient_zero i =
 
 
 
-let string_of_intervalle parameters i =
-    match i with
-        _ when i.sup=Infinity ->
-        ((Remanent_parameters.get_open_int_interval_inclusive_symbol parameters )^
-         (string_of_int(trunc (i.inf)))^
-         (Remanent_parameters.get_int_interval_separator_symbol parameters)^
-         (Remanent_parameters.get_plus_infinity_symbol  parameters )^
-         (Remanent_parameters.get_close_int_interval_infinity_symbol parameters ))
-   |  _ when trunc(i.inf)=trunc(i.sup)    -> string_of_int(trunc(i.inf))
-   |  _ ->
-     (Remanent_parameters.get_open_int_interval_inclusive_symbol parameters )^
-     (string_of_int(trunc i.inf))^
-     (Remanent_parameters.get_int_interval_separator_symbol parameters)^
-     (string_of_int(trunc(i.sup)))^
-     (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters )
+let string_of_intervalle parameters error i =
+  let error, inf_string =
+    match i.inf with
+    | Infinity | Unknown ->
+      Exception.warn parameters error __POS__ Exit "BUG"
+    | Frac a ->
+      error, ((Remanent_parameters.get_open_int_interval_inclusive_symbol parameters )^(string_of_int(cell_int (i.inf))))
+    | Minfinity ->
+      error, ((Remanent_parameters.get_open_int_interval_infinity_symbol parameters)^
+      (Remanent_parameters.get_minus_infinity_symbol parameters))
+  in
+  let error, sup_string =
+    match i.sup with
+    | Minfinity | Unknown ->
+      Exception.warn parameters error __POS__ Exit "BUG"
+    | Frac a ->
+      error, ((string_of_int(floor_int (i.sup)))^
+       (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters))
+    | Infinity ->
+      error, (
+        (Remanent_parameters.get_plus_infinity_symbol parameters)^
+        (Remanent_parameters.get_close_int_interval_infinity_symbol parameters))
+  in
+  error, inf_string^(Remanent_parameters.get_int_interval_separator_symbol parameters)^sup_string
