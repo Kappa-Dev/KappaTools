@@ -89,7 +89,7 @@ install:
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] || [ '$CHECKED' = windows ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then opam install -y atdgen cohttp-lwt-unix ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then pip install -v . nose ; fi"
-  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-windows lwt-windows ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-windows lwt-windows fmt-windows logs-windows ; fi"
 
 script:
   - make all
