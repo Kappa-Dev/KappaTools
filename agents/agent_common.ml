@@ -21,7 +21,7 @@ let lwt_reporter chan =
     let k () =
       let write () = match level with
       | Logs.App -> Lwt_io.write Lwt_io.stdout (app_flush ())
-      | Logs.(Debug | Info | Warning) | Logs.Error ->
+      | Logs.Debug | Logs.Info | Logs.Warning | Logs.Error ->
         Lwt_io.write
           (Option_util.unsome Lwt_io.stderr chan)
           (dst_flush ())
