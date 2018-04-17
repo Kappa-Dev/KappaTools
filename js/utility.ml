@@ -53,11 +53,11 @@ let print_counter_interval (a,b) list =
     | None -> Public_data.close_interval_exclusive_symbol, Public_data.plus_infinity_symbol
     | Some b -> Public_data.close_interval_inclusive_symbol, string_of_int b
   in
-  print_string close_range
-    (print_string sup
+  print_string open_range
+    (print_string inf
        (print_string Public_data.counter_state_range_backend_symbol
-          (print_string inf
-             (print_string open_range list))))
+          (print_string sup
+             (print_string close_range list))))
 
 let print_counter_state (a,b) list =
   print_string

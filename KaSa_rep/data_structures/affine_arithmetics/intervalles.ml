@@ -171,7 +171,7 @@ let string_of_intervalle parameters error i =
     match i.inf with
     | Infinity | Unknown ->
       Exception.warn parameters error __POS__ Exit "BUG"
-    | Frac a ->
+    | Frac _ ->
       error, ((Remanent_parameters.get_open_int_interval_inclusive_symbol parameters )^(string_of_int(cell_int (i.inf))))
     | Minfinity ->
       error, ((Remanent_parameters.get_open_int_interval_infinity_symbol parameters)^
@@ -181,7 +181,7 @@ let string_of_intervalle parameters error i =
     match i.sup with
     | Minfinity | Unknown ->
       Exception.warn parameters error __POS__ Exit "BUG"
-    | Frac a ->
+    | Frac _ ->
       error, ((string_of_int(floor_int (i.sup)))^
        (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters))
     | Infinity ->
