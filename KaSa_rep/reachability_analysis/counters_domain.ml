@@ -114,7 +114,7 @@ module Functor =
          (get_local_static_information
             static).Counters_domain_type.packs
 
-  let get_backqard_pointers static =
+  let get_backward_pointers static =
   (get_local_static_information
      static).Counters_domain_type.backward_pointers
 
@@ -611,7 +611,7 @@ module Functor =
                            let error = MI.affiche_mat parameters error x' in
                            error, false
                          else
-                           error, false 
+                           error, false
                        | Some _ -> error, true)
                   pack_map
             )
@@ -685,7 +685,7 @@ module Functor =
     let rule_creation = get_rule_creation static in
     (*-----------------------------------------------------------*)
     let error, rule = get_rule parameters error static rule_id in
-    let backward = get_backqard_pointers static in
+    let backward = get_backward_pointers static in
     let error, potential_side_effects =
       Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
         parameters error []
@@ -1089,6 +1089,7 @@ module Functor =
   let export static dynamic error kasa_state =
       let parameters = get_parameter static in
       let kappa_handler = get_kappa_handler static in
+      let back = get_backward_pointers static in
       let store_value = get_value dynamic in
       let domain_name = "Counters" in
       (*string * 'site_graph lemma list : head*)
@@ -1107,11 +1108,41 @@ module Functor =
       let error, current_list =
         Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
           parameters error
-          (fun parameters error (agent_type, site) mi current_list ->
-             let error, intervalle =
-               MI.interval_of_pro parameters error mi (Occu1.Counter site)
+          (fun parameters error (agent_type, site) _ current_list ->
+             let error, back_site_opt =
+               Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                 parameters error (agent_type, site) back
              in
-             match intervalle with
+             let error, back_site =
+               match back_site_opt with
+               | None -> Exception.warn parameters error __POS__ Exit Ckappa_sig.Site_map_and_set.Set.empty
+               | Some set -> error, set
+             in
+             let error, intervalle_opt =
+               Ckappa_sig.Site_map_and_set.Set.fold
+                 (fun counter (error, intervalle_opt) ->
+                    let error, mi_opt = Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                        parameters error (agent_type,counter) store_value
+                    in
+                      match mi_opt with
+                      | Some new_mi ->
+                        begin
+                          let error, interv =
+                            MI.interval_of_pro parameters error new_mi (Occu1.Counter site)
+                          in
+                          match intervalle_opt, interv with
+                          | None, _ -> error, interv
+                          | _, None -> error, intervalle_opt
+                          | Some (a,b), Some (c,d) ->
+                            error, Some (Fraction.ffmax a c, Fraction.ffmin b d)
+                        end
+                      | None ->
+                        Exception.warn parameters error __POS__ Exit intervalle_opt
+                 )
+                 back_site
+                 (error, None)
+             in
+             match intervalle_opt with
              | Some (Fraction.Minfinity, Fraction.Infinity) ->
                error, current_list
              | None
