@@ -12,7 +12,9 @@ open Lwt.Infix
 class system_process () : Kappa_facade.system_process =
   object
     method log ?exn (msg : string) =
-      Lwt_log_core.log ~level:Lwt_log_core.Info ?exn msg
+      Logs_lwt.info
+        (fun m -> m "%s%a" msg
+            (Pp.option (fun f e -> Fmt.pf f ": %s" (Printexc.to_string e))) exn)
     method yield () : unit Lwt.t = Lwt_main.yield ()
     method min_run_duration () = 0.1
   end
@@ -46,10 +48,15 @@ let () =
     Arg.parse options
       (fun _ -> ()) usage_msg in
   (* set protocol version *)
+  let () = Logs.set_reporter
+      (Agent_common.lwt_reporter app_args.App_args.log_channel) in
   let process_comand : string -> unit Lwt.t =
     (match app_args.App_args.api with
      | App_args.V2 -> process_comand_v2
     ) stdsim_args.Agent_args.delimiter in
   Lwt_main.run
     (Agent_common.serve
-       Lwt_io.stdin stdsim_args.Agent_args.delimiter process_comand)
+       Lwt_io.stdin stdsim_args.Agent_args.delimiter process_comand >>= fun ()->
+     match app_args.App_args.log_channel with
+     | None -> Lwt.return_unit
+     | Some ch -> Lwt_io.close ch)

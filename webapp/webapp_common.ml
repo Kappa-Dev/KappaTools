@@ -32,9 +32,8 @@ let error_response
   let () =
     Lwt.async
       (fun () ->
-         Lwt_log_core.log
-           ~level:Lwt_log_core.Debug
-           (Format.sprintf " + error : %s" error_msg))
+         Logs_lwt.debug
+           (fun m -> m " + error : %s" error_msg))
   in
   Server.respond_string
     ~headers
@@ -59,7 +58,7 @@ let api_result_response
     ~error:(fun (code : Api.manager_code) (errors : Api_types_j.errors) ->
         let error_msg : string = Api_types_j.string_of_errors errors in
         let status :> Cohttp.Code.status_code = code in
-        Lwt_log_core.log ~level:Lwt_log_core.Error error_msg >>= fun () ->
+        Logs_lwt.err (fun m -> m "%s" error_msg) >>= fun () ->
         Server.respond_string ~headers ~status ~body:error_msg ())
 
 let result_response ~string_of_success = function
@@ -134,9 +133,8 @@ let create_url_matcher (url : string) : url_matcher =
   let () =
     Lwt.async
       (fun () ->
-         Lwt_log_core.log
-           ~level:Lwt_log_core.Debug
-           (Format.sprintf " + route : %s" (Format.asprintf "%a" Re.pp pattern)))
+         Logs_lwt.debug
+           (fun m -> m " + route : %a" Re.pp pattern))
   in
   let re = Re.compile pattern in
   { re; labels; route = url ; }
@@ -157,14 +155,13 @@ let rec match_url
        let () =
          Lwt.async
            (fun () ->
-              Lwt_log_core.log_f
-                ~level:Lwt_log_core.Debug
-                "match_url :\n+ url : '%s'\n+ route: '%s'\n+ args: { %a }"
-                url matcher.route
-                (fun () -> Format.asprintf "@[%a@]"
+              Logs_lwt.debug
+                (fun m -> m
+                    "match_url :\n+ url : '%s'\n+ route: '%s'\n+ args: { @[%a@] }"
+                    url matcher.route
                     (Pp.list Pp.comma
-                       (fun f (key,value) -> Format.fprintf f "%s: %s" key value)))
-                get_parameters) in
+                       (fun f (key,value) -> Format.fprintf f "%s: %s" key value))
+                    get_parameters)) in
        [arg,get_parameters]
      with Not_found -> [])
     @(match_url tail url)

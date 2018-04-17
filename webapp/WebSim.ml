@@ -18,7 +18,7 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
   : (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t =
   (Lwt.catch
      (fun () -> handler conn request body)
-     (fun exn -> Lwt_log.fatal ~exn "" >>=
+     (fun exn -> Logs_lwt.err (fun m -> m "%s" (Printexc.to_string exn)) >>=
        (fun () -> Lwt.fail exn))
   )
   >>=
@@ -46,14 +46,15 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
        Cohttp.Code.string_of_status
          response.Cohttp.Response.status
      in
-     (Lwt_log_core.info_f
-        "%s\t[%02d/%02d/%04d %02d:%02d:%02d]\t\"%s %s\"\t%s"
-        ip
-        t.Unix.tm_mday t.Unix.tm_mon (1900 + t.Unix.tm_year)
-        t.Unix.tm_hour t.Unix.tm_min t.Unix.tm_sec
-        request_method
-        request_path
-        response_code)
+     Logs_lwt.info
+       (fun m ->
+          m "%s\t[%02d/%02d/%04d %02d:%02d:%02d]\t\"%s %s\"\t%s"
+            ip
+            t.Unix.tm_mday t.Unix.tm_mon (1900 + t.Unix.tm_year)
+            t.Unix.tm_hour t.Unix.tm_min t.Unix.tm_sec
+            request_method
+            request_path
+            response_code)
      >>=
      (fun _ -> Lwt.return (response,body))
   )
@@ -68,6 +69,8 @@ let server =
   in
   let usage_msg : string = "kappa webservice" in
   let () = Arg.parse options (fun _ -> ()) usage_msg in
+  let () = Logs.set_reporter
+      (Agent_common.lwt_reporter app_args.App_args.log_channel) in
   let () = Printexc.record_backtrace common_args.Common_args.backtrace in
   let mode = match websim_args.Websim_args.cert_dir with
     | None -> `TCP (`Port websim_args.Websim_args.port)
@@ -95,7 +98,11 @@ let server =
           )
        )
        ()
-    )
+    ) >>= fun () ->
+  match app_args.App_args.log_channel with
+  | None -> Lwt.return_unit
+  | Some ch -> Lwt_io.close ch
+
 let () =
   let () = Lwt.async_exception_hook := ignore in (* see https://github.com/mirage/ocaml-cohttp/issues/511 *)
   ignore (Lwt_main.run server)

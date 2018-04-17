@@ -17,6 +17,8 @@ depends : [
   "ocamlbuild" {build}
   "yojson"
   "lwt" { >= "2.6.0" }
+  "fmt"
+  "logs"
 ]
 
 depopts: [

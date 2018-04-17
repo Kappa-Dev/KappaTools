@@ -6,13 +6,14 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type api_version = V2;;
+type api_version = V2
 
-type t = { mutable seed_value : int option ;
-           mutable api : api_version ; }
+type t = {
+  mutable api : api_version;
+  mutable log_channel : Lwt_io.output_channel option;
+}
 
-let default : t = { seed_value = None;
-                    api = V2; }
+let default : t = { api = V2; log_channel = None; }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
   ("--development",
@@ -22,33 +23,32 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("--log",
    Arg.String
      (fun file_name ->
-        let () =
-          Lwt.bind
-            (if file_name = "-" then
-               Lwt.return
-                 (Lwt_log.channel
-                    ~close_mode:(`Keep) ~channel:(Lwt_io.stdout) ())
-             else
-               Lwt_log.file ~mode:`Append ~file_name ())
-            (fun l -> let () = Lwt_log_core.default := l in
-              Lwt.return_unit) |> Lwt.ignore_result
-        in
-        ()
+        let () = Lwt.ignore_result (match t.log_channel with
+            | None -> Lwt.return_unit
+            | Some c -> Lwt_io.close c) in
+        if file_name = "-" then t.log_channel <- None
+        else
+          let fd = Unix.openfile
+              file_name
+              [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_APPEND; Unix.O_NONBLOCK]
+              0o640 in
+          let () = Unix.set_close_on_exec fd in
+          t.log_channel <-
+            Some (Lwt_io.of_unix_fd ~mode:Lwt_io.output fd)
      ),
    "path to log file path '-' logs to stdout");
   ("--level",
    Arg.String
          (fun level ->
-         Lwt_log_core.append_rule "*"
-           (match level with
-            | "debug" -> Lwt_log_core.Debug
-            | "info" -> Lwt_log_core.Info
-            | "notice" -> Lwt_log_core.Notice
-            | "warning" -> Lwt_log_core.Warning
-            | "error" -> Lwt_log_core.Error
-            | "fatal" -> Lwt_log_core.Fatal
-            | level -> raise (Arg.Bad ("\""^level^"\" is not a valid level"))
-           )),
-   "levels : debug,info,notice,warning,error,fatal"
+         Logs.set_level
+           (Some (match level with
+                | "debug" -> Logs.Debug
+                | "info" -> Logs.Info
+                | "warning" -> Logs.Warning
+                | "error" -> Logs.Error
+                | "app" -> Logs.App
+                | level -> raise (Arg.Bad ("\""^level^"\" is not a valid level"))
+              ))),
+   "levels : debug,info,warning,error,app"
   )
   ]
