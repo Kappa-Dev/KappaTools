@@ -1,3 +1,6 @@
+module EQUREL =
+  Union_find.Make (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif)
+
 let add_relation_one_step parameters error
     ~agent_name ~source ~target array
   =
@@ -47,8 +50,11 @@ let add_relation_two_steps parameters error
     parameters error agent_name new_map array
 
 
-let add_dependence parameters error
-    ~agent_name ~site ~counter ~packs ~backward_dependences =
+let add_dependence parameters error handler
+    ~agent_name ~site ~counter ~packs ~backward_dependences ~equivalence_relation =
+  let error, is_counter =
+    Handler.is_counter parameters error handler agent_name site
+  in
   let error, packs =
     add_relation_two_steps
       parameters error
@@ -60,7 +66,125 @@ let add_dependence parameters error
       ~agent_name~source:site ~target:counter
       backward_dependences
   in
-  error, (packs, backward_dependences)
+  let error, equivalence_relation =
+    EQUREL.union_list
+      parameters
+      error
+      equivalence_relation
+      [agent_name,site;agent_name,counter]
+  in
+  error, (packs, backward_dependences,equivalence_relation)
+
+let quotient_packs parameters error packs equivalence =
+  let error, agent_array =
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create
+      parameters error 1
+  in
+  let error, (equivalence, packs) =
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
+      parameters error
+      (fun parameters error agent_name site_map (equivalence, new_packs) ->
+         let error, new_site_map =
+           match
+             Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
+               parameters error agent_name new_packs
+           with
+           | error, None ->
+             Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters error 1
+           | error, Some a -> error, a
+         in
+         let error, (equivalence, new_site_map) =
+           Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.fold
+             parameters error
+             (fun parameters error site pack (equivalence, new_site_map) ->
+                let error, equivalence, (agent',site') =
+                  EQUREL.get_representent
+                    parameters error (agent_name,site) equivalence
+                in
+                let error, new_site_map =
+                  if agent_name = agent'
+                  then
+                    let error, old_pack_opt =
+                      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                        parameters error
+                        site'
+                        new_site_map
+                    in
+                    let error, new_pack =
+                      match old_pack_opt with None -> error, pack
+                                        | Some old_pack ->
+                      Ckappa_sig.Site_map_and_set.Set.union
+                        parameters error pack old_pack
+                    in
+                    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.set
+                      parameters error site'
+                      new_pack new_site_map
+                  else
+                    Exception.warn parameters error __POS__ Exit new_site_map
+                in
+                error, (equivalence, new_site_map)
+             )
+             site_map
+             (equivalence, new_site_map)
+         in
+         let error, new_agent_array =
+             Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
+               parameters error agent_name new_site_map new_packs
+         in
+         error, (equivalence, new_agent_array)
+      )
+      packs
+      (equivalence, agent_array)
+  in
+  error, equivalence, packs
+
+let quotient_back parameters error back equivalence =
+  let error, new_back =
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create
+      parameters error
+      (1,1)
+  in
+  let error, (equivalence, back) =
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
+      parameters error
+      (fun parameters error (agent_name, site) set (equivalence,new_back) ->
+         let error, equivalence, new_set =
+           Ckappa_sig.Site_map_and_set.Set.fold
+             (fun key (error, equivalence, new_set) ->
+                let error, equivalence, (agent_name',key')  =
+                  EQUREL.get_representent parameters error (agent_name,key)  equivalence
+                in
+                if agent_name = agent_name'
+                then
+                  let error, new_set =
+                    Ckappa_sig.Site_map_and_set.Set.add_when_not_in
+                      parameters
+                      error
+                      key'
+                      new_set
+                  in
+                  error, equivalence, new_set
+                else
+                  let error, () =
+                    Exception.warn parameters error __POS__ Exit ()
+                  in
+                  error, equivalence, new_set)
+             set (error, equivalence, Ckappa_sig.Site_map_and_set.Set.empty)
+         in
+         let error, new_back =
+           Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent_name, site) new_set new_back
+         in
+             error, (equivalence, new_back)
+      )
+      back
+      (equivalence, new_back)
+  in
+  error, equivalence, back
+
+let quotient parameters error packs backward equivalence =
+  let error, equivalence, packs = quotient_packs parameters error packs equivalence in
+  let error, equivalence, backward = quotient_back parameters error backward equivalence in
+  error, equivalence, packs, backward
 
 let compute_packs parameters error handler compil =
   let error, packs =
@@ -69,11 +193,15 @@ let compute_packs parameters error handler compil =
   let error, backward_dependences =
     Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0,0)
   in
-  let error, (packs, backward_dependences) =
+  let error, equivalence_relation =
+    EQUREL.create parameters error (1,1)
+  in
+  let error, (packs, backward_dependences, equivalence_relation) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameters
       error
-      (fun parameters error _rule_id rule (packs, backward_dependences)  ->
+      (fun parameters error _rule_id rule
+        (packs, backward_dependences,equivalence_relation)  ->
          let rule = rule.Cckappa_sig.e_rule_c_rule in
          let actions = rule.Cckappa_sig.actions.Cckappa_sig.translate_counters in
          let error, agents_with_counters =
@@ -104,11 +232,11 @@ let compute_packs parameters error handler compil =
              (error, Ckappa_sig.Agent_id_map_and_set.Map.empty)
              actions
          in
-         let error, (packs, backward_dependences)  =
+         let error, (packs, backward_dependences,equivalence_relation)  =
            Ckappa_sig.Agent_id_map_and_set.Map.fold
              (fun
                ag list_of_counters
-               (error, (packs, backward_dependences))
+               (error, (packs, backward_dependences,equivalence_relation))
                ->
                  match
                    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
@@ -116,33 +244,43 @@ let compute_packs parameters error handler compil =
                      ag
                      rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
                  with
-                 | error, None -> error, (packs, backward_dependences)
+                 | error, None -> error,
+                                  (packs, backward_dependences, equivalence_relation)
                  | error, Some a ->
                    begin
                      match a with
                      | Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _
                      | Cckappa_sig.Unknown_agent _ ->
-                       error, (packs, backward_dependences)
+                       error, (packs, backward_dependences,equivalence_relation)
                      | Cckappa_sig.Agent ag ->
                        let agent_name = ag.Cckappa_sig.agent_name in
                        Ckappa_sig.Site_map_and_set.Map.fold
-                         (fun site _ (error, (packs, backward_dependences)) ->
+                         (fun site _
+                           (error, (packs, backward_dependences,equivalence_relation)) ->
                             List.fold_left
-                              (fun (error, (packs, backward_dependences)) counter ->
+                              (fun
+                                (error,
+                                 (packs, backward_dependences,equivalence_relation))
+                                counter ->
                                  add_dependence
-                                   parameters error
-                                   ~agent_name ~site ~counter ~packs ~backward_dependences)
-                              (error, (packs, backward_dependences))
+                                   parameters error handler
+                                   ~agent_name ~site ~counter ~packs ~backward_dependences
+                                   ~equivalence_relation)
+                              (error,
+                               (packs, backward_dependences, equivalence_relation))
                               list_of_counters)
                          ag.Cckappa_sig.agent_interface
-                         (error, (packs, backward_dependences))
+                         (error, (packs, backward_dependences, equivalence_relation))
                    end
              )
              agents_with_counters
-             (error, (packs, backward_dependences))
+             (error, (packs, backward_dependences, equivalence_relation))
          in
-         error, (packs, backward_dependences)
-      ) compil.Cckappa_sig.rules (packs, backward_dependences)
+         error, (packs, backward_dependences, equivalence_relation)
+      ) compil.Cckappa_sig.rules (packs, backward_dependences, equivalence_relation)
+  in
+  let error, _, packs, backward_dependences =
+    quotient parameters error packs backward_dependences equivalence_relation
   in
   error, (packs, backward_dependences)
 

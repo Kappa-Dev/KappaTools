@@ -4,7 +4,7 @@
     * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 2015, the 11th of March
-    * Last modification: Time-stamp: <Aug 06 2016>
+    * Last modification: Time-stamp: <Apr 18 2018>
     * *
     * This library provides primitives to deal with union find algorithm with
     * path compression
@@ -38,6 +38,13 @@ sig
      Exception.method_handler ->
      key -> key -> Exception.method_handler) ->
     t -> Exception.method_handler
+
+  val get_representent:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  key ->
+  t ->
+  Exception.method_handler * t * key
 end
 
 module Make =
@@ -69,15 +76,11 @@ module Make =
         in
         let rec helper parameter error e l t =
           let error, parent =
-            Storage.get parameter error e t
+            Storage.unsafe_get parameter error e t
           in
           match parent
           with
-          | None ->
-            Exception.warn
-              parameter error __POS__
-              ~message:"Error, missing association"
-              Exit (t,None)
+          | None -> error, (t,e)
           | Some p when p <> e ->
             helper parameter error p (e::l) t
           | Some p ->
@@ -85,27 +88,21 @@ module Make =
               (* base case: we hit the root node make all collected nodes on the
                  path point to the root. And return the root afterwards *)
               let error, t = pointToRoot parameter error p l t in
-              error, (t, Some p)
+              error, (t, p)
             end
         in
         helper parameter error e [] t
 
+      let get_representent parameters error e t =
+        let error, (union, elt) = findSet parameters error e t in
+        error, union, elt
       (*********************************************************************)
       (*UNION*)
 
       let union parameter error x y t =
         let error, (t, root_x) = findSet parameter error x t in
         let error, (t, root_y) = findSet parameter error y t in
-        match
-          root_x,root_y
-        with
-        | None, _ | _, None ->
-          Exception.warn
-            parameter error __POS__
-            ~message:"missing_association"
-            Exit t
-        | Some a,Some b ->
-          Storage.set parameter error a b t
+          Storage.set parameter error root_x root_y t
 
 
 
