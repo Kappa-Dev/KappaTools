@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa missing_binding_state.ka --debugging-mode --output-directory output -syntax 4 || exit 0

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Mar 01 2018>
+ * Last modification: Time-stamp: <Apr 20 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -83,6 +83,7 @@ and link =
   | LNK_ANY   of position
   | LNK_SOME  of position
   | LNK_TYPE  of (string Locality.annot * string Locality.annot)
+  | LNK_MISSING
 
 type direction = Direct | Reverse
 
@@ -235,6 +236,7 @@ let rename_link parameters error f link =
     let error, ag = f parameters error ag in
     let error, ag' = f parameters error ag' in
     error, LNK_VALUE (ag,x,y,ag',position)
+  | LNK_MISSING
   | FREE
   | LNK_ANY _
   | LNK_SOME _
@@ -350,6 +352,8 @@ let join_link parameters error link1 link2 =
   then error, link1
   else
     match link1, link2 with
+    | LNK_MISSING,_ | _, LNK_MISSING ->
+      Exception.warn parameters error __POS__ Exit link1
     | LNK_ANY _, _ -> error, link2
     | _, LNK_ANY _ -> error, link1
     | FREE, _ | _, FREE ->
@@ -405,12 +409,12 @@ let join_counter parameters error counter1 counter2 =
   else
     Exception.warn parameters error __POS__ Exit counter1
 
-type interface_elt = Port of port | Counter of counter
+type interface_elt = Port of port | CounterP of counter
 let rev_list_of_interface x =
   let rec aux x output =
     match x with
     | PORT_SEP (port, interface) -> aux interface (Port port::output)
-    | COUNTER_SEP (counter, interface) -> aux interface (Counter counter::output)
+    | COUNTER_SEP (counter, interface) -> aux interface (CounterP counter::output)
     | EMPTY_INTF -> output
   in
   aux x []
@@ -419,7 +423,7 @@ let rev_interface_of_list x =
   let rec aux list x =
     match list with [] -> x
                   | Port t::q -> aux q (PORT_SEP(t,x))
-                  | Counter t::q -> aux q (COUNTER_SEP (t,x))
+                  | CounterP t::q -> aux q (COUNTER_SEP (t,x))
   in
   aux x EMPTY_INTF
 
@@ -481,7 +485,7 @@ let join_interface parameters error interface1 interface2 =
   let list_counters = Mods.StringMap.bindings map_counters_3 in
   let list =
     List.fold_left
-      (fun l (_,b) -> Counter b::l)
+      (fun l (_,b) -> CounterP b::l)
       list_ports list_counters
   in
   error, rev_interface_of_list list
@@ -722,7 +726,8 @@ let mod_site_gen parameters error agent_id site_name f mixture =
 let add_binding_state  parameters error agent_id site_name p state bool_opt mixture =
   mod_site_gen parameters error agent_id site_name
     (fun parameters error port ->
-       if p port.port_lnk
+       let error, b = p port.port_lnk in
+       if b
        then
          error, {port with port_lnk = state ; port_free = bool_opt}
        else
@@ -733,8 +738,9 @@ let add_free parameters error agent_id site_name mixture =
   add_binding_state parameters error agent_id site_name
     (fun lnk ->
        match lnk with
-       | LNK_ANY _ -> true
-       | FREE | LNK_VALUE _ | LNK_SOME _ | LNK_TYPE _ -> false)
+       | LNK_ANY _ -> error, true
+       | LNK_MISSING -> Exception.warn parameters error __POS__ Exit true
+       | FREE | LNK_VALUE _ | LNK_SOME _ | LNK_TYPE _ -> error, false)
     FREE
     (Some true)
     mixture
@@ -743,8 +749,9 @@ let add_binding_type parameters error agent_id site_name agent_name' site_name' 
   add_binding_state parameters error agent_id site_name
   (fun lnk ->
      match lnk with
-       | LNK_SOME _ | LNK_ANY _ -> true
-       | FREE | LNK_VALUE _ | LNK_TYPE _ -> false)
+       | LNK_MISSING -> Exception.warn parameters error __POS__ Exit true
+       | LNK_SOME _ | LNK_ANY _ -> error, true
+       | FREE | LNK_VALUE _ | LNK_TYPE _ -> error, false)
   (LNK_TYPE (Locality.dummy_annot agent_name', Locality.dummy_annot site_name'))
   (Some false)
   mixture
@@ -754,8 +761,9 @@ let add_bound parameters error agent_id site_name mixture =
   add_binding_state parameters error agent_id site_name
     (fun lnk ->
        match lnk with
-       | LNK_ANY _ -> true
-       | LNK_SOME _ | FREE | LNK_VALUE _ | LNK_TYPE _ -> false)
+       | LNK_MISSING -> Exception.warn parameters error __POS__ Exit true
+       | LNK_ANY _ -> error, true
+       | LNK_SOME _ | FREE | LNK_VALUE _ | LNK_TYPE _ -> error, false)
     (LNK_SOME Locality.dummy)
     (Some false)
     mixture
@@ -764,10 +772,11 @@ let add_pointer parameters error agent_id site_name agent_id' agent_name' site_n
   add_binding_state parameters error agent_id site_name
     (fun lnk ->
        match lnk with
-       | LNK_SOME _ | LNK_ANY _ -> true
+       | LNK_MISSING -> Exception.warn parameters error __POS__ Exit true
+       | LNK_SOME _ | LNK_ANY _ -> error, true
        | LNK_TYPE ((agent_name'',_),(site_name'',_)) ->
-         agent_name'' = agent_name' && site_name'' = site_name'
-       | FREE | LNK_VALUE _ -> false)
+         error, agent_name'' = agent_name' && site_name'' = site_name'
+       | FREE | LNK_VALUE _ -> error, false)
     (LNK_VALUE (agent_id',agent_name', site_name', lnk_value, Locality.dummy))
     (Some false)
     mixture

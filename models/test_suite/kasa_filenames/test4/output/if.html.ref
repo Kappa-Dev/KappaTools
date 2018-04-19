@@ -35,7 +35,7 @@ Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a P
   g.setNode(4, { label: "mod x1", shape: "rect", style: "fill: #8ce"  });
   g.setNode(5, { label: "a.c", shape: "rect", style: "fill: #8ce"  });
   g.setNode(6, { label: "mod x2", shape: "rect", style: "fill: #8ce"  });
-  g.setNode(7, { label: "6:C(x1{p}[#],x2{p}[#])->.", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(7, { label: "6:C(x1{p},x2{p})->.", shape: "rect", style: "fill: #8ce"  });
   <Br>
 g.setNode(8, { label: "on_rate", shape: "ellipse", style: "fill: #9f9"  });
 g.setNode(9, { label: "off_rate", shape: "ellipse", style: "fill: #9f9"  });

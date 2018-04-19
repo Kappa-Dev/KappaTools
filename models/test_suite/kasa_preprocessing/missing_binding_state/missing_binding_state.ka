@@ -1,0 +1,7 @@
+%agent: A(x,y)
+%agent: B(x)
+%agent: C(x)
+
+%init: 10 A(x,y),B(x)
+%init: 10 A(x[1],y[2]),C(x[1]),C(x[2])
+.,.-> A(x,y),B(x) @1

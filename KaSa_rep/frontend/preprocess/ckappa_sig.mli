@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Feb 20 2018>
+ * Last modification: Time-stamp: <Apr 19 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -162,6 +162,7 @@ and link =
   | LNK_ANY   of position
   | LNK_SOME  of position
   | LNK_TYPE  of (string Locality.annot * string Locality.annot)
+  | LNK_MISSING
 
 type direction = Direct | Reverse
 

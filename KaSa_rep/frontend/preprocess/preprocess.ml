@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Mar 05 2018>
+   * Last modification: Time-stamp: <Apr 20 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -327,7 +327,7 @@ let translate_agent_sig
       in
       let error, c_interface =
         match port.Ckappa_sig.port_lnk with
-        | Ckappa_sig.LNK_ANY _ ->
+        | Ckappa_sig.LNK_ANY _ | Ckappa_sig.LNK_MISSING ->
           Exception.warn parameters error __POS__ Exit c_interface
         | Ckappa_sig.FREE ->
           begin
@@ -382,7 +382,7 @@ let translate_agent_sig
   }:Cckappa_sig.agent_sig), map
 
 let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
-    (kasim_id:Ckappa_sig.c_agent_id) agent bond_list question_marks delta =
+    (kasim_id:Ckappa_sig.c_agent_id) ~creation agent bond_list question_marks delta =
   let error, (bool, output) =
     Ckappa_sig.Dictionary_of_agents.allocate_bool
       parameters
@@ -614,7 +614,49 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
           in
           let error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites) =
             match port.Ckappa_sig.port_lnk with
-            | Ckappa_sig.LNK_ANY _pos ->
+            | Ckappa_sig.LNK_MISSING when creation ->
+              begin
+                let error, (bool, output) =
+                  Ckappa_sig.Dictionary_of_sites.allocate_bool
+                    parameters
+                    error
+                    Ckappa_sig.compare_unit_site_name
+                    (Ckappa_sig.Binding port.Ckappa_sig.port_nme)
+                    ()
+                    Misc_sa.const_unit
+                    site_dic
+                in
+                match bool, output with
+                | _ , None
+                | true, _  -> error,
+                              (c_interface, bond_list, question_marks, dead_sites, dead_link_sites)
+                | _ , Some (site_name, _, _, _) ->
+                  let error',c_interface =
+                    Ckappa_sig.Site_map_and_set.Map.add
+                      parameters
+                      error
+                      site_name
+                      {
+                        Cckappa_sig.site_name = site_name ;
+                        Cckappa_sig.site_position = Locality.dummy ;
+                        Cckappa_sig.site_free = port.Ckappa_sig.port_free ;
+                        Cckappa_sig.site_state =
+                          {Cckappa_sig.min =
+                             Some (Ckappa_sig.dummy_state_index) ;
+                           Cckappa_sig.max =
+                             Some (Ckappa_sig.dummy_state_index)
+                          }
+                      }
+                      c_interface
+                  in
+                  let error =
+                    Exception.check_point
+                      Exception.warn parameters error error' __POS__ Exit
+                  in
+                  error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+              end
+            | Ckappa_sig.LNK_MISSING
+            | Ckappa_sig.LNK_ANY _ ->
               begin
                 let error, (bool, output) =
                   Ckappa_sig.Dictionary_of_sites.allocate_bool
@@ -1150,7 +1192,26 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
             dead_link_sites)
     end
 
-let translate_mixture parameters error handler mixture =
+let update parameters error creation lhs_opt k =
+  if creation then error, creation
+  else
+    match lhs_opt with
+      | None -> error, creation
+      | Some lhs ->
+      let error, agent =
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameters
+          error
+          k
+          lhs.Cckappa_sig.views
+      in
+      match agent with
+      | None | Some Cckappa_sig.Ghost -> error, true
+      | Some (Cckappa_sig.Dead_agent _
+             | Cckappa_sig.Unknown_agent _
+             | Cckappa_sig.Agent _ ) -> error, creation
+
+let translate_mixture parameters error handler ~creation ?lhs mixture =
   let syntax_version =
     Remanent_parameters.get_syntax_version parameters
   in
@@ -1160,11 +1221,13 @@ let translate_mixture parameters error handler mixture =
     match mixture with
     | Ckappa_sig.EMPTY_MIX -> error,bond_list,questionmarks,dot_list,plus_list,array,delta
     | Ckappa_sig.COMMA(agent,mixture) ->
+      let error, creation = update parameters error creation lhs k in
       let error,bond_list,questionmarks,delta,view =
         translate_view
           parameters
           error
           handler
+          ~creation
           k
           kasim_id
           agent
@@ -1192,12 +1255,14 @@ let translate_mixture parameters error handler mixture =
         array
         delta
     | Ckappa_sig.DOT(id, agent, mixture) ->
+      let error, creation = update parameters error creation lhs k in
       let dot_list = (k, id) :: dot_list in
       let error,bond_list,questionmarks, delta, view =
         translate_view
           parameters
           error
           handler
+          ~creation
           k
           kasim_id
           agent
@@ -1223,12 +1288,14 @@ let translate_mixture parameters error handler mixture =
         array
         delta
     | Ckappa_sig.PLUS(id, agent, mixture) ->
+      let error, creation = update parameters error creation lhs k in
       let plus_list = (k, id) :: plus_list in
       let error,bond_list,questionmarks,delta,view =
         translate_view
           parameters
           error
           handler
+          ~creation
           k
           kasim_id
           agent
@@ -1509,8 +1576,9 @@ let check_freeness parameters lhs source (error, half_release_set) =
 let translate_rule parameters error handler rule =
   let label,(rule,position) = rule in
   let direction = rule.Ckappa_sig.interprete_delta in
-  let error,c_rule_lhs,question_marks_l,delta_l = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
-  let error,c_rule_rhs,question_marks_r,delta_r = translate_mixture parameters error handler rule.Ckappa_sig.rhs in
+  let error,c_rule_lhs,question_marks_l,delta_l = translate_mixture parameters error handler ~creation:false rule.Ckappa_sig.lhs in
+  let lhs = c_rule_lhs in
+  let error,c_rule_rhs,question_marks_r,delta_r = translate_mixture parameters error handler ~creation:false ~lhs rule.Ckappa_sig.rhs in
   let error, delta =
     Ckappa_sig.AgentsSite_map_and_set.Map.map2
       parameters error
@@ -2123,12 +2191,12 @@ let refine_rule parameters error handler rule =
 
 let lift_forbidding_question_marks parameters handler =
   (fun error x ->
-     let a,b,_,_ = translate_mixture parameters error handler  x
+     let a,b,_,_ = translate_mixture parameters error handler ~creation:false x
      in a,b)
 
 let lift_allowing_question_marks parameters handler =
   (fun error x ->
-     let a,b,c,_ = translate_mixture parameters error handler x in
+     let a,b,c,_ = translate_mixture parameters error handler ~creation:false x in
      clean_question_marks parameters a c b)
 
 
@@ -2144,7 +2212,7 @@ let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
 let translate_pert parameters error handler alg (mixture,pos') =
   (*  let mixture = c_mixture.Cckappa_sig.c_mixture in*)
-  let error,c_mixture,_,_ = translate_mixture parameters error handler mixture in
+  let error,c_mixture,_,_ = translate_mixture parameters error handler ~creation:false mixture in
   let error, c_alg = alg_with_pos_map (lift_allowing_question_marks parameters handler) error alg in
   translate_pert_init error alg c_alg mixture c_mixture pos'
 
@@ -2157,7 +2225,7 @@ let translate_init parameters error handler ((alg,pos_alg),init_t) =
     init_t
     with
     | Ast.INIT_MIX (mixture,pos') ->
-    let error,c_mixture,_,_ = translate_mixture parameters error handler mixture in
+    let error,c_mixture,_,_ = translate_mixture parameters error handler ~creation:true mixture in
     translate_pert_init error
       (alg,pos_alg) (c_alg,pos_alg) mixture c_mixture pos'
     | Ast.INIT_TOK _ -> (*TO DO*)
