@@ -7,4 +7,6 @@
 #
 digraph G{
 "0:.,.->A(x,y),B(x)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x{u})->A(x{p})" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:.,.->A(x,y),B(x)" -> "1:A(x{u})->A(x{p})" [label="[0->0]" color="green"];
 }

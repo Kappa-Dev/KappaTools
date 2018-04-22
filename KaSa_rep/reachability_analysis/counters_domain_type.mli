@@ -11,6 +11,7 @@ val empty_restriction: restriction
 
 type static =
   {
+    counters: Ckappa_sig.AgentSite_map_and_set.Set.t ; 
     packs:
       Ckappa_sig.Site_map_and_set.Set.t
         Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t

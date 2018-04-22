@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 17 2018>
+  * Last modification: Time-stamp: <Apr 22 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -101,6 +101,9 @@ module Functor =
     error, rule
 
   (*static information*)
+
+  let get_counters_set static =
+    (get_local_static_information static).Counters_domain_type.counters
 
   let get_rule_restriction static =
         (get_local_static_information
@@ -948,9 +951,48 @@ module Functor =
     let dynamic = set_value store_value dynamic in
     error, dynamic, ()
 
+  let get_interval static error (agent_type,site) store_value =
+    let back = get_backward_pointers static in
+    let parameters = get_parameter static in
+    let error, back_site_opt =
+      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+        parameters error (agent_type, site) back
+    in
+    let error, back_site =
+      match back_site_opt with
+      | None -> Exception.warn parameters error __POS__ Exit
+                  Ckappa_sig.Site_map_and_set.Set.empty
+      | Some set -> error, set
+    in
+    Ckappa_sig.Site_map_and_set.Set.fold
+      (fun counter (error, intervalle_opt) ->
+         let error, mi_opt =
+           Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+             parameters error (agent_type,counter) store_value
+         in
+         match mi_opt with
+         | Some new_mi ->
+           begin
+             let error, interv =
+               MI.interval_of_pro parameters error new_mi (Occu1.Counter site)
+             in
+             match intervalle_opt, interv with
+             | None, _ -> error, interv
+             | _, None -> error, intervalle_opt
+             | Some (a,b), Some (c,d) ->
+               error, Some (Fraction.ffmax a c, Fraction.ffmin b d)
+           end
+         | None ->
+           Exception.warn parameters error __POS__ Exit intervalle_opt
+      )
+      back_site
+      (error, None)
+
+
   let print ?dead_rules static dynamic (error:Exception.method_handler) loggers =
     let _ = dead_rules in
     let kappa_handler = get_kappa_handler static in
+    let counter_set = get_counters_set static in
     let parameters = get_parameter static in
     let log = loggers in
     (*-------------------------------------------------------*)
@@ -966,11 +1008,10 @@ module Functor =
             "------------------------------------------------------------\n"
         in
         let store_value = get_value dynamic in
-        Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter
-          parameters error
-          (fun parameters error (agent_type, site) mi ->
-             let error, intervalle =
-               MI.interval_of_pro parameters error mi (Occu1.Counter site)
+        Ckappa_sig.AgentSite_map_and_set.Set.fold
+          (fun (agent_type, site) error ->
+             let error, intervalle_opt =
+               get_interval static error (agent_type, site) store_value
              in
              let error, agent_string =
                  Handler.translate_agent
@@ -991,7 +1032,7 @@ module Functor =
              in
              let error,() =
                match
-                 intervalle
+                 intervalle_opt
                with
                | None
                | Some (Fraction.Minfinity, Fraction.Infinity)
@@ -1016,7 +1057,6 @@ module Functor =
                      (Remanent_parameters.get_close_counter_state parameters)
 
                      (Remanent_parameters.get_agent_close_symbol parameters)
-
                  in
                  error, Loggers.print_newline
                  (Remanent_parameters.get_logger parameters)
@@ -1039,9 +1079,7 @@ module Functor =
                      (Remanent_parameters.get_plus_infinity_symbol parameters)
                      (Remanent_parameters.get_close_int_interval_infinity_symbol parameters)
                      (Remanent_parameters.get_close_counter_state parameters)
-
-(Remanent_parameters.get_agent_close_symbol parameters)
-
+                     (Remanent_parameters.get_agent_close_symbol parameters)
                  in
                  error, Loggers.print_newline
                    (Remanent_parameters.get_logger parameters)
@@ -1053,10 +1091,8 @@ module Functor =
                      agent_string
                      (Remanent_parameters.get_agent_open_symbol parameters)
                      (Remanent_parameters.get_agent_close_symbol parameters)
-
                      agent_string
                      (Remanent_parameters.get_agent_open_symbol parameters)
-
                      site_string
                      (Remanent_parameters.get_open_counter_state parameters)
                      (Remanent_parameters.get_open_int_interval_inclusive_symbol parameters)
@@ -1065,9 +1101,7 @@ module Functor =
                      (Fraction.string_of f2)
                      (Remanent_parameters.get_close_int_interval_inclusive_symbol parameters)
                      (Remanent_parameters.get_close_counter_state parameters)
-
                      (Remanent_parameters.get_agent_close_symbol parameters)
-
                  in
                  error, Loggers.print_newline
                    (Remanent_parameters.get_logger parameters)
@@ -1078,7 +1112,7 @@ module Functor =
                    ()
              in
              error)
-          store_value
+          counter_set error
       else
         error
     in
@@ -1094,6 +1128,7 @@ module Functor =
       let domain_name = "Counters" in
       (*string * 'site_graph lemma list : head*)
       let current_list = [] in
+      let counters_set = get_counters_set static in
       (*------------------------------------------------------------------*)
       (*internal constraint list*)
       let internal_constraints_list =
@@ -1106,50 +1141,19 @@ module Functor =
         | Some l -> error, l
       in
       let error, current_list =
-        Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
-          parameters error
-          (fun parameters error (agent_type, site) _ current_list ->
-             let error, back_site_opt =
-               Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-                 parameters error (agent_type, site) back
-             in
-             let error, back_site =
-               match back_site_opt with
-               | None -> Exception.warn parameters error __POS__ Exit Ckappa_sig.Site_map_and_set.Set.empty
-               | Some set -> error, set
-             in
+        Ckappa_sig.AgentSite_map_and_set.Set.fold
+          (fun (agent_type, site) (error, current_list) ->
              let error, intervalle_opt =
-               Ckappa_sig.Site_map_and_set.Set.fold
-                 (fun counter (error, intervalle_opt) ->
-                    let error, mi_opt = Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-                        parameters error (agent_type,counter) store_value
-                    in
-                      match mi_opt with
-                      | Some new_mi ->
-                        begin
-                          let error, interv =
-                            MI.interval_of_pro parameters error new_mi (Occu1.Counter site)
-                          in
-                          match intervalle_opt, interv with
-                          | None, _ -> error, interv
-                          | _, None -> error, intervalle_opt
-                          | Some (a,b), Some (c,d) ->
-                            error, Some (Fraction.ffmax a c, Fraction.ffmin b d)
-                        end
-                      | None ->
-                        Exception.warn parameters error __POS__ Exit intervalle_opt
-                 )
-                 back_site
-                 (error, None)
+               get_interval static error (agent_type, site) store_value
              in
-             match intervalle_opt with
-             | Some (Fraction.Minfinity, Fraction.Infinity) ->
-               error, current_list
+              match intervalle_opt with
              | None
              | Some (Fraction.Infinity, _ | _, Fraction.Minfinity
                     | Fraction.Unknown , _ | _, Fraction.Unknown)
                ->
                Exception.warn parameters error __POS__ Exit current_list
+             | Some (Fraction.Minfinity, Fraction.Infinity) ->
+               error, current_list
              | Some ((Fraction.Frac _ | Fraction.Minfinity) as inf,
                      ((Fraction.Frac _ | Fraction.Infinity) as sup)) ->
                let t = Ckappa_backend.Ckappa_backend.empty in
@@ -1192,8 +1196,8 @@ module Functor =
                  Public_data.hyp = t;
                  Public_data.refinement = [t'];
                }::current_list)
-          store_value
-          current_list
+          counters_set
+          (error, current_list)
       in
       let pair_list =
         (domain_name, List.rev current_list) :: internal_constraints_list

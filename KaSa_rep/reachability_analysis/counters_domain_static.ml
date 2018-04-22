@@ -50,16 +50,20 @@ let add_relation_two_steps parameters error
     parameters error agent_name new_map array
 
 
-let add_dependence parameters error handler
-    ~agent_name ~site ~counter ~packs ~backward_dependences ~equivalence_relation =
-  let error, is_counter =
-    Handler.is_counter parameters error handler agent_name site
-  in
+let add_dependence parameters error
+    ~agent_name ~site ~counter ~counter_set ~packs ~backward_dependences ~equivalence_relation =
   let error, packs =
     add_relation_two_steps
       parameters error
       ~agent_name ~source:counter ~target:site packs
   in
+  let error, counter_set =
+    Ckappa_sig.AgentSite_map_and_set.Set.add_when_not_in
+      parameters error
+      (agent_name,counter)
+      counter_set
+  in
+
   let error, backward_dependences =
     add_relation_one_step
       parameters error
@@ -73,7 +77,7 @@ let add_dependence parameters error handler
       equivalence_relation
       [agent_name,site;agent_name,counter]
   in
-  error, (packs, backward_dependences,equivalence_relation)
+  error, (counter_set, packs, backward_dependences,equivalence_relation)
 
 let quotient_packs parameters error packs equivalence =
   let error, agent_array =
@@ -193,15 +197,18 @@ let compute_packs parameters error handler compil =
   let error, backward_dependences =
     Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0,0)
   in
+  let counter_set =
+    Ckappa_sig.AgentSite_map_and_set.Set.empty
+  in
   let error, equivalence_relation =
     EQUREL.create parameters error (1,1)
   in
-  let error, (packs, backward_dependences, equivalence_relation) =
+  let error, (counter_set, packs, backward_dependences, equivalence_relation) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameters
       error
       (fun parameters error _rule_id rule
-        (packs, backward_dependences,equivalence_relation)  ->
+        (counter_set, packs, backward_dependences,equivalence_relation)  ->
          let rule = rule.Cckappa_sig.e_rule_c_rule in
          let actions = rule.Cckappa_sig.actions.Cckappa_sig.translate_counters in
          let error, agents_with_counters =
@@ -232,11 +239,12 @@ let compute_packs parameters error handler compil =
              (error, Ckappa_sig.Agent_id_map_and_set.Map.empty)
              actions
          in
-         let error, (packs, backward_dependences,equivalence_relation)  =
+         let error,
+             (counter_set, packs, backward_dependences,equivalence_relation)  =
            Ckappa_sig.Agent_id_map_and_set.Map.fold
              (fun
                ag list_of_counters
-               (error, (packs, backward_dependences,equivalence_relation))
+               (error, (counter_set, packs, backward_dependences,equivalence_relation))
                ->
                  match
                    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
@@ -245,44 +253,57 @@ let compute_packs parameters error handler compil =
                      rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
                  with
                  | error, None -> error,
-                                  (packs, backward_dependences, equivalence_relation)
+                                  (counter_set,
+                                   packs,
+                                   backward_dependences,
+                                   equivalence_relation)
                  | error, Some a ->
                    begin
                      match a with
                      | Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _
                      | Cckappa_sig.Unknown_agent _ ->
-                       error, (packs, backward_dependences,equivalence_relation)
+                       error,
+                       (
+                         counter_set,
+                         packs,
+                         backward_dependences,
+                         equivalence_relation
+                       )
                      | Cckappa_sig.Agent ag ->
                        let agent_name = ag.Cckappa_sig.agent_name in
                        Ckappa_sig.Site_map_and_set.Map.fold
                          (fun site _
-                           (error, (packs, backward_dependences,equivalence_relation)) ->
-                            List.fold_left
+                           (error, (counter_set, packs, backward_dependences,equivalence_relation)) ->
+                              List.fold_left
                               (fun
                                 (error,
-                                 (packs, backward_dependences,equivalence_relation))
+                                 (counter_set,
+                                  packs, backward_dependences,equivalence_relation))
                                 counter ->
-                                 add_dependence
-                                   parameters error handler
-                                   ~agent_name ~site ~counter ~packs ~backward_dependences
+                                add_dependence
+                                   parameters error
+                                   ~agent_name ~site ~counter ~counter_set ~packs ~backward_dependences
                                    ~equivalence_relation)
                               (error,
-                               (packs, backward_dependences, equivalence_relation))
-                              list_of_counters)
+                               (counter_set, packs, backward_dependences, equivalence_relation))
+                              list_of_counters
+                          )
                          ag.Cckappa_sig.agent_interface
-                         (error, (packs, backward_dependences, equivalence_relation))
+                         (error, (counter_set, packs, backward_dependences, equivalence_relation))
                    end
              )
              agents_with_counters
-             (error, (packs, backward_dependences, equivalence_relation))
+             (error, (counter_set, packs, backward_dependences, equivalence_relation))
          in
-         error, (packs, backward_dependences, equivalence_relation)
-      ) compil.Cckappa_sig.rules (packs, backward_dependences, equivalence_relation)
+         error, (counter_set, packs, backward_dependences, equivalence_relation)
+      )
+      compil.Cckappa_sig.rules
+      (counter_set, packs, backward_dependences, equivalence_relation)
   in
   let error, _, packs, backward_dependences =
     quotient parameters error packs backward_dependences equivalence_relation
   in
-  error, (packs, backward_dependences)
+  error, (counter_set, packs, backward_dependences)
 
 
 
@@ -868,7 +889,7 @@ let compute_rule_creation parameters error handler (packs, _backward) compil =
 
 
 let compute_static parameters error handler compil =
-  let error, (packs, backward) =
+  let error, (counter_set, packs, backward) =
     compute_packs parameters error handler compil
   in
   let error, rule_restrictions =
@@ -879,6 +900,7 @@ let compute_static parameters error handler compil =
   in
   error,
   {
+    Counters_domain_type.counters = counter_set ;
     Counters_domain_type.packs = packs ;
     Counters_domain_type.backward_pointers = backward ;
     Counters_domain_type.rule_restrictions =

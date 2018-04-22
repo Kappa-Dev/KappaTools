@@ -10,6 +10,7 @@ Signature:sites:
 Signature:sites:0:
 Signature:sites:0:site_type:0->x(binding state)
 Signature:sites:0:site_type:1->y(binding state)
+Signature:sites:0:site_type:2->x(internal state)
 Signature:sites:1:
 Signature:sites:2:
 Signature:sites:2:site_type:0->x(binding state)
@@ -21,6 +22,9 @@ Signature:states:0:0:state_id:1->agent_type:2@site_type:0
 Signature:states:0:1:
 Signature:states:0:1:state_id:0->free
 Signature:states:0:1:state_id:1->agent_type:2@site_type:0
+Signature:states:0:2:
+Signature:states:0:2:state_id:0->u
+Signature:states:0:2:state_id:1->p
 Signature:states:2:
 Signature:states:2:0:
 Signature:states:2:0:state_id:0->free
@@ -61,6 +65,19 @@ Compilation:rules:0:direct:agent_id_1:
 Compilation:rules:0:reverse:
 Compilation:rules:0:actions:creation:(agent_id_0,agent_type_0)
 Compilation:rules:0:actions:creation:(agent_id_1,agent_type_1)
+Compilation:rules:1:
+Compilation:rules:1:lhs:
+Compilation:rules:1:lhs:agent_id_0:
+Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:1:rhs:
+Compilation:rules:1:rhs:agent_id_0:
+Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:1:direct:
+Compilation:rules:1:direct:agent_id_0:
+Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:1:reverse:
+Compilation:rules:1:reverse:agent_id_0:
+Compilation:rules:1:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:initial_states:0:
 Compilation:initial_states:0:mixture:
 Compilation:initial_states:0:mixture:agent_id_0:
@@ -97,15 +114,51 @@ Quarks:rule_id:0,agent_type:0,site_type:0,state:0
 Quarks:rule_id:0,agent_type:0,site_type:1,state:0
 Quarks:MODIFICATION-
 Quarks:HALF BOND BREAKING
+Quarks:Rule 1
+Quarks:TEST
+Quarks:rule_id:1,agent_type:0
+Quarks:rule_id:1,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:1,agent_type:0,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:1,agent_type:0,site_type:2,state:0
+Quarks:HALF BOND BREAKING
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_test**:agent_type:0,rule:1->[0]
 Quarks:agent_modif+:agent_type:1,rule:0->[1]
 Quarks:agent_modif+:agent_type:0,rule:0->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:1->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:1->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:1->[0]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Wake_up_map:rule(0):'' .,.->A(x,y),B(x) -> rule(1):'' A(x{u})->A(x{p})[0->0]
 Reachability analysis...
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{u})
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -225,6 +278,39 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule ., . -> A(x y), B(x) (File "missing_binding_state.ka", line 7, characters 0-20:) is applied for the first time
+
+	Applying rule A(x{u}) -> A(x{p}) (File "missing_binding_state.ka", line 8, characters 0-21:):
+		the precondition is satisfied
+
+		rule A(x{u}) -> A(x{p}) (File "missing_binding_state.ka", line 8, characters 0-21:) is applied for the first time
+
+		Updating the views for A(x{})
+
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p})
+
+
+	Applying rule ., . -> A(x y), B(x) (File "missing_binding_state.ka", line 7, characters 0-20:):
+		the precondition is satisfied
+
+	Applying rule A(x{u}) -> A(x{p}) (File "missing_binding_state.ka", line 8, characters 0-21:):
+		the precondition is satisfied
+
+		Updating the views for A(x{})
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -248,6 +334,20 @@ Id=6
      Leaf False 
 
 agent_type:0:A:cv_id:1
+Id=6
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+agent_type:0:A:cv_id:2
 Id=6
  Node(site_type:1<0)
   Id=0
@@ -296,12 +396,12 @@ Id=6
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=11
- Node(site_type:0<0)
+ Node(site_type:2<0)
   Id=0
    Leaf False 
 
   Id=10
-   Node(site_type:0<2)
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -311,11 +411,26 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=13
- Node(site_type:0<1)
+ Node(site_type:0<0)
   Id=0
    Leaf False 
 
   Id=12
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:0<1)
+  Id=0
+   Leaf False 
+
+  Id=14
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -325,6 +440,7 @@ Id=13
 
 EXTENSIONAL DESCRIPTION:
 A() => [ A(y[.]) v A(y[x.C]) ]
+A() => [ A(x{u}[#]) v A(x{p}[#]) ]
 A() => [ A(x[.]) v A(x[x.C]) ]
 C() => [ C(x[x.A]) v C(x[y.A]) ]
 
@@ -348,12 +464,12 @@ Id=6
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=11
- Node(site_type:0<0)
+ Node(site_type:2<0)
   Id=0
    Leaf False 
 
   Id=10
-   Node(site_type:0<2)
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -363,11 +479,26 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=13
- Node(site_type:0<1)
+ Node(site_type:0<0)
   Id=0
    Leaf False 
 
   Id=12
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:0<1)
+  Id=0
+   Leaf False 
+
+  Id=14
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -382,6 +513,9 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
@@ -399,12 +533,12 @@ Id=6
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=11
- Node(site_type:0<0)
+ Node(site_type:2<0)
   Id=0
    Leaf False 
 
   Id=10
-   Node(site_type:0<2)
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -414,11 +548,26 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=13
- Node(site_type:0<1)
+ Node(site_type:0<0)
   Id=0
    Leaf False 
 
   Id=12
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:0<1)
+  Id=0
+   Leaf False 
+
+  Id=14
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -444,12 +593,12 @@ Id=6
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=11
- Node(site_type:0<0)
+ Node(site_type:2<0)
   Id=0
    Leaf False 
 
   Id=10
-   Node(site_type:0<2)
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -459,11 +608,26 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=13
- Node(site_type:0<1)
+ Node(site_type:0<0)
   Id=0
    Leaf False 
 
   Id=12
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:0<1)
+  Id=0
+   Leaf False 
+
+  Id=14
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -482,6 +646,9 @@ A()=> [
 		  A(x[.])
 		v A(x[x.C])]
 A()=> [
+		  A(x{u}[#])
+		v A(x{p}[#])]
+A()=> [
 		  A(y[.])
 		v A(y[x.C])]
 
@@ -495,6 +662,10 @@ A()=> [
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 execution finished without any exception
