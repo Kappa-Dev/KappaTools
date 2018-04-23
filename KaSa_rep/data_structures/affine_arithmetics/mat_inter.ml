@@ -327,7 +327,7 @@ posref j))) in
                           sommesup
                           {num=(-1);den=1}
                           (Frac((M.read_val posm k Affine_cst))))
-                   | (Bool _ | Counter _ as t)::q       ->
+                   | (Bool _ | Counter _ | Site _ as t)::q       ->
                      let delta=(M.read_val posm k t) in
                      (match delta.num
                       with
@@ -590,7 +590,7 @@ posref j))) in
           let rec cop_line (k,c) =
             match k with
             | Affine_cst::q -> cop_line (q,c)
-            | [] | (Bool _ | Counter _)::_ ->
+            | [] | (Bool _ | Counter _ | Site _)::_ ->
               let nl=
                 Hashtbl.create
                   (Remanent_parameters.get_empty_hashtbl_size parameters)

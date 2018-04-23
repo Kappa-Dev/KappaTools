@@ -425,7 +425,22 @@ let collect_tests parameters handler error ag_id ag backward restriction =
              let rec aux error k agent_restriction =
                if Ckappa_sig.compare_state_index k max_state > 0
                then
-                 error, agent_restriction
+                 let test =
+                   Occu1.Site site,
+                   Counters_domain_type.EQ,
+                   Ckappa_sig.int_of_state_index a
+                 in
+               fold_counter_dep
+                 parameters error backward
+                 (fun parameters error _agent_type counter _site agent_restriction
+                   ->
+                     add_test_in_agent_description
+                       parameters error
+                       test counter agent_restriction
+                 )
+                 agent_type
+                 site
+                 agent_restriction
                else
                 let error, agent_restriction =
                   add_test
@@ -439,11 +454,29 @@ let collect_tests parameters handler error ag_id ag backward restriction =
              aux error (Ckappa_sig.state_index_of_int 0) agent_restriction
            | Some a, Some b when a=Ckappa_sig.state_index_of_int 1
                               && b = max_state ->
-             add_test
+             let error, agent_restriction =
+               add_test
                parameters error
                agent_type site
                agent_restriction
                (Ckappa_sig.state_index_of_int 0) Counters_domain_type.EQ 0
+             in
+             let test =
+               Occu1.Site site,
+               Counters_domain_type.GTEQ,
+               1
+             in
+           fold_counter_dep
+             parameters error backward
+             (fun parameters error _agent_type counter _site agent_restriction
+               ->
+                 add_test_in_agent_description
+                   parameters error
+                   test counter agent_restriction
+             )
+             agent_type
+             site
+             agent_restriction
            | (Some _ | None), (Some _ | None) ->
              error, agent_restriction
       )
@@ -534,15 +567,33 @@ let collect_updates parameters handler error ag_id agl diff_agr backward restric
               | Some al, Some bl when al=bl ->
               let action1 = ar, 1 in
               let action2 = al, -1 in
-              List.fold_left
-                (fun (error, agent_restriction) (state,action) ->
-                   add_invertible_action
-                     parameters error
-                     agent_type site agent_restriction state
-                     action)
-                (error, agent_restriction)
-                [action1;action2]
-              | Some al, Some bl ->
+              let error, agent_restriction =
+                List.fold_left
+                  (fun (error, agent_restriction) (state,action) ->
+                     add_invertible_action
+                       parameters error
+                       agent_type site agent_restriction state
+                       action)
+                  (error, agent_restriction)
+                  [action1;action2]
+              in
+              fold_counter_dep
+                parameters error backward
+                (fun parameters error _agent_type counter site agent_restriction
+                  ->
+                    let action = Occu1.Site (site),
+                                 (Ckappa_sig.int_of_state_index ar)-
+                                 (Ckappa_sig.int_of_state_index al)
+                    in
+                    add_invertible_action_in_agent_description
+                      parameters error
+                      action counter agent_restriction
+                   )
+                agent_type
+                site
+                agent_restriction
+
+                  | Some al, Some bl ->
                 let rec declare_potential_updates
                     state list seen =
                   if Ckappa_sig.compare_state_index state bl > 0
@@ -578,6 +629,7 @@ let collect_updates parameters handler error ag_id agl diff_agr backward restric
                     (error, agent_restriction)
                     list
                 in
+                let error, agent_restriction =
                 if seen then
                   error, agent_restriction
                 else
@@ -585,6 +637,19 @@ let collect_updates parameters handler error ag_id agl diff_agr backward restric
                     parameters error
                     agent_type site agent_restriction
                     ar 1
+                in
+                fold_counter_dep
+                  parameters error backward
+                  (fun parameters error agent_type counter site agent_restriction
+                    ->
+                    let action = Occu1.Site site, Ckappa_sig.int_of_state_index ar in
+                      add_non_invertible_action_in_agent_description
+                        parameters error
+                        action counter agent_restriction
+                     )
+                  agent_type
+                  site
+                  agent_restriction
 
               | None, _ | Some _ , None ->
                 add_non_invertible_action
@@ -828,7 +893,8 @@ let convert_view parameters error handler compil packs agent_type ag =
                     in
                     error,
                     aux
-                      (Ckappa_sig.state_index_of_int 0) interface
+                      (Ckappa_sig.state_index_of_int 0)
+                      ((Occu1.Site (site), Ckappa_sig.int_of_state_index state)::interface)
 
                )
                site_set

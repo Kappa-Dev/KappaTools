@@ -506,7 +506,7 @@ lrep))))
           match (find m.entry i)
           with (Affine_cst)::k::_ -> k
              |   [Affine_cst]  -> failwith "compteur_pivot_2"
-             |   (Bool _ | Counter _  as k)::_ -> k
+             |   (Bool _ | Counter _ | Site _ as k)::_ -> k
              |   []  ->  failwith "compteur_pivot_3"
         )
 
@@ -609,8 +609,8 @@ lrep))))
      with Affine_cst,Affine_cst -> true
         | Affine_cst,_ -> false
         | _ ,Affine_cst -> true
-        | (Bool _ | Counter _ as a),
-          (Bool _ | Counter _ as b)
+        | (Bool _ | Counter _ | Site _ as a),
+          (Bool _ | Counter _ | Site _ as b)
           -> (po a b) in
    let rec aux k1 k2 error =
      match (k2>n2),(k1>n1),(avant k1 k2)
@@ -674,7 +674,7 @@ lrep))))
    let forget_affine l =
      match l with
      | Affine_cst::q -> q
-     | [] | (Bool _ | Counter _)::_-> l in
+     | [] | (Bool _ | Counter _ | Site _)::_-> l in
    let rec aux i error =
      if i > (!(m.nligne))
      then error
@@ -768,7 +768,7 @@ lrep))))
             let rec algo r sliste =
               match sliste  with
                 Affine_cst::squeue -> algo r squeue
-              |	(Bool _ | Counter _ as s)::squeue ->
+              |	(Bool _ | Counter _ | Site _ as s)::squeue ->
                 let rprim = (traite s r )
                 in algo rprim squeue
               |	[] -> ignore (traite  Affine_cst r) in
