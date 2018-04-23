@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 22 2018>
+  * Last modification: Time-stamp: <Apr 23 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -857,9 +857,9 @@ module Functor =
                  parameters error
                  (agent,site)
                    backward
-               with
-               | error, None -> error, dynamic, event_list
-               | error, Some set ->
+             with
+             | error, None -> error, dynamic, event_list
+             | error, Some set ->
                    Ckappa_sig.Site_map_and_set.Set.fold
                      (fun counter (error,dynamic, event_list) ->
                         let value = get_value dynamic in
@@ -1123,7 +1123,6 @@ module Functor =
   let export static dynamic error kasa_state =
       let parameters = get_parameter static in
       let kappa_handler = get_kappa_handler static in
-      let back = get_backward_pointers static in
       let store_value = get_value dynamic in
       let domain_name = "Counters" in
       (*string * 'site_graph lemma list : head*)

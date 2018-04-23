@@ -22,7 +22,7 @@ let empty_restriction =
 
 type static =
   {
-    counters: Ckappa_sig.AgentSite_map_and_set.Set.t ; 
+    counters: Ckappa_sig.AgentSite_map_and_set.Set.t ;
     packs:
       Ckappa_sig.Site_map_and_set.Set.t
         Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t
@@ -125,8 +125,118 @@ type static =
     in
     error
 
+let print_restriction parameters _handler error restriction =
+  let () =
+    if restriction.tests = []
+    then ()
+    else
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "%s        test: "
+          (Remanent_parameters.get_prefix parameters)
+      in
+      let () =
+        List.iter
+          (fun (var,op,int) ->
+             Loggers.fprintf (Remanent_parameters.get_logger parameters)
+               "%s%s%i,"
+               (string_of_var var)
+               (string_of_op op)
+               int)
+          restriction.tests
+      in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
+      ()
+  in
+  let () =
+    if restriction.invertible_assignments = []
+    then ()
+    else
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "%s        inversible_assignemets: "
+          (Remanent_parameters.get_prefix parameters)
+      in
+      let () =
+        List.iter
+          (fun (var,int) ->
+             if int=0 then () else
+               Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                 "%s%s%i,"
+                 (string_of_var var)
+                 (if int>0 then "+=" else if int<0 then "-=" else "")
+                 (if int>0 then int else -int))
+          restriction.invertible_assignments
+      in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
+      ()
+  in
+  let () =
+    if restriction.non_invertible_assignments = []
+    then ()
+    else
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "%s        non_inversible_assignemets: "
+          (Remanent_parameters.get_prefix parameters)
+      in
+      let () =
+        List.iter
+          (fun (var,int) ->
+             Loggers.fprintf (Remanent_parameters.get_logger parameters)
+               "%s:=%i,"
+               (string_of_var var)
+               int)
+          restriction.non_invertible_assignments
+      in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
+      ()
+  in
+  error
 
-    let print_restrictions parameters _handler error restrictions =
+let print_agent_restriction parameters handler error agent_restriction =
+Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.iter
+  parameters error
+  (fun parameters error site_id restriction ->
+   let () =
+     Loggers.fprintf (Remanent_parameters.get_logger parameters)
+       "%s       Pack %i"
+       (Remanent_parameters.get_prefix parameters)
+       (Ckappa_sig.int_of_site_name site_id)
+   in
+   let () =
+     Loggers.print_newline (Remanent_parameters.get_logger parameters)
+   in
+   print_restriction
+       parameters handler error restriction)
+  agent_restriction
+
+let print_rule_restriction parameters handler error rule_restriction
+  =
+Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.iter
+  parameters error
+  (fun parameters error agent_id agent_restriction ->
+   let () =
+     Loggers.fprintf (Remanent_parameters.get_logger parameters)
+       "%s    Agent %i"
+       (Remanent_parameters.get_prefix parameters)
+       (Ckappa_sig.int_of_agent_id agent_id)
+   in
+   let () =
+     Loggers.print_newline (Remanent_parameters.get_logger parameters)
+   in
+   print_agent_restriction
+     parameters handler error
+     agent_restriction)
+  rule_restriction
+
+let print_restrictions parameters handler error restrictions =
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
           "%srule restrictions (counters)"
@@ -148,105 +258,8 @@ type static =
              let () =
                Loggers.print_newline (Remanent_parameters.get_logger parameters)
              in
-             Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.iter
-               parameters error
-               (fun parameters error agent_id agent_restriction ->
-                let () =
-                  Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                    "%s    Agent %i"
-                    (Remanent_parameters.get_prefix parameters)
-                    (Ckappa_sig.int_of_agent_id agent_id)
-                in
-                let () =
-                  Loggers.print_newline (Remanent_parameters.get_logger parameters)
-                in
-                Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.iter
-                  parameters error
-                  (fun parameters error site_id restriction ->
-                   let () =
-                     Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                       "%s       Pack %i"
-                       (Remanent_parameters.get_prefix parameters)
-                       (Ckappa_sig.int_of_site_name site_id)
-                   in
-                   let () =
-                     Loggers.print_newline (Remanent_parameters.get_logger parameters)
-                   in
-                   let () =
-                     if restriction.tests = []
-                     then ()
-                     else
-                     let () =
-                       Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                         "%s        test: "
-                         (Remanent_parameters.get_prefix parameters)
-                     in
-                     let () =
-                       List.iter
-                         (fun (var,op,int) ->
-                            Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                              "%s%s%i,"
-                              (string_of_var var)
-                              (string_of_op op)
-                              int)
-                         restriction.tests
-                     in
-                     let () =
-                       Loggers.print_newline (Remanent_parameters.get_logger parameters)
-                     in
-                     ()
-                   in
-                   let () =
-                     if restriction.invertible_assignments = []
-                     then ()
-                     else
-                     let () =
-                       Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                         "%s        inversible_assignemets: "
-                         (Remanent_parameters.get_prefix parameters)
-                     in
-                     let () =
-                       List.iter
-                         (fun (var,int) ->
-                            if int=0 then () else
-                            Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                              "%s%s%i,"
-                              (string_of_var var)
-                              (if int>0 then "+=" else if int<0 then "-=" else "")
-                              (if int>0 then int else -int))
-                         restriction.invertible_assignments
-                     in
-                     let () =
-                       Loggers.print_newline (Remanent_parameters.get_logger parameters)
-                     in
-                     ()
-                   in
-                   let () =
-                     if restriction.non_invertible_assignments = []
-                     then ()
-                     else
-                     let () =
-                       Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                         "%s        non_inversible_assignemets: "
-                         (Remanent_parameters.get_prefix parameters)
-                     in
-                     let () =
-                       List.iter
-                         (fun (var,int) ->
-                            Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                              "%s:=%i,"
-                              (string_of_var var)
-                              int)
-                         restriction.non_invertible_assignments
-                     in
-                     let () =
-                       Loggers.print_newline (Remanent_parameters.get_logger parameters)
-                     in
-                     ()
-                   in
-                   error)
-                  agent_restriction)
-               rule_restriction)
+             print_rule_restriction parameters handler error rule_restriction
+          )
           restrictions
       in
       error

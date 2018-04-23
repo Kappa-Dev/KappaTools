@@ -11,7 +11,7 @@ val empty_restriction: restriction
 
 type static =
   {
-    counters: Ckappa_sig.AgentSite_map_and_set.Set.t ; 
+    counters: Ckappa_sig.AgentSite_map_and_set.Set.t ;
     packs:
       Ckappa_sig.Site_map_and_set.Set.t
         Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t
@@ -29,6 +29,35 @@ type static =
       Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t
       Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.t;
   }
+
+  val print_restriction:
+    Remanent_parameters_sig.parameters ->
+    Cckappa_sig.kappa_handler ->
+    Exception.method_handler ->
+    restriction ->
+    Exception.method_handler
+
+val print_agent_restriction:
+  Remanent_parameters_sig.parameters ->
+  Cckappa_sig.kappa_handler ->
+  Exception.method_handler ->
+  restriction Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.t ->
+  Exception.method_handler
+
+val print_rule_restriction:
+  Remanent_parameters_sig.parameters ->
+  Cckappa_sig.kappa_handler ->
+  Exception.method_handler ->
+  restriction Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.t Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.t->
+  Exception.method_handler
+
+val print_restrictions:
+Remanent_parameters_sig.parameters ->
+Cckappa_sig.kappa_handler ->
+Exception.method_handler ->
+restriction Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.t Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.t
+Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.t ->
+Exception.method_handler
 
 val print:
   Remanent_parameters_sig.parameters ->

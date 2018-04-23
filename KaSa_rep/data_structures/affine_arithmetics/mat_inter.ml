@@ -258,12 +258,12 @@ posref j))) in
 
           let _minf = Hashtbl.create n in                  (* contrainte -> monomes non minores*)
           let good_line=Working_list_imperative.make  n in (*contraintes � r�duire*)
-          let solved=Working_list_imperative.make n in (*variable trouv�e*)
+          (*let solved=Working_list_imperative.make n in (*variable trouv�e*)*)
           let visited_line=Working_list_imperative.make n in (*contraintes r�duites ou en cours*)
-          let read_t t x =
+          (*    let read_t t x =
             try (Working_list_imperative.list (Hashtbl.find t x))
-            with _ -> []
-          in
+                with _ -> [] in*)
+
           let update t x y =
             let l=
               try (Hashtbl.find t x)
@@ -280,29 +280,29 @@ posref j))) in
                (Working_list_imperative.push k visited_line;
                 Working_list_imperative.push (k,v) good_line)
           in
-          let solve k =
+          (*      let solve k =
             (*d�duit les nouvelles contraintes lors de la r�duction d'une variable*)
             if not (Working_list_imperative.member k solved) then
               (
                 List.iter (fun x->
                     begin
                       nb_inf.(x)<-(nb_inf.(x)-1);
-                      if (nb_inf.(x)=0)
-                      then
+                      (*if (nb_inf.(x)=0)
+                        then*)
                         (view (x,k))
                     end)
                   (read_t pos k);
                 List.iter (fun x->
                     begin
                       nb_minf.(x)<-(nb_minf.(x)-1);
-                      if (nb_minf.(x)=0)
-                      then
+                      (*  if (nb_minf.(x)=0)
+                        then*)
                         (if (not (Working_list_imperative.member x visited_line))
                          then
                            (view (x,k)))
                     end)
                   (read_t neg k))
-          in
+                  in*)
           let rec vide () =
             (*traite les contraintes en attentes*)
             try
@@ -313,10 +313,100 @@ posref j))) in
                  | None -> raise Exit
                in
                begin
+                 let rec vide error list sommeinf sommesup =
+                   match list
+                   with
+                   | [] -> error
+                   | Affine_cst::q ->
+                     vide error q
+                       (ffplus
+                          sommeinf
+                          {num=(-1);den=1}
+                          (Frac((M.read_val posm k Affine_cst))))
+                       (ffplus
+                          sommesup
+                          {num=(-1);den=1}
+                          (Frac((M.read_val posm k Affine_cst))))
+                   | (Bool _ | Counter _ as t)::q       ->
+                     let delta=(M.read_val posm k t) in
+                     (match delta.num
+                      with
+                      | 0 -> vide error q sommeinf sommesup
+                      | a when a<0 ->
+                        let () = vide2 error t delta q sommeinf sommesup in
+                        vide error q
+                          (ffplus sommeinf
+                             {num=(-(delta.num));den=delta.den}
+                             ((I.read inter (t)).inf))
+                            (ffplus sommesup
+                               {num=(-(delta.num));den=delta.den}
+                               ((I.read inter (t)).sup))
+
+                      | a when a>0 ->
+                        let () = vide2 error t delta q sommeinf sommesup in
+                        vide error q
+                          (ffplus sommeinf
+                             {num=(-(delta.num));den=delta.den}
+                             ((I.read inter (t)).sup))
+                          (ffplus sommesup
+                             {num=(-(delta.num));den=delta.den}
+                             ((I.read inter (t)).inf))
+                      |  _ -> vide error q sommeinf sommesup)
+                 and vide2 error t t_delta q sommeinf sommesup =
+                   match q with
+                   | [] ->
+                     let sommeinf,sommesup = if
+                       t_delta.num > 0
+                         then sommeinf, sommesup
+                         else
+                           sommesup,sommeinf
+                     in
+                     let () =
+                     I.set inter t
+                      (cap_inter
+                         (I.read inter t)
+                         {inf=ffdiv sommeinf (Frac(t_delta));
+                          sup=ffdiv sommesup (Frac(t_delta))})
+                     in
+                     ()
+                   | head::tail ->
+                   let delta=(M.read_val posm k head) in
+                   (match delta.num
+                    with
+                    | 0 -> vide2 error t t_delta tail sommeinf sommesup
+                    | a when a<0 ->
+                      vide2 error t t_delta tail
+                        (ffplus sommeinf
+                           {num=(-(delta.num));den=delta.den}
+                           ((I.read inter head).inf))
+                        (ffplus sommesup
+                             {num=(-(delta.num));den=delta.den}
+                             ((I.read inter head).sup))
+
+                    | a when a>0 ->
+                      vide2 error t t_delta tail
+                        (ffplus sommeinf
+                           {num=(-(delta.num));den=delta.den}
+                           ((I.read inter head).sup))
+                        (ffplus sommesup
+                           {num=(-(delta.num));den=delta.den}
+                           ((I.read inter head).inf))
+                    |  _ -> vide2 error t t_delta tail sommeinf sommesup)
+
+
+                 in
+                 let error, line  = M.get_line parameters (!error_ref) posm k in
+                 let error =
+                   vide error (M.get_trans_list line)  (Frac{num=0;den=1}) (Frac{num=0;den=1})
+                 in
+                 let () = error_ref:=error in
+                 ()
+               end ;
+               (* begin
                  (if nb_inf.(k)=0
                   then
                     (
-                      let rec vide list somme  =
+                    let rec vide list somme  =
                         match list
                         with
                         | Affine_cst::q ->
@@ -325,6 +415,23 @@ posref j))) in
                                (Frac({num=0;den=1}))
                                {num=(-1);den=1}
                                (Frac((M.read_val posm k Affine_cst))))
+                               | (Bool _ | Counter _ as t)::q       ->
+                                 let delta=(M.read_val posm k t) in
+                                 (match delta.num
+                                  with
+                                  | 0 -> vide q somme
+                                  | a when a<0 ->
+                                    vide q
+                                      (ffplus somme
+                                         {num=(-(delta.num));
+                                          den=delta.den}
+                                         ((I.read inter (t)).inf))
+                                  | a when a>0 ->
+                                    vide q
+                                      (ffplus somme
+                                         {num=(-(delta.num));den=delta.den}
+                                         ((I.read inter (t)).sup))
+                                  |  _ -> vide q somme)
 
                         | (Bool _ | Counter _ as t)::q       ->
                           let delta=(M.read_val posm k t) in
@@ -447,7 +554,7 @@ posref j))) in
                        let () = error_ref:=error in
 
                      vide2 (M.get_trans_list line)))
-               end;
+                  end;*)
                vide ())
             with _ -> ()
           in

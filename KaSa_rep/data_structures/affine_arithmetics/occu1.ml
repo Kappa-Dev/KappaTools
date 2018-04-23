@@ -16,6 +16,19 @@ let p x y =
   if cmp = 0 then Ckappa_sig.compare_state_index b b'
   else cmp
 
+  (*let p x y =
+    match x,y with
+  | Affine_cst, Affine_cst -> 0
+  | _, Affine_cst -> -1
+  | Affine_cst, _ -> 1
+  | Bool (a,b), Bool (a',b') ->
+    let cmp = Ckappa_sig.compare_site_name a a' in
+    if cmp = 0 then Ckappa_sig.compare_state_index b b'
+    else cmp
+  | Bool _ , _ -> 1
+  | _ , Bool _ -> -1
+    | Counter c, Counter c' -> Ckappa_sig.compare_site_name c c'*)
+
 let po x y = ((p x y)>0)
 
 let string_of_trans x =

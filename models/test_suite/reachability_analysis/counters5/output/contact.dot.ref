@@ -9,11 +9,10 @@ graph G{
 subgraph cluster0 {
    0.0 [style = filled label = "x1" shape =circle color = yellow size = "5"]
    0.1 [style = filled label = "c" shape =house color = grey size = "5"]
-   0.2 [style = filled label = "d" shape =house color = grey size = "5"]
-   0.3 [style = filled label = "x2" shape =circle color = yellow size = "5"]
-   0.4 [style = filled label = "x3" shape =circle color = yellow size = "5"]
-   0.5 [style = filled label = "x4" shape =circle color = yellow size = "5"]
-   0.6 [style = filled label = "x5" shape =circle color = yellow size = "5"]
+   0.2 [style = filled label = "x2" shape =circle color = yellow size = "5"]
+   0.3 [style = filled label = "x3" shape =circle color = yellow size = "5"]
+   0.4 [style = filled label = "x4" shape =circle color = yellow size = "5"]
+   0.5 [style = filled label = "x5" shape =circle color = yellow size = "5"]
 label =  "A";  shape = rectangle; color = blue
 } ; 
 subgraph cluster1 {
@@ -26,8 +25,8 @@ label =  "B";  shape = rectangle; color = blue
 } ; 
 0.0 -- 1.0
 0.0 -- 2.0
+0.2 -- 2.0
 0.3 -- 2.0
 0.4 -- 2.0
 0.5 -- 2.0
-0.6 -- 2.0
 }

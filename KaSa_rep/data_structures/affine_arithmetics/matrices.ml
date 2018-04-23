@@ -29,6 +29,11 @@ val affiche:
   matrice->
   Exception.method_handler
 
+val affiche_cons:
+  Remanent_parameters_sig.parameters ->
+  int list * (int, Fraction.fraction) Hashtbl.t *
+  Intervalles.intervalle -> unit
+
 val get_all_entry:
   matrice-> var Working_list_imperative.working_list
 val add_entry:
