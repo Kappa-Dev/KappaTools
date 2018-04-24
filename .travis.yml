@@ -78,7 +78,7 @@ matrix:
           - gcc-mingw-w64-x86-64
 
 before_install:
-  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then brew update && brew install --without-aspcud opam ; fi"
+  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then curl -LO https://github.com/ocaml/opam/releases/download/2.0.0-rc/opam-2.0.0-rc-x86_64-darwin && sudo mv opam-2.0.0-rc-x86_64-darwin /usr/local/bin/opam && sudo chmod +x /usr/local/bin/opam ; fi"
 
 install:
   - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.06.1 ; else opam init -a git://github.com/ocaml/opam-repository ; fi"
