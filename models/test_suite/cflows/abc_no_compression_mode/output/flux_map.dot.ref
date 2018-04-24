@@ -1,0 +1,21 @@
+digraph G{ label="Dynamic influence network" ; labelloc="t" ; node [shape=box,style=filled,fillcolor=lightskyblue]
+"a.b" -> "a.b" [weight=0,label="-0.002",color=red3,arrowhead=tee];
+"a.b" -> "a.b_op" [weight=0,label="0.016",color=green3,arrowhead=normal];
+"a.b" -> "ab.c" [weight=0,label="0.023",color=green3,arrowhead=normal];
+"a.b" -> "a.c" [weight=0,label="-0.001",color=red3,arrowhead=tee];
+"a.b" -> "mod x2" [weight=0,label="-0.003",color=red3,arrowhead=tee];
+"a.b_op" -> "a.b" [weight=0,label="0.003",color=green3,arrowhead=normal];
+"a.b_op" -> "a.b_op" [weight=0,label="-0.005",color=red3,arrowhead=tee];
+"a.b_op" -> "ab.c" [weight=0,label="-0.005",color=red3,arrowhead=tee];
+"a.b_op" -> "a.c" [weight=0,label="0.001",color=green3,arrowhead=normal];
+"a.b_op" -> "mod x2" [weight=0,label="0.004",color=green3,arrowhead=normal];
+"ab.c" -> "ab.c" [weight=0,label="-0.010",color=red3,arrowhead=tee];
+"ab.c" -> "mod x1" [weight=0,label="0.019",color=green3,arrowhead=normal];
+"mod x1" -> "ab.c" [weight=0,label="0.008",color=green3,arrowhead=normal];
+"mod x1" -> "mod x1" [weight=0,label="-0.012",color=red3,arrowhead=tee];
+"mod x1" -> "a.c" [weight=0,label="0.014",color=green3,arrowhead=normal];
+"a.c" -> "a.c" [weight=0,label="-0.012",color=red3,arrowhead=tee];
+"a.c" -> "mod x2" [weight=0,label="0.167",color=green3,arrowhead=normal];
+"mod x2" -> "a.c" [weight=0,label="0.001",color=green3,arrowhead=normal];
+"mod x2" -> "mod x2" [weight=0,label="-0.116",color=red3,arrowhead=tee];
+}
