@@ -60,7 +60,7 @@ let content () =
             Html.div ~a:[Html.a_class ["col-md-10"] ] [accuracy_chooser] ]
       ] in
   [ accuracy_form;
-    [%html {|<div id="|}display_id{|">|}[ Html.entity "nbsp" ]{|</div>|}];
+    Html.div ~a:[ Html.a_id display_id; Html.a_class [ "flex-content" ] ] [ Html.entity "nbsp" ];
     Widget_export.content configuration ]
 
 let extract_contact_map = function
