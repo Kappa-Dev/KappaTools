@@ -84,7 +84,16 @@ let recenter =
                   Html.a_size 1;]
     ()
 
-
+let export_config = {
+  Widget_export.id = "influence-export";
+  Widget_export.handlers =
+    [ Widget_export.export_json ~serialize_json:(fun () ->
+          Option_util.unsome "null" (React.S.value influence_map_text)
+        );
+    ];
+  Widget_export.show =
+    React.S.map (function None -> false | Some _ -> true) influence_map_text;
+}
 
 let accuracy_chooser_id = "influence-accuracy"
 
@@ -297,7 +306,8 @@ let content () =
             Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter]]]
   in
   [ accuracy_form;
-    Html.div ~a:[Html.a_id display_id; Html.a_class ["flex-content"] ] [] ]
+    Html.div ~a:[Html.a_id display_id; Html.a_class ["flex-content"] ] [];
+    Widget_export.content export_config ]
 
 let _ =
   React.S.l6
@@ -344,6 +354,7 @@ let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 
 let onload () =
+  let () = Widget_export.onload export_config in
   let _ =
     React.S.map
       (function
