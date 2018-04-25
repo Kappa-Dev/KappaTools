@@ -37,6 +37,8 @@ function ObservablePlot (mainDivId) {
 	}
     };
 
+    this.timeLabel = "Time";
+
     this.plotLabelDivId = "plot-label-div"          // div to place plot interval
     this.plotDivAxisSelectId = "plot-axis-select"
     this.plotDivId = "plot-display"
@@ -52,7 +54,8 @@ function ObservablePlot (mainDivId) {
        null.  This allows an arbitary axis to serve at the
        x-axis.
      */
-    this.state = [];
+    this.state =
+	[{ label : this.timeLabel, values : [], mode : this.modes.XAXIS }];
 
     /* Return the list of labels for values in the plot.
        The time axis is filtered out as it is null.
@@ -82,8 +85,6 @@ function ObservablePlot (mainDivId) {
     this.getStatesByMode = function(mode){
         return this.state.filter(function(obs){ return obs.mode == mode; })
     }
-
-    this.timeLabel = "Time";
 
     this.rawData = { legend:[], values:[] }
 

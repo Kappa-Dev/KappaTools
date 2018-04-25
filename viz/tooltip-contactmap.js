@@ -7,9 +7,9 @@ class UIManager {
         this.buttonClicked = 0;
         let UI = this;
 
-        this.tip = renderer.root.append("div")	
-            .attr("class", "tooltip")	
-            .style("font-size", "1.5em")			
+        this.tip = renderer.root.append("div")
+            .attr("class", "tooltip")
+            .style("font-size", "1.5em")
             .style("opacity", 0)
             .style("padding", "0.5em");
 
@@ -23,7 +23,7 @@ class UIManager {
         toolbox.append('label')
             .attr('for', 'cycleCheckbox')
             .text("Interactive Mode");
-        
+
         toolbox.append("input")
             .attr("id", "toggleLines")
             .attr("type", "checkbox")
@@ -41,13 +41,12 @@ class UIManager {
             .attr("type", "button")
             .attr("value", "Show All States")
             .on("click", showStates);
-            
+
         this.toggles.append("input")
             .attr("id", "resetZoomButton")
             .attr("class", "stateButton")
             .attr("type", "button")
             .attr("value", "Reset Zoom");
-
 
         function toggleCycleDetection() {
             //console.log("checked");
@@ -57,7 +56,7 @@ class UIManager {
                 renderer.root.select("#toggleLines").attr("disabled", null);
                 console.log("cycled");
             }
-            else 
+            else
             {
                 renderer.cycleDetect = false;
                 renderer.rerender();
@@ -73,7 +72,7 @@ class UIManager {
                     .style("stroke-width", 2);
 
             }
-            else 
+            else
             {
                 renderer.toggleLines = false;
                 renderer.root.selectAll(".link").filter( d => d.side || d.clicked)
@@ -84,7 +83,8 @@ class UIManager {
 
         function showStates() {
             UI.buttonClicked = UI.buttonClicked === 0 ? 1: 0;
-            let states = renderer.svg.selectAll(".stateLink").filter( d => d.states.length > 0 ); 
+            let states = renderer.svg.selectAll(".stateLink").
+		filter( d => d.states.length > 0 );
             //let siteNodes = renderer.svg.selectAll("")
             if (UI.buttonClicked) {
                 states.attr('opacity', 1);
@@ -96,7 +96,7 @@ class UIManager {
                 });
                 renderer.root.select(".stateButton").attr("value", "Hide All States");
             }
-            else { 
+            else {
                 states.attr('opacity', 0);
                 renderer.svg.selectAll('.outerSite')
                     .style("fill", function(d) {
@@ -108,18 +108,17 @@ class UIManager {
             }
         }
     }
-    
 
-    showSite(d) { 
-        let site = d;       
+    showSite(d) {
+        let site = d;
         this.tip
             .style("opacity", 1);
         this.tip
             .text( () => {
                 if(site.states.length > 0) {
                     let text = "agent: " + site.agent.label + "\n" +
-                           "site: " + site.label + "\n" +
-                           "states: ";
+                        "site: " + site.label + "\n" +
+                        "states: ";
                     for (let i in site.states) {
                         text = text + site.states[i].name + "\n";
                     }
@@ -127,12 +126,12 @@ class UIManager {
                 }
                 else
                     return "agent: " + site.agent.label + "\n" +
-                           "site: " + site.label + "\n" +
-                           "states: none" ; })
+                    "site: " + site.label + "\n" +
+                    "states: none" ; })
             .style('color', site.agent.color);
     }
 
-    showNode(d) {        
+    showNode(d) {
         this.tip
             .style("opacity", 1);
         this.tip

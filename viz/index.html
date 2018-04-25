@@ -44,8 +44,11 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <script src="class.js"></script>
+    <script src="utils.js"></script>
     <script src="tooltip-snapshot.js"></script>
     <script src="render-snapshot.js"></script>
+    <script src="tooltip-contactmap.js"></script>
+    <script src="render-contactmap.js"></script>
     <script src="common.js"></script>
     <script src="plot.js"></script>
     <link rel="stylesheet" href="JsSim.css"></link>
@@ -56,6 +59,8 @@
       CONTACTMAP:2
       };
       var mode = modes.SNAPSHOT;
+
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) { redraw(); });
 
       function activate(dstId) {
       switch (dstId) {
@@ -73,7 +78,6 @@
       break;
       }
       $("#"+dstId+" a").tab('show');
-      redraw();
       }
 
       var snap = new Snapshot("snap",[]);
@@ -88,6 +92,12 @@
         plot.setData(plotReader.result);
       }, false);
 
+      var cmap = new ContactMap("contact");
+      var cmapReader = new FileReader();
+      cmapReader.addEventListener("load",function (event) {
+        cmap.setData(cmapReader.result);
+      }, false);
+
       var redraw = function () {
       switch (mode) {
       case modes.SNAPSHOT:
@@ -97,6 +107,7 @@
       plot.redraw();
       break;
       case modes.CONTACTMAP:
+      cmap.redraw();
       break;
       default:
       alert("Unknown mode "+mode+" in redraw handler");
@@ -120,6 +131,7 @@
       plotReader.readAsText(data);
       break;
       case modes.CONTACTMAP:
+      cmapReader.readAsText(data);
       break;
       default:
       alert("Unknown mode "+mode+" in drop handler");
