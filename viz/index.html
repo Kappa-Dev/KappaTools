@@ -83,19 +83,28 @@
       var snap = new Snapshot("snap",[]);
       var snapReader = new FileReader();
       snapReader.addEventListener("load",function (event) {
-        snap.setData("null",snapReader.result);
+        try { snap.setData("null",snapReader.result); } catch (e) { alert (e); }
+      }, false);
+      snapReader.addEventListener("error",function (event) {
+      alert(snapReader.error);
       }, false);
 
       var plot = new ObservablePlot("plot");
       var plotReader = new FileReader();
       plotReader.addEventListener("load",function (event) {
-        plot.setData(plotReader.result);
+        try { plot.setData(plotReader.result); } catch (e) { alert (e); }
+      }, false);
+      plotReader.addEventListener("error",function (event) {
+      alert(plotReader.error);
       }, false);
 
       var cmap = new ContactMap("contact");
       var cmapReader = new FileReader();
       cmapReader.addEventListener("load",function (event) {
-        cmap.setData(cmapReader.result);
+        try { cmap.setData(cmapReader.result); } catch (e) { alert (e); }
+      }, false);
+      cmapReader.addEventListener("error",function (event) {
+      alert(cmapReader.error);
       }, false);
 
       var redraw = function () {

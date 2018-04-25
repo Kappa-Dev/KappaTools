@@ -96,7 +96,7 @@ class SnapUIManager {
             .append("svg")
             .attr("class", "legend-container")   
             .attr("height", (legendRectSize + legendSpacing) * dataArray.length + 2 * padding )
-            .attr("width", "15vw" )
+            .attr("width", "100%" )
             .attr("preserveAspectRatio", "xMinYMin meet");        	
         
         window.addEventListener("resize", resizeLegend);
