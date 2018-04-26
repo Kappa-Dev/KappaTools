@@ -79,7 +79,8 @@ let find_implicit_infos contact_map ags =
       aux_one free_id previous current todos ag_tail ag ag.LKappa.ra_ports 0 in
   aux_ags (succ (LKappa.max_link_id ags)) [] [] [] ags
 
-let complete_with_candidate ag id todo p_id dst_info p_switch =
+let complete_with_candidate
+    outs prevs ag ag_tail id todo p_id dst_info p_switch =
   Tools.array_fold_lefti
     (fun i acc port ->
        if i <> p_id then acc else
@@ -91,20 +92,22 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
                ports'.(i) <-
                  (Locality.dummy_annot
                     (Ast.LNK_VALUE (id,dst_info)),p_switch) in
-             ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
-                LKappa.ra_ints = ag.LKappa.ra_ints;
-                LKappa.ra_erased = ag.LKappa.ra_erased;
-                LKappa.ra_syntax = ag.LKappa.ra_syntax;}, todo)
+             (List.rev_append prevs
+                ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
+                   LKappa.ra_ints = ag.LKappa.ra_ints;
+                   LKappa.ra_erased = ag.LKappa.ra_erased;
+                   LKappa.ra_syntax = ag.LKappa.ra_syntax;}::ag_tail), todo)
              :: acc
            else if s = LKappa.Erased && p_switch = LKappa.Freed then
              let ports' = Array.copy ag.LKappa.ra_ports in
              let () =
                ports'.(i) <-
                  (Locality.dummy_annot (Ast.LNK_VALUE (id,dst_info)),s) in
-             ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
-                LKappa.ra_ints = ag.LKappa.ra_ints;
-                LKappa.ra_erased = ag.LKappa.ra_erased;
-                LKappa.ra_syntax = ag.LKappa.ra_syntax;}, todo)
+             (List.rev_append prevs
+                ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
+                   LKappa.ra_ints = ag.LKappa.ra_ints;
+                   LKappa.ra_erased = ag.LKappa.ra_erased;
+                   LKappa.ra_syntax = ag.LKappa.ra_syntax;}::ag_tail), todo)
              :: acc
            else acc
          | (Ast.LNK_VALUE (k,x),_),s ->
@@ -118,16 +121,17 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
                let () = assert (x = dst_info) in
                let () = ports'.(i) <-
                    (Locality.dummy_annot (Ast.LNK_VALUE (id,x)),s) in
-               ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
-                  LKappa.ra_ints = ag.LKappa.ra_ints;
-                  LKappa.ra_erased = ag.LKappa.ra_erased;
-                  LKappa.ra_syntax = ag.LKappa.ra_syntax;},
+               (List.rev_append prevs
+                  ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
+                     LKappa.ra_ints = ag.LKappa.ra_ints;
+                     LKappa.ra_erased = ag.LKappa.ra_erased;
+                     LKappa.ra_syntax = ag.LKappa.ra_syntax;}::ag_tail),
                 todo') :: acc
              |[], _ -> acc
              | _ :: _ :: _, _ -> assert false
            end
          | ((Ast.LNK_TYPE _ | Ast.LNK_FREE | Ast.LNK_SOME),_), _ -> acc)
-    [] ag.LKappa.ra_ports
+    outs ag.LKappa.ra_ports
 
 let new_agent_with_one_link sigs ty_id port link dst_info switch =
   let arity = Signature.arity sigs ty_id in
@@ -139,27 +143,22 @@ let new_agent_with_one_link sigs ty_id port link dst_info switch =
   { LKappa.ra_type = ty_id; LKappa.ra_ports = ports; LKappa.ra_ints = internals;
     LKappa.ra_erased = false; LKappa.ra_syntax = None;}
 
-let rec add_one_implicit_info sigs id ((port,ty_id),dst_info,s as info) todo =
+let rec add_one_implicit_info sigs id ((port,ty_id),dst_info,s as info) acc out todo =
   function
-  | [] -> [[new_agent_with_one_link sigs ty_id port id dst_info s],todo]
+  | [] ->
+    (List.rev_append acc [new_agent_with_one_link sigs ty_id port id dst_info s],todo)::out
   | ag :: ag_tail ->
-    let out_tail = add_one_implicit_info sigs id info todo ag_tail in
-    let extra_ags =
-      if ty_id = ag.LKappa.ra_type then
-        (List.map
-           (fun (ag',todo') -> ag'::ag_tail,todo')
-           (complete_with_candidate ag id todo port dst_info s))
-      else [] in
-    List.fold_left (fun l (x,todo') -> ((ag::x,todo')::l)) extra_ags out_tail
+    let out_tail = add_one_implicit_info sigs id info (ag::acc) out todo ag_tail in
+    if ty_id = ag.LKappa.ra_type then
+      complete_with_candidate out_tail acc ag ag_tail id todo port dst_info s
+      else out_tail
 
 let add_implicit_infos sigs l =
   let rec aux acc = function
     | [] -> acc
     | (m,[]) :: t -> aux (m::acc) t
     | (m,((id,info,dst_info,s) :: todo')) :: t ->
-      aux acc
-        (List.rev_append
-           (add_one_implicit_info sigs id (info,dst_info,s) todo' m) t)
+      aux acc (add_one_implicit_info sigs id (info,dst_info,s) [] t todo' m)
   in aux [] l
 
 let is_linked_on_port me i id = function
@@ -563,7 +562,7 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
   add_implicit_infos
     sigs (find_implicit_infos
             contact_map
-            (List.map LKappa.copy_rule_agent precomp_mixs))
+            (List.rev (List.rev_map LKappa.copy_rule_agent precomp_mixs)))
 
 let connected_components_sum_of_ambiguous_rule
    ~compileModeOn contact_map env ?origin precomp_mixs created =
@@ -591,7 +590,7 @@ let connected_components_sum_of_ambiguous_mixture
   let rules,(cc_env,_) =
     connected_components_sum_of_ambiguous_rule
       ~compileModeOn contact_map env ?origin mix [] in
-  (cc_env, List.map
+  (cc_env, List.rev_map
      (function _, l, event, ([],[]) -> l, event.Instantiation.tests
              | _ -> assert false) rules)
 
