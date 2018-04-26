@@ -12,7 +12,7 @@ class Layout {
 class ContactMap {
     constructor(id, coloring) {
         this.id = '#' + id;
-        this.coloring = coloring || [];
+        this.coloring = coloring || {};
     }
 
     redraw(tip = true) {
@@ -541,6 +541,7 @@ class Render {
                   this.checkStateCollusion(textSize - 10);
 		  }
     */
+
     renderDonut() {
         let siteRadius = this.siteRadius;
         let siteList = this.siteList;
@@ -554,7 +555,6 @@ class Render {
         let renderer = this;
         let tip = this.tip;
 
-        let c20 = d3.scaleOrdinal(d3.schemeCategory20);
         let cluster = d3.cluster();
         // .size([360, innerRadius - 2.5]);
 
@@ -594,6 +594,11 @@ class Render {
             .data(site(siteList))
             .enter().append("g");
 
+	/* Cleanup coloring */
+	for (let member in renderer.coloring)
+	    if (data.listNodes().find( (d) => { return d.label === member ; })
+	       === undefined)
+		delete renderer.coloring[member];
         /* render node arcs paths */
         gNode.append("path")
             .attr("class", "nodeArcPath")
@@ -605,10 +610,11 @@ class Render {
                     d.data.color = renderer.coloring[d.data.label];
                 }
                 else {
-                    d.data.color = d3.rgb(c20(i)).darker(1);
+                    d.data.color =
+			d3.rgb(d3.schemeCategory20[Object.keys(renderer.coloring).length % 20]).darker(1);
                     renderer.coloring[d.data.label] = d.data.color;
                 }
-                return d3.rgb(c20(i)).brighter(0.5);})
+                return d.data.color.brighter(1.5);})
             .style("opacity", (d,i) => {
                 if (!this.nodemapping || !this.selection)
                     return opacity.node_normal;

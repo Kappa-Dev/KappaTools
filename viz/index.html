@@ -80,7 +80,7 @@
       $("#"+dstId+" a").tab('show');
       }
 
-      var snap = new Snapshot("snap",[]);
+      var snap = new Snapshot("snap",{});
       var snapReader = new FileReader();
       snapReader.addEventListener("load",function (event) {
         try { snap.setData("null",snapReader.result); } catch (e) { alert (e); }

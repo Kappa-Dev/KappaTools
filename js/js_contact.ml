@@ -14,6 +14,6 @@ class type contact_map =
   end
 
 let create_contact_map
-    (id : string) (coloring : unit Js.js_array Js.t) : contact_map Js.t =
+    (id : string) (coloring : unit Js.t) : contact_map Js.t =
   Js.Unsafe.new_obj (Js.Unsafe.variable "ContactMap")
     [| Js.Unsafe.inject (Js.string id); Js.Unsafe.inject coloring |]

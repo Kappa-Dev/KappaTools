@@ -312,18 +312,19 @@ class SnapRender {
 
 
             node.append("rect")
-                    .attr("class", "treeRects")
-                    .attr("id", d => d.data.id )
-                    .attr("width", d => d.x1 - d.x0 )
-                    .attr("height", d => d.y1 - d.y0 )
-                    .attr("fill", (d, i) => { 
-                        if (renderer.coloring[d.data.name] === undefined) {
-                            renderer.coloring[d.data.name] = d3.rgb(c20(Object.keys(renderer.coloring).length));
-                        } 
-                        if (renderer.marking[d.parent.data.name] === 1)
-                            return renderer.coloring[d.data.name];
-                        return renderer.coloring[d.data.name].brighter(1.5); });
-                    //.style('pointer-events', 'none');
+                .attr("class", "treeRects")
+                .attr("id", d => d.data.id )
+                .attr("width", d => d.x1 - d.x0 )
+                .attr("height", d => d.y1 - d.y0 )
+                .attr("fill", (d, i) => {
+                    if (renderer.coloring[d.data.name] === undefined) {
+                        renderer.coloring[d.data.name] =
+			    d3.rgb(d3.schemeCategory20[Object.keys(renderer.coloring).length % 20]).darker(1);
+                    }
+                    if (renderer.marking[d.parent.data.name] === 1)
+                        return renderer.coloring[d.data.name];
+                    return renderer.coloring[d.data.name].brighter(1.5); });
+            //.style('pointer-events', 'none');
 
             node.exit().remove();
         }
