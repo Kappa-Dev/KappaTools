@@ -620,3 +620,16 @@ let to_raw_mixture sigs x =
          Raw_mixture.a_ports = ports; Raw_mixture.a_ints =
                                         internals; })
     x
+
+let max_link_id r =
+  let max_s m = function
+    | Linked i -> max i m
+    | Freed | Maintained | Erased -> m in
+  let max_link_id_sites max_id ag =
+    Array.fold_left (fun max_id -> function
+        | (Ast.LNK_VALUE (j,_),_),s -> max_s (max j max_id) s
+        | ((Ast.LNK_TYPE _|Ast.LNK_SOME|
+            Ast.LNK_FREE|Ast.LNK_ANY|Ast.ANY_FREE),_),s -> max_s max_id s)
+      max_id ag.ra_ports in
+  List.fold_left max_link_id_sites 0 r
+

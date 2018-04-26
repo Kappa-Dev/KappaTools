@@ -85,3 +85,5 @@ val print_rule :
 val rule_to_json :
   filenames : int Mods.StringMap.t -> rule -> Yojson.Basic.json
 val rule_of_json : filenames : string array -> Yojson.Basic.json -> rule
+
+val max_link_id : rule_mixture -> int

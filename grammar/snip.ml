@@ -16,16 +16,13 @@ let ports_from_contact_map contact_map ty_id p_id =
   snd contact_map.(ty_id).(p_id)
 
 let find_implicit_infos contact_map ags =
-  let max_s m = function
-    | LKappa.Linked i -> max i m
-    | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> m in
   let new_switch = function
     | LKappa.Maintained -> LKappa.Maintained
     | LKappa.Freed | LKappa.Linked _ | LKappa.Erased -> LKappa.Freed in
-  let rec aux_one ag_tail ty_id max_id ports i =
+  let rec aux_one ag_tail ty_id ports i =
     let or_ty = (i,ty_id) in
     if i = Array.length ports
-    then List.map (fun (f,a,c) -> (f,ports,a,c)) (aux_ags max_id ag_tail)
+    then List.map (fun (f,a,c) -> (f,ports,a,c)) (aux_ags ag_tail)
     else
       match ports.(i) with
       | (Ast.LNK_TYPE (p,a),_),s ->
@@ -36,7 +33,7 @@ let find_implicit_infos contact_map ags =
                  (Locality.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
              (succ free_id, ports, ags,
               (free_id,(p,a),or_ty,new_switch s)::cor))
-          (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
+          (aux_one ag_tail ty_id ports (succ i))
       | (Ast.LNK_SOME,_), s ->
         List_util.map_flatten
           (fun (free_id,ports,ags,cor) ->
@@ -50,27 +47,27 @@ let find_implicit_infos contact_map ags =
                   (succ free_id, ports', ags,
                    (free_id,(p,a),or_ty,new_switch s)::cor))
                (ports_from_contact_map contact_map ty_id i))
-          (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
-      | (Ast.LNK_VALUE (j,_),_),s ->
-        aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
+          (aux_one ag_tail ty_id ports (succ i))
+      | (Ast.LNK_VALUE _,_),_ ->
+        aux_one ag_tail ty_id ports (succ i)
       | (Ast.LNK_FREE, pos), (LKappa.Maintained | LKappa.Erased as s) ->
         let () = (* Do not make test if being free is the only possibility *)
           match ports_from_contact_map contact_map ty_id i with
           | [] -> ports.(i) <- (Ast.LNK_ANY,pos), s
           | _ :: _ -> () in
-        aux_one ag_tail ty_id max_id ports (succ i)
+        aux_one ag_tail ty_id ports (succ i)
       | (Ast.LNK_FREE, _), LKappa.Freed -> failwith "A free site cannot be freed"
-      | (Ast.LNK_FREE, _), (LKappa.Linked _ as s) ->
-        aux_one ag_tail ty_id (max_s max_id s) ports (succ i)
+      | (Ast.LNK_FREE, _), LKappa.Linked _ ->
+        aux_one ag_tail ty_id ports (succ i)
       | ((Ast.LNK_ANY|Ast.ANY_FREE),_), LKappa.Maintained ->
-        aux_one ag_tail ty_id max_id ports (succ i)
+        aux_one ag_tail ty_id ports (succ i)
       | ((Ast.LNK_ANY|Ast.ANY_FREE),pos),
         (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
         match ports_from_contact_map contact_map ty_id i with
         | [] when s = LKappa.Freed ->
           (* Do not make test is being free is the only possibility *)
           let () = ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained in
-          aux_one ag_tail ty_id max_id ports (succ i)
+          aux_one ag_tail ty_id ports (succ i)
         | _pfcm ->
           (*List_util.map_flatten
             (fun (free_id,ports,ags,cor) ->
@@ -87,9 +84,9 @@ let find_implicit_infos contact_map ags =
             (succ free_id, ports', ags,
             (free_id,(p,a),or_ty,new_switch s)::cor))
             pfcm)*)
-          (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
-  and aux_ags max_id = function
-    | [] -> [succ max_id,[],[]]
+          (aux_one ag_tail ty_id ports (succ i))
+  and aux_ags = function
+    | [] -> [succ (LKappa.max_link_id ags),[],[]]
     | ag :: ag_tail ->
       List.map
         (fun (free_id,ports,ags,cor) ->
@@ -100,8 +97,8 @@ let find_implicit_infos contact_map ags =
              LKappa.ra_syntax = ag.LKappa.ra_syntax}::ags,
             cor)
         )
-        (aux_one ag_tail ag.LKappa.ra_type max_id ag.LKappa.ra_ports 0)
-  in List.rev @@ List.rev_map (fun (_,mix,todo) -> (mix,todo)) (aux_ags 0 ags)
+        (aux_one ag_tail ag.LKappa.ra_type ag.LKappa.ra_ports 0)
+  in List.rev @@ List.rev_map (fun (_,mix,todo) -> (mix,todo)) (aux_ags ags)
 
 let complete_with_candidate ag id todo p_id dst_info p_switch =
   Tools.array_fold_lefti
