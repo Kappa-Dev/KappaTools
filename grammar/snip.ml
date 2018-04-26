@@ -53,13 +53,14 @@ let find_implicit_infos contact_map ags =
           (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
       | (Ast.LNK_VALUE (j,_),_),s ->
         aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
-      | (Ast.LNK_FREE, pos), LKappa.Maintained ->
+      | (Ast.LNK_FREE, pos), (LKappa.Maintained | LKappa.Erased as s) ->
         let () = (* Do not make test if being free is the only possibility *)
           match ports_from_contact_map contact_map ty_id i with
-          | [] -> ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained
+          | [] -> ports.(i) <- (Ast.LNK_ANY,pos), s
           | _ :: _ -> () in
         aux_one ag_tail ty_id max_id ports (succ i)
-      | (Ast.LNK_FREE, _), (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
+      | (Ast.LNK_FREE, _), LKappa.Freed -> failwith "A free site cannot be freed"
+      | (Ast.LNK_FREE, _), (LKappa.Linked _ as s) ->
         aux_one ag_tail ty_id (max_s max_id s) ports (succ i)
       | ((Ast.LNK_ANY|Ast.ANY_FREE),_), LKappa.Maintained ->
         aux_one ag_tail ty_id max_id ports (succ i)
