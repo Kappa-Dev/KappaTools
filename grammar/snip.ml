@@ -19,86 +19,65 @@ let find_implicit_infos contact_map ags =
   let new_switch = function
     | LKappa.Maintained -> LKappa.Maintained
     | LKappa.Freed | LKappa.Linked _ | LKappa.Erased -> LKappa.Freed in
-  let rec aux_one ag_tail ty_id ports i =
-    let or_ty = (i,ty_id) in
-    if i = Array.length ports
-    then List.map (fun (f,a,c) -> (f,ports,a,c)) (aux_ags ag_tail)
-    else
-      match ports.(i) with
+  let rec aux_one free_id previous current todos ag_tail ag ports i =
+    let ty_id = ag.LKappa.ra_type in
+    if i = Array.length ports then
+      let current' = {
+        LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports;
+        LKappa.ra_ints = ag.LKappa.ra_ints;
+        LKappa.ra_erased = ag.LKappa.ra_erased;
+        LKappa.ra_syntax = ag.LKappa.ra_syntax
+      }::current in
+      aux_ags free_id previous current' todos ag_tail
+    else match ports.(i) with
       | (Ast.LNK_TYPE (p,a),_),s ->
-        List.map
-          (fun (free_id,ports,ags,cor) ->
-             let () =
-               ports.(i) <-
-                 (Locality.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
-             (succ free_id, ports, ags,
-              (free_id,(p,a),or_ty,new_switch s)::cor))
-          (aux_one ag_tail ty_id ports (succ i))
+        let or_ty = (i,ty_id) in
+        let () = ports.(i) <-
+            (Locality.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
+        aux_one
+          (succ free_id) previous current
+          ((free_id,(p,a),or_ty,new_switch s)::todos) ag_tail ag ports (succ i)
       | (Ast.LNK_SOME,_), s ->
-        List_util.map_flatten
-          (fun (free_id,ports,ags,cor) ->
-             List.map
-               (fun (a,p) ->
-                  let ports' = Array.copy ports in
-                  let () =
-                    ports'.(i) <-
-                      (Locality.dummy_annot
-                         (Ast.LNK_VALUE (free_id,(p,a))),s) in
-                  (succ free_id, ports', ags,
-                   (free_id,(p,a),or_ty,new_switch s)::cor))
-               (ports_from_contact_map contact_map ty_id i))
-          (aux_one ag_tail ty_id ports (succ i))
+        let or_ty = (i,ty_id) in
+        List.fold_left
+          (fun prev' (a,p) ->
+             let ports' = Array.copy ports in
+             let () =
+               ports'.(i) <-
+                 (Locality.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
+             let todos' =
+               (free_id,(p,a),or_ty,new_switch s)::todos in
+             aux_one
+               (succ free_id) prev' current todos' ag_tail ag ports' (succ i))
+          previous
+          (ports_from_contact_map contact_map ty_id i)
       | (Ast.LNK_VALUE _,_),_ ->
-        aux_one ag_tail ty_id ports (succ i)
+        aux_one free_id previous current todos ag_tail ag ports (succ i)
       | (Ast.LNK_FREE, pos), (LKappa.Maintained | LKappa.Erased as s) ->
         let () = (* Do not make test if being free is the only possibility *)
           match ports_from_contact_map contact_map ty_id i with
           | [] -> ports.(i) <- (Ast.LNK_ANY,pos), s
           | _ :: _ -> () in
-        aux_one ag_tail ty_id ports (succ i)
-      | (Ast.LNK_FREE, _), LKappa.Freed -> failwith "A free site cannot be freed"
+        aux_one free_id previous current todos ag_tail ag ports (succ i)
+      | (Ast.LNK_FREE, _), LKappa.Freed ->failwith "A free site cannot be freed"
       | (Ast.LNK_FREE, _), LKappa.Linked _ ->
-        aux_one ag_tail ty_id ports (succ i)
+        aux_one free_id previous current todos ag_tail ag ports (succ i)
       | ((Ast.LNK_ANY|Ast.ANY_FREE),_), LKappa.Maintained ->
-        aux_one ag_tail ty_id ports (succ i)
+        aux_one free_id previous current todos ag_tail ag ports (succ i)
       | ((Ast.LNK_ANY|Ast.ANY_FREE),pos),
         (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
         match ports_from_contact_map contact_map ty_id i with
         | [] when s = LKappa.Freed ->
           (* Do not make test is being free is the only possibility *)
           let () = ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained in
-          aux_one ag_tail ty_id ports (succ i)
+          aux_one free_id previous current todos ag_tail ag ports (succ i)
         | _pfcm ->
-          (*List_util.map_flatten
-            (fun (free_id,ports,ags,cor) ->
-            let () = ports.(i) <-
-            (Locality.dummy_annot Ast.FREE,
-            if s = LKappa.Freed then LKappa.Maintained else s) in
-            (free_id, ports, ags, cor) ::
-            List.map
-            (fun (a,p) ->
-            let ports' = Array.copy ports in
-            let () =
-            ports'.(i) <- (Locality.dummy_annot
-            (Ast.LNK_VALUE (free_id,(p,a))),s) in
-            (succ free_id, ports', ags,
-            (free_id,(p,a),or_ty,new_switch s)::cor))
-            pfcm)*)
-          (aux_one ag_tail ty_id ports (succ i))
-  and aux_ags = function
-    | [] -> [succ (LKappa.max_link_id ags),[],[]]
+          aux_one free_id previous current todos ag_tail ag ports (succ i)
+  and aux_ags free_id previous current todos = function
+    | [] -> (List.rev current,todos) :: previous
     | ag :: ag_tail ->
-      List.map
-        (fun (free_id,ports,ags,cor) ->
-           (free_id,
-            {LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports;
-             LKappa.ra_ints = ag.LKappa.ra_ints;
-             LKappa.ra_erased = ag.LKappa.ra_erased;
-             LKappa.ra_syntax = ag.LKappa.ra_syntax}::ags,
-            cor)
-        )
-        (aux_one ag_tail ag.LKappa.ra_type ag.LKappa.ra_ports 0)
-  in List.rev @@ List.rev_map (fun (_,mix,todo) -> (mix,todo)) (aux_ags ags)
+      aux_one free_id previous current todos ag_tail ag ag.LKappa.ra_ports 0 in
+  aux_ags (succ (LKappa.max_link_id ags)) [] [] [] ags
 
 let complete_with_candidate ag id todo p_id dst_info p_switch =
   Tools.array_fold_lefti
