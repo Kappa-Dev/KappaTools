@@ -13,12 +13,12 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-type t = ((int list) * (int*int) list) array array
+type t = (Mods.IntSet.t * Mods.Int2Set.t) array array
 
 let to_yojson a =
-  let intls_to_json a = `List (List.map (fun b -> `Int b) a) in
+  let intls_to_json a = `List (Mods.IntSet.fold (fun b acc -> `Int b::acc) a []) in
   let pairls_to_json a =
-    `List (List.map (fun (b,c) -> `List[`Int b;`Int c]) a) in
+    `List (Mods.Int2Set.fold (fun (b,c) acc-> `List[`Int b;`Int c]::acc) a []) in
   let array_to_json a =
     `List (Array.fold_left
              (fun acc (a,b) ->
@@ -28,11 +28,15 @@ let to_yojson a =
 
 let of_yojson (a:Yojson.Basic.json) =
   let intls_of_json a =
-    List.map (function `Int b -> b
-                     | x -> raise (Yojson.Basic.Util.Type_error("bla1",x))) a in
+    List.fold_left (fun acc -> function
+        | `Int b -> Mods.IntSet.add b acc
+        | x -> raise (Yojson.Basic.Util.Type_error("bla1",x)))
+      Mods.IntSet.empty a in
   let pairls_of_json a =
-    List.map (function `List [`Int b;`Int c] -> (b,c)
-                     | x -> raise (Yojson.Basic.Util.Type_error("bla2",x))) a in
+    List.fold_left (fun acc -> function
+        | `List [`Int b;`Int c] -> Mods.Int2Set.add (b,c) acc
+        | x -> raise (Yojson.Basic.Util.Type_error("bla2",x)))
+      Mods.Int2Set.empty a in
   let array_of_json =
     function `List ls ->
              (match ls with
@@ -67,16 +71,17 @@ let print_kappa sigs f c =
                     else
                       Format.fprintf f "@[%a%t%t@]"
                         (Signature.print_site sigs ag) s
-                        (fun f -> if is <> [] then
+                        (fun f -> if not (Mods.IntSet.is_empty is) then
                             Format.fprintf f "{@[%a@]}"
-                              (Pp.list Pp.space
+                              (Pp.set Mods.IntSet.elements Pp.space
                                  (Signature.print_internal_state sigs ag s)) is)
-                        (fun f -> if ls <> [] then
+                        (fun f -> if not (Mods.Int2Set.is_empty ls) then
                             Format.fprintf f "@,[@[%a@]]"
-                              (Pp.list Pp.space (fun f (ad,sd) ->
-                                   Format.fprintf f "%a.%a"
-                                     (Signature.print_site sigs ad) sd
-                                     (Signature.print_agent sigs) ad)) ls)
+                              (Pp.set Mods.Int2Set.elements  Pp.space
+                                 (fun f (ad,sd) ->
+                                    Format.fprintf f "%a.%a"
+                                      (Signature.print_site sigs ad) sd
+                                      (Signature.print_agent sigs) ad)) ls)
                  ))
               intf))
     c
@@ -100,9 +105,9 @@ let get_cycles contact_map =
       Tools.array_fold_lefti
         (fun s acc (_,l)->
            if s = last_s then acc else
-             List.fold_left
-               (fun acc (ty,s' as x) -> dfs acc (((i,s),x)::path) ty s')
-               acc l)
+             Mods.Int2Set.fold
+               (fun (ty,s' as x) acc -> dfs acc (((i,s),x)::path) ty s')
+               l acc)
         (known',out) contact_map.(i) in
   let rec scan (known,out as acc) i =
     if i < 0 then out else

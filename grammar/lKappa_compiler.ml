@@ -18,9 +18,9 @@ let add_link_contact_map ?contact_map sty sp dty dp =
     let si, sl = contact_map.(sty).(sp) in
     let di,dl = contact_map.(dty).(dp) in
     let () = contact_map.(sty).(sp) <-
-        si, List_util.merge_uniq Mods.int_pair_compare sl [dty,dp] in
+        si, Mods.Int2Set.add (dty,dp) sl in
     contact_map.(dty).(dp) <-
-      di, List_util.merge_uniq Mods.int_pair_compare dl [sty,sp]
+      di, Mods.Int2Set.add (sty,sp) dl
 
 let rule_induces_link_permutation ~warning ~pos ?dst_ty sigs sort site =
   let warning_for_counters =
@@ -1281,8 +1281,9 @@ let compil_of_ast ~warning ~syntax_version overwrite c =
       (Signature.size sigs)
       (fun i -> Array.init (Signature.arity sigs i)
           (fun s -> (Tools.recti
-                       (fun a k -> k::a) []
-                       (Signature.internal_states_number i s sigs),[]))) in
+                       (fun a k -> Mods.IntSet.add k a) Mods.IntSet.empty
+                       (Signature.internal_states_number i s sigs),
+                     Mods.Int2Set.empty))) in
   let ((_,rule_names),extra_vars,cleaned_rules) =
     List.fold_left
       (name_and_purify_rule ~warning ~syntax_version sigs ~contact_map)

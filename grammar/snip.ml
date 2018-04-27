@@ -39,8 +39,8 @@ let find_implicit_infos contact_map ags =
           ((free_id,(p,a),or_ty,new_switch s)::todos) ag_tail ag ports (succ i)
       | (Ast.LNK_SOME,_), s ->
         let or_ty = (i,ty_id) in
-        List.fold_left
-          (fun prev' (a,p) ->
+        Mods.Int2Set.fold
+          (fun (a,p) prev' ->
              let ports' = Array.copy ports in
              let () =
                ports'.(i) <-
@@ -49,15 +49,15 @@ let find_implicit_infos contact_map ags =
                (free_id,(p,a),or_ty,new_switch s)::todos in
              aux_one
                (succ free_id) prev' current todos' ag_tail ag ports' (succ i))
-          previous
           (ports_from_contact_map contact_map ty_id i)
+          previous
       | (Ast.LNK_VALUE _,_),_ ->
         aux_one free_id previous current todos ag_tail ag ports (succ i)
       | (Ast.LNK_FREE, pos), (LKappa.Maintained | LKappa.Erased as s) ->
         let () = (* Do not make test if being free is the only possibility *)
-          match ports_from_contact_map contact_map ty_id i with
-          | [] -> ports.(i) <- (Ast.LNK_ANY,pos), s
-          | _ :: _ -> () in
+          if Mods.Int2Set.is_empty (ports_from_contact_map contact_map ty_id i)
+          then ports.(i) <- (Ast.LNK_ANY,pos), s
+          else () in
         aux_one free_id previous current todos ag_tail ag ports (succ i)
       | (Ast.LNK_FREE, _), LKappa.Freed ->failwith "A free site cannot be freed"
       | (Ast.LNK_FREE, _), LKappa.Linked _ ->
@@ -66,12 +66,12 @@ let find_implicit_infos contact_map ags =
         aux_one free_id previous current todos ag_tail ag ports (succ i)
       | ((Ast.LNK_ANY|Ast.ANY_FREE),pos),
         (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
-        match ports_from_contact_map contact_map ty_id i with
-        | [] when s = LKappa.Freed ->
+        if Mods.Int2Set.is_empty (ports_from_contact_map contact_map ty_id i)
+        && s = LKappa.Freed then
           (* Do not make test is being free is the only possibility *)
           let () = ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained in
           aux_one free_id previous current todos ag_tail ag ports (succ i)
-        | _pfcm ->
+        else
           aux_one free_id previous current todos ag_tail ag ports (succ i)
   and aux_ags free_id previous current todos = function
     | [] -> (List.rev current,todos) :: previous

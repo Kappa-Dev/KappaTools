@@ -14,7 +14,7 @@ type init = (Primitives.alg_expr * rule) list
 
 type compil =
   {
-    contact_map: (int list * (int * int) list) array array ;
+    contact_map: Contact_map.t ;
     environment: Model.t ;
     init: init;
     rule_rate_convention: Remanent_parameters_sig.rate_convention ;

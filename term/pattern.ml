@@ -1330,15 +1330,15 @@ let minimal_env env contact_map =
             let w = new_free w (n,s) in
             let acc',_,_,_ = raw_finish_new ~toplevel:false w in
             let acc'' =
-              List.fold_left
-                (fun acc i ->
+              Mods.IntSet.fold
+                (fun i acc ->
                    let w = begin_new acc in
                    let n,w = new_node w ty in
                    let w = new_internal_state w (n,s) i in
                    let out,_,_,_ = raw_finish_new ~toplevel:false w in
-                   out) acc' ints in
-            List.fold_left
-              (fun acc (ty',s') ->
+                   out) ints acc' in
+            Mods.Int2Set.fold
+              (fun (ty',s') acc ->
                  let w = begin_new acc in
                  let n,w = new_node w ty in
                  let n',w = new_node w ty' in
@@ -1350,7 +1350,7 @@ let minimal_env env contact_map =
                    let w = new_link w (n,s) (n,s') in
                    let out',_,_,_ = raw_finish_new ~toplevel:false w in
                    out'
-                 else out) acc'' links
+                 else out) links acc''
          ))
     env contact_map
 
@@ -1366,7 +1366,8 @@ let fold_by_type f cc acc =
     acc
     cc.nodes_by_type
 
-let fold f cc acc = Mods.IntMap.fold f cc.nodes acc 
+let fold f cc acc = Mods.IntMap.fold f cc.nodes acc
+
 let finalize ~max_sharing env contact_map =
   let env = minimal_env env contact_map in
   let si,complete_domain = PreEnv.saturate ~max_sharing env.PreEnv.domain in
