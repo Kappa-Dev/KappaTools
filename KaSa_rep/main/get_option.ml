@@ -393,13 +393,13 @@ let options =
       [],
       Hidden;
 
-      "--backdoor-dump-nbr-non_weakly_reversible_transitions",
+      "--backdoor-dump-nbr-non-weakly-reversible-transitions",
       Bool Config.backdoor_nbr_of_non_weakly_reversible_transitions,
       "dump the number of non weakly reversible transitions",
       [],
       Hidden;
 
-      "--backdoor-dump-nbr-of-rules-with-non_weakly_reversible_transitions",
+      "--backdoor-dump-nbr-of-rules-with-non-weakly-reversible-transitions",
       Bool Config.backdoor_nbr_of_rules_with_non_weakly_reversible_transitions,
       "dump the number of rules with non weakly reversible transitions",
       [],
