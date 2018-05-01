@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Apr 16 2018>
+  * Last modification: Time-stamp: <May 01 2018>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -28,6 +28,7 @@ val get_called_from: Remanent_parameters_sig.parameters -> Remanent_parameters_s
 
 val get_logger: Remanent_parameters_sig.parameters -> Loggers.t
 val get_logger_err: Remanent_parameters_sig.parameters -> Loggers.t
+val get_logger_backdoor: Remanent_parameters_sig.parameters -> Loggers.t
 
 val get_command_line: Remanent_parameters_sig.parameters -> string array
 val get_short_version: Remanent_parameters_sig.parameters -> string
@@ -81,7 +82,7 @@ val get_open_counterceq: Remanent_parameters_sig.parameters -> string
 val get_open_countercvar: Remanent_parameters_sig.parameters -> string
 val get_open_countercgte: Remanent_parameters_sig.parameters -> string
 val get_open_counterval: Remanent_parameters_sig.parameters -> string
-val get_close_counter_state: Remanent_parameters_sig.parameters -> string 
+val get_close_counter_state: Remanent_parameters_sig.parameters -> string
 val get_close_counterceq: Remanent_parameters_sig.parameters -> string
 val get_close_countercvar: Remanent_parameters_sig.parameters -> string
 val get_close_countercgte: Remanent_parameters_sig.parameters -> string
@@ -211,3 +212,11 @@ val get_close_int_interval_infinity_symbol: Remanent_parameters_sig.parameters -
 val get_plus_infinity_symbol: Remanent_parameters_sig.parameters -> string
 val get_minus_infinity_symbol: Remanent_parameters_sig.parameters -> string
 val get_int_interval_separator_symbol: Remanent_parameters_sig.parameters -> string
+
+val get_backdoor_nbr_of_dead_rules: Remanent_parameters_sig.parameters -> bool
+val get_backdoor_nbr_of_rules: Remanent_parameters_sig.parameters -> bool
+val get_backdoor_nbr_of_non_weakly_reversible_transitions: Remanent_parameters_sig.parameters -> bool
+val get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions: Remanent_parameters_sig.parameters -> bool
+val get_backdoor_timing: Remanent_parameters_sig.parameters -> bool
+val get_backdoor_file: Remanent_parameters_sig.parameters -> string
+val get_backdoor_directory: Remanent_parameters_sig.parameters -> string

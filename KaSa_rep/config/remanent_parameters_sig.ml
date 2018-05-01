@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Apr 09 2018>
+  * Last modification:  Time-stamp: <May 01 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -107,6 +107,17 @@ type reachability_parameters =
     counter_domain: counters_domain ;
   }
 
+type backdoors =
+  {
+    backdoor_nbr_of_dead_rules: bool;
+    backdoor_nbr_of_rules: bool;
+    backdoor_nbr_of_non_weakly_reversible_transitions: bool;
+    backdoor_nbr_of_rules_with_non_weakly_reversible_transitions: bool;
+    backdoor_timing: bool;
+    backdoor_file: string;
+    backdoor_directory: string;
+  }
+
 type marshalisable_parameters =
   {
     syntax_version: Ast.syntax_version ;
@@ -147,10 +158,15 @@ type marshalisable_parameters =
    tk_interface: bool ;
    html_mode: bool ;
    empty_hashtbl_size: int ;
-  }
+   backdoors: backdoors
+ }
+
+
+
 
 type parameters =
   {
+    logger_backdoor: Loggers.t;
     logger: Loggers.t;
     logger_err: Loggers.t;
     profiler: Loggers.t;

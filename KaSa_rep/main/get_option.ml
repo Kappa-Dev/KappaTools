@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Apr 09 2018>
+  * Last modification: Time-stamp: <May 01 2018>
   * *
   * primitive to parse command-line options
   *
@@ -381,6 +381,48 @@ let options =
       "prompt CPU time and various datas",
       [debug,5],
       Expert;
+
+      "--backdoor-dump-nbr-rules",
+      Bool Config.backdoor_nbr_of_rules,
+      "dump the number of rules",
+      [],
+      Hidden;
+      "--backdoor-dump-nbr-dead-rules",
+      Bool Config.backdoor_nbr_of_dead_rules,
+      "dump the number of dead rules",
+      [],
+      Hidden;
+
+      "--backdoor-dump-nbr-non_weakly_reversible_transitions",
+      Bool Config.backdoor_nbr_of_non_weakly_reversible_transitions,
+      "dump the number of non weakly reversible transitions",
+      [],
+      Hidden;
+
+      "--backdoor-dump-nbr-of-rules-with-non_weakly_reversible_transitions",
+      Bool Config.backdoor_nbr_of_rules_with_non_weakly_reversible_transitions,
+      "dump the number of rules with non weakly reversible transitions",
+      [],
+      Hidden;
+
+      "--backdoor-dump-timing",
+      Bool Config.backdoor_timing,
+      "dump CPU time",
+      [],
+      Hidden;
+
+      "--backdoor-file",
+      String Config.backdoor_file,
+      "select the file to dump backdoor information",
+      [],
+      Hidden;
+
+      "--backdoor-directory",
+      String Config.backdoor_directory,
+      "select the directory for the file to dump backdoor information",
+      [],
+      Hidden;
+
     ]
 
 let get_option error =

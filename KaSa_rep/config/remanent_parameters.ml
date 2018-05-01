@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Apr 16 2018>
+  * Last modification: Time-stamp: <May 01 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -35,6 +35,18 @@ let open_out a ext =
       then (Format.eprintf "'%s' is not a directory@." d; exit 1)
     with Sys_error _ -> Kappa_files.mk_dir_r d in
   open_out a
+
+let open_append a ext =
+  let a = add_extension_if_not_already_mentioned a ext in
+  let d = Filename.dirname a in
+  let () = try
+      if not (Sys.is_directory d)
+      then (Format.eprintf "'%s' is not a directory@." d; exit 1)
+    with Sys_error _ -> Kappa_files.mk_dir_r d in
+  try
+    open_out_gen [Open_append] 511 a
+  with
+  | _ -> open_out a ext
 
 let compose f g = fun x -> f (g x)
 let ext_format x =
@@ -320,18 +332,32 @@ let open_tasks_profiling =
       channel
     | Some channel -> channel
 
+let fetch_backdoors () =
+  {
+    Remanent_parameters_sig.backdoor_nbr_of_dead_rules= !Config.backdoor_nbr_of_dead_rules;
+    Remanent_parameters_sig.backdoor_nbr_of_rules= !Config.backdoor_nbr_of_rules;
+
+    Remanent_parameters_sig.backdoor_nbr_of_non_weakly_reversible_transitions= !Config.backdoor_nbr_of_non_weakly_reversible_transitions;
+    Remanent_parameters_sig.backdoor_nbr_of_rules_with_non_weakly_reversible_transitions=
+      !Config.backdoor_nbr_of_rules_with_non_weakly_reversible_transitions;
+
+    Remanent_parameters_sig.backdoor_timing= !Config.backdoor_timing;
+    Remanent_parameters_sig.backdoor_file= !Config.backdoor_file;
+    Remanent_parameters_sig.backdoor_directory= !Config.backdoor_directory;
+  }
+
 let get_parameters ?html_mode:(html_mode=true) ~called_from () =
-  let channel,channel_err,html_mode,command  =
+  let channel,channel_err,channel_backdoor,html_mode,command  =
     match
       called_from
     with
     | Remanent_parameters_sig.Server ->
-      None,None,false || html_mode, [|"KaSa";"(Interractive mode)"|]
+      None,None,None,false || html_mode, [|"KaSa";"(Interractive mode)"|]
     | Remanent_parameters_sig.Internalised ->
-      Some stdout,Some Format.err_formatter, false || html_mode, Sys.argv
+      Some stdout,Some Format.err_formatter,Some stdout,false || html_mode, Sys.argv
 
     | Remanent_parameters_sig.KaSim ->
-      Some (open_tasks_profiling ()), None, false || html_mode, Sys.argv
+      Some (open_tasks_profiling ()), None,None,  false || html_mode, Sys.argv
     | Remanent_parameters_sig.KaSa ->
       begin
         match
@@ -341,7 +367,30 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
          | _,"",_ -> Some stdout
          | "",a,ext -> Some (open_out a ext)
          | a,b,ext -> Some (open_out (a^"/"^b) ext)
-      end, Some Format.err_formatter, false || html_mode, Sys.argv
+       end, Some Format.err_formatter,
+       begin
+         match
+           !Config.backdoor_nbr_of_rules
+           ||
+           !Config.backdoor_nbr_of_dead_rules
+           ||
+           !Config.backdoor_nbr_of_rules
+           ||
+           !Config.backdoor_nbr_of_non_weakly_reversible_transitions
+           ||
+           !Config.backdoor_nbr_of_rules_with_non_weakly_reversible_transitions ||
+           !Config.backdoor_nbr_of_non_weakly_reversible_transitions
+           ||
+           !Config.backdoor_timing
+           ,
+           !Config.backdoor_directory,!Config.backdoor_file,".tex"
+          with
+          | false, _,_,_ -> None
+          | _,_,"",_ -> Some stdout
+          | _,"",a,ext -> Some (open_append a ext)
+          | _,a,b,ext -> Some (open_append (a^"/"^b) ext)
+       end,
+      false || html_mode, Sys.argv
   in
   { Remanent_parameters_sig.marshalisable_parameters =
       {
@@ -414,6 +463,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
           Remanent_parameters_sig.called_from = called_from ;
         Remanent_parameters_sig.html_mode = html_mode ;
         Remanent_parameters_sig.empty_hashtbl_size = 1 ;
+        Remanent_parameters_sig.backdoors = fetch_backdoors () ;
       } ;
     Remanent_parameters_sig.save_error_list = (fun _ -> ());
     Remanent_parameters_sig.save_progress_bar = (fun _ -> ());
@@ -428,16 +478,21 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
          (match channel_err with
           | None -> Loggers.dummy_txt_logger
           | Some fmt -> Loggers.open_logger_from_formatter fmt);
-
+    Remanent_parameters_sig.logger_backdoor =
+      (match channel_backdoor with
+       | None -> Loggers.dummy_txt_logger
+       | Some channel -> Loggers.open_logger_from_channel channel);
     Remanent_parameters_sig.compression_status = Loggers.dummy_txt_logger;
     Remanent_parameters_sig.print_efficiency = !Config.print_efficiency;
     Remanent_parameters_sig.profiler =
-      match
-        channel
-      with
-      | None -> Loggers.dummy_txt_logger
-      | Some a ->
-        Loggers.open_logger_from_channel ~mode:Loggers.HTML_Tabular a
+      begin
+        match
+          channel
+        with
+        | None -> Loggers.dummy_txt_logger
+        | Some a ->
+          Loggers.open_logger_from_channel ~mode:Loggers.HTML_Tabular a
+      end ;
   }
 
 let dummy_parameters ~called_from =
@@ -680,6 +735,8 @@ let get_command_line_1                               marshalisable =
 let get_marshalisable parameter = parameter.Remanent_parameters_sig.marshalisable_parameters
 let get_logger parameter = parameter.Remanent_parameters_sig.logger
 let get_logger_err parameter = parameter.Remanent_parameters_sig.logger_err
+let get_logger_backdoor parameter =
+  parameter.Remanent_parameters_sig.logger_backdoor
 
 (*let get_formatter parameter = parameter.Remanent_parameters_sig.formatter
 let set_formatter parameter logger = {parameter with Remanent_parameters_sig.formatter = logger}*)
@@ -994,7 +1051,55 @@ let open_contact_map_file parameters =
 
 let get_called_from parameter = parameter.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.called_from
 
- let get_profiler parameter = parameter.Remanent_parameters_sig.profiler
+let get_backdoor_nbr_of_dead_rules_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_nbr_of_dead_rules
+let get_backdoor_nbr_of_rules_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_nbr_of_rules
+let get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_nbr_of_rules_with_non_weakly_reversible_transitions
+let get_backdoor_nbr_of_non_weakly_reversible_transitions_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_nbr_of_non_weakly_reversible_transitions
+let get_backdoor_timing_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_timing
+let get_backdoor_file_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_file
+let get_backdoor_directory_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_directory
+
+let get_backdoors marshalisable =
+  marshalisable.Remanent_parameters_sig.backdoors
+
+let get_backdoor_nbr_of_dead_rules_2  =
+  compose get_backdoor_nbr_of_dead_rules_1 get_backdoors
+  let get_backdoor_nbr_of_rules_2  =
+    compose get_backdoor_nbr_of_rules_1 get_backdoors
+let get_backdoor_nbr_of_non_weakly_reversible_transitions_2 =
+  compose get_backdoor_nbr_of_non_weakly_reversible_transitions_1 get_backdoors
+let get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions_2 =
+    compose get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions_1 get_backdoors
+let get_backdoor_timing_2 =
+  compose get_backdoor_timing_1 get_backdoors
+let get_backdoor_file_2 =
+  compose get_backdoor_file_1 get_backdoors
+let get_backdoor_directory_2 =
+  compose get_backdoor_directory_1 get_backdoors
+
+let get_backdoor_nbr_of_rules =
+    compose get_backdoor_nbr_of_rules_2 get_marshalisable
+let get_backdoor_nbr_of_dead_rules =
+  compose get_backdoor_nbr_of_dead_rules_2 get_marshalisable
+let get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions =
+    compose get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions_2 get_marshalisable
+let get_backdoor_nbr_of_non_weakly_reversible_transitions =
+  compose get_backdoor_nbr_of_non_weakly_reversible_transitions_2 get_marshalisable
+let get_backdoor_timing =
+  compose get_backdoor_timing_2 get_marshalisable
+let get_backdoor_file =
+  compose get_backdoor_file_2 get_marshalisable
+let get_backdoor_directory =
+  compose get_backdoor_directory_2 get_marshalisable
+
+let get_profiler parameter = parameter.Remanent_parameters_sig.profiler
 let get_compression_status_logger parameter =
   parameter.Remanent_parameters_sig.compression_status
 

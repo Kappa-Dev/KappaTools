@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Apr 15 2018>
+ * Last modification: Time-stamp: <May 01 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -299,6 +299,116 @@ let main () =
       let () =
         Loggers.print_newline
           (Remanent_parameters.get_logger parameters)
+      in
+      ()
+  in
+  let () =
+    if
+      (Remanent_parameters.get_backdoor_nbr_of_dead_rules parameters
+      ||
+      Remanent_parameters.get_backdoor_nbr_of_non_weakly_reversible_transitions parameters
+      ||
+      Remanent_parameters.get_backdoor_timing parameters
+      ||
+      Remanent_parameters.get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions parameters
+      ||
+      Remanent_parameters.get_backdoor_nbr_of_rules parameters
+     )
+    then
+      let handler, dead_rules, separating_transitions,
+          _  =
+        Export_to_KaSa.get_data state
+      in
+      let () =
+        if
+          Remanent_parameters.get_backdoor_nbr_of_dead_rules parameters
+        then
+          let () =
+            match
+              dead_rules
+            with
+            | None -> ()
+            | Some dead_rules ->
+              Loggers.fprintf
+                (Remanent_parameters.get_logger_backdoor parameters)
+                "%i" (List.length dead_rules)
+          in ()
+      in
+      let () =
+        if
+          Remanent_parameters.get_backdoor_nbr_of_rules parameters
+        then
+          let () =
+            match
+              handler
+            with
+            | None  -> ()
+            | Some l ->
+              Loggers.fprintf
+                (Remanent_parameters.get_logger_backdoor parameters)
+                "%i" l.Cckappa_sig.nrules
+          in ()
+      in
+      let () =
+        if
+          Remanent_parameters.get_backdoor_nbr_of_non_weakly_reversible_transitions parameters
+        then
+          let () =
+            match
+              separating_transitions
+            with
+            | None -> ()
+            | Some l ->
+            let nt =
+              List.fold_left
+                (fun nt (_,l) ->
+                   nt+List.length l)
+                (0) l
+            in
+            Loggers.fprintf
+              (Remanent_parameters.get_logger_backdoor parameters)
+              "%i" nt
+          in
+          ()
+      in
+      let () =
+        if
+          Remanent_parameters.get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions parameters
+        then
+          let () =
+            match
+              separating_transitions
+            with
+            | None -> ()
+            | Some l ->
+            let nt =
+              List.fold_left
+                (fun nt (_,l) ->
+                   nt+List.length l)
+                (0) l
+            in
+            Loggers.fprintf
+              (Remanent_parameters.get_logger_backdoor parameters)
+              "%i" nt
+          in
+          ()
+      in
+
+      let () =
+        if Remanent_parameters.get_backdoor_timing parameters
+        then
+        let end_time = Sys.time () in
+        let cpu_time = end_time -. start_time in
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger_backdoor parameters)
+            "%g" cpu_time
+        in
+        ()
+      in
+      let () =
+        Loggers.flush_logger
+          (Remanent_parameters.get_logger_backdoor parameters)
       in
       ()
   in

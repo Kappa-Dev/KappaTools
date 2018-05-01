@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Apr 09 2018>
+  * Last modification: Time-stamp: <May 01 2018>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -131,4 +131,15 @@ let scc_accuracy_level = ref "High"
 (* Symmetries *)
 let do_symmetries = ref false
 let rate_convention = ref "biochemist"
+
+(* Backdoors - stats for benchmarking *)
 let print_efficiency = ref false
+let backdoor_nbr_of_rules = ref false
+let backdoor_nbr_of_dead_rules = ref false
+let backdoor_nbr_of_rules = ref false
+let backdoor_nbr_of_non_weakly_reversible_transitions = ref false
+let backdoor_nbr_of_rules_with_non_weakly_reversible_transitions = ref false
+let backdoor_nbr_of_non_weakly_reversible_transitions = ref false
+let backdoor_timing = ref false
+let backdoor_file = ref "benchmark.tex"
+let backdoor_directory = ref ""
