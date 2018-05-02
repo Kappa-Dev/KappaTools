@@ -1,0 +1,2 @@
+%var: 'scale' 1
+%var: 'system_mass' 0.00000000001*scale*microg

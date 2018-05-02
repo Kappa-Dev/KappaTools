@@ -1,0 +1,382 @@
+%var: 'q' 'coef_amount'
+
+
+
+%obs: 'unary_low'
+|TGFB1(state{latent},w[1]), LTBP1(TB[1])| /* line 8 'TGFB1(state~latent)_LTBP1dissociate' */
++|LTBP1(TB[_],hinge[1], Nter[2]), HS(a[1]), FN1(y[2])| /* line 16 'LTBP1_HS_FN1dissociate' */
++|FN1(RGD[1],Nter[2]), FN1(III1[2],Nter[3]), FN1(III1[3]), ITGA5B1(x[1])|  /* line 24 'LTBP1_HS_FBN1_dissociate' */
++|FN1(RGD[1],Nter[2]), FN1(III1[2],Nter[3]), FN1(III1[3]), ITGA5B1(x[1])| /* line 38 'FN1_ITGA5B1_dissociate3' */
++|FN1(Nter[1]), FN1(III1[1], Nter[2]), FN1(III1[2])| /* line 39 'FN1(Nter)_FN1(III1)_FN1_dissociate1' */
++|FN1(RGD[_],Nter[1]), FN1(III1[1], Nter[2]), FN1(III1[2],Nter[.])| /* line 40 'FN1(Nter)_FN1(III1)_FN1_dissociate2'  */
++|FN1(RGD[_],Nter[1]), FN1(III1[1], Nter[2]), FN1(III1[2],Nter[.],CBD[3]), FBN1(HSBS[_],Cter[3])| /* line 49 'FN1_FBN1(Cter)_dissociate' */
++|TGFB1(state{latent},w[1],RGD[2]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB6(x[2])| /* line 91 'TGFB1(state~latent,ITGAVB6)_LTBP1_dissociate' */
++|TGFB1(state{latent},w[1],RGD[2]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB6(x[2])| /* line 92 'TGFB1(state~latent)_LTBP1_ITGAVB6_dissociate' */
++|TGFB1(state{latent},w[1],RGD[2]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB5(x[2])| /* line 100 'TGFB1(state~latent,ITGAVB5)_LTBP1_dissociate' */
++|TGFB1(state{latent},w[1],RGD[2]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB5(x[2])| /* line 101 'TGFB1(state~latent)_LTBP1_ITGAVB5_dissociate' */
++|TGFB1(state{latent},w[1],RGD[2]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB3(x[2])| /* line 109 'TGFB1(state~latent,ITGAVB3)_LTBP1_dissociate' */
++|TGFB1(state{latent},w[1],RGD[2]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB3(x[2])| /* line 110 'TGFB1(state~latent)_LTBP1_ITGAVB3_dissociate' */
++|FBN1(RGD[1]), ITGAVB3(x[1])| /* line 117 'FBN1_ITGAVB3_dissociate' */
++|ADAMTSL2(y[1],x[2]), LTBP1(TB[_],y[1]), FBN1(Cter[_],WMS[2])| /* Line 136 'ADAMTSL2_increasestoringLTBP1_TGF_dissociate' */
++|ADAMTSL2(y[1],x[2]), LTBP1(TB[_],y[1]), FBN1(Cter[_],WMS[2])| /* line 137 'ADAMTSL2_increasestoringLTBP1_TGF_dissociate_bis' */
++|ADAMTSL3(y[1],x[2]), LTBP1(TB[_],y[1]), FBN1(Cter[_],WMS[2])| /* line 140 'ADAMTSL3_increasestoringLTBP1_TGF_dissociate' */
++|ADAMTSL3(y[1],x[2]), LTBP1(TB[_],y[1]), FBN1(Cter[_],WMS[2])| /* line 141 'ADAMTSL3_increasestoringLTBP1_TGF_dissociate_bis' */
++|MMP14(state{latent},a[1]), ITGAVB3(z[1],w[2]), ADAM12(x[2])| /* line 193 'MMP14,ADAM12,ITGAVB3_dissociate' */
++|ITGA2B1(x[1]), COL1(z[1],c[2]), MMP2(state{latent},CBD[2])| /* line 205 'COL1_MMP2_ITGA2B1_dissociate' */
++|TGFB1(state{active},a[1]), DCN(x[1],y[2]), MMP2(state{active},Cat[2])| /* line 235 'TGF_DCN_MMP2_dissociate' */
++|DCN(core[1]), MAGP1(x[1],Cter[2]), FBN1(Nter[2],Hyb1[.])| /* line 244 'DCN_FBN1_MGAP1_dissociate' */
++|THBS1(WxxW[1],KRFK[2]), TGFB1(state{latent},VLAL[1],LSKL[2])| /* line 255 'THBS1_TGFB1(state~latent)_dissociate' */
++|TGFB1(state{latent},w[1],VLAL[2],LSKL[3]), LTBP1(TB[1]), THBS1(WxxW[2],KRFK[3])| /* line 258 'THBS1_TGFB1(state~latent)_LTBP1_FN1_FBN1_dissociate' */
++|TIMP1(Nter[1]), MMP2(state{active},Cat[1])| /* line 309 'TIMP1_MMP2_dissociate' */
+
+%obs: 'unary_normal'
+|LTBP1(TB[_],Nter[1]), FN1(y[1])| /*  line 14 'LTBP1_FN1_dissociate' */
++|LTBP1(TB[_],Cter[1]), FBN1(Hyb1[1])| /* line 22 'LTBP1_FBN1_dissociate' */
++|TGFB1(state{latent},RGD[1],c[2]), ITGAVB8(x[1]), MMP14(state{active},Cat[2])| /* line 82 'TGFB1(state~latent)_ITGAVB8_MMP14_dissociate' */
++|LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB3(x[2]), TGFB1(state{latent},w[1],RGD[2])| /* line 111 'TGFB1(state~latent)_LTBP1_ITGAVB3_Activate' */
++|FBN1(RGD[1]), ITGA5B1(x[1])| /* line 119 'FBN1_ITGA5B1_dissociate' */
++|ADAMTS10(x[1]), FBN1(Nter[1],Cter[_],Hyb1[2]), LTBP1(TB[_],Cter[2])| /* line 147 'ADAMTS10_increasestoringLTBP1_TGF_dissociate' */
++|ADAMTS10(x[1]), FBN1(Nter[1],Cter[_],Hyb1[2]), LTBP1(TB[_],Cter[2])| /* line 148 'ADAMTS10_increasestoringLTBP1_TGF_dissociate_bis' */
++|ADAMTS1(KTFR[1]), TGFB1(state{latent},LSKL[1])| /* line 161 'ADAMTS1_TGFB1(state~latent)_Activate' */
++|TGFB1(state{latent},w[1],z[3]), LTBP1(TB[1],Nter[_],Cter[_],hinge[_],x[2]), BMP1(Cat[2]), MMP2(state{active},Cat[3])| /* line 171 'BMP1_LTBP1-TGFB1(state~latent)-MMP2_dissociate' */
++|MMP14(state{active},Cat[1]), CD44(y[1])| /* line 185 */
++|THBS1(a[1]), COL1(b[1])| /* line 221 'THBS1_COL1_dissociate' */
++|TGFB1(state{active},a[1]), DCN(c[1])| /* line 231 'TGFB1_DCN(low)_dissociate' */
++|FN1(b[1]), DCN(core[1])| /* line 251 'FN1(b)_DCN_dissociate' */
++|THBS1(c[1]), FBN1(PF2[1])| /* line 279 'THBS1_FBN1_dissociate' */
+
+%obs: 'unary_high'
+ |LTBP1(TB[_],hinge[1]), HS(a[1])| /* line 15 'LTBP1_HS_dissociate' */
++|MAGP1(Cter[1]), FBN1(Nter[1],Hyb1[.])| /* line 28 'MAGP1_FBN1_dissociate' */
++|FN1(RGD[1],Nter[2]), FN1(III1[2],Nter[.]), ITGA5B1(x[1])| /* line 37 'FN1_ITGA5B1_dissociate2' */
++|FN1(RGD[_],Nter[1]), FN1(III1[1],Nter[.])| /* line 41 'FN1(Nter)_FN1(III1)_FN1_dissociate3' */
++|HS(x[1]), FBN1(HSBS[1])| /* line 45 'HS_FBN1(HSB)_dissociate' */
++|FN1(RGD[_],Nter[1],y[4]), FN1(III1[1], Nter[2]), FN1(III1[2],Nter[.],CBD[3]), FBN1(HSBS[_],Cter[3],Hyb1[5]), LTBP1(TB[_],hinge[_],Nter[4],Cter[5])| /* line 53 'FN1fibril_FBN1_HSfibril_LTBP1_TGFB1_dissociate' */
++|FN1(NGR[1]), ITGAVB3(y[1])| /* line 58 'FN1_ITGAVB3_dissociate' */
++|FN1(NGR[_], Nter[1]), FN1(III1[1], Nter[.])| /* line 59'FN1(NGR)_FN1_dissociate' */
++|FBN1(Hyb1[1]),FBLN4(y[1])| /* line 63 'FBN1_FBLN4_dissociate' */
++|FN1(Cter[1]), FBLN1(z[1])| /* line 67 'FN1_FBLN1_dissociate' */
++|TGFB1(state{latent},RGD[1]),ITGAVB3(x[1])| /* line 71 'TGFB1(state~latent)_ITGAVB3_dissociate' */
++|TGFB1(state{latent},RGD[1]), ITGAVB5(x[1])| /* line 73 'TGFB1(state~latent)_ITGAVB5_dissociate' */
++|TGFB1(state{latent},RGD[1]), ITGAVB6(x[1])| /* line 75 'TGFB1(state~latent)_ITGAVB6_dissociate' */
++|TGFB1(state{latent},RGD[1]), ITGAVB8(x[1])| /* line 77 'TGFB1(state~latent)_ITGAVB8_dissociate' */
++|TGFB1(state{latent},w[1],RGD[.]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_])| /* line 89 'TGFB1(state~latent,nonITG)_LTBP1_dissociate' */
++|TGFB1(state{latent},w[.],RGD[2]), ITGAVB6(x[2])| /* line 90 'TGFB1(state~latent,nonLTBP)_ITGAVB6_dissociate' */
++|LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB6(x[2]), TGFB1(state{latent},w[1],RGD[2])| /* line 93 'TGFB1(state~latent)_LTBP1_ITGAVB6_Activate' */
++|TGFB1(state{latent},w[.],RGD[2]), ITGAVB5(x[2])| /* line 99 'TGFB1(state~latent,nonLTBP)_ITGAVB5_dissociate' */
++|LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), ITGAVB5(x[2]), TGFB1(state{latent},w[1],RGD[2])| /* line 102 'TGFB1(state~latent)_LTBP1_ITGAVB5_Activate' */
++|TGFB1(state{latent},w[.],RGD[2]), ITGAVB3(x[2])| /* line 108 'TGFB1(state~latent,nonLTBP)_ITGAVB3_dissociate' */
++|FBN1(RGD[1]), ITGAVB6(x[1])| /* line 115 'FBN1_ITGAVB6_dissociate' */
++|ADAMTSL2(y[1]), LTBP1(TB[_],y[1])| /* line 123 'ADAMTSL2_LTBP1_dissociate' */
++|ADAMTSL3(x[1]), FBN1(WMS[1])| /* line 129 'ADAMTSL3_FBN1_dissociate' */
++|ADAMTSL3(y[1]), LTBP1(TB[_],y[1])| /* line 131 'ADAMTSL3_LTBP1_dissociate' */
++|ADAMTS1(x[1]), FBLN1(Cter[1])| /* line 156 'ADAMTS1_FBLN1_dissociate' */
++|ADAMTS1(KTFR[1]), TGFB1(state{latent},LSKL[1])| /* line 160 'ADAMTS1_TGFB1(state~latent)_dissociate' */
++|ADAMTS4(spacer[1]), FN1(Cter[1])| /* line 165 'ADAMTS4_FN1_dissociate' */
++|LTBP1(TB[1],Nter[_],Cter[_],hinge[_],x[2]), BMP1(Cat[2]), MMP2(state{active},Cat[3]), TGFB1(state{latent},w[1],z[3])| /* line 172 'BMP1_LTBP1-TGFB1(state~latent)-MMP2_Activate' */
++|CD44(x[1]), MMP9(a[1])| /* line 177 'CD44_MMP9_dissociate' */
++|TGFB1(state{latent},w[1],d[3]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), CD44(x[2]), MMP9(a[2],Cat[3])| /* line 179 */
++|LTBP1(TB[1],hinge[_],Nter[_],Cter[_]), CD44(x[2]), MMP9(a[2],Cat[3]), TGFB1(state{latent},w[1],d[3])| /* line 180 */
++|CD44(y[1]), MMP14(state{active},Cat[1])| /* line 184 */
++|MMP14(state{latent},a[1]), ITGAVB3(z[1])| /* line 190 'MMP14,ITGAVB3_dissociate' */
++|ADAM12(x[1]), ITGAVB3(w[1])| /* line 191 'ADAM12,ITGAVB3_dissociate' */
++|MMP14(state{latent},a[1]), ITGAVB3(z[1],w[2]), ADAM12(x[2])| /* line 194 'MMP14 activation' */
++|FN1(c[1]), COL1(y[1])| /* line 198 'FN1_COL1_dissociate' */
++|ITGA2B1(x[1]), COL1(z[1])| /* line 201 'ITGA2B1_COL1_dissociate' */
++|ITGA2B1(x[1]), COL1(z[1],c[2]), MMP2(state{latent},CBD[2])| /* line 206 'MMP2 Activation ' */
++|FBN1(Cter[1]), MMP2(state{active},Cat[1])| /* line 210 'FBN1_MMP2_dissociate' */
++|MMP2(state{active},Cat[1]), FBN1(Cter[1])| /* line 211 'FBN1_MMP2_degradation' */
++|FBN1(Cter[1]), MMP14(state{active},Cat[1])| /* line 213 'FBN1_MMP14_dissociate' */
++|MMP14(state{active},Cat[1]), FBN1(Cter[1])| /* line 214 'FBN1_MMP14_degradation' */
++|FBN1(Cter[1]), MMP9(Cat[1])| /* line 216 'FBN1_MMP9_dissociate' */
++|MMP9(Cat[1]), FBN1(Cter[1])| /* line 217 'FBN1_MMP9_degradation' */
++|DCN(y[1]), MMP2(state{active},Cat[1])| /* line 233 'DCN_MMP2_dissociate' */
++|DCN(x[1],y[2]), MMP2(state{active},Cat[2]), TGFB1(state{active},a[1])| /* line 236 'DCN_TGFB1_MMP2_Activate' */
++|DCN(core[1]), MAGP1(x[1])| /* line 240 'DCN_MAGP1_dissociate' */
++|DCN(a[1]), FBN1(Nter[1])| /* line 242 'DCN_FBN11_dissociate' */
++|THBS1(WxxW[1],KRFK[2]), TGFB1(state{latent},VLAL[1],LSKL[2])| /* line 256 'THBS1_TGFB1(state~latent)_Activate' */
++|LTBP1(TB[1]), THBS1(WxxW[2],KRFK[3]), TGFB1(state{latent},w[1],VLAL[2],LSKL[3])| /* line 259 'THBS1_TGFB1(state~latent)_LTBP1_FN1_FBN1_Activate' */
++|MMP2(state{latent},Cat[1]), THBS1(z[1])| /* line 268 'MMP2_THBS1_dissociate' */
++|MMP9(Cat[1]), THBS1(z[1])| /* line 270 'MMP9_THBS1_dissociate' */
++|ADAMTS1(y[1]), THBS1(b[1])| /* line 274 'high_affinity_un' */
++|ADAMTS1(y[1]), THBS1(b[1])| /* line 275 'Degradation of THBS1 by ADAMTS1' */
++|TIMP3(Nter[1]), MMP14(state{active},Cat[1])| /* line 301 'TIMP3_MMP14(state~active)_dissociate' */
++|TIMP3(Nter[1]), MMP2(state{active},Cat[1])| /* line 303 'TIMP3_MMP2(state~active)_dissociate' */
++|TIMP3(Nter[1]), MMP9(Cat[1])| /* line 305 'TIMP3_MMP9_dissociate' */
++|ADAMTS4(Cat[1]),TIMP3(Nter[1])| /* line 315 'ADAMTS4_TIMP3_dissociate' */
++|MMP14(state{active},Cat[1]), COL1(d[1])| /* line 319 'MMP14_COL1_dissociate' */
++|MMP14(state{active},Cat[1]), COL1(d[1])| /* line 320 'Degradation of COL1 by MMP14' */
++|MMP9(Cat[1]), COL1(c[1])| /* line 325 'MMP9_COL1_dissociate' */
++|MMP9(Cat[1]), COL1(c[1])| /* line 326 'Degradation of COL1 by MMP9' */
++|MMP9(Cat[1]), FN1(e[1])| /* line 331 'MMP9_FN1_dissociate' */
++|MMP2(state{active},Cat[1],PEX[.]), FN1(e[1])| /* line 333 'MMP2_FN1_dissociate' */
++|MMP14(state{active},Cat[1]), FN1(e[1])| /* line 335 'MMP14_FN1_dissociate' */
+
+%obs: 'unary_very_high'
+|FN1(RGD[1],Nter[.]), ITGA5B1(x[1])| /* line 36 'FN1_ITGA5B1_dissociate1'  */
++|ITGAVB8(x[1]), MMP14(state{active},Cat[2]), TGFB1(state{latent},RGD[1],c[2])| /* line 83 'TGFB1(state~latent)_ITGAVB8_MMP14_Activate' */
++|ADAMTSL2(x[1]), FBN1(WMS[1])| /* line 127 'ADAMTSL2_FBN1_dissociate' */
++|ADAMTSL6(x[1]), FBN1(WMS[1])| /* line 133 'ADAMTSL6_FBN1_dissociate' */
++|ADAMTS10(x[1]), FBN1(Nter[1])| /* line 145 'ADAMTS10_FBN1(Nter)_dissociate' */
++|LTBP1(TB[_],Nter[_],Cter[_],hinge[_],x[1]), BMP1(Cat[1])| /* line 169 'BMP1_LTBP1-TGFB1(state~latent)_dissociate' */
++|DCN(core[1]), COL1(a[1])| /* line 225 'DCN_COL1_dissociate' */
++|TGFB1(state{active},a[1]), DCN(x[1])| /* line 229 'TGFB1_DCN(high)_dissociate' */
++|FN1(a[1]), DCN(core[1])| /* line 249 'FN1(a)_DCN_dissociate' */
++|THBS1(x[1]), DCN(core[1])| /* line 264 'THBS1_DCN_dissociate' */
++|TIMP1(Nter[1]), MMP9(Cat[1])| /* line 311 'TIMP1_MMP9_dissociate' */
++|MMP9(Cat[1]), FN1(e[1])| /* line 336 'Degradation of FN1 by MMP9' */
++|MMP2(state{active},Cat[1],PEX[.]), FN1(e[1])| /* line 337 'Degradation of FN1 by MMP2' */
++|MMP14(state{active},Cat[1]), FN1(e[1])| /* line 338 'Degradation of FN1 by MMP14' */
+
+%obs: 'binary_low'
+(|LTBP1(TB[_],Nter[.])|*|FN1(y[.])|) /* line 11 'LTBP1_FN1' */
++(|LTBP1(TB[_],Cter[.])|*|FBN1(Hyb1[.])|) /* line 19 'LTBP1_FBN1' */
++(|FBN1(RGD[.])|*|ITGA5B1(x[.])|) /* line 118 'FBN1_ITGA5B1' */
++(|THBS1(a[.])|*|COL1(b[.])|) /* line 220 'THBS1_COL1' */
++(|TGFB1(state{active},a[.])|*|DCN(c[.])|) /* line 230 'TGFB1_DCN(low)' */
++(|FN1(b[.])|*|DCN(core[.])|) /* line 250 'FN1(b)_DCN' */
++(|THBS1(c[.])|*|FBN1(PF2[.])|) /* line 278 'low_affinity_bin' */
++(|TIMP1(Nter[.])|*|MMP2(state{active},Cat[.])|) /* line 308 'TIMP1_MMP2' */
+
+%obs: 'binary_normal'
+(|LTBP1(TB[_],hinge[.])|*|HS(a[.])|) /* line 12 'LTBP1_HS' */
++(|MAGP1(Cter[.])|*|FBN1(Nter[.],Hyb1[.])|) /* line 27 'MAGP1_FBN1' */
++(|HS(x[.])|*|FBN1(HSBS[.])|) /* line 44 HS_FBN1(HSB)' */
++(|FN1(NGR[.])|*|ITGAVB3(y[.])|) /* line 56 'FN1_ITGAVB3' */
++(|FN1(NGR[_], Nter[.])|*|FN1(III1[.],Nter[.])|) /* line 57 'FN1(NGR)_FN1' */
++(|FBN1(Hyb1[.])|*|FBLN4(y[.])|) /* line 62 FBN1_FBLN4' */
++(|FN1(Cter[.])|*|FBLN1(z[.])|) /* line 66 'FN1_FBLN1' */
++(|TGFB1(state{latent},RGD[.])|*|ITGAVB3(x[.])|) /* line 70 'TGFB1(state~latent)_ITGAVB3' */
++(|TGFB1(state{latent},RGD[.])|*|ITGAVB5(x[.])|) /* line 72 'TGFB1(state~latent_ITGAVB5' */
++(|TGFB1(state{latent},RGD[.])|*|ITGAVB6(x[.])|) /* line 74 'TGFB1(state~latent)_ITGAVB6' */
++(|TGFB1(state{latent},RGD[.])|*|ITGAVB8(x[.])|) /* line 76 TGFB1(state{latent},RGD[1]), ITGAVB8(x[1]) */
++(|TGFB1(state{latent},w[1],RGD[.]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_])|*|ITGAVB6(x[.])|) /* line 86 'TGFB1(state~latent)_LTBP1_ITGAVB6' */
++(|TGFB1(state{latent},w[1],RGD[.]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_])|*|ITGAVB5(x[.])|) /* line 96 'TGFB1(state~latent)_LTBP1_ITGAVB5' */
++(|TGFB1(state{latent},w[1],RGD[.]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_])|*|ITGAVB3(x[.])|) /* line 105 'TGFB1(state~latent)_LTBP1_ITGAVB3' */
++(|FBN1(RGD[.])|*|ITGAVB6(x[.])|) /* line 114 'FBN1_ITGAVB6' */
++(|ADAMTSL2(y[.])|*|LTBP1(TB[_],y[.])|) /* line 122 'ADAMTSL2_LTBP1' */
++(|ADAMTSL3(x[.])|*|FBN1(WMS[.])|) /* line 128 'ADAMTSL3_FBN1' */
++(|ADAMTSL3(y[.])|*|LTBP1(TB[_],y[.])|) /* line 130 'ADAMTSL3_LTBP1' */
++(|ADAMTS1(x[.])|*|FBLN1(Cter[.])|) /* line 155 'ADAMTS1_FBLN1' */
++(|ADAMTS1(KTFR[.])|*|TGFB1(state{latent},LSKL[.])|) /* line 159 'ADAMTS1_TGFB1(state~latent)' */
++(|ADAMTS4(spacer[.])|*|FN1(Cter[.])|) /* line 164 'ADAMTS4_FN1' */
++(|CD44(x[.])|*|MMP9(a[.])|) /* line 176 'CD44_MMP9' */
++(|TGFB1(state{latent},w[1],d[.]), LTBP1(TB[1],hinge[_],Nter[_],Cter[_])|*|CD44(x[2]), MMP9(a[2],Cat[.])|) /* line 178 'CD44_MMP9_TGFB1(state~latent)_LTBP1__FN1_FBN1' */
++(|CD44(y[.])|*|MMP14(state{active},Cat[.])|) /* line 183 */
++(|MMP14(state{latent},a[.])|*|ITGAVB3(z[.])|) /* line 188 */
++(|ADAM12(x[.])|*|ITGAVB3(w[.])|) /* line 189 */
++(|MMP14(state{latent},a[1]), ITGAVB3(z[1],w[.])|*|ADAM12(x[.])|) /* line 192 */
++(|FN1(c[.])|*|COL1(y[.])|) /* line 197 'FN1_COL1 */
++(|ITGA2B1(x[.])|*|COL1(z[.])|) /* line 200 'ITGA2B1_COL1' */
++(|ITGA2B1(x[1]), COL1(z[1],c[.])|*|MMP2(state{latent},CBD[.])|) /* line 204 'COL1_MMP2_ITGA21' */
++(|FBN1(Cter[.])|*|MMP2(state{active},Cat[.])|) /* line 209 'FBN1_MMP2' */
++(|FBN1(Cter[.])|*|MMP14(state{active},Cat[.])|) /* line 212 'FBN1_MMP14' */
++(|FBN1(Cter[.])|*|MMP9(Cat[.])|) /* line 215 'FBN1_MMP9' */
++(|DCN(y[.])|*|MMP2(state{active},Cat[.])|) /* line 232 'DCN_MMP2' */
++(|TGFB1(state{active},a[1]), DCN(x[1],y[.])|*| MMP2(state{active},Cat[.])|) /* line 234 'TGF_DCN_MMP2' */
++(|DCN(core[.])|*|MAGP1(x[.])|) /* line 239 'DCN_MAGP1' */
++(|DCN(a[.])|*|FBN1(Nter[.])|) /* line 241 'DCN_FBN1' */
++(|DCN(core[1]), MAGP1(x[1],Cter[.])|*| FBN1(Nter[.],Hyb1[.])|) /* line 243 'DCN_FBN1_MGAP1' */
++(|THBS1(WxxW[.],KRFK[.])|*| TGFB1(state{latent},VLAL[.],LSKL[.])|) /* line 254 'THBS1_TGFB1(state~latent)' */
++(|MMP2(state{latent},Cat[.])|*|THBS1(z[.])|) /* line 267 'MMP2_THBS1' */
++(|MMP9(Cat[.])|*|THBS1(z[.])|) /* line 269 'MMP9_THBS1' */
++(|ADAMTS1(y[.])|*|THBS1(b[.])|) /* line 273 'ADAMTS1_THBS1' */
++(|TIMP3(Nter[.])|*|MMP14(state{active},Cat[.])|) /* line 300 'TIMP3_MMP14(state~active)' */
++(|TIMP3(Nter[.])|*|MMP9(Cat[.])|) /* line 304 'TIMP3_MMP9' */
++(|ADAMTS4(Cat[.])|*|TIMP3(Nter[.])|) /* line 314 'ADAMTS4_TIMP3' */
++(|MMP14(state{active},Cat[.])|*|COL1(d[.])|) /* line 318 'MMP14_COL1' */
++(|MMP9(Cat[.])|*|COL1(c[.])|) /* line 324 'MMP9_COL1' */
++(|MMP9(Cat[.])|*|FN1(e[.])|) /* line 330 'MMP9_FN1' */
++(|MMP2(state{active},Cat[.],PEX[.])|*|FN1(e[.])|) /* line 332 'MMP2_FN1' */
++(|MMP14(state{active},Cat[.])|*|FN1(e[.])|) /* line 334 'MMP14_FN1' */
++(|TIMP3(Nter[.])|*|MMP2(state{active},Cat[.])|) /* line 302 'TIMP3_MMP2(state~active)' */
+
+
+%obs: 'binary_high'
+(|TGFB1(state{latent},w[.])|*|LTBP1(TB[.])|) /* line 7 'TGFB1(state~latent)_LTBP1' */
++(|LTBP1(TB[_],hinge[1], Nter[.]), HS(a[1])|*|FN1(y[.])|) /* line 13 'LTBP1_HS_FN1' */
++(|LTBP1(TB[_],hinge[1], Cter[.]), HS(a[1])|*| FBN1(Hyb1[.])|) /* line 21 'LTBP1_HS_FBN1' */
++(|FN1(RGD[.])|*|ITGA5B1(x[.])|) /* line 32 'FN1_ITGA5B1' */
++(|FN1(RGD[_], Nter[.])|*| FN1(III1[.],Nter[.])|) /* line 33 'FN1(RGD)_FN1' */
++(|FN1(RGD[_],Nter[1]), FN1(III1[1], Nter[.])|*| FN1(III1[.],Nter[.])|) /* line 34 'FN1(Nter)_FN1(III1)_FN1' */
++(|FN1(RGD[_],Nter[1]), FN1(III1[1], Nter[2]), FN1(III1[2],Nter[.],CBD[.])|*|FBN1(HSBS[_],Cter[.])|) /* line 48 'FN1_FBN1(Cter)' */
++(|TGFB1(state{latent},RGD[1],c[.]), ITGAVB8(x[1])|*|MMP14(state{active},Cat[.])|) /* line 81 'TGFB1(state~latent)_ITGAVB8_MMP14' */
++(|FBN1(RGD[.])|*|ITGAVB3(x[.])|) /* line 116 'FBN1_ITGAVB3' */
++(|ADAMTSL2(x[.])|*|FBN1(WMS[.])|) /* line 126 'ADAMTSL2_FBN1' */
++(|ADAMTSL6(x[.])|*|FBN1(WMS[.])|) /* line 132 'ADAMTSL6_FBN1' */
++(|ADAMTS10(x[.])|*|FBN1(Nter[.])|) /* line 144 'ADAMTS10_FBN1(Nter)' */
++(|LTBP1(TB[_],Nter[_],Cter[_],hinge[_],x[.])|*|BMP1(Cat[.])|) /* line 168 'BMP1_LTBP1-TGFB1(state~latent)' */
++(|TGFB1(state{latent},w[1],z[.]), LTBP1(TB[1],Nter[_],Cter[_],hinge[_],x[2]), BMP1(Cat[2])|*|MMP2(state{active},Cat[.])|) /* line 170 'BMP1_LTBP1-TGFB1(state~latent)-MMP2' */
++(|DCN(core[.])|*|COL1(a[.])|) /* line 224 'DCN(high)_COL1' */
++(|TGFB1(state{active},a[.])|*|DCN(x[.])|) /* line 228 'TGFB1_DCN(high)' */
++(|FN1(a[.])|*|DCN(core[.])|) /* line 248 'FN1(a)_DCN' */
++(|TGFB1(state{latent},w[1],VLAL[.],LSKL[.]), LTBP1(TB[1])|*|THBS1(WxxW[.],KRFK[.])|) /* line 257 'THBS1_TGFB1(state~latent)_LTBP1_FN1_FBN1' */
++(|THBS1(x[.])|*|DCN(core[.])|) /* line 263 'THBS1_DCN' */
++(|TIMP1(Nter[.])|*|MMP9(Cat[.])|) /* line 310 'TIMP1_MMP9' */
+
+
+%obs: 'binary_very_high'
+(|FN1(RGD[_],Nter[1],y[.]), FN1(III1[1], Nter[2]), FN1(III1[2],Nter[.],CBD[3]), FBN1(HSBS[_],Cter[3],Hyb1[.])|*| LTBP1(TB[_],hinge[_],Nter[.],Cter[.])|) /* line 52 'FN1fibril_FBN1_HSfibril_LTBP1_TGFB1' */
++(|ADAMTSL2(y[1],x[.]), LTBP1(TB[_],y[1])|*|FBN1(Cter[_],WMS[.])|) /* line 135 'ADAMTSL2_increasestoringLTBP1_TGF' */
++(|ADAMTSL3(y[1],x[.]), LTBP1(TB[_],y[1])|*|FBN1(Cter[_],WMS[.])|) /* line 139 'ADAMTSL3_increasestoringLTBP1_TGF' */
++(|ADAMTS10(x[1]), FBN1(Nter[1],Cter[_],Hyb1[.]), LTBP1(TB[_],Cter[.])|) /* line 146 'ADAMTS10_increasestoringLTBP1_TGF' */
+
+%obs: 'k_un_obs'
+|MMP14(state{latent},Cat[1]), TIMP2(Nter[1],Cter[.])| /* line 286 'MMP14(state~latent)_TIMP2_dissociate' */
++|MMP14(state{latent},Cat[1]), TIMP2(Nter[1],Cter[2]), MMP2(state{latent},PEX[2],Nter[3]), MMP14(state{active},Cat[3])| /* line 291 'Activation MMP2' */
+
+%obs: 'kd_un_obs'
+|MMP14(state{latent},Cat[1]), TIMP2(Nter[1],Cter[2]), MMP2(state{latent},PEX[2])| /* line 288 'MMP14_TIMP2_MMP2_dissociate' */
++|MMP14(state{latent},Cat[1]), TIMP2(Nter[1],Cter[2]), MMP2(state{latent},PEX[2],Nter[3]), MMP14(state{active},Cat[3])| /* line 290 'MMP14_TIMP2_MMP2-MMP14_dissociate' */
+
+
+%obs: 'k_bin_obs'
+(|MMP14(state{latent},Cat[.])|*|TIMP2(Nter[.],Cter[.])|) /* line 285 'MMP14(state~latent)_TIMP2' */
++(|MMP14(state{latent},Cat[1]), TIMP2(Nter[1],Cter[.])|*| MMP2(state{latent},PEX[.])|) /* line 287 'MMP14_TIMP2_MMP2' */
++(|MMP14(state{latent},Cat[1]), TIMP2(Nter[1],Cter[2]), MMP2(state{latent},PEX[2],Nter[.])|*|MMP14(state{active},Cat[.])|) /* Line 289 'MMP14_TIMP2_MMP2-MMP14' */
+
+%obs: 'l_un_obs'
+|TIMP2(Nter[1]), MMP2(state{active},Cat[1])| /* line 295 'TIMP2_MMP2(state~active)_dissociate' */
++|TIMP2(Nter[1]), MMP14(state{active},Cat[1])| /* line 297 'TIMP2_MMP14(state~active)_dissociate' */
+
+%obs: 'l_bin_obs'
+(|TIMP2(Nter[.])|*|MMP2(state{active},Cat[.])|) /* line 294 'TIMP2_MMP2(state~active)' */
++(|TIMP2(Nter[.])|*|MMP14(state{active},Cat[.])|) /* line 296 'TIMP2_MMP14(state~active)' */
+
+
+
+%obs: 'unary_low_rc' unary_low * low_affinity_un
+
+%obs: 'unary_normal_rc' unary_normal * normal_affinity_un
+
+%obs: 'unary_high_rc' unary_high * high_affinity_un
+
+%obs: 'unary_very_high_rc' unary_very_high * very_high_affinity_un
+
+%obs: 'binary_low_rc' binary_low * low_affinity_bin
+
+%obs: 'binary_normal_rc' binary_normal * normal_affinity_bin
+
+%obs: 'binary_high_rc' binary_high * high_affinity_bin
+
+%obs: 'binary_very_high_rc' binary_very_high * very_high_affinity_bin
+
+%obs: 'kd_un_obs_rc' kd_un_obs * kd_un
+
+%obs: 'k_bin_obs_rc' k_bin_obs * k_bin
+
+
+%obs: 'syn_activity'
+'TGFB1_synthesis_rate'
++'TGFBi_synthesis_rate'
++'LTBP1_synthesis_rate'
++'FN1_synthesis_rate'
++'FBN1_synthesis_rate'
++'FBLN1_synthesis_rate'
++'FBLN4_synthesis_rate'
++'ITGAVB1_synthesis_rate'
++'ITGAVB3_synthesis_rate'
++'ITGAVB5_synthesis_rate'
++'ITGAVB6_synthesis_rate'
++'ITGAVB8_synthesis_rate'
++'ITGA5B1_synthesis_rate'
++'ITGA2B1_synthesis_rate'
++'ADAMTS1_synthesis_rate'
++'ADAMTSL2_synthesis_rate'
++'ADAMTSL3_synthesis_rate'
++'ADAMTS4_synthesis_rate'
++'ADAMTS10_synthesis_rate'
++'ADAMTSL6_synthesis_rate'
++'ADAM12_synthesis_rate'
++'THBS1_synthesis_rate'
++'COL1_synthesis_rate'
++'DCN_synthesis_rate'
++'MAGP1_synthesis_rate'
++'MMP2_synthesis_rate'
++'MMP9_synthesis_rate'
++'MMP14_synthesis_rate'
++'TIMP1_synthesis_rate'
++'TIMP2_synthesis_rate'
++'TIMP3_synthesis_rate'
++'CD44_synthesis_rate'
++'BMP1_synthesis_rate'
++'HS_synthesis_rate'
+
+%obs: 'deg_activity'
+'TGFB1_deg_rate' * |TGFB1()|
++'TGFBi_deg_rate' * |TGFBi()|
++'LTBP1_deg_rate' * |LTBP1()|
++'FN1_deg_rate' * |FN1()|
++'FBN1_deg_rate' * |FBN1()|
++'FBLN1_deg_rate' * |FBLN1()|
++'FBLN4_deg_rate' * |FBLN4()|
++'ITGAVB1_deg_rate' * |ITGAVB1()|
++'ITGAVB3_deg_rate' * |ITGAVB3()|
++'ITGAVB5_deg_rate' * |ITGAVB5()|
++'ITGAVB6_deg_rate' * |ITGAVB6()|
++'ITGAVB8_deg_rate' * |ITGAVB8()|
++'ITGA5B1_deg_rate' * |ITGA5B1()|
++'ITGA2B1_deg_rate' * |ITGA2B1()|
++'ADAMTS1_deg_rate' * |ADAMTS1()|
++'ADAMTSL2_deg_rate' * |ADAMTSL2()|
++'ADAMTSL3_deg_rate' * |ADAMTSL3()|
++'ADAMTS4_deg_rate' * |ADAMTS4()|
++'ADAMTS10_deg_rate' * |ADAMTS10()|
++'ADAMTSL6_deg_rate' * |ADAMTSL6()|
++'ADAM12_deg_rate' * |ADAM12()|
++'THBS1_deg_rate' * |THBS1()|
++'COL1_deg_rate' * |COL1()|
++'DCN_deg_rate' * |DCN()|
++'MAGP1_deg_rate' * |MAGP1()|
++'MMP2_deg_rate' * |MMP2()|
++'MMP9_deg_rate' * |MMP9()|
++'MMP14_deg_rate' * |MMP14()|
++'TIMP1_deg_rate' * |TIMP1()|
++'TIMP2_deg_rate' * |TIMP2()|
++'TIMP3_deg_rate' * |TIMP3()|
++'CD44_deg_rate' * |CD44()|
++'BMP1_deg_rate' * |BMP1()|
++'HS_deg_rate' * |HS()|
+
+%obs: 'TGFB1(state{active})' |TGFB1(state{active})|
+%obs: 'GENE_COL1(x{hidden})' |GENE_COL1(x{hidden})|
+%obs: 'GENE_COL1(x{visible})' |GENE_COL1(x{visible})|
+%obs: 'GENE_DCN(x{hidden})' |GENE_DCN(x{hidden})|
+%obs: 'GENE_DCN(x{visible})' |GENE_DCN(x{visible})|
+%obs: 'GENE_MMP2(x{hidden})' |GENE_MMP2(x{hidden})|
+%obs: 'GENE_MMP2(x{visible})' |GENE_MMP2(x{visible})|
+%obs: 'GENE_TIMP1(x{hidden})' |GENE_TIMP1(x{hidden})|
+%obs: 'GENE_TIMP1(x{visible})' |GENE_TIMP1(x{visible})|
+
+%obs: 'COL1activation'
+|GENE_COL1(x{hidden})| * |TGFB1(state{active})| * 'COL1_gene_activation_rate'
+%obs: 'COL1genedeactivation'
+|GENE_COL1(x{visible})| * 'COL1_gene_deactivation_rate'
+%obs: 'COL1synthesisbyGENE_COL1'
+|GENE_COL1(x{visible})| * 'COL1_synthesis_by_gene_expression_rate'
+
+
+%obs: 'DCNactivation'
+|GENE_DCN(x{hidden})| * |TGFB1(state{active})| * 'DCN_gene_activation_rate'
+%obs: 'DCNgenedeactivation'
+|GENE_DCN(x{visible})| * 'DCN_gene_deactivation_rate'
+%obs: 'DCNsynthesisbyGENE_DCN'
+|GENE_DCN(x{visible})| * 'DCN_synthesis_by_gene_expression_rate'
+
+%obs: 'MMP2activation'
+|GENE_MMP2(x{hidden})| * |TGFB1(state{active})| * 'MMP2_gene_activation_rate'
+%obs: 'MMP2genedeactivation'
+|GENE_MMP2(x{visible})| * 'MMP2_gene_deactivation_rate'
+%obs: 'MMP2synthesisbyGENE_MMP2'
+|GENE_MMP2(x{visible})| * 'MMP2_synthesis_by_gene_expression_rate'
+
+%obs: 'TIMP1activation'
+|GENE_TIMP1(x{hidden})| * |TGFB1(state{active})| * 'TIMP1_gene_activation_rate'
+%obs: 'TIMP1genedeactivation'
+|GENE_TIMP1(x{visible})| * 'TIMP1_gene_deactivation_rate'
+%obs: 'TIMP1synthesisbyGENE_TIMP1'
+|GENE_TIMP1(x{visible})| * 'TIMP1_synthesis_by_gene_expression_rate'
+
+/* %obs: 'l_un_obs_rc' l_un_obs * l_un */
+
+/* #%obs: 'l_bin_obs_rc' l_bin_obs * l_bin */

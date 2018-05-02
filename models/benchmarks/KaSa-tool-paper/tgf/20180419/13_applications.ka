@@ -1,0 +1,477 @@
+%plot: |de|
+
+%plot: |TIMP1_g1|
+%plot: |TIMP1_g2|
+%plot: |TIMP1_g3|
+%plot: |TIMP1_syn|
+%obs: 'gvTIMP1' |GENE_TIMP1(x{visible})|
+%plot: |COL1_g1|
+%plot: |COL1_g2|
+%plot: |COL1_g3|
+%plot: |COL1_syn|
+%obs: 'gvCOL1' |GENE_COL1(x{visible})|
+%plot: |MMP2_g1|
+%plot: |MMP2_g2|
+%plot: |MMP2_g3|
+%plot: |MMP2_syn|
+%obs: 'gvMMP2' |GENE_MMP2(x{visible})|
+%plot: |DCN_g1|
+%plot: |DCN_g2|
+%plot: |DCN_g3|
+%plot: |DCN_syn|
+%obs: 'gvDCN' |GENE_DCN(x{visible})|
+
+
+
+
+%plot: |iterateTGFB1_syn|
+%plot: |iterateTGFB1_deg|
+%plot: |TGFB1_syn|
+%plot: |TGFB1_deg|
+%obs: 'diffTGFB1' |TGFB1_syn| - |TGFB1_deg|
+%plot: |TGFBi_syn|
+%plot: |TGFBi_deg|
+%obs: 'diffTGFB1i' |TGFBi_syn| - |TGFBi_deg|
+%plot: |LTBP1_syn|
+%plot: |LTBP1_deg|
+%obs: 'diffLTBP1' |LTBP1_syn| - |LTBP1_deg|
+%plot: |FN1_syn|
+%plot: |FN1_deg|
+%obs: 'diffFN1' |FN1_syn| - |FN1_deg|
+%plot: |FBN1_syn|
+%plot: |FBN1_deg|
+%obs: 'diffFBN1' |FBN1_syn| - |FBN1_deg|
+%plot: |FBLN4_syn|
+%plot: |FBLN4_deg|
+%obs: 'diffFBLN4' |FBLN4_syn| - |FBLN4_deg|
+%plot: |FBLN1_syn|
+%plot: |FBLN1_deg|
+%obs: 'diffFBLN1' |FBLN1_syn| - |FBLN1_deg|
+%plot: |ITGAVB1_syn|
+%plot: |ITGAVB1_deg|
+%obs: 'diffITGAVB1' |ITGAVB1_syn| - |ITGAVB1_deg|
+%plot: |ITGAVB3_syn|
+%plot: |ITGAVB3_deg|
+%obs: 'diffITGAVB3' |ITGAVB3_syn| - |ITGAVB3_deg|
+%plot: |ITGAVB5_syn|
+%plot: |ITGAVB5_deg|
+%obs: 'difITGAVB3' |ITGAVB3_syn| - |ITGAVB3_deg|
+%plot: |ITGAVB6_syn|
+%plot: |ITGAVB6_deg|
+%obs: 'diffITGAVB6' |ITGAVB6_syn| - |ITGAVB6_deg|
+%plot: |ITGAVB8_syn|
+%plot: |ITGAVB8_deg|
+%obs: 'diffITGAVB8' |ITGAVB8_syn| - |ITGAVB8_deg|
+%plot: |ITGA5B1_syn|
+%plot: |ITGA5B1_deg|
+%obs: 'diffITGA5B1' |ITGA5B1_syn| - |ITGA5B1_deg|
+%plot: |ITGA2B1_syn|
+%plot: |ITGA2B1_deg|
+%obs: 'difTGFB1' |TGFB1_syn| - |TGFB1_deg|
+%plot: |ADAMTS1_syn|
+%plot: |ADAMTS1_deg|
+%obs: 'diffADAMTS1' |ADAMTS1_syn| - |ADAMTS1_deg|
+%plot: |ADAMTSL2_syn|
+%plot: |ADAMTSL2_deg|
+%obs: 'diffADAMTSL2' |ADAMTSL2_syn| - |ADAMTSL2_deg|
+%plot: |ADAMTSL3_syn|
+%plot: |ADAMTSL3_deg|
+%obs: 'diffADAMTSL3' |ADAMTSL3_syn| - |ADAMTSL3_deg|
+%plot: |ADAMTS4_syn|
+%plot: |ADAMTS4_deg|
+%obs: 'diffADAMTS4' |ADAMTS4_syn| - |ADAMTS4_deg|
+%plot: |ADAMTSL6_syn|
+%plot: |ADAMTSL6_deg|
+%obs: 'diffADAMTSL6' |ADAMTSL6_syn| - |ADAMTSL6_deg|
+%plot: |ADAM12_syn|
+%plot: |ADAM12_deg|
+%obs: 'diffADAM12' |ADAM12_syn| - |ADAM12_deg|
+%plot: |THBS1_syn|
+%plot: |THBS1_deg|
+%obs: 'diffTHBS1' |THBS1_syn| - |THBS1_deg|
+%plot: |HS_syn|
+%plot: |HS_deg|
+%obs: 'diffHS' |HS_syn| - |HS_deg|
+%plot: |MAGP1_syn|
+%plot: |MAGP1_deg|
+%obs: 'diffMAGP1' |MAGP1_syn| - |MAGP1_deg|
+%plot: |CD44_syn|
+%plot: |CD44_deg|
+%obs: 'diffCD44' |CD44_syn| - |CD44_deg|
+%plot: |BMP1_syn|
+%plot: |BMP1_deg|
+%obs: 'diffBMP1' |BMP1_syn| - |BMP1_deg|
+%plot: |MMP9_syn|
+%plot: |MMP9_deg|
+%obs: 'diffMMP9' |MMP9_syn| - |MMP9_deg|
+%plot: |MMP14_syn|
+%plot: |MMP14_deg|
+%obs: 'diffMMP14' |MMP14_syn| - |MMP14_deg|
+%plot: |TIMP2_syn|
+%plot: |TIMP2_deg|
+%obs: 'diffTIMP2' |TIMP2_syn| - |TIMP2_deg|
+%plot: |TIMP3_syn|
+%plot: |TIMP3_deg|
+%obs: 'diffTIMP3' |TIMP3_syn| - |TIMP3_deg|
+
+
+
+
+
+%obs: 'TGFB1_' |TGFB1()|
+%obs: 'TGFB1_l' |TGFB1(state{latent})|
+%obs: 'TGFB1_a' |TGFB1(state{active})|
+
+%obs: 'TGFBi_i' 'TGFBi_init'
+%obs: 'TGFBi_' |TGFBi()|
+
+%obs: 'LTBP1_i' 'LTBP1_init'
+%obs: 'LTBP1_' |LTBP1()|
+
+%obs: 'FN1_i' 'FN1_init'
+%obs: 'FN1_' |FN1()|
+
+%obs: 'FBN1_i' 'FBN1_init'
+%obs: 'FBN1_' |FBN1()|
+
+%obs: 'FBLN1_i' 'FBLN1_init'
+%obs: 'FBLN1_' |FBLN1()|
+
+%obs: 'FBLN4_i' 'FBLN4_init'
+%obs: 'FBLN4_' |FBLN4()|
+
+%obs: 'ITGAVB1_i' 'ITGAVB1_init'
+%obs: 'ITGAVB1_' |ITGAVB1()|
+
+%obs: 'ITGAVB3_i' 'ITGAVB3_init'
+%obs: 'ITGAVB3_' |ITGAVB3()|
+
+%obs: 'ITGAVB5_i' 'ITGAVB5_init'
+%obs: 'ITGAVB5_' |ITGAVB5()|
+
+%obs: 'ITGAVB6_i' 'ITGAVB6_init'
+%obs: 'ITGAVB6_' |ITGAVB6()|
+
+%obs: 'ITGAVB8_i' 'ITGAVB8_init'
+%obs: 'ITGAVB8_' |ITGAVB8()|
+
+%obs: 'ITGA5B1_i' 'ITGA5B1_init'
+%obs: 'ITGA5B1_' |ITGA5B1()|
+
+%obs: 'ITGA2B1_i' 'ITGA2B1_init'
+%obs: 'ITGA2B1_' |ITGA2B1()|
+
+%obs: 'ADAMTS1_i' 'ADAMTS1_init'
+%obs: 'ADAMTS1_' |ADAMTS1()|
+
+%obs: 'ADAMTSL2_i' 'ADAMTSL2_init'
+%obs: 'ADAMTSL2_' |ADAMTSL2()|
+
+%obs: 'ADAMTSL3_i' 'ADAMTSL3_init'
+%obs: 'ADAMTSL3_' |ADAMTSL3()|
+
+%obs: 'ADAMTS4_i' 'ADAMTS4_init'
+%obs: 'ADAMTS4_' |ADAMTS4()|
+
+%obs: 'ADAMTS10_i' 'ADAMTS10_init'
+%obs: 'ADAMTS10_' |ADAMTS10()|
+
+%obs: 'ADAMTSL6_i' 'ADAMTSL6_init'
+%obs: 'ADAMTSL6_' |ADAMTSL6()|
+
+%obs: 'ADAM12_i' 'ADAM12_init'
+%obs: 'ADAM12_' |ADAM12()|
+
+%obs: 'THBS1_i' 'THBS1_init'
+%obs: 'THBS1_' |THBS1()|
+
+%obs: 'COL1_i' 'COL1_init'
+%obs: 'COL1_' |COL1()|
+
+%obs: 'DCN_i' 'DCN_init'
+%obs: 'DCN_' |DCN()|
+
+%obs: 'MAGP1_i' 'MAGP1_init'
+%obs: 'MAGP1_' |MAGP1()|
+
+%obs: 'MMP2_i' 'MMP2_init'
+%obs: 'MMP2_' |MMP2()|
+
+%obs: 'MMP9_i' 'MMP9_init'
+%obs: 'MMP9_' |MMP9()|
+
+%obs: 'MMP14_i' 'MMP14_init'
+%obs: 'MMP14_' |MMP14()|
+
+%obs: 'TIMP1_i' 'TIMP1_init'
+%obs: 'TIMP1_' |TIMP1()|
+
+%obs: 'TIMP2_i' 'TIMP2_init'
+%obs: 'TIMP2_' |TIMP2()|
+
+%obs: 'TIMP3_i' 'TIMP3_init'
+%obs: 'TIMP3_' |TIMP3()|
+
+%obs: 'CD44_i' 'CD44_init'
+%obs: 'CD44_' |CD44()|
+
+%obs: 'BMP1_i' 'BMP1_init'
+%obs: 'BMP1_' |BMP1()|
+
+%obs: 'HS_i' 'HS_init'
+%obs: 'HS_' |HS()|
+
+%obs: 'tot'
+|TGFB1()|
++ |TGFBi()|
++ |LTBP1()|
++ |FN1()|
++ |FBN1()|
++ |FBLN1()|
++ |FBLN4()|
++ |ITGAVB1()|
++ |ITGAVB3()|
++ |ITGAVB5()|
++ |ITGAVB6()|
++ |ITGAVB8()|
++ |ITGA5B1()|
++ |ITGA2B1()|
++ |ADAMTS1()|
++ |ADAMTSL2()|
++ |ADAMTSL3()|
++ |ADAMTS4()|
++ |ADAMTS10()|
++ |ADAMTSL6()|
++ |ADAM12()|
++ |THBS1()|
++ |COL1()|
++ |DCN()|
++ |MAGP1()|
++ |MMP2()|
++ |MMP9()|
++ |MMP14()|
++ |TIMP1()|
++ |TIMP2()|
++ |TIMP3()|
++ |CD44()|
++ |BMP1()|
++ |HS()|
+
+
+
+
+%plot: |r1|
+%plot: |r2|
+%plot: |r3|
+%plot: |r4|
+%plot: |r5|
+%plot: |r6|
+%plot: |r7|
+%plot: |r8|
+%plot: |r9|
+%plot: |r10|
+%plot: |r11|
+%plot: |r12|
+%plot: |r13|
+%plot: |r14|
+%plot: |r15|
+%plot: |r16|
+%plot: |r17|
+%plot: |r18|
+%plot: |r19|
+%plot: |r20|
+%plot: |r21|
+%plot: |r22|
+%plot: |r23|
+%plot: |r24|
+%plot: |r25|
+%plot: |r26|
+%plot: |r27|
+%plot: |r28|
+%plot: |r29|
+%plot: |r30|
+%plot: |r31|
+%plot: |r32|
+%plot: |r33|
+%plot: |r34|
+%plot: |r35|
+%plot: |r36|
+%plot: |r37|
+%plot: |r38|
+%plot: |r39|
+%plot: |r40|
+%plot: |r41|
+%plot: |r42|
+%plot: |r43|
+%plot: |r44|
+%plot: |r45|
+%plot: |r46|
+%plot: |r47|
+%plot: |r48|
+%plot: |r49|
+%plot: |r50|
+%plot: |r50bis|
+%plot: |r51|
+%plot: |r52|
+%plot: |r53|
+%plot: |r54|
+%plot: |r55|
+%plot: |r56|
+%plot: |r57|
+%plot: |r58|
+%plot: |r59|
+%plot: |r60|
+%plot: |r61|
+%plot: |r62|
+%plot: |r63|
+%plot: |r64|
+%plot: |r65|
+%plot: |r66|
+%plot: |r67|
+%plot: |r68|
+%plot: |r69|
+%plot: |r70|
+%plot: |r71|
+%plot: |r72|
+%plot: |r73|
+%plot: |r74|
+%plot: |r75|
+%plot: |r76|
+%plot: |r77|
+%plot: |r78|
+%plot: |r79|
+%plot: |r80|
+%plot: |r81|
+%plot: |r82|
+%plot: |r83|
+%plot: |r84|
+%plot: |r85|
+%plot: |r86|
+%plot: |r87|
+%plot: |r88|
+%plot: |r89|
+%plot: |r90|
+%plot: |r91|
+%plot: |r92|
+%plot: |r93|
+%plot: |r94|
+%plot: |r95|
+%plot: |r96|
+%plot: |r97|
+%plot: |r98|
+%plot: |r99|
+%plot: |r100|
+%plot: |r101|
+%plot: |r102|
+%plot: |r103|
+%plot: |r104|
+%plot: |r105|
+%plot: |r106|
+%plot: |r106bis|
+%plot: |r107|
+%plot: |r108|
+%plot: |r108bis|
+%plot: |r109|
+%plot: |r110|
+%plot: |r111|
+%plot: |r112|
+%plot: |r113|
+%plot: |r114|
+%plot: |r115|
+%plot: |r116|
+%plot: |r117|
+%plot: |r118|
+%plot: |r119|
+%plot: |r120|
+%plot: |r121|
+%plot: |r122|
+%plot: |r123|
+%plot: |r124|
+%plot: |r125|
+%plot: |r126|
+%plot: |r127|
+%plot: |r128|
+%plot: |r129|
+%plot: |r130|
+%plot: |r131|
+%plot: |r132|
+%plot: |r133|
+%plot: |r134|
+%plot: |r135|
+%plot: |r136|
+%plot: |r137|
+%plot: |r138|
+%plot: |r139|
+%plot: |r140|
+%plot: |r141|
+%plot: |r142|
+%plot: |r143|
+%plot: |r144|
+%plot: |r145|
+%plot: |r146|
+%plot: |r147|
+%plot: |r148|
+%plot: |r149|
+%plot: |r150|
+%plot: |r150bis|
+%plot: |r151|
+%plot: |r152|
+%plot: |r153|
+%plot: |r154|
+%plot: |r155|
+%plot: |r156|
+%plot: |r157|
+%plot: |r158|
+%plot: |r159|
+%plot: |r160|
+%plot: |r161|
+%plot: |r162|
+%plot: |r163|
+%plot: |r164|
+%plot: |r165|
+%plot: |r166|
+%plot: |r167|
+%plot: |r168|
+%plot: |r169|
+%plot: |r170|
+%plot: |r171|
+%plot: |r172|
+%plot: |r173|
+%plot: |r174|
+%plot: |r175|
+%plot: |r176|
+%plot: |r177|
+%plot: |r178|
+%plot: |r179|
+%plot: |r180|
+%plot: |r181|
+%plot: |r182|
+%plot: |r183|
+%plot: |r184|
+%plot: |r185|
+%plot: |r186|
+%plot: |r187|
+%plot: |r188|
+%plot: |r189|
+%plot: |r190|
+%plot: |r191|
+%plot: |r192|
+%plot: |r193|
+%plot: |r194|
+%plot: |r195|
+%plot: |r196|
+%plot: |r197|
+%plot: |r198|
+%plot: |r199|
+%plot: |r200|
+%plot: |r201|
+%plot: |r202|
+%plot: |r203|
+%plot: |r204|
+%plot: |r205|
+%plot: |r206|
+%plot: |r207|
+%plot: |r208|
+%plot: |r209|
+%plot: |r210|
+%plot: |r211|

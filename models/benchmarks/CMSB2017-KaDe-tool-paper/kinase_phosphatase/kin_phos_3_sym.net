@@ -1,0 +1,96 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot  100  # Constant
+    2 kKS   0.01  # Constant
+    3 kdKS  1.0  # Constant
+    4 kpS   0.1  # Constant
+    5 kPS   0.001  # Constant
+    6 kdPS  0.1  # Constant
+    7 kuS   0.01  # Constant
+end parameters
+begin species
+    1 K(s) Stot
+    2 P(s) Stot
+    3 S(x~u,x~u,x~u) Stot
+    4 K(s!1).S(x~u!1,x~u,x~u) 0
+    5 K(s!1).K(s!2).S(x~u!2,x~u!1,x~u) 0
+    6 S(x~p,x~u,x~u) 0
+    7 K(s!1).K(s!2).K(s!3).S(x~u!3,x~u!2,x~u!1) 0
+    8 K(s!1).S(x~p,x~u!1,x~u) 0
+    9 P(s!1).S(x~p!1,x~u,x~u) 0
+   10 K(s!1).K(s!2).S(x~p,x~u!2,x~u!1) 0
+   11 K(s!1).P(s!2).S(x~p!2,x~u!1,x~u) 0
+   12 S(x~p,x~p,x~u) 0
+   13 K(s!1).K(s!2).P(s!3).S(x~p!3,x~u!2,x~u!1) 0
+   14 K(s!1).S(x~p,x~p,x~u!1) 0
+   15 P(s!1).S(x~p!1,x~p,x~u) 0
+   16 K(s!1).P(s!2).S(x~p!2,x~p,x~u!1) 0
+   17 S(x~p,x~p,x~p) 0
+   18 P(s!1).P(s!2).S(x~p!2,x~p!1,x~u) 0
+   19 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~u!1) 0
+   20 P(s!1).S(x~p!1,x~p,x~p) 0
+   21 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p) 0
+   22 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1) 0
+end species
+begin reactions
+    1 1,3 4 9*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9
+    2 1,4 5 6*kKS #_R1,_R5,_R5,_R9,_R9
+    3 4 1,3 3*kdKS #_reverse__R1,_reverse__R5,_reverse__R9
+    4 4 1,6 3*kpS #_R2,_R6,_R10
+    5 1,5 7 3*kKS #_R1,_R5,_R9
+    6 1,6 8 6*kKS #_R1,_R5,_R5,_R9,_R9
+    7 5 1,4 6*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9
+    8 5 1,8 6*kpS #_R2,_R6,_R6,_R10,_R10
+    9 2,6 9 3*kPS #_R3,_R7,_R11
+   10 1,8 10 3*kKS #_R1,_R5,_R9
+   11 1,9 11 6*kKS #_R1,_R5,_R5,_R9,_R9
+   12 7 1,5 9*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9
+   13 8 1,6 3*kdKS #_reverse__R1,_reverse__R5,_reverse__R9
+   14 7 1,10 9*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10
+   15 8 1,12 3*kpS #_R2,_R6,_R10
+   16 2,8 11 3*kPS #_R3,_R7,_R11
+   17 9 2,6 3*kdPS #_reverse__R3,_reverse__R7,_reverse__R11
+   18 9 2,3 3*kuS #_R4,_R8,_R12
+   19 1,11 13 3*kKS #_R1,_R5,_R9
+   20 1,12 14 3*kKS #_R1,_R5,_R9
+   21 10 1,8 6*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9
+   22 11 1,9 3*kdKS #_reverse__R1,_reverse__R5,_reverse__R9
+   23 10 1,14 6*kpS #_R2,_R6,_R6,_R10,_R10
+   24 11 1,15 3*kpS #_R2,_R6,_R10
+   25 2,10 13 3*kPS #_R3,_R7,_R11
+   26 2,12 15 6*kPS #_R3,_R7,_R7,_R11,_R11
+   27 11 2,8 3*kdPS #_reverse__R3,_reverse__R7,_reverse__R11
+   28 11 2,4 3*kuS #_R4,_R8,_R12
+   29 1,15 16 3*kKS #_R1,_R5,_R9
+   30 13 1,11 6*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9
+   31 14 1,12 3*kdKS #_reverse__R1,_reverse__R5,_reverse__R9
+   32 13 1,16 6*kpS #_R2,_R6,_R6,_R10,_R10
+   33 14 1,17 3*kpS #_R2,_R6,_R10
+   34 2,14 16 6*kPS #_R3,_R7,_R7,_R11,_R11
+   35 2,15 18 3*kPS #_R3,_R7,_R11
+   36 13 2,10 3*kdPS #_reverse__R3,_reverse__R7,_reverse__R11
+   37 15 2,12 3*kdPS #_reverse__R3,_reverse__R7,_reverse__R11
+   38 13 2,5 3*kuS #_R4,_R8,_R12
+   39 15 2,6 3*kuS #_R4,_R8,_R12
+   40 1,18 19 3*kKS #_R1,_R5,_R9
+   41 16 1,15 3*kdKS #_reverse__R1,_reverse__R5,_reverse__R9
+   42 16 1,20 3*kpS #_R2,_R6,_R10
+   43 2,16 19 3*kPS #_R3,_R7,_R11
+   44 2,17 20 9*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11
+   45 16 2,14 3*kdPS #_reverse__R3,_reverse__R7,_reverse__R11
+   46 18 2,15 6*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11
+   47 16 2,8 3*kuS #_R4,_R8,_R12
+   48 18 2,9 6*kuS #_R4,_R8,_R8,_R12,_R12
+   49 19 1,18 3*kdKS #_reverse__R1,_reverse__R5,_reverse__R9
+   50 19 1,21 3*kpS #_R2,_R6,_R10
+   51 2,20 21 6*kPS #_R3,_R7,_R7,_R11,_R11
+   52 19 2,16 6*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11
+   53 20 2,17 3*kdPS #_reverse__R3,_reverse__R7,_reverse__R11
+   54 19 2,11 6*kuS #_R4,_R8,_R8,_R12,_R12
+   55 20 2,12 3*kuS #_R4,_R8,_R12
+   56 2,21 22 3*kPS #_R3,_R7,_R11
+   57 21 2,20 6*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11
+   58 21 2,15 6*kuS #_R4,_R8,_R8,_R12,_R12
+   59 22 2,21 9*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11
+   60 22 2,18 9*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12
+end reactions

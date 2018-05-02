@@ -1,0 +1,73 @@
+/*protein synthesis*/
+/*Parameters come from parameters.csv*/
+%var: 'TGFB1_synthesis_rate' 'TGFB1_equilibrium'*(TGFB1_deg_rate)
+%var: 'TGFBi_synthesis_rate' 'TGFBi_equilibrium'*(TGFBi_deg_rate)
+%var: 'LTBP1_synthesis_rate' 'LTBP1_equilibrium'*(LTBP1_deg_rate)
+%var: 'FN1_synthesis_rate' 'FN1_equilibrium'*(FN1_deg_rate + FN1_deg_int)
+%var: 'FBN1_synthesis_rate' 'FBN1_equilibrium'*(FBN1_deg_rate + FBN1_deg_int)
+%var: 'FBLN1_synthesis_rate' 'FBLN1_equilibrium'*(FBLN1_deg_rate)
+%var: 'FBLN4_synthesis_rate' 'FBLN4_equilibrium'*(FBLN4_deg_rate)
+%var: 'ITGAVB1_synthesis_rate' 'ITGAVB1_equilibrium'*(ITGAVB1_deg_rate)
+%var: 'ITGAVB3_synthesis_rate' 'ITGAVB3_equilibrium'*(ITGAVB3_deg_rate)
+%var: 'ITGAVB5_synthesis_rate' 'ITGAVB5_equilibrium'*(ITGAVB5_deg_rate)
+%var: 'ITGAVB6_synthesis_rate' 'ITGAVB6_equilibrium'*(ITGAVB6_deg_rate)
+%var: 'ITGAVB8_synthesis_rate' 'ITGAVB8_equilibrium'*(ITGAVB8_deg_rate)
+%var: 'ITGA5B1_synthesis_rate' 'ITGA5B1_equilibrium'*(ITGA5B1_deg_rate)
+%var: 'ITGA2B1_synthesis_rate' 'ITGA2B1_equilibrium'*(ITGA2B1_deg_rate)
+%var: 'ADAMTS1_synthesis_rate' 'ADAMTS1_equilibrium'*(ADAMTS1_deg_rate)
+%var: 'ADAMTSL2_synthesis_rate' 'ADAMTSL2_equilibrium'*(ADAMTSL2_deg_rate)
+%var: 'ADAMTSL3_synthesis_rate' 'ADAMTSL3_equilibrium'*(ADAMTSL3_deg_rate)
+%var: 'ADAMTS4_synthesis_rate' 'ADAMTS4_equilibrium'*(ADAMTS4_deg_rate)
+%var: 'ADAMTS10_synthesis_rate' 'ADAMTS10_equilibrium'*(ADAMTS10_deg_rate)
+%var: 'ADAMTSL6_synthesis_rate' 'ADAMTSL6_equilibrium'*(ADAMTSL6_deg_rate)
+%var: 'ADAM12_synthesis_rate' 'ADAM12_equilibrium'*(ADAM12_deg_rate)
+%var: 'THBS1_synthesis_rate' 'THBS1_equilibrium'*(THBS1_deg_rate + THBS1_deg_int)
+%var: 'COL1_synthesis_rate' 'COL1_equilibrium'*(COL1_deg_rate + COL1_deg_int)
+%var: 'DCN_synthesis_rate' 'DCN_equilibrium'*(DCN_deg_rate)
+%var: 'MAGP1_synthesis_rate' 'MAGP1_equilibrium'*(MAGP1_deg_rate)
+%var: 'MMP2_synthesis_rate' 'MMP2_equilibrium'*(MMP2_deg_rate)
+%var: 'MMP9_synthesis_rate' 'MMP9_equilibrium'*(MMP9_deg_rate)
+%var: 'MMP14_synthesis_rate' 'MMP14_equilibrium'*(MMP14_deg_rate)
+%var: 'TIMP1_synthesis_rate' 'TIMP1_equilibrium'*(TIMP1_deg_rate)
+%var: 'TIMP2_synthesis_rate' 'TIMP2_equilibrium'*(TIMP2_deg_rate)
+%var: 'TIMP3_synthesis_rate' 'TIMP3_equilibrium'*(TIMP3_deg_rate)
+%var: 'CD44_synthesis_rate' 'CD44_equilibrium'*(CD44_deg_rate)
+%var: 'BMP1_synthesis_rate' 'BMP1_equilibrium'*(BMP1_deg_rate)
+%var: 'HS_synthesis_rate' 'HS_equilibrium'*(HS_deg_rate)
+
+ 
+ 
+'TGFB1_synthesis' . -> TGFB1() @ 'TGFB1_synthesis_rate' * 'coef_zero'
+'TGFBi_synthesis' . -> TGFBi() @ 'TGFBi_synthesis_rate' * 'coef_zero'
+'LTBP1_synthesis' . -> LTBP1() @ 'LTBP1_synthesis_rate' * 'coef_zero'
+'FN1_synthesis' . -> FN1() @ 'FN1_synthesis_rate' * 'coef_zero'
+'FBN1_synthesis' . -> FBN1() @ 'FBN1_synthesis_rate' * 'coef_zero'
+'FBLN1_synthesis' . -> FBLN1() @ 'FBLN1_synthesis_rate' * 'coef_zero'
+'FBLN4_synthesis' . -> FBLN4() @ 'FBLN4_synthesis_rate' * 'coef_zero'
+'ITGAVB1_synthesis' . -> ITGAVB1() @ 'ITGAVB1_synthesis_rate' * 'coef_zero'
+'ITGAVB3_synthesis' . -> ITGAVB3() @ 'ITGAVB3_synthesis_rate' * 'coef_zero'
+'ITGAVB5_synthesis' . -> ITGAVB5() @ 'ITGAVB5_synthesis_rate' * 'coef_zero'
+'ITGAVB6_synthesis' . -> ITGAVB6() @ 'ITGAVB6_synthesis_rate' * 'coef_zero'
+'ITGAVB8_synthesis' . -> ITGAVB8() @ 'ITGAVB8_synthesis_rate' * 'coef_zero'
+'ITGA5B1_synthesis' . -> ITGA5B1() @ 'ITGA5B1_synthesis_rate' * 'coef_zero'
+'ITGA2B1_synthesis' . -> ITGA2B1() @ 'ITGA2B1_synthesis_rate' * 'coef_zero'
+'ADAMTS1_synthesis' . -> ADAMTS1() @ 'ADAMTS1_synthesis_rate' * 'coef_zero'
+'ADAMTSL2_synthesis' . -> ADAMTSL2() @ 'ADAMTSL2_synthesis_rate' * 'coef_zero'
+'ADAMTSL3_synthesis' . -> ADAMTSL3() @ 'ADAMTSL3_synthesis_rate' * 'coef_zero'
+'ADAMTS4_synthesis' . -> ADAMTS4() @ 'ADAMTS4_synthesis_rate' * 'coef_zero'
+'ADAMTS10_synthesis' . -> ADAMTS10() @ 'ADAMTS10_synthesis_rate' * 'coef_zero'
+'ADAMTSL6_synthesis' . -> ADAMTSL6() @ 'ADAMTSL6_synthesis_rate' * 'coef_zero'
+'ADAM12_synthesis' . -> ADAM12() @ 'ADAM12_synthesis_rate' * 'coef_zero'
+'THBS1_synthesis' . -> THBS1() @ 'THBS1_synthesis_rate' * 'coef_zero'
+'COL1_synthesis' . -> COL1() @ 'COL1_synthesis_rate' * 'coef_zero'
+'DCN_synthesis' . -> DCN() @ 'DCN_synthesis_rate' * 'coef_zero'
+'MAGP1_synthesis' . -> MAGP1() @ 'MAGP1_synthesis_rate' * 'coef_zero'
+'MMP2_synthesis' . -> MMP2() @ 'MMP2_synthesis_rate' * 'coef_zero'
+'MMP9_synthesis' . -> MMP9() @ 'MMP9_synthesis_rate' * 'coef_zero'
+'MMP14_synthesis' . -> MMP14() @ 'MMP14_synthesis_rate' * 'coef_zero'
+'TIMP1_synthesis' . -> TIMP1() @ 'TIMP1_synthesis_rate' * 'coef_zero'
+'TIMP2_synthesis' . -> TIMP2() @ 'TIMP2_synthesis_rate' * 'coef_zero'
+'TIMP3_synthesis' . -> TIMP3() @ 'TIMP3_synthesis_rate' * 'coef_zero'
+'CD44_synthesis' . -> CD44() @ 'CD44_synthesis_rate' * 'coef_zero'
+'BMP1_synthesis' . -> BMP1() @ 'BMP1_synthesis_rate' * 'coef_zero'
+'HS_synthesis' . -> HS() @ 'HS_synthesis_rate' * 'coef_zero'

@@ -1,0 +1,35 @@
+begin parameters
+Stot 100
+kKS 0.01
+kdKS 1.
+kpS 0.1
+kPS 0.001
+kdPS 0.1
+kuS 0.01
+end parameters
+
+begin molecule types
+K(s)
+P(s)
+S(x~u~p,x~u~p)
+end molecule types
+
+begin seed species
+K(s) Stot
+P(s) Stot
+S(x~u,x~u) Stot
+end seed species
+
+
+begin reaction rules
+K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
+K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
+P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
+P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
+K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
+K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
+P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
+P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
+end reaction rules
+
+generate_network({overwrite=>1});

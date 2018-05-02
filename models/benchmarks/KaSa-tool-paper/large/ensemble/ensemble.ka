@@ -1,0 +1,758 @@
+/* Ensemble model in KaSim syntax */
+
+//Agent Declarations
+%agent: Pheromone(ste2)
+%agent: Ste2(pheromone,gpa1,sst2)
+%agent: Gpa1(ste2,ste4,nuc{GDP GTP})
+%agent: Ste4(ste5,gpa1,state{reg synth},ste20)
+%agent: Sst2(ste2,mapk,S539{u p})
+%agent: Ste20(ste4)
+%agent: Ste5(ste11,ste7,ste4,mapk,ste5,loc{n c},T287{u p})
+%agent: Ste11(mapk,ste5,degradation{u p},S302_S306_S307{u p pp ppp})
+%agent: Ste7(ste5,mapk,S359_T363{u p pp})
+%agent: Fus3(dock,T180{u p},Y182{u p})
+%agent: Kss1(dock,T183{u p},Y185{u p})
+%agent: Msg5(mapk)
+%agent: Ptp(mapk)
+%agent: Ste12(mapk,dna,dig1,dig2)
+%agent: Dig1(ste12,mapk,activation{u p})
+%agent: Dig2(ste12,mapk,activation{u p})
+%agent: Ste2_gene(promoter)
+%agent: Gpa1_gene(promoter)
+%agent: Dig2_gene(promoter)
+%agent: Ste4_gene(promoter)
+%agent: Sst2_gene(promoter)
+%agent: Fus3_gene(promoter)
+%agent: Ste12_gene(promoter)
+%agent: Msg5_gene(promoter)
+%agent: Mekkp(ste11)
+%agent: Mekp(ste7)
+
+//Initial Conditions
+//%init: 0 Pheromone(ste2)
+//%init: 1 (Ste12_gene(promoter[.]))
+//%init: 1 (Dig2_gene(promoter[.]))
+//%init: 1390 Ste12(dig1[1] dig2[.] mapk[.] dna),Dig1(mapk[.] ste12[1] activation{u}[.]) //
+//%init: 1184 (Dig2(mapk[.] ste12[.] activation{u}[.]))  //
+//%init: 3409 (Dig1(mapk ste12[.] activation{u}[.]))  //
+//%init: 1 (Msg5_gene(promoter[.]))
+//%init: 1 (Fus3_gene(promoter[.]))
+//%init: 1 (Sst2_gene(promoter[.]))
+//%init: 1 (Gpa1_gene(promoter[.]))
+//%init: 1 Ste4_gene(promoter[.])
+//%init: 1 (Ste2_gene(promoter[.]))
+//%init: 10000 Gpa1(ste4[1] ste2[.] nuc{GDP}[.]),Ste4(ste5 gpa1[1] ste20[.] state{reg}[.])//
+//%init: 5000 Gpa1(ste4[.] ste2[.] nuc{GDP}[.]) //
+//%init: 2500 (Sst2(mapk[.] ste2[.] S539{u}[.])) //
+//%init: 10000 (Ste2(gpa1[.] sst2[.] pheromone[.])) //
+//%init: 4200 (Ste20(ste4[.])) //
+//%init: 20400 (Fus3(T180{u}[.] Y182{u}[.] dock[.])) // 
+//%init: 20800 (Kss1(Y185{u}[.] T183{u}[.] dock[.])) //
+//%init: 38 (Msg5(mapk[.])) 					//
+//%init: 1270 (Ptp(mapk[.]))					//
+//%init: 960 (Ste7(ste5[.] mapk[.] S359_T363{u}[.]))	//
+//%init: 3500 (Ste11(ste5[.] S302_S306_S307{u}[.] mapk[.] degradation{u}[.])) //
+//%init: 1680 (Ste5(ste5[.] ste7[.] ste4[.] mapk[.] ste11[.] loc{n}[.] T287{u}[.])) // 
+//%init: 1750 Mekkp(ste11[.]) //
+//%init: 1750 Mekp(ste7[.]) //
+
+
+//Rules
+// Chapter 'Receptor and G protein'
+'Pheromone.Ste2' 
+  Pheromone(ste2[.]),Ste2(pheromone[.]), . ->
+  Pheromone(ste2[1]),Ste2(pheromone[1]),Pheromone(ste2[.]) @ 3e-05
+'Pheromone...Ste2'
+  Ste2(pheromone[1]),Pheromone(ste2[1]) ->
+  Ste2(pheromone[.]), . @ 0.015
+'Ste2.Gpa1'
+  Ste2(gpa1[.]),Gpa1(ste2[.]) ->
+  Ste2(gpa1[1]),Gpa1(ste2[1]) @ 0.001725
+'Ste2...Gpa1 Ref1'
+  Ste2(gpa1[1]),Gpa1(ste2[1] ste4[.]) ->
+  Ste2(gpa1[.]),Gpa1(ste2[.] ste4[.]) @ 0.15
+'Ste2...Gpa1 Ref2'
+  Ste2(gpa1[1]),Gpa1(ste2[1] ste4[2]),Ste4(gpa1[2]) ->
+  Ste2(gpa1[.]),Gpa1(ste2[.] ste4[2]),Ste4(gpa1[2]) @ 0.03
+'Gpa1.Ste4'
+  Gpa1(ste4[.]),Ste4(gpa1[.] ste5[.] ste20[.] state{reg}[.]) ->
+  Gpa1(ste4[1]),Ste4(gpa1[1] ste5[.] ste20[.] state{reg}[.]) @ 0.001725
+'Gpa1.Ste4 Ref1'
+  Gpa1(ste4[.]),Ste4(gpa1[.] ste5[.] ste20[.] state{synth}[.]) ->
+  Gpa1(ste4[1]),Ste4(gpa1[1] ste5[.] ste20[.] state{synth}[.]) @ 8.595e-08
+'Gpa1...Ste4 Ref1'
+  Ste4(gpa1[1]),Gpa1(ste4[1] ste2[.] nuc{GTP}[.]) ->
+  Ste4(gpa1[.]),Gpa1(ste4[.] ste2[.] nuc{GTP}[.]) @ 7.5
+'Gpa1...Ste4 Ref2'
+  Ste4(gpa1[1]),Gpa1(ste4[1] ste2[_] nuc{GTP}[.]) ->
+  Ste4(gpa1[.]),Gpa1(ste4[.] ste2[_] nuc{GTP}[.]) @ 1.5
+'Gpa1@nuc_GTP'
+  Pheromone(ste2[1]),Ste2(pheromone[1] gpa1[2]),Gpa1(nuc{GDP}[.] ste2[2]) ->
+  Pheromone(ste2[1]),Ste2(pheromone[1] gpa1[2]),Gpa1(nuc{GTP}[.] ste2[2]) @ 0.15
+'Sst2.Ste2'
+  Ste2(sst2[.]),Sst2(ste2[.]) -> Ste2(sst2[1]),Sst2(ste2[1]) @ 0.0008595
+'Sst2...Ste2'
+  Ste2(sst2[1]),Sst2(ste2[1]) -> Ste2(sst2[.]),Sst2(ste2[.]) @ 0.15
+'Gpa1@nuc_GDP Ref1'
+  Gpa1(nuc{GTP}[.],ste2[.]) -> Gpa1(nuc{GDP}[.],ste2[.]) @ 0.015
+'Gpa1@nuc_GDP Ref2'
+  Gpa1(nuc{GTP}[.] ste2[2]),Ste2(gpa1[2],sst2[.]) ->
+  Gpa1(nuc{GDP}[.] ste2[2]),Ste2(gpa1[2] sst2[.]) @ 0.015
+'Gpa1@nuc_GDP Ref3'
+  Gpa1(nuc{GTP}[.] ste2[2]),Ste2(gpa1[2] sst2[1]),Sst2(ste2[1] S539{p}[.]) ->
+  Gpa1(nuc{GDP}[.] ste2[2]),Ste2(gpa1[2] sst2[1]),Sst2(ste2[1] S539{p}[.]) @ 1.5
+'Gpa1@nuc_GDP Ref4'
+  Gpa1(nuc{GTP}[.] ste2[2]),Ste2(gpa1[2] sst2[1]),Sst2(ste2[1] S539{u}[.]) ->
+  Gpa1(nuc{GDP}[.] ste2[2]),Ste2(gpa1[2] sst2[1]),Sst2(ste2[1] S539{u}[.]) @ 1.5
+
+//G protein/Receptor regulation
+'Sst2.Fus3'
+  Fus3(dock[.]),Sst2(S539[.] mapk[.]) ->
+  Fus3(dock[1]),Sst2(S539[.] mapk[1]) @ 8.595e-05
+'Sst2...Fus3 Ref1'
+  Fus3(dock[1] T180{u}[.] Y182{u}[.]),Sst2(S539[.] mapk[1]) ->
+  Fus3(dock[.] T180{u}[.] Y182{u}[.]),Sst2(S539[.] mapk[.]) @ 1.5
+'Sst2...Fus3 Ref2'
+  Fus3(dock[1] T180{p}[.] Y182{u}[.]),Sst2(S539[.] mapk[1]) ->
+  Fus3(dock[.] T180{p}[.] Y182{u}[.]),Sst2(S539[.] mapk[.]) @ 0.75
+'Sst2...Fus3 Ref3'
+  Fus3(dock[1] T180{u}[.] Y182{p}[.]),Sst2(S539[.] mapk[1]) ->
+  Fus3(dock[.] T180{u}[.] Y182{p}[.]),Sst2(S539[.] mapk[.]) @ 0.75
+'Sst2...Fus3 Ref4'
+  Fus3(dock[1] T180{p}[.] Y182{p}[.]),Sst2(S539[.] mapk[1]) ->
+  Fus3(dock[.] T180{p}[.] Y182{p}[.]),Sst2(S539[.] mapk[.]) @ 0.375
+'Sst2@S539_p...Fus3'
+  Sst2(mapk[1] S539{u}[.]),Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Sst2(mapk[.] S539{p}[.]),Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 1.5
+'Sst2.Kss1'
+  Kss1(dock[.]),Sst2(S539[.] mapk[.]) ->
+  Kss1(dock[1]),Sst2(S539[.] mapk[1]) @ 8.595e-05
+'Sst2...Kss1 Ref1'
+  Kss1(dock[1] T183{u}[.] Y185{u}[.]),Sst2(S539[.] mapk[1]) ->
+  Kss1(dock[.] T183{u}[.] Y185{u}[.]),Sst2(S539[.] mapk[.]) @ 1.5
+'Sst2...Kss1 Ref2'
+  Kss1(dock[1] T183{p}[.] Y185{u}[.]),Sst2(S539[.] mapk[1]) ->
+  Kss1(dock[.] T183{p}[.] Y185{u}[.]),Sst2(S539[.] mapk[.]) @ 0.75
+'Sst2...Kss1 Ref3'
+  Kss1(dock[1] T183{u}[.] Y185{p}[.]),Sst2(S539[.] mapk[1]) ->
+  Kss1(dock[.] T183{u}[.] Y185{p}[.]),Sst2(S539[.] mapk[.]) @ 0.75
+'Sst2...Kss1 Ref4'
+  Kss1(dock[1] T183{p}[.] Y185{p}[.]),Sst2(S539[.] mapk[1]) ->
+  Kss1(dock[.] T183{p}[.] Y185{p}[.]),Sst2(S539[.] mapk[.]) @ 0.375
+'Sst2@S539_p...Kss1'
+  Sst2(mapk[1] S539{u}[.]),Kss1(dock[1] T183{p}[.] Y185{p}[.]) ->
+  Sst2(mapk[.] S539{p}[.]),Kss1(dock[.] T183{p}[.] Y185{p}[.]) @ 1.5
+'Sst2@S539_u' Sst2(S539{p}[.]) -> Sst2(S539{u}[.]) @ 0.00087
+'-Ste2' Ste2(pheromone[.]) -> . @ 0.000435
+'-PheromoneSte2' Pheromone(ste2[1]),Ste2(pheromone[1]) -> ., . @ 0.00295
+'Ste12.Ste2_gene'
+  Ste12(dna[.]),Ste2_gene(promoter[.]) ->
+  Ste12(dna[1]),Ste2_gene(promoter[1]) @ 2.145e-05
+'Ste12...Ste2_gene'
+  Ste12(dna[1]),Ste2_gene(promoter[1]) ->
+  Ste12(dna[.]),Ste2_gene(promoter[.]) @ 0.03
+'+Ste2' . -> Ste2(gpa1[.] pheromone[.] sst2[.]) @ 2.865
+'+Ste2 Ref1'
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Ste2_gene(promoter[1]),. ->
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Ste2_gene(promoter[1]),Ste2(gpa1[.] pheromone[.] sst2[.]) @ 12
+'-Gpa1' Gpa1(ste4[.]) -> . @ 4.95e-05
+'-Ste4' Ste4(gpa1[.]) -> . @ 4.95e-05
+'-Gprotein trimer' Ste4(gpa1[1]),Gpa1(ste4[1]) -> ., .@ 3.3e-5 
+'Ste12.Gpa1_gene'
+  Ste12(dna[.]),Gpa1_gene(promoter[.]) ->
+  Ste12(dna[1]),Gpa1_gene(promoter[1]) @ 2.145e-03
+'Ste12...Gpa1_gene'
+  Ste12(dna[1]),Gpa1_gene(promoter[1]) ->
+  Ste12(dna[.]),Gpa1_gene(promoter[.]) @ 0.03
+'+Gpa1'
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Gpa1_gene(promoter[1]),. ->
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Gpa1_gene(promoter[1]),Gpa1(ste2[.] ste4[.] nuc{GDP}[.]) @ 27
+'Ste12.Ste4_gene'
+  Ste12(dna[.]),Ste4_gene(promoter[.]) ->
+  Ste12(dna[1]),Ste4_gene(promoter[1]) @ 0.0002145
+'Ste12...Ste4_gene'
+  Ste12(dna[1]),Ste4_gene(promoter[1]) ->
+  Ste12(dna[.]),Ste4_gene(promoter[.]) @ 0.03
+'+heterotrimer' 
+., . -> Ste4(gpa1[1] ste5[.] ste20[.] state{reg}[.]),Gpa1(ste4[1] ste2[.] nuc{GDP}[.]) @ 0.495
+'+Ste4'
+  Ste12(dna[1] dig1[.] dig2[.] mapk[.]),Ste4_gene(promoter[1]), . ->
+  Ste12(dna[1] dig1[.] dig2[.] mapk[.]),Ste4_gene(promoter[1]),Ste4(gpa1[.] ste5[.] ste20[.] state{synth}[.]) @ 18
+'-Sst2 Ref1' Sst2(S539{u}[.]) -> . @ 0.00039
+'-Sst2 Ref2' Sst2(S539{p}[.]) -> . @ 0.000585
+'Ste12.Sst2_gene'
+  Ste12(dna[.]),Sst2_gene(promoter[.]) ->
+  Ste12(dna[1]),Sst2_gene(promoter[1]) @ 2.145e-05
+'Ste12...Sst2_gene'
+  Ste12(dna[1]),Sst2_gene(promoter[1]) ->
+  Ste12(dna[.]),Sst2_gene(promoter[.]) @ 0.03
+'+Sst2' . -> Sst2(ste2[.] mapk[.] S539{u}[.]) @ 0.78
+'+Sst2 Ref1'
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Sst2_gene(promoter[1]), . ->
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Sst2_gene(promoter[1]),Sst2(ste2[.] mapk[.] S539{u}[.]) @ 1.5
+
+// Chapter 'MAPK cascade activation'
+'Ste4.Ste20'
+  Ste20(ste4[.]),Ste4(gpa1[.] ste20[.]) ->
+  Ste20(ste4[1]),Ste4(gpa1[.] ste20[1]) @ 8.595e-05
+'Ste4...Ste20'
+  Ste20(ste4[1]),Ste4(gpa1[.] ste20[1]) ->
+  Ste20(ste4[.]),Ste4(gpa1[.],ste20[.]) @ 0.8
+'Ste4.Ste5 Ref1'
+  Ste5(ste4[.] ste5[1] loc{c}[.]),Ste4(ste5[2]),Ste4(ste5[.] gpa1[.]),Ste5(ste5[1] ste4[2] loc{c}[.]) ->
+  Ste5(ste4[3] ste5[1] loc{c}[.]),Ste4(ste5[2]),Ste4(ste5[3] gpa1[.]),Ste5(ste5[1] ste4[2] loc{c}[.]) @ 0.001725
+'Ste4.Ste5 Ref2'
+  Ste5(ste5[1] ste4[.] loc{c}[.]),Ste5(ste5[1] ste4[.] loc{c}[.]),Ste4(ste5[.] gpa1[.]) ->
+  Ste5(ste5[1] ste4[3] loc{c}[.]),Ste5(ste5[1] ste4[.] loc{c}[.]),Ste4(ste5[3] gpa1[.]) @ 8.595e-05
+'Ste4.Ste5 Ref3'
+  Ste5(ste5[.] ste4[.] loc{c}[.]),Ste4(gpa1[.] ste5[.]) ->
+  Ste5(ste5[.] ste4[3] loc{c}[.]),Ste4(gpa1[.] ste5[3]) @ 8.595e-05
+'Ste4...Ste5 Ref1'
+  Ste4(ste5[1]),Ste5(ste4[1] ste5[.]) ->
+  Ste4(ste5[.]),Ste5(ste4[.] ste5[.]) @ 0.2
+'Ste4...Ste5 Ref2'
+  Ste4(ste5[1]),Ste5(ste4[1] ste5[2]),Ste5(ste5[2]) ->
+  Ste4(ste5[.]),Ste5(ste4[.] ste5[2]),Ste5(ste5[2]) @ 0.02
+'Ste5.Ste5 Ref1'
+  Ste5(ste5[.] ste4[.] loc{c}[.]),Ste5(ste5[.] ste4[.] loc{c}[.]) ->
+  Ste5(ste5[3] ste4[.] loc{c}[.]),Ste5(ste5[3] ste4[.] loc{c}[.]) @ 8.595e-05
+'Ste5.Ste5 Ref2'
+  Ste5(ste5[.] ste4[1] loc{c}[.]),Ste5(ste5[.] ste4[.] loc{c}[.]),Ste4(ste5[1]) ->
+  Ste5(ste5[1] ste4[2] loc{c}[.]),Ste5(ste5[1] ste4[.] loc{c}[.]),Ste4(ste5[2]) @ 8.595e-05
+'Ste5.Ste5 Ref3'
+  Ste4(ste5[2]),Ste5(ste5[.] ste4[2] loc{c}[.]),Ste5(ste5[.] ste4[1] loc{c}[.]),Ste4(ste5[1]) ->
+  Ste4(ste5[3]),Ste5(ste5[1] ste4[3] loc{c}[.]),Ste5(ste5[1] ste4[2] loc{c}[.]),Ste4(ste5[2]) @ 0.001725
+'Ste5...Ste5 Ref1'
+  Ste5(ste5[1] ste4[.]),Ste5(ste5[1] ste4[.]) ->
+  Ste5(ste5[.] ste4[.]),Ste5(ste5[.] ste4[.]) @ 0.075
+'Ste5...Ste5 Ref2'
+  Ste5(ste4[2] ste5[1]),Ste5(ste5[1] ste4[.]),Ste4(ste5[2]) ->
+  Ste5(ste4[2] ste5[.]),Ste5(ste5[.] ste4[.]),Ste4(ste5[2]) @ 0.0075
+'Ste5...Ste5 Ref3'
+  Ste5(ste4[3] ste5[1]),Ste5(ste5[1] ste4[2]),Ste4(ste5[3]),Ste4(ste5[2]) ->
+  Ste5(ste4[3] ste5[.]),Ste5(ste5[.] ste4[2]),Ste4(ste5[3]),Ste4(ste5[2]) @ 0.0005 
+'Ste5.Ste11'
+  Ste5(ste11[.] loc{c}[.]),Ste11(ste5[.]) ->
+  Ste5(ste11[1] loc{c}[.]),Ste11(ste5[1]) @ 8.595e-05
+'Ste5...Ste11'
+  Ste5(ste11[1]),Ste11(ste5[1]) -> Ste5(ste11[.]),Ste11(ste5[.]) @ 0.1605
+'Ste11_p'
+  Ste4(ste20[1] ste5[2]),Ste20(ste4[1]),Ste11(ste5[3] S302_S306_S307{u}[.]),Ste5(ste4[2] ste11[3]) ->
+  Ste4(ste20[1] ste5[2]),Ste20(ste4[1]),Ste11(ste5[3] S302_S306_S307{p}[.]),Ste5(ste4[2] ste11[3]) @ 0.495
+'Ste11_pp'
+  Ste20(ste4[1]),Ste4(ste20[1] ste5[2]),Ste11(ste5[3] S302_S306_S307{p}[.]),Ste5(ste4[2] ste11[3]) ->
+  Ste20(ste4[1]),Ste4(ste20[1] ste5[2]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste5(ste4[2] ste11[3]) @ 0.495
+'Ste11_ppp'
+  Ste20(ste4[1]),Ste4(ste20[1] ste5[2]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste5(ste4[2] ste11[3]) ->
+    Ste20(ste4[1]),Ste4(ste20[1] ste5[2]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste5(ste4[2] ste11[3]) @ 0.495
+'Ste5.Ste7 Ref1'
+  Ste5(ste7[.] loc{c}[.] T287{u}[.]),Ste7(ste5[.]) ->
+  Ste5(ste7[1] loc{c}[.] T287{u}[.]),Ste7(ste5[1]) @ 8.595e-05
+'Ste5.Ste7 Ref2'
+  Ste5(ste7[.] loc{c}[.] T287{p}[.]),Ste7(ste5[.]) ->
+  Ste5(ste7[1] loc{c}[.],T287{p}[.]),Ste7(ste5[1]) @ 8.595e-07
+'Ste5...Ste7'
+  Ste5(ste7[1]),Ste7(ste5[1]) ->
+  Ste5(ste7[.]),Ste7(ste5[.]) @ 0.153
+'Ste7_p Ref1'
+  Ste7(S359_T363{u}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[4]),Ste5(ste5[2] ste7[1] ste4[.]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]) ->
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[4]),Ste5(ste5[2] ste7[1] ste4[.]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]) @ 0.495
+'Ste7_p Ref2'
+  Ste7(S359_T363{u}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[.]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]) ->
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[.]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]) @ 0.495
+'Ste7_p Ref3'
+  Ste7(S359_T363{u}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[5]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]),Ste4(ste5[5]) ->
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[5]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]),Ste4(ste5[5]) @ 0.495
+'Ste7_p Ref4'
+  Ste7(S359_T363{u}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[4]),Ste5(ste5[2] ste7[1] ste4[.]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]) ->
+    Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[4]),Ste5(ste5[2] ste7[1] ste4[.]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]) @ 0.495
+'Ste7_p Ref5'
+  Ste5(ste11[3] ste5[2] ste4[.]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]),Ste7(S359_T363{u}[.] ste5[1]) ->
+  Ste5(ste11[3] ste5[2] ste4[.]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]),Ste7(S359_T363{p}[.] ste5[1]) @ 0.495
+'Ste7_p Ref6'
+  Ste7(S359_T363{u}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[5]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]),Ste4(ste5[5]) ->
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[5]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]),Ste4(ste5[5]) @ 0.495
+'Ste7_pp Ref1'
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[4]),Ste5(ste5[2] ste7[1] ste4[.]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]) ->
+  Ste7(S359_T363{pp}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[4]),Ste5(ste5[2] ste7[1] ste4[.]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]) @ 0.495
+'Ste7_pp Ref2'
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[.]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]) ->
+  Ste7(S359_T363{pp}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[.]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]) @ 0.495
+'Ste7_pp Ref3'
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[5]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]),Ste4(ste5[5]) ->
+  Ste7(S359_T363{pp}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[5]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{pp}[.]),Ste4(ste5[4]),Ste4(ste5[5]) @ 0.495
+'Ste7_pp Ref4'
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[4]),Ste5(ste5[2] ste7[1] ste4[.]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]) ->
+  Ste7(S359_T363{pp}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[4]),Ste5(ste5[2] ste7[1] ste4[.]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]) @ 0.495
+'Ste7_pp Ref5'
+  Ste5(ste11[3] ste5[2] ste4[.]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]),Ste7(S359_T363{p}[.] ste5[1]) ->
+  Ste5(ste11[3] ste5[2] ste4[.]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]),Ste7(S359_T363{pp}[.],ste5[1]) @ 0.495
+'Ste7_pp Ref6'
+  Ste7(S359_T363{p}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[5]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]),Ste4(ste5[5]) ->
+  Ste7(S359_T363{pp}[.] ste5[1]),Ste5(ste11[3] ste5[2] ste4[5]),Ste5(ste5[2] ste7[1] ste4[4]),Ste11(ste5[3] S302_S306_S307{ppp}[.]),Ste4(ste5[4]),Ste4(ste5[5]) @ 0.495
+'Fus3.Ste7'
+  Ste7(mapk[.]),Fus3(dock[.]) -> Ste7(mapk[1]),Fus3(dock[1]) @ 4.35e-06
+'Fus3...Ste7'
+  Ste7(mapk[1]),Fus3(dock[1]) -> Ste7(mapk[.]),Fus3(dock[.]) @ 0.0075
+'Fus3@T180_p Ref1'
+  Ste5(ste7[1]),Ste7(mapk[2] ste5[1] S359_T363{pp}[.]),Fus3(dock[2] T180{u}[.] Y182{u}[.]) ->
+  Ste5(ste7[1]),Ste7(mapk[2] ste5[1] S359_T363{pp}[.]),Fus3(dock[2] T180{p}[.] Y182{u}[.]) @ 7.5
+'Fus3@T180_p Ref2'
+  Ste5(ste7[1]),Ste7(mapk[2] ste5[1] S359_T363{pp}[.]),Fus3(dock[2] T180{u}[.] Y182{p}[.]) ->
+  Ste5(ste7[1]),Ste7(mapk[2] ste5[1] S359_T363{pp}[.]),Fus3(dock[2] T180{p}[.] Y182{p}[.]) @ 7.5
+'Fus3@Y182_p Ref1'
+  Ste5(ste7[1]),Ste7(mapk[2] ste5[1] S359_T363{pp}[.]),Fus3(dock[2] T180{u}[.] Y182{u}[.]) ->
+  Ste5(ste7[1]),Ste7(mapk[2] ste5[1] S359_T363{pp}[.]),Fus3(dock[2] T180{u}[.] Y182{p}[.]) @ 7.5
+'Fus3@Y182_p Ref2'
+  Ste5(ste7[1]),Ste7(mapk[2] ste5[1] S359_T363{pp}[.]),Fus3(dock[2] T180{p}[.] Y182{u}[.]) ->
+  Ste5(ste7[1]),Ste7(mapk[2] ste5[1] S359_T363{pp}[.]),Fus3(dock[2] T180{p}[.] Y182{p}[.]) @ 7.5
+'Ste5.Fus3'
+  Fus3(dock[.]),Ste5(mapk[.] loc{c}[.]) ->
+  Fus3(dock[1]),Ste5(mapk[1] loc{c}[.]) @ 8.595e-05
+'Ste5...Fus3' 
+  Fus3(dock[1]),Ste5(mapk[1]) -> Fus3(dock[.]),Ste5(mapk[.]) @ 1.425
+'Fus3@Y182_p (autophosph)'
+  Ste5(mapk[1]),Fus3(dock[1] Y182{u}[.]) ->
+  Ste5(mapk[1]),Fus3(dock[1],Y182{p}[.]) @ 0.000435
+'Kss1.Ste7'
+  Ste7(mapk[.]),Kss1(dock[.]) -> Ste7(mapk[1]),Kss1(dock[1]) @ 4.35e-06
+'Kss1...Ste7'
+  Ste7(mapk[1]),Kss1(dock[1]) -> Ste7(mapk[.]),Kss1(dock[.]) @ 0.0075
+'Kss1@T183_p Ref1'
+  Ste7(mapk[2] S359_T363{pp}[.]),Kss1(dock[2] Y185{u}[.] T183{u}[.]) -> 
+  Ste7(mapk[2] S359_T363{pp}[.]),Kss1(dock[2] Y185{u}[.] T183{p}[.]) @ 1.5
+'Kss1@T183_p Ref2'
+  Ste7(mapk[2] S359_T363{pp}[.]),Kss1(dock[2] Y185{p}[.] T183{u}[.]) ->
+  Ste7(mapk[2] S359_T363{pp}[.]),Kss1(dock[2] Y185{p}[.] T183{p}[.]) @ 1.5
+'Kss1@Y185_p Ref1'
+  Ste7(mapk[2] S359_T363{pp}[.]),Kss1(dock[2] Y185{u}[.] T183{u}[.]) ->
+  Ste7(mapk[2] S359_T363{pp}[.]),Kss1(dock[2] Y185{p}[.] T183{u}[.]) @ 1.5
+'Kss1@Y185_p Ref2'
+  Ste7(mapk[2] S359_T363{pp}[.]),Kss1(dock[2] Y185{u}[.] T183{p}[.]) ->
+  Ste7(mapk[2] S359_T363{pp}[.]),Kss1(dock[2] Y185{p}[.] T183{p}[.]) @ 1.5
+'Ste5.Kss1'
+  Kss1(dock[.]),Ste5(mapk[.] loc{c}[.]) ->
+  Kss1(dock[1]),Ste5(mapk[1],loc{c}[.]) @ 8.595e-05
+'Ste5...Kss1'
+  Kss1(dock[1]),Ste5(mapk[1]) -> Kss1(dock[.]),Ste5(mapk[.]) @ 1.425
+'Kss1@Y185_p (autophosph)'
+  Ste5(mapk[1]),Kss1(dock[1] Y185{u}[.]) ->
+  Ste5(mapk[1]),Kss1(dock[1] Y185{p}[.]) @ 0.000435
+
+// Chapter 'MAPKKK and MAPKK regulation
+'deph Ste11_pp'
+  Ste11(S302_S306_S307{ppp}[.]) -> Ste11(S302_S306_S307{pp}[.]) @ 0.00087
+'deph Ste11_p'
+  Ste11(S302_S306_S307{pp}[.]) -> Ste11(S302_S306_S307{p}[.]) @ 0.00087
+'deph Ste11_u'
+  Ste11(S302_S306_S307{p}[.]) -> Ste11(S302_S306_S307{u}[.]) @ 0.00087
+'Ste11@degradation_u'
+  Ste11(degradation{p}[.]) -> Ste11(degradation{u}[.]) @ 0.00087
+'Ste11.Fus3'
+  Fus3(dock[.]),Ste11(mapk[.] degradation{u}[.]) ->
+  Fus3(dock[1]),Ste11(mapk[1] degradation{u}[.]) @ 8.595e-05
+'Ste11...Fus3 Ref1'
+  Fus3(dock[1] T180{u}[.] Y182{u}[.]),Ste11(mapk[1]) ->
+  Fus3(dock[.] T180{u}[.] Y182{u}[.]),Ste11(mapk[.]) @ 1.5
+'Ste11...Fus3 Ref2'
+  Fus3(dock[1] T180{p}[.] Y182{u}[.]),Ste11(mapk[1]) ->
+  Fus3(dock[.] T180{p}[.] Y182{u}[.]),Ste11(mapk[.]) @ 0.75
+'Ste11...Fus3 Ref3'
+  Fus3(dock[1] T180{u}[.] Y182{p}[.]),Ste11(mapk[1]) ->
+  Fus3(dock[.] T180{u}[.] Y182{p}[.]),Ste11(mapk[.]) @ 0.75
+'Ste11...Fus3 Ref4'
+  Fus3(dock[1] T180{p}[.] Y182{p}[.]),Ste11(mapk[1]) ->
+  Fus3(dock[.] T180{p}[.] Y182{p}[.]),Ste11(mapk[.]) @ 0.375
+'Ste11@degradation_p...Kss1'
+  Ste11(mapk[1] degradation{u}[.]),Kss1(dock[1] Y185{p}[.] T183{p}[.]) ->
+  Ste11(mapk[.] degradation{p}[.]),Kss1(dock[.] Y185{p}[.] T183{p}[.]) @ 1.5
+'Ste11.Kss1'
+  Kss1(dock[.]),Ste11(mapk[.] degradation{u}) ->
+  Kss1(dock[1]),Ste11(mapk[1] degradation{u}) @ 8.595e-05
+'Ste11...Kss1 Ref1'
+  Kss1(dock[1] T183{u}[.] Y185{u}[.]),Ste11(mapk[1]) ->
+  Kss1(dock[.] T183{u}[.] Y185{u}[.]),Ste11(mapk[.]) @ 1.5
+'Ste11...Kss1 Ref2'
+  Kss1(dock[1] T183{p}[.] Y185{u}[.]),Ste11(mapk[1]) ->
+  Kss1(dock[.] T183{p}[.] Y185{u}[.]),Ste11(mapk[.]) @ 0.75
+'Ste11...Kss1 Ref3'
+  Kss1(dock[1] T183{u}[.] Y185{p}[.]),Ste11(mapk[1]) ->
+  Kss1(dock[.] T183{u}[.] Y185{p}[.]),Ste11(mapk[.]) @ 0.75
+'Ste11...Kss1 Ref4'
+  Kss1(dock[1] T183{p}[.] Y185{p}[.]),Ste11(mapk[1]) ->
+  Kss1(dock[.] T183{p}[.] Y185{p}[.]),Ste11(mapk[.]) @ 0.375
+'Ste11@degradation_p...Fus3'
+  Ste11(mapk[1] degradation{u}[.]),Fus3(dock[1] Y182{p}[.] T180{p}[.]) ->
+  Ste11(mapk[.] degradation{p}[.]),Fus3(dock[.] Y182{p}[.] T180{p}[.]) @ 1.5
+'-Ste11' Ste11(degradation{p}[.]) -> . @ 0.00075
+'deph Ste7_p' Ste7(S359_T363{pp}[.]) -> Ste7(S359_T363{p}[.]) @ 0.00087
+'deph Ste7_u' Ste7(S359_T363{p}[.]) -> Ste7(S359_T363{u}[.]) @ 0.00087
+
+// Chapter 'MAPK regulation
+'Fus3@T180_u' Fus3(T180{p}[.]) -> Fus3(T180{u}[.]) @ 0.00087
+'Fus3@Y182_u' Fus3(Y182{p}[.]) -> Fus3(Y182{u}[.]) @ 0.00087
+'Kss1@T183_u' Kss1(T183{p}[.]) -> Kss1(T183{u}[.]) @ 0.00087
+'Kss1@Y185_u' Kss1(Y185{p}[.]) -> Kss1(Y185{u}[.]) @ 0.00087
+'Msg5.Fus3' 
+  Fus3(dock[.]),Msg5(mapk[.]) -> Fus3(dock[1]),Msg5(mapk[1]) @ 8.595e-05
+'Msg5...Fus3 Ref1'
+  Fus3(dock[1] Y182{u}[.] T180{u}[.]),Msg5(mapk[1]) ->
+  Fus3(dock[.] Y182{u}[.] T180{u}[.]),Msg5(mapk[.]) @ 7.5
+'Msg5...Fus3 Ref2'
+  Fus3(dock[1] Y182{p}[.] T180{u}[.]),Msg5(mapk[1]) ->
+  Fus3(dock[.] Y182{p}[.] T180{u}[.]),Msg5(mapk[.]) @ 3
+'Msg5...Fus3 Ref3'
+  Msg5(mapk[1]),Fus3(dock[1] T180{p}[.] Y182{u}[.]) ->
+  Msg5(mapk[.]),Fus3(dock[.] T180{p}[.] Y182{u}[.]) @ 3
+'Msg5...Fus3 Ref4'
+  Msg5(mapk[1]),Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Msg5(mapk[.]),Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 3
+'Msg5...Fus3@T180_u'
+  Msg5(mapk[1]),Fus3(dock[1] T180{p}[.]) ->
+  Msg5(mapk[.]),Fus3(dock[.] T180{u}[.]) @ 0.12
+'Msg5...Fus3@Y182_u'
+  Fus3(dock[1] Y182{p}[.]),Msg5(mapk[1]) ->
+  Fus3(dock[.] Y182{u}[.]),Msg5(mapk[.]) @ 0.12
+'Msg5.Kss1'
+  Kss1(dock[.]),Msg5(mapk[.]) ->
+  Kss1(dock[1]),Msg5(mapk[1]) @ 8.595e-05
+'Msg5...Kss1 Ref1'
+  Msg5(mapk[1]),Kss1(dock[1] T183{u}[.] Y185{u}[.]) ->
+  Msg5(mapk[.]),Kss1(dock[.] T183{u}[.] Y185{u}[.]) @ 1.2
+'Msg5...Kss1 Ref2'
+  Msg5(mapk[1]),Kss1(dock[1] T183{u}[.] Y185{p}[.]) ->
+  Msg5(mapk[.]),Kss1(dock[.] T183{u}[.] Y185{p}[.]) @ 0.12
+'Msg5...Kss1 Ref3'
+  Msg5(mapk[1]),Kss1(dock[1] T183{p}[.] Y185{u}[.]) ->
+  Msg5(mapk[.]),Kss1(dock[.] T183{p}[.] Y185{u}[.]) @ 0.12
+'Msg5...Kss1 Ref4'
+  Msg5(mapk[1]),Kss1(dock[1] T183{p}[.] Y185{p}[.]) ->
+  Msg5(mapk[.]),Kss1(dock[.] T183{p}[.] Y185{p}[.]) @ 0.12
+'Msg5...Kss1@T183_u'
+  Msg5(mapk[1]),Kss1(dock[1] T183{p}[.]) ->
+  Msg5(mapk[.]),Kss1(dock[.] T183{u}[.]) @ 0.12
+'Msg5...Kss1@Y185_u'
+  Msg5(mapk[1]),Kss1(dock[1] Y185{p}[.]) ->
+  Msg5(mapk[.]),Kss1(dock[.] Y185{u}[.]) @ 0.12
+'Ptp.Fus3'
+  Fus3(dock[.]),Ptp(mapk[.]) -> Fus3(dock[1]),Ptp(mapk[1]) @ 8.595e-05
+'Ptp...Fus3 Ref1'
+  Ptp(mapk[1]),Fus3(dock[1] Y182{u}[.]) ->
+  Ptp(mapk[.]),Fus3(dock[.] Y182{u}[.]) @ 1.5
+'Ptp...Fus3 Ref2'
+  Ptp(mapk[1]),Fus3(dock[1] Y182{p}[.]) ->
+  Ptp(mapk[.]),Fus3(dock[.] Y182{p}[.]) @ 0.3
+'Ptp...Fus3@Y182_u'
+  Ptp(mapk[1]),Fus3(dock[1] Y182{p}[.]) ->
+  Ptp(mapk[.]),Fus3(dock[.] Y182{u}[.]) @ 1.2
+'Ptp.Kss1'
+  Kss1(dock[.]),Ptp(mapk[.]) -> Kss1(dock[1]),Ptp(mapk[1]) @ 8.595e-05
+'Ptp...Kss1 Ref1'
+  Ptp(mapk[1]),Kss1(dock[1] Y185{u}[.]) ->
+  Ptp(mapk[.]),Kss1(dock[.] Y185{u}[.]) @ 0.15
+'Ptp...Kss1 Ref2'
+  Ptp(mapk[1]),Kss1(dock[1] Y185{p}[.]) ->
+  Ptp(mapk[.]),Kss1(dock[.] Y185{p}[.]) @ 0.03
+'Ptp...Kss1@Y185_u'
+  Ptp(mapk[1]),Kss1(dock[1] Y185{p}[.]) ->
+  Ptp(mapk[.]),Kss1(dock[.] Y185{u}[.]) @ 0.12
+'-Fus3' Fus3() -> . @ 0.000192
+'Ste12.Fus3_gene'
+  Ste12(dna[.]),Fus3_gene(promoter[.]) ->
+  Ste12(dna[1]),Fus3_gene(promoter[1]) @ 2.145e-05
+'Ste12...Fus3_gene'
+  Ste12(dna[1]),Fus3_gene(promoter[1]) ->
+  Ste12(dna[.]),Fus3_gene(promoter[.]) @ 0.03
+'+Fus3' . -> Fus3(dock[.] T180{u}[.] Y182{u}[.]) @ 3.9
+'+Fus3 Ref1'
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Fus3_gene(promoter[1]), . ->
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Fus3_gene(promoter[1]),Fus3(dock[.] T180{u}[.] Y182{u}[.]) @ 15
+'-Msg5' Msg5() -> . @ 0.000795
+'Ste12.Msg5_gene'
+  Ste12(dna[.]),Msg5_gene(promoter[.]) ->
+  Ste12(dna[1]),Msg5_gene(promoter[1]) @ 2.145e-05
+'Ste12...Msg5_gene'
+  Ste12(dna[1]),Msg5_gene(promoter[1]) ->
+  Ste12(dna[.]),Msg5_gene(promoter[.]) @ 0.03
+'+Msg5' . -> Msg5(mapk[.]) @ 0.0795
+'+Msg5 Ref1'
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Msg5_gene(promoter[1]), . ->
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Msg5_gene(promoter[1]),Msg5(mapk[.]) @ 0.63
+
+//Gene expression repression
+'Dig1.Ste12'
+  Dig1(ste12[.]),Ste12(dig1[.]) -> Dig1(ste12[1]),Ste12(dig1[1]) @ 0.000855
+'Dig1...Ste12 Ref1'
+  Dig1(ste12[1] activation{p}[.]),Ste12(dig1[1] dig2[.] mapk[.]) ->
+  Dig1(ste12[.] activation{p}[.]),Ste12(dig1[.] dig2[.] mapk[.]) @ 30
+'Dig1...Ste12 Ref2'
+  Dig1(ste12[1] activation{p}[.]),Ste12(dig1[1] dig2[2] mapk[.]),Dig2(ste12[2]) ->
+  Dig1(ste12[.] activation{p}[.]),Ste12(dig1[.] dig2[2],mapk[.]),Dig2(ste12[2]) @ 3
+'Dig1...Ste12 Ref3'
+  Dig1(ste12[1] activation{p}[.]),Ste12(dig1[1] dig2[.] mapk[_]) ->
+  Dig1(ste12[.] activation{p}[.]),Ste12(dig1[.] dig2[.] mapk[_]) @ 3
+'Dig1...Ste12 Ref4'
+  Dig1(ste12[1] activation{p}[.]),Ste12(dig1[1] dig2[2] mapk[_]),Dig2(ste12[2]) ->
+  Dig1(ste12[.] activation{p}[.]),Ste12(dig1[.] dig2[2] mapk[_]),Dig2(ste12[2]) @ 0.03
+'Dig2.Ste12'
+  Ste12(dig2[.]),Dig2(ste12[.]) -> Ste12(dig2[1]),Dig2(ste12[1]) @ 0.000855
+'Dig2...Ste12 Ref1'
+  Dig2(ste12[1] activation{p}[.]),Ste12(dig1[.] dig2[1]) ->
+  Dig2(ste12[.] activation{p}[.]),Ste12(dig1[.] dig2[.]) @ 30
+'Dig2...Ste12 Ref2'
+  Ste12(dig1[1] dig2[2]),Dig1(ste12[1]),Dig2(ste12[2] activation{p}[.]) ->
+  Ste12(dig1[1] dig2[.]),Dig1(ste12[1]),Dig2(ste12[.] activation{p}[.]) @ 3
+'Fus3.Ste12'
+  Fus3(dock[.]),Ste12(mapk[.]) -> Fus3(dock[1]),Ste12(mapk[1]) @ 8.595e-05
+'Fus3...Ste12 Ref1'
+  Ste12(mapk[1] dig1[.]),Fus3(dock[1] T180{u}[.] Y182{u}[.]) ->
+  Ste12(mapk[.] dig1[.]),Fus3(dock[.] T180{u}[.] Y182{u}[.]) @ 3
+'Fus3...Ste12 Ref2'
+  Ste12(mapk[1] dig1[.]),Fus3(dock[1] T180{u}[.] Y182{p}[.]) ->
+  Ste12(mapk[.] dig1[.]),Fus3(dock[.] T180{u}[.] Y182{p}[.]) @ 15
+'Fus3...Ste12 Ref3'
+  Ste12(mapk[1] dig1[.]),Fus3(dock[1] T180{p}[.] Y182{u}[.]) ->
+  Ste12(mapk[.] dig1[.]),Fus3(dock[.] T180{p}[.] Y182{u}[.]) @ 15
+'Fus3...Ste12 Ref4'
+  Ste12(mapk[1] dig1[.]),Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Ste12(mapk[.] dig1[.]),Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 75
+'Fus3...Ste12 Ref5'
+  Ste12(mapk[1] dig1[2]),Dig1(ste12[2]),Fus3(dock[1] T180{u}[.] Y182{u}[.]) ->
+  Ste12(mapk[.] dig1[1]),Dig1(ste12[1]),Fus3(dock[.] T180{u}[.] Y182{u}[.]) @ 0.3
+'Fus3...Ste12 Ref6'
+  Ste12(mapk[1] dig1[2]),Dig1(ste12[2]),Fus3(dock[1] T180{u}[.] Y182{p}[.]) ->
+  Ste12(mapk[.] dig1[1]),Dig1(ste12[1]),Fus3(dock[.] T180{u}[.] Y182{p}[.]) @ 1.5
+'Fus3...Ste12 Ref7'
+  Ste12(mapk[1] dig1[2]),Dig1(ste12[2]),Fus3(dock[1] T180{p}[.] Y182{u}[.]) ->
+  Ste12(mapk[.] dig1[1]),Dig1(ste12[1]),Fus3(dock[.] T180{p}[.] Y182{u}[.]) @ 1.5
+'Fus3...Ste12 Ref8'
+  Ste12(mapk[1] dig1[2]),Dig1(ste12[2]),Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Ste12(mapk[.] dig1[1]),Dig1(ste12[1]),Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 7.5
+'Kss1.Ste12'
+  Kss1(dock[.]),Ste12(mapk[.]) -> Kss1(dock[1]),Ste12(mapk[1]) @ 8.595e-05
+'Kss1...Ste12 Ref1'
+  Ste12(mapk[1] dig1[.]),Kss1(dock[1] T183{u}[.] Y185{u}[.]) ->
+  Ste12(mapk[.] dig1[.]),Kss1(dock[.] T183{u}[.] Y185{u}[.]) @ 0.75
+'Kss1...Ste12 Ref2'
+  Ste12(mapk[1] dig1[.]),Kss1(dock[1] T183{u}[.] Y185{p}[.]) ->
+  Ste12(mapk[.] dig1[.]),Kss1(dock[.] T183{u}[.] Y185{p}[.]) @ 3.75
+'Kss1...Ste12 Ref3'
+  Ste12(mapk[1] dig1[.]),Kss1(dock[1] T183{p}[.] Y185{u}[.]) ->
+  Ste12(mapk[.] dig1[.]),Kss1(dock[.] T183{p}[.] Y185{u}[.]) @ 3.75
+'Kss1...Ste12 Ref4'
+  Ste12(mapk[1] dig1[.]),Kss1(dock[1] T183{p}[.] Y185{p}[.]) ->
+  Ste12(mapk[.] dig1[.]),Kss1(dock[.] T183{p}[.] Y185{p}[.]) @ 18.75
+'Kss1...Ste12 Ref5'
+  Ste12(mapk[1] dig1[2]),Dig1(ste12[2]),Kss1(dock[1] T183{u}[.] Y185{u}[.]) ->
+  Ste12(mapk[.]dig1[1]),Dig1(ste12[1]),Kss1(dock[.] T183{u}[.] Y185{u}[.]) @ 0.075
+'Kss1...Ste12 Ref6'
+  Ste12(mapk[1] dig1[2]),Dig1(ste12[2]),Kss1(dock[1] T183{u}[.] Y185{p}[.]) ->
+  Ste12(mapk[.] dig1[1]),Dig1(ste12[1]),Kss1(dock[.] T183{u}[.] Y185{p}[.]) @ 0.375
+'Kss1...Ste12 Ref7'
+  Ste12(mapk[1] dig1[2]),Dig1(ste12[2]),Kss1(dock[1] T183{p}[.] Y185{u}[.]) ->
+  Ste12(mapk[.] dig1[1]),Dig1(ste12[1]),Kss1(dock[.] T183{p}[.] Y185{u}[.]) @ 0.375
+'Kss1...Ste12 Ref8'
+  Ste12(mapk[1] dig1[2]),Dig1(ste12[2]),Kss1(dock[1] T183{p}[.] Y185{p}[.]) ->
+  Ste12(mapk[.] dig1[1]),Dig1(ste12[1]),Kss1(dock[.] T183{p}[.] Y185{p}[.]) @ 1.5
+
+//Gene expression activation
+'Fus3.Dig1'
+  Dig1(mapk[.] activation{u}[.]), Fus3(dock[.]) ->
+  Dig1(mapk[1] activation{u}[.]), Fus3(dock[1]) @ 8.595e-05
+'Fus3...Dig1-Refinement (1)'
+  Dig1(mapk[1]), Fus3(dock[1] T180{u}[.] Y182{u}[.]) ->
+  Dig1(mapk[.]), Fus3(dock[.] T180{u}[.] Y182{u}[.]) @ 4.5
+'Fus3...Dig1-Refinement (2)'
+  Dig1(mapk[1]), Fus3(dock[1] T180{u}[.] Y182{p}[.]) ->
+  Dig1(mapk[.]), Fus3(dock[.] T180{u}[.] Y182{p}[.]) @ 2.25
+'Fus3...Dig1-Refinement (3)'
+  Dig1(mapk[1]), Fus3(dock[1] T180{p}[.] Y182{u}[.]) ->
+  Dig1(mapk[.]), Fus3(dock[.] T180{p}[.] Y182{u}[.]) @ 2.25
+'Fus3...Dig1-Refinement (4)'
+  Dig1(mapk[1]), Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Dig1(mapk[.]), Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 1.125
+'Fus3...Dig1@activation_p'
+  Dig1(mapk[1] activation{u}[.]), Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Dig1(mapk[.] activation{p}[.]), Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 1.5
+'Kss1.Dig1'
+  Kss1(dock[.]), Dig1(mapk[.] activation{u}[.]) ->
+  Kss1(dock[1]), Dig1(mapk[1] activation{u}[.]) @ 8.595e-06
+'Kss1...Dig1-Refinement (1)'
+  Dig1(mapk[1]), Kss1(dock[1] Y185{u}[.] T183{u}[.]) ->
+  Dig1(mapk[.]), Kss1(dock[.] Y185{u}[.] T183{u}[.]) @ 7.5
+'Kss1...Dig1-Refinement (2)'
+  Dig1(mapk[1]), Kss1(dock[1] Y185{u}[.] T183{p}[.]) ->
+  Dig1(mapk[.]), Kss1(dock[.] Y185{u}[.] T183{p}[.]) @ 3.75
+'Kss1...Dig1-Refinement (3)'
+  Dig1(mapk[1]), Kss1(dock[1] Y185{p}[.] T183{u}[.]) ->
+  Dig1(mapk[.]), Kss1(dock[.] Y185{p}[.] T183{u}[.]) @ 3.75
+'Kss1...Dig1-Refinement (4)'
+  Dig1(mapk[1]), Kss1(dock[1] Y185{p}[.] T183{p}[.]) ->
+  Dig1(mapk[.]), Kss1(dock[.] Y185{p}[.] T183{p}[.]) @ 1.875
+'Kss1...Dig1@activation_p'
+  Kss1(dock[1] Y185{p}[.] T183{p}[.]), Dig1(mapk[1] activation{u}[.]) ->
+  Kss1(dock[.] Y185{p}[.] T183{p}[.]), Dig1(mapk[.] activation{p}[.]) @ 1.5
+'Fus3.Dig2'
+  Fus3(dock[.]), Dig2(mapk[.] activation{u}[.]) ->
+  Fus3(dock[1]), Dig2(mapk[1] activation{u}[.]) @ 8.595e-05
+'Fus3...Dig2-Refinement (1)'
+  Dig2(mapk[1]), Fus3(dock[1] T180{u}[.] Y182{u}[.]) ->
+  Dig2(mapk[.]), Fus3(dock[.] T180{u}[.] Y182{u}[.]) @ 1.5
+'Fus3...Dig2-Refinement (2)'
+  Dig2(mapk[1]), Fus3(dock[1] T180{u}[.] Y182{p}[.]) ->
+  Dig2(mapk[.]), Fus3(dock[.] T180{u}[.] Y182{p}[.]) @ 0.75
+'Fus3...Dig2-Refinement (3)'
+  Dig2(mapk[1]), Fus3(dock[1] T180{p}[.] Y182{u}[.]) ->
+  Dig2(mapk[.]), Fus3(dock[.] T180{p}[.] Y182{u}[.]) @ 0.75
+'Fus3...Dig2-Refinement (4)'
+  Dig2(mapk[1]), Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Dig2(mapk[.]), Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 0.375
+'Fus3...Dig2@activation_p'
+  Dig2(mapk[1] activation{u}[.]), Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Dig2(mapk[.] activation{p}[.]), Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 1.5
+'Kss1.Dig2'
+  Dig2(mapk[.] activation{u}[.]), Kss1(dock[.]) ->
+  Dig2(mapk[1] activation{u}[.]), Kss1(dock[1]) @ 8.595e-06
+'Kss1...Dig2-Refinement (1)'
+  Dig2(mapk[1]), Kss1(dock[1] Y185{u}[.] T183{u}[.]) ->
+  Dig2(mapk[.]), Kss1(dock[.] Y185{u}[.] T183{u}[.]) @ 2.55
+'Kss1...Dig2-Refinement (2)'
+  Dig2(mapk[1]), Kss1(dock[1] Y185{u}[.] T183{p}[.]) ->
+  Dig2(mapk[.]), Kss1(dock[.] Y185{u}[.] T183{p}[.]) @ 1.275
+'Kss1...Dig2-Refinement (3)'
+  Dig2(mapk[1]), Kss1(dock[1] Y185{p}[.] T183{u}[.]) ->
+  Dig2(mapk[.]), Kss1(dock[.] Y185{p}[.] T183{u}[.]) @ 1.275
+'Kss1...Dig2-Refinement (4)'
+  Dig2(mapk[1]), Kss1(dock[1] Y185{p}[.] T183{p}[.]) ->
+  Dig2(mapk[.]), Kss1(dock[.] Y185{p}[.] T183{p}[.]) @ 0.645
+'Kss1...Dig2@activation_p'
+  Kss1(dock[1] Y185{p}[.] T183{p}[.]), Dig2(mapk[1] activation{u}[.]) ->
+  Kss1(dock[.] Y185{p}[.] T183{p}[.]), Dig2(mapk[.] activation{p}[.]) @ 1.5
+
+//Gene expression regulation
+'Dig1@activation_u'
+  Dig1(activation{p}[.]) -> Dig1(activation{u}[.]) @ 0.00087
+'Dig2@activation_u'
+  Dig2(activation{p}[.]) -> Dig2(activation{u}[.]) @ 0.00087
+'-Dig2' Dig2() -> . @ 0.000192
+'Ste12.Dig2_gene'
+  Ste12(dna[.]), Dig2_gene(promoter[.]) ->
+  Ste12(dna[1]), Dig2_gene(promoter[1]) @ 2.145e-05
+'Ste12...Dig2_gene'
+  Ste12(dna[1]), Dig2_gene(promoter[1]) ->
+  Ste12(dna[.]), Dig2_gene(promoter[.]) @ 0.03
+'+Dig2' . -> Dig2(mapk[.] ste12[.] activation{u}[.]) @ 0.24
+'+Dig2 Ref1'
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Dig2_gene(promoter[1]), . ->
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Dig2_gene(promoter[1]),Dig2(mapk[.] ste12[.] activation{u}[.]) @ 0.45
+'Ste12.Ste12_gene'
+  Ste12(dna[.]), Ste12_gene(promoter[.]) ->
+  Ste12(dna[1]), Ste12_gene(promoter[1]) @ 2.145e-05
+'Ste12...Ste12_gene'
+  Ste12(dna[1]), Ste12_gene(promoter[1]) ->
+  Ste12(dna[.]), Ste12_gene(promoter[.]) @ 0.03
+'+Ste12'
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Ste12_gene(promoter[1]), . ->
+  Ste12(dig1[.] dig2[.] mapk[.] dna[1]),Ste12_gene(promoter[1]),Ste12(dig1[.] dig2[.] mapk[.] dna[.]) @ 0.45
+
+//hyperphosphorylation rules
+'Ste7pp...Ste5'
+  Ste7(ste5[2] S359_T363{pp}[.] mapk[1]),Ste5(ste7[2]),Fus3(dock[1] T180{p}[.] Y182{p}[.]) ->
+  Ste7(ste5[.] S359_T363{pp}[.] mapk[.]),Ste5(ste7[.]),Fus3(dock[.] T180{p}[.] Y182{p}[.]) @ 0.495
+'-Ste7' Ste7(ste5[.] S359_T363{pp}[.] mapk[.]) -> . @ 0.00255
+
+//mapk cascade phosphatases
+'Ste11.Mekkp'
+  Ste11(ste5[.]),Mekkp(ste11[.]) ->
+  Ste11(ste5[1]),Mekkp(ste11[1]) @ 7.155e-05
+'Ste11...Mekkp'
+  Ste11(ste5[1]),Mekkp(ste11[1]) ->
+  Ste11(ste5[.]),Mekkp(ste11[.]) @ 0.6
+'Ste11ppp -> pp'
+  Ste11(S302_S306_S307{ppp}[.] ste5[1]),Mekkp(ste11[1]) ->
+  Ste11(S302_S306_S307{pp}[.] ste5[1]),Mekkp(ste11[1]) @ 0.2505
+'Ste11pp -> p'
+  Ste11(S302_S306_S307{pp}[.] ste5[1]),Mekkp(ste11[1]) ->
+  Ste11(S302_S306_S307{p}[.] ste5[1]),Mekkp(ste11[1]) @ 0.2505
+'Ste11p -> u'
+  Ste11(S302_S306_S307{p}[.] ste5[1]),Mekkp(ste11[1]) ->
+  Ste11(S302_S306_S307{u}[.] ste5[1]),Mekkp(ste11[1]) @ 0.2505
+'Ste7.Mekp'
+  Ste7(ste5[.]),Mekp(ste7[.]) -> Ste7(ste5[1]),Mekp(ste7[1]) @ 7.155e-05
+'Ste7...Mekp'
+  Ste7(ste5[1]),Mekp(ste7[1]) -> Ste7(ste5[.]),Mekp(ste7[.]) @ 0.6
+'Ste7pp -> p'
+  Ste7(S359_T363{pp}[.] ste5[1]),Mekp(ste7[1]) ->
+  Ste7(S359_T363{p}[.] ste5[1]),Mekp(ste7[1]) @ 0.2505
+'Ste7p -> u'
+ Ste7(S359_T363{p}[.] ste5[1]),Mekp(ste7[1]) ->
+ Ste7(S359_T363{u}[.] ste5[1]),Mekp(ste7[1]) @ 0.2505
+
+//Ste5 nuclear shuttling
+'Ste5 import'
+  Ste5(ste11[.] ste7[.] ste4[.] mapk[.] ste5[.] loc{c}[.]) ->
+  Ste5(ste11[.] ste7[.] ste4[.] mapk[.] ste5[.] loc{n}[.]) @ 0.5
+//rate based on Shao model
+'Ste5 export'
+  Ste5(loc{n}[.]) -> Ste5(loc{c}[.]) @ 0.3 * ('Gpa1_free' / ('Gpa1_free' + 2500))
+
+//Fus3 negative feedback via Ste5
+'Fus3...Ste5@activation_p Ref1'
+  Fus3(dock[1] Y182{p}[.]),Ste5(mapk[1] T287{u}[.]) ->
+  Fus3(dock[1] Y182{p}[.]),Ste5(mapk[1] T287{p}[.]) @ 1.5
+'Ste5 autodephosph'
+  Ste5(T287{p}[.]) -> Ste5(T287{u}[.]) @ 0.0087
+
+%var: 'G_act' |Ste4(gpa1[.])|
+%var: 'Gpa1_free' |Gpa1(ste4[.])|
+%var: 'dodec'
+  |Ste5(ste5[1] ste7[2] mapk[.]),Ste5(ste5[1] ste7[3] mapk[.]),Ste7(mapk[_] ste5[2]),Ste7(mapk[_] ste5[3])|
+%var: 'decamer'
+  |Ste5(ste5[1] ste7[2] mapk[.]),Ste5(ste5[1] ste7[3] mapk[.]),Ste7(ste5[2] mapk[.]),Ste7(ste5[3] mapk[.])|
+%var: 'active decamer'
+  |Ste5(ste5[1] ste7[2] mapk[.]),Ste5(ste5[1] ste7[3] mapk[.]),Ste7(ste5[2] S359_T363{pp}[.],mapk[.]),Ste7(ste5[3] S359_T363{pp}[.],mapk[.])|
+%var: 'octomer'
+  |Ste5(ste5[1] ste11[_] ste7[.] mapk[.]),Ste5(ste5[1] ste11[_] ste7[.] mapk[.])|
+%var: 'hexamer'
+  |Ste5(ste5[1] ste4[2] ste11[.] mapk[.]),Ste5(ste5[1] ste4[3] ste11[.] mapk[.]),Ste4(ste5[2] ste20[4]),Ste20(ste4[4]),Ste4(ste5[3] ste20[5]),Ste20(ste4[5])|
+
+/*//observables
+%obs: 'Fus3tot' Fus3()
+%obs: 'Fus3PP' Fus3(T180{p},Y182{p})
+%obs: 'membrane Ste5' Ste5(ste4[1]),Ste4(ste5[1])
+%obs: 'bound G protein' Gpa1(ste4[1]),Ste4(gpa1[1])
+%obs: 'total Gpa1' Gpa1()
+%obs: 'total Ste4' Ste4()
+%obs: 'unbound Ste4' Ste4(gpa1)
+%obs: 'ste20 bound ste4' Ste4(ste20[1]),Ste20(ste4[1])
+%obs: 'active Ste12' Ste12(dig1,dig2,mapk)
+%obs: 'total Ste12' Ste12()
+%obs: 'activated Ste7' Ste7(S359_T363{p}p)
+%obs: 'total Ste7' Ste7()
+%obs: 'active Ste11' Ste11(S302_S306_S307{p}pp)
+%obs: 'Ste11{p}p' Ste11(S302_S306_S307{p}p)
+%obs: 'Ste11{p}' Ste11(S302_S306_S307{p})
+%obs: 'Msg5' Msg5()
+%obs: 'active Ste2' Ste2(pheromone[1]),Pheromone(ste2[1])
+%obs: 'total Ste2' Ste2()
+%obs: 'Kss1tot' Kss1()
+%obs: 'Kss1PP' Kss1(T183{p},Y185{p})
+%obs: 'synthesized Ste4' Ste4(state~synth)
+%obs: 'Ste12 bound to Ste4_gene' Ste12(dna[1]),Ste4_gene(promoter[1])
+%obs: 'total Pheromone' Pheromone()
+%obs: 'nuclear Ste5' Ste5(loc~n,ste11,ste7,ste4,mapk,ste5)
+%obs: 'cyto, free ste5' Ste5(loc{c},ste11,ste7,ste4,mapk,ste5)
+%obs: 'ste5.ste11' Ste5(ste11[1]),Ste11(ste5[1])
+%obs: 'ste5.ste7' Ste5(ste7[1]),Ste7(ste5[1])
+%obs: 'ste5.mapk' Ste5(mapk[_])
+%obs: 'ste5 dimerized' Ste5(ste5[1]),Ste5(ste5[1])
+%obs: 'ste5 phosph' Ste5(T287{p})
+%obs: 'FRET data' 'Gpa1_free' / 'bound G protein'
+*/
+
+%mod: [true] do $ADD 10000 Pheromone(ste2);
+%mod: alarm 360 do $SNAPSHOT "peak_ensemble";
+%mod: alarm 1000 do $DIN "flux_ensemble2_t1000_p3000.dot" [false];
+    $STOP "end_ensemble";
+%mod: alarm 50 do $SNAPSHOT "autodrift_ensemble"; repeat [true]
+%mod: [true] do $DIN "flux_ensemble2_t1000_p3000.dot" [true];

@@ -1,0 +1,20 @@
+%var: 'Stot' 100
+%var: 'kKS' 0.01
+%var: 'kdKS' 1.
+%var: 'kpS' 0.1
+%var: 'kPS' 0.001
+%var: 'kdPS' 0.1
+%var: 'kuS' 0.01
+%agent: K(s) 
+%agent: P(s) 
+%agent: S(x1~u~p)
+
+%init: 'Stot' K(s)
+%init: 'Stot' P(s)
+%init: 'Stot' S(x1~u)
+
+
+K(s) , S(x1~u) <-> K(s!1) , S(x1~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x1~u!1) -> K(s) , S(x1~p) @ 'kpS' 
+P(s) , S(x1~p) <-> P(s!1) , S(x1~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x1~p!1) -> P(s) , S(x1~u) @ 'kuS' 

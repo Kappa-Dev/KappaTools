@@ -1,0 +1,46 @@
+
+
+%var: 'NA'  6.02e23    # Avogadro's number (molecues/mol)
+%var: 'f'   0.01       # Fraction of the cell to simulate
+%var: 'Vo'  f*1.0e-10  # Extracellular volume=1/cell_density (L)
+%var: 'V'   f*3.0e-12  # Cytoplasmic volume (L)
+# Inital amount of ligand (nM)
+%var: 'EGF_init'     20*1e-10*NA*Vo  # convert to copies per cell
+# Initial amounts of cellular components (copies per cell)
+%var: 'EGFR_init'    f*1.8e5
+%var: 'Grb2_init'    f*1.5e5
+%var: 'Sos1_init'    f*6.2e4
+# Rate constants
+# Divide by NA*Vcyt to convert bimolecular rate constants
+# from /M/sec to /(molecule/cell)/sec
+%var: 'kp1'  3.0e6/(NA*V)  # ligand-monomer binding
+%var: 'km1'  0.06          # ligand-monomer dissociation
+%var: 'kp2'  1.0e7/(NA*V)  # aggregation of bound monomers
+%var: 'km2'  0.1           # dissociation of bound monomers
+%var: 'kp3'  0.5           # dimer transphosphorylation
+%var: 'km3'  4.505         # dimer dephosphorylation
+%var: 'kp4'  1.5e6/(NA*V)  # binding of Grb2 to receptor
+%var: 'km4'  0.05          # dissociation of Grb2 from receptor
+%var: 'kp5'  1.0e7/(NA*V)  # binding of Grb2 to Sos1
+%var: 'km5'  0.06          # dissociation of Grb2 from Sos1
+%var: 'deg'  0.01          # degradation of receptor dimers
+
+    # Convert EGF conc. from nM to molecule/cell
+%init: 0     EGF(R)
+%init: 'EGFR_init'     EGFR(L,CR1,Y1068~U)
+%init: 'Grb2_init' Grb2(SH2,SH3)
+%init: 'Sos1_init' Sos1(PxxP)
+
+    # Ligand-receptor binding
+    'R1' EGFR(L,CR1) , EGF(R) <-> EGFR(L!1,CR1),EGF(R!1)  @'kp1'{0},'km1'
+    # Receptor-aggregation
+    'R2' EGFR(L!_,CR1) , EGFR(L!_,CR1) <-> EGFR(L!_,CR1!1),EGFR(L!_,CR1!1) @'kp2','km2'
+    # Transphosphorylation of EGFR by RTK
+    'R3' EGFR(CR1!_,Y1068~U) -> EGFR(CR1!_,Y1068~P)  @'kp3'
+    # Dephosphorylation
+    'R4' EGFR(Y1068~P) -> EGFR(Y1068~U)  @'km3'
+    # Grb2 binding to pY1068
+    'R5' EGFR(Y1068~P) , Grb2(SH2) <-> EGFR(Y1068~P!1), Grb2(SH2!1)  @'kp4'{0},'km4'
+    # Grb2 binding to Sos1
+    'R6' Grb2(SH3) , Sos1(PxxP) <-> Grb2(SH3!1), Sos1(PxxP!1) @'kp5'{0},'km5'
+    # Receptor dimer internalization/degradation

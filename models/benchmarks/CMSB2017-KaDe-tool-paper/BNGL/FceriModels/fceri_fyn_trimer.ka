@@ -1,0 +1,949 @@
+%agent: Lig(l1,l2,l3,a~1~2)
+%agent: Lyn(U,SH2,a~Y~pY)
+%agent: Fyn(SH2,a~Y~pY,t~Y)
+%agent: Syk(tSH2,l~Y~pY,a~Y~pY)
+%agent: Rec(a,b~Y~pY,g~Y~pY)
+
+
+%var: 'Lig_tot'  6.0e3
+%var: 'Rec_tot'  4.0e2
+%var: 'Lyn_tot'  2.8e1
+%var: 'Fyn_tot'  4.0e2
+%var: 'Syk_tot'  4.0e2
+
+%var: 'kp1'  1.32845238e-7
+%var: 'km1'  0
+%var: 'kp2'  2.5e-1
+%var: 'km2'  0
+%var: 'kpL'  5e-2
+%var: 'kmL'  20
+%var: 'kpLs'  5e-2
+%var: 'kmLs'  0.12
+%var: 'kpF'  5e-2
+%var: 'kmF'  20
+%var: 'kpS'  6e-2
+%var: 'kmS'  0.13
+%var: 'kpSs'  6e-2
+%var: 'kmSs'  0.13
+%var: 'pLb'  30
+%var: 'pLbs'  100
+%var: 'pLg'    1
+%var: 'pLgs'    3
+%var: 'pLS'   30
+%var: 'pLSs'  100
+%var: 'pSS'  100
+%var: 'pSSs'  200
+%var: 'pLF'   30
+%var: 'pLFs'  100
+%var: 'dm'   20
+%var: 'dc'   20
+
+
+
+%init: 'Lig_tot' Lig(l1,l2,l3)
+%init: 'Lyn_tot' Lyn(U,SH2,a~Y)
+%init: 'Fyn_tot' Fyn(SH2,a~Y,t~Y)
+%init: 'Syk_tot' Syk(tSH2,l~Y,a~Y)
+%init: 'Rec_tot' Rec(a,b~Y,g~Y)
+
+
+
+# Ligand-receptor binding
+Rec(a), Lig(l1,l2,l3) <-> Rec(a!1),Lig(l1!1,l2,l3) @'kp1'{0}, 'km1'
+Rec(a), Lig(l2,l1,l3) <-> Rec(a!1),Lig(l2!1,l1,l3) @'kp1'{0}, 'km1'
+Rec(a), Lig(l1,l3,l2) <-> Rec(a!1),Lig(l1!1,l3,l2) @'kp1'{0}, 'km1'
+Rec(a), Lig(l3,l1,l2) <-> Rec(a!1),Lig(l3!1,l1,l2) @'kp1'{0}, 'km1'
+Rec(a), Lig(l2,l3,l1) <-> Rec(a!1),Lig(l2!1,l3,l1) @'kp1'{0}, 'km1'
+Rec(a), Lig(l3,l2,l1) <-> Rec(a!1),Lig(l3!1,l2,l1) @'kp1'{0}, 'km1'
+Rec(a), Lig(l1,l2,l3!_) <-> Rec(a!1),Lig(l1!1,l2,l3!_) @'kp1'{0}, 'km1'
+Rec(a), Lig(l2,l1,l3!_) <-> Rec(a!1),Lig(l2!1,l1,l3!_) @'kp1'{0}, 'km1'
+Rec(a), Lig(l1,l3,l2!_) <-> Rec(a!1),Lig(l1!1,l3,l2!_) @'kp1'{0}, 'km1'
+Rec(a), Lig(l3,l1,l2!_) <-> Rec(a!1),Lig(l3!1,l1,l2!_) @'kp1'{0}, 'km1'
+Rec(a), Lig(l2,l3,l1!_) <-> Rec(a!1),Lig(l2!1,l3,l1!_) @'kp1'{0}, 'km1'
+Rec(a), Lig(l3,l2,l1!_) <-> Rec(a!1),Lig(l3!1,l2,l1!_) @'kp1'{0}, 'km1'
+
+# Receptor-aggregation
+Rec(a) , Lig(l1,l2!_,l3) <-> Rec(a!2),Lig(l1!2,l2!_,l3) @'kp2'{0},'km2'
+Rec(a) , Lig(l2,l1!_,l3) <-> Rec(a!2),Lig(l2!2,l1!_,l3) @'kp2'{0},'km2'
+Rec(a) , Lig(l1,l3!_,l2) <-> Rec(a!2),Lig(l1!2,l3!_,l2) @'kp2'{0},'km2'
+Rec(a) , Lig(l3,l1!_,l2) <-> Rec(a!2),Lig(l3!2,l1!_,l2) @'kp2'{0},'km2'
+Rec(a) , Lig(l2,l3!_,l1) <-> Rec(a!2),Lig(l2!2,l3!_,l1) @'kp2'{0},'km2'
+Rec(a) , Lig(l3,l2!_,l1) <-> Rec(a!2),Lig(l3!2,l2!_,l1) @'kp2'{0},'km2'
+Rec(a) , Lig(l1,l2!_,l3!_) <-> Rec(a!2),Lig(l1!2,l2!_,l3!_) @'kp2'{0},'km2'
+Rec(a) , Lig(l2,l1!_,l3!_) <-> Rec(a!2),Lig(l2!2,l1!_,l3!_) @'kp2'{0},'km2'
+Rec(a) , Lig(l1,l3!_,l2!_) <-> Rec(a!2),Lig(l1!2,l3!_,l2!_) @'kp2'{0},'km2'
+Rec(a) , Lig(l3,l1!_,l2!_) <-> Rec(a!2),Lig(l3!2,l1!_,l2!_) @'kp2'{0},'km2'
+Rec(a) , Lig(l2,l3!_,l1!_) <-> Rec(a!2),Lig(l2!2,l3!_,l1!_) @'kp2'{0},'km2'
+Rec(a) , Lig(l3,l2!_,l1!_) <-> Rec(a!2),Lig(l3!2,l2!_,l1!_) @'kp2'{0},'km2'
+
+
+# Constitutive Lyn-receptor binding
+Rec(b~Y) , Lyn(U,SH2) <-> Rec(b~Y!1),Lyn(U!1,SH2) @'kpL'{0}, 'kmL'
+
+# Transphosphorylation of beta by constitutive Lyn
+
+#1 Third site is free
+
+Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y) -> Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY) @'pLb'
+
+Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y) -> Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY) @'pLb'
+
+Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y) -> Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY) @'pLb'
+
+Lig(l1!1,l2,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y) -> Lig(l1!1,l2,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY) @'pLb'
+
+Lig(l2!1,l1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y) -> Lig(l2!1,l1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY) @'pLb'
+
+Lig(l3!1,l1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y) -> Lig(l3!1,l1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY) @'pLb'
+
+#2 Second and third site have the same state
+
+Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+#3 Third site is bound to a free receptor
+
+Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b) -> Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b) @'pLb'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b) -> Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b) @'pLb'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b)-> Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b)@'pLb'
+
+Lig(l1!1,l2!2,l3!4),Rec(a!2,b),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l1!1,l2!2,l3!4),Rec(a!2,b),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+Lig(l2!1,l1!2,l3!4),Rec(a!2,b),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l2!1,l1!2,l3!4),Rec(a!2,b),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+Lig(l3!1,l1!2,l2!4),Rec(a!2,b),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l3!1,l1!2,l2!4),Rec(a!2,b),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+#4 Third site is bound to a bouny but phosphorylated receptor
+
+Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~pY!_) -> Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~pY!_) @'pLb'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~pY!_) -> Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~pY!_) @'pLb'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~pY!_)-> Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~pY!_)@'pLb'
+
+Lig(l1!1,l2!2,l3!4),Rec(a!2,b~pY!_),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l1!1,l2!2,l3!4),Rec(a!2,b~pY!_),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+Lig(l2!1,l1!2,l3!4),Rec(a!2,b~pY!_),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l2!1,l1!2,l3!4),Rec(a!2,b~pY!_),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+Lig(l3!1,l1!2,l2!4),Rec(a!2,b~pY!_),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l3!1,l1!2,l2!4),Rec(a!2,b~pY!_),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+#5 Third site a bound to a receptor bound to Fyn
+
+Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~Y!6),Fyn(SH2!6) -> Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~Y!6),Fyn(SH2!6) @'pLb'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~Y!6),Fyn(SH2!6) -> Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~Y!6),Fyn(SH2!6) @'pLb'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y),Rec(a!4,b~Y!6),Fyn(SH2!6)-> Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY),Rec(a!4,b~Y!6),Fyn(SH2!6)@'pLb'
+
+Lig(l1!1,l2!2,l3!4),Rec(a!2,b~Y!6),Fyn(SH2!6),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l1!1,l2!2,l3!4),Rec(a!2,b~Y!6),Fyn(SH2!6),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+Lig(l2!1,l1!2,l3!4),Rec(a!2,b~Y!6),Fyn(SH2!6),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l2!1,l1!2,l3!4),Rec(a!2,b~Y!6),Fyn(SH2!6),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+Lig(l3!1,l1!2,l2!4),Rec(a!2,b~Y!6),Fyn(SH2!6),Rec(a!1,b~Y),Rec(a!4,b~Y!5),Lyn(U!5,SH2) -> Lig(l3!1,l1!2,l2!4),Rec(a!2,b~Y!6),Fyn(SH2!6),Rec(a!1,b~pY),Rec(a!4,b~Y!5),Lyn(U!5,SH2) @'pLb'
+
+# Transphosphorylation of gamma by constitutive Lyn
+
+#1 Third site is free
+
+Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y) -> Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY) @'pLg'
+
+Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y) -> Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY) @'pLg'
+
+Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y) -> Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY) @'pLg'
+
+Lig(l1!1,l2,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y) -> Lig(l1!1,l2,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY) @'pLg'
+
+Lig(l2!1,l1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y) -> Lig(l2!1,l1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY) @'pLg'
+
+Lig(l3!1,l1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y) -> Lig(l3!1,l1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY) @'pLg'
+
+#2 Second and third site have the same state
+
+Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Lyn(U!5,SH2),Rec(a!4,b~Y!5) -> Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Lyn(U!5,SH2),Rec(a!4,b~Y!5) @'pLg'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Lyn(U!5,SH2),Rec(a!4,b~Y!5) -> Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Lyn(U!5,SH2),Rec(a!4,b~Y!5) @'pLg'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Lyn(U!5,SH2),Rec(a!4,b~Y!5) -> Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Lyn(U!5,SH2),Rec(a!4,b~Y!5) @'pLg'
+
+#3 Third site is bound to a free receptor
+
+Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b) @'pLg'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b) @'pLg'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b) @'pLg'
+
+Lig(l1!1,l2!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l1!1,l2!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b) @'pLg'
+
+Lig(l2!1,l1!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l2!1,l1!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b) @'pLg'
+
+Lig(l3!1,l1!4,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l3!1,l1!4,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b) @'pLg'
+
+#4 Third site is bound to a bound but phosphorylated receptor
+
+Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~pY!_) -> Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~pY!_) @'pLg'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~pY!_) -> Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~pY!_) @'pLg'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~pY!_) -> Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~pY!_) @'pLg'
+
+Lig(l1!1,l2!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~pY!_) -> Lig(l1!1,l2!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~pY!_) @'pLg'
+
+Lig(l2!1,l1!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~pY!_) -> Lig(l2!1,l1!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~pY!_) @'pLg'
+
+Lig(l3!1,l1!4,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~pY!_) -> Lig(l3!1,l1!4,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~pY!_) @'pLg'
+
+#5 Third site a bound to a receptor bound to Fyn
+
+Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~Y!5),Fyn(SH2!5) -> Lig(l1!1,l2!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~Y!5),Fyn(SH2!5) @'pLg'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~Y!5),Fyn(SH2!5) -> Lig(l2!1,l1!2,l3!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~Y!5),Fyn(SH2!5) @'pLg'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~Y!5),Fyn(SH2!5) -> Lig(l3!1,l1!2,l2!4),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~Y!5),Fyn(SH2!5) @'pLg'
+
+Lig(l1!1,l2!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~Y!5),Fyn(SH2!5) -> Lig(l1!1,l2!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~Y!5),Fyn(SH2!5) @'pLg'
+
+Lig(l2!1,l1!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~Y!5),Fyn(SH2!5) -> Lig(l2!1,l1!4,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~Y!5),Fyn(SH2!5) @'pLg'
+
+Lig(l3!1,l1!4,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y),Rec(a!4,b~Y!5),Fyn(SH2!5) -> Lig(l3!1,l1!4,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY),Rec(a!4,b~Y!5),Fyn(SH2!5) @'pLg'
+
+# Lyn-receptor binding through SH2 domain
+Rec(b~pY) , Lyn(U,SH2) <-> Rec(b~pY!1),Lyn(U,SH2!1) @'kpLs'{0}, 'kmLs'
+
+# Fyn-receptor binding through SH2 domain
+Rec(b~pY) , Fyn(SH2) <-> Rec(b~pY!1), Fyn(SH2!1) @'kpF'{0}, 'kmF'
+
+# Transphosphorylation of beta by SH2-bound Lyn
+#1 Third site is free
+
+Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
+
+Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
+
+Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
+
+Lig(l1!1,l2,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l1!1,l2,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
+
+Lig(l2!1,l1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l2!1,l1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
+
+Lig(l3!1,l1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l3!1,l1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
+
+#2 Second and third site have the same state
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5)-> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5)@'pLbs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5)-> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5)@'pLbs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5)-> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5)@'pLbs'
+
+#3 Third site is bound to a free receptor
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b)-> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b)@'pLbs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b)-> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b)@'pLbs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b)-> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b)@'pLbs'
+
+Lig(l1!1,l2!2,l3!4),Rec(a!2,b),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5)-> Lig(l1!1,l2!2,l3!4),Rec(a!2,b),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5)@'pLbs'
+
+Lig(l2!1,l1!2,l3!4),Rec(a!2,b),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5)-> Lig(l2!1,l1!2,l3!4),Rec(a!2,b),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5)@'pLbs'
+
+Lig(l3!1,l1!2,l2!4),Rec(a!2,b),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5)-> Lig(l3!1,l1!2,l2!4),Rec(a!2,b),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5)@'pLbs'
+
+#4 Third site is bound to a bound but not phosphorylated receptor
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b~Y!_)-> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b~Y!_)@'pLbs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b~Y!_)-> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b~Y!_)@'pLbs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b~Y!_)-> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b~Y!_)@'pLbs'
+
+Lig(l1!1,l2!2,l3!4),Rec(a!2,b~Y!_),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5)-> Lig(l1!1,l2!2,l3!4),Rec(a!2,b~Y!_),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5)@'pLbs'
+
+Lig(l2!1,l1!2,l3!4),Rec(a!2,b~Y!_),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5)-> Lig(l2!1,l1!2,l3!4),Rec(a!2,b~Y!_),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5)@'pLbs'
+
+Lig(l3!1,l1!2,l2!4),Rec(a!2,b~Y!_),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5)-> Lig(l3!1,l1!2,l2!4),Rec(a!2,b~Y!_),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5)@'pLbs'
+
+
+#5 Third site a bound to a receptor bound to Fyn
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b~pY!5),Fyn(SH2!5)-> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b~pY!5),Fyn(SH2!5)@'pLbs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b~pY!5),Fyn(SH2!5)-> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b~pY!5),Fyn(SH2!5)@'pLbs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) ,Rec(a!4,b~pY!5),Fyn(SH2!5)-> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) ,Rec(a!4,b~pY!5),Fyn(SH2!5)@'pLbs'
+
+Lig(l1!1,l2!2,l3!4),Rec(a!2,b~pY!3),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5),Fyn(SH2!3)-> Lig(l1!1,l2!2,l3!4),Rec(a!2,b~pY!3),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5),Fyn(SH2!3)@'pLbs'
+
+Lig(l2!1,l1!2,l3!4),Rec(a!2,b~pY!3),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5),Fyn(SH2!3)-> Lig(l2!1,l1!2,l3!4),Rec(a!2,b~pY!3),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5),Fyn(SH2!3)@'pLbs'
+
+Lig(l3!1,l1!2,l2!4),Rec(a!2,b~pY!3),Rec(a!1,b~Y),Rec(a!4,b~pY!5),Lyn(U,SH2!5),Fyn(SH2!3)-> Lig(l3!1,l1!2,l2!4),Rec(a!2,b~pY!3),Rec(a!1,b~pY),Rec(a!4,b~pY!5),Lyn(U,SH2!5),Fyn(SH2!3)@'pLbs'
+
+# Transphosphorylation of gamma by SH2-bound Lyn
+
+#1 Third site is free
+
+Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y) -> Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) @'pLgs'
+
+Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y) -> Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) @'pLgs'
+
+Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y) -> Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) @'pLgs'
+
+Lig(l1!1,l2,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y) -> Lig(l1!1,l2,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) @'pLgs'
+
+Lig(l2!1,l1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y) -> Lig(l2!1,l1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) @'pLgs'
+
+Lig(l3!1,l1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y) -> Lig(l3!1,l1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) @'pLgs'
+
+#2 Second and third site have the same state
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Lyn(U,SH2!5),Rec(a!4,b~pY!5) -> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5) @'pLgs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Lyn(U,SH2!5),Rec(a!4,b~pY!5) -> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5) @'pLgs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Lyn(U,SH2!5),Rec(a!4,b~pY!5) -> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Lyn(U,SH2!5),Rec(a!4,b~pY!5) @'pLgs'
+
+#3 Third site is bound to a free receptor
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b) @'pLgs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b) @'pLgs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b) -> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b) @'pLgs'
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b) -> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY) ,Rec(a!2,b) @'pLgs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b) -> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY) ,Rec(a!2,b) @'pLgs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b) -> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY) ,Rec(a!2,b) @'pLgs'
+
+#4 Third site is bound to a bound but not phosphorylated receptor
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b~Y!_) -> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b~Y!_) @'pLgs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b~Y!_) -> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b~Y!_) @'pLgs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b~Y!_) -> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b~Y!_) @'pLgs'
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b~Y!_) -> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY) ,Rec(a!2,b~Y!_) @'pLgs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b~Y!_) -> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY) ,Rec(a!2,b~Y!_) @'pLgs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b~Y!_) -> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY),Rec(a!2,b~Y!_) @'pLgs'
+
+#5 Third site a bound to a receptor bound to Fyn
+
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b~Y!6),Fyn(SH2!6) -> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b~Y!6),Fyn(SH2!6) @'pLgs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b~Y!6),Fyn(SH2!6) -> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b~Y!6),Fyn(SH2!6) @'pLgs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y),Rec(a!4,b~Y!6),Fyn(SH2!6) -> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) ,Rec(a!4,b~Y!6),Fyn(SH2!6) @'pLgs'
+
+Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b~Y!6),Fyn(SH2!6) -> Lig(l1!1,l2!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY) ,Rec(a!2,b~Y!6),Fyn(SH2!6) @'pLgs'
+
+Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b~Y!6),Fyn(SH2!6) -> Lig(l2!1,l1!2,l3!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY) ,Rec(a!2,b~Y!6),Fyn(SH2!6) @'pLgs'
+
+Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~Y),Rec(a!2,b~Y!6),Fyn(SH2!6) -> Lig(l3!1,l1!2,l2!4),Lyn(U,SH2!5),Rec(a!4,b~pY!5),Rec(a!1,g~pY),Rec(a!2,b~Y!6),Fyn(SH2!6) @'pLgs'
+
+# Syk-receptor binding through tSH2 domain
+Rec(g~pY) , Syk(tSH2) <-> Rec(g~pY!1),Syk(tSH2!1) @'kpS'{0}, 'kmS'
+
+# Transphosphorylation of Lyn by constitutive Lyn
+
+#1 Third site free
+
+Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l1!1,l3!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l3!2,l1),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l2!2,l1),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+#2 Second and third site in the same state
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+#3 Third site bound to a free receptor
+
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+#4 Third site bound to a bound but phosphorylated receptor
+
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+#5 Third site a bound to a receptor bound to Fyn
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+
+# Transphosphorylation of Lyn by SH2-bound Lyn
+#1 Third site free
+
+Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l1!1,l3!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l3!2,l1),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l2!2,l1),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+# Second and third site in the same state
+
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+#3 Third site bound to a free receptor
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+
+#4 Third site bount to a bound but not phosphorylated receptor
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+#5 Third site a bound to a receptor bound to Fyn
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~pY!6),Fyn(SH2!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLSs'
+
+
+# Transphosphorylation of Fyn by constitutive Lyn
+#1 Third site is free
+
+Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l1!1,l3!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l3!2,l1),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l2!2,l1),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+
+
+#2 Second and third site in the same state
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> Lig(l1!1,l2!2,l3!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l3!2,l1!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> Lig(l2!1,l3!2,l1!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> Lig(l3!1,l1!2,l2!5),Lyn(U!6,SH2),Rec(a!5,b~Y!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+#3 Third site bound to a free receptor
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+
+#4 Third site bound to a bound phosphorylated receptor
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~pY!_),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+#5 Third site a bound to a receptor bound to Fyn
+
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!6),Fyn(SH2!6),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLF'
+
+# Transphosphorylation of Fyn by SH2-bound Lyn
+# KaSa has discovered that both following six rules are wrong
+# Lyn has to be bound via SH2, not via U (since it is bound to a site with state pY)
+
+#correct rules:
+
+#1 Third site is free
+Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l1!1,l3!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l3!2,l1),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l2!2,l1),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+#2 Second and third are in the same state
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!6),Rec(a!5,b~pY!6),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+#3 Third site is bound to a free receptor
+
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+
+#4 Third site is bound to a bound but not phosphorylated receptor
+
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+#5 Third site a bound to a receptor bound to Fyn
+
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l2!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l1!2,l3!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l1!1,l3!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l1!2,l2!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l2!1,l3!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+Lig(l3!1,l2!2,l1!5),Rec(a!5,b~Y!_),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+# Transphosphorylation of Syk by constitutive Lyn
+
+#1 Third site is free
+
+Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l1!1,l2!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
+
+Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l2!1,l1!2,l3),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
+
+Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l3!1,l1!2,l2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
+
+Lig(l1!1,l2,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l1!1,l2,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
+
+Lig(l2!1,l1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l2!1,l1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
+
+Lig(l3!1,l1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l3!1,l1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
+
+#2 Second and third site have the same state
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Lyn(U!6,SH2),Rec(a!5,b~Y!6) -> Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Lyn(U!6,SH2),Rec(a!5,b~Y!6) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Lyn(U!6,SH2),Rec(a!5,b~Y!6) -> Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Lyn(U!6,SH2),Rec(a!5,b~Y!6) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Lyn(U!6,SH2),Rec(a!5,b~Y!6) -> Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Lyn(U!6,SH2),Rec(a!5,b~Y!6) @'pLS'
+
+#3 Third site is bound to a free receptor
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b) -> Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b) -> Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b) -> Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b) @'pLS'
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b) -> Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b) -> Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b) -> Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b) @'pLS'
+
+#4 Third site is bound to a bound but phosphorylated receptor
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~pY!_) -> Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~pY!_) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~pY!_) -> Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~pY!_) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~pY!_) -> Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~pY!_) @'pLS'
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~pY!_) -> Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~pY!_) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~pY!_) -> Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~pY!_) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~pY!_) -> Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~pY!_) @'pLS'
+
+#5 Third site a bound to a receptor bound to Fyn
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~Y!6),Fyn(SH2!6) -> Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~Y!6),Fyn(SH2!6) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~Y!6),Fyn(SH2!6) -> Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~Y!6),Fyn(SH2!6) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~Y!6),Fyn(SH2!6) -> Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~Y!6),Fyn(SH2!6) @'pLS'
+
+Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~Y!6),Fyn(SH2!6) -> Lig(l1!1,l2!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~Y!6),Fyn(SH2!6) @'pLS'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~Y!6),Fyn(SH2!6) -> Lig(l2!1,l1!2,l3!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~Y!6),Fyn(SH2!6) @'pLS'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~Y!6),Fyn(SH2!6) -> Lig(l3!1,l1!2,l2!5),Lyn(U!3,SH2),Rec(a!5,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~Y!6),Fyn(SH2!6) @'pLS'
+
+# Transphosphorylation of Syk by SH2-bound Lyn
+
+#1 Third site is free
+
+Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l1!1,l2!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
+
+Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l2!1,l1!2,l3),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
+
+Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l3!1,l1!2,l2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
+
+Lig(l1!1,l2,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l1!1,l2,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
+
+Lig(l2!1,l1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l2!1,l1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
+
+Lig(l3!1,l1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l3!1,l1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
+
+#2 Second and third site have the same state
+
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Lyn(U,SH2!6),Rec(a!5,b~pY!6) -> Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Lyn(U,SH2!6),Rec(a!5,b~pY!6) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Lyn(U,SH2!6),Rec(a!5,b~pY!6) -> Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Lyn(U,SH2!6),Rec(a!5,b~pY!6) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Lyn(U,SH2!6),Rec(a!5,b~pY!6) -> Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Lyn(U,SH2!6),Rec(a!5,b~pY!6) @'pLSs'
+
+#3 Third site is bound to a free receptor
+
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b) -> Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b) -> Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b) -> Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b) @'pLSs'
+
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b) -> Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b) -> Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b) -> Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b) @'pLSs'
+
+#4 Third site is bound to a bound but not phosphorylated receptor
+
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~Y!_) -> Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~Y!_) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~Y!_) -> Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~Y!_) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~Y!_) -> Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~Y!_) @'pLSs'
+
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~Y!_) -> Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~Y!_) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~Y!_) -> Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~Y!_) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~Y!_) -> Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~Y!_) @'pLSs'
+
+#5 Third site a bound to a receptor bound to Fyn
+
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~pY!6),Fyn(SH2!6) -> Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~pY!6),Fyn(SH2!6) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~pY!6),Fyn(SH2!6) -> Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~pY!6),Fyn(SH2!6) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!5,b~pY!6),Fyn(SH2!6) -> Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!5,b~pY!6),Fyn(SH2!6) @'pLSs'
+
+Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~pY!6),Fyn(SH2!6) -> Lig(l1!1,l2!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~pY!6),Fyn(SH2!6) @'pLSs'
+
+Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~pY!6),Fyn(SH2!6) -> Lig(l2!1,l1!2,l3!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~pY!6),Fyn(SH2!6) @'pLSs'
+
+Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y),Rec(a!2,b~pY!6),Fyn(SH2!6) -> Lig(l3!1,l1!2,l2!5),Lyn(U,SH2!3),Rec(a!5,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY),Rec(a!2,b~pY!6),Fyn(SH2!6) @'pLSs'
+
+
+# Transphosphorylation of Syk by Syk not phosphorylated on aloop
+
+  #1 Third site is free
+
+  Lig(l1!1,l2!2,l3),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l1!1,l2!2,l3),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSS'
+
+  Lig(l2!1,l1!2,l3),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l2!1,l1!2,l3),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSS'
+
+  Lig(l3!1,l1!2,l2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l3!1,l1!2,l2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSS'
+
+  Lig(l1!1,l2,l3!2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l1!1,l2,l3!2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSS'
+
+  Lig(l2!1,l1,l3!2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l2!1,l1,l3!2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSS'
+
+  Lig(l3!1,l1,l2!2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l3!1,l1,l2!2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSS'
+
+  #2 Second and third site have the same state
+
+  Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Syk(tSH2!6,a~Y),Rec(a!5,g~pY!6) -> Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Syk(tSH2!6,a~Y),Rec(a!5,g~pY!6) @'pSS'
+
+  Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Syk(tSH2!6,a~Y),Rec(a!5,g~pY!6) -> Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Syk(tSH2!6,a~Y),Rec(a!5,g~pY!6) @'pSS'
+
+  Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Syk(tSH2!6,a~Y),Rec(a!5,g~pY!6) -> Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Syk(tSH2!6,a~Y),Rec(a!5,g~pY!6) @'pSS'
+
+  #3 Third site is bound to a free receptor
+
+  Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!5,g) -> Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!5,g) @'pSS'
+
+  Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!5,g) -> Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!5,g) @'pSS'
+
+  Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!5,g) -> Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!5,g) @'pSS'
+
+  Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!2,g) -> Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!2,g) @'pSS'
+
+  Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!2,g) -> Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~Y),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!2,g) @'pSS'
+
+  Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~Y),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!2,g) -> Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~Y),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!2,g) @'pSS'
+
+  # Transphosphorylation of Syk by Syk phosphorylated on aloop
+
+  #1 Third site is free
+
+  Lig(l1!1,l2!2,l3),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l1!1,l2!2,l3),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSSs'
+
+  Lig(l2!1,l1!2,l3),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l2!1,l1!2,l3),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSSs'
+
+  Lig(l3!1,l1!2,l2),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l3!1,l1!2,l2),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSSs'
+
+  Lig(l1!1,l2,l3!2),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l1!1,l2,l3!2),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSSs'
+
+  Lig(l2!1,l1,l3!2),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l2!1,l1,l3!2),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSSs'
+
+  Lig(l3!1,l1,l2!2),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l3!1,l1,l2!2),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSSs'
+
+  #2 Second and third site have the same state
+
+  Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Syk(tSH2!6,a~pY),Rec(a!5,g~pY!6) -> Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Syk(tSH2!6,a~pY),Rec(a!5,g~pY!6)  @'pSSs'
+
+  Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Syk(tSH2!6,a~pY),Rec(a!5,g~pY!6) -> Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Syk(tSH2!6,a~pY),Rec(a!5,g~pY!6)  @'pSSs'
+
+  Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Syk(tSH2!6,a~pY),Rec(a!5,g~pY!6) -> Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Syk(tSH2!6,a~pY),Rec(a!5,g~pY!6)  @'pSSs'
+
+  #3 Third site is bound to a free receptor
+
+  Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!5,g) -> Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!5,g)  @'pSSs'
+
+  Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!5,g) -> Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!5,g)  @'pSSs'
+
+  Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!5,g) -> Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~pY),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!5,g)  @'pSSs'
+
+  Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!2,g) -> Lig(l1!1,l2!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!2,g)  @'pSSs'
+
+  Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!2,g) -> Lig(l2!1,l1!2,l3!5),Syk(tSH2!3,a~pY),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!2,g)  @'pSSs'
+
+  Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~pY),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y),Rec(a!2,g) -> Lig(l3!1,l1!2,l2!5),Syk(tSH2!3,a~pY),Rec(a!5,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY),Rec(a!2,g)  @'pSSs'
+
+
+
+# Dephosphorylation of Rec beta
+Rec(b~pY) -> Rec(b~Y) @'dm'
+
+    # Dephosphorylation of Rec gamma
+    Rec(g~pY) -> Rec(g~Y) @'dm'
+
+    # Dephosphorylation of Syk at membrane
+    Syk(tSH2!_,l~pY)-> Syk(tSH2!_,l~Y) @'dm'
+    Syk(tSH2!_,a~pY)-> Syk(tSH2!_,a~Y) @'dm'
+
+    # Dephosphorylation of Syk in cytosol
+    Syk(tSH2,l~pY)-> Syk(tSH2,l~Y) @'dc'
+    Syk(tSH2,a~pY)-> Syk(tSH2,a~Y) @'dc'

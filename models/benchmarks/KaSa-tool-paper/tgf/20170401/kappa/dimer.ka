@@ -1,0 +1,19 @@
+%agent: TGFBR1(y,Cter)
+%agent: TGFBR2(x,y)
+
+
+
+#binding
+'TGFB1_TGFBR2' TGFB1(a), TGFBR2(x) -> TGFB1(a!1), TGFBR2(x!1) @ 'normal_affinity'
+'TGFBR1_TGFBR2' TGFBR1(y),TGFBR2(y) -> TGFBR1(y!1),TGFBR2(y!1) @ 'low_affinity'
+'TGFBR1_TGFBR2_fast' TGFBR1(y),TGFBR2(y,x!a.TGFB1) -> TGFBR1(y!1),TGFBR2(y!1,x!a.TGFB1) @ 'high_affinity'
+'TGFBR1_Cter' TGFBR1(y!1,Cter~u),TGFBR2(y!1,x!a.TGFB1) -> TGFBR1(y!1,Cter~p),TGFBR2(y!1,x!a.TGFB1) @ 'normal_affinity'
+
+#unbinding
+'TGFB1_TGFBR2_dissociate' TGFB1(a!1), TGFBR2(x!1)  -> TGFB1(a), TGFBR2(x) @ 'low_affinity'
+'TGFBR1_TGFBR2_dissociare' TGFBR1(y!1),TGFBR2(y!1) -> TGFBR1(y),TGFBR2(y) @ 'low_affinity'
+
+
+#### Initial conditions
+%init: 10     TGFBR1()
+%init: 10     TGFBR2()

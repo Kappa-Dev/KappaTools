@@ -1,0 +1,668 @@
+// Snapshot [Event: 30625119, Time: 1000.000009]
+%init: 129
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Mekkp(ste11[1])
+%init: 1
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk[4], activation{u}),Fus3(dock[4], T180{u}, Y182{u}),Fus3(dock[3], T180{u}, Y182{p}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 1
+Ste5(ste11, ste7, ste4, mapk, ste5[0], loc{c}, T287{p}),Ste5(ste11, ste7, ste4, mapk, ste5[0], loc{c}, T287{u})
+%init: 1046
+Kss1(dock[0], T183{u}, Y185{u}),Ptp(mapk[0])
+%init: 24
+Ste12(mapk, dna, dig1[0], dig2[1]),Dig1(ste12[0], mapk, activation{u}),Dig2(ste12[1], mapk, activation{u})
+%init: 3
+Kss1(dock[0], T183{u}, Y185{p}),Ste11(mapk[0], ste5, degradation{u}, S302_S306_S307{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{p}),Ste11(mapk[0], ste5, degradation{u}, S302_S306_S307{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7, ste4, mapk[0], ste5[7], loc{c}, T287{u}),Ste5(ste11[5], ste7[4], ste4, mapk[1], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[4], ste4, mapk[2], ste5[7], loc{c}, T287{u}),Ste5(ste11[6], ste7, ste4, mapk, ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste7(ste5[5], mapk[3], S359_T363{u}),Ste11(mapk, ste5[6], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[7], ste7[4], ste4, mapk[2], ste5[8], loc{c}, T287{u}),Ste5(ste11[6], ste7[5], ste4, mapk[1], ste5[8], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[2], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[1], ste5[7], loc{c}, T287{u}),Ste5(ste11[6], ste7[4], ste4, mapk[0], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[4], ste4, mapk[1], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[4], ste4, mapk[1], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[2], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk, ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[3], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7[4], ste4, mapk[1], ste5[6], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste11(mapk[0], ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[1], ste5[7], loc{c}, T287{u}),Ste5(ste11[6], ste7[4], ste4, mapk[2], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[4], ste4, mapk[2], ste5[7], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[1], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[2], S359_T363{u}),Ste7(ste5[6], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[5], ste4, mapk[4], ste5[8], loc{c}, T287{u}),Ste5(ste11[7], ste7[6], ste4, mapk[3], ste5[8], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk, S359_T363{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[4], ste4, mapk[1], ste5[7], loc{c}, T287{u}),Ste5(ste11[6], ste7, ste4, mapk[2], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7[3], ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk, S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[2], ste4, mapk[0], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[0], S359_T363{u}),Ste7(ste5[6], mapk[4], S359_T363{u}),Ste11(mapk[2], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[7], ste7[6], ste4, mapk[3], ste5[8], loc{c}, T287{u}),Ste5(ste11, ste7[5], ste4, mapk[1], ste5[8], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Fus3(dock[3], T180{u}, Y182{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[3], S359_T363{u}),Ste11(mapk[1], ste5[6], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7, ste4, mapk[4], ste5[8], loc{c}, T287{u}),Ste5(ste11[7], ste7[5], ste4, mapk[2], ste5[8], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[0], ste5[6], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk[1], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste7(ste5[5], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[5], ste4, mapk, ste5[7], loc{c}, T287{u}),Ste5(ste11, ste7[4], ste4, mapk[3], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk, ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[4], ste4, mapk[0], ste5[7], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[3], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[4], ste4, mapk[3], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[1], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[2], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7[4], ste4, mapk[3], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[4], ste4, mapk[3], ste5[7], loc{c}, T287{u}),Ste5(ste11[6], ste7, ste4, mapk[2], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7[3], ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[3], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7, ste4, mapk[0], ste5[7], loc{c}, T287{u}),Ste5(ste11[5], ste7[4], ste4, mapk, ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7[4], ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[3], ste4, mapk, ste5[7], loc{c}, T287{u}),Ste5(ste11[5], ste7[4], ste4, mapk, ste5[7], loc{c}, T287{u})
+%init: 7
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7[2], ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[2], ste4, mapk[0], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[0], S359_T363{u}),Ste11(mapk[2], ste5[6], degradation{u}, S302_S306_S307{u}),Ste11(mapk[3], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7, ste4, mapk[4], ste5[8], loc{c}, T287{u}),Ste5(ste11[7], ste7[5], ste4, mapk[1], ste5[8], loc{c}, T287{u})
+%init: 7
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Fus3(dock[3], T180{u}, Y182{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[4], S359_T363{u}),Ste11(mapk[2], ste5[6], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[5], ste4, mapk[3], ste5[8], loc{c}, T287{u}),Ste5(ste11[7], ste7, ste4, mapk[1], ste5[8], loc{c}, T287{u})
+%init: 6
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[2], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[4], S359_T363{u}),Ste7(ste5[6], mapk[3], S359_T363{u}),Ste11(mapk[0], ste5[7], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[8], degradation{u}, S302_S306_S307{u}),Ste5(ste11[8], ste7[5], ste4, mapk[1], ste5[9], loc{c}, T287{u}),Ste5(ste11[7], ste7[6], ste4, mapk[2], ste5[9], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[5], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[3], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7[4], ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk, ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[1], ste5[7], loc{c}, T287{u}),Ste5(ste11[6], ste7[4], ste4, mapk, ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[2], ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 9
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7[3], ste4, mapk[2], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[6], degradation{u}, S302_S306_S307{u}),Ste11(mapk[4], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[7], ste7, ste4, mapk[2], ste5[8], loc{c}, T287{u}),Ste5(ste11[6], ste7[5], ste4, mapk[3], ste5[8], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk, S359_T363{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[3], ste4, mapk[1], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7[4], ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 6
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[4], ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 5
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[4], ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7[3], ste4, mapk, ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[4], ste4, mapk[3], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[6], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk, S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk, S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[1], ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[4], ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[1], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7[3], ste4, mapk, ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk[2], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[3], ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[4], S359_T363{u}),Ste11(mapk[2], ste5[6], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[5], ste4, mapk[3], ste5[8], loc{c}, T287{u}),Ste5(ste11[7], ste7, ste4, mapk[0], ste5[8], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[1], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7[4], ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7[3], ste4, mapk[1], ste5[5], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7[4], ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7, ste4, mapk[3], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7[4], ste4, mapk[1], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste7(ste5[5], mapk[0], S359_T363{u}),Ste11(mapk, ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[4], ste4, mapk[1], ste5[7], loc{c}, T287{u}),Ste5(ste11, ste7[5], ste4, mapk[2], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7[3], ste4, mapk[1], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[3], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7, ste4, mapk, ste5[7], loc{c}, T287{u}),Ste5(ste11[5], ste7[4], ste4, mapk[1], ste5[7], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[3], ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk, ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[1], ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[5], loc{c}, T287{u})
+%init: 785
+Ste11(mapk, ste5, degradation{u}, S302_S306_S307{u})
+%init: 31
+Ste2(pheromone, gpa1, sst2)
+%init: 12
+Fus3(dock[0], T180{u}, Y182{u}),Ste5(ste11, ste7, ste4, mapk, ste5[1], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[1], loc{c}, T287{u})
+%init: 88
+Fus3(dock[0], T180{u}, Y182{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[2], loc{c}, T287{u})
+%init: 732
+Fus3(dock[0], T180{u}, Y182{u}),Dig1(ste12, mapk[0], activation{u})
+%init: 1180
+Ste2(pheromone, gpa1[0], sst2),Gpa1(ste2[0], ste4, nuc{GDP})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5, loc{c}, T287{p})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 4
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 5
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 6
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[2], loc{c}, T287{u}),Ste5(ste11[1], ste7, ste4, mapk[0], ste5[2], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Fus3(dock[3], T180{u}, Y182{u}),Ste11(mapk[3], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[0], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[2], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 7
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u})
+%init: 31
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 5
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u})
+%init: 32
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 34
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5, loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 4
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 10
+Ste5(ste11, ste7, ste4, mapk, ste5, loc{n}, T287{p})
+%init: 765
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk[0], ste5, degradation{u}, S302_S306_S307{u})
+%init: 2958
+Gpa1(ste2, ste4[0], nuc{GDP}),Ste4(ste5, gpa1[0], state{reg}, ste20)
+%init: 1
+Ste7(ste5[0], mapk, S359_T363{u}),Ste5(ste11, ste7[0], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste11(mapk[3], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[2], ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[5], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[1], ste5[6], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[2], ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[3], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 5
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 5
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[2], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 34
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 20
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[2], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 4
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk[2], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 4
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[2], ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 7
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[2], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[2], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 5
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[2], ste5[4], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste11(mapk[2], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[3], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u})
+%init: 116
+Ste12(mapk[0], dna, dig1[1], dig2),Dig1(ste12[1], mapk, activation{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk[0], ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 2
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 4
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[5], loc{c}, T287{u})
+%init: 4
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 2
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 39
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 33
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 3
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u})
+%init: 32
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5, loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 5
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 4
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 3
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{p}),Ste5(ste11[1], ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[4], loc{c}, T287{p})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5, loc{c}, T287{p})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5, loc{c}, T287{p})
+%init: 2
+Dig2(ste12, mapk, activation{u})
+%init: 149
+Ste2(pheromone, gpa1[0], sst2[1]),Gpa1(ste2[0], ste4, nuc{GDP}),Sst2(ste2[1], mapk, S539{u})
+%init: 55
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Mekp(ste7[1])
+%init: 10
+Fus3(dock[0], T180{u}, Y182{u}),Msg5(mapk[0])
+%init: 115
+Fus3(dock[0], T180{u}, Y182{u}),Ptp(mapk[0])
+%init: 48
+Fus3(dock[0], T180{u}, Y182{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Mekp(ste7[1])
+%init: 2
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk[4], activation{u}),Fus3(dock[4], T180{u}, Y182{u}),Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u})
+%init: 86
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk, activation{u}),Fus3(dock[3], T180{u}, Y182{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 3
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk, activation{u}),Dig2(ste12[2], mapk[3], activation{u}),Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u})
+%init: 332
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk, activation{u}),Dig2(ste12[2], mapk[3], activation{u}),Fus3(dock[3], T180{u}, Y182{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 78
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Fus3(dock[3], T180{u}, Y182{u}),Fus3(dock[4], T180{u}, Y182{u}),Dig2(ste12[2], mapk[4], activation{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 1
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk[4], activation{u}),Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[3], T180{u}, Y182{u}),Kss1(dock[4], T183{u}, Y185{u})
+%init: 4
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk[4], activation{u}),Fus3(dock[4], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 3
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk[4], activation{u}),Fus3(dock[3], T180{u}, Y182{u}),Kss1(dock[4], T183{u}, Y185{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 1
+Ste12(mapk, dna, dig1[0], dig2[1]),Dig1(ste12[0], mapk[2], activation{u}),Dig2(ste12[1], mapk[3], activation{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u})
+%init: 575
+Ste2(pheromone, gpa1[0], sst2[1]),Gpa1(ste2[0], ste4[2], nuc{GDP}),Ste4(ste5, gpa1[2], state{reg}, ste20),Sst2(ste2[1], mapk[3], S539{u}),Fus3(dock[3], T180{u}, Y182{u})
+%init: 1645
+Mekp(ste7)
+%init: 26
+Sst2(ste2, mapk[0], S539{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 1
+Ste2_gene(promoter)
+%init: 34
+Msg5(mapk[0]),Kss1(dock[0], T183{u}, Y185{u})
+%init: 757
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk[0], ste5, degradation{u}, S302_S306_S307{u})
+%init: 108
+Ptp(mapk)
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[3], ste5[6], loc{c}, T287{p}),Ste5(ste11[5], ste7[4], ste4, mapk[0], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Kss1(dock[4], T183{u}, Y185{u}),Ste7(ste5[5], mapk[1], S359_T363{u}),Ste11(mapk[2], ste5[6], degradation{u}, S302_S306_S307{u}),Ste11(mapk[3], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[7], ste7, ste4, mapk[0], ste5[8], loc{c}, T287{u}),Ste5(ste11[6], ste7[5], ste4, mapk[4], ste5[8], loc{c}, T287{p})
+%init: 24
+Sst2(ste2, mapk, S539{u})
+%init: 13
+Fus3(dock, T180{u}, Y182{p})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[3], ste4, mapk[0], ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[5], ste7[3], ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[6], loc{c}, T287{u})
+%init: 5
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[5], loc{c}, T287{u})
+%init: 4
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 7
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5, loc{c}, T287{u})
+%init: 7
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u})
+%init: 7
+Fus3(dock[0], T180{u}, Y182{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7[1], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[2], ste4, mapk[0], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Ste7(ste5[1], mapk, S359_T363{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7[1], ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 1
+Ste7(ste5[0], mapk, S359_T363{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[0], ste4, mapk, ste5[2], loc{c}, T287{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 4
+Kss1(dock[0], T183{u}, Y185{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5, loc{c}, T287{p})
+%init: 2615
+Dig1(ste12, mapk, activation{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5, loc{c}, T287{p})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5, loc{c}, T287{p})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5, loc{c}, T287{p})
+%init: 1
+Ste12_gene(promoter[0]),Ste12(mapk[1], dna[0], dig1[2], dig2),Dig1(ste12[2], mapk, activation{u}),Fus3(dock[1], T180{u}, Y182{u})
+%init: 9
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk, activation{u}),Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u})
+%init: 18
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk, activation{u}),Dig2(ste12[2], mapk[3], activation{u}),Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u})
+%init: 357
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk, activation{u}),Dig2(ste12[2], mapk, activation{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 1
+Ste12(mapk, dna, dig1[0], dig2[1]),Dig1(ste12[0], mapk, activation{u}),Dig2(ste12[1], mapk[2], activation{u}),Kss1(dock[2], T183{u}, Y185{u})
+%init: 1
+Ste12(mapk, dna, dig1[0], dig2[1]),Dig1(ste12[0], mapk[2], activation{u}),Dig2(ste12[1], mapk, activation{u}),Kss1(dock[2], T183{u}, Y185{u})
+%init: 1
+Msg5_gene(promoter)
+%init: 9
+Fus3(dock[0], T180{u}, Y182{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Ste5(ste11, ste7[1], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 6
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste5(ste11, ste7[2], ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 3
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Ste5(ste11, ste7, ste4, mapk, ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7[1], ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 2
+Gpa1(ste2[0], ste4[1], nuc{GDP}),Ste4(ste5, gpa1[1], state{reg}, ste20),Sst2(ste2[2], mapk[3], S539{u}),Ste2(pheromone, gpa1[0], sst2[2]),Fus3(dock[3], T180{u}, Y182{p})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste5(ste11, ste7[3], ste4, mapk[1], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[4], loc{c}, T287{p})
+%init: 62
+Dig1(ste12, mapk[0], activation{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 254
+Fus3(dock[0], T180{u}, Y182{u}),Ste7(ste5, mapk[0], S359_T363{u})
+%init: 127
+Ste2(pheromone, gpa1[0], sst2[1]),Gpa1(ste2[0], ste4, nuc{GDP}),Sst2(ste2[1], mapk[2], S539{u}),Kss1(dock[2], T183{u}, Y185{u})
+%init: 34
+Ste12(mapk[0], dna, dig1[1], dig2),Dig1(ste12[1], mapk[2], activation{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 9
+Kss1(dock[0], T183{u}, Y185{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[1], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[1], loc{c}, T287{u})
+%init: 99
+Kss1(dock[0], T183{u}, Y185{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 5
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[2], loc{c}, T287{u})
+%init: 3162
+Gpa1(ste2, ste4, nuc{GDP})
+%init: 32
+Msg5(mapk)
+%init: 1
+Fus3(dock[0], T180{u}, Y182{p}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5, loc{c}, T287{u})
+%init: 15
+Kss1(dock, T183{u}, Y185{p})
+%init: 4200
+Ste20(ste4)
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{p}),Ste5(ste11, ste7[2], ste4, mapk[1], ste5[3], loc{c}, T287{u})
+%init: 15661
+Kss1(dock, T183{u}, Y185{u})
+%init: 1
+Ste12(mapk[0], dna[1], dig1[2], dig2[3]),Dig1(ste12[2], mapk, activation{u}),Dig2(ste12[3], mapk[4], activation{u}),Ste4_gene(promoter[1]),Fus3(dock[4], T180{u}, Y182{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[2], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[4], loc{c}, T287{p})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{p}),Ste5(ste11[2], ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Fus3(dock[2], T180{u}, Y182{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste11(mapk[3], ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[1], ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[0], ste5[6], loc{c}, T287{p})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{p}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u})
+%init: 684
+Gpa1(ste2[0], ste4[1], nuc{GDP}),Sst2(ste2[2], mapk, S539{u}),Ste2(pheromone, gpa1[0], sst2[2]),Ste4(ste5, gpa1[1], state{reg}, ste20)
+%init: 1
+Ste12(mapk, dna[0], dig1[1], dig2[2]),Dig1(ste12[1], mapk, activation{u}),Dig2(ste12[2], mapk, activation{u}),Fus3_gene(promoter[0])
+%init: 2
+Ste7(ste5[0], mapk, S359_T363{u}),Mekp(ste7[0])
+%init: 130
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Mekkp(ste11[1])
+%init: 15
+Sst2(ste2, mapk[0], S539{u}),Fus3(dock[0], T180{u}, Y182{u})
+%init: 1
+Dig2(ste12, mapk[0], activation{u}),Fus3(dock[0], T180{u}, Y182{u})
+%init: 234
+Ste5(ste11, ste7, ste4, mapk, ste5, loc{n}, T287{u})
+%init: 46
+Ste11(mapk, ste5[0], degradation{u}, S302_S306_S307{u}),Ste5(ste11[0], ste7, ste4, mapk, ste5, loc{c}, T287{u})
+%init: 3
+Ste11(mapk, ste5[0], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[1], loc{c}, T287{u}),Ste5(ste11[0], ste7, ste4, mapk, ste5[1], loc{c}, T287{u})
+%init: 146
+Ste11(mapk, ste5[0], degradation{u}, S302_S306_S307{u}),Mekkp(ste11[0])
+%init: 1
+Sst2(ste2[0], mapk[1], S539{u}),Ste2(pheromone, gpa1, sst2[0]),Fus3(dock[1], T180{u}, Y182{u})
+%init: 2
+Kss1(dock[0], T183{u}, Y185{p}),Ste7(ste5, mapk[0], S359_T363{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{p}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[1], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u})
+%init: 138
+Sst2(ste2[0], mapk[1], S539{u}),Gpa1(ste2[2], ste4, nuc{GDP}),Ste2(pheromone, gpa1[2], sst2[0]),Fus3(dock[1], T180{u}, Y182{u})
+%init: 630
+Ste2(pheromone, gpa1[0], sst2[1]),Gpa1(ste2[0], ste4[2], nuc{GDP}),Ste4(ste5, gpa1[2], state{reg}, ste20),Sst2(ste2[1], mapk[3], S539{u}),Kss1(dock[3], T183{u}, Y185{u})
+%init: 9
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste7(ste5[4], mapk[2], S359_T363{u}),Ste5(ste11, ste7[4], ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7[3], ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste5(ste11, ste7[4], ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7[3], ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste5(ste11, ste7[3], ste4, mapk[2], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste5(ste11, ste7, ste4, mapk[2], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7[3], ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste5(ste11, ste7[3], ste4, mapk[1], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[0], S359_T363{u}),Ste7(ste5[5], mapk[3], S359_T363{u}),Ste5(ste11, ste7[5], ste4, mapk[2], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7[4], ste4, mapk[1], ste5[6], loc{c}, T287{u})
+%init: 8
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste5(ste11, ste7[2], ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 13
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste5(ste11, ste7[2], ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[1], T180{u}, Y182{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste7(ste5[5], mapk[0], S359_T363{u}),Ste5(ste11, ste7[4], ste4, mapk[3], ste5[6], loc{c}, T287{u}),Ste5(ste11, ste7[5], ste4, mapk[2], ste5[6], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7[3], ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste5(ste11, ste7[2], ste4, mapk[1], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[3], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk, S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[1], ste5[5], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[5], loc{c}, T287{u})
+%init: 5
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 10
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7[1], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk, ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[4], loc{c}, T287{u})
+%init: 6
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[1], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7[3], ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 2
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[2], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[3], ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7, ste4, mapk[1], ste5[5], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste11(mapk[0], ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[5], loc{c}, T287{u}),Ste5(ste11[4], ste7[3], ste4, mapk[2], ste5[5], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[1], S359_T363{u}),Ste7(ste5[5], mapk[0], S359_T363{u}),Ste11(mapk, ste5[6], degradation{u}, S302_S306_S307{u}),Ste11(mapk[2], ste5[7], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[5], ste4, mapk[3], ste5[8], loc{c}, T287{u}),Ste5(ste11[7], ste7[4], ste4, mapk, ste5[8], loc{c}, T287{u})
+%init: 2
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7[1], ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste7(ste5[3], mapk[0], S359_T363{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste11(mapk[2], ste5[5], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk, ste5[6], loc{c}, T287{u}),Ste5(ste11[5], ste7[3], ste4, mapk[1], ste5[6], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7[1], ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[3], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Kss1(dock[3], T183{u}, Y185{u}),Ste7(ste5[4], mapk[3], S359_T363{u}),Ste11(mapk, ste5[5], degradation{u}, S302_S306_S307{u}),Ste11(mapk[0], ste5[6], degradation{u}, S302_S306_S307{u}),Ste5(ste11[6], ste7[4], ste4, mapk[2], ste5[7], loc{c}, T287{u}),Ste5(ste11[5], ste7, ste4, mapk[1], ste5[7], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk, S359_T363{u}),Ste11(mapk[0], ste5[3], degradation{u}, S302_S306_S307{u}),Ste5(ste11[3], ste7[2], ste4, mapk[1], ste5, loc{c}, T287{u})
+%init: 1
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[2], loc{c}, T287{p})
+%init: 2
+Fus3(dock[0], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{p}),Ste5(ste11, ste7, ste4, mapk[1], ste5[2], loc{c}, T287{u})
+%init: 15688
+Fus3(dock, T180{u}, Y182{u})
+%init: 5288
+Ste2(pheromone, gpa1[0], sst2),Gpa1(ste2[0], ste4[1], nuc{GDP}),Ste4(ste5, gpa1[1], state{reg}, ste20)
+%init: 1
+Ste12(mapk[0], dna[1], dig1[2], dig2[3]),Dig1(ste12[2], mapk[4], activation{u}),Gpa1_gene(promoter[1]),Dig2(ste12[3], mapk, activation{u}),Fus3(dock[4], T180{u}, Y182{u}),Fus3(dock[0], T180{u}, Y182{u})
+%init: 76
+Ste5(ste11, ste7, ste4, mapk, ste5, loc{c}, T287{u})
+%init: 7
+Ste5(ste11, ste7, ste4, mapk, ste5[0], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[0], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{p}),Ptp(mapk[0])
+%init: 271
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5, mapk[0], S359_T363{u})
+%init: 3
+Sst2(ste2[0], mapk[1], S539{u}),Ste2(pheromone, gpa1, sst2[0]),Kss1(dock[1], T183{u}, Y185{u})
+%init: 1
+Ste12(mapk[0], dna[1], dig1[2], dig2[3]),Dig1(ste12[2], mapk[4], activation{u}),Dig2(ste12[3], mapk[5], activation{u}),Sst2_gene(promoter[1]),Fus3(dock[5], T180{u}, Y182{u}),Kss1(dock[4], T183{u}, Y185{u}),Kss1(dock[0], T183{u}, Y185{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5[1], mapk, S359_T363{u}),Ste5(ste11, ste7[1], ste4, mapk[0], ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 2
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5[1], mapk, S359_T363{u}),Ste5(ste11, ste7[1], ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 8
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[1], S359_T363{u}),Ste5(ste11, ste7[2], ste4, mapk[0], ste5, loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste7(ste5[3], mapk[1], S359_T363{u}),Ste5(ste11, ste7[3], ste4, mapk, ste5[4], loc{c}, T287{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[4], loc{c}, T287{u})
+%init: 14
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Ste5(ste11, ste7[1], ste4, mapk, ste5, loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Ste7(ste5[1], mapk[0], S359_T363{u}),Ste5(ste11, ste7[1], ste4, mapk, ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste7(ste5[2], mapk[0], S359_T363{u}),Ste5(ste11, ste7[2], ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u})
+%init: 4
+Ste12(mapk, dna, dig1[0], dig2),Dig1(ste12[0], mapk[1], activation{u}),Fus3(dock[1], T180{u}, Y182{u})
+%init: 11
+Ste12(mapk[0], dna, dig1[1], dig2),Dig1(ste12[1], mapk[2], activation{u}),Fus3(dock[2], T180{u}, Y182{u}),Fus3(dock[0], T180{u}, Y182{u})
+%init: 25
+Ste12(mapk[0], dna, dig1[1], dig2),Dig1(ste12[1], mapk, activation{u}),Fus3(dock[0], T180{u}, Y182{u})
+%init: 7
+Ste12(mapk, dna, dig1[0], dig2),Dig1(ste12[0], mapk, activation{u})
+%init: 4
+Ste5(ste11, ste7, ste4, mapk, ste5, loc{c}, T287{p})
+%init: 16
+Ste7(ste5, mapk, S359_T363{u})
+%init: 1345
+Mekkp(ste11)
+%init: 3
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk[0], ste5, loc{c}, T287{p})
+%init: 2
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5, loc{c}, T287{p})
+%init: 4
+Gpa1(ste2[0], ste4[1], nuc{GDP}),Ste4(ste5, gpa1[1], state{reg}, ste20),Sst2(ste2[2], mapk[3], S539{u}),Ste2(pheromone, gpa1[0], sst2[2]),Kss1(dock[3], T183{u}, Y185{p})
+%init: 1
+Dig2_gene(promoter[0]),Ste12(mapk[1], dna[0], dig1[2], dig2[3]),Dig1(ste12[2], mapk, activation{u}),Dig2(ste12[3], mapk[4], activation{u}),Fus3(dock[4], T180{u}, Y182{u}),Kss1(dock[1], T183{u}, Y185{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk, ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11[1], ste7, ste4, mapk, ste5[2], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[2], loc{c}, T287{p})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Ste11(mapk[0], ste5[1], degradation{u}, S302_S306_S307{u}),Ste5(ste11, ste7, ste4, mapk, ste5[2], loc{c}, T287{p}),Ste5(ste11[1], ste7, ste4, mapk, ste5[2], loc{c}, T287{u})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Kss1(dock[2], T183{u}, Y185{u}),Ste11(mapk[1], ste5[3], degradation{u}, S302_S306_S307{u}),Ste11(mapk, ste5[4], degradation{u}, S302_S306_S307{u}),Ste5(ste11[4], ste7, ste4, mapk[2], ste5[5], loc{c}, T287{u}),Ste5(ste11[3], ste7, ste4, mapk[0], ste5[5], loc{c}, T287{p})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk[0], ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk, ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[1], ste5[3], loc{c}, T287{p})
+%init: 1
+Kss1(dock[0], T183{u}, Y185{u}),Kss1(dock[1], T183{u}, Y185{u}),Ste11(mapk, ste5[2], degradation{u}, S302_S306_S307{u}),Ste5(ste11[2], ste7, ste4, mapk[1], ste5[3], loc{c}, T287{u}),Ste5(ste11, ste7, ste4, mapk[0], ste5[3], loc{c}, T287{p})
+%init: 3
+Sst2(ste2[0], mapk, S539{u}),Ste2(pheromone, gpa1, sst2[0])
+%init: 13
+Ste12(mapk, dna, dig1[0], dig2[1]),Dig1(ste12[0], mapk[2], activation{u}),Dig2(ste12[1], mapk, activation{u}),Fus3(dock[2], T180{u}, Y182{u})
+%init: 25
+Ste12(mapk, dna, dig1[0], dig2[1]),Dig1(ste12[0], mapk, activation{u}),Dig2(ste12[1], mapk[2], activation{u}),Fus3(dock[2], T180{u}, Y182{u})
+%init: 81
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk, activation{u}),Dig2(ste12[2], mapk, activation{u}),Fus3(dock[0], T180{u}, Y182{u})
+%init: 32
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk[4], activation{u}),Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[3], T180{u}, Y182{u}),Fus3(dock[4], T180{u}, Y182{u})
+%init: 87
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk, activation{u}),Dig2(ste12[2], mapk[3], activation{u}),Fus3(dock[0], T180{u}, Y182{u}),Fus3(dock[3], T180{u}, Y182{u})
+%init: 23
+Ste12(mapk[0], dna, dig1[1], dig2[2]),Dig1(ste12[1], mapk[3], activation{u}),Dig2(ste12[2], mapk, activation{u}),Fus3(dock[3], T180{u}, Y182{u}),Fus3(dock[0], T180{u}, Y182{u})
+%init: 5
+Ste12(mapk, dna, dig1[0], dig2[1]),Dig1(ste12[0], mapk[2], activation{u}),Dig2(ste12[1], mapk[3], activation{u}),Fus3(dock[2], T180{u}, Y182{u}),Fus3(dock[3], T180{u}, Y182{u})
+// End snapshot

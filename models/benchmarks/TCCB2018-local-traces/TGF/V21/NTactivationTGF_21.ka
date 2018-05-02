@@ -1,0 +1,654 @@
+#%def: "displayCompression" "weak"
+
+
+#### Signatures
+%agent: TGFB1(a,b)
+%agent: iterateTGFB1()
+%agent: LAP_TGFB1(x,z,c,d,VLAL,RGD,LSKL)
+%agent: TGFBi(x,y,z,RGD)
+
+%agent: LTBP1(TB,Nter,Cter,hinge,x,y,z)
+%agent: FN1(Nter,Cter,RGD,III1,CBD,NGR,y,z,a,b,c,e)
+%agent: FBN1(WMS,Cter,Nter,Hyb1,RGD,HSBS,PF2)
+%agent: FBLN4(x,y)
+%agent: FBLN1(Cter,z)
+
+%agent: ITGAVB1(x)
+%agent: ITGAVB3(w,x,y,z)
+%agent: ITGAVB5(x)
+%agent: ITGAVB6(x)
+%agent: ITGAVB8(x)
+%agent: ITGA5B1(x)
+%agent: ITGA2B1(x)
+
+%agent: ADAMTS1(x,y,KTFR)
+%agent: ADAMTSL2(x,y)
+%agent: ADAMTSL3(x,y)
+%agent: ADAMTS4(spacer,Cat)
+%agent: ADAMTS10(x)
+%agent: ADAMTSL6(x)
+%agent: ADAM12(x)
+
+%agent: THBS1(WxxW,KRFK,x,z,a,b,c,RGD) # TSP1
+%agent: HS(a,x)
+%agent: COL1(y,z,a,b,c,d)
+%agent: DCN(x,y,z,a,c,core)
+%agent: MAGP1(Cter,x) # MFAP2
+%agent: CD44(x,y)
+
+%agent: BMP1(Cat)
+%agent: MMP2(etat~x~y,Nter,PEX,Cat,CBD) # etatx is for proform and etat y is for mature form
+%agent: MMP9(Cat,a)
+%agent: MMP14(etat~x~y,Cat,a) # MMP14 is also known as transmembrane matrix metalloproteinase-1 (MT1-MMP) [18243766]
+
+%agent: TIMP1(Nter)
+%agent: TIMP2(Nter,Cter)
+%agent: TIMP3(Nter)
+
+
+#### Rules
+
+#Hypothesis:rules leading to release of TGFB1 do not permit de regenerate components that are involved in the activation process. Proteic complexes reponsible for activation of latent-TGF lead to release of TGFB1 and degradation of proteins
+#HYpothesis: rule of association is counterbalanced by rule of dissociation ie ; association (binary rule) A + B -> AB @ k where rate is k[A][B] ; dissociation (unary rule) AB -> A + B @ k where rate is k[AB]. Rate for dissociation is commonly choosen higher than rate for association to compensate the lack of factor in the product. However we can use two rates for dissociation : a lower one for stable structure such as ternary complex and a higher dissociation rate for lesser stable structures
+
+#LAP_TGFB1 binds to LTBP(TB)[15611103]. The 8-Cys3 domain of LTBP1 binds the Small Latent Complex, SLC of TGFbeta [8617200,8939931] 
+'LAP_TGFB1_LTBP1' LAP_TGFB1(x),LTBP1(TB) -> LAP_TGFB1(x!1),LTBP1(TB!1) @ 'high_affinity'
+#'LAP_TGFB1_LTBP1dissociate' LAP_TGFB1(x!1),LTBP1(TB!1) -> LAP_TGFB1(x),LTBP1(TB) @ 'low_affinity'NDA Cette regle de dissociation est a élaborer dans chaque complexe ternaire impliquant ces deux éléments.
+
+# LTBP1 binds to FN1.  FROM [20699357], Interactions have been reported between fibronectin and the N-terminal region of LTBP-1 by ELISA and blot overlay assays [16260650]. However, using solid-phase binding assays, no interactions of full-length LTBP1 or LTBP1 fragments with fibronectin were detected, except in the presence of heparin, which binds a hinge region of LTBP1 [17580303]. 
+'LTBP1_FN1' LTBP1(TB!_,Nter),FN1(y) -> LTBP1(TB!_,Nter!1),FN1(y!1) @ 'normal_affinity'
+'LTBP1_HS' LTBP1(TB!_,hinge),HS(a) -> LTBP1(TB!_,hinge!1),HS(a!1) @ 'normal_affinity'
+'LTBP1_HS_FN1' LTBP1(TB!_,hinge!1, Nter),HS(a!1),FN1(y) -> LTBP1(TB!_,hinge!1, Nter!2),HS(a!1),FN1(y!2) @ 'high_affinity'
+'LTBP1_FN1dissociate' LTBP1(TB!_,Nter!1),FN1(y!1) -> LTBP1(TB!_,Nter),FN1(y) @ 'low_affinity'
+'LTBP1_HSdissociate' LTBP1(TB!_,hinge!1),HS(a!1) -> LTBP1(TB!_,hinge),HS(a) @ 'low_affinity'
+'LTBP1_HS_FN1dissociate' LTBP1(TB!_,hinge!1, Nter!2),HS(a!1),FN1(y!2) -> LTBP1(TB!_,hinge!1, Nter),HS(a!1),FN1(y) @ 'low_affinity'
+
+# LTBP1 binds to fibrillin1. FROM [12429738] the binding site was within three domains of the LTBP1 C terminus, and in fibrillin1 the site was defined within four domains near the N terminus .FROM [20699357]the deposition of LTBP-1-containing LLC is governed by pericellular assembly of fibrillin microfibrils through interactions with heparan sulfate and with microfibril-associated molecules that fine-tune TGFβ sequestration Thus, the cell-surface heparan-sulfate-rich microenvironment is an essential orchestrator of TGFβ sequestration within microfibrils, which also interact with fibronectin during higher-order fibrillogenesis. Full-length LTBP1 bound only weakly to N-terminal pro-fibrillin1, but this association was strongly enhanced by heparin. C-terminal LTBP-1 binds well to the first hybrid domain and subsequent cbEGF domain. The EGF preceding the first hybrid domain influences this interaction, and the PF1Ex5-7 subfragment binds more strongly than does PF1 itself. These data indicate that the fibrillin-1-binding region for LTBP1 must be conformation-dependent.  
+'LTBP1_FBN1' LTBP1(TB!_,Cter),FBN1(Hyb1) -> LTBP1(TB!_,Cter!1),FBN1(Hyb1!1) @ 'low_affinity'
+'LTBP1_HS_FBN1' LTBP1(TB!_,hinge!1, Cter), HS(a!1), FBN1(Hyb1) -> LTBP1(TB!_,hinge!1, Cter!2),HS(a!1),FBN1(Hyb1!2) @ 'high_affinity'
+'LTBP1_FBN1dissociate' LTBP1(TB!_,hinge,Cter!1),FBN1(Hyb1!1) -> LTBP1(TB!_,hinge,Cter),FBN1(Hyb1)  @ 'high_affinity'
+#'LTBP1_HSdissociate' LTBP1(TB!_,hinge!1),HS(a!1) -> LTBP1(TB!_,hinge),HS(a) @ 'low_affinity'NDA règle déjà présente 
+'LTBP1_HS_FBN1dissociate' LTBP1(TB!_,hinge!1, Cter!2),HS(a!1),FBN1(Hyb1!2) -> LTBP1(TB!_,hinge!1, Cter), HS(a!1), FBN1(Hyb1) @ 'low_affinity'
+
+# MAGP1(Cter) alias MFAP2  bound to a region at the Nterminus of fibrillin1 [15039439,11481325,18669635] and inhibits LTBP1 binding to fibrillin1 , the binding of MAGP1 and LTBP1 to fibrillin1 might be mutually exclusive [20699357](Hyb1 must be free to permit MAGP1 binding to FBN1). Note that MAGP1 did not bind immobilized fulllength LTBP1 [20699357]
+'MAGP1_FBN1' MAGP1(Cter),FBN1(Nter,Hyb1) -> MAGP1(Cter!1),FBN1(Nter!1,Hyb1) @ 'normal_affinity'
+'MAGP1_FBN1dissociate' MAGP1(Cter!1),FBN1(Nter!1,Hyb1) -> MAGP1(Cter),FBN1(Nter,Hyb1)  @ 'high_affinity'
+
+# Binding FN1 to ITGA5B1 and fibril formation. FROM [7691819,]alpha 5 beta 1 integrins, the typical fibronectin receptor, not only mediate cell adhesion to fibronectin, but also play an essential role in the assembly of a fibronectin matrix.  FROM [8521488]First, multiple Fn-binding integrins can support matrix assembly; their activation state controls fibrillogenesis. Second, Fn binding to cells expressing an activated integrin is necessary but not sufficient for matrix assembly. Additional “postoccupancy” events involving the integrin β, but not the α subunit, cytoplasmic domain are needed. Third, these postoccupancy events require an intact actin cytoskeleton. FROM [10704455]whereas the vitronectin receptor alpha(v)beta(3) remains within focal contacts, the fibronectin receptor alpha(5)beta(1) translocates from focal contacts into and along extracellular matrix (ECM) contacts. Translocating alpha(5)beta(1)integrins induce initial fibronectin fibrillogenesis by transmitting cytoskeleton-generated tension to extracellular fibronectin molecules. FROM[12857786],FN matrix assembly is a cell-mediated process in which soluble dimeric FN is converted into a fibrillar network. Binding of cell surface integrin receptors to FN converts it to an active form, which promotes fibril formation through interactions with other cell-associated FN dimers. FROM [16567085]the 70-kDa region of fibronectin binds to linearly arrayed cell surface molecules of adherent cells to initiate assembly, display of the arrays is controlled by the integrin that mediates adhesion, and fibronectin-binding integrins promote fibronectin-fibronectin interactions during progression of assembly. FROM [16984808]Fibronectin orchestrates the assembly of ECM. From [18653538]Assembly is initiated by Nterminal fibronectin interactions with the cell surface, which induces α5β1 integrin clustering and translocation from focal contacts into fibrillar adhesions, followed by fibronectin self-association. In addition to α5β1integrin binding to fibronectin's RGD-containing domain, cells must bind with high affinity to fibronectin's amino-terminal 29-kDa matrix assembly domain to form a fibronectin matrix. FROM[7961716, 9446562, 8034677, 8609174]Interaction with integrins is hypothesized to promote extension of FN and thereby facilitate interactions of the N-terminal 70K region with other parts of FN, notably the first type III repeat (III1). Fibronectin matrix assembly is thought to involve binding interactions between N-ter and III1
+# For the dissociation rules of FN1_ITGA5B1_FN1, we include three dissociation rules for ITGA5B1(RGD) and FN1 and three dissociation rules for FN1_FN1 depending on the size of the polymers. 
+'FN1_ITGA5B1' FN1(RGD),ITGA5B1(x) -> FN1(RGD!1),ITGA5B1(x!1)@ 'high_affinity'
+'FN1(RGD)_FN1' FN1(RGD!_, Nter),FN1(III1,Nter) -> FN1(RGD!_, Nter!1),FN1(III1!1, Nter) @ 'high_affinity'
+'FN1(Nter)_FN1(III1)_FN1' FN1(RGD!_,Nter!1),FN1(III1!1, Nter),FN1(III1,Nter) -> FN1(RGD!_,Nter!1),FN1(III1!1, Nter!2),FN1(III1!2,Nter)  @ 'high_affinity'
+
+'FN1_ITGA5B1dissociate1' FN1(RGD!1,Nter),ITGA5B1(x!1) -> FN1(RGD,Nter),ITGA5B1(x) @ 'very_high_affinity'
+'FN1_ITGA5B1dissociate2' FN1(RGD!1,Nter!2),FN1(III1!2,Nter),ITGA5B1(x!1) -> FN1(RGD,Nter!2),FN1(III1!2,Nter),ITGA5B1(x) @ 'high_affinity'
+'FN1_ITGA5B1dissociate3' FN1(RGD!1,Nter!2),FN1(III1!2,Nter!3),FN1(III1!3),ITGA5B1(x!1) -> FN1(RGD,Nter!2),FN1(III1!2,Nter!3),FN1(III1!3),ITGA5B1(x) @ 'low_affinity' 
+'FN1(Nter)_FN1(III1)_FN1dissociate1' FN1(Nter!1),FN1(III1!1, Nter!2),FN1(III1!2) -> FN1(Nter!1),FN1(III1!1,Nter),FN1(III1)  @ 'low_affinity' 
+'FN1(Nter)_FN1(III1)_FN1dissociate2'  FN1(RGD!_,Nter!1),FN1(III1!1, Nter!2),FN1(III1!2,Nter) -> FN1(RGD!_,Nter),FN1(III1, Nter!2),FN1(III1!2,Nter)  @ 'low_affinity'
+'FN1(Nter)_FN1(III1)_FN1dissociate3' FN1(RGD!_,Nter!1),FN1(III1!1,Nter) -> FN1(RGD!_,Nter),FN1(III1,Nter)  @ 'high_affinity'
+
+# FBN1 binds HS leading to FBN1s assembly. FROM [11461921], by using different binding assays, we localize two calcium-independent heparin-binding sites to the N-terminal (Arg(45)-Thr(450)) and C-terminal (Asp(1528)-Arg(2731)) domains of FBN1. Interaction of FBN1 with heparan sulfate containing proteoglycans are necessary to mediate or nucleate FBN1 assembly. (JE DESIGNE CES SITES PAR HSBS dans FBN1). JE NE FORMALISE PAS LES MICROFIBRILLES DE FBN1 MAIS J'IDENTIFE LE COMPLEXE FBN1-HS COMME INDICATEUR FIBRILLES. FROM [16492675] Heparan sulfate negatively modulates TGFB1 responsiveness by decreasing the ratio of TGFB1 binding to TbetaR-II and TbetaR-I, facilitating caveolae/lipid-raft-mediated endocytosis and rapid degradation of TGfB1, thus diminishing non-lipid-raft-mediated endocytosis and signaling of TGFB1 in these epithelial cells (CHO). A GARDER EN MEMOIRE POUR LIER AVEC MODELE INTRACELLULAIRE
+'HS_FBN1(HSB)' HS(x),FBN1(HSBS) -> HS(x!1),FBN1(HSBS!1) @ 'normal_affinity'
+'HS_FBN1(HSB)dissociate' HS(x!1),FBN1(HSBS!1) -> HS(x),FBN1(HSBS) @ 'high_affinity'
+
+# Protein-binding assays demonstrated interactions of fibronectin with a Cterminal region of fibrillin1, fibrillin2, and fibrillin3 (and with an Nterminal region of fibrillin1). The Cterminal of fibrillins interacted strongly with fibronectin as multimers, but not as monomers. Mapping studies revealed that the major binding interaction between fibrillins and fibronectin involves the collagen-gelatin-binding (CBD)region between domains FNI(6) and FNI(9)[19037100]. Note that the collagen region of FN1 is include in Nter domain.
+'FN1_FBN1(Cter)' FN1(RGD!_,Nter!1),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD),FBN1(HSBS!_,Cter) -> FN1(RGD!_,Nter!1),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD!3),FBN1(HSBS!_,Cter!3) @ 'high_affinity'
+'FN1_FBN1(Cter)dissociate' FN1(RGD!_,Nter!1),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD!3),FBN1(HSBS!_,Cter!3) -> FN1(RGD!_,Nter!1),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD),FBN1(HSBS!_,Cter) @ 'low_affinity'
+
+# From [20699357], LLC or LAP_TGFB1_LTBP1 sequestration in the matrix is a poorly understood process. The contextual environment that facilitates this sequestration is proposed to depend on LTBP1 association with fibronectin fibrils and their relocation to fibrillin microfibrils [19525102]. Deposition of a large latent TGFbeta complex (LLC), which contains latent TGFbeta-binding protein 1 (LTBP1), is directly dependent on the pericellular assembly of fibrillin microfibrils, which interact with fibronectin during higher-order fibrillogenesis. NDA:LA COMPLICATION A CE STADE VIENT DE CE QUE FN1 ET FBN1 PEUVENT SE LIER A LTBP1, FN1 ET FBN1 PEUVENT SE POLYMERISER EN FIBRILLES, FBN1 SE LIE AU MULTIMER DE FN1, LE TOUT ETANT FACILITER PAR HS ET FAVORISANT LE STOCKAGE DU LLC.JE PARS DU POSTULAT QUE FN1 ET FBN1 SONT ASSOCIE POUR STOCKER LLC. CE LLC PEUT SE LIER SOIT VIA FN1 site y SOIT VIA FBN1 site Hyb
+'FN1fibril_FBN1_HSfibril_LTBP1_TGFB1' FN1(RGD!_,Nter!1,y),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD!3),FBN1(HSBS!_,Cter!3,Hyb1),LTBP1(TB!_,hinge!_,Nter,Cter) -> FN1(RGD!_,Nter!1,y!4),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD!3),FBN1(HSBS!_,Cter!3,Hyb1!5),LTBP1(TB!_,hinge!_,Nter!4,Cter!5) @ 'very_high_affinity'
+'FN1fibril_FBN1_HSfibril_LTBP1_TGFB1dissociate'  FN1(RGD!_,Nter!1,y!4),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD!3),FBN1(HSBS!_,Cter!3,Hyb1!5),LTBP1(TB!_,hinge!_,Nter!4,Cter!5) -> FN1(RGD!_,Nter!1,y),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD!3),FBN1(HSBS!_,Cter!3,Hyb1),LTBP1(TB!_,hinge!_,Nter,Cter) @ 'very_high_affinity'
+
+# Binding FN1 and ITGAVB3.  From [18653538] although integrin α5β1 is a primary regulator of extracellular fibronectin assembly (16061370), αvβ3 integrin also supports the assembly of short pericellular fibronectin fibrils (17591922).  FROM (17591922)The GNGRG motif in FN-I5 is a novel αvβ3 binding site that can function for FN matrix assembly
+'FN1_ITGAVB3' FN1(NGR),ITGAVB3(y) -> FN1(NGR!1),ITGAVB3(y!1)@ 'normal_affinity'
+'FN1(NGR)_FN1' FN1(NGR!_, Nter),FN1(III1,Nter) -> FN1(NGR!_, Nter!1), FN1(III1!1, Nter) @ 'normal_affinity'
+'FN1_ITGAVB3dissociate' FN1(NGR!1),ITGAVB3(y!1) -> FN1(NGR),ITGAVB3(y) @  'high_affinity'
+'FN1(NGR)_FN1dissociate' FN1(NGR!_, Nter!1),FN1(III1!1, Nter) ->  FN1(NGR!_, Nter), FN1(III1,Nter) @ 'high_affinity'
+
+# Fibulin-2 and -5 were shown to interact with fibrillin-1, and the binding epitopes were mapped to a relatively large N-terminal region of fibrillin-1 [8702639, 15790312]. The first hybrid domain in fibrillin-1 is essential for binding to fibulin-2, -4, and -5 [17255108]. Fibulin 4 (but also fibulin2 and 5) binds to residues contained within EGF3/Hyb1 of fibrillin1 and inhibit the interaction of C-terminal LTBP1 with fibrillin1. Interactions between LTBP-1 and fibrillin-1 compete for interactions between fibrillin-1 and these fibulin [19349279]. At the opposite Massam-Wu et al repport that FBLN4 can strongly bind LTBP1, and can simultaneously bind LTBP1 and fibrillin1. FBLN4 forms a stable ternary complex with full-length LTBP1 and fibrillin1. They conclude that FBN1 binding region for LTBP1 must be conformation-dependent [20699357] ? I keep the negative option
+'FBN1_FBLN4' FBN1(Hyb1),FBLN4(y) -> FBN1(Hyb1!1),FBLN4(y!1) @ 'normal_affinity'
+'FBN1_FBLN4dissociate' FBN1(Hyb1!1),FBLN4(y!1) -> FBN1(Hyb1),FBLN4(y) @ 'high_affinity'
+#'LTBP1_FBLN4' LTBP1(z),FBLN4(x) -> LTBP1(z!1),FBLN(x!1) @ 'high_affinity'
+
+# FBLN1 binds to FN1 . FROM [1400330]Fibulin binds to itself and to the carboxyl-terminal heparin-binding region of fibronectin. .The binding of fibulin to solid-phase FN was estimated to have a Kd of 139 nM, whereas the Kd for self-interaction was 322 nM. Evaluation of proteolytic fragments from all regions of FN allowed a fibulin-binding site to be localized within a 23-kDa heparin-binding fragment containing type III repeats 13-14. Heparin did not compete for the interaction between fibulin and FN, suggesting that the binding sites for fibulin and heparin are distinct.FROM [8354280] fibulin-1 has been shown to bind the extracellular matrix proteins fibronectin (FN),1 nidogen, and laminin
+'FN1_FBLN1' FN1(Cter),FBLN1(z) -> FN1(Cter!1),FBLN1(z!1) @ 'normal_affinity'
+'FN1_FBLN1dissociate'  FN1(Cter!1),FBLN1(z!1) -> FN1(Cter),FBLN1(z) @ 'high_affinity'
+
+# Fibulin binds to itself and to the carboxyl-terminal heparin-binding region of fibronectin. The binding of fibulin to solid-phase FN was estimated to have a Kd of 139 nM, whereas the Kd for self-interaction was 322 nM . Heparin did not compete for the interaction between fibulin and FN, suggesting that the binding sites for fibulin and heparin are distinct.Our results localize a fibulin-binding site in FN1 to a region within repeat IIIln [1400330]. This old paper did not specify what fibulin. Of note from 19349279, fibulin1 do not bind FN1
+#The amino-terminal cryptic site of fibulin-1 may be important for assembly of fibulin-1 into polymers. The self-association site contained within the amino-terminal region of fibulin-1 mediates the interaction involved in the formation of the spider-shaped multimers. [9278415] Such observation is not necessary to the model
+
+# Integrins bind to latentTGFB1. FROM [22025551] six (αvβ1,αvβ3, αvβ5, αvβ6 and αvβ8) of the 24 currently described integrins recognize and bind arginine-glycine-aspartate (RGD) motifs in the latency-associated peptide of both TGF-β1 and TGF-β3. Four of these have been reported to activate TGF-β in vitro, including αvβ6 (10025398), αvβ8 (11970960), αvβ3 (16301681), and αvβ5 (16436664,18086923). Integrin-mediated TGF-β activation has been best characterized for the αvβ6 and the αvβ8 integrins. Activation of TGF-β by the αvβ8 integrin involves MMP14 and proteolytic cleavage of the latent TGF-β molecule [18243766], whereas αvβ3, αvβ5, and αvβ6 integrins activate TGF-β by a mechanism requiring an intact cytoskeleton and cell contraction[10025398,18086923,16710477,19147812]. Activation of TGF-β by αvβ6 integrins is spatially restricted to epithelial cells, whereas αvβ5, and to a lesser extent αvβ3, are present on mesenchymal cells and are able to activate mesenchymal TGF-β [18086923,16142753,19652365]
+
+'LAP_TGFB1_ITGAVB1' LAP_TGFB1(RGD),ITGAVB1(x) -> LAP_TGFB1(RGD!1),ITGAVB1(x!1) @ 'normal_affinity'
+'LAP_TGFB1_ITGAVB1dissociae' LAP_TGFB1(RGD!1),ITGAVB1(x!1) -> LAP_TGFB1(RGD),ITGAVB1(x) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB3' LAP_TGFB1(RGD),ITGAVB3(x) -> LAP_TGFB1(RGD!1),ITGAVB3(x!1) @ 'normal_affinity'
+'LAP_TGFB1_ITGAVB3dissociate' LAP_TGFB1(RGD!1),ITGAVB3(x!1) -> LAP_TGFB1(RGD),ITGAVB3(x) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB5' LAP_TGFB1(RGD),ITGAVB5(x) -> LAP_TGFB1(RGD!1),ITGAVB5(x!1) @ 'normal_affinity'
+'LAP_TGFB1_ITGAVB5dissociate'  LAP_TGFB1(RGD!1),ITGAVB5(x!1)-> LAP_TGFB1(RGD),ITGAVB5(x) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB6' LAP_TGFB1(RGD),ITGAVB6(x) -> LAP_TGFB1(RGD!1),ITGAVB6(x!1) @ 'normal_affinity'
+'LAP_TGFB1_ITGAVB6dissociate' LAP_TGFB1(RGD!1),ITGAVB6(x!1) -> LAP_TGFB1(RGD),ITGAVB6(x) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB8' LAP_TGFB1(RGD),ITGAVB8(x) -> LAP_TGFB1(RGD!1),ITGAVB8(x!1) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB8dissociate' LAP_TGFB1(RGD!1),ITGAVB8(x!1) -> LAP_TGFB1(RGD),ITGAVB8(x) @ 'very_high_affinity'
+
+# FROM [18243766], αvβ8 is expressed in either quiescent cells or cells with a low rate of turnover and is lost in the process of neoplastic transformation. αvβ8 binds with high affinity to the RGD site of recombinant LAP-β1. Upon ligation of αvβ8 with SLC, αvβ8 and MMP14 become closely associated to form a complex on the cell surface and Cell surface-associated MMP14 cleaves  LAP_TGB1. FROM [11970960], αvβ8-mediated TGF-β activation is crucial for vascular and brain developmental and for suppression of adaptive immunity. 
+'LAP_TGFB1_ITGAVB8_MMP14' LAP_TGFB1(RGD!1,c),ITGAVB8(x!1),MMP14(etat~y,Cat) -> LAP_TGFB1(RGD!1,c!2),ITGAVB8(x!1),MMP14(etat~y,Cat!2) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB8_MMP14dissociate' LAP_TGFB1(RGD!1,c!2),ITGAVB8(x!1),MMP14(etat~y,Cat!2) -> LAP_TGFB1(RGD!1,c),ITGAVB8(x!1),MMP14(etat~y,Cat) @ 'low_affinity'
+'LAP_TGFB1_ITGAVB8_MMP14 Activate' LAP_TGFB1(RGD!1,c!2),ITGAVB8(x!1),MMP14(etat~y,Cat!2) -> TGFB1(a,b),iterateTGFB1() @ 'high_affinity'
+
+
+# FROM [10025398], The integrin αVβ6 binds and activates lAP-TGFB1.FROM [15184403],Integrin αVβ6-mediated activation of latent TGF-beta requires the LTBP1. αVβ6-mediated activation requires fixed latent TGF-β. LTBP promotes αVβ6-mediated activation by both concentrating and fixing the latent complex. The LTBP-1–TGF-β complex is incorporated into the ECM and, therefore, when bound by αVβ6, promotes focal adhesion formation, force generation, and release of TGF-β from the latent complex. FROM [16260650] Fibronectin participates in latent TGF-β activation by αvβ6 integrins by binding to a region of the LTBP1 hinge sequence but FROM [17580303] no interactions of full-length LTBP1 or LTBP1 fragments with fibronectin were detected, except in the presence of heparin, which binds a hinge region of LTBP1..
+'LAP_TGFB1_LTBP1_ITGAVB6' LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB6(x) -> LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB6(x!2) @ 'normal_affinity'
+
+# In order to have a ternary complex  stable, the dissociation rule include four rules :  two rules for the dissociation of LAP_TGFB1,LTBP1 which must be strong when LAP-TGFB1 is not associated with ITGAVB6 and weak when LAP-TGFB1 is associated with ITGAVB6_and two rules for the dissociation of ITGAVB6,LAP-TGFB1 which must be strong when LAP-TGFB1 is not associated with LTBP1 and weak when LAP-TGFB1 is associated with LTBP1.  
+'LAP_TGFB1_LTBP1_dissociate' LAP_TGFB1(x!1,RGD),LTBP1(TB!1) -> LAP_TGFB1(x,RGD),LTBP1(TB) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB6_dissociate' LAP_TGFB1(x,RGD!2),ITGAVB6(x!2) ->  LAP_TGFB1(x,RGD),ITGAVB6(x) @ 'high_affinity'
+'LAP_TGFB1(ITGAVB6)_LTBP1_dissociate' LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB6(x!2) -> LAP_TGFB1(x,RGD!2),LTBP1(TB,hinge!_,Nter!_,Cter!_),ITGAVB6(x!2)@ 'low_affinity'
+'LAP_TGFB1_LTBP1_ITGAVB6_dissociate'LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB6(x!2) -> LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB6(x) @ 'low_affinity'
+
+'LAP_TGFB1_LTBP1_ITGAVB6_Activate' LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB6(x!2) -> TGFB1(a,b),iterateTGFB1() @ 'high_affinity'
+
+# FROM [18086923], contraction activation of latent TGF-β1 from the ECM is integrin mediated. The fibroblast integrins that bind to the LLC and are potentially involved in protease-independent latent TGF-β1 activation are αvβ3 [12358597,16301681], α8β1[10854216,12415008]  and αvβ5 [16142753,16436664,16258727-revue]. FROM [12415008], alpha8beta1 binding to LAP-TGFbeta1 increased cell proliferation and phosphorylation of FAK and ERK, but did not activate of TGFbeta1. 
+'LAP_TGFB1_LTBP1_ITGAVB5' LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB5(x) -> LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB5(x!2) @ 'normal_affinity'
+# In order to have a ternary complex  stable, the dissociation rule include four rules :  two rules for the dissociation of LAP_TGFB1,LTBP1 which must be strong when LAP-TGFB1 is not associated with ITGAVB6 and weak when LAP-TGFB1 is associated with ITGAVB5_and two rules for the dissociation of ITGAVB5,LAP-TGFB1 which must be strong when LAP-TGFB1 is not associated with LTBP1 and weak when LAP-TGFB1 is associated with LTBP1.  
+#'LAP_TGFB1_LTBP1_dissociate' LAP_TGFB1(x!1,RGD),LTBP1(TB!1) -> LAP_TGFB1(x),LTBP1(TB) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB5_dissociate' LAP_TGFB1(x,RGD!2),ITGAVB5(x!2) ->  LAP_TGFB1(x,RGD),ITGAVB5(x) @ 'high_affinity'
+'LAP_TGFB1(ITGAVB5)_LTBP1_dissociate' LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB5(x!2) -> LAP_TGFB1(x,RGD!2),LTBP1(TB,hinge!_,Nter!_,Cter!_),ITGAVB5(x!2)@ 'low_affinity'
+'LAP_TGFB1_LTBP1_ITGAVB5_dissociate'LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB5(x!2) -> LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB5(x) @ 'low_affinity'
+
+'LAP_TGFB1_LTBP1_ITGAVB5_Activate' LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB5(x!2) -> TGFB1(a,b),iterateTGFB1() @ 'high_affinity'
+
+'LAP_TGFB1_LTBP1_ITGAVB3' LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB3(x) -> LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB3(x!2) @ 'normal_affinity'
+# In order to have a ternary complex  stable, the dissociation rule include four rules :  two rules for the dissociation of LAP_TGFB1,LTBP1 which must be strong when LAP-TGFB1 is not associated with ITGAVB6 and weak when LAP-TGFB1 is associated with ITGAVB3_and two rules for the dissociation of ITGAVB3,LAP-TGFB1 which must be strong when LAP-TGFB1 is not associated with LTBP1 and weak when LAP-TGFB1 is associated with LTBP1.  
+#'LAP_TGFB1_LTBP1_dissociate' LAP_TGFB1(x!1,RGD),LTBP1(TB!1) -> LAP_TGFB1(x),LTBP1(TB) @ 'high_affinity'
+'LAP_TGFB1_ITGAVB3_dissociate' LAP_TGFB1(x,RGD!2),ITGAVB3(x!2) ->  LAP_TGFB1(x,RGD),ITGAVB3(x) @ 'high_affinity'
+'LAP_TGFB1(ITGAVB3)_LTBP1_dissociate' LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB3(x!2) -> LAP_TGFB1(x,RGD!2),LTBP1(TB,hinge!_,Nter!_,Cter!_),ITGAVB3(x!2)@ 'low_affinity'
+'LAP_TGFB1_LTBP1_ITGAVB3_dissociate'LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB3(x!2) -> LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB3(x) @ 'low_affinity'
+
+
+'LAP_TGFB1_LTBP1_ITGAVB3 Activate' LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB3(x!2) -> TGFB1(a,b),iterateTGFB1() @ 'normal_affinity'
+
+
+# FROM [12807887]Cell adhesion to FBN1 and microfibrils is mediated by α5β1 and αVβ3 integrins. FROM [17158881], Human FBN1, contains TGF-binding protein-like (TB) domains and TB4 contains a flexible RGD loop that mediates cell adhesion via αVβ3 and α5β1 integrins. This study identifies integrin αVβ6 as a novel cellular receptor for fibrillin-1 with a Kd of ∼0.45 μM. Quantitative studies on αVβ3-mediated interactions with FBN1 identified a high affinity interaction (Kd ∼ 0.04 μM). Furthermore, our data suggest α5β1 is a low affinity FBN1 receptor (Kd > 1 μM).LE ROLE DE CES INTERACTIONS DANS LE CONTEXTE DE L'ACTIVATION DU TGF N EST PAS CLAIR ET ELLES VIENNENT EN COMPETITION AVEC LE ROLE DES ITG SE FIXANT SUR RGD DU LAPTGF POUR INDUIRE L ACTIVATION ?? 
+'FBN1_ITGAVB6' FBN1(RGD),ITGAVB6(x) -> FBN1(RGD!1),ITGAVB6(x!1) @ 'normal_affinity' 
+'FBN1_ITGAVB6dissociate' FBN1(RGD!1),ITGAVB6(x!1) -> FBN1(RGD),ITGAVB6(x) @ 'high_affinity'
+'FBN1_ITGAVB3' FBN1(RGD),ITGAVB3(x) -> FBN1(RGD!1),ITGAVB3(x!1) @ 'high_affinity' 
+'FBN1_ITGAVB3dissociate' FBN1(RGD!1),ITGAVB3(x!1) -> FBN1(RGD),ITGAVB3(x)  @ 'low_affinity'
+'FBN1_ITGA5B1' FBN1(RGD),ITGA5B1(x) -> FBN1(RGD!1),ITGA5B1(x!1) @ 'low_affinity' 
+'FBN1_ITGA5B1dissociate' FBN1(RGD!1),ITGA5B1(x!1) -> FBN1(RGD),ITGA5B1(x) @ 'normal_affinity'
+
+# ADAMTSL2 regulates TGF-beta signalling. FROM [18677313],ADAMTSL2 mutations in geleophysic dysplasia demonstrate a role for ADAMTS-like proteins in TGF-beta bioavailability regulation. Yeast two-hybrid screen showed that ADAMTSL2 interacts with LTBP1. Functional studies in HEK293 cells showed that ADAMTSL2 mutations lead to reduced secretion of the mutated proteins.A significant increase in total and active TGF-beta in the culture medium as well as nuclear localization of phosphorylated SMAD2 in fibroblasts from individuals with geleophysic dysplasia 
+'ADAMTSL2_LTBP1' ADAMTSL2(y),LTBP1(TB!_,y) -> ADAMTSL2(y!1),LTBP1(TB!_,y!1) @ 'normal_affinity'
+'ADAMTSL2_LTBP1dissociate' ADAMTSL2(y!1),LTBP1(TB!_,y!1) -> ADAMTSL2(y),LTBP1(TB!_,y) @ 'high_affinity'
+
+# ADAMTSL2 and ADAMTSL3 binds to FBN1. FROM [21683322] a direct interaction between ADAMTSL2 and FBN1 was demonstrated using SPR. Although the fibrillin construct used did not contain TB5 domain, this analysis identified a specific direct interaction (KD = 60 nM= 0.06 μM) between the two proteins. FROM [22242013] Similar to ADAMTSL-6, ADAMTSL-2, -3, and papilin polypeptides interacted with the N-terminal half of fibrillin-1 (the WMS domain), but ADAMTSL-1 did not. FROM [19940141] Surface plasmon resonance analyses demonstrated that ADAMTSL-6beta binds to the N-terminal half of fibrillin-1 with high affinity (Kd= 80 nM) and ADAMTSL6 promotes fibrillin-1 fibril formation.FROM [22242013] a new mutation found in family with  Weill-Marchesani syndrome (WMS)that deletes three domains in fibrillin-1, abolishing a binding site utilized by ADAMTSLIKE-2, -3, -6, and papilin is associated with thick skin, short stature, and brachydactyly when replicated in mice.There is an upregulation of collagen genes in the skin of WMΔ mice and increased Trichrome staining of WMΔ dermis suggested increased TGFβ signaling.In addition, molecular interactions of LTBP1 with both ADAMTSL-2 and ADAMTSL-3 were determined, suggesting that loss of the ADAMTSL binding site in WMΔ mutant mice might render the large latent TGFβ complex more susceptible to activation. However, if activation of TGFβ signaling underlies the dermal fibrosis in WMΔ mutant mice, this activation of signaling did not manifest detectable differences in other conventional TGFβ signaling readouts (e.g., increased α-smooth muscle actin positive cells). It is possible that local changes in the fibrillin microfibril matrix could influence force-dependent activation of latent TGFβ
+'ADAMTSL2_FBN1' ADAMTSL2(x),FBN1(WMS) -> ADAMTSL2(x!1),FBN1(WMS!1) @ 'high_affinity'
+'ADAMTSL2_FBN1dissociate'  ADAMTSL2(x!1),FBN1(WMS!1)-> ADAMTSL2(x),FBN1(WMS) @ 'very_high_affinity'
+'ADAMTSL3_FBN1' ADAMTSL3(x),FBN1(WMS) -> ADAMTSL3(x!1),FBN1(WMS!1) @ 'normal_affinity'
+'ADAMTSL3_FBN1dissociate' ADAMTSL3(x!1),FBN1(WMS!1) -> ADAMTSL3(x),FBN1(WMS) @ 'high_affinity'
+'ADAMTSL3_LTBP1' ADAMTSL3(y),LTBP1(TB!_,y) -> ADAMTSL3(y!1),LTBP1(TB!_,y!1) @ 'normal_affinity'
+'ADAMTSL3_LTBP1dissociate'  ADAMTSL3(y!1),LTBP1(TB!_,y!1) -> ADAMTSL3(y),LTBP1(TB!_,y) @ 'high_affinity'
+'ADAMTSL6_FBN1' ADAMTSL6(x),FBN1(WMS) -> ADAMTSL6(x!1),FBN1(WMS!1) @ 'high_affinity'
+'ADAMTSL6_FBN1dissociate' ADAMTSL6(x!1),FBN1(WMS!1) -> ADAMTSL6(x),FBN1(WMS) @ 'very_high_affinity'
+
+'ADAMTSL2_increasestoringLTBP1_TGF' ADAMTSL2(y!1,x),LTBP1(TB!_,y!1),FBN1(Cter!_,WMS) -> ADAMTSL2(y!1,x!2),LTBP1(TB!_,y!1),FBN1(Cter!_,WMS!2) @ 'very_high_affinity'
+'ADAMTSL2_increasestoringLTBP1_TGFdissociate'  ADAMTSL2(y!1,x!2),LTBP1(TB!_,y!1),FBN1(Cter!_,WMS!2) -> ADAMTSL2(y!1,x),LTBP1(TB!_,y!1),FBN1(Cter!_,WMS) @ 'low_affinity'
+'ADAMTSL3_increasestoringLTBP1_TGF' ADAMTSL3(y!1,x),LTBP1(TB!_,y!1),FBN1(Cter!_,WMS) -> ADAMTSL3(y!1,x!2),LTBP1(TB!_,y!1),FBN1(Cter!_,WMS!2) @ 'very_high_affinity'
+'ADAMTSL3_increasestoringLTBP1_TGFdissociate' ADAMTSL3(y!1,x!2),LTBP1(TB!_,y!1),FBN1(Cter!_,WMS!2) -> ADAMTSL3(y!1,x),LTBP1(TB!_,y!1),FBN1(Cter!_,WMS) @ 'low_affinity'
+
+# ADAMTS10 binds to FBN1. FROM [21402694], ADAMTS10 protein interacts with fibrillin-1 and promotes its deposition in extracellular matrix of cultured fibroblasts.Using ligand affinity blotting and surface plasmon resonance, recombinant ADAMTS10 was found to bind to fibrillin-1 with a high degree of specificity and with high affinity. Two sites of ADAMTS10 binding to fibrillin-1 were identified, one toward the N terminus (SPR for rF11,full N-ter KD= 28nM)and another  in the C-terminal half of fibrillin-1 (SPR for rF6, full Cter no data , for rF36 Kd=72nM). DONC VALIDATION QUE DU Nter AVEC LA MOLECULE ENTIERE. FROM [22242013], using SPR interaction studies, a KD of 450 nM was calculated for the binding of the N-terminal fibrillin-1 polypeptide to the C-terminal end of ADAMTS-10.A ternary complex of ADAMTSL, ADAMTS-10, and fibrillin-1 has been proposed and the proximity of the RGD-containing domain to the ADAMTSL binding site in fibrillin-1 suggests that integrins may cooperate with ADAMTSL proteins and ADAMTS-10 in modulating fibrillin microfibril [19940141,21402694]
+'ADAMTS10_FBN1(Nter)' ADAMTS10(x),FBN1(Nter) -> ADAMTS10(x!1),FBN1(Nter!1) @ 'high_affinity'
+'ADAMTS10_FBN1(Nter)dissociate' ADAMTS10(x!1),FBN1(Nter!1) ->  ADAMTS10(x),FBN1(Nter) @ 'very_high_affinity'
+'ADAMTS10_increasestoringLTBP1_TGF' ADAMTS10(x!1),FBN1(Nter!1,Cter!_,Hyb1),LTBP1(TB!_,Cter) -> ADAMTS10(x!1),FBN1(Nter!1,Cter!_,Hyb1!2),LTBP1(TB!_,Cter!2) @ 'very_high_affinity'
+'ADAMTS10_increasestoringLTBP1_TGFdissociate'  ADAMTS10(x!1),FBN1(Nter!1,Cter!_,Hyb1!2),LTBP1(TB!_,Cter!2) -> ADAMTS10(x!1),FBN1(Nter!1,Cter!_,Hyb1),LTBP1(TB!_,Cter) @ 'normal_affinity'
+#le Cter!_ implique que FBN1 soit lié à FN1 (seul interactant déclaré)
+
+
+# ADAMTSL5 binds to fibrillin-1 and co-localized with fibrillin microfibrils in the extracellular matrix of cultured fibroblasts, but without discernible effect on microfibril assembly[23010571]. Because of the non demonstrated implication in TGF-b storage and release, I do not keep this interaction  
+
+
+# ADAMTS1 binds Fibulin. FROM [16061471], Fibulin-1 acts as a cofactor for the matrix metalloprotease ADAMTS-1. A yeast two-hybrid screen was performed using the carboxyl-terminal region of ADAMTS-1 as bait and fibulin-1 was identified as a potential interacting molecule. The sequence corresponds to the carboxyl-end of fibulin-1D (amino acid residues 476-703), including the two last epidermal growth factor-like elements and the carboxyl-terminal fibulin-type module. Fibulin-1 was found to enhance the capacity of ADAMTS-1 to cleave aggrecan, a proteoglycan known to bind to fibulin-1. We confirmed that fibulin-1 was not a proteolytic substrate for ADAMTS-1. 
+'ADAMTS1_FBLN1' ADAMTS1(x),FBLN1(Cter) -> ADAMTS1(x!1),FBLN1(Cter!1) @ 'normal_affinity'
+'ADAMTS1_FBLN1dissociate'  ADAMTS1(x!1),FBLN1(Cter!1)-> ADAMTS1(x),FBLN1(Cter) @ 'high_affinity'
+
+# ADAMTS1 binds and activates LAP_TGFB1. The THBS1-Containing Domain of ADAMTS1 Mediates Interactions With the Latent Form of TGF-Beta, LAP-TGF-Beta. Similar to thrombospondin/TGF-Beta interactions, ADAMTS1 interacts via its KTFR  with LSKL in the LAP-TGF-Beta [21826695]. Note that even we did not demonstrate LTBP1 requirement, we hypothesize that in the liver fibrosis context (Stellate cells) LAP-TGFB1 is secreted with LTBP1.
+'ADAMTS1_LAP_TGFB1' ADAMTS1(KTFR),LAP_TGFB1(LSKL) -> ADAMTS1(KTFR!1),LAP_TGFB1(LSKL!1) @ 'normal_affinity'
+'ADAMTS1_LAP_TGFB1dissociate' ADAMTS1(KTFR!1),LAP_TGFB1(LSKL!1) -> ADAMTS1(KTFR),LAP_TGFB1(LSKL) @ 'high_affinity'
+'ADAMTS1_LAP_TGFB1_Activate' ADAMTS1(KTFR!1),LAP_TGFB1(LSKL!1) -> TGFB1(a,b),iterateTGFB1() @ 'normal_affinity'
+
+# ADAMTS4 binds FN1. FROM [15161923], ADAMTS4 (aggrecanase-1) interaction with the C-terminal domain of fibronectin inhibits proteolysis of aggrecan. A yeast two-hybrid assay and solid-phase binding assay using wild-type fibronectin and ADAMTS4 and their mutants demonstrated that the C-terminal domain of fibronectin is capable of binding to the C-terminal spacer domain of ADAMTS4.
+'ADAMTS4_FN1' ADAMTS4(spacer),FN1(Cter) -> ADAMTS4(spacer!1),FN1(Cter!1) @ 'normal_affinity'
+'ADAMTS4_FN1dissociate' ADAMTS4(spacer!1),FN1(Cter!1) -> ADAMTS4(spacer),FN1(Cter) @ 'high_affinity'
+
+# MMP dependent activation of LAP-TGFB1. FROM [17015622], We provide in vitro and in vivo evidence that BMP1 cleaves LTBP1 at two specific sites, thus liberating LLC from ECM and resulting in consequent activation of TGFβ1 via cleavage of LAP by non–BMP1-like proteinases. In mouse embryo fibroblasts, LAP cleavage is shown to be predominantly MMP2 dependent.  MMP2 is capable of in vitro cleavage of LAP in small latent complexes (SLC), but MMP2 cleavage of LLC-associated LAP was extremely inefficient, without prior incubation of LLC with BMP1. Thus, in vitro, as in vivo, prior LLC processing by BMP1 greatly facilitates subsequent MMP2 cleavage of LAP. 
+'BMP1_LTBP1-LAP_TGFB1' LAP_TGFB1(x!1),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x),BMP1(Cat) -> LAP_TGFB1(x!1),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x!2),BMP1(Cat!2) @ 'high_affinity'
+'BMP1_LTBP1-LAP_TGFB1dissociate'  LAP_TGFB1(x!1),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x!2),BMP1(Cat!2)-> LAP_TGFB1(x!1),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x),BMP1(Cat) @ 'normal_affinity'
+'BMP1_LTBP1-LAP-TGFB1-MMP2' LAP_TGFB1(x!1,z),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x!2),BMP1(Cat!2), MMP2(etat~y,Cat) -> LAP_TGFB1(x!1,z!3),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x!2),BMP1(Cat!2), MMP2(etat~y,Cat!3) @ 'high_affinity'
+'BMP1_LTBP1-LAP-TGFB1-MMP2dissociate'  LAP_TGFB1(x!1,z!3),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x!2),BMP1(Cat!2), MMP2(etat~y,Cat!3) -> LAP_TGFB1(x!1,z),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x!2),BMP1(Cat!2), MMP2(etat~y,Cat) @ 'normal_affinity'
+'BMP1_LTBP1-LAPT-GFB1-MMP2 Activate' LAP_TGFB1(x!1,z!3),LTBP1(TB!1,Nter!_,Cter!_,hinge!_,x!2),BMP1(Cat!2), MMP2(etat~y,Cat!3) -> TGFB1(a,b),iterateTGFB1() @ 'high_affinity'
+
+# MMP9 and CD44 in activation of latentTGF ? FROM [18243766 revue] MMP2 and MMP9 are both able to cleave the latency associated peptide of TGF-β, releasing active TGF-β (10652271; 17015622). This may be important in osteoblast survival (12226090) and atherosclerosis (16690877). In vitro MMP2 and MMP9 preferentially cleave TGF-β2 and TGF-β3 with little effect on TGF-β1. Furthermore, MMP9 activation of TGF-β is dependent on CD44 in vitro (10652271). Over-expression of MMP2 and MMP9 occurs in caveolin null mice and this gives rise to an invasive breast tumour phenotype associated with increased TGF-β activation (16400031). Mice null for MMP9 (mmp9−/−) mice over-expressing IL13 show a partial reduction in TGF-β1 activity compared with wild type IL-13 transgenic mice, suggesting MMP9 is involved in TGF-β activation in vivo, however this does not rely on the presence of CD44 (11560996). FROM [10652271], CD44 has been shown to act as a docking molecule for MMP9, localizing MMP9 activity to the cell surface. FROM [11935029] CD44KO mice had normal to enhanced levels of latent TGFβ but reduced levels of active TGFβ in broncho-alveolar lavage fluid, suggesting that CD44 may be critical for regulating TGFβ activation. FROM [18397995] CD44KO fibroblasts exhibit a defect in TGFβ activation that translates into a decrease in TGFβ-receptor mediated signaling and the robust activation of TGFβ induced in CD44WT cells in response to wounding was reduced to near background (uninjured) levels in the presence of the MMP inhibitor. 
+# OF NOTE CD44 binds to TGFBR1 with high affinitty [12145287] thereby promoting TGFB1 signaling and CD44 binds also ECM componenents that include laminin, fibronectin and collagen (For review on CD44, see [25081532]).
+
+'CD44_MMP9' CD44(x),MMP9(a) -> CD44(x!1),MMP9(a!1) @ 'normal_affinity'
+'CD44_MMP9dissociate' CD44(x!1),MMP9(a!1) -> CD44(x),MMP9(a) @ 'high_affinity'
+'CD44_MMP9_LAP_TGFB1_LTBP1__FN1_FBN1' LAP_TGFB1(x!1,d),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),CD44(x!2),MMP9(a!2,Cat) -> LAP_TGFB1(x!1,d!3),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),CD44(x!2),MMP9(a!2,Cat!3) @ 'normal_affinity'
+'CD44_MMP9_LAP_TGFB1_LTBP1__FN1_FBN1dissociate' LAP_TGFB1(x!1,d!3),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),CD44(x!2),MMP9(a!2,Cat!3) -> LAP_TGFB1(x!1,d),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),CD44(x!2),MMP9(a!2,Cat) @ 'high_affinity'
+'CD44_MMP9_LAP_TGFB1_LTBP1__FN1_FBN1 Activate' LAP_TGFB1(x!1,d!3),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),CD44(x!2),MMP9(a!2,Cat!3) -> TGFB1(a,b),iterateTGFB1() @ 'high_affinity'
+
+# MMP14 cleaves CD44. FROM [11381077], MT1-MMP acts as a processing enzyme for CD44, releasing it into the medium as a soluble 70-kD fragment. Furthermore, this processing event stimulates cell motility; however, expression of either CD44 or MT1-MMP alone did not stimulate cell motility. FROM [19243022] TGF-beta induces CD44 cleavage that promotes migration of MDA-MB-435s cells through the up-regulation of MT1-MMP
+'CD44_MMP14' CD44(y),MMP14(etat~y,Cat) -> CD44(y!1),MMP14(etat~y,Cat!1) @ 'normal_affinity'
+'CD44_MMP14dissociate' CD44(y!1),MMP14(etat~y,Cat!1) -> CD44(y),MMP14(etat~y,Cat) @ 'high_affinity'
+'CD44_MMP14-cleavage' CD44(y!1),MMP14(etat~y,Cat!1) -> @ 'normal_affinity'
+
+# ADAM12 and αVβ3 integrin in MMP14 activation. FROM [24006261], a ternary protein complex composed of ADAM12, αVβ3 integrin and MMP14 at the tumor cell surface regulates the function of MMP14. Neither the catalytic activity of ADAM12 nor the cytoplasmic tail of ADAM12 were required. We have previously shown that the secreted form of ADAM12 binds αVβ3 integrin on tumor cells [16213489]. Moreover, it is well established that MMP14 associates with αVβ3 integrin at the cell surface, and that the cell surface MMP14 activity can be regulated by αVβ3 integrin [17175151,15260832, 12427871).ADAM12 coimmunoprecipitated with both MMP14 and αVβ3 integrin. A direct or indirect interaction between ADAM12 and MMP14 occurs in the lysate of cells ; however, αVβ3 integrin seems to be the key-player for correct transport of the protein triple complex to the cell surface. FROM [12427871] the biochemical association of MT1-MMP with β1 or αvβ3 integrins was directly assessed by coimmunoprecipitation assays.
+'MMP14,ITGAVB3' MMP14(etat~x,a),ITGAVB3(z) -> MMP14(etat~x,a!1),ITGAVB3(z!1) @ 'normal_affinity'
+'ADAM12,ITGAVB3' ADAM12(x),ITGAVB3(w) -> ADAM12(x!1),ITGAVB3(w!1) @ 'high_affinity'
+'MMP14,ITGAVB3dissociate'  MMP14(etat~x,a!1),ITGAVB3(z!1) -> MMP14(etat~x,a),ITGAVB3(z) @ 'normal_affinity'
+'ADAM12,ITGAVB3dissociate' ADAM12(x!1),ITGAVB3(w!1) -> ADAM12(x),ITGAVB3(w) @ 'high_affinity'
+'MMP14,ADAM12,ITGAVB3' MMP14(etat~x,a!1),ITGAVB3(z!1,w),ADAM12(x) ->  MMP14(etat~x,a!1),ITGAVB3(z!1,w!2),ADAM12(x!2) @ 'normal_affinity'
+'MMP14,ADAM12,ITGAVB3dissociate' MMP14(etat~x,a!1),ITGAVB3(z!1,w!2),ADAM12(x!2) ->  MMP14(etat~x,a!1),ITGAVB3(z!1,w),ADAM12(x) @ 'low_affinity'
+'MMP14 activation' MMP14(etat~x,a!1),ITGAVB3(z!1,w!2),ADAM12(x!2) -> MMP14(etat~y,a) @ 'high_affinity'
+
+# Binding of fibronectin to type I collagen. FROM  [23653354],..it has long been known that FN is crucial for fibroblast attachment to collagen matrices and for organization of collagen type I fibrils. In vitro, however, 6FnI1–2FnII7–9FnI binds strongly to gelatin, the denatured form of collagen, but not to triple-helical collagen fibrils; 6FnI1–2FnII7–9FnI was thus named the “gelatin-binding domain” (GBD). To reconcile the in vitro and cellular findings, it was suggested that the physiological function of the FN-collagen interaction is related to clearance of denatured collagenous material during wound repair and binding of exposed single collagen chains following fiber processing by MMP during tissue growth. However, recent work suggested that the collagen triple helix unfolds locally at physiological temperatures, which suggested the possibility that FN could also interact with unwound collagen in intact fibers. Here result indicates that the GBD does not undergo any major conformational changes upon collagen binding. Rather, we propose that the FN GBD adopts in solution a well defined major conformation, which is capable and ready for functional engagement with collagen. FROM [12145303] collagen deposition is regulated by the cells, both indirectly through integrin alpha(5)beta(1)-dependent polymerization of fibronectin and directly through collagen-binding integrins.FROM [17928541]fibronectin-dependent collagen I deposition regulates the cell migratory response to fibronectin
+'FN1_COL1' FN1(c),COL1(y) -> FN1(c!1),COL1(y!1) @ 'normal_affinity'
+'FN1_COL1dissociate' FN1(c!1),COL1(y!1) -> FN1(c),COL1(y) @ 'high_affinity'
+
+# Binding of alha2Beta1 Integrin to type I collagen. FROM [2156854] the alha2Beta1 Integrin Cell Surface Collagen Receptor Binds to the al(I)-CB3 Peptide of Collagen 
+'ITGA2B1_COL1' ITGA2B1(x),COL1(z) -> ITGA2B1(x!1),COL1(z!1) @ 'normal_affinity'
+'ITGA2B1_COL1dissociate' ITGA2B1(x!1),COL1(z!1) -> ITGA2B1(x),COL1(z) @ 'high_affinity'
+
+# Collagen1 activates pro-MMP2 through activation of integrin beta 1 [1322793,10197640,10421655]
+'COL1_MMP2_ITG_Alpha2Beta1' ITGA2B1(x!1),COL1(z!1,c),MMP2(etat~x,CBD) -> ITGA2B1(x!1),COL1(z!1,c!2),MMP2(etat~x,CBD!2) @ 'normal_affinity'
+'COL1_MMP2_ITG_Alpha2Beta1dissociate'  ITGA2B1(x!1),COL1(z!1,c!2),MMP2(etat~x,CBD!2) -> ITGA2B1(x!1),COL1(z!1,c),MMP2(etat~x,CBD) @ 'low_affinity'
+'MMP2 Activation ' ITGA2B1(x!1),COL1(z!1,c!2),MMP2(etat~x,CBD!2) -> MMP2(etat~y) @ 'high_affinity'
+
+
+
+# Degradation of fibrillin by MMP. FROM [10386589] and [10229672] Cleavage sites for MMP2, MMP9 and MMP14 were identified at the carboxy-terminal end of the recombinant fibrillin. Such cleavage is predicted to disrupt the structure and function of the fibrillin-rich microfibrils.
+'FBN1,MMP2' FBN1(Cter),MMP2(etat~y,Cat) -> FBN1(Cter!1),MMP2(etat~y,Cat!1) @ 'normal_affinity'
+'FBN1,MMP2dissociate' FBN1(Cter!1),MMP2(etat~y,Cat!1) ->  FBN1(Cter),MMP2(etat~y,Cat) @ 'high_affinity'
+'FBN1,MMP2activate' FBN1(Cter!1),MMP2(etat~y,Cat!1) ->  @ 'high_affinity'
+'FBN1,MMP14' FBN1(Cter),MMP14(etat~y,Cat) -> FBN1(Cter!1),MMP14(etat~y,Cat!1) @ 'normal_affinity'
+'FBN1,MMP14dissociate' FBN1(Cter!1),MMP14(etat~y,Cat!1) ->  FBN1(Cter),MMP14(etat~y,Cat) @ 'high_affinity'
+'FBN1,MMP14activate' FBN1(Cter!1),MMP14(etat~y,Cat!1) ->  @ 'high_affinity'
+'FBN1,MMP9' FBN1(Cter),MMP9(Cat) -> FBN1(Cter!1),MMP9(Cat!1) @ 'normal_affinity'
+'FBN1,MMP9dissociate' FBN1(Cter!1),MMP9(Cat!1) -> FBN1(Cter),MMP9(Cat) @ 'high_affinity'
+'FBN1,MMP9activate' FBN1(Cter!1),MMP9(Cat!1) ->  @ 'high_affinity'
+
+# Binding of THBS1 to type I collagen.  FROM [3571333] Binding of thrombospondin (TSP) to types I-V collagen was examined by direct binding assays using 125I-TSP and by visualization of rotary-shadowed intermolecular complexes in the electron microscope. The binding of TSP was highest to type V collagen in the absence of Ca, while lower but significant levels of binding were observed to all other collagen types.
+'THBS1_COL1' THBS1(a),COL1(b) -> THBS1(a!1),COL1(b!1) @ 'low_affinity'
+'THBS1_COL1dissociate' THBS1(a!1),COL1(b!1) -> THBS1(a),COL1(b) @ 'normal_affinity'
+
+# Binding of Decorin to type I collagen [2635760,2496122].  FROM  [25661523]The name decorin originates from its ability to decorate collagen type I fibrils. Decorin has been shown to bind to the d and e bands of type I collagen via its core protein, “decoron,” thereby controlling fibril formation [1449470], [19753304] and [20080181]. 
+'DCN_COL1' DCN(c),COL1(a) -> DCN(c!1),COL1(a!1) @ 'high_affinity'
+'DCN_COL1dissociate'  DCN(c!1),COL1(a!1) -> DCN(c),COL1(a) @ 'very_high_affinity'
+
+# Binding of Decorin  to TGFB1. FROM [2374594] Decorins bind to TGFB1, an autocrine factor that stimulates cell growth. As TGFB1 induces synthesis of decorin in many cell types, decorin may be a component of a feedback system regulating cell growth. FROM [7798269] Scatchard analysis of the binding of 125I-TGF-beta 1 to immobilized decorin purified from osteoblastic MC3T3-E1 cell conditioned medium revealed that there were two specific binding sites with high and low affinities for TGF-beta 1 (Kd = 0.3 and 5 nM, respectively). The addition of decorin along with TGF-beta 1 enhanced the inhibitory effect of TGF-beta 1 on MC3T3-E1 cell proliferation.FROM [8093006] affinity measurements suggest a two-site binding model with Kd values ranging from 1 to 20 nM for a high-affinity binding site and 50 to 200 nM for the lower-affinity binding site. The stoichiometry indicated that the high-affinity binding site was present in one of ten proteoglycan core molecules and that each molecule contained a low-affinity binding site. Latent recombinant TGF-beta 1 precursor bound slightly to fibromodulin and not at all to decorin and biglycan. FROM [9675033] decorin contains independent binding sites for TGFB1 and type I collagen fibrils.The high-affinity binding sites of decorin for type I collagen and TGFB1 are different, whereas lower affinity binding sites could be identical. # FROM [9148753] Recombinant MMP2 digest DCN into seven major fragments. MMP-2 liberate TGF-β1 from the DCN–TGF-β1 complex. No proteolytic degradation of TGF-β1 released from the complex was observed by SDS\PAGE. It may be reasonable to speculate that the released growth factor is functionally active.
+
+'TGFB1(a)_DCN' TGFB1(a),DCN(x) -> TGFB1(a!1),DCN(x!1) @ 'high_affinity'
+'TGFB1(a)_DCNdissociate' TGFB1(a!1),DCN(x!1) -> TGFB1(a),DCN(x) @ 'very_high_affinity'
+'TGFB1(b)_DCN' TGFB1(b),DCN(c) -> TGFB1(b!1),DCN(c!1) @ 'low_affinity'
+'TGFB1(b)_DCNdissociate' TGFB1(b!1),DCN(c!1) -> TGFB1(b),DCN(c) @ 'normal_affinity'
+'DCN_MMP2' DCN(z),MMP2(etat~y,Cat) -> DCN(z!1),MMP2(etat~y,Cat!1) @ 'normal_affinity'
+'DCN_MMP2dissociate' DCN(z!1),MMP2(etat~y,Cat!1) -> DCN(z),MMP2(etat~y,Cat) @ 'high_affinity'
+'TGF_DCN_MMP2' TGFB1(a!1),DCN(x!1,y),MMP2(etat~y,Cat) -> TGFB1(a!1),DCN(x!1,y!2),MMP2(etat~y,Cat!2) @ 'normal_affinity'
+'TGF_DCN_MMP2dissociate' TGFB1(a!1),DCN(x!1,y!2),MMP2(etat~y,Cat!2) -> TGFB1(a!1),DCN(x!1,y),MMP2(etat~y,Cat) @ 'low_affinity'
+'DCN_TGFB1_MMP2activate' TGFB1(a!1),DCN(x!1,y!2),MMP2(etat~y,Cat!2) -> TGFB1(a),iterateTGFB1() @ 'high_affinity'
+
+# Binding of Decorin to fibrillin-1 and MAGP1. FROM [10793130]MAGP1 and fibrillin-1, two protein components of extracellular microfibrils, were shown by immunoprecipitation studies to interact with the chondroitin sulfate proteoglycan decorin in the medium of cultured fetal bovine chondrocytes. Coprecipitation of the proteoglycan from chondroitinase-treated medium indicates that its association with MAGP-1 occurs via the decorin core protein. Immunoprecipitation of truncated fibrillin proteins expressed in Chinese hamster ovary (CHO) cells localized a decorin-binding site to an amino-terminal region of fibrillin-1 near the proline-rich domain.MAGP-1, in contrast, does not bind to NH2-part. Decorin interacted with each protein individually and with both proteins together to form a ternary complex.
+'DCN_MAGP1' DCN(core),MAGP1(x) -> DCN(core!1),MAGP1(x!1) @ 'normal_affinity'
+'DCN_MAGP1dissociate' DCN(core!1),MAGP1(x!1) -> DCN(core),MAGP1(x) @ 'high_affinity'
+'DCN_FBN1' DCN(a),FBN1(Nter) -> DCN(a!1),FBN1(Nter!1) @ 'normal_affinity'
+'DCN_FBN11dissociate' DCN(a!1),FBN1(Nter!1) -> DCN(a),FBN1(Nter) @ 'high_affinity'
+'DCN_FBN1_MGAP1' DCN(core!1),MAGP1(x!1,Cter),FBN1(Nter,Hyb1) -> DCN(core!1),MAGP1(x!1,Cter!2),FBN1(Nter!2,Hyb1) @ 'normal_affinity'
+'DCN_FBN1_MGAP1dissociate' DCN(core!1),MAGP1(x!1,Cter!2),FBN1(Nter!2,Hyb1) -> DCN(core!1),MAGP1(x!1,Cter),FBN1(Nter,Hyb1) @ 'low_affinity'
+#regle déjà décrite ligne74'MAGP1_FBN1' MAGP1(Cter),FBN1(Nter,Hyb1) -> MAGP1(Cter!1),FBN1(Nter!1,Hyb1) @ 'normal_affinity'
+
+# Binding of Decorin to Fibronectin. FROM [1747115], decorin interacts with fibronectin via its core protein. In a solid-phase assay, both high-affinity (KD values between 10 and 20 nM) and low-affinity (KD values between 110 and 130 nM) binding sites were found. 
+'FN1(a)_DCN' FN1(a),DCN(core) -> FN1(a!1),DCN(core!1) @ 'high_affinity'
+'FN1(a)_DCNdissociate' FN1(a!1),DCN(core!1) -> FN1(a),DCN(core) @ 'very_high_affinity'
+'FN1(b)_DCN' FN1(b),DCN(core) -> FN1(b!1),DCN(core!1) @ 'low_affinity'
+'FN1(b)_DCNdissociate' FN1(b!1),DCN(core!1) -> FN1(b),DCN(core) @ 'normal_affinity'
+
+# FROM [22363291], TSP-1 (alias THBS1) can activate latent TGF-β1 in vitro [8349738,7929413) and in vivo [9657149]. Indeed TSP-1 activates recombinant small and large latent TGF-βs even in a cell-free system, and this activation is inhibited by a specific antibody for the amino-terminus of the LAP but not for the COOH terminus of the LAP and the LTBP [7929413]. Thus, TSP-1 binds small latent TGF-β and large latent TGF-β, and this binding interaction is sufficient to generate biologically active TGF-β. The two sequences (GGWSHW and KRFK) located in the type I repeat of TSP-1 comprise the region responsible for binding and activating latent TGF-β, respectively [3045564, 7929414]. In LAP, a sequence LSKL near the amino-terminus plays a pivotal role in the interaction and TSP-1-mediated activation of latent TGF-β, because LSKL peptides competitively inhibit TSP-1- or a KRFK-peptide-mediated latent TGF-β activation [10224129]. Furthermore, mutations of the LSKL sequence in LAP reduce the binding of LAP to the mature TGF-β and induce the impaired ability of LAP to confer latency to mature TGF-β [15208302]. Such a direct interaction between TSP-1 and LAP is supposed to induce a conformational change of LAP in relation to mature TGF-β and thereby presumably unmask the TGF-β receptor binding site that can bind to its receptor [10708953).FROM [5342643]The tryptophan-rich motifs of the thrombospondin type 1 repeats bind VLAL motifs in the latent transforming growth factor-beta complex
+'THBS1_LAP_TGFB1' THBS1(WxxW,KRFK),LAP_TGFB1(VLAL,LSKL) -> THBS1(WxxW!1,KRFK!2),LAP_TGFB1(VLAL!1,LSKL!2) @ 'normal_affinity'
+'THBS1_LAP_TGFB1dissociate' THBS1(WxxW!1,KRFK!2),LAP_TGFB1(VLAL!1,LSKL!2) -> THBS1(WxxW,KRFK),LAP_TGFB1(VLAL,LSKL) @ 'low_affinity'
+'THBS1_LAP_TGFB1 Activate' THBS1(WxxW!1,KRFK!2),LAP_TGFB1(VLAL!1,LSKL!2) -> TGFB1(a,b),iterateTGFB1() @ 'high_affinity'
+'THBS1_LAP_TGFB1_LTBP1_FN1_FBN1' LAP_TGFB1(x!1,VLAL,LSKL),LTBP1(TB!1),THBS1(WxxW,KRFK) -> LAP_TGFB1(x!1,VLAL!2,LSKL!3),LTBP1(TB!1),THBS1(WxxW!2,KRFK!3) @ 'high_affinity'
+'THBS1_LAP_TGFB1_LTBP1_FN1_FBN1dissociate' LAP_TGFB1(x!1,VLAL!2,LSKL!3),LTBP1(TB!1),THBS1(WxxW!2,KRFK!3) -> LAP_TGFB1(x!1,VLAL,LSKL),LTBP1(TB!1),THBS1(WxxW,KRFK) @ 'low_affinity'
+'THBS1_LAP_TGFB1_LTBP1_FN1_FBN1 Activate' LAP_TGFB1(x!1,VLAL!2,LSKL!3),LTBP1(TB!1),THBS1(WxxW!2,KRFK!3) -> TGFB1(a,b),iterateTGFB1() @ 'high_affinity'
+
+
+# Binding of Decorin to Thrombospondin. FROM [1468447] Using a solid phase assay, intact DCN as well as its glycosaminoglycan-free core protein exhibits with KD values of about 5 nM and 2 nM, respectively, high affinity binding to thrombospondin. The addition of decorin or of its glycosaminoglycan-free core protein led to a considerable delay of cell attachment on a thrombospondin substrate. FROM [1550960], 125I-TGF-beta binds to purified TSP in an interaction that is specific in the sense that bound TGF-beta could be displaced by TGF-depleted TSP but not significantly by native TSP, heparin, decorin, alpha 2-macroglobulin, fibronectin, or albumin. Conclusion:DCN and TGFB1 have different binding sites on THBS1.
+'THBS1_DCN' THBS1(x),DCN(core) -> THBS1(x!1),DCN(core!1) @ 'high_affinity'
+'THBS1_DCNdissociate' THBS1(x!1),DCN(core!1) -> THBS1(x),DCN(core) @ 'very_high_affinity'
+
+# Binding of Thrombospondin to MMP2 and MMP9 [10900205,11606713] Using yeast two-hybrid system MMP2 has been shown to interact with the thrombospondins 1 (TSP1) and 2 (TSP2) properdin-like type 1 repeats (TSR).TSR interacted with the NH(2)-terminal region of the MMP2 that contains the catalytic domain. but Neither TSP1 nor TSP2 was degraded by MMP2 in vitro.Tissue culture and in vitro assays demonstrated that the presence of purified TSR and intact THBS1 resulted in inhibition of MMP activity. The ability of THBS1 to inhibit MMP3-dependent activation of pro-MMP9 and thrombin-induced activation of pro-MMP2 suggests that the TSPs may inhibit MMP activity by preventing activation of the MMP2 and MMP9 
+'MMP2_THBS1' MMP2(etat~x,Cat),THBS1(z) -> MMP2(etat~x,Cat!1),THBS1(z!1) @ 'normal_affinity'
+'MMP2_THBS1dissociate'  MMP2(etat~x,Cat!1),THBS1(z!1)-> MMP2(etat~x,Cat),THBS1(z) @ 'high_affinity'
+'MMP9_THBS1' MMP9(Cat),THBS1(z) -> MMP9(Cat!1),THBS1(z!1) @ 'normal_affinity'
+'MMP9_THBS1dissociate' MMP9(Cat!1),THBS1(z!1) -> MMP9(Cat),THBS1(z) @ 'high_affinity'
+
+# ADAMTS1 cleaves Thrombospondin [17082774]
+'ADAMTS1_THBS1' ADAMTS1(y),THBS1(b) -> ADAMTS1(y!1),THBS1(b!1) @ 'normal_affinity'
+'ADAMTS1_THBS1dissociate' ADAMTS1(y!1),THBS1(b!1) -> ADAMTS1(y),THBS1(b) @ 'high_affinity'
+'Degradation of THBS1 by ADAMTS1' ADAMTS1(y!1),THBS1(b!1) ->  @ 'high_affinity'
+
+# Binding of FBN1 to Thrombospondin. FROM [19755719], Using cell culture models, we defined primary and secondary elastic fiber interaction networks by identifying molecular interactions with the elastic fiber molecules fibrillin-1, MAGP1, fibulin-5, and lysyl oxidase.PF2 fragment from fibrillin-1 bound to endogenous fibrillin-1, IGFBP3, βigH3 (TGFBi), stanniocalcin-2, PAI-1, perlecan, thrombospondin-1, and LOXL.
+'THBS1_FBN1' THBS1(c),FBN1(PF2) -> THBS1(c!1),FBN1(PF2!1) @ 'low_affinity'
+'THBS1_FBN1dissociate' THBS1(c!1),FBN1(PF2!1) -> THBS1(c),FBN1(PF2) @ 'normal_affinity'
+
+# Binding of ITGAVB3 to Thrombospondin . FROM [14963009],TSP-1 has previously been shown to ligate the integrin heterodimers αIIbβ3, αvβ3 [2848850], α3β1 [10446179], α4β1, α5β1, and α6β4 [2475502]. NDA: CE ROLE N EST PAS CLAIR DANS LE CONTEXTE DE L ACTIVATION DU TGF. JE METS DE COTE
+#'THBS1_ITGAVB3' THBS1(RGD),ITGAVB3(x) -> THBS1(RGD!1),ITGAVB3(x!1) @ 'normal_affinity'
+
+# Binding and activation of MMP2. FROM model [21980344]; proMMP2 is activated on the cell surface through the formation of a ternary complex of active MT1-MMP and TIMP2 bound to proMMP2.  Apperance of MMP14 at the cell surface is followed by binding of stochiometric concentration of TIMP2 to the catalytic site of MMP14. Pro-MMP2 then binds to the C-ter of TIMP2 and is cleaved and activated by a second MMP14. TIMP2 paradox: this inhibitor of both MT1-MMP and MMP2 activity is also required for pro-MMP2 activation leading to MMP2 formation at low concentration. FROM [8663332] Analysis of the rate of binding of TIMPs to the catalytic domain of MT1-MMP using kinetic methods showed that TIMP-1 is an extremely poor inhibitor of MT1-MMP. In comparison, TIMP-2 and TIMP-3 are excellent inhibitors, binding more rapidly to the catalytic domain of MT1-MMP than to the catalytic domain of gelatinase A. NDA:L INHIBITION D ACTIVITE DES MMP PAR LES TIMPS SE TRADUIT PAR UNE MISE EN COMPETITION DU SITE CATALYTIQUE ENTRE TIMP ET LES SUBSTRATS. 
+'MMP14(etat~x)_TIMP2' MMP14(etat~x,Cat),TIMP2(Nter,Cter) -> MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter) @ 'k'
+'MMP14(etat~x)_TIMP2dissociate' MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter) -> MMP14(etat~x,Cat),TIMP2(Nter,Cter) @ 'k'
+'MMP14_TIMP2_MMP2' MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter),MMP2(etat~x,PEX) -> MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2) @ 'k'
+'MMP14_TIMP2_MMP2dissociate' MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2) -> MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter),MMP2(etat~x,PEX) @ 'kd'
+'MMP14_TIMP2_MMP2-MMP14' MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2,Nter),MMP14(etat~y,Cat) -> MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2,Nter!3),MMP14(etat~y,Cat!3)  @ 'k'
+'MMP14_TIMP2_MMP2-MMP14dissociate' MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2,Nter!3),MMP14(etat~y,Cat!3) -> MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2,Nter),MMP14(etat~y,Cat) @ 'kd'
+'Activation MMP2' MMP14(etat~x,Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2,Nter!3),MMP14(etat~y,Cat!3) -> MMP2(etat~y) @ 'k'
+
+# Inhibition of MMP2, MMP14 activities by high concentration, TIMP2. FROM [9368077] the CTD of MMP2 contains the high affinity binding site, whereas the catalytic domain contains the low affinity site. 
+'TIMP2_MMP2(etat~y)' TIMP2(Nter),MMP2(etat~y,Cat) -> TIMP2(Nter!1),MMP2(etat~y,Cat!1) @ 'l' 
+'TIMP2_MMP2(etat~y)dissociate' TIMP2(Nter!1),MMP2(etat~y,Cat!1) -> TIMP2(Nter),MMP2(etat~y,Cat) @ 'l'
+'TIMP2_MMP14(etat~y)' TIMP2(Nter),MMP14(etat~y,Cat) -> TIMP2(Nter!1),MMP14(etat~y,Cat!1) @ 'l'
+'TIMP2_MMP14(etat~y)dissociate' TIMP2(Nter!1),MMP14(etat~y,Cat!1) -> TIMP2(Nter),MMP14(etat~y,Cat) @ 'l'
+
+# Inhibition of MMP2, MMP9 and 14 activity by TIMP3 (From Review [20080133]).
+'TIMP3_MMP14(etat~y)' TIMP3(Nter),MMP14(etat~y,Cat) -> TIMP3(Nter!1),MMP14(etat~y,Cat!1) @ 'normal_affinity' 
+'TIMP3_MMP14(etat~y)dissociate' TIMP3(Nter!1),MMP14(etat~y,Cat!1) -> TIMP3(Nter),MMP14(etat~y,Cat) @ 'high_affinity'
+'TIMP3_MMP2(etat~y)' TIMP3(Nter),MMP2(etat~y,Cat) -> TIMP3(Nter!1),MMP2(etat~y,Cat!1) @ 'normal_affinity' 
+'TIMP3_MMP2(etat~y)dissociate' TIMP3(Nter!1),MMP2(etat~y,Cat!1) -> TIMP3(Nter),MMP2(etat~y,Cat) @ 'high_affinity' 
+'TIMP3_MMP9' TIMP3(Nter),MMP9(Cat) -> TIMP3(Nter!1),MMP9(Cat!1) @ 'normal_affinity' 
+'TIMP3_MMP9dissociate' TIMP3(Nter!1),MMP9(Cat!1) -> TIMP3(Nter),MMP9(Cat) @ 'high_affinity'  
+
+# Inhibition of MMP2 and MMP9 activity by TIMP1 
+'TIMP1_MMP2' TIMP1(Nter),MMP2(etat~y,Cat) -> TIMP1(Nter!1),MMP2(etat~y,Cat!1) @ 'low_affinity' 
+'TIMP1_MMP2dissociate' TIMP1(Nter!1),MMP2(etat~y,Cat!1) -> TIMP1(Nter),MMP2(etat~y,Cat) @ 'low_affinity' 
+'TIMP1_MMP9' TIMP1(Nter),MMP9(Cat) -> TIMP1(Nter!1),MMP9(Cat!1) @ 'high_affinity'
+'TIMP1_MMP9dissociate' TIMP1(Nter!1),MMP9(Cat!1) -> TIMP1(Nter),MMP9(Cat) @ 'very_high_affinity'
+
+# Inhibition of ADAMTS-4  by TIMP3. FROM [19643179], Our Ki values for TIMP3 inhibition of ADAMTS4 (Ki = 0.1–0.7 nM) are in agreement with that reported by Kashiwagi et al. (11278243), although higher values of 4–8 nM have been reported in other studies (11311239 and 17470431).
+'ADAMTS4_TIMP3' ADAMTS4(Cat), TIMP3(Nter) -> ADAMTS4(Cat!1), TIMP3(Nter!1) @ 'normal_affinity' 
+'ADAMTS4_TIMP3dissociate'  ADAMTS4(Cat!1),TIMP3(Nter!1)-> ADAMTS4(Cat), TIMP3(Nter) @ 'high_affinity' 
+
+# Degradation of type 1 Collagen by MMP14.FROM [8999957]MT1-MMP alias MMP14 is an extracellular matrix-degrading enzyme sharing the substrate specificity with interstitial collagenases.
+'MMP14_COL1' MMP14(etat~y,Cat),COL1(d) -> MMP14(etat~y,Cat!1),COL1(d!1) @ 'normal_affinity'
+'MMP14_COL1dissociate' MMP14(etat~y,Cat!1),COL1(d!1) -> MMP14(etat~y,Cat),COL1(d) @ 'high_affinity'
+'Degradation of COL1 by MMP14' MMP14(etat~y,Cat!1),COL1(d!1) -> @ 'high_affinity'
+
+# Binding-degradation of type I collagen  by MMP9 and MMP2. FROM [23085623] MMP2 and MMP9 primarily utilize a unique collagen binding domain (CBD) consisting of three in-tandem fibronectin-like type II modules inserted into the catalytic domain for positioning collagen [1313021, 8120015,7744795] substrate molecules. Domain deletion of the CBD in MMP2 attenuated cleavage of gelatin (denatured collagen) by 90percent (8120015). Among those MMPs which most efficiently cleave the interstitial triple-helical collagens, MMP1, MMP8, MMP13, and MMP14, the hemopexin-like (PEX) C-terminal domain has been shown to contribute mostly as an exosite [1315762]. Whereas PEX is not critical for gelatin cleavage, additional studies point to contributions of both CBD and PEX during MMP2 cleavage of native type I collagen [11513874]. FROM [17298441 and 7890717]MMP9 and MP2, are able to cleave collagens I in its native form and in a manner that is characteristic of the unique collagenolytic activity of MMP collagenases. BUT BUT BUT FROM [11368514], purified MMP2 binds but does not cleave intact type I collagen.These data provide biochemical evidence that MMP2 exosite interactions with type I collagen may function in the posttranslational control of MMP2 activity by reducing the rate of autolytic inactivation.CONCLUSION, proMMP2 binds Type I collagen leading to stabilization (when MMP2 is active, it degrades substrates and itself) but does not degrade native type I collagen.NDA:COMME LE SITE CBD EST DANS LE SITE CATALYTIQUE, JE NE GARDE QUE LE SITE CAT (LES AUTRES SUBSTRATS SONT EN COMPETITION POUR CE SITE). D AUTRE PART LE ROLE DE MMP2 N EST PAS CLAIR: SON ASSOCIATION AU COLLAGENE EST DEMONTRE MAIS SON ACTIVITE CATALYSTIQUE SUR CELUI CI, EST CONTREVERSEE. DE PLUS SON AUTOCATALYSE N A JAMAIS ETE DEMONTRE IN VIVO DONC JE PREFERE NE PAS IMPLIQUER MMP2 DANS LA DEGRADATION DE COLLAGENE 1 ET JE N INCLU PAS DE REGLE POUR DECRIRE SON AUTOCATALYSE. 
+
+'MMP9_COL1' MMP9(Cat),COL1(c) -> MMP9(Cat!1),COL1(c!1) @ 'normal_affinity'
+'MMP9_COL1dissociate' MMP9(Cat!1),COL1(c!1) -> MMP9(Cat),COL1(c) @ 'high_affinity'
+'Degradation of COL1 by MMP9' MMP9(Cat!1),COL1(c!1) -> @ 'high_affinity'
+
+# Binding-degradation of fibronectin  by MMP9 and MMP2. FROM [9054449]In context of FN cleavage, it was demonstrated that the carboxyl-terminal hemopexin-like domain of MMP2 (PEX) is essential for binding of FN. FROM [20932906]The carboxyl-terminal hemopexin-like domain (PEX) of MMP2 was shown to possess critical exodomain properties required for the interactions of MMP2 with FN, and FN was cleaved at a significantly reduced rate by an MMP2 variant with deletion of PEX. FROM [23201304] MMP2 and MMP9 cleave fibronectin and contribute to cell migration by eliminating the surrounding ECM and basement membrane barriers. FROM [18039280]fibronectin avidly binds MMP2, MMP9 or MMP13  which are involved in fibronectin degradation of rat lung granulomatous fibrosis caused by Angiostrongylus cantonensis.FROM [18340378]The initial steps of ovarian cancer cell metastasis are mediated by MMP-2 cleavage of vitronectin and fibronectin. FROM [22159414], MT1-MMP regulates the turnover and endocytosis of extracellular matrix fibronectin.
+
+'MMP9_FN1' MMP9(Cat),FN1(e) -> MMP9(Cat!1),FN1(e!1) @ 'normal_affinity'
+'MMP9_FN1dissociate' MMP9(Cat!1),FN1(e!1) -> MMP9(Cat),FN1(e) @ 'high_affinity'
+'MMP2_FN1' MMP2(etat~y,Cat!_,PEX),FN1(e) -> MMP2(etat~y,Cat!_,PEX!1),FN1(e!1) @ 'normal_affinity'
+'MMP2_FN1dissociate' MMP2(etat~y,Cat!_,PEX!1),FN1(e!1) -> MMP2(etat~y,Cat!_,PEX),FN1(e) @ 'high_affinity'
+'MMP14_FN1' MMP14(etat~y,Cat),FN1(e) -> MMP14(etat~y,Cat!1),FN1(e!1) @ 'normal_affinity'
+'MMP14_FN1dissociate' MMP14(etat~y,Cat!1),FN1(e!1) -> MMP2(etat~y,Cat),FN1(e) @ 'high_affinity'
+'Degradation of FN1 by MMP9' MMP9(Cat!1),FN1(e!1) -> @ 'very_high_affinity'
+'Degradation of FN1 by MMP2' MMP2(etat~y,Cat!_,PEX!1),FN1(e!1) -> @ 'very_high_affinity'
+'Degradation of FN1 by MMP14' MMP14(etat~y,Cat!1),FN1(e!1) -> @ 'very_high_affinity'
+
+
+# TGFBi binds to ITGAVB3. FROM [23792174] TGFBI, a transforming growth factor β-induced extracellular matrix protein, circulates at a level of ~300ng/ml in humans and modulates several integrin-mediated cellular functions. The protein contains an N-terminal EMI domain, four consecutive FAS1 domains, and the RGD motif. Each FAS1 domain and the RGD motif have been known to interact with avb3 integrin. Here, we found that the binding affinity (Kd) of TGFBI for αvβ3 integrin was approximately 3.8×10(-8)M, a value ~2300-fold higher than that of a single FAS1 domain. FROM [12270930]Identification of motifs in the fasciclin domains of the transforming growth factor-beta-induced matrix protein betaig-h3 that interact with the alphavbeta5 integrin.NDA:IL N EXISTE PAS DE LIENS CLAIRS ENTRE TGFBi ET L ACTIVATION DU TGFbeta. JE PREFERE L'ECARTER CAR IL RENTRE EN COMPETITION AVEC D AUTRES ACTEURS
+#'TGFBi_ITGAVB3' TGFBi(RGD),ITGAVB3(x) -> TGFBi(RGD!1),ITGAVB3(x!1) @ 'high_affinity'
+#TGFBi binds to ITGAVB5 by RGD_A VERIFIER
+#'TGFBi_ITGAVB5' TGFBi(RGD),ITGAVB5(x) -> TGFBi(RGD!1),ITGAVB5(x!1) @ 'normal_affinity'
+
+# TGFBi binds to COL1, FN1, FBN1 FROM [17659994, review), TGFBI in both the native and recombinant form can bind to type I, II and IV collagens [9061001]. Similarly, Billings et al. [12034705] showed interactions of purified TGFBIp with fibronectin and type I collagen: collagen/gelatin domains in the N-terminal region of fibronectin mediated this interaction. Moreover, TGFBI mutations that commonly occur in certain corneal dystrophies do not apparently affect its binding to type I collagen, fibronectin and laminin or to forming fibrillar structures [11867580]. 
+#'TGFBi_COL1' TGFBi(x),COL1(c) -> TGFBi(x!1),COL1(c!1) @ 'normal_affinity'
+#'TGFBi_FN1' TGFBi(y),FN1(z) -> TGFBi(y!1),FN1(z!1) @ 'normal_affinity'
+#'TGFBi_FBN1' TGFBi(z),FBN1(y) -> TGFBi(z!1),FBN1(y!1) @ 'normal_affinity'
+
+
+####Different scenario to select before stimulation 
+#'Scenario1 Gene expression to make proteins' TGFB1(a,b) -> LAP_TGFB1(),LTBP1(),FN1(),FBN1(),FBLN1(),FBLN4(),COL1(),DCN(),ITGAVB1(),ITGAVB3(),ITGAVB5(),ITGAVB6(),ITGAVB8(),ITGA5B1(),ITGA2B1(),ADAMTS1(),ADAMTSL2(),ADAMTS4(),ADAMTS10(),ADAMTSL6(),THBS1(),MAGP1(),HS(),MMP2(),MMP9(),MMP14(),TIMP1(),TIMP2(),TIMP3() @ 10000
+
+#'Scenario2 Gene expression to make proteins A549 cells' TGFB1(a,b) -> LAP_TGFB1(),LAP_TGFB1(),LTBP1(),LTBP1(),FN1(),FN1(),FN1(),FBN1(),CD44(),COL1(),COL1(),COL1(),COL1(),ITGAVB1(),ITGAVB3(),ITGAVB5(),ITGAVB6(),ITGAVB6(),ITGAVB6(),ITGAVB6(),ITGAVB6(),ITGA5B1(),ITGA5B1(),ITGA2B1(),ITGA2B1(),ITGA2B1(),ITGA2B1(),THBS1(),THBS1(),THBS1(),THBS1(),THBS1(),HS(),MMP2(),MMP2(),MMP9(),MMP9(),TIMP2(),TIMP2(),TIMP3(),TIMP3() @ 10000
+
+'Scenario3 Gene expression to make proteins' TGFB1(a,b) -> LAP_TGFB1(),LTBP1(),BMP1(),FN1(),FN1(),FBN1(),CD44(), COL1(),COL1(),COL1(),ITGAVB1(),ITGAVB1(),ITGAVB1(),ITGAVB3(),ITGAVB3(),ITGAVB3(),ITGAVB5(),ITGAVB5(),ITGAVB5(),ITGAVB6(),ITGAVB6(),ITGAVB6(),ITGAVB6(),ITGAVB8(),ITGA5B1(),ITGA5B1(),ITGA2B1(),THBS1(),THBS1(),HS(),HS(),HS(),ADAM12(),ADAM12(),MMP14(),MMP2(),MMP2(),MMP2(),MMP2(),MMP9(),MMP9(),TIMP1(),TIMP2(),TIMP3(),TIMP3(),TIMP3() @ 10000
+
+
+#### Variables 
+%var: 'normal_affinity' 0.0001
+%var: 'low_affinity' 0.000001
+%var: 'high_affinity' 0.01
+%var: 'very_high_affinity' 0.1
+%var: 'kon'0.01
+%var: 'koff'0
+%var: 'lon'0.001
+%var: 'loff'0
+%var: 'k'0.01
+%var: 'l''loff'
+%var: 'kd'0.001
+%var: 'kdon'0.001
+%var: 'kdoff'0
+
+#### Perturbation
+%mod: [true] do $TRACK 'TGFB1' [true]
+#%mod: repeat ([E+]=50) do $ADD 10 TGFB1() until [false]
+%mod: repeat 'TIMP2'>500 do ($UPDATE 'k''koff'; $UPDATE 'l''lon' ; $UPDATE 'kd''kdoff') until [false]
+%mod: repeat 'TIMP2'<500 do ($UPDATE 'k''kon' ; $UPDATE 'l''loff' ; $UPDATE 'kd''kdon') until [false]
+
+%mod: [true] do $FLUX "flux.dot" [true]
+%var: 'fluxmap_interval' 5
+%var: 'tick' 0
+%mod: repeat [T] > 'tick' && 'tick' > 'fluxmap_interval' - 1 do $FLUX "flux_".'tick' - 'fluxmap_interval'.".json" [false] until [false]
+%mod: repeat [T] > 'tick' do $FLUX "flux_".'tick'.".json" [true]; $UPDATE 'tick' 'tick' + 1 until 'tick' + 'fluxmap_interval' > [Tmax]
+%mod: repeat [T] > 'tick' do $UPDATE 'tick' 'tick' + 1 until [false]
+
+#### Observables
+%obs:'LAP_TGFB1_LTBP1_cpt' |LAP_TGFB1(x),LTBP1(TB)|
+%obs:'LTBP1_FN1_cpt' |LTBP1(TB!_,Nter),FN1(y)|
+%obs:'LTBP1_HS_cpt' |LTBP1(TB!_,hinge),HS(a)| 
+%obs:'LTBP1_HS_FN1_cpt' |LTBP1(TB!_,hinge!1, Nter),HS(a!1),FN1(y)|
+%obs:'LTBP1_FBN1_cpt' |LTBP1(TB!_,Cter),FBN1(Hyb1)| 
+%obs:'LTBP1_HS_FBN1_cpt' |LTBP1(TB!_,hinge!1, Cter),HS(a!1),FBN1(Hyb1)|
+%obs:'MAGP1_FBN1_cpt' |MAGP1(Cter),FBN1(Nter,Hyb1)| 
+%obs:'HS_FBN1(HSB)_cpt' |HS(x),FBN1(HSBS)|
+%obs:'FN1_FBN1(Cter)_cpt' |FN1(RGD!_,Nter!1),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD),FBN1(HSBS!_,Cter)|
+%obs:'FN1fibril_FBN1_HSfibril_LTBP1_TGFB1_cpt' |FN1(RGD!_,Nter!1),FN1(III1!1, Nter!2),FN1(III1!2,Nter,CBD!3),FBN1(HSBS!_,Cter!3),LTBP1(TB!_,hinge!_,Nter,Cter)|
+%obs:'FN1_ITGA5B1_cpt' |FN1(RGD),ITGA5B1(x)| 
+%obs:'FN1(RGD)_FN1_cpt' |FN1(RGD!_, Nter),FN1(III1,Nter)| 
+%obs:'FN1(Nter)_FN1(III1)_FN1_cpt' |FN1(Nter!1),FN1(III1!1, Nter),FN1(III1,Nter)|
+%obs:'FN1_ITGAVB3_cpt' |FN1(NGR),ITGAVB3(x)| 
+%obs:'FN1(NGR)_FN1_cpt' |FN1(NGR!_, Nter), FN1(III1,Nter)|
+%obs:'FBN1_FBLN4_cpt' |FBN1(Hyb1),FBLN4(y)|  
+%obs:'FN1_FBLN1_cpt' |FN1(Cter),FBLN1(z)| 
+%obs:'LAP_TGFB1_ITGAVB1_cpt' |LAP_TGFB1(RGD),ITGAVB1(x)| 
+%obs:'LAP_TGFB1_ITGAVB3_cpt' |LAP_TGFB1(RGD),ITGAVB3(x)| 
+%obs:'LAP_TGFB1_ITGAVB5_cpt' |LAP_TGFB1(RGD),ITGAVB5(x)| 
+%obs:'LAP_TGFB1_ITGAVB6_cpt' |LAP_TGFB1(RGD),ITGAVB6(x)| 
+%obs:'LAP_TGFB1_ITGAVB8_cpt' |LAP_TGFB1(RGD),ITGAVB8(x)| 
+%obs:'LAP_TGFB1_ITGAVB8_MMP14_cpt' |LAP_TGFB1(RGD!1,c),ITGAVB8(x!1),MMP14(Cat)| 
+%obs:'LAP_TGFB1_ITGAVB8_MMP14_Activ' |LAP_TGFB1(RGD!1,c!2),ITGAVB8(x!1),MMP14(Cat!2)| 
+%obs:'LAP_TGFB1_LTBP1_FN1_FBN1_ITGAVB6_cpt' |LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB6(x)| 
+%obs:'LAP_TGFB1_LTBP1_FN1_FBN1_ITGAVB6_Activ' |LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB6(x!2)| 
+%obs:'LAP_TGFB1_LTBP1_FN1_FBN1_ITGAVB5_cpt' |LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB5(x)|
+%obs:'LAP_TGFB1_LTBP1_FN1_FBN1_ITGAVB5_Activ' |LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB5(x!2)|
+%obs:'LAP_TGFB1_LTBP1_FN1_FBN1_ITGAVB3_cpt' |LAP_TGFB1(x!1,RGD),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB3(x)|
+%obs:'LAP_TGFB1_LTBP1_FN1_FBN1_ITGAVB3_Activ' |LAP_TGFB1(x!1,RGD!2),LTBP1(TB!1,hinge!_,Nter!_,Cter!_),ITGAVB3(x!2)| 
+%obs:'ADAMTSL2_LTBP1_cpt' |ADAMTSL2(y),LTBP1(y)| 
+%obs:'ADAMTSL2_FBN1_cpt' |ADAMTSL2(x),FBN1(WMS)| 
+%obs:'ADAMTSL3_FBN1_cpt' |ADAMTSL3(x),FBN1(WMS)| 
+%obs:'ADAMTSL3_LTBP1_cpt' |ADAMTSL3(y),LTBP1(y)| 
+%obs:'ADAMTSL6_FBN1_cpt' |ADAMTSL6(x),FBN1(WMS)| 
+%obs:'ADAMTSL2_increasestoringLTBP1_TGF_cpt' |ADAMTSL2(y!1),LTBP1(y!1,TB!_),FBN1(Cter!_,WMS)| 
+%obs:'ADAMTSL3_increasestoringLTBP1_TGF_cpt' |ADAMTSL3(y!1),LTBP1(y!1,TB!_),FBN1(Cter!_,WMS)|
+%obs:'ADAMTS10_FBN1(Nter)_cpt' |ADAMTS10(x),FBN1(Nter)| 
+%obs:'ADAMTS10_increasestoringLTBP1_TGF_cpt' |ADAMTS10(x!1),FBN1(Nter!1,Cter!_,Hyb1),LTBP1(TB!_,Cter)| 
+%obs:'ADAMTS1_FBLN1_cpt' |ADAMTS1(x),FBLN1(Cter)| 
+%obs:'ADAMTS1_LAP_TGFB1_cpt' |ADAMTS1(KTFR),LAP_TGFB1(LSKL)|
+%obs:'ADAMTS1_LAP_TGFB1_LTBP1_FN1_FBN1_Activ' |LTBP1(TB!1,Nter!_,Cter!_),ADAMTS1(KTFR!2),LAP_TGFB1(LSKL!2,x!1)|
+%obs:'ADAMTS1_LAP_TGFB1_LTBP1_FN1_FBN1_FBLN1 Activ' |LTBP1(TB!1,Nter!_,Cter!_),ADAMTS1(KTFR!2,x!3),LAP_TGFB1(LSKL!2,x!1),FBLN1(Cter!3)|
+%obs:'ADAMTS4_FN1_cpt' |ADAMTS4(spacer),FN1(Cter)|
+%obs:'BMP1_LTBP1-LAP_cpt' |LAP_TGFB1(x!1),LTBP1(TB!1,x),BMP1(Cat)| 
+%obs:'BMP1_LTBP1-LAP-MMP2_cpt' |LAP_TGFB1(x!1,z),LTBP1(TB!1,x!2),BMP1(Cat!2),MMP2(Cat)| 
+%obs:'BMP1_LTBP1-LAP-MMP2_Activ' |LAP_TGFB1(x!1,z!3),LTBP1(TB!1,x!2),BMP1(Cat!2),MMP2(Cat!3)| 
+%obs:'CD44_MMP9_cpt' |CD44(x),MMP9(a)| 
+%obs:'CD44_MMP9_LAP_TGFB1_LTBP1__FN1_FBN1_Activ' |LTBP1(TB!1,Nter!_,Cter!_),CD44(x!2),MMP9(a!2),LAP_TGFB1(x!1)|
+%obs:'CD44_MMP14_cpt' |CD44(x),MMP14(Cat)| 
+%obs:'CD44_MMP14-cleavage_cpt' |CD44(x!1),MMP14(Cat!1)| 
+%obs:'FN1_COL1_cpt' |FN1(c),COL1(y)| 
+%obs:'ITGA2B1_COL1_cpt' |ITGA2B1(x),COL1(z)| 
+%obs:'COL1_MMP2_ITG_Alpha2Beta1_Activ_MMP2' |ITGA2B1(x!1),COL1(z!1,c),MMP2(etat~x,CBD)| 
+%obs:'Activation of MMP2_cpt' |ITGA2B1(x!1),COL1(z!1,c!2),MMP2(etat~x,CBD!2)| 
+%obs:'THBS1_COL1_cpt' |THBS1(a),COL1(b)|  
+%obs:'DCN_COL1_cpt' |DCN(c),COL1(a)| 
+
+%obs:'TGFB1(a)_DCN_cpt' |TGFB1(a),DCN(x)|
+%obs:'TGFB1(b)_DCN_cpt' |TGFB1(b),DCN(c)|
+%obs:'DCN_MMP2_cpt' |DCN(z),MMP2(Cat)| 
+%obs:'Relase of TGFB1 from DCN_TGFB1_MMP2_Activ' |TGFB1(a!1),DCN(x!1,y!2),MMP2(Cat!2)|
+%obs:'DCN_MAGP1_cpt' |DCN(a),MAGP1(x)|
+%obs:'DCN_FBN1_MGAP1_cpt' |DCN(a!1),MAGP1(x!1,Cter),FBN1(Nter,Hyb1)| 
+%obs:'FN1(a)_DCN_cpt' |FN1(a),DCN(core)| 
+%obs:'FN1(b)_DCN_cpt' |FN1(b),DCN(core)| 
+%obs:'THBS1_LAP_TGFB1_cpt' |THBS1(WxxW,KRFK),LAP_TGFB1(VLAL,LSKL)| 
+%obs:'THBS1_LAP_TGFB1_Activ' |THBS1(WxxW!1,KRFK!2),LAP_TGFB1(VLAL!1,LSKL!2)| 
+%obs:'THBS1_LAP_TGFB1_LTBP1_FN1_FBN1_Activ' |LTBP1(TB!1,Nter!_,Cter!_),THBS1(WxxW!2,KRFK!3),LAP_TGFB1(VLAL!2,LSKL!3,x!1)| 
+%obs:'THBS1_DCN_cpt' |THBS1(x),DCN(core)| 
+%obs:'MMP9_THBS1_cpt' |MMP9(Cat),THBS1(z)| 
+%obs:'ADAMTS1_THBS1_cpt' |ADAMTS1(y),THBS1(b)| 
+%obs:'Degradation of THBS1 by ADAMTS1_cpt' |ADAMTS1(y!1),THBS1(b!1)| 
+%obs:'THBS1_FBN1_cpt' |THBS1(c),FBN1(PF2)| 
+#%obs:'THBS1_ITGAVB3_cpt' |THBS1(RGD),ITGAVB3(x)| 
+%obs:'MMP14_TIMP2_cpt' |MMP14(Cat),TIMP2(Nter,Cter)|
+%obs:'MMP14_TIMP2_MMP2_cpt' |MMP14(Cat!1),TIMP2(Nter!1,Cter),MMP2(etat~x,PEX)| 
+%obs:'MMP14_TIMP2_MMP2-MMP14_cpt' |MMP14(Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2,Nter),MMP14(Cat)| 
+%obs:'Activation MMP2_cpt' |MMP14(Cat!1),TIMP2(Nter!1,Cter!2),MMP2(etat~x,PEX!2,Nter!3),MMP14(Cat!3)| 
+%obs:'TIMP2_MMP2(etat~y)_cpt' |TIMP2(Nter),MMP2(etat~y,Cat)| 
+%obs:'TIMP2_MMP14_cpt' |TIMP2(Nter),MMP14(etat~y,Cat)| 
+%obs:'TIMP3_MMP14_cpt' |TIMP3(Nter),MMP14(etat~y,Cat)| 
+%obs:'TIMP1_MMP2_cpt' |TIMP1(Nter),MMP2(etat~y,Cat)| 
+%obs:'TIMP1_MMP9_cpt' |TIMP1(Nter),MMP9(Cat)| 
+%obs:'ADAMTS4_TIMP3_cpt' |ADAMTS4(Cat), TIMP3(Nter)| 
+%obs:'MMP14_COL1_cpt' |MMP14(etat~y,Cat),COL1(z)| 
+%obs:'Degradation of COL1 by MMP14_cpt' |MMP14(etat~y,Cat!1),COL1(z!1)| 
+%obs:'MMP9_COL1_cpt' |MMP9(Cat),COL1(c)|  
+%obs:'Degradation of COL1 by MMP9_cpt' |MMP9(Cat!1),COL1(c!1)| 
+%obs:'MMP9_FN1_cpt' |MMP9(Cat),FN1(e)| 
+%obs:'MMP2_FN1_cpt' |MMP2(etat~y,Cat!_,PEX),FN1(e)| 
+%obs:'MMP14_FN1_cpt' |MMP14(etat~y,Cat),FN1(e)| 
+%obs:'Degradation of FN1 by MMP9_cpt' |MMP9(Cat!1),FN1(e!1)| 
+%obs:'Degradation of FN1 by MMP2_cpt' |MMP2(etat~y,Cat!_,PEX!1),FN1(e!1)|
+%obs:'Degradation of FN1 by MMP14_cpt' |MMP14(etat~y,Cat!1),FN1(e!1)| 
+%obs: 'TGFB1' |iterateTGFB1()|
+#%obs: 'TGFBi' |TGFBi()|
+%obs: 'ADAMTS1' |ADAMTS1()|
+%obs: 'ADAMTS10' |ADAMTS10()|
+%obs: 'ADAMTSL2' |ADAMTSL2()|
+%obs: 'ADAMTSL3' |ADAMTSL3()|
+%obs: 'ADAMTS4' |ADAMTS4()|
+%obs: 'ADAMTSL6' |ADAMTSL6()|
+%obs: 'FBLN1' |FBLN1()|
+%obs: 'FBLN4' |FBLN4()|
+%obs: 'FBN1' |FBN1()|
+%obs: 'FN1' |FN1()|
+%obs: 'HS' |HS()|
+%obs: 'ITGAVB1' |ITGAVB1()|
+%obs: 'ITGAVB3' |ITGAVB3()|
+%obs: 'ITGAVB5' |ITGAVB5()|
+%obs: 'ITGAVB6' |ITGAVB6()|
+%obs: 'ITGAVB8' |ITGAVB8()|
+%obs: 'ITGA5B1' |ITGA5B1()|
+%obs: 'ITGA2B1' |ITGA2B1()|
+%obs: 'LAP_TGFB1' |LAP_TGFB1()|
+%obs: 'LTBP1' |LTBP1()|
+%obs: 'MMP14' |MMP14()|
+%obs: 'MMP9' |MMP9()|
+%obs: 'MMP2' |MMP2()|
+%obs: 'THBS1' |THBS1()|
+%obs: 'TIMP1' |TIMP1()|
+%obs: 'TIMP2' |TIMP2()|
+%obs: 'TIMP3' |TIMP3()|
+%obs: 'CD44' |CD44()|
+
+
+#### Initial conditions 
+#donnees PAXdb integrated liver (sauf TGFB1)
+#%init: 0       TGFB1()
+# %init: 0.45     LAP_TGFB1()
+#%init: 52.9      TGFBi()
+#%init: 1.09      LTBP1()
+#%init: 110       FN1()
+#%init: 32        FBN1()
+#%init: 36.6      FBLN1()
+#%init: 0         FBLN4()
+#%init: 64.1      ITGAVB1()
+#%init: 5.23      ITGAVB3()
+#%init: 0         ITGAVB5()
+#%init: 3.72      ITGAVB6()
+#%init: 0         ITGAVB8()
+#%init: 19.9      ITGA5B1()
+#%init: 7.30      ITGA2B1()
+#%init: 6.94      ADAMTS1()
+#%init: 2.11      ADAMTSL2()
+#%init: a verifier         ADAMTSL3()
+#%init: 1.23      ADAMTS4()
+#%init: 0         ADAMTS10()
+#%init: 0.O1      ADAMTSL6()
+#%init: a verifier      ADAMTSL12()
+#%init: 9.66      THBS1()
+#%init: 100        HS()          
+#%init: 250       COL1()
+#%init: 58.6      DCN()
+#%init: 1.09      MAGP1()
+#%init: 0.13      MMP2()
+#%init: 6.15      MMP9()
+#%init: 0.44      MMP14()
+#%init: 0.36      TIMP1()
+#%init: 0         TIMP2()
+#%init: 0.08      TIMP3()
+#%init: 8.54	 CD44()
+
+#### Initial conditions 
+#SATURATION
+%init: 100       TGFB1()
+%init: 100     LAP_TGFB1()
+%init: 100      TGFBi()
+%init: 100     LTBP1()
+%init: 100       FN1()
+%init: 100      FBN1()
+%init: 100    FBLN1()
+%init: 100       FBLN4()
+%init: 100       ITGAVB1()
+%init: 100       ITGAVB3()
+%init: 100         ITGAVB5()
+%init: 100       ITGAVB6()
+%init: 100          ITGAVB8()
+%init: 100       ITGA5B1()
+%init: 100       ITGA2B1()
+%init: 100      ADAMTS1()
+%init: 100      ADAMTSL2()
+%init: 100     ADAMTSL3()
+%init: 100      ADAMTS4()
+%init: 100        ADAMTS10()
+%init: 100       ADAMTSL6()
+%init: 100 	ADAM12()
+%init: 100       THBS1()
+%init: 100         HS()          
+%init: 100        COL1()
+%init: 100       DCN()
+%init: 100       MAGP1()
+%init: 100       MMP2()
+%init: 100       MMP9()
+%init: 100       MMP14()
+%init: 100       TIMP1()
+%init: 100         TIMP2()
+%init: 100       TIMP3()
+%init: 100 	 CD44()
+
+
+
+
+
+

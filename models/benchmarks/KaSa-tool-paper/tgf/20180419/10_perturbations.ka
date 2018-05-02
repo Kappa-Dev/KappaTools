@@ -1,0 +1,20 @@
+
+%var: 'TIMP2' |TIMP2()|
+%var: 'MMP2' |MMP2()|
+%mod: ('TIMP2' > (2*'MMP2')) do
+$UPDATE 'k_un' 'koff_un';
+$UPDATE 'l_un' 'lon_un';
+$UPDATE 'kd_un' 'kdoff_un';
+$UPDATE 'k_bin' 'koff_bin';
+$UPDATE 'l_bin' 'lon_bin';
+$UPDATE 'kd_bin' 'kdoff_un';
+repeat ('TIMP2' > (2*'MMP2'))
+
+%mod: 'TIMP2' < (2*'MMP2') do
+$UPDATE 'k_un' 'kon_un';
+$UPDATE 'l_un' 'loff_un';
+$UPDATE 'kd_un''kdon_un';
+$UPDATE 'k_bin' 'kon_bin'*slow;
+$UPDATE 'l_bin' 'loff_bin';
+$UPDATE 'kd_bin' 'kdon_bin';
+repeat ('TIMP2' < (2*'MMP2'))

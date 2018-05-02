@@ -1,0 +1,282 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot  100  # Constant
+    2 kKS   0.01  # Constant
+    3 kdKS  1.0  # Constant
+    4 kpS   0.1  # Constant
+    5 kPS   0.001  # Constant
+    6 kdPS  0.1  # Constant
+    7 kuS   0.01  # Constant
+end parameters
+begin species
+    1 K(s) Stot
+    2 P(s) Stot
+    3 S(x~u,x~u,x~u,x~u,x~u) Stot
+    4 K(s!1).S(x~u!1,x~u,x~u,x~u,x~u) 0
+    5 K(s!1).K(s!2).S(x~u!2,x~u!1,x~u,x~u,x~u) 0
+    6 S(x~p,x~u,x~u,x~u,x~u) 0
+    7 K(s!1).K(s!2).K(s!3).S(x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+    8 K(s!1).S(x~p,x~u!1,x~u,x~u,x~u) 0
+    9 P(s!1).S(x~p!1,x~u,x~u,x~u,x~u) 0
+   10 K(s!1).K(s!2).K(s!3).K(s!4).S(x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   11 K(s!1).K(s!2).S(x~p,x~u!2,x~u!1,x~u,x~u) 0
+   12 K(s!1).P(s!2).S(x~p!2,x~u!1,x~u,x~u,x~u) 0
+   13 S(x~p,x~p,x~u,x~u,x~u) 0
+   14 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   15 K(s!1).K(s!2).K(s!3).S(x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+   16 K(s!1).K(s!2).P(s!3).S(x~p!3,x~u!2,x~u!1,x~u,x~u) 0
+   17 K(s!1).S(x~p,x~p,x~u!1,x~u,x~u) 0
+   18 P(s!1).S(x~p!1,x~p,x~u,x~u,x~u) 0
+   19 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   20 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   21 K(s!1).K(s!2).S(x~p,x~p,x~u!2,x~u!1,x~u) 0
+   22 K(s!1).P(s!2).S(x~p!2,x~p,x~u!1,x~u,x~u) 0
+   23 S(x~p,x~p,x~p,x~u,x~u) 0
+   24 P(s!1).P(s!2).S(x~p!2,x~p!1,x~u,x~u,x~u) 0
+   25 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   26 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+   27 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~u!2,x~u!1,x~u) 0
+   28 K(s!1).S(x~p,x~p,x~p,x~u!1,x~u) 0
+   29 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~u!1,x~u,x~u) 0
+   30 P(s!1).S(x~p!1,x~p,x~p,x~u,x~u) 0
+   31 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~u!3,x~u!2,x~u!1) 0
+   32 K(s!1).K(s!2).S(x~p,x~p,x~p,x~u!2,x~u!1) 0
+   33 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~u!2,x~u!1,x~u) 0
+   34 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~u!1,x~u) 0
+   35 S(x~p,x~p,x~p,x~p,x~u) 0
+   36 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~u,x~u) 0
+   37 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~u!3,x~u!2,x~u!1) 0
+   38 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~u!2,x~u!1) 0
+   39 K(s!1).S(x~p,x~p,x~p,x~p,x~u!1) 0
+   40 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~u!1,x~u) 0
+   41 P(s!1).S(x~p!1,x~p,x~p,x~p,x~u) 0
+   42 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~u,x~u) 0
+   43 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~u!2,x~u!1) 0
+   44 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~u!1) 0
+   45 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~u!1,x~u) 0
+   46 S(x~p,x~p,x~p,x~p,x~p) 0
+   47 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~u) 0
+   48 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~u!2,x~u!1) 0
+   49 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~u!1) 0
+   50 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p) 0
+   51 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~u) 0
+   52 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~u!1) 0
+   53 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p) 0
+   54 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~u) 0
+   55 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~u!1) 0
+   56 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p) 0
+   57 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p) 0
+   58 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1) 0
+end species
+begin reactions
+    1 1,3 4 25*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17
+    2 1,4 5 20*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17
+    3 4 1,3 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+    4 4 1,6 5*kpS #_R2,_R6,_R10,_R14,_R18
+    5 1,5 7 15*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17
+    6 1,6 8 20*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17
+    7 5 1,4 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+    8 5 1,8 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+    9 2,6 9 5*kPS #_R3,_R7,_R11,_R15,_R19
+   10 1,7 10 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+   11 1,8 11 15*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17
+   12 1,9 12 20*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17
+   13 7 1,5 15*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17
+   14 8 1,6 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+   15 7 1,11 15*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18
+   16 8 1,13 5*kpS #_R2,_R6,_R10,_R14,_R18
+   17 2,8 12 5*kPS #_R3,_R7,_R11,_R15,_R19
+   18 9 2,6 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   19 9 2,3 5*kuS #_R4,_R8,_R12,_R16,_R20
+   20 1,10 14 5*kKS #_R1,_R5,_R9,_R13,_R17
+   21 1,11 15 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+   22 1,12 16 15*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17
+   23 1,13 17 15*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17
+   24 10 1,7 20*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17
+   25 11 1,8 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+   26 12 1,9 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+   27 10 1,15 20*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18
+   28 11 1,17 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+   29 12 1,18 5*kpS #_R2,_R6,_R10,_R14,_R18
+   30 2,11 16 5*kPS #_R3,_R7,_R11,_R15,_R19
+   31 2,13 18 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+   32 12 2,8 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   33 12 2,4 5*kuS #_R4,_R8,_R12,_R16,_R20
+   34 1,15 19 5*kKS #_R1,_R5,_R9,_R13,_R17
+   35 1,16 20 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+   36 1,17 21 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+   37 1,18 22 15*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17
+   38 14 1,10 25*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17
+   39 15 1,11 15*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17
+   40 16 1,12 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+   41 17 1,13 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+   42 14 1,19 25*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18
+   43 15 1,21 15*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18
+   44 16 1,22 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+   45 17 1,23 5*kpS #_R2,_R6,_R10,_R14,_R18
+   46 2,15 20 5*kPS #_R3,_R7,_R11,_R15,_R19
+   47 2,17 22 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+   48 2,18 24 5*kPS #_R3,_R7,_R11,_R15,_R19
+   49 16 2,11 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   50 18 2,13 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   51 16 2,5 5*kuS #_R4,_R8,_R12,_R16,_R20
+   52 18 2,6 5*kuS #_R4,_R8,_R12,_R16,_R20
+   53 1,20 25 5*kKS #_R1,_R5,_R9,_R13,_R17
+   54 1,21 26 5*kKS #_R1,_R5,_R9,_R13,_R17
+   55 1,22 27 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+   56 1,23 28 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+   57 1,24 29 15*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17
+   58 19 1,15 20*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17
+   59 20 1,16 15*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17
+   60 21 1,17 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+   61 22 1,18 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+   62 19 1,26 20*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18
+   63 20 1,27 15*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18
+   64 21 1,28 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+   65 22 1,30 5*kpS #_R2,_R6,_R10,_R14,_R18
+   66 2,19 25 5*kPS #_R3,_R7,_R11,_R15,_R19
+   67 2,21 27 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+   68 2,22 29 5*kPS #_R3,_R7,_R11,_R15,_R19
+   69 2,23 30 15*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19
+   70 20 2,15 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   71 22 2,17 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   72 24 2,18 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+   73 20 2,7 5*kuS #_R4,_R8,_R12,_R16,_R20
+   74 22 2,8 5*kuS #_R4,_R8,_R12,_R16,_R20
+   75 24 2,9 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+   76 1,27 31 5*kKS #_R1,_R5,_R9,_R13,_R17
+   77 1,28 32 5*kKS #_R1,_R5,_R9,_R13,_R17
+   78 1,29 33 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+   79 1,30 34 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+   80 25 1,20 20*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17
+   81 26 1,21 15*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17
+   82 27 1,22 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+   83 28 1,23 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+   84 29 1,24 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+   85 25 1,31 20*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18
+   86 26 1,32 15*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18
+   87 27 1,34 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+   88 28 1,35 5*kpS #_R2,_R6,_R10,_R14,_R18
+   89 29 1,36 5*kpS #_R2,_R6,_R10,_R14,_R18
+   90 2,26 31 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+   91 2,27 33 5*kPS #_R3,_R7,_R11,_R15,_R19
+   92 2,28 34 15*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19
+   93 2,30 36 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+   94 25 2,19 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   95 27 2,21 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   96 29 2,22 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+   97 30 2,23 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+   98 25 2,10 5*kuS #_R4,_R8,_R12,_R16,_R20
+   99 27 2,11 5*kuS #_R4,_R8,_R12,_R16,_R20
+  100 29 2,12 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  101 30 2,13 5*kuS #_R4,_R8,_R12,_R16,_R20
+  102 1,33 37 5*kKS #_R1,_R5,_R9,_R13,_R17
+  103 1,34 38 5*kKS #_R1,_R5,_R9,_R13,_R17
+  104 1,35 39 5*kKS #_R1,_R5,_R9,_R13,_R17
+  105 1,36 40 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+  106 31 1,27 15*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17
+  107 32 1,28 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+  108 33 1,29 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+  109 34 1,30 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+  110 31 1,38 15*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18
+  111 32 1,39 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+  112 33 1,40 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+  113 34 1,41 5*kpS #_R2,_R6,_R10,_R14,_R18
+  114 2,31 37 5*kPS #_R3,_R7,_R11,_R15,_R19
+  115 2,32 38 15*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19
+  116 2,34 40 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+  117 2,35 41 20*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19
+  118 2,36 42 5*kPS #_R3,_R7,_R11,_R15,_R19
+  119 31 2,26 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+  120 33 2,27 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+  121 34 2,28 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+  122 36 2,30 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+  123 31 2,15 5*kuS #_R4,_R8,_R12,_R16,_R20
+  124 33 2,16 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  125 34 2,17 5*kuS #_R4,_R8,_R12,_R16,_R20
+  126 36 2,18 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  127 1,40 43 5*kKS #_R1,_R5,_R9,_R13,_R17
+  128 1,41 44 5*kKS #_R1,_R5,_R9,_R13,_R17
+  129 1,42 45 10*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17
+  130 37 1,33 15*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17
+  131 38 1,34 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+  132 39 1,35 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+  133 40 1,36 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+  134 37 1,43 15*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18
+  135 38 1,44 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+  136 39 1,46 5*kpS #_R2,_R6,_R10,_R14,_R18
+  137 40 1,47 5*kpS #_R2,_R6,_R10,_R14,_R18
+  138 2,38 43 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+  139 2,39 44 20*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19
+  140 2,40 45 5*kPS #_R3,_R7,_R11,_R15,_R19
+  141 2,41 47 15*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19
+  142 37 2,31 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+  143 38 2,32 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+  144 40 2,34 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+  145 41 2,35 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+  146 42 2,36 15*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19
+  147 37 2,20 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  148 38 2,21 5*kuS #_R4,_R8,_R12,_R16,_R20
+  149 40 2,22 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  150 41 2,23 5*kuS #_R4,_R8,_R12,_R16,_R20
+  151 42 2,24 15*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20
+  152 1,45 48 5*kKS #_R1,_R5,_R9,_R13,_R17
+  153 1,47 49 5*kKS #_R1,_R5,_R9,_R13,_R17
+  154 43 1,40 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+  155 44 1,41 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+  156 45 1,42 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+  157 43 1,49 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+  158 44 1,50 5*kpS #_R2,_R6,_R10,_R14,_R18
+  159 45 1,51 5*kpS #_R2,_R6,_R10,_R14,_R18
+  160 2,43 48 5*kPS #_R3,_R7,_R11,_R15,_R19
+  161 2,44 49 15*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19
+  162 2,46 50 25*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19
+  163 2,47 51 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+  164 43 2,38 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+  165 44 2,39 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+  166 45 2,40 15*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19
+  167 47 2,41 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+  168 43 2,27 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  169 44 2,28 5*kuS #_R4,_R8,_R12,_R16,_R20
+  170 45 2,29 15*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20
+  171 47 2,30 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  172 1,51 52 5*kKS #_R1,_R5,_R9,_R13,_R17
+  173 48 1,45 10*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17
+  174 49 1,47 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+  175 48 1,52 10*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18
+  176 49 1,53 5*kpS #_R2,_R6,_R10,_R14,_R18
+  177 2,49 52 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+  178 2,50 53 20*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19
+  179 2,51 54 5*kPS #_R3,_R7,_R11,_R15,_R19
+  180 48 2,43 15*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19
+  181 49 2,44 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+  182 50 2,46 5*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19
+  183 51 2,47 15*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19
+  184 48 2,33 15*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20
+  185 49 2,34 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  186 50 2,35 5*kuS #_R4,_R8,_R12,_R16,_R20
+  187 51 2,36 15*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20
+  188 1,54 55 5*kKS #_R1,_R5,_R9,_R13,_R17
+  189 52 1,51 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+  190 52 1,56 5*kpS #_R2,_R6,_R10,_R14,_R18
+  191 2,52 55 5*kPS #_R3,_R7,_R11,_R15,_R19
+  192 2,53 56 15*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19
+  193 52 2,49 15*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19
+  194 53 2,50 10*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19
+  195 54 2,51 20*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19
+  196 52 2,40 15*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20
+  197 53 2,41 10*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20
+  198 54 2,42 20*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20
+  199 55 1,54 5*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17
+  200 55 1,57 5*kpS #_R2,_R6,_R10,_R14,_R18
+  201 2,56 57 10*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19
+  202 55 2,52 20*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19
+  203 56 2,53 15*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19
+  204 55 2,45 20*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20
+  205 56 2,47 15*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20
+  206 2,57 58 5*kPS #_R3,_R7,_R11,_R15,_R19
+  207 57 2,56 20*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19
+  208 57 2,51 20*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20
+  209 58 2,57 25*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19
+  210 58 2,54 25*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20
+end reactions

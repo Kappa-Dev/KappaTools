@@ -1,0 +1,5146 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 kp0   3  # Constant
+    2 ku1   14  # Constant
+    3 kp1   15  # Constant
+    4 ku2   98  # Constant
+    5 kp2   75  # Constant
+    6 ku3   686  # Constant
+    7 kp3   375  # Constant
+    8 ku4   4802  # Constant
+    9 kp4   1875  # Constant
+   10 ku5   33614  # Constant
+   11 kp5   9375  # Constant
+   12 ku6   235298  # Constant
+   13 kp6   46875  # Constant
+   14 ku7   1647086  # Constant
+   15 kp7   234375  # Constant
+   16 ku8   11529602  # Constant
+   17 kp8   1171875  # Constant
+   18 ku9   80707214  # Constant
+   19 Stot  100  # Constant
+end parameters
+begin species
+    1 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!1,r) Stot
+    2 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!1,r!2).P(l!2,r) 0
+    3 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!1,r!2).P(l!2,r) 0
+    4 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!1,r!2).P(l!2,r) 0
+    5 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!1,r!2).P(l!2,r) 0
+    6 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!1,r!2).P(l!2,r) 0
+    7 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!1,r!2).P(l!2,r) 0
+    8 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!1,r!2).P(l!2,r) 0
+    9 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!1,r!2).P(l!2,r) 0
+   10 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!1,r!2).P(l!2,r) 0
+   11 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   12 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   13 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   14 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   15 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   16 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   17 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   18 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   19 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   20 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   21 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   22 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   23 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   24 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   25 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   26 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   27 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   28 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   29 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   30 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   31 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   32 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   33 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   34 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   35 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   36 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   37 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   38 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   39 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   40 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   41 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   42 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   43 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   44 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   45 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   46 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+   47 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   48 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   49 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   50 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   51 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   52 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   53 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   54 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   55 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   56 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   57 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   58 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   59 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   60 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   61 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   62 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   63 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   64 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   65 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   66 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   67 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   68 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   69 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   70 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   71 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   72 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   73 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   74 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   75 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   76 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   77 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   78 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   79 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   80 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   81 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   82 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   83 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   84 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   85 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   86 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   87 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   88 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   89 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   90 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   91 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   92 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   93 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   94 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   95 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   96 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   97 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   98 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+   99 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  100 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  101 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  102 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  103 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  104 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  105 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  106 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  107 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  108 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  109 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  110 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  111 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  112 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  113 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  114 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  115 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  116 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  117 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  118 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  119 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  120 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  121 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  122 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  123 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  124 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  125 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  126 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  127 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  128 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  129 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  130 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+  131 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  132 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  133 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  134 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  135 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  136 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  137 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  138 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  139 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  140 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  141 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  142 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  143 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  144 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  145 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  146 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  147 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  148 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  149 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  150 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  151 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  152 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  153 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  154 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  155 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  156 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  157 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  158 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  159 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  160 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  161 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  162 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  163 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  164 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  165 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  166 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  167 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  168 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  169 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  170 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  171 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  172 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  173 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  174 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  175 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  176 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  177 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  178 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  179 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  180 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  181 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  182 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  183 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  184 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  185 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  186 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  187 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  188 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  189 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  190 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  191 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  192 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  193 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  194 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  195 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  196 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  197 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  198 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  199 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  200 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  201 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  202 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  203 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  204 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  205 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  206 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  207 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  208 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  209 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  210 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  211 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  212 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  213 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  214 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  215 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  216 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  217 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  218 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  219 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  220 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  221 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  222 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  223 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  224 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  225 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  226 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  227 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  228 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  229 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  230 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  231 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  232 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  233 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  234 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  235 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  236 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  237 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  238 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  239 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  240 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  241 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  242 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  243 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  244 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  245 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  246 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  247 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  248 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  249 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  250 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  251 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  252 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  253 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  254 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  255 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  256 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+  257 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~u,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  258 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  259 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  260 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  261 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  262 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  263 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  264 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  265 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  266 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  267 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  268 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  269 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  270 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  271 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  272 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  273 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  274 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  275 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  276 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  277 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  278 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  279 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  280 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  281 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  282 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  283 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  284 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  285 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  286 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  287 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  288 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  289 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  290 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  291 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  292 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  293 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  294 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  295 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  296 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  297 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  298 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  299 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  300 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  301 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  302 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  303 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  304 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  305 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  306 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  307 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  308 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  309 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  310 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  311 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  312 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  313 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  314 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  315 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  316 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  317 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  318 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  319 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  320 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  321 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  322 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  323 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  324 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  325 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  326 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  327 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  328 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  329 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  330 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  331 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  332 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  333 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  334 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  335 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  336 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  337 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  338 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  339 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  340 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  341 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  342 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  343 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  344 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  345 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  346 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  347 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  348 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  349 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  350 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  351 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  352 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  353 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  354 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  355 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  356 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  357 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  358 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  359 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  360 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  361 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  362 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  363 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  364 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  365 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  366 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  367 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  368 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  369 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  370 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  371 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  372 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  373 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  374 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  375 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  376 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  377 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  378 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  379 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  380 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  381 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  382 A(p!1,s1~u,s2~u,s3~u,s4~u,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+  383 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~p,s7~u,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  384 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~u,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  385 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~u,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  386 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~u,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  387 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  388 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  389 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  390 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  391 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  392 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  393 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  394 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  395 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  396 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  397 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  398 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  399 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  400 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  401 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  402 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  403 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  404 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  405 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  406 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  407 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  408 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  409 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  410 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  411 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  412 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  413 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  414 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  415 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  416 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  417 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  418 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  419 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  420 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  421 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  422 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  423 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  424 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  425 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  426 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  427 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  428 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  429 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  430 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  431 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  432 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  433 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  434 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  435 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  436 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  437 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  438 A(p!1,s1~p,s2~u,s3~u,s4~u,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  439 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  440 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  441 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  442 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  443 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  444 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  445 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  446 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  447 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  448 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  449 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  450 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  451 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  452 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  453 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  454 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  455 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  456 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  457 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  458 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  459 A(p!1,s1~u,s2~p,s3~u,s4~u,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  460 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  461 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  462 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  463 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  464 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  465 A(p!1,s1~u,s2~u,s3~p,s4~u,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  466 A(p!1,s1~u,s2~u,s3~u,s4~p,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+  467 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~p,s7~p,s8~u,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  468 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~p,s7~u,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  469 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~p,s7~u,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  470 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~u,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  471 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~u,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  472 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~u,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  473 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  474 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  475 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  476 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  477 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  478 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  479 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  480 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  481 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  482 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  483 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  484 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  485 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  486 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  487 A(p!1,s1~p,s2~p,s3~u,s4~u,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  488 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  489 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  490 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  491 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  492 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  493 A(p!1,s1~p,s2~u,s3~p,s4~u,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  494 A(p!1,s1~p,s2~u,s3~u,s4~p,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  495 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  496 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  497 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  498 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  499 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  500 A(p!1,s1~u,s2~p,s3~p,s4~u,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  501 A(p!1,s1~u,s2~p,s3~u,s4~p,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  502 A(p!1,s1~u,s2~u,s3~p,s4~p,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+  503 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~p,s7~p,s8~p,s9~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  504 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~p,s7~p,s8~u,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  505 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~p,s7~u,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  506 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~u,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  507 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~u,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  508 A(p!1,s1~p,s2~p,s3~p,s4~u,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  509 A(p!1,s1~p,s2~p,s3~u,s4~p,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  510 A(p!1,s1~p,s2~u,s3~p,s4~p,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  511 A(p!1,s1~u,s2~p,s3~p,s4~p,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+  512 A(p!1,s1~p,s2~p,s3~p,s4~p,s5~p,s6~p,s7~p,s8~p,s9~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!10,r!9).P(l!1,r!10).P(l!3,r) 0
+end species
+begin reactions
+    1 1 2 kp0 #_R1
+    2 1 3 kp0 #_R2
+    3 1 4 kp0 #_R3
+    4 1 5 kp0 #_R4
+    5 1 6 kp0 #_R5
+    6 1 7 kp0 #_R6
+    7 1 8 kp0 #_R7
+    8 1 9 kp0 #_R8
+    9 1 10 kp0 #_R9
+   10 3 11 kp1 #_R10
+   11 4 12 kp1 #_R10
+   12 5 13 kp1 #_R10
+   13 6 14 kp1 #_R10
+   14 7 15 kp1 #_R10
+   15 8 16 kp1 #_R10
+   16 9 17 kp1 #_R10
+   17 10 18 kp1 #_R10
+   18 2 1 ku1 #_R11
+   19 2 11 kp1 #_R12
+   20 4 19 kp1 #_R12
+   21 5 20 kp1 #_R12
+   22 6 21 kp1 #_R12
+   23 7 22 kp1 #_R12
+   24 8 23 kp1 #_R12
+   25 9 24 kp1 #_R12
+   26 10 25 kp1 #_R12
+   27 3 1 ku1 #_R13
+   28 2 12 kp1 #_R14
+   29 3 19 kp1 #_R14
+   30 5 26 kp1 #_R14
+   31 6 27 kp1 #_R14
+   32 7 28 kp1 #_R14
+   33 8 29 kp1 #_R14
+   34 9 30 kp1 #_R14
+   35 10 31 kp1 #_R14
+   36 4 1 ku1 #_R15
+   37 2 13 kp1 #_R16
+   38 3 20 kp1 #_R16
+   39 4 26 kp1 #_R16
+   40 6 32 kp1 #_R16
+   41 7 33 kp1 #_R16
+   42 8 34 kp1 #_R16
+   43 9 35 kp1 #_R16
+   44 10 36 kp1 #_R16
+   45 5 1 ku1 #_R17
+   46 2 14 kp1 #_R18
+   47 3 21 kp1 #_R18
+   48 4 27 kp1 #_R18
+   49 5 32 kp1 #_R18
+   50 7 37 kp1 #_R18
+   51 8 38 kp1 #_R18
+   52 9 39 kp1 #_R18
+   53 10 40 kp1 #_R18
+   54 6 1 ku1 #_R19
+   55 2 15 kp1 #_R20
+   56 3 22 kp1 #_R20
+   57 4 28 kp1 #_R20
+   58 5 33 kp1 #_R20
+   59 6 37 kp1 #_R20
+   60 8 41 kp1 #_R20
+   61 9 42 kp1 #_R20
+   62 10 43 kp1 #_R20
+   63 7 1 ku1 #_R21
+   64 2 16 kp1 #_R22
+   65 3 23 kp1 #_R22
+   66 4 29 kp1 #_R22
+   67 5 34 kp1 #_R22
+   68 6 38 kp1 #_R22
+   69 7 41 kp1 #_R22
+   70 9 44 kp1 #_R22
+   71 10 45 kp1 #_R22
+   72 8 1 ku1 #_R23
+   73 2 17 kp1 #_R24
+   74 3 24 kp1 #_R24
+   75 4 30 kp1 #_R24
+   76 5 35 kp1 #_R24
+   77 6 39 kp1 #_R24
+   78 7 42 kp1 #_R24
+   79 8 44 kp1 #_R24
+   80 10 46 kp1 #_R24
+   81 9 1 ku1 #_R25
+   82 2 18 kp1 #_R26
+   83 3 25 kp1 #_R26
+   84 4 31 kp1 #_R26
+   85 5 36 kp1 #_R26
+   86 6 40 kp1 #_R26
+   87 7 43 kp1 #_R26
+   88 8 45 kp1 #_R26
+   89 9 46 kp1 #_R26
+   90 10 1 ku1 #_R27
+   91 19 47 kp2 #_R28
+   92 20 48 kp2 #_R28
+   93 21 49 kp2 #_R28
+   94 22 50 kp2 #_R28
+   95 23 51 kp2 #_R28
+   96 24 52 kp2 #_R28
+   97 25 53 kp2 #_R28
+   98 26 54 kp2 #_R28
+   99 27 55 kp2 #_R28
+  100 28 56 kp2 #_R28
+  101 29 57 kp2 #_R28
+  102 30 58 kp2 #_R28
+  103 31 59 kp2 #_R28
+  104 32 60 kp2 #_R28
+  105 33 61 kp2 #_R28
+  106 34 62 kp2 #_R28
+  107 35 63 kp2 #_R28
+  108 36 64 kp2 #_R28
+  109 37 65 kp2 #_R28
+  110 38 66 kp2 #_R28
+  111 39 67 kp2 #_R28
+  112 40 68 kp2 #_R28
+  113 41 69 kp2 #_R28
+  114 42 70 kp2 #_R28
+  115 43 71 kp2 #_R28
+  116 44 72 kp2 #_R28
+  117 45 73 kp2 #_R28
+  118 46 74 kp2 #_R28
+  119 11 3 ku2 #_R29
+  120 12 4 ku2 #_R29
+  121 13 5 ku2 #_R29
+  122 14 6 ku2 #_R29
+  123 15 7 ku2 #_R29
+  124 16 8 ku2 #_R29
+  125 17 9 ku2 #_R29
+  126 18 10 ku2 #_R29
+  127 12 47 kp2 #_R30
+  128 13 48 kp2 #_R30
+  129 14 49 kp2 #_R30
+  130 15 50 kp2 #_R30
+  131 16 51 kp2 #_R30
+  132 17 52 kp2 #_R30
+  133 18 53 kp2 #_R30
+  134 26 75 kp2 #_R30
+  135 27 76 kp2 #_R30
+  136 28 77 kp2 #_R30
+  137 29 78 kp2 #_R30
+  138 30 79 kp2 #_R30
+  139 31 80 kp2 #_R30
+  140 32 81 kp2 #_R30
+  141 33 82 kp2 #_R30
+  142 34 83 kp2 #_R30
+  143 35 84 kp2 #_R30
+  144 36 85 kp2 #_R30
+  145 37 86 kp2 #_R30
+  146 38 87 kp2 #_R30
+  147 39 88 kp2 #_R30
+  148 40 89 kp2 #_R30
+  149 41 90 kp2 #_R30
+  150 42 91 kp2 #_R30
+  151 43 92 kp2 #_R30
+  152 44 93 kp2 #_R30
+  153 45 94 kp2 #_R30
+  154 46 95 kp2 #_R30
+  155 11 2 ku2 #_R31
+  156 19 4 ku2 #_R31
+  157 20 5 ku2 #_R31
+  158 21 6 ku2 #_R31
+  159 22 7 ku2 #_R31
+  160 23 8 ku2 #_R31
+  161 24 9 ku2 #_R31
+  162 25 10 ku2 #_R31
+  163 11 47 kp2 #_R32
+  164 13 54 kp2 #_R32
+  165 14 55 kp2 #_R32
+  166 15 56 kp2 #_R32
+  167 16 57 kp2 #_R32
+  168 17 58 kp2 #_R32
+  169 18 59 kp2 #_R32
+  170 20 75 kp2 #_R32
+  171 21 76 kp2 #_R32
+  172 22 77 kp2 #_R32
+  173 23 78 kp2 #_R32
+  174 24 79 kp2 #_R32
+  175 25 80 kp2 #_R32
+  176 32 96 kp2 #_R32
+  177 33 97 kp2 #_R32
+  178 34 98 kp2 #_R32
+  179 35 99 kp2 #_R32
+  180 36 100 kp2 #_R32
+  181 37 101 kp2 #_R32
+  182 38 102 kp2 #_R32
+  183 39 103 kp2 #_R32
+  184 40 104 kp2 #_R32
+  185 41 105 kp2 #_R32
+  186 42 106 kp2 #_R32
+  187 43 107 kp2 #_R32
+  188 44 108 kp2 #_R32
+  189 45 109 kp2 #_R32
+  190 46 110 kp2 #_R32
+  191 12 2 ku2 #_R33
+  192 19 3 ku2 #_R33
+  193 26 5 ku2 #_R33
+  194 27 6 ku2 #_R33
+  195 28 7 ku2 #_R33
+  196 29 8 ku2 #_R33
+  197 30 9 ku2 #_R33
+  198 31 10 ku2 #_R33
+  199 11 48 kp2 #_R34
+  200 12 54 kp2 #_R34
+  201 14 60 kp2 #_R34
+  202 15 61 kp2 #_R34
+  203 16 62 kp2 #_R34
+  204 17 63 kp2 #_R34
+  205 18 64 kp2 #_R34
+  206 19 75 kp2 #_R34
+  207 21 81 kp2 #_R34
+  208 22 82 kp2 #_R34
+  209 23 83 kp2 #_R34
+  210 24 84 kp2 #_R34
+  211 25 85 kp2 #_R34
+  212 27 96 kp2 #_R34
+  213 28 97 kp2 #_R34
+  214 29 98 kp2 #_R34
+  215 30 99 kp2 #_R34
+  216 31 100 kp2 #_R34
+  217 37 111 kp2 #_R34
+  218 38 112 kp2 #_R34
+  219 39 113 kp2 #_R34
+  220 40 114 kp2 #_R34
+  221 41 115 kp2 #_R34
+  222 42 116 kp2 #_R34
+  223 43 117 kp2 #_R34
+  224 44 118 kp2 #_R34
+  225 45 119 kp2 #_R34
+  226 46 120 kp2 #_R34
+  227 13 2 ku2 #_R35
+  228 20 3 ku2 #_R35
+  229 26 4 ku2 #_R35
+  230 32 6 ku2 #_R35
+  231 33 7 ku2 #_R35
+  232 34 8 ku2 #_R35
+  233 35 9 ku2 #_R35
+  234 36 10 ku2 #_R35
+  235 11 49 kp2 #_R36
+  236 12 55 kp2 #_R36
+  237 13 60 kp2 #_R36
+  238 15 65 kp2 #_R36
+  239 16 66 kp2 #_R36
+  240 17 67 kp2 #_R36
+  241 18 68 kp2 #_R36
+  242 19 76 kp2 #_R36
+  243 20 81 kp2 #_R36
+  244 22 86 kp2 #_R36
+  245 23 87 kp2 #_R36
+  246 24 88 kp2 #_R36
+  247 25 89 kp2 #_R36
+  248 26 96 kp2 #_R36
+  249 28 101 kp2 #_R36
+  250 29 102 kp2 #_R36
+  251 30 103 kp2 #_R36
+  252 31 104 kp2 #_R36
+  253 33 111 kp2 #_R36
+  254 34 112 kp2 #_R36
+  255 35 113 kp2 #_R36
+  256 36 114 kp2 #_R36
+  257 41 121 kp2 #_R36
+  258 42 122 kp2 #_R36
+  259 43 123 kp2 #_R36
+  260 44 124 kp2 #_R36
+  261 45 125 kp2 #_R36
+  262 46 126 kp2 #_R36
+  263 14 2 ku2 #_R37
+  264 21 3 ku2 #_R37
+  265 27 4 ku2 #_R37
+  266 32 5 ku2 #_R37
+  267 37 7 ku2 #_R37
+  268 38 8 ku2 #_R37
+  269 39 9 ku2 #_R37
+  270 40 10 ku2 #_R37
+  271 11 50 kp2 #_R38
+  272 12 56 kp2 #_R38
+  273 13 61 kp2 #_R38
+  274 14 65 kp2 #_R38
+  275 16 69 kp2 #_R38
+  276 17 70 kp2 #_R38
+  277 18 71 kp2 #_R38
+  278 19 77 kp2 #_R38
+  279 20 82 kp2 #_R38
+  280 21 86 kp2 #_R38
+  281 23 90 kp2 #_R38
+  282 24 91 kp2 #_R38
+  283 25 92 kp2 #_R38
+  284 26 97 kp2 #_R38
+  285 27 101 kp2 #_R38
+  286 29 105 kp2 #_R38
+  287 30 106 kp2 #_R38
+  288 31 107 kp2 #_R38
+  289 32 111 kp2 #_R38
+  290 34 115 kp2 #_R38
+  291 35 116 kp2 #_R38
+  292 36 117 kp2 #_R38
+  293 38 121 kp2 #_R38
+  294 39 122 kp2 #_R38
+  295 40 123 kp2 #_R38
+  296 44 127 kp2 #_R38
+  297 45 128 kp2 #_R38
+  298 46 129 kp2 #_R38
+  299 15 2 ku2 #_R39
+  300 22 3 ku2 #_R39
+  301 28 4 ku2 #_R39
+  302 33 5 ku2 #_R39
+  303 37 6 ku2 #_R39
+  304 41 8 ku2 #_R39
+  305 42 9 ku2 #_R39
+  306 43 10 ku2 #_R39
+  307 11 51 kp2 #_R40
+  308 12 57 kp2 #_R40
+  309 13 62 kp2 #_R40
+  310 14 66 kp2 #_R40
+  311 15 69 kp2 #_R40
+  312 17 72 kp2 #_R40
+  313 18 73 kp2 #_R40
+  314 19 78 kp2 #_R40
+  315 20 83 kp2 #_R40
+  316 21 87 kp2 #_R40
+  317 22 90 kp2 #_R40
+  318 24 93 kp2 #_R40
+  319 25 94 kp2 #_R40
+  320 26 98 kp2 #_R40
+  321 27 102 kp2 #_R40
+  322 28 105 kp2 #_R40
+  323 30 108 kp2 #_R40
+  324 31 109 kp2 #_R40
+  325 32 112 kp2 #_R40
+  326 33 115 kp2 #_R40
+  327 35 118 kp2 #_R40
+  328 36 119 kp2 #_R40
+  329 37 121 kp2 #_R40
+  330 39 124 kp2 #_R40
+  331 40 125 kp2 #_R40
+  332 42 127 kp2 #_R40
+  333 43 128 kp2 #_R40
+  334 46 130 kp2 #_R40
+  335 16 2 ku2 #_R41
+  336 23 3 ku2 #_R41
+  337 29 4 ku2 #_R41
+  338 34 5 ku2 #_R41
+  339 38 6 ku2 #_R41
+  340 41 7 ku2 #_R41
+  341 44 9 ku2 #_R41
+  342 45 10 ku2 #_R41
+  343 11 52 kp2 #_R42
+  344 12 58 kp2 #_R42
+  345 13 63 kp2 #_R42
+  346 14 67 kp2 #_R42
+  347 15 70 kp2 #_R42
+  348 16 72 kp2 #_R42
+  349 18 74 kp2 #_R42
+  350 19 79 kp2 #_R42
+  351 20 84 kp2 #_R42
+  352 21 88 kp2 #_R42
+  353 22 91 kp2 #_R42
+  354 23 93 kp2 #_R42
+  355 25 95 kp2 #_R42
+  356 26 99 kp2 #_R42
+  357 27 103 kp2 #_R42
+  358 28 106 kp2 #_R42
+  359 29 108 kp2 #_R42
+  360 31 110 kp2 #_R42
+  361 32 113 kp2 #_R42
+  362 33 116 kp2 #_R42
+  363 34 118 kp2 #_R42
+  364 36 120 kp2 #_R42
+  365 37 122 kp2 #_R42
+  366 38 124 kp2 #_R42
+  367 40 126 kp2 #_R42
+  368 41 127 kp2 #_R42
+  369 43 129 kp2 #_R42
+  370 45 130 kp2 #_R42
+  371 17 2 ku2 #_R43
+  372 24 3 ku2 #_R43
+  373 30 4 ku2 #_R43
+  374 35 5 ku2 #_R43
+  375 39 6 ku2 #_R43
+  376 42 7 ku2 #_R43
+  377 44 8 ku2 #_R43
+  378 46 10 ku2 #_R43
+  379 11 53 kp2 #_R44
+  380 12 59 kp2 #_R44
+  381 13 64 kp2 #_R44
+  382 14 68 kp2 #_R44
+  383 15 71 kp2 #_R44
+  384 16 73 kp2 #_R44
+  385 17 74 kp2 #_R44
+  386 19 80 kp2 #_R44
+  387 20 85 kp2 #_R44
+  388 21 89 kp2 #_R44
+  389 22 92 kp2 #_R44
+  390 23 94 kp2 #_R44
+  391 24 95 kp2 #_R44
+  392 26 100 kp2 #_R44
+  393 27 104 kp2 #_R44
+  394 28 107 kp2 #_R44
+  395 29 109 kp2 #_R44
+  396 30 110 kp2 #_R44
+  397 32 114 kp2 #_R44
+  398 33 117 kp2 #_R44
+  399 34 119 kp2 #_R44
+  400 35 120 kp2 #_R44
+  401 37 123 kp2 #_R44
+  402 38 125 kp2 #_R44
+  403 39 126 kp2 #_R44
+  404 41 128 kp2 #_R44
+  405 42 129 kp2 #_R44
+  406 44 130 kp2 #_R44
+  407 18 2 ku2 #_R45
+  408 25 3 ku2 #_R45
+  409 31 4 ku2 #_R45
+  410 36 5 ku2 #_R45
+  411 40 6 ku2 #_R45
+  412 43 7 ku2 #_R45
+  413 45 8 ku2 #_R45
+  414 46 9 ku2 #_R45
+  415 75 131 kp3 #_R46
+  416 76 132 kp3 #_R46
+  417 77 133 kp3 #_R46
+  418 78 134 kp3 #_R46
+  419 79 135 kp3 #_R46
+  420 80 136 kp3 #_R46
+  421 81 137 kp3 #_R46
+  422 82 138 kp3 #_R46
+  423 83 139 kp3 #_R46
+  424 84 140 kp3 #_R46
+  425 85 141 kp3 #_R46
+  426 86 142 kp3 #_R46
+  427 87 143 kp3 #_R46
+  428 88 144 kp3 #_R46
+  429 89 145 kp3 #_R46
+  430 90 146 kp3 #_R46
+  431 91 147 kp3 #_R46
+  432 92 148 kp3 #_R46
+  433 93 149 kp3 #_R46
+  434 94 150 kp3 #_R46
+  435 95 151 kp3 #_R46
+  436 96 152 kp3 #_R46
+  437 97 153 kp3 #_R46
+  438 98 154 kp3 #_R46
+  439 99 155 kp3 #_R46
+  440 100 156 kp3 #_R46
+  441 101 157 kp3 #_R46
+  442 102 158 kp3 #_R46
+  443 103 159 kp3 #_R46
+  444 104 160 kp3 #_R46
+  445 105 161 kp3 #_R46
+  446 106 162 kp3 #_R46
+  447 107 163 kp3 #_R46
+  448 108 164 kp3 #_R46
+  449 109 165 kp3 #_R46
+  450 110 166 kp3 #_R46
+  451 111 167 kp3 #_R46
+  452 112 168 kp3 #_R46
+  453 113 169 kp3 #_R46
+  454 114 170 kp3 #_R46
+  455 115 171 kp3 #_R46
+  456 116 172 kp3 #_R46
+  457 117 173 kp3 #_R46
+  458 118 174 kp3 #_R46
+  459 119 175 kp3 #_R46
+  460 120 176 kp3 #_R46
+  461 121 177 kp3 #_R46
+  462 122 178 kp3 #_R46
+  463 123 179 kp3 #_R46
+  464 124 180 kp3 #_R46
+  465 125 181 kp3 #_R46
+  466 126 182 kp3 #_R46
+  467 127 183 kp3 #_R46
+  468 128 184 kp3 #_R46
+  469 129 185 kp3 #_R46
+  470 130 186 kp3 #_R46
+  471 47 19 ku3 #_R47
+  472 48 20 ku3 #_R47
+  473 49 21 ku3 #_R47
+  474 50 22 ku3 #_R47
+  475 51 23 ku3 #_R47
+  476 52 24 ku3 #_R47
+  477 53 25 ku3 #_R47
+  478 54 26 ku3 #_R47
+  479 55 27 ku3 #_R47
+  480 56 28 ku3 #_R47
+  481 57 29 ku3 #_R47
+  482 58 30 ku3 #_R47
+  483 59 31 ku3 #_R47
+  484 60 32 ku3 #_R47
+  485 61 33 ku3 #_R47
+  486 62 34 ku3 #_R47
+  487 63 35 ku3 #_R47
+  488 64 36 ku3 #_R47
+  489 65 37 ku3 #_R47
+  490 66 38 ku3 #_R47
+  491 67 39 ku3 #_R47
+  492 68 40 ku3 #_R47
+  493 69 41 ku3 #_R47
+  494 70 42 ku3 #_R47
+  495 71 43 ku3 #_R47
+  496 72 44 ku3 #_R47
+  497 73 45 ku3 #_R47
+  498 74 46 ku3 #_R47
+  499 54 131 kp3 #_R48
+  500 55 132 kp3 #_R48
+  501 56 133 kp3 #_R48
+  502 57 134 kp3 #_R48
+  503 58 135 kp3 #_R48
+  504 59 136 kp3 #_R48
+  505 60 137 kp3 #_R48
+  506 61 138 kp3 #_R48
+  507 62 139 kp3 #_R48
+  508 63 140 kp3 #_R48
+  509 64 141 kp3 #_R48
+  510 65 142 kp3 #_R48
+  511 66 143 kp3 #_R48
+  512 67 144 kp3 #_R48
+  513 68 145 kp3 #_R48
+  514 69 146 kp3 #_R48
+  515 70 147 kp3 #_R48
+  516 71 148 kp3 #_R48
+  517 72 149 kp3 #_R48
+  518 73 150 kp3 #_R48
+  519 74 151 kp3 #_R48
+  520 96 187 kp3 #_R48
+  521 97 188 kp3 #_R48
+  522 98 189 kp3 #_R48
+  523 99 190 kp3 #_R48
+  524 100 191 kp3 #_R48
+  525 101 192 kp3 #_R48
+  526 102 193 kp3 #_R48
+  527 103 194 kp3 #_R48
+  528 104 195 kp3 #_R48
+  529 105 196 kp3 #_R48
+  530 106 197 kp3 #_R48
+  531 107 198 kp3 #_R48
+  532 108 199 kp3 #_R48
+  533 109 200 kp3 #_R48
+  534 110 201 kp3 #_R48
+  535 111 202 kp3 #_R48
+  536 112 203 kp3 #_R48
+  537 113 204 kp3 #_R48
+  538 114 205 kp3 #_R48
+  539 115 206 kp3 #_R48
+  540 116 207 kp3 #_R48
+  541 117 208 kp3 #_R48
+  542 118 209 kp3 #_R48
+  543 119 210 kp3 #_R48
+  544 120 211 kp3 #_R48
+  545 121 212 kp3 #_R48
+  546 122 213 kp3 #_R48
+  547 123 214 kp3 #_R48
+  548 124 215 kp3 #_R48
+  549 125 216 kp3 #_R48
+  550 126 217 kp3 #_R48
+  551 127 218 kp3 #_R48
+  552 128 219 kp3 #_R48
+  553 129 220 kp3 #_R48
+  554 130 221 kp3 #_R48
+  555 47 12 ku3 #_R49
+  556 48 13 ku3 #_R49
+  557 49 14 ku3 #_R49
+  558 50 15 ku3 #_R49
+  559 51 16 ku3 #_R49
+  560 52 17 ku3 #_R49
+  561 53 18 ku3 #_R49
+  562 75 26 ku3 #_R49
+  563 76 27 ku3 #_R49
+  564 77 28 ku3 #_R49
+  565 78 29 ku3 #_R49
+  566 79 30 ku3 #_R49
+  567 80 31 ku3 #_R49
+  568 81 32 ku3 #_R49
+  569 82 33 ku3 #_R49
+  570 83 34 ku3 #_R49
+  571 84 35 ku3 #_R49
+  572 85 36 ku3 #_R49
+  573 86 37 ku3 #_R49
+  574 87 38 ku3 #_R49
+  575 88 39 ku3 #_R49
+  576 89 40 ku3 #_R49
+  577 90 41 ku3 #_R49
+  578 91 42 ku3 #_R49
+  579 92 43 ku3 #_R49
+  580 93 44 ku3 #_R49
+  581 94 45 ku3 #_R49
+  582 95 46 ku3 #_R49
+  583 48 131 kp3 #_R50
+  584 49 132 kp3 #_R50
+  585 50 133 kp3 #_R50
+  586 51 134 kp3 #_R50
+  587 52 135 kp3 #_R50
+  588 53 136 kp3 #_R50
+  589 60 152 kp3 #_R50
+  590 61 153 kp3 #_R50
+  591 62 154 kp3 #_R50
+  592 63 155 kp3 #_R50
+  593 64 156 kp3 #_R50
+  594 65 157 kp3 #_R50
+  595 66 158 kp3 #_R50
+  596 67 159 kp3 #_R50
+  597 68 160 kp3 #_R50
+  598 69 161 kp3 #_R50
+  599 70 162 kp3 #_R50
+  600 71 163 kp3 #_R50
+  601 72 164 kp3 #_R50
+  602 73 165 kp3 #_R50
+  603 74 166 kp3 #_R50
+  604 81 187 kp3 #_R50
+  605 82 188 kp3 #_R50
+  606 83 189 kp3 #_R50
+  607 84 190 kp3 #_R50
+  608 85 191 kp3 #_R50
+  609 86 192 kp3 #_R50
+  610 87 193 kp3 #_R50
+  611 88 194 kp3 #_R50
+  612 89 195 kp3 #_R50
+  613 90 196 kp3 #_R50
+  614 91 197 kp3 #_R50
+  615 92 198 kp3 #_R50
+  616 93 199 kp3 #_R50
+  617 94 200 kp3 #_R50
+  618 95 201 kp3 #_R50
+  619 111 222 kp3 #_R50
+  620 112 223 kp3 #_R50
+  621 113 224 kp3 #_R50
+  622 114 225 kp3 #_R50
+  623 115 226 kp3 #_R50
+  624 116 227 kp3 #_R50
+  625 117 228 kp3 #_R50
+  626 118 229 kp3 #_R50
+  627 119 230 kp3 #_R50
+  628 120 231 kp3 #_R50
+  629 121 232 kp3 #_R50
+  630 122 233 kp3 #_R50
+  631 123 234 kp3 #_R50
+  632 124 235 kp3 #_R50
+  633 125 236 kp3 #_R50
+  634 126 237 kp3 #_R50
+  635 127 238 kp3 #_R50
+  636 128 239 kp3 #_R50
+  637 129 240 kp3 #_R50
+  638 130 241 kp3 #_R50
+  639 47 11 ku3 #_R51
+  640 54 13 ku3 #_R51
+  641 55 14 ku3 #_R51
+  642 56 15 ku3 #_R51
+  643 57 16 ku3 #_R51
+  644 58 17 ku3 #_R51
+  645 59 18 ku3 #_R51
+  646 75 20 ku3 #_R51
+  647 76 21 ku3 #_R51
+  648 77 22 ku3 #_R51
+  649 78 23 ku3 #_R51
+  650 79 24 ku3 #_R51
+  651 80 25 ku3 #_R51
+  652 96 32 ku3 #_R51
+  653 97 33 ku3 #_R51
+  654 98 34 ku3 #_R51
+  655 99 35 ku3 #_R51
+  656 100 36 ku3 #_R51
+  657 101 37 ku3 #_R51
+  658 102 38 ku3 #_R51
+  659 103 39 ku3 #_R51
+  660 104 40 ku3 #_R51
+  661 105 41 ku3 #_R51
+  662 106 42 ku3 #_R51
+  663 107 43 ku3 #_R51
+  664 108 44 ku3 #_R51
+  665 109 45 ku3 #_R51
+  666 110 46 ku3 #_R51
+  667 47 131 kp3 #_R52
+  668 49 137 kp3 #_R52
+  669 50 138 kp3 #_R52
+  670 51 139 kp3 #_R52
+  671 52 140 kp3 #_R52
+  672 53 141 kp3 #_R52
+  673 55 152 kp3 #_R52
+  674 56 153 kp3 #_R52
+  675 57 154 kp3 #_R52
+  676 58 155 kp3 #_R52
+  677 59 156 kp3 #_R52
+  678 65 167 kp3 #_R52
+  679 66 168 kp3 #_R52
+  680 67 169 kp3 #_R52
+  681 68 170 kp3 #_R52
+  682 69 171 kp3 #_R52
+  683 70 172 kp3 #_R52
+  684 71 173 kp3 #_R52
+  685 72 174 kp3 #_R52
+  686 73 175 kp3 #_R52
+  687 74 176 kp3 #_R52
+  688 76 187 kp3 #_R52
+  689 77 188 kp3 #_R52
+  690 78 189 kp3 #_R52
+  691 79 190 kp3 #_R52
+  692 80 191 kp3 #_R52
+  693 86 202 kp3 #_R52
+  694 87 203 kp3 #_R52
+  695 88 204 kp3 #_R52
+  696 89 205 kp3 #_R52
+  697 90 206 kp3 #_R52
+  698 91 207 kp3 #_R52
+  699 92 208 kp3 #_R52
+  700 93 209 kp3 #_R52
+  701 94 210 kp3 #_R52
+  702 95 211 kp3 #_R52
+  703 101 222 kp3 #_R52
+  704 102 223 kp3 #_R52
+  705 103 224 kp3 #_R52
+  706 104 225 kp3 #_R52
+  707 105 226 kp3 #_R52
+  708 106 227 kp3 #_R52
+  709 107 228 kp3 #_R52
+  710 108 229 kp3 #_R52
+  711 109 230 kp3 #_R52
+  712 110 231 kp3 #_R52
+  713 121 242 kp3 #_R52
+  714 122 243 kp3 #_R52
+  715 123 244 kp3 #_R52
+  716 124 245 kp3 #_R52
+  717 125 246 kp3 #_R52
+  718 126 247 kp3 #_R52
+  719 127 248 kp3 #_R52
+  720 128 249 kp3 #_R52
+  721 129 250 kp3 #_R52
+  722 130 251 kp3 #_R52
+  723 48 11 ku3 #_R53
+  724 54 12 ku3 #_R53
+  725 60 14 ku3 #_R53
+  726 61 15 ku3 #_R53
+  727 62 16 ku3 #_R53
+  728 63 17 ku3 #_R53
+  729 64 18 ku3 #_R53
+  730 75 19 ku3 #_R53
+  731 81 21 ku3 #_R53
+  732 82 22 ku3 #_R53
+  733 83 23 ku3 #_R53
+  734 84 24 ku3 #_R53
+  735 85 25 ku3 #_R53
+  736 96 27 ku3 #_R53
+  737 97 28 ku3 #_R53
+  738 98 29 ku3 #_R53
+  739 99 30 ku3 #_R53
+  740 100 31 ku3 #_R53
+  741 111 37 ku3 #_R53
+  742 112 38 ku3 #_R53
+  743 113 39 ku3 #_R53
+  744 114 40 ku3 #_R53
+  745 115 41 ku3 #_R53
+  746 116 42 ku3 #_R53
+  747 117 43 ku3 #_R53
+  748 118 44 ku3 #_R53
+  749 119 45 ku3 #_R53
+  750 120 46 ku3 #_R53
+  751 47 132 kp3 #_R54
+  752 48 137 kp3 #_R54
+  753 50 142 kp3 #_R54
+  754 51 143 kp3 #_R54
+  755 52 144 kp3 #_R54
+  756 53 145 kp3 #_R54
+  757 54 152 kp3 #_R54
+  758 56 157 kp3 #_R54
+  759 57 158 kp3 #_R54
+  760 58 159 kp3 #_R54
+  761 59 160 kp3 #_R54
+  762 61 167 kp3 #_R54
+  763 62 168 kp3 #_R54
+  764 63 169 kp3 #_R54
+  765 64 170 kp3 #_R54
+  766 69 177 kp3 #_R54
+  767 70 178 kp3 #_R54
+  768 71 179 kp3 #_R54
+  769 72 180 kp3 #_R54
+  770 73 181 kp3 #_R54
+  771 74 182 kp3 #_R54
+  772 75 187 kp3 #_R54
+  773 77 192 kp3 #_R54
+  774 78 193 kp3 #_R54
+  775 79 194 kp3 #_R54
+  776 80 195 kp3 #_R54
+  777 82 202 kp3 #_R54
+  778 83 203 kp3 #_R54
+  779 84 204 kp3 #_R54
+  780 85 205 kp3 #_R54
+  781 90 212 kp3 #_R54
+  782 91 213 kp3 #_R54
+  783 92 214 kp3 #_R54
+  784 93 215 kp3 #_R54
+  785 94 216 kp3 #_R54
+  786 95 217 kp3 #_R54
+  787 97 222 kp3 #_R54
+  788 98 223 kp3 #_R54
+  789 99 224 kp3 #_R54
+  790 100 225 kp3 #_R54
+  791 105 232 kp3 #_R54
+  792 106 233 kp3 #_R54
+  793 107 234 kp3 #_R54
+  794 108 235 kp3 #_R54
+  795 109 236 kp3 #_R54
+  796 110 237 kp3 #_R54
+  797 115 242 kp3 #_R54
+  798 116 243 kp3 #_R54
+  799 117 244 kp3 #_R54
+  800 118 245 kp3 #_R54
+  801 119 246 kp3 #_R54
+  802 120 247 kp3 #_R54
+  803 127 252 kp3 #_R54
+  804 128 253 kp3 #_R54
+  805 129 254 kp3 #_R54
+  806 130 255 kp3 #_R54
+  807 49 11 ku3 #_R55
+  808 55 12 ku3 #_R55
+  809 60 13 ku3 #_R55
+  810 65 15 ku3 #_R55
+  811 66 16 ku3 #_R55
+  812 67 17 ku3 #_R55
+  813 68 18 ku3 #_R55
+  814 76 19 ku3 #_R55
+  815 81 20 ku3 #_R55
+  816 86 22 ku3 #_R55
+  817 87 23 ku3 #_R55
+  818 88 24 ku3 #_R55
+  819 89 25 ku3 #_R55
+  820 96 26 ku3 #_R55
+  821 101 28 ku3 #_R55
+  822 102 29 ku3 #_R55
+  823 103 30 ku3 #_R55
+  824 104 31 ku3 #_R55
+  825 111 33 ku3 #_R55
+  826 112 34 ku3 #_R55
+  827 113 35 ku3 #_R55
+  828 114 36 ku3 #_R55
+  829 121 41 ku3 #_R55
+  830 122 42 ku3 #_R55
+  831 123 43 ku3 #_R55
+  832 124 44 ku3 #_R55
+  833 125 45 ku3 #_R55
+  834 126 46 ku3 #_R55
+  835 47 133 kp3 #_R56
+  836 48 138 kp3 #_R56
+  837 49 142 kp3 #_R56
+  838 51 146 kp3 #_R56
+  839 52 147 kp3 #_R56
+  840 53 148 kp3 #_R56
+  841 54 153 kp3 #_R56
+  842 55 157 kp3 #_R56
+  843 57 161 kp3 #_R56
+  844 58 162 kp3 #_R56
+  845 59 163 kp3 #_R56
+  846 60 167 kp3 #_R56
+  847 62 171 kp3 #_R56
+  848 63 172 kp3 #_R56
+  849 64 173 kp3 #_R56
+  850 66 177 kp3 #_R56
+  851 67 178 kp3 #_R56
+  852 68 179 kp3 #_R56
+  853 72 183 kp3 #_R56
+  854 73 184 kp3 #_R56
+  855 74 185 kp3 #_R56
+  856 75 188 kp3 #_R56
+  857 76 192 kp3 #_R56
+  858 78 196 kp3 #_R56
+  859 79 197 kp3 #_R56
+  860 80 198 kp3 #_R56
+  861 81 202 kp3 #_R56
+  862 83 206 kp3 #_R56
+  863 84 207 kp3 #_R56
+  864 85 208 kp3 #_R56
+  865 87 212 kp3 #_R56
+  866 88 213 kp3 #_R56
+  867 89 214 kp3 #_R56
+  868 93 218 kp3 #_R56
+  869 94 219 kp3 #_R56
+  870 95 220 kp3 #_R56
+  871 96 222 kp3 #_R56
+  872 98 226 kp3 #_R56
+  873 99 227 kp3 #_R56
+  874 100 228 kp3 #_R56
+  875 102 232 kp3 #_R56
+  876 103 233 kp3 #_R56
+  877 104 234 kp3 #_R56
+  878 108 238 kp3 #_R56
+  879 109 239 kp3 #_R56
+  880 110 240 kp3 #_R56
+  881 112 242 kp3 #_R56
+  882 113 243 kp3 #_R56
+  883 114 244 kp3 #_R56
+  884 118 248 kp3 #_R56
+  885 119 249 kp3 #_R56
+  886 120 250 kp3 #_R56
+  887 124 252 kp3 #_R56
+  888 125 253 kp3 #_R56
+  889 126 254 kp3 #_R56
+  890 130 256 kp3 #_R56
+  891 50 11 ku3 #_R57
+  892 56 12 ku3 #_R57
+  893 61 13 ku3 #_R57
+  894 65 14 ku3 #_R57
+  895 69 16 ku3 #_R57
+  896 70 17 ku3 #_R57
+  897 71 18 ku3 #_R57
+  898 77 19 ku3 #_R57
+  899 82 20 ku3 #_R57
+  900 86 21 ku3 #_R57
+  901 90 23 ku3 #_R57
+  902 91 24 ku3 #_R57
+  903 92 25 ku3 #_R57
+  904 97 26 ku3 #_R57
+  905 101 27 ku3 #_R57
+  906 105 29 ku3 #_R57
+  907 106 30 ku3 #_R57
+  908 107 31 ku3 #_R57
+  909 111 32 ku3 #_R57
+  910 115 34 ku3 #_R57
+  911 116 35 ku3 #_R57
+  912 117 36 ku3 #_R57
+  913 121 38 ku3 #_R57
+  914 122 39 ku3 #_R57
+  915 123 40 ku3 #_R57
+  916 127 44 ku3 #_R57
+  917 128 45 ku3 #_R57
+  918 129 46 ku3 #_R57
+  919 47 134 kp3 #_R58
+  920 48 139 kp3 #_R58
+  921 49 143 kp3 #_R58
+  922 50 146 kp3 #_R58
+  923 52 149 kp3 #_R58
+  924 53 150 kp3 #_R58
+  925 54 154 kp3 #_R58
+  926 55 158 kp3 #_R58
+  927 56 161 kp3 #_R58
+  928 58 164 kp3 #_R58
+  929 59 165 kp3 #_R58
+  930 60 168 kp3 #_R58
+  931 61 171 kp3 #_R58
+  932 63 174 kp3 #_R58
+  933 64 175 kp3 #_R58
+  934 65 177 kp3 #_R58
+  935 67 180 kp3 #_R58
+  936 68 181 kp3 #_R58
+  937 70 183 kp3 #_R58
+  938 71 184 kp3 #_R58
+  939 74 186 kp3 #_R58
+  940 75 189 kp3 #_R58
+  941 76 193 kp3 #_R58
+  942 77 196 kp3 #_R58
+  943 79 199 kp3 #_R58
+  944 80 200 kp3 #_R58
+  945 81 203 kp3 #_R58
+  946 82 206 kp3 #_R58
+  947 84 209 kp3 #_R58
+  948 85 210 kp3 #_R58
+  949 86 212 kp3 #_R58
+  950 88 215 kp3 #_R58
+  951 89 216 kp3 #_R58
+  952 91 218 kp3 #_R58
+  953 92 219 kp3 #_R58
+  954 95 221 kp3 #_R58
+  955 96 223 kp3 #_R58
+  956 97 226 kp3 #_R58
+  957 99 229 kp3 #_R58
+  958 100 230 kp3 #_R58
+  959 101 232 kp3 #_R58
+  960 103 235 kp3 #_R58
+  961 104 236 kp3 #_R58
+  962 106 238 kp3 #_R58
+  963 107 239 kp3 #_R58
+  964 110 241 kp3 #_R58
+  965 111 242 kp3 #_R58
+  966 113 245 kp3 #_R58
+  967 114 246 kp3 #_R58
+  968 116 248 kp3 #_R58
+  969 117 249 kp3 #_R58
+  970 120 251 kp3 #_R58
+  971 122 252 kp3 #_R58
+  972 123 253 kp3 #_R58
+  973 126 255 kp3 #_R58
+  974 129 256 kp3 #_R58
+  975 51 11 ku3 #_R59
+  976 57 12 ku3 #_R59
+  977 62 13 ku3 #_R59
+  978 66 14 ku3 #_R59
+  979 69 15 ku3 #_R59
+  980 72 17 ku3 #_R59
+  981 73 18 ku3 #_R59
+  982 78 19 ku3 #_R59
+  983 83 20 ku3 #_R59
+  984 87 21 ku3 #_R59
+  985 90 22 ku3 #_R59
+  986 93 24 ku3 #_R59
+  987 94 25 ku3 #_R59
+  988 98 26 ku3 #_R59
+  989 102 27 ku3 #_R59
+  990 105 28 ku3 #_R59
+  991 108 30 ku3 #_R59
+  992 109 31 ku3 #_R59
+  993 112 32 ku3 #_R59
+  994 115 33 ku3 #_R59
+  995 118 35 ku3 #_R59
+  996 119 36 ku3 #_R59
+  997 121 37 ku3 #_R59
+  998 124 39 ku3 #_R59
+  999 125 40 ku3 #_R59
+ 1000 127 42 ku3 #_R59
+ 1001 128 43 ku3 #_R59
+ 1002 130 46 ku3 #_R59
+ 1003 47 135 kp3 #_R60
+ 1004 48 140 kp3 #_R60
+ 1005 49 144 kp3 #_R60
+ 1006 50 147 kp3 #_R60
+ 1007 51 149 kp3 #_R60
+ 1008 53 151 kp3 #_R60
+ 1009 54 155 kp3 #_R60
+ 1010 55 159 kp3 #_R60
+ 1011 56 162 kp3 #_R60
+ 1012 57 164 kp3 #_R60
+ 1013 59 166 kp3 #_R60
+ 1014 60 169 kp3 #_R60
+ 1015 61 172 kp3 #_R60
+ 1016 62 174 kp3 #_R60
+ 1017 64 176 kp3 #_R60
+ 1018 65 178 kp3 #_R60
+ 1019 66 180 kp3 #_R60
+ 1020 68 182 kp3 #_R60
+ 1021 69 183 kp3 #_R60
+ 1022 71 185 kp3 #_R60
+ 1023 73 186 kp3 #_R60
+ 1024 75 190 kp3 #_R60
+ 1025 76 194 kp3 #_R60
+ 1026 77 197 kp3 #_R60
+ 1027 78 199 kp3 #_R60
+ 1028 80 201 kp3 #_R60
+ 1029 81 204 kp3 #_R60
+ 1030 82 207 kp3 #_R60
+ 1031 83 209 kp3 #_R60
+ 1032 85 211 kp3 #_R60
+ 1033 86 213 kp3 #_R60
+ 1034 87 215 kp3 #_R60
+ 1035 89 217 kp3 #_R60
+ 1036 90 218 kp3 #_R60
+ 1037 92 220 kp3 #_R60
+ 1038 94 221 kp3 #_R60
+ 1039 96 224 kp3 #_R60
+ 1040 97 227 kp3 #_R60
+ 1041 98 229 kp3 #_R60
+ 1042 100 231 kp3 #_R60
+ 1043 101 233 kp3 #_R60
+ 1044 102 235 kp3 #_R60
+ 1045 104 237 kp3 #_R60
+ 1046 105 238 kp3 #_R60
+ 1047 107 240 kp3 #_R60
+ 1048 109 241 kp3 #_R60
+ 1049 111 243 kp3 #_R60
+ 1050 112 245 kp3 #_R60
+ 1051 114 247 kp3 #_R60
+ 1052 115 248 kp3 #_R60
+ 1053 117 250 kp3 #_R60
+ 1054 119 251 kp3 #_R60
+ 1055 121 252 kp3 #_R60
+ 1056 123 254 kp3 #_R60
+ 1057 125 255 kp3 #_R60
+ 1058 128 256 kp3 #_R60
+ 1059 52 11 ku3 #_R61
+ 1060 58 12 ku3 #_R61
+ 1061 63 13 ku3 #_R61
+ 1062 67 14 ku3 #_R61
+ 1063 70 15 ku3 #_R61
+ 1064 72 16 ku3 #_R61
+ 1065 74 18 ku3 #_R61
+ 1066 79 19 ku3 #_R61
+ 1067 84 20 ku3 #_R61
+ 1068 88 21 ku3 #_R61
+ 1069 91 22 ku3 #_R61
+ 1070 93 23 ku3 #_R61
+ 1071 95 25 ku3 #_R61
+ 1072 99 26 ku3 #_R61
+ 1073 103 27 ku3 #_R61
+ 1074 106 28 ku3 #_R61
+ 1075 108 29 ku3 #_R61
+ 1076 110 31 ku3 #_R61
+ 1077 113 32 ku3 #_R61
+ 1078 116 33 ku3 #_R61
+ 1079 118 34 ku3 #_R61
+ 1080 120 36 ku3 #_R61
+ 1081 122 37 ku3 #_R61
+ 1082 124 38 ku3 #_R61
+ 1083 126 40 ku3 #_R61
+ 1084 127 41 ku3 #_R61
+ 1085 129 43 ku3 #_R61
+ 1086 130 45 ku3 #_R61
+ 1087 47 136 kp3 #_R62
+ 1088 48 141 kp3 #_R62
+ 1089 49 145 kp3 #_R62
+ 1090 50 148 kp3 #_R62
+ 1091 51 150 kp3 #_R62
+ 1092 52 151 kp3 #_R62
+ 1093 54 156 kp3 #_R62
+ 1094 55 160 kp3 #_R62
+ 1095 56 163 kp3 #_R62
+ 1096 57 165 kp3 #_R62
+ 1097 58 166 kp3 #_R62
+ 1098 60 170 kp3 #_R62
+ 1099 61 173 kp3 #_R62
+ 1100 62 175 kp3 #_R62
+ 1101 63 176 kp3 #_R62
+ 1102 65 179 kp3 #_R62
+ 1103 66 181 kp3 #_R62
+ 1104 67 182 kp3 #_R62
+ 1105 69 184 kp3 #_R62
+ 1106 70 185 kp3 #_R62
+ 1107 72 186 kp3 #_R62
+ 1108 75 191 kp3 #_R62
+ 1109 76 195 kp3 #_R62
+ 1110 77 198 kp3 #_R62
+ 1111 78 200 kp3 #_R62
+ 1112 79 201 kp3 #_R62
+ 1113 81 205 kp3 #_R62
+ 1114 82 208 kp3 #_R62
+ 1115 83 210 kp3 #_R62
+ 1116 84 211 kp3 #_R62
+ 1117 86 214 kp3 #_R62
+ 1118 87 216 kp3 #_R62
+ 1119 88 217 kp3 #_R62
+ 1120 90 219 kp3 #_R62
+ 1121 91 220 kp3 #_R62
+ 1122 93 221 kp3 #_R62
+ 1123 96 225 kp3 #_R62
+ 1124 97 228 kp3 #_R62
+ 1125 98 230 kp3 #_R62
+ 1126 99 231 kp3 #_R62
+ 1127 101 234 kp3 #_R62
+ 1128 102 236 kp3 #_R62
+ 1129 103 237 kp3 #_R62
+ 1130 105 239 kp3 #_R62
+ 1131 106 240 kp3 #_R62
+ 1132 108 241 kp3 #_R62
+ 1133 111 244 kp3 #_R62
+ 1134 112 246 kp3 #_R62
+ 1135 113 247 kp3 #_R62
+ 1136 115 249 kp3 #_R62
+ 1137 116 250 kp3 #_R62
+ 1138 118 251 kp3 #_R62
+ 1139 121 253 kp3 #_R62
+ 1140 122 254 kp3 #_R62
+ 1141 124 255 kp3 #_R62
+ 1142 127 256 kp3 #_R62
+ 1143 53 11 ku3 #_R63
+ 1144 59 12 ku3 #_R63
+ 1145 64 13 ku3 #_R63
+ 1146 68 14 ku3 #_R63
+ 1147 71 15 ku3 #_R63
+ 1148 73 16 ku3 #_R63
+ 1149 74 17 ku3 #_R63
+ 1150 80 19 ku3 #_R63
+ 1151 85 20 ku3 #_R63
+ 1152 89 21 ku3 #_R63
+ 1153 92 22 ku3 #_R63
+ 1154 94 23 ku3 #_R63
+ 1155 95 24 ku3 #_R63
+ 1156 100 26 ku3 #_R63
+ 1157 104 27 ku3 #_R63
+ 1158 107 28 ku3 #_R63
+ 1159 109 29 ku3 #_R63
+ 1160 110 30 ku3 #_R63
+ 1161 114 32 ku3 #_R63
+ 1162 117 33 ku3 #_R63
+ 1163 119 34 ku3 #_R63
+ 1164 120 35 ku3 #_R63
+ 1165 123 37 ku3 #_R63
+ 1166 125 38 ku3 #_R63
+ 1167 126 39 ku3 #_R63
+ 1168 128 41 ku3 #_R63
+ 1169 129 42 ku3 #_R63
+ 1170 130 44 ku3 #_R63
+ 1171 187 257 kp4 #_R64
+ 1172 188 258 kp4 #_R64
+ 1173 189 259 kp4 #_R64
+ 1174 190 260 kp4 #_R64
+ 1175 191 261 kp4 #_R64
+ 1176 192 262 kp4 #_R64
+ 1177 193 263 kp4 #_R64
+ 1178 194 264 kp4 #_R64
+ 1179 195 265 kp4 #_R64
+ 1180 196 266 kp4 #_R64
+ 1181 197 267 kp4 #_R64
+ 1182 198 268 kp4 #_R64
+ 1183 199 269 kp4 #_R64
+ 1184 200 270 kp4 #_R64
+ 1185 201 271 kp4 #_R64
+ 1186 202 272 kp4 #_R64
+ 1187 203 273 kp4 #_R64
+ 1188 204 274 kp4 #_R64
+ 1189 205 275 kp4 #_R64
+ 1190 206 276 kp4 #_R64
+ 1191 207 277 kp4 #_R64
+ 1192 208 278 kp4 #_R64
+ 1193 209 279 kp4 #_R64
+ 1194 210 280 kp4 #_R64
+ 1195 211 281 kp4 #_R64
+ 1196 212 282 kp4 #_R64
+ 1197 213 283 kp4 #_R64
+ 1198 214 284 kp4 #_R64
+ 1199 215 285 kp4 #_R64
+ 1200 216 286 kp4 #_R64
+ 1201 217 287 kp4 #_R64
+ 1202 218 288 kp4 #_R64
+ 1203 219 289 kp4 #_R64
+ 1204 220 290 kp4 #_R64
+ 1205 221 291 kp4 #_R64
+ 1206 222 292 kp4 #_R64
+ 1207 223 293 kp4 #_R64
+ 1208 224 294 kp4 #_R64
+ 1209 225 295 kp4 #_R64
+ 1210 226 296 kp4 #_R64
+ 1211 227 297 kp4 #_R64
+ 1212 228 298 kp4 #_R64
+ 1213 229 299 kp4 #_R64
+ 1214 230 300 kp4 #_R64
+ 1215 231 301 kp4 #_R64
+ 1216 232 302 kp4 #_R64
+ 1217 233 303 kp4 #_R64
+ 1218 234 304 kp4 #_R64
+ 1219 235 305 kp4 #_R64
+ 1220 236 306 kp4 #_R64
+ 1221 237 307 kp4 #_R64
+ 1222 238 308 kp4 #_R64
+ 1223 239 309 kp4 #_R64
+ 1224 240 310 kp4 #_R64
+ 1225 241 311 kp4 #_R64
+ 1226 242 312 kp4 #_R64
+ 1227 243 313 kp4 #_R64
+ 1228 244 314 kp4 #_R64
+ 1229 245 315 kp4 #_R64
+ 1230 246 316 kp4 #_R64
+ 1231 247 317 kp4 #_R64
+ 1232 248 318 kp4 #_R64
+ 1233 249 319 kp4 #_R64
+ 1234 250 320 kp4 #_R64
+ 1235 251 321 kp4 #_R64
+ 1236 252 322 kp4 #_R64
+ 1237 253 323 kp4 #_R64
+ 1238 254 324 kp4 #_R64
+ 1239 255 325 kp4 #_R64
+ 1240 256 326 kp4 #_R64
+ 1241 131 75 ku4 #_R65
+ 1242 132 76 ku4 #_R65
+ 1243 133 77 ku4 #_R65
+ 1244 134 78 ku4 #_R65
+ 1245 135 79 ku4 #_R65
+ 1246 136 80 ku4 #_R65
+ 1247 137 81 ku4 #_R65
+ 1248 138 82 ku4 #_R65
+ 1249 139 83 ku4 #_R65
+ 1250 140 84 ku4 #_R65
+ 1251 141 85 ku4 #_R65
+ 1252 142 86 ku4 #_R65
+ 1253 143 87 ku4 #_R65
+ 1254 144 88 ku4 #_R65
+ 1255 145 89 ku4 #_R65
+ 1256 146 90 ku4 #_R65
+ 1257 147 91 ku4 #_R65
+ 1258 148 92 ku4 #_R65
+ 1259 149 93 ku4 #_R65
+ 1260 150 94 ku4 #_R65
+ 1261 151 95 ku4 #_R65
+ 1262 152 96 ku4 #_R65
+ 1263 153 97 ku4 #_R65
+ 1264 154 98 ku4 #_R65
+ 1265 155 99 ku4 #_R65
+ 1266 156 100 ku4 #_R65
+ 1267 157 101 ku4 #_R65
+ 1268 158 102 ku4 #_R65
+ 1269 159 103 ku4 #_R65
+ 1270 160 104 ku4 #_R65
+ 1271 161 105 ku4 #_R65
+ 1272 162 106 ku4 #_R65
+ 1273 163 107 ku4 #_R65
+ 1274 164 108 ku4 #_R65
+ 1275 165 109 ku4 #_R65
+ 1276 166 110 ku4 #_R65
+ 1277 167 111 ku4 #_R65
+ 1278 168 112 ku4 #_R65
+ 1279 169 113 ku4 #_R65
+ 1280 170 114 ku4 #_R65
+ 1281 171 115 ku4 #_R65
+ 1282 172 116 ku4 #_R65
+ 1283 173 117 ku4 #_R65
+ 1284 174 118 ku4 #_R65
+ 1285 175 119 ku4 #_R65
+ 1286 176 120 ku4 #_R65
+ 1287 177 121 ku4 #_R65
+ 1288 178 122 ku4 #_R65
+ 1289 179 123 ku4 #_R65
+ 1290 180 124 ku4 #_R65
+ 1291 181 125 ku4 #_R65
+ 1292 182 126 ku4 #_R65
+ 1293 183 127 ku4 #_R65
+ 1294 184 128 ku4 #_R65
+ 1295 185 129 ku4 #_R65
+ 1296 186 130 ku4 #_R65
+ 1297 152 257 kp4 #_R66
+ 1298 153 258 kp4 #_R66
+ 1299 154 259 kp4 #_R66
+ 1300 155 260 kp4 #_R66
+ 1301 156 261 kp4 #_R66
+ 1302 157 262 kp4 #_R66
+ 1303 158 263 kp4 #_R66
+ 1304 159 264 kp4 #_R66
+ 1305 160 265 kp4 #_R66
+ 1306 161 266 kp4 #_R66
+ 1307 162 267 kp4 #_R66
+ 1308 163 268 kp4 #_R66
+ 1309 164 269 kp4 #_R66
+ 1310 165 270 kp4 #_R66
+ 1311 166 271 kp4 #_R66
+ 1312 167 272 kp4 #_R66
+ 1313 168 273 kp4 #_R66
+ 1314 169 274 kp4 #_R66
+ 1315 170 275 kp4 #_R66
+ 1316 171 276 kp4 #_R66
+ 1317 172 277 kp4 #_R66
+ 1318 173 278 kp4 #_R66
+ 1319 174 279 kp4 #_R66
+ 1320 175 280 kp4 #_R66
+ 1321 176 281 kp4 #_R66
+ 1322 177 282 kp4 #_R66
+ 1323 178 283 kp4 #_R66
+ 1324 179 284 kp4 #_R66
+ 1325 180 285 kp4 #_R66
+ 1326 181 286 kp4 #_R66
+ 1327 182 287 kp4 #_R66
+ 1328 183 288 kp4 #_R66
+ 1329 184 289 kp4 #_R66
+ 1330 185 290 kp4 #_R66
+ 1331 186 291 kp4 #_R66
+ 1332 222 327 kp4 #_R66
+ 1333 223 328 kp4 #_R66
+ 1334 224 329 kp4 #_R66
+ 1335 225 330 kp4 #_R66
+ 1336 226 331 kp4 #_R66
+ 1337 227 332 kp4 #_R66
+ 1338 228 333 kp4 #_R66
+ 1339 229 334 kp4 #_R66
+ 1340 230 335 kp4 #_R66
+ 1341 231 336 kp4 #_R66
+ 1342 232 337 kp4 #_R66
+ 1343 233 338 kp4 #_R66
+ 1344 234 339 kp4 #_R66
+ 1345 235 340 kp4 #_R66
+ 1346 236 341 kp4 #_R66
+ 1347 237 342 kp4 #_R66
+ 1348 238 343 kp4 #_R66
+ 1349 239 344 kp4 #_R66
+ 1350 240 345 kp4 #_R66
+ 1351 241 346 kp4 #_R66
+ 1352 242 347 kp4 #_R66
+ 1353 243 348 kp4 #_R66
+ 1354 244 349 kp4 #_R66
+ 1355 245 350 kp4 #_R66
+ 1356 246 351 kp4 #_R66
+ 1357 247 352 kp4 #_R66
+ 1358 248 353 kp4 #_R66
+ 1359 249 354 kp4 #_R66
+ 1360 250 355 kp4 #_R66
+ 1361 251 356 kp4 #_R66
+ 1362 252 357 kp4 #_R66
+ 1363 253 358 kp4 #_R66
+ 1364 254 359 kp4 #_R66
+ 1365 255 360 kp4 #_R66
+ 1366 256 361 kp4 #_R66
+ 1367 131 54 ku4 #_R67
+ 1368 132 55 ku4 #_R67
+ 1369 133 56 ku4 #_R67
+ 1370 134 57 ku4 #_R67
+ 1371 135 58 ku4 #_R67
+ 1372 136 59 ku4 #_R67
+ 1373 137 60 ku4 #_R67
+ 1374 138 61 ku4 #_R67
+ 1375 139 62 ku4 #_R67
+ 1376 140 63 ku4 #_R67
+ 1377 141 64 ku4 #_R67
+ 1378 142 65 ku4 #_R67
+ 1379 143 66 ku4 #_R67
+ 1380 144 67 ku4 #_R67
+ 1381 145 68 ku4 #_R67
+ 1382 146 69 ku4 #_R67
+ 1383 147 70 ku4 #_R67
+ 1384 148 71 ku4 #_R67
+ 1385 149 72 ku4 #_R67
+ 1386 150 73 ku4 #_R67
+ 1387 151 74 ku4 #_R67
+ 1388 187 96 ku4 #_R67
+ 1389 188 97 ku4 #_R67
+ 1390 189 98 ku4 #_R67
+ 1391 190 99 ku4 #_R67
+ 1392 191 100 ku4 #_R67
+ 1393 192 101 ku4 #_R67
+ 1394 193 102 ku4 #_R67
+ 1395 194 103 ku4 #_R67
+ 1396 195 104 ku4 #_R67
+ 1397 196 105 ku4 #_R67
+ 1398 197 106 ku4 #_R67
+ 1399 198 107 ku4 #_R67
+ 1400 199 108 ku4 #_R67
+ 1401 200 109 ku4 #_R67
+ 1402 201 110 ku4 #_R67
+ 1403 202 111 ku4 #_R67
+ 1404 203 112 ku4 #_R67
+ 1405 204 113 ku4 #_R67
+ 1406 205 114 ku4 #_R67
+ 1407 206 115 ku4 #_R67
+ 1408 207 116 ku4 #_R67
+ 1409 208 117 ku4 #_R67
+ 1410 209 118 ku4 #_R67
+ 1411 210 119 ku4 #_R67
+ 1412 211 120 ku4 #_R67
+ 1413 212 121 ku4 #_R67
+ 1414 213 122 ku4 #_R67
+ 1415 214 123 ku4 #_R67
+ 1416 215 124 ku4 #_R67
+ 1417 216 125 ku4 #_R67
+ 1418 217 126 ku4 #_R67
+ 1419 218 127 ku4 #_R67
+ 1420 219 128 ku4 #_R67
+ 1421 220 129 ku4 #_R67
+ 1422 221 130 ku4 #_R67
+ 1423 137 257 kp4 #_R68
+ 1424 138 258 kp4 #_R68
+ 1425 139 259 kp4 #_R68
+ 1426 140 260 kp4 #_R68
+ 1427 141 261 kp4 #_R68
+ 1428 142 262 kp4 #_R68
+ 1429 143 263 kp4 #_R68
+ 1430 144 264 kp4 #_R68
+ 1431 145 265 kp4 #_R68
+ 1432 146 266 kp4 #_R68
+ 1433 147 267 kp4 #_R68
+ 1434 148 268 kp4 #_R68
+ 1435 149 269 kp4 #_R68
+ 1436 150 270 kp4 #_R68
+ 1437 151 271 kp4 #_R68
+ 1438 167 292 kp4 #_R68
+ 1439 168 293 kp4 #_R68
+ 1440 169 294 kp4 #_R68
+ 1441 170 295 kp4 #_R68
+ 1442 171 296 kp4 #_R68
+ 1443 172 297 kp4 #_R68
+ 1444 173 298 kp4 #_R68
+ 1445 174 299 kp4 #_R68
+ 1446 175 300 kp4 #_R68
+ 1447 176 301 kp4 #_R68
+ 1448 177 302 kp4 #_R68
+ 1449 178 303 kp4 #_R68
+ 1450 179 304 kp4 #_R68
+ 1451 180 305 kp4 #_R68
+ 1452 181 306 kp4 #_R68
+ 1453 182 307 kp4 #_R68
+ 1454 183 308 kp4 #_R68
+ 1455 184 309 kp4 #_R68
+ 1456 185 310 kp4 #_R68
+ 1457 186 311 kp4 #_R68
+ 1458 202 327 kp4 #_R68
+ 1459 203 328 kp4 #_R68
+ 1460 204 329 kp4 #_R68
+ 1461 205 330 kp4 #_R68
+ 1462 206 331 kp4 #_R68
+ 1463 207 332 kp4 #_R68
+ 1464 208 333 kp4 #_R68
+ 1465 209 334 kp4 #_R68
+ 1466 210 335 kp4 #_R68
+ 1467 211 336 kp4 #_R68
+ 1468 212 337 kp4 #_R68
+ 1469 213 338 kp4 #_R68
+ 1470 214 339 kp4 #_R68
+ 1471 215 340 kp4 #_R68
+ 1472 216 341 kp4 #_R68
+ 1473 217 342 kp4 #_R68
+ 1474 218 343 kp4 #_R68
+ 1475 219 344 kp4 #_R68
+ 1476 220 345 kp4 #_R68
+ 1477 221 346 kp4 #_R68
+ 1478 242 362 kp4 #_R68
+ 1479 243 363 kp4 #_R68
+ 1480 244 364 kp4 #_R68
+ 1481 245 365 kp4 #_R68
+ 1482 246 366 kp4 #_R68
+ 1483 247 367 kp4 #_R68
+ 1484 248 368 kp4 #_R68
+ 1485 249 369 kp4 #_R68
+ 1486 250 370 kp4 #_R68
+ 1487 251 371 kp4 #_R68
+ 1488 252 372 kp4 #_R68
+ 1489 253 373 kp4 #_R68
+ 1490 254 374 kp4 #_R68
+ 1491 255 375 kp4 #_R68
+ 1492 256 376 kp4 #_R68
+ 1493 131 48 ku4 #_R69
+ 1494 132 49 ku4 #_R69
+ 1495 133 50 ku4 #_R69
+ 1496 134 51 ku4 #_R69
+ 1497 135 52 ku4 #_R69
+ 1498 136 53 ku4 #_R69
+ 1499 152 60 ku4 #_R69
+ 1500 153 61 ku4 #_R69
+ 1501 154 62 ku4 #_R69
+ 1502 155 63 ku4 #_R69
+ 1503 156 64 ku4 #_R69
+ 1504 157 65 ku4 #_R69
+ 1505 158 66 ku4 #_R69
+ 1506 159 67 ku4 #_R69
+ 1507 160 68 ku4 #_R69
+ 1508 161 69 ku4 #_R69
+ 1509 162 70 ku4 #_R69
+ 1510 163 71 ku4 #_R69
+ 1511 164 72 ku4 #_R69
+ 1512 165 73 ku4 #_R69
+ 1513 166 74 ku4 #_R69
+ 1514 187 81 ku4 #_R69
+ 1515 188 82 ku4 #_R69
+ 1516 189 83 ku4 #_R69
+ 1517 190 84 ku4 #_R69
+ 1518 191 85 ku4 #_R69
+ 1519 192 86 ku4 #_R69
+ 1520 193 87 ku4 #_R69
+ 1521 194 88 ku4 #_R69
+ 1522 195 89 ku4 #_R69
+ 1523 196 90 ku4 #_R69
+ 1524 197 91 ku4 #_R69
+ 1525 198 92 ku4 #_R69
+ 1526 199 93 ku4 #_R69
+ 1527 200 94 ku4 #_R69
+ 1528 201 95 ku4 #_R69
+ 1529 222 111 ku4 #_R69
+ 1530 223 112 ku4 #_R69
+ 1531 224 113 ku4 #_R69
+ 1532 225 114 ku4 #_R69
+ 1533 226 115 ku4 #_R69
+ 1534 227 116 ku4 #_R69
+ 1535 228 117 ku4 #_R69
+ 1536 229 118 ku4 #_R69
+ 1537 230 119 ku4 #_R69
+ 1538 231 120 ku4 #_R69
+ 1539 232 121 ku4 #_R69
+ 1540 233 122 ku4 #_R69
+ 1541 234 123 ku4 #_R69
+ 1542 235 124 ku4 #_R69
+ 1543 236 125 ku4 #_R69
+ 1544 237 126 ku4 #_R69
+ 1545 238 127 ku4 #_R69
+ 1546 239 128 ku4 #_R69
+ 1547 240 129 ku4 #_R69
+ 1548 241 130 ku4 #_R69
+ 1549 132 257 kp4 #_R70
+ 1550 133 258 kp4 #_R70
+ 1551 134 259 kp4 #_R70
+ 1552 135 260 kp4 #_R70
+ 1553 136 261 kp4 #_R70
+ 1554 142 272 kp4 #_R70
+ 1555 143 273 kp4 #_R70
+ 1556 144 274 kp4 #_R70
+ 1557 145 275 kp4 #_R70
+ 1558 146 276 kp4 #_R70
+ 1559 147 277 kp4 #_R70
+ 1560 148 278 kp4 #_R70
+ 1561 149 279 kp4 #_R70
+ 1562 150 280 kp4 #_R70
+ 1563 151 281 kp4 #_R70
+ 1564 157 292 kp4 #_R70
+ 1565 158 293 kp4 #_R70
+ 1566 159 294 kp4 #_R70
+ 1567 160 295 kp4 #_R70
+ 1568 161 296 kp4 #_R70
+ 1569 162 297 kp4 #_R70
+ 1570 163 298 kp4 #_R70
+ 1571 164 299 kp4 #_R70
+ 1572 165 300 kp4 #_R70
+ 1573 166 301 kp4 #_R70
+ 1574 177 312 kp4 #_R70
+ 1575 178 313 kp4 #_R70
+ 1576 179 314 kp4 #_R70
+ 1577 180 315 kp4 #_R70
+ 1578 181 316 kp4 #_R70
+ 1579 182 317 kp4 #_R70
+ 1580 183 318 kp4 #_R70
+ 1581 184 319 kp4 #_R70
+ 1582 185 320 kp4 #_R70
+ 1583 186 321 kp4 #_R70
+ 1584 192 327 kp4 #_R70
+ 1585 193 328 kp4 #_R70
+ 1586 194 329 kp4 #_R70
+ 1587 195 330 kp4 #_R70
+ 1588 196 331 kp4 #_R70
+ 1589 197 332 kp4 #_R70
+ 1590 198 333 kp4 #_R70
+ 1591 199 334 kp4 #_R70
+ 1592 200 335 kp4 #_R70
+ 1593 201 336 kp4 #_R70
+ 1594 212 347 kp4 #_R70
+ 1595 213 348 kp4 #_R70
+ 1596 214 349 kp4 #_R70
+ 1597 215 350 kp4 #_R70
+ 1598 216 351 kp4 #_R70
+ 1599 217 352 kp4 #_R70
+ 1600 218 353 kp4 #_R70
+ 1601 219 354 kp4 #_R70
+ 1602 220 355 kp4 #_R70
+ 1603 221 356 kp4 #_R70
+ 1604 232 362 kp4 #_R70
+ 1605 233 363 kp4 #_R70
+ 1606 234 364 kp4 #_R70
+ 1607 235 365 kp4 #_R70
+ 1608 236 366 kp4 #_R70
+ 1609 237 367 kp4 #_R70
+ 1610 238 368 kp4 #_R70
+ 1611 239 369 kp4 #_R70
+ 1612 240 370 kp4 #_R70
+ 1613 241 371 kp4 #_R70
+ 1614 252 377 kp4 #_R70
+ 1615 253 378 kp4 #_R70
+ 1616 254 379 kp4 #_R70
+ 1617 255 380 kp4 #_R70
+ 1618 256 381 kp4 #_R70
+ 1619 131 47 ku4 #_R71
+ 1620 137 49 ku4 #_R71
+ 1621 138 50 ku4 #_R71
+ 1622 139 51 ku4 #_R71
+ 1623 140 52 ku4 #_R71
+ 1624 141 53 ku4 #_R71
+ 1625 152 55 ku4 #_R71
+ 1626 153 56 ku4 #_R71
+ 1627 154 57 ku4 #_R71
+ 1628 155 58 ku4 #_R71
+ 1629 156 59 ku4 #_R71
+ 1630 167 65 ku4 #_R71
+ 1631 168 66 ku4 #_R71
+ 1632 169 67 ku4 #_R71
+ 1633 170 68 ku4 #_R71
+ 1634 171 69 ku4 #_R71
+ 1635 172 70 ku4 #_R71
+ 1636 173 71 ku4 #_R71
+ 1637 174 72 ku4 #_R71
+ 1638 175 73 ku4 #_R71
+ 1639 176 74 ku4 #_R71
+ 1640 187 76 ku4 #_R71
+ 1641 188 77 ku4 #_R71
+ 1642 189 78 ku4 #_R71
+ 1643 190 79 ku4 #_R71
+ 1644 191 80 ku4 #_R71
+ 1645 202 86 ku4 #_R71
+ 1646 203 87 ku4 #_R71
+ 1647 204 88 ku4 #_R71
+ 1648 205 89 ku4 #_R71
+ 1649 206 90 ku4 #_R71
+ 1650 207 91 ku4 #_R71
+ 1651 208 92 ku4 #_R71
+ 1652 209 93 ku4 #_R71
+ 1653 210 94 ku4 #_R71
+ 1654 211 95 ku4 #_R71
+ 1655 222 101 ku4 #_R71
+ 1656 223 102 ku4 #_R71
+ 1657 224 103 ku4 #_R71
+ 1658 225 104 ku4 #_R71
+ 1659 226 105 ku4 #_R71
+ 1660 227 106 ku4 #_R71
+ 1661 228 107 ku4 #_R71
+ 1662 229 108 ku4 #_R71
+ 1663 230 109 ku4 #_R71
+ 1664 231 110 ku4 #_R71
+ 1665 242 121 ku4 #_R71
+ 1666 243 122 ku4 #_R71
+ 1667 244 123 ku4 #_R71
+ 1668 245 124 ku4 #_R71
+ 1669 246 125 ku4 #_R71
+ 1670 247 126 ku4 #_R71
+ 1671 248 127 ku4 #_R71
+ 1672 249 128 ku4 #_R71
+ 1673 250 129 ku4 #_R71
+ 1674 251 130 ku4 #_R71
+ 1675 131 257 kp4 #_R72
+ 1676 133 262 kp4 #_R72
+ 1677 134 263 kp4 #_R72
+ 1678 135 264 kp4 #_R72
+ 1679 136 265 kp4 #_R72
+ 1680 138 272 kp4 #_R72
+ 1681 139 273 kp4 #_R72
+ 1682 140 274 kp4 #_R72
+ 1683 141 275 kp4 #_R72
+ 1684 146 282 kp4 #_R72
+ 1685 147 283 kp4 #_R72
+ 1686 148 284 kp4 #_R72
+ 1687 149 285 kp4 #_R72
+ 1688 150 286 kp4 #_R72
+ 1689 151 287 kp4 #_R72
+ 1690 153 292 kp4 #_R72
+ 1691 154 293 kp4 #_R72
+ 1692 155 294 kp4 #_R72
+ 1693 156 295 kp4 #_R72
+ 1694 161 302 kp4 #_R72
+ 1695 162 303 kp4 #_R72
+ 1696 163 304 kp4 #_R72
+ 1697 164 305 kp4 #_R72
+ 1698 165 306 kp4 #_R72
+ 1699 166 307 kp4 #_R72
+ 1700 171 312 kp4 #_R72
+ 1701 172 313 kp4 #_R72
+ 1702 173 314 kp4 #_R72
+ 1703 174 315 kp4 #_R72
+ 1704 175 316 kp4 #_R72
+ 1705 176 317 kp4 #_R72
+ 1706 183 322 kp4 #_R72
+ 1707 184 323 kp4 #_R72
+ 1708 185 324 kp4 #_R72
+ 1709 186 325 kp4 #_R72
+ 1710 188 327 kp4 #_R72
+ 1711 189 328 kp4 #_R72
+ 1712 190 329 kp4 #_R72
+ 1713 191 330 kp4 #_R72
+ 1714 196 337 kp4 #_R72
+ 1715 197 338 kp4 #_R72
+ 1716 198 339 kp4 #_R72
+ 1717 199 340 kp4 #_R72
+ 1718 200 341 kp4 #_R72
+ 1719 201 342 kp4 #_R72
+ 1720 206 347 kp4 #_R72
+ 1721 207 348 kp4 #_R72
+ 1722 208 349 kp4 #_R72
+ 1723 209 350 kp4 #_R72
+ 1724 210 351 kp4 #_R72
+ 1725 211 352 kp4 #_R72
+ 1726 218 357 kp4 #_R72
+ 1727 219 358 kp4 #_R72
+ 1728 220 359 kp4 #_R72
+ 1729 221 360 kp4 #_R72
+ 1730 226 362 kp4 #_R72
+ 1731 227 363 kp4 #_R72
+ 1732 228 364 kp4 #_R72
+ 1733 229 365 kp4 #_R72
+ 1734 230 366 kp4 #_R72
+ 1735 231 367 kp4 #_R72
+ 1736 238 372 kp4 #_R72
+ 1737 239 373 kp4 #_R72
+ 1738 240 374 kp4 #_R72
+ 1739 241 375 kp4 #_R72
+ 1740 248 377 kp4 #_R72
+ 1741 249 378 kp4 #_R72
+ 1742 250 379 kp4 #_R72
+ 1743 251 380 kp4 #_R72
+ 1744 256 382 kp4 #_R72
+ 1745 132 47 ku4 #_R73
+ 1746 137 48 ku4 #_R73
+ 1747 142 50 ku4 #_R73
+ 1748 143 51 ku4 #_R73
+ 1749 144 52 ku4 #_R73
+ 1750 145 53 ku4 #_R73
+ 1751 152 54 ku4 #_R73
+ 1752 157 56 ku4 #_R73
+ 1753 158 57 ku4 #_R73
+ 1754 159 58 ku4 #_R73
+ 1755 160 59 ku4 #_R73
+ 1756 167 61 ku4 #_R73
+ 1757 168 62 ku4 #_R73
+ 1758 169 63 ku4 #_R73
+ 1759 170 64 ku4 #_R73
+ 1760 177 69 ku4 #_R73
+ 1761 178 70 ku4 #_R73
+ 1762 179 71 ku4 #_R73
+ 1763 180 72 ku4 #_R73
+ 1764 181 73 ku4 #_R73
+ 1765 182 74 ku4 #_R73
+ 1766 187 75 ku4 #_R73
+ 1767 192 77 ku4 #_R73
+ 1768 193 78 ku4 #_R73
+ 1769 194 79 ku4 #_R73
+ 1770 195 80 ku4 #_R73
+ 1771 202 82 ku4 #_R73
+ 1772 203 83 ku4 #_R73
+ 1773 204 84 ku4 #_R73
+ 1774 205 85 ku4 #_R73
+ 1775 212 90 ku4 #_R73
+ 1776 213 91 ku4 #_R73
+ 1777 214 92 ku4 #_R73
+ 1778 215 93 ku4 #_R73
+ 1779 216 94 ku4 #_R73
+ 1780 217 95 ku4 #_R73
+ 1781 222 97 ku4 #_R73
+ 1782 223 98 ku4 #_R73
+ 1783 224 99 ku4 #_R73
+ 1784 225 100 ku4 #_R73
+ 1785 232 105 ku4 #_R73
+ 1786 233 106 ku4 #_R73
+ 1787 234 107 ku4 #_R73
+ 1788 235 108 ku4 #_R73
+ 1789 236 109 ku4 #_R73
+ 1790 237 110 ku4 #_R73
+ 1791 242 115 ku4 #_R73
+ 1792 243 116 ku4 #_R73
+ 1793 244 117 ku4 #_R73
+ 1794 245 118 ku4 #_R73
+ 1795 246 119 ku4 #_R73
+ 1796 247 120 ku4 #_R73
+ 1797 252 127 ku4 #_R73
+ 1798 253 128 ku4 #_R73
+ 1799 254 129 ku4 #_R73
+ 1800 255 130 ku4 #_R73
+ 1801 131 258 kp4 #_R74
+ 1802 132 262 kp4 #_R74
+ 1803 134 266 kp4 #_R74
+ 1804 135 267 kp4 #_R74
+ 1805 136 268 kp4 #_R74
+ 1806 137 272 kp4 #_R74
+ 1807 139 276 kp4 #_R74
+ 1808 140 277 kp4 #_R74
+ 1809 141 278 kp4 #_R74
+ 1810 143 282 kp4 #_R74
+ 1811 144 283 kp4 #_R74
+ 1812 145 284 kp4 #_R74
+ 1813 149 288 kp4 #_R74
+ 1814 150 289 kp4 #_R74
+ 1815 151 290 kp4 #_R74
+ 1816 152 292 kp4 #_R74
+ 1817 154 296 kp4 #_R74
+ 1818 155 297 kp4 #_R74
+ 1819 156 298 kp4 #_R74
+ 1820 158 302 kp4 #_R74
+ 1821 159 303 kp4 #_R74
+ 1822 160 304 kp4 #_R74
+ 1823 164 308 kp4 #_R74
+ 1824 165 309 kp4 #_R74
+ 1825 166 310 kp4 #_R74
+ 1826 168 312 kp4 #_R74
+ 1827 169 313 kp4 #_R74
+ 1828 170 314 kp4 #_R74
+ 1829 174 318 kp4 #_R74
+ 1830 175 319 kp4 #_R74
+ 1831 176 320 kp4 #_R74
+ 1832 180 322 kp4 #_R74
+ 1833 181 323 kp4 #_R74
+ 1834 182 324 kp4 #_R74
+ 1835 186 326 kp4 #_R74
+ 1836 187 327 kp4 #_R74
+ 1837 189 331 kp4 #_R74
+ 1838 190 332 kp4 #_R74
+ 1839 191 333 kp4 #_R74
+ 1840 193 337 kp4 #_R74
+ 1841 194 338 kp4 #_R74
+ 1842 195 339 kp4 #_R74
+ 1843 199 343 kp4 #_R74
+ 1844 200 344 kp4 #_R74
+ 1845 201 345 kp4 #_R74
+ 1846 203 347 kp4 #_R74
+ 1847 204 348 kp4 #_R74
+ 1848 205 349 kp4 #_R74
+ 1849 209 353 kp4 #_R74
+ 1850 210 354 kp4 #_R74
+ 1851 211 355 kp4 #_R74
+ 1852 215 357 kp4 #_R74
+ 1853 216 358 kp4 #_R74
+ 1854 217 359 kp4 #_R74
+ 1855 221 361 kp4 #_R74
+ 1856 223 362 kp4 #_R74
+ 1857 224 363 kp4 #_R74
+ 1858 225 364 kp4 #_R74
+ 1859 229 368 kp4 #_R74
+ 1860 230 369 kp4 #_R74
+ 1861 231 370 kp4 #_R74
+ 1862 235 372 kp4 #_R74
+ 1863 236 373 kp4 #_R74
+ 1864 237 374 kp4 #_R74
+ 1865 241 376 kp4 #_R74
+ 1866 245 377 kp4 #_R74
+ 1867 246 378 kp4 #_R74
+ 1868 247 379 kp4 #_R74
+ 1869 251 381 kp4 #_R74
+ 1870 255 382 kp4 #_R74
+ 1871 133 47 ku4 #_R75
+ 1872 138 48 ku4 #_R75
+ 1873 142 49 ku4 #_R75
+ 1874 146 51 ku4 #_R75
+ 1875 147 52 ku4 #_R75
+ 1876 148 53 ku4 #_R75
+ 1877 153 54 ku4 #_R75
+ 1878 157 55 ku4 #_R75
+ 1879 161 57 ku4 #_R75
+ 1880 162 58 ku4 #_R75
+ 1881 163 59 ku4 #_R75
+ 1882 167 60 ku4 #_R75
+ 1883 171 62 ku4 #_R75
+ 1884 172 63 ku4 #_R75
+ 1885 173 64 ku4 #_R75
+ 1886 177 66 ku4 #_R75
+ 1887 178 67 ku4 #_R75
+ 1888 179 68 ku4 #_R75
+ 1889 183 72 ku4 #_R75
+ 1890 184 73 ku4 #_R75
+ 1891 185 74 ku4 #_R75
+ 1892 188 75 ku4 #_R75
+ 1893 192 76 ku4 #_R75
+ 1894 196 78 ku4 #_R75
+ 1895 197 79 ku4 #_R75
+ 1896 198 80 ku4 #_R75
+ 1897 202 81 ku4 #_R75
+ 1898 206 83 ku4 #_R75
+ 1899 207 84 ku4 #_R75
+ 1900 208 85 ku4 #_R75
+ 1901 212 87 ku4 #_R75
+ 1902 213 88 ku4 #_R75
+ 1903 214 89 ku4 #_R75
+ 1904 218 93 ku4 #_R75
+ 1905 219 94 ku4 #_R75
+ 1906 220 95 ku4 #_R75
+ 1907 222 96 ku4 #_R75
+ 1908 226 98 ku4 #_R75
+ 1909 227 99 ku4 #_R75
+ 1910 228 100 ku4 #_R75
+ 1911 232 102 ku4 #_R75
+ 1912 233 103 ku4 #_R75
+ 1913 234 104 ku4 #_R75
+ 1914 238 108 ku4 #_R75
+ 1915 239 109 ku4 #_R75
+ 1916 240 110 ku4 #_R75
+ 1917 242 112 ku4 #_R75
+ 1918 243 113 ku4 #_R75
+ 1919 244 114 ku4 #_R75
+ 1920 248 118 ku4 #_R75
+ 1921 249 119 ku4 #_R75
+ 1922 250 120 ku4 #_R75
+ 1923 252 124 ku4 #_R75
+ 1924 253 125 ku4 #_R75
+ 1925 254 126 ku4 #_R75
+ 1926 256 130 ku4 #_R75
+ 1927 131 259 kp4 #_R76
+ 1928 132 263 kp4 #_R76
+ 1929 133 266 kp4 #_R76
+ 1930 135 269 kp4 #_R76
+ 1931 136 270 kp4 #_R76
+ 1932 137 273 kp4 #_R76
+ 1933 138 276 kp4 #_R76
+ 1934 140 279 kp4 #_R76
+ 1935 141 280 kp4 #_R76
+ 1936 142 282 kp4 #_R76
+ 1937 144 285 kp4 #_R76
+ 1938 145 286 kp4 #_R76
+ 1939 147 288 kp4 #_R76
+ 1940 148 289 kp4 #_R76
+ 1941 151 291 kp4 #_R76
+ 1942 152 293 kp4 #_R76
+ 1943 153 296 kp4 #_R76
+ 1944 155 299 kp4 #_R76
+ 1945 156 300 kp4 #_R76
+ 1946 157 302 kp4 #_R76
+ 1947 159 305 kp4 #_R76
+ 1948 160 306 kp4 #_R76
+ 1949 162 308 kp4 #_R76
+ 1950 163 309 kp4 #_R76
+ 1951 166 311 kp4 #_R76
+ 1952 167 312 kp4 #_R76
+ 1953 169 315 kp4 #_R76
+ 1954 170 316 kp4 #_R76
+ 1955 172 318 kp4 #_R76
+ 1956 173 319 kp4 #_R76
+ 1957 176 321 kp4 #_R76
+ 1958 178 322 kp4 #_R76
+ 1959 179 323 kp4 #_R76
+ 1960 182 325 kp4 #_R76
+ 1961 185 326 kp4 #_R76
+ 1962 187 328 kp4 #_R76
+ 1963 188 331 kp4 #_R76
+ 1964 190 334 kp4 #_R76
+ 1965 191 335 kp4 #_R76
+ 1966 192 337 kp4 #_R76
+ 1967 194 340 kp4 #_R76
+ 1968 195 341 kp4 #_R76
+ 1969 197 343 kp4 #_R76
+ 1970 198 344 kp4 #_R76
+ 1971 201 346 kp4 #_R76
+ 1972 202 347 kp4 #_R76
+ 1973 204 350 kp4 #_R76
+ 1974 205 351 kp4 #_R76
+ 1975 207 353 kp4 #_R76
+ 1976 208 354 kp4 #_R76
+ 1977 211 356 kp4 #_R76
+ 1978 213 357 kp4 #_R76
+ 1979 214 358 kp4 #_R76
+ 1980 217 360 kp4 #_R76
+ 1981 220 361 kp4 #_R76
+ 1982 222 362 kp4 #_R76
+ 1983 224 365 kp4 #_R76
+ 1984 225 366 kp4 #_R76
+ 1985 227 368 kp4 #_R76
+ 1986 228 369 kp4 #_R76
+ 1987 231 371 kp4 #_R76
+ 1988 233 372 kp4 #_R76
+ 1989 234 373 kp4 #_R76
+ 1990 237 375 kp4 #_R76
+ 1991 240 376 kp4 #_R76
+ 1992 243 377 kp4 #_R76
+ 1993 244 378 kp4 #_R76
+ 1994 247 380 kp4 #_R76
+ 1995 250 381 kp4 #_R76
+ 1996 254 382 kp4 #_R76
+ 1997 134 47 ku4 #_R77
+ 1998 139 48 ku4 #_R77
+ 1999 143 49 ku4 #_R77
+ 2000 146 50 ku4 #_R77
+ 2001 149 52 ku4 #_R77
+ 2002 150 53 ku4 #_R77
+ 2003 154 54 ku4 #_R77
+ 2004 158 55 ku4 #_R77
+ 2005 161 56 ku4 #_R77
+ 2006 164 58 ku4 #_R77
+ 2007 165 59 ku4 #_R77
+ 2008 168 60 ku4 #_R77
+ 2009 171 61 ku4 #_R77
+ 2010 174 63 ku4 #_R77
+ 2011 175 64 ku4 #_R77
+ 2012 177 65 ku4 #_R77
+ 2013 180 67 ku4 #_R77
+ 2014 181 68 ku4 #_R77
+ 2015 183 70 ku4 #_R77
+ 2016 184 71 ku4 #_R77
+ 2017 186 74 ku4 #_R77
+ 2018 189 75 ku4 #_R77
+ 2019 193 76 ku4 #_R77
+ 2020 196 77 ku4 #_R77
+ 2021 199 79 ku4 #_R77
+ 2022 200 80 ku4 #_R77
+ 2023 203 81 ku4 #_R77
+ 2024 206 82 ku4 #_R77
+ 2025 209 84 ku4 #_R77
+ 2026 210 85 ku4 #_R77
+ 2027 212 86 ku4 #_R77
+ 2028 215 88 ku4 #_R77
+ 2029 216 89 ku4 #_R77
+ 2030 218 91 ku4 #_R77
+ 2031 219 92 ku4 #_R77
+ 2032 221 95 ku4 #_R77
+ 2033 223 96 ku4 #_R77
+ 2034 226 97 ku4 #_R77
+ 2035 229 99 ku4 #_R77
+ 2036 230 100 ku4 #_R77
+ 2037 232 101 ku4 #_R77
+ 2038 235 103 ku4 #_R77
+ 2039 236 104 ku4 #_R77
+ 2040 238 106 ku4 #_R77
+ 2041 239 107 ku4 #_R77
+ 2042 241 110 ku4 #_R77
+ 2043 242 111 ku4 #_R77
+ 2044 245 113 ku4 #_R77
+ 2045 246 114 ku4 #_R77
+ 2046 248 116 ku4 #_R77
+ 2047 249 117 ku4 #_R77
+ 2048 251 120 ku4 #_R77
+ 2049 252 122 ku4 #_R77
+ 2050 253 123 ku4 #_R77
+ 2051 255 126 ku4 #_R77
+ 2052 256 129 ku4 #_R77
+ 2053 131 260 kp4 #_R78
+ 2054 132 264 kp4 #_R78
+ 2055 133 267 kp4 #_R78
+ 2056 134 269 kp4 #_R78
+ 2057 136 271 kp4 #_R78
+ 2058 137 274 kp4 #_R78
+ 2059 138 277 kp4 #_R78
+ 2060 139 279 kp4 #_R78
+ 2061 141 281 kp4 #_R78
+ 2062 142 283 kp4 #_R78
+ 2063 143 285 kp4 #_R78
+ 2064 145 287 kp4 #_R78
+ 2065 146 288 kp4 #_R78
+ 2066 148 290 kp4 #_R78
+ 2067 150 291 kp4 #_R78
+ 2068 152 294 kp4 #_R78
+ 2069 153 297 kp4 #_R78
+ 2070 154 299 kp4 #_R78
+ 2071 156 301 kp4 #_R78
+ 2072 157 303 kp4 #_R78
+ 2073 158 305 kp4 #_R78
+ 2074 160 307 kp4 #_R78
+ 2075 161 308 kp4 #_R78
+ 2076 163 310 kp4 #_R78
+ 2077 165 311 kp4 #_R78
+ 2078 167 313 kp4 #_R78
+ 2079 168 315 kp4 #_R78
+ 2080 170 317 kp4 #_R78
+ 2081 171 318 kp4 #_R78
+ 2082 173 320 kp4 #_R78
+ 2083 175 321 kp4 #_R78
+ 2084 177 322 kp4 #_R78
+ 2085 179 324 kp4 #_R78
+ 2086 181 325 kp4 #_R78
+ 2087 184 326 kp4 #_R78
+ 2088 187 329 kp4 #_R78
+ 2089 188 332 kp4 #_R78
+ 2090 189 334 kp4 #_R78
+ 2091 191 336 kp4 #_R78
+ 2092 192 338 kp4 #_R78
+ 2093 193 340 kp4 #_R78
+ 2094 195 342 kp4 #_R78
+ 2095 196 343 kp4 #_R78
+ 2096 198 345 kp4 #_R78
+ 2097 200 346 kp4 #_R78
+ 2098 202 348 kp4 #_R78
+ 2099 203 350 kp4 #_R78
+ 2100 205 352 kp4 #_R78
+ 2101 206 353 kp4 #_R78
+ 2102 208 355 kp4 #_R78
+ 2103 210 356 kp4 #_R78
+ 2104 212 357 kp4 #_R78
+ 2105 214 359 kp4 #_R78
+ 2106 216 360 kp4 #_R78
+ 2107 219 361 kp4 #_R78
+ 2108 222 363 kp4 #_R78
+ 2109 223 365 kp4 #_R78
+ 2110 225 367 kp4 #_R78
+ 2111 226 368 kp4 #_R78
+ 2112 228 370 kp4 #_R78
+ 2113 230 371 kp4 #_R78
+ 2114 232 372 kp4 #_R78
+ 2115 234 374 kp4 #_R78
+ 2116 236 375 kp4 #_R78
+ 2117 239 376 kp4 #_R78
+ 2118 242 377 kp4 #_R78
+ 2119 244 379 kp4 #_R78
+ 2120 246 380 kp4 #_R78
+ 2121 249 381 kp4 #_R78
+ 2122 253 382 kp4 #_R78
+ 2123 135 47 ku4 #_R79
+ 2124 140 48 ku4 #_R79
+ 2125 144 49 ku4 #_R79
+ 2126 147 50 ku4 #_R79
+ 2127 149 51 ku4 #_R79
+ 2128 151 53 ku4 #_R79
+ 2129 155 54 ku4 #_R79
+ 2130 159 55 ku4 #_R79
+ 2131 162 56 ku4 #_R79
+ 2132 164 57 ku4 #_R79
+ 2133 166 59 ku4 #_R79
+ 2134 169 60 ku4 #_R79
+ 2135 172 61 ku4 #_R79
+ 2136 174 62 ku4 #_R79
+ 2137 176 64 ku4 #_R79
+ 2138 178 65 ku4 #_R79
+ 2139 180 66 ku4 #_R79
+ 2140 182 68 ku4 #_R79
+ 2141 183 69 ku4 #_R79
+ 2142 185 71 ku4 #_R79
+ 2143 186 73 ku4 #_R79
+ 2144 190 75 ku4 #_R79
+ 2145 194 76 ku4 #_R79
+ 2146 197 77 ku4 #_R79
+ 2147 199 78 ku4 #_R79
+ 2148 201 80 ku4 #_R79
+ 2149 204 81 ku4 #_R79
+ 2150 207 82 ku4 #_R79
+ 2151 209 83 ku4 #_R79
+ 2152 211 85 ku4 #_R79
+ 2153 213 86 ku4 #_R79
+ 2154 215 87 ku4 #_R79
+ 2155 217 89 ku4 #_R79
+ 2156 218 90 ku4 #_R79
+ 2157 220 92 ku4 #_R79
+ 2158 221 94 ku4 #_R79
+ 2159 224 96 ku4 #_R79
+ 2160 227 97 ku4 #_R79
+ 2161 229 98 ku4 #_R79
+ 2162 231 100 ku4 #_R79
+ 2163 233 101 ku4 #_R79
+ 2164 235 102 ku4 #_R79
+ 2165 237 104 ku4 #_R79
+ 2166 238 105 ku4 #_R79
+ 2167 240 107 ku4 #_R79
+ 2168 241 109 ku4 #_R79
+ 2169 243 111 ku4 #_R79
+ 2170 245 112 ku4 #_R79
+ 2171 247 114 ku4 #_R79
+ 2172 248 115 ku4 #_R79
+ 2173 250 117 ku4 #_R79
+ 2174 251 119 ku4 #_R79
+ 2175 252 121 ku4 #_R79
+ 2176 254 123 ku4 #_R79
+ 2177 255 125 ku4 #_R79
+ 2178 256 128 ku4 #_R79
+ 2179 131 261 kp4 #_R80
+ 2180 132 265 kp4 #_R80
+ 2181 133 268 kp4 #_R80
+ 2182 134 270 kp4 #_R80
+ 2183 135 271 kp4 #_R80
+ 2184 137 275 kp4 #_R80
+ 2185 138 278 kp4 #_R80
+ 2186 139 280 kp4 #_R80
+ 2187 140 281 kp4 #_R80
+ 2188 142 284 kp4 #_R80
+ 2189 143 286 kp4 #_R80
+ 2190 144 287 kp4 #_R80
+ 2191 146 289 kp4 #_R80
+ 2192 147 290 kp4 #_R80
+ 2193 149 291 kp4 #_R80
+ 2194 152 295 kp4 #_R80
+ 2195 153 298 kp4 #_R80
+ 2196 154 300 kp4 #_R80
+ 2197 155 301 kp4 #_R80
+ 2198 157 304 kp4 #_R80
+ 2199 158 306 kp4 #_R80
+ 2200 159 307 kp4 #_R80
+ 2201 161 309 kp4 #_R80
+ 2202 162 310 kp4 #_R80
+ 2203 164 311 kp4 #_R80
+ 2204 167 314 kp4 #_R80
+ 2205 168 316 kp4 #_R80
+ 2206 169 317 kp4 #_R80
+ 2207 171 319 kp4 #_R80
+ 2208 172 320 kp4 #_R80
+ 2209 174 321 kp4 #_R80
+ 2210 177 323 kp4 #_R80
+ 2211 178 324 kp4 #_R80
+ 2212 180 325 kp4 #_R80
+ 2213 183 326 kp4 #_R80
+ 2214 187 330 kp4 #_R80
+ 2215 188 333 kp4 #_R80
+ 2216 189 335 kp4 #_R80
+ 2217 190 336 kp4 #_R80
+ 2218 192 339 kp4 #_R80
+ 2219 193 341 kp4 #_R80
+ 2220 194 342 kp4 #_R80
+ 2221 196 344 kp4 #_R80
+ 2222 197 345 kp4 #_R80
+ 2223 199 346 kp4 #_R80
+ 2224 202 349 kp4 #_R80
+ 2225 203 351 kp4 #_R80
+ 2226 204 352 kp4 #_R80
+ 2227 206 354 kp4 #_R80
+ 2228 207 355 kp4 #_R80
+ 2229 209 356 kp4 #_R80
+ 2230 212 358 kp4 #_R80
+ 2231 213 359 kp4 #_R80
+ 2232 215 360 kp4 #_R80
+ 2233 218 361 kp4 #_R80
+ 2234 222 364 kp4 #_R80
+ 2235 223 366 kp4 #_R80
+ 2236 224 367 kp4 #_R80
+ 2237 226 369 kp4 #_R80
+ 2238 227 370 kp4 #_R80
+ 2239 229 371 kp4 #_R80
+ 2240 232 373 kp4 #_R80
+ 2241 233 374 kp4 #_R80
+ 2242 235 375 kp4 #_R80
+ 2243 238 376 kp4 #_R80
+ 2244 242 378 kp4 #_R80
+ 2245 243 379 kp4 #_R80
+ 2246 245 380 kp4 #_R80
+ 2247 248 381 kp4 #_R80
+ 2248 252 382 kp4 #_R80
+ 2249 136 47 ku4 #_R81
+ 2250 141 48 ku4 #_R81
+ 2251 145 49 ku4 #_R81
+ 2252 148 50 ku4 #_R81
+ 2253 150 51 ku4 #_R81
+ 2254 151 52 ku4 #_R81
+ 2255 156 54 ku4 #_R81
+ 2256 160 55 ku4 #_R81
+ 2257 163 56 ku4 #_R81
+ 2258 165 57 ku4 #_R81
+ 2259 166 58 ku4 #_R81
+ 2260 170 60 ku4 #_R81
+ 2261 173 61 ku4 #_R81
+ 2262 175 62 ku4 #_R81
+ 2263 176 63 ku4 #_R81
+ 2264 179 65 ku4 #_R81
+ 2265 181 66 ku4 #_R81
+ 2266 182 67 ku4 #_R81
+ 2267 184 69 ku4 #_R81
+ 2268 185 70 ku4 #_R81
+ 2269 186 72 ku4 #_R81
+ 2270 191 75 ku4 #_R81
+ 2271 195 76 ku4 #_R81
+ 2272 198 77 ku4 #_R81
+ 2273 200 78 ku4 #_R81
+ 2274 201 79 ku4 #_R81
+ 2275 205 81 ku4 #_R81
+ 2276 208 82 ku4 #_R81
+ 2277 210 83 ku4 #_R81
+ 2278 211 84 ku4 #_R81
+ 2279 214 86 ku4 #_R81
+ 2280 216 87 ku4 #_R81
+ 2281 217 88 ku4 #_R81
+ 2282 219 90 ku4 #_R81
+ 2283 220 91 ku4 #_R81
+ 2284 221 93 ku4 #_R81
+ 2285 225 96 ku4 #_R81
+ 2286 228 97 ku4 #_R81
+ 2287 230 98 ku4 #_R81
+ 2288 231 99 ku4 #_R81
+ 2289 234 101 ku4 #_R81
+ 2290 236 102 ku4 #_R81
+ 2291 237 103 ku4 #_R81
+ 2292 239 105 ku4 #_R81
+ 2293 240 106 ku4 #_R81
+ 2294 241 108 ku4 #_R81
+ 2295 244 111 ku4 #_R81
+ 2296 246 112 ku4 #_R81
+ 2297 247 113 ku4 #_R81
+ 2298 249 115 ku4 #_R81
+ 2299 250 116 ku4 #_R81
+ 2300 251 118 ku4 #_R81
+ 2301 253 121 ku4 #_R81
+ 2302 254 122 ku4 #_R81
+ 2303 255 124 ku4 #_R81
+ 2304 256 127 ku4 #_R81
+ 2305 327 383 kp5 #_R82
+ 2306 328 384 kp5 #_R82
+ 2307 329 385 kp5 #_R82
+ 2308 330 386 kp5 #_R82
+ 2309 331 387 kp5 #_R82
+ 2310 332 388 kp5 #_R82
+ 2311 333 389 kp5 #_R82
+ 2312 334 390 kp5 #_R82
+ 2313 335 391 kp5 #_R82
+ 2314 336 392 kp5 #_R82
+ 2315 337 393 kp5 #_R82
+ 2316 338 394 kp5 #_R82
+ 2317 339 395 kp5 #_R82
+ 2318 340 396 kp5 #_R82
+ 2319 341 397 kp5 #_R82
+ 2320 342 398 kp5 #_R82
+ 2321 343 399 kp5 #_R82
+ 2322 344 400 kp5 #_R82
+ 2323 345 401 kp5 #_R82
+ 2324 346 402 kp5 #_R82
+ 2325 347 403 kp5 #_R82
+ 2326 348 404 kp5 #_R82
+ 2327 349 405 kp5 #_R82
+ 2328 350 406 kp5 #_R82
+ 2329 351 407 kp5 #_R82
+ 2330 352 408 kp5 #_R82
+ 2331 353 409 kp5 #_R82
+ 2332 354 410 kp5 #_R82
+ 2333 355 411 kp5 #_R82
+ 2334 356 412 kp5 #_R82
+ 2335 357 413 kp5 #_R82
+ 2336 358 414 kp5 #_R82
+ 2337 359 415 kp5 #_R82
+ 2338 360 416 kp5 #_R82
+ 2339 361 417 kp5 #_R82
+ 2340 362 418 kp5 #_R82
+ 2341 363 419 kp5 #_R82
+ 2342 364 420 kp5 #_R82
+ 2343 365 421 kp5 #_R82
+ 2344 366 422 kp5 #_R82
+ 2345 367 423 kp5 #_R82
+ 2346 368 424 kp5 #_R82
+ 2347 369 425 kp5 #_R82
+ 2348 370 426 kp5 #_R82
+ 2349 371 427 kp5 #_R82
+ 2350 372 428 kp5 #_R82
+ 2351 373 429 kp5 #_R82
+ 2352 374 430 kp5 #_R82
+ 2353 375 431 kp5 #_R82
+ 2354 376 432 kp5 #_R82
+ 2355 377 433 kp5 #_R82
+ 2356 378 434 kp5 #_R82
+ 2357 379 435 kp5 #_R82
+ 2358 380 436 kp5 #_R82
+ 2359 381 437 kp5 #_R82
+ 2360 382 438 kp5 #_R82
+ 2361 257 187 ku5 #_R83
+ 2362 258 188 ku5 #_R83
+ 2363 259 189 ku5 #_R83
+ 2364 260 190 ku5 #_R83
+ 2365 261 191 ku5 #_R83
+ 2366 262 192 ku5 #_R83
+ 2367 263 193 ku5 #_R83
+ 2368 264 194 ku5 #_R83
+ 2369 265 195 ku5 #_R83
+ 2370 266 196 ku5 #_R83
+ 2371 267 197 ku5 #_R83
+ 2372 268 198 ku5 #_R83
+ 2373 269 199 ku5 #_R83
+ 2374 270 200 ku5 #_R83
+ 2375 271 201 ku5 #_R83
+ 2376 272 202 ku5 #_R83
+ 2377 273 203 ku5 #_R83
+ 2378 274 204 ku5 #_R83
+ 2379 275 205 ku5 #_R83
+ 2380 276 206 ku5 #_R83
+ 2381 277 207 ku5 #_R83
+ 2382 278 208 ku5 #_R83
+ 2383 279 209 ku5 #_R83
+ 2384 280 210 ku5 #_R83
+ 2385 281 211 ku5 #_R83
+ 2386 282 212 ku5 #_R83
+ 2387 283 213 ku5 #_R83
+ 2388 284 214 ku5 #_R83
+ 2389 285 215 ku5 #_R83
+ 2390 286 216 ku5 #_R83
+ 2391 287 217 ku5 #_R83
+ 2392 288 218 ku5 #_R83
+ 2393 289 219 ku5 #_R83
+ 2394 290 220 ku5 #_R83
+ 2395 291 221 ku5 #_R83
+ 2396 292 222 ku5 #_R83
+ 2397 293 223 ku5 #_R83
+ 2398 294 224 ku5 #_R83
+ 2399 295 225 ku5 #_R83
+ 2400 296 226 ku5 #_R83
+ 2401 297 227 ku5 #_R83
+ 2402 298 228 ku5 #_R83
+ 2403 299 229 ku5 #_R83
+ 2404 300 230 ku5 #_R83
+ 2405 301 231 ku5 #_R83
+ 2406 302 232 ku5 #_R83
+ 2407 303 233 ku5 #_R83
+ 2408 304 234 ku5 #_R83
+ 2409 305 235 ku5 #_R83
+ 2410 306 236 ku5 #_R83
+ 2411 307 237 ku5 #_R83
+ 2412 308 238 ku5 #_R83
+ 2413 309 239 ku5 #_R83
+ 2414 310 240 ku5 #_R83
+ 2415 311 241 ku5 #_R83
+ 2416 312 242 ku5 #_R83
+ 2417 313 243 ku5 #_R83
+ 2418 314 244 ku5 #_R83
+ 2419 315 245 ku5 #_R83
+ 2420 316 246 ku5 #_R83
+ 2421 317 247 ku5 #_R83
+ 2422 318 248 ku5 #_R83
+ 2423 319 249 ku5 #_R83
+ 2424 320 250 ku5 #_R83
+ 2425 321 251 ku5 #_R83
+ 2426 322 252 ku5 #_R83
+ 2427 323 253 ku5 #_R83
+ 2428 324 254 ku5 #_R83
+ 2429 325 255 ku5 #_R83
+ 2430 326 256 ku5 #_R83
+ 2431 292 383 kp5 #_R84
+ 2432 293 384 kp5 #_R84
+ 2433 294 385 kp5 #_R84
+ 2434 295 386 kp5 #_R84
+ 2435 296 387 kp5 #_R84
+ 2436 297 388 kp5 #_R84
+ 2437 298 389 kp5 #_R84
+ 2438 299 390 kp5 #_R84
+ 2439 300 391 kp5 #_R84
+ 2440 301 392 kp5 #_R84
+ 2441 302 393 kp5 #_R84
+ 2442 303 394 kp5 #_R84
+ 2443 304 395 kp5 #_R84
+ 2444 305 396 kp5 #_R84
+ 2445 306 397 kp5 #_R84
+ 2446 307 398 kp5 #_R84
+ 2447 308 399 kp5 #_R84
+ 2448 309 400 kp5 #_R84
+ 2449 310 401 kp5 #_R84
+ 2450 311 402 kp5 #_R84
+ 2451 312 403 kp5 #_R84
+ 2452 313 404 kp5 #_R84
+ 2453 314 405 kp5 #_R84
+ 2454 315 406 kp5 #_R84
+ 2455 316 407 kp5 #_R84
+ 2456 317 408 kp5 #_R84
+ 2457 318 409 kp5 #_R84
+ 2458 319 410 kp5 #_R84
+ 2459 320 411 kp5 #_R84
+ 2460 321 412 kp5 #_R84
+ 2461 322 413 kp5 #_R84
+ 2462 323 414 kp5 #_R84
+ 2463 324 415 kp5 #_R84
+ 2464 325 416 kp5 #_R84
+ 2465 326 417 kp5 #_R84
+ 2466 362 439 kp5 #_R84
+ 2467 363 440 kp5 #_R84
+ 2468 364 441 kp5 #_R84
+ 2469 365 442 kp5 #_R84
+ 2470 366 443 kp5 #_R84
+ 2471 367 444 kp5 #_R84
+ 2472 368 445 kp5 #_R84
+ 2473 369 446 kp5 #_R84
+ 2474 370 447 kp5 #_R84
+ 2475 371 448 kp5 #_R84
+ 2476 372 449 kp5 #_R84
+ 2477 373 450 kp5 #_R84
+ 2478 374 451 kp5 #_R84
+ 2479 375 452 kp5 #_R84
+ 2480 376 453 kp5 #_R84
+ 2481 377 454 kp5 #_R84
+ 2482 378 455 kp5 #_R84
+ 2483 379 456 kp5 #_R84
+ 2484 380 457 kp5 #_R84
+ 2485 381 458 kp5 #_R84
+ 2486 382 459 kp5 #_R84
+ 2487 257 152 ku5 #_R85
+ 2488 258 153 ku5 #_R85
+ 2489 259 154 ku5 #_R85
+ 2490 260 155 ku5 #_R85
+ 2491 261 156 ku5 #_R85
+ 2492 262 157 ku5 #_R85
+ 2493 263 158 ku5 #_R85
+ 2494 264 159 ku5 #_R85
+ 2495 265 160 ku5 #_R85
+ 2496 266 161 ku5 #_R85
+ 2497 267 162 ku5 #_R85
+ 2498 268 163 ku5 #_R85
+ 2499 269 164 ku5 #_R85
+ 2500 270 165 ku5 #_R85
+ 2501 271 166 ku5 #_R85
+ 2502 272 167 ku5 #_R85
+ 2503 273 168 ku5 #_R85
+ 2504 274 169 ku5 #_R85
+ 2505 275 170 ku5 #_R85
+ 2506 276 171 ku5 #_R85
+ 2507 277 172 ku5 #_R85
+ 2508 278 173 ku5 #_R85
+ 2509 279 174 ku5 #_R85
+ 2510 280 175 ku5 #_R85
+ 2511 281 176 ku5 #_R85
+ 2512 282 177 ku5 #_R85
+ 2513 283 178 ku5 #_R85
+ 2514 284 179 ku5 #_R85
+ 2515 285 180 ku5 #_R85
+ 2516 286 181 ku5 #_R85
+ 2517 287 182 ku5 #_R85
+ 2518 288 183 ku5 #_R85
+ 2519 289 184 ku5 #_R85
+ 2520 290 185 ku5 #_R85
+ 2521 291 186 ku5 #_R85
+ 2522 327 222 ku5 #_R85
+ 2523 328 223 ku5 #_R85
+ 2524 329 224 ku5 #_R85
+ 2525 330 225 ku5 #_R85
+ 2526 331 226 ku5 #_R85
+ 2527 332 227 ku5 #_R85
+ 2528 333 228 ku5 #_R85
+ 2529 334 229 ku5 #_R85
+ 2530 335 230 ku5 #_R85
+ 2531 336 231 ku5 #_R85
+ 2532 337 232 ku5 #_R85
+ 2533 338 233 ku5 #_R85
+ 2534 339 234 ku5 #_R85
+ 2535 340 235 ku5 #_R85
+ 2536 341 236 ku5 #_R85
+ 2537 342 237 ku5 #_R85
+ 2538 343 238 ku5 #_R85
+ 2539 344 239 ku5 #_R85
+ 2540 345 240 ku5 #_R85
+ 2541 346 241 ku5 #_R85
+ 2542 347 242 ku5 #_R85
+ 2543 348 243 ku5 #_R85
+ 2544 349 244 ku5 #_R85
+ 2545 350 245 ku5 #_R85
+ 2546 351 246 ku5 #_R85
+ 2547 352 247 ku5 #_R85
+ 2548 353 248 ku5 #_R85
+ 2549 354 249 ku5 #_R85
+ 2550 355 250 ku5 #_R85
+ 2551 356 251 ku5 #_R85
+ 2552 357 252 ku5 #_R85
+ 2553 358 253 ku5 #_R85
+ 2554 359 254 ku5 #_R85
+ 2555 360 255 ku5 #_R85
+ 2556 361 256 ku5 #_R85
+ 2557 272 383 kp5 #_R86
+ 2558 273 384 kp5 #_R86
+ 2559 274 385 kp5 #_R86
+ 2560 275 386 kp5 #_R86
+ 2561 276 387 kp5 #_R86
+ 2562 277 388 kp5 #_R86
+ 2563 278 389 kp5 #_R86
+ 2564 279 390 kp5 #_R86
+ 2565 280 391 kp5 #_R86
+ 2566 281 392 kp5 #_R86
+ 2567 282 393 kp5 #_R86
+ 2568 283 394 kp5 #_R86
+ 2569 284 395 kp5 #_R86
+ 2570 285 396 kp5 #_R86
+ 2571 286 397 kp5 #_R86
+ 2572 287 398 kp5 #_R86
+ 2573 288 399 kp5 #_R86
+ 2574 289 400 kp5 #_R86
+ 2575 290 401 kp5 #_R86
+ 2576 291 402 kp5 #_R86
+ 2577 312 418 kp5 #_R86
+ 2578 313 419 kp5 #_R86
+ 2579 314 420 kp5 #_R86
+ 2580 315 421 kp5 #_R86
+ 2581 316 422 kp5 #_R86
+ 2582 317 423 kp5 #_R86
+ 2583 318 424 kp5 #_R86
+ 2584 319 425 kp5 #_R86
+ 2585 320 426 kp5 #_R86
+ 2586 321 427 kp5 #_R86
+ 2587 322 428 kp5 #_R86
+ 2588 323 429 kp5 #_R86
+ 2589 324 430 kp5 #_R86
+ 2590 325 431 kp5 #_R86
+ 2591 326 432 kp5 #_R86
+ 2592 347 439 kp5 #_R86
+ 2593 348 440 kp5 #_R86
+ 2594 349 441 kp5 #_R86
+ 2595 350 442 kp5 #_R86
+ 2596 351 443 kp5 #_R86
+ 2597 352 444 kp5 #_R86
+ 2598 353 445 kp5 #_R86
+ 2599 354 446 kp5 #_R86
+ 2600 355 447 kp5 #_R86
+ 2601 356 448 kp5 #_R86
+ 2602 357 449 kp5 #_R86
+ 2603 358 450 kp5 #_R86
+ 2604 359 451 kp5 #_R86
+ 2605 360 452 kp5 #_R86
+ 2606 361 453 kp5 #_R86
+ 2607 377 460 kp5 #_R86
+ 2608 378 461 kp5 #_R86
+ 2609 379 462 kp5 #_R86
+ 2610 380 463 kp5 #_R86
+ 2611 381 464 kp5 #_R86
+ 2612 382 465 kp5 #_R86
+ 2613 257 137 ku5 #_R87
+ 2614 258 138 ku5 #_R87
+ 2615 259 139 ku5 #_R87
+ 2616 260 140 ku5 #_R87
+ 2617 261 141 ku5 #_R87
+ 2618 262 142 ku5 #_R87
+ 2619 263 143 ku5 #_R87
+ 2620 264 144 ku5 #_R87
+ 2621 265 145 ku5 #_R87
+ 2622 266 146 ku5 #_R87
+ 2623 267 147 ku5 #_R87
+ 2624 268 148 ku5 #_R87
+ 2625 269 149 ku5 #_R87
+ 2626 270 150 ku5 #_R87
+ 2627 271 151 ku5 #_R87
+ 2628 292 167 ku5 #_R87
+ 2629 293 168 ku5 #_R87
+ 2630 294 169 ku5 #_R87
+ 2631 295 170 ku5 #_R87
+ 2632 296 171 ku5 #_R87
+ 2633 297 172 ku5 #_R87
+ 2634 298 173 ku5 #_R87
+ 2635 299 174 ku5 #_R87
+ 2636 300 175 ku5 #_R87
+ 2637 301 176 ku5 #_R87
+ 2638 302 177 ku5 #_R87
+ 2639 303 178 ku5 #_R87
+ 2640 304 179 ku5 #_R87
+ 2641 305 180 ku5 #_R87
+ 2642 306 181 ku5 #_R87
+ 2643 307 182 ku5 #_R87
+ 2644 308 183 ku5 #_R87
+ 2645 309 184 ku5 #_R87
+ 2646 310 185 ku5 #_R87
+ 2647 311 186 ku5 #_R87
+ 2648 327 202 ku5 #_R87
+ 2649 328 203 ku5 #_R87
+ 2650 329 204 ku5 #_R87
+ 2651 330 205 ku5 #_R87
+ 2652 331 206 ku5 #_R87
+ 2653 332 207 ku5 #_R87
+ 2654 333 208 ku5 #_R87
+ 2655 334 209 ku5 #_R87
+ 2656 335 210 ku5 #_R87
+ 2657 336 211 ku5 #_R87
+ 2658 337 212 ku5 #_R87
+ 2659 338 213 ku5 #_R87
+ 2660 339 214 ku5 #_R87
+ 2661 340 215 ku5 #_R87
+ 2662 341 216 ku5 #_R87
+ 2663 342 217 ku5 #_R87
+ 2664 343 218 ku5 #_R87
+ 2665 344 219 ku5 #_R87
+ 2666 345 220 ku5 #_R87
+ 2667 346 221 ku5 #_R87
+ 2668 362 242 ku5 #_R87
+ 2669 363 243 ku5 #_R87
+ 2670 364 244 ku5 #_R87
+ 2671 365 245 ku5 #_R87
+ 2672 366 246 ku5 #_R87
+ 2673 367 247 ku5 #_R87
+ 2674 368 248 ku5 #_R87
+ 2675 369 249 ku5 #_R87
+ 2676 370 250 ku5 #_R87
+ 2677 371 251 ku5 #_R87
+ 2678 372 252 ku5 #_R87
+ 2679 373 253 ku5 #_R87
+ 2680 374 254 ku5 #_R87
+ 2681 375 255 ku5 #_R87
+ 2682 376 256 ku5 #_R87
+ 2683 262 383 kp5 #_R88
+ 2684 263 384 kp5 #_R88
+ 2685 264 385 kp5 #_R88
+ 2686 265 386 kp5 #_R88
+ 2687 266 387 kp5 #_R88
+ 2688 267 388 kp5 #_R88
+ 2689 268 389 kp5 #_R88
+ 2690 269 390 kp5 #_R88
+ 2691 270 391 kp5 #_R88
+ 2692 271 392 kp5 #_R88
+ 2693 282 403 kp5 #_R88
+ 2694 283 404 kp5 #_R88
+ 2695 284 405 kp5 #_R88
+ 2696 285 406 kp5 #_R88
+ 2697 286 407 kp5 #_R88
+ 2698 287 408 kp5 #_R88
+ 2699 288 409 kp5 #_R88
+ 2700 289 410 kp5 #_R88
+ 2701 290 411 kp5 #_R88
+ 2702 291 412 kp5 #_R88
+ 2703 302 418 kp5 #_R88
+ 2704 303 419 kp5 #_R88
+ 2705 304 420 kp5 #_R88
+ 2706 305 421 kp5 #_R88
+ 2707 306 422 kp5 #_R88
+ 2708 307 423 kp5 #_R88
+ 2709 308 424 kp5 #_R88
+ 2710 309 425 kp5 #_R88
+ 2711 310 426 kp5 #_R88
+ 2712 311 427 kp5 #_R88
+ 2713 322 433 kp5 #_R88
+ 2714 323 434 kp5 #_R88
+ 2715 324 435 kp5 #_R88
+ 2716 325 436 kp5 #_R88
+ 2717 326 437 kp5 #_R88
+ 2718 337 439 kp5 #_R88
+ 2719 338 440 kp5 #_R88
+ 2720 339 441 kp5 #_R88
+ 2721 340 442 kp5 #_R88
+ 2722 341 443 kp5 #_R88
+ 2723 342 444 kp5 #_R88
+ 2724 343 445 kp5 #_R88
+ 2725 344 446 kp5 #_R88
+ 2726 345 447 kp5 #_R88
+ 2727 346 448 kp5 #_R88
+ 2728 357 454 kp5 #_R88
+ 2729 358 455 kp5 #_R88
+ 2730 359 456 kp5 #_R88
+ 2731 360 457 kp5 #_R88
+ 2732 361 458 kp5 #_R88
+ 2733 372 460 kp5 #_R88
+ 2734 373 461 kp5 #_R88
+ 2735 374 462 kp5 #_R88
+ 2736 375 463 kp5 #_R88
+ 2737 376 464 kp5 #_R88
+ 2738 382 466 kp5 #_R88
+ 2739 257 132 ku5 #_R89
+ 2740 258 133 ku5 #_R89
+ 2741 259 134 ku5 #_R89
+ 2742 260 135 ku5 #_R89
+ 2743 261 136 ku5 #_R89
+ 2744 272 142 ku5 #_R89
+ 2745 273 143 ku5 #_R89
+ 2746 274 144 ku5 #_R89
+ 2747 275 145 ku5 #_R89
+ 2748 276 146 ku5 #_R89
+ 2749 277 147 ku5 #_R89
+ 2750 278 148 ku5 #_R89
+ 2751 279 149 ku5 #_R89
+ 2752 280 150 ku5 #_R89
+ 2753 281 151 ku5 #_R89
+ 2754 292 157 ku5 #_R89
+ 2755 293 158 ku5 #_R89
+ 2756 294 159 ku5 #_R89
+ 2757 295 160 ku5 #_R89
+ 2758 296 161 ku5 #_R89
+ 2759 297 162 ku5 #_R89
+ 2760 298 163 ku5 #_R89
+ 2761 299 164 ku5 #_R89
+ 2762 300 165 ku5 #_R89
+ 2763 301 166 ku5 #_R89
+ 2764 312 177 ku5 #_R89
+ 2765 313 178 ku5 #_R89
+ 2766 314 179 ku5 #_R89
+ 2767 315 180 ku5 #_R89
+ 2768 316 181 ku5 #_R89
+ 2769 317 182 ku5 #_R89
+ 2770 318 183 ku5 #_R89
+ 2771 319 184 ku5 #_R89
+ 2772 320 185 ku5 #_R89
+ 2773 321 186 ku5 #_R89
+ 2774 327 192 ku5 #_R89
+ 2775 328 193 ku5 #_R89
+ 2776 329 194 ku5 #_R89
+ 2777 330 195 ku5 #_R89
+ 2778 331 196 ku5 #_R89
+ 2779 332 197 ku5 #_R89
+ 2780 333 198 ku5 #_R89
+ 2781 334 199 ku5 #_R89
+ 2782 335 200 ku5 #_R89
+ 2783 336 201 ku5 #_R89
+ 2784 347 212 ku5 #_R89
+ 2785 348 213 ku5 #_R89
+ 2786 349 214 ku5 #_R89
+ 2787 350 215 ku5 #_R89
+ 2788 351 216 ku5 #_R89
+ 2789 352 217 ku5 #_R89
+ 2790 353 218 ku5 #_R89
+ 2791 354 219 ku5 #_R89
+ 2792 355 220 ku5 #_R89
+ 2793 356 221 ku5 #_R89
+ 2794 362 232 ku5 #_R89
+ 2795 363 233 ku5 #_R89
+ 2796 364 234 ku5 #_R89
+ 2797 365 235 ku5 #_R89
+ 2798 366 236 ku5 #_R89
+ 2799 367 237 ku5 #_R89
+ 2800 368 238 ku5 #_R89
+ 2801 369 239 ku5 #_R89
+ 2802 370 240 ku5 #_R89
+ 2803 371 241 ku5 #_R89
+ 2804 377 252 ku5 #_R89
+ 2805 378 253 ku5 #_R89
+ 2806 379 254 ku5 #_R89
+ 2807 380 255 ku5 #_R89
+ 2808 381 256 ku5 #_R89
+ 2809 258 383 kp5 #_R90
+ 2810 259 384 kp5 #_R90
+ 2811 260 385 kp5 #_R90
+ 2812 261 386 kp5 #_R90
+ 2813 266 393 kp5 #_R90
+ 2814 267 394 kp5 #_R90
+ 2815 268 395 kp5 #_R90
+ 2816 269 396 kp5 #_R90
+ 2817 270 397 kp5 #_R90
+ 2818 271 398 kp5 #_R90
+ 2819 276 403 kp5 #_R90
+ 2820 277 404 kp5 #_R90
+ 2821 278 405 kp5 #_R90
+ 2822 279 406 kp5 #_R90
+ 2823 280 407 kp5 #_R90
+ 2824 281 408 kp5 #_R90
+ 2825 288 413 kp5 #_R90
+ 2826 289 414 kp5 #_R90
+ 2827 290 415 kp5 #_R90
+ 2828 291 416 kp5 #_R90
+ 2829 296 418 kp5 #_R90
+ 2830 297 419 kp5 #_R90
+ 2831 298 420 kp5 #_R90
+ 2832 299 421 kp5 #_R90
+ 2833 300 422 kp5 #_R90
+ 2834 301 423 kp5 #_R90
+ 2835 308 428 kp5 #_R90
+ 2836 309 429 kp5 #_R90
+ 2837 310 430 kp5 #_R90
+ 2838 311 431 kp5 #_R90
+ 2839 318 433 kp5 #_R90
+ 2840 319 434 kp5 #_R90
+ 2841 320 435 kp5 #_R90
+ 2842 321 436 kp5 #_R90
+ 2843 326 438 kp5 #_R90
+ 2844 331 439 kp5 #_R90
+ 2845 332 440 kp5 #_R90
+ 2846 333 441 kp5 #_R90
+ 2847 334 442 kp5 #_R90
+ 2848 335 443 kp5 #_R90
+ 2849 336 444 kp5 #_R90
+ 2850 343 449 kp5 #_R90
+ 2851 344 450 kp5 #_R90
+ 2852 345 451 kp5 #_R90
+ 2853 346 452 kp5 #_R90
+ 2854 353 454 kp5 #_R90
+ 2855 354 455 kp5 #_R90
+ 2856 355 456 kp5 #_R90
+ 2857 356 457 kp5 #_R90
+ 2858 361 459 kp5 #_R90
+ 2859 368 460 kp5 #_R90
+ 2860 369 461 kp5 #_R90
+ 2861 370 462 kp5 #_R90
+ 2862 371 463 kp5 #_R90
+ 2863 376 465 kp5 #_R90
+ 2864 381 466 kp5 #_R90
+ 2865 257 131 ku5 #_R91
+ 2866 262 133 ku5 #_R91
+ 2867 263 134 ku5 #_R91
+ 2868 264 135 ku5 #_R91
+ 2869 265 136 ku5 #_R91
+ 2870 272 138 ku5 #_R91
+ 2871 273 139 ku5 #_R91
+ 2872 274 140 ku5 #_R91
+ 2873 275 141 ku5 #_R91
+ 2874 282 146 ku5 #_R91
+ 2875 283 147 ku5 #_R91
+ 2876 284 148 ku5 #_R91
+ 2877 285 149 ku5 #_R91
+ 2878 286 150 ku5 #_R91
+ 2879 287 151 ku5 #_R91
+ 2880 292 153 ku5 #_R91
+ 2881 293 154 ku5 #_R91
+ 2882 294 155 ku5 #_R91
+ 2883 295 156 ku5 #_R91
+ 2884 302 161 ku5 #_R91
+ 2885 303 162 ku5 #_R91
+ 2886 304 163 ku5 #_R91
+ 2887 305 164 ku5 #_R91
+ 2888 306 165 ku5 #_R91
+ 2889 307 166 ku5 #_R91
+ 2890 312 171 ku5 #_R91
+ 2891 313 172 ku5 #_R91
+ 2892 314 173 ku5 #_R91
+ 2893 315 174 ku5 #_R91
+ 2894 316 175 ku5 #_R91
+ 2895 317 176 ku5 #_R91
+ 2896 322 183 ku5 #_R91
+ 2897 323 184 ku5 #_R91
+ 2898 324 185 ku5 #_R91
+ 2899 325 186 ku5 #_R91
+ 2900 327 188 ku5 #_R91
+ 2901 328 189 ku5 #_R91
+ 2902 329 190 ku5 #_R91
+ 2903 330 191 ku5 #_R91
+ 2904 337 196 ku5 #_R91
+ 2905 338 197 ku5 #_R91
+ 2906 339 198 ku5 #_R91
+ 2907 340 199 ku5 #_R91
+ 2908 341 200 ku5 #_R91
+ 2909 342 201 ku5 #_R91
+ 2910 347 206 ku5 #_R91
+ 2911 348 207 ku5 #_R91
+ 2912 349 208 ku5 #_R91
+ 2913 350 209 ku5 #_R91
+ 2914 351 210 ku5 #_R91
+ 2915 352 211 ku5 #_R91
+ 2916 357 218 ku5 #_R91
+ 2917 358 219 ku5 #_R91
+ 2918 359 220 ku5 #_R91
+ 2919 360 221 ku5 #_R91
+ 2920 362 226 ku5 #_R91
+ 2921 363 227 ku5 #_R91
+ 2922 364 228 ku5 #_R91
+ 2923 365 229 ku5 #_R91
+ 2924 366 230 ku5 #_R91
+ 2925 367 231 ku5 #_R91
+ 2926 372 238 ku5 #_R91
+ 2927 373 239 ku5 #_R91
+ 2928 374 240 ku5 #_R91
+ 2929 375 241 ku5 #_R91
+ 2930 377 248 ku5 #_R91
+ 2931 378 249 ku5 #_R91
+ 2932 379 250 ku5 #_R91
+ 2933 380 251 ku5 #_R91
+ 2934 382 256 ku5 #_R91
+ 2935 257 383 kp5 #_R92
+ 2936 259 387 kp5 #_R92
+ 2937 260 388 kp5 #_R92
+ 2938 261 389 kp5 #_R92
+ 2939 263 393 kp5 #_R92
+ 2940 264 394 kp5 #_R92
+ 2941 265 395 kp5 #_R92
+ 2942 269 399 kp5 #_R92
+ 2943 270 400 kp5 #_R92
+ 2944 271 401 kp5 #_R92
+ 2945 273 403 kp5 #_R92
+ 2946 274 404 kp5 #_R92
+ 2947 275 405 kp5 #_R92
+ 2948 279 409 kp5 #_R92
+ 2949 280 410 kp5 #_R92
+ 2950 281 411 kp5 #_R92
+ 2951 285 413 kp5 #_R92
+ 2952 286 414 kp5 #_R92
+ 2953 287 415 kp5 #_R92
+ 2954 291 417 kp5 #_R92
+ 2955 293 418 kp5 #_R92
+ 2956 294 419 kp5 #_R92
+ 2957 295 420 kp5 #_R92
+ 2958 299 424 kp5 #_R92
+ 2959 300 425 kp5 #_R92
+ 2960 301 426 kp5 #_R92
+ 2961 305 428 kp5 #_R92
+ 2962 306 429 kp5 #_R92
+ 2963 307 430 kp5 #_R92
+ 2964 311 432 kp5 #_R92
+ 2965 315 433 kp5 #_R92
+ 2966 316 434 kp5 #_R92
+ 2967 317 435 kp5 #_R92
+ 2968 321 437 kp5 #_R92
+ 2969 325 438 kp5 #_R92
+ 2970 328 439 kp5 #_R92
+ 2971 329 440 kp5 #_R92
+ 2972 330 441 kp5 #_R92
+ 2973 334 445 kp5 #_R92
+ 2974 335 446 kp5 #_R92
+ 2975 336 447 kp5 #_R92
+ 2976 340 449 kp5 #_R92
+ 2977 341 450 kp5 #_R92
+ 2978 342 451 kp5 #_R92
+ 2979 346 453 kp5 #_R92
+ 2980 350 454 kp5 #_R92
+ 2981 351 455 kp5 #_R92
+ 2982 352 456 kp5 #_R92
+ 2983 356 458 kp5 #_R92
+ 2984 360 459 kp5 #_R92
+ 2985 365 460 kp5 #_R92
+ 2986 366 461 kp5 #_R92
+ 2987 367 462 kp5 #_R92
+ 2988 371 464 kp5 #_R92
+ 2989 375 465 kp5 #_R92
+ 2990 380 466 kp5 #_R92
+ 2991 258 131 ku5 #_R93
+ 2992 262 132 ku5 #_R93
+ 2993 266 134 ku5 #_R93
+ 2994 267 135 ku5 #_R93
+ 2995 268 136 ku5 #_R93
+ 2996 272 137 ku5 #_R93
+ 2997 276 139 ku5 #_R93
+ 2998 277 140 ku5 #_R93
+ 2999 278 141 ku5 #_R93
+ 3000 282 143 ku5 #_R93
+ 3001 283 144 ku5 #_R93
+ 3002 284 145 ku5 #_R93
+ 3003 288 149 ku5 #_R93
+ 3004 289 150 ku5 #_R93
+ 3005 290 151 ku5 #_R93
+ 3006 292 152 ku5 #_R93
+ 3007 296 154 ku5 #_R93
+ 3008 297 155 ku5 #_R93
+ 3009 298 156 ku5 #_R93
+ 3010 302 158 ku5 #_R93
+ 3011 303 159 ku5 #_R93
+ 3012 304 160 ku5 #_R93
+ 3013 308 164 ku5 #_R93
+ 3014 309 165 ku5 #_R93
+ 3015 310 166 ku5 #_R93
+ 3016 312 168 ku5 #_R93
+ 3017 313 169 ku5 #_R93
+ 3018 314 170 ku5 #_R93
+ 3019 318 174 ku5 #_R93
+ 3020 319 175 ku5 #_R93
+ 3021 320 176 ku5 #_R93
+ 3022 322 180 ku5 #_R93
+ 3023 323 181 ku5 #_R93
+ 3024 324 182 ku5 #_R93
+ 3025 326 186 ku5 #_R93
+ 3026 327 187 ku5 #_R93
+ 3027 331 189 ku5 #_R93
+ 3028 332 190 ku5 #_R93
+ 3029 333 191 ku5 #_R93
+ 3030 337 193 ku5 #_R93
+ 3031 338 194 ku5 #_R93
+ 3032 339 195 ku5 #_R93
+ 3033 343 199 ku5 #_R93
+ 3034 344 200 ku5 #_R93
+ 3035 345 201 ku5 #_R93
+ 3036 347 203 ku5 #_R93
+ 3037 348 204 ku5 #_R93
+ 3038 349 205 ku5 #_R93
+ 3039 353 209 ku5 #_R93
+ 3040 354 210 ku5 #_R93
+ 3041 355 211 ku5 #_R93
+ 3042 357 215 ku5 #_R93
+ 3043 358 216 ku5 #_R93
+ 3044 359 217 ku5 #_R93
+ 3045 361 221 ku5 #_R93
+ 3046 362 223 ku5 #_R93
+ 3047 363 224 ku5 #_R93
+ 3048 364 225 ku5 #_R93
+ 3049 368 229 ku5 #_R93
+ 3050 369 230 ku5 #_R93
+ 3051 370 231 ku5 #_R93
+ 3052 372 235 ku5 #_R93
+ 3053 373 236 ku5 #_R93
+ 3054 374 237 ku5 #_R93
+ 3055 376 241 ku5 #_R93
+ 3056 377 245 ku5 #_R93
+ 3057 378 246 ku5 #_R93
+ 3058 379 247 ku5 #_R93
+ 3059 381 251 ku5 #_R93
+ 3060 382 255 ku5 #_R93
+ 3061 257 384 kp5 #_R94
+ 3062 258 387 kp5 #_R94
+ 3063 260 390 kp5 #_R94
+ 3064 261 391 kp5 #_R94
+ 3065 262 393 kp5 #_R94
+ 3066 264 396 kp5 #_R94
+ 3067 265 397 kp5 #_R94
+ 3068 267 399 kp5 #_R94
+ 3069 268 400 kp5 #_R94
+ 3070 271 402 kp5 #_R94
+ 3071 272 403 kp5 #_R94
+ 3072 274 406 kp5 #_R94
+ 3073 275 407 kp5 #_R94
+ 3074 277 409 kp5 #_R94
+ 3075 278 410 kp5 #_R94
+ 3076 281 412 kp5 #_R94
+ 3077 283 413 kp5 #_R94
+ 3078 284 414 kp5 #_R94
+ 3079 287 416 kp5 #_R94
+ 3080 290 417 kp5 #_R94
+ 3081 292 418 kp5 #_R94
+ 3082 294 421 kp5 #_R94
+ 3083 295 422 kp5 #_R94
+ 3084 297 424 kp5 #_R94
+ 3085 298 425 kp5 #_R94
+ 3086 301 427 kp5 #_R94
+ 3087 303 428 kp5 #_R94
+ 3088 304 429 kp5 #_R94
+ 3089 307 431 kp5 #_R94
+ 3090 310 432 kp5 #_R94
+ 3091 313 433 kp5 #_R94
+ 3092 314 434 kp5 #_R94
+ 3093 317 436 kp5 #_R94
+ 3094 320 437 kp5 #_R94
+ 3095 324 438 kp5 #_R94
+ 3096 327 439 kp5 #_R94
+ 3097 329 442 kp5 #_R94
+ 3098 330 443 kp5 #_R94
+ 3099 332 445 kp5 #_R94
+ 3100 333 446 kp5 #_R94
+ 3101 336 448 kp5 #_R94
+ 3102 338 449 kp5 #_R94
+ 3103 339 450 kp5 #_R94
+ 3104 342 452 kp5 #_R94
+ 3105 345 453 kp5 #_R94
+ 3106 348 454 kp5 #_R94
+ 3107 349 455 kp5 #_R94
+ 3108 352 457 kp5 #_R94
+ 3109 355 458 kp5 #_R94
+ 3110 359 459 kp5 #_R94
+ 3111 363 460 kp5 #_R94
+ 3112 364 461 kp5 #_R94
+ 3113 367 463 kp5 #_R94
+ 3114 370 464 kp5 #_R94
+ 3115 374 465 kp5 #_R94
+ 3116 379 466 kp5 #_R94
+ 3117 259 131 ku5 #_R95
+ 3118 263 132 ku5 #_R95
+ 3119 266 133 ku5 #_R95
+ 3120 269 135 ku5 #_R95
+ 3121 270 136 ku5 #_R95
+ 3122 273 137 ku5 #_R95
+ 3123 276 138 ku5 #_R95
+ 3124 279 140 ku5 #_R95
+ 3125 280 141 ku5 #_R95
+ 3126 282 142 ku5 #_R95
+ 3127 285 144 ku5 #_R95
+ 3128 286 145 ku5 #_R95
+ 3129 288 147 ku5 #_R95
+ 3130 289 148 ku5 #_R95
+ 3131 291 151 ku5 #_R95
+ 3132 293 152 ku5 #_R95
+ 3133 296 153 ku5 #_R95
+ 3134 299 155 ku5 #_R95
+ 3135 300 156 ku5 #_R95
+ 3136 302 157 ku5 #_R95
+ 3137 305 159 ku5 #_R95
+ 3138 306 160 ku5 #_R95
+ 3139 308 162 ku5 #_R95
+ 3140 309 163 ku5 #_R95
+ 3141 311 166 ku5 #_R95
+ 3142 312 167 ku5 #_R95
+ 3143 315 169 ku5 #_R95
+ 3144 316 170 ku5 #_R95
+ 3145 318 172 ku5 #_R95
+ 3146 319 173 ku5 #_R95
+ 3147 321 176 ku5 #_R95
+ 3148 322 178 ku5 #_R95
+ 3149 323 179 ku5 #_R95
+ 3150 325 182 ku5 #_R95
+ 3151 326 185 ku5 #_R95
+ 3152 328 187 ku5 #_R95
+ 3153 331 188 ku5 #_R95
+ 3154 334 190 ku5 #_R95
+ 3155 335 191 ku5 #_R95
+ 3156 337 192 ku5 #_R95
+ 3157 340 194 ku5 #_R95
+ 3158 341 195 ku5 #_R95
+ 3159 343 197 ku5 #_R95
+ 3160 344 198 ku5 #_R95
+ 3161 346 201 ku5 #_R95
+ 3162 347 202 ku5 #_R95
+ 3163 350 204 ku5 #_R95
+ 3164 351 205 ku5 #_R95
+ 3165 353 207 ku5 #_R95
+ 3166 354 208 ku5 #_R95
+ 3167 356 211 ku5 #_R95
+ 3168 357 213 ku5 #_R95
+ 3169 358 214 ku5 #_R95
+ 3170 360 217 ku5 #_R95
+ 3171 361 220 ku5 #_R95
+ 3172 362 222 ku5 #_R95
+ 3173 365 224 ku5 #_R95
+ 3174 366 225 ku5 #_R95
+ 3175 368 227 ku5 #_R95
+ 3176 369 228 ku5 #_R95
+ 3177 371 231 ku5 #_R95
+ 3178 372 233 ku5 #_R95
+ 3179 373 234 ku5 #_R95
+ 3180 375 237 ku5 #_R95
+ 3181 376 240 ku5 #_R95
+ 3182 377 243 ku5 #_R95
+ 3183 378 244 ku5 #_R95
+ 3184 380 247 ku5 #_R95
+ 3185 381 250 ku5 #_R95
+ 3186 382 254 ku5 #_R95
+ 3187 257 385 kp5 #_R96
+ 3188 258 388 kp5 #_R96
+ 3189 259 390 kp5 #_R96
+ 3190 261 392 kp5 #_R96
+ 3191 262 394 kp5 #_R96
+ 3192 263 396 kp5 #_R96
+ 3193 265 398 kp5 #_R96
+ 3194 266 399 kp5 #_R96
+ 3195 268 401 kp5 #_R96
+ 3196 270 402 kp5 #_R96
+ 3197 272 404 kp5 #_R96
+ 3198 273 406 kp5 #_R96
+ 3199 275 408 kp5 #_R96
+ 3200 276 409 kp5 #_R96
+ 3201 278 411 kp5 #_R96
+ 3202 280 412 kp5 #_R96
+ 3203 282 413 kp5 #_R96
+ 3204 284 415 kp5 #_R96
+ 3205 286 416 kp5 #_R96
+ 3206 289 417 kp5 #_R96
+ 3207 292 419 kp5 #_R96
+ 3208 293 421 kp5 #_R96
+ 3209 295 423 kp5 #_R96
+ 3210 296 424 kp5 #_R96
+ 3211 298 426 kp5 #_R96
+ 3212 300 427 kp5 #_R96
+ 3213 302 428 kp5 #_R96
+ 3214 304 430 kp5 #_R96
+ 3215 306 431 kp5 #_R96
+ 3216 309 432 kp5 #_R96
+ 3217 312 433 kp5 #_R96
+ 3218 314 435 kp5 #_R96
+ 3219 316 436 kp5 #_R96
+ 3220 319 437 kp5 #_R96
+ 3221 323 438 kp5 #_R96
+ 3222 327 440 kp5 #_R96
+ 3223 328 442 kp5 #_R96
+ 3224 330 444 kp5 #_R96
+ 3225 331 445 kp5 #_R96
+ 3226 333 447 kp5 #_R96
+ 3227 335 448 kp5 #_R96
+ 3228 337 449 kp5 #_R96
+ 3229 339 451 kp5 #_R96
+ 3230 341 452 kp5 #_R96
+ 3231 344 453 kp5 #_R96
+ 3232 347 454 kp5 #_R96
+ 3233 349 456 kp5 #_R96
+ 3234 351 457 kp5 #_R96
+ 3235 354 458 kp5 #_R96
+ 3236 358 459 kp5 #_R96
+ 3237 362 460 kp5 #_R96
+ 3238 364 462 kp5 #_R96
+ 3239 366 463 kp5 #_R96
+ 3240 369 464 kp5 #_R96
+ 3241 373 465 kp5 #_R96
+ 3242 378 466 kp5 #_R96
+ 3243 260 131 ku5 #_R97
+ 3244 264 132 ku5 #_R97
+ 3245 267 133 ku5 #_R97
+ 3246 269 134 ku5 #_R97
+ 3247 271 136 ku5 #_R97
+ 3248 274 137 ku5 #_R97
+ 3249 277 138 ku5 #_R97
+ 3250 279 139 ku5 #_R97
+ 3251 281 141 ku5 #_R97
+ 3252 283 142 ku5 #_R97
+ 3253 285 143 ku5 #_R97
+ 3254 287 145 ku5 #_R97
+ 3255 288 146 ku5 #_R97
+ 3256 290 148 ku5 #_R97
+ 3257 291 150 ku5 #_R97
+ 3258 294 152 ku5 #_R97
+ 3259 297 153 ku5 #_R97
+ 3260 299 154 ku5 #_R97
+ 3261 301 156 ku5 #_R97
+ 3262 303 157 ku5 #_R97
+ 3263 305 158 ku5 #_R97
+ 3264 307 160 ku5 #_R97
+ 3265 308 161 ku5 #_R97
+ 3266 310 163 ku5 #_R97
+ 3267 311 165 ku5 #_R97
+ 3268 313 167 ku5 #_R97
+ 3269 315 168 ku5 #_R97
+ 3270 317 170 ku5 #_R97
+ 3271 318 171 ku5 #_R97
+ 3272 320 173 ku5 #_R97
+ 3273 321 175 ku5 #_R97
+ 3274 322 177 ku5 #_R97
+ 3275 324 179 ku5 #_R97
+ 3276 325 181 ku5 #_R97
+ 3277 326 184 ku5 #_R97
+ 3278 329 187 ku5 #_R97
+ 3279 332 188 ku5 #_R97
+ 3280 334 189 ku5 #_R97
+ 3281 336 191 ku5 #_R97
+ 3282 338 192 ku5 #_R97
+ 3283 340 193 ku5 #_R97
+ 3284 342 195 ku5 #_R97
+ 3285 343 196 ku5 #_R97
+ 3286 345 198 ku5 #_R97
+ 3287 346 200 ku5 #_R97
+ 3288 348 202 ku5 #_R97
+ 3289 350 203 ku5 #_R97
+ 3290 352 205 ku5 #_R97
+ 3291 353 206 ku5 #_R97
+ 3292 355 208 ku5 #_R97
+ 3293 356 210 ku5 #_R97
+ 3294 357 212 ku5 #_R97
+ 3295 359 214 ku5 #_R97
+ 3296 360 216 ku5 #_R97
+ 3297 361 219 ku5 #_R97
+ 3298 363 222 ku5 #_R97
+ 3299 365 223 ku5 #_R97
+ 3300 367 225 ku5 #_R97
+ 3301 368 226 ku5 #_R97
+ 3302 370 228 ku5 #_R97
+ 3303 371 230 ku5 #_R97
+ 3304 372 232 ku5 #_R97
+ 3305 374 234 ku5 #_R97
+ 3306 375 236 ku5 #_R97
+ 3307 376 239 ku5 #_R97
+ 3308 377 242 ku5 #_R97
+ 3309 379 244 ku5 #_R97
+ 3310 380 246 ku5 #_R97
+ 3311 381 249 ku5 #_R97
+ 3312 382 253 ku5 #_R97
+ 3313 257 386 kp5 #_R98
+ 3314 258 389 kp5 #_R98
+ 3315 259 391 kp5 #_R98
+ 3316 260 392 kp5 #_R98
+ 3317 262 395 kp5 #_R98
+ 3318 263 397 kp5 #_R98
+ 3319 264 398 kp5 #_R98
+ 3320 266 400 kp5 #_R98
+ 3321 267 401 kp5 #_R98
+ 3322 269 402 kp5 #_R98
+ 3323 272 405 kp5 #_R98
+ 3324 273 407 kp5 #_R98
+ 3325 274 408 kp5 #_R98
+ 3326 276 410 kp5 #_R98
+ 3327 277 411 kp5 #_R98
+ 3328 279 412 kp5 #_R98
+ 3329 282 414 kp5 #_R98
+ 3330 283 415 kp5 #_R98
+ 3331 285 416 kp5 #_R98
+ 3332 288 417 kp5 #_R98
+ 3333 292 420 kp5 #_R98
+ 3334 293 422 kp5 #_R98
+ 3335 294 423 kp5 #_R98
+ 3336 296 425 kp5 #_R98
+ 3337 297 426 kp5 #_R98
+ 3338 299 427 kp5 #_R98
+ 3339 302 429 kp5 #_R98
+ 3340 303 430 kp5 #_R98
+ 3341 305 431 kp5 #_R98
+ 3342 308 432 kp5 #_R98
+ 3343 312 434 kp5 #_R98
+ 3344 313 435 kp5 #_R98
+ 3345 315 436 kp5 #_R98
+ 3346 318 437 kp5 #_R98
+ 3347 322 438 kp5 #_R98
+ 3348 327 441 kp5 #_R98
+ 3349 328 443 kp5 #_R98
+ 3350 329 444 kp5 #_R98
+ 3351 331 446 kp5 #_R98
+ 3352 332 447 kp5 #_R98
+ 3353 334 448 kp5 #_R98
+ 3354 337 450 kp5 #_R98
+ 3355 338 451 kp5 #_R98
+ 3356 340 452 kp5 #_R98
+ 3357 343 453 kp5 #_R98
+ 3358 347 455 kp5 #_R98
+ 3359 348 456 kp5 #_R98
+ 3360 350 457 kp5 #_R98
+ 3361 353 458 kp5 #_R98
+ 3362 357 459 kp5 #_R98
+ 3363 362 461 kp5 #_R98
+ 3364 363 462 kp5 #_R98
+ 3365 365 463 kp5 #_R98
+ 3366 368 464 kp5 #_R98
+ 3367 372 465 kp5 #_R98
+ 3368 377 466 kp5 #_R98
+ 3369 261 131 ku5 #_R99
+ 3370 265 132 ku5 #_R99
+ 3371 268 133 ku5 #_R99
+ 3372 270 134 ku5 #_R99
+ 3373 271 135 ku5 #_R99
+ 3374 275 137 ku5 #_R99
+ 3375 278 138 ku5 #_R99
+ 3376 280 139 ku5 #_R99
+ 3377 281 140 ku5 #_R99
+ 3378 284 142 ku5 #_R99
+ 3379 286 143 ku5 #_R99
+ 3380 287 144 ku5 #_R99
+ 3381 289 146 ku5 #_R99
+ 3382 290 147 ku5 #_R99
+ 3383 291 149 ku5 #_R99
+ 3384 295 152 ku5 #_R99
+ 3385 298 153 ku5 #_R99
+ 3386 300 154 ku5 #_R99
+ 3387 301 155 ku5 #_R99
+ 3388 304 157 ku5 #_R99
+ 3389 306 158 ku5 #_R99
+ 3390 307 159 ku5 #_R99
+ 3391 309 161 ku5 #_R99
+ 3392 310 162 ku5 #_R99
+ 3393 311 164 ku5 #_R99
+ 3394 314 167 ku5 #_R99
+ 3395 316 168 ku5 #_R99
+ 3396 317 169 ku5 #_R99
+ 3397 319 171 ku5 #_R99
+ 3398 320 172 ku5 #_R99
+ 3399 321 174 ku5 #_R99
+ 3400 323 177 ku5 #_R99
+ 3401 324 178 ku5 #_R99
+ 3402 325 180 ku5 #_R99
+ 3403 326 183 ku5 #_R99
+ 3404 330 187 ku5 #_R99
+ 3405 333 188 ku5 #_R99
+ 3406 335 189 ku5 #_R99
+ 3407 336 190 ku5 #_R99
+ 3408 339 192 ku5 #_R99
+ 3409 341 193 ku5 #_R99
+ 3410 342 194 ku5 #_R99
+ 3411 344 196 ku5 #_R99
+ 3412 345 197 ku5 #_R99
+ 3413 346 199 ku5 #_R99
+ 3414 349 202 ku5 #_R99
+ 3415 351 203 ku5 #_R99
+ 3416 352 204 ku5 #_R99
+ 3417 354 206 ku5 #_R99
+ 3418 355 207 ku5 #_R99
+ 3419 356 209 ku5 #_R99
+ 3420 358 212 ku5 #_R99
+ 3421 359 213 ku5 #_R99
+ 3422 360 215 ku5 #_R99
+ 3423 361 218 ku5 #_R99
+ 3424 364 222 ku5 #_R99
+ 3425 366 223 ku5 #_R99
+ 3426 367 224 ku5 #_R99
+ 3427 369 226 ku5 #_R99
+ 3428 370 227 ku5 #_R99
+ 3429 371 229 ku5 #_R99
+ 3430 373 232 ku5 #_R99
+ 3431 374 233 ku5 #_R99
+ 3432 375 235 ku5 #_R99
+ 3433 376 238 ku5 #_R99
+ 3434 378 242 ku5 #_R99
+ 3435 379 243 ku5 #_R99
+ 3436 380 245 ku5 #_R99
+ 3437 381 248 ku5 #_R99
+ 3438 382 252 ku5 #_R99
+ 3439 439 467 kp6 #_R100
+ 3440 440 468 kp6 #_R100
+ 3441 441 469 kp6 #_R100
+ 3442 442 470 kp6 #_R100
+ 3443 443 471 kp6 #_R100
+ 3444 444 472 kp6 #_R100
+ 3445 445 473 kp6 #_R100
+ 3446 446 474 kp6 #_R100
+ 3447 447 475 kp6 #_R100
+ 3448 448 476 kp6 #_R100
+ 3449 449 477 kp6 #_R100
+ 3450 450 478 kp6 #_R100
+ 3451 451 479 kp6 #_R100
+ 3452 452 480 kp6 #_R100
+ 3453 453 481 kp6 #_R100
+ 3454 454 482 kp6 #_R100
+ 3455 455 483 kp6 #_R100
+ 3456 456 484 kp6 #_R100
+ 3457 457 485 kp6 #_R100
+ 3458 458 486 kp6 #_R100
+ 3459 459 487 kp6 #_R100
+ 3460 460 488 kp6 #_R100
+ 3461 461 489 kp6 #_R100
+ 3462 462 490 kp6 #_R100
+ 3463 463 491 kp6 #_R100
+ 3464 464 492 kp6 #_R100
+ 3465 465 493 kp6 #_R100
+ 3466 466 494 kp6 #_R100
+ 3467 383 327 ku6 #_R101
+ 3468 384 328 ku6 #_R101
+ 3469 385 329 ku6 #_R101
+ 3470 386 330 ku6 #_R101
+ 3471 387 331 ku6 #_R101
+ 3472 388 332 ku6 #_R101
+ 3473 389 333 ku6 #_R101
+ 3474 390 334 ku6 #_R101
+ 3475 391 335 ku6 #_R101
+ 3476 392 336 ku6 #_R101
+ 3477 393 337 ku6 #_R101
+ 3478 394 338 ku6 #_R101
+ 3479 395 339 ku6 #_R101
+ 3480 396 340 ku6 #_R101
+ 3481 397 341 ku6 #_R101
+ 3482 398 342 ku6 #_R101
+ 3483 399 343 ku6 #_R101
+ 3484 400 344 ku6 #_R101
+ 3485 401 345 ku6 #_R101
+ 3486 402 346 ku6 #_R101
+ 3487 403 347 ku6 #_R101
+ 3488 404 348 ku6 #_R101
+ 3489 405 349 ku6 #_R101
+ 3490 406 350 ku6 #_R101
+ 3491 407 351 ku6 #_R101
+ 3492 408 352 ku6 #_R101
+ 3493 409 353 ku6 #_R101
+ 3494 410 354 ku6 #_R101
+ 3495 411 355 ku6 #_R101
+ 3496 412 356 ku6 #_R101
+ 3497 413 357 ku6 #_R101
+ 3498 414 358 ku6 #_R101
+ 3499 415 359 ku6 #_R101
+ 3500 416 360 ku6 #_R101
+ 3501 417 361 ku6 #_R101
+ 3502 418 362 ku6 #_R101
+ 3503 419 363 ku6 #_R101
+ 3504 420 364 ku6 #_R101
+ 3505 421 365 ku6 #_R101
+ 3506 422 366 ku6 #_R101
+ 3507 423 367 ku6 #_R101
+ 3508 424 368 ku6 #_R101
+ 3509 425 369 ku6 #_R101
+ 3510 426 370 ku6 #_R101
+ 3511 427 371 ku6 #_R101
+ 3512 428 372 ku6 #_R101
+ 3513 429 373 ku6 #_R101
+ 3514 430 374 ku6 #_R101
+ 3515 431 375 ku6 #_R101
+ 3516 432 376 ku6 #_R101
+ 3517 433 377 ku6 #_R101
+ 3518 434 378 ku6 #_R101
+ 3519 435 379 ku6 #_R101
+ 3520 436 380 ku6 #_R101
+ 3521 437 381 ku6 #_R101
+ 3522 438 382 ku6 #_R101
+ 3523 418 467 kp6 #_R102
+ 3524 419 468 kp6 #_R102
+ 3525 420 469 kp6 #_R102
+ 3526 421 470 kp6 #_R102
+ 3527 422 471 kp6 #_R102
+ 3528 423 472 kp6 #_R102
+ 3529 424 473 kp6 #_R102
+ 3530 425 474 kp6 #_R102
+ 3531 426 475 kp6 #_R102
+ 3532 427 476 kp6 #_R102
+ 3533 428 477 kp6 #_R102
+ 3534 429 478 kp6 #_R102
+ 3535 430 479 kp6 #_R102
+ 3536 431 480 kp6 #_R102
+ 3537 432 481 kp6 #_R102
+ 3538 433 482 kp6 #_R102
+ 3539 434 483 kp6 #_R102
+ 3540 435 484 kp6 #_R102
+ 3541 436 485 kp6 #_R102
+ 3542 437 486 kp6 #_R102
+ 3543 438 487 kp6 #_R102
+ 3544 460 495 kp6 #_R102
+ 3545 461 496 kp6 #_R102
+ 3546 462 497 kp6 #_R102
+ 3547 463 498 kp6 #_R102
+ 3548 464 499 kp6 #_R102
+ 3549 465 500 kp6 #_R102
+ 3550 466 501 kp6 #_R102
+ 3551 383 292 ku6 #_R103
+ 3552 384 293 ku6 #_R103
+ 3553 385 294 ku6 #_R103
+ 3554 386 295 ku6 #_R103
+ 3555 387 296 ku6 #_R103
+ 3556 388 297 ku6 #_R103
+ 3557 389 298 ku6 #_R103
+ 3558 390 299 ku6 #_R103
+ 3559 391 300 ku6 #_R103
+ 3560 392 301 ku6 #_R103
+ 3561 393 302 ku6 #_R103
+ 3562 394 303 ku6 #_R103
+ 3563 395 304 ku6 #_R103
+ 3564 396 305 ku6 #_R103
+ 3565 397 306 ku6 #_R103
+ 3566 398 307 ku6 #_R103
+ 3567 399 308 ku6 #_R103
+ 3568 400 309 ku6 #_R103
+ 3569 401 310 ku6 #_R103
+ 3570 402 311 ku6 #_R103
+ 3571 403 312 ku6 #_R103
+ 3572 404 313 ku6 #_R103
+ 3573 405 314 ku6 #_R103
+ 3574 406 315 ku6 #_R103
+ 3575 407 316 ku6 #_R103
+ 3576 408 317 ku6 #_R103
+ 3577 409 318 ku6 #_R103
+ 3578 410 319 ku6 #_R103
+ 3579 411 320 ku6 #_R103
+ 3580 412 321 ku6 #_R103
+ 3581 413 322 ku6 #_R103
+ 3582 414 323 ku6 #_R103
+ 3583 415 324 ku6 #_R103
+ 3584 416 325 ku6 #_R103
+ 3585 417 326 ku6 #_R103
+ 3586 439 362 ku6 #_R103
+ 3587 440 363 ku6 #_R103
+ 3588 441 364 ku6 #_R103
+ 3589 442 365 ku6 #_R103
+ 3590 443 366 ku6 #_R103
+ 3591 444 367 ku6 #_R103
+ 3592 445 368 ku6 #_R103
+ 3593 446 369 ku6 #_R103
+ 3594 447 370 ku6 #_R103
+ 3595 448 371 ku6 #_R103
+ 3596 449 372 ku6 #_R103
+ 3597 450 373 ku6 #_R103
+ 3598 451 374 ku6 #_R103
+ 3599 452 375 ku6 #_R103
+ 3600 453 376 ku6 #_R103
+ 3601 454 377 ku6 #_R103
+ 3602 455 378 ku6 #_R103
+ 3603 456 379 ku6 #_R103
+ 3604 457 380 ku6 #_R103
+ 3605 458 381 ku6 #_R103
+ 3606 459 382 ku6 #_R103
+ 3607 403 467 kp6 #_R104
+ 3608 404 468 kp6 #_R104
+ 3609 405 469 kp6 #_R104
+ 3610 406 470 kp6 #_R104
+ 3611 407 471 kp6 #_R104
+ 3612 408 472 kp6 #_R104
+ 3613 409 473 kp6 #_R104
+ 3614 410 474 kp6 #_R104
+ 3615 411 475 kp6 #_R104
+ 3616 412 476 kp6 #_R104
+ 3617 413 477 kp6 #_R104
+ 3618 414 478 kp6 #_R104
+ 3619 415 479 kp6 #_R104
+ 3620 416 480 kp6 #_R104
+ 3621 417 481 kp6 #_R104
+ 3622 433 488 kp6 #_R104
+ 3623 434 489 kp6 #_R104
+ 3624 435 490 kp6 #_R104
+ 3625 436 491 kp6 #_R104
+ 3626 437 492 kp6 #_R104
+ 3627 438 493 kp6 #_R104
+ 3628 454 495 kp6 #_R104
+ 3629 455 496 kp6 #_R104
+ 3630 456 497 kp6 #_R104
+ 3631 457 498 kp6 #_R104
+ 3632 458 499 kp6 #_R104
+ 3633 459 500 kp6 #_R104
+ 3634 466 502 kp6 #_R104
+ 3635 383 272 ku6 #_R105
+ 3636 384 273 ku6 #_R105
+ 3637 385 274 ku6 #_R105
+ 3638 386 275 ku6 #_R105
+ 3639 387 276 ku6 #_R105
+ 3640 388 277 ku6 #_R105
+ 3641 389 278 ku6 #_R105
+ 3642 390 279 ku6 #_R105
+ 3643 391 280 ku6 #_R105
+ 3644 392 281 ku6 #_R105
+ 3645 393 282 ku6 #_R105
+ 3646 394 283 ku6 #_R105
+ 3647 395 284 ku6 #_R105
+ 3648 396 285 ku6 #_R105
+ 3649 397 286 ku6 #_R105
+ 3650 398 287 ku6 #_R105
+ 3651 399 288 ku6 #_R105
+ 3652 400 289 ku6 #_R105
+ 3653 401 290 ku6 #_R105
+ 3654 402 291 ku6 #_R105
+ 3655 418 312 ku6 #_R105
+ 3656 419 313 ku6 #_R105
+ 3657 420 314 ku6 #_R105
+ 3658 421 315 ku6 #_R105
+ 3659 422 316 ku6 #_R105
+ 3660 423 317 ku6 #_R105
+ 3661 424 318 ku6 #_R105
+ 3662 425 319 ku6 #_R105
+ 3663 426 320 ku6 #_R105
+ 3664 427 321 ku6 #_R105
+ 3665 428 322 ku6 #_R105
+ 3666 429 323 ku6 #_R105
+ 3667 430 324 ku6 #_R105
+ 3668 431 325 ku6 #_R105
+ 3669 432 326 ku6 #_R105
+ 3670 439 347 ku6 #_R105
+ 3671 440 348 ku6 #_R105
+ 3672 441 349 ku6 #_R105
+ 3673 442 350 ku6 #_R105
+ 3674 443 351 ku6 #_R105
+ 3675 444 352 ku6 #_R105
+ 3676 445 353 ku6 #_R105
+ 3677 446 354 ku6 #_R105
+ 3678 447 355 ku6 #_R105
+ 3679 448 356 ku6 #_R105
+ 3680 449 357 ku6 #_R105
+ 3681 450 358 ku6 #_R105
+ 3682 451 359 ku6 #_R105
+ 3683 452 360 ku6 #_R105
+ 3684 453 361 ku6 #_R105
+ 3685 460 377 ku6 #_R105
+ 3686 461 378 ku6 #_R105
+ 3687 462 379 ku6 #_R105
+ 3688 463 380 ku6 #_R105
+ 3689 464 381 ku6 #_R105
+ 3690 465 382 ku6 #_R105
+ 3691 393 467 kp6 #_R106
+ 3692 394 468 kp6 #_R106
+ 3693 395 469 kp6 #_R106
+ 3694 396 470 kp6 #_R106
+ 3695 397 471 kp6 #_R106
+ 3696 398 472 kp6 #_R106
+ 3697 399 473 kp6 #_R106
+ 3698 400 474 kp6 #_R106
+ 3699 401 475 kp6 #_R106
+ 3700 402 476 kp6 #_R106
+ 3701 413 482 kp6 #_R106
+ 3702 414 483 kp6 #_R106
+ 3703 415 484 kp6 #_R106
+ 3704 416 485 kp6 #_R106
+ 3705 417 486 kp6 #_R106
+ 3706 428 488 kp6 #_R106
+ 3707 429 489 kp6 #_R106
+ 3708 430 490 kp6 #_R106
+ 3709 431 491 kp6 #_R106
+ 3710 432 492 kp6 #_R106
+ 3711 438 494 kp6 #_R106
+ 3712 449 495 kp6 #_R106
+ 3713 450 496 kp6 #_R106
+ 3714 451 497 kp6 #_R106
+ 3715 452 498 kp6 #_R106
+ 3716 453 499 kp6 #_R106
+ 3717 459 501 kp6 #_R106
+ 3718 465 502 kp6 #_R106
+ 3719 383 262 ku6 #_R107
+ 3720 384 263 ku6 #_R107
+ 3721 385 264 ku6 #_R107
+ 3722 386 265 ku6 #_R107
+ 3723 387 266 ku6 #_R107
+ 3724 388 267 ku6 #_R107
+ 3725 389 268 ku6 #_R107
+ 3726 390 269 ku6 #_R107
+ 3727 391 270 ku6 #_R107
+ 3728 392 271 ku6 #_R107
+ 3729 403 282 ku6 #_R107
+ 3730 404 283 ku6 #_R107
+ 3731 405 284 ku6 #_R107
+ 3732 406 285 ku6 #_R107
+ 3733 407 286 ku6 #_R107
+ 3734 408 287 ku6 #_R107
+ 3735 409 288 ku6 #_R107
+ 3736 410 289 ku6 #_R107
+ 3737 411 290 ku6 #_R107
+ 3738 412 291 ku6 #_R107
+ 3739 418 302 ku6 #_R107
+ 3740 419 303 ku6 #_R107
+ 3741 420 304 ku6 #_R107
+ 3742 421 305 ku6 #_R107
+ 3743 422 306 ku6 #_R107
+ 3744 423 307 ku6 #_R107
+ 3745 424 308 ku6 #_R107
+ 3746 425 309 ku6 #_R107
+ 3747 426 310 ku6 #_R107
+ 3748 427 311 ku6 #_R107
+ 3749 433 322 ku6 #_R107
+ 3750 434 323 ku6 #_R107
+ 3751 435 324 ku6 #_R107
+ 3752 436 325 ku6 #_R107
+ 3753 437 326 ku6 #_R107
+ 3754 439 337 ku6 #_R107
+ 3755 440 338 ku6 #_R107
+ 3756 441 339 ku6 #_R107
+ 3757 442 340 ku6 #_R107
+ 3758 443 341 ku6 #_R107
+ 3759 444 342 ku6 #_R107
+ 3760 445 343 ku6 #_R107
+ 3761 446 344 ku6 #_R107
+ 3762 447 345 ku6 #_R107
+ 3763 448 346 ku6 #_R107
+ 3764 454 357 ku6 #_R107
+ 3765 455 358 ku6 #_R107
+ 3766 456 359 ku6 #_R107
+ 3767 457 360 ku6 #_R107
+ 3768 458 361 ku6 #_R107
+ 3769 460 372 ku6 #_R107
+ 3770 461 373 ku6 #_R107
+ 3771 462 374 ku6 #_R107
+ 3772 463 375 ku6 #_R107
+ 3773 464 376 ku6 #_R107
+ 3774 466 382 ku6 #_R107
+ 3775 387 467 kp6 #_R108
+ 3776 388 468 kp6 #_R108
+ 3777 389 469 kp6 #_R108
+ 3778 390 470 kp6 #_R108
+ 3779 391 471 kp6 #_R108
+ 3780 392 472 kp6 #_R108
+ 3781 399 477 kp6 #_R108
+ 3782 400 478 kp6 #_R108
+ 3783 401 479 kp6 #_R108
+ 3784 402 480 kp6 #_R108
+ 3785 409 482 kp6 #_R108
+ 3786 410 483 kp6 #_R108
+ 3787 411 484 kp6 #_R108
+ 3788 412 485 kp6 #_R108
+ 3789 417 487 kp6 #_R108
+ 3790 424 488 kp6 #_R108
+ 3791 425 489 kp6 #_R108
+ 3792 426 490 kp6 #_R108
+ 3793 427 491 kp6 #_R108
+ 3794 432 493 kp6 #_R108
+ 3795 437 494 kp6 #_R108
+ 3796 445 495 kp6 #_R108
+ 3797 446 496 kp6 #_R108
+ 3798 447 497 kp6 #_R108
+ 3799 448 498 kp6 #_R108
+ 3800 453 500 kp6 #_R108
+ 3801 458 501 kp6 #_R108
+ 3802 464 502 kp6 #_R108
+ 3803 383 258 ku6 #_R109
+ 3804 384 259 ku6 #_R109
+ 3805 385 260 ku6 #_R109
+ 3806 386 261 ku6 #_R109
+ 3807 393 266 ku6 #_R109
+ 3808 394 267 ku6 #_R109
+ 3809 395 268 ku6 #_R109
+ 3810 396 269 ku6 #_R109
+ 3811 397 270 ku6 #_R109
+ 3812 398 271 ku6 #_R109
+ 3813 403 276 ku6 #_R109
+ 3814 404 277 ku6 #_R109
+ 3815 405 278 ku6 #_R109
+ 3816 406 279 ku6 #_R109
+ 3817 407 280 ku6 #_R109
+ 3818 408 281 ku6 #_R109
+ 3819 413 288 ku6 #_R109
+ 3820 414 289 ku6 #_R109
+ 3821 415 290 ku6 #_R109
+ 3822 416 291 ku6 #_R109
+ 3823 418 296 ku6 #_R109
+ 3824 419 297 ku6 #_R109
+ 3825 420 298 ku6 #_R109
+ 3826 421 299 ku6 #_R109
+ 3827 422 300 ku6 #_R109
+ 3828 423 301 ku6 #_R109
+ 3829 428 308 ku6 #_R109
+ 3830 429 309 ku6 #_R109
+ 3831 430 310 ku6 #_R109
+ 3832 431 311 ku6 #_R109
+ 3833 433 318 ku6 #_R109
+ 3834 434 319 ku6 #_R109
+ 3835 435 320 ku6 #_R109
+ 3836 436 321 ku6 #_R109
+ 3837 438 326 ku6 #_R109
+ 3838 439 331 ku6 #_R109
+ 3839 440 332 ku6 #_R109
+ 3840 441 333 ku6 #_R109
+ 3841 442 334 ku6 #_R109
+ 3842 443 335 ku6 #_R109
+ 3843 444 336 ku6 #_R109
+ 3844 449 343 ku6 #_R109
+ 3845 450 344 ku6 #_R109
+ 3846 451 345 ku6 #_R109
+ 3847 452 346 ku6 #_R109
+ 3848 454 353 ku6 #_R109
+ 3849 455 354 ku6 #_R109
+ 3850 456 355 ku6 #_R109
+ 3851 457 356 ku6 #_R109
+ 3852 459 361 ku6 #_R109
+ 3853 460 368 ku6 #_R109
+ 3854 461 369 ku6 #_R109
+ 3855 462 370 ku6 #_R109
+ 3856 463 371 ku6 #_R109
+ 3857 465 376 ku6 #_R109
+ 3858 466 381 ku6 #_R109
+ 3859 384 467 kp6 #_R110
+ 3860 385 468 kp6 #_R110
+ 3861 386 469 kp6 #_R110
+ 3862 390 473 kp6 #_R110
+ 3863 391 474 kp6 #_R110
+ 3864 392 475 kp6 #_R110
+ 3865 396 477 kp6 #_R110
+ 3866 397 478 kp6 #_R110
+ 3867 398 479 kp6 #_R110
+ 3868 402 481 kp6 #_R110
+ 3869 406 482 kp6 #_R110
+ 3870 407 483 kp6 #_R110
+ 3871 408 484 kp6 #_R110
+ 3872 412 486 kp6 #_R110
+ 3873 416 487 kp6 #_R110
+ 3874 421 488 kp6 #_R110
+ 3875 422 489 kp6 #_R110
+ 3876 423 490 kp6 #_R110
+ 3877 427 492 kp6 #_R110
+ 3878 431 493 kp6 #_R110
+ 3879 436 494 kp6 #_R110
+ 3880 442 495 kp6 #_R110
+ 3881 443 496 kp6 #_R110
+ 3882 444 497 kp6 #_R110
+ 3883 448 499 kp6 #_R110
+ 3884 452 500 kp6 #_R110
+ 3885 457 501 kp6 #_R110
+ 3886 463 502 kp6 #_R110
+ 3887 383 257 ku6 #_R111
+ 3888 387 259 ku6 #_R111
+ 3889 388 260 ku6 #_R111
+ 3890 389 261 ku6 #_R111
+ 3891 393 263 ku6 #_R111
+ 3892 394 264 ku6 #_R111
+ 3893 395 265 ku6 #_R111
+ 3894 399 269 ku6 #_R111
+ 3895 400 270 ku6 #_R111
+ 3896 401 271 ku6 #_R111
+ 3897 403 273 ku6 #_R111
+ 3898 404 274 ku6 #_R111
+ 3899 405 275 ku6 #_R111
+ 3900 409 279 ku6 #_R111
+ 3901 410 280 ku6 #_R111
+ 3902 411 281 ku6 #_R111
+ 3903 413 285 ku6 #_R111
+ 3904 414 286 ku6 #_R111
+ 3905 415 287 ku6 #_R111
+ 3906 417 291 ku6 #_R111
+ 3907 418 293 ku6 #_R111
+ 3908 419 294 ku6 #_R111
+ 3909 420 295 ku6 #_R111
+ 3910 424 299 ku6 #_R111
+ 3911 425 300 ku6 #_R111
+ 3912 426 301 ku6 #_R111
+ 3913 428 305 ku6 #_R111
+ 3914 429 306 ku6 #_R111
+ 3915 430 307 ku6 #_R111
+ 3916 432 311 ku6 #_R111
+ 3917 433 315 ku6 #_R111
+ 3918 434 316 ku6 #_R111
+ 3919 435 317 ku6 #_R111
+ 3920 437 321 ku6 #_R111
+ 3921 438 325 ku6 #_R111
+ 3922 439 328 ku6 #_R111
+ 3923 440 329 ku6 #_R111
+ 3924 441 330 ku6 #_R111
+ 3925 445 334 ku6 #_R111
+ 3926 446 335 ku6 #_R111
+ 3927 447 336 ku6 #_R111
+ 3928 449 340 ku6 #_R111
+ 3929 450 341 ku6 #_R111
+ 3930 451 342 ku6 #_R111
+ 3931 453 346 ku6 #_R111
+ 3932 454 350 ku6 #_R111
+ 3933 455 351 ku6 #_R111
+ 3934 456 352 ku6 #_R111
+ 3935 458 356 ku6 #_R111
+ 3936 459 360 ku6 #_R111
+ 3937 460 365 ku6 #_R111
+ 3938 461 366 ku6 #_R111
+ 3939 462 367 ku6 #_R111
+ 3940 464 371 ku6 #_R111
+ 3941 465 375 ku6 #_R111
+ 3942 466 380 ku6 #_R111
+ 3943 383 467 kp6 #_R112
+ 3944 385 470 kp6 #_R112
+ 3945 386 471 kp6 #_R112
+ 3946 388 473 kp6 #_R112
+ 3947 389 474 kp6 #_R112
+ 3948 392 476 kp6 #_R112
+ 3949 394 477 kp6 #_R112
+ 3950 395 478 kp6 #_R112
+ 3951 398 480 kp6 #_R112
+ 3952 401 481 kp6 #_R112
+ 3953 404 482 kp6 #_R112
+ 3954 405 483 kp6 #_R112
+ 3955 408 485 kp6 #_R112
+ 3956 411 486 kp6 #_R112
+ 3957 415 487 kp6 #_R112
+ 3958 419 488 kp6 #_R112
+ 3959 420 489 kp6 #_R112
+ 3960 423 491 kp6 #_R112
+ 3961 426 492 kp6 #_R112
+ 3962 430 493 kp6 #_R112
+ 3963 435 494 kp6 #_R112
+ 3964 440 495 kp6 #_R112
+ 3965 441 496 kp6 #_R112
+ 3966 444 498 kp6 #_R112
+ 3967 447 499 kp6 #_R112
+ 3968 451 500 kp6 #_R112
+ 3969 456 501 kp6 #_R112
+ 3970 462 502 kp6 #_R112
+ 3971 384 257 ku6 #_R113
+ 3972 387 258 ku6 #_R113
+ 3973 390 260 ku6 #_R113
+ 3974 391 261 ku6 #_R113
+ 3975 393 262 ku6 #_R113
+ 3976 396 264 ku6 #_R113
+ 3977 397 265 ku6 #_R113
+ 3978 399 267 ku6 #_R113
+ 3979 400 268 ku6 #_R113
+ 3980 402 271 ku6 #_R113
+ 3981 403 272 ku6 #_R113
+ 3982 406 274 ku6 #_R113
+ 3983 407 275 ku6 #_R113
+ 3984 409 277 ku6 #_R113
+ 3985 410 278 ku6 #_R113
+ 3986 412 281 ku6 #_R113
+ 3987 413 283 ku6 #_R113
+ 3988 414 284 ku6 #_R113
+ 3989 416 287 ku6 #_R113
+ 3990 417 290 ku6 #_R113
+ 3991 418 292 ku6 #_R113
+ 3992 421 294 ku6 #_R113
+ 3993 422 295 ku6 #_R113
+ 3994 424 297 ku6 #_R113
+ 3995 425 298 ku6 #_R113
+ 3996 427 301 ku6 #_R113
+ 3997 428 303 ku6 #_R113
+ 3998 429 304 ku6 #_R113
+ 3999 431 307 ku6 #_R113
+ 4000 432 310 ku6 #_R113
+ 4001 433 313 ku6 #_R113
+ 4002 434 314 ku6 #_R113
+ 4003 436 317 ku6 #_R113
+ 4004 437 320 ku6 #_R113
+ 4005 438 324 ku6 #_R113
+ 4006 439 327 ku6 #_R113
+ 4007 442 329 ku6 #_R113
+ 4008 443 330 ku6 #_R113
+ 4009 445 332 ku6 #_R113
+ 4010 446 333 ku6 #_R113
+ 4011 448 336 ku6 #_R113
+ 4012 449 338 ku6 #_R113
+ 4013 450 339 ku6 #_R113
+ 4014 452 342 ku6 #_R113
+ 4015 453 345 ku6 #_R113
+ 4016 454 348 ku6 #_R113
+ 4017 455 349 ku6 #_R113
+ 4018 457 352 ku6 #_R113
+ 4019 458 355 ku6 #_R113
+ 4020 459 359 ku6 #_R113
+ 4021 460 363 ku6 #_R113
+ 4022 461 364 ku6 #_R113
+ 4023 463 367 ku6 #_R113
+ 4024 464 370 ku6 #_R113
+ 4025 465 374 ku6 #_R113
+ 4026 466 379 ku6 #_R113
+ 4027 383 468 kp6 #_R114
+ 4028 384 470 kp6 #_R114
+ 4029 386 472 kp6 #_R114
+ 4030 387 473 kp6 #_R114
+ 4031 389 475 kp6 #_R114
+ 4032 391 476 kp6 #_R114
+ 4033 393 477 kp6 #_R114
+ 4034 395 479 kp6 #_R114
+ 4035 397 480 kp6 #_R114
+ 4036 400 481 kp6 #_R114
+ 4037 403 482 kp6 #_R114
+ 4038 405 484 kp6 #_R114
+ 4039 407 485 kp6 #_R114
+ 4040 410 486 kp6 #_R114
+ 4041 414 487 kp6 #_R114
+ 4042 418 488 kp6 #_R114
+ 4043 420 490 kp6 #_R114
+ 4044 422 491 kp6 #_R114
+ 4045 425 492 kp6 #_R114
+ 4046 429 493 kp6 #_R114
+ 4047 434 494 kp6 #_R114
+ 4048 439 495 kp6 #_R114
+ 4049 441 497 kp6 #_R114
+ 4050 443 498 kp6 #_R114
+ 4051 446 499 kp6 #_R114
+ 4052 450 500 kp6 #_R114
+ 4053 455 501 kp6 #_R114
+ 4054 461 502 kp6 #_R114
+ 4055 385 257 ku6 #_R115
+ 4056 388 258 ku6 #_R115
+ 4057 390 259 ku6 #_R115
+ 4058 392 261 ku6 #_R115
+ 4059 394 262 ku6 #_R115
+ 4060 396 263 ku6 #_R115
+ 4061 398 265 ku6 #_R115
+ 4062 399 266 ku6 #_R115
+ 4063 401 268 ku6 #_R115
+ 4064 402 270 ku6 #_R115
+ 4065 404 272 ku6 #_R115
+ 4066 406 273 ku6 #_R115
+ 4067 408 275 ku6 #_R115
+ 4068 409 276 ku6 #_R115
+ 4069 411 278 ku6 #_R115
+ 4070 412 280 ku6 #_R115
+ 4071 413 282 ku6 #_R115
+ 4072 415 284 ku6 #_R115
+ 4073 416 286 ku6 #_R115
+ 4074 417 289 ku6 #_R115
+ 4075 419 292 ku6 #_R115
+ 4076 421 293 ku6 #_R115
+ 4077 423 295 ku6 #_R115
+ 4078 424 296 ku6 #_R115
+ 4079 426 298 ku6 #_R115
+ 4080 427 300 ku6 #_R115
+ 4081 428 302 ku6 #_R115
+ 4082 430 304 ku6 #_R115
+ 4083 431 306 ku6 #_R115
+ 4084 432 309 ku6 #_R115
+ 4085 433 312 ku6 #_R115
+ 4086 435 314 ku6 #_R115
+ 4087 436 316 ku6 #_R115
+ 4088 437 319 ku6 #_R115
+ 4089 438 323 ku6 #_R115
+ 4090 440 327 ku6 #_R115
+ 4091 442 328 ku6 #_R115
+ 4092 444 330 ku6 #_R115
+ 4093 445 331 ku6 #_R115
+ 4094 447 333 ku6 #_R115
+ 4095 448 335 ku6 #_R115
+ 4096 449 337 ku6 #_R115
+ 4097 451 339 ku6 #_R115
+ 4098 452 341 ku6 #_R115
+ 4099 453 344 ku6 #_R115
+ 4100 454 347 ku6 #_R115
+ 4101 456 349 ku6 #_R115
+ 4102 457 351 ku6 #_R115
+ 4103 458 354 ku6 #_R115
+ 4104 459 358 ku6 #_R115
+ 4105 460 362 ku6 #_R115
+ 4106 462 364 ku6 #_R115
+ 4107 463 366 ku6 #_R115
+ 4108 464 369 ku6 #_R115
+ 4109 465 373 ku6 #_R115
+ 4110 466 378 ku6 #_R115
+ 4111 383 469 kp6 #_R116
+ 4112 384 471 kp6 #_R116
+ 4113 385 472 kp6 #_R116
+ 4114 387 474 kp6 #_R116
+ 4115 388 475 kp6 #_R116
+ 4116 390 476 kp6 #_R116
+ 4117 393 478 kp6 #_R116
+ 4118 394 479 kp6 #_R116
+ 4119 396 480 kp6 #_R116
+ 4120 399 481 kp6 #_R116
+ 4121 403 483 kp6 #_R116
+ 4122 404 484 kp6 #_R116
+ 4123 406 485 kp6 #_R116
+ 4124 409 486 kp6 #_R116
+ 4125 413 487 kp6 #_R116
+ 4126 418 489 kp6 #_R116
+ 4127 419 490 kp6 #_R116
+ 4128 421 491 kp6 #_R116
+ 4129 424 492 kp6 #_R116
+ 4130 428 493 kp6 #_R116
+ 4131 433 494 kp6 #_R116
+ 4132 439 496 kp6 #_R116
+ 4133 440 497 kp6 #_R116
+ 4134 442 498 kp6 #_R116
+ 4135 445 499 kp6 #_R116
+ 4136 449 500 kp6 #_R116
+ 4137 454 501 kp6 #_R116
+ 4138 460 502 kp6 #_R116
+ 4139 386 257 ku6 #_R117
+ 4140 389 258 ku6 #_R117
+ 4141 391 259 ku6 #_R117
+ 4142 392 260 ku6 #_R117
+ 4143 395 262 ku6 #_R117
+ 4144 397 263 ku6 #_R117
+ 4145 398 264 ku6 #_R117
+ 4146 400 266 ku6 #_R117
+ 4147 401 267 ku6 #_R117
+ 4148 402 269 ku6 #_R117
+ 4149 405 272 ku6 #_R117
+ 4150 407 273 ku6 #_R117
+ 4151 408 274 ku6 #_R117
+ 4152 410 276 ku6 #_R117
+ 4153 411 277 ku6 #_R117
+ 4154 412 279 ku6 #_R117
+ 4155 414 282 ku6 #_R117
+ 4156 415 283 ku6 #_R117
+ 4157 416 285 ku6 #_R117
+ 4158 417 288 ku6 #_R117
+ 4159 420 292 ku6 #_R117
+ 4160 422 293 ku6 #_R117
+ 4161 423 294 ku6 #_R117
+ 4162 425 296 ku6 #_R117
+ 4163 426 297 ku6 #_R117
+ 4164 427 299 ku6 #_R117
+ 4165 429 302 ku6 #_R117
+ 4166 430 303 ku6 #_R117
+ 4167 431 305 ku6 #_R117
+ 4168 432 308 ku6 #_R117
+ 4169 434 312 ku6 #_R117
+ 4170 435 313 ku6 #_R117
+ 4171 436 315 ku6 #_R117
+ 4172 437 318 ku6 #_R117
+ 4173 438 322 ku6 #_R117
+ 4174 441 327 ku6 #_R117
+ 4175 443 328 ku6 #_R117
+ 4176 444 329 ku6 #_R117
+ 4177 446 331 ku6 #_R117
+ 4178 447 332 ku6 #_R117
+ 4179 448 334 ku6 #_R117
+ 4180 450 337 ku6 #_R117
+ 4181 451 338 ku6 #_R117
+ 4182 452 340 ku6 #_R117
+ 4183 453 343 ku6 #_R117
+ 4184 455 347 ku6 #_R117
+ 4185 456 348 ku6 #_R117
+ 4186 457 350 ku6 #_R117
+ 4187 458 353 ku6 #_R117
+ 4188 459 357 ku6 #_R117
+ 4189 461 362 ku6 #_R117
+ 4190 462 363 ku6 #_R117
+ 4191 463 365 ku6 #_R117
+ 4192 464 368 ku6 #_R117
+ 4193 465 372 ku6 #_R117
+ 4194 466 377 ku6 #_R117
+ 4195 495 503 kp7 #_R118
+ 4196 496 504 kp7 #_R118
+ 4197 497 505 kp7 #_R118
+ 4198 498 506 kp7 #_R118
+ 4199 499 507 kp7 #_R118
+ 4200 500 508 kp7 #_R118
+ 4201 501 509 kp7 #_R118
+ 4202 502 510 kp7 #_R118
+ 4203 467 439 ku7 #_R119
+ 4204 468 440 ku7 #_R119
+ 4205 469 441 ku7 #_R119
+ 4206 470 442 ku7 #_R119
+ 4207 471 443 ku7 #_R119
+ 4208 472 444 ku7 #_R119
+ 4209 473 445 ku7 #_R119
+ 4210 474 446 ku7 #_R119
+ 4211 475 447 ku7 #_R119
+ 4212 476 448 ku7 #_R119
+ 4213 477 449 ku7 #_R119
+ 4214 478 450 ku7 #_R119
+ 4215 479 451 ku7 #_R119
+ 4216 480 452 ku7 #_R119
+ 4217 481 453 ku7 #_R119
+ 4218 482 454 ku7 #_R119
+ 4219 483 455 ku7 #_R119
+ 4220 484 456 ku7 #_R119
+ 4221 485 457 ku7 #_R119
+ 4222 486 458 ku7 #_R119
+ 4223 487 459 ku7 #_R119
+ 4224 488 460 ku7 #_R119
+ 4225 489 461 ku7 #_R119
+ 4226 490 462 ku7 #_R119
+ 4227 491 463 ku7 #_R119
+ 4228 492 464 ku7 #_R119
+ 4229 493 465 ku7 #_R119
+ 4230 494 466 ku7 #_R119
+ 4231 488 503 kp7 #_R120
+ 4232 489 504 kp7 #_R120
+ 4233 490 505 kp7 #_R120
+ 4234 491 506 kp7 #_R120
+ 4235 492 507 kp7 #_R120
+ 4236 493 508 kp7 #_R120
+ 4237 494 509 kp7 #_R120
+ 4238 502 511 kp7 #_R120
+ 4239 467 418 ku7 #_R121
+ 4240 468 419 ku7 #_R121
+ 4241 469 420 ku7 #_R121
+ 4242 470 421 ku7 #_R121
+ 4243 471 422 ku7 #_R121
+ 4244 472 423 ku7 #_R121
+ 4245 473 424 ku7 #_R121
+ 4246 474 425 ku7 #_R121
+ 4247 475 426 ku7 #_R121
+ 4248 476 427 ku7 #_R121
+ 4249 477 428 ku7 #_R121
+ 4250 478 429 ku7 #_R121
+ 4251 479 430 ku7 #_R121
+ 4252 480 431 ku7 #_R121
+ 4253 481 432 ku7 #_R121
+ 4254 482 433 ku7 #_R121
+ 4255 483 434 ku7 #_R121
+ 4256 484 435 ku7 #_R121
+ 4257 485 436 ku7 #_R121
+ 4258 486 437 ku7 #_R121
+ 4259 487 438 ku7 #_R121
+ 4260 495 460 ku7 #_R121
+ 4261 496 461 ku7 #_R121
+ 4262 497 462 ku7 #_R121
+ 4263 498 463 ku7 #_R121
+ 4264 499 464 ku7 #_R121
+ 4265 500 465 ku7 #_R121
+ 4266 501 466 ku7 #_R121
+ 4267 482 503 kp7 #_R122
+ 4268 483 504 kp7 #_R122
+ 4269 484 505 kp7 #_R122
+ 4270 485 506 kp7 #_R122
+ 4271 486 507 kp7 #_R122
+ 4272 487 508 kp7 #_R122
+ 4273 494 510 kp7 #_R122
+ 4274 501 511 kp7 #_R122
+ 4275 467 403 ku7 #_R123
+ 4276 468 404 ku7 #_R123
+ 4277 469 405 ku7 #_R123
+ 4278 470 406 ku7 #_R123
+ 4279 471 407 ku7 #_R123
+ 4280 472 408 ku7 #_R123
+ 4281 473 409 ku7 #_R123
+ 4282 474 410 ku7 #_R123
+ 4283 475 411 ku7 #_R123
+ 4284 476 412 ku7 #_R123
+ 4285 477 413 ku7 #_R123
+ 4286 478 414 ku7 #_R123
+ 4287 479 415 ku7 #_R123
+ 4288 480 416 ku7 #_R123
+ 4289 481 417 ku7 #_R123
+ 4290 488 433 ku7 #_R123
+ 4291 489 434 ku7 #_R123
+ 4292 490 435 ku7 #_R123
+ 4293 491 436 ku7 #_R123
+ 4294 492 437 ku7 #_R123
+ 4295 493 438 ku7 #_R123
+ 4296 495 454 ku7 #_R123
+ 4297 496 455 ku7 #_R123
+ 4298 497 456 ku7 #_R123
+ 4299 498 457 ku7 #_R123
+ 4300 499 458 ku7 #_R123
+ 4301 500 459 ku7 #_R123
+ 4302 502 466 ku7 #_R123
+ 4303 477 503 kp7 #_R124
+ 4304 478 504 kp7 #_R124
+ 4305 479 505 kp7 #_R124
+ 4306 480 506 kp7 #_R124
+ 4307 481 507 kp7 #_R124
+ 4308 487 509 kp7 #_R124
+ 4309 493 510 kp7 #_R124
+ 4310 500 511 kp7 #_R124
+ 4311 467 393 ku7 #_R125
+ 4312 468 394 ku7 #_R125
+ 4313 469 395 ku7 #_R125
+ 4314 470 396 ku7 #_R125
+ 4315 471 397 ku7 #_R125
+ 4316 472 398 ku7 #_R125
+ 4317 473 399 ku7 #_R125
+ 4318 474 400 ku7 #_R125
+ 4319 475 401 ku7 #_R125
+ 4320 476 402 ku7 #_R125
+ 4321 482 413 ku7 #_R125
+ 4322 483 414 ku7 #_R125
+ 4323 484 415 ku7 #_R125
+ 4324 485 416 ku7 #_R125
+ 4325 486 417 ku7 #_R125
+ 4326 488 428 ku7 #_R125
+ 4327 489 429 ku7 #_R125
+ 4328 490 430 ku7 #_R125
+ 4329 491 431 ku7 #_R125
+ 4330 492 432 ku7 #_R125
+ 4331 494 438 ku7 #_R125
+ 4332 495 449 ku7 #_R125
+ 4333 496 450 ku7 #_R125
+ 4334 497 451 ku7 #_R125
+ 4335 498 452 ku7 #_R125
+ 4336 499 453 ku7 #_R125
+ 4337 501 459 ku7 #_R125
+ 4338 502 465 ku7 #_R125
+ 4339 473 503 kp7 #_R126
+ 4340 474 504 kp7 #_R126
+ 4341 475 505 kp7 #_R126
+ 4342 476 506 kp7 #_R126
+ 4343 481 508 kp7 #_R126
+ 4344 486 509 kp7 #_R126
+ 4345 492 510 kp7 #_R126
+ 4346 499 511 kp7 #_R126
+ 4347 467 387 ku7 #_R127
+ 4348 468 388 ku7 #_R127
+ 4349 469 389 ku7 #_R127
+ 4350 470 390 ku7 #_R127
+ 4351 471 391 ku7 #_R127
+ 4352 472 392 ku7 #_R127
+ 4353 477 399 ku7 #_R127
+ 4354 478 400 ku7 #_R127
+ 4355 479 401 ku7 #_R127
+ 4356 480 402 ku7 #_R127
+ 4357 482 409 ku7 #_R127
+ 4358 483 410 ku7 #_R127
+ 4359 484 411 ku7 #_R127
+ 4360 485 412 ku7 #_R127
+ 4361 487 417 ku7 #_R127
+ 4362 488 424 ku7 #_R127
+ 4363 489 425 ku7 #_R127
+ 4364 490 426 ku7 #_R127
+ 4365 491 427 ku7 #_R127
+ 4366 493 432 ku7 #_R127
+ 4367 494 437 ku7 #_R127
+ 4368 495 445 ku7 #_R127
+ 4369 496 446 ku7 #_R127
+ 4370 497 447 ku7 #_R127
+ 4371 498 448 ku7 #_R127
+ 4372 500 453 ku7 #_R127
+ 4373 501 458 ku7 #_R127
+ 4374 502 464 ku7 #_R127
+ 4375 470 503 kp7 #_R128
+ 4376 471 504 kp7 #_R128
+ 4377 472 505 kp7 #_R128
+ 4378 476 507 kp7 #_R128
+ 4379 480 508 kp7 #_R128
+ 4380 485 509 kp7 #_R128
+ 4381 491 510 kp7 #_R128
+ 4382 498 511 kp7 #_R128
+ 4383 467 384 ku7 #_R129
+ 4384 468 385 ku7 #_R129
+ 4385 469 386 ku7 #_R129
+ 4386 473 390 ku7 #_R129
+ 4387 474 391 ku7 #_R129
+ 4388 475 392 ku7 #_R129
+ 4389 477 396 ku7 #_R129
+ 4390 478 397 ku7 #_R129
+ 4391 479 398 ku7 #_R129
+ 4392 481 402 ku7 #_R129
+ 4393 482 406 ku7 #_R129
+ 4394 483 407 ku7 #_R129
+ 4395 484 408 ku7 #_R129
+ 4396 486 412 ku7 #_R129
+ 4397 487 416 ku7 #_R129
+ 4398 488 421 ku7 #_R129
+ 4399 489 422 ku7 #_R129
+ 4400 490 423 ku7 #_R129
+ 4401 492 427 ku7 #_R129
+ 4402 493 431 ku7 #_R129
+ 4403 494 436 ku7 #_R129
+ 4404 495 442 ku7 #_R129
+ 4405 496 443 ku7 #_R129
+ 4406 497 444 ku7 #_R129
+ 4407 499 448 ku7 #_R129
+ 4408 500 452 ku7 #_R129
+ 4409 501 457 ku7 #_R129
+ 4410 502 463 ku7 #_R129
+ 4411 468 503 kp7 #_R130
+ 4412 469 504 kp7 #_R130
+ 4413 472 506 kp7 #_R130
+ 4414 475 507 kp7 #_R130
+ 4415 479 508 kp7 #_R130
+ 4416 484 509 kp7 #_R130
+ 4417 490 510 kp7 #_R130
+ 4418 497 511 kp7 #_R130
+ 4419 467 383 ku7 #_R131
+ 4420 470 385 ku7 #_R131
+ 4421 471 386 ku7 #_R131
+ 4422 473 388 ku7 #_R131
+ 4423 474 389 ku7 #_R131
+ 4424 476 392 ku7 #_R131
+ 4425 477 394 ku7 #_R131
+ 4426 478 395 ku7 #_R131
+ 4427 480 398 ku7 #_R131
+ 4428 481 401 ku7 #_R131
+ 4429 482 404 ku7 #_R131
+ 4430 483 405 ku7 #_R131
+ 4431 485 408 ku7 #_R131
+ 4432 486 411 ku7 #_R131
+ 4433 487 415 ku7 #_R131
+ 4434 488 419 ku7 #_R131
+ 4435 489 420 ku7 #_R131
+ 4436 491 423 ku7 #_R131
+ 4437 492 426 ku7 #_R131
+ 4438 493 430 ku7 #_R131
+ 4439 494 435 ku7 #_R131
+ 4440 495 440 ku7 #_R131
+ 4441 496 441 ku7 #_R131
+ 4442 498 444 ku7 #_R131
+ 4443 499 447 ku7 #_R131
+ 4444 500 451 ku7 #_R131
+ 4445 501 456 ku7 #_R131
+ 4446 502 462 ku7 #_R131
+ 4447 467 503 kp7 #_R132
+ 4448 469 505 kp7 #_R132
+ 4449 471 506 kp7 #_R132
+ 4450 474 507 kp7 #_R132
+ 4451 478 508 kp7 #_R132
+ 4452 483 509 kp7 #_R132
+ 4453 489 510 kp7 #_R132
+ 4454 496 511 kp7 #_R132
+ 4455 468 383 ku7 #_R133
+ 4456 470 384 ku7 #_R133
+ 4457 472 386 ku7 #_R133
+ 4458 473 387 ku7 #_R133
+ 4459 475 389 ku7 #_R133
+ 4460 476 391 ku7 #_R133
+ 4461 477 393 ku7 #_R133
+ 4462 479 395 ku7 #_R133
+ 4463 480 397 ku7 #_R133
+ 4464 481 400 ku7 #_R133
+ 4465 482 403 ku7 #_R133
+ 4466 484 405 ku7 #_R133
+ 4467 485 407 ku7 #_R133
+ 4468 486 410 ku7 #_R133
+ 4469 487 414 ku7 #_R133
+ 4470 488 418 ku7 #_R133
+ 4471 490 420 ku7 #_R133
+ 4472 491 422 ku7 #_R133
+ 4473 492 425 ku7 #_R133
+ 4474 493 429 ku7 #_R133
+ 4475 494 434 ku7 #_R133
+ 4476 495 439 ku7 #_R133
+ 4477 497 441 ku7 #_R133
+ 4478 498 443 ku7 #_R133
+ 4479 499 446 ku7 #_R133
+ 4480 500 450 ku7 #_R133
+ 4481 501 455 ku7 #_R133
+ 4482 502 461 ku7 #_R133
+ 4483 467 504 kp7 #_R134
+ 4484 468 505 kp7 #_R134
+ 4485 470 506 kp7 #_R134
+ 4486 473 507 kp7 #_R134
+ 4487 477 508 kp7 #_R134
+ 4488 482 509 kp7 #_R134
+ 4489 488 510 kp7 #_R134
+ 4490 495 511 kp7 #_R134
+ 4491 469 383 ku7 #_R135
+ 4492 471 384 ku7 #_R135
+ 4493 472 385 ku7 #_R135
+ 4494 474 387 ku7 #_R135
+ 4495 475 388 ku7 #_R135
+ 4496 476 390 ku7 #_R135
+ 4497 478 393 ku7 #_R135
+ 4498 479 394 ku7 #_R135
+ 4499 480 396 ku7 #_R135
+ 4500 481 399 ku7 #_R135
+ 4501 483 403 ku7 #_R135
+ 4502 484 404 ku7 #_R135
+ 4503 485 406 ku7 #_R135
+ 4504 486 409 ku7 #_R135
+ 4505 487 413 ku7 #_R135
+ 4506 489 418 ku7 #_R135
+ 4507 490 419 ku7 #_R135
+ 4508 491 421 ku7 #_R135
+ 4509 492 424 ku7 #_R135
+ 4510 493 428 ku7 #_R135
+ 4511 494 433 ku7 #_R135
+ 4512 496 439 ku7 #_R135
+ 4513 497 440 ku7 #_R135
+ 4514 498 442 ku7 #_R135
+ 4515 499 445 ku7 #_R135
+ 4516 500 449 ku7 #_R135
+ 4517 501 454 ku7 #_R135
+ 4518 502 460 ku7 #_R135
+ 4519 511 512 kp8 #_R136
+ 4520 503 495 ku8 #_R137
+ 4521 504 496 ku8 #_R137
+ 4522 505 497 ku8 #_R137
+ 4523 506 498 ku8 #_R137
+ 4524 507 499 ku8 #_R137
+ 4525 508 500 ku8 #_R137
+ 4526 509 501 ku8 #_R137
+ 4527 510 502 ku8 #_R137
+ 4528 510 512 kp8 #_R138
+ 4529 503 488 ku8 #_R139
+ 4530 504 489 ku8 #_R139
+ 4531 505 490 ku8 #_R139
+ 4532 506 491 ku8 #_R139
+ 4533 507 492 ku8 #_R139
+ 4534 508 493 ku8 #_R139
+ 4535 509 494 ku8 #_R139
+ 4536 511 502 ku8 #_R139
+ 4537 509 512 kp8 #_R140
+ 4538 503 482 ku8 #_R141
+ 4539 504 483 ku8 #_R141
+ 4540 505 484 ku8 #_R141
+ 4541 506 485 ku8 #_R141
+ 4542 507 486 ku8 #_R141
+ 4543 508 487 ku8 #_R141
+ 4544 510 494 ku8 #_R141
+ 4545 511 501 ku8 #_R141
+ 4546 508 512 kp8 #_R142
+ 4547 503 477 ku8 #_R143
+ 4548 504 478 ku8 #_R143
+ 4549 505 479 ku8 #_R143
+ 4550 506 480 ku8 #_R143
+ 4551 507 481 ku8 #_R143
+ 4552 509 487 ku8 #_R143
+ 4553 510 493 ku8 #_R143
+ 4554 511 500 ku8 #_R143
+ 4555 507 512 kp8 #_R144
+ 4556 503 473 ku8 #_R145
+ 4557 504 474 ku8 #_R145
+ 4558 505 475 ku8 #_R145
+ 4559 506 476 ku8 #_R145
+ 4560 508 481 ku8 #_R145
+ 4561 509 486 ku8 #_R145
+ 4562 510 492 ku8 #_R145
+ 4563 511 499 ku8 #_R145
+ 4564 506 512 kp8 #_R146
+ 4565 503 470 ku8 #_R147
+ 4566 504 471 ku8 #_R147
+ 4567 505 472 ku8 #_R147
+ 4568 507 476 ku8 #_R147
+ 4569 508 480 ku8 #_R147
+ 4570 509 485 ku8 #_R147
+ 4571 510 491 ku8 #_R147
+ 4572 511 498 ku8 #_R147
+ 4573 505 512 kp8 #_R148
+ 4574 503 468 ku8 #_R149
+ 4575 504 469 ku8 #_R149
+ 4576 506 472 ku8 #_R149
+ 4577 507 475 ku8 #_R149
+ 4578 508 479 ku8 #_R149
+ 4579 509 484 ku8 #_R149
+ 4580 510 490 ku8 #_R149
+ 4581 511 497 ku8 #_R149
+ 4582 504 512 kp8 #_R150
+ 4583 503 467 ku8 #_R151
+ 4584 505 469 ku8 #_R151
+ 4585 506 471 ku8 #_R151
+ 4586 507 474 ku8 #_R151
+ 4587 508 478 ku8 #_R151
+ 4588 509 483 ku8 #_R151
+ 4589 510 489 ku8 #_R151
+ 4590 511 496 ku8 #_R151
+ 4591 503 512 kp8 #_R152
+ 4592 504 467 ku8 #_R153
+ 4593 505 468 ku8 #_R153
+ 4594 506 470 ku8 #_R153
+ 4595 507 473 ku8 #_R153
+ 4596 508 477 ku8 #_R153
+ 4597 509 482 ku8 #_R153
+ 4598 510 488 ku8 #_R153
+ 4599 511 495 ku8 #_R153
+ 4600 512 511 ku9 #_R154
+ 4601 512 510 ku9 #_R155
+ 4602 512 509 ku9 #_R156
+ 4603 512 508 ku9 #_R157
+ 4604 512 507 ku9 #_R158
+ 4605 512 506 ku9 #_R159
+ 4606 512 505 ku9 #_R160
+ 4607 512 504 ku9 #_R161
+ 4608 512 503 ku9 #_R162
+end reactions

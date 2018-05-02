@@ -1,0 +1,26 @@
+rm -f bench.txt
+touch bench.txt
+echo TGF V19
+echo TGF V19 >> bench.txt
+time KaSa -syntax 3 --print-efficiency --no-compute-influence-map --compute-separating-transitions TGF/V19/*.ka|grep TCCB >> bench.txt
+echo TGF V20
+echo TGF V20 >> bench.txt
+time KaSa -syntax 3 --print-efficiency --no-compute-influence-map --compute-separating-transitions TGF/V20/*.ka|grep TCCB >> bench.txt
+echo TGF V21
+echo TGF V21 >> bench.txt
+time KaSa -syntax 3 --print-efficiency --no-compute-influence-map --compute-separating-transitions TGF/V21/*.ka|grep TCCB >> bench.txt
+echo TGF current
+echo TGF current >> bench.txt
+time KaSa -syntax 3 --print-efficiency --no-compute-influence-map --compute-separating-transitions TGF/20170401/kappa/N*.ka TGF/20170401/kappa/scenario1.ka|grep TCCB >> bench.txt
+echo TGF V19 long
+echo TGF V19 long >> bench.txt
+time KaSa -syntax 3 --print-efficiency  --no-compute-influence-map  --compute-local-traces --use-macrotransitions-in-local-traces   --compute-separating-transitions TGF/V19/*.ka|grep TCCB >> bench.txt
+echo TGF V20 long
+echo TGF V20 long >> bench.txt
+time KaSa -syntax 3 --print-efficiency  --no-compute-influence-map --compute-local-traces --use-macrotransitions-in-local-traces --compute-separating-transitions TGF/V20/*.ka|grep TCCB >> bench.txt
+echo TGF V21 long
+echo TGF V21 long >> bench.txt
+time KaSa -syntax 3 --print-efficiency  --no-compute-influence-map --compute-local-traces --use-macrotransitions-in-local-traces --compute-separating-transitions TGF/V21/*.ka|grep TCCB >> bench.txt
+echo TGF current long
+echo TGF current long >> bench.txt
+time KaSa -syntax 3 --print-efficiency  --no-compute-influence-map --compute-local-traces --use-macrotransitions-in-local-traces --compute-separating-transitions TGF/20170401/kappa/N*.ka TGF/20170401/kappa/scenario1.ka|grep TCCB >> bench.txt

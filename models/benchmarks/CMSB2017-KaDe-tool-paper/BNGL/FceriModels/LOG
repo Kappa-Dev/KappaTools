@@ -1,0 +1,1630 @@
+Kappa Static Analyzer (v4beta-53-g78998cb-dirty) (with Tk interface)
+Analysis launched at 2017/05/24 08:33:39 (GMT+2) on applecell.home
+Parsing fceri_fyn.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated 
+
+	Views in initial state:
+
+		Lig(l1!free,l2!free)
+
+			(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated
+			(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated
+			(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated
+			(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated
+			(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated
+			(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated
+			(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated
+			(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated
+			(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated
+			(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated
+			(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated
+			(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated
+			(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated
+			(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated
+			(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 141, characters 0-30:) should be investigated
+			(rule File "fceri_fyn.ka", line 144, characters 0-30:) should be investigated
+			(rule File "fceri_fyn.ka", line 147, characters 0-44:) should be investigated
+			(rule File "fceri_fyn.ka", line 148, characters 0-44:) should be investigated
+			(rule File "fceri_fyn.ka", line 151, characters 0-40:) should be investigated
+			(rule File "fceri_fyn.ka", line 152, characters 0-40:) should be investigated
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated 
+				(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated 
+				(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated 
+
+	Views in initial state:
+
+		Lyn(U!free,SH2!free)
+
+	Views in initial state:
+
+		Lyn(a~Y,SH2!free)
+
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated 
+				(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated 
+
+	Views in initial state:
+
+		Fyn(t~Y)
+
+	Views in initial state:
+
+		Fyn(a~Y,SH2!free)
+
+				(rule File "fceri_fyn.ka", line 152, characters 0-40:) should be investigated 
+				(rule File "fceri_fyn.ka", line 151, characters 0-40:) should be investigated 
+				(rule File "fceri_fyn.ka", line 148, characters 0-44:) should be investigated 
+				(rule File "fceri_fyn.ka", line 147, characters 0-44:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated 
+
+	Views in initial state:
+
+		Syk(a~Y,tSH2!free)
+
+	Views in initial state:
+
+		Syk(l~Y,tSH2!free)
+
+				(rule File "fceri_fyn.ka", line 144, characters 0-30:) should be investigated 
+				(rule File "fceri_fyn.ka", line 141, characters 0-30:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated 
+				(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated 
+				(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated 
+				(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated 
+				(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated 
+				(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated 
+
+	Views in initial state:
+
+		Rec(g~Y,a!free,g!free)
+
+	Views in initial state:
+
+		Rec(b~Y,a!free,b!free)
+
+
+	Applying rule File "fceri_fyn.ka", line 45, characters 0-67::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 45, characters 0-67: is applied for the first time
+				(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+
+				(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Rec(g~Y,a!Lig@l1,g!free)
+
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Rec(b~Y,a!Lig@l1,b!free)
+
+
+		Updating the views for Lig(l1!,l2!)
+
+		Lig(l1!Rec@a,l2!free)
+
+		Update information about potential sites across domain
+
+		Rec(a!1,b~Y?),Lig(l1!1,l2)
+		Rec(a!1,g~Y?),Lig(l1!1,l2)
+		Rec(a!1,b),Lig(l1!1,l2)
+		Rec(a!1,g),Lig(l1!1,l2)
+		Lig(l1!1,l2),Rec(a!1,b~Y?)
+		Lig(l1!1,l2),Rec(a!1,g~Y?)
+		Lig(l1!1,l2),Rec(a!1,b)
+		Lig(l1!1,l2),Rec(a!1,g)
+
+			(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 45, characters 0-67::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 45, characters 0-67: is applied for the first time
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 46, characters 0-67::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 46, characters 0-67: is applied for the first time
+				(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+
+				(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated 
+				(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Rec(g~Y,a!Lig@l2,g!free)
+
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Rec(b~Y,a!Lig@l2,b!free)
+
+
+		Updating the views for Lig(l1!,l2!)
+
+		Lig(l1!free,l2!Rec@a)
+
+		Update information about potential sites across domain
+
+		Rec(a!1,b~Y?),Lig(l1,l2!1)
+		Rec(a!1,g~Y?),Lig(l1,l2!1)
+		Rec(a!1,b),Lig(l1,l2!1)
+		Rec(a!1,g),Lig(l1,l2!1)
+		Lig(l1,l2!1),Rec(a!1,b~Y?)
+		Lig(l1,l2!1),Rec(a!1,g~Y?)
+		Lig(l1,l2!1),Rec(a!1,b)
+		Lig(l1,l2!1),Rec(a!1,g)
+
+			(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 46, characters 0-67::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 46, characters 0-67: is applied for the first time
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 49, characters 0-70::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 49, characters 0-70: is applied for the first time
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+		Lig(l1!Rec@a,l2!Rec@a)
+
+		Update information about potential sites across domain
+
+		Rec(a!1,b~Y?),Lig(l1!1,l2!Rec.a)
+		Rec(a!1,g~Y?),Lig(l1!1,l2!Rec.a)
+		Rec(a!1,b),Lig(l1!1,l2!Rec.a)
+		Rec(a!1,g),Lig(l1!1,l2!Rec.a)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,b~Y?)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,g~Y?)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,b)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,g)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,b~Y?)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,g~Y?)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,b)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,g)
+		Rec(a!1,b~Y?),Lig(l1!Rec.a,l2!1)
+		Rec(a!1,g~Y?),Lig(l1!Rec.a,l2!1)
+		Rec(a!1,b),Lig(l1!Rec.a,l2!1)
+		Rec(a!1,g),Lig(l1!Rec.a,l2!1)
+
+			(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 49, characters 0-70::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 49, characters 0-70: is applied for the first time
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 50, characters 0-70::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 50, characters 0-70: is applied for the first time
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 50, characters 0-70::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 50, characters 0-70: is applied for the first time
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 56, characters 0-126::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 58, characters 0-126::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 61, characters 0-126::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 63, characters 0-126::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 72, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 74, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 77, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 79, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 85-86, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 88-89, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 92-93, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 95-96, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 99-100, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 102-103, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 106-107, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 109-110, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 113-114, characters 0-86::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 116-117, characters 0-86::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 120-121, characters 0-88::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 123-124, characters 0-88::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 127-128, characters 0-90::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 130-131, characters 0-90::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 134-135, characters 0-92::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 137-138, characters 0-92::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 53, characters 0-72::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 53, characters 0-72: is applied for the first time
+				(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+
+				(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated 
+				(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Rec(b~Y,a!free,b!Lyn@U)
+		Rec(b~Y,a!Lig@l1,b!Lyn@U)
+		Rec(b~Y,a!Lig@l2,b!Lyn@U)
+
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+		Lyn(U!Rec@b,SH2!free)
+
+		Update information about potential sites across domain
+
+		Rec(b~Y!1),Lyn(SH2,U!1)
+		Rec(a!Lig.l2,b!1),Lyn(SH2,U!1)
+		Rec(a!Lig.l1,b!1),Lyn(SH2,U!1)
+		Rec(a,b!1),Lyn(SH2,U!1)
+		Lyn(SH2,U!1),Rec(b~Y!1)
+		Lyn(SH2,U!1),Rec(a!Lig.l2,b!1)
+		Lyn(SH2,U!1),Rec(a!Lig.l1,b!1)
+		Lyn(SH2,U!1),Rec(a,b!1)
+		Rec(a!1,b!Lyn.U),Lig(l1!1,l2!Rec.a)
+		Rec(a!1,b!Lyn.U),Lig(l1!1,l2)
+		Rec(a!1,b!Lyn.U),Lig(l1!Rec.a,l2!1)
+		Rec(a!1,b!Lyn.U),Lig(l1,l2!1)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,b!Lyn.U)
+		Lig(l1!1,l2),Rec(a!1,b!Lyn.U)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,b!Lyn.U)
+		Lig(l1,l2!1),Rec(a!1,b!Lyn.U)
+
+			(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated
+			(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated
+			(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated
+			(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated
+			(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated
+			(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated
+			(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated
+			(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated
+			(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 53, characters 0-72::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 53, characters 0-72: is applied for the first time
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 66, characters 0-74::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 66, characters 0-74::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 69, characters 0-68::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 69, characters 0-68::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 82, characters 0-70::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 82, characters 0-70::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 141, characters 0-30::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 144, characters 0-30::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 147, characters 0-44::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 148, characters 0-44::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 151, characters 0-40::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 152, characters 0-40::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 45, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 45, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 46, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 46, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 49, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", lines 116-117, characters 0-86::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 113-114, characters 0-86::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 109-110, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 106-107, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 102-103, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 99-100, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 88-89, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 85-86, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 63, characters 0-126::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 63, characters 0-126: is applied for the first time
+
+		Updating the views for Lig(l1!,l2!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Rec(g~pY,a!Lig@l2,g!free)
+
+
+		Updating the views for Rec(b~,a!,b!)
+		Update information about potential sites across domain
+
+		Rec(a!1,g~pY?),Lig(l1!Rec.a,l2!1)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,g~pY?)
+
+			(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated
+			(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated
+			(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated
+			(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated
+			(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated
+			(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated
+			(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated
+			(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated
+			(rule File "fceri_fyn.ka", line 141, characters 0-30:) should be investigated
+			(rule File "fceri_fyn.ka", line 144, characters 0-30:) should be investigated
+			(rule File "fceri_fyn.ka", line 147, characters 0-44:) should be investigated
+			(rule File "fceri_fyn.ka", line 148, characters 0-44:) should be investigated
+			(rule File "fceri_fyn.ka", line 151, characters 0-40:) should be investigated
+			(rule File "fceri_fyn.ka", line 152, characters 0-40:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 61, characters 0-126::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 58, characters 0-126::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 58, characters 0-126: is applied for the first time
+
+		Updating the views for Lig(l1!,l2!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Rec(b~pY,a!Lig@l2,b!free)
+
+		Update information about potential sites across domain
+
+		Rec(a!1,b~pY?),Lig(l1!Rec.a,l2!1)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,b~pY?)
+
+			(rule File "fceri_fyn.ka", line 58, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 61, characters 0-126:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 56, characters 0-126::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 49, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+		Update information about potential sites across domain
+
+		Lig(l1,l2!1),Rec(a!1,b~pY?)
+		Lig(l1,l2!1),Rec(a!1,g~pY?)
+		Rec(a!1,b~pY?),Lig(l1,l2!1)
+		Rec(a!1,g~pY?),Lig(l1,l2!1)
+
+			(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 56, characters 0-126:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 50, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 50, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Rec(g~pY,a!free,g!free)
+
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Rec(b~pY,a!free,b!free)
+
+
+		Updating the views for Lig(l1!,l2!)
+			(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated
+			(rule File "fceri_fyn.ka", line 50, characters 0-70:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 53, characters 0-72::
+		the precondition is satisfied
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 72, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 74, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 77, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 79, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 92-93, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 95-96, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 120-121, characters 0-88::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 123-124, characters 0-88::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 127-128, characters 0-90::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 130-131, characters 0-90::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 134-135, characters 0-92::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 137-138, characters 0-92::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 45, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Rec(g~pY,a!Lig@l1,g!free)
+
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Rec(b~pY,a!Lig@l1,b!free)
+
+
+		Updating the views for Lig(l1!,l2!)
+		Update information about potential sites across domain
+
+		Rec(a!1,b~pY?),Lig(l1!1,l2)
+		Rec(a!1,g~pY?),Lig(l1!1,l2)
+		Lig(l1!1,l2),Rec(a!1,b~pY?)
+		Lig(l1!1,l2),Rec(a!1,g~pY?)
+
+			(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated
+			(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated
+			(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated
+			(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated
+			(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated
+			(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated
+			(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated
+			(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated
+			(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 45, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 46, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 46, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 49, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+		Update information about potential sites across domain
+
+		Rec(a!1,b~pY?),Lig(l1!1,l2!Rec.a)
+		Rec(a!1,g~pY?),Lig(l1!1,l2!Rec.a)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,b~pY?)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,g~pY?)
+
+			(rule File "fceri_fyn.ka", line 45, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 46, characters 0-67:) should be investigated
+			(rule File "fceri_fyn.ka", line 49, characters 0-70:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 53, characters 0-72::
+		the precondition is satisfied
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 63, characters 0-126::
+		the precondition is satisfied
+
+		Updating the views for Lig(l1!,l2!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+	Applying rule File "fceri_fyn.ka", line 66, characters 0-74::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 66, characters 0-74: is applied for the first time
+				(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+
+				(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated 
+				(rule File "fceri_fyn.ka", line 72, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 74, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 77, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", line 79, characters 0-129:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 85-86, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 88-89, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 92-93, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 95-96, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Rec(b~pY,a!free,b!Lyn@SH2)
+		Rec(b~pY,a!Lig@l1,b!Lyn@SH2)
+		Rec(b~pY,a!Lig@l2,b!Lyn@SH2)
+
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Lyn(a~Y,SH2!Rec@b)
+
+
+		Updating the views for Lyn(U!,SH2!)
+
+		Lyn(U!free,SH2!Rec@b)
+
+		Update information about potential sites across domain
+
+		Rec(b~pY!1),Lyn(SH2!1,a~Y)
+		Rec(b~pY!1),Lyn(SH2!1,U)
+		Rec(a!Lig.l2,b!1),Lyn(SH2!1,a~Y)
+		Rec(a!Lig.l1,b!1),Lyn(SH2!1,a~Y)
+		Rec(a,b!1),Lyn(SH2!1,a~Y)
+		Rec(a!Lig.l2,b!1),Lyn(SH2!1,U)
+		Rec(a!Lig.l1,b!1),Lyn(SH2!1,U)
+		Rec(a,b!1),Lyn(SH2!1,U)
+		Lyn(SH2!1,a~Y),Rec(b~pY!1)
+		Lyn(SH2!1,a~Y),Rec(a!Lig.l2,b!1)
+		Lyn(SH2!1,a~Y),Rec(a!Lig.l1,b!1)
+		Lyn(SH2!1,a~Y),Rec(a,b!1)
+		Lyn(SH2!1,U),Rec(b~pY!1)
+		Lyn(SH2!1,U),Rec(a!Lig.l2,b!1)
+		Lyn(SH2!1,U),Rec(a!Lig.l1,b!1)
+		Lyn(SH2!1,U),Rec(a,b!1)
+		Rec(a!1,b!Lyn.SH2),Lig(l1!1,l2!Rec.a)
+		Rec(a!1,b!Lyn.SH2),Lig(l1!1,l2)
+		Rec(a!1,b!Lyn.SH2),Lig(l1!Rec.a,l2!1)
+		Rec(a!1,b!Lyn.SH2),Lig(l1,l2!1)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,b!Lyn.SH2)
+		Lig(l1!1,l2),Rec(a!1,b!Lyn.SH2)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,b!Lyn.SH2)
+		Lig(l1,l2!1),Rec(a!1,b!Lyn.SH2)
+
+			(rule File "fceri_fyn.ka", line 53, characters 0-72:) should be investigated
+			(rule File "fceri_fyn.ka", line 63, characters 0-126:) should be investigated
+			(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 66, characters 0-74::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 66, characters 0-74: is applied for the first time
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 69, characters 0-68::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 69, characters 0-68: is applied for the first time
+				(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+
+				(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 99-100, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 102-103, characters 0-85:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 106-107, characters 0-87:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 109-110, characters 0-87:) should be investigated 
+
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Rec(b~pY,a!free,b!Fyn@SH2)
+		Rec(b~pY,a!Lig@l1,b!Fyn@SH2)
+		Rec(b~pY,a!Lig@l2,b!Fyn@SH2)
+
+
+		Updating the views for Fyn(a~,SH2!)
+
+		Fyn(a~Y,SH2!Rec@b)
+
+		Update information about potential sites across domain
+
+		Rec(b~pY!1),Fyn(SH2!1,a~Y)
+		Rec(a!Lig.l2,b!1),Fyn(SH2!1,a~Y)
+		Rec(a!Lig.l1,b!1),Fyn(SH2!1,a~Y)
+		Rec(a,b!1),Fyn(SH2!1,a~Y)
+		Fyn(SH2!1,a~Y),Rec(b~pY!1)
+		Fyn(SH2!1,a~Y),Rec(a!Lig.l2,b!1)
+		Fyn(SH2!1,a~Y),Rec(a!Lig.l1,b!1)
+		Fyn(SH2!1,a~Y),Rec(a,b!1)
+		Rec(a!1,b!Fyn.SH2),Lig(l1!1,l2!Rec.a)
+		Rec(a!1,b!Fyn.SH2),Lig(l1!1,l2)
+		Rec(a!1,b!Fyn.SH2),Lig(l1!Rec.a,l2!1)
+		Rec(a!1,b!Fyn.SH2),Lig(l1,l2!1)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,b!Fyn.SH2)
+		Lig(l1!1,l2),Rec(a!1,b!Fyn.SH2)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,b!Fyn.SH2)
+		Lig(l1,l2!1),Rec(a!1,b!Fyn.SH2)
+
+			(rule File "fceri_fyn.ka", line 66, characters 0-74:) should be investigated
+			(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 69, characters 0-68::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 69, characters 0-68: is applied for the first time
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Fyn(a~,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 82, characters 0-70::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 82, characters 0-70: is applied for the first time
+				(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+
+				(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 113-114, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 116-117, characters 0-86:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 120-121, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 123-124, characters 0-88:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 127-128, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 130-131, characters 0-90:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 134-135, characters 0-92:) should be investigated 
+				(rule File "fceri_fyn.ka", lines 137-138, characters 0-92:) should be investigated 
+
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Rec(g~pY,a!free,g!Syk@tSH2)
+		Rec(g~pY,a!Lig@l1,g!Syk@tSH2)
+		Rec(g~pY,a!Lig@l2,g!Syk@tSH2)
+
+
+		Updating the views for Syk(a~,tSH2!)
+
+		Syk(a~Y,tSH2!Rec@g)
+
+
+		Updating the views for Syk(l~,tSH2!)
+
+		Syk(l~Y,tSH2!Rec@g)
+
+		Update information about potential sites across domain
+
+		Rec(g~pY!1),Syk(l~Y,tSH2!1)
+		Rec(g~pY!1),Syk(a~Y,tSH2!1)
+		Rec(a!Lig.l2,g!1),Syk(l~Y,tSH2!1)
+		Rec(a!Lig.l1,g!1),Syk(l~Y,tSH2!1)
+		Rec(a,g!1),Syk(l~Y,tSH2!1)
+		Rec(a!Lig.l2,g!1),Syk(a~Y,tSH2!1)
+		Rec(a!Lig.l1,g!1),Syk(a~Y,tSH2!1)
+		Rec(a,g!1),Syk(a~Y,tSH2!1)
+		Syk(l~Y,tSH2!1),Rec(g~pY!1)
+		Syk(l~Y,tSH2!1),Rec(a!Lig.l2,g!1)
+		Syk(l~Y,tSH2!1),Rec(a!Lig.l1,g!1)
+		Syk(l~Y,tSH2!1),Rec(a,g!1)
+		Syk(a~Y,tSH2!1),Rec(g~pY!1)
+		Syk(a~Y,tSH2!1),Rec(a!Lig.l2,g!1)
+		Syk(a~Y,tSH2!1),Rec(a!Lig.l1,g!1)
+		Syk(a~Y,tSH2!1),Rec(a,g!1)
+		Rec(a!1,g!Syk.tSH2),Lig(l1!1,l2!Rec.a)
+		Rec(a!1,g!Syk.tSH2),Lig(l1!1,l2)
+		Rec(a!1,g!Syk.tSH2),Lig(l1!Rec.a,l2!1)
+		Rec(a!1,g!Syk.tSH2),Lig(l1,l2!1)
+		Lig(l1!1,l2!Rec.a),Rec(a!1,g!Syk.tSH2)
+		Lig(l1!1,l2),Rec(a!1,g!Syk.tSH2)
+		Lig(l1!Rec.a,l2!1),Rec(a!1,g!Syk.tSH2)
+		Lig(l1,l2!1),Rec(a!1,g!Syk.tSH2)
+
+			(rule File "fceri_fyn.ka", line 69, characters 0-68:) should be investigated
+			(rule File "fceri_fyn.ka", line 82, characters 0-70:) should be investigated
+
+	Applying rule File "fceri_fyn.ka", line 82, characters 0-70::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 82, characters 0-70: is applied for the first time
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Syk(a~,tSH2!)
+
+		Updating the views for Syk(l~,tSH2!)
+
+	Applying rule File "fceri_fyn.ka", lines 85-86, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 88-89, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 99-100, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 102-103, characters 0-85::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 106-107, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 109-110, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 113-114, characters 0-86::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 116-117, characters 0-86::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 141, characters 0-30::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 141, characters 0-30: is applied for the first time
+
+		Updating the views for Rec(b~,a!,b!)
+
+	Applying rule File "fceri_fyn.ka", line 144, characters 0-30::
+		the precondition is satisfied
+
+		rule File "fceri_fyn.ka", line 144, characters 0-30: is applied for the first time
+
+		Updating the views for Rec(g~,a!,g!)
+
+	Applying rule File "fceri_fyn.ka", line 147, characters 0-44::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 148, characters 0-44::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 151, characters 0-40::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 152, characters 0-40::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 58, characters 0-126::
+		the precondition is satisfied
+
+		Updating the views for Lig(l1!,l2!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+	Applying rule File "fceri_fyn.ka", line 61, characters 0-126::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 49, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 56, characters 0-126::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 50, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 50, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 45, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 53, characters 0-72::
+		the precondition is satisfied
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 72, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 74, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 77, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 79, characters 0-129::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 92-93, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 95-96, characters 0-87::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 120-121, characters 0-88::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 123-124, characters 0-88::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 127-128, characters 0-90::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 130-131, characters 0-90::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 134-135, characters 0-92::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", lines 137-138, characters 0-92::
+		the precondition is not satisfied yet
+
+	Applying rule File "fceri_fyn.ka", line 45, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 46, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 46, characters 0-67::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 49, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lig(l1!,l2!)
+
+	Applying rule File "fceri_fyn.ka", line 53, characters 0-72::
+		the precondition is satisfied
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 63, characters 0-126::
+		the precondition is satisfied
+
+		Updating the views for Lig(l1!,l2!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Rec(b~,a!,b!)
+
+	Applying rule File "fceri_fyn.ka", line 66, characters 0-74::
+		the precondition is satisfied
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 66, characters 0-74::
+		the precondition is satisfied
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Lyn(a~,SH2!)
+
+		Updating the views for Lyn(U!,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 69, characters 0-68::
+		the precondition is satisfied
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Fyn(a~,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 69, characters 0-68::
+		the precondition is satisfied
+
+		Updating the views for Rec(b~,a!,b!)
+
+		Updating the views for Fyn(a~,SH2!)
+
+	Applying rule File "fceri_fyn.ka", line 82, characters 0-70::
+		the precondition is satisfied
+
+		Updating the views for Rec(g~,a!,g!)
+
+		Updating the views for Syk(a~,tSH2!)
+
+		Updating the views for Syk(l~,tSH2!)
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "fceri_fyn.ka", line 56, characters 0-126: will never be applied.
+rule File "fceri_fyn.ka", line 61, characters 0-126: will never be applied.
+rule File "fceri_fyn.ka", line 72, characters 0-129: will never be applied.
+rule File "fceri_fyn.ka", line 74, characters 0-129: will never be applied.
+rule File "fceri_fyn.ka", line 77, characters 0-129: will never be applied.
+rule File "fceri_fyn.ka", line 79, characters 0-129: will never be applied.
+rule File "fceri_fyn.ka", lines 85-86, characters 0-85: will never be applied.
+rule File "fceri_fyn.ka", lines 88-89, characters 0-85: will never be applied.
+rule File "fceri_fyn.ka", lines 92-93, characters 0-87: will never be applied.
+rule File "fceri_fyn.ka", lines 95-96, characters 0-87: will never be applied.
+rule File "fceri_fyn.ka", lines 99-100, characters 0-85: will never be applied.
+rule File "fceri_fyn.ka", lines 102-103, characters 0-85: will never be applied.
+rule File "fceri_fyn.ka", lines 106-107, characters 0-87: will never be applied.
+rule File "fceri_fyn.ka", lines 109-110, characters 0-87: will never be applied.
+rule File "fceri_fyn.ka", lines 113-114, characters 0-86: will never be applied.
+rule File "fceri_fyn.ka", lines 116-117, characters 0-86: will never be applied.
+rule File "fceri_fyn.ka", lines 120-121, characters 0-88: will never be applied.
+rule File "fceri_fyn.ka", lines 123-124, characters 0-88: will never be applied.
+rule File "fceri_fyn.ka", lines 127-128, characters 0-90: will never be applied.
+rule File "fceri_fyn.ka", lines 130-131, characters 0-90: will never be applied.
+rule File "fceri_fyn.ka", lines 134-135, characters 0-92: will never be applied.
+rule File "fceri_fyn.ka", lines 137-138, characters 0-92: will never be applied.
+rule File "fceri_fyn.ka", line 147, characters 0-44: will never be applied.
+rule File "fceri_fyn.ka", line 148, characters 0-44: will never be applied.
+rule File "fceri_fyn.ka", line 151, characters 0-40: will never be applied.
+rule File "fceri_fyn.ka", line 152, characters 0-40: will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+Lig() => [ Lig(l2) v Lig(l2!Rec.a) ]
+Lig() => [ Lig(l1) v Lig(l1!Rec.a) ]
+Lyn() => [ Lyn(U) v Lyn(U!Rec.b) ]
+Lyn() => [ Lyn(SH2) v Lyn(SH2!Rec.b) ]
+Lyn() => Lyn(a~Y)
+Fyn() => Fyn(t~Y)
+Fyn() => [ Fyn(SH2) v Fyn(SH2!Rec.b) ]
+Fyn() => Fyn(a~Y)
+Syk() => Syk(a~Y)
+Syk() => [ Syk(tSH2) v Syk(tSH2!Rec.g) ]
+Syk() => Syk(l~Y)
+Rec() => [ Rec(g~Y?) v Rec(g~pY?) ]
+Rec() => [ Rec(b) v Rec(b!Lyn.U) v Rec(b!Lyn.SH2) v Rec(b!Fyn.SH2) ]
+Rec() => [ Rec(a) v Rec(a!Lig.l1) v Rec(a!Lig.l2) ]
+Rec() => [ Rec(b~Y?) v Rec(b~pY?) ]
+Rec() => [ Rec(g) v Rec(g!Syk.tSH2) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+Lyn(U!Rec.b) => Lyn(SH2,U!Rec.b)
+Rec(g!Syk.tSH2) => Rec(g~pY!Syk.tSH2)
+Rec(b~pY?) => [ Rec(b~pY) v Rec(b~pY!Lyn.SH2) v Rec(b~pY!Fyn.SH2) ]
+Rec(b~Y?) => [ Rec(b~Y) v Rec(b~Y!Lyn.U) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+execution finished without any exception

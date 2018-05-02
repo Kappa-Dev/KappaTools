@@ -1,0 +1,97 @@
+//////////////////////////////////////////////////////////////////////////////
+//		agent interfaces
+
+%agent:		EGF(r)
+%agent:		EGFR(CR,C,N,L,Y1016{u p},Y1092{u p},Y1172{u p})
+%agent:		SoS(PR,S{u p})
+%agent:		Shc(Y{u p},PTB{u p})
+%agent:		Grb2(SH3c,SH3n,SH2{u p})
+
+//////////////////////////////////////////////////////////////////////////////
+//		constants
+
+%var:	'scale'				1/2
+%var:	'Avogadro'			6.0221413E+23
+%var:	'mammalian cell'		2.25E-12	// l (mammalian cell)
+%var:	'yeast cell'			4.2E-14		// l (hapl yeast cell)
+%var:	'V'				'scale' * 'yeast cell'
+
+//////////////////////////////////////////////////////////////////////////////
+//		rate constants
+
+%var:	'det k_on'		2.5E08	// M^-1 s^-1
+%var:	'det k_off'		2.5	// s^-1
+%var:	'det k_cat'		1	// s^-1
+
+%var:	'k_on'	'det k_on' / ('Avogadro' * 'V')	// molecule^-1 s^-1
+%var:	'k_off'	'det k_off'			// s^-1
+%var:	'k_cat'	'det k_cat'			// s^-1
+
+//------------------------------------------------------------------------------
+//		"mad computer scientist" rate constants
+
+//	%var:	'k_on'	1 / 'scale'
+//	%var:	'k_cat'	1
+//	%var:	'k_off'	1
+
+//------------------------------------------------------------------------------
+//		more reasonable rate constants
+
+//	%var:	'k_on  K'	0.01 / 'scale'	# molecule^-1 s^-1
+//	%var:	'k_off K'	2.5		# s^-1
+//	%var:	'k_cat K'	1		# s^-1
+
+//////////////////////////////////////////////////////////////////////////////
+//		initial mixture
+
+%init:  10000 / 'scale' EGF(r)
+%init:  10000 / 'scale' EGFR(CR,C,N,L,Y1016{u},Y1092{u},Y1172{u})
+%init:  20000 / 'scale' SoS(PR,S{u})
+%init:  16000 / 'scale' Shc(Y{u},PTB{u})
+%init:  10000 / 'scale' Grb2(SH3c,SH3n,SH2{u})
+
+//////////////////////////////////////////////////////////////////////////////
+//		observables
+
+%obs: 'long'			|Shc(PTB[_],Y[1]),Grb2(SH2[1],SH3n[2]),SoS(PR[2])|
+%obs: 'short'			|EGFR(Y1092{p}[2]),Grb2(SH2[2],SH3n[1]),SoS(PR[1])|
+%var: 'sos recruited'		|Grb2(SH2[_],SH3n[2]),SoS(PR[2])|
+
+
+//////////////////////////////////////////////////////////////////////////////
+//		rules for "Sos recruitment"
+
+/*'EGFR.EGFR' 
+  EGFR(L[_],CR[.],N[.],C[.]), EGFR(L[_],CR,[.]N[.],C[.]) ->
+  EGFR(L[_],CR[1],N[.],C[.]), EGFR(L[_],CR[1],N[.],C[.]) @ 'k_on'/2*/
+'EGFR.EGFR'
+  EGF(r[2]), EGFR(L[2],CR[.],N[.],C[.]), EGF(r[3]), EGFR(L[3],CR[.],N[.],C[.]) ->
+  EGF(r[2]), EGFR(L[2],CR[1],N[.],C[.]), EGF(r[3]), EGFR(L[3],CR[1],N[.],C[.]) @ 'k_on'/2
+
+/*'EGFR/EGFR' EGFR(L!_,CR!1,N,C), EGFR(L!_,CR!1,N,C) -> EGFR(L!_,CR,N,C), EGFR(L!_,CR,N,C) @ 'k_off'/2*/
+/*'EGFR/EGFR' EGFR(CR!1,N,C), EGFR(CR!1,N,C) -> EGFR(CR,N,C), EGFR(CR,N,C) @ 'k_off'/2*/
+'EGFR/EGFR'
+  EGF(r[2]), EGFR(L[2],CR[1],N[.],C[.]), EGF(r[3]), EGFR(L[3],CR[1],N[.],C[.]) ->
+  EGF(r[2]), EGFR(L[2],CR[.],N[.],C[.]), EGF(r[3]), EGFR(L[3],CR[.],N[.],C[.]) @ 'k_off'/2
+
+'EGF.EGFR' EGF(r[.]), EGFR(L[.],CR[.]) -> EGF(r[1]), EGFR(L[1],CR[.]) @ 'k_on'
+'EGF/EGFR' EGF(r[1]), EGFR(L[1],CR[.]) -> EGF(r[.]), EGFR(L[.],CR[.]) @ 'k_off'
+'Shc.Grb2' Shc(Y[.]{p}), Grb2(SH2[.]) -> Shc(Y[1]{p}), Grb2(SH2[1]) @ 5*'k_on'
+'Shc/Grb2' Shc(Y{p}[1]), Grb2(SH2[1]) -> Shc(Y{p}[.]), Grb2(SH2[.]) @ 'k_off'
+'EGFR.Grb2' EGFR(Y1092{p}[.]), Grb2(SH2[.]) -> EGFR(Y1092{p}[1]), Grb2(SH2[1]) @ 'k_on'
+'EGFR/Grb2' EGFR(Y1092{p}[1]), Grb2(SH2[1]) -> EGFR(Y1092{p}[.]), Grb2(SH2[.]) @ 'k_off'
+'EGFR.Shc' EGFR(Y1172{p}[.]), Shc(PTB[.]) -> EGFR(Y1172{p}[1]), Shc(PTB[1]) @ 'k_on'
+'EGFR/Shc' EGFR(Y1172{p}[1]), Shc(PTB[1]) -> EGFR(Y1172{p}[.]), Shc(PTB[.]) @ 'k_off'
+'Grb2.SoS' Grb2(SH3n[.]), SoS(PR[.],S[.]{u}) -> Grb2(SH3n[1]), SoS(PR[1],S[.]{u}) @ 'k_on'
+'Grb2/SoS' Grb2(SH3n[1]), SoS(PR[1]) -> Grb2(SH3n[.]), SoS(PR[.]) @ 'k_off'
+'EGFR.int' EGFR(CR[1],N[.],C[.]), EGFR(CR[1],N[.],C[.]) -> EGFR(CR[1],N[2],C[.]), EGFR(CR[1],N[.],C[2]) @ 'k_on'
+'EGFR/int' EGFR(CR[1],N[2],C[.]), EGFR(CR[1],N[.],C[2]) -> EGFR(CR[1],N[.],C[.]), EGFR(CR[1],N[.],C[.]) @ 'k_off'
+'pY1092@EGFR' EGFR(N[1]), EGFR(C[1],Y1092{u}[.]) -> EGFR(N[1]), EGFR(C[1],Y1092{p}[.]) @ 'k_cat'
+'pY1172@EGFR' EGFR(N[1]), EGFR(C[1],Y1172[.]{u}) -> EGFR(N[1]), EGFR(C[1],Y1172[.]{p}) @ 'k_cat'
+'uY1092@EGFR' EGFR(Y1092[.]{p}) -> EGFR(Y1092[.]{u}) @ 'k_cat'
+'uY1172@EGFR' EGFR(Y1172{p}[.]) -> EGFR(Y1172{u}[.]) @ 'k_cat'
+
+// 'pY@Shc' Shc(PTB!_,Y~u) -> Shc(PTB!_,Y~p) @ 'k_cat'
+'pY@Shc' EGFR(Y1172{p}[1]), Shc(PTB[1],Y{u}[.]) -> EGFR(Y1172{p}[1]), Shc(PTB[1],Y{p}[.]) @ 'k_cat'
+
+'uY@Shc' Shc(Y{p}[.]) -> Shc(Y{u}[.]) @ 'k_cat'

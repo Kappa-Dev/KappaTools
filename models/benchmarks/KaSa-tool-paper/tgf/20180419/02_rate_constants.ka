@@ -1,0 +1,37 @@
+%var: 'coef_time_inv' 1/time_unit
+%var: 'coef_amount' system_mass/mass_unit*particle_quantity_unit
+%var: 'coef_zero' coef_time_inv * coef_amount
+%var: 'coef_un' coef_time_inv
+%var: 'coef_bin' coef_time_inv /coef_amount
+
+
+%var: 'slow'  1E-20
+/*  coef_amount 2E-21*/
+
+%var: 'low_affinity_bin' 0.0001*coef_bin*slow
+%var: 'normal_affinity_bin' 0.001*coef_bin*slow
+%var: 'high_affinity_bin' 0.01*coef_bin*slow
+%var: 'very_high_affinity_bin' 0.1*coef_bin*slow
+%var: 'kon_bin' 0.01*coef_bin*slow
+%var: 'koff_bin' 0*coef_bin*slow
+%var: 'lon_bin' 0.001*coef_bin*slow
+%var: 'loff_bin' 0
+%var: 'k_bin' 0.01*coef_bin*slow
+%var: 'l_bin' 'loff_bin'
+%var: 'kd_bin' 0.001*coef_bin*slow
+%var: 'kdon_bin' 0.001*coef_bin*slow
+%var: 'kdoff_bin' 0
+
+%var: 'low_affinity_un' 0.0001*coef_un
+%var: 'normal_affinity_un' 0.001*coef_un
+%var: 'high_affinity_un' 0.01*coef_un
+%var: 'very_high_affinity_un' 0.1*coef_un
+%var: 'kon_un' 0.01*coef_un
+%var: 'koff_un' 0*coef_un
+%var: 'lon_un' 0.001*coef_un
+%var: 'loff_un' 0*coef_un
+%var: 'k_un' 0.01*coef_un
+%var: 'l_un' 'loff_un'
+%var: 'kd_un' 0.001*coef_un
+%var: 'kdon_un' 0.001*coef_un
+%var: 'kdoff_un' 0*coef_un

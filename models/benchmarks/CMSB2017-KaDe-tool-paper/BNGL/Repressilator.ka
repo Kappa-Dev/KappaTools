@@ -1,0 +1,112 @@
+
+    %var: 'Na'    6.022e23    # Avogadro's [mol^-1]
+    %var: 'V'      1.4e-15    # Cell volume [L]
+    #
+    %var: 'c0'    1e9         # M^-1 s^-1
+    %var: 'c1'    224         # s^-1
+    %var: 'c2'    9           # s^-1
+    %var: 'c3'    0.5         # s^-1
+    %var: 'c4'    5e-4        # s^-1
+    %var: 'c5'    0.167       # s^-1
+    %var: 'c6'    0.0057762265  # s^-1
+    %var: 'c7'    0.0011552453  # s^-1
+    #
+    %var: 'tF'    1e-4        # telegraph factor
+    %var: 'rF'    1000        # rna factor
+    %var: 'pF'    1000        # protein factor
+
+%agent: Null()
+%agent: gTetR(lac1,lac2)
+%agent: pLacI(tet)
+%agent: pTetR(cI)
+%agent: gCI(tet1,tet2)
+%agent: gLacI(cI1,cI2)
+%agent: mTetR()
+%agent: mCI()
+%agent: mLacI()
+%agent: pCI(lac )
+
+    %init: 1 Null()
+    %init: 1 gTetR(lac1!1,lac2!2),pLacI(tet!1),pLacI(tet!2)
+    %init: 1 gCI(tet1!1,tet2!2),pTetR(cI!1),pTetR(cI!2)
+    %init: 1 gLacI(cI1!1,cI2!2),pCI(lac!1),pCI(lac!2)
+    %init: 3163 mTetR()
+    %init: 6819 mCI()
+    %init: 129 mLacI()
+    %init: 183453 pTetR(cI)
+    %init: 2006198 pCI(lac)
+    %init: 165670 pLacI(tet)
+
+    %var: 'k0' 'c0'/'Na'/'V'*'tF'/'pF'
+    %var: 'k1' 'c1'*'tF'
+    %var: 'k2' 'c2'*'tF'
+    %var: 'k3' 'c3'*'rF'
+    %var: 'k4' 'c4'*'rF'
+
+    gTetR(lac1,lac2) , pLacI(tet) <-> gTetR(lac1!1,lac2),pLacI(tet!1)        @'k0', 'k1'
+    gTetR(lac2,lac1) , pLacI(tet) <-> gTetR(lac2!1,lac1),pLacI(tet!1)        @'k0', 'k1'
+
+    gTetR(lac1!_,lac2) , pLacI(tet) <-> gTetR(lac1!_,lac2!1),pLacI(tet!1)    @'k0', 'k2'
+
+    gTetR(lac2!_,lac1) , pLacI(tet) <-> gTetR(lac2!_,lac1!1),pLacI(tet!1)    @'k0', 'k2'
+
+    gTetR(lac1,lac2) -> gTetR(lac1,lac2) , mTetR() @'k3'
+
+    gTetR(lac1!_) -> gTetR(lac1!_) , mTetR() @'k4'
+
+    gTetR(lac2!_) -> gTetR(lac2!_) , mTetR() @'k4'
+
+    mTetR() -> mTetR() , pTetR(cI)                                    @'c5'/'rF'*'pF'
+
+    mTetR() , Null() -> Null()                                           @'c6'{0}
+    pTetR(cI) , Null() -> Null()                                         @'c7'{0}
+    #
+
+    %var: 'l0' 'c0'/'Na'/'V'*'tF'/'pF'
+    %var: 'l1' 'c1'*'tF'
+    %var: 'l2' 'c2'*'tF'
+    %var: 'l3' 'c3'*'rF'
+    %var: 'l4' 'c4'*'rF'
+    gCI(tet1,tet2) , pTetR(cI) <-> gCI(tet1!1,tet2),pTetR(cI!1) @'l0', 'l1'
+
+    gCI(tet2,tet1) , pTetR(cI) <-> gCI(tet2!1,tet1),pTetR(cI!1) @'l0', 'l1'
+
+    gCI(tet1!_,tet2) , pTetR(cI) <-> gCI(tet1!_,tet2!1),pTetR(cI!1)          @'l0', 'l2'
+
+    gCI(tet2!_,tet1) , pTetR(cI) <-> gCI(tet2!_,tet1!1),pTetR(cI!1)          @'l0', 'l2'
+
+    gCI(tet1,tet2) -> gCI(tet1,tet2) ,mCI()                                 @'l3'
+
+    gCI(tet1!_) -> gCI(tet1!_) , mCI()                                     @'l4'
+    gCI(tet2!_) -> gCI(tet2!_) , mCI()                                     @'l4'
+
+    mCI() -> mCI() , pCI(lac)                                            @'c5'/'rF'*'pF'
+
+    mCI() , Null() -> Null()                                             @'c6'{0}
+    pCI(lac) , Null() -> Null()                                          @'c7'{0}
+    #
+
+    %var: 'm0' 'c0'/'Na'/'V'*'tF'/'pF'
+    %var: 'm1' 'c1'*'tF'
+    %var: 'm2' 'c2'*'tF'
+    %var: 'm3' 'c3'*'rF'
+    %var: 'm4' 'c4'*'rF'
+
+    gLacI(cI1,cI2) , pCI(lac) <-> gLacI(cI1!1,cI2),pCI(lac!1)                @'m0','m1'
+
+    gLacI(cI2,cI1) , pCI(lac) <-> gLacI(cI2!1,cI1),pCI(lac!1)                @'m0','m1'
+
+    gLacI(cI1!_,cI2) , pCI(lac) <-> gLacI(cI1!_,cI2!1),pCI(lac!1)            @'m0','m2'
+
+    gLacI(cI2!_,cI1) , pCI(lac) <-> gLacI(cI2!_,cI1!1),pCI(lac!1)            @'m0','m2'
+
+    gLacI(cI1,cI2) -> gLacI(cI1,cI2) , mLacI() @ 'm3'
+
+
+    gLacI(cI1!_) -> gLacI(cI1!_), mLacI() @'m4'
+
+    gLacI(cI2!_) -> gLacI(cI2!_), mLacI() @'m4'
+
+    mLacI() -> mLacI() , pLacI(tet)                                      @'c5'/'rF'*'pF'
+    mLacI() , Null() -> Null()                                           @'c6'{0}
+    pLacI(tet) , Null() -> Null()                                        @'c7'{0}

@@ -1,0 +1,97 @@
+# This is a demo model of EGFR signaling.
+# The parameters and rules have been modified to keep things
+# as simple as possible.
+begin model
+begin parameters
+    NA  6.02e23    # Avogadro's number (molecues/mol)
+    f   0.01       # Fraction of the cell to simulate
+    Vo  f*1.0e-10  # Extracellular volume=1/cell_density (L)
+    V   f*3.0e-12  # Cytoplasmic volume (L)
+    # Inital amount of ligand (nM)
+    EGF_init     20*1e-10*NA*Vo  # convert to copies per cell
+    # Initial amounts of cellular components (copies per cell)
+    EGFR_init    f*1.8e5   
+    Grb2_init    f*1.5e5  
+    Sos1_init    f*6.2e4
+    # Rate constants 
+    # Divide by NA*Vcyt to convert bimolecular rate constants
+    # from /M/sec to /(molecule/cell)/sec
+    kp1  3.0e6/(NA*V)  # ligand-monomer binding
+    km1  0.06          # ligand-monomer dissociation
+    kp2  1.0e7/(NA*V)  # aggregation of bound monomers
+    km2  0.1           # dissociation of bound monomers
+    kp3  0.5           # dimer transphosphorylation   
+    km3  4.505         # dimer dephosphorylation        
+    kp4  1.5e6/(NA*V)  # binding of Grb2 to receptor
+    km4  0.05          # dissociation of Grb2 from receptor
+    kp5  1.0e7/(NA*V)  # binding of Grb2 to Sos1
+    km5  0.06          # dissociation of Grb2 from Sos1
+    deg  0.01          # degradation of receptor dimers
+end parameters
+begin molecule types
+    EGF(R)
+    EGFR(L,CR1,Y1068~U~P)
+    Grb2(SH2,SH3)
+    Sos1(PxxP)
+    Null()
+end molecule types
+begin seed species
+    # Convert EGF conc. from nM to molecule/cell
+    EGF(R)               0
+    EGFR(L,CR1,Y1068~U)  EGFR_init
+    Grb2(SH2,SH3)        Grb2_init
+    Sos1(PxxP)           Sos1_init
+end seed species
+begin observables
+    Molecules  Sos1_act  EGFR(Y1068!1).Grb2(SH2!1,SH3!2).Sos1(PxxP!2)
+    Molecules  EGFR_tot  EGFR()
+    Molecules  Lig_free  EGF(R)
+    Species    Dim       EGFR(CR1!+)
+    Molecules  RP	     EGFR(Y1068~P!?)
+    # Cytosolic Grb2-Sos1
+    Molecules  Grb2Sos1  Grb2(SH2,SH3!1).Sos1(PxxP!1)
+end observables
+begin reaction rules
+    # Ligand-receptor binding      
+    R1: EGFR(L,CR1) + EGF(R) <-> EGFR(L!1,CR1).EGF(R!1)  kp1, km1
+    # Receptor-aggregation 
+    R2: EGFR(L!+,CR1) + EGFR(L!+,CR1) <-> EGFR(L!+,CR1!1).EGFR(L!+,CR1!1)  kp2,km2
+    # Transphosphorylation of EGFR by RTK
+    R3: EGFR(CR1!+,Y1068~U) -> EGFR(CR1!+,Y1068~P)  kp3
+    # Dephosphorylation
+    R4: EGFR(Y1068~P) -> EGFR(Y1068~U)  km3
+    # Grb2 binding to pY1068
+    R5: EGFR(Y1068~P) + Grb2(SH2) <-> EGFR(Y1068~P!1).Grb2(SH2!1)  kp4,km4
+    # Grb2 binding to Sos1
+    R6: Grb2(SH3) + Sos1(PxxP) <-> Grb2(SH3!1).Sos1(PxxP!1)  kp5,km5
+    # Receptor dimer internalization/degradation
+    #R7: EGF(R!1).EGF(R!2).EGFR(L!1,CR1!3).EGFR(L!2,CR1!3) -> Null() deg DeleteMolecules
+end reaction rules
+end model
+
+begin actions
+    #writeXML({suffix=>"bngxml"})
+    generate_network({overwrite=>1})
+
+    # Equilibration
+    #simulate({method=>ode,suffix=>equil,t_end=>100000,n_steps=>10,sparse=>1,steady_state=>1})
+
+    # Kinetics 
+    setConcentration("EGF(R)","EGF_init")
+    simulate({method=>"ode",t_start=>0,t_end=>100,n_steps=>40})
+    setConcentration("EGF(R)", "10*EGF_init")
+    simulate({method=>"ode",t_end=>200,n_steps=>40,continue=>1})
+    setConcentration("EGF(R)", "0.1*EGF_init")
+    simulate({method=>"ode",t_end=>300,n_steps=>40,continue=>1})
+
+    resetConcentrations() # reverts to saved Concentrations
+    # Stochastic simulation
+    setConcentration("EGF(R)","EGF_init")
+    simulate({method=>"ssa",suffix=>"ssa",t_start=>0,t_end=>100,n_steps=>40})
+    setConcentration("EGF(R)", "10*EGF_init")
+    simulate({method=>"ssa",suffix=>"ssa",t_end=>200,n_steps=>40,continue=>1})
+    setConcentration("EGF(R)", "0.1*EGF_init")
+    simulate({method=>"ssa",suffix=>"ssa",t_end=>300,n_steps=>40,continue=>1})
+
+end actions
+

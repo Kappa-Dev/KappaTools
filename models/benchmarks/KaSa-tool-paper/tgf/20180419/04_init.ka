@@ -1,0 +1,175 @@
+/*initial state*/
+/*Parameters come from parameters.csv*/
+%var: 'TGFB1_mg_per_kg' 0.450000
+%var: 'TGFB1_mw' 44341.000000
+%var: 'TGFB1_init' 'TGFB1_mg_per_kg'*'TGFB1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'TGFBi_mg_per_kg' 52.900000
+%var: 'TGFBi_mw' 74681.000000
+%var: 'TGFBi_init' 'TGFBi_mg_per_kg'*'TGFBi_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'LTBP1_mg_per_kg' 1.090000
+%var: 'LTBP1_mw' 186796.000000
+%var: 'LTBP1_init' 'LTBP1_mg_per_kg'*'LTBP1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'FN1_mg_per_kg' 110.000000
+%var: 'FN1_mw' 262625.000000
+%var: 'FN1_init' 'FN1_mg_per_kg'*'FN1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'FBN1_mg_per_kg' 32.000000
+%var: 'FBN1_mw' 312237.000000
+%var: 'FBN1_init' 'FBN1_mg_per_kg'*'FBN1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'FBLN1_mg_per_kg' 36.600000
+%var: 'FBLN1_mw' 77214.000000
+%var: 'FBLN1_init' 'FBLN1_mg_per_kg'*'FBLN1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'FBLN4_mg_per_kg' 0.990000
+%var: 'FBLN4_mw' 49405.000000
+%var: 'FBLN4_init' 'FBLN4_mg_per_kg'*'FBLN4_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ITGAVB1_mg_per_kg' 9.920000
+%var: 'ITGAVB1_mw' 116038.000000
+%var: 'ITGAVB1_init' 'ITGAVB1_mg_per_kg'*'ITGAVB1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ITGAVB3_mg_per_kg' 5.230000
+%var: 'ITGAVB3_mw' 87058.000000
+%var: 'ITGAVB3_init' 'ITGAVB3_mg_per_kg'*'ITGAVB3_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ITGAVB5_mg_per_kg' 6.250000
+%var: 'ITGAVB5_mw' 88054.000000
+%var: 'ITGAVB5_init' 'ITGAVB5_mg_per_kg'*'ITGAVB5_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ITGAVB6_mg_per_kg' 3.720000
+%var: 'ITGAVB6_mw' 85936.000000
+%var: 'ITGAVB6_init' 'ITGAVB6_mg_per_kg'*'ITGAVB6_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ITGAVB8_mg_per_kg' 0.000010
+%var: 'ITGAVB8_mw' 85632.000000
+%var: 'ITGAVB8_init' 'ITGAVB8_mg_per_kg'*'ITGAVB8_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ITGA5B1_mg_per_kg' 19.900000
+%var: 'ITGA5B1_mw' 114536.000000
+%var: 'ITGA5B1_init' 'ITGA5B1_mg_per_kg'*'ITGA5B1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ITGA2B1_mg_per_kg' 7.300000
+%var: 'ITGA2B1_mw' 129295.000000
+%var: 'ITGA2B1_init' 'ITGA2B1_mg_per_kg'*'ITGA2B1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ADAMTS1_mg_per_kg' 6.940000
+%var: 'ADAMTS1_mw' 105358.000000
+%var: 'ADAMTS1_init' 'ADAMTS1_mg_per_kg'*'ADAMTS1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ADAMTSL2_mg_per_kg' 2.110000
+%var: 'ADAMTSL2_mw' 104621.000000
+%var: 'ADAMTSL2_init' 'ADAMTSL2_mg_per_kg'*'ADAMTSL2_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ADAMTSL3_mg_per_kg' 1.660000
+%var: 'ADAMTSL3_mw' 188692.000000
+%var: 'ADAMTSL3_init' 'ADAMTSL3_mg_per_kg'*'ADAMTSL3_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ADAMTS4_mg_per_kg' 1.230000
+%var: 'ADAMTS4_mw' 90197.000000
+%var: 'ADAMTS4_init' 'ADAMTS4_mg_per_kg'*'ADAMTS4_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ADAMTS10_mg_per_kg' 0.000010
+%var: 'ADAMTS10_mw' 120874.000000
+%var: 'ADAMTS10_init' 'ADAMTS10_mg_per_kg'*'ADAMTS10_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ADAMTSL6_mg_per_kg' 0.010000
+%var: 'ADAMTSL6_mw' 112450.000000
+%var: 'ADAMTSL6_init' 'ADAMTSL6_mg_per_kg'*'ADAMTSL6_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'ADAM12_mg_per_kg' 0.130000
+%var: 'ADAM12_mw' 99542.000000
+%var: 'ADAM12_init' 'ADAM12_mg_per_kg'*'ADAM12_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'THBS1_mg_per_kg' 9.660000
+%var: 'THBS1_mw' 129383.000000
+%var: 'THBS1_init' 'THBS1_mg_per_kg'*'THBS1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'COL1_mg_per_kg' 246.900000
+%var: 'COL1_mw' 134127.000000
+%var: 'COL1_init' 'COL1_mg_per_kg'*'COL1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'DCN_mg_per_kg' 58.600000
+%var: 'DCN_mw' 39747.000000
+%var: 'DCN_init' 'DCN_mg_per_kg'*'DCN_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'MAGP1_mg_per_kg' 1.090000
+%var: 'MAGP1_mw' 20826.000000
+%var: 'MAGP1_init' 'MAGP1_mg_per_kg'*'MAGP1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'MMP2_mg_per_kg' 0.130000
+%var: 'MMP2_mw' 73882.000000
+%var: 'MMP2_init' 'MMP2_mg_per_kg'*'MMP2_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'MMP9_mg_per_kg' 6.150000
+%var: 'MMP9_mw' 78458.000000
+%var: 'MMP9_init' 'MMP9_mg_per_kg'*'MMP9_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'MMP14_mg_per_kg' 0.440000
+%var: 'MMP14_mw' 65894.000000
+%var: 'MMP14_init' 'MMP14_mg_per_kg'*'MMP14_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'TIMP1_mg_per_kg' 0.360000
+%var: 'TIMP1_mw' 23171.000000
+%var: 'TIMP1_init' 'TIMP1_mg_per_kg'*'TIMP1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'TIMP2_mg_per_kg' 0.000010
+%var: 'TIMP2_mw' 24399.000000
+%var: 'TIMP2_init' 'TIMP2_mg_per_kg'*'TIMP2_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'TIMP3_mg_per_kg' 0.090000
+%var: 'TIMP3_mw' 24145.000000
+%var: 'TIMP3_init' 'TIMP3_mg_per_kg'*'TIMP3_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'CD44_mg_per_kg' 8.540000
+%var: 'CD44_mw' 81538.000000
+%var: 'CD44_init' 'CD44_mg_per_kg'*'CD44_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'BMP1_mg_per_kg' 1.150000
+%var: 'BMP1_mw' 111249.000000
+%var: 'BMP1_init' 'BMP1_mg_per_kg'*'BMP1_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+%var: 'HS_mg_per_kg' 49.380000
+%var: 'HS_mw' 40000.000000
+%var: 'HS_init' 'HS_mg_per_kg'*'HS_mw'*'n_avogadro'*'mole'*('mg'/'kg')*'coef_amount'
+
+
+ 
+ 
+%init: 'TGFB1_init' TGFB1() 
+%init: 'TGFBi_init' TGFBi() 
+%init: 'LTBP1_init' LTBP1() 
+%init: 'FN1_init' FN1() 
+%init: 'FBN1_init' FBN1() 
+%init: 'FBLN1_init' FBLN1() 
+%init: 'FBLN4_init' FBLN4() 
+%init: 'ITGAVB1_init' ITGAVB1() 
+%init: 'ITGAVB3_init' ITGAVB3() 
+%init: 'ITGAVB5_init' ITGAVB5() 
+%init: 'ITGAVB6_init' ITGAVB6() 
+%init: 'ITGAVB8_init' ITGAVB8() 
+%init: 'ITGA5B1_init' ITGA5B1() 
+%init: 'ITGA2B1_init' ITGA2B1() 
+%init: 'ADAMTS1_init' ADAMTS1() 
+%init: 'ADAMTSL2_init' ADAMTSL2() 
+%init: 'ADAMTSL3_init' ADAMTSL3() 
+%init: 'ADAMTS4_init' ADAMTS4() 
+%init: 'ADAMTS10_init' ADAMTS10() 
+%init: 'ADAMTSL6_init' ADAMTSL6() 
+%init: 'ADAM12_init' ADAM12() 
+%init: 'THBS1_init' THBS1() 
+%init: 'COL1_init' COL1() 
+%init: 'DCN_init' DCN() 
+%init: 'MAGP1_init' MAGP1() 
+%init: 'MMP2_init' MMP2() 
+%init: 'MMP9_init' MMP9() 
+%init: 'MMP14_init' MMP14() 
+%init: 'TIMP1_init' TIMP1() 
+%init: 'TIMP2_init' TIMP2() 
+%init: 'TIMP3_init' TIMP3() 
+%init: 'CD44_init' CD44() 
+%init: 'BMP1_init' BMP1() 
+%init: 'HS_init' HS() 

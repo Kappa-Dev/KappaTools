@@ -1,0 +1,22 @@
+
+%obs: 'd4' |MMP9(Cat[1]), FBN1(Cter[1])|
+%obs: 'FBN1_in' FBN1_init
+%obs: 'FBN1()' |FBN1()|
+%plot: |r170| /* 'Degradation of THBS1 by ADAMTS1' ADAMTS1(y[1]), THBS1(b[1]) -> ADAMTS1(y[.]),. | 1 r170 @ 'high_affinity_un' */
+%obs: 'd5' |ADAMTS1(y[1]), THBS1(b[1])|
+%obs: 'THBS1_in' THBS1_init
+%obs: 'THBS1()' |THBS1()|
+%plot: |r199| /* 'Degradation of COL1 by MMP14' MMP14(state{active},Cat[1]), COL1(d[1]) -> MMP14(state{active},Cat[.]),. | 1 r199 @ 'high_affinity_un' */
+%obs: 'd6' |MMP14(state{active},Cat[1]), COL1(d[1])|
+%plot: |r202| /* 'Degradation of COL1 by MMP9' MMP9(Cat[1]), COL1(c[1]) -> MMP9(Cat[.]),. | 1 r202 @ 'high_affinity_un' */
+%obs: 'd7' |MMP9(Cat[1]), COL1(c[1])|
+%obs: 'COL1_in' COL1_init
+%obs: 'COL1()' |COL1()|
+%plot: |r209| /* 'Degradation of FN1 by MMP9' MMP9(Cat[1]), FN1(e[1]) -> MMP9(Cat[.]),. | 1 r209 @ 'very_high_affinity_un' */
+%obs: 'd8' |MMP9(Cat[1]), FN1(e[1])|
+%obs: 'FN1_in' FN1_init
+%obs: 'FN1()' |FN1()|
+%plot: |r210| /* 'Degradation of FN1 by MMP2' MMP2(state{active},Cat[1],PEX[.]), FN1(e[1]) -> MMP2(state{active},Cat[.],PEX[.]),. | 1 r210 @ 'very_high_affinity_un' */
+
+%plot: |r211| /* 'Degradation of FN1 by MMP14' MMP14(state{active},Cat[1]), FN1(e[1]) -> MMP14(state{active},Cat[.]),. | 1 r211 @ 'very_high_affinity_un' */
+%obs: 'd10' |MMP14(state{active},Cat[1]), FN1(e[1])|

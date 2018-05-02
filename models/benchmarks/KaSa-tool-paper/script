@@ -1,0 +1,34 @@
+make hline
+make title
+make hline
+make OPTIONS="-syntax V3" MODEL=BNGL/Repressilator.ka TITLE=repressilator line
+make OPTIONS="-syntax V3" MODEL=BNGL/egfr_net.ka TITLE=egfr\\_net line
+make OPTIONS="-syntax V3" MODEL=BNGL/egfr_net_red.ka TITLE=egfr\\_net\\_red line
+make OPTIONS="-syntax V3" MODEL=BNGL/fceri_fyn.ka TITLE=fceri\\_fyn line
+make OPTIONS="-syntax V3" MODEL=BNGL/fceri_fyn_lig.ka TITLE=fceri\\_fyn\\_lig line
+make OPTIONS="-syntax V3" MODEL=BNGL/fceri_fyn_trimer.ka TITLE=fceri\\_fyn\\_trimer line
+make OPTIONS="-syntax V3" MODEL=BNGL/fceri_gamma2.ka TITLE=fceri\\_fyn\\_gamma2 line
+make OPTIONS="-syntax V3" MODEL=BNGL/fceri_ji.ka TITLE=fceri\\_fyn\\_ji line
+make OPTIONS="-syntax V3" MODEL=BNGL/fceri_ji_red.ka TITLE=fceri\\_fyn\\_ji\\_red line
+make OPTIONS="-syntax V3" MODEL=BNGL/fceri_lyn_745.ka TITLE=fceri\\_fyn\\_lyn\\_745 line
+make OPTIONS="-syntax V3" MODEL=BNGL/fceri_trimer.ka TITLE=fceri\\_fyn\\_trimer line
+make hline
+make MODEL=large/sos/sos.ka TITLE=sos line
+make hline
+make OPTIONS="-syntax V3" MODEL="large/machine/machine.ka" TITLE="machine" line
+make MODEL="large/ensemble/ensemble.ka  large/ensemble/init_ensemble.ka" TITLE="ensemble" line
+make hline
+make OPTIONS="-syntax V3" MODEL=korkut/20170113/prior_model.ka   TITLE="korkut (2017/01/13)" line
+make OPTIONS="-syntax V3" MODEL=korkut/20170117/korkut_model.ka   TITLE="korkut (2017/01/17)" line
+make OPTIONS="-syntax V3" MODEL=korkut/20170206/korkut_model.ka   TITLE="korkut (2017/02/06)" line
+make hline
+make OPTIONS="-syntax V3" MODEL=tgf/V19/NTactivationTGF_19.ka TITLE="TGF (V19)" line
+make OPTIONS="-syntax V3" MODEL=tgf/V20/NTactivationTGF_20.ka TITLE="TGF (V20)" line
+make OPTIONS="-syntax V3" MODEL=tgf/V21/NTactivationTGF_21.ka TITLE="TGF (V21)" line
+make OPTIONS="-syntax V3" MODEL=tgf/20170401/kappa/*.ka TITLE="TGF (2017/04/01)" line
+make MODEL=tgf/20180419/*.ka TITLE="TGF (2018/04/19)" line
+make hline
+make OPTIONS="-syntax V3" MODEL="wnt/20151228/*.ka" TITLE="BigWnt (2015/12/28)" line
+make OPTIONS="-syntax V3" MODEL="wnt/20160928/*.ka"  TITLE="BigWnt (2016/09/28)" line
+make OPTIONS="-syntax V3" MODEL="wnt/20170322/*.ka" TITLE="BigWnt (20170322)" line
+make hline

@@ -1,0 +1,96 @@
+/*protein degradation*/
+/*Parameters come from parameters.csv*/
+%var: 'ln2' (([log] 2)/([log] 10)) /* 0.693147*/ 
+
+
+%var: 'TGFB1_deg_active_state_rate' (ln2/0.0333)
+%var: 'TGFB1_deg_rate' (ln2/1.500000)
+%var: 'TGFBi_deg_rate' (ln2/24.000000)
+%var: 'LTBP1_deg_rate' (ln2/1.500000)
+%var: 'FN1_deg_rate' (ln2/48.000000)
+%var: 'FBN1_deg_rate' (ln2/48.000000)
+%var: 'FBLN1_deg_rate' (ln2/48.000000)
+%var: 'FBLN4_deg_rate' (ln2/48.000000)
+%var: 'ITGAVB1_deg_rate' (ln2/24.000000)
+%var: 'ITGAVB3_deg_rate' (ln2/24.000000)
+%var: 'ITGAVB5_deg_rate' (ln2/24.000000)
+%var: 'ITGAVB6_deg_rate' (ln2/24.000000)
+%var: 'ITGAVB8_deg_rate' (ln2/24.000000)
+%var: 'ITGA5B1_deg_rate' (ln2/24.000000)
+%var: 'ITGA2B1_deg_rate' (ln2/24.000000)
+%var: 'ADAMTS1_deg_rate' (ln2/24.000000)
+%var: 'ADAMTSL2_deg_rate' (ln2/24.000000)
+%var: 'ADAMTSL3_deg_rate' (ln2/24.000000)
+%var: 'ADAMTS4_deg_rate' (ln2/24.000000)
+%var: 'ADAMTS10_deg_rate' (ln2/24.000000)
+%var: 'ADAMTSL6_deg_rate' (ln2/24.000000)
+%var: 'ADAM12_deg_rate' (ln2/24.000000)
+%var: 'THBS1_deg_rate' (ln2/24.000000)
+%var: 'COL1_deg_rate' (ln2/48.000000)
+%var: 'DCN_deg_rate' (ln2/2.500000)
+%var: 'MAGP1_deg_rate' (ln2/24.000000)
+%var: 'MMP2_deg_active_state_rate' (ln2/0.5)
+%var: 'MMP2_deg_rate' (ln2/24.000000)
+%var: 'MMP9_deg_rate' (ln2/24.000000)
+%var: 'MMP14_deg_active_state_rate' (ln2/0.5)
+%var: 'MMP14_deg_rate' (ln2/24.000000)
+%var: 'TIMP1_deg_rate' (ln2/12.000000)
+%var: 'TIMP2_deg_rate' (ln2/12.000000)
+%var: 'TIMP3_deg_rate' (ln2/12.000000)
+%var: 'CD44_deg_rate' (ln2/24.000000)
+%var: 'BMP1_deg_rate' (ln2/12.000000)
+%var: 'HS_deg_rate' (ln2/4.000000)
+
+ 
+ 
+'TGFB1_degradation' TGFB1() -> . @ 'TGFB1_deg_rate' * 'coef_un'  
+
+'TGFB1_degradation_active' TGFB1(state{active}) -> . @ ('TGFB1_deg_active_state_rate' - 'TGFB1_deg_rate') * 'coef_un'  
+'TGFBi_degradation' TGFBi() -> . @ 'TGFBi_deg_rate' * 'coef_un'  
+'LTBP1_degradation' LTBP1() -> . @ 'LTBP1_deg_rate' * 'coef_un'  
+'FN1_degradation' FN1() -> . @ 'FN1_deg_rate' * 'coef_un'  
+'FBN1_degradation' FBN1() -> . @ 'FBN1_deg_rate' * 'coef_un'  
+'FBLN1_degradation' FBLN1() -> . @ 'FBLN1_deg_rate' * 'coef_un'  
+'FBLN4_degradation' FBLN4() -> . @ 'FBLN4_deg_rate' * 'coef_un'  
+'ITGAVB1_degradation' ITGAVB1() -> . @ 'ITGAVB1_deg_rate' * 'coef_un'  
+'ITGAVB3_degradation' ITGAVB3() -> . @ 'ITGAVB3_deg_rate' * 'coef_un'  
+'ITGAVB5_degradation' ITGAVB5() -> . @ 'ITGAVB5_deg_rate' * 'coef_un'  
+'ITGAVB6_degradation' ITGAVB6() -> . @ 'ITGAVB6_deg_rate' * 'coef_un'  
+'ITGAVB8_degradation' ITGAVB8() -> . @ 'ITGAVB8_deg_rate' * 'coef_un'  
+'ITGA5B1_degradation' ITGA5B1() -> . @ 'ITGA5B1_deg_rate' * 'coef_un'  
+'ITGA2B1_degradation' ITGA2B1() -> . @ 'ITGA2B1_deg_rate' * 'coef_un'  
+'ADAMTS1_degradation' ADAMTS1() -> . @ 'ADAMTS1_deg_rate' * 'coef_un'  
+'ADAMTSL2_degradation' ADAMTSL2() -> . @ 'ADAMTSL2_deg_rate' * 'coef_un'  
+'ADAMTSL3_degradation' ADAMTSL3() -> . @ 'ADAMTSL3_deg_rate' * 'coef_un'  
+'ADAMTS4_degradation' ADAMTS4() -> . @ 'ADAMTS4_deg_rate' * 'coef_un'  
+'ADAMTS10_degradation' ADAMTS10() -> . @ 'ADAMTS10_deg_rate' * 'coef_un'  
+'ADAMTSL6_degradation' ADAMTSL6() -> . @ 'ADAMTSL6_deg_rate' * 'coef_un'  
+'ADAM12_degradation' ADAM12() -> . @ 'ADAM12_deg_rate' * 'coef_un'  
+'THBS1_degradation' THBS1() -> . @ 'THBS1_deg_rate' * 'coef_un'  
+'COL1_degradation' COL1() -> . @ 'COL1_deg_rate' * 'coef_un'  
+'DCN_degradation' DCN() -> . @ 'DCN_deg_rate' * 'coef_un'  
+'MAGP1_degradation' MAGP1() -> . @ 'MAGP1_deg_rate' * 'coef_un'  
+'MMP2_degradation' MMP2() -> . @ 'MMP2_deg_rate' * 'coef_un'  
+
+'MMP2_degradation_active' MMP2(state{active}) -> . @ ('MMP2_deg_active_state_rate' - 'MMP2_deg_rate') * 'coef_un'  
+'MMP9_degradation' MMP9() -> . @ 'MMP9_deg_rate' * 'coef_un'  
+'MMP14_degradation' MMP14() -> . @ 'MMP14_deg_rate' * 'coef_un'  
+
+'MMP14_degradation_active' MMP14(state{active}) -> . @ ('MMP14_deg_active_state_rate' - 'MMP14_deg_rate') * 'coef_un'  
+'TIMP1_degradation' TIMP1() -> . @ 'TIMP1_deg_rate' * 'coef_un'  
+'TIMP2_degradation' TIMP2() -> . @ 'TIMP2_deg_rate' * 'coef_un'  
+'TIMP3_degradation' TIMP3() -> . @ 'TIMP3_deg_rate' * 'coef_un'  
+'CD44_degradation' CD44() -> . @ 'CD44_deg_rate' * 'coef_un'  
+'BMP1_degradation' BMP1() -> . @ 'BMP1_deg_rate' * 'coef_un'  
+'HS_degradation' HS() -> . @ 'HS_deg_rate' * 'coef_un'  
+
+
+/*protein internal degradation*/
+/*Parameters come from parameters.csv*/
+%var: 'FN1_deg_int' (ln2/315705.000000)
+%var: 'FBN1_deg_int' (ln2/1038040.000000)
+%var: 'THBS1_deg_int' (ln2/128977.000000)
+%var: 'COL1_deg_int' (ln2/416895.000000)
+
+ 
+ 

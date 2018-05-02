@@ -1,0 +1,15 @@
+#### Perturbation
+%mod: [true] do $TRACK 'TGFB1' [true]
+%mod: repeat ([E]=10) do $ADD 10 TGFB1() until [false]
+%mod: repeat 'TIMP2'>50 do ($UPDATE 'k''koff'; $UPDATE 'l''lon' ; $UPDATE 'kd''kdoff') until [false]
+%mod: repeat 'TIMP2'<50 do ($UPDATE 'k''kon' ; $UPDATE 'l''loff' ; $UPDATE 'kd''kdon') until [false]
+
+%mod: [true] do $FLUX "flux.dot" [true]
+%var: 'fluxmap_interval' 5
+%var: 'tick' 0
+%mod: repeat [T] > 'tick' && 'tick' > 'fluxmap_interval' - 1 do $FLUX "flux_".'tick' - 'fluxmap_interval'.".json" [false] until [false]
+%mod: repeat [T] > 'tick' do $FLUX "flux_".'tick'.".json" [true]; $UPDATE 'tick' 'tick' + 1 until 'tick' + 'fluxmap_interval' > [Tmax]
+%mod: repeat [T] > 'tick' do $UPDATE 'tick' 'tick' + 1 until [false]
+
+
+%mod: [true] do ($TRACK 'TGFB1' [true])

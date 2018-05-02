@@ -1,0 +1,28 @@
+%var: 'g' 1
+%var: 'kg' 1000*g
+%var: 'mg' 0.001*g
+%var: 'microg' 0.001*mg
+%var: 'picog' 0.000001*microg
+
+
+
+%var: 'mass_unit' kg
+
+%var: 's' 1
+%var: 'mn' 60*s
+%var: 'h' 60*mn
+%var: 'd' 24*h
+
+%var: 'time_unit' h
+
+%var: 'particle' 1
+%var: 'thousand' 1000*particle
+%var: 'million' 1000*thousand
+
+%var: 'particle_quantity_unit' particle
+/* was million in the DYLISS repository*/
+/* please fix.*/
+/* please change the mass in parameters accordingly (we cannot simulate so many particles)*/
+
+%var: 'mole' 1e23
+%var: 'n_avogadro' 6.022

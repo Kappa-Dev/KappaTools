@@ -1,0 +1,259 @@
+%obs: 'unary_low_num'
+|r2| /* line 8 'TGFB1(state~latent)_LTBP1dissociate' */
++|r8| /* line 16 'LTBP1_HS_FN1dissociate' */
++|r12|  /* line 24 'LTBP1_HS_FBN1_dissociate' */
++|r20| /* line 38 'FN1_ITGA5B1_dissociate3' */
++|r21| /* line 39 'FN1(Nter)_FN1(III1)_FN1_dissociate1' */
++|r22| /* line 40 'FN1(Nter)_FN1(III1)_FN1_dissociate2'  */
++|r27| /* line 49 'FN1_FBN1(Cter)_dissociate' */
++|r51| /* line 91 'TGFB1(state~latent,ITGAVB6)_LTBP1_dissociate' */
++|r52| /* line 92 'TGFB1(state~latent)_LTBP1_ITGAVB6_dissociate' */
++|r57| /* line 100 'TGFB1(state~latent,ITGAVB5)_LTBP1_dissociate' */
++|r58| /* line 101 'TGFB1(state~latent)_LTBP1_ITGAVB5_dissociate' */
++|r63| /* line 109 'TGFB1(state~latent,ITGAVB3)_LTBP1_dissociate' */
++|r64| /* line 110 'TGFB1(state~latent)_LTBP1_ITGAVB3_dissociate' */
++|r69| /* line 117 'FBN1_ITGAVB3_dissociate' */
++|r83| /* Line 136 'ADAMTSL2_increasestoringLTBP1_TGF_dissociate' */
++|r84| /* line 137 'ADAMTSL2_increasestoringLTBP1_TGF_dissociate_bis' */
++|r86| /* line 140 'ADAMTSL3_increasestoringLTBP1_TGF_dissociate' */
++|r87| /* line 141 'ADAMTSL3_increasestoringLTBP1_TGF_dissociate_bis' */
++|r116| /* line 193 'MMP14,ADAM12,ITGAVB3_dissociate' */
++|r123| /* line 205 'COL1_MMP2_ITGA2B1_dissociate' */
++|r145| /* line 235 'TGF_DCN_MMP2_dissociate' */
++|r151| /* line 244 'DCN_FBN1_MGAP1_dissociate' */
++|r157| /* line 255 'THBS1_TGFB1(state~latent)_dissociate' */
++|r160| /* line 258 'THBS1_TGFB1(state~latent)_LTBP1_FN1_FBN1_dissociate' */
++|r192| /* line 309 'TIMP1_MMP2_dissociate' */
+
+%obs: 'unary_normal_num'
+|r6| /*  line 14 'LTBP1_FN1_dissociate' */
++|r11| /* line 22 'LTBP1_FBN1_dissociate' */
++|r47| /* line 82 'TGFB1(state~latent)_ITGAVB8_MMP14_dissociate' */
++|r65| /* line 111 'TGFB1(state~latent)_LTBP1_ITGAVB3_Activate' */
++|r71| /* line 119 'FBN1_ITGA5B1_dissociate' */
++|r91| /* line 147 'ADAMTS10_increasestoringLTBP1_TGF_dissociate' */
++|r92| /* line 148 'ADAMTS10_increasestoringLTBP1_TGF_dissociate_bis' */
++|r97| /* line 161 'ADAMTS1_TGFB1(state~latent)_Activate' */
++|r103| /* line 171 'BMP1_LTBP1-TGFB1(state~latent)-MMP2_dissociate' */
++|r110| /* line 185 */
++|r135| /* line 221 'THBS1_COL1_dissociate' */
++|r141| /* line 231 'TGFB1_DCN(low)_dissociate' */
++|r155| /* line 251 'FN1(b)_DCN_dissociate' */
++|r172| /* line 279 'THBS1_FBN1_dissociate' */
+
+%obs: 'unary_high_num'
+ |r7| /* line 15 'LTBP1_HS_dissociate' */
++|r14| /* line 28 'MAGP1_FBN1_dissociate' */
++|r19| /* line 37 'FN1_ITGA5B1_dissociate2' */
++|r23| /* line 41 'FN1(Nter)_FN1(III1)_FN1_dissociate3' */
++|r25| /* line 45 'HS_FBN1(HSB)_dissociate' */
++|r29| /* line 53 'FN1fibril_FBN1_HSfibril_LTBP1_TGFB1_dissociate' */
++|r32| /* line 58 'FN1_ITGAVB3_dissociate' */
++|r33| /* line 59'FN1(NGR)_FN1_dissociate' */
++|r35| /* line 63 'FBN1_FBLN4_dissociate' */
++|r37| /* line 67 'FN1_FBLN1_dissociate' */
++|r39| /* line 71 'TGFB1(state~latent)_ITGAVB3_dissociate' */
++|r41| /* line 73 'TGFB1(state~latent)_ITGAVB5_dissociate' */
++|r43| /* line 75 'TGFB1(state~latent)_ITGAVB6_dissociate' */
++|r45| /* line 77 'TGFB1(state~latent)_ITGAVB8_dissociate' */
++|r50| /* line 89 'TGFB1(state~latent,nonITG)_LTBP1_dissociate' */
++|r50bis| /* line 90 'TGFB1(state~latent,nonLTBP)_ITGAVB6_dissociate' */
++|r53| /* line 93 'TGFB1(state~latent)_LTBP1_ITGAVB6_Activate' */
++|r56| /* line 99 'TGFB1(state~latent,nonLTBP)_ITGAVB5_dissociate' */
++|r59| /* line 102 'TGFB1(state~latent)_LTBP1_ITGAVB5_Activate' */
++|r62| /* line 108 'TGFB1(state~latent,nonLTBP)_ITGAVB3_dissociate' */
++|r67| /* line 115 'FBN1_ITGAVB6_dissociate' */
++|r73| /* line 123 'ADAMTSL2_LTBP1_dissociate' */
++|r77| /* line 129 'ADAMTSL3_FBN1_dissociate' */
++|r79| /* line 131 'ADAMTSL3_LTBP1_dissociate' */
++|r94| /* line 156 'ADAMTS1_FBLN1_dissociate' */
++|r96| /* line 160 'ADAMTS1_TGFB1(state~latent)_dissociate' */
++|r99| /* line 165 'ADAMTS4_FN1_dissociate' */
++|r104| /* line 172 'BMP1_LTBP1-TGFB1(state~latent)-MMP2_Activate' */
++|r106bis| /* line 177 'CD44_MMP9_dissociate' */
++|r107| /* line 179 */
++|r108| /* line 180 */
++|r109| /* line 184 */
++|r113| /* line 190 'MMP14,ITGAVB3_dissociate' */
++|r114| /* line 191 'ADAM12,ITGAVB3_dissociate' */
++|r117| /* line 194 'MMP14 activation' */
++|r119| /* line 198 'FN1_COL1_dissociate' */
++|r121| /* line 201 'ITGA2B1_COL1_dissociate' */
++|r124| /* line 206 'MMP2 Activation ' */
++|r126| /* line 210 'FBN1_MMP2_dissociate' */
++|r127| /* line 211 'FBN1_MMP2_degradation' */
++|r129| /* line 213 'FBN1_MMP14_dissociate' */
++|r130| /* line 214 'FBN1_MMP14_degradation' */
++|r132| /* line 216 'FBN1_MMP9_dissociate' */
++|r133| /* line 217 'FBN1_MMP9_degradation' */
++|r143| /* line 233 'DCN_MMP2_dissociate' */
++|r146| /* line 236 'DCN_TGFB1_MMP2_Activate' */
++|r148| /* line 240 'DCN_MAGP1_dissociate' */
++|r150| /* line 242 'DCN_FBN11_dissociate' */
++|r158| /* line 256 'THBS1_TGFB1(state~latent)_Activate' */
++|r161| /* line 259 'THBS1_TGFB1(state~latent)_LTBP1_FN1_FBN1_Activate' */
++|r165| /* line 268 'MMP2_THBS1_dissociate' */
++|r167| /* line 270 'MMP9_THBS1_dissociate' */
++|r169| /* line 274 'high_affinity_un' */
++|r170| /* line 275 'Degradation of THBS1 by ADAMTS1' */
++|r186| /* line 301 'TIMP3_MMP14(state~active)_dissociate' */
++|r188| /* line 303 'TIMP3_MMP2(state~active)_dissociate' */
++|r190| /* line 305 'TIMP3_MMP9_dissociate' */
++|r196| /* line 315 'ADAMTS4_TIMP3_dissociate' */
++|r198| /* line 319 'MMP14_COL1_dissociate' */
++|r199| /* line 320 'Degradation of COL1 by MMP14' */
++|r201| /* line 325 'MMP9_COL1_dissociate' */
++|r202| /* line 326 'Degradation of COL1 by MMP9' */
++|r204| /* line 331 'MMP9_FN1_dissociate' */
++|r206| /* line 333 'MMP2_FN1_dissociate' */
++|r208| /* line 335 'MMP14_FN1_dissociate' */
+
+
+%obs: 'unary_very_high_num'
+|r18| /* line 36 'FN1_ITGA5B1_dissociate1'  */
++|r48| /* line 83 'TGFB1(state~latent)_ITGAVB8_MMP14_Activate' */
++|r75| /* line 127 'ADAMTSL2_FBN1_dissociate' */
++|r81| /* line 133 'ADAMTSL6_FBN1_dissociate' */
++|r89| /* line 145 'ADAMTS10_FBN1(Nter)_dissociate' */
++|r101| /* line 169 'BMP1_LTBP1-TGFB1(state~latent)_dissociate' */
++|r137| /* line 225 'DCN_COL1_dissociate' */
++|r139| /* line 229 'TGFB1_DCN(high)_dissociate' */
++|r153| /* line 249 'FN1(a)_DCN_dissociate' */
++|r163| /* line 264 'THBS1_DCN_dissociate' */
++|r194| /* line 311 'TIMP1_MMP9_dissociate' */
++|r209| /* line 336 'Degradation of FN1 by MMP9' */
++|r210| /* line 337 'Degradation of FN1 by MMP2' */
++|r211| /* line 338 'Degradation of FN1 by MMP14' */
+
+%obs: 'binary_low_num'
+|r3| /* line 11 'LTBP1_FN1' */
++|r9| /* line 19 'LTBP1_FBN1' */
++|r70| /* line 118 'FBN1_ITGA5B1' */
++|r134| /* line 220 'THBS1_COL1' */
++|r140| /* line 230 'TGFB1_DCN(low)' */
++|r154| /* line 250 'FN1(b)_DCN' */
++|r171| /* line 278 'low_affinity_bin' */
++|r191| /* line 308 'TIMP1_MMP2' */
+
+%obs: 'binary_normal_num'
+|r4| /* line 12 'LTBP1_HS' */
++|r13| /* line 27 'MAGP1_FBN1' */
++|r24| /* line 44 HS_FBN1(HSB)' */
++|r30| /* line 56 'FN1_ITGAVB3' */
++|r31| /* line 57 'FN1(NGR)_FN1' */
++|r34| /* line 62 FBN1_FBLN4' */
++|r36| /* line 66 'FN1_FBLN1' */
++|r38| /* line 70 'TGFB1(state~latent)_ITGAVB3' */
++|r40| /* line 72 'TGFB1(state~latent_ITGAVB5' */
++|r42| /* line 74 'TGFB1(state~latent)_ITGAVB6' */
++|r44| /* line 76 TGFB1(state{latent},RGD[1]), ITGAVB8(x[1]) */
++|r49| /* line 86 'TGFB1(state~latent)_LTBP1_ITGAVB6' */
++|r54| /* line 96 'TGFB1(state~latent)_LTBP1_ITGAVB5' */
++|r60| /* line 105 'TGFB1(state~latent)_LTBP1_ITGAVB3' */
++|r66| /* line 114 'FBN1_ITGAVB6' */
++|r72| /* line 122 'ADAMTSL2_LTBP1' */
++|r76| /* line 128 'ADAMTSL3_FBN1' */
++|r78| /* line 130 'ADAMTSL3_LTBP1' */
++|r93| /* line 155 'ADAMTS1_FBLN1' */
++|r95| /* line 159 'ADAMTS1_TGFB1(state~latent)' */
++|r98| /* line 164 'ADAMTS4_FN1' */
++|r105| /* line 176 'CD44_MMP9' */
++|r106| /* line 178 'CD44_MMP9_TGFB1(state~latent)_LTBP1__FN1_FBN1' */
++|r108bis| /* line 183 */
++|r111| /* line 188 */
++|r112| /* line 189 */
++|r115| /* line 192 */
++|r118| /* line 197 'FN1_COL1 */
++|r120| /* line 200 'ITGA2B1_COL1' */
++|r122| /* line 204 'COL1_MMP2_ITGA21' */
++|r125| /* line 209 'FBN1_MMP2' */
++|r128| /* line 212 'FBN1_MMP14' */
++|r131| /* line 215 'FBN1_MMP9' */
++|r142| /* line 232 'DCN_MMP2' */
++|r144| /* line 234 'TGF_DCN_MMP2' */
++|r147| /* line 239 'DCN_MAGP1' */
++|r149| /* line 241 'DCN_FBN1' */
++|r150bis| /* line 243 'DCN_FBN1_MGAP1' */
++|r156| /* line 254 'THBS1_TGFB1(state~latent)' */
++|r164| /* line 267 'MMP2_THBS1' */
++|r166| /* line 269 'MMP9_THBS1' */
++|r168| /* line 273 'ADAMTS1_THBS1' */
++|r185| /* line 300 'TIMP3_MMP14(state~active)' */
++|r189| /* line 304 'TIMP3_MMP9' */
++|r195| /* line 314 'ADAMTS4_TIMP3' */
++|r197| /* line 318 'MMP14_COL1' */
++|r200| /* line 324 'MMP9_COL1' */
++|r203| /* line 330 'MMP9_FN1' */
++|r205| /* line 332 'MMP2_FN1' */
++|r207| /* line 334 'MMP14_FN1' */
++|r187| /* line 302 'TIMP3_MMP2(state~active)' */
+
+%obs: 'binary_high_num'
+|r1| /* line 7 'TGFB1(state~latent)_LTBP1' */
++|r5| /* line 13 'LTBP1_HS_FN1' */
++|r10| /* line 21 'LTBP1_HS_FBN1' */
++|r15| /* line 32 'FN1_ITGA5B1' */
++|r16| /* line 33 'FN1(RGD)_FN1' */
++|r17| /* line 34 'FN1(Nter)_FN1(III1)_FN1' */
++|r26| /* line 48 'FN1_FBN1(Cter)' */
++|r46| /* line 81 'TGFB1(state~latent)_ITGAVB8_MMP14' */
++|r68| /* line 116 'FBN1_ITGAVB3' */
++|r74| /* line 126 'ADAMTSL2_FBN1' */
++|r80| /* line 132 'ADAMTSL6_FBN1' */
++|r88| /* line 144 'ADAMTS10_FBN1(Nter)' */
++|r100| /* line 168 'BMP1_LTBP1-TGFB1(state~latent)' */
++|r102| /* line 170 'BMP1_LTBP1-TGFB1(state~latent)-MMP2' */
++|r136| /* line 224 'DCN(high)_COL1' */
++|r138| /* line 228 'TGFB1_DCN(high)' */
++|r152| /* line 248 'FN1(a)_DCN' */
++|r159| /* line 257 'THBS1_TGFB1(state~latent)_LTBP1_FN1_FBN1' */
++|r162| /* line 263 'THBS1_DCN' */
++|r193| /* line 310 'TIMP1_MMP9' */
+
+%obs: 'binary_very_high_num'
+|r28| /* line 52 'FN1fibril_FBN1_HSfibril_LTBP1_TGFB1' */
++|r82| /* line 135 'ADAMTSL2_increasestoringLTBP1_TGF' */
++|r85| /* line 139 'ADAMTSL3_increasestoringLTBP1_TGF' */
++|r90| /* line 146 'ADAMTS10_increasestoringLTBP1_TGF' */
+
+%obs: 'k_un_num'
+|r175| /* line 286 'MMP14(state~latent)_TIMP2_dissociate' */
++|r180| /* line 291 'Activation MMP2' */
+
+%obs: 'kd_un_num'
+|r177| /* line 288 'MMP14_TIMP2_MMP2_dissociate' */
++|r179| /* line 290 'MMP14_TIMP2_MMP2-MMP14_dissociate' */
+
+%obs: 'k_bin_num'
+|r174| /* line 285 'MMP14(state~latent)_TIMP2' */
++|r176| /* line 287 'MMP14_TIMP2_MMP2' */
++|r178| /* Line 289 'MMP14_TIMP2_MMP2-MMP14' */
+
+
+%obs: 'tot_num'
+'unary_low_num'
++'unary_normal_num'
++'unary_high_num'
++'unary_very_high_num'
++'binary_low_num'
++'binary_normal_num'
++'binary_high_num'
++'binary_very_high_num'
++'k_un_num'
++'kd_un_num'
++'k_bin_num'
+
+
+/*
+%plot: |r174|
+%plot: |r176|
+%plot: |r178|
+*/
+
+%var: 'l_un_num'
+|r182| /* line 295 'TIMP2_MMP2(state~active)_dissociate' */
++|r184| /* line 297 'TIMP2_MMP14(state~active)_dissociate' */
+
+%var: 'l_bin_num'
+|r181| /* line 294 'TIMP2_MMP2(state~active)' */
++|r183| /* line 296 'TIMP2_MMP14(state~active)' */
