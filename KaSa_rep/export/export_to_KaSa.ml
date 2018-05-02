@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Jan 14 2018>
+  * Last modification: Time-stamp: <May 01 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -24,7 +24,7 @@ sig
 
   type bidirectional_influence_map
 
-  type internal_constraints_list
+  type internal_constraints_list = Remanent_state.internal_constraints_list
 
   val empty_constraints_list : internal_constraints_list
 
@@ -127,7 +127,7 @@ val output_scc_decomposition :
   val get_data:
     state ->
     Cckappa_sig.kappa_handler option * Public_data.dead_rules
-    option * Remanent_state.separating_transitions option * int list option 
+    option * Remanent_state.separating_transitions option * int list option
 end
 
 module Export =

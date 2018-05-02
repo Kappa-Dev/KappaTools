@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <May 01 2018>
+ * Last modification: Time-stamp: <May 02 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -304,19 +304,27 @@ let main () =
   in
   let () =
     if
-      (Remanent_parameters.get_backdoor_nbr_of_dead_rules parameters
-      ||
-      Remanent_parameters.get_backdoor_nbr_of_non_weakly_reversible_transitions parameters
+      (Remanent_parameters.get_backdoor_nbr_of_scc parameters
+       ||
+       Remanent_parameters.get_backdoor_average_size_of_scc parameters
+       ||
+       Remanent_parameters.get_backdoor_nbr_of_dead_rules parameters
+       ||
+       Remanent_parameters.get_backdoor_nbr_of_non_weakly_reversible_transitions parameters
       ||
       Remanent_parameters.get_backdoor_timing parameters
       ||
       Remanent_parameters.get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions parameters
       ||
       Remanent_parameters.get_backdoor_nbr_of_rules parameters
+      ||
+      Remanent_parameters.get_backdoor_nbr_of_constraints parameters
+      ||
+      Remanent_parameters.get_backdoor_nbr_of_influences parameters
      )
     then
       let handler, dead_rules, separating_transitions,
-          _  =
+          _   =
         Export_to_KaSa.get_data state
       in
       let () =
@@ -393,16 +401,148 @@ let main () =
           in
           ()
       in
-
+      let () =
+        if Remanent_parameters.get_backdoor_nbr_of_constraints parameters
+        then
+          let _,constraints = Export_to_KaSa.get_constraints_list state in
+          let n_constraints =
+            List.fold_left
+              (fun n (_,l) -> n+List.length l)
+              0 constraints
+          in
+          Loggers.fprintf
+            (Remanent_parameters.get_logger_backdoor parameters)
+            "%i" n_constraints
+      in
+      let () =
+        if Remanent_parameters.get_backdoor_nbr_of_influences parameters
+        then
+          let _,(_,influence_plus, influence_minus) =
+            Export_to_KaSa.get_influence_map
+              ~accuracy_level:
+                (match
+                   Remanent_parameters.get_influence_map_accuracy_level parameters
+                 with
+                 | Remanent_parameters_sig.None
+                 | Remanent_parameters_sig.Low -> Public_data.Low
+                 | Remanent_parameters_sig.Medium -> Public_data.Medium
+                 | Remanent_parameters_sig.High
+                 | Remanent_parameters_sig.Full -> Public_data.High)
+              state
+          in
+          let n_constraints =
+            Ckappa_sig.PairRule_setmap.Map.fold
+              (fun _ _ n -> 1+n)
+              influence_plus
+              (Ckappa_sig.PairRule_setmap.Map.fold
+                 (fun _ _ n  -> 1+n)
+                 influence_minus 0)
+          in
+          Loggers.fprintf
+            (Remanent_parameters.get_logger_backdoor parameters)
+            "%i" n_constraints
+      in
+      let () =
+        if Remanent_parameters.get_backdoor_nbr_of_scc parameters
+        then
+        let accuracy_level_cm =
+          match
+            Remanent_parameters.get_contact_map_accuracy_level parameters
+          with
+          | Remanent_parameters_sig.None -> Public_data.Low
+          | Remanent_parameters_sig.Low -> Public_data.Low
+          | Remanent_parameters_sig.Medium
+          | Remanent_parameters_sig.High
+          | Remanent_parameters_sig.Full -> Public_data.Full
+        in
+        let accuracy_level_scc =
+          match
+            Remanent_parameters.get_scc_accuracy_level parameters
+          with
+          | Remanent_parameters_sig.None
+          | Remanent_parameters_sig.Low -> Public_data.Low
+          | Remanent_parameters_sig.Medium
+          | Remanent_parameters_sig.High
+          | Remanent_parameters_sig.Full -> Public_data.High
+        in
+          let _,scc =
+            Export_to_KaSa.get_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc state
+          in
+          let n_constraints = List.length scc in
+          Loggers.fprintf
+            (Remanent_parameters.get_logger_backdoor parameters)
+            "%i" n_constraints
+      in
+      let () =
+        if Remanent_parameters.get_backdoor_average_size_of_scc parameters
+        then
+        let accuracy_level_cm =
+          match
+            Remanent_parameters.get_contact_map_accuracy_level parameters
+          with
+          | Remanent_parameters_sig.None -> Public_data.Low
+          | Remanent_parameters_sig.Low -> Public_data.Low
+          | Remanent_parameters_sig.Medium
+          | Remanent_parameters_sig.High
+          | Remanent_parameters_sig.Full -> Public_data.Full
+        in
+        let accuracy_level_scc =
+          match
+            Remanent_parameters.get_scc_accuracy_level parameters
+          with
+          | Remanent_parameters_sig.None
+          | Remanent_parameters_sig.Low -> Public_data.Low
+          | Remanent_parameters_sig.Medium
+          | Remanent_parameters_sig.High
+          | Remanent_parameters_sig.Full -> Public_data.High
+        in
+          let _,scc =
+            Export_to_KaSa.get_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc state
+          in
+          let n_scc = List.length scc in
+          if n_scc > 0
+          then
+            let n_constraints =
+              List.fold_left
+                (fun n l -> n+List.length l)
+                0
+                scc
+            in
+            let n_constraints = n_constraints / n_scc in
+            Loggers.fprintf
+              (Remanent_parameters.get_logger_backdoor parameters)
+              "%i" n_constraints
+          else
+          Loggers.fprintf
+            (Remanent_parameters.get_logger_backdoor parameters)
+            "N/A"
+      in
       let () =
         if Remanent_parameters.get_backdoor_timing parameters
         then
         let end_time = Sys.time () in
         let cpu_time = end_time -. start_time in
         let () =
-          Loggers.fprintf
-            (Remanent_parameters.get_logger_backdoor parameters)
-            "%g" cpu_time
+
+
+          if cpu_time <= 1. then
+            Loggers.fprintf
+              (Remanent_parameters.get_logger_backdoor parameters)
+              "%0.3f" cpu_time
+          else if cpu_time <= 10.
+          then
+            Loggers.fprintf
+              (Remanent_parameters.get_logger_backdoor parameters)
+              "%.2f" cpu_time
+          else if cpu_time <= 1000.
+          then
+            Loggers.fprintf
+              (Remanent_parameters.get_logger_backdoor parameters)
+              "%3.0f" cpu_time
+          else
+              Loggers.fprintf
+                (Remanent_parameters.get_logger_backdoor parameters)
+                "%3.0g" cpu_time
         in
         ()
       in

@@ -75,7 +75,7 @@ let options =
          (["Indirect","Ignore gluing compatibility";
            "Direct","Ignore reachable states";
            "Realisable","Take into account reachable states" ],
-          ["Low";"High";"Full";"Medium"],
+          ["Low";"Medium";"High";"Full"],
           Config.influence_map_accuracy_level)),
       "Tune the accuracy level of the influence map",
       [influence_map,1],
@@ -387,6 +387,20 @@ let options =
       "dump the number of rules",
       [],
       Hidden;
+
+      "--backdoor-dump-nbr-constraints",
+      Bool Config.backdoor_nbr_of_constraints,
+      "dump the number of refinement constraints",
+      [],
+      Hidden;
+
+      "--backdoor-dump-nbr-influences",
+      Bool Config.backdoor_nbr_of_influences,
+      "dump the number of influence relations",
+      [],
+      Hidden;
+
+
       "--backdoor-dump-nbr-dead-rules",
       Bool Config.backdoor_nbr_of_dead_rules,
       "dump the number of dead rules",
@@ -402,6 +416,18 @@ let options =
       "--backdoor-dump-nbr-of-rules-with-non-weakly-reversible-transitions",
       Bool Config.backdoor_nbr_of_rules_with_non_weakly_reversible_transitions,
       "dump the number of rules with non weakly reversible transitions",
+      [],
+      Hidden;
+
+      "--backdoor-dump-nbr-scc",
+      Bool Config.backdoor_nbr_of_scc,
+      "dump the number of strongly connected components",
+      [],
+      Hidden;
+
+      "--backdoor-dump-average-scc",
+      Bool Config.backdoor_average_size_of_scc,
+      "dump the average size of strongly connected components",
       [],
       Hidden;
 

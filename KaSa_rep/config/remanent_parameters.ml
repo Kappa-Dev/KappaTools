@@ -334,6 +334,14 @@ let open_tasks_profiling =
 
 let fetch_backdoors () =
   {
+    Remanent_parameters_sig.backdoor_nbr_of_scc=
+      !Config.backdoor_nbr_of_scc;
+    Remanent_parameters_sig.backdoor_average_size_of_scc=
+      !Config.backdoor_average_size_of_scc;
+    Remanent_parameters_sig.backdoor_nbr_of_constraints=
+      !Config.backdoor_nbr_of_constraints;
+    Remanent_parameters_sig.backdoor_nbr_of_influences=
+        !Config.backdoor_nbr_of_influences;
     Remanent_parameters_sig.backdoor_nbr_of_dead_rules= !Config.backdoor_nbr_of_dead_rules;
     Remanent_parameters_sig.backdoor_nbr_of_rules= !Config.backdoor_nbr_of_rules;
 
@@ -372,6 +380,10 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
          match
            !Config.backdoor_nbr_of_rules
            ||
+           !Config.backdoor_nbr_of_scc
+           ||
+           !Config.backdoor_average_size_of_scc
+           ||
            !Config.backdoor_nbr_of_dead_rules
            ||
            !Config.backdoor_nbr_of_rules
@@ -381,7 +393,11 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
            !Config.backdoor_nbr_of_rules_with_non_weakly_reversible_transitions ||
            !Config.backdoor_nbr_of_non_weakly_reversible_transitions
            ||
-           !Config.backdoor_timing
+           !Config.backdoor_nbr_of_constraints
+           ||
+             !Config.backdoor_timing
+           ||
+           !Config.backdoor_nbr_of_influences
            ,
            !Config.backdoor_directory,!Config.backdoor_file,".tex"
           with
@@ -1051,6 +1067,15 @@ let open_contact_map_file parameters =
 
 let get_called_from parameter = parameter.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.called_from
 
+let get_backdoor_nbr_of_scc_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_nbr_of_scc
+let get_backdoor_average_size_of_scc_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_average_size_of_scc
+                    
+let get_backdoor_nbr_of_influences_1 backdoors =
+  backdoors.Remanent_parameters_sig.backdoor_nbr_of_influences
+  let get_backdoor_nbr_of_constraints_1 backdoors =
+    backdoors.Remanent_parameters_sig.backdoor_nbr_of_constraints
 let get_backdoor_nbr_of_dead_rules_1 backdoors =
   backdoors.Remanent_parameters_sig.backdoor_nbr_of_dead_rules
 let get_backdoor_nbr_of_rules_1 backdoors =
@@ -1069,9 +1094,17 @@ let get_backdoor_directory_1 backdoors =
 let get_backdoors marshalisable =
   marshalisable.Remanent_parameters_sig.backdoors
 
+let get_backdoor_nbr_of_scc_2  =
+  compose get_backdoor_nbr_of_scc_1 get_backdoors
+let get_backdoor_average_size_of_scc_2  =
+  compose get_backdoor_average_size_of_scc_1 get_backdoors
+let get_backdoor_nbr_of_constraints_2  =
+  compose get_backdoor_nbr_of_constraints_1 get_backdoors
+let get_backdoor_nbr_of_influences_2  =
+  compose get_backdoor_nbr_of_influences_1 get_backdoors
 let get_backdoor_nbr_of_dead_rules_2  =
   compose get_backdoor_nbr_of_dead_rules_1 get_backdoors
-  let get_backdoor_nbr_of_rules_2  =
+let get_backdoor_nbr_of_rules_2  =
     compose get_backdoor_nbr_of_rules_1 get_backdoors
 let get_backdoor_nbr_of_non_weakly_reversible_transitions_2 =
   compose get_backdoor_nbr_of_non_weakly_reversible_transitions_1 get_backdoors
@@ -1083,6 +1116,18 @@ let get_backdoor_file_2 =
   compose get_backdoor_file_1 get_backdoors
 let get_backdoor_directory_2 =
   compose get_backdoor_directory_1 get_backdoors
+
+let get_backdoor_nbr_of_constraints =
+    compose get_backdoor_nbr_of_constraints_2 get_marshalisable
+
+let get_backdoor_nbr_of_scc =
+  compose get_backdoor_nbr_of_scc_2 get_marshalisable
+
+let get_backdoor_average_size_of_scc =
+  compose get_backdoor_average_size_of_scc_2 get_marshalisable
+
+let get_backdoor_nbr_of_influences =
+  compose get_backdoor_nbr_of_influences_2 get_marshalisable
 
 let get_backdoor_nbr_of_rules =
     compose get_backdoor_nbr_of_rules_2 get_marshalisable
