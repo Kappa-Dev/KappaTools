@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <Nov 20 2017>
+  * Last modification: Time-stamp: <May 03 2018>
   *
   * Compute strongly connected component in contact map
   *
@@ -257,7 +257,8 @@ let filter_edges_in_converted_contact_map
 
 let keep_list l =
   match l with
-  | [] -> false
+  | [] -> false 
+  | [a,b] when a=b -> false
   | [(a,_),(a',_)] -> a=a'
   | _::_::_ -> true
 
