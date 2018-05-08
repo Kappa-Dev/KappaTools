@@ -28,7 +28,7 @@ sig
     prod->
     Exception.method_handler * prod
 
-  val exclusion:
+      (*  val exclusion:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod -> var list ->
@@ -37,7 +37,7 @@ sig
   val all_here :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
-    prod -> var list -> Exception.method_handler * prod option
+          prod -> var list -> Exception.method_handler * prod option*)
 
   val guard :
     Remanent_parameters_sig.parameters ->
@@ -85,11 +85,11 @@ sig
     Exception.method_handler ->
     prod->prod->
     Exception.method_handler * prod
-  val plus:
+  (*val plus:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod->prod->
-    Exception.method_handler * prod
+    Exception.method_handler * prod*)
   val widen:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
@@ -107,16 +107,16 @@ sig
     prod->var -> Fraction.fraction->
     Exception.method_handler * prod
 
-  val pushbool:
+      (*  val pushbool:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler -> prod -> var ->
-    Exception.method_handler * prod
+          Exception.method_handler * prod
 
   val translate:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     prod-> (var * int) list ->
-    Exception.method_handler * prod
+    Exception.method_handler * prod*)
 
   val abstract_away:
     Remanent_parameters_sig.parameters ->
