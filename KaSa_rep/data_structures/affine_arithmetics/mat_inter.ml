@@ -107,17 +107,6 @@ sig
     prod->var -> Fraction.fraction->
     Exception.method_handler * prod
 
-      (*  val pushbool:
-    Remanent_parameters_sig.parameters ->
-    Exception.method_handler -> prod -> var ->
-          Exception.method_handler * prod
-
-  val translate:
-    Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
-    prod-> (var * int) list ->
-    Exception.method_handler * prod*)
-
   val abstract_away:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
@@ -158,6 +147,27 @@ module Mat_inter =
       let is_infinite m x =
 
          (I.read (m.i) x).sup=Fraction.Infinity
+
+      type side = Upper | Lower
+
+      let reduce_lower _parameters error inter t b =
+          let () =
+          I.set inter t
+            (cap_inter
+               (I.read inter t)
+               {inf=b;
+                sup=Infinity})
+        in error
+
+      let reduce_upper _parameters error inter t b =
+        let () =
+          I.set inter t
+            (cap_inter
+               (I.read inter t)
+               {inf=Minfinity;
+                sup=b})
+        in
+        error
 
       (* improve this algorithm in the presence of -oo  ?? *)
       let solve_inf parameters error prod  l =
@@ -211,43 +221,52 @@ posref j))) in
 
           let lprob =
             List.filter
-              (fun j -> (let rec aux_214 q =
-                           if (M.read_val posm q j).num<0 then true
-                           else if q<=2 then false
-                           else aux_214 (q-1)
-                          in aux_214 (M.n_ligne posm)))
-                         (l)  in
-          List.iter (fun j -> (try
-                                 (let size = M.n_ligne posm in
-                                  for i1=1 to size do
-                                    for i2=i1+1 to size do
-                                      let a=M.read_val posm i1 j in
-                                      let b=M.read_val posm i2 j in
-                                      if (a={num=0;den=1} || b={num=0;den=1})
-                                      then ()
-                                      else
-                                        ( let f x y = (fmoins x (ffois a (fdiv
-                                                                            y b)))
-                                        in
-                                        if (List.for_all (fun x->(f (M.read_val posm i1 x)  (M.read_val posm i2 x)).num >= 0) l)
-                                        then (
-                                          let error = M.new_empty_ligne parameters (!error_ref) posm in
-                                          let () = error_ref:=error in
-                                          let  size = M.n_ligne posm in
-                                          M.addligne posm size {num=1;den=1} i1;
-                                          M.addligne posm size (ffois {num=(-1);den=1} (fdiv a b)) i2;
-                                          raise Exit)
-                                        else
-                                          let g x y = (fmoins x (ffois  b (fdiv y a))) in
-                                          if (List.for_all (fun x->(g (M.read_val posm i2 x)  (M.read_val posm i1 x)).num>=0) l)
-                                          then (
-                                            let error =  M.new_empty_ligne parameters (!error_ref) posm in
-                                            let () = error_ref:=error in
-                                            let  size = M.n_ligne posm in
-                                            M.addligne posm size {num=1;den=1} i2;
-                                            M.addligne posm size (ffois {num=(-1);den=1} (fdiv a b)) i1;
-               raise Exit))
-        done;done) with Exit -> ())) lprob;
+              (fun j ->
+                 (let rec aux_214 q =
+                    if (M.read_val posm q j).num<0 then true
+                    else if q<=2 then false
+                    else aux_214 (q-1)
+                  in aux_214 (M.n_ligne posm)))
+              (l)
+          in
+          List.iter
+            (fun j ->
+               (try
+                  (let size = M.n_ligne posm in
+                   for i1=1 to size do
+                     for i2=i1+1 to size do
+                       let a=M.read_val posm i1 j in
+                       let b=M.read_val posm i2 j in
+                       if (a={num=0;den=1} || b={num=0;den=1})
+                       then ()
+                       else
+                         ( let f x y = (fmoins x (ffois a (fdiv
+                                                             y b)))
+                           in
+                           if (List.for_all (fun x->(f (M.read_val posm i1 x)
+                                                      (M.read_val posm i2 x)).num >= 0) l)
+                           then (
+                             let error = M.new_empty_ligne parameters
+                                (!error_ref) posm in
+                             let () = error_ref:=error in
+                             let  size = M.n_ligne posm in
+                             M.addligne posm size {num=1;den=1} i1;
+                             M.addligne posm size (ffois {num=(-1);den=1} (fdiv
+                                                                             a b)) i2;
+                             raise Exit)
+                           else
+                             let g x y = (fmoins x (ffois  b (fdiv y a))) in
+                             if (List.for_all (fun x->(g (M.read_val posm i2
+                                                            x)  (M.read_val posm i1 x)).num>=0) l)
+                             then (
+                               let error =  M.new_empty_ligne parameters
+                                   (!error_ref) posm in
+                               let () = error_ref:=error in
+                               let  size = M.n_ligne posm in
+                               M.addligne posm size {num=1;den=1} i2;
+                               M.addligne posm size (ffois {num=(-1);den=1} (fdiv a b)) i1;
+                               raise Exit))
+                     done;done) with Exit -> ())) lprob;
 
           let n= Remanent_parameters.get_empty_hashtbl_size parameters in
           let pos=Hashtbl.create n in                     (* variable -> contraintes o� il apparait positivement*)
@@ -280,29 +299,6 @@ posref j))) in
                (Working_list_imperative.push k visited_line;
                 Working_list_imperative.push (k,v) good_line)
           in
-          (*      let solve k =
-            (*d�duit les nouvelles contraintes lors de la r�duction d'une variable*)
-            if not (Working_list_imperative.member k solved) then
-              (
-                List.iter (fun x->
-                    begin
-                      nb_inf.(x)<-(nb_inf.(x)-1);
-                      (*if (nb_inf.(x)=0)
-                        then*)
-                        (view (x,k))
-                    end)
-                  (read_t pos k);
-                List.iter (fun x->
-                    begin
-                      nb_minf.(x)<-(nb_minf.(x)-1);
-                      (*  if (nb_minf.(x)=0)
-                        then*)
-                        (if (not (Working_list_imperative.member x visited_line))
-                         then
-                           (view (x,k)))
-                    end)
-                  (read_t neg k))
-                  in*)
           let rec vide () =
             (*traite les contraintes en attentes*)
             try
@@ -313,91 +309,276 @@ posref j))) in
                  | None -> raise Exit
                in
                begin
-                 let rec vide error list sommeinf sommesup =
+                 let rec check_double_infinity error list
+                     ~has_seen_minus_infinity
+                     ~has_seen_plus_infinity
+                     ~has_seen_unsimplifiable_plus_infinity
+                     ~has_seen_unsimplifiable_minus_infinity
+                      =
+                   match list with
+                   | [] -> error,
+                           (has_seen_unsimplifiable_minus_infinity,
+                            has_seen_unsimplifiable_plus_infinity)
+                   | Affine_cst::q ->
+                     check_double_infinity error q
+                       ~has_seen_minus_infinity
+                       ~has_seen_plus_infinity
+                       ~has_seen_unsimplifiable_plus_infinity
+                       ~has_seen_unsimplifiable_minus_infinity
+                   | (Bool _ | Counter _ | Site _ as t)::q  ->
+                     let delta=(M.read_val posm k t) in
+                     begin
+                       match compare delta.num 0
+                       with
+                       | 0  ->
+                         check_double_infinity error q
+                           ~has_seen_minus_infinity
+                           ~has_seen_plus_infinity
+                           ~has_seen_unsimplifiable_plus_infinity
+                           ~has_seen_unsimplifiable_minus_infinity
+                      | -1 ->
+                        begin
+                          let error, new_plus_infinity =
+                            match (I.read inter t).inf with
+                            | Minfinity -> error, true
+                            | Frac _ -> error, false
+                            | Infinity | Unknown ->
+                              Exception.warn parameters error __POS__ Exit false
+                          in
+                          let error, new_minus_infinity =
+                            match (I.read inter t).sup with
+                            | Infinity -> error, true
+                            | Frac _ -> error, false
+                            | Minfinity | Unknown ->
+                              Exception.warn parameters error __POS__ Exit false
+                          in
+                          let has_seen_unsimplifiable_plus_infinity =
+                            has_seen_unsimplifiable_plus_infinity
+                            ||
+                            (new_plus_infinity && has_seen_minus_infinity)
+                          in
+                          let has_seen_unsimplifiable_minus_infinity =
+                            has_seen_unsimplifiable_minus_infinity
+                            ||
+                            (new_minus_infinity && has_seen_plus_infinity)
+                          in
+                          let has_seen_plus_infinity =
+                            has_seen_plus_infinity || new_plus_infinity
+                          in
+                          let has_seen_minus_infinity =
+                            has_seen_minus_infinity || new_minus_infinity
+                          in
+                          if has_seen_unsimplifiable_minus_infinity &&
+                             has_seen_unsimplifiable_plus_infinity
+                          then
+                            error, (true, true)
+                          else
+                            check_double_infinity error q
+                              ~has_seen_minus_infinity
+                              ~has_seen_plus_infinity
+                              ~has_seen_unsimplifiable_plus_infinity
+                              ~has_seen_unsimplifiable_minus_infinity
+                        end
+                      | 1 ->
+                        begin
+                          let error, new_minus_infinity =
+                            match (I.read inter t).inf with
+                            | Minfinity -> error, true
+                            | Frac _ -> error, false
+                            | Infinity | Unknown ->
+                              Exception.warn parameters error __POS__ Exit false
+                          in
+                          let error, new_plus_infinity =
+                            match (I.read inter t).sup with
+                            | Infinity -> error, true
+                            | Frac _ -> error, false
+                            | Minfinity | Unknown ->
+                              Exception.warn parameters error __POS__ Exit false
+                          in
+                          let has_seen_unsimplifiable_plus_infinity =
+                            has_seen_unsimplifiable_plus_infinity
+                            ||
+                            (new_plus_infinity && has_seen_minus_infinity)
+                          in
+                          let has_seen_unsimplifiable_minus_infinity =
+                            has_seen_unsimplifiable_minus_infinity
+                            ||
+                            (new_minus_infinity && has_seen_plus_infinity)
+                          in
+                          let has_seen_plus_infinity =
+                            has_seen_plus_infinity || new_plus_infinity
+                          in
+                          let has_seen_minus_infinity =
+                            has_seen_minus_infinity || new_minus_infinity
+                          in
+                          if has_seen_unsimplifiable_minus_infinity &&
+                             has_seen_unsimplifiable_plus_infinity
+                          then
+                            error, (true, true)
+                          else
+                            check_double_infinity error q
+                              ~has_seen_minus_infinity
+                              ~has_seen_plus_infinity
+                              ~has_seen_unsimplifiable_plus_infinity
+                              ~has_seen_unsimplifiable_minus_infinity
+                        end
+                      | _ ->
+                        Exception.warn parameters error __POS__ Exit (true,true)
+                     end
+                 in
+                 let rec vide error side list somme waiting =
                    match list
                    with
-                   | [] -> error
+                   | [] ->
+                     vide_waiting error side somme waiting
                    | Affine_cst::q ->
-                     vide error q
-                       (ffplus
-                          sommeinf
+                     vide error side q
+                       (match side with
+                       | Lower ->
+                       ffplus
+                          somme
+                          {num=(-1);den=1}
+                          (Frac((M.read_val posm k Affine_cst)))
+                       | Upper ->
+                         ffplus
+                          somme
                           {num=(-1);den=1}
                           (Frac((M.read_val posm k Affine_cst))))
-                       (ffplus
-                          sommesup
-                          {num=(-1);den=1}
-                          (Frac((M.read_val posm k Affine_cst))))
+                       waiting
+
                    | (Bool _ | Counter _ | Site _ as t)::q       ->
                      let delta=(M.read_val posm k t) in
-                     (match delta.num
+                     (match compare delta.num 0, side
                       with
-                      | 0 -> vide error q sommeinf sommesup
-                      | a when a<0 ->
-                        let () = vide2 error t delta q sommeinf sommesup in
-                        vide error q
-                          (ffplus sommeinf
-                             {num=(-(delta.num));den=delta.den}
-                             ((I.read inter (t)).inf))
-                            (ffplus sommesup
-                               {num=(-(delta.num));den=delta.den}
-                               ((I.read inter (t)).sup))
-
-                      | a when a>0 ->
-                        let () = vide2 error t delta q sommeinf sommesup in
-                        vide error q
-                          (ffplus sommeinf
-                             {num=(-(delta.num));den=delta.den}
-                             ((I.read inter (t)).sup))
-                          (ffplus sommesup
-                             {num=(-(delta.num));den=delta.den}
-                             ((I.read inter (t)).inf))
-                      |  _ -> vide error q sommeinf sommesup)
-                 and vide2 error t t_delta q sommeinf sommesup =
+                      | 0,_ ->
+                        vide error side q somme waiting
+                      | -1, Lower | 1, Upper  ->
+                        begin
+                            match (I.read inter t).inf with
+                            | Minfinity ->
+                              let error = vide2 error side (t,Upper) delta q somme in
+                              begin
+                                match (I.read inter t).inf with
+                                | Minfinity | Infinity | Unknown ->
+                                let error, () =
+                                  Exception.warn parameters error __POS__ Exit ()
+                                in
+                                error
+                                | Frac _ as f ->
+                                  vide error side q
+                                    (ffplus somme
+                                       {num=(-(delta.num));den=delta.den}
+                                       f) waiting
+                              end
+                            | Frac _ as f ->
+                              vide error side q
+                                (ffplus somme
+                                   {num=(-(delta.num));den=delta.den}
+                                   f) ((delta,f,t,Upper)::waiting)
+                            | Infinity | Unknown ->
+                              let error, () =
+                                Exception.warn parameters error __POS__ Exit ()
+                              in
+                              error
+                        end
+                      | 1, Lower | (-1), Upper  ->
+                        begin
+                          match (I.read inter t).sup with
+                          | Infinity ->
+                            let error = vide2 error side (t,Lower) delta q somme in
+                            begin
+                              match (I.read inter t).sup with
+                              | Minfinity | Infinity | Unknown ->
+                                let error, () =
+                                  Exception.warn parameters error __POS__ Exit ()
+                                in
+                                error
+                              | Frac _ as f ->
+                                vide error side q
+                                  (ffplus somme
+                                     {num=(-(delta.num));den=delta.den}
+                                     f) waiting
+                            end
+                          | Frac _ as f ->
+                            vide error side q
+                              (ffplus somme
+                                 {num=(-(delta.num));den=delta.den}
+                                 f) ((delta,f,t,Lower)::waiting)
+                          | Minfinity | Unknown ->
+                            let error, () =
+                              Exception.warn parameters error __POS__ Exit ()
+                            in
+                            error
+                        end
+                      | _, (Lower | Upper) ->
+                      let error, () =
+                        Exception.warn parameters error __POS__ Exit ()
+                      in
+                      error
+                     )
+                 and vide2 error side t t_delta q somme =
                    match q with
                    | [] ->
-                     let sommeinf,sommesup = if
-                       t_delta.num > 0
-                         then sommeinf, sommesup
-                         else
-                           sommesup,sommeinf
-                     in
-                     let () =
-                     I.set inter t
-                      (cap_inter
-                         (I.read inter t)
-                         {inf=ffdiv sommeinf (Frac(t_delta));
-                          sup=ffdiv sommesup (Frac(t_delta))})
-                     in
-                     ()
+                     let (t,side_t) = t in
+                     begin
+                       let new_bound = ffdiv somme (Frac(t_delta)) in
+                       match side_t with
+                       | Lower -> reduce_lower parameters error inter t new_bound
+                       | Upper -> reduce_upper parameters error inter t new_bound
+                     end
                    | head::tail ->
                    let delta=(M.read_val posm k head) in
-                   (match delta.num
+                   (match compare delta.num 0, side
                     with
-                    | 0 -> vide2 error t t_delta tail sommeinf sommesup
-                    | a when a<0 ->
-                      vide2 error t t_delta tail
-                        (ffplus sommeinf
+                    | 0,_ -> vide2 error side t t_delta tail somme
+                    | -1, Lower | 1, Upper ->
+                      vide2 error side t t_delta tail
+                        (ffplus somme
                            {num=(-(delta.num));den=delta.den}
                            ((I.read inter head).inf))
-                        (ffplus sommesup
+                    | 1, Lower | -1, Upper ->
+                      vide2 error side t t_delta tail
+                        (ffplus somme
                              {num=(-(delta.num));den=delta.den}
                              ((I.read inter head).sup))
-
-                    | a when a>0 ->
-                      vide2 error t t_delta tail
-                        (ffplus sommeinf
-                           {num=(-(delta.num));den=delta.den}
-                           ((I.read inter head).sup))
-                        (ffplus sommesup
-                           {num=(-(delta.num));den=delta.den}
-                           ((I.read inter head).inf))
-                    |  _ -> vide2 error t t_delta tail sommeinf sommesup)
-
-
+                    |  _, (Lower | Upper) ->
+                      let error, () =
+                      Exception.warn parameters error __POS__ Exit ()
+                      in
+                      error)
+                 and vide_waiting error _side somme waiting =
+                   List.fold_left
+                     (fun error (delta,f,t,side) ->
+                        let somme = ffplus somme delta f in
+                        let somme = ffdiv somme (Frac delta) in
+                        match side with
+                        | Lower ->
+                          reduce_lower parameters error inter t somme
+                        | Upper ->
+                          reduce_upper parameters error inter t somme
+                     )
+                     error
+                     waiting
                  in
                  let error, line  = M.get_line parameters (!error_ref) posm k in
+                 let error, (blocked_minus_infinity, blocked_plus_infinity)  =
+                   check_double_infinity error  (M.get_trans_list line)
+                     ~has_seen_plus_infinity:false
+                     ~has_seen_minus_infinity:false
+                     ~has_seen_unsimplifiable_plus_infinity:false
+                     ~has_seen_unsimplifiable_minus_infinity:false
+                 in
                  let error =
-                   vide error (M.get_trans_list line)  (Frac{num=0;den=1}) (Frac{num=0;den=1})
+                   if not blocked_minus_infinity then
+                     vide error Lower (M.get_trans_list line)
+                       (Frac{num=0;den=1}) []
+                   else error
+                 in
+                 let error =
+                   if not blocked_plus_infinity then
+                     vide error Upper (M.get_trans_list line)
+                       (Frac{num=0;den=1}) []
+                   else error
                  in
                  let () = error_ref:=error in
                  ()
@@ -570,7 +751,7 @@ posref j))) in
                        (((I.read inter j).sup),
                         ((M.read_val posm i j).num))
                      with
-                     |	Infinity,a when a>0 -> (update pos j i;rep:=j;
+                     | Infinity,a when a>0 -> (update pos j i;rep:=j;
 					                                 nb_inf.(i)<-1+nb_inf.(i))
                      | Infinity,a when a<0 -> (update neg j i;rep:=j;
                                                   nb_minf.(i)<-1+nb_minf.(i))
@@ -828,30 +1009,6 @@ posref j))) in
          List.filter (fun x-> not(x=Affine_cst)) (Working_list_imperative.list rep))
 
 	let red2 mi = mi
-(*  (* try*) (  List.iter (fun (x:var) ->
-       match x with Occu1.Trans(a,b,c) as y ->
-         if ffinf (Frac{num=0;den=1}) (I.read mi.i y).inf
-	     then
-	    I.set
-	      (mi.i)  ((Occu1.Transb(a,b,c)):var)
-	      (cap_inter (I.read mi.i (Occu1.Transb(a,b,c))) {inf=Frac{num=1;den=1};
-				       sup=Infinity})
-	     else if (I.read mi.i y).sup = Frac{num=0;den=1}
-		 then I.set mi.i (Occu1.Transb(a,b,c)) zero
-
-       | Occu1.Transb(a,b,c) as y ->
-	   let i = I.read mi.i y in
-	   if i=un
-	       then  I.set mi.i (Occu1.Trans(a,b,c))
-	       (cap_inter (I.read mi.i (Occu1.Trans(a,b,c))) {inf=Frac{num=1;den=1};
-				       sup=Infinity})
-	     else if i = zero
-		 then (I.set mi.i (Occu1.Trans(a,b,c))  zero)
-       | Pro _ -> ())
-	            [Occu1.Transb(21,12,0);Occu1.Trans(21,12,0);Occu1.Transb(12,19,13);Occu1.Trans(12,19,13)])
-	*)
-
-
 
 
 let solve_inf parameters error mi c =
@@ -877,46 +1034,12 @@ let solve_inf parameters error mi c =
     Intervalle_vide -> error, None (*to do: propagate error *)
 
 
-let exclusion parameters error p l  =
-    begin
-      let _mat=p.mat in
-      let classe=classe p l  in
-      let error, i2=I.copy parameters error (p.i) in
-      try
-        (
-          let () =
-            List.iter (fun j -> I.set i2 j (cap_inter (I.read i2 j)
-                                           {inf=Frac{num=1;den=1};
-                                            sup=Infinity})) l in
-         let error, _ =
-           solve_inf parameters error {mat=p.mat;i=i2} classe
-         in
-         error, false)
 
-      with _ -> error, true
-     end
-
-   let all_here parameters error p l  =
-    begin
-      let _mat=p.mat in
-      let classe=classe p l  in
-      let h = Hashtbl.create (Remanent_parameters.get_empty_hashtbl_size parameters) in
-      let get x = try (let rep = Hashtbl.find h x in (Hashtbl.remove h x;rep)) with _ -> 0 in
-      let inc x = let n=get x in
-	              Hashtbl.add h x (n+1) in
-      List.iter (fun x->inc x) l;
-      let error, i2=I.copy parameters error (p.i) in
-      (List.iter (fun j -> I.set i2 j (cap_inter (I.read i2 j) {inf=Frac{num=(get j);den=1};
-                                                                sup=Infinity})) l;
-       solve_inf parameters error {mat=p.mat;i=i2} classe)
-    end
-
-
-   let guard parameters error p l  =
-     let classe=classe p (List.rev_map (fun (a,_,_) -> a) (List.rev l))  in
-     let error, m2= M.copy parameters error (p.mat) in
-     let error, i2=I.copy parameters error (p.i) in
-     try
+let guard parameters error p l  =
+  let classe=classe p (List.rev_map (fun (a,_,_) -> a) (List.rev l))  in
+  let error, m2= M.copy parameters error (p.mat) in
+  let error, i2=I.copy parameters error (p.i) in
+  try
        let () =
          List.iter
            (fun (j,cmp,i) ->
@@ -950,64 +1073,12 @@ let exclusion parameters error p l  =
 
 
 
-   let double_here parameters error p l  =
-       begin
-         let classe=classe p l  in
-         let h =
-           Hashtbl.create (Remanent_parameters.get_empty_hashtbl_size parameters) in
-         let get x =
-           try (let rep = Hashtbl.find h x in (Hashtbl.remove h x;rep))
-
-           with _ -> 0 in
-         let inc x =
-           let n=get x in
-           Hashtbl.add h x (n+1)
-         in
-         List.iter (fun x->inc x) l;
-         let error, i2=I.copy parameters error (p.i) in
-         let () = List.iter (fun j -> I.set i2 j (cap_inter (I.read i2 j)
-                                                    {inf=Frac{num=2;den=1};
-                                                     sup=Infinity})) l in
-         let error = solve_inf parameters error {mat=p.mat;i=i2} classe in
-         error, {mat=p.mat;i=i2}
-       end
-
-   let not_here parameters error p l  =
-      let _mat=p.mat in
-      let classe=classe p l  in
-      let h =
-        Hashtbl.create
-          (Remanent_parameters.get_empty_hashtbl_size parameters)
-      in
-      let get x =
-        try
-          (let rep = Hashtbl.find h x in (Hashtbl.remove h x;rep))
-        with _ -> 0
-      in
-      let inc x =
-        let n=get x in
-        Hashtbl.add h x (n+1)
-      in
-      let () = List.iter (fun x->inc x) l in
-      let error, i2=I.copy parameters error (p.i) in
-      let () =
-        List.iter
-          (fun j ->
-             I.set i2 j
-               (cap_inter
-                  (I.read i2 j)
-                  {inf=Frac{num=0;den=1};sup=Frac{num=0;den=1}}))
-          l
-      in
-        solve_inf parameters error {mat=p.mat;i=i2} classe
 
    let gen_bin f_m f_i parameters error p q =
      let error, mat = f_m parameters error p.mat q.mat in
      let error, i = f_i parameters error p.i q.i in
      error, {mat;i}
 
-   let plus parameters error p q =
-     gen_bin M.somme_affine I.somme parameters error p q
    let union parameters error p q =
      gen_bin M.union I.union parameters error p q
    let merge parameters error p q =
@@ -1032,7 +1103,6 @@ let exclusion parameters error p l  =
      bin_incr I.wide_place parameters error p q
    let union_incr parameters error p q =
      bin_incr I.union_place parameters error p q
-
 
    let solve_all parameters error m =
        solve_inf parameters error m (list_var parameters m)
@@ -1068,31 +1138,6 @@ let exclusion parameters error p l  =
     let error, i = I.copy parameters error m.i in
     error, {mat;i}
 
-  let pushbool parameters error m x  =
-    let error, mc = copy parameters error m in
-    let error, m1,b1 =
-      let error, m1_opt = all_here parameters error mc [x]  in
-         match m1_opt with
-           Some m1 -> error, m1, true
-         | None ->
-         let error, mc = copy parameters error m in
-         error, mc,false
-     in
-     let error, mc = copy parameters error m in
-     let (error, m2),b2 =
-       let error, prod_opt = not_here parameters error mc [x] in
-       match prod_opt with
-       | Some prod ->
-         push parameters error prod x
-           {Fraction.num=1;Fraction.den=1},true
-       | None ->
-      (copy parameters error m),false
-     in
-     if b1 then
-       if b2 then
-         union parameters error m1 m2
-	   else error, m1
-     else if b2 then error, m2 else error, m
 
   let abstract_away parameters error m l =
     let error, mat = M.abstract_away parameters error m.mat l in
