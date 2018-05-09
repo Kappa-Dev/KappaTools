@@ -145,8 +145,16 @@ module Mat_inter =
         (I.read (prod.i) x)={inf=Frac({num=0;den=1});sup=Frac({num=0;den=1})}
 
       let is_infinite m x =
-
          (I.read (m.i) x).sup=Fraction.Infinity
+
+      let is_minfinite m x =
+        (I.read (m.i) x).inf=Fraction.Minfinity
+
+      let is_both_infinite m x =
+        is_infinite m x && is_minfinite m x
+
+      let is_either_infinite m x =
+        is_infinite m x || is_minfinite m x
 
       type side = Upper | Lower
 
@@ -174,7 +182,7 @@ module Mat_inter =
         let m = prod.mat in
         let inter =prod.i in
         let error, m= M.copy parameters error m  in
-        let li=ref (List.filter (fun x->(is_infinite prod x)) l) in
+        let li=ref (List.filter (fun x->(is_either_infinite prod x)) l) in
         let nli=ref (1) in
         let error_ref = ref error in
         while (!nli)<>0 do
@@ -185,35 +193,43 @@ module Mat_inter =
             match liste
             with
             | [] -> ()
-            |  j::q when (not(is_infinite prod j)) -> aux_174 q
+            | j::q when (not(is_either_infinite prod j)) -> aux_174 q
+            | j::q when is_both_infinite prod j -> aux_174 q
+
             | j::q ->
               (
-                let rec aux2 i pos neg lneg refpos =
-                  match
-                    ((i>(M.n_ligne m)),
-                     pos,
-                     neg,
-                     ((M.read_val posm i j).num))
-                  with
-                  | true,true,true,_  -> (true,refpos,lneg)
-                  | true,_,_,_  -> (false,refpos,lneg)
-                  | _,_,_,a when a<0 -> aux2 (i+1) pos true (i::lneg) refpos
-                  | _,true,_,_ -> aux2 (i+1) pos neg lneg refpos
-                  | _,false,_,a when a>0 -> aux2 (i+1) true neg lneg i
-                  | _ -> aux2 (i+1) pos neg lneg refpos
+                let rec aux2 i lneg lpos =
+                  if
+                    i> M.n_ligne m
+                  then lneg, lpos
+                  else
+                    let s = (M.read_val posm i j).num in
+                    if s = 0 then
+                      aux2 (i+1) lneg lpos
+                    else if s>0 then aux2 (i+1) lneg (i::lpos)
+                    else aux2 (i+1) (i::lneg) (i::lpos)
                 in
-                match  (aux2 1 false false [] (-1))
-                with
-                | (false,_,_) ->  aux_174 q
-    	          | (_,posref,l) ->
-                 let rec aux3 l =
-                   match l with t::q ->
-                     let k=(fmoins {num=0;den=1} (fdiv  (M.read_val posm  t j)
-                                                    (M.read_val posm
-posref j))) in
-                     (M.addligne posm t k  posref;aux3 q)
-                              | [] -> aux_174 q
-                 in aux3 l
+                let rec aux3 i l =
+                  match l with
+                  | t::q ->
+                    let k=
+                      fmoins
+                        {num=0;den=1}
+                        (fdiv
+                           (M.read_val posm t j)
+                           (M.read_val posm i j))
+                    in
+                    (M.addligne posm t k i;
+                     aux3 i q)
+                  | [] -> ()
+                in
+                let lneg,lpos = aux2 1 [] [] in
+                match lneg,lpos, is_infinite prod j with
+                | l, posref::_,true | posref::_, l, false  ->
+                  let () = aux3 posref l in
+                  aux_174 q
+                | _,[],true | [],_,false ->
+                  aux_174 q
               )
           in
           let () = aux_174 l in
@@ -223,7 +239,8 @@ posref j))) in
             List.filter
               (fun j ->
                  (let rec aux_214 q =
-                    if (M.read_val posm q j).num<0 then true
+                    if (M.read_val posm q j).num<0 && is_infinite prod j then true
+                    else if (M.read_val posm q j).num>0 && is_minfinite prod j then true
                     else if q<=2 then false
                     else aux_214 (q-1)
                   in aux_214 (M.n_ligne posm)))
@@ -273,9 +290,6 @@ posref j))) in
          let neg=Hashtbl.create n in                     (* variable -> contraintes o� il apparait n�gativement*)
           let nb_inf=Array.make ((M.n_ligne posm)+1) 0 in     (* contrainte -> nb de monomes  non major�e *)
           let nb_minf=Array.make ((M.n_ligne posm)+1) 0 in    (* contrainte -> nb de monome non minor�e *)
-          let _inf =Hashtbl.create n in                    (* contrainte -> monomes non majores*)
-
-          let _minf = Hashtbl.create n in                  (* contrainte -> monomes non minores*)
           let good_line=Working_list_imperative.make  n in (*contraintes � r�duire*)
           (*let solved=Working_list_imperative.make n in (*variable trouv�e*)*)
           let visited_line=Working_list_imperative.make n in (*contraintes r�duites ou en cours*)
