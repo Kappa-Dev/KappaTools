@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <May 01 2018>
+  * Last modification: Time-stamp: <May 10 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -311,7 +311,7 @@ let get_reachability_parameters () =
           Tools.lowercase !Config.counter_analysis_domain
         with
         | "mi" -> Remanent_parameters_sig.Mi
-        | "octagon" | "oct" -> Remanent_parameters_sig.Octagons
+        | "octagon" | "oct" | "octo" -> Remanent_parameters_sig.Octagons
         | "abstract-multiset" | "am" -> Remanent_parameters_sig.Abstract_multiset
         | "non-relational" | "nr" ->
           Remanent_parameters_sig.Non_relational
@@ -1071,7 +1071,7 @@ let get_backdoor_nbr_of_scc_1 backdoors =
   backdoors.Remanent_parameters_sig.backdoor_nbr_of_scc
 let get_backdoor_average_size_of_scc_1 backdoors =
   backdoors.Remanent_parameters_sig.backdoor_average_size_of_scc
-                    
+
 let get_backdoor_nbr_of_influences_1 backdoors =
   backdoors.Remanent_parameters_sig.backdoor_nbr_of_influences
   let get_backdoor_nbr_of_constraints_1 backdoors =

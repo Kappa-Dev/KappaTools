@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <May 02 2018>
+ * Last modification: Time-stamp: <May 03 2018>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -389,12 +389,7 @@ let main () =
             with
             | None -> ()
             | Some l ->
-            let nt =
-              List.fold_left
-                (fun nt (_,l) ->
-                   nt+List.length l)
-                (0) l
-            in
+            let nt = List.length l in
             Loggers.fprintf
               (Remanent_parameters.get_logger_backdoor parameters)
               "%i" nt

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 23 2018>
+  * Last modification: Time-stamp: <May 09 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1217,6 +1217,6 @@ module Functor =
 end
 
 module Domain_affine_equalities_and_intervalles = Functor(Mat_inter.Mat_int)
-module Domain_octagons = Functor(Mat_inter.Mat_int) (* to do *)
+module Domain_octagons = Functor(Octo.Octo) 
 module Domain_non_relational = Functor(Mat_inter.Mat_int) (* to do *)
 module Domain_abstract_multisets = Functor(Mat_inter.Mat_int) (* to do *)
