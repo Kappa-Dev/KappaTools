@@ -267,21 +267,21 @@ let create _parameters n =
                 (Working_list_imperative.list prod.var))
             (Working_list_imperative.list prod.var)
         in
-        let rep =
-          if
+          let rep =
+             if
             List.exists
               (fun x ->
                  List.exists
                    (fun v ->
                       let a = get_cons prod v v in
                       match a with
-                      | Integer.Infinity -> true
-                      | Integer.Bounded a -> a>=0  
+                      | Integer.Infinity -> false
+                      | Integer.Bounded a -> a<0
                    )
                    [Plus x;Moins x])
               (Working_list_imperative.list prod.var)
-          then None else Some prod
-        in
+                then None else  Some prod
+            in
         error, rep
 
 (*	List.iter (fun (i,j) -> set_cons t1 i j (get_cons t2 i j))
