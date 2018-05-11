@@ -1674,7 +1674,7 @@ The following options are available:
 reversible. These are the transitions between two configurations of an agent, that are impossible to revert (even in several computation steps).
 \end{itemize}
 
-Lastly, a switch allows to select the version for Kappa syntax.
+Lastly, a switch allows to select the version for Kappa syntax for the input file, among version $3$, \texttt{V3}, and version $4$, \texttt{V4}.
 
 \subsection{The sub-tab \texttt{Syntax}}
 
@@ -1685,7 +1685,7 @@ Lastly, a switch allows to select the version for Kappa syntax.
 \label{fig:kasa:01}
 \end{figure}
 
-The sub-tab \texttt{Syntax} (see Fig.~\ref{fig:kasa:01}) contains the switch to select between the version 3 and the version 4 of Kappa syntax.
+The sub-tab \texttt{Syntax} (see Fig.~\ref{fig:kasa:01}) contains the switch to select between the version 3, \texttt{V3}, and the version 4, \texttt{V4}, of Kappa syntax.
 
 \subsection{The sub-tab \texttt{Output}}
 
@@ -1773,7 +1773,7 @@ A refinement lemma is made of a precondition (on the left of the implication sym
 The meaning of a refinement lemma is that every embedding between its precondition into a reachable state can be refined/extended into
 an embedding from one site graph in its postcondition into the same reachable state. This way, a refinement lemma provides an enumeration of all the potential contexts for the precondition.
 
-We now detail the six different parts:
+We now detail the seven different parts:
 \begin{itemize}
 \item \textbf{Detection of dead rules.} A rule is called dead, if there is no trace starting from the initial state in which this rule is applied. The analysis reports the list of the rules it has detected to be dead. Due to the over-approximation, it may happen that a dead rule is not discovered by the analysis. Yet, every rule that is reported as dead, is dead indeed.
 
@@ -1806,6 +1806,51 @@ It is quite common to model the location of a protein as the internal state of  
 It might be interesting to know whether a protein can be bound to another protein twice simultaneously, and whether a protein can be bound to two instances of a same protein simultaneously. This abstraction \cite{Feret:SASB2016} captures this kind of constraint. It can be used to prove that some proteins do not polymerize.
 
 In our example, when a \texttt{R} has its sites \texttt{cr} and \texttt{c} bound, they are necessarily bound to the same instance of \texttt{R}. The same statement holds for the sites \texttt{cr} and \texttt{n}.
+
+\item \textbf{Properties of counters.}
+
+\ttt{KaSa} is inferring the range of counters.
+
+There are no counter in our previous example.
+Let us consider the following one:
+\begin{lstlisting}[language=kappa]
+%agent:	A(x1{u p},x2{u p q},x3{u p},c{=0},d{=0})
+%agent: B(x)
+
+A(x1{u}) -> A(x1{p},c{+=3},d{+=2}) @1
+A(x1{p}) -> A(x1{u},c{-=3},d{-=1}) @1
+A(x2{u}) -> A(x2{p},c{+=2},d{+=1}) @1
+A(x2{p}) -> A(x2{u},c{-=2},d{-=2}) @1
+A(x2{p}) -> A(x2{q},c{+=1}) @1
+A(x2{q}) -> A(x2{p},c{-=1}) @1
+A(x3{u}) -> A(x3{p},c{+=3}) @1
+A(x3{p}) -> A(x3{u},c{-=3}) @1
+A(x1[.]),B(x[.]) -> A(x1[1],c{+=1}),B(x[1]) @1
+A(x1[1]),B(x[1]) -> A(x1[.],c{-=1}),B(x[.]) @1
+A(x2[.]),B(x[.]) -> A(x2[1],c{+=1}),B(x[1]) @1
+A(x2[1]),B(x[1]) -> A(x2[.],c{-=1}),B(x[.]) @1
+A(x3[.]),B(x[.]) -> A(x3[1],c{+=1}),B(x[1]) @1
+A(x3[1]),B(x[1]) -> A(x3[.],c{-=1}),B(x[.]) @1
+
+%init:	10	A()
+%init: 10 B()
+\end{lstlisting}
+
+Typing the following command line:
+\begin{verbatim}
+KaSa reachability.ka --reset-all --compute-reachability-analysis
+\end{verbatim}
+we get in the section `Properties of counters' of the output what is prompted  in Fig.~\ref{fig:reachability_counters}. \ttt{KaSa} has inferred that the counter \texttt{c} is ranging from $0$ to $12$
+. There is no information on counter \texttt{d} since its value has no lower bound and no upper bound.
+
+By default, \ttt{KaSa} is using a relational numerical analysis based on a product between interval analysis \cite{CousotCousot76-1} and affine relationship analysis \cite{karr}. The product is approximate. It used a decision procedure described in \cite{feret:occurrence-counting}.
+
+Other abstractions for counters are available for pedagogical purpose. For instance, the following command line:
+\begin{verbatim}
+KaSa reachability.ka --reset-all --compute-reachability-analysis
+     --counters-accuract octagon
+\end{verbatim}
+will provide no property for counters (\eg see Fig.~\ref{fig:reachability_counters_oct}). \ttt{KaSa} has failed in bounding the range of the counter \texttt{c}
 \end{itemize}
 
 
@@ -1851,6 +1896,18 @@ In our example, when a \texttt{R} has its sites \texttt{cr} and \texttt{c} bound
 \label{fig:reachability_full}
 \end{figure}
 
+\begin{figure}[htbp]
+\input{generated_img/LOG_counters.txt}
+\caption{Reachability analysis: \ttt{KaSa} infers the range of counters.}
+\label{fig:reachability_counters}
+\end{figure}
+
+\begin{figure}[htbp]
+\input{generated_img/LOG_counters_oct.txt}
+\caption{Reachability analysis: \ttt{KaSa} infers the range of counters.}
+\label{fig:reachability_counters_oct}
+\end{figure}
+
 Now we describe the options that are available on this sub-tab.
 
 The option \verb?--compute-reachability-analysis? can be used to switch on/off then reachability analysis.
@@ -1861,6 +1918,10 @@ The option \verb?--contact-map-domain? impacts the way side-effects are handled 
 In \verb?dynamic? mode, only the bond that has been encountered so far during the analysis are considered.
 
 The option \verb?--views-domain? can be used to switch on/off the views domains that combine the non-relational analysis and the relational analysis.
+
+The option \verb?--counters-domain? can be used to switch on/off the analysis of the potential range of counters.
+
+The option \verb?--counter-accuracy? can be used to select the abstraction for the potential range of counters. The domain \texttt{mi} consists in an approximate reduced product between interval analysis \cite{CousotCousot76-1} and affine relationships \cite{karr}. The reduction between these two domains, is obtained by applying the decision procedure that is described in \cite{feret:occurrence-counting}. The domain \texttt{octagons} infer a range for each variable, each sum and each difference among two variables. Although both domains have the same complexity, the product between intervals and affine constraints is more appropriate in the case of counters, since usually the state of more than two variables have to be related.
 
 The option \verb?--double-bonds-domain? can be used to switch on/off the analysis of potential double bonds between proteins.
 

@@ -114,9 +114,14 @@ let declare_rules fmt n_sites n_phos  =
   in
   ()
 
+let string_of_int_bis i =
+  if i>=0 && i<10 then "0"^(string_of_int i)
+  else 
+    string_of_int i
+
 let main rep n_sites n_phos  =
   let ext = ".ka" in
-  let file = rep^"/"^ex_name^(string_of_int n_sites)^"_"^(string_of_int n_phos)^ext in
+  let file = rep^"/"^ex_name^(string_of_int_bis n_sites)^"_"^(string_of_int_bis n_phos)^ext in
   let channel = open_out file in
   let fmt = Format.formatter_of_out_channel channel in
   let () = print_signatures fmt n_sites n_phos in

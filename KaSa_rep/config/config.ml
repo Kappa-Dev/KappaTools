@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <May 01 2018>
+  * Last modification: Time-stamp: <May 11 2018>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -120,7 +120,7 @@ let with_site_across_bonds_analysis = ref true
 let with_parallel_bonds_analysis = ref true
 let with_dynamic_contact_map = ref "dynamic"
 let with_counters_analysis = ref true
-let counter_analysis_domain = ref "Mi"
+let counter_analysis_domain = ref "mi"
 
 
 let view_accuracy_level = ref "High"
@@ -135,7 +135,7 @@ let rate_convention = ref "biochemist"
 (* Backdoors - stats for benchmarking *)
 let print_efficiency = ref false
 let backdoor_nbr_of_scc = ref false
-let backdoor_average_size_of_scc = ref false 
+let backdoor_average_size_of_scc = ref false
 let backdoor_nbr_of_constraints = ref false
 let backdoor_nbr_of_influences = ref false
 let backdoor_nbr_of_rules = ref false

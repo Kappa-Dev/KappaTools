@@ -5,11 +5,15 @@ cat kasa_options.head > LOG_medium_KO.txt && \
 cat kasa_options.head > LOG_high_init.txt && \
 cat kasa_options.head > LOG_high_rule.txt && \
 cat kasa_options.head > LOG_full.txt && \
+cat kasa_options.head > LOG_counters.txt && \
+cat kasa_options.head > LOG_counters_oct.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka | fold -w 61 -s >> LOG_low.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-reachability-analysis Mute | fold -w 61 -s >> LOG_mute.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-reachability-analysis Medium > LOG_medium.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-reachability-analysis High >> LOG_high.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-reachability-analysis Full > LOG_pre_full.txt && \
+"${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/counters.ka| grep "Properties of counters" --before-context 1 --after-context 20 | fold -w 81 -s >> LOG_counters.txt
+"${KAPPABIN}"KaSa --reset-all --counters-accuracy oct --compute-reachability-analysis ../kappa/counters.ka| grep "Properties of counters" --before-context 1 --after-context 20 | fold -w 81 -s >> LOG_counters_oct.txt
 cat kasa_options.foot >> LOG_mute.txt && \
 cat kasa_options.foot >> LOG_low.txt && \
 grep -h --before-context 1 -m 1 "is satisfied" LOG_medium.txt | fold -w 81 -s >> LOG_medium_OK.txt && \
@@ -22,6 +26,8 @@ cat kasa_options.foot >> LOG_medium_KO.txt && \
 cat kasa_options.foot >> LOG_high_init.txt && \
 cat kasa_options.foot >> LOG_high_rule.txt && \
 cat kasa_options.foot >> LOG_full.txt && \
+cat kasa_options.foot >> LOG_counters.txt && \
+cat kasa_options.foot >> LOG_counters_oct.txt && \ 
 mv LOG*.txt ../generated_img/ #&& \
 #rm LOG*.txt
 
