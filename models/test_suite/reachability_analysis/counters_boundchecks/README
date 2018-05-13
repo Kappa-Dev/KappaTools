@@ -1,6 +1,7 @@
 #Command-line:
 "${KAPPABIN}"KaSa counters_boundchecks.ka  --output-directory output -syntax 4 || exit 0
 "${KAPPABIN}"KaSa counters_boundchecks.ka  --output-directory output -syntax 4 --counters-accuracy octo || exit 0
+"${KAPPABIN}"KaSa counters_boundchecks.ka  --output-directory output -syntax 4 --counters-accuracy nr || exit 0
 
 #the counter may range from 0 to 6.
 #since this is ensure by bound-checks, any domain should be able to infer this property

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <May 11 2018>
+  * Last modification: Time-stamp: <May 13 2018>
   * *
   * primitive to parse command-line options
   *
@@ -136,8 +136,10 @@ let options =
       [reachability,5],Normal;
       "--counters-accuracy",
       Choice
-        (["mi","Approximate reduced product between intervals and affine relationships";
-          "octagons","Lower and upper bounds for each variable,  an each sum and each difference among two variables" ],["oct";"octo";"octagon";"MI";"Mi";"Oct";"Octo";"Octagon";"Octagons"],Config.counter_analysis_domain),
+        (["non-relational","Lower and upper bounds for each variable";
+          "octagons","Lower and upper bounds for each variable,  an each sum and each difference among two variables";
+            "mi","Approximate reduced product between intervals and affine relationships";
+        ],["oct";"octo";"octagon";"MI";"Mi";"Oct";"Octo";"Octagon";"Octagons";"non-relational";"nr";"non-rel";"non_rel"; "non_relational";"Non-relational";"Nr";"Non-rel";"Non_rel"; "Non_relational"],Config.counter_analysis_domain),
       "Abstract domain for counter analysis",
       [reachability,6],Normal;
       "--double-bonds-domain",

@@ -1,6 +1,6 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa counters_boundchecks.ka --output-directory output -syntax 4 --counters-accuracy octo
+#Command line is: KaSa counters_boundchecks.ka --output-directory output -syntax 4 --counters-accuracy nr
 #
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
