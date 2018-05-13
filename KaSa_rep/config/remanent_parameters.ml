@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <May 10 2018>
+  * Last modification: Time-stamp: <May 13 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -312,8 +312,8 @@ let get_reachability_parameters () =
         with
         | "mi" -> Remanent_parameters_sig.Mi
         | "octagon" | "oct" | "octo" -> Remanent_parameters_sig.Octagons
-        | "abstract-multiset" | "am" -> Remanent_parameters_sig.Abstract_multiset
-        | "non-relational" | "nr" ->
+        | "abstract-multiset" | "am" | "abstract_multiset"-> Remanent_parameters_sig.Abstract_multiset
+        | "non-relational" | "nr" | "non-rel" | "non_rel" | "non_relational"->
           Remanent_parameters_sig.Non_relational
         | _ -> Remanent_parameters_sig.Mi
       end ;
