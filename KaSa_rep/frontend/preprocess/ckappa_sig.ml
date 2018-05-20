@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Apr 20 2018>
+ * Last modification: Time-stamp: <May 20 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -78,7 +78,7 @@ and counter_test =
 and internal = string list
 
 and link =
-  | LNK_VALUE of (c_agent_id * agent_name * site_name * c_agent_id * position)
+  | LNK_VALUE of (c_agent_id * agent_name * site_name * c_link_value * position)
   | FREE
   | LNK_ANY   of position
   | LNK_SOME  of position
@@ -232,10 +232,9 @@ let rename_link parameters error f link =
   match
     link
   with
-  | LNK_VALUE (ag,x,y,ag',position) ->
+  | LNK_VALUE (ag,x,y,value,position) ->
     let error, ag = f parameters error ag in
-    let error, ag' = f parameters error ag' in
-    error, LNK_VALUE (ag,x,y,ag',position)
+    error, LNK_VALUE (ag,x,y,value,position)
   | LNK_MISSING
   | FREE
   | LNK_ANY _
@@ -365,8 +364,8 @@ let join_link parameters error link1 link2 =
     | LNK_TYPE _, LNK_TYPE _ -> Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
     | LNK_VALUE(_,x,y,_,_), LNK_TYPE((a,_),(b,_)) when x=a && b=y -> error, link1
     | LNK_TYPE((a,_),(b,_)), LNK_VALUE(_,x,y,_,_) when x=a && b=y -> error, link2
-    | LNK_VALUE(ag,x,y,ag1,_), LNK_VALUE(ag',x',y',ag1',_) when
-        ag=ag' && x=x' && y=y' && ag1=ag1'
+    | LNK_VALUE(ag,x,y,_,_), LNK_VALUE(ag',x',y',_,_) when
+        ag=ag' && x=x' && y=y'
       -> error, link1
     | (LNK_VALUE _ | LNK_TYPE _ ), (LNK_VALUE _ | LNK_TYPE _ ) ->
       Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
