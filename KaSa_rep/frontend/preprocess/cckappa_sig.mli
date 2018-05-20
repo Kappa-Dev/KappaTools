@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Feb 28 2018>
+  * Last modification: Time-stamp: <May 20 2018>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -12,7 +12,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(* eventually, each type will be abtract, no int will appear in type declaration *)
 
 type site  = (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
 
@@ -183,7 +182,7 @@ type compil =
     (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures : (agent_sig (** position*)) Int_storage.Nearly_inf_Imperatif.t;
     (*agent signature declaration*)
-    counter_default: Ckappa_sig.c_state option Ckappa_sig.AgentSite_map_and_set.Map.t ; 
+    counter_default: Ckappa_sig.c_state option Ckappa_sig.AgentSite_map_and_set.Map.t ;
     rules : enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
     (*rules (possibly named)*)
     observables :
@@ -257,37 +256,3 @@ val join_mixture: Remanent_parameters_sig.parameters ->
    Exception.method_handler * Ckappa_sig.c_agent_id) ->
    mixture -> mixture ->
   Exception.method_handler * mixture
-
-(*val add_agent : Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Ckappa_sig.c_agent_name -> Exception.method_handler * Ckappa_sig.agent_name) ->
-  'a -> Ckappa_sig.c_agent_id ->
-  Ckappa_sig.c_agent_name -> Exception.method_handler * agent
-*)
-(*val add_views : Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> Ckappa_sig.c_agent_id ->
-  views -> Exception.method_handler * views
-
-val add_site_address : Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> Ckappa_sig.c_agent_id ->
-  Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
-  Exception.method_handler * site_address
-
-val add_site_map : Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> Ckappa_sig.c_site_name ->
-  site_address Ckappa_sig.Site_map_and_set.Map.t ->
-  Exception.method_handler *
-  site_address Ckappa_sig.Site_map_and_set.Map.t
-
-val add_bonds: Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> Ckappa_sig.c_agent_id ->
-  site_address Ckappa_sig.Site_map_and_set.Map.t
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t ->
-  Exception.method_handler *
-  site_address Ckappa_sig.Site_map_and_set.Map.t
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t
-
-val add_mixture : Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> Ckappa_sig.c_agent_id ->
-  Ckappa_sig.c_agent_name -> mixture ->
-  Exception.method_handler * mixture*)

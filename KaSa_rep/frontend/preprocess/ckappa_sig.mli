@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Apr 19 2018>
+ * Last modification: Time-stamp: <May 20 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -578,13 +578,6 @@ module Views_intbdu: Mvbdu_wrapper.Internalized_mvbdu
 
 (***************************************************************************)
 
-(* JF: This file is the API for KaSa frontend *)
-(* JF: Please do not put domain specific module here, put them with the definition of the corresponding abstract domain *)
-
-(*bonds in rhs and lhs: use in Common_static.ml*)
-
-(*module Agentnames_map_and_set: Map_wrapper.S_with_logs
-  with type elt = c_agent_name * c_agent_name*)
 
 module PairAgentsSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
