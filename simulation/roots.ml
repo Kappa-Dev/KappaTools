@@ -70,16 +70,16 @@ let merge_cc state mod_connectivity = function
   | None -> state
   | Some (cc1,cc2) ->
     let () = Hashtbl.replace mod_connectivity cc1 () in
-    let () = Hashtbl.replace mod_connectivity  cc2 () in
+    let () = Hashtbl.replace mod_connectivity cc2 () in
     {
       of_patterns = state.of_patterns;
       of_unary_patterns =
         Pattern.ObsMap.map
           (fun cc_map ->
-             let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc1 cc_map in
              match Mods.IntMap.pop cc2 cc_map with
              | None,_ -> cc_map
              | Some set2, cc_map' ->
+               let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc1 cc_map in
                add_intset_in_intmap cc1 (Mods.IntSet.union set1 set2) cc_map')
           state.of_unary_patterns;
     }
@@ -94,19 +94,17 @@ let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
   if Pattern.Set.mem pattern unary_ccs then
     let cc_map =
       Pattern.ObsMap.get state.of_unary_patterns pattern in
-    let cc_map' =
-      match Edges.get_connected_component root edges with
-      | Some cc_id ->
-        let () = Hashtbl.replace mod_connectivity cc_id () in
-        let set = Mods.IntMap.find_default Mods.IntSet.empty cc_id cc_map in
-        let set' =
-          (if is_add then Mods.IntSet.add else Mods.IntSet.remove) root set in
-        add_intset_in_intmap cc_id set' cc_map
-      | None ->
-        Mods.IntMap.map
-          (fun set ->
-             (if is_add then Mods.IntSet.add else Mods.IntSet.remove) root set)
-          cc_map in
+    let cc_id =
+      (* The only case where get_connected_component is None is when
+         [not is_add] and [root] has just been erased! But, just
+         before being erased, we know that an agent is in its own
+         connected component... *)
+      Option_util.unsome root (Edges.get_connected_component root edges) in
+    let () = Hashtbl.replace mod_connectivity cc_id () in
+    let set = Mods.IntMap.find_default Mods.IntSet.empty cc_id cc_map in
+    let set' =
+      (if is_add then Mods.IntSet.add else Mods.IntSet.remove) root set in
+    let cc_map' = add_intset_in_intmap cc_id set' cc_map in
     Pattern.ObsMap.set state.of_unary_patterns pattern cc_map'
 
 let number r pat =
