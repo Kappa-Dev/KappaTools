@@ -92,39 +92,69 @@ let glue_connected_component links cache ccs node1 node2 =
   let () = Cache.mark cache node1 in
   is_in_cc [] [node1]
 
-let separate_connected_component links cache ccs node1 node2 =
-  let old_cc_id = Option_util.unsome (-1) (Mods.DynArray.get ccs node2) in
-  let rec inspect_site dst id site next =
+let separate_connected_component links (cache1,cache2) ccs node1 node2 =
+  let old_cc_id = Option_util.unsome (-1) (Mods.DynArray.get ccs node1) in
+  let rec inspect_site cache ?dst_cache id site next =
     if site = 0 then Some next else
       match (Mods.DynArray.get links id).(pred site) with
-      | None -> inspect_site dst id (pred site) next
+      | None -> inspect_site cache ?dst_cache id (pred site) next
       | Some ((id',_),_) ->
-        if id' = dst then None
-        else if Cache.test cache id' then inspect_site dst id (pred site) next
+        if match dst_cache with
+          | None -> false
+          | Some dc -> Cache.test dc id' then None
+        else if Cache.test cache id'
+        then inspect_site cache ?dst_cache id (pred site) next
         else
           let () = Cache.mark cache id' in
-          inspect_site dst id (pred site) (id'::next) in
-  let rec in_same_cc orig dst next = function
+          inspect_site cache ?dst_cache id (pred site) (id'::next) in
+  let rec mark_new_cc orig cache next = function
     | id ::todos ->
       begin match
-          inspect_site dst id (Array.length (Mods.DynArray.get links id)) next with
-      | None -> let () = Cache.reset cache in None
-      | Some next' -> in_same_cc orig dst next' todos
+          inspect_site
+            cache id (Array.length (Mods.DynArray.get links id)) next with
+      | None -> assert false
+      | Some next' -> mark_new_cc orig cache next' todos
       end
     | [] -> match next with
       | [] ->
-        if Cache.test cache old_cc_id then
-          let () = Cache.reset cache in
-          let () = Cache.mark cache node2 in
-          in_same_cc node2 node1 [] [node2]
+        let () =
+          Cache.iteri_reset
+            (fun i -> Mods.DynArray.set ccs i (Some orig)) cache in
+        Some (old_cc_id,orig)
+      | _ -> mark_new_cc orig cache [] next in
+  let rec in_same_cc
+      other_orig other_cache other_next
+      this_orig this_cache this_next = function
+    | id ::todos ->
+      begin match
+          inspect_site
+            this_cache ~dst_cache:other_cache id
+            (Array.length (Mods.DynArray.get links id)) this_next with
+      | None ->
+        let () = Cache.reset this_cache in
+        let () = Cache.reset other_cache in
+        None
+      | Some next' ->
+        in_same_cc
+          other_orig other_cache other_next this_orig this_cache next' todos
+      end
+    | [] -> match this_next with
+      | [] ->
+        if Cache.test this_cache old_cc_id then
+          let () = Cache.reset this_cache in
+          mark_new_cc other_orig other_cache [] other_next
         else
+          let () = Cache.reset other_cache in
           let () =
             Cache.iteri_reset
-              (fun i -> Mods.DynArray.set ccs i (Some orig)) cache in
-          Some (old_cc_id,orig)
-      | _ -> in_same_cc orig dst [] next in
-  let () = Cache.mark cache node1 in
-  in_same_cc node1 node2 [] [node1]
+              (fun i -> Mods.DynArray.set ccs i (Some this_orig)) this_cache in
+          Some (old_cc_id,this_orig)
+      | _ ->
+        in_same_cc
+          this_orig this_cache this_next other_orig other_cache [] other_next in
+  let () = Cache.mark cache1 node1 in
+  let () = Cache.mark cache2 node2 in
+  in_same_cc node1 cache1 [node1] node2 cache2 [] [node2]
 
 type t =
   {
@@ -133,7 +163,7 @@ type t =
     missings : Mods.Int2Set.t;
     state : int option array Mods.DynArray.t;
     sort : int option Mods.DynArray.t;
-    cache : Cache.t;
+    caches : Cache.t * Cache.t;
     free_id : int * int list;
     connected_component : int option Mods.DynArray.t option;
   }
@@ -148,7 +178,7 @@ let empty ~with_connected_components =
     missings = Mods.Int2Set.empty;
     state = Mods.DynArray.make 1 [||];
     sort = Mods.DynArray.make 1 None;
-    cache = Cache.create ();
+    caches = (Cache.create (), Cache.create ());
     free_id =(0,[]);
     connected_component = if with_connected_components
       then Some (Mods.DynArray.make 1 None)
@@ -164,7 +194,7 @@ let copy graph =
     missings = Mods.Int2Set.empty;
     state = Mods.DynArray.map Array.copy graph.state;
     sort = Mods.DynArray.copy graph.sort;
-    cache = Cache.create ();
+    caches = (Cache.create (), Cache.create ());
     free_id = graph.free_id;
     connected_component =
       (match graph.connected_component with
@@ -220,7 +250,7 @@ let add_agent ?id sigs ty graph =
     missings = missings';
     state = graph.state;
     sort = graph.sort;
-    cache = graph.cache;
+    caches = graph.caches;
     free_id;
     connected_component = graph.connected_component;
   }
@@ -235,7 +265,7 @@ let add_free ag s graph =
     missings = Mods.Int2Set.remove (ag,s) graph.missings;
     state = graph.state;
     sort = graph.sort;
-    cache = graph.cache;
+    caches = graph.caches;
     free_id = graph.free_id;
     connected_component = graph.connected_component;
   }
@@ -250,7 +280,7 @@ let add_internal ag s i graph =
     missings = graph.missings;
     state = graph.state;
     sort = graph.sort;
-    cache = graph.cache;
+    caches = graph.caches;
     free_id = graph.free_id;
     connected_component = graph.connected_component;
   }
@@ -266,8 +296,8 @@ let add_link (ag,ty) s (ag',ty') s' graph =
       let i = Option_util.unsome (-1) (Mods.DynArray.get ccs ag) in
       let j = Option_util.unsome (-2) (Mods.DynArray.get ccs ag') in
       if i = j then None else
-        let () =
-          glue_connected_component graph.connect graph.cache ccs ag ag' in
+        let () = glue_connected_component
+            graph.connect (fst graph.caches) ccs ag ag' in
         Some (j,i) in
   {
     outdated = false;
@@ -276,7 +306,7 @@ let add_link (ag,ty) s (ag',ty') s' graph =
       Mods.Int2Set.remove (ag,s) (Mods.Int2Set.remove (ag',s') graph.missings);
     state = graph.state;
     sort = graph.sort;
-    cache = graph.cache;
+    caches = graph.caches;
     free_id = graph.free_id;
     connected_component = graph.connected_component;
   },out
@@ -296,7 +326,7 @@ let remove_agent ag graph =
     missings = Mods.Int2Set.filter (fun (ag',_) -> ag <> ag') graph.missings;
     state = graph.state;
     sort = graph.sort;
-    cache = graph.cache;
+    caches = graph.caches;
     free_id = (let new_id,ids = graph.free_id in (new_id,ag::ids));
     connected_component = graph.connected_component;
   }
@@ -310,7 +340,7 @@ let remove_free ag s graph =
     missings = Mods.Int2Set.add (ag,s) graph.missings;
     state = graph.state;
     sort = graph.sort;
-    cache = graph.cache;
+    caches = graph.caches;
     free_id = graph.free_id;
     connected_component = graph.connected_component;
   }
@@ -349,7 +379,7 @@ let remove_internal ag s graph =
       missings = graph.missings;
       state = graph.state;
       sort = graph.sort;
-      cache = graph.cache;
+      caches = graph.caches;
       free_id = graph.free_id;
       connected_component = graph.connected_component;
     }
@@ -362,7 +392,8 @@ let remove_link ag s ag' s' graph =
   let out = match graph.connected_component with
     | None -> None
     | Some ccs ->
-      separate_connected_component graph.connect graph.cache ccs ag ag' in
+      separate_connected_component
+        graph.connect graph.caches ccs ag ag' in
   {
     outdated = false;
     connect = graph.connect;
@@ -370,7 +401,7 @@ let remove_link ag s ag' s' graph =
       Mods.Int2Set.add (ag,s) (Mods.Int2Set.add (ag',s') graph.missings);
     state = graph.state;
     sort = graph.sort;
-    cache = graph.cache;
+    caches = graph.caches;
     free_id = graph.free_id;
     connected_component = graph.connected_component;
   },out
@@ -456,12 +487,12 @@ let one_connected_component sigs ty node graph =
                        sites;
                  }) acc
     | (node,ty) :: todos ->
-      if Cache.test graph.cache node
+      if Cache.test (fst graph.caches) node
       then build id acc known todos
       else match Mods.DynArray.get graph.sort node with
         | None -> failwith "Edges.one_connected_component"
         | Some _ ->
-          let () = Cache.mark graph.cache node in
+          let () = Cache.mark (fst graph.caches) node in
           let known' = Mods.IntMap.add node id known in
           let arity = Signature.arity sigs ty in
           let todos',ports =
@@ -488,16 +519,16 @@ let species sigs root graph =
     | Some ty ->
       Snapshot.cc_to_user_cc
         sigs (one_connected_component sigs ty root graph) in
-  let () = Cache.reset graph.cache in
+  let () = Cache.reset (fst graph.caches) in
   specie
 
 let build_snapshot sigs graph =
   let () = assert (not graph.outdated) in
   let rec aux ccs node =
     if node = Mods.DynArray.length graph.sort
-    then let () = Cache.reset graph.cache in Snapshot.export sigs ccs
+    then let () = Cache.reset (fst graph.caches) in Snapshot.export sigs ccs
     else
-    if Cache.test graph.cache node
+    if Cache.test (fst graph.caches) node
     then aux ccs (succ node)
     else match Mods.DynArray.get graph.sort node with
       | None -> aux ccs (succ node)
@@ -609,11 +640,11 @@ let are_connected ?max_distance graph nodes_x nodes_y =
        and with all nodes in nodes_x marked as done *)
     let prepare =
       List.fold_left (fun acc (id,_ as ag) ->
-          let () = Cache.mark graph.cache id in
+          let () = Cache.mark (fst graph.caches) id in
           (ag,[])::acc) [] nodes_x in
     match breadth_first_traversal ~looping:((-1,-1),-1) ?max_distance true
-            is_in_nodes_y graph.connect graph.cache [] prepare
-    with [] -> let () = Cache.reset graph.cache in None
-       | [ _,p ] -> let () = Cache.reset graph.cache in Some p
+            is_in_nodes_y graph.connect (fst graph.caches) [] prepare
+    with [] -> let () = Cache.reset (fst graph.caches) in None
+       | [ _,p ] -> let () = Cache.reset (fst graph.caches) in Some p
        | _ :: _ -> failwith "Edges.are_they_connected completely broken"
   else None
