@@ -36,9 +36,24 @@ let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 let hash_prime = 29
 
 let coarse_hash cc =
+  let plus_internal acc s i =
+    if i < 0 then acc else Tools.cantor_pairing (succ s) (succ i) + acc in
+  let node_shape =
+    Mods.IntMap.fold
+      (fun n e acc ->
+         Tools.array_fold_lefti
+           (fun s acc -> function
+              | UnSpec, i -> plus_internal acc s i
+              | Free, i -> plus_internal (3 + s*3 + acc) s i
+              | Link (n',s'), i ->
+                let acc' = plus_internal acc s i in
+                let extra = Tools.cantor_pairing (1+min s s') (1+max s s') in
+                if (n = n' && s < s') || n < n' then extra * 7 + acc' else acc')
+           acc e)
+      cc.nodes 0 in
   Array.fold_right
     (fun l acc -> List.length l + hash_prime * acc)
-    cc.nodes_by_type 0
+    cc.nodes_by_type node_shape
 
 let id_to_yojson cc = `Int cc
 

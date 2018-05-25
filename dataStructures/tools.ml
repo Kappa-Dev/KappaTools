@@ -90,6 +90,9 @@ let pow64 x n =
   in
   aux n Int64.one
 
+let cantor_pairing x y =
+  let s = x + y in (succ s * s)/2 + y
+
 let read_input () =
   let rec parse acc input =
     match Stream.next input with

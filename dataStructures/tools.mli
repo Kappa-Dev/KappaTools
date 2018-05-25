@@ -46,6 +46,8 @@ val gcd_2: int -> int -> int
 val lcm: int list -> int
 
 val fact: int -> int
+val cantor_pairing: int -> int -> int
+
 val get_product_image_occ:
   int ->
   (int -> int -> int) ->
