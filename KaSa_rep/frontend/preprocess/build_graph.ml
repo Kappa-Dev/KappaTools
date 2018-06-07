@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: November, the 12th of 2017
-  * Last modification: Time-stamp: <Feb 22 2018>
+  * Last modification: Time-stamp: <Jun 07 2018>
   * *
   * Primitives to build site graph in Cckappa
   *
@@ -146,6 +146,19 @@ let add_state parameters error agent_id site_name state mixture =
         site_name
         ag.Cckappa_sig.agent_interface
     in
+    let error, () =
+      if Ckappa_sig.compare_state_index_option_min
+          (Some state)
+          site.Cckappa_sig.site_state.Cckappa_sig.min > 0
+         ||
+         Ckappa_sig.compare_state_index_option_max
+           site.Cckappa_sig.site_state.Cckappa_sig.max
+           (Some state) > 0
+      then
+        Exception.warn parameters error __POS__ Exit ()
+      else
+        error, ()
+    in
     let site = {site with Cckappa_sig.site_state = {Cckappa_sig.min=Some state; Cckappa_sig.max=Some state}}
     in
     let error', agent_interface =
@@ -176,6 +189,9 @@ let add_state parameters error agent_id site_name state mixture =
     }
   | Some (Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _ | Cckappa_sig.Unknown_agent _ ) | None ->
     Exception.warn parameters error __POS__ Exit mixture
+
+
+
 
 let add_pointer
     parameter error
@@ -329,6 +345,20 @@ let add_site parameters error agent_id site_name in_progress =
       agent_id site_name in_progress.mixture
   in
   error, {in_progress with mixture}
+
+let add_internal_state parameters error agent_id site_name state in_progress =
+  let error',mixture =
+    add_state
+      parameters error agent_id site_name state in_progress.mixture
+  in
+  Exception.check_point Exception.warn parameters error error' __POS__ Exit, {in_progress with mixture}
+
+let add_free parameters error agent_id site_name in_progress =
+  add_internal_state
+    parameters error agent_id site_name Ckappa_sig.dummy_state_index in_progress
+
+
+
 
 let add_link parameters error agent_id site_name agent_id' site_name' in_progress =
   let handler = in_progress.kappa_handler in
