@@ -32,7 +32,7 @@
 "KaSa_rep/contact_map_scc" : include
 "odes/symmetries_analysis" : include
 
-<agents/*> : package(lwt.unix)
+<agents/*> : package(lwt.unix),thread
 
 true : debug, bin_annot, safe_string
 true : package(str), package(bigarray), package(num), package(unix)
