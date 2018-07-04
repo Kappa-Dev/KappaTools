@@ -149,11 +149,11 @@ let add_state parameters error agent_id site_name state mixture =
     let error, () =
       if Ckappa_sig.compare_state_index_option_min
           (Some state)
-          site.Cckappa_sig.site_state.Cckappa_sig.min > 0
+          site.Cckappa_sig.site_state.Cckappa_sig.min < 0
          ||
          Ckappa_sig.compare_state_index_option_max
            site.Cckappa_sig.site_state.Cckappa_sig.max
-           (Some state) > 0
+           (Some state) < 0
       then
         Exception.warn parameters error __POS__ Exit ()
       else
