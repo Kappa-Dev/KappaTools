@@ -180,7 +180,6 @@ let request_handler context = function
            ~string_of_success:(fun x -> x)
            (match exn with
             | Yojson.Json_error e -> (Api_common.result_error_msg e)
-            | Ag_oj_run.Error e -> (Api_common.result_error_msg e)
             | exn -> (Api_common.result_error_exception exn)
            )
       )
