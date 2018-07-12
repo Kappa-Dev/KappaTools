@@ -382,11 +382,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         let nrules, nreactions, nspecies = A.get_data network in
         let () =
           Format.printf
-            "CPU time: %g s.; %i rules; %i species; %i reactions."
+            "CPU time: %g s.; %i rules; %i species; %i reactions.@."
             cpu_time nrules nspecies nreactions
-        in
-        let () =
-          Format.print_newline ()
         in
         ()
     in

@@ -126,7 +126,7 @@ struct
       symbol_table (print_internal ?sigs ag p) fmt st
 
   let print_cc
-      ?full_species:(full_species=false) ?sigs ?cc_id ~with_id ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) f cc =
+      ?(full_species=false) ?sigs ?cc_id ~with_id ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) f cc =
         let print_intf (ag_i, _ as ag) link_ids neigh =
           snd
             (Tools.array_fold_lefti

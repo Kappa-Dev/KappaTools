@@ -14,16 +14,6 @@ let debug s =
 module Make(I:Ode_interface_sig.Interface) =
 
 struct
-  module SpeciesSetMap =
-    SetMap.Make
-      (struct
-        type t = I.chemical_species
-        let compare = compare
-        let print x = I.print_chemical_species ?compil:None x
-      end)
-  module SpeciesSet = SpeciesSetMap.Set
-  module SpeciesMap = SpeciesSetMap.Map
-
   type connected_component_id = int
   let fst_cc_id = 1
   let next_cc_id = succ
@@ -275,7 +265,7 @@ struct
     }
 
   let add_embed_to_current_species cc embed network =
-    let old,network =
+    let _old,network =
       match I.ObsMap.get cc network.cc_to_embedding_to_current_species
       with
       | [] -> [],
