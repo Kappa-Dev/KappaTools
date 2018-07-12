@@ -57,7 +57,7 @@ sig
   val do_we_count_in_embeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
 
-  val symbol_table: compil -> Symbol_table.symbol_table 
+  val symbol_table: compil -> Symbol_table.symbol_table
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
 
   val canonic_form: chemical_species -> canonic_species
