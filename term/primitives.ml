@@ -625,21 +625,3 @@ let map_expr_perturbation f_alg f_bool x =
     repeat = f_bool x.repeat;
     needs_backtrack = x.needs_backtrack;
   }
-
-let stops_of_perturbation algs_deps x =
-  let stopping_time = match x.alarm with
-    | Some n -> [(Some n,n)]
-    | None ->
-       let () =
-         if (Alg_expr.is_equality_test_time algs_deps (fst x.precondition)) then
-           raise
-             (ExceptionDefn.Malformed_Decl
-                ("Equality test on time requires an alarm",(snd x.precondition)))
-       in
-       let () =
-         if (Alg_expr.is_equality_test_time algs_deps (fst x.repeat)) then
-           raise
-             (ExceptionDefn.Malformed_Decl
-                ("Equality test on time requires an alarm",(snd x.repeat))) in
-       [] in
-  stopping_time

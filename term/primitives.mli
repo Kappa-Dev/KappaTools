@@ -154,8 +154,3 @@ val map_expr_perturbation :
   ((Pattern.id array list,int) Alg_expr.bool Locality.annot ->
    (Pattern.id array list,int) Alg_expr.bool Locality.annot) ->
   perturbation -> perturbation
-
-val stops_of_perturbation :
-  (Operator.DepSet.t * Operator.DepSet.t *
-   Operator.DepSet.t array * Operator.DepSet.t array) ->
-  perturbation -> (Nbr.t option * Nbr.t) list

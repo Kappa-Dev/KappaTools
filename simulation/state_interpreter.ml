@@ -7,8 +7,8 @@
 (******************************************************************************)
 
 type t = {
-  init_stopping_times : (Nbr.t option * Nbr.t * int) list;
-  mutable stopping_times : (Nbr.t option * Nbr.t * int) list;
+  init_stopping_times : (Nbr.t * int) list;
+  mutable stopping_times : (Nbr.t * int) list;
   perturbations_alive : bool array;
   time_dependent_perts : int list;
   mutable force_test_perturbations : int list;
@@ -18,11 +18,35 @@ type t = {
   with_delta_activities : bool;
 }
 
-let compare_stops (_,t1,p1) (_,t2,p2) =
+let compare_stops (t1,p1) (t2,p2) =
   let t = Nbr.compare t1 t2 in
   if t = 0 then compare p1 p2 else t
 
-let empty ~with_delta_activities env stopping_times =
+let empty ~with_delta_activities env =
+  let stopping_times =
+    let algs_deps = Model.all_dependencies env in
+    Model.fold_perturbations
+      (fun i acc x ->
+         match x.Primitives.alarm with
+         | Some n -> (n,i)::acc
+         | None ->
+           let () =
+             if (Alg_expr.is_equality_test_time
+                   algs_deps (fst x.Primitives.precondition)) then
+               raise
+                 (ExceptionDefn.Malformed_Decl
+                    ("Equality test on time requires an alarm",
+                     (snd x.Primitives.precondition)))
+           in
+           let () =
+             if (Alg_expr.is_equality_test_time
+                   algs_deps (fst x.Primitives.repeat)) then
+               raise
+                 (ExceptionDefn.Malformed_Decl
+                    ("Equality test on time requires an alarm",
+                     (snd x.Primitives.repeat))) in
+           acc)
+      [] env in
   let stops = List.sort compare_stops stopping_times in
   let time_dependent_perts =
     let rec aux dep acc =
@@ -341,15 +365,9 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
 let rec perturbate_until_first_backtrack
           env counter ~outputs (stop,graph,state,dt) =
   match state.stopping_times with
-  | [] -> (stop,graph,state,dt,None)
-  | (rt,ti,pe) :: tail ->
+  | [] -> (stop,graph,state,dt,false)
+  | (ti,pe) :: tail ->
      if (Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt))) then
-       let tail' = match rt with
-         | None -> tail
-         | Some n ->
-            List_util.merge_uniq compare_stops [(rt,(Nbr.add ti n),pe)] tail in
-       let () = state.stopping_times <- tail' in
-
        let pert = Model.get_perturbation env pe in
        if not(pert.Primitives.needs_backtrack) then
          let stop',graph',state',dt' =
@@ -362,6 +380,13 @@ let rec perturbate_until_first_backtrack
               if Counter.one_time_advance counter dti then
                 let stop',graph',state' = perturbate
                     ~outputs ~is_alarm:true env counter graph state [pe] in
+                let tail' = match pert.Primitives.alarm with
+                  | None -> tail
+                  | Some n ->
+                    if state.perturbations_alive.(pe) then
+                      List_util.merge_uniq compare_stops [((Nbr.add ti n),pe)] tail
+                    else tail in
+                let () = state.stopping_times <- tail' in
                 let () = state'.perturbations_not_done_yet.(pe) <- true in
                 (* Argument to reset only pe and not all perts is "if
                    you're not backtracking, nothing depends upon
@@ -373,23 +398,31 @@ let rec perturbate_until_first_backtrack
            env counter ~outputs (stop',graph',state',dt')
 
        (* if some perturbation needs backtrack, return the perturbation *)
-       else (stop,graph,state,dt,Some (ti,pe))
-     else (stop,graph,state,dt,None)
+       else (stop,graph,state,dt,true)
+     else (stop,graph,state,dt,false)
 
-let perturbate_with_backtrack ~outputs env counter graph state (ti,pe) =
-  if Counter.one_time_correction_event counter ti then
-    let () =
-      let outputs counter' time =
-        let cand =
-          observables_values env graph (Counter.fake_time counter' time) in
-        if Array.length cand > 1 then outputs (Data.Plot cand) in
-      Counter.fill ~outputs counter ~dt:0. in
-    let stop,graph',state' =
-      perturbate ~outputs ~is_alarm:true env counter graph state [pe] in
-    let () =
-      Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
-        state.perturbations_not_done_yet in
-    (stop,graph',state')
+let perturbate_with_backtrack ~outputs env counter graph state = function
+  | [] -> assert false
+  | (ti,pe) :: tail ->
+    let tail' = match (Model.get_perturbation env pe).Primitives.alarm with
+      | None -> tail
+      | Some n ->
+        List_util.merge_uniq
+          compare_stops [((Nbr.add ti n),pe)] tail in
+    let () = state.stopping_times <- tail' in
+    if Counter.one_time_correction_event counter ti then
+      let () =
+        let outputs counter' time =
+          let cand =
+            observables_values env graph (Counter.fake_time counter' time) in
+          if Array.length cand > 1 then outputs (Data.Plot cand) in
+        Counter.fill ~outputs counter ~dt:0. in
+      let stop,graph',state' =
+        perturbate ~outputs ~is_alarm:true env counter graph state [pe] in
+      let () =
+        Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
+          state.perturbations_not_done_yet in
+      (stop,graph',state')
     else (true,graph,state)
 
 let a_loop
@@ -418,19 +451,13 @@ let a_loop
                     (Counter.current_event counter)
                     (Counter.current_time counter) activity)) in
         (true,graph,state)
-      | (rt,ti,pe) :: tail ->
-         let tail' = match rt with
-           | None -> tail
-           | Some n ->
-             List_util.merge_uniq
-               compare_stops [(rt,(Nbr.add ti n),pe)] tail in
-        let () = state.stopping_times <- tail' in
-        perturbate_with_backtrack ~outputs env counter graph state (ti,pe)
+      | l ->
+        perturbate_with_backtrack ~outputs env counter graph state l
 
     else
       (*activity is positive*)
       match state.stopping_times with
-      | (_,ti,_) :: _
+      | (ti,_) :: _
         when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
 
          let (stop,graph',state',dt',needs_backtrack) =
@@ -438,17 +465,17 @@ let a_loop
              env counter ~outputs (false,graph,state,dt) in
 
          begin
-           match needs_backtrack with
-           | Some p ->
-              perturbate_with_backtrack ~outputs env counter graph' state' p
-           | None ->
+           if needs_backtrack then
+             perturbate_with_backtrack
+               ~outputs env counter graph' state' state'.stopping_times
+           else
              (*set time for apply rule *)
              let () =
                let outputs counter' time =
                  let cand = observables_values
                      env graph' (Counter.fake_time counter' time) in
                  if Array.length cand > 1 then outputs (Data.Plot cand) in
-               Counter.fill ~outputs counter ~dt in
+               Counter.fill ~outputs counter ~dt:dt' in
               let continue = Counter.one_time_advance counter dt' in
 
               if (not continue) || stop then (true,graph',state') else
