@@ -386,7 +386,7 @@ let rec perturbate_until_first_backtrack
                     if state.perturbations_alive.(pe) then
                       List_util.merge_uniq compare_stops [((Nbr.add ti n),pe)] tail
                     else tail in
-                let () = state.stopping_times <- tail' in
+                let () = state'.stopping_times <- tail' in
                 let () = state'.perturbations_not_done_yet.(pe) <- true in
                 (* Argument to reset only pe and not all perts is "if
                    you're not backtracking, nothing depends upon
@@ -420,8 +420,8 @@ let perturbate_with_backtrack ~outputs env counter graph state = function
       let stop,graph',state' =
         perturbate ~outputs ~is_alarm:true env counter graph state [pe] in
       let () =
-        Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
-          state.perturbations_not_done_yet in
+        Array.iteri (fun i _ -> state'.perturbations_not_done_yet.(i) <- true)
+          state'.perturbations_not_done_yet in
       (stop,graph',state')
     else (true,graph,state)
 
@@ -459,27 +459,26 @@ let a_loop
       match state.stopping_times with
       | (ti,_) :: _
         when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
-
-         let (stop,graph',state',dt',needs_backtrack) =
+        let (stop,graph',state',dt',needs_backtrack) =
            perturbate_until_first_backtrack
              env counter ~outputs (false,graph,state,dt) in
 
-         begin
-           if needs_backtrack then
-             perturbate_with_backtrack
-               ~outputs env counter graph' state' state'.stopping_times
-           else
-             (*set time for apply rule *)
-             let () =
-               let outputs counter' time =
-                 let cand = observables_values
-                     env graph' (Counter.fake_time counter' time) in
-                 if Array.length cand > 1 then outputs (Data.Plot cand) in
-               Counter.fill ~outputs counter ~dt:dt' in
-              let continue = Counter.one_time_advance counter dt' in
+        begin
+          if needs_backtrack then
+            perturbate_with_backtrack
+              ~outputs env counter graph' state' state'.stopping_times
+          else
+            (*set time for apply rule *)
+            let () =
+              let outputs counter' time =
+                let cand = observables_values
+                    env graph' (Counter.fake_time counter' time) in
+                if Array.length cand > 1 then outputs (Data.Plot cand) in
+              Counter.fill ~outputs counter ~dt:dt' in
+            let continue = Counter.one_time_advance counter dt' in
 
-              if (not continue) || stop then (true,graph',state') else
-                one_rule ~outputs ~maxConsecutiveClash env counter graph' state'
+            if (not continue) || stop then (true,graph',state') else
+              one_rule ~outputs ~maxConsecutiveClash env counter graph' state'
          end
 
       | _ ->

@@ -341,11 +341,11 @@ let to_plot_points counter dt =
             if check_output_time counter time then time::acc else acc)
          ((float_of_int next) *. dT,[]) n),counter
   | DE _ ->
-    if n>1 then
+    if n=1 then [counter.time],counter
+    else if n=0 then [],counter
+    else
       invalid_arg
         ("Counter.to_plot_points: invalid increment "^string_of_int n)
-    else
-      (if n <> 0 then [counter.time] else []),counter
 
 let fill ~outputs counter ~dt =
   let points, counter' = to_plot_points counter dt in
