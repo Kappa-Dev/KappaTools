@@ -140,7 +140,7 @@ let get_pack_from_marshalizedfile
     exit 1
 
 let get_compilation_from_pack
-    ~warning ?(unit=Kasim_args.Time) cli_args pack =
+    ~warning ?(unit=Kasim_args.Time) kasim_args cli_args pack =
     let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
          formatCflows, cflowFile, init_l),
         alg_overwrite,overwrite_t0 = pack in
@@ -170,7 +170,8 @@ let get_compilation_from_pack
   let counter =
     Counter.create ~init_t ?init_e ?max_time ?max_event ~plot_period in
   let env =
-    if cli_args.Run_cli_args.batchmode then
+    if cli_args.Run_cli_args.batchmode &&
+       kasim_args.Kasim_args.marshalizeOutFile = None then
       Model.propagate_constant
         ~warning ?max_time:(Counter.max_time counter)
         ?max_events:(Counter.max_events counter) updated_vars alg_overwrite env0
@@ -187,7 +188,7 @@ let get_compilation_from_preprocessed_ast
       ~kasim_args ~max_sharing ?bwd_bisim ~compileModeOn
       preprocessed
     in
-    get_compilation_from_pack ~warning ~unit cli_args pack
+    get_compilation_from_pack ~warning ~unit kasim_args cli_args pack
 
 let get_compilation
     ~warning ?(unit=Kasim_args.Time) ?(max_sharing=false) ?bwd_bisim
@@ -203,4 +204,4 @@ let get_compilation
        | marshalized_file ->
          get_pack_from_marshalizedfile
            ~warning kasim_args cli_args marshalized_file in
-     get_compilation_from_pack ~warning ~unit cli_args pack
+     get_compilation_from_pack ~warning ~unit kasim_args cli_args pack
