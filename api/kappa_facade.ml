@@ -108,7 +108,7 @@ let reinitialize ~outputs random_state t =
   t.graph <- Rule_interpreter.empty
       ~outputs ~with_trace:false
       random_state t.env t.counter;
-  t.state <- State_interpreter.empty ~with_delta_activities:false t.env []
+  t.state <- State_interpreter.empty ~with_delta_activities:false t.env
 
 let catch_error : 'a . (Api_types_t.errors -> 'a) -> exn -> 'a =
   fun handler ->
@@ -245,7 +245,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                   ~graph:(Rule_interpreter.empty
                             ~outputs ~with_trace
                             random_state env counter)
-                  ~state:(State_interpreter.empty ~with_delta_activities:false env [])
+                  ~state:(State_interpreter.empty ~with_delta_activities:false env)
                   ~init_l ~lastyield
               in
               Lwt.return (Result_util.ok simulation))
