@@ -43,15 +43,8 @@ let panel_heading =
          Html.Unsafe.string_attrib "role" "group" ; ]
     (Menu_editor_file.content ())
   in
-  let menu_editor_simulation_content :
-    [> Html_types.div ] Tyxml_js.Html5.elt =
-    Html.div
-      ~a:[ Html.a_class [ "btn-group" ] ;
-           Html.Unsafe.string_attrib "role" "group" ; ]
-      (Menu_editor_simulation.content ()) in
   let buttons =
     menu_editor_file_content ::
-    menu_editor_simulation_content ::
        [toggle_button] in
   [%html {|<div class="row">
              <div id="|}panel_heading_group_id{|" class="col-md-10 btn-group">|} buttons{|</div>
@@ -140,7 +133,6 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
 
 let onload () : unit =
   let () = Menu_editor_file.onload () in
-  let () = Menu_editor_simulation.onload () in
   let lint_config =
     Codemirror.create_lint_configuration () in
   let () = lint_config##.getAnnotations := setup_lint in

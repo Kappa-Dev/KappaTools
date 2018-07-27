@@ -1,16 +1,17 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2018 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
 module Html = Tyxml_js.Html5
-
-let simulation_options_modal_id = "simulation_options_modal"
-
 let configuration_seed_input_id = "simulation_seed_input"
+let preferences_modal_id = "preferences_modal"
+
+let preferences_button =
+  Html.a [ Html.pcdata "Preferences" ]
 
 let option_seed_input =
   Html.input ~a:[
@@ -37,53 +38,68 @@ let increase_font =
     Html.a_class [ "btn"; "btn-default"; "btn-lg" ]
   ] [Html.pcdata "+"]
 
-let options_modal =
-  Ui_common.create_modal
-    ~id:simulation_options_modal_id
-    ~title_label:"Simulation Configuration"
-    ~body:[%html
-            {|<div class="row">
-                   <div class="col-md-1"><label for="|}configuration_seed_input_id{|">Seed</label></div>
-                   <div class="col-md-5">|}[option_seed_input]{|</div>
-              </div>
-              <div class="row">
-                <div class="col-md-offset-1 col-md-5 checkbox">
-                  <label>|}[option_withtrace]{|Store trace</label>
-                </div>
-              </div>
-              <div class="row">
-                   <div class="col-md-1"><label>Font size</label></div>
-                   <div class="col-md-5">|}[decrease_font; increase_font]{|</div>
-</div>|}]
-    ~submit_label:"Save"
-    ~submit:
-      (Dom_html.handler
-         (fun (_ : Dom_html.event Js.t)  ->
-            let input : Dom_html.inputElement Js.t =
-              Tyxml_js.To_dom.of_input option_seed_input in
-            let value : string = Js.to_string input##.value in
-            let model_seed =
-              try Some (int_of_string value) with Failure _ -> None in
-            let () = State_project.set_seed model_seed in
-            let () = State_project.set_store_trace
-                (Js.to_bool
-                   (Tyxml_js.To_dom.of_input option_withtrace)##.checked) in
-            let () =
-              Common.modal
-                ~id:("#"^simulation_options_modal_id)
-                ~action:"hide"
-            in
-            Js._false))
 
-let options =
+let%html bodies =
+  {|<div class="row">
+    <div class="col-md-1"><label for="|}configuration_seed_input_id{|">Seed</label></div>
+    <div class="col-md-5">|}[option_seed_input]{|</div>
+    </div>
+    <div class="row">
+    <div class="col-md-offset-1 col-md-5 checkbox"><label>|}
+    [option_withtrace]{|Store trace
+    </label></div>
+    </div>
+    <div class="row">
+    <div class="col-md-1"><label>Font size</label></div>
+    <div class="col-md-5">|}[decrease_font; increase_font]{|</div>
+    </div>|}
+
+let set_button =
   Html.button
-    ~a:[ Html.Unsafe.string_attrib "type" "button"
-       ; Html.a_class ["btn"; "btn-default" ] ]
-    [ Html.cdata "Simulation options" ]
+    ~a:[ Html.a_button_type `Submit;
+         Html.a_class [ "btn"; "btn-primary" ] ]
+    [ Html.pcdata "Set" ]
 
-let content () =
-  [ options ; options_modal]
+let save_button =
+  Html.button
+    ~a:[ Html.a_button_type `Button;
+         Html.a_class [ "btn"; "btn-default" ] ]
+    [ Html.pcdata "Save as default" ]
 
+let modal =
+  let head = Html.div
+      ~a:[ Html.a_class [ "modal-header" ] ]
+      [ Html.button
+          ~a:[ Html.a_button_type `Button;
+               Html.a_class [ "close" ];
+               Html.a_user_data "dismiss" "modal" ]
+          [ Html.entity "times" ];
+        Html.h4 ~a:[ Html.a_class ["modal-title"] ] [ Html.pcdata "Preferences" ]
+      ] in
+  let body = Html.div
+      ~a:[ Html.a_class [ "modal-body" ] ]
+      bodies in
+  let foot = Html.div
+      ~a:[ Html.a_class [ "modal-footer" ] ]
+      [ set_button; save_button;
+        Html.button
+          ~a:[ Html.a_button_type `Button;
+               Html.a_class [ "btn"; "btn-default" ];
+               Html.a_user_data "dismiss" "modal" ]
+          [ Html.pcdata "Close" ] ] in
+  Html.form ~a:[ Html.a_class [ "modal-content" ] ] [head; body; foot]
+
+let content () = [
+  preferences_button;
+  Html.div
+    ~a:[ Html.a_class [ "modal"; "fade" ];
+         Html.a_id preferences_modal_id;
+         Html.a_role [ "dialog" ];
+         Html.a_tabindex (-1)]
+    [ Html.div
+        ~a:[ Html.a_class [ "modal-dialog" ]; Html.a_role [ "document" ] ]
+        [ modal ] ]
+]
 
 let fontSizeParamId = Js.string "kappappFontSize"
 let initFontSize () =
@@ -104,7 +120,26 @@ let setFontSize v =
 
 let onload () =
   let () =
-    (Tyxml_js.To_dom.of_button options)##.onclick :=
+    (Tyxml_js.To_dom.of_form modal)##.onsubmit :=
+      Dom_html.handler
+        (fun (_ : Dom_html.event Js.t)  ->
+           let input : Dom_html.inputElement Js.t =
+             Tyxml_js.To_dom.of_input option_seed_input in
+           let value : string = Js.to_string input##.value in
+           let model_seed =
+             try Some (int_of_string value) with Failure _ -> None in
+           let () = State_project.set_seed model_seed in
+           let () = State_project.set_store_trace
+               (Js.to_bool
+                  (Tyxml_js.To_dom.of_input option_withtrace)##.checked) in
+           let () =
+             Common.modal
+               ~id:("#"^preferences_modal_id)
+               ~action:"hide"
+           in
+           Js._false) in
+  let () =
+    (Tyxml_js.To_dom.of_a preferences_button)##.onclick :=
       Dom_html.handler
         (fun _  ->
            let input : Dom_html.inputElement Js.t =
@@ -116,10 +151,11 @@ let onload () =
                  | Some model_seed -> string_of_int model_seed) in
            let () =
              Common.modal
-               ~id:("#"^simulation_options_modal_id)
+               ~id:("#"^preferences_modal_id)
                ~action:"show"
            in
            Js._false) in
+
   let currentFontSize = ref (initFontSize ()) in
   let () = setFontSize !currentFontSize in
   let () =
