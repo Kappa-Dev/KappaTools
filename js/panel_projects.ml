@@ -21,9 +21,6 @@ let project_id_input =
 let li_new =
   Html.li [ Html.a [ Html.cdata "New project" ]]
 
-let li_settings =
-  Html.li (Menu_editor_settings.content ())
-
 let li_prefs =
   Html.li (Modal_preferences.content ())
 
@@ -77,7 +74,7 @@ let content () =
                                 Js._true) in
                        Html.li ~a:[ Html.a_class li_class ] [a_project])
                     model.State_project.model_catalog in
-                List.rev_append acc [li_new; li_settings; li_prefs])
+                List.rev_append acc [li_new; li_prefs])
              State_project.model));
      Ui_common.create_modal
        ~id:project_id_modal_id
@@ -100,7 +97,6 @@ let content () =
     ]
 
 let onload () =
-  let () = Menu_editor_settings.onload () in
   let () = Modal_preferences.onload () in
   let () = (Tyxml_js.To_dom.of_span li_new)##.onclick :=
       Dom.handler
