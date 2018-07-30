@@ -98,6 +98,14 @@ let content () =
 
 let onload () =
   let () = Modal_preferences.onload () in
+  let () =
+    Common.jquery_on
+      ("#"^project_id_modal_id)
+      "shown.bs.modal"
+      (Dom_html.handler
+         (fun _ ->
+           let () = project_id_input_dom##focus in
+           Js._false)) in
   let () = (Tyxml_js.To_dom.of_span li_new)##.onclick :=
       Dom.handler
         (fun _ ->
