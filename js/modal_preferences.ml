@@ -64,7 +64,7 @@ let backend_select =
 
 let%html bodies =
   {|
-    <h5>Application</h5>
+    <h4>Application</h4>
     <div class="form-group">
     <label class="col-md-2">Font size</label>
     <div class="col-md-5">|}[decrease_font; increase_font]{|</div>
@@ -73,7 +73,7 @@ let%html bodies =
     <label class="col-md-2">Backend for new projects</label>
     <div class="col-md-5">|}[backend_select]{|</div>
     </div>
-    <h5>Project</h5>
+    <h4>Project</h4>
     <div class="form-group">
     <label class="col-md-2" for="|}configuration_seed_input_id{|">Seed</label>
     <div class="col-md-5">|}[option_seed_input]{|</div>
@@ -83,7 +83,7 @@ let%html bodies =
     [option_withtrace]{|Store trace
     </label></div>
     </div>
-    <h5>HTTPS backend</h5>
+    <h4>HTTPS backend</h4>
     <div class="form-group">
     <label class="col-md-2" for="|}settings_client_id_input_id{|">Client id</label>
     <div class="col-md-5">|}[settings_client_id_input]{|</div>
@@ -93,7 +93,7 @@ let%html bodies =
     [option_http_synch]{|Auto synch
     </label></div>
     </div>
-    <h5>Static analyses</h5>
+    <h4>Static analyses</h4>
 |}
 
 let set_button =
