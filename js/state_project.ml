@@ -8,6 +8,12 @@
 
 open Lwt.Infix
 
+
+let plotPeriodParamId = Js.string "kappappPlotPeriod"
+let pauseConditionParamId = Js.string "kappappPauseCondition"
+let seedParamId = Js.string "kappappDefaultSeed"
+let storeTraceParamId = Js.string "kappappStoreTrace"
+
 type parameters = {
   plot_period : float;
   pause_condition : string;
@@ -48,6 +54,7 @@ let catalog_equal x y =
 let state_equal a b =
   Option_util.equal project_equal a.project_current b.project_current &&
   a.project_version = b.project_version &&
+  a.default_parameters = b.default_parameters &&
   Mods.StringMap.equal
     (fun x y  -> compare x y = 0)
     a.project_parameters b.project_parameters &&
@@ -64,7 +71,7 @@ let model_equal a b =
   a.model_project_version = b.model_project_version &&
   a.model_parameters = b.model_parameters
 
-let default_parameters = {
+let init_default_parameters = {
   plot_period = 1.;
   pause_condition = "[false]";
   seed = None;
@@ -76,7 +83,7 @@ let state , set_state =
     project_current = None;
     project_catalog = [];
     project_version = -1;
-    default_parameters;
+    default_parameters = init_default_parameters;
     project_parameters = Mods.StringMap.empty;
   }
 
@@ -84,7 +91,8 @@ let update_parameters handler =
   let st = React.S.value state in
   let default_parameters,project_parameters =
     match st.project_current with
-    | None -> handler st.default_parameters, st.project_parameters
+    | None ->
+      handler st.default_parameters, st.project_parameters
     | Some proj ->
       st.default_parameters,
       Mods.StringMap.add proj.project_id
@@ -96,6 +104,39 @@ let update_parameters handler =
     project_catalog = st.project_catalog;
     project_version = st.project_version;
     default_parameters; project_parameters;
+  }
+
+let set_parameters_as_default () =
+  let st = React.S.value state in
+  let pa =
+    match st.project_current with
+    | None -> st.default_parameters
+    | Some proj ->
+      Mods.StringMap.find_default
+        st.default_parameters proj.project_id st.project_parameters in
+  let () = Js.Optdef.iter
+      Dom_html.window##.localStorage
+      (fun ls ->
+         let () = ls##setItem
+             plotPeriodParamId (Js.string (string_of_float pa.plot_period)) in
+         let () = ls##setItem
+             pauseConditionParamId (Js.string pa.pause_condition) in
+         let () =
+           match pa.seed with
+           | None -> ls##removeItem seedParamId
+           | Some va ->
+             ls##setItem seedParamId (Js.string (string_of_int va)) in
+         let () =
+           if pa.store_trace then
+             ls##setItem storeTraceParamId (Js.string "true")
+           else ls##removeItem storeTraceParamId in
+         ()) in
+  set_state {
+    project_current = st.project_current;
+    project_catalog = st.project_catalog;
+    project_version = st.project_version;
+    project_parameters = st.project_parameters;
+    default_parameters = pa;
   }
 
 let set_plot_period plot_period =
@@ -140,31 +181,31 @@ let computing_watcher manager setter =
   cancelled
 
 let add_project is_new project_id : unit Api.result Lwt.t =
-  let catalog = (React.S.value state).project_catalog in
+  let state_va = React.S.value state in
+  let catalog = state_va.project_catalog in
   (try
      Lwt.return (Api_common.result_ok
                    (List.find (fun x -> x.project_id = project_id) catalog,
                     catalog,
-                   (React.S.value state).project_parameters))
+                    state_va.project_parameters))
    with Not_found ->
      State_runtime.create_manager ~is_new project_id >>=
-     (Api_common.result_bind_lwt
-        ~ok:(fun project_manager ->
-            let project_is_computing, set_computes = React.S.create true in
-            let project_watcher_cancel =
-              computing_watcher project_manager (set_computes ?step:None) in
-            let me = {project_id; project_manager;
+     Api_common.result_bind_lwt
+       ~ok:(fun project_manager ->
+           let project_is_computing, set_computes = React.S.create true in
+           let project_watcher_cancel =
+             computing_watcher project_manager (set_computes ?step:None) in
+           let me = { project_id; project_manager;
                       project_is_computing; project_watcher_cancel } in
-            let default_parameters =
-              (React.S.value state).default_parameters in
-            let params =
-              Mods.StringMap.add project_id default_parameters
-                (React.S.value state).project_parameters in
-            Lwt.return
-              (Api_common.result_ok (me,me::catalog,params))))) >>=
+           let default_parameters = state_va.default_parameters in
+           let params =
+             Mods.StringMap.add
+               project_id default_parameters state_va.project_parameters in
+           Lwt.return
+             (Api_common.result_ok (me,me::catalog,params)))) >>=
   Api_common.result_bind_lwt
     ~ok:(fun (me,catalog,params) ->
-        update_state me catalog default_parameters params)
+        update_state me catalog state_va.default_parameters params)
 
 let create_project project_id = add_project true project_id
 let set_project project_id = add_project false project_id
@@ -173,7 +214,7 @@ let dummy_model = {
   model_current_id = None;
   model_catalog = [];
   model_project_version = -1;
-  model_parameters = default_parameters;
+  model_parameters = init_default_parameters;
 }
 
 let model : model React.signal =
@@ -290,14 +331,56 @@ let rec init_model_seed (arg : string list) : unit =
       let () = Common.debug (Js.string msg) in
       init_model_seed t
 
+let init_store_trace (arg : string list) : unit =
+  match arg with
+  | [] -> ()
+  | h::_ -> set_store_trace (h <> "false")
+
 let init existing_projects : unit Lwt.t =
-  let arg_plot_period = Common_state.url_args "plot_period" in
+  let arg_plot_period =
+    let default =
+      Js.Optdef.case
+        Dom_html.window##.localStorage
+        (fun () -> [])
+        (fun st ->
+           Js.Opt.case
+             (st##getItem plotPeriodParamId)
+             (fun () -> []) (fun x -> [Js.to_string x])) in
+    Common_state.url_args ~default "plot_period" in
   let arg_pause_condition =
-    Common_state.url_args ~default:["[T] > 100"] "pause_condition" in
-  let arg_model_seed = Common_state.url_args "model_seed" in
+    let default =
+      Js.Optdef.case
+        Dom_html.window##.localStorage
+        (fun () -> [])
+        (fun st ->
+           Js.Opt.case
+             (st##getItem pauseConditionParamId)
+             (fun () -> []) (fun x -> [Js.to_string x])) in
+    Common_state.url_args ~default "pause_condition" in
+  let arg_model_seed =
+        let default =
+      Js.Optdef.case
+        Dom_html.window##.localStorage
+        (fun () -> [])
+        (fun st ->
+           Js.Opt.case
+             (st##getItem seedParamId)
+             (fun () -> []) (fun x -> [Js.to_string x])) in
+        Common_state.url_args ~default "model_seed" in
+  let arg_store_trace =
+        let default =
+      Js.Optdef.case
+        Dom_html.window##.localStorage
+        (fun () -> [])
+        (fun st ->
+           Js.Opt.case
+             (st##getItem storeTraceParamId)
+             (fun () -> []) (fun x -> [Js.to_string x])) in
+        Common_state.url_args ~default "store_trace" in
   let () = init_plot_period arg_plot_period in
   let () = init_pause_condition arg_pause_condition in
   let () = init_model_seed arg_model_seed in
+  let () = init_store_trace arg_store_trace in
 
   let projects = Common_state.url_args ~default:["default"] "project" in
   let rec add_projects projects : unit Lwt.t =
@@ -316,7 +399,8 @@ let init existing_projects : unit Lwt.t =
                 project
                 (Api_types_j.string_of_errors errors)
             in
-            let () = Common.debug (Js.string (Format.sprintf "State_project.init 2 : %s" msg)) in
+            let () = Common.debug
+                (Js.string (Format.sprintf "State_project.init 2 : %s" msg)) in
             add_projects projects)
   in
   add_projects existing_projects >>= fun () -> add_projects projects

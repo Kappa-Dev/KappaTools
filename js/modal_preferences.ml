@@ -165,15 +165,13 @@ let set_action () =
   let () =
     Panel_projects_controller.set_manager
       (Js.to_string (Tyxml_js.To_dom.of_select backend_select)##.value) in
-
-  let () =
-    Common.modal ~id:("#"^preferences_modal_id) ~action:"hide" in
   ()
 
 let set_and_save_action () =
   let () = set_action () in
 
   let () = State_settings.storeFontSize () in
+  let () = State_project.set_parameters_as_default () in
 
   ()
 
@@ -181,7 +179,11 @@ let onload () =
   let () =
     (Tyxml_js.To_dom.of_form modal)##.onsubmit :=
       Dom_html.handler
-        (fun (_: Dom_html.event Js.t) -> let () = set_action () in Js._false) in
+        (fun (_: Dom_html.event Js.t) ->
+           let () =
+             Common.modal ~id:("#"^preferences_modal_id) ~action:"hide" in
+           let () = set_action () in
+           Js._false) in
   let () =
     (Tyxml_js.To_dom.of_button save_button)##.onclick :=
       Dom_html.handler

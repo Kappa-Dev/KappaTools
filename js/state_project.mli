@@ -33,6 +33,7 @@ val set_plot_period : float -> unit
 val set_pause_condition : string -> unit
 val set_seed : int option -> unit
 val set_store_trace : bool -> unit
+val set_parameters_as_default : unit -> unit
 
 val set_project : string -> unit Api.result Lwt.t
 
