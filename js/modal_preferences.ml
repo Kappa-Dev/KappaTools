@@ -21,13 +21,7 @@ let option_seed_input =
     Html.a_class ["form-control"];
   ] ()
 let option_withtrace =
-  Html.input ~a:[
-    Html.a_input_type `Checkbox;
-    Tyxml_js.R.filter_attrib (Html.a_checked ())
-      (React.S.map
-         (fun s -> s.State_project.model_parameters.State_project.store_trace)
-         State_project.model);
-  ] ()
+  Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 let decrease_font =
   Html.button ~a:[
     Html.a_button_type `Button;
@@ -51,11 +45,7 @@ let settings_client_id_input =
 let settings_client_id_input_dom =
   Tyxml_js.To_dom.of_input settings_client_id_input
 
-let option_http_synch =
-  Html.input
-    ~a:[ Html.a_input_type `Checkbox;
-         Tyxml_js.R.filter_attrib (Html.a_checked ()) State_settings.synch]
-    ()
+let option_http_synch = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 
 let dropdown (model : State_runtime.model) =
   let current_id = State_runtime.spec_id  model.State_runtime.model_current in
@@ -74,7 +64,7 @@ let backend_select =
 
 let%html bodies =
   {|
-    <h3>Application</h3>
+    <h5>Application</h5>
     <div class="form-group">
     <label class="col-md-2">Font size</label>
     <div class="col-md-5">|}[decrease_font; increase_font]{|</div>
@@ -83,7 +73,7 @@ let%html bodies =
     <label class="col-md-2">Backend for new projects</label>
     <div class="col-md-5">|}[backend_select]{|</div>
     </div>
-    <h3>Project</h3>
+    <h5>Project</h5>
     <div class="form-group">
     <label class="col-md-2" for="|}configuration_seed_input_id{|">Seed</label>
     <div class="col-md-5">|}[option_seed_input]{|</div>
@@ -93,7 +83,7 @@ let%html bodies =
     [option_withtrace]{|Store trace
     </label></div>
     </div>
-    <h3>HTTPS backend</h3>
+    <h5>HTTPS backend</h5>
     <div class="form-group">
     <label class="col-md-2" for="|}settings_client_id_input_id{|">Client id</label>
     <div class="col-md-5">|}[settings_client_id_input]{|</div>
@@ -102,7 +92,9 @@ let%html bodies =
     <div class="col-md-offset-2 col-md-5 checkbox"><label>|}
     [option_http_synch]{|Auto synch
     </label></div>
-    </div>|}
+    </div>
+    <h5>Static analyses</h5>
+|}
 
 let set_button =
   Html.button
@@ -208,16 +200,32 @@ let onload () =
     (Tyxml_js.To_dom.of_a preferences_button)##.onclick :=
       Dom_html.handler
         (fun _  ->
+           let sp = React.S.value State_project.model in
            let () =
              settings_client_id_input_dom##.value :=
                Js.string (State_settings.get_client_id ()) in
 
            let input = Tyxml_js.To_dom.of_input option_seed_input in
            let () = input##.value := Js.string
-                 (match (React.S.value State_project.model).
-                          State_project.model_parameters.State_project.seed with
-                 | None -> ""
-                 | Some model_seed -> string_of_int model_seed) in
+                 (match sp.State_project.model_parameters.State_project.seed with
+                  | None -> ""
+                  | Some model_seed -> string_of_int model_seed) in
+
+           let () =
+             (Tyxml_js.To_dom.of_input option_withtrace)##.checked :=
+               Js.bool
+                 sp.State_project.model_parameters.State_project.store_trace in
+
+           let () =
+             (Tyxml_js.To_dom.of_input option_http_synch)##.checked :=
+               Js.bool (React.S.value State_settings.synch) in
+           let () =
+             (Tyxml_js.To_dom.of_select backend_select)##.value :=
+               Js.string
+                 (State_runtime.spec_id
+                    (React.S.value State_runtime.model)
+                    .State_runtime.model_current) in
+
 
            let () =
              Common.modal ~id:("#"^preferences_modal_id) ~action:"show" in
