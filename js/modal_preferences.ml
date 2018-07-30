@@ -145,57 +145,47 @@ let content () = [
         [ modal ] ]
 ]
 
-let fontSizeParamId = Js.string "kappappFontSize"
-let initFontSize () =
-  Js.Optdef.case
-    Dom_html.window##.localStorage
-    (fun () -> 1.4)
-    (fun st ->
-       Js.Opt.case (st##getItem fontSizeParamId) (fun () -> 1.4) Js.parseFloat)
+let set_action () =
+  let settings_client_id = Js.to_string settings_client_id_input_dom##.value in
+  let () = State_settings.set_client_id settings_client_id in
 
-let setFontSize v =
-  let v' = string_of_float v in
-  let () = Dom_html.document##.body##.style##.fontSize :=
-      Js.string (v'^"em") in
-  let () = Js.Optdef.iter
-      Dom_html.window##.localStorage
-      (fun st -> st##setItem fontSizeParamId (Js.string v')) in
+  let synch_checkbox_dom = Tyxml_js.To_dom.of_input option_http_synch in
+  let is_checked = Js.to_bool (synch_checkbox_dom##.checked) in
+  let () = State_settings.set_synch is_checked in
+
+  let input = Tyxml_js.To_dom.of_input option_seed_input in
+  let value : string = Js.to_string input##.value in
+  let model_seed =
+    try Some (int_of_string value) with Failure _ -> None in
+  let () = State_project.set_seed model_seed in
+
+  let () = State_project.set_store_trace
+      (Js.to_bool (Tyxml_js.To_dom.of_input option_withtrace)##.checked) in
+
+  let () =
+    Panel_projects_controller.set_manager
+      (Js.to_string (Tyxml_js.To_dom.of_select backend_select)##.value) in
+
+  let () =
+    Common.modal ~id:("#"^preferences_modal_id) ~action:"hide" in
+  ()
+
+let set_and_save_action () =
+  let () = set_action () in
+
+  let () = State_settings.storeFontSize () in
+
   ()
 
 let onload () =
   let () =
     (Tyxml_js.To_dom.of_form modal)##.onsubmit :=
       Dom_html.handler
-        (fun (_ : Dom_html.event Js.t)  ->
-           let settings_client_id =
-             Js.to_string settings_client_id_input_dom##.value in
-           let () = State_settings.set_client_id settings_client_id in
-
-           let synch_checkbox_dom =
-             Tyxml_js.To_dom.of_input option_http_synch in
-           let is_checked = Js.to_bool (synch_checkbox_dom##.checked) in
-           let () = State_settings.set_synch is_checked in
-
-           let input : Dom_html.inputElement Js.t =
-             Tyxml_js.To_dom.of_input option_seed_input in
-           let value : string = Js.to_string input##.value in
-           let model_seed =
-             try Some (int_of_string value) with Failure _ -> None in
-           let () = State_project.set_seed model_seed in
-
-           let () = State_project.set_store_trace
-               (Js.to_bool
-                  (Tyxml_js.To_dom.of_input option_withtrace)##.checked) in
-
-           let () =
-             Panel_projects_controller.set_manager
-               (Js.to_string
-                  (Tyxml_js.To_dom.of_select backend_select)##.value) in
-
-           let () =
-             Common.modal ~id:("#"^preferences_modal_id) ~action:"hide" in
-
-           Js._false) in
+        (fun (_: Dom_html.event Js.t) -> let () = set_action () in Js._false) in
+  let () =
+    (Tyxml_js.To_dom.of_button save_button)##.onclick :=
+      Dom_html.handler
+        (fun _  -> let () = set_and_save_action () in Js._false) in
   let () =
     (Tyxml_js.To_dom.of_a preferences_button)##.onclick :=
       Dom_html.handler
@@ -226,7 +216,6 @@ let onload () =
                     (React.S.value State_runtime.model)
                     .State_runtime.model_current) in
 
-
            let () =
              Common.modal ~id:("#"^preferences_modal_id) ~action:"show" in
 
@@ -240,22 +229,17 @@ let onload () =
            ReactiveData.RList.set backend_handle (dropdown list_t) in
          React.S.const ()) in
 
-  let currentFontSize = ref (initFontSize ()) in
-  let () = setFontSize !currentFontSize in
+  let () = State_settings.updateFontSize ~delta:0. in
   let () =
     (Tyxml_js.To_dom.of_button increase_font)##.onclick :=
       Dom_html.handler
         (fun _ ->
-           let () = currentFontSize :=
-               min 3. (!currentFontSize +. 0.2) in
-           let () = setFontSize !currentFontSize in
+           let () = State_settings.updateFontSize ~delta:0.2 in
            Js._false) in
   let () =
     (Tyxml_js.To_dom.of_button decrease_font)##.onclick :=
       Dom_html.handler
         (fun _ ->
-           let () = currentFontSize :=
-               max 0.2 (!currentFontSize -. 0.2) in
-           let () = setFontSize !currentFontSize in
+           let () = State_settings.updateFontSize ~delta:(-0.2) in
            Js._false) in
   ()
