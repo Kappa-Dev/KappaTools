@@ -170,7 +170,7 @@ let set_action () =
 let set_and_save_action () =
   let () = set_action () in
 
-  let () = State_settings.storeFontSize () in
+  let () = State_settings.set_parameters_as_default () in
   let () = State_project.set_parameters_as_default () in
 
   ()
