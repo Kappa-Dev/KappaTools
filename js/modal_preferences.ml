@@ -22,6 +22,10 @@ let option_seed_input =
   ] ()
 let option_withtrace =
   Html.input ~a:[ Html.a_input_type `Checkbox ] ()
+let option_withdeadrules =
+  Html.input ~a:[ Html.a_input_type `Checkbox ] ()
+let option_withirreversible =
+  Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 let decrease_font =
   Html.button ~a:[
     Html.a_button_type `Button;
@@ -94,6 +98,16 @@ let%html bodies =
     </label></div>
     </div>
     <h4>Static analyses</h4>
+    <div class="form-group">
+    <div class="col-md-offset-2 col-md-5 checkbox"><label>|}
+    [option_withdeadrules]{|Show dead rules
+    </label></div>
+    </div>
+    <div class="form-group">
+    <div class="col-md-offset-2 col-md-5 checkbox"><label>|}
+    [option_withirreversible]{|Show non weakly reversible transitions
+    </label></div>
+    </div>
 |}
 
 let set_button =
@@ -161,6 +175,10 @@ let set_action () =
 
   let () = State_project.set_store_trace
       (Js.to_bool (Tyxml_js.To_dom.of_input option_withtrace)##.checked) in
+  let () = State_project.set_show_dead_rules
+      (Js.to_bool (Tyxml_js.To_dom.of_input option_withdeadrules)##.checked) in
+  let () = State_project.set_show_non_weakly_reversible_transitions
+      (Js.to_bool (Tyxml_js.To_dom.of_input option_withirreversible)##.checked) in
 
   let () =
     Panel_projects_controller.set_manager
@@ -207,6 +225,16 @@ let onload () =
              (Tyxml_js.To_dom.of_input option_withtrace)##.checked :=
                Js.bool
                  sp.State_project.model_parameters.State_project.store_trace in
+           let () =
+             (Tyxml_js.To_dom.of_input option_withdeadrules)##.checked :=
+               Js.bool
+                 sp.State_project.model_parameters.State_project.show_dead_rules
+           in
+           let () =
+             (Tyxml_js.To_dom.of_input option_withirreversible)##.checked :=
+               Js.bool
+                 sp.State_project.model_parameters.
+                   State_project.show_non_weakly_reversible_transitions in
 
            let () =
              (Tyxml_js.To_dom.of_input option_http_synch)##.checked :=

@@ -13,12 +13,17 @@ let plotPeriodParamId = Js.string "kappappPlotPeriod"
 let pauseConditionParamId = Js.string "kappappPauseCondition"
 let seedParamId = Js.string "kappappDefaultSeed"
 let storeTraceParamId = Js.string "kappappStoreTrace"
+let showDeadRulesParamId = Js.string "kappappShowDeadRules"
+let showIrreversibleTransitionsParamId =
+  Js.string "kappappShowIrreversibleTransition"
 
 type parameters = {
   plot_period : float;
   pause_condition : string;
   seed : int option;
   store_trace : bool;
+  show_dead_rules : bool;
+  show_non_weakly_reversible_transitions : bool;
 }
 
 type a_project = {
@@ -76,6 +81,8 @@ let init_default_parameters = {
   pause_condition = "[false]";
   seed = None;
   store_trace = false;
+  show_dead_rules = true;
+  show_non_weakly_reversible_transitions = false;
 }
 
 let state , set_state =
@@ -130,6 +137,14 @@ let set_parameters_as_default () =
            if pa.store_trace then
              ls##setItem storeTraceParamId (Js.string "true")
            else ls##removeItem storeTraceParamId in
+         let () =
+           if pa.show_dead_rules then
+             ls##setItem showDeadRulesParamId (Js.string "true")
+           else ls##removeItem showDeadRulesParamId in
+         let () =
+           if pa.show_non_weakly_reversible_transitions then
+             ls##setItem showIrreversibleTransitionsParamId (Js.string "true")
+           else ls##removeItem showIrreversibleTransitionsParamId in
          ()) in
   set_state {
     project_current = st.project_current;
@@ -147,6 +162,12 @@ let set_seed seed =
   update_parameters (fun param -> { param with seed })
 let set_store_trace store_trace =
   update_parameters (fun param -> { param with store_trace })
+let set_show_dead_rules show_dead_rules =
+  update_parameters (fun param -> { param with show_dead_rules })
+let set_show_non_weakly_reversible_transitions
+    show_non_weakly_reversible_transitions =
+  update_parameters
+    (fun param -> { param with show_non_weakly_reversible_transitions })
 
 let update_state me project_catalog default_parameters project_parameters =
     me.project_manager#project_parse [] >>=
@@ -336,6 +357,16 @@ let init_store_trace (arg : string list) : unit =
   | [] -> ()
   | h::_ -> set_store_trace (h <> "false")
 
+let init_show_dead_rules (arg : string list) : unit =
+  match arg with
+  | [] -> ()
+  | h::_ -> set_show_dead_rules (h <> "false")
+
+let init_show_non_weakly_reversible_transitions (arg : string list) : unit =
+  match arg with
+  | [] -> ()
+  | h::_ -> set_show_non_weakly_reversible_transitions (h <> "false")
+
 let init existing_projects : unit Lwt.t =
   let arg_plot_period =
     let default =
@@ -377,10 +408,33 @@ let init existing_projects : unit Lwt.t =
              (st##getItem storeTraceParamId)
              (fun () -> []) (fun x -> [Js.to_string x])) in
         Common_state.url_args ~default "store_trace" in
+  let arg_show_dead_rules =
+        let default =
+      Js.Optdef.case
+        Dom_html.window##.localStorage
+        (fun () -> [])
+        (fun st ->
+           Js.Opt.case
+             (st##getItem showDeadRulesParamId)
+             (fun () -> []) (fun x -> [Js.to_string x])) in
+        Common_state.url_args ~default "show_dead_rules" in
+  let arg_show_irreversible_transitions =
+        let default =
+      Js.Optdef.case
+        Dom_html.window##.localStorage
+        (fun () -> [])
+        (fun st ->
+           Js.Opt.case
+             (st##getItem showIrreversibleTransitionsParamId)
+             (fun () -> []) (fun x -> [Js.to_string x])) in
+        Common_state.url_args ~default "show_non_weakly_reversible_transitions" in
   let () = init_plot_period arg_plot_period in
   let () = init_pause_condition arg_pause_condition in
   let () = init_model_seed arg_model_seed in
   let () = init_store_trace arg_store_trace in
+  let () = init_show_dead_rules arg_show_dead_rules in
+  let () = init_show_non_weakly_reversible_transitions
+      arg_show_irreversible_transitions in
 
   let projects = Common_state.url_args ~default:["default"] "project" in
   let rec add_projects projects : unit Lwt.t =
