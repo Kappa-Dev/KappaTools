@@ -139,8 +139,7 @@ let () =
         counter =
       let warning ~pos msg = Outputs.go (Data.Warning (Some pos,msg)) in
       Cli_init.get_compilation
-        ~warning ~unit:kasim_args.Kasim_args.unit
-        ~max_sharing:kasim_args.Kasim_args.maxSharing
+        ~warning
         ~compileModeOn:kasim_args.Kasim_args.compileMode ~kasim_args cli_args in
     let () = if kasim_args.Kasim_args.showEfficiency then
         Format.printf " All that took %fs@." (Sys.time () -. cpu_time) in

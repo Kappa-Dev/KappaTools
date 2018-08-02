@@ -14,19 +14,23 @@ type preprocessed_ast =
   (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list option *
   float option
 
-let preprocess
-    ~warning ?(kasim_args=Kasim_args.default) cli_args ast =
+let preprocess ~warning ?kasim_args cli_args ast =
   let () = Format.printf "+ simulation parameters@." in
   let conf, progressConf,
       story_compression, formatCflow, cflowFile =
     Configuration.parse ast.Ast.configurations in
   let () = Format.printf "+ Sanity checks@." in
   let syntax_version = cli_args.Run_cli_args.syntaxVersion in
+  let var_overwrite,initialMix =
+    match kasim_args with
+    | None -> ([],None)
+    | Some kasim_args ->
+      (kasim_args.Kasim_args.alg_var_overwrite,kasim_args.Kasim_args.initialMix)
+  in
   let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
     LKappa_compiler.compil_of_ast
-      ~warning ~syntax_version
-      kasim_args.Kasim_args.alg_var_overwrite ast in
-  let overwrite_init,overwrite_t0 = match kasim_args.Kasim_args.initialMix with
+      ~warning ~syntax_version var_overwrite ast in
+  let overwrite_init,overwrite_t0 = match initialMix with
     | None -> None,None
     | Some file ->
       let compil =
@@ -67,9 +71,8 @@ let get_preprocessed_ast_from_cli_args
   in
   preprocess ~warning cli_args ~kasim_args ast
 
-let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
-    ~max_sharing ?bwd_bisim ~compileModeOn preprocessed_ast
-  =
+let get_pack_from_preprocessed_ast
+    ~kasim_args ?bwd_bisim ~compileModeOn preprocessed_ast =
   let conf, progressConf,
       story_compression, formatCflow, cflowFile,sigs_nd,contact_map,tk_nd,
       _alg_finder, updated_vars,result',overwrite_init,overwrite_t0
@@ -80,7 +83,8 @@ let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
   let (env, has_tracking,init_l) =
     Eval.compile
       ~outputs:Outputs.go
-      ~pause:(fun f -> f ()) ~return:(fun x -> x) ~max_sharing
+      ~pause:(fun f -> f ()) ~return:(fun x -> x)
+      ~max_sharing:kasim_args.Kasim_args.maxSharing
       ?rescale_init:kasim_args.Kasim_args.rescale
       ?overwrite_init ?bwd_bisim ~compileModeOn
       sigs_nd tk_nd contact_map result' in
@@ -139,8 +143,7 @@ let get_pack_from_marshalizedfile
       "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
     exit 1
 
-let get_compilation_from_pack
-    ~warning ?(unit=Kasim_args.Time) kasim_args cli_args pack =
+let get_compilation_from_pack ~warning kasim_args cli_args pack =
     let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
          formatCflows, cflowFile, init_l),
         alg_overwrite,overwrite_t0 = pack in
@@ -149,7 +152,7 @@ let get_compilation_from_pack
         (Option_util.unsome 0. conf.Configuration.initial)
         overwrite_t0 in
     let init_t,max_time,init_e,max_event,plot_period =
-    match unit with
+    match kasim_args.Kasim_args.unit with
     | Kasim_args.Time ->
       Option_util.unsome init_t_from_files cli_args.Run_cli_args.minValue,
       cli_args.Run_cli_args.maxValue,
@@ -180,28 +183,25 @@ let get_compilation_from_pack
    formatCflows, cflowFile, init_l),counter
 
 let get_compilation_from_preprocessed_ast
-  ~warning ?(unit=Kasim_args.Time) ?(max_sharing=false) ?bwd_bisim
-    ?(compileModeOn=false) ?(kasim_args=Kasim_args.default)
+  ~warning ?bwd_bisim ?(compileModeOn=false) ?(kasim_args=Kasim_args.default)
     cli_args preprocessed =
     let pack =
       get_pack_from_preprocessed_ast
-      ~kasim_args ~max_sharing ?bwd_bisim ~compileModeOn
-      preprocessed
+        ~kasim_args ?bwd_bisim ~compileModeOn preprocessed
     in
-    get_compilation_from_pack ~warning ~unit kasim_args cli_args pack
+    get_compilation_from_pack ~warning kasim_args cli_args pack
 
 let get_compilation
-    ~warning ?(unit=Kasim_args.Time) ?(max_sharing=false) ?bwd_bisim
-    ?(compileModeOn=false) ?(kasim_args=Kasim_args.default) cli_args =
+    ~warning ?bwd_bisim ?(compileModeOn=false)
+    ?(kasim_args=Kasim_args.default) cli_args =
      let pack =
        match kasim_args.Kasim_args.marshalizedInFile with
        | "" ->
          let preprocess =
            get_preprocessed_ast_from_cli_args ~warning cli_args in
          get_pack_from_preprocessed_ast
-           ~kasim_args ~max_sharing ?bwd_bisim ~compileModeOn
-           preprocess
+           ~kasim_args ?bwd_bisim ~compileModeOn preprocess
        | marshalized_file ->
          get_pack_from_marshalizedfile
            ~warning kasim_args cli_args marshalized_file in
-     get_compilation_from_pack ~warning ~unit kasim_args cli_args pack
+     get_compilation_from_pack ~warning kasim_args cli_args pack
