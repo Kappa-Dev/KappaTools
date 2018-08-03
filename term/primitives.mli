@@ -70,6 +70,9 @@ val rule_to_yojson :
 val rule_of_yojson :
   filenames : string array -> Yojson.Basic.json -> elementary_rule
 
+val fully_specified_pattern_to_positive_transformations :
+  Pattern.cc -> Instantiation.concrete Transformation.t list
+
 type 'alg_expr print_expr =
     Str_pexpr of string Locality.annot
   | Alg_pexpr of 'alg_expr Locality.annot

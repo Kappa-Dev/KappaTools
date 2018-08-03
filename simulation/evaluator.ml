@@ -66,3 +66,16 @@ let get_pause_criteria
       raise (ExceptionDefn.Malformed_Decl
                ("[T] can only be used in inequalities",pos_b'')) in
   (env',graph',b'')
+
+let find_all_embeddings env tr =
+  let domain = Model.domain env in
+  let _,graph = List.fold_left
+      (Rule_interpreter.apply_concrete_positive_transformation
+         (Model.signatures env) ?mod_connectivity_store:None)
+      (Instances.empty env,
+       Edges.empty ~with_connected_components:false)
+      tr in
+  let out,_ = Rule_interpreter.obs_from_transformations domain graph tr in
+  List.map
+    (fun (p,(root,_)) -> (p, Matching.reconstruct_renaming domain graph p root))
+    out

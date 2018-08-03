@@ -19,3 +19,7 @@ val get_pause_criteria :
   syntax_version:Ast.syntax_version -> Contact_map.t -> Model.t ->
   Rule_interpreter.t -> (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   Model.t * Rule_interpreter.t * (Pattern.id array list, int) Alg_expr.bool
+
+val find_all_embeddings :
+  Model.t -> Instantiation.concrete Primitives.Transformation.t list ->
+  (Pattern.id * Renaming.t) list

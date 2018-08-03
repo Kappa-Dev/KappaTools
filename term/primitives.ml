@@ -261,6 +261,34 @@ let rule_of_yojson ~filenames r =
      end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct elementary rule",x))
 
+let fully_specified_pattern_to_positive_transformations cc =
+  let _,tr =
+    Pattern.fold_by_type
+      (fun ~pos ~agent_type intf (emb,g) ->
+         let a = (pos,agent_type) in
+         let g' = Transformation.Agent a::g in
+         let emb' = Mods.IntMap.add pos a emb in
+         emb',
+         Tools.array_fold_lefti
+           (fun site acc (l,i) ->
+              let acc' =
+                if i <> -1 then
+                  Transformation.PositiveInternalized (a,site,i)::acc
+                else acc in
+              match l with
+              | Pattern.UnSpec
+              | Pattern.Free ->
+                Transformation.Freed (a,site)::acc'
+              | Pattern.Link (x',s') ->
+                match Mods.IntMap.find_option x' emb' with
+                | None -> acc'
+                | Some ag' ->
+                  Transformation.Linked ((a,site),(ag',s'))::acc')
+           g' intf)
+      cc
+      (Mods.IntMap.empty,[]) in
+  List.rev tr
+
 type 'alg_expr print_expr =
     Str_pexpr of string Locality.annot
   | Alg_pexpr of 'alg_expr Locality.annot

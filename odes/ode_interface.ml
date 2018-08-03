@@ -238,48 +238,12 @@ let lift_embedding x =
     Matching.empty
     (Matching.add_cc Matching.empty 0 x)
 
-let species_to_positive_transformations cc =
-  let _,tr =
-    Pattern.fold_by_type
-      (fun ~pos ~agent_type intf (emb,g) ->
-         let a = (pos,agent_type) in
-         let g' = Primitives.Transformation.Agent a::g in
-         let emb' = Mods.IntMap.add pos a emb in
-         emb',
-         Tools.array_fold_lefti
-           (fun site acc (l,i) ->
-              let acc' =
-                if i <> -1 then
-                  Primitives.Transformation.PositiveInternalized (a,site,i)::acc
-                else acc in
-              match l with
-              | Pattern.UnSpec
-              | Pattern.Free ->
-                Primitives.Transformation.Freed (a,site)::acc'
-              | Pattern.Link (x',s') ->
-                match Mods.IntMap.find_option x' emb' with
-                | None -> acc'
-                | Some ag' ->
-                  Primitives.Transformation.Linked ((a,site),(ag',s'))::acc')
-           g' intf)
-      cc
-      (Mods.IntMap.empty,[]) in
-  List.rev tr
 
-let find_all_embeddings compil species =
-  let tr = species_to_positive_transformations species in
+let find_all_embeddings compil cc =
+  let tr =
+    Primitives.fully_specified_pattern_to_positive_transformations cc in
   let env = environment compil in
-  let domain = Model.domain env in
-  let _,graph = List.fold_left
-      (Rule_interpreter.apply_concrete_positive_transformation
-         (Model.signatures env) ?mod_connectivity_store:None)
-      (Instances.empty env,
-       Edges.empty ~with_connected_components:false)
-      tr in
-  let out,_ = Rule_interpreter.obs_from_transformations domain graph tr in
-  List.map
-    (fun (p,(root,_)) -> (p, Matching.reconstruct_renaming domain graph p root))
-    out
+  Evaluator.find_all_embeddings env tr
 
 let add_fully_specified_to_graph sigs graph cc =
   let e,g =
@@ -537,7 +501,8 @@ let apply_sigs env rule inj_nodes mix =
   in
   let (side_effects, dummy, edges_after_neg) =
     List.fold_left
-      (Rule_interpreter.apply_negative_transformation)
+      (Rule_interpreter.apply_negative_transformation
+         ?mod_connectivity_store:None)
       ([], Instances.empty env, mix)
       concrete_removed
   in
