@@ -424,7 +424,7 @@ let dotcomma dotnet =
   else  Pp.space
 let print_cc
     ?dotnet:(dotnet=false)
-    ?full_species:(full_species=false) ?sigs ?cc_id ~with_id f cc =
+    ?(full_species=false) ?sigs ?cc_id ~with_id f cc =
   let print_intf (ag_i, _ as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
@@ -1022,7 +1022,6 @@ type work = {
   reserved_id: int list array;
   used_id: int list array;
   free_id: int;
-  cc_id: int;
   cc_nodes: (link*int) array Mods.IntMap.t;
   dangling: int; (* node_id *)
 }
@@ -1051,14 +1050,6 @@ module PreEnv = struct
     let nbt' = Array.make (Signature.size sigs) [] in
     fresh sigs nbt' 1 Mods.IntMap.empty
 
-  let fresh_id env =
-    succ
-      (Mods.IntMap.fold
-         (fun _ -> Mods.IntMap.fold
-             (fun _ x acc ->
-                List.fold_left (fun acc p -> max acc p.p_id) acc x))
-         env.domain 0)
-
   let check_vitality env = assert (env.used_by_a_begin_new = false)
 
   let to_work env =
@@ -1070,7 +1061,6 @@ module PreEnv = struct
       reserved_id = env.id_by_type;
       used_id = Array.make (Array.length env.id_by_type) [];
       free_id = env.nb_id;
-      cc_id = fresh_id env;
       cc_nodes = Mods.IntMap.empty;
       dangling = 0;
     }
@@ -1251,6 +1241,14 @@ let check_dangling wk =
 
 let begin_new env = PreEnv.to_work env
 
+let fresh_cc_id domain =
+  succ
+    (Mods.IntMap.fold
+       (fun _ -> Mods.IntMap.fold
+           (fun _ x acc ->
+              List.fold_left (fun acc p -> max acc p.p_id) acc x))
+       domain 0)
+
 let raw_finish_new ~toplevel ?origin wk =
   let () = check_dangling wk in
   (* rebuild env *)
@@ -1263,7 +1261,7 @@ let raw_finish_new ~toplevel ?origin wk =
     { nodes_by_type = wk.used_id; nodes = wk.cc_nodes;
       recogn_nav = raw_to_navigation false wk.used_id wk.cc_nodes} in
   let preenv,r,out,out_id = PreEnv.add_cc
-      ~toplevel ?origin wk.cc_env wk.cc_id cc_candidate in
+      ~toplevel ?origin wk.cc_env (fresh_cc_id wk.cc_env) cc_candidate in
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv,r,out,out_id
 
 let finish_new ?origin wk = raw_finish_new ~toplevel:true ?origin wk
@@ -1304,7 +1302,9 @@ let new_node wk type_id =
     let () = wk.reserved_id.(type_id) <- t in
     let node = (h,type_id) in
     (node,
-     { wk with
+     {
+       sigs = wk.sigs; cc_env = wk.cc_env; reserved_id = wk.reserved_id;
+       used_id = wk.used_id; free_id = wk.free_id;
        dangling = if Mods.IntMap.is_empty wk.cc_nodes then 0 else h;
        cc_nodes = Mods.IntMap.add h (Array.make arity (UnSpec,-1)) wk.cc_nodes;
      })
@@ -1312,8 +1312,9 @@ let new_node wk type_id =
     let () = wk.used_id.(type_id) <- wk.free_id :: wk.used_id.(type_id) in
     let node = (wk.free_id, type_id) in
     (node,
-     { wk with
-       free_id = succ wk.free_id;
+     {
+       sigs = wk.sigs; cc_env = wk.cc_env; reserved_id = wk.reserved_id;
+       used_id = wk.used_id; free_id = succ wk.free_id;
        dangling = if Mods.IntMap.is_empty wk.cc_nodes then 0 else wk.free_id;
        cc_nodes =
          Mods.IntMap.add wk.free_id (Array.make arity (UnSpec,-1)) wk.cc_nodes;
@@ -1438,7 +1439,7 @@ let finalize ~max_sharing env contact_map =
   {
     Env.sig_decl = env.PreEnv.sig_decl;
     Env.id_by_type = env.PreEnv.id_by_type;
-    Env.max_obs = PreEnv.fresh_id env;
+    Env.max_obs = fresh_cc_id env.PreEnv.domain;
     Env.domain;
     Env.elementaries;
     Env.single_agent_points;
