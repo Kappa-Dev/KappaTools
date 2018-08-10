@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Mar 01 2018>
+   * Last modification: Time-stamp: <Aug 10 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -773,6 +773,132 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
 
   (***************************************************************)
 
+  let _dump_view static dynamic error (agent_type, cv_id) bdu
+    =
+    let parameters = get_parameter static in
+    let handler_kappa = get_kappa_handler static in
+    let site_correspondence = get_site_correspondence_array static in
+    let prefix = Remanent_parameters.get_prefix parameters in
+    let handler = get_mvbdu_handler dynamic in
+    let dynamic = set_mvbdu_handler handler dynamic in
+    (*-----------------------------------------------------------------*)
+    let error, agent_string =
+      try
+        Handler.string_of_agent parameters error handler_kappa agent_type
+      with
+      | _ ->
+        Exception.warn
+          parameters error __POS__ Exit
+          (Ckappa_sig.string_of_agent_name agent_type)
+    in
+    (*------------------------------------------------------------------*)
+    (*list of sites in a covering class*)
+    let error, (_,map2) =
+      get_list_of_sites_correspondence_map parameters error
+        agent_type
+        cv_id
+        site_correspondence
+    in
+    (*-------------------------------------------------------------------*)
+    let log = Remanent_parameters.get_logger parameters in
+    let error, dynamic =
+      (*print a list of relations: this will print in a format readable*)
+      let () =
+        Loggers.fprintf log
+          "%sEXTENSIONAL DESCRIPTION:" prefix
+      in
+      let () = Loggers.print_newline log in
+      error, dynamic
+    in
+    (*this is a function to convert a bdu of diff into a list.
+        return a pair: (bdu, and a pair of (site, state) list of list)*)
+      let handler = get_mvbdu_handler dynamic in
+      let error, handler, list =
+        Ckappa_sig.Views_bdu.extensional_of_mvbdu
+          parameters handler error bdu
+      in
+      let dynamic = set_mvbdu_handler handler dynamic in
+      (*----------------------------------------------------*)
+      (*print function for extentional description*)
+      let error =
+        if list = []
+        then
+        let () =
+          Loggers.fprintf log
+            "%sINTENSIONAL DESCRIPTION:" prefix
+        in
+        let () = Loggers.print_newline log in
+        (*print bdu different: this will print in a format of bdu*)
+        let () =
+          Ckappa_sig.Views_bdu.print parameters bdu
+        in
+        error
+
+        else
+
+        List.fold_left
+          (fun error l ->
+             let error, bool =
+               List.fold_left
+                 (fun (error, bool) (site_type, state) ->
+                    let error, site_type =
+                      match Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.get
+                              parameters error site_type map2
+                      with
+                      | error, None ->
+                        Exception.warn
+                          parameters error __POS__ Exit
+                          Ckappa_sig.dummy_site_name
+                      | error, Some i -> error, i
+                    in
+                    (*----------------------------------------------------*)
+                    let error, site_string =
+                      try
+                        Handler.string_of_site
+                          parameters error handler_kappa
+                          ~state agent_type site_type
+                      with
+                      | _ ->
+                        Exception.warn
+                          parameters error __POS__ Exit
+                          (Ckappa_sig.string_of_site_name site_type)
+                    in
+                    (*-----------------------------------------------------*)
+                    let () =
+                      if bool
+                      then
+                        Loggers.fprintf log ","
+                      else
+                        Loggers.fprintf log
+                          "\t\t%s%s(" prefix agent_string
+                    in
+                    let () =
+                      Loggers.fprintf log
+                        "%s" site_string
+                    in
+                    error, true
+                 )
+                 (error, false) l
+             in
+             (*-----------------------------------------------------------*)
+             let () =
+               if bool
+               then
+                 let () =
+                   Loggers.fprintf log ")" in
+                 Loggers.print_newline log
+             in error)
+          error list
+      in
+      let () =
+        if list = []
+        then ()
+        else
+          Loggers.print_newline log
+      in
+      error, dynamic
+
+
   let dump_view_diff static dynamic error (agent_type, cv_id) bdu_old bdu_union
     =
     let parameters = get_parameter static in
@@ -1531,7 +1657,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       parameters error dynamic kappa_handler path
       agent_type (*agent_type inside the pattern*)
       bdu_false bdu_true
-      site_correspondence site_correspondence_map
+      _site_correspondence site_correspondence_map
       store_covering_classes_id
       fixpoint_result =
     (*get the information of the path,
@@ -3020,7 +3146,8 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       in
       error, (dynamic, precondition), true
     with
-      False (error, dynamic) -> error, (dynamic, precondition), false
+      False (error, dynamic) ->
+      error, (dynamic, precondition), false
 
   (* the flag can be safely ignored in this abstract domain *)
   let maybe_reachable static dynamic error _flag pattern

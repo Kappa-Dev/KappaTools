@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <May 03 2018>
+  * Last modification: Time-stamp: <Aug 10 2018>
   *
   * Compute strongly connected component in contact map
   *
@@ -255,12 +255,18 @@ let filter_edges_in_converted_contact_map
   in
   error, dynamic, converted_contact_map
 
-let keep_list l =
+let keep_list parameters error self l =
   match l with
-  | [] -> false 
-  | [a,b] when a=b -> false
-  | [(a,_),(a',_)] -> a=a'
-  | _::_::_ -> true
+  | [] -> error, false
+  | [x] ->
+    begin
+    match Graphs.Nodearray.unsafe_get
+            parameters error x self
+    with
+    | error, Some true -> error, true
+    | error, (Some _ | None) -> error, false
+  end
+  | _::_::_ -> error, true
 
 let compute_graph_scc parameters error contact_map_converted =
   let error, (nodes, edges_list) =
@@ -287,6 +293,11 @@ let compute_graph_scc parameters error contact_map_converted =
       ((Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name),
        (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name))
   in
+  let error, self =
+    Graphs.Nodearray.create
+      parameters error
+      n_nodes
+  in
   let nodes_map = Ckappa_sig.PairAgentSite_map_and_set.Map.empty in
   let _, nodes, (error, nodes_map) =
     List.fold_left
@@ -301,9 +312,9 @@ let compute_graph_scc parameters error contact_map_converted =
            map
       ) (0, [], (error, nodes_map)) nodes
   in
-  let error, edges =
+  let error, (edges,self) =
     List.fold_left
-      (fun (error, l) (a,b) ->
+      (fun (error, (l,self)) (a,b) ->
          let error, node_opt =
            Ckappa_sig.PairAgentSite_map_and_set.Map.find_option
              parameters error
@@ -318,9 +329,17 @@ let compute_graph_scc parameters error contact_map_converted =
          in
          match node_opt,node_opt' with
          | None, _ | _, None ->
-           Exception.warn parameters error __POS__ Exit l
-         | Some a, Some b -> error, (a, (), b) :: l)
-      (error, []) edges_list
+           Exception.warn parameters error __POS__ Exit (l,self)
+         | Some a, Some b ->
+           let error, set =
+               if a = b then
+                 Graphs.Nodearray.set parameters error a true self
+               else
+                 error, self
+           in
+           error,
+           ((a, (), b) :: l, set))
+             (error, ([], self)) edges_list
   in
   (*build a graph_scc*)
   let graph =
@@ -335,6 +354,13 @@ let compute_graph_scc parameters error contact_map_converted =
       (fun () -> "")
       graph
   in
+  let error, scc =
+    List.fold_left
+      (fun (error,l) a ->
+         let error, bool = keep_list parameters error self a in
+         error, if bool then a::l else l)
+      (error,[]) (List.rev scc)
+  in
   let scc =
     List.rev_map
       (fun a ->
@@ -342,10 +368,5 @@ let compute_graph_scc parameters error contact_map_converted =
            (fun b -> nodes_array.(Graphs.int_of_node b))
            (List.rev a))
       (List.rev scc )
-  in
-  let scc =
-    List.fold_left
-      (fun l a -> if keep_list a then a::l else l)
-      [] (List.rev scc)
   in
   error, scc
