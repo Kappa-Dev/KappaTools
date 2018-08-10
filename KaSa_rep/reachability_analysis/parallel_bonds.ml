@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 29 2017>
+  * Last modification: Time-stamp: <Aug 10 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -370,8 +370,8 @@ struct
              | [] -> error, (tuples_of_interest,map)
              | h::t ->
                let p1,p2 = h in
-               let (_,site1,site1_,_,state1_) = p1 in
-               let (agent2,site2,site2_,_,state2_) = p2 in
+               let (_,site1,site1_,state1,state1_) = p1 in
+               let (agent2,site2,site2_,state2,state2_) = p2 in
                let error, tuples_of_interest =
                  List.fold_left
                    (fun (error, (tuples_of_interest,map)) (p1',p2') ->
@@ -380,7 +380,7 @@ struct
                    if agent2=agent2' && site1 = site1' && site2 = site2'
                      then
                        add parameter error
-                         (site1, site2, h, (p1',p2'))
+                         (site1, site2, state1, state2,  h, (p1',p2'))
                          (agent,site1_,site1_',state1_,state1_')
                          (agent2,site2_,site2_',state2_,state2_')
                          tuples_of_interest map
@@ -798,6 +798,9 @@ struct
   type pos = Fst | Snd
 
   let apply_gen pos parameters error static dynamic precondition rule_id rule =
+    let kappa_handler = get_kappa_handler static in
+    let closure = get_closure static in
+    let store_value = get_value dynamic in
     let store_site_create_parallel_bonds_rhs =
       match pos with
       | Fst -> get_fst_site_create_parallel_bonds_rhs static
@@ -836,23 +839,35 @@ struct
            List.fold_left
              (fun
                (error, dynamic, precondition, store_result) (z, t) ->
-               let (agent_id1, agent_type1, site_type1, site_type2, state1,
+               let (agent_id, agent_type, site_type1, site_type2, state1,
                     state2) = z
                in
-               let (agent_id1', agent_type1', site_type1', site_type2',
+               let (agent_id', agent_type', site_type1', site_type2',
                     state1', state2') = t
                in
                let z' = Parallel_bonds_type.project z in
                let t' = Parallel_bonds_type.project t in
-               let other_site, other_site' =
+               let
+                 site_specified,
+                 site_specified',
+                 state_specified,
+                 state_specified',
+                 site_unspecified,
+                 site_unspecified',
+                 state_unspecified,
+                 state_unspecified' =
                  match pos with
-                 | Fst -> site_type2, site_type2'
-                 | Snd -> site_type1, site_type1'
+                 | Fst ->
+                   site_type1, site_type1', state1, state1',
+                   site_type2, site_type2', state2, state2'
+                 | Snd ->
+                   site_type2, site_type2', state2, state2',
+                   site_type1, site_type1', state1, state1'
                in
                if
                  necessarily_double
-                   agent_id1
-                   agent_id1'
+                   agent_id
+                   agent_id'
                    (z', t')
                    rule_double_bonds_rhs_map
                then
@@ -863,7 +878,7 @@ struct
                    match
                      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
                        parameters error
-                       (agent_id1, (z', t'))
+                       (agent_id, (z', t'))
                        store_result
                    with
                    | error, None ->
@@ -879,8 +894,8 @@ struct
                      set_global_dynamic_information
                      error static dynamic
                      (rule_id, rule)
-                     agent_id1 (*A*)
-                     other_site
+                     agent_id (*A*)
+                     site_unspecified
                      precondition
                  in
                  let error, dynamic, precondition, state_list' =
@@ -890,17 +905,12 @@ struct
                      set_global_dynamic_information
                      error static dynamic
                      (rule_id,rule)
-                     agent_id1' (*B*)
-                     other_site'
+                     agent_id' (*B*)
+                     site_unspecified'
                      precondition
                  in
                  let error, dynamic, precondition, store_result =
                    match state_list, state_list' with
-                   (*   | _::_::_, _::_::_ ->*)
-                     (*     (*we know for sure that none of the two sites have been
-                       modified*)
-                      q        error, dynamic, precondition, store_result
-                     *)
                    | [], _ | _, [] ->
                      let error, () =
                        Exception.warn parameters error __POS__
@@ -914,18 +924,25 @@ struct
                          (fun (error, current_list) pre_state ->
                             List.fold_left
                               (fun (error, current_list) pre_state' ->
-                                 let state1, state2, state1', state2' =
+                                 let tuple =
                                    match pos with
                                    | Fst ->
-                                     state1, pre_state, state1', pre_state'
+                                     (agent_id, agent_type,
+                                      site_specified, site_unspecified,
+                                      state_specified, pre_state ),
+                                     (agent_id',agent_type',
+                                      site_specified',site_unspecified',
+                                      state_specified',pre_state')
                                    | Snd ->
-                                     pre_state, state2, pre_state', state2'
+                                     (agent_id, agent_type,
+                                      site_unspecified, site_specified,
+                                      pre_state, state_specified ),
+                                     (agent_id', agent_type', site_unspecified',site_specified',
+                                      pre_state',
+                                      state_specified')
                                  in
                                  let potential_list =
-                                   ((agent_id1, agent_type1, site_type1,
-                                     site_type2, state1, state2),
-                                    (agent_id1', agent_type1', site_type1',
-                                     site_type2', state1', state2'))
+                                   tuple
                                    :: current_list
                                  in
                                  error, potential_list
@@ -935,82 +952,150 @@ struct
                      (*------------------------------------------------------*)
                      (*fold over a potential list and compare with parallel
                        list*)
-                     let error, value =
-                       List.fold_left (fun (error, value) (x', y') ->
-                           let _site_other, pre_state_other, _site_other',
-                               _pre_state_other' =
+                     let error, dynamic, precondition, value =
+                       List.fold_left
+                         (fun (error, dynamic, precondition, value) (x', y') ->
+                           let pre_state_other, pre_state_other' =
                              match pos with
                              | Fst ->
-                               let (_, _, _, s_type2, _, pre_state2) = x' in
-                               let (_, _, _, s_type2', _, pre_state2') = y' in
-                               s_type2, pre_state2, s_type2', pre_state2'
+                               let (_, _, _, _, _, pre_state2) = x' in
+                               let (_,_,_,_,_,pre_state2') = y' in
+                               pre_state2,pre_state2'
                              | Snd ->
-                               let (_, _, s_type1, _, pre_state1, _) = x' in
-                               let (_, _, s_type1', _, pre_state1', _) = y' in
-                               s_type1, pre_state1, s_type1', pre_state1'
+                               let (_, _, _, _, pre_state1, _) = x' in
+                               let (_, _, _, _, pre_state1', _) = x' in
+                               pre_state1,pre_state1'
                            in
-                           (*check if the pre_state2 and pre_state2' of the
-                             other sites are bound and if yes with the good
-                             state?  -
-                             Firstly check that if the parallel bonds depend on
-                             the state of the second site, it will give a
-                             different value: whether Undefined or Any,
-                             (question 1 and 2)*)
+                           (*check if the pre_state_other and pre_state_other'
+                             are the good ones.
+                             If yes -> Any
+                             If no -> Undefined *)
                            begin
-                             (*question 1: if the pre_state2/pre_state2' of A
-                               or B is free -> undefined*)
                              if
-                               Ckappa_sig.int_of_state_index pre_state_other = 0
+                               not
+                                 (pre_state_other = state_unspecified
+                                 && pre_state_other' = state_unspecified')
                              then
-                               (*answer of question 1: the second site is free*)
+                               (* Not the good states *)
                                let new_value =
                                  Usual_domains.lub value
                                    Usual_domains.Undefined
                                in
-                               error, new_value
+                               error, dynamic, precondition, new_value
                              else
-                               (* the pre_state2 is bound or pre_state2' is
-                                  bound. Question
-                                  2: both sites are bound with the good sites,
-                                  then return Any, if not return false*)
-                               begin
-                                 (*   if site_other = site_other' &&
-                                    pre_state_other = pre_state_other' &&
-                                    not (Ckappa_sig.int_of_state_index
-                                           pre_state_other' = 0)
-                                      then*)
-                               (*both question1 and 2 are yes: return any*)
-                                 (* let () =
-                                 Format.fprintf
-                                   Format.std_formatter
-                                   "%s %s %s %s -> Any\n"
-                                   (Ckappa_sig.string_of_site_name site_other )
-                                   (Ckappa_sig.string_of_site_name site_other' )
-                                   (Ckappa_sig.string_of_state_index  pre_state_other )
-                                    (Ckappa_sig.string_of_state_index  pre_state_other' ) in*)
-                                   let new_value =
-                                     Usual_domains.lub value
-                                       Usual_domains.Any
+                               begin (* compatible states *)
+                                 let error, dynamic, precondition, update_value =
+                                   let error, closure_list =
+                                     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_default_without_logs
+                                       parameters error
+                                       [] (z',t') closure
                                    in
-                                   error, new_value
-                                     (*                               else
-                                   (*the question1 is true but the question 2 is false -> false*)
-                                   let () =
-                                     Format.fprintf
-                                       Format.std_formatter
-                                       "%s %s %s %s -> False\n"
-                                       (Ckappa_sig.string_of_site_name site_other )
-                                       (Ckappa_sig.string_of_site_name site_other' )
-                                       (Ckappa_sig.string_of_state_index  pre_state_other )
-                                       (Ckappa_sig.string_of_state_index  pre_state_other' ) in
-                                   let new_value =
-                                     Usual_domains.lub value
-                                       (Usual_domains.Val false)
+                                   let error, dynamic, precondition, bool =
+                                     let rec aux error dynamic precondition l =
+                                       match l with
+                                       | [] ->
+                                         error, dynamic, precondition, false
+                                       | h::t ->
+                                         let
+                                           (site_bond_test,
+                                            site_bond_test',
+                                            state_bond_test,
+                                            state_bond_test', _,_) = h
+                                         in
+
+                                         let error, b =
+                                           let rec aux2 error l =
+                                             match l with
+                                               [] -> error, false
+                                             | (site_clo_1',
+                                                _site_clo_2',
+                                                state_clo_1',
+                                                _state_clo_2',_,_)::tail
+                                               ->
+                                               if (* Could be optimized *)
+                                                 site_bond_test = site_clo_1' &&
+                                                 state_bond_test  = state_clo_1'
+                                               then
+                                                 begin
+                                                   if
+                                                     necessarily_double
+                                                       agent_id
+                                                       agent_id'
+                                                       ((agent_type,
+                                                         site_bond_test,
+                                                         site_specified,
+                                                         state_bond_test,
+                                                         state_specified)
+                                                       ,
+                                                       (agent_type',
+                                                        site_bond_test',
+                                                        site_specified',
+                                                        state_bond_test',
+                                                        state_specified')
+                                                      )
+                                                       rule_double_bonds_rhs_map
+                                                   then
+                                                     begin
+                                                       let tuple =
+                                                         (agent_type,
+                                                          site_bond_test,
+                                                          site_unspecified,
+                                                          state_bond_test,
+                                                          state_unspecified),
+                                                         (agent_type',
+                                                          site_bond_test',
+                                                          site_unspecified',
+                                                          state_bond_test',
+                                                          state_unspecified')
+                                                       in
+                                                       match
+                                                         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_default_without_logs
+                                                           parameters
+                                                           error
+                                                           Usual_domains.Undefined
+                                                           tuple
+                                                           store_value
+                                                       with
+                                                       | error,
+                                                        (Usual_domains.Val false |Usual_domains.Any) ->
+                                                         aux2 error tail
+                                                       | error,
+                                                        (Usual_domains.Val true
+                                                        |Usual_domains.Undefined)
+                                                         -> error, true
+                                                     end
+                                                 else
+                                                   aux2 error tail
+                                                 end
+                                               else
+                                                 aux2 error tail
+                                           in
+                                           aux2 error closure_list
+                                         in
+                                         if b then
+                                           error, dynamic, precondition, true
+                                         else aux error dynamic precondition t
                                    in
-                                                                      error, new_value*)
+                                   aux error dynamic precondition closure_list
+                                 in
+                                 if bool
+                                 then
+                                   error,
+                                   dynamic, precondition,
+                                   Usual_domains.Val true
+                                 else
+                                   error,
+                                   dynamic, precondition,
+                                   Usual_domains.Any
+                                 in
+                                 let new_value =
+                                   Usual_domains.lub value
+                                     update_value
+                                 in
+                                   error, dynamic, precondition, new_value
                                end
                            end
-                         ) (error, old_value) potential_list
+                         ) (error, dynamic, precondition, old_value) potential_list
                      in
                      (*------------------------------------------------------*)
                      (*call the symmetric add *)
@@ -1148,7 +1233,7 @@ struct
              let new_value = Usual_domains.lub value1 value2 in
              let error, store_result =
                Parallel_bonds_type.add_value_from_refined_tuple
-                 parameters error 
+                 parameters error
                  x new_value store_result
              in
              error, store_result

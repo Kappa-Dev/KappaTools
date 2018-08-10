@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 29 2017>
+   * Last modification: Time-stamp: <Aug 10 2018>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -32,7 +32,7 @@ type local_static_information =
     (* information of partial formation of parallel or non-parallel bonds in
        rules *)
     store_closure:
-      (Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+      (Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state * 
        ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state) *
         (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state)) *
        ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *Ckappa_sig.c_state * Ckappa_sig.c_state) *
@@ -183,7 +183,7 @@ let project_away_ag_id_gen f parameters error big_store acc =
 let project_away_ag_id parameters kappa_handler error big_store acc =
   let f parameters error tuple value acc =
     Parallel_bonds_type.add_value
-      parameters error 
+      parameters error
       tuple
       (Usual_domains.Val value)
       acc
