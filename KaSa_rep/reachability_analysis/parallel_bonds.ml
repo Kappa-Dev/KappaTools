@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 10 2018>
+  * Last modification: Time-stamp: <Aug 12 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -798,7 +798,6 @@ struct
   type pos = Fst | Snd
 
   let apply_gen pos parameters error static dynamic precondition rule_id rule =
-    let kappa_handler = get_kappa_handler static in
     let closure = get_closure static in
     let store_value = get_value dynamic in
     let store_site_create_parallel_bonds_rhs =

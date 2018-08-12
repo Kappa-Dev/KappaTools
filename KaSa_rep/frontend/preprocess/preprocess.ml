@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Apr 20 2018>
+   * Last modification: Time-stamp: <Aug 12 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -20,7 +20,8 @@ let empty_agent handler error =
     Cckappa_sig.agent_kasim_id = Ckappa_sig.dummy_agent_id;
     Cckappa_sig.agent_name = Ckappa_sig.dummy_agent_name;
     Cckappa_sig.agent_interface = interface;
-    Cckappa_sig.agent_position = Locality.dummy
+    Cckappa_sig.agent_position = Locality.dummy;
+    Cckappa_sig.is_created = false;
   }
 
 let empty_mixture handler error =
@@ -379,6 +380,7 @@ let translate_agent_sig
     Cckappa_sig.agent_name = agent_name ;
     Cckappa_sig.agent_interface = c_interface ;
     Cckappa_sig.agent_position = Locality.dummy ;
+    Cckappa_sig.is_created = false ;
   }:Cckappa_sig.agent_sig), map
 
 let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
@@ -1178,6 +1180,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
             Cckappa_sig.agent_name = agent_name ;
             Cckappa_sig.agent_interface = c_interface ;
             Cckappa_sig.agent_position = Locality.dummy ;
+            Cckappa_sig.is_created = creation ;
           }
       else
         Cckappa_sig.Dead_agent
@@ -1186,6 +1189,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
             Cckappa_sig.agent_name = agent_name ;
             Cckappa_sig.agent_interface = c_interface ;
             Cckappa_sig.agent_position = Locality.dummy ;
+            Cckappa_sig.is_created = creation ;          
           },
             dead_sites,
             dead_state_sites,

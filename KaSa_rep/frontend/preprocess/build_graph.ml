@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: November, the 12th of 2017
-  * Last modification: Time-stamp: <Jun 07 2018>
+  * Last modification: Time-stamp: <Aug 12 2018>
   * *
   * Primitives to build site graph in Cckappa
   *
@@ -29,7 +29,8 @@ let add_agent parameters error handler cckappa_only agent_id agent_type mixture 
       Cckappa_sig.agent_kasim_id = agent_id ;
       Cckappa_sig.agent_name = agent_type ;
       Cckappa_sig.agent_interface = Ckappa_sig.Site_map_and_set.Map.empty;
-      Cckappa_sig.agent_position = Locality.dummy
+      Cckappa_sig.agent_position = Locality.dummy ;
+      Cckappa_sig.is_created = false ; 
     }
   in
   let error', views =

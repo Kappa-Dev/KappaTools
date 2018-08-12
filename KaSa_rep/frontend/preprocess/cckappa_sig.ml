@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <May 20 2018>
+  * Last modification: Time-stamp: <Aug 12 2018>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -51,7 +51,8 @@ type 'interface proper_agent =
     agent_kasim_id  : Ckappa_sig.c_agent_id;
     agent_name      : Ckappa_sig.c_agent_name;
     agent_interface : 'interface;
-    agent_position  : Ckappa_sig.position
+    agent_position  : Ckappa_sig.position;
+    is_created : bool;
   }
 
 type site_address =
@@ -462,13 +463,8 @@ let join_rel error l1 l2 =
 (* UPGRADE *)
 (*******************************************************)
 
-let upgrade_interface ag interface  =
-  {
-    agent_kasim_id  = ag.agent_kasim_id;
-    agent_name      = ag.agent_name;
-    agent_interface = interface;
-    agent_position  = ag.agent_position
-  }
+let upgrade_interface ag agent_interface  =
+  {ag with agent_interface}
 
 let map_agent f ag =
   upgrade_interface

@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: September, the 27th of 2015
-   * Last modification: Time-stamp: <Nov 08 2017>
+   * Last modification: Time-stamp: <Aug 12 2018>
    * *
    * algebraic check for the influence map.
    *
@@ -14,7 +14,51 @@
 
 exception False of Exception.method_handler
 
-let check ~allow_dead_agent parameters error _handler mixture1 mixture2 (i,j) =
+let complete_interface parameters error handler proper_agent =
+  if proper_agent.Cckappa_sig.is_created
+  then
+    let site_list =
+      Ckappa_sig.Site_map_and_set.Map.fold
+        (fun site _ l -> site::l)
+        proper_agent.Cckappa_sig.agent_interface
+        []
+    in
+    let error, missing_sites =
+      Handler.complementary_interface
+        parameters error handler
+        proper_agent.Cckappa_sig.agent_name (List.rev site_list)
+    in
+    let interface = proper_agent.Cckappa_sig.agent_interface in
+    let error, interface =
+      List.fold_left
+        (fun (error, interface) site ->
+           let error, is_binding_site =
+             Handler.is_binding_site
+               parameters error handler proper_agent.Cckappa_sig.agent_name site
+           in
+           Ckappa_sig.Site_map_and_set.Map.add
+             parameters error
+             site
+             {
+               Cckappa_sig.site_name     = site;
+               Cckappa_sig.site_position =
+                 Locality.dummy;
+               Cckappa_sig.site_free     =
+                 if is_binding_site then Some true else None;
+               Cckappa_sig.site_state    =
+                 {
+               Cckappa_sig.min = Some Ckappa_sig.dummy_state_index;
+               Cckappa_sig.max = Some Ckappa_sig.dummy_state_index
+             }} interface)
+        (error, interface)
+        missing_sites
+    in
+    let proper_agent = {proper_agent with Cckappa_sig.agent_interface = interface}
+    in
+    error, proper_agent
+  else
+    error, proper_agent
+let check ~allow_dead_agent parameters error handler mixture1 mixture2 (i,j) =
   let add (n1,n2) error to_do (inj1,inj2) =
     let im1 =
       Ckappa_sig.Agent_id_setmap.Map.find_option
@@ -157,6 +201,7 @@ let check ~allow_dead_agent parameters error _handler mixture1 mixture2 (i,j) =
             begin
               if not allow_dead_agent then raise (False error)
               else
+                let error, ag1 = complete_interface parameters error handler ag1 in
               match ag2 with
               | Cckappa_sig.Unknown_agent _ -> raise (False error)
               | Cckappa_sig.Ghost ->
@@ -166,6 +211,7 @@ let check ~allow_dead_agent parameters error _handler mixture1 mixture2 (i,j) =
                   Exit (true,(to_do,already_done))
               | Cckappa_sig.Dead_agent (ag2,_s2,l21,l22) ->
                 begin
+                  let error, ag2 = complete_interface parameters error handler ag2 in
                   let error,(_bool,(to_do,already_done)) =
                     deal_with error
                       (fun parameter error ->
@@ -190,6 +236,7 @@ let check ~allow_dead_agent parameters error _handler mixture1 mixture2 (i,j) =
                   error,(true,(to_do,already_done))
                 end
               | Cckappa_sig.Agent ag2 ->
+                let error, ag2 = complete_interface parameters error handler ag2 in
                 deal_with error
                   (fun parameter error ->
                      Ckappa_sig.Site_map_and_set.Map.iter2
@@ -209,6 +256,7 @@ let check ~allow_dead_agent parameters error _handler mixture1 mixture2 (i,j) =
             end
           | Cckappa_sig.Agent ag1 ->
             begin
+              let error, ag1 = complete_interface parameters error handler ag1 in
               match ag2 with
               | Cckappa_sig.Unknown_agent _ -> raise (False error)
               | Cckappa_sig.Ghost ->
@@ -218,6 +266,9 @@ let check ~allow_dead_agent parameters error _handler mixture1 mixture2 (i,j) =
                   Exit (true,(to_do,already_done))
               | Cckappa_sig.Dead_agent (ag2,_,l21,l22) ->
                 begin
+                  let error, ag2 =
+                    complete_interface parameters error handler ag2
+                  in
                   if not allow_dead_agent then raise (False error)
                   else
                     begin
@@ -239,6 +290,9 @@ let check ~allow_dead_agent parameters error _handler mixture1 mixture2 (i,j) =
                   end
                 end
               | Cckappa_sig.Agent ag2 ->
+                let error, ag2 =
+                  complete_interface parameters error handler ag2
+                in
                 deal_with error Ckappa_sig.Site_map_and_set.Map.iter2_sparse
                   ag1 ag2 bonds1 bonds2 (to_do,already_done)
             end
@@ -429,7 +483,7 @@ let filter_influence_high maybe_reachable
     parameters handler error compilation
     static dynamic
     map bool =
-  let dynamic_ref = ref dynamic in 
+  let dynamic_ref = ref dynamic in
   let nrules = Handler.nrules parameters error handler in
   let allow_dead_agent = false in
   let get_var v =

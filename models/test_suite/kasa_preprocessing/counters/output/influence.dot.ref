@@ -66,9 +66,6 @@ digraph G{
 "r12" -> "r16" [label="[2->1]" color="green"];
 "r12bis" -> "r1" [label="[0->0];[1->0]" color="green"];
 "r12bis" -> "r2" [label="[0->0];[1->0]" color="green"];
-"r12bis" -> "r6" [label="[0->0]" color="green"];
-"r12bis" -> "r7" [label="[0->0]" color="green"];
-"r12bis" -> "r8" [label="[0->0]" color="green"];
 "r12bis" -> "r10" [label="[0->0];[1->0]" color="green"];
 "r12bis" -> "r14" [label="[1->0]" color="green"];
 "r12bis" -> "r15" [label="[1->1]" color="green"];
