@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Jan 16 2017>
+   * Last modification: Time-stamp: <Aug 17 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -131,7 +131,7 @@ let store_covering_classes_modification_side_effects parameters error
       (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result)
         ->
          List.fold_left
-           (fun (error, store_result) (site_type_partner, _state) ->
+           (fun (error, store_result) (_,(site_type_partner, _state)) ->
               let error, rule_id_set =
                 match
                   Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs

@@ -530,8 +530,8 @@ C cannot occur in the model
 ------------------------------------------------------------
 
 Some exceptions have been raised
-error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1044; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1044; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1052; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1052; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 331; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 331; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/counters_domain_static.ml; message: line 661; exception:Exit

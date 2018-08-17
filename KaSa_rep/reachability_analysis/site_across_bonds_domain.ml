@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Feb 25 2018>
+   * Last modification: Time-stamp: <Aug 17 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -397,7 +397,7 @@ struct
   (*RULE*)
   (***************************************************************************)
 
-  let scan_rule parameters error kappa_handler rule_id rule static =
+  let scan_rule parameters error kappa_handler rule_id _rule static =
     (*------------------------------------------------------------*)
     (*collect potential tuple pair on the rhs views*)
     let store_views_rhs = get_views_rhs static in
@@ -753,7 +753,7 @@ struct
     let error, wake_up =
       Ckappa_sig.Rule_map_and_set.Map.fold
         (fun rule_id list (error, wake_up) ->
-           List.fold_left (fun (error, wake_up) (agent_type, site_type, _) ->
+           List.fold_left (fun (error, wake_up) (_,(agent_type, site_type, _)) -> (* TO TO BETTER *)
                Common_static.add_dependency_site_rule
                  parameters error
                  agent_type
@@ -863,7 +863,7 @@ struct
       match list with
       | [] -> error, true, dynamic
       | tuple :: tail ->
-        let proj (b,c,d,e,f) = (b,c,d,e) in
+        let proj (b,c,d,e,_) = (b,c,d,e) in
         let proj2 (x, y) = proj x, proj y in
         let tuple' = proj2 tuple in
         let error, mvbdu_value =
@@ -1652,7 +1652,7 @@ struct
     in
     let error, bool, dynamic, modified_sites =
       List.fold_left
-        (fun (error, bool, dynamic, modified_sites) (agent_name, site, state) ->
+        (fun (error, bool, dynamic, modified_sites) (_, (agent_name, site, state)) (* TO DO BETTER *)->
            let error, bool, dynamic, modified_sites =
              free_site
                static dynamic error bool dump_title agent_name site state
@@ -1925,7 +1925,7 @@ struct
   (****************************************************************)
 
   let print ?dead_rules static dynamic (error:Exception.method_handler) loggers =
-    let _ = dead_rules in 
+    let _ = dead_rules in
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let handler = get_mvbdu_handler dynamic in

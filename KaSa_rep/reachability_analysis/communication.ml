@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Feb 20 2018>
+   * Last modification: Time-stamp: <Aug 17 2018>
    *
    * Abstract domain to record live rules
    *
@@ -290,8 +290,8 @@ let may_get_free_by_side_effect parameters error static _precondition rule_id
       (agent_name,rule_id)
       (snd (Analyzer_headers.get_potential_side_effects static))
   in
-  let site_name = path.site in
-  error, List.exists (fun (a,_) -> a=site_name) list
+  let site_name = path.site in (* TO DO BETTER *)
+  error, List.exists (fun (_,(a,_)) -> a=site_name) list
 
 let min_not_free interv =
   match interv.Cckappa_sig.min

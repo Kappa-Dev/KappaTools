@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Mar 01 2018>
+  * Last modification: Time-stamp: <Aug 17 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -64,10 +64,14 @@ type remove_action =
   (int list * Ckappa_sig.c_rule_id list) Ckappa_sig.AgentSite_map_and_set.Map.t
 
 type free_partner =
-  (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list Ckappa_sig.AgentRule_map_and_set.Map.t
+  ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
+    * Ckappa_sig.c_state) *
+    (Ckappa_sig.c_site_name * Ckappa_sig.c_state)) list Ckappa_sig.AgentRule_map_and_set.Map.t
 
-type bind_partner = (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list
-    Ckappa_sig.AgentRule_map_and_set.Map.t
+type bind_partner =
+  ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_state) *
+   (Ckappa_sig.c_site_name * Ckappa_sig.c_state)) list Ckappa_sig.AgentRule_map_and_set.Map.t
 
 type potential_partner_free = free_partner
 type potential_partner_bind = bind_partner
@@ -138,7 +142,9 @@ type common_views =
     store_agent_name_from_pattern :
       Ckappa_sig.c_agent_name Ckappa_sig.Agent_id_map_and_set.Map.t;
     store_potential_side_effects_per_rule:
-      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+      ( (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+        Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
         list Ckappa_sig.Rule_map_and_set.Map.t;
     store_side_effects_views : side_effects_views;
     store_binding_views : binding_views;
@@ -401,7 +407,7 @@ let collect_side_effects parameter error handler rule_id half_break remove
 (*return a potential sites of side effects in the case of half break action*)
 
 let collect_potential_free_and_bind parameter error handler rule_id
-    (agent_type, site_type) k store_result =
+    (agent_id, agent_type, site_type) k store_result =
   (*potential partner*)
   match Handler.dual parameter error handler agent_type site_type k with
   | error, None -> error, store_result
@@ -409,19 +415,19 @@ let collect_potential_free_and_bind parameter error handler rule_id
     let error, store_potential_free =
       Common_map.add_dependency_pair_sites_rule parameter error
         (agent_type2, rule_id)
-        ((site2,Ckappa_sig.dummy_state_index) :: [])
+        (((agent_id,agent_type, site_type, k), (site2,Ckappa_sig.dummy_state_index)) :: [])
         (fst store_result)
     in
     let error, store_potential_bind =
       Common_map.add_dependency_pair_sites_rule parameter error
         (agent_type2, rule_id)
-        ((site2, state2) :: [])
+        (((agent_id,agent_type, site_type, k),(site2, state2)) :: [])
         (snd store_result)
     in
     error, (store_potential_free, store_potential_bind)
 
 let get_potential_partner parameter error handler rule_id
-    (agent_type, site_type) (state_min, state_max) store_result =
+    (agent_id, agent_type, site_type) (state_min, state_max) store_result =
   let error, state_min =
     match
       state_min
@@ -449,7 +455,7 @@ let get_potential_partner parameter error handler rule_id
       let error, (store_potential_free, store_potential_bind) =
         collect_potential_free_and_bind
           parameter error handler rule_id
-          (agent_type, site_type)
+          (agent_id, agent_type, site_type)
           k
           store_result
       in
@@ -462,6 +468,7 @@ let store_potential_half_break parameter error handler rule_id half_break
     store_result =
   List.fold_left
     (fun (error, store_result) (add, state_op) ->
+       let agent_index = add.Cckappa_sig.agent_index in
        let agent_type = add.Cckappa_sig.agent_type in
        let site_type = add.Cckappa_sig.site in
        (*state*)
@@ -471,7 +478,7 @@ let store_potential_half_break parameter error handler rule_id half_break
        (*--------------------------------------------------------------------*)
        let error, store_result =
          get_potential_partner parameter error
-           handler rule_id (agent_type, site_type)
+           handler rule_id (agent_index, agent_type, site_type)
            (state_min, state_max)
            store_result
        in
@@ -479,7 +486,8 @@ let store_potential_half_break parameter error handler rule_id half_break
     ) (error, store_result) half_break
 
 let store_potential_remove parameter error handler rule_id remove store_result =
-  List.fold_left (fun (error, store_result) (_agent_index, agent, list_undoc) ->
+  List.fold_left
+    (fun (error, store_result) (agent_index, agent, list_undoc) ->
       let agent_type = agent.Cckappa_sig.agent_name in
       let error, store_result =
         List.fold_left (fun (error, store_result) site_type ->
@@ -498,7 +506,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                 (*-----------------------------------------------------------*)
                 let error, store_result =
                   get_potential_partner parameter error handler rule_id
-                    (agent_type, site_type)
+                    (agent_index, agent_type, site_type)
                     (Some Ckappa_sig.dummy_state_index_1, Some last_entry)
                     store_result
                 in
@@ -1339,11 +1347,12 @@ let scan_rule_set parameter error kappa_handler compil =
   in
   let error, potential_side_effects_per_rule =
     Proj_agent_rule_to_rule.monadic_proj_map_i
-      (fun _parameter error (_,rule_id) -> error, rule_id) parameter error []
+      (fun _parameter error (_,rule_id) -> error, rule_id)
+      parameter error []
       (fun _parameters error old (agent_name,_) l ->
          let new_list =
            List.fold_left
-             (fun old (x,y) -> (agent_name,x,y)::old)
+             (fun old (source, (x,y)) -> (source, (agent_name,x,y))::old)
              old l
          in
          error,new_list)
@@ -1352,7 +1361,8 @@ let scan_rule_set parameter error kappa_handler compil =
   error,
   {store_result
    with
-    store_potential_side_effects_per_rule = potential_side_effects_per_rule
+    store_potential_side_effects_per_rule =
+      potential_side_effects_per_rule
   }
 
 (******************************************************************)

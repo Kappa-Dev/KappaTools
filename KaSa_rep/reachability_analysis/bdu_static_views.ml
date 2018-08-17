@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Feb 22 2018>
+   * Last modification: Time-stamp: <Aug 17 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -455,7 +455,7 @@ let get_triple_map parameters error pair_list triple_list =
       (*-----------------------------------------------------*)
       let error', map_res =
         List.fold_left
-          (fun (error, map_res) (site, state) ->
+          (fun (error, map_res) (_,(site, state)) ->
              if Ckappa_sig.Site_map_and_set.Set.mem site set
              then
                let error, site' =

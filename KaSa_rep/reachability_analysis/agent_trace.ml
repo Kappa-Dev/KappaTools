@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Apr 17 2018>
+  * Last modification: Time-stamp: <Aug 17 2018>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -527,7 +527,7 @@ let build_support parameters error handler rules dead_rules =
 let pw parameters error list =
   let error, map =
     List.fold_left
-      (fun (error, acc) (a,b) ->
+      (fun (error, acc) (_,(a,b)) -> 
          let error, old =
            SiteMap.find_default_without_logs
              parameters error [] a
@@ -606,7 +606,9 @@ let build_side_effect
            __POS__
            Exit
        in
-       let list = List.filter (fun (a,_) -> SiteSet.mem a site_set) list in
+       let list =
+         List.filter (fun (_, (a,_)) -> SiteSet.mem a site_set) list in
+       (* TO DO Better *)
        let error, list = pw parameters error list in
        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set
          parameters error r_id list map)
