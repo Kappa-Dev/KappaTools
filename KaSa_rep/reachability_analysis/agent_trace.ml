@@ -527,7 +527,7 @@ let build_support parameters error handler rules dead_rules =
 let pw parameters error list =
   let error, map =
     List.fold_left
-      (fun (error, acc) (_,(a,b)) -> 
+      (fun (error, acc) (_,(a,b)) ->
          let error, old =
            SiteMap.find_default_without_logs
              parameters error [] a
@@ -574,7 +574,7 @@ let smash_side_effect parameters error static dead_rules =
            agent_name
            new_asso
            map)
-    (snd (Analyzer_headers.get_potential_side_effects static))
+    (Analyzer_headers.get_potential_side_effects static)
     (error, init)
 
 let build_side_effect
@@ -597,7 +597,7 @@ let build_side_effect
            error
            []
            (agent_name,r_id)
-           (snd (Analyzer_headers.get_potential_side_effects static))
+           (Analyzer_headers.get_potential_side_effects static)
        in
        let error =
          Exception.check_point

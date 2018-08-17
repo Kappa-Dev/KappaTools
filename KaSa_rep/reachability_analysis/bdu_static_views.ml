@@ -65,7 +65,7 @@ type bdu_analysis_static =
 (*initial values of BDU static*)
 (***************************************************************************)
 
-let init_bdu_analysis_static parameters error =
+let init_bdu_analysis_static _parameters error =
   let init_bdu_analysis_static =
     {
       store_proj_bdu_creation_restriction_map =
@@ -585,7 +585,6 @@ let store_bdu_potential_effect_restriction_map parameters handler error
     (*store_new_index_pair_map*)
     store_remanent_triple
     store_potential_side_effects store_result =
-  let _, store_potential_bind = store_potential_side_effects in
   let error', (handler, store_result) =
     store_bdu_potential_restriction_map_aux
       parameters
@@ -593,7 +592,7 @@ let store_bdu_potential_effect_restriction_map parameters handler error
       error
       (*store_new_index_pair_map*)
       store_remanent_triple
-      store_potential_bind
+      store_potential_side_effects 
       store_result
   in
   let error =
@@ -888,7 +887,7 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
     (rule_id:Ckappa_sig.c_rule_id) rule
     (*store_new_index_pair_map*)
     store_remanent_triple
-    store_potential_side_effects compil store_result =
+    store_potential_side_effects _compil store_result =
   (*-----------------------------------------------------------------------*)
   (*pre_static*)
   let error, log_info = StoryProfiling.StoryStats.add_event parameters error
@@ -961,7 +960,7 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
 (***************************************************************************)
 
 let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
-    store_potential_side_effects (*store_new_index_pair_map*)
+    store_potential_side_effects
     store_remanent_triple =
   let error, init = init_bdu_analysis_static parameters error in
   let error, (handler_bdu, log_info, store_results) =
@@ -978,8 +977,7 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
              handler_bdu
              rule_id
              rule.Cckappa_sig.e_rule_c_rule
-             (*store_new_index_pair_map*)
-             store_remanent_triple
+               store_remanent_triple
              store_potential_side_effects
              compiled
              store_result

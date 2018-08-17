@@ -98,10 +98,10 @@ val set_side_effects :
 
 val get_potential_side_effects :
   global_static_information ->
-  Common_static.potential_partner_free * Common_static.potential_partner_bind
+  Common_static.potential_side_effect
 
 val set_potential_side_effects:
-  Common_static.potential_partner_free * Common_static.potential_partner_bind ->
+  Common_static.potential_side_effect ->  
   global_static_information ->
   global_static_information
 

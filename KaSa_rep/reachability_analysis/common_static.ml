@@ -63,24 +63,17 @@ type half_break_action =
 type remove_action =
   (int list * Ckappa_sig.c_rule_id list) Ckappa_sig.AgentSite_map_and_set.Map.t
 
-type free_partner =
-  ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
-    * Ckappa_sig.c_state) *
-    (Ckappa_sig.c_site_name * Ckappa_sig.c_state)) list Ckappa_sig.AgentRule_map_and_set.Map.t
 
-type bind_partner =
+type potential_side_effect =
   ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
   * Ckappa_sig.c_state) *
    (Ckappa_sig.c_site_name * Ckappa_sig.c_state)) list Ckappa_sig.AgentRule_map_and_set.Map.t
 
-type potential_partner_free = free_partner
-type potential_partner_bind = bind_partner
 
 type side_effects_views =
   {
     store_side_effects           : half_break_action * remove_action;
-    store_potential_side_effects : potential_partner_free *
-                                   potential_partner_bind;
+    store_potential_side_effects : potential_side_effect;
   }
 
 (***************************************************************************)
@@ -192,7 +185,7 @@ let init_binding_views =
 let init_side_effect_views =
   {
     store_side_effects = (empty_agentsite, empty_agentsite);
-    store_potential_side_effects = (empty_agentrule, empty_agentrule);
+    store_potential_side_effects = empty_agentrule ;
   }
 
 
@@ -620,17 +613,7 @@ let collect_potential_side_effects_bind parameter error handler rule_id
 
 let collect_potential_side_effects parameter error handler rule_id half_break
     remove store_result =
-  let error, store_result_free =
-    collect_potential_side_effects_free
-      parameter
-      error
-      handler
-      rule_id
-      half_break
-      remove
-      (fst store_result)
-  in
-  let error, store_result_bind =
+  let error, store_result =
     collect_potential_side_effects_bind
       parameter
       error
@@ -638,9 +621,9 @@ let collect_potential_side_effects parameter error handler rule_id half_break
       rule_id
       half_break
       remove
-      (snd store_result)
+      store_result
   in
-  error, (store_result_free, store_result_bind)
+  error, store_result
 
 let scan_rule_side_effects_views parameter error kappa_handler rule_id rule
     store_result =
@@ -1356,7 +1339,7 @@ let scan_rule_set parameter error kappa_handler compil =
              old l
          in
          error,new_list)
-      (snd store_result.store_side_effects_views.store_potential_side_effects)
+      (store_result.store_side_effects_views.store_potential_side_effects)
   in
   error,
   {store_result

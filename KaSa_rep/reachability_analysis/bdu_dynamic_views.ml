@@ -125,7 +125,6 @@ let store_covering_classes_modification_side_effects parameters error
     covering_classes
     store_result =
   (*------------------------------------------------------------------------*)
-  let _, store_potential_side_effects_bind = store_potential_side_effects in
   let error, store_result =
     Ckappa_sig.AgentRule_map_and_set.Map.fold
       (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result)
@@ -172,7 +171,7 @@ let store_covering_classes_modification_side_effects parameters error
               in
               error, store_result
            ) (error, store_result) pair_list
-      ) store_potential_side_effects_bind (error, store_result)
+      ) store_potential_side_effects (error, store_result)
   in
   error, store_result
 

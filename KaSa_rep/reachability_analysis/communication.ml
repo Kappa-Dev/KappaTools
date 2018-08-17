@@ -288,7 +288,7 @@ let may_get_free_by_side_effect parameters error static _precondition rule_id
       error
       []
       (agent_name,rule_id)
-      (snd (Analyzer_headers.get_potential_side_effects static))
+      (Analyzer_headers.get_potential_side_effects static)
   in
   let site_name = path.site in (* TO DO BETTER *)
   error, List.exists (fun (_,(a,_)) -> a=site_name) list
@@ -337,7 +337,7 @@ let check_state_compatibility parameters error kappa_handler
         match interv.Cckappa_sig.min, interv.Cckappa_sig.max with
         | None, _ | _, None ->
           Exception.warn parameters error __POS__ Exit true
-        | Some min, Some max ->
+        | Some _, Some max ->
         let rec aux error k =
           if Ckappa_sig.compare_state_index k max > 0
           then
@@ -687,7 +687,7 @@ let get_state_of_site_in_postcondition
 
 
 let add_rule ?local_trace:(local_trace=false)
-    parameters compiled kappa_handler  error rule_id event_list =
+    parameters compiled _kappa_handler  error rule_id event_list =
   let error =
     if local_trace
     || Remanent_parameters.get_dump_reachability_analysis_wl
