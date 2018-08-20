@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 18 2017>
+   * Last modification: Time-stamp: <Aug 20 2018>
    *
    * Abstract domain to record live rules
    *
@@ -572,6 +572,12 @@ struct
         array []
     in
     error, dynamic, Remanent_state.set_dead_agents list kasa_state
+
+  let apply_one_side_effect
+      _static dynamic error
+      _ _ precondition
+    =
+    error, dynamic, (precondition,[]) (* this domain ignores side effects *)
 
   (**************************************************************************)
   let stabilize _static dynamic error = error, dynamic, ()

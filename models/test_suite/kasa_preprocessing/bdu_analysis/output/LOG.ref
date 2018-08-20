@@ -697,12 +697,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[])
 
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:1<2)
     Id=13
      Node(site_type:2<1)
@@ -772,12 +772,12 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=23
+  Id=25
    Node(site_type:1<2)
     Id=17
      Node(site_type:2<0)
@@ -856,21 +856,6 @@ Id=20
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:2<0)
   Id=0
@@ -886,12 +871,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=22
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=21
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -945,8 +945,8 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => A(y{u}[#])
 A() => [ A(x[.]) v A(x[x.B]) ]
+A() => A(y{u}[#])
 A() => [ A(y[.]) v A(y[x.C]) ]
 A() => A(x{u}[#])
 B() => [ B(x[.]) v B(x[x.A]) ]
@@ -955,21 +955,6 @@ C() => [ C(x[.]) v C(x[y.A]) ]
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:2<0)
@@ -986,12 +971,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=22
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=21
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1055,21 +1055,6 @@ EXTENSIONAL DESCRIPTION:
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:2<0)
   Id=0
@@ -1085,12 +1070,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=22
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=21
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1145,21 +1145,6 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:2<0)
   Id=0
@@ -1175,12 +1160,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=22
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=21
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1247,10 +1247,10 @@ A()=> [A(x{u}[#])]
 A()=> [
 		  A(y[.])
 		v A(y[x.C])]
+A()=> [A(y{u}[#])]
 A()=> [
 		  A(x[.])
 		v A(x[x.B])]
-A()=> [A(y{u}[#])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

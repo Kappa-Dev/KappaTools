@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Apr 02 2017>
+   * Last modification: Time-stamp: <Aug 20 2018>
    *
    * Abstract domain to record live rules
    *
@@ -161,7 +161,15 @@ struct
   (**************************************************************************)
 
   let apply_rule _static dynamic error _rule_id precondition =
-    error, dynamic, (precondition, [])
+    error, dynamic, (precondition, []) (* this domain ignores rule application *)
+
+
+  let apply_one_side_effect
+      _static dynamic error
+      _ _ precondition
+    =
+    error, dynamic, (precondition,[]) (* this domain ignores side effects *)
+
 
   let apply_event_list _static dynamic error _event_list =
     let event_list = [] in

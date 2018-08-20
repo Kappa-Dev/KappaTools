@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 17 2018>
+  * Last modification: Time-stamp: <Aug 20 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -907,6 +907,12 @@ module Functor =
       in
       error, dynamic, (precondition, event_list)
 
+  let apply_one_side_effect
+      _static dynamic error
+      _ _ precondition
+    =
+    error, dynamic, (precondition,[]) (* move here the handling of side effects *)
+      
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 

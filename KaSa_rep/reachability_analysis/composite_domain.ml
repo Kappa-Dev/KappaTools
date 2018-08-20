@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 31 2017>
+  * Last modification: Time-stamp: <Aug 20 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -172,6 +172,14 @@ struct
     {
       dynamic with domain = domain
     }
+
+  let get_global_dynamic_information dynamic = Domain.get_global_dynamic_information dynamic.domain
+
+  let set_global_dynamic_information gdynamic dynamic =
+    {
+      dynamic with
+      domain =
+        Domain.set_global_dynamic_information gdynamic dynamic.domain}
 
   let push_rule static dynamic error r_id =
     let working_list = get_working_list dynamic in
@@ -543,17 +551,126 @@ struct
     in
     apply_event_list static dynamic error event_list
 
-  (**if it has a precondition for this rule_id then apply a list of event
+    let get_rule parameter error static r_id =
+      let compil = get_compil static in
+      let error, rule  =
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+          parameter
+          error
+          r_id
+          compil.Cckappa_sig.rules
+      in
+      error, rule
+
+  let apply_one_side_effect
+      static
+      dynamic
+      error
+      r_id
+      target
+      precondition
+      event_list
+    =
+    let error, dynamic, (precondition, event_list') =
+      lift_ternary
+        Domain.apply_one_side_effect
+        static
+        dynamic
+        error
+        r_id
+        target
+        precondition
+    in error, dynamic, (precondition, (event_list'@event_list))
+(**if it has a precondition for this rule_id then apply a list of event
      starts from this new list*)
+  let
+    apply_side_effect
+      static
+      dynamic
+      error
+      r_id
+      precondition
+      event_list
+    =
+    let parameters =
+      Analyzer_headers.get_parameter
+        (get_global_static_information static)
+    in
+    let error, side_effects =
+      Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
+        parameters error
+        []
+        r_id
+        (Analyzer_headers.get_potential_side_effects_per_rule
+           (get_global_static_information static))
+    in
+    let error, rule_opt =
+      get_rule
+        parameters error static r_id
+    in
+    match rule_opt with
+    | Some rule ->
+      List.fold_left
+        (fun  (error, dynamic, (precondition, event_list)) (source, target) ->
+           let (agent_id, _, site, state) = source in
+           let error, global_dynamic_information, precondition, state_list =
+             Communication.get_state_of_site_in_precondition
+               (fun x -> x)
+               (fun x -> x)
+               (fun x _ -> x)
+               error
+               (get_global_static_information static)
+               (get_global_dynamic_information dynamic)
+               (r_id, rule)
+               agent_id (*A*)
+               site
+               precondition
+           in
+           let dynamic =
+             set_global_dynamic_information
+               global_dynamic_information dynamic
+           in
+           if List.mem state state_list
+           then
+             apply_one_side_effect
+               static
+               dynamic
+               error
+               r_id
+               target
+               precondition
+               event_list
+           else
+             (error, dynamic, (precondition, event_list))
+            )
+            (error, dynamic, (precondition, event_list))
+            side_effects
+    | None ->
+      let error, () =
+        Exception.warn
+          parameters error
+          __POS__
+          Exit ()
+      in
+      (error, dynamic, (precondition, event_list))
 
   let apply_rule static dynamic error r_id precondition =
-    let error, dynamic, (_, event_list) =
+    let error, dynamic, (precondition, event_list) =
       pre_apply_rule
         static
         dynamic
         error
         r_id
         precondition
+    in
+    let error, dynamic, (_precondition, event_list) =
+      apply_side_effect
+        static
+        dynamic
+        error
+        r_id
+        precondition
+        event_list
     in
     apply_event_list static dynamic error event_list
 
@@ -581,12 +698,5 @@ struct
       mixture
       Communication.dummy_precondition
 
-  let get_global_dynamic_information dynamic = Domain.get_global_dynamic_information dynamic.domain
-
-  let set_global_dynamic_information gdynamic dynamic =
-    {
-      dynamic with
-      domain =
-        Domain.set_global_dynamic_information gdynamic dynamic.domain}
 
 end

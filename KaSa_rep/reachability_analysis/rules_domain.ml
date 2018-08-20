@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 18 2017>
+   * Last modification: Time-stamp: <Aug 20 2018>
    *
    * Abstract domain to record live rules
    *
@@ -238,6 +238,13 @@ struct
 
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
+
+  let apply_one_side_effect
+      _static dynamic error
+      _ _ precondition
+    =
+    error, dynamic, (precondition,[]) (* this domain ignores side effects *)
+
 
   let apply_event_list _static dynamic error _event_list =
     let event_list = [] in

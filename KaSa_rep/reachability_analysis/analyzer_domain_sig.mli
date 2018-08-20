@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 02 2017>
+  * Last modification: Time-stamp: <Aug 17 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -95,6 +95,12 @@ sig
      Communication.precondition,
      Communication.precondition * Communication.event list) binary
 
+  val apply_one_side_effect:
+    (Ckappa_sig.c_rule_id,
+     (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state),
+     Communication.precondition,
+     Communication.precondition * Communication.event list) ternary
+
   val apply_event_list:
     (Communication.event list, Communication.event list) unary
 
@@ -105,7 +111,7 @@ sig
     (('static,'dynamic) Analyzer_headers.kasa_state, ('static,'dynamic) Analyzer_headers.kasa_state) unary
 
   val print:
-    ?dead_rules:(Remanent_parameters_sig.parameters -> Exception.method_handler -> Ckappa_sig.c_rule_id -> Exception.method_handler * bool) 
+    ?dead_rules:(Remanent_parameters_sig.parameters -> Exception.method_handler -> Ckappa_sig.c_rule_id -> Exception.method_handler * bool)
     ->  (Loggers.t, unit) unary
 
   val maybe_reachable:

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 17 2018>
+   * Last modification: Time-stamp: <Aug 20 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -3463,6 +3463,12 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       compute_views_enabled static dynamic error rule_id precondition
     in
     error, dynamic, (precondition, event_list)
+
+  let apply_one_side_effect
+      _static dynamic error
+      _ _ precondition
+    =
+    error, dynamic, (precondition,[]) (* move here the handling of side effects *)
 
   (**************************************************************************)
   (* events enable communication between domains. At this moment, the

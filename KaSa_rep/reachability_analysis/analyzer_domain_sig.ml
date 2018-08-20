@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Feb 12 2018>
+  * Last modification: Time-stamp: <Aug 17 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -90,6 +90,12 @@ sig
   val apply_rule:
     (Ckappa_sig.c_rule_id,
      Communication.precondition, Communication.precondition * Communication.event list) binary
+
+  val apply_one_side_effect:
+    (Ckappa_sig.c_rule_id,
+     (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state),
+     Communication.precondition,
+     Communication.precondition * Communication.event list) ternary
 
   val apply_event_list:
     (Communication.event list, Communication.event list) unary

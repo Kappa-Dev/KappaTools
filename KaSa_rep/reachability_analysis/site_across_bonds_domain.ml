@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 17 2018>
+   * Last modification: Time-stamp: <Aug 20 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1784,6 +1784,12 @@ struct
       ~local_trace
       parameters compiled kappa_handler error
       rule_id event_list
+
+  let apply_one_side_effect
+      _static dynamic error
+      _ _ precondition
+    =
+    error, dynamic, (precondition,[]) (* move here the handling of side effects *)
 
   (****************************************************************)
   (*APPLY A LIST OF EVENT*)
