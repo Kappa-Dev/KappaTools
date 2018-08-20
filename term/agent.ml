@@ -30,6 +30,12 @@ let print_internal ?sigs (i,agent) site f id =
     Signature.print_site_internal_state sigs agent site f (Some id)
   | None -> Format.fprintf f "n%is%i~%i" i site id
 
+let print_raw_internal ?sigs (i,agent) site f id =
+  match sigs with
+  | Some sigs ->
+    Signature.print_internal_state sigs agent site f id
+  | None -> Format.fprintf f "n%is%i~%i" i site id
+
 let rename inj (n_id,n_ty) = (Renaming.apply inj n_id,n_ty)
 
 let sort (_,ty) = ty

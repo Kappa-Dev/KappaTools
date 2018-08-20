@@ -124,6 +124,8 @@ val print_cc :
   ?sigs:Signature.s -> ?cc_id:id -> with_id:bool ->
   Format.formatter -> t -> unit
 
+val print_cc_as_id : Signature.s -> Format.formatter -> t -> unit
+
 val print :
   ?domain:Env.t -> with_id:bool -> Format.formatter -> id -> unit
 (** [print ~domain ?with_id:None form cc] *)

@@ -22,6 +22,8 @@ val print_site :
   ?sigs:Signature.s -> t -> Format.formatter -> int -> unit
 val print_internal :
   ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
+val print_raw_internal :
+  ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
 
 val rename : Renaming.t -> t -> t
 
