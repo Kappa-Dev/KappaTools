@@ -38,7 +38,7 @@ struct
       f ()
 
   let print_binding_state_and_switch_symbol
-      symbol_table pr_binding_state binding_state pr_switch f switch =
+      _symbol_table pr_binding_state binding_state pr_switch f switch =
          Format.fprintf f "%a%a"
            pr_binding_state binding_state
            pr_switch switch
@@ -162,8 +162,10 @@ struct
                     (true,out)
                   | Pattern.Link (dst_a,dst_p) ->
                     let dst_ty = Pattern.find_ty cc dst_a in
-                    if Signature.is_counter_agent sigs dst_ty
-                    && not(!Parameter.debugModeOn) then
+                    if match sigs with
+                      | None -> false
+                      | Some sigs -> Signature.is_counter_agent sigs dst_ty
+                                     && not(!Parameter.debugModeOn) then
                       let counter = Pattern.counter_value_cc cc (dst_a,dst_p) 0 in
                       let () = Format.fprintf f "{=%d}" counter in
                       (* to do: add symbols in symbol table for counters *)
@@ -193,8 +195,11 @@ struct
           Pattern.fold
             (fun x el (not_empty,link_ids) ->
                let ag_x = (x,Pattern.find_ty cc x) in
-               if (not (Signature.is_counter_agent sigs (snd ag_x)))
-               || (!Parameter.debugModeOn) then
+               if match sigs with
+                 | None -> true
+                 | Some sigs ->
+                   (not (Signature.is_counter_agent sigs (snd ag_x)))
+                   || (!Parameter.debugModeOn) then
                  let () =
                    Format.fprintf
                      f "%t@[<h>%a%s"
@@ -342,8 +347,10 @@ struct
     let rec aux_print some = function
       | [] -> ()
       | h::t ->
-        if Signature.is_counter_agent sigs h.Raw_mixture.a_type && not
-             !Parameter.debugModeOn
+        if match sigs with
+          | None -> false
+          | Some sigs -> Signature.is_counter_agent sigs h.Raw_mixture.a_type
+                         && not !Parameter.debugModeOn
         then aux_print some t
         else
           let () =
@@ -527,7 +534,7 @@ let print_rule_mixture
     let rec aux_print some = function
       | [] -> ()
       | h::t ->
-        if Signature.is_counter_agent (Some sigs) h.LKappa.ra_type
+        if Signature.is_counter_agent sigs h.LKappa.ra_type
         && not !Parameter.debugModeOn
         then aux_print some t
         else

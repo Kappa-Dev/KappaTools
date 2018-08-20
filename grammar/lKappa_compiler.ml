@@ -24,11 +24,11 @@ let add_link_contact_map ?contact_map sty sp dty dp =
 
 let rule_induces_link_permutation ~warning ~pos ?dst_ty sigs sort site =
   let warning_for_counters =
-    if Signature.is_counter_agent (Some sigs) sort then true
+    if Signature.is_counter_agent sigs sort then true
     else
     match dst_ty with
     | None -> false
-    | Some s -> Signature.is_counter_agent (Some sigs) s in
+    | Some s -> Signature.is_counter_agent sigs s in
 
   if not(warning_for_counters) then
   warning

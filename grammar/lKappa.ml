@@ -219,7 +219,7 @@ let print_rule_mixture sigs ~ltypes created f mix =
   let rec aux_print some = function
     | [] -> ()
     | h::t ->
-      if Signature.is_counter_agent (Some sigs) h.ra_type
+      if Signature.is_counter_agent sigs h.ra_type
       && not !Parameter.debugModeOn
       then aux_print some t
       else

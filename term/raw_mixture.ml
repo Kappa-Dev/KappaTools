@@ -134,7 +134,10 @@ let print ~created ?sigs f mix =
   let rec aux_print some = function
     | [] -> ()
     | h::t ->
-      if Signature.is_counter_agent sigs h.a_type && not !Parameter.debugModeOn
+      if match sigs with
+        | None -> false
+        | Some sigs ->
+          Signature.is_counter_agent sigs h.a_type && not !Parameter.debugModeOn
       then aux_print some t
       else
         let () = if some then Pp.comma f in

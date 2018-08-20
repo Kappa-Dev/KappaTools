@@ -276,10 +276,7 @@ let of_json v =
   { t; incr; incr_sites; }
 
 let is_counter_agent sigs n_id =
-  match sigs with
-  | None -> false
-  | Some sigs ->
-    match sigs.incr with None -> false | Some incr_id -> n_id = incr_id
+  match sigs.incr with None -> false | Some incr_id -> n_id = incr_id
 
 let ports_if_counter_agent sigs n_id =
   if match sigs.incr with None -> false | Some incr_id -> n_id = incr_id

@@ -77,7 +77,7 @@ val print : Format.formatter -> s -> unit
 val to_json : s -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> s
 
-val is_counter_agent : s option -> int -> bool
+val is_counter_agent : s -> int -> bool
 val ports_if_counter_agent : s -> int -> (int*int) option
 val site_is_counter : s -> int -> int -> bool
 val incr_agent : s -> (int * int * int * int) (** id, arity, before, after *)
