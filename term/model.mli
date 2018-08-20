@@ -22,6 +22,18 @@ val init :
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
 
+
+val deconstruct :
+  t ->
+  string list * Pattern.Env.t * unit NamedDecls.t *
+  Primitives.alg_expr Locality.annot NamedDecls.t *
+  (Operator.DepSet.t * Operator.DepSet.t *
+   Operator.DepSet.t array * Operator.DepSet.t array) *
+  ((string Locality.annot option * LKappa.rule Locality.annot) array *
+   Primitives.elementary_rule array) *
+  Primitives.alg_expr Locality.annot array * Primitives.perturbation array *
+  Contact_map.t
+
 val nb_tokens : t -> int
 val nb_algs : t -> int
 val nb_rules : t -> int

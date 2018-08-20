@@ -32,6 +32,13 @@ let init ~filenames domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
     interventions; contact_map;
   }
 
+let deconstruct env =
+  (env.filenames, env.domain, env.tokens, env.algs,
+   (env.dependencies_in_time, env.dependencies_in_event,
+    env.tokens_reverse_dependencies, env.algs_reverse_dependencies),
+   (env.ast_rules, env.rules),
+   env.observables, env.interventions, env.contact_map)
+
 let domain env = env.domain
 let get_obs env = env.observables
 let get_rules env = env.rules
