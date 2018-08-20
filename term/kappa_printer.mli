@@ -31,3 +31,5 @@ val perturbation :
 val env : Format.formatter -> Model.t -> unit
 
 val env_kappa : Format.formatter -> Model.t -> unit
+
+val decompiled_env : Format.formatter -> Model.t -> unit

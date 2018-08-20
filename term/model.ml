@@ -148,10 +148,10 @@ let print_rule ?env f id =
 let map_observables f env =
   Array.map (fun (x,_) -> f x) env.observables
 
-let print_kappa pr_alg pr_pert f env =
+let print_kappa pr_alg ?pr_rule pr_pert f env =
   let sigs = signatures env in
   Format.fprintf
-    f "@[<v>%a@,%a%t@,%a%t%a@,%a%t%a@]"
+    f "@[<v>%a@,%a%t@,%a%t%a@,%t%t%a@]"
     (Contact_map.print_kappa sigs) env.contact_map
     (NamedDecls.print
        ~sep:Pp.space (fun _ n f () -> Format.fprintf f "%%token: %s" n))
@@ -166,15 +166,22 @@ let print_kappa pr_alg pr_pert f env =
     (Pp.array Pp.space ~trailing:Pp.space
        (fun _ f (e,_) -> Format.fprintf f "@[<h>%%plot: %a@]" (pr_alg env) e))
     env.observables
-    (Pp.array Pp.space ~trailing:Pp.space
-       (fun _ f (na,(e,_)) ->
-          Format.fprintf f "%a%a"
-            (Pp.option ~with_space:false
-               (fun f (na,_) -> Format.fprintf f "'%s' " na)) na
-            (LKappa.print_rule
-               ~full:true sigs (print_token ~env) (print_alg ~env))
-            e))
-    env.ast_rules
+    (fun f ->
+       match pr_rule with
+       | None ->
+         Pp.array Pp.space ~trailing:Pp.space
+           (fun _ f (na,(e,_)) ->
+              Format.fprintf f "%a%a"
+                (Pp.option ~with_space:false
+                   (fun f (na,_) -> Format.fprintf f "'%s' " na)) na
+                (LKappa.print_rule
+                   ~full:true sigs (print_token ~env) (print_alg ~env))
+                e)
+           f env.ast_rules
+       | Some pr_rule ->
+         Pp.array Pp.space ~trailing:Pp.space
+           (fun _ f r -> Format.fprintf f "@[<2>%a@]" (pr_rule env) r)
+           f env.rules)
     (fun f -> if env.interventions <> [||] then Pp.space f)
     (Pp.array Pp.space (fun i f p ->
          Format.fprintf f "@[<h>/*%i*/%a@]" i (pr_pert env) p))

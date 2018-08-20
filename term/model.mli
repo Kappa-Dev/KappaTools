@@ -96,6 +96,7 @@ val print :
 
 val print_kappa :
   (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
+  ?pr_rule:(t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
   Format.formatter -> t -> unit
 

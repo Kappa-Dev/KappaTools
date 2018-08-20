@@ -190,3 +190,8 @@ let env f env =
 let env_kappa f env =
   Model.print_kappa
     (fun env -> alg_expr ~env) (fun env -> perturbation ~env) f env
+
+let decompiled_env f env =
+  Model.print_kappa
+    (fun env -> alg_expr ~env) ~pr_rule:(decompiled_rule ~full:true)
+    (fun env -> perturbation ~env) f env
