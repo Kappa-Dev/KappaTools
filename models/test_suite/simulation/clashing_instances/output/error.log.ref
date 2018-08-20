@@ -1,9 +1,8 @@
 Environment:
+  %agent: A(x)
   
   %plot: [T]
   'rule' A(x[.]), A(x[.])- @ 1
-  Signatures:
-    %agent: A(x)
   Rules:
     0: (ast: 1) 0: /*cc1*/ A/*1*/(), 1: /*cc1*/ A/*1*/()
       -- A/*1*//*1*/.x = ???, A/*1*//*1*/ ++  @1

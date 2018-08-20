@@ -187,8 +187,6 @@ let env f env =
   Model.print (fun env -> alg_expr ~env) (fun env -> elementary_rule ~env)
     (fun env -> perturbation ~env) f env
 
-let env_kappa contact_map f env =
-  Format.fprintf f "@[<v>%a@,%a@]"
-    (Contact_map.print_kappa (Model.signatures env)) contact_map
-    (Model.print_kappa
-       (fun env -> alg_expr ~env) (fun env -> perturbation ~env)) env
+let env_kappa f env =
+  Model.print_kappa
+    (fun env -> alg_expr ~env) (fun env -> perturbation ~env) f env

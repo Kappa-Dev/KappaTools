@@ -6,13 +6,12 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let print_initial_inputs ?uuid conf env contact_map inputs_form init =
+let print_initial_inputs ?uuid conf env inputs_form init =
   let () = match uuid with
     | None -> ()
     | Some uuid -> Format.fprintf inputs_form "// \"uuid\" : \"%i\"@." uuid in
   let () = Format.fprintf inputs_form
-      "%a@.%a@." Configuration.print conf
-      (Kappa_printer.env_kappa contact_map) env in
+      "%a@.%a@." Configuration.print conf Kappa_printer.env_kappa env in
   let sigs = Model.signatures env in
   Format.fprintf inputs_form "@.@[<v>%a@]@."
     (Pp.list Pp.space

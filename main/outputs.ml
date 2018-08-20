@@ -215,11 +215,11 @@ let close ?event () =
   let () = close_input ?event () in
   close_desc ()
 
-let initial_inputs conf env contact_map init ~filename =
+let initial_inputs conf env init ~filename =
   let inputs = Kappa_files.open_out_fresh filename "" ".ka" in
   let inputs_form = Format.formatter_of_out_channel inputs in
   let () =
-    Data.print_initial_inputs ~uuid conf env contact_map inputs_form init in
+    Data.print_initial_inputs ~uuid conf env inputs_form init in
   inputsDesc := Some inputs
 
 let input_modifications env event mods =

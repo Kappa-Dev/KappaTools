@@ -121,7 +121,7 @@ val print_plot_line :
 val export_plot : is_tsv: bool -> plot -> string
 
 val print_initial_inputs :
-  ?uuid:int -> Configuration.t -> Model.t -> Contact_map.t ->
+  ?uuid:int -> Configuration.t -> Model.t ->
   Format.formatter -> (Primitives.alg_expr * Primitives.elementary_rule) list ->
   unit
 

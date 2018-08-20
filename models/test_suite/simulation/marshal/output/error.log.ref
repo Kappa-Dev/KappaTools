@@ -5,6 +5,8 @@ A(x[1/*x.B*//.]), B(x[1/*x.A*//.])
 _____(1)
 B(x[1])+, A(x[1])+
 Environment:
+  %agent: A(x[x.B])
+  %agent: B(x[x.A])
   
   %var:/*0*/ 'init' 100
   %plot: [T]
@@ -12,9 +14,6 @@ Environment:
   'dim_op' A(x[1/.]), B(x[1/.]) @ 0.01
   
   /*0*/%mod: [false] do $STOP ; repeat [false]
-  Signatures:
-    %agent: A(x)
-    %agent: B(x)
   Rules:
     0: (ast: 1) 0: /*cc1*/ A/*1*/(x[.]), 1: /*cc2*/ B/*2*/(x[.])
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
@@ -33,6 +32,8 @@ Intial graph;
   %init: 100 A(x[1]), B(x[1])
   
 Environment:
+  %agent: A(x[x.B])
+  %agent: B(x[x.A])
   
   %var:/*0*/ 'init' 100
   %plot: [T]
@@ -40,9 +41,6 @@ Environment:
   'dim_op' A(x[1/.]), B(x[1/.]) @ 0.01
   
   /*0*/%mod: [false] do $STOP ; repeat [false]
-  Signatures:
-    %agent: A(x)
-    %agent: B(x)
   Rules:
     0: (ast: 1) 0: /*cc1*/ A/*1*/(x[.]), 1: /*cc2*/ B/*2*/(x[.])
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
@@ -61,6 +59,8 @@ Intial graph;
   %init: 100 A(x[1]), B(x[1])
   
 Environment:
+  %agent: A(x[x.B])
+  %agent: B(x[x.A])
   
   %var:/*0*/ 'init' 300
   %plot: [T]
@@ -68,9 +68,6 @@ Environment:
   'dim_op' A(x[1/.]), B(x[1/.]) @ 0.01
   
   /*0*/%mod: [false] do $STOP ; repeat [false]
-  Signatures:
-    %agent: A(x)
-    %agent: B(x)
   Rules:
     0: (ast: 1) 0: /*cc1*/ A/*1*/(x[.]), 1: /*cc2*/ B/*2*/(x[.])
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥

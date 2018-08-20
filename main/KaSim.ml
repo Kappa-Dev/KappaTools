@@ -212,7 +212,7 @@ let () =
                else Some (Counter.init_time counter);
              Configuration.plotPeriod = Some (Counter.plot_period counter);
              Configuration.outputFileName = Some plot_file;}
-            env contact_map init_l ~filename
+            env init_l ~filename
     in
     Kappa_files.setCheckFileExists
       ~batchmode:cli_args.Run_cli_args.batchmode

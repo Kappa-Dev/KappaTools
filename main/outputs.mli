@@ -13,7 +13,7 @@ val initialize :
   Model.t -> unit
 
 val initial_inputs :
-  Configuration.t -> Model.t -> Contact_map.t ->
+  Configuration.t -> Model.t ->
   (Primitives.alg_expr * Primitives.elementary_rule) list ->
   filename:string -> unit
 

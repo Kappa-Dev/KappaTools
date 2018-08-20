@@ -1,4 +1,5 @@
 Environment:
+  %agent: A(x[x.A y.A] y[x.A y.A])
   
   %plot: [T]
   A(x[./1]), A(x[./1]) @ 1
@@ -7,8 +8,6 @@ Environment:
   'GOAL' A(x[1/.]), A(y[1/.]) @ 1
   
   /*0*/%mod: [true] do $TRACK A(x[1]), A(y[1]) [true]; repeat [false]
-  Signatures:
-    %agent: A(x,y)
   Rules:
     0: (ast: 1) 0: /*cc1*/ A/*1*/(x[.]), 1: /*cc1*/ A/*1*/(x[.])
       -- A/*1*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
