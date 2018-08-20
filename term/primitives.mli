@@ -20,12 +20,19 @@ sig
         'a * Instantiation.site_name * Instantiation.internal_state
     | NegativeInternalized of 'a Instantiation.site
 
+  val map_agent : ('a -> 'b) -> 'a t -> 'b t
+  val fold_agent : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+  val map_fold_agent : ('a -> 'b -> 'c * 'b) -> 'a t -> 'b -> 'c t * 'b
+
+  val equal : ('a -> 'b -> bool) -> 'a t -> 'b t -> bool
+
   val rename :
     int -> Renaming.t -> Instantiation.abstract t -> Instantiation.abstract t
 
   val concretize :
     Matching.t * int Mods.IntMap.t ->
     Instantiation.abstract t -> Instantiation.concrete t
+
   val print :
     ?sigs:Signature.s -> Format.formatter -> Instantiation.abstract t -> unit
 

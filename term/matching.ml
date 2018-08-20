@@ -227,12 +227,6 @@ module Agent = struct
     | Existing (n,_) -> Agent.id n
     | Fresh (_,i) -> i
 
-  let same_connected_component p p' =
-    match p,p' with
-    | (Existing _, Fresh _ | Fresh _, Existing _) -> false
-    | Fresh (_,i), Fresh (_,i') -> i=i'
-    | Existing (_,id), Existing (_,id') -> id=id'
-
   let is_fresh = function
     | Existing _ -> false
     | Fresh _ -> true

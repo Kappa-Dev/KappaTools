@@ -80,6 +80,66 @@ module Transformation = struct
     | NegativeInternalized (n,s) ->
       NegativeInternalized (Matching.Agent.concretize inj2graph n,s)
 
+  let map_fold_agent f x acc =
+    match x with
+    | Agent a -> let (a',acc') = f a acc in (Agent a',acc')
+    | Freed (a,s) -> let (a',acc') = f a acc in (Freed (a',s),acc')
+    | Linked ((a1,s1),(a2,s2)) ->
+      let (a1',acc') = f a1 acc in
+      let (a2',acc'') = f a2 acc' in
+      (Linked ((a1',s1),(a2',s2)), acc'')
+    | NegativeWhatEver (a,s) ->
+      let (a',acc') = f a acc in (NegativeWhatEver (a',s),acc')
+    | PositiveInternalized (a,s,i) ->
+      let (a',acc') = f a acc in (PositiveInternalized (a',s,i),acc')
+    | NegativeInternalized (a,s) ->
+      let (a',acc') = f a acc in (NegativeInternalized (a',s),acc')
+
+  let map_agent f = function
+    | Agent a -> Agent (f a)
+    | Freed (a,s) -> Freed (f a,s)
+    | Linked ((a1,s1),(a2,s2)) -> Linked ((f a1,s1),(f a2,s2))
+    | NegativeWhatEver (a,s) -> NegativeWhatEver (f a,s)
+    | PositiveInternalized (a,s,i) -> PositiveInternalized (f a,s,i)
+    | NegativeInternalized (a,s) -> NegativeInternalized (f a,s)
+
+  let fold_agent f acc = function
+    | Agent a -> f acc a
+    | Freed (a,_) -> f acc a
+    | Linked ((a1,_),(a2,_)) -> f (f acc a1) a2
+    | NegativeWhatEver (a,_) -> f acc a
+    | PositiveInternalized (a,_,_) -> f acc a
+    | NegativeInternalized (a,_) -> f acc a
+
+  let equal f a b =
+    match a,b with
+    | Agent a, Agent a' -> f a a'
+    | Agent _,
+      (Freed _ | Linked _ | NegativeWhatEver _ | PositiveInternalized _
+      | NegativeInternalized _)
+    | _, Agent _ -> false
+    | Freed (a,s), Freed (a',s') -> s=s' && f a a'
+    | Freed _,
+      (Linked _ | NegativeWhatEver _ | PositiveInternalized _
+      | NegativeInternalized _)
+    | _, Freed _ -> false
+    | Linked ((a1,s1),(a2,s2)), Linked ((a1',s1'),(a2',s2')) ->
+      (s1 = s1' && s2 = s2' && f a1 a1' && f a2 a2')
+      || (s1 = s2' && s2 = s1' && f a1 a2' && f a2 a1')
+    | Linked _,
+      (NegativeWhatEver _ | PositiveInternalized _
+      | NegativeInternalized _)
+    | _, Linked _ -> false
+    | NegativeWhatEver (a,s), NegativeWhatEver (a',s') -> s=s' && f a a'
+    | NegativeWhatEver _,
+      (PositiveInternalized _ | NegativeInternalized _)
+    | _, NegativeWhatEver _ -> false
+    | NegativeInternalized (a,s), NegativeInternalized (a',s') -> s=s' && f a a'
+    | NegativeInternalized _, PositiveInternalized _
+    | PositiveInternalized _, NegativeInternalized _ -> false
+    | PositiveInternalized (a,s,i), PositiveInternalized (a',s',i') ->
+      i = i' && s = s' && f a a'
+
   let print ?sigs f = function
     | Agent p ->
       Format.fprintf f "@[%a@]" (Matching.Agent.print ?sigs) p

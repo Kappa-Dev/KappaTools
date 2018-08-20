@@ -37,7 +37,8 @@ val get_corrected_rate:
 (* false means "either equal, or not"*)
 
 val necessarily_equal:
-  ('mix,'id) corrected_rate_const option -> ('mix,'id) corrected_rate_const option -> bool
+  ('mix,'id) corrected_rate_const option ->
+  ('mix,'id) corrected_rate_const option -> bool
 
 (** derivation *)
 

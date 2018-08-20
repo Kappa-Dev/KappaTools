@@ -66,7 +66,7 @@ module Agent: sig
   (** An agent in a connected component *)
 
   type t =
-    | Existing of Agent.t * int (* node, id *)
+    | Existing of Agent.t * int (* node, cc_id *)
     | Fresh of int * int (* type, id *)
 
   val rename : int -> Renaming.t -> t -> t
@@ -75,7 +75,6 @@ module Agent: sig
 
   val get_type : t -> int
   val get_id : t -> int
-  val same_connected_component : t -> t -> bool
   val is_fresh : t -> bool
 
   val print : ?sigs:Signature.s -> Format.formatter -> t -> unit

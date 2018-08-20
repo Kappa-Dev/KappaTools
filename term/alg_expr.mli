@@ -93,21 +93,26 @@ val sqrt:
 
 (** depend in time, depend in event number, depend in given var *)
 val add_dep :
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array) ->
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array
+   * Operator.DepSet.t array) ->
   Operator.rev_dep ->
   ('a,int) e Locality.annot ->
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array
+   * Operator.DepSet.t array)
 
 val add_dep_bool :
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array) ->
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array
+   * Operator.DepSet.t array) ->
   Operator.rev_dep ->
   ('a,int) bool Locality.annot ->
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array
+   * Operator.DepSet.t array)
 
 val setup_alg_vars_rev_dep :
   unit NamedDecls.t ->
   (string Locality.annot * ('a,int) e Locality.annot) array ->
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array
+   * Operator.DepSet.t array)
 
 val has_mix : ?var_decls:('b -> ('c,'b) e) -> ('a,'b) e -> pervasives_bool
 
@@ -136,3 +141,15 @@ val is_equality_test_time :
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
   ('a,int) bool -> pervasives_bool
+
+val map_on_mixture :
+  ('a -> ('c, 'b) e) -> ('a, 'b) e Locality.annot -> ('c, 'b) e Locality.annot
+val map_bool_on_mixture :
+  ('a -> ('c, 'b) e) ->
+  ('a, 'b) bool Locality.annot -> ('c, 'b) bool Locality.annot
+
+(* Syntactic equality up to positions but not associativity and comutativity *)
+val equal :
+  ('a, 'b) e Locality.annot -> ('a, 'b) e Locality.annot -> pervasives_bool
+val equal_bool :
+  ('a, 'b) bool Locality.annot -> ('a, 'b) bool Locality.annot -> pervasives_bool

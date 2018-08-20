@@ -457,3 +457,89 @@ let rec is_equality_test_time vars_deps = function
         true
      | (Operator.EQUAL | Operator.SMALLER | Operator.GREATER | Operator.DIFF) ->
         false
+
+let rec map_on_mixture f = function
+  | KAPPA_INSTANCE i,p -> (f i,p)
+  | DIFF_KAPPA_INSTANCE _,_ ->
+    failwith
+      "Alg_expr.map_on_mixture doesn't know what to do of DIFF_KAPPA_INSTANCE"
+  | CONST _,_ as x -> x
+  | ALG_VAR _,_ as x -> x
+  | TOKEN_ID _,_ as x -> x
+  | DIFF_TOKEN (a,i),p -> (DIFF_TOKEN (map_on_mixture f a,i),p)
+  | STATE_ALG_OP _,_ as x -> x
+  | BIN_ALG_OP (o,x,y),p ->
+    (BIN_ALG_OP (o,map_on_mixture f x,map_on_mixture f y),p)
+  | UN_ALG_OP (o,x),p -> (UN_ALG_OP (o,map_on_mixture f x),p)
+  | IF (b,x,y),p ->
+    (IF (map_bool_on_mixture f b,map_on_mixture f x,map_on_mixture f y),p)
+and map_bool_on_mixture f = function
+  | TRUE,_ as x -> x
+  | FALSE,_ as x -> x
+  | BIN_BOOL_OP (o,x,y),p ->
+    (BIN_BOOL_OP (o,map_bool_on_mixture f x,map_bool_on_mixture f y),p)
+  | UN_BOOL_OP (o,x),p ->
+    (UN_BOOL_OP (o,map_bool_on_mixture f x),p)
+  | COMPARE_OP (o,x,y),p ->
+    (COMPARE_OP (o,map_on_mixture f x,map_on_mixture f y),p)
+
+let rec equal a b =
+  match a,b with
+  | (BIN_ALG_OP (opa,a1,a2),_), (BIN_ALG_OP (opb,b1,b2),_) ->
+    opa = opb && equal a1 b1 && equal a2 b2
+  | (BIN_ALG_OP _,_),
+    ((UN_ALG_OP _ | STATE_ALG_OP _ | ALG_VAR _ | KAPPA_INSTANCE _ | TOKEN_ID _
+     | CONST _ | IF _),_)
+  | ((UN_ALG_OP _ | STATE_ALG_OP _ | ALG_VAR _ | KAPPA_INSTANCE _ | TOKEN_ID _
+     | CONST _ | IF _),_),
+    (BIN_ALG_OP _,_) -> false
+  |  (UN_ALG_OP (opa,a1),_), (UN_ALG_OP (opb,b1),_) -> opa = opb && equal a1 b1
+  | (UN_ALG_OP _,_),
+    ((STATE_ALG_OP _ | ALG_VAR _ | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _
+     | IF _),_)
+  | ((STATE_ALG_OP _ | ALG_VAR _ | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _
+     | IF _),_),
+    (UN_ALG_OP _,_) -> false
+  | (STATE_ALG_OP opa,_), (STATE_ALG_OP opb,_) -> opa = opb
+  | (STATE_ALG_OP _,_),
+    ((ALG_VAR _ | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _),_)
+  | ((ALG_VAR _ | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _),_),
+    (STATE_ALG_OP _,_) -> false
+  | (ALG_VAR id1,_), (ALG_VAR id2,_) -> id1=id2
+  | (ALG_VAR _,_), ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _),_)
+  | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _),_), (ALG_VAR _,_) ->
+    false
+  | (KAPPA_INSTANCE mix1,_),(KAPPA_INSTANCE mix2,_) -> mix1=mix2
+  | (KAPPA_INSTANCE _,_), (( TOKEN_ID _ | CONST _ | IF _),_)
+  | (( TOKEN_ID _ | CONST _ | IF _),_), (KAPPA_INSTANCE _,_) ->
+    false
+  | (TOKEN_ID id1,_), (TOKEN_ID id2,_) -> id1=id2
+  | (TOKEN_ID _,_), (( CONST _ | IF _),_)
+  | (( CONST _ | IF _),_), (TOKEN_ID _,_) -> false
+  | (CONST c1, _), (CONST c2, _) -> Nbr.is_equal c1 c2
+  | (CONST _,_), (IF _,_)
+  | (IF _,_),(CONST _,_) -> false
+
+  | (IF (conda,a1,a2),_), (IF (condb,b1,b2),_) ->
+    equal_bool conda condb && equal a1 b1 && equal a2 b2
+  | ((DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _),_),_
+  | _,((DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _),_) -> assert false
+and equal_bool a b  =
+  match a,b with
+  | (TRUE,_),(TRUE,_) -> true
+  | (TRUE,_), ((FALSE |BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_)
+  | ((FALSE | BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_), (TRUE,_) ->
+    false
+  | (FALSE,_),(FALSE,_) -> true
+  | (FALSE,_), ((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_)
+  | ((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_), (FALSE,_) -> false
+  | (UN_BOOL_OP (opa,a),_), (UN_BOOL_OP (opb,b),_) -> opa=opb && equal_bool a b
+  | (UN_BOOL_OP _,_),((BIN_BOOL_OP _ | COMPARE_OP _),_)
+  | ((BIN_BOOL_OP _ | COMPARE_OP _),_),(UN_BOOL_OP _,_) -> false
+  | (BIN_BOOL_OP (opa,a1,a2),_), (BIN_BOOL_OP (opb,b1,b2),_) ->
+    opa=opb && equal_bool a1 b1 && equal_bool a2 b2
+  | (BIN_BOOL_OP _,_),(COMPARE_OP _,_)
+  | (COMPARE_OP _,_),(BIN_BOOL_OP _,_) -> false
+  | (COMPARE_OP (opa,a1,a2),_), (COMPARE_OP (opb,b1,b2),_) ->
+    opa=opb && equal a1 b1 && equal a2 b2
+
