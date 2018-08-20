@@ -53,7 +53,7 @@ val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t
 val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
   Signature.s -> ltypes:bool -> Raw_mixture.t -> Format.formatter ->
-  rule_agent list -> unit
+  rule_mixture -> unit
 
 type 'a rule_agent_counters =
   {

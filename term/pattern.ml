@@ -1208,7 +1208,6 @@ module PreEnv = struct
           domain 0 in
       saturate_level ~max_sharing l l (si,domain)
 
-
   let of_env env =
     let add_cc acc p =
       let w = weight p.element in
