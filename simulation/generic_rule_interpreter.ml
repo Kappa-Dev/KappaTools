@@ -378,7 +378,7 @@ module Make (Instances:Instances_sig.S) = struct
       (inj_nodes,Mods.IntMap.add id free_id inj_fresh)
 
   let apply_negative_transformation
-      mod_connectivity (side_effects,stuff4unaries,edges) = function
+      ?mod_connectivity_store (side_effects,stuff4unaries,edges) = function
     | Primitives.Transformation.Agent (id,_) ->
       let edges' = Edges.remove_agent id edges in
       (side_effects,stuff4unaries,edges')
@@ -388,7 +388,9 @@ module Make (Instances:Instances_sig.S) = struct
     | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) ->
       let edges',cc_modif = Edges.remove_link id s id' s' edges in
       (side_effects,
-       Instances.break_apart_cc stuff4unaries edges' mod_connectivity cc_modif,edges')
+       Instances.break_apart_cc
+         stuff4unaries edges' ?mod_connectivity_store cc_modif,
+       edges')
     | Primitives.Transformation.NegativeWhatEver ((id,_),s as n) ->
       begin
         match (List.partition (fun x -> x =n) side_effects) with
@@ -399,7 +401,8 @@ module Make (Instances:Instances_sig.S) = struct
           | Some ((id',_ as nc'),s') ->
             let edges',cc_modif = Edges.remove_link id s id' s' edges in
             ((nc',s')::side_effects,
-             Instances.break_apart_cc stuff4unaries edges' mod_connectivity cc_modif,
+             Instances.break_apart_cc
+               stuff4unaries edges' ?mod_connectivity_store cc_modif,
              edges')
       end
     | Primitives.Transformation.PositiveInternalized _ ->
@@ -411,7 +414,8 @@ module Make (Instances:Instances_sig.S) = struct
       (side_effects,stuff4unaries,edges')
 
   let apply_positive_transformation
-      sigs mod_connectivity (inj2graph,side_effects,stuff4unaries,edges) = function
+      sigs ?mod_connectivity_store (inj2graph,side_effects,stuff4unaries,edges) =
+    function
     | Primitives.Transformation.Agent n ->
       let nc, inj2graph',edges' =
         let ty = Matching.Agent.get_type n in
@@ -433,7 +437,7 @@ module Make (Instances:Instances_sig.S) = struct
       let side_effects' = List_util.smart_filter
           (fun x -> x<>(nc,s) && x<>(nc',s')) side_effects in
       (inj2graph,side_effects',
-       Instances.merge_cc stuff4unaries mod_connectivity modif_cc,edges'),
+       Instances.merge_cc stuff4unaries ?mod_connectivity_store modif_cc,edges'),
       Primitives.Transformation.Linked ((nc,s),(nc',s'))
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
@@ -450,7 +454,7 @@ module Make (Instances:Instances_sig.S) = struct
            (Locality.dummy_annot "NegativeInternalized in positive update"))
 
   let apply_concrete_positive_transformation
-      sigs mod_connectivity (stuff4unaries,edges) = function
+      sigs ?mod_connectivity_store (stuff4unaries,edges) = function
     | Primitives.Transformation.Agent (id,ty) ->
       let _,edges' = Edges.add_agent ~id sigs ty edges in
       (stuff4unaries,edges')
@@ -459,7 +463,7 @@ module Make (Instances:Instances_sig.S) = struct
       (stuff4unaries,edges')
     | Primitives.Transformation.Linked ((nc,s),(nc',s')) ->
       let edges',modif_cc = Edges.add_link nc s nc' s' edges in
-      (Instances.merge_cc stuff4unaries mod_connectivity modif_cc,edges')
+      (Instances.merge_cc stuff4unaries ?mod_connectivity_store modif_cc,edges')
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
         (ExceptionDefn.Internal_Error
@@ -611,7 +615,7 @@ module Make (Instances:Instances_sig.S) = struct
       outputs counter domain inj_nodes state event_kind ?path rule sigs =
     let () = assert (not state.outdated) in
     let () = state.outdated <- true in
-    let former_deps,mod_connectivity = state.outdated_elements in
+    let former_deps,mod_connectivity_store = state.outdated_elements in
     (*Negative update*)
     let concrete_removed =
       List.map (Primitives.Transformation.concretize
@@ -623,14 +627,14 @@ module Make (Instances:Instances_sig.S) = struct
         concrete_removed in
     let (side_effects,instances,edges_after_neg) =
       List.fold_left
-        (apply_negative_transformation mod_connectivity)
+        (apply_negative_transformation ~mod_connectivity_store)
         ([],(state.instances),state.edges)
         concrete_removed in
     let () =
       List.iter
         (fun (pat,(root,_)) ->
            Instances.update_roots instances false state.precomputed.unary_patterns
-             edges_after_neg mod_connectivity pat root)
+             edges_after_neg mod_connectivity_store pat root)
         del_obs in
     (*Positive update*)
     let (final_inj2graph,remaining_side_effects,instances',edges'),
@@ -639,7 +643,7 @@ module Make (Instances:Instances_sig.S) = struct
         (fun (x,p) h ->
            let (x', h') =
              apply_positive_transformation
-               (Pattern.Env.signatures domain) mod_connectivity x h in
+               (Pattern.Env.signatures domain) ~mod_connectivity_store x h in
            (x',h'::p))
         (((inj_nodes,Mods.IntMap.empty),side_effects,
           instances,edges_after_neg),[])
@@ -658,7 +662,7 @@ module Make (Instances:Instances_sig.S) = struct
       List.iter
         (fun (pat,(root,_)) ->
            Instances.update_roots instances' true state.precomputed.unary_patterns
-             edges'' mod_connectivity pat root)
+             edges'' mod_connectivity_store pat root)
         new_obs in
     (*Store event*)
     let new_tracked_obs_instances =
@@ -687,7 +691,7 @@ module Make (Instances:Instances_sig.S) = struct
       variables_cache = state.variables_cache;
       variables_overwrite = state.variables_overwrite;
       edges = edges''; tokens = state.tokens;
-      outdated_elements = rev_deps,mod_connectivity;
+      outdated_elements = rev_deps,mod_connectivity_store;
       activities = state.activities;
       random_state = state.random_state;
       story_machinery = state.story_machinery;
@@ -699,7 +703,7 @@ module Make (Instances:Instances_sig.S) = struct
       ~outputs sigs counter domain state (actions,side_effect_dst) =
     let () = assert (not state.outdated) in
     let () = state.outdated <- true in
-    let former_deps,mod_connectivity = state.outdated_elements in
+    let former_deps,mod_connectivity_store = state.outdated_elements in
     (*Negative update*)
     let lnk_dst ((a,_),s) = Edges.link_destination a s state.edges in
     let concrete_removed =
@@ -712,14 +716,14 @@ module Make (Instances:Instances_sig.S) = struct
         concrete_removed in
     let (_side_effects,instances,edges_after_neg) =
       List.fold_left
-        (apply_negative_transformation mod_connectivity)
+        (apply_negative_transformation ~mod_connectivity_store)
         ([],(state.instances),state.edges)
         concrete_removed in
     let () =
       List.iter
         (fun (pat,(root,_)) ->
            Instances.update_roots instances false state.precomputed.unary_patterns
-             edges_after_neg mod_connectivity pat root)
+             edges_after_neg mod_connectivity_store pat root)
         del_obs in
     (*Positive update*)
     let concrete_inserted =
@@ -729,7 +733,7 @@ module Make (Instances:Instances_sig.S) = struct
       List.fold_left
         (fun x h ->
            apply_concrete_positive_transformation
-             (Pattern.Env.signatures domain) mod_connectivity x h)
+             (Pattern.Env.signatures domain) ~mod_connectivity_store x h)
         (instances,edges_after_neg)
         concrete_inserted in
     let ((new_obs,new_deps),_) =
@@ -741,7 +745,7 @@ module Make (Instances:Instances_sig.S) = struct
       List.iter
         (fun (pat,(root,_)) ->
            Instances.update_roots instances' true state.precomputed.unary_patterns
-             edges' mod_connectivity pat root)
+             edges' mod_connectivity_store pat root)
         new_obs in
     (*Print species*)
     let species =
@@ -753,7 +757,7 @@ module Make (Instances:Instances_sig.S) = struct
                       (file,(Counter.current_time counter),mixture))) species in
     let rev_deps = Operator.DepSet.union
         former_deps (Operator.DepSet.union del_deps new_deps) in
-    { activities = state.activities ; 
+    { activities = state.activities ;
       outdated = false;
       precomputed = state.precomputed;
       instances = instances';
@@ -763,7 +767,7 @@ module Make (Instances:Instances_sig.S) = struct
       variables_cache = state.variables_cache;
       variables_overwrite = state.variables_overwrite;
       edges = edges'; tokens = state.tokens;
-      outdated_elements = rev_deps,mod_connectivity;
+      outdated_elements = rev_deps,mod_connectivity_store;
       random_state = state.random_state;
       story_machinery = state.story_machinery;
       species = state.species;
@@ -772,7 +776,7 @@ module Make (Instances:Instances_sig.S) = struct
 
   let max_dist_to_int counter state d = Nbr.to_int (value_alg counter state d)
 
-  (* cc_va is the number of embeddings. It only has 
+  (* cc_va is the number of embeddings. It only has
   to be multiplied by the rate constant of the rule *)
   let store_activity store env counter state id syntax_id rate cc_va =
     let () =

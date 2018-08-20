@@ -41,11 +41,14 @@ let add_intset_in_intmap id set map =
     Should caches be handled at this level ? I do nt think so
     and I will probably clean this.
 *)
-let break_apart_cc state edges mod_conn = function
+let break_apart_cc state edges ?mod_connectivity_store = function
   | None -> state
   | Some (origin_cc,new_cc) ->
-    let () = Hashtbl.replace mod_conn origin_cc () in
-    let () = Hashtbl.replace mod_conn new_cc () in
+    let () = match mod_connectivity_store with
+      | None -> ()
+      | Some mod_conn ->
+        let () = Hashtbl.replace mod_conn new_cc () in
+        Hashtbl.replace mod_conn origin_cc () in
     {
       of_patterns = state.of_patterns;
       of_unary_patterns =
@@ -66,11 +69,14 @@ let break_apart_cc state edges mod_conn = function
     }
 
 (* Same: not very subtle. You just propagate. *)
-let merge_cc state mod_connectivity = function
+let merge_cc state ?mod_connectivity_store = function
   | None -> state
   | Some (cc1,cc2) ->
-    let () = Hashtbl.replace mod_connectivity cc1 () in
-    let () = Hashtbl.replace mod_connectivity cc2 () in
+    let () = match mod_connectivity_store with
+      | None -> ()
+      | Some mod_connectivity ->
+        let () = Hashtbl.replace mod_connectivity cc2 () in
+        Hashtbl.replace mod_connectivity cc1 () in
     {
       of_patterns = state.of_patterns;
       of_unary_patterns =

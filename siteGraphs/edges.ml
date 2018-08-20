@@ -187,11 +187,10 @@ let empty ~with_connected_components =
 
 let copy graph =
   let () = assert (not graph.outdated) in
-  let () = assert (Mods.Int2Set.is_empty graph.missings) in
   {
     outdated = false;
     connect = Mods.DynArray.map Array.copy graph.connect;
-    missings = Mods.Int2Set.empty;
+    missings = graph.missings;
     state = Mods.DynArray.map Array.copy graph.state;
     sort = Mods.DynArray.copy graph.sort;
     caches = (Cache.create (), Cache.create ());

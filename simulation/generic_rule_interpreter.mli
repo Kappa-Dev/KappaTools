@@ -126,12 +126,12 @@ module Make (Instances:Instances_sig.S) : sig
 
   (** {6 Internals } *)
   val apply_negative_transformation :
-    (int,unit) Hashtbl.t ->
+     ?mod_connectivity_store:Roots.mod_ccs_cache ->
     (Instantiation.concrete Instantiation.site) list * Instances.t * Edges.t ->
     Instantiation.concrete Primitives.Transformation.t ->
     (Instantiation.concrete Instantiation.site) list * Instances.t * Edges.t
   val apply_positive_transformation :
-    Signature.s -> (int,unit) Hashtbl.t ->
+    Signature.s -> ?mod_connectivity_store:Roots.mod_ccs_cache ->
     (Matching.t * int Mods.IntMap.t) *
     (Instantiation.concrete Instantiation.site) list *
     Instances.t * Edges.t ->
@@ -141,7 +141,8 @@ module Make (Instances:Instances_sig.S) : sig
      Instances.t * Edges.t) *
     Instantiation.concrete Primitives.Transformation.t
   val apply_concrete_positive_transformation :
-    Signature.s -> (int,unit) Hashtbl.t -> Instances.t * Edges.t ->
+    Signature.s -> ?mod_connectivity_store:Roots.mod_ccs_cache ->
+    Instances.t * Edges.t ->
     Instantiation.concrete Primitives.Transformation.t ->
     Instances.t * Edges.t
 

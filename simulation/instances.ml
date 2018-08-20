@@ -22,17 +22,17 @@ let empty env = {
 let incorporate_extra_pattern state pattern matchings =
   Roots.incorporate_extra_pattern state.roots pattern matchings
 
-let break_apart_cc state edges mod_conn ccs = {
-  roots = Roots.break_apart_cc state.roots edges mod_conn ccs
+let break_apart_cc state edges ?mod_connectivity_store ccs = {
+  roots = Roots.break_apart_cc state.roots edges ?mod_connectivity_store ccs
 }
 
-let merge_cc state mod_connectivity ccs = {
-  roots = Roots.merge_cc state.roots mod_connectivity ccs
+let merge_cc state ?mod_connectivity_store ccs = {
+  roots = Roots.merge_cc state.roots ?mod_connectivity_store ccs
 }
 
 let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
-    Roots.update_roots 
-      state.roots is_add unary_ccs edges mod_connectivity pattern root
+  Roots.update_roots
+    state.roots is_add unary_ccs edges mod_connectivity pattern root
 
 
 
@@ -43,10 +43,10 @@ let number_of_instances ?rule_id:_ st pats =
     (fun acc pattern ->  acc * (Roots.number st.roots pattern)) 1 pats
 
 
-let number_of_unary_instances_in_cc ?rule_id:_ st (pat1, pat2) = 
+let number_of_unary_instances_in_cc ?rule_id:_ st (pat1, pat2) =
   let map1 = Roots.of_unary_pattern pat1 st.roots in
   let map2 = Roots.of_unary_pattern pat2 st.roots in
-  fun cc -> 
+  fun cc ->
     let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc map1 in
     let set2 = Mods.IntMap.find_default Mods.IntSet.empty cc map2 in
     Mods.IntSet.size set1 * Mods.IntSet.size set2

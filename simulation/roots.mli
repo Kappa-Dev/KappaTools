@@ -14,9 +14,12 @@ val empty : Model.t -> t
 
 val incorporate_extra_pattern : t -> Pattern.id -> IntCollection.t -> unit
 
-val break_apart_cc : t -> Edges.t -> mod_ccs_cache -> (int * int) option -> t
+val break_apart_cc :
+  t -> Edges.t -> ?mod_connectivity_store:mod_ccs_cache ->
+  (int * int) option -> t
 
-val merge_cc : t -> mod_ccs_cache -> (int * int) option -> t
+val merge_cc :
+  t -> ?mod_connectivity_store:mod_ccs_cache -> (int * int) option -> t
 
 val update_roots :
   t -> bool -> Pattern.Set.t -> Edges.t ->

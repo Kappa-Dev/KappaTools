@@ -266,15 +266,13 @@ let species_to_positive_transformations cc =
       (Mods.IntMap.empty,[]) in
   List.rev tr
 
-let dummy_htbl = Hashtbl.create 0
-
 let find_all_embeddings compil species =
   let tr = species_to_positive_transformations species in
   let env = environment compil in
   let domain = Model.domain env in
   let _,graph = List.fold_left
       (Rule_interpreter.apply_concrete_positive_transformation
-         (Model.signatures env) dummy_htbl)
+         (Model.signatures env) ?mod_connectivity_store:None)
       (Instances.empty env,
        Edges.empty ~with_connected_components:false)
       tr in
@@ -539,7 +537,7 @@ let apply_sigs env rule inj_nodes mix =
   in
   let (side_effects, dummy, edges_after_neg) =
     List.fold_left
-      (Rule_interpreter.apply_negative_transformation dummy_htbl)
+      (Rule_interpreter.apply_negative_transformation)
       ([], Instances.empty env, mix)
       concrete_removed
   in
@@ -548,7 +546,7 @@ let apply_sigs env rule inj_nodes mix =
       (fun (x,p) h ->
          let (x',h') =
            Rule_interpreter.apply_positive_transformation
-             (Model.signatures env) dummy_htbl x h in
+             (Model.signatures env) x h in
          (x', h' :: p))
       (((inj_nodes, Mods.IntMap.empty),
         side_effects, dummy, edges_after_neg), [])
