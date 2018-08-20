@@ -235,7 +235,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
               let () =
                 Data.print_initial_inputs
                   ?uuid:None {conf with Configuration.seed = Some theSeed}
-                  env contact_map inputs_form init_l in
+                  env inputs_form init_l in
               let simulation =
                 create_t
                   ~contact_map ~log_form ~log_buffer ~inputs_buffer ~inputs_form
