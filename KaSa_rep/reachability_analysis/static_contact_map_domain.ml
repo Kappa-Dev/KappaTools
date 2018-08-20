@@ -182,6 +182,7 @@ struct
 
 
   let print ?dead_rules _static dynamic error _loggers =
+    let _ = dead_rules in
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

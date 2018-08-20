@@ -1640,33 +1640,8 @@ struct
       ~pos:Snd static dynamic error bool dump_title
       agent' site_name' state' modified_sites
 
-  let apply_rule_side_effects static dynamic error bool dump_title rule_id
-      modified_sites =
-    let parameters = get_parameter static in
-    let error, list =
-      Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
-        parameters error
-        []
-        rule_id
-        (get_potential_side_effects static)
-    in
-    let error, bool, dynamic, modified_sites =
-      List.fold_left
-        (fun (error, bool, dynamic, modified_sites) (_, (agent_name, site, state)) (* TO DO BETTER *)->
-           let error, bool, dynamic, modified_sites =
-             free_site
-               static dynamic error bool dump_title agent_name site state
-               modified_sites
-           in
-           error, bool, dynamic, modified_sites
-        )
-        (error, bool, dynamic, modified_sites)
-        list
-    in
-    error, bool, dynamic, modified_sites
 
- (*if it is not the first time it is apply then do not apply *)
-
+ (*if it is not the first time it is applied then do not apply *)
   let can_we_prove_this_is_not_the_first_application precondition =
     match
       Communication.is_the_rule_applied_for_the_first_time precondition
@@ -1747,10 +1722,6 @@ struct
       (*new event*)
       (*-----------------------------------------------------------*)
       (*1.d a site is modified by side effect *)
-      let error, bool, dynamic, modified_sites = (*new event*)
-        apply_rule_side_effects static dynamic error bool dump_title rule_id
-          modified_sites
-      in
       let () =
         if bool &&
            (local_trace ||
@@ -1786,10 +1757,50 @@ struct
       rule_id event_list
 
   let apply_one_side_effect
-      _static dynamic error
-      _ _ precondition
+      static dynamic error
+      _ (agent_name, site, state) precondition
     =
-    error, dynamic, (precondition,[]) (* move here the handling of side effects *)
+    let parameters = get_parameter static in
+    let dump_title () =
+      if local_trace ||
+         Remanent_parameters.get_dump_reachability_analysis_diff parameters
+      then
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "%sUpdate information about potential sites across domain"
+            (Remanent_parameters.get_prefix parameters)
+        in
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      else
+        ()
+    in
+    let error, modified_sites =
+      Communication.init_sites_working_list parameters error
+    in
+    let error, bool, dynamic, modified_sites =
+      free_site
+        static dynamic error false dump_title agent_name site state
+        modified_sites
+    in
+    let error, event_list =
+      Communication.fold_sites
+        parameters error
+        (fun _ error s _ event_list ->
+           error, (Communication.Modified_sites s) :: event_list)
+        modified_sites
+        []
+    in
+    let () =
+      if bool &&
+         (local_trace ||
+          Remanent_parameters.get_dump_reachability_analysis_diff parameters)
+      then
+        let () = Loggers.print_newline
+            (Remanent_parameters.get_logger parameters) in
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in
+    error, dynamic, (precondition,event_list)
 
   (****************************************************************)
   (*APPLY A LIST OF EVENT*)

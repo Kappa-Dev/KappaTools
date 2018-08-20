@@ -688,18 +688,10 @@ module Functor =
     let rule_creation = get_rule_creation static in
     (*-----------------------------------------------------------*)
     let error, rule = get_rule parameters error static rule_id in
-    let backward = get_backward_pointers static in
-    let error, potential_side_effects =
-      Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
-        parameters error []
-        rule_id
-        (get_potential_side_effects static)
-    in
     let first_application =
       can_we_prove_this_is_not_the_first_application
          precondition
     in
-
     match rule with
     | None ->
       let error, () =
