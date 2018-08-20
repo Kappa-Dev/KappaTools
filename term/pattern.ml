@@ -521,14 +521,8 @@ let print_cc_as_id sigs f cc =
               if st >= 0 then Format.fprintf
                   f "~%a" (Agent.print_raw_internal ~sigs ag p) st in
             match el with
-            | UnSpec ->
-              if st >= 0 then
-                let () = Format.pp_print_string f "~." in
-                (true,out)
-              else (not_empty,out)
-            | Free ->
-              let () = Format.pp_print_string f "~." in
-              (true,out)
+            | UnSpec -> (not_empty||st >= 0,out)
+            | Free -> (true,out)
             | Link (dst_a,dst_p) ->
               let dst_ty = find_ty cc dst_a in
               if Signature.is_counter_agent sigs dst_ty then
