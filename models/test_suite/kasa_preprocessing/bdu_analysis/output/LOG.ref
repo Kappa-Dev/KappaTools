@@ -490,40 +490,60 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
-Id=3
+Id=7
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
+  Id=6
    Node(site_type:1<1)
-    Id=1
-     Leaf True 
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
 
     Id=0
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(y{u})
+		A(y{u},x[.])
 
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
-Id=3
+Id=7
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
+  Id=6
    Node(site_type:1<1)
-    Id=1
-     Leaf True 
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
 
     Id=0
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x{u})
+		A(x{u},x[.])
 
 
 	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 5-32:):
@@ -558,6 +578,64 @@ Id=11
 
 EXTENSIONAL DESCRIPTION:
 		A(x[x.B],y[.])
+
+	Dealing with creation
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<1)
+    Id=13
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(y{u},x[x.B])
+
+	Dealing with creation
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<1)
+    Id=13
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{u},x[x.B])
 
 	Dealing with creation
 
@@ -682,12 +760,20 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[])
 
+		Updating the views for A(y{},x[])
+
+		Updating the views for A(x{},x[])
+
 	Applying rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:):
 		the precondition is satisfied
 
 		rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:) is applied for the first time
 
 		Updating the views for A(x[],y[])
+
+		Updating the views for A(y{},x[])
+
+		Updating the views for A(x{},x[])
 
 	Applying rule r6 (File "bdu_analysis.ka", line 15, characters 5-44:):
 		the precondition is satisfied
@@ -724,6 +810,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x[x.B],y[x.C])
 
 
+		Updating the views for A(y{},x[])
+
+		Updating the views for A(x{},x[])
+
 		Updating the views for B(x[])
 
 	Applying rule r7 (File "bdu_analysis.ka", line 16, characters 5-56:):
@@ -732,6 +822,10 @@ EXTENSIONAL DESCRIPTION:
 		rule r7 (File "bdu_analysis.ka", line 16, characters 5-56:) is applied for the first time
 
 		Updating the views for A(x[],y[])
+
+		Updating the views for A(y{},x[])
+
+		Updating the views for A(x{},x[])
 
 		Updating the views for C(x[])
 
@@ -752,15 +846,27 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[])
 
+		Updating the views for A(y{},x[])
+
+		Updating the views for A(x{},x[])
+
 	Applying rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
 
+		Updating the views for A(y{},x[])
+
+		Updating the views for A(x{},x[])
+
 	Applying rule r6 (File "bdu_analysis.ka", line 15, characters 5-44:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
+
+		Updating the views for A(y{},x[])
+
+		Updating the views for A(x{},x[])
 
 		Updating the views for B(x[])
 ------------------------------------------------------------
@@ -796,35 +902,55 @@ Id=27
      Leaf False 
 
 agent_type:0:A:cv_id:1
-Id=3
+Id=19
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
+  Id=18
    Node(site_type:1<1)
-    Id=1
-     Leaf True 
+    Id=17
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
 
     Id=0
      Leaf False 
 
 agent_type:0:A:cv_id:2
-Id=3
+Id=19
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
+  Id=18
    Node(site_type:1<1)
-    Id=1
-     Leaf True 
+    Id=17
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
 
     Id=0
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=22
+Id=24
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -838,7 +964,7 @@ Id=22
      Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=22
+Id=24
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -886,12 +1012,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=21
+Id=23
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=20
+  Id=22
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -986,12 +1112,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=21
+Id=23
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=20
+  Id=22
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1085,12 +1211,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=21
+Id=23
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=20
+  Id=22
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1175,12 +1301,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=21
+Id=23
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=20
+  Id=22
    Node(site_type:3<2)
     Id=1
      Leaf True 

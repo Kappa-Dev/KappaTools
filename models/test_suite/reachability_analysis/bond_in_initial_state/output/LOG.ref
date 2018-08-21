@@ -15,11 +15,7 @@ Reachability analysis...
 
 	Views in initial state:
 
-		A(x[x.B])
-
-	Views in initial state:
-
-		A(x{u})
+		A(x{u},x[x.B])
 
 	Views in initial state:
 
@@ -46,7 +42,7 @@ Reachability analysis...
 
 		rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:) is applied for the first time
 
-		Updating the views for A(x[])
+		Updating the views for A(x{},x[])
 	Dealing with side effects
 
 		B(x[.],x{u})
@@ -62,7 +58,7 @@ Reachability analysis...
 	Applying rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:):
 		the precondition is satisfied
 
-		Updating the views for A(x[])
+		Updating the views for A(x{},x[])
 
 	Applying rule ., B(x{p}[.]) -> B(x{p}[.]), B(x{p}[.]) (File "initial_state.ka", line 5, characters 0-42:):
 		the precondition is not satisfied yet
@@ -94,7 +90,7 @@ Reachability analysis...
 	Applying rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:):
 		the precondition is satisfied
 
-		Updating the views for A(x[])
+		Updating the views for A(x{},x[])
 	Dealing with side effects
 
 		B(x[.],x{p})
@@ -122,7 +118,7 @@ Reachability analysis...
 	Applying rule A(x[_]) -> . (File "initial_state.ka", line 4, characters 0-16:):
 		the precondition is satisfied
 
-		Updating the views for A(x[])
+		Updating the views for A(x{},x[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 23th of Feburary
-  * Last modification: Time-stamp: <Mar 01 2018>
+  * Last modification: Time-stamp: <Aug 21 2018>
   *
   * Compute the relations between the left hand site of a rule and its sites.
   *
@@ -84,7 +84,7 @@ let collect_modified_map parameters error kappa_handler diff_reverse store_modif
 (*-------------------------------------------------------------------------*)
 (*compute covering classes, site test and bdu*)
 
-let collect_covering_classes parameters error kappa_handler views diff_reverse store_result =
+let collect_covering_classes_regular parameters error kappa_handler views diff_reverse store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       parameters error
@@ -138,6 +138,45 @@ let collect_covering_classes parameters error kappa_handler views diff_reverse s
       ) views diff_reverse store_result
   in error, store_result
 
+let collect_covering_classes_side_effects parameters error kappa_handler  remove store_result =
+  List.fold_left
+    (fun (error, store_result) (_,agent,list) ->
+       let declared =
+         Ckappa_sig.Site_map_and_set.Map.fold
+           (fun site _ list -> site::list)
+           agent.Cckappa_sig.agent_interface
+           []
+       in
+       let declared = List.rev declared in
+       let error, old_list =
+         match
+           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+             parameters
+             error
+             agent.Cckappa_sig.agent_name
+             store_result
+         with
+         | error, None -> error, []
+         | error, Some l -> error, l
+       in
+       let new_list =
+         List.fold_left
+           (fun new_list site ->
+              (List.merge Ckappa_sig.compare_site_name declared [site])::new_list
+         )
+         old_list
+         list
+       in
+       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+         parameters
+         error
+         agent.Cckappa_sig.agent_name
+         new_list
+         store_result)
+    (error, store_result)
+    remove
+
+
 (************************************************************************************)
 (*compute covering class: it is a covering class whenever there is a
   modified site in that agent. (CHECK on their left-hand side)
@@ -166,13 +205,21 @@ let scan_rule_covering_classes parameters error kappa_handler rule classes =
   (*----------------------------------------------------------------------*)
   (*compute covering_class*)
   let error, store_covering_classes =
-    collect_covering_classes
+    collect_covering_classes_regular
       parameters
       error
       kappa_handler
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       rule.Cckappa_sig.diff_reverse
       classes.Covering_classes_type.store_covering_classes
+  in
+  let error, store_covering_classes =
+    collect_covering_classes_side_effects
+      parameters
+      error
+      kappa_handler
+      rule.Cckappa_sig.actions.Cckappa_sig.remove
+      store_covering_classes
   in
   (*----------------------------------------------------------------------*)
   (*result*)

@@ -1150,22 +1150,42 @@ Reachability analysis...
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=7
+Id=76
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=6
+  Id=75
    Node(site_type:1<1)
-    Id=3
+    Id=74
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=2
+      Id=73
        Node(site_type:2<1)
-        Id=1
-         Leaf True 
+        Id=46
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=45
+           Node(site_type:3<2)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -1174,7 +1194,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x{u},x[.])
+		A(x{u},c:=0,d:=1,x[.])
 
 	Views in initial state:
 
@@ -1201,52 +1221,46 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:) is applied for the first time
 
-		Updating the views for A(x{},x[])
-
-	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
-		the precondition is satisfied
-
-		rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:) is applied for the first time
-
-	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
-		the precondition is not satisfied yet
-
-	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
-		the precondition is satisfied
-
-		rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:) is applied for the first time
-
-	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
-		the precondition is satisfied
-
-		rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
-		the precondition is satisfied
-
-		rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:) is applied for the first time
-
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
+	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
-Id=13
+Id=36
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=35
    Node(site_type:1<1)
-    Id=9
-     Node(site_type:2<1)
+    Id=34
+     Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=8
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
+      Id=33
+       Node(site_type:2<1)
+        Id=32
+         Node(site_type:3<2)
+          Id=0
+           Leaf False 
+
+          Id=31
+           Node(site_type:3<3)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -1255,7 +1269,255 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x{u},x[x.B])
+		A(x{u},c:=0,d:=2,x[.])
+
+
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+		the precondition is satisfied
+
+		rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:) is applied for the first time
+	Dealing with creation
+
+INTENSIONAL DESCRIPTION:
+Id=40
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=39
+   Node(site_type:1<1)
+    Id=38
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=37
+       Node(site_type:2<2)
+        Id=32
+         Node(site_type:3<2)
+          Id=0
+           Leaf False 
+
+          Id=31
+           Node(site_type:3<3)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{u},c:=1,d:=2,x[.])
+
+
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
+		the precondition is not satisfied yet
+
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
+		the precondition is satisfied
+
+		rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:) is applied for the first time
+	Dealing with creation
+
+INTENSIONAL DESCRIPTION:
+Id=67
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=66
+   Node(site_type:1<1)
+    Id=65
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=57
+       Node(site_type:2<3)
+        Id=56
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=55
+           Node(site_type:3<1)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{u},c:=1,d:=0,x[.])
+		A(x{u},c:=2,d:=0,x[.])
+
+
+	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
+		the precondition is satisfied
+
+		rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+		the precondition is satisfied
+
+		rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=103
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=102
+   Node(site_type:1<1)
+    Id=101
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=100
+       Node(site_type:2<1)
+        Id=93
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=24
+           Node(site_type:3<3)
+            Id=9
+             Node(site_type:4<1)
+              Id=0
+               Leaf False 
+
+              Id=8
+               Node(site_type:4<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=99
+         Node(site_type:2<2)
+          Id=95
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
+
+            Id=94
+             Node(site_type:3<1)
+              Id=9
+               Node(site_type:4<1)
+                Id=0
+                 Leaf False 
+
+                Id=8
+                 Node(site_type:4<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=25
+               Node(site_type:3<2)
+                Id=0
+                 Leaf False 
+
+                Id=24
+                 Node(site_type:3<3)
+                  Id=9
+                   Node(site_type:4<1)
+                    Id=0
+                     Leaf False 
+
+                    Id=8
+                     Node(site_type:4<2)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+          Id=98
+           Node(site_type:2<3)
+            Id=97
+             Node(site_type:3<0)
+              Id=0
+               Leaf False 
+
+              Id=96
+               Node(site_type:3<1)
+                Id=9
+                 Node(site_type:4<1)
+                  Id=0
+                   Leaf False 
+
+                  Id=8
+                   Node(site_type:4<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{u},c:=0,d:=2,x[x.B])
+		A(x{u},c:=0,d:=1,x[x.B])
+		A(x{u},c:=1,d:=2,x[x.B])
+		A(x{u},c:=1,d:=0,x[x.B])
+		A(x{u},c:=2,d:=0,x[x.B])
 
 
 		Updating the views for B(x[])
@@ -1283,7 +1545,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:) is applied for the first time
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
@@ -1292,25 +1554,220 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:) is applied for the first time
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 INTENSIONAL DESCRIPTION:
-Id=19
+Id=120
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=18
+  Id=119
    Node(site_type:1<2)
-    Id=3
+    Id=90
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=2
+      Id=89
        Node(site_type:2<1)
-        Id=1
-         Leaf True 
+        Id=77
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=31
+           Node(site_type:3<3)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=88
+         Node(site_type:2<2)
+          Id=87
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
+
+            Id=86
+             Node(site_type:3<1)
+              Id=3
+               Node(site_type:4<0)
+                Id=0
+                 Leaf False 
+
+                Id=2
+                 Node(site_type:4<1)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=32
+               Node(site_type:3<2)
+                Id=0
+                 Leaf False 
+
+                Id=31
+                 Node(site_type:3<3)
+                  Id=3
+                   Node(site_type:4<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=2
+                     Node(site_type:4<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+          Id=57
+           Node(site_type:2<3)
+            Id=56
+             Node(site_type:3<0)
+              Id=0
+               Leaf False 
+
+              Id=55
+               Node(site_type:3<1)
+                Id=3
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=2
+                   Node(site_type:4<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=0,d:=2,x[.])
+		A(x{p},c:=0,d:=1,x[.])
+		A(x{p},c:=1,d:=2,x[.])
+		A(x{p},c:=1,d:=0,x[.])
+		A(x{p},c:=2,d:=0,x[.])
+
+
+	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
+		the precondition is satisfied
+
+		rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
+		the precondition is satisfied
+
+		rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+		the precondition is satisfied
+
+		rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
+		the precondition is not satisfied yet
+
+	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
+		the precondition is satisfied
+
+		rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=132
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=131
+   Node(site_type:1<1)
+    Id=130
+     Node(site_type:2<4)
+      Id=0
+       Leaf False 
+
+      Id=129
+       Node(site_type:2<5)
+        Id=87
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=86
+           Node(site_type:3<1)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=32
+             Node(site_type:3<2)
+              Id=0
+               Leaf False 
+
+              Id=31
+               Node(site_type:3<3)
+                Id=3
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=2
+                   Node(site_type:4<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
 
         Id=0
          Leaf False 
@@ -1319,45 +1776,9 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x{p},x[.])
+		A(x{u},c:=4,d:=2,x[.])
+		A(x{u},c:=4,d:=0,x[.])
 
-
-	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
-		the precondition is satisfied
-
-		rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
-		the precondition is satisfied
-
-		rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
-		the precondition is satisfied
-
-		rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
-		the precondition is satisfied
-
-		rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
-		the precondition is satisfied
-
-		rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:) is applied for the first time
-
-		Updating the views for A(x{},x[])
 
 		Updating the views for B(x[])
 
@@ -1369,79 +1790,45 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:) is applied for the first time
 
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
-		the precondition is satisfied
-
-		rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
-		the precondition is satisfied
-
-		rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
-		the precondition is satisfied
-
-		rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
-		the precondition is satisfied
-
-		rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
-		the precondition is satisfied
-
-	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
-		the precondition is satisfied
-
-		rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:) is applied for the first time
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 INTENSIONAL DESCRIPTION:
-Id=27
- Node(site_type:1<1)
+Id=150
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=23
-   Node(site_type:1<2)
-    Id=9
-     Node(site_type:2<1)
+  Id=149
+   Node(site_type:1<1)
+    Id=148
+     Node(site_type:2<4)
       Id=0
        Leaf False 
 
-      Id=8
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
+      Id=147
+       Node(site_type:2<5)
+        Id=146
+         Node(site_type:3<4)
+          Id=0
+           Leaf False 
+
+          Id=145
+           Node(site_type:3<5)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -1450,7 +1837,449 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x{p},x[x.B])
+		A(x{u},c:=4,d:=4,x[.])
+
+
+		Updating the views for B(x[])
+
+	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
+		the precondition is satisfied
+
+		rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=176
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=175
+   Node(site_type:1<2)
+    Id=174
+     Node(site_type:2<3)
+      Id=0
+       Leaf False 
+
+      Id=173
+       Node(site_type:2<4)
+        Id=172
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=151
+           Node(site_type:3<3)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=146
+             Node(site_type:3<4)
+              Id=0
+               Leaf False 
+
+              Id=145
+               Node(site_type:3<5)
+                Id=3
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=2
+                   Node(site_type:4<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=3,d:=4,x[.])
+		A(x{p},c:=3,d:=2,x[.])
+		A(x{p},c:=3,d:=1,x[.])
+		A(x{p},c:=3,d:=0,x[.])
+
+
+	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
+		the precondition is satisfied
+
+		rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=199
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=198
+   Node(site_type:1<2)
+    Id=197
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=196
+       Node(site_type:2<2)
+        Id=195
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=194
+           Node(site_type:3<2)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=146
+             Node(site_type:3<4)
+              Id=0
+               Leaf False 
+
+              Id=145
+               Node(site_type:3<5)
+                Id=3
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=2
+                   Node(site_type:4<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=1,d:=4,x[.])
+		A(x{p},c:=1,d:=1,x[.])
+
+
+	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
+		the precondition is satisfied
+
+		rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
+		the precondition is satisfied
+
+		rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+		the precondition is satisfied
+
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
+		the precondition is not satisfied yet
+
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
+		the precondition is satisfied
+
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=243
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=242
+   Node(site_type:1<1)
+    Id=207
+     Node(site_type:2<4)
+      Id=0
+       Leaf False 
+
+      Id=206
+       Node(site_type:2<5)
+        Id=205
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=204
+           Node(site_type:3<1)
+            Id=9
+             Node(site_type:4<1)
+              Id=0
+               Leaf False 
+
+              Id=8
+               Node(site_type:4<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=203
+             Node(site_type:3<2)
+              Id=0
+               Leaf False 
+
+              Id=202
+               Node(site_type:3<3)
+                Id=9
+                 Node(site_type:4<1)
+                  Id=0
+                   Leaf False 
+
+                  Id=8
+                   Node(site_type:4<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=144
+                 Node(site_type:3<4)
+                  Id=0
+                   Leaf False 
+
+                  Id=143
+                   Node(site_type:3<5)
+                    Id=9
+                     Node(site_type:4<1)
+                      Id=0
+                       Leaf False 
+
+                      Id=8
+                       Node(site_type:4<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=0
+                     Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=218
+     Node(site_type:1<2)
+      Id=217
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=216
+         Node(site_type:2<1)
+          Id=93
+           Node(site_type:3<1)
+            Id=0
+             Leaf False 
+
+            Id=24
+             Node(site_type:3<3)
+              Id=9
+               Node(site_type:4<1)
+                Id=0
+                 Leaf False 
+
+                Id=8
+                 Node(site_type:4<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
+          Id=215
+           Node(site_type:2<2)
+            Id=212
+             Node(site_type:3<0)
+              Id=0
+               Leaf False 
+
+              Id=202
+               Node(site_type:3<3)
+                Id=9
+                 Node(site_type:4<1)
+                  Id=0
+                   Leaf False 
+
+                  Id=8
+                   Node(site_type:4<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=144
+                 Node(site_type:3<4)
+                  Id=0
+                   Leaf False 
+
+                  Id=143
+                   Node(site_type:3<5)
+                    Id=9
+                     Node(site_type:4<1)
+                      Id=0
+                       Leaf False 
+
+                      Id=8
+                       Node(site_type:4<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=0
+                     Leaf False 
+
+            Id=214
+             Node(site_type:2<3)
+              Id=97
+               Node(site_type:3<0)
+                Id=0
+                 Leaf False 
+
+                Id=96
+                 Node(site_type:3<1)
+                  Id=9
+                   Node(site_type:4<1)
+                    Id=0
+                     Leaf False 
+
+                    Id=8
+                     Node(site_type:4<2)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=213
+               Node(site_type:2<4)
+                Id=212
+                 Node(site_type:3<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=202
+                   Node(site_type:3<3)
+                    Id=9
+                     Node(site_type:4<1)
+                      Id=0
+                       Leaf False 
+
+                      Id=8
+                       Node(site_type:4<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=144
+                     Node(site_type:3<4)
+                      Id=0
+                       Leaf False 
+
+                      Id=143
+                       Node(site_type:3<5)
+                        Id=9
+                         Node(site_type:4<1)
+                          Id=0
+                           Leaf False 
+
+                          Id=8
+                           Node(site_type:4<2)
+                            Id=1
+                             Leaf True 
+
+                            Id=0
+                             Leaf False 
+
+                        Id=0
+                         Leaf False 
+
+                Id=0
+                 Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=0,d:=2,x[x.B])
+		A(x{p},c:=0,d:=1,x[x.B])
+		A(x{p},c:=1,d:=4,x[x.B])
+		A(x{p},c:=1,d:=2,x[x.B])
+		A(x{p},c:=1,d:=1,x[x.B])
+		A(x{p},c:=1,d:=0,x[x.B])
+		A(x{p},c:=2,d:=0,x[x.B])
+		A(x{p},c:=3,d:=4,x[x.B])
+		A(x{p},c:=3,d:=2,x[x.B])
+		A(x{p},c:=3,d:=1,x[x.B])
+		A(x{p},c:=3,d:=0,x[x.B])
+		A(x{u},c:=4,d:=4,x[x.B])
+		A(x{u},c:=4,d:=2,x[x.B])
+		A(x{u},c:=4,d:=0,x[x.B])
 
 
 		Updating the views for B(x[])
@@ -1458,46 +2287,553 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
 	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=253
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=252
+   Node(site_type:1<2)
+    Id=156
+     Node(site_type:2<4)
+      Id=0
+       Leaf False 
+
+      Id=155
+       Node(site_type:2<5)
+        Id=154
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=153
+           Node(site_type:3<1)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=152
+             Node(site_type:3<2)
+              Id=0
+               Leaf False 
+
+              Id=151
+               Node(site_type:3<3)
+                Id=3
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=2
+                   Node(site_type:4<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=146
+                 Node(site_type:3<4)
+                  Id=0
+                   Leaf False 
+
+                  Id=145
+                   Node(site_type:3<5)
+                    Id=3
+                     Node(site_type:4<0)
+                      Id=0
+                       Leaf False 
+
+                      Id=2
+                       Node(site_type:4<1)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=0
+                     Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=4,d:=4,x[.])
+		A(x{p},c:=4,d:=2,x[.])
+		A(x{p},c:=4,d:=0,x[.])
+
 
 	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
-
-	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
 
 	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=277
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=276
+   Node(site_type:1<2)
+    Id=275
+     Node(site_type:2<4)
+      Id=0
+       Leaf False 
+
+      Id=274
+       Node(site_type:2<5)
+        Id=46
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=45
+           Node(site_type:3<2)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=4,d:=1,x[.])
+
+
+		Updating the views for B(x[])
+
+	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
+		the precondition is not satisfied yet
+
+	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
+		the precondition is not satisfied yet
+
+	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=305
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=304
+   Node(site_type:1<2)
+    Id=260
+     Node(site_type:2<4)
+      Id=0
+       Leaf False 
+
+      Id=259
+       Node(site_type:2<5)
+        Id=212
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=202
+           Node(site_type:3<3)
+            Id=9
+             Node(site_type:4<1)
+              Id=0
+               Leaf False 
+
+              Id=8
+               Node(site_type:4<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=144
+             Node(site_type:3<4)
+              Id=0
+               Leaf False 
+
+              Id=143
+               Node(site_type:3<5)
+                Id=9
+                 Node(site_type:4<1)
+                  Id=0
+                   Leaf False 
+
+                  Id=8
+                   Node(site_type:4<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=4,d:=4,x[x.B])
+		A(x{p},c:=4,d:=2,x[x.B])
+		A(x{p},c:=4,d:=1,x[x.B])
+		A(x{p},c:=4,d:=0,x[x.B])
+
+
+		Updating the views for B(x[])
+
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
+		the precondition is satisfied
+
+		rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:) is applied for the first time
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+	Dealing with creation
+
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=49
+   Node(site_type:1<1)
+    Id=48
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=47
+       Node(site_type:2<3)
+        Id=46
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=45
+           Node(site_type:3<2)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{u},c:=2,d:=1,x[.])
+
+
+	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+		the precondition is satisfied
+
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
+		the precondition is satisfied
+
+	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=350
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=349
+   Node(site_type:1<1)
+    Id=348
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=347
+       Node(site_type:2<3)
+        Id=346
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=330
+           Node(site_type:3<2)
+            Id=9
+             Node(site_type:4<1)
+              Id=0
+               Leaf False 
+
+              Id=8
+               Node(site_type:4<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{u},c:=2,d:=1,x[x.B])
+
+
+		Updating the views for B(x[])
+
+	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=361
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=360
+   Node(site_type:1<2)
+    Id=48
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=47
+       Node(site_type:2<3)
+        Id=46
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=45
+           Node(site_type:3<2)
+            Id=3
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=2
+               Node(site_type:4<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=2,d:=1,x[.])
+
+
+	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+INTENSIONAL DESCRIPTION:
+Id=384
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=383
+   Node(site_type:1<2)
+    Id=348
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=347
+       Node(site_type:2<3)
+        Id=346
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=330
+           Node(site_type:3<2)
+            Id=9
+             Node(site_type:4<1)
+              Id=0
+               Leaf False 
+
+              Id=8
+               Node(site_type:4<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x{p},c:=2,d:=1,x[x.B])
+
 
 		Updating the views for B(x[])
 
@@ -1507,113 +2843,112 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
+
+	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
+		the precondition is not satisfied yet
 
 	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
-
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
 	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+		the precondition is satisfied
+
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
 		the precondition is satisfied
 
 	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
-		Updating the views for A(x{},x[])
-
-	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
 
 	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
 	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
@@ -1623,96 +2958,62 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
 	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
 	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
-
-	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
+		the precondition is not satisfied yet
 
 	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+		the precondition is satisfied
+
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
 		the precondition is satisfied
 
 	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
 		the precondition is satisfied
 
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
-		Updating the views for A(x{},x[])
-
-	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
+rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:) will never be applied.
 rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:) will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
@@ -1721,31 +3022,341 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=26
+Id=382
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
-   Node(site_type:1<2)
-    Id=14
+  Id=381
+   Node(site_type:1<1)
+    Id=343
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=8
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
+      Id=342
+       Node(site_type:2<1)
+        Id=106
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
 
+          Id=105
+           Node(site_type:3<3)
+            Id=104
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=8
+               Node(site_type:4<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=341
+         Node(site_type:2<2)
+          Id=109
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
+
+            Id=108
+             Node(site_type:3<1)
+              Id=104
+               Node(site_type:4<0)
+                Id=0
+                 Leaf False 
+
+                Id=8
+                 Node(site_type:4<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=107
+               Node(site_type:3<2)
+                Id=0
+                 Leaf False 
+
+                Id=105
+                 Node(site_type:3<3)
+                  Id=104
+                   Node(site_type:4<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=8
+                     Node(site_type:4<2)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+          Id=340
+           Node(site_type:2<3)
+            Id=339
+             Node(site_type:3<0)
+              Id=0
+               Leaf False 
+
+              Id=338
+               Node(site_type:3<2)
+                Id=104
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=8
+                   Node(site_type:4<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+            Id=228
+             Node(site_type:2<4)
+              Id=0
+               Leaf False 
+
+              Id=227
+               Node(site_type:2<5)
+                Id=226
+                 Node(site_type:3<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=225
+                   Node(site_type:3<1)
+                    Id=104
+                     Node(site_type:4<0)
+                      Id=0
+                       Leaf False 
+
+                      Id=8
+                       Node(site_type:4<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=224
+                     Node(site_type:3<2)
+                      Id=0
+                       Leaf False 
+
+                      Id=223
+                       Node(site_type:3<3)
+                        Id=104
+                         Node(site_type:4<0)
+                          Id=0
+                           Leaf False 
+
+                          Id=8
+                           Node(site_type:4<2)
+                            Id=1
+                             Leaf True 
+
+                            Id=0
+                             Leaf False 
+
+                        Id=222
+                         Node(site_type:3<4)
+                          Id=0
+                           Leaf False 
+
+                          Id=221
+                           Node(site_type:3<5)
+                            Id=104
+                             Node(site_type:4<0)
+                              Id=0
+                               Leaf False 
+
+                              Id=8
+                               Node(site_type:4<2)
+                                Id=1
+                                 Leaf True 
+
+                                Id=0
+                                 Leaf False 
+
+                            Id=0
+                             Leaf False 
+
+                Id=0
+                 Leaf False 
+
+    Id=380
+     Node(site_type:1<2)
+      Id=379
+       Node(site_type:2<0)
         Id=0
          Leaf False 
 
-    Id=0
-     Leaf False 
+        Id=378
+         Node(site_type:2<1)
+          Id=106
+           Node(site_type:3<1)
+            Id=0
+             Leaf False 
+
+            Id=105
+             Node(site_type:3<3)
+              Id=104
+               Node(site_type:4<0)
+                Id=0
+                 Leaf False 
+
+                Id=8
+                 Node(site_type:4<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
+          Id=377
+           Node(site_type:2<2)
+            Id=233
+             Node(site_type:3<0)
+              Id=0
+               Leaf False 
+
+              Id=223
+               Node(site_type:3<3)
+                Id=104
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=8
+                   Node(site_type:4<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=222
+                 Node(site_type:3<4)
+                  Id=0
+                   Leaf False 
+
+                  Id=221
+                   Node(site_type:3<5)
+                    Id=104
+                     Node(site_type:4<0)
+                      Id=0
+                       Leaf False 
+
+                      Id=8
+                       Node(site_type:4<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=0
+                     Leaf False 
+
+            Id=376
+             Node(site_type:2<3)
+              Id=339
+               Node(site_type:3<0)
+                Id=0
+                 Leaf False 
+
+                Id=338
+                 Node(site_type:3<2)
+                  Id=104
+                   Node(site_type:4<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=8
+                     Node(site_type:4<2)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=296
+               Node(site_type:2<5)
+                Id=233
+                 Node(site_type:3<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=223
+                   Node(site_type:3<3)
+                    Id=104
+                     Node(site_type:4<0)
+                      Id=0
+                       Leaf False 
+
+                      Id=8
+                       Node(site_type:4<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=222
+                     Node(site_type:3<4)
+                      Id=0
+                       Leaf False 
+
+                      Id=221
+                       Node(site_type:3<5)
+                        Id=104
+                         Node(site_type:4<0)
+                          Id=0
+                           Leaf False 
+
+                          Id=8
+                           Node(site_type:4<2)
+                            Id=1
+                             Leaf True 
+
+                            Id=0
+                             Leaf False 
+
+                        Id=0
+                         Leaf False 
+
+                Id=0
+                 Leaf False 
+
+      Id=0
+       Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=17
+Id=118
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1763,12 +3374,27 @@ Id=17
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=394
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=393
+   Node(site_type:1<5)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=392
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=391
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1778,12 +3404,37 @@ Id=29
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=31
+Id=397
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=396
+   Node(site_type:2<3)
+    Id=1
+     Leaf True 
+
+    Id=395
+     Node(site_type:2<4)
+      Id=0
+       Leaf False 
+
+      Id=385
+       Node(site_type:2<5)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=398
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=30
+  Id=43
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1793,7 +3444,7 @@ Id=31
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=17
+Id=118
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1807,7 +3458,9 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+A() => [ A(c[.]:[0 .. 0]) v A(c[.]:[1 .. 1]) v A(c[.]:[2 .. 2]) v A(c[.]:[3 .. 3]) v A(c[.]:[4 .. 4]) ]
 A() => [ A(x{u}[#]) v A(x{p}[#]) ]
+A() => [ A(d[.]:[0 .. 0]) v A(d[.]:[1 .. 1]) v A(d[.]:[2 .. 2]) v A(d[.]:[4 .. 4]) ]
 A() => [ A(x[.]) v A(x[x.B]) ]
 B() => [ B(x[.]) v B(x[x.A]) ]
 
@@ -1815,27 +3468,12 @@ B() => [ B(x[.]) v B(x[x.A]) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=31
+Id=398
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=30
+  Id=43
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1845,7 +3483,212 @@ Id=31
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=17
+Id=459
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=458
+   Node(site_type:0<1)
+    Id=451
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=450
+       Node(site_type:1<1)
+        Id=439
+         Node(site_type:2<1)
+          Id=0
+           Leaf False 
+
+          Id=41
+           Node(site_type:2<3)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=449
+         Node(site_type:1<2)
+          Id=441
+           Node(site_type:2<0)
+            Id=0
+             Leaf False 
+
+            Id=440
+             Node(site_type:2<1)
+              Id=1
+               Leaf True 
+
+              Id=42
+               Node(site_type:2<2)
+                Id=0
+                 Leaf False 
+
+                Id=41
+                 Node(site_type:2<3)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+          Id=448
+           Node(site_type:1<3)
+            Id=442
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=18
+               Node(site_type:2<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=447
+             Node(site_type:1<4)
+              Id=0
+               Leaf False 
+
+              Id=446
+               Node(site_type:1<5)
+                Id=445
+                 Node(site_type:2<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=444
+                   Node(site_type:2<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=443
+                     Node(site_type:2<2)
+                      Id=0
+                       Leaf False 
+
+                      Id=396
+                       Node(site_type:2<3)
+                        Id=1
+                         Leaf True 
+
+                        Id=395
+                         Node(site_type:2<4)
+                          Id=0
+                           Leaf False 
+
+                          Id=385
+                           Node(site_type:2<5)
+                            Id=1
+                             Leaf True 
+
+                            Id=0
+                             Leaf False 
+
+                Id=0
+                 Leaf False 
+
+    Id=457
+     Node(site_type:0<2)
+      Id=456
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=455
+         Node(site_type:1<1)
+          Id=439
+           Node(site_type:2<1)
+            Id=0
+             Leaf False 
+
+            Id=41
+             Node(site_type:2<3)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=454
+           Node(site_type:1<2)
+            Id=397
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=396
+               Node(site_type:2<3)
+                Id=1
+                 Leaf True 
+
+                Id=395
+                 Node(site_type:2<4)
+                  Id=0
+                   Leaf False 
+
+                  Id=385
+                   Node(site_type:2<5)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+            Id=453
+             Node(site_type:1<3)
+              Id=442
+               Node(site_type:2<0)
+                Id=0
+                 Leaf False 
+
+                Id=18
+                 Node(site_type:2<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=452
+               Node(site_type:1<5)
+                Id=397
+                 Node(site_type:2<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=396
+                   Node(site_type:2<3)
+                    Id=1
+                     Leaf True 
+
+                    Id=395
+                     Node(site_type:2<4)
+                      Id=0
+                       Leaf False 
+
+                      Id=385
+                       Node(site_type:2<5)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                Id=0
+                 Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=118
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1859,6 +3702,34 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(c[.]:[0 .. 0],d[.]:[2 .. 2],x{p}[#])
+	v A(c[.]:[0 .. 0],d[.]:[1 .. 1],x{p}[#])
+	v A(c[.]:[1 .. 1],d[.]:[4 .. 4],x{p}[#])
+	v A(c[.]:[1 .. 1],d[.]:[2 .. 2],x{p}[#])
+	v A(c[.]:[1 .. 1],d[.]:[1 .. 1],x{p}[#])
+	v A(c[.]:[1 .. 1],d[.]:[0 .. 0],x{p}[#])
+	v A(c[.]:[2 .. 2],d[.]:[1 .. 1],x{p}[#])
+	v A(c[.]:[2 .. 2],d[.]:[0 .. 0],x{p}[#])
+	v A(c[.]:[3 .. 3],d[.]:[4 .. 4],x{p}[#])
+	v A(c[.]:[3 .. 3],d[.]:[2 .. 2],x{p}[#])
+	v A(c[.]:[3 .. 3],d[.]:[1 .. 1],x{p}[#])
+	v A(c[.]:[3 .. 3],d[.]:[0 .. 0],x{p}[#])
+	v A(c[.]:[4 .. 4],d[.]:[4 .. 4],x{p}[#])
+	v A(c[.]:[4 .. 4],d[.]:[2 .. 2],x{p}[#])
+	v A(c[.]:[4 .. 4],d[.]:[1 .. 1],x{p}[#])
+	v A(c[.]:[4 .. 4],d[.]:[0 .. 0],x{p}[#])
+	v A(c[.]:[0 .. 0],d[.]:[2 .. 2],x{u}[#])
+	v A(c[.]:[0 .. 0],d[.]:[1 .. 1],x{u}[#])
+	v A(c[.]:[1 .. 1],d[.]:[2 .. 2],x{u}[#])
+	v A(c[.]:[1 .. 1],d[.]:[0 .. 0],x{u}[#])
+	v A(c[.]:[2 .. 2],d[.]:[1 .. 1],x{u}[#])
+	v A(c[.]:[2 .. 2],d[.]:[0 .. 0],x{u}[#])
+	v A(c[.]:[4 .. 4],d[.]:[4 .. 4],x{u}[#])
+	v A(c[.]:[4 .. 4],d[.]:[2 .. 2],x{u}[#])
+	v A(c[.]:[4 .. 4],d[.]:[0 .. 0],x{u}[#])
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -1871,12 +3742,27 @@ EXTENSIONAL DESCRIPTION:
 A() => A(d{[1 .. 4]})
 B() => B(c{]-oo .. 0]})
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=394
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=393
+   Node(site_type:1<5)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=392
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=391
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1886,12 +3772,37 @@ Id=29
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=31
+Id=397
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=396
+   Node(site_type:2<3)
+    Id=1
+     Leaf True 
+
+    Id=395
+     Node(site_type:2<4)
+      Id=0
+       Leaf False 
+
+      Id=385
+       Node(site_type:2<5)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=398
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=30
+  Id=43
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1901,7 +3812,7 @@ Id=31
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=17
+Id=118
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1916,27 +3827,12 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=31
+Id=398
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=30
+  Id=43
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1946,7 +3842,212 @@ Id=31
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=17
+Id=459
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=458
+   Node(site_type:0<1)
+    Id=451
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=450
+       Node(site_type:1<1)
+        Id=439
+         Node(site_type:2<1)
+          Id=0
+           Leaf False 
+
+          Id=41
+           Node(site_type:2<3)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=449
+         Node(site_type:1<2)
+          Id=441
+           Node(site_type:2<0)
+            Id=0
+             Leaf False 
+
+            Id=440
+             Node(site_type:2<1)
+              Id=1
+               Leaf True 
+
+              Id=42
+               Node(site_type:2<2)
+                Id=0
+                 Leaf False 
+
+                Id=41
+                 Node(site_type:2<3)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+          Id=448
+           Node(site_type:1<3)
+            Id=442
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=18
+               Node(site_type:2<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=447
+             Node(site_type:1<4)
+              Id=0
+               Leaf False 
+
+              Id=446
+               Node(site_type:1<5)
+                Id=445
+                 Node(site_type:2<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=444
+                   Node(site_type:2<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=443
+                     Node(site_type:2<2)
+                      Id=0
+                       Leaf False 
+
+                      Id=396
+                       Node(site_type:2<3)
+                        Id=1
+                         Leaf True 
+
+                        Id=395
+                         Node(site_type:2<4)
+                          Id=0
+                           Leaf False 
+
+                          Id=385
+                           Node(site_type:2<5)
+                            Id=1
+                             Leaf True 
+
+                            Id=0
+                             Leaf False 
+
+                Id=0
+                 Leaf False 
+
+    Id=457
+     Node(site_type:0<2)
+      Id=456
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=455
+         Node(site_type:1<1)
+          Id=439
+           Node(site_type:2<1)
+            Id=0
+             Leaf False 
+
+            Id=41
+             Node(site_type:2<3)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=454
+           Node(site_type:1<2)
+            Id=397
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=396
+               Node(site_type:2<3)
+                Id=1
+                 Leaf True 
+
+                Id=395
+                 Node(site_type:2<4)
+                  Id=0
+                   Leaf False 
+
+                  Id=385
+                   Node(site_type:2<5)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+            Id=453
+             Node(site_type:1<3)
+              Id=442
+               Node(site_type:2<0)
+                Id=0
+                 Leaf False 
+
+                Id=18
+                 Node(site_type:2<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=452
+               Node(site_type:1<5)
+                Id=397
+                 Node(site_type:2<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=396
+                   Node(site_type:2<3)
+                    Id=1
+                     Leaf True 
+
+                    Id=395
+                     Node(site_type:2<4)
+                      Id=0
+                       Leaf False 
+
+                      Id=385
+                       Node(site_type:2<5)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                Id=0
+                 Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=118
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1970,12 +4071,49 @@ A()=> [
 		  A(x[.])
 		v A(x[x.B])]
 A()=> [
+		  A(d[.]:[0 .. 0])
+		v A(d[.]:[1 .. 1])
+		v A(d[.]:[2 .. 2])
+		v A(d[.]:[4 .. 4])]
+A()=> [
 		  A(x{u}[#])
 		v A(x{p}[#])]
+A()=> [
+		  A(c[.]:[0 .. 0])
+		v A(c[.]:[1 .. 1])
+		v A(c[.]:[2 .. 2])
+		v A(c[.]:[3 .. 3])
+		v A(c[.]:[4 .. 4])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+A()=> [
+		  A(c[.]:[0 .. 0],d[.]:[2 .. 2],x{p}[#])
+		v A(c[.]:[0 .. 0],d[.]:[1 .. 1],x{p}[#])
+		v A(c[.]:[1 .. 1],d[.]:[4 .. 4],x{p}[#])
+		v A(c[.]:[1 .. 1],d[.]:[2 .. 2],x{p}[#])
+		v A(c[.]:[1 .. 1],d[.]:[1 .. 1],x{p}[#])
+		v A(c[.]:[1 .. 1],d[.]:[0 .. 0],x{p}[#])
+		v A(c[.]:[2 .. 2],d[.]:[1 .. 1],x{p}[#])
+		v A(c[.]:[2 .. 2],d[.]:[0 .. 0],x{p}[#])
+		v A(c[.]:[3 .. 3],d[.]:[4 .. 4],x{p}[#])
+		v A(c[.]:[3 .. 3],d[.]:[2 .. 2],x{p}[#])
+		v A(c[.]:[3 .. 3],d[.]:[1 .. 1],x{p}[#])
+		v A(c[.]:[3 .. 3],d[.]:[0 .. 0],x{p}[#])
+		v A(c[.]:[4 .. 4],d[.]:[4 .. 4],x{p}[#])
+		v A(c[.]:[4 .. 4],d[.]:[2 .. 2],x{p}[#])
+		v A(c[.]:[4 .. 4],d[.]:[1 .. 1],x{p}[#])
+		v A(c[.]:[4 .. 4],d[.]:[0 .. 0],x{p}[#])
+		v A(c[.]:[0 .. 0],d[.]:[2 .. 2],x{u}[#])
+		v A(c[.]:[0 .. 0],d[.]:[1 .. 1],x{u}[#])
+		v A(c[.]:[1 .. 1],d[.]:[2 .. 2],x{u}[#])
+		v A(c[.]:[1 .. 1],d[.]:[0 .. 0],x{u}[#])
+		v A(c[.]:[2 .. 2],d[.]:[1 .. 1],x{u}[#])
+		v A(c[.]:[2 .. 2],d[.]:[0 .. 0],x{u}[#])
+		v A(c[.]:[4 .. 4],d[.]:[4 .. 4],x{u}[#])
+		v A(c[.]:[4 .. 4],d[.]:[2 .. 2],x{u}[#])
+		v A(c[.]:[4 .. 4],d[.]:[0 .. 0],x{u}[#])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
@@ -1991,4 +4129,6 @@ A()=> [
 A()=> [A(d[.]:[1 .. 4])]
 B()=> [B(c[.]:]-oo .. 0])]
 
-execution finished without any exception
+Some exceptions have been raised
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 340; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 340; exception:Exit

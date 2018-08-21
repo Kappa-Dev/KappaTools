@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaSa side_effect_reduction.ka  || exit 0
+
+#Reduction with the view domain is necessary to establish that C cannot be freed by side effects.

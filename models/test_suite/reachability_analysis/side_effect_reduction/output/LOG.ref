@@ -1,0 +1,34 @@
+Parsing side_effect_reduction.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+A() => [ A(y[x.B]) v A(y[x.C]) ]
+A() => [ A(x[x.B]) v A(x[x.C]) ]
+B() => [ B(x[.]) v B(x[x.A]) v B(x[y.A]) ]
+C() => [ C(x[x.A]) v C(x[y.A]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+A(x[x.C]) <=> A(y[x.C])
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+execution finished without any exception

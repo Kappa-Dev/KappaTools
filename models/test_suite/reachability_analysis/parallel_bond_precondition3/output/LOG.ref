@@ -378,22 +378,32 @@ Reachability analysis...
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=9
+Id=19
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=8
+  Id=18
    Node(site_type:1<1)
-    Id=7
+    Id=9
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=6
+      Id=8
        Node(site_type:2<1)
-        Id=1
-         Leaf True 
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -402,46 +412,37 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z[.],t[.])
+		A(x{u},z[.],t[.])
 
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=19
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=18
    Node(site_type:1<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A(x{u})
-
-	Views in initial state:
-
-INTENSIONAL DESCRIPTION:
-Id=9
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<1)
-    Id=7
+    Id=9
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=6
+      Id=8
        Node(site_type:2<1)
-        Id=1
-         Leaf True 
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -450,26 +451,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(z[.],t[.])
-
-	Views in initial state:
-
-INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		B(x{u})
+		B(x{u},z[.],t[.])
 
 
 	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:):
@@ -477,25 +459,35 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:) is applied for the first time
 
-		Updating the views for A(z[],t[])
+		Updating the views for A(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
-Id=11
- Node(site_type:1<1)
+Id=21
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=10
-   Node(site_type:1<2)
-    Id=7
-     Node(site_type:2<0)
+  Id=20
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=6
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
+      Id=10
+       Node(site_type:2<2)
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -504,28 +496,38 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z[z.B],t[.])
+		A(x{u},z[z.B],t[.])
 
 
-		Updating the views for B(z[],t[])
+		Updating the views for B(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
-Id=11
- Node(site_type:1<1)
+Id=21
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=10
-   Node(site_type:1<2)
-    Id=7
-     Node(site_type:2<0)
+  Id=20
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=6
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
+      Id=10
+       Node(site_type:2<2)
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -534,7 +536,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(z[z.A],t[.])
+		B(x{u},z[z.A],t[.])
 
 
 	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:):
@@ -542,25 +544,35 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:) is applied for the first time
 
-		Updating the views for A(z[],t[])
+		Updating the views for A(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<1)
+Id=28
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=14
-   Node(site_type:1<2)
-    Id=13
+  Id=27
+   Node(site_type:1<1)
+    Id=15
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=12
+      Id=14
        Node(site_type:2<2)
-        Id=1
-         Leaf True 
+        Id=13
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=12
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -569,28 +581,38 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z[z.B],t[t.B])
+		A(x{u},z[z.B],t[t.B])
 
 
-		Updating the views for B(z[],t[])
+		Updating the views for B(x{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<1)
+Id=28
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=14
-   Node(site_type:1<2)
-    Id=13
+  Id=27
+   Node(site_type:1<1)
+    Id=15
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=12
+      Id=14
        Node(site_type:2<2)
-        Id=1
-         Leaf True 
+        Id=13
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=12
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -599,7 +621,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(z[z.A],t[t.A])
+		B(x{u},z[z.A],t[t.A])
 
 
 	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:):
@@ -607,28 +629,38 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:) is applied for the first time
 
-		Updating the views for A(z[],t[])
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(z[],t[])
+		Updating the views for B(x{},z[],t[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=54
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=27
+  Id=53
    Node(site_type:1<1)
-    Id=13
-     Node(site_type:2<1)
+    Id=52
+     Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=12
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
+      Id=51
+       Node(site_type:2<1)
+        Id=13
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=12
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -637,27 +669,37 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(z[.],t[t.A])
+		B(x{u},z[.],t[t.A])
 
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=54
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=27
+  Id=53
    Node(site_type:1<1)
-    Id=13
-     Node(site_type:2<1)
+    Id=52
+     Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=12
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
+      Id=51
+       Node(site_type:2<1)
+        Id=13
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=12
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
@@ -666,7 +708,7 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z[.],t[t.B])
+		A(x{u},z[.],t[t.B])
 
 
 	Applying rule r4 (File "parallel_bonds.ka", line 10, characters 5-41:):
@@ -674,30 +716,30 @@ EXTENSIONAL DESCRIPTION:
 
 		rule r4 (File "parallel_bonds.ka", line 10, characters 5-41:) is applied for the first time
 
-		Updating the views for A(z[],t[])
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(z[],t[])
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(z[],t[])
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(z[],t[])
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(z[],t[])
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(z[],t[])
+		Updating the views for B(x{},z[],t[])
 
 	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:):
 		the precondition is satisfied
 
-		Updating the views for A(z[],t[])
+		Updating the views for A(x{},z[],t[])
 
-		Updating the views for B(z[],t[])
+		Updating the views for B(x{},z[],t[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -707,77 +749,69 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=26
+Id=50
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=18
-   Node(site_type:1<2)
-    Id=17
+  Id=49
+   Node(site_type:1<1)
+    Id=48
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=12
+      Id=30
        Node(site_type:2<2)
-        Id=1
-         Leaf True 
+        Id=29
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=12
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
-
-    Id=0
-     Leaf False 
-
-agent_type:0:A:cv_id:1
-Id=5
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<1)
-    Id=1
-     Leaf True 
 
     Id=0
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=26
+Id=50
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=18
-   Node(site_type:1<2)
-    Id=17
+  Id=49
+   Node(site_type:1<1)
+    Id=48
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=12
+      Id=30
        Node(site_type:2<2)
-        Id=1
-         Leaf True 
+        Id=29
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=12
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
 
         Id=0
          Leaf False 
-
-    Id=0
-     Leaf False 
-
-agent_type:1:B:cv_id:1
-Id=5
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<1)
-    Id=1
-     Leaf True 
 
     Id=0
      Leaf False 
@@ -787,27 +821,12 @@ Id=5
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=17
+Id=60
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=2
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -817,27 +836,12 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=31
-   Node(site_type:0<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=30
+Id=70
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
+  Id=35
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -847,12 +851,27 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=17
+Id=72
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=71
+   Node(site_type:0<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=60
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=2
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -862,12 +881,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=70
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=35
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=72
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=71
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -876,38 +910,23 @@ Id=32
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(z[.]) v A(z[z.B]) ]
 A() => [ A(t[.]) v A(t[t.B]) ]
+A() => [ A(z[.]) v A(z[z.B]) ]
 A() => A(x{u}[.])
-B() => [ B(z[.]) v B(z[z.A]) ]
 B() => [ B(t[.]) v B(t[t.A]) ]
+B() => [ B(z[.]) v B(z[z.A]) ]
 B() => B(x{u}[.])
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=17
+Id=60
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=2
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -917,12 +936,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=70
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=35
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=72
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=71
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -932,27 +966,12 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=17
+Id=60
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=2
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -962,12 +981,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=70
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=35
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=72
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=71
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -993,27 +1027,12 @@ B(t[t.A],z[z.A]) => B(t[2],z[1]),A(t[2],z[1])
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=17
+Id=60
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=2
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -1023,12 +1042,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=70
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=35
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=72
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=71
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1038,27 +1072,12 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=17
+Id=60
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=2
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -1068,12 +1087,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=70
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=35
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=72
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=71
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1083,27 +1117,12 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=17
+Id=60
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=2
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -1113,12 +1132,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=70
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=35
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=72
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=71
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1128,27 +1162,12 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=17
+Id=60
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=12
+  Id=2
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -1158,12 +1177,27 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=70
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=35
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=72
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=71
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1177,18 +1211,18 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 B()=> [B(x{u}[.])]
 B()=> [
-		  B(t[.])
-		v B(t[t.A])]
-B()=> [
 		  B(z[.])
 		v B(z[z.A])]
+B()=> [
+		  B(t[.])
+		v B(t[t.A])]
 A()=> [A(x{u}[.])]
-A()=> [
-		  A(t[.])
-		v A(t[t.B])]
 A()=> [
 		  A(z[.])
 		v A(z[z.B])]
+A()=> [
+		  A(t[.])
+		v A(t[t.B])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

@@ -508,10 +508,10 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r7 (File "stochastic_create.ka", line 14, characters 5-24:):
 		the precondition is not satisfied yet
 
-	Applying rule r5 (File "stochastic_create.ka", line 12, characters 5-37:):
+	Applying rule r4 (File "stochastic_create.ka", line 11, characters 5-32:):
 		the precondition is not satisfied yet
 
-	Applying rule r4 (File "stochastic_create.ka", line 11, characters 5-32:):
+	Applying rule r5 (File "stochastic_create.ka", line 12, characters 5-37:):
 		the precondition is not satisfied yet
 
 	Applying rule r2 (File "stochastic_create.ka", line 9, characters 5-49:):
@@ -627,12 +627,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=11
+Id=13
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=10
+  Id=12
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -657,12 +657,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=11
+Id=13
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=10
+  Id=12
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -695,12 +695,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=11
+Id=13
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=10
+  Id=12
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -725,12 +725,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=11
+Id=13
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=10
+  Id=12
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -764,12 +764,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=11
+Id=13
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=10
+  Id=12
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -794,12 +794,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=11
+Id=13
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=10
+  Id=12
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -824,12 +824,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=11
+Id=13
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=10
+  Id=12
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -854,12 +854,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=11
+Id=13
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=10
+  Id=12
    Node(site_type:0<1)
     Id=1
      Leaf True 
