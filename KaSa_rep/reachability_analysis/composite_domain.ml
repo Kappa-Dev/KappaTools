@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 20 2018>
+  * Last modification: Time-stamp: <Aug 21 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -613,23 +613,19 @@ struct
       List.fold_left
         (fun  (error, dynamic, (precondition, event_list)) (source, target) ->
            let (agent_id, _, site, state) = source in
-           let error, global_dynamic_information, precondition, state_list =
+           let error, dynamic, precondition, state_list =
              Communication.get_state_of_site_in_precondition
-               (fun x -> x)
-               (fun x -> x)
-               (fun x _ -> x)
+               get_global_static_information
+               get_global_dynamic_information
+               set_global_dynamic_information
                error
-               (get_global_static_information static)
-               (get_global_dynamic_information dynamic)
+               static
+               dynamic
                (r_id, rule)
                agent_id (*A*)
                site
                precondition
-           in
-           let dynamic =
-             set_global_dynamic_information
-               global_dynamic_information dynamic
-           in
+           in           
            if List.mem state state_list
            then
              apply_one_side_effect

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Aug 17 2018>
+   * Last modification: Time-stamp: <Aug 21 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -59,13 +59,20 @@ type bdu_analysis_static =
       Ckappa_sig.Views_bdu.mvbdu
         Covering_classes_type.AgentsCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
+    site_to_renamed_site_list:
+      (Covering_classes_type.cv_id * Ckappa_sig.c_site_name)
+      list
+      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t
   }
 
 (***************************************************************************)
 (*initial values of BDU static*)
 (***************************************************************************)
 
-let init_bdu_analysis_static _parameters error =
+let init_bdu_analysis_static parameters error =
+  let error, init_site_to_renamed_site_list =
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0,0)
+  in
   let init_bdu_analysis_static =
     {
       store_proj_bdu_creation_restriction_map =
@@ -76,6 +83,8 @@ let init_bdu_analysis_static _parameters error =
         Ckappa_sig.Rule_setmap.Map.empty;
       store_proj_bdu_test_restriction =
         Ckappa_sig.Rule_setmap.Map.empty;
+      site_to_renamed_site_list =
+        init_site_to_renamed_site_list
     }
   in
   error, init_bdu_analysis_static
@@ -592,7 +601,7 @@ let store_bdu_potential_effect_restriction_map parameters handler error
       error
       (*store_new_index_pair_map*)
       store_remanent_triple
-      store_potential_side_effects 
+      store_potential_side_effects
       store_result
   in
   let error =
@@ -600,6 +609,43 @@ let store_bdu_potential_effect_restriction_map parameters handler error
       Exception.warn parameters error error' __POS__ Exit
   in
   error, (handler, store_result)
+
+let collect_site_to_renamed_site_list
+    parameters error store_remanent_triple output
+  =
+  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
+    error
+    (fun parameters error agent_type' triple_list output ->
+       List.fold_left
+         (fun (error, output) (cv_id, list, _) ->
+            let rec aux error site list output =
+              match list with
+              | [] -> error, output
+              | h::t ->
+                begin
+                  let key = (agent_type', h) in
+                  let error, old =
+                    match
+                      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
+                        parameters error key output
+                    with
+                    | error, None -> error, []
+                    | error, Some l -> error, l
+                  in
+                  let new_list = (cv_id, site)::old in
+                  let error, output =
+                    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
+                      parameters error key new_list output
+                  in
+                  let site' = Ckappa_sig.next_site_name site in
+                  aux error site' t output
+                end
+            in
+            aux error Ckappa_sig.dummy_site_name_1 list output)
+         (error, output) triple_list)
+    store_remanent_triple
+    output
+
 
 (**************************************************************************)
 (*projection with rule_id*)
@@ -948,7 +994,7 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
       None log_info
   in
   error, log_info, handler_bdu,
-  {
+  {store_result with
     store_proj_bdu_creation_restriction_map =
       store_proj_bdu_creation_restriction_map;
     store_modif_list_restriction_map = store_modif_list_restriction_map;
@@ -977,7 +1023,7 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
              handler_bdu
              rule_id
              rule.Cckappa_sig.e_rule_c_rule
-               store_remanent_triple
+             store_remanent_triple
              store_potential_side_effects
              compiled
              store_result
@@ -985,7 +1031,14 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
          error, (handler_bdu, log_info, store_result)
       ) compiled.Cckappa_sig.rules (handler_bdu, log_info, init)
   in
-  error, (handler_bdu, log_info, store_results)
+  let error, site_to_renamed_site_list =
+    collect_site_to_renamed_site_list
+      parameters error
+      store_remanent_triple
+      store_results.site_to_renamed_site_list
+  in
+  error, (handler_bdu, log_info,
+          {store_results with site_to_renamed_site_list})
 
 (***************************************************************************)
 (*PATTERN*)

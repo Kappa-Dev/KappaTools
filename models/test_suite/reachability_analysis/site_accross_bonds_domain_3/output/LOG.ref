@@ -1197,70 +1197,12 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		A(z[.],t[t.B])
-
-	Dealing with side effects
-
-INTENSIONAL DESCRIPTION:
-Id=34
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=33
-   Node(site_type:1<2)
-    Id=32
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=31
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		B(t[t.A],z[.])
-
-	Dealing with side effects
-
-INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=28
+  Id=30
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<1)
@@ -1280,6 +1222,64 @@ Id=29
 
 EXTENSIONAL DESCRIPTION:
 		E(z[.],t[t.F])
+
+	Dealing with side effects
+
+INTENSIONAL DESCRIPTION:
+Id=37
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=36
+   Node(site_type:1<2)
+    Id=35
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=34
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		B(t[t.A],z[.])
+
+	Dealing with side effects
+
+INTENSIONAL DESCRIPTION:
+Id=31
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(z[.],t[t.B])
 
 
 	Applying rule ., ., ., . -> C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]) (File "site_accross_bonds_domain.ka", line 9, characters 0-56:):
@@ -1321,7 +1321,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=30
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1345,14 +1345,14 @@ Id=30
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=37
+Id=43
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=36
+  Id=42
    Node(site_type:1<2)
-    Id=35
+    Id=41
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1369,7 +1369,7 @@ Id=37
      Leaf False 
 
 agent_type:2:E:cv_id:0
-Id=30
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1597,12 +1597,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=29
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=28
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1612,12 +1612,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=29
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=28
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1793,12 +1793,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=29
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=28
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1808,12 +1808,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=29
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=28
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1996,12 +1996,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=29
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=28
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2011,12 +2011,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=29
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=28
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2176,12 +2176,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=29
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=28
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2191,12 +2191,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=29
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=28
    Node(site_type:0<4)
     Id=1
      Leaf True 

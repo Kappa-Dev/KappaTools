@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 20 2018>
+   * Last modification: Time-stamp: <Aug 21 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -117,8 +117,6 @@ struct
 
   let get_agent_name_from_pattern static =
     lift Analyzer_headers.get_agent_name_from_pattern static
-
-  let get_side_effects static = lift Analyzer_headers.get_side_effects static
 
   let get_potential_side_effects static =
     lift Analyzer_headers.get_potential_side_effects static
@@ -290,6 +288,11 @@ struct
     in
     error, result_static.Bdu_static_views.store_modif_list_restriction_map
 
+  let get_site_to_renamed_site_list static error =
+    let error, result_static =
+      get_bdu_analysis_static static error
+    in
+    error, result_static.Bdu_static_views.site_to_renamed_site_list
   (*--------------------------------------------------------------------*)
 
   type 'a zeroary =
@@ -3210,12 +3213,28 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
 
   (***************************************************************)
 
-  let compute_bdu_update_side_effects static dynamic error bdu_test list_a
-      bdu_X =
-    let error, dynamic, bdu_result =
-      compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X
+  let compute_bdu_update_side_effects static dynamic error bdu_test list_a bdu_X =
+    let parameters = get_parameter static in
+    let parameter_views = Remanent_parameters.update_prefix parameters "\t\t\t"
     in
+    let handler = get_mvbdu_handler dynamic in
+    let error, handler, bdu_inter =
+      Ckappa_sig.Views_bdu.mvbdu_and
+        parameter_views handler error bdu_X bdu_test
+    in
+    (*redefine with modification list*)
+    let error, handler, bdu_redefine =
+      Ckappa_sig.Views_bdu.mvbdu_redefine
+        parameter_views handler error bdu_inter list_a
+    in
+    (*do the union of bdu_redefine and bdu_X*)
+    let error, handler, bdu_result =
+      Ckappa_sig.Views_bdu.mvbdu_or
+        parameter_views handler error bdu_redefine bdu_X
+    in
+    let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_result
+
 
   (****************************************************************)
 
@@ -3349,59 +3368,9 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
     error, dynamic, event_list
 
   (**************************************************************************)
-  (*deal with side effects*)
-
-  let compute_side_effects_enabled static dynamic error rule_id event_list =
-    let parameters = get_parameter static in
-    let error, store_bdu_potential =
-      get_store_proj_bdu_potential_restriction static error
-    in
-    let error, proj_bdu_potential_restriction =
-      match Ckappa_sig.Rule_setmap.Map.find_option rule_id
-              store_bdu_potential
-      with
-      | None -> error, Covering_classes_type.AgentSiteCV_setmap.Map.empty
-      | Some map -> error, map
-    in
-    (*-----------------------------------------------------------------------*)
-    let error, dynamic, event_list =
-      Covering_classes_type.AgentSiteCV_setmap.Map.fold
-        (fun (agent_type, _new_site_id, cv_id) (bdu_test, list)
-          (error, dynamic, event_list) ->
-          let fixpoint_result = get_fixpoint_result dynamic in
-          let error, dynamic, bdu_false =
-            get_mvbdu_false static dynamic error in
-          let error, bdu_X =
-            match
-              Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                parameters error
-                (agent_type, cv_id)
-                fixpoint_result
-            with
-            | error, None -> error, bdu_false
-            | error, Some bdu -> error, bdu
-          in
-          let error, dynamic, bdu_update =
-            compute_bdu_update_side_effects static dynamic error bdu_test list
-              bdu_X
-          in
-          let error, dynamic, event_list =
-            add_link
-              ~title:"Dealing with side effects"
-              error
-              static
-              dynamic
-              (agent_type, cv_id)
-              bdu_update
-              event_list
-          in
-          error, dynamic, event_list
-        ) proj_bdu_potential_restriction (error, dynamic, event_list)
-    in
-    error, dynamic, event_list
 
   (**************************************************************************)
-  (*compute enable in different cases*)
+  (*apply rules in different cases*)
 
   let can_we_prove_this_is_the_first_application precondition =
     match
@@ -3444,16 +3413,6 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
         (*Sure_value is false*)
         error, dynamic, event_list
     in
-    (*-----------------------------------------------------------------------*)
-    (*deal with side effects*)
-    let error, dynamic, event_list =
-      compute_side_effects_enabled
-        static
-        dynamic
-        error
-        rule_id
-        event_list
-    in
     error, dynamic, event_list
 
   (**************************************************************)
@@ -3465,10 +3424,70 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
     error, dynamic, (precondition, event_list)
 
   let apply_one_side_effect
-      _static dynamic error
-      _ _ precondition
+      static dynamic error
+      _rule_id (agent_name, site, state) precondition
     =
-    error, dynamic, (precondition,[]) (* move here the handling of side effects *)
+    let parameters = get_parameter static in
+    let error, site_to_site_list =
+      get_site_to_renamed_site_list static error
+    in
+    let error, site_list_opt =
+      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
+        parameters error
+        (agent_name,site)
+        site_to_site_list
+    in
+    let site_list =
+      match site_list_opt with
+      | None -> []
+      | Some l -> l
+    in
+    let error, dynamic, event_list =
+      List.fold_left
+        (fun (error, dynamic, event_list) (cv_id, site') ->
+           let list_test = [site', state] in
+           let list_modif = [site', Ckappa_sig.dummy_state_index] in
+           let handler = get_mvbdu_handler dynamic in
+           let error, handler, bdu_test =
+             Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list
+               parameters handler error list_test
+           in
+           let error, handler, list_modif =
+             Ckappa_sig.Views_bdu.build_association_list
+               parameters handler error list_modif
+           in
+           let dynamic = set_mvbdu_handler handler dynamic in
+           let fixpoint_result = get_fixpoint_result dynamic in
+           let error, dynamic, bdu_false =
+             get_mvbdu_false static dynamic error in
+           let error, bdu_X =
+             match
+               Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                parameters error
+                (agent_name, cv_id)
+                fixpoint_result
+            with
+            | error, None -> error, bdu_false
+            | error, Some bdu -> error, bdu
+          in
+          let error, dynamic, bdu_update =
+            compute_bdu_update_side_effects static dynamic error bdu_test list_modif
+              bdu_X
+          in
+          let error, dynamic, event_list =
+            add_link
+              ~title:"Dealing with side effects"
+              error
+              static
+              dynamic
+              (agent_name, cv_id)
+              bdu_update
+              event_list
+          in
+          error, dynamic, event_list
+        ) (error, dynamic, []) site_list
+    in
+    error, dynamic, (precondition,event_list)
 
   (**************************************************************************)
   (* events enable communication between domains. At this moment, the

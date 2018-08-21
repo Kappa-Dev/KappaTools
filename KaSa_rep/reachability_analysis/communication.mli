@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Apr 02 2017>
+   * Last modification: Time-stamp: <Aug 21 2018>
    *
    * Abstract domain to record live rules
    *
@@ -185,14 +185,14 @@ val follow_path_inside_cc:
 val get_state_of_site_in_precondition:
   ('static -> Analyzer_headers.global_static_information) ->
   ('dynamic -> Analyzer_headers.global_dynamic_information) ->
-  (Analyzer_headers.global_dynamic_information -> 'dynamic -> 'c) ->
+  (Analyzer_headers.global_dynamic_information -> 'dynamic -> 'dynamic) ->
   Exception.method_handler ->
   'static -> 'dynamic ->
   (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule) ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   precondition ->
-  Exception.method_handler * 'c * precondition *
+  Exception.method_handler * 'dynamic * precondition *
   Ckappa_sig.c_state list
 
 val get_state_of_site_in_postcondition:

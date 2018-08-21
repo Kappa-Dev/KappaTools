@@ -653,7 +653,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x[.])
+		C(x[.])
 
 	Dealing with side effects
 
@@ -672,7 +672,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x[.])
+		B(x[.])
 
 
 	Applying rule r4 (File "bdu_analysis.ka", line 13, characters 5-21:):
@@ -824,7 +824,7 @@ Id=3
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=20
+Id=22
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -838,7 +838,7 @@ Id=20
      Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=20
+Id=22
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -886,12 +886,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=22
+Id=21
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=21
+  Id=20
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -986,12 +986,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=22
+Id=21
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=21
+  Id=20
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1085,12 +1085,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=22
+Id=21
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=21
+  Id=20
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -1175,12 +1175,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=22
+Id=21
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=21
+  Id=20
    Node(site_type:3<2)
     Id=1
      Leaf True 

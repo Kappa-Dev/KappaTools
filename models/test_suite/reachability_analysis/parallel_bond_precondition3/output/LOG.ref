@@ -637,7 +637,7 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z[.],t[t.B])
+		B(z[.],t[t.A])
 
 	Dealing with side effects
 
@@ -666,7 +666,7 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(z[.],t[t.A])
+		A(z[.],t[t.B])
 
 
 	Applying rule r4 (File "parallel_bonds.ka", line 10, characters 5-41:):

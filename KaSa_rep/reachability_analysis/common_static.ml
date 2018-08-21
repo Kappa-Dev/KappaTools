@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Aug 17 2018>
+  * Last modification: Time-stamp: <Aug 21 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -531,9 +531,9 @@ let combine_half_break_and_remove parameter error
        error, store_result
     )
     (*exists in 'b t*)
-    (fun paramter error (agent_type, rule_id) l2 store_result ->
+    (fun parameter error (agent_type, rule_id) l2 store_result ->
        let error, store_result =
-         Common_map.add_dependency_pair_sites_rule paramter error
+         Common_map.add_dependency_pair_sites_rule parameter error
            (agent_type, rule_id)
            l2
            store_result
