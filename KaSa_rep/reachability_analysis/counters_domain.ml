@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 20 2018>
+  * Last modification: Time-stamp: <Aug 22 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -844,7 +844,7 @@ module Functor =
 
   let apply_one_side_effect
       static dynamic error
-      _rule_id (agent,site,state) precondition
+      _rule_id (_,(agent,site,state)) precondition
     =
     let parameters = get_parameter static in
     let backward = get_backward_pointers static in
@@ -1225,6 +1225,10 @@ module Functor =
 
   let get_dead_rules _static _dynamic  =
     Analyzer_headers.dummy_dead_rules
+
+  let get_side_effects _static _dynamic =
+    Analyzer_headers.dummy_side_effects 
+
 end
 
 module Domain_affine_equalities_and_intervalles = Functor(Mat_inter.Mat_int)

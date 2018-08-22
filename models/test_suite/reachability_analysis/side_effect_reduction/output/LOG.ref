@@ -16,7 +16,7 @@ every agent may occur in the model
 A() => [ A(y[x.B]) v A(y[x.C]) ]
 A() => [ A(x[x.B]) v A(x[x.C]) ]
 B() => [ B(x[.]) v B(x[x.A]) v B(x[y.A]) ]
-C() => [ C(x[x.A]) v C(x[y.A]) ]
+C() => [ C(x[.]) v C(x[x.A]) v C(x[y.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:

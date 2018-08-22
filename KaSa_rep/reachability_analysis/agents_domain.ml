@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 20 2018>
+   * Last modification: Time-stamp: <Aug 22 2018>
    *
    * Abstract domain to record live rules
    *
@@ -669,5 +669,9 @@ struct
     error, dynamic, Usual_domains.Maybe (* to do *)
 
   let get_dead_rules _static _dynamic  =
-      Analyzer_headers.dummy_dead_rules
+    Analyzer_headers.dummy_dead_rules
+
+  let get_side_effects _static _dynamic =
+    Analyzer_headers.dummy_side_effects
+
 end

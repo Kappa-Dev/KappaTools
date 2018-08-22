@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 20 2018>
+   * Last modification: Time-stamp: <Aug 22 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1758,7 +1758,7 @@ struct
 
   let apply_one_side_effect
       static dynamic error
-      _ (agent_name, site, state) precondition
+      _ (_,(agent_name, site, state)) precondition
     =
     let parameters = get_parameter static in
     let dump_title () =
@@ -1992,4 +1992,6 @@ struct
   let get_dead_rules _static _dynamic  =
     Analyzer_headers.dummy_dead_rules
 
+  let get_side_effects _static _dynamic =
+      Analyzer_headers.dummy_side_effects
 end

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 21 2018>
+  * Last modification: Time-stamp: <Aug 22 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -567,7 +567,7 @@ struct
       dynamic
       error
       r_id
-      target
+      (source,target)
       precondition
       event_list
     =
@@ -578,11 +578,40 @@ struct
         dynamic
         error
         r_id
-        target
+        (source,target)
         precondition
     in error, dynamic, (precondition, (event_list'@event_list))
 (**if it has a precondition for this rule_id then apply a list of event
      starts from this new list*)
+
+  let check_side_effect static dynamic error precondition event_list r_id rule source target =
+    let (agent_id, _, site, state) = source in
+    let error, dynamic, precondition, state_list =
+      Communication.get_state_of_site_in_precondition
+        get_global_static_information
+        get_global_dynamic_information
+        set_global_dynamic_information
+        error
+        static
+        dynamic
+        (r_id, rule)
+        agent_id (*A*)
+        site
+        precondition
+    in
+    if List.mem state state_list
+    then
+      apply_one_side_effect
+        static
+        dynamic
+        error
+        r_id
+        (Some source,target)
+        precondition
+        event_list
+    else
+      (error, dynamic, (precondition, event_list))
+
   let
     apply_side_effect
       static
@@ -610,37 +639,63 @@ struct
     in
     match rule_opt with
     | Some rule ->
-      List.fold_left
-        (fun  (error, dynamic, (precondition, event_list)) (source, target) ->
-           let (agent_id, _, site, state) = source in
-           let error, dynamic, precondition, state_list =
-             Communication.get_state_of_site_in_precondition
-               get_global_static_information
-               get_global_dynamic_information
-               set_global_dynamic_information
-               error
-               static
-               dynamic
-               (r_id, rule)
-               agent_id (*A*)
-               site
-               precondition
-           in           
-           if List.mem state state_list
-           then
-             apply_one_side_effect
-               static
-               dynamic
-               error
-               r_id
-               target
-               precondition
-               event_list
-           else
-             (error, dynamic, (precondition, event_list))
-            )
-            (error, dynamic, (precondition, event_list))
-            side_effects
+      let error, side_effects_opt =
+          Domain.get_side_effects
+            (get_domain_static_information static)
+            dynamic.domain
+            parameters error
+            r_id
+      in
+      begin
+        match side_effects_opt with
+        |
+          None ->
+            List.fold_left
+              (fun
+                (error, dynamic, (precondition, event_list))
+                (source,target) ->
+                check_side_effect static dynamic error precondition event_list r_id rule source target)
+                (error, dynamic, (precondition, event_list))
+                side_effects
+        | Some side_effects ->
+          begin
+            let error, dynamic, (precondition, event_list) =
+              Ckappa_sig.AgentSiteState_map_and_set.Set.fold
+                (fun target
+                  (error, dynamic, (precondition, event_list)) ->
+                  apply_one_side_effect
+                    static
+                    dynamic
+                    error
+                    r_id
+                    (None,target)
+                    precondition
+                    event_list
+                )
+                side_effects.Ckappa_sig.seen
+                (error, dynamic, (precondition, event_list))
+            in
+            let error, dynamic, (precondition, event_list) =
+              Ckappa_sig.AgentsSiteState_map_and_set.Map.fold
+                (fun source target
+                  (error, dynamic, (precondition, event_list)) ->
+                  apply_one_side_effect
+                    static
+                    dynamic
+                    error
+                    r_id
+                    (Some source,target)
+                    precondition
+                    event_list
+                )
+                side_effects.Ckappa_sig.not_seen_yet
+                (error, dynamic, (precondition, event_list))
+            in
+            error, dynamic, (precondition, event_list)
+
+          end
+      end
+
     | None ->
       let error, () =
         Exception.warn

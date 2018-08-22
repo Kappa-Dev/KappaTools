@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Feb 13 2018>
+  * Last modification: Time-stamp: <Aug 22 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -332,7 +332,7 @@ let set_test_modif_map sites static =
     }
     static
 
-  
+
 (*****************************************************************************)
 (*INITIAL STATES*)
 
@@ -395,3 +395,4 @@ let initialize_global_information
   error, static, init_dynamic
 
 let dummy_dead_rules _ error _ = error, false
+let dummy_side_effects _ error _ = error, None 

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <May 20 2018>
+ * Last modification: Time-stamp: <Aug 22 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -593,3 +593,13 @@ module PairAgentSitesState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
          (c_agent_name * c_site_name * c_site_name * c_state) *
          (c_agent_name * c_site_name * c_site_name * c_state)
+
+type side_effects =
+  {
+    not_seen_yet:
+      (c_agent_name * c_site_name * c_state)
+        AgentsSiteState_map_and_set.Map.t ;
+    seen: AgentSiteState_map_and_set.Set.t
+  }
+
+val empty_side_effects: side_effects 

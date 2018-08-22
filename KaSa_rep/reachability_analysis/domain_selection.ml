@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of June
-  * Last modification: Time-stamp: <Apr 09 2018>
+  * Last modification: Time-stamp: <Aug 22 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -29,8 +29,10 @@ let select_domain
   let base =
     (module
       Product.Product
-         (Agents_domain.Domain)
-         (Rules_domain.Domain):Analyzer_domain_sig.Domain)
+        (Side_effects_domain.Domain)
+        (Product.Product
+           (Agents_domain.Domain)
+           (Rules_domain.Domain)):Analyzer_domain_sig.Domain)
   in
   let module Base = (val base: Analyzer_domain_sig.Domain) in
   let with_cm =

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 20 2018>
+  * Last modification: Time-stamp: <Aug 22 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1904,4 +1904,7 @@ struct
 
   let get_dead_rules _static _dynamic  =
     Analyzer_headers.dummy_dead_rules
+
+  let get_side_effects _static _dynamic =
+      Analyzer_headers.dummy_side_effects
 end

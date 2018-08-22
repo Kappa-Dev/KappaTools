@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 21 2018>
+   * Last modification: Time-stamp: <Aug 22 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -3425,7 +3425,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
 
   let apply_one_side_effect
       static dynamic error
-      _rule_id (agent_name, site, state) precondition
+      _rule_id (_,(agent_name, site, state)) precondition
     =
     let parameters = get_parameter static in
     let error, site_to_site_list =
@@ -4433,4 +4433,6 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
   let get_dead_rules _static _dynamic  =
     Analyzer_headers.dummy_dead_rules
 
+  let get_side_effects _static _dynamic =
+      Analyzer_headers.dummy_side_effects
 end

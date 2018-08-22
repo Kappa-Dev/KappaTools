@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 17 2018>
+  * Last modification: Time-stamp: <Aug 22 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -93,7 +93,7 @@ sig
 
   val apply_one_side_effect:
     (Ckappa_sig.c_rule_id,
-     (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state),
+     ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) option) * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state),
      Communication.precondition,
      Communication.precondition * Communication.event list) ternary
 
@@ -124,5 +124,12 @@ sig
     static_information ->
     dynamic_information ->
     Remanent_parameters_sig.parameters -> Exception.method_handler -> Ckappa_sig.c_rule_id -> Exception.method_handler * bool
+
+  val get_side_effects:
+    static_information ->
+    dynamic_information ->
+    Remanent_parameters_sig.parameters -> Exception.method_handler ->
+    Ckappa_sig.c_rule_id ->
+    Exception.method_handler * Ckappa_sig.side_effects option
 
 end
