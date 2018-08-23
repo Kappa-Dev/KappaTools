@@ -46,7 +46,7 @@ let destruct_rule_of_ltoken
     Snip.connected_components_sum_of_ambiguous_rule
       ~compileModeOn:false contact_map preenv ?origin mix [] in
   let (cc,rule) =  match outs with
-    | [ origin'', [|cc_id,cc|], instantiations, (removed,inserted)] ->
+    | [ origin'', [|cc_id,_ as cc|], instantiations, (removed,inserted)] ->
       let () = assert (origin = origin'') in
       ((tk_id,cc),{
           Primitives.rate = Alg_expr.const (Nbr.F infinity);
@@ -68,7 +68,101 @@ let destruct_lrule_of_ltoken tk_id r_mix = {
   LKappa.r_un_rate = None; LKappa.r_editStyle = true;
 }
 
-let matchings_of_a_token model (tk_id,pattern) =
+let reabstract =
+    Primitives.Transformation.map_agent
+    (fun (x,ty) -> Matching.Agent.Fresh (ty,x))
+
+let put_transf_in_its_cc (cc_of_agent,ccs,exists) = function
+  | Primitives.Transformation.Agent ag as x ->
+    if Matching.Agent.is_fresh ag then
+      let id = Matching.Agent.get_id ag in
+      let concrete =
+        Primitives.Transformation.Agent (id, Matching.Agent.get_type ag) in
+      (Mods.IntMap.add id id cc_of_agent,
+       Mods.IntMap.add id [concrete] ccs,
+       exists)
+    else (cc_of_agent,ccs,x::exists)
+  | Primitives.Transformation.Freed (ag,site) as x->
+    if Matching.Agent.is_fresh ag then
+      let id = Matching.Agent.get_id ag in
+      let cc_id = Mods.IntMap.find_default (-1) id cc_of_agent in
+      if cc_id < 0 then (cc_of_agent,ccs,x::exists) else
+        let l = Mods.IntMap.find_default [] cc_id ccs in
+        let concrete =
+          Primitives.Transformation.Freed
+            ((id, Matching.Agent.get_type ag),site) in
+        (cc_of_agent, Mods.IntMap.add cc_id (concrete::l) ccs,exists)
+    else (cc_of_agent,ccs,x::exists)
+  | Primitives.Transformation.PositiveInternalized (ag,site,state) as x ->
+    if Matching.Agent.is_fresh ag then
+      let id = Matching.Agent.get_id ag in
+      let cc_id = Mods.IntMap.find_default (-1) id cc_of_agent in
+      if cc_id < 0 then (cc_of_agent,ccs,x::exists) else
+        let l = Mods.IntMap.find_default [] cc_id ccs in
+        let concrete =
+          Primitives.Transformation.PositiveInternalized
+            ((id, Matching.Agent.get_type ag),site,state) in
+        (cc_of_agent, Mods.IntMap.add cc_id (concrete::l) ccs,exists)
+    else (cc_of_agent,ccs,x::exists)
+  | Primitives.Transformation.Linked ((ag1,site1),(ag2,site2)) as x ->
+    let id1 = Matching.Agent.get_id ag1 in
+    let cc_id1 = Mods.IntMap.find_default (-1) id1 cc_of_agent in
+    let id2 = Matching.Agent.get_id ag2 in
+    let cc_id2 = Mods.IntMap.find_default (-1) id2 cc_of_agent in
+    if Matching.Agent.is_fresh ag1 && cc_id1 >= 0 then
+      if Matching.Agent.is_fresh ag2 && cc_id2 >= 0 then
+        let l1 = Mods.IntMap.find_default [] cc_id1 ccs in
+        let concrete =
+          Primitives.Transformation.Linked
+            (((id1, Matching.Agent.get_type ag1),site1),
+             ((id2, Matching.Agent.get_type ag2),site2)) in
+        if cc_id1 = cc_id2 then
+          (cc_of_agent, Mods.IntMap.add cc_id1 (concrete::l1) ccs,exists)
+        else
+          let l2,ccs' = Mods.IntMap.pop cc_id2 ccs in
+          let l = concrete :: Option_util.unsome [] l2 @ l1 in (* DANGER *)
+          let cc_of_agent' =
+            Mods.IntMap.map
+              (fun cc_id -> if cc_id = cc_id2 then cc_id1 else cc_id)
+              cc_of_agent in
+          (cc_of_agent', Mods.IntMap.add cc_id1 l ccs',exists)
+      else
+        let l1,ccs' = Mods.IntMap.pop cc_id1 ccs in
+        let tmp = List.rev_map reabstract (Option_util.unsome [] l1) in
+        (cc_of_agent,ccs',x::List.rev_append tmp exists)
+    else if Matching.Agent.is_fresh ag2 && cc_id2 >= 0 then
+      let l2,ccs' = Mods.IntMap.pop cc_id2 ccs in
+      let tmp = List.rev_map reabstract (Option_util.unsome [] l2) in
+      (cc_of_agent,ccs',x::List.rev_append tmp exists)
+    else (cc_of_agent,ccs,x::exists)
+  | Primitives.Transformation.NegativeWhatEver _
+  | Primitives.Transformation.NegativeInternalized _ ->
+    failwith "Clearly not a positive transformation"
+
+let recognize_token model tokens transfs =
+  let pats = Evaluator.find_all_embeddings model transfs in
+  List.fold_left
+    (fun acc (x,_) ->
+       List.fold_left
+         (fun acc (tk_id,(cc_id,_)) ->
+            if x = cc_id then
+              let () = assert
+                (match acc with None -> true | Some y -> y = tk_id) in
+              Some tk_id else acc)
+         acc tokens)
+    None pats
+
+let tokenify_fresh_transfs model tokens transfs =
+  let (_,ccs,existings) =
+    List.fold_left
+      put_transf_in_its_cc (Mods.IntMap.empty, Mods.IntMap.empty, []) transfs in
+  Mods.IntMap.fold (fun _ x (remains,toks) ->
+      match recognize_token model tokens (List.rev x) with
+      | None -> (List_util.rev_map_append reabstract x remains,toks)
+      | Some tk -> (remains,tk::toks))
+    ccs (List.rev existings,[])
+
+let matchings_of_a_token model (tk_id,(_,pattern)) =
   let transfs =
     Primitives.fully_specified_pattern_to_positive_transformations pattern in
   let pats = Evaluator.find_all_embeddings model transfs in
@@ -186,6 +280,25 @@ let replace_cc_in_rule tk_id transfs cc_pos inj rule =
       (*TODO: super hyper wrong*) rule.Primitives.instantiations;
   }
 
+let tokenify_fresh_inserted model tokens r =
+  let (inserted,inserted_toks) =
+    tokenify_fresh_transfs model tokens r.Primitives.inserted in
+  let delta_tokens =
+    List_util.rev_map_append
+      (fun tk_id -> ((Alg_expr.const Nbr.one),tk_id))
+      inserted_toks r.Primitives.delta_tokens in
+  {
+    Primitives.rate = r.Primitives.rate;
+    Primitives.unary_rate = r.Primitives.unary_rate;
+    Primitives.connected_components = r.Primitives.connected_components;
+    Primitives.removed = r.Primitives.removed;
+    Primitives.inserted;
+    Primitives.delta_tokens;
+    Primitives.syntactic_rule = r.Primitives.syntactic_rule;
+    Primitives.instantiations = r.Primitives.instantiations;
+  }
+
+
 let new_rules_involving_a_token rule_list (tk_id,to_replace,transfs) =
   List.fold_left
     (fun acc rule ->
@@ -209,18 +322,18 @@ let print_result conf env inputs_form init =
        (fun f (n,r) ->
           let _,ins_fresh =
             Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
-          if ins_fresh = [] then
-            Pp.list Pp.space (fun f (nb,tk) ->
-                Format.fprintf f "@[<h>%%init: %a %a@]"
-                  (Kappa_printer.alg_expr ~env)
-                  (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
-                  (Model.print_token ~env) tk)
-              f r.Primitives.delta_tokens
-          else
-            Format.fprintf f "@[<h>%%init: %a %a@]"
-              (Kappa_printer.alg_expr ~env) n
-              (Raw_mixture.print ~created:false ~sigs)
-              ins_fresh)) init
+          let () =
+            if ins_fresh <> [] then
+              Format.fprintf f "@[<h>%%init: %a %a@]"
+                (Kappa_printer.alg_expr ~env) n
+                (Raw_mixture.print ~created:false ~sigs)
+                ins_fresh in
+          Pp.list Pp.space (fun f (nb,tk) ->
+              Format.fprintf f "@[<h>%%init: %a %a@]"
+                (Kappa_printer.alg_expr ~env)
+                (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
+                (Model.print_token ~env) tk)
+            f r.Primitives.delta_tokens)) init
 
 let output_result ?filename conf model init =
   let filename = match filename with
@@ -278,7 +391,7 @@ let main () =
             (fun (x,y) -> (Locality.dummy_annot x,y))
             tokens.NamedDecls.decls)
          (Tools.array_rev_map_of_list
-            (fun (_,cc) ->
+            (fun (_,(_,cc)) ->
                (Locality.dummy_annot
                   (Format.asprintf "%a" (Pattern.print_cc_as_id sigs) cc),()))
             ccs)) in
@@ -316,15 +429,17 @@ let main () =
     List.fold_left new_rules_involving_a_token rules' to_be_rewritten in
 let rules'' = Array.append
     (Tools.array_rev_of_list destruct_rules)
-    (Array.of_list exploded_rules) in
+    (Tools.array_map_of_list
+       (tokenify_fresh_inserted (Model.new_domain domain' model) ccs)
+       exploded_rules) in
   let env =
     Model.init ~filenames domain' tokens' algs' all_deps
       (ast_rules'',rules'') obs' interventions' contact_map in
-  (*let () =
-    Format.printf "%a@." (Kappa_printer.env_kappa contact_map) env in*)
+  let init' =
+    List.rev_map (fun (a,r) -> (a,tokenify_fresh_inserted env ccs r)) init in
   let () = output_result
       ?filename:cli_args.Run_cli_args.outputDataFile
-      conf env init in
+      conf env init' in
   ()
 
 let () = main ()
