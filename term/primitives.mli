@@ -42,6 +42,8 @@ sig
      Instantiation.concrete Instantiation.site option) ->
     Instantiation.concrete Instantiation.action list ->
     Instantiation.concrete t list
+  (** [negative_transformation_of_actions signature link_dst actions] *)
+
   val positive_transformations_of_actions :
     Signature.s -> Instantiation.concrete Instantiation.site list ->
     Instantiation.concrete Instantiation.action list ->
