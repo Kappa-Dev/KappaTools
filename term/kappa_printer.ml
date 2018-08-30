@@ -62,7 +62,7 @@ let decompiled_rule ~full env f r =
     (Pp.list Pp.comma pr_tok) r.Primitives.delta_tokens
 
     (fun f -> if full then
-        Format.fprintf f " @@@ %a%t"
+        Format.fprintf f "@ @@ %a%t"
           pr_alg r.Primitives.rate
           (fun f ->
              match r.Primitives.unary_rate with
