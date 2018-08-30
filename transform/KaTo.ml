@@ -120,7 +120,7 @@ let put_transf_in_its_cc (cc_of_agent,ccs,exists) = function
           (cc_of_agent, Mods.IntMap.add cc_id1 (concrete::l1) ccs,exists)
         else
           let l2,ccs' = Mods.IntMap.pop cc_id2 ccs in
-          let l = concrete :: Option_util.unsome [] l2 @ l1 in (* DANGER *)
+          let l = concrete :: l1 @ Option_util.unsome [] l2 in (* DANGER *)
           let cc_of_agent' =
             Mods.IntMap.map
               (fun cc_id -> if cc_id = cc_id2 then cc_id1 else cc_id)
@@ -327,12 +327,15 @@ let print_result conf env inputs_form init =
             Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
           let () =
             if ins_fresh <> [] then
-              Format.fprintf f "@[<h>%%init: %a %a@]"
-                (Kappa_printer.alg_expr ~env) n
-                (Raw_mixture.print ~created:false ~sigs)
-                ins_fresh in
+              let () =
+                Format.fprintf f "@[%%init:@ @[%a@]@ @[%a@]@]"
+                  (Kappa_printer.alg_expr ~env) n
+                  (Raw_mixture.print ~created:false ~sigs)
+                  ins_fresh in
+              if r.Primitives.delta_tokens <> [] then
+                Format.pp_print_space f () in
           Pp.list Pp.space (fun f (nb,tk) ->
-              Format.fprintf f "@[<h>%%init: %a %a@]"
+              Format.fprintf f "@[%%init:@ @[%a@]@ %a@]"
                 (Kappa_printer.alg_expr ~env)
                 (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
                 (Model.print_token ~env) tk)
