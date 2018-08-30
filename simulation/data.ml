@@ -18,18 +18,21 @@ let print_initial_inputs ?uuid conf env inputs_form init =
        (fun f (n,r) ->
           let _,ins_fresh =
             Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
-          if ins_fresh = [] then
-            Pp.list Pp.space (fun f (nb,tk) ->
-                Format.fprintf f "@[<h>%%init: %a %a@]"
-                  (Kappa_printer.alg_expr ~env)
-                  (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
-                  (Model.print_token ~env) tk)
-              f r.Primitives.delta_tokens
-          else
-            Format.fprintf f "@[<h>%%init: %a %a@]"
-              (Kappa_printer.alg_expr ~env) n
-              (Raw_mixture.print ~created:false ~sigs)
-              ins_fresh)) init
+          let () =
+            if ins_fresh <> [] then
+              let () =
+                Format.fprintf f "@[<hov 2>%%init:@ @[%a@]@ @[%a@]@]"
+                  (Kappa_printer.alg_expr ~env) n
+                  (Raw_mixture.print ~created:false ~sigs)
+                  ins_fresh in
+              if r.Primitives.delta_tokens <> [] then
+                Format.pp_print_space f () in
+          Pp.list Pp.space (fun f (nb,tk) ->
+              Format.fprintf f "@[<hov 2>%%init:@ @[%a@]@ %a@]"
+                (Kappa_printer.alg_expr ~env)
+                (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
+                (Model.print_token ~env) tk)
+            f r.Primitives.delta_tokens)) init
 
 type snapshot = {
   snapshot_file : string;

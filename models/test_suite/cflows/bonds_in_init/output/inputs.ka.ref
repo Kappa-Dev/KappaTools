@@ -22,6 +22,8 @@
 
 /*0*/%mod: [true] do $TRACK L(z[.]) [true]; repeat [false]
 
-%init: 10 K(s[.] x{u}[.]), S(k[.] l[.] z[.] x{u}[.] y{u}[.]), L(z[1] s[.]), Z(l[1] s[.])
+%init: 10
+  K(s[.] x{u}[.]), S(k[.] l[.] z[.] x{u}[.] y{u}[.]), L(z[1] s[.]),
+  Z(l[1] s[.])
 
 %mod: [E] = 685 do $STOP;
