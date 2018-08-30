@@ -6,18 +6,22 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let cc_mix ?env =
+let cc_mix ?env f mix =
   let domain = match env with
     | None -> None
     | Some e -> Some (Model.domain e) in
-  Pp.list
-    (fun f -> Format.fprintf f " +@ ")
-    (fun f ccs ->
-       Pp.array
-         (fun f -> Format.fprintf f "*")
-         (fun _ f cc ->
-            Format.fprintf
-              f "|%a|" (Pattern.print ?domain ~with_id:false) cc) f ccs)
+  match mix with
+  | [] -> Format.fprintf f "0"
+  | _ ->
+    Pp.list
+      (fun f -> Format.fprintf f " +@ ")
+      (fun f ccs ->
+         Pp.array
+           (fun f -> Format.fprintf f "*")
+           (fun _ f cc ->
+              Format.fprintf
+                f "|%a|" (Pattern.print ?domain ~with_id:false) cc) f ccs)
+      f mix
 
 let alg_expr ?env =
   Alg_expr.print (cc_mix ?env) (Model.print_token ?env) (Model.print_alg ?env)
