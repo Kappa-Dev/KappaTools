@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 31 2018>
+   * Last modification: Time-stamp: <Aug 22 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1122,10 +1122,18 @@ struct
                 in
                 (*-----------------------------------------------------------*)
                 let error, bool, dynamic, precondition, modified_sites =
+                  match state'_list_x, state'_list_y with
                   (*   _::_::_, _::_::_ ->
                   (*we know for sure that none of the two sites have been
                       modified*)
                       error, bool, dynamic, precondition, modified_sites*)
+                  | [], _ | _, [] ->
+                    let error, () =
+                      Exception.warn parameters error __POS__
+                        ~message: "empty list in potential states in post condition" Exit ()
+                    in
+                    error, bool, dynamic, precondition, modified_sites
+                  | _::_ , _::_  -> (*general case*)
                     List.fold_left
                       (fun
                         (error, bool, dynamic, precondition, modified_sites)
