@@ -111,6 +111,40 @@ module Transformation = struct
     | PositiveInternalized (a,_,_) -> f acc a
     | NegativeInternalized (a,_) -> f acc a
 
+  let is_the_opposite_of f a b =
+    match a,b with
+    | Agent a, Agent a' -> f a a'
+    | Agent _,
+      (Freed _ | Linked _ | NegativeWhatEver _ | PositiveInternalized _
+      | NegativeInternalized _)
+    | _, Agent _ -> false
+    | Freed (a,s), Freed (a',s') -> s=s' && f a a'
+    | Freed (a,s), NegativeWhatEver (a',s') -> s=s' && f a a'
+    | NegativeWhatEver (a,s), Freed (a',s') -> s=s' && f a a'
+    | Freed _,
+      (Linked _ | PositiveInternalized _
+      | NegativeInternalized _)
+    | _, Freed _ -> false
+    | Linked ((a1,s1),(a2,s2)), Linked ((a1',s1'),(a2',s2')) ->
+      (s1 = s1' && s2 = s2' && f a1 a1' && f a2 a2')
+      || (s1 = s2' && s2 = s1' && f a1 a2' && f a2 a1')
+    | Linked ((a1,s1),(a2,s2)), NegativeWhatEver (a',s') ->
+      (s1 = s' && f a1 a') || (s2 = s' && f a2 a')
+    | NegativeWhatEver (a,s), Linked ((a1',s1'),(a2',s2')) ->
+      (s = s1' && f a a1') || (s = s2' && f a a2')
+    | Linked _,
+      (PositiveInternalized _ | NegativeInternalized _)
+    | _, Linked _ -> false
+    | NegativeWhatEver _, NegativeWhatEver _ -> false
+    | NegativeWhatEver _,
+      (PositiveInternalized _ | NegativeInternalized _)
+    | _, NegativeWhatEver _ -> false
+    | PositiveInternalized (a,s,_), NegativeInternalized (a',s')
+    | NegativeInternalized (a,s), PositiveInternalized (a',s',_)
+      -> s=s' && f a a'
+    | PositiveInternalized _, PositiveInternalized _
+    | NegativeInternalized _, NegativeInternalized _ -> false
+
   let equal f a b =
     match a,b with
     | Agent a, Agent a' -> f a a'

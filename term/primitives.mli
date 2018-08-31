@@ -25,6 +25,7 @@ sig
   val map_fold_agent : ('a -> 'b -> 'c * 'b) -> 'a t -> 'b -> 'c t * 'b
 
   val equal : ('a -> 'b -> bool) -> 'a t -> 'b t -> bool
+  val is_the_opposite_of : ('a -> 'b -> bool) -> 'a t -> 'b t -> bool
 
   val rename :
     int -> Renaming.t -> Instantiation.abstract t -> Instantiation.abstract t

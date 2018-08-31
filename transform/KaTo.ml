@@ -245,7 +245,10 @@ let replace_cc_in_rule tk_id transfs cc_pos inj rule =
             | Matching.Agent.Existing _ -> m))
       (-1) rule.Primitives.inserted in
   let new_transfs =
-    List.filter (fun x -> not (List.mem x concrete_obselete)) transfs in
+    List.filter
+      (fun x -> not (List.exists
+                       (Primitives.Transformation.is_the_opposite_of (=) x)
+                       concrete_obselete)) transfs in
   let find_abstract_id (inj,fresh as p) i =
     match Mods.IntMap.find_option i inj with
     | Some j -> (p,j)
