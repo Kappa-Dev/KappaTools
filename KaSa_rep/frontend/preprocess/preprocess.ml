@@ -522,9 +522,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
             question_marks dead_sites dead_state_sites dead_link_sites delta
         end
         | Ckappa_sig.PORT_SEP (port, interface) ->
-          let error, (c_interface, dead_sites, _dead_states_sites)  =
+          let error, (c_interface, question_marks, dead_sites, _dead_states_sites)  =
             match port.Ckappa_sig.port_int with
-            | [] -> error, (c_interface, dead_sites, dead_state_sites)
+            | [] -> error, (c_interface, question_marks, dead_sites, dead_state_sites)
             | [None] ->
             begin
               let error, (bool, output) =
@@ -541,7 +541,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
               | _, None ->
                 Exception.warn parameters error __POS__
                   ~message:(                                   agent.Ckappa_sig.ag_nme ^ " " ^ port.Ckappa_sig.port_nme)
-                  Exit (c_interface, dead_sites, dead_state_sites)
+                  Exit (c_interface, question_marks, dead_sites, dead_state_sites)
               | true, _ ->
                 let error, dead_sites =
                   Cckappa_sig.KaSim_Site_map_and_set.Set.add
@@ -550,7 +550,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                     (Ckappa_sig.Internal port.Ckappa_sig.port_nme)
                     dead_sites
                 in
-                error, (c_interface, dead_sites, dead_state_sites)
+                error, (c_interface, question_marks, dead_sites, dead_state_sites)
               | _, Some (site_name, _, _, _) ->
                 begin
                   if bool then
@@ -566,7 +566,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                       Exception.warn parameters error error' __POS__
                       ~message:"a site even dead should occur only once in an interface"
                       Exit,
-                    (c_interface, dead_sites, dead_state_sites)
+                    (c_interface, question_marks, dead_sites, dead_state_sites)
                   else
                     let error, last =
                       Handler.last_state_of_site
@@ -593,7 +593,8 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         ~message:"a site should occur only once in an interface"
                         Exit
                     in
-                    error, (c_interface, dead_sites, dead_state_sites)
+                    error, (c_interface,
+                            (k,site_name)::question_marks, dead_sites, dead_state_sites)
                 end
             end
             | [Some state] ->
@@ -612,7 +613,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                 | _, None ->
                   Exception.warn parameters error __POS__
                     ~message:(                                   agent.Ckappa_sig.ag_nme ^ " " ^ port.Ckappa_sig.port_nme)
-                    Exit (c_interface, dead_sites, dead_state_sites)
+                    Exit (c_interface, question_marks, dead_sites, dead_state_sites)
                 | true, _ ->
                   let error, dead_sites =
                     Cckappa_sig.KaSim_Site_map_and_set.Set.add
@@ -621,7 +622,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                       (Ckappa_sig.Internal port.Ckappa_sig.port_nme)
                       dead_sites
                   in
-                  error, (c_interface, dead_sites, dead_state_sites)
+                  error, (c_interface, question_marks, dead_sites, dead_state_sites)
                 | _, Some (site_name, _, _, _) ->
                   begin
                     let error, state_dic =
@@ -663,7 +664,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         Exception.warn parameters error error' __POS__
                         ~message:"a site even dead should occur only once in an interface"
                         Exit,
-                      (c_interface, dead_sites, dead_state_sites)
+                      (c_interface, question_marks, dead_sites, dead_state_sites)
                     | _ , Some (internal, _, _, _) ->
                       let error',c_interface =
                         Ckappa_sig.Site_map_and_set.Map.add
@@ -686,12 +687,13 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                           ~message:"a site should occur only once in an interface"
                           Exit
                       in
-                      error, (c_interface, dead_sites, dead_state_sites)
+                      error,
+                      (c_interface, question_marks, dead_sites, dead_state_sites)
                   end
               end
             | _ -> Exception.warn
                      parameters error __POS__ Exit
-                     (c_interface,dead_sites,dead_state_sites)
+                     (c_interface,question_marks,dead_sites,dead_state_sites)
           in
           let error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites) =
             match port.Ckappa_sig.port_lnk with
