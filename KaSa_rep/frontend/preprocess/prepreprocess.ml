@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Apr 20 2018>
+ * Last modification: Time-stamp: <Aug 31 2018>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -325,10 +325,7 @@ let translate_port is_signature parameters int_set port remanent =
   {
     Ckappa_sig.port_nme = fst (port.Ast.port_nme) ;
     Ckappa_sig.port_int =
-      List.fold_left (fun acc -> function
-          | Some x, _ -> x::acc
-          | None, _ -> acc)
-        [] (List.rev port.Ast.port_int) ;
+      List.rev_map fst (List.rev port.Ast.port_int) ;
     Ckappa_sig.port_lnk = lnk ;
     (*       port_pos = pos ; *)
     Ckappa_sig.port_free = is_free },

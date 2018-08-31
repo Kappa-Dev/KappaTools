@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Aug 12 2018>
+  * Last modification: Time-stamp: <Aug 31 2018>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -53,7 +53,7 @@ type 'interface proper_agent =
     agent_name      : Ckappa_sig.c_agent_name;
     agent_interface : 'interface;
     agent_position  : Ckappa_sig.position;
-    is_created : bool; 
+    is_created : bool;
   }
 
 type site_address =
@@ -77,7 +77,7 @@ type agent =
   | Ghost
   | Agent of Ckappa_sig.c_state interval interface proper_agent
   | Dead_agent of Ckappa_sig.c_state interval interface proper_agent
-                  * KaSim_Site_map_and_set.Set.t * ((string, unit, unit) Ckappa_sig.site_type) Ckappa_sig.Site_map_and_set.Map.t
+                  * KaSim_Site_map_and_set.Set.t * ((string option, unit, unit) Ckappa_sig.site_type) Ckappa_sig.Site_map_and_set.Map.t
                   * Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
   (* agent with a site or state that never occur in the rhs or an initial
      state, set of the undefined sites, map of sites with undefined

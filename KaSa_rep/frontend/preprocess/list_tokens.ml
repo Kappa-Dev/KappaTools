@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 17th of January
-   * Last modification: Time-stamp: <Apr 20 2018>
+   * Last modification: Time-stamp: <Aug 31 2018>
    * *
    * Number agents, sites, states in ckappa represenations
    *
@@ -334,6 +334,14 @@ let scan_agent parameters (error, handler) agent =
         match port.Ckappa_sig.port_int with
         | [] -> error, handler
         | list ->
+          let list =
+            List.fold_left
+              (fun list x ->
+                 match x with
+                 | None -> list
+                 | Some x -> x::list)
+              [] (List.rev list)
+          in
           begin
             let error, (handler, _, _c) =
               declare_site_with_internal_states

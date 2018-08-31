@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Aug 22 2018>
+ * Last modification: Time-stamp: <Aug 31 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -154,7 +154,7 @@ and counter =
 and counter_test =
   | CEQ of int | CGTE of int | CVAR of string | UNKNOWN
 
-and internal = string list
+and internal = string option list
 
 and link =
   | LNK_VALUE of (c_agent_id * agent_name * site_name * c_link_value * position)
@@ -280,7 +280,7 @@ module Dictionary_of_States: Dictionary.Dictionary
 
 type internal_state_specification =
   {
-    string : internal_state;
+    string : internal_state option;
   }
 
 module Dictionary_of_agents: Dictionary.Dictionary
@@ -602,4 +602,4 @@ type side_effects =
     seen: AgentSiteState_map_and_set.Set.t
   }
 
-val empty_side_effects: side_effects 
+val empty_side_effects: side_effects

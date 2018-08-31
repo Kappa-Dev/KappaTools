@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Aug 12 2018>
+   * Last modification: Time-stamp: <Aug 31 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -218,7 +218,8 @@ let translate_agent_sig
             match
               counter.Ckappa_sig.count_test
             with
-            | Some (Ckappa_sig.CEQ i) -> [Ckappa_sig.state_index_of_int i]
+            | Some (Ckappa_sig.CEQ i) ->
+              [Ckappa_sig.state_index_of_int i]
             | Some (Ckappa_sig.CGTE _)
             | Some (Ckappa_sig.CVAR _ )
             | Some Ckappa_sig.UNKNOWN
@@ -289,12 +290,19 @@ let translate_agent_sig
           let error, internal_list =
             List.fold_left
               (fun (error, internal_list) state ->
+                 match state with
+                 | None ->
+                   Exception.warn parameters error
+                     __POS__ Exit
+                     internal_list
+                 | Some a ->
+
                  let error, (bool, output) =
                    Ckappa_sig.Dictionary_of_States.allocate_bool
                      parameters
                      error
                      Ckappa_sig.compare_unit_state_index
-                     (Ckappa_sig.Internal state)
+                     (Ckappa_sig.Internal a)
                      ()
                      Misc_sa.const_unit
                      state_dic
@@ -303,9 +311,9 @@ let translate_agent_sig
                    match bool, output with
                    | _ , None
                    | true, _  -> Exception.warn
-                                   parameters error __POS__ Exit Ckappa_sig.dummy_state_index
+                                   parameters error __POS__ Exit ( Ckappa_sig.dummy_state_index)
                    | _ , Some (i, _, _, _) ->
-                     error, i
+                     error,  i
                  in
                  error, internal :: internal_list)
               (error, []) list
@@ -352,7 +360,7 @@ let translate_agent_sig
                   {
                     Cckappa_sig.site_name = site_name ;
                     Cckappa_sig.site_position = Locality.dummy ;
-                    Cckappa_sig.site_state = [Ckappa_sig.dummy_state_index] ;
+                    Cckappa_sig.site_state = [ Ckappa_sig.dummy_state_index] ;
                     Cckappa_sig.site_free = port.Ckappa_sig.port_free
                   }
                   c_interface
@@ -517,7 +525,78 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
           let error, (c_interface, dead_sites, _dead_states_sites)  =
             match port.Ckappa_sig.port_int with
             | [] -> error, (c_interface, dead_sites, dead_state_sites)
-            | [state] ->
+            | [None] ->
+            begin
+              let error, (bool, output) =
+                Ckappa_sig.Dictionary_of_sites.allocate_bool
+                  parameters
+                  error
+                  Ckappa_sig.compare_unit_site_name
+                  (Ckappa_sig.Internal port.Ckappa_sig.port_nme)
+                  ()
+                  Misc_sa.const_unit
+                  site_dic
+              in
+              match bool, output with
+              | _, None ->
+                Exception.warn parameters error __POS__
+                  ~message:(                                   agent.Ckappa_sig.ag_nme ^ " " ^ port.Ckappa_sig.port_nme)
+                  Exit (c_interface, dead_sites, dead_state_sites)
+              | true, _ ->
+                let error, dead_sites =
+                  Cckappa_sig.KaSim_Site_map_and_set.Set.add
+                    parameters
+                    error
+                    (Ckappa_sig.Internal port.Ckappa_sig.port_nme)
+                    dead_sites
+                in
+                error, (c_interface, dead_sites, dead_state_sites)
+              | _, Some (site_name, _, _, _) ->
+                begin
+                  if bool then
+                    let error',_dead_state_sites =
+                      Ckappa_sig.Site_map_and_set.Map.add
+                        parameters
+                        error
+                        site_name
+                        (Ckappa_sig.Internal None)
+                        dead_state_sites
+                    in
+                    Exception.check_point
+                      Exception.warn parameters error error' __POS__
+                      ~message:"a site even dead should occur only once in an interface"
+                      Exit,
+                    (c_interface, dead_sites, dead_state_sites)
+                  else
+                    let error, last =
+                      Handler.last_state_of_site
+                        parameters error handler agent_name site_name
+                    in
+                    let error',c_interface =
+                      Ckappa_sig.Site_map_and_set.Map.add
+                        parameters
+                        error
+                        site_name
+                        {
+                          Cckappa_sig.site_name = site_name ;
+                          Cckappa_sig.site_position = Locality.dummy ;
+                          Cckappa_sig.site_free = None ;
+                          Cckappa_sig.site_state =
+                            {
+                              Cckappa_sig.min = Some Ckappa_sig.dummy_state_index ;
+                              Cckappa_sig.max = Some last
+                            };
+                        } c_interface in
+                    let error =
+                      Exception.check_point
+                        Exception.warn  parameters error error' __POS__
+                        ~message:"a site should occur only once in an interface"
+                        Exit
+                    in
+                    error, (c_interface, dead_sites, dead_state_sites)
+                end
+            end
+            | [Some state] ->
               begin
                 let error, (bool, output) =
                   Ckappa_sig.Dictionary_of_sites.allocate_bool
@@ -577,7 +656,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                           parameters
                           error
                           site_name
-                          (Ckappa_sig.Internal state)
+                          (Ckappa_sig.Internal (Some state))
                           dead_state_sites
                       in
                       Exception.check_point
@@ -1189,7 +1268,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
             Cckappa_sig.agent_name = agent_name ;
             Cckappa_sig.agent_interface = c_interface ;
             Cckappa_sig.agent_position = Locality.dummy ;
-            Cckappa_sig.is_created = creation ;          
+            Cckappa_sig.is_created = creation ;
           },
             dead_sites,
             dead_state_sites,

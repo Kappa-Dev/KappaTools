@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 23rd of 2011
- * Last modification: Time-stamp: <Apr 20 2018>
+ * Last modification: Time-stamp: <Aug 31 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -155,7 +155,7 @@ let print_port parameter error port =
            "%s%s%s%s"
            (Remanent_parameters.get_open_internal_state parameter)
            (Remanent_parameters.get_internal_state_symbol parameter)
-           x
+           (match x with Some x -> x | None -> "#")
            (Remanent_parameters.get_close_internal_state parameter)
   ) port.Ckappa_sig.port_int
   in

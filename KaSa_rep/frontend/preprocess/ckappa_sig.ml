@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Aug 22 2018>
+ * Last modification: Time-stamp: <Aug 31 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -75,7 +75,7 @@ and counter_test =
   | CEQ of int | CGTE of int | CVAR of string | UNKNOWN
 
 
-and internal = string list
+and internal = string option list
 
 and link =
   | LNK_VALUE of (c_agent_id * agent_name * site_name * c_link_value * position)
@@ -778,7 +778,7 @@ let add_internal_state parameters error agent_id (site_name:site_name) (state:in
     (fun parameters error port ->
        match port.port_int with
        | [] ->
-         error, {port with port_int = [state]}
+         error, {port with port_int = [Some state]}
        | _::_ ->
          Exception.warn parameters error __POS__ Exit port)
     mixture
@@ -809,7 +809,7 @@ module Dictionary_of_States =
 
 type internal_state_specification =
   {
-    string : internal_state;
+    string : internal_state option;
   }
 
 module Site =
