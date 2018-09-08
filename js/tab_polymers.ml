@@ -35,37 +35,32 @@ let content () =
                     let output =
                       if scc = [] || scc = [[]]
                       then
-                        [Html.p
-                           (Utility.print_string "The size of biomolecular compounds is uniformly bounded." [])]
+                        Utility.print_string "The size of biomolecular compounds is uniformly bounded." []
                       else
-                        [ Html.p
-                            begin
-                              let list =
-                                List.fold_left
-                                   (fun list list_edges ->
-                                      let list = Utility.print_newline list in
-                                      List.fold_left
-                                        (fun list ((a,b),(c,d)) ->
-                                           print_edge ((a,b),(c,d)) list
-                                        )  list list_edges) [] scc
-                              in
-                              let list = Utility.print_newline list in
-                              let list =
-                                Utility.print_string "The following bonds may form arbitrary long chains of agents:" list
-                              in list
-                            end
-                        ]
+                        let list =
+                          List.fold_left
+                            (fun list list_edges ->
+                               let list = Utility.print_newline list in
+                               List.fold_left
+                                 (fun list ((a,b),(c,d)) ->
+                                    print_edge ((a,b),(c,d)) list
+                                 )  list list_edges) [] scc
+                        in
+                        let list = Utility.print_newline list in
+                        let list =
+                          Utility.print_string "The following bonds may form arbitrary long chains of agents:" list
+                        in list
                     in
                     ReactiveData.RList.set set_scc output)
                  (manager#get_potential_polymers (Some Public_data.High) (Some Public_data.High) (*to do. make these options tunable *))) >>=
               fun out -> Lwt.return (Api_common.result_lift out)
            )
       )
-      (React.S.on tab_is_active
+      (React.S.on ~eq:State_project.model_equal tab_is_active
          State_project.dummy_model State_project.model) in
-  [ Tyxml_js.R.Html5.div
+  [ Html.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
-      scc
+      [ Tyxml_js.R.Html5.p scc ]
   ]
 
 
