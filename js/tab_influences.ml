@@ -150,15 +150,14 @@ let json_to_graph logger origin_short_opt influences_json =
       let contextual_help =
         (Locality.to_string pos)^" "^(r.Public_data.rule_ast)
       in
+      let fillcolor =
+        if is_center origin_short_opt node then !Config.center_color
+        else !Config.rule_color in
       [
           Graph_loggers_sig.Label label;
           Graph_loggers_sig.Shape !Config.rule_shape;
-          Graph_loggers_sig.FillColor !Config.rule_color;
-          Graph_loggers_sig.Color
-            (if is_center origin_short_opt node then
-               !Config.center_color
-             else
-               !Config.rule_color);
+          Graph_loggers_sig.FillColor fillcolor;
+          Graph_loggers_sig.Color fillcolor;
           Graph_loggers_sig.Position [pos] ;
           Graph_loggers_sig.OnClick json ;
           Graph_loggers_sig.Contextual_help contextual_help
@@ -173,16 +172,14 @@ let json_to_graph logger origin_short_opt influences_json =
       let contextual_help =
         (Locality.to_string pos)^(r.Public_data.var_ast)
       in
-
+      let fillcolor =
+        if is_center origin_short_opt node then !Config.center_color
+        else !Config.variable_color in
       [
         Graph_loggers_sig.Label label;
         Graph_loggers_sig.Shape !Config.variable_shape;
-        Graph_loggers_sig.FillColor !Config.variable_color;
-        Graph_loggers_sig.Color
-          (if is_center origin_short_opt node then
-             !Config.center_color
-           else
-             !Config.variable_color);
+        Graph_loggers_sig.FillColor fillcolor;
+        Graph_loggers_sig.Color fillcolor;
         Graph_loggers_sig.Position [pos] ;
         Graph_loggers_sig.OnClick json ;
         Graph_loggers_sig.Contextual_help contextual_help]
