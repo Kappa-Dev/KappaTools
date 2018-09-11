@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSim -seed 0 --compile -syntax 4 532.ka || exit 0

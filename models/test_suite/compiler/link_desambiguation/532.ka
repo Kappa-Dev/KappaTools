@@ -1,0 +1,11 @@
+%agent: V(x,y,z)
+
+%var: 'yx' 1
+%var: 'zx' 2
+
+'growYX' V(y[./1]),V(x[./1]) @ 'yx'
+'growZX' V(z[./1]),V(x[./1]) @ 'zx'
+
+%obs: 'nodes' |V(x[_],y[_],z[_])|/|V()|
+
+%init: 1000 V()

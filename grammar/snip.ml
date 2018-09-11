@@ -111,14 +111,13 @@ let complete_with_candidate
              :: acc
            else acc
          | (Ast.LNK_VALUE (k,x),_),s ->
-           begin
+           if x = dst_info then
              match
                List.partition
                  (fun (j,_,(p',a'),sw') -> j=k && i=p' && a'= ag.LKappa.ra_type
                                            && sw' = p_switch) todo with
              | [ _ ], todo' ->
                let ports' = Array.copy ag.LKappa.ra_ports in
-               let () = assert (x = dst_info) in
                let () = ports'.(i) <-
                    (Locality.dummy_annot (Ast.LNK_VALUE (id,x)),s) in
                (List.rev_append prevs
@@ -129,7 +128,7 @@ let complete_with_candidate
                 todo') :: acc
              |[], _ -> acc
              | _ :: _ :: _, _ -> assert false
-           end
+           else acc
          | ((Ast.LNK_TYPE _ | Ast.LNK_FREE | Ast.LNK_SOME),_), _ -> acc)
     outs ag.LKappa.ra_ports
 
