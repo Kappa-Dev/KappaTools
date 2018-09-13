@@ -848,13 +848,19 @@ let modif_of_json filenames f_mix f_var = function
         Locality.annot_of_yojson ~filenames f_mix m)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid modification",x))
 
+let merge_internal_mod acc = function
+  | None -> acc
+  | Some (x,pos) ->
+    let x_op = Some x in
+    if List.exists (fun (x',_) -> x_op = x') acc then acc else (x_op,pos)::acc
+
 let merge_internals =
   List.fold_left
     (fun acc (x,_ as y) ->
-       if List.exists
+      if x = None || List.exists
            (fun (x',_) ->
               Option_util.equal (fun x x' -> String.compare x x' = 0) x x') acc
-       then acc else y::acc)
+      then acc else y::acc)
 
 let rec merge_sites_counter c = function
   | [] -> [Counter c]
@@ -864,7 +870,8 @@ let rec merge_sites_port p = function
   | [] -> [Port {p with port_lnk = []}]
   | Port h :: t when fst p.port_nme = fst h.port_nme ->
     Port {h with port_int =
-                   merge_internals h.port_int p.port_int}::t
+                   merge_internal_mod
+                     (merge_internals h.port_int p.port_int) p.port_int_mod}::t
   | (Port _ | Counter _ as h) :: t -> h :: merge_sites_port p t
 let merge_sites =
   List.fold_left
