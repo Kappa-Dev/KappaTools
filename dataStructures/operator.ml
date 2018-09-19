@@ -26,8 +26,15 @@ let bin_alg_op_to_string = function
   | MIN -> "[min]"
   | MAX -> "[max]"
 
-let print_bin_alg_op f op =
-  Format.fprintf f "%s" (bin_alg_op_to_string op)
+let bin_alg_op_is_prefix = function
+  | MAX | MIN -> true
+  | MULT | SUM | DIV | MINUS | POW | MODULO -> false
+
+let print_bin_alg_op fx x fy y f op =
+  if bin_alg_op_is_prefix op then
+    Format.fprintf f "%s (%a) (%a)" (bin_alg_op_to_string op) fx x fy y
+  else
+    Format.fprintf f "(%a %s %a)" fx x (bin_alg_op_to_string op) fy y
 
 let bin_alg_op_to_json op = `String (bin_alg_op_to_string op)
 let bin_alg_op_of_json = function

@@ -321,39 +321,24 @@ let rec print_alg parameter (error:Exception.method_handler) alg =
   | Alg_expr.BIN_ALG_OP (op,(alg1,_),(alg2,_)) ->
     let () = get_agent_open_symbol parameter in
     let error = print_alg parameter error alg1 in
-    let () =
-      match
-        Loggers.formatter_of_logger
-          (Remanent_parameters.get_logger parameter)
-      with
-      | None -> ()
-      | Some formatter -> Operator.print_bin_alg_op formatter op in
+    let () = Loggers.fprintf
+        (Remanent_parameters.get_logger parameter) "%s"
+        (Operator.bin_alg_op_to_string op) in
     let error = print_alg parameter error alg2 in
     let () =  get_agent_close_symbol parameter in
     error
   | Alg_expr.UN_ALG_OP (op,(alg,_)) ->
     let () = get_agent_open_symbol parameter in
-    let () =
-      match
-        Loggers.formatter_of_logger
-          (Remanent_parameters.get_logger parameter)
-      with
-      | None -> ()
-      | Some formatter -> Operator.print_un_alg_op formatter op
-    in
+    let () = Loggers.fprintf
+        (Remanent_parameters.get_logger parameter) "%a"
+        Operator.print_un_alg_op op in
     let error = print_alg parameter error alg in
     let () = get_agent_close_symbol parameter in
     error
   | Alg_expr.STATE_ALG_OP state_alg_op ->
-    let () =
-      match
-        Loggers.formatter_of_logger
-          (Remanent_parameters.get_logger parameter)
-      with
-      | None -> ()
-      | Some formatter ->
-        Operator.print_state_alg_op formatter state_alg_op
-    in
+    let () = Loggers.fprintf
+        (Remanent_parameters.get_logger parameter) "%a"
+        Operator.print_state_alg_op state_alg_op in
     error
   | Alg_expr.ALG_VAR string ->
     let () = Loggers.fprintf

@@ -18,12 +18,23 @@ type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
 (** {6 Printers} *)
 
-val print_bin_alg_op : Format.formatter -> bin_alg_op -> unit
+val bin_alg_op_is_prefix : bin_alg_op -> bool
+val print_bin_alg_op :
+  (Format.formatter -> 'a -> unit) -> 'a ->
+  (Format.formatter -> 'b -> unit) -> 'b ->
+  Format.formatter -> bin_alg_op -> unit
 val print_un_alg_op : Format.formatter -> un_alg_op -> unit
 val print_state_alg_op : Format.formatter -> state_alg_op -> unit
 val print_bin_bool_op : Format.formatter -> bin_bool_op -> unit
 val print_un_bool_op : Format.formatter -> un_bool_op -> unit
 val print_compare_op : Format.formatter -> compare_op -> unit
+
+val bin_alg_op_to_string : bin_alg_op -> string
+val un_alg_op_to_string : un_alg_op -> string
+val state_alg_op_to_string : state_alg_op -> string
+val bin_bool_op_to_string : bin_bool_op -> string
+val un_bool_op_to_string : un_bool_op -> string
+val compare_op_to_string : compare_op -> string
 
 (** {6 Json } *)
 

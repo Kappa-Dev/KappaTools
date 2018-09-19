@@ -155,10 +155,10 @@ let rec print pr_mix pr_tok pr_var f = function
   | TOKEN_ID tk -> Format.fprintf f "|%a|" pr_tok tk
   | STATE_ALG_OP op -> Operator.print_state_alg_op f op
   | BIN_ALG_OP (op, (a,_), (b,_)) ->
-    Format.fprintf f "(%a %a %a)"
+    Operator.print_bin_alg_op
       (print pr_mix pr_tok pr_var) a
-      Operator.print_bin_alg_op op
       (print pr_mix pr_tok pr_var) b
+      f op
   | UN_ALG_OP (op, (a,_)) ->
     Format.fprintf f "%a(%a)" Operator.print_un_alg_op op
       (print pr_mix pr_tok pr_var) a
