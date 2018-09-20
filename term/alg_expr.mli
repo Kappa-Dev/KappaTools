@@ -116,6 +116,11 @@ val setup_alg_vars_rev_dep :
 
 val has_mix : ?var_decls:('b -> ('c,'b) e) -> ('a,'b) e -> pervasives_bool
 
+val is_constant : ('a, 'b) e Locality.annot -> pervasives_bool
+
+val is_time_homogeneous : ('a, 'b) e Locality.annot -> pervasives_bool
+(** does not take into account symbolic propagation of expression *)
+
 val has_progress_dep : only_time:pervasives_bool ->
     (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->

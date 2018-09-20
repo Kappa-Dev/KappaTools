@@ -256,6 +256,44 @@ and bool_has_mix :
   | UN_BOOL_OP (_,(a,_)) ->
     bool_has_mix ?var_decls a
 
+let rec is_constant = function
+  | CONST _,_ -> true
+  | IF (a,b,c),_ -> bool_is_constant a && is_constant b && is_constant c
+  | BIN_ALG_OP (_,a,b),_ -> is_constant a && is_constant b
+  | (UN_ALG_OP (_,a) | DIFF_KAPPA_INSTANCE (a,_) | DIFF_TOKEN (a,_)),_ ->
+    is_constant a
+  | (ALG_VAR _ | STATE_ALG_OP _ | TOKEN_ID _ | KAPPA_INSTANCE _),_  -> false
+and bool_is_constant = function
+  | (TRUE | FALSE),_ -> true
+  | COMPARE_OP (_,a,b),_ -> is_constant a && is_constant b
+  | BIN_BOOL_OP (_,a,b),_ -> bool_is_constant a && bool_is_constant b
+  | UN_BOOL_OP (_,a),_ -> bool_is_constant a
+
+let rec is_time_homogeneous = function
+  | CONST _,_ -> true
+  | IF (a,b,c),_ ->
+    bool_is_time_homogeneous a && is_time_homogeneous b && is_time_homogeneous c
+  | BIN_ALG_OP (_,a,b),_ -> is_time_homogeneous a && is_time_homogeneous b
+  | (UN_ALG_OP (_,a) | DIFF_KAPPA_INSTANCE (a,_) | DIFF_TOKEN (a,_)), _ ->
+    is_time_homogeneous a
+  | STATE_ALG_OP
+      ( Operator.EVENT_VAR
+      | Operator.CPUTIME
+      | Operator.NULL_EVENT_VAR
+      | Operator.TMAX_VAR
+      | Operator.EMAX_VAR) ,_
+  | ALG_VAR _,_
+  | TOKEN_ID _,_
+  | KAPPA_INSTANCE _,_ -> true
+  | STATE_ALG_OP Operator.TIME_VAR,_ -> false
+and bool_is_time_homogeneous = function
+  | (TRUE | FALSE),_ -> true
+  | COMPARE_OP (_,a,b),_ ->
+    is_time_homogeneous a && is_time_homogeneous b
+  | BIN_BOOL_OP (_,a,b),_ ->
+    bool_is_time_homogeneous a && bool_is_time_homogeneous b
+  | UN_BOOL_OP (_,a),_ -> bool_is_time_homogeneous a
+
 let rec aux_extract_cc acc = function
   | BIN_ALG_OP (_, a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
   | (UN_ALG_OP (_, a) | DIFF_TOKEN (a,_) | DIFF_KAPPA_INSTANCE (a,_)),_ ->

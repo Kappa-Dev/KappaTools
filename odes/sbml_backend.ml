@@ -718,59 +718,57 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
          (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
            Network_handler.t)
   =
-  match
-    Ode_loggers_sig.is_expr_alias alg_expr,
-    Ode_loggers_sig.is_expr_const alg_expr
-  with
-  | Some x, true ->
-    let () =
-      print_ci logger logger_err
-               (Loggers.get_id_of_global_parameter
-                  logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
-    in
-    do_dotnet logger logger_err
-      (fun _ logger_err ->
-         let pos = Some __POS__ in
-         warn_expr ?pos alg_expr "not handled yet, todo" logger logger_err
-      )
-  | None, _ | Some _, false ->
-    begin
-      match fst alg_expr with
-      | Alg_expr.CONST nbr  ->
-        print_nbr logger logger_err nbr
-      | Alg_expr.ALG_VAR x ->
-        begin
-          let id =
-            network.Network_handler.int_of_obs x
-          in
-          match
-            Loggers.get_expr logger (Ode_loggers_sig.Expr id)
-          with
-          | Some expr ->
-            if Ode_loggers_sig.is_expr_const expr
-            then
-              let () =
-                do_sbml logger logger_err
-                  (lift0 (fun logger ->
-                    Loggers.fprintf logger "<ci> %s </ci>"
-                      (string_of_var_id id)))
-              in
-              do_dotnet logger logger_err
+  match fst alg_expr with
+  | Alg_expr.CONST nbr  ->
+    print_nbr logger logger_err nbr
+  | Alg_expr.ALG_VAR x ->
+    if Alg_expr.is_constant alg_expr then
+      (* TODO Jérome: This is dead code
+         ([alg_expr] = [ALG_VAR _, _] and [is_constant (ALG_VAR _,_)] = false)
+         please have a look *)
+      let () =
+        print_ci logger logger_err
+          (Loggers.get_id_of_global_parameter
+             logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
+      in
+      do_dotnet logger logger_err
+        (fun _ logger_err ->
+           let pos = Some __POS__ in
+           warn_expr ?pos alg_expr "not handled yet, todo" logger logger_err
+        )
+    else
+      begin
+        let id =
+          network.Network_handler.int_of_obs x
+        in
+        match
+          Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+        with
+        | Some expr ->
+          if Alg_expr.is_constant expr
+          then
+            let () =
+              do_sbml logger logger_err
                 (lift0 (fun logger ->
-                  Loggers.fprintf logger "%s"
-                    (string_of_var_id id)))
-            else
-              (*if expr is not a constant in case of
+                     Loggers.fprintf logger "<ci> %s </ci>"
+                       (string_of_var_id id)))
+            in
+            do_dotnet logger logger_err
+              (lift0 (fun logger ->
+                   Loggers.fprintf logger "%s"
+                     (string_of_var_id id)))
+          else
+            (*if expr is not a constant in case of
               DOTNET gives warning*)
-              (*  let () =
+            (*  let () =
                 do_sbml logger logger_err
                   (fun logger logger_err ->*)
-                    print_alg_expr_in_sbml
-                      string_of_var_id
-                      logger
-                      logger_err
-                      expr
-                      network (*
+            print_alg_expr_in_sbml
+              string_of_var_id
+              logger
+              logger_err
+              expr
+              network (*
               in
               let () =
                 do_dotnet logger logger_err
@@ -785,162 +783,161 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
                 (fun logger logger_err ->
                    print_nbr logger logger_err Nbr.one
                                )*)
-          | None ->
-            Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
-        end
-      | Alg_expr.KAPPA_INSTANCE x ->
-        let () =
-          do_sbml logger logger_err
-          (fun logger _logger_err ->
-             Loggers.fprintf logger "<ci>s%i</ci>"
-               (network.Network_handler.int_of_kappa_instance x))
-        in
-        do_dotnet logger logger_err
-          (fun _logger logger_err ->
-             let () =
-               warn_expr
-                 alg_expr
-                 ("DOTNET backend does not support kappa expression in rates for rules: cowardly replacing it with 0")
-                 logger
-                 logger_err
-             in
-             print_nbr logger logger_err Nbr.zero)
-      | Alg_expr.TOKEN_ID x ->
-        let () =
-          do_sbml logger logger_err
-            (fun logger logger_err ->
-               print_ci_with_id logger logger_err "t"
-                 (network.Network_handler.int_of_token_id x))
-        in
-        do_dotnet logger logger_err
-          (fun _logger logger_err ->
-             let () =
-               warn_expr
-                 alg_expr
-                 ("DOTNET backend does not support token values in rates for rules: cowardly replacing it with 0")
-                 logger
-                 logger_err
-             in
-             print_nbr logger logger_err Nbr.zero)
-      | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
-        print_ci logger logger_err "tend"
-      | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
-        print_nbr logger logger_err (Nbr.zero)
-      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
-        let () =
-          do_sbml logger logger_err (fun logger _ ->
-              Loggers.fprintf logger
-                "<apply>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
-                (Loggers_string_of_op.string_of_bin_op logger
-                   Operator.MULT)
+        | None ->
+          Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
+      end
+  | Alg_expr.KAPPA_INSTANCE x ->
+    let () =
+      do_sbml logger logger_err
+        (fun logger _logger_err ->
+           Loggers.fprintf logger "<ci>s%i</ci>"
+             (network.Network_handler.int_of_kappa_instance x))
+    in
+    do_dotnet logger logger_err
+      (fun _logger logger_err ->
+         let () =
+           warn_expr
+             alg_expr
+             ("DOTNET backend does not support kappa expression in rates for rules: cowardly replacing it with 0")
+             logger
+             logger_err
+         in
+         print_nbr logger logger_err Nbr.zero)
+  | Alg_expr.TOKEN_ID x ->
+    let () =
+      do_sbml logger logger_err
+        (fun logger logger_err ->
+           print_ci_with_id logger logger_err "t"
+             (network.Network_handler.int_of_token_id x))
+    in
+    do_dotnet logger logger_err
+      (fun _logger logger_err ->
+         let () =
+           warn_expr
+             alg_expr
+             ("DOTNET backend does not support token values in rates for rules: cowardly replacing it with 0")
+             logger
+             logger_err
+         in
+         print_nbr logger logger_err Nbr.zero)
+  | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
+    print_ci logger logger_err "tend"
+  | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
+    print_nbr logger logger_err (Nbr.zero)
+  | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
+    let () =
+      do_sbml logger logger_err (fun logger _ ->
+          Loggers.fprintf logger
+            "<apply>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
+            (Loggers_string_of_op.string_of_bin_op logger
+               Operator.MULT)
+        )
+    in
+    let () =
+      do_dotnet logger logger_err
+        (fun _logger logger_err ->
+           let pos = Some __POS__ in
+           warn_expr ?pos alg_expr "Internal error" logger logger_err
+        )
+    in
+    ()
+  | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
+    print_nbr logger logger_err Nbr.zero
+  | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
+    print_ci logger logger_err "event_max"
+  | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) ->
+    print_nbr logger logger_err Nbr.zero
+  | Alg_expr.BIN_ALG_OP (op, a, b) ->
+    let string_op = Loggers_string_of_op.string_of_bin_op logger op in
+    let () =
+      do_sbml logger logger_err
+        (fun logger logger_err ->
+           let () = Loggers.fprintf logger "<apply>" in
+           let () = Loggers.fprintf logger "%s" string_op in
+           let () =
+             print_alg_expr_in_sbml string_of_var_id logger logger_err a network
+           in
+           let () =
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err b network
+           in
+           let () = Loggers.fprintf logger "</apply>" in
+           ()
             )
-        in
-        let () =
-          do_dotnet logger logger_err
-            (fun _logger logger_err ->
-              let pos = Some __POS__ in
-              warn_expr ?pos alg_expr "Internal error" logger logger_err
-            )
-        in
-        ()
-      | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
-        print_nbr logger logger_err Nbr.zero
-      | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
-        print_ci logger logger_err "event_max"
-      | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) ->
-        print_nbr logger logger_err Nbr.zero
-      | Alg_expr.BIN_ALG_OP (op, a, b) ->
-        let string_op = Loggers_string_of_op.string_of_bin_op logger op in
-        let () =
-          do_sbml logger logger_err
-            (fun logger logger_err ->
-              let () = Loggers.fprintf logger "<apply>" in
-              let () = Loggers.fprintf logger "%s" string_op in
-              let () =
-                print_alg_expr_in_sbml string_of_var_id logger logger_err a network
-              in
-              let () =
-                print_alg_expr_in_sbml
-                  string_of_var_id logger logger_err b network
-              in
-              let () = Loggers.fprintf logger "</apply>" in
-              ()
-            )
-        in
-        let () =
-          do_dotnet
-            logger logger_err
-            (fun logger logger_err ->
-              let () =
-                print_alg_expr_in_sbml
-                  string_of_var_id logger logger_err a network
-              in
-              let () = Loggers.fprintf logger "%s" string_op in
-              let () =
-                print_alg_expr_in_sbml
-                  string_of_var_id logger logger_err b network
-              in
-            ()
-            )
-        in
-        ()
-      | Alg_expr.UN_ALG_OP (op, a) ->
-        let string_op = Loggers_string_of_op.string_of_un_op logger op in
-        let () =
-          do_sbml logger logger_err
-            (fun logger logger_err ->
-               let () = Loggers.fprintf logger "<apply>" in
-               let () = Loggers.fprintf logger "%s" string_op in
-               let () =
-                 print_alg_expr_in_sbml
-                   string_of_var_id logger logger_err a network
-               in
-               let () = Loggers.fprintf logger "</apply>" in
-               ())
-        in
-        let () =
-          do_dotnet logger logger_err
-            (fun logger logger_err ->
-              let () = Loggers.fprintf logger "%s" string_op in
-              let () =
-                print_alg_expr_in_sbml
-                  string_of_var_id logger logger_err a network
-              in
-              ()
-            )
-        in ()
-      | Alg_expr.IF (cond, yes, no) ->
-        let () =
-          do_sbml logger logger_err
-            (fun logger logger_err ->
-               let () = Loggers.fprintf logger "<apply>" in
-               let () = Loggers.fprintf logger "<if-then-else>"  in
-               let () =
-                 print_bool_expr_in_sbml
-                   string_of_var_id logger logger_err cond network
-               in
-               let () =
-                 print_alg_expr_in_sbml
-                   string_of_var_id logger logger_err yes network
-               in
-               let () =
-                 print_alg_expr_in_sbml
-                   string_of_var_id logger logger_err no network
-               in
-               let () = Loggers.fprintf logger "</apply>" in
-               ())
-        in
-          do_dotnet logger logger_err
-            (fun _logger logger_err ->
-               let pos = Some __POS__ in
-               warn_expr ?pos alg_expr "Conditionals are not allowed in DOTNET backend" logger logger_err
-            )
-      | (Alg_expr.DIFF_KAPPA_INSTANCE _
-        | Alg_expr.DIFF_TOKEN _) ->
-        raise
-          (ExceptionDefn.Internal_Error
-             ("SBML does not support differentiation",snd alg_expr))
-    end
+    in
+    let () =
+      do_dotnet
+        logger logger_err
+        (fun logger logger_err ->
+           let () =
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err a network
+           in
+           let () = Loggers.fprintf logger "%s" string_op in
+           let () =
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err b network
+           in
+           ()
+        )
+    in
+    ()
+  | Alg_expr.UN_ALG_OP (op, a) ->
+    let string_op = Loggers_string_of_op.string_of_un_op logger op in
+    let () =
+      do_sbml logger logger_err
+        (fun logger logger_err ->
+           let () = Loggers.fprintf logger "<apply>" in
+           let () = Loggers.fprintf logger "%s" string_op in
+           let () =
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err a network
+           in
+           let () = Loggers.fprintf logger "</apply>" in
+           ())
+    in
+    let () =
+      do_dotnet logger logger_err
+        (fun logger logger_err ->
+           let () = Loggers.fprintf logger "%s" string_op in
+           let () =
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err a network
+           in
+           ()
+        )
+    in ()
+  | Alg_expr.IF (cond, yes, no) ->
+    let () =
+      do_sbml logger logger_err
+        (fun logger logger_err ->
+           let () = Loggers.fprintf logger "<apply>" in
+           let () = Loggers.fprintf logger "<if-then-else>"  in
+           let () =
+             print_bool_expr_in_sbml
+               string_of_var_id logger logger_err cond network
+           in
+           let () =
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err yes network
+           in
+           let () =
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err no network
+           in
+           let () = Loggers.fprintf logger "</apply>" in
+           ())
+    in
+    do_dotnet logger logger_err
+      (fun _logger logger_err ->
+         let pos = Some __POS__ in
+         warn_expr ?pos alg_expr "Conditionals are not allowed in DOTNET backend" logger logger_err
+      )
+  | (Alg_expr.DIFF_KAPPA_INSTANCE _
+    | Alg_expr.DIFF_TOKEN _) ->
+    raise
+      (ExceptionDefn.Internal_Error
+         ("SBML does not support differentiation",snd alg_expr))
 and
   print_bool_expr_in_sbml string_of_var_id logger logger_err cond network =
   let () =
@@ -1002,69 +999,62 @@ let rec substance_expr_in_sbml logger
     ) (network:
          (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
   =
-  match
-    Ode_loggers_sig.is_expr_alias alg_expr,
-    Ode_loggers_sig.is_expr_const alg_expr
-  with
-  | Some x, true ->
-    Mods.StringSet.singleton
-      (Loggers.get_id_of_global_parameter
-         logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
-  | None, _ | Some _, false ->
-    begin
-      match fst alg_expr with
-      | Alg_expr.CONST _
-      | Alg_expr.STATE_ALG_OP (Operator.CPUTIME)
-      | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR)
-      | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR)
-        ->
+  match fst alg_expr with
+  | Alg_expr.CONST _
+  | Alg_expr.STATE_ALG_OP (Operator.CPUTIME)
+  | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR)
+  | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) ->
+    Mods.StringSet.empty
+  | Alg_expr.ALG_VAR x ->
+    if Alg_expr.is_constant alg_expr then
+      (* TODO Jérome: This is dead code, please have a look *)
+      Mods.StringSet.singleton
+        (Loggers.get_id_of_global_parameter
+           logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
+    else begin
+      let id =
+        network.Network_handler.int_of_obs x
+      in
+      match
+        Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+      with
+      | Some expr ->
+        substance_expr_in_sbml
+          logger
+          expr
+          network
+      | None ->(* TO DO *)
         Mods.StringSet.empty
-      | Alg_expr.ALG_VAR x ->
-        begin
-          let id =
-            network.Network_handler.int_of_obs x
-          in
-          match
-            Loggers.get_expr logger (Ode_loggers_sig.Expr id)
-          with
-          | Some expr ->
-            substance_expr_in_sbml
-              logger
-              expr
-              network
-          | None ->(* TO DO *)
-            Mods.StringSet.empty
-        end
-      | Alg_expr.KAPPA_INSTANCE x ->
-        Mods.StringSet.singleton
-          ("s"^(string_of_int (network.Network_handler.int_of_kappa_instance x)))
-      | Alg_expr.TOKEN_ID x ->
-        Mods.StringSet.singleton
-          ("t"^(string_of_int (network.Network_handler.int_of_token_id x)))
-      | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
-        Mods.StringSet.singleton "tend"
-      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
-        Mods.StringSet.singleton "time"
-      | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
-        Mods.StringSet.singleton "event_max"
-      | Alg_expr.BIN_ALG_OP (_op, a, b) ->
-        Mods.StringSet.union
-          (substance_expr_in_sbml logger a network)
-          (substance_expr_in_sbml logger b network)
-      | Alg_expr.UN_ALG_OP (_op, a) ->
-        substance_expr_in_sbml logger a network
-      | Alg_expr.IF (cond, yes, no) ->
-        Mods.StringSet.union
-          (substance_bool_expr_in_sbml logger cond network)
-          (Mods.StringSet.union
-             (substance_expr_in_sbml logger yes network)
-             (substance_expr_in_sbml logger no network))
-      | (Alg_expr.DIFF_KAPPA_INSTANCE _
-        | Alg_expr.DIFF_TOKEN _) ->
-        raise
-          (ExceptionDefn.Internal_Error
-             ("SBML does not support differentiation",snd alg_expr))
     end
+  | Alg_expr.KAPPA_INSTANCE x ->
+    Mods.StringSet.singleton
+      ("s"^(string_of_int (network.Network_handler.int_of_kappa_instance x)))
+  | Alg_expr.TOKEN_ID x ->
+    Mods.StringSet.singleton
+      ("t"^(string_of_int (network.Network_handler.int_of_token_id x)))
+  | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
+    Mods.StringSet.singleton "tend"
+  | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
+    Mods.StringSet.singleton "time"
+  | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
+    Mods.StringSet.singleton "event_max"
+  | Alg_expr.BIN_ALG_OP (_op, a, b) ->
+    Mods.StringSet.union
+      (substance_expr_in_sbml logger a network)
+      (substance_expr_in_sbml logger b network)
+  | Alg_expr.UN_ALG_OP (_op, a) ->
+    substance_expr_in_sbml logger a network
+  | Alg_expr.IF (cond, yes, no) ->
+    Mods.StringSet.union
+      (substance_bool_expr_in_sbml logger cond network)
+      (Mods.StringSet.union
+         (substance_expr_in_sbml logger yes network)
+         (substance_expr_in_sbml logger no network))
+  | (Alg_expr.DIFF_KAPPA_INSTANCE _
+    | Alg_expr.DIFF_TOKEN _) ->
+    raise
+      (ExceptionDefn.Internal_Error
+         ("SBML does not support differentiation",snd alg_expr))
 and
   substance_bool_expr_in_sbml logger cond network =
   match fst cond with
@@ -1075,9 +1065,9 @@ and
       (substance_expr_in_sbml logger a network)
       (substance_expr_in_sbml logger b network)
   | Alg_expr.BIN_BOOL_OP (_,a,b) ->
-  Mods.StringSet.union
-    (substance_bool_expr_in_sbml logger a network)
-    (substance_bool_expr_in_sbml logger b network)
+    Mods.StringSet.union
+      (substance_bool_expr_in_sbml logger a network)
+      (substance_bool_expr_in_sbml logger b network)
   | Alg_expr.UN_BOOL_OP (_,a) ->
     substance_bool_expr_in_sbml logger a network
 
@@ -1088,53 +1078,49 @@ let rec maybe_time_dependent_alg_expr_in_sbml logger
     ) (network:
          (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
   =
-  match
-    Ode_loggers_sig.is_expr_alias alg_expr
-  with
-  | Some _ -> false
-  | None ->
-    begin
-      match fst alg_expr with
-      | Alg_expr.CONST (Nbr.I _)
-      | Alg_expr.CONST (Nbr.I64 _)
-      | Alg_expr.CONST (Nbr.F _) -> false
-      | Alg_expr.ALG_VAR x ->
-        begin
-          let id =
-            network.Network_handler.int_of_obs x
-          in
-          match
-            Loggers.get_expr logger (Ode_loggers_sig.Expr id)
-          with
-          | Some expr ->
-            maybe_time_dependent_alg_expr_in_sbml
-              logger
-              expr
-              network
-          | None -> false
-        end
-      | Alg_expr.KAPPA_INSTANCE _
-      | Alg_expr.TOKEN_ID _
-      | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR)
-      | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> false
-      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> true
-      | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR)
-      | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR)
-      | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> false
-      | Alg_expr.BIN_ALG_OP (_, a, b) ->
-        maybe_time_dependent_alg_expr_in_sbml logger a network
-        || maybe_time_dependent_alg_expr_in_sbml logger b network
-      | Alg_expr.UN_ALG_OP (_, a)
-      | Alg_expr.DIFF_KAPPA_INSTANCE (a,_)
-      | Alg_expr.DIFF_TOKEN (a,_) ->
-        maybe_time_dependent_alg_expr_in_sbml logger a network
-      | Alg_expr.IF (cond, yes, no) ->
-        maybe_time_dependent_bool_expr_in_sbml logger cond network
-        ||
-        maybe_time_dependent_alg_expr_in_sbml logger yes network
-        ||
-        maybe_time_dependent_alg_expr_in_sbml logger no network
-    end
+  match fst alg_expr with
+  | Alg_expr.CONST (Nbr.I _)
+  | Alg_expr.CONST (Nbr.I64 _)
+  | Alg_expr.CONST (Nbr.F _) -> false
+  | Alg_expr.ALG_VAR _x ->
+    false
+      (* TODO Jérome: please check that! All this commented code was dead code
+         but it is very suspicious... (signed pirbo) *)
+  (* begin
+      let id =
+        network.Network_handler.int_of_obs x
+      in
+      match
+        Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+      with
+      | Some expr ->
+        maybe_time_dependent_alg_expr_in_sbml
+          logger
+          expr
+          network
+      | None -> false
+       end*)
+  | Alg_expr.KAPPA_INSTANCE _
+  | Alg_expr.TOKEN_ID _
+  | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR)
+  | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> false
+  | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> true
+  | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR)
+  | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR)
+  | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> false
+  | Alg_expr.BIN_ALG_OP (_, a, b) ->
+    maybe_time_dependent_alg_expr_in_sbml logger a network
+    || maybe_time_dependent_alg_expr_in_sbml logger b network
+  | Alg_expr.UN_ALG_OP (_, a)
+  | Alg_expr.DIFF_KAPPA_INSTANCE (a,_)
+  | Alg_expr.DIFF_TOKEN (a,_) ->
+    maybe_time_dependent_alg_expr_in_sbml logger a network
+  | Alg_expr.IF (cond, yes, no) ->
+    maybe_time_dependent_bool_expr_in_sbml logger cond network
+    ||
+    maybe_time_dependent_alg_expr_in_sbml logger yes network
+    ||
+    maybe_time_dependent_alg_expr_in_sbml logger no network
 and
   maybe_time_dependent_bool_expr_in_sbml logger cond network =
   match fst cond with
@@ -1343,9 +1329,9 @@ let dump_kinetic_law
                    (fun logger -> Loggers.fprintf logger "%s" (Nbr.to_string cst))
                  else
                  match
-                   Ode_loggers_sig.is_expr_alias expr
+                    expr
                  with
-                 | Some var_id ->
+                 | Alg_expr.ALG_VAR var_id,_ ->
                    let var_id = get_last_alias logger network var_id in
                    let s = string_of_var_id
                        (network.Network_handler.int_of_obs var_id)
@@ -1366,7 +1352,11 @@ let dump_kinetic_law
                       Loggers.fprintf logger "%s"
                         (string_of_var_id
                            (network.Network_handler.int_of_obs var_id)))
-                 | None ->
+                 | ( Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _
+                   | Alg_expr.IF _ | Alg_expr.STATE_ALG_OP _
+                   | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.DIFF_KAPPA_INSTANCE _
+                   | Alg_expr.TOKEN_ID _ | Alg_expr.DIFF_TOKEN _
+                   | Alg_expr.CONST _), _ ->
                    (fun logger ->
                       Loggers.fprintf logger "%s"
                         (string_of_variable
@@ -1430,7 +1420,7 @@ let dump_kinetic_law
            Loggers.get_expr logger var_rule in
          let expr = unsome expr_opt in
          let f logger =
-           if Ode_loggers_sig.is_expr_const expr
+           if Alg_expr.is_constant expr
            then
              if correct = nocc
              then

@@ -553,7 +553,7 @@ let flag_dangerous t id string =
     set_dangerous_global_parameter_name t id
 
 let set_expr t v expr =
-  let const = Ode_loggers_sig.is_expr_const expr in
+  let const = Alg_expr.is_constant expr in
   let () =
     if not const then
         t.const := VarSet.remove v (!(t.const))

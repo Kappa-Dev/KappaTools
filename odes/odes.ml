@@ -1434,7 +1434,7 @@ struct
                with
                  init = decl::sort_decls.init}
            | Var (_id,Some a,b) ->
-             if Ode_loggers_sig.is_expr_const b
+             if Alg_expr.is_constant b
              then
                {
                  sort_decls
@@ -1494,7 +1494,7 @@ struct
                  convert_alg_expr parameters compil network rate
                in
                let network, const_list, var_list =
-                 if Ode_loggers_sig.is_expr_const rate
+                 if Alg_expr.is_constant rate
                  then
                    network, (R rate)::const_list, var_list
                  else
@@ -1520,7 +1520,7 @@ struct
                        (fun (network, const_list, var_list, n) (expr,_) ->
                           let network, rate =
                             convert_alg_expr parameters compil network expr in
-                          if Ode_loggers_sig.is_expr_const rate
+                          if Alg_expr.is_constant rate
                           then network, (S (n,rate))::const_list, var_list, n+1
                           else network, const_list, (S (n,rate))::var_list, n+1
                        )
@@ -1573,8 +1573,7 @@ struct
          in
          match rate_opt with
          | None -> true
-         | Some rate ->
-           Ode_loggers_sig.is_expr_time_homogeneous rate)
+         | Some rate -> Alg_expr.is_time_homogeneous rate)
       rules
 
   let time_homogeneity_of_vars network =
@@ -1583,14 +1582,13 @@ struct
       (fun decl ->
          match decl with
          | Dummy_decl | Init_expr _ -> true
-         | Var (_,_,expr) ->
-           Ode_loggers_sig.is_expr_time_homogeneous expr)
+         | Var (_,_,expr) -> Alg_expr.is_time_homogeneous expr)
       vars_decl
 
   let time_homogeneity_of_obs network =
     let obs = network.obs in
     List.for_all
-      (fun (_,expr) -> Ode_loggers_sig.is_expr_time_homogeneous expr)
+      (fun (_,expr) -> Alg_expr.is_time_homogeneous expr)
       obs
 
   let check_time_homogeneity ~ignore_obs compil network =

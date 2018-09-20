@@ -1738,15 +1738,18 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
         | Ode_loggers_sig.Rated _,_
         | Ode_loggers_sig.Rateun _,_
         | Ode_loggers_sig.Rateund _,_ ->
-          if Ode_loggers_sig.is_expr_const alg_expr then
+          if Alg_expr.is_constant alg_expr then
             doit ~must_be_fresh:true "_"
           else if
             not propagate_constants
             && not
-              (match Ode_loggers_sig.is_expr_alias alg_expr
-               with
-               | None -> false
-               | Some _ -> true)
+              (match alg_expr with
+               | Alg_expr.ALG_VAR _,_ -> true
+               | ( Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _
+                 | Alg_expr.IF _ | Alg_expr.STATE_ALG_OP _
+                 | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.DIFF_KAPPA_INSTANCE _
+                 | Alg_expr.TOKEN_ID _ | Alg_expr.DIFF_TOKEN _
+                 | Alg_expr.CONST _), _ -> false)
           then doit ~must_be_fresh:true "_"
         | Ode_loggers_sig.Obs _,_ ->
           doit_obs ()
@@ -1783,26 +1786,18 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
     begin
       match variable, init_mode with
       | Ode_loggers_sig.Expr _ , true ->
-        begin
-          match
-            Ode_loggers_sig.is_expr_alias alg_expr,
-            Ode_loggers_sig.is_expr_const alg_expr
-          with
-          | None, true  ->
-            print_sbml_parameters
-              string_of_var_id
-              logger
-              logger_buffer
-              logger_err
-              variable
-              (Sbml_backend.eval_init_alg_expr
-                 logger
-                 network_handler
-                 alg_expr)
-          | Some _, _
-          | _, false -> ()
-        end
-        | (Ode_loggers_sig.Tinit |
+        if Alg_expr.is_constant alg_expr then
+          print_sbml_parameters
+            string_of_var_id
+            logger
+            logger_buffer
+            logger_err
+            variable
+            (Sbml_backend.eval_init_alg_expr
+               logger
+               network_handler
+               alg_expr)
+      | (Ode_loggers_sig.Tinit |
          Ode_loggers_sig.Tend |
          Ode_loggers_sig.Period_t_points
         ) ,_ ->
@@ -1817,7 +1812,7 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
         | Ode_loggers_sig.Rated _,_
         | Ode_loggers_sig.Rateun _,_
         | Ode_loggers_sig.Rateund _,_ ->
-          if Ode_loggers_sig.is_expr_const alg_expr then
+          if Alg_expr.is_constant alg_expr then
             print_sbml_parameters
               string_of_var_id
               logger
