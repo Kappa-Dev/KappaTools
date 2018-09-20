@@ -27,10 +27,11 @@ sig
   val equal : ('a -> 'b -> bool) -> 'a t -> 'b t -> bool
 
   val rename :
-    int -> Renaming.t -> Instantiation.abstract t -> Instantiation.abstract t
+    debugMode:bool -> int -> Renaming.t ->
+    Instantiation.abstract t -> Instantiation.abstract t
 
   val concretize :
-    Matching.t * int Mods.IntMap.t ->
+    debugMode:bool -> Matching.t * int Mods.IntMap.t ->
     Instantiation.abstract t -> Instantiation.concrete t
 
   val print :

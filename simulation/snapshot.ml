@@ -99,7 +99,7 @@ let rec counter_value cc (nid,sid) count =
         | None -> acc
         | Some x -> counter_value cc x (acc+1)) count ag.node_sites
 
-let cc_to_user_cc sigs cc =
+let cc_to_user_cc ~debugMode sigs cc =
   let r = Renaming.empty () in
   let (cc_list,indexes,_) =
     Tools.array_fold_lefti
@@ -108,7 +108,7 @@ let cc_to_user_cc sigs cc =
           | None ->
             let indexes' =
               if i = pos then indexes else
-                match Renaming.add i pos indexes with
+                match Renaming.add ~debugMode i pos indexes with
                 | None ->
                   raise
                     (ExceptionDefn.Internal_Error
@@ -143,7 +143,7 @@ let cc_to_user_cc sigs cc =
                        {User_graph.port_links = []; User_graph.port_states}
                    | Some (dn_id,s) ->
                      let dn_id' =
-                       try Renaming.apply indexes dn_id with
+                       try Renaming.apply ~debugMode indexes dn_id with
                          Renaming.Undefined | Invalid_argument _ -> dn_id in
                       match Signature.ports_if_counter_agent
                               sigs (cc.(dn_id)).node_type with
@@ -158,7 +158,7 @@ let cc_to_user_cc sigs cc =
        })
     cc_without_counters
 
-let export sigs s =
+let export ~debugMode sigs s =
   Mods.IntMap.fold (fun _ l acc ->
       List_util.rev_map_append
-        (fun (x,_,y) -> (x,cc_to_user_cc sigs y)) l acc) s []
+        (fun (x,_,y) -> (x,cc_to_user_cc ~debugMode sigs y)) l acc) s []

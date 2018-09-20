@@ -59,8 +59,8 @@ module Env : sig
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
   val get_elementary :
-    t -> Agent.t -> int -> Navigation.abstract Navigation.arrow ->
-    (id * point * Renaming.t) option
+    debugMode:bool -> t -> Agent.t -> int ->
+    Navigation.abstract Navigation.arrow -> (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
 
@@ -110,7 +110,8 @@ val new_free : work -> (Agent.t * int) -> work
 val new_internal_state : work -> (Agent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 
-val finish_new : ?origin:Operator.rev_dep -> work ->
+val finish_new :
+  debugMode:bool -> ?origin:Operator.rev_dep -> work ->
   (PreEnv.t*Renaming.t*cc*id)
 
 (** {6 Use a connected component } *)
@@ -138,9 +139,10 @@ val reconstruction_navigation : t -> Navigation.abstract Navigation.t
 
 val find_ty : cc -> int -> int (** Abstraction leak, please do not use *)
 
-val automorphisms : t -> Renaming.t list
+val automorphisms : debugMode:bool -> t -> Renaming.t list
 
-val embeddings_to_fully_specified : Env.t -> id -> cc -> Renaming.t list
+val embeddings_to_fully_specified :
+  debugMode:bool -> Env.t -> id -> cc -> Renaming.t list
 
 val size_of_cc : cc -> int
 
@@ -156,13 +158,15 @@ val fold:
 (** USE WITH CARE: Break some abstraction. The array must not be
     modified and internal state [-1] means unspecified *)
 
-val finalize : max_sharing:bool -> PreEnv.t -> Contact_map.t ->
-               Env.t * PreEnv.stat
+val finalize :
+  debugMode:bool -> max_sharing:bool -> PreEnv.t -> Contact_map.t ->
+  Env.t * PreEnv.stat
 
-val infs : t -> t -> t list
-val matchings : t -> t -> Renaming.t list
-val merge_on_inf : PreEnv.t -> Renaming.t -> t -> t ->
-                   t option * (t * int * t * int * int * bool) option
+val infs : debugMode:bool -> t -> t -> t list
+val matchings : debugMode:bool -> t -> t -> Renaming.t list
+val merge_on_inf :
+  debugMode:bool -> PreEnv.t -> Renaming.t -> t -> t ->
+  t option * (t * int * t * int * int * bool) option
 val length : t -> int
 
 module Set : SetMap.Set with type elt=id

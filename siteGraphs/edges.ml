@@ -508,7 +508,7 @@ let one_connected_component sigs ty node graph =
           build (succ id) ((ty,ports)::acc) known' todos' in
   build 0 [] Mods.IntMap.empty [node,ty]
 
-let species sigs root graph =
+let species ~debugMode sigs root graph =
   let specie = match Mods.DynArray.get graph.sort root with
     | None ->
        raise
@@ -517,15 +517,16 @@ let species sigs root graph =
                ("Sort of node unavailable "^string_of_int root)))
     | Some ty ->
       Snapshot.cc_to_user_cc
-        sigs (one_connected_component sigs ty root graph) in
+        ~debugMode sigs (one_connected_component sigs ty root graph) in
   let () = Cache.reset (fst graph.caches) in
   specie
 
-let build_snapshot sigs graph =
+let build_snapshot ~debugMode sigs graph =
   let () = assert (not graph.outdated) in
   let rec aux ccs node =
-    if node = Mods.DynArray.length graph.sort
-    then let () = Cache.reset (fst graph.caches) in Snapshot.export sigs ccs
+    if node = Mods.DynArray.length graph.sort then
+      let () = Cache.reset (fst graph.caches) in
+      Snapshot.export ~debugMode sigs ccs
     else
     if Cache.test (fst graph.caches) node
     then aux ccs (succ node)

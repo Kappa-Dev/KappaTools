@@ -61,7 +61,8 @@ module Make (Instances:Instances_sig.S) : sig
       case of null_event, it computes the exact injections of the left hand
       side to do apply the rule and returns the remaining exact injections. *)
 
-  val incorporate_extra_pattern : Pattern.Env.t -> t -> Pattern.id -> t
+  val incorporate_extra_pattern :
+    debugMode:bool -> Pattern.Env.t -> t -> Pattern.id -> t
 
   val overwrite_var : int -> Counter.t -> t -> Primitives.alg_expr -> t
   val update_outdated_activities :
@@ -78,14 +79,16 @@ module Make (Instances:Instances_sig.S) : sig
 
       takes the list of perturbations to be tried and returns it updated *)
 
-  val snapshot: Model.t -> Counter.t -> string -> t -> Data.snapshot
+  val snapshot:
+    debugMode:bool -> Model.t -> Counter.t -> string -> t -> Data.snapshot
 
   val print : Model.t -> Format.formatter -> t -> unit
 
   val get_random_state : t -> Random.State.t
 
   val update_edges_from_actions :
-    outputs:(Data.t -> unit) -> Signature.s -> Counter.t -> Pattern.Env.t ->
+    debugMode:bool -> outputs:(Data.t -> unit) ->
+    Signature.s -> Counter.t -> Pattern.Env.t ->
     t -> Instantiation.concrete Instantiation.action list *
          Instantiation.concrete Instantiation.site list -> t
 
@@ -131,6 +134,7 @@ module Make (Instances:Instances_sig.S) : sig
     Instantiation.concrete Primitives.Transformation.t ->
     (Instantiation.concrete Instantiation.site) list * Instances.t * Edges.t
   val apply_positive_transformation :
+    debugMode:bool ->
     Signature.s -> ?mod_connectivity_store:Roots.mod_ccs_cache ->
     (Matching.t * int Mods.IntMap.t) *
     (Instantiation.concrete Instantiation.site) list *
@@ -147,7 +151,7 @@ module Make (Instances:Instances_sig.S) : sig
     Instances.t * Edges.t
 
 val obs_from_transformations :
-  Pattern.Env.t -> Edges.t ->
+  debugMode:bool -> Pattern.Env.t -> Edges.t ->
   Instantiation.concrete Primitives.Transformation.t list ->
   (Pattern.id * Agent.t) list * Operator.DepSet.t
 (** [obs_from_transformations domain state transformations]

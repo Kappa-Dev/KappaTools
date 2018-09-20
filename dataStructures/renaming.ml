@@ -74,9 +74,9 @@ let unsafe_functionnal_add x y i =
     is_identity = i.is_identity && x==y ;
     dsts = Mods.IntSet.add y i.dsts
   }
-let add x y i =
+let add ~debugMode x y i =
   let not_ok =
-    !Parameter.debugModeOn &&
+    debugMode &&
     x < Array.length i.immediate && i.immediate.(x) <> special_val in
   if not_ok then raise Clashing else
     let i' = unsafe_functionnal_add x y i in
@@ -95,9 +95,9 @@ let unsafe_imperative_add x y i =
   let () = i.is_identity <- i.is_identity && x==y in
   i.dsts <- Mods.IntSet.add y i.dsts
 
-let imperative_add x y i =
+let imperative_add ~debugMode x y i =
   let not_ok =
-    !Parameter.debugModeOn &&
+    debugMode &&
     x < Array.length i.immediate && i.immediate.(x) <> special_val in
   if not_ok then raise Clashing else
     let origin = i.dsts in
@@ -126,14 +126,14 @@ let fold f i acc =
     acc
     i.immediate
 
-let apply i x =
-  if not i.is_identity || !Parameter.debugModeOn then
+let apply ~debugMode i x =
+  if not i.is_identity || debugMode then
     let c = compute x i in
     if c = special_val then raise Undefined else c
   else x
 
-let compose extensible i i' =
-  if not i.is_identity || extensible || !Parameter.debugModeOn then {
+let compose ~debugMode extensible i i' =
+  if not i.is_identity || extensible || debugMode then {
     immediate = Array.make (Array.length i.immediate) special_val;
     delayed = Some (i,i');
     is_identity = i.is_identity && i'.is_identity;
@@ -217,7 +217,7 @@ let of_yojson = function
     let () =
       List.iter (function
           | `List [ `Int src; `Int dst ] as x ->
-            if  not (imperative_add src dst out) then
+            if  not (imperative_add ~debugMode:false src dst out) then
               raise (Yojson.Basic.Util.Type_error ("Incorrect renaming item",x))
           | x ->
             raise (Yojson.Basic.Util.Type_error ("Incorrect renaming item",x))

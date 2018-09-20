@@ -25,7 +25,7 @@ val print_internal :
 val print_raw_internal :
   ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
 
-val rename : Renaming.t -> t -> t
+val rename : debugMode:bool -> Renaming.t -> t -> t
 
 val json_dictionnary : string
 val write_json : Bi_outbuf.t -> t -> unit

@@ -17,21 +17,21 @@
 
 
 val compile_bool:
-  ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
+  debugMode:bool -> ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool -> ?origin:Operator.rev_dep -> Contact_map.t ->
   Pattern.PreEnv.t -> (LKappa.rule_mixture, int) Alg_expr.bool Locality.annot ->
   Pattern.PreEnv.t *
   (Pattern.id array list,int) Alg_expr.bool Locality.annot
 
 val compile_modifications_no_track:
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  debugMode:bool -> warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool -> Contact_map.t -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
 
 val compile_inits:
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  debugMode:bool -> warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?rescale:float -> ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool -> Contact_map.t -> Model.t ->
   (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
@@ -41,7 +41,7 @@ val compile :
   outputs:(Data.t -> unit) -> pause:((unit -> 'b) -> 'b) ->
   return:(Model.t * bool (*has_tracking*) *
           (Primitives.alg_expr * Primitives.elementary_rule) list -> 'b) ->
-  max_sharing:bool ->
+  max_sharing:bool -> debugMode:bool ->
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool ->
   ?overwrite_init:(LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->

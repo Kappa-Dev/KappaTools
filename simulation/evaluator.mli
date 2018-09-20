@@ -21,5 +21,6 @@ val get_pause_criteria :
   Model.t * Rule_interpreter.t * (Pattern.id array list, int) Alg_expr.bool
 
 val find_all_embeddings :
-  Model.t -> Instantiation.concrete Primitives.Transformation.t list ->
+  debugMode:bool -> Model.t ->
+  Instantiation.concrete Primitives.Transformation.t list ->
   (Pattern.id * Renaming.t) list

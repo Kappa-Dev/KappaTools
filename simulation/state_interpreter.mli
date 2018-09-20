@@ -27,7 +27,7 @@ val observables_values :
 values of observables) *)
 
 val do_modifications :
-  outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
+  debugMode:bool -> outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
   Rule_interpreter.t -> t -> Primitives.modification list ->
   (bool * Rule_interpreter.t * t)
 

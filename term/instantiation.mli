@@ -62,30 +62,34 @@ type 'a event = {
 val empty_event : 'a event
 
 val rename_abstract_test :
-  int -> Renaming.t -> abstract test -> abstract test
+  debugMode:bool -> int -> Renaming.t -> abstract test -> abstract test
 val rename_abstract_action :
-  int -> Renaming.t -> abstract action -> abstract action
+  debugMode:bool -> int -> Renaming.t -> abstract action -> abstract action
 val rename_abstract_event :
-  int -> Renaming.t -> abstract event -> abstract event
+  debugMode:bool -> int -> Renaming.t -> abstract event -> abstract event
 val rename_abstract_side_effect:
-  int -> Renaming.t ->
+  debugMode:bool -> int -> Renaming.t ->
   (Matching.Agent.t * 'a) * Matching.Agent.t binding_state ->
   (Matching.Agent.t * 'a) * Matching.Agent.t binding_state
 val concretize_test :
-  (Matching.t * int Mods.IntMap.t) -> abstract test -> concrete test
+  debugMode:bool -> (Matching.t * int Mods.IntMap.t) ->
+  abstract test -> concrete test
 val concretize_action :
-  (Matching.t * int Mods.IntMap.t) -> abstract action -> concrete action
+  debugMode:bool -> (Matching.t * int Mods.IntMap.t) ->
+  abstract action -> concrete action
 
 val try_concretize_action :
-  (Matching.t * int Mods.IntMap.t) -> abstract action -> (concrete action) option
+  debugMode:bool -> (Matching.t * int Mods.IntMap.t) ->
+  abstract action -> (concrete action) option
 (** Same than [concretize_action], except that it returns [None]
     if the provided injection's domain does not contain a fresh agent
     that is involved in the action that is being concretized. *)
 
 val concretize_event :
-  (Matching.t * int Mods.IntMap.t) -> abstract event -> concrete event
+  debugMode:bool -> (Matching.t * int Mods.IntMap.t) ->
+  abstract event -> concrete event
 val matching_abstract_concrete :
-  abstract event -> concrete event -> Renaming.t option
+  debugMode:bool -> abstract event -> concrete event -> Renaming.t option
 
 val subst_map_agent_in_concrete_test :
   (int -> int) -> concrete test -> concrete test

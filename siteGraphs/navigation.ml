@@ -92,29 +92,30 @@ let rec print sigs find_ty f = function
       (print_id_internal_state sigs find_ty source site) (Some i)
       (print sigs (extend find_ty source)) t
 
-let compatible_fresh_point e (sid,sty) ssite arrow =
+let compatible_fresh_point ~debugMode e (sid,sty) ssite arrow =
   match e,arrow with
   | ((Fresh (id,ty),site),x), ToNothing ->
     if ty = sty && site = ssite && x = ToNothing
     then let inj = Renaming.empty () in
-      if Renaming.imperative_add id sid inj then Some inj else None
+      if Renaming.imperative_add ~debugMode id sid inj then Some inj else None
     else None
   | ((Fresh (id,ty),site),x), ToInternal i ->
     if ty = sty && site = ssite && x = ToInternal i
     then let inj = Renaming.empty () in
-      if Renaming.imperative_add id sid inj then Some inj else None
+      if Renaming.imperative_add ~debugMode id sid inj then Some inj else None
     else None
   | ((Fresh (id,ty),site), ToNode (Fresh (id',ty'),site')),
     ToNode (Fresh (sid',sty'),ssite') ->
     if ty = sty && site = ssite && ty' = sty' && site' = ssite'
     then let inj = Renaming.empty () in
-      if Renaming.imperative_add id sid inj then
-        if Renaming.imperative_add id' sid' inj then Some inj else None
+      if Renaming.imperative_add ~debugMode id sid inj then
+        if Renaming.imperative_add ~debugMode id' sid' inj
+        then Some inj else None
       else None
     else if ty = sty' && site = ssite' && ty' = sty && site' = ssite
     then let inj = Renaming.empty () in
-      if Renaming.imperative_add id sid' inj then
-        if Renaming.imperative_add id' sid inj then Some inj else None
+      if Renaming.imperative_add ~debugMode id sid' inj then
+        if Renaming.imperative_add ~debugMode id' sid inj then Some inj else None
       else None
     else None
   | (((Existing id,site), ToNode (Fresh(id',ty'),site'))
@@ -123,31 +124,31 @@ let compatible_fresh_point e (sid,sty) ssite arrow =
     if  ((ssite = site && ssite' = site') || (ssite' = site && ssite = site'))
         && ty' = sty && id = id' && sid = sid'
     then let inj = Renaming.empty () in
-      if Renaming.imperative_add id sid' inj then Some inj else None
+      if Renaming.imperative_add ~debugMode id sid' inj then Some inj else None
     else None
   | ((Existing _,_),_), _ -> None
   | ((Fresh _,_),_), ToNode _ -> None
 
-let compatible_point inj e e' =
+let compatible_point ~debugMode inj e e' =
   match e,e' with
   | ((Existing id,site), ToNothing), e ->
     if Renaming.mem id inj &&
-       e = ((Existing (Renaming.apply inj id),site),ToNothing)
+       e = ((Existing (Renaming.apply ~debugMode inj id),site),ToNothing)
     then Some inj
     else None
   | ((Existing id,site), ToInternal i), e ->
     if Renaming.mem id inj &&
-       e = ((Existing (Renaming.apply inj id),site),ToInternal i)
+       e = ((Existing (Renaming.apply ~debugMode inj id),site),ToInternal i)
     then Some inj
     else None
   | ((Existing id,site), ToNode (Existing id',site')), e ->
     if Renaming.mem id inj && Renaming.mem id' inj &&
        (e =
-        ((Existing (Renaming.apply inj id),site),
-         ToNode (Existing (Renaming.apply inj id'),site'))
+        ((Existing (Renaming.apply ~debugMode inj id),site),
+         ToNode (Existing (Renaming.apply ~debugMode inj id'),site'))
         || e =
-           ((Existing (Renaming.apply inj id'),site'),
-            ToNode (Existing (Renaming.apply inj id),site)))
+           ((Existing (Renaming.apply ~debugMode inj id'),site'),
+            ToNode (Existing (Renaming.apply ~debugMode inj id),site)))
     then Some inj
     else None
   | (((Existing id,site),ToNode (Fresh (id',ty),site')),
@@ -161,8 +162,9 @@ let compatible_point inj e e' =
     if ty' = ty && not (Renaming.mem id' inj) &&
        ((ssite = site && ssite' = site') ||
         (id = id' && ssite = site' && ssite' = site)) then
-      match Renaming.add id' sid' inj with
-      | Some inj' when Renaming.mem id inj' && sid = Renaming.apply inj' id  ->
+      match Renaming.add ~debugMode id' sid' inj with
+      | Some inj' when Renaming.mem id inj' &&
+                       sid = Renaming.apply ~debugMode inj' id  ->
         Some inj'
       | _ -> None
     else None
@@ -171,26 +173,26 @@ let compatible_point inj e e' =
   | ((Fresh (id,ty),site), ToNothing), ((Fresh (id',ty'),site'),x) ->
     if ty = ty' && site = site' && x = ToNothing
        && not (Renaming.mem id inj)
-    then Renaming.add id id' inj
+    then Renaming.add ~debugMode id id' inj
     else None
   | ((Fresh (id,ty),site), ToInternal i), ((Fresh (id',ty'),site'),x) ->
     if ty = ty' && site = site' &&
        x = ToInternal i && not (Renaming.mem id inj)
-    then Renaming.add id id' inj
+    then Renaming.add ~debugMode id id' inj
     else None
   | ((Fresh (id,ty),site), ToNode (Fresh (id',ty'),site')),
     ((Fresh (sid,sty),ssite), ToNode (Fresh (sid',sty'),ssite')) ->
     if not (Renaming.mem id inj) && not (Renaming.mem id' inj) then
       if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-      then match Renaming.add id sid inj with
+      then match Renaming.add ~debugMode id sid inj with
         | None -> None
-        | Some inj' -> match Renaming.add id' sid' inj' with
+        | Some inj' -> match Renaming.add ~debugMode id' sid' inj' with
           | None -> None
           | Some inj'' -> Some inj''
       else if ty = sty' && site = ssite' && ty' = sty && site' = ssite
-      then match Renaming.add id sid' inj with
+      then match Renaming.add ~debugMode id sid' inj with
         | None -> None
-        | Some inj' -> match Renaming.add id' sid inj' with
+        | Some inj' -> match Renaming.add ~debugMode id' sid inj' with
           | None -> None
           | Some inj'' -> Some inj''
       else None
@@ -198,19 +200,19 @@ let compatible_point inj e e' =
   | ((Fresh _,_), _), ((Fresh _,_),_) -> None
   | ((Fresh _,_), _), ((Existing _,_),_) -> None
 
-let rec aux_sub inj goal acc = function
+let rec aux_sub ~debugMode inj goal acc = function
   | [] -> None
-  | h :: t -> match compatible_point inj h goal with
-    | None -> aux_sub inj goal (h::acc) t
+  | h :: t -> match compatible_point ~debugMode inj h goal with
+    | None -> aux_sub ~debugMode inj goal (h::acc) t
     | Some inj' -> Some (inj',List.rev_append acc t)
-let rec is_subnavigation inj nav = function
+let rec is_subnavigation ~debugMode inj nav = function
   | [] -> Some (inj,nav)
-  | h :: t -> match aux_sub inj h [] nav with
+  | h :: t -> match aux_sub ~debugMode inj h [] nav with
     | None -> None
-    | Some (inj',nav') -> is_subnavigation inj' nav' t
+    | Some (inj',nav') -> is_subnavigation ~debugMode inj' nav' t
 
-let rename_id inj2cc = function
-  | Existing n -> inj2cc,Existing (Renaming.apply inj2cc n)
+let rename_id ~debugMode inj2cc = function
+  | Existing n -> inj2cc,Existing (Renaming.apply ~debugMode inj2cc n)
   | Fresh (id,ty) ->
     let img = Renaming.image inj2cc in
     let id' =
@@ -219,20 +221,20 @@ let rename_id inj2cc = function
         | None -> 1
         | Some i -> succ i
     else id in
-    match Renaming.add id id' inj2cc with
+    match Renaming.add ~debugMode id id' inj2cc with
     | None -> assert false
     | Some inj' -> inj',Fresh (id',ty)
 
-let rec rename inj2cc = function
+let rec rename ~debugMode inj2cc = function
   | [] -> inj2cc,[]
   | ((x,i), (ToNothing | ToInternal _ as a)) :: t ->
-    let inj,x' = rename_id inj2cc x in
-    let inj',t' = rename inj t in
+    let inj,x' = rename_id ~debugMode inj2cc x in
+    let inj',t' = rename ~debugMode inj t in
     inj',((x',i),a)::t'
   | ((x,i),ToNode (y,j)) :: t->
-    let inj,x' = rename_id inj2cc x in
-    let inj',y' = rename_id inj y in
-    let inj'',t' = rename inj' t in
+    let inj,x' = rename_id ~debugMode inj2cc x in
+    let inj',y' = rename_id ~debugMode inj y in
+    let inj'',t' = rename ~debugMode inj' t in
     inj'',((x',i),ToNode (y',j))::t'
 
 let check_edge graph = function
@@ -250,60 +252,61 @@ let check_edge graph = function
     Edges.link_exists id site id' site' graph
 
 (*inj is the partial injection built so far: inj:abs->concrete*)
-let dst_is_okay inj' graph root site = function
+let dst_is_okay ~debugMode inj' graph root site = function
   | ToNothing ->
     if Edges.is_free root site graph then Some inj' else None
   | ToInternal i ->
     if Edges.is_internal i root site graph then Some inj' else None
   | ToNode (Existing id',site') ->
     if Edges.link_exists root site
-        (Renaming.apply inj' id') site' graph
+        (Renaming.apply ~debugMode inj' id') site' graph
     then Some inj' else None
   | ToNode (Fresh (id',ty),site') ->
     match Edges.exists_fresh root site ty site' graph with
     | None -> None
-    | Some node -> Renaming.add id' node inj'
+    | Some node -> Renaming.add ~debugMode id' node inj'
 
-let injection_for_one_more_edge ?root inj graph = function
+let injection_for_one_more_edge ~debugMode ?root inj graph = function
   | ((Existing id,site),dst) ->
-    dst_is_okay inj graph (Renaming.apply inj id) site dst
+    dst_is_okay ~debugMode inj graph (Renaming.apply ~debugMode inj id) site dst
   | ((Fresh (id,rty),site),dst) ->
     match root with
     | Some (root,rty') when rty=rty' ->
-      (match Renaming.add id root inj with
+      (match Renaming.add ~debugMode id root inj with
        | None -> None
-       | Some inj' -> dst_is_okay inj' graph root site dst)
+       | Some inj' -> dst_is_okay ~debugMode inj' graph root site dst)
     | _ -> None
 
-let imperative_dst_is_okay inj' graph root site = function
+let imperative_dst_is_okay ~debugMode inj' graph root site = function
   | ToNothing -> Edges.is_free root site graph
   | ToInternal i -> Edges.is_internal i root site graph
   | ToNode (Existing id',site') ->
-    Edges.link_exists root site (Renaming.apply inj' id') site' graph
+    Edges.link_exists root site (Renaming.apply ~debugMode inj' id') site' graph
   | ToNode (Fresh (id',ty),site') ->
     match Edges.exists_fresh root site ty site' graph with
     | None -> false
-    | Some node -> Renaming.imperative_add id' node inj'
+    | Some node -> Renaming.imperative_add ~debugMode id' node inj'
 
-let imperative_edge_is_valid ?root inj graph = function
+let imperative_edge_is_valid ~debugMode ?root inj graph = function
   | ((Existing id,site),dst) ->
-    imperative_dst_is_okay inj graph (Renaming.apply inj id) site dst
+    imperative_dst_is_okay
+      ~debugMode inj graph (Renaming.apply ~debugMode inj id) site dst
   | ((Fresh (id,rty),site),dst) ->
     match root with
     | Some (root,rty') when rty=rty' ->
-      Renaming.imperative_add id root inj &&
-      imperative_dst_is_okay inj graph root site dst
+      Renaming.imperative_add ~debugMode id root inj &&
+      imperative_dst_is_okay ~debugMode inj graph root site dst
     | _ -> false
 
-let concretize_port inj = function
-  | (Existing id,site) -> (Renaming.apply inj id,site)
-  | (Fresh (id,_),site) -> (Renaming.apply inj id,site)
+let concretize_port ~debugMode inj = function
+  | (Existing id,site) -> (Renaming.apply ~debugMode inj id,site)
+  | (Fresh (id,_),site) -> (Renaming.apply ~debugMode inj id,site)
 
-let concretize_arrow inj = function
+let concretize_arrow ~debugMode inj = function
   | ToNothing | ToInternal _ as x -> x
-  | ToNode x -> ToNode (concretize_port inj x)
+  | ToNode x -> ToNode (concretize_port ~debugMode inj x)
 
-let concretize root graph nav =
+let concretize ~debugMode root graph nav =
   let inj = Renaming.empty () in
   let out =
     List.fold_left
@@ -311,8 +314,9 @@ let concretize root graph nav =
          match out with
          | None -> out
          | Some (root,acc) ->
-           if imperative_edge_is_valid ?root inj graph step then
-             let st = (concretize_port inj p, concretize_arrow inj dst) in
+           if imperative_edge_is_valid ~debugMode ?root inj graph step then
+             let st = (concretize_port ~debugMode inj p,
+                       concretize_arrow ~debugMode inj dst) in
              Some (None,st::acc)
            else None)
       (Some (Some root,[])) nav in

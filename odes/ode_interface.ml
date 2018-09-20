@@ -26,6 +26,8 @@ type compil =
     allow_empty_lhs: bool;
   }
 
+let debugMode = false
+
 let do_we_allow_empty_lhs compil = compil.allow_empty_lhs
 
 let to_dotnet compil =
@@ -199,7 +201,7 @@ let print_token ?compil fmt k =
 let print_canonic_species = print_chemical_species
 
 let nbr_automorphisms_in_chemical_species x =
-  List.length (Pattern.automorphisms x)
+  List.length (Pattern.automorphisms ~debugMode x)
 
 let compare_connected_component = Pattern.compare_canonicals
 
@@ -215,8 +217,8 @@ let connected_components_of_patterns = Array.to_list
 
 let connected_components_of_mixture_sigs sigs cache contact_map_int e =
   let (cache,acc) =
-    Snip.patterns_of_mixture contact_map_int sigs
-      cache e
+    Snip.patterns_of_mixture
+      ~debugMode contact_map_int sigs cache e
   in
     cache, acc
 
@@ -225,7 +227,7 @@ let connected_components_of_mixture compil cache e =
   let contact_map = contact_map compil in
   let sigs = Pattern.Env.signatures (domain compil) in
   let cc_cache, acc =
-    Snip.patterns_of_mixture contact_map sigs cc_cache e
+    Snip.patterns_of_mixture ~debugMode contact_map sigs cc_cache e
   in
   {cache with cc_cache = cc_cache}, acc
 
@@ -243,9 +245,9 @@ let find_all_embeddings compil cc =
   let tr =
     Primitives.fully_specified_pattern_to_positive_transformations cc in
   let env = environment compil in
-  Evaluator.find_all_embeddings env tr
+  Evaluator.find_all_embeddings ~debugMode env tr
 
-let add_fully_specified_to_graph sigs graph cc =
+let add_fully_specified_to_graph ~debugMode sigs graph cc =
   let e,g =
     Pattern.fold_by_type
       (fun ~pos ~agent_type intf (emb,g) ->
@@ -268,13 +270,13 @@ let add_fully_specified_to_graph sigs graph cc =
   let r = Renaming.empty () in
   let out =
     Mods.IntMap.fold
-      (fun i (a,_) acc -> acc && Renaming.imperative_add i a r)
+      (fun i (a,_) acc -> acc && Renaming.imperative_add ~debugMode i a r)
       e true in
   let () = assert out in
   (g,r)
 
 let find_embeddings compil =
-  Pattern.embeddings_to_fully_specified (domain compil)
+  Pattern.embeddings_to_fully_specified ~debugMode (domain compil)
 
 let f ren acc (i,_cc) em =
   List_util.map_flatten
@@ -282,7 +284,7 @@ let f ren acc (i,_cc) em =
        List_util.map_option
          (fun r ->
             Matching.add_cc m i
-              (Renaming.compose true r ren)) em)
+              (Renaming.compose ~debugMode true r ren)) em)
     acc
 
 (*let find_embeddings_unary_binary compil p x =
@@ -302,7 +304,7 @@ let f ren acc (i,_cc) em =
 let compose_embeddings_unary_binary compil p emb_list x =
   let mix,ren =
     add_fully_specified_to_graph
-      (Model.signatures compil.environment)
+      ~debugMode (Model.signatures compil.environment)
       (Edges.empty ~with_connected_components:false) x in
   let cc_list =
     Tools.array_fold_lefti
@@ -323,8 +325,8 @@ let disjoint_union_sigs  sigs l =
       (fun (i,em,mix) (_,r,cc) ->
          let i = pred i in
          let (mix',r') =
-           add_fully_specified_to_graph sigs mix cc  in
-         let r'' = Renaming.compose false r r' in
+           add_fully_specified_to_graph ~debugMode sigs mix cc  in
+         let r'' = Renaming.compose ~debugMode false r r' in
          (i,
           Option_util.unsome
             Matching.empty
@@ -493,10 +495,10 @@ let rate_name compil rule rule_id =
   Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
     arity_tag direction_tag
 
-let apply_sigs env rule inj_nodes mix =
+let apply_sigs ~debugMode env rule inj_nodes mix =
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
-                (inj_nodes, Mods.IntMap.empty))
+                ~debugMode (inj_nodes, Mods.IntMap.empty))
       rule.Primitives.removed
   in
   let (side_effects, dummy, edges_after_neg) =
@@ -511,7 +513,7 @@ let apply_sigs env rule inj_nodes mix =
       (fun (x,p) h ->
          let (x',h') =
            Rule_interpreter.apply_positive_transformation
-             (Model.signatures env) x h in
+             ~debugMode (Model.signatures env) x h in
          (x', h' :: p))
       (((inj_nodes, Mods.IntMap.empty),
         side_effects, dummy, edges_after_neg), [])
@@ -527,7 +529,7 @@ let apply_sigs env rule inj_nodes mix =
   edges''
 
 let apply compil rule inj_nodes mix =
-  apply_sigs compil.environment rule inj_nodes mix
+  apply_sigs ~debugMode compil.environment rule inj_nodes mix
 
 let get_rules compil =
   Model.fold_rules
@@ -632,7 +634,7 @@ let mixture_of_init compil c =
 
 let mixture_of_init_sigs env c =
   let _, emb, m = disjoint_union_sigs (Model.signatures env) [] in
-  let m = apply_sigs env c emb m in
+  let m = apply_sigs ~debugMode env c emb m in
   m
 
 let species_of_initial_state_env env contact_map_int cache list =
@@ -642,8 +644,8 @@ let species_of_initial_state_env env contact_map_int cache list =
       (fun (cache,list) (_,r) ->
          let b = mixture_of_init_sigs env r in
          let cache', acc =
-           connected_components_of_mixture_sigs sigs cache
-             contact_map_int b
+           connected_components_of_mixture_sigs
+             sigs cache contact_map_int b
          in
          cache', List.rev_append acc list)
       (cache,[]) list

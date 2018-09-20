@@ -213,7 +213,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
              | Data.TraceStep _
              | Data.Print _ -> assert false in
            Eval.compile
-             ~pause:(fun f -> Lwt.bind (yield ()) f)
+             ~debugMode:false ~pause:(fun f -> Lwt.bind (yield ()) f)
              ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
              ~outputs ~max_sharing:false sig_nd tk_nd contact_map result >>=
            (fun (env,with_trace,init_l) ->

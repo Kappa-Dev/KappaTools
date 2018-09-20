@@ -8,6 +8,7 @@
 
 let do_interactive_directives
     ~outputs ~max_sharing ~syntax_version contact_map env counter graph state e =
+  let debugMode = !Parameter.debugModeOn in
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
@@ -26,22 +27,26 @@ let do_interactive_directives
       raise (ExceptionDefn.Malformed_Decl
                (Locality.dummy_annot "Creating new link type is forbidden")) in
   let cc_preenv', e'' = Eval.compile_modifications_no_track
-      ~warning ~compileModeOn:false contact_map cc_preenv e' in
+      ~debugMode ~warning ~compileModeOn:false contact_map cc_preenv e' in
   let env',graph' =
     if cc_preenv == cc_preenv' then (env,graph)
     else
-      let fenv,_ = Pattern.finalize ~max_sharing cc_preenv' contact_map in
+      let fenv,_ =
+        Pattern.finalize ~debugMode ~max_sharing cc_preenv' contact_map in
       (Model.new_domain fenv env,
        List.fold_left
-         (Rule_interpreter.incorporate_extra_pattern fenv)
+         (Rule_interpreter.incorporate_extra_pattern
+            ~debugMode fenv)
          graph
          (Primitives.extract_connected_components_modifications e'')) in
   e'',
   (env',
-   State_interpreter.do_modifications ~outputs env' counter graph' state e'')
+   State_interpreter.do_modifications
+     ~debugMode ~outputs env' counter graph' state e'')
 
 let get_pause_criteria
     ~outputs ~max_sharing ~syntax_version contact_map env graph b =
+  let debugMode = !Parameter.debugModeOn in
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
@@ -51,14 +56,16 @@ let get_pause_criteria
       (Model.signatures env) (Model.tokens_finder env)
       (Model.algs_finder env) b in
   let cc_preenv',(b'',pos_b'' as bpos'') =
-    Eval.compile_bool ~compileModeOn:false  contact_map cc_preenv b' in
+    Eval.compile_bool
+      ~debugMode ~compileModeOn:false  contact_map cc_preenv b' in
   let env',graph' =
     if cc_preenv == cc_preenv' then (env,graph)
     else
-      let fenv,_ = Pattern.finalize ~max_sharing cc_preenv' contact_map in
+      let fenv,_ =
+        Pattern.finalize ~debugMode ~max_sharing cc_preenv' contact_map in
       (Model.new_domain fenv env,
        List.fold_left
-         (Rule_interpreter.incorporate_extra_pattern fenv)
+         (Rule_interpreter.incorporate_extra_pattern ~debugMode fenv)
          graph
          (Primitives.extract_connected_components_bool bpos'')) in
   let () =
@@ -67,7 +74,7 @@ let get_pause_criteria
                ("[T] can only be used in inequalities",pos_b'')) in
   (env',graph',b'')
 
-let find_all_embeddings env tr =
+let find_all_embeddings ~debugMode env tr =
   let domain = Model.domain env in
   let _,graph = List.fold_left
       (Rule_interpreter.apply_concrete_positive_transformation
@@ -75,7 +82,9 @@ let find_all_embeddings env tr =
       (Instances.empty env,
        Edges.empty ~with_connected_components:false)
       tr in
-  let out,_ = Rule_interpreter.obs_from_transformations domain graph tr in
+  let out,_ =
+    Rule_interpreter.obs_from_transformations ~debugMode domain graph tr in
   List.map
-    (fun (p,(root,_)) -> (p, Matching.reconstruct_renaming domain graph p root))
+    (fun (p,(root,_)) ->
+       (p, Matching.reconstruct_renaming ~debugMode domain graph p root))
     out

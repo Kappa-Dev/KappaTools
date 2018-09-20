@@ -30,7 +30,7 @@ let debug_print f (m,_co) =
             (fun f (node,dst) ->
                Format.fprintf f "%i:%i->%i" ccid node dst) f nm)) m
 
-let reconstruct_renaming domain graph cc_id root =
+let reconstruct_renaming ~debugMode domain graph cc_id root =
   let point = Pattern.Env.get domain cc_id in
   match Pattern.Env.roots point with
   | None -> failwith "Matching.reconstruct cc error"
@@ -43,43 +43,45 @@ let reconstruct_renaming domain graph cc_id root =
         List.fold_left
           (fun (root,injective) nav ->
              None,injective &&
-                  Navigation.imperative_edge_is_valid ?root inj graph nav)
+                  Navigation.imperative_edge_is_valid
+                    ~debugMode ?root inj graph nav)
           (Some (root,rty),true) nav
       (*- rm - find_root: cc -> (type, node) option *)
       | [] -> None,match rids with
-        | [rid] -> Renaming.imperative_add rid root inj
+        | [rid] -> Renaming.imperative_add ~debugMode rid root inj
         | _ -> false in
     if injective then inj else
       failwith ("Matching.reconstruct renaming error at root "^string_of_int root)
 
 (* reconstruct: Pattern.Env.t -> Edges.t -> t -> int -> Pattern.id ->
    int -> t option*)
-let reconstruct domain graph inj id cc_id root =
-  let rename = reconstruct_renaming domain graph cc_id root in
+let reconstruct ~debugMode domain graph inj id cc_id root =
+  let rename = reconstruct_renaming ~debugMode domain graph cc_id root in
   match Mods.IntSet.disjoint_union (Renaming.image rename) (snd inj) with
   | None -> None
   | Some co -> Some (Mods.IntMap.add id rename (fst inj),co)
 
-let rec aux_is_root_of graph root inj = function
+let rec aux_is_root_of ~debugMode graph root inj = function
   | [] -> true
   | h :: t ->
-    Navigation.imperative_edge_is_valid ?root inj graph h &&
-    aux_is_root_of graph None inj t
-let is_root_of domain graph (_,rty as root) cc_id =
+    Navigation.imperative_edge_is_valid ~debugMode ?root inj graph h &&
+    aux_is_root_of ~debugMode graph None inj t
+let is_root_of ~debugMode domain graph (_,rty as root) cc_id =
   let point = Pattern.Env.get domain cc_id in
   match Pattern.reconstruction_navigation (Pattern.Env.content point) with
   | [] ->
     (match Pattern.Env.roots point with
      | Some (_,rty') -> rty = rty'
      | None -> false)
-  | nav -> aux_is_root_of graph (Some root) (Renaming.empty ()) nav
+  | nav -> aux_is_root_of ~debugMode graph (Some root) (Renaming.empty ()) nav
 
-let roots_of domain graph cc =
-  Edges.all_agents_where (fun x -> is_root_of domain graph x cc) graph
+let roots_of ~debugMode domain graph cc =
+  Edges.all_agents_where
+    (fun x -> is_root_of ~debugMode domain graph x cc) graph
 
 (* get : (ContentAgent.t * int) -> t -> int *)
-let get ((node,_),id) (t,_) =
-  Renaming.apply (Mods.IntMap.find_default Renaming.dummy id t) node
+let get ~debugMode ((node,_),id) (t,_) =
+  Renaming.apply ~debugMode (Mods.IntMap.find_default Renaming.dummy id t) node
 
 let elements_with_types domain ccs (t,_) =
   let out = Array.make (Mods.IntMap.size t) [] in
@@ -115,18 +117,18 @@ module CacheSetMap = SetMap.Make(Cache)
 type cache = CacheSetMap.Set.t
 let empty_cache = CacheSetMap.Set.empty
 
-let survive_nav inj graph =
+let survive_nav ~debugMode inj graph =
   List.fold_left
     (fun inj step ->
        match inj with
        | None -> inj
        | Some inj ->
-         Navigation.injection_for_one_more_edge inj graph step)
+         Navigation.injection_for_one_more_edge ~debugMode inj graph step)
     (Some inj)
 
 (*edges: list of concrete edges,
     returns the roots of observables that are above in the domain*)
-let from_edge domain graph (out,cache as acc) node site arrow =
+let from_edge ~debugMode domain graph (out,cache as acc) node site arrow =
   let rec aux_from_edges cache (obs,rev_deps as acc) = function
     | [] -> acc,cache
     | (pid,point,inj_point2graph) :: remains ->
@@ -136,16 +138,18 @@ let from_edge domain graph (out,cache as acc) node site arrow =
         |Some (ids,ty) ->
           (List.fold_left
              (fun acc id ->
-                (pid,(Renaming.apply inj_point2graph id,ty))::acc)
+                (pid,(Renaming.apply ~debugMode inj_point2graph id,ty))::acc)
              obs ids,
            Operator.DepSet.union rev_deps (Pattern.Env.deps point)) in
       let remains',cache' =
         List.fold_left
           (fun (re,ca as pair) son ->
-             match survive_nav inj_point2graph graph son.Pattern.Env.next with
+             match survive_nav
+                     ~debugMode inj_point2graph graph son.Pattern.Env.next with
              | None -> pair
              | Some inj' ->
-               let rename = Renaming.compose false son.Pattern.Env.inj inj' in
+               let rename =
+                 Renaming.compose ~debugMode false son.Pattern.Env.inj inj' in
                let ca' = CacheSetMap.Set.add
                    (son.Pattern.Env.dst,Renaming.min_elt rename) ca in
                if ca == ca'
@@ -156,7 +160,7 @@ let from_edge domain graph (out,cache as acc) node site arrow =
                  (next::re,ca'))
           (remains,cache) (Pattern.Env.sons point) in
       aux_from_edges cache' acc' remains' in
-  match Pattern.Env.get_elementary domain node site arrow with
+  match Pattern.Env.get_elementary ~debugMode domain node site arrow with
   | None -> acc
   | Some x ->
     aux_from_edges
@@ -172,23 +176,23 @@ let observables_from_agent
     | None -> acc
   else acc
 
-let observables_from_free domain graph acc node site =
-  from_edge domain graph acc node site Navigation.ToNothing
-let observables_from_internal domain graph acc node site id =
-  from_edge domain graph acc node site (Navigation.ToInternal id)
-let observables_from_link domain graph acc n site  n' site' =
+let observables_from_free ~debugMode domain graph acc node site =
+  from_edge ~debugMode domain graph acc node site Navigation.ToNothing
+let observables_from_internal ~debugMode domain graph acc node site id =
+  from_edge ~debugMode domain graph acc node site (Navigation.ToInternal id)
+let observables_from_link ~debugMode domain graph acc n site  n' site' =
   from_edge domain
-    graph acc n site (Navigation.ToNode (Navigation.Fresh n',site'))
+    ~debugMode graph acc n site (Navigation.ToNode (Navigation.Fresh n',site'))
 
 module Agent = struct
   type t =
     | Existing of Agent.t * int
     | Fresh of int * int (* type, id *)
 
-  let rename id inj = function
+  let rename ~debugMode id inj = function
     | Existing (n, id') as x ->
       if id <> id' then x else
-        let n' = Agent.rename inj n in
+        let n' = Agent.rename ~debugMode inj n in
         if n == n' then x else Existing (n',id')
     | Fresh _ as x -> x
 
@@ -231,8 +235,8 @@ module Agent = struct
     | Existing _ -> false
     | Fresh _ -> true
 
-  let concretize (inj_nodes,inj_fresh) = function
-    | Existing (n,id) -> (get (n,id) inj_nodes,Agent.sort n)
+  let concretize ~debugMode (inj_nodes,inj_fresh) = function
+    | Existing (n,id) -> (get ~debugMode (n,id) inj_nodes,Agent.sort n)
     | Fresh (ty,id) ->
       match Mods.IntMap.find_option id inj_fresh with
       | Some x -> (x,ty)

@@ -24,18 +24,18 @@ val image : t -> Mods.IntSet.t
 val cyclic_permutation_from_list : stop_at:int -> int list -> t
 (** very specific use case for Connected_component.remove_ag_cc *)
 
-val imperative_add : int -> int -> t -> bool
+val imperative_add : debugMode:bool -> int -> int -> t -> bool
 (** @raise Clashing in debug mode
 @return if the addition preserves injectivity *)
 
-val add : int -> int -> t -> t option
+val add : debugMode:bool -> int -> int -> t -> t option
 (** @raise Clashing in debug mode
 @return [None] if the addition would break injectivity *)
 
-val compose : bool -> t -> t -> t
+val compose : debugMode:bool -> bool -> t -> t -> t
 (** @raise Undefined *)
 
-val apply : t -> int -> int
+val apply : debugMode:bool -> t -> int -> int
 (** @raise Undefined *)
 
 val mem : int -> t -> bool

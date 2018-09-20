@@ -19,11 +19,13 @@ type connected_component = cc_node array
 type t
 
 val cc_to_user_cc :
-  Signature.s -> connected_component -> User_graph.connected_component
+  debugMode:bool -> Signature.s -> connected_component ->
+  User_graph.connected_component
 
 val empty : t
 
 val increment_in_snapshot : Signature.s -> connected_component -> t -> t
 
 val export :
-  Signature.s -> t -> (int * User_graph.connected_component) list
+  debugMode:bool -> Signature.s -> t ->
+  (int * User_graph.connected_component) list

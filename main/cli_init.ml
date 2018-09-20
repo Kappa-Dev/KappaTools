@@ -84,6 +84,7 @@ let get_pack_from_preprocessed_ast
     Eval.compile
       ~outputs:Outputs.go
       ~pause:(fun f -> f ()) ~return:(fun x -> x)
+      ~debugMode:!Parameter.debugModeOn
       ~max_sharing:kasim_args.Kasim_args.maxSharing
       ?rescale_init:kasim_args.Kasim_args.rescale
       ?overwrite_init ?bwd_bisim ~compileModeOn
@@ -131,6 +132,7 @@ let get_pack_from_marshalizedfile
           (Model.signatures env) contact
           (Model.tokens_finder env) (Model.algs_finder env) compil.Ast.init in
       let inits = Eval.compile_inits
+          ~debugMode:!Parameter.debugModeOn
           ~warning ?rescale:kasim_args.Kasim_args.rescale
           ~compileModeOn:false contact env raw_inits in
       (conf,progress,env,contact,updated,compr,cflow,cflowfile,inits),

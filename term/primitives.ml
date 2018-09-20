@@ -46,39 +46,41 @@ module Transformation = struct
        NegativeInternalized (Matching.Agent.of_yojson a,s)
     | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
 
-  let rename id inj = function
+  let rename ~debugMode id inj = function
     | Freed (p,s) as x ->
-      let p' = Matching.Agent.rename id inj p in
+      let p' = Matching.Agent.rename ~debugMode id inj p in
       if p == p' then x else Freed (p',s)
     | NegativeWhatEver (p,s) as x ->
-      let p' = Matching.Agent.rename id inj p in
+      let p' = Matching.Agent.rename ~debugMode id inj p in
       if p == p' then x else NegativeWhatEver (p',s)
     | Linked ((p1,s1),(p2,s2)) as x ->
-      let p1' = Matching.Agent.rename id inj p1 in
-      let p2' = Matching.Agent.rename id inj p2 in
+      let p1' = Matching.Agent.rename ~debugMode id inj p1 in
+      let p2' = Matching.Agent.rename ~debugMode id inj p2 in
       if p1 == p1' && p2 == p2' then x else Linked ((p1',s1),(p2',s2))
     | PositiveInternalized (p,s,i) as x ->
-      let p' = Matching.Agent.rename id inj p in
+      let p' = Matching.Agent.rename ~debugMode id inj p in
       if p == p' then x else PositiveInternalized (p',s,i)
     | NegativeInternalized (p,s) as x ->
-      let p' = Matching.Agent.rename id inj p in
+      let p' = Matching.Agent.rename ~debugMode id inj p in
       if p == p' then x else NegativeInternalized (p',s)
     | Agent p as x ->
-      let p' = Matching.Agent.rename id inj p in
+      let p' = Matching.Agent.rename ~debugMode id inj p in
       if p == p' then x else Agent p'
 
-  let concretize inj2graph = function
-    | Agent n -> Agent (Matching.Agent.concretize inj2graph n)
-    | Freed (n,s) -> Freed (Matching.Agent.concretize inj2graph n,s)
+  let concretize ~debugMode inj2graph = function
+    | Agent n -> Agent (Matching.Agent.concretize ~debugMode inj2graph n)
+    | Freed (n,s) -> Freed (Matching.Agent.concretize ~debugMode inj2graph n,s)
     | Linked ((n,s),(n',s')) ->
-      Linked ((Matching.Agent.concretize inj2graph n,s),
-              (Matching.Agent.concretize inj2graph n',s'))
+      Linked ((Matching.Agent.concretize ~debugMode inj2graph n,s),
+              (Matching.Agent.concretize ~debugMode inj2graph n',s'))
     | NegativeWhatEver (n,s) ->
-      NegativeWhatEver (Matching.Agent.concretize inj2graph n,s)
+      NegativeWhatEver (Matching.Agent.concretize ~debugMode inj2graph n,s)
     | PositiveInternalized (n,s,i) ->
-      PositiveInternalized (Matching.Agent.concretize inj2graph n,s,i)
+      PositiveInternalized
+        (Matching.Agent.concretize ~debugMode inj2graph n,s,i)
     | NegativeInternalized (n,s) ->
-      NegativeInternalized (Matching.Agent.concretize inj2graph n,s)
+      NegativeInternalized
+        (Matching.Agent.concretize ~debugMode inj2graph n,s)
 
   let map_fold_agent f x acc =
     match x with

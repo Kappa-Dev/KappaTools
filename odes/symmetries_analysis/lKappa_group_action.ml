@@ -563,7 +563,7 @@ type bwd_bisim_info =
   int Symmetries_sig.site_partition array * bool Mods.DynArray.t * Signature.s * (LKappa_auto.cache ref)
 
 let saturate_domain_with_symmetric_patterns
-    ~compileModeOn ?origin contact_map bwd_bisim_info ccs domain =
+    ~debugMode ~compileModeOn ?origin contact_map bwd_bisim_info ccs domain =
   let equivalence_relations,bool_array,sigs,cache_ref = bwd_bisim_info in
   let cache = !cache_ref in
   let partitions_internal_states i =
@@ -596,7 +596,7 @@ let saturate_domain_with_symmetric_patterns
                      let rule_mixture = lkappa_rule.LKappa.r_mix in
                      let domain,_ =
                        Snip.connected_components_sum_of_ambiguous_mixture
-                         ~compileModeOn contact_map domain ?origin
+                         ~debugMode ~compileModeOn contact_map domain ?origin
                          rule_mixture
                      in
                      domain)

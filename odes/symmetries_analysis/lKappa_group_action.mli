@@ -145,6 +145,6 @@ val equiv_class:
   LKappa_auto.cache * bool Mods.DynArray.t * (LKappa.rule * int) list
 
 val saturate_domain_with_symmetric_patterns:
-  compileModeOn:bool -> ?origin:Operator.rev_dep -> Contact_map.t ->
-  bwd_bisim_info -> (('a * Pattern.cc) array * 'b) list ->
-  Pattern.PreEnv.t -> Pattern.PreEnv.t
+  debugMode:bool -> compileModeOn:bool ->
+  ?origin:Operator.rev_dep -> Contact_map.t -> bwd_bisim_info ->
+  (('a * Pattern.cc) array * 'b) list -> Pattern.PreEnv.t -> Pattern.PreEnv.t
