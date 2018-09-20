@@ -5,7 +5,7 @@ let alpha = ['a';'b';'c';'d';'e';'f';'g';'h';'i';'l';'j';'k';'m';'n';'o';'p';'q'
              '0';'1';'2';'3';'4';'5';'6';'7';'8';'9']
 
 let strip_nonalpha =
-  String.map (fun c -> if List.mem c alpha then (Char.lowercase c) else '_')
+  String.map (fun c -> if List.mem c alpha then (Char.lowercase_ascii c) else '_')
 
 (* https://www.rosettacode.org/wiki/Read_entire_file#OCaml *)
 let read_file filename =

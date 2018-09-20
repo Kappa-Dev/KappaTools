@@ -13,7 +13,7 @@
 *)
 let prototype = Js.Unsafe.js_expr "CodeMirror.prototype"
 let create_handler label =
-  let head : char = Char.uppercase (String.get label 0) in
+  let head : char = Char.uppercase_ascii (String.get label 0) in
   let tail : string = String.sub label 1 ((String.length label) -1) in
   let on_label = "on"^(Char.escaped head)^tail in
   let wrapper handler = (Js.Unsafe.variable "this")##on label handler in

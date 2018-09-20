@@ -288,8 +288,8 @@ let get_interval_list p i j =
   in
   aux p j None []
 
-let lowercase = String.lowercase
-let capitalize = String.capitalize
+let lowercase = String.lowercase_ascii
+let capitalize = String.capitalize_ascii
 
 let smash_duplicate_in_ordered_list p l =
 
