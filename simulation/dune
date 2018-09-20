@@ -1,0 +1,17 @@
+(library
+  (name kappa_runtime)
+  (libraries yojson result re
+    kappa_generic_toolset kappa_mixtures kappa_terms)
+  (flags (:standard -w @a
+    -open Kappa_generic_toolset
+    -open Kappa_mixtures
+    -open Kappa_terms)))
+
+(rule
+  (targets git_version.ml)
+  (deps ../dev/get-git-version.ml)
+  (action (with-stdout-to %{targets} (run ocaml unix.cma %{deps}))))
+(rule
+  (targets resource_strings.ml)
+  (deps ../dev/generate-string.sh ../shared/flux.js ../viz/common.js)
+  (action (with-stdout-to %{targets} (run ocaml %{deps}))))

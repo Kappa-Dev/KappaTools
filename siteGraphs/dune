@@ -1,0 +1,4 @@
+(library
+  (name kappa_mixtures)
+  (libraries yojson result kappa_generic_toolset)
+  (flags (:standard -w @a -open Kappa_generic_toolset)))

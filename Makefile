@@ -251,6 +251,7 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc cl
 	rm -f KaDE bin/KaDE META KappaLib.cm*
 	rm -rf generated
 	find . -name \*~ -delete
+	find * -name .merlin -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
 
 check:

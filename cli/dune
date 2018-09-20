@@ -1,0 +1,11 @@
+(library
+  (name kappa_cli)
+  (libraries unix
+	     kappa_generic_toolset
+  	     kappa_grammar
+  	     kappa_runtime)
+  (flags (:standard -w @a
+  	 -open Kappa_generic_toolset
+  	 -open Kappa_grammar
+	 -open Kappa_runtime)))
+
