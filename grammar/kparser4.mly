@@ -62,12 +62,12 @@ nbr:
   ;
 
 link_state:
-  | DOT { add_pos 1 Ast.LNK_FREE }
-  | INT { add_pos 1 (Ast.LNK_VALUE ($1,())) }
-  | UNDERSCORE { add_pos 1 Ast.LNK_SOME }
+  | DOT { add_pos 1 LKappa.LNK_FREE }
+  | INT { add_pos 1 (LKappa.LNK_VALUE ($1,())) }
+  | UNDERSCORE { add_pos 1 LKappa.LNK_SOME }
   | ID annot DOT annot ID
-    { add_pos 5 (Ast.LNK_TYPE (($1,rhs_pos 1),($5,rhs_pos 5))) }
-  | SHARP { add_pos 1 Ast.LNK_ANY }
+    { add_pos 5 (LKappa.LNK_TYPE (($1,rhs_pos 1),($5,rhs_pos 5))) }
+  | SHARP { add_pos 1 LKappa.LNK_ANY }
   | ID annot error
     { raise (ExceptionDefn.Syntax_Error (add_pos 3 "incomplete link state")) }
   ;

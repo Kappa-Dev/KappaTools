@@ -6,6 +6,11 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type 'a rule_agent_counters = {
+  ra : 'a;
+  ra_counters : (Ast.counter * LKappa.switching) option array;
+}
+
 let combinations ls1 ls2 =
   if (ls1 = []) then List.fold_left (fun acc (b,ds) -> ([b],ds)::acc) [] ls2
   else
@@ -279,18 +284,18 @@ let compile ~warning c =
 let make_counter_agent sigs
       (first,(dst,ra_erased)) (last,equal) i j pos created =
   let (ra_type,arity,incr_b,incr_a) = Signature.incr_agent sigs in
-  let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), LKappa.Maintained) in
+  let ra_ports = Array.make arity ((LKappa.LNK_FREE,pos), LKappa.Maintained) in
   let before_switch =
     if first&&created then LKappa.Linked i else LKappa.Maintained in
   let before =
-    if first then Ast.LNK_VALUE (i,dst), pos
-    else Ast.LNK_VALUE (i,(ra_type,incr_a)), pos in
+    if first then LKappa.LNK_VALUE (i,dst), pos
+    else LKappa.LNK_VALUE (i,(ra_type,incr_a)), pos in
   let () = ra_ports.(incr_b) <- before,before_switch in
   let after =
-    if (last&&equal) then Ast.LNK_FREE, pos
+    if (last&&equal) then LKappa.LNK_FREE, pos
     else
-      if last then Ast.LNK_ANY, pos
-      else Ast.LNK_VALUE (j,(ra_type,incr_b)), pos in
+      if last then LKappa.LNK_ANY, pos
+      else LKappa.LNK_VALUE (j,(ra_type,incr_b)), pos in
   let () = ra_ports.(incr_a) <- (after,LKappa.Maintained) in
   let ra_ints = Array.make arity LKappa.I_ANY in
   {LKappa.ra_type; ra_erased; ra_ports; ra_ints;
@@ -377,7 +382,7 @@ let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
     if (delta = 0) then LKappa.Maintained
     else if (delta > 0) then LKappa.Linked start_lnk_for_created
     else LKappa.Linked lnk_for_erased in
-  let p = (Ast.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
+  let p = (LKappa.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
   let () = ra.LKappa.ra_ports.(p_id) <- p in
   (adjust_delta,created)
 
@@ -401,22 +406,22 @@ let remove_counter_agent sigs ag lnk_nb =
              match test with
              | Ast.CEQ j ->
               (counter_becomes_port
-                 sigs ag.LKappa.ra id delta pos true j lnk_nb)::acc_incrs,
+                 sigs ag.ra id delta pos true j lnk_nb)::acc_incrs,
               lnk_nb+1+j+(fst delta)
              | Ast.CGTE j ->
                (counter_becomes_port
-                  sigs ag.LKappa.ra id delta pos false j lnk_nb)::acc_incrs,
+                  sigs ag.ra id delta pos false j lnk_nb)::acc_incrs,
                lnk_nb+1+j+(fst delta)
              | Ast.CVAR _ ->
                raise (ExceptionDefn.Internal_Error
                         ("Counter "^s^" should not have a var by now",pos')))
-      ([],lnk_nb) ag.LKappa.ra_counters in
+      ([],lnk_nb) ag.ra_counters in
   let (als,bls) =
     List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
   (als,bls,lnk_nb')
 
 let remove_counter_created_agent sigs ag lnk_nb =
-  let raw_ag = ag.LKappa.ra in
+  let raw_ag = ag.ra in
   let ports = raw_ag.Raw_mixture.a_ports in
   let () =
     Signature.print_agent sigs (Format.str_formatter) raw_ag.Raw_mixture.a_type in
@@ -438,12 +443,12 @@ let remove_counter_created_agent sigs ag lnk_nb =
            | Ast.CGTE _ | Ast.CVAR _ ->
              LKappa.not_enough_specified
                ~status:"counter" ~side:"left" agent_name c.Ast.count_nme)
-    ([],lnk_nb) ag.LKappa.ra_counters
+    ([],lnk_nb) ag.ra_counters
 
 let raw_agent_with_counters ag =
   Array.fold_left
     (fun ok x -> x<>None||ok)
-    false ag.LKappa.ra_counters
+    false ag.ra_counters
 
 let agent_with_counters ag sigs =
   let sign = Signature.get sigs ag.LKappa.ra_type in
@@ -456,7 +461,7 @@ let agent_with_counters ag sigs =
 let remove_counter_rule sigs mix created =
   let with_counters =
     List.fold_left
-      (fun ok ag -> (agent_with_counters ag.LKappa.ra sigs)||ok) false mix in
+      (fun ok ag -> (agent_with_counters ag.ra sigs)||ok) false mix in
   let with_counters =
     List.fold_left
       (fun ok ag -> (raw_agent_with_counters ag)||ok) with_counters created in
@@ -468,13 +473,13 @@ let remove_counter_rule sigs mix created =
           (fun max ((lnk,_),switch) ->
             let max' =
               match lnk with
-                Ast.LNK_VALUE (i,_) -> if (max<i) then i else max
-              | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME
-                | Ast.LNK_TYPE _ -> max in
+                LKappa.LNK_VALUE (i,_) -> if (max<i) then i else max
+              | LKappa.ANY_FREE | LKappa.LNK_FREE | LKappa.LNK_ANY
+              | LKappa.LNK_SOME | LKappa.LNK_TYPE _ -> max in
             match switch with
               | LKappa.Linked i ->  if (max'<i) then i else max'
               | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> max')
-            max ag.LKappa.ra.LKappa.ra_ports) 0 mix in
+            max ag.ra.LKappa.ra_ports) 0 mix in
 
     let incrs,incrs_created,lnk_nb' =
       List.fold_left
@@ -490,11 +495,11 @@ let remove_counter_rule sigs mix created =
           (a@acc,lnk'))
         ([],lnk_nb'+1) created in
 
-    let rule_agent_mix = List.rev (List.map (fun ag -> ag.LKappa.ra) mix) in
-    let raw_mix = List.rev (List.map (fun ag -> ag.LKappa.ra) created) in
+    let rule_agent_mix = List.rev (List.map (fun ag -> ag.ra) mix) in
+    let raw_mix = List.rev (List.map (fun ag -> ag.ra) created) in
     (rule_agent_mix@incrs,raw_mix@incrs_created@incrs_created')
-  else (List.map (fun ag -> ag.LKappa.ra) mix),
-       (List.map (fun ag -> ag.LKappa.ra) created)
+  else (List.map (fun ag -> ag.ra) mix),
+       (List.map (fun ag -> ag.ra) created)
 
 let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let (incr_type,_,incr_b,_) = Signature.incr_agent sigs in
@@ -502,14 +507,14 @@ let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let ports =
-    Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
+    Array.make arity (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained) in
   let internals = Array.make arity LKappa.I_ANY in
   let c_na = c.Ast.count_nme in
   let c_id = Signature.num_of_site ~agent_name c_na sign in
   let (max_val,pos) = c.Ast.count_delta in
   let max_val' = max_val+1 in
   let incrs = link_incr sigs 0 (max_val'+1) ((c_id,ag_id),false) false 1 pos (-1) in
-  let p = Ast.LNK_VALUE (1,(incr_b,incr_type)),pos in
+  let p = LKappa.LNK_VALUE (1,(incr_b,incr_type)),pos in
   let () = ports.(c_id) <- p,LKappa.Maintained in
   let ra =
     { LKappa.ra_type = ag_id;ra_ports = ports;ra_ints = internals;ra_erased = false;
@@ -574,7 +579,7 @@ let annotate_dropped_counters sign counts ra arity agent_name aux =
         let () = match aux with | Some f -> f p_id | None -> () in
         let () = ra_counters.(p_id) <- Some (c,LKappa.Erased) in pset')
       Mods.IntSet.empty counts in
-  {LKappa.ra; ra_counters;}
+  {ra; ra_counters;}
 
 let annotate_edit_counters
       sigs (agent_name, _ as ag_ty) counts ra add_link_contact_map =
@@ -598,7 +603,7 @@ let annotate_edit_counters
         let () = register_counter_modif p_id in
         let () = ra_counters.(p_id) <- Some (c,LKappa.Maintained) in pset')
       Mods.IntSet.empty counts in
-  {LKappa.ra; ra_counters;}
+  {ra; ra_counters;}
 
 let annotate_counters_with_diff
       sigs (agent_name, pos as ag_ty) lc rc ra add_link_contact_map =
@@ -634,7 +639,7 @@ let annotate_counters_with_diff
     if not(rc =[]) && not(rc_r =[]) then
       raise (ExceptionDefn.Internal_Error
                ("Counters in "^agent_name^" should have tests by now",pos)) in
-  {LKappa.ra; ra_counters;}
+  {ra; ra_counters;}
 
 let annotate_created_counters
       sigs (agent_name,_ as ag_ty) counts add_link_contact_map ra =
@@ -688,4 +693,4 @@ let annotate_created_counters
           let () = register_counter_modif p_id in
           let () = ra_counters.(p_id) <- Some (c,LKappa.Maintained) in
           pset') Mods.IntSet.empty counts in
-    {LKappa.ra;ra_counters;}
+    {ra;ra_counters;}

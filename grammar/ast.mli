@@ -11,21 +11,13 @@ type syntax_version = V3 | V4
 
 val merge_version : syntax_version -> syntax_version -> syntax_version
 
-type ('a,'annot) link =
-  | ANY_FREE
-  | LNK_VALUE of int * 'annot
-  | LNK_FREE
-  | LNK_ANY
-  | LNK_SOME
-  | LNK_TYPE of 'a * 'a (** port * agent_type *)
-
 type internal = string option Locality.annot list
 
 type port = {
   port_nme:string Locality.annot;
   port_int:internal;
   port_int_mod: string Locality.annot option;
-  port_lnk:(string Locality.annot,unit) link Locality.annot list;
+  port_lnk:(string Locality.annot,unit) LKappa.link Locality.annot list;
   port_lnk_mod: int Locality.annot option option;
 }
 
@@ -177,11 +169,6 @@ val implicit_signature : parsing_compil -> parsing_compil
 
 (** {6 Printers} *)
 
-val print_link :
-  ('a -> Format.formatter -> 'a -> unit) ->
-  (Format.formatter -> 'a -> unit) ->
-  (Format.formatter -> 'b -> unit) ->
-  Format.formatter -> ('a, 'b) link -> unit
 val print_counter : Format.formatter -> counter -> unit
 val print_ast_mix : Format.formatter -> mixture -> unit
 val print_ast_rule : Format.formatter -> rule -> unit
@@ -190,15 +177,6 @@ val print_rule_content :
 
 val to_erased_mixture : mixture -> mixture
 val to_created_mixture : mixture -> mixture
-
-val link_to_json :
-  ('a -> 'a -> Yojson.Basic.json) -> ('a -> Yojson.Basic.json) ->
-  ('b -> Yojson.Basic.json list) -> ('a, 'b) link -> Yojson.Basic.json
-(** Fragile: the list MUST NOT be a singleton *)
-
-val link_of_json :
-  ('a -> Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'a) ->
-  (Yojson.Basic.json list -> 'b) -> Yojson.Basic.json -> ('a, 'b) link
 
 val compil_of_json : Yojson.Basic.json -> parsing_compil
 val compil_to_json : parsing_compil -> Yojson.Basic.json

@@ -6,6 +6,14 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type ('a,'annot) link =
+  | ANY_FREE
+  | LNK_VALUE of int * 'annot
+  | LNK_FREE
+  | LNK_ANY
+  | LNK_SOME
+  | LNK_TYPE of 'a * 'a (** port * agent_type *)
+
 type switching = Linked of int | Freed | Maintained | Erased
 
 type rule_internal =
@@ -20,20 +28,14 @@ type rule_agent =
     ra_type: int;
     ra_erased: bool;
     ra_ports:
-      ((int,int*int) Ast.link Locality.annot * switching) array;
+      ((int,int*int) link Locality.annot * switching) array;
     ra_ints: rule_internal array;
     ra_syntax:
-      (((int,int*int) Ast.link Locality.annot * switching) array *
+      (((int,int*int) link Locality.annot * switching) array *
        rule_internal array) option;
   }
 
 type rule_mixture = rule_agent list
-
-type 'a rule_agent_counters =
-  {
-    ra : 'a;
-    ra_counters : (Ast.counter * switching) option array;
-  }
 
 type rule =
   {
@@ -46,6 +48,31 @@ type rule =
                  * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
     r_editStyle: bool;
   }
+
+let print_link pr_port pr_type pr_annot f = function
+  | ANY_FREE -> Format.pp_print_string f "#"
+  | LNK_TYPE (p, a) -> Format.fprintf f "%a.%a" (pr_port a) p pr_type a
+  | LNK_ANY -> Format.pp_print_string f "#"
+  | LNK_FREE -> Format.pp_print_string f "."
+  | LNK_SOME -> Format.pp_print_string f "_"
+  | LNK_VALUE (i,a) -> Format.fprintf f "%i%a" i pr_annot a
+
+let link_to_json port_to_json type_to_json annot_to_json = function
+  | ANY_FREE -> `String "ANY_FREE"
+  | LNK_FREE -> `String "FREE"
+  | LNK_TYPE (p, a) -> `List [port_to_json a p; type_to_json a]
+  | LNK_ANY -> `Null
+  | LNK_SOME -> `String "SOME"
+  | LNK_VALUE (i,a) -> `List (`Int i :: annot_to_json a)
+
+let link_of_json port_of_json type_of_json annot_of_json = function
+  | `String "ANY_FREE" -> ANY_FREE
+  | `String "FREE" -> LNK_FREE
+  | `List [p; a] -> let x = type_of_json a in LNK_TYPE (port_of_json x p, x)
+  | `Null -> LNK_ANY
+  | `String "SOME" -> LNK_SOME
+  | `List (`Int i :: ( [] | _::_::_ as a)) -> LNK_VALUE (i,annot_of_json a)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect link",x))
 
 let print_link_annot ~ltypes sigs f (s,a) =
   if ltypes then
@@ -108,7 +135,7 @@ let switching_of_json = function
 let print_rule_link sigs ~show_erased ~ltypes f ((e,_),s) =
   Format.fprintf
     f "[%a%a]"
-    (Ast.print_link
+    (print_link
        (Signature.print_site sigs)
        (Signature.print_agent sigs) (print_link_annot ~ltypes sigs))
     e
@@ -138,16 +165,15 @@ let print_rule_intf
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
-         | (Ast.LNK_ANY, _), Maintained ->  ints.(i) <> I_ANY
-         | ((Ast.LNK_ANY, _), (Erased | Freed | Linked _) |
-            ((Ast.LNK_SOME | Ast.ANY_FREE | Ast.LNK_FREE |
-              Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true) then
+         | (LNK_ANY, _), Maintained ->  ints.(i) <> I_ANY
+         | ((LNK_ANY, _), (Erased | Freed | Linked _) |
+            ((LNK_SOME | ANY_FREE | LNK_FREE |
+              LNK_TYPE _ | LNK_VALUE _),_), _) -> true) then
 
         let ((e,_),switch) = ports.(i) in
         let is_counter = match e with
-          | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
-            | Ast.LNK_TYPE _ | Ast.LNK_SOME -> false
-          | Ast.LNK_VALUE (j,_) ->
+          | ANY_FREE | LNK_FREE | LNK_ANY | LNK_TYPE _ | LNK_SOME -> false
+          | LNK_VALUE (j,_) ->
              try
                let root = Raw_mixture.find counters j in
                let (c,(eq,is_counter')) =
@@ -186,20 +212,19 @@ let union_find_counters sigs mix =
              let ((a,_),_) = ag.ra_ports.(after) in
              let ((b,_),_) = ag.ra_ports.(before) in
              match b with
-             | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
-             | Ast.LNK_TYPE _ | Ast.LNK_SOME -> ()
-             | Ast.LNK_VALUE (lnk_b,_) ->
+             | ANY_FREE | LNK_FREE | LNK_ANY | LNK_TYPE _ | LNK_SOME -> ()
+             | LNK_VALUE (lnk_b,_) ->
                match a with
-               | Ast.LNK_VALUE (lnk_a,_) -> Raw_mixture.union t lnk_b lnk_a
-               | Ast.ANY_FREE | Ast.LNK_FREE ->
+               | LNK_VALUE (lnk_a,_) -> Raw_mixture.union t lnk_b lnk_a
+               | ANY_FREE | LNK_FREE ->
                  let root = Raw_mixture.find t lnk_b in
                  let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
                  Mods.DynArray.set t.Raw_mixture.rank root (s,(true,true))
-               | Ast.LNK_ANY ->
+               | LNK_ANY ->
                  let root = Raw_mixture.find t lnk_b in
                  let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
                  Mods.DynArray.set t.Raw_mixture.rank root (s,(false,true))
-               | Ast.LNK_TYPE _ | Ast.LNK_SOME ->
+               | LNK_TYPE _ | LNK_SOME ->
                  raise (ExceptionDefn.Internal_Error
                           (Locality.dummy_annot
                              ("Port a of __incr agent not well specified"))))
@@ -241,7 +266,7 @@ let print_internal_rhs sigs ag_ty site f = function
   | (I_ANY_ERASED | I_VAL_ERASED _) -> assert false
 
 let print_link_lhs ~ltypes sigs f ((e,_),_) =
-  Ast.print_link
+  print_link
     (Signature.print_site sigs)
     (Signature.print_agent sigs) (print_link_annot ~ltypes sigs)
     f e
@@ -249,13 +274,13 @@ let print_link_lhs ~ltypes sigs f ((e,_),_) =
 let print_link_rhs ~ltypes sigs f ((e,_),s) =
   match s with
   | Linked i ->
-    Ast.print_link
+    print_link
       (Signature.print_site sigs)
       (Signature.print_agent sigs) (fun _ () -> ())
-      f (Ast.LNK_VALUE (i,()))
+      f (LNK_VALUE (i,()))
   | Freed -> Format.pp_print_string f "."
   | Maintained ->
-    Ast.print_link
+    print_link
       (Signature.print_site sigs)
       (Signature.print_agent sigs) (print_link_annot ~ltypes sigs)
       f e
@@ -265,9 +290,9 @@ let print_intf_lhs ~ltypes sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
-          | (((Ast.LNK_SOME | Ast.LNK_FREE | Ast.ANY_FREE |
-               Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
-          | (Ast.LNK_ANY, _), _ ->
+          | (((LNK_SOME | LNK_FREE | ANY_FREE |
+               LNK_TYPE _ | LNK_VALUE _),_), _) -> true
+          | (LNK_ANY, _), _ ->
             match ints.(i) with
             | (I_ANY | I_ANY_ERASED | I_ANY_CHANGED _) -> false
             | ( I_VAL_CHANGED _ | I_VAL_ERASED _) -> true) then
@@ -285,10 +310,10 @@ let print_intf_rhs ~ltypes sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
-          | (((Ast.LNK_SOME | Ast.LNK_FREE |  Ast.ANY_FREE |
-               Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
-          | ((Ast.LNK_ANY, _), (Erased | Freed | Linked _)) -> true
-          | ((Ast.LNK_ANY, _), Maintained) ->
+          | (((LNK_SOME | LNK_FREE |  ANY_FREE |
+               LNK_TYPE _ | LNK_VALUE _),_), _) -> true
+          | ((LNK_ANY, _), (Erased | Freed | Linked _)) -> true
+          | ((LNK_ANY, _), Maintained) ->
             match ints.(i) with
             | I_ANY -> false
             | I_VAL_CHANGED (i,j) -> i <> j
@@ -398,7 +423,7 @@ let rule_agent_to_json filenames a =
                 (`List [
                     Locality.annot_to_yojson
                       ~filenames
-                      (Ast.link_to_json (fun _ i -> `Int i) (fun i -> `Int i)
+                      (link_to_json (fun _ i -> `Int i) (fun i -> `Int i)
                          (fun (s,a) -> [`Int s;`Int a])) e;
                     switching_to_json s])::c)
              a.ra_ports []);
@@ -419,7 +444,7 @@ let rule_agent_of_json filenames = function
                 | `List [e;s] ->
                   (Locality.annot_of_yojson
                      ~filenames
-                     (Ast.link_of_json
+                     (link_of_json
                         (fun _ -> Yojson.Basic.Util.to_int)
                         Yojson.Basic.Util.to_int
                         (function
@@ -602,7 +627,7 @@ let to_raw_mixture sigs x =
        let ports =
          Array.mapi
            (fun j -> function
-              | ((Ast.LNK_SOME, pos) | (Ast.LNK_TYPE _,pos)),_ ->
+              | ((LNK_SOME, pos) | (LNK_TYPE _,pos)),_ ->
                 let ag_na =
                   Format.asprintf
                     "%a" (Signature.print_agent sigs) r.ra_type in
@@ -611,8 +636,8 @@ let to_raw_mixture sigs x =
                     "%a" (Signature.print_site sigs r.ra_type) j in
                 not_enough_specified
                   ~status:"linking" ~side:"left" ag_na (p_na,pos)
-              | (Ast.LNK_VALUE (i,_), _),_ -> Raw_mixture.VAL i
-              | (((Ast.LNK_ANY | Ast.ANY_FREE | Ast.LNK_FREE), _)),_ ->
+              | (LNK_VALUE (i,_), _),_ -> Raw_mixture.VAL i
+              | (((LNK_ANY | ANY_FREE | LNK_FREE), _)),_ ->
                 Raw_mixture.FREE
            )
            r.ra_ports in
@@ -627,9 +652,9 @@ let max_link_id r =
     | Freed | Maintained | Erased -> m in
   let max_link_id_sites max_id ag =
     Array.fold_left (fun max_id -> function
-        | (Ast.LNK_VALUE (j,_),_),s -> max_s (max j max_id) s
-        | ((Ast.LNK_TYPE _|Ast.LNK_SOME|
-            Ast.LNK_FREE|Ast.LNK_ANY|Ast.ANY_FREE),_),s -> max_s max_id s)
+        | (LNK_VALUE (j,_),_),s -> max_s (max j max_id) s
+        | ((LNK_TYPE _|LNK_SOME|
+            LNK_FREE|LNK_ANY|ANY_FREE),_),s -> max_s max_id s)
       max_id ag.ra_ports in
   List.fold_left max_link_id_sites 0 r
 

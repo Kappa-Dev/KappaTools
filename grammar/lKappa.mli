@@ -8,6 +8,14 @@
 
 (** Intermediate representation of model on wich sanity has been checked *)
 
+type ('a,'annot) link =
+  | ANY_FREE
+  | LNK_VALUE of int * 'annot
+  | LNK_FREE
+  | LNK_ANY
+  | LNK_SOME
+  | LNK_TYPE of 'a * 'a (** port * agent_type *)
+
 type switching = Linked of int | Freed | Maintained | Erased
 
 type rule_internal = (*state*)
@@ -20,10 +28,10 @@ type rule_internal = (*state*)
 type rule_agent =
   { ra_type: int; (*agent_id*)
     ra_erased: bool;
-    ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array;
+    ra_ports: ((int,int*int) link Locality.annot * switching) array;
     (*((link nb, (dst_site,dst_ag_type)), _) , switch*)
     ra_ints: rule_internal array;
-    ra_syntax: (((int,int*int) Ast.link Locality.annot * switching) array *
+    ra_syntax: (((int,int*int) link Locality.annot * switching) array *
                 rule_internal array) option;
   }
 (** A representation of 'left-hand-side' agent that stores how
@@ -55,12 +63,6 @@ val print_rule_mixture :
   Signature.s -> ltypes:bool -> Raw_mixture.t -> Format.formatter ->
   rule_mixture -> unit
 
-type 'a rule_agent_counters =
-  {
-    ra : 'a;
-    ra_counters : (Ast.counter * switching) option array;
-  }
-
 type rule =
   {
     r_mix: rule_mixture;
@@ -74,6 +76,21 @@ type rule =
          option) option;
     r_editStyle: bool;
   }
+
+val print_link :
+  ('a -> Format.formatter -> 'a -> unit) ->
+  (Format.formatter -> 'a -> unit) ->
+  (Format.formatter -> 'b -> unit) ->
+  Format.formatter -> ('a, 'b) link -> unit
+
+val link_to_json :
+  ('a -> 'a -> Yojson.Basic.json) -> ('a -> Yojson.Basic.json) ->
+  ('b -> Yojson.Basic.json list) -> ('a, 'b) link -> Yojson.Basic.json
+(** Fragile: the list MUST NOT be a singleton *)
+
+val link_of_json :
+  ('a -> Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'a) ->
+  (Yojson.Basic.json list -> 'b) -> Yojson.Basic.json -> ('a, 'b) link
 
 val print_rates : Signature.s -> (Format.formatter -> int -> unit)
   -> (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit

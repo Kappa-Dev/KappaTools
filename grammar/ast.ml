@@ -13,22 +13,13 @@ let merge_version a b =
   | V4, _ | _, V4 -> V4
   | V3, V3 -> V3
 
-type ('a,'annot) link =
-  | ANY_FREE
-  | LNK_VALUE of int * 'annot
-  | LNK_FREE
-  | LNK_ANY
-  | LNK_SOME
-  | LNK_TYPE of 'a (* port *)
-    * 'a (*agent_type*)
-
 type internal = string option Locality.annot list
 
 type port = {
   port_nme:string Locality.annot;
   port_int:internal;
   port_int_mod: string Locality.annot option;
-  port_lnk:(string Locality.annot,unit) link Locality.annot list;
+  port_lnk:(string Locality.annot,unit) LKappa.link Locality.annot list;
   port_lnk_mod: int Locality.annot option option;
 }
 
@@ -217,36 +208,11 @@ let empty_compil =
         rules=l_rul ; init = l_ini ; observables = l_obs}
 *)
 
-let print_link pr_port pr_type pr_annot f = function
-  | ANY_FREE -> Format.pp_print_string f "#"
-  | LNK_TYPE (p, a) -> Format.fprintf f "%a.%a" (pr_port a) p pr_type a
-  | LNK_ANY -> Format.pp_print_string f "#"
-  | LNK_FREE -> Format.pp_print_string f "."
-  | LNK_SOME -> Format.pp_print_string f "_"
-  | LNK_VALUE (i,a) -> Format.fprintf f "%i%a" i pr_annot a
-
-let link_to_json port_to_json type_to_json annot_to_json = function
-  | ANY_FREE -> `String "ANY_FREE"
-  | LNK_FREE -> `String "FREE"
-  | LNK_TYPE (p, a) -> `List [port_to_json a p; type_to_json a]
-  | LNK_ANY -> `Null
-  | LNK_SOME -> `String "SOME"
-  | LNK_VALUE (i,a) -> `List (`Int i :: annot_to_json a)
-
-let link_of_json port_of_json type_of_json annot_of_json = function
-  | `String "ANY_FREE" -> ANY_FREE
-  | `String "FREE" -> LNK_FREE
-  | `List [p; a] -> let x = type_of_json a in LNK_TYPE (port_of_json x p, x)
-  | `Null -> LNK_ANY
-  | `String "SOME" -> LNK_SOME
-  | `List (`Int i :: ( [] | _::_::_ as a)) -> LNK_VALUE (i,annot_of_json a)
-  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect link",x))
-
 let print_ast_link mod_l f l =
   if l <> [] || mod_l <> None then
     Format.fprintf f "[%a%a]"
       (Pp.list Pp.space
-         (fun f (x,_) -> print_link
+         (fun f (x,_) -> LKappa.print_link
              (fun _ f (x,_) -> Format.pp_print_string f x)
              (fun f (x,_) -> Format.pp_print_string f x)
              (fun _ () -> ()) f x))
@@ -340,7 +306,7 @@ let port_to_json filenames p =
     "port_lnk", JsonUtil.smart_assoc [
       "state", JsonUtil.of_list
         (Locality.annot_to_yojson ~filenames
-           (link_to_json
+           (LKappa.link_to_json
               (fun _ -> string_annot_to_json filenames)
               (string_annot_to_json filenames) (fun ()->[])))
         p.port_lnk;
@@ -374,7 +340,7 @@ let build_port_of_json filenames n i l =
       (JsonUtil.to_list
          (Locality.annot_of_yojson
             ~filenames
-            (link_of_json
+            (LKappa.link_of_json
                (fun _ -> string_annot_of_json filenames)
                (string_annot_of_json filenames)
                (fun _ -> ()))) l,None)
@@ -384,7 +350,7 @@ let build_port_of_json filenames n i l =
       (JsonUtil.to_list
          (Locality.annot_of_yojson
             ~filenames
-            (link_of_json
+            (LKappa.link_of_json
                (fun _ -> string_annot_of_json filenames)
                (string_annot_of_json filenames)
                (fun _ -> ()))) l,mod_l m)
@@ -971,8 +937,10 @@ let split_mixture m =
                              port_lnk =
                                (match p.port_lnk_mod with
                                 | None -> p.port_lnk
-                                | Some None -> [Locality.dummy_annot LNK_FREE]
-                                | Some (Some (i,pos))-> [LNK_VALUE (i,()),pos]);
+                                | Some None ->
+                                  [ Locality.dummy_annot LKappa.LNK_FREE ]
+                                | Some (Some (i,pos))->
+                                  [ LKappa.LNK_VALUE (i,()),pos ]);
                              port_lnk_mod=None}::r)
                     | Counter c ->
                       (Counter {c with count_delta = Locality.dummy_annot 0}::l,

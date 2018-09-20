@@ -36,12 +36,12 @@ let care_binding_regular ((test,_),mods) =
    | LKappa.Freed | LKappa.Linked _ -> true)
   ||
   (match test with
-   | Ast.LNK_VALUE _
-   | Ast.LNK_FREE
-   | Ast.ANY_FREE
-   | Ast.LNK_SOME
-   | Ast.LNK_TYPE _ -> true
-   | Ast.LNK_ANY -> false
+   | LKappa.LNK_VALUE _
+   | LKappa.LNK_FREE
+   | LKappa.ANY_FREE
+   | LKappa.LNK_SOME
+   | LKappa.LNK_TYPE _ -> true
+   | LKappa.LNK_ANY -> false
   )
 
 let care_internal_regular =

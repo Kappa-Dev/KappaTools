@@ -30,46 +30,46 @@ let find_implicit_infos contact_map ags =
       }::current in
       aux_ags free_id previous current' todos ag_tail
     else match ports.(i) with
-      | (Ast.LNK_TYPE (p,a),_),s ->
+      | (LKappa.LNK_TYPE (p,a),_),s ->
         let or_ty = (i,ty_id) in
         let () = ports.(i) <-
-            (Locality.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
+            (Locality.dummy_annot (LKappa.LNK_VALUE (free_id,(p,a))),s) in
         aux_one
           (succ free_id) previous current
           ((free_id,(p,a),or_ty,new_switch s)::todos) ag_tail ag ports (succ i)
-      | (Ast.LNK_SOME,_), s ->
+      | (LKappa.LNK_SOME,_), s ->
         let or_ty = (i,ty_id) in
         Mods.Int2Set.fold
           (fun (a,p) prev' ->
              let ports' = Array.copy ports in
              let () =
                ports'.(i) <-
-                 (Locality.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
+                 (Locality.dummy_annot (LKappa.LNK_VALUE (free_id,(p,a))),s) in
              let todos' =
                (free_id,(p,a),or_ty,new_switch s)::todos in
              aux_one
                (succ free_id) prev' current todos' ag_tail ag ports' (succ i))
           (ports_from_contact_map contact_map ty_id i)
           previous
-      | (Ast.LNK_VALUE _,_),_ ->
+      | (LKappa.LNK_VALUE _,_),_ ->
         aux_one free_id previous current todos ag_tail ag ports (succ i)
-      | (Ast.LNK_FREE, pos), (LKappa.Maintained | LKappa.Erased as s) ->
+      | (LKappa.LNK_FREE, pos), (LKappa.Maintained | LKappa.Erased as s) ->
         let () = (* Do not make test if being free is the only possibility *)
           if Mods.Int2Set.is_empty (ports_from_contact_map contact_map ty_id i)
-          then ports.(i) <- (Ast.LNK_ANY,pos), s
+          then ports.(i) <- (LKappa.LNK_ANY,pos), s
           else () in
         aux_one free_id previous current todos ag_tail ag ports (succ i)
-      | (Ast.LNK_FREE, _), LKappa.Freed ->failwith "A free site cannot be freed"
-      | (Ast.LNK_FREE, _), LKappa.Linked _ ->
+      | (LKappa.LNK_FREE, _), LKappa.Freed ->failwith "A free site cannot be freed"
+      | (LKappa.LNK_FREE, _), LKappa.Linked _ ->
         aux_one free_id previous current todos ag_tail ag ports (succ i)
-      | ((Ast.LNK_ANY|Ast.ANY_FREE),_), LKappa.Maintained ->
+      | ((LKappa.LNK_ANY|LKappa.ANY_FREE),_), LKappa.Maintained ->
         aux_one free_id previous current todos ag_tail ag ports (succ i)
-      | ((Ast.LNK_ANY|Ast.ANY_FREE),pos),
+      | ((LKappa.LNK_ANY|LKappa.ANY_FREE),pos),
         (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
         if Mods.Int2Set.is_empty (ports_from_contact_map contact_map ty_id i)
         && s = LKappa.Freed then
           (* Do not make test is being free is the only possibility *)
-          let () = ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained in
+          let () = ports.(i) <- (LKappa.LNK_ANY,pos), LKappa.Maintained in
           aux_one free_id previous current todos ag_tail ag ports (succ i)
         else
           aux_one free_id previous current todos ag_tail ag ports (succ i)
@@ -85,13 +85,13 @@ let complete_with_candidate
     (fun i acc port ->
        if i <> p_id then acc else
          match port with
-         | ((Ast.LNK_ANY|Ast.ANY_FREE),_), s ->
+         | ((LKappa.LNK_ANY|LKappa.ANY_FREE),_), s ->
            if s = LKappa.Maintained then
              let ports' = Array.copy ag.LKappa.ra_ports in
              let () =
                ports'.(i) <-
                  (Locality.dummy_annot
-                    (Ast.LNK_VALUE (id,dst_info)),p_switch) in
+                    (LKappa.LNK_VALUE (id,dst_info)),p_switch) in
              (List.rev_append prevs
                 ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
                    LKappa.ra_ints = ag.LKappa.ra_ints;
@@ -102,7 +102,7 @@ let complete_with_candidate
              let ports' = Array.copy ag.LKappa.ra_ports in
              let () =
                ports'.(i) <-
-                 (Locality.dummy_annot (Ast.LNK_VALUE (id,dst_info)),s) in
+                 (Locality.dummy_annot (LKappa.LNK_VALUE (id,dst_info)),s) in
              (List.rev_append prevs
                 ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
                    LKappa.ra_ints = ag.LKappa.ra_ints;
@@ -110,7 +110,7 @@ let complete_with_candidate
                    LKappa.ra_syntax = ag.LKappa.ra_syntax;}::ag_tail), todo)
              :: acc
            else acc
-         | (Ast.LNK_VALUE (k,x),_),s ->
+         | (LKappa.LNK_VALUE (k,x),_),s ->
            if x = dst_info then
              match
                List.partition
@@ -119,7 +119,7 @@ let complete_with_candidate
              | [ _ ], todo' ->
                let ports' = Array.copy ag.LKappa.ra_ports in
                let () = ports'.(i) <-
-                   (Locality.dummy_annot (Ast.LNK_VALUE (id,x)),s) in
+                   (Locality.dummy_annot (LKappa.LNK_VALUE (id,x)),s) in
                (List.rev_append prevs
                   ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
                      LKappa.ra_ints = ag.LKappa.ra_ints;
@@ -129,16 +129,16 @@ let complete_with_candidate
              |[], _ -> acc
              | _ :: _ :: _, _ -> assert false
            else acc
-         | ((Ast.LNK_TYPE _ | Ast.LNK_FREE | Ast.LNK_SOME),_), _ -> acc)
+         | ((LKappa.LNK_TYPE _ | LKappa.LNK_FREE | LKappa.LNK_SOME),_), _ -> acc)
     outs ag.LKappa.ra_ports
 
 let new_agent_with_one_link sigs ty_id port link dst_info switch =
   let arity = Signature.arity sigs ty_id in
   let ports =
-    Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
+    Array.make arity (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained) in
   let internals = Array.make arity LKappa.I_ANY in
   let () = ports.(port) <-
-      (Locality.dummy_annot (Ast.LNK_VALUE (link,dst_info)),switch) in
+      (Locality.dummy_annot (LKappa.LNK_VALUE (link,dst_info)),switch) in
   { LKappa.ra_type = ty_id; LKappa.ra_ports = ports; LKappa.ra_ints = internals;
     LKappa.ra_erased = false; LKappa.ra_syntax = None;}
 
@@ -161,9 +161,9 @@ let add_implicit_infos sigs l =
   in aux [] l
 
 let is_linked_on_port me i id = function
-  | (Ast.LNK_VALUE (j,_),_),_ when i = j -> id <> me
-  | ((Ast.LNK_VALUE _ | Ast.LNK_FREE | Ast.LNK_TYPE _ |
-      Ast.LNK_ANY | Ast.LNK_SOME | Ast.ANY_FREE),_),_ -> false
+  | (LKappa.LNK_VALUE (j,_),_),_ when i = j -> id <> me
+  | ((LKappa.LNK_VALUE _ | LKappa.LNK_FREE | LKappa.LNK_TYPE _ |
+      LKappa.LNK_ANY | LKappa.LNK_SOME | LKappa.ANY_FREE),_),_ -> false
 
 let is_linked_on i ag =
   Tools.array_filter (is_linked_on_port (-1) i) ag.LKappa.ra_ports <> []
@@ -217,10 +217,10 @@ let add_side_site side_sites bt pl s = function
   | (LKappa.Freed | LKappa.Linked _ | LKappa.Erased) -> ((pl,s),bt)::side_sites
   | LKappa.Maintained -> side_sites
 let add_freed_side_effect side_effects pl s = function
-  | (Ast.LNK_VALUE _,_),LKappa.Freed -> (pl,s)::side_effects
-  | (Ast.LNK_VALUE _,_),(LKappa.Maintained | LKappa.Erased | LKappa.Linked _)
-  | ((Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME |
-      Ast.LNK_TYPE _ | Ast.ANY_FREE),_),_ ->
+  | (LKappa.LNK_VALUE _,_),LKappa.Freed -> (pl,s)::side_effects
+  | (LKappa.LNK_VALUE _,_),(LKappa.Maintained | LKappa.Erased | LKappa.Linked _)
+  | ((LKappa.LNK_FREE | LKappa.LNK_ANY | LKappa.LNK_SOME |
+      LKappa.LNK_TYPE _ | LKappa.ANY_FREE),_),_ ->
     side_effects
 let add_extra_side_effects side_effects place refined =
   let rec aux side_effects site_id =
@@ -271,7 +271,7 @@ let make_instantiation place links event ref_ports is_erased =
               actions in
           let tests'',actions'',side_sites',side_effects',links' =
             match ports.(site_id) with
-            | ((Ast.LNK_ANY|Ast.ANY_FREE),_), s ->
+            | ((LKappa.LNK_ANY|LKappa.ANY_FREE),_), s ->
               let side_effects' =
                 match s with
                 | LKappa.Maintained ->
@@ -284,17 +284,17 @@ let make_instantiation place links event ref_ports is_erased =
                 place site_id s,
               side_effects',
               links
-            | (Ast.LNK_FREE,_), s ->
+            | (LKappa.LNK_FREE,_), s ->
               (Instantiation.Is_Free (place,site_id) :: tests'),
               add_instantiation_free actions' place site_id s,side_effects_src,
               side_effects_dst, links
-            | (Ast.LNK_SOME,_), s ->
+            | (LKappa.LNK_SOME,_), s ->
               Instantiation.Is_Bound (place,site_id) :: tests',
               add_instantiation_free actions' place site_id s,
               add_side_site side_effects_src Instantiation.BOUND
                 place site_id s,
               side_effects_dst, links
-            | (Ast.LNK_TYPE (b,a),_),s ->
+            | (LKappa.LNK_TYPE (b,a),_),s ->
               Instantiation.Has_Binding_type ((place,site_id),(a,b))
               :: tests',
               add_instantiation_free actions' place site_id s,
@@ -302,7 +302,7 @@ let make_instantiation place links event ref_ports is_erased =
                 side_effects_src (Instantiation.BOUND_TYPE (a,b))
                 place site_id s,
               side_effects_dst, links
-            | (Ast.LNK_VALUE (i,_),_),s ->
+            | (LKappa.LNK_VALUE (i,_),_),s ->
               match Mods.IntMap.find_option i links with
               | Some x -> x :: tests',
                           add_instantiation_free actions' place site_id s,
@@ -363,14 +363,14 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
             Pattern.new_internal_state wk (node,site_id) i
         in
         match ag.LKappa.ra_ports.(site_id) with
-        | ((Ast.LNK_ANY|Ast.ANY_FREE),pos), s ->
+        | ((LKappa.LNK_ANY|LKappa.ANY_FREE),pos), s ->
           let transf',l_t' =
             define_full_transformation
               transf l_t place site_id
               (Primitives.Transformation.NegativeWhatEver
                  (place,site_id),Some pos) s in
           handle_ports wk' r_l c_l transf' l_t' re acc (succ site_id)
-        | (Ast.LNK_FREE,_), s ->
+        | (LKappa.LNK_FREE,_), s ->
           let wk'' = Pattern.new_free wk' (node,site_id) in
           let transf',l_t' =
             define_full_transformation
@@ -378,11 +378,11 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
               (Primitives.Transformation.Freed (place,site_id),None) s in
           handle_ports
             wk'' r_l c_l transf' l_t' re acc (succ site_id)
-        | ((Ast.LNK_SOME | Ast.LNK_TYPE _),_),_ ->
+        | ((LKappa.LNK_SOME | LKappa.LNK_TYPE _),_),_ ->
           raise (ExceptionDefn.Internal_Error
                    (Locality.dummy_annot
                       "Try to create the connected components of an ambiguous mixture."))
-        | (Ast.LNK_VALUE (i,_),pos),s ->
+        | (LKappa.LNK_VALUE (i,_),pos),s ->
           match Mods.IntMap.find_option i r_l with
           | Some (node',site' as dst) ->
             let dst_place = Matching.Agent.Existing (node',id),site' in
@@ -614,7 +614,7 @@ let aux_lkappa_of_pattern free_id p =
        let ra_ports =
          Array.make
            (Array.length intf)
-           (Locality.dummy_annot Ast.LNK_ANY,LKappa.Maintained) in
+           (Locality.dummy_annot LKappa.LNK_ANY,LKappa.Maintained) in
        let ra_ints = Array.make (Array.length intf) LKappa.I_ANY in
        let out = {
          LKappa.ra_type = agent_type; LKappa.ra_erased = false;
@@ -628,18 +628,18 @@ let aux_lkappa_of_pattern free_id p =
               | Pattern.UnSpec -> pack
               | Pattern.Free ->
                 let () = ra_ports.(site) <-
-                    (Locality.dummy_annot Ast.LNK_FREE,LKappa.Maintained) in
+                    (Locality.dummy_annot LKappa.LNK_FREE,LKappa.Maintained) in
                 pack
               | Pattern.Link (dst_a,dst_s) ->
                 let src_info = (site,agent_type) in
                 match Mods.Int2Map.find_option (dst_a,dst_s) known_src with
                 | Some (id,dst_info) ->
                   let () = ra_ports.(site) <-
-                      (Locality.dummy_annot (Ast.LNK_VALUE (id,dst_info)),
+                      (Locality.dummy_annot (LKappa.LNK_VALUE (id,dst_info)),
                        LKappa.Maintained) in
                   let () = (Mods.IntMap.find_default out dst_a acc').
                              LKappa.ra_ports.(dst_s) <-
-                      (Locality.dummy_annot (Ast.LNK_VALUE (id,src_info)),
+                      (Locality.dummy_annot (LKappa.LNK_VALUE (id,src_info)),
                        LKappa.Maintained) in
                   pack
                 | None ->

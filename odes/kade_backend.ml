@@ -240,15 +240,15 @@ struct
   include Ast
 
   let print_link pr_port pr_type pr_annot symbol_table f = function
-    | Ast.ANY_FREE | Ast.LNK_ANY ->
+    | LKappa.ANY_FREE | LKappa.LNK_ANY ->
       Utils.print_link_to_any_symbol f symbol_table
-    | Ast.LNK_TYPE (p, a) ->
+    | LKappa.LNK_TYPE (p, a) ->
       Utils.print_binding_type_symbol symbol_table pr_port pr_type p f a
-    | Ast.LNK_FREE ->
+    | LKappa.LNK_FREE ->
       Utils.print_free_symbol f symbol_table
-    | Ast.LNK_SOME ->
+    | LKappa.LNK_SOME ->
       Utils.print_bound_to_unknown_symbol f symbol_table
-    | Ast.LNK_VALUE (i,a) ->
+    | LKappa.LNK_VALUE (i,a) ->
       Utils.print_bound_symbol symbol_table
         (fun fmt a ->
            Format.fprintf fmt "%i%a" i pr_annot a)
@@ -442,16 +442,16 @@ struct
     let rec aux empty i =
       if i < Array.length ports then
         if (match ports.(i) with
-            | (Ast.LNK_ANY, _), LKappa.Maintained ->  ints.(i) <> LKappa.I_ANY
-            | ((Ast.LNK_ANY, _), (LKappa.Erased | LKappa.Freed | LKappa.Linked _) |
-               ((Ast.LNK_SOME | Ast.ANY_FREE | Ast.LNK_FREE |
-                 Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true) then
+            | (LKappa.LNK_ANY, _), LKappa.Maintained ->  ints.(i) <> LKappa.I_ANY
+            | ((LKappa.LNK_ANY, _), (LKappa.Erased | LKappa.Freed | LKappa.Linked _) |
+               ((LKappa.LNK_SOME | LKappa.ANY_FREE | LKappa.LNK_FREE |
+                 LKappa.LNK_TYPE _ | LKappa.LNK_VALUE _),_), _) -> true) then
 
           let ((e,_),switch) = ports.(i) in
           let is_counter = match e with
-            | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
-            | Ast.LNK_TYPE _ | Ast.LNK_SOME -> false
-            | Ast.LNK_VALUE (j,_) ->
+            | LKappa.ANY_FREE | LKappa.LNK_FREE | LKappa.LNK_ANY
+            | LKappa.LNK_TYPE _ | LKappa.LNK_SOME -> false
+            | LKappa.LNK_VALUE (j,_) ->
               try
                 let root = Raw_mixture.find counters j in
                 let (c,(eq,is_counter')) =
@@ -506,20 +506,20 @@ let union_find_counters sigs mix =
              let ((a,_),_) = ag.LKappa.ra_ports.(after) in
              let ((b,_),_) = ag.LKappa.ra_ports.(before) in
              match b with
-             | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
-             | Ast.LNK_TYPE _ | Ast.LNK_SOME -> ()
-             | Ast.LNK_VALUE (lnk_b,_) ->
+             | LKappa.ANY_FREE | LKappa.LNK_FREE | LKappa.LNK_ANY
+             | LKappa.LNK_TYPE _ | LKappa.LNK_SOME -> ()
+             | LKappa.LNK_VALUE (lnk_b,_) ->
                match a with
-               | Ast.LNK_VALUE (lnk_a,_) -> Raw_mixture.union t lnk_b lnk_a
-               | Ast.ANY_FREE | Ast.LNK_FREE ->
+               | LKappa.LNK_VALUE (lnk_a,_) -> Raw_mixture.union t lnk_b lnk_a
+               | LKappa.ANY_FREE | LKappa.LNK_FREE ->
                  let root = Raw_mixture.find t lnk_b in
                  let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
                  Mods.DynArray.set t.Raw_mixture.rank root (s,(true,true))
-               | Ast.LNK_ANY ->
+               | LKappa.LNK_ANY ->
                  let root = Raw_mixture.find t lnk_b in
                  let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
                  Mods.DynArray.set t.Raw_mixture.rank root (s,(false,true))
-               | Ast.LNK_TYPE _ | Ast.LNK_SOME ->
+               | LKappa.LNK_TYPE _ | LKappa.LNK_SOME ->
                  raise (ExceptionDefn.Internal_Error
                           (Locality.dummy_annot
                              ("Port a of __incr agent not well specified"))))
@@ -581,12 +581,12 @@ let print_link_rhs ~ltypes sigs symbol_table f ((e,_),s) =
         Ast.print_link
           (Signature.print_site sigs)
           (Signature.print_agent sigs) (fun _ () -> ())
-          symbol_table f (Ast.LNK_VALUE (i,()))
+          symbol_table f (LKappa.LNK_VALUE (i,()))
       | LKappa.Freed ->
         Ast.print_link
           (Signature.print_site sigs)
           (Signature.print_agent sigs) (fun _ () -> ())
-          symbol_table f Ast.LNK_FREE
+          symbol_table f LKappa.LNK_FREE
       | LKappa.Maintained ->
         Ast.print_link
           (Signature.print_site sigs)
@@ -603,9 +603,9 @@ let print_intf_lhs ~ltypes sigs symbol_table ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
-          | (((Ast.LNK_SOME | Ast.LNK_FREE | Ast.ANY_FREE |
-               Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
-          | (Ast.LNK_ANY, _), _ ->
+          | (((LKappa.LNK_SOME | LKappa.LNK_FREE | LKappa.ANY_FREE |
+               LKappa.LNK_TYPE _ | LKappa.LNK_VALUE _),_), _) -> true
+          | (LKappa.LNK_ANY, _), _ ->
             match ints.(i) with
             | (LKappa.I_ANY | LKappa.I_ANY_ERASED | LKappa.I_ANY_CHANGED _) -> false
             | ( LKappa.I_VAL_CHANGED _ | LKappa.I_VAL_ERASED _) -> true) then
@@ -624,10 +624,10 @@ let print_intf_rhs ~ltypes sigs symbol_table ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
-          | (((Ast.LNK_SOME | Ast.LNK_FREE |  Ast.ANY_FREE |
-               Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
-          | ((Ast.LNK_ANY, _), (LKappa.Erased | LKappa.Freed | LKappa.Linked _)) -> true
-          | ((Ast.LNK_ANY, _), LKappa.Maintained) ->
+          | (((LKappa.LNK_SOME | LKappa.LNK_FREE |  LKappa.ANY_FREE |
+               LKappa.LNK_TYPE _ | LKappa.LNK_VALUE _),_), _) -> true
+          | ((LKappa.LNK_ANY, _), (LKappa.Erased | LKappa.Freed | LKappa.Linked _)) -> true
+          | ((LKappa.LNK_ANY, _), LKappa.Maintained) ->
               match ints.(i) with
             | LKappa.I_ANY -> false
             | LKappa.I_VAL_CHANGED (i,j) -> i <> j

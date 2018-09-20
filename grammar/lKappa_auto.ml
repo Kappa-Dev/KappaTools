@@ -25,12 +25,12 @@ module Binding_idMap = Binding_idSetMap.Map
 
 module Binding_states =
 struct
-  type t = int * ((int, unit) Ast.link)
+  type t = int * ((int, unit) LKappa.link)
   let compare = compare
   let print log (a,b) =
     Format.fprintf log "%i:[%a]" a
       (fun log  ->
-         Ast.print_link
+         LKappa.print_link
            (fun _ f x -> Format.pp_print_int f x)
            (fun f x -> Format.pp_print_int f x)
            (fun _ () -> ()) log)
@@ -103,12 +103,12 @@ let init_cache () =
 (* id gets rid of location annotation *)
 let id =
   function
-  | Ast.LNK_VALUE (i,_) -> Ast.LNK_VALUE (i,())
-  | Ast.LNK_FREE -> Ast.LNK_FREE
-  | Ast.ANY_FREE -> Ast.ANY_FREE
-  | Ast.LNK_ANY -> Ast.LNK_ANY
-  | Ast.LNK_SOME -> Ast.LNK_SOME
-  | Ast.LNK_TYPE (a,b) -> Ast.LNK_TYPE (a,b)
+  | LKappa.LNK_VALUE (i,_) -> LKappa.LNK_VALUE (i,())
+  | LKappa.LNK_FREE -> LKappa.LNK_FREE
+  | LKappa.ANY_FREE -> LKappa.ANY_FREE
+  | LKappa.LNK_ANY -> LKappa.LNK_ANY
+  | LKappa.LNK_SOME -> LKappa.LNK_SOME
+  | LKappa.LNK_TYPE (a,b) -> LKappa.LNK_TYPE (a,b)
 
 (* This function translate a mixture into an array of views and a function
    mapping each binding site to its partner *)
@@ -162,20 +162,20 @@ let translate rate_convention cache rule  =
            Array.fold_left
              (fun (map, site_id) ((state,_),switch) ->
                 match state, switch with
-                | Ast.LNK_VALUE (i,_), LKappa.Maintained  ->
+                | LKappa.LNK_VALUE (i,_), LKappa.Maintained  ->
                   add_map rate_convention
                     (Copy_lhs i) (agent_id, site_id+n_site)
                     (add_map rate_convention (Lhs i) (agent_id, site_id) map),
                   site_id + 1
-                | Ast.LNK_VALUE (i,_), LKappa.Linked j ->
+                | LKappa.LNK_VALUE (i,_), LKappa.Linked j ->
                   add_map rate_convention (Rhs j) (agent_id,site_id+n_site)
                     (add_map rate_convention (Lhs i) (agent_id, site_id) map), site_id + 1
-                | Ast.LNK_VALUE (i,_), _ ->
+                | LKappa.LNK_VALUE (i,_), _ ->
                   add_map rate_convention (Lhs i) (agent_id, site_id) map, site_id + 1
                 | _, LKappa.Linked j ->
                   add_map rate_convention (Rhs j) (agent_id, site_id+n_site) map, site_id + 1
-                | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_SOME |
-                   Ast.LNK_ANY | Ast.LNK_TYPE _),
+                | (LKappa.LNK_FREE | LKappa.ANY_FREE | LKappa.LNK_SOME |
+                   LKappa.LNK_ANY | LKappa.LNK_TYPE _),
                   (LKappa.Maintained | LKappa.Freed | LKappa.Erased ) -> map, site_id+1
 
              )
@@ -255,7 +255,7 @@ let translate rate_convention cache rule  =
         (fun (list, interface, site_id) ((port,_),switch) ->
            let list, interface =
              match port with
-             | Ast.LNK_VALUE _  ->
+             | LKappa.LNK_VALUE _  ->
                let ag_partner, site_partner =
                  match
                    Mods.Int2Map.find_option (agent_id, site_id) bonds_map
@@ -266,13 +266,13 @@ let translate rate_convention cache rule  =
                in
                let ag_partner = array_name.(ag_partner) in
                (site_id,
-                Ast.LNK_TYPE
+                LKappa.LNK_TYPE
                   (site_partner,
                    ag_partner))
                ::list,
                Mods.IntSet.add site_id interface
-             | Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY
-             | Ast.LNK_SOME | Ast.LNK_TYPE _ ->
+             | LKappa.LNK_FREE | LKappa.ANY_FREE | LKappa.LNK_ANY
+             | LKappa.LNK_SOME | LKappa.LNK_TYPE _ ->
                (site_id,id port)::list, interface
            in
            let list, interface =
@@ -293,12 +293,12 @@ let translate rate_convention cache rule  =
                    in
                    let ag_partner = array_name.(ag_partner) in
                    (site_id,
-                    Ast.LNK_TYPE
+                    LKappa.LNK_TYPE
                       (site_partner,
                        ag_partner))
                    ::list,
                    Mods.IntSet.add site_id interface
-                 | Ast.LNK_VALUE _, LKappa.Maintained ->
+                 | LKappa.LNK_VALUE _, LKappa.Maintained ->
                    let site_id = site_id + n_sites in
                    let ag_partner, site_partner =
                      match
@@ -309,17 +309,17 @@ let translate rate_convention cache rule  =
                    in
                    let ag_partner = array_name.(ag_partner) in
                    (site_id,
-                    Ast.LNK_TYPE
+                    LKappa.LNK_TYPE
                       (site_partner,
                        ag_partner))
                    ::list,
                    Mods.IntSet.add site_id interface
-                 | (Ast.LNK_VALUE _ | Ast.LNK_FREE | Ast.ANY_FREE |  Ast.LNK_ANY |
-                    Ast.LNK_SOME | Ast.LNK_TYPE _),
+                 | (LKappa.LNK_VALUE _ | LKappa.LNK_FREE | LKappa.ANY_FREE
+                   |  LKappa.LNK_ANY | LKappa.LNK_SOME | LKappa.LNK_TYPE _),
                    (LKappa.Maintained | LKappa.Erased) -> list, interface
                  | _, LKappa.Freed ->
                    let site_id = site_id + n_sites in
-                   (site_id,Ast.LNK_FREE)::list, interface
+                   (site_id,LKappa.LNK_FREE)::list, interface
                end
            in
            list, interface, site_id + 1
@@ -370,13 +370,13 @@ let translate rate_convention cache rule  =
                in
                let ag_partner = array_name.(ag_partner) in
                (site_id,
-                Ast.LNK_TYPE
+                LKappa.LNK_TYPE
                   (site_partner,
                    ag_partner))
                ::list,
                Mods.IntSet.add site_id interface
              | Raw_mixture.FREE ->
-               (site_id, Ast.LNK_FREE)::list, interface
+               (site_id, LKappa.LNK_FREE)::list, interface
            in
            list, interface, site_id + 1
         )

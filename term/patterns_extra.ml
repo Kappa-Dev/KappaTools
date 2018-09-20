@@ -184,10 +184,10 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
         Tools.array_fold_lefti
           (fun site (work,bond_map) state ->
              match state with
-             | (Ast.ANY_FREE,_), LKappa.Maintained -> work,bond_map
-             | (Ast.LNK_VALUE (i,_),_) , LKappa.Maintained ->
+             | (LKappa.ANY_FREE,_), LKappa.Maintained -> work,bond_map
+             | (LKappa.LNK_VALUE (i,_),_) , LKappa.Maintained ->
                declare_bond work pattern_agent site i bond_map
-             | (Ast.LNK_FREE,_), LKappa.Maintained ->
+             | (LKappa.LNK_FREE,_), LKappa.Maintained ->
                if Mods.Int2Set.mem
                    (mixture_agent.LKappa.ra_type,site)
                    unspec
@@ -196,9 +196,9 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
                else
                  Pattern.new_free work (pattern_agent,site), bond_map
              |
-               ((Ast.LNK_ANY
-               | Ast.LNK_SOME
-                | Ast.LNK_TYPE _),_),_
+               ((LKappa.LNK_ANY
+               | LKappa.LNK_SOME
+                | LKappa.LNK_TYPE _),_),_
              | _,(LKappa.Linked _ | LKappa.Freed | LKappa.Erased)
                -> assert false)
           (work, bond_map)
@@ -287,9 +287,9 @@ let top_sort_raw_mixture list =
 let top_sort_mixture list =
   top_sort_gen
     (function
-      | (Ast.LNK_VALUE (i,_),_),_ -> Some i
-      | ((Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
-        | Ast.LNK_SOME | Ast.LNK_TYPE (_, _)),_),_ -> None)
+      | (LKappa.LNK_VALUE (i,_),_),_ -> Some i
+      | ((LKappa.ANY_FREE | LKappa.LNK_FREE | LKappa.LNK_ANY
+        | LKappa.LNK_SOME | LKappa.LNK_TYPE (_, _)),_),_ -> None)
     (fun x -> x.LKappa.ra_ports)
     list
 
@@ -487,7 +487,7 @@ let pattern_to_mixture ?parameters ~sigs pattern =
            else
              Signature.arity sigs ag_type
          in
-         Array.make n_site (Ast.ANY_FREE, None)
+         Array.make n_site (LKappa.ANY_FREE, None)
       ) agent_type_map
     in
   let rec aux tail unspec=
@@ -509,7 +509,7 @@ let pattern_to_mixture ?parameters ~sigs pattern =
           with
           | None -> raise Exit
           | Some array ->
-            array.(site) <- (Ast.ANY_FREE, int_state)
+            array.(site) <- (LKappa.ANY_FREE, int_state)
         in
         let agent_type =
           Mods.IntMap.find_default (-1) pos agent_type_map
@@ -524,7 +524,7 @@ let pattern_to_mixture ?parameters ~sigs pattern =
           with
           | None -> raise Exit
           | Some array ->
-            array.(site) <- (Ast.LNK_FREE, int_state)
+            array.(site) <- (LKappa.LNK_FREE, int_state)
         in
         aux tail unspec
       | Pattern.Link _ ->
@@ -540,7 +540,7 @@ let pattern_to_mixture ?parameters ~sigs pattern =
               with
               | None -> raise Exit
               | Some array ->
-                array.(site) <- (Ast.LNK_VALUE (i,(0,0)), int_state)
+                array.(site) <- (LKappa.LNK_VALUE (i,(0,0)), int_state)
             in
             aux tail unspec
         end

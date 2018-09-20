@@ -182,7 +182,7 @@ let rec scan_interface parameters k agent interface ((error,a),(set_sites,set_co
     let remanent = error,a in
     scan_interface parameters k agent interface
       ((match port.Ast.port_lnk with
-          | [Ast.LNK_VALUE (i,()),_] ->
+          | [LKappa.LNK_VALUE (i,()),_] ->
             add_entry_lnk
               parameters
               (Ckappa_sig.lnk_value_of_int i)
@@ -190,8 +190,8 @@ let rec scan_interface parameters k agent interface ((error,a),(set_sites,set_co
               (fst port.Ast.port_nme)
               k
               remanent
-          | [] | ((Ast.LNK_ANY | Ast.LNK_FREE | Ast.LNK_TYPE _ | Ast.LNK_SOME
-                  | Ast.ANY_FREE | Ast.LNK_VALUE (_,())),_) :: _ -> remanent),(set_sites,set_counters))
+          | [] | ((LKappa.LNK_ANY | LKappa.LNK_FREE | LKappa.LNK_TYPE _ | LKappa.LNK_SOME
+                  | LKappa.ANY_FREE | LKappa.LNK_VALUE (_,())),_) :: _ -> remanent),(set_sites,set_counters))
 
 let scan_agent parameters k ag remanent =
   match ag with
@@ -252,7 +252,7 @@ let collect_binding_label parameters mixture f k remanent =
 
 let translate_lnk_state parameters lnk_state remanent =
   match lnk_state with
-  | [Ast.LNK_VALUE (id,()),pos] ->
+  | [LKappa.LNK_VALUE (id,()),pos] ->
     begin
       let error, remanent = remanent in
       let error, (triple, map) =
@@ -290,16 +290,16 @@ let translate_lnk_state parameters lnk_state remanent =
              pos),
           (error, (map, (snd remanent)))
     end
-  | [(Ast.LNK_FREE|Ast.ANY_FREE),_]  -> Ckappa_sig.FREE,remanent
+  | [(LKappa.LNK_FREE|LKappa.ANY_FREE),_]  -> Ckappa_sig.FREE,remanent
   | [] ->
     begin
       match Remanent_parameters.get_syntax_version parameters with
       | Ast.V3 -> Ckappa_sig.FREE, remanent
       | Ast.V4 -> Ckappa_sig.LNK_MISSING , remanent
     end
-  | [Ast.LNK_ANY,position] -> Ckappa_sig.LNK_ANY position,remanent
-  | [Ast.LNK_SOME,position] -> Ckappa_sig.LNK_SOME position,remanent
-  | [Ast.LNK_TYPE (x,y),_position] -> Ckappa_sig.LNK_TYPE (y,x),remanent
+  | [LKappa.LNK_ANY,position] -> Ckappa_sig.LNK_ANY position,remanent
+  | [LKappa.LNK_SOME,position] -> Ckappa_sig.LNK_SOME position,remanent
+  | [LKappa.LNK_TYPE (x,y),_position] -> Ckappa_sig.LNK_TYPE (y,x),remanent
   | _::(_,pos)::_ ->
     let error, va = remanent in
     Ckappa_sig.LNK_ANY pos,
@@ -315,10 +315,10 @@ let translate_port is_signature parameters int_set port remanent =
   in
   let error',is_free =
     match port.Ast.port_lnk
-    with [(Ast.LNK_FREE|Ast.ANY_FREE),_] | [] -> error,Some true
-          | [Ast.LNK_ANY,_] -> error,None
-          | ((Ast.LNK_SOME | Ast.LNK_TYPE _ | Ast.LNK_VALUE _ | Ast.ANY_FREE
-            | Ast.LNK_FREE | Ast.LNK_ANY),_) :: _ -> error,Some false in
+    with [(LKappa.LNK_FREE|LKappa.ANY_FREE),_] | [] -> error,Some true
+          | [LKappa.LNK_ANY,_] -> error,None
+          | ((LKappa.LNK_SOME | LKappa.LNK_TYPE _ | LKappa.LNK_VALUE _ | LKappa.ANY_FREE
+            | LKappa.LNK_FREE | LKappa.LNK_ANY),_) :: _ -> error,Some false in
   let lnk,remanent =
     if is_signature then Ckappa_sig.FREE,remanent else
       translate_lnk_state parameters port.Ast.port_lnk (error',map) in

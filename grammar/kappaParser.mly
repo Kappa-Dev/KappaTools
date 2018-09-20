@@ -512,12 +512,12 @@ link_state_mod:
 
 
 a_link_state:
-    | KAPPA_LNK DOT {(Ast.LNK_FREE,rhs_pos 2)}
-    | KAPPA_LNK INT {(Ast.LNK_VALUE ($2,()),rhs_pos 2)}
-    | KAPPA_LNK KAPPA_SEMI {(Ast.LNK_SOME,rhs_pos 2)}
-    | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE
+    | KAPPA_LNK DOT {(LKappa.LNK_FREE,rhs_pos 2)}
+    | KAPPA_LNK INT {(LKappa.LNK_VALUE ($2,()),rhs_pos 2)}
+    | KAPPA_LNK KAPPA_SEMI {(LKappa.LNK_SOME,rhs_pos 2)}
+    | KAPPA_LNK ID DOT ID {add_pos (LKappa.LNK_TYPE
 				      (($2,rhs_pos 2),($4,rhs_pos 4)))}
-    | KAPPA_WLD {add_pos Ast.LNK_ANY}
+    | KAPPA_WLD {add_pos LKappa.LNK_ANY}
     | KAPPA_LNK error
 	{raise (ExceptionDefn.Syntax_Error
 		  (add_pos "Invalid link state"))}
