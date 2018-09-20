@@ -804,7 +804,7 @@ module Make (Instances:Instances_sig.S) = struct
       if !Parameter.debugModeOn then
         Format.printf "@[%sule %a has now %i instances.@]@."
           (if id mod 2 = 1 then "Unary r" else "R")
-          (Model.print_rule ~env) (id/2) cc_va in
+          (Model.print_rule ~noCounters:true ~env) (id/2) cc_va in
     let act =
       match Nbr.to_float @@ value_alg counter state rate with
       | None -> if cc_va = 0 then 0. else infinity
@@ -818,7 +818,8 @@ module Make (Instances:Instances_sig.S) = struct
                  "At t=%.2f %sctivity of rule %a has become negative (%f)"
                  (Counter.current_time counter)
                  (if unary then "Unary " else "")
-                 (Model.print_rule ~env) id act),
+                 (Model.print_rule ~noCounters:!Parameter.debugModeOn ~env) id
+                 act),
               Model.get_ast_rule_rate_pos ~unary env syntax_id)) in
     let old_act = get_activity id state in
     let () = set_activity id act state in
@@ -1069,6 +1070,7 @@ module Make (Instances:Instances_sig.S) = struct
       ~outputs ?maxConsecutiveBlocked ~maxConsecutiveClash
       env counter graph =
     let debugMode = !Parameter.debugModeOn in
+    let noCounters = !Parameter.debugModeOn in
     let choice = pick_rule graph.random_state graph in
     let rule_id = choice/2 in
     let rule = Model.get_rule env rule_id in
@@ -1078,7 +1080,7 @@ module Make (Instances:Instances_sig.S) = struct
         Format.printf
           "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
           (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
-          rule_id (Kappa_printer.decompiled_rule ~full:true env) rule
+          rule_id (Kappa_printer.decompiled_rule ~noCounters ~full:true env) rule
           (*Rule_interpreter.print_dist env graph rule_id*) in
     let apply_rule =
       if choice mod 2 = 1

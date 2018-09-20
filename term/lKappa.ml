@@ -161,7 +161,8 @@ let print_counter_delta counters j f switch = match switch with
   | Erased -> ()
 
 let print_rule_intf
-      sigs ~show_erased ~ltypes ag_ty f (ports,ints,counters,created_counters) =
+    ~noCounters sigs ~show_erased ~ltypes ag_ty
+    f (ports,ints,counters,created_counters) =
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
@@ -178,7 +179,7 @@ let print_rule_intf
                let root = Raw_mixture.find counters j in
                let (c,(eq,is_counter')) =
                  Mods.DynArray.get counters.Raw_mixture.rank root in
-               if (is_counter')&&not(!Parameter.debugModeOn) then
+               if is_counter' && not noCounters then
                  let () = Format.fprintf f "%t%a{%a%a}"
                           (if empty then Pp.empty else Pp.space)
                           (Signature.print_site sigs ag_ty) i
@@ -231,25 +232,26 @@ let union_find_counters sigs mix =
         mix in
   t
 
-let print_rule_agent sigs ~ltypes counters created_counters f ag =
+let print_rule_agent ~noCounters sigs ~ltypes counters created_counters f ag =
   Format.fprintf f "%a(@[<h>%a@])%t"
     (Signature.print_agent sigs) ag.ra_type
-    (print_rule_intf sigs ~show_erased:false ~ltypes ag.ra_type)
+    (print_rule_intf ~noCounters sigs ~show_erased:false ~ltypes ag.ra_type)
     (ag.ra_ports,ag.ra_ints,counters,created_counters)
     (fun f -> if ag.ra_erased then Format.pp_print_string f "-")
 
-let print_rule_mixture sigs ~ltypes created f mix =
+let print_rule_mixture ~noCounters sigs ~ltypes created f mix =
   let incr_agents = union_find_counters (Some sigs) mix in
   let created_incr = Raw_mixture.union_find_counters (Some sigs) created in
   let rec aux_print some = function
     | [] -> ()
     | h::t ->
       if Signature.is_counter_agent sigs h.ra_type
-      && not !Parameter.debugModeOn
+      && not noCounters
       then aux_print some t
       else
         let () = if some then Pp.comma f in
-        let () = print_rule_agent sigs ~ltypes incr_agents created_incr f h in
+        let () = print_rule_agent
+            ~noCounters sigs ~ltypes incr_agents created_incr f h in
         aux_print true t in
   aux_print false mix
 
@@ -339,12 +341,12 @@ let print_agent_rhs ~ltypes sigs f ag =
       f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.ra_type
       (print_intf_rhs ~ltypes sigs ag.ra_type) (ag.ra_ports,ag.ra_ints)
 
-let print_rhs ~ltypes sigs created f mix =
+let print_rhs ~noCounters ~ltypes sigs created f mix =
   let rec aux empty = function
     | [] ->
       Format.fprintf f "%t%a"
         (if empty || created = [] then Pp.empty else Pp.comma)
-        (Raw_mixture.print ~created:false ~sigs) created
+        (Raw_mixture.print ~noCounters ~created:false ~sigs) created
     | h :: t ->
       if h.ra_erased then
         let () = Format.fprintf f "%t."
@@ -357,12 +359,13 @@ let print_rhs ~ltypes sigs created f mix =
         aux false t in
   aux true mix
 
-let print_rates sigs pr_tok pr_var f r =
+let print_rates ~noCounters sigs pr_tok pr_var f r =
   let ltypes = false in
   Format.fprintf
     f " @@ %a%t"
     (Alg_expr.print
-       (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs ~ltypes []) m)
+       (fun f m -> Format.fprintf
+           f "|%a|" (print_rule_mixture ~noCounters sigs ~ltypes []) m)
        pr_tok pr_var) (fst r.r_rate)
     (fun f ->
        match r.r_un_rate with
@@ -372,32 +375,32 @@ let print_rates sigs pr_tok pr_var f r =
            f " {%a%a}"
            (Alg_expr.print
               (fun f m -> Format.fprintf f "|%a|"
-                  (print_rule_mixture sigs ~ltypes []) m)
+                  (print_rule_mixture ~noCounters sigs ~ltypes []) m)
               pr_tok pr_var) ra
            (Pp.option
               (fun f (md,_) ->
                 Format.fprintf f ":%a"
                 (Alg_expr.print
                    (fun f m -> Format.fprintf f "|%a|"
-                       (print_rule_mixture sigs ~ltypes []) m)
+                       (print_rule_mixture ~noCounters sigs ~ltypes []) m)
                    pr_tok pr_var) md)) max_dist)
 
-let print_rule ~full sigs pr_tok pr_var f r =
+let print_rule ~noCounters ~full sigs pr_tok pr_var f r =
   Format.fprintf
     f "@[<h>%t%t%a%t@]"
     (fun f ->
        if full || r.r_editStyle then
          Format.fprintf f "%a%t%a"
-           (print_rule_mixture sigs ~ltypes:false r.r_created) r.r_mix
+           (print_rule_mixture ~noCounters sigs ~ltypes:false r.r_created) r.r_mix
            (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
-           (Raw_mixture.print ~created:true ~sigs)
+           (Raw_mixture.print ~noCounters ~created:true ~sigs)
            r.r_created
        else Format.fprintf f "%a%t%a -> %a"
            (Pp.list Pp.comma (print_agent_lhs ~ltypes:false sigs)) r.r_mix
            (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
            (Pp.list Pp.comma (fun f _ -> Format.pp_print_string f "."))
            r.r_created
-           (print_rhs ~ltypes:false sigs r.r_created) r.r_mix)
+           (print_rhs ~noCounters ~ltypes:false sigs r.r_created) r.r_mix)
     (fun f ->
        match r.r_delta_tokens with [] -> ()
                                  | _::_ -> Format.pp_print_string f " | ")
@@ -408,11 +411,11 @@ let print_rule ~full sigs pr_tok pr_var f r =
             f "%a %a"
             (Alg_expr.print
                (fun f m -> Format.fprintf
-                   f "|%a|" (print_rule_mixture sigs ~ltypes:false []) m)
+                   f "|%a|" (print_rule_mixture ~noCounters sigs ~ltypes:false []) m)
                pr_tok pr_var) nb
             pr_tok tk))
     r.r_delta_tokens
-    (fun f -> if full then print_rates sigs pr_tok pr_var f r)
+    (fun f -> if full then print_rates ~noCounters sigs pr_tok pr_var f r)
 
 let rule_agent_to_json filenames a =
   `Assoc [

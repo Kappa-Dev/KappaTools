@@ -78,10 +78,12 @@ val num_of_alg : string Locality.annot -> t -> int
 val num_of_token : string Locality.annot -> t -> int
 val nums_of_rule : string -> t -> int list
 
-val print_ast_rule : ?env:t -> Format.formatter -> int -> unit
+val print_ast_rule :
+  noCounters:bool -> ?env:t -> Format.formatter -> int -> unit
 (** The int is the ast_rule_id *)
 
-val print_rule : ?env:t -> Format.formatter -> int -> unit
+val print_rule :
+  noCounters:bool -> ?env:t -> Format.formatter -> int -> unit
 (** Same as above but the int is this time the rule_id *)
 
 val print_agent : ?env:t -> Format.formatter -> int -> unit
@@ -89,13 +91,13 @@ val print_alg : ?env:t -> Format.formatter -> int -> unit
 val print_token : ?env:t -> Format.formatter -> int -> unit
 
 val print :
-  (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
+  noCounters:bool -> (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
   (t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
   Format.formatter -> t -> unit
 
 val print_kappa :
-  (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
+  noCounters:bool -> (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
   ?pr_rule:(t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
   Format.formatter -> t -> unit

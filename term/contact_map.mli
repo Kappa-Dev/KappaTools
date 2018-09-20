@@ -9,8 +9,8 @@
 type t = (Mods.IntSet.t * Mods.Int2Set.t) array array
 (** (internal_states, (agent_type, agent_site) link_states *)
 
-val print_kappa : Signature.s -> Format.formatter -> t -> unit
-
+val print_kappa :
+  noCounters:bool -> Signature.s -> Format.formatter -> t -> unit
 
 val print_cycles : Signature.s -> Format.formatter -> t -> unit
 

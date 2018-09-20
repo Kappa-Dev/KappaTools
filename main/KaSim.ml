@@ -120,6 +120,7 @@ let () =
         Kappa_files.set_marshalized marshalizeOutFile
     in
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
+    let debugMode = common_args.Common_args.debug in
     let () =
       Parameter.time_independent := kasim_args.Kasim_args.timeIndependent in
 
@@ -130,7 +131,7 @@ let () =
     if abort then (prerr_string usage_msg ; exit 1) ;
     let () = Sys.catch_break true in
     Printexc.record_backtrace
-      (!Parameter.debugModeOn || common_args.Common_args.backtrace);
+      (debugMode || common_args.Common_args.backtrace);
     (*Possible backtrace*)
 
     let cpu_time = Sys.time () in
@@ -187,7 +188,8 @@ let () =
     let plotPack =
       let head =
         Model.map_observables
-          (fun o -> Format.asprintf "@[<h>%a@]" (Kappa_printer.alg_expr ~env) o)
+          (fun o -> Format.asprintf "@[<h>%a@]"
+              (Kappa_printer.alg_expr ~noCounters:debugMode ~env) o)
           env in
       if Array.length head > 1 then
         let title = "Output of " ^ command_line in
@@ -239,13 +241,14 @@ let () =
     Format.printf "@.Done@.+ Command line to rerun is: %s@." command_line;
 
     let () =
-      if kasim_args.Kasim_args.compileMode || !Parameter.debugModeOn then
+      if kasim_args.Kasim_args.compileMode || debugMode then
         Format.eprintf
           "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Polymers:@,%a@]@,\
 @[<v 2>Domain:@,%a@]@,@[<v 2>Intial graph;@,%a@]@]@."
-          Kappa_printer.env env
+          (Kappa_printer.env ~noCounters:debugMode) env
           (Contact_map.print_cycles (Model.signatures env)) contact_map
-          Pattern.Env.print (Model.domain env)
+          (Pattern.Env.print ~noCounters:debugMode)
+          (Model.domain env)
           (Rule_interpreter.print env) graph
     in
     (*------------------------------------------------------------*)

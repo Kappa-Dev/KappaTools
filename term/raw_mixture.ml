@@ -87,13 +87,13 @@ let union_find_counters sigs mix =
                | VAL lnk_a -> union t lnk_b lnk_a) mix in
   t
 
-let print_link incr_agents f = function
+let print_link ~noCounters incr_agents f = function
   | FREE -> Format.pp_print_string f "[.]"
   | VAL i ->
      try
        let root = find incr_agents i in
        let (counter,(_,is_counter)) = Mods.DynArray.get incr_agents.rank root in
-       if (is_counter)&&not(!Parameter.debugModeOn) then
+       if is_counter && not noCounters then
          Format.fprintf f "{=%d}" counter
        else Format.fprintf f "[%i]" i
      with Invalid_argument _ -> Format.fprintf f "[%i]" i
@@ -106,14 +106,14 @@ let aux_pp_si sigs a s f i =
     | Some i -> Format.fprintf f "%i{%i}" s i
     | None -> Format.pp_print_int f s
 
-let print_intf with_link ?sigs incr_agents ag_ty f (ports,ints) =
+let print_intf ~noCounters with_link ?sigs incr_agents ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       let () = Format.fprintf
           f "%t%a%a"
           (if empty then Pp.empty else Pp.space)
           (aux_pp_si sigs ag_ty i) ints.(i)
-          (if with_link then print_link incr_agents else (fun _ _ -> ()))
+          (if with_link then print_link ~noCounters incr_agents else (fun _ _ -> ()))
           ports.(i) in
       aux false (succ i) in
   aux true 0
@@ -123,13 +123,13 @@ let aux_pp_ag sigs f a =
   | Some sigs -> Signature.print_agent sigs f a
   | None -> Format.pp_print_int f a
 
-let print_agent created link ?sigs incr_agents f ag =
+let print_agent ~noCounters created link ?sigs incr_agents f ag =
   Format.fprintf f "%a(@[<h>%a@])%t"
       (aux_pp_ag sigs) ag.a_type
-      (print_intf link ?sigs incr_agents ag.a_type) (ag.a_ports, ag.a_ints)
+      (print_intf ~noCounters link ?sigs incr_agents ag.a_type) (ag.a_ports, ag.a_ints)
       (fun f -> if created then Format.pp_print_string f "+")
 
-let print ~created ?sigs f mix =
+let print ~noCounters ~created ?sigs f mix =
   let incr_agents = union_find_counters sigs mix in
   let rec aux_print some = function
     | [] -> ()
@@ -137,11 +137,11 @@ let print ~created ?sigs f mix =
       if match sigs with
         | None -> false
         | Some sigs ->
-          Signature.is_counter_agent sigs h.a_type && not !Parameter.debugModeOn
+          Signature.is_counter_agent sigs h.a_type && not noCounters
       then aux_print some t
       else
         let () = if some then Pp.comma f in
-        let () = print_agent created true ?sigs incr_agents f h in
+        let () = print_agent ~noCounters created true ?sigs incr_agents f h in
         aux_print true t in
   aux_print false mix
 

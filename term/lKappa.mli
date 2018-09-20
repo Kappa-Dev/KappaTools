@@ -60,8 +60,8 @@ val to_maintained : rule_mixture -> rule_mixture
 val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t
 val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
-  Signature.s -> ltypes:bool -> Raw_mixture.t -> Format.formatter ->
-  rule_mixture -> unit
+  noCounters:bool -> Signature.s -> ltypes:bool -> Raw_mixture.t ->
+  Format.formatter -> rule_mixture -> unit
 
 type rule =
   {
@@ -92,12 +92,14 @@ val link_of_json :
   ('a -> Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'a) ->
   (Yojson.Basic.json list -> 'b) -> Yojson.Basic.json -> ('a, 'b) link
 
-val print_rates : Signature.s -> (Format.formatter -> int -> unit)
-  -> (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
+val print_rates :
+  noCounters:bool -> Signature.s -> (Format.formatter -> int -> unit) ->
+  (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
 
 val print_rule :
-  full:bool -> Signature.s -> (Format.formatter -> int -> unit) ->
-  (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
+  noCounters:bool -> full:bool -> Signature.s ->
+  (Format.formatter -> int -> unit) -> (Format.formatter -> int -> unit) ->
+  Format.formatter -> rule -> unit
 
 val rule_to_json :
   filenames : int Mods.StringMap.t -> rule -> Yojson.Basic.json

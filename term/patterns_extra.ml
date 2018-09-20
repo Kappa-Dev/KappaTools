@@ -58,6 +58,7 @@ let declare_bond work ag_pos site bond_id map =
     end
 
 let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
+  let noCounters = do_trace parameters in
   let () = trace_print ?parameters "Translation from raw_mixture to pattern" in
   let () = trace_print ?parameters "INPUT:" in
   let () =
@@ -68,9 +69,9 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
         __POS__
         ?parameters
         (fun fmt ->
-           Raw_mixture.print ~created:false ~sigs fmt mix)
+           Raw_mixture.print ~noCounters ~created:false ~sigs fmt mix)
         (fun fmt ->
-           Raw_mixture.print ~created:false fmt mix)
+           Raw_mixture.print ~noCounters ~created:false fmt mix)
   in
   let unspec =
     List.fold_left
@@ -120,7 +121,7 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
       aux (ag_id + 1) tail (work, bond_map)
   in
   let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
-  let (a, _, b, c) = Pattern.finish_new ~debugMode:!Parameter.debugModeOn work in
+  let (a, _, b, c) = Pattern.finish_new ~debugMode:noCounters work in
   let () =
     match sigs with
     | None -> ()
@@ -128,12 +129,13 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
       let () = trace_print ?parameters "OUTPUT:" in
       let () =
         safe_print_str __POS__ ?parameters
-          (fun fmt -> Pattern.print_cc ~sigs ~with_id:false fmt b)
-          (fun fmt -> Pattern.print_cc ~with_id:false fmt b)
+          (fun fmt -> Pattern.print_cc ~noCounters ~sigs ~with_id:false fmt b)
+          (fun fmt -> Pattern.print_cc ~noCounters ~with_id:false fmt b)
       in ()
   in (a, b, c)
 
 let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
+  let noCounters = do_trace parameters in
   let () = trace_print ?parameters "Translation from mixture to pattern" in
   let () = trace_print ?parameters "INPUT:" in
   let () =
@@ -144,9 +146,9 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
         __POS__
         ?parameters
         (fun fmt ->
-           LKappa.print_rule_mixture ~ltypes:true sigs [] fmt mix)
+           LKappa.print_rule_mixture ~noCounters ~ltypes:true sigs [] fmt mix)
         (fun fmt ->
-           LKappa.print_rule_mixture ~ltypes:true sigs [] fmt mix)
+           LKappa.print_rule_mixture ~noCounters ~ltypes:true sigs [] fmt mix)
   in
   let unspec =
     List.fold_left
@@ -207,18 +209,18 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
       aux (ag_id + 1) tail (work, bond_map)
   in
   let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
-  let (a, _, b, c) = Pattern.finish_new ~debugMode:!Parameter.debugModeOn work in
+  let (a, _, b, c) = Pattern.finish_new ~debugMode:noCounters work in
   let () =
     match sigs with
     | None -> ()
     | Some sigs ->
       let () = trace_print ?parameters "OUTPUT:" in
       let () =
-        if !Parameter.debugModeOn then let _ = Pattern.id_to_yojson c in () in
+        if noCounters then let _ = Pattern.id_to_yojson c in () in
       let () =
         safe_print_str __POS__ ?parameters
-          (fun fmt -> Pattern.print_cc ~sigs ~with_id:true fmt b)
-          (fun fmt -> Pattern.print_cc ~with_id:true fmt b)
+          (fun fmt -> Pattern.print_cc ~noCounters ~sigs ~with_id:true fmt b)
+          (fun fmt -> Pattern.print_cc ~noCounters ~with_id:true fmt b)
       in ()
   in (a, b, c)
 
@@ -338,6 +340,7 @@ let parse pattern =
   agent_list, site_list, agent_type_map, bond_map
 
 let species_to_raw_mixture ?parameters ~sigs pattern =
+  let noCounters = do_trace parameters in
   let () = trace_print ?parameters
       "Translation from patten to raw_mixture" in
   let () =
@@ -345,8 +348,10 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
     let () =
       safe_print_str
         __POS__ ?parameters
-        (fun fmt -> Pattern.print_cc ~sigs ~with_id:false fmt pattern)
-        (fun fmt -> Pattern.print_cc ~with_id:false fmt pattern)
+        (fun fmt ->
+           Pattern.print_cc ~noCounters ~sigs ~with_id:false fmt pattern)
+        (fun fmt ->
+           Pattern.print_cc ~noCounters ~with_id:false fmt pattern)
       in ()
   in
   let _agent_list, site_list, agent_type_map, bond_map =
@@ -458,20 +463,23 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
       let () =
         safe_print_str
           __POS__ ?parameters
-          (fun fmt -> Raw_mixture.print ~created:false ~sigs fmt output)
-          (fun fmt -> Raw_mixture.print ~created:false fmt output)
+          (fun fmt ->
+             Raw_mixture.print ~noCounters ~created:false ~sigs fmt output)
+          (fun fmt -> Raw_mixture.print ~noCounters ~created:false fmt output)
       in
       Some (output, unspec)
     end
 
 let pattern_to_mixture ?parameters ~sigs pattern =
+  let noCounters = do_trace parameters in
   let () = trace_print ?parameters "Translation from pattern to mixture" in
   let () = trace_print ?parameters "INPUT:" in
   let () =
     safe_print_str
         __POS__ ?parameters
-        (fun fmt -> Pattern.print_cc ~sigs ~with_id:false fmt pattern)
-        (fun fmt -> Pattern.print_cc ~with_id:false fmt pattern)
+        (fun fmt ->
+           Pattern.print_cc ~noCounters ~sigs ~with_id:false fmt pattern)
+        (fun fmt -> Pattern.print_cc ~noCounters ~with_id:false fmt pattern)
   in
   let _agent_list, site_list, agent_type_map, bond_map =
     parse pattern
@@ -594,9 +602,11 @@ let pattern_to_mixture ?parameters ~sigs pattern =
         safe_print_str
           __POS__ ?parameters
           (fun fmt ->
-             LKappa.print_rule_mixture sigs ~ltypes:false [] fmt output)
+             LKappa.print_rule_mixture
+               ~noCounters sigs ~ltypes:false [] fmt output)
           (fun fmt ->
-             LKappa.print_rule_mixture sigs ~ltypes:false [] fmt output)
+             LKappa.print_rule_mixture
+               ~noCounters sigs ~ltypes:false [] fmt output)
       in
       Some (output, unspec)
     end

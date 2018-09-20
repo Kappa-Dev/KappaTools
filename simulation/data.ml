@@ -7,11 +7,13 @@
 (******************************************************************************)
 
 let print_initial_inputs ?uuid conf env inputs_form init =
+  let noCounters = false in
   let () = match uuid with
     | None -> ()
     | Some uuid -> Format.fprintf inputs_form "// \"uuid\" : \"%i\"@." uuid in
   let () = Format.fprintf inputs_form
-      "%a@.%a@." Configuration.print conf Kappa_printer.env_kappa env in
+      "%a@.%a@." Configuration.print conf
+      (Kappa_printer.env_kappa ~noCounters) env in
   let sigs = Model.signatures env in
   Format.fprintf inputs_form "@.@[<v>%a@]@."
     (Pp.list Pp.space
@@ -22,14 +24,14 @@ let print_initial_inputs ?uuid conf env inputs_form init =
             if ins_fresh <> [] then
               let () =
                 Format.fprintf f "@[<hov 2>%%init:@ @[%a@]@ @[%a@]@]"
-                  (Kappa_printer.alg_expr ~env) n
-                  (Raw_mixture.print ~created:false ~sigs)
+                  (Kappa_printer.alg_expr ~noCounters ~env) n
+                  (Raw_mixture.print ~noCounters ~created:false ~sigs)
                   ins_fresh in
               if r.Primitives.delta_tokens <> [] then
                 Format.pp_print_space f () in
           Pp.list Pp.space (fun f (nb,tk) ->
               Format.fprintf f "@[<hov 2>%%init:@ @[%a@]@ %a@]"
-                (Kappa_printer.alg_expr ~env)
+                (Kappa_printer.alg_expr ~noCounters ~env)
                 (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
                 (Model.print_token ~env) tk)
             f r.Primitives.delta_tokens)) init
@@ -299,9 +301,12 @@ let add_plot_line new_observables plot =
   }
 
 let init_plot env =
+  let noCounters = false in
   let plot_legend =
     Model.map_observables
-      (fun o -> Format.asprintf "@[%a@]" (Kappa_printer.alg_expr ~env) o) env in
+      (fun o ->
+         Format.asprintf "@[%a@]" (Kappa_printer.alg_expr ~noCounters ~env) o)
+      env in
   { plot_legend; plot_series = []; }
 
 let write_plot ob f =

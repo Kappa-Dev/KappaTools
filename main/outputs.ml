@@ -40,6 +40,7 @@ let emptyActs = ref true
 let init_activities env = function
   | None -> ()
   | Some s ->
+    let noCounters = !Parameter.debugModeOn in
     let desc = Kappa_files.open_out s in
     let form = Format.formatter_of_out_channel desc in
     let nb_r = Model.nb_syntactic_rules env in
@@ -47,9 +48,11 @@ let init_activities env = function
     let () = Format.fprintf form "@[<v>{@,rules:@[[" in
     let () =
       Tools.iteri
-        (fun x -> Format.fprintf form "\"%a\",@," (Model.print_ast_rule ~env) x)
+        (fun x -> Format.fprintf
+            form "\"%a\",@," (Model.print_ast_rule ~noCounters ~env) x)
         nb_r in
-    Format.fprintf form "\"%a\"]@],@,data:[@," (Model.print_ast_rule ~env) nb_r
+    Format.fprintf form "\"%a\"]@],@,data:[@,"
+      (Model.print_ast_rule ~noCounters ~env) nb_r
 
 let close_activities () =
   match !actsDescr with
@@ -230,5 +233,6 @@ let input_modifications env event mods =
       (Format.formatter_of_out_channel inputs)
       "%%mod: [E] = %i do %a@."
       event
-      (Pp.list ~trailing:Pp.colon Pp.colon (Kappa_printer.modification ~env))
+      (Pp.list ~trailing:Pp.colon Pp.colon
+         (Kappa_printer.modification ~noCounters:!Parameter.debugModeOn ~env))
       mods

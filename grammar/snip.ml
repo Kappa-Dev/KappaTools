@@ -564,7 +564,8 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
             (List.rev (List.rev_map LKappa.copy_rule_agent precomp_mixs)))
 
 let connected_components_sum_of_ambiguous_rule
-   ~debugMode ~compileModeOn contact_map env ?origin precomp_mixs created =
+    ~debugMode ~compileModeOn contact_map env ?origin precomp_mixs created =
+  let noCounters = debugMode in
   let sigs = Pattern.PreEnv.sigs env in
   let all_mixs =
     rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs in
@@ -577,9 +578,11 @@ let connected_components_sum_of_ambiguous_rule
            (fun f x ->
               Format.fprintf
                 f "@[%a%t%a@]"
-                (LKappa.print_rule_mixture sigs ~ltypes:true created) x
+                (LKappa.print_rule_mixture
+                   ~noCounters sigs ~ltypes:true created) x
                 (if x <> [] && created <> [] then Pp.comma else Pp.empty)
-                (Raw_mixture.print ~created:true ~sigs) (List.rev created)))
+                (Raw_mixture.print ~noCounters ~created:true ~sigs)
+                (List.rev created)))
         all_mixs in
   List_util.fold_right_map (connected_components_of_mixture ~debugMode created)
     all_mixs (env,origin)

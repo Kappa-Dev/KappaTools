@@ -29,7 +29,8 @@ let stop_flux env counter din_data =
   let size = Model.nb_syntactic_rules env + 1 in
   let din_rules =
     Array.init size
-      (fun x -> Format.asprintf "%a" (Model.print_ast_rule ~env) x) in
+      (fun x -> Format.asprintf
+          "%a" (Model.print_ast_rule ~noCounters:false ~env) x) in
   let () =
     match din_data.Data.din_kind with
     | Primitives.ABSOLUTE -> ()

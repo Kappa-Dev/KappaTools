@@ -441,7 +441,7 @@ let dotcomma dotnet =
   then (fun fmt -> Format.fprintf fmt ",")
   else  Pp.space
 let print_cc
-    ?dotnet:(dotnet=false)
+    ~noCounters ?dotnet:(dotnet=false)
     ?(full_species=false) ?sigs ?cc_id ~with_id f cc =
   let print_intf (ag_i, _ as ag) link_ids neigh =
     snd
@@ -474,7 +474,7 @@ let print_cc
               if match sigs with
                 | None -> false
                 | Some sigs -> Signature.is_counter_agent sigs dst_ty
-                               && not !Parameter.debugModeOn then
+                               && not noCounters then
                 let counter = counter_value cc.nodes (dst_a,dst_p) 0 in
                 let () = Format.fprintf f "{=%d}" counter in
                 true,out
@@ -502,7 +502,7 @@ let print_cc
          if match sigs with
            | None -> true
            | Some sigs -> not (Signature.is_counter_agent sigs (snd ag_x))
-                          || !Parameter.debugModeOn then
+                          || noCounters then
          let () =
            Format.fprintf
              f "%t@[<h>%a("
@@ -873,7 +873,7 @@ module Env : sig
   val signatures : t -> Signature.s
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
-  val print : Format.formatter -> t -> unit
+  val print : noCounters:bool -> Format.formatter -> t -> unit
   val to_yojson : t -> Yojson.Basic.json
   val of_yojson : Yojson.Basic.json -> t
 end = struct
@@ -906,11 +906,12 @@ end = struct
 
   let signatures env = env.sig_decl
 
-  let print f env =
+  let print ~noCounters f env =
     let pp_point p_id f p =
       Format.fprintf
         f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
-        (fun x -> print_cc ~sigs:env.sig_decl ~cc_id:p_id ~with_id:true x)
+        (fun x ->
+           print_cc ~noCounters ~sigs:env.sig_decl ~cc_id:p_id ~with_id:true x)
         p.content
         (fun f -> if p.roots <> None then
             Format.fprintf
@@ -1077,12 +1078,13 @@ end = struct
 
 end
 
-let print ?domain ~with_id f id =
+let print ~noCounters ?domain ~with_id f id =
   match domain with
   | None -> Format.pp_print_int f id
   | Some env ->
     let cc_id = if with_id then Some id else None in
-    print_cc ~sigs:(Env.signatures env) ?cc_id ~with_id
+    print_cc
+      ~noCounters ~sigs:(Env.signatures env) ?cc_id ~with_id
       f env.Env.domain.(id).Env.content
 
 let embeddings_to_fully_specified ~debugMode domain a_id b =

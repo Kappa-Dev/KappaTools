@@ -12,7 +12,9 @@ type agent =
     { a_type: int; a_ports: link array; a_ints: internal array; }
 type t = agent list
 
-val print : created:bool -> ?sigs:Signature.s -> Format.formatter -> t -> unit
+val print :
+  noCounters:bool -> created:bool -> ?sigs:Signature.s ->
+  Format.formatter -> t -> unit
 
 val to_json : t -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> t

@@ -483,7 +483,9 @@ let compile_inits
                raise (ExceptionDefn.Malformed_Decl
                         (Format.asprintf
                            "initial mixture %a is partially defined"
-                           (Raw_mixture.print ~created:true ~sigs) raw_mix,
+                           (Raw_mixture.print
+                              ~noCounters:debugMode ~created:true ~sigs)
+                           raw_mix,
                          mix_pos)) in
            preenv'',state'
          | INIT_TOK tk_l ->

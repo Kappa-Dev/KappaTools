@@ -528,14 +528,14 @@ let perturbation
                t.log_form "%%mod: [E] = %i do %a@."
                (Counter.current_event t.counter)
                (Pp.list ~trailing:Pp.colon Pp.colon
-                  (Kappa_printer.modification ~env:t.env))
+                  (Kappa_printer.modification ~noCounters:false ~env:t.env))
                e' in
            let () =
              Format.fprintf
                t.inputs_form "%%mod: [E] = %i do %a@."
                (Counter.current_event t.counter)
                (Pp.list ~trailing:Pp.colon Pp.colon
-                  (Kappa_printer.modification ~env:t.env))
+                  (Kappa_printer.modification ~noCounters:false ~env:t.env))
                e' in
            Lwt.return (Result_util.ok (Buffer.contents log_buffer))
          with ExceptionDefn.Syntax_Error (message,region) ->

@@ -127,7 +127,7 @@ let print_token ?env f id =
   | Some env ->
     Format.fprintf f "%s" (NamedDecls.elt_name env.tokens id)
 
-let print_ast_rule ?env f i =
+let print_ast_rule ~noCounters ?env f i =
   match env with
   | None -> Format.fprintf f "__ast_rule_%i" i
   | Some env ->
@@ -137,22 +137,23 @@ let print_ast_rule ?env f i =
       match env.ast_rules.(pred i) with
       | (Some (na,_),_) -> Format.pp_print_string f na
       | (None,(r,_)) ->
-        LKappa.print_rule ~full:false sigs
+        LKappa.print_rule ~noCounters ~full:false sigs
           (print_token ~env) (print_alg ~env) f r
 
-let print_rule ?env f id =
+let print_rule ~noCounters ?env f id =
   match env with
   | None -> Format.fprintf f "__rule_%i" id
-  | Some env -> print_ast_rule ~env f env.rules.(id).Primitives.syntactic_rule
+  | Some env ->
+    print_ast_rule ~noCounters ~env f env.rules.(id).Primitives.syntactic_rule
 
 let map_observables f env =
   Array.map (fun (x,_) -> f x) env.observables
 
-let print_kappa pr_alg ?pr_rule pr_pert f env =
+let print_kappa ~noCounters pr_alg ?pr_rule pr_pert f env =
   let sigs = signatures env in
   Format.fprintf
     f "@[<v>%a@,%a%t@,%a%t%a@,%t%t%a@]"
-    (Contact_map.print_kappa sigs) env.contact_map
+    (Contact_map.print_kappa ~noCounters sigs) env.contact_map
     (NamedDecls.print
        ~sep:Pp.space (fun _ n f () -> Format.fprintf f "%%token: %s" n))
     env.tokens
@@ -175,7 +176,8 @@ let print_kappa pr_alg ?pr_rule pr_pert f env =
                 (Pp.option ~with_space:false
                    (fun f (na,_) -> Format.fprintf f "'%s' " na)) na
                 (LKappa.print_rule
-                   ~full:true sigs (print_token ~env) (print_alg ~env))
+                   ~noCounters ~full:true
+                   sigs (print_token ~env) (print_alg ~env))
                 e)
            f env.ast_rules
        | Some pr_rule ->
@@ -187,8 +189,8 @@ let print_kappa pr_alg ?pr_rule pr_pert f env =
          Format.fprintf f "@[<h>/*%i*/%a@]" i (pr_pert env) p))
     env.interventions
 
-let print pr_alg pr_rule pr_pert f env =
-  let () = print_kappa pr_alg pr_pert f env in
+let print ~noCounters pr_alg pr_rule pr_pert f env =
+  let () = print_kappa ~noCounters pr_alg pr_pert f env in
   Format.fprintf
     f "@,@[<v>@[<v 2>Rules:@,%a@]@]"
     (Pp.array Pp.space

@@ -629,7 +629,7 @@ let check_orbit
           let () = Format.fprintf fmt  " rule:   " in
           let () =
             LKappa.print_rule
-              ~full:true
+              ~noCounters:true ~full:true
               sigs
               (fun _ _ -> ()) (fun _ _ -> ())
               fmt rule
@@ -648,7 +648,7 @@ let check_orbit
             let () = Format.fprintf fmt  " rule:   " in
             let () =
               LKappa.print_rule
-                ~full:true
+                ~noCounters:true ~full:true
                 sigs
                 (fun _ _ -> ()) (fun _ _ -> ())
                 fmt rule

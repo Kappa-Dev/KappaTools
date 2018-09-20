@@ -116,7 +116,7 @@ let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
 let number r pat =
   IntCollection.size (Pattern.ObsMap.get r.of_patterns pat)
 
-let print_injections ?domain f roots_of_patterns =
+let print_injections ~noCounters ?domain f roots_of_patterns =
   Format.fprintf
     f "@[<v>%a@]"
     (Pattern.ObsMap.print Pp.space
@@ -124,19 +124,19 @@ let print_injections ?domain f roots_of_patterns =
           if IntCollection.size roots > 0 then
             Format.fprintf
               f "@[# @[%a@] ==>@ @[%a@]@]"
-              (Pattern.print ?domain ~with_id:true) pattern
+              (Pattern.print ~noCounters ?domain ~with_id:true) pattern
               IntCollection.print roots
        )
     ) roots_of_patterns
 
-let print_unary_injections ?domain f roots_of_patterns =
+let print_unary_injections ~noCounters ?domain f roots_of_patterns =
   Format.fprintf
     f "@[<hov>%a@]"
     (Pattern.ObsMap.print Pp.space
        (fun pattern f root_maps ->
           Format.fprintf
             f "@[# @[%a@] ==>@ @[%a@]@]"
-            (Pattern.print ?domain ~with_id:true) pattern
+            (Pattern.print ~noCounters ?domain ~with_id:true) pattern
             (Pp.set Mods.IntMap.bindings Pp.space
                (fun f (_cc_id, roots) -> Mods.IntSet.print f roots))
             root_maps
@@ -144,8 +144,10 @@ let print_unary_injections ?domain f roots_of_patterns =
     ) roots_of_patterns
 
 let debug_print f state =
-  let () = print_injections ?domain:None f state.of_patterns in
-  print_unary_injections ?domain:None f state.of_unary_patterns
+  let noCounters = true in
+  let domain = None in
+  let () = print_injections ~noCounters ?domain f state.of_patterns in
+  print_unary_injections ~noCounters ?domain f state.of_unary_patterns
 
 (* Useful shortcuts *)
 

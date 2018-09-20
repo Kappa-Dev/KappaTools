@@ -272,7 +272,8 @@ module Cflow_handler =
         Model.fold_rules
           (fun x () r ->
              rule_name_cache.(x) <-
-               Format.asprintf "%a" (Model.print_ast_rule ~env:env)
+               Format.asprintf "%a"
+                 (Model.print_ast_rule ~noCounters:false ~env:env)
                  r.Primitives.syntactic_rule) () env in
       let n_agents = Signature.size (Model.signatures env) in
       let agent_name_cache = Array.init n_agents

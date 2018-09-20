@@ -87,7 +87,8 @@ let do_modification
   | Primitives.ITER_RULE ((v,_),r) ->
     let text =
       Format.asprintf
-        "@[<h>%a@]" (Kappa_printer.modification ~env) modification in
+        "@[<h>%a@]"
+        (Kappa_printer.modification ~noCounters:debugMode ~env) modification in
     let graph' =
       Nbr.maybe_iteri
         (fun _ g ->
@@ -139,7 +140,10 @@ let do_modification
         let domain = Model.domain env in
         Format.asprintf
           "@[<h>%a@]"
-          (Pp.array Pp.comma (fun _ -> Pattern.print ~domain ~with_id:false))
+          (Pp.array
+             Pp.comma
+             (fun _ ->
+                Pattern.print ~noCounters:debugMode ~domain ~with_id:false))
           cc in
     ((false,
       Rule_interpreter.add_tracked ~outputs cc name tests graph,

@@ -68,7 +68,7 @@ module Env : sig
 
   val to_navigation : t -> id -> Navigation.abstract Navigation.t
 
-  val print : Format.formatter -> t -> unit
+  val print : noCounters:bool -> Format.formatter -> t -> unit
 
   val to_yojson : t -> Yojson.Basic.json
 
@@ -121,14 +121,15 @@ val compare_canonicals : id -> id -> int
 val is_equal_canonicals : id -> id -> bool
 
 val print_cc :
-  ?dotnet:bool -> ?full_species:bool ->
+  noCounters:bool -> ?dotnet:bool -> ?full_species:bool ->
   ?sigs:Signature.s -> ?cc_id:id -> with_id:bool ->
   Format.formatter -> t -> unit
 
 val print_cc_as_id : Signature.s -> Format.formatter -> t -> unit
 
 val print :
-  ?domain:Env.t -> with_id:bool -> Format.formatter -> id -> unit
+  noCounters: bool -> ?domain:Env.t -> with_id:bool ->
+  Format.formatter -> id -> unit
 (** [print ~domain ?with_id:None form cc] *)
 
 val id_to_yojson : id -> Yojson.Basic.json
