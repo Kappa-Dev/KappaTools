@@ -1,11 +1,12 @@
 "cflow" : include
-<{dataStructures,term,generated,grammar,simulation,siteGraphs,Error,main,agents}/*.ml{,i}> : warn_A
+<{dataStructures,term,generated,logging,grammar,simulation,siteGraphs,Error,main,agents}/*.ml{,i}> : warn_A
 "dataStructures" : include
 "term" : include
 "grammar" : include
 "simulation" : include
 "siteGraphs" : include
 "Error" : include
+"logging" : include
 "odes" : include
 "generated" : include
 "util" : include
