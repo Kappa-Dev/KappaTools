@@ -423,16 +423,17 @@ let remove_counter_agent sigs ag lnk_nb =
 let remove_counter_created_agent sigs ag lnk_nb =
   let raw_ag = ag.ra in
   let ports = raw_ag.Raw_mixture.a_ports in
-  let () =
-    Signature.print_agent sigs (Format.str_formatter) raw_ag.Raw_mixture.a_type in
-  let agent_name = Format.flush_str_formatter () in
   Tools.array_fold_lefti
     (fun p_id (acc,lnk) -> function
        | None -> (acc,lnk)
        | Some (c,_) ->
          match c.Ast.count_test with
-         | None -> LKappa.not_enough_specified
-                     ~status:"counter" ~side:"left" agent_name c.Ast.count_nme
+         | None ->
+           let agent_name =
+             Format.asprintf "@[%a@]"
+               (Signature.print_agent sigs) raw_ag.Raw_mixture.a_type in
+           LKappa.not_enough_specified
+             ~status:"counter" ~side:"left" agent_name c.Ast.count_nme
          | Some (test,_) ->
          match test with
            | Ast.CEQ j ->
@@ -441,6 +442,9 @@ let remove_counter_created_agent sigs ag lnk_nb =
              let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
              (acc@incrs,(lnk+j+1))
            | Ast.CGTE _ | Ast.CVAR _ ->
+             let agent_name =
+               Format.asprintf "@[%a@]"
+                 (Signature.print_agent sigs) raw_ag.Raw_mixture.a_type in
              LKappa.not_enough_specified
                ~status:"counter" ~side:"left" agent_name c.Ast.count_nme)
     ([],lnk_nb) ag.ra_counters
@@ -460,26 +464,12 @@ let agent_with_counters ag sigs =
      to the increments *)
 let remove_counter_rule sigs mix created =
   let with_counters =
-    List.fold_left
-      (fun ok ag -> (agent_with_counters ag.ra sigs)||ok) false mix in
-  let with_counters =
-    List.fold_left
-      (fun ok ag -> (raw_agent_with_counters ag)||ok) with_counters created in
+    List.exists (fun ag -> agent_with_counters ag.ra sigs) mix ||
+    List.exists (fun ag -> raw_agent_with_counters ag) created in
   if with_counters then
     let lnk_nb =
       List.fold_left
-        (fun max ag ->
-          Array.fold_left
-          (fun max ((lnk,_),switch) ->
-            let max' =
-              match lnk with
-                LKappa.LNK_VALUE (i,_) -> if (max<i) then i else max
-              | LKappa.ANY_FREE | LKappa.LNK_FREE | LKappa.LNK_ANY
-              | LKappa.LNK_SOME | LKappa.LNK_TYPE _ -> max in
-            match switch with
-              | LKappa.Linked i ->  if (max'<i) then i else max'
-              | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> max')
-            max ag.ra.LKappa.ra_ports) 0 mix in
+        (fun m ag -> max m (LKappa.max_link_id [ag.ra])) 0 mix in
 
     let incrs,incrs_created,lnk_nb' =
       List.fold_left
@@ -495,9 +485,12 @@ let remove_counter_rule sigs mix created =
           (a@acc,lnk'))
         ([],lnk_nb'+1) created in
 
-    let rule_agent_mix = List.rev (List.map (fun ag -> ag.ra) mix) in
-    let raw_mix = List.rev (List.map (fun ag -> ag.ra) created) in
-    (rule_agent_mix@incrs,raw_mix@incrs_created@incrs_created')
+    let rule_agent_mix =
+      List_util.rev_map_append (fun ag -> ag.ra) mix incrs in
+    let raw_mix =
+      List_util.rev_map_append
+        (fun ag -> ag.ra) created (incrs_created@incrs_created') in
+    (rule_agent_mix,raw_mix)
   else (List.map (fun ag -> ag.ra) mix),
        (List.map (fun ag -> ag.ra) created)
 

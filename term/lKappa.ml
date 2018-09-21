@@ -660,4 +660,3 @@ let max_link_id r =
             LNK_FREE|LNK_ANY|ANY_FREE),_),s -> max_s max_id s)
       max_id ag.ra_ports in
   List.fold_left max_link_id_sites 0 r
-
