@@ -33,10 +33,10 @@ val is_step_triggerable : state -> Trace.step -> bool
 val is_step_triggerable_on_edges : Edges.t -> Trace.step -> bool
 (** same function but takes a graph of type Edges.t directly. *)
 
-val tests_pass_on : Edges.t -> 
+val tests_pass_on : Edges.t ->
   Instantiation.concrete Instantiation.test list list -> bool
 (** exported for convenience. *)
 
 val cc_of_state :
-  state -> Pattern.PreEnv.t ->
+  debugMode:bool -> state -> Pattern.PreEnv.t ->
   Pattern.PreEnv.t * ((int*int) list * Pattern.cc * Pattern.id) list
