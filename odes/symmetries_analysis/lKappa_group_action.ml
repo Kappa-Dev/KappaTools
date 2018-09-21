@@ -595,7 +595,7 @@ let saturate_domain_with_symmetric_patterns
                   (fun domain (lkappa_rule,_) ->
                      let rule_mixture = lkappa_rule.LKappa.r_mix in
                      let domain,_ =
-                       Snip.connected_components_sum_of_ambiguous_mixture
+                       Pattern_compiler.connected_components_sum_of_ambiguous_mixture
                          ~debugMode ~compileModeOn contact_map domain ?origin
                          rule_mixture
                      in

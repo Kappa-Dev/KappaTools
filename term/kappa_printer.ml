@@ -54,7 +54,7 @@ let print_expr_val alg_val f e =
 let decompiled_rule ~noCounters ~full env f r =
   let sigs = Model.signatures env in
   let (r_mix,r_created) =
-    Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
+    Pattern_compiler.lkappa_of_elementary_rule sigs (Model.domain env) r in
   let pr_alg f (a,_) = alg_expr ~noCounters ~env f a in
   let pr_tok f (va,tok) =
     Format.fprintf f "%a %a" pr_alg va (Model.print_token ~env) tok in

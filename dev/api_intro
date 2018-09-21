@@ -13,11 +13,11 @@ Including the KaSa machinery:
 
 
 In term/ directory stands all definitions the simulator works on.
-{!modules: Agent Signature Contact_map Pattern
+{!modules: Agent Signature Contact_map Pattern Pattern_compiler
 Instantiation Alg_expr Alg_expr_extra Affine_combinations Raw_mixture Patterns_extra Primitives Model Kappa_printer }
 
 In grammar/ are the parser and the compilers
-{!modules:Configuration Ast LKappa Snip Eval}
+{!modules:Configuration Ast LKappa Eval}
 
 The module to store and manipulate the state of the simulation are in
 siteGraph/

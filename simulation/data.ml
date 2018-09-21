@@ -19,7 +19,7 @@ let print_initial_inputs ?uuid conf env inputs_form init =
     (Pp.list Pp.space
        (fun f (n,r) ->
           let _,ins_fresh =
-            Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
+            Pattern_compiler.lkappa_of_elementary_rule sigs (Model.domain env) r in
           let () =
             if ins_fresh <> [] then
               let () =

@@ -16,7 +16,7 @@ let rec compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain (alg,pos) =
       | Some (origin,contact_map,domain) ->
         begin
           let domain',ccs =
-            Snip.connected_components_sum_of_ambiguous_mixture
+            Pattern_compiler.connected_components_sum_of_ambiguous_mixture
               ~debugMode ~compileModeOn contact_map domain ?origin ast
           in
           let domain' =
@@ -180,7 +180,7 @@ let rules_of_ast
       Primitives.instantiations = syntax;
     } in
   let rule_mixtures,(domain',origin') =
-    Snip.connected_components_sum_of_ambiguous_rule
+    Pattern_compiler.connected_components_sum_of_ambiguous_rule
       ~debugMode ~compileModeOn contact_map
       domain' ?origin rule.LKappa.r_mix rule.LKappa.r_created in
   let deps_algs',rules_l =
@@ -252,7 +252,7 @@ let cflows_of_label
                 "' does not refer to a non ambiguous Kappa expression"
                ,pos)) in
   let domain',ccs =
-    Snip.connected_components_sum_of_ambiguous_mixture
+    Pattern_compiler.connected_components_sum_of_ambiguous_mixture
       ~debugMode ~compileModeOn contact_map domain ~origin mix in
   (domain',
    List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
@@ -299,7 +299,7 @@ let effects_of_modif
       if on then Primitives.CFLOW (None,x,tests) :: l
       else Primitives.CFLOWOFF (None,x) :: l in
     let domain',ccs =
-      Snip.connected_components_sum_of_ambiguous_mixture
+      Pattern_compiler.connected_components_sum_of_ambiguous_mixture
         ~debugMode ~compileModeOn contact_map domain ~origin ast in
     (domain',
      List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
@@ -331,7 +331,7 @@ let effects_of_modif
       if on then Primitives.SPECIES (pexpr',x,tests) :: l
       else Primitives.SPECIES_OFF pexpr' :: l in
     let domain'',ccs =
-      Snip.connected_components_sum_of_ambiguous_mixture
+      Pattern_compiler.connected_components_sum_of_ambiguous_mixture
         ~debugMode ~compileModeOn contact_map domain' ~origin ast in
     let () =
       List.iter

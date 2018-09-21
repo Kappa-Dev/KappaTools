@@ -815,7 +815,7 @@ struct
       ~full ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) env f r =
     let sigs = Model.signatures env in
     let (r_mix,r_created) =
-      Snip.lkappa_of_elementary_rule sigs (Model.domain env) r in
+      Pattern_compiler.lkappa_of_elementary_rule sigs (Model.domain env) r in
     let pr_alg f (a,_) = alg_expr ~env ~symbol_table f a in
     let pr_tok f (va,tok) =
       Format.fprintf f "%a %a" pr_alg va (Model.print_token ~env) tok in
