@@ -596,21 +596,6 @@ let connected_components_sum_of_ambiguous_mixture
      (function _, l, event, ([],[]) -> l, event.Instantiation.tests
              | _ -> assert false) rules)
 
-let patterns_of_mixture ~debugMode contact_map sigs pre_env e =
-  let snap = Edges.build_snapshot ~debugMode sigs e in
-  let pre_env', acc =
-    List.fold_left
-      (fun (cc_cache,acc) (i,m) ->
-         match connected_components_sum_of_ambiguous_mixture
-                 ~debugMode ~compileModeOn:false contact_map
-                 cc_cache (LKappa_compiler.of_user_graph sigs m) with
-         | cc_cache',[[|_,x|],_] ->
-           cc_cache',Tools.recti (fun a _ -> x::a) acc i
-         | _ -> assert false)
-      (pre_env,[]) snap
-  in
-   (pre_env', acc)
-
 let aux_lkappa_of_pattern free_id p =
   Pattern.fold_by_type
     (fun ~pos ~agent_type intf (acc,lnk_pack) ->

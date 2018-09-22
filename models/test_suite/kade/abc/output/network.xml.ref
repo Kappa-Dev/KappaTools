@@ -36,8 +36,8 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </listOfCompartments>
 <listOfSpecies>
 <species metaid="CMD11" id="s1" name="C(x1{u}[.],x2{u}[.])" compartment="default" initialAmount="10000" substanceUnits="substance"/>
-<species metaid="CMD12" id="s2" name="B(x[.])" compartment="default" initialAmount="1000" substanceUnits="substance"/>
-<species metaid="CMD13" id="s3" name="A(x[.],c[.])" compartment="default" initialAmount="1000" substanceUnits="substance"/>
+<species metaid="CMD12" id="s2" name="A(x[.],c[.])" compartment="default" initialAmount="1000" substanceUnits="substance"/>
+<species metaid="CMD13" id="s3" name="B(x[.])" compartment="default" initialAmount="1000" substanceUnits="substance"/>
 <species metaid="CMD14" id="s4" name="A(x[1],c[.]), B(x[1])" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD15" id="s5" name="A(x[1],c[2]), B(x[1]), C(x1{u}[2],x2{u}[.])" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD16" id="s6" name="C(x1{p}[.],x2{u}[.])" compartment="default" initialAmount="0" substanceUnits="substance"/>
@@ -58,13 +58,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : a.b_op -->
-<!-- reaction: A(x[1],c[2]).B(x[1]).C(x1{p}[.],x2{u}[2]) -> A(x[.],c[1]).C(x1{p}[.],x2{u}[1]) + B(x[.]) -->
+<!-- reaction: A(x[1],c[2]).B(x[1]).C(x1{p}[.],x2{u}[2]) -> B(x[.]) + A(x[.],c[1]).C(x1{p}[.],x2{u}[1]) -->
 <reaction id="re1" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD21" species="s10"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD22" species="s2"/>
+<speciesReference metaid="CMD22" species="s3"/>
 <speciesReference metaid="CMD23" species="s8"/>
 </listOfProducts>
 <kineticLaw>
@@ -75,10 +75,10 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : a.b -->
-<!-- reaction: A(x[.],c[1]).C(x1{p}[.],x2{u}[1]) + B(x[.]) -> A(x[1],c[2]).B(x[1]).C(x1{p}[.],x2{u}[2]) -->
+<!-- reaction: B(x[.]) + A(x[.],c[1]).C(x1{p}[.],x2{u}[1]) -> A(x[1],c[2]).B(x[1]).C(x1{p}[.],x2{u}[2]) -->
 <reaction id="re2" name="a.b" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD24" species="s2"/>
+<speciesReference metaid="CMD24" species="s3"/>
 <speciesReference metaid="CMD25" species="s8"/>
 </listOfReactants>
 <listOfProducts>
@@ -88,19 +88,19 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> on_rate </ci><apply>
-<times/><ci> s2 </ci><ci> s8 </ci></apply>
+<times/><ci> s8 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : mod x2 -->
-<!-- reaction: A(x[.],c[1]).C(x1{p}[.],x2{u}[1]) -> C(x1{p}[.],x2{p}[.]) + A(x[.],c[.]) -->
+<!-- reaction: A(x[.],c[1]).C(x1{p}[.],x2{u}[1]) -> A(x[.],c[.]) + C(x1{p}[.],x2{p}[.]) -->
 <reaction id="re3" name="mod x2" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD27" species="s8"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD28" species="s3"/>
+<speciesReference metaid="CMD28" species="s2"/>
 <speciesReference metaid="CMD29" species="s9"/>
 </listOfProducts>
 <kineticLaw>
@@ -111,10 +111,10 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : a.c -->
-<!-- reaction: C(x1{p}[.],x2{u}[.]) + A(x[.],c[.]) -> A(x[.],c[1]).C(x1{p}[.],x2{u}[1]) -->
+<!-- reaction: A(x[.],c[.]) + C(x1{p}[.],x2{u}[.]) -> A(x[.],c[1]).C(x1{p}[.],x2{u}[1]) -->
 <reaction id="re4" name="a.c" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD30" species="s3"/>
+<speciesReference metaid="CMD30" species="s2"/>
 <speciesReference metaid="CMD31" species="s6"/>
 </listOfReactants>
 <listOfProducts>
@@ -124,16 +124,16 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> on_rate </ci><apply>
-<times/><ci> s3 </ci><ci> s6 </ci></apply>
+<times/><ci> s6 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : a.b -->
-<!-- reaction: A(x[.],c[1]).C(x1{u}[1],x2{u}[.]) + B(x[.]) -> A(x[1],c[2]).B(x[1]).C(x1{u}[2],x2{u}[.]) -->
+<!-- reaction: B(x[.]) + A(x[.],c[1]).C(x1{u}[1],x2{u}[.]) -> A(x[1],c[2]).B(x[1]).C(x1{u}[2],x2{u}[.]) -->
 <reaction id="re5" name="a.b" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD33" species="s2"/>
+<speciesReference metaid="CMD33" species="s3"/>
 <speciesReference metaid="CMD34" species="s7"/>
 </listOfReactants>
 <listOfProducts>
@@ -143,19 +143,19 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> on_rate </ci><apply>
-<times/><ci> s2 </ci><ci> s7 </ci></apply>
+<times/><ci> s7 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : mod x1 -->
-<!-- reaction: A(x[.],c[1]).C(x1{u}[1],x2{u}[.]) -> C(x1{p}[.],x2{u}[.]) + A(x[.],c[.]) -->
+<!-- reaction: A(x[.],c[1]).C(x1{u}[1],x2{u}[.]) -> A(x[.],c[.]) + C(x1{p}[.],x2{u}[.]) -->
 <reaction id="re6" name="mod x1" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD36" species="s7"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD37" species="s3"/>
+<speciesReference metaid="CMD37" species="s2"/>
 <speciesReference metaid="CMD38" species="s6"/>
 </listOfProducts>
 <kineticLaw>
@@ -166,13 +166,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : a.b_op -->
-<!-- reaction: A(x[1],c[2]).B(x[1]).C(x1{u}[2],x2{u}[.]) -> A(x[.],c[1]).C(x1{u}[1],x2{u}[.]) + B(x[.]) -->
+<!-- reaction: A(x[1],c[2]).B(x[1]).C(x1{u}[2],x2{u}[.]) -> B(x[.]) + A(x[.],c[1]).C(x1{u}[1],x2{u}[.]) -->
 <reaction id="re7" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD39" species="s5"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD40" species="s2"/>
+<speciesReference metaid="CMD40" species="s3"/>
 <speciesReference metaid="CMD41" species="s7"/>
 </listOfProducts>
 <kineticLaw>
@@ -183,7 +183,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : mod x1 -->
-<!-- reaction: A(x[1],c[2]).B(x[1]).C(x1{u}[2],x2{u}[.]) -> C(x1{p}[.],x2{u}[.]) + A(x[1],c[.]).B(x[1]) -->
+<!-- reaction: A(x[1],c[2]).B(x[1]).C(x1{u}[2],x2{u}[.]) -> A(x[1],c[.]).B(x[1]) + C(x1{p}[.],x2{u}[.]) -->
 <reaction id="re8" name="mod x1" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD42" species="s5"/>
@@ -200,7 +200,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : ab.c -->
-<!-- reaction: C(x1{u}[.],x2{u}[.]) + A(x[1],c[.]).B(x[1]) -> A(x[1],c[2]).B(x[1]).C(x1{u}[2],x2{u}[.]) -->
+<!-- reaction: A(x[1],c[.]).B(x[1]) + C(x1{u}[.],x2{u}[.]) -> A(x[1],c[2]).B(x[1]).C(x1{u}[2],x2{u}[.]) -->
 <reaction id="re9" name="ab.c" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD45" species="s1"/>
@@ -213,13 +213,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> on_rate </ci><apply>
-<times/><ci> s4 </ci><ci> s1 </ci></apply>
+<times/><ci> s1 </ci><ci> s4 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : a.b_op -->
-<!-- reaction: A(x[1],c[.]).B(x[1]) -> B(x[.]) + A(x[.],c[.]) -->
+<!-- reaction: A(x[1],c[.]).B(x[1]) -> A(x[.],c[.]) + B(x[.]) -->
 <reaction id="re10" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD48" species="s4"/>
@@ -236,7 +236,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : a.b -->
-<!-- reaction: B(x[.]) + A(x[.],c[.]) -> A(x[1],c[.]).B(x[1]) -->
+<!-- reaction: A(x[.],c[.]) + B(x[.]) -> A(x[1],c[.]).B(x[1]) -->
 <reaction id="re11" name="a.b" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD51" species="s2"/>

@@ -71,7 +71,7 @@ no correcion is applied on reaction rates
 </kineticLaw>
 </reaction>
 <!-- rule    : A(), A(), A(), B(), B(), ., . -> A(), A(), ., ., ., B(), B() -->
-<!-- reaction: B() + B() + A() + A() + A() -> B() + B() + A() + A() -->
+<!-- reaction: A() + A() + A() + B() + B() -> A() + A() + B() + B() -->
 <reaction id="re2" name="A(), A(), A(), B(), B(), ., . -> A(), A(), ., ., ., B(), B()" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD13" species="s1" stoichiometry="2"/>
@@ -88,10 +88,10 @@ no correcion is applied on reaction rates
 <divide/><ci> k2 </ci><cn type="integer"> 12 </cn>
 </apply>
 <apply>
+<times/><ci> s1 </ci><apply>
+<times/><ci> s1 </ci><apply>
 <times/><ci> s2 </ci><apply>
-<times/><ci> s2 </ci><apply>
-<times/><ci> s2 </ci><apply>
-<times/><ci> s1 </ci><ci> s1 </ci></apply>
+<times/><ci> s2 </ci><ci> s2 </ci></apply>
 </apply>
 </apply>
 </apply>

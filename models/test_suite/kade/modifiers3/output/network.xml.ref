@@ -66,7 +66,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: U(x[.],y{p}[.]) + T(x[.]) -> U(x[1],y{p}[.]).T(x[1]) -->
+<!-- reaction: T(x[.]) + U(x[.],y{p}[.]) -> U(x[1],y{p}[.]).T(x[1]) -->
 <reaction id="re2" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD15" species="s2"/>
@@ -84,7 +84,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s1</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s3</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply></apply><apply>
-<times/><ci> s2 </ci><ci> s3 </ci></apply>
+<times/><ci> s3 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -106,7 +106,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: U(x[1],y{p}[.]).T(x[1]) -> U(x[.],y{p}[.]) + T(x[.]) -->
+<!-- reaction: U(x[1],y{p}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{p}[.]) -->
 <reaction id="re4" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD23" species="s5"/>
@@ -143,7 +143,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[.],y{u}[.]) + T(x[.]) -->
+<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{u}[.]) -->
 <reaction id="re6" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD30" species="s4"/>
@@ -196,7 +196,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: U(x[.],y{u}[.]) + T(x[.]) -> U(x[1],y{u}[.]).T(x[1]) -->
+<!-- reaction: T(x[.]) + U(x[.],y{u}[.]) -> U(x[1],y{u}[.]).T(x[1]) -->
 <reaction id="re9" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD39" species="s1"/>
@@ -214,7 +214,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s1</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s3</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply></apply><apply>
-<times/><ci> s2 </ci><ci> s1 </ci></apply>
+<times/><ci> s1 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>

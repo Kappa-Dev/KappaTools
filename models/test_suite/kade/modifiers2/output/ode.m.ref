@@ -210,18 +210,18 @@ k(2)=var(5);
 dydt=zeros(nodevar,1);
 
 % rule    : unbind
-% reaction: U(x[1]).T(x[1]) -> U(x[.]) + T(x[.])
+% reaction: U(x[1]).T(x[1]) -> T(x[.]) + U(x[.])
 
 dydt(3)=dydt(3)-k(2)*y(3);
-dydt(2)=dydt(2)+k(2)*y(3);
 dydt(1)=dydt(1)+k(2)*y(3);
+dydt(2)=dydt(2)+k(2)*y(3);
 
 % rule    : bind
-% reaction: U(x[.]) + T(x[.]) -> U(x[1]).T(x[1])
+% reaction: T(x[.]) + U(x[.]) -> U(x[1]).T(x[1])
 
-dydt(2)=dydt(2)-k(1)*y(2)*y(1);
-dydt(1)=dydt(1)-k(1)*y(2)*y(1);
-dydt(3)=dydt(3)+k(1)*y(2)*y(1);
+dydt(1)=dydt(1)-k(1)*y(1)*y(2);
+dydt(2)=dydt(2)-k(1)*y(1)*y(2);
+dydt(3)=dydt(3)+k(1)*y(1)*y(2);
 dydt(4)=1;
 
 end
@@ -267,33 +267,33 @@ jack(2,3)=jacvar(5,3);
 jac=sparse(nodevar,nodevar);
 
 % rule    : unbind
-% reaction: U(x[1]).T(x[1]) -> U(x[.]) + T(x[.])
+% reaction: U(x[1]).T(x[1]) -> T(x[.]) + U(x[.])
 
 jac(3,2)=jac(3,2)-jack(2,2)*y(3);
 jac(3,3)=jac(3,3)-jack(2,3)*y(3);
 jac(3,3)=jac(3,3)-k(2);
-jac(2,2)=jac(2,2)+jack(2,2)*y(3);
-jac(2,3)=jac(2,3)+jack(2,3)*y(3);
-jac(2,3)=jac(2,3)+k(2);
 jac(1,2)=jac(1,2)+jack(2,2)*y(3);
 jac(1,3)=jac(1,3)+jack(2,3)*y(3);
 jac(1,3)=jac(1,3)+k(2);
+jac(2,2)=jac(2,2)+jack(2,2)*y(3);
+jac(2,3)=jac(2,3)+jack(2,3)*y(3);
+jac(2,3)=jac(2,3)+k(2);
 
 % rule    : bind
-% reaction: U(x[.]) + T(x[.]) -> U(x[1]).T(x[1])
+% reaction: T(x[.]) + U(x[.]) -> U(x[1]).T(x[1])
 
-jac(2,1)=jac(2,1)-jack(1,1)*y(2)*y(1);
-jac(2,3)=jac(2,3)-jack(1,3)*y(2)*y(1);
-jac(2,2)=jac(2,2)-k(1)*y(1);
-jac(2,1)=jac(2,1)-k(1)*y(2);
-jac(1,1)=jac(1,1)-jack(1,1)*y(2)*y(1);
-jac(1,3)=jac(1,3)-jack(1,3)*y(2)*y(1);
-jac(1,2)=jac(1,2)-k(1)*y(1);
+jac(1,1)=jac(1,1)-jack(1,1)*y(1)*y(2);
+jac(1,3)=jac(1,3)-jack(1,3)*y(1)*y(2);
 jac(1,1)=jac(1,1)-k(1)*y(2);
-jac(3,1)=jac(3,1)+jack(1,1)*y(2)*y(1);
-jac(3,3)=jac(3,3)+jack(1,3)*y(2)*y(1);
-jac(3,2)=jac(3,2)+k(1)*y(1);
+jac(1,2)=jac(1,2)-k(1)*y(1);
+jac(2,1)=jac(2,1)-jack(1,1)*y(1)*y(2);
+jac(2,3)=jac(2,3)-jack(1,3)*y(1)*y(2);
+jac(2,1)=jac(2,1)-k(1)*y(2);
+jac(2,2)=jac(2,2)-k(1)*y(1);
+jac(3,1)=jac(3,1)+jack(1,1)*y(1)*y(2);
+jac(3,3)=jac(3,3)+jack(1,3)*y(1)*y(2);
 jac(3,1)=jac(3,1)+k(1)*y(2);
+jac(3,2)=jac(3,2)+k(1)*y(1);
 end
 
 

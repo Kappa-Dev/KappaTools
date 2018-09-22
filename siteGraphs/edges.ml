@@ -521,12 +521,12 @@ let species ~debugMode sigs root graph =
   let () = Cache.reset (fst graph.caches) in
   specie
 
-let build_snapshot ~debugMode sigs graph =
+let build_snapshot sigs graph =
   let () = assert (not graph.outdated) in
   let rec aux ccs node =
     if node = Mods.DynArray.length graph.sort then
       let () = Cache.reset (fst graph.caches) in
-      Snapshot.export ~debugMode sigs ccs
+      ccs
     else
     if Cache.test (fst graph.caches) node
     then aux ccs (succ node)
@@ -537,6 +537,9 @@ let build_snapshot ~debugMode sigs graph =
           one_connected_component sigs ty node graph in
         aux (Snapshot.increment_in_snapshot sigs out ccs) (succ node) in
   aux Snapshot.empty 0
+
+let build_user_snapshot ~debugMode sigs graph =
+  Snapshot.export ~debugMode sigs (build_snapshot sigs graph)
 
 let debug_print f graph =
   let print_sites ag =

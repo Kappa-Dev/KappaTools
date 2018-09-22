@@ -24,10 +24,6 @@ val connected_components_sum_of_ambiguous_rule :
           Instantiation.abstract Primitives.Transformation.t list))
     list *   (Pattern.PreEnv.t * Operator.rev_dep option)
 
-val patterns_of_mixture :
-  debugMode:bool -> Contact_map.t -> Signature.s ->
-  Pattern.PreEnv.t -> Edges.t -> Pattern.PreEnv.t * Pattern.cc list
-
 val lkappa_of_elementary_rule :
   Signature.s -> Pattern.Env.t -> Primitives.elementary_rule ->
   LKappa.rule_mixture * Raw_mixture.t

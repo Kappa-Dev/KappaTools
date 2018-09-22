@@ -220,11 +220,11 @@ dydt(3)=dydt(3)-k(1)*y(3);
 dydt(2)=dydt(2)+k(1)*y(3);
 
 % rule    : bind
-% reaction: U(x[.],y{p}[.]) + T(x[.]) -> U(x[1],y{p}[.]).T(x[1])
+% reaction: T(x[.]) + U(x[.],y{p}[.]) -> U(x[1],y{p}[.]).T(x[1])
 
-dydt(2)=dydt(2)-k(3)*y(2)*y(3);
-dydt(3)=dydt(3)-k(3)*y(2)*y(3);
-dydt(5)=dydt(5)+k(3)*y(2)*y(3);
+dydt(3)=dydt(3)-k(3)*y(3)*y(2);
+dydt(2)=dydt(2)-k(3)*y(3)*y(2);
+dydt(5)=dydt(5)+k(3)*y(3)*y(2);
 
 % rule    : essai
 % reaction: U(x[1],y{p}[.]).T(x[1]) -> T(x[.]) + T(x[.])
@@ -234,11 +234,11 @@ dydt(2)=dydt(2)+k(1)*y(5);
 dydt(2)=dydt(2)+k(1)*y(5);
 
 % rule    : unbind
-% reaction: U(x[1],y{p}[.]).T(x[1]) -> U(x[.],y{p}[.]) + T(x[.])
+% reaction: U(x[1],y{p}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{p}[.])
 
 dydt(5)=dydt(5)-k(4)*y(5);
-dydt(2)=dydt(2)+k(4)*y(5);
 dydt(3)=dydt(3)+k(4)*y(5);
+dydt(2)=dydt(2)+k(4)*y(5);
 
 % rule    : essai
 % reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + T(x[.])
@@ -248,11 +248,11 @@ dydt(2)=dydt(2)+k(1)*y(4);
 dydt(2)=dydt(2)+k(1)*y(4);
 
 % rule    : unbind
-% reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[.],y{u}[.]) + T(x[.])
+% reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{u}[.])
 
 dydt(4)=dydt(4)-k(4)*y(4);
-dydt(2)=dydt(2)+k(4)*y(4);
 dydt(1)=dydt(1)+k(4)*y(4);
+dydt(2)=dydt(2)+k(4)*y(4);
 
 % rule    : essai2
 % reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1])
@@ -267,11 +267,11 @@ dydt(1)=dydt(1)-k(1)*y(1);
 dydt(2)=dydt(2)+k(1)*y(1);
 
 % rule    : bind
-% reaction: U(x[.],y{u}[.]) + T(x[.]) -> U(x[1],y{u}[.]).T(x[1])
+% reaction: T(x[.]) + U(x[.],y{u}[.]) -> U(x[1],y{u}[.]).T(x[1])
 
-dydt(2)=dydt(2)-k(3)*y(2)*y(1);
-dydt(1)=dydt(1)-k(3)*y(2)*y(1);
-dydt(4)=dydt(4)+k(3)*y(2)*y(1);
+dydt(1)=dydt(1)-k(3)*y(1)*y(2);
+dydt(2)=dydt(2)-k(3)*y(1)*y(2);
+dydt(4)=dydt(4)+k(3)*y(1)*y(2);
 
 % rule    : essai2
 % reaction: U(x[.],y{u}[.]) -> U(x[.],y{p}[.])
@@ -337,26 +337,26 @@ jac(3,3)=jac(3,3)-k(1);
 jac(2,3)=jac(2,3)+k(1);
 
 % rule    : bind
-% reaction: U(x[.],y{p}[.]) + T(x[.]) -> U(x[1],y{p}[.]).T(x[1])
+% reaction: T(x[.]) + U(x[.],y{p}[.]) -> U(x[1],y{p}[.]).T(x[1])
 
-jac(2,1)=jac(2,1)-jack(3,1)*y(2)*y(3);
-jac(2,3)=jac(2,3)-jack(3,3)*y(2)*y(3);
-jac(2,4)=jac(2,4)-jack(3,4)*y(2)*y(3);
-jac(2,5)=jac(2,5)-jack(3,5)*y(2)*y(3);
-jac(2,2)=jac(2,2)-k(3)*y(3);
-jac(2,3)=jac(2,3)-k(3)*y(2);
-jac(3,1)=jac(3,1)-jack(3,1)*y(2)*y(3);
-jac(3,3)=jac(3,3)-jack(3,3)*y(2)*y(3);
-jac(3,4)=jac(3,4)-jack(3,4)*y(2)*y(3);
-jac(3,5)=jac(3,5)-jack(3,5)*y(2)*y(3);
-jac(3,2)=jac(3,2)-k(3)*y(3);
+jac(3,1)=jac(3,1)-jack(3,1)*y(3)*y(2);
+jac(3,3)=jac(3,3)-jack(3,3)*y(3)*y(2);
+jac(3,4)=jac(3,4)-jack(3,4)*y(3)*y(2);
+jac(3,5)=jac(3,5)-jack(3,5)*y(3)*y(2);
 jac(3,3)=jac(3,3)-k(3)*y(2);
-jac(5,1)=jac(5,1)+jack(3,1)*y(2)*y(3);
-jac(5,3)=jac(5,3)+jack(3,3)*y(2)*y(3);
-jac(5,4)=jac(5,4)+jack(3,4)*y(2)*y(3);
-jac(5,5)=jac(5,5)+jack(3,5)*y(2)*y(3);
-jac(5,2)=jac(5,2)+k(3)*y(3);
+jac(3,2)=jac(3,2)-k(3)*y(3);
+jac(2,1)=jac(2,1)-jack(3,1)*y(3)*y(2);
+jac(2,3)=jac(2,3)-jack(3,3)*y(3)*y(2);
+jac(2,4)=jac(2,4)-jack(3,4)*y(3)*y(2);
+jac(2,5)=jac(2,5)-jack(3,5)*y(3)*y(2);
+jac(2,3)=jac(2,3)-k(3)*y(2);
+jac(2,2)=jac(2,2)-k(3)*y(3);
+jac(5,1)=jac(5,1)+jack(3,1)*y(3)*y(2);
+jac(5,3)=jac(5,3)+jack(3,3)*y(3)*y(2);
+jac(5,4)=jac(5,4)+jack(3,4)*y(3)*y(2);
+jac(5,5)=jac(5,5)+jack(3,5)*y(3)*y(2);
 jac(5,3)=jac(5,3)+k(3)*y(2);
+jac(5,2)=jac(5,2)+k(3)*y(3);
 
 % rule    : essai
 % reaction: U(x[1],y{p}[.]).T(x[1]) -> T(x[.]) + T(x[.])
@@ -366,20 +366,20 @@ jac(2,5)=jac(2,5)+k(1);
 jac(2,5)=jac(2,5)+k(1);
 
 % rule    : unbind
-% reaction: U(x[1],y{p}[.]).T(x[1]) -> U(x[.],y{p}[.]) + T(x[.])
+% reaction: U(x[1],y{p}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{p}[.])
 
 jac(5,2)=jac(5,2)-jack(4,2)*y(5);
 jac(5,4)=jac(5,4)-jack(4,4)*y(5);
 jac(5,5)=jac(5,5)-jack(4,5)*y(5);
 jac(5,5)=jac(5,5)-k(4);
-jac(2,2)=jac(2,2)+jack(4,2)*y(5);
-jac(2,4)=jac(2,4)+jack(4,4)*y(5);
-jac(2,5)=jac(2,5)+jack(4,5)*y(5);
-jac(2,5)=jac(2,5)+k(4);
 jac(3,2)=jac(3,2)+jack(4,2)*y(5);
 jac(3,4)=jac(3,4)+jack(4,4)*y(5);
 jac(3,5)=jac(3,5)+jack(4,5)*y(5);
 jac(3,5)=jac(3,5)+k(4);
+jac(2,2)=jac(2,2)+jack(4,2)*y(5);
+jac(2,4)=jac(2,4)+jack(4,4)*y(5);
+jac(2,5)=jac(2,5)+jack(4,5)*y(5);
+jac(2,5)=jac(2,5)+k(4);
 
 % rule    : essai
 % reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + T(x[.])
@@ -389,20 +389,20 @@ jac(2,4)=jac(2,4)+k(1);
 jac(2,4)=jac(2,4)+k(1);
 
 % rule    : unbind
-% reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[.],y{u}[.]) + T(x[.])
+% reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{u}[.])
 
 jac(4,2)=jac(4,2)-jack(4,2)*y(4);
 jac(4,4)=jac(4,4)-jack(4,4)*y(4);
 jac(4,5)=jac(4,5)-jack(4,5)*y(4);
 jac(4,4)=jac(4,4)-k(4);
-jac(2,2)=jac(2,2)+jack(4,2)*y(4);
-jac(2,4)=jac(2,4)+jack(4,4)*y(4);
-jac(2,5)=jac(2,5)+jack(4,5)*y(4);
-jac(2,4)=jac(2,4)+k(4);
 jac(1,2)=jac(1,2)+jack(4,2)*y(4);
 jac(1,4)=jac(1,4)+jack(4,4)*y(4);
 jac(1,5)=jac(1,5)+jack(4,5)*y(4);
 jac(1,4)=jac(1,4)+k(4);
+jac(2,2)=jac(2,2)+jack(4,2)*y(4);
+jac(2,4)=jac(2,4)+jack(4,4)*y(4);
+jac(2,5)=jac(2,5)+jack(4,5)*y(4);
+jac(2,4)=jac(2,4)+k(4);
 
 % rule    : essai2
 % reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1])
@@ -417,26 +417,26 @@ jac(1,1)=jac(1,1)-k(1);
 jac(2,1)=jac(2,1)+k(1);
 
 % rule    : bind
-% reaction: U(x[.],y{u}[.]) + T(x[.]) -> U(x[1],y{u}[.]).T(x[1])
+% reaction: T(x[.]) + U(x[.],y{u}[.]) -> U(x[1],y{u}[.]).T(x[1])
 
-jac(2,1)=jac(2,1)-jack(3,1)*y(2)*y(1);
-jac(2,3)=jac(2,3)-jack(3,3)*y(2)*y(1);
-jac(2,4)=jac(2,4)-jack(3,4)*y(2)*y(1);
-jac(2,5)=jac(2,5)-jack(3,5)*y(2)*y(1);
-jac(2,2)=jac(2,2)-k(3)*y(1);
-jac(2,1)=jac(2,1)-k(3)*y(2);
-jac(1,1)=jac(1,1)-jack(3,1)*y(2)*y(1);
-jac(1,3)=jac(1,3)-jack(3,3)*y(2)*y(1);
-jac(1,4)=jac(1,4)-jack(3,4)*y(2)*y(1);
-jac(1,5)=jac(1,5)-jack(3,5)*y(2)*y(1);
-jac(1,2)=jac(1,2)-k(3)*y(1);
+jac(1,1)=jac(1,1)-jack(3,1)*y(1)*y(2);
+jac(1,3)=jac(1,3)-jack(3,3)*y(1)*y(2);
+jac(1,4)=jac(1,4)-jack(3,4)*y(1)*y(2);
+jac(1,5)=jac(1,5)-jack(3,5)*y(1)*y(2);
 jac(1,1)=jac(1,1)-k(3)*y(2);
-jac(4,1)=jac(4,1)+jack(3,1)*y(2)*y(1);
-jac(4,3)=jac(4,3)+jack(3,3)*y(2)*y(1);
-jac(4,4)=jac(4,4)+jack(3,4)*y(2)*y(1);
-jac(4,5)=jac(4,5)+jack(3,5)*y(2)*y(1);
-jac(4,2)=jac(4,2)+k(3)*y(1);
+jac(1,2)=jac(1,2)-k(3)*y(1);
+jac(2,1)=jac(2,1)-jack(3,1)*y(1)*y(2);
+jac(2,3)=jac(2,3)-jack(3,3)*y(1)*y(2);
+jac(2,4)=jac(2,4)-jack(3,4)*y(1)*y(2);
+jac(2,5)=jac(2,5)-jack(3,5)*y(1)*y(2);
+jac(2,1)=jac(2,1)-k(3)*y(2);
+jac(2,2)=jac(2,2)-k(3)*y(1);
+jac(4,1)=jac(4,1)+jack(3,1)*y(1)*y(2);
+jac(4,3)=jac(4,3)+jack(3,3)*y(1)*y(2);
+jac(4,4)=jac(4,4)+jack(3,4)*y(1)*y(2);
+jac(4,5)=jac(4,5)+jack(3,5)*y(1)*y(2);
 jac(4,1)=jac(4,1)+k(3)*y(2);
+jac(4,2)=jac(4,2)+k(3)*y(1);
 
 % rule    : essai2
 % reaction: U(x[.],y{u}[.]) -> U(x[.],y{p}[.])

@@ -60,7 +60,7 @@ begin reactions
 # E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
 2 1,1 16 k8
 # rule    : R() -> 
-# E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r) + E(r)
+# E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~u!1,r)
 3 1,1 2,5 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3)
@@ -69,7 +69,7 @@ begin reactions
 # E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
 5 1,1 7 k2
 # rule    : R() -> 
-# E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r) + E(r)
+# E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~u!1,r)
 6 1,1 2,5 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3)
@@ -84,7 +84,7 @@ begin reactions
 # E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2)
 10 7 11 k8
 # rule    : R() -> 
-# E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r) + E(r)
+# E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~u!1,r)
 11 7 2,5 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3)
@@ -93,7 +93,7 @@ begin reactions
 # E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3)
 13 7 1,1 k7
 # rule    : R() -> 
-# E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p!1,r) + E(r)
+# E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~p!1,r)
 14 7 2,6 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
@@ -105,7 +105,7 @@ begin reactions
 # E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> R(e~u,r!1).R(e~p,r!1)
 17 11 14 k8
 # rule    : R() -> 
-# E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> R(e~u,r) + E(r)
+# E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r) + R(e~u,r)
 18 11 2,3 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
@@ -120,13 +120,13 @@ begin reactions
 # E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2)
 22 11 11 k6
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# E(r!1).R(e~u,r!2).R(e~p!1,r!2) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
+# E(r) + E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
 23 2,11 7 k1
 # rule    : E() -> 
 # E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> R(e~u,r!1).R(e~p,r!1)
 24 12 14 k8
 # rule    : R() -> 
-# E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> R(e~p,r) + E(r)
+# E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r) + R(e~p,r)
 25 12 2,9 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2)
@@ -144,7 +144,7 @@ begin reactions
 # E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
 30 12 16 k7
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# E(r!1).R(e~p,r!2).R(e~u!1,r!2) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
+# E(r) + E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
 31 2,12 7 k1
 # rule    : E() -> 
 # E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> R(e~u,r!1).R(e~u,r!1)
@@ -156,10 +156,10 @@ begin reactions
 # E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
 34 16 16 k6
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# E(r!1).R(e~u!1,r!2).R(e~u,r!2) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3)
+# E(r) + E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3)
 35 2,16 1,1 k1
 # rule    : R() -> 
-# E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> R(e~u,r) + E(r)
+# E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r) + R(e~u,r)
 36 16 2,3 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
@@ -174,7 +174,7 @@ begin reactions
 # R(e~u,r!1).R(e~u,r!1) -> R(e~u,r!1).R(e~u,r!1)
 40 15,15 15,15 k6
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# R(e~u,r!1).R(e~u,r!1) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
+# E(r) + R(e~u,r!1).R(e~u,r!1) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
 41 2,15,15 16 k1
 # rule    : R() -> 
 # R(e~u,r!1).R(e~u,r!1) -> R(e~u,r)
@@ -183,7 +183,7 @@ begin reactions
 # R(e~u,r!1).R(e~u,r!1) -> R(e~u,r!1).R(e~u,r!1)
 43 15,15 15,15 k6
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# R(e~u,r!1).R(e~u,r!1) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
+# E(r) + R(e~u,r!1).R(e~u,r!1) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2)
 44 2,15,15 16 k1
 # rule    : R() -> 
 # R(e~u,r!1).R(e~p,r!1) -> R(e~u,r)
@@ -195,7 +195,7 @@ begin reactions
 # R(e~u,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~u,r!1)
 47 14 15,15 k7
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# R(e~u,r!1).R(e~p,r!1) + E(r) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2)
+# E(r) + R(e~u,r!1).R(e~p,r!1) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2)
 48 2,14 11 k1
 # rule    : R() -> 
 # R(e~u,r!1).R(e~p,r!1) -> R(e~p,r)
@@ -204,7 +204,7 @@ begin reactions
 # R(e~u,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~p,r!1)
 50 14 14 k6
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# R(e~u,r!1).R(e~p,r!1) + E(r) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2)
+# E(r) + R(e~u,r!1).R(e~p,r!1) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2)
 51 2,14 12 k1
 # rule    : R() -> 
 # R(e~p,r!1).R(e~p,r!1) -> R(e~p,r)
@@ -216,7 +216,7 @@ begin reactions
 # R(e~p,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~p,r!1)
 54 13,13 14 k7
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# R(e~p,r!1).R(e~p,r!1) + E(r) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2)
+# E(r) + R(e~p,r!1).R(e~p,r!1) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2)
 55 2,13,13 10 k1
 # rule    : R() -> 
 # R(e~p,r!1).R(e~p,r!1) -> R(e~p,r)
@@ -228,13 +228,13 @@ begin reactions
 # R(e~p,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~p,r!1)
 58 13,13 14 k7
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# R(e~p,r!1).R(e~p,r!1) + E(r) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2)
+# E(r) + R(e~p,r!1).R(e~p,r!1) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2)
 59 2,13,13 10 k1
 # rule    : E() -> 
 # E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> R(e~p,r!1).R(e~p,r!1)
 60 10 13,13 k8
 # rule    : R() -> 
-# E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> R(e~p,r) + E(r)
+# E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r) + R(e~p,r)
 61 10 2,9 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2)
@@ -252,7 +252,7 @@ begin reactions
 # E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2)
 66 10 11 k7
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# E(r!1).R(e~p,r!2).R(e~p!1,r!2) + E(r) -> E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3)
+# E(r) + E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3)
 67 2,10 8,8 k1
 # rule    : E() -> 
 # E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2)
@@ -261,7 +261,7 @@ begin reactions
 # E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2)
 69 8,8 10 k8
 # rule    : R() -> 
-# E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p!1,r) + E(r)
+# E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~p!1,r)
 70 8,8 2,6 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
@@ -270,7 +270,7 @@ begin reactions
 # E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
 72 8,8 7 k7
 # rule    : R() -> 
-# E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p!1,r) + E(r)
+# E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~p!1,r)
 73 8,8 2,6 k9
 # rule    : R() -> R(e~u?)
 # E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
@@ -288,7 +288,7 @@ begin reactions
 # R(e~p,r) -> R(e~u,r)
 78 9 3 k7
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# R(e~p,r) + E(r) -> E(r!1).R(e~p!1,r)
+# E(r) + R(e~p,r) -> E(r!1).R(e~p!1,r)
 79 2,9 6 k1
 # rule    : E() -> 
 # E(r!1).R(e~p!1,r) -> R(e~p,r)
@@ -307,10 +307,10 @@ begin reactions
 84 6,6 8,8 2*k5
 
 # rule    : R(e!_,r), R(e!r.E,r) -> R(e!_,r!1), R(e!r.E,r!1)
-# E(r!1).R(e~p!1,r) + E(r!1).R(e~u!1,r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
+# E(r!1).R(e~u!1,r) + E(r!1).R(e~p!1,r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
 85 5,6 7 k5
 # rule    : R(e!_,r), R(e!r.E,r) -> R(e!_,r!1), R(e!r.E,r!1)
-# E(r!1).R(e~u!1,r) + E(r!1).R(e~p!1,r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
+# E(r!1).R(e~p!1,r) + E(r!1).R(e~u!1,r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3)
 86 5,6 7 k5
 # rule    : E() -> 
 # E(r!1).R(e~u!1,r) -> R(e~u,r)
@@ -332,7 +332,7 @@ begin reactions
 # E(r) -> 
 92 2 k8
 # rule    : E(r), R(e) -> E(r!1), R(e!1)
-# R(e~u,r) + E(r) -> E(r!1).R(e~u!1,r)
+# E(r) + R(e~u,r) -> E(r!1).R(e~u!1,r)
 93 2,3 5 k1
 # rule    : R() -> 
 # R(e~u,r) -> 

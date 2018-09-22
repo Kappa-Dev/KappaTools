@@ -109,7 +109,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~u!1,r) -->
 <reaction id="re3" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD36" species="s1" stoichiometry="2"/>
@@ -157,7 +157,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~u!1,r) -->
 <reaction id="re5" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD50" species="s1" stoichiometry="2"/>
@@ -245,7 +245,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~u!1,r) -->
 <reaction id="re9" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD72" species="s6"/>
@@ -289,7 +289,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p!1,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~p!1,r) -->
 <reaction id="re11" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD86" species="s6"/>
@@ -354,7 +354,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> R(e~u,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r) + R(e~u,r) -->
 <reaction id="re14" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD105" species="s10"/>
@@ -441,7 +441,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
+<!-- reaction: E(r) + E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
 <reaction id="re18" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD132" species="s2"/>
@@ -454,7 +454,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><ci> s10 </ci></apply>
+<times/><ci> s10 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -481,7 +481,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> R(e~p,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r) + R(e~p,r) -->
 <reaction id="re20" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD140" species="s11"/>
@@ -584,7 +584,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
+<!-- reaction: E(r) + E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
 <reaction id="re25" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD169" species="s2"/>
@@ -597,7 +597,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><ci> s11 </ci></apply>
+<times/><ci> s11 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -667,7 +667,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -->
+<!-- reaction: E(r) + E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -->
 <reaction id="re29" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD190" species="s2"/>
@@ -680,13 +680,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><ci> s15 </ci></apply>
+<times/><ci> s15 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> R(e~u,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r) + R(e~u,r) -->
 <reaction id="re30" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD193" species="s15"/>
@@ -778,7 +778,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: R(e~u,r!1).R(e~u,r!1) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
+<!-- reaction: E(r) + R(e~u,r!1).R(e~u,r!1) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
 <reaction id="re34" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD221" species="s2"/>
@@ -791,9 +791,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><apply>
+<times/><apply>
 <divide/><ci> s14 </ci><cn type="integer"> 2 </cn></apply>
-</apply>
+<ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -847,7 +847,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: R(e~u,r!1).R(e~u,r!1) + E(r) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
+<!-- reaction: E(r) + R(e~u,r!1).R(e~u,r!1) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
 <reaction id="re37" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD238" species="s2"/>
@@ -860,9 +860,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><apply>
+<times/><apply>
 <divide/><ci> s14 </ci><cn type="integer"> 2 </cn></apply>
-</apply>
+<ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -928,7 +928,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: R(e~u,r!1).R(e~p,r!1) + E(r) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
+<!-- reaction: E(r) + R(e~u,r!1).R(e~p,r!1) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
 <reaction id="re41" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD257" species="s2"/>
@@ -941,7 +941,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><ci> s13 </ci></apply>
+<times/><ci> s13 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -991,7 +991,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: R(e~u,r!1).R(e~p,r!1) + E(r) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2) -->
+<!-- reaction: E(r) + R(e~u,r!1).R(e~p,r!1) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2) -->
 <reaction id="re44" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD274" species="s2"/>
@@ -1004,7 +1004,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><ci> s13 </ci></apply>
+<times/><ci> s13 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -1076,7 +1076,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: R(e~p,r!1).R(e~p,r!1) + E(r) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2) -->
+<!-- reaction: E(r) + R(e~p,r!1).R(e~p,r!1) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2) -->
 <reaction id="re48" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD293" species="s2"/>
@@ -1089,9 +1089,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><apply>
+<times/><apply>
 <divide/><ci> s12 </ci><cn type="integer"> 2 </cn></apply>
-</apply>
+<ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -1163,7 +1163,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: R(e~p,r!1).R(e~p,r!1) + E(r) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2) -->
+<!-- reaction: E(r) + R(e~p,r!1).R(e~p,r!1) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2) -->
 <reaction id="re52" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD312" species="s2"/>
@@ -1176,9 +1176,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><apply>
+<times/><apply>
 <divide/><ci> s12 </ci><cn type="integer"> 2 </cn></apply>
-</apply>
+<ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -1205,7 +1205,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> R(e~p,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r) + R(e~p,r) -->
 <reaction id="re54" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD320" species="s9"/>
@@ -1308,7 +1308,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) + E(r) -> E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -->
+<!-- reaction: E(r) + E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -->
 <reaction id="re59" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD349" species="s2"/>
@@ -1321,7 +1321,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><ci> s9 </ci></apply>
+<times/><ci> s9 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -1371,7 +1371,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p!1,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~p!1,r) -->
 <reaction id="re62" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD360" species="s7" stoichiometry="2"/>
@@ -1419,7 +1419,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p!1,r) + E(r) -->
+<!-- reaction: E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~p!1,r) -->
 <reaction id="re64" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD374" species="s7" stoichiometry="2"/>
@@ -1524,7 +1524,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: R(e~p,r) + E(r) -> E(r!1).R(e~p!1,r) -->
+<!-- reaction: E(r) + R(e~p,r) -> E(r!1).R(e~p!1,r) -->
 <reaction id="re69" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD403" species="s2"/>
@@ -1537,7 +1537,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><ci> s8 </ci></apply>
+<times/><ci> s8 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -1628,7 +1628,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e!_,r), R(e!r.E,r) -> R(e!_,r!1), R(e!r.E,r!1) -->
-<!-- reaction: E(r!1).R(e~p!1,r) + E(r!1).R(e~u!1,r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
+<!-- reaction: E(r!1).R(e~u!1,r) + E(r!1).R(e~p!1,r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
 <reaction id="re74" name="R(e!_,r), R(e!r.E,r) -> R(e!_,r!1), R(e!r.E,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD426" species="s4"/>
@@ -1641,13 +1641,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k5 </ci><apply>
-<times/><ci> s4 </ci><ci> s5 </ci></apply>
+<times/><ci> s5 </ci><ci> s4 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e!_,r), R(e!r.E,r) -> R(e!_,r!1), R(e!r.E,r!1) -->
-<!-- reaction: E(r!1).R(e~u!1,r) + E(r!1).R(e~p!1,r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
+<!-- reaction: E(r!1).R(e~p!1,r) + E(r!1).R(e~u!1,r) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
 <reaction id="re75" name="R(e!_,r), R(e!r.E,r) -> R(e!_,r!1), R(e!r.E,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD429" species="s4"/>
@@ -1660,7 +1660,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k5 </ci><apply>
-<times/><ci> s5 </ci><ci> s4 </ci></apply>
+<times/><ci> s4 </ci><ci> s5 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -1769,7 +1769,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: R(e~u,r) + E(r) -> E(r!1).R(e~u!1,r) -->
+<!-- reaction: E(r) + R(e~u,r) -> E(r!1).R(e~u!1,r) -->
 <reaction id="re81" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD456" species="s2"/>
@@ -1782,7 +1782,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> k1 </ci><apply>
-<times/><ci> s2 </ci><ci> s3 </ci></apply>
+<times/><ci> s3 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>

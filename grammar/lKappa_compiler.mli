@@ -20,8 +20,6 @@ val modif_expr_of_ast :
   (Ast.mixture, Ast.mixture, string,Ast.rule) Ast.modif_expr -> int list ->
   (LKappa.rule_agent list, Raw_mixture.t, int, LKappa.rule) Ast.modif_expr *
   int list
-val of_user_graph :
-  Signature.s -> User_graph.connected_component -> LKappa.rule_mixture
 val init_of_ast :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   syntax_version:Ast.syntax_version -> Signature.s -> Contact_map.t ->

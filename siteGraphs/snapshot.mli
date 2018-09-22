@@ -29,3 +29,5 @@ val increment_in_snapshot : Signature.s -> connected_component -> t -> t
 val export :
   debugMode:bool -> Signature.s -> t ->
   (int * User_graph.connected_component) list
+
+val fold : ('a -> int -> connected_component -> 'a) -> 'a -> t -> 'a

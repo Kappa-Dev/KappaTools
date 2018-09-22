@@ -217,7 +217,7 @@ let connected_components_of_patterns = Array.to_list
 
 let connected_components_of_mixture_sigs sigs cache contact_map_int e =
   let (cache,acc) =
-    Pattern_compiler.patterns_of_mixture
+    Pattern_decompiler.patterns_of_mixture
       ~debugMode contact_map_int sigs cache e
   in
     cache, acc
@@ -227,7 +227,8 @@ let connected_components_of_mixture compil cache e =
   let contact_map = contact_map compil in
   let sigs = Pattern.Env.signatures (domain compil) in
   let cc_cache, acc =
-    Pattern_compiler.patterns_of_mixture ~debugMode contact_map sigs cc_cache e
+    Pattern_decompiler.patterns_of_mixture
+      ~debugMode contact_map sigs cc_cache e
   in
   {cache with cc_cache = cc_cache}, acc
 

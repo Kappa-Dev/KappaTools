@@ -143,8 +143,8 @@ let cc_to_user_cc ~debugMode sigs cc =
                        {User_graph.port_links = []; User_graph.port_states}
                    | Some (dn_id,s) ->
                      let dn_id' =
-                       try Renaming.apply ~debugMode indexes dn_id with
-                         Renaming.Undefined | Invalid_argument _ -> dn_id in
+                       try Renaming.apply ~debugMode indexes dn_id
+                       with Renaming.Undefined | Invalid_argument _ -> dn_id in
                       match Signature.ports_if_counter_agent
                               sigs (cc.(dn_id)).node_type with
                       | None ->
@@ -158,7 +158,11 @@ let cc_to_user_cc ~debugMode sigs cc =
        })
     cc_without_counters
 
-let export ~debugMode sigs s =
+let fold f x s =
   Mods.IntMap.fold (fun _ l acc ->
-      List_util.rev_map_append
-        (fun (x,_,y) -> (x,cc_to_user_cc ~debugMode sigs y)) l acc) s []
+      List.fold_left (fun a (nb, _, cc) -> f a nb cc) acc l)
+    s x
+
+let export ~debugMode sigs s =
+  fold (fun a x y -> (x,cc_to_user_cc ~debugMode sigs y)::a) [] s
+
