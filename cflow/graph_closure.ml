@@ -145,11 +145,11 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
     if max_index > 300 && config.do_tick
     then
       begin
-        let tick = Tick_stories.tick_stories err_logger Counter.default_progress
+        let tick = Tick_stories.tick_stories err_logger Configuration.empty
             (Remanent_parameters.save_progress_bar parameter)
             (false,0,0,max_index) in
         let f = Tick_stories.tick_stories
-            err_logger Counter.default_progress
+            err_logger Configuration.empty
             (Remanent_parameters.save_progress_bar parameter) in
         let close () = Loggers.print_newline err_logger in
         f,
@@ -323,11 +323,11 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
     if max_index > 300 && config.do_tick
     then
       let tick =
-        Tick_stories.tick_stories err_logger Counter.default_progress
+        Tick_stories.tick_stories err_logger Configuration.empty
           (Remanent_parameters.save_progress_bar parameter)
           (false,0,0,max_index) in
       let f =
-        Tick_stories.tick_stories err_logger Counter.default_progress
+        Tick_stories.tick_stories err_logger Configuration.empty
           (Remanent_parameters.save_progress_bar parameter)
       in
       let close () = Loggers.print_newline err_logger in

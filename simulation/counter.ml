@@ -6,16 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type progressBar = {
-  progressSize : int;
-  progressChar : char;
-}
-
-let default_progress = {
-  progressSize = 60;
-  progressChar = '#';
-}
-
 module Efficiency : sig
   type t = {
     mutable consecutive : int;
@@ -171,7 +161,6 @@ type t = {
     mutable stat_null : Efficiency.t ;
     init_time : float ;
     init_event : int ;
-    mutable progress_report : Progress_report.t option ;
     mutable plot_period : period;
     mutable max_time : float option ;
     mutable max_event : int option ;
@@ -228,31 +217,20 @@ let plot_period c = c.plot_period
 
 let time_ratio t =
   match t.max_time with
-  | None -> 0.
+  | None -> None
   | Some tmax ->
     if tmax > t.init_time then
-      (t.time -. t.init_time) /. (tmax -. t.init_time)
-    else 0.
+      Some ((t.time -. t.init_time) /. (tmax -. t.init_time))
+    else None
 
 let event_ratio t =
   match t.max_event with
-  | None -> 0.
+  | None -> None
   | Some emax ->
-    if emax = 0 then 0.
-    else float_of_int (t.events - t.init_event) /.
-         float_of_int (emax - t.init_event)
-
-let event_percentage t : int option =
-  let p_e = event_ratio t in
-  match classify_float p_e with
-    | FP_normal -> Some (int_of_float (p_e *. 100.))
-    | FP_subnormal | FP_zero | FP_infinite | FP_nan -> None
-
-let time_percentage t : int option =
-  let p_t = time_ratio t in
-  match classify_float p_t with
-    | FP_normal -> Some (int_of_float (p_t *. 100.))
-    | FP_subnormal | FP_zero | FP_infinite | FP_nan -> None
+    if emax = 0 then None
+    else
+      Some (float_of_int (t.events - t.init_event) /.
+            float_of_int (emax - t.init_event))
 
 let set_max_time c t = c.max_time <- t
 let set_max_events c e = c.max_event <- e
@@ -272,44 +250,26 @@ let create ?(init_t=0.) ?(init_e=0) ?max_time ?max_event ~plot_period =
    init_time = init_t ;
    init_event = init_e ;
    max_time; max_event;
-   progress_report = None;
    last_point = 0 ;
   }
 
 let reinitialize counter =
-  counter.progress_report <- None;
   counter.time <- counter.init_time;
   counter.events <- counter.init_event;
   counter.stories <- -1;
   counter.last_point <- 0;
   counter.stat_null <- Efficiency.init
 
-let tick ~efficiency conf c =
-  let pr =
-    match c.progress_report with
-    | None ->
-      let pr =
-        Progress_report.create
-          conf.progressSize conf.progressChar in
-      let () = c.progress_report <- Some pr in
-      pr
-    | Some pr -> pr in
-  Progress_report.tick
-    ~efficiency c.time (time_ratio c) c.events (event_ratio c) pr
+let current_simulation_info c = {
+  Trace.Simulation_info.story_id = current_story c;
+  Trace.Simulation_info.story_time = current_time c;
+  Trace.Simulation_info.story_event = current_event c+1;
+  Trace.Simulation_info.profiling_info = ();
+}
 
-  let current_simulation_info c =
-  { Trace.Simulation_info.story_id = current_story c;
-    Trace.Simulation_info.story_time = current_time c;
-    Trace.Simulation_info.story_event = current_event c+1;
-    Trace.Simulation_info.profiling_info = (); }
-  let next_story c =
-    let () = inc_stories c in
-    current_simulation_info c
-
-let complete_progress_bar c =
-  match c.progress_report with
-  | None -> ()
-  | Some pr -> Progress_report.complete_progress_bar c.time c.events pr
+let next_story c =
+  let () = inc_stories c in
+  current_simulation_info c
 
 let positive_plot_period counter =
   match plot_period counter with

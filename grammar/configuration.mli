@@ -7,6 +7,8 @@
 (******************************************************************************)
 
 type t = {
+  progressSize : int;
+  progressChar : char;
   dumpIfDeadlocked : bool;
   initial : float option;
   maxConsecutiveClash : int;
@@ -17,9 +19,11 @@ type t = {
   deltaActivitiesFileName : string option;
 }
 
+val empty : t
+
 val parse :
   ((string * Locality.t) * (string * Locality.t) list) list ->
-  t * Counter.progressBar * (bool * bool * bool) *
+  t * (bool * bool * bool) *
   string (*cflowFormat*) * string option (*cflowFile*)
 
 val print : Format.formatter -> t -> unit

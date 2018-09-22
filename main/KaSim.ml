@@ -19,7 +19,7 @@ let rec waitpid_non_intr pid =
 
 let batch_loop
     ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency
-    progressConf env counter graph state =
+    progress env counter graph state =
   let rec iter graph state =
     let stop,graph',state' =
       State_interpreter.a_loop
@@ -27,13 +27,17 @@ let batch_loop
         env counter graph state in
     if stop then (graph',state')
     else
-      let () = Counter.tick ~efficiency progressConf counter in
+      let () = Progress_report.tick
+          ~efficiency (Counter.current_time counter)
+          (Counter.time_ratio counter)
+          (Counter.current_event counter)
+          (Counter.event_ratio counter) progress in
       iter graph' state'
   in iter graph state
 
 let interactive_loop
-    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency progressConf
-    pause_criteria env counter graph state =
+    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency
+    progress pause_criteria env counter graph state =
   let user_interrupted = ref false in
   let old_sigint_behavior =
     Sys.signal Sys.sigint
@@ -54,16 +58,21 @@ let interactive_loop
         let () = Sys.set_signal Sys.sigint old_sigint_behavior in
         out
       else
-        let () = Counter.tick ~efficiency progressConf counter in
+        let () = Progress_report.tick
+            ~efficiency (Counter.current_time counter)
+            (Counter.time_ratio counter)
+            (Counter.current_event counter)
+            (Counter.event_ratio counter) progress in
         iter graph' state'
   in iter graph state
 
 let finalize
     ~outputs dotFormat cflow_file trace_file
-    env counter graph state stories_compression =
+    progress env counter graph state stories_compression =
   let () = State_interpreter.end_of_simulation
       ~outputs env counter graph state in
-  let () = Counter.complete_progress_bar counter in
+  let () = Progress_report.complete_progress_bar
+      (Counter.current_time counter) (Counter.current_event counter) progress in
   let () = Outputs.close ~event:(Counter.current_event counter) () in
   match trace_file,stories_compression with
   | None,_ -> ()
@@ -135,7 +144,7 @@ let () =
     (*Possible backtrace*)
 
     let cpu_time = Sys.time () in
-    let (conf, progressConf, env, contact_map, _, story_compression,
+    let (conf, env, contact_map, _, story_compression,
          formatCflows, cflowFile, init_l as init_result),
         counter =
       let warning ~pos msg = Outputs.go (Data.Warning (Some pos,msg)) in
@@ -206,6 +215,8 @@ let () =
         | Some filename ->
           Outputs.initial_inputs
             {Configuration.seed = Some theSeed;
+             Configuration.progressChar = conf.Configuration.progressChar;
+             Configuration.progressSize = conf.Configuration.progressSize;
              Configuration.dumpIfDeadlocked; Configuration.maxConsecutiveClash;
              Configuration.deltaActivitiesFileName;
              Configuration.traceFileName = user_trace_file;
@@ -271,19 +282,21 @@ let () =
       | _ -> ()
     in
     let () =
+      let progress = Progress_report.create
+          conf.Configuration.progressSize conf.Configuration.progressChar in
       if stop then
         finalize
           ~outputs formatCflows cflowFile trace_file
-          env counter graph state story_compression
+          progress env counter graph state story_compression
       else if cli_args.Run_cli_args.batchmode then
         let (graph',state') =
           batch_loop
             ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
             ~efficiency:kasim_args.Kasim_args.showEfficiency
-            progressConf env counter graph state in
+            progress env counter graph state in
         finalize
           ~outputs formatCflows cflowFile trace_file
-          env counter graph' state' story_compression
+          progress env counter graph' state' story_compression
       else
         let lexbuf = Lexing.from_channel stdin in
         let rec toplevel env graph state =
@@ -305,10 +318,13 @@ let () =
                     ~outputs ~max_sharing:kasim_args.Kasim_args.maxSharing
                     ~syntax_version:(cli_args.Run_cli_args.syntaxVersion)
                     contact_map env graph b in
+                let progress = Progress_report.create
+                    conf.Configuration.progressSize
+                    conf.Configuration.progressChar in
                 env',interactive_loop
                   ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
                   ~efficiency:kasim_args.Kasim_args.showEfficiency
-                  progressConf b'' env' counter graph' state
+                  progress b'' env' counter graph' state
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
                 let e', (env',_ as o) =
@@ -329,7 +345,7 @@ let () =
           if stop then
             finalize
               ~outputs formatCflows cflowFile trace_file
-              env counter graph' state' story_compression
+              progress env counter graph' state' story_compression
           else
             toplevel env' graph' state' in
         let toplevel_intro () =
@@ -344,11 +360,11 @@ let () =
             interactive_loop
               ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
               ~efficiency:kasim_args.Kasim_args.showEfficiency
-              progressConf Alg_expr.FALSE env counter graph state in
+              progress Alg_expr.FALSE env counter graph state in
           if stop then
             finalize
               ~outputs formatCflows cflowFile trace_file
-              env counter graph' state' story_compression
+              progress env counter graph' state' story_compression
           else
             let () = toplevel_intro () in toplevel env graph' state' in
     Format.printf "Simulation ended@.";

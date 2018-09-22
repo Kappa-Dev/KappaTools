@@ -115,6 +115,7 @@ Rule rule has now 10000 instances.
  (128 agents)
 Done
 + Command line to rerun is: 'KaSim' '-u' 'event' '-l' '120' '-d' 'output' 'clashing_instances.ka' '-seed' '923639563' '--debug' '-syntax' '4'
+____________________________________________________________
 Applied 0:
 A(), A(x[#])- @ 1
 On roots: 47 9
@@ -122,7 +123,6 @@ Rule rule has now 9801 instances.
 Obtained
 %init: 99 A(x[.])
 
-____________________________________________________________
 Applied 0:
 A(), A(x[#])- @ 1
 On roots: 36 31

@@ -578,7 +578,7 @@ let get_compil
     ~rule_rate_convention ?reaction_rate_convention
     ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
-  let (_,_,env, contact_map,  _, _, _, _, init), _ =
+  let (_, env, contact_map, _, _, _, _, init), _ =
     Cli_init.get_compilation_from_preprocessed_ast
       ~warning ?bwd_bisim cli_args preprocessed_ast
   in

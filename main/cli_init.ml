@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 type preprocessed_ast =
-  Configuration.t * Counter.progressBar * (bool * bool * bool) * string *
+  Configuration.t * (bool * bool * bool) * string *
   string option * Signature.s * Contact_map.t * unit NamedDecls.t *
   int Mods.StringMap.t * int list *
   (Ast.agent, LKappa.rule_agent list, Raw_mixture.t, int, LKappa.rule) Ast.compil *
@@ -16,7 +16,7 @@ type preprocessed_ast =
 
 let preprocess ~warning ?kasim_args cli_args ast =
   let () = Format.printf "+ simulation parameters@." in
-  let conf, progressConf,
+  let conf,
       story_compression, formatCflow, cflowFile =
     Configuration.parse ast.Ast.configurations in
   let () = Format.printf "+ Sanity checks@." in
@@ -39,14 +39,14 @@ let preprocess ~warning ?kasim_args cli_args ast =
           Klexer4.compile Format.std_formatter Ast.empty_compil file
         | Ast.V3 ->
           KappaLexer.compile Format.std_formatter Ast.empty_compil file in
-      let conf, _, _, _, _ =
+      let conf, _, _, _ =
         Configuration.parse compil.Ast.configurations in
       Some
         (LKappa_compiler.init_of_ast
            ~warning ~syntax_version sigs_nd contact_map
            tk_nd.NamedDecls.finder alg_finder compil.Ast.init),
       conf.Configuration.initial in
-  conf, progressConf,
+  conf,
   story_compression, formatCflow, cflowFile,sigs_nd,contact_map,tk_nd,alg_finder,
   updated_vars,result',overwrite_init,overwrite_t0
 
@@ -73,7 +73,7 @@ let get_preprocessed_ast_from_cli_args
 
 let get_pack_from_preprocessed_ast
     ~kasim_args ?bwd_bisim ~compileModeOn preprocessed_ast =
-  let conf, progressConf,
+  let conf,
       story_compression, formatCflow, cflowFile,sigs_nd,contact_map,tk_nd,
       _alg_finder, updated_vars,result',overwrite_init,overwrite_t0
     = preprocessed_ast
@@ -91,7 +91,7 @@ let get_pack_from_preprocessed_ast
       sigs_nd tk_nd contact_map result' in
   let story_compression =
     if has_tracking && (n||w||s) then Some story_compression else None in
-  (conf, progressConf, env, contact_map, updated_vars, story_compression,
+  (conf, env, contact_map, updated_vars, story_compression,
  formatCflow, cflowFile,init_l),[],overwrite_t0
 
 let get_pack_from_marshalizedfile
@@ -107,9 +107,9 @@ let get_pack_from_marshalizedfile
                f "Simulation package loaded, all kappa files are ignored") in
     let () = Format.printf "+ Loading simulation package %s...@."
         marshalized_file in
-    let conf,progress,env,contact,updated,compr,cflow,cflowfile,_ as pack =
+    let conf,env,contact,updated,compr,cflow,cflowfile,_ as pack =
       (Marshal.from_channel d :
-         Configuration.t*Counter.progressBar*Model.t*Contact_map.t*int list*
+         Configuration.t*Model.t*Contact_map.t*int list*
          (bool*bool*bool) option*string*string option*
          (Primitives.alg_expr * Primitives.elementary_rule) list) in
     let () = Pervasives.close_in d  in
@@ -124,7 +124,7 @@ let get_pack_from_marshalizedfile
     | Some file ->
       let compil =
         get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion [file] in
-      let conf', _, _, _, _ =
+      let conf', _, _, _ =
         Configuration.parse compil.Ast.configurations in
       let raw_inits =
         LKappa_compiler.init_of_ast
@@ -135,7 +135,7 @@ let get_pack_from_marshalizedfile
           ~debugMode:!Parameter.debugModeOn
           ~warning ?rescale:kasim_args.Kasim_args.rescale
           ~compileModeOn:false contact env raw_inits in
-      (conf,progress,env,contact,updated,compr,cflow,cflowfile,inits),
+      (conf,env,contact,updated,compr,cflow,cflowfile,inits),
       alg_overwrite,conf'.Configuration.initial
   with
   | ExceptionDefn.Malformed_Decl _ as e -> raise e
@@ -146,7 +146,7 @@ let get_pack_from_marshalizedfile
     exit 1
 
 let get_compilation_from_pack ~warning kasim_args cli_args pack =
-    let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
+    let (conf, env0, contact_map, updated_vars, story_compression,
          formatCflows, cflowFile, init_l),
         alg_overwrite,overwrite_t0 = pack in
     let init_t_from_files =
@@ -181,7 +181,7 @@ let get_compilation_from_pack ~warning kasim_args cli_args pack =
         ~warning ?max_time:(Counter.max_time counter)
         ?max_events:(Counter.max_events counter) updated_vars alg_overwrite env0
     else Model.overwrite_vars alg_overwrite env0 in
-  (conf, progressConf, env, contact_map, updated_vars, story_compression,
+  (conf, env, contact_map, updated_vars, story_compression,
    formatCflows, cflowFile, init_l),counter
 
 let get_compilation_from_preprocessed_ast

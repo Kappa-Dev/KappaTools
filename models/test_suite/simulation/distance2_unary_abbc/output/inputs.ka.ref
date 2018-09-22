@@ -1,6 +1,8 @@
 %def: "seed" "438438234"
 %def: "dumpIfDeadlocked" "true"
 %def: "maxConsecutiveClash" "2"
+%def: "progressBarSize" "60"
+%def: "progressBarSymbol" "#"
 %def: "plotPeriod" "2" "events"
 %def: "outputFileName" "data.svg"
 

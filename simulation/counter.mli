@@ -34,13 +34,6 @@ module Efficiency : sig
   (** Deserialize JSON data of type {!t}. *)
 end
 
-type progressBar = {
-  progressSize : int;
-  progressChar : char;
-}
-
-val default_progress : progressBar
-
 type period = DE of int | DT of float
 
 type t
@@ -71,8 +64,8 @@ val max_time : t -> float option
 val max_events : t -> int option
 val set_max_time  : t -> float option -> unit
 val set_max_events : t -> int option -> unit
-val event_percentage : t -> int option
-val time_percentage : t -> int option
+val event_ratio : t -> float option
+val time_ratio : t -> float option
 val tracked_events : t -> int option
 
 val positive_plot_period : t -> bool
@@ -88,7 +81,3 @@ val consecutive_blocked : t -> int
 
 val get_efficiency : t -> Efficiency.t
 val print_efficiency : Format.formatter -> t -> unit
-
-(** {5 Output on stdout } *)
-val tick : efficiency:bool -> progressBar -> t -> unit
-val complete_progress_bar : t -> unit

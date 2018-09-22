@@ -7,6 +7,8 @@
 (******************************************************************************)
 
 type t = {
+  progressSize : int;
+  progressChar : char;
   dumpIfDeadlocked : bool;
   initial : float option;
   maxConsecutiveClash : int;
@@ -18,6 +20,8 @@ type t = {
 }
 
 let empty = {
+  progressSize = 60;
+  progressChar = '#';
   dumpIfDeadlocked = true;
   initial = None;
   maxConsecutiveClash = 2;
@@ -48,7 +52,7 @@ let parse result =
                 ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
       ) in
   List.fold_left
-    (fun (conf,progress,story_compression,formatCflow,cflowFile)
+    (fun (conf,story_compression,formatCflow,cflowFile)
       ((param,pos_p),value_list) ->
       match param with
       | "displayCompression" ->
@@ -57,7 +61,7 @@ let parse result =
           | ("strong",_)::tl -> parse (a,b,true) tl
           | ("weak",_)::tl -> parse (a,true,c) tl
           | ("none",_)::tl -> parse (true,b,c) tl
-          | [] -> (conf,progress,(a,b,c),formatCflow,cflowFile)
+          | [] -> (conf,(a,b,c),formatCflow,cflowFile)
           | (error,pos)::_ ->
             raise (ExceptionDefn.Malformed_Decl
                      ("Unknown value "^error^" for compression mode", pos))
@@ -65,13 +69,13 @@ let parse result =
         parse story_compression value_list
       | "cflowFileName" ->
         get_value pos_p param value_list
-          (fun x _ -> (conf,progress,story_compression,formatCflow,Some x))
+          (fun x _ -> (conf,story_compression,formatCflow,Some x))
       | "seed" ->
         get_value pos_p param value_list
           (fun s p ->
              try
                ({ conf with seed = Some (int_of_string s) },
-                progress,story_compression,formatCflow,cflowFile)
+                story_compression,formatCflow,cflowFile)
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^s^" should be an integer", p)))
@@ -80,7 +84,7 @@ let parse result =
           (fun s p ->
              try
                ({ conf with initial = Some (float_of_string s) },
-                progress,story_compression,formatCflow,cflowFile)
+                story_compression,formatCflow,cflowFile)
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^s^" should be a float", p)))
@@ -89,7 +93,7 @@ let parse result =
           | [s,p] ->
             (try
                ({conf with plotPeriod = Some (Counter.DT (float_of_string s))},
-                progress,story_compression,formatCflow,cflowFile)
+                story_compression,formatCflow,cflowFile)
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^s^" should be a float", p)))
@@ -98,7 +102,7 @@ let parse result =
                u = "Event" || u = "Events" then
               try
                 ({conf with plotPeriod = Some (Counter.DE (int_of_string s))},
-                 progress,story_compression,formatCflow,cflowFile)
+                 story_compression,formatCflow,cflowFile)
               with Failure _ ->
                 raise (ExceptionDefn.Malformed_Decl
                          ("Value "^s^" should be an integer", sp))
@@ -106,7 +110,7 @@ let parse result =
                     u = "time unit" || u = "Time unit" then
               try
                 ({conf with plotPeriod = Some (Counter.DT (float_of_string s))},
-                 progress,story_compression,formatCflow,cflowFile)
+                 story_compression,formatCflow,cflowFile)
               with Failure _ ->
                 raise (ExceptionDefn.Malformed_Decl
                          ("Value "^s^" should be a float", sp))
@@ -122,59 +126,59 @@ let parse result =
         get_value pos_p param value_list
           (fun s _ ->
                ({ conf with outputFileName = Some s },
-                progress,story_compression,formatCflow,cflowFile))
+                story_compression,formatCflow,cflowFile))
       | "traceFileName" ->
         get_value pos_p param value_list
           (fun s _ ->
                ({ conf with traceFileName = Some s },
-                progress,story_compression,formatCflow,cflowFile))
+                story_compression,formatCflow,cflowFile))
       | "deltaActivitiesFileName" ->
         get_value pos_p param value_list
           (fun s _ ->
                ({ conf with deltaActivitiesFileName = Some s },
-                progress,story_compression,formatCflow,cflowFile))
+                story_compression,formatCflow,cflowFile))
 
       | "progressBarSize" ->
-         (conf,{ progress with
-                 Counter.progressSize = get_value pos_p param value_list
-                     (fun v p ->
-                        try int_of_string v
-                        with Failure _ ->
-                          raise (ExceptionDefn.Malformed_Decl
-                                   ("Value "^v^" should be an integer", p)))
-               },story_compression,formatCflow,cflowFile)
+        ({ conf with
+           progressSize = get_value pos_p param value_list
+               (fun v p ->
+                  try int_of_string v
+                  with Failure _ ->
+                    raise (ExceptionDefn.Malformed_Decl
+                             ("Value "^v^" should be an integer", p)))
+         },story_compression,formatCflow,cflowFile)
       | "progressBarSymbol" ->
-         (conf,{ progress with
-                 Counter.progressChar = get_value pos_p param value_list
-                     (fun v p ->
-                        try
-                          String.unsafe_get v 0
-                        with _ ->
-                          raise (ExceptionDefn.Malformed_Decl
-                                   ("Value "^v^" should be a character",p)))
-               },story_compression,formatCflow,cflowFile)
+        ({ conf with
+           progressChar = get_value pos_p param value_list
+               (fun v p ->
+                  try
+                    String.unsafe_get v 0
+                  with _ ->
+                    raise (ExceptionDefn.Malformed_Decl
+                             ("Value "^v^" should be a character",p)))
+         },story_compression,formatCflow,cflowFile)
 
       | "dumpIfDeadlocked" ->
         ({ conf with dumpIfDeadlocked = get_bool_value pos_p param value_list },
-         progress,story_compression,formatCflow,cflowFile)
+         story_compression,formatCflow,cflowFile)
       | "maxConsecutiveClash" ->
         get_value pos_p param value_list
           (fun v p ->
              try
                ({ conf with maxConsecutiveClash = int_of_string v },
-                progress,story_compression,formatCflow,cflowFile)
+                story_compression,formatCflow,cflowFile)
              with _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^v^" should be an integer",p)))
       | "dotCflows" ->
          let formatCflow = get_value pos_p param value_list (fun v _ -> v) in
-         (conf,progress,story_compression,formatCflow,cflowFile)
+         (conf,story_compression,formatCflow,cflowFile)
 (*         if get_bool_value pos_p param value_list then
            (story_compression, Dot) else
            (story_compression, Html)*)
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unknown parameter "^error, pos_p))
-    ) (empty, Counter.default_progress, (false,false,false), "dot", None) result
+    ) (empty, (false,false,false), "dot", None) result
 
 let print f conf =
   let () = Format.pp_open_vbox f 0 in
@@ -184,6 +188,10 @@ let print f conf =
       f "%%def: \"dumpIfDeadlocked\" \"%b\"@," conf.dumpIfDeadlocked in
   let () = Format.fprintf
       f "%%def: \"maxConsecutiveClash\" \"%i\"@," conf.maxConsecutiveClash in
+  let () = Format.fprintf
+      f "%%def: \"progressBarSize\" \"%i\"@," conf.progressSize in
+  let () = Format.fprintf
+      f "%%def: \"progressBarSymbol\" \"%c\"@," conf.progressChar in
   let () = Pp.option ~with_space:false
       (fun f -> Format.fprintf f "%%def: \"T0\" \"%g\"@,")
       f conf.initial in

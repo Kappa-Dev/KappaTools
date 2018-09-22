@@ -1,6 +1,8 @@
 %def: "seed" "148153191"
 %def: "dumpIfDeadlocked" "true"
 %def: "maxConsecutiveClash" "2"
+%def: "progressBarSize" "60"
+%def: "progressBarSymbol" "#"
 %def: "plotPeriod" "1" "t.u."
 %def: "outputFileName" "data.csv"
 
