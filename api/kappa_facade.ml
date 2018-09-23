@@ -179,7 +179,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
   let inputs_buffer = Buffer.create 512 in
   let inputs_form = Format.formatter_of_buffer inputs_buffer in
   let post_parse ast =
-    let (conf,_,_,_,_) =
+    let (conf,_,_,_) =
       Configuration.parse ast.Ast.configurations in
     let warning ~pos msg = Data.print_warning ~pos log_form msg in
     (Lwt.wrap2
@@ -598,11 +598,15 @@ let progress
              Api_types_t.simulation_progress_time =
                Counter.current_time t.counter ;
              Api_types_t.simulation_progress_time_percentage =
-               Counter.time_percentage t.counter ;
+               Option_util.map
+                 (fun x -> int_of_float ( x *. 100.))
+                 (Counter.time_ratio t.counter) ;
              Api_types_t.simulation_progress_event =
                Counter.current_event t.counter ;
              Api_types_t.simulation_progress_event_percentage =
-               Counter.event_percentage t.counter ;
+               Option_util.map
+                 (fun x -> int_of_float ( x *. 100.))
+                 (Counter.event_ratio t.counter) ;
              Api_types_t.simulation_progress_tracked_events =
                Counter.tracked_events t.counter ;
              Api_types_t.simulation_progress_is_running =
