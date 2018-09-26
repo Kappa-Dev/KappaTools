@@ -508,11 +508,9 @@ let refined_influence_node_to_json =
 let refined_influence_node_of_json =
   influence_node_of_json json_to_rule json_to_var
 
-let get_short_node_opt_of_refined_node_opt node_opt =
-  match node_opt with
-  | None -> None
-  | Some (Rule rule) -> Some (Rule rule.rule_id)
-  | Some (Var var) -> Some (Var var.var_id)
+let short_node_of_refined_node = function
+  | Rule rule -> Rule rule.rule_id
+  | Var var -> Var var.var_id
 
 module InfluenceNodeSetMap =
   SetMap.Make

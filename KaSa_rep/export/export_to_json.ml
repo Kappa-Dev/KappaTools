@@ -138,7 +138,7 @@ functor (A:Analyzer.Analyzer) ->
 
     let short_origin_of_influence_map state =
       let state, origin_opt = origin_of_influence_map state in
-      state, Public_data.get_short_node_opt_of_refined_node_opt origin_opt
+      state, Option_util.map Public_data.short_node_of_refined_node origin_opt
 
     let previous_node_in_influence_map state short_id_opt =
       let state, nrules = nrules state in

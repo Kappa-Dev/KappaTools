@@ -9,6 +9,40 @@
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
+type model_graph = {
+  fwd : int option;
+  bwd : int option;
+  total : int;
+}
+
+type influence_sphere = {
+  positive_on :
+    ((Public_data.rule,Public_data.var) Public_data.influence_node *
+     Public_data.location Public_data.pair list) list;
+  negative_on :
+    ((Public_data.rule,Public_data.var) Public_data.influence_node *
+     Public_data.location Public_data.pair list) list;
+  positive_by :
+    ((Public_data.rule,Public_data.var) Public_data.influence_node *
+     Public_data.location Public_data.pair list) list;
+  negative_by :
+    ((Public_data.rule,Public_data.var) Public_data.influence_node *
+     Public_data.location Public_data.pair list) list;
+}
+
+let empty_sphere =
+  { positive_on = []; positive_by = []; negative_on = []; negative_by = [] }
+
+type model_rendering =
+  | DrawGraph of model_graph
+  | DrawTabular of unit
+
+type model = {
+  rendering : model_rendering;
+  accuracy : Public_data.accuracy_level option;
+  origin : (Public_data.rule, Public_data.var) Public_data.influence_node option;
+}
+
 let navli () = ReactiveData.RList.empty
 
 let tab_is_active, set_tab_is_active = React.S.create false
@@ -16,11 +50,13 @@ let tab_was_active = ref false
 
 let node = ref None
 
-let accuracy, set_accuracy = React.S.create (Some Public_data.Low)
-let fwd, set_fwd = React.S.create None
-let bwd, set_bwd = React.S.create None
-let total, set_total = React.S.create 1
-let origin, set_origin = React.S.create None
+let dummy_model = {
+  rendering = DrawTabular ();
+  accuracy = Some Public_data.Low;
+  origin = None;
+}
+
+let model, set_model = React.S.create dummy_model
 
 let total_input_id = "total_input"
 let fwd_input_id = "fwd_input"
@@ -29,14 +65,24 @@ let recenter_id = "reset"
 let next_node_id = "next"
 let prev_node_id = "previous"
 
+let update_model_graph f =
+  let m = React.S.value model in
+  match m.rendering with
+  | DrawTabular _ -> ()
+  | DrawGraph g -> set_model { m with rendering = DrawGraph (f g) }
+
+let update_model f =
+  set_model (f (React.S.value model))
+
 let display_id = "influence_map_display"
 let influence_map_text,set_influence_map_text = React.S.create None
 let influencemap =
   Js_graphlogger.create_graph_logger
     display_id
-    (fun x -> set_origin
-        (Some (Public_data.refined_influence_node_of_json
-                 (Yojson.Basic.from_string (Js.to_string x)))))
+    (fun x -> update_model
+      (fun m ->
+        { m with origin = Some (Public_data.refined_influence_node_of_json
+                                  (Yojson.Basic.from_string (Js.to_string x))) }))
 
 let total_input =
   Html.input ~a:[
@@ -95,14 +141,35 @@ let export_config = {
     React.S.map (function None -> false | Some _ -> true) influence_map_text;
 }
 
+let rendering_chooser_id = "influence-rendering"
+
+let rendering_chooser =
+  let { rendering; _ } = React.S.value model in
+  Html.select
+    ~a:[Html.a_class [ "form-control" ]; Html.a_id rendering_chooser_id ]
+    [
+      Html.option
+        ~a:((fun l -> match rendering with
+            | DrawTabular _ -> Html.a_selected () :: l
+            | DrawGraph _ -> l)
+             [ Html.a_value "tabular" ])
+        (Html.pcdata "Tabular");
+      Html.option
+        ~a:((fun l -> match rendering with
+            | DrawGraph _ -> Html.a_selected () :: l
+            | DrawTabular _ -> l)
+             [ Html.a_value "graph" ])
+        (Html.pcdata "Graph");
+    ]
+
 let accuracy_chooser_id = "influence-accuracy"
 
 let accuracy_chooser =
+  let { accuracy; _ } = React.S.value model in
   let option_gen x =
     Html.option
       ~a:
-        ((fun l -> if React.S.value accuracy = Some x
-           then Html.a_selected () :: l else l)
+        ((fun l -> if accuracy = Some x then Html.a_selected () :: l else l)
            [ Html.a_value (Public_data.accuracy_to_string x) ])
       (Html.pcdata
          (Public_data.accuracy_to_string x)) in
@@ -127,6 +194,16 @@ let is_center origin_short_opt node =
     | Public_data.Var _, Public_data.Rule _
     | Public_data.Rule _, Public_data.Var _ -> false
 
+let influence_node_label = function
+  | Public_data.Rule r ->
+    if r.Public_data.rule_label = ""
+    then r.Public_data.rule_ast
+    else r.Public_data.rule_label
+  | Public_data.Var r ->
+    if r.Public_data.var_label = ""
+    then r.Public_data.var_ast
+    else r.Public_data.var_label
+
 let json_to_graph logger origin_short_opt influences_json =
   let () = Graph_loggers.print_graph_preamble logger "" in
   let _,_,_,_,influence_map =
@@ -138,14 +215,10 @@ let json_to_graph logger origin_short_opt influences_json =
     let json =
       Public_data.refined_influence_node_to_json node
     in
+    let label = influence_node_label node in
     match node
     with
     | Public_data.Rule r ->
-      let label,_ast =
-        if r.Public_data.rule_label = ""
-        then r.Public_data.rule_ast,""
-        else r.Public_data.rule_label,r.Public_data.rule_ast
-      in
       let pos = r.Public_data.rule_position in
       let contextual_help =
         (Locality.to_string pos)^" "^(r.Public_data.rule_ast)
@@ -163,11 +236,6 @@ let json_to_graph logger origin_short_opt influences_json =
           Graph_loggers_sig.Contextual_help contextual_help
         ]
     | Public_data.Var r ->
-      let label,_ast =
-        if r.Public_data.var_label = ""
-        then r.Public_data.var_ast,""
-        else r.Public_data.var_label,r.Public_data.var_ast
-      in
       let pos = r.Public_data.var_position in
       let contextual_help =
         (Locality.to_string pos)^(r.Public_data.var_ast)
@@ -199,15 +267,7 @@ let json_to_graph logger origin_short_opt influences_json =
     | Public_data.Var id -> id + max_rule_id
   in
   let get_id_of_node node =
-    get_id_of_node_id
-      (
-        match node with
-        | Public_data.Rule rule ->
-          Public_data.Rule rule.Public_data.rule_id
-        | Public_data.Var var ->
-          Public_data.Var var.Public_data.var_id
-      )
-  in
+    get_id_of_node_id (Public_data.short_node_of_refined_node node) in
   let () =
     List.iter
       (fun node ->
@@ -269,83 +329,212 @@ let json_to_graph logger origin_short_opt influences_json =
   let () = Graph_loggers.print_graph_foot logger in
   ()
 
+let table_of_influences_json origin influences_json =
+  let _,_,_,_,influence_map =
+    Public_data.local_influence_map_of_json influences_json in
+  let namer =
+    List.fold_left
+      (fun acc e -> Public_data.InfluenceNodeMap.add
+          (Public_data.short_node_of_refined_node e) e acc)
+      Public_data.InfluenceNodeMap.empty
+      influence_map.Public_data.nodes in
+  match origin with
+  | None -> empty_sphere
+  | Some origin ->
+    let positive_on,positive_by =
+      Public_data.InfluenceNodeMap.fold
+        (fun src ->
+           Public_data.InfluenceNodeMap.fold
+             (fun dst data (on,by as acc) ->
+                if src = origin then
+                  match Public_data.InfluenceNodeMap.find_option dst namer with
+                  | None -> acc
+                  | Some v -> ((v,data)::on,by)
+                else if dst = origin then
+                  match Public_data.InfluenceNodeMap.find_option src namer with
+                  | None -> acc
+                  | Some v -> (on,(v,data)::by)
+                else acc))
+        influence_map.Public_data.positive ([],[]) in
+    let negative_on,negative_by =
+      Public_data.InfluenceNodeMap.fold
+        (fun src ->
+           Public_data.InfluenceNodeMap.fold
+             (fun dst data (on,by as acc) ->
+                if src = origin then
+                  match Public_data.InfluenceNodeMap.find_option dst namer with
+                  | None -> acc
+                  | Some v -> ((v,data)::on,by)
+                else if dst = origin then
+                  match Public_data.InfluenceNodeMap.find_option src namer with
+                  | None -> acc
+                  | Some v -> (on,(v,data)::by)
+                else acc))
+        influence_map.Public_data.negative ([],[]) in
+    { positive_on; positive_by; negative_on; negative_by }
+
+let pop_cell = function
+  | [] -> (Html.td [],[])
+  | ((node,_mappings),positive)::t ->
+    (Html.td ~a:[ Html.a_class [if positive then "success" else "danger"] ]
+       [Html.cdata (influence_node_label node)],t)
+
+let rec fill_table acc by on =
+  if on = [] && by = [] then
+    List.rev acc
+  else
+    let b,by' = pop_cell by in
+    let o,on' = pop_cell on in
+    let line = Html.tr [ b; o ] in
+    fill_table (line::acc) by' on'
+
+let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
+    let by =
+    List_util.rev_map_append (fun x -> (x,false)) negative_by
+      (List.rev_map (fun x -> (x,true)) positive_by) in
+  let on =
+    List_util.rev_map_append (fun x -> (x,false)) negative_on
+      (List.rev_map (fun x -> (x,true)) positive_on) in
+  let outs = fill_table [] by on in
+  Html.tablex
+    ~a:[ Html.a_class ["table"]]
+    ~thead:(Html.thead [
+        Html.tr
+          [Html.th ~a:[Html.a_colspan 2]
+             [Html.cdata
+                (match origin with None -> "origin"|Some n -> influence_node_label n)
+             ]];
+        Html.tr [
+          Html.th [Html.cdata "is influenced by"];
+          Html.th [Html.cdata "influences"]];
+      ])
+    [Html.tbody outs]
+
+let influence_sphere =
+  State_project.on_project_change_async
+    ~on:tab_is_active dummy_model model empty_sphere
+    (fun manager { rendering; accuracy; origin = origin_refined } ->
+       match rendering with
+       | DrawTabular _ ->
+         let origin =
+           Option_util.map
+             Public_data.short_node_of_refined_node origin_refined in
+         (manager#get_local_influence_map
+            ?fwd:None ?bwd:None ?origin ~total:1 accuracy >>= function
+          | Result.Ok influences_json ->
+            Lwt.return
+              (table_of_influences_json origin influences_json)
+          | Result.Error _e -> Lwt.return empty_sphere)
+       | DrawGraph _ -> Lwt.return empty_sphere)
+
 let content () =
   let accuracy_form =
     Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
       [ Html.div
           ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label
+          [
+            Html.label
+              ~a:[ Html.a_class ["col-md-2"];
+                   Html.a_label_for rendering_chooser_id ]
+              [Html.pcdata "Rendering"];
+            Html.span ~a:[Html.a_class ["col-md-4"] ] [rendering_chooser];
+            Html.label
               ~a:[ Html.a_class ["col-md-2"];
                    Html.a_label_for accuracy_chooser_id ]
               [Html.pcdata "Accuracy"];
-            Html.div
-              ~a:[Html.a_class ["col-md-2"] ]
-              [accuracy_chooser] ];
-        Html.div
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [accuracy_chooser] ];
+              Html.div
+          ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label
+              ~a:[Html.a_class ["col-md-3"];
+                  Html.a_label_for total_input_id]
+              [Html.pcdata "Navigate"];
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [prev_node];
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [next_node];
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter]]] in
+  let graph_form =
+    Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
+      [ Html.div
           ~a:[ Html.a_class [ "form-group" ] ]
           [
             Html.label ~a:[Html.a_class ["col-md-3"]]
-              [Html.pcdata "Size         Radius"];
+              [Html.pcdata "Size Radius"];
             Html.span  ~a:[Html.a_class ["col-md-2"]] [total_input];
             Html.label ~a:[Html.a_class ["col-md-1"]] [Html.pcdata "fwd"];
             Html.span ~a:[Html.a_class ["col-md-2"]] [fwd_input];
             Html.label ~a:[Html.a_class ["col-md-2"]] [Html.pcdata "bwd"];
             Html.span ~a:[Html.a_class ["col-md-2"]] [bwd_input];
-          ];
-        Html.div
-          ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label
-             ~a:[Html.a_class ["col-md-3"];
-                 Html.a_label_for total_input_id]
-             [Html.pcdata "Navigate"];
-            Html.span ~a:[Html.a_class ["col-md-2"] ] [prev_node];
-            Html.span ~a:[Html.a_class ["col-md-2"] ] [next_node];
-            Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter]]]
-  in
+          ]] in
   [ accuracy_form;
-    Html.div ~a:[Html.a_id display_id; Html.a_class ["flex-content"] ] [];
-    Widget_export.content export_config ]
+    Html.div
+      ~a:[ Tyxml_js.R.Html5.a_class
+             (React.S.map
+                (fun { rendering; _ } ->
+                   match rendering with
+                   | DrawGraph _ -> ["flex-content"]
+                   | DrawTabular _ -> [])
+                model);
+           Tyxml_js.R.filter_attrib
+             (Html.a_hidden ())
+             (React.S.map
+                (fun { rendering; _ } ->
+                   match rendering with
+                   | DrawGraph _ -> false
+                   | DrawTabular _ -> true)
+                model)
+         ]
+      [ graph_form;
+        Html.div ~a:[Html.a_id display_id; Html.a_class ["flex-content"] ] []];
+    Tyxml_js.R.Html5.div
+      ~a:[ Html.a_class ["panel-scroll"] ]
+      (ReactiveData.RList.from_signal
+         (React.S.l2
+            (fun { rendering; origin; _ } sphere ->
+               match rendering with
+               | DrawGraph _ -> []
+               | DrawTabular () -> [ draw_table origin sphere ])
+            model influence_sphere));
+    Widget_export.content export_config;
+  ]
 
 let _ =
-  React.S.l6
-    (fun _ acc fwd bwd total origin_refined ->
-       (*let origin_json =
-             JsonUtil.of_option
-               Public_data.refined_influence_node_to_json origin_refined
-           in*)
-       let origin =
-         Public_data.get_short_node_opt_of_refined_node_opt origin_refined
-       in
+  React.S.l2
+    (fun _ { rendering; accuracy; origin = origin_refined } ->
        State_project.with_project
          ~label:__LOC__
          (fun (manager : Api.concrete_manager) ->
-            ((manager#get_local_influence_map
-                ?fwd ?bwd ?origin ~total acc) >>= function
-             | Result.Ok influences_json ->
-               let buf = Buffer.create 1000 in
-               let fmt = Format.formatter_of_buffer buf in
-               let logger =
-                 Loggers.open_logger_from_formatter
-                   ~mode:Loggers.Js_Graph fmt
-               in
-               let () =
-                 json_to_graph logger origin influences_json in
-               let graph = Loggers.graph_of_logger logger in
-               let graph_json = Graph_json.to_json graph in
-               let () = Loggers.flush_logger logger in
-               let () = Loggers.close_logger logger in
-               let () =
-                 set_influence_map_text
-                   (Some (Yojson.Basic.to_string graph_json)) in
-               Lwt_result.return ()
-             | Result.Error e ->
-               let () = set_influence_map_text None in
-               Lwt_result.fail e) >>=
+            (match rendering with
+             | DrawTabular _ -> Lwt_result.return ()
+             | DrawGraph { fwd; bwd; total } ->
+               let origin =
+                 Option_util.map
+                   Public_data.short_node_of_refined_node origin_refined in
+               (manager#get_local_influence_map
+                  ?fwd ?bwd ?origin ~total accuracy) >>= function
+               | Result.Ok influences_json ->
+                 let buf = Buffer.create 1000 in
+                 let fmt = Format.formatter_of_buffer buf in
+                 let logger =
+                   Loggers.open_logger_from_formatter
+                     ~mode:Loggers.Js_Graph fmt in
+                 let () =
+                   json_to_graph logger origin influences_json in
+                 let graph = Loggers.graph_of_logger logger in
+                 let graph_json = Graph_json.to_json graph in
+                 let () = Loggers.flush_logger logger in
+                 let () = Loggers.close_logger logger in
+                 let () =
+                   set_influence_map_text
+                     (Some (Yojson.Basic.to_string graph_json)) in
+                 Lwt_result.return ()
+               | Result.Error e ->
+                 let () = set_influence_map_text None in
+                 Lwt_result.fail e) >>=
             fun out -> Lwt.return (Api_common.result_lift out)
          ))
     (React.S.on ~eq:State_project.model_equal tab_is_active
        State_project.dummy_model State_project.model)
-    accuracy fwd bwd total origin
+    model
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
@@ -358,18 +547,30 @@ let onload () =
         | None -> influencemap##clearData
         | Some data -> influencemap##setData (Js.string data))
       (React.S.on tab_is_active None influence_map_text) in
+  let () = (Tyxml_js.To_dom.of_select rendering_chooser)##.onchange :=
+      Dom_html.full_handler
+        (fun va _ ->
+           let () = update_model (fun m ->
+               { m with
+                 rendering =
+                   if Js.to_string va##.value = "graph" then
+                     DrawGraph { fwd = None; bwd = None; total = 1 }
+                   else DrawTabular () }) in
+           Js._true) in
   let () = (Tyxml_js.To_dom.of_select accuracy_chooser)##.onchange :=
       Dom_html.full_handler
         (fun va _ ->
-           let va = Js.to_string va##.value in
-           let () = set_accuracy (Public_data.accuracy_of_string va) in
+           let accuracy =
+             Public_data.accuracy_of_string (Js.to_string va##.value) in
+           let () = update_model (fun m -> { m with accuracy }) in
            Js._true) in
   let () = (Tyxml_js.To_dom.of_input total_input)##.onchange :=
                Dom_html.full_handler
                  (fun va _ ->
                     let va = Js.to_string va##.value in
                     try
-                      let () = set_total (int_of_string va) in
+                      let () = update_model_graph
+                          (fun m -> { m with total = int_of_string va }) in
                       Js._true
                     with _ -> Js._false)
   in
@@ -378,11 +579,11 @@ let onload () =
         (fun va _ ->
            let va = Js.to_string va##.value in
            try
-             let va_opt =
+             let fwd =
                if va = "" then None
                else Some (int_of_string va)
              in
-             let () = set_fwd va_opt in
+             let () = update_model_graph (fun m -> { m with fwd }) in
              Js._true
            with _ -> Js._false)
   in
@@ -391,11 +592,11 @@ let onload () =
                  (fun va _ ->
                     let va = Js.to_string va##.value in
                     try
-                      let va_opt =
+                      let bwd =
                         if va = "" then None
                         else  Some (int_of_string va)
                       in
-                      let () = set_bwd va_opt in
+                      let () = update_model_graph (fun m -> { m with bwd }) in
                       Js._true
                     with _ -> Js._false) in
   let () =
@@ -411,9 +612,8 @@ let onload () =
                         let origin =
                           JsonUtil.to_option
                             Public_data.refined_influence_node_of_json
-                            origin
-                        in
-                        let () = set_origin origin in
+                            origin in
+                        let () = update_model (fun m -> { m with origin }) in
                         ())
                      manager#get_initial_node >>=
                    fun out ->
@@ -427,8 +627,8 @@ let onload () =
       Dom_html.full_handler
         (fun _ _ ->
            let origin =
-             Public_data.get_short_node_opt_of_refined_node_opt
-               (React.S.value origin) in
+             let { origin; _ } = React.S.value model in
+             Option_util.map Public_data.short_node_of_refined_node origin in
            let _ =
              State_project.with_project
                ~label:__LOC__
@@ -440,7 +640,8 @@ let onload () =
                             Public_data.refined_influence_node_of_json
                             origin'
                         in
-                        let () = set_origin origin' in
+                        let () = update_model
+                            (fun m -> { m with origin = origin' }) in
                         ())
                      (manager#get_next_node origin) >>=
                    fun out -> Lwt.return (Api_common.result_lift out)
@@ -453,8 +654,8 @@ let onload () =
       Dom_html.full_handler
         (fun _ _ ->
            let origin =
-             Public_data.get_short_node_opt_of_refined_node_opt
-               (React.S.value origin) in
+             let { origin; _ } = React.S.value model in
+             Option_util.map Public_data.short_node_of_refined_node origin in
            let _ =
              State_project.with_project
                ~label:__LOC__
@@ -466,7 +667,8 @@ let onload () =
                             Public_data.refined_influence_node_of_json
                             origin'
                         in
-                        let () = set_origin origin' in
+                        let () = update_model
+                            (fun m -> { m with origin = origin' }) in
                         ())
                      (manager#get_previous_node origin) >>=
                    fun out -> Lwt.return (Api_common.result_lift out)
