@@ -158,18 +158,18 @@ let get_compilation_from_pack ~warning kasim_args cli_args pack =
       cli_args.Run_cli_args.maxValue,
       None,None,
       (match cli_args.Run_cli_args.plotPeriod with
-       | Some a -> Counter.DT a
+       | Some a -> Configuration.DT a
        | None ->
-         Option_util.unsome (Counter.DT 1.) conf.Configuration.plotPeriod)
+         Option_util.unsome (Configuration.DT 1.) conf.Configuration.plotPeriod)
     | Kasim_args.Event ->
       init_t_from_files,None,
       Some (int_of_float
               (Option_util.unsome 0. cli_args.Run_cli_args.minValue)),
       Option_util.map int_of_float cli_args.Run_cli_args.maxValue,
       match cli_args.Run_cli_args.plotPeriod with
-      | Some a -> Counter.DE (int_of_float (ceil a))
+      | Some a -> Configuration.DE (int_of_float (ceil a))
       | None ->
-        Option_util.unsome (Counter.DE 1) conf.Configuration.plotPeriod in
+        Option_util.unsome (Configuration.DE 1) conf.Configuration.plotPeriod in
   let counter =
     Counter.create ~init_t ?init_e ?max_time ?max_event ~plot_period in
   let env =

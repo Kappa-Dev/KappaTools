@@ -93,17 +93,17 @@ let do_modification
       Nbr.maybe_iteri
         (fun _ g ->
            Rule_interpreter.force_rule
-             ~outputs env counter g (Trace.PERT text) r)
+             ~debugMode ~outputs env counter g (Trace.PERT text) r)
         graph (Rule_interpreter.value_alg counter graph v) in
     let graph'',extra' =
       Rule_interpreter.update_outdated_activities
-        (fun _ _ _  -> ()) env counter graph' extra in
+        ~debugMode (fun _ _ _  -> ()) env counter graph' extra in
     ((false,graph'',state), extra')
   | Primitives.UPDATE (i,(expr,_)) ->
     let graph' = Rule_interpreter.overwrite_var i counter graph expr in
     let graph'',extra' =
         Rule_interpreter.update_outdated_activities
-          (fun _ _ _  -> ()) env counter graph' extra in
+          ~debugMode (fun _ _ _  -> ()) env counter graph' extra in
     ((false, graph'', state), extra')
   | Primitives.STOP pexpr ->
     let () = if pexpr <> [] then
@@ -232,7 +232,8 @@ let do_modifications ~debugMode ~outputs env counter graph state list =
   else perturbate
       ~debugMode ~outputs ~is_alarm:false env counter graph state extra
 
-let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
+let initialize
+    ~bind ~return ~debugMode ~outputs env counter graph0 state0 init_l =
   let mgraph =
     List.fold_left
       (fun mstate (alg,compiled_rule) ->
@@ -255,8 +256,8 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
                 Nbr.iteri
                   (fun _ s ->
                      match Rule_interpreter.apply_given_rule
-                             ~outputs env counter s (Trace.INIT creations_sort)
-                             compiled_rule with
+                             ~debugMode ~outputs env counter s
+                             (Trace.INIT creations_sort) compiled_rule with
                      | Rule_interpreter.Success s -> s
                      | (Rule_interpreter.Clash | Rule_interpreter.Corrected
                        | Rule_interpreter.Blocked) ->
@@ -268,13 +269,12 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
     (fun (_,graph,state0) ->
        let mid_graph,_ =
          Rule_interpreter.update_outdated_activities
-           (fun _ _ _  -> ()) env counter graph [] in
+           ~debugMode (fun _ _ _  -> ()) env counter graph [] in
        let out =
          Tools.array_fold_lefti (fun i (stop,graph,state as acc) _ ->
              if stop then acc else
                perturbate
-                 ~debugMode:!Parameter.debugModeOn
-                 ~outputs ~is_alarm:true env counter graph state [i])
+                 ~debugMode ~outputs ~is_alarm:true env counter graph state [i])
        (false,mid_graph,state0) state0.perturbations_alive in
        let () =
          Array.iteri (fun i _ -> state0.perturbations_not_done_yet.(i) <- true)
@@ -322,7 +322,8 @@ let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state =
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
 
   let applied_rid_syntax,final_step,graph' =
-    Rule_interpreter.apply_rule ~outputs ~maxConsecutiveClash env counter graph in
+    Rule_interpreter.apply_rule
+      ~debugMode ~outputs ~maxConsecutiveClash env counter graph in
   match applied_rid_syntax with
   | None -> (final_step,graph',state)
   | Some syntax_rid ->
@@ -362,7 +363,7 @@ let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state =
     let () = state.force_test_perturbations <- [] in
     let graph'',extra_pert =
       Rule_interpreter.update_outdated_activities
-        register_new_activity env counter graph' force_tested in
+        ~debugMode register_new_activity env counter graph' force_tested in
     let () = finalize_registration syntax_rid in
     let (stop,graph''',state') =
       perturbate
@@ -371,7 +372,7 @@ let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state =
       Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
         state.perturbations_not_done_yet in
     let () =
-      if !Parameter.debugModeOn then
+      if debugMode then
         Format.printf "@[<v>Obtained@ %a@]@." (Rule_interpreter.print env) graph''' in
     (final_step||stop,graph''',state')
 
@@ -442,9 +443,8 @@ let perturbate_with_backtrack
       (stop,graph',state')
     else (true,graph,state)
 
-let a_loop
-    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash env counter graph state =
-  let debugMode = !Parameter.debugModeOn in
+let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+    env counter graph state =
   let activity = Rule_interpreter.activity graph in
   let rd = Random.State.float (Rule_interpreter.get_random_state graph) 1.0 in
   let dt = abs_float (log rd /. activity) in

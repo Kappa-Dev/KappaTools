@@ -6,6 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type period = DE of int | DT of float
+
 type t = {
   progressSize : int;
   progressChar : char;
@@ -13,7 +15,7 @@ type t = {
   initial : float option;
   maxConsecutiveClash : int;
   outputFileName : string option;
-  plotPeriod : Counter.period option;
+  plotPeriod : period option;
   seed : int option;
   traceFileName : string option;
   deltaActivitiesFileName : string option;
@@ -92,7 +94,7 @@ let parse result =
         begin match value_list with
           | [s,p] ->
             (try
-               ({conf with plotPeriod = Some (Counter.DT (float_of_string s))},
+               ({conf with plotPeriod = Some (DT (float_of_string s))},
                 story_compression,formatCflow,cflowFile)
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
@@ -101,7 +103,7 @@ let parse result =
             if u = "e" || u = "event" || u = "events" ||
                u = "Event" || u = "Events" then
               try
-                ({conf with plotPeriod = Some (Counter.DE (int_of_string s))},
+                ({conf with plotPeriod = Some (DE (int_of_string s))},
                  story_compression,formatCflow,cflowFile)
               with Failure _ ->
                 raise (ExceptionDefn.Malformed_Decl
@@ -109,7 +111,7 @@ let parse result =
             else if u = "t.u." || u = "time units" || u = "Time units" ||
                     u = "time unit" || u = "Time unit" then
               try
-                ({conf with plotPeriod = Some (Counter.DT (float_of_string s))},
+                ({conf with plotPeriod = Some (DT (float_of_string s))},
                  story_compression,formatCflow,cflowFile)
               with Failure _ ->
                 raise (ExceptionDefn.Malformed_Decl
@@ -197,9 +199,9 @@ let print f conf =
       f conf.initial in
   let () = Pp.option ~with_space:false
       (fun f -> function
-         | Counter.DE i ->
+         | DE i ->
            Format.fprintf f "%%def: \"plotPeriod\" \"%i\" \"events\"@," i
-         | Counter.DT t ->
+         | DT t ->
            Format.fprintf f "%%def: \"plotPeriod\" \"%g\" \"t.u.\"@," t)
       f conf.plotPeriod in
   let () = Pp.option ~with_space:false

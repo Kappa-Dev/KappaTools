@@ -6,6 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type period = DE of int | DT of float
+
 type t = {
   progressSize : int;
   progressChar : char;
@@ -13,7 +15,7 @@ type t = {
   initial : float option;
   maxConsecutiveClash : int;
   outputFileName : string option;
-  plotPeriod : Counter.period option;
+  plotPeriod : period option;
   seed : int option;
   traceFileName : string option;
   deltaActivitiesFileName : string option;

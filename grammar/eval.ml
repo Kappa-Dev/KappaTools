@@ -596,10 +596,10 @@ let compile
   return (env,has_tracking,init_l)
 
 let build_initial_state
-    ~bind ~return ~outputs counter env ~with_trace ~with_delta_activities
-    random_state init_l =
+    ~bind ~return ~debugMode ~outputs counter env
+    ~with_trace ~with_delta_activities random_state init_l =
   let graph0 = Rule_interpreter.empty
       ~outputs ~with_trace random_state env counter in
   let state0 = State_interpreter.empty ~with_delta_activities env in
   State_interpreter.initialize
-    ~bind ~return ~outputs env counter graph0 state0 init_l
+    ~bind ~return ~debugMode ~outputs env counter graph0 state0 init_l

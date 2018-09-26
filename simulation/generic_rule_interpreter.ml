@@ -799,9 +799,10 @@ module Make (Instances:Instances_sig.S) = struct
 
   (* cc_va is the number of embeddings. It only has
   to be multiplied by the rate constant of the rule *)
-  let store_activity store env counter state id syntax_id rate cc_va =
+  let store_activity
+      ~debugMode store env counter state id syntax_id rate cc_va =
     let () =
-      if !Parameter.debugModeOn then
+      if debugMode then
         Format.printf "@[%sule %a has now %i instances.@]@."
           (if id mod 2 = 1 then "Unary r" else "R")
           (Model.print_rule ~noCounters:true ~env) (id/2) cc_va in
@@ -818,14 +819,15 @@ module Make (Instances:Instances_sig.S) = struct
                  "At t=%.2f %sctivity of rule %a has become negative (%f)"
                  (Counter.current_time counter)
                  (if unary then "Unary " else "")
-                 (Model.print_rule ~noCounters:!Parameter.debugModeOn ~env) id
+                 (Model.print_rule ~noCounters:debugMode ~env) id
                  act),
               Model.get_ast_rule_rate_pos ~unary env syntax_id)) in
     let old_act = get_activity id state in
     let () = set_activity id act state in
     store syntax_id old_act act
 
-  let update_outdated_activities store env counter state known_perts =
+  let update_outdated_activities
+      ~debugMode store env counter state known_perts =
     let () = assert (not state.outdated) in
     let deps,changed_connectivity = state.outdated_elements in
     let unary_rule_update modified_cc i state rule =
@@ -836,7 +838,7 @@ module Make (Instances:Instances_sig.S) = struct
           compute_unary_number state modified_cc rule i in
         let () =
           store_activity
-            store env counter state (2*i+1)
+            ~debugMode store env counter state (2*i+1)
             rule.Primitives.syntactic_rule (fst unrate) va in
         state in
     let rec aux dep acc =
@@ -854,7 +856,8 @@ module Make (Instances:Instances_sig.S) = struct
                  ~rule_id:i
                  state.instances rule.Primitives.connected_components in
              let () =
-               store_activity store env counter state (2*i)
+               store_activity
+                 ~debugMode store env counter state (2*i)
                  rule.Primitives.syntactic_rule
                  (fst rule.Primitives.rate) pattern_va in
              let state = pop_exact_matchings state i in
@@ -904,9 +907,9 @@ module Make (Instances:Instances_sig.S) = struct
           state event_kind ?path rule (Model.signatures env) in
       Success state
 
-  let apply_given_unary_rule ~outputs ~rule_id env counter state event_kind rule =
+  let apply_given_unary_rule
+      ~debugMode ~outputs ~rule_id env counter state event_kind rule =
     let () = assert (not state.outdated) in
-    let debugMode = !Parameter.debugModeOn in
     let domain = Model.domain env in
     let inj,path = pick_a_unary_rule_instance
         ~debugMode state state.random_state domain state.edges ~rule_id rule in
@@ -937,16 +940,16 @@ module Make (Instances:Instances_sig.S) = struct
           transform_by_a_rule
             ~debugMode outputs env counter state' event_kind ?path rule ~rule_id inj
 
-  let apply_given_rule ~outputs ?rule_id env counter state event_kind rule =
+  let apply_given_rule
+      ~debugMode ~outputs ?rule_id env counter state event_kind rule =
     let () = assert (not state.outdated) in
-    let debugMode = !Parameter.debugModeOn in
     let domain = Model.domain env in
     match pick_a_rule_instance
             ~debugMode state state.random_state domain state.edges ?rule_id rule with
     | None -> Clash
     | Some (inj,rev_roots) ->
       let () =
-        if !Parameter.debugModeOn then
+        if debugMode then
           let roots = Tools.array_rev_of_list rev_roots in
           Format.printf "@[On roots:@ @[%a@]@]@."
             (Pp.array Pp.space (fun _ -> Format.pp_print_int)) roots in
@@ -963,7 +966,8 @@ module Make (Instances:Instances_sig.S) = struct
                Corrected
              else
                transform_by_a_rule
-                 ~debugMode outputs env counter state event_kind rule ?rule_id inj
+                 ~debugMode outputs env counter state
+                 event_kind rule ?rule_id inj
            | _ -> failwith "apply_given_rule unary rule without 2 patterns")
         | Some dist ->
           let dist' = Some (max_dist_to_int counter state dist) in
@@ -977,8 +981,9 @@ module Make (Instances:Instances_sig.S) = struct
               ~debugMode outputs env counter state event_kind rule ?rule_id inj
           | Some _ -> Corrected
 
-  let force_rule ~outputs env counter state event_kind ?rule_id rule =
-    match apply_given_rule ~outputs ?rule_id env counter state event_kind rule with
+  let force_rule ~debugMode ~outputs env counter state event_kind ?rule_id rule =
+    match apply_given_rule
+            ~debugMode ~outputs ?rule_id env counter state event_kind rule with
     | Success out -> Some out
     | Corrected | Blocked | Clash ->
       let () = assert (not state.outdated) in
@@ -989,7 +994,7 @@ module Make (Instances:Instances_sig.S) = struct
            | None -> Some (loc,None)
            | Some d ->
              Some (loc,Some (max_dist_to_int counter state d))) in
-      match all_injections ~debugMode:!Parameter.debugModeOn ?rule_id
+      match all_injections ~debugMode ?rule_id
               ?unary_rate state.instances (Model.domain env) state.edges
               rule.Primitives.connected_components with
       | [] ->
@@ -1005,8 +1010,7 @@ module Make (Instances:Instances_sig.S) = struct
         let (h,_) = List_util.random state.random_state l in
         let out =
           transform_by_a_rule
-            ~debugMode:!Parameter.debugModeOn outputs
-            env counter state event_kind rule ?rule_id h in
+            ~debugMode outputs env counter state event_kind rule ?rule_id h in
         match out with
           | Success out -> Some out
           | Blocked -> None
@@ -1027,7 +1031,8 @@ module Make (Instances:Instances_sig.S) = struct
         ~debugMode ~rule_id ?unary_rate state domain state.edges
         rule.Primitives.connected_components rule in
     let () =
-      store_activity (fun _ _ _ -> ()) env counter state (2*rule_id)
+      store_activity
+        ~debugMode (fun _ _ _ -> ()) env counter state (2*rule_id)
         rule.Primitives.syntactic_rule (fst rule.Primitives.rate) act in
     state
 
@@ -1045,7 +1050,8 @@ module Make (Instances:Instances_sig.S) = struct
         ~debugMode ~rule_id ?max_distance state domain state.edges
         rule.Primitives.connected_components rule in
     let () =
-      store_activity (fun _ _ _ -> ()) env counter state (2*rule_id+1)
+      store_activity
+        ~debugMode (fun _ _ _ -> ()) env counter state (2*rule_id+1)
         rule.Primitives.syntactic_rule (fst rule.Primitives.rate) act in
     state
 
@@ -1067,25 +1073,23 @@ module Make (Instances:Instances_sig.S) = struct
   }
 
   let apply_rule
-      ~outputs ?maxConsecutiveBlocked ~maxConsecutiveClash
+      ~debugMode ~outputs ?maxConsecutiveBlocked ~maxConsecutiveClash
       env counter graph =
-    let debugMode = !Parameter.debugModeOn in
-    let noCounters = !Parameter.debugModeOn in
     let choice = pick_rule graph.random_state graph in
     let rule_id = choice/2 in
     let rule = Model.get_rule env rule_id in
     let cause = Trace.RULE rule_id in
     let () =
-      if !Parameter.debugModeOn then
+      if debugMode then
         Format.printf
           "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
           (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
-          rule_id (Kappa_printer.decompiled_rule ~noCounters ~full:true env) rule
+          rule_id (Kappa_printer.decompiled_rule ~noCounters:true ~full:true env) rule
           (*Rule_interpreter.print_dist env graph rule_id*) in
     let apply_rule =
       if choice mod 2 = 1
-      then apply_given_unary_rule ~outputs ~rule_id
-      else apply_given_rule ~outputs ~rule_id in
+      then apply_given_unary_rule ~debugMode ~outputs ~rule_id
+      else apply_given_rule ~debugMode ~outputs ~rule_id in
     match apply_rule env counter graph cause rule with
     | Success (graph') ->
       let final_step = not (Counter.one_constructive_event counter) in

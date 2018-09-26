@@ -221,7 +221,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                 Counter.create
                   ~init_t:(0. : float) ~init_e:(0 : int)
                   ?max_time:None ?max_event:None
-                  ~plot_period:(Counter.DT 1.) in
+                  ~plot_period:(Configuration.DT 1.) in
               let theSeed =
                 match conf.Configuration.seed with
                 | None ->
@@ -365,7 +365,8 @@ let run_simulation
               do
                 let (stop,graph',state') =
                   State_interpreter.a_loop
-                    ~outputs:(outputs t) ~dumpIfDeadlocked:t.dumpIfDeadlocked
+                    ~debugMode:false ~outputs:(outputs t)
+                    ~dumpIfDeadlocked:t.dumpIfDeadlocked
                     ~maxConsecutiveClash:t.maxConsecutiveClash
                     t.env t.counter t.graph t.state in
                 rstop := stop || Rule_interpreter.value_bool
@@ -429,7 +430,7 @@ let start
         let () =
           Counter.set_plot_period
             t.counter
-            (Counter.DT parameter.Api_types_t.simulation_plot_period) in
+            (Configuration.DT parameter.Api_types_t.simulation_plot_period) in
         let () =
           Lwt.async
             (fun () ->
@@ -439,7 +440,7 @@ let start
                    ~bind:(fun x f ->
                        (time_yield ~system_process:system_process ~t:t) >>=
                        (fun () -> x >>= f))
-                   ~return:Lwt.return ~outputs:(outputs t)
+                   ~return:Lwt.return ~debugMode:false ~outputs:(outputs t)
                    ~with_trace:parameter.Api_types_t.simulation_store_trace
                    ~with_delta_activities:false
                    t.counter

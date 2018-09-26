@@ -18,12 +18,12 @@ let rec waitpid_non_intr pid =
   with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
 
 let batch_loop
-    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency
+    ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency
     progress env counter graph state =
   let rec iter graph state =
     let stop,graph',state' =
       State_interpreter.a_loop
-        ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+        ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
         env counter graph state in
     if stop then (graph',state')
     else
@@ -36,7 +36,7 @@ let batch_loop
   in iter graph state
 
 let interactive_loop
-    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency
+    ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency
     progress pause_criteria env counter graph state =
   let user_interrupted = ref false in
   let old_sigint_behavior =
@@ -52,7 +52,7 @@ let interactive_loop
       (false,graph,state)
     else
       let stop,graph',state' as out =
-        State_interpreter.a_loop ~outputs
+        State_interpreter.a_loop ~debugMode ~outputs
           ~dumpIfDeadlocked ~maxConsecutiveClash env counter graph state in
       if stop then
         let () = Sys.set_signal Sys.sigint old_sigint_behavior in
@@ -241,8 +241,8 @@ let () =
     let () = Format.printf "+ Building initial state@?" in
     let (stop,graph,state) =
       Eval.build_initial_state
-        ~bind:(fun x f -> f x) ~return:(fun x -> x) ~outputs counter env
-        ~with_trace:(trace_file<>None)
+        ~bind:(fun x f -> f x) ~return:(fun x -> x)
+        ~debugMode ~outputs counter env ~with_trace:(trace_file<>None)
         ~with_delta_activities:(deltaActivitiesFileName<>None)
         random_state init_l in
     let () = Format.printf " (%a)" Rule_interpreter.print_stats graph in
@@ -291,7 +291,7 @@ let () =
       else if cli_args.Run_cli_args.batchmode then
         let (graph',state') =
           batch_loop
-            ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+            ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
             ~efficiency:kasim_args.Kasim_args.showEfficiency
             progress env counter graph state in
         finalize
@@ -322,7 +322,7 @@ let () =
                     conf.Configuration.progressSize
                     conf.Configuration.progressChar in
                 env',interactive_loop
-                  ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+                  ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
                   ~efficiency:kasim_args.Kasim_args.showEfficiency
                   progress b'' env' counter graph' state
               | Ast.QUIT -> env,(true,graph,state)
@@ -358,7 +358,7 @@ let () =
         else
           let (stop,graph',state') =
             interactive_loop
-              ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+              ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
               ~efficiency:kasim_args.Kasim_args.showEfficiency
               progress Alg_expr.FALSE env counter graph state in
           if stop then

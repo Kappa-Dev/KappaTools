@@ -37,14 +37,14 @@ module Make (Instances:Instances_sig.S) : sig
   (** {6 Core} *)
 
   val apply_given_rule :
-    outputs:(Data.t -> unit) ->
+    debugMode:bool -> outputs:(Data.t -> unit) ->
     ?rule_id:int -> Model.t -> Counter.t -> t -> Trace.event_kind ->
     Primitives.elementary_rule -> result
   (** Returns the graph obtained by applying the rule.
       [rule_id] is mandatory if the rule has an unary rate.*)
 
   val apply_rule :
-    outputs:(Data.t -> unit) ->
+    debugMode:bool -> outputs:(Data.t -> unit) ->
     ?maxConsecutiveBlocked:int -> maxConsecutiveClash:int ->
     Model.t -> Counter.t -> t -> int option * bool * t
   (** [apply_rule ~outputs ~maxConsecutiveClash ?is_blocked model counter st]
@@ -54,7 +54,7 @@ module Make (Instances:Instances_sig.S) : sig
       a null event occured *)
 
   val force_rule :
-    outputs:(Data.t -> unit) ->
+    debugMode:bool -> outputs:(Data.t -> unit) ->
     Model.t -> Counter.t -> t -> Trace.event_kind ->
     ?rule_id:int ->  Primitives.elementary_rule -> t option
   (** Apply the rule for sure if it is possible. Try [apply_rule] but in
@@ -66,7 +66,7 @@ module Make (Instances:Instances_sig.S) : sig
 
   val overwrite_var : int -> Counter.t -> t -> Primitives.alg_expr -> t
   val update_outdated_activities :
-    (int -> float -> float -> unit) ->
+    debugMode:bool -> (int -> float -> float -> unit) ->
     Model.t -> Counter.t -> t -> int list -> (t * int list)
   (** Resynchronize the state after a rule application.
 

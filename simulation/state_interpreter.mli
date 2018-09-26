@@ -15,10 +15,9 @@ val empty : with_delta_activities:bool -> Model.t -> t
 
 val initialize :
   bind:('a -> (bool * Rule_interpreter.t * t -> 'a) -> 'a) ->
-  return:(bool * Rule_interpreter.t * t -> 'a) -> outputs:(Data.t -> unit) ->
-  Model.t -> Counter.t -> Rule_interpreter.t -> t ->
-  (Primitives.alg_expr * Primitives.elementary_rule) list ->
-  'a
+  return:(bool * Rule_interpreter.t * t -> 'a) -> debugMode:bool ->
+  outputs:(Data.t -> unit) -> Model.t -> Counter.t -> Rule_interpreter.t -> t ->
+  (Primitives.alg_expr * Primitives.elementary_rule) list -> 'a
 (** [initial env counter graph state] builds up the initial state *)
 
 val observables_values :
@@ -32,7 +31,7 @@ val do_modifications :
   (bool * Rule_interpreter.t * t)
 
 val a_loop :
-  outputs:(Data.t -> unit) -> dumpIfDeadlocked:bool ->
+  debugMode:bool -> outputs:(Data.t -> unit) -> dumpIfDeadlocked:bool ->
   maxConsecutiveClash:int -> Model.t -> Counter.t ->
   Rule_interpreter.t -> t -> (bool * Rule_interpreter.t * t)
 (** One event loop *)

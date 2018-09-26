@@ -34,12 +34,10 @@ module Efficiency : sig
   (** Deserialize JSON data of type {!t}. *)
 end
 
-type period = DE of int | DT of float
-
 type t
 val create : ?init_t:float -> ?init_e:int ->
   ?max_time:float -> ?max_event:int ->
-  plot_period:period -> t
+  plot_period:Configuration.period -> t
 
 val reinitialize : t -> unit
 
@@ -69,8 +67,8 @@ val time_ratio : t -> float option
 val tracked_events : t -> int option
 
 val positive_plot_period : t -> bool
-val plot_period : t -> period
-val set_plot_period : t -> period -> unit
+val plot_period : t -> Configuration.period
+val set_plot_period : t -> Configuration.period -> unit
 
 val current_time : t -> float
 val current_event : t -> int

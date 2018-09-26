@@ -152,7 +152,6 @@ end =
       read_t (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
   end
 
-type period = DE of int | DT of float
 type t = {
     mutable time:float ;
     mutable events:int ;
@@ -161,7 +160,7 @@ type t = {
     mutable stat_null : Efficiency.t ;
     init_time : float ;
     init_event : int ;
-    mutable plot_period : period;
+    mutable plot_period : Configuration.period;
     mutable max_time : float option ;
     mutable max_event : int option ;
   }
@@ -273,17 +272,17 @@ let next_story c =
 
 let positive_plot_period counter =
   match plot_period counter with
-  | DE e -> e > 0
-  | DT t -> t > 0.
+  | Configuration.DE e -> e > 0
+  | Configuration.DT t -> t > 0.
 
 let next_point counter dt =
   match counter.plot_period with
-  | DT dT ->
+  | Configuration.DT dT ->
     if dT <= 0. then 0 else
       int_of_float
         ((min (Option_util.unsome infinity (max_time counter))
             (dt +. current_time counter) -. counter.init_time) /. dT)
-  | DE dE ->
+  | Configuration.DE dE ->
     if dE <= 0 then 0 else
       (current_event counter - counter.init_event) / dE
 
@@ -293,14 +292,14 @@ let to_plot_points counter dt =
   let () = counter.last_point <- next in
   let n = next - last in
   match counter.plot_period with
-  | DT dT ->
+  | Configuration.DT dT ->
     snd
       (Tools.recti
          (fun (time,acc) _ ->
             time -. dT,
             if check_output_time counter time then time::acc else acc)
          ((float_of_int next) *. dT,[]) n),counter
-  | DE _ ->
+  | Configuration.DE _ ->
     if n=1 then [counter.time],counter
     else if n=0 then [],counter
     else
