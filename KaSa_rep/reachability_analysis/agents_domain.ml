@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 22 2018>
+   * Last modification: Time-stamp: <Sep 26 2018>
    *
    * Abstract domain to record live rules
    *
@@ -561,13 +561,21 @@ struct
 
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
+    let handler = get_kappa_handler static in
+    let compil = get_compil static in 
     let array = get_seen_agent dynamic in
     let error, list =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
         parameters
         error
-        (fun _parameters error i bool list ->
-           error, if not bool then i::list else list
+        (fun _parameters error agent bool list ->
+           if bool then error, list
+           else
+             let error, info =
+               Handler.info_of_agent parameters error handler compil agent
+             in
+             let agent = Remanent_state.info_to_agent info in
+             error, agent::list
         )
         array []
     in

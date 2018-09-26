@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Apr 15 2018>
+  * Last modification: Time-stamp: <Sep 26 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -35,11 +35,15 @@ type quark_map = Quark_type.quarks
 type rule_id = int
 type var_id =  int
 
-type dead_agents = Ckappa_sig.c_agent_name list
+type dead_agents = Public_data.agent_name list
 
 val info_to_rule:
   (string*Locality.t*Public_data.rule_direction*string*Ckappa_sig.c_rule_id)
   -> Public_data.rule
+
+val info_to_agent:
+  Public_data.agent_name
+    -> Public_data.agent_name
 
 type separating_transitions = Public_data.separating_transitions
 

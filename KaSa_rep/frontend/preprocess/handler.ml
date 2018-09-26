@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Feb 25 2018>
+   * Last modification: Time-stamp: <Sep 26 2018>
    * *
    * Primitives to use a kappa handler
    *
@@ -314,7 +314,16 @@ let info_of_rule
     in
     error, (label, position, direction, ast, rule_id)
 
+
 let hide rule = {rule with Public_data.rule_hidden = true}
+
+let info_of_agent
+    parameters handler error _compiled agent =
+  let error, agent_name =
+    translate_agent parameters handler error agent
+  in
+    error, agent_name
+
 
 let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
   let vars = compiled.Cckappa_sig.variables in

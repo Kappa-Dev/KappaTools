@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Apr 15 2018>
+  * Last modification: Time-stamp: <Sep 26 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -66,7 +66,7 @@ let info_to_rule (s1,loc,direction,s2,id) =
     Public_data.rule_hidden=false;
   }
 
-type dead_agents = Ckappa_sig.c_agent_name list
+type dead_agents = Public_data.dead_agents
 
 type separating_transitions = Public_data.separating_transitions
 
@@ -833,3 +833,5 @@ let set_symmetries accuracy partition state =
            Public_data.AccuracyMap.add
              accuracy partition state.symmetric_sites
   }
+
+let info_to_agent x = x

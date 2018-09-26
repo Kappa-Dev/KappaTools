@@ -520,6 +520,18 @@ paths:
           description: OK
         default:
           $ref: '#/components/responses/Default'
+  '/projects/{project_id}/analyses/dead_agents':
+            get:
+              tags:
+                - analyses
+              summary: Return dead agents
+              parameters:
+                - $ref: '#/components/parameters/ProjectId'
+              responses:
+                '200':
+                  description: OK
+                default:
+                  $ref: '#/components/responses/Default'
   '/projects/{project_id}/analyses/constraints':
     get:
       tags:

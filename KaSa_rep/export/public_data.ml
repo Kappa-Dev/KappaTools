@@ -14,6 +14,7 @@ let agent="agent name"
 let contactmap="contact map"
 let accuracy_string = "accuracy"
 let dead_rules = "dead rules"
+let dead_agents = "dead agents"
 let map = "map"
 let interface="interface"
 let site="site name"
@@ -746,15 +747,16 @@ let local_influence_map_of_json =
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
 
+
+(***************)
+(* dead rules  *)
+(***************)
+
 type dead_rules = rule list
 
 let dead_rules_to_json json =
   `Assoc
     [dead_rules, JsonUtil.of_list rule_to_json json]
-
-(***************)
-(* dead rules *)
-(***************)
 
 let dead_rules_of_json =
   function
@@ -763,14 +765,42 @@ let dead_rules_of_json =
       try
         JsonUtil.to_list json_to_rule json
       with Not_found ->
-        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead rules",x))
+        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_rules,x))
     end
   | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead rules",x))
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_rules,x))
 
 (***************)
 (* dead agents *)
 (***************)
+
+type agent_name  = string
+
+let agent_name_to_json x = `String x
+let agent_name_of_json = Yojson.Basic.Util.to_string
+
+type dead_agents = agent_name list
+
+let dead_agents_to_json json =
+  `Assoc
+    [dead_agents, JsonUtil.of_list agent_name_to_json json]
+
+let dead_agents_of_json =
+  function
+  | `Assoc [s,json] as x when s=dead_agents ->
+    begin
+      try
+        JsonUtil.to_list agent_name_of_json json
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_agents,x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_agents,x))
+
+
+(*************************************)
+(* non weakly reversible transitions *)
+(*************************************)
 
 type separating_transitions = (rule * (string * string) list) list
 
@@ -815,6 +845,7 @@ type binding_state =
     | Binding_type of string * string
 
 type agent = string * (string * string option * binding_state option * (int option * int option) option) list
+
 
 type 'site_graph lemma =
   {
