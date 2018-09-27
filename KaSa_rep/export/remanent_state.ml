@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Sep 26 2018>
+  * Last modification: Time-stamp: <Sep 27 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -834,4 +834,9 @@ let set_symmetries accuracy partition state =
              accuracy partition state.symmetric_sites
   }
 
-let info_to_agent x = x
+let info_to_agent (agent_name,pos,agent_id)  =
+  {
+    Public_data.agent_id = Ckappa_sig.int_of_agent_name agent_id;
+    Public_data.agent_ast = agent_name ;
+    Public_data.agent_position = pos
+  }

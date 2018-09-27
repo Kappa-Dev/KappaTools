@@ -154,11 +154,17 @@ type dead_rules = rule list
 val dead_rules_of_json : Yojson.Basic.json -> dead_rules
 val dead_rules_to_json : dead_rules -> Yojson.Basic.json
 
-type agent_name = string
-type dead_agents = agent_name list
+type agent_kind =
+  {
+    agent_id: int;
+    agent_ast: string ;
+    agent_position: Locality.t list;
+  }
 
-val dead_agents_of_json : Yojson.Basic.json -> dead_agents
-val dead_agents_to_json : dead_agents -> Yojson.Basic.json
+type dead_agents = agent_kind list
+
+val json_to_dead_agents : Yojson.Basic.json -> dead_agents
+val json_of_dead_agents : dead_agents -> Yojson.Basic.json
 
 type separating_transitions = (rule * (string * string) list) list
 
@@ -178,7 +184,7 @@ type binding_state =
   | Bound_to of int
   | Binding_type of string * string
 
-type agent = agent_name * (string * string option * binding_state option * (int option * int option) option) list
+type agent = string * (string * string option * binding_state option * (int option * int option) option) list
 
 val lemma_to_json:
   ('site_graph -> Yojson.Basic.json) -> 'site_graph lemma -> Yojson.Basic.json

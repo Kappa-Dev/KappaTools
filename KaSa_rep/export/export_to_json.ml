@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Sep 26 2018>
+  * Last modification: Time-stamp: <Sep 27 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -233,7 +233,7 @@ functor (A:Analyzer.Analyzer) ->
 
     let get_dead_agents state =
       let state, agents = get_dead_agents state in
-      state, Public_data.dead_agents_to_json agents
+      state, Public_data.json_of_dead_agents agents
 
     let get_separating_transitions state =
       let state, separating_transitions = get_separating_transitions state in

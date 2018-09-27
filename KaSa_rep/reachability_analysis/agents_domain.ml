@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Sep 26 2018>
+   * Last modification: Time-stamp: <Sep 27 2018>
    *
    * Abstract domain to record live rules
    *
@@ -562,7 +562,7 @@ struct
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
     let handler = get_kappa_handler static in
-    let compil = get_compil static in 
+    let compil = get_compil static in
     let array = get_seen_agent dynamic in
     let error, list =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold

@@ -31,9 +31,11 @@ let domain_name = "domain name"
 let refinements_list = "refinements list"
 let refinement_lemmas="refinement lemmas"
 let rule_id = "id"
+let agent_id = "id"
 let label = "label"
 let ast = "ast"
 let position = "location"
+let position_list = "location list"
 let edit = "edit_rule"
 let variable = "variable"
 let rule = "rule"
@@ -774,23 +776,81 @@ let dead_rules_of_json =
 (* dead agents *)
 (***************)
 
-type agent_name  = string
+type agent_kind  =
+  {
+    agent_id: int;
+    agent_ast: string ;
+    agent_position: Locality.t list;
+  }
 
-let agent_name_to_json x = `String x
-let agent_name_of_json = Yojson.Basic.Util.to_string
 
-type dead_agents = agent_name list
-
-let dead_agents_to_json json =
+let rule_to_json rule =
   `Assoc
-    [dead_agents, JsonUtil.of_list agent_name_to_json json]
+    [
+      rule_id,JsonUtil.of_int rule.rule_id;
+      label, JsonUtil.of_string rule.rule_label;
+      ast, JsonUtil.of_string rule.rule_ast;
+      position,Locality.annot_to_yojson
+        JsonUtil.of_unit ((),rule.rule_position);
+      direction, direction_to_json rule.rule_direction;
+      rule_hidden, JsonUtil.of_bool rule.rule_hidden
+    ]
 
-let dead_agents_of_json =
+let json_to_agent_kind =
+  function
+  | `Assoc l as x when List.length l = 3 ->
+    begin
+      try
+        {
+          agent_id = JsonUtil.to_int (List.assoc rule_id l) ;
+          agent_ast =  JsonUtil.to_string (List.assoc label l) ;
+          agent_position =
+            JsonUtil.to_list
+              ~error_msg:(JsonUtil.build_msg "locality list")
+              (fun json ->
+                snd
+                  (Locality.annot_of_yojson
+                     (JsonUtil.to_unit
+                        ~error_msg:(JsonUtil.build_msg "locality")
+                     )
+                     json
+                  ))
+              (List.assoc position_list l);
+            }
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "agent kind",x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("agent kind",x))
+
+
+let agent_kind_to_json agent_kind =
+  `Assoc
+    [
+      agent_id,JsonUtil.of_int agent_kind.agent_id;
+      ast, JsonUtil.of_string agent_kind.agent_ast;
+      position_list,
+      JsonUtil.of_list
+        (fun a ->
+           Locality.annot_to_yojson
+             JsonUtil.of_unit ((),a))
+        agent_kind.agent_position;
+      ]
+
+
+type dead_agents = agent_kind list
+
+let json_of_dead_agents json =
+  `Assoc
+    [dead_agents, JsonUtil.of_list agent_kind_to_json json]
+
+let json_to_dead_agents =
   function
   | `Assoc [s,json] as x when s=dead_agents ->
     begin
       try
-        JsonUtil.to_list agent_name_of_json json
+        JsonUtil.to_list
+          json_to_agent_kind json
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_agents,x))
     end
