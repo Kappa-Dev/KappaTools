@@ -23,6 +23,12 @@ Compilation:Compilation:variables:0:
 Compilation:variables:0:Auu: 
 Compilation:variables:1:
 Compilation:variables:1:Apu: 
+Compilation:agent definition:0:A:
+Compilation:agent definition:       File "sanity1.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "sanity1.ka", line 9, characters 5-6:
+Compilation:agent definition:       File "sanity1.ka", line 9, characters 28-29:
+Compilation:agent definition:       File "sanity1.ka", line 10, characters 5-6:
+Compilation:agent definition:       File "sanity1.ka", line 10, characters 19-20:
 Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:

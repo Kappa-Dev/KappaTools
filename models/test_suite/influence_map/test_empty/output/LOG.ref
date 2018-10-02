@@ -18,6 +18,38 @@ Compilation:Compilation:variables:0:
 Compilation:variables:0:qb: 
 Compilation:variables:1:
 Compilation:variables:1:qc: 
+Compilation:agent definition:0:A:
+Compilation:agent definition:       File "test_empty.ka", line 7, characters 8-9:
+Compilation:agent definition:       File "test_empty.ka", line 10, characters 10-11:
+Compilation:agent definition:       File "test_empty.ka", line 11, characters 10-11:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 0-1:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 18-19:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 18-19:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 0-1:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 0-1:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 16-17:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 16-17:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 0-1:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "test_empty.ka", line 8, characters 8-9:
+Compilation:agent definition:       File "test_empty.ka", line 12, characters 10-11:
+Compilation:agent definition:       File "test_empty.ka", line 13, characters 10-11:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 4-5:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 4-5:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 22-23:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 26-27:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 22-23:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 26-27:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "test_empty.ka", line 9, characters 8-9:
+Compilation:agent definition:       File "test_empty.ka", line 14, characters 10-11:
+Compilation:agent definition:       File "test_empty.ka", line 15, characters 10-11:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 26-27:
+Compilation:agent definition:       File "test_empty.ka", line 1, characters 26-27:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 4-5:
+Compilation:agent definition:       File "test_empty.ka", line 2, characters 4-5:
 Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:

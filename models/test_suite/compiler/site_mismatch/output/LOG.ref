@@ -14,7 +14,10 @@ Signature:states:
 Signature:duals: 
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:initial_states:0:
+Compilation:Compilation:agent definition:0:C:
+Compilation:agent definition:       File "crash.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "crash.ka", line 2, characters 10-11:
+Compilation:initial_states:0:
 Compilation:initial_states:0:mixture:
 Compilation:initial_states:0:mixture:agent_id_0:
 Generating the raw influence map...

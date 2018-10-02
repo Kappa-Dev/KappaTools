@@ -50,7 +50,27 @@ Signature:duals:1:2:1:
 Signature:duals:1:2:1:agent_type:0,site_type:2,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "parallel_bonds.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "parallel_bonds.ka", line 4, characters 10-11:
+Compilation:agent definition:       File "parallel_bonds.ka", line 7, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 7, characters 34-35:
+Compilation:agent definition:       File "parallel_bonds.ka", line 8, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 8, characters 34-35:
+Compilation:agent definition:       File "parallel_bonds.ka", line 9, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 9, characters 47-48:
+Compilation:agent definition:       File "parallel_bonds.ka", line 10, characters 5-6:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "parallel_bonds.ka", line 2, characters 8-9:
+Compilation:agent definition:       File "parallel_bonds.ka", line 5, characters 10-11:
+Compilation:agent definition:       File "parallel_bonds.ka", line 7, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 7, characters 47-48:
+Compilation:agent definition:       File "parallel_bonds.ka", line 8, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 8, characters 47-48:
+Compilation:agent definition:       File "parallel_bonds.ka", line 9, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 9, characters 34-35:
+Compilation:agent definition:       File "parallel_bonds.ka", line 10, characters 18-19:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]

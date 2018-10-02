@@ -148,7 +148,48 @@ Signature:duals:7:0:1:
 Signature:duals:7:0:1:agent_type:3,site_type:1,state_id:2
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 9, characters 19-20:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 10, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 10, characters 69-70:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 2, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 9, characters 32-33:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 10, characters 21-22:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 10, characters 82-83:
+Compilation:agent definition:2:E:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 3, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 12, characters 19-20:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 13, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 13, characters 69-70:
+Compilation:agent definition:3:F:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 4, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 12, characters 32-33:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 13, characters 21-22:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 13, characters 82-83:
+Compilation:agent definition:4:C:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 9, characters 11-12:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 9, characters 45-46:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 10, characters 0-1:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 10, characters 34-35:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 11, characters 0-1:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 12, characters 11-12:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 13, characters 0-1:
+Compilation:agent definition:5:D:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 6, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 10, characters 61-62:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 10, characters 95-96:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 12, characters 45-46:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 13, characters 34-35:
+Compilation:agent definition:6:G:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 7, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 13, characters 61-62:
+Compilation:agent definition:7:H:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 8, characters 8-9:
+Compilation:agent definition:       File "site_accross_bonds_domain.ka", line 13, characters 95-96:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:Ghost

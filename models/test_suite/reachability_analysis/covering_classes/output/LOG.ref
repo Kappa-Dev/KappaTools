@@ -92,7 +92,45 @@ Signature:duals:2:3:1:
 Signature:duals:2:3:1:agent_type:0,site_type:3,state_id:2
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "covering_classes.ka", line 1, characters 10-11:
+Compilation:agent definition:       File "covering_classes.ka", line 4, characters 5-6:
+Compilation:agent definition:       File "covering_classes.ka", line 5, characters 5-6:
+Compilation:agent definition:       File "covering_classes.ka", line 5, characters 27-28:
+Compilation:agent definition:       File "covering_classes.ka", line 6, characters 5-6:
+Compilation:agent definition:       File "covering_classes.ka", line 6, characters 38-39:
+Compilation:agent definition:       File "covering_classes.ka", line 7, characters 16-17:
+Compilation:agent definition:       File "covering_classes.ka", line 7, characters 41-42:
+Compilation:agent definition:       File "covering_classes.ka", line 9, characters 5-6:
+Compilation:agent definition:       File "covering_classes.ka", line 10, characters 5-6:
+Compilation:agent definition:       File "covering_classes.ka", line 10, characters 27-28:
+Compilation:agent definition:       File "covering_classes.ka", line 11, characters 6-7:
+Compilation:agent definition:       File "covering_classes.ka", line 11, characters 39-40:
+Compilation:agent definition:       File "covering_classes.ka", line 12, characters 17-18:
+Compilation:agent definition:       File "covering_classes.ka", line 12, characters 42-43:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "covering_classes.ka", line 2, characters 10-11:
+Compilation:agent definition:       File "covering_classes.ka", line 5, characters 13-14:
+Compilation:agent definition:       File "covering_classes.ka", line 5, characters 35-36:
+Compilation:agent definition:       File "covering_classes.ka", line 6, characters 13-14:
+Compilation:agent definition:       File "covering_classes.ka", line 6, characters 46-47:
+Compilation:agent definition:       File "covering_classes.ka", line 10, characters 13-14:
+Compilation:agent definition:       File "covering_classes.ka", line 10, characters 35-36:
+Compilation:agent definition:       File "covering_classes.ka", line 11, characters 14-15:
+Compilation:agent definition:       File "covering_classes.ka", line 11, characters 47-48:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "covering_classes.ka", line 3, characters 10-11:
+Compilation:agent definition:       File "covering_classes.ka", line 6, characters 24-25:
+Compilation:agent definition:       File "covering_classes.ka", line 6, characters 57-58:
+Compilation:agent definition:       File "covering_classes.ka", line 7, characters 5-6:
+Compilation:agent definition:       File "covering_classes.ka", line 7, characters 30-31:
+Compilation:agent definition:       File "covering_classes.ka", line 8, characters 5-6:
+Compilation:agent definition:       File "covering_classes.ka", line 11, characters 25-26:
+Compilation:agent definition:       File "covering_classes.ka", line 11, characters 58-59:
+Compilation:agent definition:       File "covering_classes.ka", line 12, characters 6-7:
+Compilation:agent definition:       File "covering_classes.ka", line 12, characters 31-32:
+Compilation:agent definition:       File "covering_classes.ka", line 13, characters 6-7:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:Ghost

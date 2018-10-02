@@ -16,7 +16,17 @@ Signature:states:0:0:state_id:2->q
 Signature:duals: 
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "labels.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "labels.ka", line 3, characters 40-41:
+Compilation:agent definition:       File "labels.ka", line 3, characters 54-55:
+Compilation:agent definition:       File "labels.ka", line 4, characters 38-39:
+Compilation:agent definition:       File "labels.ka", line 4, characters 52-53:
+Compilation:agent definition:       File "labels.ka", line 5, characters 5-6:
+Compilation:agent definition:       File "labels.ka", line 5, characters 19-20:
+Compilation:agent definition:       File "labels.ka", line 6, characters 5-6:
+Compilation:agent definition:       File "labels.ka", line 6, characters 19-20:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

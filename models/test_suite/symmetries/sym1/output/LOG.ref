@@ -36,7 +36,57 @@ Signature:states:0:2:state_id:1->p
 Signature:duals: 
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "sym1.ka", line 17, characters 10-11:
+Compilation:agent definition:       File "sym1.ka", line 1, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 1, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 1, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 1, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 2, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 2, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 2, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 2, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 3, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 3, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 3, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 3, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 5, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 5, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 5, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 5, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 6, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 6, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 6, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 6, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 7, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 7, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 7, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 7, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 9, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 9, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 9, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 9, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 10, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 10, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 10, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 10, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 11, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 11, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 11, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 11, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 13, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 13, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 13, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 13, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 14, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 14, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 14, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 14, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 15, characters 0-1:
+Compilation:agent definition:       File "sym1.ka", line 15, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 15, characters 31-32:
+Compilation:agent definition:       File "sym1.ka", line 15, characters 0-1:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

@@ -74,7 +74,29 @@ Signature:duals:2:3:1:
 Signature:duals:2:3:1:agent_type:1,site_type:1,state_id:2
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "complex.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "complex.ka", line 11, characters 5-6:
+Compilation:agent definition:       File "complex.ka", line 11, characters 35-36:
+Compilation:agent definition:       File "complex.ka", line 11, characters 35-36:
+Compilation:agent definition:       File "complex.ka", line 11, characters 5-6:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "complex.ka", line 6, characters 8-9:
+Compilation:agent definition:       File "complex.ka", line 11, characters 18-19:
+Compilation:agent definition:       File "complex.ka", line 11, characters 48-49:
+Compilation:agent definition:       File "complex.ka", line 11, characters 48-49:
+Compilation:agent definition:       File "complex.ka", line 11, characters 18-19:
+Compilation:agent definition:       File "complex.ka", line 12, characters 5-6:
+Compilation:agent definition:       File "complex.ka", line 12, characters 41-42:
+Compilation:agent definition:       File "complex.ka", line 12, characters 41-42:
+Compilation:agent definition:       File "complex.ka", line 12, characters 5-6:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "complex.ka", line 7, characters 8-9:
+Compilation:agent definition:       File "complex.ka", line 12, characters 18-19:
+Compilation:agent definition:       File "complex.ka", line 12, characters 54-55:
+Compilation:agent definition:       File "complex.ka", line 12, characters 54-55:
+Compilation:agent definition:       File "complex.ka", line 12, characters 18-19:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

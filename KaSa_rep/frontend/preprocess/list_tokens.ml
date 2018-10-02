@@ -570,6 +570,24 @@ let scan_rules scan_mixt parameters a b =
          (scan_mixt parameters remanent rule.Ckappa_sig.lhs) rule.Ckappa_sig.rhs)
     a b
 
+let reverse_agents_annotation parameters (error, remanent) =
+  let agents_annotation =
+    remanent.Cckappa_sig.agents_annotation
+  in
+  let error, agents_annotation =
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
+      parameters error
+      (fun parameters error i (a,l) agents_annotation ->
+         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
+           parameters error i (a,List.rev l) agents_annotation)
+      agents_annotation
+      agents_annotation
+
+  in
+  (error,
+   {remanent with Cckappa_sig.agents_annotation = agents_annotation})
+
+
 let scan_compil parameters error compil =
   let parameters =
     Remanent_parameters.set_trace
@@ -594,5 +612,7 @@ let scan_compil parameters error compil =
       compil.Ast.perturbations
   in
   let remanent = scan_rules scan_tested_mixture parameters remanent compil.Ast.rules
+  in
+  let remanent = reverse_agents_annotation parameters remanent
   in
   remanent

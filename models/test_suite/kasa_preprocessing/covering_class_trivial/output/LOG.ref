@@ -22,7 +22,15 @@ Signature:states:0:2:state_id:1->p
 Signature:duals: 
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "covering_class_trivial.ka", line 4, characters 8-9:
+Compilation:agent definition:       File "covering_class_trivial.ka", line 7, characters 5-6:
+Compilation:agent definition:       File "covering_class_trivial.ka", line 7, characters 28-29:
+Compilation:agent definition:       File "covering_class_trivial.ka", line 8, characters 5-6:
+Compilation:agent definition:       File "covering_class_trivial.ka", line 8, characters 28-29:
+Compilation:agent definition:       File "covering_class_trivial.ka", line 9, characters 5-6:
+Compilation:agent definition:       File "covering_class_trivial.ka", line 9, characters 37-38:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

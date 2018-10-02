@@ -102,7 +102,35 @@ Signature:duals:3:2:1:
 Signature:duals:3:2:1:agent_type:0,site_type:4,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "ode5.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "ode5.ka", line 11, characters 5-6:
+Compilation:agent definition:       File "ode5.ka", line 11, characters 28-29:
+Compilation:agent definition:       File "ode5.ka", line 12, characters 5-6:
+Compilation:agent definition:       File "ode5.ka", line 12, characters 28-29:
+Compilation:agent definition:       File "ode5.ka", line 15, characters 24-25:
+Compilation:agent definition:       File "ode5.ka", line 15, characters 64-65:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "ode5.ka", line 6, characters 8-9:
+Compilation:agent definition:       File "ode5.ka", line 11, characters 17-18:
+Compilation:agent definition:       File "ode5.ka", line 11, characters 40-41:
+Compilation:agent definition:       File "ode5.ka", line 13, characters 5-6:
+Compilation:agent definition:       File "ode5.ka", line 13, characters 30-31:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "ode5.ka", line 7, characters 8-9:
+Compilation:agent definition:       File "ode5.ka", line 12, characters 17-18:
+Compilation:agent definition:       File "ode5.ka", line 12, characters 40-41:
+Compilation:agent definition:       File "ode5.ka", line 14, characters 5-6:
+Compilation:agent definition:       File "ode5.ka", line 14, characters 30-31:
+Compilation:agent definition:3:D:
+Compilation:agent definition:       File "ode5.ka", line 8, characters 8-9:
+Compilation:agent definition:       File "ode5.ka", line 13, characters 19-20:
+Compilation:agent definition:       File "ode5.ka", line 13, characters 44-45:
+Compilation:agent definition:       File "ode5.ka", line 14, characters 19-20:
+Compilation:agent definition:       File "ode5.ka", line 14, characters 44-45:
+Compilation:agent definition:       File "ode5.ka", line 15, characters 5-6:
+Compilation:agent definition:       File "ode5.ka", line 15, characters 45-46:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

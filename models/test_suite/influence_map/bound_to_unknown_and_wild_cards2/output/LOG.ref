@@ -48,7 +48,31 @@ Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:0,site_type:1,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "influence.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "influence.ka", line 1, characters 0-1:
+Compilation:agent definition:       File "influence.ka", line 1, characters 34-35:
+Compilation:agent definition:       File "influence.ka", line 2, characters 0-1:
+Compilation:agent definition:       File "influence.ka", line 2, characters 34-35:
+Compilation:agent definition:       File "influence.ka", line 3, characters 0-1:
+Compilation:agent definition:       File "influence.ka", line 3, characters 34-35:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "influence.ka", line 6, characters 8-9:
+Compilation:agent definition:       File "influence.ka", line 1, characters 14-15:
+Compilation:agent definition:       File "influence.ka", line 1, characters 49-50:
+Compilation:agent definition:       File "influence.ka", line 2, characters 14-15:
+Compilation:agent definition:       File "influence.ka", line 2, characters 49-50:
+Compilation:agent definition:       File "influence.ka", line 3, characters 14-15:
+Compilation:agent definition:       File "influence.ka", line 3, characters 49-50:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "influence.ka", line 7, characters 8-9:
+Compilation:agent definition:       File "influence.ka", line 1, characters 23-24:
+Compilation:agent definition:       File "influence.ka", line 1, characters 58-59:
+Compilation:agent definition:       File "influence.ka", line 2, characters 23-24:
+Compilation:agent definition:       File "influence.ka", line 2, characters 58-59:
+Compilation:agent definition:       File "influence.ka", line 3, characters 23-24:
+Compilation:agent definition:       File "influence.ka", line 3, characters 58-59:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]

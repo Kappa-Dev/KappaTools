@@ -762,9 +762,9 @@ let print_compil parameters error handler compil =
     print_signatures
       parameters' error handler compil.Cckappa_sig.signatures
   in
-  (*  let parameters' = Remanent_parameters.update_prefix parameters
+  let parameters' = Remanent_parameters.update_prefix parameters
       "agent definition:" in
-      let error = print_agent_annotation parameters' error handler in*)
+      let error = print_agent_annotation parameters' error handler in
   let parameters' =  Remanent_parameters.update_prefix parameters "default_counters:" in
   let error = print_default_counters parameters' error handler compil.Cckappa_sig.counter_default in
   let parameters' =  Remanent_parameters.update_prefix parameters "rules:" in

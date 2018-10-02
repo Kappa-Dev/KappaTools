@@ -122,7 +122,57 @@ Signature:duals:5:1:1:
 Signature:duals:5:1:1:agent_type:5,site_type:0,state_id:2
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "parallel_bonds.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "parallel_bonds.ka", line 7, characters 10-11:
+Compilation:agent definition:       File "parallel_bonds.ka", line 14, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 14, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 14, characters 34-35:
+Compilation:agent definition:       File "parallel_bonds.ka", line 14, characters 47-48:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "parallel_bonds.ka", line 2, characters 8-9:
+Compilation:agent definition:       File "parallel_bonds.ka", line 8, characters 10-11:
+Compilation:agent definition:       File "parallel_bonds.ka", line 15, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 15, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 15, characters 34-35:
+Compilation:agent definition:       File "parallel_bonds.ka", line 15, characters 47-48:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "parallel_bonds.ka", line 3, characters 8-9:
+Compilation:agent definition:       File "parallel_bonds.ka", line 9, characters 10-11:
+Compilation:agent definition:       File "parallel_bonds.ka", line 16, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 16, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 16, characters 26-27:
+Compilation:agent definition:       File "parallel_bonds.ka", line 16, characters 37-38:
+Compilation:agent definition:       File "parallel_bonds.ka", line 16, characters 50-51:
+Compilation:agent definition:       File "parallel_bonds.ka", line 16, characters 58-59:
+Compilation:agent definition:3:D:
+Compilation:agent definition:       File "parallel_bonds.ka", line 4, characters 8-9:
+Compilation:agent definition:       File "parallel_bonds.ka", line 10, characters 10-11:
+Compilation:agent definition:       File "parallel_bonds.ka", line 17, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 17, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 17, characters 26-27:
+Compilation:agent definition:       File "parallel_bonds.ka", line 17, characters 37-38:
+Compilation:agent definition:       File "parallel_bonds.ka", line 17, characters 50-51:
+Compilation:agent definition:       File "parallel_bonds.ka", line 17, characters 58-59:
+Compilation:agent definition:4:E:
+Compilation:agent definition:       File "parallel_bonds.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "parallel_bonds.ka", line 11, characters 10-11:
+Compilation:agent definition:       File "parallel_bonds.ka", line 18, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 18, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 18, characters 26-27:
+Compilation:agent definition:       File "parallel_bonds.ka", line 18, characters 37-38:
+Compilation:agent definition:       File "parallel_bonds.ka", line 18, characters 50-51:
+Compilation:agent definition:       File "parallel_bonds.ka", line 18, characters 58-59:
+Compilation:agent definition:5:F:
+Compilation:agent definition:       File "parallel_bonds.ka", line 6, characters 8-9:
+Compilation:agent definition:       File "parallel_bonds.ka", line 12, characters 10-11:
+Compilation:agent definition:       File "parallel_bonds.ka", line 19, characters 5-6:
+Compilation:agent definition:       File "parallel_bonds.ka", line 19, characters 18-19:
+Compilation:agent definition:       File "parallel_bonds.ka", line 19, characters 26-27:
+Compilation:agent definition:       File "parallel_bonds.ka", line 19, characters 37-38:
+Compilation:agent definition:       File "parallel_bonds.ka", line 19, characters 50-51:
+Compilation:agent definition:       File "parallel_bonds.ka", line 19, characters 58-59:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

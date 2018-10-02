@@ -45,7 +45,41 @@ Signature:duals:0:1:2:
 Signature:duals:0:1:2:agent_type:0,site_type:1,state_id:2
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "sym2.ka", line 6, characters 10-11:
+Compilation:agent definition:       File "sym2.ka", line 1, characters 0-1:
+Compilation:agent definition:       File "sym2.ka", line 1, characters 13-14:
+Compilation:agent definition:       File "sym2.ka", line 1, characters 30-31:
+Compilation:agent definition:       File "sym2.ka", line 1, characters 43-44:
+Compilation:agent definition:       File "sym2.ka", line 1, characters 30-31:
+Compilation:agent definition:       File "sym2.ka", line 1, characters 43-44:
+Compilation:agent definition:       File "sym2.ka", line 1, characters 0-1:
+Compilation:agent definition:       File "sym2.ka", line 1, characters 13-14:
+Compilation:agent definition:       File "sym2.ka", line 2, characters 0-1:
+Compilation:agent definition:       File "sym2.ka", line 2, characters 13-14:
+Compilation:agent definition:       File "sym2.ka", line 2, characters 30-31:
+Compilation:agent definition:       File "sym2.ka", line 2, characters 43-44:
+Compilation:agent definition:       File "sym2.ka", line 2, characters 30-31:
+Compilation:agent definition:       File "sym2.ka", line 2, characters 43-44:
+Compilation:agent definition:       File "sym2.ka", line 2, characters 0-1:
+Compilation:agent definition:       File "sym2.ka", line 2, characters 13-14:
+Compilation:agent definition:       File "sym2.ka", line 3, characters 0-1:
+Compilation:agent definition:       File "sym2.ka", line 3, characters 13-14:
+Compilation:agent definition:       File "sym2.ka", line 3, characters 30-31:
+Compilation:agent definition:       File "sym2.ka", line 3, characters 43-44:
+Compilation:agent definition:       File "sym2.ka", line 3, characters 30-31:
+Compilation:agent definition:       File "sym2.ka", line 3, characters 43-44:
+Compilation:agent definition:       File "sym2.ka", line 3, characters 0-1:
+Compilation:agent definition:       File "sym2.ka", line 3, characters 13-14:
+Compilation:agent definition:       File "sym2.ka", line 4, characters 0-1:
+Compilation:agent definition:       File "sym2.ka", line 4, characters 13-14:
+Compilation:agent definition:       File "sym2.ka", line 4, characters 30-31:
+Compilation:agent definition:       File "sym2.ka", line 4, characters 43-44:
+Compilation:agent definition:       File "sym2.ka", line 4, characters 30-31:
+Compilation:agent definition:       File "sym2.ka", line 4, characters 43-44:
+Compilation:agent definition:       File "sym2.ka", line 4, characters 0-1:
+Compilation:agent definition:       File "sym2.ka", line 4, characters 13-14:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

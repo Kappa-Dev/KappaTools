@@ -42,6 +42,65 @@ Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:
 Compilation:variables:0:A1: 
+Compilation:agent definition:0:A:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 4, characters 10-11:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 8, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 8, characters 25-26:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 11, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 11, characters 44-45:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 14, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 14, characters 19-20:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 17, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 17, characters 19-20:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 18, characters 8-9:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 18, characters 22-23:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 19, characters 6-7:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 19, characters 26-27:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 22, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 22, characters 25-26:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 23, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 23, characters 31-32:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 24, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 24, characters 37-38:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 25, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 25, characters 37-38:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 26, characters 5-6:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 26, characters 26-27:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 29, characters 6-7:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 29, characters 23-24:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 29, characters 35-36:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 30, characters 6-7:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 31, characters 6-7:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 31, characters 6-7:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 31, characters 43-44:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 32, characters 17-18:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 32, characters 27-28:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 38, characters 11-12:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 38, characters 32-33:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 41, characters 6-7:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 42, characters 6-7:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 42, characters 25-26:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 42, characters 6-7:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 43, characters 25-26:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 43, characters 6-7:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 2, characters 8-9:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 5, characters 10-11:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 8, characters 14-15:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 8, characters 34-35:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 11, characters 26-27:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 11, characters 53-54:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 19, characters 15-16:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 19, characters 43-44:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 23, characters 20-21:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 23, characters 47-48:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 24, characters 20-21:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 24, characters 53-54:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 25, characters 26-27:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 25, characters 60-61:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 31, characters 32-33:
+Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 31, characters 32-33:
 Compilation:default_counters::
 Compilation:default_counters:: 0.1 ->0
 Compilation:default_counters:: 0.2 ->1

@@ -48,7 +48,24 @@ Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:0,site_type:1,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "side_effect.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "side_effect.ka", line 11, characters 5-6:
+Compilation:agent definition:       File "side_effect.ka", line 12, characters 5-6:
+Compilation:agent definition:       File "side_effect.ka", line 12, characters 25-26:
+Compilation:agent definition:       File "side_effect.ka", line 13, characters 5-6:
+Compilation:agent definition:       File "side_effect.ka", line 14, characters 5-6:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "side_effect.ka", line 6, characters 8-9:
+Compilation:agent definition:       File "side_effect.ka", line 12, characters 14-15:
+Compilation:agent definition:       File "side_effect.ka", line 12, characters 34-35:
+Compilation:agent definition:       File "side_effect.ka", line 13, characters 14-15:
+Compilation:agent definition:       File "side_effect.ka", line 13, characters 31-32:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "side_effect.ka", line 7, characters 8-9:
+Compilation:agent definition:       File "side_effect.ka", line 14, characters 14-15:
+Compilation:agent definition:       File "side_effect.ka", line 14, characters 31-32:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]

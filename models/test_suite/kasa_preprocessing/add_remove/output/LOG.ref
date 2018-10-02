@@ -22,7 +22,21 @@ Signature:states:1:0:state_id:1->p
 Signature:duals: 
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "add_remove.ka", line 4, characters 8-9:
+Compilation:agent definition:       File "add_remove.ka", line 7, characters 0-1:
+Compilation:agent definition:       File "add_remove.ka", line 7, characters 27-28:
+Compilation:agent definition:       File "add_remove.ka", line 7, characters 40-41:
+Compilation:agent definition:       File "add_remove.ka", line 8, characters 0-1:
+Compilation:agent definition:       File "add_remove.ka", line 8, characters 14-15:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "add_remove.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "add_remove.ka", line 7, characters 11-12:
+Compilation:agent definition:       File "add_remove.ka", line 9, characters 0-1:
+Compilation:agent definition:       File "add_remove.ka", line 9, characters 14-15:
+Compilation:agent definition:       File "add_remove.ka", line 10, characters 0-1:
+Compilation:agent definition:       File "add_remove.ka", line 10, characters 14-15:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

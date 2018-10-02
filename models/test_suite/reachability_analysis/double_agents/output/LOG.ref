@@ -62,7 +62,34 @@ Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:1,site_type:2,state_id:2
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "double_agents.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "double_agents.ka", line 5, characters 12-13:
+Compilation:agent definition:       File "double_agents.ka", line 5, characters 23-24:
+Compilation:agent definition:       File "double_agents.ka", line 8, characters 5-6:
+Compilation:agent definition:       File "double_agents.ka", line 8, characters 24-25:
+Compilation:agent definition:       File "double_agents.ka", line 9, characters 5-6:
+Compilation:agent definition:       File "double_agents.ka", line 9, characters 13-14:
+Compilation:agent definition:       File "double_agents.ka", line 9, characters 20-21:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "double_agents.ka", line 2, characters 8-9:
+Compilation:agent definition:       File "double_agents.ka", line 6, characters 12-13:
+Compilation:agent definition:       File "double_agents.ka", line 6, characters 23-24:
+Compilation:agent definition:       File "double_agents.ka", line 7, characters 5-6:
+Compilation:agent definition:       File "double_agents.ka", line 7, characters 27-28:
+Compilation:agent definition:       File "double_agents.ka", line 8, characters 13-14:
+Compilation:agent definition:       File "double_agents.ka", line 8, characters 32-33:
+Compilation:agent definition:       File "double_agents.ka", line 11, characters 13-14:
+Compilation:agent definition:       File "double_agents.ka", line 11, characters 32-33:
+Compilation:agent definition:       File "double_agents.ka", line 12, characters 5-6:
+Compilation:agent definition:       File "double_agents.ka", line 12, characters 9-10:
+Compilation:agent definition:       File "double_agents.ka", line 12, characters 19-20:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "double_agents.ka", line 3, characters 8-9:
+Compilation:agent definition:       File "double_agents.ka", line 10, characters 10-11:
+Compilation:agent definition:       File "double_agents.ka", line 11, characters 5-6:
+Compilation:agent definition:       File "double_agents.ka", line 11, characters 24-25:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:Ghost

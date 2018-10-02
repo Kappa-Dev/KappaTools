@@ -48,7 +48,18 @@ Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:0,site_type:1,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "wild_cards.ka", line 1, characters 8-9:
+Compilation:agent definition:       File "wild_cards.ka", line 5, characters 5-6:
+Compilation:agent definition:       File "wild_cards.ka", line 5, characters 33-34:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "wild_cards.ka", line 2, characters 8-9:
+Compilation:agent definition:       File "wild_cards.ka", line 5, characters 19-20:
+Compilation:agent definition:       File "wild_cards.ka", line 5, characters 48-49:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "wild_cards.ka", line 3, characters 8-9:
+Compilation:agent definition:       File "wild_cards.ka", line 5, characters 57-58:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]

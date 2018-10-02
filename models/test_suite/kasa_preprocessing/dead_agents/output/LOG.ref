@@ -34,7 +34,35 @@ Signature:states:3:0:state_id:0->free
 Signature:duals: 
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "dead_agents.ka", line 20, characters 9-10:
+Compilation:agent definition:       File "dead_agents.ka", line 10, characters 0-1:
+Compilation:agent definition:       File "dead_agents.ka", line 10, characters 25-26:
+Compilation:agent definition:       File "dead_agents.ka", line 12, characters 0-1:
+Compilation:agent definition:       File "dead_agents.ka", line 12, characters 15-16:
+Compilation:agent definition:       File "dead_agents.ka", line 12, characters 15-16:
+Compilation:agent definition:       File "dead_agents.ka", line 12, characters 0-1:
+Compilation:agent definition:       File "dead_agents.ka", line 13, characters 0-1:
+Compilation:agent definition:       File "dead_agents.ka", line 13, characters 14-15:
+Compilation:agent definition:       File "dead_agents.ka", line 14, characters 0-1:
+Compilation:agent definition:       File "dead_agents.ka", line 14, characters 14-15:
+Compilation:agent definition:       File "dead_agents.ka", line 15, characters 0-1:
+Compilation:agent definition:       File "dead_agents.ka", line 15, characters 14-15:
+Compilation:agent definition:       File "dead_agents.ka", line 17, characters 15-16:
+Compilation:agent definition:       File "dead_agents.ka", line 18, characters 15-16:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "dead_agents.ka", line 21, characters 9-10:
+Compilation:agent definition:       File "dead_agents.ka", line 10, characters 11-12:
+Compilation:agent definition:       File "dead_agents.ka", line 10, characters 36-37:
+Compilation:agent definition:       File "dead_agents.ka", line 11, characters 0-1:
+Compilation:agent definition:       File "dead_agents.ka", line 11, characters 15-16:
+Compilation:agent definition:       File "dead_agents.ka", line 11, characters 15-16:
+Compilation:agent definition:       File "dead_agents.ka", line 11, characters 0-1:
+Compilation:agent definition:2:D:
+Compilation:agent definition:       File "dead_agents.ka", line 17, characters 0-1:
+Compilation:agent definition:3:E:
+Compilation:agent definition:       File "dead_agents.ka", line 18, characters 0-1:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]

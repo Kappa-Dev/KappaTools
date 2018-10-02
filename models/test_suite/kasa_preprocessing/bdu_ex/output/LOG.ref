@@ -27,7 +27,18 @@ Signature:duals:0:2:1:
 Signature:duals:0:2:1:agent_type:0,site_type:2,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "bdu_ex.ka", line 4, characters 8-9:
+Compilation:agent definition:       File "bdu_ex.ka", line 7, characters 14-15:
+Compilation:agent definition:       File "bdu_ex.ka", line 8, characters 4-5:
+Compilation:agent definition:       File "bdu_ex.ka", line 8, characters 18-19:
+Compilation:agent definition:       File "bdu_ex.ka", line 9, characters 4-5:
+Compilation:agent definition:       File "bdu_ex.ka", line 9, characters 27-28:
+Compilation:agent definition:       File "bdu_ex.ka", line 10, characters 7-8:
+Compilation:agent definition:       File "bdu_ex.ka", line 10, characters 15-16:
+Compilation:agent definition:       File "bdu_ex.ka", line 10, characters 26-27:
+Compilation:agent definition:       File "bdu_ex.ka", line 10, characters 34-35:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:Ghost

@@ -26,7 +26,21 @@ Signature:states:0:2:state_id:1->q
 Signature:duals: 
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:rules:0:
+Compilation:Compilation:agent definition:0:A:
+Compilation:agent definition:       File "relations.ka", line 1, characters 5-6:
+Compilation:agent definition:       File "relations.ka", line 2, characters 0-1:
+Compilation:agent definition:       File "relations.ka", line 2, characters 14-15:
+Compilation:agent definition:       File "relations.ka", line 3, characters 0-1:
+Compilation:agent definition:       File "relations.ka", line 3, characters 22-23:
+Compilation:agent definition:       File "relations.ka", line 4, characters 0-1:
+Compilation:agent definition:       File "relations.ka", line 4, characters 30-31:
+Compilation:agent definition:       File "relations.ka", line 5, characters 0-1:
+Compilation:agent definition:       File "relations.ka", line 5, characters 14-15:
+Compilation:agent definition:       File "relations.ka", line 6, characters 0-1:
+Compilation:agent definition:       File "relations.ka", line 6, characters 22-23:
+Compilation:agent definition:       File "relations.ka", line 7, characters 0-1:
+Compilation:agent definition:       File "relations.ka", line 7, characters 22-23:
+Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:Ghost

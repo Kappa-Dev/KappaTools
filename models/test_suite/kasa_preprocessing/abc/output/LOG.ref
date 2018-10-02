@@ -84,6 +84,39 @@ Compilation:variables:7:
 Compilation:variables:7:n_ab: 1000 
 Compilation:variables:8:
 Compilation:variables:8:n_c: 10000 
+Compilation:agent definition:0:A:
+Compilation:agent definition:       File "abc.ka", line 5, characters 8-9:
+Compilation:agent definition:       File "abc.ka", line 31, characters 15-16:
+Compilation:agent definition:       File "abc.ka", line 10, characters 6-7:
+Compilation:agent definition:       File "abc.ka", line 10, characters 26-27:
+Compilation:agent definition:       File "abc.ka", line 10, characters 26-27:
+Compilation:agent definition:       File "abc.ka", line 10, characters 6-7:
+Compilation:agent definition:       File "abc.ka", line 12, characters 7-8:
+Compilation:agent definition:       File "abc.ka", line 12, characters 35-36:
+Compilation:agent definition:       File "abc.ka", line 13, characters 21-22:
+Compilation:agent definition:       File "abc.ka", line 13, characters 44-45:
+Compilation:agent definition:       File "abc.ka", line 14, characters 6-7:
+Compilation:agent definition:       File "abc.ka", line 14, characters 43-44:
+Compilation:agent definition:       File "abc.ka", line 15, characters 9-10:
+Compilation:agent definition:       File "abc.ka", line 15, characters 46-47:
+Compilation:agent definition:1:B:
+Compilation:agent definition:       File "abc.ka", line 6, characters 8-9:
+Compilation:agent definition:       File "abc.ka", line 31, characters 19-20:
+Compilation:agent definition:       File "abc.ka", line 10, characters 14-15:
+Compilation:agent definition:       File "abc.ka", line 10, characters 34-35:
+Compilation:agent definition:       File "abc.ka", line 10, characters 34-35:
+Compilation:agent definition:       File "abc.ka", line 10, characters 14-15:
+Compilation:agent definition:2:C:
+Compilation:agent definition:       File "abc.ka", line 7, characters 8-9:
+Compilation:agent definition:       File "abc.ka", line 32, characters 13-14:
+Compilation:agent definition:       File "abc.ka", line 12, characters 20-21:
+Compilation:agent definition:       File "abc.ka", line 12, characters 48-49:
+Compilation:agent definition:       File "abc.ka", line 13, characters 9-10:
+Compilation:agent definition:       File "abc.ka", line 13, characters 32-33:
+Compilation:agent definition:       File "abc.ka", line 14, characters 19-20:
+Compilation:agent definition:       File "abc.ka", line 14, characters 56-57:
+Compilation:agent definition:       File "abc.ka", line 15, characters 22-23:
+Compilation:agent definition:       File "abc.ka", line 15, characters 59-60:
 Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
