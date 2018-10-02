@@ -7,15 +7,15 @@
 #
 graph G{ 
 subgraph cluster0 {
-   0.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
-   0.1 [style = filled label = "t" shape =ellipse color = green size = "5"]
+   0.0 [style = filled label = "t" shape =ellipse color = green size = "5"]
+   0.1 [style = filled label = "z" shape =circle color = yellow size = "5"]
 label =  "A";  shape = rectangle; color = blue
 } ; 
 subgraph cluster1 {
    1.0 [style = filled label = "z" shape =ellipse color = green size = "5"]
-   1.1 [style = filled label = "z" shape =circle color = yellow size = "5"]
-   1.2 [style = filled label = "t" shape =ellipse color = green size = "5"]
+   1.1 [style = filled label = "t" shape =ellipse color = green size = "5"]
+   1.2 [style = filled label = "z" shape =circle color = yellow size = "5"]
 label =  "B";  shape = rectangle; color = blue
 } ; 
-0.0 -- 1.1
+0.1 -- 1.2
 }

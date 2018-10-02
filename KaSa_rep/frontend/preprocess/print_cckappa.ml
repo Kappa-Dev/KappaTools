@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 12th of August
-   * Last modification: Time-stamp: <Feb 28 2018>
+   * Last modification: Time-stamp: <Oct 02 2018>
    * *
    * Pretty printing of token library
    *
@@ -717,6 +717,40 @@ let print_inits parameters error handler init =
 
 let print_perturbations _parameters error _handler _perturbations = error
 
+let print_agent_annotation parameters error handler =
+  Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.iter
+    parameters error
+    (fun parameters error agent_name (agent_string, locations) ->
+       let () =
+         Loggers.fprintf
+           (Remanent_parameters.get_logger parameters)
+           "%s%i:%s:"
+           (Remanent_parameters.get_prefix parameters)
+           (Ckappa_sig.int_of_agent_name agent_name)
+           agent_string
+       in
+       let () =
+         Loggers.print_newline
+           (Remanent_parameters.get_logger parameters)
+       in
+       let () =
+         List.iter
+           (fun position ->
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "%s       %s"
+                  (Remanent_parameters.get_prefix parameters)
+                  (Locality.to_string position)
+              in
+              Loggers.print_newline
+                  (Remanent_parameters.get_logger parameters)
+          )
+           locations
+       in
+       error
+    ) handler.Cckappa_sig.agents_annotation
+
 let print_compil parameters error handler compil =
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
     (Remanent_parameters.get_prefix parameters)
@@ -724,7 +758,13 @@ let print_compil parameters error handler compil =
   let parameters' =  Remanent_parameters.update_prefix parameters "variables:" in
   let error = print_variables parameters' error handler compil.Cckappa_sig.variables in
   let parameters' =  Remanent_parameters.update_prefix parameters "signature:" in
-  let error = print_signatures parameters' error handler compil.Cckappa_sig.signatures in
+  let error =
+    print_signatures
+      parameters' error handler compil.Cckappa_sig.signatures
+  in
+  (*  let parameters' = Remanent_parameters.update_prefix parameters
+      "agent definition:" in
+      let error = print_agent_annotation parameters' error handler in*)
   let parameters' =  Remanent_parameters.update_prefix parameters "default_counters:" in
   let error = print_default_counters parameters' error handler compil.Cckappa_sig.counter_default in
   let parameters' =  Remanent_parameters.update_prefix parameters "rules:" in

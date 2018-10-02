@@ -28,8 +28,8 @@ Signature:states:0:0:
 Signature:states:0:0:state_id:0->u
 Signature:states:0:0:state_id:1->p
 Signature:states:0:1:
-Signature:states:0:1:state_id:0->p
-Signature:states:0:1:state_id:1->u
+Signature:states:0:1:state_id:0->u
+Signature:states:0:1:state_id:1->p
 Signature:states:0:2:
 Signature:states:0:2:state_id:0->free
 Signature:states:0:2:state_id:1->agent_type:0@site_type:2
@@ -70,23 +70,23 @@ Compilation:initial_states:0:
 Compilation:initial_states:0:mixture:
 Compilation:initial_states:0:mixture:agent_id_0:
 Compilation:initial_states:0:mixture:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:initial_states:0:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:initial_states:0:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:initial_states:0:mixture:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:initial_states:1:
 Compilation:initial_states:1:mixture:
 Compilation:initial_states:1:mixture:agent_id_0:
 Compilation:initial_states:1:mixture:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-Compilation:initial_states:1:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:initial_states:1:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
 Compilation:initial_states:1:mixture:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:initial_states:2:
 Compilation:initial_states:2:mixture:
 Compilation:initial_states:2:mixture:agent_id_0:
 Compilation:initial_states:2:mixture:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:initial_states:2:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:initial_states:2:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:initial_states:2:mixture:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
 Compilation:initial_states:2:mixture:agent_id_1:
 Compilation:initial_states:2:mixture:agent_id_1:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:initial_states:2:mixture:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:initial_states:2:mixture:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:initial_states:2:mixture:agent_id_1:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
 Compilation:initial_states:2:mixture:bonds:agent_id_0:
 Compilation:initial_states:2:mixture:bonds:agent_id_0:site_type_2->agent_id_1.site_type_2
@@ -96,11 +96,11 @@ Compilation:initial_states:3:
 Compilation:initial_states:3:mixture:
 Compilation:initial_states:3:mixture:agent_id_0:
 Compilation:initial_states:3:mixture:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-Compilation:initial_states:3:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:initial_states:3:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:initial_states:3:mixture:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
 Compilation:initial_states:3:mixture:agent_id_1:
 Compilation:initial_states:3:mixture:agent_id_1:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-Compilation:initial_states:3:mixture:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:initial_states:3:mixture:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:initial_states:3:mixture:agent_id_1:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
 Compilation:initial_states:3:mixture:bonds:agent_id_0:
 Compilation:initial_states:3:mixture:bonds:agent_id_0:site_type_2->agent_id_1.site_type_2
@@ -110,11 +110,11 @@ Compilation:initial_states:4:
 Compilation:initial_states:4:mixture:
 Compilation:initial_states:4:mixture:agent_id_0:
 Compilation:initial_states:4:mixture:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:initial_states:4:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:initial_states:4:mixture:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:initial_states:4:mixture:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
 Compilation:initial_states:4:mixture:agent_id_1:
 Compilation:initial_states:4:mixture:agent_id_1:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-Compilation:initial_states:4:mixture:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:initial_states:4:mixture:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
 Compilation:initial_states:4:mixture:agent_id_1:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
 Compilation:initial_states:4:mixture:bonds:agent_id_0:
 Compilation:initial_states:4:mixture:bonds:agent_id_0:site_type_2->agent_id_1.site_type_2
@@ -176,13 +176,13 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
+Id=5
+ Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=4
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -214,13 +214,13 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:1<1)
+Id=3
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
-   Node(site_type:1<2)
+  Id=2
+   Node(site_type:1<1)
     Id=1
      Leaf True 
 
@@ -362,12 +362,12 @@ Id=22
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=33
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=32
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -376,7 +376,7 @@ Id=32
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{p}[.]) v A(y{u}[.]) ]
+A() => [ A(y{u}[.]) v A(y{p}[.]) ]
 A() => [ A(z[.]) v A(z[z.A]) ]
 A() => [ A(x{u}[.]) v A(x{p}[.]) ]
 
@@ -414,12 +414,12 @@ Id=22
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=33
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=32
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -434,14 +434,14 @@ EXTENSIONAL DESCRIPTION:
 A(z[1]),A(z[1]) => 
 	[
 		  A(x{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{p}[.],z[1])
 		v A(x{u}[.],z[1]),A(y{u}[.],z[1])
+		v A(x{u}[.],z[1]),A(y{p}[.],z[1])
 	]
 A(z[1]),A(z[1]) => 
 	[
-		  A(y{u}[.],z[1]),A(y{p}[.],z[1])
+		  A(y{p}[.],z[1]),A(y{u}[.],z[1])
 		v A(y{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(y{p}[.],z[1]),A(y{u}[.],z[1])
+		v A(y{u}[.],z[1]),A(y{p}[.],z[1])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -480,12 +480,12 @@ Id=22
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=33
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=32
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -525,12 +525,12 @@ Id=22
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=33
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=32
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -549,8 +549,8 @@ A()=> [
 		  A(z[.])
 		v A(z[z.A])]
 A()=> [
-		  A(y{p}[.])
-		v A(y{u}[.])]
+		  A(y{u}[.])
+		v A(y{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -561,12 +561,12 @@ A()=> [
 ------------------------------------------------------------
 A(z[1]),A(z[1])=> [
 		  A(x{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{u}[.],z[1])]
+		v A(x{u}[.],z[1]),A(y{u}[.],z[1])
+		v A(x{u}[.],z[1]),A(y{p}[.],z[1])]
 A(z[1]),A(z[1])=> [
-		  A(y{u}[.],z[1]),A(y{p}[.],z[1])
+		  A(y{p}[.],z[1]),A(y{u}[.],z[1])
 		v A(y{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(y{p}[.],z[1]),A(y{u}[.],z[1])]
+		v A(y{u}[.],z[1]),A(y{p}[.],z[1])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
