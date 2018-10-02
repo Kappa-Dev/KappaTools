@@ -1,0 +1,11 @@
+digraph G{
+"Init_22" [label="" style="invis" width="0px" height="0px"];
+"Node_25" [label="A(z{u},x[.],y[y.B])"];
+"Node_24" [label="A(z{p},x[.],y[y.B])"];
+"Node_23" [label="A(z{p},x[a.C],y[y.B])"];
+"Node_22" [label="A(z{u},x[a.C],y[y.B])"];
+"Node_22" -> "Node_23" [label="2"];
+"Node_22" -> "Node_25" [label="0"];
+"Node_23" -> "Node_24" [label="0"];
+"Init_22" -> "Node_22" [label=""];
+}
