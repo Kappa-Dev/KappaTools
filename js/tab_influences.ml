@@ -75,7 +75,6 @@ let update_model f =
   set_model (f (React.S.value model))
 
 let display_id = "influence_map_display"
-let influence_map_text,set_influence_map_text = React.S.create None
 let influencemap =
   Js_graphlogger.create_graph_logger
     display_id
@@ -133,12 +132,27 @@ let recenter =
 let export_config = {
   Widget_export.id = "influence-export";
   Widget_export.handlers =
-    [ Widget_export.export_json ~serialize_json:(fun () ->
-          Option_util.unsome "null" (React.S.value influence_map_text)
-        );
-    ];
-  Widget_export.show =
-    React.S.map (function None -> false | Some _ -> true) influence_map_text;
+    [ {
+      Widget_export.suffix = "json";
+      Widget_export.label = "json";
+      Widget_export.export = (fun filename ->
+          Lwt.ignore_result
+            (State_project.with_project
+               ~label:__LOC__
+               (fun manager ->
+                  let { accuracy; _ } = React.S.value model in
+                  (manager#get_influence_map accuracy) >>= function
+                  | Result.Ok influences_json ->
+                    let data =
+                      Js.string (Yojson.Basic.to_string influences_json) in
+                    let () =
+                      Common.saveFile ~data ~mime:"application/json" ~filename in
+                    Lwt.return (Api_common.result_ok ())
+                  | Result.Error _err ->
+                    Lwt.return (Api_common.result_ok ()))
+             >>= fun _ -> Lwt.return_unit));
+    } ];
+  Widget_export.show = React.S.const true;
 }
 
 let rendering_chooser_id = "influence-rendering"
@@ -524,11 +538,11 @@ let _ =
                  let () = Loggers.flush_logger logger in
                  let () = Loggers.close_logger logger in
                  let () =
-                   set_influence_map_text
-                     (Some (Yojson.Basic.to_string graph_json)) in
+                   influencemap##setData
+                     (Js.string (Yojson.Basic.to_string graph_json)) in
                  Lwt_result.return ()
                | Result.Error e ->
-                 let () = set_influence_map_text None in
+                 let () = influencemap##clearData in
                  Lwt_result.fail e) >>=
             fun out -> Lwt.return (Api_common.result_lift out)
          ))
@@ -541,12 +555,6 @@ let parent_shown () = set_tab_is_active !tab_was_active
 
 let onload () =
   let () = Widget_export.onload export_config in
-  let _ =
-    React.S.map
-      (function
-        | None -> influencemap##clearData
-        | Some data -> influencemap##setData (Js.string data))
-      (React.S.on tab_is_active None influence_map_text) in
   let () = (Tyxml_js.To_dom.of_select rendering_chooser)##.onchange :=
       Dom_html.full_handler
         (fun va _ ->
