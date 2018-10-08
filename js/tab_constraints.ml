@@ -21,81 +21,74 @@ let site_accross = ref true
 let parallel_bond = ref true
 
 let content () =
-  let constraints_div,set_constraints_div = React.S.create [] in
-  let _ = React.S.l1
-      (fun _ ->
-         State_project.with_project
-           ~label:__LOC__
-           (fun (manager : Api.concrete_manager) ->
-              (manager#get_constraints_list >>= function
-              | Result.Ok constraints_json ->
-                let constraints =
-                  Public_data.lemmas_list_of_json constraints_json in
-                Lwt.return
-                  (List.fold_left
-                     (fun panels (a,b) ->
-                        (*match b with
+  let constraints_div =
+    State_project.on_project_change_async ~on:tab_is_active []
+      (fun (manager : Api.concrete_manager) ->
+         (manager#get_constraints_list >>= function
+           | Result.Ok constraints_json ->
+             let constraints =
+               Public_data.lemmas_list_of_json constraints_json in
+             Lwt.return
+               (List.fold_left
+                  (fun panels (a,b) ->
+                     (*match b with
                         | [] -> panels
                           | _ :: _ ->*)
-                          let texts =
-                            List.fold_left
-                              (fun list lemma ->
-                                 let hyp = Public_data.get_hyp lemma in
-                                 let conclusion = Public_data.get_refinement lemma in
-                                 let list =
-                                   match conclusion with
-                                   | [site_graph] ->
-                                     Utility.print_site_graph site_graph
-                                       (Utility.print_newline list)
-                                   | _::_ | [] ->
-                                     let list = Utility.print_newline list in
-                                     let list = Utility.print_string " ]" list in
-                                     let list =
-                                       (snd
-                                          (List.fold_left
-                                             (fun (bool,list) a ->
-                                                let list =
-                                                  if bool then
-                                                    (Utility.print_string " v " list)
-                                                  else
-                                                    list
-                                                in
-                                                 let list =
-                                                   Utility.print_site_graph a list
-                                                in
-                                                true,list)
-                                             (false,list)
-                                             (List.rev conclusion)
-                                          )) in
-                                     let list =
-                                       Utility.print_string " [ " list in
-                                     list in
-                                 let list = Utility.print_string " =>  " list in
-                                 let list = Utility.print_site_graph hyp list in
-                                 list)
-                              []
-                              b in
-                          let title = Html.div
-                              ~a:[Html.a_class [ "panel-heading" ]] [Html.pcdata a] in
-                          let content = Html.div
-                              ~a:[Html.a_class [ "panel-body"; "panel-pre" ]] texts in
-                          Html.div
-                            ~a:[Html.a_class [ "panel"; "panel-default" ]] [title;content] ::
-                          panels)
-                     [] constraints)
-              | Result.Error r ->
-                let title = Html.div
-                    ~a:[Html.a_class [ "panel-heading" ]] [Html.pcdata "KaSa has failed"] in
-                let content = Html.div
-                    ~a:[Html.a_class [ "panel-body"; "panel-pre" ]] [Html.pcdata r] in
-                let out = Html.div
-                    ~a:[Html.a_class [ "panel"; "panel-danger" ]] [title;content] in
-                Lwt.return [out]) >>= fun out ->
-              let () = set_constraints_div out in Lwt.return (Api_common.result_ok ())
-         )
-      )
-      (React.S.on ~eq:State_project.model_equal tab_is_active
-         State_project.dummy_model State_project.model) in
+                     let texts =
+                       List.fold_left
+                         (fun list lemma ->
+                            let hyp = Public_data.get_hyp lemma in
+                            let conclusion = Public_data.get_refinement lemma in
+                            let list =
+                              match conclusion with
+                              | [site_graph] ->
+                                Utility.print_site_graph site_graph
+                                  (Utility.print_newline list)
+                              | _::_ | [] ->
+                                let list = Utility.print_newline list in
+                                let list = Utility.print_string " ]" list in
+                                let list =
+                                  (snd
+                                     (List.fold_left
+                                        (fun (bool,list) a ->
+                                           let list =
+                                             if bool then
+                                               (Utility.print_string " v " list)
+                                             else
+                                               list
+                                           in
+                                           let list =
+                                             Utility.print_site_graph a list
+                                           in
+                                           true,list)
+                                        (false,list)
+                                        (List.rev conclusion)
+                                     )) in
+                                let list =
+                                  Utility.print_string " [ " list in
+                                list in
+                            let list = Utility.print_string " =>  " list in
+                            let list = Utility.print_site_graph hyp list in
+                            list)
+                         []
+                         b in
+                     let title = Html.div
+                         ~a:[Html.a_class [ "panel-heading" ]] [Html.pcdata a] in
+                     let content = Html.div
+                         ~a:[Html.a_class [ "panel-body"; "panel-pre" ]] texts in
+                     Html.div
+                       ~a:[Html.a_class [ "panel"; "panel-default" ]] [title;content] ::
+                     panels)
+                  [] constraints)
+           | Result.Error r ->
+             let title = Html.div
+                 ~a:[Html.a_class [ "panel-heading" ]] [Html.pcdata "KaSa has failed"] in
+             let content = Html.div
+                 ~a:[Html.a_class [ "panel-body"; "panel-pre" ]] [Html.pcdata r] in
+             let out = Html.div
+                 ~a:[Html.a_class [ "panel"; "panel-danger" ]] [title;content] in
+             Lwt.return [out]) >>= fun out ->
+         Lwt.return out) in
   [ Tyxml_js.R.Html5.div
       ~a:[Html.a_class ["panel-scroll"]]
       (ReactiveData.RList.from_signal constraints_div)

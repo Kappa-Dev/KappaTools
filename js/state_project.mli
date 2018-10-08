@@ -55,3 +55,7 @@ val sync : unit -> unit Api.result Lwt.t
 val with_project :
   label:string -> (Api.concrete_manager -> 'a Api.result Lwt.t) ->
   'a Api.result Lwt.t
+
+val on_project_change_async :
+  ?eq:('a -> 'a -> bool) -> on:bool React.signal ->
+  'a -> (Api.concrete_manager -> 'a Lwt.t) -> 'a React.signal

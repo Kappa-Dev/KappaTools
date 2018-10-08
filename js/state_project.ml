@@ -85,14 +85,16 @@ let init_default_parameters = {
   show_non_weakly_reversible_transitions = false;
 }
 
+let init_state = {
+  project_current = None;
+  project_catalog = [];
+  project_version = -1;
+  default_parameters = init_default_parameters;
+  project_parameters = Mods.StringMap.empty;
+}
+
 let state , set_state =
-  React.S.create ~eq:state_equal {
-    project_current = None;
-    project_catalog = [];
-    project_version = -1;
-    default_parameters = init_default_parameters;
-    project_parameters = Mods.StringMap.empty;
-  }
+  React.S.create ~eq:state_equal init_state
 
 let update_parameters handler =
   let st = React.S.value state in
@@ -472,3 +474,12 @@ let with_project :
           label in
       Lwt.return (Api_common.result_error_msg error_msg)
     | Some current -> handler current.project_manager
+
+let on_project_change_async ?eq ~on default handler =
+  React.S.hold
+    ?eq default
+    (Lwt_react.E.map_p
+       (fun st -> match st.project_current with
+          | None -> Lwt.return default
+          | Some current -> handler current.project_manager)
+       (React.S.changes (React.S.on ~eq:state_equal on init_state state)))
