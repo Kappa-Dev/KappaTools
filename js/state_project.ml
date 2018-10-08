@@ -475,11 +475,14 @@ let with_project :
       Lwt.return (Api_common.result_error_msg error_msg)
     | Some current -> handler current.project_manager
 
-let on_project_change_async ?eq ~on default handler =
+let on_project_change_async ?eq ~on ?(others_eq= (=)) init_others others default handler =
+  let eq_pair = Mods.pair_equal state_equal others_eq in
   React.S.hold
     ?eq default
     (Lwt_react.E.map_p
-       (fun st -> match st.project_current with
+       (fun (st,oth) -> match st.project_current with
           | None -> Lwt.return default
-          | Some current -> handler current.project_manager)
-       (React.S.changes (React.S.on ~eq:state_equal on init_state state)))
+          | Some current -> handler current.project_manager oth)
+       (React.S.changes
+          (React.S.on ~eq:eq_pair on (init_state,init_others)
+             (React.S.Pair.pair ~eq:eq_pair state others))))

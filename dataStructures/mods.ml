@@ -14,6 +14,8 @@ let string_pair_compare (p,q) (p',q') =
   let o = String.compare p p' in
   if o=0 then String.compare q q' else o
 
+let pair_equal eqa eqb (xa,xb) (ya,yb) = eqa xa ya && eqb xb yb
+
 module StringSetMap =
   SetMap.Make (struct type t = string
     let compare = String.compare

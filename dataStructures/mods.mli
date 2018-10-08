@@ -11,6 +11,9 @@
 val int_compare : int -> int -> int
 val int_pair_compare : (int*int) -> (int*int) -> int
 
+val pair_equal :
+  ('a -> 'a -> bool) -> ('b -> 'b -> bool) -> 'a * 'b -> 'a * 'b -> bool
+
 module StringSetMap : SetMap.S with type elt = string
 module StringSet = StringSetMap.Set
 module StringMap = StringSetMap.Map

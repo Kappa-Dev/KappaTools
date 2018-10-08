@@ -20,7 +20,23 @@ let tab_was_active = ref true
 
 let accuracy, set_accuracy = React.S.create (Some Public_data.Low)
 
-let contact_map_text,set_contact_map_text = React.S.create None
+let extract_contact_map = function
+  | `Assoc [ "contact map", `Assoc [ "accuracy", acc; "map", contact ] ] ->
+    acc,contact
+  | `Assoc [ "contact map", `Assoc [ "map", contact; "accuracy", acc ] ] ->
+    acc,contact
+  | _ -> failwith "Wrong ugly contact_map extractor"
+
+let contact_map_text =
+  State_project.on_project_change_async
+    ~on:tab_is_active None accuracy None
+    (fun (manager : Api.concrete_manager) acc ->
+       manager#get_contact_map acc >>= function
+       | Result.Ok contact_json ->
+         let _,map_json = extract_contact_map contact_json in
+         Lwt.return_some (Yojson.Basic.to_string map_json)
+       | Result.Error _e -> Lwt.return_none
+    )
 
 let configuration : Widget_export.configuration = {
   Widget_export.id = export_id ;
@@ -63,11 +79,6 @@ let content () =
     Html.div ~a:[ Html.a_id display_id; Html.a_class [ "flex-content" ] ] [ Html.entity "nbsp" ];
     Widget_export.content configuration ]
 
-let extract_contact_map = function
-  | `Assoc [ "contact map", `Assoc [ "accuracy", acc; "map", contact ] ] -> acc,contact
-  | `Assoc [ "contact map", `Assoc [ "map", contact; "accuracy", acc ] ] -> acc,contact
-  | _ -> failwith "Wrong ugly contact_map extractor"
-
 let extract_contact_scc json =
   match json with
   | `Assoc [ "scc", `Assoc l] when List.length l = 3 ->
@@ -81,23 +92,6 @@ let extract_contact_scc json =
       failwith "Wrong ugly scc extractor"
   end
   | _ -> failwith "Wrong ugly scc extractor"
-
-let _ = React.S.l2
-    (fun _ acc ->
-       State_project.with_project
-         ~label:__LOC__
-         (fun (manager : Api.concrete_manager) ->
-            (Lwt_result.map
-               (fun contact_json ->
-                  let _,map_json = extract_contact_map contact_json in
-                  set_contact_map_text (Some (Yojson.Basic.to_string map_json)))
-               (manager#get_contact_map acc)) >>=
-            fun out -> Lwt.return (Api_common.result_lift out)
-         )
-    )
-    (React.S.on ~eq:State_project.model_equal tab_is_active
-       State_project.dummy_model State_project.model)
-    accuracy
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active

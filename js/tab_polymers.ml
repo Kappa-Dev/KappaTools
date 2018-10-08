@@ -21,8 +21,9 @@ let print_edge ((a,b),(c,d)) list =
 
 let content () =
   let scc =
-    State_project.on_project_change_async ~on:tab_is_active []
-      (fun (manager : Api.concrete_manager) ->
+    State_project.on_project_change_async ~on:tab_is_active
+      () (React.S.const ()) []
+      (fun (manager : Api.concrete_manager) () ->
          manager#get_potential_polymers
            (Some Public_data.High) (Some Public_data.High)
          (*TODO: make these options tunable *) >>= function
