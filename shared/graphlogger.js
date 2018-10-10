@@ -134,7 +134,7 @@ class GraphLogger {
             });
 
             edgelabels.attr('transform', function (d) {
-		if (d.target.x < d.source.x) {
+		if (this.children.length !== 0 && d.target.x < d.source.x) {
                     var bbox = this.getBBox();
 
                     let rx = bbox.x + bbox.width / 2;
