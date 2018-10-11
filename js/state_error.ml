@@ -25,13 +25,9 @@ let has_errors () =
 
 let add_error (location : string) (errors : Api_types_j.errors) =
   (* log location and errors if debugging is enabled *)
-  let debug =
-    Format.sprintf
-      "{ location : \"%s\" , errors : %s }"
-      location
-      (Api_types_j.string_of_errors errors)
-  in
-  let () = Common.debug (Js.string (Format.sprintf "set_errors %s "debug)) in
+  let () = Common.debug
+      (Js.string (Format.sprintf "set_errors { location : \"%s\" , errors : %s }"
+                    location (Api_types_j.string_of_errors errors))) in
   let current_state_error : t list = React.S.value state_error in
   let new_state_error : t list =
     { state_error_errors = errors;

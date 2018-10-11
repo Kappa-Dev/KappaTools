@@ -148,7 +148,9 @@ let export_config = {
                     let () =
                       Common.saveFile ~data ~mime:"application/json" ~filename in
                     Lwt.return (Api_common.result_ok ())
-                  | Result.Error _err ->
+                  | Result.Error err ->
+                    let () = State_error.add_error
+                        "influence_map_export" [Api_common.error_msg err] in
                     Lwt.return (Api_common.result_ok ()))
              >>= fun _ -> Lwt.return_unit));
     } ];
@@ -390,7 +392,12 @@ let table_of_influences_json origin influences_json =
 let pop_cell = function
   | [] -> (Html.td [],[])
   | ((node,_mappings),positive)::t ->
-    (Html.td ~a:[ Html.a_class [if positive then "success" else "danger"] ]
+    (Html.td ~a:[
+        Html.a_onclick  (fun _ ->
+            let () = update_model (fun m -> { m with origin = Some node }) in
+            true);
+        Html.a_class [if positive then "success" else "danger"]
+      ]
        [Html.cdata (influence_node_label node)],t)
 
 let rec fill_table acc by on =
@@ -438,7 +445,10 @@ let influence_sphere =
           | Result.Ok influences_json ->
             Lwt.return
               (table_of_influences_json origin influences_json)
-          | Result.Error _e -> Lwt.return empty_sphere)
+          | Result.Error err ->
+            let () = State_error.add_error
+                "influence_map" [Api_common.error_msg err] in
+            Lwt.return empty_sphere)
        | DrawGraph _ -> Lwt.return empty_sphere)
 
 let content () =
@@ -514,38 +524,40 @@ let content () =
 let _ =
   React.S.l2
     (fun _ { rendering; accuracy; origin = origin_refined } ->
-       State_project.with_project
-         ~label:__LOC__
-         (fun (manager : Api.concrete_manager) ->
-            (match rendering with
-             | DrawTabular _ -> Lwt_result.return ()
-             | DrawGraph { fwd; bwd; total } ->
-               let origin =
-                 Option_util.map
-                   Public_data.short_node_of_refined_node origin_refined in
-               (manager#get_local_influence_map
-                  ?fwd ?bwd ?origin ~total accuracy) >>= function
-               | Result.Ok influences_json ->
-                 let buf = Buffer.create 1000 in
-                 let fmt = Format.formatter_of_buffer buf in
-                 let logger =
-                   Loggers.open_logger_from_formatter
-                     ~mode:Loggers.Js_Graph fmt in
-                 let () =
-                   json_to_graph logger origin influences_json in
-                 let graph = Loggers.graph_of_logger logger in
-                 let graph_json = Graph_json.to_json graph in
-                 let () = Loggers.flush_logger logger in
-                 let () = Loggers.close_logger logger in
-                 let () =
-                   influencemap##setData
-                     (Js.string (Yojson.Basic.to_string graph_json)) in
-                 Lwt_result.return ()
-               | Result.Error e ->
-                 let () = influencemap##clearData in
-                 Lwt_result.fail e) >>=
-            fun out -> Lwt.return (Api_common.result_lift out)
-         ))
+       match rendering with
+       | DrawTabular _ -> Lwt.return (Api_common.result_ok ())
+       | DrawGraph { fwd; bwd; total } ->
+         State_error.wrap
+           ~append:true "influence_map"
+           (State_project.with_project
+              ~label:__LOC__
+              (fun (manager : Api.concrete_manager) ->
+                 let origin =
+                   Option_util.map
+                     Public_data.short_node_of_refined_node origin_refined in
+                 ((manager#get_local_influence_map
+                     ?fwd ?bwd ?origin ~total accuracy) >>= function
+                  | Result.Ok influences_json ->
+                    let buf = Buffer.create 1000 in
+                    let fmt = Format.formatter_of_buffer buf in
+                    let logger =
+                      Loggers.open_logger_from_formatter
+                        ~mode:Loggers.Js_Graph fmt in
+                    let () =
+                      json_to_graph logger origin influences_json in
+                    let graph = Loggers.graph_of_logger logger in
+                    let graph_json = Graph_json.to_json graph in
+                    let () = Loggers.flush_logger logger in
+                    let () = Loggers.close_logger logger in
+                    let () =
+                      influencemap##setData
+                        (Js.string (Yojson.Basic.to_string graph_json)) in
+                    Lwt_result.return ()
+                  | Result.Error e ->
+                    let () = influencemap##clearData in
+                    Lwt_result.fail e) >>=
+                 fun out -> Lwt.return (Api_common.result_lift out)
+              )))
     (React.S.on ~eq:State_project.model_equal tab_is_active
        State_project.dummy_model State_project.model)
     model
