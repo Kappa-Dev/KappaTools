@@ -7,16 +7,25 @@
 (******************************************************************************)
 
 type mailbox =
-  (int, (Yojson.Basic.json, string) Result.result Lwt.u) Hashtbl.t
+  (int,
+   (Yojson.Basic.json,
+    Exception_without_parameter.method_handler) Result.result Lwt.u)
+    Hashtbl.t
 
 let reply_of_string x =
   match Yojson.Basic.from_string x with
   | `Assoc [ "id", ` Int id; "code", `String "ERROR"; "data", err ] ->
-    Some id,Result.Error (Yojson.Basic.to_string err)
+    Some id,Result.Error (Exception_without_parameter.of_json err)
   | `Assoc [ "id", ` Int id; "code", `String "SUCCESS"; "data", data ] ->
     Some id,Result.Ok data
   | x ->
-    None, Result.Error ("Invalid response from KaSa: "^Yojson.Basic.to_string x)
+    None, Result.Error
+      (Exception_without_parameter.add_uncaught_error
+         (Exception_without_parameter.build_uncaught_exception
+            ~file_name:"kasa_client"
+            ~message:("Invalid response from KaSa: "^Yojson.Basic.to_string x)
+            Exit)
+         Exception_without_parameter.empty_error_handler)
 
 let receive mailbox x =
   match reply_of_string x with
@@ -50,7 +59,13 @@ class virtual new_client ~post (mailbox : mailbox) :
         let () = id <- id+1 in
         result
       else
-        Lwt.return_error "KaSa agent is dead"
+        Lwt.return_error
+          (Exception_without_parameter.add_uncaught_error
+             (Exception_without_parameter.build_uncaught_exception
+                ~file_name:"kasa_client"
+                ~message:"KaSa agent is dead"
+                Exit)
+             Exception_without_parameter.empty_error_handler)
     method private message post request =
       self#raw_message post (fun outb -> Yojson.Basic.to_outbuf outb request)
 
@@ -61,10 +76,16 @@ class virtual new_client ~post (mailbox : mailbox) :
         Bi_outbuf.add_string outbuf "]" in
       Lwt_result.bind_result
         (self#raw_message post request)
-        (function `Null -> Result.Ok ()
-                | x -> Result.Error
-                         ("Not a KaSa INIT response: "^
-                          Yojson.Basic.to_string x))
+        (function
+          | `Null -> Result.Ok ()
+          | x -> Result.Error
+                   (Exception_without_parameter.add_uncaught_error
+                      (Exception_without_parameter.build_uncaught_exception
+                         ~file_name:"kasa_client"
+                         ~message:("Not a KaSa INIT response: "^
+                                   Yojson.Basic.to_string x)
+                         Exit)
+                      Exception_without_parameter.empty_error_handler))
     method init_static_analyser compil =
       self#init_static_analyser_raw
         (Yojson.Basic.to_string (Ast.compil_to_json compil))

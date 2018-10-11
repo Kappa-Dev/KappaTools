@@ -20,3 +20,6 @@ val print_site_graph:
     (int option * int option) option)
      list)
     list -> ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list
+
+val print_method_handler :
+  Exception_without_parameter.method_handler ->  [> Html_types.p ] Html.elt list

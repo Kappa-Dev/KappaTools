@@ -37,6 +37,29 @@ let result_error_exception
     ~severity:severity
     ~result_code:result_code
     message
+
+let method_handler_errors ?severity mh =
+  let uncaught = Exception_without_parameter.get_uncaught_exception_list mh in
+  let caught = Exception_without_parameter.get_caught_exception_list mh in
+  List.fold_right
+    (fun x l ->
+       error_msg ?severity
+         (Format.asprintf
+            "%a" Exception_without_parameter.pp_caught x)::l)
+    caught
+    (List.map
+       (fun x ->
+          error_msg ?severity
+            (Format.asprintf "%a" Exception_without_parameter.pp_uncaught x))
+       uncaught)
+
+let method_handler_messages ?severity ?result_code mh =
+    result_messages ?result_code (method_handler_errors ?severity mh)
+
+let result_kasa = function
+  | Result.Ok x -> result_ok x
+  | Result.Error mh -> method_handler_messages ~severity:`Error mh
+
 let result_map :
   ok:('code -> 'ok -> 'a) ->
   error:('code -> Api_types_t.errors -> 'a) ->

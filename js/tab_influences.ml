@@ -137,21 +137,22 @@ let export_config = {
       Widget_export.label = "json";
       Widget_export.export = (fun filename ->
           Lwt.ignore_result
-            (State_project.with_project
-               ~label:__LOC__
-               (fun manager ->
-                  let { accuracy; _ } = React.S.value model in
-                  (manager#get_influence_map accuracy) >>= function
-                  | Result.Ok influences_json ->
-                    let data =
-                      Js.string (Yojson.Basic.to_string influences_json) in
-                    let () =
-                      Common.saveFile ~data ~mime:"application/json" ~filename in
-                    Lwt.return (Api_common.result_ok ())
-                  | Result.Error err ->
-                    let () = State_error.add_error
-                        "influence_map_export" [Api_common.error_msg err] in
-                    Lwt.return (Api_common.result_ok ()))
+            (State_error.wrap "influence_map_export"
+               (State_project.with_project
+                  ~label:__LOC__
+                  (fun manager ->
+                     let { accuracy; _ } = React.S.value model in
+                     Lwt_result.map
+                       (fun influences_json ->
+                          let data =
+                            Js.string
+                              (Yojson.Basic.to_string influences_json) in
+                          let () =
+                            Common.saveFile
+                              ~data ~mime:"application/json" ~filename in
+                          ())
+                       (manager#get_influence_map accuracy) >>=
+                     fun x -> Lwt.return (Api_common.result_kasa x)))
              >>= fun _ -> Lwt.return_unit));
     } ];
   Widget_export.show = React.S.const true;
@@ -410,7 +411,7 @@ let rec fill_table acc by on =
     fill_table (line::acc) by' on'
 
 let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
-    let by =
+  let by =
     List_util.rev_map_append (fun x -> (x,false)) negative_by
       (List.rev_map (fun x -> (x,true)) positive_by) in
   let on =
@@ -433,23 +434,18 @@ let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
 
 let influence_sphere =
   State_project.on_project_change_async
-    ~on:tab_is_active dummy_model model empty_sphere
+    ~on:tab_is_active dummy_model model (Result.Ok empty_sphere)
     (fun manager { rendering; accuracy; origin = origin_refined } ->
        match rendering with
        | DrawTabular _ ->
          let origin =
            Option_util.map
              Public_data.short_node_of_refined_node origin_refined in
-         (manager#get_local_influence_map
-            ?fwd:None ?bwd:None ?origin ~total:1 accuracy >>= function
-          | Result.Ok influences_json ->
-            Lwt.return
-              (table_of_influences_json origin influences_json)
-          | Result.Error err ->
-            let () = State_error.add_error
-                "influence_map" [Api_common.error_msg err] in
-            Lwt.return empty_sphere)
-       | DrawGraph _ -> Lwt.return empty_sphere)
+         Lwt_result.map
+           (table_of_influences_json origin)
+           (manager#get_local_influence_map
+              ?fwd:None ?bwd:None ?origin ~total:1 accuracy)
+       | DrawGraph _ -> Lwt.return (Result.Ok empty_sphere))
 
 let content () =
   let accuracy_form =
@@ -516,7 +512,9 @@ let content () =
             (fun { rendering; origin; _ } sphere ->
                match rendering with
                | DrawGraph _ -> []
-               | DrawTabular () -> [ draw_table origin sphere ])
+               | DrawTabular () -> match sphere with
+                 | Result.Ok sphere -> [ draw_table origin sphere ]
+                 | Result.Error mh -> Utility.print_method_handler mh)
             model influence_sphere));
     Widget_export.content export_config;
   ]
@@ -527,8 +525,7 @@ let _ =
        match rendering with
        | DrawTabular _ -> Lwt.return (Api_common.result_ok ())
        | DrawGraph { fwd; bwd; total } ->
-         State_error.wrap
-           ~append:true "influence_map"
+         State_error.wrap ~append:true "influence_map"
            (State_project.with_project
               ~label:__LOC__
               (fun (manager : Api.concrete_manager) ->
@@ -556,7 +553,7 @@ let _ =
                   | Result.Error e ->
                     let () = influencemap##clearData in
                     Lwt_result.fail e) >>=
-                 fun out -> Lwt.return (Api_common.result_lift out)
+                 fun out -> Lwt.return (Api_common.result_kasa out)
               )))
     (React.S.on ~eq:State_project.model_equal tab_is_active
        State_project.dummy_model State_project.model)
@@ -624,21 +621,22 @@ let onload () =
       Dom_html.full_handler
         (fun _ _ ->
            let _ =
-             State_project.with_project
-               ~label:__LOC__
-               (fun (manager : Api.concrete_manager) ->
-                  (Lwt_result.map
-                     (fun origin ->
-                        let origin =
-                          JsonUtil.to_option
-                            Public_data.refined_influence_node_of_json
-                            origin in
-                        let () = update_model (fun m -> { m with origin }) in
-                        ())
-                     manager#get_initial_node >>=
-                   fun out ->
-                   Lwt.return (Api_common.result_lift out)
-                  ))
+             State_error.wrap "influence_map_recenter"
+               (State_project.with_project
+                  ~label:__LOC__
+                  (fun (manager : Api.concrete_manager) ->
+                     (Lwt_result.map
+                        (fun origin ->
+                           let origin =
+                             JsonUtil.to_option
+                               Public_data.refined_influence_node_of_json
+                               origin in
+                           let () = update_model (fun m -> { m with origin }) in
+                           ())
+                        manager#get_initial_node >>=
+                      fun out ->
+                      Lwt.return (Api_common.result_kasa out)
+                     )))
            in Js._true
         )
   in
@@ -650,25 +648,24 @@ let onload () =
              let { origin; _ } = React.S.value model in
              Option_util.map Public_data.short_node_of_refined_node origin in
            let _ =
-             State_project.with_project
-               ~label:__LOC__
-               (fun (manager : Api.concrete_manager) ->
-                  (Lwt_result.map
-                     (fun origin' ->
-                        let origin' =
-                          JsonUtil.to_option
-                            Public_data.refined_influence_node_of_json
-                            origin'
-                        in
-                        let () = update_model
-                            (fun m -> { m with origin = origin' }) in
-                        ())
-                     (manager#get_next_node origin) >>=
-                   fun out -> Lwt.return (Api_common.result_lift out)
-                  ))
+             State_error.wrap "influence_map_next_node"
+               (State_project.with_project
+                  ~label:__LOC__
+                  (fun (manager : Api.concrete_manager) ->
+                     (Lwt_result.map
+                        (fun origin' ->
+                           let origin' =
+                             JsonUtil.to_option
+                               Public_data.refined_influence_node_of_json
+                               origin' in
+                           let () = update_model
+                               (fun m -> { m with origin = origin' }) in
+                           ())
+                        (manager#get_next_node origin) >>=
+                      fun out -> Lwt.return (Api_common.result_kasa out)
+                     )))
            in Js._true
-        )
-  in
+        ) in
   let () =
     (Tyxml_js.To_dom.of_input prev_node )##.onclick :=
       Dom_html.full_handler
@@ -677,22 +674,22 @@ let onload () =
              let { origin; _ } = React.S.value model in
              Option_util.map Public_data.short_node_of_refined_node origin in
            let _ =
-             State_project.with_project
-               ~label:__LOC__
-               (fun (manager : Api.concrete_manager) ->
-                  (Lwt_result.map
-                     (fun origin' ->
-                        let origin' =
-                          JsonUtil.to_option
-                            Public_data.refined_influence_node_of_json
-                            origin'
-                        in
-                        let () = update_model
-                            (fun m -> { m with origin = origin' }) in
-                        ())
-                     (manager#get_previous_node origin) >>=
-                   fun out -> Lwt.return (Api_common.result_lift out)
-                  ))
+             State_error.wrap "influence_map_prev_node"
+               (State_project.with_project
+                  ~label:__LOC__
+                  (fun (manager : Api.concrete_manager) ->
+                     (Lwt_result.map
+                        (fun origin' ->
+                           let origin' =
+                             JsonUtil.to_option
+                               Public_data.refined_influence_node_of_json
+                               origin' in
+                           let () = update_model
+                               (fun m -> { m with origin = origin' }) in
+                           ())
+                        (manager#get_previous_node origin) >>=
+                      fun out -> Lwt.return (Api_common.result_kasa out)
+                     )))
            in Js._true
         )
   in

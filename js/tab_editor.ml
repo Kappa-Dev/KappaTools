@@ -71,52 +71,54 @@ let childs_hide b =
 let init_dead_rules () =
   React.S.l1
     (fun model ->
-       State_project.with_project
-         ~label:__LOC__
-         (fun (manager : Api.concrete_manager) ->
-            if model.State_project.model_parameters.
-                 State_project.show_dead_rules then
-              (Lwt_result.map
-                 (fun dead_json ->
-                    let list = Public_data.dead_rules_of_json dead_json in
-                    let warnings =
-                      List.fold_left
-                        (fun acc rule ->
-                           if rule.Public_data.rule_hidden
-                           then acc
-                           else
-                             let message_text =
-                               "Dead rule "^
-                               if rule.Public_data.rule_label <> ""
-                               then (" '"^rule.Public_data.rule_label^"'")
-                               else if rule.Public_data.rule_ast <> ""
-                               then rule.Public_data.rule_ast
-                               else string_of_int rule.Public_data.rule_id in
-                             {
-                               Api_types_t.message_severity = `Warning;
-                               Api_types_t.message_range =
-                                 Some rule.Public_data.rule_position;
-                               Api_types_t.message_text;
-                             } :: acc) [] list in
-                    let warnings = List.rev warnings in
-                    State_error.add_error __LOC__ warnings)
-                 manager#get_dead_rules) >>=
-              fun out -> Lwt.return (Api_common.result_lift out)
-            else
-              Lwt.return (Api_common.result_ok ()))
-    )
+       State_error.wrap  ~append:true "tab_editor_dead_rule"
+         (State_project.with_project
+            ~label:__LOC__
+            (fun (manager : Api.concrete_manager) ->
+               if model.State_project.model_parameters.
+                    State_project.show_dead_rules then
+                 manager#get_dead_rules >>= function
+                 | Result.Ok dead_json ->
+                   let list = Public_data.dead_rules_of_json dead_json in
+                   let warnings =
+                     List.fold_left
+                       (fun acc rule ->
+                          if rule.Public_data.rule_hidden
+                          then acc
+                          else
+                            let message_text =
+                              "Dead rule "^
+                              if rule.Public_data.rule_label <> ""
+                              then (" '"^rule.Public_data.rule_label^"'")
+                              else if rule.Public_data.rule_ast <> ""
+                              then rule.Public_data.rule_ast
+                              else string_of_int rule.Public_data.rule_id in
+                            {
+                              Api_types_t.message_severity = `Warning;
+                              Api_types_t.message_range =
+                                Some rule.Public_data.rule_position;
+                              Api_types_t.message_text;
+                            } :: acc) [] list in
+                   let warnings = List.rev warnings in
+                   Lwt.return (Api_common.result_messages warnings)
+                 | Result.Error mh ->
+                   Lwt.return (Api_common.method_handler_messages mh)
+               else
+                 Lwt.return (Api_common.result_ok ()))
+         ))
     State_project.model
 
 let init_non_weakly_reversible_transitions () =
   React.S.l1
     (fun model ->
-       State_project.with_project
-         ~label:__LOC__
-         (fun (manager : Api.concrete_manager) ->
-            if model.State_project.model_parameters.
-                 State_project.show_non_weakly_reversible_transitions then
-              Lwt_result.map
-                (fun non_weakly_reversible_transitions_json ->
+       State_error.wrap  ~append:true "tab_editor_dead_rule"
+         (State_project.with_project
+            ~label:__LOC__
+            (fun (manager : Api.concrete_manager) ->
+               if model.State_project.model_parameters.
+                    State_project.show_non_weakly_reversible_transitions then
+                 manager#get_non_weakly_reversible_transitions >>= function
+                 | Result.Ok non_weakly_reversible_transitions_json ->
                    let list =
                      Public_data.separating_transitions_of_json
                        non_weakly_reversible_transitions_json in
@@ -134,7 +136,7 @@ let init_non_weakly_reversible_transitions () =
                             let message_text =
                               Format.asprintf
                                 "Rule %s may induce non wealky reversible events in the following context%s:%s%a"
-
+                                
                                 (if rule.Public_data.rule_label <> ""
                                  then (" '"^rule.Public_data.rule_label^"'")
                                  else if rule.Public_data.rule_ast <> ""
@@ -157,11 +159,10 @@ let init_non_weakly_reversible_transitions () =
                               Api_types_t.message_text;
                             } :: acc) [] list in
                    let warnings = List.rev warnings in
-                   State_error.add_error __LOC__ warnings)
-                manager#get_non_weakly_reversible_transitions >>=
-              fun out -> Lwt.return (Api_common.result_lift out)
-            else
-              Lwt.return (Api_common.result_ok ())
+                   Lwt.return (Api_common.result_messages warnings)
+                 | Result.Error mh -> Lwt.return (Api_common.method_handler_messages mh)
+               else
+                 Lwt.return (Api_common.result_ok ()))
          )
     )
     State_project.model

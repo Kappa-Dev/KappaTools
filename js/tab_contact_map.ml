@@ -29,14 +29,14 @@ let extract_contact_map = function
 
 let contact_map_text =
   State_project.on_project_change_async
-    ~on:tab_is_active None accuracy None
+    ~on:tab_is_active None accuracy
+    (Result.Error Exception_without_parameter.empty_error_handler)
     (fun (manager : Api.concrete_manager) acc ->
-       manager#get_contact_map acc >>= function
-       | Result.Ok contact_json ->
+       Lwt_result.map
+         (fun contact_json ->
          let _,map_json = extract_contact_map contact_json in
-         Lwt.return_some (Yojson.Basic.to_string map_json)
-       | Result.Error _e -> Lwt.return_none
-    )
+         Yojson.Basic.to_string map_json)
+         (manager#get_contact_map acc))
 
 let configuration : Widget_export.configuration = {
   Widget_export.id = export_id ;
@@ -45,8 +45,9 @@ let configuration : Widget_export.configuration = {
       Widget_export.export_png ~svg_div_id:display_id ();
       Widget_export.export_json
         ~serialize_json:(fun () ->
-            Option_util.unsome "null" (React.S.value contact_map_text)
-          )
+            match React.S.value contact_map_text with
+            | Result.Ok x -> x
+            | Result.Error _ -> "null")
     ];
   Widget_export.show = React.S.const true;
 }
@@ -104,12 +105,12 @@ let onload () =
   let _ =
     React.S.map
       (function
-        | None -> (contactmap##clearData)
-        | Some data ->
-          contactmap##setData (Js.string data))
-      (React.S.on
-         tab_is_active None contact_map_text)
-  in
+        | Result.Error mh  ->
+          let () = State_error.add_error
+              "tab_contact_map" (Api_common.method_handler_errors mh) in
+          contactmap##clearData
+        | Result.Ok data -> contactmap##setData (Js.string data))
+      contact_map_text in
   let () = (Tyxml_js.To_dom.of_select accuracy_chooser)##.onchange :=
       Dom_html.full_handler
         (fun va _ ->

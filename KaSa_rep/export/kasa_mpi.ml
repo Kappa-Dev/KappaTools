@@ -28,7 +28,11 @@ let send_exception post ?id e =
   let reply =
     `Assoc (head @ [
         "code", `String "ERROR";
-        "data", `String (Printexc.to_string e);
+        "data", Exception_without_parameter.to_json
+          (Exception_without_parameter.add_uncaught_error
+             (Exception_without_parameter.build_uncaught_exception
+                ~file_name:"kasa_mpi" e)
+             Exception_without_parameter.empty_error_handler);
       ]) in
   post (Yojson.Basic.to_string reply)
 
@@ -165,10 +169,16 @@ let on_message post text =
     send_exception
       post ~id (Yojson.Basic.Util.Type_error("Invalid KaSa request",x))
   | None ->
+    let message =
+      "Not a valid { id : _int_, data : ... } JSON message: "^text in
     let reply =
       `Assoc [
         "code", `String "ERROR";
         "data",
-        `String ("Not a valid { id : _int_, data : ... } JSON message; "^text)
+        Exception_without_parameter.to_json
+          (Exception_without_parameter.add_uncaught_error
+             (Exception_without_parameter.build_uncaught_exception
+                ~file_name:"kasa_mpi" ~message Exit)
+             Exception_without_parameter.empty_error_handler);
       ] in
     post (Yojson.Basic.to_string reply)

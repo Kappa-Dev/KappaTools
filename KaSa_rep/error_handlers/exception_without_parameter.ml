@@ -157,7 +157,7 @@ and caught_exception_of_json json =
 
 
 
-let build_uncaught_exception file_name message exn =
+let build_uncaught_exception ?file_name ?message exn =
   {
     file_name = file_name;
     message = message ;
@@ -166,7 +166,7 @@ let build_uncaught_exception file_name message exn =
 
 let build_caught_exception file_name message exn stack =
   {
-    uncaught_exception = build_uncaught_exception file_name message exn ;
+    uncaught_exception = build_uncaught_exception ?file_name ?message exn ;
     calling_stack = stack ;
   }
 
@@ -176,6 +176,44 @@ let raise_exception file_name key message exn =
       {file_name=file_name;
         message=message;
         alarm=exn})
+
+let rec pp_exception f = function
+  | Exit -> Format.pp_print_string f "Exit"
+  | Not_found -> Format.pp_print_string f "Not_found"
+  | Arg.Bad x -> Format.fprintf f "Arg.Bad(%s)" x
+  | Sys.Break -> Format.pp_print_string f "Sys.Break"
+  | Stack.Empty -> Format.pp_print_string f "Stack.Empty"
+  | Queue.Empty -> Format.pp_print_string f "Queue.Empty"
+  | Stream.Error x -> Format.fprintf f "Stream.Error %s" x
+  | Stream.Failure -> Format.pp_print_string f "Stream.Failure"
+  | Arg.Help x -> Format.fprintf f "Arg.Help(%s)" x
+  | Parsing.Parse_error -> Format.pp_print_string f "Parsing.Parse_error"
+  | Scanf.Scan_failure x -> Format.fprintf f "Scanf.Scan.failure(%s)" x
+  | Lazy.Undefined -> Format.pp_print_string f "Lazy.Undefined"
+  | UnixLabels.Unix_error (er,x,y) ->
+    Format.fprintf f "UnixLabels.Unix_error(%s,%s,%s)"
+      (UnixLabels.error_message er) x y
+  | Unix.Unix_error (er,x,y) ->
+    Format.fprintf f "Unix.Unix_error(%s,%s,%s)" (Unix.error_message er) x y
+  | Failure x -> Format.fprintf f "Failure(%s)" x
+  | Stack_overflow -> Format.pp_print_string f "Stack_overflow"
+  | Uncaught_exception x  ->
+    Format.fprintf f "Uncaught_exception(%a)" pp_uncaught x
+  | Caught_exception x  ->
+    Format.fprintf f "Caught_exception(%a)" pp_caught x
+  | exc -> Format.pp_print_string f (Printexc.to_string exc)
+and pp_uncaught f x =
+  let with_space = false in
+  Format.fprintf f "@[<h>%a%aexception:@ %a@]"
+    (Pp.option ~with_space (fun f x -> Format.fprintf f "file_name: %s; " x))
+    x.file_name
+    (Pp.option ~with_space (fun f x -> Format.fprintf f "message: %s; " x))
+    x.message
+    pp_exception x.alarm
+and pp_caught f x =
+  Format.fprintf f "@[<h>calling_stack: %a; %a@]"
+    (Pp.list (Pp.space) Format.pp_print_string) x.calling_stack
+    pp_uncaught x.uncaught_exception
 
 let rec stringlist_of_exception x stack =
   match x with
@@ -229,10 +267,10 @@ and stringlist_of_caught_light x stack =
       ("; "::(stringlist_of_uncaught x.uncaught_exception ("; "::stack))))
       x.calling_stack
 
-type method_handler =
-  {mh_caught_error_list:caught_exception list;
-   mh_uncaught_error_list:uncaught_exception list;
-   mh_calling_stack: string list}
+type method_handler = {
+  mh_caught_error_list:caught_exception list;
+  mh_uncaught_error_list:uncaught_exception list;
+}
 
 let to_json method_handler =
   `Assoc
@@ -243,15 +281,11 @@ let to_json method_handler =
       "uncaught",
       JsonUtil.of_list
         uncaught_exception_to_json method_handler.mh_uncaught_error_list;
-      "calling_stack",
-      JsonUtil.of_list
-        JsonUtil.of_string
-        method_handler.mh_calling_stack
     ]
 
 let of_json =
   function
-  | `Assoc l as x when List.length l = 3->
+  | `Assoc l as x when List.length l = 2 ->
     begin
       try
         let caught =
@@ -262,14 +296,9 @@ let of_json =
           (JsonUtil.to_list uncaught_exception_of_json)
             (List.assoc "uncaught" l)
         in
-        let stack =
-          (JsonUtil.to_list (JsonUtil.to_string ~error_msg:"calling stack"))
-            (List.assoc "calling_stack" l)
-        in
         {
           mh_caught_error_list = caught ;
           mh_uncaught_error_list = uncaught ;
-          mh_calling_stack = stack
         }
       with
       | _ ->
@@ -283,7 +312,6 @@ let empty_error_handler =
   {
     mh_caught_error_list=[];
     mh_uncaught_error_list=[];
-    mh_calling_stack=[]
   }
 
 let add_uncaught_error uncaught error = {error with mh_uncaught_error_list = uncaught::error.mh_uncaught_error_list}

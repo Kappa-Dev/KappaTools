@@ -85,7 +85,8 @@ let content () =
              let title = Html.div
                  ~a:[Html.a_class [ "panel-heading" ]] [Html.pcdata "KaSa has failed"] in
              let content = Html.div
-                 ~a:[Html.a_class [ "panel-body"; "panel-pre" ]] [Html.pcdata r] in
+                 ~a:[Html.a_class [ "panel-body"; "panel-pre" ]]
+                 (Utility.print_method_handler r) in
              let out = Html.div
                  ~a:[Html.a_class [ "panel"; "panel-danger" ]] [title;content] in
              Lwt.return [out]) >>= fun out ->

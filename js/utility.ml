@@ -138,3 +138,21 @@ let print_site_graph agent_list list =
          true, print_agent agent list)
       (false,list)
       (List.rev agent_list))
+
+let print_method_handler mh =
+  let uncaught = Exception_without_parameter.get_uncaught_exception_list mh in
+  let caught = Exception_without_parameter.get_caught_exception_list mh in
+  List.fold_right
+    (fun x l ->
+       Html.p
+         [Html.pcdata
+            (Format.asprintf
+               "%a" Exception_without_parameter.pp_caught x)]::l)
+    caught
+    (List.map
+       (fun x ->
+          Html.p
+            [Html.pcdata
+               (Format.asprintf
+                  "%a" Exception_without_parameter.pp_uncaught x)])
+       uncaught)

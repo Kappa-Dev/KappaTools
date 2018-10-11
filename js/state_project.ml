@@ -184,7 +184,7 @@ let update_state me project_catalog default_parameters project_parameters =
                project_version =
                  project_parse.Api_types_j.project_parse_project_version ;
              } in
-           Lwt.return (Api_common.result_lift out))
+           Lwt.return (Api_common.result_kasa out))
        ~error:(fun _ errors ->
            let () = set_state {
                project_current = Some me ;
@@ -278,7 +278,7 @@ let sync () : unit Api.result Lwt.t =
                project_version =
                  project_parse.Api_types_j.project_parse_project_version;
              } in
-           Lwt.return (Api_common.result_lift out)))
+           Lwt.return (Api_common.result_kasa out)))
 
 let remove_simulations manager project_id =
   manager#simulation_delete project_id

@@ -99,8 +99,12 @@ let tmp_bind_projects f id projects =
   match Mods.StringMap.find_option id !projects with
   | Some p -> f p
   | None ->
-    let m = "Project '"^id^"' not found" in
-    Lwt.return (Result.Error m)
+    let message = "Project '"^id^"' not found" in
+    Lwt.return_error
+      (Exception_without_parameter.add_uncaught_error
+         (Exception_without_parameter.build_uncaught_exception
+            ~file_name:"route_root" ~message Not_found)
+         Exception_without_parameter.empty_error_handler)
 
 let add_projects parameter projects =
   let project_id = parameter.Api_types_j.project_parameter_project_id in
@@ -638,7 +642,7 @@ let route
             fun compil -> tmp_bind_projects
               (fun manager -> manager#init_static_analyser_raw compil)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun () -> "null")
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -659,7 +663,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_contact_map accuracy)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -690,7 +694,7 @@ let route
                      accuracy ?fwd ?bwd ?origin ~total
                  | _ -> manager#get_influence_map accuracy)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -706,7 +710,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_initial_node)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -725,7 +729,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_next_node node)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -744,7 +748,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_previous_node node)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -760,7 +764,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_dead_rules)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -776,7 +780,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_dead_agents)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -792,7 +796,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_non_weakly_reversible_transitions)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -808,7 +812,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_constraints_list)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -824,7 +828,7 @@ let route
             tmp_bind_projects
               (fun manager -> manager#get_potential_polymers (Some Public_data.High) (Some Public_data.High)) (*TO DO make it tunable *)
               project_id projects >>=
-            Webapp_common.result_response
+            Webapp_common.kasa_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods

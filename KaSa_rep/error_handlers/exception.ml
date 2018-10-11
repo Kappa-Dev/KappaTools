@@ -17,8 +17,8 @@ type method_handler = Exception_without_parameter.method_handler
 let empty_error_handler = Exception_without_parameter.empty_error_handler
 let is_empty_error_handler = Exception_without_parameter.is_empty_error_handler
 
-let safe_warn parameters _error_handler file message exn _default =
-  let uncaught = Exception_without_parameter.build_uncaught_exception file message exn in
+let safe_warn parameters _error_handler file_name message exn _default =
+  let uncaught = Exception_without_parameter.build_uncaught_exception ?file_name ?message exn in
   let stringlist = Exception_without_parameter.stringlist_of_uncaught uncaught [Remanent_parameters.get_prefix parameters] in
   let _ =
     List.iter
@@ -28,8 +28,8 @@ let safe_warn parameters _error_handler file message exn _default =
   let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   raise (Exception_without_parameter.Uncaught_exception uncaught)
 
-let unsafe_warn _parameters error_handler file message exn default =
-  let uncaught = Exception_without_parameter.build_uncaught_exception file message exn in
+let unsafe_warn _parameters error_handler file_name message exn default =
+  let uncaught = Exception_without_parameter.build_uncaught_exception ?file_name ?message exn in
   Exception_without_parameter.add_uncaught_error uncaught error_handler, default ()
 
 let warn_aux parameters error_handler file message exn default =

@@ -51,11 +51,11 @@ let content () =
                  Utility.print_string "The following bonds may form arbitrary long chains of agents:" list
                in list
            in
-           Lwt.return output
-         | Result.Error e -> Lwt.return [ Html.cdata e ]) in
-  [ Html.div
+           Lwt.return [Html.p output]
+         | Result.Error mh -> Lwt.return (Utility.print_method_handler mh)) in
+  [ Tyxml_js.R.Html5.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
-      [ Tyxml_js.R.Html5.p (ReactiveData.RList.from_signal scc) ]
+      (ReactiveData.RList.from_signal scc)
   ]
 
 

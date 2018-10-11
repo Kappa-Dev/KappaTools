@@ -96,38 +96,36 @@ class type manager_simulation = object
   inherit manager_snapshot
 end
 
+type 'a kasa_reply =
+  ('a, Exception_without_parameter.method_handler) Lwt_result.t
+
 class type virtual manager_static_analysis = object
   method virtual is_running : bool
-  method init_static_analyser :
-    Ast.parsing_compil -> (unit, string) Lwt_result.t
-  method init_static_analyser_raw :
-    string -> (unit, string) Lwt_result.t
+  method init_static_analyser : Ast.parsing_compil -> unit kasa_reply
+  method init_static_analyser_raw : string -> unit kasa_reply
   (** The string has to be the json corresponding to an [Ast.parsing_compil] *)
 
   method get_contact_map :
-    Public_data.accuracy_level option -> (Yojson.Basic.json,string) Lwt_result.t
+    Public_data.accuracy_level option -> Yojson.Basic.json kasa_reply
   method get_influence_map :
-    Public_data.accuracy_level option -> (Yojson.Basic.json,string) Lwt_result.t
+    Public_data.accuracy_level option -> Yojson.Basic.json kasa_reply
   method get_local_influence_map :
     Public_data.accuracy_level option -> ?fwd:int -> ?bwd:int ->
     ?origin:(int,int) Public_data.influence_node -> total:int ->
-    (Yojson.Basic.json,string) Lwt_result.t
-  method get_initial_node : (Yojson.Basic.json,string) Lwt_result.t
+    Yojson.Basic.json kasa_reply
+  method get_initial_node : Yojson.Basic.json kasa_reply
   method get_next_node :
-    (int,int) Public_data.influence_node option ->
-    (Yojson.Basic.json,string) Lwt_result.t
+    (int,int) Public_data.influence_node option -> Yojson.Basic.json kasa_reply
   method get_previous_node :
-    (int,int) Public_data.influence_node option ->
-    (Yojson.Basic.json,string) Lwt_result.t
-  method get_dead_rules : (Yojson.Basic.json,string) Lwt_result.t
-  method get_dead_agents: (Yojson.Basic.json,string) Lwt_result.t 
-  method get_non_weakly_reversible_transitions :
-    (Yojson.Basic.json,string) Lwt_result.t
-  method get_constraints_list : (Yojson.Basic.json,string) Lwt_result.t
+    (int,int) Public_data.influence_node option -> Yojson.Basic.json kasa_reply
+  method get_dead_rules : Yojson.Basic.json kasa_reply
+  method get_dead_agents: Yojson.Basic.json kasa_reply
+  method get_non_weakly_reversible_transitions : Yojson.Basic.json kasa_reply
+  method get_constraints_list : Yojson.Basic.json kasa_reply
   method get_potential_polymers :
     Public_data.accuracy_level option ->
     Public_data.accuracy_level option ->
-    (Yojson.Basic.json,string) Lwt_result.t
+    Yojson.Basic.json kasa_reply
 end
 
 class type virtual manager_stories = object

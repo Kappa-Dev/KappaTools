@@ -55,12 +55,22 @@ let send
   let () = Common.ajax_request ~url ~meth ?timeout ?data ~handler in
   reply
 
+let kasa_error _ l =
+  Lwt.return_error
+    (List.fold_left
+       (fun acc m ->
+          Exception_without_parameter.add_uncaught_error
+            (Exception_without_parameter.build_uncaught_exception
+               ~file_name:"rest_api" ~message:m.Api_types_t.message_text Exit)
+            acc)
+       Exception_without_parameter.empty_error_handler l)
+
 class manager
     ?(timeout:float option)
-    ~url ~project_id =
+    ~url ~project_id : Api.rest_manager =
   let request_count = ref 0 in
   object(self)
-    method message :
+    method private message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
     | `FileCreate file ->
@@ -324,7 +334,7 @@ class manager
 
   inherit Mpi_api.manager_base ()
 
-  method rest_message = function
+  method private rest_message = function
     | `EnvironmentInfo ->
       send
         ?timeout request_count
@@ -423,9 +433,7 @@ class manager
              (Yojson.Basic.Util.Type_error ("Not a KaSa INIT response: ", x)))
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method init_static_analyser compil =
     self#init_static_analyser_raw
@@ -444,9 +452,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_influence_map accuracy =
     send
@@ -460,9 +466,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
     send
@@ -489,9 +493,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_initial_node =
     send
@@ -506,9 +508,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_next_node short_id_opt =
     send
@@ -529,9 +529,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_previous_node short_id_opt =
     send
@@ -551,9 +549,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
 
   method get_dead_rules =
@@ -564,9 +560,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_dead_agents =
     send
@@ -576,9 +570,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_non_weakly_reversible_transitions =
     send
@@ -590,9 +582,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_constraints_list =
     send
@@ -602,9 +592,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method get_potential_polymers accuracy_cm accuracy_scc =
     let options =
@@ -621,9 +609,7 @@ class manager
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
       ~ok:(fun _ x -> Lwt.return_ok x)
-      ~error:(fun _ -> function
-          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
-          | [] -> Lwt.return_error "Rest_api empty error")
+      ~error:kasa_error
 
   method is_computing = is_computing request_count
 

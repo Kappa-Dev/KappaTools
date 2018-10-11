@@ -22,7 +22,7 @@ exception Caught_exception of caught_exception
 type method_handler
 
 val raise_exception: string option -> unit -> string option -> exn -> unit
-val build_uncaught_exception: string option -> string option -> exn -> uncaught_exception
+val build_uncaught_exception: ?file_name:string -> ?message:string -> exn -> uncaught_exception
 val build_caught_exception: string option -> string option -> exn -> string list -> caught_exception
 val add_uncaught_error: uncaught_exception -> method_handler -> method_handler
 val stringlist_of_exception: exn -> string list -> string list
@@ -30,6 +30,9 @@ val stringlist_of_uncaught: uncaught_exception -> string list -> string list
 val stringlist_of_caught: caught_exception -> string list -> string list
 val stringlist_of_caught_light: caught_exception -> string list -> string list
 
+val pp_exception: Format.formatter -> exn -> unit
+val pp_uncaught: Format.formatter -> uncaught_exception -> unit
+val pp_caught: Format.formatter -> caught_exception -> unit
 
 val empty_error_handler: method_handler
 val is_empty_error_handler: method_handler -> bool

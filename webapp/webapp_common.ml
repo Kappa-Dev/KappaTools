@@ -61,11 +61,8 @@ let api_result_response
         Logs_lwt.err (fun m -> m "%s" error_msg) >>= fun () ->
         Server.respond_string ~headers ~status ~body:error_msg ())
 
-let result_response ~string_of_success = function
-  | Result.Ok r ->
-    Server.respond_string ~headers ~status:`OK ~body:(string_of_success r) ()
-  | Result.Error e ->
-    error_response [Api_common.error_msg e]
+let kasa_response ~string_of_success x =
+  api_result_response ~string_of_success (Api_common.result_kasa x)
 
 let method_not_allowed_respond meths =
   let headers =
