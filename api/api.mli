@@ -118,6 +118,8 @@ class type virtual manager_static_analysis = object
     (int,int) Public_data.influence_node option -> Yojson.Basic.json kasa_reply
   method get_previous_node :
     (int,int) Public_data.influence_node option -> Yojson.Basic.json kasa_reply
+  method get_nodes_of_influence_map :
+    Public_data.accuracy_level option -> Yojson.Basic.json kasa_reply
   method get_dead_rules : Yojson.Basic.json kasa_reply
   method get_dead_agents: Yojson.Basic.json kasa_reply
   method get_non_weakly_reversible_transitions : Yojson.Basic.json kasa_reply

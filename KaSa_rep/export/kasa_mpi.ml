@@ -131,6 +131,21 @@ let on_message post text =
     let state, im = previous_node_in_influence_map !gState origin in
     let () = gState := state in
     send_response post id im
+  | Some(id, `List [ `String "INFLUENCE_MAP_ALL_NODES" ; acc ]) ->
+    let accuracy_level = Public_data.accuracy_of_json acc in
+    let state, rules = get_all_nodes_of_influence_map ~accuracy_level !gState in
+    let () = gState := state in
+    send_response post id rules
+  | Some(id,
+         (`List [
+            `String "INFLUENCE_MAP_ALL_NODES"]
+         | `String "INFLUENCE_MAP_ALL_NODES"))
+    ->
+    let accuracy_level = Public_data.Low in
+    let state, rules = get_all_nodes_of_influence_map ~accuracy_level !gState in
+    let () = gState := state in
+    send_response post id rules
+
   | Some(id, (`List [ `String "DEAD_RULES" ] | `String "DEAD_RULES")) ->
     let state, rules = get_dead_rules !gState in
     let () = gState := state in

@@ -145,7 +145,18 @@ class virtual new_client ~post (mailbox : mailbox) :
       in
       Lwt_result.bind_result
         (self#message post request)
-            (fun x -> Result.Ok x)
+        (fun x -> Result.Ok x)
+
+    method get_nodes_of_influence_map accuracy =
+      let request = `List ( `String "INFLUENCE_MAP_ALL_NODES"  ::
+                            (match accuracy with
+                             | None -> []
+                             | Some a -> [Public_data.accuracy_to_json a]))
+      in
+      Lwt_result.bind_result
+        (self#message post request)
+        (fun x -> Result.Ok x)
+
     method get_dead_rules =
       let request = `List [ `String "DEAD_RULES" ] in
       Lwt_result.bind_result

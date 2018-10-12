@@ -754,6 +754,29 @@ let route
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
     { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/all_nodes_of_influence_map" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let project_id = project_ref context in
+            let request = context.Webapp_common.request in
+            let uri = Cohttp.Request.uri request in
+            let query = Uri.get_query_param  uri in
+            let accuracy = Option_util.bind
+                Public_data.accuracy_of_string (query "accuracy") in
+            tmp_bind_projects
+              (fun manager ->
+                   manager#get_nodes_of_influence_map
+                     accuracy)
+              project_id projects >>=
+            Webapp_common.kasa_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
         "/v2/projects/{projectid}/analyses/dead_rules" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `GET ; ] in

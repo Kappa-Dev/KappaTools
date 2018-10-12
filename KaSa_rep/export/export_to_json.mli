@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Sep 26 2018>
+  * Last modification: Time-stamp: <Oct 12 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -27,6 +27,10 @@ module type Type =
       state -> state * Yojson.Basic.json
 
     val get_influence_map:
+      ?accuracy_level:Public_data.accuracy_level ->
+      state -> state * Yojson.Basic.json
+
+    val get_all_nodes_of_influence_map:
       ?accuracy_level:Public_data.accuracy_level ->
       state -> state * Yojson.Basic.json
 

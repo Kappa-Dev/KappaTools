@@ -551,6 +551,20 @@ class manager
       ~ok:(fun _ x -> Lwt.return_ok x)
       ~error:kasa_error
 
+  method get_nodes_of_influence_map accuracy =
+  send
+    ?timeout request_count
+    (match accuracy with
+     | Some accuracy ->
+       Format.sprintf "%s/v2/projects/%s/analyses/all_nodes_of_influence_map?accuracy=%s"
+         url project_id (Public_data.accuracy_to_string accuracy)
+     | None -> Format.sprintf "%s/v2/analyses/all_nodes_of_influence_map" url)
+    `GET
+    (fun x -> Yojson.Basic.from_string x)
+  >>= Api_common.result_map
+    ~ok:(fun _ x -> Lwt.return_ok x)
+    ~error:kasa_error
+
 
   method get_dead_rules =
     send

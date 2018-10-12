@@ -10,6 +10,8 @@
 (* JSon labels*)
 (**************)
 
+let id = "id"
+let info = "info"
 let agent="agent name"
 let contactmap="contact map"
 let accuracy_string = "accuracy"
@@ -48,6 +50,7 @@ let location_pair_list = "location pair list"
 let rhs = "RHS"
 let lhs = "LHS"
 let influencemap="influence map"
+let nodesofinfluencemap="nodes of influence map"
 let wakeup = "wake-up map"
 let inhibition = "inhibition map"
 let nodes = "nodes"
@@ -502,6 +505,7 @@ let short_influence_node_of_json =
     (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "rule id"))
     (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "var id"))
 
+
 let refined_influence_node_to_json =
   influence_node_to_json rule_to_json var_to_json
 
@@ -628,6 +632,52 @@ let influence_map_to_json influence_map =
               wakeup,half_influence_map_to_json influence_map.positive;
               inhibition,half_influence_map_to_json
                 influence_map.negative;]) influence_map]
+
+let nodes_of_influence_map_to_json nodes_list =
+  `Assoc
+    [nodesofinfluencemap,
+     JsonUtil.of_pair
+       ~lab1:accuracy_string ~lab2:map
+       accuracy_to_json
+       (fun nodes_list ->
+          `Assoc
+            [ nodes,
+              nodes_list_to_json nodes_list;])
+       nodes_list]
+
+let nodes_of_influence_map_of_json =
+  function
+  | `Assoc l as x ->
+    begin
+      try
+        let json = List.assoc nodesofinfluencemap l in
+        JsonUtil.to_pair
+          ~lab1:accuracy_string ~lab2:map
+          ~error_msg:(JsonUtil.build_msg "nodes of influence map1")
+          accuracy_of_json
+          (function
+            | `Assoc l as x when List.length l = 1 ->
+              begin
+                try
+                  nodes_list_of_json
+                    (List.assoc nodes l)
+                with Not_found ->
+                  raise
+                    (Yojson.Basic.Util.Type_error
+                       (JsonUtil.build_msg "nodes of influence map",x))
+              end
+            | x ->
+              raise
+                (Yojson.Basic.Util.Type_error
+                   (JsonUtil.build_msg "nodes of influence map",x)))
+          json
+      with
+      | _ ->
+        raise
+          (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "nodes of influence map",x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "nodes of influence map",x))
 
 let local_influence_map_to_json influence_map =
   let accuracy, total, bwd, fwd, influence_map = influence_map in

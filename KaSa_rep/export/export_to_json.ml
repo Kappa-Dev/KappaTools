@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Sep 27 2018>
+  * Last modification: Time-stamp: <Oct 12 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -27,6 +27,10 @@ sig
       state -> state * Yojson.Basic.json
 
   val get_influence_map:
+    ?accuracy_level:Public_data.accuracy_level ->
+    state -> state * Yojson.Basic.json
+
+  val get_all_nodes_of_influence_map:
     ?accuracy_level:Public_data.accuracy_level ->
     state -> state * Yojson.Basic.json
 
@@ -91,6 +95,11 @@ functor (A:Analyzer.Analyzer) ->
         ?accuracy_level:(accuracy_level=Public_data.Low) state =
       let state, influence_map = get_influence_map ~accuracy_level state in
       state, Public_data.influence_map_to_json (accuracy_level,influence_map)
+
+    let get_all_nodes_of_influence_map
+        ?accuracy_level:(accuracy_level=Public_data.Low) state =
+      let state, nodes = get_all_nodes_of_influence_map ~accuracy_level state in
+      state, Public_data.nodes_of_influence_map_to_json (accuracy_level,nodes)
 
     let get_local_influence_map
         ?accuracy_level:(accuracy_level=Public_data.Low)

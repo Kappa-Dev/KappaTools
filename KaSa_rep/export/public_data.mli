@@ -143,6 +143,12 @@ val influence_map_to_json:
 val influence_map_of_json:
   Yojson.Basic.json -> accuracy_level * influence_map
 
+val nodes_of_influence_map_to_json:
+  accuracy_level * (rule, var) influence_node list -> Yojson.Basic.json
+
+val nodes_of_influence_map_of_json:
+  Yojson.Basic.json -> accuracy_level * (rule, var) influence_node list
+
 val local_influence_map_to_json:
   accuracy_level * int * int option * int option * influence_map -> Yojson.Basic.json
 

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Apr 16 2018>
+  * Last modification: Time-stamp: <Oct 12 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -755,9 +755,8 @@ let convert_half_influence_map parameters error handler compiled influence =
     influence
     (error, Public_data.InfluenceNodeMap.empty)
 
-let convert_influence_map
-    state (nodes, wake_up_map, inhibition_map)
-  =
+
+let extract_all_nodes_of_influence_map state (nodes,_,_) =
   let parameters = Remanent_state.get_parameters state in
   let state, handler = get_handler state in
   let state, compiled = get_c_compilation state in
@@ -765,11 +764,26 @@ let convert_influence_map
   let error, nodes =
     List.fold_left
       (fun (error, list) id ->
-         let error, head = Handler.convert_id_refined parameters error handler compiled id in
+         let error, head =
+           Handler.convert_id_refined parameters error
+             handler compiled id
+         in
          error, head::list)
-        (error, [])
-        (List.rev nodes)
+      (error, [])
+      (List.rev nodes)
   in
+  state, nodes
+
+let convert_influence_map
+    state (nodes, wake_up_map, inhibition_map)
+  =
+  let state, nodes =
+    extract_all_nodes_of_influence_map state (nodes,wake_up_map,inhibition_map)
+  in
+  let parameters = Remanent_state.get_parameters state in
+  let state, handler = get_handler state in
+  let state, compiled = get_c_compilation state in
+  let error = Remanent_state.get_errors state in
   let error, pos = convert_half_influence_map parameters error handler  compiled wake_up_map in
   let error, neg = convert_half_influence_map parameters error handler  compiled inhibition_map in
   let state = Remanent_state.set_errors error state in
@@ -1169,6 +1183,17 @@ let get_local_influence_map
       state
   in
   convert_influence_map state internal_influence_map
+
+let get_all_nodes_of_influence_map
+    ?accuracy_level:(accuracy_level=Public_data.Low)
+    state =
+  let state, internal_influence_map =
+    get_internal_influence_map
+      ~accuracy_level
+      state
+  in
+  extract_all_nodes_of_influence_map state internal_influence_map
+
 
 let query_inhibition_map ?accuracy_level state r1 r2 =
   let state,inf_map = get_influence_map ?accuracy_level state in
