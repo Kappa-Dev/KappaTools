@@ -16,11 +16,11 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-E() => [ E(x) v E(x!x.R) ]
-R() => [ R(c) v R(c!c.R) ]
-R() => [ R(x) v R(x!x.E) ]
-R() => [ R(cr) v R(cr!n.R) ]
-R() => [ R(n) v R(n!cr.R) ]
+E(x?) => [ E(x) v E(x!x.R) ]
+R(c?) => [ R(c) v R(c!c.R) ]
+R(x?) => [ R(x) v R(x!x.E) ]
+R(cr?) => [ R(cr) v R(cr!n.R) ]
+R(n?) => [ R(n) v R(n!cr.R) ]
 
 ------------------------------------------------------------
 * Relational properties:

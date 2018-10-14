@@ -21,9 +21,9 @@ The following transitions are separating:
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => [ A(y~u?) v A(y~p?) ]
-A() => [ A(z~u?) v A(z~p?) ]
-A() => [ A(x~u?) v A(x~p?) ]
+A(y?) => [ A(y~u?) v A(y~p?) ]
+A(z?) => [ A(z~u?) v A(z~p?) ]
+A(x?) => [ A(x~u?) v A(x~p?) ]
 
 ------------------------------------------------------------
 * Relational properties:

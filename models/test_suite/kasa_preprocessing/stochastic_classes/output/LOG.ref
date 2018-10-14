@@ -695,10 +695,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B() => B(y{u})
-B() => B(x{u})
-D() => D(y{u})
-D() => D(x{u})
+B(y) => B(y{u})
+B(x) => B(x{u})
+D(y) => D(y{u})
+D(x) => D(x{u})
 
 ------------------------------------------------------------
 * Relational properties:
@@ -895,10 +895,10 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-D()=> [D(x{u})]
-D()=> [D(y{u})]
-B()=> [B(x{u})]
-B()=> [B(y{u})]
+D(x)=> [D(x{u})]
+D(y)=> [D(y{u})]
+B(x)=> [B(x{u})]
+B(y)=> [B(y{u})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

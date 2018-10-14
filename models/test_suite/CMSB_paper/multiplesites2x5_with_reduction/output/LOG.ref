@@ -13,17 +13,17 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => [ A(a2~u?) v A(a2~p?) ]
-A() => [ A(a1~u?) v A(a1~p?) ]
-A() => [ A(b1~u?) v A(b1~p?) ]
-A() => [ A(b2~u?) v A(b2~p?) ]
-A() => [ A(c1~u?) v A(c1~p?) ]
-A() => [ A(c2~u?) v A(c2~p?) ]
-A() => [ A(d1~u?) v A(d1~p?) ]
-A() => [ A(d2~u?) v A(d2~p?) ]
-A() => [ A(e1~u?) v A(e1~p?) ]
-A() => [ A(e2~u?) v A(e2~p?) ]
-A() => [ A(g~u?) v A(g~p?) ]
+A(a2?) => [ A(a2~u?) v A(a2~p?) ]
+A(a1?) => [ A(a1~u?) v A(a1~p?) ]
+A(b1?) => [ A(b1~u?) v A(b1~p?) ]
+A(b2?) => [ A(b2~u?) v A(b2~p?) ]
+A(c1?) => [ A(c1~u?) v A(c1~p?) ]
+A(c2?) => [ A(c2~u?) v A(c2~p?) ]
+A(d1?) => [ A(d1~u?) v A(d1~p?) ]
+A(d2?) => [ A(d2~u?) v A(d2~p?) ]
+A(e1?) => [ A(e1~u?) v A(e1~p?) ]
+A(e2?) => [ A(e2~u?) v A(e2~p?) ]
+A(g?) => [ A(g~u?) v A(g~p?) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -300,17 +300,17 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => [ A(a2~u?) v A(a2~p?) ]
-A() => [ A(a1~u?) v A(a1~p?) ]
-A() => [ A(b1~u?) v A(b1~p?) ]
-A() => [ A(b2~u?) v A(b2~p?) ]
-A() => [ A(c1~u?) v A(c1~p?) ]
-A() => [ A(c2~u?) v A(c2~p?) ]
-A() => [ A(d1~u?) v A(d1~p?) ]
-A() => [ A(d2~u?) v A(d2~p?) ]
-A() => [ A(e1~u?) v A(e1~p?) ]
-A() => [ A(e2~u?) v A(e2~p?) ]
-A() => [ A(g~u?) v A(g~p?) ]
+A(a2?) => [ A(a2~u?) v A(a2~p?) ]
+A(a1?) => [ A(a1~u?) v A(a1~p?) ]
+A(b1?) => [ A(b1~u?) v A(b1~p?) ]
+A(b2?) => [ A(b2~u?) v A(b2~p?) ]
+A(c1?) => [ A(c1~u?) v A(c1~p?) ]
+A(c2?) => [ A(c2~u?) v A(c2~p?) ]
+A(d1?) => [ A(d1~u?) v A(d1~p?) ]
+A(d2?) => [ A(d2~u?) v A(d2~p?) ]
+A(e1?) => [ A(e1~u?) v A(e1~p?) ]
+A(e2?) => [ A(e2~u?) v A(e2~p?) ]
+A(g?) => [ A(g~u?) v A(g~p?) ]
 
 ------------------------------------------------------------
 * Relational properties:

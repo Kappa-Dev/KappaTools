@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Nov 29 2017>
+ * Last modification: Time-stamp: <Oct 14 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -438,6 +438,13 @@ let rec print ?beginning_of_sentence:(beggining=true)
             match Remanent_parameters.get_backend_mode parameters with
             | Remanent_parameters_sig.Kappa
             | Remanent_parameters_sig.Raw ->
+              let error, t =
+                Ckappa_backend.Ckappa_backend.add_site
+                  parameters error handler_kappa
+                  agent_id
+                  site_type
+                  t
+              in
               let error =
                 Ckappa_backend.Ckappa_backend.print
                   log
@@ -1010,6 +1017,10 @@ let rec convert_views_internal_constraints_list_aux
             | Remanent_parameters_sig.Raw ->
               (*hyp*)
               (*-----------------------------------------------------*)
+              let error, t =
+                Ckappa_backend.Ckappa_backend.add_site parameters
+                  error handler_kappa agent_id site_type t
+              in
               let error'', refinement =
                 List.fold_left (fun (error, c_list) state ->
                     let error', t' =
@@ -1026,7 +1037,6 @@ let rec convert_views_internal_constraints_list_aux
               in
               let lemma =
                 {
-                  (*Remanent_state.hyp = site_graph;*)
                   Public_data.hyp = t;
                   Public_data.refinement = refinement
                 }
@@ -1087,8 +1097,6 @@ let rec convert_views_internal_constraints_list_aux
             (*--------------------------------------------------*)
             let lemma =
               {
-                (*Remanent_state.hyp = site_graph;
-                  Remanent_state.refinement = [site_graph'']*)
                 Public_data.hyp = t';
                 Public_data.refinement = [t'']
               }
@@ -1192,9 +1200,6 @@ let rec convert_views_internal_constraints_list_aux
       in
       error, current_list
     | No_known_translation list ->
-      (*let _ =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "test2\n"
-    in*)
       begin
         match Remanent_parameters.get_backend_mode parameters with
         | Remanent_parameters_sig.Kappa
@@ -1260,6 +1265,19 @@ let convert_views_internal_constraints_list
     Exception.check_point
       Exception.warn parameters error error'
       __POS__ Exit
+  in
+  let error, t =
+    match translation with
+    | Range (site,_) ->
+      Ckappa_backend.Ckappa_backend.add_site
+                      parameters error handler_kappa
+                      agent_id
+                      site t
+    | Equiv _
+    | Imply _
+    | Partition _
+    | No_known_translation _
+      -> error, t
   in
   convert_views_internal_constraints_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min

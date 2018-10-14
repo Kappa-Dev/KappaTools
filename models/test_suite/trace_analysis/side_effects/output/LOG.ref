@@ -17,13 +17,13 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => [ A(x[.]) v A(x[a.C]) ]
-A() => [ A(z{u}) v A(z{p}) ]
-A() => A(y[y.B])
-B() => [ B(x[.]) v B(x[a.C]) ]
-B() => B(y[y.A])
-C() => [ C(a[x.A]) v C(a[x.B]) ]
-C() => C(b{u})
+A(x) => [ A(x[.]) v A(x[a.C]) ]
+A(z) => [ A(z{u}) v A(z{p}) ]
+A(y) => A(y[y.B])
+B(x) => [ B(x[.]) v B(x[a.C]) ]
+B(y) => B(y[y.A])
+C(a) => [ C(a[x.A]) v C(a[x.B]) ]
+C(b) => C(b{u})
 
 ------------------------------------------------------------
 * Relational properties:

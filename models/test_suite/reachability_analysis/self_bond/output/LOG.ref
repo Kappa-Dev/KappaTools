@@ -1786,18 +1786,18 @@ Id=58
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t[.]) v A(t[t.A]) ]
-A() => [ A(z[.]) v A(z[z.A]) ]
-B() => [ B(t[.]) v B(t[z.B]) ]
-B() => [ B(z[.]) v B(z[t.B]) ]
-C() => [ C(t[.]) v C(t[z.C]) ]
-C() => [ C(z[.]) v C(z[t.C]) ]
-D() => [ D(t[.]) v D(t[z.D]) v D(t[t.D]) ]
-D() => [ D(z[.]) v D(z[t.D]) ]
-E() => [ E(t[.]) v E(t[t.E]) ]
-E() => [ E(z[.]) v E(z[z.E]) ]
-F() => [ F(t[.]) v F(t[z.F]) ]
-F() => [ F(z[.]) v F(z[z.F]) v F(z[t.F]) ]
+A(t) => [ A(t[.]) v A(t[t.A]) ]
+A(z) => [ A(z[.]) v A(z[z.A]) ]
+B(t) => [ B(t[.]) v B(t[z.B]) ]
+B(z) => [ B(z[.]) v B(z[t.B]) ]
+C(t) => [ C(t[.]) v C(t[z.C]) ]
+C(z) => [ C(z[.]) v C(z[t.C]) ]
+D(t) => [ D(t[.]) v D(t[z.D]) v D(t[t.D]) ]
+D(z) => [ D(z[.]) v D(z[t.D]) ]
+E(t) => [ E(t[.]) v E(t[t.E]) ]
+E(z) => [ E(z[.]) v E(z[z.E]) ]
+F(t) => [ F(t[.]) v F(t[z.F]) ]
+F(z) => [ F(z[.]) v F(z[z.F]) v F(z[t.F]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -2039,9 +2039,9 @@ Id=73
 EXTENSIONAL DESCRIPTION:
 A(z[z.A]) <=> A(t[t.A])
 B(z[t.B]) <=> B(t[z.B])
-D(z[t.D]) => D(t[t.D],z[t.D])
-F(z[t.F]) => F(t[.],z[t.F])
-F(z[.]) => F(t[.],z[.])
+D(t,z[t.D]) => D(t[t.D],z[t.D])
+F(t,z[t.F]) => F(t[.],z[t.F])
+F(t,z[.]) => F(t[.],z[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -2473,51 +2473,51 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-F()=> [
+F(z)=> [
 		  F(z[.])
 		v F(z[z.F])
 		v F(z[t.F])]
-F()=> [
+F(t)=> [
 		  F(t[.])
 		v F(t[z.F])]
-E()=> [
+E(z)=> [
 		  E(z[.])
 		v E(z[z.E])]
-E()=> [
+E(t)=> [
 		  E(t[.])
 		v E(t[t.E])]
-D()=> [
+D(z)=> [
 		  D(z[.])
 		v D(z[t.D])]
-D()=> [
+D(t)=> [
 		  D(t[.])
 		v D(t[z.D])
 		v D(t[t.D])]
-C()=> [
+C(z)=> [
 		  C(z[.])
 		v C(z[t.C])]
-C()=> [
+C(t)=> [
 		  C(t[.])
 		v C(t[z.C])]
-B()=> [
+B(z)=> [
 		  B(z[.])
 		v B(z[t.B])]
-B()=> [
+B(t)=> [
 		  B(t[.])
 		v B(t[z.B])]
-A()=> [
+A(z)=> [
 		  A(z[.])
 		v A(z[z.A])]
-A()=> [
+A(t)=> [
 		  A(t[.])
 		v A(t[t.A])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-F(z[.])=> [F(t[.],z[.])]
-F(z[t.F])=> [F(t[.],z[t.F])]
-D(z[t.D])=> [D(t[t.D],z[t.D])]
+F(t,z[.])=> [F(t[.],z[.])]
+F(t,z[t.F])=> [F(t[.],z[t.F])]
+D(t,z[t.D])=> [D(t[t.D],z[t.D])]
 A(z[z.A])=> [A(t[t.A])]
 B(z[t.B])=> [B(t[z.B])]
 

@@ -178,6 +178,81 @@ struct
     | Ckappa_sig.Binding _ ->
       Exception.warn parameter error __POS__ Exit false
 
+
+  let add_site parameter error kappa_handler agent_id site t =
+    let error, agent_op =
+      Ckappa_sig.Agent_id_map_and_set.Map.find_option
+        parameter error
+        agent_id
+        t.views
+    in
+    match agent_op with
+    | None ->
+      Exception.warn
+        parameter error __POS__
+        ~message:"unknown agent type"
+        Exit t
+    | Some (agent_type, map) ->
+      begin
+        let error', (agent_string, sitemap) =
+        Ckappa_sig.Agent_id_map_and_set.Map.find_default
+          parameter error
+          ("",Wrapped_modules.LoggedStringMap.empty)
+          agent_id
+          t.string_version
+        in
+        let error =
+          Exception.check_point
+            Exception.warn
+            parameter error error' __POS__ Exit
+        in
+        let error', site_string =
+          Handler.string_of_site_contact_map
+          ~ml_pos:(Some __POS__)
+          ~message:"undefined site"
+          parameter error kappa_handler agent_type site
+        in
+        let error =
+          Exception.check_point
+            Exception.warn
+            parameter error error' __POS__ Exit
+        in
+        let error, state_opt =
+          Wrapped_modules.LoggedStringMap.find_option_without_logs
+            parameter error
+            site_string
+            sitemap
+        in
+        let state =
+          match
+            state_opt
+          with
+          | None -> None, None, None
+          | Some state -> state
+        in
+        let error, sitemap =
+        Wrapped_modules.LoggedStringMap.add_or_overwrite
+          parameter error
+          site_string
+          state
+          sitemap
+      in
+      let error', string_version =
+        Ckappa_sig.Agent_id_map_and_set.Map.overwrite
+          parameter error
+          agent_id
+          (agent_string, sitemap)
+          t.string_version
+      in
+      let error =
+        Exception.check_point
+          Exception.warn
+          parameter error error' __POS__ Exit
+      in
+      error,
+      { t with string_version }
+    end
+
   let add_state_interv parameter error kappa_handler agent_id site
       state_min state_max t =
     let error, agent_op =

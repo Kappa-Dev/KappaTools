@@ -37,6 +37,15 @@ sig
     Ckappa_sig.c_agent_name -> t ->
     Exception.method_handler * agent_id * t
 
+  val add_site:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    Cckappa_sig.kappa_handler ->
+    agent_id ->
+    Ckappa_sig.c_site_name ->
+    t ->
+    Exception.method_handler * t
+
   val add_state:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->

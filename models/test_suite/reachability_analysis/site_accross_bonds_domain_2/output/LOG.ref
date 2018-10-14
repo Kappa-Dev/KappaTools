@@ -954,11 +954,11 @@ Id=93
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(z[.]) v A(z[z.B]) ]
-A() => [ A(t{u}) v A(t{p}) v A(t{q}) ]
-B() => [ B(t{u}) v B(t{p}) ]
-B() => [ B(z[.]) v B(z[z.A]) ]
-B() => [ B(z{u}) v B(z{p}) ]
+A(z) => [ A(z[.]) v A(z[z.B]) ]
+A(t) => [ A(t{u}) v A(t{p}) v A(t{q}) ]
+B(t) => [ B(t{u}) v B(t{p}) ]
+B(z) => [ B(z[.]) v B(z[z.A]) ]
+B(z) => [ B(z{u}) v B(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1078,10 +1078,10 @@ Id=118
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(t{q}) => A(t{q},z[z.B])
-A(t{p}) => A(t{p},z[z.B])
+A(t{q},z) => A(t{q},z[z.B])
+A(t{p},z) => A(t{p},z[z.B])
 B(z[z.A]) => B(z{p}[z.A])
-B(z[.]) => B(t{u},z[.])
+B(t,z[.]) => B(t{u},z[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -1290,30 +1290,30 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-B()=> [
+B(z)=> [
 		  B(z{u})
 		v B(z{p})]
-B()=> [
+B(z)=> [
 		  B(z[.])
 		v B(z[z.A])]
-B()=> [
+B(t)=> [
 		  B(t{u})
 		v B(t{p})]
-A()=> [
+A(t)=> [
 		  A(t{u})
 		v A(t{p})
 		v A(t{q})]
-A()=> [
+A(z)=> [
 		  A(z[.])
 		v A(z[z.B])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-B(z[.])=> [B(t{u},z[.])]
+B(t,z[.])=> [B(t{u},z[.])]
 B(z[z.A])=> [B(z{p}[z.A])]
-A(t{p})=> [A(t{p},z[z.B])]
-A(t{q})=> [A(t{q},z[z.B])]
+A(t{p},z)=> [A(t{p},z[z.B])]
+A(t{q},z)=> [A(t{q},z[z.B])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

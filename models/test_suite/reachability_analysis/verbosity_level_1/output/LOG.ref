@@ -16,9 +16,9 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => [ A(y{u}) v A(y{p}) v A(y{q}) ]
-A() => [ A(x{u}) v A(x{p}) v A(x{o}) v A(x{q}) ]
-A() => [ A(z{u}) v A(z{q}) ]
+A(y) => [ A(y{u}) v A(y{p}) v A(y{q}) ]
+A(x) => [ A(x{u}) v A(x{p}) v A(x{o}) v A(x{q}) ]
+A(z) => [ A(z{u}) v A(z{q}) ]
 
 ------------------------------------------------------------
 * Relational properties:

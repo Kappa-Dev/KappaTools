@@ -1697,18 +1697,18 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => A(t[t.B])
-A() => [ A(z[.]) v A(z[x.C]) v A(z[x.D]) ]
-B() => [ B(z[.]) v B(z[x.C]) v B(z[x.D]) ]
-B() => B(t[t.A])
-E() => E(t[t.F])
-E() => [ E(z[.]) v E(z[x.C]) v E(z[x.G]) ]
-F() => [ F(z[x.D]) v F(z[x.H]) ]
-F() => F(t[t.E])
-C() => [ C(x[z.A]) v C(x[z.B]) v C(x[z.E]) ]
-D() => [ D(x[z.A]) v D(x[z.B]) v D(x[z.F]) ]
-G() => G(x[z.E])
-H() => H(x[z.F])
+A(t) => A(t[t.B])
+A(z) => [ A(z[.]) v A(z[x.C]) v A(z[x.D]) ]
+B(z) => [ B(z[.]) v B(z[x.C]) v B(z[x.D]) ]
+B(t) => B(t[t.A])
+E(t) => E(t[t.F])
+E(z) => [ E(z[.]) v E(z[x.C]) v E(z[x.G]) ]
+F(z) => [ F(z[x.D]) v F(z[x.H]) ]
+F(t) => F(t[t.E])
+C(x) => [ C(x[z.A]) v C(x[z.B]) v C(x[z.E]) ]
+D(x) => [ D(x[z.A]) v D(x[z.B]) v D(x[z.F]) ]
+G(x) => G(x[z.E])
+H(x) => H(x[z.F])
 
 ------------------------------------------------------------
 * Relational properties:
@@ -2279,35 +2279,35 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-H()=> [H(x[z.F])]
-G()=> [G(x[z.E])]
-D()=> [
+H(x)=> [H(x[z.F])]
+G(x)=> [G(x[z.E])]
+D(x)=> [
 		  D(x[z.A])
 		v D(x[z.B])
 		v D(x[z.F])]
-C()=> [
+C(x)=> [
 		  C(x[z.A])
 		v C(x[z.B])
 		v C(x[z.E])]
-F()=> [F(t[t.E])]
-F()=> [
+F(t)=> [F(t[t.E])]
+F(z)=> [
 		  F(z[x.D])
 		v F(z[x.H])]
-E()=> [
+E(z)=> [
 		  E(z[.])
 		v E(z[x.C])
 		v E(z[x.G])]
-E()=> [E(t[t.F])]
-B()=> [B(t[t.A])]
-B()=> [
+E(t)=> [E(t[t.F])]
+B(t)=> [B(t[t.A])]
+B(z)=> [
 		  B(z[.])
 		v B(z[x.C])
 		v B(z[x.D])]
-A()=> [
+A(z)=> [
 		  A(z[.])
 		v A(z[x.C])
 		v A(z[x.D])]
-A()=> [A(t[t.B])]
+A(t)=> [A(t[t.B])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
