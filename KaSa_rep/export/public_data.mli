@@ -25,6 +25,7 @@ val sup:string
 val binding_type_backend_symbol: string
 val free_backend_symbol: string
 val wildcard_backend_symbol: string
+val missing_binding_site_backend_symbol: string 
 val bound_to_unknown_backend_symbol: string
 val internal_state_introduction_backend_symbol: string
 val internal_state_delimiter_backend_symbol: string

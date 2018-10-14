@@ -845,7 +845,7 @@ struct
     let error =
       print logger parameters error t
     in
-    let _ = Format.pp_print_flush string_fmt in
+    let () = Format.pp_print_flush string_fmt () in
     error, Buffer.contents buffer
 
 end

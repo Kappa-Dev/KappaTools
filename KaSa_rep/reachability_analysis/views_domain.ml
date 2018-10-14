@@ -4001,7 +4001,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       let () = Loggers.print_newline log in
       let error, handler =
         print_bdu_update_map_cartesian_decomposition
-          ~sort:false 
+          ~sort:false
           parameters
           handler
           error
@@ -4300,13 +4300,15 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
     in
     let error, current_list =
       if sort then
-        Tools_kasa.sort_list
-          (fun parameters error lemma ->
-             Ckappa_backend.Ckappa_backend.to_string
-               parameters error lemma.Public_data.hyp)
-          parameters
-          error
-          current_list
+        let error, current_list =
+          Tools_kasa.sort_list
+             (fun parameters error lemma ->
+                Ckappa_backend.Ckappa_backend.to_string
+                  parameters error lemma.Public_data.hyp)
+             parameters
+             error
+             current_list
+        in error, List.rev current_list 
       else
         error, current_list
     in

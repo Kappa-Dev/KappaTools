@@ -69,7 +69,9 @@ let print_site site list =
   let site_name, prop_opt, binding_opt, counter_opt = site in
   let list =
     match binding_opt with
-    | Some Public_data.Free | None ->
+    | None ->
+      print_string Public_data.missing_binding_site_backend_symbol list 
+    | Some Public_data.Free  ->
       print_single_binding_state
         Public_data.free_backend_symbol list
     | Some Public_data.Wildcard -> (*

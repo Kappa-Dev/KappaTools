@@ -81,4 +81,4 @@ let sort_list key parameter error list =
   let refined_sorted_list =
     List.sort (fun (a,_) (b,_) -> compare b a) refined_list
   in
-  error, List.rev_map snd refined_sorted_list 
+  error, List.rev_map snd refined_sorted_list
