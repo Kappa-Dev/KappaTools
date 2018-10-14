@@ -958,8 +958,8 @@ Id=40
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y) => [ A(y[.]) v A(y[x.A]) v A(y[y.A]) ]
 A(x) => [ A(x[.]) v A(x[x.A]) v A(x[y.A]) ]
+A(y) => [ A(y[.]) v A(y[x.A]) v A(y[y.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:

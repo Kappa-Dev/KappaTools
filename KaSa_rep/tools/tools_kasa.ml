@@ -66,3 +66,19 @@ let sorted_parts_of_list n list =
 	 aux k t suffix (aux (k-1) t (h::suffix) output)
       | [] -> output
   in aux n list [] []
+
+let sort_list key parameter error list =
+  let error, refined_list =
+    List.fold_left
+      (fun (error, refined_list) a ->
+         let error, key =
+           key parameter error a
+         in
+         error, (key,a)::refined_list)
+      (error, [])
+      list
+  in
+  let refined_sorted_list =
+    List.sort (fun (a,_) (b,_) -> compare b a) refined_list
+  in
+  error, List.rev_map snd refined_sorted_list 

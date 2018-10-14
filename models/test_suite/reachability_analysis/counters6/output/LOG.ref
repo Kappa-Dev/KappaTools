@@ -13,11 +13,11 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A(x2) => [ A(x2{u}) v A(x2{p}) v A(x2{q}) ]
-A(x5) => [ A(x5{u}) v A(x5{p}) v A(x5{q}) ]
-A(x4) => [ A(x4{u}) v A(x4{p}) v A(x4{q}) ]
-A(x3) => [ A(x3{u}) v A(x3{p}) v A(x3{q}) ]
 A(x1) => [ A(x1{u}) v A(x1{p}) v A(x1{q}) ]
+A(x2) => [ A(x2{u}) v A(x2{p}) v A(x2{q}) ]
+A(x3) => [ A(x3{u}) v A(x3{p}) v A(x3{q}) ]
+A(x4) => [ A(x4{u}) v A(x4{p}) v A(x4{q}) ]
+A(x5) => [ A(x5{u}) v A(x5{p}) v A(x5{q}) ]
 
 ------------------------------------------------------------
 * Relational properties:

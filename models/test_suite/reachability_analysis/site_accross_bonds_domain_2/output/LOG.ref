@@ -954,8 +954,8 @@ Id=93
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z) => [ A(z[.]) v A(z[z.B]) ]
 A(t) => [ A(t{u}) v A(t{p}) v A(t{q}) ]
+A(z) => [ A(z[.]) v A(z[z.B]) ]
 B(t) => [ B(t{u}) v B(t{p}) ]
 B(z) => [ B(z[.]) v B(z[z.A]) ]
 B(z) => [ B(z{u}) v B(z{p}) ]

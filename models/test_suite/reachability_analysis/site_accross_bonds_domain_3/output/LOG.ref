@@ -1699,14 +1699,14 @@ Id=53
 EXTENSIONAL DESCRIPTION:
 A(t) => A(t[t.B])
 A(z) => [ A(z[.]) v A(z[x.C]) v A(z[x.D]) ]
-B(z) => [ B(z[.]) v B(z[x.C]) v B(z[x.D]) ]
 B(t) => B(t[t.A])
-E(t) => E(t[t.F])
-E(z) => [ E(z[.]) v E(z[x.C]) v E(z[x.G]) ]
-F(z) => [ F(z[x.D]) v F(z[x.H]) ]
-F(t) => F(t[t.E])
+B(z) => [ B(z[.]) v B(z[x.C]) v B(z[x.D]) ]
 C(x) => [ C(x[z.A]) v C(x[z.B]) v C(x[z.E]) ]
 D(x) => [ D(x[z.A]) v D(x[z.B]) v D(x[z.F]) ]
+E(t) => E(t[t.F])
+E(z) => [ E(z[.]) v E(z[x.C]) v E(z[x.G]) ]
+F(t) => F(t[t.E])
+F(z) => [ F(z[x.D]) v F(z[x.H]) ]
 G(x) => G(x[z.E])
 H(x) => H(x[z.F])
 

@@ -3518,8 +3518,8 @@ Id=118
 
 EXTENSIONAL DESCRIPTION:
 A(c) => [ A(c:[0 .. 0]) v A(c:[1 .. 1]) v A(c:[2 .. 2]) v A(c:[3 .. 3]) v A(c:[4 .. 4]) ]
-A(x) => [ A(x{u}) v A(x{p}) ]
 A(d) => [ A(d:[0 .. 0]) v A(d:[1 .. 1]) v A(d:[2 .. 2]) v A(d:[4 .. 4]) ]
+A(x) => [ A(x{u}) v A(x{p}) ]
 A(x) => [ A(x[.]) v A(x[x.B]) ]
 B(x) => [ B(x[.]) v B(x[x.A]) ]
 

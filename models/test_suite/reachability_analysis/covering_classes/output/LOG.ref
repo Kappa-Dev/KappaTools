@@ -3245,18 +3245,18 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y) => [ A(y{u}) v A(y{p}) ]
 A(x) => [ A(x[.]) v A(x[x.B]) v A(x[x.C]) ]
-A(y) => [ A(y[.]) v A(y[y.B]) v A(y[y.C]) ]
 A(x) => [ A(x{u}) v A(x{p}) ]
-B(y) => [ B(y{u}) v B(y{p}) ]
+A(y) => [ A(y{u}) v A(y{p}) ]
+A(y) => [ A(y[.]) v A(y[y.B]) v A(y[y.C]) ]
 B(x) => [ B(x[.]) v B(x[x.A]) ]
-B(y) => [ B(y[.]) v B(y[y.A]) ]
 B(x) => [ B(x{u}) v B(x{p}) ]
-C(y) => [ C(y{u}) v C(y{p}) ]
+B(y) => [ B(y{u}) v B(y{p}) ]
+B(y) => [ B(y[.]) v B(y[y.A]) ]
 C(x) => [ C(x[.]) v C(x[x.A]) ]
-C(y) => [ C(y[.]) v C(y[y.A]) ]
 C(x) => [ C(x{u}) v C(x{p}) ]
+C(y) => [ C(y{u}) v C(y{p}) ]
+C(y) => [ C(y[.]) v C(y[y.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:

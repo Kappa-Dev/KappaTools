@@ -3810,7 +3810,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       end
 
   let print_bdu_update_map_gen_decomposition decomposition
-      ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
+      ~sort:sort ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
       parameters handler error handler_kappa
       site_correspondence result =
     let error, handler, list =
@@ -3819,6 +3819,29 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
         parameters handler error handler_kappa
         site_correspondence result
     in
+    let error, list =
+      if sort then
+        Tools_kasa.sort_list
+          (fun parameters error
+            (agent_string,agent_id,_,translation)
+          ->
+            match translation with
+            | Translation_in_natural_language.Range (x,_)
+              ->
+              let error, x =
+                Handler.string_of_site_contact_map
+                  parameters error handler_kappa
+                  agent_id x
+              in
+              error, (agent_string,x)
+            | _ -> error, (agent_string,"")
+
+          )
+          parameters error list
+      else
+        error, list
+    in
+
     let error =
       List.fold_left
         (fun error (agent_string, agent_type, _, translation) ->
@@ -3837,6 +3860,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
   let print_bdu_update_map_cartesian_abstraction parameters handler error
       handler_kappa  =
     print_bdu_update_map_gen_decomposition
+      ~sort:true
       ~smash:true
       ~show_dep_with_dimmension_higher_than:1
       Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
@@ -3977,6 +4001,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       let () = Loggers.print_newline log in
       let error, handler =
         print_bdu_update_map_cartesian_decomposition
+          ~sort:false 
           parameters
           handler
           error
@@ -4213,6 +4238,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       error, dynamic, kasa_state
 
   let export_relation_properties_aux
+      ~sort:sort
       ~smash:smash
       ~show_dep_with_dimmension_higher_than:dim_min
       decomposition
@@ -4272,6 +4298,18 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
         Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
     in
+    let error, current_list =
+      if sort then
+        Tools_kasa.sort_list
+          (fun parameters error lemma ->
+             Ckappa_backend.Ckappa_backend.to_string
+               parameters error lemma.Public_data.hyp)
+          parameters
+          error
+          current_list
+      else
+        error, current_list
+    in
     let pair_list = (domain_name, current_list) :: internal_constraints_list in
     let kasa_state =
       Remanent_state.set_internal_constraints_list pair_list kasa_state
@@ -4282,6 +4320,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
   let export_relation_properties parameters dynamic error handler_kappa =
   let domain_name = "Views domain - relational properties" in
     export_relation_properties_aux
+      ~sort:false
       ~smash:true
       ~show_dep_with_dimmension_higher_than:
       (if
@@ -4296,6 +4335,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
   let export_non_relation_properties parameters dynamic error handler_kappa =
   let domain_name = "Views domain - non relational properties" in
     export_relation_properties_aux
+      ~sort:true
       ~smash:true
       ~show_dep_with_dimmension_higher_than:1
       Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction

@@ -821,8 +821,8 @@ Id=88
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y) => [ A(y{u}) v A(y{p}) v A(y{q}) ]
 A(x) => [ A(x{u}) v A(x{p}) v A(x{o}) v A(x{q}) ]
+A(y) => [ A(y{u}) v A(y{p}) v A(y{q}) ]
 A(z) => [ A(z{u}) v A(z{q}) ]
 
 ------------------------------------------------------------

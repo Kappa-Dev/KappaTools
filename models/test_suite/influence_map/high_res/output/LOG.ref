@@ -13,10 +13,10 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A(y) => [ A(y{u}) v A(y{p}) ]
-A(x) => [ A(x{u}) v A(x{p}) ]
-A(z) => [ A(z{u}) v A(z{p}) ]
 A(w) => [ A(w{u}) v A(w{p}) ]
+A(x) => [ A(x{u}) v A(x{p}) ]
+A(y) => [ A(y{u}) v A(y{p}) ]
+A(z) => [ A(z{u}) v A(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -934,10 +934,10 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y) => [ A(y{u}) v A(y{p}) ]
-A(x) => [ A(x{u}) v A(x{p}) ]
-A(z) => [ A(z{u}) v A(z{p}) ]
 A(w) => [ A(w{u}) v A(w{p}) ]
+A(x) => [ A(x{u}) v A(x{p}) ]
+A(y) => [ A(y{u}) v A(y{p}) ]
+A(z) => [ A(z{u}) v A(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:

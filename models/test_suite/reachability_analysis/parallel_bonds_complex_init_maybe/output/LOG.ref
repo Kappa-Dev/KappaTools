@@ -1304,12 +1304,12 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z) => [ A(z[.]) v A(z[z.B]) ]
 A(t) => [ A(t[.]) v A(t[t.B]) ]
 A(x) => [ A(x{u}) v A(x{p}) ]
-B(z) => [ B(z[.]) v B(z[z.A]) ]
+A(z) => [ A(z[.]) v A(z[z.B]) ]
 B(t) => [ B(t[.]) v B(t[t.A]) ]
 B(x) => [ B(x{u}) v B(x{p}) ]
+B(z) => [ B(z[.]) v B(z[z.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:

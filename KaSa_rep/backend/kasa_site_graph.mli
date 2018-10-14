@@ -96,6 +96,11 @@ sig
     t ->
     Exception.method_handler * t
 
+  val to_string:
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    t ->
+    Exception.method_handler * string
 
   val print:
     Loggers.t ->

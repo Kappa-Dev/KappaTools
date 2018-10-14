@@ -13,15 +13,15 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A(y) => [ A(y{u}) v A(y{p}) ]
 A(x) => [ A(x{u}) v A(x{p}) ]
+A(y) => [ A(y{u}) v A(y{p}) ]
 A(z) => [ A(z{u}) v A(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-A(x,z{p}) => A(x{p},z{p})
 A(y,z{p}) => A(y{p},z{p})
+A(x,z{p}) => A(x{p},z{p})
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -31,4 +31,7 @@ A(y,z{p}) => A(y{p},z{p})
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-execution finished without any exception
+Some exceptions have been raised
+error: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 24: Site 'y' is already used; exception:Exit
+error: file_name: setMap.ml ; message: dataStructures/setMap.ml line: 1099: Attempt to add an association over a former one in a map; exception:Failure(Set_and_Map.Map.add)
+error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 686: a site should occur only once in an interface; exception:Exit

@@ -1335,12 +1335,12 @@ Id=101
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y) => [ A(y{p}) v A(y{u}) ]
 A(x) => [ A(x[.]) v A(x[x.B]) ]
 A(x) => [ A(x{u}) v A(x{p}) ]
-B(y) => [ B(y{u}) v B(y{p}) v B(y{q}) ]
+A(y) => [ A(y{p}) v A(y{u}) ]
 B(x) => [ B(x[.]) v B(x[x.A]) v B(x[x.C]) ]
 B(x) => [ B(x{p}) v B(x{q}) v B(x{u}) ]
+B(y) => [ B(y{u}) v B(y{p}) v B(y{q}) ]
 C(x) => [ C(x[.]) v C(x[x.B]) ]
 
 ------------------------------------------------------------

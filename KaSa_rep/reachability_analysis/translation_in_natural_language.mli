@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Jul 19 2017>
+ * Last modification: Time-stamp: <Oct 14 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -12,7 +12,12 @@
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
 
-type token
+ type token =
+   | Range of Ckappa_sig.c_site_name * Ckappa_sig.c_state list
+   | Equiv of (Ckappa_sig.c_site_name * Ckappa_sig.c_state) * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+   | Imply of (Ckappa_sig.c_site_name * Ckappa_sig.c_state) * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+   | Partition of (Ckappa_sig.c_site_name * (Ckappa_sig.c_state * token list) list)
+   | No_known_translation of (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list
 
 type rename_sites =
   (Remanent_parameters_sig.parameters ->

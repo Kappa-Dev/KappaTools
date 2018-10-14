@@ -14,8 +14,8 @@ every agent may occur in the model
 * Non relational properties:
 ------------------------------------------------------------
 A(x) => [ A(x[.]) v A(x[y.B]) ]
-A(z) => [ A(z{u}) v A(z{p}) ]
 A(y) => [ A(y[.]) v A(y[x.B]) ]
+A(z) => [ A(z{u}) v A(z{p}) ]
 B(x) => [ B(x[.]) v B(x[y.A]) ]
 B(y) => B(y[x.A])
 

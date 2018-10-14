@@ -929,11 +929,11 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 A(t) => [ A(t[.]) v A(t[t.B]) ]
-A(z) => [ A(z[.]) v A(z[z.B]) ]
 A(x) => A(x{u})
+A(z) => [ A(z[.]) v A(z[z.B]) ]
 B(t) => [ B(t[.]) v B(t[t.A]) ]
-B(z) => [ B(z[.]) v B(z[z.A]) ]
 B(x) => B(x{u})
+B(z) => [ B(z[.]) v B(z[z.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:

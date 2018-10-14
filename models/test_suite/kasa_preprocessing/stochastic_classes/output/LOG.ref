@@ -695,10 +695,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(y) => B(y{u})
 B(x) => B(x{u})
-D(y) => D(y{u})
+B(y) => B(y{u})
 D(x) => D(x{u})
+D(y) => D(y{u})
 
 ------------------------------------------------------------
 * Relational properties:

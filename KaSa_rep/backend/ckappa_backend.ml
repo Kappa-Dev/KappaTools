@@ -808,6 +808,9 @@ struct
         (error, false)
     in error
 
+
+
+
   (***************************************************************************)
 
   let print_list logger parameter error _kappa_handler list =
@@ -834,4 +837,15 @@ struct
         in
         error
       end
+
+  let to_string parameters  error t =
+    let buffer = Buffer.create 1 in
+    let string_fmt = Format.formatter_of_buffer buffer in
+    let logger = Loggers.open_logger_from_formatter string_fmt in
+    let error =
+      print logger parameters error t
+    in
+    let _ = Format.pp_print_flush string_fmt in
+    error, Buffer.contents buffer
+
 end

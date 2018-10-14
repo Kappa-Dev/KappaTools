@@ -545,9 +545,9 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y) => [ A(y{u}) v A(y{p}) ]
 A(x) => [ A(x{u}) v A(x{p}) ]
 A(x) => [ A(x[.]) v A(x[x.A]) ]
+A(y) => [ A(y{u}) v A(y{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:

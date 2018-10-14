@@ -777,10 +777,10 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y) => [ A(y{u}) v A(y{p}) ]
-A(w) => [ A(w{u}) v A(w{p}) ]
 A(t) => [ A(t{u}) v A(t{p}) ]
+A(w) => [ A(w{u}) v A(w{p}) ]
 A(x) => [ A(x{u}) v A(x{p}) ]
+A(y) => [ A(y{u}) v A(y{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
