@@ -1401,10 +1401,10 @@ EXTENSIONAL DESCRIPTION:
 A() => [ A(c[.]) v A(c[x1.C]) v A(c[x2.C]) ]
 A() => [ A(x[.]) v A(x[x.B]) ]
 B() => [ B(x[.]) v B(x[x.A]) ]
-C() => [ C(x2{u}[#]) v C(x2{p}[#]) ]
+C() => [ C(x2{u}) v C(x2{p}) ]
 C() => [ C(x1[.]) v C(x1[c.A]) ]
 C() => [ C(x2[.]) v C(x2[c.A]) ]
-C() => [ C(x1{u}[#]) v C(x1{p}[#]) ]
+C() => [ C(x1{u}) v C(x1{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1835,8 +1835,8 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x1{u}[#])
-		v C(x1{p}[#])]
+		  C(x1{u})
+		v C(x1{p})]
 C()=> [
 		  C(x2[.])
 		v C(x2[c.A])]
@@ -1844,8 +1844,8 @@ C()=> [
 		  C(x1[.])
 		v C(x1[c.A])]
 C()=> [
-		  C(x2{u}[#])
-		v C(x2{p}[#])]
+		  C(x2{u})
+		v C(x2{p})]
 B()=> [
 		  B(x[.])
 		v B(x[x.A])]

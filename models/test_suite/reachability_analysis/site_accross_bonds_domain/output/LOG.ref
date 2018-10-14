@@ -1019,10 +1019,10 @@ Id=69
 
 EXTENSIONAL DESCRIPTION:
 A() => [ A(z[.]) v A(z[z.B]) ]
-A() => [ A(t{u}[.]) v A(t{p}[.]) ]
-B() => [ B(t{u}[.]) v B(t{p}[.]) ]
+A() => [ A(t{u}) v A(t{p}) ]
+B() => [ B(t{u}) v B(t{p}) ]
 B() => [ B(z[.]) v B(z[z.A]) ]
-B() => [ B(z{u}[#]) v B(z{p}[#]) ]
+B() => [ B(z{u}) v B(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1118,9 +1118,9 @@ B(z[z.A]) => B(z{p}[z.A])
 ------------------------------------------------------------
 A(z[1]),B(z[1]) => 
 	[
-		  A(t{p}[.],z[1]),B(t{p}[.],z[1])
-		v A(t{u}[.],z[1]),B(t{u}[.],z[1])
-		v A(t{u}[.],z[1]),B(t{p}[.],z[1])
+		  A(t{p},z[1]),B(t{p},z[1])
+		v A(t{u},z[1]),B(t{u},z[1])
+		v A(t{u},z[1]),B(t{p},z[1])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1292,17 +1292,17 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(z{u}[#])
-		v B(z{p}[#])]
+		  B(z{u})
+		v B(z{p})]
 B()=> [
 		  B(z[.])
 		v B(z[z.A])]
 B()=> [
-		  B(t{u}[.])
-		v B(t{p}[.])]
+		  B(t{u})
+		v B(t{p})]
 A()=> [
-		  A(t{u}[.])
-		v A(t{p}[.])]
+		  A(t{u})
+		v A(t{p})]
 A()=> [
 		  A(z[.])
 		v A(z[z.B])]
@@ -1316,9 +1316,9 @@ B(z[z.A])=> [B(z{p}[z.A])]
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(z[1]),B(z[1])=> [
-		  A(t{p}[.],z[1]),B(t{p}[.],z[1])
-		v A(t{u}[.],z[1]),B(t{u}[.],z[1])
-		v A(t{u}[.],z[1]),B(t{p}[.],z[1])]
+		  A(t{p},z[1]),B(t{p},z[1])
+		v A(t{u},z[1]),B(t{u},z[1])
+		v A(t{u},z[1]),B(t{p},z[1])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

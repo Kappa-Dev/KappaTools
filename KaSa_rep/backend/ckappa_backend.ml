@@ -390,18 +390,11 @@ struct
           in
           let error, new_binding_state =
             match
-              internal_state_string_opt, binding_state_opt, old_binding
+              binding_state_opt
             with
-            | Some _, None, None ->
-              let error, bool =
-                Handler.has_a_binding_state parameter error kappa_handler agent_type site
-              in
-              if bool then
-                error, Some Wildcard
-              else
+            | None ->
                 error, old_binding
-            | _, Some _, _  -> error, binding_state_opt
-            | _, None, _ -> error, old_binding
+            | Some _ -> error, binding_state_opt
           in
           let error, sitemap =
             Wrapped_modules.LoggedStringMap.add_or_overwrite
@@ -645,7 +638,12 @@ struct
            in
            let () =
              match binding with
-             | None | Some Free ->
+             | None ->
+             Loggers.fprintf logger
+               "%s"
+               (Remanent_parameters.get_missing_binding_state parameter)
+
+             | Some Free ->
                Loggers.fprintf logger
                  "%s%s%s"
                  (Remanent_parameters.get_open_binding_state parameter)

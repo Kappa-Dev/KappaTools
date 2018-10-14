@@ -763,8 +763,8 @@ Id=26
 
 EXTENSIONAL DESCRIPTION:
 A() => A(x[.])
-A() => [ A(x{u}[#]) v A(x{p}[#]) ]
-B() => [ B(x{u}[.]) v B(x{p}[.]) ]
+A() => [ A(x{u}) v A(x{p}) ]
+B() => [ B(x{u}) v B(x{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -947,11 +947,11 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(x{u}[.])
-		v B(x{p}[.])]
+		  B(x{u})
+		v B(x{p})]
 A()=> [
-		  A(x{u}[#])
-		v A(x{p}[#])]
+		  A(x{u})
+		v A(x{p})]
 A()=> [A(x[.])]
 
 ------------------------------------------------------------

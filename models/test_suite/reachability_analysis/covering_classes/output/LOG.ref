@@ -3245,18 +3245,18 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{u}[#]) v A(y{p}[#]) ]
+A() => [ A(y{u}) v A(y{p}) ]
 A() => [ A(x[.]) v A(x[x.B]) v A(x[x.C]) ]
 A() => [ A(y[.]) v A(y[y.B]) v A(y[y.C]) ]
-A() => [ A(x{u}[#]) v A(x{p}[#]) ]
-B() => [ B(y{u}[#]) v B(y{p}[#]) ]
+A() => [ A(x{u}) v A(x{p}) ]
+B() => [ B(y{u}) v B(y{p}) ]
 B() => [ B(x[.]) v B(x[x.A]) ]
 B() => [ B(y[.]) v B(y[y.A]) ]
-B() => [ B(x{u}[#]) v B(x{p}[#]) ]
-C() => [ C(y{u}[#]) v C(y{p}[#]) ]
+B() => [ B(x{u}) v B(x{p}) ]
+C() => [ C(y{u}) v C(y{p}) ]
 C() => [ C(x[.]) v C(x[x.A]) ]
 C() => [ C(y[.]) v C(y[y.A]) ]
-C() => [ C(x{u}[#]) v C(x{p}[#]) ]
+C() => [ C(x{u}) v C(x{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -4018,8 +4018,8 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x{u}[#])
-		v C(x{p}[#])]
+		  C(x{u})
+		v C(x{p})]
 C()=> [
 		  C(y[.])
 		v C(y[y.A])]
@@ -4027,11 +4027,11 @@ C()=> [
 		  C(x[.])
 		v C(x[x.A])]
 C()=> [
-		  C(y{u}[#])
-		v C(y{p}[#])]
+		  C(y{u})
+		v C(y{p})]
 B()=> [
-		  B(x{u}[#])
-		v B(x{p}[#])]
+		  B(x{u})
+		v B(x{p})]
 B()=> [
 		  B(y[.])
 		v B(y[y.A])]
@@ -4039,11 +4039,11 @@ B()=> [
 		  B(x[.])
 		v B(x[x.A])]
 B()=> [
-		  B(y{u}[#])
-		v B(y{p}[#])]
+		  B(y{u})
+		v B(y{p})]
 A()=> [
-		  A(x{u}[#])
-		v A(x{p}[#])]
+		  A(x{u})
+		v A(x{p})]
 A()=> [
 		  A(y[.])
 		v A(y[y.B])
@@ -4053,8 +4053,8 @@ A()=> [
 		v A(x[x.B])
 		v A(x[x.C])]
 A()=> [
-		  A(y{u}[#])
-		v A(y{p}[#])]
+		  A(y{u})
+		v A(y{p})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

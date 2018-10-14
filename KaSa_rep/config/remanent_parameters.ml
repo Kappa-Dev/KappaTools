@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <May 13 2018>
+  * Last modification: Time-stamp: <Oct 14 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -527,6 +527,7 @@ let dummy_parameters ~called_from =
 let get_bound_symbol_1 symbol = symbol.Symbol_table.bound
 let get_open_binding_state_1 symbol = symbol.Symbol_table.open_binding_state
 let get_close_binding_state_1 symbol = symbol.Symbol_table.close_binding_state
+let get_missing_binding_state_1 symbol = symbol.Symbol_table.missing_binding_state
 let get_link_to_any_1 symbol = symbol.Symbol_table.link_to_any
 let get_link_to_some_1 symbol = symbol.Symbol_table.link_to_some
 let get_internal_state_symbol_1 symbol = symbol.Symbol_table.internal_state_symbol
@@ -809,6 +810,8 @@ let upgrade_from_reachability_analysis_parameters_field f = compose f get_reacha
 let get_bound_symbol = upgrade_from_symbols_field get_bound_symbol_1
 let get_open_binding_state = upgrade_from_symbols_field get_open_binding_state_1
 let get_close_binding_state = upgrade_from_symbols_field get_close_binding_state_1
+let get_missing_binding_state = upgrade_from_symbols_field
+get_missing_binding_state_1 
 let get_internal_state_symbol = upgrade_from_symbols_field get_internal_state_symbol_1
 let get_open_internal_state = upgrade_from_symbols_field get_open_internal_state_1
 let get_close_internal_state = upgrade_from_symbols_field get_close_internal_state_1

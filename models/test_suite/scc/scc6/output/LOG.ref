@@ -14,7 +14,7 @@ every agent may occur in the model
 R() => [ R(y[.]) v R(y[z.R]) ]
 R() => [ R(z[.]) v R(z[y.R]) ]
 R() => [ R(x[.]) v R(x[x.R]) ]
-R() => [ R(a{u}[.]) v R(a{p}[.]) ]
+R() => [ R(a{u}) v R(a{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:

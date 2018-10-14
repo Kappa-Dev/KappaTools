@@ -20,6 +20,7 @@ type symbol_table =
     internal_state_any: string;
     open_binding_state : string;
     close_binding_state : string;
+    missing_binding_state : string;
     open_binding_state_mod: string;
     binding_state_mod_symbol: string;
     close_binding_state_mod: string;
@@ -69,6 +70,7 @@ let symbol_table_V3 =
     bound = "!";
     open_binding_state = "";
     close_binding_state = "";
+    missing_binding_state = "?";
     link_to_any = "?";
     link_to_some = "!_";
     internal_state_symbol = "~";
@@ -144,6 +146,7 @@ let symbol_table_V4 =
     bound = "";
     open_binding_state = "[";
     close_binding_state = "]";
+    missing_binding_state = ""; 
     link_to_any = "#";
     link_to_some = "_";
     internal_state_symbol = "";

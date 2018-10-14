@@ -19,6 +19,7 @@ type break_hint =
         internal_state_any: string;
         open_binding_state : string;
         close_binding_state : string;
+        missing_binding_state : string; 
         open_binding_state_mod: string;
         binding_state_mod_symbol: string;
         close_binding_state_mod: string;
@@ -49,7 +50,7 @@ type break_hint =
         open_countercvar: string ;
         open_counterdelta: string ;
         open_counterval: string ;
-        close_counter_state : string ; 
+        close_counter_state : string ;
         close_counterceq: string ;
         close_countercgte: string ;
         close_countercvar: string ;

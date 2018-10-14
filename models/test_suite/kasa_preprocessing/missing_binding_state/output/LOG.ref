@@ -455,7 +455,7 @@ Id=15
 
 EXTENSIONAL DESCRIPTION:
 A() => [ A(x[.]) v A(x[x.C]) ]
-A() => [ A(x{u}[#]) v A(x{p}[#]) ]
+A() => [ A(x{u}) v A(x{p}) ]
 A() => [ A(y[.]) v A(y[x.C]) ]
 C() => [ C(x[x.A]) v C(x[y.A]) ]
 
@@ -661,8 +661,8 @@ A()=> [
 		  A(y[.])
 		v A(y[x.C])]
 A()=> [
-		  A(x{u}[#])
-		v A(x{p}[#])]
+		  A(x{u})
+		v A(x{p})]
 A()=> [
 		  A(x[.])
 		v A(x[x.C])]

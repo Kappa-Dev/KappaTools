@@ -821,9 +821,9 @@ Id=88
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{u}[.]) v A(y{p}[.]) v A(y{q}[.]) ]
-A() => [ A(x{u}[.]) v A(x{p}[.]) v A(x{o}[.]) v A(x{q}[.]) ]
-A() => [ A(z{u}[.]) v A(z{q}[.]) ]
+A() => [ A(y{u}) v A(y{p}) v A(y{q}) ]
+A() => [ A(x{u}) v A(x{p}) v A(x{o}) v A(x{q}) ]
+A() => [ A(z{u}) v A(z{q}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -960,13 +960,13 @@ Id=133
 EXTENSIONAL DESCRIPTION:
 A() =>
    [
-	  A(x{q}[.],y{u}[.],z{u}[.])
-	v A(x{q}[.],y{q}[.],z{q}[.])
-	v A(x{q}[.],y{q}[.],z{u}[.])
-	v A(x{o}[.],y{p}[.],z{q}[.])
-	v A(x{p}[.],y{u}[.],z{u}[.])
-	v A(x{p}[.],y{p}[.],z{u}[.])
-	v A(x{u}[.],y{u}[.],z{u}[.])
+	  A(x{q},y{u},z{u})
+	v A(x{q},y{q},z{q})
+	v A(x{q},y{q},z{u})
+	v A(x{o},y{p},z{q})
+	v A(x{p},y{u},z{u})
+	v A(x{p},y{p},z{u})
+	v A(x{u},y{u},z{u})
    ]
 ------------------------------------------------------------
 * Properties in connected agents
@@ -1156,29 +1156,29 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(z{u}[.])
-		v A(z{q}[.])]
+		  A(z{u})
+		v A(z{q})]
 A()=> [
-		  A(x{u}[.])
-		v A(x{p}[.])
-		v A(x{o}[.])
-		v A(x{q}[.])]
+		  A(x{u})
+		v A(x{p})
+		v A(x{o})
+		v A(x{q})]
 A()=> [
-		  A(y{u}[.])
-		v A(y{p}[.])
-		v A(y{q}[.])]
+		  A(y{u})
+		v A(y{p})
+		v A(y{q})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(x{q}[.],y{u}[.],z{u}[.])
-		v A(x{q}[.],y{q}[.],z{q}[.])
-		v A(x{q}[.],y{q}[.],z{u}[.])
-		v A(x{o}[.],y{p}[.],z{q}[.])
-		v A(x{p}[.],y{u}[.],z{u}[.])
-		v A(x{p}[.],y{p}[.],z{u}[.])
-		v A(x{u}[.],y{u}[.],z{u}[.])]
+		  A(x{q},y{u},z{u})
+		v A(x{q},y{q},z{q})
+		v A(x{q},y{q},z{u})
+		v A(x{o},y{p},z{q})
+		v A(x{p},y{u},z{u})
+		v A(x{p},y{p},z{u})
+		v A(x{u},y{u},z{u})]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

@@ -390,9 +390,9 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y{u}[.]) v A(y{p}[.]) ]
+A() => [ A(y{u}) v A(y{p}) ]
 A() => [ A(z[.]) v A(z[z.A]) ]
-A() => [ A(x{u}[.]) v A(x{p}[.]) ]
+A() => [ A(x{u}) v A(x{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -447,15 +447,15 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 A(z[1]),A(z[1]) => 
 	[
-		  A(x{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{u}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{p}[.],z[1])
+		  A(x{p},z[1]),A(y{p},z[1])
+		v A(x{u},z[1]),A(y{u},z[1])
+		v A(x{u},z[1]),A(y{p},z[1])
 	]
 A(z[1]),A(z[1]) => 
 	[
-		  A(y{p}[.],z[1]),A(y{u}[.],z[1])
-		v A(y{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(y{u}[.],z[1]),A(y{p}[.],z[1])
+		  A(y{p},z[1]),A(y{u},z[1])
+		v A(y{p},z[1]),A(y{p},z[1])
+		v A(y{u},z[1]),A(y{p},z[1])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -557,14 +557,14 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(x{u}[.])
-		v A(x{p}[.])]
+		  A(x{u})
+		v A(x{p})]
 A()=> [
 		  A(z[.])
 		v A(z[z.A])]
 A()=> [
-		  A(y{u}[.])
-		v A(y{p}[.])]
+		  A(y{u})
+		v A(y{p})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -574,13 +574,13 @@ A()=> [
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(z[1]),A(z[1])=> [
-		  A(x{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{u}[.],z[1])
-		v A(x{u}[.],z[1]),A(y{p}[.],z[1])]
+		  A(x{p},z[1]),A(y{p},z[1])
+		v A(x{u},z[1]),A(y{u},z[1])
+		v A(x{u},z[1]),A(y{p},z[1])]
 A(z[1]),A(z[1])=> [
-		  A(y{p}[.],z[1]),A(y{u}[.],z[1])
-		v A(y{p}[.],z[1]),A(y{p}[.],z[1])
-		v A(y{u}[.],z[1]),A(y{p}[.],z[1])]
+		  A(y{p},z[1]),A(y{u},z[1])
+		v A(y{p},z[1]),A(y{p},z[1])
+		v A(y{u},z[1]),A(y{p},z[1])]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

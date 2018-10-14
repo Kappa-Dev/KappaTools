@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <May 01 2018>
+  * Last modification: Time-stamp: <Oct 14 2018>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -60,6 +60,7 @@ val get_btype_sep_symbol: Remanent_parameters_sig.parameters -> string
 val get_bound_symbol: Remanent_parameters_sig.parameters -> string
 val get_open_binding_state: Remanent_parameters_sig.parameters -> string
 val get_close_binding_state: Remanent_parameters_sig.parameters -> string
+val get_missing_binding_state: Remanent_parameters_sig.parameters -> string 
 val get_at_symbol: Remanent_parameters_sig.parameters -> string
 val get_link_to_any: Remanent_parameters_sig.parameters -> string
 val get_link_to_some: Remanent_parameters_sig.parameters -> string

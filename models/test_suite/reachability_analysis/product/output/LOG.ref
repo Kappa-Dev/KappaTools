@@ -1088,7 +1088,7 @@ Id=71
 EXTENSIONAL DESCRIPTION:
 A() => [ A(z[.]) v A(z[z.A]) ]
 A() => [ A(t[.]) v A(t[t.A]) ]
-A() => [ A(z{u}[#]) v A(z{p}[#]) ]
+A() => [ A(z{u}) v A(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1159,8 +1159,8 @@ A(z[1]),A(z[1]) =>
 	]
 A(t[1]),A(t[1]) => 
 	[
-		  A(t[1],z{p}[#]),A(t[1],z{p}[#])
-		v A(t[1],z{u}[#]),A(t[1],z{u}[#])
+		  A(t[1],z{p}),A(t[1],z{p})
+		v A(t[1],z{u}),A(t[1],z{u})
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1272,8 +1272,8 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(z{u}[#])
-		v A(z{p}[#])]
+		  A(z{u})
+		v A(z{p})]
 A()=> [
 		  A(t[.])
 		v A(t[t.A])]
@@ -1293,8 +1293,8 @@ A(z[1]),A(z[1])=> [
 		  A(z{p}[1]),A(z{p}[1])
 		v A(z{u}[1]),A(z{u}[1])]
 A(t[1]),A(t[1])=> [
-		  A(t[1],z{p}[#]),A(t[1],z{p}[#])
-		v A(t[1],z{u}[#]),A(t[1],z{u}[#])]
+		  A(t[1],z{p}),A(t[1],z{p})
+		v A(t[1],z{u}),A(t[1],z{u})]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
