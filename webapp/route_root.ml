@@ -106,6 +106,20 @@ let tmp_bind_projects f id projects =
             ~file_name:"route_root" ~message Not_found)
          Exception_without_parameter.empty_error_handler)
 
+let tmp_bind_projects_raw f id projects =
+  match Mods.StringMap.find_option id !projects with
+  | Some p -> f p
+  | None ->
+    let message = "Project '"^id^"' not found" in
+    let err =
+      Exception_without_parameter.add_uncaught_error
+        (Exception_without_parameter.build_uncaught_exception
+           ~file_name:"route_root" ~message Not_found)
+        Exception_without_parameter.empty_error_handler in
+    Webapp_common.kasa_response
+      ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+      (Result.Error err)
+
 let add_projects parameter projects =
   let project_id = parameter.Api_types_j.project_parameter_project_id in
   if Mods.StringMap.mem project_id !projects then
@@ -686,16 +700,20 @@ let route
             let total = Option_util.map int_of_string (query "total") in
             let origin =
               Option_util.map influence_node_of_string (query "origin") in
-            tmp_bind_projects
+            tmp_bind_projects_raw
               (fun manager ->
                  match total with
                  | Some total ->
                    manager#get_local_influence_map
-                     accuracy ?fwd ?bwd ?origin ~total
-                 | _ -> manager#get_influence_map accuracy)
-              project_id projects >>=
-            Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+                     accuracy ?fwd ?bwd ?origin ~total >>=
+                   Webapp_common.kasa_response
+                     ~string_of_success:(fun x ->
+                         Yojson.Basic.to_string
+                           (Public_data.local_influence_map_to_json x))
+                 | _ -> manager#get_influence_map_raw accuracy >>=
+                   Webapp_common.kasa_response
+                     ~string_of_success:(fun x -> x))
+              project_id projects
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -711,7 +729,10 @@ let route
               (fun manager -> manager#get_initial_node)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x ->
+                  let o = JsonUtil.of_option
+                      Public_data.refined_influence_node_to_json x in
+                  Yojson.Basic.to_string o)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -730,7 +751,10 @@ let route
               (fun manager -> manager#get_next_node node)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x ->
+                  let o = JsonUtil.of_option
+                      Public_data.refined_influence_node_to_json x in
+                  Yojson.Basic.to_string o)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -749,7 +773,10 @@ let route
               (fun manager -> manager#get_previous_node node)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x ->
+                  let o = JsonUtil.of_option
+                      Public_data.refined_influence_node_to_json x in
+                  Yojson.Basic.to_string o)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -772,7 +799,9 @@ let route
                      accuracy)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x ->
+                  Yojson.Basic.to_string
+                    Public_data.nodes_of_influence_map_to_json x))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -788,7 +817,8 @@ let route
               (fun manager -> manager#get_dead_rules)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x -> Yojson.Basic.to_string
+                                     (Public_data.dead_rules_to_json x))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -820,7 +850,9 @@ let route
               (fun manager -> manager#get_non_weakly_reversible_transitions)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x ->
+                  Yojson.Basic.to_string
+                    (Public_data.separating_transitions_to_json x))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -836,7 +868,8 @@ let route
               (fun manager -> manager#get_constraints_list)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x ->
+                  Yojson.Basic.to_string (Public_data.lemmas_list_to_json x))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -852,7 +885,8 @@ let route
               (fun manager -> manager#get_potential_polymers (Some Public_data.High) (Some Public_data.High)) (*TO DO make it tunable *)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x -> Yojson.Basic.to_string
+                                     (Public_data.scc_to_json x))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };

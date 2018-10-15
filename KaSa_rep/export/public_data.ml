@@ -961,8 +961,7 @@ type 'site_graph lemma =
     refinement : 'site_graph list
   }
 
-type 'site_graph poly_constraints_list =
-  (string * 'site_graph lemma list) list
+type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
 let lemma_to_json site_graph_to_json json =
   JsonUtil.of_pair
@@ -1051,6 +1050,17 @@ let binding_state_light_of_json =
   | x -> raise
            (Yojson.Basic.Util.Type_error ("wrong binding state",x))
 
+let binding_state_light_to_json = function
+  | Free -> `Assoc [free, `Null]
+  | Wildcard -> `Assoc [wildcard, `Null]
+  | Bound_to_unknown -> `Assoc [bound_to, `Null]
+  | Bound_to bond_index -> `Assoc [bond_id, JsonUtil.of_int bond_index]
+  | Binding_type (agent_name, site_name) ->
+    let j =
+      JsonUtil.of_pair
+        ~lab1:"agent" ~lab2:"site" JsonUtil.of_string JsonUtil.of_string
+        (agent_name, site_name) in
+    `Assoc [binding_type, j]
 
 let counter_state_light_of_json =
   JsonUtil.to_pair
@@ -1060,8 +1070,27 @@ let counter_state_light_of_json =
     (JsonUtil.to_option (JsonUtil.to_int ~error_msg:counter))
     (JsonUtil.to_option (JsonUtil.to_int ~error_msg:counter))
 
-let interface_light_of_json json
-  =
+let counter_state_light_to_json =
+  JsonUtil.of_pair
+    ~lab1:inf ~lab2:sup
+    (JsonUtil.of_option JsonUtil.of_int) (JsonUtil.of_option JsonUtil.of_int)
+
+let interface_light_to_json intf =
+  JsonUtil.of_map
+    ~lab_key:site ~lab_value:stateslist
+    ~fold:(fun f a x ->
+        List.fold_left (fun list (k,a,b,c) -> f k (a,b,c) list) x a)
+    (*json -> elt*)
+    (fun site -> JsonUtil.of_string site)
+    (*json -> 'value*)
+    (JsonUtil.of_triple
+       ~lab1:prop ~lab2:bind ~lab3:counter
+       (JsonUtil.of_option JsonUtil.of_string)
+       (JsonUtil.of_option binding_state_light_to_json)
+       (JsonUtil.of_option counter_state_light_to_json))
+    intf
+
+let interface_light_of_json json =
   JsonUtil.to_map
     ~lab_key:site ~lab_value:stateslist ~error_msg:interface
     ~empty:[]
@@ -1089,8 +1118,6 @@ let agent_gen_of_json interface_of_json =
     (JsonUtil.to_string ~error_msg:"agent name")
     interface_of_json
 
-let agent_of_json json = agent_gen_of_json interface_light_of_json json
-
 let poly_constraints_list_of_json site_graph_of_json =
   JsonUtil.to_list
     (JsonUtil.to_pair ~error_msg:"constraints list"
@@ -1098,20 +1125,16 @@ let poly_constraints_list_of_json site_graph_of_json =
        (JsonUtil.to_string ~error_msg:"abstract domain")
        (JsonUtil.to_list (lemma_of_json site_graph_of_json)))
 
-
-let lemmas_list_of_json_gen agent_of_json =
-  function
+let lemmas_list_of_json_gen interface_of_json = function
   | `Assoc l as x ->
     begin
       try
-        let json =
-          List.assoc refinement_lemmas l
-        in
+        let json = List.assoc refinement_lemmas l in
         poly_constraints_list_of_json
-          (JsonUtil.to_list ~error_msg:"site graph" agent_of_json)
+          (JsonUtil.to_list ~error_msg:"site graph"
+             (agent_gen_of_json interface_of_json))
           json
-      with
-      | _ ->
+      with _ ->
         raise
           (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "refinement lemmas list",x))
     end
@@ -1119,4 +1142,30 @@ let lemmas_list_of_json_gen agent_of_json =
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "refinement lemmas list",x))
 
 let lemmas_list_of_json json =
-  lemmas_list_of_json_gen agent_of_json json
+  lemmas_list_of_json_gen interface_light_of_json json
+
+let agent_gen_to_json interface_to_json =
+  JsonUtil.of_pair
+    ~lab1:agent ~lab2:interface
+    JsonUtil.of_string
+    interface_to_json
+
+let poly_constraints_list_to_json site_graph_to_json constraints =
+  JsonUtil.of_list
+    (JsonUtil.of_pair
+       ~lab1:domain_name ~lab2:refinements_list
+       JsonUtil.of_string
+       (JsonUtil.of_list (lemma_to_json site_graph_to_json))
+    )
+    constraints
+
+let lemmas_list_to_json_gen interface_to_json constraints =
+  `Assoc
+    [
+      refinement_lemmas,
+      poly_constraints_list_to_json
+        (JsonUtil.of_list (agent_gen_to_json interface_to_json)) constraints
+    ]
+
+let lemmas_list_to_json constraints =
+ lemmas_list_to_json_gen interface_light_to_json constraints

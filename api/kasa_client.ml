@@ -98,14 +98,14 @@ class virtual new_client ~post (mailbox : mailbox) :
       Lwt_result.bind_result
         (self#message post request)
         (fun x -> Result.Ok x)
-    method get_influence_map accuracy =
+    method get_influence_map_raw accuracy =
       let request =
         `List ( `String "INFLUENCE_MAP" :: match accuracy with
           | None -> []
           | Some a -> [Public_data.accuracy_to_json a]) in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+        (fun x -> Result.Ok (Yojson.Basic.to_string x))
     method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
           let request =
             `List ( `String "INFLUENCE_MAP" :: (
@@ -122,14 +122,19 @@ class virtual new_client ~post (mailbox : mailbox) :
                  in
           Lwt_result.bind_result
             (self#message post request)
-            (fun x -> Result.Ok x)
+            (fun x ->
+               let o = Public_data.local_influence_map_of_json x in
+               Result.Ok o)
     method get_initial_node =
       let request =
         `List [`String "INFLUENCE_MAP_ORIGINAL_NODE"]
       in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+        (fun x ->
+           let o = JsonUtil.to_option
+               Public_data.refined_influence_node_of_json x in
+           Result.Ok o)
     method get_next_node json =
       let request =
         `List [`String "INFLUENCE_MAP_NEXT_NODE";
@@ -137,7 +142,11 @@ class virtual new_client ~post (mailbox : mailbox) :
       in
       Lwt_result.bind_result
         (self#message post request)
-            (fun x -> Result.Ok x)
+        (fun x ->
+           let o = JsonUtil.to_option
+               Public_data.refined_influence_node_of_json x in
+           Result.Ok o)
+
     method get_previous_node json =
       let request =
         `List [`String "INFLUENCE_MAP_PREVIOUS_NODE";
@@ -145,8 +154,10 @@ class virtual new_client ~post (mailbox : mailbox) :
       in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
-
+        (fun x ->
+           let o = JsonUtil.to_option
+               Public_data.refined_influence_node_of_json x in
+           Result.Ok o)
     method get_nodes_of_influence_map accuracy =
       let request = `List ( `String "INFLUENCE_MAP_ALL_NODES"  ::
                             (match accuracy with
@@ -155,13 +166,12 @@ class virtual new_client ~post (mailbox : mailbox) :
       in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
-
+        (fun x -> Result.Ok (Public_data.nodes_of_influence_map_of_json x))
     method get_dead_rules =
       let request = `List [ `String "DEAD_RULES" ] in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+        (fun x -> Result.Ok (Public_data.dead_rules_of_json x))
     method get_dead_agents =
       let request = `List [ `String "DEAD_AGENTS" ] in
       Lwt_result.bind_result
@@ -173,12 +183,12 @@ class virtual new_client ~post (mailbox : mailbox) :
       in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+        (fun x -> Result.Ok (Public_data.separating_transitions_of_json x))
     method get_constraints_list =
       let request = `List [ `String "CONSTRAINTS" ] in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+        (fun x -> Result.Ok (Public_data.lemmas_list_of_json x))
     method get_potential_polymers accuracy_cm accuracy_scc =
       let request = `List ( `String "POLYMERS" ::   (
          match accuracy_cm, accuracy_scc with
@@ -197,5 +207,5 @@ class virtual new_client ~post (mailbox : mailbox) :
       in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+        (fun x -> Result.Ok (Public_data.scc_of_json x))
   end

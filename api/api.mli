@@ -107,27 +107,40 @@ class type virtual manager_static_analysis = object
 
   method get_contact_map :
     Public_data.accuracy_level option -> Yojson.Basic.json kasa_reply
-  method get_influence_map :
-    Public_data.accuracy_level option -> Yojson.Basic.json kasa_reply
+  method get_influence_map_raw :
+    Public_data.accuracy_level option -> string kasa_reply
   method get_local_influence_map :
     Public_data.accuracy_level option -> ?fwd:int -> ?bwd:int ->
     ?origin:(int,int) Public_data.influence_node -> total:int ->
-    Yojson.Basic.json kasa_reply
-  method get_initial_node : Yojson.Basic.json kasa_reply
+    (Public_data.accuracy_level * int * int option * int option *
+     Public_data.influence_map) kasa_reply
+  method get_initial_node :
+    (Public_data.rule, Public_data.var) Public_data.influence_node
+      option kasa_reply
   method get_next_node :
-    (int,int) Public_data.influence_node option -> Yojson.Basic.json kasa_reply
+    (int,int) Public_data.influence_node option ->
+    (Public_data.rule, Public_data.var) Public_data.influence_node
+      option kasa_reply
   method get_previous_node :
-    (int,int) Public_data.influence_node option -> Yojson.Basic.json kasa_reply
+    (int,int) Public_data.influence_node option ->
+    (Public_data.rule, Public_data.var) Public_data.influence_node
+      option kasa_reply
   method get_nodes_of_influence_map :
-    Public_data.accuracy_level option -> Yojson.Basic.json kasa_reply
-  method get_dead_rules : Yojson.Basic.json kasa_reply
+    Public_data.accuracy_level option ->
+    (Public_data.accuracy_level *
+     (Public_data.rule, Public_data.var) Public_data.influence_node
+       list) kasa_reply
+  method get_dead_rules : Public_data.dead_rules kasa_reply
   method get_dead_agents: Yojson.Basic.json kasa_reply
-  method get_non_weakly_reversible_transitions : Yojson.Basic.json kasa_reply
-  method get_constraints_list : Yojson.Basic.json kasa_reply
+  method get_non_weakly_reversible_transitions :
+    Public_data.separating_transitions kasa_reply
+  method get_constraints_list :
+    (string * Public_data.agent list Public_data.lemma list) list kasa_reply
   method get_potential_polymers :
     Public_data.accuracy_level option ->
     Public_data.accuracy_level option ->
-    Yojson.Basic.json kasa_reply
+    (Public_data.accuracy_level * Public_data.accuracy_level * Public_data.scc)
+      kasa_reply
 end
 
 class type virtual manager_stories = object

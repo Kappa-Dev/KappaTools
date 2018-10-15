@@ -78,8 +78,7 @@ let init_dead_rules () =
                if model.State_project.model_parameters.
                     State_project.show_dead_rules then
                  manager#get_dead_rules >>= function
-                 | Result.Ok dead_json ->
-                   let list = Public_data.dead_rules_of_json dead_json in
+                 | Result.Ok list ->
                    let warnings =
                      List.fold_left
                        (fun acc rule ->
@@ -118,10 +117,7 @@ let init_non_weakly_reversible_transitions () =
                if model.State_project.model_parameters.
                     State_project.show_non_weakly_reversible_transitions then
                  manager#get_non_weakly_reversible_transitions >>= function
-                 | Result.Ok non_weakly_reversible_transitions_json ->
-                   let list =
-                     Public_data.separating_transitions_of_json
-                       non_weakly_reversible_transitions_json in
+                 | Result.Ok list ->
                    let warnings =
                      List.fold_left
                        (fun acc (rule,context_list) ->

@@ -454,7 +454,7 @@ class manager
       ~ok:(fun _ x -> Lwt.return_ok x)
       ~error:kasa_error
 
-  method get_influence_map accuracy =
+  method get_influence_map_raw accuracy =
     send
       ?timeout request_count
       (match accuracy with
@@ -465,7 +465,7 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x -> Lwt.return_ok (Yojson.Basic.to_string x))
       ~error:kasa_error
 
   method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
@@ -492,7 +492,8 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x ->
+          Lwt.return_ok (Public_data.local_influence_map_of_json x))
       ~error:kasa_error
 
   method get_initial_node =
@@ -507,7 +508,10 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x ->
+          let o = JsonUtil.to_option
+              Public_data.refined_influence_node_of_json x in
+          Lwt.return_ok o)
       ~error:kasa_error
 
   method get_next_node short_id_opt =
@@ -528,7 +532,10 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x ->
+          let o = JsonUtil.to_option
+              Public_data.refined_influence_node_of_json x in
+          Lwt.return_ok o)
       ~error:kasa_error
 
   method get_previous_node short_id_opt =
@@ -548,7 +555,10 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x ->
+          let o = JsonUtil.to_option
+              Public_data.refined_influence_node_of_json x in
+          Lwt.return_ok o)
       ~error:kasa_error
 
   method get_nodes_of_influence_map accuracy =
@@ -562,9 +572,9 @@ class manager
     `GET
     (fun x -> Yojson.Basic.from_string x)
   >>= Api_common.result_map
-    ~ok:(fun _ x -> Lwt.return_ok x)
+    ~ok:(fun _ x -> Lwt.return_ok
+            (Public_data.nodes_of_influence_map_of_json x))
     ~error:kasa_error
-
 
   method get_dead_rules =
     send
@@ -573,7 +583,7 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x -> Lwt.return_ok (Public_data.dead_rules_of_json x))
       ~error:kasa_error
 
   method get_dead_agents =
@@ -595,7 +605,8 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x ->
+          Lwt.return_ok (Public_data.separating_transitions_of_json x))
       ~error:kasa_error
 
   method get_constraints_list =
@@ -605,7 +616,7 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x -> Lwt.return_ok (Public_data.lemmas_list_of_json x))
       ~error:kasa_error
 
   method get_potential_polymers accuracy_cm accuracy_scc =
@@ -622,7 +633,7 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x -> Lwt.return_ok (Public_data.scc_of_json x))
       ~error:kasa_error
 
   method is_computing = is_computing request_count

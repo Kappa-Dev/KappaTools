@@ -138,76 +138,16 @@ type agent =
   string * (* agent name *)
   interface
 
-let agent_to_json =
-  JsonUtil.of_pair
-    ~lab1:agent ~lab2:interface
-    JsonUtil.of_string
-    interface_to_json
-
-let agent_of_json json =
-  Public_data.agent_gen_of_json interface_of_json json
-
 (***************************************************************************)
-
-let pair_to_json (p: string * string): Yojson.Basic.json =
-  JsonUtil.of_pair ~lab1:agent ~lab2:site
-    (fun a ->  JsonUtil.of_string a)
-    (fun b ->  JsonUtil.of_string b)
-    p
-
-(*let pair_of_json (json:Yojson.Basic.json) : string * string  =
-  let (agent_name, site_name) =
-    JsonUtil.to_pair ~lab1:agent ~lab2:site
-      (fun json_a -> JsonUtil.to_string json_a)
-      (fun json_b -> JsonUtil.to_string json_b)
-      json
-  in
-  (agent_name,site_name)*)
 
 type constraints_list = agent list Public_data.poly_constraints_list
 
-let poly_constraints_list_to_json site_graph_to_json (constraints:constraints_list) =
-  JsonUtil.of_list
-    (JsonUtil.of_pair
-       ~lab1:Public_data.domain_name ~lab2:Public_data.refinements_list
-       JsonUtil.of_string
-       (JsonUtil.of_list (Public_data.lemma_to_json site_graph_to_json))
-    )
-    constraints
-
-
-let lemmas_list_to_json (constraints:constraints_list) =
-  `Assoc
-    [
-      Public_data.refinement_lemmas,
-      poly_constraints_list_to_json
-        (JsonUtil.of_list agent_to_json) constraints
-    ]
-
-let lemmas_list_of_json_gen agent_of_json =
-function
-| `Assoc l as x ->
-  begin
-    try
-      let json =
-        List.assoc Public_data.refinement_lemmas l
-      in
-      Public_data.poly_constraints_list_of_json
-        (JsonUtil.to_list ~error_msg:"site graph" agent_of_json)
-        json
-    with
-    | _ ->
-      raise
-        (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "refinement lemmas list",x))
-  end
-| x ->
-  raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "refinement lemmas list",x))
-
 let lemmas_list_of_json json =
-  lemmas_list_of_json_gen agent_of_json json
+  Public_data.lemmas_list_of_json_gen interface_of_json json
 
-let lemmas_list_of_json_light json =
-  lemmas_list_of_json_gen Public_data.agent_of_json json
+let lemmas_list_to_json l =
+  Public_data.lemmas_list_to_json_gen interface_to_json l
+
 
 (******************************************************************************)
 (******************************************************************************)

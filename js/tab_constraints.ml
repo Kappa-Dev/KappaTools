@@ -26,9 +26,7 @@ let content () =
       () (React.S.const ()) []
       (fun (manager : Api.concrete_manager) () ->
          (manager#get_constraints_list >>= function
-           | Result.Ok constraints_json ->
-             let constraints =
-               Public_data.lemmas_list_of_json constraints_json in
+           | Result.Ok constraints ->
              Lwt.return
                (List.fold_left
                   (fun panels (a,b) ->

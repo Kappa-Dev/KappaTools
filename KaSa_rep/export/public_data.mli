@@ -191,7 +191,12 @@ type binding_state =
   | Bound_to of int
   | Binding_type of string * string
 
-type agent = string * (string * string option * binding_state option * (int option * int option) option) list
+type agent =
+  string *
+  (string * string option * binding_state option *
+   (int option * int option) option) list
+
+type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
 val lemma_to_json:
   ('site_graph -> Yojson.Basic.json) -> 'site_graph lemma -> Yojson.Basic.json
@@ -199,20 +204,19 @@ val lemma_to_json:
 val lemma_of_json:
   (Yojson.Basic.json -> 'site_graph) -> Yojson.Basic.json -> 'site_graph lemma
 
+val lemmas_list_to_json_gen:
+  ('a -> Yojson.Basic.json) ->
+  (string * (string * 'a) list lemma list) list -> Yojson.Basic.json
+
+val lemmas_list_of_json_gen:
+  (Yojson.Basic.json -> 'a) ->
+  Yojson.Basic.json -> (string * (string * 'a) list lemma list) list
+
+val lemmas_list_to_json:
+  (string * agent list lemma list ) list -> Yojson.Basic.json
+
 val lemmas_list_of_json:
-  Yojson.Basic.json -> (string * agent list lemma list ) list
-
-val agent_gen_of_json:
-  (Yojson.Basic.json -> 'interface) -> Yojson.Basic.json -> string * 'interface
-
-val agent_of_json: Yojson.Basic.json -> agent
-
-type 'site_graph poly_constraints_list =
-  (string * 'site_graph lemma list) list
-
-val poly_constraints_list_of_json:
-  (Yojson.Basic.json -> 'site_graph) ->
-  Yojson.Basic.json -> 'site_graph poly_constraints_list
+  Yojson.Basic.json -> (string * agent list lemma list) list
 
 val get_hyp: 'site_graph lemma -> 'site_graph
 

@@ -143,15 +143,13 @@ let export_config = {
                   (fun manager ->
                      let { accuracy; _ } = React.S.value model in
                      Lwt_result.map
-                       (fun influences_json ->
-                          let data =
-                            Js.string
-                              (Yojson.Basic.to_string influences_json) in
+                       (fun influences_string ->
+                          let data = Js.string influences_string in
                           let () =
                             Common.saveFile
                               ~data ~mime:"application/json" ~filename in
                           ())
-                       (manager#get_influence_map accuracy) >>=
+                       (manager#get_influence_map_raw accuracy) >>=
                      fun x -> Lwt.return (Api_common.result_kasa x)))
              >>= fun _ -> Lwt.return_unit));
     } ];
@@ -221,12 +219,8 @@ let influence_node_label = function
     then r.Public_data.var_ast
     else r.Public_data.var_label
 
-let json_to_graph logger origin_short_opt influences_json =
+let json_to_graph logger origin_short_opt (_,_,_,_,influence_map) =
   let () = Graph_loggers.print_graph_preamble logger "" in
-  let _,_,_,_,influence_map =
-    Public_data.local_influence_map_of_json
-      influences_json
-  in
   let nodes = influence_map.Public_data.nodes in
   let directives_of_node node =
     let json =
@@ -346,9 +340,7 @@ let json_to_graph logger origin_short_opt influences_json =
   let () = Graph_loggers.print_graph_foot logger in
   ()
 
-let table_of_influences_json origin influences_json =
-  let _,_,_,_,influence_map =
-    Public_data.local_influence_map_of_json influences_json in
+let table_of_influences_json origin (_,_,_,_,influence_map) =
   let namer =
     List.fold_left
       (fun acc e -> Public_data.InfluenceNodeMap.add
@@ -534,14 +526,14 @@ let _ =
                      Public_data.short_node_of_refined_node origin_refined in
                  ((manager#get_local_influence_map
                      ?fwd ?bwd ?origin ~total accuracy) >>= function
-                  | Result.Ok influences_json ->
+                  | Result.Ok influences ->
                     let buf = Buffer.create 1000 in
                     let fmt = Format.formatter_of_buffer buf in
                     let logger =
                       Loggers.open_logger_from_formatter
                         ~mode:Loggers.Js_Graph fmt in
                     let () =
-                      json_to_graph logger origin influences_json in
+                      json_to_graph logger origin influences in
                     let graph = Loggers.graph_of_logger logger in
                     let graph_json = Graph_json.to_json graph in
                     let () = Loggers.flush_logger logger in
@@ -627,14 +619,8 @@ let onload () =
                   (fun (manager : Api.concrete_manager) ->
                      (Lwt_result.map
                         (fun origin ->
-                           let origin =
-                             JsonUtil.to_option
-                               Public_data.refined_influence_node_of_json
-                               origin in
-                           let () = update_model (fun m -> { m with origin }) in
-                           ())
-                        manager#get_initial_node >>=
-                      fun out ->
+                           update_model (fun m -> { m with origin }))
+                        manager#get_initial_node >>= fun out ->
                       Lwt.return (Api_common.result_kasa out)
                      )))
            in Js._true
@@ -654,13 +640,8 @@ let onload () =
                   (fun (manager : Api.concrete_manager) ->
                      (Lwt_result.map
                         (fun origin' ->
-                           let origin' =
-                             JsonUtil.to_option
-                               Public_data.refined_influence_node_of_json
-                               origin' in
-                           let () = update_model
-                               (fun m -> { m with origin = origin' }) in
-                           ())
+                           update_model
+                             (fun m -> { m with origin = origin' }))
                         (manager#get_next_node origin) >>=
                       fun out -> Lwt.return (Api_common.result_kasa out)
                      )))
@@ -680,13 +661,8 @@ let onload () =
                   (fun (manager : Api.concrete_manager) ->
                      (Lwt_result.map
                         (fun origin' ->
-                           let origin' =
-                             JsonUtil.to_option
-                               Public_data.refined_influence_node_of_json
-                               origin' in
-                           let () = update_model
-                               (fun m -> { m with origin = origin' }) in
-                           ())
+                           update_model
+                             (fun m -> { m with origin = origin' }))
                         (manager#get_previous_node origin) >>=
                       fun out -> Lwt.return (Api_common.result_kasa out)
                      )))

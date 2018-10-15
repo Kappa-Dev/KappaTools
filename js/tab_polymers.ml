@@ -27,11 +27,8 @@ let content () =
          manager#get_potential_polymers
            (Some Public_data.High) (Some Public_data.High)
          (*TODO: make these options tunable *) >>= function
-         | Result.Ok scc_json ->
-           let _,_,scc = Public_data.scc_of_json scc_json in
-           let scc =
-             List.rev_map List.rev scc
-           in
+         | Result.Ok (_,_,scc) ->
+           let scc = List.rev_map List.rev scc in
            let output =
              if scc = [] || scc = [[]]
              then
