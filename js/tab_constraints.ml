@@ -64,9 +64,9 @@ let content () =
                                         (List.rev conclusion)
                                      )) in
                                 let list =
-                                  Utility.print_string " [ " list in
+                                  Utility.print_string "[ " list in
                                 list in
-                            let list = Utility.print_string " =>  " list in
+                            let list = Utility.print_string "  =>  " list in
                             let list = Utility.print_site_graph hyp list in
                             list)
                          []

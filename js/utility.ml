@@ -70,13 +70,13 @@ let print_site site list =
   let list =
     match binding_opt with
     | None ->
-      print_string Public_data.missing_binding_site_backend_symbol list 
+      print_string Public_data.missing_binding_site_backend_symbol list
     | Some Public_data.Free  ->
       print_single_binding_state
         Public_data.free_backend_symbol list
-    | Some Public_data.Wildcard -> (*
+    | Some Public_data.Wildcard ->
       print_single_binding_state
-        Public_data.wildcard_backend_symbol*) list
+        Public_data.wildcard_backend_symbol list
     | Some Public_data.Bound_to_unknown ->
       print_single_binding_state
         Public_data.bound_to_unknown_backend_symbol list
