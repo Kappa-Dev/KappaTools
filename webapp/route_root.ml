@@ -834,7 +834,8 @@ let route
               (fun manager -> manager#get_dead_agents)
               project_id projects >>=
             Webapp_common.kasa_response
-              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
+              ~string_of_success:(fun x -> Yojson.Basic.to_string
+                                     (Public_data.json_of_dead_agents x))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };

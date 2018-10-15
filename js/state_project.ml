@@ -14,6 +14,7 @@ let pauseConditionParamId = Js.string "kappappPauseCondition"
 let seedParamId = Js.string "kappappDefaultSeed"
 let storeTraceParamId = Js.string "kappappStoreTrace"
 let showDeadRulesParamId = Js.string "kappappShowDeadRules"
+let showDeadAgentsParamId = Js.string "kappappShowDeadAgents"
 let showIrreversibleTransitionsParamId =
   Js.string "kappappShowIrreversibleTransition"
 
@@ -23,6 +24,7 @@ type parameters = {
   seed : int option;
   store_trace : bool;
   show_dead_rules : bool;
+  show_dead_agents : bool;
   show_non_weakly_reversible_transitions : bool;
 }
 
@@ -82,6 +84,7 @@ let init_default_parameters = {
   seed = None;
   store_trace = false;
   show_dead_rules = true;
+  show_dead_agents = true;
   show_non_weakly_reversible_transitions = false;
 }
 
@@ -142,7 +145,11 @@ let set_parameters_as_default () =
          let () =
            if pa.show_dead_rules then
              ls##setItem showDeadRulesParamId (Js.string "true")
-           else ls##removeItem showDeadRulesParamId in
+           else ls##setItem showDeadRulesParamId (Js.string "false") in
+         let () =
+           if pa.show_dead_agents then
+             ls##setItem showDeadAgentsParamId (Js.string "true")
+           else ls##setItem showDeadAgentsParamId (Js.string "false") in
          let () =
            if pa.show_non_weakly_reversible_transitions then
              ls##setItem showIrreversibleTransitionsParamId (Js.string "true")
@@ -166,6 +173,8 @@ let set_store_trace store_trace =
   update_parameters (fun param -> { param with store_trace })
 let set_show_dead_rules show_dead_rules =
   update_parameters (fun param -> { param with show_dead_rules })
+let set_show_dead_agents show_dead_agents =
+  update_parameters (fun param -> { param with show_dead_agents })
 let set_show_non_weakly_reversible_transitions
     show_non_weakly_reversible_transitions =
   update_parameters
@@ -364,6 +373,11 @@ let init_show_dead_rules (arg : string list) : unit =
   | [] -> ()
   | h::_ -> set_show_dead_rules (h <> "false")
 
+let init_show_dead_agents (arg : string list) : unit =
+  match arg with
+  | [] -> ()
+  | h::_ -> set_show_dead_agents (h <> "false")
+
 let init_show_non_weakly_reversible_transitions (arg : string list) : unit =
   match arg with
   | [] -> ()
@@ -420,6 +434,16 @@ let init existing_projects : unit Lwt.t =
              (st##getItem showDeadRulesParamId)
              (fun () -> []) (fun x -> [Js.to_string x])) in
         Common_state.url_args ~default "show_dead_rules" in
+  let arg_show_dead_agents =
+        let default =
+      Js.Optdef.case
+        Dom_html.window##.localStorage
+        (fun () -> [])
+        (fun st ->
+           Js.Opt.case
+             (st##getItem showDeadAgentsParamId)
+             (fun () -> []) (fun x -> [Js.to_string x])) in
+        Common_state.url_args ~default "show_dead_agents" in
   let arg_show_irreversible_transitions =
         let default =
       Js.Optdef.case
@@ -435,6 +459,7 @@ let init existing_projects : unit Lwt.t =
   let () = init_model_seed arg_model_seed in
   let () = init_store_trace arg_store_trace in
   let () = init_show_dead_rules arg_show_dead_rules in
+  let () = init_show_dead_agents arg_show_dead_agents in
   let () = init_show_non_weakly_reversible_transitions
       arg_show_irreversible_transitions in
 

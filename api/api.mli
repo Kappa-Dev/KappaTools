@@ -131,7 +131,7 @@ class type virtual manager_static_analysis = object
      (Public_data.rule, Public_data.var) Public_data.influence_node
        list) kasa_reply
   method get_dead_rules : Public_data.dead_rules kasa_reply
-  method get_dead_agents: Yojson.Basic.json kasa_reply
+  method get_dead_agents: Public_data.dead_agents kasa_reply
   method get_non_weakly_reversible_transitions :
     Public_data.separating_transitions kasa_reply
   method get_constraints_list :

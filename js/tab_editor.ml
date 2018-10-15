@@ -107,6 +107,43 @@ let init_dead_rules () =
          ))
     State_project.model
 
+let init_dead_agents () =
+  React.S.l1
+    (fun model ->
+       State_error.wrap  ~append:true "tab_editor_dead_agent"
+         (State_project.with_project
+            ~label:__LOC__
+            (fun (manager : Api.concrete_manager) ->
+               if model.State_project.model_parameters.
+                    State_project.show_dead_agents then
+                 manager#get_dead_agents >>= function
+                 | Result.Ok list ->
+                   let warnings =
+                     List.fold_left
+                       (fun acc agent ->
+                          let message_text =
+                            "Dead agent "^
+                            if agent.Public_data.agent_ast <> ""
+                            then agent.Public_data.agent_ast
+                            else string_of_int agent.Public_data.agent_id in
+                          List.fold_left
+                            (fun acc range ->
+                               {
+                                 Api_types_t.message_severity = `Warning;
+                                 Api_types_t.message_range = Some range;
+                                 Api_types_t.message_text;
+                               } :: acc)
+                            acc agent.Public_data.agent_position)
+                       [] list in
+                   let warnings = List.rev warnings in
+                   Lwt.return (Api_common.result_messages warnings)
+                 | Result.Error mh ->
+                   Lwt.return (Api_common.method_handler_messages mh)
+               else
+                 Lwt.return (Api_common.result_ok ()))
+         ))
+    State_project.model
+
 let init_non_weakly_reversible_transitions () =
   React.S.l1
     (fun model ->
@@ -166,6 +203,7 @@ let init_non_weakly_reversible_transitions () =
 let onload () =
   let () = Subpanel_editor.onload () in
   let _ = init_dead_rules () in
+  let _ = init_dead_agents () in
   let _ = init_non_weakly_reversible_transitions () in
   let () = Tab_contact_map.onload () in
   let () = Tab_influences.onload () in

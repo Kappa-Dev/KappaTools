@@ -593,7 +593,7 @@ class manager
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~ok:(fun _ x -> Lwt.return_ok (Public_data.json_to_dead_agents x))
       ~error:kasa_error
 
   method get_non_weakly_reversible_transitions =

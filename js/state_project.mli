@@ -12,6 +12,7 @@ type parameters = {
   seed : int option;
   store_trace : bool;
   show_dead_rules : bool;
+  show_dead_agents : bool;
   show_non_weakly_reversible_transitions : bool;
 }
 
@@ -36,6 +37,7 @@ val set_pause_condition : string -> unit
 val set_seed : int option -> unit
 val set_store_trace : bool -> unit
 val set_show_dead_rules : bool -> unit
+val set_show_dead_agents : bool -> unit
 val set_show_non_weakly_reversible_transitions : bool -> unit
 
 val set_parameters_as_default : unit -> unit

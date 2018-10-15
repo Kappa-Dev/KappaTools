@@ -176,7 +176,7 @@ class virtual new_client ~post (mailbox : mailbox) :
       let request = `List [ `String "DEAD_AGENTS" ] in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+        (fun x -> Result.Ok (Public_data.json_to_dead_agents x))
     method get_non_weakly_reversible_transitions =
       let request =
         `List [ `String "NON_WEAKLY_REVERSIBLE_TRANSITIONS" ]
