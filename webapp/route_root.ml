@@ -801,7 +801,7 @@ let route
             Webapp_common.kasa_response
               ~string_of_success:(fun x ->
                   Yojson.Basic.to_string
-                    Public_data.nodes_of_influence_map_to_json x))
+                    (Public_data.nodes_of_influence_map_to_json x))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
