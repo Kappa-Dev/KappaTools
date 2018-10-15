@@ -831,27 +831,14 @@ type agent_kind  =
     agent_position: Locality.t list;
   }
 
-
-let rule_to_json rule =
-  `Assoc
-    [
-      rule_id,JsonUtil.of_int rule.rule_id;
-      label, JsonUtil.of_string rule.rule_label;
-      ast, JsonUtil.of_string rule.rule_ast;
-      position,Locality.annot_to_yojson
-        JsonUtil.of_unit ((),rule.rule_position);
-      direction, direction_to_json rule.rule_direction;
-      rule_hidden, JsonUtil.of_bool rule.rule_hidden
-    ]
-
 let json_to_agent_kind =
   function
   | `Assoc l as x when List.length l = 3 ->
     begin
       try
         {
-          agent_id = JsonUtil.to_int (List.assoc rule_id l) ;
-          agent_ast =  JsonUtil.to_string (List.assoc label l) ;
+          agent_id = JsonUtil.to_int (List.assoc agent_id l) ;
+          agent_ast =  JsonUtil.to_string (List.assoc ast l) ;
           agent_position =
             JsonUtil.to_list
               ~error_msg:(JsonUtil.build_msg "locality list")
