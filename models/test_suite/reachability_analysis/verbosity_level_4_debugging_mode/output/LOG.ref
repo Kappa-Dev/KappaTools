@@ -1228,9 +1228,6 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z)=> [
-		  A(z{u})
-		v A(z{q})]
 A(x)=> [
 		  A(x{u})
 		v A(x{p})
@@ -1240,6 +1237,9 @@ A(y)=> [
 		  A(y{u})
 		v A(y{p})
 		v A(y{q})]
+A(z)=> [
+		  A(z{u})
+		v A(z{q})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

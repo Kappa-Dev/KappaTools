@@ -946,13 +946,13 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-B(x)=> [
-		  B(x{u})
-		v B(x{p})]
 A(x)=> [
 		  A(x{u})
 		v A(x{p})]
 A(x)=> [A(x[.])]
+B(x)=> [
+		  B(x{u})
+		v B(x{p})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

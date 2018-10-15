@@ -2295,15 +2295,15 @@ Influence_map:Inhibition_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-C(x)=> [
-		  C(x{u})
-		v C(x{p})]
-B(x)=> [
-		  B(x{u})
-		v B(x{p})]
 A(x)=> [
 		  A(x{u})
 		v A(x{p})]
+B(x)=> [
+		  B(x{u})
+		v B(x{p})]
+C(x)=> [
+		  C(x{u})
+		v C(x{p})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

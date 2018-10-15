@@ -1197,20 +1197,20 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-B(x)=> [B(x{u})]
-B(z)=> [
-		  B(z[.])
-		v B(z[z.A])]
-B(t)=> [
-		  B(t[.])
-		v B(t[t.A])]
+A(t)=> [
+		  A(t[.])
+		v A(t[t.B])]
 A(x)=> [A(x{u})]
 A(z)=> [
 		  A(z[.])
 		v A(z[z.B])]
-A(t)=> [
-		  A(t[.])
-		v A(t[t.B])]
+B(t)=> [
+		  B(t[.])
+		v B(t[t.A])]
+B(x)=> [B(x{u})]
+B(z)=> [
+		  B(z[.])
+		v B(z[z.A])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

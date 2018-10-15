@@ -1271,12 +1271,12 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z)=> [
-		  A(z{u})
-		v A(z{p})]
 A(t)=> [
 		  A(t[.])
 		v A(t[t.A])]
+A(z)=> [
+		  A(z{u})
+		v A(z{p})]
 A(z)=> [
 		  A(z[.])
 		v A(z[z.A])]

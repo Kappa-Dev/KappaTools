@@ -2279,35 +2279,35 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-H(x)=> [H(x[z.F])]
-G(x)=> [G(x[z.E])]
-D(x)=> [
-		  D(x[z.A])
-		v D(x[z.B])
-		v D(x[z.F])]
-C(x)=> [
-		  C(x[z.A])
-		v C(x[z.B])
-		v C(x[z.E])]
-F(t)=> [F(t[t.E])]
-F(z)=> [
-		  F(z[x.D])
-		v F(z[x.H])]
-E(z)=> [
-		  E(z[.])
-		v E(z[x.C])
-		v E(z[x.G])]
-E(t)=> [E(t[t.F])]
+A(t)=> [A(t[t.B])]
+A(z)=> [
+		  A(z[.])
+		v A(z[x.C])
+		v A(z[x.D])]
 B(t)=> [B(t[t.A])]
 B(z)=> [
 		  B(z[.])
 		v B(z[x.C])
 		v B(z[x.D])]
-A(z)=> [
-		  A(z[.])
-		v A(z[x.C])
-		v A(z[x.D])]
-A(t)=> [A(t[t.B])]
+C(x)=> [
+		  C(x[z.A])
+		v C(x[z.B])
+		v C(x[z.E])]
+D(x)=> [
+		  D(x[z.A])
+		v D(x[z.B])
+		v D(x[z.F])]
+E(t)=> [E(t[t.F])]
+E(z)=> [
+		  E(z[.])
+		v E(z[x.C])
+		v E(z[x.G])]
+F(t)=> [F(t[t.E])]
+F(z)=> [
+		  F(z[x.D])
+		v F(z[x.H])]
+G(x)=> [G(x[z.E])]
+H(x)=> [H(x[z.F])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

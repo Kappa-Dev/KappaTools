@@ -895,10 +895,10 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-D(x)=> [D(x{u})]
-D(y)=> [D(y{u})]
 B(x)=> [B(x{u})]
 B(y)=> [B(y{u})]
+D(x)=> [D(x{u})]
+D(y)=> [D(y{u})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

@@ -1514,15 +1514,15 @@ Influence_map:Inhibition_map:rule(0):'' A(x{u}[.])->A(x{p}[.]) -> rule(4):'' A(x
 A(w)=> [
 		  A(w{u})
 		v A(w{p})]
-A(z)=> [
-		  A(z{u})
-		v A(z{p})]
 A(x)=> [
 		  A(x{u})
 		v A(x{p})]
 A(y)=> [
 		  A(y{u})
 		v A(y{p})]
+A(z)=> [
+		  A(z{u})
+		v A(z{p})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

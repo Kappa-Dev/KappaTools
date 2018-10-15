@@ -72,7 +72,7 @@ let content () =
                             let list = Utility.print_site_graph hyp list in
                             list)
                          []
-                         b in
+                         (List.rev b) in
                      let title = Html.div
                          ~a:[Html.a_class [ "panel-heading" ]] [Html.pcdata a] in
                      let content = Html.div
