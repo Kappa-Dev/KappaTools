@@ -113,6 +113,8 @@ class type virtual manager_static_analysis = object
     Public_data.accuracy_level option -> ?fwd:int -> ?bwd:int ->
     ?origin:(int,int) Public_data.influence_node -> total:int ->
     (Public_data.accuracy_level * int * int option * int option *
+     (Public_data.rule, Public_data.var) Public_data.influence_node
+       option *
      Public_data.influence_map) kasa_reply
   method get_initial_node :
     (Public_data.rule, Public_data.var) Public_data.influence_node

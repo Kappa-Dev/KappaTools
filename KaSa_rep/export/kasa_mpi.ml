@@ -84,7 +84,7 @@ let on_message post text =
       JsonUtil.to_option Public_data.short_influence_node_of_json origin
     in
     let state, im =
-      get_local_influence_map ~accuracy_level ?fwd ?bwd ~total ~origin !gState
+      get_local_influence_map ~accuracy_level ?fwd ?bwd ~total ?origin !gState
     in
     let () = gState := state in
     send_response post id im
@@ -98,7 +98,7 @@ let on_message post text =
         JsonUtil.to_option Public_data.short_influence_node_of_json origin
       in
       let state, im =
-        get_local_influence_map ~accuracy_level ?fwd ?bwd ~total ~origin !gState
+        get_local_influence_map ~accuracy_level ?fwd ?bwd ~total ?origin !gState
       in
       let () = gState := state in
       send_response post id im

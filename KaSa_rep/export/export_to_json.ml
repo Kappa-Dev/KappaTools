@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Oct 12 2018>
+  * Last modification: Time-stamp: <Oct 17 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -37,7 +37,7 @@ sig
   val get_local_influence_map:
     ?accuracy_level:Public_data.accuracy_level ->
     ?bwd:int -> ?fwd:int -> total:int ->
-    origin:(int,int) Public_data.influence_node option ->
+    ?origin:(int,int) Public_data.influence_node ->
     state -> state * Yojson.Basic.json
 
   val origin_of_influence_map: state -> state * Yojson.Basic.json
@@ -101,49 +101,61 @@ functor (A:Analyzer.Analyzer) ->
       let state, nodes = get_all_nodes_of_influence_map ~accuracy_level state in
       state, Public_data.nodes_of_influence_map_to_json (accuracy_level,nodes)
 
-    let get_local_influence_map
-        ?accuracy_level:(accuracy_level=Public_data.Low)
-        ?bwd  ?fwd  ~total
-        ~origin
-        state =
-      let state, rule_id =
-        match origin
-        with
-        | Some (Public_data.Rule a)  ->
-          state, a
-        | Some (Public_data.Var a) ->
-          let state, n = nrules state in
-          state, a+n
-        | None -> state, 0
-      in
-      let rule_id = Ckappa_sig.rule_id_of_int rule_id in
-      let state, influence_map =
-        get_local_influence_map
-          ~accuracy_level ?fwd ?bwd ~total
-          rule_id state
-      in
-      state, Public_data.local_influence_map_to_json (accuracy_level,total,bwd,fwd,influence_map)
-
-    let origin_of_influence_map state =
-      let state, nrules = nrules state in
-      let state, nvars = nvars state in
+    let convert_id_refined state i =
       let parameters = get_parameters state in
       let state, handler = get_handler state in
       let state, compil = get_c_compilation state in
       let error = get_errors state in
-      let error, id_opt =
-        if nrules = 0 && nvars = 0 then
-          Exception.warn parameters error __POS__ Exit  None
-        else
-          let error, id =
+      let state, nrules = nrules state in
+      let state, nvars = nvars state in
+      let error, refined_id_opt =
+        if i < nrules+nvars
+        then
+          let error, refined_id =
             convert_id_refined
               parameters
-              error handler compil (Ckappa_sig.rule_id_of_int 0)
+              error handler compil (Ckappa_sig.rule_id_of_int i)
           in
-          error, Some id
+          error, Some refined_id
+        else
+          Exception.warn parameters error __POS__ Exit  None
       in
       let state = set_errors error state in
-      state, id_opt
+      state, refined_id_opt
+
+
+
+    let origin_of_influence_map state =
+      convert_id_refined state 0
+
+    let get_local_influence_map
+          ?accuracy_level:(accuracy_level=Public_data.Low)
+          ?bwd  ?fwd  ~total
+          ?origin
+          state =
+        let state, rule_id_int =
+          match origin
+          with
+          | Some (Public_data.Rule a)  ->
+            state, a
+          | Some (Public_data.Var a) ->
+            let state, n = nrules state in
+            state, a+n
+          | None ->
+            state, 0
+        in
+        let rule_id = Ckappa_sig.rule_id_of_int rule_id_int in
+        let state, influence_map =
+          get_local_influence_map
+            ~accuracy_level ?fwd ?bwd ~total
+            rule_id state
+        in
+        let state, origin =
+          convert_id_refined state rule_id_int
+        in
+        state,
+        Public_data.local_influence_map_to_json
+          (accuracy_level,total,bwd,fwd,origin,influence_map)
 
     let short_origin_of_influence_map state =
       let state, origin_opt = origin_of_influence_map state in
@@ -173,16 +185,11 @@ functor (A:Analyzer.Analyzer) ->
             | None ->
               Exception.warn parameters error __POS__ Exit 0
           in
-          let error, node =
-            if id_int = 0 then
-              convert_id_refined parameters error handler compil
-                (Ckappa_sig.rule_id_of_int (max 0 n))
-            else
-              convert_id_refined parameters error handler compil
-                (Ckappa_sig.rule_id_of_int (id_int-1))
-          in
           let state = set_errors error state in
-          state, Some node
+          if id_int = 0 then
+            convert_id_refined state (max 0 n)
+          else
+            convert_id_refined state (id_int-1)
       in
       let json =
         JsonUtil.of_option Public_data.refined_influence_node_to_json
@@ -220,12 +227,7 @@ functor (A:Analyzer.Analyzer) ->
           then
             origin_of_influence_map state
           else
-            let error = get_errors state in
-            let error, node =
-              convert_id_refined parameters error handler compil
-                (Ckappa_sig.rule_id_of_int (id_int+1))
-            in
-            set_errors error state, Some node
+            convert_id_refined state (id_int+1)
       in
       let json =
         JsonUtil.of_option Public_data.refined_influence_node_to_json node_opt

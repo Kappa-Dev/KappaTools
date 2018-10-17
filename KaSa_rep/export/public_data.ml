@@ -57,6 +57,7 @@ let nodes = "nodes"
 let total_string = "total"
 let fwd_string = "fwd"
 let bwd_string = "bwd"
+let origin = "origin"
 let direction = "direction"
 let rule_hidden = "hidden"
 let scc = "scc"
@@ -680,13 +681,14 @@ let nodes_of_influence_map_of_json =
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "nodes of influence map",x))
 
 let local_influence_map_to_json influence_map =
-  let accuracy, total, bwd, fwd, influence_map = influence_map in
+  let accuracy, total, bwd, fwd, origin_opt, influence_map = influence_map in
   `Assoc
     [influencemap,
      `Assoc [accuracy_string,accuracy_to_json accuracy;
              total_string,JsonUtil.of_int total;
              fwd_string,JsonUtil.of_option JsonUtil.of_int fwd;
              bwd_string,JsonUtil.of_option JsonUtil.of_int bwd;
+             origin,JsonUtil.of_option refined_influence_node_to_json origin_opt;
              map,
              (fun influence_map ->
                 `Assoc
@@ -760,6 +762,11 @@ let local_influence_map_of_json =
             JsonUtil.to_option
               (JsonUtil.to_int ~error_msg) (List.assoc bwd_string l')
           in
+          let origin =
+            JsonUtil.to_option
+              refined_influence_node_of_json
+              (List.assoc origin l')
+          in
           let influence_map =
             (function
               | `Assoc l as x when List.length l = 3 ->
@@ -784,7 +791,7 @@ let local_influence_map_of_json =
                      (JsonUtil.build_msg "local influence map",x)))
               (List.assoc map l')
           in
-          (accuracy, total, fwd, bwd, influence_map)
+          (accuracy, total, fwd, bwd, origin, influence_map)
         | _ ->
           raise
             (Yojson.Basic.Util.Type_error

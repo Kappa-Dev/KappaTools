@@ -16,6 +16,8 @@ type model_graph = {
 }
 
 type influence_sphere = {
+  origin :
+    (Public_data.rule,Public_data.var) Public_data.influence_node option;
   positive_on :
     ((Public_data.rule,Public_data.var) Public_data.influence_node *
      Public_data.location Public_data.pair list) list;
@@ -31,7 +33,8 @@ type influence_sphere = {
 }
 
 let empty_sphere =
-  { positive_on = []; positive_by = []; negative_on = []; negative_by = [] }
+  { origin = None ;
+    positive_on = []; positive_by = []; negative_on = []; negative_by = [] }
 
 type model_rendering =
   | DrawGraph of model_graph
@@ -219,7 +222,12 @@ let influence_node_label = function
     then r.Public_data.var_ast
     else r.Public_data.var_label
 
-let json_to_graph logger origin_short_opt (_,_,_,_,influence_map) =
+let json_to_graph logger (_,_,_,_,origin,influence_map) =
+  let origin_short_opt =
+    Option_util.map
+      Public_data.short_node_of_refined_node
+      origin
+  in
   let () = Graph_loggers.print_graph_preamble logger "" in
   let nodes = influence_map.Public_data.nodes in
   let directives_of_node node =
@@ -340,26 +348,31 @@ let json_to_graph logger origin_short_opt (_,_,_,_,influence_map) =
   let () = Graph_loggers.print_graph_foot logger in
   ()
 
-let table_of_influences_json origin (_,_,_,_,influence_map) =
+let table_of_influences_json (_,_,_,_,origin,influence_map) =
   let namer =
     List.fold_left
       (fun acc e -> Public_data.InfluenceNodeMap.add
           (Public_data.short_node_of_refined_node e) e acc)
       Public_data.InfluenceNodeMap.empty
       influence_map.Public_data.nodes in
-  match origin with
+  let origin_id_opt =
+    Option_util.map
+      Public_data.short_node_of_refined_node origin
+  in
+  match origin_id_opt with
   | None -> empty_sphere
-  | Some origin ->
+  | Some origin_id ->
+
     let positive_on,positive_by =
       Public_data.InfluenceNodeMap.fold
         (fun src ->
            Public_data.InfluenceNodeMap.fold
              (fun dst data (on,by as acc) ->
-                if src = origin then
+                if src = origin_id then
                   match Public_data.InfluenceNodeMap.find_option dst namer with
                   | None -> acc
                   | Some v -> ((v,data)::on,by)
-                else if dst = origin then
+                else if dst = origin_id then
                   match Public_data.InfluenceNodeMap.find_option src namer with
                   | None -> acc
                   | Some v -> (on,(v,data)::by)
@@ -370,17 +383,17 @@ let table_of_influences_json origin (_,_,_,_,influence_map) =
         (fun src ->
            Public_data.InfluenceNodeMap.fold
              (fun dst data (on,by as acc) ->
-                if src = origin then
+                if src = origin_id then
                   match Public_data.InfluenceNodeMap.find_option dst namer with
                   | None -> acc
                   | Some v -> ((v,data)::on,by)
-                else if dst = origin then
+                else if dst = origin_id then
                   match Public_data.InfluenceNodeMap.find_option src namer with
                   | None -> acc
                   | Some v -> (on,(v,data)::by)
                 else acc))
         influence_map.Public_data.negative ([],[]) in
-    { positive_on; positive_by; negative_on; negative_by }
+    { origin; positive_on; positive_by; negative_on; negative_by }
 
 let pop_cell = function
   | [] -> (Html.td [],[])
@@ -402,7 +415,7 @@ let rec fill_table acc by on =
     let line = Html.tr [ b; o ] in
     fill_table (line::acc) by' on'
 
-let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
+let draw_table { origin; positive_on; positive_by; negative_on; negative_by } =
   let by =
     List_util.rev_map_append (fun x -> (x,false)) negative_by
       (List.rev_map (fun x -> (x,true)) positive_by) in
@@ -434,7 +447,7 @@ let influence_sphere =
            Option_util.map
              Public_data.short_node_of_refined_node origin_refined in
          Lwt_result.map
-           (table_of_influences_json origin)
+           table_of_influences_json
            (manager#get_local_influence_map
               ?fwd:None ?bwd:None ?origin ~total:1 accuracy)
        | DrawGraph _ -> Lwt.return (Result.Ok empty_sphere))
@@ -505,7 +518,7 @@ let content () =
                match rendering with
                | DrawGraph _ -> []
                | DrawTabular () -> match sphere with
-                 | Result.Ok sphere -> [ draw_table origin sphere ]
+                 | Result.Ok sphere -> [ draw_table sphere ]
                  | Result.Error mh -> Utility.print_method_handler mh)
             model influence_sphere));
     Widget_export.content export_config;
@@ -533,7 +546,7 @@ let _ =
                       Loggers.open_logger_from_formatter
                         ~mode:Loggers.Js_Graph fmt in
                     let () =
-                      json_to_graph logger origin influences in
+                      json_to_graph logger influences in
                     let graph = Loggers.graph_of_logger logger in
                     let graph_json = Graph_json.to_json graph in
                     let () = Loggers.flush_logger logger in
