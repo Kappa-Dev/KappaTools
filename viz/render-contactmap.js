@@ -246,7 +246,7 @@ class Render {
             .attr("d", line)
             .attr("stroke", "steelblue")
             .attr("stroke-width", 2)
-            .attr("fill", "white")
+            .attr("fill", "transparent")
             .style("stroke-opacity", opacity.line_normal)
             .on("mouseover", mouseoverLink)
             .on("mouseout", mouseoutLink)
