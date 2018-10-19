@@ -14,7 +14,7 @@ type preprocessed_ast =
   (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list option *
   float option
 
-let preprocess ~warning ?kasim_args cli_args ast =
+let preprocess ~warning ~debugMode ?kasim_args cli_args ast =
   let () = Format.printf "+ simulation parameters@." in
   let conf,
       story_compression, formatCflow, cflowFile =
@@ -29,7 +29,7 @@ let preprocess ~warning ?kasim_args cli_args ast =
   in
   let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
     LKappa_compiler.compil_of_ast
-      ~warning ~syntax_version var_overwrite ast in
+      ~warning ~debugMode ~syntax_version var_overwrite ast in
   let overwrite_init,overwrite_t0 = match initialMix with
     | None -> None,None
     | Some file ->
@@ -63,13 +63,13 @@ let get_ast_from_cli_args cli_args =
     cli_args.Run_cli_args.inputKappaFileNames
 
 let get_preprocessed_ast_from_cli_args
-    ~warning ?(kasim_args=Kasim_args.default) cli_args =
+    ~warning ~debugMode ?(kasim_args=Kasim_args.default) cli_args =
   let ast =
     get_ast_from_list_of_files
       cli_args.Run_cli_args.syntaxVersion
       cli_args.Run_cli_args.inputKappaFileNames
   in
-  preprocess ~warning cli_args ~kasim_args ast
+  preprocess ~warning ~debugMode cli_args ~kasim_args ast
 
 let get_pack_from_preprocessed_ast ~kasim_args ~compileModeOn preprocessed_ast =
   let conf,
@@ -190,12 +190,14 @@ let get_compilation_from_preprocessed_ast
     get_compilation_from_pack ~warning kasim_args cli_args pack
 
 let get_compilation
-    ~warning ?(compileModeOn=false) ?(kasim_args=Kasim_args.default) cli_args =
+    ~warning ~debugMode ?(compileModeOn=false)
+    ?(kasim_args=Kasim_args.default) cli_args =
      let pack =
        match kasim_args.Kasim_args.marshalizedInFile with
        | "" ->
          let preprocess =
-           get_preprocessed_ast_from_cli_args ~warning cli_args in
+           get_preprocessed_ast_from_cli_args
+             ~warning ~debugMode cli_args in
          get_pack_from_preprocessed_ast
            ~kasim_args ~compileModeOn preprocess
        | marshalized_file ->

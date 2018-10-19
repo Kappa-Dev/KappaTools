@@ -6,9 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let do_interactive_directives
-    ~outputs ~max_sharing ~syntax_version contact_map env counter graph state e =
-  let debugMode = !Parameter.debugModeOn in
+let do_interactive_directives ~debugMode ~outputs ~max_sharing ~syntax_version
+    contact_map env counter graph state e =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
@@ -45,8 +44,7 @@ let do_interactive_directives
      ~debugMode ~outputs env' counter graph' state e'')
 
 let get_pause_criteria
-    ~outputs ~max_sharing ~syntax_version contact_map env graph b =
-  let debugMode = !Parameter.debugModeOn in
+    ~debugMode ~outputs ~max_sharing ~syntax_version contact_map env graph b =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in

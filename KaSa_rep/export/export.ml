@@ -249,8 +249,8 @@ let compute_env_init
     let () = cli.Run_cli_args.syntaxVersion <- syntax_version in
     let () = cli.Run_cli_args.inputKappaFileNames <- files in
     let (_,env, contactmap, _, _, _, _, init), _ =
-      Cli_init.get_compilation ~warning:(fun ~pos _msg -> let _ = pos in ()) cli
-    in
+      Cli_init.get_compilation
+        ~warning:(fun ~pos:_ _msg -> ()) ~debugMode:false cli in
     let state =
       Remanent_state.set_init_state
         init
@@ -761,7 +761,7 @@ let extract_all_nodes_of_influence_map state (nodes,_,_) =
   let state, handler = get_handler state in
   let state, compiled = get_c_compilation state in
   let error = Remanent_state.get_errors state in
-  let error, nodes =
+  let _error, nodes =
     List.fold_left
       (fun (error, list) id ->
          let error, head =

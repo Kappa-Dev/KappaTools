@@ -29,8 +29,8 @@ val init_of_ast :
 
 val compil_of_ast :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
-  syntax_version:Ast.syntax_version -> (string * Nbr.t) list ->
-  Ast.parsing_compil ->
+  debugMode:bool -> syntax_version:Ast.syntax_version ->
+  (string * Nbr.t) list -> Ast.parsing_compil ->
   Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
   int list *
   (Ast.agent, LKappa.rule_agent list, Raw_mixture.t, int, LKappa.rule)

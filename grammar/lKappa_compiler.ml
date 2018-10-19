@@ -1264,9 +1264,9 @@ let init_of_ast ~warning ~syntax_version sigs contact_map tok algs inits =
       init_of_ast ~warning ~syntax_version sigs tok contact_map ini)
     inits
 
-let compil_of_ast ~warning ~syntax_version overwrite c =
+let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
   let (c,with_counters) =
-    Counters_compiler.compile ~warning c in
+    Counters_compiler.compile ~warning ~debugMode c in
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
     then

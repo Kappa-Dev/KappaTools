@@ -13,7 +13,7 @@ type 'a rule_agent_counters = {
 
 val compile :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
-  Ast.parsing_compil -> Ast.parsing_compil * bool
+  debugMode:bool -> Ast.parsing_compil -> Ast.parsing_compil * bool
 
 val make_counter : int -> string -> Ast.counter
 

@@ -563,7 +563,7 @@ let get_obs_titles compil =
 
 let get_preprocessed_ast cli_args =
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
-  Cli_init.get_preprocessed_ast_from_cli_args ~warning cli_args
+  Cli_init.get_preprocessed_ast_from_cli_args ~warning ~debugMode:false cli_args
 let to_preprocessed_ast x = x
 
 let get_ast cli_args = Cli_init.get_ast_from_cli_args cli_args
@@ -571,7 +571,7 @@ let to_ast x = x
 
 let preprocess cli_args ast =
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
-  Cli_init.preprocess ~warning cli_args ast
+  Cli_init.preprocess ~warning ~debugMode:false cli_args ast
 
 let saturate_domain_with_symmetric_patterns bwd_bisim_info env =
   let contact_map = Model.contact_map env in

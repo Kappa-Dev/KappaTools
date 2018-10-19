@@ -267,12 +267,12 @@ let with_counters c =
       mix in
   with_counters_mix c.Ast.signatures
 
-let compile ~warning c =
+let compile ~warning ~debugMode c =
   if (with_counters c) then
     let rules =
       remove_variable_in_counters ~warning c.Ast.rules c.Ast.signatures in
     let () =
-      if (!Parameter.debugModeOn) then
+      if debugMode then
         let () = Format.printf "@.ast rules@." in
         List.iter (fun (s,(r,_)) ->
             let label = match s with None -> "" | Some (l,_) -> l in

@@ -184,7 +184,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
     let warning ~pos msg = Data.print_warning ~pos log_form msg in
     (Lwt.wrap2
        (LKappa_compiler.compil_of_ast
-          ~warning ~syntax_version:Ast.V4) overwrite ast) >>=
+          ~warning ~debugMode:false ~syntax_version:Ast.V4) overwrite ast) >>=
     (fun
       (sig_nd,
        contact_map,
@@ -420,7 +420,7 @@ let start
       try
         let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
         Lwt.wrap4 (Evaluator.get_pause_criteria
-                     ~outputs:(outputs t)
+                     ~debugMode:false ~outputs:(outputs t)
                      ~max_sharing:false ~syntax_version:Ast.V4)
           t.contact_map t.env t.graph pause >>=
         fun (env',graph',b'') ->
@@ -517,7 +517,7 @@ let perturbation
            let log_form = Format.formatter_of_buffer log_buffer in
            Lwt.wrap6
              (Evaluator.do_interactive_directives
-                ~outputs:(interactive_outputs log_form t)
+                ~debugMode:false ~outputs:(interactive_outputs log_form t)
                 ~max_sharing:false ~syntax_version:Ast.V4)
              t.contact_map t.env t.counter t.graph t.state e >>=
            fun (e',(env',(_,graph'',state'))) ->
@@ -558,7 +558,7 @@ let continue
          try
            let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
            Lwt.wrap4 (Evaluator.get_pause_criteria
-                        ~outputs:(outputs t)
+                        ~debugMode:false ~outputs:(outputs t)
                         ~max_sharing:false ~syntax_version:Ast.V4)
              t.contact_map t.env t.graph pause >>=
            fun (env',graph',b'') ->
