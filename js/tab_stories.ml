@@ -62,9 +62,7 @@ let log_div = Tyxml_js.R.Html5.div
     story_log_html
 
 let graph_display_id = "story_graph_display"
-let story_graph =
-  Js_graphlogger.create_graph_logger
-    graph_display_id (fun _ -> ())
+let story_graph = Js_story.create_story_rendering graph_display_id
 
 let story_content =
     [Html.p ~a:[Html.a_class ["panel-pre"]]

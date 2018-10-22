@@ -49,7 +49,7 @@ RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) $(wildcard viz/*.js) 
 APP_EXT?=cdn
 INDEX_HTML=js/use-$(APP_EXT).html
 ifeq ($(APP_EXT),local)
-SITE_EXTRAS= site/external site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist site/external/codemirror-$(CODEMIRROR_VERSION) site/external/d3 site/external/jquery
+SITE_EXTRAS= site/external site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist site/external/codemirror-$(CODEMIRROR_VERSION) site/external/dagre-d3 site/external/d3 site/external/jquery
 else
 SITE_EXTRAS=
 endif
@@ -120,6 +120,10 @@ site/external/codemirror-$(CODEMIRROR_VERSION): externals.mk
 site/external/d3: externals.mk
 	mkdir -p $@
 	curl -LsS -o $@/d3.v4.min.js http://d3js.org/d3.v4.min.js
+
+site/external/dagre-d3: externals.mk
+	mkdir -p $@
+	curl -LsS -o $@/dagre-d3.min.js https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js
 
 site/external/jquery: externals.mk
 	mkdir -p $@
