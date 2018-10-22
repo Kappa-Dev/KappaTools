@@ -168,6 +168,8 @@ let onload () : unit =
              (* ignore if missing file *)
              Lwt.return (Api_common.result_ok ())))
   in
+  let () = Codemirror.commands##.save :=
+      (fun _ -> Menu_editor_file_controller.export_current_file ()) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
     let () = set_is_paused true in

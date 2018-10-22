@@ -9,5 +9,6 @@
 val create_file : ?text:Js.js_string Js.t Lwt.t -> string -> unit
 val set_file : string -> unit
 val close_file : unit -> unit
+val export_current_file : unit -> unit
 val set_file_compile : string -> bool -> unit
 val order_files : string list -> unit

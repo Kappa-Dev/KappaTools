@@ -275,28 +275,7 @@ let onload () =
       "click"
       (Dom_html.handler
          (fun _ ->
-            let () = Common.async
-                __LOC__
-                (fun _ ->
-                   State_error.wrap
-                     __LOC__
-                     (State_file.get_file ()) >>=
-                   (Api_common.result_map
-                      ~ok:(fun _ (file : Api_types_j.file) ->
-                          let data = Js.string file.Api_types_j.file_content in
-                          let () =
-                            Common.saveFile
-                              ~data
-                              ~mime:"application/octet-stream"
-                              ~filename:file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
-                          in
-                          Lwt.return_unit)
-                      ~error:(fun _ _ -> Lwt.return_unit)
-                   )
-                )
-            in
-
-
+            let () = Menu_editor_file_controller.export_current_file () in
             Js._false)) in
   let () =
     Common.jquery_on

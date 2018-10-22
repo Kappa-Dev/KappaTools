@@ -418,3 +418,10 @@ let fromTextArea
   (* let () = Js.debugger() in *)
   (Js.Unsafe.js_expr "CodeMirror")##fromTextArea
     (Js.Unsafe.inject dom) (Js.Unsafe.inject configuration)
+
+class type commands = object
+  method save : (codemirror Js.t -> unit) Js.prop
+end
+
+let commands : commands Js.t =
+  (Js.Unsafe.js_expr "CodeMirror")##.commands

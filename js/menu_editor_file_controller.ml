@@ -81,3 +81,24 @@ let order_files (filenames : string list) : unit =
                 fun r' -> Lwt.return (Api_common.result_combine [r; r']))) (* get new contact map *)
        >>= (fun _ -> Lwt.return_unit)
     )
+
+let export_current_file () =
+  Common.async
+    __LOC__
+    (fun () ->
+       State_error.wrap
+         __LOC__
+         (State_file.get_file ()) >>=
+       (Api_common.result_map
+          ~ok:(fun _ (file : Api_types_j.file) ->
+              let data = Js.string file.Api_types_j.file_content in
+              let () =
+                Common.saveFile
+                  ~data
+                  ~mime:"application/octet-stream"
+                  ~filename:file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
+              in
+              Lwt.return_unit)
+          ~error:(fun _ _ -> Lwt.return_unit)
+       )
+    )
