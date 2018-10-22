@@ -115,14 +115,25 @@ let print_graph logger parameter _handler error id story_info graph =
   let () = Graph_loggers.print_graph_preamble logger "story" in
   let () =
     A.iteri
-      (fun i (_,j) ->
+      (fun i (node_kind,j) ->
          if i=0 && j = ""
          then
            ()
          else
+           let directives =
+             match node_kind
+             with
+               OBS -> [Graph_loggers_sig.Color Graph_loggers_sig.Red]
+             | PERT -> [Graph_loggers_sig.Color Graph_loggers_sig.Green;
+                        Graph_loggers_sig.Shape Graph_loggers_sig.Invhouse]
+             | RULE -> [Graph_loggers_sig.Color Graph_loggers_sig.LightSkyBlue ;Graph_loggers_sig.Shape Graph_loggers_sig.Invhouse]
+             | INIT -> [Graph_loggers_sig.Color Graph_loggers_sig.Green;
+                        Graph_loggers_sig.Shape Graph_loggers_sig.House]
+             | FICTITIOUS -> [Graph_loggers_sig.Shape Graph_loggers_sig.Invisible]
+           in
            Graph_loggers.print_node
              logger
-             ~directives:[Graph_loggers_sig.Label j]
+             ~directives:(Graph_loggers_sig.Label j::directives)
              (string_of_int i)
       )
       graph.labels

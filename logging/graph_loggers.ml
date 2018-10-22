@@ -596,6 +596,7 @@ let shape_in_dot shape =
     shape
   with
   | Graph_loggers_sig.Invisible -> "style=\"invis\""
+  | Graph_loggers_sig.Invhouse -> "shape=\"invhouse\""
   | Graph_loggers_sig.House -> "shape=\"house\""
   | Graph_loggers_sig.Rect -> "shape=\"box\""
   | Graph_loggers_sig.Ellipse -> "shape=\"ellipse\""
@@ -606,6 +607,7 @@ let shape_in_html shape =
     shape
   with
   | Graph_loggers_sig.Invisible -> Some "style: \"visibility:hidden\""
+  | Graph_loggers_sig.Invhouse -> Some "shape: \"invhouse\""
   | Graph_loggers_sig.House -> Some "shape: \"house\""
   | Graph_loggers_sig.Rect -> Some "shape: \"rect\""
   | Graph_loggers_sig.Ellipse -> Some "shape: \"ellipse\""

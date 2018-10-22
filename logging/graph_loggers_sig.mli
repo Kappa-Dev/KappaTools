@@ -17,7 +17,7 @@
   * under the terms of the GNU Library General Public License *)
 
 type direction = Direct | Reverse | Undirected | Both
-type shape = Invisible | House | Rect | Ellipse | Circle
+type shape = Invisible | House | Rect | Ellipse | Circle | Invhouse
 type headkind = Normal | Vee | Tee | No_head
 type linestyle = Plain | Dotted | Dashed
 
@@ -36,7 +36,7 @@ type options =
     | LineStyle of linestyle
     | OnClick of Yojson.Basic.json
     | Contextual_help of string
-    | Position of Locality.t list 
+    | Position of Locality.t list
 
 type graph =
     (string * options list) list
