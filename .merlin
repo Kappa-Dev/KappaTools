@@ -11,6 +11,7 @@ S simulation
 S siteGraphs
 S Error
 S odes
+S cli
 S main
 S util
 
