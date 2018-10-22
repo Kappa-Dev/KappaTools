@@ -27,6 +27,7 @@ let shape_to_json shape =
   match shape with
   | Graph_loggers_sig.Invisible -> `String "Invisible"
   | Graph_loggers_sig.House -> `String "House"
+  | Graph_loggers_sig.Invhouse -> `String "Invhouse"
   | Graph_loggers_sig.Rect -> `String "Rect"
   | Graph_loggers_sig.Ellipse -> `String "Ellipse"
   | Graph_loggers_sig.Circle-> `String "Circle"
@@ -122,6 +123,7 @@ let headkind_of_json = function
 let shape_of_json = function
   | `String "Invisible" -> Graph_loggers_sig.Invisible
   | `String "House" -> Graph_loggers_sig.House
+  | `String "Invhouse" -> Graph_loggers_sig.Invhouse
   | `String "Rect" -> Graph_loggers_sig.Rect
   | `String "Ellipse" -> Graph_loggers_sig.Ellipse
   | `String "Circle" -> Graph_loggers_sig.Circle

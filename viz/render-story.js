@@ -13,12 +13,11 @@ class StoryRendering {
 
 	story.nodes.forEach(function (n) {
 	    g.setNode(n.id, { label: n.directives.label,
-			      style: "fill: #fff; stroke: #333"});
+			      style: "fill: " + n.directives.color +"; stroke: #333"});
 	});
 	story.edges.forEach(function (e) {
 	    g.setEdge(e.source, e.target, { style : "stroke: #333; fill: #fff; stroke-width: 1.5px;" });
 	});
-	
 
 	// Create the renderer
 	var render = new dagreD3.render();
