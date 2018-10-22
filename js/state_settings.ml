@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let clientIdParamId = Js.string "kappappFontSize"
+let clientIdParamId = Js.string "kappappClientId"
 let _client_id : string ref = ref ""
 let get_client_id () : string = !_client_id
 let set_client_id (client_id : string) : unit = _client_id := client_id
