@@ -106,15 +106,22 @@ let set_a_story =
              | None -> Lwt.return (Api_common.result_ok ())
              | Some (d,v) ->
                let () = set_info
-                   (Format.asprintf "@[<v>%a@]"
+                   (Format.asprintf "@[ids: @[%a@]@ t=@[%a@]@ event=@[%a@]@]"
                       (Pp.list
-                         Pp.space
-                         (Pp.list Pp.space (fun f d ->
-                              Format.fprintf f "%i: at t=%f after %i events"
-                                d.Trace.Simulation_info.story_id
-                                d.Trace.Simulation_info.story_time
-                                d.Trace.Simulation_info.story_event)))
-                      d) in
+                         Pp.comma
+                         (Pp.list Pp.comma (fun f d ->
+                              Format.pp_print_int f
+                                d.Trace.Simulation_info.story_id))) d
+                      (Pp.list
+                         Pp.comma
+                         (Pp.list Pp.comma (fun f d ->
+                              Format.pp_print_float f
+                                d.Trace.Simulation_info.story_time))) d
+                      (Pp.list
+                         Pp.comma
+                         (Pp.list Pp.comma (fun f d ->
+                              Format.pp_print_int f
+                                d.Trace.Simulation_info.story_event))) d) in
                let () =
                  story_graph##setData
                    (Js.string
