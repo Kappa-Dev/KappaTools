@@ -26,6 +26,12 @@ class StoryRendering {
 	var svg = topdiv.append("svg"),
 	    inner = svg.append("g");
 
+	// Set up zoom support
+	var zoom = d3.zoom().on("zoom", function() {
+	    inner.attr("transform", d3.event.transform);
+	});
+	svg.call(zoom);
+
 	// Run the renderer. This is what draws the final graph.
 	render(inner, g);
 
@@ -36,7 +42,8 @@ class StoryRendering {
 	svg.attr("width",w);
 	svg.attr("height", h);
 	var xCenterOffset = (w - g.graph().width) / 2;
-	inner.attr("transform", "translate(" + xCenterOffset + ", 0)");
+
+	svg.call(zoom.transform, d3.zoomIdentity.translate(xCenterOffset, 5));
     }
     redraw() {
 
