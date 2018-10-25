@@ -125,7 +125,7 @@ val is_invariant_full_states_permutation:
 
 
 type bwd_bisim_info =
-  int Symmetries_sig.site_partition array * bool Mods.DynArray.t * Signature.s * (LKappa_auto.cache ref)
+  int Symmetries_sig.site_partition array * bool Mods.DynArray.t * (LKappa_auto.cache ref)
 
 val swap_binding_state_regular : int -> int -> int -> LKappa.rule_agent -> unit
 val swap_internal_state_regular : int -> int -> int -> LKappa.rule_agent -> unit
@@ -145,6 +145,5 @@ val equiv_class:
   LKappa_auto.cache * bool Mods.DynArray.t * (LKappa.rule * int) list
 
 val saturate_domain_with_symmetric_patterns:
-  debugMode:bool -> compileModeOn:bool ->
-  ?origin:Operator.rev_dep -> Contact_map.t -> bwd_bisim_info ->
-  (('a * Pattern.cc) array * 'b) list -> Pattern.PreEnv.t -> Pattern.PreEnv.t
+  debugMode:bool -> compileModeOn:bool -> Model.t -> bwd_bisim_info ->
+  Pattern.id array list -> Pattern.PreEnv.t -> Pattern.PreEnv.t

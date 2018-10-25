@@ -167,3 +167,11 @@ val map_expr_perturbation :
   ((Pattern.id array list,int) Alg_expr.bool Locality.annot ->
    (Pattern.id array list,int) Alg_expr.bool Locality.annot) ->
   perturbation -> perturbation
+
+val fold_expr_rule :
+  ('a -> alg_expr Locality.annot -> 'a) -> 'a -> elementary_rule -> 'a
+
+val fold_expr_perturbation :
+  ('a -> alg_expr Locality.annot -> 'a) ->
+  ('a -> (Pattern.id array list,int) Alg_expr.bool Locality.annot -> 'a) ->
+  'a -> perturbation -> 'a

@@ -228,7 +228,6 @@ sig
     cache * bool
 
   val init_bwd_bisim_info:
-    compil ->
     Symmetries.equivalence_classes ->
     LKappa_group_action.bwd_bisim_info
 

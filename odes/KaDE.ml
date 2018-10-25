@@ -273,9 +273,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
               A.set_to_backward_symmetries_from_model
                 network
             in
-            let bwd_bisim =
-              A.init_bwd_bisim_info compil network
-            in
+            let bwd_bisim = A.init_bwd_bisim_info network in
             let () = Format.printf "+ restart compilation to account for ~-equivalent patterns in algebraic expressions... @." in
             let compil =
               A.get_compil ~dotnet ?bwd_bisim

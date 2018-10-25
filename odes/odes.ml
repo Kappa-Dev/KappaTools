@@ -3359,8 +3359,8 @@ let print_symmetries parameters compil network =
       compil
       sym
 
-let init_bwd_bisim_info compil network =
+let init_bwd_bisim_info network =
   match network.sym_reduction with
-  | Symmetries.Backward red -> Some (I.init_bwd_bisim_info compil red)
+  | Symmetries.Backward red -> Some (I.init_bwd_bisim_info red)
   | Symmetries.Forward _ | Symmetries.Ground -> None
 end

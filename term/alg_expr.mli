@@ -153,6 +153,11 @@ val map_bool_on_mixture :
   ('a -> ('c, 'b) e) ->
   ('a, 'b) bool Locality.annot -> ('c, 'b) bool Locality.annot
 
+val fold_on_mixture :
+  ('a -> 'b -> 'a) -> 'a -> ('b, 'c) e Locality.annot -> 'a
+val fold_bool_on_mixture :
+  ('a -> 'b -> 'a) -> 'a -> ('b, 'c) bool Locality.annot -> 'a
+
 (* Syntactic equality up to positions but not associativity and comutativity *)
 val equal :
   ('a, 'b) e Locality.annot -> ('a, 'b) e Locality.annot -> pervasives_bool

@@ -375,6 +375,11 @@ let map_expr_print f x =
       | Str_pexpr _ as x -> x
       | Alg_pexpr e -> Alg_pexpr (f e)) x
 
+let fold_expr_print f acc x =
+  List.fold_left (fun acc -> function
+      | Str_pexpr _ -> acc
+      | Alg_pexpr e -> f acc e) acc x
+
 type din_kind = ABSOLUTE | RELATIVE | PROBABILITY
 
 let din_kind_to_yojson = function
@@ -697,6 +702,13 @@ let map_expr_rule f x = {
   instantiations = x.instantiations;
 }
 
+let fold_expr_rule f x r =
+  List.fold_left
+    (fun acc (y,_) -> f acc y)
+    (Option_util.fold
+       (fun a (e,_) -> f a e) (f x r.rate) r.unary_rate)
+    r.delta_tokens
+
 let map_expr_modification f = function
   | ITER_RULE (e,r) -> ITER_RULE (f e, map_expr_rule f r)
   | UPDATE (i,e) -> UPDATE (i,f e)
@@ -708,6 +720,17 @@ let map_expr_modification f = function
   | (CFLOW _ | CFLOWOFF _ | SPECIES_OFF _ | PLOTENTRY) as x -> x
   | SPECIES (p,x,t) -> SPECIES ((map_expr_print f p),x,t)
 
+let fold_expr_modification f x = function
+  | ITER_RULE (e,r) -> fold_expr_rule f (f x e) r
+  | UPDATE (_,e) -> f x e
+  | SNAPSHOT p -> fold_expr_print f x p
+  | STOP p -> fold_expr_print f x p
+  | PRINT (fn,p) -> fold_expr_print f (fold_expr_print f x p) fn
+  | DIN (_,p) -> fold_expr_print f x p
+  | DINOFF p -> fold_expr_print f x p
+  | (CFLOW _ | CFLOWOFF _ | SPECIES_OFF _ | PLOTENTRY) -> x
+  | SPECIES (p,_,_) -> fold_expr_print f x p
+
 let map_expr_perturbation f_alg f_bool x =
   { alarm = x.alarm;
     precondition = f_bool x.precondition;
@@ -715,3 +738,8 @@ let map_expr_perturbation f_alg f_bool x =
     repeat = f_bool x.repeat;
     needs_backtrack = x.needs_backtrack;
   }
+
+let fold_expr_perturbation f_alg f_bool acc x =
+  let a1 = f_bool acc x.precondition in
+  let a2 = List.fold_left (fold_expr_modification f_alg) a1 x.effect in
+  f_bool a2 x.repeat

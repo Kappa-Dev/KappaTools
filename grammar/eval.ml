@@ -8,7 +8,7 @@
 
 open Ast
 
-let rec compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain (alg,pos) =
+let rec compile_alg ~debugMode ~compileModeOn domain (alg,pos) =
   match alg with
   | Alg_expr.KAPPA_INSTANCE ast ->
     begin
@@ -18,14 +18,6 @@ let rec compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain (alg,pos) =
           let domain',ccs =
             Pattern_compiler.connected_components_sum_of_ambiguous_mixture
               ~debugMode ~compileModeOn contact_map domain ?origin ast
-          in
-          let domain' =
-            match bwd_bisim with
-          | None -> domain'
-          | Some bwd_bisim_info ->
-            LKappa_group_action.saturate_domain_with_symmetric_patterns
-              ~debugMode ~compileModeOn ?origin contact_map
-              bwd_bisim_info ccs domain'
           in
           let out_ccs = List.map (fun (x,_) -> Array.map fst x) ccs in
           (Some (origin,contact_map,domain'),
@@ -40,86 +32,72 @@ let rec compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain (alg,pos) =
   | Alg_expr.STATE_ALG_OP (op) -> (domain,(Alg_expr.STATE_ALG_OP (op),pos))
   | Alg_expr.CONST n -> (domain,(Alg_expr.CONST n,pos))
   | Alg_expr.BIN_ALG_OP (op, a, b) ->
-    let domain',a' =
-      compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain a in
-    let domain'',b' =
-      compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain' b in
+    let domain',a' = compile_alg ~debugMode ~compileModeOn domain a in
+    let domain'',b' = compile_alg ~debugMode ~compileModeOn domain' b in
     (domain'',(Alg_expr.BIN_ALG_OP (op,a',b'),pos))
   | Alg_expr.UN_ALG_OP (op,a) ->
-    let domain',a' =
-      compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain a in
+    let domain',a' = compile_alg ~debugMode ~compileModeOn domain a in
     (domain',(Alg_expr.UN_ALG_OP (op,a'),pos))
   | Alg_expr.IF (cond,yes,no) ->
-    let domain',cond' =
-      compile_bool ~debugMode ?bwd_bisim ~compileModeOn domain cond in
-    let domain'',yes' =
-      compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain' yes in
-    let domain''',no' =
-      compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain'' no in
+    let domain',cond' = compile_bool ~debugMode ~compileModeOn domain cond in
+    let domain'',yes' = compile_alg ~debugMode ~compileModeOn domain' yes in
+    let domain''',no' = compile_alg ~debugMode ~compileModeOn domain'' no in
     (domain''',(Alg_expr.IF (cond',yes',no'),pos))
   | Alg_expr.DIFF_KAPPA_INSTANCE _
     | Alg_expr.DIFF_TOKEN _ ->
     raise
       (ExceptionDefn.Internal_Error
          ("Cannot deal with derivative in expressions",pos))
-and compile_bool ~debugMode ?bwd_bisim ~compileModeOn domain = function
+and compile_bool ~debugMode ~compileModeOn domain = function
   | Alg_expr.TRUE,pos -> (domain,(Alg_expr.TRUE,pos))
   | Alg_expr.FALSE,pos -> (domain,(Alg_expr.FALSE,pos))
   | Alg_expr.BIN_BOOL_OP (op,a,b), pos ->
-    let domain',a' =
-      compile_bool ~debugMode ?bwd_bisim ~compileModeOn domain a in
-    let domain'',b' =
-      compile_bool ~debugMode ?bwd_bisim ~compileModeOn domain' b in
+    let domain',a' = compile_bool ~debugMode ~compileModeOn domain a in
+    let domain'',b' = compile_bool ~debugMode ~compileModeOn domain' b in
     (domain'',(Alg_expr.BIN_BOOL_OP (op,a',b'),pos))
   | Alg_expr.UN_BOOL_OP (op,a), pos ->
-    let domain',a' =
-      compile_bool ~debugMode ?bwd_bisim ~compileModeOn domain a in
+    let domain',a' = compile_bool ~debugMode ~compileModeOn domain a in
     (domain',(Alg_expr.UN_BOOL_OP (op,a'),pos))
   | Alg_expr.COMPARE_OP (op,a,b),pos ->
-    let (domain',a') =
-      compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain a in
-    let (domain'',b') =
-      compile_alg ~debugMode ?bwd_bisim ~compileModeOn domain' b in
+    let (domain',a') = compile_alg ~debugMode ~compileModeOn domain a in
+    let (domain'',b') = compile_alg ~debugMode ~compileModeOn domain' b in
     (domain'',(Alg_expr.COMPARE_OP (op,a',b'), pos))
 
-let compile_pure_alg ~debugMode ?bwd_bisim ~compileModeOn (alg,pos) =
-  snd @@ compile_alg ~debugMode ?bwd_bisim ~compileModeOn None (alg,pos)
+let compile_pure_alg ~debugMode ~compileModeOn (alg,pos) =
+  snd @@ compile_alg ~debugMode ~compileModeOn None (alg,pos)
 
-let compile_alg
-    ~debugMode ?bwd_bisim ~compileModeOn ?origin contact_map domain (alg,pos) =
+let compile_alg ~debugMode ~compileModeOn ?origin contact_map domain (alg,pos) =
   match compile_alg
-          ~debugMode ?bwd_bisim ~compileModeOn
+          ~debugMode ~compileModeOn
           (Some (origin,contact_map,domain)) (alg,pos)
   with
   | Some (_, _,domain),alg -> domain,alg
   | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
 let compile_bool
-    ~debugMode ?bwd_bisim ~compileModeOn ?origin contact_map domain (alg,pos) =
+    ~debugMode ~compileModeOn ?origin contact_map domain (alg,pos) =
   match compile_bool
-          ~debugMode ?bwd_bisim ~compileModeOn
+          ~debugMode ~compileModeOn
           (Some (origin,contact_map,domain)) (alg,pos)
   with
   | Some (_, _,domain),alg -> domain,alg
   | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
-let tokenify ~debugMode ?bwd_bisim ~compileModeOn contact_map domain l =
+let tokenify ~debugMode ~compileModeOn contact_map domain l =
   List.fold_right
     (fun (alg_expr,id) (domain,out) ->
        let (domain',alg) =
-         compile_alg
-           ~debugMode ?bwd_bisim ~compileModeOn contact_map domain alg_expr in
+         compile_alg ~debugMode ~compileModeOn contact_map domain alg_expr in
        (domain',(alg,id)::out)
     ) l (domain,[])
 
 (* transform an LKappa rule into a Primitives rule *)
 let rules_of_ast
-    ~debugMode ~warning ?deps_machinery ?bwd_bisim ~compileModeOn
+    ~debugMode ~warning ?deps_machinery ~compileModeOn
     contact_map domain ~syntax_ref (rule,_) =
   let domain',delta_toks =
     tokenify
-      ~debugMode ?bwd_bisim ~compileModeOn
-      contact_map domain rule.LKappa.r_delta_tokens in
+      ~debugMode ~compileModeOn contact_map domain rule.LKappa.r_delta_tokens in
   (*  let one_side syntax_ref label (domain,deps_machinery,unary_ccs,acc)
         rate unary_rate lhs rhs rm add =*)
   let origin,deps =
@@ -127,19 +105,17 @@ let rules_of_ast
     | None -> None,None
     | Some (o,d) -> Some o, Some d in
   let unary_infos =
-    let crp = compile_pure_alg
-        ~debugMode ?bwd_bisim ~compileModeOn rule.LKappa.r_rate in
+    let crp =
+      compile_pure_alg ~debugMode ~compileModeOn rule.LKappa.r_rate in
     match rule.LKappa.r_un_rate with
     | None -> fun _ -> crp,None
     | Some ((_,pos as rate),dist) ->
       let dist' = match dist with
         | None -> None
         | Some d ->
-          let (d', _) =
-            compile_pure_alg ~debugMode ?bwd_bisim ~compileModeOn d in
+          let (d', _) = compile_pure_alg ~debugMode ~compileModeOn d in
            Some d' in
-      let unrate =
-        compile_pure_alg ~debugMode ?bwd_bisim ~compileModeOn rate in
+      let unrate = compile_pure_alg ~debugMode ~compileModeOn rate in
       fun ccs ->
         match Array.length ccs with
         | (0 | 1) ->
@@ -198,13 +174,13 @@ let rules_of_ast
   rules_l
 
 let obs_of_result
-    ~debugMode ?bwd_bisim ~compileModeOn contact_map domain alg_deps res =
+    ~debugMode ~compileModeOn contact_map domain alg_deps res =
   let domain,out =
     List.fold_left
       (fun (domain,cont) alg_expr ->
          let (domain',alg_pos) =
            compile_alg
-             ~debugMode ?bwd_bisim ~compileModeOn contact_map domain alg_expr in
+             ~debugMode ~compileModeOn contact_map domain alg_expr in
          domain',alg_pos :: cont)
       (domain,[]) res.observables in
   if List.exists (Alg_expr.has_progress_dep ~only_time:false alg_deps) out then
@@ -214,8 +190,7 @@ let obs_of_result
      Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
      :: List.rev out)
 
-let compile_print_expr
-    ~debugMode ?bwd_bisim ~compileModeOn contact_map domain ex =
+let compile_print_expr ~debugMode ~compileModeOn contact_map domain ex =
   List.fold_right
     (fun el (domain,out) ->
        match el with
@@ -223,7 +198,7 @@ let compile_print_expr
        | Primitives.Alg_pexpr ast_alg ->
          let (domain', alg) =
            compile_alg
-             ~debugMode ?bwd_bisim ~compileModeOn contact_map domain ast_alg in
+             ~debugMode ~compileModeOn contact_map domain ast_alg in
          (domain',(Primitives.Alg_pexpr alg::out)))
     ex (domain,[])
 
@@ -258,14 +233,14 @@ let cflows_of_label
    List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
 
 let effects_of_modif
-    ~debugMode ~warning ast_algs ast_rules origin ?bwd_bisim ~compileModeOn
+    ~debugMode ~warning ast_algs ast_rules origin ~compileModeOn
     contact_map (domain,rev_effects) = function
   | APPLY (alg_expr, (_,pos as pack)) ->
     let (domain',alg_pos) =
       compile_alg
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain alg_expr in
+        ~debugMode ~compileModeOn contact_map domain alg_expr in
     let domain'',_,elem_rules =
-      rules_of_ast ~debugMode ~warning ?bwd_bisim
+      rules_of_ast ~debugMode ~warning
         ~compileModeOn contact_map domain' ~syntax_ref:0 pack in
     let elem_rule = match elem_rules with
       | [ r ] -> r
@@ -278,18 +253,16 @@ let effects_of_modif
   | UPDATE ((i, _), alg_expr) ->
     let (domain', alg_pos) =
       compile_alg
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain alg_expr in
+        ~debugMode ~compileModeOn contact_map domain alg_expr in
     (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
   | SNAPSHOT pexpr ->
     let (domain',pexpr') =
-      compile_print_expr
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain pexpr in
+      compile_print_expr ~debugMode ~compileModeOn contact_map domain pexpr in
     (*when specializing snapshots to particular mixtures, add variables below*)
     (domain', (Primitives.SNAPSHOT pexpr')::rev_effects)
   | STOP pexpr ->
     let (domain',pexpr') =
-      compile_print_expr
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain pexpr in
+      compile_print_expr ~debugMode ~compileModeOn contact_map domain pexpr in
     (domain', (Primitives.STOP pexpr')::rev_effects)
   | CFLOWLABEL (on,lab) ->
     cflows_of_label ~debugMode origin ~compileModeOn
@@ -305,28 +278,23 @@ let effects_of_modif
      List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
   | DIN (rel,pexpr) ->
     let (domain',pexpr') =
-      compile_print_expr
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain pexpr in
+      compile_print_expr ~debugMode ~compileModeOn contact_map domain pexpr in
     (domain', (Primitives.DIN (rel,pexpr'))::rev_effects)
   | DINOFF pexpr ->
     let (domain',pexpr') =
-      compile_print_expr
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain pexpr in
+      compile_print_expr ~debugMode ~compileModeOn contact_map domain pexpr in
     (domain', (Primitives.DINOFF pexpr')::rev_effects)
   | Ast.PRINT (pexpr,print) ->
     let (domain',pexpr') =
-      compile_print_expr
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain pexpr in
+      compile_print_expr ~debugMode ~compileModeOn contact_map domain pexpr in
     let (domain'',print') =
-      compile_print_expr
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain' print in
+      compile_print_expr ~debugMode ~compileModeOn contact_map domain' print in
     (domain'', (Primitives.PRINT (pexpr',print'))::rev_effects)
   | PLOTENTRY ->
     (domain, (Primitives.PLOTENTRY)::rev_effects)
   | SPECIES_OF (on,pexpr,(ast,pos)) ->
     let (domain',pexpr') =
-      compile_print_expr
-        ~debugMode ?bwd_bisim ~compileModeOn contact_map domain pexpr in
+      compile_print_expr ~debugMode ~compileModeOn contact_map domain pexpr in
     let adds tests l x =
       if on then Primitives.SPECIES (pexpr',x,tests) :: l
       else Primitives.SPECIES_OFF pexpr' :: l in
@@ -345,11 +313,11 @@ let effects_of_modif
 
 let effects_of_modifs
     ~debugMode ~warning
-    ast_algs ast_rules origin ?bwd_bisim ~compileModeOn contact_map domain l =
+    ast_algs ast_rules origin ~compileModeOn contact_map domain l =
   let domain',rev_effects =
     List.fold_left
       (effects_of_modif ~debugMode ~warning
-         ast_algs ast_rules origin ?bwd_bisim ~compileModeOn contact_map)
+         ast_algs ast_rules origin ~compileModeOn contact_map)
       (domain,[]) l in
   domain',List.rev rev_effects
 
@@ -371,7 +339,7 @@ let pert_not_init x y z =
 
 
 let pert_of_result
-    ~debugMode ~warning ast_algs ast_rules alg_deps ?bwd_bisim ~compileModeOn
+    ~debugMode ~warning ast_algs ast_rules alg_deps ~compileModeOn
     contact_map domain res =
   let (domain, out_alg_deps, _, lpert,tracking_enabled) =
     List.fold_left
@@ -388,14 +356,13 @@ let pert_of_result
         let pre_expr' = pert_not_init alarm pre_expr opt_post in
         let (domain',pre) =
           compile_bool
-            ~debugMode ?bwd_bisim ~compileModeOn ~origin
-            contact_map domain pre_expr' in
+            ~debugMode ~compileModeOn ~origin contact_map domain pre_expr' in
         let alg_deps' = match alarm with
           | Some _ -> alg_deps
           | None -> Alg_expr.add_dep_bool alg_deps origin pre in
         let (domain, effects) =
           effects_of_modifs
-            ~debugMode ~warning ast_algs ast_rules origin ?bwd_bisim ~compileModeOn
+            ~debugMode ~warning ast_algs ast_rules origin ~compileModeOn
             contact_map domain' modif_expr_list in
         let domain,opt =
           match opt_post with
@@ -403,7 +370,7 @@ let pert_of_result
           | Some post_expr ->
             let (domain',(post,post_pos)) =
               compile_bool
-                ~debugMode ?bwd_bisim ~compileModeOn contact_map domain post_expr in
+                ~debugMode ~compileModeOn contact_map domain post_expr in
             (domain',Some (post,post_pos))
         in
         let has_tracking =
@@ -444,7 +411,7 @@ let pert_of_result
   (domain, out_alg_deps, List.rev lpert,tracking_enabled)
 
 let compile_inits
-    ~debugMode ~warning ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
+    ~debugMode ~warning ?rescale ~compileModeOn contact_map env inits =
   let init_l,_ =
     List_util.fold_right_map
       (fun (alg,init_t) preenv ->
@@ -461,8 +428,7 @@ let compile_inits
          | INIT_MIX (raw_mix,mix_pos) ->
            let sigs = Model.signatures env in
            let (preenv',alg') =
-             compile_alg
-               ~debugMode ?bwd_bisim ~compileModeOn contact_map preenv alg in
+             compile_alg ~debugMode ~compileModeOn contact_map preenv alg in
            let fake_rule = {
              LKappa.r_mix = [];
              LKappa.r_created = raw_mix;
@@ -474,7 +440,7 @@ let compile_inits
            let preenv'',state' =
              match
                rules_of_ast
-                 ~debugMode ~warning ?bwd_bisim ~compileModeOn contact_map
+                 ~debugMode ~warning ~compileModeOn contact_map
                  preenv' ~syntax_ref:0 (fake_rule,mix_pos)
              with
              | domain'',_,[ compiled_rule ] ->
@@ -499,7 +465,7 @@ let compile_inits
            } in
            match
              rules_of_ast
-               ~debugMode ~warning ?bwd_bisim ~compileModeOn
+               ~debugMode ~warning ~compileModeOn
                contact_map preenv ~syntax_ref:0 (Locality.dummy_annot fake_rule)
            with
            | domain'',_,[ compiled_rule ] ->
@@ -508,25 +474,24 @@ let compile_inits
       ) inits (Pattern.PreEnv.empty (Model.signatures env)) in
   init_l
 
-let compile_alg_vars
-    ~debugMode ?bwd_bisim ~compileModeOn contact_map domain vars =
+let compile_alg_vars ~debugMode ~compileModeOn contact_map domain vars =
   Tools.array_fold_left_mapi
     (fun i domain (lbl_pos,ast) ->
        let (domain',alg) =
          compile_alg
-           ~debugMode ?bwd_bisim ~compileModeOn ~origin:(Operator.ALG i)
+           ~debugMode ~compileModeOn ~origin:(Operator.ALG i)
            contact_map domain ast
        in (domain',(lbl_pos,alg))) domain
     (Array.of_list vars)
 
 let compile_rules
-    ~debugMode ~warning alg_deps ?bwd_bisim ~compileModeOn contact_map domain rules =
+    ~debugMode ~warning alg_deps ~compileModeOn contact_map domain rules =
   match
     List.fold_left
       (fun (domain,syntax_ref,deps_machinery,acc) (_,rule) ->
          let (domain',origin',cr) =
            rules_of_ast
-             ~debugMode ~warning ?deps_machinery ?bwd_bisim ~compileModeOn
+             ~debugMode ~warning ?deps_machinery ~compileModeOn
              contact_map domain ~syntax_ref rule in
          (domain',succ syntax_ref,origin',
           List.append cr acc))
@@ -575,7 +540,7 @@ let init_kasa called_from sigs result =
   Export_to_KaSim.flush_errors kasa_state
 *)
 let compile
-    ~outputs ~pause ~return ~max_sharing ~debugMode ?bwd_bisim ~compileModeOn
+    ~outputs ~pause ~return ~max_sharing ~debugMode ~compileModeOn
     ?overwrite_init ?rescale_init sigs_nd tk_nd contact_map result =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
@@ -583,7 +548,7 @@ let compile
   outputs (Data.Log "\t -variable declarations");
   let preenv',alg_a =
     compile_alg_vars
-      ~debugMode ?bwd_bisim ~compileModeOn
+      ~debugMode ~compileModeOn
       contact_map preenv result.Ast.variables in
   let alg_nd = NamedDecls.create alg_a in
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep tk_nd alg_a in
@@ -592,7 +557,7 @@ let compile
   outputs (Data.Log "\t -rules");
   let (preenv',alg_deps',compiled_rules) =
     compile_rules
-      ~debugMode ~warning alg_deps ?bwd_bisim ~compileModeOn
+      ~debugMode ~warning alg_deps ~compileModeOn
       contact_map preenv' result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
@@ -600,14 +565,14 @@ let compile
   outputs (Data.Log "\t -interventions");
   let (preenv,alg_deps'',pert,has_tracking) =
     pert_of_result
-      ~debugMode ~warning result.variables result.rules alg_deps' ?bwd_bisim ~compileModeOn
+      ~debugMode ~warning result.variables result.rules alg_deps' ~compileModeOn
       contact_map preenv' result in
 
   pause @@ fun () ->
   outputs (Data.Log "\t -observables");
   let preenv,obs =
     obs_of_result
-      ~debugMode ?bwd_bisim ~compileModeOn contact_map preenv alg_deps result in
+      ~debugMode ~compileModeOn contact_map preenv alg_deps result in
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
   let domain,dom_stats =
@@ -626,7 +591,7 @@ let compile
   pause @@ fun () ->
   let init_l =
     compile_inits
-      ~debugMode ~warning ?rescale:rescale_init ?bwd_bisim ~compileModeOn
+      ~debugMode ~warning ?rescale:rescale_init ~compileModeOn
       contact_map env (Option_util.unsome result.Ast.init overwrite_init) in
   return (env,has_tracking,init_l)
 

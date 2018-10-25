@@ -16,8 +16,7 @@ sig
   val preprocess: Run_cli_args.t -> I.ast -> I.preprocessed_ast
 
   val get_compil :
-    dotnet:bool -> 
-    ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
+    dotnet:bool -> ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
     ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
@@ -95,6 +94,6 @@ sig
     int * int * int
 
   val init_bwd_bisim_info:
-    I.compil -> (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
     LKappa_group_action.bwd_bisim_info option
 end

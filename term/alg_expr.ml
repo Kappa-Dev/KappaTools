@@ -521,6 +521,29 @@ and map_bool_on_mixture f = function
   | COMPARE_OP (o,x,y),p ->
     (COMPARE_OP (o,map_on_mixture f x,map_on_mixture f y),p)
 
+let rec fold_on_mixture f x = function
+  | KAPPA_INSTANCE i,_ -> f x i
+  | DIFF_KAPPA_INSTANCE _,_ ->
+    failwith
+      "Alg_expr.fold_on_mixture doesn't know what to do of DIFF_KAPPA_INSTANCE"
+  | CONST _,_ -> x
+  | ALG_VAR _,_ -> x
+  | TOKEN_ID _,_ -> x
+  | DIFF_TOKEN (a,_),_ -> fold_on_mixture f x a
+  | STATE_ALG_OP _,_ -> x
+  | BIN_ALG_OP (_,a,b),_ -> fold_on_mixture f (fold_on_mixture f x a) b
+  | UN_ALG_OP (_,a),_ -> fold_on_mixture f x a
+  | IF (b,u,v),_ ->
+    fold_bool_on_mixture f (fold_on_mixture f (fold_on_mixture f x u) v) b
+and fold_bool_on_mixture f x = function
+  | TRUE,_ -> x
+  | FALSE,_ -> x
+  | BIN_BOOL_OP (_,a,b),_ ->
+    fold_bool_on_mixture f (fold_bool_on_mixture f x a) b
+  | UN_BOOL_OP (_,a),_ -> fold_bool_on_mixture f x a
+  | COMPARE_OP (_,a,b),_ ->
+    fold_on_mixture f (fold_on_mixture f x a) b
+
 let rec equal a b =
   match a,b with
   | (BIN_ALG_OP (opa,a1,a2),_), (BIN_ALG_OP (opb,b1,b2),_) ->

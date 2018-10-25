@@ -572,6 +572,20 @@ let to_ast x = x
 let preprocess cli_args ast =
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
   Cli_init.preprocess ~warning cli_args ast
+
+let saturate_domain_with_symmetric_patterns bwd_bisim_info env =
+  let contact_map = Model.contact_map env in
+  let preenv' =
+    Model.fold_mixture_in_expr
+      (fun domain ccs ->
+         LKappa_group_action.saturate_domain_with_symmetric_patterns
+           ~debugMode ~compileModeOn:false env bwd_bisim_info ccs domain)
+      (Pattern.PreEnv.of_env (Model.domain env))
+      env in
+  let (domain,_) =
+    Pattern.finalize ~debugMode ~max_sharing:false preenv' contact_map in
+  Model.new_domain domain env
+
 let get_compil
     ~dotnet
     ?bwd_bisim
@@ -580,8 +594,11 @@ let get_compil
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
   let (_, env, contact_map, _, _, _, _, init), _ =
     Cli_init.get_compilation_from_preprocessed_ast
-      ~warning ?bwd_bisim cli_args preprocessed_ast
+      ~warning cli_args preprocessed_ast
   in
+  let env = match bwd_bisim with
+    | None -> env
+    | Some bsi -> saturate_domain_with_symmetric_patterns bsi env in
   let compil =
     {
     environment = env ;
@@ -725,10 +742,9 @@ let valid_mixture compil cc_cache  ?max_size mixture =
         (fun cc -> Pattern.size_of_cc cc <= n)
         cc_list
 
-let init_bwd_bisim_info compil red =
+let init_bwd_bisim_info red =
   red,
   Mods.DynArray.create 1 false,
-  Model.signatures (compil.environment),
   ref (LKappa_auto.init_cache ())
 
 module type ObsMap =

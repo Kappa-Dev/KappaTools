@@ -219,6 +219,18 @@ let overwrite_vars alg_overwrite env =
       algs'.(i) <- (fst algs'.(i),Locality.dummy_annot v)) alg_overwrite in
   { env with algs = NamedDecls.create algs' }
 
+let fold_alg_expr f_alg f_bool x env =
+  let x1 = Array.fold_left
+      (fun acc (_,y) -> f_alg acc y) x env.algs.NamedDecls.decls in
+  let x2 = Array.fold_left f_alg x1 env.observables in
+  let x3 =
+    Array.fold_left (Primitives.fold_expr_rule f_alg) x2 env.rules in
+  Array.fold_left
+    (Primitives.fold_expr_perturbation f_alg f_bool) x3 env.interventions
+
+let fold_mixture_in_expr f =
+  fold_alg_expr (Alg_expr.fold_on_mixture f) (Alg_expr.fold_bool_on_mixture f)
+
 let propagate_constant
     ~warning ?max_time ?max_events updated_vars alg_overwrite x =
   let algs' =

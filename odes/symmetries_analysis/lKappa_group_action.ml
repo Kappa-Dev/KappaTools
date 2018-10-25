@@ -560,11 +560,13 @@ let equiv_class
    cache, seen, equ_class
 
 type bwd_bisim_info =
-  int Symmetries_sig.site_partition array * bool Mods.DynArray.t * Signature.s * (LKappa_auto.cache ref)
+  int Symmetries_sig.site_partition array * bool Mods.DynArray.t * (LKappa_auto.cache ref)
 
 let saturate_domain_with_symmetric_patterns
-    ~debugMode ~compileModeOn ?origin contact_map bwd_bisim_info ccs domain =
-  let equivalence_relations,bool_array,sigs,cache_ref = bwd_bisim_info in
+    ~debugMode ~compileModeOn env bwd_bisim_info ccs domain =
+  let sigs = Model.signatures env in
+  let contact_map = Model.contact_map env in
+  let equivalence_relations,bool_array,cache_ref = bwd_bisim_info in
   let cache = !cache_ref in
   let partitions_internal_states i =
     equivalence_relations.(i).Symmetries_sig.over_internal_states
@@ -577,9 +579,11 @@ let saturate_domain_with_symmetric_patterns
   in
   let domain,cache =
     List.fold_left
-      (fun (domain,cache) (cc_array,_) ->
+      (fun (domain,cache) cc_array ->
          Array.fold_left
-           (fun (domain,cache) (_,cc) ->
+           (fun (domain,cache) cc_id ->
+              let cc =
+                Pattern.Env.content (Pattern.Env.get (Model.domain env) cc_id) in
               let cache,_,equiv_class =
                 equiv_class
                   ~partitions_internal_states
@@ -596,7 +600,7 @@ let saturate_domain_with_symmetric_patterns
                      let rule_mixture = lkappa_rule.LKappa.r_mix in
                      let domain,_ =
                        Pattern_compiler.connected_components_sum_of_ambiguous_mixture
-                         ~debugMode ~compileModeOn contact_map domain ?origin
+                         ~debugMode ~compileModeOn contact_map domain ?origin:None
                          rule_mixture
                      in
                      domain)

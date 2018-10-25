@@ -18,6 +18,10 @@ let bind f = function
   | None -> None
   | Some o -> f o
 
+let fold f x = function
+  | None -> x
+  | Some y -> f x y
+
 let equal eq a b =
   match a, b with
   | None, None -> true

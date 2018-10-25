@@ -74,7 +74,7 @@ done
 	 -interventions
 	 -observables
 	 -update_domain construction
-	 17 (sub)observables 120 navigation steps
+	 16 (sub)observables 108 navigation steps
 	 -initial conditions
 + generate the network... 
 	 -initial states 
@@ -111,7 +111,7 @@ done
 	 -interventions
 	 -observables
 	 -update_domain construction
-	 17 (sub)observables 120 navigation steps
+	 16 (sub)observables 108 navigation steps
 	 -initial conditions
 + generate the network... 
 	 -initial states 

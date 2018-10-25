@@ -113,4 +113,7 @@ val propagate_constant :
   int list -> (int * Primitives.alg_expr) list -> t -> t
 (** [propagate_constant updated_vars overwrite_vars env] *)
 
+val fold_mixture_in_expr :
+  ('a -> Pattern.id array list -> 'a) -> 'a -> t -> 'a
+
 val unary_patterns : t -> Pattern.Set.t

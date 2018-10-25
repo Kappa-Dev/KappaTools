@@ -71,8 +71,7 @@ let get_preprocessed_ast_from_cli_args
   in
   preprocess ~warning cli_args ~kasim_args ast
 
-let get_pack_from_preprocessed_ast
-    ~kasim_args ?bwd_bisim ~compileModeOn preprocessed_ast =
+let get_pack_from_preprocessed_ast ~kasim_args ~compileModeOn preprocessed_ast =
   let conf,
       story_compression, formatCflow, cflowFile,sigs_nd,contact_map,tk_nd,
       _alg_finder, updated_vars,result',overwrite_init,overwrite_t0
@@ -87,8 +86,7 @@ let get_pack_from_preprocessed_ast
       ~debugMode:!Parameter.debugModeOn
       ~max_sharing:kasim_args.Kasim_args.maxSharing
       ?rescale_init:kasim_args.Kasim_args.rescale
-      ?overwrite_init ?bwd_bisim ~compileModeOn
-      sigs_nd tk_nd contact_map result' in
+      ?overwrite_init ~compileModeOn sigs_nd tk_nd contact_map result' in
   let story_compression =
     if has_tracking && (n||w||s) then Some story_compression else None in
   (conf, env, contact_map, updated_vars, story_compression,
@@ -185,24 +183,21 @@ let get_compilation_from_pack ~warning kasim_args cli_args pack =
    formatCflows, cflowFile, init_l),counter
 
 let get_compilation_from_preprocessed_ast
-  ~warning ?bwd_bisim ?(compileModeOn=false) ?(kasim_args=Kasim_args.default)
+  ~warning ?(compileModeOn=false) ?(kasim_args=Kasim_args.default)
     cli_args preprocessed =
     let pack =
-      get_pack_from_preprocessed_ast
-        ~kasim_args ?bwd_bisim ~compileModeOn preprocessed
-    in
+      get_pack_from_preprocessed_ast ~kasim_args ~compileModeOn preprocessed in
     get_compilation_from_pack ~warning kasim_args cli_args pack
 
 let get_compilation
-    ~warning ?bwd_bisim ?(compileModeOn=false)
-    ?(kasim_args=Kasim_args.default) cli_args =
+    ~warning ?(compileModeOn=false) ?(kasim_args=Kasim_args.default) cli_args =
      let pack =
        match kasim_args.Kasim_args.marshalizedInFile with
        | "" ->
          let preprocess =
            get_preprocessed_ast_from_cli_args ~warning cli_args in
          get_pack_from_preprocessed_ast
-           ~kasim_args ?bwd_bisim ~compileModeOn preprocess
+           ~kasim_args ~compileModeOn preprocess
        | marshalized_file ->
          get_pack_from_marshalizedfile
            ~warning kasim_args cli_args marshalized_file in
