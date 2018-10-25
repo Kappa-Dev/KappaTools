@@ -8,8 +8,6 @@
    Copyright (C) Antoine Mine' 2006
  *)
 
-
-
 let expert_mode = ref false  (* shows expert options *)
 let dev_mode = ref false    (* accept _ALL_ options *)
 
@@ -435,7 +433,8 @@ let parse_list ~with_tk ?title (a:t) (l:string list) : string list =
         with
         | None -> Version.version_kasa_full_name
         | Some x -> x)
-       (if with_tk then "" else "out"); exit 0)
+       (if with_tk then "" else "out");
+     exit 0)
   else if !long_help then (Format.printf "%a" (print_help true true) a; exit 0)
   else if !short_help then (Format.printf "%a" (print_help true false) a; exit 0);
   (* List.concat*) filenames (*(List.map Wordexp.wordexp filenames)*)

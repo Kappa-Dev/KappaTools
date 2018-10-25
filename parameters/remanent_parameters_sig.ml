@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <May 01 2018>
+  * Last modification:  Time-stamp: <Nov 28 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -57,19 +57,19 @@ type contact_map_output =
     cm_file : string option ;
     cm_format: graph_format ;
     pure_contact : bool ;
-    binding_site_shape : string ;
-    binding_site_color : string ;
-    internal_site_shape : string ;
-    internal_site_color : string ;
-    counter_site_shape : string ;
-    counter_site_color : string ;
-    agent_shape_array : string option array ;
-    agent_color_array : string option array ;
-    agent_shape_def : string ;
-    agent_color_def : string ;
-    link_color : string ;
-    influence_color : string ;
-    influence_arrow : string ;
+    binding_site_shape : Graph_loggers_sig.shape ;
+    binding_site_color : Graph_loggers_sig.color ;
+    internal_site_shape : Graph_loggers_sig.shape ;
+    internal_site_color : Graph_loggers_sig.color ;
+    counter_site_shape : Graph_loggers_sig.shape ;
+    counter_site_color : Graph_loggers_sig.color ;
+    agent_shape_array : Graph_loggers_sig.shape option array ;
+    agent_color_array : Graph_loggers_sig.color option array ;
+    agent_shape_def : Graph_loggers_sig.shape ;
+    agent_color_def : Graph_loggers_sig.color ;
+    link_color : Graph_loggers_sig.color ;
+    influence_color : Graph_loggers_sig.color ;
+    influence_arrow : Graph_loggers_sig.headkind ;
   }
 
 type reachability_map_output =
@@ -110,7 +110,7 @@ type reachability_parameters =
 type backdoors =
   {
     backdoor_nbr_of_scc: bool;
-    backdoor_average_size_of_scc: bool;   
+    backdoor_average_size_of_scc: bool;
     backdoor_nbr_of_influences: bool;
     backdoor_nbr_of_constraints: bool;
     backdoor_nbr_of_dead_rules: bool;
@@ -159,7 +159,7 @@ type marshalisable_parameters =
    command_line: string array ;
    version: string ;
    short_version: string ;
-   tk_interface: bool ;
+   tk_interface : bool;
    html_mode: bool ;
    empty_hashtbl_size: int ;
    backdoors: backdoors

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Aug 31 2018>
+ * Last modification: Time-stamp: <Nov 28 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -102,8 +102,10 @@ val compare_state_index_option_min: c_state option -> c_state option -> int
 val compare_state_index_option_max: c_state option -> c_state option -> int
 val compare_agent_name: c_agent_name -> c_agent_name -> int
 
-val get_agent_shape: c_site_name -> Remanent_parameters_sig.parameters -> string
-val get_agent_color: c_site_name -> Remanent_parameters_sig.parameters -> string
+val get_agent_shape: c_site_name -> Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
+val get_agent_color: c_site_name -> Remanent_parameters_sig.parameters ->
+Graph_loggers_sig.color
+
 
 val compare_unit : unit -> unit -> int
 val compare_unit_agent_name: unit -> unit -> c_agent_name

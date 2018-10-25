@@ -10,8 +10,6 @@
 (* JSon labels*)
 (**************)
 
-let id = "id"
-let info = "info"
 let agent="agent name"
 let contactmap="contact map"
 let accuracy_string = "accuracy"
@@ -38,7 +36,6 @@ let label = "label"
 let ast = "ast"
 let position = "location"
 let position_list = "location list"
-let edit = "edit_rule"
 let variable = "variable"
 let rule = "rule"
 let direct = "direct"

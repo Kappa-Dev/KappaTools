@@ -20,6 +20,8 @@ let dot_color_encoding x =
   match
     x
   with
+  | Graph_loggers_sig.Yellow -> "yellow"
+  | Graph_loggers_sig.Grey -> "grey"
   | Graph_loggers_sig.Red -> "red"
   | Graph_loggers_sig.Green -> "green"
   | Graph_loggers_sig.White -> "white"
@@ -33,6 +35,8 @@ let svg_color_encoding x =
   match
     x
   with
+  | Graph_loggers_sig.Yellow -> "#ff3"
+  | Graph_loggers_sig.Grey -> "#aaa"
   | Graph_loggers_sig.Red -> "#f00"
   | Graph_loggers_sig.Green -> "#0f0"
   | Graph_loggers_sig.White -> "#fff"
@@ -268,6 +272,8 @@ let matrix_string_of_options l =
                   | Graph_loggers_sig.White -> i
                   | Graph_loggers_sig.LightSkyBlue -> i*11
                   | Graph_loggers_sig.PaleGreen -> i*13
+                  | Graph_loggers_sig.Grey -> i*17
+                  | Graph_loggers_sig.Yellow -> i*19
                 end
               | Graph_loggers_sig.Position _
               | Graph_loggers_sig.Contextual_help _
@@ -596,11 +602,22 @@ let shape_in_dot shape =
     shape
   with
   | Graph_loggers_sig.Invisible -> "style=\"invis\""
-  | Graph_loggers_sig.Invhouse -> "shape=\"invhouse\""
-  | Graph_loggers_sig.House -> "shape=\"house\""
+  | Graph_loggers_sig.Invhouse -> "shape=invhouse"
+  | Graph_loggers_sig.House -> "shape=house"
   | Graph_loggers_sig.Rect -> "shape=\"box\""
   | Graph_loggers_sig.Ellipse -> "shape=\"ellipse\""
-  | Graph_loggers_sig.Circle -> "shape=\"circle\""
+  | Graph_loggers_sig.Circle -> "shape =circle"
+
+let shape_in_dot_bis shape =
+    match
+      shape
+    with
+    | Graph_loggers_sig.Invisible -> "style=\"invis\""
+    | Graph_loggers_sig.Invhouse -> "shape=invhouse"
+    | Graph_loggers_sig.House -> "shape =house"
+    | Graph_loggers_sig.Rect -> "shape = rectangle"
+    | Graph_loggers_sig.Ellipse -> "shape =ellipse"
+    | Graph_loggers_sig.Circle -> "shape =circle"
 
 let shape_in_html shape =
   match

@@ -19,7 +19,7 @@ type break_hint =
         internal_state_any: string;
         open_binding_state : string;
         close_binding_state : string;
-        missing_binding_state : string; 
+        missing_binding_state : string;
         open_binding_state_mod: string;
         binding_state_mod_symbol: string;
         close_binding_state_mod: string;
@@ -34,6 +34,8 @@ type break_hint =
         rev_arrow : string ;
         bi_arrow : string ;
         uni_arrow_nopoly : string ;
+        rev_arrow_nopoly : string ;
+        bi_arrow_nopoly : string ;
         breakable : bool ;
         open_int_interval_inclusive : string ;
         open_int_interval_exclusive : string ;

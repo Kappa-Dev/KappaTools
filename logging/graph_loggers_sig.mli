@@ -21,7 +21,7 @@ type shape = Invisible | House | Rect | Ellipse | Circle | Invhouse
 type headkind = Normal | Vee | Tee | No_head
 type linestyle = Plain | Dotted | Dashed
 
-type color = Red | Green | White | Blue | Black | LightSkyBlue | PaleGreen | Brown
+type color = Red | Green | White | Blue | Black | LightSkyBlue | PaleGreen | Brown | Yellow | Grey 
 
 type options =
     | Color of color

@@ -223,8 +223,7 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
   [Common_args.static_analysis,2],Expert   ;
   "--site-across-bonds-domain",
   Superarg.Bool t.site_across ,
-  "Enable/disable the analysis of the relation amond the states of sites in
-      connected agents",
+  "Enable/disable the analysis of the relation amond the states of sites in connected agents",
   [Common_args.static_analysis,3],Expert    ;
   "--nonnegative",
   Superarg.Bool t.nonnegative,
@@ -258,8 +257,9 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
 
 let get_option options =
   let title = Version.version_kade_full_name in
-  let () = SuperargTk.parse ~title options FileNames.input in
-  !FileNames.input
+  let input = ref [] in
+  let () = SuperargTk.parse ~title options input in
+  input
 
 let build_kasa_parameters ~called_from t t_common =
   Config.with_views_analysis := !(t.views) ;

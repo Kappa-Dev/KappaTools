@@ -1657,7 +1657,7 @@ let dump_reactants_of_token_vector
 
 let dump_sbml_reaction
     ~propagate_constants
-    print_expr
+    _print_expr
     string_of_var_id
     get_rule
     get_rule_id

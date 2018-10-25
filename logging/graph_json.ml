@@ -55,6 +55,8 @@ let color_to_json color =
   | Graph_loggers_sig.LightSkyBlue -> `String "lightskyblue"
   | Graph_loggers_sig.PaleGreen -> `String "palegreen"
   | Graph_loggers_sig.Brown -> `String "brown"
+  | Graph_loggers_sig.Yellow -> `String "yellow"
+  | Graph_loggers_sig.Grey -> `String "grey"
 
 let directive_to_json option =
   match option
@@ -137,6 +139,8 @@ let direction_of_json = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct direction",x))
 
 let color_of_json = function
+  | `String "grey" -> Graph_loggers_sig.Grey
+  | `String "yellow" -> Graph_loggers_sig.Yellow 
   | `String "red" -> Graph_loggers_sig.Red
   | `String "green" -> Graph_loggers_sig.Green
   | `String "white" -> Graph_loggers_sig.White

@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Oct 14 2018>
+  * Last modification: Time-stamp: <Nov 28 2018>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -35,6 +35,9 @@ val get_short_version: Remanent_parameters_sig.parameters -> string
 val get_full_version: Remanent_parameters_sig.parameters -> string
 val get_launched_when_and_where: Remanent_parameters_sig.parameters -> string
 val get_syntax_version: Remanent_parameters_sig.parameters -> Ast.syntax_version
+
+val get_file: Remanent_parameters_sig.parameters -> string option
+
 val get_do_contact_map: Remanent_parameters_sig.parameters -> bool
 val get_do_scc: Remanent_parameters_sig.parameters -> bool
 val get_do_influence_map: Remanent_parameters_sig.parameters -> bool
@@ -45,12 +48,14 @@ val get_do_site_dependencies: Remanent_parameters_sig.parameters -> bool
 val get_dump_site_dependencies: Remanent_parameters_sig.parameters -> bool
 
 val get_unsafe: Remanent_parameters_sig.parameters -> bool
+val get_dump_error_as_soon_as_they_occur: Remanent_parameters_sig.parameters -> bool
 val get_trace: Remanent_parameters_sig.parameters -> bool
 
 val get_prefix: Remanent_parameters_sig.parameters -> string
 val set_logger: Remanent_parameters_sig.parameters -> Loggers.t -> Remanent_parameters_sig.parameters
 val set_prefix: Remanent_parameters_sig.parameters -> string -> Remanent_parameters_sig.parameters
 val get_link_mode: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.link_mode
+val get_view_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
 val get_influence_map_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
 val get_contact_map_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
 val get_scc_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
@@ -60,7 +65,7 @@ val get_btype_sep_symbol: Remanent_parameters_sig.parameters -> string
 val get_bound_symbol: Remanent_parameters_sig.parameters -> string
 val get_open_binding_state: Remanent_parameters_sig.parameters -> string
 val get_close_binding_state: Remanent_parameters_sig.parameters -> string
-val get_missing_binding_state: Remanent_parameters_sig.parameters -> string 
+val get_missing_binding_state: Remanent_parameters_sig.parameters -> string
 val get_at_symbol: Remanent_parameters_sig.parameters -> string
 val get_link_to_any: Remanent_parameters_sig.parameters -> string
 val get_link_to_some: Remanent_parameters_sig.parameters -> string
@@ -77,7 +82,11 @@ val get_open_internal_state: Remanent_parameters_sig.parameters -> string
 val get_close_internal_state: Remanent_parameters_sig.parameters -> string
 val get_free_symbol: Remanent_parameters_sig.parameters -> string
 val get_uni_arrow_symbol: Remanent_parameters_sig.parameters -> string
+val get_rev_arrow_symbol: Remanent_parameters_sig.parameters -> string
+val get_rev_arrow_no_poly_symbol: Remanent_parameters_sig.parameters -> string
+val get_uni_arrow_no_poly_symbol: Remanent_parameters_sig.parameters -> string
 val get_bi_arrow_symbol: Remanent_parameters_sig.parameters -> string
+val get_bi_arrow_no_poly_symbol: Remanent_parameters_sig.parameters -> string
 val get_open_counter_state: Remanent_parameters_sig.parameters -> string
 val get_open_counterceq: Remanent_parameters_sig.parameters -> string
 val get_open_countercvar: Remanent_parameters_sig.parameters -> string
@@ -100,30 +109,35 @@ val get_counterval_symbol: Remanent_parameters_sig.parameters -> string
 (** influence map *)
 val get_rule_shape: Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
 val get_rule_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
+val get_link_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 val get_variable_shape: Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
 val get_variable_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
+val get_influence_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 val get_wake_up_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 val get_inhibition_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 val get_wake_up_arrow: Remanent_parameters_sig.parameters -> Graph_loggers_sig.headkind
 val get_inhibition_arrow: Remanent_parameters_sig.parameters -> Graph_loggers_sig.headkind
+val get_influence_arrow: Remanent_parameters_sig.parameters -> Graph_loggers_sig.headkind
 val get_prompt_full_var_def: Remanent_parameters_sig.parameters -> bool
 val get_prompt_full_rule_def: Remanent_parameters_sig.parameters -> bool
 val get_make_labels_compatible_with_dot: Remanent_parameters_sig.parameters -> char list Remanent_parameters_sig.CharMap.t
 
 (** contact map *)
 val get_pure_contact: Remanent_parameters_sig.parameters -> bool
-val get_binding_site_color: Remanent_parameters_sig.parameters -> string
-val get_binding_site_shape: Remanent_parameters_sig.parameters -> string
-val get_internal_site_shape: Remanent_parameters_sig.parameters -> string
-val get_internal_site_color: Remanent_parameters_sig.parameters -> string
-val get_counter_site_shape: Remanent_parameters_sig.parameters -> string
-val get_counter_site_color: Remanent_parameters_sig.parameters -> string
+val get_binding_site_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
+val get_binding_site_shape: Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
+val get_internal_site_shape: Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
+val get_internal_site_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
+val get_counter_site_shape: Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
+val get_counter_site_color: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 
-val get_agent_shape_array: Remanent_parameters_sig.parameters -> string option array
+val get_agent_shape_array: Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape option array
 
-val get_agent_color_array: Remanent_parameters_sig.parameters -> string option array
-val get_agent_shape_def: Remanent_parameters_sig.parameters -> string
-val get_agent_color_def: Remanent_parameters_sig.parameters -> string
+val get_agent_color_array: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color option array
+val get_agent_shape_def: Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
+
+val get_agent_color_def: Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
+
 
 (** reachability analysis *)
 val get_dump_reachability_analysis_static: Remanent_parameters_sig.parameters -> bool
@@ -225,3 +239,6 @@ val get_backdoor_nbr_of_rules_with_non_weakly_reversible_transitions: Remanent_p
 val get_backdoor_timing: Remanent_parameters_sig.parameters -> bool
 val get_backdoor_file: Remanent_parameters_sig.parameters -> string
 val get_backdoor_directory: Remanent_parameters_sig.parameters -> string
+
+val get_kasa_state: Remanent_parameters_sig.parameters ->
+  Remanent_state_signature.engine_state

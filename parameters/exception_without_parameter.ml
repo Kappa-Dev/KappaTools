@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 08/03/2010
- * Last modification: Time-stamp: <Nov 28 2016>
+ * Last modification: Time-stamp: <Nov 04 2018>
     * *
     * This library declares exceptions
     *
@@ -24,6 +24,8 @@ type caught_exception =
 exception Uncaught_exception of uncaught_exception
 exception Caught_exception of caught_exception
 
+
+
 let rec exn_to_json =
   function
   | Exit -> `Assoc ["Exit", `Null]
@@ -36,7 +38,8 @@ let rec exn_to_json =
   | Stream.Failure -> `Assoc ["Stream.Failure", `Null]
   | Arg.Help x -> `Assoc ["Arg.Help", JsonUtil.of_string x]
   | Parsing.Parse_error -> `Assoc ["Parsing.Parse_error", `Null]
-  | Scanf.Scan_failure x -> `Assoc ["Scan_failure", JsonUtil.of_string x]
+  | Scanf.Scan_failure x ->
+    `Assoc ["Scan_failure", JsonUtil.of_string x]
   | Lazy.Undefined -> `Assoc ["Lazy.Undefined", `Null]
   | UnixLabels.Unix_error (a,b,c) ->
     `Assoc
@@ -56,16 +59,18 @@ let rec exn_to_json =
       ]
   | Failure x ->  `Assoc ["Failure", JsonUtil.of_string x]
   | Stack_overflow -> `Assoc ["Stack_overflow", `Null]
-  | Caught_exception x  -> `Assoc ["Caught", caught_exception_to_json x]
+  | Caught_exception x  ->
+    `Assoc ["Caught", caught_exception_to_json x]
   | Uncaught_exception x  -> `Assoc ["Uncaught", uncaught_exception_to_json x]
   | _ -> `Assoc ["Unknown", `Null]
 
 and uncaught_exception_to_json uncaught =
-  JsonUtil.of_pair
-    ~lab1:"file_name" ~lab2:"message"
+  JsonUtil.of_triple
+    ~lab1:"file_name" ~lab2:"message" ~lab3:"exn"
     (JsonUtil.of_option JsonUtil.of_string)
     (JsonUtil.of_option JsonUtil.of_string)
-    (uncaught.file_name, uncaught.message)
+    exn_to_json
+    (uncaught.file_name, uncaught.message, uncaught.alarm)
 
 and caught_exception_to_json caught =
   JsonUtil.of_pair
@@ -73,7 +78,6 @@ and caught_exception_to_json caught =
     uncaught_exception_to_json
     (JsonUtil.of_list JsonUtil.of_string)
     (caught.uncaught_exception, caught.calling_stack)
-
 
 let rec exn_of_json (json : Yojson.Basic.json) =
   match
@@ -89,7 +93,9 @@ let rec exn_of_json (json : Yojson.Basic.json) =
   | `Assoc ["Stream.Failure", `Null] -> Stream.Failure
   | `Assoc ["Arg.Help", x] -> Arg.Help (JsonUtil.to_string x)
   | `Assoc ["Parsing.Parse_error", `Null] -> Parsing.Parse_error
-  | `Assoc ["Scan_failure", x] -> Scanf.Scan_failure (JsonUtil.to_string x)
+  | `Assoc ["Scan_failure", x] ->
+    Scanf.Scan_failure
+      (JsonUtil.to_string x)
   | `Assoc ["Lazy.Undefined", `Null] -> Lazy.Undefined
   | `Assoc
       ["UnixLabels.Unix_error", `Assoc l] when List.length l = 3 ->
@@ -104,42 +110,42 @@ let rec exn_of_json (json : Yojson.Basic.json) =
         raise (Yojson.Basic.Util.Type_error
                  (JsonUtil.build_msg "unix labels error",json))
     end
-    | `Assoc
-        ["Unix.Unix_error", `Assoc l] when List.length l = 3 ->
-      begin
-        try
-          Unix.Unix_error
-            (JsonUtil.to_unix_label (List.assoc "fst" l),
-             JsonUtil.to_string (List.assoc "snd" l),
-             JsonUtil.to_string (List.assoc "trd" l))
-        with
-        | _ ->
-          raise (Yojson.Basic.Util.Type_error
-                   (JsonUtil.build_msg "unix error",json))
-      end
-    | `Assoc ["Failure", x] -> Failure (JsonUtil.to_string x)
+  | `Assoc
+      ["Unix.Unix_error", `Assoc l] when List.length l = 3 ->
+    begin
+      try
+        Unix.Unix_error
+          (JsonUtil.to_unix_label (List.assoc "fst" l),
+           JsonUtil.to_string (List.assoc "snd" l),
+           JsonUtil.to_string (List.assoc "trd" l))
+      with
+      | _ ->
+        raise (Yojson.Basic.Util.Type_error
+                 (JsonUtil.build_msg "unix error",json))
+    end
+  | `Assoc ["Failure", x] -> Failure (JsonUtil.to_string x)
   | `Assoc ["Stack_overflow", `Null] -> Stack_overflow
   | `Assoc ["Caught", x] ->  Caught_exception (caught_exception_of_json x)
   | `Assoc ["Uncaught", x] -> Uncaught_exception (uncaught_exception_of_json x)
   | `Assoc ["Unknown", `Null] -> Failure "Unknown"
   | _ ->
     raise (Yojson.Basic.Util.Type_error
-                   (JsonUtil.build_msg "exception",json))
+             (JsonUtil.build_msg "exception",json))
 
 and uncaught_exception_of_json json =
-  let a,b =
-    JsonUtil.to_pair
-    ~lab1:"file_name" ~lab2:"message"
+  let a,b,c =
+    JsonUtil.to_triple
+    ~lab1:"file_name" ~lab2:"message" ~lab3:"exn"
     (JsonUtil.to_option (JsonUtil.to_string ~error_msg:"file_name"))
     (JsonUtil.to_option (JsonUtil.to_string ~error_msg:"message"))
+    exn_of_json
     json
   in
   {
     file_name = a ;
     message = b ;
-    alarm = Exit
+    alarm = c
   }
-
 
 and caught_exception_of_json json =
   let a,b =
@@ -170,7 +176,7 @@ let build_caught_exception file_name message exn stack =
     calling_stack = stack ;
   }
 
-let raise_exception file_name key message exn =
+let raise_exception file_name _key message exn =
   raise
     (Uncaught_exception
       {file_name=file_name;
@@ -264,7 +270,7 @@ and stringlist_of_caught_light x stack =
   "calling_stack: "
   ::(List.fold_left
       (fun sol string -> string::", "::sol)
-      ("; "::(stringlist_of_uncaught x.uncaught_exception ("; "::stack))))
+      ("; "::(stringlist_of_uncaught_light x.uncaught_exception ("; "::stack))))
       x.calling_stack
 
 type method_handler = {

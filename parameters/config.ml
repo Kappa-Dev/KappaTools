@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <May 11 2018>
+  * Last modification: Time-stamp: <Nov 28 2018>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -18,7 +18,6 @@
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
 let date="<2015.01.23"
-let date_commit=Git_commit_info.git_commit_date
 let version = "4.01"
 
 let output_directory = ref "output"
@@ -65,19 +64,19 @@ let do_scc = ref false
 let pure_contact = ref false
 let contact_map_file = ref "contact"
 let contact_map_format = ref "DOT"
-let binding_site_shape = ref "circle"
-let binding_site_color = ref "yellow"
-let internal_site_shape = ref "ellipse"
-let internal_site_color = ref "green"
-let counter_site_shape = ref "house"
-let counter_site_color = ref "grey"
-let agent_shape_array = ref ([||]:string option array)
-let agent_color_array = ref ([||]:string option array)
-let agent_shape_def = ref "rectangle"
-let agent_color_def = ref "blue"
-let link_color = ref "black"
-let influence_color = ref "red"
-let influence_arrow = ref "normal"
+let binding_site_shape = ref Graph_loggers_sig.Circle
+let binding_site_color = ref Graph_loggers_sig.Yellow
+let internal_site_shape = ref Graph_loggers_sig.Ellipse
+let internal_site_color = ref Graph_loggers_sig.Green
+let counter_site_shape = ref Graph_loggers_sig.House
+let counter_site_color = ref Graph_loggers_sig.Grey
+let agent_shape_array = ref ([||]:Graph_loggers_sig.shape option array)
+let agent_color_array = ref ([||]:Graph_loggers_sig.color option array)
+let agent_shape_def = ref Graph_loggers_sig.Rect
+let agent_color_def = ref Graph_loggers_sig.Blue
+let link_color = ref Graph_loggers_sig.Black
+let influence_color = ref Graph_loggers_sig.Red
+let influence_arrow = ref Graph_loggers_sig.Normal
 
 (**flow of information: internal; external flow*)
 let do_ODE_flow_of_information = ref false
@@ -114,7 +113,9 @@ let local_trace_prefix = ref "Agent_trace_"
 let local_trace_format = ref "DOT"
 
 let compute_separating_transitions = ref false
+
 (** accuracy *)
+
 let with_views_analysis = ref true
 let with_site_across_bonds_analysis = ref true
 let with_parallel_bonds_analysis = ref true
@@ -140,8 +141,6 @@ let backdoor_nbr_of_constraints = ref false
 let backdoor_nbr_of_influences = ref false
 let backdoor_nbr_of_rules = ref false
 let backdoor_nbr_of_dead_rules = ref false
-let backdoor_nbr_of_rules = ref false
-let backdoor_nbr_of_non_weakly_reversible_transitions = ref false
 let backdoor_nbr_of_rules_with_non_weakly_reversible_transitions = ref false
 let backdoor_nbr_of_non_weakly_reversible_transitions = ref false
 let backdoor_timing = ref false

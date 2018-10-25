@@ -35,6 +35,8 @@ type symbol_table =
     rev_arrow : string ;
     bi_arrow : string ;
     uni_arrow_nopoly : string ;
+    rev_arrow_nopoly : string ;
+    bi_arrow_nopoly : string ;
     breakable : bool ;
     open_int_interval_inclusive : string ;
     open_int_interval_exclusive : string ;
@@ -98,6 +100,8 @@ let symbol_table_V3 =
     rev_arrow = "<-" ;
     bi_arrow = "<->" ;
     uni_arrow_nopoly = "-!->" ;
+    rev_arrow_nopoly = "<-!-" ;
+    bi_arrow_nopoly = "<-!->" ;
     breakable = true ;
     open_int_interval_inclusive = "[" ;
     open_int_interval_exclusive = "]" ;
@@ -146,7 +150,7 @@ let symbol_table_V4 =
     bound = "";
     open_binding_state = "[";
     close_binding_state = "]";
-    missing_binding_state = ""; 
+    missing_binding_state = "";
     link_to_any = "#";
     link_to_some = "_";
     internal_state_symbol = "";
@@ -174,6 +178,8 @@ let symbol_table_V4 =
     rev_arrow = "<-" ;
     bi_arrow = "<->" ;
     uni_arrow_nopoly = "-!->" ;
+    rev_arrow_nopoly = "<-!-" ;
+    bi_arrow_nopoly = "<-!->" ; 
     breakable = true ;
     open_int_interval_inclusive = "[" ;
     open_int_interval_exclusive = "]" ;

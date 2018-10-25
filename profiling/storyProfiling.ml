@@ -262,7 +262,18 @@ module StoryStats =
            step_kind
          with
          | Dummy -> true
-         | _ -> false
+         | Beginning|Collect_traces|Causal_compression|Weak_compression|Strong_compression|
+           Partial_order_reduction|Siphon_detection|Decompose_initial_state|
+           Agent_ids_disambiguation|Pseudo_inverse_deletion|
+           Remove_events_after_last_observable|Compression|Build_grid|
+           Build_configuration|Transitive_closure|Graph_reduction|Graph_conversion|
+           Cannonic_form_computation|Store_trace|Removing_blacklisted_events|
+           Blacklisting_events|Global_initialization|Domains_initialization|
+           Regular_influences|Side_effects_influences|Merge_influences|
+           KaSim_compilation|KaSa_precompilation|KaSa_lexing|KaSa_linking|
+           LKappa_signature|Iteration _|Story _|Domain_initialization _|Apply_rule _|
+           Initial_state _|Scan_rule_static _|Scan_rule_dynamic _|Influence_map _|
+           Internal_influence_map _ -> false
 
        let add_event parameter error step_kind f log_info =
          if is_dummy step_kind

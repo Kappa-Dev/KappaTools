@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Aug 31 2018>
+   * Last modification: Time-stamp: <Nov 29 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -2679,12 +2679,15 @@ let dot_of_contact_map ?logger parameters error
                       let () =
                         Loggers.fprintf
                           (Remanent_parameters.get_logger parameters_dot)
-                          "   %s.%s [style = filled label = \"%s\" shape =%s color = %s size = \"5\"]"
+                          "   %s.%s [style = filled label = \"%s\" %s color = %s size = \"5\"]"
                           (Ckappa_sig.string_of_agent_name i)
                           (Ckappa_sig.string_of_site_name j)
                           site_name
-                          (Remanent_parameters.get_internal_site_shape parameters_dot)
-                          (Remanent_parameters.get_internal_site_color parameters_dot) in
+                          (Graph_loggers.shape_in_dot_bis
+                             (Remanent_parameters.get_internal_site_shape parameters_dot))
+                          (Graph_loggers.dot_color_encoding
+                             (Remanent_parameters.get_internal_site_color parameters_dot))
+                      in
                       Loggers.print_newline (Remanent_parameters.get_logger parameters_dot)
                     else
                       ()
@@ -2692,12 +2695,14 @@ let dot_of_contact_map ?logger parameters error
                     let () =
                       Loggers.fprintf
                         (Remanent_parameters.get_logger parameters_dot)
-                        "   %s.%s [style = filled label = \"%s\" shape =%s color = %s size = \"5\"]"
+                        "   %s.%s [style = filled label = \"%s\" %s color = %s size = \"5\"]"
                         (Ckappa_sig.string_of_agent_name i)
                         (Ckappa_sig.string_of_site_name j)
                         site_name
-                        (Remanent_parameters.get_binding_site_shape parameters_dot)
-                        (Remanent_parameters.get_binding_site_color parameters_dot)
+                        (Graph_loggers.shape_in_dot_bis
+                           (Remanent_parameters.get_binding_site_shape parameters_dot))
+                        (Graph_loggers.dot_color_encoding
+                           (Remanent_parameters.get_binding_site_color parameters_dot))
                     in
                     let () =
                       Loggers.print_newline
@@ -2707,12 +2712,14 @@ let dot_of_contact_map ?logger parameters error
                     let () =
                       Loggers.fprintf
                         (Remanent_parameters.get_logger parameters_dot)
-                        "   %s.%s [style = filled label = \"%s\" shape =%s color = %s size = \"5\"]"
+                        "   %s.%s [style = filled label = \"%s\" %s color = %s size = \"5\"]"
                         (Ckappa_sig.string_of_agent_name i)
                         (Ckappa_sig.string_of_site_name j)
                         site_name
-                        (Remanent_parameters.get_counter_site_shape parameters_dot)
-                        (Remanent_parameters.get_counter_site_color parameters_dot)
+                        (Graph_loggers.shape_in_dot_bis
+                           (Remanent_parameters.get_counter_site_shape parameters_dot))
+                        (Graph_loggers.dot_color_encoding
+                           (Remanent_parameters.get_counter_site_color parameters_dot))
                     in
                     let () =
                       Loggers.print_newline
@@ -2748,10 +2755,10 @@ let dot_of_contact_map ?logger parameters error
          let () =
            Loggers.fprintf
              (Remanent_parameters.get_logger parameters_dot)
-             "label =  \"%s\";  shape = %s; color = %s"
+             "label =  \"%s\";  %s; color = %s"
              agent_name
-             shape
-             color
+             (Graph_loggers.shape_in_dot_bis shape)
+             (Graph_loggers.dot_color_encoding color)
          in
          let () =
            Loggers.print_newline

@@ -13,6 +13,10 @@
 "cli" : include
 "main" : include
 "agents" : include
+"parameters" : include
+"error_handlers" : include
+"more_datastructures" : include
+"profiling" : include
 "KaSa_rep" : include
 "KaSa_rep/backend" : include
 "KaSa_rep/pipeline" : include

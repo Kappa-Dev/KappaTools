@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Oct 14 2018>
+  * Last modification: Time-stamp: <Nov 28 2018>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -551,7 +551,9 @@ let get_do_we_show_ghost_1 symbol = symbol.Symbol_table.show_ghost
 let get_uni_arrow_symbol_1 symbol = symbol.Symbol_table.uni_arrow
 let get_rev_arrow_symbol_1 symbol = symbol.Symbol_table.rev_arrow
 let get_bi_arrow_symbol_1 symbol = symbol.Symbol_table.bi_arrow
+let get_bi_arrow_no_poly_symbol_1 symbol = symbol.Symbol_table.bi_arrow_nopoly
 let get_uni_arrow_no_poly_symbol_1 symbol = symbol.Symbol_table.uni_arrow_nopoly
+let get_rev_arrow_no_poly_symbol_1 symbol = symbol.Symbol_table.rev_arrow_nopoly
 
 let get_open_int_interval_inclusive_symbol_1 symbol =
   symbol.Symbol_table.open_int_interval_inclusive
@@ -645,7 +647,6 @@ let get_influence_arrow_1     cm = cm.Remanent_parameters_sig.influence_arrow
 (*add reachability*)
 
 let get_dump_reachability_analysis_result_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_result
-let get_dump_reachability_analysis_covering_classes_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_covering_classes
 let get_dump_reachability_analysis_iteration_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_iteration
 let get_dump_reachability_analysis_static_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_static
 let get_dump_reachability_analysis_dynamic_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_dynamic
@@ -672,10 +673,11 @@ let set_compute_separating_transitions_1 r b =
    Remanent_parameters_sig.compute_separating_transitions = b}
 let set_use_macrotransition_in_local_traces_1 r b =
   {r with
-  Remanent_parameters_sig.use_macrotransitions_in_local_traces = b}
+   Remanent_parameters_sig.use_macrotransitions_in_local_traces = b}
+let get_ignore_trivial_losanges_1 r =
+  r.Remanent_parameters_sig.ignore_trivial_losanges
 let get_show_rule_names_in_local_traces_1 r = r.Remanent_parameters_sig.show_rule_names_in_local_traces
 let get_use_macrotransitions_in_local_traces_1 r = r.Remanent_parameters_sig.use_macrotransitions_in_local_traces
-let get_ignore_trivial_losanges_1 r = r.Remanent_parameters_sig.ignore_trivial_losanges
 let get_add_singular_macrostates_1 r = r.Remanent_parameters_sig.add_singular_macrostates
 let get_add_singular_microstates_1 r = r.Remanent_parameters_sig.add_singular_microstates
 let get_local_trace_prefix_1 r = r.Remanent_parameters_sig.trace_prefix
@@ -695,12 +697,12 @@ let get_rate_convention_1 marshalisable =
 let get_empty_hashtbl_size_1 marshalisable =
   marshalisable.Remanent_parameters_sig.empty_hashtbl_size
 
-let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
-let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
-let get_influence_map_1                    marshalisable = marshalisable.Remanent_parameters_sig.influence_map_output
-let get_contact_map_1                      marshalisable = marshalisable.Remanent_parameters_sig.contact_map_output
+let get_symbols_1 marshalisable = marshalisable.Remanent_parameters_sig.symbols
+let get_file_1 marshalisable = marshalisable.Remanent_parameters_sig.file
+let get_influence_map_1 marshalisable = marshalisable.Remanent_parameters_sig.influence_map_output
+let get_contact_map_1 marshalisable = marshalisable.Remanent_parameters_sig.contact_map_output
 (*add reachability*)
-let get_reachability_map_1                      marshalisable = marshalisable.Remanent_parameters_sig.reachability_map_output
+let get_reachability_map_1 marshalisable = marshalisable.Remanent_parameters_sig.reachability_map_output
 let get_reachability_analysis_parameters_1 marshalisable =
   marshalisable.Remanent_parameters_sig.reachability_analysis_parameters
 
@@ -710,7 +712,7 @@ let get_dump_error_as_soon_as_they_occur_1 marshalisable = marshalisable.Remanen
 let get_prefix_1                           marshalisable = marshalisable.Remanent_parameters_sig.prefix
 let get_call_stack_1                       marshalisable = marshalisable.Remanent_parameters_sig.call_stack
 let get_link_mode_1                        marshalisable = marshalisable.Remanent_parameters_sig.link_mode
-let get_kasa_state_1                       marshalisable = marshalisable.Remanent_parameters_sig.kasa_state
+let get_kasa_state_1 marshalisable = marshalisable.Remanent_parameters_sig.kasa_state
 let get_do_contact_map_1                   marshalisable = marshalisable.Remanent_parameters_sig.do_contact_map
 let get_syntax_version_1                   marshalisable =
   marshalisable.Remanent_parameters_sig.syntax_version
@@ -730,7 +732,8 @@ let get_do_reachability_analysis_1        marshalisable =
 let get_influence_map_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.influence_map_accuracy_level
 let get_contact_map_accuracy_level_1      marshalisable = marshalisable.Remanent_parameters_sig.contact_map_accuracy_level
 let get_scc_accuracy_level_1              marshalisable = marshalisable.Remanent_parameters_sig.scc_accuracy_level
-let get_view_accuracy_level_1             marshalisable = marshalisable.Remanent_parameters_sig.view_accuracy_level
+let get_view_accuracy_level_1 marshalisable = marshalisable.Remanent_parameters_sig.view_accuracy_level
+
 let get_launching_date_1                             marshalisable =
   let t = marshalisable.Remanent_parameters_sig.launching_date in
   let gmt = marshalisable.Remanent_parameters_sig.time_shift in
@@ -743,7 +746,10 @@ let get_launching_date_1                             marshalisable =
 let get_short_version_1                              marshalisable =
   marshalisable.Remanent_parameters_sig.version
 let get_full_version_1                               marshalisable =
-  Printf.sprintf "%s (with%s Tk interface)" marshalisable.Remanent_parameters_sig.version (if marshalisable.Remanent_parameters_sig.tk_interface then "" else "out")
+  Printf.sprintf "%s (with%s Tk interface)"
+    marshalisable.Remanent_parameters_sig.version
+    (if marshalisable.Remanent_parameters_sig.tk_interface then "" else "out")
+
 let get_launched_where_1                             marshalisable =
       marshalisable.Remanent_parameters_sig.hostname
 let get_command_line_1                               marshalisable =
@@ -810,8 +816,7 @@ let upgrade_from_reachability_analysis_parameters_field f = compose f get_reacha
 let get_bound_symbol = upgrade_from_symbols_field get_bound_symbol_1
 let get_open_binding_state = upgrade_from_symbols_field get_open_binding_state_1
 let get_close_binding_state = upgrade_from_symbols_field get_close_binding_state_1
-let get_missing_binding_state = upgrade_from_symbols_field
-get_missing_binding_state_1 
+let get_missing_binding_state = upgrade_from_symbols_field get_missing_binding_state_1
 let get_internal_state_symbol = upgrade_from_symbols_field get_internal_state_symbol_1
 let get_open_internal_state = upgrade_from_symbols_field get_open_internal_state_1
 let get_close_internal_state = upgrade_from_symbols_field get_close_internal_state_1
@@ -831,6 +836,8 @@ let get_do_we_show_ghost = upgrade_from_symbols_field get_do_we_show_ghost_1
 let get_uni_arrow_symbol = upgrade_from_symbols_field get_uni_arrow_symbol_1
 let get_rev_arrow_symbol = upgrade_from_symbols_field get_rev_arrow_symbol_1
 let get_bi_arrow_symbol = upgrade_from_symbols_field get_bi_arrow_symbol_1
+let get_bi_arrow_no_poly_symbol =  upgrade_from_symbols_field get_bi_arrow_no_poly_symbol_1
+let get_rev_arrow_no_poly_symbol = upgrade_from_symbols_field get_rev_arrow_no_poly_symbol_1
 let get_uni_arrow_no_poly_symbol = upgrade_from_symbols_field get_uni_arrow_no_poly_symbol_1
 let get_open_int_interval_inclusive_symbol = upgrade_from_symbols_field get_open_int_interval_inclusive_symbol_1
 let get_open_int_interval_exclusive_symbol = upgrade_from_symbols_field get_open_int_interval_exclusive_symbol_1
@@ -911,7 +918,6 @@ let get_influence_arrow = upgrade_from_contact_map_field get_influence_arrow_1
 (*add reachablity*)
 
 let get_dump_reachability_analysis_result = upgrade_from_reachability_map_field get_dump_reachability_analysis_result_1
-let get_dump_reachability_analysis_covering_classes = upgrade_from_reachability_map_field get_dump_reachability_analysis_covering_classes_1
 let get_dump_reachability_analysis_iteration = upgrade_from_reachability_map_field get_dump_reachability_analysis_iteration_1
 let get_dump_reachability_analysis_static = upgrade_from_reachability_map_field get_dump_reachability_analysis_static_1
 let get_dump_reachability_analysis_dynamic = upgrade_from_reachability_map_field get_dump_reachability_analysis_dynamic_1
@@ -947,7 +953,8 @@ let set_use_macrotransitions_in_local_traces r b =
 
 let get_show_rule_names_in_local_traces = upgrade_from_reachability_map_field get_show_rule_names_in_local_traces_1
 let get_use_macrotransitions_in_local_traces = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1
-let get_ignore_local_losanges = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1
+let get_ignore_local_losanges = upgrade_from_reachability_map_field get_ignore_trivial_losanges_1
+
 let get_add_singular_macrostates =
   upgrade_from_reachability_map_field
     get_add_singular_macrostates_1
@@ -1150,6 +1157,8 @@ let get_backdoor_directory =
 let get_profiler parameter = parameter.Remanent_parameters_sig.profiler
 let get_compression_status_logger parameter =
   parameter.Remanent_parameters_sig.compression_status
+
+let get_kasa_state = compose get_kasa_state_1 get_marshalisable
 
 let set_print_efficiency parameter bool =
   {parameter with Remanent_parameters_sig.print_efficiency = bool}

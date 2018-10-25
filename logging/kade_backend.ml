@@ -801,29 +801,6 @@ module Kappa_printer = struct
       (Model.print_token ?env)
       (Model.print_alg ?env)
 
-  let bool_expr ~noCounters ?env ?symbol_table =
-    Alg_expr.print_bool
-      (cc_mix ~noCounters ?env ?symbol_table)
-      (fun f i -> Format.fprintf f "|%a|" (Model.print_token ?env) i)
-      (Model.print_alg ?env)
-
-  let print_expr ~noCounters ?env ?symbol_table f =
-    let aux f = function
-      | Primitives.Str_pexpr (str,_) -> Format.fprintf f "\"%s\"" str
-      | Primitives.Alg_pexpr (alg,_) -> alg_expr ~noCounters ?env ?symbol_table f alg
-    in function
-      | [] -> ()
-      | [ Primitives.Str_pexpr (str,_) ] -> Format.fprintf f "\"%s\"" str
-      | ([ Primitives.Alg_pexpr  _ ] | _::_::_) as e ->
-        Format.fprintf f "(%a)" (Pp.list (fun f -> Format.fprintf f ".") aux) e
-
-  let print_expr_val alg_val f e =
-    let aux f = function
-      | Primitives.Str_pexpr (str,_) -> Format.pp_print_string f str
-      | Primitives.Alg_pexpr (alg,_) ->
-        Nbr.print f (alg_val alg)
-    in Pp.list (fun f -> Format.pp_print_cut f ()) aux f e
-
   let decompiled_rule
       ~noCounters ~full ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) env f r =
     let sigs = Model.signatures env in

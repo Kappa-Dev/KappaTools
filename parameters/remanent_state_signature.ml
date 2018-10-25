@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 12/10/2010
-    * Last modification: Time-stamp: <Jul 02 2016>
+    * Last modification: Time-stamp: <Nov 28 2018>
     * *
     * Signature for the current state of the memory
     *
