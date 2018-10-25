@@ -503,11 +503,9 @@ let fold_over_elt_transformation
 let copy_lkappa_rule rule =
   {rule with
    LKappa.r_mix =
-     List.rev_map Patterns_extra.copy_agent_in_lkappa
-       (List.rev rule.LKappa.r_mix);
+     List.rev_map LKappa.copy_rule_agent (List.rev rule.LKappa.r_mix);
    r_created =
-     List.rev_map Patterns_extra.copy_agent_in_raw_mixture
-       (List.rev rule.LKappa.r_created);
+     List.rev_map Raw_mixture.copy_agent (List.rev rule.LKappa.r_created);
   }
 
 let equiv_class

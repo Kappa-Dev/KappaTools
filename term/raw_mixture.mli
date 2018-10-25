@@ -12,6 +12,8 @@ type agent =
     { a_type: int; a_ports: link array; a_ints: internal array; }
 type t = agent list
 
+val copy_agent : agent -> agent
+
 val print :
   noCounters:bool -> created:bool -> ?sigs:Signature.s ->
   Format.formatter -> t -> unit

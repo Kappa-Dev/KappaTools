@@ -19,6 +19,12 @@ type agent =
 
 type t = agent list
 
+let copy_agent agent = {
+  a_type = agent.a_type;
+  a_ports = Array.copy agent.a_ports;
+  a_ints = Array.copy agent.a_ints;
+}
+
 type incr_t = {
     father : int Mods.DynArray.t;
     rank : (int * (bool * bool)) Mods.DynArray.t;
