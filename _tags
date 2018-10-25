@@ -38,4 +38,4 @@
 
 true : debug, bin_annot, safe_string
 true : package(str), package(bigarray), package(num), package(unix)
-true : package(logs.lwt), package(yojson), package(logs.fmt)
+true : package(logs.lwt), package(yojson), package(logs.fmt), package(re)

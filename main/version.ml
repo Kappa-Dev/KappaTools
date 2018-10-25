@@ -6,7 +6,16 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let version_string = "$Format:%D$"
+let raw_version_string = "$Format:%D$"
+
+let extract_tag_re =
+  Re.compile
+    (Re.seq [ Re.str "tag: "; Re.group (Re.rep (Re.compl [Re.char ',']))])
+
+let version_string =
+  match Re.exec_opt extract_tag_re raw_version_string with
+  | Some gr -> Re.Group.get gr 1
+  | None -> Git_version.t
 
 let version_msg = "Kappa Simulator: "^version_string
 

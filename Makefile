@@ -36,7 +36,7 @@ SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)
 SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness) $(MANGENREP)version.tex
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
-VERSION=generated/version.ml
+VERSION=generated/git_version.ml
 RESOURCE=generated/resource_strings.ml
 GENERATED=$(VERSION) \
 	  $(RESOURCE) \
@@ -82,9 +82,8 @@ generated/mpi_message_j.ml: api/mpi_message.atd generated
 $(RESOURCE): shared/flux.js viz/common.js api/test_message.json
 	./dev/generate-string.sh $^  > $@
 
-$(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
-	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
-	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
+$(VERSION): $(wildcard .git/refs/heads/*) generated
+	./dev/get-git-version.ml > $@
 
 $(MANGENREP)version.tex: $(MANREP)version.tex.skel $(wildcard .git/refs/heads/*) $(MANGENREP)
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
@@ -165,7 +164,7 @@ WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<agents/*> : package(atdgen)" \
-	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp-lwt-unix), package(re)" \
+	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp-lwt-unix)" \
 	$@
 
 %Agent.native %Agent.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
