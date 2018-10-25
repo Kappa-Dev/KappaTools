@@ -14,6 +14,7 @@ type init = (Primitives.alg_expr * rule) list
 
 type compil =
   {
+    debugMode: bool;
     contact_map: Contact_map.t ;
     environment: Model.t ;
     init: init;
@@ -26,8 +27,7 @@ type compil =
     allow_empty_lhs: bool;
   }
 
-let debugMode = false
-
+let debug_mode compil = compil.debugMode
 let do_we_allow_empty_lhs compil = compil.allow_empty_lhs
 
 let to_dotnet compil =
@@ -186,7 +186,8 @@ let do_we_prompt_reactions compil =
 let print_chemical_species ?compil f =
   Format.fprintf f "@[<h>%a@]"
     (Kade_backend.Pattern.print_cc
-       ?full_species:(Some true)
+       ~noCounters:(match compil with None -> false | Some c -> c.debugMode)
+       ~full_species:true
        ?sigs:(Option_util.map Model.signatures (environment_opt compil))
        ?cc_id:None
        ~symbol_table:(symbol_table_opt compil)
@@ -200,13 +201,14 @@ let print_token ?compil fmt k =
 
 let print_canonic_species = print_chemical_species
 
-let nbr_automorphisms_in_chemical_species x =
+let nbr_automorphisms_in_chemical_species ~debugMode x =
   List.length (Pattern.automorphisms ~debugMode x)
 
 let compare_connected_component = Pattern.compare_canonicals
 
 let print_connected_component ?compil =
   Kade_backend.Pattern.print
+    ~noCounters:(match compil with None -> false | Some c -> c.debugMode)
     ?domain:(domain_opt compil)
     ~symbol_table:(symbol_table_opt compil)
     ~with_id:false
@@ -215,7 +217,8 @@ let canonic_form x = x
 
 let connected_components_of_patterns = Array.to_list
 
-let connected_components_of_mixture_sigs sigs cache contact_map_int e =
+let connected_components_of_mixture_sigs
+    ~debugMode sigs cache contact_map_int e =
   let (cache,acc) =
     Pattern_decompiler.patterns_of_mixture
       ~debugMode contact_map_int sigs cache e
@@ -228,7 +231,7 @@ let connected_components_of_mixture compil cache e =
   let sigs = Pattern.Env.signatures (domain compil) in
   let cc_cache, acc =
     Pattern_decompiler.patterns_of_mixture
-      ~debugMode contact_map sigs cc_cache e
+      ~debugMode:compil.debugMode contact_map sigs cc_cache e
   in
   {cache with cc_cache = cc_cache}, acc
 
@@ -246,7 +249,7 @@ let find_all_embeddings compil cc =
   let tr =
     Primitives.fully_specified_pattern_to_positive_transformations cc in
   let env = environment compil in
-  Evaluator.find_all_embeddings ~debugMode env tr
+  Evaluator.find_all_embeddings ~debugMode:compil.debugMode env tr
 
 let add_fully_specified_to_graph ~debugMode sigs graph cc =
   let e,g =
@@ -277,9 +280,10 @@ let add_fully_specified_to_graph ~debugMode sigs graph cc =
   (g,r)
 
 let find_embeddings compil =
-  Pattern.embeddings_to_fully_specified ~debugMode (domain compil)
+  Pattern.embeddings_to_fully_specified
+    ~debugMode:compil.debugMode (domain compil)
 
-let f ren acc (i,_cc) em =
+let f ~debugMode ren acc (i,_cc) em =
   List_util.map_flatten
     (fun m ->
        List_util.map_option
@@ -305,7 +309,8 @@ let f ren acc (i,_cc) em =
 let compose_embeddings_unary_binary compil p emb_list x =
   let mix,ren =
     add_fully_specified_to_graph
-      ~debugMode (Model.signatures compil.environment)
+      ~debugMode:compil.debugMode
+      (Model.signatures compil.environment)
       (Edges.empty ~with_connected_components:false) x in
   let cc_list =
     Tools.array_fold_lefti
@@ -314,19 +319,19 @@ let compose_embeddings_unary_binary compil p emb_list x =
   in
   let matc =
     List.fold_left2
-      (f ren)
+      (f ~debugMode:compil.debugMode ren)
       [Matching.empty]
       cc_list emb_list in
   (matc,mix)
 
-let disjoint_union_sigs  sigs l =
+let disjoint_union_sigs ~debugMode sigs l =
   let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
   let _,em,mix =
     List.fold_left
       (fun (i,em,mix) (_,r,cc) ->
          let i = pred i in
          let (mix',r') =
-           add_fully_specified_to_graph ~debugMode sigs mix cc  in
+           add_fully_specified_to_graph ~debugMode sigs mix cc in
          let r'' = Renaming.compose ~debugMode false r r' in
          (i,
           Option_util.unsome
@@ -340,7 +345,7 @@ let disjoint_union_sigs  sigs l =
 
 let disjoint_union compil l =
   let sigs = Model.signatures (compil.environment) in
-  disjoint_union_sigs sigs l
+  disjoint_union_sigs ~debugMode:compil.debugMode sigs l
 
 type rule_id = int
 
@@ -441,9 +446,10 @@ let print_rule ?compil =
   match compil with
   | None ->
     Kade_backend.Kappa_printer.elementary_rule
-      ?env:None ?symbol_table:None
+      ~noCounters:true ?env:None ?symbol_table:None
   | Some compil ->
     Kade_backend.Kappa_printer.decompiled_rule
+      ~noCounters:compil.debugMode
       ~full:true (environment compil) ~symbol_table:(symbol_table compil)
 
 
@@ -451,6 +457,7 @@ let print_rule_name ?compil f r =
   let env = environment_opt compil in
   let id = r.Primitives.syntactic_rule in
   Kade_backend.Model.print_ast_rule
+    ~noCounters:(match compil with None -> false | Some c -> c.debugMode)
     ?env ~symbol_table:(symbol_table_opt compil) f id
 
 let string_of_var_id ?compil ?init_mode logger r =
@@ -530,7 +537,8 @@ let apply_sigs ~debugMode env rule inj_nodes mix =
   edges''
 
 let apply compil rule inj_nodes mix =
-  apply_sigs ~debugMode compil.environment rule inj_nodes mix
+  apply_sigs
+    ~debugMode:compil.debugMode  compil.environment rule inj_nodes mix
 
 let get_rules compil =
   Model.fold_rules
@@ -556,8 +564,8 @@ let get_obs_titles compil =
     (fun x -> remove_escape_char
         (Format.asprintf "%a"
            (Kade_backend.Kappa_printer.alg_expr
-              ~env
-                ~symbol_table:(symbol_table compil)
+              ~noCounters:compil.debugMode ~env
+              ~symbol_table:(symbol_table compil)
            ) x))
     env
 
@@ -573,7 +581,7 @@ let preprocess cli_args ast =
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
   Cli_init.preprocess ~warning ~debugMode:false cli_args ast
 
-let saturate_domain_with_symmetric_patterns bwd_bisim_info env =
+let saturate_domain_with_symmetric_patterns ~debugMode bwd_bisim_info env =
   let contact_map = Model.contact_map env in
   let preenv' =
     Model.fold_mixture_in_expr
@@ -587,8 +595,7 @@ let saturate_domain_with_symmetric_patterns bwd_bisim_info env =
   Model.new_domain domain env
 
 let get_compil
-    ~dotnet
-    ?bwd_bisim
+    ~debugMode ~dotnet ?bwd_bisim
     ~rule_rate_convention ?reaction_rate_convention
     ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
@@ -598,9 +605,10 @@ let get_compil
   in
   let env = match bwd_bisim with
     | None -> env
-    | Some bsi -> saturate_domain_with_symmetric_patterns bsi env in
-  let compil =
-    {
+    | Some bsi ->
+      saturate_domain_with_symmetric_patterns ~debugMode bsi env in
+  let compil = {
+    debugMode;
     environment = env ;
     contact_map = contact_map ;
     init = init ;
@@ -650,20 +658,20 @@ let mixture_of_init compil c =
   let m = apply compil c emb m in
   m
 
-let mixture_of_init_sigs env c =
-  let _, emb, m = disjoint_union_sigs (Model.signatures env) [] in
+let mixture_of_init_sigs ~debugMode env c =
+  let _, emb, m = disjoint_union_sigs ~debugMode (Model.signatures env) [] in
   let m = apply_sigs ~debugMode env c emb m in
   m
 
-let species_of_initial_state_env env contact_map_int cache list =
+let species_of_initial_state_env ~debugMode env contact_map_int cache list =
   let sigs = Model.signatures env in
   let cache, list =
     List.fold_left
       (fun (cache,list) (_,r) ->
-         let b = mixture_of_init_sigs env r in
+         let b = mixture_of_init_sigs ~debugMode env r in
          let cache', acc =
            connected_components_of_mixture_sigs
-             sigs cache contact_map_int b
+             ~debugMode sigs cache contact_map_int b
          in
          cache', List.rev_append acc list)
       (cache,[]) list
@@ -671,14 +679,13 @@ let species_of_initial_state_env env contact_map_int cache list =
   cache, list
 
 let species_of_initial_state compil cache list =
-  let contact_map = contact_map compil in
   let cc_cache, list =
-    species_of_initial_state_env compil.environment contact_map cache.cc_cache list
-  in
+    species_of_initial_state_env
+      ~debugMode:compil.debugMode compil.environment
+      (contact_map compil) cache.cc_cache list in
   {cache with cc_cache = cc_cache}, list
 
 let nb_tokens compil = Model.nb_tokens (environment compil)
-
 
 let divide_rule_rate_by cache compil rule =
   match compil.rule_rate_convention with

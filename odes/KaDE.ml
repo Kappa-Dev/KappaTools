@@ -160,7 +160,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let abstol= !(ode_args.Ode_args.absolute_tolerance) in
     let () =
       if not cli_args.Run_cli_args.batchmode then
-        Kappa_files.check_not_exists (Loggers.get_ode backend)
+        Kappa_files.check_not_exists (Loggers.get_ode ~mode:backend)
     in
     let command_line =
       Format.asprintf "%a"
@@ -252,7 +252,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         in
         let compil =
           A.get_compil
-            ~dotnet
+            ~debugMode:common_args.Common_args.debug ~dotnet
             ~reaction_rate_convention ~rule_rate_convention
             ~show_reactions ~count ~compute_jacobian
             cli_args preprocessed_ast
@@ -275,9 +275,10 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             let bwd_bisim = A.init_bwd_bisim_info network in
             let () = Format.printf "+ restart compilation to account for ~-equivalent patterns in algebraic expressions... @." in
             let compil =
-              A.get_compil ~dotnet ?bwd_bisim
-                ~reaction_rate_convention ~rule_rate_convention ~show_reactions ~count ~compute_jacobian
-                cli_args preprocessed_ast
+              A.get_compil
+                ~debugMode:common_args.Common_args.debug ~dotnet ?bwd_bisim
+                ~reaction_rate_convention ~rule_rate_convention ~show_reactions
+                ~count ~compute_jacobian cli_args preprocessed_ast
             in
             let network = A.reset compil network in
             let network =
@@ -303,7 +304,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       else
         let compil =
           A.get_compil
-            ~dotnet
+            ~debugMode:common_args.Common_args.debug ~dotnet
             ~reaction_rate_convention ~rule_rate_convention
             ~show_reactions ~count ~compute_jacobian
             cli_args preprocessed_ast

@@ -126,7 +126,8 @@ struct
       symbol_table (print_internal ?sigs ag p) fmt st
 
   let print_cc
-      ?(full_species=false) ?sigs ?cc_id ~with_id ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) f cc =
+      ?(full_species=false) ?sigs ?cc_id ~noCounters ~with_id
+      ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) f cc =
         let print_intf (ag_i, _ as ag) link_ids neigh =
           snd
             (Tools.array_fold_lefti
@@ -165,7 +166,7 @@ struct
                     if match sigs with
                       | None -> false
                       | Some sigs -> Signature.is_counter_agent sigs dst_ty
-                                     && not(!Parameter.debugModeOn) then
+                                     && not noCounters then
                       let counter = Pattern.counter_value_cc cc (dst_a,dst_p) 0 in
                       let () = Format.fprintf f "{=%d}" counter in
                       (* to do: add symbols in symbol table for counters *)
@@ -199,7 +200,7 @@ struct
                  | None -> true
                  | Some sigs ->
                    (not (Signature.is_counter_agent sigs (snd ag_x)))
-                   || (!Parameter.debugModeOn) then
+                   || noCounters then
                  let () =
                    Format.fprintf
                      f "%t@[<h>%a%s"
@@ -222,14 +223,14 @@ struct
 
 
   let print
-      ?domain ~with_id ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
-      f id =
+      ?domain ~noCounters ~with_id
+      ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) f id =
     match domain with
     | None -> Pattern.debug_print_id f id
     | Some env ->
       let cc_id = if with_id then Some id else None in
       print_cc
-        ~sigs:(Pattern.Env.signatures env) ?cc_id ~with_id
+        ~sigs:(Pattern.Env.signatures env) ?cc_id ~noCounters ~with_id
         ~symbol_table
         f (Pattern.Env.content (Pattern.Env.get env id))
 
@@ -261,7 +262,7 @@ module Raw_mixture =
 struct
 
   include Raw_mixture
-  let print_link symbol_table incr_agents f = function
+  let print_link ~noCounters symbol_table incr_agents f = function
     | Raw_mixture.FREE ->
       Utils.print_free_site f symbol_table
     | Raw_mixture.VAL i ->
@@ -269,7 +270,7 @@ struct
         let root = Raw_mixture.find incr_agents i in
         let (counter,(_,is_counter)) = Mods.DynArray.get incr_agents.Raw_mixture.rank root
         in
-        if (is_counter)&&not(!Parameter.debugModeOn) then
+        if is_counter && not noCounters then
           Format.fprintf f "{=%d}" counter
           (* to do: add symbols in symbol table for counters *)
         else
@@ -302,7 +303,7 @@ struct
 
       | None -> Format.pp_print_int f s
 
-  let print_intf with_link ?sigs
+  let print_intf ~noCounters with_link ?sigs
       ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
       incr_agents (ag_ty:int) f (ports,ints) =
     let rec aux empty i =
@@ -312,7 +313,7 @@ struct
             (if empty then Pp.empty else (Utils.print_site_sep symbol_table))
             (aux_pp_si sigs symbol_table ag_ty i) ints.(i)
             (if with_link
-             then print_link symbol_table incr_agents
+             then print_link ~noCounters symbol_table incr_agents
              else (fun _ _ -> ()))
             ports.(i) in
         aux false (succ i) in
@@ -323,13 +324,14 @@ struct
     | Some sigs -> Signature.print_agent sigs f a
     | None -> Format.pp_print_int f a
 
-  let print_agent created link
+  let print_agent ~noCounters created link
       ?sigs ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
       incr_agents f ag =
     Format.fprintf f "%a%s@[<h>%a@]%s%t"
       (aux_pp_ag sigs) ag.Raw_mixture.a_type
       symbol_table.Symbol_table.agent_open
       (print_intf
+         ~noCounters
          link
          ?sigs
          ~symbol_table
@@ -340,7 +342,7 @@ struct
       (fun f -> if created then Format.pp_print_string f "+")
       (* to do: add symbols for agent creation/degradation *)
 
-  let print ~created ?sigs
+  let print ~noCounters ~created ?sigs
       ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
       f mix =
     let incr_agents = Raw_mixture.union_find_counters sigs mix in
@@ -350,15 +352,15 @@ struct
         if match sigs with
           | None -> false
           | Some sigs -> Signature.is_counter_agent sigs h.Raw_mixture.a_type
-                         && not !Parameter.debugModeOn
+                         && not noCounters
         then aux_print some t
         else
           let () =
             if some then
               Utils.print_agent_sep_comma symbol_table f
           in
-          let () = print_agent created true ?sigs ~symbol_table incr_agents f h
-          in
+          let () = print_agent
+              ~noCounters created true ?sigs ~symbol_table incr_agents f h in
           aux_print true t in
     aux_print false mix
 
@@ -437,8 +439,7 @@ struct
 
 
   let print_rule_intf
-      sigs ~show_erased ~ltypes symbol_table
-      ag_ty f (ports,ints,counters,created_counters) =
+      sigs ~show_erased ~ltypes symbol_table ag_ty ?counters f (ports,ints) =
     let rec aux empty i =
       if i < Array.length ports then
         if (match ports.(i) with
@@ -452,19 +453,22 @@ struct
             | LKappa.ANY_FREE | LKappa.LNK_FREE | LKappa.LNK_ANY
             | LKappa.LNK_TYPE _ | LKappa.LNK_SOME -> false
             | LKappa.LNK_VALUE (j,_) ->
-              try
-                let root = Raw_mixture.find counters j in
-                let (c,(eq,is_counter')) =
-                  Mods.DynArray.get counters.Raw_mixture.rank root in
-                if (is_counter')&&not(!Parameter.debugModeOn) then
-                  (* to do: add symbols for counters *)
-                  let () = Format.fprintf f "%t%a{%a%a}"
-                      (if empty then Pp.empty else Pp.space)
-                      (Signature.print_site sigs ag_ty) i
-                      print_counter_test (c-1,eq)
-                      (print_counter_delta created_counters j) switch
-                  in true else false
-              with Invalid_argument _ -> false in
+              match counters with
+              | None -> false
+              | Some (counters,created_counters) ->
+                try
+                  let root = Raw_mixture.find counters j in
+                  let (c,(eq,is_counter')) =
+                    Mods.DynArray.get counters.Raw_mixture.rank root in
+                  if is_counter' then
+                    (* to do: add symbols for counters *)
+                    let () = Format.fprintf f "%t%a{%a%a}"
+                        (if empty then Pp.empty else Pp.space)
+                        (Signature.print_site sigs ag_ty) i
+                        print_counter_test (c-1,eq)
+                        (print_counter_delta created_counters j) switch
+                    in true else false
+                with Invalid_argument _ -> false in
           let () = if not(is_counter) then
               Format.fprintf
                 f "%t%a%a%a"
@@ -479,15 +483,15 @@ struct
 
 
   let print_rule_agent
-      sigs
-      ~ltypes
+      sigs ~ltypes
       ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
-      counters created_counters f ag =
+      ?counters f ag =
     Format.fprintf f "%a%s@[<h>%a@]%s%t"
       (Signature.print_agent sigs) ag.LKappa.ra_type
       symbol_table.Symbol_table.agent_open
-      (print_rule_intf sigs symbol_table ~show_erased:false ~ltypes  ag.LKappa.ra_type)
-      (ag.LKappa.ra_ports,ag.LKappa.ra_ints,counters,created_counters)
+      (print_rule_intf sigs symbol_table ~show_erased:false
+         ~ltypes ag.LKappa.ra_type ?counters)
+      (ag.LKappa.ra_ports,ag.LKappa.ra_ints)
       symbol_table.Symbol_table.agent_close
       (fun f -> if ag.LKappa.ra_erased then Format.pp_print_string f "-")
 
@@ -527,15 +531,18 @@ let union_find_counters sigs mix =
   t
 
 let print_rule_mixture
-    sigs ~ltypes ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
+    ~noCounters sigs ~ltypes ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
     created f mix =
-    let incr_agents = union_find_counters (Some sigs) mix in
-    let created_incr = Raw_mixture.union_find_counters (Some sigs) created in
+  let counters =
+    if noCounters then None
+    else
+      Some (union_find_counters (Some sigs) mix,
+            Raw_mixture.union_find_counters (Some sigs) created) in
     let rec aux_print some = function
       | [] -> ()
       | h::t ->
         if Signature.is_counter_agent sigs h.LKappa.ra_type
-        && not !Parameter.debugModeOn
+        && not noCounters
         then aux_print some t
         else
           let () =
@@ -543,7 +550,7 @@ let print_rule_mixture
               Utils.print_agent_sep_comma symbol_table f
           in
           let () = print_rule_agent sigs ~ltypes ~symbol_table
-              incr_agents created_incr f h in
+              ?counters f h in
           aux_print true t in
     aux_print false mix
 
@@ -659,7 +666,7 @@ let print_agent_rhs ~ltypes sigs symbol_table f ag =
       (print_intf_rhs ~ltypes sigs symbol_table ag.LKappa.ra_type) (ag.LKappa.ra_ports,ag.LKappa.ra_ints)
       symbol_table.Symbol_table.agent_close
 
-let print_rhs ~ltypes sigs symbol_table created f mix =
+let print_rhs ~noCounters ~ltypes sigs symbol_table created f mix =
   let rec aux empty = function
     | [] ->
       Format.fprintf f "%t%a"
@@ -667,7 +674,8 @@ let print_rhs ~ltypes sigs symbol_table created f mix =
          then Pp.empty
          else
            Utils.print_agent_sep_comma symbol_table)
-        (Raw_mixture.print ~created:false ~sigs ~symbol_table) created
+        (Raw_mixture.print ~noCounters ~created:false ~sigs ~symbol_table)
+        created
     | h :: t ->
       if h.LKappa.ra_erased
       then
@@ -691,13 +699,13 @@ let print_rhs ~ltypes sigs symbol_table created f mix =
         aux false t in
   aux true mix
 
-let print_rates sigs symbol_table pr_tok pr_var f r =
+let print_rates ~noCounters sigs ?symbol_table pr_tok pr_var f r =
   let ltypes = false in
   Format.fprintf
     f " @@ %a%t"
     (Alg_expr.print
        (fun f m -> Format.fprintf f "|%a|"
-           (print_rule_mixture sigs ~symbol_table ~ltypes []) m)
+           (print_rule_mixture ~noCounters sigs ?symbol_table ~ltypes []) m)
        pr_tok pr_var) (fst r.LKappa.r_rate)
     (fun f ->
        match r.LKappa.r_un_rate with
@@ -707,18 +715,20 @@ let print_rates sigs symbol_table pr_tok pr_var f r =
            f " {%a%a}"
            (Alg_expr.print
               (fun f m -> Format.fprintf f "|%a|"
-                  (print_rule_mixture sigs ~symbol_table ~ltypes []) m)
+                  (print_rule_mixture ~noCounters sigs ?symbol_table ~ltypes [])
+                  m)
               pr_tok pr_var) ra
            (Pp.option
               (fun f (md,_) ->
                  Format.fprintf f ":%a"
                    (Alg_expr.print
                       (fun f m -> Format.fprintf f "|%a|"
-                          (print_rule_mixture sigs ~symbol_table ~ltypes []) m)
+                          (print_rule_mixture
+                             ~noCounters sigs ?symbol_table ~ltypes []) m)
                       pr_tok pr_var) md)) max_dist)
 
 
-let print_rule ~full sigs
+let print_rule ~noCounters ~full sigs
     ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
     pr_tok pr_var f r =
   Format.fprintf
@@ -726,11 +736,13 @@ let print_rule ~full sigs
     (fun f ->
        if full || r.LKappa.r_editStyle then
          Format.fprintf f "%a%t%a"
-           (print_rule_mixture sigs ~ltypes:false ~symbol_table r.LKappa.r_created) r.LKappa.r_mix
+           (print_rule_mixture
+              ~noCounters sigs ~ltypes:false ~symbol_table r.LKappa.r_created)
+           r.LKappa.r_mix
            (fun f -> if r.LKappa.r_mix <> [] && r.LKappa.r_created <> [] then
                (Utils.print_agent_sep_comma symbol_table)
                  f)
-           (Raw_mixture.print ~created:true ~sigs ~symbol_table)
+           (Raw_mixture.print ~noCounters ~created:true ~sigs ~symbol_table)
            r.LKappa.r_created
        else Format.fprintf f "%a%t%a -> %a"
            (Pp.list (Utils.print_agent_sep_comma symbol_table)
@@ -742,7 +754,9 @@ let print_rule ~full sigs
                 (fun f _ -> Format.pp_print_string f  symbol_table.Symbol_table.ghost_agent)
             else (fun f _ -> Pp.empty f))
            r.LKappa.r_created
-           (print_rhs ~ltypes:false sigs symbol_table r.LKappa.r_created) r.LKappa.r_mix)
+           (print_rhs
+              ~noCounters ~ltypes:false sigs symbol_table r.LKappa.r_created)
+           r.LKappa.r_mix)
     (fun f ->
        match r.LKappa.r_delta_tokens with [] -> ()
                                  | _::_ -> Format.pp_print_string f " | ")
@@ -754,20 +768,18 @@ let print_rule ~full sigs
             (Alg_expr.print
                (fun f m -> Format.fprintf
                    f "|%a|"
-                   (print_rule_mixture sigs ~symbol_table ~ltypes:false []) m)
+                   (print_rule_mixture
+                      ~noCounters sigs ~symbol_table ~ltypes:false []) m)
                pr_tok pr_var) nb
             pr_tok tk))
     r.LKappa.r_delta_tokens
-    (fun f -> if full then print_rates sigs symbol_table pr_tok pr_var f r)
-
-
+    (fun f ->
+       if full then print_rates ~noCounters sigs ~symbol_table pr_tok pr_var f r)
 end
 
 
-module Kappa_printer =
-struct
-
-  let cc_mix ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) =
+module Kappa_printer = struct
+  let cc_mix ~noCounters ?env ?symbol_table =
     let domain = match env with
       | None -> None
       | Some e -> Some (Model.domain e) in
@@ -778,26 +790,27 @@ struct
            (fun f -> Format.fprintf f "*")
            (fun _ f cc ->
               Format.fprintf
-                f "|%a|" (Pattern.print ?domain ~with_id:false ~symbol_table)
+                f "|%a|"
+                (Pattern.print ~noCounters ?domain ~with_id:false ?symbol_table)
                 cc)
            f ccs)
 
-  let alg_expr ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) =
+  let alg_expr ~noCounters ?env ?symbol_table =
     Alg_expr.print
-      (cc_mix ?env ~symbol_table)
+      (cc_mix ~noCounters ?env ?symbol_table)
       (Model.print_token ?env)
       (Model.print_alg ?env)
 
-  let bool_expr ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) =
+  let bool_expr ~noCounters ?env ?symbol_table =
     Alg_expr.print_bool
-      (cc_mix ?env ~symbol_table)
+      (cc_mix ~noCounters ?env ?symbol_table)
       (fun f i -> Format.fprintf f "|%a|" (Model.print_token ?env) i)
       (Model.print_alg ?env)
 
-  let print_expr ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) f =
+  let print_expr ~noCounters ?env ?symbol_table f =
     let aux f = function
       | Primitives.Str_pexpr (str,_) -> Format.fprintf f "\"%s\"" str
-      | Primitives.Alg_pexpr (alg,_) -> alg_expr ?env ~symbol_table f alg
+      | Primitives.Alg_pexpr (alg,_) -> alg_expr ~noCounters ?env ?symbol_table f alg
     in function
       | [] -> ()
       | [ Primitives.Str_pexpr (str,_) ] -> Format.fprintf f "\"%s\"" str
@@ -812,19 +825,21 @@ struct
     in Pp.list (fun f -> Format.pp_print_cut f ()) aux f e
 
   let decompiled_rule
-      ~full ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) env f r =
+      ~noCounters ~full ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4) env f r =
     let sigs = Model.signatures env in
     let (r_mix,r_created) =
       Pattern_compiler.lkappa_of_elementary_rule sigs (Model.domain env) r in
-    let pr_alg f (a,_) = alg_expr ~env ~symbol_table f a in
+    let pr_alg f (a,_) = alg_expr ~noCounters ~env ~symbol_table f a in
     let pr_tok f (va,tok) =
       Format.fprintf f "%a %a" pr_alg va (Model.print_token ~env) tok in
     Format.fprintf f "%a%t%a%t%a%t"
-      (LKappa.print_rule_mixture sigs ~symbol_table ~ltypes:false r_created) r_mix
+      (LKappa.print_rule_mixture
+         ~noCounters sigs ~symbol_table ~ltypes:false r_created) r_mix
       (if r_mix <> [] && r_created <> [] then
          (fun fmt -> Utils.print_agent_sep_dot symbol_table fmt)
        else Pp.empty)
-      (Raw_mixture.print ~created:true ~sigs ~symbol_table) r_created
+      (Raw_mixture.print ~noCounters ~created:true ~sigs ~symbol_table)
+      r_created
 
       (if r.Primitives.delta_tokens <> []
        then (fun f -> Format.fprintf f "|@ ") else Pp.empty)
@@ -839,16 +854,15 @@ struct
                  Format.fprintf
                    f " {%a%a}" pr_alg rate
                    (Pp.option (fun f md ->
-                        Format.fprintf f ":%a" (alg_expr ~env ~symbol_table) md))
+                        Format.fprintf
+                          f ":%a" (alg_expr ~noCounters ~env ~symbol_table) md))
                    dist))
 
-  let elementary_rule
-      ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
-      f r =
+  let elementary_rule ~noCounters ?env ?symbol_table f r =
     let domain,sigs = match env with
       | None -> None,None
       | Some e -> Some (Model.domain e), Some (Model.signatures e) in
-    let pr_alg f (a,_) = alg_expr ?env ~symbol_table f a in
+    let pr_alg f (a,_) = alg_expr ~noCounters ?env ?symbol_table f a in
     let pr_tok f (va,tok) =
       Format.fprintf f "%a %a" pr_alg va (Model.print_token ?env) tok in
     let pr_trans f t = Primitives.Transformation.print ?sigs f t in
@@ -856,7 +870,8 @@ struct
       let () = Format.pp_open_box f 2 in
       let () = Format.pp_print_int f i in
       let () = Format.pp_print_string f ": " in
-      let () = Pattern.print ?domain ~with_id:true ~symbol_table f cc in
+      let () =
+        Pattern.print ~noCounters ?domain ~with_id:true ?symbol_table f cc in
       Format.pp_close_box f ()
     in
     Format.fprintf
@@ -880,7 +895,8 @@ struct
            Format.fprintf
              f " {%a%a}" pr_alg rate
              (Pp.option (fun f md ->
-                  Format.fprintf f ":%a" (alg_expr ?env ~symbol_table) md))
+                  Format.fprintf f ":%a"
+                    (alg_expr ~noCounters ?env ?symbol_table) md))
              dist)
 
 
@@ -888,9 +904,7 @@ struct
 
 module Model =
 struct
-  let print_ast_rule
-      ?env ?symbol_table:(symbol_table=Symbol_table.symbol_table_V4)
-      f i =
+  let print_ast_rule ~noCounters ?env ?symbol_table f i =
     match env with
     | None -> Format.fprintf f "__ast_rule_%i" i
     | Some env ->
@@ -902,7 +916,8 @@ struct
         with
         | (Some (na,_),_) -> Format.pp_print_string f na
         | (None,(r,_)) ->
-        LKappa.print_rule ~full:false sigs ~symbol_table
+          LKappa.print_rule
+            ~noCounters ~full:false sigs ?symbol_table
             (Model.print_token ~env) (Model.print_alg ~env) f r
 
 end

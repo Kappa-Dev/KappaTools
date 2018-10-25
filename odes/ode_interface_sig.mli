@@ -21,6 +21,7 @@ sig
   type init =
     ((connected_component array list,int) Alg_expr.e * rule) list
 
+  val debug_mode: compil -> bool
   val do_we_allow_empty_lhs: compil -> bool
   val to_dotnet: compil -> compil
   val with_dot_and_plus: compil -> compil
@@ -58,7 +59,8 @@ sig
   val do_we_prompt_reactions: compil -> bool
 
   val symbol_table: compil -> Symbol_table.symbol_table
-  val nbr_automorphisms_in_chemical_species: chemical_species -> int
+  val nbr_automorphisms_in_chemical_species:
+    debugMode:bool -> chemical_species -> int
 
   val canonic_form: chemical_species -> canonic_species
 
@@ -156,7 +158,7 @@ sig
   val preprocess: Run_cli_args.t -> ast -> preprocessed_ast
 
   val get_compil:
-    dotnet:bool ->
+    debugMode:bool -> dotnet:bool ->
     ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
     ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->
@@ -184,8 +186,7 @@ sig
     cache * int
 
   val species_of_initial_state_env  :
-    Model.t ->
-    Contact_map.t ->
+    debugMode:bool -> Model.t -> Contact_map.t ->
     Pattern.PreEnv.t ->
     ('b * Primitives.elementary_rule) list ->
     Pattern.PreEnv.t * Pattern.cc list

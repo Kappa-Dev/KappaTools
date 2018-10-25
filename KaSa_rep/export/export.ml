@@ -2137,11 +2137,8 @@ let compute_symmetries
       let cc_cache = Pattern.PreEnv.of_env (Model.domain env) in
       let _cc_cache, chemical_species =
         Ode_interface.species_of_initial_state_env
-          env
-          contact_map_int
-          cc_cache
-          init
-      in
+          ~debugMode:false env contact_map_int
+          cc_cache init in
       let state, contact_map =
         get_contact_map ~accuracy_level state
       in

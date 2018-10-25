@@ -10,13 +10,14 @@ module Pattern:
 sig
   type id = Pattern.id
   val print_cc:
-  ?full_species:bool ->
-  ?sigs:Signature.s -> ?cc_id:Pattern.id -> with_id:bool ->
-  ?symbol_table:Symbol_table.symbol_table ->
-  Format.formatter -> Pattern.cc -> unit
+    ?full_species:bool -> ?sigs:Signature.s -> ?cc_id:Pattern.id ->
+    noCounters:bool -> with_id:bool ->
+    ?symbol_table:Symbol_table.symbol_table ->
+    Format.formatter -> Pattern.cc -> unit
 
   val print:
     ?domain:Pattern.Env.t ->
+    noCounters:bool ->
     with_id:bool ->
     ?symbol_table:Symbol_table.symbol_table ->
     Format.formatter -> Pattern.id -> unit
@@ -25,24 +26,25 @@ end
 module Kappa_printer:
 sig
   val alg_expr:
-    ?env:Model.t ->
+    noCounters:bool -> ?env:Model.t ->
     ?symbol_table:Symbol_table.symbol_table ->
-    Format.formatter ->
-    (Pattern.id array list, int) Alg_expr.e -> unit
+    Format.formatter -> (Pattern.id array list, int) Alg_expr.e -> unit
 
   val decompiled_rule:
-    full:bool ->
+    noCounters:bool -> full:bool ->
     ?symbol_table:Symbol_table.symbol_table ->
     Model.t -> Format.formatter -> Primitives.elementary_rule -> unit
 
   val elementary_rule:
-    ?env:Model.t ->
+    noCounters:bool -> ?env:Model.t ->
     ?symbol_table:Symbol_table.symbol_table ->
     Format.formatter -> Primitives.elementary_rule -> unit
-
   end
 
 module Model:
 sig
-  val print_ast_rule: ?env:Model.t -> ?symbol_table:Symbol_table.symbol_table -> Format.formatter -> int -> unit
+  val print_ast_rule:
+    noCounters:bool -> ?env:Model.t ->
+    ?symbol_table:Symbol_table.symbol_table ->
+    Format.formatter -> int -> unit
 end

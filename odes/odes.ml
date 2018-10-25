@@ -5,8 +5,8 @@
 
 let local_trace = false
 
-let debug s =
-  if local_trace || !Parameter.debugModeOn
+let debug ~debugMode s =
+  if local_trace || debugMode
   then Format.kfprintf (fun f -> Format.pp_print_break f 0 0)
       Format.err_formatter s
   else Format.ifprintf Format.err_formatter s
@@ -40,7 +40,7 @@ struct
           in
           let () = I.print_rule_id a r in
           let () = Format.fprintf a "cc_id: %i \n" cc_id in
-          I.print_connected_component a cc
+          I.print_connected_component ?compil:None a cc
       end)
 
   module StoreMap = Store.Map
@@ -67,7 +67,8 @@ struct
         let compare = compare
         let print log x =
           match x with
-          | Nembed x | Noccurrences x -> I.print_canonic_species log x
+          | Nembed x | Noccurrences x ->
+            I.print_canonic_species ?compil:None log x
           | Token x -> Format.fprintf log "%i" x
           | Dummy -> ()
       end)
@@ -391,12 +392,12 @@ struct
     let network = inc_fresh_ode_var_id network in
     network
 
-  let add_new_canonic_species canonic species network =
+  let add_new_canonic_species ~debugMode canonic species network =
     let () =
       Mods.DynArray.set
         network.species_tab
         (get_fresh_ode_var_id network)
-        (species, I.nbr_automorphisms_in_chemical_species species)
+        (species, I.nbr_automorphisms_in_chemical_species ~debugMode species)
     in
     add_new_var (Nembed canonic) network
 
@@ -447,6 +448,7 @@ struct
     StoreMap.add key new_list store
 
   let translate_canonic_species compil canonic species remanent =
+    let debugMode = I.debug_mode compil in
     let id_opt =
       VarMap.find_option
         (Nembed canonic)
@@ -455,20 +457,20 @@ struct
       id_opt
     with
     | None ->
-      let () = debug "A NEW SPECIES IS DISCOVERED @." in
-      let () = debug "canonic form: %a@."
+      let () = debug ~debugMode "A NEW SPECIES IS DISCOVERED @." in
+      let () = debug ~debugMode "canonic form: %a@."
           (fun x -> I.print_canonic_species ~compil x) canonic in
-      let () = debug "species: %a@.@."
+      let () = debug ~debugMode "species: %a@.@."
           (fun x -> I.print_chemical_species ~compil x) species in
       let to_be_visited, network = remanent in
-      let network, id = add_new_canonic_species canonic species network
-      in
+      let network, id = add_new_canonic_species
+          ~debugMode canonic species network in
       (species::to_be_visited,network), id
     | Some i ->
-      let () = debug "ALREADY SEEN SPECIES @." in
-      let () = debug "canonic form: %a@."
+      let () = debug ~debugMode "ALREADY SEEN SPECIES @." in
+      let () = debug ~debugMode "canonic form: %a@."
           (fun x -> I.print_canonic_species ~compil x) canonic in
-      let () = debug "species: %a@.@."
+      let () = debug ~debugMode "species: %a@.@."
           (fun x -> I.print_chemical_species ~compil x) species in
       remanent,i
 
@@ -710,11 +712,12 @@ struct
 
   let add_reaction ?max_size
       parameters compil enriched_rule embedding_forest mixture remanent =
+    let debugMode = I.debug_mode compil in
     let rule = enriched_rule.rule in
-    let _  = debug "REACTANTS\n" in
+    let _  = debug ~debugMode "REACTANTS\n" in
     let remanent, reactants =
       petrify_mixture parameters compil mixture remanent in
-    let _  = debug "PRODUCT\n" in
+    let _  = debug ~debugMode "PRODUCT\n" in
     let products = I.apply compil rule embedding_forest mixture in
     let list, network = remanent in
     let cache, bool  =
@@ -748,9 +751,8 @@ struct
       remanent
 
   let initial_network ?max_size parameters compil network initial_states rules =
-    let network =
-      {network with has_empty_lhs = Some false}
-    in
+    let network = {network with has_empty_lhs = Some false} in
+    let debugMode = I.debug_mode compil in
     let l,network =
       List.fold_left
         (fun remanent enriched_rule ->
@@ -758,7 +760,7 @@ struct
            | [] ->
              begin
                let _, embed, mixture = I.disjoint_union compil [] in
-               let () = debug "add new reaction" in
+               let () = debug ~debugMode "add new reaction" in
                let l,network = remanent in
                let remanent = l,{network with has_empty_lhs = Some true} in
                add_reaction ?max_size parameters compil enriched_rule embed mixture remanent
@@ -811,6 +813,7 @@ struct
 
   let compute_reactions ?max_size ~smash_reactions parameters compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
+    let debugMode = I.debug_mode compil in
     let n_rules = List.length rules in
     let cache = network.cache in
     let cache, max_coef, rules_rev =
@@ -875,7 +878,7 @@ struct
       | [] -> network
       | new_species::to_be_visited ->
         let network = clean_embed_to_current_species network in
-        let () = debug "@[<v 2>@[test for the new species:@ %a@]"
+        let () = debug ~debugMode "@[<v 2>@[test for the new species:@ %a@]"
             (fun x -> I.print_chemical_species ~compil x) new_species
         in
         (* add in store the embeddings from cc of lhs to
@@ -897,7 +900,7 @@ struct
 
                   (* regular application of tules, we store the
                  embeddings*)
-              let () = debug
+              let () = debug ~debugMode
                   "@[<v 2>test for rule %i at pos %i (Aut:%i)@[%a@]"
                   (rule_id_of enriched_rule) pos
                   enriched_rule.divide_rate_by
@@ -906,11 +909,11 @@ struct
               match arity_of enriched_rule with
               | Rule_modes.Usual | Rule_modes.Unary_refinement ->
                 begin
-                  let () = debug "regular case" in
+                  let () = debug ~debugMode "regular case" in
                   let store_new_embeddings =
                     (*List.fold_left
                       (fun store (cc_id,cc) ->
-                         let () = debug "find embeddings" in
+                         let () = debug ~debugMode "find embeddings" in
                          let lembed =
                            I.find_embeddings compil cc new_species
                          in
@@ -942,12 +945,12 @@ struct
                      species that contain at least one occurence of
                      new_species *)
                   let dump_store store =
-                    if local_trace || !Parameter.debugModeOn
+                    if local_trace || debugMode
                     then
                       StoreMap.iter
                         (fun ((a,ar,dir),id,b) c ->
                            let () =
-                             debug
+                             debug ~debugMode
                                "@[<v 2>* rule:%i %s %s  cc:%i:@[%a@]:" a
                                (match ar with
                                   Rule_modes.Usual -> "@"
@@ -962,16 +965,16 @@ struct
                            in
                            let () =
                              List.iter (fun (_, b) ->
-                                 debug "%a"
+                                 debug ~debugMode "%a"
                                    (fun x -> I.print_chemical_species
                                       ~compil x) b) c
                            in
-                           let () = debug "@]" in
+                           let () = debug ~debugMode "@]" in
                            ()
                         )
                         store
                   in
-                  let () = debug "new embeddings" in
+                  let () = debug ~debugMode "new embeddings" in
                   let () = dump_store store_new_embeddings in
                   let _,new_embedding_list =
                     List.fold_left
@@ -1007,8 +1010,8 @@ struct
                   let to_be_visited, network =
                     List.fold_left
                       (fun remanent list ->
-                         let () = debug "compute one refinement" in
-                         let () = debug "disjoint union @[<v>%a@]"
+                         let () = debug ~debugMode "compute one refinement" in
+                         let () = debug ~debugMode "disjoint union @[<v>%a@]"
                              (Pp.list Pp.space
                                 (fun f (_,_,s) ->
                                    I.print_chemical_species ~compil
@@ -1018,7 +1021,7 @@ struct
                          let _, embed,mixture =
                            I.disjoint_union compil list in
                          let () =
-                           debug "add new reaction"
+                           debug ~debugMode "add new reaction"
                          in
                          add_reaction ?max_size
                            parameters compil enriched_rule embed
@@ -1026,13 +1029,13 @@ struct
                       (to_be_visited,network)
                       new_embedding_list
                   in
-                  let () = debug "@]" in
+                  let () = debug ~debugMode "@]" in
                   store_all_embeddings,to_be_visited,network
                 end
               | Rule_modes.Unary ->
                 begin
                   (* unary application of binary rules *)
-                  let () = debug "unary case" in
+                  let () = debug ~debugMode "unary case" in
                   let network =
                     add_embed_to_current_species
                       cc embed network
@@ -1064,13 +1067,13 @@ struct
                       fold_left_swap
                         (fun embed remanent ->
                            let () =
-                             debug "add new reaction (unary)"
+                             debug ~debugMode "add new reaction (unary)"
                            in
                            let embed =
                              add_reaction ?max_size
                                parameters compil enriched_rule embed mix remanent in
                            let () =
-                                 debug "end new reaction (unary)"
+                                 debug ~debugMode "end new reaction (unary)"
                            in
                            embed
                         )
@@ -1078,7 +1081,7 @@ struct
                         (to_be_visited, network)
                     | None -> (to_be_visited, network)
                   in
-                  let () = debug "@]" in
+                  let () = debug ~debugMode "@]" in
                   store_old_embeddings, to_be_visited, network
                 end)
                 (store_old_embeddings, to_be_visited, network)
@@ -1087,7 +1090,7 @@ struct
             (store, to_be_visited, network)
             all_ccs
         in
-        let () = debug "@]" in
+        let () = debug ~debugMode "@]" in
         aux to_be_visited network store
     in
     let network = aux to_be_visited network store in
@@ -1150,7 +1153,7 @@ struct
             (List.rev reactions) in
         {network with reactions = reactions}
     in
-    let () = debug "@]@." in
+    let () = debug ~debugMode "@]@." in
     network
 
   let convert_tokens compil network =
