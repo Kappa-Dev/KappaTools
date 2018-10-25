@@ -638,7 +638,7 @@ class Render {
         /* render node text */
         gNode.append("text")
             .append("textPath")
-            .attr('alignment-baseline', "middle")
+            .attr('dominant-baseline', "central")
             .attr("xlink:href",  (d,i) => { return "#nodeTextArc_" + i;})
             .attr("startOffset", (d) => {
                 if ( (d.startAngle + d.endAngle + 3 * Math.PI ) / 2 < 2 * Math.PI) {
