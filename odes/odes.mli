@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 15 2017>
+  * Last modification: Time-stamp: <Nov 05 2018>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -21,6 +21,7 @@ sig
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
     ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
+    internal_meaning:Ode_args.count -> 
     compute_jacobian:bool -> Run_cli_args.t -> I.preprocessed_ast -> I.compil
 
   val init: I.compil -> (ode_var_id,Ode_loggers_sig.ode_var_id) network

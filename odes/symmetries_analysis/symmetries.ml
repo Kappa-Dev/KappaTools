@@ -19,14 +19,6 @@
 
 let local_trace = false
 
-
-type contact_map =
-  ((string list) * (string*string) list)
-    Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
-
-type partitioned_contact_map =
-  string Symmetries_sig.site_partition Mods.StringSetMap.Map.t
-
 (*internal states * binding states*)
 type equivalence_classes =
   int Symmetries_sig.site_partition array
@@ -243,17 +235,6 @@ let print_contact_map parameters contact_map =
               in ()) interface) contact_map
 
 (****************************************************************)
-
-let translate_list l agent_interface =
-  List.rev_map
-    (fun equ_class ->
-       List.rev_map
-         (fun site_string ->
-            Signature.num_of_site
-              (Locality.dummy_annot site_string)
-              agent_interface)
-         (List.rev equ_class))
-    (List.rev l)
 
 let translate_to_lkappa_representation env partitioned_contact_map =
   let signature = Model.signatures env in

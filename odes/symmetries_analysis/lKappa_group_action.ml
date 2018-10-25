@@ -23,10 +23,6 @@ let do_print ?trace ?fmt ?(sigs:Signature.s option) f =
   | _, None, _
   | _, _, None  -> ()
 
-let get_binding_precondition x = fst (fst x)
-
-let get_binding_mod x = snd x
-
 let binding_equal ((a_t,_),a_m) ((b_t,_),b_m) =
   a_t = b_t && a_m = b_m
 

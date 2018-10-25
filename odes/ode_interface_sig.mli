@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 23 2017>
+  * Last modification: Time-stamp: <Nov 05 2018>
 *)
 
 module type Interface =
@@ -56,6 +56,7 @@ sig
       Remanent_parameters_sig.rate_convention option
   val what_do_we_count: compil -> Ode_args.count
   val do_we_count_in_embeddings: compil -> bool
+  val internal_meaning_is_nembeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
 
   val symbol_table: compil -> Symbol_table.symbol_table
@@ -139,8 +140,10 @@ sig
     ?compil:compil -> Format.formatter -> rule -> unit
 
   val string_of_var_id:
-    ?compil:compil -> ?init_mode:bool -> Loggers.t -> int -> string
+    ?compil:compil -> ?init_mode:bool -> Loggers.t -> rule_id -> string
 
+  val string_of_var_id_jac:
+      ?compil:compil -> rule_id -> rule_id -> string
   (*  module SyntacticRuleSetMap:SetMap.SetMap*)
 
   val rate:
@@ -153,6 +156,7 @@ sig
   val apply: compil -> rule -> embedding_forest -> mixture -> mixture
 
   val get_preprocessed_ast: Run_cli_args.t -> preprocessed_ast
+  val to_preprocessed_ast: preprocessed_ast -> Cli_init.preprocessed_ast
   val get_ast: Run_cli_args.t -> ast
   val to_ast: ast -> Ast.parsing_compil
   val preprocess: Run_cli_args.t -> ast -> preprocessed_ast
@@ -162,7 +166,7 @@ sig
     ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
     ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->
-    show_reactions:bool -> count:Ode_args.count ->
+    show_reactions:bool -> count:Ode_args.count -> internal_meaning:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> preprocessed_ast -> compil
 
   val get_rules: compil -> rule list

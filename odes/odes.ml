@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 23 2017>
+  * Last modification: Time-stamp: <Nov 05 2018>
 *)
 
 let local_trace = false
@@ -67,8 +67,7 @@ struct
         let compare = compare
         let print log x =
           match x with
-          | Nembed x | Noccurrences x ->
-            I.print_canonic_species ?compil:None log x
+          | Nembed x | Noccurrences x -> I.print_canonic_species log x
           | Token x -> Format.fprintf log "%i" x
           | Dummy -> ()
       end)
@@ -179,7 +178,7 @@ struct
       begin
         (VarSet.fold
            (fun a n ->
-              match a with Noccurrences _ | Nembed _ -> n+1
+              match a with Nembed _ | Noccurrences _ -> n+1
                          | Token _ | Dummy -> n)
            network.ode_variables
            0)
@@ -364,6 +363,21 @@ struct
 
   let to_nembed = lift to_nembed_correct
   let to_nocc = lift to_nocc_correct
+
+  let to_var compil expr auto =
+    if I.internal_meaning_is_nembeddings compil
+    then
+      to_nembed compil expr auto
+    else
+      to_nocc compil expr auto
+
+  let species_to_var compil species =
+    if I.internal_meaning_is_nembeddings compil
+    then
+      Nembed species
+    else
+      Noccurrences species
+
   let from_nembed = lift from_nembed_correct
   let from_nocc = lift from_nocc_correct
 
@@ -392,14 +406,15 @@ struct
     let network = inc_fresh_ode_var_id network in
     network
 
-  let add_new_canonic_species ~debugMode canonic species network =
+  let add_new_canonic_species ~debugMode compil canonic species network =
     let () =
       Mods.DynArray.set
         network.species_tab
         (get_fresh_ode_var_id network)
         (species, I.nbr_automorphisms_in_chemical_species ~debugMode species)
     in
-    add_new_var (Nembed canonic) network
+    let var = species_to_var compil canonic in
+    add_new_var var network
 
   let add_new_token token network =
     let network, id = add_new_var (Token token) network in
@@ -430,11 +445,6 @@ struct
       divide_rate_by = divide_rate_by ;
     }
 
-  let add_embedding key embed store =
-    let old_list =
-      StoreMap.find_default [] key store
-    in
-    StoreMap.add key (embed::old_list) store
 
   let add_embedding_list key lembed store =
     let old_list =
@@ -449,9 +459,10 @@ struct
 
   let translate_canonic_species compil canonic species remanent =
     let debugMode = I.debug_mode compil in
+    let var = species_to_var compil canonic in
     let id_opt =
       VarMap.find_option
-        (Nembed canonic)
+        var
         (snd remanent).id_of_ode_var in
     match
       id_opt
@@ -464,7 +475,7 @@ struct
           (fun x -> I.print_chemical_species ~compil x) species in
       let to_be_visited, network = remanent in
       let network, id = add_new_canonic_species
-          ~debugMode canonic species network in
+          ~debugMode compil canonic species network in
       (species::to_be_visited,network), id
     | Some i ->
       let () = debug ~debugMode "ALREADY SEEN SPECIES @." in
@@ -608,15 +619,15 @@ struct
     | (h,w)::tail ->  aux tail (term network h w)
 
   let nembed_of_connected_component
-      parameters compil network
-      connected_component =
-    match network.sym_reduction with
-    | Symmetries.Ground | Symmetries.Forward _ ->
-      count_in_connected_component_fwd to_nembed
-        compil network connected_component
-    | Symmetries.Backward _ ->
-      count_in_connected_component_bwd to_nembed
-        parameters compil network connected_component
+        parameters compil network
+        connected_component =
+      match network.sym_reduction with
+      | Symmetries.Ground | Symmetries.Forward _ ->
+        count_in_connected_component_fwd to_nembed
+          compil network connected_component
+      | Symmetries.Backward _ ->
+        count_in_connected_component_bwd to_nembed
+                            parameters compil network connected_component
 
   let nocc_of_connected_component
       parameters compil network
@@ -627,7 +638,7 @@ struct
         compil network connected_component
     | Symmetries.Backward _ ->
       count_in_connected_component_bwd to_nocc
-        parameters compil network connected_component
+                            parameters compil network connected_component
 
   let rec convert_alg_expr parameter compil network alg =
     match
@@ -1351,30 +1362,31 @@ struct
       let () = Format.fprintf Format.std_formatter "Circular dependencies\n" in
       assert false
 
-  let convert_one_obs parameters obs network =
-    let a,b = obs in
-    a,convert_alg_expr parameters b network
 
-  let convert_obs parameters compil network =
-    let list_obs = I.get_obs compil in
-    let network =
-      List.fold_left
-        (fun network obs ->
-           let network,expr_obs =
-             convert_alg_expr parameters compil network
-               (Locality.dummy_annot obs)
-           in
-           inc_fresh_obs_id
-             {network with
-              obs = (get_fresh_obs_id network,
-                     expr_obs)
-                    ::network.obs})
-        network
-        list_obs
-    in
-    {network with
-     obs = List.rev network.obs;
-     n_obs = network.n_obs - 1}
+let convert_one_obs parameters obs network =
+  let a,b = obs in
+  a,convert_alg_expr parameters b network
+
+let convert_obs parameters compil network =
+  let list_obs = I.get_obs compil in
+  let network =
+    List.fold_left
+      (fun network obs ->
+         let network,expr_obs =
+           convert_alg_expr parameters compil network
+             (Locality.dummy_annot obs)
+         in
+         inc_fresh_obs_id
+           {network with
+            obs = (get_fresh_obs_id network,
+                   expr_obs)
+                  ::network.obs})
+      network
+      list_obs
+  in
+  {network with
+   obs = List.rev network.obs;
+   n_obs = network.n_obs - 1}
 
 
   let build_time_var network =
@@ -1607,14 +1619,6 @@ struct
       time_homogeneous_rates =
         Some (time_homogeneity_of_rates compil network) }
 
-  let string_of_bool b =
-    if b then "true" else "false"
-
-  let string_of_bool_opt b_opt =
-    match b_opt with
-    | None -> "none"
-    | Some b -> string_of_bool b
-
   let network_from_compil ?max_size ~smash_reactions ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
@@ -1674,7 +1678,7 @@ struct
         | [] -> ()
         | [a] ->
           let species, n = species_of_species_id network a in
-          let expr = to_nembed compil (from_nocc compil expr n) n in
+          let expr = to_var compil (from_nocc compil expr n) n in
           let comment =
             Format.asprintf "%a"
               (fun log  ->
@@ -1699,7 +1703,7 @@ struct
                  snd (species_of_species_id network id)
                in
                let expr =
-                 to_nembed compil
+                 to_var compil
                    (from_nocc compil
                       (Locality.dummy_annot (Alg_expr.ALG_VAR id'))
                       n) n in
@@ -2293,7 +2297,7 @@ struct
         let pos i =
           match Mods.DynArray.get network.ode_vars_tab i
           with
-          | Noccurrences _ | Nembed _ -> true
+          | Nembed _ | Noccurrences _ -> true
           | Token _ | Dummy -> false
         in
         let nodevar = network.fresh_ode_var_id - 1 in
@@ -3070,7 +3074,7 @@ struct
                                   (Mods.DynArray.get network.species_tab k))
                            ) k, None
                   end
-                | Noccurrences _ | Nembed _ ->
+                | Nembed _ | Noccurrences _ ->
                   match Loggers.get_encoding_format logger with
                   | Loggers.SBML ->
                     "s"^(string_of_int k),
@@ -3366,4 +3370,18 @@ let init_bwd_bisim_info network =
   match network.sym_reduction with
   | Symmetries.Backward red -> Some (I.init_bwd_bisim_info red)
   | Symmetries.Forward _ | Symmetries.Ground -> None
+
+let _ = is_step_two
+let _ = Init_decl
+let _ = Var_decl ""
+let _ = Init_value Dummy
+let _ = var_id_of_decl
+let _ = direction_of
+let _ = may_be_time_homogeneous_gen
+let _ = is_known_variable
+let _ = last_fresh_obs_id
+let _ = nembed_of_connected_component
+let _ = translate_token
+let _ = convert_one_obs 
+
 end

@@ -411,7 +411,7 @@ let is_pattern_invariant_full_states_permutation
     cache
 
 let equiv_class_gen
-    ?parameters ?sigs
+    ?parameters
     ~partitions_internal_states
     ~partitions_binding_states
     ~partitions_full_states
@@ -494,7 +494,6 @@ let equiv_class_of_a_species
     species =
   equiv_class_gen
     ?parameters
-    ~sigs
     ~partitions_internal_states
     ~partitions_binding_states
     ~partitions_full_states

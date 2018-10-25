@@ -1,7 +1,13 @@
 module Utils:
 sig
 
-  val  print_agent_sep_plus:
+  val print_binding_type:
+    Symbol_table.symbol_table ->
+    (int -> Format.formatter -> int -> unit) ->
+    (Format.formatter -> int -> unit) ->
+    int -> Format.formatter -> int -> unit
+
+  val print_agent_sep_plus:
     Symbol_table.symbol_table -> Format.formatter -> unit
 
 end

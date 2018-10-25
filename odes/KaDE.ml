@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jan 25 2018>
+  * Last modification: Time-stamp: <Nov 05 2018>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -148,6 +148,20 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         exit 0
       end
     in
+    let internal_meaning =
+      match Tools.lowercase !(ode_args.Ode_args.internal_meaning) with
+      | "embedding" | "embeddings" -> Ode_args.Embeddings
+      | "occurrences" | "occurrence" | "instances" | "instance"->
+        Ode_args.Occurrences
+    | s ->
+      begin
+        (*Arg.usage options usage_msg;*)
+        Format.printf
+          "Wrong option %s.@.Only Embeddings and Occurrences are supported.@."
+          s;
+        exit 0
+      end
+    in
     let show_reactions = !(ode_args.Ode_args.show_reactions) in
     let compute_jacobian = !(ode_args.Ode_args.compute_jacobian) in
     let show_time_advance = !(ode_args.Ode_args.show_time_advance) in
@@ -252,7 +266,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           A.get_compil
             ~debugMode:common_args.Common_args.debug ~dotnet
             ~reaction_rate_convention ~rule_rate_convention
-            ~show_reactions ~count ~compute_jacobian
+            ~show_reactions ~count ~internal_meaning ~compute_jacobian
             cli_args preprocessed_ast
         in
         let network = A.init compil in
@@ -276,7 +290,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
               A.get_compil
                 ~debugMode:common_args.Common_args.debug ~dotnet ?bwd_bisim
                 ~reaction_rate_convention ~rule_rate_convention ~show_reactions
-                ~count ~compute_jacobian cli_args preprocessed_ast
+                ~count ~internal_meaning ~compute_jacobian
+                cli_args preprocessed_ast
             in
             let network = A.reset compil network in
             let network =
@@ -304,7 +319,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           A.get_compil
             ~debugMode:common_args.Common_args.debug ~dotnet
             ~reaction_rate_convention ~rule_rate_convention
-            ~show_reactions ~count ~compute_jacobian
+            ~show_reactions ~count ~internal_meaning ~compute_jacobian
             cli_args preprocessed_ast
         in
         let network = A.init compil in

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 23 2017>
+  * Last modification: Time-stamp: <Nov 05 2018>
 *)
 
 type rule = Primitives.elementary_rule
@@ -22,6 +22,7 @@ type compil =
     reaction_rate_convention: Remanent_parameters_sig.rate_convention option;
     show_reactions: bool ;
     count: Ode_args.count ;
+    internal_meaning : Ode_args.count ;
     compute_jacobian: bool ;
     symbol_table: Symbol_table.symbol_table;
     allow_empty_lhs: bool;
@@ -62,8 +63,21 @@ type cache =
     seen_species: seen_cache;
     correcting_coef: rule_weight;
     n_cc: rule_weight;
-
   }
+
+let get_cc_cache cache = cache.cc_cache
+
+let set_cc_cache cc_cache cache = {cache with cc_cache = cc_cache}
+
+let get_rule_cache cache = cache.rule_cache
+
+let set_rule_cache rule_cache cache =
+  {cache with rule_cache = rule_cache}
+
+let get_sym_cache cache = cache.representative_cache
+
+let set_sym_cache sym_cache cache =
+  {cache with representative_cache = sym_cache}
 
 let hash_rule_weight get set f cache compil rule =
   match get cache rule with
@@ -79,16 +93,17 @@ let get_representative parameters compil cache symmetries species =
     Symmetries.representative
       ~parameters
       ~sigs
-      cache.representative_cache
-      cache.rule_cache
-      cache.cc_cache
+      (get_sym_cache cache)
+      (get_rule_cache cache)
+      (get_cc_cache cache)
       symmetries species
   in
-  {cache with
-   representative_cache = rep_cache;
-   cc_cache = cc_cache ;
-   rule_cache = rule_cache ;
-  }, species
+  let cache =
+    set_rule_cache rule_cache
+      (set_cc_cache cc_cache
+         (set_sym_cache rep_cache cache))
+  in
+  cache, species
 
 let equiv_class_of_pattern parameters compil cache symmetries pattern =
   let env = compil.environment in
@@ -97,32 +112,18 @@ let equiv_class_of_pattern parameters compil cache symmetries pattern =
       ~parameters
       env
       cache.seen_pattern
-      cache.representative_cache
-      cache.rule_cache
-      cache.cc_cache
+      (get_sym_cache cache)
+      (get_rule_cache cache)
+      (get_cc_cache cache)
       symmetries pattern
   in
-  {cache with
-    representative_cache = rep_cache;
-    cc_cache = cc_cache ;
-    rule_cache = rule_cache ;
-    seen_pattern = seen_pattern ;
-  },
+  let cache =
+    set_rule_cache rule_cache
+      (set_cc_cache cc_cache
+         (set_sym_cache rep_cache cache))
+  in
+  {cache with seen_pattern},
   equiv_class
-
-let get_cc_cache cache = cache.cc_cache
-
-let set_cc_cache cc_cache cache = {cache with cc_cache = cc_cache}
-
-let get_rule_cache cache = cache.rule_cache
-
-let set_rule_cache rule_cache cache =
-  {cache with rule_cache = rule_cache}
-
-let get_sym_cache cache = cache.representative_cache
-
-let set_sym_cache sym_cache cache =
-  {cache with representative_cache = sym_cache}
 
 let get_init compil= compil.init
 
@@ -180,6 +181,13 @@ let do_we_count_in_embeddings compil =
   | Ode_args.Occurrences -> false
   | Ode_args.Embeddings -> true
 
+let internal_meaning_is_nembeddings compil =
+    match
+      compil.internal_meaning
+    with
+    | Ode_args.Occurrences -> false
+    | Ode_args.Embeddings -> true
+
 let do_we_prompt_reactions compil =
   compil.show_reactions
 
@@ -226,14 +234,14 @@ let connected_components_of_mixture_sigs
     cache, acc
 
 let connected_components_of_mixture compil cache e =
-  let cc_cache = cache.cc_cache in
+  let cc_cache = get_cc_cache cache in
   let contact_map = contact_map compil in
   let sigs = Pattern.Env.signatures (domain compil) in
   let cc_cache, acc =
     Pattern_decompiler.patterns_of_mixture
       ~debugMode:compil.debugMode contact_map sigs cc_cache e
   in
-  {cache with cc_cache = cc_cache}, acc
+  set_cc_cache cc_cache cache, acc
 
 type embedding = Renaming.t (* the domain is connected *)
 type embedding_forest = Matching.t
@@ -434,7 +442,8 @@ let rate _compil rule (_,arity,_) =
     arity
   with
   | Rule_modes.Usual -> Some rule.Primitives.rate
-  | (Rule_modes.Unary | Rule_modes.Unary_refinement) -> Option_util.map fst rule.Primitives.unary_rate
+  | (Rule_modes.Unary | Rule_modes.Unary_refinement) ->
+    Option_util.map fst rule.Primitives.unary_rate
 
 let token_vector a = a.Primitives.delta_tokens
 
@@ -451,7 +460,6 @@ let print_rule ?compil =
     Kade_backend.Kappa_printer.decompiled_rule
       ~noCounters:compil.debugMode
       ~full:true (environment compil) ~symbol_table:(symbol_table compil)
-
 
 let print_rule_name ?compil f r =
   let env = environment_opt compil in
@@ -597,7 +605,7 @@ let saturate_domain_with_symmetric_patterns ~debugMode bwd_bisim_info env =
 let get_compil
     ~debugMode ~dotnet ?bwd_bisim
     ~rule_rate_convention ?reaction_rate_convention
-    ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
+    ~show_reactions ~count ~internal_meaning ~compute_jacobian cli_args preprocessed_ast =
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
   let (_, env, contact_map, _, _, _, _, init), _ =
     Cli_init.get_compilation_from_preprocessed_ast
@@ -610,12 +618,13 @@ let get_compil
   let compil = {
     debugMode;
     environment = env ;
-    contact_map = contact_map ;
+    contact_map  ;
     init = init ;
     rule_rate_convention = rule_rate_convention ;
     reaction_rate_convention = reaction_rate_convention ;
     show_reactions = show_reactions ;
     count = count ;
+    internal_meaning = internal_meaning ;
     compute_jacobian = compute_jacobian ;
     allow_empty_lhs = true ;
     symbol_table =
@@ -682,8 +691,8 @@ let species_of_initial_state compil cache list =
   let cc_cache, list =
     species_of_initial_state_env
       ~debugMode:compil.debugMode compil.environment
-      (contact_map compil) cache.cc_cache list in
-  {cache with cc_cache = cc_cache}, list
+      (contact_map compil) (get_cc_cache cache) list in
+  set_cc_cache cc_cache cache, list
 
 let nb_tokens compil = Model.nb_tokens (environment compil)
 
@@ -700,10 +709,11 @@ let divide_rule_rate_by cache compil rule =
       Model.get_ast_rule compil.environment rule_id
     in
     let rule_cache, output =
-      LKappa_auto.nauto compil.rule_rate_convention cache.rule_cache
+      LKappa_auto.nauto compil.rule_rate_convention
+        (get_rule_cache cache)
         lkappa_rule
     in
-    {cache with rule_cache = rule_cache}, output
+    set_rule_cache rule_cache cache, output
 
 let divide_rule_rate_by cache compil rule =
   hash_rule_weight
@@ -718,7 +728,7 @@ let divide_rule_rate_by cache compil rule =
     cache compil rule
 
 let detect_symmetries parameters compil cache chemical_species contact_map =
-  let rule_cache = cache.rule_cache in
+  let rule_cache = get_rule_cache cache in
   let rule_cache, symmetries =
     Symmetries.detect_symmetries
       parameters
@@ -729,7 +739,7 @@ let detect_symmetries parameters compil cache chemical_species contact_map =
       (get_rules compil)
       contact_map
   in
-  {cache with rule_cache = rule_cache},
+  set_rule_cache rule_cache cache,
   symmetries
 
 let print_symmetries parameters compil symmetries =

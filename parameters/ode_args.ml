@@ -7,6 +7,7 @@ type t = {
   rule_rate_convention : string ref ;
   reaction_rate_convention : string ref ;
   count : string ref ;
+  internal_meaning : string ref ;
   show_reactions : bool ref ;
   compute_jacobian : bool ref ;
   octave_output : string option ref ;
@@ -39,6 +40,7 @@ let default : t =
     rule_rate_convention = ref "Divide_by_nbr_of_autos_in_lhs" ;
     reaction_rate_convention = ref "Divide_by_nbr_of_autos_in_lhs" ;
     count = ref "Embeddings" ;
+    internal_meaning = ref "Embeddings" ;
     show_reactions = ref true ;
     compute_jacobian = ref true ;
     dotnet_output = ref (Some "network.net") ;
@@ -177,9 +179,27 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
   Superarg.Choice (
     [ "Embeddings","count the number of embeddings of patterns into species";
       "Occurrences","count the number of occurrences of species"],
-    ["embeddings";"EMBEDDINGS";"occurrences";"OCCURRENCES"],t.count),
-    "tune whether we cound in embeddings or in occurrences",
+    ["embeddings";"EMBEDDINGS";"occurrences";"OCCURRENCES"],
+    t.count),
+  "tune whether we count in embeddings or in occurrences",
   [Common_args.semantics,3],Normal;
+  "--internal-meaning",
+  Superarg.Choice (
+      [
+        "Embeddings",
+        "Variables for Kappa species denote numbers of embeddings";
+        "Occurrences",
+        "Variables for Kappa species denote numbers of occurrences"
+      ],
+      [
+        "embeddings";
+        "EMBEDDINGS";
+        "occurrences";
+        "OCCURRENCES"
+        ],
+      t.internal_meaning),
+  "tune the meaning of variable for Kappa species (whether it is the number of embeddings or the number of occurrences)",
+  [Common_args.semantics,4],Hidden;
   "--truncate",
   Superarg.Int_opt t.max_size_for_species,
   "truncate the network by discarding species with size greater than the argument",
@@ -259,7 +279,7 @@ let get_option options =
   let title = Version.version_kade_full_name in
   let input = ref [] in
   let () = SuperargTk.parse ~title options input in
-  input
+  !input
 
 let build_kasa_parameters ~called_from t t_common =
   Config.with_views_analysis := !(t.views) ;
