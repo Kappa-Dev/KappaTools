@@ -1,0 +1,13 @@
+(library
+  (name kappa_symmetries)
+  (libraries kappa_grammar kappa_terms kappa_mixtures kappa_parameters kappa_generic_toolset kappa_logging kappa_runtime kappa_cli)
+  (flags (:standard)
+  -open Kappa_grammar
+  -open Kappa_terms
+  -open Kappa_mixtures
+  -open Kappa_parameters
+  -open Kappa_generic_toolset
+  -open Kappa_logging
+  -open Kappa_cli
+  -open Kappa_runtime 
+))

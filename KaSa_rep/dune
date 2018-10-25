@@ -1,0 +1,33 @@
+(include_subdirs unqualified)
+
+(library
+  (name kappa_staticanalyses)
+  (libraries unix
+      	     kappa_version kappa_generic_toolset kappa_mixtures kappa_terms kappa_runtime kappa_grammar kappa_cli kappa_profiling kappa_logging kappa_errors kappa_kasa_kastor_toolset kappa_symmetries kappa_parameters)
+  (modules (:standard \ KaSa Export_to_KaSim Export_to_Trace_Checker))
+  (flags (:standard -w @a
+  	 -open Kappa_generic_toolset
+     -open Kappa_mixtures
+     -open Kappa_terms
+  	 -open Kappa_runtime
+  	 -open Kappa_grammar
+     -open Kappa_cli
+     -open Kappa_profiling
+     -open Kappa_logging
+     -open Kappa_errors
+     -open Kappa_version
+     -open Kappa_kasa_kastor_toolset
+     -open Kappa_symmetries
+     -open Kappa_parameters)))
+
+
+(executable
+  (name KaSa)
+  (libraries num yojson str kappa_staticanalyses)
+  (modules KaSa)
+  (flags (:standard
+	-open Kappa_logging
+  -open Kappa_profiling
+  -open Kappa_errors
+	-open Kappa_staticanalyses
+  -open Kappa_parameters)))

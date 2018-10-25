@@ -1,0 +1,19 @@
+(library
+  (name kappa_agents)
+  (modules agent_common)
+  (libraries logs.fmt lwt.unix kappa_generic_toolset kappa_parameters)
+  (flags (:standard -w @a
+    -open Kappa_generic_toolset)))
+
+(executable
+  (name KaStor)
+  (modules KaStor)
+  (libraries yojson lwt.unix kappa_cflow kappa_agents)
+  (flags (:standard
+    -open Kappa_generic_toolset
+    -open Kappa_runtime
+    -open Kappa_cli
+    -open Kappa_logging
+    -open Kappa_cflow
+    -open Kappa_agents
+    -open Kappa_parameters)))

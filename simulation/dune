@@ -8,10 +8,6 @@
     -open Kappa_terms)))
 
 (rule
-  (targets git_version.ml)
-  (deps ../dev/get-git-version.ml)
-  (action (with-stdout-to %{targets} (run ocaml unix.cma %{deps}))))
-(rule
   (targets resource_strings.ml)
   (deps ../dev/generate-string.sh ../shared/flux.js ../viz/common.js)
   (action (with-stdout-to %{targets} (run ocaml %{deps}))))
