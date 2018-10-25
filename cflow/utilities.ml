@@ -177,7 +177,7 @@ let transform_trace_gen f log_message debug_message profiling_event =
            match (Loggers.formatter_of_logger
                     (S.PH.B.PB.CI.Po.K.H.get_debugging_channel parameters))
            with
-           | Some fmt -> Debug.tag fmt debug_message
+           | Some fmt -> Format.fprintf fmt debug_message
            | None -> ()
          in
           print_trace parameters kappa_handler trace

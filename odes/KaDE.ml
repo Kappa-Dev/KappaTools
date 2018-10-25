@@ -28,9 +28,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let () =
       match files with
       | [] ->
-      Debug.tag
-        Format.std_formatter
-        ("No input file has been provided.");
+        Format.printf "No input file has been provided.@.";
       exit 0
       | _::_ -> ()
     in
@@ -50,9 +48,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | s ->
         begin
           (*Arg.usage options usage_msg;*)
-          Debug.tag
-            Format.std_formatter
-            ("Wrong option "^s^".\nOnly DOTNET, Matlab, Mathematica, Maple, Octave, and SBML backends are supported.");
+          Format.printf
+            "Wrong option %s.@.Only DOTNET, Matlab, Mathematica, Maple, Octave, and SBML backends are supported.@."
+             s;
           exit 0
         end
     in
@@ -65,9 +63,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     | s ->
       begin
         (*Arg.usage options usage_msg;*)
-        Debug.tag
-          Format.std_formatter
-          ("Wrong option "^s^".\nOnly KaSim and Biochemist are supported.");
+        Format.printf
+          "Wrong option %s.@.Only KaSim and Biochemist are supported.@."
+          s;
         exit 0
       end
     in
@@ -86,9 +84,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     | _,s ->
       begin
         (*Arg.usage options usage_msg;*)
-        Debug.tag
-          Format.std_formatter
-          ("Wrong option "^s^".\nOnly KaSim and Biochemist are supported.");
+        Format.printf
+          "Wrong option %s.@.Only KaSim and Biochemist are supported.@."
+          s;
         exit 0
       end
     in
@@ -144,9 +142,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     | s ->
       begin
         (*Arg.usage options usage_msg;*)
-        Debug.tag
-          Format.std_formatter
-          ("Wrong option "^s^".\nOnly Embeddings and Occurrences are supported.");
+        Format.printf
+          "Wrong option %s.@.Only Embeddings and Occurrences are supported.@."
+          s;
         exit 0
       end
     in

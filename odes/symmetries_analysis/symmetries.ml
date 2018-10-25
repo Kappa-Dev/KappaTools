@@ -968,7 +968,9 @@ let equiv_class ?parameters env array cache rule_cache preenv_cache
         List.fold_left
           (fun equiv_class_map (id,_) ->
              let () =
-               if local_trace || !Parameter.debugModeOn
+               if local_trace || (match parameters with
+                   | None -> false
+                   | Some p -> Remanent_parameters.get_trace p)
                then
                  let _ = Pattern.id_to_yojson id in ()
              in
