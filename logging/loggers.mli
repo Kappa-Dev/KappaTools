@@ -94,3 +94,6 @@ val allocate: t -> string -> unit
 val print_binding_type:
   t -> ?binding_type_symbol:string -> agent_name:string ->
   site_name:string -> unit
+
+val set_ode : mode:encoding -> string -> unit
+val get_ode : mode:encoding -> string

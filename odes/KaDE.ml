@@ -100,7 +100,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       with
       | None -> ()
       | Some s ->
-        Kappa_files.set_ode
+        Loggers.set_ode
           ~mode:Loggers.Matlab
           s
     in
@@ -110,7 +110,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       with
       | None -> ()
       | Some s ->
-        Kappa_files.set_ode
+        Loggers.set_ode
           ~mode:Loggers.Octave
           s
     in
@@ -121,7 +121,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       with
       | None -> ()
       | Some s ->
-        Kappa_files.set_ode
+        Loggers.set_ode
           ~mode:Loggers.SBML
           s
     in
@@ -132,7 +132,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       with
       | None -> ()
       | Some s ->
-        Kappa_files.set_ode
+        Loggers.set_ode
           ~mode:Loggers.DOTNET
           s
     in
@@ -159,9 +159,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let reltol = !(ode_args.Ode_args.relative_tolerance) in
     let abstol= !(ode_args.Ode_args.absolute_tolerance) in
     let () =
-      Kappa_files.setCheckFileExistsODE
-        ~batchmode:cli_args.Run_cli_args.batchmode
-        ~mode:backend
+      if not cli_args.Run_cli_args.batchmode then
+        Kappa_files.check_not_exists (Loggers.get_ode backend)
     in
     let command_line =
       Format.asprintf "%a"
@@ -321,7 +320,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     (*************************************************************)
     let out_channel =
-      Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
+      Kappa_files.open_out (Loggers.get_ode ~mode:backend)
     in
     let logger = Loggers.open_logger_from_channel ~mode:backend
         out_channel

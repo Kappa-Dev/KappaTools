@@ -138,9 +138,8 @@ let get_pack_from_marshalizedfile
   with
   | ExceptionDefn.Malformed_Decl _ as e -> raise e
   | _exn ->
-    Debug.tag
-      Format.std_formatter
-      "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
+    Format.printf
+      "Simulation package seems to have been created with a different version of KaSim, aborting...";
     exit 1
 
 let get_compilation_from_pack ~warning kasim_args cli_args pack =

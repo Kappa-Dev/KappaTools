@@ -14,13 +14,10 @@ val open_out_fresh : string -> string -> string -> out_channel
 
 val path : string -> string
 val mk_dir_r : string -> unit
+val check_not_exists : string -> unit
 val setCheckFileExists : batchmode:bool -> string -> unit
-val setCheckFileExistsODE : batchmode:bool -> mode:Loggers.encoding -> unit
 val set_dir : string -> unit
 val get_dir : unit -> string
-
-val set_ode : mode:Loggers.encoding -> string -> unit
-val get_ode : mode:Loggers.encoding -> string
 
 val set_marshalized : string -> unit
 val with_marshalized : (out_channel -> unit) -> unit

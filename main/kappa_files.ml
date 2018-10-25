@@ -12,34 +12,6 @@ let cflowFileName = ref "cflow.dot"
 let branch_and_cut_engine_profilingName = ref "compression_status.txt"
 let tasks_profilingName = ref "profiling.html"
 let fluxFileName = ref ""
-let odeFileName  =
-  begin
-    List.fold_left
-      (fun map (key,value) ->
-         Loggers.FormatMap.add key (ref value) map)
-      Loggers.FormatMap.empty
-      [
-        Loggers.Octave, "ode.m";
-        Loggers.Matlab, "ode.m";
-        Loggers.DOTNET, "network.net";
-        Loggers.SBML, "network.xml";
-        Loggers.Maple, "ode.mws";
-        Loggers.Mathematica, "ode.nb" ;
-      ]
-  end
-
-let get_odeFileName backend =
-  try
-    Loggers.FormatMap.find backend odeFileName
-  with
-    Not_found ->
-    let output = ref "" in
-    let _ = Loggers.FormatMap.add backend output odeFileName in
-    output
-
-let set_odeFileName backend name =
-  let reference = get_odeFileName backend in
-  reference:=name
 
 let mk_dir_r d =
   let rec aux d =
@@ -89,10 +61,6 @@ let set name ext_opt =
 
 let setOutputName () =
   set fluxFileName (Some "dot") ;
-  set (get_odeFileName Loggers.Octave) (Some "m") ;
-  set (get_odeFileName Loggers.Matlab) (Some "m") ;
-  set (get_odeFileName Loggers.SBML) (Some "xml") ;
-  set (get_odeFileName Loggers.DOTNET) (Some "net") ;
   set marshalizedOutFile None
 
 let check_not_exists = function
@@ -116,10 +84,6 @@ let setCheckFileExists ~batchmode outputFile =
     let () = check_not_exists !marshalizedOutFile in
     check_not_exists outputFile
 
-let setCheckFileExistsODE ~batchmode ~mode =
-  let () = setOutputName () in
-  if not batchmode then check_not_exists !(get_odeFileName mode)
-
 let with_channel str f =
   if str <> ""  then
     let desc = open_out str in
@@ -142,11 +106,6 @@ let set_dir s =
   outputDirName := s
 
 let get_dir () = !outputDirName
-
-let set_ode ~mode f =
-  set_odeFileName mode f
-let get_ode ~mode =
-  !(get_odeFileName mode)
 
 let set_marshalized f = marshalizedOutFile := f
 let with_marshalized f =

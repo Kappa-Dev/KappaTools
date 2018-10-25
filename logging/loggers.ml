@@ -643,3 +643,35 @@ let print_binding_type
   fprintf t
     "%s"
     (Public_data.string_of_binding_type ~binding_type_symbol ~agent_name ~site_name)
+
+let odeFileName  =
+  begin
+    List.fold_left
+      (fun map (key,value) ->
+         FormatMap.add key (ref value) map)
+      FormatMap.empty
+      [
+        Octave, "ode.m";
+        Matlab, "ode.m";
+        DOTNET, "network.net";
+        SBML, "network.xml";
+        Maple, "ode.mws";
+        Mathematica, "ode.nb" ;
+      ]
+  end
+
+let get_odeFileName backend =
+  try
+    FormatMap.find backend odeFileName
+  with
+    Not_found ->
+    let output = ref "" in
+    let _ = FormatMap.add backend output odeFileName in
+    output
+
+let set_odeFileName backend name =
+  let reference = get_odeFileName backend in
+  reference:=name
+
+let set_ode ~mode f = set_odeFileName mode f
+let get_ode ~mode = !(get_odeFileName mode)
