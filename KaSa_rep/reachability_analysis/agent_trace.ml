@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Aug 17 2018>
+  * Last modification: Time-stamp: <Nov 05 2018>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1733,7 +1733,7 @@ let agent_trace
                       transition_system.subframe
                       edges
                   in
-                  let graph =
+                  let error, graph =
                     Graphs.create
                       parameters
                       error

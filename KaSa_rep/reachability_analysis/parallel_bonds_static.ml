@@ -180,7 +180,7 @@ let project_away_ag_id_gen f parameters error big_store acc =
          acc)
     big_store (error, acc)
 
-let project_away_ag_id parameters kappa_handler error big_store acc =
+let project_away_ag_id parameters _kappa_handler error big_store acc =
   let f parameters error tuple value acc =
     Parallel_bonds_type.add_value
       parameters error

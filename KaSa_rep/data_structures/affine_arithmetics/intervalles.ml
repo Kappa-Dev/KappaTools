@@ -1,10 +1,5 @@
 open Fraction;;
-open Hashtbl;;
 open Header;;
-open Working_list_imperative;;
-
-
-
 
 type intervalle = {inf:ffraction;sup:ffraction} ;;
 

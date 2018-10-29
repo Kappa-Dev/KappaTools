@@ -1,6 +1,4 @@
 (* header pour le Pi_Calcul   *)
-open Hashtbl;;
-
 let hashnumber=29000;;
 
 

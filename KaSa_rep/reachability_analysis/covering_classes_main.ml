@@ -138,7 +138,7 @@ let collect_covering_classes_regular parameters error kappa_handler views diff_r
       ) views diff_reverse store_result
   in error, store_result
 
-let collect_covering_classes_side_effects parameters error kappa_handler  remove store_result =
+let collect_covering_classes_side_effects parameters error _kappa_handler remove store_result =
   List.fold_left
     (fun (error, store_result) (_,agent,list) ->
        let declared =

@@ -3,7 +3,6 @@ open Intervalles
 open Matrices
 open Intertab
 open Occu1
-open Tools
 
 module type Mat_inter =
 sig
@@ -126,7 +125,7 @@ module Mat_inter =
       type var = Occu1.trans
       let addzero=true
 
-      let n_ligne p = M.n_ligne p.mat
+      let _n_ligne p = M.n_ligne p.mat
 
       let compt_of_var_list parameters error l
         =
@@ -1011,8 +1010,8 @@ module Mat_inter =
 		    i = (I.make n)}
       let f_un = {num=1;den=1}
       let f_zero = {num=0;den=1}
-      let un ={inf = Frac f_un;sup=Frac f_un}
-      let zero = {inf = Frac f_zero;sup=Frac f_zero}
+      let _un ={inf = Frac f_un;sup=Frac f_un}
+      let _zero = {inf = Frac f_zero;sup=Frac f_zero}
       let list_var parameters p =
         let rep =
           Working_list_imperative.make (Remanent_parameters.get_empty_hashtbl_size parameters)
@@ -1138,7 +1137,7 @@ let guard parameters error p l  =
      let error = M.push parameters error (m.mat) x f in
      error, m
 
-   let translate parameters error m l =
+   let _translate parameters error m l =
      List.fold_left
        (fun (error, m) (x,i) ->
           push parameters error m x {num=i;den=1})

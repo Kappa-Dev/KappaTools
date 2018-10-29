@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Sep 27 2018>
+  * Last modification: Time-stamp: <Nov 05 2018>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -196,7 +196,7 @@ type compil =
   {
     variables : enriched_variable Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t ;
     (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
-    signatures : (agent_sig (** position*)) Int_storage.Nearly_inf_Imperatif.t;
+    signatures : (agent_sig (*position*)) Int_storage.Nearly_inf_Imperatif.t;
     (*agent signature declaration*)
     counter_default: Ckappa_sig.c_state option Ckappa_sig.AgentSite_map_and_set.Map.t ;
     rules : enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
@@ -254,7 +254,7 @@ let dummy_init parameters error =
 
 let state_equal a b = compare a b = 0
 
-let port_equal port1 port2 =
+let _port_equal port1 port2 =
   port1.site_name = port2.site_name
   && port1.site_free = port2.site_free
   && state_equal port1.site_state port2.site_state
@@ -283,7 +283,7 @@ let join_port parameters error a b =
   else
     Exception.warn parameters error __POS__ Exit a
 
-let join_interface parameters error interface1 interface2 =
+let _join_interface parameters error interface1 interface2 =
   Ckappa_sig.Site_map_and_set.Map.fold2
     parameters error
     Ckappa_sig.Site_map_and_set.Map.add
@@ -482,13 +482,6 @@ let map_agent f ag =
              site_state    = f port.site_state
            })
         ag.agent_interface
-    end
-
-let upgrade_some_interface ag =
-  upgrade_interface ag
-    begin
-      Ckappa_sig.Site_map_and_set.Map.map
-        (fun x -> Some x) ag.agent_interface
     end
 
 let build_address k agent site =
@@ -711,22 +704,6 @@ let get_state_port_interval parameters error site agent_interface =
     Exception.warn parameters error __POS__ Exit
       (empty_port site)
   | error, Some value -> error, value
-
-let max_state_index a b =
-  if Ckappa_sig.compare_state_index a b <= 0
-  then b else a
-
-let min_state_index a b =
-    if Ckappa_sig.compare_state_index a b <= 0
-    then a else b
-
-let min_state_index_option_min a b =
-  if Ckappa_sig.compare_state_index_option_min a b <= 0
-  then a else b
-
-let max_state_index_option_max a b =
-    if Ckappa_sig.compare_state_index_option_max a b <= 0
-    then b else a
 
 let max_state_index_option_min a b =
   if Ckappa_sig.compare_state_index_option_min a b <= 0

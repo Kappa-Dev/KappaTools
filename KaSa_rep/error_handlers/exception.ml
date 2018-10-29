@@ -109,7 +109,7 @@ let wrap =
   (fun parameters error string string_opt exn ->
      fst (warn_aux parameters error (Some string) string_opt exn (fun  () -> ())))
 
-let lift_error_logs_for_KaSa f =
+let _lift_error_logs_for_KaSa f =
   f
     (fun parameters error string string_opt exn ->
        fst (warn_aux parameters error (Some string)

@@ -8,7 +8,7 @@ let plus x y =
 let min a b = 
   match a,b with 
       Bounded(x),Bounded(y) -> (if x<y then a else b)
-    | Bounded(x),Infinity ->  a
+    | Bounded _,Infinity ->  a
     | _ -> b
 
 let minl l1 = 

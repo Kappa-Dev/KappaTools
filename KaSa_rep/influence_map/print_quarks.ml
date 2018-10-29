@@ -15,12 +15,12 @@
 let trace = false
 let local_trace = false
 
-let string_of_int_option_min parameters error a =
+let string_of_int_option_min parameters _error a =
   match a with
   | Some a -> string_of_int a
   | None -> Remanent_parameters.get_minus_infinity_symbol parameters
 
-let string_of_int_option_max parameters error a  =
+let string_of_int_option_max parameters _error a  =
   match a with
   | Some a -> string_of_int a
   | None -> Remanent_parameters.get_plus_infinity_symbol parameters

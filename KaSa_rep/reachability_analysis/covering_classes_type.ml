@@ -14,6 +14,8 @@
 
 let local_trace = false
 
+let _ = local_trace
+
 type covering_classes =
   {
     store_modified_map : Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t

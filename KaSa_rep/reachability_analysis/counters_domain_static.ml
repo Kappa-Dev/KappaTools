@@ -524,12 +524,12 @@ let collect_updates parameters handler error ag_id agl diff_agr backward restric
       agent_restriction
   in
   let add_non_invertible_action
-      parameter error handler
+      parameter error _handler
       agent_type site agent_restriction state
       action =
     fold_counter_dep
       parameter error backward
-      (fun parameters error agent_type counter site agent_restriction
+      (fun parameters error _agent_type counter site agent_restriction
         ->
         let action = Occu1.Bool (site, state), action in
           add_non_invertible_action_in_agent_description
@@ -640,7 +640,7 @@ let collect_updates parameters handler error ag_id agl diff_agr backward restric
                 in
                 fold_counter_dep
                   parameters error backward
-                  (fun parameters error agent_type counter site agent_restriction
+                  (fun parameters error _agent_type counter site agent_restriction
                     ->
                     let action = Occu1.Site site, Ckappa_sig.int_of_state_index ar in
                       add_non_invertible_action_in_agent_description

@@ -1,5 +1,4 @@
-open Hashtbl;;
-open Queue;;
+open Queue
 
 type 'a working_list =
   {indice:int;
@@ -58,7 +57,7 @@ let rec make n =
      copy=copy };;
 
 
-let wmap parameters error f l =
+let _wmap parameters _error f l =
   let rep =
     make (Remanent_parameters.get_empty_hashtbl_size parameters)
   in

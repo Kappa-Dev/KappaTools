@@ -67,6 +67,7 @@ let create parameters error node_of_node_label node_list edge_list =
       (error, edges)
       edge_list
   in
+  error,
   {
     node_labels = nodes ;
     edges =  edges ;
@@ -142,7 +143,7 @@ let compute_scc
     | Some low, Some pre, Some on_stack ->
       error, low, pre, on_stack
     | None, _, _| _, None, _| _, _, None ->
-      let error, max_node =
+      let error, _max_node =
         Fixed_size_array.fold
           parameters error
           (fun _parameter error i _ j -> error, max (int_of_node i) j)
@@ -244,7 +245,7 @@ let compute_scc
     else
       error, (pre, low, counter, on_stack, scc_list, stack)
   in
-  let error, (pre, low, counter, on_stack, scc_list, stack) =
+  let error, (pre, low, _counter, on_stack, scc_list, _stack) =
     Fixed_size_array.fold
       parameters error
       (fun parameters error  v _ ( pre, low, counter, on_stack, scc_list, stack) ->
@@ -317,7 +318,7 @@ let detect_bridges
                 match
                   Fixed_size_array.get parameters error ni graph.node_labels
               with
-              | erro, None ->
+              | error, None ->
                 Exception.warn parameters error __POS__ Exit bridges
               | error, Some nstringi ->
                 begin

@@ -14,6 +14,8 @@
 
 let trace = false
 
+let _ = trace
+
 type token =
   | Range of Ckappa_sig.c_site_name * Ckappa_sig.c_state list
   | Equiv of (Ckappa_sig.c_site_name * Ckappa_sig.c_state) * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)

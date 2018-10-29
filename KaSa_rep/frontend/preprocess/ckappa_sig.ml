@@ -16,6 +16,8 @@ module Int_Set_and_Map = Map_wrapper.Make(Mods.IntSetMap)
 
 let local_trace = true
 
+let _ = local_trace
+
 type position       = Locality.t
 type agent_name     = string
 type site_name      = string
@@ -180,9 +182,8 @@ let string_of_agent_name (a: c_agent_name) : string = string_of_int a
 let int_of_agent_name (a: c_agent_name) : int = a
 let agent_name_of_int (a: int) : c_agent_name = a
 
-let int_of_lnk_value (a: c_link_value) : int = a
+let _int_of_lnk_value (a: c_link_value) : int = a
 let lnk_value_of_int (a: int) : c_link_value = a
-let dummy_lnk_value: c_link_value  = 0
 let next_lnk_value (i: c_link_value) : c_link_value = i+1
 
 let site_name_of_int (a: int) : c_site_name = a
@@ -426,7 +427,7 @@ let rev_interface_of_list x =
   in
   aux x EMPTY_INTF
 
-let list_of_interface x = List.rev (rev_list_of_interface x)
+let _list_of_interface x = List.rev (rev_list_of_interface x)
 
 let join_interface parameters error interface1 interface2 =
   let rec collect interface map_ports map_counters =

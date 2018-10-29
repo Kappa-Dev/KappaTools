@@ -123,4 +123,22 @@ sig
     Cckappa_sig.kappa_handler ->
     t list -> Exception.method_handler
 
+
+  val has_a_counter:
+    Remanent_parameters_sig.parameters ->
+    Exception_without_parameter.method_handler ->
+    Cckappa_sig.kappa_handler ->
+    Ckappa_sig.c_agent_name ->
+    Ckappa_sig.c_site_name ->
+    Exception_without_parameter.method_handler * bool
+
+  val has_a_binding_state:
+    Remanent_parameters_sig.parameters ->
+    Exception_without_parameter.method_handler ->
+    Cckappa_sig.kappa_handler ->
+    Ckappa_sig.c_agent_name ->
+    Ckappa_sig.c_site_name ->
+    Exception_without_parameter.method_handler * bool
+
+
 end

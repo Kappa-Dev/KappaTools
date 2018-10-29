@@ -1,6 +1,4 @@
-open Hashtbl
 open List
-open Working_list_imperative
 
 let trace = ref false
 
@@ -131,8 +129,8 @@ let produit_predicat  p i j =
 let union_list p liste1 liste2 =
     let rec aux liste1 liste2 sol =
         match liste1,liste2 with a::b,t::q when a=t -> aux b q (t::sol)
-                       | a::b,t::q when (p a t)-> aux b liste2 (a::sol)
-                       | a::b,t::q -> aux liste1 q (t::sol)
+                       | a::b,t::_q when (p a t)-> aux b liste2 (a::sol)
+                       | _a::_b,t::q -> aux liste1 q (t::sol)
                        | a::b,[]   -> aux b [] (a::sol)
                        | [],a::b   -> aux b [] (a::sol)
                        | [],[]     -> (rev sol)
@@ -209,7 +207,7 @@ let insert_sort p l k =
     let rec aux l rep =
       match l with
       | t::q when (p t k) -> aux q (t::rep)
-      |  t::q when t=k -> concat (List.rev rep) l
+      |  t::_q when t=k -> concat (List.rev rep) l
       |   _           -> concat (List.rev rep) (k::l)
     in aux l []
 
@@ -217,9 +215,9 @@ let insert_sort p l k =
 let merge p l k =
   let rec aux l1 l2 rep =
     match l1,l2
-    with t::q,a::b when p t a -> aux q l2 (t::rep)
+    with t::q,a::_b when p t a -> aux q l2 (t::rep)
        |  t::q,a::b when p a t -> aux (t::q) b (a::rep)
-       |  t::q,a::b           -> aux q b (t::rep)
+       |  t::q,_a::b           -> aux q b (t::rep)
        |  t::q, []           -> aux q l2 (t::rep)
        |   [] ,a::b         -> aux l1 b (a::rep)
        |   _                -> (List.rev rep)
@@ -252,14 +250,14 @@ let rev l =
 
 
 
-let flap_map parameters _error f l =
+let flap_map parameters error f l =
   let n=Working_list_imperative.make
       (Remanent_parameters.get_empty_hashtbl_size parameters) in
   let rec aux l =
     match l with t::q -> (Working_list_imperative.push (f t) n;aux q)
     |  [] -> ()
   in List.iter aux l;
-  Working_list_imperative.list n
+  error, Working_list_imperative.list n
 
 
 let map_list (f:'a->'b) (l:'a list) =
@@ -279,4 +277,4 @@ let compte_list parameters error l =
          (Hashtbl.remove a x;
 	  Hashtbl.add a x (rep+1)) in
   List.iter (fun x->inc x) l ;
-  list_of_table a;;
+  error, list_of_table a;;

@@ -1,40 +1,10 @@
 open Fraction
-open Intervalles
 open Integer
-open Occu1
 open Mat_inter
 
 exception Exit
 
 type unbounded= Bound of int | Infinity
-
-(*
-module type Mat_inter =
-    sig
-     (* type matrice
-      type intertab*)
-      type prod
-      type var
-      val list_var : prod -> var list
-      val add_zero : bool
-      val solve_inf: prod -> var list->unit
-      val create : int -> prod
-      val copy : prod->prod
-      val exclusion: prod -> var list -> bool
-(*      val do_trans: prod -> var list -> prod ->var list*)
-      val all_here : prod -> var list -> prod
-      val solve_all : prod->unit
-      val compt_of_var_list : var list -> prod
-	val affiche_mat : prod -> unit
-      val is_vide: prod -> var->bool
-      val string_of_pro:prod -> var  -> string
-      val is_infinite:prod->var->bool
-(*      val maybe:var->unit*)
-(*      val affiche_mat:trans->unit*)
-      val plus:prod -> prod -> prod
-      val widen:prod->prod->(prod*var list)
-	val push:prod->var -> Fraction.fraction->prod
-    end*)
 
 module Octo  =
     (struct
@@ -45,7 +15,7 @@ module Octo  =
 		   var : (var) Working_list_imperative.working_list}
 
       let addzero = false
-      let p i j  =
+      let _p i j  =
 	match i,j with
 (*	  ZERO,_ -> true
 	| _,ZERO -> false*)
@@ -114,12 +84,12 @@ module Octo  =
 
  let op x =
    match x with Plus(x) -> Moins(x) | Moins(x) -> Plus(x)
- let test_and_set m i j k =
+ let _test_and_set m i j k =
 	  if (Integer.p (minus (get_cons m (op i) (op j))) k)
           then raise Exit
 	  else set_cons m i j k
 
- let interval_of_pro _parameters error m x =
+ let interval_of_pro _parameters _error m x =
    (minus (div2 (get_cons m (Moins(x)) (Plus(x))))),
    (div2 (get_cons m (Plus(x)) (Moins(x))))
 
@@ -128,7 +98,7 @@ module Octo  =
    error, "[|"^(print parameters inf)^
    ";"^(print parameters sup)^"|]"
 
- let push parameters error m x f  =
+ let push _parameters error m x f  =
      add_var m (Plus(x));
      let k=f.num in
      List.iter (fun y ->
@@ -146,13 +116,13 @@ module Octo  =
 
  let affiche parameters error prod =
    print_string "<HR>";
-   List.fold_left
-     (fun error x->
-        let error, s = string_of_pro parameters error prod x in
-       let () = print_string s in
-     error) error (Working_list_imperative.list prod.var);
-	 print_newline ();
-	 print_string "<BR>"; error
+   let error' = List.fold_left
+       (fun error x->
+          let error, s = string_of_pro parameters error prod x in
+          let () = print_string s in
+          error) error (Working_list_imperative.list prod.var) in
+   print_newline ();
+   print_string "<BR>"; error'
 	 (*List.iter
 	   (fun x->
 	     (List.iter
@@ -197,11 +167,11 @@ let create _parameters n =
         error, tmp
 
    let affiche_mat x = affiche x
-      let is_vide prod x =  not (Integer.p (get_cons prod (Plus(x)) (Moins(x))) (Bounded(0)))
-      let is_empty prod =
+   let is_vide prod x =  not (Integer.p (get_cons prod (Plus(x)) (Moins(x))) (Bounded(0)))
+      let _is_empty prod =
         List.exists (fun x->is_vide prod x) (Working_list_imperative.list prod.var)
 
-      let solve_all parameters error prod =
+      let solve_all _parameters error prod =
         let signe s x = if s then Plus(x) else Moins(x) in
         let () =
           List.iter (fun x->new_cons prod (Plus(x)) (Plus(x)) (Bounded(0));
@@ -302,7 +272,7 @@ let create _parameters n =
      List.iter (fun x->add_var q (Plus x)) a
 
    let list_var _parameters p = Working_list_imperative.list p.var
-   let equal m n =
+   let _equal m n =
      List.for_all (fun (i,j)->(get_cons m i j) = (get_cons n i j)) (Working_list_imperative.list m.key)
      &&
   List.for_all (fun (i,j)->(get_cons m i j) = (get_cons n i j)) (Working_list_imperative.list n.key)

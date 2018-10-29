@@ -17,6 +17,7 @@ val create:
   Exception.method_handler ->
   (node -> 'node_label) -> node list ->
   (node * 'edge_label * node) list ->
+  Exception.method_handler * 
   ('node_label, 'edge_label) graph
 
 val add_bridges:

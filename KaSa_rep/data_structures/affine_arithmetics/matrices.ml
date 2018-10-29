@@ -3,7 +3,6 @@ open Hashtbl
 open Fraction
 open Intervalles
 open Occu1
-open Intertab
 
 module type Matrice =
   sig
@@ -142,12 +141,12 @@ end
 module Matrice =
   struct
 let trace=false ;;
-let t_i parameters i =
+let _t_i parameters i =
   if trace || Remanent_parameters.get_trace parameters then
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%i" i in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
 
-let t_s parameters _error x =
+let _t_s parameters _error x =
   if trace || Remanent_parameters.get_trace parameters then
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x in
     Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -204,7 +203,7 @@ let affiche_int parameters i =
       | Unknown | Minfinity  ->  Loggers.fprintf (Remanent_parameters.get_logger parameters)       "!U!"
     in ()
 
-let affiche_inter = affiche_int
+let _affiche_inter = affiche_int
 
 let affiche_cons parameters (k,c,b) =
   let () =
@@ -627,7 +626,7 @@ lrep))))
    in
    aux 1 1 error
 
- let safe_merge parameters error m m2 =
+ let _safe_merge parameters error m m2 =
    let error, rep = merge parameters error m m2 in
    let error = normalise parameters error rep in
    error, rep

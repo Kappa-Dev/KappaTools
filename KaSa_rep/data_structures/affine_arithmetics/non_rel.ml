@@ -1,9 +1,6 @@
 open Fraction
 open Intervalles
-open Matrices
 open Intertab
-open Occu1
-open Tools
 
 module NR =
     functor (I:Tabinter with type var=Occu1.trans and type intervalle=Intervalles.intervalle) ->
@@ -30,20 +27,20 @@ module NR =
       let is_minfinite m x =
         (I.read m x).inf=Fraction.Minfinity
 
-      let is_both_infinite m x =
+      let _is_both_infinite m x =
         is_infinite m x && is_minfinite m x
 
-      let is_either_infinite m x =
+      let _is_either_infinite m x =
         is_infinite m x || is_minfinite m x
 
           let create _parameters n =
         I.make n
       let f_un = {num=1;den=1}
       let f_zero = {num=0;den=1}
-      let un ={inf = Frac f_un;sup=Frac f_un}
-      let zero = {inf = Frac f_zero;sup=Frac f_zero}
+      let _un ={inf = Frac f_un;sup=Frac f_un}
+      let _zero = {inf = Frac f_zero;sup=Frac f_zero}
 
-      let list_var parameters p =
+      let list_var _parameters p =
           I.clef p
 
 
@@ -119,11 +116,11 @@ let guard parameters error p l  =
      error, Some (interv.inf, interv.sup)
 
 
-   let push parameters error m x f  =
+   let push _parameters error m x f  =
      let _ =I.push m x f  in
      error, m
 
-   let translate parameters error m l =
+   let _translate parameters error m l =
      List.fold_left
        (fun (error, m) (x,i) ->
           push parameters error m x {num=i;den=1})

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <Aug 10 2018>
+  * Last modification: Time-stamp: <Nov 05 2018>
   *
   * Compute strongly connected component in contact map
   *
@@ -342,7 +342,7 @@ let compute_graph_scc parameters error contact_map_converted =
              (error, ([], self)) edges_list
   in
   (*build a graph_scc*)
-  let graph =
+  let error, graph =
     Graphs.create parameters error
       (fun _ -> ())
       nodes

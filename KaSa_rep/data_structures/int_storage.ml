@@ -111,7 +111,7 @@ module Int_storage_imperatif =
         let _ = array.array.(key)<-Some value in
         error, array
 
-    let rec init parameters error size f =
+    let init parameters error size f =
       if size < 0
       then
         let error, array = create parameters error 0 in

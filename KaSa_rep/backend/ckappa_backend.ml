@@ -13,7 +13,7 @@ struct
   let site = "site"
   let free = ""
   let wildcard = "?"
-  let bound = "!_"
+  let _bound = "!_"
   let bond_id = "bond id"
   let bound_to = "bound to"
   let binding_type = "binding type"
@@ -77,8 +77,6 @@ struct
         agent
           Ckappa_sig.Agent_id_map_and_set.Map.t
     }
-
-  type string_version = agent list
 
   let get_string_version t = t.string_version
   let set_string_version s_v t =
@@ -192,7 +190,7 @@ struct
         parameter error __POS__
         ~message:"unknown agent type"
         Exit t
-    | Some (agent_type, map) ->
+    | Some (agent_type, _map) ->
       begin
         let error', (agent_string, sitemap) =
         Ckappa_sig.Agent_id_map_and_set.Map.find_default
