@@ -42,6 +42,7 @@ sig
   val dec_step_short_id: step_short_id -> step_short_id
 
 (** blackboard predicates*)
+
   type predicate_id = int
   type predicate_info
   type predicate_value
@@ -64,18 +65,22 @@ sig
   val compatible: predicate_value -> predicate_value -> bool
   val strictly_more_refined: predicate_value -> predicate_value -> bool
   val get_pre_column_map_inv: pre_blackboard -> predicate_info A.t
+
   (** generation*)
+
   val init:  pre_blackboard CI.Po.K.H.zeroary
   val add_step: (Trace.step,pre_blackboard,step_id,pre_blackboard * step_id) CI.Po.K.H.ternary
   val add_step_up_to_iso: (Trace.step,pre_blackboard,step_id,pre_blackboard * step_id) CI.Po.K.H.ternary
   val finalize: Priority.priorities option -> (pre_blackboard,pre_blackboard) CI.Po.K.H.unary
 
   (**pretty printing*)
+
   val string_of_predicate_value: predicate_value -> string
   val print_predicate_value: Loggers.t ->  predicate_value -> unit
   val print_preblackboard: (pre_blackboard,unit) CI.Po.K.H.unary
 
   (**interface*)
+
   val n_events: (pre_blackboard, int) CI.Po.K.H.unary
   val n_predicates: (pre_blackboard, int) CI.Po.K.H.unary
   val n_events_per_predicate: (pre_blackboard, int, predicate_id) CI.Po.K.H.binary
@@ -106,6 +111,7 @@ module Preblackboard =
     (** blackboard matrix*)
 
     type step_id = int       (** global id of an event *)
+
     let zero_step_id = 0
     let dummy_step_id = -1
     let int_of_step_id i = i
@@ -124,7 +130,8 @@ module Preblackboard =
 
 (** blackboard predicates*)
 
-    type rule_type = (** kind of events*)
+    (** kind of events*)
+    type rule_type =
       | Subs
       | Dummy
       | Init
@@ -133,22 +140,24 @@ module Preblackboard =
       | Side_effect_of of (step_id * (CI.Po.K.agent_id * Instantiation.site_name) list)
 
     type predicate_id = int (** wire identifiers *)
+
     type mutex =
       | Lock_side_effect of step_id * CI.Po.K.agent_id * CI.Po.K.agent_id * Instantiation.site_name
       | Lock_agent of step_id * CI.Po.K.agent_id
       | Lock_rectangular of step_id * CI.Po.K.agent_id
       | Lock_links of step_id * (CI.Po.K.agent_id * CI.Po.K.agent_id)
 
-    type predicate_info = (** wire labels *)
-      | Fictitious
+    (** wire labels *)
+    type predicate_info =
+      | Fictitious (*to handle with ambiguous site effects *)
       | Here of CI.Po.K.agent_id
       | Bound_site of CI.Po.K.agent_id * Instantiation.site_name
       | Internal_state of CI.Po.K.agent_id * Instantiation.site_name
       | Pointer of step_id * CI.Po.K.agent_id
-      | Link of step_id * CI.Po.K.agent_id * CI.Po.K.agent_id
       | Mutex of mutex
-     (*
-       | Fictitious of int (**to handle with ambiguous site effects *)*)
+      | Link of step_id * CI.Po.K.agent_id * CI.Po.K.agent_id
+
+    let _ = Link (0,0,0) (* do not remove, it will be necessary for dealing effectively with unary/binary rule *)
 
     type predicate_value =
       | Counter of int
@@ -185,6 +194,7 @@ module Preblackboard =
     let is_undefined x = x=Undefined
 
     (** maps and sets *)
+
     module PredicateSetMap = SetMap.Make (struct type t = predicate_info let compare = compare let print _ _ = () end)
     module PredicateSet = PredicateSetMap.Set
     module PredicateMap = PredicateSetMap.Map
@@ -225,6 +235,7 @@ module Preblackboard =
     let get_pre_event _parameter _handler log_info error x = error,log_info,x.pre_event
 
     (** pretty printing *)
+
     let print_predicate_info log x =
       match x
       with
@@ -242,7 +253,9 @@ module Preblackboard =
     let print_known log t x =
       match t with
       | Unknown -> ()
-      | _ -> Loggers.fprintf log "%s" x
+      | Pointer_to_agent _ | Counter _ | Internal_state_is _ | Present | Free
+      | Bound | Bound_to _ | Bound_to_type _ | Defined | Undefined ->
+        Loggers.fprintf log "%s" x
 
     let string_of_predicate_value x =
       match x
@@ -382,6 +395,7 @@ module Preblackboard =
       error,log_info,()
 
     (** information lattice *)
+
     let strictly_more_refined x y =
       match y
       with
@@ -458,7 +472,7 @@ module Preblackboard =
       | Here x -> Some x
       | Bound_site (x,_) -> Some x
       | Internal_state (x,_) -> Some x
-      | Pointer _ | Link _ | Mutex _  | Fictitious -> None
+      | Pointer _ | Mutex _  | Link _ | Fictitious -> None
 
 
     let rec bind parameter handler log_info error blackboard _predicate predicate_id ag_id =
@@ -963,7 +977,7 @@ module Preblackboard =
         removed_sites_in_other_links = SiteIdSet.empty ;
       }
 
-    let print_data_structure parameter handler error data =
+    let print_data_structure _parameter _handler error _data =
       (*  let stderr = parameter.CI.Po.K.H.out_channel_err in
           let sigs = Model.signatures handler.CI.Po.K.H.env in
           let _ = Format.fprintf stderr "New agents: @." in
@@ -1705,7 +1719,7 @@ module Preblackboard =
             let test_list = [] in
             let fictitious_list = [] in
 
-            let error,log_info,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step  =
+            let error,log_info,blackboard,fictitious_list,_fictitious_local_list,unambiguous_side_effects,_init_step  =
               List.fold_left
                 (fun (error,log_info,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step) (site,(binding_state)) ->
                    begin
@@ -1734,7 +1748,7 @@ module Preblackboard =
                          let rule_ag_id = CI.Po.K.agent_id_of_agent (CI.Po.K.agent_of_site site) in
                          let predicate_info = Mutex (Lock_side_effect (step_id,rule_ag_id,rule_ag_id,CI.Po.K.site_name_of_site site)) in
                          let error,log_info,blackboard,predicate_id = allocate parameter handler log_info error blackboard predicate_info  in
-                         let  error,log_info,blackboard,step_id =
+                         let  error,log_info,blackboard,_step_id =
                            init_fictitious_action log_info error predicate_id  blackboard init_step
                          in
                          let error,log_info,blackboard =
@@ -2247,7 +2261,7 @@ module Preblackboard =
                            let merged_map =
                              PredicateidMap.add link_mutex (Counter 0,Counter 1) merged_map
                            in
-                           (*** Pointer ->  ***)
+                           (* Pointer -> *)
                            let merged_map =
                              match AgentIdMap.find_option
                                      rule_ag_id1 data_structure.rule_agent_id_subs with
@@ -2322,7 +2336,7 @@ module Preblackboard =
         f error log_info blackboard data_structure.other_links
       in
 
-      (*** deal with rigid elements ***)
+      (* deal with rigid elements *)
       let side_effect = data_structure.sure_side_effects in
       let action_list =
         match init_step with
@@ -2332,7 +2346,7 @@ module Preblackboard =
       let test_list = data_structure.sure_tests in
       let fictitious_list = blackboard.pre_fictitious_list in
 
-      let error,log_info,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step  =
+      let error,log_info,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,_init_step  =
         List.fold_left
           (fun (error,log_info,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step) (site,(binding_state)) ->
              begin
@@ -2361,7 +2375,7 @@ module Preblackboard =
                    let rule_ag_id = CI.Po.K.agent_id_of_agent (CI.Po.K.agent_of_site site) in
                    let predicate_info = Mutex (Lock_side_effect (step_id,rule_ag_id,rule_ag_id,CI.Po.K.site_name_of_site site)) in
                    let error,log_info, blackboard,predicate_id = allocate parameter handler log_info error blackboard predicate_info  in
-                   let  error,log_info,blackboard,step_id =
+                   let  error,log_info,blackboard,_step_id =
                      init_fictitious_action log_info error predicate_id  blackboard init_step
                    in
                    let error,log_info,blackboard =
@@ -2510,7 +2524,6 @@ module Preblackboard =
           in
           error,log_info,(blackboard,step_id+1)
         end
-    (*** ***)
 
     let add_step parameter handler log_info error step blackboard step_id =
       let init = Trace.step_is_init step in
@@ -2555,7 +2568,7 @@ module Preblackboard =
           let old = A.get map pid in
           A.set map pid (C.add p old)
       in
-      let error,log_info,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step =
+      let error,log_info,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,_init_step =
         List.fold_left
           (fun (error,log_info,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step) (site,(binding_state)) ->
              begin
@@ -2778,11 +2791,12 @@ module Preblackboard =
 
     let add_step_up_to_iso = add_step_strong
 
-    (**interface*)
+    (** interface *)
+
     let n_predicates _parameter _handler log_info error blackboard =
       error,log_info,blackboard.pre_ncolumn+1
 
-    let event_list_of_predicate parameter handler log_info error blackboard predicate_id =
+    let event_list_of_predicate parameter _handler log_info error blackboard predicate_id =
       try
         error,log_info,snd (A.get blackboard.pre_steps_by_column predicate_id)
       with

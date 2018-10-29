@@ -55,10 +55,6 @@ type graph =
     conflict_pred: int list A.t;
   }
 
-type compression_result =
-  | New_story of StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list * graph
-  | Old_story of StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list * int
-
 let dummy_graph =
   {
     root = 0 ;
@@ -67,7 +63,6 @@ let dummy_graph =
     conflict_pred = A.make 1 [] ;
   }
 
-type edge_kind = Succ | Conflict
 type position = int
 type key =
   | Fresh of node
@@ -77,10 +72,10 @@ type key =
 type canonical_form = key list
 type prehash = (node*int) list
 
-let dummy_cannonical_form = []
-let dummy_prehash = []
+let _dummy_cannonical_form = []
+let _dummy_prehash = []
 
-let print_story_info logger _parameter json =
+let _print_story_info logger _parameter json =
   (*List.iter
     (fun
       story_info ->
@@ -198,7 +193,7 @@ let print_elt log elt =
     let () = Loggers.fprintf log "Event %s" s in
     Loggers.print_newline log
 
-let print_canonical_form parameter _handler error dag =
+let _print_canonical_form parameter _handler error dag =
   let _ =
     List.iter
       (print_elt (H.get_debugging_channel parameter))
@@ -207,7 +202,7 @@ let print_canonical_form parameter _handler error dag =
   let _ = Loggers.print_newline (H.get_debugging_channel parameter) in
   error
 
-let print_prehash parameter _handler error representation =
+let _print_prehash parameter _handler error representation =
   let _ =
     List.iter
       (fun ((_,b),i) -> Loggers.fprintf (H.get_debugging_channel parameter) "%s:%i," b i)

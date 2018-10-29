@@ -14,6 +14,7 @@
 
 let debug_mode = false
 
+let _ = debug_mode
 
 type parameters =
   {
@@ -205,7 +206,7 @@ let compute_status_ranges cflow_parameters parameter global_status =
 
 
 let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
-      cflow_parameters ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
+      cflow_parameters ~shall_we_compute:_ ~shall_we_compute_profiling_information:_
       handler log_info error
       we_shall never
       parameters
@@ -221,8 +222,8 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
   =
   let f
       cflow_parameters
-      ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-      ?(print_if_zero=we_shall)
+      ?shall_we_compute:(_) ?shall_we_compute_profiling_information:(_)
+      ?print_if_zero:(_)
       handler log_info error trace info (last_info,stop_next,global_status,counter,table) =
     if stop_next
     then error,log_info,Stop.stop (last_info,table)

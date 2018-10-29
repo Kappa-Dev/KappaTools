@@ -104,6 +104,7 @@ val fold_over_causal_past_of_obs :
     Stop.stop
 
 val debug_print_grid : Format.formatter -> grid -> unit
+
 val pretty_print :
   dotFormat:formatCflow ->
   Remanent_parameters_sig.parameters ->
@@ -117,5 +118,6 @@ val pretty_print :
   Exception.method_handler*StoryProfiling.StoryStats.log_info
 (** [pretty_print err_fmt env config_closure compression_type label story_list
                   state env] *)
+
 val print_stat :
   Format.formatter -> 'a -> 'b -> enriched_grid -> unit

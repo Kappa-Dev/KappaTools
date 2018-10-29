@@ -340,15 +340,6 @@ module Blackboard =
         dynamic = dummy_case_info_dynamic
       }
 
-    let init_case_info =
-      {dummy_case_info
-       with dynamic =
-              { dummy_case_info_dynamic
-                with
-                  state_after = PB.undefined ;
-                  pointer_previous = pointer_before_blackboard ;
-                  pointer_next = PB.inc_step_short_id (PB.zero_step_short_id) }}
-
     let init_info p_id seid size triple =
       {
         static = init_info_static p_id seid triple ;
@@ -747,7 +738,7 @@ module Blackboard =
 
     let empty_stack = []
 
-    let import ?heuristic parameter handler log_info error pre_blackboard =
+    let import ?heuristic:(_) parameter handler log_info error pre_blackboard =
       let error,log_info,n_predicates = PB.n_predicates parameter handler log_info error pre_blackboard in
       let error,log_info,n_events = PB.n_events parameter handler log_info error pre_blackboard in
       let stack = [] in
@@ -839,8 +830,10 @@ module Blackboard =
               | triple::q ->
                 let info = init_info p_id seid (size-1) triple in
                 let eid = get_eid_of_triple triple in
-                let error,log_info,events = PB.get_pre_event parameter handler log_info error pre_blackboard  in
-                let error,log_info,level = PB.get_level_of_event parameter handler log_info error pre_blackboard eid in
+                let error,log_info,_events =
+                  PB.get_pre_event parameter handler log_info error pre_blackboard  in
+                let _error,log_info,level =
+                  PB.get_level_of_event parameter handler log_info error pre_blackboard eid in
                 let () = inc_depth level p_id in
                 let (),_ = add_event eid (p_id,seid) event_case_list level Priority.LevelMap.empty in
                 let () = PB.A.set array (PB.int_of_step_short_id seid) info in
@@ -1666,7 +1659,8 @@ let useless_predicate_id parameter handler log_info error blackboard list =
                            let prev_event_case_address =
                              {event_case_address with row_short_event_id = pointer}
                            in
-                           let error,log_info,prev_case = get_case parameter handler log_info error prev_event_case_address blackboard in
+                           let _error,_log_info,prev_case =
+                             get_case parameter handler log_info error prev_event_case_address blackboard in
                            let prev_eid = prev_case.static.event_id in
                            if is_null_pointer_step_id prev_eid
                            then None
@@ -1735,7 +1729,7 @@ let cut parameter handler log_info error blackboard list =
 
 let import ?heuristic parameter handler log_info error list =
   let error,log_info,preblackboard = PB.init parameter handler log_info error in
-  let error,log_info,(preblackboard,step_id,string,to_xls) =
+  let error,log_info,(preblackboard,_step_id,string,to_xls) =
     match
       parameter.PB.CI.Po.K.H.current_compression_mode
     with

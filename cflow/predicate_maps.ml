@@ -69,8 +69,8 @@ end
        struct
 	 type 'a t = 'a PredicateMap.t
 
-	 let predicate_max parameter handler info error list = error,info,0
-	 let empty n = PredicateMap.empty
+	 let predicate_max _parameter _handler info error _list = error,info,0
+	 let empty _n = PredicateMap.empty
 
 	 let iter = PredicateMap.iter
 	 let find_default = PredicateMap.find_default

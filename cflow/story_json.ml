@@ -26,10 +26,6 @@ let int_of_json = function
   | `Int s -> s
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct int",x))
 
-let float_of_json = function
-  | `Float s -> s
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct float",x))
-
 let new_story_to_json new_story =
   `Assoc
     [
@@ -130,12 +126,6 @@ type phase =
   | Success
   | Faillure
 
-type status =
-  {
-    phase: phase;
-    message: string;
-  }
-
 let start = "starting computation"
 let inprogress = "computation in progress"
 let success = "computation completed successfully"
@@ -152,27 +142,6 @@ let phase_of_json = function
   | `String s when s = success -> Success
   | `String s when s = faillure -> Faillure
   | x ->  raise (Yojson.Basic.Util.Type_error ("Not a correct phase",x))
-
-let status_to_json status =
-  `Assoc
-    [
-      "phase", phase_to_json status.phase;
-      "message", `String status.message ;
-    ]
-
-
-let status_of_json = function
-  | `Assoc l as x when List.length l = 2 ->
-    begin
-      try
-        {
-          phase = phase_of_json (List.assoc "phase" l);
-          message = string_of_json (List.assoc "message" l);
-        }
-      with Not_found ->
-        raise (Yojson.Basic.Util.Type_error ("Not a correct status",x))
-    end
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct status",x))
 
 type progress_bar =
   {

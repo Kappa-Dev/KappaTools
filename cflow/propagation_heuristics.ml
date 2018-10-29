@@ -63,14 +63,14 @@ module Propagation_heuristic =
       | Propagate_up of B.event_case_address
       | Propagate_down of B.event_case_address
 
-    let print_output log x =
+    let _print_output log x =
       if B.is_failed x
       then Loggers.fprintf log "FAILED"
       else if B.is_ignored x
       then Loggers.fprintf log "IGNORED"
       else Loggers.fprintf log "SUCCESS"
 
-    let forced_events parameter handler log_info error blackboard =
+    let forced_events _parameter _handler log_info error blackboard =
       let list = B.forced_events blackboard in
       error,log_info,
       List.rev_map
@@ -80,7 +80,7 @@ module Propagation_heuristic =
             (List.rev l),l,info)
         (List.rev list)
 
-    let forbidden_events paramter handler log_info error list =
+    let forbidden_events _paramter _handler log_info error list =
       error,log_info,List.rev_map (fun x -> Cut_event x) (List.rev list)
 
     let get_gen_unresolved_event_on_pid first last succ stop parameter handler log_info error blackboard p_id level =
@@ -100,7 +100,8 @@ module Propagation_heuristic =
                 match exist
                 with
                 | None ->
-                    let error,log_info,(seid,eid,test,action) = B.get_static parameter handler log_info error blackboard event_case_address in
+                  let error,log_info,(_seid,eid,_test,_action) =
+                    B.get_static parameter handler log_info error blackboard event_case_address in
                     let error,log_info,level_of_event = B.level_of_event parameter handler log_info error blackboard eid in
                     if level_of_event = level
                     then
@@ -270,7 +271,7 @@ module Propagation_heuristic =
               then
                 try_level (Priority.lower level) error
               else
-                let error,log_info,event_id =
+                let error,_log_info,event_id =
                   get_unresolved_event priority parameter handler log_info error blackboard p_id level
                 in
                 match event_id
@@ -344,7 +345,8 @@ module Propagation_heuristic =
                   end
                 | Some true ->
                   begin (* next event is selected *)
-                    let error,log_info,(next_seid,next_eid,next_test,next_action) = B.get_static parameter handler log_info error blackboard next_event_case_address in
+                    let error,log_info,(_next_seid,_next_eid,next_test,next_action) =
+                      B.get_static parameter handler log_info error blackboard next_event_case_address in
                     let case_address = B.case_address_of_case_event_address event_case_address in
                     let error,log_info,case_value = B.get parameter handler log_info error case_address blackboard in
                     let error,log_info,predicate_value = B.predicate_value_of_case_value parameter handler log_info error case_value in
@@ -573,7 +575,8 @@ module Propagation_heuristic =
                   end
                 | None -> (* we do not know whether the event is played or not *)
                   begin
-                    let error,log_info,(next_seid,next_eid,next_test,next_action) = B.get_static parameter handler log_info error blackboard next_event_case_address in
+                    let error,log_info,(_next_seid,next_eid,next_test,next_action) =
+                      B.get_static parameter handler log_info error blackboard next_event_case_address in
                     match B.PB.is_unknown next_action
                     with
                       | true  ->
@@ -899,7 +902,8 @@ module Propagation_heuristic =
           error,false,log_info,blackboard
         | Some true ->
           begin
-            let error,log_info,(seid,eid,test,action) = B.get_static parameter handler log_info error blackboard event_case_address in
+            let error,log_info,(_seid,_eid,_test,action) =
+              B.get_static parameter handler log_info error blackboard event_case_address in
             if B.PB.is_unknown action
             then
               begin
@@ -932,7 +936,8 @@ module Propagation_heuristic =
           end
         | None ->
             begin
-              let error,log_info,(seid,eid,test,action) = B.get_static parameter handler log_info error blackboard event_case_address in
+              let error,log_info,(_seid,_eid,_test,action) =
+                B.get_static parameter handler log_info error blackboard event_case_address in
               if B.PB.more_refined action predicate_value
               then
                 error,false,log_info,blackboard
@@ -981,7 +986,8 @@ module Propagation_heuristic =
             B.success)
           | Some true ->
               (* we know that the pair (test/action) has been executed *)
-            let error,log_info,(seid,eid,test,action) = B.get_static parameter handler log_info error blackboard event_case_address in
+            let error,log_info,(_seid,_eid,test,action) =
+              B.get_static parameter handler log_info error blackboard event_case_address in
             let case_address = B.case_address_of_case_event_address event_case_address in
             let error,log_info,case_value = B.get parameter handler log_info error case_address blackboard in
             let error,log_info,predicate_value = B.predicate_value_of_case_value parameter handler log_info error case_value in
@@ -1205,7 +1211,8 @@ module Propagation_heuristic =
             end
           | None ->
             (* we do not know whether the pair (test/action) has been executed *)
-            let error,log_info,(seid,eid,test,action) = B.get_static parameter handler log_info error blackboard event_case_address in
+            let error,log_info,(_seid,eid,test,action) =
+              B.get_static parameter handler log_info error blackboard event_case_address in
             let case_address = B.case_address_of_case_event_address event_case_address in
             let error,log_info,case_value = B.get parameter handler log_info error case_address blackboard in
             let error,log_info,predicate_value = B.predicate_value_of_case_value parameter handler log_info error case_value in
@@ -1665,7 +1672,7 @@ module Propagation_heuristic =
     let cut_case parameter handler case (error,log_info,blackboard,instruction_list,propagate_list) =
       let error,log_info,pointer_next = B.follow_pointer_down parameter handler log_info error blackboard case in
       let error,log_info,pointer_previous = B.follow_pointer_up parameter handler log_info error blackboard case in
-      (** we remove the case *)
+      (* we remove the case *)
       let error,log_info,(blackboard,result) =
         B.refine
           parameter
@@ -1683,7 +1690,7 @@ module Propagation_heuristic =
       else
         begin
           let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events_in_column case) blackboard in
-            (** we plug pointer next of the previous event *)
+            (* we plug pointer next of the previous event *)
           let error,log_info,blackboard =
             B.overwrite
               parameter
@@ -1694,7 +1701,7 @@ module Propagation_heuristic =
               (B.pointer pointer_next)
               blackboard
           in
-            (** we plug pointer previous of the next event *)
+            (* we plug pointer previous of the next event *)
           let error,log_info,blackboard =
             B.overwrite
               parameter
@@ -1786,7 +1793,7 @@ module Propagation_heuristic =
     let discard_case parameter handler case (error,log_info,blackboard,instruction_list,propagate_list) =
       let error,log_info,pointer_next = B.follow_pointer_down parameter handler log_info error blackboard case in
       let error,log_info,pointer_previous = B.follow_pointer_up parameter handler log_info error blackboard case in
-      (** we remove the case *)
+      (* we remove the case *)
       let error,log_info,(blackboard,result) =
         B.refine
           parameter
@@ -1815,7 +1822,7 @@ module Propagation_heuristic =
             let error,log_info,level = B.level_of_event parameter handler log_info error blackboard event in
             let error,log_info,blackboard = B.dec parameter handler log_info error
                 (B.n_unresolved_events_in_column_at_level  case level) blackboard in
-            (** we plug pointer next of the previous event *)
+            (* we plug pointer next of the previous event *)
             let error,log_info,blackboard =
               B.overwrite
                 parameter
@@ -1826,7 +1833,7 @@ module Propagation_heuristic =
                 (B.pointer pointer_next)
                 blackboard
             in
-            (** we plug pointer previous of the next event *)
+            (* we plug pointer previous of the next event *)
             let error,log_info,blackboard =
               B.overwrite
                 parameter
@@ -1847,7 +1854,7 @@ module Propagation_heuristic =
         end
 
     let keep_case parameter handler case (error,log_info,blackboard,instruction_list,propagate_list) =
-      (** we keep the case *)
+      (* we keep the case *)
       let error,log_info,(blackboard,result) =
         B.refine
           parameter
@@ -1867,8 +1874,10 @@ module Propagation_heuristic =
       else
         begin
           let error,log_info,pointer_previous = B.follow_pointer_up parameter handler log_info error blackboard case in
-          let error,log_info,pointer_next = B.follow_pointer_down parameter handler log_info error blackboard case in
-          let error,log_info,(seid,eid,test,action) = B.get_static parameter handler log_info error blackboard case in
+          let error,log_info,_pointer_next =
+            B.follow_pointer_down parameter handler log_info error blackboard case in
+          let error,log_info,(_seid,eid,test,action) =
+            B.get_static parameter handler log_info error blackboard case in
           begin
             let error,log_info,(blackboard,instruction_list,_,result') =
               refine_value_before parameter handler log_info error blackboard case test  instruction_list propagate_list in
@@ -2010,5 +2019,5 @@ module Propagation_heuristic =
           | Refine_value_before (address,value) -> refine_value_before parameter handler log_info error blackboard address value instruction_list propagate_list
           | Skip -> error,log_info,(blackboard,instruction_list,propagate_list,B.ignore)
 
-    let keep x = Keep_event x
+    let _keep x = Keep_event x
   end:Blackboard_with_heuristic)

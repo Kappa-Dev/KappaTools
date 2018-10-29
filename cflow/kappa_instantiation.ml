@@ -69,12 +69,10 @@ end
 module Cflow_linker =
   (struct
     module H = Cflow_handler.Cflow_handler
-    module P = StoryProfiling.StoryStats
     module PI = Instantiation
 
     type agent_id = int
 
-    module AgIdSet = Mods.IntSet
     type side_effect = PI.concrete PI.site list
 
     module AgentIdMap = Mods.IntMap
@@ -190,7 +188,7 @@ module Cflow_linker =
         (fun ((a,_),b) -> Loggers.fprintf log "(%i,%i)," a b)
     let side_effect_of_list l = l
 
-    let level_of_event priority_opt parameter handler log_info error e set =
+    let level_of_event priority_opt parameter _handler log_info error e set =
       match priority_opt,H.get_priorities parameter with
       | None,None -> error,log_info,Priority.highest
       | Some priorities,_ | None,Some priorities ->

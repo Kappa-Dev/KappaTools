@@ -22,7 +22,6 @@ type error_log =  Exception.method_handler
 type parameter =  S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = S.PH.B.PB.CI.Po.K.H.handler
 type profiling_info = P.log_info
-type progress_bar = bool * int * int
 type shall_we = (parameter -> bool)
 
 type step = Trace.step
@@ -37,7 +36,6 @@ type trace =
   }
 type trace_runtime_info = profiling_info Trace.Simulation_info.t
 
-type do_we_log = (parameter -> bool)
 type 'a with_handlers =
   parameter -> ?shall_we_compute:shall_we -> ?shall_we_compute_profiling_information:shall_we ->
   ?print_if_zero:shall_we ->
@@ -65,8 +63,8 @@ let size_of_pretrace trace = List.length (get_pretrace_of_trace trace)
 
 let may_initial_sites_be_ambiguous trace = trace.with_potential_ambiguity
 let set_ambiguity_level trace x = {trace with with_potential_ambiguity=x}
-let set_pretrace trace x = {trace with pretrace = x}
-let set_compressed_trace trace x = {trace with compressed_trace = x}
+let _set_pretrace trace x = {trace with pretrace = x}
+let _set_compressed_trace trace x = {trace with compressed_trace = x}
 let get_compressed_trace trace =
   match
     trace.compressed_trace
@@ -96,9 +94,7 @@ let build_compressed_trace x y =
 let get_id_of_event = S.PH.B.PB.CI.Po.K.get_id_of_refined_step
 let get_simulation_time_of_event = S.PH.B.PB.CI.Po.K.get_time_of_refined_step
 
-let dummy_log = fun p -> p
-
-let extend_trace_with_dummy_side_effects l = List.rev_map (fun a -> a,[]) (List.rev l)
+let _extend_trace_with_dummy_side_effects l = List.rev_map (fun a -> a,[]) (List.rev l)
 
 let print_pretrace parameter _handler =
   Loggers.fprintf
@@ -110,7 +106,7 @@ let print_trace parameter handler trace = print_pretrace parameter handler (get_
 
 let transform_trace_gen f log_message debug_message profiling_event =
   (fun parameters ?(shall_we_compute=we_shall)
-    ?(shall_we_compute_profiling_information=we_shall)
+    ?shall_we_compute_profiling_information:(_)
     ?(print_if_zero=we_shall)
     kappa_handler profiling_info error trace ->
      if shall_we_compute parameters
@@ -192,7 +188,7 @@ let transform_trace_gen f log_message debug_message profiling_event =
 
 
 type kind =
-  | Solve_ambiguities
+  (*  | Solve_ambiguities*)
   | May_add_ambiguities
   | Neutral
 
@@ -200,24 +196,24 @@ type kind =
 let handle_ambiguities kind b =
   match kind
   with
-  | Solve_ambiguities -> false
+  (*  | Solve_ambiguities -> false*)
   | Neutral -> b
   | May_add_ambiguities -> true
 
-type ambiquities_precondition = Do_not_care | Require_the_abscence_of_ambiguity | Better_when_no_ambiguity
+type ambiquities_precondition = Do_not_care | Require_the_abscence_of_ambiguity (*| Better_when_no_ambiguity*)
 
-let must_we_solve_ambiguity parameters x =
+let must_we_solve_ambiguity _parameters x =
   match
     x
   with
   | Do_not_care -> false
   | Require_the_abscence_of_ambiguity -> true
-  | Better_when_no_ambiguity -> S.PH.B.PB.CI.Po.K.H.always_disambiguate parameters
+(*  | Better_when_no_ambiguity -> S.PH.B.PB.CI.Po.K.H.always_disambiguate parameters*)
 
 let monadic_lift f = (fun _ _ log_info error t ->
     let t' = f t in
     error,log_info,(t',List.length t - List.length t'))
-let dummy_profiling = (fun _ p -> p)
+let _dummy_profiling = (fun _ p -> p)
 
 let disambiguate =
   transform_trace_gen
@@ -316,7 +312,7 @@ let cut_rev_trace rev_trace =
       (List.fold_left on_the_fly_cut_step on_the_fly_cut_init rev_trace)
 
 
-let remove_obs_before parameter handler log_info error last_eid trace =
+let remove_obs_before _parameter _handler log_info error last_eid trace =
   error,log_info,
   (
     let rec aux l score output =
@@ -353,9 +349,8 @@ let remove_obs_before parameter handler log_info error last_info trace =
 
 let remove_obs_before
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
-    handler log_info error last_info trace =
+    ?shall_we_compute:(_) ?shall_we_compute_profiling_information:(_)
+    ?print_if_zero:(_) handler log_info error last_info trace =
   match last_info
   with
   | None -> error,log_info,trace
@@ -403,7 +398,6 @@ let remove_pseudo_inverse_events =
 type cflow_grid = Causal.grid
 type enriched_cflow_grid = Causal.enriched_grid
 type musical_grid =  S.PH.B.blackboard
-type transitive_closure_config = Graph_closure.config
 type story_table =
   {
     story_counter:int;
@@ -420,13 +414,13 @@ type observable_hit =
 
 let get_event_list_from_observable_hit a = a.list_of_events
 let get_runtime_info_from_observable_hit a = a.runtime_info
-let get_list_order a = a.list_of_actions
+let _get_list_order a = a.list_of_actions
 
 let error_init = Exception.empty_error_handler
 
 let extract_observable_hits_from_musical_notation a
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:(_) ?shall_we_compute_profiling_information:(_)
+    ?print_if_zero:(_)
     b profiling_info c d =
   let error,profiling_info,l = S.PH.forced_events a b profiling_info c d in
   error,
@@ -442,8 +436,8 @@ let extract_observable_hits_from_musical_notation a
 
 let extract_observable_hit_from_musical_notation
     a
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:(_) ?shall_we_compute_profiling_information:(_)
+    ?print_if_zero:(_)
     b profiling_info c string d =
   let error,profiling_info,l = S.PH.forced_events a b profiling_info c d in
   match l with
@@ -462,8 +456,8 @@ let translate p h profiling_info e b list =
 
 let causal_prefix_of_an_observable_hit
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:(_) ?shall_we_compute_profiling_information:(_)
+    ?print_if_zero:(_)
     handler profiling_info error string blackboard (enriched_grid:enriched_cflow_grid) observable_id =
   let eid =
     match
@@ -487,16 +481,16 @@ let causal_prefix_of_an_observable_hit
 
 let export_musical_grid_to_xls
     a
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:(_) ?shall_we_compute_profiling_information:(_)
+    ?print_if_zero:(_)
     b (p:StoryProfiling.StoryStats.log_info) c d e f g
   =
   S.PH.B.export_blackboard_to_xls a b p c d e f g
 
 let print_musical_grid
     a
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:(_) ?shall_we_compute_profiling_information:(_)
+    ?print_if_zero:(_)
     b p c d
   =
   S.PH.B.print_blackboard a b p c d
@@ -504,8 +498,8 @@ let print_musical_grid
 
 let create_story_table
     parameters
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:(_) ?shall_we_compute_profiling_information:(_)
+    ?print_if_zero:(_)
     handler profiling_info error  =
   let error,profiling_info,init = D.init_table parameters handler profiling_info error in
   error,
@@ -515,8 +509,8 @@ let create_story_table
     story_list= init ;
   }
 
-let get_trace_of_story (_,_,_,y,_) = trace_of_pretrace y
-let get_info_of_story (_,_,_,_,t) = t
+let _get_trace_of_story (_,_,_,y,_) = trace_of_pretrace y
+let _get_info_of_story (_,_,_,_,t) = t
 
 
 let tick_opt parameter bar =
@@ -570,7 +564,7 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
 let fold_story_table_with_progress_bar
     parameter
     ?shall_we_compute ?shall_we_compute_profiling_information
-    ?(print_if_zero=we_shall)
+    ?print_if_zero:_
     handler profiling_info error s
     f l a =
   fold_story_table_gen
@@ -582,20 +576,20 @@ let fold_story_table_with_progress_bar
 
 let fold_story_table_without_progress_bar
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute ?shall_we_compute_profiling_information
+    ?print_if_zero:_
     handler profiling_info error s f l a =
   fold_story_table_gen
     Loggers.dummy_txt_logger
     parameter
-    ~shall_we_compute:shall_we_compute
-    ~shall_we_compute_profiling_information:shall_we_compute_profiling_information
+    ?shall_we_compute
+    ?shall_we_compute_profiling_information
     handler profiling_info error s f l a
 
 
 let get_counter story_list = story_list.story_counter
 let get_stories story_list = story_list.story_list
-let inc_counter story_list = { story_list with story_counter = succ story_list.story_counter }
+let _inc_counter story_list = { story_list with story_counter = succ story_list.story_counter }
 
 let build_grid parameter handler computation_info error trace bool =
   let error,computation_info = StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Build_grid None computation_info in
@@ -605,8 +599,8 @@ let build_grid parameter handler computation_info error trace bool =
 
 let store_trace
     (parameter:parameter)
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     handler computation_info error trace obs_info story_table =
   let error,computation_info = StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Store_trace None computation_info in
   let pretrace = get_pretrace_of_trace trace in
@@ -632,8 +626,8 @@ let store_trace
 
 let flatten_story_table
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     handler log_info error story_table =
   let error,log_info,list = D.hash_list parameter handler log_info error story_table.story_list in
   error,
@@ -644,9 +638,9 @@ let flatten_story_table
 
 let compress
     ?heuristic parameter
-    ?(shall_we_compute=we_shall)
-    ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_
+    ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     handler log_info error trace =
   match
     parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
@@ -754,31 +748,31 @@ let convert_trace_into_grid trace handler =
 
 let convert_trace_into_musical_notation
     parameters
-    ?(shall_we_compute=we_shall)
-    ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_
+    ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     kappa_handler profiling_info error trace =
   S.PH.B.import parameters kappa_handler profiling_info error (get_pretrace_of_trace trace)
 
 let enrich_grid_with_transitive_closure
     config  logger
-    ?(shall_we_compute=we_shall)
-    ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_
+    ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     handler log_info error grid =
   let error,log_info,output = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters logger) handler log_info error config grid in
   error,log_info,output
 
 let enrich_grid_with_transitive_past_of_observables_with_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_big_graph_with_progress_bar
 let enrich_grid_with_transitive_past_of_observables_without_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_big_graph_without_progress_bar
-let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_big_graph_without_progress_bar
+let _enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_big_graph_without_progress_bar
 let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_small_graph
 
 let sort_story_list  = D.sort_list
 let export_story_table
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     handler log_info error x =
   let a,log_info,b = sort_story_list parameter handler log_info error (get_stories x) in
   a,log_info,b
@@ -868,7 +862,7 @@ let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
   let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.logger_err string n_fail in
   error,profiling_information,a
 
-let fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar parameter handler log_info error f t a =
+let _fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar parameter handler log_info error f t a =
   let grid = convert_trace_into_grid t handler in
   Causal.fold_over_causal_past_of_obs
     parameter
@@ -882,8 +876,8 @@ let fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar 
 
 let fold_over_the_causal_past_of_observables_with_a_progress_bar
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     handler log_info error log_step debug_mode counter f t a =
   let () =
     if log_step parameter
@@ -981,8 +975,8 @@ type canonical_form = Dag.canonical_form
 let compare_canonical_form = Dag.compare_canonic
 let compute_canonical_form
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     handler log_info error trace =
   let grid = convert_trace_into_grid trace handler in
   let error, log_info, graph = Dag.graph_of_grid parameter handler log_info error grid in
@@ -1019,10 +1013,10 @@ type black_list = BlackList.t
 let create_black_list n = BlackList.init n
 
 let black_list
-    parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
-    handler log_info error trace blacklist =
+    _parameter
+    ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
+    _handler log_info error trace blacklist =
   let blacklist =
     List.fold_left
       (fun blacklist (event,_) ->
@@ -1032,7 +1026,7 @@ let black_list
   in
   error, log_info, blacklist
 
-let remove_blacklisted_event handler log_info error blacklist trace =
+let remove_blacklisted_event _handler log_info error blacklist trace =
   let list,int =
     List.fold_left
       (fun (trace,int) event ->
@@ -1046,8 +1040,8 @@ let remove_blacklisted_event handler log_info error blacklist trace =
 
 let remove_blacklisted_event
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-    ?(print_if_zero=we_shall)
+    ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+    ?print_if_zero:_
     handler log_info error blacklist trace =
   lift_to_care_about_ambiguities
     (transform_trace_gen
@@ -1061,10 +1055,7 @@ let remove_blacklisted_event
 
 let last_eid_in_pretrace trace =
   let l = List.rev (get_pretrace_of_trace trace) in
-  let rec aux list =
-    match
-      l
-    with
+  let rec aux = function
     | [] -> 0
     | h::t ->
       begin

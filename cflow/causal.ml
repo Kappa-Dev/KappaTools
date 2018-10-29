@@ -121,7 +121,7 @@ let add_init_pid eid pid grid =
   let () = Hashtbl.replace grid.init_to_eidmax eid_init eid in
   grid
 
-let subset subs l s =
+let _subset subs l s =
   List.fold_left
     (fun s' a ->
        if Mods.IntSet.mem a s
@@ -150,15 +150,15 @@ let subenriched_grid_with_subs subs  grid l =
     size = List.length l ;
   }
 
-let subconfig config l = subconfig_with_subs (build_subs l) config l
-let subenriched_grid grid l = subenriched_grid_with_subs (build_subs l) grid l
+let _subconfig config l = subconfig_with_subs (build_subs l) config l
+let _subenriched_grid grid l = subenriched_grid_with_subs (build_subs l) grid l
 
 let add_obs_eid eid grid = {grid with obs = eid::(grid.obs)}
 
 let grid_find (node_id,site_id,quark) grid =
   Hashtbl.find grid.flow (node_id,site_id,quark)
 
-let is_empty_grid grid = (Hashtbl.length grid.flow = 0)
+let _is_empty_grid grid = (Hashtbl.length grid.flow = 0)
 
 let grid_add quark eid (attribute:attribute) grid =
   let () =
@@ -167,7 +167,7 @@ let grid_add quark eid (attribute:attribute) grid =
   Hashtbl.replace grid.flow quark attribute ;
   grid
 
-let last_event attribute =
+let _last_event attribute =
   match attribute with
   | [] -> None
   | a::_ -> (Some a.eid)
@@ -190,15 +190,15 @@ let push (a:atom) (att:atom list) =
 (*let impact is_link c =
   if is_link then
     if Primitives.Causality.is_link_modif c then
-      if Primitives.Causality.is_link_tested c then 3 else 2
-    else 1
+      if Primitives.Causality.is_link_tested c then atom_testedmodified else atom_modified
+    else atom_tested
   else (*internal state*)
     if Primitives.Causality.is_internal_modif c then
-      if Primitives.Causality.is_internal_tested c then 3 else 2
-    else 1
+      if Primitives.Causality.is_internal_tested c then atom_testedmodified else atom_modified
+    else atom_tested
 *)
 let add ((node_id,_),site_id) is_link va grid event_number kind =
-  let q = if is_link then 1 else 0 in
+  let q = if is_link then atom_tested else 0 in
   let att =
     try grid_find (node_id,site_id,q) grid
     with Not_found -> [] in
@@ -303,7 +303,7 @@ let rec parse_attribute last_modif last_tested attribute config =
       Mods.IntMap.add atom.eid preds config.prec_1 in
     let config = {config with events_kind =  events_kind ; prec_1 = prec_1} in
     (*atom has a modification*)
-    if (atom.causal_impact = atom_modified) || (atom.causal_impact = 3) then
+    if (atom.causal_impact = atom_modified) || (atom.causal_impact = atom_testedmodified) then
       let config =
         List.fold_left (fun config pred_id -> add_pred pred_id atom config)
           config last_tested in
@@ -341,10 +341,10 @@ let cut ?with_reduction:(with_reduction=true) parameter handler log_info error a
               Mods.IntMap.find_default Mods.IntSet.empty atom.eid cfg.prec_1 in
             Mods.IntMap.add atom.eid preds cfg.prec_1 in
           let tested =
-            if (atom.causal_impact = atom_tested) || (atom.causal_impact = 3)
+            if (atom.causal_impact = atom_tested) || (atom.causal_impact = atom_testedmodified)
             then [atom.eid] else [] in
           let modif =
-            if (atom.causal_impact = atom_modified) || (atom.causal_impact = 3)
+            if (atom.causal_impact = atom_modified) || (atom.causal_impact = atom_testedmodified)
             then Some atom.eid else None in
           parse_attribute
             modif tested att
@@ -363,12 +363,13 @@ let cut ?with_reduction:(with_reduction=true) parameter handler log_info error a
   error,log_info,{cfg with prec_1 = reduction}
 
 let pp_atom f atom =
-  let imp_str = match atom.causal_impact with
+  let imp_str =
+    match atom.causal_impact with
       1 -> "o" | 2 -> "x" | 3 -> "%"
     | _ -> invalid_arg "Causal.string_of_atom" in
   Format.fprintf f "%s_%d" imp_str atom.eid
 
-let dump grid fic =
+let _dump grid fic =
   let d_chan = Kappa_files.open_out ((Filename.chop_extension fic)^".txt") in
   let d = Format.formatter_of_out_channel d_chan in
   let () = Format.pp_open_vbox d 0 in
@@ -601,19 +602,19 @@ let check_create_quarks aid sites quarks =
   List.for_all
     (fun (site,internal) ->
       match internal with
-      | Some _ -> ((List.mem (2,(aid,site,0)) quarks)&&
-                     (List.mem (2,(aid,site,1)) quarks))
-      | None -> (List.mem (2,(aid,site,1)) quarks)) sites
+      | Some _ -> ((List.mem (atom_modified,(aid,site,0)) quarks)&&
+                     (List.mem (atom_modified,(aid,site,1)) quarks))
+      | None -> (List.mem (atom_modified,(aid,site,1)) quarks)) sites
 
 let check_modified_quarks ((aid,_),site) modif quarks =
   List.exists
     (fun (c,(n,s,m)) ->
-      ((c=2)||(c=3))&&(n=aid)&&(s=site)&&(m=modif)) quarks
+      ((c=atom_modified)||(c=atom_testedmodified))&&(n=aid)&&(s=site)&&(m=modif)) quarks
 
 let check_tested_quarks ((aid,_),site) modif quarks =
   List.exists
     (fun (c,(n,s,m)) ->
-      ((c=1)||(c=3))&&(n=aid)&&(s=site)&&(m=modif)) quarks
+      ((c=atom_tested)||(c=atom_testedmodified))&&(n=aid)&&(s=site)&&(m=modif)) quarks
 
 let check_event_quarks actions tests quarks =
   (List.for_all
@@ -631,14 +632,14 @@ let check_event_quarks actions tests quarks =
      | Instantiation.Remove (aid,_) ->
         List.exists
           (fun (c,(n,_,_)) ->
-            ((c=2)||(c=3))&&(n=aid)) quarks)
+            ((c=atom_modified)||(c=atom_testedmodified))&&(n=aid)) quarks)
     actions)&&
   (List.for_all (List.for_all
     (function
      | Instantiation.Is_Here (aid,_) ->
         List.exists
           (fun (c,(n,_,_)) ->
-            ((c=1)||(c=3))&&(n=aid)) quarks
+            ((c=atom_tested)||(c=atom_testedmodified))&&(n=aid)) quarks
      | Instantiation.Has_Internal (asite,_) ->
         check_tested_quarks asite 0 quarks
      | Instantiation.Is_Free asite | Instantiation.Is_Bound asite

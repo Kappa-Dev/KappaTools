@@ -106,7 +106,7 @@ module Po_cut =
 
     type on_the_fly_state = PS.t * Trace.step list * int
     let init_cut = (PS.empty, [], 0)
-    let finalize_cut (a,b,c) = b,c
+    let finalize_cut (_a,b,c) = b,c
 
     let cut_step (seen,kept,n_cut) event =
       let rec keep l =

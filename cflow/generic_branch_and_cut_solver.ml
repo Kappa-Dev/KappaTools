@@ -48,7 +48,7 @@ struct
       (PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error  pos
       ~message exn default
 
-  let combine_output o1 o2 =
+  let _combine_output o1 o2 =
     if PH.B.is_ignored o2 then o1 else o2
 
   let rec propagate parameter handler log_info error instruction_list propagate_list blackboard =
@@ -134,7 +134,7 @@ struct
     | [],_ -> true
     | _,[] -> false
     | h::t,h'::t' when h=h' -> sublist t t'
-    | _,h'::t' -> sublist l t'
+    | _,_h'::t' -> sublist l t'
 
   let sort_stories_according_to_length l =
     List.rev_map fst (List.sort (fun (_,a) (_,b) -> compare b a) (List.rev_map (fun a -> (a,List.length a)) l))
@@ -198,7 +198,8 @@ struct
       let error,choice_list =
         if no_more_choice choice_list
         then
-          let error,log_info,list = PH.next_choice parameter handler log_info error blackboard in
+          let error,_log_info,list =
+            PH.next_choice parameter handler log_info error blackboard in
           error,update_current choice_list list
         else
           error,choice_list
@@ -219,10 +220,11 @@ struct
         iter parameter handler log_info error blackboard (branch_choice_list choice_list) story_list
 
   let detect_independent_events parameter handler log_info error blackboard list_eid =
-    let error,log_info,(blackboard,events_to_keep) = PH.B.cut parameter handler log_info error blackboard list_eid  in
+    let error,log_info,(_blackboard,events_to_keep) =
+      PH.B.cut parameter handler log_info error blackboard list_eid  in
     error,log_info,events_to_keep
 
-  let translate parameter handler log_info error blackboard list =
+  let translate _parameter _handler log_info error blackboard list =
     let list' =
       List.rev_map
         (fun k ->
@@ -269,7 +271,7 @@ struct
         let () = Loggers.print_newline (PH.B.PB.CI.Po.K.H.get_logger parameter) in
         ()
     in
-    let error,log_info,(blackboard,output) =
+    let error,log_info,(blackboard,_output) =
       propagate parameter handler log_info error forbidden_events [] blackboard
     in
     let log_info = StoryProfiling.StoryStats.set_concurrent_event_deletion_time log_info in

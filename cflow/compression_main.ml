@@ -33,15 +33,10 @@ let log_step = true
 let debug_mode = false
 let dump_profiling_info = true
 
+let _ = dump_profiling_info
+
 let bucket_sort = true
 let get_all_stories = false (** false -> only the first story per observable hit; true -> all stories per obs hit *)
-
-let th_of_int n =
-  match n mod 10 with
-  | 1 -> (string_of_int n)^"st"
-  | 2 -> (string_of_int n)^"nd"
-  | 3 -> (string_of_int n)^"rd"
-  | _ -> (string_of_int n)^"th"
 
 let max_number_of_itterations = None
 
@@ -232,9 +227,9 @@ let compress_and_print
                   ~event:StoryProfiling.Collect_traces
                   (fun
                     parameter
-                    ?(shall_we_compute=we_shall)
-                    ?(shall_we_compute_profiling_information=we_shall)
-                    ?(print_if_zero=we_shall)
+                    ?shall_we_compute:_
+                    ?shall_we_compute_profiling_information:_
+                    ?print_if_zero:_
                     handler log_info error story_list observable_id ->
                     let () =
                       if debug_mode then
@@ -428,9 +423,9 @@ let compress_and_print
                            handler log_info error trace
                       )
                       (fun parameter
-                        ?shall_we_compute
-                        ?shall_we_compute_profiling_information
-                        ?print_if_zero
+                        ?shall_we_compute:_
+                        ?shall_we_compute_profiling_information:_
+                        ?print_if_zero:_
                         handler log_info error trace info (blacklist,table2,table3) ->
                         let error,log_info,table2 = U.store_trace parameter handler log_info error trace info table2 in
                         let error,log_info,trace = U.remove_blacklisted_event parameter handler log_info error blacklist trace in
@@ -498,9 +493,9 @@ let compress_and_print
                            handler log_info error trace
                       )
                       (fun parameter
-                        ?shall_we_compute
-                        ?shall_we_compute_profiling_information
-                        ?print_if_zero
+                        ?shall_we_compute:_
+                        ?shall_we_compute_profiling_information:_
+                        ?print_if_zero:_
                         handler log_info error info trace table ->
                         let error, info, table = U.store_trace parameter handler log_info error info trace table in
                         let () = Cflow_js_interface.save_trivial_compression_table js_interface table in
@@ -535,8 +530,8 @@ let compress_and_print
                         U.fold_story_table_with_progress_bar parameter handler log_info error "weak compression"
                           (fun
                             parameter
-                            ?shall_we_compute ?shall_we_compute_profiling_information
-                            ?print_if_zero
+                            ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+                            ?print_if_zero:_
                             handler log_info error trace list_info (blacklist,story_list) ->
                              let error,log_info,list = U.weakly_compress parameter handler log_info error trace in
                              let error,log_info,blacklist,story_list =
@@ -578,8 +573,8 @@ let compress_and_print
                     "strong_compression"
                     (fun
                       parameter
-                      ?shall_we_compute ?shall_we_compute_profiling_information
-                      ?print_if_zero
+                      ?shall_we_compute:_ ?shall_we_compute_profiling_information:_
+                      ?print_if_zero:_
                       handler log_info error refined_event_list list_info strongly_story_table ->
                       let error,log_info,list = U.compress parameter handler log_info error refined_event_list in
                       let error,log_info,strongly_story_table =

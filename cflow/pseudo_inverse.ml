@@ -78,7 +78,7 @@ module type Cut_pseudo_inverse =
        }
 
 
-      let print_blackboard parameter handler error blackboard =
+      let _print_blackboard parameter handler error blackboard =
         let () = Loggers.fprintf (Po.K.H.get_debugging_channel parameter) "Blackboard for removing pseudo inverse element" in
         let () = Loggers.print_newline (Po.K.H.get_debugging_channel parameter) in
         let () = Loggers.fprintf (Po.K.H.get_debugging_channel parameter)"n_events: %i" blackboard.nsteps in

@@ -187,6 +187,7 @@ val export_story_table: (story_table,(Trace.t*Causal.grid*trace_runtime_info lis
 
 
 (** The following functions are for expert only *)
+
 (** compress a trace with the level of abstraction defined in the argument parameter.
     The optional argument heuristic can be used to tune the heuristic that select which
     event will be tried to be discarded first. *)
@@ -219,7 +220,9 @@ type observable_hit
 
 val get_runtime_info_from_observable_hit:
   observable_hit -> unit Trace.Simulation_info.t option
+
 (** Musical processing *)
+
 val convert_trace_into_musical_notation:
   (trace,musical_grid) unary
 val extract_observable_hits_from_musical_notation:
@@ -233,6 +236,7 @@ val causal_prefix_of_an_observable_hit:
 (** Show the current status of the branch and cut assumptions in a libreoffice macro file *)
 val export_musical_grid_to_xls:
   (string,int,int,musical_grid,unit) quaternary
+
 (** Show the current status of the branch and cut assumptions in ASCII *)
 val print_musical_grid:
   (musical_grid,unit) unary

@@ -162,7 +162,7 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
       (fun () -> ())
   in
   let s_pred_star = A.make (max_index+1) [] in
-  let clean,max_succ =
+  let clean,_max_succ =
     begin
       let max_succ = A.init (max_index+1) (fun i -> i) in
       let _ =
@@ -271,7 +271,7 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
 let closure_bottom_up parameter handler log_info error event_opt config prec is_obs =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let s_pred_star = A.make (max_index+1) [] in
-  let f p h c e i s a =
+  let f _p _h c e i s a =
     let _ = A.set a i s in (e,c,Stop.success a)
   in
   let output = closure_bottom_up_with_fold parameter handler log_info error event_opt config prec is_obs
@@ -282,7 +282,7 @@ let closure_bottom_up parameter handler log_info error event_opt config prec is_
     (fun (error,log_info,_) -> error,log_info,(s_pred_star,Decreasing_without_last_event))
     output
 
-let closure_top_down parameter handler log_info error event_opt config prec is_obs  delta =
+let closure_top_down parameter _handler log_info error _event_opt config prec is_obs  delta =
   let err_logger = Remanent_parameters.get_logger parameter in
   let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in
   let max_index = M.fold (fun i _ -> max i) prec 0 in
@@ -314,7 +314,7 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
     match
       taints
     with [] -> ()
-       | t::q ->
+       | t::_q ->
          S.iter
            (fun taint -> A.set s_pred_star taint (i::(A.get s_pred_star taint)))
            t
@@ -381,7 +381,7 @@ let closure_check parameter handler log_info error event_opt config prec is_obs 
   let _ = Printf.fprintf stderr "NEW: %f OLD: %f \n" (t'-.t) (t''-.t') in
   let _ =
     A.iteri
-      (fun i s ->
+      (fun i _s ->
          let s = get_list_in_increasing_order_with_last_event i (a,a') in
          let s' = get_list_in_increasing_order_with_last_event i (b,b') in
          if s = s' then ()

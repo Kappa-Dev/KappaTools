@@ -36,9 +36,9 @@ let weight x =
   | Low -> 5
   | Lowest -> 6
 
-let compare_level lvl1 lvl2 = compare (weight lvl1) (weight lvl2)
+let _compare_level lvl1 lvl2 = compare (weight lvl1) (weight lvl2)
 let min_level a b = if compare a b <= 0 then a else b
-let max_level a b = if compare a b <= 0 then b else a
+let _max_level a b = if compare a b <= 0 then b else a
 
 let highest = Highest
 let high = High
@@ -102,9 +102,9 @@ type priorities =
     candidate_set_of_events: selection_strategy;
     try_to_remove_first: try_to_remove_first;
   }
-(** each event is associated with a level corresponding of its actions (if multiple action, then, the least corresponding level is selected *)
-(** Events with the least level of priority are removed first *)
-(** Among them, the choice is driven by the fields 'candidate_set_of_events' and 'try_to_remove_first' *)
+(** each event is associated with a level corresponding of its actions (if multiple action, then, the least corresponding level is selected
+ Events with the least level of priority are removed first
+ Among them, the choice is driven by the fields 'candidate_set_of_events' and 'try_to_remove_first' *)
 
 let causal =
   {
