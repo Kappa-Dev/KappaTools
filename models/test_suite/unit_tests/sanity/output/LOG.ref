@@ -304,8 +304,6 @@ Some exceptions have been raised
 error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 778; exception:Exit
 Some exceptions have been raised
 error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 778; exception:Exit
-Some exceptions have been raised
-error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 778; exception:Exit
 Mvbdu.001: ok
 Mvbdu.002: ok
 Mvbdu.003: ok

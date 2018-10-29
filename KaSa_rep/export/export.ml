@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 29 2018>
+  * Last modification: Time-stamp: <Dec 04 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -91,11 +91,11 @@ let init ?compil ~called_from () =
           let errors = Exception.empty_error_handler in
           let errors, parameters, files  = Get_option.get_option errors in
           let log = (Remanent_parameters.get_logger parameters) in
-          (*  let _ =
+          let _ =
             Loggers.fprintf log "%s"
               (Remanent_parameters.get_full_version parameters)
-              in
-              let () = Loggers.print_newline log in*)
+          in
+          let () = Loggers.print_newline log in
           let _ =
             Loggers.fprintf log "%s"
               (Remanent_parameters.get_launched_when_and_where parameters)

@@ -670,10 +670,10 @@ struct
     in
     error, dynamic, ()
 
-  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
+  let _lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let cc_mixture_is_reachable _static dynamic error _ccmixture =
+  let _cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
   let get_dead_rules _static _dynamic  =

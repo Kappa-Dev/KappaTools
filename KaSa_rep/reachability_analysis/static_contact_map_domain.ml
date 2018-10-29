@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 22 2018>
+   * Last modification: Time-stamp: <Dec 04 2018>
    *
    * Abstract domain to record live rules
    *
@@ -14,6 +14,8 @@
    * under the terms of the GNU Library General Public License *)
 
 let local_trace = false
+
+let _ = local_trace
 
 module Domain =
 struct
@@ -39,14 +41,6 @@ struct
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
-  let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
-
-  let get_compil static = lift Analyzer_headers.get_cc_code static
-
-  let get_bond_rhs static = lift Analyzer_headers.get_bonds_rhs static
-
-  let get_bond_lhs static = lift Analyzer_headers.get_bonds_lhs static
-
   (*--------------------------------------------------------------------*)
   (** dynamic information*)
 
@@ -58,26 +52,6 @@ struct
 
   (**************************************************************************)
   (*implementations*)
-
-  let add_oriented_relation parameter error r_id site1 site2 map =
-    let error, old_set =
-      match
-        Ckappa_sig.PairAgentSiteState_map_and_set.Map.find_option_without_logs
-          parameter error (site1,site2) map
-      with
-      | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
-      | error, Some s -> error, s
-    in
-    let error, new_set =
-      Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
-        parameter error r_id old_set
-    in
-    Ckappa_sig.PairAgentSiteState_map_and_set.Map.add_or_overwrite
-      parameter error (site1,site2) new_set map
-
-  let add_relation parameter error r_id site1 site2 map =
-    let error, map = add_oriented_relation parameter error r_id site1 site2 map in
-    add_oriented_relation parameter error r_id site2 site1 map
 
   let initialize static dynamic error =
     let init_global_dynamic_information =
@@ -184,12 +158,6 @@ struct
   let print ?dead_rules _static dynamic error _loggers =
     let _ = dead_rules in
     error, dynamic, ()
-
-  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do *)
-
-  let cc_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do *)
 
   let get_dead_rules _static _dynamic  =
     Analyzer_headers.dummy_dead_rules

@@ -175,8 +175,6 @@ functor (A:Analyzer.Analyzer) ->
             | None -> short_origin_of_influence_map state
             | Some _ -> state, short_id_opt in
           let parameters = get_parameters state in
-          let state, handler = get_handler state in
-          let state, compil = get_c_compilation state in
           let error = get_errors state in
           let error, id_int =
             match short_id_opt with
@@ -212,8 +210,6 @@ functor (A:Analyzer.Analyzer) ->
             | Some _ -> state, short_id_opt
           in
           let parameters = get_parameters state in
-          let state, handler = get_handler state in
-          let state, compil = get_c_compilation state in
           let error = get_errors state in
           let error, id_int =
             match short_id_opt with

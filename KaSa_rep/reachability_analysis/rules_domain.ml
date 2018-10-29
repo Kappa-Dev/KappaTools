@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 22 2018>
+   * Last modification: Time-stamp: <Dec 04 2018>
    *
    * Abstract domain to record live rules
    *
@@ -52,8 +52,6 @@ struct
   let lift f x = f (get_global_static_information x)
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
-
-  let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
@@ -370,12 +368,6 @@ struct
         error
     in
     error, dynamic, ()
-
-  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do *)
-
-  let cc_mixture_is_reachable _static dynamic error _ccmixture =
-    error, dynamic, Usual_domains.Maybe (* to do *)
 
   let get_dead_rules _static dynamic =
     (fun parameters error r_id ->

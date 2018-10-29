@@ -77,7 +77,7 @@ let rec safety_check_maximal_sharing_working_list (allocate_uniquely:('a,'b,'c,'
   match working_list with
     | [] -> error,true,handler
     | mvbdu::tail ->
-      (** check that mvbdu is uniquely represented in memory *)
+      (* check that mvbdu is uniquely represented in memory *)
       let error,output =
         try
           allocate_uniquely
@@ -116,9 +116,9 @@ let rec safety_check_maximaly_compressed_working_list error working_list =
         match head.Mvbdu_sig.value with
           | Mvbdu_sig.Leaf _ -> safety_check_maximaly_compressed_working_list error tail
           | Mvbdu_sig.Node x ->
-            (** check that mvbdu is maximally compressed *)
+            (* check that mvbdu is maximally compressed *)
             if x.Mvbdu_sig.branch_true == x.Mvbdu_sig.branch_false
-            (**sibbling should be different*)
+            (*sibbling should be different*)
             then error, false
             else
               match x.Mvbdu_sig.branch_false.Mvbdu_sig.value with
@@ -126,7 +126,7 @@ let rec safety_check_maximaly_compressed_working_list error working_list =
                   safety_check_maximaly_compressed_working_list error tail
                 | Mvbdu_sig.Node y ->
                   if x.Mvbdu_sig.branch_true == y.Mvbdu_sig.branch_true
-                  (**successive true_sibbling should be different*)
+                  (*successive true_sibbling should be different*)
                   then error, false
                   else
                     safety_check_maximaly_compressed_working_list

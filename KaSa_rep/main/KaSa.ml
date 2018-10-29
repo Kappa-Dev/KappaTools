@@ -11,8 +11,6 @@
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
 
-open Mat_inter
-
 let main () =
   let start_time = Sys.time () in
   let errors = Exception.empty_error_handler in

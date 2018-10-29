@@ -86,10 +86,6 @@ sig
      Communication.precondition,
      Communication.precondition option) binary
 
-  val maybe_reachable:
-    (Cckappa_sig.mixture,
-     Communication.precondition, Communication.precondition option) binary
-
   val apply_rule:
     (Ckappa_sig.c_rule_id,
      Communication.precondition,

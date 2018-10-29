@@ -41,63 +41,6 @@ type global_dynamic_information =
     log_info: StoryProfiling.StoryStats.log_info;
   }
 
-type event =
-  | Dummy
-  | Check_rule of Ckappa_sig.c_rule_id
-  | See_a_new_bond of
-      (
-        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-        * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
-           Ckappa_sig.c_state)
-      )
-
-type 'a bot_or_not =
-  | Bot
-  | Not_bot of 'a
-
-type 'a top_or_not =
-  | Top
-  | Not_top of 'a
-
-type maybe_bool =
-  | Sure_value of bool
-  | Maybe
-
-type step =
-  {
-    site_out: Ckappa_sig.c_site_name;
-    site_in: Ckappa_sig.c_site_name;
-    agent_type_in: Ckappa_sig.c_agent_name
-  }
-type path =
-  {
-    agent_id: Ckappa_sig.c_agent_id;
-    relative_address: step list;
-    site: Ckappa_sig.c_site_name;
-  }
-
-module type PathMap =
-sig
-  type 'a t
-  val empty: 'a -> 'a t
-  val add: path -> 'a -> 'a t -> 'a t
-  val find: path -> 'a t -> 'a option
-end
-
-module PathSetMap =
-  SetMap.Make (struct type t = path let compare = compare let print _ _ = () end)
-
-module PathMap =
-  (struct
-
-    type 'a t   = 'a PathSetMap.Map.t
-
-    let empty _ = PathSetMap.Map.empty
-    let add     = PathSetMap.Map.add
-    let find    = PathSetMap.Map.find_option
-
-  end:PathMap)
-
 type ('static, 'dynamic) kasa_state = ('static, 'dynamic) Remanent_state.state
 
 type initial_state = Cckappa_sig.enriched_init

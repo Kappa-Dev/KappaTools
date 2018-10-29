@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2018, the 21th of August
-   * Last modification: Time-stamp: <Aug 22 2018>
+   * Last modification: Time-stamp: <Dec 04 2018>
    *
    * Abstract domain to record effective side effects
    *
@@ -14,6 +14,8 @@
    * under the terms of the GNU Library General Public License *)
 
 let local_trace = false
+
+let _ = local_trace
 
 module Domain =
 struct
@@ -51,10 +53,6 @@ struct
   let lift f x = f (get_global_static_information x)
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
-
-  let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
-
-  let get_compil static = lift Analyzer_headers.get_cc_code static
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
@@ -241,12 +239,6 @@ struct
   let print ?dead_rules _static dynamic error _loggers =
     let _ = dead_rules in
     error, dynamic, ()
-
-  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe
-
-  let cc_mixture_is_reachable _static dynamic error _ccmixture =
-    error, dynamic, Usual_domains.Maybe
 
   let get_dead_rules _static _dynamic  =
       Analyzer_headers.dummy_dead_rules

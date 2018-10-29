@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Feb 22 2018>
+   * Last modification: Time-stamp: <Dec 09 2018>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -254,7 +254,15 @@ module type Nul =
   sig
   end
 
+module Optimize (M:Mvbdu with type key = int and type value = int) :
+  Mvbdu
+  with type mvbdu = M.mvbdu and type key = int and type value = int
+
 module Internalize (M:Mvbdu with type key = int and type value = int) :
+  Internalized_mvbdu
+  with type mvbdu = M.mvbdu and type key = int and type value = int
+
+module Optimize_internalized (M:Internalized_mvbdu with type key = int and type value = int) :
   Internalized_mvbdu
   with type mvbdu = M.mvbdu and type key = int and type value = int
 
@@ -263,3 +271,4 @@ module Mvbdu:Mvbdu with type key = int and type value = int
 module IntMvbdu:Internalized_mvbdu with type key = int and type value = int and type mvbdu= Mvbdu.mvbdu
 module Optimized_Mvbdu:Mvbdu with type key = int and type value = int
 module Optimized_IntMvbdu:Internalized_mvbdu with type key = int and type value = int
+module Optimized_IntMvbdu_bis:Internalized_mvbdu with type key = int and type value = int

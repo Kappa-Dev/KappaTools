@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <May 01 2018>
+  * Last modification: Time-stamp: <Dec 04 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -139,8 +139,6 @@ module Export =
 
       let get_contact_map = get_contact_map
       let dump_contact_map = dump_contact_map
-      let get_scc_contact_map = get_internal_scc_decomposition
-
 
       let get_internal_contact_map = get_internal_contact_map
       let get_influence_map = get_internal_influence_map

@@ -29,7 +29,7 @@ let rec safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c,'d,'e) Sanity_
   match list_val with
     | List_sig.Empty -> error,true,handler
     | List_sig.Cons _ ->
-      (** check that list is uniquely represented in memory *)
+      (* check that list is uniquely represented in memory *)
       let error,output = allocate_uniquely
         error
         compare

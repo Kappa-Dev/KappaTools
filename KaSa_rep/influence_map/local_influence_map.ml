@@ -35,17 +35,6 @@ let origin =
     Remanent_state.total=0;
   }
 
-let combine_distance a b =
-  match a with
-  | None -> Some b
-  | Some a ->
-    Some
-      {
-        Remanent_state.fwd = min a.Remanent_state.fwd b.Remanent_state.fwd ;
-        Remanent_state.bwd = min a.Remanent_state.fwd b.Remanent_state.fwd ;
-        Remanent_state.total = min a.Remanent_state.total b.Remanent_state.total
-      }
-
 let init_blackboard nrules nvars =
   let n = nrules + nvars in
   {

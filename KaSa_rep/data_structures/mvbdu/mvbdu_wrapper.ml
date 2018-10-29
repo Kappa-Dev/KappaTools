@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Feb 22 2018>
+   * Last modification: Time-stamp: <Dec 09 2018>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -1013,9 +1013,9 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
       | None -> error,handler,list
       | Some bdu -> error,handler,bdu::list
 
-  end:Mvbdu with type key = int and type value = int)
+  end:Mvbdu with type mvbdu = M.mvbdu and type key = int and type value = int)
 
-module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) =
+module Optimize_internalized(M:Internalized_mvbdu with type key = int and type value = int) =
   (struct
     module Mvbdu = M
 
@@ -1107,11 +1107,11 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
     let hash_of_variables_list = M.hash_of_variables_list
     let nbr_variables = M.nbr_variables
 
-  end:Internalized_mvbdu)
-
+  end:Internalized_mvbdu with type mvbdu = M.mvbdu and type key = int and type value = int)
 
 module Vd = struct end
 module Mvbdu = Make(Vd)
-module IntMvbdu = Internalize(Mvbdu)
+module IntMvbdu = Internalize(Make(Vd))
 module Optimized_Mvbdu = Optimize(Make(Vd))
 module Optimized_IntMvbdu = Internalize(Optimize(Make (Vd)))
+module Optimized_IntMvbdu_bis = Optimize_internalized(Internalize(Make(Vd)))

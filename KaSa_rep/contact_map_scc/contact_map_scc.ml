@@ -175,10 +175,6 @@ let mixture_of_edge
     in
     error, Build_graph.export mixture
 
-(* *)
-exception Pass of Exception.method_handler
-exception False of Exception.method_handler
-
 let filter_edges_in_converted_contact_map
     parameters error handler static dynamic
     is_reachable
@@ -198,58 +194,54 @@ let filter_edges_in_converted_contact_map
   let error, dynamic, converted_contact_map =
     Ckappa_sig.PairAgentSite_map_and_set.Map.fold
       (fun node1 potential_sites (error, dynamic, map) ->
-         try
-           begin
+         begin
+           let error, dynamic, potential_sites' =
              let error, dynamic, potential_sites' =
-               try
-                 let error, dynamic, potential_sites' =
-                   List.fold_left
-                     (fun (error, dynamic, potential_sites') node2 ->
-                       let ((ag,st),(ag',st')) = node1 in
-                       let ((ag'',st''),(ag''',st''')) = node2 in
-                       let pattern =
-                         (((ag,st),(ag',st')),
-                          ((ag'',st''),(ag''',st''')))
-                       in
-                       let error, mixture =
-                         mixture_of_edge
-                           parameters error handler
-                           pattern
-                       in
-                       let error, dynamic, bool =
-                         is_reachable parameters error
-                           static dynamic
-                           mixture
-                       in
-                       let error, potential_sites' =
-                         if bool
-                         then
-                           error, node2 :: potential_sites'
-                         else
-                           error, potential_sites'
-                       in
-                       error, dynamic, potential_sites'
-                     )  (error, dynamic, []) potential_sites
-                 in
-                 error, dynamic, potential_sites'
-               with False (error) -> error, dynamic, potential_sites
+               List.fold_left
+                 (fun (error, dynamic, potential_sites') node2 ->
+                    let ((ag,st),(ag',st')) = node1 in
+                    let ((ag'',st''),(ag''',st''')) = node2 in
+                    let pattern =
+                      (((ag,st),(ag',st')),
+                       ((ag'',st''),(ag''',st''')))
+                    in
+                    let error, mixture =
+                      mixture_of_edge
+                        parameters error handler
+                        pattern
+                    in
+                    let error, dynamic, bool =
+                      is_reachable parameters error
+                        static dynamic
+                        mixture
+                    in
+                    let error, potential_sites' =
+                      if bool
+                      then
+                        error, node2 :: potential_sites'
+                      else
+                        error, potential_sites'
+                    in
+                    error, dynamic, potential_sites'
+                 ) (error, dynamic, []) potential_sites
              in
-             if  potential_sites' <> []
-             then
-               let error', map =
-                 Ckappa_sig.PairAgentSite_map_and_set.Map.add
-                   parameters error
-                   node1
-                   potential_sites'
-                   map
-               in
-               let error =
-                 Exception.check_point Exception.warn parameters error error' __POS__ Exit
-               in
-               error, dynamic, map
-             else error, dynamic, map
-           end
-         with Pass error -> error, dynamic, map
+             error, dynamic, potential_sites'
+           in
+           if  potential_sites' <> []
+           then
+             let error', map =
+               Ckappa_sig.PairAgentSite_map_and_set.Map.add
+                 parameters error
+                 node1
+                 potential_sites'
+                 map
+             in
+             let error =
+               Exception.check_point Exception.warn parameters error error' __POS__ Exit
+             in
+             error, dynamic, map
+           else error, dynamic, map
+         end
       ) converted_contact_map
       (error, dynamic, Ckappa_sig.PairAgentSite_map_and_set.Map.empty)
   in

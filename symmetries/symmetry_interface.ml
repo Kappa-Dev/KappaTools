@@ -5,8 +5,6 @@
 
 type rule = Primitives.elementary_rule
 
-module SyntacticRuleSetMap = Mods.IntSetMap
-
 type preprocessed_ast = Cli_init.preprocessed_ast
 type ast = Ast.parsing_compil
 

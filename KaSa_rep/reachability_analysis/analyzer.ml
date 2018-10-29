@@ -209,13 +209,6 @@ struct
     in
     error, log_info, static, dynamic
 
-  let rev_opt l =
-    match
-      l
-    with
-    | None -> None
-    | Some l -> Some (List.rev l)
-
   let export static dynamic error kasa_state =
     let kasa_state =
       Remanent_state.set_internal_constraints_list [] kasa_state in

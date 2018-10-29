@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 22 2018>
+  * Last modification: Time-stamp: <Dec 04 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -80,20 +80,12 @@ struct
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
-  let get_wake_up_relation static =
-    lift Analyzer_headers.get_wake_up_relation static
-
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
-  let get_views_rhs static = lift Analyzer_headers.get_views_rhs static
-
   let get_action_binding static =
     lift Analyzer_headers.get_action_binding static
-
-  let get_project_modified_map static =
-    lift Analyzer_headers.get_project_modified_map static
 
   let get_local_static_information static = static.local_static_information
 
@@ -1411,15 +1403,6 @@ struct
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  let add_rule static error rule_id event_list =
-    let parameters = get_parameter static in
-    let compiled = get_compil static in
-    let kappa_handler = get_kappa_handler static in
-    Communication.add_rule ~local_trace
-      parameters compiled kappa_handler error
-      rule_id event_list
-
-
   let apply_one_side_effect
       _static dynamic error
       _ _ precondition
@@ -1895,12 +1878,6 @@ struct
         ) (error, kasa_state) internal_constraints_list
     in
     error, dynamic, kasa_state*)
-
-  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do *)
-
-  let cc_mixture_is_reachable _static dynamic error _ccmixture =
-    error, dynamic, Usual_domains.Maybe (* to do *)
 
   let get_dead_rules _static _dynamic  =
     Analyzer_headers.dummy_dead_rules

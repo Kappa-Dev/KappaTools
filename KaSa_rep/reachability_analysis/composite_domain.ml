@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 22 2018>
+  * Last modification: Time-stamp: <Dec 04 2018>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -105,8 +105,6 @@ struct
     }
 
   let get_modified_sites_blackboard dynamic = dynamic.modified_sites_blackboard
-  let set_modified_sites_blackboard modified_sites_blackboard dynamic =
-    {dynamic with modified_sites_blackboard = modified_sites_blackboard}
 
   let get_bonds dynamic = dynamic.bonds
   let set_bonds bonds dynamic =
@@ -122,8 +120,6 @@ struct
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
   let get_wake_up_relation static = lift Analyzer_headers.get_wake_up_relation static
-
-  let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let empty_working_list = Ckappa_sig.Rule_FIFO.empty
 
@@ -165,8 +161,6 @@ struct
     {
       dynamic with rule_working_list = rule_working_list
     }
-
-  let get_domain dynamic = dynamic.domain
 
   let set_domain domain dynamic =
     {

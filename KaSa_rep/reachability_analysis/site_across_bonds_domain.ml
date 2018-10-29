@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 22 2018>
+   * Last modification: Time-stamp: <Dec 04 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -88,9 +88,6 @@ struct
   let lift f x = f (get_global_static_information x)
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
-
-  let get_wake_up_relation static =
-    lift Analyzer_headers.get_wake_up_relation static
 
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
@@ -561,7 +558,7 @@ struct
         store_partition_created_bonds_map_1
         static
     in
-    (**)
+    (* *)
     let store_partition_created_bonds_map_2 =
       get_partition_created_bonds_map_2 static
     in
@@ -1640,22 +1637,6 @@ struct
       ~pos:Snd static dynamic error bool dump_title
       agent' site_name' state' modified_sites
 
-
- (*if it is not the first time it is applied then do not apply *)
-  let can_we_prove_this_is_not_the_first_application precondition =
-    match
-      Communication.is_the_rule_applied_for_the_first_time precondition
-    with
-    | Usual_domains.Sure_value b ->
-      if b
-      then
-        (*it is applied for the first time *)
-        true
-      else
-        (*it is not applied for the first time*)
-        false
-    | Usual_domains.Maybe -> false
-
   let apply_rule static dynamic error rule_id precondition =
     let parameters  = get_parameter static in
     let event_list = [] in
@@ -1746,15 +1727,6 @@ struct
 (* events enable communication between domains. At this moment, the
        global domain does not collect information *)
 (***************************************************************************)
-
-  let add_rule static error rule_id event_list =
-    let parameters = get_parameter static in
-    let compiled = get_compil static in
-    let kappa_handler = get_kappa_handler static in
-    Communication.add_rule
-      ~local_trace
-      parameters compiled kappa_handler error
-      rule_id event_list
 
   let apply_one_side_effect
       static dynamic error
@@ -1982,12 +1954,6 @@ struct
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, ()
-
-  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do *)
-
-  let cc_mixture_is_reachable _static dynamic error _ccmixture =
-    error, dynamic, Usual_domains.Maybe (* to do *)
 
   let get_dead_rules _static _dynamic  =
     Analyzer_headers.dummy_dead_rules

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Sep 27 2018>
+  * Last modification: Time-stamp: <Dec 04 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -38,11 +38,9 @@ type var_id =  int
 (**************)
 
 let accuracy_string = "accuracy"
-let map = "map"
 let site="site name"
 let stateslist="states list"
 let interface="interface"
-let agent="agent name"
 let contactmap="contact map"
 let dead_rules = "dead rules"
 let contactmaps="contact maps"
@@ -216,7 +214,6 @@ type ('static,'dynamic) state =
   {
     parameters    : Remanent_parameters_sig.parameters ;
     log_info : StoryProfiling.StoryStats.log_info ;
-    prehandler: Cckappa_sig.kappa_handler option ;
     handler       : Cckappa_sig.kappa_handler option ;
     init : init ;
     env : Model.t option option ;
@@ -280,7 +277,6 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
   {
     parameters = parameters;
     log_info = StoryProfiling.StoryStats.init_log_info ();
-    prehandler = None ;
     handler = None ;
     init = init ;
     env = env ;
@@ -317,9 +313,6 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
 (**************)
 (* JSON: main *)
 (**************)
-
-let add_to_json f state l =
-  (f state) :: l
 
 let annotate map =
   Public_data.AccuracyMap.fold
@@ -581,17 +574,9 @@ let set_compilation compilation state =
 
 let get_compilation state = state.compilation
 
-let set_prehandler handler state = {state with prehandler = Some handler}
-
-let get_prehandler state = state.prehandler
-
 let set_handler handler state = {state with handler = Some handler}
 
 let get_handler state = state.handler
-
-let set_compil compil state = {state with compilation = compil}
-
-let get_compil state = state.compilation
 
 let set_c_compil c_compil state = {state with c_compil = Some c_compil}
 

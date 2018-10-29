@@ -160,7 +160,7 @@ let print_pattern_aux ?logger
       error, b
     ) (error, false) lemma_list
 
-let print_pattern ?logger parameters error _kappa_handler list =
+let _print_pattern ?logger parameters error _kappa_handler list =
   let logger' =
     match
       logger
@@ -201,7 +201,7 @@ let site_graph_list_to_list error list =
       error, site_graph :: current_list
     ) (error, []) list
 
-let pair_list_to_list parameters error kappa_handler pattern
+let _pair_list_to_list parameters error kappa_handler pattern
     agent_id1 site_type1' agent_id2 site_type2'
     pair_list =
   List.fold_left (fun (error, current_list) l ->
