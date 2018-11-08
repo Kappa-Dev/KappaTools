@@ -6,11 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type 'a rule_agent_counters = {
-  ra : 'a;
-  ra_counters : (Ast.counter * LKappa.switching) option array;
-}
-
 let combinations ls1 ls2 =
   if (ls1 = []) then List.fold_left (fun acc (b,ds) -> ([b],ds)::acc) [] ls2
   else
@@ -267,7 +262,7 @@ let with_counters c =
       mix in
   with_counters_mix c.Ast.signatures
 
-let compile ~warning ~debugMode c =
+let remove_variables_in_counters ~warning ~debugMode c =
   if (with_counters c) then
     let rules =
       remove_variable_in_counters ~warning c.Ast.rules c.Ast.signatures in
@@ -281,409 +276,275 @@ let compile ~warning ~debugMode c =
     ({c with Ast.rules},true)
   else (c,false)
 
-let make_counter_agent sigs
-      (first,(dst,ra_erased)) (last,equal) i j pos created =
-  let (ra_type,arity,incr_b,incr_a) = Signature.incr_agent sigs in
-  let ra_ports = Array.make arity ((LKappa.LNK_FREE,pos), LKappa.Maintained) in
-  let before_switch =
-    if first&&created then LKappa.Linked i else LKappa.Maintained in
-  let before =
-    if first then LKappa.LNK_VALUE (i,dst), pos
-    else LKappa.LNK_VALUE (i,(ra_type,incr_a)), pos in
-  let () = ra_ports.(incr_b) <- before,before_switch in
-  let after =
-    if (last&&equal) then LKappa.LNK_FREE, pos
+let incr_type = 0
+
+let one_fresh_incr_agent is_zero is_value b_link_id a_link_id =
+  let a_type = incr_type in
+  let a_ints = [|None; Some (if is_zero then 1 else 0); None|] in
+  let a_ports =
+    [|Raw_mixture.VAL b_link_id; is_value; Raw_mixture.VAL a_link_id|] in
+  { Raw_mixture.a_type; Raw_mixture.a_ports; Raw_mixture.a_ints; }
+
+let build_created_counter min_value nb_agents value_link_id test acc =
+  let value_lnk =
+    match test with
+    | None ->
+      fun id ->
+        if id = min_value then Raw_mixture.VAL value_link_id
+        else Raw_mixture.FREE
+    | Some (Ast.CEQ value,_) ->
+      fun id ->
+        if id = value then Raw_mixture.VAL value_link_id
+        else Raw_mixture.FREE
+    | Some ((Ast.CGTE _ | Ast.CVAR _),pos) ->
+      raise (ExceptionDefn.Malformed_Decl
+               ("Ambiguous definition of created counter",pos)) in
+  let rec aux_fresh_ring id link_id acc =
+    if id = 0 then
+      (one_fresh_incr_agent true (value_lnk id) (succ value_link_id) link_id
+       :: acc,
+       succ value_link_id)
     else
-      if last then LKappa.LNK_ANY, pos
-      else LKappa.LNK_VALUE (j,(ra_type,incr_b)), pos in
-  let () = ra_ports.(incr_a) <- (after,LKappa.Maintained) in
-  let ra_ints = Array.make arity LKappa.I_ANY in
-  {LKappa.ra_type; ra_erased; ra_ports; ra_ints;
-   ra_syntax = Some (Array.copy ra_ports,Array.copy ra_ints)}
+      let ag =
+        one_fresh_incr_agent false (value_lnk id) (succ link_id) link_id in
+      aux_fresh_ring (pred id) (succ link_id) (ag::acc) in
+  if nb_agents <= 0 then assert false
+  else aux_fresh_ring (pred nb_agents) (succ value_link_id) acc
 
-let raw_counter_agent
-      (first,first_lnk) (last,last_lnk) i j sigs equal =
-  let (incr_type,arity,incr_b,incr_a) = Signature.incr_agent sigs in
-  let ports = Array.make arity (Raw_mixture.FREE) in
-  let internals =
-    Array.init arity
-               (fun i ->
-                 Signature.default_internal_state incr_type i sigs) in
-  let before = if first then Raw_mixture.VAL first_lnk
-               else Raw_mixture.VAL i in
-  let () = ports.(incr_b) <- before in
-  let after =
-    if (last&&equal) then Raw_mixture.FREE
+let one_incr_agent ra_erased zero_state value_val b_link_id a_link_id =
+  let ra_type = incr_type in
+  let int_state = LKappa.I_ANY in
+  let ra_ints = [|int_state; zero_state; int_state|] in
+  let switch = if ra_erased then LKappa.Erased else LKappa.Maintained in
+  let b_val = match b_link_id with
+    | None -> LKappa.LNK_ANY
+    | Some lnk_id -> LKappa.LNK_VALUE (lnk_id,(2,ra_type)) in
+  let a_val = match a_link_id with
+    | None -> LKappa.LNK_ANY
+    | Some lnk_id -> LKappa.LNK_VALUE (lnk_id,(0,ra_type)) in
+  let ra_ports = [|
+    (Locality.dummy_annot b_val,switch);
+    value_val;
+    (Locality.dummy_annot a_val,switch)|] in
+  { LKappa.ra_type; ra_erased; ra_ports; ra_ints;
+    ra_syntax = Some (Array.copy ra_ports,Array.copy ra_ints) }
+
+let build_erased_counter nb_agents value_link_id link_value_info test acc =
+  let value_lnk id =
+    match test with
+    | None | Some (Ast.CGTE 0,_) ->
+      ((if id = 0 then LKappa.LNK_VALUE (value_link_id,link_value_info)
+        else LKappa.LNK_ANY),
+       LKappa.I_ANY_ERASED)
+    | Some (Ast.CEQ v,_) ->
+      ((if id = 0 then LKappa.LNK_VALUE (value_link_id,link_value_info)
+        else LKappa.LNK_ANY),
+       if id = v then LKappa.I_VAL_ERASED 1 else LKappa.I_ANY_ERASED)
+    | Some (Ast.CGTE v,_) ->
+      ((if id = v - 1 then LKappa.LNK_VALUE (value_link_id,link_value_info)
+        else LKappa.LNK_ANY),
+       if id < v then LKappa.I_VAL_ERASED 0 else LKappa.I_ANY_ERASED)
+    | Some (Ast.CVAR _,pos) ->
+      raise (ExceptionDefn.Malformed_Decl
+               ("A counter variable cannot occur here",pos)) in
+  let rec aux_destruct_ring id link_id acc =
+    let (test_value,test_is_zero) = value_lnk id in
+    let value_val = (Locality.dummy_annot test_value,LKappa.Erased) in
+    if id = 0 then
+      (one_incr_agent
+         true test_is_zero value_val (Some link_id) (Some (succ value_link_id))
+       :: acc,
+       succ link_id)
     else
-      if last then Raw_mixture.VAL last_lnk
-      else Raw_mixture.VAL j in
-  let () = ports.(incr_a) <- after in
-  { Raw_mixture.a_type = incr_type;
-    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
+      let ag =
+        one_incr_agent
+          true test_is_zero value_val (Some link_id) (Some (succ link_id)) in
+      aux_destruct_ring (pred id) (succ link_id) (ag::acc) in
+  let () = assert (nb_agents > 0) in
+  aux_destruct_ring (pred nb_agents) (succ value_link_id) acc
 
-let rec add_incr i first_lnk last_lnk delta equal sigs =
-  if (i=delta) then []
+let build_maintained_counter_test_eq
+    fresh_link_id link_value_id link_value_info test diff acc =
+  let rec aux_chain_test_eq old_val new_val next_link_id first_ag acc =
+    let (test_is_zero, old_val', new_val') =
+      match old_val, new_val with
+      | Some 0, Some 0 -> (LKappa.I_VAL_CHANGED (1,1),None,None)
+      | Some 0, b -> (LKappa.I_VAL_CHANGED (1,0),None,Option_util.map pred b)
+      | a, Some 0 -> (LKappa.I_VAL_CHANGED (0,1),Option_util.map pred a,None)
+      | a, b -> (LKappa.I_ANY,Option_util.map pred a,Option_util.map pred b) in
+    if old_val' = None && new_val' = None then
+      if first_ag then
+        let ag = one_incr_agent
+            false test_is_zero
+            (Locality.dummy_annot
+               (LKappa.LNK_VALUE (link_value_id,link_value_info)),
+             LKappa.Maintained)
+            None None in
+        (ag::acc,next_link_id,false)
+      else
+        let ag = one_incr_agent
+            false test_is_zero
+            (Locality.dummy_annot LKappa.LNK_ANY,LKappa.Maintained)
+            None (Some next_link_id) in
+        (ag::acc,succ next_link_id,false)
+    else
+      if first_ag then
+        let ag = one_incr_agent
+            false test_is_zero
+            (Locality.dummy_annot
+               (LKappa.LNK_VALUE (link_value_id,link_value_info)),
+             LKappa.Maintained)
+            (Some next_link_id) None in
+        aux_chain_test_eq old_val' new_val' next_link_id false (ag::acc)
+      else
+        let ag = one_incr_agent
+            false test_is_zero
+            (Locality.dummy_annot LKappa.LNK_ANY,LKappa.Maintained)
+            (Some (succ next_link_id)) (Some next_link_id) in
+        aux_chain_test_eq
+          old_val' new_val' (succ next_link_id) false (ag::acc) in
+  let () = assert (test >= - diff) in
+  aux_chain_test_eq (Some test) (Some (test+diff)) fresh_link_id true acc
+
+let rec build_diff_only_negative new_link_value_id todo next_link_id acc =
+  if todo < 1 then
+    let ag =
+      one_incr_agent
+        false LKappa.I_ANY
+        (Locality.dummy_annot LKappa.LNK_FREE, LKappa.Linked new_link_value_id)
+        None (Some next_link_id) in
+    (ag::acc, succ next_link_id, true)
   else
-    let first = (i=0) in
-    let last = (i=(delta-1)) in
-    let raw_incr =
-      raw_counter_agent
-        (first,first_lnk) (last,last_lnk)
-        (first_lnk+i) (first_lnk+i+1) sigs equal in
-    raw_incr::(add_incr (i+1) first_lnk last_lnk delta equal sigs)
+    let ag =
+      one_incr_agent
+        false LKappa.I_ANY
+        (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained)
+        (Some (succ next_link_id)) (Some next_link_id) in
+    build_diff_only_negative
+      new_link_value_id (pred todo) (succ next_link_id) (ag::acc)
 
-let rec link_incr sigs i nb ag_info equal lnk pos delta =
-  if (i=nb) then []
+let rec build_diff_only_positive new_link_value_id todo next_link_id acc =
+  if todo < 1 then
+    let ag =
+      one_incr_agent
+        false LKappa.I_ANY
+        (Locality.dummy_annot LKappa.LNK_FREE, LKappa.Linked new_link_value_id)
+        (Some next_link_id) None in
+    (ag::acc, succ next_link_id, true)
   else
-    let first = (i=0) in
-    let last = (i=(nb-1)) in
-    let ra_agent =
-      make_counter_agent sigs (first,ag_info) (last,equal)
-                         (lnk+i) (lnk+i+1) pos (delta>0) in
-    ra_agent::(link_incr sigs (i+1) nb ag_info equal lnk pos delta)
+    let ag =
+      one_incr_agent
+        false LKappa.I_ANY
+        (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained)
+        (Some next_link_id) (Some (succ next_link_id)) in
+    build_diff_only_positive
+      new_link_value_id (pred todo) (succ next_link_id) (ag::acc)
 
-let rec erase_incr sigs i incrs delta lnk =
-  let (_,_,incr_b,_) = Signature.incr_agent sigs in
-  match incrs with
-  | hd::tl ->
-     if (i = abs(delta)) then
-       let (before,_) = hd.LKappa.ra_ports.(incr_b) in
-       let () = hd.LKappa.ra_ports.(incr_b) <- before, LKappa.Linked lnk in
-       hd::tl
-     else
-       let () =
-         Array.iteri
-           (fun i (a,_) -> hd.LKappa.ra_ports.(i) <- a,LKappa.Erased) hd.LKappa.ra_ports in
-       let ag = {hd with LKappa.ra_erased = true} in
-       ag::(erase_incr sigs (i+1) tl delta lnk)
-  | [] -> []
+let build_maintained_counter_test_gte
+    fresh_link_id link_value_id link_value_info new_link_value_id test diff acc=
+  let rec build_not_zero_maybe_diff_negative
+      todo diff link_moved next_link_id acc =
+    if todo < 1 then
+      match diff with
+      | None -> (acc,next_link_id,link_moved)
+      | Some x ->
+        build_diff_only_negative new_link_value_id x next_link_id acc
+    else
+      let (diff',value_val) =
+        match diff with
+        | Some 0 ->
+          (None,
+           (Locality.dummy_annot LKappa.LNK_FREE,
+            LKappa.Linked new_link_value_id))
+        | x ->
+          (Option_util.map pred x,
+           (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained)) in
+      let ag =
+        one_incr_agent
+          false (LKappa.I_VAL_CHANGED (0,0)) value_val
+          (if todo = 1 && diff' = None then None else (Some (succ next_link_id)))
+          (Some next_link_id) in
+      build_not_zero_maybe_diff_negative
+        (pred todo) diff' link_moved (succ next_link_id) (ag::acc) in
+  if diff > 0 then
+    let (l,fresh_link_id',_) =
+      build_not_zero_maybe_diff_negative
+        (pred test) None false fresh_link_id acc in
+    let ag =
+      one_incr_agent
+        false (LKappa.I_VAL_CHANGED (0,0))
+        (Locality.dummy_annot
+           (LKappa.LNK_VALUE (link_value_id,link_value_info)),
+         LKappa.Freed)
+        (if test = 1 then None else Some fresh_link_id) (Some fresh_link_id') in
+    build_diff_only_positive
+      new_link_value_id (pred diff) fresh_link_id' (ag::l)
+  else
+    let diff' = if diff = 0 then None else Some (-1 - diff) in
+    let (l,fresh_link_id',new_link_value_id') =
+      build_not_zero_maybe_diff_negative
+        (pred test) diff' (diff <> 0) fresh_link_id acc in
+    let ag =
+      one_incr_agent
+        false (LKappa.I_VAL_CHANGED (0,0))
+        (Locality.dummy_annot
+           (LKappa.LNK_VALUE (link_value_id,link_value_info)),
+         if diff = 0 then LKappa.Maintained else LKappa.Freed)
+        (if test = 1 && diff = 0 then None else Some fresh_link_id) None in
+    (ag::l,fresh_link_id',new_link_value_id')
 
-let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
-  let (incr_type,_,incr_b,_) = Signature.incr_agent sigs in
-  let start_lnk_for_created = start_lnk_nb + test +1 in
-  let lnk_for_erased = start_lnk_nb + abs(delta) in
-  let ag_info = (p_id,ra.LKappa.ra_type),ra.LKappa.ra_erased in
+let build_untested_counter_chain
+    fresh_link_id link_value_id link_value_info new_link_value_id diff acc =
+  if diff < 0 then
+    let ag =
+      one_incr_agent
+        false LKappa.I_ANY
+        (Locality.dummy_annot
+           (LKappa.LNK_VALUE (link_value_id,link_value_info)),
+         LKappa.Freed)
+        (Some fresh_link_id) None in
+    build_diff_only_negative
+      new_link_value_id (-1 - diff) fresh_link_id (ag::acc)
+  else if diff = 0 then
+    let ag =
+      one_incr_agent
+        false LKappa.I_ANY
+        (Locality.dummy_annot
+           (LKappa.LNK_VALUE (link_value_id,link_value_info)),
+         LKappa.Maintained)
+        None None in
+(ag::acc,fresh_link_id,false)
+  else
+    let ag =
+      one_incr_agent
+        false LKappa.I_ANY
+        (Locality.dummy_annot
+           (LKappa.LNK_VALUE (link_value_id,link_value_info)),
+         LKappa.Freed)
+        None (Some fresh_link_id) in
+    build_diff_only_positive
+      new_link_value_id (pred diff) fresh_link_id (ag::acc)
 
-  let test_incr =
-    link_incr sigs 0 (test+1) ag_info equal start_lnk_nb pos delta in
-  let adjust_delta =
-    if (delta<0)
-    then erase_incr sigs 0 test_incr delta lnk_for_erased
-    else test_incr in
-  let created =
-    if (delta>0)
-    then add_incr 0 start_lnk_for_created start_lnk_nb delta false sigs
-    else [] in
-
-  let () = if (test + delta < 0) then
-      raise (ExceptionDefn.Internal_Error
-               ("Counter test should be greater then abs(delta)",pos')) in
-  let switch =
-    if (delta = 0) then LKappa.Maintained
-    else if (delta > 0) then LKappa.Linked start_lnk_for_created
-    else LKappa.Linked lnk_for_erased in
-  let p = (LKappa.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
-  let () = ra.LKappa.ra_ports.(p_id) <- p in
-  (adjust_delta,created)
-
-(* ag - agent with counters in a rule
-   lnk_nb - the max link number used in the rule;
-   incr_info - info on the incr agent from the signature
-   returns: agent with explicit counters; created incr agents;
-            the next link number to use *)
-let remove_counter_agent sigs ag lnk_nb =
-  let (incrs,lnk_nb') =
-    Tools.array_fold_lefti
-      (fun id (acc_incrs,lnk_nb) -> function
-         | None -> (acc_incrs,lnk_nb)
-         | Some (counter,_) ->
-           let (s,pos) = counter.Ast.count_nme in
-           match (counter.Ast.count_test,counter.Ast.count_delta) with
-           | (None,_) ->
-             raise (ExceptionDefn.Internal_Error
-                      ("Counter "^s^" should have a test by now",pos))
-           | (Some (test,pos')), delta ->
-             match test with
-             | Ast.CEQ j ->
-              (counter_becomes_port
-                 sigs ag.ra id delta pos true j lnk_nb)::acc_incrs,
-              lnk_nb+1+j+(fst delta)
-             | Ast.CGTE j ->
-               (counter_becomes_port
-                  sigs ag.ra id delta pos false j lnk_nb)::acc_incrs,
-               lnk_nb+1+j+(fst delta)
-             | Ast.CVAR _ ->
-               raise (ExceptionDefn.Internal_Error
-                        ("Counter "^s^" should not have a var by now",pos')))
-      ([],lnk_nb) ag.ra_counters in
-  let (als,bls) =
-    List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
-  (als,bls,lnk_nb')
-
-let remove_counter_created_agent sigs ag lnk_nb =
-  let raw_ag = ag.ra in
-  let ports = raw_ag.Raw_mixture.a_ports in
-  Tools.array_fold_lefti
-    (fun p_id (acc,lnk) -> function
-       | None -> (acc,lnk)
-       | Some (c,_) ->
-         match c.Ast.count_test with
-         | None ->
-           let agent_name =
-             Format.asprintf "@[%a@]"
-               (Signature.print_agent sigs) raw_ag.Raw_mixture.a_type in
-           LKappa.not_enough_specified
-             ~status:"counter" ~side:"left" agent_name c.Ast.count_nme
-         | Some (test,_) ->
-         match test with
-           | Ast.CEQ j ->
-             let p = Raw_mixture.VAL lnk in
-             let () = ports.(p_id) <- p in
-             let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
-             (acc@incrs,(lnk+j+1))
-           | Ast.CGTE _ | Ast.CVAR _ ->
-             let agent_name =
-               Format.asprintf "@[%a@]"
-                 (Signature.print_agent sigs) raw_ag.Raw_mixture.a_type in
-             LKappa.not_enough_specified
-               ~status:"counter" ~side:"left" agent_name c.Ast.count_nme)
-    ([],lnk_nb) ag.ra_counters
-
-let raw_agent_with_counters ag =
-  Array.fold_left
-    (fun ok x -> x<>None||ok)
-    false ag.ra_counters
-
-let agent_with_counters ag sigs =
-  let sign = Signature.get sigs ag.LKappa.ra_type in
-  Signature.has_counter sign
-
-(* - adds increment agents to the rule_agent mixture
-   - adds increment agents to the raw mixture
-   - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
-     to the increments *)
-let remove_counter_rule sigs mix created =
-  let with_counters =
-    List.exists (fun ag -> agent_with_counters ag.ra sigs) mix ||
-    List.exists (fun ag -> raw_agent_with_counters ag) created in
-  if with_counters then
-    let lnk_nb =
-      List.fold_left
-        (fun m ag -> max m (LKappa.max_link_id [ag.ra])) 0 mix in
-
-    let incrs,incrs_created,lnk_nb' =
-      List.fold_left
-        (fun (a,b,lnk) ag ->
-            let (a',b',lnk') = remove_counter_agent sigs ag lnk in
-            a'@a,b'@b,lnk'+1)
-        ([],[],lnk_nb+1) mix in
-    let incrs_created',_ =
-      List.fold_left
-        (fun (acc,lnk) ag ->
-          let (a,lnk') =
-            remove_counter_created_agent sigs ag lnk in
-          (a@acc,lnk'))
-        ([],lnk_nb'+1) created in
-
-    let rule_agent_mix =
-      List_util.rev_map_append (fun ag -> ag.ra) mix incrs in
-    let raw_mix =
-      List_util.rev_map_append
-        (fun ag -> ag.ra) created (incrs_created@incrs_created') in
-    (rule_agent_mix,raw_mix)
-  else (List.map (fun ag -> ag.ra) mix),
-       (List.map (fun ag -> ag.ra) created)
-
-let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
-  let (incr_type,_,incr_b,_) = Signature.incr_agent sigs in
-  let ag_id = Signature.num_of_agent ag_ty sigs in
-  let sign = Signature.get sigs ag_id in
-  let arity = Signature.arity sigs ag_id in
-  let ports =
-    Array.make arity (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained) in
-  let internals = Array.make arity LKappa.I_ANY in
-  let c_na = c.Ast.count_nme in
-  let c_id = Signature.num_of_site ~agent_name c_na sign in
-  let (max_val,pos) = c.Ast.count_delta in
-  let max_val' = max_val+1 in
-  let incrs = link_incr sigs 0 (max_val'+1) ((c_id,ag_id),false) false 1 pos (-1) in
-  let p = LKappa.LNK_VALUE (1,(incr_b,incr_type)),pos in
-  let () = ports.(c_id) <- p,LKappa.Maintained in
-  let ra =
-    { LKappa.ra_type = ag_id;ra_ports = ports;ra_ints = internals;ra_erased = false;
-      ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  ra::incrs
-
-let counter_perturbation sigs c ag_ty =
-  let filename =
-    [Primitives.Str_pexpr ("counter_perturbation.ka", snd c.Ast.count_nme) ] in
-  let stop_message =
-    "\nCounter "^(fst c.Ast.count_nme)^" of agent "^(fst ag_ty)^" reached maximum\n" in
-  let stop_message' =
-    [Primitives.Str_pexpr (stop_message, snd c.Ast.count_nme) ] in
-  let mods = [Ast.PRINT ([],stop_message'); Ast.STOP filename] in
-  let val_of_counter =
-    Alg_expr.KAPPA_INSTANCE (agent_with_max_counter sigs c ag_ty) in
-  let pre =
-    Alg_expr.COMPARE_OP
-      (Operator.EQUAL,(val_of_counter,snd c.Ast.count_nme),
-       (Alg_expr.CONST (Nbr.I 1),snd c.Ast.count_nme)) in
-  (None,Some (pre,snd ag_ty),mods,Some (Locality.dummy_annot Alg_expr.FALSE))
-
-let counters_perturbations sigs ast_sigs =
-  List.fold_left
-    (fun acc -> function
-       | Ast.Absent _ -> acc
-       | Ast.Present (ag_ty,sites,_) ->
-         List.fold_left
-           (fun acc' site ->
-              match site with
-                Ast.Port _ -> acc'
-              | Ast.Counter c ->
-                ((counter_perturbation sigs c ag_ty),(snd ag_ty))::acc')
-           acc sites)
-    [] ast_sigs
-
-let make_counter i name =
-  {Ast.count_nme = (name,Locality.dummy);
-   count_test = Some (Ast.CEQ i,Locality.dummy); count_delta =(0,Locality.dummy)}
-
-let add_counter_to_contact_map sigs add_link_contact_map =
-  let (incr_id,_,incr_b,incr_a) = Signature.incr_agent sigs in
-  add_link_contact_map incr_id incr_a incr_id incr_b
-
-let forbid_modification (delta,pos) =
-  if delta != 0 then LKappa.forbid_modification pos (Some delta)
-
-let annotate_dropped_counters sign counts ra arity agent_name aux =
-  let ra_counters = Array.make arity None in
-  let _ =
-    List.fold_left
-      (fun pset c ->
-        let p_na = c.Ast.count_nme in
-        let p_id = Signature.num_of_site ~agent_name p_na sign in
-        let () = match Signature.counter_of_site p_id sign with
-          | None -> LKappa.counter_misused agent_name c.Ast.count_nme
-          | Some _ -> () in
-        let pset' = Mods.IntSet.add p_id pset in
-        let () = if pset == pset' then
-             LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
-        let () = forbid_modification c.Ast.count_delta in
-        let () = match aux with | Some f -> f p_id | None -> () in
-        let () = ra_counters.(p_id) <- Some (c,LKappa.Erased) in pset')
-      Mods.IntSet.empty counts in
-  {ra; ra_counters;}
-
-let annotate_edit_counters
-      sigs (agent_name, _ as ag_ty) counts ra add_link_contact_map =
-  let ag_id = Signature.num_of_agent ag_ty sigs in
-  let sign = Signature.get sigs ag_id in
-  let arity = Signature.arity sigs ag_id in
-  let ra_counters = Array.make arity None in
-  let register_counter_modif c_id =
-    let (incr_id,_,incr_b,_) = Signature.incr_agent sigs in
-    add_link_contact_map ag_id c_id incr_id incr_b in
-  let _ =
-    List.fold_left
-      (fun pset c ->
-        let p_na = c.Ast.count_nme in
-        let p_id = Signature.num_of_site ~agent_name p_na sign in
-        let () = match Signature.counter_of_site p_id sign with
-          | None -> LKappa.counter_misused agent_name c.Ast.count_nme | Some _ -> () in
-        let pset' = Mods.IntSet.add p_id pset in
-        let () = if pset == pset' then
-             LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
-        let () = register_counter_modif p_id in
-        let () = ra_counters.(p_id) <- Some (c,LKappa.Maintained) in pset')
-      Mods.IntSet.empty counts in
-  {ra; ra_counters;}
-
-let annotate_counters_with_diff
-      sigs (agent_name, pos as ag_ty) lc rc ra add_link_contact_map =
-  let ag_id = Signature.num_of_agent ag_ty sigs in
-  let sign = Signature.get sigs ag_id in
-  let arity = Signature.arity sigs ag_id in
-  let register_counter_modif c c_id =
-    let (incr_id,_,incr_b,_) = Signature.incr_agent sigs in
-    let () = add_link_contact_map ag_id c_id incr_id incr_b in
-    (c, LKappa.Maintained) in
-  let ra_counters = Array.make arity None in
-  let rc_r,_ =
-    List.fold_left
-      (fun (rc,cset) c ->
-        let (na,_) as c_na = c.Ast.count_nme in
-        let c_id = Signature.num_of_site ~agent_name c_na sign in
-        let cset' = Mods.IntSet.add c_id cset in
-        let () = if cset == cset' then
-                   LKappa.several_occurence_of_site agent_name c_na in
-        let c',rc' =
-          List.partition
-            (fun p -> String.compare (fst p.Ast.count_nme) na = 0) rc in
-        let c'' =
-          match c' with
-          | _::[] | [] -> register_counter_modif c c_id
-          | _ :: _ -> LKappa.several_occurence_of_site agent_name c_na in
-        let () = ra_counters.(c_id) <- Some c'' in
-        (rc',cset')) (rc,Mods.IntSet.empty) lc in
-  let _ = (* test if counter of rhs is in the signature *)
-    List.map
-      (fun c -> Signature.num_of_site ~agent_name (c.Ast.count_nme) sign) rc_r in
-  let () =
-    if not(rc =[]) && not(rc_r =[]) then
-      raise (ExceptionDefn.Internal_Error
-               ("Counters in "^agent_name^" should have tests by now",pos)) in
-  {ra; ra_counters;}
-
-let annotate_created_counters
-      sigs (agent_name,_ as ag_ty) counts add_link_contact_map ra =
-
-  let ag_id = Signature.num_of_agent ag_ty sigs in
-  let sign = Signature.get sigs ag_id in
-  let arity = Signature.arity sigs ag_id in
-  let ra_counters = Array.make arity None in
-
-    (* register all counters (specified or not) with min value *)
-    let () =
-      Array.iteri
-        (fun p_id _ ->
-          match Signature.counter_of_site p_id sign with
-          | Some (min,_) ->
-             begin
-               let c_name = Signature.site_of_num p_id sign in
-               try
-                 let c =
-                   List.find
-                     (fun c' ->
-                        (String.compare (fst c'.Ast.count_nme) c_name) = 0) counts in
-                 ra_counters.(p_id) <-
-                   Some
-                     ({Ast.count_nme = c.Ast.count_nme;
-                       Ast.count_test = c.Ast.count_test;
-                       Ast.count_delta = (0,Locality.dummy)},LKappa.Maintained)
-               with Not_found ->
-                 ra_counters.(p_id) <-
-                   Some
-                     ({Ast.count_nme = (c_name,Locality.dummy);
-                       Ast.count_test = Some (Ast.CEQ min,Locality.dummy);
-                       Ast.count_delta = (0,Locality.dummy)},LKappa.Maintained)
-             end
-          | None -> ()) ra_counters in
-
-    let register_counter_modif c_id =
-      let (incr_id,_,incr_b,_) = Signature.incr_agent sigs in
-      add_link_contact_map ag_id c_id incr_id incr_b in
-    let _ =
-      List.fold_left
-        (fun pset c ->
-          let p_na = c.Ast.count_nme in
-          let p_id = Signature.num_of_site ~agent_name p_na sign in
-          let () = match Signature.counter_of_site p_id sign with
-            | None -> LKappa.counter_misused agent_name c.Ast.count_nme
-            | Some _ -> () in
-          let pset' = Mods.IntSet.add p_id pset in
-          let () = if pset == pset' then
-                     LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
-          let () = register_counter_modif p_id in
-          let () = ra_counters.(p_id) <- Some (c,LKappa.Maintained) in
-          pset') Mods.IntSet.empty counts in
-    {ra;ra_counters;}
+let build_maintained_counter
+    value_link_id link_value_info new_value_link_id test diff acc =
+  match test with
+  | None ->
+    build_untested_counter_chain
+      (succ value_link_id) value_link_id
+      link_value_info new_value_link_id diff acc
+  | Some (Ast.CEQ test,_) ->
+    build_maintained_counter_test_eq
+      (succ value_link_id) value_link_id link_value_info
+      test diff acc
+  | Some (Ast.CGTE test,_) ->
+    if test > 0 then
+      build_maintained_counter_test_gte
+        (succ value_link_id) value_link_id
+        link_value_info new_value_link_id test diff acc
+    else
+      build_untested_counter_chain
+        (succ value_link_id) value_link_id
+        link_value_info new_value_link_id diff acc
+  | Some (Ast.CVAR _,pos) ->
+    raise (ExceptionDefn.Malformed_Decl
+             ("A counter variable cannot occur here",pos))

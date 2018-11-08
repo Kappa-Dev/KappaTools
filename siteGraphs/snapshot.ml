@@ -89,23 +89,21 @@ let increment_in_snapshot sigs x s =
     else h::aux_increment t in
   Mods.IntMap.add hs (aux_increment l) s
 
-let rec counter_value cc (nid,sid) count =
+let rec counter_value cc nid count =
   let ag = cc.(nid) in
-  Tools.array_fold_lefti
-    (fun id acc si ->
-      if (id = sid) then acc
-      else
-        match si.site_link with
-        | None -> acc
-        | Some x -> counter_value cc x (acc+1)) count ag.node_sites
+  if ag.node_sites.(1).site_state = Some 1 then count
+  else match ag.node_sites.(2).site_link with
+    | Some (nid',_) -> counter_value cc nid' (succ count)
+    | None -> assert false
 
 let cc_to_user_cc ~debugMode sigs cc =
   let r = Renaming.empty () in
   let (cc_list,indexes,_) =
     Tools.array_fold_lefti
          (fun i (acc,indexes,pos) ag ->
-          match Signature.ports_if_counter_agent sigs ag.node_type with
-          | None ->
+          if Signature.is_counter_agent sigs ag.node_type then
+            (acc,indexes,pos)
+          else
             let indexes' =
               if i = pos then indexes else
                 match Renaming.add ~debugMode i pos indexes with
@@ -115,8 +113,7 @@ let cc_to_user_cc ~debugMode sigs cc =
                        (Locality.dummy_annot
                           "Injectivity of renaming in snapshot"))
                 | Some r -> r in
-            (ag::acc,indexes',pos+1)
-          | Some _ -> (acc,indexes,pos))
+            (ag::acc,indexes',pos+1))
          ([],r,0) cc in
   let cc_without_counters = Array.of_list (List.rev cc_list) in
   Array.map
@@ -145,14 +142,13 @@ let cc_to_user_cc ~debugMode sigs cc =
                      let dn_id' =
                        try Renaming.apply ~debugMode indexes dn_id
                        with Renaming.Undefined | Invalid_argument _ -> dn_id in
-                      match Signature.ports_if_counter_agent
-                              sigs (cc.(dn_id)).node_type with
-                      | None ->
-                        User_graph.Port
-                          {User_graph.port_links = [(dn_id',s)];
-                           User_graph.port_states}
-                      | Some _ ->
-                        User_graph.Counter (counter_value cc (dn_id,s) 0)
+                     if Signature.is_counter_agent
+                         sigs (cc.(dn_id)).node_type then
+                       User_graph.Counter (counter_value cc dn_id 0)
+                     else
+                       User_graph.Port
+                         {User_graph.port_links = [(dn_id',s)];
+                          User_graph.port_states}
                })
              ag.node_sites;
        })

@@ -69,7 +69,7 @@ let union h x y =
 
 let union_find_counters sigs mix =
   let t = create 1 in
-  let () =
+(*  let () =
     match sigs with
     | None -> ()
     | Some sigs ->
@@ -90,7 +90,7 @@ let union_find_counters sigs mix =
                  let root = find t lnk_b in
                  let (s,_) = Mods.DynArray.get t.rank root in
                  Mods.DynArray.set t.rank root (s-1,(true,true))
-               | VAL lnk_a -> union t lnk_b lnk_a) mix in
+               | VAL lnk_a -> union t lnk_b lnk_a) mix in*)
   t
 
 let print_link ~noCounters incr_agents f = function

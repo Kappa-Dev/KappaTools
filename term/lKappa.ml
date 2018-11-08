@@ -201,7 +201,7 @@ let print_rule_intf
 
 let union_find_counters sigs mix =
   let t = Raw_mixture.create 1 in
-  let () =
+  (*let () =
     match sigs with
     | None -> ()
     | Some sigs ->
@@ -229,7 +229,7 @@ let union_find_counters sigs mix =
                  raise (ExceptionDefn.Internal_Error
                           (Locality.dummy_annot
                              ("Port a of __incr agent not well specified"))))
-        mix in
+        mix in*)
   t
 
 let print_rule_agent ~noCounters sigs ~ltypes counters created_counters f ag =

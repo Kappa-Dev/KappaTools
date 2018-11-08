@@ -164,6 +164,9 @@ val no_more_site_on_right : bool -> site list -> site list -> bool
 val split_mixture : mixture -> (mixture * mixture)
 (** @return (lhs,rhs) *)
 
+val free_link_id_mixture : mixture -> (int * int)
+val free_link_id_rule_content : rule_content -> (int * int)
+
 val implicit_signature : parsing_compil -> parsing_compil
 (** Infer agent signatures and tokens from init, rules and perturbations *)
 

@@ -7,6 +7,7 @@ EXEC=$1
 shift;
 
 ledit -x -h ${HISTORYFILE} ocamldebug $(ocamlfind query -r -i-format yojson) \
+      $(ocamlfind query -r -i-format re) \
       -I ${BUILDROOT}dev -I ${BUILDROOT}grammar -I ${BUILDROOT} \
       -I ${BUILDROOT}pattern -I ${BUILDROOT}simulation -I ${BUILDROOT}term \
       -I ${BUILDROOT}siteGraphs -I ${BUILDROOT}dataStructures -I ${BUILDROOT}main \

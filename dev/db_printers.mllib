@@ -12,8 +12,8 @@ Pp_html
 Pp_svg
 Kappa_files
 
-Tk_version
 Git_commit_info
+Tk_version
 Config
 Int_storage
 Fifo
@@ -47,5 +47,4 @@ Graph_json
 Story_json
 Compression_main
 
-Debug
 Raw_printers

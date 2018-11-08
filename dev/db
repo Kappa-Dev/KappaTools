@@ -2,6 +2,7 @@ load_printer "str.cma"
 load_printer "easy_format.cma"
 load_printer "biniou.cma"
 load_printer "yojson.cma"
+load_printer "re.cma"
 load_printer "KappaLib.cma"
 load_printer "db_printers.cma"
 

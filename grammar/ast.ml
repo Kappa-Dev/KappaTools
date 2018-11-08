@@ -182,6 +182,33 @@ let no_more_site_on_right error left right =
        in false)
     right
 
+let free_link_id_mixture =
+  List.fold_left
+    (fun acc -> function
+       | Absent _ -> acc
+       | Present (_,s,_) ->
+         List.fold_left
+           (fun (lid,rid as ids) -> function
+              | Counter _ -> ids
+              | Port p ->
+                (List.fold_left
+                   (fun id (lk,_) ->
+                      match lk with
+                      | LKappa.LNK_VALUE (i,_) -> if id <= i then succ i else id
+                      | LKappa.LNK_FREE | LKappa.LNK_ANY | LKappa.LNK_TYPE _
+                      | LKappa.ANY_FREE | LKappa.LNK_SOME -> id)
+                   lid p.port_lnk,
+                 match p.port_lnk_mod with
+                 | None | Some None -> rid
+                 | Some (Some (i,_)) -> if rid <= i then succ i else rid))
+           acc s)
+    (0,0)
+
+let free_link_id_rule_content = function
+  | Edit e -> free_link_id_mixture e.mix
+  | Arrow r ->
+    (fst (free_link_id_mixture r.lhs), fst (free_link_id_mixture r.rhs))
+
 let empty_compil =
   {
     filenames      = [];

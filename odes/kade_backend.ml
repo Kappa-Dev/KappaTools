@@ -499,7 +499,7 @@ struct
 let union_find_counters sigs mix =
   let t = Raw_mixture.create 1 in
   let () =
-    match sigs with
+    (*match sigs with
     | None -> ()
     | Some sigs ->
       List.iter
@@ -527,7 +527,7 @@ let union_find_counters sigs mix =
                  raise (ExceptionDefn.Internal_Error
                           (Locality.dummy_annot
                              ("Port a of __incr agent not well specified"))))
-        mix in
+        mix*) () in
   t
 
 let print_rule_mixture

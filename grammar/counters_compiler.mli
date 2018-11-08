@@ -6,43 +6,22 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type 'a rule_agent_counters = {
-  ra : 'a;
-  ra_counters : (Ast.counter * LKappa.switching) option array;
-}
-
-val compile :
+val remove_variables_in_counters :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   debugMode:bool -> Ast.parsing_compil -> Ast.parsing_compil * bool
 
-val make_counter : int -> string -> Ast.counter
+val build_created_counter :
+  int -> int -> int -> Ast.counter_test Locality.annot option ->
+  Raw_mixture.t -> (Raw_mixture.t * int)
+(** [build_created_counter min_value nb_agents value_link_id value acc] *)
 
-val remove_counter_rule :
-  Signature.s -> LKappa.rule_agent rule_agent_counters list ->
-  Raw_mixture.agent rule_agent_counters list ->
-  LKappa.rule_agent list *  Raw_mixture.agent list
+val build_erased_counter :
+  int -> int -> (int * int) -> Ast.counter_test Locality.annot option ->
+  LKappa.rule_mixture -> (LKappa.rule_mixture * int)
+(** [build_erased_counter nb_agents value_link_id link_value_info test acc] *)
 
-val counters_perturbations :
-  Signature.s -> Ast.mixture ->
-  (LKappa.rule_mixture, Raw_mixture.agent list, int,LKappa.rule) Ast.perturbation list
-
-val annotate_dropped_counters :
-  Signature.t -> Ast.counter list ->  LKappa.rule_agent -> int -> string ->
-  (int -> unit) option -> LKappa.rule_agent rule_agent_counters
-
-val annotate_edit_counters :
-  Signature.s -> string * Locality.t -> Ast.counter list -> LKappa.rule_agent ->
-  (int -> int -> int -> int -> unit) -> LKappa.rule_agent rule_agent_counters
-
-val annotate_created_counters :
-  Signature.s -> string * Locality.t -> Ast.counter list ->
-  (int -> int -> int -> int -> unit) -> Raw_mixture.agent ->
-  Raw_mixture.agent rule_agent_counters
-
-val annotate_counters_with_diff :
-  Signature.s -> string Locality.annot -> Ast.counter list -> Ast.counter list ->
-  LKappa.rule_agent -> (int -> int -> int -> int -> unit) ->
-  LKappa.rule_agent rule_agent_counters
-
-val add_counter_to_contact_map :
-  Signature.s -> (int -> int -> int -> int -> unit) -> unit
+val build_maintained_counter :
+  int -> int * int -> int -> Ast.counter_test Locality.annot option -> int ->
+  LKappa.rule_mixture -> (LKappa.rule_mixture * int * bool)
+(** [build_maintained_counter
+    value_link_id link_value_info new_value_link_id test diff acc] *)

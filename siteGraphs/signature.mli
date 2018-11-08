@@ -20,7 +20,7 @@ val num_of_internal_state : int -> string Locality.annot -> t -> int
 val internal_state_of_num : int -> int -> t -> string
 
 val counter_of_site : int -> t -> (int * int) option
-val has_counter : t -> bool
+val list_counters : t -> int list
 
 type s (** Store of all the agents *)
 
@@ -64,6 +64,7 @@ val allowed_link : int -> int -> int -> int -> s -> bool
 
 val print_agent : s -> Format.formatter -> int -> unit
 val print_site : s -> int -> Format.formatter -> int -> unit
+val print_counter : s -> int -> Format.formatter -> int -> unit
 val print_internal_state :
   s -> int -> int -> Format.formatter -> int -> unit
 val print_site_internal_state :
@@ -71,13 +72,9 @@ val print_site_internal_state :
 (** [print_site_internal_state sigs agent_type site_id f state_id]
 prints both the site and its internal state if it is not [None]. *)
 
-val print_counter : s -> int -> Format.formatter -> int -> unit
-
 val print : Format.formatter -> s -> unit
 val to_json : s -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> s
 
 val is_counter_agent : s -> int -> bool
-val ports_if_counter_agent : s -> int -> (int*int) option
 val site_is_counter : s -> int -> int -> bool
-val incr_agent : s -> (int * int * int * int) (** id, arity, before, after *)

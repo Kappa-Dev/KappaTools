@@ -51,13 +51,11 @@ let of_yojson (a:Yojson.Basic.json) =
                       array1
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct contact map",x))
 
-
 let print_kappa ~noCounters sigs f c =
   Format.fprintf f "@[<v>%a@]"
     (Pp.array Pp.space
        (fun ag f intf ->
-          if Signature.ports_if_counter_agent sigs ag = None
-          || noCounters then
+          if not (Signature.is_counter_agent sigs ag) || noCounters then
             Format.fprintf f "@[<hv 2>%%agent:@ %a(@[%a@])@]"
               (Signature.print_agent sigs) ag
               (Pp.array Pp.space

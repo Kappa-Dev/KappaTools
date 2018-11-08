@@ -6,6 +6,13 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let counter_port_mismatch counter_expected ag_ty (site,pos) =
+  raise
+    (ExceptionDefn.Malformed_Decl
+       (Format.asprintf
+          "Site %s of agent %s is %sa counter." site ag_ty
+          (if counter_expected then "not " else ""),pos))
+
 let build_l_type sigs pos dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
   let p_id = Signature.id_of_site dst_ty dst_p sigs in
@@ -79,9 +86,30 @@ let build_link
                     (Signature.print_agent sigs) dst_ty,
                   pos))
 
+let incr_type = 0
+let incr_value_site = 1
+let bounded_to_incr_info = (incr_value_site,incr_type)
+
+let add_implicitly_dropped_counter pset sign ag_id ports free_link_id acc =
+  List.fold_left
+    (fun (l,free_link_id as acc) c_id ->
+       if Mods.IntSet.mem c_id pset then acc
+       else
+         let (_,max_val) = match Signature.counter_of_site c_id sign with
+           | Some (a,b) -> (a,b)
+           | None -> assert false in
+         let va =
+           (Locality.dummy_annot
+              (LKappa.LNK_VALUE (free_link_id,bounded_to_incr_info)),
+            LKappa.Erased) in
+         let () = ports.(c_id) <- va in
+         Counters_compiler.build_erased_counter
+           (succ max_val) free_link_id (c_id,ag_id) None l)
+    (acc,free_link_id) (Signature.list_counters sign)
+
 let annotate_dropped_agent
     ~warning ~syntax_version ~r_editStyle
-    sigs links_annot (agent_name, _ as ag_ty) intf counts =
+    sigs acc free_link_id links_annot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -92,86 +120,126 @@ let annotate_dropped_agent
       (fun i ->
          match Signature.default_internal_state ag_id i sigs with
          | None -> LKappa.I_ANY | Some _ -> LKappa.I_ANY_ERASED) in
-  let lannot,_ =
+  let lannot,acc',free_link_id',pset' =
     List.fold_left
-      (fun (lannot,pset) p ->
-         let (_,p_pos as p_na) = p.Ast.port_nme in
-         let p_id = Signature.num_of_site ~agent_name p_na sign in
-         let () = match Signature.counter_of_site p_id sign with
-           | Some _ ->
-             LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
-         let pset' = Mods.IntSet.add p_id pset in
-         let () = if pset == pset' then
-             LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
-         let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
-         let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
+      (fun (lannot,acc',free_link_id,pset) -> function
+         | Ast.Counter c ->
+           let () = let (delta,pos) = c.Ast.count_delta in
+             if delta <> 0 then
+               LKappa.forbid_modification pos (Some delta) in
+           let c_na = c.Ast.count_nme in
+           let c_id = Signature.num_of_site ~agent_name c_na sign in
+           let pset' = Mods.IntSet.add c_id pset in
+           let () = if pset == pset' then
+               LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
+           let (_,max_val) = match Signature.counter_of_site c_id sign with
+             | Some (a,b) -> (a,b)
+             | None -> counter_port_mismatch true agent_name c.Ast.count_nme in
+           let va =
+             (Locality.dummy_annot
+                (LKappa.LNK_VALUE (free_link_id,bounded_to_incr_info)),
+              LKappa.Erased) in
+           let () = ports.(c_id) <- va in
+           let (acc'',free_link_id') =
+             Counters_compiler.build_erased_counter
+               (succ max_val) free_link_id (c_id,ag_id) c.Ast.count_test acc' in
+           (lannot,acc'',free_link_id',pset')
+         | Ast.Port p ->
+           let (_,p_pos as p_na) = p.Ast.port_nme in
+           let p_id = Signature.num_of_site ~agent_name p_na sign in
+           let pset' = Mods.IntSet.add p_id pset in
+           let () = if pset == pset' then
+               LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
+           let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
+           let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
+           let () =
+             if Signature.counter_of_site p_id sign <> None
+             then counter_port_mismatch false agent_name p.Ast.port_nme in
 
-         let () = match p.Ast.port_int with
-           | [] | [ None , _ ] -> ()
-           | [ Some va,pos ] ->
-             internals.(p_id) <-
-               LKappa.I_VAL_ERASED
-                 (Signature.num_of_internal_state p_id (va,pos) sign)
-           | _ :: (_, pos) :: _ -> LKappa.several_internal_states pos in
-         match p.Ast.port_lnk with
-         | [LKappa.LNK_ANY, pos] ->
-           let () = ports.(p_id) <- ((LKappa.ANY_FREE,pos), LKappa.Erased) in
-           (lannot,pset')
-         | [LKappa.LNK_SOME, pos_lnk] ->
-           let (na,pos) = p.Ast.port_nme in
-           let () =
-             warning
-               ~pos
-               (fun f ->
-                  Format.fprintf
-                    f "breaking a semi-link on site '%s' will induce a side effect"
-                    na) in
-           let () = ports.(p_id) <- ((LKappa.LNK_SOME,pos_lnk), LKappa.Erased) in
-           (lannot,pset')
-         | [LKappa.LNK_TYPE (dst_p, dst_ty),pos_lnk] ->
-           let (na,pos) = p.Ast.port_nme in
-           let () =
-             warning
-               ~pos
-               (fun f ->
-                  Format.fprintf
-                    f "breaking a semi-link on site '%s' will induce a side effect"
-                    na) in
-           let () = ports.(p_id) <-
-               build_l_type sigs pos_lnk dst_ty dst_p LKappa.Erased in
-           (lannot,pset')
-         | [LKappa.ANY_FREE,_] | [] when syntax_version = Ast.V3 ->
-           let () = ports.(p_id) <-
-               Locality.dummy_annot LKappa.LNK_FREE, LKappa.Erased in
-           (lannot,pset')
-         | [LKappa.ANY_FREE,_] | [] ->
-           let () = ports.(p_id) <-
-               Locality.dummy_annot LKappa.ANY_FREE, LKappa.Erased in
-           (lannot,pset')
-         | [LKappa.LNK_FREE,_] ->
-           let () = ports.(p_id) <-
-               Locality.dummy_annot LKappa.LNK_FREE, LKappa.Erased in
-           (lannot,pset')
-         | [LKappa.LNK_VALUE (i,()), pos] ->
-           let va,lannot' =
-             let warn_on_swap = if r_editStyle then None else Some warning in
-             build_link
-               ?warn_on_swap sigs pos i ag_id p_id LKappa.Erased lannot in
-           let () = ports.(p_id) <- va in (lannot',pset')
-         | _::(_,pos)::_ ->
-           raise (ExceptionDefn.Malformed_Decl
-                    ("Several link state for a single site",pos)))
-      (links_annot,Mods.IntSet.empty) intf in
+           let () = match p.Ast.port_int with
+             | [] | [ None , _ ] -> ()
+             | [ Some va,pos ] ->
+               internals.(p_id) <-
+                 LKappa.I_VAL_ERASED
+                   (Signature.num_of_internal_state p_id (va,pos) sign)
+             | _ :: (_, pos) :: _ -> LKappa.several_internal_states pos in
+           match p.Ast.port_lnk with
+           | [LKappa.LNK_ANY, pos] ->
+             let () = ports.(p_id) <- ((LKappa.ANY_FREE,pos), LKappa.Erased) in
+             (lannot,acc',free_link_id,pset')
+           | [LKappa.LNK_SOME, pos_lnk] ->
+             let (na,pos) = p.Ast.port_nme in
+             let () =
+               warning
+                 ~pos
+                 (fun f ->
+                    Format.fprintf
+                      f "breaking a semi-link on site '%s' will induce a side effect"
+                      na) in
+             let () = ports.(p_id) <- ((LKappa.LNK_SOME,pos_lnk), LKappa.Erased) in
+             (lannot,acc',free_link_id,pset')
+           | [LKappa.LNK_TYPE (dst_p, dst_ty),pos_lnk] ->
+             let (na,pos) = p.Ast.port_nme in
+             let () =
+               warning
+                 ~pos
+                 (fun f ->
+                    Format.fprintf
+                      f "breaking a semi-link on site '%s' will induce a side effect"
+                      na) in
+             let () = ports.(p_id) <-
+                 build_l_type sigs pos_lnk dst_ty dst_p LKappa.Erased in
+             (lannot,acc',free_link_id,pset')
+           | [LKappa.ANY_FREE,_] | [] when syntax_version = Ast.V3 ->
+             let () = ports.(p_id) <-
+                 Locality.dummy_annot LKappa.LNK_FREE, LKappa.Erased in
+             (lannot,acc',free_link_id,pset')
+           | [LKappa.ANY_FREE,_] | [] ->
+             let () = ports.(p_id) <-
+                 Locality.dummy_annot LKappa.ANY_FREE, LKappa.Erased in
+             (lannot,acc',free_link_id,pset')
+           | [LKappa.LNK_FREE,_] ->
+             let () = ports.(p_id) <-
+                 Locality.dummy_annot LKappa.LNK_FREE, LKappa.Erased in
+             (lannot,acc',free_link_id,pset')
+           | [LKappa.LNK_VALUE (i,()), pos] ->
+             let va,lannot' =
+               let warn_on_swap = if r_editStyle then None else Some warning in
+               build_link
+                 ?warn_on_swap sigs pos i ag_id p_id LKappa.Erased lannot in
+             let () = ports.(p_id) <- va in
+             (lannot',acc',free_link_id,pset')
+           | _::(_,pos)::_ ->
+             raise (ExceptionDefn.Malformed_Decl
+                      ("Several link state for a single site",pos)))
+      (links_annot,acc,free_link_id,Mods.IntSet.empty) intf in
+  let (acc'',free_link_id'') =
+    add_implicitly_dropped_counter pset' sign ag_id ports free_link_id' acc' in
   let ra = {
     LKappa.ra_type = ag_id; ra_ports = ports; ra_ints = internals;
     ra_erased = true;
     ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  Counters_compiler.annotate_dropped_counters
-    sign counts ra arity agent_name None,lannot
+  (ra::acc'',free_link_id'',lannot)
+
+let add_implicitly_created_counter
+    ?contact_map pset sign ag_id ports free_link_id acc =
+  List.fold_left
+    (fun (l,free_link_id as acc) c_id ->
+       if Mods.IntSet.mem c_id pset then acc
+       else
+         let (min_val,max_val) =
+           match Signature.counter_of_site c_id sign with
+           | Some (a,b) -> (a,b)
+           | None -> assert false in
+         let () = ports.(c_id) <- Raw_mixture.VAL free_link_id in
+         let () = add_link_contact_map ?contact_map incr_type 1 ag_id c_id in
+         Counters_compiler.build_created_counter
+           min_val (succ max_val) free_link_id None l)
+    (acc,free_link_id) (Signature.list_counters sign)
 
 let annotate_created_agent
     ~warning ~syntax_version ~r_editStyle
-    sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
+    sigs ?contact_map acc free_link_id rannot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -180,48 +248,72 @@ let annotate_created_agent
     Array.init arity
       (fun i ->
          Signature.default_internal_state ag_id i sigs) in
-  let _,rannot =
+  let pset',acc',free_link_id',rannot =
     List.fold_left
-      (fun (pset,rannot) p ->
-         let (_,p_pos as p_na) = p.Ast.port_nme in
-         let p_id = Signature.num_of_site ~agent_name p_na sign in
-         let () = match Signature.counter_of_site p_id sign with
-           | Some _ ->
-             LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
-         let pset' = Mods.IntSet.add p_id pset in
-         let () = if pset == pset' then
-             LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
-         let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
-         let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
-         let () = match p.Ast.port_int with
-           | [] -> ()
-           | [ None, _ ] -> LKappa.not_enough_specified
-                              ~status:"internal" ~side:"left" agent_name p_na
-           | [ Some va, pos ] ->
-             internals.(p_id) <-
-               Some (Signature.num_of_internal_state p_id (va,pos) sign)
-           | _ :: (_, pos) :: _ -> LKappa.several_internal_states pos in
-         match p.Ast.port_lnk with
-         | ([LKappa.LNK_ANY, _] | [LKappa.LNK_SOME, _] |
-            [LKappa.LNK_TYPE _, _] | _::_::_) ->
-           LKappa.not_enough_specified
-             ~status:"linking" ~side:"left" agent_name p_na
-         | [LKappa.ANY_FREE, _] when syntax_version = Ast.V4 ->
-           LKappa.not_enough_specified
-             ~status:"linking" ~side:"left" agent_name p_na
-         | [LKappa.LNK_VALUE (i,()), pos] ->
-           let () = ports.(p_id) <- Raw_mixture.VAL i in
-           let _,rannot' =
-             let warn_on_swap = if r_editStyle then None else Some warning in
-             build_link
-               ?warn_on_swap sigs
-               ?contact_map pos i ag_id p_id LKappa.Freed rannot in
-           pset',rannot'
-         | [(LKappa.ANY_FREE | LKappa.LNK_FREE), _] | [] -> pset',rannot
-      ) (Mods.IntSet.empty,rannot) intf in
-  rannot,
-  { Raw_mixture.a_type = ag_id;
-    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
+      (fun (pset,acc,free_link_id,rannot) -> function
+         | Ast.Counter c ->
+           let () = let (delta,pos) = c.Ast.count_delta in
+             if delta <> 0 then
+               LKappa.forbid_modification pos (Some delta) in
+           let c_na = c.Ast.count_nme in
+           let c_id = Signature.num_of_site ~agent_name c_na sign in
+           let pset' = Mods.IntSet.add c_id pset in
+           let () = if pset == pset' then
+               LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
+           let (min_val,max_val) =
+             match Signature.counter_of_site c_id sign with
+             | Some (a,b) -> (a,b)
+             | None -> counter_port_mismatch true agent_name c.Ast.count_nme in
+           let () = add_link_contact_map ?contact_map incr_type 1 ag_id c_id in
+           let () = ports.(c_id) <- Raw_mixture.VAL free_link_id in
+           let (acc',free_link_id') =
+             Counters_compiler.build_created_counter
+               min_val (succ max_val) free_link_id c.Ast.count_test acc in
+               (pset',acc',free_link_id',rannot)
+         | Ast.Port p ->
+           let (_,p_pos as p_na) = p.Ast.port_nme in
+           let p_id = Signature.num_of_site ~agent_name p_na sign in
+           let pset' = Mods.IntSet.add p_id pset in
+           let () = if pset == pset' then
+               LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
+           let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
+           let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
+           let () =
+             if Signature.counter_of_site p_id sign <> None
+             then counter_port_mismatch false agent_name p.Ast.port_nme in
+           let () = match p.Ast.port_int with
+             | [] -> ()
+             | [ None, _ ] -> LKappa.not_enough_specified
+                                ~status:"internal" ~side:"left" agent_name p_na
+             | [ Some va, pos ] ->
+               internals.(p_id) <-
+                 Some (Signature.num_of_internal_state p_id (va,pos) sign)
+             | _ :: (_, pos) :: _ -> LKappa.several_internal_states pos in
+           match p.Ast.port_lnk with
+           | ([LKappa.LNK_ANY, _] | [LKappa.LNK_SOME, _] |
+              [LKappa.LNK_TYPE _, _] | _::_::_) ->
+             LKappa.not_enough_specified
+               ~status:"linking" ~side:"left" agent_name p_na
+           | [LKappa.ANY_FREE, _] when syntax_version = Ast.V4 ->
+             LKappa.not_enough_specified
+               ~status:"linking" ~side:"left" agent_name p_na
+           | [LKappa.LNK_VALUE (i,()), pos] ->
+             let () = ports.(p_id) <- Raw_mixture.VAL i in
+             let _,rannot' =
+               let warn_on_swap = if r_editStyle then None else Some warning in
+               build_link
+                 ?warn_on_swap sigs
+                 ?contact_map pos i ag_id p_id LKappa.Freed rannot in
+             pset',acc,free_link_id,rannot'
+           | [(LKappa.ANY_FREE | LKappa.LNK_FREE), _] | [] ->
+             pset',acc,free_link_id,rannot
+      ) (Mods.IntSet.empty,acc,free_link_id,rannot) intf in
+  let (acc'',free_link_id'') =
+    add_implicitly_created_counter pset' sign ag_id ports free_link_id' acc' in
+  ({ Raw_mixture.a_type = ag_id;
+     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; } :: acc'',
+   free_link_id'',
+   rannot)
 
 let translate_modification
     ~warning sigs ?contact_map ag_id p_id
@@ -248,115 +340,175 @@ let translate_modification
       LKappa.Linked j,(lhs_links,rhs_links')
 
 let annotate_edit_agent
-    ~warning ~syntax_version ~is_rule sigs ?contact_map (agent_name, _ as ag_ty)
-    links_annot intf counts =
+    ~warning ~syntax_version ~is_rule sigs ?contact_map
+    acc free_link_ids links_annot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let ports =
     Array.make arity (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained) in
   let internals = Array.make arity LKappa.I_ANY in
-  let scan_port (links_annot,pset) p =
-    let (p_na,_) = p.Ast.port_nme in
-    let p_id = Signature.num_of_site ~agent_name p.Ast.port_nme sign in
-    let () = match Signature.counter_of_site p_id sign with
-      | Some _ ->
-        LKappa.counter_misused agent_name p.Ast.port_nme | None -> () in
-    let pset' = Mods.IntSet.add p_id pset in
-    let () = if pset == pset' then
-        LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
-    let links_annot' =
-      match p.Ast.port_lnk with
-      | [LKappa.LNK_SOME, pos as x] ->
-        let (modif,links_annot') = translate_modification
-            ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
-            links_annot p.Ast.port_lnk_mod in
-        let () = ports.(p_id) <- (x, modif) in
-        links_annot'
-      | [(LKappa.LNK_ANY, pos)] ->
-        let (modif,links_annot') = translate_modification
-            ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
-            links_annot p.Ast.port_lnk_mod in
-        let () = ports.(p_id) <- ((LKappa.ANY_FREE,pos), modif) in
-        links_annot'
-      | ([] | [LKappa.ANY_FREE, _]) when syntax_version = Ast.V3 ->
-        let (modif,links_annot') = translate_modification
-            ~warning ?warn:None sigs ?contact_map ag_id p_id
-            links_annot p.Ast.port_lnk_mod in
-        let () = ports.(p_id) <- (Locality.dummy_annot LKappa.LNK_FREE, modif) in
-        links_annot'
-      | [] when p.Ast.port_lnk_mod = None -> links_annot
-      | ([LKappa.ANY_FREE, _] | []) ->
-        LKappa.not_enough_specified
-          ~status:"linking" ~side:"left" agent_name p.Ast.port_nme
-      | [LKappa.LNK_FREE, _] ->
-        let (modif,links_annot') = translate_modification
-            ~warning ?warn:None sigs ?contact_map ag_id p_id
-            links_annot p.Ast.port_lnk_mod in
-        let () = ports.(p_id) <- (Locality.dummy_annot LKappa.LNK_FREE, modif) in
-        links_annot'
-      | [LKappa.LNK_TYPE (dst_p,dst_ty), pos] ->
-        let (modif,links_annot') = translate_modification
-            ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
-            links_annot p.Ast.port_lnk_mod in
-        let () = ports.(p_id) <- build_l_type sigs pos dst_ty dst_p modif in
-        links_annot'
-      | [LKappa.LNK_VALUE (i,()), pos] ->
-        let (modif,(lhs_links,rhs_links)) = translate_modification
-            ~warning ?warn:None sigs ?contact_map ag_id p_id
-            links_annot p.Ast.port_lnk_mod in
-        let va,lhs_links' =
-          build_link
-            sigs ?contact_map:(if is_rule then None else contact_map)
-            ?warn_on_swap:None pos i ag_id p_id modif lhs_links in
-        let () = ports.(p_id) <- va in
-        (lhs_links',rhs_links)
-      | _::(_,pos)::_ ->
-        raise (ExceptionDefn.Malformed_Decl
-                 ("Several link state for a single site",pos)) in
-    let () =
-      match p.Ast.port_int,p.Ast.port_int_mod with
-      | ([None,_] | []), None -> ()
-      | [ Some va, pos ], Some va' ->
-        internals.(p_id) <-
-          LKappa.I_VAL_CHANGED
-            (Signature.num_of_internal_state p_id (va,pos) sign,
-             Signature.num_of_internal_state p_id va' sign)
-      | [], Some (_,pos as va) ->
-        let () =
-          if syntax_version = Ast.V3 then
-            warning
-              ~pos
-              (fun f ->
-               Format.fprintf
-                 f
-                 "internal state of site '%s' of agent '%s' is modified \
-                  although it is left unpecified in the left hand side"
-                 p_na agent_name)
-          else
-            raise (ExceptionDefn.Malformed_Decl
-                     ("Modified internal state must appear on the left",pos)) in
-        internals.(p_id) <-
-          LKappa.I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
-      | [None,_], Some va ->
-        internals.(p_id) <-
-          LKappa.I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
-      | [ Some va, pos ], None ->
-        let i_id = Signature.num_of_internal_state p_id (va,pos) sign in
-        internals.(p_id) <- LKappa.I_VAL_CHANGED (i_id,i_id)
-      | _ :: (_,pos) :: _, _ -> LKappa.several_internal_states pos in
-    (links_annot',pset') in
-  let annot',_ =
-    List.fold_left scan_port (links_annot,Mods.IntSet.empty) intf in
+  let scan_port (links_annot,acc,free_link_ids,pset) = function
+    | Ast.Counter c ->
+      let (lfreeid,rfreeid) = free_link_ids in
+      let c_na = c.Ast.count_nme in
+      let c_id = Signature.num_of_site ~agent_name c_na sign in
+      let pset' = Mods.IntSet.add c_id pset in
+      let () = if pset == pset' then
+          LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
+      let () =
+        if Signature.counter_of_site c_id sign = None
+        then counter_port_mismatch true agent_name c.Ast.count_nme in
+      let (acc',lfreeid',value_moved) =
+        Counters_compiler.build_maintained_counter
+          lfreeid (c_id,ag_id) rfreeid
+          c.Ast.count_test (fst c.Ast.count_delta) acc in
+      let va =
+        (Locality.dummy_annot
+           (LKappa.LNK_VALUE (lfreeid,bounded_to_incr_info)),
+         if value_moved then LKappa.Linked rfreeid else LKappa.Maintained) in
+      let () = add_link_contact_map ?contact_map incr_type 1 ag_id c_id in
+      let () = ports.(c_id) <- va in
+      (links_annot,acc',
+       (lfreeid',if value_moved then succ rfreeid else rfreeid),pset')
+    | Ast.Port p ->
+      let (p_na,_) = p.Ast.port_nme in
+      let p_id = Signature.num_of_site ~agent_name p.Ast.port_nme sign in
+      let pset' = Mods.IntSet.add p_id pset in
+      let () = if pset == pset' then
+          LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
+      let () =
+        if Signature.counter_of_site p_id sign <> None
+        then counter_port_mismatch false agent_name p.Ast.port_nme in
+      let links_annot' =
+        match p.Ast.port_lnk with
+        | [LKappa.LNK_SOME, pos as x] ->
+          let (modif,links_annot') = translate_modification
+              ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
+              links_annot p.Ast.port_lnk_mod in
+          let () = ports.(p_id) <- (x, modif) in
+          links_annot'
+        | [(LKappa.LNK_ANY, pos)] ->
+          let (modif,links_annot') = translate_modification
+              ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
+              links_annot p.Ast.port_lnk_mod in
+          let () = ports.(p_id) <- ((LKappa.ANY_FREE,pos), modif) in
+          links_annot'
+        | ([] | [LKappa.ANY_FREE, _]) when syntax_version = Ast.V3 ->
+          let (modif,links_annot') = translate_modification
+              ~warning ?warn:None sigs ?contact_map ag_id p_id
+              links_annot p.Ast.port_lnk_mod in
+          let () =
+            ports.(p_id) <- (Locality.dummy_annot LKappa.LNK_FREE, modif) in
+          links_annot'
+        | [] when p.Ast.port_lnk_mod = None -> links_annot
+        | ([LKappa.ANY_FREE, _] | []) ->
+          LKappa.not_enough_specified
+            ~status:"linking" ~side:"left" agent_name p.Ast.port_nme
+        | [LKappa.LNK_FREE, _] ->
+          let (modif,links_annot') = translate_modification
+              ~warning ?warn:None sigs ?contact_map ag_id p_id
+              links_annot p.Ast.port_lnk_mod in
+          let () =
+            ports.(p_id) <- (Locality.dummy_annot LKappa.LNK_FREE, modif) in
+          links_annot'
+        | [LKappa.LNK_TYPE (dst_p,dst_ty), pos] ->
+          let (modif,links_annot') = translate_modification
+              ~warning ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
+              links_annot p.Ast.port_lnk_mod in
+          let () = ports.(p_id) <- build_l_type sigs pos dst_ty dst_p modif in
+          links_annot'
+        | [LKappa.LNK_VALUE (i,()), pos] ->
+          let (modif,(lhs_links,rhs_links)) = translate_modification
+              ~warning ?warn:None sigs ?contact_map ag_id p_id
+              links_annot p.Ast.port_lnk_mod in
+          let va,lhs_links' =
+            build_link
+              sigs ?contact_map:(if is_rule then None else contact_map)
+              ?warn_on_swap:None pos i ag_id p_id modif lhs_links in
+          let () = ports.(p_id) <- va in
+          (lhs_links',rhs_links)
+        | _::(_,pos)::_ ->
+          raise (ExceptionDefn.Malformed_Decl
+                   ("Several link state for a single site",pos)) in
+      let () =
+        match p.Ast.port_int,p.Ast.port_int_mod with
+        | ([None,_] | []), None -> ()
+        | [ Some va, pos ], Some va' ->
+          internals.(p_id) <-
+            LKappa.I_VAL_CHANGED
+              (Signature.num_of_internal_state p_id (va,pos) sign,
+               Signature.num_of_internal_state p_id va' sign)
+        | [], Some (_,pos as va) ->
+          let () =
+            if syntax_version = Ast.V3 then
+              warning
+                ~pos
+                (fun f ->
+                   Format.fprintf
+                     f
+                     "internal state of site '%s' of agent '%s' is modified \
+                      although it is left unpecified in the left hand side"
+                     p_na agent_name)
+            else
+              raise (ExceptionDefn.Malformed_Decl
+                       ("Modified internal state must appear on the left",pos)) in
+          internals.(p_id) <-
+            LKappa.I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
+        | [None,_], Some va ->
+          internals.(p_id) <-
+            LKappa.I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
+        | [ Some va, pos ], None ->
+          let i_id = Signature.num_of_internal_state p_id (va,pos) sign in
+          internals.(p_id) <- LKappa.I_VAL_CHANGED (i_id,i_id)
+        | _ :: (_,pos) :: _, _ -> LKappa.several_internal_states pos in
+      (links_annot',acc,free_link_ids,pset') in
+  let annot',acc',free_link_id',_ =
+    List.fold_left
+      scan_port (links_annot,acc,free_link_ids,Mods.IntSet.empty) intf in
   let ra =
-    { LKappa.ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
+    { LKappa.ra_type = ag_id; ra_ports = ports;
+      ra_ints = internals; ra_erased = false;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  Counters_compiler.annotate_edit_counters
-    sigs ag_ty counts ra (add_link_contact_map ?contact_map),annot'
+  (ra::acc',free_link_id',annot')
+
+let find_port_in_r agent_name (na,_ as p_na) rp =
+  let (p',r) =
+    List.fold_left
+      (fun (a,b) -> function
+         | Ast.Port p as s ->
+           if String.compare (fst p.Ast.port_nme) na = 0 then ((p::a),b)
+           else (a,(s::b))
+         | Ast.Counter c as s ->
+           if String.compare (fst c.Ast.count_nme) na = 0 then
+             LKappa.counter_misused agent_name p_na
+           else (a,(s::b))) ([],[]) rp in
+  match p' with
+  | [p'] -> (p',r)
+  | [] ->
+    LKappa.not_enough_specified
+      ~status:"linking" ~side:"right" agent_name p_na
+  | _ :: _ -> LKappa.several_occurence_of_site agent_name p_na
+
+let find_counter_in_r agent_name (na,_ as p_na) rp =
+  let (p',r) =
+    List.fold_left
+      (fun (a,b) -> function
+         | Ast.Counter c as s ->
+           if String.compare (fst c.Ast.count_nme) na = 0 then ((c::a),b)
+           else (a,(s::b))
+         | Ast.Port p as s ->
+           if String.compare (fst p.Ast.port_nme) na = 0 then
+             LKappa.counter_misused agent_name p_na
+           else (a,(s::b))) ([],[]) rp in
+  match p' with
+  | [p'] -> Some (p',r)
+  | [] -> None
+  | _ :: _ -> LKappa.several_occurence_of_site agent_name p_na
 
 let annotate_agent_with_diff
     ~warning ~syntax_version sigs ?contact_map
-    (agent_name,_ as ag_ty) links_annot lp rp lc rc =
+    acc free_link_id links_annot (agent_name,_ as ag_ty) ls rs =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -563,46 +715,119 @@ although it is left unpecified in the left hand side"
         ~status:"internal" ~side:"right" agent_name p'.Ast.port_nme
     | (_ :: (_,pos) :: _, _ | _, _ :: (_,pos) :: _) ->
       LKappa.several_internal_states pos in
-  let find_in_r (na,pos) rp =
-    let (p',r) =
-      List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
-    match p' with
-    | [p'] -> (p',r)
-    | [] ->
-      LKappa.not_enough_specified
-        ~status:"linking" ~side:"right" agent_name (na,pos)
-    | _ :: _ -> LKappa.several_occurence_of_site agent_name (na,pos) in
-  let rp_r,annot,_ =
+  let rp_r,annot,acc',free_link_id',pset =
     List.fold_left
-      (fun (rp,annot,pset) p ->
-         let (_,p_pos as p_na) = p.Ast.port_nme in
-         let p_id = Signature.num_of_site ~agent_name p_na sign in
-         let pset' = Mods.IntSet.add p_id pset in
-         let () = if pset == pset' then
-             LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
-         let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
-         let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
+      (fun (rs,annot,acc,free_link_ids,pset) -> function
+         | Ast.Port p ->
+           let (_,p_pos as p_na) = p.Ast.port_nme in
+           let p_id = Signature.num_of_site ~agent_name p_na sign in
+           let pset' = Mods.IntSet.add p_id pset in
+           let () = if pset == pset' then
+               LKappa.several_occurence_of_site agent_name p_na in
+           let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
+           let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
+           let () =
+             if Signature.counter_of_site p_id sign <> None
+             then counter_port_mismatch false agent_name p.Ast.port_nme in
 
-         let p',rp' = find_in_r p_na rp in
-         let annot' = register_port_modif
-             p_id p.Ast.port_lnk p' annot in
-         let () = register_internal_modif p_id p.Ast.port_int p' in
-         (rp',annot',pset')) (rp,links_annot,Mods.IntSet.empty) lp in
-  let annot' =
+           let p',rp' = find_port_in_r agent_name p_na rs in
+           let annot' = register_port_modif
+               p_id p.Ast.port_lnk p' annot in
+           let () = register_internal_modif p_id p.Ast.port_int p' in
+           (rp',annot',acc,free_link_ids,pset')
+         | Ast.Counter c ->
+           (*let () = let (delta,pos) = c.Ast.count_delta in
+             if delta <> 0 then
+               LKappa.forbid_modification pos (Some delta) in*)
+           let c_na = c.Ast.count_nme in
+           let c_id = Signature.num_of_site ~agent_name c_na sign in
+           let pset' = Mods.IntSet.add c_id pset in
+           let () = if pset == pset' then
+               LKappa.several_occurence_of_site agent_name c_na in
+           let () =
+             if Signature.counter_of_site c_id sign = None
+             then counter_port_mismatch false agent_name c.Ast.count_nme in
+
+           let (delta,rs') =
+             match find_counter_in_r agent_name c_na rs with
+             | Some (c',rs') ->
+               let () = match c'.Ast.count_test with
+                 | None -> ()
+                 | Some (_,pos) ->
+                   raise (ExceptionDefn.Malformed_Decl
+                            ("Tests on counter '"^(fst c'.Ast.count_nme)
+                             ^"' is forbidden in a right hand side",pos)) in
+               (fst c'.Ast.count_delta,rs')
+             | None -> (0,rs) in
+           let (lfreeid,rfreeid) = free_link_ids in
+           let (acc',lfreeid',value_moved) =
+             Counters_compiler.build_maintained_counter
+               lfreeid (c_id,ag_id) rfreeid
+               c.Ast.count_test delta acc in
+           let va =
+             (Locality.dummy_annot
+                (LKappa.LNK_VALUE (lfreeid,bounded_to_incr_info)),
+              if value_moved then LKappa.Linked rfreeid
+              else LKappa.Maintained) in
+           let () = ports.(c_id) <- va in
+           let () = add_link_contact_map ?contact_map incr_type 1 ag_id c_id in
+           (rs',annot,acc',
+            (lfreeid',if value_moved then succ rfreeid else rfreeid),pset'))
+      (rs,links_annot,acc,free_link_id,Mods.IntSet.empty) ls in
+  let (acc'',free_link_id'',annot',_) =
     List.fold_left
-      (fun annot p ->
-         let p_na = p.Ast.port_nme in
-         let p_id = Signature.num_of_site ~agent_name p_na sign in
-         let () = register_internal_modif p_id [] p in
-         register_port_modif p_id [Locality.dummy_annot LKappa.LNK_ANY] p annot)
-      annot rp_r in
+      (fun (acc,free_link_ids,annot,pset) -> function
+         | Ast.Port p ->
+           let p_na = p.Ast.port_nme in
+           let p_id = Signature.num_of_site ~agent_name p_na sign in
+           let pset' = Mods.IntSet.add p_id pset in
+           let () = if pset == pset' then
+               LKappa.several_occurence_of_site agent_name p_na in
+           let () =
+             if Signature.counter_of_site p_id sign <> None
+             then counter_port_mismatch false agent_name p.Ast.port_nme in
+           let () = register_internal_modif p_id [] p in
+           (acc,free_link_ids,
+            register_port_modif
+              p_id [Locality.dummy_annot LKappa.LNK_ANY] p annot,
+            pset')
+         | Ast.Counter c ->
+           let c_na = c.Ast.count_nme in
+           let c_id = Signature.num_of_site ~agent_name c_na sign in
+           let pset' = Mods.IntSet.add c_id pset in
+           let () = if pset == pset' then
+               LKappa.several_occurence_of_site agent_name c_na in
+           let () =
+             if Signature.counter_of_site c_id sign = None
+             then counter_port_mismatch false agent_name c.Ast.count_nme in
+           let () = match c.Ast.count_test with
+             | None -> ()
+             | Some (_,pos) ->
+               raise (ExceptionDefn.Malformed_Decl
+                        ("Tests on counter '"^(fst c.Ast.count_nme)
+                         ^"' is forbidden in a right hand side",pos)) in
+           let (lfreeid,rfreeid) = free_link_ids in
+           let (acc',lfreeid',value_moved) =
+             Counters_compiler.build_maintained_counter
+               lfreeid (c_id,ag_id) rfreeid
+               None (fst c.Ast.count_delta) acc in
+           let va =
+             (Locality.dummy_annot
+                (LKappa.LNK_VALUE (lfreeid,bounded_to_incr_info)),
+              if value_moved then LKappa.Linked rfreeid
+              else LKappa.Maintained) in
+           let () = ports.(c_id) <- va in
+           let () = add_link_contact_map ?contact_map incr_type 1 ag_id c_id in
+           (acc',
+            (lfreeid',if value_moved then succ rfreeid else rfreeid),
+           annot,pset'))
+      (acc',free_link_id',annot,pset) rp_r in
 
   let ra = {
     LKappa.ra_type = ag_id; ra_ports = ports; ra_ints = internals;
     ra_erased = false;
     ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  Counters_compiler.annotate_counters_with_diff
-    sigs ag_ty lc rc ra (add_link_contact_map ?contact_map),annot'
+  (ra::acc'',free_link_id'',annot')
 
 let refer_links_annot ?warning sigs links_annot mix =
   List.iter
@@ -630,14 +855,6 @@ let refer_links_annot ?warning sigs links_annot mix =
                | LKappa.LNK_TYPE _ | LKappa.LNK_FREE | LKappa.ANY_FREE),_),_ -> ())
          ra.LKappa.ra_ports) mix
 
-let separate_sites ls =
-  let (a,b) =
-    List.fold_left
-      (fun (ps,cs) -> function
-        | Ast.Port p -> (p::ps,cs)
-        | Ast.Counter c -> (ps,c::cs)) ([],[]) ls in
-  (List.rev a,b)
-
 let final_rule_sanity
       ?warning sigs ((lhs_links_one,lhs_links_two),(rhs_links_one,_)) mix =
   let () =
@@ -645,9 +862,7 @@ let final_rule_sanity
     | None -> ()
     | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
   let () =
-    refer_links_annot
-      ?warning sigs lhs_links_two
-      (List.map (fun r -> r.Counters_compiler.ra) mix) in
+    refer_links_annot ?warning sigs lhs_links_two mix in
   match Mods.IntMap.root rhs_links_one with
   | None -> ()
   | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos
@@ -662,9 +877,9 @@ Is responsible for the check that:
 - links appear exactly twice
 *)
 let annotate_lhs_with_diff_v3
-    ~warning sigs ?contact_map lhs rhs =
+    ~warning sigs ?contact_map free_link_ids lhs rhs =
   let syntax_version=Ast.V3 in
-  let rec aux links_annot acc lhs rhs =
+  let rec aux links_annot acc free_link_ids lhs rhs =
     match lhs,rhs with
     | Ast.Absent pos::_, _
     | (Ast.Present _ :: _ | []), Ast.Absent pos::_ ->
@@ -677,13 +892,11 @@ let annotate_lhs_with_diff_v3
            Ast.no_more_site_on_right true lag_s rag_s ->
       let () = LKappa.forbid_modification lpos lmod in
       let () = LKappa.forbid_modification rpos rmod in
-      let (lag_p,lag_c) = separate_sites lag_s in
-      let (rag_p,rag_c) = separate_sites rag_s in
-      let ra,links_annot' =
+      let (acc',free_link_ids',links_annot') =
         annotate_agent_with_diff
           ~warning ~syntax_version sigs ?contact_map
-          ag_ty links_annot lag_p rag_p lag_c rag_c in
-      aux links_annot' (ra::acc) lt rt
+          acc free_link_ids links_annot ag_ty lag_s rag_s in
+      aux links_annot' acc' free_link_ids' lt rt
     | (Ast.Present _ :: _ | [] as erased), added ->
       let () =
         if added <> [] then
@@ -702,83 +915,75 @@ let annotate_lhs_with_diff_v3
                          f "Rule induced deletion AND creation of the agent %s"
                          lag))
             erased in
-      let mix,llinks =
+      let mix,_,llinks =
         List.fold_left
-          (fun (acc,lannot) -> function
+          (fun (acc,lf_link_id,lannot) -> function
              | Ast.Absent pos ->
                raise
                  (ExceptionDefn.Malformed_Decl
                     ("Absent agent are KaSim > 3 syntax",pos))
              | Ast.Present ((_,pos as na),sites,modif) ->
                let () = LKappa.forbid_modification pos modif in
-               let intf,counts = separate_sites sites in
-               let ra,lannot' = annotate_dropped_agent
-                   ~warning ~syntax_version ~r_editStyle:false
-                   sigs lannot na intf counts in
-               (ra::acc,lannot'))
-          (acc,fst links_annot) erased in
-      let cmix,rlinks =
+               annotate_dropped_agent
+                 ~warning ~syntax_version ~r_editStyle:false
+                 sigs acc lf_link_id lannot na sites)
+          (acc,fst free_link_ids,fst links_annot) erased in
+      let cmix,_,rlinks =
         List.fold_left
-          (fun (acc,rannot) -> function
+          (fun (acc,rfreeid,rannot) -> function
              | Ast.Absent pos ->
                raise
                  (ExceptionDefn.Malformed_Decl
                     ("Absent agent are KaSim > 3 syntax",pos))
              | Ast.Present ((_,pos as na),sites,modif) ->
              let () = LKappa.forbid_modification pos modif in
-             let intf,counts = separate_sites sites in
-             let rannot',x' = annotate_created_agent
-                 ~warning ~syntax_version ~r_editStyle:false sigs
-                 ?contact_map rannot na intf in
-             let x'' =
-               Counters_compiler.annotate_created_counters
-                 sigs na counts (add_link_contact_map ?contact_map) x' in
-             x''::acc,rannot')
-          ([],snd links_annot) added in
+             annotate_created_agent
+               ~warning ~syntax_version ~r_editStyle:false sigs
+               ?contact_map acc rfreeid rannot na sites)
+          ([],snd free_link_ids,snd links_annot) added in
       let () = final_rule_sanity ~warning sigs (llinks,rlinks) mix in
       List.rev mix, List.rev cmix in
   aux
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
-    [] lhs rhs
+    [] free_link_ids lhs rhs
 
-let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
+let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map free_link_ids lhs rhs =
   let syntax_version = Ast.V4 in
-  let rec aux links_annot mix cmix lhs rhs =
+  let rec aux links_annot link_free_ids mix cmix lhs rhs =
     match lhs,rhs with
     | [], [] ->
       let () = final_rule_sanity ~warning sigs links_annot mix in
       List.rev mix, List.rev cmix
-    | Ast.Absent _::lt, Ast.Absent _:: rt -> aux links_annot mix cmix lt rt
+    | Ast.Absent _::lt, Ast.Absent _:: rt ->
+      aux links_annot link_free_ids mix cmix lt rt
     | Ast.Present ((_,pos as ty),sites,lmod) :: lt, Ast.Absent _ :: rt ->
       let () = LKappa.forbid_modification pos lmod in
-      let (intf,counts) = separate_sites sites in
-      let ra,lannot' = annotate_dropped_agent
+      let mix',lfreeid,lannot' =
+        annotate_dropped_agent
           ~warning ~syntax_version ~r_editStyle:false
-          sigs (fst links_annot) ty intf counts in
-      aux (lannot',snd links_annot) (ra::mix) cmix lt rt
+          sigs mix (fst free_link_ids) (fst links_annot) ty sites in
+      aux
+        (lannot',snd links_annot) (lfreeid,snd link_free_ids)
+        mix' cmix lt rt
     | Ast.Absent _ :: lt, Ast.Present ((_,pos as ty),sites,rmod) :: rt ->
       let () = LKappa.forbid_modification pos rmod in
-      let (intf,counts) = separate_sites sites in
-      let rannot',x' = annotate_created_agent
+      let cmix',rfreeid,rannot' = annotate_created_agent
           ~warning ~syntax_version ~r_editStyle:false sigs
-          ?contact_map (snd links_annot) ty intf in
-      let x'' =
-        Counters_compiler.annotate_created_counters
-          sigs ty counts (add_link_contact_map ?contact_map) x' in
-      aux (fst links_annot,rannot') mix (x''::cmix) lt rt
+          ?contact_map cmix (snd link_free_ids) (snd links_annot) ty sites in
+      aux
+        (fst links_annot,rannot') (fst link_free_ids,rfreeid)
+        mix cmix' lt rt
     | Ast.Present ((lag_na,lpos as ag_ty),lag_s,lmod)::lt,
       Ast.Present ((rag_na,rpos),rag_s,rmod)::rt ->
       if String.compare lag_na rag_na = 0 &&
          Ast.no_more_site_on_right true lag_s rag_s then
         let () = LKappa.forbid_modification lpos lmod in
         let () = LKappa.forbid_modification rpos rmod in
-        let (lag_p,lag_c) = separate_sites lag_s in
-        let (rag_p,rag_c) = separate_sites rag_s in
-        let ra,links_annot' =
+        let mix',link_free_ids',links_annot' =
           annotate_agent_with_diff
             ~warning ~syntax_version sigs ?contact_map
-            ag_ty links_annot lag_p rag_p lag_c rag_c in
-        aux links_annot' (ra::mix) cmix lt rt
+            mix link_free_ids links_annot ag_ty lag_s rag_s in
+        aux links_annot' link_free_ids' mix' cmix lt rt
       else
         raise
           (ExceptionDefn.Malformed_Decl
@@ -791,45 +996,44 @@ let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
  in
   aux
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
-    [] [] lhs rhs
+    free_link_ids [] [] lhs rhs
 
-let annotate_lhs_with_diff ~warning ~syntax_version sigs ?contact_map lhs rhs =
+let annotate_lhs_with_diff
+    ~warning ~syntax_version sigs ?contact_map link_free_ids lhs rhs =
   match syntax_version with
-  | Ast.V3 -> annotate_lhs_with_diff_v3 ~warning sigs ?contact_map lhs rhs
-  | Ast.V4 -> annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs
+  | Ast.V3 ->
+    annotate_lhs_with_diff_v3 ~warning sigs ?contact_map link_free_ids lhs rhs
+  | Ast.V4 ->
+    annotate_lhs_with_diff_v4 ~warning sigs ?contact_map link_free_ids lhs rhs
 
 let annotate_edit_mixture
-    ~warning ~syntax_version ~is_rule sigs ?contact_map m =
-  let links_annot,mix,cmix =
+    ~warning ~syntax_version ~is_rule sigs ?contact_map free_link_ids m =
+  let links_annot,_,mix,cmix =
     List.fold_left
-      (fun (lannot,acc,news) -> function
+      (fun (lannot,free_link_ids,acc,news) -> function
          | Ast.Absent pos ->
            raise
              (ExceptionDefn.Malformed_Decl
                 ("Absent agent cannot occurs in rule in edit notation",pos))
          | Ast.Present (ty,sites,modif) ->
-         let (intf,counts) = separate_sites sites in
          match modif with
          | None ->
-           let a,lannot' = annotate_edit_agent
+           let acc',free_link_ids',lannot' = annotate_edit_agent
                ~warning ~syntax_version ~is_rule sigs
-               ?contact_map ty lannot intf counts in
-           (lannot',a::acc,news)
+               ?contact_map acc free_link_ids lannot ty sites in
+           (lannot',free_link_ids',acc',news)
          | Some Ast.Create ->
-           let rannot',x' = annotate_created_agent
+           let news',rfreeid,rannot' = annotate_created_agent
                ~warning ~syntax_version ~r_editStyle:true sigs
-               ?contact_map (snd lannot) ty intf in
-           let x'' =
-              Counters_compiler.annotate_created_counters
-               sigs ty counts (add_link_contact_map ?contact_map) x' in
-           ((fst lannot,rannot'),acc,x''::news)
+               ?contact_map news (snd free_link_ids) (snd lannot) ty sites in
+           ((fst lannot,rannot'),(fst free_link_ids,rfreeid),acc,news')
          | Some Ast.Erase ->
-           let ra,lannot' = annotate_dropped_agent
+           let acc',lfreeid,lannot' = annotate_dropped_agent
                ~warning ~syntax_version ~r_editStyle:true sigs
-               (fst lannot) ty intf counts in
-           ((lannot',snd lannot),ra::acc,news))
+               acc (fst free_link_ids) (fst lannot) ty sites in
+           ((lannot',snd lannot),(lfreeid,snd free_link_ids),acc',news))
       (((Mods.IntMap.empty,Mods.IntMap.empty),
-        (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
+        (Mods.IntMap.empty,Mods.IntMap.empty)),free_link_ids,[],[])
       m in
   let () = final_rule_sanity ?warning:None sigs links_annot mix in
   (List.rev mix, List.rev cmix)
@@ -854,9 +1058,11 @@ let give_rule_label bidirectional (id,set) printer r = function
     else (id,set'),lab
 
 let mixture_of_ast ~warning ~syntax_version sigs ?contact_map pos mix =
+  let free_link_ids = Ast.free_link_id_mixture mix in
   match annotate_edit_mixture
-          ~warning ~syntax_version ~is_rule:false sigs ?contact_map mix with
-  | r, [] -> fst (Counters_compiler.remove_counter_rule sigs r [])
+          ~warning ~syntax_version ~is_rule:false sigs
+          ?contact_map free_link_ids mix with
+  | r, [] -> r
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
 
@@ -866,10 +1072,11 @@ let raw_mixture_of_ast ~warning ~syntax_version sigs ?contact_map mix =
         | Ast.Absent l -> Ast.Absent l
         | Ast.Present (ty,sites,_) -> Ast.Present (ty,sites,Some Ast.Create))
       mix in
-  let (a,b) =
-    annotate_edit_mixture
-      ~warning ~syntax_version ~is_rule:false sigs ?contact_map created in
-  snd (Counters_compiler.remove_counter_rule sigs a b)
+  let free_link_ids = Ast.free_link_id_mixture created in
+  snd
+    (annotate_edit_mixture
+       ~warning ~syntax_version ~is_rule:false sigs
+       ?contact_map free_link_ids created)
 
 let convert_alg_var ?max_allowed_var algs lab pos =
   let i =
@@ -1001,17 +1208,18 @@ let modif_expr_of_ast
   match modif with
   | Ast.APPLY(nb,(r,pos)) ->
     let (mix,cmix),rm_tok,add_tok,r_editStyle =
+      let free_link_ids = Ast.free_link_id_rule_content r.Ast.rewrite in
       match r.Ast.rewrite with
       | Ast.Edit e ->
         annotate_edit_mixture
           ~warning ~syntax_version:Ast.V4 ~is_rule:true
-          sigs ~contact_map e.Ast.mix,
+          sigs ~contact_map free_link_ids e.Ast.mix,
         [],e.Ast.delta_token,true
       | Ast.Arrow a ->
         annotate_lhs_with_diff
-          ~warning ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs,
+          ~warning ~syntax_version sigs ~contact_map
+          free_link_ids a.Ast.lhs a.Ast.rhs,
         a.Ast.rm_token,a.Ast.add_token,false in
-    let mix,cmix = Counters_compiler.remove_counter_rule sigs mix cmix in
     Ast.APPLY
       (alg_expr_of_ast ~warning ~syntax_version sigs tok algs nb,
        (assemble_rule
@@ -1117,6 +1325,7 @@ let name_and_purify_rule
        Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
     else (acc,r.Ast.k_def) in
   let acc'',k_un = add_un_variable r.Ast.k_un acc' (label^"_un_rate") in
+  let free_link_ids = Ast.free_link_id_rule_content r.Ast.rewrite in
   match r.Ast.rewrite with
   | Ast.Edit e ->
     let () =
@@ -1125,13 +1334,15 @@ let name_and_purify_rule
           (ExceptionDefn.Malformed_Decl
              ("Rules in edit notation cannot be bidirectional",r_pos)) in
     let mix,created = annotate_edit_mixture
-        ~warning ~syntax_version ~is_rule:true sigs ~contact_map e.Ast.mix in
+        ~warning ~syntax_version ~is_rule:true sigs ~contact_map
+        free_link_ids e.Ast.mix in
     (pack',acc'',
      (label_opt,true,mix,created,[],e.Ast.delta_token,k_def,k_un,r_pos)::rules)
   | Ast.Arrow a ->
     let mix,created =
       annotate_lhs_with_diff
-        ~warning ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs in
+        ~warning ~syntax_version sigs ~contact_map
+        free_link_ids a.Ast.lhs a.Ast.rhs in
     let rules' =
       (label_opt,false,mix,created,
        a.Ast.rm_token,a.Ast.add_token,k_def,k_un,r_pos)
@@ -1144,7 +1355,8 @@ let name_and_purify_rule
         let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
         let mix,created =
           annotate_lhs_with_diff
-            ~warning ~syntax_version sigs ~contact_map a.Ast.rhs a.Ast.lhs in
+            ~warning ~syntax_version sigs ~contact_map
+            (snd free_link_ids,fst free_link_ids) a.Ast.rhs a.Ast.lhs in
         ((Locality.dummy_annot rate_var,k)::acc_un,
          (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
           false,mix,created,a.Ast.add_token,a.Ast.rm_token,
@@ -1155,7 +1367,8 @@ let name_and_purify_rule
         let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
         let mix,created =
           annotate_lhs_with_diff
-            ~warning ~syntax_version sigs ~contact_map a.Ast.rhs a.Ast.lhs in
+            ~warning ~syntax_version sigs ~contact_map
+            (snd free_link_ids,fst free_link_ids) a.Ast.rhs a.Ast.lhs in
         (acc_un,
          (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
           false,mix,created,a.Ast.add_token,a.Ast.rm_token,
@@ -1168,7 +1381,7 @@ let name_and_purify_rule
               r_pos)) in
     (pack',acc''',rules'')
 
-let create_t sites incr_info =
+let create_t sites =
   let (aux,counters) =
     List.fold_right
       (fun site (acc,counts) ->
@@ -1212,7 +1425,7 @@ let create_t sites incr_info =
              | Ast.CEQ j ->
                 (c.Ast.count_nme,
                 (NamedDecls.create [||],
-                 [incr_info],
+                 [Locality.dummy_annot "v",Locality.dummy_annot "__incr"],
                  Some (j,(fst c.Ast.count_delta))))::acc,
                c.Ast.count_nme::counts)
       sites ([],[]) in
@@ -1243,15 +1456,13 @@ let create_sig l =
                       | LKappa.LNK_TYPE (_,_), _ -> true) false p.Ast.port_lnk)
              contact sites)
       false l in
-  let annot = Locality.dummy in
   let (sigs,counters) =
     List.fold_right
       (fun ag (acc,counters) ->
          match ag with
          | Ast.Absent _ -> (acc,counters)
          | Ast.Present (name,sites,_) ->
-           let (lnks,counters_ag) =
-             create_t sites (("b",annot),("__incr",annot)) in
+           let (lnks,counters_ag) = create_t sites in
            let counters' = if counters_ag = [] then counters
                else (name,counters_ag)::counters in
            ((name,lnks)::acc,counters'))
@@ -1266,7 +1477,7 @@ let init_of_ast ~warning ~syntax_version sigs contact_map tok algs inits =
 
 let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
   let (c,with_counters) =
-    Counters_compiler.compile ~warning ~debugMode c in
+    Counters_compiler.remove_variables_in_counters ~warning ~debugMode c in
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
     then
@@ -1285,6 +1496,10 @@ let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
                        (fun a k -> Mods.IntSet.add k a) Mods.IntSet.empty
                        (Signature.internal_states_number i s sigs),
                      Mods.Int2Set.empty))) in
+  let () =
+    if with_counters then
+      add_link_contact_map ~contact_map incr_type 0 incr_type 2 in
+
   let ((_,rule_names),extra_vars,cleaned_rules) =
     List.fold_left
       (name_and_purify_rule ~warning ~syntax_version sigs ~contact_map)
@@ -1313,22 +1528,13 @@ let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
   let tk_nd = NamedDecls.create
       (Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
-  let () = if with_counters then
-             Counters_compiler.add_counter_to_contact_map
-               sigs (add_link_contact_map ~contact_map) in
   let perts',updated_vars =
     List_util.fold_right_map
       (perturbation_of_ast ~warning ~syntax_version sigs tok algs contact_map)
       c.Ast.perturbations [] in
-  let perts'' =
-    if with_counters then
-      (Counters_compiler.counters_perturbations sigs c.Ast.signatures)@perts'
-    else perts' in
   let rules =
     List.rev_map
       (fun (label,r_editStyle,mix,created,rm_tk,add_tk,rate,un_rate,r_pos) ->
-        let mix,created =
-          Counters_compiler.remove_counter_rule sigs mix created in
         label,
         (assemble_rule
            ~warning ~syntax_version ~r_editStyle
@@ -1352,7 +1558,7 @@ let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
         (List.rev c.Ast.observables);
     Ast.init =
       init_of_ast ~warning ~syntax_version sigs contact_map tok algs c.Ast.init;
-    Ast.perturbations = perts'';
+    Ast.perturbations = perts';
     Ast.volumes = c.Ast.volumes;
     Ast.tokens = c.Ast.tokens;
     Ast.signatures = c.Ast.signatures;
