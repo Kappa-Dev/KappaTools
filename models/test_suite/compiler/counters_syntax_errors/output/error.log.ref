@@ -1,7 +1,7 @@
 line 0, characters -1--1:
 Counter variable y appears twice in rule
-File "counter_not_enough_spec.ka", line 5, characters 54-55:
-The counter state of agent 'A', site 'd' on the left hand side is underspecified
+File "counter_not_enough_spec.ka", line 5, characters 59-60:
+Ambiguous definition of created counter
 File "modif_lhs.ka", line 5, characters 22-23:
 Counter c has a modif in the lhs
 File "negative_delta_too_big.ka", line 5, characters 35-36:
@@ -15,6 +15,6 @@ File "counter_not_declared.ka", line 4, characters 28-29:
 File "counter_erase_modify.ka", line 5, characters 24-25:
 A modification is forbidden here.
 File "counter_misused.ka", line 4, characters 36-37:
-Site 'c' occurs both as port and as counter in 'A'
+Site c of agent A is a counter.
 File "port_misused.ka", line 4, characters 25-26:
-Site 'a' occurs both as port and as counter in 'B'
+Site a of agent B is not a counter.
