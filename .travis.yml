@@ -1,7 +1,6 @@
 language: OCaml
 
-dist: trusty
-sudo: required
+dist: xenial
 
 env:
   global:
