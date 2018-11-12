@@ -193,6 +193,7 @@ bin/%: %.$(OCAMLBEST) Makefile
 
 %.htm: %.tex %.pdf
 	cd $(dir $<) && LOG=$$(mktemp -t htlatexlogXXXX); \
+	for file in *_img/*.pdf ; do pdftoppm $${file} $${file%.pdf} -png -singlefile ; done && \
 	htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" \
 	" -cunihtf -utf8" "" "-halt-on-error"> $${LOG} 2>&1 && \
 	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }

@@ -44,8 +44,8 @@ matrix:
           - aspcud
           - opam
           - gnuplot-nox
+          - poppler-utils
           - graphviz
-          - ghostscript
           - latex-xcolor
           - texlive-latex-recommended
           - texlive-fonts-recommended
