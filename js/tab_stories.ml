@@ -27,6 +27,19 @@ let launch_button = Html.button
     ~a:[Html.a_class ["btn"; "btn-default"]; Html.a_button_type `Submit]
     [Html.pcdata "Launch"]
 
+let story_list, list_control = React.S.create []
+
+let story_list_html =
+  ReactiveData.RList.map
+    (fun id ->
+       Html.option
+         ~a:[Html.a_value (string_of_int id)] (Html.pcdata (string_of_int id)))
+    (ReactiveData.RList.from_signal story_list)
+
+
+let select_stories = Tyxml_js.R.Html5.select story_list_html
+let select_stories_dom = Tyxml_js.To_dom.of_select select_stories
+
 let%html setup_form =
   {|<form class="form-inline">
     <div class="form-group">
@@ -36,18 +49,13 @@ let%html setup_form =
     <div class="checkbox"><label>|}[strong_checkbox]{| Strongly</label></div>
     </div>
     <div class="form-group">|}[launch_button]{|</div>
+    <div class="form-group">
+    <label>Selected story</label>|}[select_stories]{|
+    </div>
     </form>|}
 
-let story_list, list_control = React.S.create []
 let story_log, log_control = React.S.create []
 let current_info, set_info = React.S.create ""
-
-let story_list_html =
-  ReactiveData.RList.map
-    (fun id ->
-       Html.option
-         ~a:[Html.a_value (string_of_int id)] (Html.pcdata (string_of_int id)))
-    (ReactiveData.RList.from_signal story_list)
 
 let story_log_html =
   ReactiveData.RList.map
@@ -55,24 +63,31 @@ let story_log_html =
     (ReactiveData.RList.rev
        (ReactiveData.RList.from_signal story_log))
 
-let select_stories = Tyxml_js.R.Html5.select story_list_html
-let select_stories_dom = Tyxml_js.To_dom.of_select select_stories
 let log_div = Tyxml_js.R.Html5.div
     ~a:[Html.a_class ["panel-pre";"panel-scroll"]]
     story_log_html
 
+let info_div =
+  Html.p ~a:[Html.a_class ["panel-pre";"panel-scroll"]]
+    [Tyxml_js.R.Html5.pcdata current_info]
+
+let log_panel =
+  Html.div
+    [Ui_common.navtabs "storylognavtab"
+       [ "story_computation_log", None, ReactiveData.RList.empty;
+         "story_info_log", None,  ReactiveData.RList.empty ];
+     Ui_common.navcontent []
+       [ "story_computation_log", [], [log_div];
+         "story_info_log", [],  [info_div]]]
+
 let graph_display_id = "story_graph_display"
 let story_graph = Js_story.create_story_rendering graph_display_id
 
-let story_content =
-    [Html.p ~a:[Html.a_class ["panel-pre"]]
-       [Tyxml_js.R.Html5.pcdata current_info];
-     Html.div ~a:[Html.a_id graph_display_id; Html.a_class ["flex-content"]] []]
-
 let content () =
-  [Html.div ~a:[Html.a_class ["col-md-3";"flex-content"]] [setup_form; log_div];
-   Html.div ~a:[Html.a_class ["col-md-9";"flex-content"]]
-     (select_stories::story_content)
+  [Html.div ~a:[Html.a_class ["col-md-5";"flex-content"]] [setup_form; log_panel];
+   Html.div
+     ~a:[Html.a_id graph_display_id; Html.a_class ["col-md-7";"flex-content"]]
+     []
   ]
 
 let do_update_compression_level () =
