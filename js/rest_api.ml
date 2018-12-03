@@ -638,8 +638,9 @@ class manager
 
   method is_computing = is_computing request_count
 
-  method config_story_computation ~none ~weak ~strong : (unit,string) Lwt_result.t =
-    let _dontcare = none || weak || strong in
+  method config_story_computation
+      {Api.causal; Api.weak; Api.strong } : (unit,string) Lwt_result.t =
+    let _dontcare = causal || weak || strong in
     Lwt.return_error "KaStor in not available through HTTP"
 
   method raw_launch_story_computation (_:string) : (unit,string) Lwt_result.t =
@@ -649,6 +650,7 @@ class manager
   method story_is_computing = false
   method story_progress : Story_json.progress_bar option = None
   method story_list :
-    (unit Trace.Simulation_info.t list list * Graph_loggers_sig.graph)
-      Mods.IntMap.t = Mods.IntMap.empty
+    (Api.compression_modes *
+     unit Trace.Simulation_info.t list list *
+     Graph_loggers_sig.graph) Mods.IntMap.t = Mods.IntMap.empty
 end

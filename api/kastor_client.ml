@@ -6,13 +6,35 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let init_compression_mode = function
+  | Story_json.Causal ->
+    { Api.causal = true; Api.weak = false; Api.strong = false }
+  | Story_json.Weak ->
+    { Api.causal = false; Api.weak = true; Api.strong = false }
+  | Story_json.Strong ->
+    { Api.causal = false; Api.weak = false; Api.strong = true }
+
+let add_compression_mode { Api.causal; Api.weak; Api.strong } = function
+  | Story_json.Causal -> { Api.causal = true; Api.weak; Api.strong }
+  | Story_json.Weak -> { Api.causal; Api.weak = true; Api.strong }
+  | Story_json.Strong -> { Api.causal; Api.weak; Api.strong = true }
+
+let print_compression_modes f { Api.causal; Api.weak; Api.strong } =
+  let () = if causal then Format.pp_print_string f "CAUSAL" in
+  let () = if weak then
+      Format.pp_print_string f (if causal then ", WEAK" else "WEAK") in
+  if strong then
+    Format.pp_print_string f (if causal || weak then ", STRONG"
+                              else "STRONG")
+
 type state_t = {
   running : bool;
   progress : Story_json.progress_bar option;
   log : string list;
   stories :
-    (unit Trace.Simulation_info.t list list * Graph_loggers_sig.graph)
-      Mods.IntMap.t
+    (Api.compression_modes *
+     unit Trace.Simulation_info.t list list *
+     Graph_loggers_sig.graph) Mods.IntMap.t
 }
 
 type state = state_t ref
@@ -62,19 +84,25 @@ let controller s = function
         stories =
           Mods.IntMap.add
             e.Story_json.id
-            ([c.Story_json.log_info],e.Story_json.graph)
+            (init_compression_mode c.Story_json.story_mode,
+             [c.Story_json.log_info],
+             e.Story_json.graph)
             s.stories;
       }
     | Story_json.Same_as i ->
         match Mods.IntMap.find_option i s.stories with
-          | Some (infos,graph) ->
+          | Some (cm,infos,graph) ->
             {
               running = s.running;
               progress = s.progress;
               log = s.log;
               stories =
                 Mods.IntMap.add
-                  i (c.Story_json.log_info::infos,graph) s.stories;
+                  i
+                  (add_compression_mode cm c.Story_json.story_mode,
+                   c.Story_json.log_info::infos,
+                   graph)
+                  s.stories;
             }
           | None -> assert false
 
@@ -89,12 +117,12 @@ class virtual new_client ~post current_state =
   object(self)
     method virtual is_running : bool
 
-    method config_story_computation ~none ~weak ~strong =
+    method config_story_computation { Api.causal; Api.weak; Api.strong } =
       if self#is_running then
         let () = post
             (Yojson.Basic.to_string
                (`List [ `String "CONFIG";
-                        `Assoc [ "none", `Bool none;
+                        `Assoc [ "none", `Bool causal;
                                  "weak", `Bool weak;
                                  "strong", `Bool strong]])) in
         Lwt.return_ok ()

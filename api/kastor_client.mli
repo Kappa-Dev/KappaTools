@@ -8,6 +8,8 @@
 
 type state
 
+val print_compression_modes : Format.formatter -> Api.compression_modes -> unit
+
 val init_state : unit -> state * (unit Story_json.message -> unit)
 
 val receive : (unit Story_json.message -> 'a) -> string -> 'a

@@ -31,9 +31,12 @@ let story_list, list_control = React.S.create []
 
 let story_list_html =
   ReactiveData.RList.map
-    (fun id ->
+    (fun (id,cm) ->
        Html.option
-         ~a:[Html.a_value (string_of_int id)] (Html.pcdata (string_of_int id)))
+         ~a:[Html.a_value (string_of_int id)]
+         (Html.pcdata (Format.asprintf
+                         "@[%i (%a)@]"
+                         id Kastor_client.print_compression_modes cm)))
     (ReactiveData.RList.from_signal story_list)
 
 
@@ -44,7 +47,7 @@ let%html setup_form =
   {|<form class="form-inline">
     <div class="form-group">
     <label>Compression level</label>
-    <div class="checkbox"><label>|}[none_checkbox]{| None</label></div>
+    <div class="checkbox"><label>|}[none_checkbox]{| Causal</label></div>
     <div class="checkbox"><label>|}[weak_checkbox]{| Weakly</label></div>
     <div class="checkbox"><label>|}[strong_checkbox]{| Strongly</label></div>
     </div>
@@ -64,27 +67,22 @@ let story_log_html =
        (ReactiveData.RList.from_signal story_log))
 
 let log_div = Tyxml_js.R.Html5.div
-    ~a:[Html.a_class ["panel-pre";"panel-scroll"]]
+    ~a:[Html.a_class ["panel-pre"]]
     story_log_html
 
-let info_div =
-  Html.p ~a:[Html.a_class ["panel-pre";"panel-scroll"]]
-    [Tyxml_js.R.Html5.pcdata current_info]
-
 let log_panel =
-  Html.div
     [Ui_common.navtabs "storylognavtab"
        [ "story_computation_log", None, ReactiveData.RList.empty;
          "story_info_log", None,  ReactiveData.RList.empty ];
-     Ui_common.navcontent []
+     Ui_common.navcontent ["panel-scroll"]
        [ "story_computation_log", [], [log_div];
-         "story_info_log", [],  [info_div]]]
+         "story_info_log", ["panel-pre"], [Tyxml_js.R.Html5.pcdata current_info]]]
 
 let graph_display_id = "story_graph_display"
 let story_graph = Js_story.create_story_rendering graph_display_id
 
 let content () =
-  [Html.div ~a:[Html.a_class ["col-md-5";"flex-content"]] [setup_form; log_panel];
+  [Html.div ~a:[Html.a_class ["col-md-5";"flex-content"]] (setup_form::log_panel);
    Html.div
      ~a:[Html.a_id graph_display_id; Html.a_class ["col-md-7";"flex-content"]]
      []
@@ -93,10 +91,10 @@ let content () =
 let do_update_compression_level () =
   State_project.with_project ~label:"Config compression"
     (fun manager ->
-       let none = Js.to_bool none_box##.checked in
+       let causal = Js.to_bool none_box##.checked in
        let weak = Js.to_bool weak_box##.checked in
        let strong = Js.to_bool strong_box##.checked in
-       manager#config_story_computation ~none ~weak ~strong >|=
+       manager#config_story_computation {Api.causal; Api.weak; Api.strong} >|=
        Api_common.result_lift)
 
 let update_compression_level =
@@ -119,7 +117,7 @@ let set_a_story =
           (fun manager ->
              match Mods.IntMap.find_option id manager#story_list with
              | None -> Lwt.return (Api_common.result_ok ())
-             | Some (d,v) ->
+             | Some (_cm,d,v) ->
                let () = set_info
                    (Format.asprintf "@[ids: @[%a@]@ t=@[%a@]@ event=@[%a@]@]"
                       (Pp.list
@@ -151,7 +149,7 @@ let rec inspect_stories () =
        let () =
          list_control
            (Mods.IntMap.fold
-              (fun id _ acc -> id :: acc
+              (fun id (cm,_,_) acc -> (id,cm) :: acc
               ) manager#story_list []) in
        let () = log_control manager#story_log in
        set_a_story ()) >>= fun _ ->

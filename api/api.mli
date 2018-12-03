@@ -3,6 +3,8 @@
    are run using the kappa code.
 *)
 
+type compression_modes = { causal : bool; weak : bool; strong : bool; }
+
 type manager_code =
   [ `OK | `Accepted | `Created |
     `Bad_request | `Conflict | `Not_found | `Request_timeout ]
@@ -148,14 +150,15 @@ end
 class type virtual manager_stories = object
   method virtual is_running : bool
   method config_story_computation :
-    none:bool -> weak:bool -> strong:bool -> (unit,string) Lwt_result.t
+    compression_modes -> (unit,string) Lwt_result.t
   method raw_launch_story_computation : string -> (unit,string) Lwt_result.t
   method story_log : string list
   method story_is_computing : bool
   method story_progress : Story_json.progress_bar option
   method story_list :
-    (unit Trace.Simulation_info.t list list * Graph_loggers_sig.graph)
-    Mods.IntMap.t
+    (compression_modes *
+     unit Trace.Simulation_info.t list list *
+     Graph_loggers_sig.graph) Mods.IntMap.t
 end
 
 class type manager = object
