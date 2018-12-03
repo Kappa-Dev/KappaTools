@@ -6,10 +6,10 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"label" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x{p}[.])->A(x{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:B(x{u}[.])->B(x{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:B(x{p}[.])->B(x{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"label" [shape=box fillcolor="#87ceeb" style=filled];
+"1:A(x{p}[.])->A(x{u}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"2:B(x{u}[.])->B(x{p}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"3:B(x{p}[.])->B(x{u}[.])" [shape=box fillcolor="#87ceeb" style=filled];
 "label" -> "1:A(x{p}[.])->A(x{u}[.])" [label="[2->0]" color="green"];
 "1:A(x{p}[.])->A(x{u}[.])" -> "label" [label="[0->0]" color="green"];
 "2:B(x{u}[.])->B(x{p}[.])" -> "label" [label="[0->1]" color="green"];

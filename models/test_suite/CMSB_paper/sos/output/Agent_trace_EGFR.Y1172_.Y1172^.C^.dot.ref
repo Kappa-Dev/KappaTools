@@ -1,5 +1,5 @@
 digraph G{
-"Init_70" [label="" style="invis" width="0px" height="0px"];
+"Init_70" [label="" style=invis width="0px" height="0px"];
 "Node_78" [label="EGFR(Y1172~u,Y1172!,C!N.EGFR)"];
 "Node_77" [label="EGFR(Y1172~p,Y1172!PTB.Shc,C!)"];
 "Node_75" [label="EGFR(Y1172~p,Y1172!,C!)"];

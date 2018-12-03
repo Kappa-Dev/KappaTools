@@ -601,23 +601,12 @@ let shape_in_dot shape =
   match
     shape
   with
-  | Graph_loggers_sig.Invisible -> "style=\"invis\""
+  | Graph_loggers_sig.Invisible -> "style=invis"
   | Graph_loggers_sig.Invhouse -> "shape=invhouse"
   | Graph_loggers_sig.House -> "shape=house"
-  | Graph_loggers_sig.Rect -> "shape=\"box\""
-  | Graph_loggers_sig.Ellipse -> "shape=\"ellipse\""
-  | Graph_loggers_sig.Circle -> "shape =circle"
-
-let shape_in_dot_bis shape =
-    match
-      shape
-    with
-    | Graph_loggers_sig.Invisible -> "style=\"invis\""
-    | Graph_loggers_sig.Invhouse -> "shape=invhouse"
-    | Graph_loggers_sig.House -> "shape =house"
-    | Graph_loggers_sig.Rect -> "shape = rectangle"
-    | Graph_loggers_sig.Ellipse -> "shape =ellipse"
-    | Graph_loggers_sig.Circle -> "shape =circle"
+  | Graph_loggers_sig.Rect -> "shape=box"
+  | Graph_loggers_sig.Ellipse -> "shape=ellipse"
+  | Graph_loggers_sig.Circle -> "shape=circle"
 
 let shape_in_html shape =
   match

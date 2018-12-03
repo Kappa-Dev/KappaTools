@@ -1,5 +1,5 @@
 digraph G{
-"Init_15" [label="" style="invis" width="0px" height="0px"];
+"Init_15" [label="" style=invis width="0px" height="0px"];
 "Node_21" [label="A(x{p},y{p},z{p})"];
 "Node_19" [label="A(x{p},y{p},z{u})"];
 "Node_18" [label="A(x{u},y{p},z{u})"];

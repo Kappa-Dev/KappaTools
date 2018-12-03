@@ -1,8 +1,8 @@
 digraph G{
-"Init_29" [label="" style="invis" width="0px" height="0px"];
-"Init_28" [label="" style="invis" width="0px" height="0px"];
-"Final_28" [label="" style="invis" width="0px" height="0px"];
-"Final_29" [label="" style="invis" width="0px" height="0px"];
+"Init_29" [label="" style=invis width="0px" height="0px"];
+"Init_28" [label="" style=invis width="0px" height="0px"];
+"Final_28" [label="" style=invis width="0px" height="0px"];
+"Final_29" [label="" style=invis width="0px" height="0px"];
 "Node_29" [label="C(b{u},a[x.A])"];
 "Node_28" [label="C(b{u},a[x.B])"];
 "Init_29" -> "Node_29" [label=""];

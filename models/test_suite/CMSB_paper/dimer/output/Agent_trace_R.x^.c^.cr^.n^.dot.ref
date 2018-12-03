@@ -1,5 +1,5 @@
 digraph G{
-"Init_25" [label="" style="invis" width="0px" height="0px"];
+"Init_25" [label="" style=invis width="0px" height="0px"];
 "Node_34" [label="R(x!x.E,c!c.R,cr!,n!cr.R)"];
 "Node_31" [label="R(x!x.E,c!c.R,cr!n.R,n!)"];
 "Node_28" [label="R(x!x.E,c!c.R,cr!,n!)"];

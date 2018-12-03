@@ -1,5 +1,5 @@
 digraph G{
-"Init_40" [label="" style="invis" width="0px" height="0px"];
+"Init_40" [label="" style=invis width="0px" height="0px"];
 "Node_40" [label="EGFR(Y1016~u)"];
 "Init_40" -> "Node_40" [label=""];
 }

@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Nov 29 2018>
+   * Last modification: Time-stamp: <Dec 01 2018>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -2683,7 +2683,7 @@ let dot_of_contact_map ?logger parameters error
                           (Ckappa_sig.string_of_agent_name i)
                           (Ckappa_sig.string_of_site_name j)
                           site_name
-                          (Graph_loggers.shape_in_dot_bis
+                          (Graph_loggers.shape_in_dot
                              (Remanent_parameters.get_internal_site_shape parameters_dot))
                           (Graph_loggers.dot_color_encoding
                              (Remanent_parameters.get_internal_site_color parameters_dot))
@@ -2699,7 +2699,7 @@ let dot_of_contact_map ?logger parameters error
                         (Ckappa_sig.string_of_agent_name i)
                         (Ckappa_sig.string_of_site_name j)
                         site_name
-                        (Graph_loggers.shape_in_dot_bis
+                        (Graph_loggers.shape_in_dot
                            (Remanent_parameters.get_binding_site_shape parameters_dot))
                         (Graph_loggers.dot_color_encoding
                            (Remanent_parameters.get_binding_site_color parameters_dot))
@@ -2716,7 +2716,7 @@ let dot_of_contact_map ?logger parameters error
                         (Ckappa_sig.string_of_agent_name i)
                         (Ckappa_sig.string_of_site_name j)
                         site_name
-                        (Graph_loggers.shape_in_dot_bis
+                        (Graph_loggers.shape_in_dot
                            (Remanent_parameters.get_counter_site_shape parameters_dot))
                         (Graph_loggers.dot_color_encoding
                            (Remanent_parameters.get_counter_site_color parameters_dot))
@@ -2757,7 +2757,7 @@ let dot_of_contact_map ?logger parameters error
              (Remanent_parameters.get_logger parameters_dot)
              "label =  \"%s\";  %s; color = %s"
              agent_name
-             (Graph_loggers.shape_in_dot_bis shape)
+             (Graph_loggers.shape_in_dot shape)
              (Graph_loggers.dot_color_encoding color)
          in
          let () =

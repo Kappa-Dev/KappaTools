@@ -1,7 +1,7 @@
 digraph G{
-"Init_18" [label="" style="invis" width="0px" height="0px"];
-"Final_25" [label="" style="invis" width="0px" height="0px"];
-"Final_17" [label="" style="invis" width="0px" height="0px"];
+"Init_18" [label="" style=invis width="0px" height="0px"];
+"Final_25" [label="" style=invis width="0px" height="0px"];
+"Final_17" [label="" style=invis width="0px" height="0px"];
 "Node_26" [label="A(z{u},x[y.B],y[.])"];
 "Node_17" [label="A(z{u},x[.],y[.])"];
 "Node_25" [label="A(z{u},x[.],y[x.B])"];

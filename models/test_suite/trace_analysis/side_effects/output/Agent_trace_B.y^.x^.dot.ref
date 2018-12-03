@@ -1,5 +1,5 @@
 digraph G{
-"Init_18" [label="" style="invis" width="0px" height="0px"];
+"Init_18" [label="" style=invis width="0px" height="0px"];
 "Node_27" [label="B(y[y.A],x[.])"];
 "Node_18" [label="B(y[y.A],x[a.C])"];
 "Node_18" -> "Node_27" [label="0"];

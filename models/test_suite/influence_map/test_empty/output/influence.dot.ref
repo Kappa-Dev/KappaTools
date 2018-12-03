@@ -6,13 +6,13 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(),B(),B(),.->A(),.,.,C()" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(),.,.,C()->A(),B(),B(),." [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(),C(),.,.->A(),.,B(),B()" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:A(),.,B(),B()->A(),C(),.,." [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(),B(),B(),.->A(),.,.,C()" [shape=box fillcolor="#87ceeb" style=filled];
+"1:A(),.,.,C()->A(),B(),B(),." [shape=box fillcolor="#87ceeb" style=filled];
+"2:A(),C(),.,.->A(),.,B(),B()" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(),.,B(),B()->A(),C(),.,." [shape=box fillcolor="#87ceeb" style=filled];
 
-"qb" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"qc" [shape="ellipse" fillcolor="#98fb98" style=filled];
+"qb" [shape=ellipse fillcolor="#98fb98" style=filled];
+"qc" [shape=ellipse fillcolor="#98fb98" style=filled];
 "0:A(),B(),B(),.->A(),.,.,C()" -> "1:A(),.,.,C()->A(),B(),B(),." [label="[3->3]" color="green"];
 "0:A(),B(),B(),.->A(),.,.,C()" -> "2:A(),C(),.,.->A(),.,B(),B()" [label="[3->1]" color="green"];
 "0:A(),B(),B(),.->A(),.,.,C()" -> "qc" [label="[3->0]" color="green"];

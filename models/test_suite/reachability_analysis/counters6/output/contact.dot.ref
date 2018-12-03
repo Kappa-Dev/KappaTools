@@ -7,12 +7,12 @@
 #
 graph G{ 
 subgraph cluster0 {
-   0.0 [style = filled label = "x1" shape =ellipse color = green size = "5"]
-   0.1 [style = filled label = "x2" shape =ellipse color = green size = "5"]
-   0.2 [style = filled label = "x3" shape =ellipse color = green size = "5"]
-   0.3 [style = filled label = "x4" shape =ellipse color = green size = "5"]
-   0.4 [style = filled label = "x5" shape =ellipse color = green size = "5"]
-   0.5 [style = filled label = "c" shape =house color = grey size = "5"]
-label =  "A";  shape = rectangle; color = blue
+   0.0 [style = filled label = "x1" shape=ellipse color = green size = "5"]
+   0.1 [style = filled label = "x2" shape=ellipse color = green size = "5"]
+   0.2 [style = filled label = "x3" shape=ellipse color = green size = "5"]
+   0.3 [style = filled label = "x4" shape=ellipse color = green size = "5"]
+   0.4 [style = filled label = "x5" shape=ellipse color = green size = "5"]
+   0.5 [style = filled label = "c" shape=house color = grey size = "5"]
+label =  "A";  shape=box; color = blue
 } ; 
 }

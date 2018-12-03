@@ -7,17 +7,17 @@
 #
 graph G{ 
 subgraph cluster0 {
-   0.0 [style = filled label = "a1" shape =ellipse color = green size = "5"]
-   0.1 [style = filled label = "a2" shape =ellipse color = green size = "5"]
-   0.2 [style = filled label = "b1" shape =ellipse color = green size = "5"]
-   0.3 [style = filled label = "b2" shape =ellipse color = green size = "5"]
-   0.4 [style = filled label = "c1" shape =ellipse color = green size = "5"]
-   0.5 [style = filled label = "c2" shape =ellipse color = green size = "5"]
-   0.6 [style = filled label = "d1" shape =ellipse color = green size = "5"]
-   0.7 [style = filled label = "d2" shape =ellipse color = green size = "5"]
-   0.8 [style = filled label = "e1" shape =ellipse color = green size = "5"]
-   0.9 [style = filled label = "e2" shape =ellipse color = green size = "5"]
-   0.10 [style = filled label = "g" shape =ellipse color = green size = "5"]
-label =  "A";  shape = rectangle; color = blue
+   0.0 [style = filled label = "a1" shape=ellipse color = green size = "5"]
+   0.1 [style = filled label = "a2" shape=ellipse color = green size = "5"]
+   0.2 [style = filled label = "b1" shape=ellipse color = green size = "5"]
+   0.3 [style = filled label = "b2" shape=ellipse color = green size = "5"]
+   0.4 [style = filled label = "c1" shape=ellipse color = green size = "5"]
+   0.5 [style = filled label = "c2" shape=ellipse color = green size = "5"]
+   0.6 [style = filled label = "d1" shape=ellipse color = green size = "5"]
+   0.7 [style = filled label = "d2" shape=ellipse color = green size = "5"]
+   0.8 [style = filled label = "e1" shape=ellipse color = green size = "5"]
+   0.9 [style = filled label = "e2" shape=ellipse color = green size = "5"]
+   0.10 [style = filled label = "g" shape=ellipse color = green size = "5"]
+label =  "A";  shape=box; color = blue
 } ; 
 }

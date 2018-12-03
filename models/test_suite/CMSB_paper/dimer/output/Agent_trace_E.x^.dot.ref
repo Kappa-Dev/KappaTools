@@ -1,5 +1,5 @@
 digraph G{
-"Init_22" [label="" style="invis" width="0px" height="0px"];
+"Init_22" [label="" style=invis width="0px" height="0px"];
 "Node_21" [label="E(x!x.R)"];
 "Node_22" [label="E(x!)"];
 "Node_21" -> "Node_22" [label="E/R"];

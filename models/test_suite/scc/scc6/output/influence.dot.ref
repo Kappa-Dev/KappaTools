@@ -6,9 +6,9 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:R(a{u})->R(a{p})" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:R(x[.]),R(x[.])->R(x[1]),R(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:R(x[1],y[.],z[.]),R(x[1],y[.],z[.])->R(x[1],y[2],z[.]),R(x[1],y[.],z[2])" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:R(a{u})->R(a{p})" [shape=box fillcolor="#87ceeb" style=filled];
+"1:R(x[.]),R(x[.])->R(x[1]),R(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"2:R(x[1],y[.],z[.]),R(x[1],y[.],z[.])->R(x[1],y[2],z[.]),R(x[1],y[.],z[2])" [shape=box fillcolor="#87ceeb" style=filled];
 "1:R(x[.]),R(x[.])->R(x[1]),R(x[1])" -> "2:R(x[1],y[.],z[.]),R(x[1],y[.],z[.])->R(x[1],y[2],z[.]),R(x[1],y[.],z[2])" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
 "1:R(x[.]),R(x[.])->R(x[1]),R(x[1])" -> "1:R(x[.]),R(x[.])->R(x[1]),R(x[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
 "2:R(x[1],y[.],z[.]),R(x[1],y[.],z[.])->R(x[1],y[2],z[.]),R(x[1],y[.],z[2])" -> "2:R(x[1],y[.],z[.]),R(x[1],y[.],z[.])->R(x[1],y[2],z[.]),R(x[1],y[.],z[2])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];

@@ -1,5 +1,5 @@
 digraph G{
-"Init_55" [label="" style="invis" width="0px" height="0px"];
+"Init_55" [label="" style=invis width="0px" height="0px"];
 "Node_89" [label="SoS(S~u,PR!SH3n.Grb2)"];
 "Node_55" [label="SoS(S~u,PR!)"];
 "Node_89" -> "Node_55" [label="Grb2/SoS"];

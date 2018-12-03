@@ -6,11 +6,11 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:.->A(x{u}[.],y{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x{u}[.],y{u}[.])->A(x{p}[.],y{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x{u}[.],y{u}[.])->A(x{u}[.],y{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:A(x{p}[.],y{u}[.]),.->.,D(x{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"4:D(x{u}[.])->D(x{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:.->A(x{u}[.],y{u}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"1:A(x{u}[.],y{u}[.])->A(x{p}[.],y{u}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"2:A(x{u}[.],y{u}[.])->A(x{u}[.],y{p}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(x{p}[.],y{u}[.]),.->.,D(x{u}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"4:D(x{u}[.])->D(x{p}[.])" [shape=box fillcolor="#87ceeb" style=filled];
 "0:.->A(x{u}[.],y{u}[.])" -> "1:A(x{u}[.],y{u}[.])->A(x{p}[.],y{u}[.])" [label="[0->0]" color="green"];
 "0:.->A(x{u}[.],y{u}[.])" -> "2:A(x{u}[.],y{u}[.])->A(x{u}[.],y{p}[.])" [label="[0->0]" color="green"];
 "1:A(x{u}[.],y{u}[.])->A(x{p}[.],y{u}[.])" -> "3:A(x{p}[.],y{u}[.]),.->.,D(x{u}[.])" [label="[0->0]" color="green"];

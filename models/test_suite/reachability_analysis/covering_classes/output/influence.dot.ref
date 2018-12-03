@@ -6,19 +6,19 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"r0" [shape="box" fillcolor="#87ceeb" style=filled];
-"r1" [shape="box" fillcolor="#87ceeb" style=filled];
-"r2" [shape="box" fillcolor="#87ceeb" style=filled];
-"r3" [shape="box" fillcolor="#87ceeb" style=filled];
-"r4" [shape="box" fillcolor="#87ceeb" style=filled];
-"r5" [shape="box" fillcolor="#87ceeb" style=filled];
-"r6" [shape="box" fillcolor="#87ceeb" style=filled];
-"r7" [shape="box" fillcolor="#87ceeb" style=filled];
-"r8" [shape="box" fillcolor="#87ceeb" style=filled];
-"r9" [shape="box" fillcolor="#87ceeb" style=filled];
-"r10" [shape="box" fillcolor="#87ceeb" style=filled];
-"r11" [shape="box" fillcolor="#87ceeb" style=filled];
-"r12" [shape="box" fillcolor="#87ceeb" style=filled];
+"r0" [shape=box fillcolor="#87ceeb" style=filled];
+"r1" [shape=box fillcolor="#87ceeb" style=filled];
+"r2" [shape=box fillcolor="#87ceeb" style=filled];
+"r3" [shape=box fillcolor="#87ceeb" style=filled];
+"r4" [shape=box fillcolor="#87ceeb" style=filled];
+"r5" [shape=box fillcolor="#87ceeb" style=filled];
+"r6" [shape=box fillcolor="#87ceeb" style=filled];
+"r7" [shape=box fillcolor="#87ceeb" style=filled];
+"r8" [shape=box fillcolor="#87ceeb" style=filled];
+"r9" [shape=box fillcolor="#87ceeb" style=filled];
+"r10" [shape=box fillcolor="#87ceeb" style=filled];
+"r11" [shape=box fillcolor="#87ceeb" style=filled];
+"r12" [shape=box fillcolor="#87ceeb" style=filled];
 "r0" -> "r4" [label="[0->0]" color="green"];
 "r0" -> "r5" [label="[0->0]" color="green"];
 "r0" -> "r9" [label="[0->0]" color="green"];

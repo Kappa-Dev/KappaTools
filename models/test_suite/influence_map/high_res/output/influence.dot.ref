@@ -6,11 +6,11 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x{u}[.])->A(x{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(y{p}[.],z{u}[.])->A(y{p}[.],z{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:A(x{u}[.],z{p}[.],w{u}[.])->A(x{u}[.],z{p}[.],w{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
-"4:A(x{u}[.],z{u}[.])->A(x{u}[.],z{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x{u}[.])->A(x{p}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"1:A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"2:A(y{p}[.],z{u}[.])->A(y{p}[.],z{p}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(x{u}[.],z{p}[.],w{u}[.])->A(x{u}[.],z{p}[.],w{p}[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"4:A(x{u}[.],z{u}[.])->A(x{u}[.],z{p}[.])" [shape=box fillcolor="#87ceeb" style=filled];
 "0:A(x{u}[.])->A(x{p}[.])" -> "1:A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])" [label="[0->0]" color="green"];
 "1:A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])" -> "2:A(y{p}[.],z{u}[.])->A(y{p}[.],z{p}[.])" [label="[0->0]" color="green"];
 "2:A(y{p}[.],z{u}[.])->A(y{p}[.],z{p}[.])" -> "3:A(x{u}[.],z{p}[.],w{u}[.])->A(x{u}[.],z{p}[.],w{p}[.])" [label="[0->0]" color="green"];

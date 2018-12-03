@@ -1,5 +1,5 @@
 digraph G{
-"Init_27" [label="" style="invis" width="0px" height="0px"];
+"Init_27" [label="" style=invis width="0px" height="0px"];
 "Node_53" [label="P(a1{p},a2{p},b1{p},b2{p},g[x.K])"];
 "Node_49" [label="P(a1{p},a2{p},b1{p},b2{p},g[.])"];
 "Node_47" [label="P(a1{p},a2{p},b1{p},b2{u},g[.])"];

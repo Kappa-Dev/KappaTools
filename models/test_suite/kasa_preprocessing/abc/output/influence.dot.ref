@@ -6,22 +6,22 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"a.b" [shape="box" fillcolor="#87ceeb" style=filled];
-"a.b_op" [shape="box" fillcolor="#87ceeb" style=filled];
-"ab.c" [shape="box" fillcolor="#87ceeb" style=filled];
-"mod x1" [shape="box" fillcolor="#87ceeb" style=filled];
-"a.c" [shape="box" fillcolor="#87ceeb" style=filled];
-"mod x2" [shape="box" fillcolor="#87ceeb" style=filled];
+"a.b" [shape=box fillcolor="#87ceeb" style=filled];
+"a.b_op" [shape=box fillcolor="#87ceeb" style=filled];
+"ab.c" [shape=box fillcolor="#87ceeb" style=filled];
+"mod x1" [shape=box fillcolor="#87ceeb" style=filled];
+"a.c" [shape=box fillcolor="#87ceeb" style=filled];
+"mod x2" [shape=box fillcolor="#87ceeb" style=filled];
 
-"on_rate" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"off_rate" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"mod_rate" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"AB" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"Cuu" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"Cpu" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"Cpp" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"n_ab" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"n_c" [shape="ellipse" fillcolor="#98fb98" style=filled];
+"on_rate" [shape=ellipse fillcolor="#98fb98" style=filled];
+"off_rate" [shape=ellipse fillcolor="#98fb98" style=filled];
+"mod_rate" [shape=ellipse fillcolor="#98fb98" style=filled];
+"AB" [shape=ellipse fillcolor="#98fb98" style=filled];
+"Cuu" [shape=ellipse fillcolor="#98fb98" style=filled];
+"Cpu" [shape=ellipse fillcolor="#98fb98" style=filled];
+"Cpp" [shape=ellipse fillcolor="#98fb98" style=filled];
+"n_ab" [shape=ellipse fillcolor="#98fb98" style=filled];
+"n_c" [shape=ellipse fillcolor="#98fb98" style=filled];
 "a.b" -> "a.b_op" [label="[0->0];[1->1]" color="green"];
 "a.b" -> "ab.c" [label="[0->0]" color="green"];
 "a.b" -> "AB" [label="[0->0]" color="green"];

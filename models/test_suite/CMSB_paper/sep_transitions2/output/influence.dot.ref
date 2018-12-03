@@ -6,13 +6,13 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"init" [shape="box" fillcolor="#87ceeb" style=filled];
-"init_op" [shape="box" fillcolor="#87ceeb" style=filled];
-"x" [shape="box" fillcolor="#87ceeb" style=filled];
-"x_op" [shape="box" fillcolor="#87ceeb" style=filled];
-"y" [shape="box" fillcolor="#87ceeb" style=filled];
-"y_op" [shape="box" fillcolor="#87ceeb" style=filled];
-"z" [shape="box" fillcolor="#87ceeb" style=filled];
+"init" [shape=box fillcolor="#87ceeb" style=filled];
+"init_op" [shape=box fillcolor="#87ceeb" style=filled];
+"x" [shape=box fillcolor="#87ceeb" style=filled];
+"x_op" [shape=box fillcolor="#87ceeb" style=filled];
+"y" [shape=box fillcolor="#87ceeb" style=filled];
+"y_op" [shape=box fillcolor="#87ceeb" style=filled];
+"z" [shape=box fillcolor="#87ceeb" style=filled];
 "init" -> "init_op" [label="[0->0]" color="green"];
 "init" -> "x" [label="[0->0]" color="green"];
 "init" -> "z" [label="[0->0]" color="green"];

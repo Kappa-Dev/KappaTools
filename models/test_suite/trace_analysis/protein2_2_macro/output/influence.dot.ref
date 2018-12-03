@@ -6,16 +6,16 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"a1+" [shape="box" fillcolor="#87ceeb" style=filled];
-"b1+" [shape="box" fillcolor="#87ceeb" style=filled];
-"a1-" [shape="box" fillcolor="#87ceeb" style=filled];
-"b1-" [shape="box" fillcolor="#87ceeb" style=filled];
-"a2+" [shape="box" fillcolor="#87ceeb" style=filled];
-"a2-" [shape="box" fillcolor="#87ceeb" style=filled];
-"b2+" [shape="box" fillcolor="#87ceeb" style=filled];
-"b2-" [shape="box" fillcolor="#87ceeb" style=filled];
-"P.K" [shape="box" fillcolor="#87ceeb" style=filled];
-"P/K" [shape="box" fillcolor="#87ceeb" style=filled];
+"a1+" [shape=box fillcolor="#87ceeb" style=filled];
+"b1+" [shape=box fillcolor="#87ceeb" style=filled];
+"a1-" [shape=box fillcolor="#87ceeb" style=filled];
+"b1-" [shape=box fillcolor="#87ceeb" style=filled];
+"a2+" [shape=box fillcolor="#87ceeb" style=filled];
+"a2-" [shape=box fillcolor="#87ceeb" style=filled];
+"b2+" [shape=box fillcolor="#87ceeb" style=filled];
+"b2-" [shape=box fillcolor="#87ceeb" style=filled];
+"P.K" [shape=box fillcolor="#87ceeb" style=filled];
+"P/K" [shape=box fillcolor="#87ceeb" style=filled];
 "a1+" -> "b1+" [label="[0->0]" color="green"];
 "a1+" -> "a1-" [label="[0->0]" color="green"];
 "a1+" -> "P.K" [label="[0->0]" color="green"];

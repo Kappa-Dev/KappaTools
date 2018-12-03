@@ -18,7 +18,6 @@
 
 val dot_color_encoding: Graph_loggers_sig.color -> string
 val shape_in_dot: Graph_loggers_sig.shape -> string
-val shape_in_dot_bis: Graph_loggers_sig.shape -> string
 
 val print_graph_preamble:
   Loggers.t ->

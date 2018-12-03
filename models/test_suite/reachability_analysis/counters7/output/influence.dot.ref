@@ -6,18 +6,18 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x1{u})->A(x1{p},c+1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x1{p})->A(x1{u},c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x2{u})->A(x2{p},c+1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:A(x2{p})->A(x2{u},c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"4:A(x3{u})->A(x3{p},c+1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"5:A(x3{p})->A(x3{u},c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"6:A(x4{u})->A(x4{p},c+1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"7:A(x4{p})->A(x4{u},c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"8:A(x5{u})->A(x5{p},c+1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"9:A(x5{p})->A(x5{u},c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"10:A(c>=2)->A(c-2,d+1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"11:A(d>=1)->A(d-1,c+2)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x1{u})->A(x1{p},c+1)" [shape=box fillcolor="#87ceeb" style=filled];
+"1:A(x1{p})->A(x1{u},c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"2:A(x2{u})->A(x2{p},c+1)" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(x2{p})->A(x2{u},c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"4:A(x3{u})->A(x3{p},c+1)" [shape=box fillcolor="#87ceeb" style=filled];
+"5:A(x3{p})->A(x3{u},c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"6:A(x4{u})->A(x4{p},c+1)" [shape=box fillcolor="#87ceeb" style=filled];
+"7:A(x4{p})->A(x4{u},c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"8:A(x5{u})->A(x5{p},c+1)" [shape=box fillcolor="#87ceeb" style=filled];
+"9:A(x5{p})->A(x5{u},c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"10:A(c>=2)->A(c-2,d+1)" [shape=box fillcolor="#87ceeb" style=filled];
+"11:A(d>=1)->A(d-1,c+2)" [shape=box fillcolor="#87ceeb" style=filled];
 "0:A(x1{u})->A(x1{p},c+1)" -> "1:A(x1{p})->A(x1{u},c-1)" [label="[0->0]" color="green"];
 "1:A(x1{p})->A(x1{u},c-1)" -> "0:A(x1{u})->A(x1{p},c+1)" [label="[0->0]" color="green"];
 "2:A(x2{u})->A(x2{p},c+1)" -> "3:A(x2{p})->A(x2{u},c-1)" [label="[0->0]" color="green"];

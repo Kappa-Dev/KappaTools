@@ -6,21 +6,21 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x1[.]),.->A(x1[1],c+1),B(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x1[_])->A(x1[.],c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x2[.]),.->A(x2[1],c+1),B(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:A(x2[_])->A(x2[.],c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"4:A(x3[.]),.->A(x3[1],c+1),B(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"5:A(x3[_])->A(x3[.],c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"6:A(x4[.]),.->A(x4[1],c+1),B(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"7:A(x4[_])->A(x4[.],c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"8:A(x5[.]),.->A(x5[1],c+1),B(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"9:A(x5[_])->A(x5[.],c-1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"10:A(x1[.]),.->A(x1[1],c+2),C(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"11:A(x2[.]),.->A(x2[1],c+2),C(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"12:A(x3[.]),.->A(x3[1],c+2),C(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"13:A(x4[.]),.->A(x4[1],c+2),C(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
-"14:A(x5[.]),.->A(x5[1],c+2),C(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x1[.]),.->A(x1[1],c+1),B(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"1:A(x1[_])->A(x1[.],c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"2:A(x2[.]),.->A(x2[1],c+1),B(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(x2[_])->A(x2[.],c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"4:A(x3[.]),.->A(x3[1],c+1),B(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"5:A(x3[_])->A(x3[.],c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"6:A(x4[.]),.->A(x4[1],c+1),B(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"7:A(x4[_])->A(x4[.],c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"8:A(x5[.]),.->A(x5[1],c+1),B(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"9:A(x5[_])->A(x5[.],c-1)" [shape=box fillcolor="#87ceeb" style=filled];
+"10:A(x1[.]),.->A(x1[1],c+2),C(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"11:A(x2[.]),.->A(x2[1],c+2),C(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"12:A(x3[.]),.->A(x3[1],c+2),C(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"13:A(x4[.]),.->A(x4[1],c+2),C(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"14:A(x5[.]),.->A(x5[1],c+2),C(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
 "0:A(x1[.]),.->A(x1[1],c+1),B(x[1])" -> "1:A(x1[_])->A(x1[.],c-1)" [label="[0->0]" color="green"];
 "1:A(x1[_])->A(x1[.],c-1)" -> "0:A(x1[.]),.->A(x1[1],c+1),B(x[1])" [label="[0->0]" color="green"];
 "1:A(x1[_])->A(x1[.],c-1)" -> "10:A(x1[.]),.->A(x1[1],c+2),C(x[1])" [label="[0->0]" color="green"];
