@@ -7,12 +7,13 @@ authors: [
   "Ioana Cristescu" "Mutaamba Maasha" "Lý Kim Quyên"
 ]
 license: "LGPL-3.0"
-homepage: "http://dev.executableknowledge.org/"
+homepage: "https://kappalanguage.org/"
 bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
 dev-repo: "https://github.com/Kappa-Dev/KaSim.git"
 
 depends : [
   "num"
+  "re"
   "ocamlfind"
   "ocamlbuild" {build}
   "yojson"
