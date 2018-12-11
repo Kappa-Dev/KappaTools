@@ -24,3 +24,14 @@ A kappa agent can be obtained thanks to the *opam* package manager through::
 
 The methods of *client* is described in the **kappa_common.py**
 file in the source distribution.
+
+A minimal example of usage is
+
+>>> model = "%agent: A(x[x.A]) %var: k_on 1e-2 'rule' A(x[.]), A(x[.]) <-> A(x[1]), A(x[1]) @ k_on, 1 %plot: |A(x[.])| %init: 100 A()"
+>>> client.add_model_string(model)
+>>> client.project_parse()
+>>> sim_params = kappy.SimulationParameter(pause_condition="[T] > 100",plot_period=1)
+>>> client.simulation_start(sim_params)
+>>> while client.get_is_sim_running(): sleep(0.1)
+>>> results = client.simulation_plot()
+>>> client.shutdown()
