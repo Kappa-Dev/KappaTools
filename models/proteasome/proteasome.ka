@@ -1,0 +1,12 @@
+%agent: alpha(al,bl,br,ar)
+%agent: beta(al,b,ar)
+
+%obs: 'proteasome' |alpha(al[7],bl[11],br[12],ar[1]),alpha(al[1],bl[13],br[14],ar[2]),alpha(al[2],bl[15],br[16],ar[3]),alpha(al[3],bl[17],br[18],ar[4]),alpha(al[4],bl[19],br[20],ar[5]),alpha(al[5],bl[21],br[22],ar[6]),alpha(al[6],bl[23],br[24],ar[7]),
+                       beta(al[24],b[51],ar[11]),beta(al[12],b[52],ar[13]),beta(al[14],b[53],ar[15]),beta(al[16],b[54],ar[17]),beta(al[18],b[55],ar[19]),beta(al[20],b[56],ar[21]),beta(al[22],b[57],ar[23]),
+                       beta(al[74],b[51],ar[61]),beta(al[62],b[52],ar[63]),beta(al[64],b[53],ar[65]),beta(al[66],b[54],ar[67]),beta(al[68],b[55],ar[69]),beta(al[70],b[56],ar[71]),beta(al[72],b[57],ar[73]),
+                    alpha(al[87],bl[61],br[62],ar[81]),alpha(al[81],bl[63],br[64],ar[82]),alpha(al[82],bl[65],br[66],ar[83]),alpha(al[83],bl[67],br[68],ar[84]),alpha(al[84],bl[69],br[70],ar[85]),alpha(al[85],bl[71],br[72],ar[86]),alpha(al[86],bl[73],br[74],ar[87])|
+
+%init: 1 alpha(al[7],bl[11],br[12],ar[1]),alpha(al[1],bl[13],br[14],ar[2]),alpha(al[2],bl[15],br[16],ar[3]),alpha(al[3],bl[17],br[18],ar[4]),alpha(al[4],bl[19],br[20],ar[5]),alpha(al[5],bl[21],br[22],ar[6]),alpha(al[6],bl[23],br[24],ar[7]),
+                       beta(al[24],b[51],ar[11]),beta(al[12],b[52],ar[13]),beta(al[14],b[53],ar[15]),beta(al[16],b[54],ar[17]),beta(al[18],b[55],ar[19]),beta(al[20],b[56],ar[21]),beta(al[22],b[57],ar[23]),
+                       beta(al[74],b[51],ar[61]),beta(al[62],b[52],ar[63]),beta(al[64],b[53],ar[65]),beta(al[66],b[54],ar[67]),beta(al[68],b[55],ar[69]),beta(al[70],b[56],ar[71]),beta(al[72],b[57],ar[73]),
+                    alpha(al[87],bl[61],br[62],ar[81]),alpha(al[81],bl[63],br[64],ar[82]),alpha(al[82],bl[65],br[66],ar[83]),alpha(al[83],bl[67],br[68],ar[84]),alpha(al[84],bl[69],br[70],ar[85]),alpha(al[85],bl[71],br[72],ar[86]),alpha(al[86],bl[73],br[74],ar[87])
