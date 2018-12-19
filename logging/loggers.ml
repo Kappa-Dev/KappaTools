@@ -17,13 +17,6 @@
   * under the terms of the GNU Library General Public License *)
 
 module StringMap = Map.Make (struct type t = string let compare = compare end)
-module VarOrd =
-struct
-  type t = Ode_loggers_sig.variable
-  let compare = compare
-end
-module VarMap = Map.Make(VarOrd)
-module VarSet = Set.Make(VarOrd)
 
 type encoding =
   | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular
@@ -64,29 +57,21 @@ let breakable x =
 type t =
   {
     encoding:encoding;
-    logger: logger;
-    channel_opt: out_channel option;
     id_map: int StringMap.t ref ;
+    logger: logger;
     fresh_id: int ref ;
-    fresh_meta_id: int ref ;
-    fresh_reaction_id: int ref;
-    fresh_obs_id: int ref;
+    channel_opt: out_channel option;
     mutable current_line: token list;
     nodes: (string * Graph_loggers_sig.options list) list ref ;
     edges: (string * string * Graph_loggers_sig.options list) list ref ;
     edges_map: Graph_loggers_sig.options list list Mods.String2Map.t ref ;
-    env: (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot VarMap.t ref ;
-    const: VarSet.t ref;
-    id_of_parameters: string VarMap.t ref;
-    dangerous_parameters: VarSet.t ref ;
-    idset: Mods.StringSet.t ref ;
   }
 
 let refresh_id t =
   let () = t.id_map:=StringMap.empty in
-  let () = t.fresh_id:= 1 in
   let () = t.nodes := [] in
   let () = t.edges := [] in
+  let () = t.fresh_id := 1 in
   ()
 
 let get_encoding_format t = t.encoding
@@ -94,43 +79,27 @@ let get_encoding_format t = t.encoding
 let dummy_html_logger =
   {
     id_map = ref StringMap.empty ;
-    fresh_meta_id = ref 1 ;
-    fresh_id = ref 1 ;
     encoding = HTML;
     logger = DEVNUL;
     channel_opt = None;
     current_line = [];
+    fresh_id = ref 1;
     nodes = ref [];
     edges = ref [];
     edges_map = ref Mods.String2Map.empty;
-    fresh_reaction_id = ref 1;
-    fresh_obs_id = ref 1;
-    env = ref VarMap.empty;
-    const = ref VarSet.empty;
-    id_of_parameters = ref VarMap.empty;
-    dangerous_parameters = ref VarSet.empty;
-    idset = ref Mods.StringSet.empty ;
-  }
+    }
 
 let dummy_txt_logger =
   {
-    fresh_meta_id = ref 1 ;
-    fresh_id = ref 1;
-    id_map = ref StringMap.empty;
+    id_map = ref StringMap.empty ;
     encoding = TXT;
     channel_opt = None;
     logger = DEVNUL;
     current_line = [];
+    fresh_id = ref 1;
     nodes = ref [];
     edges = ref [];
     edges_map = ref Mods.String2Map.empty;
-    fresh_reaction_id = ref 1;
-    fresh_obs_id = ref 1;
-    env = ref VarMap.empty;
-    const = ref VarSet.empty;
-    id_of_parameters = ref VarMap.empty;
-    dangerous_parameters = ref VarSet.empty;
-    idset = ref Mods.StringSet.empty ;
   }
 
 (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
@@ -333,9 +302,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
   let logger =
     {
       id_map = ref StringMap.empty;
-      fresh_meta_id = ref 1 ;
       fresh_id = ref 1;
-      fresh_obs_id = ref 1;
       logger = Formatter formatter;
       channel_opt = Some channel;
       encoding = mode;
@@ -343,13 +310,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       nodes = ref [];
       edges = ref [];
       edges_map = ref Mods.String2Map.empty;
-      fresh_reaction_id = ref 1;
-      env = ref VarMap.empty;
-      const = ref VarSet.empty;
-      id_of_parameters = ref VarMap.empty;
-      dangerous_parameters = ref VarSet.empty;
-      idset = ref Mods.StringSet.empty ;
-    }
+      }
   in
   let () = print_preamble logger in
   logger
@@ -358,9 +319,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
   let logger =
     {
       id_map = ref StringMap.empty;
-      fresh_meta_id = ref 1 ;
       fresh_id = ref 1;
-      fresh_obs_id = ref 1;
       logger = Formatter formatter;
       channel_opt = None;
       encoding = mode;
@@ -368,12 +327,6 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       nodes = ref [];
       edges = ref [];
       edges_map = ref Mods.String2Map.empty;
-      fresh_reaction_id = ref 1;
-      env = ref VarMap.empty;
-      const = ref VarSet.empty;
-      id_of_parameters = ref VarMap.empty;
-      dangerous_parameters = ref VarSet.empty;
-      idset = ref Mods.StringSet.empty ;
     }
   in
   let () = print_preamble logger in
@@ -382,9 +335,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
 let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
   {
     id_map = ref StringMap.empty;
-    fresh_meta_id = ref 1 ;
     fresh_id = ref 1;
-    fresh_obs_id = ref 1;
     logger = Circular_buffer (ref (Circular_buffers.create size "" ));
     channel_opt = None;
     encoding = mode;
@@ -392,34 +343,20 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     nodes = ref [];
     edges = ref [];
     edges_map = ref Mods.String2Map.empty;
-    fresh_reaction_id = ref 1;
-    env = ref VarMap.empty;
-    const = ref VarSet.empty;
-    id_of_parameters = ref VarMap.empty;
-    dangerous_parameters = ref VarSet.empty;
-    idset = ref Mods.StringSet.empty ;
   }
 
 let open_infinite_buffer ?mode:(mode=TXT) () =
   let logger =
     {
-      id_map = ref StringMap.empty;
-      fresh_meta_id = ref 1 ;
-      fresh_obs_id = ref 1;
-      fresh_id = ref 1;
-      logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
-      channel_opt = None;
-      encoding = mode;
-      current_line = [];
-      nodes = ref [];
-      edges = ref [];
-      edges_map = ref Mods.String2Map.empty;
-      fresh_reaction_id = ref 1;
-      env = ref VarMap.empty;
-      const = ref VarSet.empty;
-      id_of_parameters = ref VarMap.empty;
-      dangerous_parameters = ref VarSet.empty;
-      idset = ref Mods.StringSet.empty ;
+        id_map = ref StringMap.empty;
+        fresh_id = ref 1;
+        logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
+        channel_opt = None;
+        encoding = mode;
+        current_line = [];
+        nodes = ref [];
+        edges = ref [];
+        edges_map = ref Mods.String2Map.empty;
     }
   in
   let () = print_preamble logger in
@@ -487,8 +424,6 @@ let get_ref ref =
   i
 
 let fresh_id logger = get_ref logger.fresh_id
-let get_fresh_meta_id logger = get_ref logger.fresh_meta_id
-let get_fresh_obs_id logger = get_ref logger.fresh_obs_id
 
 let int_of_string_id logger string =
   try
@@ -518,80 +453,6 @@ let add_edge t s1 s2 d =
   in
   ()
 let graph_of_logger logger = List.rev !(logger.nodes), List.rev !(logger.edges)
-
-let get_expr t v =
-  try
-    Some (VarMap.find v (!(t.env)))
-  with
-  | Not_found ->
-    None
-
-let set_dangerous_global_parameter_name t var =
-  t.dangerous_parameters := VarSet.add var (!(t.dangerous_parameters))
-
-let forbidden_char c =
-  match c with
-    '*' | '+' | '-' | '(' | ')' -> true
-  | _ -> false
-
-let has_forbidden_char t string =
-  (match get_encoding_format t
-   with
-     DOTNET -> true
-   | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
-   | Octave | Matlab | Maple | Mathematica | Json | SBML -> false)
-  &&
-  let rec aux k n =
-    if k=n then false
-    else forbidden_char (string.[k]) || aux (k+1) n
-  in
-  aux 0 (String.length string)
-
-let flag_dangerous t id string =
-  if has_forbidden_char t string
-  then
-    set_dangerous_global_parameter_name t id
-
-let set_expr t v expr =
-  let const = Alg_expr.is_constant expr in
-  let () =
-    if not const then
-        t.const := VarSet.remove v (!(t.const))
-    else
-      t.const := VarSet.add v (!(t.const))
-  in
-  t.env := VarMap.add v expr (!(t.env))
-
-let is_const t v =
-  VarSet.mem v (!(t.const))
-
-let get_fresh_reaction_id t =
-  let output = !(t.fresh_reaction_id) in
-  let () = t.fresh_reaction_id:=succ output in
-  output
-
-let get_id_of_global_parameter t var =
-  try
-    VarMap.find var (!(t.id_of_parameters))
-  with
-    Not_found -> ""
-
-let set_id_of_global_parameter t var id =
-  let () = t.id_of_parameters := VarMap.add var id (!(t.id_of_parameters)) in
-  flag_dangerous t var id
-
-let rec allocate_fresh_name t name potential_suffix =
-  if Mods.StringSet.mem name (!(t.idset))
-  then
-    allocate_fresh_name t (name^potential_suffix) potential_suffix
-  else
-    name
-
-let allocate t name =
-  let () = t.idset := Mods.StringSet.add name (!(t.idset)) in
-  ()
-let is_dangerous_ode_variable t var =
-     VarSet.mem var (!(t.dangerous_parameters))
 
 let dump_json logger json =
   let channel_opt = channel_of_logger logger in
@@ -643,35 +504,3 @@ let print_binding_type
   fprintf t
     "%s"
     (Public_data.string_of_binding_type ~binding_type_symbol ~agent_name ~site_name)
-
-let odeFileName  =
-  begin
-    List.fold_left
-      (fun map (key,value) ->
-         FormatMap.add key (ref value) map)
-      FormatMap.empty
-      [
-        Octave, "ode.m";
-        Matlab, "ode.m";
-        DOTNET, "network.net";
-        SBML, "network.xml";
-        Maple, "ode.mws";
-        Mathematica, "ode.nb" ;
-      ]
-  end
-
-let get_odeFileName backend =
-  try
-    FormatMap.find backend odeFileName
-  with
-    Not_found ->
-    let output = ref "" in
-    let _ = FormatMap.add backend output odeFileName in
-    output
-
-let set_odeFileName backend name =
-  let reference = get_odeFileName backend in
-  reference:=name
-
-let set_ode ~mode f = set_odeFileName mode f
-let get_ode ~mode = !(get_odeFileName mode)

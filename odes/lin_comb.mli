@@ -16,9 +16,9 @@ sig
   val print:
     sep:string ->
     product:string ->
-    (Loggers.t -> mix -> unit) ->
-    (Loggers.t -> id -> unit) ->
-    Loggers.t -> t -> unit
+    (Ode_loggers_sig.t -> mix -> unit) ->
+    (Ode_loggers_sig.t -> id -> unit) ->
+    Ode_loggers_sig.t -> t -> unit
 end
 
 module Lin : Lin_comb with type mix = int and type id = int

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Nov 05 2018>
+  * Last modification: Time-stamp: <Dec 19 2018>
 *)
 
 module A = Odes.Make (Symmetry_interface)
@@ -47,7 +47,6 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | "sbml" -> Loggers.SBML
       | s ->
         begin
-          (*Arg.usage options usage_msg;*)
           Format.printf
             "Wrong option %s.@.Only DOTNET, Matlab, Mathematica, Maple, Octave, and SBML backends are supported.@."
              s;
@@ -62,7 +61,6 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     | "biochemist" -> Remanent_parameters_sig.Biochemist
     | s ->
       begin
-        (*Arg.usage options usage_msg;*)
         Format.printf
           "Wrong option %s.@.Only KaSim and Biochemist are supported.@."
           s;
@@ -83,7 +81,6 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     | (Loggers.SBML | Loggers.DOTNET),"biochemist" -> Remanent_parameters_sig.Biochemist
     | _,s ->
       begin
-        (*Arg.usage options usage_msg;*)
         Format.printf
           "Wrong option %s.@.Only KaSim and Biochemist are supported.@."
           s;
@@ -98,7 +95,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       with
       | None -> ()
       | Some s ->
-        Loggers.set_ode
+        Ode_loggers_sig.set_ode
           ~mode:Loggers.Matlab
           s
     in
@@ -108,7 +105,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       with
       | None -> ()
       | Some s ->
-        Loggers.set_ode
+        Ode_loggers_sig.set_ode
           ~mode:Loggers.Octave
           s
     in
@@ -119,7 +116,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       with
       | None -> ()
       | Some s ->
-        Loggers.set_ode
+        Ode_loggers_sig.set_ode
           ~mode:Loggers.SBML
           s
     in
@@ -130,7 +127,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       with
       | None -> ()
       | Some s ->
-        Loggers.set_ode
+        Ode_loggers_sig.set_ode
           ~mode:Loggers.DOTNET
           s
     in
@@ -141,7 +138,6 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         Ode_args.Occurrences
     | s ->
       begin
-        (*Arg.usage options usage_msg;*)
         Format.printf
           "Wrong option %s.@.Only Embeddings and Occurrences are supported.@."
           s;
@@ -155,7 +151,6 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         Ode_args.Occurrences
     | s ->
       begin
-        (*Arg.usage options usage_msg;*)
         Format.printf
           "Wrong option %s.@.Only Embeddings and Occurrences are supported.@."
           s;
@@ -172,7 +167,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let abstol= !(ode_args.Ode_args.absolute_tolerance) in
     let () =
       if not cli_args.Run_cli_args.batchmode then
-        Kappa_files.check_not_exists (Loggers.get_ode ~mode:backend)
+        Kappa_files.check_not_exists (Ode_loggers_sig.get_ode ~mode:backend)
     in
     let command_line =
       Format.asprintf "%a"
@@ -334,21 +329,25 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     (*************************************************************)
     let out_channel =
-      Kappa_files.open_out (Loggers.get_ode ~mode:backend)
+      Kappa_files.open_out (Ode_loggers_sig.get_ode ~mode:backend)
     in
-    let logger = Loggers.open_logger_from_channel ~mode:backend
-        out_channel
-    in
+    let pre_logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
+    let logger = Ode_loggers_sig.extend_logger pre_logger in
     let logger_buffer =
-      match backend with
-      | Loggers.SBML -> Loggers.open_infinite_buffer ~mode:backend ()
-      | Loggers.DOTNET
-      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
-      | Loggers.HTML_Tabular
-      | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-      | Loggers.XLS -> logger
-      | Loggers.Octave | Loggers.Matlab
-      | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
+        begin
+          match backend with
+          | Loggers.SBML ->
+            Ode_loggers_sig.extend_logger
+              (Loggers.open_infinite_buffer ~mode:backend ())
+          | Loggers.DOTNET
+          | Loggers.Matrix | Loggers.HTML_Graph
+          | Loggers.Js_Graph | Loggers.HTML
+          | Loggers.HTML_Tabular
+          | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+          | Loggers.XLS
+          | Loggers.Octave | Loggers.Matlab
+          | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
+        end
     in
     let logger_err =
       match backend with
@@ -357,9 +356,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
       | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-      | Loggers.XLS -> logger
+      | Loggers.XLS -> pre_logger
       | Loggers.Octave | Loggers.Matlab
-      | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
+      | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> pre_logger
     in
     let network =
       A.export_network
@@ -383,7 +382,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         logger_err
         compil network
     in
-    let () = Loggers.flush_logger logger in
+    let () = Ode_loggers_sig.flush_logger logger in
     let () = close_out out_channel in
     let () =
       if !(ode_args.Ode_args.print_efficiency)

@@ -1,5 +1,5 @@
 let print_comment logger_fmt logger_buf (s:string) : unit =
-  match Loggers.get_encoding_format logger_fmt
+  match Ode_loggers_sig.get_encoding_format logger_fmt
   with
   | Loggers.DOTNET ->
     let () = Loggers.fprintf logger_buf "# %s" s in
@@ -41,7 +41,7 @@ let warn_expr ?pos expr m logger logger_err =
 
 let do_sbml logger logger_err f =
 match
-  Loggers.get_encoding_format logger
+  Ode_loggers_sig.get_encoding_format logger
 with
 | Loggers.SBML ->
   f logger logger_err
@@ -53,7 +53,7 @@ with
 
 let do_dotnet logger logger_err f =
   match
-    Loggers.get_encoding_format logger
+    Ode_loggers_sig.get_encoding_format logger
   with
   | Loggers.DOTNET -> f logger logger_err
   | Loggers.SBML
@@ -64,7 +64,7 @@ let do_dotnet logger logger_err f =
 
 let is_dotnet logger =
   match
-    Loggers.get_encoding_format logger
+    Ode_loggers_sig.get_encoding_format logger
   with
   | Loggers.DOTNET -> true
   | Loggers.SBML
@@ -75,7 +75,7 @@ let is_dotnet logger =
 
 let is_sbml logger =
     match
-      Loggers.get_encoding_format logger
+      Ode_loggers_sig.get_encoding_format logger
     with
     | Loggers.SBML -> true
     | Loggers.DOTNET
@@ -86,7 +86,7 @@ let is_sbml logger =
 
 let is_dotnet_or_sbml  logger =
   match
-    Loggers.get_encoding_format logger
+    Ode_loggers_sig.get_encoding_format logger
   with
   | Loggers.DOTNET
   | Loggers.SBML -> true
@@ -123,28 +123,28 @@ let lift1 f =
 let print_sbml logger logger_err s =
   do_sbml logger logger_err
     (lift0 (fun logger ->
-         Loggers.fprintf logger "%s" s))
+         Ode_loggers_sig.fprintf logger "%s" s))
 
 let print_dotnet logger logger_err s =
   do_dotnet logger logger_err
-    (lift0 (fun logger -> Loggers.fprintf logger "%s" s))
+    (lift0 (fun logger -> Ode_loggers_sig.fprintf logger "%s" s))
 
 (*break sbml or dotnet*)
 let break_dotnet_or_sbml logger logger_err =
   do_dotnet_or_sbml logger logger_err
-    (lift0 Loggers.print_breakable_hint)
+    (lift0 Ode_loggers_sig.print_breakable_hint)
 
 let line_dotnet_or_sbml logger logger_err =
   do_dotnet_or_sbml logger logger_err
-    (lift0 Loggers.print_newline)
+    (lift0 Ode_loggers_sig.print_newline)
 
 let line_dotnet logger logger_err =
   do_dotnet logger logger_err
-    (lift0 Loggers.print_newline)
+    (lift0 Ode_loggers_sig.print_newline)
 
 let line_sbml logger logger_err =
   do_sbml logger logger_err
-    (lift0 Loggers.print_newline)
+    (lift0 Ode_loggers_sig.print_newline)
 
 let extend s =
   if s="" || String.sub s 0 1 = " "  then s else " "^s
@@ -285,25 +285,25 @@ let string_of_variable logger string_of_var_id variable =
   | Ode_loggers_sig.Rate int ->
     let s = Printf.sprintf "k%i" int in
     if is_dotnet logger then
-      Loggers.allocate_fresh_name logger s "_"
+      Ode_loggers_sig.allocate_fresh_name logger s "_"
     else
       s
   | Ode_loggers_sig.Rated int ->
     let s = Printf.sprintf "kd%i" int in
     if is_dotnet logger then
-      Loggers.allocate_fresh_name logger s "_"
+      Ode_loggers_sig.allocate_fresh_name logger s "_"
     else
       s
   | Ode_loggers_sig.Rateun int ->
     let s = Printf.sprintf "kun%i" int in
     if is_dotnet logger then
-      Loggers.allocate_fresh_name logger s "_"
+      Ode_loggers_sig.allocate_fresh_name logger s "_"
     else
       s
   | Ode_loggers_sig.Rateund int ->
     let s = Printf.sprintf "kdun%i" int in
     if is_dotnet logger then
-      Loggers.allocate_fresh_name logger s "_"
+      Ode_loggers_sig.allocate_fresh_name logger s "_"
     else
       s
   | Ode_loggers_sig.Stochiometric_coef (int1,int2) ->
@@ -356,10 +356,10 @@ let unit_of_variable variable =
   | Ode_loggers_sig.Tmp -> None
 
 let meta_id_of_logger logger =
-  "CMD"^(string_of_int (Loggers.get_fresh_meta_id logger))
+  "CMD"^(string_of_int (Ode_loggers_sig.get_fresh_meta_id logger))
 
 let dotnet_id_of_logger logger =
-  (string_of_int (Loggers.get_fresh_meta_id logger))
+  (string_of_int (Ode_loggers_sig.get_fresh_meta_id logger))
 
 let print_parameters
     string_of_var_id logger logger_buffer logger_err variable expr =
@@ -371,7 +371,7 @@ let print_parameters
     | Some x -> " units=\""^x^"\""
   in
   let id = string_of_variable logger string_of_var_id variable in
-  let () = Loggers.set_id_of_global_parameter logger variable id  in
+  let () = Ode_loggers_sig.set_id_of_global_parameter logger variable id  in
   let () =
     do_sbml logger logger_err
       (fun logger logger_err ->
@@ -419,18 +419,18 @@ let rec eval_init_alg_expr logger network_handler alg_expr =
   | Alg_expr.CONST x  -> x
   | Alg_expr.ALG_VAR x ->
     let id = network_handler.Network_handler.int_of_obs x in
-    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
+    let expr_opt = Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Expr id) in
     eval_init_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.KAPPA_INSTANCE x ->
       let id = network_handler.Network_handler.int_of_kappa_instance x in
-    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Init id) in
+    let expr_opt = Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Init id) in
     eval_init_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.TOKEN_ID x ->
     let id = network_handler.Network_handler.int_of_token_id x in
-    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Init id) in
+    let expr_opt = Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Init id) in
     eval_init_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
-    let expr_opt = Loggers.get_expr logger Ode_loggers_sig.Tend in
+    let expr_opt = Ode_loggers_sig.get_expr logger Ode_loggers_sig.Tend in
     eval_init_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.STATE_ALG_OP
       ( Operator.CPUTIME
@@ -481,14 +481,14 @@ let rec propagate_def_in_alg_expr_p p logger network_handler alg_expr =
   | Alg_expr.KAPPA_INSTANCE _,_ -> alg_expr
   | Alg_expr.ALG_VAR x,loc ->
     let id = network_handler.Network_handler.int_of_obs x in
-    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
+    let expr_opt = Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Expr id) in
     let expr = unsome expr_opt in
     if p logger id x expr
     then
       fst (propagate_def_in_alg_expr_p p logger network_handler expr),loc
     else alg_expr
   | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR),loc ->
-    let expr_opt = Loggers.get_expr logger Ode_loggers_sig.Tend in
+    let expr_opt = Ode_loggers_sig.get_expr logger Ode_loggers_sig.Tend in
     fst (propagate_def_in_alg_expr_p p logger network_handler (unsome expr_opt)),loc
   | Alg_expr.STATE_ALG_OP
       ( Operator.CPUTIME
@@ -545,7 +545,7 @@ let propagate_dangerous_var_names_in_alg_expr a b c =
   if is_dotnet a then
     propagate_def_in_alg_expr_p
       (fun logger id _ _  ->
-         Loggers.is_dangerous_ode_variable logger
+         Ode_loggers_sig.is_dangerous_ode_variable logger
            ((Ode_loggers_sig.Expr id)))
       a b c
   else c
@@ -557,10 +557,10 @@ let rec eval_const_alg_expr logger network_handler alg_expr =
   | Alg_expr.KAPPA_INSTANCE _ -> None
   | Alg_expr.ALG_VAR x ->
     let id = network_handler.Network_handler.int_of_obs x in
-    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
+    let expr_opt = Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Expr id) in
     eval_const_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
-    let expr_opt = Loggers.get_expr logger Ode_loggers_sig.Tend in
+    let expr_opt = Ode_loggers_sig.get_expr logger Ode_loggers_sig.Tend in
     eval_const_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.STATE_ALG_OP
       ( Operator.CPUTIME
@@ -647,11 +647,11 @@ and eval_const_bool_expr logger network_handler expr =
 
 let rec get_last_alias logger network_handler x =
   let id = network_handler.Network_handler.int_of_obs x in
-  let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
+  let expr_opt = Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Expr id) in
   match fst (unsome expr_opt)
   with
   | Alg_expr.ALG_VAR x' when x<>x'
-                          && not (Loggers.is_dangerous_ode_variable logger (Ode_loggers_sig.Expr (network_handler.Network_handler.int_of_obs x'))) ->
+                          && not (Ode_loggers_sig.is_dangerous_ode_variable logger (Ode_loggers_sig.Expr (network_handler.Network_handler.int_of_obs x'))) ->
     get_last_alias logger network_handler x'
   | Alg_expr.ALG_VAR _
   | Alg_expr.CONST _
@@ -669,11 +669,11 @@ let print_int logger logger_err n =
   let () =
     do_sbml logger logger_err
       (lift0 (fun logger ->
-           Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
+           Ode_loggers_sig.fprintf logger "<cn type=\"integer\"> %i </cn>" n
          ))
   in
   do_dotnet logger logger_err
-    (lift0 (fun logger -> Loggers.fprintf logger "%i" n))
+    (lift0 (fun logger -> Ode_loggers_sig.fprintf logger "%i" n))
 
 let print_nbr logger logger_err nbr =
   match nbr with
@@ -683,32 +683,32 @@ let print_nbr logger logger_err nbr =
     let () =
       do_sbml logger logger_err
         (lift0 (fun logger ->
-             Loggers.fprintf logger "<cn type=\"real\"> %g </cn>" f))
+             Ode_loggers_sig.fprintf logger "<cn type=\"real\"> %g </cn>" f))
     in
     do_dotnet logger logger_err
-      (lift0 (fun logger -> Loggers.fprintf logger "%g" f))
+      (lift0 (fun logger -> Ode_loggers_sig.fprintf logger "%g" f))
 
 let print_ci logger logger_err ci=
   let () =
     do_sbml logger logger_err
       (fun logger _ ->
-         Loggers.fprintf logger "<ci>%s</ci>"
+         Ode_loggers_sig.fprintf logger "<ci>%s</ci>"
            ci)
   in
   do_dotnet logger logger_err
     (fun logger _ ->
-       Loggers.fprintf logger "%s" ci)
+       Ode_loggers_sig.fprintf logger "%s" ci)
 
 let print_ci_with_id logger logger_err ci id =
   let () =
     do_sbml logger logger_err
       (fun logger _ ->
-         Loggers.fprintf logger "<ci>%s%i</ci>"
+         Ode_loggers_sig.fprintf logger "<ci>%s%i</ci>"
            ci id)
   in
   do_dotnet logger logger_err
     (fun logger _ ->
-       Loggers.fprintf logger "%i" id)
+       Ode_loggers_sig.fprintf logger "%i" id)
 
 let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
     (alg_expr:
@@ -728,7 +728,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
          please have a look *)
       let () =
         print_ci logger logger_err
-          (Loggers.get_id_of_global_parameter
+          (Ode_loggers_sig.get_id_of_global_parameter
              logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
       in
       do_dotnet logger logger_err
@@ -742,7 +742,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
           network.Network_handler.int_of_obs x
         in
         match
-          Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+          Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Expr id)
         with
         | Some expr ->
           if Alg_expr.is_constant expr
@@ -750,12 +750,12 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
             let () =
               do_sbml logger logger_err
                 (lift0 (fun logger ->
-                     Loggers.fprintf logger "<ci> %s </ci>"
+                     Ode_loggers_sig.fprintf logger "<ci> %s </ci>"
                        (string_of_var_id id)))
             in
             do_dotnet logger logger_err
               (lift0 (fun logger ->
-                   Loggers.fprintf logger "%s"
+                   Ode_loggers_sig.fprintf logger "%s"
                      (string_of_var_id id)))
           else
             (*if expr is not a constant in case of
@@ -784,13 +784,13 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
                    print_nbr logger logger_err Nbr.one
                                )*)
         | None ->
-          Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
+          Ode_loggers_sig.fprintf logger "<ci>TODO:v%i</ci>" id
       end
   | Alg_expr.KAPPA_INSTANCE x ->
     let () =
       do_sbml logger logger_err
         (fun logger _logger_err ->
-           Loggers.fprintf logger "<ci>s%i</ci>"
+           Ode_loggers_sig.fprintf logger "<ci>s%i</ci>"
              (network.Network_handler.int_of_kappa_instance x))
     in
     do_dotnet logger logger_err
@@ -827,9 +827,9 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
   | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
     let () =
       do_sbml logger logger_err (fun logger _ ->
-          Loggers.fprintf logger
+          Ode_loggers_sig.fprintf logger
             "<apply>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
-            (Loggers_string_of_op.string_of_bin_op logger
+            (Ode_loggers_sig.string_of_bin_op logger
                Operator.MULT)
         )
     in
@@ -848,12 +848,12 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
   | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) ->
     print_nbr logger logger_err Nbr.zero
   | Alg_expr.BIN_ALG_OP (op, a, b) ->
-    let string_op = Loggers_string_of_op.string_of_bin_op logger op in
+    let string_op = Ode_loggers_sig.string_of_bin_op logger op in
     let () =
       do_sbml logger logger_err
         (fun logger logger_err ->
-           let () = Loggers.fprintf logger "<apply>" in
-           let () = Loggers.fprintf logger "%s" string_op in
+           let () = Ode_loggers_sig.fprintf logger "<apply>" in
+           let () = Ode_loggers_sig.fprintf logger "%s" string_op in
            let () =
              print_alg_expr_in_sbml string_of_var_id logger logger_err a network
            in
@@ -861,7 +861,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
              print_alg_expr_in_sbml
                string_of_var_id logger logger_err b network
            in
-           let () = Loggers.fprintf logger "</apply>" in
+           let () = Ode_loggers_sig.fprintf logger "</apply>" in
            ()
             )
     in
@@ -873,7 +873,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
              print_alg_expr_in_sbml
                string_of_var_id logger logger_err a network
            in
-           let () = Loggers.fprintf logger "%s" string_op in
+           let () = Ode_loggers_sig.fprintf logger "%s" string_op in
            let () =
              print_alg_expr_in_sbml
                string_of_var_id logger logger_err b network
@@ -883,23 +883,23 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
     in
     ()
   | Alg_expr.UN_ALG_OP (op, a) ->
-    let string_op = Loggers_string_of_op.string_of_un_op logger op in
+    let string_op = Ode_loggers_sig.string_of_un_op logger op in
     let () =
       do_sbml logger logger_err
         (fun logger logger_err ->
-           let () = Loggers.fprintf logger "<apply>" in
-           let () = Loggers.fprintf logger "%s" string_op in
+           let () = Ode_loggers_sig.fprintf logger "<apply>" in
+           let () = Ode_loggers_sig.fprintf logger "%s" string_op in
            let () =
              print_alg_expr_in_sbml
                string_of_var_id logger logger_err a network
            in
-           let () = Loggers.fprintf logger "</apply>" in
+           let () = Ode_loggers_sig.fprintf logger "</apply>" in
            ())
     in
     let () =
       do_dotnet logger logger_err
         (fun logger logger_err ->
-           let () = Loggers.fprintf logger "%s" string_op in
+           let () = Ode_loggers_sig.fprintf logger "%s" string_op in
            let () =
              print_alg_expr_in_sbml
                string_of_var_id logger logger_err a network
@@ -911,8 +911,8 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
     let () =
       do_sbml logger logger_err
         (fun logger logger_err ->
-           let () = Loggers.fprintf logger "<apply>" in
-           let () = Loggers.fprintf logger "<if-then-else>"  in
+           let () = Ode_loggers_sig.fprintf logger "<apply>" in
+           let () = Ode_loggers_sig.fprintf logger "<if-then-else>"  in
            let () =
              print_bool_expr_in_sbml
                string_of_var_id logger logger_err cond network
@@ -925,7 +925,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
              print_alg_expr_in_sbml
                string_of_var_id logger logger_err no network
            in
-           let () = Loggers.fprintf logger "</apply>" in
+           let () = Ode_loggers_sig.fprintf logger "</apply>" in
            ())
     in
     do_dotnet logger logger_err
@@ -944,13 +944,13 @@ and
     do_sbml logger logger_err
       (fun logger logger_err ->
          match fst cond with
-         | Alg_expr.TRUE -> Loggers.fprintf logger "<true/>"
-         | Alg_expr.FALSE -> Loggers.fprintf logger "<false/>"
+         | Alg_expr.TRUE -> Ode_loggers_sig.fprintf logger "<true/>"
+         | Alg_expr.FALSE -> Ode_loggers_sig.fprintf logger "<false/>"
          | Alg_expr.COMPARE_OP (op,a,b) ->
-           let () = Loggers.fprintf logger "<apply>" in
+           let () = Ode_loggers_sig.fprintf logger "<apply>" in
            let () =
-             Loggers.fprintf logger "%s"
-               (Loggers_string_of_op.string_of_compare_op logger op) in
+             Ode_loggers_sig.fprintf logger "%s"
+               (Ode_loggers_sig.string_of_compare_op logger op) in
            let () =
              print_alg_expr_in_sbml
                string_of_var_id logger logger_err a network
@@ -958,12 +958,12 @@ and
            let () =
              print_alg_expr_in_sbml string_of_var_id logger logger_err b
               network in
-           let () = Loggers.fprintf logger "</apply>" in
+           let () = Ode_loggers_sig.fprintf logger "</apply>" in
            ()
          | Alg_expr.BIN_BOOL_OP (op,a,b) ->
-           let () = Loggers.fprintf logger "<apply>" in
-           let () = Loggers.fprintf logger "%s"
-               (Loggers_string_of_op.string_of_bin_bool_op logger op) in
+           let () = Ode_loggers_sig.fprintf logger "<apply>" in
+           let () = Ode_loggers_sig.fprintf logger "%s"
+               (Ode_loggers_sig.string_of_bin_bool_op logger op) in
            let () =
              print_bool_expr_in_sbml
                string_of_var_id logger logger_err a network
@@ -972,17 +972,17 @@ and
              print_bool_expr_in_sbml
                string_of_var_id logger logger_err b network
            in
-           let () = Loggers.fprintf logger "</apply>" in
+           let () = Ode_loggers_sig.fprintf logger "</apply>" in
            ()
          | Alg_expr.UN_BOOL_OP (op,a) ->
-           let () = Loggers.fprintf logger "<apply>" in
-           let () = Loggers.fprintf logger "%s"
-               (Loggers_string_of_op.string_of_un_bool_op logger op) in
+           let () = Ode_loggers_sig.fprintf logger "<apply>" in
+           let () = Ode_loggers_sig.fprintf logger "%s"
+               (Ode_loggers_sig.string_of_un_bool_op logger op) in
            let () =
              print_bool_expr_in_sbml
                string_of_var_id logger logger_err a network
            in
-           let () = Loggers.fprintf logger "</apply>" in
+           let () = Ode_loggers_sig.fprintf logger "</apply>" in
            ())
   in
   do_dotnet logger logger_err
@@ -1009,14 +1009,14 @@ let rec substance_expr_in_sbml logger
     if Alg_expr.is_constant alg_expr then
       (* TODO Jérome: This is dead code, please have a look *)
       Mods.StringSet.singleton
-        (Loggers.get_id_of_global_parameter
+        (Ode_loggers_sig.get_id_of_global_parameter
            logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
     else begin
       let id =
         network.Network_handler.int_of_obs x
       in
       match
-        Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+        Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Expr id)
       with
       | Some expr ->
         substance_expr_in_sbml
@@ -1091,7 +1091,7 @@ let rec maybe_time_dependent_alg_expr_in_sbml logger
         network.Network_handler.int_of_obs x
       in
       match
-        Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+        Ode_loggers_sig.get_expr logger (Ode_loggers_sig.Expr id)
       with
       | Some expr ->
         maybe_time_dependent_alg_expr_in_sbml
@@ -1142,7 +1142,7 @@ let replace_space_with_underscore =
 
 let dump_initial_species ?units loggers logger_err network_handler k name species =
   let expr =
-    match Loggers.get_expr loggers (Ode_loggers_sig.Init k) with
+    match Ode_loggers_sig.get_expr loggers (Ode_loggers_sig.Init k) with
     | Some a -> a
     | None -> Alg_expr.const Nbr.zero
   in
@@ -1197,11 +1197,11 @@ let dump_species_reference ?dotnet_sep:(dotnet_sep="") loggers logger_err specie
       do_dotnet loggers logger_err (fun loggers _ ->
         let rec aux k =
           let () =
-            Loggers.fprintf loggers "%i" species
+            Ode_loggers_sig.fprintf loggers "%i" species
           in
           if k>=i then ()
           else
-            let () = Loggers.fprintf loggers "%s" dotnet_sep in
+            let () = Ode_loggers_sig.fprintf loggers "%s" dotnet_sep in
             aux (k+1)
         in
         aux 1
@@ -1237,7 +1237,7 @@ let dump_list_of_species_reference
          let () =
            if bool then
              do_dotnet loggers logger_err
-               (fun logger _ -> Loggers.fprintf logger "%s" dotnet_sep)
+               (fun logger _ -> Ode_loggers_sig.fprintf logger "%s" dotnet_sep)
          in
          let () = dump_species_reference ~dotnet_sep loggers logger_err s (i*j) in
          (* check what to do when stochiometric coefficients are bigger than 1*)
@@ -1250,25 +1250,25 @@ let dump_list_of_species_reference
 let dump_pair logger logger_err (t,i) =
   if i = 1 then
     let () =
-      Loggers.fprintf logger "<ci> s%i </ci>" t
+      Ode_loggers_sig.fprintf logger "<ci> s%i </ci>" t
     in
     ()
   else
     let () =
       add_box ~break logger logger_err "apply" ""
         (fun logger _  ->
-           let () = Loggers.fprintf logger "<divide/>" in
-           Loggers.fprintf logger "<ci> s%i </ci><cn type=\"integer\"> %i </cn>" t i)
+           let () = Ode_loggers_sig.fprintf logger "<divide/>" in
+           Ode_loggers_sig.fprintf logger "<ci> s%i </ci><cn type=\"integer\"> %i </cn>" t i)
     in
     ()
 
 let maybe_time_dependent logger network var_rule =
   match
-    Loggers.get_encoding_format logger
+    Ode_loggers_sig.get_encoding_format logger
   with
   | Loggers.SBML ->
     let expr_opt =
-      Loggers.get_expr logger var_rule in
+      Ode_loggers_sig.get_expr logger var_rule in
     let expr = unsome expr_opt in
     maybe_time_dependent_alg_expr_in_sbml logger expr network
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
@@ -1293,7 +1293,7 @@ let dump_kinetic_law
       (fun logger logger_err ->
          begin
          let expr_opt =
-           Loggers.get_expr logger var_rule in
+           Ode_loggers_sig.get_expr logger var_rule in
          let expr = unsome expr_opt in
          let f logger =
            let dump_constant =
@@ -1314,7 +1314,7 @@ let dump_kinetic_law
                    logger_err
                in
                (fun logger ->
-               Loggers.fprintf logger "%s"
+               Ode_loggers_sig.fprintf logger "%s"
                  (string_of_variable
                   logger
                   (fun _logger var -> string_of_int
@@ -1326,7 +1326,7 @@ let dump_kinetic_law
                  let cst = promote cst in
                  if propagate_constants
                  then
-                   (fun logger -> Loggers.fprintf logger "%s" (Nbr.to_string cst))
+                   (fun logger -> Ode_loggers_sig.fprintf logger "%s" (Nbr.to_string cst))
                  else
                  match
                     expr
@@ -1336,11 +1336,11 @@ let dump_kinetic_law
                    let s = string_of_var_id
                        (network.Network_handler.int_of_obs var_id)
                    in
-                   if Loggers.has_forbidden_char logger s then
+                   if Ode_loggers_sig.has_forbidden_char logger s then
                      (* MAKE A CLEANER TEST *)
 
                      (fun logger ->
-                        Loggers.fprintf logger "%s"
+                        Ode_loggers_sig.fprintf logger "%s"
                           (string_of_variable
                              logger
                              (fun _logger var -> string_of_int
@@ -1349,7 +1349,7 @@ let dump_kinetic_law
                              var_rule))
                    else
                    (fun logger ->
-                      Loggers.fprintf logger "%s"
+                      Ode_loggers_sig.fprintf logger "%s"
                         (string_of_var_id
                            (network.Network_handler.int_of_obs var_id)))
                  | ( Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _
@@ -1358,7 +1358,7 @@ let dump_kinetic_law
                    | Alg_expr.TOKEN_ID _ | Alg_expr.DIFF_TOKEN _
                    | Alg_expr.CONST _), _ ->
                    (fun logger ->
-                      Loggers.fprintf logger "%s"
+                      Ode_loggers_sig.fprintf logger "%s"
                         (string_of_variable
                            logger
                            (fun _logger var -> string_of_int
@@ -1373,20 +1373,20 @@ let dump_kinetic_law
            else
            if correct = 1
            then
-             let () = Loggers.fprintf logger "%i*" nocc in
+             let () = Ode_loggers_sig.fprintf logger "%i*" nocc in
              let () = dump_constant logger in
-             let () = Loggers.print_newline logger in
+             let () = Ode_loggers_sig.print_newline logger in
              ()
            else
            if nocc=1 then
-             let () = Loggers.fprintf logger "%g*" (1./.(float_of_int correct)) in
+             let () = Ode_loggers_sig.fprintf logger "%g*" (1./.(float_of_int correct)) in
              let () = dump_constant logger in
-             let () = Loggers.print_newline logger in
+             let () = Ode_loggers_sig.print_newline logger in
              ()
            else
-             let () = Loggers.fprintf logger "%g*" ((float_of_int nocc)/.(float_of_int correct)) in
+             let () = Ode_loggers_sig.fprintf logger "%g*" ((float_of_int nocc)/.(float_of_int correct)) in
              let () = dump_constant logger in
-             let () = Loggers.print_newline logger in
+             let () = Ode_loggers_sig.print_newline logger in
              ()
          in f logger
          (*match reactants with
@@ -1395,7 +1395,7 @@ let dump_kinetic_law
          | _::_ ->
            add_box ~break logger "apply" ""
              (fun logger ->
-                let () = Loggers.fprintf logger "<times/>" in
+                let () = Ode_loggers_sig.fprintf logger "<times/>" in
                 let () = f logger in
                 let rec aux list =
                   match list with
@@ -1405,7 +1405,7 @@ let dump_kinetic_law
                   | t::q ->
                     add_box ~break logger "apply" ""
                       (fun logger ->
-                         let () = Loggers.fprintf logger "<times/>" in
+                         let () = Ode_loggers_sig.fprintf logger "<times/>" in
                          let () = dump_pair logger t in
                          aux q)
                 in aux reactants
@@ -1417,14 +1417,14 @@ let dump_kinetic_law
     (fun logger _ ->
        begin
          let expr_opt =
-           Loggers.get_expr logger var_rule in
+           Ode_loggers_sig.get_expr logger var_rule in
          let expr = unsome expr_opt in
          let f logger =
            if Alg_expr.is_constant expr
            then
              if correct = nocc
              then
-               Loggers.fprintf logger "<ci> %s </ci>"
+               Ode_loggers_sig.fprintf logger "<ci> %s </ci>"
                  (string_of_variable
                     logger
                     (fun _logger var -> string_of_int
@@ -1434,9 +1434,9 @@ let dump_kinetic_law
              if nocc = 1 then
                add_box ~break logger logger_err "apply" ""
                  (fun logger _ ->
-                    let () = Loggers.fprintf logger "<divide/>" in
+                    let () = Ode_loggers_sig.fprintf logger "<divide/>" in
                     let () =
-                      Loggers.fprintf logger
+                      Ode_loggers_sig.fprintf logger
                         "<ci> %s </ci><cn type=\"integer\"> %i </cn>"
                         (string_of_variable
                            logger
@@ -1446,16 +1446,16 @@ let dump_kinetic_law
                            var_rule)
                         correct
                     in
-                    let () = Loggers.print_newline logger in
+                    let () = Ode_loggers_sig.print_newline logger in
                     ()
                  )
              else if correct=1
              then
                add_box ~break logger logger_err "apply" ""
                  (fun logger _ ->
-                    let () = Loggers.fprintf logger "<times/>" in
+                    let () = Ode_loggers_sig.fprintf logger "<times/>" in
                     let () =
-                      Loggers.fprintf logger
+                      Ode_loggers_sig.fprintf logger
                         "<cn type=\"integer\"> %i </cn><ci> %s </ci>"
                         nocc
                         (string_of_variable
@@ -1465,15 +1465,15 @@ let dump_kinetic_law
                                   var))
                            var_rule)
                     in
-                    let () = Loggers.print_newline logger in
+                    let () = Ode_loggers_sig.print_newline logger in
                     ()
                  )
              else
                add_box ~break logger logger_err "apply" ""
                  (fun logger _ ->
-                    let () = Loggers.fprintf logger "<times/>" in
+                    let () = Ode_loggers_sig.fprintf logger "<times/>" in
                     let () =
-                      Loggers.fprintf logger
+                      Ode_loggers_sig.fprintf logger
                         "<cn type=\"integer\"> %i </cn><divide/><ci> %s </ci><cn type=\"integer\"> %i </cn>"
                         nocc
                         (string_of_variable
@@ -1484,7 +1484,7 @@ let dump_kinetic_law
                            var_rule)
                         correct
                     in
-                    let () = Loggers.print_newline logger in
+                    let () = Ode_loggers_sig.print_newline logger in
                     ()
                  )
            else
@@ -1512,7 +1512,7 @@ let dump_kinetic_law
          | _::_ ->
            add_box ~break logger logger_err "apply" ""
              (fun logger _ ->
-                let () = Loggers.fprintf logger "<times/>" in
+                let () = Ode_loggers_sig.fprintf logger "<times/>" in
                 let () = f logger in
                 let rec aux list =
                   match list with
@@ -1522,7 +1522,7 @@ let dump_kinetic_law
                   | t::q ->
                     add_box ~break logger logger_err "apply" ""
                       (fun logger logger_err ->
-                         let () = Loggers.fprintf logger "<times/>" in
+                         let () = Ode_loggers_sig.fprintf logger "<times/>" in
                          let () = dump_pair logger logger_err t in
                          aux q)
                 in aux reactants
@@ -1553,7 +1553,7 @@ let dump_token_vector convert logger logger_err network_handler rule_id token_ve
           List.fold_left
             (fun n (id,_) ->
                let expr_opt =
-                 Loggers.get_expr logger
+                 Ode_loggers_sig.get_expr logger
                    (Ode_loggers_sig.Stochiometric_coef (rule_id,n))
                in
                let expr = unsome expr_opt in
@@ -1598,7 +1598,7 @@ let dump_token_vector convert logger logger_err network_handler rule_id token_ve
          | [] -> ()
          | _::_ ->
            let expr_opt =
-             Loggers.get_expr logger
+             Ode_loggers_sig.get_expr logger
                (Ode_loggers_sig.Stochiometric_coef (rule_id,1))
            in
            let expr = unsome expr_opt in
@@ -1618,7 +1618,7 @@ let has_good_token_token_vector
     | _::tail ->
       begin
         let expr_opt =
-          Loggers.get_expr logger
+          Ode_loggers_sig.get_expr logger
             (Ode_loggers_sig.Stochiometric_coef (rule_id,n))
         in
         let stochiometry_opt =
@@ -1676,7 +1676,7 @@ let dump_sbml_reaction
     fictitious
   =
   let dotnet_sep = "," in
-  let reaction_id = Loggers.get_fresh_reaction_id logger in
+  let reaction_id = Ode_loggers_sig.get_fresh_reaction_id logger in
   let label_reaction  = "reaction" in
   let label = "" in
   let label_list_of_reactants = "listOfReactants" in
@@ -1703,7 +1703,7 @@ let dump_sbml_reaction
         | [] -> token_vector
         | _::_ ->
           let expr_opt =
-            Loggers.get_expr logger
+            Ode_loggers_sig.get_expr logger
               (Ode_loggers_sig.Stochiometric_coef (rule_id,1))
           in
           let expr = unsome expr_opt in
@@ -1732,7 +1732,7 @@ let dump_sbml_reaction
          let () =
            do_dotnet logger logger_err
              (fun logger _ ->
-                Loggers.fprintf logger "%i " reaction_id)
+                Ode_loggers_sig.fprintf logger "%i " reaction_id)
          in
          let () =
            if reactants = [] &&
@@ -1757,7 +1757,7 @@ let dump_sbml_reaction
              in
              let () =
                do_dotnet logger logger_err
-                 (fun logger _ -> Loggers.fprintf logger " ")
+                 (fun logger _ -> Ode_loggers_sig.fprintf logger " ")
              in
              ()
          in
@@ -1785,11 +1785,11 @@ let dump_sbml_reaction
              let () =
                do_dotnet
                  logger logger_err
-                 (fun logger _ -> Loggers.fprintf logger " ")
+                 (fun logger _ -> Ode_loggers_sig.fprintf logger " ")
              in
              ()
          in
-         let expr_opt = Loggers.get_expr logger var_rule in
+         let expr_opt = Ode_loggers_sig.get_expr logger var_rule in
          let expr = unsome expr_opt in
          let modifiers = substance_expr_in_sbml logger expr network in
          let modifiers =
@@ -1874,7 +1874,7 @@ let dump_sbml_reaction
   ()
 
 let time_advance logger logger_err =
-  let reaction_id = Loggers.get_fresh_reaction_id logger in
+  let reaction_id = Ode_loggers_sig.get_fresh_reaction_id logger in
   let label_reaction  = "reaction" in
   let label_dotnet = "" in
   let label_list_of_products = "listOfProducts" in

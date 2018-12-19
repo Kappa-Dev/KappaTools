@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Nov 05 2018>
+  * Last modification: Time-stamp: <Dec 19 2018>
 *)
 module Make(I:Symmetry_interface_sig.Interface) :
 sig
@@ -21,7 +21,7 @@ sig
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
     ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
-    internal_meaning:Ode_args.count -> 
+    internal_meaning:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> I.preprocessed_ast -> I.compil
 
   val init: I.compil -> (ode_var_id,Ode_loggers_sig.ode_var_id) network
@@ -50,7 +50,7 @@ sig
     ?nonnegative:bool -> ?initial_step:float -> ?max_step:float ->
     ?abstol:float -> ?reltol:float ->
     Remanent_parameters_sig.parameters ->
-    Loggers.t -> Loggers.t -> Loggers.t ->
+    Ode_loggers_sig.t -> Ode_loggers_sig.t -> Loggers.t ->
     I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network

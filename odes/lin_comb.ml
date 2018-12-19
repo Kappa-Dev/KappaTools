@@ -22,9 +22,9 @@ sig
   val print:
     sep:string ->
     product:string ->
-    (Loggers.t -> mix -> unit) ->
-    (Loggers.t -> id -> unit) ->
-    Loggers.t -> t -> unit
+    (Ode_loggers_sig.t -> mix -> unit) ->
+    (Ode_loggers_sig.t -> id -> unit) ->
+    Ode_loggers_sig.t -> t -> unit
 
 end
 
@@ -196,7 +196,7 @@ module Make =
 
       let print_first logger sep first =
         if first then ()
-        else Loggers.fprintf logger "%s" sep
+        else Ode_loggers_sig.fprintf logger "%s" sep
 
       let print_v pr_mix pr_token logger var =
         match var with
@@ -219,7 +219,7 @@ module Make =
                    false
                  else
                    let () =
-                     Loggers.fprintf logger "%s%s" (Nbr.to_string coef) product
+                     Ode_loggers_sig.fprintf logger "%s%s" (Nbr.to_string coef) product
                    in
                    let () = print_v pr_mix pr_token logger var in
                    false)

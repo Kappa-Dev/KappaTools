@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Nov 05 2018>
+  * Last modification: Time-stamp: <Dec 19 2018>
 *)
 
 let local_trace = false
@@ -47,7 +47,6 @@ struct
 
   type id = int
   type ode_var_id = id
-  (*  type intro_coef_id = id*)
   type var_id = id
   type obs_id = id
   type rule_id = id
@@ -260,8 +259,8 @@ struct
       time_homogeneous_vars = None ;
       time_homogeneous_obs = None ;
       time_homogeneous_rates = None ;
-      (*  symmetries = None ;*)
-      (*sym_reduction = Symmetries.Ground ;*)
+      (*  symmetries = None ;
+          sym_reduction = Symmetries.Ground ;*)
     }
 
   let add_embed_to_current_species cc embed network =
@@ -1659,6 +1658,9 @@ let convert_obs parameters compil network =
       Network_handler.int_of_token_id = (fun i -> i);
     }
 
+  let string_of_var_id ?compil ?init_mode t id =
+    I.string_of_var_id ?compil ?init_mode (Ode_loggers_sig.lift t) id
+
   let increment ~propagate_constants
       is_zero ?(init_mode=false) ?(comment="") string_of_var logger logger_buffer logger_err x =
     if is_zero x
@@ -1687,12 +1689,12 @@ let convert_obs parameters compil network =
           in
           increment ~propagate_constants
             is_zero ~init_mode ~comment
-            (I.string_of_var_id ~compil ~init_mode logger) logger logger_buffer logger_err a expr
+            (string_of_var_id ~compil ~init_mode logger) logger logger_buffer logger_err a expr
             handler_expr
         | _ ->
           let () = Ode_loggers.associate ~propagate_constants
               ~init_mode
-              (I.string_of_var_id ~compil ~init_mode logger)
+              (string_of_var_id ~compil ~init_mode logger)
               logger logger_buffer logger_err
               (Ode_loggers_sig.Expr id') expr
               handler_expr
@@ -1708,7 +1710,7 @@ let convert_obs parameters compil network =
                       (Locality.dummy_annot (Alg_expr.ALG_VAR id'))
                       n) n in
                increment ~propagate_constants
-                 is_zero (I.string_of_var_id ~compil ~init_mode logger)
+                 is_zero (string_of_var_id ~compil ~init_mode logger)
                  logger logger_buffer logger_err
                  ~init_mode id expr
                  handler_init)
@@ -1722,7 +1724,7 @@ let convert_obs parameters compil network =
         else expr
       in
       Ode_loggers.associate ?comment ~propagate_constants
-        ~init_mode (I.string_of_var_id ~compil ~init_mode logger)
+        ~init_mode (string_of_var_id ~compil ~init_mode logger)
         logger logger_buffer logger_err
         (Ode_loggers_sig.Expr id) expr handler_expr
 
@@ -1775,9 +1777,9 @@ let convert_obs parameters compil network =
              Ode_loggers.associate
                ~propagate_constants
                ~init_mode:false
-               (I.string_of_var_id ~compil logger)
+               (string_of_var_id ~compil logger)
                logger logger_buffer logger_err
-               (Ode_loggers.variable_of_derived_variable
+               (Ode_loggers_sig.variable_of_derived_variable
                   (Ode_loggers_sig.Expr id) dt)
                expr handler_expr)
           (fst dep_var)
@@ -1792,9 +1794,9 @@ let convert_obs parameters compil network =
             Ode_loggers.associate
               ~propagate_constants
                ~init_mode:false
-               (I.string_of_var_id ~compil logger)
+               (string_of_var_id ~compil logger)
                logger logger_buffer logger_err
-               (Ode_loggers.variable_of_derived_variable
+               (Ode_loggers_sig.variable_of_derived_variable
                   (Ode_loggers_sig.Expr id) dt)
                expr handler_expr)
           (snd dep_var)
@@ -1818,9 +1820,9 @@ let convert_obs parameters compil network =
              Ode_loggers.associate
                ~propagate_constants
                ~init_mode:false
-               (I.string_of_var_id ~compil logger)
+               (string_of_var_id ~compil logger)
                logger logger_buffer logger_err
-               (Ode_loggers.variable_of_derived_variable
+               (Ode_loggers_sig.variable_of_derived_variable
                   var dt)
                 expr handler_expr)
           (fst dep_set)
@@ -1835,9 +1837,9 @@ let convert_obs parameters compil network =
              Ode_loggers.associate
                ~propagate_constants
                ~init_mode:false
-               (I.string_of_var_id ~compil logger)
+               (string_of_var_id ~compil logger)
                logger logger_buffer logger_err
-               (Ode_loggers.variable_of_derived_variable
+               (Ode_loggers_sig.variable_of_derived_variable
                   var dt)
                 expr handler_expr)
           (snd dep_set)
@@ -1879,7 +1881,7 @@ let convert_obs parameters compil network =
     let () = do_it (fun x ->
         Ode_loggers_sig.Stochiometric_coef (x,network.max_stoch_coef)) in
     let () =
-      match Loggers.get_encoding_format logger with
+      match Ode_loggers_sig.get_encoding_format logger with
       | Loggers.Octave | Loggers.Matlab ->
         Ode_loggers.print_newline logger
       | Loggers.Mathematica
@@ -1900,14 +1902,14 @@ let convert_obs parameters compil network =
 
   let declare_jacobian_rates_global logger network =
     declare_rates_global_gen
-      Ode_loggers.variable_of_derived_variable
+      Ode_loggers_sig.variable_of_derived_variable
       logger network
 
 
   let breakline = true
 
   let good_step ~step logger =
-    match Loggers.get_encoding_format logger
+    match Ode_loggers_sig.get_encoding_format logger
     with
     | Loggers.Mathematica | Loggers.Maple -> step = 2
     | Loggers.Matlab | Loggers.Octave
@@ -1932,7 +1934,8 @@ let convert_obs parameters compil network =
       ~compute_jacobian
       ~command_line ~command_line_quotes ?(data_file="data.csv")
       ?(init_t=0.)
-      ~max_t ?(plot_period=1.) logger logger_buffer logger_err compil network
+      ~max_t ?(plot_period=1.)
+      logger logger_buffer (logger_err:Loggers.t) compil network
       split =
     let is_zero = fresh_is_zero network in
     let nodevar = get_last_ode_var_id network in
@@ -1982,44 +1985,44 @@ let convert_obs parameters compil network =
             (*---------------------------------------------------------------*)
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger) logger
+                (string_of_var_id ~compil logger) logger
                 logger_buffer logger_err Ode_loggers_sig.Tinit (Alg_expr.float init_t)
                 handler_expr
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger) logger
+                (string_of_var_id ~compil logger) logger
                 logger_buffer logger_err Ode_loggers_sig.Tend
                 (Alg_expr.float max_t)
                 handler_expr
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err Ode_loggers_sig.InitialStep
                 (Alg_expr.float initial_step) handler_expr
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err Ode_loggers_sig.MaxStep
                 (Alg_expr.float max_step) handler_expr
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err Ode_loggers_sig.RelTol
                 (Alg_expr.float reltol) handler_expr
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err Ode_loggers_sig.AbsTol
                 (Alg_expr.float abstol) handler_expr
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err Ode_loggers_sig.Period_t_points
                 (Alg_expr.float plot_period) handler_expr
             in
@@ -2031,7 +2034,7 @@ let convert_obs parameters compil network =
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err
                 Ode_loggers_sig.N_ode_var
                 (Alg_expr.int nodevar)
@@ -2043,7 +2046,7 @@ let convert_obs parameters compil network =
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err
                 Ode_loggers_sig.N_max_stoc_coef
                 (Alg_expr.int network.max_stoch_coef)
@@ -2051,7 +2054,7 @@ let convert_obs parameters compil network =
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err
                 Ode_loggers_sig.N_var
                 (Alg_expr.int (get_last_var_id network))
@@ -2059,7 +2062,7 @@ let convert_obs parameters compil network =
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err
                 Ode_loggers_sig.N_obs
                 (Alg_expr.int network.n_obs)
@@ -2067,7 +2070,7 @@ let convert_obs parameters compil network =
             in
             let () =
               Ode_loggers.associate ~propagate_constants
-                (I.string_of_var_id ~compil logger)
+                (string_of_var_id ~compil logger)
                 logger logger_buffer logger_err
                 Ode_loggers_sig.N_rules
                 (Alg_expr.int network.n_rules)
@@ -2171,12 +2174,12 @@ let convert_obs parameters compil network =
             let () =
               if may_be_not_time_homogeneous
               then
-                match Loggers.get_encoding_format logger with
+                match Ode_loggers_sig.get_encoding_format logger with
                 | Loggers.SBML | Loggers.Octave | Loggers.Matlab |
                   Loggers.DOTNET ->
                   let () =
                     Ode_loggers.associate ~propagate_constants
-                      (I.string_of_var_id ~compil logger)
+                      (string_of_var_id ~compil logger)
                       logger logger_buffer logger_err
                       (Ode_loggers_sig.Init (get_last_ode_var_id network))
                       (Locality.dummy_annot
@@ -2185,7 +2188,7 @@ let convert_obs parameters compil network =
                       handler_init
                   in
                   Sbml_backend.print_parameters
-                    (fun x -> I.string_of_var_id x)
+                    (fun x -> string_of_var_id x)
                     logger logger_buffer logger_err
                     Ode_loggers_sig.Time_scale_factor Nbr.one;
                   Sbml_backend.line_dotnet logger logger_err
@@ -2215,13 +2218,13 @@ let convert_obs parameters compil network =
                         match coef with
                         | R rate ->
                           Ode_loggers.associate ~propagate_constants
-                            (I.string_of_var_id ~compil logger)
+                            (string_of_var_id ~compil logger)
                             ~comment:rule.comment logger logger_buffer
                             logger_err
                             (var_of_rate rule.rule_id_with_mode) rate handler_expr
                         | S (n,stoc) ->
                           Ode_loggers.associate ~propagate_constants
-                            (I.string_of_var_id ~compil logger)
+                            (string_of_var_id ~compil logger)
                             logger logger_buffer logger_err
                             (Ode_loggers_sig.Stochiometric_coef
                                ((let a,_,_ = rule.rule_id_with_mode in a) , n))
@@ -2249,7 +2252,7 @@ let convert_obs parameters compil network =
                                  | Some _ ->
                                    (* if not propagate_constants then*)
                                      Ode_loggers.associate ~propagate_constants
-                                       (I.string_of_var_id ~compil logger)
+                                       (string_of_var_id ~compil logger)
                                        ~comment:rule.comment logger
                                        logger_buffer
                                        logger_err
@@ -2264,7 +2267,7 @@ let convert_obs parameters compil network =
                                        logger logger_err
                                    in
                                    Ode_loggers.associate ~propagate_constants
-                                     (I.string_of_var_id ~compil  logger)
+                                     (string_of_var_id ~compil  logger)
                                      ~comment:rule.comment logger logger_buffer
                                      logger_err
                                      (var_of_rate rule.rule_id_with_mode)
@@ -2394,12 +2397,12 @@ let convert_obs parameters compil network =
                     match coef with
                     | R rate ->
                       Ode_loggers.associate ~propagate_constants
-                        (I.string_of_var_id ~compil logger)
+                        (string_of_var_id ~compil logger)
                         logger logger logger_err
                         (var_of_rule rule) rate (handler_expr network)
                     | S (n, stoc) ->
                       Ode_loggers.associate ~propagate_constants
-                        (I.string_of_var_id ~compil logger)
+                        (string_of_var_id ~compil logger)
                         logger logger logger_err
                         (Ode_loggers_sig.Stochiometric_coef
                            ((let a,_,_ = rule.rule_id_with_mode in a), n))
@@ -2494,7 +2497,7 @@ let convert_obs parameters compil network =
                                (I.print_token ~compil)
                                (fun fmt var_id ->
                                   Format.fprintf fmt "%s"
-                                    (I.string_of_var_id
+                                    (string_of_var_id
                                        ~compil logger (succ var_id)))
                           )
                           alg
@@ -2542,7 +2545,7 @@ let convert_obs parameters compil network =
                  in ()
                in
                (*----------------------------------------------*)
-               match Loggers.get_encoding_format logger with
+               match Ode_loggers_sig.get_encoding_format logger with
                | Loggers.Matlab | Loggers.Octave
                | Loggers.SBML
                | Loggers.Mathematica | Loggers.Maple ->
@@ -2577,7 +2580,7 @@ let convert_obs parameters compil network =
              Sbml_backend.dump_sbml_reaction
                ~propagate_constants
                Ode_loggers.print_alg_expr_few_parenthesis
-               (I.string_of_var_id ~compil logger)
+               (string_of_var_id ~compil logger)
                get_rule
                (fun a ->
                   let (a,_,_) = a.rule_id_with_mode in a)
@@ -2597,7 +2600,7 @@ let convert_obs parameters compil network =
            in
            let () =
              match
-               Loggers.formatter_of_logger logger
+               Ode_loggers_sig.formatter_of_logger logger
              with
              | None -> ()
              | Some fmt ->
@@ -2662,7 +2665,7 @@ let convert_obs parameters compil network =
         else
           let () =
             Ode_loggers.associate ~propagate_constants
-              (I.string_of_var_id ~compil logger) logger logger logger_err
+              (string_of_var_id ~compil logger) logger logger logger_err
               (Ode_loggers_sig.Deriv
                  (get_last_ode_var_id network))
               (Alg_expr.const Nbr.one) (handler_expr network)
@@ -2680,7 +2683,7 @@ let convert_obs parameters compil network =
     let () = Sbml_backend.close_box_dotnet logger logger_err label_close in
     let () =
       match
-        Loggers.formatter_of_logger logger
+        Ode_loggers_sig.formatter_of_logger logger
       with
       | None -> ()
       | Some fmt ->
@@ -2692,7 +2695,7 @@ let convert_obs parameters compil network =
 
   let export_jac ~propagate_constants logger logger_err compil network split =
     let nodevar = get_last_ode_var_id network in
-    match Loggers.get_encoding_format logger with
+    match Ode_loggers_sig.get_encoding_format logger with
     | Loggers.Matrix | Loggers.TXT
     | Loggers.Maple | Loggers.Mathematica
     | Loggers.TXT_Tabular | Loggers.XLS
@@ -2737,13 +2740,13 @@ let convert_obs parameters compil network =
                   match coef with
                   | R rate ->
                   Ode_loggers.associate ~propagate_constants
-                    (I.string_of_var_id ~compil logger)
+                    (string_of_var_id ~compil logger)
                     logger logger logger_err
                     (var_of_rule rule)
                     rate (handler_expr network)
                   | S (n,rate) ->
                     Ode_loggers.associate ~propagate_constants
-                      (I.string_of_var_id ~compil logger)
+                      (string_of_var_id ~compil logger)
                       logger logger logger_err
                       (var_of_stoch rule n)
                       rate (handler_expr network)
@@ -2871,7 +2874,7 @@ let convert_obs parameters compil network =
                                   (I.print_token ~compil)
                                   (fun fmt var_id ->
                                      Format.fprintf fmt "%s"
-                                       (I.string_of_var_id
+                                       (string_of_var_id
                                           ~compil logger (succ var_id)))
                               )
                               alg
@@ -3049,7 +3052,7 @@ let convert_obs parameters compil network =
                 | Dummy -> "dummy", "", None
                 | Token id ->
                   begin
-                    match Loggers.get_encoding_format logger with
+                    match Ode_loggers_sig.get_encoding_format logger with
                     | Loggers.SBML ->
                       "t"^(string_of_int k),
                       Format.asprintf "%a"
@@ -3075,7 +3078,7 @@ let convert_obs parameters compil network =
                            ) k, None
                   end
                 | Nembed _ | Noccurrences _ ->
-                  match Loggers.get_encoding_format logger with
+                  match Ode_loggers_sig.get_encoding_format logger with
                   | Loggers.SBML ->
                     "s"^(string_of_int k),
                     Format.asprintf "%a"
@@ -3154,7 +3157,7 @@ let convert_obs parameters compil network =
     let titles = I.get_obs_titles compil in
     let () =
       match
-        Loggers.get_encoding_format logger
+        Ode_loggers_sig.get_encoding_format logger
       with
       | Loggers.DOTNET
       | Loggers.Matlab | Loggers.Octave ->
@@ -3179,7 +3182,7 @@ let convert_obs parameters compil network =
       else
         let () =
           Sbml_backend.do_dotnet logger logger_err
-            (fun log _ -> Loggers.print_newline log)
+            (fun log _ -> Ode_loggers.print_newline log)
         in
         let () =
           Sbml_backend.open_box_dotnet logger logger_err
@@ -3187,9 +3190,9 @@ let convert_obs parameters compil network =
         in
         let () =
           Sbml_backend.do_dotnet logger logger_err
-            (fun log _ -> Loggers.print_newline log)
+            (fun log _ -> Ode_loggers.print_newline log)
         in
-        let () = Ode_loggers.print_newline logger_err in
+        let () = Loggers.print_newline logger_err in
         let titles =
           List.fold_left
             (fun titles (id,expr) ->
@@ -3198,7 +3201,7 @@ let convert_obs parameters compil network =
                  let () =
                    Ode_loggers.associate
                      ~comment ~propagate_constants
-                     (I.string_of_var_id ~compil logger)
+                     (string_of_var_id ~compil logger)
                      logger logger logger_err
                      (Ode_loggers_sig.Obs id) expr (handler_expr network)
                  in tail
@@ -3236,7 +3239,7 @@ let convert_obs parameters compil network =
       ?max_step:(max_step=0.02)
       ?abstol:(abstol=0.001)
       ?reltol:(reltol=0.001)
-      parameters logger logger_buffer logger_err compil network =
+      parameters logger logger_buffer (logger_err:Loggers.t) compil network =
     let network =
       if may_be_not_time_homogeneous network
       then
@@ -3254,17 +3257,20 @@ let convert_obs parameters compil network =
         ~propagate_constants
         ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
         ~max_t ~nonnegative ~initial_step ~max_step ~abstol ~reltol ?plot_period
-        logger logger_buffer logger_err compil network sorted_rules_and_decl
+        logger
+        logger_buffer
+        logger_err
+        compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -initial state @." in
     let () = export_init logger logger_err compil network in
     let () =
       match
-        Loggers.formatter_of_logger logger
+        Ode_loggers_sig.formatter_of_logger logger
       with
       | None -> ()
       | Some fmt ->
-        let () = Loggers.flush_buffer logger_buffer fmt in
+        let () = Ode_loggers_sig.flush_buffer logger_buffer fmt in
               Loggers.flush_and_clean logger_err fmt
     in
     let () = Format.printf "\t -ode system @." in
@@ -3382,6 +3388,6 @@ let _ = is_known_variable
 let _ = last_fresh_obs_id
 let _ = nembed_of_connected_component
 let _ = translate_token
-let _ = convert_one_obs 
+let _ = convert_one_obs
 
 end

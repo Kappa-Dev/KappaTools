@@ -65,35 +65,12 @@ val add_edge: t -> string -> string -> Graph_loggers_sig.options list -> unit
 val dump_json: t -> Yojson.Basic.json -> unit
 val get_edge_map: t -> Graph_loggers_sig.options list list Mods.String2Map.t
 val get_nodes: t -> (string * Graph_loggers_sig.options list) list
-val get_expr:
-  t -> Ode_loggers_sig.variable ->
-  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id)
-    Alg_expr.e Locality.annot option
-val set_expr:
-  t -> Ode_loggers_sig.variable ->
-  (
-    Ode_loggers_sig.ode_var_id,
-    Ode_loggers_sig.ode_var_id)
-    Alg_expr.e Locality.annot -> unit
-val is_const:
-  t -> Ode_loggers_sig.variable -> bool
 
 val of_json: Yojson.Basic.json -> string list
 val to_json: t -> Yojson.Basic.json
-val get_fresh_obs_id: t -> int
-val get_fresh_reaction_id: t -> int
-val get_fresh_meta_id: t -> int
-val set_id_of_global_parameter: t -> Ode_loggers_sig.variable -> string -> unit
-val get_id_of_global_parameter: t -> Ode_loggers_sig.variable -> string
-val is_dangerous_ode_variable: t -> Ode_loggers_sig.variable -> bool
-val flag_dangerous: t -> Ode_loggers_sig.variable -> string -> unit
-val has_forbidden_char: t -> string -> bool
-val allocate_fresh_name: t -> string -> string -> string
-val allocate: t -> string -> unit
 
 val print_binding_type:
   t -> ?binding_type_symbol:string -> agent_name:string ->
   site_name:string -> unit
 
-val set_ode : mode:encoding -> string -> unit
-val get_ode : mode:encoding -> string
+val get_ref: int ref -> int
