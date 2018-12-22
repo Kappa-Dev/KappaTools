@@ -74,3 +74,5 @@ val find_available_name :
   string -> facultative:string -> ext:string -> string
 
 val default_message_delimter : char
+
+val get_ref: int ref -> int 

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Dec 04 2018>
+  * Last modification: Time-stamp: <Dec 22 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -75,7 +75,7 @@ type separating_transitions = Public_data.separating_transitions
 
 type interface =
   (string option (* internal state *) *
-   Ckappa_backend.Ckappa_backend.binding_state option (*binding state*) *
+   Site_graphs.KaSa_site_graph.binding_state option (*binding state*) *
    (int option * int option) option (*counter state*))
     Wrapped_modules.LoggedStringMap.t
 
@@ -93,7 +93,7 @@ let interface_to_json =
               ) internal_opt
          )
          (JsonUtil.of_option
-            Ckappa_backend.Ckappa_backend.binding_state_to_json)
+            Site_graphs.KaSa_site_graph.binding_state_to_json)
          (fun counter_opt ->
             JsonUtil.of_option
               (JsonUtil.of_pair
@@ -121,7 +121,7 @@ let interface_of_json
 
            )
            (JsonUtil.to_option
-              Ckappa_backend.Ckappa_backend.binding_state_of_json)
+              Site_graphs.KaSa_site_graph.binding_state_of_json)
            (JsonUtil.to_option
               (JsonUtil.to_pair
                  ~lab1:Public_data.inf
@@ -176,7 +176,7 @@ type flow =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
 
 type internal_constraints_list =
-  Ckappa_backend.Ckappa_backend.t Public_data.poly_constraints_list
+  Site_graphs.KaSa_site_graph.t Public_data.poly_constraints_list
 
 (*******************************************************************)
 type symmetric_sites = Symmetries.symmetries option

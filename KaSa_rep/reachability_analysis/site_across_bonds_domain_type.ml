@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 29 2017>
+   * Last modification: Time-stamp: <Dec 22 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -317,17 +317,17 @@ let print_site_across_domain
       with
       | Remanent_parameters_sig.Kappa
       | Remanent_parameters_sig.Raw ->
-        let pattern = Ckappa_backend.Ckappa_backend.empty in
+        let pattern = Site_graphs.KaSa_site_graph.empty in
         let error, agent_id1, pattern =
-          Ckappa_backend.Ckappa_backend.add_agent
+          Site_graphs.KaSa_site_graph.add_agent
             parameters error kappa_handler agent_type1 pattern
         in
         let error, agent_id2, pattern =
-          Ckappa_backend.Ckappa_backend.add_agent
+          Site_graphs.KaSa_site_graph.add_agent
             parameters error kappa_handler agent_type2 pattern
         in
         let error, pattern =
-          Ckappa_backend.Ckappa_backend.add_bond
+          Site_graphs.KaSa_site_graph.add_bond
             parameters error kappa_handler agent_id1 site_type1 agent_id2 site_type2 pattern
         in
         let error =
@@ -335,7 +335,7 @@ let print_site_across_domain
           if final_result
           then
             let error =
-              Ckappa_backend.Ckappa_backend.print
+              Site_graphs.KaSa_site_graph.print
                 (Remanent_parameters.get_logger parameters) parameters error
                 pattern
             in
@@ -379,17 +379,17 @@ let print_site_across_domain
                           if final_result then "\t\t  " else "\t\t")
                      in
                      let error, pattern =
-                       Ckappa_backend.Ckappa_backend.add_state
+                       Site_graphs.KaSa_site_graph.add_state
                          parameters error kappa_handler
                          agent_id1 site_type1' state1 pattern
                      in
                      let error, pattern =
-                       Ckappa_backend.Ckappa_backend.add_state
+                       Site_graphs.KaSa_site_graph.add_state
                          parameters error kappa_handler
                          agent_id2 site_type2' state2 pattern
                      in
                      let error =
-                       Ckappa_backend.Ckappa_backend.print
+                       Site_graphs.KaSa_site_graph.print
                          (Remanent_parameters.get_logger parameters) parameters error
                          pattern
                      in

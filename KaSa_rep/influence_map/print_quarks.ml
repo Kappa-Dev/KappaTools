@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 8th 2011.
- * Last modification: Time-stamp: <Feb 22 2018>
+ * Last modification: Time-stamp: <Dec 30 2018>
  * *
  * Pretty printing of influence map
  *
@@ -273,11 +273,17 @@ let print_wake_up_map parameters error handler compilation print_rule print_var 
   let parameters = Remanent_parameters.update_prefix parameters "Wake_up_map:" in
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var." in
   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-  print_maps parameters (Remanent_parameters.get_logger parameters) error handler compilation print_rule print_var print_label_rule print_label_var print_labels (Remanent_parameters.get_prefix parameters) suffix map
+  print_maps parameters
+    (Graph_loggers_sig.extend_logger
+       (Remanent_parameters.get_logger parameters))
+    error handler compilation print_rule print_var print_label_rule print_label_var print_labels (Remanent_parameters.get_prefix parameters) suffix map
 
 let print_inhibition_map parameters error handler compilation print_rule print_var print_label_rule print_label_var print_labels suffix  map =
   let parameters = Remanent_parameters.update_prefix parameters "Inhibition_map:" in
-  print_maps parameters (Remanent_parameters.get_logger parameters) error handler compilation print_rule print_var print_label_rule print_label_var print_labels (Remanent_parameters.get_prefix parameters) suffix map
+  print_maps parameters
+  (Graph_loggers_sig.extend_logger
+     (Remanent_parameters.get_logger parameters))
+  error handler compilation print_rule print_var print_label_rule print_label_var print_labels (Remanent_parameters.get_prefix parameters) suffix map
 
 let dot_of_influence_map ?logger parameters error handler compilation (nodes,wake_up_map,inhibition_map) =
   let loggers = logger in
@@ -287,7 +293,10 @@ let dot_of_influence_map ?logger parameters error handler compilation (nodes,wak
     | None -> Remanent_parameters.open_influence_map_file parameters
     | Some loggers -> Remanent_parameters.set_logger parameters loggers
   in
-  let logger = Remanent_parameters.get_logger parameters_dot in
+  let logger =
+    Graph_loggers_sig.extend_logger
+      (Remanent_parameters.get_logger parameters_dot)
+  in
   let () =
     Graph_loggers.print_graph_preamble
       logger
@@ -335,7 +344,7 @@ let dot_of_influence_map ?logger parameters error handler compilation (nodes,wak
           let () =
             if Ckappa_sig.int_of_rule_id k = nrules
             then
-              Loggers.print_newline logger
+              Loggers.print_newline (Graph_loggers_sig.lift logger)
           in
           let () =
             if bool then
@@ -358,14 +367,6 @@ let dot_of_influence_map ?logger parameters error handler compilation (nodes,wak
         wake_up_map
     then error
     else
-      (*let _ =
-        Loggers.fprintf
-          (Remanent_parameters.get_logger parameters_dot)
-          "edge [color=%s, arrowhead=%s];"
-          (Remanent_parameters.get_wake_up_color parameters_dot)
-          (Remanent_parameters.get_wake_up_arrow parameters_dot)
-        in*)
-      (*      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in*)
       let error =
         print_maps
           ~directives:[Graph_loggers_sig.Color (Remanent_parameters.get_wake_up_color parameters_dot);

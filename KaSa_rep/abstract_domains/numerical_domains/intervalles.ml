@@ -1,5 +1,4 @@
 open Fraction;;
-open Header;;
 
 type intervalle = {inf:ffraction;sup:ffraction} ;;
 
@@ -60,6 +59,7 @@ let wide_union_convexe t1 t2 =
     done;
     ts;;
 
+let hashnumber =  1 
 let wide_en_place t1 t2 =
   let n=Array.length t1 in
   let l=Working_list_imperative.make hashnumber in

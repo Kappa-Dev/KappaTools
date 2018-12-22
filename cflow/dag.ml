@@ -106,7 +106,8 @@ let _print_story_info logger _parameter json =
   ()
 
 let print_graph logger parameter _handler error id story_info graph =
-  let () = Loggers.refresh_id logger in
+  let logger = Graph_loggers_sig.extend_logger logger in
+  let () = Graph_loggers_sig.refresh_id logger in
   let () = Graph_loggers.print_graph_preamble logger "story" in
   let () =
     A.iteri
@@ -172,7 +173,7 @@ let print_graph logger parameter _handler error id story_info graph =
       Story_json.story =
         Story_json.New
           {
-            Story_json.graph = Loggers.graph_of_logger logger ;
+            Story_json.graph = Graph_loggers_sig.graph_of_logger logger ;
             Story_json.id = id
           }}
   in

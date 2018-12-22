@@ -180,19 +180,19 @@ let print_parallel_constraint
   let (agent,site,site',_,_),(agent'',site'',site''',_,_) =
     tuple
   in
-  let t_precondition = Ckappa_backend.Ckappa_backend.empty in
+  let t_precondition = Site_graphs.KaSa_site_graph.empty in
   let error, agent_id, t_precondition =
-    Ckappa_backend.Ckappa_backend.add_agent
+    Site_graphs.KaSa_site_graph.add_agent
       parameters error kappa_handler
       agent t_precondition
   in
   let error, t_precondition =
-    Ckappa_backend.Ckappa_backend.add_bond_type
+    Site_graphs.KaSa_site_graph.add_bond_type
       parameters error kappa_handler
       agent_id site agent'' site'' t_precondition
   in
   let error, t_precondition =
-    Ckappa_backend.Ckappa_backend.add_bond_type
+    Site_graphs.KaSa_site_graph.add_bond_type
       parameters error kappa_handler
       agent_id site' agent'' site''' t_precondition
   in
@@ -200,7 +200,7 @@ let print_parallel_constraint
     if agent = agent'' && site<>site'' && site'<>site'''
     then
       let error, t_same_self =
-        Ckappa_backend.Ckappa_backend.add_bond
+        Site_graphs.KaSa_site_graph.add_bond
           parameters error kappa_handler
           agent_id site agent_id site'' t_precondition
       in
@@ -209,7 +209,7 @@ let print_parallel_constraint
       error, None
   in
   let error, agent_id'', t_same =
-    Ckappa_backend.Ckappa_backend.add_agent
+    Site_graphs.KaSa_site_graph.add_agent
       parameters error kappa_handler
       agent'' t_precondition
   in
@@ -218,12 +218,12 @@ let print_parallel_constraint
        site <> site'' && site <> site' && site' <> site''
     then
       let error, t_distinct_self1 =
-        Ckappa_backend.Ckappa_backend.add_bond
+        Site_graphs.KaSa_site_graph.add_bond
           parameters error kappa_handler
           agent_id site' agent_id'' site'''  t_same
       in
       let error, t_distinct_self1 =
-        Ckappa_backend.Ckappa_backend.add_bond
+        Site_graphs.KaSa_site_graph.add_bond
           parameters error kappa_handler
           agent_id site agent_id site'' t_distinct_self1
       in
@@ -232,7 +232,7 @@ let print_parallel_constraint
       error, None
   in
   let error, t_same =
-    Ckappa_backend.Ckappa_backend.add_bond
+    Site_graphs.KaSa_site_graph.add_bond
       parameters error kappa_handler
       agent_id site agent_id'' site'' t_same
   in
@@ -241,7 +241,7 @@ let print_parallel_constraint
        site' <> site''' && site' <> site && site<>site'''
     then
       let error, t_distinct_self2 =
-        Ckappa_backend.Ckappa_backend.add_bond
+        Site_graphs.KaSa_site_graph.add_bond
           parameters error kappa_handler
           agent_id site' agent_id site''' t_same
       in error, Some t_distinct_self2
@@ -249,17 +249,17 @@ let print_parallel_constraint
       error, None
   in
   let error, agent_id''', t_distinct =
-    Ckappa_backend.Ckappa_backend.add_agent
+    Site_graphs.KaSa_site_graph.add_agent
       parameters error kappa_handler
       agent'' t_same
   in
   let error, t_distinct =
-    Ckappa_backend.Ckappa_backend.add_bond
+    Site_graphs.KaSa_site_graph.add_bond
       parameters error kappa_handler
       agent_id site' agent_id''' site''' t_distinct
   in
   let error, t_same =
-    Ckappa_backend.Ckappa_backend.add_bond
+    Site_graphs.KaSa_site_graph.add_bond
       parameters error kappa_handler
       agent_id site' agent_id'' site''' t_same
   in
@@ -288,7 +288,7 @@ let print_parallel_constraint
                 then
                   (*print hyp*)
                   let error =
-                    Ckappa_backend.Ckappa_backend.print
+                    Site_graphs.KaSa_site_graph.print
                       (Remanent_parameters.get_logger parameters) parameters
                       error
                       t_precondition
@@ -305,7 +305,7 @@ let print_parallel_constraint
                   in error
               in
               (*print the list of refinement*)
-              let error = Ckappa_backend.Ckappa_backend.print_list
+              let error = Site_graphs.KaSa_site_graph.print_list
                   (Remanent_parameters.get_logger parameters) parameters error
                   kappa_handler
                   list_same
@@ -332,7 +332,7 @@ let print_parallel_constraint
                   "%s" prefix
               in
               let error =
-                Ckappa_backend.Ckappa_backend.print
+                Site_graphs.KaSa_site_graph.print
                   (Remanent_parameters.get_logger parameters) parameters error
                   t_same
               in
@@ -352,7 +352,7 @@ let print_parallel_constraint
               let error =
                 if verbose then
                   let error =
-                    Ckappa_backend.Ckappa_backend.print
+                    Site_graphs.KaSa_site_graph.print
                       (Remanent_parameters.get_logger parameters) parameters
                       error
                       t_precondition
@@ -369,7 +369,7 @@ let print_parallel_constraint
                   in error
               in
               let error =
-                Ckappa_backend.Ckappa_backend.print_list
+                Site_graphs.KaSa_site_graph.print_list
                   (Remanent_parameters.get_logger parameters) parameters error
                   kappa_handler
                   list_distinct
@@ -393,7 +393,7 @@ let print_parallel_constraint
                 in error
               else
                 let error =
-                  Ckappa_backend.Ckappa_backend.print
+                  Site_graphs.KaSa_site_graph.print
                     (Remanent_parameters.get_logger parameters) parameters
                     error
                     t_distinct
@@ -425,7 +425,7 @@ let print_parallel_constraint
               in error
             else
               let error =
-                Ckappa_backend.Ckappa_backend.print
+                Site_graphs.KaSa_site_graph.print
                   (Remanent_parameters.get_logger parameters) parameters error
                   t_same
               in
@@ -434,7 +434,7 @@ let print_parallel_constraint
                   (Remanent_parameters.get_logger parameters)
               in
               let error =
-                Ckappa_backend.Ckappa_backend.print
+                Site_graphs.KaSa_site_graph.print
                   (Remanent_parameters.get_logger parameters) parameters error
                   t_distinct
               in

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Apr 11 2017>
+  * Last modification: Time-stamp: <Dec 30 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -18,6 +18,8 @@ module A =
         Remanent_parameters_sig.site_across_bonds = true;
         Remanent_parameters_sig.parallel_bonds = true;
         Remanent_parameters_sig.dynamic_contact_map = true;
+        Remanent_parameters_sig.counters = true;
+        Remanent_parameters_sig.counter_domain = Remanent_parameters_sig.Mi; 
       } ())
 include Export.Export(A)
 

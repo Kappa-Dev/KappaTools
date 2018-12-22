@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 04 2018>
+  * Last modification: Time-stamp: <Dec 22 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1470,16 +1470,16 @@ struct
              let (agent, site, site', _, _),
                  (agent'', site'', site''', _, _) = tuple
              in
-             let t_precondition = Ckappa_backend.Ckappa_backend.empty in
+             let t_precondition = Site_graphs.KaSa_site_graph.empty in
              let error, agent_id, t_precondition =
-               Ckappa_backend.Ckappa_backend.add_agent
+               Site_graphs.KaSa_site_graph.add_agent
                  parameters error kappa_handler
                  agent
                  t_precondition
              in
              (*first pair*)
              let error, t_precondition =
-               Ckappa_backend.Ckappa_backend.add_bond_type
+               Site_graphs.KaSa_site_graph.add_bond_type
                  parameters error kappa_handler
                  agent_id
                  site
@@ -1489,7 +1489,7 @@ struct
              in
              (*second pair*)
              let error, t_precondition =
-               Ckappa_backend.Ckappa_backend.add_bond_type
+               Site_graphs.KaSa_site_graph.add_bond_type
                  parameters error kappa_handler
                  agent_id
                  site'
@@ -1502,7 +1502,7 @@ struct
                if agent = agent'' && site <> site'' && site' <> site'''
                then
                  let error, t_same_self =
-                   Ckappa_backend.Ckappa_backend.add_bond
+                   Site_graphs.KaSa_site_graph.add_bond
                      parameters error kappa_handler
                      agent_id
                      site
@@ -1516,7 +1516,7 @@ struct
              in
              (*--------------------------------------------------------*)
              let error, agent_id'', t_same =
-               Ckappa_backend.Ckappa_backend.add_agent
+               Site_graphs.KaSa_site_graph.add_agent
                  parameters error kappa_handler
                  agent''
                  t_precondition
@@ -1527,7 +1527,7 @@ struct
                   site <> site' && site' <> site''
                then
                  let error, t_distinct_self1 =
-                   Ckappa_backend.Ckappa_backend.add_bond
+                   Site_graphs.KaSa_site_graph.add_bond
                      parameters error kappa_handler
                      agent_id
                      site'
@@ -1536,7 +1536,7 @@ struct
                      t_same
                  in
                  let error, t_distinct_self1 =
-                   Ckappa_backend.Ckappa_backend.add_bond
+                   Site_graphs.KaSa_site_graph.add_bond
                      parameters error kappa_handler
                      agent_id
                      site
@@ -1549,7 +1549,7 @@ struct
              in
              (*--------------------------------------------------------*)
              let error, t_same =
-               Ckappa_backend.Ckappa_backend.add_bond
+               Site_graphs.KaSa_site_graph.add_bond
                  parameters error kappa_handler
                  agent_id
                  site
@@ -1563,7 +1563,7 @@ struct
                   site' <> site''' && site' <> site && site <> site'''
                then
                  let error, t_distinct_self2 =
-                   Ckappa_backend.Ckappa_backend.add_bond
+                   Site_graphs.KaSa_site_graph.add_bond
                      parameters error kappa_handler
                      agent_id
                      site'
@@ -1576,13 +1576,13 @@ struct
              in
              (*--------------------------------------------------------*)
              let error, agent_id''', t_distinct =
-               Ckappa_backend.Ckappa_backend.add_agent
+               Site_graphs.KaSa_site_graph.add_agent
                  parameters error kappa_handler
                  agent''
                  t_same
              in
              let error, t_distinct =
-               Ckappa_backend.Ckappa_backend.add_bond
+               Site_graphs.KaSa_site_graph.add_bond
                  parameters error kappa_handler
                  agent_id
                  site'
@@ -1591,7 +1591,7 @@ struct
                  t_distinct
              in
              let error, t_same =
-               Ckappa_backend.Ckappa_backend.add_bond
+               Site_graphs.KaSa_site_graph.add_bond
                  parameters error kappa_handler
                  agent_id
                  site'
@@ -1621,7 +1621,7 @@ struct
                      begin
                        (*hyp*)
                        (*let string_version =
-                         Ckappa_backend.Ckappa_backend.get_string_version
+                         Site_graphs.KaSa_site_graph.get_string_version
                            t_precondition
                        in
                        let error, site_graph =
@@ -1652,7 +1652,7 @@ struct
                      end
                    | Remanent_parameters_sig.Natural_language ->
                      (*let string_version =
-                       Ckappa_backend.Ckappa_backend.get_string_version
+                       Site_graphs.KaSa_site_graph.get_string_version
                          t_same
                      in
                      let error, site_graph =
@@ -1686,7 +1686,7 @@ struct
                    | Remanent_parameters_sig.Kappa
                    | Remanent_parameters_sig.Raw ->
                      (*let string_version =
-                       Ckappa_backend.Ckappa_backend.get_string_version
+                       Site_graphs.KaSa_site_graph.get_string_version
                          t_precondition
                      in
                      let error, site_graph =
@@ -1712,7 +1712,7 @@ struct
                      error, current_list
                    | Remanent_parameters_sig.Natural_language ->
                      (*let string_version =
-                       Ckappa_backend.Ckappa_backend.get_string_version
+                       Site_graphs.KaSa_site_graph.get_string_version
                          t_distinct
                      in
                      let error, site_graph =
@@ -1744,7 +1744,7 @@ struct
                    error, current_list
                  | Remanent_parameters_sig.Natural_language ->
                    (*let string_version =
-                     Ckappa_backend.Ckappa_backend.get_string_version
+                     Site_graphs.KaSa_site_graph.get_string_version
                        t_same
                    in
                    let error, site_graph =
@@ -1769,7 +1769,7 @@ struct
                    let current_list = lemma_internal :: current_list in
                    (*----------------------------------------------*)
                    (*let string_version =
-                     Ckappa_backend.Ckappa_backend.get_string_version
+                     Site_graphs.KaSa_site_graph.get_string_version
                        t_distinct
                    in
                    let error, site_graph =
@@ -1853,7 +1853,7 @@ struct
                 let hyp = Remanent_state.get_hyp lem in
                 let refine = Remanent_state.get_refinement lem in
                 let string_version =
-                  Ckappa_backend.Ckappa_backend.get_string_version
+                  Site_graphs.KaSa_site_graph.get_string_version
                     hyp
                 in
                 let error, site_graph =

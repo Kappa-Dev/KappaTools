@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 8th of March
-   * Last modification: Time-stamp: <Dec 31 2016>
+   * Last modification: Time-stamp: <Dec 20 2018>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -35,7 +35,7 @@ let print_flag parameters bool =
   then Loggers.fprintf (Remanent_parameters.get_logger parameters) "Yes"
   else Loggers.fprintf (Remanent_parameters.get_logger parameters) "No"
 
-let build_already_compressed_cell (allocate: ('a,'b,'c,'d,'e) Sanity_test_sig.f)
+let build_already_compressed_cell allocate
     error handler skeleton cell =
   allocate
     error
@@ -45,7 +45,7 @@ let build_already_compressed_cell (allocate: ('a,'b,'c,'d,'e) Sanity_test_sig.f)
     (fun key -> {Mvbdu_sig.id=key; Mvbdu_sig.value=cell})
     handler
 
-let compress_node (allocate:('a,'b,'c,'d,'e) Sanity_test_sig.f) error handler cell =
+let compress_node allocate error handler cell =
   match cell with
     | Mvbdu_sig.Leaf _a as x ->
       build_already_compressed_cell

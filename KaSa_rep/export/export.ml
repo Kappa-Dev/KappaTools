@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Dec 04 2018>
+  * Last modification: Time-stamp: <Dec 22 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -2053,7 +2053,7 @@ let compute_constraints_list _show_title state =
               let hyp = Public_data.get_hyp lem in
               let refine = Public_data.get_refinement lem in
               let string_version =
-                Ckappa_backend.Ckappa_backend.get_string_version
+                Site_graphs.KaSa_site_graph.get_string_version
                   hyp
               in
               let error, site_graph =

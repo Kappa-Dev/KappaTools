@@ -447,7 +447,7 @@ let allocate t name =
 let is_dangerous_ode_variable t var =
   VarSet.mem var (!(t.dangerous_parameters))
 
-let get_fresh_meta_id logger = Loggers.get_ref logger.fresh_meta_id
-let get_fresh_obs_id logger = Loggers.get_ref logger.fresh_obs_id
+let get_fresh_meta_id logger = Tools.get_ref logger.fresh_meta_id
+let get_fresh_obs_id logger = Tools.get_ref logger.fresh_obs_id
 
 let lift t = t.logger

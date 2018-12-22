@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 04 2018>
+   * Last modification: Time-stamp: <Dec 22 2018>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -4116,7 +4116,7 @@ let get_list_of_sites_correspondence_map parameters error agent_type cv_id
       if sort then
         Tools_kasa.sort_list
           (fun parameters error lemma ->
-                Ckappa_backend.Ckappa_backend.to_string
+                Site_graphs.KaSa_site_graph.to_string
                   parameters error lemma.Public_data.hyp)
           parameters
           error

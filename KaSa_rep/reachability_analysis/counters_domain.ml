@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 04 2018>
+  * Last modification: Time-stamp: <Dec 22 2018>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1140,9 +1140,9 @@ module Functor =
                error, current_list
              | Some ((Fraction.Frac _ | Fraction.Minfinity) as inf,
                      ((Fraction.Frac _ | Fraction.Infinity) as sup)) ->
-               let t = Ckappa_backend.Ckappa_backend.empty in
+               let t = Site_graphs.KaSa_site_graph.empty in
                let error', agent_id, t =
-                 Ckappa_backend.Ckappa_backend.add_agent
+                 Site_graphs.KaSa_site_graph.add_agent
                    parameters error kappa_handler agent_type t
                in
                let error =
@@ -1167,7 +1167,7 @@ module Functor =
                    error, Some (Fraction.cell_int sup)
                in
                let error', t' =
-                 Ckappa_backend.Ckappa_backend.add_counter_range
+                 Site_graphs.KaSa_site_graph.add_counter_range
                    parameters error kappa_handler agent_id site ?inf ?sup t
                in
                let error =

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 17th of November
-   * Last modification: Time-stamp: <Apr 15 2018>
+   * Last modification: Time-stamp: <Dec 22 2018>
    *
    * Site graph
    *
@@ -38,7 +38,7 @@ let print_internal_pattern_aux ?logger parameters error _kappa_handler
       let hyp = Public_data.get_hyp lemma in
       let refinement = Public_data.get_refinement lemma in
       let error =
-        Ckappa_backend.Ckappa_backend.print
+        Site_graphs.KaSa_site_graph.print
           logger parameters error
           hyp
       in
@@ -47,7 +47,7 @@ let print_internal_pattern_aux ?logger parameters error _kappa_handler
         match refinement with
         | [] -> error, false
         | [hyp] ->
-          Ckappa_backend.Ckappa_backend.print logger parameters error
+          Site_graphs.KaSa_site_graph.print logger parameters error
             hyp, false
         | _::_ as l ->
           List.fold_left (fun (error, bool) hyp ->
@@ -61,7 +61,7 @@ let print_internal_pattern_aux ?logger parameters error _kappa_handler
                   (if bool  then "\t\tv " else "\t\t  ")
               in
               let error =
-                Ckappa_backend.Ckappa_backend.print logger parameters error
+                Site_graphs.KaSa_site_graph.print logger parameters error
                   hyp
               in
               error, true
@@ -102,7 +102,7 @@ let print_for_list logger parameter error t =
   let error, _ =
     List.fold_left (fun (error, bool) (agent_string, site_map) ->
         let error =
-          Ckappa_backend.Ckappa_backend.print_agent logger parameter error
+          Site_graphs.KaSa_site_graph.print_agent logger parameter error
             agent_string site_map bool
         in
         error, true
@@ -196,7 +196,7 @@ let site_graph_to_list error string_version =
 
 let site_graph_list_to_list error list =
   List.fold_left (fun (error, current_list) t ->
-      let string_version = Ckappa_backend.Ckappa_backend.get_string_version t in
+      let string_version = Site_graphs.KaSa_site_graph.get_string_version t in
       let error, site_graph = site_graph_to_list error string_version in
       error, site_graph :: current_list
     ) (error, []) list
@@ -210,7 +210,7 @@ let _pair_list_to_list parameters error kappa_handler pattern
           siteone == Ckappa_sig.fst_site
           && sitetwo == Ckappa_sig.snd_site ->
         let error, pattern =
-          Ckappa_backend.Ckappa_backend.add_state
+          Site_graphs.KaSa_site_graph.add_state
             parameters error kappa_handler
             agent_id1
             site_type1'
@@ -218,7 +218,7 @@ let _pair_list_to_list parameters error kappa_handler pattern
             pattern
         in
         let error, pattern =
-          Ckappa_backend.Ckappa_backend.add_state
+          Site_graphs.KaSa_site_graph.add_state
             parameters error kappa_handler
             agent_id2
             site_type2'
@@ -226,7 +226,7 @@ let _pair_list_to_list parameters error kappa_handler pattern
             pattern
         in
         let string_version =
-          Ckappa_backend.Ckappa_backend.get_string_version
+          Site_graphs.KaSa_site_graph.get_string_version
             pattern
         in
         let error, site_graph = site_graph_to_list error string_version in
@@ -242,7 +242,7 @@ let internal_pair_list_to_list parameters error kappa_handler pattern
           siteone == Ckappa_sig.fst_site
           && sitetwo == Ckappa_sig.snd_site ->
         let error, pattern =
-          Ckappa_backend.Ckappa_backend.add_state
+          Site_graphs.KaSa_site_graph.add_state
             parameters error kappa_handler
             agent_id1
             site_type1'
@@ -250,7 +250,7 @@ let internal_pair_list_to_list parameters error kappa_handler pattern
             pattern
         in
         let error, pattern =
-          Ckappa_backend.Ckappa_backend.add_state
+          Site_graphs.KaSa_site_graph.add_state
             parameters error kappa_handler
             agent_id2
             site_type2'

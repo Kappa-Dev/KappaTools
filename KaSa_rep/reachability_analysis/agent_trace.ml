@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Nov 05 2018>
+  * Last modification: Time-stamp: <Dec 30 2018>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1655,6 +1655,9 @@ let agent_trace
                           Loggers.open_logger_from_channel fic
                             ~mode:format
                         in
+                        let logger =
+                          Graph_loggers_sig.extend_logger logger
+                        in 
                         let error =
                           print
                             logger parameters compil

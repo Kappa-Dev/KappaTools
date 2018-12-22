@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Dec 04 2018>
+   * Last modification: Time-stamp: <Dec 22 2018>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1834,9 +1834,9 @@ struct
                match Remanent_parameters.get_backend_mode parameters with
                | Remanent_parameters_sig.Kappa
                | Remanent_parameters_sig.Raw ->
-                 let pattern = Ckappa_backend.Ckappa_backend.empty in
+                 let pattern = Site_graphs.KaSa_site_graph.empty in
                  let error, agent_id1, pattern =
-                   Ckappa_backend.Ckappa_backend.add_agent
+                   Site_graphs.KaSa_site_graph.add_agent
                      parameters
                      error
                      kappa_handler
@@ -1844,13 +1844,13 @@ struct
                      pattern
                  in
                  let error, agent_id2, pattern =
-                   Ckappa_backend.Ckappa_backend.add_agent
+                   Site_graphs.KaSa_site_graph.add_agent
                      parameters error kappa_handler
                      agent_type2
                      pattern
                  in
                  let error, pattern =
-                   Ckappa_backend.Ckappa_backend.add_bond
+                   Site_graphs.KaSa_site_graph.add_bond
                      parameters error kappa_handler
                      agent_id1
                      site_type1

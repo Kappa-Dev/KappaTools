@@ -34,7 +34,6 @@ module FormatMap:FormatMap
 
 type t
 
-val refresh_id: t -> unit
 val get_encoding_format: t -> encoding
 val fprintf: t -> ('a, Format.formatter, unit) format -> 'a
 val print_newline: t -> unit
@@ -57,20 +56,11 @@ val formatter_of_logger: t -> Format.formatter option
 val channel_of_logger: t -> out_channel option
 val flush_buffer: t -> Format.formatter -> unit
 val flush_and_clean: t -> Format.formatter -> unit
-val int_of_string_id: t -> string -> int
-
-val graph_of_logger: t -> Graph_loggers_sig.graph
-val add_node: t -> string -> Graph_loggers_sig.options list -> unit
-val add_edge: t -> string -> string -> Graph_loggers_sig.options list -> unit
-val dump_json: t -> Yojson.Basic.json -> unit
-val get_edge_map: t -> Graph_loggers_sig.options list list Mods.String2Map.t
-val get_nodes: t -> (string * Graph_loggers_sig.options list) list
-
-val of_json: Yojson.Basic.json -> string list
-val to_json: t -> Yojson.Basic.json
 
 val print_binding_type:
   t -> ?binding_type_symbol:string -> agent_name:string ->
   site_name:string -> unit
 
-val get_ref: int ref -> int
+val dump_json: t -> Yojson.Basic.json -> unit
+val to_json: t -> Yojson.Basic.json
+val of_json: Yojson.Basic.json -> string list

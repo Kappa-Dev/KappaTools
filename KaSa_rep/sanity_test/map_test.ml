@@ -27,27 +27,27 @@ let map_test remanent parameters =
   let error4,_ = LIntS.Map.add parameters error3 2 9 f4' in
   let error5,f5' = LIntS.Map.overwrite parameters error3 10 12 f4' in
   let f = List.fold_left
-	  (fun map (a,b) -> IntS.Map.add a b map)
-	  IntS.Map.empty
-	  [1,[2;3];2,[3;4];5,[6;7];8,[12;13]]
+      (fun map (a,b) -> IntS.Map.add a b map)
+      IntS.Map.empty
+      [1,[2;3];2,[3;4];5,[6;7];8,[12;13]]
   in
   let g = P.proj_map proj [] (List.append) f in
   let g' = CharS.Map.map List.rev (P.proj_map proj  [] (fun x y -> List.append (List.rev y) x) f) in
   let error6,h = LP.monadic_proj_map
-		   monaproj
-		   parameters
-		   error5  []
-		   (fun _ a l l' -> a,List.append l l')
-		   f
+      monaproj
+      parameters
+      error5  []
+      (fun _ a l l' -> a,List.append l l')
+      f
   in
   let error7,h' =  LP.monadic_proj_map monaproj parameters error6 [] (fun _ a x y -> a,List.append (List.rev y) x) f in
   let h' =  LCharS.Map.map List.rev h' in
   let error8,i = LP.proj_map
-		   proj
-		   parameters
-		   error7  []
-		   (fun l l' -> List.append l l')
-		   f in
+      proj
+      parameters
+      error7  []
+      (fun l l' -> List.append l l')
+      f in
   let error9,i' =  LP.proj_map proj parameters error8 [] (fun x y -> List.append (List.rev y) x) f in
   let i' =  LCharS.Map.map List.rev i' in
   ["map1",(fun remanent -> remanent, IntS.Map.equal p f1 f1',None);

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Oct 14 2018>
+ * Last modification: Time-stamp: <Dec 22 2018>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -441,14 +441,14 @@ let rec print ?beginning_of_sentence:(beggining=true)
             | Remanent_parameters_sig.Kappa
             | Remanent_parameters_sig.Raw ->
               let error, t =
-                Ckappa_backend.Ckappa_backend.add_site
+                Site_graphs.KaSa_site_graph.add_site
                   parameters error handler_kappa
                   agent_id
                   site_type
                   t
               in
               let error =
-                Ckappa_backend.Ckappa_backend.print
+                Site_graphs.KaSa_site_graph.print
                   log
                   parameters error
                   t
@@ -477,12 +477,12 @@ let rec print ?beginning_of_sentence:(beggining=true)
                          Loggers.fprintf log " v "
                      in
                      let error, t =
-                       Ckappa_backend.Ckappa_backend.add_state
+                       Site_graphs.KaSa_site_graph.add_state
                          parameters error handler_kappa
                          agent_id site_type state t
                      in
                      let error =
-                       Ckappa_backend.Ckappa_backend.print
+                       Site_graphs.KaSa_site_graph.print
                          log parameters error
                          t
                      in
@@ -615,24 +615,24 @@ let rec print ?beginning_of_sentence:(beggining=true)
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
             let error, t' =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id site1 state1 t
             in
             let error, t'' =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id site2 state2 t
             in
             let error =
-              Ckappa_backend.Ckappa_backend.print
+              Site_graphs.KaSa_site_graph.print
                 (Remanent_parameters.get_logger parameters) parameters error
                 t'
             in
             let () =
               Loggers.fprintf (Remanent_parameters.get_logger parameters) " <=> " in
             let error =
-              Ckappa_backend.Ckappa_backend.print
+              Site_graphs.KaSa_site_graph.print
                 (Remanent_parameters.get_logger parameters) parameters error
                 t''
             in
@@ -696,24 +696,24 @@ let rec print ?beginning_of_sentence:(beggining=true)
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
             let error, t =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id site1 state1 t
             in
             let error, t' =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id site2 state2 t
             in
             let error =
-              Ckappa_backend.Ckappa_backend.print
+              Site_graphs.KaSa_site_graph.print
                 (Remanent_parameters.get_logger parameters) parameters error
                 t
             in
             let () =
               Loggers.fprintf (Remanent_parameters.get_logger parameters) " => " in
             let error =
-              Ckappa_backend.Ckappa_backend.print
+              Site_graphs.KaSa_site_graph.print
                 (Remanent_parameters.get_logger parameters) parameters error
                 t'
             in
@@ -805,7 +805,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
                  error, parameters
              in
              let error, t' =
-               Ckappa_backend.Ckappa_backend.add_state
+               Site_graphs.KaSa_site_graph.add_state
                  parameters error handler_kappa
                  agent_id v a t
              in
@@ -844,7 +844,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
         | Remanent_parameters_sig.Raw ->
           begin
             let error =
-              Ckappa_backend.Ckappa_backend.print
+              Site_graphs.KaSa_site_graph.print
                 log parameters error
                 t
             in
@@ -864,14 +864,14 @@ let rec print ?beginning_of_sentence:(beggining=true)
                    let error, t' =
                      List.fold_left
                        (fun (error,t) (site,state) ->
-                          Ckappa_backend.Ckappa_backend.add_state
+                          Site_graphs.KaSa_site_graph.add_state
                             parameters error handler_kappa
                             agent_id site state t)
                        (error, t)
                        state_list
                    in
                    let error =
-                     Ckappa_backend.Ckappa_backend.print
+                     Site_graphs.KaSa_site_graph.print
                       log parameters error
                        t'
                    in
@@ -1020,13 +1020,13 @@ let rec convert_views_internal_constraints_list_aux
               (*hyp*)
               (*-----------------------------------------------------*)
               let error, t =
-                Ckappa_backend.Ckappa_backend.add_site parameters
+                Site_graphs.KaSa_site_graph.add_site parameters
                   error handler_kappa agent_id site_type t
               in
               let error'', refinement =
                 List.fold_left (fun (error, c_list) state ->
                     let error', t' =
-                      Ckappa_backend.Ckappa_backend.add_state parameters
+                      Site_graphs.KaSa_site_graph.add_state parameters
                         error handler_kappa agent_id site_type state t
                     in
                     let error =
@@ -1070,7 +1070,7 @@ let rec convert_views_internal_constraints_list_aux
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
             let error', t' =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id
                 site1
@@ -1084,7 +1084,7 @@ let rec convert_views_internal_constraints_list_aux
             in
             (*--------------------------------------------------*)
             let error''', t'' =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id
                 site2
@@ -1118,7 +1118,7 @@ let rec convert_views_internal_constraints_list_aux
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
             let error', t =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id
                 site1
@@ -1132,7 +1132,7 @@ let rec convert_views_internal_constraints_list_aux
             in
             (*--------------------------------------------------*)
             let error''', t' =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id
                 site2
@@ -1164,7 +1164,7 @@ let rec convert_views_internal_constraints_list_aux
       let error, current_list =
         List.fold_left (fun (error, current_list) (state, list) ->
             let error', t' =
-              Ckappa_backend.Ckappa_backend.add_state
+              Site_graphs.KaSa_site_graph.add_state
                 parameters error handler_kappa
                 agent_id
                 site_type state t
@@ -1215,7 +1215,7 @@ let rec convert_views_internal_constraints_list_aux
                        List.fold_left
                          (fun (error, t') (site, state) ->
                          let error', t' =
-                           Ckappa_backend.Ckappa_backend.add_state
+                           Site_graphs.KaSa_site_graph.add_state
                              parameters error handler_kappa
                              agent_id site state t'
                          in
@@ -1258,9 +1258,9 @@ let convert_views_internal_constraints_list
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error
     agent_string agent_type translation current_list =
-  let t = Ckappa_backend.Ckappa_backend.empty in
+  let t = Site_graphs.KaSa_site_graph.empty in
   let error', agent_id, t =
-    Ckappa_backend.Ckappa_backend.add_agent
+    Site_graphs.KaSa_site_graph.add_agent
       parameters error handler_kappa agent_type t
   in
   let error =
@@ -1271,7 +1271,7 @@ let convert_views_internal_constraints_list
   let error, t =
     match translation with
     | Range (site,_) ->
-      Ckappa_backend.Ckappa_backend.add_site
+      Site_graphs.KaSa_site_graph.add_site
                       parameters error handler_kappa
                       agent_id
                       site t
@@ -1293,9 +1293,9 @@ let print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_age
     parameters handler_kappa error
     agent_string agent_type translation
   =
-  let t = Ckappa_backend.Ckappa_backend.empty in
+  let t = Site_graphs.KaSa_site_graph.empty in
   let error, id, t =
-    Ckappa_backend.Ckappa_backend.add_agent
+    Site_graphs.KaSa_site_graph.add_agent
       parameters error handler_kappa
       agent_type t
   in

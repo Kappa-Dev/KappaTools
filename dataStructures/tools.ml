@@ -322,3 +322,8 @@ let find_available_name ~already_there name ~facultative ~ext =
   else base^ext
 
 let default_message_delimter : char = '\x1e' (* "\t" *)
+
+let get_ref ref =
+  let i = !ref in
+  let () = ref := i+1 in
+  i

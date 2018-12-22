@@ -15,28 +15,28 @@
 "agents" : include
 "parameters" : include
 "error_handlers" : include
-"more_datastructures" : include
+"KaSa_rep/more_datastructures" : include
 "profiling" : include
-"KaSa_rep" : include
-"KaSa_rep/backend" : include
-"KaSa_rep/pipeline" : include
-"KaSa_rep/config" : include
-"KaSa_rep/error_handlers" : include
-"KaSa_rep/data_structures" : include
-"KaSa_rep/lib" : include
-"KaSa_rep/main" : include
-"KaSa_rep/tools" : include
-"KaSa_rep/frontend/preprocess" : include
-"KaSa_rep/influence_map" : include
-"KaSa_rep/export" : include
-"KaSa_rep/automatically_generated" : include
-"KaSa_rep/counting_enumeration" : include
-"KaSa_rep/data_structures/mvbdu" : include
-"KaSa_rep/data_structures/affine_arithmetics" : include
-"KaSa_rep/sanity_test" : include
-"KaSa_rep/reachability_analysis" : include
-"KaSa_rep/contact_map_scc" : include
 "symmetries" : include
+"KaSa_rep/flow" : include
+"KaSa_rep/abstract_domains/numerical_domains" : include
+"KaSa_rep/reachability_analysis" : include
+"KaSa_rep/backend" : include
+"KaSa_rep/export" : include
+"KaSa_rep/frontend" : include
+"KaSa_rep/main" : include
+"KaSa_rep/remanent_state" : include
+"KaSa_rep/sanity_test" : include
+"KaSa_rep/site_graphs" : include
+"KaSa_rep/type_interface" : include
+"KaSa_rep/influence_map" : include
+"KaSa_rep/counting_enumeration_species" : include
+"KaSa_rep/polymer_detection" : include
+"KaSa_rep/abstract_domains/mvbdu" : include
+"KaSa_rep/flow" : include
+"classical_graphs" : include
+"KaSa_rep/counting_enumerating_species": include
+
 
 <agents/*> : package(lwt.unix),thread
 

@@ -109,13 +109,13 @@ let is_no_edge_attributes edge_attribute =
 
 let between_attributes_in_dot logger bool =
   if bool then
-    Loggers.fprintf logger " "
+    Loggers.fprintf (Graph_loggers_sig.lift logger) " "
   else
     ()
 
 let between_attributes_in_html logger bool =
   if bool then
-    Loggers.fprintf logger ", "
+    Loggers.fprintf (Graph_loggers_sig.lift logger) ", "
   else
     ()
 
@@ -151,7 +151,7 @@ let print_graph_preamble
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[]) ?header:(header=[])
     title
   =
-  let format = Loggers.get_encoding_format logger in
+  let format = Loggers.get_encoding_format (Graph_loggers_sig.lift logger) in
   if shall_I_do_it format filter_in filter_out
   then
     match
@@ -161,17 +161,19 @@ let print_graph_preamble
       let () =
         List.iter
           (fun x ->
-             let () = Loggers.fprintf logger "#%s" x in
-             let () = Loggers.print_newline logger in
+             let () = Loggers.fprintf (Graph_loggers_sig.lift logger) "#%s" x in
+             let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
              ())
           header
       in
-      let () = Loggers.fprintf logger "digraph G{" in
-      let () = Loggers.print_newline logger in
+      let () = Loggers.fprintf (Graph_loggers_sig.lift logger) "digraph G{" in
+      let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
       ()
     | Loggers.Js_Graph -> (* IN PROGESS *)
       begin
-        let f_opt = Loggers.formatter_of_logger logger in
+        let f_opt =
+          Loggers.formatter_of_logger (Graph_loggers_sig.lift logger)
+        in
         match
           f_opt
         with
@@ -181,22 +183,27 @@ let print_graph_preamble
       end
     | Loggers.HTML_Graph  ->
       begin
-        let f_opt = Loggers.formatter_of_logger logger in
+        let f_opt =
+          Loggers.formatter_of_logger
+            (Graph_loggers_sig.lift logger)
+        in
         match
           f_opt
         with
         | None -> ()
         | Some f ->
-          let () = Loggers.fprintf logger "<!--@," in
+          let () = Loggers.fprintf (Graph_loggers_sig.lift logger) "<!--@," in
           let () =
             List.iter
               (fun x ->
-                 let () = Loggers.fprintf logger "%s" x in
-                 let () = Loggers.print_newline logger in
+                 let () =
+                   Loggers.fprintf (Graph_loggers_sig.lift logger) "%s" x
+                 in
+                 let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
                  ())
               header
           in
-          let () = Loggers.fprintf logger "-->@," in
+          let () = Loggers.fprintf (Graph_loggers_sig.lift logger) "-->@," in
           let dependency f t =
             Format.fprintf f "<script src=\"%s\" charset=\"utf-8\"></script>" t
           in
@@ -241,7 +248,7 @@ let string_of_arrow_in_html logger bool title style =
   | Graph_loggers_sig.Vee ->
     let () = between_attributes_in_html logger bool in
     let () =
-      Loggers.fprintf logger "%s: \"vee\"" title
+      Loggers.fprintf (Graph_loggers_sig.lift logger) "%s: \"vee\"" title
     in
     true
   | Graph_loggers_sig.No_head ->
@@ -296,8 +303,8 @@ let print_foot_shared_html_js logger =
     Mods.String2Map.iter
       (fun (id1,id2) list ->
          let list = List.rev list in
-         let id1_int = Loggers.int_of_string_id logger id1 in
-         let id2_int = Loggers.int_of_string_id logger id2 in
+         let id1_int = Graph_loggers_sig.int_of_string_id logger id1 in
+         let id2_int = Graph_loggers_sig.int_of_string_id logger id2 in
          let attributes = dummy_edge in
          let attributes =
            List.fold_left
@@ -360,8 +367,11 @@ let print_foot_shared_html_js logger =
              list
          in
          let () =
-           Loggers.fprintf logger "g.setEdge(%i,%i,{ " id1_int
-             id2_int in
+           Loggers.fprintf
+             (Graph_loggers_sig.lift logger) "g.setEdge(%i,%i,{ "
+             id1_int
+             id2_int
+         in
          let attributes =
            match attributes.edge_direction
            with
@@ -382,7 +392,11 @@ let print_foot_shared_html_js logger =
            with
            | None -> bool,None
            | Some string_list ->
-             let () = Loggers.fprintf logger "label: \"" in
+             let () =
+               Loggers.fprintf
+                 (Graph_loggers_sig.lift logger)
+                 "label: \""
+             in
              let s =
                Format.asprintf
                  "%a" (fun fmt -> List.iter (Format.fprintf fmt "%s")) (List.rev string_list)
@@ -395,8 +409,11 @@ let print_foot_shared_html_js logger =
                else
                  None, s
              in
-             let () = Loggers.fprintf logger "%s" s' in
-             let () = Loggers.fprintf logger "\"" in
+             let () =
+               Loggers.fprintf
+                 (Graph_loggers_sig.lift logger)
+                 "%s\"" s'
+             in
              true, s_opt
          in
          let bool =
@@ -407,7 +424,8 @@ let print_foot_shared_html_js logger =
              let () = between_attributes_in_html logger bool in
              let color = svg_color_encoding s in
              let () =
-               Loggers.fprintf logger
+               Loggers.fprintf
+                 (Graph_loggers_sig.lift logger)
                  "style: \"stroke: %s; fill: white\", arrowheadStyle: \"fill: %s; stroke: %s\""
                  color color color
              in
@@ -416,17 +434,21 @@ let print_foot_shared_html_js logger =
          let bool = string_of_arrow_in_html logger bool "arrowhead" attributes.edge_arrowhead in
          let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
          let () = if bool then () else () in
-         let () = Loggers.fprintf logger " });@," in
+         let () =
+           Loggers.fprintf
+             (Graph_loggers_sig.lift logger) " });@,"
+         in
          let () =
            match s_opt
            with None -> ()
               | Some s ->
-                Loggers.fprintf logger "<!--%s-->\n" s
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger) "<!--%s-->\n" s
          in
          ())
-      (Loggers.get_edge_map logger)
+      (Graph_loggers_sig.get_edge_map logger)
   in
-  let f_opt = Loggers.formatter_of_logger logger in
+  let f_opt = Loggers.formatter_of_logger (Graph_loggers_sig.lift logger) in
   match
     f_opt
   with
@@ -454,55 +476,76 @@ let print_foot_shared_html_js logger =
 
 let print_graph_foot logger =
   match
-    Loggers.get_encoding_format logger
+    Loggers.get_encoding_format (Graph_loggers_sig.lift logger)
   with
   | Loggers.DOT ->
-    let () = Loggers.fprintf logger "}" in
-    Loggers.print_newline logger
+    let () = Loggers.fprintf (Graph_loggers_sig.lift logger) "}" in
+    Loggers.print_newline (Graph_loggers_sig.lift logger)
   | Loggers.Matrix ->
-    let nodes = Loggers.get_nodes logger in
-    let edges = Loggers.get_edge_map logger in
-    let () = Loggers.fprintf logger "\"rules\" :" in
-    let () = Loggers.print_newline logger in
-    let () = Loggers.open_row logger in
+    let nodes = Graph_loggers_sig.get_nodes logger in
+    let edges = Graph_loggers_sig.get_edge_map logger in
+    let () =
+      Loggers.fprintf (Graph_loggers_sig.lift logger) "\"rules\" :"
+    in
+    let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
+    let () = Loggers.open_row (Graph_loggers_sig.lift logger) in
     let _ =
       List.fold_left
         (fun sep (s,_) ->
-           let () = Loggers.fprintf logger "%s\"%s\"" sep s in
+           let () =
+             Loggers.fprintf
+               (Graph_loggers_sig.lift logger)
+               "%s\"%s\"" sep s
+           in
            ", "
         )
         "" nodes
     in
-    let () = Loggers.close_row logger in
-    let () = Loggers.fprintf logger "," in
-    let () = Loggers.print_newline logger in
-    let () = Loggers.fprintf logger "\"hits\" :" in
-    let () = Loggers.print_newline logger in
-    let () = Loggers.open_row logger in
+    let () = Loggers.close_row (Graph_loggers_sig.lift logger) in
+    let () = Loggers.fprintf (Graph_loggers_sig.lift logger) "," in
+    let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
+    let () = Loggers.fprintf (Graph_loggers_sig.lift logger) "\"hits\" :" in
+    let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
+    let () = Loggers.open_row (Graph_loggers_sig.lift logger) in
     let _ =
       List.fold_left
         (fun sep _ ->
-           let () = Loggers.fprintf logger "%s1" sep in
+           let () =
+             Loggers.fprintf
+               (Graph_loggers_sig.lift logger)
+               "%s1" sep
+           in
            ", "
         )
         "" nodes
     in
-    let () = Loggers.close_row logger in
-    let () = Loggers.fprintf logger "," in
-    let () = Loggers.print_newline logger in
-    let () = Loggers.fprintf logger "\"fluxs\" :" in
-    let () = Loggers.print_newline logger in
-    let () = Loggers.open_row logger in
+    let () = Loggers.close_row (Graph_loggers_sig.lift logger) in
+    let () = Loggers.fprintf (Graph_loggers_sig.lift logger) "," in
+    let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
+    let () =
+      Loggers.fprintf
+        (Graph_loggers_sig.lift logger)
+        "\"fluxs\" :"
+    in
+    let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
+    let () = Loggers.open_row (Graph_loggers_sig.lift logger) in
     let _ =
       List.fold_left
         (fun b (s1,_) ->
            let () =
              if b then
-               let () = Loggers.fprintf logger "," in
-               let () = Loggers.print_newline logger in
+               let () =
+                 Loggers.fprintf
+                   (Graph_loggers_sig.lift logger)
+                   ","
+               in
+               let () =
+                 Loggers.print_newline
+                   (Graph_loggers_sig.lift logger)
+               in
                ()
            in
-           let () = Loggers.open_row logger in
+           let () = Loggers.open_row (Graph_loggers_sig.lift logger) in
            let _ =
              List.fold_left
                (fun sep (s2,_) ->
@@ -516,17 +559,19 @@ let print_graph_foot logger =
                     | Some options -> matrix_string_of_options options
                   in
                   let () =
-                    Loggers.fprintf logger "%s%s" sep color_value in
+                    Loggers.fprintf
+                      (Graph_loggers_sig.lift logger)
+                      "%s%s" sep color_value in
                   ", "
                )
                "" nodes
            in
-           let () = Loggers.close_row logger in
+           let () = Loggers.close_row (Graph_loggers_sig.lift logger) in
            true
         )  false nodes
     in
-    let () = Loggers.close_row logger in
-    let () = Loggers.print_newline logger in
+    let () = Loggers.close_row (Graph_loggers_sig.lift logger) in
+    let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
     ()
   | Loggers.Js_Graph ->
     begin
@@ -534,7 +579,10 @@ let print_graph_foot logger =
     end
   | Loggers.HTML_Graph ->
     begin
-      let f_opt = Loggers.formatter_of_logger logger in
+      let f_opt =
+        Loggers.formatter_of_logger
+          (Graph_loggers_sig.lift logger)
+      in
       match
         f_opt
       with
@@ -554,14 +602,16 @@ let print_comment
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
     string
   =
-  let format = Loggers.get_encoding_format logger in
+  let format = Loggers.get_encoding_format (Graph_loggers_sig.lift logger) in
   if shall_I_do_it format filter_in filter_out
   then
     match
       format
     with
-    | Loggers.DOT -> Loggers.fprintf logger "#%s" string
-    | Loggers.HTML_Graph | Loggers.Js_Graph -> Loggers.fprintf logger "%s" string
+    | Loggers.DOT ->
+      Loggers.fprintf (Graph_loggers_sig.lift logger) "#%s" string
+    | Loggers.HTML_Graph | Loggers.Js_Graph ->
+      Loggers.fprintf (Graph_loggers_sig.lift logger) "%s" string
     | Loggers.Json
     | Loggers.Matrix
     | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Mathematica
@@ -570,27 +620,34 @@ let print_comment
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let open_asso logger =
-  match Loggers.get_encoding_format logger with
-  | Loggers.HTML_Graph | Loggers.Js_Graph -> Loggers.fprintf logger "\t<p><dl>\n"
+  match Loggers.get_encoding_format (Graph_loggers_sig.lift logger) with
+  | Loggers.HTML_Graph | Loggers.Js_Graph ->
+    Loggers.fprintf (Graph_loggers_sig.lift logger) "\t<p><dl>\n"
   | Loggers.Json
   | Loggers.Mathematica
   |  Loggers.SBML | Loggers.Maple | Loggers.Matlab
   | Loggers.DOTNET | Loggers.Octave
-  | Loggers.Matrix | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
+  | Loggers.Matrix | Loggers.HTML | Loggers.DOT
+  | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 let close_asso logger =
-  match Loggers.get_encoding_format logger with
-  | Loggers.HTML_Graph | Loggers.Js_Graph -> Loggers.fprintf logger "\t\t</dl></p>\n"
+  match Loggers.get_encoding_format (Graph_loggers_sig.lift logger) with
+  | Loggers.HTML_Graph | Loggers.Js_Graph ->
+    Loggers.fprintf (Graph_loggers_sig.lift logger) "\t\t</dl></p>\n"
   | Loggers.Json
   | Loggers.DOTNET | Loggers.Mathematica | Loggers.Maple
   | Loggers.Matlab | Loggers.Octave | Loggers.SBML
-  | Loggers.Matrix | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
+  | Loggers.Matrix | Loggers.HTML | Loggers.DOT
+  | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_asso logger string1 string2 =
-  match Loggers.get_encoding_format logger with
-  | Loggers.DOT -> Loggers.fprintf logger "/*%s %s*/" string1 string2
-  | Loggers.HTML_Graph | Loggers.Js_Graph -> Loggers.fprintf logger "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
+  match Loggers.get_encoding_format (Graph_loggers_sig.lift logger) with
+  | Loggers.DOT ->
+    Loggers.fprintf (Graph_loggers_sig.lift logger) "/*%s %s*/" string1 string2
+  | Loggers.HTML_Graph | Loggers.Js_Graph ->
+    Loggers.fprintf (Graph_loggers_sig.lift logger)
+      "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
   | Loggers.Json
   | Loggers.DOTNET | Loggers.Matrix | Loggers.SBML
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.Mathematica
@@ -644,7 +701,7 @@ let string_of_arrow_tail_in_dot style =
 let print_node logger ?directives:(directives=[]) id =
   let attributes = dummy_node in
   let attributes =
-    match Loggers.get_encoding_format logger with
+    match Loggers.get_encoding_format (Graph_loggers_sig.lift logger) with
     | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.TXT ->
       List.fold_left
         (fun attributes option ->
@@ -680,23 +737,34 @@ let print_node logger ?directives:(directives=[]) id =
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML
       -> attributes
   in
-  match Loggers.get_encoding_format logger with
+  match Loggers.get_encoding_format (Graph_loggers_sig.lift logger) with
   | Loggers.DOT ->
     begin
-      let () = Loggers.fprintf logger "\"%s\"" id in
+      let () =
+        Loggers.fprintf
+          (Graph_loggers_sig.lift logger)
+          "\"%s\"" id
+      in
       let () =
         if is_no_node_attributes attributes
         then ()
         else
           begin
-            let () = Loggers.fprintf logger " [" in
+            let () =
+              Loggers.fprintf
+                (Graph_loggers_sig.lift logger)
+                " ["
+            in
             let bool = false in
             let bool =
               match attributes.node_label
               with
               | None -> bool
               | Some string ->
-                let () = Loggers.fprintf logger "label=\"%s\"" string in
+                let () =
+                  Loggers.fprintf
+                    (Graph_loggers_sig.lift logger)                    "label=\"%s\"" string
+                in
                 true
             in
             let bool =
@@ -706,7 +774,9 @@ let print_node logger ?directives:(directives=[]) id =
               | Some shape ->
                 let () = between_attributes_in_dot logger bool in
                 let () =
-                  Loggers.fprintf logger "%s" (shape_in_dot shape)
+                  Loggers.fprintf
+                    (Graph_loggers_sig.lift logger)
+                    "%s" (shape_in_dot shape)
                 in
                 true
             in
@@ -717,7 +787,9 @@ let print_node logger ?directives:(directives=[]) id =
               | Some i ->
                 let () = between_attributes_in_dot logger bool in
                 let () =
-                  Loggers.fprintf logger "width=\"%ipx\"" i
+                  Loggers.fprintf
+                    (Graph_loggers_sig.lift logger)
+                    "width=\"%ipx\"" i
                 in
                 true
             in
@@ -728,7 +800,9 @@ let print_node logger ?directives:(directives=[]) id =
               | Some i ->
                 let () = between_attributes_in_dot logger bool in
                 let () =
-                  Loggers.fprintf logger "height=\"%ipx\"" i
+                  Loggers.fprintf
+                    (Graph_loggers_sig.lift logger)
+                    "height=\"%ipx\"" i
                 in
                 true
             in
@@ -740,7 +814,7 @@ let print_node logger ?directives:(directives=[]) id =
                 let () = between_attributes_in_dot logger bool in
                 let () =
                   Loggers.fprintf
-                    logger
+                    (Graph_loggers_sig.lift logger)
                     "color=\"%s\""
                     (dot_color_encoding s)
                 in
@@ -754,22 +828,32 @@ let print_node logger ?directives:(directives=[]) id =
                 let () = between_attributes_in_dot logger bool in
                 let () =
                   Loggers.fprintf
-                    logger
+                    (Graph_loggers_sig.lift logger)
                     "fillcolor=\"%s\" style=filled"
                     (dot_color_encoding s)
                 in
                 true
             in
             let () = if bool then () in
-            let () = Loggers.fprintf logger "];" in
-            let () = Loggers.print_newline logger in
+            let () =
+              Loggers.fprintf
+                (Graph_loggers_sig.lift logger)
+                "];"
+            in
+            let () =
+              Loggers.print_newline (Graph_loggers_sig.lift logger)
+            in
             ()
           end
       in ()
     end
   | Loggers.HTML_Graph  ->
-    let id_int = Loggers.int_of_string_id logger id in
-    let () = Loggers.fprintf logger "g.setNode(%i, { " id_int in
+    let id_int = Graph_loggers_sig.int_of_string_id logger id in
+    let () =
+      Loggers.fprintf
+        (Graph_loggers_sig.lift logger)
+        "g.setNode(%i, { " id_int
+    in
     let () =
       if is_no_node_attributes attributes
       then ()
@@ -783,7 +867,9 @@ let print_node logger ?directives:(directives=[]) id =
           in
           let string = String.escaped string in
           let () =
-            Loggers.fprintf logger "label: \"%s\"" string
+            Loggers.fprintf
+              (Graph_loggers_sig.lift logger)
+              "label: \"%s\"" string
           in
           let () =
             match attributes.node_shape
@@ -797,7 +883,8 @@ let print_node logger ?directives:(directives=[]) id =
                 | Some shape ->
                   let () = between_attributes_in_html logger true in
                   let () =
-                    Loggers.fprintf logger "%s" shape
+                    Loggers.fprintf
+                      (Graph_loggers_sig.lift logger) "%s" shape
                   in
                   ()
               end
@@ -809,7 +896,8 @@ let print_node logger ?directives:(directives=[]) id =
             | Some i ->
               let () = between_attributes_in_html logger true in
               let () =
-                Loggers.fprintf logger "width: \"%i\"" i
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger) "width: \"%i\"" i
               in
               ()
           in
@@ -820,7 +908,8 @@ let print_node logger ?directives:(directives=[]) id =
             | Some i ->
               let () = between_attributes_in_html logger true in
               let () =
-                Loggers.fprintf logger "height: \"%i\"" i
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger) "height: \"%i\"" i
               in
               ()
           in
@@ -832,7 +921,7 @@ let print_node logger ?directives:(directives=[]) id =
               let () = between_attributes_in_html logger true in
               let () =
                 Loggers.fprintf
-                  logger
+                  (Graph_loggers_sig.lift logger)
                   "color: \"%s\""
                   (svg_color_encoding s)
               in
@@ -846,7 +935,7 @@ let print_node logger ?directives:(directives=[]) id =
               let () = between_attributes_in_html logger true in
               let () =
                 Loggers.fprintf
-                  logger
+                  (Graph_loggers_sig.lift logger)
                   "style: \"fill: %s\" "
                   (svg_color_encoding s)
               in
@@ -855,24 +944,31 @@ let print_node logger ?directives:(directives=[]) id =
           ()
         end
     in
-    let () = Loggers.fprintf logger " });@," in
+    let () = Loggers.fprintf (Graph_loggers_sig.lift logger) " });@," in
     ()
   | Loggers.TXT ->
     begin
       match attributes.node_label
       with
       | None ->
-        let () = Loggers.fprintf logger "Node: %s" id in
-        let () = Loggers.print_newline logger in
+        let () =
+          Loggers.fprintf
+            (Graph_loggers_sig.lift logger) "Node: %s" id
+        in
+        let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
         ()
       | Some label ->
-        let () = Loggers.fprintf logger "Node:%s, Label:%s" id label in
-        let () = Loggers.print_newline logger in
+        let () =
+          Loggers.fprintf
+            (Graph_loggers_sig.lift logger)
+            "Node:%s, Label:%s" id label
+        in
+        let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
         ()
     end
   | Loggers.Matrix
   | Loggers.Js_Graph
-  | Loggers.Json -> Loggers.add_node logger id directives
+  | Loggers.Json -> Graph_loggers_sig.add_node logger id directives
   | Loggers.DOTNET | Loggers.Mathematica
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -880,7 +976,7 @@ let print_node logger ?directives:(directives=[]) id =
 let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
   let attributes = dummy_edge in
   let attributes =
-    match Loggers.get_encoding_format logger with
+    match Loggers.get_encoding_format (Graph_loggers_sig.lift logger) with
     | Loggers.Matrix | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph
     | Loggers.Json | Loggers.TXT | Loggers.HTML ->
       List.fold_left
@@ -914,7 +1010,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular -> attributes
   in
-  match Loggers.get_encoding_format logger with
+  match Loggers.get_encoding_format (Graph_loggers_sig.lift logger) with
   | Loggers.DOT ->
     begin
       let direction =
@@ -928,27 +1024,37 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
                         Graph_loggers_sig.Normal)^(string_one_of_linestyle_in_dot
                                    attributes.edge_style)
       in
-      let () = Loggers.fprintf logger "\"%s\" %s \"%s\"" id1 direction id2 in
+      let () =
+        Loggers.fprintf
+          (Graph_loggers_sig.lift logger)
+          "\"%s\" %s \"%s\"" id1 direction id2 in
       let () =
         if is_no_edge_attributes attributes
         then
           ()
         else
-          let () = Loggers.fprintf logger " [" in
+          let () =
+            Loggers.fprintf (Graph_loggers_sig.lift logger) " ["
+          in
           let bool = false in
           let bool =
             match attributes.edge_label
             with
             | None -> bool
             | Some string_list ->
-              let () = Loggers.fprintf logger "label=\"" in
+              let () =
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "label=\""
+              in
               let () =
                 List.iter
-                  (Loggers.fprintf logger "%s")
+                  (Loggers.fprintf (Graph_loggers_sig.lift logger) "%s")
                   (List.rev string_list)
               in
-              let () = Loggers.fprintf logger "\"" in
-
+              let () =
+                Loggers.fprintf (Graph_loggers_sig.lift logger) "\""
+              in
               true
           in
           let bool =
@@ -956,10 +1062,18 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
             with
             | Graph_loggers_sig.Plain -> bool
             | Graph_loggers_sig.Dotted ->
-              let () = Loggers.fprintf logger "style=\"dotted\"" in
+              let () =
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "style=\"dotted\""
+              in
               true
             | Graph_loggers_sig.Dashed ->
-              let () = Loggers.fprintf logger "style=\"dashed\"" in
+              let () =
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "style=\"dashed\""
+              in
               true
           in
           let bool =
@@ -969,7 +1083,9 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
             | Some s ->
               let () = between_attributes_in_dot logger bool in
               let () =
-                Loggers.fprintf logger "color=\"%s\""
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "color=\"%s\""
                   (dot_color_encoding s)
               in
               true
@@ -981,19 +1097,25 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
             | Graph_loggers_sig.Tee ->
               let () = between_attributes_in_dot logger bool in
               let () =
-                Loggers.fprintf logger "arrowhead=\"tee\""
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "arrowhead=\"tee\""
               in
               true
             | Graph_loggers_sig.Vee ->
               let () = between_attributes_in_dot logger bool in
               let () =
-                Loggers.fprintf logger "arrowhead=\"vee\""
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "arrowhead=\"vee\""
               in
               true
             | Graph_loggers_sig.No_head ->
               let () = between_attributes_in_dot logger bool in
               let () =
-                Loggers.fprintf logger "arrowhead=\"none\""
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "arrowhead=\"none\""
               in
               true
           in
@@ -1004,29 +1126,39 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
             | Graph_loggers_sig.Tee ->
               let () = between_attributes_in_dot logger bool in
               let () =
-                Loggers.fprintf logger "arrowtail=\"tee\""
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "arrowtail=\"tee\""
               in
               true
             | Graph_loggers_sig.Vee ->
               let () = between_attributes_in_dot logger bool in
               let () =
-                Loggers.fprintf logger "arrowtail=\"vee\""
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "arrowtail=\"vee\""
               in
               true
             | Graph_loggers_sig.No_head ->
               let () = between_attributes_in_dot logger bool in
               let () =
-                Loggers.fprintf logger "arrowtail=\"none\""
+                Loggers.fprintf
+                  (Graph_loggers_sig.lift logger)
+                  "arrowtail=\"none\""
               in
               true
           in
           let () = if bool then () in
-          let () = Loggers.fprintf logger "];" in
-          let () = Loggers.print_newline logger in
+          let () =
+            Loggers.fprintf
+              (Graph_loggers_sig.lift logger)
+              "];"
+          in
+          let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
           ()
       in ()
     end
-| Loggers.TXT   | Loggers.HTML ->
+  | Loggers.TXT   | Loggers.HTML ->
     let label =
       match
         attributes.edge_label
@@ -1042,12 +1174,20 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
       | Graph_loggers_sig.Normal | Graph_loggers_sig.Vee  -> "->"
       | Graph_loggers_sig.Tee -> "-|"
     in
-    let () = Loggers.fprintf logger "%s%s %s %s" prefix id1 arrow id2 in
-    let () = List.iter (Loggers.fprintf logger "%s") (List.rev label) in
-    let () = Loggers.print_newline logger in
+    let () =
+      Loggers.fprintf
+        (Graph_loggers_sig.lift logger)
+        "%s%s %s %s" prefix id1 arrow id2
+    in
+    let () =
+      List.iter
+        (Loggers.fprintf (Graph_loggers_sig.lift logger) "%s")
+        (List.rev label)
+    in
+    let () = Loggers.print_newline (Graph_loggers_sig.lift logger) in
    ()
 | Loggers.Matrix | Loggers.Json | Loggers.HTML_Graph | Loggers.Js_Graph ->
-  Loggers.add_edge logger id1 id2 directives
+  Graph_loggers_sig.add_edge logger id1 id2 directives
 | Loggers.DOTNET | Loggers.Mathematica
 | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
 | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -1060,7 +1200,7 @@ let print_one_to_n_relation
   let fictitious = "Fictitious_"^id in
   let directives_fict =
     match
-      Loggers.get_encoding_format logger
+      Loggers.get_encoding_format (Graph_loggers_sig.lift logger)
     with
     | Loggers.HTML_Graph  ->
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Circle)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(Graph_loggers_sig.FillColor Graph_loggers_sig.Black)::(List.rev directives))

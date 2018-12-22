@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Dec 30 2018>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -17,7 +17,7 @@ module type Type =
 
 
     type contact_map =
-      (string list * (string * string) list) Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
+      Public_data.contact_map
 
 
     val init:
@@ -29,7 +29,7 @@ module type Type =
       ?accuracy_level: Public_data.accuracy_level -> state -> state * contact_map
 
     val get_dead_rules:
-      state -> state * Ckappa_sig.c_rule_id list
+      state -> state * Public_data.dead_rules 
 
     val dump_errors_light: state -> unit
 

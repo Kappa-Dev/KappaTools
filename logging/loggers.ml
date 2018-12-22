@@ -16,8 +16,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-module StringMap = Map.Make (struct type t = string let compare = compare end)
-
 type encoding =
   | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular
   | DOT | TXT | TXT_Tabular | XLS
@@ -57,49 +55,37 @@ let breakable x =
 type t =
   {
     encoding:encoding;
-    id_map: int StringMap.t ref ;
     logger: logger;
-    fresh_id: int ref ;
     channel_opt: out_channel option;
     mutable current_line: token list;
-    nodes: (string * Graph_loggers_sig.options list) list ref ;
-    edges: (string * string * Graph_loggers_sig.options list) list ref ;
-    edges_map: Graph_loggers_sig.options list list Mods.String2Map.t ref ;
   }
-
-let refresh_id t =
-  let () = t.id_map:=StringMap.empty in
-  let () = t.nodes := [] in
-  let () = t.edges := [] in
-  let () = t.fresh_id := 1 in
-  ()
 
 let get_encoding_format t = t.encoding
 
 let dummy_html_logger =
   {
-    id_map = ref StringMap.empty ;
+    (*  id_map = ref StringMap.empty ;*)
     encoding = HTML;
     logger = DEVNUL;
     channel_opt = None;
     current_line = [];
-    fresh_id = ref 1;
+    (*  fresh_id = ref 1;
     nodes = ref [];
     edges = ref [];
-    edges_map = ref Mods.String2Map.empty;
+        edges_map = ref Mods.String2Map.empty;*)
     }
 
 let dummy_txt_logger =
   {
-    id_map = ref StringMap.empty ;
+    (*  id_map = ref StringMap.empty ;*)
     encoding = TXT;
     channel_opt = None;
     logger = DEVNUL;
     current_line = [];
-    fresh_id = ref 1;
+    (*  fresh_id = ref 1;
     nodes = ref [];
     edges = ref [];
-    edges_map = ref Mods.String2Map.empty;
+        edges_map = ref Mods.String2Map.empty;*)
   }
 
 (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
@@ -301,15 +287,15 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
   let formatter = Format.formatter_of_out_channel channel in
   let logger =
     {
-      id_map = ref StringMap.empty;
-      fresh_id = ref 1;
+      (*  id_map = ref StringMap.empty;
+          fresh_id = ref 1;*)
       logger = Formatter formatter;
       channel_opt = Some channel;
       encoding = mode;
       current_line = [];
-      nodes = ref [];
+      (*  nodes = ref [];
       edges = ref [];
-      edges_map = ref Mods.String2Map.empty;
+          edges_map = ref Mods.String2Map.empty;*)
       }
   in
   let () = print_preamble logger in
@@ -318,15 +304,15 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
 let open_logger_from_formatter ?mode:(mode=TXT) formatter =
   let logger =
     {
-      id_map = ref StringMap.empty;
-      fresh_id = ref 1;
+      (*  id_map = ref StringMap.empty;
+          fresh_id = ref 1;*)
       logger = Formatter formatter;
       channel_opt = None;
       encoding = mode;
       current_line = [];
-      nodes = ref [];
+      (*  nodes = ref [];
       edges = ref [];
-      edges_map = ref Mods.String2Map.empty;
+          edges_map = ref Mods.String2Map.empty;*)
     }
   in
   let () = print_preamble logger in
@@ -334,29 +320,29 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
 
 let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
   {
-    id_map = ref StringMap.empty;
-    fresh_id = ref 1;
+    (*  id_map = ref StringMap.empty;
+        fresh_id = ref 1;*)
     logger = Circular_buffer (ref (Circular_buffers.create size "" ));
     channel_opt = None;
     encoding = mode;
     current_line = [];
-    nodes = ref [];
+    (*  nodes = ref [];
     edges = ref [];
-    edges_map = ref Mods.String2Map.empty;
+        edges_map = ref Mods.String2Map.empty;*)
   }
 
 let open_infinite_buffer ?mode:(mode=TXT) () =
   let logger =
     {
-        id_map = ref StringMap.empty;
-        fresh_id = ref 1;
+      (*  id_map = ref StringMap.empty;
+          fresh_id = ref 1;*)
         logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
         channel_opt = None;
         encoding = mode;
         current_line = [];
-        nodes = ref [];
+        (*  nodes = ref [];
         edges = ref [];
-        edges_map = ref Mods.String2Map.empty;
+            edges_map = ref Mods.String2Map.empty;*)
     }
   in
   let () = print_preamble logger in
@@ -418,41 +404,14 @@ let flush_and_clean logger fmt =
 
 let fprintf logger = fprintf ~fprintnewline:false logger
 
-let get_ref ref =
-  let i = !ref in
-  let () = ref := i+1 in
-  i
-
-let fresh_id logger = get_ref logger.fresh_id
-
-let int_of_string_id logger string =
-  try
-    StringMap.find string !(logger.id_map)
-  with
-  | Not_found ->
-    let i = fresh_id logger in
-    let () = logger.id_map := StringMap.add string i !(logger.id_map) in
-    i
 let channel_of_logger logger = logger.channel_opt
 
-let add_node t s d = t.nodes:= (s,d)::(!(t.nodes))
-let add_edge t s1 s2 d =
-  let () = t.edges:= (s1,s2,d)::(!(t.edges)) in
-  let map = !(t.edges_map) in
-  let old_list =
-    match
-    Mods.String2Map.find_option
-      (s1,s2)
-      map
-    with Some l -> l
-       | None -> []
-  in
-  let () =
-    t.edges_map :=
-      Mods.String2Map.add (s1,s2) (d::old_list) map
-  in
-  ()
-let graph_of_logger logger = List.rev !(logger.nodes), List.rev !(logger.edges)
+let print_binding_type
+    t ?binding_type_symbol:(binding_type_symbol=".")
+    ~agent_name ~site_name =
+  fprintf t
+    "%s"
+    (Public_data.string_of_binding_type ~binding_type_symbol ~agent_name ~site_name)
 
 let dump_json logger json =
   let channel_opt = channel_of_logger logger in
@@ -483,6 +442,8 @@ let gen_iter iter list =
   let () = iter (fun line -> output:=line::!output) list in
   JsonUtil.of_list line_to_json (List.rev !output)
 
+let of_json = JsonUtil.to_list ~error_msg:"line list" line_of_json
+
 let to_json logger =
   match
     logger.logger
@@ -493,14 +454,3 @@ let to_json logger =
     gen_iter Circular_buffers.iter !a
   | Infinite_buffer b ->
     gen_iter Infinite_buffers.iter !b
-
-let of_json = JsonUtil.to_list ~error_msg:"line list" line_of_json
-let get_edge_map t = !(t.edges_map)
-let get_nodes t = !(t.nodes)
-
-let print_binding_type
-    t ?binding_type_symbol:(binding_type_symbol=".")
-    ~agent_name ~site_name =
-  fprintf t
-    "%s"
-    (Public_data.string_of_binding_type ~binding_type_symbol ~agent_name ~site_name)

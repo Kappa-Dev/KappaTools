@@ -1,4 +1,4 @@
-module Ckappa_backend =
+module KaSa_site_graph =
 struct
 
   type agent_id = Ckappa_sig.c_agent_id
