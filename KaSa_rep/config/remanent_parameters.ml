@@ -458,7 +458,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
           Remanent_parameters_sig.command_line= command;
           Remanent_parameters_sig.short_version=Version.version_string;
           Remanent_parameters_sig.version=Version.version_kasa_full_name;
-          Remanent_parameters_sig.tk_interface=Tk_version.tk;
+          Remanent_parameters_sig.tk_interface= !Version.tk_is_initialized;
         Remanent_parameters_sig.influence_map_accuracy_level =
           begin
             match Tools.lowercase !Config.influence_map_accuracy_level with

@@ -22,3 +22,5 @@ let version_msg = "Kappa Simulator: "^version_string
 let version_kasa_full_name = "Kappa Static Analyzer ("^version_string^")"
 
 let version_kade_full_name = "KaDE ("^version_string^")"
+
+let tk_is_initialized = ref false

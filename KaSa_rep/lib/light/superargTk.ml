@@ -20,7 +20,8 @@ let parse ?title (a:Superarg.t) (def:string list ref) =
   (* if no argument or "--gui" given, launch the gui, otherwise, parse args *)
   let rem =
     if args=[] || args=["--expert"] || args=["--no-expert"] || List.exists ((=) "--gui") args
-    then Superarg.parse_list ?title a (if List.exists ((=) "--expert") args then ["--help";"--expert"] else ["--help"])
-    else Superarg.parse_list ?title a args
+    then Superarg.parse_list
+        ~with_tk:false ?title a (if List.exists ((=) "--expert") args then ["--help";"--expert"] else ["--help"])
+    else Superarg.parse_list ~with_tk:false ?title a args
   in
   if rem<>[] then def := rem

@@ -578,14 +578,15 @@ let gui ?title (a:Superarg.t) (args:string list) : string list =
   if not !do_launch then (backup "autosave_pre_quit.options"; exit 0);
   backup "autosave_pre_launch.options";
   Printf.printf "/* The GUI launches the analysis with the options:\n%s\n*/\n" (String.concat " " (cmd ())); flush stdout;
-  Superarg.parse_list a (cmd ())
-
+  Version.tk_is_initialized := true;
+  Superarg.parse_list ~with_tk:true a (cmd ())
 
 (* MAIN *)
 (* **** *)
 
 let parse ?title (a:Superarg.t) (def:string list ref) =
   Superarg.check a;
+  Version.tk_is_initialized := true;
   let a = Superarg.order a in
   let a =
     Superarg.StringIntMap.fold
@@ -599,6 +600,6 @@ let parse ?title (a:Superarg.t) (def:string list ref) =
   (* if no argument or "--gui" given, launch the gui, otherwise, parse args *)
   let rem =
     if args=[] || args=["--expert"] || args=["--no-expert"] || List.exists ((=) "--gui") args
-    then gui ?title a args else Superarg.parse_list ?title a args
+    then gui ?title a args else Superarg.parse_list ~with_tk:true ?title a args
   in
   if rem<>[] then def := rem
