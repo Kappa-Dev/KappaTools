@@ -21,7 +21,7 @@ class BuildAgentsCommand(distutils.cmd.Command):
         ()
 
     def run(self):
-        subprocess.check_call(["make","agents"])
+        subprocess.check_call(["make","all","agents"])
 
 class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
     """Compile Kappa agent in addition of standard build"""
