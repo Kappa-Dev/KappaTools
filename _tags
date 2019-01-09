@@ -36,7 +36,7 @@
 "KaSa_rep/sanity_test" : include
 "KaSa_rep/reachability_analysis" : include
 "KaSa_rep/contact_map_scc" : include
-"odes/symmetries_analysis" : include
+"symmetries" : include
 
 <agents/*> : package(lwt.unix),thread
 

@@ -3,7 +3,7 @@
   * Last modification: Time-stamp: <Nov 05 2018>
 *)
 
-module A = Odes.Make (Ode_interface)
+module A = Odes.Make (Symmetry_interface)
 
 let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let start_time = Sys.time () in

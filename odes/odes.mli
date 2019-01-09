@@ -2,7 +2,7 @@
   * Creation: 15/07/2016
   * Last modification: Time-stamp: <Nov 05 2018>
 *)
-module Make(I:Ode_interface_sig.Interface) :
+module Make(I:Symmetry_interface_sig.Interface) :
 sig
   type ode_var_id
   type ('a,'b) network

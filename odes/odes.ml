@@ -11,7 +11,7 @@ let debug ~debugMode s =
       Format.err_formatter s
   else Format.ifprintf Format.err_formatter s
 
-module Make(I:Ode_interface_sig.Interface) =
+module Make(I:Symmetry_interface_sig.Interface) =
 
 struct
   type connected_component_id = int

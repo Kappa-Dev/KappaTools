@@ -3,4 +3,4 @@
   * Last modification: Time-stamp: <Feb 08 2017>
  *)
 
-include Ode_interface_sig.Interface
+include Symmetry_interface_sig.Interface
