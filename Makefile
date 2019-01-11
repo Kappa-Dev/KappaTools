@@ -2,7 +2,7 @@
 
 include externals.mk
 
-LABLTKLIBREP?=$(CAML_LD_LIBRARY_PATH)/../labltk
+LABLTKLIBREP?=$(shell ocamlfind ocamlc -where)/../labltk
 
 MANREP= man/
 MANSCRIPTREP = $(MANREP)scripts/
