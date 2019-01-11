@@ -70,15 +70,12 @@ Priority
 Outputs
 Kappa_files
 
-Ode_interface_sig
-Ode_interface
 Odes
-Rule_modes
 
 Ckappa_sig
 Cckappa_sig
 Build_graph
- 
+
 Analyzer
 Analyzer_headers
 Analyzer_domain_sig
@@ -99,6 +96,9 @@ Mvbdu_wrapper
 
 LKappa_group_action
 Pattern_group_action
+Rule_modes
+Symmetry_interface_sig
+Symmetry_interface
 Symmetries_sig
 Symmetries
 
