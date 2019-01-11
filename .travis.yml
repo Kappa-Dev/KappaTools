@@ -10,6 +10,8 @@ matrix:
     language: python
     addons:
       apt:
+        sources:
+          - avsm
         packages:
           - aspcud
           - opam
@@ -18,12 +20,16 @@ matrix:
     python: 3.6
     addons:
       apt:
+        sources:
+          - avsm
         packages:
           - aspcud
           - opam
   - env: CHECKED=js
     addons:
       apt:
+        sources:
+          - avsm
         packages:
           - ocaml-nox
           - aspcud
@@ -31,6 +37,8 @@ matrix:
   - env: USE_TK=1
     addons:
       apt:
+        sources:
+          - avsm
         packages:
           - ocaml-nox
           - aspcud
@@ -39,6 +47,8 @@ matrix:
   - env: CHECKED=native
     addons:
       apt:
+        sources:
+          - avsm
         packages:
           - ocaml-nox
           - aspcud
@@ -56,6 +66,8 @@ matrix:
   - env: CHECKED=windows
     addons:
       apt:
+        sources:
+          - avsm
         packages:
           - aspcud
           - opam
