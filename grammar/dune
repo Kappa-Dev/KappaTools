@@ -1,7 +1,7 @@
 (library
   (name kappa_grammar)
   (libraries yojson result
-    kappa_generic_toolset kappa_mixtures kappa_terms kappa_runtime)
+    kappa_generic_toolset kappa_runtime)
   (flags (:standard -w @a
     -open Kappa_generic_toolset
     -open Kappa_mixtures

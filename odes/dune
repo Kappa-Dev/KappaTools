@@ -1,10 +1,6 @@
-(include_subdirs unqualified)
-
 (executable
   (name KaDE)
-  (libraries num yojson str
-      	     kappa_generic_toolset kappa_mixtures kappa_terms kappa_runtime
-	     kappa_grammar kappa_cli kappa_logging kappa_parameters kappa_staticanalyses kappa_symmetries)
+  (libraries num yojson str kappa_runtime kappa_grammar kappa_cli kappa_staticanalyses kappa_kasa_export )
   (flags (:standard
 	-open Kappa_generic_toolset
 	-open Kappa_mixtures
@@ -15,4 +11,7 @@
 	-open Kappa_logging
   -open Kappa_parameters
 	-open Kappa_staticanalyses
-  -open Kappa_symmetries)))
+  -open Kappa_symmetries
+  -open Kappa_reachability
+  -open Kappa_kasa_export
+  -open Kappa_kasa_type_interface)))

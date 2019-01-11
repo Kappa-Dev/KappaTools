@@ -1,11 +1,8 @@
 (library
   (name kappa_logging)
   (libraries yojson
-    kappa_mixtures kappa_terms kappa_runtime kappa_grammar kappa_cli)
+    kappa_mixtures kappa_cli kappa_kasa_type_interface)
   (flags (:standard -w @a
     -open Kappa_generic_toolset
-    -open Kappa_mixtures
-    -open Kappa_terms
-    -open Kappa_runtime
-    -open Kappa_grammar
-    -open Kappa_cli)))
+    -open Kappa_cli
+    -open Kappa_kasa_type_interface)))

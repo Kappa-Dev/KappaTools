@@ -1,7 +1,7 @@
 (library
   (name kappa_agents)
   (modules agent_common)
-  (libraries logs.fmt lwt.unix kappa_generic_toolset kappa_parameters)
+  (libraries logs.fmt lwt.unix kappa_generic_toolset)
   (flags (:standard -w @a
     -open Kappa_generic_toolset)))
 

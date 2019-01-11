@@ -1,7 +1,7 @@
 (library
   (name kappa_cflow)
   (libraries yojson result
-    kappa_runtime kappa_cli kappa_logging kappa_profiling kappa_errors kappa_kasa_kastor_toolset kappa_parameters)
+     kappa_profiling kappa_kasa_kastor_toolset  kappa_classical_graphs)
   (flags (:standard
     -open Kappa_generic_toolset
     -open Kappa_mixtures
@@ -12,4 +12,5 @@
     -open Kappa_profiling
     -open Kappa_errors
     -open Kappa_kasa_kastor_toolset
-    -open Kappa_parameters)))
+    -open Kappa_parameters
+    -open Kappa_classical_graphs)))
