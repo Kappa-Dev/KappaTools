@@ -64,7 +64,7 @@ let xml () =
              ~a:([ Html.a_value key]@
                  (if key = current_file_id then [Html.a_selected ()]
                   else  []))
-             (Html.pcdata (Ui_common.option_label key)))
+             (Html.txt (Ui_common.option_label key)))
         file_ids in
     let () = update_outputs current_file_id in
     Tyxml_js.Html.select
@@ -89,7 +89,7 @@ let xml () =
                                | key::[] ->
                                  let () = update_outputs key in
                                  [Html.h4
-                                    [ Html.pcdata
+                                    [ Html.txt
                                         (Ui_common.option_label key)]]
                                | _ :: _ :: _ -> [select file_line_info])
                           in
@@ -112,7 +112,7 @@ let xml () =
              (function
                | None -> []
                | Some (_,lines) ->
-                 List.map (fun line -> Html.p [ Html.pcdata line ]) lines)
+                 List.map (fun line -> Html.p [ Html.txt line ]) lines)
              current_file))] in
   [ [%html {|<div class="navcontent-view">
              <div class="row">

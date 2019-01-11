@@ -16,8 +16,6 @@ type model_graph = {
 }
 
 type influence_sphere = {
-  origin :
-    (Public_data.rule,Public_data.var) Public_data.influence_node option;
   positive_on :
     ((Public_data.rule,Public_data.var) Public_data.influence_node *
      Public_data.location Public_data.pair list) list;
@@ -33,8 +31,7 @@ type influence_sphere = {
 }
 
 let empty_sphere =
-  { origin = None ;
-    positive_on = []; positive_by = []; negative_on = []; negative_by = [] }
+  { positive_on = []; positive_by = []; negative_on = []; negative_by = [] }
 
 type model_rendering =
   | DrawGraph of model_graph
@@ -171,13 +168,13 @@ let rendering_chooser =
             | DrawTabular _ -> Html.a_selected () :: l
             | DrawGraph _ -> l)
              [ Html.a_value "tabular" ])
-        (Html.pcdata "Tabular");
+        (Html.txt "Tabular");
       Html.option
         ~a:((fun l -> match rendering with
             | DrawGraph _ -> Html.a_selected () :: l
             | DrawTabular _ -> l)
              [ Html.a_value "graph" ])
-        (Html.pcdata "Graph");
+        (Html.txt "Graph");
     ]
 
 let accuracy_chooser_id = "influence-accuracy"
@@ -189,7 +186,7 @@ let accuracy_chooser =
       ~a:
         ((fun l -> if accuracy = Some x then Html.a_selected () :: l else l)
            [ Html.a_value (Public_data.accuracy_to_string x) ])
-      (Html.pcdata
+      (Html.txt
          (Public_data.accuracy_to_string x)) in
   Html.select
     ~a:[Html.a_class [ "form-control" ]; Html.a_id accuracy_chooser_id ]
@@ -393,7 +390,7 @@ let table_of_influences_json (_,_,_,_,origin,influence_map) =
                   | Some v -> (on,(v,data)::by)
                 else acc))
         influence_map.Public_data.negative ([],[]) in
-    { origin; positive_on; positive_by; negative_on; negative_by }
+    { positive_on; positive_by; negative_on; negative_by }
 
 let pop_cell = function
   | [] -> (Html.td [],[])
@@ -415,7 +412,7 @@ let rec fill_table acc by on =
     let line = Html.tr [ b; o ] in
     fill_table (line::acc) by' on'
 
-let draw_table { origin; positive_on; positive_by; negative_on; negative_by } =
+let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
   let by =
     List_util.rev_map_append (fun x -> (x,false)) negative_by
       (List.rev_map (fun x -> (x,true)) positive_by) in
@@ -461,19 +458,19 @@ let content () =
             Html.label
               ~a:[ Html.a_class ["col-md-2"];
                    Html.a_label_for rendering_chooser_id ]
-              [Html.pcdata "Rendering"];
+              [Html.txt "Rendering"];
             Html.span ~a:[Html.a_class ["col-md-4"] ] [rendering_chooser];
             Html.label
               ~a:[ Html.a_class ["col-md-2"];
                    Html.a_label_for accuracy_chooser_id ]
-              [Html.pcdata "Accuracy"];
+              [Html.txt "Accuracy"];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [accuracy_chooser] ];
               Html.div
           ~a:[ Html.a_class [ "form-group" ] ]
           [ Html.label
               ~a:[Html.a_class ["col-md-3"];
                   Html.a_label_for total_input_id]
-              [Html.pcdata "Navigate"];
+              [Html.txt "Navigate"];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [prev_node];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [next_node];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter]]] in
@@ -483,11 +480,11 @@ let content () =
           ~a:[ Html.a_class [ "form-group" ] ]
           [
             Html.label ~a:[Html.a_class ["col-md-3"]]
-              [Html.pcdata "Size Radius"];
+              [Html.txt "Size Radius"];
             Html.span  ~a:[Html.a_class ["col-md-2"]] [total_input];
-            Html.label ~a:[Html.a_class ["col-md-1"]] [Html.pcdata "fwd"];
+            Html.label ~a:[Html.a_class ["col-md-1"]] [Html.txt "fwd"];
             Html.span ~a:[Html.a_class ["col-md-2"]] [fwd_input];
-            Html.label ~a:[Html.a_class ["col-md-2"]] [Html.pcdata "bwd"];
+            Html.label ~a:[Html.a_class ["col-md-2"]] [Html.txt "bwd"];
             Html.span ~a:[Html.a_class ["col-md-2"]] [bwd_input];
           ]] in
   [ accuracy_form;
@@ -518,7 +515,7 @@ let content () =
                match rendering with
                | DrawGraph _ -> []
                | DrawTabular () -> match sphere with
-                 | Result.Ok sphere -> [ draw_table sphere ]
+                 | Result.Ok sphere -> [ draw_table origin sphere ]
                  | Result.Error mh -> Utility.print_method_handler mh)
             model influence_sphere));
     Widget_export.content export_config;

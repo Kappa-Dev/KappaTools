@@ -109,10 +109,10 @@ let label_news tab_is_active counter =
                   ReactiveData.RList.set
                     set_labels
                     (if v > 0 then
-                       [ Html.pcdata " " ;
+                       [ Html.txt " " ;
                          Html.span
                            ~a:[ Html.a_class ["label";"label-default"] ]
-                           [ Html.pcdata "New" ; ] ]
+                           [ Html.txt "New" ; ] ]
                      else [])
                )
                (React.S.changes count)
@@ -131,10 +131,10 @@ let badge
          if count > 0  then
            ReactiveData.RList.set
              badge_handle
-             [ Html.pcdata " " ;
+             [ Html.txt " " ;
                Html.span
                  ~a:[ Html.a_class ["badge"] ; ]
-                 [ Html.pcdata (string_of_int count) ; ] ;
+                 [ Html.txt (string_of_int count) ; ] ;
              ]
          else
            ReactiveData.RList.set badge_handle []
@@ -316,7 +316,7 @@ let create_modal
       Html.button
     ~a:[ Html.a_button_type `Submit;
          Html.a_class [ "btn" ; "btn-primary"; ] ]
-    [ Html.pcdata submit_label ] in
+    [ Html.txt submit_label ] in
   let form =
     Html.form
       ~a:[ Html.a_class [ "modal-content" ] ]

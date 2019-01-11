@@ -46,7 +46,7 @@ let content () =
          tab_is_active State_simulation.dummy_model State_simulation.model) in
     [ Html.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
-      [ Tyxml_js.R.Html.pcdata state_log ]
+      [ Tyxml_js.R.Html.txt state_log ]
     ]
 
 let parent_hide () = set_tab_is_active false

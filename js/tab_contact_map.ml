@@ -61,8 +61,7 @@ let accuracy_chooser =
         ((fun l -> if React.S.value accuracy = Some x
            then Html.a_selected () :: l else l)
            [ Html.a_value (Public_data.accuracy_to_string x) ])
-      (Html.pcdata
-         (Public_data.accuracy_to_string x)) in
+      (Html.txt (Public_data.accuracy_to_string x)) in
   Html.select
     ~a:[Html.a_class [ "form-control" ]; Html.a_id accuracy_chooser_id ]
     (List.map option_gen Public_data.contact_map_accuracy_levels)
@@ -73,7 +72,7 @@ let content () =
                    Html.a_id "contact_map_accuracy_form" ]
       [ Html.div ~a:[ Html.a_class [ "form-group" ] ]
           [ Html.label ~a:[ Html.a_class ["col-md-2"]; Html.a_label_for accuracy_chooser_id ]
-              [Html.pcdata "Accuracy"];
+              [Html.txt "Accuracy"];
             Html.div ~a:[Html.a_class ["col-md-10"] ] [accuracy_chooser] ]
       ] in
   [ accuracy_form;

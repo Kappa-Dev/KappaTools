@@ -72,7 +72,7 @@ let content () =
                          []
                          (List.rev b) in
                      let title = Html.div
-                         ~a:[Html.a_class [ "panel-heading" ]] [Html.pcdata a] in
+                         ~a:[Html.a_class [ "panel-heading" ]] [Html.txt a] in
                      let content = Html.div
                          ~a:[Html.a_class [ "panel-body"; "panel-pre" ]] texts in
                      Html.div
@@ -81,7 +81,7 @@ let content () =
                   [] constraints)
            | Result.Error r ->
              let title = Html.div
-                 ~a:[Html.a_class [ "panel-heading" ]] [Html.pcdata "KaSa has failed"] in
+                 ~a:[Html.a_class [ "panel-heading" ]] [Html.txt "KaSa has failed"] in
              let content = Html.div
                  ~a:[Html.a_class [ "panel-body"; "panel-pre" ]]
                  (Utility.print_method_handler r) in

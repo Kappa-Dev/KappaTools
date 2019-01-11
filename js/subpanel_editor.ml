@@ -15,7 +15,7 @@ let filename , set_filename = React.S.create (None : string option)
 
 let file_label_signal, set_file_label = React.S.create ""
 let file_label =
-  Tyxml_js.R.Html.pcdata
+  Tyxml_js.R.Html.txt
     (React.S.bind
        State_file.model
        (fun model ->
@@ -58,7 +58,7 @@ let content () =
   let textarea =
     Html.textarea
       ~a:[Html.a_id codemirror_id]
-      (Html.pcdata "")
+      (Html.txt "")
   in
   Html.div
     ~a:[Html.a_class ["flex-content";"panel";"panel-default"]]

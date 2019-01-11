@@ -185,7 +185,7 @@ let content () =
                 )
              );
            ]
-        [ Html.pcdata "File" ;
+        [ Html.txt "File" ;
           Html.span ~a:[ Html.a_class ["caret"]] [ ]
         ] ;
       Tyxml_js.R.Html.ul

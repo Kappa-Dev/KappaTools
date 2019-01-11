@@ -219,14 +219,14 @@ module DivErrorMessage : Ui_common.Div = struct
     let message_nav_dec =
       Html.span
       ~a:[ Html.a_id message_nav_dec_id ; a_class ; ]
-      [ Html.pcdata " « " ]
+      [ Html.txt " « " ]
     let message_nav_inc =
       Html.span
       ~a:[ Html.a_id message_nav_inc_id ; a_class ; ]
-      [ Html.pcdata " » " ]
+      [ Html.txt " » " ]
     let message_nav =
     [  message_nav_dec ;
-       Tyxml_js.R.Html.pcdata mesage_nav_text ;
+       Tyxml_js.R.Html.txt mesage_nav_text ;
        message_nav_inc ; ]
 
   let file_label_text =
@@ -248,7 +248,7 @@ module DivErrorMessage : Ui_common.Div = struct
       ~a:[Html.a_id message_file_label_id;
           Html.a_class [ "error-span" ; "clickable" ] ;
          ]
-          [Tyxml_js.R.Html.pcdata file_label_text]
+          [Tyxml_js.R.Html.txt file_label_text]
 
   let error_message_text =
     React.S.l2
@@ -264,7 +264,7 @@ module DivErrorMessage : Ui_common.Div = struct
       ~a:[Html.a_id id ;
           Html.a_class [ "error-span" ] ;
          ]
-      [Tyxml_js.R.Html.pcdata error_message_text]
+      [Tyxml_js.R.Html.txt error_message_text]
 
   let alert_messages =
     Html.div
@@ -504,7 +504,7 @@ module DivStatusIndicator : Ui_common.Div = struct
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     let debug =
       Html.div
-        [ Tyxml_js.R.Html.pcdata
+        [ Tyxml_js.R.Html.txt
             (React.S.bind
                State_simulation.model
                (fun model ->
@@ -539,7 +539,7 @@ module RunningPanelLayout : Ui_common.Div = struct
               (fun s -> Format.sprintf "width: %d%%;" s)
               percent_signal) ;
            Html.a_class ["progress-bar"] ]
-    [ Tyxml_js.R.Html.pcdata
+    [ Tyxml_js.R.Html.txt
         (React.S.bind
            value_signal
            (fun value -> React.S.const value)
@@ -613,7 +613,7 @@ module RunningPanelLayout : Ui_common.Div = struct
       None
 
   let tracked_events_count () =
-    Tyxml_js.R.Html.pcdata
+    Tyxml_js.R.Html.txt
       (React.S.map
          (fun model ->
             let simulation_info = State_simulation.model_simulation_info model in
@@ -624,7 +624,7 @@ module RunningPanelLayout : Ui_common.Div = struct
          State_simulation.model)
 
   let tracked_events_label () =
-    Tyxml_js.R.Html.pcdata
+    Tyxml_js.R.Html.txt
       (React.S.map
          (fun model ->
             let simulation_info = State_simulation.model_simulation_info model in
@@ -642,7 +642,7 @@ module RunningPanelLayout : Ui_common.Div = struct
          t.Counter.Efficiency.time_correction) in
     let events = float_of_int current_event in
     Html.p
-      [ Html.pcdata
+      [ Html.txt
           (Format.asprintf
              "@[%.2f%% of event loops were productive.%t@]"
              (100. *. events /. (all +. events))
@@ -651,7 +651,7 @@ module RunningPanelLayout : Ui_common.Div = struct
     ::
     ((if t.Counter.Efficiency.no_more_unary > 0 then
        Some (Html.p
-               [ Html.pcdata
+               [ Html.txt
                    (Format.asprintf
                       "Valid embedding but no longer unary when required: %.2f%%"
                       (100. *. (float_of_int t.Counter.Efficiency.no_more_unary) /. all) )])
@@ -659,7 +659,7 @@ module RunningPanelLayout : Ui_common.Div = struct
     $$
     ((if t.Counter.Efficiency.no_more_binary > 0 then
        Some (Html.p
-               [ Html.pcdata
+               [ Html.txt
                    (Format.asprintf
                       "Valid embedding but not binary when required: %.2f%%"
                       (100. *. (float_of_int t.Counter.Efficiency.no_more_binary) /. all)) ] )
@@ -667,7 +667,7 @@ module RunningPanelLayout : Ui_common.Div = struct
     $$
     ((if t.Counter.Efficiency.clashing_instance > 0 then
        Some (Html.p
-               [ Html.pcdata
+               [ Html.txt
                    (Format.asprintf
                       "Clashing instance: %.2f%%"
                       (100. *. (float_of_int t.Counter.Efficiency.clashing_instance) /. all))])
@@ -675,7 +675,7 @@ module RunningPanelLayout : Ui_common.Div = struct
     $$
     ((if t.Counter.Efficiency.time_correction > 0 then
        Some (Html.p
-               [ Html.pcdata
+               [ Html.txt
                    (Format.asprintf
                       "Perturbation interrupting time advance: %.2f%%"
                       (100. *. (float_of_int t.Counter.Efficiency.time_correction) /. all))])

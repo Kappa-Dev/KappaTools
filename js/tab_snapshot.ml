@@ -195,7 +195,7 @@ let select (snapshots : Api_types_j.snapshot_id list) =
                  | Some s -> s.Data.snapshot_file = snapshot_id)
              then [Html.a_selected ()]
              else [])
-         (Html.pcdata snapshot_id))
+         (Html.txt snapshot_id))
     snapshots
 
 let snapshot_class :
@@ -247,7 +247,7 @@ let xml () =
                 ~single:(fun _ -> ["oneliner"; "visible"])
                 ~multiple:(fun _ -> ["hidden"]))
          ]
-      [ Tyxml_js.R.Html.pcdata
+      [ Tyxml_js.R.Html.txt
           (React.S.map
              (fun snapshot ->
                 match snapshot with
@@ -296,7 +296,7 @@ let xml () =
                 display_format
              )
          ]
-      [ Tyxml_js.R.Html.pcdata
+      [ Tyxml_js.R.Html.txt
           (React.S.map
              (fun snapshot ->
                 match snapshot with

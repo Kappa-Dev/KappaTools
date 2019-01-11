@@ -25,9 +25,9 @@ let fill_table din =
   let all = din.din_data.din_kind = Primitives.PROBABILITY in
   let header =
     Html.tr
-      ((Html.th [Html.pcdata "affects"]) ::
+      ((Html.th [Html.txt "affects"]) ::
        Array.fold_right
-         (fun r acc -> Html.th [Html.pcdata r] :: acc)
+         (fun r acc -> Html.th [Html.txt r] :: acc)
          din.din_rules []) in
   let body =
     Tools.array_fold_righti
@@ -35,7 +35,7 @@ let fill_table din =
          if all || din.din_data.din_hits.(i) > 0 then
            Html.tr
              (Html.th
-                [Html.pcdata (din.din_rules.(i)^" ("^
+                [Html.txt (din.din_rules.(i)^" ("^
                               string_of_int din.din_data.din_hits.(i)^
                               " hits)")] ::
               Array.fold_right
@@ -43,7 +43,7 @@ let fill_table din =
                     ~a:[Html.a_class (if v > 0. then ["success"]
                                       else if v < 0. then ["info"]
                                       else [])]
-                    [Html.pcdata (string_of_float v)] :: acc)
+                    [Html.txt (string_of_float v)] :: acc)
                 data [])
            ::acc
          else acc) din.din_data.din_fluxs [] in
@@ -94,7 +94,7 @@ let _ = React.S.map
                       (List.rev_map
                          (fun id -> Html.option
                              ~a:[ Html.a_value id ]
-                             (Html.pcdata id))
+                             (Html.txt id))
                          data.Api_types_t.din_ids) in
                   let () = select_din () in
                   Lwt.return (Api_common.result_ok ()))

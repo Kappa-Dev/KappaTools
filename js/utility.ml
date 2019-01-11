@@ -20,7 +20,7 @@ let split (s : string) (delimiter : char) : (string * string option) =
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
-let print_string s list = (Html.pcdata s)::list
+let print_string s list = (Html.txt s)::list
 let print_newline list = print_string "\n" list
 let print_int i l = print_string (string_of_int i) l
 
@@ -124,8 +124,8 @@ let print_agent agent list =
             true,list)
          (false,list) interface)
   in
-  let list = (Html.pcdata "(")::list in
-  let list = (Html.pcdata agent_name)::list in
+  let list = (Html.txt "(")::list in
+  let list = (Html.txt agent_name)::list in
   list
 
 let print_site_graph agent_list list =
@@ -147,14 +147,14 @@ let print_method_handler mh =
   List.fold_right
     (fun x l ->
        Html.p
-         [Html.pcdata
+         [Html.txt
             (Format.asprintf
                "%a" Exception_without_parameter.pp_caught x)]::l)
     caught
     (List.map
        (fun x ->
           Html.p
-            [Html.pcdata
+            [Html.txt
                (Format.asprintf
                   "%a" Exception_without_parameter.pp_uncaught x)])
        uncaught)

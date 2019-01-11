@@ -12,7 +12,7 @@ let preferences_modal_id = "preferences_modal"
 let settings_client_id_input_id = "settings-client-id-input"
 
 let preferences_button =
-  Html.a [ Html.pcdata "Preferences" ]
+  Html.a [ Html.txt "Preferences" ]
 
 let option_seed_input =
   Html.input ~a:[
@@ -32,12 +32,12 @@ let decrease_font =
   Html.button ~a:[
     Html.a_button_type `Button;
     Html.a_class [ "btn"; "btn-default"; "btn-sm" ]
-  ] [Html.pcdata "-"]
+  ] [Html.txt "-"]
 let increase_font =
   Html.button ~a:[
     Html.a_button_type `Button;
     Html.a_class [ "btn"; "btn-default"; "btn-lg" ]
-  ] [Html.pcdata "+"]
+  ] [Html.txt "+"]
 
 let settings_client_id_input =
   Html.input
@@ -61,7 +61,7 @@ let dropdown (model : State_runtime.model) =
         Html.option
           ~a:(Html.a_value spec_id ::
               if current_id = spec_id then [Html.a_selected ()] else [])
-          (Html.pcdata (State_runtime.spec_label spec)))
+          (Html.txt (State_runtime.spec_label spec)))
      model.State_runtime.model_runtimes)
 
 let backend_options, backend_handle = ReactiveData.RList.create []
@@ -121,13 +121,13 @@ let set_button =
   Html.button
     ~a:[ Html.a_button_type `Submit;
          Html.a_class [ "btn"; "btn-primary" ] ]
-    [ Html.pcdata "Set" ]
+    [ Html.txt "Set" ]
 
 let save_button =
   Html.button
     ~a:[ Html.a_button_type `Button;
          Html.a_class [ "btn"; "btn-default" ] ]
-    [ Html.pcdata "Save as default" ]
+    [ Html.txt "Save as default" ]
 
 let modal =
   let head = Html.div
@@ -137,7 +137,7 @@ let modal =
                Html.a_class [ "close" ];
                Html.a_user_data "dismiss" "modal" ]
           [ Html.entity "times" ];
-        Html.h4 ~a:[ Html.a_class ["modal-title"] ] [ Html.pcdata "Preferences" ]
+        Html.h4 ~a:[ Html.a_class ["modal-title"] ] [ Html.txt "Preferences" ]
       ] in
   let body = Html.div
       ~a:[ Html.a_class [ "modal-body" ] ]
@@ -149,7 +149,7 @@ let modal =
           ~a:[ Html.a_button_type `Button;
                Html.a_class [ "btn"; "btn-default" ];
                Html.a_user_data "dismiss" "modal" ]
-          [ Html.pcdata "Close" ] ] in
+          [ Html.txt "Close" ] ] in
   Html.form
     ~a:[ Html.a_class [ "modal-content"; "form-horizontal" ] ]
     [head; body; foot]

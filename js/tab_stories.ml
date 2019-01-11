@@ -25,7 +25,7 @@ let strong_box = Tyxml_js.To_dom.of_input strong_checkbox
 
 let launch_button = Html.button
     ~a:[Html.a_class ["btn"; "btn-default"]; Html.a_button_type `Submit]
-    [Html.pcdata "Launch"]
+    [Html.txt "Launch"]
 
 let story_list, list_control = React.S.create []
 
@@ -34,7 +34,7 @@ let story_list_html =
     (fun (id,cm) ->
        Html.option
          ~a:[Html.a_value (string_of_int id)]
-         (Html.pcdata (Format.asprintf
+         (Html.txt (Format.asprintf
                          "@[%i (%a)@]"
                          id Kastor_client.print_compression_modes cm)))
     (ReactiveData.RList.from_signal story_list)
@@ -62,7 +62,7 @@ let current_info, set_info = React.S.create ""
 
 let story_log_html =
   ReactiveData.RList.map
-    (fun line -> Html.pcdata (line^"\n"))
+    (fun line -> Html.txt (line^"\n"))
     (ReactiveData.RList.rev
        (ReactiveData.RList.from_signal story_log))
 
@@ -76,7 +76,7 @@ let log_panel =
          "story_info_log", None,  ReactiveData.RList.empty ];
      Ui_common.navcontent ["panel-scroll"]
        [ "story_computation_log", [], [log_div];
-         "story_info_log", ["panel-pre"], [Tyxml_js.R.Html5.pcdata current_info]]]
+         "story_info_log", ["panel-pre"], [Tyxml_js.R.Html5.txt current_info]]]
 
 let graph_display_id = "story_graph_display"
 let story_graph = Js_story.create_story_rendering graph_display_id
