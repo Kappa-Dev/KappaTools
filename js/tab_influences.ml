@@ -542,9 +542,10 @@ let _ =
                     let logger =
                       Loggers.open_logger_from_formatter
                         ~mode:Loggers.Js_Graph fmt in
-                    let () =
-                      json_to_graph logger influences in
-                    let graph = Loggers.graph_of_logger logger in
+                    let logger_graph = Graph_loggers_sig.extend_logger logger in
+                    let () = json_to_graph logger_graph influences in
+                    let graph =
+                      Graph_loggers_sig.graph_of_logger logger_graph in
                     let graph_json = Graph_json.to_json graph in
                     let () = Loggers.flush_logger logger in
                     let () = Loggers.close_logger logger in
