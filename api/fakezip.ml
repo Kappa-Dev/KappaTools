@@ -52,18 +52,6 @@ let filename_is_directory name =
 
 (* Convert between Unix dates and DOS dates *)
 
-let unixtime_of_dostime time date =
-  fst(Unix.mktime
-        { Unix.tm_sec = (time lsl 1) land 0x3e;
-          Unix.tm_min = (time lsr 5) land 0x3f;
-          Unix.tm_hour = (time lsr 11) land 0x1f;
-          Unix.tm_mday = date land 0x1f;
-          Unix.tm_mon = ((date lsr 5) land 0xf) - 1;
-          Unix.tm_year = ((date lsr 9) land 0x7f) + 80;
-          Unix.tm_wday = 0;
-          Unix.tm_yday = 0;
-          Unix.tm_isdst = false })
-
 let dostime_of_unixtime t =
   let tm = Unix.localtime t in
   (tm.Unix.tm_sec lsr 1

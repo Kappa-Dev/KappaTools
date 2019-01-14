@@ -31,12 +31,14 @@ type compression_method =
 type out_file
           (** Abstract type representing a handle opened for writing to
               a ZIP file. *)
+
 val open_out: ?comment: string -> string -> out_file
 (** Create the structure representing a ZIP file. The argument
    (morally the filename) is useless.  The optional argument [comment]
    is a comment string that is attached to the ZIP file as a whole (as
    opposed to the comments that can be attached to individual ZIP
    entries). *)
+
 val add_entry:
   string -> out_file -> 
     ?extra: string -> ?comment: string -> ?level: int ->
@@ -76,6 +78,7 @@ val copy_file_to_entry:
               optional parameter is the time of last modification of the
               file. *)
 *)
+
 val add_entry_generator:
   out_file ->
     ?extra: string -> ?comment: string -> ?level: int ->
@@ -93,6 +96,7 @@ val add_entry_generator:
               [Zip.add_entry_generator].  [finish] must be called exactly once.
               The optional arguments to [Zip.add_entry_generator]
               are as described in {!Zip.add_entry}. *)
+
 val close_out: out_file -> Bigbuffer.bigstring
           (** Finish writing the ZIP archive by adding the table of
               contents, and return its content. *)

@@ -2,16 +2,8 @@ open Lwt.Infix
 
 (** Interface to kappa runtime *)
 (* Error messages *)
-let msg_process_not_running =
-  "process not running"
-let msg_process_already_paused =
-  "process already paused"
 let msg_process_not_paused =
   "process not paused"
-let msg_observables_less_than_zero =
-  "Plot observables must be greater than zero"
-let msg_missing_intervention_context =
-  "Invalid runtime state: missing intervention context"
 
 (**  System process
 
@@ -33,20 +25,7 @@ class null_process : system_process =
       Lwt.return_unit
     method yield () = Lwt.return_unit
     method min_run_duration() = 0.0
-  end;;
-
-type file_index =
-  { file_index_file_id : Api_types_t.file_id ;
-    file_index_line_offset : int ;
-    file_index_char_offset : int ;
-    file_line_count : int ; }
-
-type kappa_file =
-  { kappa_file_id : Api_types_t.file_id ;
-    kappa_file_code : string ;
-  }
-
-type kappa_code = kappa_file list
+  end
 
 (** State of the running simulation. *)
 type t =

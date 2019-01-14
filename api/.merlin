@@ -1,6 +1,0 @@
-B ../_build/api
-
-PKG lwt
-PKG atdgen
-
-REC
