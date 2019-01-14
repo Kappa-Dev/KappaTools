@@ -11,8 +11,6 @@ MANGENREP = $(MANREP)$(GENIMG)/
 
 RANDOM_NUMBER = $(shell bash -c 'echo $$RANDOM')
 
-OCAMLBEST := $(shell which `ocamlfind opt -only-show` > /dev/null && echo native || echo byte)
-
 SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)
 SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness) $(MANGENREP)version.tex
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
@@ -146,11 +144,12 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc cl
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
 
 check:
-	@+$(MAKE) bin/sanity_test
+	dune runtest
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite all
 
-build-tests: bin/sanity_test
+build-tests:
+	dune promote
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite build
 
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:

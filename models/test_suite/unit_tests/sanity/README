@@ -1,2 +1,0 @@
-#Command-line:
-"${KAPPABIN}"sanity_test || exit 0

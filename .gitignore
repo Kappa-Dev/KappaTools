@@ -1,15 +1,5 @@
 js/external
 todo.org
-*.cm*
-*.o
-*.annot
-KaSim.docdir
-KaSim
-KaStor
-KaSa
-KaDE
-sanity_test
-bin/
 *~
 _build/
 .merlin
@@ -18,9 +8,6 @@ _build/
 Kappapp.app
 
 #server
-WebSim
-KaSimAgent
-KaSaAgent
 ide/Kappa.icns
 ide/Kappa.iconset/
 ide/Info.plist
@@ -63,7 +50,6 @@ models/test_suite/*/*/output/profiling.html
 models/test_suite/*/*/output/compression_status.txt
 
 # generated code
-generated/
 site
 *.install
 
