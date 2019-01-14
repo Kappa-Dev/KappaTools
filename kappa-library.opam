@@ -1,0 +1,25 @@
+opam-version: "2.0"
+version: "4~dev"
+synopsis: "Public internals of the Kappa tool suite"
+maintainer: "Pierre Boutillier <pierre.boutillier@laposte.net>"
+authors: [
+  "Jean Krivine" "Jérôme Feret" "Pierre Boutillier"
+  "Ioana Cristescu" "Mutaamba Maasha" "Lý Kim Quyên"
+]
+license: "LGPL-3.0"
+homepage: "https://kappalanguage.org/"
+bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
+dev-repo: "git+https://github.com/Kappa-Dev/KaSim.git"
+
+depends : [
+  "ocaml" { >= "4.03.0" }
+  "num"
+  "re"
+  "dune"
+  "yojson"
+  "lwt" { >= "2.6.0" }
+  "fmt"
+  "logs"
+]
+
+build: ["dune" "build" "-p" name "-j" jobs]

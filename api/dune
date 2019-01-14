@@ -1,6 +1,6 @@
 (library
  (name kappa_json_api)
- (libraries atdgen lwt
+ (libraries atdgen-runtime lwt
             kappa_grammar kappa_kasa_type_interface kappa_cflow)
  (flags (:standard -w @a
           -open Kappa_generic_toolset

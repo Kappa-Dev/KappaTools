@@ -1,5 +1,5 @@
 (library
-  (name kappa_generic_toolset)
-  (libraries yojson result)
-  (flags (:standard -w @a)))
-
+ (name kappa_generic_toolset)
+ (libraries yojson result)
+ (public_name kappa-library.generic)
+ (flags (:standard -w @a)))

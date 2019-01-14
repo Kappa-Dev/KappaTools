@@ -644,7 +644,8 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
-    (** Static analyses *)
+
+    (* Static analyses *)
     { Webapp_common.path = "/v2/projects/{projectid}/analyses" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `PUT ; ] in

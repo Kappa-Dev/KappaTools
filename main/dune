@@ -3,6 +3,8 @@
   (libraries lwt fmt num yojson
   	     kappa_version kappa_generic_toolset kappa_mixtures kappa_terms kappa_runtime
 	     kappa_grammar kappa_cli)
+  (public_name KaSim)
+  (package kappa-binaries)
 (flags (:standard -w @a
   -open Kappa_version
 	-open Kappa_generic_toolset

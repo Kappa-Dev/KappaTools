@@ -1,4 +1,0 @@
-S ../api
-
-PKG cohttp-lwt-unix atdgen
-REC

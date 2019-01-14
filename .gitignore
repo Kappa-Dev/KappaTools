@@ -12,6 +12,7 @@ sanity_test
 bin/
 *~
 _build/
+.merlin
 ._d/
 ._ncdi/
 Kappapp.app
@@ -64,9 +65,7 @@ models/test_suite/*/*/output/compression_status.txt
 # generated code
 generated/
 site
-*.byte
-*.native
-META
+*.install
 
 # python
 *.pyc

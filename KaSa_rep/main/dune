@@ -33,6 +33,8 @@
   (name KaSa)
   (libraries num yojson str kappa_staticanalyses kappa_kasa_frontend)
   (modules KaSa)
+  (public_name KaSa)
+  (package kappa-binaries)
   (flags (:standard
   -open Kappa_logging
   -open Kappa_errors

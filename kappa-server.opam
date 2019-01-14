@@ -1,0 +1,30 @@
+opam-version: "2.0"
+synopsis:"HTTP server to query the Kappa tool suite"
+version: "4~dev"
+maintainer: "Pierre Boutillier <pierre.boutillier@laposte.net>"
+authors: [
+  "Jean Krivine" "Jérôme Feret" "Pierre Boutillier"
+  "Ioana Cristescu" "Mutaamba Maasha" "Lý Kim Quyên"
+]
+license: "LGPL-3.0"
+homepage: "https://kappalanguage.org/"
+bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
+dev-repo: "git+https://github.com/Kappa-Dev/KaSim.git"
+
+depends : [
+  "ocaml" { >= "4.03.0" }
+  "num"
+  "re"
+  "dune"
+  "yojson"
+  "lwt" { >= "2.6.0" }
+  "fmt"
+  "logs"
+  "kappa-binaries"
+  "kappa-agents"
+  "cohttp-lwt-unix"
+  "atdgen-runtime"
+  "atdgen" {build}
+]
+
+build: ["dune" "build" "-p" name "-j" jobs]
