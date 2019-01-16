@@ -454,7 +454,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
           (let x = Unix.gettimeofday () in
            (Unix.localtime x).Unix.tm_hour - (Unix.gmtime x).Unix.tm_hour) ;
           Remanent_parameters_sig.hostname =
-            begin try Unix.gethostname () with Failure _ -> "javascript" end;
+            begin try Unix.gethostname () with _ -> "javascript" end;
           Remanent_parameters_sig.command_line= command;
           Remanent_parameters_sig.short_version=Version.version_string;
           Remanent_parameters_sig.version=Version.version_kasa_full_name;

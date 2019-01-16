@@ -30,14 +30,6 @@ let find_metadata
               directory)
   with Not_found -> None
 
-let directory_metadata directory_state : Api_types_j.file_metadata option =
-  try
-    match directory_state.state_current with
-    | None -> None
-    | Some file_id ->
-      find_metadata file_id directory_state.state_directory
-
-  with Not_found -> None
 let blank_state = { state_current = None ; state_directory = [] }
 let directory_state , set_directory_state = React.S.create blank_state
 type refresh = { filename : string ; content : string ; line : int option ; }

@@ -48,8 +48,6 @@ let navli () = ReactiveData.RList.empty
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
-let node = ref None
-
 let dummy_model = {
   rendering = DrawTabular ();
   accuracy = Some Public_data.Low;

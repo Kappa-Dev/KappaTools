@@ -24,16 +24,6 @@ let has_plot (state : Api_types_j.simulation_info option) : bool =
   | None -> false
   | Some state ->
     state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_plot > 0
-let plot_time
-    (state : Api_types_j.simulation_info option) : float option =
-  match state with
-  | None -> None
-  | Some state ->
-    Some state.
-           Api_types_j.
-           simulation_info_progress.
-           Api_types_j.
-           simulation_progress_time
 
 let export_json filename =
   State_simulation.when_ready

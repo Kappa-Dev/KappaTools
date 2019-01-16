@@ -289,9 +289,6 @@ let sync () : unit Api.result Lwt.t =
              } in
            Lwt.return (Api_common.result_kasa out)))
 
-let remove_simulations manager project_id =
-  manager#simulation_delete project_id
-
 let remove_files manager =
   manager#file_catalog >>=
   (Api_common.result_bind_lwt

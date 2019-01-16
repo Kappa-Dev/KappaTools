@@ -13,7 +13,6 @@ let editor_full , set_editor_full = React.S.create (false : bool)
 let is_paused , set_is_paused = React.S.create (false : bool)
 let filename , set_filename = React.S.create (None : string option)
 
-let file_label_signal, set_file_label = React.S.create ""
 let file_label =
   Tyxml_js.R.Html.txt
     (React.S.bind

@@ -18,11 +18,9 @@ let split (s : string) (delimiter : char) : (string * string option) =
   with Not_found -> (s,None)
 
 module Html = Tyxml_js.Html5
-open Lwt.Infix
 
 let print_string s list = (Html.txt s)::list
 let print_newline list = print_string "\n" list
-let print_int i l = print_string (string_of_int i) l
 
 let print_single_binding_state a list =
   print_string

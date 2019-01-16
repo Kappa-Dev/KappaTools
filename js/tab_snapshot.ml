@@ -14,10 +14,6 @@ let current_snapshot, set_current_snapshot =
   React.S.create (None : Data.snapshot option)
 
 type display_format = Kappa | Graph
-let display_format_to_string =
-  function
-  | Kappa -> "Kappa"
-  | Graph -> "Graph"
 let string_to_display_format =
   function
   | "Kappa" -> Some Kappa

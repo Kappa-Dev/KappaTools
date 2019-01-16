@@ -14,11 +14,12 @@ let navli () = ReactiveData.RList.empty
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
-(* todo add button to switch on/off the display of the information of each abstract domain *)
-let non_relational = ref true
-let relational = ref true
-let site_accross = ref true
-let parallel_bond = ref true
+(* todo add button to switch on/off the display of the information of each abstract domain
+   let non_relational = ref true
+   let relational = ref true
+   let site_accross = ref true
+   let parallel_bond = ref true
+*)
 
 let content () =
   let constraints_div =

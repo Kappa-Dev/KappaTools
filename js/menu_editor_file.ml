@@ -6,7 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Lwt.Infix
 module Html = Tyxml_js.Html5
 
 let file_new_modal_id = "menu-editor-file-new-modal"

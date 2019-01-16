@@ -8,8 +8,6 @@
 
 module Html = Tyxml_js.Html5
 
-open Lwt.Infix
-
 let display_id = "contact-map-display"
 let export_id = "contact-export"
 
@@ -78,20 +76,6 @@ let content () =
   [ accuracy_form;
     Html.div ~a:[ Html.a_id display_id; Html.a_class [ "flex-content" ] ] [ Html.entity "nbsp" ];
     Widget_export.content configuration ]
-
-let extract_contact_scc json =
-  match json with
-  | `Assoc [ "scc", `Assoc l] when List.length l = 3 ->
-    begin
-      try
-      let acc_cm = List.assoc "accuracy_cm" l in
-      let acc_scc = List.assoc "accuracy_scc" l in
-      let scc = List.assoc "map" l in
-      acc_cm, acc_scc, scc
-    with _ ->
-      failwith "Wrong ugly scc extractor"
-  end
-  | _ -> failwith "Wrong ugly scc extractor"
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active

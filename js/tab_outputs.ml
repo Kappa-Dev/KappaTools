@@ -11,7 +11,6 @@ open Lwt.Infix
 
 
 let select_id = "output-select-id"
-let export_id = "output-export"
 
 let tab_is_active, set_tab_is_active = React.S.create false
 
@@ -36,14 +35,6 @@ let file_count state =
   | None -> 0
   | Some state ->
     state.Api_types_t.simulation_info_output.Api_types_t.simulation_output_file_lines
-(* Careful this defaults to None which a valid file identifier.
-   The idea is to always give a valid file identifier.
- *)
-let get_file_line_id
-    (file : Api_types_j.file_line_detail) : string option =
-  match file with
-  | h::_ -> h.Api_types_j.file_line_name
-  | [] -> None
 
 let navli () =
   Ui_common.badge (fun state -> (file_count state))

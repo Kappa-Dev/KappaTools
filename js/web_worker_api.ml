@@ -12,7 +12,7 @@ class manager () =
   let kastor_worker = Worker.create "KaStorWorker.js" in
   let stor_state,update_stor_state = Kastor_client.init_state () in
   object(self)
-    val sim_worker = Worker.create "WebWorker.js"
+    val sim_worker = Worker.create "KaSimWorker.js"
     val mutable is_running = true
     initializer
       let () = kasa_worker##.onmessage :=
