@@ -1,0 +1,53 @@
+(library
+ (name kappa_js_lib)
+ (modules Common)
+ (libraries js_of_ocaml-lwt)
+ (flags :standard -w @a
+        -open Js_of_ocaml))
+
+(executable
+ (name KaSimWorker)
+ (modules KaSimWorker)
+ (libraries kappa_js_lib kappa_json_api)
+ (flags :standard -w @a
+        -open Js_of_ocaml
+        -open Kappa_js_lib
+        -open Kappa_json_api))
+
+(executable
+ (name KaSaWorker)
+ (modules KaSaWorker)
+ (libraries kappa_js_lib kappa_kasa_export)
+ (flags :standard -w @a
+        -open Js_of_ocaml
+        -open Kappa_js_lib
+        -open Kappa_kasa_export))
+
+(executable
+ (name KaStorWorker)
+ (modules KaStorWorker)
+ (libraries kappa_js_lib kappa_cflow)
+ (flags :standard -w @a
+        -open Js_of_ocaml
+        -open Kappa_js_lib
+        -open Kappa_cflow))
+
+(executable
+ (name JsSim)
+ (modules :standard \ Common KaSimWorker KaSaWorker KaStorWorker)
+ (libraries js_of_ocaml-tyxml lwt_react kappa_js_lib kappa_json_api kappa_parameters)
+ (preprocess (pps js_of_ocaml-ppx tyxml-ppx))
+ (flags :standard -w @a
+        -open Js_of_ocaml
+        -open Kappa_js_lib
+        -open Kappa_json_api
+        -open Kappa_generic_toolset
+        -open Kappa_terms
+        -open Kappa_grammar
+        -open Kappa_runtime
+        -open Kappa_errors
+        -open Kappa_kasa_type_interface
+        -open Kappa_parameters
+        -open Kappa_classical_graphs
+        -open Kappa_logging
+        -open Kappa_cflow))

@@ -9,24 +9,15 @@ MANIMGREP = $(MANREP)img/
 GENIMG = generated_img
 MANGENREP = $(MANREP)$(GENIMG)/
 
-KASAREP = KaSa_rep/
 RANDOM_NUMBER = $(shell bash -c 'echo $$RANDOM')
 
 OCAMLBEST := $(shell which `ocamlfind opt -only-show` > /dev/null && echo native || echo byte)
-OCAMLBUILDFLAGS = $(EXTRAFLAGS)
-
-ifeq ($(DEBUG),1)
-JSOFOCAMLFLAGS = --debuginfo --sourcemap --pretty "+nat.js"
-else
-JSOFOCAMLFLAGS = "+nat.js"
-endif
 
 SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)
 SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness) $(MANGENREP)version.tex
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
-RESOURCES_HTML=$(wildcard _build/default/js/*.js) $(wildcard shared/*.js) $(wildcard viz/*.js) \
-		$(wildcard viz/*.css) js/favicon.ico js/package.json
+RESOURCES_HTML=$(wildcard shared/*.js) $(wildcard viz/*.js) $(wildcard viz/*.css) js/favicon.ico js/package.json
 
 APP_EXT?=cdn
 INDEX_HTML=js/use-$(APP_EXT).html
@@ -36,7 +27,7 @@ else
 SITE_EXTRAS=
 endif
 
-.PHONY: all agents clean check build-tests doc clean_doc fetch_version debug
+.PHONY: all agents clean check build-tests doc clean_doc debug
 .PHONY: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 .PHONY: profiling Kappapp.app kappalib install-lib KappaBin.zip Kappapp.tar.gz
 
@@ -86,34 +77,14 @@ site/external/jquery: externals.mk
 	curl -LsS -o site/external/jquery/jquery.js https://code.jquery.com/jquery-$(JQUERY_VERSION).min.js
 	curl -LsS -o site/external/jquery/jquery-ui.min.js http://code.jquery.com/ui/$(JQUERY_UI_VERSION)/jquery-ui.min.js
 
-site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js  site/KaSaWorker.js site/KaStorWorker.js
+%.bc.js: $(filter-out _build/,$(wildcard */*.ml*))
+	dune build $@
+
+site/%.js: _build/default/js/%.bc.js site
+	sed 's/.process.argv.length>0/.process.argv.length>1/' $< > $@
+
+site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/KaSimWorker.js  site/KaSaWorker.js site/KaStorWorker.js
 	cat $< | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/JQUERY_VERSION/$(JQUERY_VERSION)/g" | sed "s/JQUERY_UI_VERSION/$(JQUERY_UI_VERSION)/g" |  sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" | sed "s/BOOTSTRAP_VERSION/$(BOOTSTRAP_VERSION)/g" > $@
-
-JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug -I js -I api \
-	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<js/*> : package(atdgen), package(js_of_ocaml.tyxml), package(js_of_ocaml-lwt), package(lwt_react), open(Js_of_ocaml)" \
-	-tag-line "<js/*.ml*> : package(js_of_ocaml.ppx), package(tyxml-ppx)" \
-	$@
-
-%Worker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug -I js -I api \
-	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<js/*> : package(atdgen), package(js_of_ocaml.ppx), package(js_of_ocaml-lwt), open(Js_of_ocaml)" \
-	$@
-
-WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-I webapp -I api \
-	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<agents/*> : package(atdgen)" \
-	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp-lwt-unix)" \
-	$@
 
 %.pdf: %.tex $(SCRIPTSWITNESS)
 	cd $(dir $<) && LOG=$$(mktemp -t pdflatexlogXXXX); rm -f *.aux && \
@@ -144,9 +115,6 @@ doc: $(MANGENREP) man/KaSim_manual.pdf
 doc_html: man/KaSim_manual.htm
 	dune build --only-packages kappa-library,kappa-binaries @doc
 
-debug:
-	@+$(MAKE) EXTRAFLAGS="-tag debug" KappaLib.cma dev/db_printers.cma KaSim.byte KaDE.byte KaStor.byte KaSa.byte
-
 profiling:
 	@+$(MAKE) EXTRAFLAGS="-pkg landmarks.ppx -pkg landmarks" OCAML_LANDMARKS="auto,allocation" all
 
@@ -155,14 +123,6 @@ all:
 
 agents:
 	dune build --only-packages kappa-library,kappa-agents
-
-kappalib: KappaLib.cma
-ifeq ($(OCAMLBEST),native)
-	@+$(MAKE) KappaLib.cmxa
-endif
-
-install-lib:
-	ocamlfind install KappaLib META _build/KappaLib.cma $(wildcard _build/*/*.cmi) $(wildcard _build/*/*.mli) -optional _build/KappaLib.cmxa _build/KappaLib.a $(wildcard _build/*/*.cmx)
 
 clean_ide:
 	rm -f KaSimAgent bin/KaSimAgent
@@ -265,5 +225,6 @@ ide/Kappa.iconset: ide/Kappa-Logo.png
 	sips -z 512 512   $< --out $@/icon_256x256@2x.png
 	sips -z 512 512   $< --out $@/icon_512x512.png
 	cp $< $@/icon_512x512@2x.png
+
 ide/Kappa.icns: ide/Kappa.iconset
 	iconutil -c icns $<
