@@ -89,11 +89,14 @@ let finalize
     let args = if !Parameter.time_independent
       then "--time-independent" :: args else args in
     let prog =
-      let predir =
-        Filename.dirname Sys.executable_name in
-      let dir = if Filename.is_implicit Sys.executable_name &&
-                   predir = "." then "" else predir^"/" in
-      dir^"KaStor" in
+      let predir = Filename.dirname Sys.executable_name in
+      if Filename.basename predir = "main" &&
+         Filename.basename (Filename.dirname predir) = "default" then
+        predir^"/../agents/KaStor.exe"
+      else
+        let dir = if Filename.is_implicit Sys.executable_name &&
+                     predir = "." then "" else predir^"/" in
+        dir^"KaStor" in
     let pid = Unix.create_process prog (Array.of_list (prog::args))
         Unix.stdin Unix.stdout Unix.stderr in
     let _old_sigint_behavior =
