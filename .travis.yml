@@ -74,25 +74,24 @@ matrix:
           - gcc-mingw-w64-x86-64
 
 before_install:
-  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then curl -LO https://github.com/ocaml/opam/releases/download/2.0.0/opam-2.0.0-x86_64-darwin && sudo mv opam-2.0.0-x86_64-darwin /usr/local/bin/opam && sudo chmod +x /usr/local/bin/opam ; fi"
+  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then curl -LO https://github.com/ocaml/opam/releases/download/2.0.2/opam-2.0.2-x86_64-darwin && sudo mv opam-2.0.2-x86_64-darwin /usr/local/bin/opam && sudo chmod +x /usr/local/bin/opam ; fi"
 
 install:
-  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a ; fi"
-  - sh -c "if [ '$CHECKED' = windows ] ; then opam remote add cross-windows git://github.com/whitequark/opam-cross-windows ; fi"
-  - eval $(opam config env) && opam install -y conf-which base-bytes #Hack so that opam choose a version of cppo & yojson recent enough
-  - opam install -y ocamlbuild num yojson lwt fmt logs re
+  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a --compiler=4.03.0 ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] ; then opam remote add cross-windows git://github.com/ocaml-cross/opam-cross-windows ; fi"
+  - eval $(opam env) && opam install -y dune num yojson lwt fmt logs re
+  - sh -c "if [ '$CHECKED' = native ] ; then opam install -y odoc ; fi"
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] || [ '$CHECKED' = windows ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then opam install -y atdgen cohttp-lwt-unix ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then pip install -v . nose ; fi"
-  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-windows lwt-windows fmt-windows logs-windows re-windows ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-runtime-windows lwt-windows fmt-windows logs-windows re-windows ; fi"
 
 script:
   - make all
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
-  - sh -c "if [ '$CHECKED' = native ] ; then make META kappalib ; fi"
-  - sh -c "if [ '$CHECKED' = python ] ; then make agents bin/WebSim && cd python && nosetests -v ; fi"
+  - sh -c "if [ '$CHECKED' = python ] ; then dune build && cd python && nosetests -v ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make Kappapp.tar.gz site/index.html ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then make Kappapp.app ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then make KappaBin.zip ; fi"

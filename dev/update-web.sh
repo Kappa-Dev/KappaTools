@@ -22,7 +22,7 @@ case $1 in
         cp man/generated_img/*.png ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/generated_img/
 
         empty_or_create  ${PLAYGROUND}/docs/KaSim-API-${TRAVIS_BRANCH}
-        cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-${TRAVIS_BRANCH}/
+        cp _build/default/_doc/_html/kappa-library/* ${PLAYGROUND}/docs/KaSim-API-${TRAVIS_BRANCH}/
 
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/docs travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
