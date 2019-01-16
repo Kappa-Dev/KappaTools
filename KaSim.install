@@ -1,9 +1,0 @@
-bin: [
-  "bin/KaSim"
-  "bin/KaSa"
-  "bin/KaStor"
-  "bin/KaDE"
-  "?bin/KaSimAgent"
-  "?bin/KaSaAgent"
-  "?bin/WebSim"
-]

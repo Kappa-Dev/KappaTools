@@ -1,4 +1,4 @@
-opam-version: "1.2"
+opam-version: "2.0"
 name: "KaSim"
 version: "4~dev"
 maintainer: "Pierre Boutillier <pierre.boutillier@laposte.net>"
@@ -9,34 +9,13 @@ authors: [
 license: "LGPL-3.0"
 homepage: "https://kappalanguage.org/"
 bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
-dev-repo: "https://github.com/Kappa-Dev/KaSim.git"
+dev-repo: "git+https://github.com/Kappa-Dev/KaSim.git"
 
 depends : [
-  "num"
-  "re"
-  "ocamlfind"
-  "ocamlbuild" {build}
-  "yojson"
-  "lwt" { >= "2.6.0" }
-  "fmt"
-  "logs"
+  "kappa-binaries"
 ]
 
 depopts: [
-  "labltk" "cohttp-lwt-unix"
-  "atdgen" {build}
+  "kappa-agents"
+  "kappa-server"
 ]
-
-build: [
-  [ make "USE_TK=1" {labltk:installed} "all" ]
-  [ make "META" "kappalib" ]
-  [ make "agents" ] {atdgen:installed}
-  [ make "bin/WebSim" ] {atdgen:installed & cohttp-lwt-unix:installed}
-]
-
-install: [ [ make "install-lib" ] ]
-remove: [ [ "ocamlfind" "remove" "KappaLib" ] ]
-
-build-test: [ [ make "check" ] ]
-
-available: [ ocaml-version >= "4.03.0" ]

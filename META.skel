@@ -1,6 +1,0 @@
-name = "KappaLib"
-version = "$Format:%D$"
-description = "Kappa Language internals"
-requires = "unix,yojson"
-archive(byte) = "KappaLib.cma"
-archive(native) = "KappaLib.cmxa"
