@@ -124,4 +124,4 @@ val fold_trace :
 val fold_trace_file :
   (Model.t -> 'a -> step -> 'a) -> (Model.t -> 'a) -> string -> (Model.t * 'a)
 
-val get_env_from_file : string -> Model.t
+val get_headers_from_file : string -> int option * Model.t
