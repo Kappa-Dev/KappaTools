@@ -10,19 +10,21 @@ module StringMap = StringSetMap.Map
 let map = ref StringMap.empty (* key => entry widget *)
 let fmap = ref StringMap.empty  (* key => frame widget *)
 
-let error = Exception.empty_error_handler
 
 (* show / hide options according to current mode *)
 let set_visibility (a:Superarg.t) =
   List.iter
     (fun (key,_,_,_,lvl) ->
       try
-	let f = snd (Misc_sa.unsome (error,StringMap.find_option key !fmap)
-                (fun _ -> raise Not_found)) in
- List.iter (fun f -> Pack.forget [coe f]) f;
- if Superarg.show_level lvl
- then
-   List.iter (fun f -> pack ~side:`Top ~anchor:`W [coe f]) f
+        let f =
+          match StringMap.find_option key !fmap
+          with Some f -> f
+             | None -> raise Not_found
+        in
+        List.iter (fun f -> Pack.forget [coe f]) f;
+        if Superarg.show_level lvl
+        then
+          List.iter (fun f -> pack ~side:`Top ~anchor:`W [coe f]) f
       with Not_found -> ()
     ) a
 
@@ -47,11 +49,17 @@ let plist_to_list l =
 (* option value => widget value *)
 let widget_update_from_spec (a:Superarg.t) =
   let set n v =
-    try Textvariable.set (snd (Misc_sa.unsome (error,StringMap.find_option (*_map*) (*parameters error*) n !map) (fun _ -> raise Not_found))) v
+    try Textvariable.set (
+        match
+          StringMap.find_option n !map
+        with
+        | None -> raise Not_found
+        | Some a -> a)
+        v
     with Not_found -> ()
   in
   List.iter
-    (fun (key,spec,msg,cat,lvl) ->
+    (fun (key,spec,_msg,_cat,_lvl) ->
       match spec with
       |	Superarg.Void -> ()
       | Superarg.Bool r -> set key (if !r then "1" else "0")
@@ -70,8 +78,8 @@ let widget_update_from_spec (a:Superarg.t) =
 	  List.iter
 	    (fun (k,_) -> set (key^"."^k) (if List.mem k !r then "1" else "0"))
 	    l
-      | Superarg.Multi (x,[]) -> ()
-      | Superarg.Multi (x,y) -> set key ""
+      | Superarg.Multi (_,[]) -> ()
+      | Superarg.Multi (_,_) -> set key ""
       |	Superarg.MultiExt _ -> set key ""
     ) a
 
@@ -89,9 +97,15 @@ let widget_update_from_cmd (a:Superarg.t) l =
 	try
 	  let key,spec,_,_,_ =
 	    List.find (fun (key,_,_,_,_) -> opt=key || opt=(Superarg.nokey key)) a in
-	  let set n v = Textvariable.set (snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) n !map) (fun _ -> raise Not_found))) v
-	  and get n = Textvariable.get (snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) n !map) (fun _ -> raise Not_found))) in
-	  let rem = match spec,rem with
+   let set n v = Textvariable.set
+       (match StringMap.find_option  n !map with
+        | Some a -> a
+        | None -> raise Not_found) v
+   and get n = Textvariable.get
+       (match StringMap.find_option n !map with
+        | Some a -> a
+        | None -> raise Not_found) in
+   let rem = match spec,rem with
 	  | Superarg.Void , rem -> rem
 	  | Superarg.Bool _, rem -> set key (if opt=key then "1" else "0"); rem
 	  | (Superarg.Int _ | Superarg.Int_opt _ | Superarg.String _ | Superarg.String_opt _ | Superarg.Float _ |
@@ -111,13 +125,13 @@ let widget_update_from_cmd (a:Superarg.t) l =
 	      set key v;
 	      if v<>"" then
 		(ignore (doit [] x);
-		 ignore (List.fold_left (fun accum l -> doit [] [l;v])
+		 ignore (List.fold_left (fun _accum l -> doit [] [l;v])
 			   accum y));
 	      rem
 	  | Superarg.MultiExt l,(v::rem) ->
 	      set key v;
 	      if v<>"" then
-		(ignore (List.fold_left (fun accum (l,ext) -> doit [] [l;v^ext])
+		(ignore (List.fold_left (fun _accum (l,ext) -> doit [] [l;v^ext])
 			  accum l));
 	      rem
 	  | _, [] -> rem
@@ -131,9 +145,13 @@ let widget_update_from_cmd (a:Superarg.t) l =
 (* widget value => command-line argument,
    if [short]=[true] no command is output is the value is the default one *)
 let cmd_of_widget (a:Superarg.t) short =
-  let get n = Textvariable.get (snd (Misc_sa.unsome (error,StringMap.find_option (* parameters error*) n !map) (fun _ -> raise Not_found))) in
+  let get n = Textvariable.get
+      (match StringMap.find_option n !map with
+       | Some a -> a
+       | None -> raise Not_found)
+  in
   List.fold_left
-    (fun accum (key,spec,msg,cat,lvl) ->
+    (fun accum (key,spec,_msg,cat,_lvl) ->
       try match spec with
       |	Superarg.Void -> accum
       | Superarg.Bool r ->
@@ -208,19 +226,16 @@ let balloon_delay = 100
 (* create an option widget, add the defined variables to the map *)
 let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
   let f = Frame.create parent in
-  let error =
-    let old =
-	StringMap.find_default [] key !fmap in
-    let fmap' = StringMap.add key (f::old) !fmap in
-    let _ = fmap:=fmap'
-    in
-    error
-  in
-  let v = snd (
-    (* match ((*snd*)*) Misc_sa.unsome (error,StringMap.find_option (*parameters error*) key (!map)) (fun _ -> error,Textvariable.create ()))
-    (*with None
-      -> (Textvariable.create ())
-       | Some a -> a *)
+  let old =
+    StringMap.find_default [] key !fmap in
+  let fmap' = StringMap.add key (f::old) !fmap in
+  let _ = fmap:=fmap'  in
+  let v =
+    match
+      StringMap.find_option key (!map)
+    with
+    | Some a -> a
+    | None -> Textvariable.create ()
   in
   (match spec with
   | Superarg.Bool _ ->
@@ -239,7 +254,12 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       | Superarg.String _ | Superarg.String_opt _ -> "<name>"
       | Superarg.String_list _ | Superarg.StringNbr_list _ -> "<names> ..."
       | Superarg.Float _ | Superarg.Float_opt _ -> "<float>"
-      | _ -> ""
+      | Superarg.Void
+      | Superarg.Bool _
+      | Superarg.Choice _
+      | Superarg.Choice_list _
+      | Superarg.Multi _
+      | Superarg.MultiExt _ -> ""
       in
       let lbl = Label.create ~text:(key^" "^ext) ~padx:20 f
       and entry = Entry.create ~textvariable:v f in
@@ -327,7 +347,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
   let text = match lvl with
    | Superarg.Expert -> "(expert)"
    | Superarg.Developper -> "(developper)"
-   | _ -> ""
+   | Superarg.Normal | Superarg.Hidden -> ""
   in
   if text<>"" then (
     let l = Label.create ~text f in
@@ -359,22 +379,34 @@ class pager bparent fparent =
     (* sets the page currently viewed *)
     method set_page name =
       (try
-	  let fr,_,b = snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) !cur !pages) (fun _ -> raise Not_found)) in
-	cur := "";
-	Button.configure ~relief:`Raised b;
-	Pack.forget [coe fr];
+         let fr,_,b =
+           match StringMap.find_option !cur !pages with
+           | None -> raise Not_found
+           | Some a -> a
+         in
+         cur := "";
+         Button.configure ~relief:`Raised b;
+         Pack.forget [coe fr];
       with Not_found -> ());
       (try
-	  let fr,_,b = snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) name !pages) (fun _ -> raise Not_found)) in
-	cur := name;
-	Button.configure ~relief:`Sunken b;
-	pack ~expand:true ~fill:`Both ~anchor:`Center [coe fr];
-      with Not_found -> ())
+         let fr,_,b =
+           match StringMap.find_option name !pages with
+           | None -> raise Not_found
+           | Some a -> a
+         in
+         cur := name;
+         Button.configure ~relief:`Sunken b;
+         pack ~expand:true ~fill:`Both ~anchor:`Center [coe fr];
+       with Not_found -> ())
 
 
     (* gets a page (create if non existing) *)
     method get_page name (lvl:Superarg.level): Widget.frame Widget.widget =
-      try let _,p,_ = snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) name !pages) (fun _ -> raise Not_found)) in p
+      try let _,p,_ =
+            match StringMap.find_option name !pages with
+            | Some a -> a
+            | None -> raise Not_found
+        in p
       with Not_found ->
 	if !barsize/maxbarwidth <> (!barsize+String.length name)/maxbarwidth
 	then (bar := Frame.create bars; pack ~side:`Top [coe !bar]);
@@ -409,7 +441,7 @@ let build_spec (a:Superarg.t) bparent fparent =
           ->
           List.iter
             (fun (((cat:string),_,lvl_opt),_) ->
-               let cat_lvl = Superarg.max_level_opt cat_lvl lvl_opt in 
+               let cat_lvl = Superarg.max_level_opt cat_lvl lvl_opt in
                widget_of_spec a key spec msg lvl (opts#get_page cat cat_lvl))
             cat)
         l )
