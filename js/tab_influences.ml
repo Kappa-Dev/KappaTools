@@ -77,9 +77,14 @@ let influencemap =
   Js_graphlogger.create_graph_logger
     display_id
     (fun x -> update_model
-      (fun m ->
-        { m with origin = Some (Public_data.refined_influence_node_of_json
-                                  (Yojson.Basic.from_string (Js.to_string x))) }))
+        (fun m ->
+           let node =
+             (Public_data.refined_influence_node_of_json
+                (Yojson.Basic.from_string (Js.to_string x))) in
+           let () =
+             Subpanel_editor.set_move_cursor
+               (Public_data.position_of_refined_influence_node node) in
+           { m with origin = Some node }))
 
 let total_input =
   Html.input ~a:[
@@ -395,6 +400,9 @@ let pop_cell = function
   | ((node,_mappings),positive)::t ->
     (Html.td ~a:[
         Html.a_onclick  (fun _ ->
+            let () =
+              Subpanel_editor.set_move_cursor
+                (Public_data.position_of_refined_influence_node node) in
             let () = update_model (fun m -> { m with origin = Some node }) in
             true);
         Html.a_class [if positive then "success" else "danger"]

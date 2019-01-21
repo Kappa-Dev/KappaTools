@@ -12,6 +12,7 @@ module Html = Tyxml_js.Html5
 let editor_full , set_editor_full = React.S.create (false : bool)
 let is_paused , set_is_paused = React.S.create (false : bool)
 let filename , set_filename = React.S.create (None : string option)
+let move_cursor, set_move_cursor = React.E.create ()
 
 let file_label =
   Tyxml_js.R.Html.txt
@@ -167,6 +168,16 @@ let onload () : unit =
              (* ignore if missing file *)
              Lwt.return (Api_common.result_ok ())))
   in
+  let _ = React.E.map
+      (fun pos ->
+         if Some pos.Locality.file = React.S.value filename then
+           let beg = pos.Locality.from_position in
+           let first =
+             new%js Codemirror.position (beg.Locality.line-1) beg.Locality.chr in
+           let en = pos.Locality.from_position in
+           let last =
+             new%js Codemirror.position (en.Locality.line-1) en.Locality.chr in
+           codemirror##setSelection first last) move_cursor in
   let () = Codemirror.commands##.save :=
       (fun _ -> Menu_editor_file_controller.export_current_file ()) in
   let timeout : Dom_html.timeout_id option ref = ref None in

@@ -119,6 +119,9 @@ val refined_influence_node_of_json:
 val refined_influence_node_to_json:
   (rule, var) influence_node -> Yojson.Basic.json
 
+val position_of_refined_influence_node :
+  (rule, var) influence_node -> Locality.t
+
 module InfluenceNodeMap: SetMap.Map
     with type elt =
            (int,int) influence_node

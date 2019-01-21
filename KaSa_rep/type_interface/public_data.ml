@@ -514,6 +514,10 @@ let short_node_of_refined_node = function
   | Rule rule -> Rule rule.rule_id
   | Var var -> Var var.var_id
 
+let position_of_refined_influence_node = function
+  | Rule r -> r.rule_position
+  | Var v -> v.var_position
+
 module InfluenceNodeSetMap =
   SetMap.Make
     (struct

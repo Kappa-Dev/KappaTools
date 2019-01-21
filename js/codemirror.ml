@@ -298,6 +298,10 @@ class type codemirror =
       (unit ->
        unit) -> unit Js.meth
 
+    method setCursor : position Js.t -> unit Js.meth
+
+    method setSelection : position Js.t -> position Js.t -> unit Js.meth
+
     method performLint : unit Js.t Js.meth
   end;;
 
