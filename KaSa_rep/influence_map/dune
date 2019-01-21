@@ -1,6 +1,6 @@
 (library
   (name kappa_influence_map)
-  (libraries kappa_kasa_frontend kappa_kasa_remanent_state  kappa_classical_graphs kappa_terms)
+  (libraries kappa_kasa_frontend kappa_kasa_remanent_state  kappa_classical_graphs kappa-library.terms)
   (flags (:standard)
     -open Kappa_kasa_frontend
     -open Kappa_kasa_remanent_state

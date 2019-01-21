@@ -1,7 +1,7 @@
 (library
   (name kappa_agents)
   (modules agent_common app_args)
-  (libraries logs.fmt lwt.unix kappa_generic_toolset)
+  (libraries logs.fmt lwt.unix kappa-library.generic)
   (flags (:standard -w @a
     -open Kappa_generic_toolset)))
 
@@ -24,7 +24,7 @@
   (name KaSimAgent)
   (modules KaSimAgent)
   (libraries logs.lwt logs.fmt lwt.unix
-             kappa_json_api kappa_runtime kappa_agents)
+             kappa_json_api kappa-library.runtime kappa_agents)
   (public_name KaSimAgent)
   (package kappa-agents)
   (flags (:standard

@@ -1,7 +1,6 @@
 (library
  (name kappa_runtime)
- (libraries yojson result re
-            kappa_generic_toolset kappa_mixtures kappa_terms)
+ (libraries kappa_terms)
  (public_name kappa-library.runtime)
  (flags (:standard -w @a
           -open Kappa_generic_toolset

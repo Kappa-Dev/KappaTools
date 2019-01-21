@@ -1,7 +1,7 @@
 (executable
   (name KaSim)
   (libraries lwt fmt num yojson
-  	     kappa_version kappa_generic_toolset kappa_mixtures kappa_terms kappa_runtime
+  	     kappa_version kappa-library.generic kappa-library.mixtures kappa-library.terms kappa-library.runtime
 	     kappa_grammar kappa_cli)
   (public_name KaSim)
   (package kappa-binaries)

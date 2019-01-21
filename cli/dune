@@ -5,7 +5,7 @@
 	       (labltk.jpf -> superargTk_tk.ml)
 	       ( -> superargTk_notk.ml))
 	     kappa_grammar
-  	     kappa_runtime kappa_version)
+  	     kappa-library.runtime kappa_version)
   (modules (:standard \ superargTk_tk superargTk_notk))
   (flags (:standard -w @a
      -open Kappa_version

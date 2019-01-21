@@ -1,6 +1,6 @@
 (library
   (name kappa_parameters)
-  (libraries yojson result kappa_version kappa_cli  kappa_generic_toolset kappa_classical_graphs)
+  (libraries yojson result kappa_version kappa_cli  kappa-library.generic kappa_classical_graphs)
   (flags (:standard)
     -open Kappa_cli
     -open Kappa_version

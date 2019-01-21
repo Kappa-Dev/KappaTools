@@ -1,6 +1,6 @@
 (executable
   (name KaDE)
-  (libraries num yojson str kappa_runtime kappa_grammar kappa_cli kappa_staticanalyses kappa_kasa_export )
+  (libraries num yojson str kappa-library.runtime kappa_grammar kappa_cli kappa_staticanalyses kappa_kasa_export )
   (public_name KaDE)
   (package kappa-binaries)
   (flags (:standard
