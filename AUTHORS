@@ -4,16 +4,16 @@ order). The teams were lead by Jean Krivine, Walter Fontana, and
 Jérôme Feret respectively.
 
 The simulator was implemented by Jean Krivine (CNRS 2010-2016) and
-Pierre Boutillier (PPS 2015 and HMS 2016).
+Pierre Boutillier (PPS 2015 and HMS 2016-2019).
 
 The computation of stories was implemented by Jérôme Feret (INRIA
-2010-2016).
+2010-2019).
 
-The static analyser was implemented by Jérôme Feret (INRIA 2010-2016)
-and Kim Quyên Lý (INRIA 2015-2016).
+The static analyser was implemented by Jérôme Feret (INRIA 2010-2019)
+and Kim Quyên Lý (INRIA 2015-2017).
 
 The interactive aspects of the simulator were the work of Mutaamba
-Maasha (HMS 2016) and Pierre Boutillier (HMS 2016).
+Maasha (HMS 2016-2017) and Pierre Boutillier (HMS 2016-2019).
 
 ######################################################################
 HMS = Harvard Medical School.

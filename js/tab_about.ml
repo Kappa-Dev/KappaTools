@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -12,7 +12,7 @@ let navli () = ReactiveData.RList.empty
 
 let content () = [%html {|
 <h2>The Kappa Language</h2>
-<p>Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF<p>
+<p>Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF<p>
 <p>Kappa Language software is distributed under the terms of the <a target="_blank" href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License Version 3</a>.
  Source code is published on <a target="_blank" href="https://github.com/Kappa-Dev/KaSim">https://github.com/Kappa-Dev/KaSim</a>.</p>
 
