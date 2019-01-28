@@ -1,7 +1,3 @@
-(* This is a mirror of pe5Arvaises result when ocaml is upgraded
-   this should be replaced by.  It is expected than non error
-   message will decide how best to relay its messages.
-*)
 type ('ok,'error) result <ocaml from module="Result_util" t="t"> = abstract
 
 type message <ocaml from module="Result_util"> = abstract

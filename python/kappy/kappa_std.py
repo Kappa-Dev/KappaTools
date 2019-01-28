@@ -144,7 +144,7 @@ class KappaStd(KappaApi):
             self.sa_agent.kill()
 
     def projection(self, response):
-        result_data = response["data"]["result_data"]
+        result_data = response["data"]
         data = result_data[1]
         if result_data[0] == "Ok":
             return data[1]
