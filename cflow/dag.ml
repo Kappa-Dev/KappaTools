@@ -10,7 +10,7 @@
   * Jean Krivine, Université Paris Diderot, CNRS
   *
   * Creation: 22/03/2012
-  * Last modification: 18/06/2013
+  * Last modxification: 18/06/2013
   * *
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation
@@ -151,9 +151,12 @@ let print_graph logger parameter _handler error id story_info graph =
            (fun j ->
               Graph_loggers.print_edge
                 logger
-                ~directives:[Graph_loggers_sig.ArrowHead Graph_loggers_sig.Tee]
-                (string_of_int j)
+                ~directives:[
+                  Graph_loggers_sig.LineStyle Graph_loggers_sig.Dotted ;
+                  Graph_loggers_sig.ArrowHead Graph_loggers_sig.Tee
+                ]
                 (string_of_int i)
+                (string_of_int j)
            )
            l
       )
