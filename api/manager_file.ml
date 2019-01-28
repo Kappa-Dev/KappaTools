@@ -122,14 +122,14 @@ type file_index = { file_index_file_id : Api_types_j.file_id ;
 
 (* modified from : https://searchcode.com/file/1109908/commons/common.ml *)
 
-class manager_file (project : Api_environment.project) : Api.manager_file =
+class manager_file (project : Api_environment.project) =
   object
     method file_catalog :
       Api_types_j.file_catalog Api.result Lwt.t =
       let files : Api_types_j.file list = (project#get_files ()) in
       let file_catalog : Api_types_j.file_catalog =
         List.map (fun file -> file.Api_types_j.file_metadata) files in
-      Lwt.return (Api_common.result_ok file_catalog)
+      Lwt.return (Result_util.ok file_catalog)
 
     method file_create
         (file : Api_types_j.file) :
@@ -161,7 +161,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
           (fun
             (_project_version) ->
             Lwt.return
-              (Api_common.result_ok
+              (Result_util.ok
                  file.Api_types_j.file_metadata)
           )
 
@@ -172,7 +172,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
         project
         file_id
         (fun (file : Api_types_j.file) ->
-           Lwt.return (Api_common.result_ok file))
+           Lwt.return (Result_util.ok file))
 
     method file_update
       (file_id : Api_types_j.file_id)
@@ -191,7 +191,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
             (fun
               (_project_version) ->
               Lwt.return
-                (Api_common.result_ok file.Api_types_j.file_metadata
+                (Result_util.ok file.Api_types_j.file_metadata
                 )
             )
         )
@@ -209,7 +209,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
              updated_directory
              (fun
                (_project_version) ->
-               Lwt.return (Api_common.result_ok ())
+               Lwt.return (Result_util.ok ())
              )
         )
 

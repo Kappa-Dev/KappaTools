@@ -8,7 +8,7 @@
 
 (* data structures *)
 (* Manager state *)
-type parse_state = (Kappa_facade.t,Api_types_j.errors) Result.result
+type parse_state = (Kappa_facade.t,Result_util.message list) Result_util.t
 
 class type simulation = object
   method get_runtime_state : unit -> Kappa_facade.t

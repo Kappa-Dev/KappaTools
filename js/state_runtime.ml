@@ -151,10 +151,10 @@ let create_manager ~is_new project_id =
   | WebWorker ->
     let () = State_settings.set_synch false in
     Lwt.return
-      (Api_common.result_ok (new Web_worker_api.manager () : Api.concrete_manager))
+      (Result_util.ok (new Web_worker_api.manager () : Api.concrete_manager))
   | Embedded ->
     let () = State_settings.set_synch false in
-    Lwt.return (Api_common.result_ok (new embedded () : Api.concrete_manager))
+    Lwt.return (Result_util.ok (new embedded () : Api.concrete_manager))
   | Remote { label = _ ; protocol = HTTP url } ->
     let version_url : string = Format.sprintf "%s/v2" url in
     let () = Common.debug
@@ -171,9 +171,9 @@ let create_manager ~is_new project_id =
          (if is_new then
             manager#project_create
               { Api_types_j.project_parameter_project_id = project_id }
-          else Lwt.return (Api_common.result_ok ())) >>=
+          else Lwt.return (Result_util.ok ())) >>=
          Api_common.result_bind_lwt
-           ~ok:(fun () -> Lwt.return (Api_common.result_ok
+           ~ok:(fun () -> Lwt.return (Result_util.ok
                                         (manager :> Api.concrete_manager)))
        else
          let error_msg : string =
@@ -189,7 +189,7 @@ let create_manager ~is_new project_id =
       if js_node_runtime#is_running then
         let () = Common.debug (Js.string "set_runtime_url:sucess") in
         let () = State_settings.set_synch false in
-        Lwt.return (Api_common.result_ok (js_node_runtime :> Api.concrete_manager))
+        Lwt.return (Result_util.ok (js_node_runtime :> Api.concrete_manager))
       else
         let () = Common.debug (Js.string "set_runtime_url:failure") in
         let error_msg : string =
@@ -220,7 +220,7 @@ let create_spec ~load (id : string): unit Api.result =
           { state_current = current_state.state_current;
             state_runtimes = runtime::current_state.state_runtimes } in
     let () = if load then set_spec runtime in
-    Api_common.result_ok ()
+    Result_util.ok ()
 
 let model : model React.signal =
   React.S.map
@@ -237,8 +237,8 @@ let init () =
     | [] -> ()
     | url::urls ->
       match create_spec ~load url with
-      | { Api_types_j.result_data = Result.Ok (); _ } -> add_urls urls false
-      | { Api_types_j.result_data = Result.Error _; _ } -> add_urls urls load
+      | { Result_util.value = Result.Ok (); _ } -> add_urls urls false
+      | { Result_util.value = Result.Error _; _ } -> add_urls urls load
   in
   let () = add_urls hosts true in
   match (React.S.value state).state_current with
@@ -257,9 +257,9 @@ let init () =
          let manager = new Rest_api.manager
            ?timeout:None ~url ~project_id:"" in
          manager#project_catalog >>=
-         Api_common.result_map
-           ~ok:(fun _ projects -> Lwt.return projects)
-           ~error:(fun _ _ -> Lwt.return_nil)
+         Result_util.fold
+           ~ok:(fun projects -> Lwt.return projects)
+           ~error:(fun _ -> Lwt.return_nil)
        else Lwt.return_nil)
 
 (* to sync state of application with runtime *)

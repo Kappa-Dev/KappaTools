@@ -89,8 +89,8 @@ let export_current_file () =
        State_error.wrap
          __LOC__
          (State_file.get_file ()) >>=
-       (Api_common.result_map
-          ~ok:(fun _ (file : Api_types_j.file) ->
+       (Result_util.fold
+          ~ok:(fun (file : Api_types_j.file) ->
               let data = Js.string file.Api_types_j.file_content in
               let () =
                 Common.saveFile
@@ -99,6 +99,6 @@ let export_current_file () =
                   ~filename:file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
               in
               Lwt.return_unit)
-          ~error:(fun _ _ -> Lwt.return_unit)
+          ~error:(fun _ -> Lwt.return_unit)
        )
     )

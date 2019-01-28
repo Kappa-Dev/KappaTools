@@ -11,18 +11,14 @@ open Lwt
 let stop_simulation (system_process:Kappa_facade.system_process) :
   Api_environment.simulation option -> unit Api.result Lwt.t =
   function
-  | None -> Lwt.return (Api_common.result_ok ())
+  | None -> Lwt.return (Result_util.ok ())
   | Some current ->
     let t : Kappa_facade.t = current#get_runtime_state () in
-    (Kappa_facade.stop ~system_process:system_process ~t:t) >>=
-    (Result_util.fold
-       ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))
-       ~error:(fun errors ->
-           Lwt.return (Api_common.result_messages errors)))
+    Kappa_facade.stop ~system_process:system_process ~t:t
 
 class manager_project
     (project : Api_environment.project)
-    (system_process : Kappa_facade.system_process) : Api.manager_project =
+    (system_process : Kappa_facade.system_process) =
 object
   method project_parse overwrites :
     Api_types_j.project_parse Api.result Lwt.t =
@@ -52,7 +48,7 @@ object
        Lwt.return
          (Result_util.fold
             ~ok:(fun kappa_facade ->
-                Api_common.result_ok {
+                Result_util.ok {
                   Api_types_t.project_parse_project_version =
                     project#get_version ();
                   Api_types_t.project_parse_raw_ast =

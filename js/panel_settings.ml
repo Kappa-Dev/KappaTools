@@ -165,7 +165,7 @@ module DivErrorMessage : Ui_common.Div = struct
 
 
   (* if there are less or no errors the index needs to be updated *)
-  let sanitize_index (index : int option) (errors : Api_types_j.errors) : int option =
+  let sanitize_index (index : int option) errors : int option =
     match (index,errors) with
     | None, [] -> None
     | None, _::_ -> Some 0
@@ -183,7 +183,7 @@ module DivErrorMessage : Ui_common.Div = struct
          else
            Some index)
 
-  let get_message (index : int option) (errors : Api_types_j.errors) : Api_types_t.message option =
+  let get_message (index : int option) errors : Api_types_t.message option =
     Option_util.bind
       (fun n -> Some (List.nth errors n))
       (sanitize_index index errors)
@@ -234,7 +234,7 @@ module DivErrorMessage : Ui_common.Div = struct
       (fun index error  ->
          let range =
            Option_util.bind
-             (fun message -> message.Api_types_j.message_range)
+             (fun message -> message.Result_util.range)
              (get_message index error)
          in
          match range with
@@ -255,7 +255,7 @@ module DivErrorMessage : Ui_common.Div = struct
       (fun index error  ->
        match get_message index error with
        | None -> ""
-       | Some message -> Format.sprintf  " %s " message.Api_types_j.message_text)
+       | Some message -> Format.sprintf  " %s " message.Result_util.text)
       error_index
       State_error.errors
 
@@ -303,7 +303,7 @@ module DivErrorMessage : Ui_common.Div = struct
              in
              let range =
                Option_util.bind
-                 (fun message -> message.Api_types_j.message_range)
+                 (fun message -> message.Result_util.range)
                  message
              in
              let () = match range with
@@ -699,12 +699,12 @@ module RunningPanelLayout : Ui_common.Div = struct
                            ReactiveData.RList.set
                              set_state_log
                              (efficiency_detail ~current_event eff) in
-                         Lwt.return (Api_common.result_ok ()))
+                         Lwt.return (Result_util.ok ()))
                   )
                )
              ~stopped:(fun _ ->
                  let () = ReactiveData.RList.set set_state_log [] in
-                 Lwt.return (Api_common.result_ok ()))
+                 Lwt.return (Result_util.ok ()))
              ()
         )
         State_simulation.model in

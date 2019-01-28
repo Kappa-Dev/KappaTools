@@ -26,7 +26,7 @@ let send
   : 'a Api.result Lwt.t =
   let reply,feeder = Lwt.task () in
   let handler status response_text =
-    let result_code : Api.manager_code option =
+    let result_code : Result_util.status option =
       match status with
       | 200 -> Some `OK
       | 201 -> Some `Created
@@ -44,10 +44,11 @@ let send
         if (400 <= status) && (status < 500) then
           Api_common.result_messages
             ~result_code
-            (Api_types_j.errors_of_string response_text)
+            (Yojson.Basic.read_list Result_util.read_message
+               (Yojson.Safe.init_lexer ()) (Lexing.from_string response_text))
         else
           let response = hydrate response_text in
-          Api_common.result_ok response in
+          Result_util.ok response in
     let () = request_down request_count in
     let () = Lwt.wakeup feeder result in ()
   in
@@ -55,13 +56,13 @@ let send
   let () = Common.ajax_request ~url ~meth ?timeout ?data ~handler in
   reply
 
-let kasa_error _ l =
+let kasa_error l =
   Lwt.return_error
     (List.fold_left
        (fun acc m ->
           Exception_without_parameter.add_uncaught_error
             (Exception_without_parameter.build_uncaught_exception
-               ~file_name:"rest_api" ~message:m.Api_types_t.message_text Exit)
+               ~file_name:"rest_api" ~message:m.Result_util.text Exit)
             acc)
        Exception_without_parameter.empty_error_handler l)
 
@@ -374,7 +375,7 @@ class manager
       ~ok:(function
           | `EnvironmentInfo
               (result : Mpi_message_t.environment_info) ->
-            Lwt.return (Api_common.result_ok result)
+            Lwt.return (Result_util.ok result)
           | response ->
             Lwt.return
               (Api_common.result_error_exception
@@ -385,7 +386,7 @@ class manager
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectDelete ->
-              Lwt.return (Api_common.result_ok ())
+              Lwt.return (Result_util.ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -398,7 +399,7 @@ class manager
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectCatalog result ->
-              Lwt.return (Api_common.result_ok result)
+              Lwt.return (Result_util.ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -410,7 +411,7 @@ class manager
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectCreate ->
-              Lwt.return (Api_common.result_ok ())
+              Lwt.return (Result_util.ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -431,8 +432,8 @@ class manager
          | x ->
            raise
              (Yojson.Basic.Util.Type_error ("Not a KaSa INIT response: ", x)))
-    >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+    >>= Result_util.fold
+      ~ok:(fun x -> Lwt.return_ok x)
       ~error:kasa_error
 
   method init_static_analyser compil =
@@ -450,8 +451,8 @@ class manager
          Format.sprintf "%s/v2/projects/%s/analyses/contact_map" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok x)
+    >>= Result_util.fold
+      ~ok:(fun x -> Lwt.return_ok x)
       ~error:kasa_error
 
   method get_influence_map_raw accuracy =
@@ -464,8 +465,8 @@ class manager
        | None -> Format.sprintf "%s/v2/analyses/influence_map" url)
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok (Yojson.Basic.to_string x))
+    >>= Result_util.fold
+      ~ok:(fun x -> Lwt.return_ok (Yojson.Basic.to_string x))
       ~error:kasa_error
 
   method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
@@ -491,8 +492,8 @@ class manager
       )
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x ->
+    >>= Result_util.fold
+      ~ok:(fun x ->
           Lwt.return_ok (Public_data.local_influence_map_of_json x))
       ~error:kasa_error
 
@@ -507,8 +508,8 @@ class manager
       )
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x ->
+    >>= Result_util.fold
+      ~ok:(fun x ->
           let o = JsonUtil.to_option
               Public_data.refined_influence_node_of_json x in
           Lwt.return_ok o)
@@ -531,8 +532,8 @@ class manager
       )
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x ->
+    >>= Result_util.fold
+      ~ok:(fun x ->
           let o = JsonUtil.to_option
               Public_data.refined_influence_node_of_json x in
           Lwt.return_ok o)
@@ -554,8 +555,8 @@ class manager
            )
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x ->
+    >>= Result_util.fold
+      ~ok:(fun x ->
           let o = JsonUtil.to_option
               Public_data.refined_influence_node_of_json x in
           Lwt.return_ok o)
@@ -571,8 +572,8 @@ class manager
      | None -> Format.sprintf "%s/v2/analyses/all_nodes_of_influence_map" url)
     `GET
     (fun x -> Yojson.Basic.from_string x)
-  >>= Api_common.result_map
-    ~ok:(fun _ x -> Lwt.return_ok
+  >>= Result_util.fold
+    ~ok:(fun x -> Lwt.return_ok
             (Public_data.nodes_of_influence_map_of_json x))
     ~error:kasa_error
 
@@ -582,8 +583,8 @@ class manager
       (Format.sprintf "%s/v2/projects/%s/analyses/dead_rules" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok (Public_data.dead_rules_of_json x))
+    >>= Result_util.fold
+      ~ok:(fun x -> Lwt.return_ok (Public_data.dead_rules_of_json x))
       ~error:kasa_error
 
   method get_dead_agents =
@@ -592,8 +593,8 @@ class manager
       (Format.sprintf "%s/v2/projects/%s/analyses/dead_agents" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok (Public_data.json_to_dead_agents x))
+    >>= Result_util.fold
+      ~ok:(fun x -> Lwt.return_ok (Public_data.json_to_dead_agents x))
       ~error:kasa_error
 
   method get_non_weakly_reversible_transitions =
@@ -604,8 +605,8 @@ class manager
          url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x ->
+    >>= Result_util.fold
+      ~ok:(fun x ->
           Lwt.return_ok (Public_data.separating_transitions_of_json x))
       ~error:kasa_error
 
@@ -615,8 +616,8 @@ class manager
       (Format.sprintf "%s/v2/projects/%s/analyses/constraints" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok (Public_data.lemmas_list_of_json x))
+    >>= Result_util.fold
+      ~ok:(fun x -> Lwt.return_ok (Public_data.lemmas_list_of_json x))
       ~error:kasa_error
 
   method get_potential_polymers accuracy_cm accuracy_scc =
@@ -632,8 +633,8 @@ class manager
       (Format.sprintf "%s/v2/projects/%s/analyses/potential_polymers%s" url project_id options )
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Api_common.result_map
-      ~ok:(fun _ x -> Lwt.return_ok (Public_data.scc_of_json x))
+    >>= Result_util.fold
+      ~ok:(fun x -> Lwt.return_ok (Public_data.scc_of_json x))
       ~error:kasa_error
 
   method is_computing = is_computing request_count

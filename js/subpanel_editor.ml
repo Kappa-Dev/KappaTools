@@ -82,7 +82,7 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
   let position p =
     new%js Codemirror.position (p.Locality.line-1) (p.Locality.chr) in
   let hydrate (error  : Api_types_j.message) : lint Js.t option =
-    match error.Api_types_j.message_range with
+    match error.Result_util.range with
     | None -> None
     | Some range ->
       let model : State_file.model = React.S.value State_file.model in
@@ -91,14 +91,16 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
       | Some file_id ->
         if range.Locality.file = file_id then
           Some (Codemirror.create_lint
-                  ~message:error.Api_types_j.message_text
+                  ~message:error.Result_util.text
               (* This is a bit of a hack ... i am trying to keep
                    the code mirror code independent of the api code.
               *)
-              ~severity:( match error.Api_types_j.message_severity with
-                      | `Error -> Codemirror.Error
-                      | `Warning -> Codemirror.Warning
-                      | `Info -> Codemirror.Warning
+                  ~severity:( match error.Result_util.severity with
+                      | Logs.App -> Codemirror.Error
+                      | Logs.Error -> Codemirror.Error
+                      | Logs.Warning -> Codemirror.Warning
+                      | Logs.Info -> Codemirror.Warning
+                      | Logs.Debug -> Codemirror.Warning
                     )
               ~from:(position range.Locality.from_position)
               ~to_:(position range.Locality.to_position))
@@ -158,15 +160,15 @@ let onload () : unit =
   let () = codemirror##setValue(Js.string "") in
   let _ = React.S.map (fun _ -> codemirror##performLint) State_error.errors in
   let _ = Subpanel_editor_controller.with_file
-      (Api_common.result_map
-         ~ok:(fun _ file ->
+      (Result_util.fold
+         ~ok:(fun file ->
              let file_content = file.Api_types_j.file_content in
              let () = set_filename (Some file.Api_types_j.file_metadata.Api_types_j.file_metadata_id) in
              let () = codemirror##setValue(Js.string file_content) in
-                 Lwt.return (Api_common.result_ok ()))
-         ~error:(fun _ _ ->
+                 Lwt.return (Result_util.ok ()))
+         ~error:(fun _ ->
              (* ignore if missing file *)
-             Lwt.return (Api_common.result_ok ())))
+             Lwt.return (Result_util.ok ())))
   in
   let _ = React.E.map
       (fun pos ->

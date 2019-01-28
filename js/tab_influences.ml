@@ -531,7 +531,7 @@ let _ =
   React.S.l2
     (fun _ { rendering; accuracy; origin = origin_refined } ->
        match rendering with
-       | DrawTabular _ -> Lwt.return (Api_common.result_ok ())
+       | DrawTabular _ -> Lwt.return (Result_util.ok ())
        | DrawGraph { fwd; bwd; total } ->
          State_error.wrap ~append:true "influence_map"
            (State_project.with_project

@@ -53,7 +53,7 @@ let send_refresh
     (line : int option) : unit Api.result Lwt.t =
   (* only send refresh if there is a current file *)
   match (React.S.value directory_state).state_current with
-  | None -> Lwt.return (Api_common.result_ok ())
+  | None -> Lwt.return (Result_util.ok ())
   | Some _ ->
     get_file () >>=
     (Api_common.result_bind_lwt
@@ -66,7 +66,7 @@ let send_refresh
                   { filename = filename ;
                     content = file.Api_types_j.file_content ;
                     line = line ; }) in
-           Lwt.return (Api_common.result_ok ()))
+           Lwt.return (Result_util.ok ()))
     )
 
 
@@ -94,7 +94,7 @@ let update_directory
              { directory with
                state_directory = catalog }
          in
-         Lwt.return (Api_common.result_ok ()))
+         Lwt.return (Result_util.ok ()))
   )
 
 let file_patch
@@ -172,7 +172,7 @@ let create_file
                   manager#file_update filename file_modification)
                >>=
                (Api_common.result_bind_lwt
-                  ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))) >>=
+                  ~ok:(fun _ -> Lwt.return (Result_util.ok ()))) >>=
                (fun r_create ->
                   let () = set_directory_state
                       { (React.S.value directory_state) with
@@ -267,7 +267,7 @@ let modify_file
                   (Api_common.result_bind_lwt
                      ~ok:(fun _ ->
                          if skip_directory_update then
-                           Lwt.return (Api_common.result_ok ())
+                           Lwt.return (Result_util.ok ())
                          else
                            update_directory manager)
                   )
@@ -317,7 +317,7 @@ let set_position
 let order_files (filenames : string list) : unit Api.result Lwt.t =
   let rec _order_file (filenames : string list) (index : int) : unit Api.result Lwt.t =
     match filenames with
-    | [] -> Lwt.return (Api_common.result_ok ())
+    | [] -> Lwt.return (Result_util.ok ())
     | file_id::tail ->
       (set_position
          (* only update directory on the last element *)
@@ -426,7 +426,7 @@ let sync ?(reset=false) () : unit Api.result Lwt.t =
               in
               let () = set_directory_state new_state in
               match refresh_ui with
-              | None -> Lwt.return (Api_common.result_ok ())
+              | None -> Lwt.return (Result_util.ok ())
               | Some filename -> send_refresh filename None
             )
        )
@@ -450,13 +450,13 @@ let remove_file () : unit Api.result Lwt.t =
 
 let load_default () : unit Lwt.t =
  (create_file ~filename:"model.ka" ~content:"") >>=
- (Api_common.result_map
-    ~ok:(fun _ () -> Lwt.return_unit)
-    ~error:(fun _ (errors : Api_types_j.errors) ->
+ (Result_util.fold
+    ~ok:(fun () -> Lwt.return_unit)
+    ~error:(fun errors ->
         let msg =
-          Format.sprintf
-            "State_file.load_default : creating default file error %s"
-            (Api_types_j.string_of_errors errors) in
+          Format.asprintf
+            "State_file.load_default : creating default file error@ @[<v>%a@]"
+            (Pp.list Pp.space Result_util.print_message) errors in
         let () = Common.debug (Js.string msg) in
         Lwt.return_unit))
 
@@ -468,24 +468,24 @@ let load_files () : unit Lwt.t =
     | filename::files ->
       let content = "" in
       (create_file ~filename ~content) >>=
-      (Api_common.result_map
-         ~ok:(fun _ () ->
+      (Result_util.fold
+         ~ok:(fun () ->
              if load_file then
                (select_file filename None) >>=
-               (Api_common.result_map
-                  ~ok:(fun _ _ -> add_files files false)
-                  ~error:(fun _ _ -> add_files files load_file)
+               (Result_util.fold
+                  ~ok:(fun _ -> add_files files false)
+                  ~error:(fun _ -> add_files files load_file)
                )
              else
                add_files files load_file)
-         ~error:(fun _ (errors : Api_types_j.errors) ->
+         ~error:(fun errors ->
              let msg =
-               Format.sprintf
-                 "creating file %s error %s"
+               Format.asprintf
+                 "creating file %s error@ @[<v>%a@]"
                  filename
-                 (Api_types_j.string_of_errors errors)
-             in
-             let () = Common.debug (Js.string (Format.sprintf "State_file.load_files %s" msg)) in
+                 (Pp.list Pp.space Result_util.print_message) errors in
+             let () = Common.debug
+                 (Js.string (Format.sprintf "State_file.load_files %s" msg)) in
              add_files files load_file)
       )
   in
@@ -519,7 +519,7 @@ let load_models () : unit Lwt.t =
              let filecontent : string =
                content.Lwt_xmlHttpRequest.content
              in
-             Lwt.return (Api_common.result_ok (filename,filecontent))
+             Lwt.return (Result_util.ok (filename,filecontent))
       )
       >>=
       (* add content *)
@@ -527,28 +527,28 @@ let load_models () : unit Lwt.t =
          ~ok:(fun (filename,content) ->
              (create_file ~filename ~content) >>=
              (Api_common.result_bind_lwt
-                ~ok:(fun () -> Lwt.return (Api_common.result_ok filename))
+                ~ok:(fun () -> Lwt.return (Result_util.ok filename))
              ))) >>=
       (* select model if needed *)
-      (Api_common.result_map
-         ~ok:(fun _ filename ->
+      (Result_util.fold
+         ~ok:(fun filename ->
              if load_file then
                (select_file filename None) >>=
-               (Api_common.result_map
-                  ~ok:(fun _ _ -> add_models models false)
-                  ~error:(fun _ _ -> add_models models load_file)
+               (Result_util.fold
+                  ~ok:(fun _ -> add_models models false)
+                  ~error:(fun _ -> add_models models load_file)
                )
              else
                add_models models load_file
            )
-         ~error:(fun _ (errors : Api_types_j.errors) ->
+         ~error:(fun errors ->
              let msg =
-               Format.sprintf
-                 "creating loading url %s error %s"
+               Format.asprintf
+                 "creating loading url %s error@ @[<v>%a@]"
                  model
-                 (Api_types_j.string_of_errors errors)
-             in
-             let () = Common.debug (Js.string (Format.sprintf "State_file.load_model %s" msg)) in
+                 (Pp.list Pp.space Result_util.print_message) errors in
+             let () = Common.debug
+                 (Js.string (Format.sprintf "State_file.load_model %s" msg)) in
              add_models models load_file)
       )
   in

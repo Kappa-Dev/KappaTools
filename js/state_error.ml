@@ -9,7 +9,7 @@
 open Lwt.Infix
 
 type t =
-  { state_error_errors : Api_types_j.errors ;
+  { state_error_errors : Result_util.message list ;
     state_error_location : string }
 let state_error, set_state_error = React.S.create ([] : t list)
 
@@ -23,18 +23,20 @@ let has_errors () =
   | [] -> false
   | _::_ -> true
 
-let add_error (location : string) (errors : Api_types_j.errors) =
+let add_error (location : string) (errors : Result_util.message list) =
   (* log location and errors if debugging is enabled *)
   let () = Common.debug
-      (Js.string (Format.sprintf "set_errors { location : \"%s\" , errors : %s }"
-                    location (Api_types_j.string_of_errors errors))) in
+      (Js.string (Format.asprintf
+                    "set_errors { location : \"%s\" , errors : [@[%a@]] }"
+                    location
+                    (Pp.list Pp.space Result_util.print_message) errors)) in
   let current_state_error : t list = React.S.value state_error in
   let new_state_error : t list =
     { state_error_errors = errors;
       state_error_location =  location; }::current_state_error in
   set_state_error new_state_error
 
-let errors : Api_types_j.errors React.signal =
+let errors : Result_util.message list React.signal =
   React.S.map
     (fun (state_error : t list) ->
        List.fold_left
@@ -47,10 +49,10 @@ let wrap : 'a . ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result L
   fun ?(append=false) loc r ->
     r >>=
     (let () = if not append then clear_errors loc in
-     Api_common.result_map
-       ~ok:(fun _ r ->
-           Lwt.return (Api_common.result_ok r))
-       ~error:(fun _ (errors : Api_types_j.errors) ->
+     Result_util.fold
+       ~ok:(fun r ->
+           Lwt.return (Result_util.ok r))
+       ~error:(fun errors ->
            let () = add_error loc errors in
            Lwt.return (Api_common.result_messages errors)
          ))

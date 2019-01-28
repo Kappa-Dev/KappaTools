@@ -35,9 +35,8 @@ let detail_projection
           ~ok:(fun (simulation_detail : Api_data.simulation_detail_output) ->
               Lwt.return (projection simulation_detail):
                 (Api_data.simulation_detail_output -> 'a Api.result Lwt.t))
-          ~error:((fun (errors : Api_types_j.errors) ->
-              Lwt.return (Api_common.result_messages errors)) :
-                    Api_types_j.errors -> 'a Api.result Lwt.t)
+          ~error:(fun errors ->
+              Lwt.return (Api_common.result_messages errors))
        )
     )
 
@@ -54,7 +53,7 @@ class manager_file_line
       let file_line_ids : string list =
         List.map fst (Mods.StringMap.bindings file_lines) in
       let file_line_catalog = { Api_types_j.file_line_ids } in
-      Api_common.result_ok file_line_catalog
+      Result_util.ok file_line_catalog
 
     method private get_file_line
         ~file_line_id
@@ -65,7 +64,7 @@ class manager_file_line
       | None ->
         let m : string = Format.sprintf "id %s not found"  file_line_id in
         Api_common.result_error_msg ~result_code:`Not_found m
-      | Some lines -> Api_common.result_ok (List.rev lines)
+      | Some lines -> Result_util.ok (List.rev lines)
 
     method simulation_catalog_file_line :
       Api_types_j.file_line_catalog Api.result Lwt.t =
@@ -91,7 +90,7 @@ class manager_flux_map
         { Api_types_j.din_ids =
             List.map (fun f -> f.Data.din_data.Data.din_name)
               flux_maps } in
-      Api_common.result_ok flux_map_catalog
+      Result_util.ok flux_map_catalog
 
     method private get_flux_map
       (flux_map_id : Api_types_j.din_id)
@@ -104,7 +103,7 @@ class manager_flux_map
         fun flux_map ->
           flux_map_id = flux_map.Data.din_data.Data.din_name
       in
-      try Api_common.result_ok (List.find flux_maps_eq flux_maps_list)
+      try Result_util.ok (List.find flux_maps_eq flux_maps_list)
       with Not_found ->
       let m : string = Format.sprintf "id %s not found" flux_map_id in
       Api_common.result_error_msg ~result_code:`Not_found m
@@ -130,7 +129,7 @@ class manager_log_message
     method private log_message
         (detail : Api_data.simulation_detail_output) :
       Api_types_j.log_message Api.result =
-      Api_common.result_ok detail.Api_types_j.simulation_output_log_messages
+      Result_util.ok detail.Api_types_j.simulation_output_log_messages
 
     method simulation_detail_log_message :
       Api_types_j.log_message Api.result Lwt.t =
@@ -166,7 +165,7 @@ class manager_plot
       Api_types_j.plot Api.result =
       match detail.Api_types_j.simulation_output_plot with
       | Some plot ->
-        Api_common.result_ok
+        Result_util.ok
           (select_observables plot_limit plot)
       | None -> let m : string = "plot not available" in
         Api_common.result_error_msg ~result_code:`Not_found m
@@ -191,7 +190,7 @@ class manager_snapshot
       let snapshot_catalog =
         { Api_types_j.snapshot_ids =
             List.map (fun s -> s.Data.snapshot_file) snapshots } in
-      Api_common.result_ok snapshot_catalog
+      Result_util.ok snapshot_catalog
     method private get_snapshot
         (snapshot_id : Api_types_j.snapshot_id)
         (detail : Api_data.simulation_detail_output)
@@ -202,7 +201,7 @@ class manager_snapshot
       let snapshot_eq : Api_types_j.snapshot -> bool =
         fun snapshot -> snapshot_id = snapshot.Data.snapshot_file
       in
-      try Api_common.result_ok (List.find snapshot_eq snapshot_list)
+      try Result_util.ok (List.find snapshot_eq snapshot_list)
       with Not_found ->
         let m : string = Format.sprintf "id %s not found" snapshot_id in
         Api_common.result_error_msg ~result_code:`Not_found m
@@ -230,8 +229,7 @@ class manager_simulation
       self#simulation_stop >>=
       (fun _ ->
          let () = project#unset_simulation () in
-         Lwt.return (Api_common.result_ok ()) : (unit, Api.manager_code)
-             Api_types_t.result -> unit Api.result Lwt.t)
+         Lwt.return (Result_util.ok ()))
 
     method simulation_start
         (simulation_parameter : Api_types_j.simulation_parameter) :
@@ -263,15 +261,15 @@ class manager_simulation
                          let () =
                            project#set_simulation simulation_parameter facade in
                          Lwt.return
-                           (Api_common.result_ok {
+                           (Result_util.ok {
                                Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
                              }))
                     ~error:
-                      (fun (errors : Api_types_j.errors) ->
+                      (fun errors ->
                          Lwt.return (Api_common.result_messages errors)))
               )
             ~error:
-              (fun (errors : Api_types_j.errors) ->
+              (fun errors ->
                  Lwt.return (Api_common.result_messages errors))
             parse
 
@@ -281,14 +279,14 @@ class manager_simulation
         project
         (fun simulation(* project simulation *) ->
            let parameter = simulation#get_simulation_parameter() in
-           Lwt.return (Api_common.result_ok parameter))
+           Lwt.return (Result_util.ok parameter))
 
     method simulation_raw_trace : string Api.result Lwt.t =
       Model_storage.bind_simulation
         project
         (fun simulation ->
            let t = simulation#get_runtime_state() in
-           Lwt.return (Api_common.result_ok
+           Lwt.return (Result_util.ok
                          (Kappa_facade.get_raw_trace t)))
 
     method simulation_outputs_zip =
@@ -328,7 +326,7 @@ class manager_simulation
                    file (filename^"/"^snapshot.Data.snapshot_file))
               t.Api_types_t.simulation_output_snapshots in
           let out = Fakezip.close_out file in
-          Api_common.result_ok out
+          Result_util.ok out
         with Fakezip.Error (_,f,e) ->
           Api_common.result_error_msg ("Zip error in "^f^": "^e) in
       detail_projection ~project ~system_process ~projection
@@ -340,7 +338,7 @@ class manager_simulation
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.pause ~system_process ~t) >>=
            (fun _ ->
-             Lwt.return (Api_common.result_ok ())))
+             Lwt.return (Result_util.ok ())))
 
     method private simulation_stop : unit Api.result Lwt.t =
       Model_storage.bind_simulation
@@ -350,10 +348,9 @@ class manager_simulation
            (Kappa_facade.stop ~system_process ~t) >>=
            (Result_util.fold
               ~ok:((fun () ->
-                  Lwt.return (Api_common.result_ok ())))
-              ~error:((fun (errors : Api_types_j.errors) ->
-                       Lwt.return (Api_common.result_messages errors)) :
-                        Api_types_j.errors -> unit Api.result Lwt.t)
+                  Lwt.return (Result_util.ok ())))
+              ~error:((fun errors ->
+                       Lwt.return (Api_common.result_messages errors)))
            )
         )
 
@@ -369,8 +366,8 @@ class manager_simulation
               ~t:t
               ~perturbation:simulation_perturbation) >>=
            (Result_util.fold
-                ~ok:((fun s -> Lwt.return (Api_common.result_ok s)))
-                ~error:(fun (errors : Api_types_j.errors) ->
+                ~ok:((fun s -> Lwt.return (Result_util.ok s)))
+                ~error:(fun errors ->
                     Lwt.return (Api_common.result_messages errors))
            )
         )
@@ -385,10 +382,9 @@ class manager_simulation
               ~system_process:system_process
               ~t:t ~pause_condition) >>=
            (Result_util.fold
-                ~ok:((fun () -> Lwt.return (Api_common.result_ok ())))
-                ~error:((fun (errors : Api_types_j.errors) ->
-                          Lwt.return (Api_common.result_messages errors)) :
-                          Api_types_j.errors -> unit Api.result Lwt.t)
+                ~ok:((fun () -> Lwt.return (Result_util.ok ())))
+                ~error:((fun errors ->
+                          Lwt.return (Api_common.result_messages errors)))
            )
         )
 
@@ -404,23 +400,21 @@ class manager_simulation
                   (Result_util.fold
                      ~ok:(fun outputs ->
                          Lwt.return
-                           (Api_common.result_ok
+                           (Result_util.ok
                               (Api_data.api_simulation_status progress outputs))
                        )
-                     ~error:(fun (errors : Api_types_j.errors) ->
-                         Lwt.return (Api_common.result_messages errors :
-                                       Api_types_j.simulation_info Api.result)))
+                     ~error:(fun errors ->
+                         Lwt.return (Api_common.result_messages errors)))
                 )
-              ~error:(fun (errors : Api_types_j.errors) ->
-                  Lwt.return (Api_common.result_messages errors :
-                                Api_types_j.simulation_info Api.result)))
+              ~error:(fun errors ->
+                  Lwt.return (Api_common.result_messages errors)))
         )
 
     method simulation_efficiency =
       Model_storage.bind_simulation project
         (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
-           Lwt.return (Api_common.result_ok (Kappa_facade.efficiency t)))
+           Lwt.return (Result_util.ok (Kappa_facade.efficiency t)))
 
     inherit  manager_file_line project system_process
     inherit  manager_flux_map project system_process

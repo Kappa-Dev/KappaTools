@@ -182,8 +182,8 @@ let set_show_non_weakly_reversible_transitions
 
 let update_state me project_catalog default_parameters project_parameters =
     me.project_manager#project_parse [] >>=
-    (Api_common.result_map
-       ~ok:(fun _ (project_parse : Api_types_j.project_parse) ->
+    (Result_util.fold
+       ~ok:(fun (project_parse : Api_types_j.project_parse) ->
            me.project_manager#init_static_analyser_raw
              project_parse.Api_types_j.project_parse_raw_ast >>= fun out ->
            let () =
@@ -194,7 +194,7 @@ let update_state me project_catalog default_parameters project_parameters =
                  project_parse.Api_types_j.project_parse_project_version ;
              } in
            Lwt.return (Api_common.result_kasa out))
-       ~error:(fun _ errors ->
+       ~error:(fun errors ->
            let () = set_state {
                project_current = Some me ;
                project_catalog; default_parameters; project_parameters;
@@ -216,7 +216,7 @@ let add_project is_new project_id : unit Api.result Lwt.t =
   let state_va = React.S.value state in
   let catalog = state_va.project_catalog in
   (try
-     Lwt.return (Api_common.result_ok
+     Lwt.return (Result_util.ok
                    (List.find (fun x -> x.project_id = project_id) catalog,
                     catalog,
                     state_va.project_parameters))
@@ -234,7 +234,7 @@ let add_project is_new project_id : unit Api.result Lwt.t =
              Mods.StringMap.add
                project_id default_parameters state_va.project_parameters in
            Lwt.return
-             (Api_common.result_ok (me,me::catalog,params)))) >>=
+             (Result_util.ok (me,me::catalog,params)))) >>=
   Api_common.result_bind_lwt
     ~ok:(fun (me,catalog,params) ->
         update_state me catalog state_va.default_parameters params)
@@ -274,7 +274,7 @@ let model : model React.signal =
 
 let sync () : unit Api.result Lwt.t =
   match (React.S.value state).project_current with
-  | None -> Lwt.return (Api_common.result_ok ())
+  | None -> Lwt.return (Result_util.ok ())
   | Some current ->
     current.project_manager#project_parse [] >>=
     (Api_common.result_bind_lwt
@@ -298,7 +298,7 @@ let remove_files manager =
               manager#file_delete m.Api_types_j.file_metadata_id>>=
               (fun _ -> Lwt.return_unit))
            catalog >>=
-         (fun () -> Lwt.return (Api_common.result_ok ()))))
+         (fun () -> Lwt.return (Result_util.ok ()))))
 
 let remove_project project_id =
   let state = React.S.value state in
@@ -468,15 +468,14 @@ let init existing_projects : unit Lwt.t =
       add_project
         (List.for_all (fun x -> x <> project) existing_projects)
         project >>=
-      Api_common.result_map
-        ~ok:(fun _ () -> add_projects projects)
-        ~error:(fun _ (errors : Api_types_j.errors) ->
+      Result_util.fold
+        ~ok:(fun () -> add_projects projects)
+        ~error:(fun errors ->
             let msg =
-              Format.sprintf
-                "creating project %s error %s"
+              Format.asprintf
+                "creating project %s error @[%a@]"
                 project
-                (Api_types_j.string_of_errors errors)
-            in
+                (Pp.list Pp.space Result_util.print_message) errors in
             let () = Common.debug
                 (Js.string (Format.sprintf "State_project.init 2 : %s" msg)) in
             add_projects projects)

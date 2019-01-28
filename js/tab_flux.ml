@@ -54,13 +54,13 @@ let update_din din_id: unit =
   State_simulation.when_ready
     ~label:__LOC__
     (fun manager -> manager#simulation_detail_din din_id >>=
-      (Api_common.result_map
-         ~ok:(fun _ (din : Api_types_t.din) ->
+      (Result_util.fold
+         ~ok:(fun (din : Api_types_t.din) ->
              let () = fill_table din in
-             Lwt.return (Api_common.result_ok ()))
-         ~error:(fun result_code e ->
+             Lwt.return (Result_util.ok ()))
+         ~error:(fun e ->
              let () = ReactiveData.RList.set table_handle [] in
-           Lwt.return (Api_common.result_messages ~result_code e ))))
+           Lwt.return (Api_common.result_messages e ))))
 
 let din_list, din_handle = ReactiveData.RList.create []
 let din_select =
@@ -80,11 +80,11 @@ let _ = React.S.map
          ~stopped:(fun _ ->
              let () = ReactiveData.RList.set din_handle [] in
              let () = ReactiveData.RList.set table_handle [] in
-             Lwt.return (Api_common.result_ok ()))
+             Lwt.return (Result_util.ok ()))
          ~initializing:(fun _ ->
              let () = ReactiveData.RList.set din_handle [] in
              let () = ReactiveData.RList.set table_handle [] in
-             Lwt.return (Api_common.result_ok ()))
+             Lwt.return (Result_util.ok ()))
          ~ready:(fun manager _ ->
            manager#simulation_catalog_din >>=
            (Api_common.result_bind_lwt
@@ -97,7 +97,7 @@ let _ = React.S.map
                              (Html.txt id))
                          data.Api_types_t.din_ids) in
                   let () = select_din () in
-                  Lwt.return (Api_common.result_ok ()))
+                  Lwt.return (Result_util.ok ()))
            )
            ) ()
     )
@@ -113,7 +113,7 @@ let export_current_din to_string mime filename =
       Api_common.result_bind_lwt
         ~ok:(fun din -> let data = Js.string (to_string din) in
               let () = Common.saveFile ~data ~mime ~filename in
-              Lwt.return (Api_common.result_ok  ())))
+              Lwt.return (Result_util.ok  ())))
 
 let export_configuration = {
   Widget_export.id = "din-export";

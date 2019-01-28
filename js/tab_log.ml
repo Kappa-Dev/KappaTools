@@ -34,12 +34,12 @@ let content () =
                 (Api_common.result_bind_lwt
                    ~ok:(fun (log_messages : Api_types_j.log_message) ->
                        let () = set_state_log log_messages in
-                       Lwt.return (Api_common.result_ok ()))
+                       Lwt.return (Result_util.ok ()))
                 )
              )
            ~stopped:(fun _ ->
                let () = set_state_log "" in
-               Lwt.return (Api_common.result_ok ()))
+               Lwt.return (Result_util.ok ()))
            ()
       )
       (React.S.on

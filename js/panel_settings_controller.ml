@@ -66,15 +66,15 @@ let intervene_simulation () =
         React.S.value State_perturbation.model_intervention in
       State_error.wrap
         __LOC__ (State_simulation.intervene_simulation model_perturbation) >>=
-      Api_common.result_map
-        ~ok:(fun _ message_text ->
+      Result_util.fold
+        ~ok:(fun text ->
             let () = State_error.add_error __LOC__ [{
-                Api_types_t.message_severity = `Info;
-                Api_types_t.message_range = None;
-                Api_types_t.message_text;
+                Result_util.severity = Logs.Info;
+                Result_util.range = None;
+                Result_util.text;
               }] in
             Lwt.return_unit)
-        ~error:(fun _ _ -> Lwt.return_unit))
+        ~error:(fun _ -> Lwt.return_unit))
 
 let focus_range (range : Locality.t) : unit =
   let file_id = range.Locality.file in
@@ -103,7 +103,7 @@ let simulation_trace () =
                   Common.saveFile
                     ~data ~mime:"application/octet-stream"
                     ~filename:"trace.json" in
-                Lwt.return (Api_common.result_ok ()))
+                Lwt.return (Result_util.ok ()))
          )
       )
 
@@ -122,6 +122,6 @@ let simulation_outputs () =
                   Common.saveFile
                     ~data ~mime:"application/zip"
                     ~filename:"simulation_outputs.zip" in
-                Lwt.return (Api_common.result_ok ()))
+                Lwt.return (Result_util.ok ()))
          )
       )

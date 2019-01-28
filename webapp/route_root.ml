@@ -129,7 +129,7 @@ let add_projects parameter projects =
   else
     let manager = new new_manager in
     let () = projects := Mods.StringMap.add project_id manager !projects in
-    Lwt.return (Api_common.result_ok ())
+    Lwt.return (Result_util.ok ())
 
 let delete_projects project_id projects :
   unit Api.result Lwt.t =
@@ -140,7 +140,7 @@ let delete_projects project_id projects :
   | Some m, p ->
     let () = projects := p in
     let () = m#terminate in
-    Lwt.return (Api_common.result_ok ())
+    Lwt.return (Result_util.ok ())
 
 let influence_node_of_string =
   let rule_re =
@@ -176,7 +176,7 @@ let route
             Webapp_common.api_result_response
               ~string_of_success:(Api_types_j.string_of_environment_info
                                     ?len:None)
-              (Api_common.result_ok info)
+              (Result_util.ok info)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -201,17 +201,14 @@ let route
                          fun () -> exit 0)
                   in
                   Lwt.return
-                    { Api_types_j.result_data = Result.Ok "shutting down" ;
-                      Api_types_j.result_code = `OK }
+                    (Result_util.ok "shutting down")
                 | _ ->
                   Lwt.return
-                    { Api_types_j.result_data =
-                        Result.Error
-                          [{ Api_types_j.message_severity = `Error ;
-                             Api_types_j.message_text = "invalid key";
-                             Api_types_j.message_range = None ; }] ;
-                      Api_types_j.result_code = `Bad_request })
-            >>= fun (msg) ->
+                    (Result_util.error ~status:`Bad_request
+                       [{ Result_util.severity = Logs.Error ;
+                          Result_util.text = "invalid key";
+                          Result_util.range = None ; }]))
+            >>= fun msg ->
             Webapp_common.api_result_response
               ~string_of_success:(fun x -> x) msg
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -228,7 +225,7 @@ let route
               ~string_of_success:
                 (JsonUtil.string_of_write
                    (JsonUtil.write_list Yojson.Basic.write_string) ?len:None)
-              (Api_common.result_ok names)
+              (Result_util.ok names)
           | `POST ->
             (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
             Mpi_message_j.project_parameter_of_string >>=
@@ -490,7 +487,7 @@ let route
             let project_id = project_ref context in
             (* handle malformed *)
             (Lwt.return
-               (Api_common.result_ok
+               (Result_util.ok
                   plot_limit )) >>=
             (Api_common.result_bind_lwt
                ~ok:(fun plot_parameter ->

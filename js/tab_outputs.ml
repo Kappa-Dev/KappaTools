@@ -25,7 +25,7 @@ let update_outputs key : unit =
       (Api_common.result_bind_lwt
          ~ok:(fun lines ->
              let () = set_current_file (Some (key,lines)) in
-             Lwt.return (Api_common.result_ok ())
+             Lwt.return (Result_util.ok ())
            )
       )
     )
@@ -84,7 +84,7 @@ let xml () =
                                         (Ui_common.option_label key)]]
                                | _ :: _ :: _ -> [select file_line_info])
                           in
-                          Lwt.return (Api_common.result_ok ())
+                          Lwt.return (Result_util.ok ())
                         )
                    )
                 )

@@ -85,7 +85,7 @@ let init_dead_rules () =
                           if rule.Public_data.rule_hidden
                           then acc
                           else
-                            let message_text =
+                            let text =
                               "Dead rule "^
                               if rule.Public_data.rule_label <> ""
                               then (" '"^rule.Public_data.rule_label^"'")
@@ -93,17 +93,17 @@ let init_dead_rules () =
                               then rule.Public_data.rule_ast
                               else string_of_int rule.Public_data.rule_id in
                             {
-                              Api_types_t.message_severity = `Warning;
-                              Api_types_t.message_range =
+                              Result_util.severity = Logs.Warning;
+                              Result_util.range =
                                 Some rule.Public_data.rule_position;
-                              Api_types_t.message_text;
+                              Result_util.text;
                             } :: acc) [] list in
                    let warnings = List.rev warnings in
                    Lwt.return (Api_common.result_messages warnings)
                  | Result.Error mh ->
                    Lwt.return (Api_common.method_handler_messages mh)
                else
-                 Lwt.return (Api_common.result_ok ()))
+                 Lwt.return (Result_util.ok ()))
          ))
     State_project.model
 
@@ -121,7 +121,7 @@ let init_dead_agents () =
                    let warnings =
                      List.fold_left
                        (fun acc agent ->
-                          let message_text =
+                          let text =
                             "Dead agent "^
                             if agent.Public_data.agent_ast <> ""
                             then agent.Public_data.agent_ast
@@ -129,9 +129,9 @@ let init_dead_agents () =
                           List.fold_left
                             (fun acc range ->
                                {
-                                 Api_types_t.message_severity = `Warning;
-                                 Api_types_t.message_range = Some range;
-                                 Api_types_t.message_text;
+                                 Result_util.severity = Logs.Warning;
+                                 Result_util.range = Some range;
+                                 Result_util.text;
                                } :: acc)
                             acc agent.Public_data.agent_position)
                        [] list in
@@ -140,7 +140,7 @@ let init_dead_agents () =
                  | Result.Error mh ->
                    Lwt.return (Api_common.method_handler_messages mh)
                else
-                 Lwt.return (Api_common.result_ok ()))
+                 Lwt.return (Result_util.ok ()))
          ))
     State_project.model
 
@@ -166,7 +166,7 @@ let init_non_weakly_reversible_transitions () =
                               | [] | [_] -> "",""," "
                               | _::_ -> "s","\n","\t"
                             in
-                            let message_text =
+                            let text =
                               Format.asprintf
                                 "Rule %s may induce non wealky reversible events in the following context%s:%s%a"
                                 
@@ -186,16 +186,16 @@ let init_non_weakly_reversible_transitions () =
                             in
                             (* to do, add the potential contexts *)
                             {
-                              Api_types_t.message_severity = `Warning;
-                              Api_types_t.message_range =
+                              Result_util.severity = Logs.Warning;
+                              Result_util.range =
                                 Some rule.Public_data.rule_position;
-                              Api_types_t.message_text;
+                              Result_util.text;
                             } :: acc) [] list in
                    let warnings = List.rev warnings in
                    Lwt.return (Api_common.result_messages warnings)
                  | Result.Error mh -> Lwt.return (Api_common.method_handler_messages mh)
                else
-                 Lwt.return (Api_common.result_ok ()))
+                 Lwt.return (Result_util.ok ()))
          )
     )
     State_project.model

@@ -88,6 +88,10 @@ let content () =
      []
   ]
 
+let lift_result = function
+  | Result.Ok x -> Result_util.ok x
+  | Result.Error e -> Api_common.result_error_msg e
+
 let do_update_compression_level () =
   State_project.with_project ~label:"Config compression"
     (fun manager ->
@@ -95,7 +99,7 @@ let do_update_compression_level () =
        let weak = Js.to_bool weak_box##.checked in
        let strong = Js.to_bool strong_box##.checked in
        manager#config_story_computation {Api.causal; Api.weak; Api.strong} >|=
-       Api_common.result_lift)
+       lift_result)
 
 let update_compression_level =
   Dom_html.handler (fun _ ->
@@ -108,7 +112,7 @@ let set_a_story =
     let va = (Js.to_string select_stories_dom##.value) in
     if va = "" then
       let () = pred_id := max_int in
-      Lwt.return (Api_common.result_ok ())
+      Lwt.return (Result_util.ok ())
     else
       let id = int_of_string va in
       if !pred_id <> id then
@@ -116,7 +120,7 @@ let set_a_story =
         State_project.with_project ~label:"Launch stories"
           (fun manager ->
              match Mods.IntMap.find_option id manager#story_list with
-             | None -> Lwt.return (Api_common.result_ok ())
+             | None -> Lwt.return (Result_util.ok ())
              | Some (_cm,d,v) ->
                let () = set_info
                    (Format.asprintf "@[ids: @[%a@]@ t=@[%a@]@ event=@[%a@]@]"
@@ -139,9 +143,9 @@ let set_a_story =
                  story_graph##setData
                    (Js.string
                       (Yojson.Basic.to_string (Graph_json.to_json v))) in
-               Lwt.return (Api_common.result_ok ()))
+               Lwt.return (Result_util.ok ()))
       else
-        Lwt.return (Api_common.result_ok ())
+        Lwt.return (Result_util.ok ())
 
 let rec inspect_stories () =
   State_project.with_project ~label:"Stories list"
@@ -155,12 +159,12 @@ let rec inspect_stories () =
        set_a_story ()) >>= fun _ ->
   State_project.with_project ~label:"Stories computing"
     (fun manager ->
-       Lwt.return (Api_common.result_ok manager#is_computing)) >>=
-  Api_common.result_map
-    ~ok:(fun _ b -> if b && React.S.value tab_is_active
+       Lwt.return (Result_util.ok manager#is_computing)) >>=
+  Result_util.fold
+    ~ok:(fun b -> if b && React.S.value tab_is_active
           then Lwt_js.sleep 3. >>= inspect_stories
           else Lwt.return_unit)
-    ~error:(fun _ _ -> Lwt.return_unit)
+    ~error:(fun _ -> Lwt.return_unit)
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
@@ -191,13 +195,13 @@ let onload () =
               State_project.with_project ~label:"Launch stories"
                 (fun manager ->
                    if manager#story_is_computing then
-                     Lwt.return (Api_common.result_ok ())
+                     Lwt.return (Result_util.ok ())
                    else
                      manager#simulation_raw_trace >>=
                      Api_common.result_bind_lwt
                        ~ok:(fun trace ->
                            manager#raw_launch_story_computation trace >|=
-                           Api_common.result_lift)) in
+                           lift_result)) in
             let () = Lwt.async inspect_stories in
             Js._false) in
   ()

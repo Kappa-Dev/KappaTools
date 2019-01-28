@@ -50,7 +50,7 @@ type t =
     mutable dins : Data.din list ;
     mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
-    mutable error_messages : Api_types_t.errors ;
+    mutable error_messages : Result_util.message list ;
     mutable trace : Bi_outbuf.t ;
     inputs_buffer : Buffer.t;
     inputs_form : Format.formatter;
@@ -97,30 +97,31 @@ let reinitialize ~outputs random_state t =
       random_state t.env t.counter;
   t.state <- State_interpreter.empty ~with_delta_activities:false t.env
 
-let catch_error : 'a . (Api_types_t.errors -> 'a) -> exn -> 'a =
-  fun handler ->
-    (function
-      |  ExceptionDefn.Syntax_Error
-          ((message,region) : string Locality.annot) ->
-        handler [Api_data.api_message_errors ~region message]
-      | ExceptionDefn.Malformed_Decl
-          ((message,region) : string Locality.annot) ->
-        handler [Api_data.api_message_errors ~region message]
-      | ExceptionDefn.Internal_Error
-          ((message,region) : string Locality.annot) ->
-        handler [Api_data.api_message_errors ~region message]
-      | Invalid_argument error ->
-        handler [Api_data.api_message_errors ("Runtime error "^ error)]
-      | exn -> handler (Api_data.api_exception_errors exn))
+let catch_error handler = function
+  |  ExceptionDefn.Syntax_Error
+      ((message,range) : string Locality.annot) ->
+    handler (Api_common.error_msg ~range message)
+  | ExceptionDefn.Malformed_Decl
+      ((message,range) : string Locality.annot) ->
+    handler (Api_common.error_msg ~range message)
+  | ExceptionDefn.Internal_Error
+      ((message,range) : string Locality.annot) ->
+    handler (Api_common.error_msg ~range message)
+  | Invalid_argument error ->
+    handler (Api_common.error_msg ("Runtime error "^ error))
+  | exn ->
+    let message = (try  (Printexc.to_string exn)
+                   with _ -> "unspecified exception thrown") in
+    handler (Api_common.error_msg message)
 
 type file = { file_id : string ; file_content : string }
 
 let rec compile_file
     (yield : unit -> unit Lwt.t)
     (compile : Ast.parsing_compil)
-  : file list -> (Ast.parsing_compil, Api_types_t.errors) Result.result Lwt.t =
+  : file list -> (Ast.parsing_compil, Result_util.message list) Result_util.t Lwt.t =
   function
-  | [] -> Lwt_result.return compile
+  | [] -> Lwt.return (Result_util.ok compile)
   | file::files ->
     let lexbuf = Lexing.from_string file.file_content in
     let () = lexbuf.Lexing.lex_curr_p <-
@@ -138,11 +139,12 @@ let rec compile_file
                if err = [] then Lwt.return
                else
                  let err = List.map
-                     (fun (m,region) -> Api_data.api_message_errors ~region m)
+                     (fun (m,range) -> Api_common.error_msg ~range m)
                      err in
                  Result_util.fold
-                   ~ok:(fun _ -> Lwt_result.fail err)
-                   ~error:(fun error -> Lwt_result.fail (err@error))))
+                   ~ok:(fun _ -> Lwt.return (Result_util.error err))
+                   ~error:(fun error ->
+                       Lwt.return (Result_util.error (err@error)))))
       )
       (catch_error
          (fun e ->
@@ -151,8 +153,8 @@ let rec compile_file
             (fun result ->
                let r =
                  Result_util.fold
-                   ~ok:(fun _ -> Result_util.error e)
-                   ~error:(fun error -> Result_util.error (e@error))
+                   ~ok:(fun _ -> Result_util.error [e])
+                   ~error:(fun error -> Result_util.error (e::error))
                    result
                 in
                 (Lwt.return r)
@@ -237,8 +239,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
               in
               Lwt.return (Result_util.ok simulation))
          with e ->
-           (catch_error
-              (fun e -> Lwt.return (Result_util.error e))) e
+           (catch_error (fun x -> Lwt.return (Result_util.error [x]))) e
       ))
   in
   Lwt.catch
@@ -251,7 +252,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
          ~error:(fun e -> Lwt.return (Result_util.error e))
        )
     )
-    (catch_error (fun e -> Lwt.return (Result_util.error e)))
+    (catch_error (fun e -> Lwt.return (Result_util.error [e])))
 
 let outputs (simulation : t) =
   function
@@ -304,7 +305,7 @@ let parse
     ~(system_process : system_process)
     ~(kappa_files : Api_types_t.file list)
     ~overwrites
-  : (t,Api_types_t.errors) Result.result Lwt.t
+  : (t,Result_util.message list) Result_util.t Lwt.t
   =
 
   let kappa_files =
@@ -317,12 +318,7 @@ let parse
          }::acc
          else acc)
          [] kappa_files in
-  Lwt.bind
-    (build_ast
-       kappa_files overwrites system_process#yield)
-    (Result_util.fold
-       ~ok:(fun simulation -> Lwt.return (Result_util.ok simulation))
-       ~error:(fun e -> Lwt.return (Result_util.error e)))
+  build_ast kappa_files overwrites system_process#yield
 
 let time_yield
     ~(system_process : system_process)
@@ -378,14 +374,14 @@ let run_simulation
     (catch_error
        (fun e ->
           let () = t.is_running <- false in
-          let () = t.error_messages <- e in
+          let () = t.error_messages <- [e] in
           Lwt.return_unit))
 
 let start
     ~(system_process : system_process)
     ~(parameter : Api_types_t.simulation_parameter)
     ~(t : t)
-  : (unit,Api_types_t.errors) Result.result Lwt.t =
+  : (unit,Result_util.message list) Result_util.t Lwt.t =
   let lexbuf =
     Lexing.from_string parameter.Api_types_t.simulation_pause_condition in
   Lwt.catch (fun () ->
@@ -445,20 +441,20 @@ let start
                with e ->
                  catch_error
                    (fun e ->
-                      let () = t.error_messages <- e in
+                      let () = t.error_messages <- [e] in
                       Lwt.return_unit) e
             ) in
-        Lwt_result.return ()
-      with ExceptionDefn.Syntax_Error (message,region) ->
-        Lwt_result.fail [Api_data.api_message_errors ~region message])
+        Lwt.return (Result_util.ok ())
+      with ExceptionDefn.Syntax_Error (message,range) ->
+        Lwt.return (Api_common.result_error_msg ~range message))
     (catch_error
        (fun e ->
-          let () = t.error_messages <- e in
-          Lwt_result.fail e))
+          let () = t.error_messages <- [e] in
+          Lwt.return (Result_util.error [e])))
 
 let pause
     ~(system_process : system_process)
-    ~(t : t) : (unit,Api_types_t.errors) Result.result Lwt.t =
+    ~(t : t) : (unit,Result_util.message list) Result_util.t Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   let () = if t.is_running then
@@ -470,7 +466,7 @@ let pause
 
 let stop
     ~(system_process : system_process)
-    ~(t : t) : (unit,Api_types_t.errors) Result.result Lwt.t =
+    ~(t : t) : (unit,Result_util.message list) Result_util.t Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   Lwt.catch
@@ -482,13 +478,13 @@ let stop
           let () = finalize_simulation ~t:t in
           Lwt.return (Result_util.ok ()))
     )
-    (catch_error (fun e -> Lwt.return (Result_util.error e)))
+    (catch_error (fun e -> Lwt.return (Result_util.error [e])))
 
 let perturbation
     ~(system_process : system_process)
     ~(t : t)
     ~(perturbation:Api_types_t.simulation_intervention)
-  : (string, Api_types_t.errors) Result.result Lwt.t =
+  : (string, Result_util.message list) Result_util.t Lwt.t =
   let () = ignore(system_process) in
   let lexbuf =
     Lexing.from_string perturbation.Api_types_t.intervention_code
@@ -496,7 +492,7 @@ let perturbation
   Lwt.catch
     (fun () ->
        if t.is_running then
-         Lwt_result.fail [Api_data.api_message_errors msg_process_not_paused]
+         Lwt.return (Api_common.result_error_msg msg_process_not_paused)
        else
          try
            let e = Kparser4.standalone_effect_list Klexer4.token lexbuf in
@@ -526,15 +522,15 @@ let perturbation
                   (Kappa_printer.modification ~noCounters:false ~env:t.env))
                e' in
            Lwt.return (Result_util.ok (Buffer.contents log_buffer))
-         with ExceptionDefn.Syntax_Error (message,region) ->
-           Lwt_result.fail [Api_data.api_message_errors ~region message])
-    (catch_error (fun e -> Lwt_result.fail e))
+         with ExceptionDefn.Syntax_Error (message,range) ->
+           Lwt.return (Api_common.result_error_msg ~range message))
+    (catch_error (fun e -> Lwt.return (Result_util.error [e])))
 
 let continue
     ~(system_process : system_process)
     ~(t : t)
     ~(pause_condition : string)
-  : (unit,Api_types_t.errors) Result.result Lwt.t =
+  : (unit,Result_util.message list) Result_util.t Lwt.t =
   let lexbuf =
     Lexing.from_string pause_condition in
   Lwt.catch
@@ -567,15 +563,14 @@ let continue
                (fun () ->
                   run_simulation ~system_process:system_process ~t:t false) in
            Lwt.return (Result_util.ok ())
-         with ExceptionDefn.Syntax_Error (message,region) ->
-           Lwt_result.fail [Api_data.api_message_errors ~region message])
-    (catch_error
-       (fun e -> Lwt.return (Result_util.error e)))
+         with ExceptionDefn.Syntax_Error (message,range) ->
+           Lwt.return (Api_common.result_error_msg ~range message))
+    (catch_error (fun e -> Lwt.return (Result_util.error [e])))
 
 let progress
     ~(system_process : system_process)
     ~(t : t) :
-  (Api_types_t.simulation_progress,Api_types_t.errors) Result.result Lwt.t =
+  (Api_types_t.simulation_progress,Result_util.message list) Result_util.t Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   match t.error_messages with
@@ -600,13 +595,13 @@ let progress
              Api_types_t.simulation_progress_is_running =
                t.is_running ;
            }))
-      (catch_error (fun e -> Lwt.return (Result_util.error e)))
+      (catch_error (fun e -> Lwt.return (Result_util.error [e])))
   | _ -> Lwt.return (Result_util.error t.error_messages)
 
 let outputs
     ~(system_process : system_process)
     ~(t : t) :
-  (Api_data.simulation_detail_output,Api_types_t.errors) Result.result Lwt.t =
+  (Api_data.simulation_detail_output,Result_util.message list) Result_util.t Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   match t.error_messages with
@@ -627,7 +622,7 @@ let outputs
              Api_types_t.simulation_output_log_messages =
                Buffer.contents t.log_buffer ;
            }))
-      (catch_error (fun e -> Lwt.return (Result_util.error e)))
+      (catch_error (fun e -> Lwt.return (Result_util.error [e])))
   | _ -> Lwt.return (Result_util.error t.error_messages)
 
 let efficiency t = Counter.get_efficiency t.counter

@@ -2,31 +2,10 @@
    this should be replaced by.  It is expected than non error
    message will decide how best to relay its messages.
 *)
-type ('ok,'error) result_data <ocaml from module="Result_util" t="t"> = abstract
+type ('ok,'error) result <ocaml from module="Result_util" t="t"> = abstract
 
-type range <ocaml from module="Locality"> = abstract
+type message <ocaml from module="Result_util"> = abstract
 
-type severity =
-     [ Error <json name="error">
-     | Warning <json name="warning">
-     | Info <json name="info"> ]
-(* Range in this case is optional to support
-   non parsing errors.
-*)
-type message =
-     { severity : severity ;
-       text     : string ;
-       range    : range nullable } <ocaml field_prefix="message_">
-type errors = message list
-
-(* Code here is the just the http code the int used here
-   to prevent there being a dependency on the cohttp package.
-   As there are success and failure codes the the response code
-   is not part othe the data variant.
-   *)
-type ('ok,'code)  result =
-     { result_data : ('ok,errors) result_data;
-       result_code : 'code }
 (* Give a summary of the service.  The intention is to give the
    users an overview of the state of the kappa service.
 *)

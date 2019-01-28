@@ -99,8 +99,8 @@ let when_ready
       (fun () ->
          with_simulation_info
            ~label
-           ~stopped:(fun _-> Lwt.return (Api_common.result_ok ()))
-           ~initializing:(fun _ -> Lwt.return (Api_common.result_ok ()))
+           ~stopped:(fun _-> Lwt.return (Result_util.ok ()))
+           ~initializing:(fun _ -> Lwt.return (Result_util.ok ()))
            ~ready:(fun manager _ ->
                (operation manager : unit Api.result Lwt.t)
              )
@@ -112,7 +112,7 @@ let sleep_time = 1.0
 let rec sync () =
   match (React.S.value state).simulation_state with
   | SIMULATION_STATE_STOPPED | SIMULATION_STATE_INITALIZING ->
-    Lwt.return (Api_common.result_ok ())
+    Lwt.return (Result_util.ok ())
   | SIMULATION_STATE_READY _ ->
     State_project.with_project ~label:"sync"
       (fun manager ->
@@ -126,7 +126,7 @@ let rec sync () =
                 if simulation_info.Api_types_t.simulation_info_progress
                    .Api_types_t.simulation_progress_is_running then
                   Lwt_js.sleep sleep_time >>= sync
-                else Lwt.return (Api_common.result_ok ())
+                else Lwt.return (Result_util.ok ())
               )
          )
       )
@@ -136,16 +136,16 @@ let refresh () =
     (fun manager ->
        (* get current directory *)
        manager#simulation_info >>=
-       (Api_common.result_map
-          ~ok:(fun _ simulation_info ->
+       (Result_util.fold
+          ~ok:(fun simulation_info ->
               let () = set_state
                   {simulation_state =
                      SIMULATION_STATE_READY simulation_info} in
               sync ())
-          ~error:(fun _ _ ->
+          ~error:(fun _ ->
               let () = set_state
                   {simulation_state = SIMULATION_STATE_STOPPED} in
-              Lwt.return (Api_common.result_ok ())
+              Lwt.return (Result_util.ok ())
             )))
 
 let init () : unit Lwt.t = Lwt.return_unit
@@ -211,7 +211,7 @@ let stop_simulation () : unit Api.result Lwt.t =
          manager#simulation_delete >>=
          (Api_common.result_bind_lwt ~ok:(fun () ->
               let () = update_simulation_state SIMULATION_STATE_STOPPED in
-              Lwt.return (Api_common.result_ok ()))))
+              Lwt.return (Result_util.ok ()))))
     ()
 
 let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) : unit Api.result Lwt.t =
@@ -219,7 +219,7 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
     ~label:"start_simulation"
     ~stopped:
       (fun manager ->
-        let on_error (error_msgs : Api_types_j.errors) : unit Api.result Lwt.t =
+        let on_error error_msgs : unit Api.result Lwt.t =
           let () =
             update_simulation_state SIMULATION_STATE_STOPPED in
           (* turn the lights off *)
@@ -242,13 +242,13 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
                       SIMULATION_STATE_READY simulation_status in
                     let () =
                       update_simulation_state simulation_state in
-                    Lwt.return (Api_common.result_ok ())
+                    Lwt.return (Result_util.ok ())
                   )
              )
              >>=
-             (Api_common.result_map
-                ~ok:(fun _ _ -> Lwt.return (Api_common.result_ok ()))
-                ~error:(fun _ error_msg ->
+             (Result_util.fold
+                ~ok:(fun _ -> Lwt.return (Result_util.ok ()))
+                ~error:(fun error_msg ->
                     let () =
                       update_simulation_state SIMULATION_STATE_STOPPED in
                     on_error error_msg))
@@ -295,5 +295,5 @@ let intervene_simulation (code : string) : string Api.result Lwt.t =
            ~ok:(fun out -> sync () >>=
                  Api_common.result_bind_lwt
                    ~ok:(fun () ->
-                       Lwt.return (Api_common.result_ok out)))))
+                       Lwt.return (Result_util.ok out)))))
     ()

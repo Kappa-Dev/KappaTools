@@ -9,42 +9,22 @@
 open Lwt.Infix
 
 (* Helper functions for result *)
-let result_ok ?(result_code:Api.manager_code = `OK)
-    (ok:'ok) : 'ok Api.result =
-  { Api_types_t.result_data = Result.Ok ok ;
-    Api_types_t.result_code = result_code }
-let error_msg
-    ?(severity:Api_types_t.severity = `Error)
-    (message:string) : Api_types_t.message =
-  { Api_types_t.message_severity = severity;
-    Api_types_t.message_text = message;
-    Api_types_t.message_range = None }
+let error_msg ?(severity = Logs.Error) ?range text : Result_util.message =
+  { Result_util.severity; Result_util.text; Result_util.range }
+
 let result_error_msg
-    ?(severity:Api_types_t.severity = `Error)
-    ?(result_code:Api.manager_code = `Bad_request)
-    (message:string) : 'ok Api.result =
-  { Api_types_t.result_data =
-      Result.Error [{ Api_types_t.message_severity = severity;
-                Api_types_t.message_text = message;
-                Api_types_t.message_range = None }];
-    Api_types_t.result_code = result_code }
+    ?severity ?range ?result_code (message:string) : 'ok Api.result =
+  Result_util.error ?status:result_code [error_msg ?severity ?range message]
 
 let result_messages
-    ?(result_code:Api.manager_code = `Bad_request)
-    (messages : Api_types_t.errors) : 'ok Api.result =
-  { Api_types_t.result_data = Result.Error messages ;
-    Api_types_t.result_code = result_code }
+    ?result_code messages : 'ok Api.result =
+  Result_util.error ?status:result_code messages
 
 let result_error_exception
-    ?(severity:Api_types_t.severity = `Error)
-    ?(result_code:Api.manager_code = `Bad_request)
-    (e : exn) : 'ok Api.result =
+    ?severity ?result_code (e : exn) : 'ok Api.result =
   let message = (try  (Printexc.to_string e)
-                 with _ -> "unspecified exception thrown")
-  in result_error_msg
-    ~severity:severity
-    ~result_code:result_code
-    message
+                 with _ -> "unspecified exception thrown") in
+  result_error_msg ?severity ?result_code message
 
 let method_handler_errors ?severity mh =
   let uncaught = Exception_without_parameter.get_uncaught_exception_list mh in
@@ -65,34 +45,8 @@ let method_handler_messages ?severity ?result_code mh =
     result_messages ?result_code (method_handler_errors ?severity mh)
 
 let result_kasa = function
-  | Result.Ok x -> result_ok x
-  | Result.Error mh -> method_handler_messages ~severity:`Error mh
-
-let result_map :
-  ok:('code -> 'ok -> 'a) ->
-  error:('code -> Api_types_t.errors -> 'a) ->
-  ('ok, 'code) Api_types_t.result -> 'a =
-  fun
-    ~(ok:'code -> 'ok -> 'a)
-    ~(error:'code -> Api_types_t.errors -> 'a)
-    (result:('ok,'code) Api_types_t.result)
-  ->  ((match result.Api_types_t.result_data with
-      | Result.Ok data -> ok result.Api_types_t.result_code data
-      | Result.Error data -> error result.Api_types_t.result_code data) : 'a)
-
-let result_bind :
-  ok:('ok -> ('a_ok, 'a_code) Api_types_t.result) ->
-  ('ok, 'a_code) Api_types_t.result ->
-  ('a_ok, 'a_code) Api_types_t.result =
-  fun
-    ~(ok:'ok -> ('a_ok,'a_code) Api_types_t.result)
-    (result:('ok,'code) Api_types_t.result) ->
-    ((match result.Api_types_t.result_data with
-        | Result.Ok data -> ok data
-        | Result.Error data ->
-          { Api_types_t.result_data = Result.Error data ;
-            Api_types_t.result_code = result.Api_types_t.result_code }) :
-       ('a_ok,'a_code) Api_types_t.result)
+  | Result.Ok x -> Result_util.ok x
+  | Result.Error mh -> method_handler_messages ~severity:Logs.Error mh
 
 let result_bind_lwt :
   ok:('ok -> ('a_ok, 'a_code) Api_types_t.result Lwt.t) ->
@@ -100,14 +54,11 @@ let result_bind_lwt :
   ('a_ok, 'a_code) Api_types_t.result Lwt.t =
   fun
     ~(ok:'ok -> ('a_ok,'a_code) Api_types_t.result Lwt.t)
-    (result:('ok,'code) Api_types_t.result) ->
-  (match result.Api_types_t.result_data with
-  | Result.Ok data -> ok data
-  | Result.Error data ->
-    Lwt.return
-      { Api_types_t.result_data = Result.Error data ;
-        Api_types_t.result_code = result.Api_types_t.result_code }
-    : ('a_ok,'a_code) Api_types_t.result Lwt.t)
+    { Result_util.value; status; messages } ->
+    match value with
+    | Result.Ok data -> ok data
+    | Result.Error e ->
+      Lwt.return { Result_util.value = Result.Error e; status; messages }
 
 let rec result_fold_lwt :
   f:(('ok, 'a_code) Api_types_t.result ->
@@ -130,24 +81,16 @@ let rec result_fold_lwt :
 
 let rec result_combine : unit Api.result list -> unit Api.result =
   function
-  | [] -> result_ok ()
+  | [] -> Result_util.ok ()
   | l::t ->
-    let r = result_combine t in
-    result_map
-      ~ok:(fun _ _-> r)
-      ~error:(fun _ (data_1 : Api_types_t.errors) ->
-          result_map
-            ~ok:(fun _ _-> l)
-            ~error:(fun result_code (data_r : Api_types_t.errors) ->
-                { Api_types_t.result_data = Result.Error (data_1@data_r);
-                  Api_types_t.result_code = result_code }
-              )
-            r
-        )
+    Result_util.fold
+      ~ok:(fun () -> result_combine t)
+      ~error:(fun data_1 ->
+         Result_util.fold
+           ~ok:(fun () -> l)
+           ~error:(fun data_r ->
+               Result_util.error ~status:l.Result_util.status (data_1@data_r))
+           (result_combine t))
       l
-
-let result_lift = function
-  | Result.Ok o -> result_ok o
-  | Result.Error e -> result_error_msg e
 
 let md5sum text = Digest.to_hex (Digest.string text)

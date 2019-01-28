@@ -6,7 +6,28 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type ('a,'b) t = ('a,'b) Result.result
+type status =
+  [ `OK | `Accepted | `Created |
+    `Bad_request | `Conflict | `Not_found | `Request_timeout ]
+(** The subset of [Cohttp.Code.status] we need *)
+
+type message = {
+  severity : Logs.level ;
+  text     : string ; (*should be an algebraic type*)
+  range    : Locality.t option;
+}
+
+type ('a,'b) t = {
+  value : ('a,'b) Result.result;
+  status : status;
+  messages : message list;
+}
+
+val write_message : Bi_outbuf.t -> message -> unit
+
+val read_message : Yojson.Safe.lexer_state -> Lexing.lexbuf -> message
+
+val print_message : Format.formatter -> message -> unit
 
 val write_t :
   (Bi_outbuf.t -> 'ok -> unit) ->
@@ -34,10 +55,15 @@ val t_of_string :
   string -> ('ok, 'error) t
 (** Deserialize JSON data of type {!t}. *)
 
+val lift :
+  ?ok_status:status -> ?error_status:status ->
+  ('a, 'b) Result.result -> ('a, 'b) t
 val fold : ok:('ok -> 'a) -> error:('error -> 'a) -> ('ok, 'error) t -> 'a
-val bind : ('ok -> ('a, 'error) t) -> ('ok, 'error) t -> ('a, 'error) t
+val bind :
+  ?overwrite_status:status -> ?error_status: status ->
+  ('ok -> ('a, 'error) Result.result) -> ('ok, 'error) t -> ('a, 'error) t
 val map : ('ok -> 'a) -> ('ok, 'error) t -> ('a, 'error) t
 val map2 :
   ('a -> 'b -> 'ok) -> ('a, 'error) t -> ('b, 'error) t -> ('ok, 'error) t
-val error : 'error -> ('ok, 'error) t
-val ok : 'ok -> ('ok, 'error) t
+val error : ?status:status -> 'error -> ('ok, 'error) t
+val ok : ?status:status -> 'ok -> ('ok, 'error) t

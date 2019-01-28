@@ -13,11 +13,7 @@
 
 type compression_modes = { causal : bool; weak : bool; strong : bool; }
 
-type manager_code =
-  [ `OK | `Accepted | `Created |
-    `Bad_request | `Conflict | `Not_found | `Request_timeout ]
-type result_code = manager_code
-type 'ok result = ('ok,manager_code) Api_types_t.result
+type 'ok result = ('ok, Result_util.message list) Result_util.t
 
 type project_id = string
 
@@ -26,12 +22,10 @@ class type manager_environment = object
     unit -> Api_types_t.environment_info result Lwt.t
 end
 
-class type manager_project = object
+class type manager_model = object
   method project_parse :
     Api_types_t.overwritten_var list -> Api_types_t.project_parse result Lwt.t
-end
 
-class type manager_file = object
   method file_catalog : Api_types_t.file_catalog result Lwt.t
 
   method file_create :
@@ -170,8 +164,7 @@ class type virtual manager_stories = object
 end
 
 class type manager = object
-  inherit manager_project
-  inherit manager_file
+  inherit manager_model
   inherit manager_simulation
 end
 

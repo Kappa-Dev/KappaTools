@@ -29,39 +29,39 @@ val parse :
   system_process:system_process ->
   kappa_files:Api_types_t.file list ->
   overwrites:(string * Nbr.t) list ->
-  (t, Api_types_t.errors) Result.result Lwt.t
+  (t, Result_util.message list) Result_util.t Lwt.t
 
 val start :
   system_process:system_process ->
   parameter:Api_types_t.simulation_parameter ->
   t:t ->
-  (unit, Api_types_t.errors) Result.result Lwt.t
+  (unit, Result_util.message list) Result_util.t Lwt.t
 
 val pause :
   system_process:system_process ->
-  t:t -> (unit, Api_types_t.errors) Result.result Lwt.t
+  t:t -> (unit, Result_util.message list) Result_util.t Lwt.t
 
 val stop :
   system_process:system_process ->
-  t:t -> (unit, Api_types_t.errors) Result.result Lwt.t
+  t:t -> (unit, Result_util.message list) Result_util.t Lwt.t
 
 val perturbation :
   system_process:system_process ->
   t:t ->
   perturbation:Api_types_t.simulation_intervention ->
-  (string, Api_types_t.errors) Result.result Lwt.t
+  (string, Result_util.message list) Result_util.t Lwt.t
 
 val continue :
   system_process:system_process -> t:t -> pause_condition:string ->
-  (unit, Api_types_t.errors) Result.result Lwt.t
+  (unit, Result_util.message list) Result_util.t Lwt.t
 
 val progress :
   system_process:system_process -> t:t ->
-  (Api_types_t.simulation_progress, Api_types_t.errors) Result.result Lwt.t
+  (Api_types_t.simulation_progress, Result_util.message list) Result_util.t Lwt.t
 
 val outputs :
   system_process:system_process -> t:t ->
-  (Api_data.simulation_detail_output, Api_types_t.errors) Result.result Lwt.t
+  (Api_data.simulation_detail_output, Result_util.message list) Result_util.t Lwt.t
 
 val efficiency : t -> Counter.Efficiency.t
 

@@ -174,7 +174,7 @@ let select_snapshot snapshot_js =
                         snapshot_js
                         snapshot
                     in
-                    Lwt.return (Api_common.result_ok ()))
+                    Lwt.return (Result_util.ok ()))
              )
           )
       in
@@ -229,7 +229,7 @@ let xml () =
                      let () = ReactiveData.RList.set
                          handle (select data.Api_types_t.snapshot_ids) in
                      let () = select_snapshot snapshot_js in
-                     Lwt.return (Api_common.result_ok ()))
+                     Lwt.return (Result_util.ok ()))
               )
            )
       )

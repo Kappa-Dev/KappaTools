@@ -26,9 +26,11 @@ let string_response ?(headers=headers) = Server.respond_string ~headers
 let error_response
     ?(headers = headers)
     ?(status = `Internal_server_error)
-    (errors : Api_types_j.errors)
+    (errors : Result_util.message list)
   : (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t =
-  let error_msg : string = Api_types_j.string_of_errors errors in
+  let error_msg : string =
+    JsonUtil.string_of_write
+      (JsonUtil.write_list Result_util.write_message) errors in
   let () =
     Lwt.async
       (fun () ->
@@ -48,18 +50,18 @@ let error_response
 *)
 let api_result_response
     ~(string_of_success: 'ok -> string)
-  : 'ok Api.result -> (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t =
-  Api_common.result_map
-    ~ok:(fun (code : Api.manager_code)
-          (ok : 'a) ->
-          let body : string = string_of_success ok in
-          let status :> Cohttp.Code.status_code = code in
-          Server.respond_string ~headers ~status ~body ())
-    ~error:(fun (code : Api.manager_code) (errors : Api_types_j.errors) ->
-        let error_msg : string = Api_types_j.string_of_errors errors in
-        let status :> Cohttp.Code.status_code = code in
-        Logs_lwt.err (fun m -> m "%s" error_msg) >>= fun () ->
-        Server.respond_string ~headers ~status ~body:error_msg ())
+  : 'ok Api.result -> (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t = function
+  | { Result_util.value = Result.Ok ok; Result_util.status; _ } ->
+    let body : string = string_of_success ok in
+    let status :> Cohttp.Code.status_code = status in
+    Server.respond_string ~headers ~status ~body ()
+  | { Result_util.value = Result.Error errors; Result_util.status; _ } ->
+    let error_msg : string =
+      JsonUtil.string_of_write
+        (JsonUtil.write_list Result_util.write_message) errors in
+    let status :> Cohttp.Code.status_code = status in
+    Logs_lwt.err (fun m -> m "%s" error_msg) >>= fun () ->
+    Server.respond_string ~headers ~status ~body:error_msg ()
 
 let kasa_response ~string_of_success x =
   api_result_response ~string_of_success (Api_common.result_kasa x)
@@ -182,9 +184,7 @@ let request_handler context = function
       )
   | _::_ ->
     error_response
-      ?headers:None
-      ?status:None
-      [Api_data.api_message_errors "multiple routes match url"]
+      ?headers:None ?status:None [Api_common.error_msg "multiple routes match url"]
 
 
 let route_handler

@@ -37,7 +37,7 @@ let export_json filename =
               let data = Js.string (Data.string_of_plot plot) in
               let () =
                 Common.saveFile ~data ~mime:"application/json" ~filename in
-              Lwt.return (Api_common.result_ok ()))))
+              Lwt.return (Result_util.ok ()))))
 
 let export mime filename =
   State_simulation.when_ready
@@ -51,7 +51,7 @@ let export mime filename =
               let data =
                 Js.string (Data.export_plot ~is_tsv:(mime="text/tsv") plot) in
               let () = Common.saveFile ~data ~mime ~filename in
-              Lwt.return (Api_common.result_ok ()))))
+              Lwt.return (Result_util.ok ()))))
 
 let configuration () : Widget_export.configuration =
   { Widget_export.id = export_id
@@ -189,7 +189,7 @@ let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
          ~ok:(fun (plot : Api_types_t.plot)  ->
              let data = Js.string (Data.string_of_plot plot) in
              let () = js_plot##setData(data) in
-             Lwt.return (Api_common.result_ok ())
+             Lwt.return (Result_util.ok ())
            )
       )
     )
