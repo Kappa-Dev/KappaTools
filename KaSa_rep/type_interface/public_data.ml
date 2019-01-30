@@ -138,11 +138,16 @@ let site_type_to_json = function
       `String "port";
       `Assoc [
         sitelinks,
-        JsonUtil.of_list (fun (x,y) -> `List [`Int x; `Int y])
-          p.User_graph.port_links;
-
+        (match p.User_graph.port_links with
+         | User_graph.LINKS l ->
+           JsonUtil.of_list (fun (x,y) -> `List [`Int x; `Int y]) l
+         | User_graph.WHATEVER -> `Null
+         | User_graph.SOME -> `Bool true
+         | User_graph.TYPE (si,ty) ->
+           `Assoc [ "site_name",`String si;"port_name",`String ty]);
         sitestates,
-        JsonUtil.of_list JsonUtil.of_string p.User_graph.port_states
+        JsonUtil.of_option (JsonUtil.of_list JsonUtil.of_string)
+          p.User_graph.port_states
       ]
     ]
 
@@ -160,17 +165,12 @@ let site_type_of_json = function
       try
         let port_links =
           let json = List.assoc sitelinks l in
-          JsonUtil.to_list ~error_msg:"link list"
-            (function
-              | `List [ `Int ag; `Int si ] -> (ag,si)
-              | x -> raise (Yojson.Basic.Util.Type_error
-                              (JsonUtil.build_msg "sites_links",x)))
-            json
-        in
+          User_graph.links_of_yojson json in
         let port_states =
           let json = List.assoc sitestates l in
-          JsonUtil.to_list ~error_msg:"state list"
-            (JsonUtil.to_string ~error_msg:"state")
+          JsonUtil.to_option
+            (JsonUtil.to_list ~error_msg:"state list"
+               (JsonUtil.to_string ~error_msg:"state"))
             json
         in
         User_graph.Port { User_graph.port_links; User_graph.port_states }

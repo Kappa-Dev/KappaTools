@@ -463,12 +463,16 @@ let rename_link parameters handler error map (i,j) =
     Exception.warn parameters error __POS__ Exit (0,0)
   | Some (i,j) -> error, (i,j)
 
-let rename_links parameter handler error map l =
-  List.fold_left
-    (fun (error, l) link ->
-       let error, link = rename_link parameter handler error map link in
-       error, link::l)
-    (error,[]) (List.rev l)
+let rename_links parameter handler error map = function
+  | User_graph.LINKS l ->
+    let error',l' =
+      List.fold_left
+        (fun (error, l) link ->
+           let error, link = rename_link parameter handler error map link in
+           error, link::l)
+        (error,[]) (List.rev l) in
+    (error', User_graph.LINKS l')
+  | User_graph.(WHATEVER | SOME | TYPE _) as x -> (error,x)
 
 let reindex parameters error handler list =
   let map,_ =
@@ -1329,8 +1333,8 @@ let convert_contact_map_map_to_list sol =
                       {
                         User_graph.site_name=a;
                         User_graph.site_type = User_graph.Port {
-                            User_graph.port_links=links;
-                            User_graph.port_states=props;
+                            User_graph.port_links=User_graph.LINKS links;
+                            User_graph.port_states=Some props;
                           }
                       }::l) data [])}::l)
        sol [])
@@ -1414,55 +1418,17 @@ let get_contact_map
          | Public_data.High | Public_data.Full ->
            Some "Refine the contact map"))
 
-let print_contact_map parameters contact_map =
-  let log = (Remanent_parameters.get_logger parameters) in
-  Loggers.fprintf log  "Contact map: ";
-  Loggers.print_newline log;
-  Array.iter
-    (fun node ->
-       let x = node.User_graph.node_type in
-       let interface = node.User_graph.node_sites in
-       Array.iter
-         (fun site ->
-            let y = site.User_graph.site_name in
-            let l1,l2 =
-              match site.User_graph.site_type with
-              | User_graph.Counter _ ->
-                failwith "KaSa does not deal yet with counters"
-              | User_graph.Port p ->
-                p.User_graph.port_states, p.User_graph.port_links in
-            if l1<>[]
-            then
-              begin
-                let () = Loggers.fprintf log "%s@%s: " x y in
-                let _ = List.fold_left
-                    (fun bool x ->
-                       (if bool then
-                          Loggers.fprintf log ", ");
-                       Loggers.fprintf log "%s" x;
-                       true)
-                    false l1
-                in
-                Loggers.print_newline log
-              end
-            else ();
-            List.iter
-              (fun (z,t) ->
-                 Loggers.fprintf log
-                   "%s@%s--%i@%i" x y z t;
-                 Loggers.print_newline log
-              ) l2
-         )
-         interface
-    ) contact_map
-
 let dump_contact_map accuracy state =
   match
     Remanent_state.get_contact_map accuracy state
   with
   | None -> ()
   | Some contact_map ->
-    print_contact_map (Remanent_state.get_parameters state) contact_map
+    let logger =
+      Remanent_parameters.get_logger
+        (Remanent_state.get_parameters state) in
+    Loggers.fprintf logger "Contact map:@ %a" User_graph.print_cc contact_map
+
 
 let compute_internal_scc_decomposition
     ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
@@ -1891,7 +1857,10 @@ let compute_signature show_title state =
                   | User_graph.Counter _ ->
                     failwith "KaSa does not deal with counters yet"
                   | User_graph.Port p ->
-                    p.User_graph.port_states, p.User_graph.port_links in
+                    Option_util.unsome [] p.User_graph.port_states,
+                    match p.User_graph.port_links with
+                    | User_graph.LINKS l -> l
+                    | User_graph.(SOME | WHATEVER | TYPE _) -> assert false in
                 let state, binding' =
                   List.fold_left
                     (fun (state,list) (x,y) ->

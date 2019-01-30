@@ -102,6 +102,10 @@ val read_compact_pair:
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'b) ->
   Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a * 'b
 
+val compact_to_pair :
+  (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
+  Yojson.Basic.json -> 'a * 'b
+  
 val of_triple:
     ?lab1:string -> ?lab2:string -> ?lab3:string ->
       ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->

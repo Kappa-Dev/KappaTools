@@ -134,7 +134,7 @@ let collect_partitioned_contact_map contact_map =
            cache1
            StateList.hash
            StateList.int_of_hashed_list
-           fst
+           (fun (x,_) -> Option_util.unsome [] x)
            site_list
        in
        let (binding_state_partition: string list list) =
@@ -142,7 +142,9 @@ let collect_partitioned_contact_map contact_map =
            cache2
            BindingTypeList.hash
            BindingTypeList.int_of_hashed_list
-           snd
+           (function
+             | (_, User_graph.LINKS l) -> l
+             | (_, (WHATEVER | SOME | TYPE _)) -> assert false)
            site_list
        in
        let full_state_partition =
@@ -157,7 +159,9 @@ let collect_partitioned_contact_map contact_map =
            (fun (a,b) ->
               StateList.int_of_hashed_list a,
               BindingTypeList.int_of_hashed_list b)
-           (fun x->x)
+           (function
+             | (x,User_graph.LINKS y) -> (Option_util.unsome [] x,y)
+             | (_, (SOME | WHATEVER | TYPE _)) -> assert false)
            site_list
        in
        Mods.StringMap.add ag
@@ -214,18 +218,18 @@ let print_contact_map parameters contact_map =
               let () = Loggers.fprintf log "counter: %i" i in
               let () = Loggers.print_newline log in ()
             | User_graph.Port p ->
-              let l1 = p.User_graph.port_states in
-              let l2 = p.User_graph.port_links in
               let () =
-                if l1 <> []
-                then
+                match p.User_graph.port_states with
+                | None | Some [] -> ()
+                | Some l1 ->
                   let () = Loggers.fprintf log "internal_states:" in
                   let () = List.iter (Loggers.fprintf log "%s;") l1 in
                   let () = Loggers.print_newline log in ()
               in
               let () =
-                if l2 <> []
-                then
+                match p.User_graph.port_links with
+                | WHATEVER | SOME | TYPE _ | LINKS [] -> ()
+                | User_graph.LINKS l2 ->
                   let () = Loggers.fprintf log "binding_states:" in
                   let () =
                     List.iter (fun (s1,s2) ->

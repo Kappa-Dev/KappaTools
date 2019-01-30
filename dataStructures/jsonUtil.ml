@@ -215,6 +215,10 @@ let read_compact_pair f g st b =
   let () = Yojson.Basic.read_rbr st b in
   (x,y)
 
+let compact_to_pair f g = function
+  | `List [ x; y ] -> (f x, g y)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a compact pair",x))
+
 let of_map
     ?lab_key:(lab_key="key")
     ?lab_value:(lab_value="value")

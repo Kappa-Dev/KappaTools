@@ -6,9 +6,16 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type links =
+  | LINKS of (int * int) list
+  | WHATEVER
+  | SOME
+  | TYPE of string * string
+
 type cc_port = {
-  port_links: (int * int) list;
-  port_states: string list;
+  port_links: links;
+  port_states: string list option;
+  (** [None] means WHATEVER *)
 }
 
 type site =
@@ -28,8 +35,11 @@ type cc_node = {
 type connected_component = cc_node array
 
 let print_link (dandling,free_id) p f = function
-  | [] -> Format.pp_print_string f "[.]"
-  | l ->
+  | WHATEVER -> Format.pp_print_string f "[#]"
+  | SOME -> Format.pp_print_string f "[_]"
+  | TYPE (si,ty) -> Format.fprintf f "[%s.%s]" si ty
+  | LINKS [] -> Format.pp_print_string f "[.]"
+  | LINKS l ->
     let myself =
       ref (Mods.Int2Map.find_default Mods.Int2Map.empty p !dandling) in
     let () =
@@ -52,8 +62,10 @@ let print_link (dandling,free_id) p f = function
 
 let print_port with_link node p id f =
   Format.fprintf f "%a%a"
-    (fun f l ->
-       if l <> [] then
+    (fun f -> function
+       | None -> Format.pp_print_string f "{#}"
+       | Some [] -> ()
+       | Some l ->
          Format.fprintf f "{%a}"
            (Pp.list Pp.space (fun f i -> Format.fprintf f "%s" i)) l)
     p.port_states
@@ -107,16 +119,21 @@ let print_dot_cc nb_cc f mix =
            match si.site_type with
            | Counter _ -> ()
            | Port p ->
-              Pp.list
-                Pp.empty
-                (fun f (a',s') ->
-                  if a < a' || (a = a' && s < s') then
-                    Format.fprintf
-                      f
-                      "node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];@,"
-                      nb_cc a nb_cc a' si.site_name
-                      mix.(a').node_sites.(s').site_name)
-                f p.port_links)
+             match p.port_links with
+             | WHATEVER -> assert false
+             | SOME -> assert false
+             | TYPE (_si,_ty) -> assert false
+             | LINKS links ->
+               Pp.list
+                 Pp.empty
+                 (fun f (a',s') ->
+                    if a < a' || (a = a' && s < s') then
+                      Format.fprintf
+                        f
+                        "node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];@,"
+                        nb_cc a nb_cc a' si.site_name
+                        mix.(a').node_sites.(s').site_name)
+                 f links)
          ag.node_sites)
     mix
 
@@ -131,14 +148,25 @@ type connected_component = cc_node array
 let write_cc_port ob p =
   let () = Bi_outbuf.add_char ob '{' in
   let () = JsonUtil.write_field
-             "port_links" (JsonUtil.write_list
-                             (JsonUtil.write_compact_pair
-                                Yojson.Basic.write_int Yojson.Basic.write_int))
+      "port_links" (fun ob -> function
+          | WHATEVER -> Yojson.Basic.write_null ob ()
+          | SOME -> Yojson.Basic.write_bool ob true
+          | TYPE (si,ty) ->
+            let () = Bi_outbuf.add_string ob "{\"site_name\":\"" in
+            let () = Bi_outbuf.add_string ob si in
+            let () = Bi_outbuf.add_string ob "\",\"agent_name\":\"" in
+            let () = Bi_outbuf.add_string ob ty in
+            Bi_outbuf.add_string ob "\"}"
+          | LINKS l ->
+            JsonUtil.write_list
+              (JsonUtil.write_compact_pair
+                 Yojson.Basic.write_int Yojson.Basic.write_int) ob l)
              ob p.port_links in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field
-             "port_states" (JsonUtil.write_list Yojson.Basic.write_string)
-             ob p.port_states in
+      "port_states"
+      (JsonUtil.write_option (JsonUtil.write_list Yojson.Basic.write_string))
+      ob p.port_states in
   Bi_outbuf.add_char ob '}'
 
 let write_site ob f =
@@ -162,17 +190,30 @@ let write_cc_site ob f =
   let () = JsonUtil.write_field "site_type" write_site ob f in
   Bi_outbuf.add_char ob '}'
 
+let links_of_yojson = function
+  | `Null -> WHATEVER
+  | `Bool b -> let () = assert b in SOME
+  | `Assoc [ "site_name", `String si; "agent_name", `String ty ]
+  | `Assoc [ "agent_name", `String ty; "site_name", `String si ] ->
+    TYPE (si,ty)
+  | `List _ as x ->
+    let error_msg = None in
+    LINKS
+      (JsonUtil.to_list
+         (JsonUtil.compact_to_pair
+            (JsonUtil.to_int ?error_msg) (JsonUtil.to_int ?error_msg)) x)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect cc_port",x))
+
 let read_cc_port p lb =
   let (port_links, port_states) =
   Yojson.Basic.read_fields
     (fun (s,i) key p lb ->
-     if key = "port_links" then
-       (Yojson.Basic.read_list
-            (JsonUtil.read_compact_pair
-               Yojson.Basic.read_int Yojson.Basic.read_int) p lb,i)
-     else let () = assert (key = "port_states") in
-          (s,Yojson.Basic.read_list Yojson.Basic.read_string p lb))
-    ([],[]) p lb in
+       if key = "port_links" then
+         (links_of_yojson (Yojson.Basic.read_json p lb),i)
+       else let () = assert (key = "port_states") in
+         (s,JsonUtil.read_option
+            (Yojson.Basic.read_list Yojson.Basic.read_string) p lb))
+    (LINKS [],Some []) p lb in
   {port_links; port_states}
 
 let read_site p lb =

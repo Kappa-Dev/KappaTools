@@ -6,25 +6,39 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type links =
+  | LINKS of (int * int) list
+  | WHATEVER
+  | SOME
+  | TYPE of string * string
+
 type cc_port = {
-  port_links: (int * int) list;
-  port_states: string list;
+  port_links: links;
+  port_states: string list option;
+  (** [None] means WHATEVER *)
 }
+
 type site =
   | Port of cc_port
   | Counter of int
+
 type cc_site = {
   site_name: string;
   site_type: site
-}type cc_node = {
+}
+
+type cc_node = {
   node_type: string;
   node_sites: cc_site array;
 }
+
 type connected_component = cc_node array
 
 val print_cc : Format.formatter -> connected_component -> unit
 
 val print_dot_cc : int -> Format.formatter -> connected_component -> unit
+
+val links_of_yojson : Yojson.Basic.json -> links
 
 val write_connected_component :
   Bi_outbuf.t -> connected_component -> unit

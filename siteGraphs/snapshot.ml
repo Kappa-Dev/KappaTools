@@ -131,16 +131,17 @@ let cc_to_user_cc ~debugMode sigs cc =
                  User_graph.site_type =
                    let port_states =
                      (match si.site_state with
-                      | None -> []
+                      | None -> Some []
                       | Some s ->
-                        [Format.asprintf
+                        Some [Format.asprintf
                            "%a" (Signature.print_internal_state
                                    sigs ag.node_type id)
                            s]) in
                    match si.site_link with
                    | None ->
                      User_graph.Port
-                       {User_graph.port_links = []; User_graph.port_states}
+                       {User_graph.port_links = User_graph.LINKS [];
+                        User_graph.port_states}
                    | Some (dn_id,s) ->
                      let dn_id' =
                        try Renaming.apply ~debugMode indexes dn_id
@@ -149,7 +150,7 @@ let cc_to_user_cc ~debugMode sigs cc =
                               sigs (cc.(dn_id)).node_type with
                       | None ->
                         User_graph.Port
-                          {User_graph.port_links = [(dn_id',s)];
+                          {User_graph.port_links = User_graph.LINKS [(dn_id',s)];
                            User_graph.port_states}
                       | Some _ ->
                         User_graph.Counter (counter_value cc (dn_id,s) 0)
