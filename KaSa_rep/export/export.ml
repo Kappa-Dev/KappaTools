@@ -472,7 +472,7 @@ let rename_links parameter handler error map = function
            error, link::l)
         (error,[]) (List.rev l) in
     (error', User_graph.LINKS l')
-  | User_graph.(WHATEVER | SOME | TYPE _) as x -> (error,x)
+  | WHATEVER | SOME | TYPE _ as x -> (error,x)
 
 let reindex parameters error handler list =
   let map,_ =
@@ -1860,7 +1860,7 @@ let compute_signature show_title state =
                     Option_util.unsome [] p.User_graph.port_states,
                     match p.User_graph.port_links with
                     | User_graph.LINKS l -> l
-                    | User_graph.(SOME | WHATEVER | TYPE _) -> assert false in
+                    | SOME | WHATEVER | TYPE _ -> assert false in
                 let state, binding' =
                   List.fold_left
                     (fun (state,list) (x,y) ->
