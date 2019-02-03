@@ -9,6 +9,7 @@
            -open Kappa_generic_toolset
            -open Kappa_version
            -open Kappa_runtime
+           -open Kappa_grammar
            -open Kappa_logging
            -open Kappa_errors
            -open Kappa_parameters

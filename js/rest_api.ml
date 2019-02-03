@@ -74,54 +74,20 @@ class manager
     method private message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
-    | `FileCreate file ->
+    | `ProjectLoad (ast,overwrite) ->
       send
         ?timeout request_count
-        (Format.sprintf "%s/v2/projects/%s/files" url project_id)
-        `POST
-        ~data:(Api_types_j.string_of_file file)
-        (fun result ->
-           (`FileCreate (Mpi_message_j.file_metadata_of_string result)))
-    | `FileDelete file_id ->
-      send
-        ?timeout request_count
-        (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
-        `DELETE
-        (fun _ -> `FileDelete)
-    | `FileGet file_id ->
-      send
-        ?timeout request_count
-        (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
-        `GET
-        (fun result ->
-           (`FileGet (Mpi_message_j.file_of_string result)))
-    | `FileCatalog ->
-      send
-        ?timeout request_count
-        (Format.sprintf "%s/v2/projects/%s/files" url project_id)
-        `GET
-        (fun result ->
-           (`FileCatalog (Mpi_message_j.file_catalog_of_string result)))
-    | `FileUpdate (file_id,file_modification) ->
-      send
-        ?timeout request_count
-        (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
-        `PUT
-        ~data:(Api_types_j.string_of_file_modification file_modification)
-        (fun result ->
-             (`FileUpdate (Mpi_message_j.file_metadata_of_string result)))
-    | `ProjectParse (overwrite) ->
-      send
-        ?timeout request_count
-        (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
-        `POST
-        ~data:(Yojson.Basic.to_string
-                 (`List (List.map (fun x ->
-                      `Assoc ["var",`String x.Api_types_j.overwrite_var;
-                              "val",(Nbr.to_yojson x.Api_types_j.overwrite_val)])
-                           overwrite)))
-        (fun result ->
-             (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
+        (Format.asprintf "%s/v2/projects/%s/load%t" url project_id
+           (fun f -> match overwrite with
+              | [] -> ()
+              | l -> Format.fprintf f "?%a"
+                       (Pp.list
+                          (fun f -> Format.pp_print_string f "&")
+                          (fun f (vr,va) ->
+                             Format.fprintf f "%s=%a" vr Nbr.print va))
+           l))
+        `POST ~data:(Yojson.Basic.to_string (Ast.compil_to_json ast))
+        (fun _ -> `ProjectLoad)
     | `SimulationContinue pause_condition ->
       send
         ?timeout request_count
@@ -420,6 +386,59 @@ class manager
     Lwt.ignore_result (self#project_delete project_id)
 
   method is_running = true (*TODO*)
+
+  method file_catalog =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/files" url project_id)
+      `GET
+      (JsonUtil.read_of_string
+         (Yojson.Basic.read_list Kfiles.read_catalog_item))
+
+  method file_create pos id content =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/files/%s/%i" url project_id id pos)
+      `PUT ~data:(Yojson.Basic.to_string (`String content))
+      (JsonUtil.read_of_string Yojson.Basic.read_null)
+
+  method file_get id =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id id)
+      `GET
+      (JsonUtil.read_of_string
+         (JsonUtil.read_compact_pair
+            Yojson.Basic.read_string Yojson.Basic.read_int))
+
+  method file_update id content =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id id)
+      `POST ~data:(Yojson.Basic.to_string (`String content))
+      (JsonUtil.read_of_string Yojson.Basic.read_null)
+
+  method file_move pos id =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/files/%s/%i" url project_id id pos)
+      `POST
+      (JsonUtil.read_of_string Yojson.Basic.read_null)
+
+  method file_delete id =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id id)
+      `DELETE
+      (JsonUtil.read_of_string Yojson.Basic.read_null)
+
+  method project_parse =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
+      `POST
+      (JsonUtil.read_of_string Ast.read_parsing_compil)
+
   method init_static_analyser_raw data =
     send
       ?timeout request_count

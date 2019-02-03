@@ -16,6 +16,11 @@ let string_of_write f ?(len = 1024) x =
   let () = f ob x in
   Bi_outbuf.contents ob
 
+let read_of_string f x =
+  let lex_st = Yojson.Basic.init_lexer () in
+  let lex_buf = Lexing.from_string x in
+  f lex_st lex_buf
+
 let read_between_spaces f lex_st lex_buf =
   let () = Yojson.Basic.read_space lex_st lex_buf in
   let x = f lex_st lex_buf in

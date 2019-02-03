@@ -6,5 +6,11 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val set_content : filename:string -> filecontent:string -> unit
-val with_file : ((string * string) Api.result -> unit Api.result Lwt.t) -> unit
+let on_message (text_message : string) : unit =
+  Lwt.ignore_result
+    (Kappa_grammar.Kamoha_mpi.on_message
+       Js_of_ocaml_lwt.Lwt_js.yield
+       (fun s -> let () = Js_of_ocaml.Worker.post_message s in Lwt.return_unit)
+       text_message)
+
+let () = Js_of_ocaml.Worker.set_onmessage on_message

@@ -63,64 +63,60 @@ let spawn_process (configuration : process_configuration  Js.t) : process Js.t J
     (Js.Unsafe.js_expr "spawnProcess")
     [| Js.Unsafe.inject configuration |]
 
+let launch_agent onClose message_delimiter command args handler =
+  let buffer = Buffer.create 512 in
+  let rec onStdout msg =
+    match Utility.split (Js.to_string msg) message_delimiter with
+    | (prefix,None) ->
+      Buffer.add_string buffer prefix
+    | (prefix,Some suffix) ->
+      let () = Buffer.add_string buffer prefix in
+      let () = handler (Buffer.contents buffer) in
+      let () = Buffer.reset buffer in
+      onStdout (Js.string suffix) in
+  let configuration : process_configuration Js.t  =
+    create_process_configuration ~onStdout ~onClose command args in
+  Js.Opt.case
+    (spawn_process configuration)
+    (fun () ->
+       let () = onClose () in
+       failwith ("Launching '"^command^"' failed"))
+    (fun x -> x)
+
 class manager
     ?(message_delimiter : char = Tools.default_message_delimter)
     (command : string)
     (args : string list) : Api.concrete_manager =
   let sim_re = Re.compile (Re.str "KaSimAgent") in
   let sa_re = Re.compile (Re.str "KaSaAgent") in
-  let sim_command,sa_command,stor_command =
+  let sim_command,sa_command,stor_command,moha_command =
     if Re.execp sim_re command then
       command, Re.replace_string  sim_re ~by:"KaSaAgent" command,
-      Re.replace_string  sim_re ~by:"KaStor" command
+      Re.replace_string  sim_re ~by:"KaStor" command,
+      Re.replace_string  sim_re ~by:"KaMoHa" command
     else if Re.execp sa_re command then
       Re.replace_string sa_re ~by:"KaSimAgent" command, command,
-      Re.replace_string  sim_re ~by:"KaStor" command
+      Re.replace_string  sa_re ~by:"KaStor" command,
+      Re.replace_string  sa_re ~by:"KaMoHa" command
     else
       failwith ("Unrecognized command: "^command) in
   let sa_mailbox = Kasa_client.new_mailbox () in
+  let moha_mailbox = Kamoha_client.new_mailbox () in
   let stor_state,update_stor_state = Kastor_client.init_state () in
   let running_ref = ref true in
   let onClose () = running_ref := false in
-  let sa_configuration : process_configuration Js.t  =
-    let rec onStdout =
-      let buffer = Buffer.create 512 in
-      fun msg ->
-        match Utility.split (Js.to_string msg) message_delimiter with
-        | (prefix,None) ->
-          Buffer.add_string buffer prefix
-        | (prefix,Some suffix) ->
-          let () = Buffer.add_string buffer prefix in
-          let () = Kasa_client.receive sa_mailbox (Buffer.contents buffer) in
-          let () = Buffer.reset buffer in
-          onStdout (Js.string suffix) in
-    create_process_configuration ~onStdout ~onClose sa_command args in
-  let sa_process =
-    Js.Opt.case
-      (spawn_process sa_configuration)
-      (fun () ->
-         let () = onClose () in
-         failwith ("Launching '"^sa_command^"' failed"))
-      (fun x -> x) in
-  let stor_configuration : process_configuration Js.t  =
-    let rec onStdout =
-      let buffer = Buffer.create 512 in
-      fun msg ->
-        match Utility.split (Js.to_string msg) message_delimiter with
-        | (prefix,None) -> Buffer.add_string buffer prefix
-        | (prefix,Some suffix) ->
-          let () = Buffer.add_string buffer prefix in
-          let () = Kastor_client.receive update_stor_state (Buffer.contents buffer) in
-          let () = Buffer.reset buffer in
-          onStdout (Js.string suffix) in
-    create_process_configuration ~onStdout ~onClose stor_command args in
   let stor_process =
-    Js.Opt.case
-      (spawn_process stor_configuration)
-      (fun () ->
-         let () = onClose () in
-         failwith ("Launching '"^stor_command^"' failed"))
-      (fun x -> x) in
+    launch_agent
+      onClose message_delimiter
+      stor_command args (Kastor_client.receive update_stor_state) in
+  let sa_process =
+    launch_agent
+      onClose message_delimiter
+      sa_command args (Kasa_client.receive sa_mailbox) in
+  let moha_process =
+    launch_agent
+      onClose message_delimiter
+      moha_command args (Kamoha_client.receive moha_mailbox) in
   object(self)
     val mutable sim_process : process Js.t option = None
     val buffer = Buffer.create 1024
@@ -183,7 +179,7 @@ class manager
 
     method is_computing =
       self#sim_is_computing || Kasa_client.is_computing sa_mailbox ||
-      self#story_is_computing
+      self#story_is_computing || Kamoha_client.is_computing moha_mailbox
 
     inherit Kastor_client.new_client
         ~post:(fun message_text ->
@@ -191,4 +187,12 @@ class manager
               (Js.string
                  (Format.sprintf "%s%c" message_text message_delimiter)))
         stor_state
+
+    inherit Kamoha_client.new_client
+        ~post:(fun message_text ->
+            moha_process##write
+              (Js.string
+                 (Format.sprintf "%s%c" message_text message_delimiter)))
+        moha_mailbox
+
   end

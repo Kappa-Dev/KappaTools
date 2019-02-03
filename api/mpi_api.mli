@@ -8,7 +8,8 @@
 
 exception BadResponse of Mpi_message_j.response_content
 
-val on_message : Api.manager -> (string -> unit Lwt.t) -> string -> unit Lwt.t
+val on_message :
+  Api.manager_simulation -> (string -> unit Lwt.t) -> string -> unit Lwt.t
 
 class type virtual manager_base_type =
   object
@@ -16,7 +17,7 @@ class type virtual manager_base_type =
       Mpi_message_j.request ->
       Mpi_message_j.response_content Mpi_message_j.result Lwt.t
 
-    inherit Api.manager
+    inherit Api.manager_simulation
 end
 
 class virtual manager_base : unit -> manager_base_type
@@ -29,7 +30,7 @@ class type virtual manager_mpi_type =
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t
     method private receive : string -> unit
 
-    inherit Api.manager
+    inherit Api.manager_simulation
     method private sim_is_computing : bool
 
     method virtual is_running : bool

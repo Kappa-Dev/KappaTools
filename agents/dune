@@ -34,6 +34,18 @@
     -open Kappa_json_api)))
 
 (executable
+ (name KaMoHa)
+ (modules KaMoHa)
+ (libraries logs.lwt lwt.unix kappa_grammar kappa_cli kappa_agents)
+ (public_name KaMoHa)
+ (package kappa-agents)
+ (flags (:standard
+          -open Kappa_generic_toolset
+          -open Kappa_grammar
+          -open Kappa_cli
+          -open Kappa_agents)))
+
+(executable
   (name KaSaAgent)
   (modules KaSaAgent)
   (libraries num str lwt.unix kappa_staticanalyses

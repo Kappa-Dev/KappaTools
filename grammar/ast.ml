@@ -1091,3 +1091,9 @@ let compil_of_json = function
         raise (Yojson.Basic.Util.Type_error ("Incorrect AST",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST",x))
+
+let write_parsing_compil b ast =
+  Yojson.Basic.write_json b (compil_to_json ast)
+
+let read_parsing_compil p lb =
+  compil_of_json (Yojson.Basic.read_json p lb)

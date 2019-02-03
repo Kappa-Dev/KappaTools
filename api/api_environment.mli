@@ -23,16 +23,8 @@ class type project = object
     Api_types_j.simulation_parameter -> Kappa_facade.t -> unit
   method get_simulation : unit -> simulation option
 
-  (* The version keeps track of the files and facade.
-       The simulations are ignored as they don't change
-       how the kappa program in interpreted. *)
-  method get_version : unit -> int
-
-  method get_files : unit -> Api_types_j.file list
-  method set_files : Api_types_j.file list -> int
-
   method get_state : unit -> parse_state option Lwt.t
-  method set_state : parse_state Lwt.t -> int
+  method set_state : parse_state Lwt.t -> unit
 end
 
 class type environment = object

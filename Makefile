@@ -81,7 +81,7 @@ site/external/jquery: externals.mk
 site/%.js: _build/default/js/%.bc.js site
 	sed 's/.process.argv.length>0/.process.argv.length>1/' $< > $@
 
-site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/KaSimWorker.js  site/KaSaWorker.js site/KaStorWorker.js
+site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/KaSimWorker.js  site/KaSaWorker.js site/KaStorWorker.js site/KaMoHaWorker.js
 	cat $< | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/JQUERY_VERSION/$(JQUERY_VERSION)/g" | sed "s/JQUERY_UI_VERSION/$(JQUERY_UI_VERSION)/g" |  sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" | sed "s/BOOTSTRAP_VERSION/$(BOOTSTRAP_VERSION)/g" > $@
 
 %.pdf: %.tex $(SCRIPTSWITNESS)
@@ -123,8 +123,6 @@ agents:
 	dune build --only-packages kappa-library,kappa-agents
 
 clean_ide:
-	rm -f KaSimAgent bin/KaSimAgent
-	rm -f KaSaAgent bin/KaSaAgent
 	rm -rf ide/Kappa.iconset
 	rm -f ide/Kappa.icns ide/Info.plist
 	rm -rf Kappapp.app Kappapp.app.zip
@@ -188,6 +186,7 @@ KappaBin.zip:
 	cp _build/default.windows/KaSa_rep/main/KaSa.exe KappaBin/resources/bin/
 	cp _build/default.windows/agents/KaStor.exe KappaBin/resources/bin/
 	cp _build/default.windows/odes/KaDE.exe KappaBin/resources/bin/
+	cp _build/default.windows/agents/KaMoHa.exe KappaBin/resources/bin/
 	cp _build/default.windows/agents/KaSimAgent.exe KappaBin/resources/bin/
 	cp _build/default.windows/agents/KaSaAgent.exe KappaBin/resources/bin/
 	zip -y -r $@ KappaBin

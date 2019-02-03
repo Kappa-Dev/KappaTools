@@ -26,10 +26,8 @@ class simulation
 class project : Api_environment.project =
   object
     val mutable _simulation = None
-    val mutable _files = []
     val mutable _state : Api_environment.parse_state option Lwt.t =
       Lwt.return_none
-    val mutable _version = 0
 
     method get_simulation () = _simulation
     method unset_simulation () = _simulation <- None
@@ -41,19 +39,9 @@ class project : Api_environment.project =
           (new simulation
             runtime_state simulation_parameter :> Api_environment.simulation)
 
-    method get_version () = _version
-
-    method get_files () = _files
-    method set_files (files : Api_types_j.file list) =
-      let () = _files <- files in
-      let () = _version <- 1 + _version in
-      let () = Lwt.cancel _state in
-      let () = _state <- Lwt.return_none in
-      _version
-
     method set_state (state : Api_environment.parse_state Lwt.t) =
-      let () = _state <- (state >>= fun x -> Lwt.return (Some x)) in
-      _version
+      let () = Lwt.cancel _state in
+      _state <- (state >>= fun x -> Lwt.return (Some x))
     method get_state () : Api_environment.parse_state option Lwt.t =
       _state
 

@@ -11,7 +11,7 @@ open Lwt.Infix
 exception BadResponse of Mpi_message_j.response_content
 
 let on_message
-    (manager: Api.manager)
+    (manager: Api.manager_simulation)
     (post_message : (string -> unit Lwt.t))
     (text_message : string) : unit Lwt.t =
   let message : Mpi_message_j.request Mpi_message_j.message =
@@ -32,24 +32,9 @@ let on_message
        post_message text)
   in
   match message.Mpi_message_j.data with
-  | `FileCreate file ->
-    (manager#file_create file) >>=
-    (handler (fun result -> `FileCreate result))
-  | `FileDelete file_id ->
-    (manager#file_delete file_id) >>=
-    (handler (fun () -> `FileDelete))
-  | `FileGet file_id ->
-    (manager#file_get file_id) >>=
-    (handler (fun result -> `FileGet result))
-  | `FileCatalog ->
-    manager#file_catalog >>=
-    (handler (fun result -> `FileCatalog result))
-  | `FileUpdate (file_id,file_modification) ->
-    (manager#file_update file_id file_modification) >>=
-    (handler (fun result -> `FileUpdate result))
-  |  `ProjectParse overwrites ->
-    manager#project_parse overwrites >>=
-    (handler (fun result -> `ProjectParse result))
+  |  `ProjectLoad (text,overwrites) ->
+    manager#simulation_load text overwrites >>=
+    (handler (fun () -> `ProjectLoad))
   | `SimulationContinue simulation_parameter ->
     (manager#simulation_continue simulation_parameter) >>=
     (handler (fun () -> `SimulationContinue))
@@ -111,7 +96,7 @@ class type virtual manager_base_type =
     method private virtual message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t
 
-    inherit Api.manager
+    inherit Api.manager_simulation
 end
 
 class virtual  manager_base () : manager_base_type =
@@ -120,78 +105,12 @@ class virtual  manager_base () : manager_base_type =
     method private virtual message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t
 
-    method file_create
-        (file : Api_types_j.file) :
-      Api_types_j.file_metadata Api.result Lwt.t =
-      self#message (`FileCreate file) >>=
+    method simulation_load ast overwrite : unit Api.result Lwt.t =
+      self#message (`ProjectLoad (ast,overwrite)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `FileCreate result ->
-              Lwt.return (Result_util.ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-    method file_delete
-        (file_id : Api_types_j.file_id) :
-      unit Api.result Lwt.t =
-      self#message (`FileDelete file_id) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `FileDelete ->
+            | `ProjectLoad ->
               Lwt.return (Result_util.ok ())
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-
-    method file_get
-        (file_id : Api_types_j.file_id) :
-      Api_types_j.file Api.result Lwt.t =
-      self#message (`FileGet file_id) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `FileGet result ->
-              Lwt.return (Result_util.ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-    method file_catalog :
-      Api_types_j.file_catalog Api.result Lwt.t =
-      self#message `FileCatalog >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `FileCatalog result ->
-              Lwt.return (Result_util.ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-    method file_update
-        (file_id : Api_types_j.file_id)
-        (file_modification : Api_types_j.file_modification) :
-      Api_types_j.file_metadata Api.result Lwt.t =
-      self#message (`FileUpdate (file_id,file_modification)) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `FileUpdate result ->
-              Lwt.return (Result_util.ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-    method project_parse overwrite : Api_types_j.project_parse Api.result Lwt.t =
-      self#message (`ProjectParse overwrite) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `ProjectParse result ->
-              Lwt.return (Result_util.ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -428,7 +347,7 @@ class type virtual manager_mpi_type =
     method private message : Mpi_message_j.request -> Mpi_message_j.response Lwt.t
     method private receive : string -> unit
 
-    inherit Api.manager
+    inherit Api.manager_simulation
     method private sim_is_computing : bool
 
     method virtual is_running : bool

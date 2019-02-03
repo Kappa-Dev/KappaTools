@@ -97,6 +97,8 @@ let read_spec : string -> spec option =
 class embedded () : Api.concrete_manager =
   let kasa_worker = Worker.create "KaSaWorker.js" in
   let kasa_mailbox = Kasa_client.new_mailbox () in
+  let kamoha_worker = Worker.create "KaMoHaWorker.js" in
+  let kamoha_mailbox = Kamoha_client.new_mailbox () in
   let kastor_worker = Worker.create "KaStorWorker.js" in
   let stor_state,update_stor_state = Kastor_client.init_state () in
   object
@@ -105,14 +107,21 @@ class embedded () : Api.concrete_manager =
           (Dom.handler
              (fun (response_message : string Worker.messageEvent Js.t) ->
                 let response_text : string = response_message##.data in
-                let () = Kasa_client.receive kasa_mailbox response_text  in
+                let () = Kasa_client.receive kasa_mailbox response_text in
+                Js._true
+             )) in
+      let () = kamoha_worker##.onmessage :=
+          (Dom.handler
+             (fun (response_message : string Worker.messageEvent Js.t) ->
+                let response_text : string = response_message##.data in
+                let () = Kamoha_client.receive kamoha_mailbox response_text in
                 Js._true
              )) in
       let () = kastor_worker##.onmessage :=
           (Dom.handler
              (fun (response_message : string Worker.messageEvent Js.t) ->
                 let response_text : string = response_message##.data in
-                let () = Kastor_client.receive update_stor_state response_text  in
+                let () = Kastor_client.receive update_stor_state response_text in
                 Js._true
              )) in
       ()
@@ -129,6 +138,9 @@ class embedded () : Api.concrete_manager =
     inherit Kasa_client.new_client
         ~post:(fun message_text -> kasa_worker##postMessage(message_text))
         kasa_mailbox
+    inherit Kamoha_client.new_client
+        ~post:(fun message_text -> kamoha_worker##postMessage(message_text))
+        kamoha_mailbox
     inherit Kastor_client.new_client
         ~post:(fun message_text -> kastor_worker##postMessage(message_text))
         stor_state

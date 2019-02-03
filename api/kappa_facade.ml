@@ -115,145 +115,88 @@ let catch_error handler = function
                    with _ -> "unspecified exception thrown") in
     handler (Api_common.error_msg message)
 
-type file = { file_id : string ; file_content : string }
-
-let rec compile_file
-    (yield : unit -> unit Lwt.t)
-    (compile : Ast.parsing_compil)
-  : file list -> (Ast.parsing_compil, Result_util.message list) Result_util.t Lwt.t =
-  function
-  | [] -> Lwt.return (Result_util.ok compile)
-  | file::files ->
-    let lexbuf = Lexing.from_string file.file_content in
-    let () = lexbuf.Lexing.lex_curr_p <-
-        { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = file.file_id }  in
-    let compile =
-      { compile with Ast.filenames = file.file_id :: compile.Ast.filenames } in
-    Lwt.catch
-      (fun () ->
-         (Lwt.wrap1 Klexer4.model lexbuf) >>=
-         (fun (insts,err) ->
-            (yield ()) >>=
-            (fun () ->
-               let new_compile = Cst.append_to_ast_compil insts compile in
-               compile_file yield new_compile files >>=
-               if err = [] then Lwt.return
-               else
-                 let err = List.map
-                     (fun (m,range) -> Api_common.error_msg ~range m)
-                     err in
-                 Result_util.fold
-                   ~ok:(fun _ -> Lwt.return (Result_util.error err))
-                   ~error:(fun error ->
-                       Lwt.return (Result_util.error (err@error)))))
-      )
-      (catch_error
-         (fun e ->
-            (yield ()) >>=
-            (fun () -> compile_file yield compile files) >>=
-            (fun result ->
-               let r =
-                 Result_util.fold
-                   ~ok:(fun _ -> Result_util.error [e])
-                   ~error:(fun error -> Result_util.error (e::error))
-                   result
-                in
-                (Lwt.return r)
-            )
-         )
-      )
-
-let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
+let parse (ast : Ast.parsing_compil) overwrite system_process =
+  let yield = system_process#yield in
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
   let inputs_buffer = Buffer.create 512 in
   let inputs_form = Format.formatter_of_buffer inputs_buffer in
-  let post_parse ast =
-    let (conf,_,_,_) =
-      Configuration.parse ast.Ast.configurations in
-    let warning ~pos msg = Data.print_warning ~pos log_form msg in
-    (Lwt.wrap2
-       (LKappa_compiler.compil_of_ast
-          ~warning ~debugMode:false ~syntax_version:Ast.V4) overwrite ast) >>=
-    (fun
-      (sig_nd,
-       contact_map,
-       tk_nd,_algs_nd,
-       _updated_vars,
-       (result :
-          (Ast.agent, LKappa.rule_agent list, Raw_mixture.t,
-           int, LKappa.rule) Ast.compil)) ->
-      (yield ()) >>=
-      (fun () ->
-         (* The last yield is updated after the last yield.
-            It is gotten here for the initial last yeild value. *)
-         let lastyield = Sys.time () in
-         try (* exception raised by compile must have used Lwt.fail.
-                Something is wrong for now *)
-           let outputs = function
-             | Data.Log s ->
-               Format.fprintf log_form "%s@." s
-             | Data.Warning (pos,msg) ->
-               Data.print_warning ?pos log_form msg
-             | Data.Snapshot _
-             | Data.DIN _
-             | Data.Species _
-             | Data.DeltaActivities _
-             | Data.Plot _
-             | Data.TraceStep _
-             | Data.Print _ -> assert false in
-           Eval.compile
-             ~debugMode:false ~pause:(fun f -> Lwt.bind (yield ()) f)
-             ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
-             ~outputs ~max_sharing:false sig_nd tk_nd contact_map result >>=
-           (fun (env,with_trace,init_l) ->
-              let counter =
-                Counter.create
-                  ~init_t:(0. : float) ~init_e:(0 : int)
-                  ?max_time:None ?max_event:None
-                  ~plot_period:(Configuration.DT 1.) in
-              let theSeed =
-                match conf.Configuration.seed with
-                | None ->
-                  let () = Random.self_init () in
-                  let out = Random.bits () in
-                  let () =
-                    Format.fprintf log_form "Random seed used: %i@." out in
-                  out
-                | Some theSeed -> theSeed in
-              let random_state = Random.State.make [|theSeed|] in
-              let () =
-                Data.print_initial_inputs
-                  ?uuid:None {conf with Configuration.seed = Some theSeed}
-                  env inputs_form init_l in
-              let simulation =
-                create_t
-                  ~contact_map ~log_form ~log_buffer ~inputs_buffer ~inputs_form
-                  ~ast ~env ~counter
-                  ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
-                  ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
-                  ~graph:(Rule_interpreter.empty
-                            ~outputs ~with_trace
-                            random_state env counter)
-                  ~state:(State_interpreter.empty
-                            ~with_delta_activities:false counter env)
-                  ~init_l ~lastyield
-              in
-              Lwt.return (Result_util.ok simulation))
-         with e ->
-           (catch_error (fun x -> Lwt.return (Result_util.error [x]))) e
-      ))
-  in
+  let (conf,_,_,_) =
+    Configuration.parse ast.Ast.configurations in
+  let warning ~pos msg = Data.print_warning ~pos log_form msg in
   Lwt.catch
     (fun () ->
-       (compile_file yield Ast.empty_compil kappa_files) >>=
-       (Result_util.fold
-          ~ok:(fun raw_ast ->
-              (yield ()) >>=
-              (fun () -> post_parse raw_ast))
-         ~error:(fun e -> Lwt.return (Result_util.error e))
-       )
-    )
+       (Lwt.wrap2
+          (LKappa_compiler.compil_of_ast
+             ~warning ~debugMode:false ~syntax_version:Ast.V4) overwrite ast) >>=
+       (fun
+         (sig_nd,
+          contact_map,
+          tk_nd,_algs_nd,
+          _updated_vars,
+          (result :
+             (Ast.agent, LKappa.rule_agent list, Raw_mixture.t,
+              int, LKappa.rule) Ast.compil)) ->
+         (yield ()) >>=
+         (fun () ->
+            (* The last yield is updated after the last yield.
+               It is gotten here for the initial last yeild value. *)
+            let lastyield = Sys.time () in
+            try (* exception raised by compile must have used Lwt.fail.
+                   Something is wrong for now *)
+              let outputs = function
+                | Data.Log s ->
+                  Format.fprintf log_form "%s@." s
+                | Data.Warning (pos,msg) ->
+                  Data.print_warning ?pos log_form msg
+                | Data.Snapshot _
+                | Data.DIN _
+                | Data.Species _
+                | Data.DeltaActivities _
+                | Data.Plot _
+                | Data.TraceStep _
+                | Data.Print _ -> assert false in
+              Eval.compile
+                ~debugMode:false ~pause:(fun f -> Lwt.bind (yield ()) f)
+                ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
+                ~outputs ~max_sharing:false sig_nd tk_nd contact_map result >>=
+              (fun (env,with_trace,init_l) ->
+                 let counter =
+                   Counter.create
+                     ~init_t:(0. : float) ~init_e:(0 : int)
+                     ?max_time:None ?max_event:None
+                     ~plot_period:(Configuration.DT 1.) in
+                 let theSeed =
+                   match conf.Configuration.seed with
+                   | None ->
+                     let () = Random.self_init () in
+                     let out = Random.bits () in
+                     let () =
+                       Format.fprintf log_form "Random seed used: %i@." out in
+                     out
+                   | Some theSeed -> theSeed in
+                 let random_state = Random.State.make [|theSeed|] in
+                 let () =
+                   Data.print_initial_inputs
+                     ?uuid:None {conf with Configuration.seed = Some theSeed}
+                     env inputs_form init_l in
+                 let simulation =
+                   create_t
+                     ~contact_map ~log_form ~log_buffer ~inputs_buffer ~inputs_form
+                     ~ast ~env ~counter
+                     ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
+                     ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
+                     ~graph:(Rule_interpreter.empty
+                               ~outputs ~with_trace
+                               random_state env counter)
+                     ~state:(State_interpreter.empty
+                               ~with_delta_activities:false counter env)
+                     ~init_l ~lastyield
+                 in
+                 Lwt.return (Result_util.ok simulation))
+            with e ->
+              (catch_error (fun x -> Lwt.return (Result_util.error [x]))) e
+         )))
     (catch_error (fun e -> Lwt.return (Result_util.error [e])))
 
 let outputs (simulation : t) =
@@ -302,25 +245,6 @@ let interactive_outputs formatter t = function
     Format.fprintf formatter "%s@." file_line.Data.file_line_text
   | Data.DIN _ | Data.DeltaActivities _ | Data.Plot _ | Data.Species _ |
     Data.Print _ | Data.Snapshot _ | Data.TraceStep _ as v -> outputs t v
-
-let parse
-    ~(system_process : system_process)
-    ~(kappa_files : Api_types_t.file list)
-    ~overwrites
-  : (t,Result_util.message list) Result_util.t Lwt.t
-  =
-
-  let kappa_files =
-    List.fold_left
-      (fun acc f ->
-         if f.Api_types_t.file_metadata.Api_types_t.file_metadata_compile
-         then {
-           file_id = f.Api_types_t.file_metadata.Api_types_t.file_metadata_id ;
-           file_content = f.Api_types_t.file_content
-         }::acc
-         else acc)
-         [] kappa_files in
-  build_ast kappa_files overwrites system_process#yield
 
 let time_yield
     ~(system_process : system_process)

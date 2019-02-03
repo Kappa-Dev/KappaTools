@@ -33,8 +33,14 @@
         -open Kappa_cflow))
 
 (executable
+ (name KaMoHaWorker)
+ (modules KaMoHaWorker)
+ (libraries kappa_js_lib kappa_grammar)
+ (flags :standard -w @a))
+
+(executable
  (name JsSim)
- (modules :standard \ Common KaSimWorker KaSaWorker KaStorWorker)
+ (modules :standard \ Common KaSimWorker KaSaWorker KaStorWorker KaMoHaWorker)
  (libraries js_of_ocaml-tyxml lwt_react kappa_js_lib kappa_json_api kappa_parameters)
  (preprocess (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w @a

@@ -24,7 +24,7 @@ let process_comand_v2
     (message_delimiter : char) :
     string -> unit Lwt.t =
   let sytem_process : Kappa_facade.system_process = new system_process () in
-  let manager : Api.manager = new Api_runtime.manager sytem_process in
+  let manager : Api.manager_simulation = new Api_runtime.manager sytem_process in
   Mpi_api.on_message
     manager
     (fun message ->

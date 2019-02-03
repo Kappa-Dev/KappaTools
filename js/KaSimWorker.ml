@@ -17,7 +17,7 @@ class system_process () : Kappa_facade.system_process =
   end
 
 let sytem_process : Kappa_facade.system_process = new system_process ()
-let manager : Api.manager = new Api_runtime.manager sytem_process
+let manager : Api.manager_simulation = new Api_runtime.manager sytem_process
 
 let on_message (text_message : string) : unit =
   Lwt.ignore_result

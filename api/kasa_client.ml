@@ -66,7 +66,7 @@ class virtual new_client ~post (mailbox : mailbox) :
                 ~message:"KaSa agent is dead"
                 Exit)
              Exception_without_parameter.empty_error_handler)
-    method private message post request =
+    method private message request =
       self#raw_message post (fun outb -> Yojson.Basic.to_outbuf outb request)
 
     method init_static_analyser_raw compil =
@@ -96,7 +96,7 @@ class virtual new_client ~post (mailbox : mailbox) :
           | None -> []
           | Some a -> [Public_data.accuracy_to_json a]) in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x -> Result.Ok x)
     method get_influence_map_raw accuracy =
       let request =
@@ -104,7 +104,7 @@ class virtual new_client ~post (mailbox : mailbox) :
           | None -> []
           | Some a -> [Public_data.accuracy_to_json a]) in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x -> Result.Ok (Yojson.Basic.to_string x))
     method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
           let request =
@@ -121,7 +121,7 @@ class virtual new_client ~post (mailbox : mailbox) :
               ))
                  in
           Lwt_result.bind_result
-            (self#message post request)
+            (self#message request)
             (fun x ->
                let o = Public_data.local_influence_map_of_json x in
                Result.Ok o)
@@ -130,7 +130,7 @@ class virtual new_client ~post (mailbox : mailbox) :
         `List [`String "INFLUENCE_MAP_ORIGINAL_NODE"]
       in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x ->
            let o = JsonUtil.to_option
                Public_data.refined_influence_node_of_json x in
@@ -141,7 +141,7 @@ class virtual new_client ~post (mailbox : mailbox) :
                JsonUtil.of_option Public_data.short_influence_node_to_json json]
       in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x ->
            let o = JsonUtil.to_option
                Public_data.refined_influence_node_of_json x in
@@ -153,7 +153,7 @@ class virtual new_client ~post (mailbox : mailbox) :
                JsonUtil.of_option Public_data.short_influence_node_to_json json]
       in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x ->
            let o = JsonUtil.to_option
                Public_data.refined_influence_node_of_json x in
@@ -165,29 +165,29 @@ class virtual new_client ~post (mailbox : mailbox) :
                              | Some a -> [Public_data.accuracy_to_json a]))
       in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x -> Result.Ok (Public_data.nodes_of_influence_map_of_json x))
     method get_dead_rules =
       let request = `List [ `String "DEAD_RULES" ] in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x -> Result.Ok (Public_data.dead_rules_of_json x))
     method get_dead_agents =
       let request = `List [ `String "DEAD_AGENTS" ] in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x -> Result.Ok (Public_data.json_to_dead_agents x))
     method get_non_weakly_reversible_transitions =
       let request =
         `List [ `String "NON_WEAKLY_REVERSIBLE_TRANSITIONS" ]
       in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x -> Result.Ok (Public_data.separating_transitions_of_json x))
     method get_constraints_list =
       let request = `List [ `String "CONSTRAINTS" ] in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x -> Result.Ok (Public_data.lemmas_list_of_json x))
     method get_potential_polymers accuracy_cm accuracy_scc =
       let request = `List ( `String "POLYMERS" ::   (
@@ -206,6 +206,6 @@ class virtual new_client ~post (mailbox : mailbox) :
              ] ))
       in
       Lwt_result.bind_result
-        (self#message post request)
+        (self#message request)
         (fun x -> Result.Ok (Public_data.scc_of_json x))
   end

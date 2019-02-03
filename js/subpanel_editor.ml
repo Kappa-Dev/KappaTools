@@ -16,14 +16,7 @@ let move_cursor, set_move_cursor = React.E.create ()
 
 let file_label =
   Tyxml_js.R.Html.txt
-    (React.S.bind
-       State_file.model
-       (fun model ->
-          React.S.const
-            (match model.State_file.model_current with
-             | None -> ""
-             | Some filename -> filename)
-       ))
+    (React.S.map (Option_util.unsome "") State_file.current_filename)
 
 let toggle_button_id = "toggle_button"
 let toggle_button =
@@ -69,7 +62,7 @@ let content () =
         ~a:[ Tyxml_js.R.Html.a_class
                (React.S.map
                   (fun model ->
-                     match model.State_file.model_current with
+                     match model.State_file.current with
                      | None -> ["no-panel-body" ; "flex-content" ]
                      | Some _ -> ["panel-body" ; "flex-content" ])
                   State_file.model) ;
@@ -85,8 +78,7 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
     match error.Result_util.range with
     | None -> None
     | Some range ->
-      let model : State_file.model = React.S.value State_file.model in
-      match model.State_file.model_current with
+      match React.S.value State_file.current_filename with
       | None -> None
       | Some file_id ->
         if range.Locality.file = file_id then
@@ -161,10 +153,9 @@ let onload () : unit =
   let _ = React.S.map (fun _ -> codemirror##performLint) State_error.errors in
   let _ = Subpanel_editor_controller.with_file
       (Result_util.fold
-         ~ok:(fun file ->
-             let file_content = file.Api_types_j.file_content in
-             let () = set_filename (Some file.Api_types_j.file_metadata.Api_types_j.file_metadata_id) in
-             let () = codemirror##setValue(Js.string file_content) in
+         ~ok:(fun (content,id) ->
+             let () = set_filename (Some id) in
+             let () = codemirror##setValue(Js.string content) in
                  Lwt.return (Result_util.ok ()))
          ~error:(fun _ ->
              (* ignore if missing file *)
@@ -231,23 +222,20 @@ let onload () : unit =
   let _ =
     React.S.map
       (fun model ->
-         match model.State_file.model_current with
+         match model.State_file.current with
          | None -> Common.hide_codemirror ()
          | Some _ -> Common.show_codemirror ())
       State_file.model
   in
   let _ =
-    React.S.map
-      (fun (refresh : State_file.refresh option) ->
-         match refresh with
-         | None -> set_filename None
-         | Some refresh ->
-           let () = set_filename (Some refresh.State_file.filename) in
-           let () = codemirror##setValue(Js.string refresh.State_file.content) in
-           let () = match refresh.State_file.line with
-             | None -> ()
-             | Some line -> jump_to_line codemirror line in
-           ()
+    React.E.map
+      (fun refresh ->
+         let () = set_filename (Some refresh.State_file.filename) in
+         let () = codemirror##setValue(Js.string refresh.State_file.content) in
+         let () = match refresh.State_file.line with
+           | None -> ()
+           | Some line -> jump_to_line codemirror line in
+         ()
       )
       State_file.refresh_file
   in

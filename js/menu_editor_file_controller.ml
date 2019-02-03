@@ -54,14 +54,14 @@ let close_file () : unit =
        >>= (fun _ -> Lwt.return_unit)
     )
 
-let set_file_compile (file_id: string) (compile : bool) : unit =
+let set_file_compile rank (compile : bool) : unit =
   Common.async
     __LOC__
     (fun () ->
        State_error.wrap
          __LOC__
          (State_file.set_compile
-            file_id
+            rank
             compile
           >>=
           (fun r -> State_project.sync () >>=
@@ -90,14 +90,12 @@ let export_current_file () =
          __LOC__
          (State_file.get_file ()) >>=
        (Result_util.fold
-          ~ok:(fun (file : Api_types_j.file) ->
-              let data = Js.string file.Api_types_j.file_content in
+          ~ok:(fun (data,filename) ->
               let () =
                 Common.saveFile
-                  ~data
+                  ~data:(Js.string data)
                   ~mime:"application/octet-stream"
-                  ~filename:file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
-              in
+                  ~filename in
               Lwt.return_unit)
           ~error:(fun _ -> Lwt.return_unit)
        )

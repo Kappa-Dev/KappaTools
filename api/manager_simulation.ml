@@ -18,16 +18,21 @@ let patch_parameter (simulation_parameter : Api_types_j.simulation_parameter) :
      seed)
   | Some seed -> (simulation_parameter,seed)
 
+let bind_simulation simulation handler =
+  match simulation with
+  | Some (_,simulation) -> handler simulation
+  | None ->
+    let m  = "No simulation available" in
+    Lwt.return (Api_common.result_error_msg ~result_code:`Not_found m)
 
 let detail_projection
-    ~(project : Api_environment.project)
+    ~simulation
     ~(system_process:Kappa_facade.system_process)
     ~(projection:(Api_data.simulation_detail_output -> 'a Api.result))
   : 'a Api.result Lwt.t =
-  Model_storage.bind_simulation
-    project
-    (fun simulation ->
-       let t : Kappa_facade.t = simulation#get_runtime_state () in
+  bind_simulation
+    simulation
+    (fun t ->
        (Kappa_facade.outputs
           ~system_process:system_process
           ~t:t) >>=
@@ -37,105 +42,103 @@ let detail_projection
                 (Api_data.simulation_detail_output -> 'a Api.result Lwt.t))
           ~error:(fun errors ->
               Lwt.return (Api_common.result_messages errors))
-       )
-    )
+       ))
 
-class manager_file_line
-    (project : Api_environment.project)
-    (system_process : Kappa_facade.system_process) : Api.manager_file_line =
-  object(self)
+class virtual manager_file_line
+    (system_process : Kappa_facade.system_process) = object(self)
 
-    method private info_file_line
-        (detail : Api_data.simulation_detail_output) :
-      Api_types_j.file_line_catalog Api.result =
-      let file_lines : string list Mods.StringMap.t =
-        detail.Api_types_t.simulation_output_file_lines in
-      let file_line_ids : string list =
-        List.map fst (Mods.StringMap.bindings file_lines) in
-      let file_line_catalog = { Api_types_j.file_line_ids } in
-      Result_util.ok file_line_catalog
+  val mutable virtual simulation :
+    (Api_types_t.simulation_parameter * Kappa_facade.t) option
 
-    method private get_file_line
-        ~file_line_id
-        (status : Api_data.simulation_detail_output) :
-      (string list) Api.result =
-      let file_line_list = status.Api_types_j.simulation_output_file_lines in
-      match Mods.StringMap.find_option file_line_id file_line_list with
-      | None ->
-        let m : string = Format.sprintf "id %s not found"  file_line_id in
-        Api_common.result_error_msg ~result_code:`Not_found m
-      | Some lines -> Result_util.ok (List.rev lines)
+  method private info_file_line
+      (detail : Api_data.simulation_detail_output) :
+    Api_types_j.file_line_catalog Api.result =
+    let file_lines : string list Mods.StringMap.t =
+      detail.Api_types_t.simulation_output_file_lines in
+    let file_line_ids : string list =
+      List.map fst (Mods.StringMap.bindings file_lines) in
+    let file_line_catalog = { Api_types_j.file_line_ids } in
+    Result_util.ok file_line_catalog
 
-    method simulation_catalog_file_line :
-      Api_types_j.file_line_catalog Api.result Lwt.t =
-      detail_projection ~project ~system_process ~projection:self#info_file_line
+  method private get_file_line
+      ~file_line_id
+      (status : Api_data.simulation_detail_output) :
+    (string list) Api.result =
+    let file_line_list = status.Api_types_j.simulation_output_file_lines in
+    match Mods.StringMap.find_option file_line_id file_line_list with
+    | None ->
+      let m : string = Format.sprintf "id %s not found"  file_line_id in
+      Api_common.result_error_msg ~result_code:`Not_found m
+    | Some lines -> Result_util.ok (List.rev lines)
 
-    method simulation_detail_file_line
-        (file_line_id : string) : string list Api.result Lwt.t =
-      detail_projection
-        ~project ~system_process ~projection:(self#get_file_line ~file_line_id)
+  method simulation_catalog_file_line :
+    Api_types_j.file_line_catalog Api.result Lwt.t =
+    detail_projection ~simulation ~system_process ~projection:self#info_file_line
 
-  end;;
+  method simulation_detail_file_line
+      (file_line_id : string) : string list Api.result Lwt.t =
+    detail_projection
+      ~simulation ~system_process ~projection:(self#get_file_line ~file_line_id)
+end
 
-class manager_flux_map
-    (project : Api_environment.project)
-    (system_process : Kappa_facade.system_process) : Api.manager_din =
-  object(self)
-    method private info_flux_map
-        (detail : Api_data.simulation_detail_output) :
-      Api_types_j.din_catalog Api.result =
-      let flux_maps : Api_types_j.din list =
-        detail.Api_types_j.simulation_output_dins in
-      let flux_map_catalog =
-        { Api_types_j.din_ids =
-            List.map (fun f -> f.Data.din_data.Data.din_name)
-              flux_maps } in
-      Result_util.ok flux_map_catalog
+class virtual manager_flux_map
+    (system_process : Kappa_facade.system_process) = object(self)
 
-    method private get_flux_map
+  val mutable virtual simulation :
+    (Api_types_t.simulation_parameter * Kappa_facade.t) option
+
+  method private info_flux_map
+      (detail : Api_data.simulation_detail_output) :
+    Api_types_j.din_catalog Api.result =
+    let flux_maps : Api_types_j.din list =
+      detail.Api_types_j.simulation_output_dins in
+    let flux_map_catalog =
+      { Api_types_j.din_ids =
+          List.map (fun f -> f.Data.din_data.Data.din_name)
+            flux_maps } in
+    Result_util.ok flux_map_catalog
+
+  method private get_flux_map
       (flux_map_id : Api_types_j.din_id)
       (detail : Api_data.simulation_detail_output) :
-      Api_types_j.din Api.result =
-      let flux_maps_list : Api_types_j.din list =
-        detail.Api_types_j.simulation_output_dins
-      in
-      let flux_maps_eq : Api_types_j.din -> bool =
-        fun flux_map ->
-          flux_map_id = flux_map.Data.din_data.Data.din_name
-      in
-      try Result_util.ok (List.find flux_maps_eq flux_maps_list)
-      with Not_found ->
+    Api_types_j.din Api.result =
+    let flux_maps_list : Api_types_j.din list =
+      detail.Api_types_j.simulation_output_dins in
+    let flux_maps_eq : Api_types_j.din -> bool =
+      fun flux_map ->
+        flux_map_id = flux_map.Data.din_data.Data.din_name in
+    try Result_util.ok (List.find flux_maps_eq flux_maps_list)
+    with Not_found ->
       let m : string = Format.sprintf "id %s not found" flux_map_id in
       Api_common.result_error_msg ~result_code:`Not_found m
 
+  method simulation_catalog_din :
+    Api_types_j.din_catalog Api.result Lwt.t =
+    detail_projection ~simulation ~system_process ~projection:self#info_flux_map
 
-    method simulation_catalog_din :
-      Api_types_j.din_catalog Api.result Lwt.t =
-      detail_projection ~project ~system_process ~projection:self#info_flux_map
+  method simulation_detail_din
+      (flux_map_id : Api_types_j.din_id) :
+    Api_types_j.din Api.result Lwt.t =
+    detail_projection
+      ~simulation ~system_process ~projection:(self#get_flux_map flux_map_id)
+end
 
-    method simulation_detail_din
-        (flux_map_id : Api_types_j.din_id) :
-      Api_types_j.din Api.result Lwt.t =
-      detail_projection
-        ~project ~system_process ~projection:(self#get_flux_map flux_map_id)
+class virtual manager_log_message
+    (system_process : Kappa_facade.system_process) = object(self)
 
-  end;;
+  val mutable virtual simulation :
+    (Api_types_t.simulation_parameter * Kappa_facade.t) option
 
-class manager_log_message
-    (project : Api_environment.project)
-    (system_process : Kappa_facade.system_process) : Api.manager_log_message =
-  object(self)
+  method private log_message
+      (detail : Api_data.simulation_detail_output) :
+    Api_types_j.log_message Api.result =
+    Result_util.ok detail.Api_types_j.simulation_output_log_messages
 
-    method private log_message
-        (detail : Api_data.simulation_detail_output) :
-      Api_types_j.log_message Api.result =
-      Result_util.ok detail.Api_types_j.simulation_output_log_messages
-
-    method simulation_detail_log_message :
-      Api_types_j.log_message Api.result Lwt.t =
-      detail_projection
-        ~project ~system_process ~projection:self#log_message
-  end
+  method simulation_detail_log_message :
+    Api_types_j.log_message Api.result Lwt.t =
+    detail_projection
+      ~simulation ~system_process ~projection:self#log_message
+end
 
 let select_observables
     (plot_limit : Api_types_j.plot_limit)
@@ -151,141 +154,156 @@ let select_observables
     | None, Some nb -> max 0 (plot_detail_size - nb), min nb plot_detail_size
     | Some offset, Some nb -> offset, min nb (max 0 (plot_detail_size - offset))
   in
-  let new_plot_time_series = (List.rev (Array.to_list (Array.sub plot_time_series start len))) in
+  let new_plot_time_series =
+    (List.rev (Array.to_list (Array.sub plot_time_series start len))) in
   { plot with Data.plot_series = new_plot_time_series }
 
-class manager_plot
-    (project : Api_environment.project)
-    (system_process : Kappa_facade.system_process) :
-  Api.manager_plot =
-  object(self)
-    method private get_plot
-        (plot_limit : Api_types_j.plot_parameter)
-        (detail : Api_data.simulation_detail_output) :
-      Api_types_j.plot Api.result =
-      match detail.Api_types_j.simulation_output_plot with
-      | Some plot ->
-        Result_util.ok
-          (select_observables plot_limit plot)
-      | None -> let m : string = "plot not available" in
-        Api_common.result_error_msg ~result_code:`Not_found m
+class virtual manager_plot
+    (system_process : Kappa_facade.system_process) = object(self)
 
-    method simulation_detail_plot
-        (plot_parameter : Api_types_j.plot_parameter) :
-      Api_types_j.plot Api.result Lwt.t =
-      detail_projection
-        ~project ~system_process ~projection:(self#get_plot plot_parameter)
-  end
+  val mutable virtual simulation :
+    (Api_types_t.simulation_parameter * Kappa_facade.t) option
 
-class manager_snapshot
-    (project : Api_environment.project)
-    (system_process : Kappa_facade.system_process) :
-  Api.manager_snapshot =
-  object(self)
-    method private info_snapshot
-        (detail : Api_data.simulation_detail_output) :
-      Api_types_j.snapshot_catalog Api.result =
-      let snapshots : Api_types_j.snapshot list =
-        detail.Api_types_j.simulation_output_snapshots in
-      let snapshot_catalog =
-        { Api_types_j.snapshot_ids =
-            List.map (fun s -> s.Data.snapshot_file) snapshots } in
-      Result_util.ok snapshot_catalog
-    method private get_snapshot
-        (snapshot_id : Api_types_j.snapshot_id)
-        (detail : Api_data.simulation_detail_output)
-      : Api_types_j.snapshot Api.result =
-      let snapshot_list : Api_types_j.snapshot list =
-        detail.Api_types_j.simulation_output_snapshots
-      in
-      let snapshot_eq : Api_types_j.snapshot -> bool =
-        fun snapshot -> snapshot_id = snapshot.Data.snapshot_file
-      in
-      try Result_util.ok (List.find snapshot_eq snapshot_list)
-      with Not_found ->
-        let m : string = Format.sprintf "id %s not found" snapshot_id in
-        Api_common.result_error_msg ~result_code:`Not_found m
+  method private get_plot
+      (plot_limit : Api_types_j.plot_parameter)
+      (detail : Api_data.simulation_detail_output) :
+    Api_types_j.plot Api.result =
+    match detail.Api_types_j.simulation_output_plot with
+    | Some plot ->
+      Result_util.ok
+        (select_observables plot_limit plot)
+    | None -> let m : string = "plot not available" in
+      Api_common.result_error_msg ~result_code:`Not_found m
 
-    method simulation_catalog_snapshot :
-      Api_types_j.snapshot_catalog Api.result Lwt.t =
-      (detail_projection
-         ~project ~system_process ~projection:self#info_snapshot
-       : Api_types_j.snapshot_catalog Api.result Lwt.t)
+  method simulation_detail_plot
+      (plot_parameter : Api_types_j.plot_parameter) :
+    Api_types_j.plot Api.result Lwt.t =
+    detail_projection
+      ~simulation ~system_process ~projection:(self#get_plot plot_parameter)
+end
 
-    method simulation_detail_snapshot
-        (snapshot_id : Api_types_j.snapshot_id):
-      Api_types_j.snapshot Api.result Lwt.t =
-      ((detail_projection
-          ~project ~system_process ~projection:(self#get_snapshot snapshot_id))
-       : Api_types_j.snapshot Api.result Lwt.t)
-  end
+class virtual manager_snapshot
+    (system_process : Kappa_facade.system_process) = object(self)
+
+  val mutable virtual simulation :
+    (Api_types_t.simulation_parameter * Kappa_facade.t) option
+
+  method private info_snapshot
+      (detail : Api_data.simulation_detail_output) :
+    Api_types_j.snapshot_catalog Api.result =
+    let snapshots : Api_types_j.snapshot list =
+      detail.Api_types_j.simulation_output_snapshots in
+    let snapshot_catalog =
+      { Api_types_j.snapshot_ids =
+          List.map (fun s -> s.Data.snapshot_file) snapshots } in
+    Result_util.ok snapshot_catalog
+  method private get_snapshot
+      (snapshot_id : Api_types_j.snapshot_id)
+      (detail : Api_data.simulation_detail_output)
+    : Api_types_j.snapshot Api.result =
+    let snapshot_list : Api_types_j.snapshot list =
+      detail.Api_types_j.simulation_output_snapshots in
+    let snapshot_eq : Api_types_j.snapshot -> bool =
+      fun snapshot -> snapshot_id = snapshot.Data.snapshot_file in
+    try Result_util.ok (List.find snapshot_eq snapshot_list)
+    with Not_found ->
+      let m : string = Format.sprintf "id %s not found" snapshot_id in
+      Api_common.result_error_msg ~result_code:`Not_found m
+
+  method simulation_catalog_snapshot :
+    Api_types_j.snapshot_catalog Api.result Lwt.t =
+    (detail_projection
+       ~simulation ~system_process ~projection:self#info_snapshot
+     : Api_types_j.snapshot_catalog Api.result Lwt.t)
+
+  method simulation_detail_snapshot
+      (snapshot_id : Api_types_j.snapshot_id):
+    Api_types_j.snapshot Api.result Lwt.t =
+    ((detail_projection
+        ~simulation ~system_process ~projection:(self#get_snapshot snapshot_id))
+     : Api_types_j.snapshot Api.result Lwt.t)
+end
 
 class manager_simulation
-    (project : Api_environment.project)
+    project
     (system_process : Kappa_facade.system_process) :
-  Api.manager_simulation =
-  object(self)
-    method simulation_delete : unit Api.result Lwt.t =
-      self#simulation_stop >>=
-      (fun _ ->
-         let () = project#unset_simulation () in
-         Lwt.return (Result_util.ok ()))
+  Api.manager_simulation = object(self)
+  val mutable simulation = None
 
-    method simulation_start
-        (simulation_parameter : Api_types_j.simulation_parameter) :
-      Api_types_j.simulation_artifact Api.result Lwt.t =
-      let (simulation_parameter,simulation_seed) =
-        patch_parameter simulation_parameter in
-      match project#get_simulation () with
-      | Some _ ->
-        Lwt.return
-          (Api_common.result_error_msg
-             ~result_code:`Conflict "A simulation already exists")
+  method simulation_load text overwrites =
+    let ast = text in
+    let harakiri,_ = Lwt.task () in
+    let _ =
+      project#set_state
+        (Lwt.pick [ Kappa_facade.parse ast overwrites system_process;
+                    harakiri >>= fun () ->
+                    Lwt.return (Result_util.error
+                                  [Api_common.error_msg
+                                     "Parse cancelled by modified files"])
+                  ]) in
+    Lwt.return (Result_util.ok ())
+
+  method simulation_delete : unit Api.result Lwt.t =
+    self#simulation_stop >>=
+    (fun _ ->
+       let () = simulation <- None in
+       Lwt.return (Result_util.ok ()))
+
+  method simulation_start
+      (simulation_parameter : Api_types_j.simulation_parameter) :
+    Api_types_j.simulation_artifact Api.result Lwt.t =
+    let (simulation_parameter,simulation_seed) =
+      patch_parameter simulation_parameter in
+    match simulation with
+    | Some _ ->
+      Lwt.return
+        (Api_common.result_error_msg
+           ~result_code:`Conflict "A simulation already exists")
+    | None ->
+      project#get_state () >>= function
       | None ->
-        project#get_state () >>= function
-        | None ->
-          Lwt.return (Api_common.result_error_msg
-                        "Cannot start simulation: Parse not done")
-        | Some parse ->
-          Result_util.fold
-            ~ok:
-              (fun (facade : Kappa_facade.t) ->
-                 (Kappa_facade.start
-                    ~system_process
-                    ~parameter:simulation_parameter
-                    ~t:facade)
-                 >>=
-                 (Result_util.fold
-                    ~ok:
-                      (fun () ->
-                         let () =
-                           project#set_simulation simulation_parameter facade in
-                         Lwt.return
-                           (Result_util.ok {
-                               Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
-                             }))
-                    ~error:
-                      (fun errors ->
-                         Lwt.return (Api_common.result_messages errors)))
-              )
-            ~error:
-              (fun errors ->
-                 Lwt.return (Api_common.result_messages errors))
-            parse
+        Lwt.return (Api_common.result_error_msg
+                      "Cannot start simulation: Parse not done")
+      | Some parse ->
+        Result_util.fold
+          ~ok:
+            (fun (facade : Kappa_facade.t) ->
+               (Kappa_facade.start
+                  ~system_process
+                  ~parameter:simulation_parameter
+                  ~t:facade)
+               >>=
+               (Result_util.fold
+                  ~ok:
+                    (fun () ->
+                       let () =
+                         simulation <- Some (simulation_parameter,facade) in
+                       Lwt.return
+                         (Result_util.ok {
+                             Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
+                           }))
+                  ~error:
+                    (fun errors ->
+                       Lwt.return (Api_common.result_messages errors)))
+            )
+          ~error:
+            (fun errors ->
+               Lwt.return (Api_common.result_messages errors))
+          parse
 
     method simulation_parameter :
       Api_types_j.simulation_parameter Api.result Lwt.t =
-      Model_storage.bind_simulation
-        project
-        (fun simulation(* project simulation *) ->
-           let parameter = simulation#get_simulation_parameter() in
-           Lwt.return (Result_util.ok parameter))
+      match simulation with
+      | Some (parameter,_) ->
+        Lwt.return (Result_util.ok parameter)
+      | None ->
+        let m  = "No simulation available" in
+        Lwt.return (Api_common.result_error_msg ~result_code:`Not_found m)
 
     method simulation_raw_trace : string Api.result Lwt.t =
-      Model_storage.bind_simulation
-        project
-        (fun simulation ->
-           let t = simulation#get_runtime_state() in
+      bind_simulation
+        simulation
+        (fun t ->
            Lwt.return (Result_util.ok
                          (Kappa_facade.get_raw_trace t)))
 
@@ -329,22 +347,20 @@ class manager_simulation
           Result_util.ok out
         with Fakezip.Error (_,f,e) ->
           Api_common.result_error_msg ("Zip error in "^f^": "^e) in
-      detail_projection ~project ~system_process ~projection
+      detail_projection ~simulation ~system_process ~projection
 
     method simulation_pause : unit Api.result Lwt.t =
-      Model_storage.bind_simulation
-        project
-        (fun simulation(* project simulation *) ->
-           let t : Kappa_facade.t = simulation#get_runtime_state () in
+      bind_simulation
+        simulation
+        (fun t ->
            (Kappa_facade.pause ~system_process ~t) >>=
            (fun _ ->
              Lwt.return (Result_util.ok ())))
 
     method private simulation_stop : unit Api.result Lwt.t =
-      Model_storage.bind_simulation
-        project
-        (fun simulation(* project simulation *) ->
-           let t : Kappa_facade.t = simulation#get_runtime_state () in
+      bind_simulation
+        simulation
+        (fun t ->
            (Kappa_facade.stop ~system_process ~t) >>=
            (Result_util.fold
               ~ok:((fun () ->
@@ -357,10 +373,9 @@ class manager_simulation
     method simulation_intervention
         (simulation_perturbation : Api_types_j.simulation_intervention) :
       string Api.result Lwt.t =
-      Model_storage.bind_simulation
-        project
-        (fun simulation ->
-           let t : Kappa_facade.t = simulation#get_runtime_state () in
+      bind_simulation
+        simulation
+        (fun t ->
            (Kappa_facade.perturbation
               ~system_process:system_process
               ~t:t
@@ -374,10 +389,9 @@ class manager_simulation
 
     method simulation_continue (pause_condition : string) :
       unit Api.result Lwt.t =
-      Model_storage.bind_simulation
-        project
-        (fun simulation ->
-           let t : Kappa_facade.t = simulation#get_runtime_state () in
+      bind_simulation
+        simulation
+        (fun t ->
            (Kappa_facade.continue
               ~system_process:system_process
               ~t:t ~pause_condition) >>=
@@ -389,10 +403,9 @@ class manager_simulation
         )
 
     method simulation_info : Api_types_j.simulation_info Api.result Lwt.t =
-      Model_storage.bind_simulation
-        project
-        (fun simulation ->
-           let t : Kappa_facade.t = simulation#get_runtime_state () in
+      bind_simulation
+        simulation
+        (fun t ->
            Kappa_facade.progress ~system_process ~t >>=
            (Result_util.fold
               ~ok:(fun progress ->
@@ -411,14 +424,13 @@ class manager_simulation
         )
 
     method simulation_efficiency =
-      Model_storage.bind_simulation project
-        (fun simulation ->
-           let t : Kappa_facade.t = simulation#get_runtime_state () in
+      bind_simulation simulation
+        (fun t ->
            Lwt.return (Result_util.ok (Kappa_facade.efficiency t)))
 
-    inherit  manager_file_line project system_process
-    inherit  manager_flux_map project system_process
-    inherit  manager_log_message project system_process
-    inherit  manager_plot project system_process
-    inherit  manager_snapshot project system_process
+    inherit  manager_file_line system_process
+    inherit  manager_flux_map system_process
+    inherit  manager_log_message system_process
+    inherit  manager_plot system_process
+    inherit  manager_snapshot system_process
   end

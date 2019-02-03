@@ -17,13 +17,9 @@ project_parameter_project_id <json name="project_id"> : string ; }
 type site_graph <ocaml module="User_graph" t="connected_component"> = abstract
 
 type nbr <ocaml module="Nbr" t="t"> = abstract
-type overwritten_var =
-{ var : string; val : nbr } <ocaml field_prefix="overwrite_">
+type parsing_compil <ocaml module="Ast"> = abstract
 
-type project_parse = {
-  project_parse_project_version  <json name="project_version">: int ;
-  project_parse_raw_ast <json name="boxed_ast">: string ;
-}
+type project_parse = (parsing_compil * (string * nbr) list)
 type kappa_code = string
 type simulation_seed = int
 
@@ -102,34 +98,3 @@ type simulation_progress = { simulation_progress_time : float;
 
 type simulation_info = { simulation_info_progress : simulation_progress  ;
 			 simulation_info_output : simulation_info_output; }
-
-(* file *)
-type client_id     = string
-type local_version = { local_version_client_id <json name="client_id"> : client_id;
-                       local_version_file_version : int ;
-                     }
-type file_version = local_version list
-type file_id = string
-type file_metadata = { compile <ocaml mutable>  : bool ;
-                       id <ocaml mutable>       : file_id ;
-                       position <ocaml mutable> : int ;
-		       version <ocaml mutable>  : file_version ;
-		       } <ocaml  field_prefix="file_metadata_">
-
-type file_catalog = file_metadata list
-type file = { file_metadata <ocaml mutable> <json name="metadata"> : file_metadata ;
-              file_content <ocaml mutable> <json name="content"> : string ; }
-type file_patch = {
-     file_patch_start   : int nullable ; (* if not provided assume begining *)
-     file_patch_end     : int nullable ; (* if not provided assume end of file *)
-     file_patch_content : string       ; (* content to fill region with *)
-     (* Replacing a file can be encoded by giving the content with out
-        specifying a start or end. *)
-}
-type file_modification = {
-     file_modification_version              : file_version ; (* version for update *)
-     file_modification_compile  <json name="compile"> : bool nullable  ;
-     file_modification_id       <json name="id"> : string nullable ;
-     file_modification_position <json name="position"> : int nullable ;
-     file_modification_patch    <json name="content"> : file_patch nullable ;
-}

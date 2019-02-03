@@ -22,23 +22,21 @@ class type manager_environment = object
     unit -> Api_types_t.environment_info result Lwt.t
 end
 
-class type manager_model = object
-  method project_parse :
-    Api_types_t.overwritten_var list -> Api_types_t.project_parse result Lwt.t
+class type virtual manager_model = object
+  method virtual is_running : bool
+  method project_parse : Ast.parsing_compil result Lwt.t
 
-  method file_catalog : Api_types_t.file_catalog result Lwt.t
+  method file_catalog : Kfiles.catalog_item list result Lwt.t
 
-  method file_create :
-    Api_types_t.file -> Api_types_t.file_metadata result Lwt.t
+  method file_create : int -> string -> string -> unit result Lwt.t
 
-  method file_get : Api_types_t.file_id -> Api_types_t.file result Lwt.t
+  method file_get : string -> (string * int) result Lwt.t
 
-  method file_update :
-    Api_types_t.file_id ->
-    Api_types_t.file_modification ->
-    Api_types_t.file_metadata result Lwt.t
+  method file_update : string -> string -> unit result Lwt.t
 
-  method file_delete : Api_types_t.file_id -> unit result Lwt.t
+  method file_move : int -> string -> unit result Lwt.t
+
+  method file_delete : string -> unit result Lwt.t
 end
 
 class type manager_file_line = object
@@ -70,6 +68,9 @@ class type manager_snapshot = object
 end
 
 class type manager_simulation = object
+  method simulation_load :
+    Ast.parsing_compil -> (string * Nbr.t) list -> unit result Lwt.t
+
   method simulation_delete : unit result Lwt.t
 
   method simulation_start :
@@ -163,13 +164,9 @@ class type virtual manager_stories = object
      Graph_loggers_sig.graph) Mods.IntMap.t
 end
 
-class type manager = object
+class type concrete_manager = object
   inherit manager_model
   inherit manager_simulation
-end
-
-class type concrete_manager = object
-  inherit manager
   inherit manager_static_analysis
   inherit manager_stories
   method is_running : bool

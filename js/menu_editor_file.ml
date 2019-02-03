@@ -64,38 +64,32 @@ let open_input =
 let dropdown (model : State_file.model) =
   (* directories *)
   let hide_on_empty l =
-    (match model.State_file.model_directory with
-     | [] ->  []
-     | _::_ -> l)
-  in
+    if Mods.IntMap.is_empty model.State_file.directory then [] else l in
   let file_li =
     List.map
-      (fun (t : State_file.t) ->
-         let file_id : Api_types_j.file_id = State_file.t_file_id t in
-         let compile : bool = State_file.t_compile t in
-         let current_file_id = model.State_file.model_current in
+      (fun (rank, { State_file.id; State_file.local }) ->
+         let compile = local = None in
+         let current_file = model.State_file.current in
          let li_class =
-           (if current_file_id = Some file_id  then
+           (if current_file = Some rank  then
               [ "active" ]
             else
               [])@["ui-state-sortable"]
          in
          Html.li
            ~a:[ Html.a_class li_class ;
-                element_set_filename file_id ; ]
-           [ Html.a ~a:[ element_set_filename file_id ; ]
+                element_set_filename id ; ]
+           [ Html.a ~a:[ element_set_filename id ; ]
                [ Html.div
                    ~a:[ Html.a_class [ "checkbox-control-div" ] ;
-                        element_set_filename  file_id ; ]
-                   [ file_checkbox file_id compile ;
+                        element_set_filename  id ; ]
+                   [ file_checkbox id compile ;
                      Html.span
                        ~a:[ Html.a_class [ "checkbox-control-label" ] ;
-                            element_set_filename file_id ;
+                            element_set_filename id ;
                           ]
-                       [ Html.cdata file_id ] ] ] ] ;
-      )
-      model.State_file.model_directory
-  in
+                       [ Html.cdata id ] ] ] ])
+      (Mods.IntMap.bindings model.State_file.directory) in
   let separator_li =
     hide_on_empty
       [ Html.li

@@ -11,12 +11,6 @@ type 'ok result = ('ok,api_message list) api_result
 
 type environment_info <ocaml from="Api_types"> = abstract
 
-type file_metadata <ocaml from="Api_types"> = abstract
-type file <ocaml from="Api_types"> = abstract
-type file_modification <ocaml from="Api_types"> = abstract
-type file_catalog <ocaml from="Api_types"> = abstract
-
-type overwritten_var <ocaml from="Api_types"> = abstract
 type project_parse <ocaml from="Api_types"> = abstract
 
 type project_parameter <ocaml from="Api_types"> = abstract
@@ -26,7 +20,6 @@ type simulation_intervention  <ocaml from="Api_types"> = abstract
 type simulation_info <ocaml from="Api_types"> = abstract
 type simulation_efficiency <ocaml module="Counter.Efficiency" t="t"> = abstract
 type file_line  <ocaml from="Api_types"> = abstract
-type file_id  <ocaml from="Api_types"> = abstract
 type file_line_detail <ocaml from="Api_types"> = abstract
 type file_line_catalog <ocaml from="Api_types"> = abstract
 
@@ -46,12 +39,7 @@ type snapshot_catalog <ocaml from="Api_types"> = abstract
 type simulation_artifact <ocaml from="Api_types"> = abstract
 
 type request = [
-               | FileCreate of file
-               | FileDelete of file_id
-               | FileGet of file_id
-               | FileCatalog
-               | FileUpdate of (file_id * file_modification)
-	       | ProjectParse of overwritten_var list
+	       | ProjectLoad of project_parse
                | SimulationContinue of string
                | SimulationDelete
                | SimulationDetailFileLine of string
@@ -81,12 +69,7 @@ type rest_request = [
      ]
 
 type response_content = [
-   | FileCreate of file_metadata
-   | FileDelete
-   | FileGet of file
-   | FileCatalog of file_catalog
-   | FileUpdate of file_metadata
-   | ProjectParse of project_parse
+   | ProjectLoad
    | SimulationDetailFileLine of string list
    | SimulationDetailDIN of din
    | SimulationDetailLogMessage of log_message

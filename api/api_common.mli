@@ -28,14 +28,11 @@ val result_kasa :
   'a Api.result
 
 val result_bind_lwt :
-  ok:('ok -> ('a_ok, 'a_code) Api_types_t.result Lwt.t) ->
-  ('ok, 'a_code) Api_types_t.result ->
-  ('a_ok, 'a_code) Api_types_t.result Lwt.t
+  ok:('ok -> 'a_ok Api.result Lwt.t) -> 'ok Api.result -> 'a_ok Api.result Lwt.t
 val result_fold_lwt :
-  f:(('a_ok, 'a_code) Api_types_t.result ->
-     'value -> ('a_ok, 'a_code) Api_types_t.result Lwt.t) ->
-  id:('a_ok, 'a_code) Api_types_t.result ->
-  'value list -> ('a_ok, 'a_code) Api_types_t.result Lwt.t
+  f:('ok Api.result -> 'value -> 'ok Api.result Lwt.t) ->
+  id:'ok Api.result ->
+  'value list -> 'ok Api.result Lwt.t
 val result_combine : unit Api.result list -> unit Api.result
 
 val md5sum : string -> string

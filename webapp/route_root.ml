@@ -13,6 +13,10 @@ let project_ref context =
 let file_ref context =
   (List.assoc "projectid" context.Webapp_common.arguments,
    List.assoc "fileid" context.Webapp_common.arguments)
+let pos_file_ref context =
+  (List.assoc "projectid" context.Webapp_common.arguments,
+   List.assoc "fileid" context.Webapp_common.arguments,
+   int_of_string (List.assoc "filepos" context.Webapp_common.arguments))
 let field_ref context field =
   (List.assoc "projectid" context.Webapp_common.arguments,
    List.assoc field context.Webapp_common.arguments)
@@ -25,7 +29,10 @@ class new_manager : Api.concrete_manager =
   let sim_process = Lwt_process.open_process (sim_command,[|sim_command|]) in
   let stor_command = Re.replace_string re ~by:"KaStor" Sys.argv.(0) in
   let stor_process = Lwt_process.open_process (stor_command,[|stor_command|]) in
+  let moha_command = Re.replace_string re ~by:"KaMoHa" Sys.argv.(0) in
+  let moha_process = Lwt_process.open_process (moha_command,[|moha_command|]) in
   let sa_mailbox = Kasa_client.new_mailbox () in
+  let moha_mailbox = Kamoha_client.new_mailbox () in
   let stor_state,update_stor_state = Kastor_client.init_state () in
   object(self)
     initializer
@@ -35,6 +42,13 @@ class new_manager : Api.concrete_manager =
              sa_process#stdout Tools.default_message_delimter
              (fun r ->
                 let ()= Kasa_client.receive sa_mailbox r in Lwt.return_unit)) in
+      let () =
+        Lwt.ignore_result
+          (Agent_common.serve
+             moha_process#stdout Tools.default_message_delimter
+             (fun r ->
+                let ()=
+                  Kamoha_client.receive moha_mailbox r in Lwt.return_unit)) in
       let () =
         Lwt.ignore_result
           (Agent_common.serve
@@ -70,6 +84,15 @@ class new_manager : Api.concrete_manager =
                     Lwt_io.write_char f Tools.default_message_delimter)
                  sa_process#stdin))
         sa_mailbox
+    inherit Kamoha_client.new_client
+        ~post:(fun message_text ->
+            Lwt.ignore_result
+              (Lwt_io.atomic
+                 (fun f ->
+                    Lwt_io.write f message_text >>= fun () ->
+                    Lwt_io.write_char f Tools.default_message_delimter)
+                 moha_process#stdin))
+        moha_mailbox
     inherit Kastor_client.new_client
         ~post:(fun message_text ->
             Lwt.ignore_result
@@ -248,6 +271,33 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
+    { Webapp_common.path = "/v2/projects/{projectid}/load" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `POST ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `POST ->
+            let project_id = project_ref context in
+            let request = context.Webapp_common.request in
+            let uri = Cohttp.Request.uri request in
+            let overwrites = Uri.query uri in
+            let overwrites =
+              List.map
+                (function
+                  | _, ([] | _::_::_) -> assert false
+                  | x, [ n ] -> (x,Nbr.of_string n))
+                overwrites in
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
+            (JsonUtil.read_of_string (Ast.read_parsing_compil))
+            >>= fun ast ->
+            bind_projects
+              (fun manager -> manager#simulation_load ast overwrites)
+              project_id projects >>=
+            (Webapp_common.api_result_response
+               ~string_of_success:(fun () -> "null"))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
     { Webapp_common.path = "/v2/projects/{projectid}/parse" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `POST ; ] in
@@ -255,51 +305,36 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `POST ->
             let project_id = project_ref context in
-            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
-            (fun s ->
-               Yojson.Safe.read_list
-                 (Api_types_j.read_overwritten_var)
-                 (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
-            >>= fun overwrites ->
             bind_projects
-              (fun manager -> manager#project_parse overwrites)
+              (fun manager -> manager#project_parse)
               project_id projects >>=
             (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_project_parse
-                                     ?len:None)
-            )
+               ~string_of_success:(
+                 JsonUtil.string_of_write Ast.write_parsing_compil))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
     { Webapp_common.path = "/v2/projects/{projectid}/files" ;
       Webapp_common.operation =
-        let methods = [ `OPTIONS ; `POST ; `GET ] in
+        let methods = [ `OPTIONS ; `GET ] in
         fun ~context:context ->
           let project_id = project_ref context in
           match context.Webapp_common.request.Cohttp.Request.meth with
-          | `POST ->
-            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
-            Mpi_message_j.file_of_string >>= fun file ->
-            bind_projects
-              (fun manager -> manager#file_create file) project_id projects >>=
-            (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_metadata
-                                     ?len:None)
-            )
           | `GET ->
             bind_projects
               (fun manager -> manager#file_catalog)
               project_id projects >>=
             (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_catalog
-                                     ?len:None))
+               ~string_of_success:(
+                 JsonUtil.string_of_write
+                   (JsonUtil.write_list Kfiles.write_catalog_item)))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
     { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}" ;
       Webapp_common.operation =
         fun ~context:context ->
-          let methods = [ `OPTIONS ; `DELETE ; `GET ; `PUT ] in
+          let methods = [ `OPTIONS ; `DELETE ; `GET ; `POST ] in
           let (project_id,file_id) = file_ref context in
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `DELETE ->
@@ -313,16 +348,42 @@ let route
               (fun manager -> manager#file_get file_id)
               project_id projects >>=
             (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_file ?len:None))
-          | `PUT ->
+               ~string_of_success:(
+                 JsonUtil.string_of_write
+                   (JsonUtil.write_compact_pair
+                      Yojson.Basic.write_string
+                      Yojson.Basic.write_int)))
+          | `POST ->
             (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
-            Mpi_message_j.file_modification_of_string >>= fun modif ->
+            JsonUtil.read_of_string Yojson.Basic.read_string >>= fun modif ->
             bind_projects
               (fun manager -> manager#file_update file_id modif)
               project_id projects >>=
             (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_metadata
-                                     ?len:None))
+               ~string_of_success:(fun () -> "null"))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}/{filepos}" ;
+      Webapp_common.operation =
+        fun ~context:context ->
+          let methods = [ `OPTIONS ; `POST ; `PUT ] in
+          let (project_id,file_id,file_pos) = pos_file_ref context in
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `POST ->
+            bind_projects
+              (fun manager -> manager#file_move file_pos file_id)
+              project_id projects >>=
+            (Webapp_common.api_result_response
+               ~string_of_success:(fun () -> "null"))
+          | `PUT ->
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
+            JsonUtil.read_of_string Yojson.Basic.read_string >>= fun content ->
+            bind_projects
+              (fun manager -> manager#file_create file_pos file_id content)
+              project_id projects >>=
+            (Webapp_common.api_result_response
+               ~string_of_success:(fun () -> "null"))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -469,7 +530,7 @@ let route
             (* "max_points" "limit_method" *)
             let request = context.Webapp_common.request in
             let uri = Cohttp.Request.uri request in
-            let query = Uri.get_query_param  uri in
+            let query = Uri.get_query_param uri in
             let plot_limit_points : int option =
               match query "plot_limit_points" with
               | None -> None

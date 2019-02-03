@@ -9,6 +9,8 @@
 class manager () =
   let kasa_worker = Worker.create "KaSaWorker.js" in
   let kasa_mailbox = Kasa_client.new_mailbox () in
+  let kamoha_worker = Worker.create "KaMoHaWorker.js" in
+  let kamoha_mailbox = Kamoha_client.new_mailbox () in
   let kastor_worker = Worker.create "KaStorWorker.js" in
   let stor_state,update_stor_state = Kastor_client.init_state () in
   object(self)
@@ -21,6 +23,14 @@ class manager () =
                 let response_text = response_message##.data in
                 let () = Common.debug response_text in
                 let () = Kasa_client.receive kasa_mailbox response_text in
+                Js._true
+             )) in
+      let () = kamoha_worker##.onmessage :=
+          (Dom.handler
+             (fun response_message ->
+                let response_text = response_message##.data in
+                let () = Common.debug response_text in
+                let () = Kamoha_client.receive kamoha_mailbox response_text in
                 Js._true
              )) in
       let () = kastor_worker##.onmessage :=
@@ -44,6 +54,9 @@ class manager () =
       let () = kasa_worker##.onerror :=
           (Dom.handler
              (fun _ -> let () = is_running <- false in Js._true)) in
+      let () = kamoha_worker##.onerror :=
+          (Dom.handler
+             (fun _ -> let () = is_running <- false in Js._true)) in
       let () = kastor_worker##.onerror :=
           (Dom.handler
              (fun _ -> let () = is_running <- false in Js._true)) in
@@ -57,6 +70,11 @@ class manager () =
             let () = Common.debug (Js.string message_text) in
             kasa_worker##postMessage(message_text))
         kasa_mailbox
+    inherit Kamoha_client.new_client
+        ~post:(fun message_text ->
+            let () = Common.debug (Js.string message_text) in
+            kamoha_worker##postMessage(message_text))
+        kamoha_mailbox
     inherit Kastor_client.new_client
         ~post:(fun message_text ->
             let () = Common.debug (Js.string message_text) in
