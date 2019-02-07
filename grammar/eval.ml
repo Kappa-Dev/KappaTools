@@ -600,6 +600,6 @@ let build_initial_state
     ~with_trace ~with_delta_activities random_state init_l =
   let graph0 = Rule_interpreter.empty
       ~outputs ~with_trace random_state env counter in
-  let state0 = State_interpreter.empty ~with_delta_activities env in
+  let state0 = State_interpreter.empty ~with_delta_activities counter env in
   State_interpreter.initialize
     ~bind ~return ~debugMode ~outputs env counter graph0 state0 init_l

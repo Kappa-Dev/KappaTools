@@ -1,0 +1,7 @@
+// Snapshot [Event: 18]
+%def: "T0" "12"
+
+%init: 37 /*2 agents*/ B(s[1]), A(s[1])
+%init: 63 /*1 agents*/ B(s[.])
+%init: 63 /*1 agents*/ A(s[.])
+

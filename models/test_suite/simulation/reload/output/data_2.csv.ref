@@ -1,0 +1,8 @@
+# Output of 'KaSim' '-i' 'model.ka' '-l' '15' '-u' 'time' '-mixture' 'output/snap_75.ka' '-o' 'data_2.csv' '-seed' '886009874' '-d' 'output'
+"[T]","AB"
+10.,31
+11.,40
+12.,37
+13.,38
+14.,38
+15.,37

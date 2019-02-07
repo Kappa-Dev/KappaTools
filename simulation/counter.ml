@@ -298,7 +298,7 @@ let to_plot_points counter dt =
          (fun (time,acc) _ ->
             time -. dT,
             if check_output_time counter time then time::acc else acc)
-         ((float_of_int next) *. dT,[]) n),counter
+         (counter.init_time +. (float_of_int next) *. dT,[]) n),counter
   | Configuration.DE _ ->
     if n=1 then [counter.time],counter
     else if n=0 then [],counter

@@ -1,0 +1,26 @@
+%def: "seed" "886009874"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "progressBarSize" "60"
+%def: "progressBarSymbol" "#"
+%def: "T0" "10"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data_2.csv"
+
+%agent: A(s[s.B])
+%agent: B(s[s.A])
+
+%var:/*0*/ 'AB' |A(s[1]), B(s[1])|
+%plot: [T]
+%plot: AB
+
+A(s[./1]), B(s[./1]) @ 0.001
+A(s[1/.]), B(s[1/.]) @ 0.1
+
+/*0*/%mod: alarm 1 [true] do $SNAPSHOT ("snap_".[E].".ka"); repeat [true]
+
+%init: 31 B(s[1]), A(s[1])
+%init: 69 B(s[.])
+%init: 69 A(s[.])
+
+%mod: [E] = 28 do $STOP;

@@ -1,0 +1,5 @@
+%agent: A(s) %agent: B(s) %init: 100 A(), B()
+A(s[./1]),B(s[./1]) @ 1e-3
+A(s[1/.]),B(s[1/.]) @ 1e-1
+%obs: 'AB' |A(s[1]),B(s[1])|
+%mod: alarm 1 [true] do $SNAPSHOT "snap_".[E].".ka" ; repeat [true]

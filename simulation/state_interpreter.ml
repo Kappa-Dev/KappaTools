@@ -22,13 +22,16 @@ let compare_stops (t1,p1) (t2,p2) =
   let t = Nbr.compare t1 t2 in
   if t = 0 then compare p1 p2 else t
 
-let empty ~with_delta_activities env =
+let empty ~with_delta_activities counter env =
+  let t0 = Counter.init_time counter in
   let stopping_times =
     let algs_deps = Model.all_dependencies env in
     Model.fold_perturbations
       (fun i acc x ->
          match x.Primitives.alarm with
-         | Some n -> (n,i)::acc
+         | Some n ->
+           let k = 1. +. floor (t0 /. Option_util.unsome 0. (Nbr.to_float n)) in
+           (Nbr.mult (Nbr.F k) n,i)::acc
          | None ->
            let () =
              if (Alg_expr.is_equality_test_time

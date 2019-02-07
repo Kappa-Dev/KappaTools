@@ -10,7 +10,7 @@
 
 type t (** Abstract state *)
 
-val empty : with_delta_activities:bool -> Model.t -> t
+val empty : with_delta_activities:bool -> Counter.t -> Model.t -> t
 (** [empty ~with_delta_activities env] *)
 
 val initialize :
