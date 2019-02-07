@@ -79,7 +79,7 @@ and caught_exception_to_json caught =
     (JsonUtil.of_list JsonUtil.of_string)
     (caught.uncaught_exception, caught.calling_stack)
 
-let rec exn_of_json (json : Yojson.Basic.json) =
+let rec exn_of_json (json : Yojson.Basic.t) =
   match
     json
   with

@@ -787,7 +787,7 @@ let json_of_grid enriched_grid grid_story steps =
       "nodes", nodes_to_json;
       "cause", prec_edges_to_json;
       "inhibit", confl_edges_to_json
-    ]: Yojson.Basic.json)
+    ]: Yojson.Basic.t)
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...]
   et sim_info:{with story_id:int story_time: float ; story_event: int}*)

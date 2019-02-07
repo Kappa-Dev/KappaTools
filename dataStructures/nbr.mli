@@ -58,8 +58,8 @@ val to_string : t -> string
 val of_string : string -> t
 (** @raise Failure "float_of_string" *)
 
-val to_yojson : t -> Yojson.Basic.json
-val of_yojson : Yojson.Basic.json -> t
+val to_yojson : t -> Yojson.Basic.t
+val of_yojson : Yojson.Basic.t -> t
 (** @raise Yojson.Basic.Util.Type_error if incorrect *)
 
 val write_t : Bi_outbuf.t -> t -> unit

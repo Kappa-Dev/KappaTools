@@ -75,10 +75,10 @@ val extract_abstract_event :
   elementary_rule -> Instantiation.abstract Instantiation.event
 
 val rule_to_yojson :
-  filenames : int Mods.StringMap.t -> elementary_rule -> Yojson.Basic.json
+  filenames : int Mods.StringMap.t -> elementary_rule -> Yojson.Basic.t
 
 val rule_of_yojson :
-  filenames : string array -> Yojson.Basic.json -> elementary_rule
+  filenames : string array -> Yojson.Basic.t -> elementary_rule
 
 val fully_specified_pattern_to_positive_transformations :
   Pattern.cc -> Instantiation.concrete Transformation.t list
@@ -89,17 +89,17 @@ type 'alg_expr print_expr =
 
 val print_expr_to_yojson :
   filenames : int Mods.StringMap.t ->
-  ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
-  ('a,'b) Alg_expr.e print_expr -> Yojson.Basic.json
+  ('a -> Yojson.Basic.t) -> ('b -> Yojson.Basic.t) ->
+  ('a,'b) Alg_expr.e print_expr -> Yojson.Basic.t
 val print_expr_of_yojson :
   filenames : string array ->
-  (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
-  Yojson.Basic.json -> ('a,'b) Alg_expr.e print_expr
+  (Yojson.Basic.t -> 'a) -> (Yojson.Basic.t -> 'b) ->
+  Yojson.Basic.t -> ('a,'b) Alg_expr.e print_expr
 
 type din_kind = ABSOLUTE | RELATIVE | PROBABILITY
 
-val din_kind_to_yojson : din_kind -> Yojson.Basic.json
-val din_kind_of_yojson : Yojson.Basic.json -> din_kind
+val din_kind_to_yojson : din_kind -> Yojson.Basic.t
+val din_kind_of_yojson : Yojson.Basic.t -> din_kind
 
 val write_din_kind :
   Bi_outbuf.t -> din_kind -> unit
@@ -147,9 +147,9 @@ type perturbation =
   }
 
 val perturbation_to_yojson :
-  filenames : int Mods.StringMap.t -> perturbation -> Yojson.Basic.json
+  filenames : int Mods.StringMap.t -> perturbation -> Yojson.Basic.t
 val perturbation_of_yojson :
-  filenames : string array -> Yojson.Basic.json -> perturbation
+  filenames : string array -> Yojson.Basic.t -> perturbation
 
 val exists_modification : (modification -> bool) -> perturbation array -> bool
 

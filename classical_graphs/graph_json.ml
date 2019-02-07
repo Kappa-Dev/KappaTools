@@ -109,7 +109,7 @@ let to_json graph =
   (`Assoc [
       "nodes", nodes_to_json (fst graph);
       "edges", edges_to_json (snd graph)
-    ]: Yojson.Basic.json)
+    ]: Yojson.Basic.t)
 
 let linestyle_of_json = function
   | `String "Plain" -> Graph_loggers_sig.Plain

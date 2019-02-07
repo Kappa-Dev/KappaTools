@@ -285,7 +285,7 @@ let rule_to_yojson ~filenames r =
 
 let rule_of_yojson ~filenames r =
   match r with
-  | ((`Assoc l):Yojson.Basic.json) as x ->
+  | ((`Assoc l):Yojson.Basic.t) as x ->
      begin
        try {
          rate = Locality.annot_of_yojson ~filenames

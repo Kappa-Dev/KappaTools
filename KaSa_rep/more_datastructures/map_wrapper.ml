@@ -114,15 +114,15 @@ sig
 
   val of_json:
     ?lab_key:string -> ?lab_value:string -> ?error_msg:string ->
-    (Yojson.Basic.json -> elt) ->
-    (Yojson.Basic.json -> 'value) ->
-    Yojson.Basic.json -> 'value t
+    (Yojson.Basic.t -> elt) ->
+    (Yojson.Basic.t -> 'value) ->
+    Yojson.Basic.t -> 'value t
 
   val to_json:
     ?lab_key:string -> ?lab_value:string ->
-    (elt -> Yojson.Basic.json) ->
-    ('value -> Yojson.Basic.json) ->
-    'value t -> Yojson.Basic.json
+    (elt -> Yojson.Basic.t) ->
+    ('value -> Yojson.Basic.t) ->
+    'value t -> Yojson.Basic.t
 
 end
 

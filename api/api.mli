@@ -110,7 +110,7 @@ class type virtual manager_static_analysis = object
   (** The string has to be the json corresponding to an [Ast.parsing_compil] *)
 
   method get_contact_map :
-    Public_data.accuracy_level option -> Yojson.Basic.json kasa_reply
+    Public_data.accuracy_level option -> Yojson.Basic.t kasa_reply
   method get_influence_map_raw :
     Public_data.accuracy_level option -> string kasa_reply
   method get_local_influence_map :

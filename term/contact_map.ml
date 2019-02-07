@@ -26,7 +26,7 @@ let to_yojson a =
   `List (Array.fold_left
            (fun acc t ->(array_to_json t)::acc) [] a)
 
-let of_yojson (a:Yojson.Basic.json) =
+let of_yojson (a:Yojson.Basic.t) =
   let intls_of_json a =
     List.fold_left (fun acc -> function
         | `Int b -> Mods.IntSet.add b acc

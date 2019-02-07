@@ -74,8 +74,8 @@ prints both the site and its internal state if it is not [None]. *)
 val print_counter : s -> int -> Format.formatter -> int -> unit
 
 val print : Format.formatter -> s -> unit
-val to_json : s -> Yojson.Basic.json
-val of_json : Yojson.Basic.json -> s
+val to_json : s -> Yojson.Basic.t
+val of_json : Yojson.Basic.t -> s
 
 val is_counter_agent : s -> int -> bool
 val ports_if_counter_agent : s -> int -> (int*int) option

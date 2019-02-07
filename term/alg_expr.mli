@@ -33,13 +33,13 @@ and ('mix,'id) bool =
 
 val e_to_yojson :
   filenames : int Mods.StringMap.t ->
-  ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
-  ('a,'b) e -> Yojson.Basic.json
+  ('a -> Yojson.Basic.t) -> ('b -> Yojson.Basic.t) ->
+  ('a,'b) e -> Yojson.Basic.t
 
 val e_of_yojson :
   filenames : string array ->
-  (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
-  Yojson.Basic.json -> ('a,'b) e
+  (Yojson.Basic.t -> 'a) -> (Yojson.Basic.t -> 'b) ->
+  Yojson.Basic.t -> ('a,'b) e
 
 val print :
   (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
@@ -47,13 +47,13 @@ val print :
 
 val bool_to_yojson :
   filenames : int Mods.StringMap.t ->
-  ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
-  ('a,'b) bool -> Yojson.Basic.json
+  ('a -> Yojson.Basic.t) -> ('b -> Yojson.Basic.t) ->
+  ('a,'b) bool -> Yojson.Basic.t
 
 val bool_of_yojson :
   filenames : string array ->
-  (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
-  Yojson.Basic.json -> ('a,'b) bool
+  (Yojson.Basic.t -> 'a) -> (Yojson.Basic.t -> 'b) ->
+  Yojson.Basic.t -> ('a,'b) bool
 
 val print_bool :
   (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->

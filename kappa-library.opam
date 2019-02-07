@@ -16,7 +16,7 @@ depends : [
   "num"
   "re"
   "dune"
-  "yojson"
+  "yojson" { >= "1.6.0" }
   "lwt" { >= "2.6.0" }
   "fmt"
   "logs"

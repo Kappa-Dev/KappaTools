@@ -54,26 +54,26 @@ val reduction_accuracy_levels: accuracy_level list
 val accuracy_to_string : accuracy_level -> string
 val accuracy_of_string : string -> accuracy_level option
 
-val accuracy_to_json : accuracy_level -> Yojson.Basic.json
-val accuracy_of_json : Yojson.Basic.json -> accuracy_level
+val accuracy_to_json : accuracy_level -> Yojson.Basic.t
+val accuracy_of_json : Yojson.Basic.t -> accuracy_level
 
 module AccuracyMap: SetMap.Map with type elt = accuracy_level
 
 type contact_map = User_graph.connected_component
 
 val contact_map_to_json:
-  accuracy_level * contact_map -> Yojson.Basic.json
+  accuracy_level * contact_map -> Yojson.Basic.t
 
 val contact_map_of_json:
-  Yojson.Basic.json -> accuracy_level * contact_map
+  Yojson.Basic.t -> accuracy_level * contact_map
 
 type scc = ((string * string) * (string * string)) list list
 
 val scc_to_json:
-  accuracy_level * accuracy_level * scc -> Yojson.Basic.json
+  accuracy_level * accuracy_level * scc -> Yojson.Basic.t
 
 val scc_of_json:
-  Yojson.Basic.json -> accuracy_level * accuracy_level * scc
+  Yojson.Basic.t -> accuracy_level * accuracy_level * scc
 
 type rule_direction =
     | Direct_rule
@@ -108,16 +108,16 @@ val short_node_of_refined_node:
   (rule, var) influence_node -> (int, int) influence_node
 
 val short_influence_node_of_json:
-  Yojson.Basic.json -> (int, int) influence_node
+  Yojson.Basic.t -> (int, int) influence_node
 
 val short_influence_node_to_json:
-  (int, int) influence_node -> Yojson.Basic.json
+  (int, int) influence_node -> Yojson.Basic.t
 
 val refined_influence_node_of_json:
-    Yojson.Basic.json -> (rule, var) influence_node
+    Yojson.Basic.t -> (rule, var) influence_node
 
 val refined_influence_node_to_json:
-  (rule, var) influence_node -> Yojson.Basic.json
+  (rule, var) influence_node -> Yojson.Basic.t
 
 val position_of_refined_influence_node :
   (rule, var) influence_node -> Locality.t
@@ -142,29 +142,29 @@ type influence_map =
 
 
 val influence_map_to_json:
-    accuracy_level * influence_map -> Yojson.Basic.json
+    accuracy_level * influence_map -> Yojson.Basic.t
 
 val influence_map_of_json:
-  Yojson.Basic.json -> accuracy_level * influence_map
+  Yojson.Basic.t -> accuracy_level * influence_map
 
 val nodes_of_influence_map_to_json:
-  accuracy_level * (rule, var) influence_node list -> Yojson.Basic.json
+  accuracy_level * (rule, var) influence_node list -> Yojson.Basic.t
 
 val nodes_of_influence_map_of_json:
-  Yojson.Basic.json -> accuracy_level * (rule, var) influence_node list
+  Yojson.Basic.t -> accuracy_level * (rule, var) influence_node list
 
 val local_influence_map_to_json:
-  accuracy_level * int * int option * int option * (rule, var) influence_node option * influence_map -> Yojson.Basic.json
+  accuracy_level * int * int option * int option * (rule, var) influence_node option * influence_map -> Yojson.Basic.t
 
 val local_influence_map_of_json:
-  Yojson.Basic.json ->
+  Yojson.Basic.t ->
   accuracy_level * int * int option * int option *
   (rule, var) influence_node option * influence_map
 
 type dead_rules = rule list
 
-val dead_rules_of_json : Yojson.Basic.json -> dead_rules
-val dead_rules_to_json : dead_rules -> Yojson.Basic.json
+val dead_rules_of_json : Yojson.Basic.t -> dead_rules
+val dead_rules_to_json : dead_rules -> Yojson.Basic.t
 
 type agent_kind =
   {
@@ -175,13 +175,13 @@ type agent_kind =
 
 type dead_agents = agent_kind list
 
-val json_to_dead_agents : Yojson.Basic.json -> dead_agents
-val json_of_dead_agents : dead_agents -> Yojson.Basic.json
+val json_to_dead_agents : Yojson.Basic.t -> dead_agents
+val json_of_dead_agents : dead_agents -> Yojson.Basic.t
 
 type separating_transitions = (rule * (string * string) list) list
 
-val separating_transitions_of_json: Yojson.Basic.json -> separating_transitions
-val separating_transitions_to_json: separating_transitions -> Yojson.Basic.json
+val separating_transitions_of_json: Yojson.Basic.t -> separating_transitions
+val separating_transitions_to_json: separating_transitions -> Yojson.Basic.t
 
 type 'site_graph lemma =
   {
@@ -204,24 +204,24 @@ type agent =
 type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
 val lemma_to_json:
-  ('site_graph -> Yojson.Basic.json) -> 'site_graph lemma -> Yojson.Basic.json
+  ('site_graph -> Yojson.Basic.t) -> 'site_graph lemma -> Yojson.Basic.t
 
 val lemma_of_json:
-  (Yojson.Basic.json -> 'site_graph) -> Yojson.Basic.json -> 'site_graph lemma
+  (Yojson.Basic.t -> 'site_graph) -> Yojson.Basic.t -> 'site_graph lemma
 
 val lemmas_list_to_json_gen:
-  ('a -> Yojson.Basic.json) ->
-  (string * (string * 'a) list lemma list) list -> Yojson.Basic.json
+  ('a -> Yojson.Basic.t) ->
+  (string * (string * 'a) list lemma list) list -> Yojson.Basic.t
 
 val lemmas_list_of_json_gen:
-  (Yojson.Basic.json -> 'a) ->
-  Yojson.Basic.json -> (string * (string * 'a) list lemma list) list
+  (Yojson.Basic.t -> 'a) ->
+  Yojson.Basic.t -> (string * (string * 'a) list lemma list) list
 
 val lemmas_list_to_json:
-  (string * agent list lemma list ) list -> Yojson.Basic.json
+  (string * agent list lemma list ) list -> Yojson.Basic.t
 
 val lemmas_list_of_json:
-  Yojson.Basic.json -> (string * agent list lemma list) list
+  Yojson.Basic.t -> (string * agent list lemma list) list
 
 val get_hyp: 'site_graph lemma -> 'site_graph
 

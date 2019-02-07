@@ -18,8 +18,8 @@ val print :
   noCounters:bool -> created:bool -> ?sigs:Signature.s ->
   Format.formatter -> t -> unit
 
-val to_json : t -> Yojson.Basic.json
-val of_json : Yojson.Basic.json -> t
+val to_json : t -> Yojson.Basic.t
+val of_json : Yojson.Basic.t -> t
 
 type incr_t = {
     father : int Mods.DynArray.t;

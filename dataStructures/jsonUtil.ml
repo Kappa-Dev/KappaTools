@@ -226,7 +226,7 @@ let of_map
   `List
     (List.rev
        (fold
-          (fun (key:'key) (value:'value) (list:Yojson.Basic.json list) ->
+          (fun (key:'key) (value:'value) (list:Yojson.Basic.t list) ->
              (`Assoc [
                  lab_key,key_to_json key;
                  lab_value,value_to_json value
@@ -337,7 +337,7 @@ let of_unix_label =
   | UnixLabels.EUNKNOWNERR int -> `Assoc ["EUNKNOWNERR", of_int int]
 
 
-let (to_unix_label : Yojson.Basic.json -> UnixLabels.error) =
+let (to_unix_label : Yojson.Basic.t -> UnixLabels.error) =
   function
   | `Assoc ["E2BIG",`Null] -> UnixLabels.E2BIG
   | `Assoc ["EACCES",`Null] -> UnixLabels.EACCES
@@ -484,7 +484,7 @@ let of_unix_error =
     | Unix.EUNKNOWNERR int -> `Assoc ["EUNKNOWNERR", of_int int]
 
 
-let (to_unix_error : Yojson.Basic.json -> Unix.error) =
+let (to_unix_error : Yojson.Basic.t -> Unix.error) =
   function
   | `Assoc ["E2BIG",`Null] -> Unix.E2BIG
   | `Assoc ["EACCES",`Null] -> Unix.EACCES

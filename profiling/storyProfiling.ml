@@ -118,8 +118,8 @@ module type StoryStats =
 
     val inc_removed_events: log_info -> log_info
     val inc_selected_events: log_info -> log_info
-    val log_info_to_json: log_info -> Yojson.Basic.json
-    val log_info_of_json: Yojson.Basic.json -> log_info
+    val log_info_to_json: log_info -> Yojson.Basic.t
+    val log_info_of_json: Yojson.Basic.t -> log_info
     val inc_cut_events: log_info -> log_info
     val inc_k_cut_events: int -> log_info -> log_info
     val reset_cut_events: log_info -> log_info

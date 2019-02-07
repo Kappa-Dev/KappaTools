@@ -85,6 +85,6 @@ module Agent: sig
   val print_site : ?sigs:Signature.s -> t -> Format.formatter -> int -> unit
   val print_internal :
     ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
-  val to_yojson : t -> Yojson.Basic.json
-  val of_yojson : Yojson.Basic.json -> t
+  val to_yojson : t -> Yojson.Basic.t
+  val of_yojson : Yojson.Basic.t -> t
 end

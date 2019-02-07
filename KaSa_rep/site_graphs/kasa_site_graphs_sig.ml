@@ -10,8 +10,8 @@ sig
     | Binding_type of string * string
     | Bound_to of bond_index
 
-  val binding_state_to_json : binding_state -> Yojson.Basic.json
-  val binding_state_of_json : Yojson.Basic.json -> binding_state
+  val binding_state_to_json : binding_state -> Yojson.Basic.t
+  val binding_state_of_json : Yojson.Basic.t -> binding_state
 
 
   val int_of_bond_index : bond_index -> int

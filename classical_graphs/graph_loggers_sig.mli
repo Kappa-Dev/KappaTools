@@ -36,7 +36,7 @@ type options =
     | ArrowHead of headkind
     | ArrowTail of headkind
     | LineStyle of linestyle
-    | OnClick of Yojson.Basic.json
+    | OnClick of Yojson.Basic.t
     | Contextual_help of string
     | Position of Locality.t list
 

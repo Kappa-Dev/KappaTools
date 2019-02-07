@@ -35,5 +35,5 @@ type 'a message =
   | Progress of progress_bar
   | Story of 'a one_compression
 
-val message_to_json : 'a message -> Yojson.Basic.json
-val message_of_json : Yojson.Basic.json -> unit message
+val message_to_json : 'a message -> Yojson.Basic.t
+val message_of_json : Yojson.Basic.t -> unit message

@@ -61,6 +61,6 @@ val print_binding_type:
   t -> ?binding_type_symbol:string -> agent_name:string ->
   site_name:string -> unit
 
-val dump_json: t -> Yojson.Basic.json -> unit
-val to_json: t -> Yojson.Basic.json
-val of_json: Yojson.Basic.json -> string list
+val dump_json: t -> Yojson.Basic.t -> unit
+val to_json: t -> Yojson.Basic.t
+val of_json: Yojson.Basic.t -> string list

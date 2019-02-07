@@ -27,8 +27,8 @@ module Simulation_info : sig
   val story_id : 'a t -> int
 
   val json_dictionnary : string
-  val to_json : ('a -> Yojson.Basic.json) -> 'a t -> Yojson.Basic.json
-  val of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a t
+  val to_json : ('a -> Yojson.Basic.t) -> 'a t -> Yojson.Basic.t
+  val of_json : (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a t
 end
 
 type event_kind =
@@ -92,7 +92,7 @@ val print_step:
 val print_label_of_step:
   ?env:Model.t -> Format.formatter -> step -> unit
 
-val step_to_yojson : step -> Yojson.Basic.json
+val step_to_yojson : step -> Yojson.Basic.t
 
 val json_dictionnary : string
 

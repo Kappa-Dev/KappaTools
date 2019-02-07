@@ -30,7 +30,7 @@ val rename : debugMode:bool -> Renaming.t -> t -> t
 val json_dictionnary : string
 val write_json : Bi_outbuf.t -> t -> unit
 val read_json : Yojson.Basic.lexer_state -> Lexing.lexbuf -> t
-val to_json : t -> Yojson.Basic.json
-val of_json : Yojson.Basic.json -> t
+val to_json : t -> Yojson.Basic.t
+val of_json : Yojson.Basic.t -> t
 
 module SetMap : SetMap.S with type elt = t

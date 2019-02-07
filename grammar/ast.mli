@@ -178,5 +178,5 @@ val print_rule_content :
 val to_erased_mixture : mixture -> mixture
 val to_created_mixture : mixture -> mixture
 
-val compil_of_json : Yojson.Basic.json -> parsing_compil
-val compil_to_json : parsing_compil -> Yojson.Basic.json
+val compil_of_json : Yojson.Basic.t -> parsing_compil
+val compil_to_json : parsing_compil -> Yojson.Basic.t

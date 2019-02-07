@@ -286,7 +286,7 @@ let string_pair_to_json (a,b) =
     JsonUtil.of_string
     (a,b)
 
-let string_pair_of_json (json:Yojson.Basic.json) : string * string  =
+let string_pair_of_json (json:Yojson.Basic.t) : string * string  =
   JsonUtil.to_pair ~lab1:agent ~lab2:sitename ~error_msg:"site"
       (JsonUtil.to_string  ~error_msg:"agent name")
       (JsonUtil.to_string ~error_msg:"site_name")

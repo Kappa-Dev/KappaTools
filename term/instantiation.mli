@@ -121,22 +121,22 @@ val print_concrete_binding_state :
 
 val json_dictionnary : string
 
-val test_to_json : ('a -> Yojson.Basic.json) -> 'a test -> Yojson.Basic.json
-val test_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a test
+val test_to_json : ('a -> Yojson.Basic.t) -> 'a test -> Yojson.Basic.t
+val test_of_json : (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a test
 val write_test : (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a test -> unit
 val read_test :
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
   Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a test
 
-val action_to_json : ('a -> Yojson.Basic.json) -> 'a action -> Yojson.Basic.json
-val action_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a action
+val action_to_json : ('a -> Yojson.Basic.t) -> 'a action -> Yojson.Basic.t
+val action_of_json : (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a action
 val write_action :
   (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a action -> unit
 val read_action :
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
   Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a action
-val event_to_json : ('a -> Yojson.Basic.json) -> 'a event -> Yojson.Basic.json
-val event_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a event
+val event_to_json : ('a -> Yojson.Basic.t) -> 'a event -> Yojson.Basic.t
+val event_of_json : (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a event
 val write_event : (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a event -> unit
 val read_event :
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->

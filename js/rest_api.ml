@@ -115,11 +115,10 @@ class manager
         ?timeout request_count
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
         `POST
-        ~data:(Yojson.Safe.to_string
+        ~data:(Yojson.Basic.to_string
                  (`List (List.map (fun x ->
                       `Assoc ["var",`String x.Api_types_j.overwrite_var;
-                              "val",(Nbr.to_yojson x.Api_types_j.overwrite_val
-                                     :> Yojson.Safe.json)])
+                              "val",(Nbr.to_yojson x.Api_types_j.overwrite_val)])
                            overwrite)))
         (fun result ->
              (`ProjectParse (Mpi_message_j.project_parse_of_string result)))

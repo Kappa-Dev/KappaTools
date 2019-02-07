@@ -84,13 +84,13 @@ val print_link :
   Format.formatter -> ('a, 'b) link -> unit
 
 val link_to_json :
-  ('a -> 'a -> Yojson.Basic.json) -> ('a -> Yojson.Basic.json) ->
-  ('b -> Yojson.Basic.json list) -> ('a, 'b) link -> Yojson.Basic.json
+  ('a -> 'a -> Yojson.Basic.t) -> ('a -> Yojson.Basic.t) ->
+  ('b -> Yojson.Basic.t list) -> ('a, 'b) link -> Yojson.Basic.t
 (** Fragile: the list MUST NOT be a singleton *)
 
 val link_of_json :
-  ('a -> Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'a) ->
-  (Yojson.Basic.json list -> 'b) -> Yojson.Basic.json -> ('a, 'b) link
+  ('a -> Yojson.Basic.t -> 'a) -> (Yojson.Basic.t -> 'a) ->
+  (Yojson.Basic.t list -> 'b) -> Yojson.Basic.t -> ('a, 'b) link
 
 val print_rates :
   noCounters:bool -> Signature.s -> (Format.formatter -> int -> unit) ->
@@ -102,7 +102,7 @@ val print_rule :
   Format.formatter -> rule -> unit
 
 val rule_to_json :
-  filenames : int Mods.StringMap.t -> rule -> Yojson.Basic.json
-val rule_of_json : filenames : string array -> Yojson.Basic.json -> rule
+  filenames : int Mods.StringMap.t -> rule -> Yojson.Basic.t
+val rule_of_json : filenames : string array -> Yojson.Basic.t -> rule
 
 val max_link_id : rule_mixture -> int

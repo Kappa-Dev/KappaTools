@@ -33,7 +33,7 @@ val print :
 val debug_print :
   (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 
-val to_json : ('a -> Yojson.Basic.json) -> 'a t -> Yojson.Basic.json
+val to_json : ('a -> Yojson.Basic.t) -> 'a t -> Yojson.Basic.t
 
-val of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a t
+val of_json : (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a t
 (** @raise Yojson.Basic.Util.Type_error if it fails *)

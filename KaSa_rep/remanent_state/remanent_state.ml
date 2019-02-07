@@ -412,7 +412,7 @@ let annotate_map_triple
     ) map [[]]
 
 let add_scc_map get title label to_json state
-    (l:(string * Yojson.Basic.json) list) =
+    (l:(string * Yojson.Basic.t) list) =
   let map = get state in
   if Public_data.AccuracyMap.is_empty map then l
   else
@@ -421,8 +421,8 @@ let add_scc_map get title label to_json state
      (add_list_of_list_of_triple title label to_json)
        (List.rev y)) :: l
 
-let add_scc_map_to_json state (l:(string * Yojson.Basic.json)list)
-  : (string * Yojson.Basic.json)list  =
+let add_scc_map_to_json state (l:(string * Yojson.Basic.t)list)
+  : (string * Yojson.Basic.t)list  =
   add_scc_map
     get_scc_decomposition
     scc_contact_map
@@ -480,7 +480,7 @@ let to_json state =
   let l = add_contact_map_to_json state l in
   let l = add_scc_map_to_json state l in
   let l = add_separating_transitions state l in
-  ((`Assoc  l): Yojson.Basic.json)
+  ((`Assoc  l): Yojson.Basic.t)
 
 let of_json =
   function

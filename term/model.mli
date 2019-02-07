@@ -102,8 +102,8 @@ val print_kappa :
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
   Format.formatter -> t -> unit
 
-val to_yojson : t -> Yojson.Basic.json
-val of_yojson : Yojson.Basic.json -> t
+val to_yojson : t -> Yojson.Basic.t
+val of_yojson : Yojson.Basic.t -> t
 
 val check_if_counter_is_filled_enough : t -> unit
 val overwrite_vars : (int * Primitives.alg_expr) list -> t -> t

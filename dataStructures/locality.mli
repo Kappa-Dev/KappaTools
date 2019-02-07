@@ -30,10 +30,10 @@ val print_annot :
 
 val annot_of_yojson :
   ?filenames : string array ->
-  (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a annot
+  (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a annot
 val annot_to_yojson :
   ?filenames : int Mods.StringMap.t ->
-  ('a -> Yojson.Basic.json) -> 'a annot -> Yojson.Basic.json
+  ('a -> Yojson.Basic.t) -> 'a annot -> Yojson.Basic.t
 
 val write_range : Bi_outbuf.t -> t -> unit
   (** Output a JSON value of type {!t}. *)

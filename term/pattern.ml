@@ -874,8 +874,8 @@ module Env : sig
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
   val print : noCounters:bool -> Format.formatter -> t -> unit
-  val to_yojson : t -> Yojson.Basic.json
-  val of_yojson : Yojson.Basic.json -> t
+  val to_yojson : t -> Yojson.Basic.t
+  val of_yojson : Yojson.Basic.t -> t
 end = struct
   type transition = {
     next: Navigation.abstract Navigation.t;

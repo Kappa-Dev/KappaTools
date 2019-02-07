@@ -89,9 +89,9 @@ type agent =
 
 type constraints_list = agent list Public_data.poly_constraints_list
 
-val lemmas_list_to_json : constraints_list -> Yojson.Basic.json
+val lemmas_list_to_json : constraints_list -> Yojson.Basic.t
 
-val lemmas_list_of_json : Yojson.Basic.json -> constraints_list
+val lemmas_list_of_json : Yojson.Basic.t -> constraints_list
 
 (*******************************************************************)
 
@@ -117,9 +117,9 @@ type ('static, 'dynamic) state
 
 (*******************************************************************)
 
-val to_json: ('static, 'dynamic) state -> Yojson.Basic.json
+val to_json: ('static, 'dynamic) state -> Yojson.Basic.t
 
-val of_json: Yojson.Basic.json ->
+val of_json: Yojson.Basic.t ->
   Exception_without_parameter.method_handler *
   Public_data.contact_map Public_data.AccuracyMap.t *
   Public_data.influence_map Public_data.AccuracyMap.t *

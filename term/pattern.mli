@@ -70,9 +70,9 @@ module Env : sig
 
   val print : noCounters:bool -> Format.formatter -> t -> unit
 
-  val to_yojson : t -> Yojson.Basic.json
+  val to_yojson : t -> Yojson.Basic.t
 
-  val of_yojson : Yojson.Basic.json -> t
+  val of_yojson : Yojson.Basic.t -> t
 
 end
 
@@ -132,9 +132,9 @@ val print :
   Format.formatter -> id -> unit
 (** [print ~domain ?with_id:None form cc] *)
 
-val id_to_yojson : id -> Yojson.Basic.json
+val id_to_yojson : id -> Yojson.Basic.t
 
-val id_of_yojson : Yojson.Basic.json -> id
+val id_of_yojson : Yojson.Basic.t -> id
 
 val reconstruction_navigation : t -> Navigation.abstract Navigation.t
 

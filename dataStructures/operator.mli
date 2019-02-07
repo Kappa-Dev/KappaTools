@@ -38,26 +38,26 @@ val compare_op_to_string : compare_op -> string
 
 (** {6 Json } *)
 
-val bin_alg_op_to_json : bin_alg_op -> Yojson.Basic.json
-val bin_alg_op_of_json : Yojson.Basic.json -> bin_alg_op
-val un_alg_op_to_json : un_alg_op -> Yojson.Basic.json
-val un_alg_op_of_json : Yojson.Basic.json -> un_alg_op
-val state_alg_op_to_json : state_alg_op -> Yojson.Basic.json
-val state_alg_op_of_json : Yojson.Basic.json -> state_alg_op
-val bin_bool_op_to_json : bin_bool_op -> Yojson.Basic.json
-val bin_bool_op_of_json : Yojson.Basic.json -> bin_bool_op
-val un_bool_op_to_json : un_bool_op -> Yojson.Basic.json
-val un_bool_op_of_json : Yojson.Basic.json -> un_bool_op
-val compare_op_to_json : compare_op -> Yojson.Basic.json
-val compare_op_of_json : Yojson.Basic.json -> compare_op
+val bin_alg_op_to_json : bin_alg_op -> Yojson.Basic.t
+val bin_alg_op_of_json : Yojson.Basic.t -> bin_alg_op
+val un_alg_op_to_json : un_alg_op -> Yojson.Basic.t
+val un_alg_op_of_json : Yojson.Basic.t -> un_alg_op
+val state_alg_op_to_json : state_alg_op -> Yojson.Basic.t
+val state_alg_op_of_json : Yojson.Basic.t -> state_alg_op
+val bin_bool_op_to_json : bin_bool_op -> Yojson.Basic.t
+val bin_bool_op_of_json : Yojson.Basic.t -> bin_bool_op
+val un_bool_op_to_json : un_bool_op -> Yojson.Basic.t
+val un_bool_op_of_json : Yojson.Basic.t -> un_bool_op
+val compare_op_to_json : compare_op -> Yojson.Basic.t
+val compare_op_of_json : Yojson.Basic.t -> compare_op
 
 (** {6 Dependencies management} *)
 
 type rev_dep = ALG of int | RULE of int | MODIF of int
 module DepSet : SetMap.Set with type elt = rev_dep
 val print_rev_dep : Format.formatter -> rev_dep -> unit
-val rev_dep_to_yojson : rev_dep -> Yojson.Basic.json
-val rev_dep_of_yojson : Yojson.Basic.json -> rev_dep
+val rev_dep_to_yojson : rev_dep -> Yojson.Basic.t
+val rev_dep_of_yojson : Yojson.Basic.t -> rev_dep
 
-val depset_to_yojson : DepSet.t -> Yojson.Basic.json
-val depset_of_yojson : Yojson.Basic.json -> DepSet.t
+val depset_to_yojson : DepSet.t -> Yojson.Basic.t
+val depset_of_yojson : Yojson.Basic.t -> DepSet.t

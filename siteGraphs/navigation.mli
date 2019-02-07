@@ -22,11 +22,11 @@ val print :
   Signature.s -> (int -> int) -> Format.formatter -> abstract t -> unit
 (** [print signatures find_existing_type nav] *)
 
-val step_to_yojson : abstract step -> Yojson.Basic.json
-val step_of_yojson : Yojson.Basic.json -> abstract step
+val step_to_yojson : abstract step -> Yojson.Basic.t
+val step_of_yojson : Yojson.Basic.t -> abstract step
 
-val to_yojson : abstract t -> Yojson.Basic.json
-val of_yojson : Yojson.Basic.json -> abstract t
+val to_yojson : abstract t -> Yojson.Basic.t
+val of_yojson : Yojson.Basic.t -> abstract t
 
 val rename :
   debugMode:bool -> Renaming.t -> abstract t -> Renaming.t * abstract t

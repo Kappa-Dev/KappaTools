@@ -8,7 +8,7 @@
 
 type mailbox =
   (int,
-   (Yojson.Basic.json,
+   (Yojson.Basic.t,
     Exception_without_parameter.method_handler) Result.result Lwt.u)
     Hashtbl.t
 

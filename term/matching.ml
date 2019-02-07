@@ -247,7 +247,7 @@ module Agent = struct
        ((`Assoc ["Existing",
                  (`List [`Assoc ["agent",(Agent.to_json n)];
                          `Assoc ["type",`Int ty]])])
-        :Yojson.Basic.json)
+        :Yojson.Basic.t)
     | Fresh (id,ty) -> `Assoc ["Fresh",(`Assoc [ "id",`Int id; "type",`Int ty])]
 
   let of_yojson = function
