@@ -105,6 +105,9 @@ let read_input () =
   | Stream.Failure -> invalid_arg "Tools.Read_input: cannot read stream"
 
 let not_an_id s =
+  (String.length s = 0) ||
+  let i = int_of_char s.[0] in
+  (i < 65 || i > 122 || (i > 90 && (i <> 95 || String.length s = 1) && i < 97)) ||
   try
     String.iter
       (fun c ->
