@@ -156,315 +156,331 @@ let separate_connected_component links (cache1,cache2) ccs node1 node2 =
   let () = Cache.mark cache2 node2 in
   in_same_cc node1 cache1 [node1] node2 cache2 [] [node2]
 
-type t =
-  {
-    mutable outdated : bool;
-    connect : Edge.t option array Mods.DynArray.t;
-    missings : Mods.Int2Set.t;
-    state : int option array Mods.DynArray.t;
-    sort : int option Mods.DynArray.t;
-    caches : Cache.t * Cache.t;
-    free_id : int * int list;
-    connected_component : int option Mods.DynArray.t option;
-  }
+type tables = {
+  connect : Edge.t option array Mods.DynArray.t;
+  state : int option array Mods.DynArray.t;
+  sort : int option Mods.DynArray.t;
+  connected_component : int option Mods.DynArray.t option;
+  caches : Cache.t * Cache.t;
+}
+
+type t = {
+  mutable tables : tables option;
+  missings : Mods.Int2Set.t;
+  free_id : int * int list;
+}
 (** (agent,site -> binding_state; missings);
     agent,site -> internal_state; agent -> sort; free_id
     the free sites are neither in missings nor in linking_destination *)
 
 let empty ~with_connected_components =
   {
-    outdated = false;
-    connect = Mods.DynArray.make 1 [||];
+    tables = Some {
+        connect = Mods.DynArray.make 1 [||];
+        state = Mods.DynArray.make 1 [||];
+        sort = Mods.DynArray.make 1 None;
+        connected_component = if with_connected_components
+          then Some (Mods.DynArray.make 1 None)
+          else None;
+        caches = (Cache.create (), Cache.create ());
+      };
     missings = Mods.Int2Set.empty;
-    state = Mods.DynArray.make 1 [||];
-    sort = Mods.DynArray.make 1 None;
-    caches = (Cache.create (), Cache.create ());
     free_id =(0,[]);
-    connected_component = if with_connected_components
-      then Some (Mods.DynArray.make 1 None)
-      else None;
   }
 
 let copy graph =
-  let () = assert (not graph.outdated) in
-  {
-    outdated = false;
-    connect = Mods.DynArray.map Array.copy graph.connect;
-    missings = graph.missings;
-    state = Mods.DynArray.map Array.copy graph.state;
-    sort = Mods.DynArray.copy graph.sort;
-    caches = (Cache.create (), Cache.create ());
-    free_id = graph.free_id;
-    connected_component =
-      (match graph.connected_component with
-       | None -> None
-       | Some ccs -> Some (Mods.DynArray.copy ccs));
-  }
+  match graph.tables with
+  | None -> assert false
+  | Some tables -> {
+      tables = Some {
+          connect = Mods.DynArray.map Array.copy tables.connect;
+          state = Mods.DynArray.map Array.copy tables.state;
+          sort = Mods.DynArray.copy tables.sort;
+          connected_component =
+            (match tables.connected_component with
+             | None -> None
+             | Some ccs -> Some (Mods.DynArray.copy ccs));
+          caches = (Cache.create (), Cache.create ());
+        };
+      free_id = graph.free_id;
+      missings = graph.missings;
+    }
 
 type stats = { nb_agents : int }
 
-let stats graph = {
-  nb_agents =
-    Mods.DynArray.length graph.sort - List.length (snd graph.free_id);
-}
+let stats graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables -> {
+      nb_agents =
+        Mods.DynArray.length tables.sort - List.length (snd graph.free_id);
+    }
 
 let add_agent ?id sigs ty graph =
   let ar = Signature.arity sigs ty in
   let al = Array.make ar None in
   let ai = Array.make ar None in
-  let () = assert (not graph.outdated) in
-  let () = graph.outdated <- true in
-  let h,free_id =
-    match id with
-    | Some id ->
-      (id,
-       let new_id,l = graph.free_id in
-       if id < new_id then
-         match List.partition (fun i -> i = id) l with
-         | [ _ ], t -> (new_id,t)
-         | _, _ ->
-           raise
-             (ExceptionDefn.Internal_Error
-                (Locality.dummy_annot
-                   ("Try to add an agent with a the free id "
-                    ^string_of_int id)))
-       else
-         (succ id, Tools.recti (fun acc k -> (k+new_id)::acc) l (id-new_id))
-      )
-    | None -> match graph.free_id with
-      | new_id,h :: t -> h,(new_id,t)
-      | new_id,[] -> new_id,(succ new_id,[]) in
-  let missings' = Tools.recti (fun a s -> Mods.Int2Set.add (h,s) a)
-      graph.missings ar in
-  let () = Mods.DynArray.set graph.connect h al in
-  let () = Mods.DynArray.set graph.state h ai in
-  let () = Mods.DynArray.set graph.sort h (Some ty) in
-  let () = match graph.connected_component with
-    | None -> ()
-    | Some ccs -> Mods.DynArray.set ccs h (Some h) in
-  h,
-  {
-    outdated = false;
-    connect = graph.connect;
-    missings = missings';
-    state = graph.state;
-    sort = graph.sort;
-    caches = graph.caches;
-    free_id;
-    connected_component = graph.connected_component;
-  }
-
-let add_free ag s graph =
-  let () = assert (not graph.outdated) in
-  let () = graph.outdated <- true in
-  let () = (Mods.DynArray.get graph.connect ag).(s) <- None in
-  {
-    outdated = false;
-    connect = graph.connect;
-    missings = Mods.Int2Set.remove (ag,s) graph.missings;
-    state = graph.state;
-    sort = graph.sort;
-    caches = graph.caches;
-    free_id = graph.free_id;
-    connected_component = graph.connected_component;
-  }
-
-let add_internal ag s i graph =
-  let () = assert (not graph.outdated) in
-  let () = graph.outdated <- true in
-  let () = (Mods.DynArray.get graph.state ag).(s) <- Some i in
-  {
-    outdated = false;
-    connect = graph.connect;
-    missings = graph.missings;
-    state = graph.state;
-    sort = graph.sort;
-    caches = graph.caches;
-    free_id = graph.free_id;
-    connected_component = graph.connected_component;
-  }
-
-let add_link (ag,ty) s (ag',ty') s' graph =
-  let () = assert (not graph.outdated) in
-  let () = graph.outdated <- true in
-  let () = (Mods.DynArray.get graph.connect ag).(s) <- Some ((ag',ty'),s') in
-  let () = (Mods.DynArray.get graph.connect ag').(s') <- Some ((ag,ty),s) in
-  let out = match graph.connected_component with
-    | None -> None
-    | Some ccs ->
-      let i = Option_util.unsome (-1) (Mods.DynArray.get ccs ag) in
-      let j = Option_util.unsome (-2) (Mods.DynArray.get ccs ag') in
-      if i = j then None else
-        let () = glue_connected_component
-            graph.connect (fst graph.caches) ccs ag ag' in
-        Some (j,i) in
-  {
-    outdated = false;
-    connect = graph.connect;
-    missings =
-      Mods.Int2Set.remove (ag,s) (Mods.Int2Set.remove (ag',s') graph.missings);
-    state = graph.state;
-    sort = graph.sort;
-    caches = graph.caches;
-    free_id = graph.free_id;
-    connected_component = graph.connected_component;
-  },out
-
-let remove_agent ag graph =
-  let () = assert (not graph.outdated) in
-  let () = graph.outdated <- true in
-  let () = Mods.DynArray.set graph.connect ag [||] in
-  let () = Mods.DynArray.set graph.state ag [||] in
-  let () = Mods.DynArray.set graph.sort ag None in
-  let () = match graph.connected_component with
-    | None -> ()
-    | Some ccs -> Mods.DynArray.set ccs ag None in
-  {
-    outdated = false;
-    connect = graph.connect;
-    missings = Mods.Int2Set.filter (fun (ag',_) -> ag <> ag') graph.missings;
-    state = graph.state;
-    sort = graph.sort;
-    caches = graph.caches;
-    free_id = (let new_id,ids = graph.free_id in (new_id,ag::ids));
-    connected_component = graph.connected_component;
-  }
-let remove_free ag s graph =
-  let () = assert (not graph.outdated) in
-  let () = graph.outdated <- true in
-  let () = assert ((Mods.DynArray.get graph.connect ag).(s) = None) in
-  {
-    outdated = false;
-    connect = graph.connect;
-    missings = Mods.Int2Set.add (ag,s) graph.missings;
-    state = graph.state;
-    sort = graph.sort;
-    caches = graph.caches;
-    free_id = graph.free_id;
-    connected_component = graph.connected_component;
-  }
-let get_internal ag s graph =
-  let () = assert (not graph.outdated) in
-  match (Mods.DynArray.get graph.state ag).(s) with
-  | Some i -> i
-  | None ->
-    failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
-              " has no internal state in the current graph.")
-
-let get_sites ag graph =
-  let () = assert (not graph.outdated) in
-  let arr = Mods.DynArray.get graph.state ag in
-  Array.length arr
-
-let get_sort ag graph =
-  let () = assert (not graph.outdated) in
-  match Mods.DynArray.get graph.sort ag with
-  | Some ty -> ty
-  | None ->
-    failwith ("Agent "^string_of_int ag^
-              " has no type in the current graph.")
-
-let remove_internal ag s graph =
-  let () = assert (not graph.outdated) in
-  let () = graph.outdated <- true in
-  let i = (Mods.DynArray.get graph.state ag).(s) in
-  let () = (Mods.DynArray.get graph.state ag).(s) <- None in
-  match i with
-    None -> assert false
-  | Some i ->
-    i, {
-      outdated = false;
-      connect = graph.connect;
-      missings = graph.missings;
-      state = graph.state;
-      sort = graph.sort;
-      caches = graph.caches;
-      free_id = graph.free_id;
-      connected_component = graph.connected_component;
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = graph.tables <- None in
+    let h,free_id =
+      match id with
+      | Some id ->
+        (id,
+         let new_id,l = graph.free_id in
+         if id < new_id then
+           match List.partition (fun i -> i = id) l with
+           | [ _ ], t -> (new_id,t)
+           | _, _ ->
+             raise
+               (ExceptionDefn.Internal_Error
+                  (Locality.dummy_annot
+                     ("Try to add an agent with a the free id "
+                      ^string_of_int id)))
+         else
+           (succ id, Tools.recti (fun acc k -> (k+new_id)::acc) l (id-new_id))
+        )
+      | None -> match graph.free_id with
+        | new_id,h :: t -> h,(new_id,t)
+        | new_id,[] -> new_id,(succ new_id,[]) in
+    let missings' = Tools.recti (fun a s -> Mods.Int2Set.add (h,s) a)
+        graph.missings ar in
+    let () = Mods.DynArray.set tables.connect h al in
+    let () = Mods.DynArray.set tables.state h ai in
+    let () = Mods.DynArray.set tables.sort h (Some ty) in
+    let () = match tables.connected_component with
+      | None -> ()
+      | Some ccs -> Mods.DynArray.set ccs h (Some h) in
+    h,
+    {
+      tables = Some tables;
+      missings = missings';
+      free_id;
     }
 
+let add_free ag s graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = graph.tables <- None in
+    let () = (Mods.DynArray.get tables.connect ag).(s) <- None in
+    {
+      tables = Some tables;
+      missings = Mods.Int2Set.remove (ag,s) graph.missings;
+      free_id = graph.free_id;
+    }
+
+let add_internal ag s i graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = graph.tables <- None in
+    let () = (Mods.DynArray.get tables.state ag).(s) <- Some i in
+    {
+      tables = Some tables;
+      missings = graph.missings;
+      free_id = graph.free_id;
+    }
+
+let add_link (ag,ty) s (ag',ty') s' graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = graph.tables <- None in
+    let () = (Mods.DynArray.get tables.connect ag).(s) <- Some ((ag',ty'),s') in
+    let () = (Mods.DynArray.get tables.connect ag').(s') <- Some ((ag,ty),s) in
+    let out = match tables.connected_component with
+      | None -> None
+      | Some ccs ->
+        let i = Option_util.unsome (-1) (Mods.DynArray.get ccs ag) in
+        let j = Option_util.unsome (-2) (Mods.DynArray.get ccs ag') in
+        if i = j then None else
+          let () = glue_connected_component
+              tables.connect (fst tables.caches) ccs ag ag' in
+          Some (j,i) in
+    {
+      tables = Some tables;
+      missings =
+        Mods.Int2Set.remove (ag,s) (Mods.Int2Set.remove (ag',s') graph.missings);
+      free_id = graph.free_id;
+    },out
+
+let remove_agent ag graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = graph.tables <- None in
+    let () = Mods.DynArray.set tables.connect ag [||] in
+    let () = Mods.DynArray.set tables.state ag [||] in
+    let () = Mods.DynArray.set tables.sort ag None in
+    let () = match tables.connected_component with
+      | None -> ()
+      | Some ccs -> Mods.DynArray.set ccs ag None in
+    {
+      tables = Some tables;
+      missings = Mods.Int2Set.filter (fun (ag',_) -> ag <> ag') graph.missings;
+      free_id = (let new_id,ids = graph.free_id in (new_id,ag::ids));
+    }
+
+let remove_free ag s graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = graph.tables <- None in
+    let () = assert ((Mods.DynArray.get tables.connect ag).(s) = None) in
+    {
+      tables = Some tables;
+      missings = Mods.Int2Set.add (ag,s) graph.missings;
+      free_id = graph.free_id;
+    }
+
+let get_internal ag s graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    match (Mods.DynArray.get tables.state ag).(s) with
+    | Some i -> i
+    | None ->
+      failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
+                " has no internal state in the current graph.")
+
+let get_sites ag graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let arr = Mods.DynArray.get tables.state ag in
+    Array.length arr
+
+let get_sort ag graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    match Mods.DynArray.get tables.sort ag with
+    | Some ty -> ty
+    | None ->
+      failwith ("Agent "^string_of_int ag^
+                " has no type in the current graph.")
+
+let remove_internal ag s graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = graph.tables <- None in
+    let i = (Mods.DynArray.get tables.state ag).(s) in
+    let () = (Mods.DynArray.get tables.state ag).(s) <- None in
+    match i with
+      None -> assert false
+    | Some i ->
+      i, {
+        tables = Some tables;
+        missings = graph.missings;
+        free_id = graph.free_id;
+      }
+
 let remove_link ag s ag' s' graph =
-  let () = assert (not graph.outdated) in
-  let () = graph.outdated <- true in
-  let () = (Mods.DynArray.get graph.connect ag).(s) <- None in
-  let () = (Mods.DynArray.get graph.connect ag').(s') <- None in
-  let out = match graph.connected_component with
-    | None -> None
-    | Some ccs ->
-      separate_connected_component
-        graph.connect graph.caches ccs ag ag' in
-  {
-    outdated = false;
-    connect = graph.connect;
-    missings =
-      Mods.Int2Set.add (ag,s) (Mods.Int2Set.add (ag',s') graph.missings);
-    state = graph.state;
-    sort = graph.sort;
-    caches = graph.caches;
-    free_id = graph.free_id;
-    connected_component = graph.connected_component;
-  },out
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = graph.tables <- None in
+    let () = (Mods.DynArray.get tables.connect ag).(s) <- None in
+    let () = (Mods.DynArray.get tables.connect ag').(s') <- None in
+    let out = match tables.connected_component with
+      | None -> None
+      | Some ccs ->
+        separate_connected_component
+          tables.connect tables.caches ccs ag ag' in
+    {
+      tables = Some tables;
+      missings =
+        Mods.Int2Set.add (ag,s) (Mods.Int2Set.add (ag',s') graph.missings);
+      free_id = graph.free_id;
+    },out
 
 let is_agent (ag,ty) graph =
-  let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  match Mods.DynArray.get graph.sort ag with
-  | Some ty' -> let () = assert (ty = ty') in true
-  | None -> false
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = assert (Mods.Int2Set.is_empty graph.missings) in
+    match Mods.DynArray.get tables.sort ag with
+    | Some ty' -> let () = assert (ty = ty') in true
+    | None -> false
 let is_free ag s graph =
-  let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  let t = Mods.DynArray.get graph.connect ag in t <> [||] && t.(s) = None
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = assert (Mods.Int2Set.is_empty graph.missings) in
+    let t = Mods.DynArray.get tables.connect ag in t <> [||] && t.(s) = None
 let is_internal i ag s graph =
-  let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  let t = Mods.DynArray.get graph.state ag in
-  t <> [||] && match t.(s) with
-  | Some j -> j = i
-  | None -> false
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = assert (Mods.Int2Set.is_empty graph.missings) in
+    let t = Mods.DynArray.get tables.state ag in
+    t <> [||] && match t.(s) with
+    | Some j -> j = i
+    | None -> false
 let link_exists ag s ag' s' graph =
-  let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  let t = Mods.DynArray.get graph.connect ag in
-  t <> [||] &&
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = assert (Mods.Int2Set.is_empty graph.missings) in
+    let t = Mods.DynArray.get tables.connect ag in
+    t <> [||] &&
     match t.(s) with
-  | Some ((ag'',_),s'') -> ag'=ag'' && s'=s''
-  | None -> false
+    | Some ((ag'',_),s'') -> ag'=ag'' && s'=s''
+    | None -> false
 
 let exists_fresh ag s ty s' graph =
-  let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  let t = Mods.DynArray.get graph.connect ag in
-  if t = [||] then None else
-    match t.(s) with
-    | Some ((ag',ty'),s'') ->
-      if ty'=ty && s'=s'' then Some ag' else None
-    | None -> None
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = assert (Mods.Int2Set.is_empty graph.missings) in
+    let t = Mods.DynArray.get tables.connect ag in
+    if t = [||] then None else
+      match t.(s) with
+      | Some ((ag',ty'),s'') ->
+        if ty'=ty && s'=s'' then Some ag' else None
+      | None -> None
 
 let link_destination ag s graph =
-  let () = assert (not graph.outdated) in
-  (Mods.DynArray.get graph.connect ag).(s)
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    (Mods.DynArray.get tables.connect ag).(s)
 
 let all_agents_where f graph =
-  let out = IntCollection.create 0 in
-  let () = Mods.DynArray.iteri
-      (fun id -> function
-         | Some ty when f (id,ty) -> IntCollection.add id out
-         | _ -> ())
-      graph.sort in
-  out
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let out = IntCollection.create 0 in
+    let () = Mods.DynArray.iteri
+        (fun id -> function
+           | Some ty when f (id,ty) -> IntCollection.add id out
+           | _ -> ())
+        tables.sort in
+    out
 
 let in_same_connected_component ag ag' graph =
-  match graph.connected_component with
-  | None ->
-    raise (ExceptionDefn.Internal_Error
-             (Locality.dummy_annot
-                "in_same_connected_component while not tracking ccs"))
-  | Some ccs ->
-    Mods.DynArray.get ccs ag = Mods.DynArray.get ccs ag'
+  match graph.tables with
+  | None -> assert false
+  | Some tables -> match tables.connected_component with
+    | None ->
+      raise (ExceptionDefn.Internal_Error
+               (Locality.dummy_annot
+                  "in_same_connected_component while not tracking ccs"))
+    | Some ccs ->
+      Mods.DynArray.get ccs ag = Mods.DynArray.get ccs ag'
 
 let get_connected_component ag graph =
-  match graph.connected_component with
-  | None ->
-    raise (ExceptionDefn.Internal_Error
-             (Locality.dummy_annot
-                "get_connected_component while not tracking ccs"))
-  | Some ccs -> Mods.DynArray.get ccs ag
+  match graph.tables with
+  | None -> assert false
+  | Some tables -> match tables.connected_component with
+    | None ->
+      raise (ExceptionDefn.Internal_Error
+               (Locality.dummy_annot
+                  "get_connected_component while not tracking ccs"))
+    | Some ccs -> Mods.DynArray.get ccs ag
 
 (** The snapshot machinery *)
 let one_connected_component sigs ty node graph =
@@ -509,66 +525,75 @@ let one_connected_component sigs ty node graph =
   build 0 [] Mods.IntMap.empty [node,ty]
 
 let species ~debugMode sigs root graph =
-  let specie = match Mods.DynArray.get graph.sort root with
-    | None ->
-       raise
-         (ExceptionDefn.Internal_Error
-            (Locality.dummy_annot
-               ("Sort of node unavailable "^string_of_int root)))
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let specie = match Mods.DynArray.get tables.sort root with
+      | None ->
+        raise
+          (ExceptionDefn.Internal_Error
+             (Locality.dummy_annot
+                ("Sort of node unavailable "^string_of_int root)))
+      | Some ty ->
+        Snapshot.cc_to_user_cc
+          ~debugMode sigs (one_connected_component sigs ty root tables) in
+    let () = Cache.reset (fst tables.caches) in
+    specie
+
+let rec aux_build_snapshot sigs tables ccs node =
+  if node = Mods.DynArray.length tables.sort then
+    let () = Cache.reset (fst tables.caches) in
+    ccs
+  else
+  if Cache.test (fst tables.caches) node
+  then aux_build_snapshot sigs tables ccs (succ node)
+  else match Mods.DynArray.get tables.sort node with
+    | None -> aux_build_snapshot sigs tables ccs (succ node)
     | Some ty ->
-      Snapshot.cc_to_user_cc
-        ~debugMode sigs (one_connected_component sigs ty root graph) in
-  let () = Cache.reset (fst graph.caches) in
-  specie
+      let out =
+        one_connected_component sigs ty node tables in
+      aux_build_snapshot
+        sigs tables (Snapshot.increment_in_snapshot sigs out ccs) (succ node)
 
 let build_snapshot sigs graph =
-  let () = assert (not graph.outdated) in
-  let rec aux ccs node =
-    if node = Mods.DynArray.length graph.sort then
-      let () = Cache.reset (fst graph.caches) in
-      ccs
-    else
-    if Cache.test (fst graph.caches) node
-    then aux ccs (succ node)
-    else match Mods.DynArray.get graph.sort node with
-      | None -> aux ccs (succ node)
-      | Some ty ->
-        let out =
-          one_connected_component sigs ty node graph in
-        aux (Snapshot.increment_in_snapshot sigs out ccs) (succ node) in
-  aux Snapshot.empty 0
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    aux_build_snapshot sigs tables Snapshot.empty 0
 
 let build_user_snapshot ~debugMode sigs graph =
   Snapshot.export ~debugMode sigs (build_snapshot sigs graph)
 
 let debug_print f graph =
-  let print_sites ag =
-    (Pp.array Pp.comma
-       (fun s f l ->
-          Format.fprintf
-            f "%i%t%t" s
-            (match (Mods.DynArray.get graph.state ag).(s) with
-             | Some int -> fun f -> Format.fprintf f "~%i" int
-             | None -> fun _ -> ())
-            (fun f -> match l with
-               | None ->
-                 if Mods.Int2Set.mem (ag,s) graph.missings
-                 then Format.pp_print_string f "?"
-               | Some ((ag',ty'),s') ->
-                 Format.fprintf f "->%i:%i.%i" ag' ty' s'))) in
-  let () = if graph.outdated then Format.fprintf f "OUTDATED@ " in
-  Mods.DynArray.print
-    Pp.empty
-    (fun ag f a ->
-       match Mods.DynArray.get graph.sort ag with
-       | Some ty ->
-         Format.fprintf
-           f "%i:%i(@[%a@])@ " ag ty (print_sites ag) a
-       | None -> if a = [||] then ()
-         else Format.fprintf
-             f "%i:NOTYPE(@[%a@])@ " ag (print_sites ag) a
-    )
-    f graph.connect
+  match graph.tables with
+  | None -> Format.fprintf f "OUTDATED@ "
+  | Some tables ->
+    let print_sites ag =
+      (Pp.array Pp.comma
+         (fun s f l ->
+            Format.fprintf
+              f "%i%t%t" s
+              (match (Mods.DynArray.get tables.state ag).(s) with
+               | Some int -> fun f -> Format.fprintf f "~%i" int
+               | None -> fun _ -> ())
+              (fun f -> match l with
+                 | None ->
+                   if Mods.Int2Set.mem (ag,s) graph.missings
+                   then Format.pp_print_string f "?"
+                 | Some ((ag',ty'),s') ->
+                   Format.fprintf f "->%i:%i.%i" ag' ty' s'))) in
+    Mods.DynArray.print
+      Pp.empty
+      (fun ag f a ->
+         match Mods.DynArray.get tables.sort ag with
+         | Some ty ->
+           Format.fprintf
+             f "%i:%i(@[%a@])@ " ag ty (print_sites ag) a
+         | None -> if a = [||] then ()
+           else Format.fprintf
+               f "%i:NOTYPE(@[%a@])@ " ag (print_sites ag) a
+      )
+      f tables.connect
 
 type path = ((Agent.t * int) * (Agent.t * int)) list
 (** ((agent_id, agent_name),site_name) *)
@@ -632,22 +657,24 @@ let breadth_first_traversal
 (* nodes_x: agent_id list = (int * int) list
    nodes_y: adent_id list = int list *)
 let are_connected ?max_distance graph nodes_x nodes_y =
-  let () = assert (not graph.outdated) in
-  if in_same_connected_component
-      (fst (List.hd nodes_x)) (fst (List.hd nodes_y)) graph then
-    (* look for the closest node in nodes_y *)
-    let is_in_nodes_y z = if List.mem z nodes_y then Some () else None in
-    (* breadth first search is called on a list of sites;
-       start the breadth first search with the boundaries of nodes_x,
-       that is all sites that are connected to other nodes in x
-       and with all nodes in nodes_x marked as done *)
-    let prepare =
-      List.fold_left (fun acc (id,_ as ag) ->
-          let () = Cache.mark (fst graph.caches) id in
-          (ag,[])::acc) [] nodes_x in
-    match breadth_first_traversal ~looping:((-1,-1),-1) ?max_distance true
-            is_in_nodes_y graph.connect (fst graph.caches) [] prepare
-    with [] -> let () = Cache.reset (fst graph.caches) in None
-       | [ _,p ] -> let () = Cache.reset (fst graph.caches) in Some p
-       | _ :: _ -> failwith "Edges.are_they_connected completely broken"
-  else None
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    if in_same_connected_component
+        (fst (List.hd nodes_x)) (fst (List.hd nodes_y)) graph then
+      (* look for the closest node in nodes_y *)
+      let is_in_nodes_y z = if List.mem z nodes_y then Some () else None in
+      (* breadth first search is called on a list of sites;
+         start the breadth first search with the boundaries of nodes_x,
+         that is all sites that are connected to other nodes in x
+         and with all nodes in nodes_x marked as done *)
+      let prepare =
+        List.fold_left (fun acc (id,_ as ag) ->
+            let () = Cache.mark (fst tables.caches) id in
+            (ag,[])::acc) [] nodes_x in
+      match breadth_first_traversal ~looping:((-1,-1),-1) ?max_distance true
+              is_in_nodes_y tables.connect (fst tables.caches) [] prepare
+      with [] -> let () = Cache.reset (fst tables.caches) in None
+         | [ _,p ] -> let () = Cache.reset (fst tables.caches) in Some p
+         | _ :: _ -> failwith "Edges.are_they_connected completely broken"
+    else None
