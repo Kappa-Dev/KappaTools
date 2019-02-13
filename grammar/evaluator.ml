@@ -74,11 +74,11 @@ let get_pause_criteria
 
 let find_all_embeddings ~debugMode env tr =
   let domain = Model.domain env in
-  let _,graph = List.fold_left
+  let dummy_instances = Instances.empty env in
+  let graph = List.fold_left
       (Rule_interpreter.apply_concrete_positive_transformation
-         (Model.signatures env) ?mod_connectivity_store:None)
-      (Instances.empty env,
-       Edges.empty ~with_connected_components:false)
+         (Model.signatures env) ?mod_connectivity_store:None dummy_instances)
+      (Edges.empty ~with_connected_components:false)
       tr in
   let out,_ =
     Rule_interpreter.obs_from_transformations ~debugMode domain graph tr in

@@ -129,26 +129,23 @@ module Make (Instances:Instances_sig.S) : sig
 
   (** {6 Internals } *)
   val apply_negative_transformation :
-     ?mod_connectivity_store:Roots.mod_ccs_cache ->
-    (Instantiation.concrete Instantiation.site) list * Instances.t * Edges.t ->
+     ?mod_connectivity_store:Roots.mod_ccs_cache -> Instances.t ->
+    (Instantiation.concrete Instantiation.site) list * Edges.t ->
     Instantiation.concrete Primitives.Transformation.t ->
-    (Instantiation.concrete Instantiation.site) list * Instances.t * Edges.t
+    (Instantiation.concrete Instantiation.site) list * Edges.t
   val apply_positive_transformation :
     debugMode:bool ->
-    Signature.s -> ?mod_connectivity_store:Roots.mod_ccs_cache ->
+    Signature.s -> ?mod_connectivity_store:Roots.mod_ccs_cache -> Instances.t ->
     (Matching.t * int Mods.IntMap.t) *
     (Instantiation.concrete Instantiation.site) list *
-    Instances.t * Edges.t ->
+    Edges.t ->
     Instantiation.abstract Primitives.Transformation.t ->
     ((Matching.t * int Mods.IntMap.t) *
-     (Instantiation.concrete Instantiation.site) list *
-     Instances.t * Edges.t) *
+     (Instantiation.concrete Instantiation.site) list * Edges.t) *
     Instantiation.concrete Primitives.Transformation.t
   val apply_concrete_positive_transformation :
-    Signature.s -> ?mod_connectivity_store:Roots.mod_ccs_cache ->
-    Instances.t * Edges.t ->
-    Instantiation.concrete Primitives.Transformation.t ->
-    Instances.t * Edges.t
+    Signature.s -> ?mod_connectivity_store:Roots.mod_ccs_cache -> Instances.t ->
+    Edges.t -> Instantiation.concrete Primitives.Transformation.t -> Edges.t
 
 val obs_from_transformations :
   debugMode:bool -> Pattern.Env.t -> Edges.t ->

@@ -42,53 +42,48 @@ let add_intset_in_intmap id set map =
     and I will probably clean this.
 *)
 let break_apart_cc state edges ?mod_connectivity_store = function
-  | None -> state
+  | None -> ()
   | Some (origin_cc,new_cc) ->
     let () = match mod_connectivity_store with
       | None -> ()
       | Some mod_conn ->
         let () = Hashtbl.replace mod_conn new_cc () in
         Hashtbl.replace mod_conn origin_cc () in
-    {
-      of_patterns = state.of_patterns;
-      of_unary_patterns =
-        Pattern.ObsMap.map
-          (fun cc_map ->
-             let oset =
-               Mods.IntMap.find_default Mods.IntSet.empty origin_cc cc_map in
-             if Mods.IntSet.is_empty oset then cc_map
-             else
-               let nset,oset' =
-                 Mods.IntSet.partition
-                   (fun x -> Edges.get_connected_component x edges = Some new_cc)
-                   oset in
-               add_intset_in_intmap
-                 new_cc nset (add_intset_in_intmap origin_cc oset' cc_map)
-          )
-          state.of_unary_patterns;
-    }
+    Pattern.ObsMap.iteri
+      (fun cc_id cc_map ->
+         let oset =
+           Mods.IntMap.find_default Mods.IntSet.empty origin_cc cc_map in
+         if not (Mods.IntSet.is_empty oset) then
+           let nset,oset' =
+             Mods.IntSet.partition
+               (fun x -> Edges.get_connected_component x edges = Some new_cc)
+               oset in
+           Pattern.ObsMap.set
+             state.of_unary_patterns cc_id
+             (add_intset_in_intmap
+                new_cc nset (add_intset_in_intmap origin_cc oset' cc_map))
+      )
+      state.of_unary_patterns
 
 (* Same: not very subtle. You just propagate. *)
 let merge_cc state ?mod_connectivity_store = function
-  | None -> state
+  | None -> ()
   | Some (cc1,cc2) ->
     let () = match mod_connectivity_store with
       | None -> ()
       | Some mod_connectivity ->
         let () = Hashtbl.replace mod_connectivity cc2 () in
         Hashtbl.replace mod_connectivity cc1 () in
-    {
-      of_patterns = state.of_patterns;
-      of_unary_patterns =
-        Pattern.ObsMap.map
-          (fun cc_map ->
-             match Mods.IntMap.pop cc2 cc_map with
-             | None,_ -> cc_map
-             | Some set2, cc_map' ->
-               let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc1 cc_map in
-               add_intset_in_intmap cc1 (Mods.IntSet.union set1 set2) cc_map')
-          state.of_unary_patterns;
-    }
+    Pattern.ObsMap.iteri
+      (fun cc_id cc_map ->
+         match Mods.IntMap.pop cc2 cc_map with
+         | None,_ -> ()
+         | Some set2, cc_map' ->
+           let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc1 cc_map in
+           Pattern.ObsMap.set
+             state.of_unary_patterns cc_id
+             (add_intset_in_intmap cc1 (Mods.IntSet.union set1 set2) cc_map'))
+      state.of_unary_patterns
 
 (* Most of the code is to deal with unary_instances.
    Does nothing fancy.

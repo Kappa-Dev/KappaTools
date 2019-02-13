@@ -390,32 +390,30 @@ module Make (Instances:Instances_sig.S) = struct
       (inj_nodes,Mods.IntMap.add id free_id inj_fresh)
 
   let apply_negative_transformation
-      ?mod_connectivity_store (side_effects,stuff4unaries,edges) = function
+      ?mod_connectivity_store instances (side_effects,edges) = function
     | Primitives.Transformation.Agent (id,_) ->
       let edges' = Edges.remove_agent id edges in
-      (side_effects,stuff4unaries,edges')
+      (side_effects,edges')
     | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
       let edges' = Edges.remove_free id s edges in
-      (side_effects,stuff4unaries,edges')
+      (side_effects,edges')
     | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) ->
       let edges',cc_modif = Edges.remove_link id s id' s' edges in
-      (side_effects,
-       Instances.break_apart_cc
-         stuff4unaries edges' ?mod_connectivity_store cc_modif,
-       edges')
+      let () = Instances.break_apart_cc
+          instances edges' ?mod_connectivity_store cc_modif in
+      (side_effects,edges')
     | Primitives.Transformation.NegativeWhatEver ((id,_),s as n) ->
       begin
         match (List.partition (fun x -> x =n) side_effects) with
-        | (_::_,side_effects') -> (side_effects',stuff4unaries,edges)
+        | (_::_,side_effects') -> (side_effects',edges)
         | ([],_) ->
           match Edges.link_destination id s edges with
-          | None -> (side_effects,stuff4unaries,Edges.remove_free id s edges)
+          | None -> (side_effects,Edges.remove_free id s edges)
           | Some ((id',_ as nc'),s') ->
             let edges',cc_modif = Edges.remove_link id s id' s' edges in
-            ((nc',s')::side_effects,
-             Instances.break_apart_cc
-               stuff4unaries edges' ?mod_connectivity_store cc_modif,
-             edges')
+            let () = Instances.break_apart_cc
+                instances edges' ?mod_connectivity_store cc_modif in
+            ((nc',s')::side_effects,edges')
       end
     | Primitives.Transformation.PositiveInternalized _ ->
       raise
@@ -423,18 +421,18 @@ module Make (Instances:Instances_sig.S) = struct
            (Locality.dummy_annot "PositiveInternalized in negative update"))
     | Primitives.Transformation.NegativeInternalized ((id,_),s) ->
       let _,edges' = Edges.remove_internal id s edges in
-      (side_effects,stuff4unaries,edges')
+      (side_effects,edges')
 
   let apply_positive_transformation
-      ~debugMode sigs ?mod_connectivity_store
-      (inj2graph,side_effects,stuff4unaries,edges) =
+      ~debugMode sigs ?mod_connectivity_store instances
+      (inj2graph,side_effects,edges) =
     function
     | Primitives.Transformation.Agent n ->
       let nc, inj2graph',edges' =
         let ty = Matching.Agent.get_type n in
         let id,edges' = Edges.add_agent sigs ty edges in
         (id,ty),new_place id inj2graph n,edges' in
-      (inj2graph',side_effects,stuff4unaries,edges'),
+      (inj2graph',side_effects,edges'),
       Primitives.Transformation.Agent nc
     | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
       let (id,_ as nc) =
@@ -442,7 +440,7 @@ module Make (Instances:Instances_sig.S) = struct
       let edges' = Edges.add_free id s edges in
       let side_effects' =
         List_util.smart_filter (fun x -> x <> (nc,s)) side_effects in
-      (inj2graph,side_effects',stuff4unaries,edges'),
+      (inj2graph,side_effects',edges'),
       Primitives.Transformation.Freed (nc,s)
     | Primitives.Transformation.Linked ((n,s),(n',s')) ->
       let nc = Matching.Agent.concretize ~debugMode inj2graph n in
@@ -450,8 +448,9 @@ module Make (Instances:Instances_sig.S) = struct
       let edges',modif_cc = Edges.add_link nc s nc' s' edges in
       let side_effects' = List_util.smart_filter
           (fun x -> x<>(nc,s) && x<>(nc',s')) side_effects in
-      (inj2graph,side_effects',
-       Instances.merge_cc stuff4unaries ?mod_connectivity_store modif_cc,edges'),
+      let () =
+        Instances.merge_cc instances ?mod_connectivity_store modif_cc in
+      (inj2graph,side_effects',edges'),
       Primitives.Transformation.Linked ((nc,s),(nc',s'))
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
@@ -460,7 +459,7 @@ module Make (Instances:Instances_sig.S) = struct
     | Primitives.Transformation.PositiveInternalized (n,s,i) ->
       let (id,_ as nc) = Matching.Agent.concretize ~debugMode inj2graph n in
       let edges' = Edges.add_internal id s i edges in
-      (inj2graph,side_effects,stuff4unaries,edges'),
+      (inj2graph,side_effects,edges'),
       Primitives.Transformation.PositiveInternalized (nc,s,i)
     | Primitives.Transformation.NegativeInternalized _ ->
       raise
@@ -468,23 +467,25 @@ module Make (Instances:Instances_sig.S) = struct
            (Locality.dummy_annot "NegativeInternalized in positive update"))
 
   let apply_concrete_positive_transformation
-      sigs ?mod_connectivity_store (stuff4unaries,edges) = function
+      sigs ?mod_connectivity_store instances edges = function
     | Primitives.Transformation.Agent (id,ty) ->
       let _,edges' = Edges.add_agent ~id sigs ty edges in
-      (stuff4unaries,edges')
+      edges'
     | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
       let edges' = Edges.add_free id s edges in
-      (stuff4unaries,edges')
+      edges'
     | Primitives.Transformation.Linked ((nc,s),(nc',s')) ->
       let edges',modif_cc = Edges.add_link nc s nc' s' edges in
-      (Instances.merge_cc stuff4unaries ?mod_connectivity_store modif_cc,edges')
+      let () =
+        Instances.merge_cc instances ?mod_connectivity_store modif_cc in
+      edges'
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
         (ExceptionDefn.Internal_Error
            (Locality.dummy_annot "NegativeWhatEver in positive update"))
     | Primitives.Transformation.PositiveInternalized ((id,_),s,i) ->
       let edges' = Edges.add_internal id s i edges in
-      (stuff4unaries,edges')
+      edges'
     | Primitives.Transformation.NegativeInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
@@ -644,29 +645,28 @@ module Make (Instances:Instances_sig.S) = struct
         (obs_from_transformation ~debugMode domain state.edges)
         (([],Operator.DepSet.empty),Matching.empty_cache)
         concrete_removed in
-    let (side_effects,instances,edges_after_neg) =
+    let (side_effects,edges_after_neg) =
       List.fold_left
-        (apply_negative_transformation ~mod_connectivity_store)
-        ([],(state.instances),state.edges)
-        concrete_removed in
+        (apply_negative_transformation ~mod_connectivity_store state.instances)
+        ([],state.edges) concrete_removed in
     let () =
       List.iter
         (fun (pat,(root,_)) ->
-           Instances.update_roots instances false state.precomputed.unary_patterns
+           Instances.update_roots
+             state.instances false state.precomputed.unary_patterns
              edges_after_neg mod_connectivity_store pat root)
         del_obs in
     (*Positive update*)
-    let (final_inj2graph,remaining_side_effects,instances',edges'),
+    let (final_inj2graph,remaining_side_effects,edges'),
         concrete_inserted =
       List.fold_left
         (fun (x,p) h ->
            let (x', h') =
              apply_positive_transformation
                ~debugMode (Pattern.Env.signatures domain) ~mod_connectivity_store
-               x h in
+               state.instances x h in
            (x',h'::p))
-        (((inj_nodes,Mods.IntMap.empty),side_effects,
-          instances,edges_after_neg),[])
+        (((inj_nodes,Mods.IntMap.empty),side_effects,edges_after_neg),[])
         rule.Primitives.inserted in
     let (edges'',concrete_inserted') =
       List.fold_left
@@ -681,13 +681,14 @@ module Make (Instances:Instances_sig.S) = struct
     let () =
       List.iter
         (fun (pat,(root,_)) ->
-           Instances.update_roots instances' true state.precomputed.unary_patterns
+           Instances.update_roots
+             state.instances true state.precomputed.unary_patterns
              edges'' mod_connectivity_store pat root)
         new_obs in
     (*Store event*)
     let new_tracked_obs_instances =
       store_obs
-        ~debugMode domain edges'' instances' new_obs [] state.story_machinery in
+        ~debugMode domain edges'' state.instances new_obs [] state.story_machinery in
     let () =
       store_event
         ~debugMode counter final_inj2graph new_tracked_obs_instances event_kind
@@ -705,7 +706,7 @@ module Make (Instances:Instances_sig.S) = struct
     {
       outdated = false;
       precomputed = state.precomputed;
-      instances = instances';
+      instances = state.instances;
       matchings_of_rule = state.matchings_of_rule;
       unary_candidates = state.unary_candidates;
       nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc;
@@ -735,28 +736,29 @@ module Make (Instances:Instances_sig.S) = struct
         (obs_from_transformation ~debugMode domain state.edges)
         (([],Operator.DepSet.empty),Matching.empty_cache)
         concrete_removed in
-    let (_side_effects,instances,edges_after_neg) =
+    let (_side_effects,edges_after_neg) =
       List.fold_left
-        (apply_negative_transformation ~mod_connectivity_store)
-        ([],(state.instances),state.edges)
+        (apply_negative_transformation ~mod_connectivity_store state.instances)
+        ([],state.edges)
         concrete_removed in
     let () =
       List.iter
         (fun (pat,(root,_)) ->
-           Instances.update_roots instances false state.precomputed.unary_patterns
+           Instances.update_roots
+             state.instances false state.precomputed.unary_patterns
              edges_after_neg mod_connectivity_store pat root)
         del_obs in
     (*Positive update*)
     let concrete_inserted =
       Primitives.Transformation.positive_transformations_of_actions
         sigs side_effect_dst actions in
-    let (instances',edges') =
+    let edges' =
       List.fold_left
         (fun x h ->
            apply_concrete_positive_transformation
-             (Pattern.Env.signatures domain) ~mod_connectivity_store x h)
-        (instances,edges_after_neg)
-        concrete_inserted in
+             (Pattern.Env.signatures domain) ~mod_connectivity_store
+             state.instances x h)
+        edges_after_neg concrete_inserted in
     let ((new_obs,new_deps),_) =
       List.fold_left
         (obs_from_transformation ~debugMode domain edges')
@@ -765,7 +767,8 @@ module Make (Instances:Instances_sig.S) = struct
     let () =
       List.iter
         (fun (pat,(root,_)) ->
-           Instances.update_roots instances' true state.precomputed.unary_patterns
+           Instances.update_roots
+             state.instances true state.precomputed.unary_patterns
              edges' mod_connectivity_store pat root)
         new_obs in
     (*Print species*)
@@ -781,7 +784,7 @@ module Make (Instances:Instances_sig.S) = struct
     { activities = state.activities ;
       outdated = false;
       precomputed = state.precomputed;
-      instances = instances';
+      instances = state.instances;
       matchings_of_rule = state.matchings_of_rule ;
       nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc ;
       unary_candidates = state.unary_candidates ;

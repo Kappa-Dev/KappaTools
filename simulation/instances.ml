@@ -22,13 +22,11 @@ let empty env = {
 let incorporate_extra_pattern state pattern matchings =
   Roots.incorporate_extra_pattern state.roots pattern matchings
 
-let break_apart_cc state edges ?mod_connectivity_store ccs = {
-  roots = Roots.break_apart_cc state.roots edges ?mod_connectivity_store ccs
-}
+let break_apart_cc state edges ?mod_connectivity_store ccs =
+  Roots.break_apart_cc state.roots edges ?mod_connectivity_store ccs
 
-let merge_cc state ?mod_connectivity_store ccs = {
-  roots = Roots.merge_cc state.roots ?mod_connectivity_store ccs
-}
+let merge_cc state ?mod_connectivity_store ccs =
+  Roots.merge_cc state.roots ?mod_connectivity_store ccs
 
 let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
   Roots.update_roots

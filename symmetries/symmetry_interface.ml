@@ -515,22 +515,23 @@ let apply_sigs ~debugMode env rule inj_nodes mix =
                 ~debugMode (inj_nodes, Mods.IntMap.empty))
       rule.Primitives.removed
   in
-  let (side_effects, dummy, edges_after_neg) =
+  let dummy_instances = Instances.empty env in
+  let (side_effects, edges_after_neg) =
     List.fold_left
       (Rule_interpreter.apply_negative_transformation
-         ?mod_connectivity_store:None)
-      ([], Instances.empty env, mix)
+         ?mod_connectivity_store:None dummy_instances)
+      ([], mix)
       concrete_removed
   in
-  let (_, remaining_side_effects, _, edges'), concrete_inserted =
+  let (_, remaining_side_effects, edges'), concrete_inserted =
     List.fold_left
       (fun (x,p) h ->
          let (x',h') =
            Rule_interpreter.apply_positive_transformation
-             ~debugMode (Model.signatures env) x h in
+             ~debugMode (Model.signatures env) dummy_instances x h in
          (x', h' :: p))
       (((inj_nodes, Mods.IntMap.empty),
-        side_effects, dummy, edges_after_neg), [])
+        side_effects, edges_after_neg), [])
       rule.Primitives.inserted
   in
   let (edges'',_) =

@@ -28,6 +28,7 @@ module ObsMap : sig
 
   val fold_lefti : (id -> 'a -> 'b -> 'a) -> 'a -> 'b t -> 'a
   val map : ('a -> 'b) -> 'a t -> 'b t
+  val iteri: (id -> 'a -> unit) -> 'a t -> unit
   val print :
     ?trailing:(Format.formatter -> unit) ->
     (Format.formatter -> unit) ->
