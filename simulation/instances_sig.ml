@@ -78,7 +78,7 @@ val fold_instances :
     Folds through every rectangular instance of an array of patterns. *)
 
 val fold_unary_instances :
-  ?rule_id:int -> t -> Pattern.id * Pattern.id -> 
+  ?rule_id:int -> t -> Pattern.id * Pattern.id ->
   init:'a -> (int * int -> 'a -> 'a) -> 'a
 (** [fold_unary_instances state (pat1, pat2) ~init f ]
     with [f (root1, root2) acc]. *)

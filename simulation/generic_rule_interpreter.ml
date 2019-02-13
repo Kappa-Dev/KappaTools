@@ -19,30 +19,15 @@ module Make (Instances:Instances_sig.S) = struct
     (Instantiation.concrete Instantiation.action) list ->
     bool
 
-  type t =
-    {
-      mutable outdated : bool;
-
+  type imperative_fields = {
       precomputed: precomputed;
 
       instances: Instances.t;
 
-      (* Without rectangular approximation *)
-      matchings_of_rule:
-        (Matching.t * int list) list Mods.IntMap.t;
-      unary_candidates: (* rule_id -> list of matchings *)
-       (Matching.t * Edges.path option) list Mods.IntMap.t;
-      (* rule -> cc -> number_instances (activity per cc) *)
-      nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
-
       variables_cache: Nbr.t array;
       variables_overwrite: Primitives.alg_expr option array;
 
-      edges: Edges.t;
       tokens: Nbr.t array;
-
-      (* Right component: set of ccs that have changed *)
-      outdated_elements: Operator.DepSet.t * (int,unit) Hashtbl.t;
 
       activities : Random_tree.tree;
       (* pair numbers are regular rule, odd unary instances *)
@@ -57,6 +42,28 @@ module Make (Instances:Instances_sig.S) = struct
         (string (*filename*) * Pattern.id array (*with only one pattern*) *
          Instantiation.abstract Instantiation.test list list) list
           Pattern.ObsMap.t;
+
+      changed_connectivity : (int,unit) Hashtbl.t;
+      (* set of ccs that have changed *)
+    }
+
+  type t =
+    {
+      mutable outdated : bool;
+
+      (* Without rectangular approximation *)
+      matchings_of_rule:
+        (Matching.t * int list) list Mods.IntMap.t;
+      unary_candidates: (* rule_id -> list of matchings *)
+       (Matching.t * Edges.path option) list Mods.IntMap.t;
+      (* rule -> cc -> number_instances (activity per cc) *)
+      nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
+
+      edges: Edges.t;
+
+      imp: imperative_fields;
+
+      outdated_elements: Operator.DepSet.t;
 
       events_to_block : event_predicate option
     }
@@ -76,28 +83,30 @@ module Make (Instances:Instances_sig.S) = struct
   let value_bool counter state expr =
     let () = assert (not state.outdated) in
     Expr_interpreter.value_bool
-      counter ~get_alg:(fun i -> Alg_expr.CONST state.variables_cache.(i))
-      ~get_mix:(fun patterns -> Nbr.I (sum_instances_numbers state.instances patterns))
-      ~get_tok:(fun i -> state.tokens.(i))
+      counter ~get_alg:(fun i -> Alg_expr.CONST state.imp.variables_cache.(i))
+      ~get_mix:(fun patterns ->
+          Nbr.I (sum_instances_numbers state.imp.instances patterns))
+      ~get_tok:(fun i -> state.imp.tokens.(i))
       expr
   let value_alg counter state alg =
     let () = assert (not state.outdated) in
     Expr_interpreter.value_alg
-      counter ~get_alg:(fun i -> Alg_expr.CONST state.variables_cache.(i))
-      ~get_mix:(fun patterns -> Nbr.I (sum_instances_numbers state.instances patterns))
-      ~get_tok:(fun i -> state.tokens.(i))
+      counter ~get_alg:(fun i -> Alg_expr.CONST state.imp.variables_cache.(i))
+      ~get_mix:(fun patterns ->
+          Nbr.I (sum_instances_numbers state.imp.instances patterns))
+      ~get_tok:(fun i -> state.imp.tokens.(i))
       alg
 
 
   let recompute env counter state i =
-    state.variables_cache.(i) <-
-      value_alg counter state (raw_get_alg env state.variables_overwrite i)
+    state.imp.variables_cache.(i) <-
+      value_alg counter state (raw_get_alg env state.imp.variables_overwrite i)
 
 
-  let activity state = Random_tree.total state.activities
-  let get_activity rule state = Random_tree.find rule state.activities
-  let set_activity rule v state = Random_tree.add rule v state.activities
-  let pick_rule rt state = fst (Random_tree.random rt state.activities)
+  let activity state = Random_tree.total state.imp.activities
+  let get_activity rule state = Random_tree.find rule state.imp.activities
+  let set_activity rule v state = Random_tree.add rule v state.imp.activities
+  let pick_rule rt state = fst (Random_tree.random rt state.imp.activities)
 
   let initial_activity ~outputs env counter state =
     Model.fold_rules
@@ -125,25 +134,28 @@ module Make (Instances:Instances_sig.S) = struct
     let variables_cache = Array.make (Model.nb_algs env) Nbr.zero in
     let cand =
       {
-        activities = activity_tree ;
+        imp = {
+          activities = activity_tree ;
+          precomputed = { unary_patterns; always_outdated};
+          instances = Instances.empty env;
+          variables_overwrite; variables_cache;
+          tokens = Array.make (Model.nb_tokens env) Nbr.zero;
+          random_state;
+          story_machinery =
+            if with_trace then
+              Some (Pattern.Env.new_obs_map
+                      (Model.domain env) (fun _ -> []))
+            else None;
+          species = Pattern.Env.new_obs_map
+              (Model.domain env) (fun _ -> []);
+          changed_connectivity = Hashtbl.create 32;
+        };
         outdated = false;
-        precomputed = { unary_patterns; always_outdated};
-        instances = Instances.empty env;
         matchings_of_rule = Mods.IntMap.empty;
         unary_candidates = Mods.IntMap.empty;
         nb_rectangular_instances_by_cc = Mods.IntMap.empty;
-        variables_overwrite; variables_cache;
         edges = Edges.empty ~with_connected_components;
-        tokens = Array.make (Model.nb_tokens env) Nbr.zero;
-        outdated_elements = always_outdated,Hashtbl.create 32;
-        random_state;
-        story_machinery =
-          if with_trace then
-            Some (Pattern.Env.new_obs_map
-                    (Model.domain env) (fun _ -> []))
-          else None;
-        species = Pattern.Env.new_obs_map
-            (Model.domain env) (fun _ -> []);
+        outdated_elements = always_outdated;
         events_to_block = None;
       } in
     let () = Tools.iteri (recompute env counter cand) (Model.nb_algs env) in
@@ -219,17 +231,15 @@ module Make (Instances:Instances_sig.S) = struct
            Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
         out
 
-  let pop_exact_matchings state rule =
-    match Mods.IntMap.pop rule state.matchings_of_rule with
-    | None,_ -> state
-    | Some _, match' -> { state with matchings_of_rule = match' }
+  let pop_exact_matchings matchings_of_rule rule =
+    snd (Mods.IntMap.pop rule matchings_of_rule)
 
   let pick_a_rule_instance
       ~debugMode state random_state domain edges ?rule_id rule =
     let from_patterns () =
       let pats = rule.Primitives.connected_components in
       Instances.fold_picked_instance ?rule_id
-        state.instances random_state pats ~init:(Matching.empty,[])
+        state.imp.instances random_state pats ~init:(Matching.empty,[])
         (fun id pattern root (inj, rev_roots) ->
            match Matching.reconstruct
                    ~debugMode domain edges inj id pattern root with
@@ -247,7 +257,7 @@ module Make (Instances:Instances_sig.S) = struct
   let adjust_rule_instances
       ~debugMode ~rule_id ?unary_rate state domain edges ccs rule =
     let matches = all_injections
-        ~debugMode ?unary_rate ~rule_id state.instances domain edges ccs in
+        ~debugMode ?unary_rate ~rule_id state.imp.instances domain edges ccs in
     let matches =
       if state.events_to_block = None then matches
       else matches |> List.filter (fun (matching, _) ->
@@ -258,16 +268,19 @@ module Make (Instances:Instances_sig.S) = struct
         Mods.IntMap.add rule_id matches state.matchings_of_rule }
 
   (* With rectangular approximation *)
-  let compute_unary_number state modified_ccs rule rule_id =
+  let compute_unary_number
+      instances (nb_rectangular_instances_by_cc, unary_candidates)
+      modified_ccs rule rule_id =
     let pat1 = rule.Primitives.connected_components.(0) in
     let pat2 = rule.Primitives.connected_components.(1) in
 
     let number_of_unary_instances_in_cc =
-      Instances.number_of_unary_instances_in_cc ~rule_id state.instances (pat1, pat2) in
+      Instances.number_of_unary_instances_in_cc
+        ~rule_id instances (pat1, pat2) in
 
     let old_pack =
       Mods.IntMap.find_default
-        ValMap.empty rule_id state.nb_rectangular_instances_by_cc in
+        ValMap.empty rule_id nb_rectangular_instances_by_cc in
     let new_pack =
       Hashtbl.fold
         (fun cc () i_inst ->
@@ -276,17 +289,14 @@ module Make (Instances:Instances_sig.S) = struct
           else ValMap.add cc new_v i_inst)
         modified_ccs old_pack in
     let va = ValMap.total new_pack in
-    let nb_rectangular_instances_by_cc =
+    let nb_rectangular_instances_by_cc' =
       if va = 0 then
-        Mods.IntMap.remove rule_id state.nb_rectangular_instances_by_cc
-      else Mods.IntMap.add rule_id new_pack state.nb_rectangular_instances_by_cc in
-    let state =
+        Mods.IntMap.remove rule_id nb_rectangular_instances_by_cc
+      else Mods.IntMap.add rule_id new_pack nb_rectangular_instances_by_cc in
+    let _, unary_candidates' =
       (* Invalidates the cache *)
-      match Mods.IntMap.pop rule_id state.unary_candidates with
-      | None, _ -> { state with nb_rectangular_instances_by_cc }
-      | Some _, unary_candidates ->
-        { state with nb_rectangular_instances_by_cc ; unary_candidates } in
-    (va, state)
+      Mods.IntMap.pop rule_id unary_candidates in
+    (va, (nb_rectangular_instances_by_cc', unary_candidates'))
 
   let pick_a_unary_rule_instance
       ~debugMode state random_state domain edges ~rule_id rule =
@@ -299,7 +309,7 @@ module Make (Instances:Instances_sig.S) = struct
       let pat2 = rule.Primitives.connected_components.(1) in
       let pick_unary_instance_in_cc =
         Instances.pick_unary_instance_in_cc ~rule_id
-          state.instances random_state (pat1, pat2) in
+          state.imp.instances random_state (pat1, pat2) in
       let cc_id = ValMap.random
           random_state
           (Mods.IntMap.find_default
@@ -324,7 +334,7 @@ module Make (Instances:Instances_sig.S) = struct
     let pattern1 = pats.(0) in let pattern2 = pats.(1) in
     let cands,len =
       Instances.fold_unary_instances ~rule_id
-        state.instances (pattern1, pattern2) ~init:([], 0)
+        state.imp.instances (pattern1, pattern2) ~init:([], 0)
         (fun (root1, root2) (list,len as out) ->
            let inj1 = Matching.reconstruct
                ~debugMode domain graph Matching.empty 0 pattern1 root1 in
@@ -363,7 +373,7 @@ module Make (Instances:Instances_sig.S) = struct
            Format.fprintf
              f "%%init: %a %a"
              Nbr.print el (Model.print_token ~env) i))
-      state.tokens
+      state.imp.tokens
 
   let debug_print f state =
     Format.fprintf
@@ -372,8 +382,8 @@ module Make (Instances:Instances_sig.S) = struct
       (Pp.array Pp.space (fun i f el ->
            Format.fprintf f "%a token_%i"
              Nbr.print el i))
-      state.tokens
-      Instances.debug_print state.instances
+      state.imp.tokens
+      Instances.debug_print state.imp.instances
 
   type stats = { mixture_stats : Edges.stats }
 
@@ -633,7 +643,7 @@ module Make (Instances:Instances_sig.S) = struct
       ~debugMode outputs counter domain inj_nodes state event_kind ?path rule sigs =
     let () = assert (not state.outdated) in
     let () = state.outdated <- true in
-    let former_deps,mod_connectivity_store = state.outdated_elements in
+    let mod_connectivity_store = state.imp.changed_connectivity in
     (*Negative update*)
     let concrete_removed =
       List.map
@@ -647,13 +657,13 @@ module Make (Instances:Instances_sig.S) = struct
         concrete_removed in
     let (side_effects,edges_after_neg) =
       List.fold_left
-        (apply_negative_transformation ~mod_connectivity_store state.instances)
+        (apply_negative_transformation ~mod_connectivity_store state.imp.instances)
         ([],state.edges) concrete_removed in
     let () =
       List.iter
         (fun (pat,(root,_)) ->
            Instances.update_roots
-             state.instances false state.precomputed.unary_patterns
+             state.imp.instances false state.imp.precomputed.unary_patterns
              edges_after_neg mod_connectivity_store pat root)
         del_obs in
     (*Positive update*)
@@ -664,7 +674,7 @@ module Make (Instances:Instances_sig.S) = struct
            let (x', h') =
              apply_positive_transformation
                ~debugMode (Pattern.Env.signatures domain) ~mod_connectivity_store
-               state.instances x h in
+               state.imp.instances x h in
            (x',h'::p))
         (((inj_nodes,Mods.IntMap.empty),side_effects,edges_after_neg),[])
         rule.Primitives.inserted in
@@ -682,42 +692,36 @@ module Make (Instances:Instances_sig.S) = struct
       List.iter
         (fun (pat,(root,_)) ->
            Instances.update_roots
-             state.instances true state.precomputed.unary_patterns
+             state.imp.instances true state.imp.precomputed.unary_patterns
              edges'' mod_connectivity_store pat root)
         new_obs in
     (*Store event*)
     let new_tracked_obs_instances =
       store_obs
-        ~debugMode domain edges'' state.instances new_obs [] state.story_machinery in
+        ~debugMode domain edges'' state.imp.instances
+        new_obs [] state.imp.story_machinery in
     let () =
       store_event
         ~debugMode counter final_inj2graph new_tracked_obs_instances event_kind
-        ?path remaining_side_effects rule outputs state.story_machinery in
+        ?path remaining_side_effects rule outputs state.imp.story_machinery in
     (*Print species*)
     let species =
-      get_species_obs ~debugMode sigs edges'' new_obs [] state.species in
+      get_species_obs ~debugMode sigs edges'' new_obs [] state.imp.species in
     let () =
       List.iter
         (fun (file,_,mixture) ->
            outputs (Data.Species
                       (file,(Counter.current_time counter),mixture))) species in
     let rev_deps = Operator.DepSet.union
-        former_deps (Operator.DepSet.union del_deps new_deps) in
+        state.outdated_elements (Operator.DepSet.union del_deps new_deps) in
     {
       outdated = false;
-      precomputed = state.precomputed;
-      instances = state.instances;
+      imp = state.imp;
       matchings_of_rule = state.matchings_of_rule;
       unary_candidates = state.unary_candidates;
       nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc;
-      variables_cache = state.variables_cache;
-      variables_overwrite = state.variables_overwrite;
-      edges = edges''; tokens = state.tokens;
-      outdated_elements = rev_deps,mod_connectivity_store;
-      activities = state.activities;
-      random_state = state.random_state;
-      story_machinery = state.story_machinery;
-      species = state.species;
+      edges = edges'';
+      outdated_elements = rev_deps;
       events_to_block = state.events_to_block;
     }
 
@@ -725,7 +729,7 @@ module Make (Instances:Instances_sig.S) = struct
       ~debugMode ~outputs sigs counter domain state (actions,side_effect_dst) =
     let () = assert (not state.outdated) in
     let () = state.outdated <- true in
-    let former_deps,mod_connectivity_store = state.outdated_elements in
+    let mod_connectivity_store = state.imp.changed_connectivity in
     (*Negative update*)
     let lnk_dst ((a,_),s) = Edges.link_destination a s state.edges in
     let concrete_removed =
@@ -738,14 +742,15 @@ module Make (Instances:Instances_sig.S) = struct
         concrete_removed in
     let (_side_effects,edges_after_neg) =
       List.fold_left
-        (apply_negative_transformation ~mod_connectivity_store state.instances)
+        (apply_negative_transformation
+           ~mod_connectivity_store state.imp.instances)
         ([],state.edges)
         concrete_removed in
     let () =
       List.iter
         (fun (pat,(root,_)) ->
            Instances.update_roots
-             state.instances false state.precomputed.unary_patterns
+             state.imp.instances false state.imp.precomputed.unary_patterns
              edges_after_neg mod_connectivity_store pat root)
         del_obs in
     (*Positive update*)
@@ -757,7 +762,7 @@ module Make (Instances:Instances_sig.S) = struct
         (fun x h ->
            apply_concrete_positive_transformation
              (Pattern.Env.signatures domain) ~mod_connectivity_store
-             state.instances x h)
+             state.imp.instances x h)
         edges_after_neg concrete_inserted in
     let ((new_obs,new_deps),_) =
       List.fold_left
@@ -768,33 +773,27 @@ module Make (Instances:Instances_sig.S) = struct
       List.iter
         (fun (pat,(root,_)) ->
            Instances.update_roots
-             state.instances true state.precomputed.unary_patterns
+             state.imp.instances true state.imp.precomputed.unary_patterns
              edges' mod_connectivity_store pat root)
         new_obs in
     (*Print species*)
     let species =
-      get_species_obs ~debugMode sigs edges' new_obs [] state.species in
+      get_species_obs ~debugMode sigs edges' new_obs [] state.imp.species in
     let () =
       List.iter
         (fun (file,_,mixture) ->
            outputs (Data.Species
                       (file,(Counter.current_time counter),mixture))) species in
     let rev_deps = Operator.DepSet.union
-        former_deps (Operator.DepSet.union del_deps new_deps) in
-    { activities = state.activities ;
+        state.outdated_elements (Operator.DepSet.union del_deps new_deps) in
+    {
       outdated = false;
-      precomputed = state.precomputed;
-      instances = state.instances;
+      imp = state.imp;
       matchings_of_rule = state.matchings_of_rule ;
       nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc ;
       unary_candidates = state.unary_candidates ;
-      variables_cache = state.variables_cache;
-      variables_overwrite = state.variables_overwrite;
-      edges = edges'; tokens = state.tokens;
-      outdated_elements = rev_deps,mod_connectivity_store;
-      random_state = state.random_state;
-      story_machinery = state.story_machinery;
-      species = state.species;
+      edges = edges';
+      outdated_elements = rev_deps;
       events_to_block = state.events_to_block;
     }
 
@@ -832,71 +831,75 @@ module Make (Instances:Instances_sig.S) = struct
   let update_outdated_activities
       ~debugMode store env counter state known_perts =
     let () = assert (not state.outdated) in
-    let deps,changed_connectivity = state.outdated_elements in
-    let unary_rule_update modified_cc i state rule =
+    let unary_rule_update modified_cc instances i pack rule =
       match rule.Primitives.unary_rate with
-      | None -> state
+      | None -> pack
       | Some (unrate, _) ->
-        let va, state =
-          compute_unary_number state modified_cc rule i in
+        let va, pack' =
+          compute_unary_number instances pack modified_cc rule i in
         let () =
           store_activity
             ~debugMode store env counter state (2*i+1)
             rule.Primitives.syntactic_rule (fst unrate) va in
-        state in
+        pack' in
     let rec aux dep acc =
       Operator.DepSet.fold
-        (fun dep (state,perts as acc) ->
+        (fun dep (exact_matchings,perts as acc) ->
            match dep with
            | Operator.ALG j ->
              let () = recompute env counter state j in
              aux (Model.get_alg_reverse_dependencies env j) acc
            | Operator.MODIF p ->
-             (state,p::perts)
+             (exact_matchings,p::perts)
            | Operator.RULE i ->
              let rule = Model.get_rule env i in
              let pattern_va = Instances.number_of_instances
                  ~rule_id:i
-                 state.instances rule.Primitives.connected_components in
+                 state.imp.instances rule.Primitives.connected_components in
              let () =
                store_activity
                  ~debugMode store env counter state (2*i)
                  rule.Primitives.syntactic_rule
                  (fst rule.Primitives.rate) pattern_va in
-             let state = pop_exact_matchings state i in
-             (state,perts))
+             (pop_exact_matchings exact_matchings i,perts))
         dep acc in
-    let state',perts = aux deps (state,known_perts) in
-    let state'' =
-      if Hashtbl.length changed_connectivity = 0 then state'
-      else Model.fold_rules (unary_rule_update changed_connectivity) state' env in
-    ({state'' with
-      outdated_elements =
-        state.precomputed.always_outdated,Hashtbl.create 32},perts)
+    let matchings_of_rule,perts =
+      aux state.outdated_elements (state.matchings_of_rule,known_perts) in
+    let (nb_rectangular_instances_by_cc, unary_candidates) =
+      if Hashtbl.length state.imp.changed_connectivity = 0 then
+        (state.nb_rectangular_instances_by_cc, state.unary_candidates)
+      else Model.fold_rules
+          (unary_rule_update state.imp.changed_connectivity state.imp.instances)
+          (state.nb_rectangular_instances_by_cc, state.unary_candidates)
+          env in
+    ({
+      outdated = false; imp = state.imp; edges = state.edges;
+      events_to_block = state.events_to_block;
+      matchings_of_rule; nb_rectangular_instances_by_cc; unary_candidates;
+      outdated_elements = state.imp.precomputed.always_outdated;
+    },perts)
 
   let overwrite_var i counter state expr =
-    let rdeps,changed_connectivity = state.outdated_elements in
     let () =
-      state.variables_overwrite.(i) <-
+      state.imp.variables_overwrite.(i) <-
         Some (Alg_expr.CONST (value_alg counter state expr)) in
     {state with
      outdated_elements =
-       (Operator.DepSet.add (Operator.ALG i) rdeps,changed_connectivity)}
+       Operator.DepSet.add (Operator.ALG i) state.outdated_elements}
 
   let update_tokens env counter state injected =
     let injected' = List.rev_map
         (fun  ((expr,_),i) -> (value_alg counter state expr,i)) injected in
-    List.fold_left
-      (fun st (va,i) ->
-         let () = st.tokens.(i) <- Nbr.add st.tokens.(i) va in
-         let deps' = Model.get_token_reverse_dependencies env i in
-         if Operator.DepSet.is_empty deps' then st
-         else
-           let rdeps,changed_connectivity = st.outdated_elements in
-           { st with outdated_elements =
-                       Operator.DepSet.union rdeps deps',changed_connectivity }
-      ) state injected'
-
+    { state with
+      outdated_elements =
+        List.fold_left
+          (fun rdeps (va,i) ->
+             let () = state.imp.tokens.(i) <- Nbr.add state.imp.tokens.(i) va in
+             let deps' = Model.get_token_reverse_dependencies env i in
+             if Operator.DepSet.is_empty deps' then rdeps
+             else
+               Operator.DepSet.union rdeps deps')
+          state.outdated_elements injected' }
 
   let transform_by_a_rule
       ~debugMode outputs env counter state event_kind ?path rule ?rule_id inj =
@@ -915,12 +918,11 @@ module Make (Instances:Instances_sig.S) = struct
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
     let inj,path = pick_a_unary_rule_instance
-        ~debugMode state state.random_state domain state.edges ~rule_id rule in
-    let rdeps,changed_c = state.outdated_elements in
+        ~debugMode state state.imp.random_state domain state.edges ~rule_id rule in
     let state' =
       {state with
        outdated_elements =
-         (Operator.DepSet.add (Operator.RULE rule_id) rdeps,changed_c)} in
+         Operator.DepSet.add (Operator.RULE rule_id) state.outdated_elements} in
     match inj with
     | None -> Clash
     | Some inj ->
@@ -948,7 +950,8 @@ module Make (Instances:Instances_sig.S) = struct
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
     match pick_a_rule_instance
-            ~debugMode state state.random_state domain state.edges ?rule_id rule with
+            ~debugMode state state.imp.random_state
+            domain state.edges ?rule_id rule with
     | None -> Clash
     | Some (inj,rev_roots) ->
       let () =
@@ -998,7 +1001,7 @@ module Make (Instances:Instances_sig.S) = struct
            | Some d ->
              Some (loc,Some (max_dist_to_int counter state d))) in
       match all_injections ~debugMode ?rule_id
-              ?unary_rate state.instances (Model.domain env) state.edges
+              ?unary_rate state.imp.instances (Model.domain env) state.edges
               rule.Primitives.connected_components with
       | [] ->
         let () =
@@ -1010,7 +1013,7 @@ module Make (Instances:Instances_sig.S) = struct
                     (Trace.print_event_kind ~env) event_kind)) in
         None
       | l ->
-        let (h,_) = List_util.random state.random_state l in
+        let (h,_) = List_util.random state.imp.random_state l in
         let out =
           transform_by_a_rule
             ~debugMode outputs env counter state event_kind rule ?rule_id h in
@@ -1061,7 +1064,7 @@ module Make (Instances:Instances_sig.S) = struct
   let incorporate_extra_pattern ~debugMode domain state pattern =
     let () = assert (not state.outdated) in
     let () = Instances.incorporate_extra_pattern
-        state.instances pattern
+        state.imp.instances pattern
         (Matching.roots_of ~debugMode domain state.edges pattern) in
     { state with outdated = false }
 
@@ -1072,13 +1075,13 @@ module Make (Instances:Instances_sig.S) = struct
     Data.snapshot_agents =
       Edges.build_user_snapshot ~debugMode (Model.signatures env) state.edges;
     Data.snapshot_tokens = Array.mapi (fun i x ->
-        (Format.asprintf "%a" (Model.print_token ~env) i,x)) state.tokens;
+        (Format.asprintf "%a" (Model.print_token ~env) i,x)) state.imp.tokens;
   }
 
   let apply_rule
       ~debugMode ~outputs ?maxConsecutiveBlocked ~maxConsecutiveClash
       env counter graph =
-    let choice = pick_rule graph.random_state graph in
+    let choice = pick_rule graph.imp.random_state graph in
     let rule_id = choice/2 in
     let rule = Model.get_rule env rule_id in
     let cause = Trace.RULE rule_id in
@@ -1086,8 +1089,8 @@ module Make (Instances:Instances_sig.S) = struct
       if debugMode then
         Format.printf
           "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
-          (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
-          rule_id (Kappa_printer.decompiled_rule ~noCounters:true ~full:true env) rule
+          (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ") rule_id
+          (Kappa_printer.decompiled_rule ~noCounters:true ~full:true env) rule
           (*Rule_interpreter.print_dist env graph rule_id*) in
     let apply_rule =
       if choice mod 2 = 1
@@ -1133,7 +1136,7 @@ module Make (Instances:Instances_sig.S) = struct
 
   let add_tracked ~outputs patterns name tests state =
     let () = assert (not state.outdated) in
-    match state.story_machinery with
+    match state.imp.story_machinery with
     | None ->
       let () =
         outputs
@@ -1146,7 +1149,7 @@ module Make (Instances:Instances_sig.S) = struct
     | Some tpattern -> aux_add_tracked patterns name tests state tpattern
   let remove_tracked patterns name state =
     let () = assert (not state.outdated) in
-    match state.story_machinery with
+    match state.imp.story_machinery with
     | None -> state
     | Some tpattern ->
       match name with
@@ -1167,32 +1170,38 @@ module Make (Instances:Instances_sig.S) = struct
       | Some name ->
         let () = state.outdated <- true in
         let tester (n,_,_) = not((String.compare name n) = 0) in
-        let tpattern' =
-          Pattern.ObsMap.map
-            (fun plist -> List.filter tester plist) tpattern in
-        { state with outdated = false; story_machinery = Some tpattern' }
+        let () =
+          Pattern.ObsMap.iteri
+            (fun cc_id plist ->
+               Pattern.ObsMap.set tpattern cc_id (List.filter tester plist))
+            tpattern in
+        { state with outdated = false }
 
   let add_tracked_species patterns name tests state =
-    aux_add_tracked patterns name tests state state.species
+    aux_add_tracked patterns name tests state state.imp.species
 
   let remove_tracked_species name state =
     let () = state.outdated <- true in
     let tester (n,_,_) = not((String.compare name n) = 0) in
-    let species' =
-      Pattern.ObsMap.map
-        (fun plist -> List.filter tester plist) state.species in
-    { state with outdated = false; species = species' }
+    let () =
+      Pattern.ObsMap.iteri
+        (fun cc_id plist ->
+           Pattern.ObsMap.set state.imp.species cc_id (List.filter tester plist))
+        state.imp.species in
+    { state with outdated = false }
 
-  let get_random_state state = state.random_state
+  let get_random_state state = state.imp.random_state
 
   let send_instances_message msg state =
-    { state with instances = Instances.receive_message msg state.instances }
+    { state with
+      imp = { state.imp with
+              instances = Instances.receive_message msg state.imp.instances } }
 
   let add_outdated_dependencies new_deps state =
-    let former_deps,mod_connectivity = state.outdated_elements in
-    let deps = Operator.DepSet.union new_deps former_deps in
-    { state with outdated_elements = deps, mod_connectivity }
+    let outdated_elements =
+      Operator.DepSet.union new_deps state.outdated_elements in
+    { state with outdated_elements }
 
-  let debug_print_instances f st = Instances.debug_print f st.instances
+  let debug_print_instances f st = Instances.debug_print f st.imp.instances
 
 end
