@@ -15,7 +15,7 @@ CodeMirror.defineSimpleMode("Kappa", {
       {regex: /(\[E\]|\[E\+\]|\[E\-\]|\[Emax\]|\[T\]|\[Tsim\]|\[Tmax\]|\[pi\]|\[true\]|\[false\])/,
        token: "atom"},
       {regex: /'([^']+)'/, token: "variable"},
-      {regex: /\/\*/, token: "comment", next: "comment"},
+      {regex: /\/\*/, token: "comment", push: "comment"},
       {regex: /(\@|\,|\(|\)|\{|\}|\[|\]|\||\.|\+|\*|\-|\^|\/|\<|\>|\=|\%|\:|\#|\;)/,
        token: "variable-2"},
       {regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
@@ -24,8 +24,10 @@ CodeMirror.defineSimpleMode("Kappa", {
   ],
   // The multi-line comment state.
     comment: [
-        {regex: /.*?\*\//, token: "comment", next: "start"},
-        {regex: /.*/, token: "comment"}
+        {regex: /\/\*/, token: "comment", push: "comment"},
+        {regex: /\/\/(.*)/, token: "comment"},
+        {regex: /.*\*\//, token: "comment", pop: true},
+        {regex: /./, token: "comment"}
     ],
   // The meta property contains global information about the mode. It
   // can contain properties like lineComment, which are supported by
