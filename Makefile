@@ -156,20 +156,20 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete
 	rm -f grammar/kappaLexer.ml grammar/kappaParser.ml grammar/kappaParser.mli
 
+# https://electronjs.org/docs/tutorial/application-distribution
+
 Kappapp.tar.gz:
 	+$(MAKE) clean
 	+$(MAKE) APP_EXT=local site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
-	FILE=$$(mktemp -t nwjsXXXX); \
-	curl -LsS -o $$FILE https://dl.nwjs.io/v$(NWJS_VERSION)/nwjs-v$(NWJS_VERSION)-linux-x64.tar.gz && \
-	tar xzf $$FILE && rm -f $$FILE
 	mkdir Kappapp
-	mv nwjs-v$(NWJS_VERSION)-linux-x64/* Kappapp/
-	rmdir nwjs-v$(NWJS_VERSION)-linux-x64
-	mv Kappapp/nw Kappapp/kappapp
-	mv site Kappapp/package.nw
-	mkdir Kappapp/bin
-	cp bin/* Kappapp/bin/
+	FILE=$$(mktemp -t electronXXXX); \
+	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-linux-x64.zip && \
+	unzip $$FILE -d Kappapp
+	mv Kappapp/electron Kappapp/kappapp
+	mv site Kappapp/resources/app
+	mkdir Kappapp/resources/bin
+	cp bin/* Kappapp/resources/bin/
 	tar czf $@ Kappapp
 	rm -r Kappapp
 
@@ -178,37 +178,33 @@ KappaBin.zip:
 	+$(MAKE) APP_EXT=local site/index.html
 	dune build -x windows --only-packages kappa-library,kappa-binaries,kappa-agents
 	mkdir KappaBin
-	mkdir KappaBin/bin
-	mv site KappaBin/package.nw
-	FILE=$$(mktemp -t nwjsXXXX); \
-	curl -LsS -o $$FILE https://dl.nwjs.io/v$(NWJS_VERSION)/nwjs-v$(NWJS_VERSION)-win-x64.zip && \
-	unzip $$FILE && rm -f $$FILE
-	mv nwjs-v$(NWJS_VERSION)-win-x64/* KappaBin/
-	rmdir nwjs-v$(NWJS_VERSION)-win-x64
-	mv KappaBin/nw.exe KappaBin/Kappapp.exe
-	cp _build/default.windows/main/KaSim.exe KappaBin/bin/
-	cp _build/default.windows/KaSa_rep/main/KaSa.exe KappaBin/bin/
-	cp _build/default.windows/agents/KaStor.exe KappaBin/bin/
-	cp _build/default.windows/odes/KaDE.exe KappaBin/bin/
-	cp _build/default.windows/agents/KaSimAgent.exe KappaBin/bin/
-	cp _build/default.windows/agents/KaSaAgent.exe KappaBin/bin/
+	FILE=$$(mktemp -t electronXXXX); \
+	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
+	unzip $$FILE -d KappaBin
+	mv site KappaBin/resources/app
+	mv KappaBin/electron.exe KappaBin/Kappapp.exe
+	mkdir KappaBin/resources/bin
+	cp _build/default.windows/main/KaSim.exe KappaBin/resources/bin/
+	cp _build/default.windows/KaSa_rep/main/KaSa.exe KappaBin/resources/bin/
+	cp _build/default.windows/agents/KaStor.exe KappaBin/resources/bin/
+	cp _build/default.windows/odes/KaDE.exe KappaBin/resources/bin/
+	cp _build/default.windows/agents/KaSimAgent.exe KappaBin/resources/bin/
+	cp _build/default.windows/agents/KaSaAgent.exe KappaBin/resources/bin/
 	zip -y -r $@ KappaBin
 	rm -r KappaBin
 
-Kappapp.app:
+Kappapp.app: ide/Info.plist ide/Kappa.icns
 	+$(MAKE) clean
 	+$(MAKE) APP_EXT=local site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	+$(MAKE) ide/Kappa.icns ide/Info.plist
-	FILE=$$(mktemp -t nwjsXXXX); \
-	curl -LsS -o $$FILE https://dl.nwjs.io/v$(NWJS_VERSION)/nwjs-v$(NWJS_VERSION)-osx-x64.zip && \
-	unzip $$FILE && rm -f $$FILE
-	mv nwjs-v$(NWJS_VERSION)-osx-x64/nwjs.app $@
-	rm -r nwjs-v$(NWJS_VERSION)-osx-x64/
+	FILE=$$(mktemp -t electronXXXX); FOLDER=$$(mktemp -t electron_unzipedXXXX); \
+	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-darwin-x64.zip && \
+	rm $$FOLDER && mkdir -p $$FOLDER && pushd $$FOLDER && unzip $$FILE && popd && mv $$FOLDER/Electron.app $@ && rm -r $$FOLDER
 	rm -r $@/Contents/Resources/*.lproj/
 	mkdir $@/Contents/Resources/bin
 	cp bin/* $@/Contents/Resources/bin/
-	mv site $@/Contents/Resources/app.nw
+	mv site $@/Contents/Resources/app/
 	mv ide/Kappa.icns $@/Contents/Resources/
 	mv ide/Info.plist $@/Contents/
 

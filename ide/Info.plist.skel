@@ -5,7 +5,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>org.executableknowledge.kappapp</string>
 	<key>CFBundleExecutable</key>
-	<string>nwjs</string>
+	<string>Electron</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>LSApplicationCategoryType</key>
@@ -25,7 +25,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
-	<string>NWJS</string>
+	<string>Electron</string>
 	<key>CFBundleIconFile</key>
 	<string>Kappa.icns</string>
 	<key>CFBundleDocumentTypes</key>
@@ -66,5 +66,23 @@
 	<string>10.9.0</string>
 	<key>NSUserNotificationAlertStyle</key>
 	<string>banner</string>
+	<key>BuildMachineOSBuild</key>
+	<string>16G1710</string>
+	<key>DTSDKBuild</key>
+	<string>16E185</string>
+	<key>DTSDKName</key>
+	<string>macosx10.1210.12</string>
+	<key>DTXcode</key>
+	<string>0833</string>
+	<key>DTXcodeBuild</key>
+	<string>8E3004b</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>AtomApplication</string>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
 </dict>
 </plist>
