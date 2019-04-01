@@ -1302,14 +1302,14 @@ let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
   let overwrite',rev_algs =
     overwrite_overwritten
       (overwrite_overwritten (overwrite,[]) c.Ast.variables) extra_vars in
-  let rev_alg_vars_over =
+  let alg_vars_over =
     List_util.rev_map_append
       (fun (x,v) -> (Locality.dummy_annot x, Alg_expr.const v))
-      overwrite' rev_algs in
+      overwrite' (List.rev rev_algs) in
+  let alg_vars_array = Array.of_list alg_vars_over in
     let algs =
     (NamedDecls.create
-       ~forbidden:rule_names
-       (Tools.array_rev_of_list rev_alg_vars_over)).NamedDecls.finder in
+       ~forbidden:rule_names alg_vars_array).NamedDecls.finder in
   let tk_nd = NamedDecls.create
       (Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
@@ -1339,12 +1339,12 @@ let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
   {
     Ast.filenames = c.Ast.filenames;
     Ast.variables =
-      List_util.rev_mapi
-        (fun i (lab,expr) ->
+      Tools.array_fold_righti
+        (fun i (lab,expr) acc ->
            (lab,alg_expr_of_ast
               ~warning ~syntax_version ~max_allowed_var:(pred i)
-              sigs tok algs expr))
-        rev_alg_vars_over;
+              sigs tok algs expr)::acc)
+        alg_vars_array [];
     Ast.rules;
     Ast.observables =
       List.rev_map (fun expr ->

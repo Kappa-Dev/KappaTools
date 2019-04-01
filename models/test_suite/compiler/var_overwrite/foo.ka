@@ -1,0 +1,4 @@
+%agent: A()
+%var: init_A 10 * i_A
+%init: init_A A()
+A()- @ 1

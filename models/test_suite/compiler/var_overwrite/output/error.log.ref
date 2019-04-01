@@ -1,0 +1,21 @@
+_____(1)
+A()-
+_____(1)
+A()+
+Environment:
+  %agent: A()
+  
+  %var:/*0*/ 'i_A' 10
+  %var:/*1*/ 'init_A' (10 * i_A)
+  %plot: [T]
+  A()- @ 1
+  Rules:
+    0: (ast: 1) 0: /*cc1*/ A/*1*/() -- A/*1*//*0*/ ++  @1
+Polymers:
+  
+Domain:
+  /*cc0*/  -> ()
+  /*cc1*/ A/*1*/() [rate_of_rule [0]] -> ()
+Intial graph;
+  %init: 100 A()
+  
