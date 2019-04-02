@@ -1,2 +1,2 @@
 #!/bin/sh
-"${KAPPABIN}"KaSim -i foo.ka -var i_A 10 -d output --compile || exit 0
+"${KAPPABIN}"KaSim -i foo.ka -var i_A 10 -d output --compile -seed 665363560 || exit 0
