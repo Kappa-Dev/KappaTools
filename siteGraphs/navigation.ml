@@ -94,6 +94,11 @@ let rec print sigs find_ty f = function
 
 let compatible_fresh_point ~debugMode e (sid,sty) ssite arrow =
   match e,arrow with
+  | _, ToNode (Existing _,_) ->
+    raise
+      (ExceptionDefn.Internal_Error
+         (Locality.dummy_annot
+            "Navigation.compatible_fresh_point does not deal with existing arrow"))
   | ((Fresh (id,ty),site),x), ToNothing ->
     if ty = sty && site = ssite && x = ToNothing
     then let inj = Renaming.empty () in
@@ -106,28 +111,30 @@ let compatible_fresh_point ~debugMode e (sid,sty) ssite arrow =
     else None
   | ((Fresh (id,ty),site), ToNode (Fresh (id',ty'),site')),
     ToNode (Fresh (sid',sty'),ssite') ->
-    if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-    then let inj = Renaming.empty () in
+    (* link between 2 agents *)
+    if ty = sty && site = ssite && ty' = sty' && site' = ssite' then
+      let inj = Renaming.empty () in
       if Renaming.imperative_add ~debugMode id sid inj then
         if Renaming.imperative_add ~debugMode id' sid' inj
         then Some inj else None
       else None
-    else if ty = sty' && site = ssite' && ty' = sty && site' = ssite
-    then let inj = Renaming.empty () in
+    else if ty = sty' && site = ssite' && ty' = sty && site' = ssite then
+      let inj = Renaming.empty () in
       if Renaming.imperative_add ~debugMode id sid' inj then
         if Renaming.imperative_add ~debugMode id' sid inj then Some inj else None
       else None
     else None
-  | (((Existing id,site), ToNode (Fresh(id',ty'),site'))
-    | ((Fresh(id',ty'),site), ToNode (Existing id,site'))),
-    ToNode (Existing sid',ssite') ->
+  | ((Existing id,site), ToNode (Fresh (id',ty),site') |
+     (Fresh (id',ty),site), ToNode (Existing id,site')),
+    ToNode (Fresh (sid',sty'),ssite') ->
+    (* self-link in agent *)
     if  ((ssite = site && ssite' = site') || (ssite' = site && ssite = site'))
-        && ty' = sty && id = id' && sid = sid'
+        && id = id' && sid = sid' && ty = sty && sty = sty'
     then let inj = Renaming.empty () in
-      if Renaming.imperative_add ~debugMode id sid' inj then Some inj else None
+      if Renaming.imperative_add ~debugMode id sid inj then Some inj else None
     else None
-  | ((Existing _,_),_), _ -> None
-  | ((Fresh _,_),_), ToNode _ -> None
+  | ((Existing _,_), _), _ -> None
+  | ((Fresh _,_),(ToNothing | ToInternal _)), ToNode _ -> None
 
 let compatible_point ~debugMode inj e e' =
   match e,e' with
