@@ -404,27 +404,23 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
             | [site_id'] (* link between 2 sites of 1 agent *)
               when List.for_all (fun x -> not(is_linked_on i x)) acc &&
                    List.for_all (fun x -> not(is_linked_on i x)) re ->
-              let wk'' =
+              let wk'',(transf',l_t') =
                 if site_id' > site_id then
-                  Pattern.new_link
-                    wk' (node,site_id) (node,site_id')
-                else wk' in
-              let transf',l_t' =
-                define_full_transformation
-                  transf l_t place site_id
-                  (Primitives.Transformation.Linked
-                     ((place,site_id),(place,site_id')),Some pos) s in
-              let transf'',l_t'' =
-                define_full_transformation
-                  transf' l_t' place site_id'
-                  (Primitives.Transformation.Linked
-                     ((place,site_id'),(place,site_id)),Some pos) s in
+                  (Pattern.new_link
+                     wk' (node,site_id) (node,site_id'),
+                   define_full_transformation
+                     transf l_t place site_id
+                     (Primitives.Transformation.Linked
+                        ((place,site_id),(place,site_id')),Some pos) s)
+                else
+                  (wk',(define_positive_transformation
+                          transf l_t place site_id s)) in
               let c_l' =
                 Mods.IntMap.add
                   i (Instantiation.Is_Bound_to
                        ((place,site_id),(place,site_id'))) c_l in
               handle_ports
-                wk'' r_l c_l' transf'' l_t'' re acc (succ site_id)
+                wk'' r_l c_l' transf' l_t' re acc (succ site_id)
             | _ :: _ ->
               link_occurence_failure i pos
             | [] -> (* link between 2 agents *)
