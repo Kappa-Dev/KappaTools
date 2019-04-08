@@ -1,0 +1,23 @@
+%def: "seed" "753891112"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "progressBarSize" "60"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(x[y.A] y[x.A])
+
+%var:/*0*/ 'A self' |A(x[1] y[1])|
+%plot: [T]
+%plot: 'A self'
+
+'A binds intra' A(x[./1] y[./1]) @ 1
+'A unbinds intra' A(x[1/.] y[1/.]) @ 0.1
+A(x[1] y[1])- @ 0.02
+
+/*0*/%mod: (|A()| = 1) do $STOP ; repeat [false]
+
+%init: 10 A(x[1] y[1])
+
+%mod: [E] = 65 do $STOP;

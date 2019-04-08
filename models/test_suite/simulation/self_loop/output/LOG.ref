@@ -1,0 +1,19 @@
+Parsing model.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 6 (sub)observables 2 navigation steps
+	 -initial conditions
++ Building initial state (16 agents)
+Done
++ Command line to rerun is: 'KaSim' 'model.ka' '-mode' 'batch' '-d' 'output' '-syntax' '4' '-seed' '753891112'
+____________________________________________________________
+############################################################
+Simulation ended

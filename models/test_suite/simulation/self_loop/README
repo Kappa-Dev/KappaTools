@@ -1,0 +1,2 @@
+#!/bin/sh
+"${KAPPABIN}"KaSim model.ka -mode batch -d output -syntax 4 -seed 753891112 || exit 0
