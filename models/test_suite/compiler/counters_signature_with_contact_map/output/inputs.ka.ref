@@ -12,7 +12,7 @@
 
 %plot: [T]
 'r1' B(x[./1]), A(x[./1]) @ 1
-'r2' B(x[1/.] c{>=0/+=1}), A(x[1/.] c{>=0/+=1}),  @ 1
+'r2' B(x[1/.] c{>=0/+=1}), A(x[1/.] c{>=0/+=1}) @ 1
 
 /*0*/%mod: (|B(c{=4})| = 1) do $PRINTF "
 Counter c of agent B reached maximum

@@ -10,7 +10,7 @@
 %agent: A(x{u p} c{=1/+=10})
 
 %plot: [T]
-A(x{u/p}[.] c{>=0/+=1}),  @ 1
+A(x{u/p}[.] c{>=0/+=1}) @ 1
 /*0*/%mod: (|A(c{=11})| = 1) do $PRINTF "
 Counter c of agent A reached maximum
 "; $STOP "counter_perturbation.ka"; repeat [false]

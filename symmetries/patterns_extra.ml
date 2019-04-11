@@ -69,9 +69,11 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
         __POS__
         ?parameters
         (fun fmt ->
-           Raw_mixture.print ~noCounters ~created:false ~sigs fmt mix)
+           Raw_mixture.print
+             ~noCounters ~created:false ~initial_comma:false ~sigs fmt mix)
         (fun fmt ->
-           Raw_mixture.print ~noCounters ~created:false fmt mix)
+           Raw_mixture.print
+             ~noCounters ~created:false ~initial_comma:false fmt mix)
   in
   let unspec =
     List.fold_left
@@ -464,8 +466,10 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
         safe_print_str
           __POS__ ?parameters
           (fun fmt ->
-             Raw_mixture.print ~noCounters ~created:false ~sigs fmt output)
-          (fun fmt -> Raw_mixture.print ~noCounters ~created:false fmt output)
+             Raw_mixture.print
+               ~noCounters ~created:false ~initial_comma:false ~sigs fmt output)
+          (fun fmt -> Raw_mixture.print
+              ~noCounters ~created:false ~initial_comma:false fmt output)
       in
       Some (output, unspec)
     end

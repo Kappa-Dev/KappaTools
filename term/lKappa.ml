@@ -343,10 +343,8 @@ let print_agent_rhs ~ltypes sigs f ag =
 
 let print_rhs ~noCounters ~ltypes sigs created f mix =
   let rec aux empty = function
-    | [] ->
-      Format.fprintf f "%t%a"
-        (if empty || created = [] then Pp.empty else Pp.comma)
-        (Raw_mixture.print ~noCounters ~created:false ~sigs) created
+    | [] -> Raw_mixture.print
+              ~noCounters ~initial_comma:(not empty) ~created:false ~sigs f created
     | h :: t ->
       if h.ra_erased then
         let () = Format.fprintf f "%t."
@@ -390,10 +388,10 @@ let print_rule ~noCounters ~full sigs pr_tok pr_var f r =
     f "@[<h>%t%t%a%t@]"
     (fun f ->
        if full || r.r_editStyle then
-         Format.fprintf f "%a%t%a"
+         Format.fprintf f "%a%a"
            (print_rule_mixture ~noCounters sigs ~ltypes:false r.r_created) r.r_mix
-           (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
-           (Raw_mixture.print ~noCounters ~created:true ~sigs)
+           (Raw_mixture.print
+              ~noCounters ~created:true ~initial_comma:(r.r_mix <> []) ~sigs)
            r.r_created
        else Format.fprintf f "%a%t%a -> %a"
            (Pp.list Pp.comma (print_agent_lhs ~ltypes:false sigs)) r.r_mix

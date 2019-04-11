@@ -25,7 +25,8 @@ let print_initial_inputs ?uuid conf env inputs_form init =
               let () =
                 Format.fprintf f "@[<hov 2>%%init:@ @[%a@]@ @[%a@]@]"
                   (Kappa_printer.alg_expr ~noCounters ~env) n
-                  (Raw_mixture.print ~noCounters ~created:false ~sigs)
+                  (Raw_mixture.print
+                     ~noCounters ~created:false ~initial_comma:false ~sigs)
                   ins_fresh in
               if r.Primitives.delta_tokens <> [] then
                 Format.pp_print_space f () in

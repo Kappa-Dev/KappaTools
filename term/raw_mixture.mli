@@ -15,7 +15,7 @@ type t = agent list
 val copy_agent : agent -> agent
 
 val print :
-  noCounters:bool -> created:bool -> ?sigs:Signature.s ->
+  noCounters:bool -> created:bool -> initial_comma:bool -> ?sigs:Signature.s ->
   Format.formatter -> t -> unit
 
 val to_json : t -> Yojson.Basic.t

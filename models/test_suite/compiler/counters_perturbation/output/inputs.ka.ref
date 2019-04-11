@@ -10,8 +10,8 @@
 %agent: A(x{u p} c{=0/+=3})
 
 %plot: [T]
-'r1' A(x[.] c{>=0/+=1}),  @ 1
-'r2' A(x[.] c{>=1/+=1}),  @ 10
+'r1' A(x[.] c{>=0/+=1}) @ 1
+'r2' A(x[.] c{>=1/+=1}) @ 10
 
 /*0*/%mod: (|A(c{=4})| = 1) do $PRINTF "
 Counter c of agent A reached maximum

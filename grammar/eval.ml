@@ -450,7 +450,8 @@ let compile_inits
                         (Format.asprintf
                            "initial mixture %a is partially defined"
                            (Raw_mixture.print
-                              ~noCounters:debugMode ~created:true ~sigs)
+                              ~noCounters:debugMode ~created:true
+                              ~initial_comma:false ~sigs)
                            raw_mix,
                          mix_pos)) in
            preenv'',state'

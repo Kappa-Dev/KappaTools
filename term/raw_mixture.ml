@@ -135,7 +135,7 @@ let print_agent ~noCounters created link ?sigs incr_agents f ag =
       (print_intf ~noCounters link ?sigs incr_agents ag.a_type) (ag.a_ports, ag.a_ints)
       (fun f -> if created then Format.pp_print_string f "+")
 
-let print ~noCounters ~created ?sigs f mix =
+let print ~noCounters ~created ~initial_comma ?sigs f mix =
   let incr_agents = union_find_counters sigs mix in
   let rec aux_print some = function
     | [] -> ()
@@ -149,7 +149,7 @@ let print ~noCounters ~created ?sigs f mix =
         let () = if some then Pp.comma f in
         let () = print_agent ~noCounters created true ?sigs incr_agents f h in
         aux_print true t in
-  aux_print false mix
+  aux_print initial_comma mix
 
 let agent_to_json a =
   `Assoc

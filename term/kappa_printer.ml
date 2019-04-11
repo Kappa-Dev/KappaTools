@@ -58,10 +58,9 @@ let decompiled_rule ~noCounters ~full env f r =
   let pr_alg f (a,_) = alg_expr ~noCounters ~env f a in
   let pr_tok f (va,tok) =
     Format.fprintf f "%a %a" pr_alg va (Model.print_token ~env) tok in
-  Format.fprintf f "%a%t%a%t%a%t"
+  Format.fprintf f "%a%a%t%a%t"
     (LKappa.print_rule_mixture ~noCounters sigs ~ltypes:false r_created) r_mix
-    (if r_mix <> [] && r_created <> [] then Pp.comma else Pp.empty)
-    (Raw_mixture.print ~noCounters ~created:true ~sigs) r_created
+    (Raw_mixture.print ~noCounters ~created:true ~initial_comma:(r_mix <> []) ~sigs) r_created
 
     (if r.Primitives.delta_tokens <> []
      then (fun f -> Format.fprintf f "|@ ") else Pp.empty)
