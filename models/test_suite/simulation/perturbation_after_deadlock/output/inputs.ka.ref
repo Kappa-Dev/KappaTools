@@ -1,0 +1,47 @@
+%def: "seed" "358755241"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "progressBarSize" "60"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(m[n.A] n[m.A])
+
+%var:/*0*/ 'scale' 0.0001
+%var:/*1*/ 'Avo' 6.022e+23
+%var:/*2*/ 'Vol' 2.25e-16
+%var:/*3*/ 'AV' 135495000.
+%var:/*4*/ 'A0' 0.00948465
+%var:/*5*/ 'Keq' 1e+12
+%var:/*6*/ 'Γeq' 7380.34613823
+%var:/*7*/ 'k+' 100000000.
+%var:/*8*/ 'γ+' 0.738034613823
+%var:/*9*/ 'k-' 0.0001
+%var:/*10*/ 'γ-' 0.0001
+%var:/*11*/ 'γ^+' 0.738034613823
+%var:/*12*/ 'γ^-' 0.0001
+%var:/*13*/ 'Γ_{eq}' 7380.34613823
+%var:/*14*/ 'A.m!n.A' |A(m[1]), A(n[1])|
+%var:/*15*/ 'A.m!.' |A(m[.])|
+%var:/*16*/ 'A.n!.' |A(n[.])|
+%var:/*17*/ 'Γ_{eq}/A_t' 778135.844573
+%plot: [T]
+%plot: 0.738034613823
+%plot: 0.0001
+%plot: 7380.34613823
+%plot: 'A.m!n.A'
+%plot: 'A.m!.'
+%plot: 'A.n!.'
+%plot: 778135.844573
+%plot: 0.00948465
+
+A(m[./1]), A(n[./1]) @ 'γ+' {0}
+A(m[1/.]), A(n[1/.]) @ 'γ-'
+
+/*0*/%mod: alarm 1. ([T] > 100) do $SNAPSHOT ; repeat [true]
+/*1*/%mod: ([T] > 1100) do $STOP ; repeat [false]
+
+%init: A0 A(m[.] n[.])
+
+%mod: [E] = 0 do $STOP;

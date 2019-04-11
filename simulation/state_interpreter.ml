@@ -455,8 +455,13 @@ let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
   let out =
     (*Activity is null or dt is infinite*)
     if not (activity > 0.) || dt = infinity then
-      match state.stopping_times with
-      | [] ->
+      if List.exists
+          (fun (_,pe) ->
+             (Model.get_perturbation env pe).Primitives.needs_backtrack)
+          state.stopping_times then
+        perturbate_with_backtrack
+          ~debugMode ~outputs env counter graph state state.stopping_times
+      else
         let () =
           if dumpIfDeadlocked then
             outputs
@@ -473,9 +478,6 @@ let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
                     (Counter.current_event counter)
                     (Counter.current_time counter) activity)) in
         (true,graph,state)
-      | l ->
-        perturbate_with_backtrack
-          ~debugMode ~outputs env counter graph state l
 
     else
       (*activity is positive*)

@@ -1,0 +1,5 @@
+// Snapshot [Event: 0]
+%def: "T0" "2.6166"
+
+%init: 1 /*1 agents*/ A(m[.] n[.])
+

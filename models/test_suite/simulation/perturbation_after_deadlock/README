@@ -1,0 +1,3 @@
+#!/bin/sh
+
+"${KAPPABIN}"KaSim -mode batch -var scale 1e-4 -d output 563.ka -seed 358755241 || exit 0

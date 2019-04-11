@@ -1,0 +1,22 @@
+%var: 'Avo' 6.022e23			%var: 'Vol' 2.25e-12 * 'scale'
+
+%var: 'AV' 'Avo' * 'Vol'		%var: 'A0' 0.07e-9 * 'AV'
+%var: 'Keq' 1.0e12				%var: 'Γeq' 'Keq' / 'AV'
+%var: 'k+' 1.0e8				%var: 'γ+' 'k+' / 'AV'
+%var: 'k-' 'k+' / 'Keq'			%var: 'γ-' 'k-'
+// Xenopus Axin concentration, mammalian volume, picoMolar affinity
+%agent: A(m, n)		%init: 'A0' A()
+A(m[./1]), A(n[./1]) @ 'γ+' {0}
+A(m[1/.]), A(n[1/.]) @ 'γ-'
+
+%obs: 'γ^+' 'γ+'
+%obs: 'γ^-' 'γ-'
+%obs: 'Γ_{eq}' 'Γeq'
+%obs: 'A.m!n.A' |A(m[1]), A(n[1])|
+%obs: 'A.m!.' |A(m[.])|
+%obs: 'A.n!.' |A(n[.])|
+%obs: 'Γ_{eq}/A_t' 'Γeq' / 'A0'
+%plot: 'A0'
+
+%mod: alarm 1.0 ([T] > 100) do $SNAPSHOT ; repeat [true]
+%mod: [T] > 1100 do $STOP ;
