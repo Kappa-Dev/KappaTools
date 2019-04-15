@@ -120,7 +120,7 @@ let cc_to_user_cc ~debugMode sigs cc =
          ([],r,0) cc in
   let cc_without_counters = Array.of_list (List.rev cc_list) in
   Array.map
-    (fun ag -> {
+    (fun ag -> Some {
          User_graph.node_type =
            Format.asprintf "%a" (Signature.print_agent sigs) ag.node_type;
          User_graph.node_sites =

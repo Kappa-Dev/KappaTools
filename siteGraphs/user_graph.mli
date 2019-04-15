@@ -32,7 +32,7 @@ type cc_node = {
   node_sites: cc_site array;
 }
 
-type connected_component = cc_node array
+type connected_component = cc_node option array
 
 val print_cc : Format.formatter -> connected_component -> unit
 

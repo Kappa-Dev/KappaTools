@@ -32,7 +32,7 @@ type cc_node = {
   node_sites: cc_site array;
 }
 
-type connected_component = cc_node array
+type connected_component = cc_node option array
 
 let print_link (dandling,free_id) p f = function
   | WHATEVER -> Format.pp_print_string f "[#]"
@@ -83,10 +83,12 @@ let print_intf with_link node =
           | Port p -> print_port with_link node p id f
           | Counter i -> Format.fprintf f "{=%i}" i))
 
-let print_agent link node f ag =
-  Format.fprintf f "%s(@[<h>%a@])"
-    ag.node_type (print_intf link node)
-    ag.node_sites
+let print_agent link node f = function
+  | None -> Format.pp_print_string f "."
+  | Some ag ->
+    Format.fprintf f "%s(@[<h>%a@])"
+      ag.node_type (print_intf link node)
+      ag.node_sites
 
 let print_cc f mix =
   let link = Some (ref(Mods.Int2Map.empty),ref 0) in
@@ -104,37 +106,44 @@ let get_color =
 let print_dot_cc nb_cc f mix =
   Pp.array
     Pp.empty
-    (fun i f ag ->
-       Format.fprintf
-         f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
-         nb_cc i (print_agent None i) ag
-         (get_color ag.node_type);
-       Format.fprintf
-         f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;
+    (fun i f -> function
+       | None -> ()
+       | Some ag ->
+         Format.fprintf
+           f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
+           nb_cc i (print_agent None i) (Some ag)
+           (get_color ag.node_type);
+         Format.fprintf
+           f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;
   ignore @@
   Array.iteri
-    (fun a ag ->
-       Array.iteri
-         (fun s si ->
-           match si.site_type with
-           | Counter _ -> ()
-           | Port p ->
-             match p.port_links with
-             | WHATEVER -> assert false
-             | SOME -> assert false
-             | TYPE (_si,_ty) -> assert false
-             | LINKS links ->
-               Pp.list
-                 Pp.empty
-                 (fun f (a',s') ->
-                    if a < a' || (a = a' && s < s') then
-                      Format.fprintf
-                        f
-                        "node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];@,"
-                        nb_cc a nb_cc a' si.site_name
-                        mix.(a').node_sites.(s').site_name)
-                 f links)
-         ag.node_sites)
+    (fun a -> function
+       | None -> ()
+       | Some ag ->
+         Array.iteri
+           (fun s si ->
+              match si.site_type with
+              | Counter _ -> ()
+              | Port p ->
+                match p.port_links with
+                | WHATEVER -> assert false
+                | SOME -> assert false
+                | TYPE (_si,_ty) -> assert false
+                | LINKS links ->
+                  Pp.list
+                    Pp.empty
+                    (fun f (a',s') ->
+                       if a < a' || (a = a' && s < s') then
+                         match mix.(a') with
+                         | None -> assert false
+                         | Some ag' ->
+                           Format.fprintf
+                             f
+                             "node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];@,"
+                             nb_cc a nb_cc a' si.site_name
+                             ag'.node_sites.(s').site_name)
+                    f links)
+           ag.node_sites)
     mix
 
 (*
@@ -238,24 +247,30 @@ let read_cc_site p lb =
       ("",Counter (-1)) p lb in
   { site_name; site_type }
 
-let write_cc_node ob f =
-  let () = Bi_outbuf.add_char ob '{' in
-  let () = JsonUtil.write_field
-      "node_type" Yojson.Basic.write_string ob f.node_type in
-  let () = JsonUtil.write_comma ob in
-  let () = JsonUtil.write_field
-      "node_sites" (JsonUtil.write_array write_cc_site) ob f.node_sites in
-  Bi_outbuf.add_char ob '}'
+let write_cc_node ob x =
+  JsonUtil.write_option
+    (fun ob f ->
+       let () = Bi_outbuf.add_char ob '{' in
+       let () = JsonUtil.write_field
+           "node_type" Yojson.Basic.write_string ob f.node_type in
+       let () = JsonUtil.write_comma ob in
+       let () = JsonUtil.write_field
+           "node_sites" (JsonUtil.write_array write_cc_site) ob f.node_sites in
+       Bi_outbuf.add_char ob '}')
+    ob x
 
 let read_cc_node p lb =
-  let (node_type,node_sites) =
-    Yojson.Basic.read_fields
-      (fun (n,s) key p lb ->
-         if key = "node_type" then (Yojson.Basic.read_string p lb,s)
-         else let () = assert (key = "node_sites") in
-           (n,Yojson.Basic.read_array read_cc_site p lb))
-      ("",[||]) p lb in
-  { node_type; node_sites }
+  JsonUtil.read_option
+    (fun p lb ->
+       let (node_type,node_sites) =
+         Yojson.Basic.read_fields
+           (fun (n,s) key p lb ->
+              if key = "node_type" then (Yojson.Basic.read_string p lb,s)
+              else let () = assert (key = "node_sites") in
+                (n,Yojson.Basic.read_array read_cc_site p lb))
+           ("",[||]) p lb in
+       { node_type; node_sites })
+    p lb
 
 let write_connected_component ob f = JsonUtil.write_array write_cc_node ob f
 

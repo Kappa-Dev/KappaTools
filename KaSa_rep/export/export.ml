@@ -516,7 +516,7 @@ let reindex parameters error handler list =
        in
        let agent = {site_node with User_graph.node_sites = Array.of_list interface}
        in
-       error, agent::agent_list)
+       error, Some agent::agent_list)
     list (error,[])
 
 
@@ -1845,56 +1845,58 @@ let compute_signature show_title state =
   let () = show_title state in
   let state, l =
     Array.fold_left
-      (fun (state,list) site_node ->
-         let a = site_node.User_graph.node_type in
-         let interface = site_node.User_graph.node_sites in
-         let state,acc =
-           Array.fold_left
-             (fun (state,acc) site ->
-                let x = site.User_graph.site_name in
-                let states,binding =
-                  match site.User_graph.site_type with
-                  | User_graph.Counter _ ->
-                    failwith "KaSa does not deal with counters yet"
-                  | User_graph.Port p ->
-                    Option_util.unsome [] p.User_graph.port_states,
-                    match p.User_graph.port_links with
-                    | User_graph.LINKS l -> l
-                    | SOME | WHATEVER | TYPE _ -> assert false in
-                let state, binding' =
-                  List.fold_left
-                    (fun (state,list) (x,y) ->
-                       let state,sx =
-                         translate_agent state
-                           ~message:"unknown agent name id" ~ml_pos:(Some __POS__)
-                           (Ckappa_sig.agent_name_of_int x)
-                       in
-                       let state,sy =
-                         translate_and_simplify_site
-                           ~message:"unknown site name id" ~ml_pos:(Some __POS__)
-                           state
-                           (Ckappa_sig.agent_name_of_int x)
-                           (Ckappa_sig.site_name_of_int y)
-                       in
-                       state,(Locality.dummy_annot sx, Locality.dummy_annot sy)::list)
-                    (state,[]) (List.rev binding)
-                in
-                let states' =
-                  NamedDecls.create
-                    (Tools.array_map_of_list
-                       (fun i -> (Locality.dummy_annot i,())) states)
-                in
-                state,
-                (Locality.dummy_annot x,
-                 (states',
-                  binding',None))::acc)
-             (state,[]) interface
-         in
-         state,
-         ((Locality.dummy_annot a,
-           NamedDecls.create
-             (Array.of_list acc)
-          ))::list)
+      (fun (state,list) -> function
+         | None -> (state,list)
+         | Some site_node ->
+           let a = site_node.User_graph.node_type in
+           let interface = site_node.User_graph.node_sites in
+           let state,acc =
+             Array.fold_left
+               (fun (state,acc) site ->
+                  let x = site.User_graph.site_name in
+                  let states,binding =
+                    match site.User_graph.site_type with
+                    | User_graph.Counter _ ->
+                      failwith "KaSa does not deal with counters yet"
+                    | User_graph.Port p ->
+                      Option_util.unsome [] p.User_graph.port_states,
+                      match p.User_graph.port_links with
+                      | User_graph.LINKS l -> l
+                      | SOME | WHATEVER | TYPE _ -> assert false in
+                  let state, binding' =
+                    List.fold_left
+                      (fun (state,list) (x,y) ->
+                         let state,sx =
+                           translate_agent state
+                             ~message:"unknown agent name id" ~ml_pos:(Some __POS__)
+                             (Ckappa_sig.agent_name_of_int x)
+                         in
+                         let state,sy =
+                           translate_and_simplify_site
+                             ~message:"unknown site name id" ~ml_pos:(Some __POS__)
+                             state
+                             (Ckappa_sig.agent_name_of_int x)
+                             (Ckappa_sig.site_name_of_int y)
+                         in
+                         state,(Locality.dummy_annot sx, Locality.dummy_annot sy)::list)
+                      (state,[]) (List.rev binding)
+                  in
+                  let states' =
+                    NamedDecls.create
+                      (Tools.array_map_of_list
+                         (fun i -> (Locality.dummy_annot i,())) states)
+                  in
+                  state,
+                  (Locality.dummy_annot x,
+                   (states',
+                    binding',None))::acc)
+               (state,[]) interface
+           in
+           state,
+           ((Locality.dummy_annot a,
+             NamedDecls.create
+               (Array.of_list acc)
+            ))::list)
       (state,[]) l
   in
   let signature = Signature.create ~counters:[] true l in

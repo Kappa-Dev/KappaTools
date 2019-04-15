@@ -124,52 +124,54 @@ module BindingTypeList = Hashed_list.Make (BindingType)
 
 let collect_partitioned_contact_map contact_map =
   Array.fold_left
-    (fun map site_node ->
-       let ag = site_node.User_graph.node_type in
-       let site_list = site_node.User_graph.node_sites in
-       let cache1 = StateList.init () in
-       let cache2 = BindingTypeList.init () in
-       let (internal_state_partition: string list list) =
-         partition
-           cache1
-           StateList.hash
-           StateList.int_of_hashed_list
-           (fun (x,_) -> Option_util.unsome [] x)
-           site_list
-       in
-       let (binding_state_partition: string list list) =
-         partition
-           cache2
-           BindingTypeList.hash
-           BindingTypeList.int_of_hashed_list
-           (function
-             | (_, User_graph.LINKS l) -> l
-             | (_, (WHATEVER | SOME | TYPE _)) -> assert false)
-           site_list
-       in
-       let full_state_partition =
-         partition_pair
-           (cache1,cache2)
-           (fun
+    (fun map -> function
+       | None -> map
+       | Some site_node ->
+         let ag = site_node.User_graph.node_type in
+         let site_list = site_node.User_graph.node_sites in
+         let cache1 = StateList.init () in
+         let cache2 = BindingTypeList.init () in
+         let (internal_state_partition: string list list) =
+           partition
+             cache1
+             StateList.hash
+             StateList.int_of_hashed_list
+             (fun (x,_) -> Option_util.unsome [] x)
+             site_list
+         in
+         let (binding_state_partition: string list list) =
+           partition
+             cache2
+             BindingTypeList.hash
+             BindingTypeList.int_of_hashed_list
+             (function
+               | (_, User_graph.LINKS l) -> l
+               | (_, (WHATEVER | SOME | TYPE _)) -> assert false)
+             site_list
+         in
+         let full_state_partition =
+           partition_pair
              (cache1,cache2)
-             (l1,l2) ->
-              let cache1,a1 = StateList.hash cache1 l1 in
-              let cache2,a2 = BindingTypeList.hash cache2 l2 in
-              (cache1,cache2),(a1,a2))
-           (fun (a,b) ->
-              StateList.int_of_hashed_list a,
-              BindingTypeList.int_of_hashed_list b)
-           (function
-             | (x,User_graph.LINKS y) -> (Option_util.unsome [] x,y)
-             | (_, (SOME | WHATEVER | TYPE _)) -> assert false)
-           site_list
-       in
-       Mods.StringMap.add ag
-         {
-         Symmetries_sig.over_internal_states = internal_state_partition ;
-         Symmetries_sig.over_binding_states = binding_state_partition ;
-         Symmetries_sig.over_full_states = full_state_partition ;
-       } map
+             (fun
+               (cache1,cache2)
+               (l1,l2) ->
+               let cache1,a1 = StateList.hash cache1 l1 in
+               let cache2,a2 = BindingTypeList.hash cache2 l2 in
+               (cache1,cache2),(a1,a2))
+             (fun (a,b) ->
+                StateList.int_of_hashed_list a,
+                BindingTypeList.int_of_hashed_list b)
+             (function
+               | (x,User_graph.LINKS y) -> (Option_util.unsome [] x,y)
+               | (_, (SOME | WHATEVER | TYPE _)) -> assert false)
+             site_list
+         in
+         Mods.StringMap.add ag
+           {
+             Symmetries_sig.over_internal_states = internal_state_partition ;
+             Symmetries_sig.over_binding_states = binding_state_partition ;
+             Symmetries_sig.over_full_states = full_state_partition ;
+           } map
     ) Mods.StringMap.empty contact_map
 
 (*****************************************************************)
@@ -205,38 +207,40 @@ let print_partitioned_contact_map_in_lkappa logger env partitioned_contact_map =
 let print_contact_map parameters contact_map =
   let log = Remanent_parameters.get_logger parameters in
   Array.iter
-    (fun site_node ->
-       let agent = site_node.User_graph.node_type in
-       let interface = site_node.User_graph.node_sites in
-       let () = Loggers.fprintf log "agent:%s\n" agent in
-       Array.iter
-         (fun site ->
-            let site_name = site.User_graph.site_name in
-            let () = Loggers.fprintf log "  site:%s\n" site_name in
-            match site.User_graph.site_type with
-            | User_graph.Counter i ->
-              let () = Loggers.fprintf log "counter: %i" i in
-              let () = Loggers.print_newline log in ()
-            | User_graph.Port p ->
-              let () =
-                match p.User_graph.port_states with
-                | None | Some [] -> ()
-                | Some l1 ->
-                  let () = Loggers.fprintf log "internal_states:" in
-                  let () = List.iter (Loggers.fprintf log "%s;") l1 in
-                  let () = Loggers.print_newline log in ()
-              in
-              let () =
-                match p.User_graph.port_links with
-                | WHATEVER | SOME | TYPE _ | LINKS [] -> ()
-                | User_graph.LINKS l2 ->
-                  let () = Loggers.fprintf log "binding_states:" in
-                  let () =
-                    List.iter (fun (s1,s2) ->
-                        Loggers.fprintf log "%i.%i;" s1 s2) l2
-                  in
-                  let () = Loggers.print_newline log in ()
-              in ()) interface) contact_map
+    (function
+      | None -> ()
+      | Some site_node ->
+        let agent = site_node.User_graph.node_type in
+        let interface = site_node.User_graph.node_sites in
+        let () = Loggers.fprintf log "agent:%s\n" agent in
+        Array.iter
+          (fun site ->
+             let site_name = site.User_graph.site_name in
+             let () = Loggers.fprintf log "  site:%s\n" site_name in
+             match site.User_graph.site_type with
+             | User_graph.Counter i ->
+               let () = Loggers.fprintf log "counter: %i" i in
+               let () = Loggers.print_newline log in ()
+             | User_graph.Port p ->
+               let () =
+                 match p.User_graph.port_states with
+                 | None | Some [] -> ()
+                 | Some l1 ->
+                   let () = Loggers.fprintf log "internal_states:" in
+                   let () = List.iter (Loggers.fprintf log "%s;") l1 in
+                   let () = Loggers.print_newline log in ()
+               in
+               let () =
+                 match p.User_graph.port_links with
+                 | WHATEVER | SOME | TYPE _ | LINKS [] -> ()
+                 | User_graph.LINKS l2 ->
+                   let () = Loggers.fprintf log "binding_states:" in
+                   let () =
+                     List.iter (fun (s1,s2) ->
+                         Loggers.fprintf log "%i.%i;" s1 s2) l2
+                   in
+                   let () = Loggers.print_newline log in ()
+               in ()) interface) contact_map
 
 (****************************************************************)
 
