@@ -415,6 +415,11 @@ let init_trace_file ~uuid env desc =
   let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
   output_string desc ",\n\"trace\":["
 
+let assert_field ident x =
+  if ident <> x then
+    Yojson.json_error
+      ("trace lacks the field \""^x^"\" (at the right place)")
+
 let read_trace_headers lex_st lex_buf =
   let ident =
     JsonUtil.read_between_spaces Yojson.Basic.read_ident lex_st lex_buf in
@@ -426,7 +431,7 @@ let read_trace_headers lex_st lex_buf =
       let uuid = try Some (int_of_string uuid) with _ -> None in
       (JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf, uuid)
     else (ident, None) in
-  let () = assert (ident' = "dict") in
+  let () = assert_field ident' "dict" in
   let () = Yojson.Basic.read_colon lex_st lex_buf in
   let () = JsonUtil.read_between_spaces Yojson.Basic.skip_json lex_st lex_buf in
   uuid
@@ -435,12 +440,12 @@ let fold_trace f init lex_st lex_buf =
   let () = Yojson.Basic.read_lcurl lex_st lex_buf in
   let _ = read_trace_headers lex_st lex_buf in
   let ident = JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf in
-  let () = assert (ident = "model") in
+  let () = assert_field ident "model" in
   let () = Yojson.Basic.read_colon lex_st lex_buf in
   let env = Model.of_yojson
       (JsonUtil.read_between_spaces Yojson.Basic.read_json lex_st lex_buf) in
   let ident = JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf in
-  let () = assert (ident = "trace") in
+  let () = assert_field ident "trace" in
   let () =Yojson.Basic.read_colon lex_st lex_buf in
   let out =
     JsonUtil.read_between_spaces
@@ -466,7 +471,7 @@ let get_headers_from_file fname =
   let () = Yojson.Basic.read_lcurl lex_st lex_buf in
   let uuid = read_trace_headers lex_st lex_buf in
   let ident = JsonUtil.read_next_item Yojson.Basic.read_ident lex_st lex_buf in
-  let () = assert (ident = "model") in
+  let () = assert_field ident "model" in
   let () = Yojson.Basic.read_colon lex_st lex_buf in
   let env = Model.of_yojson
       (JsonUtil.read_between_spaces Yojson.Basic.read_json lex_st lex_buf) in
