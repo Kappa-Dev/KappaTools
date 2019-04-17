@@ -208,7 +208,8 @@ let computing_watcher manager setter =
   let cancelled = ref false in
   let rec loop () =
     let () = setter manager#is_computing in
-    if !cancelled then Lwt.return_unit else Lwt_js.sleep delay >>= loop in
+    if !cancelled then Lwt.return_unit
+    else Js_of_ocaml_lwt.Lwt_js.sleep delay >>= loop in
   let () = Lwt.async loop in
   cancelled
 

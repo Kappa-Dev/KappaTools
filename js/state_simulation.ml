@@ -125,7 +125,7 @@ let rec sync () =
                        SIMULATION_STATE_READY simulation_info} in
                 if simulation_info.Api_types_t.simulation_info_progress
                    .Api_types_t.simulation_progress_is_running then
-                  Lwt_js.sleep sleep_time >>= sync
+                  Js_of_ocaml_lwt.Lwt_js.sleep sleep_time >>= sync
                 else Lwt.return (Result_util.ok ())
               )
          )

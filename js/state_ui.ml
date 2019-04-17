@@ -30,7 +30,7 @@ let rec loop
     (t : float)
     ()
   : unit Lwt.t =
-  h () >>= (fun _ -> Lwt_js.sleep t) >>= loop h t
+  h () >>= (fun _ -> Js_of_ocaml_lwt.Lwt_js.sleep t) >>= loop h t
 
 let loop_sync () : unit Lwt.t =
   if React.S.value State_settings.synch then

@@ -48,7 +48,7 @@ class manager () =
           (Dom.handler
              (fun _ -> let () = is_running <- false in Js._true)) in
         ()
-    method private sleep timeout = Lwt_js.sleep timeout
+    method private sleep timeout = Js_of_ocaml_lwt.Lwt_js.sleep timeout
     method private post_message (message_text : string) : unit =
       sim_worker##postMessage(message_text)
     inherit Mpi_api.manager ()

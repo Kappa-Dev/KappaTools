@@ -150,7 +150,7 @@ let ajax_request
    code.
 *)
 let async loc (task : unit -> 'a Lwt.t) : unit =
-  Lwt_js_events.async
+  Js_of_ocaml_lwt.Lwt_js_events.async
     (fun () ->
        Lwt.catch
          task

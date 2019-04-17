@@ -162,7 +162,7 @@ let rec inspect_stories () =
        Lwt.return (Result_util.ok manager#is_computing)) >>=
   Result_util.fold
     ~ok:(fun b -> if b && React.S.value tab_is_active
-          then Lwt_js.sleep 3. >>= inspect_stories
+          then Js_of_ocaml_lwt.Lwt_js.sleep 3. >>= inspect_stories
           else Lwt.return_unit)
     ~error:(fun _ -> Lwt.return_unit)
 

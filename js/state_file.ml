@@ -498,14 +498,16 @@ let load_models () : unit Lwt.t =
     | [] -> Lwt.return_unit
     | model::models ->
       (* fetch model *)
-      Lwt_xmlHttpRequest.get model >>=
+      Js_of_ocaml_lwt.XmlHttpRequest.get model >>=
       (fun content ->
-         if content.Lwt_xmlHttpRequest.code <> 200 then
+         if content.Js_of_ocaml_lwt.XmlHttpRequest.code <> 200 then
            Lwt.return
              (Api_common.result_error_msg
-                (Format.sprintf "bad response code %d fetching url %s" content.Lwt_xmlHttpRequest.code model))
+                (Format.sprintf "bad response code %d fetching url %s"
+                   content.Js_of_ocaml_lwt.XmlHttpRequest.code model))
          else
-           match Url.url_of_string content.Lwt_xmlHttpRequest.url with
+           match Url.url_of_string
+                   content.Js_of_ocaml_lwt.XmlHttpRequest.url with
            | None ->
              Lwt.return
                (Api_common.result_error_msg
@@ -517,7 +519,7 @@ let load_models () : unit Lwt.t =
                   | (Url.Http h | Url.Https h) -> h.Url.hu_path
                   | Url.File f -> f.Url.fu_path) in
              let filecontent : string =
-               content.Lwt_xmlHttpRequest.content
+               content.Js_of_ocaml_lwt.XmlHttpRequest.content
              in
              Lwt.return (Result_util.ok (filename,filecontent))
       )

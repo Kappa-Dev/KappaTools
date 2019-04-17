@@ -146,7 +146,7 @@ class manager
         Buffer.reset buffer;
         self#onSimStdout suffix
 
-    method private sleep timeout = Lwt_js.sleep timeout
+    method private sleep timeout = Js_of_ocaml_lwt.Lwt_js.sleep timeout
     method private post_message (message_text : string) : unit =
       match sim_process with
       | None -> ()

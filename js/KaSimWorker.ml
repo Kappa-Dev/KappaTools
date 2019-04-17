@@ -12,7 +12,7 @@ class system_process () : Kappa_facade.system_process =
       let () = Common.debug exn in
       let () = Common.debug msg in
       Lwt.return_unit
-    method yield () : unit Lwt.t = Lwt_js.yield ()
+    method yield () : unit Lwt.t = Js_of_ocaml_lwt.Lwt_js.yield ()
     method min_run_duration () = 0.1
   end
 

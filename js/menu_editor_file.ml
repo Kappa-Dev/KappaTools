@@ -233,7 +233,7 @@ let file_select_handler _ _ : unit Lwt.t =
   in
   let file_id = Js.to_string file##.name in
   let () = Menu_editor_file_controller.create_file
-      ~text:(Lwt_file.readAsText file) file_id in
+      ~text:(Js_of_ocaml_lwt.File.readAsText file) file_id in
   let () = open_input_dom##.value := Js.string "" in
   Lwt.return_unit
 
@@ -359,7 +359,7 @@ let onload () =
   let ()  =
     Lwt.async
       (fun () ->
-         Lwt_js_events.changes
+         Js_of_ocaml_lwt.Lwt_js_events.changes
            (Tyxml_js.To_dom.of_input open_input)
            file_select_handler)
   in
