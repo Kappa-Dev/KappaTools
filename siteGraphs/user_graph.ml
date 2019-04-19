@@ -154,7 +154,7 @@ let write_cc_port ob p =
           | TYPE (si,ty) ->
             let () = Bi_outbuf.add_string ob "{\"site_name\":\"" in
             let () = Bi_outbuf.add_string ob si in
-            let () = Bi_outbuf.add_string ob "\",\"agent_name\":\"" in
+            let () = Bi_outbuf.add_string ob "\",\"agent_type\":\"" in
             let () = Bi_outbuf.add_string ob ty in
             Bi_outbuf.add_string ob "\"}"
           | LINKS l ->
@@ -193,8 +193,8 @@ let write_cc_site ob f =
 let links_of_yojson = function
   | `Null -> WHATEVER
   | `Bool b -> let () = assert b in SOME
-  | `Assoc [ "site_name", `String si; "agent_name", `String ty ]
-  | `Assoc [ "agent_name", `String ty; "site_name", `String si ] ->
+  | `Assoc [ "site_name", `String si; "agent_type", `String ty ]
+  | `Assoc [ "agent_type", `String ty; "site_name", `String si ] ->
     TYPE (si,ty)
   | `List _ as x ->
     let error_msg = None in
