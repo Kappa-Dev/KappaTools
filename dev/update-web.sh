@@ -70,7 +70,8 @@ case $1 in
         ;;
     MacOS )
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
-        codesign -s - Kappapp.app && \
+        find Kappapp.app/Contents/ \( -name \*.app -or -name \*.framework \) -exec codesign -s - \{\} \; && \
+	    codesign -s - Kappapp.app && \
             zip -y -r ${PLAYGROUND}/binaries/Kappapp.app.zip Kappapp.app
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy ${PLAYGROUND}/binaries/Kappapp.app.zip \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
