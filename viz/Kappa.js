@@ -6,6 +6,7 @@ CodeMirror.defineSimpleMode("Kappa", {
   // The start state contains the rules that are intially used
   start: [
       {regex: /\/\/(.*)/, token: "comment"},
+      {regex: /\/\*/, token: "comment", push: "comment"},
       {regex: /(\%agent:|\%def:|\%var:|\%plot:|\%obs:|\%init:|\%mod:|\%token:|do|repeat|alarm)\s/,
        token: "keyword"},
       {regex: /(\$ADD|\$DEL|\$SNAPSHOT|\$STOP|\$DIN|\$TRACK|\$UPDATE|\$PRINT)\b/,
@@ -15,7 +16,6 @@ CodeMirror.defineSimpleMode("Kappa", {
       {regex: /(\[E\]|\[E\+\]|\[E\-\]|\[Emax\]|\[T\]|\[Tsim\]|\[Tmax\]|\[pi\]|\[true\]|\[false\])/,
        token: "atom"},
       {regex: /'([^']+)'/, token: "variable"},
-      {regex: /\/\*/, token: "comment", push: "comment"},
       {regex: /(\@|\,|\(|\)|\{|\}|\[|\]|\||\.|\+|\*|\-|\^|\/|\<|\>|\=|\%|\:|\#|\;)/,
        token: "variable-2"},
       {regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
@@ -24,9 +24,9 @@ CodeMirror.defineSimpleMode("Kappa", {
   ],
   // The multi-line comment state.
     comment: [
-        {regex: /\/\*/, token: "comment", push: "comment"},
         {regex: /\/\/(.*)/, token: "comment"},
-        {regex: /.*\*\//, token: "comment", pop: true},
+        {regex: /\/\*/, token: "comment", push: "comment"},
+        {regex: /\*\//, token: "comment", pop: true},
         {regex: /./, token: "comment"}
     ],
   // The meta property contains global information about the mode. It
