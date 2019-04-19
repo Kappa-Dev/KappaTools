@@ -19,9 +19,7 @@ A(s1{p/u}[.] c{=2/+=-1}) @ (2 * (5 ^ 2))
 A(s2{p/u}[#] c{=1/+=-1}) @ (2 * (5 ^ 1))
 A(s2{p/u}[#] c{=2/+=-1}) @ (2 * (5 ^ 2))
 
-/*0*/%mod: (|A(c{=3})| = 1) do $PRINTF "
-Counter c of agent A reached maximum
-"; $STOP "counter_perturbation.ka"; repeat [false]
+/*0*/%mod: (|A(c{=3})| = 1) do $PRINTF ""; $PRINTF "Counter c of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
 
 %init: 40 A(s1{u}[.] s2{u}[.] c{=0})
 

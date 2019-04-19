@@ -518,10 +518,11 @@ let counter_perturbation sigs c ag_ty =
   let filename =
     [Primitives.Str_pexpr ("counter_perturbation.ka", snd c.Ast.count_nme) ] in
   let stop_message =
-    "\nCounter "^(fst c.Ast.count_nme)^" of agent "^(fst ag_ty)^" reached maximum\n" in
-  let stop_message' =
-    [Primitives.Str_pexpr (stop_message, snd c.Ast.count_nme) ] in
-  let mods = [Ast.PRINT ([],stop_message'); Ast.STOP filename] in
+    "Counter "^(fst c.Ast.count_nme)^" of agent "^(fst ag_ty)^" reached maximum" in
+  let mods = [
+    Ast.PRINT ([],[ Primitives.Str_pexpr ("", snd c.Ast.count_nme) ]);
+    Ast.PRINT ([],[ Primitives.Str_pexpr (stop_message, snd c.Ast.count_nme) ]);
+    Ast.STOP filename] in
   let val_of_counter =
     Alg_expr.KAPPA_INSTANCE (agent_with_max_counter sigs c ag_ty) in
   let pre =
