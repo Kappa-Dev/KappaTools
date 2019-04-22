@@ -67,8 +67,6 @@
       };
       var mode = modes.SNAPSHOT;
 
-      $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) { redraw(); });
-
       function activate(dstId) {
 	  switch (dstId) {
 	  case "snap-tab":
@@ -91,39 +89,34 @@
       }
 
       var snap = new Snapshot("snap",{});
-      var snapReader = new FileReader();
-      snapReader.addEventListener("load",function (event) {
-          try { snap.setData("null",snapReader.result); } catch (e) { alert (e); }
-      }, false);
-      snapReader.addEventListener("error",function (event) {
-	  alert(snapReader.error);
-      }, false);
-
       var plot = new ObservablePlot("plot");
-      var plotReader = new FileReader();
-      plotReader.addEventListener("load",function (event) {
-          try { plot.setData(plotReader.result); } catch (e) { alert (e); }
-      }, false);
-      plotReader.addEventListener("error",function (event) {
-	  alert(plotReader.error);
-      }, false);
-
       var cmap = new ContactMap("contact");
-      var cmapReader = new FileReader();
-      cmapReader.addEventListener("load",function (event) {
-          try { cmap.setData(cmapReader.result); } catch (e) { alert (e); }
-      }, false);
-      cmapReader.addEventListener("error",function (event) {
-	  alert(cmapReader.error);
-      }, false);
-
       var storend = new StoryRendering("story");
-      var storendReader = new FileReader();
-      storendReader.addEventListener("load",function (event) {
-          try { storend.setData(storendReader.result); } catch (e) { alert (e); }
+
+      var dataReader = new FileReader();
+      dataReader.addEventListener("load",function (event) {
+      try {
+	  switch (mode) {
+	      case modes.SNAPSHOT:
+              snap.setData("null",dataReader.result);
+              break;
+	      case modes.PLOT:
+	      plot.setData(dataReader.result);
+	      break;
+	      case modes.CONTACTMAP:
+	      cmap.setData(dataReader.result);
+	      break;
+	      case modes.STORY:
+	      storend.setData(dataReader.result);
+	      break;
+	      default:
+	      alert("Unknown mode "+mode+" in drop handler");
+	      break;
+	  };
+      } catch (e) { alert (e); }
       }, false);
-      storendReader.addEventListener("error",function (event) {
-	  alert(storendReader.error);
+      dataReader.addEventListener("error",function (event) {
+	  alert(dataReader.error);
       }, false);
 
       var redraw = function () {
@@ -154,28 +147,15 @@
       document.addEventListener("drop", function (event) {
           event.preventDefault();
           data = event.dataTransfer.files[0];
-	  if (data) switch (mode) {
-	      case modes.SNAPSHOT:
-	      snapReader.readAsText(data);
-	      break;
-	      case modes.PLOT:
-	      plotReader.readAsText(data);
-	      break;
-	      case modes.CONTACTMAP:
-	      cmapReader.readAsText(data);
-	      break;
-	      case modes.STORY:
-	      storendReader.readAsText(data);
-	      break;
-	      default:
-	      alert("Unknown mode "+mode+" in drop handler");
-	      break;
-	  };
+          if (data) dataReader.readAsText(data);
       }, false);
 
       window.addEventListener("resize", function (event) {
           redraw();
       }, false);
+
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) { redraw(); });
+
     </script>
   </body>
 </html>
