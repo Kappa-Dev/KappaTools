@@ -100,11 +100,11 @@ site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/KaSimWorker.js 
 	" -cunihtf -utf8" "" "-halt-on-error"> $${LOG} 2>&1 && \
 	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }
 
-%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa bin/KaStor bin/KaDE $(MODELS) %.gplot
+%.witness: %.sh $(MANGENREP) $(MODELS) %.gplot
 	cd $(dir $@) && KAPPABIN="$(CURDIR)/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
-%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa bin/KaStor bin/KaDE $(MODELS)
+%.witness: %.sh $(MANGENREP) $(MODELS)
 	cd $(dir $@) && KAPPABIN="$(CURDIR)/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
