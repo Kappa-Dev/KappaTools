@@ -128,17 +128,17 @@ class KappaRest(KappaApi):
 
     # Standardized API methods. Docs are provided by parent.
 
-    def project_parse(self, overwrites=None):
-        if overwrites is None:
-            overwrites = []
-        reply = self._post(self.in_project('parse'), overwrites)
-        self.project_ast = json.loads(reply['boxed_ast'])
+    def project_parse(self, **kwargs):
+        overwrites = '&'.join('%s=%s' % (key, value) for (key, value) in kwargs.items())
+        reply = self._post(self.in_project('parse'))
+        self.project_ast = reply
+        self._post(self.in_project('?'.join(['load',overwrites])), reply)
         return reply
 
-    def file_create(self, file_object):
+    def file_create(self, file_):
         self.project_ast = None
         self.analyses_to_init = True
-        return self._post(self.in_project('files'), file_object.toJSON())
+        return self._put(self.in_project('files', file_.get_id(), str(file_.get_position())), file_.get_content())
 
     def file_delete(self, file_id):
         self.project_ast = None

@@ -40,28 +40,14 @@ class FileMetadata(object):
         files, the new file is indeed at position 'i' and all the files at
         position 'j>=i' are pushed at position 'j+1'.
 
-    options that won't probably stay
-    compile -- (boolean, default True) Indicate whether the file should be
-        compiled or not next time project will be parsed. To be dropped as
-        not compiled files could as well si;ply be deleted...
-    file_version -- (list, default empty/None) the version of the file.
-        Way too complicated logic meant to deal with the case where several
-        clients works at the same time on the same stuff (in the REST API).
-        Can be safely ignored in Std mode, Should not be trusted in Rest
-        mode...in one word, to replace and erase!
-
     Methods
     -------
     toJSON -- get a json (dict) representation of this data.
     """
 
-    def __init__(self, id, position, compile=True, version=None):
-        if version is None:
-            version = []
+    def __init__(self, id, position):
         self.id = id
         self.position = position
-        self.compile = compile
-        self.version = version
         return
 
     @classmethod
@@ -72,9 +58,7 @@ class FileMetadata(object):
     def toJSON(self):
         """Get a json dict of the attributes of this object."""
         return {"id": self.id,
-                "compile": self.compile,
-                "position": self.position,
-                "version": self.version}
+                "position": self.position}
 
 
 class File(object):
@@ -92,8 +76,8 @@ class File(object):
 
     Methods
     -------
-    toJSON -- get a JSON dict of the data in this file.
-    get_file_id -- get the id of the file from the metadata.
+    get_id -- get the id of the file from the metadata.
+    get_position -- get the position of the file from the metadata.
     get_content -- get the content of the file.
     """
 
@@ -148,14 +132,13 @@ class File(object):
             file_metadata = FileMetadata(file_id, position)
             return cls(file_metadata, file_content)
 
-    def toJSON(self):
-        """Get a JSON dict of the data in this file."""
-        return {"metadata": self.file_metadata.toJSON(),
-                "content": self.file_content}
-
-    def get_file_id(self):
+    def get_id(self):
         """Get the id of the file from the metadata."""
         return self.file_metadata.id
+
+    def get_position(self):
+        """Get the id of the file from the metadata."""
+        return self.file_metadata.position
 
     def get_content(self):
         """Get the file's contents."""
@@ -336,12 +319,12 @@ class KappaApi(ABC):
     # is used as a decorator for the class.
 
     @abc.abstractmethod
-    def project_parse(self, overwrites=None):
+    def project_parse(self, **kwargs):
         """
         Parses the project
 
-        overwrites -- list of algebraic variables to overwrite
-        Each element has the form {var : "variable_name", val : 42 }
+        kwargs -- list of algebraic variables to overwrite
+        Each element has the form variable_name=numerical_val
         """
 
     @abc.abstractmethod

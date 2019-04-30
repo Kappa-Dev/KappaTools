@@ -68,6 +68,14 @@ class KappaStd(KappaApi):
                                          stdin=subprocess.PIPE,
                                          stdout=subprocess.PIPE,
                                          stderr=subprocess.STDOUT)
+        model_args = [path.join(kappa_bin_path, "KaMoHa"), "--delimiter",
+                   "\\x{:02x}".format(ord(self.delimiter)), ]
+        if args:
+            model_args = model_args + args
+        self.model_agent = subprocess.Popen(model_args,
+                                         stdin=subprocess.PIPE,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT)
         return
 
     def __del__(self):
@@ -102,7 +110,7 @@ class KappaStd(KappaApi):
                                                        message_id)
                         )
             else:
-                return self.projection(response)
+                return self.projection(response["data"])[1]
 
         finally:
             self.lock.release()
@@ -129,6 +137,31 @@ class KappaStd(KappaApi):
         finally:
             self.lock.release()
 
+    def _dispatch_model(self, data):
+        try:
+            self.lock.acquire()
+            message_id = self._get_message_id()
+            message = [ message_id, data]
+            message = "{0}{1}".format(json.dumps(message), self.delimiter)
+            self.model_agent.stdin.write(message.encode('utf-8'))
+            self.model_agent.stdin.flush()
+            buff = bytearray()
+            c = self.model_agent.stdout.read(1)
+            while c != self.delimiter.encode('utf-8') and c:
+                buff.extend(c)
+                c = self.model_agent.stdout.read(1)
+            response = json.loads(buff.decode('utf-8'))
+            if response[0] != message_id:
+                raise KappaError(
+                        "expect id {0} got {1}".format(response[0],
+                                                       message_id)
+                        )
+            else:
+                return self.projection(response[1])
+
+        finally:
+            self.lock.release()
+
     def shutdown(self):
         """Shut down kappa instance.
 
@@ -137,17 +170,23 @@ class KappaStd(KappaApi):
         if hasattr(self, 'sim_agent'):
             self.sim_agent.stdin.close()
             self.sim_agent.stdout.close()
-            self.sim_agent.kill()
+            self.sim_agent.terminate()
+            self.sim_agent.wait()
         if hasattr(self, 'sa_agent'):
             self.sa_agent.stdin.close()
             self.sa_agent.stdout.close()
-            self.sa_agent.kill()
+            self.sa_agent.terminate()
+            self.sa_agent.wait()
+        if hasattr(self, 'model_agent'):
+            self.model_agent.stdin.close()
+            self.model_agent.stdout.close()
+            self.model_agent.terminate()
+            self.model_agent.wait()
 
-    def projection(self, response):
-        result_data = response["data"]
+    def projection(self, result_data):
         data = result_data[1]
         if result_data[0] == "Ok":
-            return data[1]
+            return data
         else:
             raise KappaError(data)
 
@@ -163,30 +202,29 @@ class KappaStd(KappaApi):
 
     # Standardized API methods. Docs are provided by parent.
 
-    def project_parse(self, overwrites=None):
-        if overwrites is None:
-            overwrites = []
-        reply = self._dispatch("ProjectParse", overwrites)
-        self.project_ast = json.loads(reply['boxed_ast'])
+    def project_parse(self, **kwargs):
+        overwrites = list(kwargs.items())
+        reply = self._dispatch_model(["ProjectParse"])
+        self.project_ast = reply
+        self._dispatch("ProjectLoad",[reply,overwrites])
         return reply
 
-    def file_create(self, file_object):
-        file_data = file_object.toJSON()
+    def file_create(self, file_):
         self.project_ast = None
         self.analyses_to_init = True
-        return self._dispatch("FileCreate", file_data)
+        return self._dispatch_model(["FileCreate", file_.get_position(), file_.get_id(), file_.get_content()])
 
     def file_delete(self, file_id):
         self.project_ast = None
         self.analyses_to_init = True
-        return self._dispatch("FileDelete", file_id)
+        return self._dispatch_model(["FileDelete", file_id])
 
     def file_get(self, file_id):
-        f = self._dispatch("FileGet", file_id)
+        f = self._dispatch_model(["FileGet", file_id])
         return File(**f)
 
     def file_info(self):
-        info = self._dispatch("FileCatalog")
+        info = self._dispatch_model("FileCatalog")
         return FileMetadata.from_metadata_list(info)
 
     def simulation_delete(self):
