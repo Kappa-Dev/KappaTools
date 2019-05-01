@@ -63,7 +63,7 @@ let file_create ~position ~id ~content catalog =
 
 let file_move ~position ~id catalog =
   match Hashtbl.find_all catalog.elements id with
-  | [] -> Result.Error ("No file \""^id^"\" in the catalog")
+  | [] -> Result.Error ("Missing file \""^id^"\" in the catalog")
   | _ :: _ :: _ -> Result.Error "File catalog has serious problems"
   | [ { rank; content } ] ->
     let () = Mods.DynArray.set catalog.index rank None in
@@ -79,11 +79,12 @@ let file_patch ~id content catalog =
 
 let file_delete ~id catalog =
   match Hashtbl.find_all catalog.elements id with
-  | [] -> ()
+  | [] -> Result.Error ("No file \""^id^"\"")
   | _ :: _ :: _ -> failwith "Big troubles in file catalog"
   | [ { rank; _ } ] ->
       let () = Mods.DynArray.set catalog.index rank None in
-      Hashtbl.remove catalog.elements id
+      let () = Hashtbl.remove catalog.elements id in
+      Result.Ok ()
 
 let file_get ~id catalog =
   match Hashtbl.find_all catalog.elements id with

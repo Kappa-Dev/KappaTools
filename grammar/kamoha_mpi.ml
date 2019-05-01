@@ -74,9 +74,9 @@ let on_message yield post text =
                       | "FileDelete" ->
                         let id =
                           JsonUtil.read_next_item Yojson.Basic.read_string st b in
-                        let () = Kfiles.file_delete ~id catalog in
+                        let out = Kfiles.file_delete ~id catalog in
                         reply
-                          post Yojson.Basic.write_null msg_id (Result_util.ok ())
+                          post Yojson.Basic.write_null msg_id (lift_answer out)
                       | "ProjectParse" ->
                         Lwt.bind
                           (Kfiles.parse yield catalog)

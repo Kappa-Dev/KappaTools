@@ -29,7 +29,7 @@ val file_move :
 
 val file_patch : id:string -> string -> catalog -> (unit,string) Result.result
 
-val file_delete : id:string -> catalog -> unit
+val file_delete : id:string -> catalog -> (unit,string) Result.result
 
 val file_get : id:string -> catalog -> (string * int,string) Result.result
 (** @return (content, position) *)
