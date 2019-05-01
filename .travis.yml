@@ -15,16 +15,6 @@ matrix:
         packages:
           - aspcud
           - opam
-  - env: CHECKED=python
-    language: python
-    python: 3.6
-    addons:
-      apt:
-        sources:
-          - avsm
-        packages:
-          - aspcud
-          - opam
   - env: CHECKED=js
     addons:
       apt:
