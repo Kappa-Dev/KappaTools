@@ -347,9 +347,9 @@ let print_concrete_agent_site ?sigs f (agent,id) =
 let print_concrete_test ?sigs f = function
   | Is_Here agent ->
     Format.fprintf f "Is_Here(%a)" (Agent.print ?sigs ~with_id:true) agent
-  | Has_Internal ((ag,id as site),int) ->
-    Format.fprintf f "Has_Internal(%a~%a)"
-      (print_concrete_agent_site ?sigs) site
+  | Has_Internal ((ag,id),int) ->
+    Format.fprintf f "Has_Internal(%a.%a)"
+      (Agent.print ?sigs ~with_id:true) ag
       (Agent.print_internal ?sigs ag id) int
   | Is_Free site ->
     Format.fprintf f "Is_Free(%a)" (print_concrete_agent_site ?sigs) site
@@ -384,8 +384,8 @@ let print_concrete_action ?sigs f = function
               | Some y ->
                 Format.fprintf f "%i.%i" x y))
       list
-  | Mod_internal ((ag,id as site),int) ->
-    Format.fprintf f "Mod(%a~%a)" (print_concrete_agent_site ?sigs) site
+  | Mod_internal ((ag,id),int) ->
+    Format.fprintf f "Mod(%a.%a)" (Agent.print ?sigs ~with_id:true) ag
       (Agent.print_internal ?sigs ag id) int
   | Bind (site1,site2) ->
     Format.fprintf f "Bind(%a,%a)" (print_concrete_agent_site ?sigs) site1
