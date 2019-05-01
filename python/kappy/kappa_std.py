@@ -221,10 +221,10 @@ class KappaStd(KappaApi):
 
     def file_get(self, file_id):
         f = self._dispatch_model(["FileGet", file_id])
-        return File(**f)
+        return File(FileMetadata(file_id,f[1]),f[0])
 
     def file_info(self):
-        info = self._dispatch_model("FileCatalog")
+        info = self._dispatch_model(["FileCatalog"])
         return FileMetadata.from_metadata_list(info)
 
     def simulation_delete(self):

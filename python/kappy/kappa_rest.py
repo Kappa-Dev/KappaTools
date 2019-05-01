@@ -146,8 +146,8 @@ class KappaRest(KappaApi):
         return self._delete(self.in_project('files', file_id))
 
     def file_get(self, file_id):
-        file_json = self._get(self.in_project('files', file_id))
-        return File(**file_json)
+        f = self._get(self.in_project('files', file_id))
+        return File(FileMetadata(file_id,f[1]),f[0])
 
     def file_info(self):
         info = self._get(self.in_project('files'))
