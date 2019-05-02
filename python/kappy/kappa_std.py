@@ -151,7 +151,9 @@ class KappaStd(KappaApi):
                 buff.extend(c)
                 c = self.model_agent.stdout.read(1)
             response = json.loads(buff.decode('utf-8'))
-            if response[0] != message_id:
+            if isinstance(response,str):
+                raise KappaError(response)
+            elif response[0] != message_id:
                 raise KappaError(
                         "expect id {0} got {1}".format(response[0],
                                                        message_id)
