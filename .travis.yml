@@ -21,7 +21,6 @@ matrix:
         sources:
           - avsm
         packages:
-          - ocaml-nox
           - aspcud
           - opam
   - env: USE_TK=1
@@ -30,7 +29,6 @@ matrix:
         sources:
           - avsm
         packages:
-          - ocaml-nox
           - aspcud
           - opam
           - tk-dev
@@ -40,7 +38,6 @@ matrix:
         sources:
           - avsm
         packages:
-          - ocaml-nox
           - aspcud
           - opam
           - gnuplot-nox

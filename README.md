@@ -44,7 +44,7 @@ optional dependency of KaSim with new capabilities and will recompile everything
 enabling them!
 
 Nothing worked so far. Well, you're pretty much on your own... Kappa
-tools depend upon the OCaml native compiler version 4.02.3 or above as
+tools depend upon the OCaml native compiler version 4.03.0 or above as
 well as _dune_, _findlib_, _Lwt_ (>= 2.6.0), _Re_, _Fmt_, _Logs_ and
 _Yojson_ libraries. Find any way to install them and you'll be only a
 `make all` away from getting Kappa binaries...

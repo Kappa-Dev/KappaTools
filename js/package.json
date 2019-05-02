@@ -1,6 +1,6 @@
 {
   "name": "kappapp",
-  "version": "4.0.0",
+  "version": "4.0.90",
   "description": "Tool suite for kappa models. Documentation and binaries can be found in the release section. Try it online at http://kappalanguage.org/",
   "main": "main.js",
   "scripts": {
