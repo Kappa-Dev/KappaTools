@@ -1,6 +1,6 @@
 opam-version: "2.0"
 synopsis: "Backends for an interactive use of the Kappa tool suite"
-version: "4~dev"
+version: "4.1~dev"
 maintainer: "Pierre Boutillier <pierre.boutillier@laposte.net>"
 authors: [
   "Jean Krivine" "Jérôme Feret" "Pierre Boutillier"
