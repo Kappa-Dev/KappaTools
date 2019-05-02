@@ -35,6 +35,8 @@ class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
         self.my_outputs.append(os.path.join(bin_dir, "KaSimAgent"))
         distutils.file_util.copy_file("bin/KaSaAgent", bin_dir)
         self.my_outputs.append(os.path.join(bin_dir, "KaSaAgent"))
+        distutils.file_util.copy_file("bin/KaMoHa", bin_dir)
+        self.my_outputs.append(os.path.join(bin_dir, "KaMoHa"))
         setuptools.command.build_ext.build_ext.run(self)
 
     def get_outputs(self):
