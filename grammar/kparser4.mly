@@ -622,6 +622,8 @@ standalone_effect_list:
 perturbation_alarm:
   | annot { None }
   | annot ALARM annot nbr annot { Some $4 }
+  | annot ALARM error
+    { raise (ExceptionDefn.Syntax_Error (add_pos 3 "alarm takes a number as argument")) }
   ;
 
 perturbation_post:
