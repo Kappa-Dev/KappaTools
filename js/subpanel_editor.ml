@@ -34,7 +34,7 @@ let panel_heading =
   Html.div
     ~a:[ Html.a_class [ "btn-group" ] ;
          Html.Unsafe.string_attrib "role" "group" ; ]
-    (Menu_editor_file.content ())
+    (Menu_editor_file.content is_paused)
   in
   let buttons =
     menu_editor_file_content ::
@@ -176,7 +176,6 @@ let onload () : unit =
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
     let () = set_is_paused true in
-    let text : string = Js.to_string codemirror##getValue in
     let () = match !timeout with
         None -> ()
       | Some timeout ->
@@ -193,7 +192,6 @@ let onload () : unit =
     let handle_timeout () =
       let () = set_is_paused false in
       let () = Common.info (Js.string "handle_timeout") in
-      let () = Common.info (Js.string text) in
       match React.S.value filename with
       | None -> ()
       | Some filename ->
@@ -231,12 +229,13 @@ let onload () : unit =
     React.E.map
       (fun refresh ->
          let () = set_filename (Some refresh.State_file.filename) in
-         let () = codemirror##setValue(Js.string refresh.State_file.content) in
-         let () = match refresh.State_file.line with
-           | None -> ()
-           | Some line -> jump_to_line codemirror line in
-         ()
-      )
+         let cand = Js.string refresh.State_file.content in
+         if not (React.S.value is_paused) && cand <> codemirror##getValue then
+           let () = codemirror##setValue cand in
+           let () = match refresh.State_file.line with
+             | None -> ()
+             | Some line -> jump_to_line codemirror line in
+           ())
       State_file.refresh_file
   in
   ()

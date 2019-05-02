@@ -148,7 +148,7 @@ let dropdown (model : State_file.model) =
   @ close_li
   @ export_li
 
-let content () =
+let content is_paused =
   let li_list, li_handle = ReactiveData.RList.create [] in
   let _ =
     React.S.bind
@@ -169,12 +169,13 @@ let content () =
              Html.Unsafe.string_attrib "aria-expanded" "false" ;
              (Tyxml_js.R.filter_attrib
                 (Html.a_disabled ())
-                (React.S.map
-                   (fun model ->
+                (React.S.l2
+                   (fun model is_paused ->
                       match model.State_project.model_current_id with
-                      | Some _ -> false
+                      | Some _ -> is_paused
                       | None -> true)
                    State_project.model
+                   is_paused
                 )
              );
            ]

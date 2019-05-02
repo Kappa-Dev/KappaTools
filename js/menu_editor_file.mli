@@ -6,4 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-include Ui_common.Menu
+val content :
+  bool React.signal ->
+  [> `Button | `Div | `Ul  | `A of [> `PCDATA | `Span ]] Tyxml_js.Html5.elt list
+
+val onload : unit -> unit
