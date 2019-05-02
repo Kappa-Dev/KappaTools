@@ -7,8 +7,7 @@ VERSION=$1
 curl -L https://github.com/Kappa-Dev/KaSim/archive/v${VERSION}.tar.gz | tar xz
 cd KaSim-${VERSION}
 opam pin add -n -y .
-opam install --deps-only -y KaSim-4
-opam install -y atdgen
+opam install --deps-only -y kappa-agents
 
 ## Copy/paste from https://github.com/pypa/python-manylinux-demo/blob/master/travis/build-wheels.sh
 
