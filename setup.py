@@ -50,7 +50,7 @@ def readme():
 
 setup(name='kappy',
       license='LGPLv3',
-      version='4.0.90',
+      version='4.0.91',
       description='Wrapper to interact with the Kappa tool suite',
       long_description=readme(),
       url='https://github.com/Kappa-Dev/KaSim.git',
@@ -67,9 +67,9 @@ setup(name='kappy',
       install_requires=['requests', 'future'],
       package_dir={'':'python'},
       include_package_data=True,
-      package_data={
-          '': ['README.rst'],
-      },
+      data_files=[
+          ('python', ['python/README.rst']),
+      ],
       packages=['kappy'],
       zip_safe=False,
       # This distribution contains binaries not built with
