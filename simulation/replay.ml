@@ -195,7 +195,7 @@ let test_pass_on graph = function
     | None -> false
     | Some ((_, dst_ag_ty), dst_s) -> dst_ag_ty = ag_ty && dst_s = s'
     end
-    
+
 let tests_pass_on graph tests =
   List.for_all (test_pass_on graph) (List.concat tests)
 
@@ -212,7 +212,8 @@ let do_step sigs state = function
   | Trace.Subs _ -> state,{ unary_distances = None }
   | Trace.Rule (kind,event,info) ->
     let unary_distances =
-      store_distances kind state.graph event.Instantiation.tests in
+      if state.connected_components = None then None
+      else store_distances kind state.graph event.Instantiation.tests in
     let pregraph,connected_components =
         List.fold_left
            (do_action sigs) (state.graph,state.connected_components)
