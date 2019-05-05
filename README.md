@@ -31,17 +31,14 @@ binaries for MacOS, Windows and Debian derivatives (as Ubuntu). [Nightly
 builds](https://tools.kappalanguage.org/nightly-builds/) of the master branch
 are built for these platforms by the continuous integration tools.
 
-If you want or need your own build, install
-[opam](https://opam.ocaml.org/doc/Install.html) (the OCaml package manager)  and
-initialize it (by issuing `opam init`) then simply type `opam pin add --dev
-KaSim`. This will compile all necessary dependencies as well as the current
-master branch of the git repository. Once that done, you'll also be able to
-`make all` from this directory too of course.
+If you want or need your own build,
+ - Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml package manager)  and
+initialize it (by issuing `opam init`)
+ - In the source directory, type `opam pin add -n .` and validate
+ - Install all the dependencies by `opam install --deps-only kappa-agents`
+ - `make all`
 
-If you would like to get `WebSim` (the Kappa REST service server), type `opam
-install atdgen cohttp-lwt-unix`. Opam will recognize that you now have an
-optional dependency of KaSim with new capabilities and will recompile everything
-enabling them!
+If you would like to get `WebSim` (the Kappa REST service server), in addition of the previous steps: `opam install kappa-server`
 
 Nothing worked so far. Well, you're pretty much on your own... Kappa
 tools depend upon the OCaml native compiler version 4.03.0 or above as
