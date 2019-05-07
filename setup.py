@@ -21,23 +21,25 @@ class BuildAgentsCommand(distutils.cmd.Command):
         ()
 
     def run(self):
-        subprocess.check_call(["make","all","agents"])
+        if os.path.isfile('agents/KaMoHa.ml'):
+            subprocess.check_call(["make","all","agents"])
 
 class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
     """Compile Kappa agent in addition of standard build"""
 
     def run(self):
         self.my_outputs = []
-        self.run_command('build_agents')
-        bin_dir = os.path.join(self.build_lib, 'kappy/bin')
-        distutils.dir_util.mkpath(bin_dir)
-        distutils.file_util.copy_file("bin/KaSimAgent", bin_dir)
-        self.my_outputs.append(os.path.join(bin_dir, "KaSimAgent"))
-        distutils.file_util.copy_file("bin/KaSaAgent", bin_dir)
-        self.my_outputs.append(os.path.join(bin_dir, "KaSaAgent"))
-        distutils.file_util.copy_file("bin/KaMoHa", bin_dir)
-        self.my_outputs.append(os.path.join(bin_dir, "KaMoHa"))
-        setuptools.command.build_ext.build_ext.run(self)
+        if os.path.isfile('agents/KaMoHa.ml'):
+            self.run_command('build_agents')
+            bin_dir = os.path.join(self.build_lib, 'kappy/bin')
+            distutils.dir_util.mkpath(bin_dir)
+            distutils.file_util.copy_file("bin/KaSimAgent", bin_dir)
+            self.my_outputs.append(os.path.join(bin_dir, "KaSimAgent"))
+            distutils.file_util.copy_file("bin/KaSaAgent", bin_dir)
+            self.my_outputs.append(os.path.join(bin_dir, "KaSaAgent"))
+            distutils.file_util.copy_file("bin/KaMoHa", bin_dir)
+            self.my_outputs.append(os.path.join(bin_dir, "KaMoHa"))
+            setuptools.command.build_ext.build_ext.run(self)
 
     def get_outputs(self):
         outputs = setuptools.command.build_ext.build_ext.get_outputs(self)
@@ -50,7 +52,7 @@ def readme():
 
 setup(name='kappy',
       license='LGPLv3',
-      version='4.0.91',
+      version='4.0.92',
       description='Wrapper to interact with the Kappa tool suite',
       long_description=readme(),
       url='https://github.com/Kappa-Dev/KaSim.git',
