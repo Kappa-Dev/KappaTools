@@ -16,6 +16,7 @@ from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
 
 def find_agent_bin():
     agent_names = ['KaSimAgent', 'KaSaAgent']
+    bin_dir = None
     for potential_dir in [KAPPY_DIR, KASIM_DIR]:
         bin_dir = path.join(potential_dir, 'bin')
         if not path.exists(bin_dir):
@@ -23,8 +24,6 @@ def find_agent_bin():
         contents = listdir(bin_dir)
         if all([agent in contents for agent in agent_names]):
             break
-    else:
-        raise KappaError("Could not find directory with agents.")
     return bin_dir
 
 
@@ -46,6 +45,10 @@ class KappaStd(KappaApi):
         self.project_ast = None
         self.analyses_to_init = True
         if kappa_bin_path is None:
+            if BIN_DIR is None:
+                # binaries must either exist in kappy directory or
+                # their location must be passed to this class
+                raise KappaError("Kappa binaries not found.")
             kappa_bin_path = BIN_DIR
         sim_args = [path.join(kappa_bin_path, "KaSimAgent"),
                     "--delimiter",
