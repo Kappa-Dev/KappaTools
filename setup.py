@@ -60,7 +60,7 @@ class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
                 self.my_outputs.append(os.path.join(bin_dir, "KaSaAgent"))
                 distutils.file_util.copy_file("bin/KaMoHa", bin_dir)
                 self.my_outputs.append(os.path.join(bin_dir, "KaMoHa"))
-                setuptools.command.build_ext.build_ext.run(self)
+        setuptools.command.build_ext.build_ext.run(self)
 
     def get_outputs(self):
         outputs = setuptools.command.build_ext.build_ext.get_outputs(self)
