@@ -43,10 +43,11 @@ let dummy = {
 }
 
 let dummy_annot x = (x, dummy)
-let has_dummy_annot (_,loc) =
+let is_dummy loc =
   loc.file = Lexing.dummy_pos.Lexing.pos_fname &&
   loc.from_position = dummy_position &&
   loc.to_position = dummy_position
+let has_dummy_annot (_,loc) = is_dummy loc
 
 let print f loc =
   let pr_f f =
@@ -66,58 +67,31 @@ let to_string loc = Format.asprintf "@[<h>%a@]" print loc
 let print_annot pr f (x,l) =
   Format.fprintf f "%a@ %a" print l pr x
 
-let position_to_yojson pos =
-  `Assoc [ "line",`Int pos.line; "chr",`Int pos.chr ]
-
-let to_yojson loc =
-  `Assoc
-    [
-      "file", `String loc.file;
-      "from_pos", position_to_yojson loc.from_position;
-      "to_pos", position_to_yojson loc.to_position;
-    ]
-
 let to_compact_yojson decls loc =
-  `Assoc
-    ((if loc.from_position.line <> loc.to_position.line
-      then fun l -> ("eline", `Int loc.to_position.line) :: l
-      else fun l -> l)
-       [
-         ("file",
-          match Mods.StringMap.find_option loc.file decls with
-          | Some i -> `Int i
-          | None -> `String loc.file);
-         "bline", `Int loc.from_position.line;
-         "bchr", `Int loc.from_position.chr;
-         "echr", `Int loc.to_position.chr;
-       ])
+  if is_dummy loc then `Null
+  else `Assoc
+      ((if loc.from_position.line <> loc.to_position.line
+        then fun l -> ("eline", `Int loc.to_position.line) :: l
+        else fun l -> l)
+         [
+           ("file",
+            match Option_util.bind
+                    (Mods.StringMap.find_option loc.file) decls with
+            | Some i -> `Int i
+            | None -> `String loc.file);
+           "bline", `Int loc.from_position.line;
+           "bchr", `Int loc.from_position.chr;
+           "echr", `Int loc.to_position.chr;
+         ])
 
-let position_of_json = function
-  | `Assoc [ "line", `Int line; "chr", `Int  chr ] |
-    `Assoc [ "chr", `Int chr; "line", `Int line ] ->
-    { line; chr }
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a position",x))
-
-let of_yojson = function
-  | `Assoc [ "file", `String file; "from_pos", fr; "to_pos", t ] |
-    `Assoc [ "file", `String file; "to_pos", t; "from_pos", fr ] |
-    `Assoc [ "from_pos", fr; "to_pos", t; "file", `String file ] |
-    `Assoc [ "to_pos", t; "from_pos", fr; "file", `String file ] |
-    `Assoc [ "from_pos", fr; "file", `String file; "to_pos", t ] |
-    `Assoc [ "to_pos", t; "file", `String file; "from_pos", fr ] -> {
-      file;
-      from_position = position_of_json fr;
-      to_position = position_of_json t
-    }
-  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
-
-let of_compact_yojson decls = function
+let of_compact_yojson ?(filenames=[||]) = function
+  | `Null -> dummy
   | `Assoc l as x when List.length l <= 5 ->
     begin
       try
         let file = match List.assoc "file" l with
           | `String x -> x
-          | `Int i -> decls.(i)
+          | `Int i -> filenames.(i)
           | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x)) in
         let of_line = match List.assoc "bline" l with
           | `Int i -> i
@@ -143,20 +117,16 @@ let of_compact_yojson decls = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
 
 let annot_to_yojson ?filenames f (x,l) =
-  `Assoc [ "val", f x;
-           "loc",
-           match filenames with
-           | None -> to_yojson l
-           | Some decls -> to_compact_yojson decls l]
+  let jp = to_compact_yojson filenames l in
+  if jp = `Null then `Assoc [ "val", f x ] else `Assoc [ "val", f x; "loc", jp ]
+
 let annot_of_yojson ?filenames f = function
   | `Assoc [ "val", x; "loc", l ] | `Assoc [ "loc", l; "val", x ] ->
-    (f x,
-     match filenames with
-     | None -> of_yojson l
-     | Some decls -> of_compact_yojson decls l)
+    (f x, of_compact_yojson ?filenames l)
+  | `Assoc [ "val", x ] -> (f x, dummy)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
 
-let write_range ob f = Yojson.Basic.to_outbuf ob (to_yojson f)
+let write_range ob f = Yojson.Basic.to_outbuf ob (to_compact_yojson None f)
 
 let string_of_range ?(len = 1024) x =
   let ob = Bi_outbuf.create len in
@@ -164,7 +134,8 @@ let string_of_range ?(len = 1024) x =
   Bi_outbuf.contents ob
 
 let read_range p lb =
-  of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)
+  of_compact_yojson
+    ?filenames:None (Yojson.Basic.from_lexbuf ~stream:true p lb)
 
 let range_of_string s =
   read_range (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
