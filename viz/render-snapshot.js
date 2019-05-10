@@ -58,7 +58,7 @@ class SnapRender {
         let width = layout.dimension.width;
         let height = layout.dimension.height;
         this.layout = layout;
-        this.isAtRoot = true;
+	this.zoomId = null;
 
         let svgWidth = width +
                             this.layout.margin.left +
@@ -97,7 +97,7 @@ class SnapRender {
 
     
         function zoomout () {
-            if(!renderer.isAtRoot) {
+            if(renderer.zoomId !== null) {
                 d3.select("#snap-form").selectAll("input")
                 .attr('disabled', null);
                 d3.select("#force-container").remove();
@@ -109,9 +109,8 @@ class SnapRender {
                     .select("rect")
                         .attr("width", d => { return renderer.zoomWidth; })
                         .attr("height", d => { return renderer.zoomHeight; });
-                renderer.isAtRoot = true;
+		renderer.zoomId = null;
             }
-            renderer.dblclicked = false;
 
         }
         controller.append("text")
@@ -184,14 +183,14 @@ class SnapRender {
                 .attr("height", d => { return d.y1 - d.y0; })
                 .on("mouseover", mouseoverSpecies)
                 .on("mouseout", mouseoutSpecies)
-                .on("click", markSpecies)
-                .on("dblclick", zoomInSpecies);
+                // .on("click", markSpecies)
+                .on("click", zoomInSpecies);
             
         function zoomInSpecies (d) 
         {
             d3.select("#snap-form").selectAll("input")
                 .attr('disabled', true);
-            if (!renderer.dblclicked) {
+            if (renderer.zoomId === null) {
                 d3.selectAll(".treeNodes").transition().duration(200).remove();
                 d3.selectAll(".treeSpecies")
                     .classed("treeSpecies-hidden", true)
@@ -228,10 +227,8 @@ class SnapRender {
                     .attr("width", width )
                     .attr("height", height );
      
-                renderer.dblclicked = true;
                 renderer.zoomId = element.data.id;
                 renderer.renderForceDirected(d.data, d.data.id, height, width);
-                renderer.isAtRoot = false;
             }
            
 
@@ -248,26 +245,26 @@ class SnapRender {
             renderer.tooltip.hideSpecies();
         }
 
-        function markSpecies(d) {
-            let species = d;
-            if (renderer.marking[d.data.name] === undefined) {
-                renderer.marking[d.data.name] = 1;
-            }
-            else if (renderer.marking[d.data.name] === 1) {
-                renderer.marking[d.data.name] = 0;
-            }
-            else {
-                renderer.marking[d.data.name] = 1;
-            }
-            svg.selectAll(".treeRects").filter(d => d.parent.data.name === species.data.name)
-                .attr("fill", d => { 
-                    if (renderer.marking[d.parent.data.name] === 1 ) {
-                        return renderer.coloring[d.data.name].brighter(1.5).darker();
-                    }
-                    return renderer.coloring[d.data.name].brighter(1.5); 
-                });  
-            //console.log(renderer.marking);
-        }
+	// function markSpecies(d) {
+        //     let species = d;
+        //     if (renderer.marking[d.data.name] === undefined) {
+        //         renderer.marking[d.data.name] = 1;
+        //     }
+        //     else if (renderer.marking[d.data.name] === 1) {
+        //         renderer.marking[d.data.name] = 0;
+        //     }
+        //     else {
+        //         renderer.marking[d.data.name] = 1;
+        //     }
+        //     svg.selectAll(".treeRects").filter(d => d.parent.data.name === species.data.name)
+        //         .attr("fill", d => {
+        //             if (renderer.marking[d.parent.data.name] === 1 ) {
+        //                 return renderer.coloring[d.data.name].brighter(1.5).darker();
+        //             }
+        //             return renderer.coloring[d.data.name].brighter(1.5);
+        //         });
+        //     //console.log(renderer.marking);
+        // }
     }
 
     renderNodes() {
