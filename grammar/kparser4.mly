@@ -110,7 +110,7 @@ site_link:
   | annot link_states link_modif CL_BRA { ($2, $3) }
   | annot error
     { raise (ExceptionDefn.Syntax_Error
-               ("invalid linking state or missing ']'",rhs_pos 4)) }
+               ("invalid linking state or missing ']'",rhs_pos 2)) }
   ;
 
 site_internal:
