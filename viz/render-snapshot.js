@@ -367,6 +367,8 @@ class SnapRender {
             .selectAll("line")
             .data(linkData)
             .enter().append("line")
+	    .attr("stroke","white")
+	    .attr("stroke-opacity",0.6)
             .attr("stroke-width", d => Math.sqrt(d.value) );
 
         let node = forceContainer.append("g")

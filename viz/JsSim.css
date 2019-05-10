@@ -318,11 +318,6 @@ form {
     fill-opacity: 0;
 }
 
-.snapshot-links line {
-    stroke:white;
-    stroke-opacity: 0.6;
-}
-
 #snap-sidebar {
     position: absolute !important;
     display: flex;
