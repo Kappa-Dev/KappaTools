@@ -248,10 +248,6 @@ rect { stroke-width: 2; }
     overflow: hidden;
 }
 
-#resetButton {
-    margin-left: 30px;
-}
-
 form {
     margin-left: 10px;
 }

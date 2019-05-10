@@ -66,8 +66,8 @@ class SnapRender {
         let svgHeight = height +
                             this.layout.margin.top +
                             this.layout.margin.bottom ;
-  
-        let container = this.container = this.root
+
+        let container = this.svg = this.root
             .append("div")
             .classed("render-container flex-content", true)
             .style("position", "relative")
@@ -83,19 +83,8 @@ class SnapRender {
             .append("div")
             .classed("snapshot-legend", true);
 
-         /* add control bar on top for zoom */
-        let controller = this.container
-        .append("g")
-            .attr("id", "controller");
+	d3.select("#rootButton").on("click", zoomout);
 
-        controller.append("rect")
-            .attr("width", width)
-            .attr("height", "20px")
-            .style("fill", "lightgrey")
-            .attr("transform", "translate(10 , 0)")
-            .on("click", zoomout);
-
-    
         function zoomout () {
             if(renderer.zoomId !== null) {
                 d3.select("#snap-form").selectAll("input")
@@ -113,13 +102,7 @@ class SnapRender {
             }
 
         }
-        controller.append("text")
-            .attr("dy", "1em")
-            .attr("dx", "1em")
-            .text("back to root");
 
-            
-        let svg = this.svg = container.append('g').attr("id", "snapshot");
         let data = this.layout.snapshot.data;
         data.generateTreeData();
         this.coloring = coloring;
@@ -149,7 +132,7 @@ class SnapRender {
         let svg = this.svg;
         let treemap = this.treemap = d3.treemap()
             .tile(d3.treemapResquarify)
-            .size([width, height - 20])
+            .size([width, height])
             .round(true)
             .paddingInner(4);
         let root = this.root = d3.hierarchy(data.treeData)
@@ -169,7 +152,7 @@ class SnapRender {
             .attr("class", "treeSpecies")
             .attr("id", d => d.data.id)
             .attr("transform", d => { let x = d.x0 + (layout.margin.left + layout.margin.right)/2;
-                                            let y = d.y0 + 30;
+                                            let y = d.y0;
                                             return "translate(" + x + "," + y + ")"; });
 
 
@@ -220,7 +203,7 @@ class SnapRender {
                 d3.selectAll(".treeSpecies").filter(d => d.data.id === element.data.id)
                 .transition()
                     .attr("transform", d => { let x = (layout.margin.left + layout.margin.right)/2;
-                                            let y = (layout.margin.top + layout.margin.bottom)/2 + 20;
+                                            let y = (layout.margin.top + layout.margin.bottom)/2;
                                             return "translate(" + x + "," + y + ")"; })
                     .duration(750)                   
                     .select("rect")
@@ -351,7 +334,7 @@ class SnapRender {
         zoomRect.call(zoom);
         
         /*add reset button functionality */
-        d3.select("#resetButton").on("click", reset);
+        d3.select("#recenterSnapButton").on("click", reset);
 
         function reset() {
             zoomRect.transition().duration(1000)

@@ -13,7 +13,7 @@ class SnapUIManager {
            /* add button functionality */
         
         let timeout = d3.timeout(function() {
-            d3.select("input[value=\"sumBySize\"]")
+            d3.select("input[value=\"sumByMass\"]")
                 .property("checked", true)
                 .dispatch("change");
         }, 10);
@@ -54,7 +54,7 @@ class SnapUIManager {
             .transition()
                 .duration(750)
                 .attr("transform", d => { let x = d.x0 + (renderer.layout.margin.left + renderer.layout.margin.right)/2;
-                                            let y = d.y0 + 30;
+                                            let y = d.y0;
                                             return "translate(" + x + "," + y + ")"; })
                 
                 .select("rect")
@@ -143,7 +143,7 @@ class SnapUIManager {
             });
 
         let speciesTip = this.tip
-            .text("count: " + d.data.count)
+            .text("count: " + d.data.count + "\nsize: " + d.data.size)
             .style('color', "black");
     }     
 
