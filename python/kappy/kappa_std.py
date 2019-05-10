@@ -106,6 +106,9 @@ class KappaStd(KappaApi):
             while c != self.delimiter.encode('utf-8') and c:
                 buff.extend(c)
                 c = self.sim_agent.stdout.read(1)
+            # error checking here?
+            print("buff: ")
+            print(buff.decode('utf-8'))
             response = json.loads(buff.decode('utf-8'))
             if response["id"] != message_id:
                 raise KappaError(
