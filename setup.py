@@ -36,8 +36,8 @@ class BuildAgentsCommand(distutils.cmd.Command):
             try:
                 subprocess.check_call(["make","all","agents"])
             except subprocess.CalledProcessError:
-                print "Failed to compile Kappa agents. Installing Python " \
-                      "wrapper only."
+                print("Failed to compile Kappa agents. Installing Python " \
+                      "wrapper only.")
                 return status
             status = True
         return status
