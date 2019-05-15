@@ -1,4 +1,4 @@
-Parsing a_bn_c.ka...
+Parsing 584.ka...
 done
 + simulation parameters
 + Sanity checks
@@ -9,13 +9,13 @@ done
 	 -interventions
 	 -observables
 	 -update_domain construction
-	 18 (sub)observables 0 navigation steps
+	 7 (sub)observables 8 navigation steps
 	 -initial conditions
-+ Building initial state (512 agents)
++ Building initial state (4 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-u' 'e' '-l' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '2' 'a_bn_c.ka'
++ Command line to rerun is: 'KaSim' '-mode' 'batch' '584.ka' '-l' '20' '-u' 'event' '-seed' '337511021' '-d' 'output'
 ____________________________________________________________
 ############################################################
 Simulation ended
-74.35% of event loops were productive. Null event cause:
-	Valid embedding but no longer unary when required: 100.00%
+58.82% of event loops were productive. Null event cause:
+	Clashing instance: 100.00%

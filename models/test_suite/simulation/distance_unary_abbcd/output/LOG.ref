@@ -17,6 +17,6 @@ Done
 ____________________________________________________________
 ############################################################
 Simulation ended
-53.91% of event loops were productive. Null event cause:
-	Valid embedding but no longer unary when required: 5.85%
-	Clashing instance: 94.15%
+54.20% of event loops were productive. Null event cause:
+	Valid embedding but no longer unary when required: 14.20%
+	Clashing instance: 85.80%

@@ -1056,9 +1056,12 @@ module Make (Instances:Instances_sig.S) = struct
         ~debugMode ~rule_id ?max_distance state domain state.edges
         rule.Primitives.connected_components rule in
     let () =
-      store_activity
-        ~debugMode (fun _ _ _ -> ()) env counter state (2*rule_id+1)
-        rule.Primitives.syntactic_rule (fst rule.Primitives.rate) act in
+      match rule.Primitives.unary_rate with
+      | None -> assert false
+      | Some (unrate, _) ->
+        store_activity
+          ~debugMode (fun _ _ _ -> ()) env counter state (2*rule_id+1)
+          rule.Primitives.syntactic_rule (fst unrate) act in
     state
 
   let incorporate_extra_pattern ~debugMode domain state pattern =

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+"${KAPPABIN}"KaSim -mode batch 584.ka -l 20 -u event -seed 337511021 -d output
