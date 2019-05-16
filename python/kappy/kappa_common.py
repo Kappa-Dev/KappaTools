@@ -319,6 +319,15 @@ class KappaApi(ABC):
     # is used as a decorator for the class.
 
     @abc.abstractmethod
+    def project_overwrite(self, ast, file_id="model.ka"):
+        """
+        Overwrite the project with the given AST
+
+        ast -- the ast in the format returned by project_parse
+        file_id -- a virtual file name in which the ast will be dump
+        """
+
+    @abc.abstractmethod
     def project_parse(self, **kwargs):
         """
         Parses the project

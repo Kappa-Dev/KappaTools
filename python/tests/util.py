@@ -132,6 +132,27 @@ class _KappaClientTest(unittest.TestCase):
         self.assertEqual(351, len(last_status['series']))
         return
 
+    def test_parsing_consistency(self):
+        print("Getting runtime...")
+        runtime = self.getRuntime()
+
+        file_id = runtime.make_unique_id('abc-pert')
+        print("Adding model file %s..." % file_id)
+        fpath = path.join(MODELS_DIR, "abc-pert.ka")
+        runtime.add_model_file(fpath, 0, file_id)
+
+        print("Parse project...")
+        ast = runtime.project_parse()
+
+        print("removing file and overwriting ast")
+        runtime.file_delete(file_id)
+        runtime.project_overwrite(ast,"plus.ka")
+
+        print("getting the model text back en reparse it")
+        gen_file = runtime.file_get("plus.ka")
+        runtime.file_delete("plus.ka")
+        runtime.add_model_string(gen_file.file_content,file_id="final")
+        runtime.project_parse()
 
 def run_nose(fname):
     import nose

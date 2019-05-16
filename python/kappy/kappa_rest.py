@@ -135,6 +135,12 @@ class KappaRest(KappaApi):
         self._post(self.in_project('?'.join(['load',overwrites])), reply)
         return reply
 
+    def project_overwrite(self, ast, file_id="model.ka"):
+        self._post(self.in_project('overwrite',file_id),ast)
+        self.project_ast = ast
+        self.analyses_to_init = True
+        self._post(self.in_project('load'), ast)
+
     def file_create(self, file_):
         self.project_ast = None
         self.analyses_to_init = True
@@ -142,7 +148,7 @@ class KappaRest(KappaApi):
 
     def file_delete(self, file_id):
         self.project_ast = None
-        self.analyses_to_init = False
+        self.analyses_to_init = True
         return self._delete(self.in_project('files', file_id))
 
     def file_get(self, file_id):
