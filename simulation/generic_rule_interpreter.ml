@@ -868,10 +868,14 @@ module Make (Instances:Instances_sig.S) = struct
     let (nb_rectangular_instances_by_cc, unary_candidates) =
       if Hashtbl.length state.imp.changed_connectivity = 0 then
         (state.nb_rectangular_instances_by_cc, state.unary_candidates)
-      else Model.fold_rules
-          (unary_rule_update state.imp.changed_connectivity state.imp.instances)
-          (state.nb_rectangular_instances_by_cc, state.unary_candidates)
-          env in
+      else
+        let out = Model.fold_rules
+            (unary_rule_update
+               state.imp.changed_connectivity state.imp.instances)
+            (state.nb_rectangular_instances_by_cc, state.unary_candidates)
+            env in
+        let () = Hashtbl.reset state.imp.changed_connectivity in
+        out in
     ({
       outdated = false; imp = state.imp; edges = state.edges;
       events_to_block = state.events_to_block;
