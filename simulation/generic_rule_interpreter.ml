@@ -588,7 +588,8 @@ module Make (Instances:Instances_sig.S) = struct
         Instantiation.connectivity_tests =
           (match path with
            | None -> []
-           | Some path -> path_tests path cevent.Instantiation.tests);
+           | Some None -> assert false
+           | Some (Some path) -> path_tests path cevent.Instantiation.tests);
       } in
       let () =
         outputs (Data.TraceStep
@@ -935,7 +936,7 @@ module Make (Instances:Instances_sig.S) = struct
       match path with
       | Some _ ->
         transform_by_a_rule
-          ~debugMode outputs env counter state' event_kind ?path rule ~rule_id inj
+          ~debugMode outputs env counter state' event_kind ~path rule ~rule_id inj
       | None ->
         let max_distance = match rule.Primitives.unary_rate with
           | None -> None
@@ -943,11 +944,19 @@ module Make (Instances:Instances_sig.S) = struct
             (match dist_opt with
              | None -> None
              | Some d -> Some (max_dist_to_int counter state' d)) in
+        if max_distance = None && state.imp.story_machinery = None then
+          if Edges.in_same_connected_component
+              (fst (List.hd nodes.(0))) (fst (List.hd nodes.(1))) state.edges then
+            transform_by_a_rule
+              ~debugMode outputs env counter state'
+              event_kind ~path:None rule ~rule_id inj
+          else Corrected
+        else
         match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
         | None -> Corrected
         | Some _ as path ->
           transform_by_a_rule
-            ~debugMode outputs env counter state' event_kind ?path rule ~rule_id inj
+            ~debugMode outputs env counter state' event_kind ~path rule ~rule_id inj
 
   let apply_given_rule
       ~debugMode ~outputs ?rule_id env counter state event_kind rule =

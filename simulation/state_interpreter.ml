@@ -454,7 +454,7 @@ let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
 
   let out =
     (*Activity is null or dt is infinite*)
-    if not (activity > 0.) || dt = infinity then
+    if not (activity > 0.) || classify_float dt = FP_infinite then
       if List.exists
           (fun (_,pe) ->
              (Model.get_perturbation env pe).Primitives.needs_backtrack)
