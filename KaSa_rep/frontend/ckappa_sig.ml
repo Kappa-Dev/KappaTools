@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Aug 31 2018>
+ * Last modification: Time-stamp: <May 21 2019>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -352,10 +352,8 @@ let join_link parameters error link1 link2 =
   then error, link1
   else
     match link1, link2 with
-    | LNK_MISSING,_ | _, LNK_MISSING ->
-      Exception.warn parameters error __POS__ Exit link1
-    | LNK_ANY _, _ -> error, link2
-    | _, LNK_ANY _ -> error, link1
+    | (LNK_ANY _ | LNK_MISSING), _ -> error, link2
+    | _, (LNK_ANY _ | LNK_MISSING) -> error, link1
     | FREE, _ | _, FREE ->
       Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
     | LNK_SOME _, _ -> error, link2
@@ -698,10 +696,9 @@ let add_binding_state  parameters error agent_id site_name p state bool_opt mixt
 
 let add_free parameters error agent_id site_name mixture =
   add_binding_state parameters error agent_id site_name
-    (fun parameters error lnk ->
+    (fun _parameters error lnk ->
        match lnk with
-       | LNK_ANY _ -> error, true
-       | LNK_MISSING -> Exception.warn parameters error __POS__ Exit true
+       | LNK_MISSING | LNK_ANY _ -> error, true
        | FREE | LNK_VALUE _ | LNK_SOME _ | LNK_TYPE _ -> error, false)
     FREE
     (Some true)
@@ -709,10 +706,9 @@ let add_free parameters error agent_id site_name mixture =
 
 let add_binding_type parameters error agent_id site_name agent_name' site_name' mixture =
   add_binding_state parameters error agent_id site_name
-  (fun parameters error lnk ->
+  (fun _parameters error lnk ->
      match lnk with
-       | LNK_MISSING -> Exception.warn parameters error __POS__ Exit true
-       | LNK_SOME _ | LNK_ANY _ -> error, true
+       | LNK_MISSING | LNK_SOME _ | LNK_ANY _ -> error, true
        | FREE | LNK_VALUE _ | LNK_TYPE _ -> error, false)
   (LNK_TYPE (Locality.dummy_annot agent_name', Locality.dummy_annot site_name'))
   (Some false)
@@ -721,10 +717,9 @@ let add_binding_type parameters error agent_id site_name agent_name' site_name' 
 
 let add_bound parameters error agent_id site_name mixture =
   add_binding_state parameters error agent_id site_name
-    (fun parameters error lnk ->
+    (fun _parameters error lnk ->
        match lnk with
-       | LNK_MISSING -> Exception.warn parameters error __POS__ Exit true
-       | LNK_ANY _ -> error, true
+       | LNK_MISSING | LNK_ANY _ -> error, true
        | LNK_SOME _ | FREE | LNK_VALUE _ | LNK_TYPE _ -> error, false)
     (LNK_SOME Locality.dummy)
     (Some false)
@@ -732,10 +727,9 @@ let add_bound parameters error agent_id site_name mixture =
 
 let add_pointer parameters error agent_id site_name agent_id' agent_name' site_name' lnk_value mixture =
   add_binding_state parameters error agent_id site_name
-    (fun parameters error lnk ->
+    (fun _parameters error lnk ->
        match lnk with
-       | LNK_MISSING -> Exception.warn parameters error __POS__ Exit true
-       | LNK_SOME _ | LNK_ANY _ -> error, true
+       | LNK_MISSING | LNK_SOME _ | LNK_ANY _ -> error, true
        | LNK_TYPE ((agent_name'',_),(site_name'',_)) ->
          error, agent_name'' = agent_name' && site_name'' = site_name'
        | FREE | LNK_VALUE _ -> error, false)
