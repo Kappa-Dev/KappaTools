@@ -39,3 +39,5 @@ val catalog : catalog -> catalog_item list
 val parse :
   (unit -> unit Lwt.t) -> catalog ->
   (Ast.parsing_compil, Result_util.message list) Result_util.t Lwt.t
+
+val overwrite : string -> Ast.parsing_compil -> catalog -> unit

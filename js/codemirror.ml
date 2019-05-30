@@ -352,6 +352,8 @@ class type configuration =
     method lineWrapping: bool Js.t Js.prop
     (*  Show line numbers to the left of the editor *)
     method lineNumbers : bool Js.t Js.prop
+    (* At which number to start counting lines. Default is 1. *)
+    method firstLineNumber : int Js.t Js.prop
     (* A function used to format line numbers. *)
     method lineNumberFormatter: (int Js.t -> Js.js_string) Js.t Js.prop
     (* Add extra gutters *)
@@ -370,6 +372,15 @@ class type configuration =
     method showCursorWhenSelecting: bool Js.t Js.prop
     (* copy or cut when there is no selection will copy or cut whole lines *)
     method lineWiseCopyCut: bool Js.t Js.prop
+    (* When pasting something from an external source (not from the
+       editor itself), if the number of lines matches the number of
+       selection, CodeMirror will by default insert one line per
+       selection. You can set this to false to disable that
+       behavior. *)
+    method pasteLinesPerSelection: bool Js.t Js.prop
+    (* Determines whether multiple selections are joined as soon as
+       they touch (the default) or only when they overlap (true). *)
+    method selectionsMayTouch: bool Js.t Js.prop
     (* maximum number of undo *)
     method undoDepth: int Js.t Js.prop
     (* milliseconds of inactivity to create a new history event *)

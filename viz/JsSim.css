@@ -248,10 +248,6 @@ rect { stroke-width: 2; }
     overflow: hidden;
 }
 
-#resetButton {
-    margin-left: 30px;
-}
-
 form {
     margin-left: 10px;
 }
@@ -320,11 +316,6 @@ form {
 
 .treeSpecies-hidden {
     fill-opacity: 0;
-}
-
-.snapshot-links line {
-    stroke:white;
-    stroke-opacity: 0.6;
 }
 
 #snap-sidebar {

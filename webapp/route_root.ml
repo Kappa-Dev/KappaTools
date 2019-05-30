@@ -314,6 +314,24 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
+    { Webapp_common.path = "/v2/projects/{projectid}/overwrite/{fileid}" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `POST ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `POST ->
+            let (project_id,file_id) = file_ref context in
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
+            (JsonUtil.read_of_string (Ast.read_parsing_compil))
+            >>= fun ast ->
+            bind_projects
+              (fun manager -> manager#project_overwrite file_id ast)
+              project_id projects >>=
+            (Webapp_common.api_result_response
+               ~string_of_success:(fun () -> "null"))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
     { Webapp_common.path = "/v2/projects/{projectid}/files" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `GET ] in

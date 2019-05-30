@@ -513,6 +513,11 @@ let print_raw_rate pr_mix pr_tok pr_var op f (def,_) =
        | Some (d,_) ->
          Format.fprintf f ", %a" (Alg_expr.print pr_mix pr_tok pr_var) d)
 
+let print_ast_alg_expr =
+  Alg_expr.print
+    (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
+    Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x)
+
 let print_rates_one_dir un f def =
   Format.fprintf
     f "%a%t"
@@ -525,24 +530,11 @@ let print_rates_one_dir un f def =
          None -> ()
        | Some ((d,_),max_dist) ->
          Format.fprintf
-           f " {%a%t}"
-           (Alg_expr.print
-              (fun f m ->
-                 Format.fprintf f "|%a|" print_ast_mix m)
-              Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x)) d
+           f " {%a%t}" print_ast_alg_expr d
            (fun f ->
-              match max_dist with
-              | None -> ()
-              | Some _  ->
-                Pp.option
-                  (fun f (md,_) ->
-                    Format.fprintf f ":%a"
-                      (Alg_expr.print
-                         (fun f m ->
-                            Format.fprintf f "|%a|" print_ast_mix m)
-                         Format.pp_print_string
-                         (fun f x -> Format.fprintf f "'%s'" x)) md)
-                  f max_dist))
+              Pp.option
+                (fun f (md,_) -> Format.fprintf f ":%a" print_ast_alg_expr md)
+                f max_dist))
 
 let print_rule_content ~bidirectional f = function
   | Edit r ->
@@ -569,6 +561,103 @@ let print_ast_rule f r =
        | Some a,_ ->
          Format.fprintf f " , %a"
            (print_rates_one_dir r.k_op_un) a)
+
+let print_configuration f ((n,_),l) =
+  Format.fprintf f "@[%%def: \"%s\" @[%a@]@]" n
+    (Pp.list Pp.space (fun f (x,_) -> Format.fprintf f "\"%s\"" x)) l
+
+let print_init f = function
+  | (n,_), INIT_MIX (m,_) ->
+    Format.fprintf f "@[%%init: @[%a@]@ @[%a@]@]"
+      print_ast_alg_expr n print_ast_mix m
+  | (n,_), INIT_TOK t ->
+    Format.fprintf f "@[%%init: %a %a@]"
+      print_ast_alg_expr n
+      (Pp.list Pp.space (fun f (x,_) -> Format.pp_print_string f x)) t
+
+let print_ast_bool_expr =
+  Alg_expr.print_bool
+    (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
+    Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x)
+
+let print_print_expr f =
+  let aux f = function
+    | Primitives.Str_pexpr (str,_) -> Format.fprintf f "\"%s\"" str
+    | Primitives.Alg_pexpr (alg,_) -> print_ast_alg_expr f alg
+  in function
+    | [] -> ()
+    | [ Primitives.Str_pexpr (str,_) ] -> Format.fprintf f " \"%s\"" str
+    | ([ Primitives.Alg_pexpr  _ ] | _::_::_) as e ->
+      Format.fprintf f "@ (@[%a@])" (Pp.list (fun f -> Format.fprintf f ".") aux) e
+
+let print_modif f = function
+  | APPLY ((n,_),(r,_)) ->
+    Format.fprintf f "$APPLY @[%a@] @[%a@];" print_ast_alg_expr n
+      (print_rule_content ~bidirectional:false) r.rewrite
+  | UPDATE ((s,_),(n,_)) ->
+    Format.fprintf f "$UPDATE '%s@' @[%a@];" s print_ast_alg_expr n
+  | STOP p -> Format.fprintf f "$STOP%a;" print_print_expr p
+  | SNAPSHOT p -> Format.fprintf f "$SNAPSHOT%a;" print_print_expr p
+  | PRINT ([],x) ->
+    Format.fprintf f "$PRINTF%a" print_print_expr x
+  | PRINT (file,x) ->
+    Format.fprintf f "$PRINTF%a >%a" print_print_expr x print_print_expr file
+  | PLOTENTRY -> Format.pp_print_string f "$PLOTNOW;"
+  | CFLOWLABEL (on,(s,_)) ->
+    Format.fprintf f "$TRACK '%s' %s;" s (if on then "[true]" else "[false]")
+  | CFLOWMIX (on,(p,_)) ->
+    Format.fprintf f "$TRACK @[%a@] %s;"
+      print_ast_mix p (if on then "[true]" else "[false]")
+  | DIN (k,p) ->
+    Format.fprintf
+      f "$DIN%a %t[true]" print_print_expr p
+      (fun f -> match k with
+         | Primitives.ABSOLUTE -> Format.fprintf f "\"absolute\" "
+         | Primitives.RELATIVE -> ()
+         | Primitives.PROBABILITY -> Format.fprintf f "\"probability\" ")
+  | DINOFF p ->
+    Format.fprintf f "$DIN%a [false]" print_print_expr p
+  | SPECIES_OF (on,p,(m,_)) ->
+    Format.fprintf f "$SPECIES_OF @[%a@] %s >%a;"
+      print_ast_mix m
+      (if on then "[true]" else "[false]") print_print_expr p
+
+let print_perturbation f ((alarm,cond,modif,rep),_) =
+  Format.fprintf f "@[%%mod:%a%a do@ @[%a@]%a@]"
+    (Pp.option (fun f i -> Format.fprintf f "alarm %a" Nbr.print i)) alarm
+    (Pp.option (fun f (r,_) -> Format.fprintf f "@[%a@]" print_ast_bool_expr r))
+    cond
+    (Pp.list Pp.space print_modif)
+    modif
+    (Pp.option (fun f (r,_) ->
+         Format.fprintf f "repeat @[%a@]" print_ast_bool_expr r))
+    rep
+
+let print_parsing_compil_kappa f c =
+  Format.fprintf f "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@]@."
+    (Pp.list Pp.space print_configuration) c.configurations
+    (Pp.list Pp.space (fun f a ->
+         Format.fprintf f "@[%%agent:@ @[%a@]@]" print_ast_agent a))
+    c.signatures
+    (Pp.list Pp.space (fun f (s,_) -> Format.fprintf f "%%token: %s" s))
+    c.tokens
+    (Pp.list Pp.space (fun f ((s,_),(a,_)) ->
+         Format.fprintf f "@[%%var: '%s'@ @[%a@]@]" s print_ast_alg_expr a))
+    c.variables
+    (Pp.list Pp.space  (fun f (a,_) ->
+         Format.fprintf f "@[%%plot:@ @[%a@]@]"
+           print_ast_alg_expr a))
+    c.observables
+    (Pp.list Pp.space  (fun f (s,(r,_)) ->
+         Format.fprintf f "@[@[%a%a@]@]"
+           (Pp.option ~with_space:false
+              (fun f (s,_) -> Format.fprintf f "'%s'@ " s)) s
+           print_ast_rule r))
+    c.rules
+    (Pp.list Pp.space print_perturbation)
+    c.perturbations
+    (Pp.list Pp.space print_init)
+    c.init
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
   JsonUtil.smart_assoc [
@@ -724,7 +813,6 @@ let rule_of_json filenames f_mix f_var = function
         raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule",x))
-
 
 let modif_to_json filenames f_mix f_var = function
   | APPLY (alg,r) ->

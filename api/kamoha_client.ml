@@ -127,4 +127,12 @@ class virtual new_client ~post mailbox :
       (fun b -> JsonUtil.write_sequence b [
            (fun b -> Yojson.Basic.write_string b "ProjectParse");
          ])
+
+  method project_overwrite file_id ast =
+    self#message Nothing
+      (fun b -> JsonUtil.write_sequence b [
+           (fun b -> Yojson.Basic.write_string b "ProjectOverwrite");
+           (fun b -> Yojson.Basic.write_string b file_id);
+           (fun b -> Ast.write_parsing_compil b ast);
+         ])
 end

@@ -439,6 +439,13 @@ class manager
       `POST
       (JsonUtil.read_of_string Ast.read_parsing_compil)
 
+  method project_overwrite file_id ast =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/overwrite/%s" url project_id file_id)
+      `POST ~data:(Yojson.Basic.to_string (Ast.compil_to_json ast))
+      (JsonUtil.read_of_string Yojson.Basic.read_null)
+
   method init_static_analyser_raw data =
     send
       ?timeout request_count

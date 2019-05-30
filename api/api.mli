@@ -26,6 +26,8 @@ class type virtual manager_model = object
   method virtual is_running : bool
   method project_parse : Ast.parsing_compil result Lwt.t
 
+  method project_overwrite : string -> Ast.parsing_compil -> unit result Lwt.t
+
   method file_catalog : Kfiles.catalog_item list result Lwt.t
 
   method file_create : int -> string -> string -> unit result Lwt.t

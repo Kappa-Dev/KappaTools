@@ -315,10 +315,11 @@ let xml () =
              ) ]
       [%html {|
         <form  class="form-inline" id="snap-form">
-        <label><input type="radio" name="mode" value="sumByMass" > Mass</label>
+        <label><input type="radio" name="mode" value="sumByMass" checked> Mass</label>
         <label><input type="radio" name="mode" value="sumByCount" > Count</label>
-        <label><input type="radio" name="mode" value="sumBySize" checked> Size</label>
-        <button id="resetButton" class="stateButton" type="button"> Reset Zoom </button>
+        <label><input type="radio" name="mode" value="sumBySize" > Size</label>
+        <button id="recenterSnapButton" class="stateButton" type="button">Reset Zoom</button>
+        <button id="rootButton" class="stateButton" type="button">Back to root</button>
         </form>
         <div class="flex-content" id="|}display_id{|"></div>|}]
   in

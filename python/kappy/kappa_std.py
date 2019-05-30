@@ -214,6 +214,12 @@ class KappaStd(KappaApi):
         self._dispatch("ProjectLoad",[reply,overwrites])
         return reply
 
+    def project_overwrite(self, ast, file_id="model.ka"):
+        self._dispatch_model(["ProjectOverwrite",file_id,ast])
+        self.project_ast = ast
+        self.analyses_to_init = True
+        self._dispatch("ProjectLoad",[ast,[]])
+
     def file_create(self, file_):
         self.project_ast = None
         self.analyses_to_init = True

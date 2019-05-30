@@ -88,6 +88,13 @@ let on_message yield post =
                          Lwt.bind
                            (Kfiles.parse yield catalog)
                          (fun out -> Lwt.return (B (Ast, msg_id, out)))
+                       | "ProjectOverwrite" ->
+                         let id =
+                           JsonUtil.read_next_item Yojson.Basic.read_string st b in
+                         let content =
+                           JsonUtil.read_next_item Ast.read_parsing_compil st b in
+                         let () = Kfiles.overwrite id content catalog in
+                         Lwt.return (B (Nothing, msg_id, Result_util.ok ()))
                        | x ->
                          Lwt.return
                            (B (Nothing, msg_id,
