@@ -319,11 +319,20 @@ module Cflow_linker =
           else aux recur (this::acc) soup' t
       in aux remanent step_list action_list action_list
 
-    let as_init agent_info =
-      SiteSet.is_empty agent_info.bound_sites
-      && SiteSet.is_empty agent_info.sites_with_wrong_internal_state
+    let as_init restriction_map agid agent_info =
+      let restriction =
+        AgentIdMap.find_default
+          SiteSet.empty
+          agid
+          restriction_map
+      in
+      SiteSet.is_empty
+        (SiteSet.inter agent_info.bound_sites restriction)
+      &&
+      SiteSet.is_empty
+        (SiteSet.inter agent_info.sites_with_wrong_internal_state restriction)
 
-    let mod_site site state (remanent,set) =
+    let mod_site restriction_map site state (remanent,set) =
       let agid = agent_id_of_site site in
       let s_name = site_name_of_site site in
       match AgentIdMap.find_option agid remanent with
@@ -345,7 +354,7 @@ module Cflow_linker =
                 in
                 let remanent = AgentIdMap.add agid ag_info remanent in
                 begin
-                  if as_init ag_info
+                  if as_init restriction_map agid ag_info
                   then
                     remanent,
                     AgentIdSet.add agid set
@@ -369,7 +378,7 @@ module Cflow_linker =
                 in
                 let remanent = AgentIdMap.add agid ag_info remanent in
                 begin
-                  if as_init ag_info
+                  if as_init restriction_map agid ag_info
                   then
                     remanent,set
                   else
@@ -378,7 +387,7 @@ module Cflow_linker =
                 end
             end
 
-    let unbind_side (agid,s_name) (remanent,set) =
+    let unbind_side restriction_map (agid,s_name) (remanent,set) =
       match AgentIdMap.find_option agid remanent with
       | None -> remanent,set
       | Some ag_info ->
@@ -392,7 +401,7 @@ module Cflow_linker =
           in
           let remanent = AgentIdMap.add agid ag_info remanent in
           begin
-            if as_init ag_info
+            if as_init restriction_map agid ag_info
             then
               remanent,
               AgentIdSet.add agid set
@@ -403,12 +412,12 @@ module Cflow_linker =
         else remanent,set
 
 
-    let unbind site rem  =
+    let unbind restriction_map site rem  =
       let agid = agent_id_of_site site in
       let s_name = site_name_of_site site in
-      unbind_side (agid,s_name) rem
+      unbind_side restriction_map (agid,s_name) rem
 
-    let bind site (remanent,set) =
+    let bind restriction_map site (remanent,set) =
       let agid = agent_id_of_site site in
       let s_name = site_name_of_site site in
       match AgentIdMap.find_option agid remanent with
@@ -426,7 +435,7 @@ module Cflow_linker =
           in
           let remanent = AgentIdMap.add agid ag_info remanent in
           begin
-            if as_init ag_info
+            if as_init restriction_map agid ag_info
             then
               remanent,set
             else
@@ -447,28 +456,77 @@ module Cflow_linker =
              ([],remanent)
              (List.rev refined_step_list))
 
+    let add_in_scope site scope =
+      let agid = agent_id_of_site site in
+      let s_name = site_name_of_site site in
+      let old_set =
+        AgentIdMap.find_default
+          SiteSet.empty
+          agid
+          scope
+      in
+      let new_set =
+        SiteSet.add s_name old_set
+      in
+      if old_set == new_set
+      then scope
+      else
+        AgentIdMap.add agid new_set scope
+
+    let deal_with_tests tests scope =
+      List.fold_left
+        (List.fold_left
+           (fun scope x ->
+              match x with
+              | PI.Is_Here _ -> scope
+              | PI.Is_Bound site
+              | PI.Is_Free site | PI.Has_Binding_type (site,_)
+               | PI.Has_Internal (site,_) ->
+                 add_in_scope site scope
+              | PI.Is_Bound_to (site1,site2) -> add_in_scope site1 (add_in_scope site2 scope)))
+        scope
+        tests
+
     let fill_siphon refined_step_list =
+      let rev_trace = List.rev refined_step_list in
+      let scope = AgentIdMap.empty in
+      let refined_step_with_scope_list,_ =
+        List.fold_left
+          (fun (step_list, scope) refined_step ->
+             match refined_step with
+             | Trace.Init _ -> (refined_step,scope)::step_list, scope
+             | Trace.Rule (_,event,_) | Trace.Pert (_,event,_) ->
+               let scope'  = deal_with_tests event.Instantiation.tests scope in
+                   (refined_step,scope)::step_list, scope'
+             | Trace.Obs (_,tests,_) ->
+               let scope' = deal_with_tests tests scope in
+               (refined_step,scope)::step_list, scope'
+             | (Trace.Subs _ | Trace.Dummy _) ->
+               assert false
+          ) ([],scope) rev_trace
+      in
       let remanent = AgentIdMap.empty in
       let a,_ =
         List.fold_left
           (fun (step_list,remanent) refined_step ->
              match refined_step with
-             | Trace.Init init -> convert_init remanent step_list init
-             | Trace.Rule (_,event,_) | Trace.Pert (_,event,_) ->
+             | (Trace.Init init,_) -> convert_init remanent step_list init
+             | (Trace.Rule (_,event,_),scope)
+             | (Trace.Pert (_,event,_),scope) ->
                let remanent,set =
                  List.fold_left
                    (fun recur ->
                       function
                       | PI.Create _ -> recur
                       | PI.Mod_internal (site,state) ->
-                        mod_site site state recur
+                        mod_site scope site state recur
                       | (PI.Bind (site1,site2) | PI.Bind_to (site1,site2)) ->
-                        bind site1 (bind site2 recur)
-                      | PI.Free site -> unbind site recur
+                        bind scope site1 (bind scope site2 recur)
+                      | PI.Free site -> unbind scope site recur
                       | PI.Remove _ -> recur )
                    (remanent,AgentIdSet.empty) event.Instantiation.actions in
                let remanent,set =
-                 List.fold_right unbind
+                 List.fold_right (unbind scope)
                    event.Instantiation.side_effects_dst (remanent,set)
                in
                ((AgentIdSet.fold
@@ -477,11 +535,12 @@ module Cflow_linker =
                       | Some x -> x.initial_step::list
                       | None -> list)
                    set
-                   (refined_step::step_list)),remanent)
-             | (Trace.Subs _ | Trace.Obs _ | Trace.Dummy _) ->
-               (refined_step::step_list,remanent))
+                   (fst refined_step::step_list)),remanent)
+             | Trace.Obs _,_ ->
+               (fst refined_step::step_list,remanent)
+             | Trace.Subs _,_ | Trace.Dummy _,_ -> assert false)
           ([],remanent)
-          refined_step_list in
+          refined_step_with_scope_list in
       List.rev a
 
     let agent_id_in_obs _parameter _handler info error = function
