@@ -243,3 +243,8 @@ class KappaRest(KappaApi):
         else:
             cmd = "influence_map?accuracy=%s" % accuracy
         return self._get(self.in_project('analyses', cmd))
+
+    def analyses_potential_polymers(self):
+        if self.analyses_to_init:
+            self._analyses_init()
+        return self._get(self.in_project('analyses', "potential_polymers"))

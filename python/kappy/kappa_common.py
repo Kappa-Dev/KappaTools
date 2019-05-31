@@ -496,3 +496,9 @@ class KappaApi(ABC):
         accuracy -- level can be \"low\", \"medium\", \"high\" or \"full\".
             Default is medium.
         """
+
+    @abc.abstractmethod
+    def analyses_potential_polymers(self):
+        """
+        Returns the list of potential polymers of the last parsed model
+        """
