@@ -101,7 +101,7 @@ class embedded () : Api.concrete_manager =
   let kamoha_mailbox = Kamoha_client.new_mailbox () in
   let kastor_worker = Worker.create "KaStorWorker.js" in
   let stor_state,update_stor_state = Kastor_client.init_state () in
-  object
+  object(self)
     initializer
       let () = kasa_worker##.onmessage :=
           (Dom.handler
@@ -149,6 +149,14 @@ class embedded () : Api.concrete_manager =
       let () = kasa_worker##terminate in
       ()(*TODO*)
     method is_computing = true (*TODO*)
+
+    method project_parse overwrites =
+      self#secret_project_parse >>=
+      Api_common.result_bind_lwt
+        ~ok:(fun out ->
+            self#secret_simulation_load out overwrites >>=
+            Api_common.result_bind_lwt
+              ~ok:(fun () -> self#init_static_analyser out >|= Api_common.result_kasa))
   end
 
 let state , set_state =

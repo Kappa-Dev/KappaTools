@@ -6,6 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+open Lwt.Infix
+
 class manager () =
   let kasa_worker = Worker.create "KaSaWorker.js" in
   let kasa_mailbox = Kasa_client.new_mailbox () in
@@ -80,6 +82,15 @@ class manager () =
             let () = Common.debug (Js.string message_text) in
             kastor_worker##postMessage(message_text))
         stor_state
+
+    method project_parse overwrites =
+      self#secret_project_parse >>=
+      Api_common.result_bind_lwt
+        ~ok:(fun out ->
+            self#secret_simulation_load out overwrites >>=
+            Api_common.result_bind_lwt
+              ~ok:(fun () -> self#init_static_analyser out >|= Api_common.result_kasa))
+
     method is_running = is_running
     method terminate =
       let () = sim_worker##terminate in

@@ -229,7 +229,7 @@ class manager_simulation
   Api.manager_simulation = object(self)
   val mutable simulation = None
 
-  method simulation_load text overwrites =
+  method secret_simulation_load text overwrites =
     let ast = text in
     let harakiri,_ = Lwt.task () in
     let _ =

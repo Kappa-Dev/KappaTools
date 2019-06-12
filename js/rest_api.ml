@@ -74,20 +74,10 @@ class manager
     method private message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
-    | `ProjectLoad (ast,overwrite) ->
-      send
-        ?timeout request_count
-        (Format.asprintf "%s/v2/projects/%s/load%t" url project_id
-           (fun f -> match overwrite with
-              | [] -> ()
-              | l -> Format.fprintf f "?%a"
-                       (Pp.list
-                          (fun f -> Format.pp_print_string f "&")
-                          (fun f (vr,va) ->
-                             Format.fprintf f "%s=%a" vr Nbr.print va))
-           l))
-        `POST ~data:(Yojson.Basic.to_string (Ast.compil_to_json ast))
-        (fun _ -> `ProjectLoad)
+    | `ProjectLoad (_ast,_overwrite) ->
+      Lwt.return (Api_common.result_error_msg
+                    ~result_code:`Bad_request
+                    "low level project_load mustn't be used over HTTP")
     | `SimulationContinue pause_condition ->
       send
         ?timeout request_count
@@ -382,6 +372,26 @@ class manager
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
+    method secret_project_parse =
+      Lwt.return (Api_common.result_error_msg
+                    ~result_code:`Bad_request
+                    "low level project_parse mustn't be used over HTTP")
+
+    method project_parse overwrite =
+      send
+        ?timeout request_count
+        (Format.asprintf "%s/v2/projects/%s/parse%t" url project_id
+           (fun f -> match overwrite with
+              | [] -> ()
+              | l -> Format.fprintf f "?%a"
+                       (Pp.list
+                          (fun f -> Format.pp_print_string f "&")
+                          (fun f (vr,va) ->
+                             Format.fprintf f "%s=%a" vr Nbr.print va))
+                       l))
+        `POST
+        (JsonUtil.read_of_string Yojson.Basic.read_null)
+
   method terminate =
     Lwt.ignore_result (self#project_delete project_id)
 
@@ -431,13 +441,6 @@ class manager
       (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id id)
       `DELETE
       (JsonUtil.read_of_string Yojson.Basic.read_null)
-
-  method project_parse =
-    send
-      ?timeout request_count
-      (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
-      `POST
-      (JsonUtil.read_of_string Ast.read_parsing_compil)
 
   method project_overwrite file_id ast =
     send

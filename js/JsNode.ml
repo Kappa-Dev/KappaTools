@@ -6,6 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+open Lwt.Infix
+
 class type process_configuration =
   object
     method command : Js.js_string Js.t Js.prop
@@ -195,4 +197,11 @@ class manager
                  (Format.sprintf "%s%c" message_text message_delimiter)))
         moha_mailbox
 
+    method project_parse overwrites =
+      self#secret_project_parse >>=
+      Api_common.result_bind_lwt
+        ~ok:(fun out ->
+            self#secret_simulation_load out overwrites >>=
+            Api_common.result_bind_lwt
+              ~ok:(fun () -> self#init_static_analyser out >|= Api_common.result_kasa))
   end

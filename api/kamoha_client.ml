@@ -122,7 +122,7 @@ class virtual new_client ~post mailbox :
            (fun b -> Yojson.Basic.write_string b "FileCatalog");
          ])
 
-  method project_parse =
+  method secret_project_parse =
     self#message Ast
       (fun b -> JsonUtil.write_sequence b [
            (fun b -> Yojson.Basic.write_string b "ProjectParse");

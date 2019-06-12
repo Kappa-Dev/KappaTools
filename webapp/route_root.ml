@@ -109,6 +109,13 @@ class new_manager : Api.concrete_manager =
     method is_computing =
       self#sim_is_computing || Kasa_client.is_computing sa_mailbox ||
       self#story_is_computing
+    method project_parse overwrites =
+      self#secret_project_parse >>=
+      Api_common.result_bind_lwt
+        ~ok:(fun out ->
+            self#secret_simulation_load out overwrites >>=
+            Api_common.result_bind_lwt
+              ~ok:(fun () -> self#init_static_analyser out >|= Api_common.result_kasa))
   end
 
 let bind_projects f id projects =
@@ -271,7 +278,7 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
-    { Webapp_common.path = "/v2/projects/{projectid}/load" ;
+    { Webapp_common.path = "/v2/projects/{projectid}/parse" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `POST ; ] in
         fun ~context:context ->
@@ -287,30 +294,11 @@ let route
                   | _, ([] | _::_::_) -> assert false
                   | x, [ n ] -> (x,Nbr.of_string n))
                 overwrites in
-            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
-            (JsonUtil.read_of_string (Ast.read_parsing_compil))
-            >>= fun ast ->
             bind_projects
-              (fun manager -> manager#simulation_load ast overwrites)
+              (fun manager -> manager#project_parse overwrites)
               project_id projects >>=
             (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
-          | `OPTIONS -> Webapp_common.options_respond methods
-          | _ -> Webapp_common.method_not_allowed_respond methods
-    };
-    { Webapp_common.path = "/v2/projects/{projectid}/parse" ;
-      Webapp_common.operation =
-        let methods = [ `OPTIONS ; `POST ; ] in
-        fun ~context:context ->
-          match context.Webapp_common.request.Cohttp.Request.meth with
-          | `POST ->
-            let project_id = project_ref context in
-            bind_projects
-              (fun manager -> manager#project_parse)
-              project_id projects >>=
-            (Webapp_common.api_result_response
-               ~string_of_success:(
-                 JsonUtil.string_of_write Ast.write_parsing_compil))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };

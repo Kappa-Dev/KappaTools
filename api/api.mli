@@ -24,7 +24,7 @@ end
 
 class type virtual manager_model = object
   method virtual is_running : bool
-  method project_parse : Ast.parsing_compil result Lwt.t
+  method secret_project_parse : Ast.parsing_compil result Lwt.t
 
   method project_overwrite : string -> Ast.parsing_compil -> unit result Lwt.t
 
@@ -70,7 +70,7 @@ class type manager_snapshot = object
 end
 
 class type manager_simulation = object
-  method simulation_load :
+  method secret_simulation_load :
     Ast.parsing_compil -> (string * Nbr.t) list -> unit result Lwt.t
 
   method simulation_delete : unit result Lwt.t
@@ -171,6 +171,7 @@ class type concrete_manager = object
   inherit manager_simulation
   inherit manager_static_analysis
   inherit manager_stories
+  method project_parse : (string * Nbr.t) list -> unit result Lwt.t
   method is_running : bool
   method terminate : unit
   method is_computing : bool
