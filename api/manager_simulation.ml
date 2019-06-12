@@ -191,22 +191,21 @@ class virtual manager_snapshot
   method private info_snapshot
       (detail : Api_data.simulation_detail_output) :
     Api_types_j.snapshot_catalog Api.result =
-    let snapshots : Api_types_j.snapshot list =
+    let snapshots =
       detail.Api_types_j.simulation_output_snapshots in
     let snapshot_catalog =
       { Api_types_j.snapshot_ids =
-          List.map (fun s -> s.Data.snapshot_file) snapshots } in
+          Mods.StringMap.fold (fun x _ acc -> x::acc) snapshots []} in
     Result_util.ok snapshot_catalog
   method private get_snapshot
       (snapshot_id : Api_types_j.snapshot_id)
       (detail : Api_data.simulation_detail_output)
     : Api_types_j.snapshot Api.result =
-    let snapshot_list : Api_types_j.snapshot list =
+    let snapshot_list =
       detail.Api_types_j.simulation_output_snapshots in
-    let snapshot_eq : Api_types_j.snapshot -> bool =
-      fun snapshot -> snapshot_id = snapshot.Data.snapshot_file in
-    try Result_util.ok (List.find snapshot_eq snapshot_list)
-    with Not_found ->
+    match Mods.StringMap.find_option snapshot_id snapshot_list with
+    | Some x -> Result_util.ok x
+    | None ->
       let m : string = Format.sprintf "id %s not found" snapshot_id in
       Api_common.result_error_msg ~result_code:`Not_found m
 
@@ -338,8 +337,8 @@ class manager_simulation
                    file (filename^"/"^din.Data.din_data.Data.din_name))
             t.Api_types_t.simulation_output_dins in
           let () =
-            List.iter
-              (fun snapshot ->
+            Mods.StringMap.iter
+              (fun _ snapshot ->
                  Fakezip.add_entry (Data.string_of_snapshot ?len:None snapshot)
                    file (filename^"/"^snapshot.Data.snapshot_file))
               t.Api_types_t.simulation_output_snapshots in

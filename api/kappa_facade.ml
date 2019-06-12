@@ -46,7 +46,7 @@ type t =
     log_buffer : Buffer.t ;
     log_form : Format.formatter ;
     mutable plot : Data.plot ;
-    mutable snapshots : Data.snapshot list ;
+    mutable snapshots : Data.snapshot Mods.StringMap.t ;
     mutable dins : Data.din list ;
     mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
@@ -70,7 +70,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
   is_running = false; run_finalize = false; counter; log_buffer; log_form;
   pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
   plot = Data.init_plot env;
-  snapshots = [];
+  snapshots = Mods.StringMap.empty;
   dins = [];
   species = Mods.StringMap.empty;
   files = Mods.StringMap.empty;
@@ -88,7 +88,7 @@ let reinitialize ~outputs random_state t =
   t.run_finalize <- false;
   t.pause_condition <- Alg_expr.FALSE;
   t.plot <- Data.init_plot t.env ;
-  t.snapshots <- [];
+  t.snapshots <- Mods.StringMap.empty;
   t.dins <- [];
   t.files <- Mods.StringMap.empty;
   t.error_messages <- [];
@@ -223,13 +223,14 @@ let outputs (simulation : t) =
     end
   | Data.Snapshot snapshot ->
     let already_there x =
-      List.exists (fun y -> x = y.Data.snapshot_file) simulation.snapshots in
+      Mods.StringMap.mem x simulation.snapshots in
     let snapshot_file =
       Tools.find_available_name
         ~already_there snapshot.Data.snapshot_file
         ~facultative:(string_of_int snapshot.Data.snapshot_event) ~ext:".ka" in
     let snapshot' = { snapshot with Data.snapshot_file } in
-    simulation.snapshots <- snapshot'::simulation.snapshots
+    simulation.snapshots <-
+      Mods.StringMap.add snapshot_file snapshot' simulation.snapshots
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.Warning (pos,msg) -> Data.print_warning ?pos simulation.log_form msg
   | Data.TraceStep st ->
