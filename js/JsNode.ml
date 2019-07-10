@@ -66,7 +66,7 @@ let spawn_process (configuration : process_configuration  Js.t) : process Js.t J
 let launch_agent onClose message_delimiter command args handler =
   let buffer = Buffer.create 512 in
   let rec onStdout msg =
-    match Utility.split (Js.to_string msg) message_delimiter with
+    match Tools.string_split_on_char message_delimiter (Js.to_string msg) with
     | (prefix,None) ->
       Buffer.add_string buffer prefix
     | (prefix,Some suffix) ->
@@ -131,7 +131,7 @@ class manager
 
     method private onSimStdout (msg : string) : unit =
       let () = Common.debug (Js.string msg) in
-      match Utility.split msg message_delimiter with
+      match Tools.string_split_on_char message_delimiter msg with
       | (prefix,None) ->
         ignore(Common.debug (Js.string "onStdout:none"));
         Buffer.add_string buffer prefix

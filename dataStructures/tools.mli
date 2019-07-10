@@ -64,6 +64,7 @@ val get_product_image_occ_2:
 
 val get_interval_list: (int -> bool) -> int -> int -> (int * int) list
 
+val string_split_on_char : char -> string -> string * string option
 val lowercase: string -> string
 val capitalize: string -> string
 val smash_duplicate_in_ordered_list:

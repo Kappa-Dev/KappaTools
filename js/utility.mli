@@ -8,7 +8,6 @@
 
 module Html = Tyxml_js.Html5
 
-val split : string -> char -> string * string option
 val print_newline: ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list
 val print_string:
   string Html.wrap ->

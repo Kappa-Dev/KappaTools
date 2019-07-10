@@ -294,6 +294,17 @@ let get_interval_list p i j =
 let lowercase = String.lowercase_ascii
 let capitalize = String.capitalize_ascii
 
+let string_split_on_char (delimiter : char) (s : string) : (string * string option) =
+  try
+    let index = String.index s delimiter in
+    let length = String.length s in
+    (String.sub s 0 index,
+     Some (String.sub
+             s
+             (index + 1)
+             (length - index - 1) ))
+  with Not_found -> (s,None)
+
 let smash_duplicate_in_ordered_list p l =
 
   let () = Format.fprintf Format.std_formatter "DUPL \n"  in
