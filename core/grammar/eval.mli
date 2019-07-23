@@ -40,7 +40,7 @@ val compile :
   outputs:(Data.t -> unit) -> pause:((unit -> 'b) -> 'b) ->
   return:(Model.t * bool (*has_tracking*) *
           (Primitives.alg_expr * Primitives.elementary_rule) list -> 'b) ->
-  max_sharing:bool -> debugMode:bool -> compileModeOn:bool ->
+  sharing:Pattern.sharing_level -> debugMode:bool -> compileModeOn:bool ->
   ?overwrite_init:(LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t -> Contact_map.t ->
   ('c, LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.compil -> 'b

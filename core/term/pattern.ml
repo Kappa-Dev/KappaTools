@@ -6,6 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type sharing_level = No_sharing | Compatible_patterns | Max_sharing
+
 type link = UnSpec | Free | Link of int * int (** node_id, site_id *)
 
 (** The link of site k of node i is [fst nodes(i).(k)].
@@ -1289,19 +1291,21 @@ module PreEnv = struct
     Mods.IntMap.add w (Mods.IntMap.add hash env_w_h env_w) env,r,out,out_id
 
   let rec saturate_one
-      ~debugMode ~max_sharing this max_l level (_,domain as acc) =
+      ~debugMode ~sharing this max_l level (_,domain as acc) =
     function
     | [] -> if level < max_l then
         saturate_one
-          ~debugMode ~max_sharing this max_l (succ level) acc
+          ~debugMode ~sharing this max_l (succ level) acc
           (Mods.IntMap.fold (fun _ -> List.rev_append)
              (Mods.IntMap.find_default Mods.IntMap.empty (succ level) domain)
              [])
       else acc
     | h :: t ->
       let news =
-        if max_sharing then infs ~debugMode this.element h.element
-        else
+        match sharing with
+        | No_sharing -> assert false
+        | Max_sharing -> infs ~debugMode this.element h.element
+        | Compatible_patterns ->
           List.rev_map
             (fun r -> intersection r this.element h.element)
             (matchings ~debugMode this.element h.element) in
@@ -1312,19 +1316,19 @@ module PreEnv = struct
              let x,_,_,id = add_cc ~debugMode ~toplevel:false acc id' cc in
              ((if id = id' then id else mid),x))
           acc news in
-       saturate_one ~debugMode ~max_sharing this max_l level acc' t
+       saturate_one ~debugMode ~sharing this max_l level acc' t
   let rec saturate_level
-      ~debugMode ~max_sharing max_l level (_,domain as acc) =
+      ~debugMode ~sharing max_l level (_,domain as acc) =
     if level < 2 then acc else
       match Mods.IntMap.find_option level domain with
-      | None -> saturate_level ~debugMode ~max_sharing max_l (pred level) acc
+      | None -> saturate_level ~debugMode ~sharing max_l (pred level) acc
       | Some list ->
         let rec aux acc = function
-          | [] -> saturate_level ~debugMode ~max_sharing max_l (pred level) acc
+          | [] -> saturate_level ~debugMode ~sharing max_l (pred level) acc
           | h::t ->
-            aux (saturate_one ~debugMode ~max_sharing h max_l level acc t) t in
+            aux (saturate_one ~debugMode ~sharing h max_l level acc t) t in
         aux acc (Mods.IntMap.fold (fun _ -> List.rev_append) list [])
-  let saturate ~debugMode ~max_sharing domain =
+  let saturate ~debugMode ~sharing domain =
     match Mods.IntMap.max_key domain with
     | None -> 0,domain
     | Some l ->
@@ -1333,7 +1337,10 @@ module PreEnv = struct
           (fun _ -> Mods.IntMap.fold
               (fun _ l m -> List.fold_left (fun m p -> max m p.p_id) m l))
           domain 0 in
-      saturate_level ~debugMode ~max_sharing l l (si,domain)
+      match sharing with
+      | No_sharing -> si,domain
+      | Compatible_patterns | Max_sharing ->
+        saturate_level ~debugMode ~sharing l l (si,domain)
 
   let of_env env =
     let add_cc acc p =
@@ -1511,10 +1518,10 @@ let fold_by_type f cc acc =
 
 let fold f cc acc = Mods.IntMap.fold f cc.nodes acc
 
-let finalize ~debugMode ~max_sharing env contact_map =
+let finalize ~debugMode ~sharing env contact_map =
   let env = minimal_env ~debugMode env contact_map in
   let si,complete_domain =
-    PreEnv.saturate ~debugMode ~max_sharing env.PreEnv.domain in
+    PreEnv.saturate ~debugMode ~sharing env.PreEnv.domain in
   let domain = Array.make (succ si) (PreEnv.empty_point env.PreEnv.sig_decl) in
   let singles =
     Mods.IntMap.find_default Mods.IntMap.empty 1 complete_domain in

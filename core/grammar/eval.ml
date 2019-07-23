@@ -541,7 +541,7 @@ let init_kasa called_from sigs result =
   Export_to_KaSim.flush_errors kasa_state
 *)
 let compile
-    ~outputs ~pause ~return ~max_sharing ~debugMode ~compileModeOn
+    ~outputs ~pause ~return ~sharing ~debugMode ~compileModeOn
     ?overwrite_init ?rescale_init sigs_nd tk_nd contact_map result =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
@@ -577,7 +577,7 @@ let compile
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
   let domain,dom_stats =
-    Pattern.finalize ~debugMode ~max_sharing preenv contact_map in
+    Pattern.finalize ~debugMode ~sharing preenv contact_map in
   outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.stat_nodes^
                      " (sub)observables "^
                      string_of_int dom_stats.Pattern.PreEnv.stat_nav_steps^

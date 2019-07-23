@@ -160,8 +160,11 @@ val fold:
 (** USE WITH CARE: Break some abstraction. The array must not be
     modified and internal state [-1] means unspecified *)
 
+type sharing_level = No_sharing | Compatible_patterns | Max_sharing
+(** Heuristic to use on domain construction *)
+
 val finalize :
-  debugMode:bool -> max_sharing:bool -> PreEnv.t -> Contact_map.t ->
+  debugMode:bool -> sharing:sharing_level -> PreEnv.t -> Contact_map.t ->
   Env.t * PreEnv.stat
 
 val infs : debugMode:bool -> t -> t -> t list

@@ -20,7 +20,7 @@ type t = {
   mutable traceFile : string option;
   mutable logFile : string option;
   mutable compileMode : bool;
-  mutable maxSharing : bool;
+  mutable sharing : Pattern.sharing_level;
   mutable showEfficiency : bool;
   mutable timeIndependent : bool;
 }
@@ -37,7 +37,7 @@ let default : t = {
   traceFile = None;
   logFile = Some "inputs";
   compileMode = false;
-  maxSharing = false;
+  sharing = Pattern.Compatible_patterns;
   showEfficiency = false;
   timeIndependent = false;
 }
@@ -97,9 +97,14 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("--print-efficiency",
    Arg.Unit (fun () -> t.showEfficiency <- true),
    "KaSim tells how fast it runs") ;
-  ("--max-sharing",
-   Arg.Unit (fun () -> t.maxSharing <- true),
-   "Initialization is heavier but simulation is faster");
+  ("-sharing",
+   Arg.String (function
+       | "no" | "none" | "None" -> t.sharing <- Pattern.No_sharing
+       | "Compatible" -> t.sharing <- Pattern.Max_sharing
+       | "max" | "Max" -> t.sharing <- Pattern.Max_sharing
+       | s -> raise (Arg.Bad ("Unrecognized sharing level: "^s))),
+   "Level of sharing computed between patterns \
+    during initialization (None/Compatible/Max)");
   ("--compile",
    Arg.Unit (fun () -> t.compileMode <- true),
    "Display rule compilation as action list") ;

@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let do_interactive_directives ~debugMode ~outputs ~max_sharing ~syntax_version
+let do_interactive_directives ~debugMode ~outputs ~sharing ~syntax_version
     contact_map env counter graph state e =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   let cc_preenv =
@@ -31,7 +31,7 @@ let do_interactive_directives ~debugMode ~outputs ~max_sharing ~syntax_version
     if cc_preenv == cc_preenv' then (env,graph)
     else
       let fenv,_ =
-        Pattern.finalize ~debugMode ~max_sharing cc_preenv' contact_map in
+        Pattern.finalize ~debugMode ~sharing cc_preenv' contact_map in
       (Model.new_domain fenv env,
        List.fold_left
          (Rule_interpreter.incorporate_extra_pattern
@@ -44,7 +44,7 @@ let do_interactive_directives ~debugMode ~outputs ~max_sharing ~syntax_version
   e'', (env', (ostop, ograph, ostate))
 
 let get_pause_criteria
-    ~debugMode ~outputs ~max_sharing ~syntax_version contact_map env graph b =
+    ~debugMode ~outputs ~sharing ~syntax_version contact_map env graph b =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
@@ -60,7 +60,7 @@ let get_pause_criteria
     if cc_preenv == cc_preenv' then (env,graph)
     else
       let fenv,_ =
-        Pattern.finalize ~debugMode ~max_sharing cc_preenv' contact_map in
+        Pattern.finalize ~debugMode ~sharing cc_preenv' contact_map in
       (Model.new_domain fenv env,
        List.fold_left
          (Rule_interpreter.incorporate_extra_pattern ~debugMode fenv)

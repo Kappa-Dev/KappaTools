@@ -84,7 +84,7 @@ let get_pack_from_preprocessed_ast ~kasim_args ~compileModeOn preprocessed_ast =
       ~outputs:Outputs.go
       ~pause:(fun f -> f ()) ~return:(fun x -> x)
       ~debugMode:!Parameter.debugModeOn
-      ~max_sharing:kasim_args.Kasim_args.maxSharing
+      ~sharing:kasim_args.Kasim_args.sharing
       ?rescale_init:kasim_args.Kasim_args.rescale
       ?overwrite_init ~compileModeOn sigs_nd tk_nd contact_map result' in
   let story_compression =
