@@ -32,9 +32,6 @@ def parse_site_type(site_type):
     return site_type[1]
 
 
-###
-### FIX THIS FUNCTION - KEY IDEA IS THAT NODE_SITES ARE BASED ON INDICES TOO!
-### SO CANNOT DO THIS USING DICTIONARIES
 def parse_node_sites(node_sites):
     """
     Parse node sites into a dictionary, indexed by site name.
@@ -112,8 +109,8 @@ class KappaAgent:
         """
         Return sink (using "port_links" field) of agent. The sink
         is represented as [i1, i2] where i1 is the index of the *agent*
-        (in coordinates of complex) and i2 is the index of the *port* (in that agent's
-        coordinates, i.e., the coordinates of 'node_sites' field).
+        (in coordinates of complex) and i2 is the index of the *port* 
+        (in that agent's coordinates, i.e., the coordinates of 'node_sites' field).
         """
         if site_type not in self.site_names:
             # No site type %s on agent %s" %(site_type, self)
@@ -261,7 +258,7 @@ class KappaSnapshot:
         if from_json is None:
             if not os.path.isfile(self.fname):
                 raise Exception("Cannot find snapshot file: %s" %(self.fname))
-            with open(fname) as file_in:
+            with open(self.fname) as file_in:
                 self.snapshot_str = file_in.read()
             # read JSON snapshot from file (other formats not supported)
             try:
@@ -298,12 +295,15 @@ class KappaSnapshot:
         self.complexes.sort(key=lambda k: k[0], reverse=descending)
         return self.complexes
 
-    def print_complexes(self):
+    def print_complexes(self, verbose=False):
         print("%d complexes in total" %(len(self.complexes)))
         for abundance, comp in self.complexes:
             agent_type_str = str(comp.get_agent_types())
             print("Complex(abundance=%d, size=%d, agent_types=%s)" \
                   %(abundance, comp.size, agent_type_str))
+            if verbose:
+                for agent in comp.agents:
+                    print(" - agent: %s" %(str(agent)))
 
 def count_chain_length(comp, agent_type):
     """
@@ -324,11 +324,4 @@ def get_chain_lens(complexes, agent_type):
     return chain_lens
             
 if __name__ == "__main__":
-    fname = "../../snapshots/snap_chains.json"
-    snap_obj = KappaSnapshot(from_fname=fname)
-    print(snap_obj)
-    complexes = snap_obj.get_complexes()
-    print(complexes)
-    for abundance, comp in complexes:
-        agent_types = comp.get_agent_types()
-        print("Complex has %d C agents" %(agent_types["C"]))
+    pass

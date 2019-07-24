@@ -8,6 +8,8 @@ import subprocess
 import threading
 import json
 
+import os
+import io
 from os import path, listdir
 
 from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
@@ -62,7 +64,11 @@ class KappaStd(KappaApi):
         self.sim_agent = subprocess.Popen(sim_args,
                                           stdin=subprocess.PIPE,
                                           stdout=subprocess.PIPE,
-                                          stderr=subprocess.STDOUT)
+                                          # YK: stderr going to PIPE
+                                          stderr=subprocess.PIPE,
+#                                          stderr=subprocess.STDOUT,
+                                          # YK: changing buffer size
+                                          bufsize=-1)
         sa_args = [path.join(kappa_bin_path, "KaSaAgent"), "--delimiter",
                    "\\x{:02x}".format(ord(self.delimiter)), ]
         if args:
@@ -88,6 +94,32 @@ class KappaStd(KappaApi):
         self.message_id += 1
         return self.message_id
 
+    def read_stdout(self, agent_to_read):
+        """
+        Read from stdout of the simulation agent. This function reads the 
+        output in large chunks (the default buffer size) until it encounters
+        the delimiter. This is more efficient than reading the output 
+        one character at a time.
+        """
+        buff = bytearray()
+        delim_val = self.delimiter.encode('utf-8') 
+        chunk_size = io.DEFAULT_BUFFER_SIZE
+        fd = agent_to_read.stdout.fileno()
+        c = os.read(fd, chunk_size)
+        buff.extend(c)
+        while (not c.endswith(delim_val)) and c:
+            c = os.read(fd, chunk_size)
+            buff.extend(c)
+        # strip the end character
+        buff = self.strip_delim(buff)
+        return buff
+        
+    def strip_delim(self, buff):
+        delim_val = self.delimiter.encode('utf-8') 
+        if buff.endswith(delim_val):
+            return buff[0:-1]
+        return buff
+
     def _dispatch(self, method, args=None):
         if args is not None:
             data = [method, args]
@@ -99,13 +131,10 @@ class KappaStd(KappaApi):
             message_id = self._get_message_id()
             message = {'id': message_id, 'data': data}
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
+            delim_val = self.delimiter.encode('utf-8')
             self.sim_agent.stdin.write(message.encode('utf-8'))
             self.sim_agent.stdin.flush()
-            buff = bytearray()
-            c = self.sim_agent.stdout.read(1)
-            while c != self.delimiter.encode('utf-8') and c:
-                buff.extend(c)
-                c = self.sim_agent.stdout.read(1)
+            buff = self.read_stdout(self.sim_agent)
             response = json.loads(buff.decode('utf-8'))
             if response["id"] != message_id:
                 raise KappaError(
@@ -126,11 +155,7 @@ class KappaStd(KappaApi):
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.sa_agent.stdin.write(message.encode('utf-8'))
             self.sa_agent.stdin.flush()
-            buff = bytearray()
-            c = self.sa_agent.stdout.read(1)
-            while c != self.delimiter.encode('utf-8') and c:
-                buff.extend(c)
-                c = self.sa_agent.stdout.read(1)
+            buff = self.read_stdout(self.sa_agent)
             response = json.loads(buff.decode('utf-8'))
             if response['code'] == "SUCCESS":
                 return response['data']
@@ -144,7 +169,7 @@ class KappaStd(KappaApi):
         try:
             self.lock.acquire()
             message_id = self._get_message_id()
-            message = [ message_id, data]
+            message = [message_id, data]
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.model_agent.stdin.write(message.encode('utf-8'))
             self.model_agent.stdin.flush()
@@ -154,7 +179,8 @@ class KappaStd(KappaApi):
                 buff.extend(c)
                 c = self.model_agent.stdout.read(1)
             response = json.loads(buff.decode('utf-8'))
-            if isinstance(response,str):
+            response = json.loads(buff.decode('utf-8'))
+            if isinstance(response, str):
                 raise KappaError(response)
             elif response[0] != message_id:
                 raise KappaError(
