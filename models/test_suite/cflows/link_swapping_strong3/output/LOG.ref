@@ -357,9 +357,9 @@ Obtained
 	- simplify the trace, 43 events 
 		- start iteration 1, 43 events remaining 
 				- alpha-conversion
-				- detecting siphons: +4 events 
+				- detecting siphons: +6 events 
 				- alpha-conversion
-				- cutting concurrent events: -11 events 
+				- cutting concurrent events: -13 events 
 				- detecting pseudo inverse events: nothing has changed 
 		- start iteration 2, 36 events remaining 
 				- alpha-conversion

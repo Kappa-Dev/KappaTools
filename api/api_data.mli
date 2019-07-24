@@ -10,7 +10,7 @@ type simulation_detail_output =
   (Api_types_t.plot option,
    Api_types_t.din list,
    string list Mods.StringMap.t,
-   Api_types_t.snapshot list,
+   Api_types_t.snapshot Mods.StringMap.t,
    string,
    string)
     Api_types_t.simulation_output

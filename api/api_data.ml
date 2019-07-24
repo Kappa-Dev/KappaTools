@@ -10,7 +10,7 @@ type simulation_detail_output =
   (Api_types_t.plot option,
    Api_types_t.din list,
    string list Mods.StringMap.t,
-   Api_types_t.snapshot list,
+   Api_types_t.snapshot Mods.StringMap.t,
    string,
    string)
     Api_types_t.simulation_output
@@ -35,7 +35,7 @@ let api_simulation_status
       Api_types_t.simulation_output_file_lines =
         Mods.StringMap.size detail.Api_types_t.simulation_output_file_lines ;
       Api_types_t.simulation_output_snapshots =
-        List.length detail.Api_types_t.simulation_output_snapshots ;
+        Mods.StringMap.size detail.Api_types_t.simulation_output_snapshots ;
       Api_types_t.simulation_output_inputs = ();
       Api_types_t.simulation_output_log_messages =
         String.length detail.Api_types_t.simulation_output_log_messages ;

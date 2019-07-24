@@ -343,3 +343,8 @@ class KappaStd(KappaApi):
         else:
             cmd = ["INFLUENCE_MAP", accuracy]
         return self._dispatch_sa(cmd)
+
+    def analyses_potential_polymers(self, accuracy_cm="high", accuracy_scc="high"):
+        if self.analyses_to_init:
+            self._analyses_init()
+        return self._dispatch_sa(["POLYMERS",accuracy_cm, accuracy_scc])

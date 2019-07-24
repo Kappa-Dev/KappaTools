@@ -73,7 +73,7 @@ def readme():
 
 setup(name='kappy',
       license='LGPLv3',
-      version='4.0.92',
+      version='4.0.93',
       description='Wrapper to interact with the Kappa tool suite',
       long_description=readme(),
       url='https://github.com/Kappa-Dev/KaSim.git',

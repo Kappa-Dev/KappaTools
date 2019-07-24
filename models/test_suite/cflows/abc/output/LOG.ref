@@ -53,15 +53,15 @@ ____________________________________________________________
 	- simplify the trace, 14617 events 
 		- start iteration 1, 14617 events remaining 
 				- alpha-conversion
-				- detecting siphons: +315 events 
+				- detecting siphons: +451 events 
 				- alpha-conversion
-				- cutting concurrent events: -11530 events 
+				- cutting concurrent events: -11666 events 
 				- detecting pseudo inverse events: nothing has changed 
 		- start iteration 2, 3402 events remaining 
 				- alpha-conversion
-				- detecting siphons: +38 events 
+				- detecting siphons: +344 events 
 				- alpha-conversion
-				- cutting concurrent events: -38 events 
+				- cutting concurrent events: -344 events 
 				- detecting pseudo inverse events: nothing has changed 
 	- a fixpoint has been reached, 3402 events remaining 
 	- blackboard generation 

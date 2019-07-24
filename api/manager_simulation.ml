@@ -8,13 +8,13 @@
 
 open Lwt.Infix
 (* addd seed to parameter *)
-let patch_parameter (simulation_parameter : Api_types_j.simulation_parameter) :
-  (Api_types_j.simulation_parameter*int) =
-  match simulation_parameter.Api_types_j.simulation_seed with
+let patch_parameter (simulation_parameter : Api_types_t.simulation_parameter) :
+  (Api_types_t.simulation_parameter*int) =
+  match simulation_parameter.Api_types_t.simulation_seed with
   | None ->
     let () = Random.self_init () in
     let seed = Random.bits () in
-    ({ simulation_parameter with Api_types_j.simulation_seed = Some seed } ,
+    ({ simulation_parameter with Api_types_t.simulation_seed = Some seed } ,
      seed)
   | Some seed -> (simulation_parameter,seed)
 
@@ -52,19 +52,19 @@ class virtual manager_file_line
 
   method private info_file_line
       (detail : Api_data.simulation_detail_output) :
-    Api_types_j.file_line_catalog Api.result =
+    Api_types_t.file_line_catalog Api.result =
     let file_lines : string list Mods.StringMap.t =
       detail.Api_types_t.simulation_output_file_lines in
     let file_line_ids : string list =
       List.map fst (Mods.StringMap.bindings file_lines) in
-    let file_line_catalog = { Api_types_j.file_line_ids } in
+    let file_line_catalog = { Api_types_t.file_line_ids } in
     Result_util.ok file_line_catalog
 
   method private get_file_line
       ~file_line_id
       (status : Api_data.simulation_detail_output) :
     (string list) Api.result =
-    let file_line_list = status.Api_types_j.simulation_output_file_lines in
+    let file_line_list = status.Api_types_t.simulation_output_file_lines in
     match Mods.StringMap.find_option file_line_id file_line_list with
     | None ->
       let m : string = Format.sprintf "id %s not found"  file_line_id in
@@ -72,7 +72,7 @@ class virtual manager_file_line
     | Some lines -> Result_util.ok (List.rev lines)
 
   method simulation_catalog_file_line :
-    Api_types_j.file_line_catalog Api.result Lwt.t =
+    Api_types_t.file_line_catalog Api.result Lwt.t =
     detail_projection ~simulation ~system_process ~projection:self#info_file_line
 
   method simulation_detail_file_line
@@ -89,22 +89,22 @@ class virtual manager_flux_map
 
   method private info_flux_map
       (detail : Api_data.simulation_detail_output) :
-    Api_types_j.din_catalog Api.result =
-    let flux_maps : Api_types_j.din list =
-      detail.Api_types_j.simulation_output_dins in
+    Api_types_t.din_catalog Api.result =
+    let flux_maps : Api_types_t.din list =
+      detail.Api_types_t.simulation_output_dins in
     let flux_map_catalog =
-      { Api_types_j.din_ids =
+      { Api_types_t.din_ids =
           List.map (fun f -> f.Data.din_data.Data.din_name)
             flux_maps } in
     Result_util.ok flux_map_catalog
 
   method private get_flux_map
-      (flux_map_id : Api_types_j.din_id)
+      (flux_map_id : Api_types_t.din_id)
       (detail : Api_data.simulation_detail_output) :
-    Api_types_j.din Api.result =
-    let flux_maps_list : Api_types_j.din list =
-      detail.Api_types_j.simulation_output_dins in
-    let flux_maps_eq : Api_types_j.din -> bool =
+    Api_types_t.din Api.result =
+    let flux_maps_list : Api_types_t.din list =
+      detail.Api_types_t.simulation_output_dins in
+    let flux_maps_eq : Api_types_t.din -> bool =
       fun flux_map ->
         flux_map_id = flux_map.Data.din_data.Data.din_name in
     try Result_util.ok (List.find flux_maps_eq flux_maps_list)
@@ -113,12 +113,12 @@ class virtual manager_flux_map
       Api_common.result_error_msg ~result_code:`Not_found m
 
   method simulation_catalog_din :
-    Api_types_j.din_catalog Api.result Lwt.t =
+    Api_types_t.din_catalog Api.result Lwt.t =
     detail_projection ~simulation ~system_process ~projection:self#info_flux_map
 
   method simulation_detail_din
-      (flux_map_id : Api_types_j.din_id) :
-    Api_types_j.din Api.result Lwt.t =
+      (flux_map_id : Api_types_t.din_id) :
+    Api_types_t.din Api.result Lwt.t =
     detail_projection
       ~simulation ~system_process ~projection:(self#get_flux_map flux_map_id)
 end
@@ -131,22 +131,22 @@ class virtual manager_log_message
 
   method private log_message
       (detail : Api_data.simulation_detail_output) :
-    Api_types_j.log_message Api.result =
-    Result_util.ok detail.Api_types_j.simulation_output_log_messages
+    Api_types_t.log_message Api.result =
+    Result_util.ok detail.Api_types_t.simulation_output_log_messages
 
   method simulation_detail_log_message :
-    Api_types_j.log_message Api.result Lwt.t =
+    Api_types_t.log_message Api.result Lwt.t =
     detail_projection
       ~simulation ~system_process ~projection:self#log_message
 end
 
 let select_observables
-    (plot_limit : Api_types_j.plot_limit)
-    (plot : Api_types_j.plot) : Api_types_j.plot =
+    (plot_limit : Api_types_t.plot_limit)
+    (plot : Api_types_t.plot) : Api_types_t.plot =
   let plot_time_series = Tools.array_rev_of_list plot.Data.plot_series in
   let plot_detail_size = Array.length plot_time_series in
-  let plot_limit_offset = plot_limit.Api_types_j.plot_limit_offset in
-  let plot_limit_points = plot_limit.Api_types_j.plot_limit_points in
+  let plot_limit_offset = plot_limit.Api_types_t.plot_limit_offset in
+  let plot_limit_points = plot_limit.Api_types_t.plot_limit_points in
   let start,len =
     match plot_limit_offset, plot_limit_points with
     | None, None -> 0, plot_detail_size
@@ -165,10 +165,10 @@ class virtual manager_plot
     (Api_types_t.simulation_parameter * Kappa_facade.t) option
 
   method private get_plot
-      (plot_limit : Api_types_j.plot_parameter)
+      (plot_limit : Api_types_t.plot_parameter)
       (detail : Api_data.simulation_detail_output) :
-    Api_types_j.plot Api.result =
-    match detail.Api_types_j.simulation_output_plot with
+    Api_types_t.plot Api.result =
+    match detail.Api_types_t.simulation_output_plot with
     | Some plot ->
       Result_util.ok
         (select_observables plot_limit plot)
@@ -176,8 +176,8 @@ class virtual manager_plot
       Api_common.result_error_msg ~result_code:`Not_found m
 
   method simulation_detail_plot
-      (plot_parameter : Api_types_j.plot_parameter) :
-    Api_types_j.plot Api.result Lwt.t =
+      (plot_parameter : Api_types_t.plot_parameter) :
+    Api_types_t.plot Api.result Lwt.t =
     detail_projection
       ~simulation ~system_process ~projection:(self#get_plot plot_parameter)
 end
@@ -190,38 +190,37 @@ class virtual manager_snapshot
 
   method private info_snapshot
       (detail : Api_data.simulation_detail_output) :
-    Api_types_j.snapshot_catalog Api.result =
-    let snapshots : Api_types_j.snapshot list =
-      detail.Api_types_j.simulation_output_snapshots in
+    Api_types_t.snapshot_catalog Api.result =
+    let snapshots =
+      detail.Api_types_t.simulation_output_snapshots in
     let snapshot_catalog =
-      { Api_types_j.snapshot_ids =
-          List.map (fun s -> s.Data.snapshot_file) snapshots } in
+      { Api_types_t.snapshot_ids =
+          Mods.StringMap.fold (fun x _ acc -> x::acc) snapshots []} in
     Result_util.ok snapshot_catalog
   method private get_snapshot
-      (snapshot_id : Api_types_j.snapshot_id)
+      (snapshot_id : Api_types_t.snapshot_id)
       (detail : Api_data.simulation_detail_output)
-    : Api_types_j.snapshot Api.result =
-    let snapshot_list : Api_types_j.snapshot list =
-      detail.Api_types_j.simulation_output_snapshots in
-    let snapshot_eq : Api_types_j.snapshot -> bool =
-      fun snapshot -> snapshot_id = snapshot.Data.snapshot_file in
-    try Result_util.ok (List.find snapshot_eq snapshot_list)
-    with Not_found ->
+    : Api_types_t.snapshot Api.result =
+    let snapshot_list =
+      detail.Api_types_t.simulation_output_snapshots in
+    match Mods.StringMap.find_option snapshot_id snapshot_list with
+    | Some x -> Result_util.ok x
+    | None ->
       let m : string = Format.sprintf "id %s not found" snapshot_id in
       Api_common.result_error_msg ~result_code:`Not_found m
 
   method simulation_catalog_snapshot :
-    Api_types_j.snapshot_catalog Api.result Lwt.t =
+    Api_types_t.snapshot_catalog Api.result Lwt.t =
     (detail_projection
        ~simulation ~system_process ~projection:self#info_snapshot
-     : Api_types_j.snapshot_catalog Api.result Lwt.t)
+     : Api_types_t.snapshot_catalog Api.result Lwt.t)
 
   method simulation_detail_snapshot
-      (snapshot_id : Api_types_j.snapshot_id):
-    Api_types_j.snapshot Api.result Lwt.t =
+      (snapshot_id : Api_types_t.snapshot_id):
+    Api_types_t.snapshot Api.result Lwt.t =
     ((detail_projection
         ~simulation ~system_process ~projection:(self#get_snapshot snapshot_id))
-     : Api_types_j.snapshot Api.result Lwt.t)
+     : Api_types_t.snapshot Api.result Lwt.t)
 end
 
 class manager_simulation
@@ -250,8 +249,8 @@ class manager_simulation
        Lwt.return (Result_util.ok ()))
 
   method simulation_start
-      (simulation_parameter : Api_types_j.simulation_parameter) :
-    Api_types_j.simulation_artifact Api.result Lwt.t =
+      (simulation_parameter : Api_types_t.simulation_parameter) :
+    Api_types_t.simulation_artifact Api.result Lwt.t =
     let (simulation_parameter,simulation_seed) =
       patch_parameter simulation_parameter in
     match simulation with
@@ -280,7 +279,7 @@ class manager_simulation
                          simulation <- Some (simulation_parameter,facade) in
                        Lwt.return
                          (Result_util.ok {
-                             Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
+                             Api_types_t.simulation_artifact_simulation_seed = simulation_seed ;
                            }))
                   ~error:
                     (fun errors ->
@@ -292,7 +291,7 @@ class manager_simulation
           parse
 
     method simulation_parameter :
-      Api_types_j.simulation_parameter Api.result Lwt.t =
+      Api_types_t.simulation_parameter Api.result Lwt.t =
       match simulation with
       | Some (parameter,_) ->
         Lwt.return (Result_util.ok parameter)
@@ -338,8 +337,8 @@ class manager_simulation
                    file (filename^"/"^din.Data.din_data.Data.din_name))
             t.Api_types_t.simulation_output_dins in
           let () =
-            List.iter
-              (fun snapshot ->
+            Mods.StringMap.iter
+              (fun _ snapshot ->
                  Fakezip.add_entry (Data.string_of_snapshot ?len:None snapshot)
                    file (filename^"/"^snapshot.Data.snapshot_file))
               t.Api_types_t.simulation_output_snapshots in
@@ -371,7 +370,7 @@ class manager_simulation
         )
 
     method simulation_intervention
-        (simulation_perturbation : Api_types_j.simulation_intervention) :
+        (simulation_perturbation : Api_types_t.simulation_intervention) :
       string Api.result Lwt.t =
       bind_simulation
         simulation
@@ -402,7 +401,7 @@ class manager_simulation
            )
         )
 
-    method simulation_info : Api_types_j.simulation_info Api.result Lwt.t =
+    method simulation_info : Api_types_t.simulation_info Api.result Lwt.t =
       bind_simulation
         simulation
         (fun t ->
