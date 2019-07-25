@@ -9,8 +9,6 @@ import threading
 import json
 
 import os
-import io
-from os import path, listdir
 
 from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
                                KappaApi, KASIM_DIR, KAPPY_DIR
@@ -20,17 +18,16 @@ def find_agent_bin():
     agent_names = ['KaSimAgent', 'KaSaAgent']
     bin_dir = None
     for potential_dir in [KAPPY_DIR, KASIM_DIR]:
-        bin_dir = path.join(potential_dir, 'bin')
-        if not path.exists(bin_dir):
+        bin_dir = os.path.join(potential_dir, 'bin')
+        if not os.path.exists(bin_dir):
             continue
-        contents = listdir(bin_dir)
+        contents = os.listdir(bin_dir)
         if all([agent in contents for agent in agent_names]):
             break
     return bin_dir
 
 
 BIN_DIR = find_agent_bin()
-
 
 @KappaApi._fix_docs
 class KappaStd(KappaApi):
@@ -52,7 +49,7 @@ class KappaStd(KappaApi):
                 # their location must be passed to this class
                 raise KappaError("Kappa binaries not found.")
             kappa_bin_path = BIN_DIR
-        sim_args = [path.join(kappa_bin_path, "KaSimAgent"),
+        sim_args = [os.path.join(kappa_bin_path, "KaSimAgent"),
                     "--delimiter",
                     "\\x{:02x}".format(ord(self.delimiter)),
                     "--log",
@@ -64,12 +61,8 @@ class KappaStd(KappaApi):
         self.sim_agent = subprocess.Popen(sim_args,
                                           stdin=subprocess.PIPE,
                                           stdout=subprocess.PIPE,
-                                          # YK: stderr going to PIPE
-                                          stderr=subprocess.PIPE,
-#                                          stderr=subprocess.STDOUT,
-                                          # YK: changing buffer size
-                                          bufsize=-1)
-        sa_args = [path.join(kappa_bin_path, "KaSaAgent"), "--delimiter",
+                                          stderr=subprocess.STDOUT)
+        sa_args = [os.path.join(kappa_bin_path, "KaSaAgent"), "--delimiter",
                    "\\x{:02x}".format(ord(self.delimiter)), ]
         if args:
             sa_args = sa_args + args
@@ -77,7 +70,7 @@ class KappaStd(KappaApi):
                                          stdin=subprocess.PIPE,
                                          stdout=subprocess.PIPE,
                                          stderr=subprocess.STDOUT)
-        model_args = [path.join(kappa_bin_path, "KaMoHa"), "--delimiter",
+        model_args = [os.path.join(kappa_bin_path, "KaMoHa"), "--delimiter",
                    "\\x{:02x}".format(ord(self.delimiter)), ]
         if args:
             model_args = model_args + args
@@ -96,28 +89,19 @@ class KappaStd(KappaApi):
 
     def read_stdout(self, agent_to_read):
         """
-        Read from stdout of the simulation agent. This function reads the 
+        Read from stdout of an agent. This function reads the
         output in large chunks (the default buffer size) until it encounters
-        the delimiter. This is more efficient than reading the output 
+        the delimiter. This is more efficient than reading the output
         one character at a time.
         """
         buff = bytearray()
-        delim_val = self.delimiter.encode('utf-8') 
-        chunk_size = io.DEFAULT_BUFFER_SIZE
-        fd = agent_to_read.stdout.fileno()
-        c = os.read(fd, chunk_size)
-        buff.extend(c)
+        delim_val = self.delimiter.encode('utf-8')
+        c = agent_to_read.stdout.read1()
         while (not c.endswith(delim_val)) and c:
-            c = os.read(fd, chunk_size)
             buff.extend(c)
+            c = agent_to_read.stdout.read1()
         # strip the end character
-        buff = self.strip_delim(buff)
-        return buff
-        
-    def strip_delim(self, buff):
-        delim_val = self.delimiter.encode('utf-8') 
-        if buff.endswith(delim_val):
-            return buff[0:-1]
+        if c: buff.extend(c[0:-1])
         return buff
 
     def _dispatch(self, method, args=None):
@@ -173,11 +157,7 @@ class KappaStd(KappaApi):
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.model_agent.stdin.write(message.encode('utf-8'))
             self.model_agent.stdin.flush()
-            buff = bytearray()
-            c = self.model_agent.stdout.read(1)
-            while c != self.delimiter.encode('utf-8') and c:
-                buff.extend(c)
-                c = self.model_agent.stdout.read(1)
+            buff = self.read_stdout(self.model_agent)
             response = json.loads(buff.decode('utf-8'))
             response = json.loads(buff.decode('utf-8'))
             if isinstance(response, str):
