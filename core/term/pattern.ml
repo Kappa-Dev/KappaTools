@@ -1558,14 +1558,27 @@ let finalize ~debugMode ~sharing env contact_map =
                 { Env.content = x.element; Env.sons = [];
                   Env.deps = x.depending; Env.roots = x.roots; }))
       singles in
+  let last_length = ref 0 in
+  let last_ins = ref 0 in
   let stat_nav_steps =
     Mods.IntMap.fold
       (fun level domain_level acc_level ->
-        if level <= 1 then acc_level else
-          Mods.IntMap.fold
-            (fun _ l acc ->
-              List.fold_left (fun acc x ->
-                      let () =  domain.(x.p_id) <-
+         if level <= 1 then acc_level else
+           Mods.IntMap.fold
+             (fun _ l acc ->
+                List.fold_left (fun acc x ->
+                    let () =
+                      if !last_ins mod 100 = 0 then
+                        let string =
+                          Format.asprintf "inserting pattern %i/%i" !last_ins si in
+                        let () =
+                          Format.eprintf "%s%s%s@?"
+                            (String.make !last_length '\b')
+                            string
+                            (String.make (max 0 (!last_length - String.length string)) ' ') in
+                        last_length := String.length string in
+                    let () = incr last_ins in
+                    let () =  domain.(x.p_id) <-
                           { Env.content = x.element; Env.sons = [];
                             Env.roots = x.roots; Env.deps = x.depending;} in
                       Mods.IntMap.fold (fun _ ll accl->
