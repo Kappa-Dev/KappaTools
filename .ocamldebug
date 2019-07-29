@@ -1,0 +1,25 @@
+directory _build/install/default/lib/kappa-library/generic _build/install/default/lib/kappa-library/mixtures
+directory _build/install/default/lib/kappa-library/terms _build/install/default/lib/kappa-library/runtime
+
+load_printer "str.cma"
+load_printer "bigarray.cma"
+load_printer "easy_format.cma"
+load_printer "biniou.cma"
+load_printer "yojson.cma"
+load_printer "logs.cma"
+load_printer "kappa_generic_toolset.cma"
+load_printer "kappa_mixtures.cma"
+load_printer "kappa_terms.cma"
+load_printer "kappa_runtime.cma"
+
+install_printer Kappa_generic_toolset.Mods.IntSetMap.Set.print
+install_printer Kappa_generic_toolset.Mods.Int2SetMap.Set.print
+install_printer Kappa_generic_toolset.Mods.StringSetMap.Set.print
+install_printer Kappa_generic_toolset.Mods.CharSetMap.Set.print
+install_printer Kappa_generic_toolset.ValMap.print
+install_printer Kappa_generic_toolset.Renaming.print_full
+install_printer Kappa_generic_toolset.Random_tree.debug_print
+install_printer Kappa_terms.Matching.debug_print
+install_printer Kappa_mixtures.Edges.debug_print
+install_printer Kappa_runtime.Rule_interpreter.debug_print
+install_printer Kappa_terms.Pattern.PreEnv.debug_print
