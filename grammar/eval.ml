@@ -578,9 +578,9 @@ let compile
   pause @@ fun () ->
   let domain,dom_stats =
     Pattern.finalize ~debugMode ~max_sharing preenv contact_map in
-  outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.nodes^
+  outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.stat_nodes^
                      " (sub)observables "^
-                     string_of_int dom_stats.Pattern.PreEnv.nav_steps^
+                     string_of_int dom_stats.Pattern.PreEnv.stat_nav_steps^
                      " navigation steps"));
 
   let env =

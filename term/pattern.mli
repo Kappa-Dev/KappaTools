@@ -80,7 +80,7 @@ end
 module PreEnv : sig
   type t
 
-  type stat = { nodes: int; nav_steps: int }
+  type stat = { stat_nodes: int; stat_nav_steps: int }
 
   val sigs : t -> Signature.s
 

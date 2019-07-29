@@ -1119,7 +1119,7 @@ module PreEnv = struct
     mutable used_by_a_begin_new: bool;
   }
 
-  type stat = { nodes: int; nav_steps: int }
+  type stat = { stat_nodes: int; stat_nav_steps: int }
 
   let fresh sigs id_by_type nb_id domain =
     {
@@ -1181,31 +1181,76 @@ module PreEnv = struct
         bottom in
     elementaries
 
-  let rec insert_navigation ~debugMode domain dst inj_dst2nav p_id nav =
-    let point = domain.(p_id) in
-    let rec insert_nav_sons = function
-      | [] ->
-        let () =
-          point.Env.sons <-
-            {Env.dst; Env.inj = inj_dst2nav; Env.next = nav} :: point.Env.sons
-        in List.length nav
-      | h :: t ->
-        match Navigation.is_subnavigation
-                ~debugMode (identity_injection point.Env.content)
-                nav h.Env.next with
-        | None -> insert_nav_sons t
-        | Some (_,[]) -> let () = assert (h.Env.dst = dst) in 0
-        | Some (inj_nav'2p,nav') ->
-          let pre_inj_nav'2q =
-            Renaming.compose
-              ~debugMode false inj_nav'2p (Renaming.inverse h.Env.inj) in
-          let (inj_nav''2q,nav'') =
-            Navigation.rename ~debugMode pre_inj_nav'2q nav' in
-          insert_navigation
-            ~debugMode domain dst
-            (Renaming.compose ~debugMode false inj_dst2nav inj_nav''2q)
-            h.Env.dst nav'' in
-    insert_nav_sons point.Env.sons
+  let present_in_dst ~debugMode dst inj2dst nav =
+    let rec aux_present_in_dst inj' = function
+      | [] -> Some inj'
+      | ((Navigation.Fresh _, _), _) :: _ -> assert false
+      | ((Navigation.Existing ag, si), Navigation.ToNothing) :: t ->
+        begin match Mods.IntMap.find_option (Renaming.apply ~debugMode inj' ag) dst.nodes with
+          | None -> assert false
+          | Some n -> if fst n.(si) = Free then aux_present_in_dst inj' t else None
+        end
+      | ((Navigation.Existing ag, si), Navigation.ToInternal i) :: t ->
+        begin match Mods.IntMap.find_option (Renaming.apply ~debugMode inj' ag) dst.nodes with
+          | None -> assert false
+          | Some n -> if snd n.(si) = i then aux_present_in_dst inj' t else None
+        end
+      | ((Navigation.Existing ag, si), Navigation.ToNode (Navigation.Existing ag',si')) :: t ->
+        begin match Mods.IntMap.find_option (Renaming.apply ~debugMode inj' ag) dst.nodes with
+          | None -> assert false
+          | Some n ->
+            if fst n.(si) = Link (Renaming.apply ~debugMode inj' ag',si')
+            then aux_present_in_dst inj' t
+            else None
+        end
+      | ((Navigation.Existing ag, si), Navigation.ToNode (Navigation.Fresh (ag',ty'),si')) :: t ->
+        begin match Mods.IntMap.find_option (Renaming.apply ~debugMode inj' ag) dst.nodes with
+          | None -> assert false
+          | Some n -> match n.(si) with
+            | Link (agl,sil), _ ->
+              if List.mem agl dst.nodes_by_type.(ty') && si' = sil
+              then match Renaming.add ~debugMode ag' agl inj' with
+                | None -> None
+                | Some inj' -> aux_present_in_dst inj' t
+              else None
+            | (Free | UnSpec) , _ -> None
+        end in
+    aux_present_in_dst inj2dst nav
+
+  let rec insert_navigation ~debugMode id_by_type nb_id domain dst_id dst inj2dst p_id =
+    if p_id = dst_id then 0
+    else
+      let point = domain.(p_id) in
+      let rec insert_nav_sons = function
+        | [] ->
+          let (inj_e2sup,_),sup =
+            merge_compatible
+              ~debugMode
+              id_by_type nb_id
+              inj2dst point.Env.content dst in
+          (match equal ~debugMode sup dst with
+          | None -> assert false
+          | Some inj_sup2dst ->
+            let inj_dst2p =
+              Renaming.inverse
+                (Renaming.compose
+                   ~debugMode false
+                   inj_e2sup inj_sup2dst) in
+            let nav = build_navigation_between
+                ~debugMode inj_dst2p point.Env.content dst in
+            let () =
+              point.Env.sons <-
+                {Env.dst = dst_id; Env.inj = inj_dst2p; Env.next = nav} :: point.Env.sons
+            in List.length nav)
+        | h :: t ->
+          match present_in_dst ~debugMode dst inj2dst h.Env.next with
+          | None -> insert_nav_sons t
+          | Some inj_p'2dst ->
+            insert_navigation
+              ~debugMode id_by_type nb_id domain dst_id dst
+              (Renaming.compose ~debugMode false h.Env.inj inj_p'2dst)
+              h.Env.dst in
+      insert_nav_sons point.Env.sons
 
   let add_cc ~debugMode ~toplevel ?origin env p_id element =
     let w = weight element in
@@ -1482,7 +1527,7 @@ let finalize ~debugMode ~max_sharing env contact_map =
                 { Env.content = x.element; Env.sons = [];
                   Env.deps = x.depending; Env.roots = x.roots; }))
       singles in
-  let nav_steps =
+  let stat_nav_steps =
     Mods.IntMap.fold
       (fun level domain_level acc_level ->
         if level <= 1 then acc_level else
@@ -1499,24 +1544,10 @@ let finalize ~debugMode ~max_sharing env contact_map =
                               | injs ->
                                 List.fold_left
                                   (fun acc inj_e_x ->
-                                     let (inj_e2sup,_),sup =
-                                       merge_compatible
-                                         ~debugMode
-                                         env.PreEnv.id_by_type env.PreEnv.nb_id
-                                         inj_e_x e.element x.element in
-                                     match equal ~debugMode sup x.element with
-                                     | None -> assert false
-                                     | Some inj_sup2x ->
-                                       let inj =
-                                         Renaming.inverse
-                                           (Renaming.compose
-                                              ~debugMode false
-                                              inj_e2sup inj_sup2x) in
-                                       let nav = build_navigation_between
-                                           ~debugMode inj e.element x.element in
-                                       PreEnv.insert_navigation
-                                         ~debugMode domain x.p_id inj e.p_id nav
-                                       + acc
+                                     PreEnv.insert_navigation
+                                       ~debugMode env.PreEnv.id_by_type env.PreEnv.nb_id
+                                       domain x.p_id x.element inj_e_x e.p_id
+                                     + acc
                                   )
                                   acc injs
                             ) accl ll) singles acc) acc l)
@@ -1544,7 +1575,7 @@ let finalize ~debugMode ~max_sharing env contact_map =
     Env.domain;
     Env.elementaries;
     Env.single_agent_points;
-  },{ nodes = si; PreEnv.nav_steps }
+  },{ stat_nodes = si; PreEnv.stat_nav_steps }
 
 let merge_on_inf ~debugMode env m g1 g2 =
   let m_list = Renaming.to_list m in
