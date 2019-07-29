@@ -1,20 +1,4 @@
-load_printer "str.cma"
-load_printer "easy_format.cma"
-load_printer "biniou.cma"
-load_printer "yojson.cma"
-load_printer "KappaLib.cma"
-load_printer "db_printers.cma"
-
-install_printer Mods.IntSetMap.Set.print
-install_printer Mods.Int2SetMap.Set.print
-install_printer Mods.StringSetMap.Set.print
-install_printer Mods.CharSetMap.Set.print
-install_printer Random_tree.debug_print
-install_printer IntCollection.print
-install_printer ValMap.print
-install_printer Renaming.print_full
 install_printer Ast.print_ast_mix
-install_printer Operator.DepSet.print
 install_printer Raw_printers.print_ast_alg
 install_printer Raw_printers.print_alg
 install_printer Raw_printers.print_bool
@@ -25,11 +9,8 @@ install_printer Raw_printers.print_transformation
 install_printer Raw_printers.print_rule
 install_printer Raw_printers.print_modification
 install_printer Raw_printers.print_perturbation
-install_printer Kappa_printer.env
-install_printer Pattern.Env.print
-install_printer Matching.debug_print
-install_printer Edges.debug_print
 install_printer Raw_printers.print_path
 install_printer Causal.debug_print_grid
-install_printer Rule_interpreter.debug_print
-install_printer Pattern.PreEnv.debug_print
+install_printer Kappa_terms.Pattern.PreEnv.debug_print
+install_printer Kappa_terms.Pattern.Env.print
+install_printer Kappa_terms.Kappa_printer.env
