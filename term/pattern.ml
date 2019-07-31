@@ -660,8 +660,8 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
       cc1.nodes_by_type in
   let available_in_cc1 =
     Array.mapi
-      (fun i l -> Tools.recti
-          (fun l _ -> List.tl l) l (List.length cc1.nodes_by_type.(i)))
+      (fun i l ->
+         List.filter (fun x -> not (List.mem x cc1.nodes_by_type.(i))) l)
       reserved_ids in
   let free_id_for_cc1 = ref free_id in
 
