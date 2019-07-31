@@ -9,6 +9,7 @@ import threading
 import json
 
 import os
+from io import DEFAULT_BUFFER_SIZE
 
 from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
                                KappaApi, KASIM_DIR, KAPPY_DIR
@@ -96,10 +97,10 @@ class KappaStd(KappaApi):
         """
         buff = bytearray()
         delim_val = self.delimiter.encode('utf-8')
-        c = agent_to_read.stdout.read1()
+        c = agent_to_read.stdout.read1(DEFAULT_BUFFER_SIZE)
         while (not c.endswith(delim_val)) and c:
             buff.extend(c)
-            c = agent_to_read.stdout.read1()
+            c = agent_to_read.stdout.read1(DEFAULT_BUFFER_SIZE)
         # strip the end character
         if c: buff.extend(c[0:-1])
         return buff
