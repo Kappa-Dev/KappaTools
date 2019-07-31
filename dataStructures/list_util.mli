@@ -7,6 +7,7 @@
 (******************************************************************************)
 
 val last : 'a list -> 'a
+val pop_last : 'a list -> 'a list * 'a
 val cons_option : 'a option -> 'a list -> 'a list
 val exists_uniq : ('a -> bool) -> 'a list -> bool
 

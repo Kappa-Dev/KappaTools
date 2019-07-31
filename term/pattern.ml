@@ -301,30 +301,28 @@ let raw_to_navigation (full:bool) nodes_by_type nodes =
 let rec sub_minimize_renaming ~debugMode r = function
   | [], _ -> r
   | _::_, [] -> assert false
-  | x::q as l,y::q' -> match Renaming.add ~debugMode x y r with
-    | Some r' -> sub_minimize_renaming ~debugMode r' (q,q')
-    | None -> sub_minimize_renaming ~debugMode r (l,q')
+  | x::q as l,y::q' ->
+    if x = y then
+      match Renaming.add ~debugMode x y r with
+      | Some r' -> sub_minimize_renaming ~debugMode r' (q,q')
+      | None -> assert false
+    else
+      let fsts,lst = List_util.pop_last l in
+      match Renaming.add ~debugMode lst y r with
+      | Some r' -> sub_minimize_renaming ~debugMode r' (fsts,q')
+      | None -> assert false
 
 let minimize_renaming ~debugMode dst_nbt ref_nbt =
   let re = Renaming.empty () in
-  let () = Array.iteri
-      (fun ty ->
-         List.iter (fun id ->
-             let ids' =
-               List_util.smart_filter (fun id' -> id <> id') dst_nbt.(ty) in
-             if ids' != dst_nbt.(ty) then
-               let () = dst_nbt.(ty) <- ids' in
-               let b = Renaming.imperative_add ~debugMode id id re in
-               assert b))
-      ref_nbt in
   Tools.array_fold_lefti
     (fun ty r ids -> sub_minimize_renaming ~debugMode r (ids,ref_nbt.(ty)))
     re dst_nbt
 
 let minimize ~debugMode cand_nbt cand_nodes ref_nbt =
   let re = minimize_renaming ~debugMode cand_nbt ref_nbt in
+  let re_img = Renaming.image re in
   let nodes_by_type =
-    Array.map (List.filter (fun a -> Renaming.mem a re)) ref_nbt in
+    Array.map (List.filter (fun a -> Mods.IntSet.mem a re_img)) ref_nbt in
   let nodes =
     Mods.IntMap.fold
       (fun id sites acc ->

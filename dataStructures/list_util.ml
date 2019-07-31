@@ -22,6 +22,13 @@ let rec last = function
   | [ x ] -> x
   | _ :: l -> last l
 
+let rec aux_pop_last acc = function
+  | [] -> failwith "list_pop_last"
+  | [ x ] -> (List.rev acc,x)
+  | h :: t -> aux_pop_last (h::acc) t
+
+let pop_last l = aux_pop_last [] l
+
 let cons_option h t  =
   match h with
   | Some x -> x :: t
