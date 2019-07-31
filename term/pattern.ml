@@ -111,16 +111,14 @@ let identity_injection cc =
     (Array.fold_left (fun x y -> List.rev_append y x) [] cc.nodes_by_type)
 
 (** pick a root in the CC. Any root works.
-    In this case pick the last node of smallest type *)
+    In this case pick the first node of smallest type *)
 let raw_find_root nodes_by_type =
   let rec aux ty =
     if ty = Array.length nodes_by_type
     then None
     else match nodes_by_type.(ty) with
       | [] -> aux (succ ty)
-      | h::t ->
-        let x = List.fold_left (fun _ x -> x) h t in
-        Some(x,ty)
+      | h::_ -> Some(h,ty)
   in aux 0
 
 let find_root cc = raw_find_root cc.nodes_by_type
@@ -1353,9 +1351,10 @@ let raw_finish_new ~debugMode ~toplevel ?origin wk =
       (fun i -> wk.reserved_id.(i) <-
           List.rev_append wk.used_id.(i) wk.reserved_id.(i))
       (Array.length wk.used_id) in
+  let nodes_by_type = Array.map List.rev wk.used_id in
   let cc_candidate =
-    { nodes_by_type = wk.used_id; nodes = wk.cc_nodes;
-      recogn_nav = raw_to_navigation false wk.used_id wk.cc_nodes} in
+    { nodes_by_type; nodes = wk.cc_nodes;
+      recogn_nav = raw_to_navigation false nodes_by_type wk.cc_nodes} in
   let preenv,r,out,out_id =
     PreEnv.add_cc
       ~debugMode ~toplevel
