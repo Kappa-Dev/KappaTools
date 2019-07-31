@@ -213,31 +213,31 @@ var(1)=(y(7)+2*y(6)+y(5))/2; % dimmers
 dydt=zeros(nodevar,1);
 
 % rule    : R(r[_]) -> R(r[.])
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> R(e[1],r[.]).E(r[1],s[.]) + R(e[1],r[.]).E(r[.],s[1])
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> R(e[1],r[.]).E(r[.],s[1]) + R(e[1],r[.]).E(r[1],s[.])
 
 dydt(6)=dydt(6)-k(6)*y(6);
-dydt(4)=dydt(4)+k(6)*y(6);
 dydt(3)=dydt(3)+k(6)*y(6);
-
-% rule    : R(r[_]) -> .
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[1],s[.])
-
-dydt(6)=dydt(6)-k(5)*y(6);
-dydt(3)=dydt(3)+k(5)*y(6);
-dydt(2)=dydt(2)+k(5)*y(6);
-
-% rule    : R(r[_]) -> R(r[.])
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> R(e[1],r[.]).E(r[1],s[.]) + R(e[1],r[.]).E(r[.],s[1])
-
-dydt(6)=dydt(6)-k(6)*y(6);
 dydt(4)=dydt(4)+k(6)*y(6);
-dydt(3)=dydt(3)+k(6)*y(6);
 
 % rule    : R(r[_]) -> .
 % reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[.],s[1])
 
 dydt(6)=dydt(6)-k(5)*y(6);
 dydt(4)=dydt(4)+k(5)*y(6);
+dydt(2)=dydt(2)+k(5)*y(6);
+
+% rule    : R(r[_]) -> R(r[.])
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> R(e[1],r[.]).E(r[.],s[1]) + R(e[1],r[.]).E(r[1],s[.])
+
+dydt(6)=dydt(6)-k(6)*y(6);
+dydt(3)=dydt(3)+k(6)*y(6);
+dydt(4)=dydt(4)+k(6)*y(6);
+
+% rule    : R(r[_]) -> .
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[1],s[.])
+
+dydt(6)=dydt(6)-k(5)*y(6);
+dydt(3)=dydt(3)+k(5)*y(6);
 dydt(2)=dydt(2)+k(5)*y(6);
 
 % rule    : R(r[_]) -> R(r[.])
@@ -416,31 +416,31 @@ jacvar(1,7)=2;
 jac=sparse(nodevar,nodevar);
 
 % rule    : R(r[_]) -> R(r[.])
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> R(e[1],r[.]).E(r[1],s[.]) + R(e[1],r[.]).E(r[.],s[1])
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> R(e[1],r[.]).E(r[.],s[1]) + R(e[1],r[.]).E(r[1],s[.])
 
 jac(6,6)=jac(6,6)-k(6);
-jac(4,6)=jac(4,6)+k(6);
 jac(3,6)=jac(3,6)+k(6);
-
-% rule    : R(r[_]) -> .
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[1],s[.])
-
-jac(6,6)=jac(6,6)-k(5);
-jac(3,6)=jac(3,6)+k(5);
-jac(2,6)=jac(2,6)+k(5);
-
-% rule    : R(r[_]) -> R(r[.])
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> R(e[1],r[.]).E(r[1],s[.]) + R(e[1],r[.]).E(r[.],s[1])
-
-jac(6,6)=jac(6,6)-k(6);
 jac(4,6)=jac(4,6)+k(6);
-jac(3,6)=jac(3,6)+k(6);
 
 % rule    : R(r[_]) -> .
 % reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[.],s[1])
 
 jac(6,6)=jac(6,6)-k(5);
 jac(4,6)=jac(4,6)+k(5);
+jac(2,6)=jac(2,6)+k(5);
+
+% rule    : R(r[_]) -> R(r[.])
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> R(e[1],r[.]).E(r[.],s[1]) + R(e[1],r[.]).E(r[1],s[.])
+
+jac(6,6)=jac(6,6)-k(6);
+jac(3,6)=jac(3,6)+k(6);
+jac(4,6)=jac(4,6)+k(6);
+
+% rule    : R(r[_]) -> .
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[1],s[.])
+
+jac(6,6)=jac(6,6)-k(5);
+jac(3,6)=jac(3,6)+k(5);
 jac(2,6)=jac(2,6)+k(5);
 
 % rule    : R(r[_]) -> R(r[.])

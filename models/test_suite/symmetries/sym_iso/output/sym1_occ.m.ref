@@ -242,12 +242,6 @@ dydt(3)=dydt(3)-k(3)*y(3);
 dydt(5)=dydt(5)+k(3)*y(3);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.],y{u}[.],z[1]).A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]).A(x{p}[.],y{p}[.],z[1])
-
-dydt(5)=dydt(5)-k(2)*y(5);
-dydt(8)=dydt(8)+k(2)*y(5);
-
-% rule    : A(x{u}[.]) -> A(x{p}[.])
 % reaction: A(x{u}[.],y{u}[.],z[1]).A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]).A(x{u}[.],y{p}[.],z[1])
 
 dydt(5)=dydt(5)-k(2)*y(5);
@@ -258,6 +252,12 @@ dydt(1)=dydt(1)+k(2)*y(5);
 
 dydt(5)=dydt(5)-k(3)*y(5);
 dydt(1)=dydt(1)+k(3)*y(5);
+
+% rule    : A(x{u}[.]) -> A(x{p}[.])
+% reaction: A(x{u}[.],y{u}[.],z[1]).A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]).A(x{p}[.],y{p}[.],z[1])
+
+dydt(5)=dydt(5)-k(2)*y(5);
+dydt(8)=dydt(8)+k(2)*y(5);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
 % reaction: A(x{u}[.],y{p}[.],z[1]).A(x{p}[.],y{p}[.],z[1]) -> A(x{p}[.],y{p}[.],z[1]).A(x{p}[.],y{p}[.],z[1])
@@ -422,12 +422,6 @@ jac(3,3)=jac(3,3)-k(3);
 jac(5,3)=jac(5,3)+k(3);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
-% reaction: A(x{u}[.],y{u}[.],z[1]).A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]).A(x{p}[.],y{p}[.],z[1])
-
-jac(5,5)=jac(5,5)-k(2);
-jac(8,5)=jac(8,5)+k(2);
-
-% rule    : A(x{u}[.]) -> A(x{p}[.])
 % reaction: A(x{u}[.],y{u}[.],z[1]).A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{p}[.],z[1]).A(x{u}[.],y{p}[.],z[1])
 
 jac(5,5)=jac(5,5)-k(2);
@@ -438,6 +432,12 @@ jac(1,5)=jac(1,5)+k(2);
 
 jac(5,5)=jac(5,5)-k(3);
 jac(1,5)=jac(1,5)+k(3);
+
+% rule    : A(x{u}[.]) -> A(x{p}[.])
+% reaction: A(x{u}[.],y{u}[.],z[1]).A(x{u}[.],y{p}[.],z[1]) -> A(x{u}[.],y{u}[.],z[1]).A(x{p}[.],y{p}[.],z[1])
+
+jac(5,5)=jac(5,5)-k(2);
+jac(8,5)=jac(8,5)+k(2);
 
 % rule    : A(x{u}[.]) -> A(x{p}[.])
 % reaction: A(x{u}[.],y{p}[.],z[1]).A(x{p}[.],y{p}[.],z[1]) -> A(x{p}[.],y{p}[.],z[1]).A(x{p}[.],y{p}[.],z[1])
