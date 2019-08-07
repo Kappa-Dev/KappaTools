@@ -491,8 +491,8 @@ let remove_counter_rule sigs mix created =
       List_util.rev_map_append
         (fun ag -> ag.ra) created (incrs_created@incrs_created') in
     (rule_agent_mix,raw_mix)
-  else (List.map (fun ag -> ag.ra) mix),
-       (List.map (fun ag -> ag.ra) created)
+  else (List.rev_map (fun ag -> ag.ra) (List.rev mix)),
+       (List.rev_map (fun ag -> ag.ra) (List.rev created))
 
 let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let (incr_type,_,incr_b,_) = Signature.incr_agent sigs in
