@@ -212,7 +212,7 @@ let array_min_equal_not_null l1 l2 =
 
 let array_compare compare a b =
   let l = Array.length a in let l' = Array.length b in
-  let d = Pervasives.compare l l' in
+  let d = Stdlib.compare l l' in
   let rec aux_array_compare k =
     if k >= l then 0 else
       let o = compare a.(k) b.(k) in

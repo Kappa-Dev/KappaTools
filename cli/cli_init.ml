@@ -110,7 +110,7 @@ let get_pack_from_marshalizedfile
          Configuration.t*Model.t*Contact_map.t*int list*
          (bool*bool*bool) option*string*string option*
          (Primitives.alg_expr * Primitives.elementary_rule) list) in
-    let () = Pervasives.close_in d  in
+    let () = Stdlib.close_in d  in
     let alg_overwrite =
       List.map
         (fun (s,v) ->

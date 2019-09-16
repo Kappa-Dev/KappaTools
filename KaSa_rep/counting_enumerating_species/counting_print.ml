@@ -39,7 +39,7 @@ let dump_hole_set log print_handler hole_set =
           let _ = Printf.fprintf log ";" in
           ()
         | _ ->
-          let _ = Printf.fprintf log "%i*" in
+          let _ = Printf.fprintf log "%i*" i in
           let _ = print_handler.print_hole log x in
           let _ = Printf.fprintf log ";" in
           ())

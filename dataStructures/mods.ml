@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let int_compare (x: int) y = Pervasives.compare x y
+let int_compare (x: int) y = Stdlib.compare x y
 let int_pair_compare (p,q) (p',q') =
   let o = int_compare p p' in
   if o = 0 then int_compare q q' else o
