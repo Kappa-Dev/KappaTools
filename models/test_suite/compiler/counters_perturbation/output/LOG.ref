@@ -11,7 +11,7 @@ done
 	 -update_domain construction
 	 11 (sub)observables 17 navigation steps
 	 -initial conditions
-+ Building initial state (128 agents)
++ Building initial state (80 agents)
 Done
 + Command line to rerun is: 'KaSim' '-l' '10' '-seed' '92067277' '-d' 'output' 'counter_max.ka' '-syntax' '4'
 ____________________________________________________________

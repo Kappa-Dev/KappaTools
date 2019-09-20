@@ -11,7 +11,7 @@ done
 	 -update_domain construction
 	 8 (sub)observables 4 navigation steps
 	 -initial conditions
-+ Building initial state (1024 agents)
++ Building initial state (1000 agents)
 Done
 + Command line to rerun is: 'KaSim' 'create.ka' '-seed' '931056658' '-u' 'event' '-l' '500' '-d' 'output' '--time-independent' '-syntax' '4'
 ____________________________________________________________

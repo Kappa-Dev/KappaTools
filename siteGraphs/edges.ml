@@ -209,12 +209,10 @@ let copy graph =
 type stats = { nb_agents : int }
 
 let stats graph =
-  match graph.tables with
-  | None -> assert false
-  | Some tables -> {
-      nb_agents =
-        Mods.DynArray.length tables.sort - List.length (snd graph.free_id);
-    }
+  let (top_id, free_ids) = graph.free_id in
+  {
+    nb_agents = top_id - List.length free_ids;
+  }
 
 let add_agent ?id sigs ty graph =
   let ar = Signature.arity sigs ty in

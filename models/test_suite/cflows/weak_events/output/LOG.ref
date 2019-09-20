@@ -11,7 +11,7 @@ done
 	 -update_domain construction
 	 3 (sub)observables 0 navigation steps
 	 -initial conditions
-+ Building initial state (1024 agents)
++ Building initial state (1001 agents)
 Done
 + Command line to rerun is: 'KaSim' 'weak_events.ka' '-seed' '924556145' '-u' 'e' '-l' '75' '-d' 'output' '--time-independent' '-syntax' '4'
 ____________________________________________________________

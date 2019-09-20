@@ -11,7 +11,7 @@ done
 	 -update_domain construction
 	 22 (sub)observables 37 navigation steps
 	 -initial conditions
-+ Building initial state (2048 agents)
++ Building initial state (2000 agents)
 Done
 + Command line to rerun is: 'KaSim' '-i' 'weak_only.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-o' 'data.svg' '-p' '1000' '--time-independent' '-syntax' '4'
 ____________________________________________________________

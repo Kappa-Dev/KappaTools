@@ -13,6 +13,6 @@ done
 	 -update_domain construction
 	 0 (sub)observables 0 navigation steps
 	 -initial conditions
-+ Building initial state (1 agents)
++ Building initial state (0 agents)
 Done
 + Command line to rerun is: 'KaSim' 'file1.ka' 'file2.ka' '-mode' 'batch' '--compile' '-d' 'output' '-l' '0' '-syntax' '4'
