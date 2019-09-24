@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <May 21 2019>
+ * Last modification: Time-stamp: <Sep 24 2019>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -297,7 +297,8 @@ let translate_lnk_state parameters lnk_state remanent =
       | Ast.V3 -> Ckappa_sig.FREE, remanent
       | Ast.V4 -> Ckappa_sig.LNK_MISSING, remanent
     end
-  | [LKappa.LNK_ANY,position] -> Ckappa_sig.LNK_ANY position,remanent
+  | [LKappa.LNK_ANY,position] ->
+    Ckappa_sig.LNK_ANY position,remanent
   | [LKappa.LNK_SOME,position] -> Ckappa_sig.LNK_SOME position,remanent
   | [LKappa.LNK_TYPE (x,y),_position] -> Ckappa_sig.LNK_TYPE (y,x),remanent
   | _::(_,pos)::_ ->
@@ -315,9 +316,16 @@ let translate_port is_signature parameters int_set port remanent =
   in
   let error',is_free =
     match port.Ast.port_lnk
-    with [(LKappa.LNK_FREE|LKappa.ANY_FREE),_] | [] -> error,Some true
-          | [LKappa.LNK_ANY,_] -> error,None
-          | ((LKappa.LNK_SOME | LKappa.LNK_TYPE _ | LKappa.LNK_VALUE _ | LKappa.ANY_FREE
+    with [(LKappa.LNK_FREE|LKappa.ANY_FREE),_] -> error,Some true
+       | [] ->
+         begin
+           match Remanent_parameters.get_syntax_version parameters with
+           | Ast.V3 ->
+             error, Some true
+           | Ast.V4 -> error, None
+         end
+       | [LKappa.LNK_ANY,_] -> error,None
+       | ((LKappa.LNK_SOME | LKappa.LNK_TYPE _ | LKappa.LNK_VALUE _ | LKappa.ANY_FREE
             | LKappa.LNK_FREE | LKappa.LNK_ANY),_) :: _ -> error,Some false in
   let lnk,remanent =
     if is_signature then Ckappa_sig.FREE,remanent else
@@ -327,7 +335,6 @@ let translate_port is_signature parameters int_set port remanent =
     Ckappa_sig.port_int =
       List.rev_map fst (List.rev port.Ast.port_int) ;
     Ckappa_sig.port_lnk = lnk ;
-    (*       port_pos = pos ; *)
     Ckappa_sig.port_free = is_free },
   remanent
 
