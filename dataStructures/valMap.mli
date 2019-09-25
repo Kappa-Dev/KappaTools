@@ -16,4 +16,4 @@ val is_empty: t -> bool
 val add: key -> int -> t -> t
 val mem: key -> t -> bool
 val remove : key -> t -> t
-val total : t -> int
+val total : t -> Int64.t

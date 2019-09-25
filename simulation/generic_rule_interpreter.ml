@@ -290,7 +290,7 @@ module Make (Instances:Instances_sig.S) = struct
         modified_ccs old_pack in
     let va = ValMap.total new_pack in
     let nb_rectangular_instances_by_cc' =
-      if va = 0 then
+      if va = 0L then
         Mods.IntMap.remove rule_id nb_rectangular_instances_by_cc
       else Mods.IntMap.add rule_id new_pack nb_rectangular_instances_by_cc in
     let _, unary_candidates' =
@@ -841,7 +841,7 @@ module Make (Instances:Instances_sig.S) = struct
         let () =
           store_activity
             ~debugMode store env counter state (2*i+1)
-            rule.Primitives.syntactic_rule (fst unrate) va in
+            rule.Primitives.syntactic_rule (fst unrate) (Int64.to_int va) in
         pack' in
     let rec aux dep acc =
       Operator.DepSet.fold
