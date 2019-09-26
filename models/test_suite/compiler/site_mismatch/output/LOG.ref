@@ -4,7 +4,7 @@ done
 + Sanity checks
 Parsing crash.ka...
 done
-Scan rules!
+File "crash.ka", line 1, characters 10-11:File "crash.ka", line 1, characters 12-13:Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:C
@@ -73,4 +73,4 @@ every agent may occur in the model
 ------------------------------------------------------------
 
 Some exceptions have been raised
-error: file_name: KaSa_rep/frontend/prepreprocess.ml; message: line 826, File "crash.ka", line 4, characters 5-69:: missaligned rule: the rule is ignored; exception:Exit
+error: file_name: KaSa_rep/frontend/prepreprocess.ml; message: line 836, File "crash.ka", line 4, characters 5-69:: missaligned rule: the rule is ignored; exception:Exit

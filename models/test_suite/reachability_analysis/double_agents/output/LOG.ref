@@ -1,6 +1,6 @@
 Parsing double_agents.ka...
 done
-Scan rules!
+File "double_agents.ka", line 1, characters 10-11:File "double_agents.ka", line 1, characters 17-18:File "double_agents.ka", line 2, characters 10-11:File "double_agents.ka", line 2, characters 19-20:File "double_agents.ka", line 3, characters 10-11:Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A

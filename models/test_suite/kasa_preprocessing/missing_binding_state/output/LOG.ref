@@ -1,6 +1,6 @@
 Parsing missing_binding_state.ka...
 done
-Scan rules!
+File "missing_binding_state.ka", line 1, characters 10-11:File "missing_binding_state.ka", line 1, characters 17-18:File "missing_binding_state.ka", line 2, characters 10-11:File "missing_binding_state.ka", line 3, characters 10-11:File "missing_binding_state.ka", line 7, characters 8-9:File "missing_binding_state.ka", line 7, characters 10-11:File "missing_binding_state.ka", line 7, characters 15-16:File "missing_binding_state.ka", line 8, characters 2-3:File "missing_binding_state.ka", line 8, characters 13-14:File "missing_binding_state.ka", line 5, characters 12-13:File "missing_binding_state.ka", line 5, characters 14-15:File "missing_binding_state.ka", line 5, characters 19-20:Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A

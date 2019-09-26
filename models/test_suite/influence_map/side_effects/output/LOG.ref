@@ -1,6 +1,6 @@
 Parsing side_effects.ka...
 done
-Scan rules!
+File "side_effects.ka", line 1, characters 10-11:File "side_effects.ka", line 2, characters 10-11:Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A

@@ -1,6 +1,6 @@
 Parsing bound_to.ka...
 done
-Scan rules!
+File "bound_to.ka", line 1, characters 10-11:File "bound_to.ka", line 2, characters 10-11:Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A

@@ -1,6 +1,6 @@
 Parsing labels.ka...
 done
-Scan rules!
+File "labels.ka", line 1, characters 10-11:Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A

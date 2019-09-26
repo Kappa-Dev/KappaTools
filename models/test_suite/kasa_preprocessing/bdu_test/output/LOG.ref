@@ -1,6 +1,6 @@
 Parsing sanity.ka...
 done
-Scan rules!
+File "sanity.ka", line 5, characters 10-11:File "sanity.ka", line 5, characters 18-19:Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A

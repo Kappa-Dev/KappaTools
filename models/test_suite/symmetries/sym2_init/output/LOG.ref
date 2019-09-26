@@ -13,7 +13,7 @@ done
 	 -initial conditions
 Parsing sym_init2.ka...
 done
-Scan rules!
+File "sym_init2.ka", line 1, characters 10-11:File "sym_init2.ka", line 1, characters 17-18:File "sym_init2.ka", line 1, characters 24-25:Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
