@@ -17,5 +17,5 @@ Done
 ____________________________________________________________
 ############################################################
 Simulation ended
-58.82% of event loops were productive. Null event cause:
+74.07% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%

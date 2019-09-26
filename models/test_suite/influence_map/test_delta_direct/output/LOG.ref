@@ -1,6 +1,6 @@
 Parsing test_delta.ka...
 done
-File "test_delta.ka", line 7, characters 10-11:File "test_delta.ka", line 8, characters 10-11:File "test_delta.ka", line 9, characters 10-11:Scan rules!
+Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A

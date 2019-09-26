@@ -1,24 +1,26 @@
 // Snapshot [Event: 200]
-%def: "T0" "1.36303"
+%def: "T0" "1.52033"
 
-%init: 2 /*6 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[4] b[2] c[5]),
+%init: 3 /*6 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[4] b[2] c[5]),
   A(a{p}[4]), C(c[5]), C(c[3])
-%init: 10 /*5 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[.] b[2] c[4]),
+%init: 7 /*5 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[.] b[2] c[4]),
   C(c[4]), C(c[3])
-%init: 2 /*4 agents*/ B(a[.] b[1] c[2]), B(a[.] b[1] c[3]), C(c[3]), C(c[2])
-%init: 6 /*5 agents*/ A(a{p}[1]), B(a[1] b[2] c[.]), B(a[3] b[2] c[4]),
+%init: 4 /*4 agents*/ B(a[.] b[1] c[2]), B(a[.] b[1] c[3]), C(c[3]), C(c[2])
+%init: 5 /*5 agents*/ A(a{p}[1]), B(a[1] b[2] c[.]), B(a[3] b[2] c[4]),
   A(a{p}[3]), C(c[4])
-%init: 4 /*4 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[.] b[2] c[.]),
+%init: 2 /*4 agents*/ A(a{p}[1]), B(a[1] b[2] c[.]), B(a[.] b[2] c[3]),
   C(c[3])
-%init: 7 /*4 agents*/ A(a{p}[1]), B(a[1] b[2] c[.]), B(a[.] b[2] c[3]),
+%init: 8 /*4 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[.] b[2] c[.]),
   C(c[3])
-%init: 3 /*3 agents*/ B(a[.] b[1] c[2]), B(a[.] b[1] c[.]), C(c[2])
-%init: 7 /*3 agents*/ A(a{p}[1]), B(a[1] b[.] c[2]), C(c[2])
-%init: 4 /*2 agents*/ B(a[.] b[.] c[1]), C(c[1])
+%init: 2 /*3 agents*/ B(a[.] b[1] c[.]), B(a[.] b[1] c[2]), C(c[2])
+%init: 11 /*3 agents*/ A(a{p}[1]), B(a[1] b[.] c[2]), C(c[2])
+%init: 3 /*2 agents*/ B(a[.] b[.] c[1]), C(c[1])
 %init: 41 /*1 agents*/ C(c[.])
-%init: 4 /*4 agents*/ A(a{u}[1]), B(a[1] b[2] c[.]), B(a[3] b[2] c[.]),
+%init: 2 /*4 agents*/ A(a{u}[1]), B(a[1] b[2] c[.]), B(a[3] b[2] c[.]),
   A(a{u}[3])
-%init: 7 /*2 agents*/ A(a{u}[1]), B(a[1] b[.] c[.])
-%init: 6 /*1 agents*/ B(a[.] b[.] c[.])
-%init: 41 /*1 agents*/ A(a{u}[.])
+%init: 2 /*3 agents*/ A(a{u}[1]), B(a[1] b[2] c[.]), B(a[.] b[2] c[.])
+%init: 2 /*2 agents*/ B(a[.] b[1] c[.]), B(a[.] b[1] c[.])
+%init: 10 /*2 agents*/ A(a{u}[1]), B(a[1] b[.] c[.])
+%init: 2 /*1 agents*/ B(a[.] b[.] c[.])
+%init: 40 /*1 agents*/ A(a{u}[.])
 
