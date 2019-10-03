@@ -227,7 +227,7 @@ let outputs (simulation : t) =
     let snapshot_file =
       Tools.find_available_name
         ~already_there snapshot.Data.snapshot_file
-        ~facultative:(string_of_int snapshot.Data.snapshot_event) ~ext:".ka" in
+        ~facultative:(string_of_int snapshot.Data.snapshot_event) ~ext:None in
     let snapshot' = { snapshot with Data.snapshot_file } in
     simulation.snapshots <-
       Mods.StringMap.add snapshot_file snapshot' simulation.snapshots

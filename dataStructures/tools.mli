@@ -72,7 +72,7 @@ val smash_duplicate_in_ordered_list:
 
 val find_available_name :
   already_there:(string -> bool) ->
-  string -> facultative:string -> ext:string -> string
+  string -> facultative:string -> ext:string option -> string
 
 val default_message_delimter : char
 

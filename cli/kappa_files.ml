@@ -26,12 +26,14 @@ let path f =
   if Filename.is_implicit f then Filename.concat !outputDirName f else f
 
 let get_fresh_filename base_name concat_list facultative ext =
-  let tmp_name = try Filename.chop_extension base_name
-    with Invalid_argument _ -> base_name in
+  let tmp_name =
+    if Filename.check_suffix base_name ext
+    then Filename.chop_suffix base_name ext
+    else Filename.remove_extension base_name in
   let base_name = String.concat "_" (tmp_name::concat_list) in
   Tools.find_available_name
     ~already_there:(fun x -> Sys.file_exists (path x))
-    base_name ~facultative ~ext
+    base_name ~facultative ~ext:(Some ext)
 
 let open_out f =
   let x = path f in
