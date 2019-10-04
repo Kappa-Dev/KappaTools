@@ -66,13 +66,13 @@ before_install:
 install:
   - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a --compiler=4.05.0 ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then opam remote add cross-windows git://github.com/ocaml-cross/opam-cross-windows ; fi"
-  - eval $(opam env) && opam install -y dune num yojson lwt fmt logs re
+  - eval $(opam env) && opam install -y dune num yojson lwt fmt logs re decompress
   - sh -c "if [ '$CHECKED' = native ] ; then opam install -y odoc ; fi"
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] || [ '$CHECKED' = windows ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then opam install -y atdgen cohttp-lwt-unix ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then pip install -v . nose ; fi"
-  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-runtime-windows.2.0.0 lwt-windows fmt-windows logs-windows re-windows ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-runtime-windows.2.0.0 lwt-windows fmt-windows logs-windows re-windows decompress-windows ; fi"
 
 script:
   - make all

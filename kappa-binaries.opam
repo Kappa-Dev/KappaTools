@@ -20,6 +20,7 @@ depends : [
   "lwt" { >= "4.2.0" }
   "fmt"
   "logs"
+  "decompress"
   "kappa-library"
 ]
 

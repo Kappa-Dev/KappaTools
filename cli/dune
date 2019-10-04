@@ -1,7 +1,8 @@
 (library
   (name kappa_cli)
   (libraries lwt
-  	     (select superargTk.ml from
+             checkseum.c decompress.gz
+             (select superargTk.ml from
 	       (labltk.jpf -> superargTk_tk.ml)
 	       ( -> superargTk_notk.ml))
 	     kappa_grammar
