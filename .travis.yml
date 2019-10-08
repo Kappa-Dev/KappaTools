@@ -64,7 +64,7 @@ before_install:
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then curl -LO https://github.com/ocaml/opam/releases/download/2.0.4/opam-2.0.4-x86_64-macos && sudo mv opam-2.0.4-x86_64-macos /usr/local/bin/opam && sudo chmod +x /usr/local/bin/opam ; fi"
 
 install:
-  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a --compiler=4.03.0 ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a --compiler=4.04.0 ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then opam remote add cross-windows git://github.com/ocaml-cross/opam-cross-windows ; fi"
   - eval $(opam env) && opam install -y dune num yojson lwt fmt logs re
   - sh -c "if [ '$CHECKED' = native ] ; then opam install -y odoc ; fi"
