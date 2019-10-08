@@ -1,5 +1,5 @@
 (library
  (name kappa_generic_toolset)
- (libraries yojson result logs stdlib-shims)
+ (libraries yojson result logs stdlib-shims bigarray)
  (public_name kappa-library.generic)
  (flags (:standard -w @a)))
