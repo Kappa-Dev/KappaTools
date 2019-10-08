@@ -100,9 +100,10 @@ end =
       let () = if t.clashing_instance > 0 then Format.fprintf
             f "\tClashing instance: %.2f%%@,"
             (100. *. (float_of_int t.clashing_instance) /. all) in
-      if t.time_correction > 0 then Format.fprintf
-          f "\tPerturbation interrupting time advance: %.2f%%@]@."
-          (100. *. (float_of_int t.time_correction) /. all)
+      let () = if t.time_correction > 0 then Format.fprintf
+            f "\tPerturbation interrupting time advance: %.2f%%@,"
+            (100. *. (float_of_int t.time_correction) /. all) in
+      Format.fprintf f "@]"
 
     let to_yojson t = `Assoc [
         "consecutive", `Int t.consecutive;
