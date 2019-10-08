@@ -9,15 +9,19 @@ function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1024,
-    height: 600,
-    webPreferences: {
-      // https://electronjs.org/docs/faq#i-can-not-use-jqueryrequirejsmeteorangularjs-in-electron
-      nodeIntegration: false
-    }
+    height: 600
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  let sim_agent = require('url').format({
+    protocol: 'file',
+    slashes: true,
+    pathname: require('path').join(__dirname, '../bin/KaSimAgent'),
+    query: { label: 'Local' }
+  })
+  mainWindow.loadFile('index.html',{
+    query: { host: sim_agent }
+  })
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
