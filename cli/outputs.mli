@@ -21,4 +21,4 @@ val input_modifications : Model.t -> int -> Primitives.modification list -> unit
 
 val go : Data.t -> unit
 val flush_warning : unit -> unit
-val close : ?event:int -> unit -> unit
+val close : ?event:int -> unit -> unit Lwt.t
