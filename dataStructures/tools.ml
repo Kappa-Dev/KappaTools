@@ -321,11 +321,14 @@ let smash_duplicate_in_ordered_list p l =
   | [] -> []
   | (h,n)::t -> aux t n h []
 
+let chop_suffix_or_extension name ext =
+  if Filename.check_suffix name ext
+  then Filename.chop_suffix name ext
+  else Filename.remove_extension name
+
 let find_available_name ~already_there name ~facultative ~ext =
   let ext = match ext with Some e -> e | None -> Filename.extension name in
-  let base = if Filename.check_suffix name ext
-    then Filename.chop_suffix name ext
-    else Filename.remove_extension name in
+  let base = chop_suffix_or_extension name ext in
   if already_there (base^ext) then
     let base' = if facultative <> "" then base^"_"^facultative else base in
     if already_there (base'^ext) then

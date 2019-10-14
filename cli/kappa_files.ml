@@ -26,10 +26,7 @@ let path f =
   if Filename.is_implicit f then Filename.concat !outputDirName f else f
 
 let get_fresh_filename base_name concat_list facultative ext =
-  let tmp_name =
-    if Filename.check_suffix base_name ext
-    then Filename.chop_suffix base_name ext
-    else Filename.remove_extension base_name in
+  let tmp_name = Tools.chop_suffix_or_extension base_name ext in
   let base_name = String.concat "_" (tmp_name::concat_list) in
   Tools.find_available_name
     ~already_there:(fun x -> Sys.file_exists (path x))
@@ -43,8 +40,7 @@ let open_out f =
 let open_out_fresh base_name facultative ext =
   let x =
     if !overwrite_permission then
-      let base = try Filename.chop_extension base_name
-        with Invalid_argument _ -> base_name in
+      let base = Tools.chop_suffix_or_extension base_name ext in
       base^ext
     else get_fresh_filename base_name [] facultative ext in
   let () = mk_dir_r (Filename.dirname x) in

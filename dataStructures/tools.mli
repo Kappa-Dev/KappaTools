@@ -70,10 +70,12 @@ val capitalize: string -> string
 val smash_duplicate_in_ordered_list:
   ('a -> 'a -> int) -> ('a * int) list -> ('a * int) list
 
+val chop_suffix_or_extension : string -> string -> string
+
 val find_available_name :
   already_there:(string -> bool) ->
   string -> facultative:string -> ext:string option -> string
 
 val default_message_delimter : char
 
-val get_ref: int ref -> int 
+val get_ref: int ref -> int
