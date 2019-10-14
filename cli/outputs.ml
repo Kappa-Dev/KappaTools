@@ -232,7 +232,7 @@ let close ?event () =
   x
 
 let initial_inputs conf env init ~filename =
-  let inputs = Kappa_files.open_out_fresh filename "" ".ka" in
+  let inputs = Kappa_files.open_out_fresh filename [] "" ".ka" in
   let inputs_form = Format.formatter_of_out_channel inputs in
   let () =
     Data.print_initial_inputs ~uuid conf env inputs_form init in
