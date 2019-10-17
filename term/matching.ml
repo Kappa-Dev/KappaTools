@@ -32,10 +32,8 @@ let debug_print f (m,_co) =
 
 let reconstruct_renaming ~debugMode domain graph cc_id root =
   let point = Pattern.Env.get domain cc_id in
-  match Pattern.Env.roots point with
-  | None -> failwith "Matching.reconstruct cc error"
-  (*- rm - add : int -> int -> Renaming.t -> Renaming.t *)
-  | Some (rids,rty) ->
+  let (_,rids,rty) =
+    List.find (fun (cc_id',_,_) -> cc_id = cc_id') (Pattern.Env.roots point) in
     let inj = Renaming.empty () in
     let _,injective =
       match Pattern.reconstruction_navigation (Pattern.Env.content point) with
@@ -70,9 +68,8 @@ let is_root_of ~debugMode domain graph (_,rty as root) cc_id =
   let point = Pattern.Env.get domain cc_id in
   match Pattern.reconstruction_navigation (Pattern.Env.content point) with
   | [] ->
-    (match Pattern.Env.roots point with
-     | Some (_,rty') -> rty = rty'
-     | None -> false)
+    List.exists
+      (fun (cc_id',_,rty') -> cc_id = cc_id' && rty = rty') (Pattern.Env.roots point)
   | nav -> aux_is_root_of ~debugMode graph (Some root) (Renaming.empty ()) nav
 
 let roots_of ~debugMode domain graph cc =
@@ -131,16 +128,16 @@ let survive_nav ~debugMode inj graph =
 let from_edge ~debugMode domain graph (out,cache as acc) node site arrow =
   let rec aux_from_edges cache (obs,rev_deps as acc) = function
     | [] -> acc,cache
-    | (pid,point,inj_point2graph) :: remains ->
+    | (point,inj_point2graph) :: remains ->
       let acc' =
-        match Pattern.Env.roots point with
-        | None -> acc
-        |Some (ids,ty) ->
-          (List.fold_left
-             (fun acc id ->
-                (pid,(Renaming.apply ~debugMode inj_point2graph id,ty))::acc)
-             obs ids,
-           Operator.DepSet.union rev_deps (Pattern.Env.deps point)) in
+        (List.fold_left
+           (fun obs' (cc_id,ids,ty) ->
+              List.fold_left
+                (fun acc id ->
+                   (cc_id,(Renaming.apply ~debugMode inj_point2graph id,ty))::acc)
+                obs' ids)
+           obs (Pattern.Env.roots point),
+         Operator.DepSet.union rev_deps (Pattern.Env.deps point)) in
       let remains',cache' =
         List.fold_left
           (fun (re,ca as pair) son ->
@@ -156,7 +153,7 @@ let from_edge ~debugMode domain graph (out,cache as acc) node site arrow =
                then pair
                else
                  let p' = Pattern.Env.get domain son.Pattern.Env.dst in
-                 let next = (son.Pattern.Env.dst,p',rename) in
+                 let next = (p',rename) in
                  (next::re,ca'))
           (remains,cache) (Pattern.Env.sons point) in
       aux_from_edges cache' acc' remains' in

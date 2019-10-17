@@ -838,13 +838,13 @@ module Env : sig
 
   type point = {
     content: cc;
-    roots: (int list (*ids*) * int (*ty*)) option;
+    roots: (int * int list (*ids*) * int (*ty*)) list;
     deps: Operator.DepSet.t;
     mutable sons: transition list;
   }
 
    val content: point -> cc
-   val roots: point -> (int list (*ids*) * int (*ty*)) option
+   val roots: point -> (id * int list (*ag_ids*) * int (*ag_ty*)) list
    val deps: point -> Operator.DepSet.t
    val sons: point -> transition list
 
@@ -864,7 +864,7 @@ module Env : sig
 
   val get_elementary :
     debugMode:bool -> t -> Agent.t -> int ->
-    Navigation.abstract Navigation.arrow -> (id * point * Renaming.t) option
+    Navigation.abstract Navigation.arrow -> (point * Renaming.t) option
 
   val signatures : t -> Signature.s
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
@@ -881,7 +881,7 @@ end = struct
 
   type point = {
     content: cc;
-    roots: (int list (*ids*) * int (*ty*)) option;
+    roots: (int (*cc_id *) * int list (*ag_ids*) * int (*ag_ty*)) list;
     deps: Operator.DepSet.t;
     mutable sons: transition list;
   }
@@ -909,7 +909,7 @@ end = struct
         (fun x ->
            print_cc ~noCounters ~sigs:env.sig_decl ~cc_id:p_id ~with_id:true x)
         p.content
-        (fun f -> if p.roots <> None then
+        (fun f -> if p.roots <> [] then
             Format.fprintf
               f "@[[%a]@]@ "
               (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
@@ -956,9 +956,9 @@ end = struct
   let point_to_yojson p =
     `Assoc [
       "content",to_yojson p.content;
-      "roots", JsonUtil.of_option
-        (fun (ids,ty) ->
-           `List [`List (List.map JsonUtil.of_int ids); `Int ty]) p.roots;
+      "roots", JsonUtil.of_list
+        (fun (cc_id,ids,ty) ->
+           `List [`Int cc_id; `List (List.map JsonUtil.of_int ids); `Int ty]) p.roots;
       "deps", Operator.depset_to_yojson p.deps;
       "sons", `List (List.map transition_to_yojson p.sons);
     ]
@@ -969,9 +969,13 @@ end = struct
         try {
           content = of_yojson sig_decl (List.assoc "content" l);
           roots = (match List.assoc "roots" l with
-              | `Null -> None
-              | `List [ `List ids; `Int ty ] ->
-                Some (List.map Yojson.Basic.Util.to_int ids,ty)
+              | `Null -> []
+              | `List l ->
+                List.map (function
+                    | `List [ `Int cc_id; `List ids; `Int ty ] ->
+                      (cc_id,List.map Yojson.Basic.Util.to_int ids,ty)
+                    | _ -> raise Not_found)
+                  l
               | _ -> raise Not_found);
           deps = Operator.depset_of_yojson (List.assoc "deps" l);
           sons = (match List.assoc "sons" l with
@@ -1069,7 +1073,7 @@ end = struct
         | None ->  find_good_edge tail
         | Some inj' ->
           let dst = get domain cc_id in
-          Some (cc_id,dst,inj') in
+          Some (dst,inj') in
     find_good_edge sa.(s)
 
 end
@@ -1097,7 +1101,7 @@ type prepoint = {
   p_id: id;
   element: cc;
   depending: Operator.DepSet.t;
-  roots: (int list (*ids*) * int (*ty*)) option;
+  roots: (int* int list (*ids*) * int (*ty*)) list;
 }
 
 type work = {
@@ -1152,7 +1156,7 @@ module PreEnv = struct
   let sigs env = env.sig_decl
 
   let empty_point sigs =
-    {Env.content = empty_cc sigs; Env.roots = None;
+    {Env.content = empty_cc sigs; Env.roots = [];
      Env.deps = Operator.DepSet.empty; Env.sons = [];}
 
   let fill_elem sigs bottom =
@@ -1259,13 +1263,14 @@ module PreEnv = struct
       | [] ->
         let roots = if toplevel then
             match find_root element with
-            | None -> None
+            | None -> []
             | Some (rid,rty) ->
-              Some (List.sort Mods.int_compare
-                      (List.map
-                         (fun r -> Renaming.apply ~debugMode r rid)
-                         (automorphisms ~debugMode element)),rty)
-          else None in
+              [ p_id,
+                List.sort Mods.int_compare
+                  (List.map
+                     (fun r -> Renaming.apply ~debugMode r rid)
+                     (automorphisms ~debugMode element)),rty ]
+          else [] in
         [{p_id; element;roots;
           depending=add_origin Operator.DepSet.empty origin}],
         identity_injection element,element,p_id
@@ -1273,14 +1278,15 @@ module PreEnv = struct
         | None -> let a,b,c,d = aux t in h::a,b,c,d
         | Some r ->
           let roots =
-            if h.roots <> None || not toplevel then h.roots
+            if h.roots <> [] || not toplevel then h.roots
             else match find_root element with
-              | None -> None
+              | None -> []
               | Some (rid,rty) ->
-                Some (List.sort Mods.int_compare
-                        (List.map
-                           (fun r -> Renaming.apply ~debugMode r rid)
-                           (automorphisms ~debugMode element)),rty) in
+                [ h.p_id,
+                  List.sort Mods.int_compare
+                     (List.map
+                        (fun r -> Renaming.apply ~debugMode r rid)
+                        (automorphisms ~debugMode element)),rty ] in
           {p_id=h.p_id; element=h.element;
            depending=add_origin h.depending origin; roots;
           }::t,r,h.element,h.p_id in

@@ -47,7 +47,7 @@ module Env : sig
 
   val content: point -> cc
 
-  val roots: point -> (int list * int) option (** (ids,ty) *)
+  val roots: point -> (id * int list * int) list (** (cc_id,ag_ids,ag_ty) *)
 
   val deps: point -> Operator.DepSet.t
 
@@ -61,7 +61,7 @@ module Env : sig
 
   val get_elementary :
     debugMode:bool -> t -> Agent.t -> int ->
-    Navigation.abstract Navigation.arrow -> (id * point * Renaming.t) option
+    Navigation.abstract Navigation.arrow -> (point * Renaming.t) option
 
   val signatures : t -> Signature.s
 
