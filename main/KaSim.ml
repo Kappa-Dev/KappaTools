@@ -71,7 +71,7 @@ let finalize
                ~outputs) env counter graph state >>= fun () ->
   Progress_report.complete_progress_bar
     (Counter.current_time counter) (Counter.current_event counter) progress <&>
-  Outputs.close ~event:(Counter.current_event counter) () >>= fun () ->
+  Lwt.wrap (Outputs.close ~event:(Counter.current_event counter)) >>= fun () ->
   match trace_file,stories_compression with
   | None,_ -> Lwt.return_unit
   | Some _, None -> Lwt.return_unit
@@ -399,12 +399,12 @@ let () =
        Lwt_io.print (Format.asprintf "%a" Counter.print_efficiency counter))
   with
   | ExceptionDefn.Malformed_Decl er ->
-    let () = Lwt_main.run (Outputs.close ()) in
+    let () = Outputs.close () in
     let () = remove_trace () in
     let () = Pp.error Format.pp_print_string er in
     exit 2
   | ExceptionDefn.Internal_Error er ->
-    let () = Lwt_main.run (Outputs.close ()) in
+    let () = Outputs.close () in
     let () = remove_trace () in
     let () =
       Pp.error
@@ -412,20 +412,20 @@ let () =
         er in
     exit 2
   | Sys.Break ->
-    let () = Lwt_main.run (Outputs.close ()) in
+    let () = Outputs.close () in
     let () = remove_trace () in
     let () =
       Format.eprintf "@.***Interrupted by user out of simulation loop***@." in
     exit 1
   | Invalid_argument msg ->
     let () = Printexc.print_backtrace stderr in
-    let () = Lwt_main.run (Outputs.close ()) in
+    let () = Outputs.close () in
     let () = remove_trace () in
     let () = Format.eprintf "@.@[<v>***Runtime error %s***@]@." msg in
     exit 2
   | e ->
     let () = Printexc.print_backtrace stderr in
     let () = Format.eprintf "%s@." (Printexc.to_string e) in
-    let () = Lwt_main.run (Outputs.close ()) in
+    let () = Outputs.close () in
     let () = remove_trace () in
     exit 3

@@ -343,16 +343,16 @@ let print_plot_sep is_tsv f =
   Format.pp_print_string f (if is_tsv then "\t" else ",")
 
 let print_plot_legend ~is_tsv f a =
-  Format.fprintf f "@[<h>%a@]"
+  Format.fprintf f "@[<h>%a@]@."
     (Pp.array (print_plot_sep is_tsv) (fun _ f x -> Format.fprintf f "\"%s\"" x))
     a
 
 let print_plot_line ~is_tsv pp f l =
-  Format.fprintf f "@,@[<h>%a@]"
+  Format.fprintf f "@[<h>%a@]@."
     (Pp.array (print_plot_sep is_tsv) (fun _ -> pp)) l
 
 let export_plot ~is_tsv plot =
-  Format.asprintf "@[<v>%a%a@]@."
+  Format.asprintf "%a%a"
     (print_plot_legend ~is_tsv) plot.plot_legend
     (Pp.list Pp.empty (print_plot_line ~is_tsv
                          (Pp.option (fun f -> Format.fprintf f "%e"))))

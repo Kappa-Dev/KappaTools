@@ -6,8 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Lwt.Infix
-
 let print_desc : (string,out_channel * Format.formatter) Hashtbl.t =
   Hashtbl.create 2
 
@@ -78,8 +76,9 @@ let output_activities r flux =
     Format.fprintf f "]@]"
 
 type fd = {
-  fill: Nbr.t array option -> unit;
-  promise: unit Lwt.t;
+  desc:out_channel;
+  form:Format.formatter;
+  is_tsv:bool;
 }
 
 type format = StandBy of (string * string * string array)
@@ -89,9 +88,9 @@ let plotDescr = ref None
 
 let close_plot () =
   match !plotDescr with
-  | (None | Some (StandBy _)) -> Lwt.return_unit
-  | Some (Raw plot) -> plot.fill None; plot.promise
-  | Some (Svg s) -> Pp_svg.to_file s; Lwt.return_unit
+  | (None | Some (StandBy _)) -> ()
+  | Some (Raw plot) -> close_out plot.desc
+  | Some (Svg s) -> Pp_svg.to_file s
 
 let traceDescr = ref None
 let traceNotEmpty = ref false
@@ -127,33 +126,22 @@ let launch_plot (filename,title,head) =
            Pp_svg.points = [];
           }
     else
-      let stream,fill = Lwt_stream.create () in
-      let promise =
-        Lwt_io.with_file
-          ~mode:Lwt_io.Output (Kappa_files.path filename)
-          (fun d_chan ->
-             let d = Lwt_fmt.of_channel d_chan in
-             let is_tsv = Filename.check_suffix filename ".tsv" in
-             Lwt_fmt.fprintf d "@[<v>" >>= fun () ->
-             (if not is_tsv then
-                Lwt_fmt.fprintf d "# %s@,# \"uuid\" : \"%i\"@," title uuid
-              else Lwt.return_unit) >>= fun () ->
-             Lwt_fmt.fprintf d "%a" (Data.print_plot_legend ~is_tsv) head
-             >>= fun () ->
-             Lwt_stream.iter_s
-               (fun l ->
-                  Lwt_fmt.fprintf
-                    d "%a" (Data.print_plot_line ~is_tsv Nbr.print_option) l)
-               stream >>= fun () ->
-             Lwt_fmt.fprintf d "@]@.") in
-      Raw {promise; fill} in
+      let d_chan = Kappa_files.open_out filename in
+      let d = Format.formatter_of_out_channel d_chan in
+      let is_tsv = Filename.check_suffix filename ".tsv" in
+      let () = if not is_tsv then Format.fprintf d "# %s@." title in
+      let () = if not is_tsv
+        then Format.fprintf d "# \"uuid\" : \"%i\"@." uuid in
+      let () = Data.print_plot_legend ~is_tsv d head in
+      Raw {desc=d_chan; form=d; is_tsv} in
     plotDescr := Some format
 
 let rec plot_now l =
   match !plotDescr with
   | None -> assert false
   | Some (StandBy p) -> let () = launch_plot p in plot_now l
-  | Some (Raw fd) -> fd.fill (Some l)
+  | Some (Raw fd) ->
+    Data.print_plot_line ~is_tsv:fd.is_tsv Nbr.print_option fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
 let snapshot s =
@@ -223,13 +211,12 @@ let close_input ?event () =
     close_out inputs
 
 let close ?event () =
-  let x = close_plot () in
+  let () = close_plot () in
   let () = close_trace () in
   let () = close_activities () in
   let () = flush_warning () in
   let () = close_input ?event () in
-  let () = close_desc () in
-  x
+  close_desc ()
 
 let initial_inputs conf env init ~filename =
   let inputs = Kappa_files.open_out_fresh filename [] "" ".ka" in
