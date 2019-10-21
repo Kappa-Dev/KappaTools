@@ -25,11 +25,12 @@ let batch_loop
         env counter graph state >>= fun (stop,graph',state') ->
     if stop then Lwt.return (graph',state')
     else
-      Progress_report.tick
-        ~efficiency (Counter.current_time counter)
-        (Counter.time_ratio counter)
-        (Counter.current_event counter)
-        (Counter.event_ratio counter) progress >>= Lwt.pause >>= fun () ->
+      let () = Progress_report.tick
+          ~efficiency (Counter.current_time counter)
+          (Counter.time_ratio counter)
+          (Counter.current_event counter)
+          (Counter.event_ratio counter) progress in
+      (*Lwt.pause () >>= fun () ->*)
       iter graph' state'
   in iter graph state
 
@@ -47,7 +48,7 @@ let interactive_loop
     if !user_interrupted ||
        Rule_interpreter.value_bool counter graph pause_criteria then
       let () = Sys.set_signal Sys.sigint old_sigint_behavior in
-      Lwt_io.printl "" >>= fun () -> Lwt.return (false,graph,state)
+      let () = Format.print_newline () in Lwt.return (false,graph,state)
     else
       Lwt.wrap4 (State_interpreter.a_loop ~debugMode ~outputs
                    ~dumpIfDeadlocked ~maxConsecutiveClash) env counter graph state >>=
@@ -56,11 +57,12 @@ let interactive_loop
         let () = Sys.set_signal Sys.sigint old_sigint_behavior in
         Lwt.return out
       else
-        Progress_report.tick
-          ~efficiency (Counter.current_time counter)
-          (Counter.time_ratio counter)
-          (Counter.current_event counter)
-          (Counter.event_ratio counter) progress >>= Lwt.pause >>= fun () ->
+        let () = Progress_report.tick
+            ~efficiency (Counter.current_time counter)
+            (Counter.time_ratio counter)
+            (Counter.current_event counter)
+            (Counter.event_ratio counter) progress in
+        (*Lwt.pause () >>= fun () ->*)
         iter graph' state'
   in iter graph state
 
@@ -69,7 +71,7 @@ let finalize
     progress env counter graph state stories_compression =
   Lwt.wrap4 (State_interpreter.end_of_simulation
                ~outputs) env counter graph state >>= fun () ->
-  Progress_report.complete_progress_bar
+  Lwt.wrap3 Progress_report.complete_progress_bar
     (Counter.current_time counter) (Counter.current_event counter) progress <&>
   Lwt.wrap (Outputs.close ~event:(Counter.current_event counter)) >>= fun () ->
   match trace_file,stories_compression with

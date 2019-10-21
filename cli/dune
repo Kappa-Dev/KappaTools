@@ -1,6 +1,6 @@
 (library
   (name kappa_cli)
-  (libraries lwt.unix
+  (libraries lwt
   	     (select superargTk.ml from
 	       (labltk.jpf -> superargTk_tk.ml)
 	       ( -> superargTk_notk.ml))
