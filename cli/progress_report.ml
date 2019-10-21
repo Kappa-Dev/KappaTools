@@ -57,11 +57,11 @@ let pp_text delta_t time t_r event e_r f s =
 
 let rec aux_tick something s n =
   if n <= 0 then
-    if something then Format.pp_print_flush Format.std_formatter ()
-    else
-      let () = Format.pp_print_char Format.std_formatter s.bar_char in
-      let () = inc_tick s in
-      aux_tick true s (pred n)
+    if something then Format.pp_print_flush Format.std_formatter () else ()
+  else
+    let () = Format.pp_print_char Format.std_formatter s.bar_char in
+    let () = inc_tick s in
+    aux_tick true s (pred n)
 
 let tick ~efficiency time t_r event e_r = function
   | Bar s ->
