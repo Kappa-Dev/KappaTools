@@ -20,7 +20,6 @@ type t = {
   mutable traceFile : string option;
   mutable logFile : string option;
   mutable compileMode : bool;
-  mutable maxSharing : bool;
   mutable showEfficiency : bool;
   mutable timeIndependent : bool;
 }
@@ -37,7 +36,6 @@ let default : t = {
   traceFile = None;
   logFile = Some "inputs";
   compileMode = false;
-  maxSharing = false;
   showEfficiency = false;
   timeIndependent = false;
 }
@@ -97,9 +95,6 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("--print-efficiency",
    Arg.Unit (fun () -> t.showEfficiency <- true),
    "KaSim tells how fast it runs") ;
-  ("--max-sharing",
-   Arg.Unit (fun () -> t.maxSharing <- true),
-   "Initialization is heavier but simulation is faster");
   ("--compile",
    Arg.Unit (fun () -> t.compileMode <- true),
    "Display rule compilation as action list") ;

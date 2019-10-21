@@ -74,7 +74,6 @@ module Env : sig
   val to_yojson : t -> Yojson.Basic.t
 
   val of_yojson : Yojson.Basic.t -> t
-
 end
 
 module PreEnv : sig
@@ -85,8 +84,6 @@ module PreEnv : sig
   val sigs : t -> Signature.s
 
   val of_env : Env.t -> t
-
-  val empty : Signature.s -> t
 
   val debug_print : Format.formatter -> t -> unit
 end
@@ -160,15 +157,15 @@ val fold:
 (** USE WITH CARE: Break some abstraction. The array must not be
     modified and internal state [-1] means unspecified *)
 
-val finalize :
-  debugMode:bool -> max_sharing:bool -> PreEnv.t -> Contact_map.t ->
-  Env.t * PreEnv.stat
+val minimal_env : Signature.s -> Contact_map.t -> PreEnv.t
 
-val infs : debugMode:bool -> t -> t -> t list
+val finalize : PreEnv.t -> Env.t * PreEnv.stat
+
+val infs : debugMode:bool -> ?rooted:(int * int) -> t -> t -> t list
 val matchings : debugMode:bool -> t -> t -> Renaming.t list
 val merge_on_inf :
   debugMode:bool -> PreEnv.t -> Renaming.t -> t -> t ->
-  t option * (t * int * t * int * int * bool) option
+  (t , (int * int * int * bool) option) Result.result
 val length : t -> int
 
 module Set : SetMap.Set with type elt=id

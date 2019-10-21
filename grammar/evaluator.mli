@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 val do_interactive_directives :
-  debugMode:bool -> outputs:(Data.t -> unit) -> max_sharing:bool ->
+  debugMode:bool -> outputs:(Data.t -> unit) ->
   syntax_version:Ast.syntax_version -> Contact_map.t -> Model.t -> Counter.t ->
   Rule_interpreter.t -> State_interpreter.t ->
   (Ast.mixture, Ast.mixture, string,Ast.rule) Ast.modif_expr list ->
@@ -15,7 +15,7 @@ val do_interactive_directives :
   (Model.t * (bool * Rule_interpreter.t * State_interpreter.t))
 
 val get_pause_criteria :
-  debugMode:bool -> outputs:(Data.t -> unit) -> max_sharing:bool ->
+  debugMode:bool -> outputs:(Data.t -> unit) ->
   syntax_version:Ast.syntax_version -> Contact_map.t -> Model.t ->
   Rule_interpreter.t -> (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   Model.t * Rule_interpreter.t * (Pattern.id array list, int) Alg_expr.bool

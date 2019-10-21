@@ -589,7 +589,6 @@ let preprocess cli_args ast =
   Cli_init.preprocess ~warning ~debugMode:false cli_args ast
 
 let saturate_domain_with_symmetric_patterns ~debugMode bwd_bisim_info env =
-  let contact_map = Model.contact_map env in
   let preenv' =
     Model.fold_mixture_in_expr
       (fun domain ccs ->
@@ -597,8 +596,7 @@ let saturate_domain_with_symmetric_patterns ~debugMode bwd_bisim_info env =
            ~debugMode ~compileModeOn:false env bwd_bisim_info ccs domain)
       (Pattern.PreEnv.of_env (Model.domain env))
       env in
-  let (domain,_) =
-    Pattern.finalize ~debugMode ~max_sharing:false preenv' contact_map in
+  let (domain,_) = Pattern.finalize preenv' in
   Model.new_domain domain env
 
 let get_compil

@@ -472,7 +472,7 @@ let compile_inits
            | domain'',_,[ compiled_rule ] ->
              (Alg_expr.CONST Nbr.one,compiled_rule),domain''
            | _,_,_ -> assert false
-      ) inits (Pattern.PreEnv.empty (Model.signatures env)) in
+      ) inits (Pattern.minimal_env (Model.signatures env) (Model.contact_map env)) in
   init_l
 
 let compile_alg_vars ~debugMode ~compileModeOn contact_map domain vars =
@@ -541,11 +541,11 @@ let init_kasa called_from sigs result =
   Export_to_KaSim.flush_errors kasa_state
 *)
 let compile
-    ~outputs ~pause ~return ~max_sharing ~debugMode ~compileModeOn
+    ~outputs ~pause ~return ~debugMode ~compileModeOn
     ?overwrite_init ?rescale_init sigs_nd tk_nd contact_map result =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
-  let preenv = Pattern.PreEnv.empty sigs_nd in
+  let preenv = Pattern.minimal_env sigs_nd contact_map in
   outputs (Data.Log "\t -variable declarations");
   let preenv',alg_a =
     compile_alg_vars
@@ -576,8 +576,7 @@ let compile
       ~debugMode ~compileModeOn contact_map preenv alg_deps result in
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
-  let domain,dom_stats =
-    Pattern.finalize ~debugMode ~max_sharing preenv contact_map in
+  let domain,dom_stats = Pattern.finalize preenv in
   outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.stat_nodes^
                      " (sub)observables "^
                      string_of_int dom_stats.Pattern.PreEnv.stat_nav_steps^

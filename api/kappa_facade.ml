@@ -159,7 +159,7 @@ let parse (ast : Ast.parsing_compil) overwrite system_process =
               Eval.compile
                 ~debugMode:false ~pause:(fun f -> Lwt.bind (yield ()) f)
                 ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
-                ~outputs ~max_sharing:false sig_nd tk_nd contact_map result >>=
+                ~outputs sig_nd tk_nd contact_map result >>=
               (fun (env,with_trace,init_l) ->
                  let counter =
                    Counter.create
@@ -331,7 +331,7 @@ let start
         let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
         Lwt.wrap4 (Evaluator.get_pause_criteria
                      ~debugMode:false ~outputs:(outputs t)
-                     ~max_sharing:false ~syntax_version:Ast.V4)
+                     ~syntax_version:Ast.V4)
           t.contact_map t.env t.graph pause >>=
         fun (env',graph',b'') ->
         let () = t.env <- env' in
@@ -428,7 +428,7 @@ let perturbation
            Lwt.wrap6
              (Evaluator.do_interactive_directives
                 ~debugMode:false ~outputs:(interactive_outputs log_form t)
-                ~max_sharing:false ~syntax_version:Ast.V4)
+                ~syntax_version:Ast.V4)
              t.contact_map t.env t.counter t.graph t.state e >>=
            fun (e',(env',(_,graph'',state'))) ->
            let () = t.env <- env' in
@@ -469,7 +469,7 @@ let continue
            let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
            Lwt.wrap4 (Evaluator.get_pause_criteria
                         ~debugMode:false ~outputs:(outputs t)
-                        ~max_sharing:false ~syntax_version:Ast.V4)
+                        ~syntax_version:Ast.V4)
              t.contact_map t.env t.graph pause >>=
            fun (env',graph',b'') ->
            let () = t.env <- env' in

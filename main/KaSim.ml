@@ -340,7 +340,6 @@ let () =
                    Lwt.wrap4
                      (Evaluator.get_pause_criteria
                         ~debugMode ~outputs
-                        ~max_sharing:kasim_args.Kasim_args.maxSharing
                         ~syntax_version:(cli_args.Run_cli_args.syntaxVersion))
                      contact_map env graph b >>= fun (env',graph',b'') ->
                    let progress = Progress_report.create
@@ -356,7 +355,6 @@ let () =
                    Lwt.wrap6
                      (Evaluator.do_interactive_directives
                         ~debugMode ~outputs
-                        ~max_sharing:kasim_args.Kasim_args.maxSharing
                         ~syntax_version:cli_args.Run_cli_args.syntaxVersion)
                      contact_map env counter graph state e >>=
                    fun (e', (env',_ as o)) ->
