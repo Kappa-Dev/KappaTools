@@ -1575,7 +1575,7 @@ let minimal_env sigs contact_map =
             Mods.Int2Set.fold
               (fun (ty',s') acc ->
                  let out =
-                   if ty < ty' || (ty = ty' && s < s') then
+                   if ty < ty' || (ty = ty' && s <= s') then
                      let w = begin_new acc in
                      let n,w = new_node w ty in
                      let n',w = new_node w ty' in
