@@ -305,7 +305,7 @@ let minimize ~debugMode cand_nbt cand_nodes ref_nbt =
       cand_nodes Mods.IntMap.empty in
   { nodes_by_type; nodes;
     recogn_nav =
-      raw_to_navigation false nodes_by_type nodes; }
+      raw_to_navigation true nodes_by_type nodes; }
 
 (* returns a list of cc where each cc is included in cc1*)
 let infs ~debugMode ?rooted cc1 cc2 =
@@ -593,7 +593,7 @@ let of_yojson sig_decl = function
           | x -> raise (Yojson.Basic.Util.Type_error ("Wrong node type",x)))
         s in
     {nodes_by_type;nodes;
-     recogn_nav = raw_to_navigation false nodes_by_type nodes}
+     recogn_nav = raw_to_navigation true nodes_by_type nodes}
   | `Null -> empty_cc sig_decl
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a pattern",x))
 
@@ -719,7 +719,7 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
   (pack',
    {
      nodes_by_type; nodes;
-     recogn_nav = raw_to_navigation false nodes_by_type nodes;
+     recogn_nav = raw_to_navigation true nodes_by_type nodes;
    })
 
 let build_navigation_between ~debugMode inj_d_to_o cc_o cc_d =
@@ -1469,7 +1469,7 @@ let finish_elementary wk =
   let nodes_by_type = Array.map List.rev wk.used_id in
   let content =
     { nodes_by_type; nodes = wk.cc_nodes;
-      recogn_nav = raw_to_navigation false nodes_by_type wk.cc_nodes} in
+      recogn_nav = raw_to_navigation true nodes_by_type wk.cc_nodes} in
   let point ={
     Env.content;
     Env.roots = [];
@@ -1493,7 +1493,7 @@ let finish_new ~debugMode ?origin wk =
   let nodes_by_type = Array.map List.rev wk.used_id in
   let cc_candidate =
     { nodes_by_type; nodes = wk.cc_nodes;
-      recogn_nav = raw_to_navigation false nodes_by_type wk.cc_nodes} in
+      recogn_nav = raw_to_navigation true nodes_by_type wk.cc_nodes} in
   let preenv =
     PreEnv.fresh
       wk.sigs wk.reserved_id wk.free_id wk.cc_env wk.singles wk.agent_points in
