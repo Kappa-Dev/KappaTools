@@ -303,69 +303,80 @@ let minimize ~debugMode cand_nbt cand_nodes ref_nbt =
              | (UnSpec|Free),_ as x -> x) sites in
          Mods.IntMap.add (Renaming.apply ~debugMode re id) sites' acc)
       cand_nodes Mods.IntMap.empty in
-  { nodes_by_type; nodes;
-    recogn_nav =
-      raw_to_navigation true nodes_by_type nodes; }
+  (re,{ nodes_by_type; nodes;
+        recogn_nav =
+          raw_to_navigation true nodes_by_type nodes; })
+
+let rec inf_for_a_rename ~debugMode possibilities cc1 cc2 rename nodes = function
+  | [] -> nodes
+  | (o,p as pair)::todos ->
+    let () = possibilities := Mods.Int2Set.remove pair !possibilities in
+    let lnk1 = Mods.IntMap.find_default [||] o cc1.nodes in
+    let (todos',ren'),outl =
+      Tools.array_fold_left_mapi
+        (fun k (todo,ren as acc) (ly,iy) ->
+           let (lx,ix) = lnk1.(k) in
+           match lx, ly with
+           | (Link _, Free| Free, Link _
+             | Link _, UnSpec |UnSpec, Link _
+             | UnSpec, Free| Free, UnSpec
+             | UnSpec, UnSpec) ->
+             acc,(UnSpec,if ix = iy then iy else -1)
+           | Free, Free -> acc,(Free,if ix = iy then iy else -1)
+           | Link (n1,s1) as x, Link (n2,s2) ->
+             if s1 = s2 then
+               if Renaming.mem n1 ren then
+                 (acc,
+                  ((if Renaming.apply ~debugMode ren n1 = n2
+                    then x else UnSpec),
+                   if ix = iy then iy else -1))
+               else match Renaming.add ~debugMode n1 n2 ren with
+                 | None -> acc,(UnSpec,if ix = iy then iy else -1)
+                 | Some r' ->
+                   if find_ty cc1 n1 = find_ty cc2 n2
+                   then ((n1,n2)::todo,r'),(x,if ix = iy then iy else -1)
+                   else acc,(UnSpec,if ix = iy then iy else -1)
+             else (acc,(UnSpec,if ix = iy then iy else -1))
+        )
+        (todos,rename)
+        (Mods.IntMap.find_default [||] p cc2.nodes) in
+    if Array.fold_left (fun b (l,i) -> b && l = UnSpec && i < 0) true outl
+    then inf_for_a_rename ~debugMode possibilities cc1 cc2 ren' nodes todos'
+    else inf_for_a_rename ~debugMode possibilities cc1 cc2
+        ren' (Mods.IntMap.add o outl nodes) todos'
 
 (* returns a list of cc where each cc is included in cc1*)
-let infs ~debugMode ?rooted cc1 cc2 =
-  let possibilities =
-    ref (match rooted with
-        | None -> potential_pairing cc1.nodes_by_type cc2.nodes_by_type
-        | Some x -> Mods. Int2Set.singleton x) in
-  let rec aux rename nodes = function
-    | [] -> nodes
-    | (o,p as pair)::todos ->
-      let () = possibilities := Mods.Int2Set.remove pair !possibilities in
-      let lnk1 = Mods.IntMap.find_default [||] o cc1.nodes in
-      let (todos',ren'),outl =
-        Tools.array_fold_left_mapi
-          (fun k (todo,ren as acc) (ly,iy) ->
-             let (lx,ix) = lnk1.(k) in
-             match lx, ly with
-             | (Link _, Free| Free, Link _
-               | Link _, UnSpec |UnSpec, Link _
-               | UnSpec, Free| Free, UnSpec
-               | UnSpec, UnSpec) ->
-               acc,(UnSpec,if ix = iy then iy else -1)
-             | Free, Free -> acc,(Free,if ix = iy then iy else -1)
-             | Link (n1,s1) as x, Link (n2,s2) ->
-               if s1 = s2 then
-                 if Renaming.mem n1 ren then
-                   (acc,
-                    ((if Renaming.apply ~debugMode ren n1 = n2
-                      then x else UnSpec),
-                     if ix = iy then iy else -1))
-                 else match Renaming.add ~debugMode n1 n2 ren with
-                   | None -> acc,(UnSpec,if ix = iy then iy else -1)
-                   | Some r' ->
-                     if find_ty cc1 n1 = find_ty cc2 n2
-                     then ((n1,n2)::todo,r'),(x,if ix = iy then iy else -1)
-                     else acc,(UnSpec,if ix = iy then iy else -1)
-               else (acc,(UnSpec,if ix = iy then iy else -1))
-          )
-          (todos,rename)
-          (Mods.IntMap.find_default [||] p cc2.nodes) in
-      if Array.fold_left (fun b (l,i) -> b && l = UnSpec && i < 0) true outl
-      then aux ren' nodes todos'
-      else aux ren' (Mods.IntMap.add o outl nodes) todos' in
+let rooted_infs ~debugMode inj cc1 cc2 =
+  let possibilities = ref (Mods.Int2Set.empty) in
+  let nodes = inf_for_a_rename
+      ~debugMode possibilities cc1 cc2 inj Mods.IntMap.empty (Renaming.to_list inj) in
+  if Mods.IntMap.is_empty nodes then None else
+    let nodes_by_type = Array.map
+        (List.filter (fun a -> Mods.IntMap.mem a nodes))
+        cc1.nodes_by_type in
+    Some (minimize ~debugMode nodes_by_type nodes cc1.nodes_by_type)
 
+(* returns a list of cc where each cc is included in cc1*)
+let infs ~debugMode cc1 cc2 =
+  let possibilities =
+    ref (potential_pairing cc1.nodes_by_type cc2.nodes_by_type) in
   let rec for_one_root acc =
     match Mods.Int2Set.choose !possibilities with
     | None -> acc
     | Some (root1,root2) ->
       match Renaming.add ~debugMode root1 root2 (Renaming.empty ()) with
-      | None -> assert false
+      | None -> acc
       | Some r ->
-        let nodes = aux r Mods.IntMap.empty [root1,root2] in
+        let nodes = inf_for_a_rename
+            ~debugMode possibilities cc1 cc2 r Mods.IntMap.empty [root1,root2] in
         let acc' =
           if Mods.IntMap.is_empty nodes then acc else
             let nodes_by_type = Array.map
                 (List.filter (fun a -> Mods.IntMap.mem a nodes))
                 cc1.nodes_by_type in
             (minimize ~debugMode nodes_by_type nodes cc1.nodes_by_type)::acc in
-        for_one_root acc'
-  in for_one_root []
+        for_one_root acc' in
+  for_one_root []
 
 let rec counter_value nodes (nid,sid) count =
   match Mods.IntMap.find_option nid nodes with
@@ -600,7 +611,9 @@ let of_yojson sig_decl = function
 let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
   let img = Renaming.image inj1_to_2 in
   let available_ids =
-    Array.map (List.filter (fun id -> not (Mods.IntSet.mem id img)))
+    Array.mapi (fun ty ->
+        List.filter (fun id ->
+            not (Mods.IntSet.mem id img || List.mem id cc2.nodes_by_type.(ty))))
       reserved_ids in
   let used_ids =
     Array.map
@@ -715,7 +728,7 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
     Array.iteri
       (fun i x -> reserved_ids.(i) <-
           List_util.merge_uniq Mods.int_compare nodes_by_type.(i) x)
-      available_ids in
+      reserved_ids in
   (pack',
    {
      nodes_by_type; nodes;
@@ -1246,7 +1259,7 @@ module PreEnv = struct
     Mods.IntMap.add dst_id dst_point domain
 
   let build_son ~debugMode id_by_type nb_id base inj2dst dst_id dst =
-    let (inj_e2sup,_),sup =
+    let (inj_e2sup,free_id),sup =
       merge_compatible ~debugMode id_by_type nb_id inj2dst base dst in
     match equal ~debugMode sup dst with
     | None -> assert false
@@ -1255,54 +1268,53 @@ module PreEnv = struct
         Renaming.inverse
           (Renaming.compose ~debugMode false inj_e2sup inj_sup2dst) in
       let nav = build_navigation_between ~debugMode inj_dst2p base dst in
-      {Env.dst = dst_id; Env.inj = inj_dst2p; Env.next = nav}
+      free_id,{Env.dst = dst_id; Env.inj = inj_dst2p; Env.next = nav}
 
   let  add_cc_to_sons ~debugMode ?origin env inj2dst dst_id dst point sons =
-      let () =
-        point.Env.sons <- List.rev_append
-            sons
-            [ build_son
-                ~debugMode env.id_by_type env.nb_id
-                point.Env.content inj2dst dst_id dst ] in {
-        used_by_a_begin_new = false;
-        sig_decl = env.sig_decl;
-        id_by_type = env.id_by_type;
-        nb_id = env.nb_id;
-        elementaries = env.elementaries;
-        single_agent_points = env.single_agent_points;
-        domain = put_fresh_point_in_domain
-            ~debugMode ~midpoint:false ?origin dst_id dst [] env.domain;
-      }
+    let (nb_id',son) =
+      build_son
+        ~debugMode env.id_by_type env.nb_id
+        point.Env.content inj2dst dst_id dst in
+    let () =
+      point.Env.sons <- List.rev_append sons [ son ] in {
+      used_by_a_begin_new = false;
+      sig_decl = env.sig_decl;
+      id_by_type = env.id_by_type;
+      nb_id = nb_id';
+      elementaries = env.elementaries;
+      single_agent_points = env.single_agent_points;
+      domain = put_fresh_point_in_domain
+          ~debugMode ~midpoint:false ?origin dst_id dst [] env.domain;
+    }
 
   let insert_mid_point
       ~debugMode ?origin env point visited sons
-      inf son_id cc_son inj2cand cand_id cc_cand =
+      inj_point2inf inf son_id inj_son2inf cc_son inj2cand cand_id cc_cand =
     let domain_with_dst = put_fresh_point_in_domain
         ~debugMode ~midpoint:false ?origin cand_id cc_cand [] env.domain in
     let inf_id = fresh_cc_id domain_with_dst in
-    let inf_sons = [
-      build_son ~debugMode env.id_by_type env.nb_id inf inj2cand cand_id cc_cand;
+    let (free_id,son1) =
       build_son
-        ~debugMode env.id_by_type env.nb_id
-        inf (identity_injection cc_son) son_id cc_son ] in
+        ~debugMode env.id_by_type env.nb_id inf inj2cand cand_id cc_cand in
+    let (free_id',son2) =
+      build_son
+        ~debugMode env.id_by_type free_id
+        inf (Renaming.inverse inj_son2inf) son_id cc_son in
     let domain = put_fresh_point_in_domain
-        ~debugMode ~midpoint:true inf_id inf inf_sons domain_with_dst in
-      let () =
-        point.Env.sons <- List.rev_append
-            visited
-            (build_son
-               ~debugMode env.id_by_type env.nb_id
-               point.Env.content (identity_injection inf) inf_id inf
-             :: sons) in
-    {
-        used_by_a_begin_new = false;
-        sig_decl = env.sig_decl;
-        id_by_type = env.id_by_type;
-        nb_id = env.nb_id;
-        elementaries = env.elementaries;
-        single_agent_points = env.single_agent_points;
-        domain;
-      }
+        ~debugMode ~midpoint:true inf_id inf [ son1; son2 ] domain_with_dst in
+    let (nb_id',new_son) =
+      build_son
+        ~debugMode env.id_by_type free_id'
+        point.Env.content inj_point2inf inf_id inf in
+    let () = point.Env.sons <- List.rev_append visited (new_son :: sons) in {
+      used_by_a_begin_new = false;
+      sig_decl = env.sig_decl;
+      id_by_type = env.id_by_type;
+      nb_id = nb_id';
+      elementaries = env.elementaries;
+      single_agent_points = env.single_agent_points;
+      domain;
+    }
 
   let rec insert_in_domain
       ~debugMode ?origin env base_id point inj2cand cand_id cc_cand =
@@ -1331,26 +1343,35 @@ module PreEnv = struct
                   (Renaming.compose ~debugMode false h.Env.inj inj'2dst)
                   cand_id cc_cand
               | None ->
-                match Renaming.min_elt h.Env.inj with
-                | None -> assert false
-                | Some (s,b') ->
-                  let c' = Renaming.apply ~debugMode inj2cand b' in
                   (*match are_compatible
                           ~debugMode ~strict:false s point'.Env.content c' cc_cand with
-                  | Error _ ->*) begin
-                      match infs ~debugMode ~rooted:(s,c') point'.Env.content cc_cand with
-                      | [] | _ :: _ :: _ -> assert false
-                      | [ inf ] ->
+                    | Error _ ->*) begin
+                  let inj_'2cand = Renaming.compose ~debugMode false h.Env.inj inj2cand in
+                  match rooted_infs ~debugMode inj_'2cand point'.Env.content cc_cand with
+                  | None -> assert false
+                  | Some (inj_'2inf,inf) ->
+                    match Renaming.min_elt inj_'2cand with
+                    | None -> assert false
+                    | Some (s,c') ->
+                      let b' = Renaming.apply ~debugMode h.Env.inj s in
+                      match are_compatible
+                              ~debugMode ~strict:true b' point.Env.content s inf with
+                      | Ok _ -> insert_domain_sons (h::visited) sons
+                      | Error _ ->
                         match are_compatible
-                                ~debugMode ~strict:true s inf b' point.Env.content with
-                        | Ok _ -> insert_domain_sons (h::visited) sons
-                        | Error _ ->
-                          let env' = insert_mid_point
-                              ~debugMode env point visited sons
-                              inf h.Env.dst point'.Env.content
-                              inj2cand cand_id cc_cand in
-                          Ok env'
-                    end
+                                ~debugMode ~strict:false b' point.Env.content s inf with
+                        | Error _ -> assert false
+                        | Ok inj_point2inf ->
+                          match are_compatible
+                                  ~debugMode ~strict:false s inf c' cc_cand with
+                          | Error _ -> assert false
+                          | Ok inj_inf2cand ->
+                            let env' = insert_mid_point
+                                ~debugMode env point visited sons
+                                inj_point2inf inf h.Env.dst
+                                inj_'2inf point'.Env.content inj_inf2cand cand_id cc_cand in
+                            Ok env'
+                end
                   (*| Ok inj_p'2cand -> match insert_domain_sons sons with
                     | Error _ as out -> out
                     | Ok result ->

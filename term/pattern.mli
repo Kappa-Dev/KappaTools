@@ -161,7 +161,9 @@ val minimal_env : Signature.s -> Contact_map.t -> PreEnv.t
 
 val finalize : PreEnv.t -> Env.t * PreEnv.stat
 
-val infs : debugMode:bool -> ?rooted:(int * int) -> t -> t -> t list
+val infs : debugMode:bool -> t -> t -> (Renaming.t * t) list
+(** @return the list of inf and the renaming from cc1 to the inf *)
+
 val matchings : debugMode:bool -> t -> t -> Renaming.t list
 val merge_on_inf :
   debugMode:bool -> PreEnv.t -> Renaming.t -> t -> t ->

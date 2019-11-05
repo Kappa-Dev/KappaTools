@@ -13,7 +13,7 @@ exception Clashing
 let special_val = max_int
 type t = {
   mutable immediate: int array;
-  mutable delayed: (t*t) option;
+  mutable delayed: (bool*t*t) option;
   mutable is_identity:bool;
   mutable dsts:Mods.IntSet.t
 }
@@ -37,19 +37,21 @@ let identity l =
 let is_identity i = i.is_identity
 
 let rec compute k i =
-  let v = i.immediate.(k) in
-  if v <> special_val then v else
-    match i.delayed with
-    | None -> special_val
-    | Some (x,y) ->
-      if k >= Array.length x.immediate then special_val
-      else
-        let v' = compute k x in
-        if v' = special_val then special_val else
-          let v'' = compute v' y in
-          let o = if v'' = special_val then v' else v'' in
-          let () = i.immediate.(k) <- o in
-          o
+  if k >= Array.length i.immediate then special_val
+  else
+    let v = i.immediate.(k) in
+    if v <> special_val then v else
+      match i.delayed with
+      | None -> special_val
+      | Some (extensible,x,y) ->
+        if k >= Array.length x.immediate then special_val
+        else
+          let v' = compute k x in
+          if v' = special_val then special_val else
+            let v'' = compute v' y in
+            let o = if v'' = special_val && extensible then v' else v'' in
+            let () = i.immediate.(k) <- o in
+            o
 
 let force i =
   if i.delayed <> None then
@@ -75,12 +77,13 @@ let unsafe_functionnal_add x y i =
     dsts = Mods.IntSet.add y i.dsts
   }
 let add ~debugMode x y i =
-  let not_ok =
-    debugMode &&
-    x < Array.length i.immediate && i.immediate.(x) <> special_val in
-  if not_ok then raise Clashing else
-    let i' = unsafe_functionnal_add x y i in
-    if i.dsts == i'.dsts then None else Some i'
+  if compute x i = y then Some i else
+    let not_ok =
+      debugMode &&
+      x < Array.length i.immediate && i.immediate.(x) <> special_val in
+    if not_ok then raise Clashing else
+      let i' = unsafe_functionnal_add x y i in
+      if i.dsts == i'.dsts then None else Some i'
 
 let unsafe_imperative_add x y i =
   let () =
@@ -135,13 +138,14 @@ let apply ~debugMode i x =
 let compose ~debugMode extensible i i' =
   if not i.is_identity || extensible || debugMode then {
     immediate = Array.make (Array.length i.immediate) special_val;
-    delayed = Some (i,i');
+    delayed = Some (extensible,i,i');
     is_identity = i.is_identity && i'.is_identity;
     dsts =
       Mods.IntSet.fold
         (fun v' set ->
            let v'' = compute v' i' in
-           Mods.IntSet.add v'' set)
+           let v_out = if v'' = special_val && extensible then v' else v'' in
+           if v_out = special_val then set else Mods.IntSet.add v_out set)
         i.dsts
         Mods.IntSet.empty
   }
