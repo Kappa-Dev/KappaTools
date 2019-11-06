@@ -807,12 +807,13 @@ module Env : sig
     mutable sons: transition list;
   }
 
-   val content: point -> cc
-   val roots: point -> (id * int list (*ag_ids*) * int (*ag_ty*)) list
-   val deps: point -> Operator.DepSet.t
-   val sons: point -> transition list
+  val content: point -> cc
+  val roots: point -> (id * int list (*ag_ids*) * int (*ag_ty*)) list
+  val deps: point -> Operator.DepSet.t
+  val sons: point -> transition list
 
   type t = {
+    mutable accurate : bool;
     sig_decl: Signature.s;
     id_by_type: int list array;
     max_obs: int;
@@ -858,6 +859,7 @@ end = struct
   let sons p = p.sons
 
   type t = {
+    mutable accurate : bool;
     sig_decl: Signature.s;
     id_by_type: int list array;
     max_obs: int;
@@ -866,7 +868,7 @@ end = struct
     single_agent_points: (id*Operator.DepSet.t) option array;
   }
 
-  let signatures env = env.sig_decl
+  let signatures env = let () = assert env.accurate in env.sig_decl
 
   let print_point ~noCounters sigs p_id f p =
     Format.fprintf
@@ -896,11 +898,15 @@ end = struct
       (Pp.array Pp.space (print_point ~noCounters env.sig_decl))
       env.domain
 
-  let get_single_agent ty env = env.single_agent_points.(ty)
+  let get_single_agent ty env =
+    let () = assert env.accurate in
+    env.single_agent_points.(ty)
 
-  let get env cc_id = env.domain.(cc_id)
+  let get env cc_id =
+    let () = assert env.accurate in env.domain.(cc_id)
 
   let to_navigation env id =
+    let () = assert env.accurate in
     let cc = (get env id).content in
     raw_to_navigation true cc.nodes_by_type cc.nodes
 
@@ -957,6 +963,7 @@ end = struct
       raise (Yojson.Basic.Util.Type_error ("Incorrect domain point",x))
 
   let to_yojson env =
+    let () = assert env.accurate in
     `Assoc [
       "signatures", Signature.to_json env.sig_decl;
       "single_agents", `List
@@ -986,6 +993,7 @@ end = struct
         let sig_decl = Signature.of_json (List.assoc "signatures" l) in
         try
           {
+            accurate = true;
             sig_decl;
             single_agent_points = (match List.assoc "single_agents" l with
                 | `List l  ->
@@ -1030,9 +1038,11 @@ end = struct
     | x ->
       raise (Yojson.Basic.Util.Type_error ("Incorrect update domain",x))
 
-  let new_obs_map env f = Mods.DynArray.init env.max_obs f
+  let new_obs_map env f =
+    let () = assert env.accurate in Mods.DynArray.init env.max_obs f
 
   let get_elementary ~debugMode domain (_,ty as node) s arrow =
+    let () = assert domain.accurate in
     let sa = domain.elementaries.(ty) in
     let rec find_good_edge = function (*one should use a hash here*)
       | [] -> None
@@ -1056,6 +1066,7 @@ let print ~noCounters ?domain ~with_id f id =
       f env.Env.domain.(id).Env.content
 
 let embeddings_to_fully_specified ~debugMode domain a_id b =
+  let () = assert domain.Env.accurate in
   let a = domain.Env.domain.(a_id).Env.content in
   match find_root a with
   | None -> [Renaming.empty ()]
@@ -1127,6 +1138,8 @@ module PreEnv = struct
     }
 
   let of_env env =
+    let () = assert env.Env.accurate in
+    let () = env.Env.accurate <- false in
     let domain =
       Tools.array_fold_lefti
         (fun id acc point -> Mods.IntMap.add id point acc)
@@ -1635,6 +1648,7 @@ let finalize env =
   let elementaries =
     PreEnv.fill_elem env.PreEnv.sig_decl env.PreEnv.elementaries in
   {
+    Env.accurate =true;
     Env.sig_decl = env.PreEnv.sig_decl;
     Env.id_by_type = env.PreEnv.id_by_type;
     Env.max_obs;
