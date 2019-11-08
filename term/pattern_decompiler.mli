@@ -8,4 +8,4 @@
 
 val patterns_of_mixture :
   debugMode:bool -> Contact_map.t -> Signature.s ->
-  Pattern.PreEnv.t -> Edges.t -> Pattern.PreEnv.t * Pattern.cc list
+  Pattern.Env.t -> Edges.t -> Pattern.Env.t * Pattern.cc list

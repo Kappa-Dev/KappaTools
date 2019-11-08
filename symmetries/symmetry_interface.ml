@@ -42,7 +42,7 @@ let with_dot_and_plus compil =
 let dont_allow_empty_lhs compil =
   {compil with allow_empty_lhs = false}
 
-type cc_cache = Pattern.PreEnv.t
+type cc_cache = Pattern.Env.t
 
 type nauto_in_rules_cache = LKappa_auto.cache
 
@@ -589,14 +589,13 @@ let preprocess cli_args ast =
   Cli_init.preprocess ~warning ~debugMode:false cli_args ast
 
 let saturate_domain_with_symmetric_patterns ~debugMode bwd_bisim_info env =
-  let preenv' =
+  let domain =
     Model.fold_mixture_in_expr
       (fun domain ccs ->
          LKappa_group_action.saturate_domain_with_symmetric_patterns
            ~debugMode ~compileModeOn:false env bwd_bisim_info ccs domain)
-      (Pattern.PreEnv.of_env (Model.domain env))
+      (Model.domain env)
       env in
-  let (domain,_) = Pattern.finalize preenv' in
   Model.new_domain domain env
 
 let get_compil
@@ -635,8 +634,7 @@ let get_compil
   else
     compil
 
-let empty_cc_cache compil =
-  Pattern.PreEnv.of_env (Model.domain compil.environment)
+let empty_cc_cache compil = Model.domain compil.environment
 
 let empty_lkappa_cache () = LKappa_auto.init_cache ()
 

@@ -9,8 +9,7 @@
 let do_interactive_directives ~debugMode ~outputs ~syntax_version
     contact_map env counter graph state e =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
-  let cc_preenv =
-    Pattern.PreEnv.of_env (Model.domain env) in
+  let cc_preenv = Model.domain env in
   let contact_map' = Array.map Array.copy contact_map in
   let e',_ =
     List_util.fold_right_map
@@ -30,11 +29,10 @@ let do_interactive_directives ~debugMode ~outputs ~syntax_version
   let env',graph' =
     if cc_preenv == cc_preenv' then (env,graph)
     else
-      let fenv,_ = Pattern.finalize cc_preenv' in
-      (Model.new_domain fenv env,
+      (Model.new_domain cc_preenv' env,
        List.fold_left
          (Rule_interpreter.incorporate_extra_pattern
-            ~debugMode fenv)
+            ~debugMode cc_preenv')
          graph
          (Primitives.extract_connected_components_modifications e'')) in
   e'',
@@ -45,20 +43,18 @@ let do_interactive_directives ~debugMode ~outputs ~syntax_version
 let get_pause_criteria
     ~debugMode ~outputs ~syntax_version contact_map env graph b =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
-  let cc_preenv =
-    Pattern.PreEnv.of_env (Model.domain env) in
+  let cc_preenv = Model.domain env in
   let b' =
     LKappa_compiler.bool_expr_of_ast
       ~warning ~syntax_version
       (Model.signatures env) (Model.tokens_finder env)
       (Model.algs_finder env) b in
-  let cc_preenv',(b'',pos_b'' as bpos'') =
+  let fenv,(b'',pos_b'' as bpos'') =
     Eval.compile_bool
       ~debugMode ~compileModeOn:false  contact_map cc_preenv b' in
   let env',graph' =
-    if cc_preenv == cc_preenv' then (env,graph)
-    else
-      let fenv,_ = Pattern.finalize cc_preenv' in
+    (*if cc_preenv == cc_preenv' then (env,graph)
+    else*)
       (Model.new_domain fenv env,
        List.fold_left
          (Rule_interpreter.incorporate_extra_pattern ~debugMode fenv)

@@ -22,4 +22,3 @@ install_printer Kappa_generic_toolset.Random_tree.debug_print
 install_printer Kappa_terms.Matching.debug_print
 install_printer Kappa_mixtures.Edges.debug_print
 install_printer Kappa_runtime.Rule_interpreter.debug_print
-install_printer Kappa_terms.Pattern.PreEnv.debug_print

@@ -76,24 +76,12 @@ module Env : sig
   val of_yojson : Yojson.Basic.t -> t
 end
 
-module PreEnv : sig
-  type t
-
-  type stat = { stat_nodes: int; stat_nav_steps: int }
-
-  val sigs : t -> Signature.s
-
-  val of_env : Env.t -> t
-
-  val debug_print : Format.formatter -> t -> unit
-end
-
 (** {6 Create a connected component} *)
 type work (** type of a PreEnv during a pattern construction *)
 
 val empty_cc : Signature.s -> cc
 
-val begin_new : PreEnv.t -> work
+val begin_new : Env.t -> work
 (** Starts creation *)
 
 val new_node : work -> int -> (Agent.t*work)
@@ -110,7 +98,7 @@ val new_internal_state : work -> (Agent.t * int) -> int -> work
 
 val finish_new :
   debugMode:bool -> ?origin:Operator.rev_dep -> work ->
-  (PreEnv.t*Renaming.t*cc*id)
+  (Env.t*Renaming.t*cc*id)
 
 (** {6 Use a connected component } *)
 
@@ -157,16 +145,14 @@ val fold:
 (** USE WITH CARE: Break some abstraction. The array must not be
     modified and internal state [-1] means unspecified *)
 
-val minimal_env : Signature.s -> Contact_map.t -> PreEnv.t
-
-val finalize : PreEnv.t -> Env.t * PreEnv.stat
+val minimal_env : Signature.s -> Contact_map.t -> Env.t
 
 val infs : debugMode:bool -> t -> t -> (Renaming.t * t) list
 (** @return the list of inf and the renaming from cc1 to the inf *)
 
 val matchings : debugMode:bool -> t -> t -> Renaming.t list
 val merge_on_inf :
-  debugMode:bool -> PreEnv.t -> Renaming.t -> t -> t ->
+  debugMode:bool -> Env.t -> Renaming.t -> t -> t ->
   (t , (int * int * int * bool) option) Result.result
 val length : t -> int
 

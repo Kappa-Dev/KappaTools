@@ -813,14 +813,15 @@ module Env : sig
   val sons: point -> transition list
 
   type t = {
-    mutable accurate : bool;
     sig_decl: Signature.s;
     id_by_type: int list array;
-    max_obs: int;
-    domain: point array;
+    mutable nb_id: int;
+    domain: point Mods.DynArray.t;
     elementaries: (Navigation.abstract Navigation.step * id) list array array;
     single_agent_points: (id*Operator.DepSet.t) option array;
   }
+
+  val empty: Signature.s -> t
 
   val get : t -> id -> point
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
@@ -834,8 +835,6 @@ module Env : sig
   val signatures : t -> Signature.s
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
-  val print_point :
-    noCounters:bool -> Signature.s -> id -> Format.formatter -> point -> unit
   val print : noCounters:bool -> Format.formatter -> t -> unit
   val to_yojson : t -> Yojson.Basic.t
   val of_yojson : Yojson.Basic.t -> t
@@ -853,22 +852,34 @@ end = struct
     mutable sons: transition list;
   }
 
+  let empty_point sigs =
+    {content = empty_cc sigs; roots = [];
+     deps = Operator.DepSet.empty; sons = [];}
+
   let content p = p.content
   let roots p = p.roots
   let deps p = p.deps
   let sons p = p.sons
 
   type t = {
-    mutable accurate : bool;
     sig_decl: Signature.s;
     id_by_type: int list array;
-    max_obs: int;
-    domain: point array;
+    mutable nb_id: int;
+    domain: point Mods.DynArray.t;
     elementaries: (Navigation.abstract Navigation.step * id) list array array;
     single_agent_points: (id*Operator.DepSet.t) option array;
   }
 
-  let signatures env = let () = assert env.accurate in env.sig_decl
+  let empty sig_decl =
+    let id_by_type = Array.make (Signature.size sig_decl) [] in
+    let single_agent_points = Array.make (Signature.size sig_decl) None in
+    let domain = Mods.DynArray.init 0 (fun _ -> empty_point sig_decl) in
+    let elementaries =
+      Array.init (Signature.size sig_decl)
+        (fun i -> Array.make (Signature.arity sig_decl i) []) in
+    { sig_decl; id_by_type; nb_id = 1; domain; elementaries; single_agent_points }
+
+  let signatures env = env.sig_decl
 
   let print_point ~noCounters sigs p_id f p =
     Format.fprintf
@@ -895,18 +906,15 @@ end = struct
   let print ~noCounters f env =
     Format.fprintf
       f "@[<v>%a@]"
-      (Pp.array Pp.space (print_point ~noCounters env.sig_decl))
+      (Mods.DynArray.print Pp.space (print_point ~noCounters env.sig_decl))
       env.domain
 
   let get_single_agent ty env =
-    let () = assert env.accurate in
     env.single_agent_points.(ty)
 
-  let get env cc_id =
-    let () = assert env.accurate in env.domain.(cc_id)
+  let get env cc_id = Mods.DynArray.get env.domain cc_id
 
   let to_navigation env id =
-    let () = assert env.accurate in
     let cc = (get env id).content in
     raw_to_navigation true cc.nodes_by_type cc.nodes
 
@@ -963,7 +971,6 @@ end = struct
       raise (Yojson.Basic.Util.Type_error ("Incorrect domain point",x))
 
   let to_yojson env =
-    let () = assert env.accurate in
     `Assoc [
       "signatures", Signature.to_json env.sig_decl;
       "single_agents", `List
@@ -979,21 +986,27 @@ end = struct
              ::acc)
             env.elementaries []);
       "dag", `List
-        (Array.fold_right (fun x acc ->
+        (Mods.DynArray.fold_righti (fun _ x acc ->
              (point_to_yojson x)::acc) env.domain []);
       "id_by_type", `List
          (Array.fold_right (fun x acc ->
              `List (List.map (fun i -> `Int i) x)::acc) env.id_by_type []);
-      "max_obs", `Int env.max_obs
     ]
 
   let of_yojson = function
-    | `Assoc l as x when List.length l = 6 ->
+    | `Assoc l as x when List.length l = 5 ->
       begin
         let sig_decl = Signature.of_json (List.assoc "signatures" l) in
+        let id_by_type = match List.assoc "id_by_type" l with
+          | `List l ->
+            Tools.array_map_of_list (function
+                | `List l -> List.map (function
+                    | `Int i -> i
+                    | _ -> raise Not_found) l
+                | _ -> raise Not_found) l
+          | _ -> raise Not_found in
         try
           {
-            accurate = true;
             sig_decl;
             single_agent_points = (match List.assoc "single_agents" l with
                 | `List l  ->
@@ -1018,19 +1031,12 @@ end = struct
                 | _ -> raise Not_found);
             domain =  (match List.assoc "dag" l with
                 | `List l  ->
-                  Tools.array_map_of_list (point_of_yojson sig_decl) l
+                   Mods.DynArray.of_list
+                     ~default:(empty_point sig_decl)
+                     (List.map (point_of_yojson sig_decl) l)
                 | _ -> raise Not_found);
-            id_by_type = (match List.assoc "id_by_type" l with
-                | `List l ->
-                   Tools.array_map_of_list (function
-                       | `List l -> List.map (function
-                           | `Int i -> i
-                           | _ -> raise Not_found) l
-                       | _ -> raise Not_found) l
-                | _ -> raise Not_found);
-            max_obs = (match List.assoc "max_obs" l with
-                        | `Int i -> i
-                        | _ -> raise Not_found)
+            id_by_type;
+            nb_id = succ (Array.fold_left (List.fold_left max) 0 id_by_type)
           }
         with Not_found ->
           raise (Yojson.Basic.Util.Type_error ("Incorrect update domain",x))
@@ -1038,11 +1044,9 @@ end = struct
     | x ->
       raise (Yojson.Basic.Util.Type_error ("Incorrect update domain",x))
 
-  let new_obs_map env f =
-    let () = assert env.accurate in Mods.DynArray.init env.max_obs f
+  let new_obs_map env f = Mods.DynArray.init (Mods.DynArray.length env.domain) f
 
   let get_elementary ~debugMode domain (_,ty as node) s arrow =
-    let () = assert domain.accurate in
     let sa = domain.elementaries.(ty) in
     let rec find_good_edge = function (*one should use a hash here*)
       | [] -> None
@@ -1053,7 +1057,6 @@ end = struct
           let dst = get domain cc_id in
           Some (dst,inj') in
     find_good_edge sa.(s)
-
 end
 
 let print ~noCounters ?domain ~with_id f id =
@@ -1063,11 +1066,10 @@ let print ~noCounters ?domain ~with_id f id =
     let cc_id = if with_id then Some id else None in
     print_cc
       ~noCounters ~sigs:(Env.signatures env) ?cc_id ~with_id
-      f env.Env.domain.(id).Env.content
+      f (Mods.DynArray.get env.Env.domain id).Env.content
 
 let embeddings_to_fully_specified ~debugMode domain a_id b =
-  let () = assert domain.Env.accurate in
-  let a = domain.Env.domain.(a_id).Env.content in
+  let a = (Mods.DynArray.get domain.Env.domain a_id).Env.content in
   match find_root a with
   | None -> [Renaming.empty ()]
   | Some (h,ty) ->
@@ -1077,10 +1079,7 @@ let embeddings_to_fully_specified ~debugMode domain a_id b =
       | Ok r -> r::acc) [] b.nodes_by_type.(ty)
 
 type work = {
-  sigs: Signature.s;
-  cc_env: Env.point Mods.IntMap.t;
-  singles : (Env.point * id) list;
-  agent_points: (id*Operator.DepSet.t) option array;
+    env: Env.t;
   reserved_id: int list array;
   used_id: int list array;
   free_id: int;
@@ -1089,105 +1088,19 @@ type work = {
 }
 
 let fresh_cc_id domain =
-  succ (Option_util.unsome (-1) (Mods.IntMap.max_key domain))
+  Mods.DynArray.length domain
 
 module PreEnv = struct
-  type t = {
-    sig_decl: Signature.s;
-    id_by_type: int list array;
-    nb_id: int;
-    domain: Env.point Mods.IntMap.t;
-    elementaries : (Env.point * id) list;
-    single_agent_points: (id*Operator.DepSet.t) option array;
-    mutable used_by_a_begin_new: bool;
-  }
-
-  type stat = { stat_nodes: int; stat_nav_steps: int }
-
-  let fresh sig_decl id_by_type nb_id domain elementaries single_agent_points =
-    {
-      sig_decl;
-      id_by_type;
-      nb_id;
-      domain;
-      elementaries;
-      single_agent_points;
-      used_by_a_begin_new = false;
-    }
-
-  let empty sigs =
-    let nbt' = Array.make (Signature.size sigs) [] in
-    let sap = Array.make (Signature.size sigs) None in
-    fresh sigs nbt' 1 Mods.IntMap.empty [] sap
-
-  let check_vitality env = assert (env.used_by_a_begin_new = false)
 
   let to_work env =
-    let () = check_vitality env in
-    let () = env.used_by_a_begin_new <- true in
     {
-      sigs = env.sig_decl;
-      cc_env = env.domain;
-      singles = env.elementaries;
-      agent_points = env.single_agent_points;
-      reserved_id = env.id_by_type;
-      used_id = Array.make (Array.length env.id_by_type) [];
-      free_id = env.nb_id;
+      env;
+      reserved_id = env.Env.id_by_type;
+      used_id = Array.make (Array.length env.Env.id_by_type) [];
+      free_id = env.Env.nb_id;
       cc_nodes = Mods.IntMap.empty;
       dangling = 0;
     }
-
-  let of_env env =
-    let () = assert env.Env.accurate in
-    let () = env.Env.accurate <- false in
-    let domain =
-      Tools.array_fold_lefti
-        (fun id acc point -> Mods.IntMap.add id point acc)
-        Mods.IntMap.empty env.Env.domain in
-    let elementaries =
-      Array.fold_left
-        (Array.fold_left
-           (List.fold_left (fun acc (_,id) -> (env.Env.domain.(id), id)::acc)))
-        [] env.Env.elementaries in {
-    sig_decl = env.Env.sig_decl;
-    id_by_type = env.Env.id_by_type;
-    nb_id = succ (Array.fold_left (List.fold_left max) 0 env.Env.id_by_type);
-    domain;
-    elementaries;
-    single_agent_points = env.Env.single_agent_points;
-    used_by_a_begin_new = false;
-    }
-
-  let sigs env = env.sig_decl
-
-  let empty_point sigs =
-    {Env.content = empty_cc sigs; Env.roots = [];
-     Env.deps = Operator.DepSet.empty; Env.sons = [];}
-
-  let fill_elem sigs bottom =
-    let elementaries =
-      Array.init (Signature.size sigs)
-        (fun i -> Array.make (Signature.arity sigs i) []) in
-    let () =
-      List.iter (fun (p,p_id) ->
-          match p.Env.content.recogn_nav with
-          | [] | ((Navigation.Existing _,_),_) :: _ -> assert false
-          | ((Navigation.Fresh _,_),_) :: _ :: _ -> ()
-          | [(Navigation.Fresh (_,ty1),s1),arr as step] ->
-            let sa1 = elementaries.(ty1) in
-            let () = sa1.(s1) <- (step,p_id) :: sa1.(s1) in
-            match arr with
-            | Navigation.ToNode (Navigation.Fresh (_,ty2),s2) ->
-              if ty1 = ty2 && s1 <> s2 then
-                sa1.(s2) <- (step,p_id) :: sa1.(s2)
-              else
-                let sa2 = elementaries.(ty2) in
-                sa2.(s2) <- (step,p_id) :: sa2.(s2)
-            | Navigation.ToNode (Navigation.Existing _,s2) ->
-              sa1.(s2) <- (step,p_id) :: sa1.(s2)
-            | Navigation.ToNothing | Navigation.ToInternal _ -> ())
-        bottom in
-    elementaries
 
   let present_in_dst ~debugMode dst inj2dst nav =
     let rec aux_present_in_dst inj' = function
@@ -1242,15 +1155,8 @@ module PreEnv = struct
       Env.content = point.Env.content;
       Env.sons = point.Env.sons;
       Env.deps = add_origin point.Env.deps origin;
-      Env.roots } in {
-        used_by_a_begin_new = false;
-        sig_decl = env.sig_decl;
-        id_by_type = env.id_by_type;
-        nb_id = env.nb_id;
-        elementaries = env.elementaries;
-        single_agent_points = env.single_agent_points;
-        domain = Mods.IntMap.add p_id point' env.domain;
-      }
+      Env.roots } in
+    Mods.DynArray.set env.Env.domain p_id point'
 
   let put_fresh_point_in_domain
       ~debugMode ~midpoint ?origin dst_id content sons domain =
@@ -1269,7 +1175,7 @@ module PreEnv = struct
                   (automorphisms ~debugMode content)),rty ]);
       Env.deps = add_origin Operator.DepSet.empty origin;
     } in
-    Mods.IntMap.add dst_id dst_point domain
+    Mods.DynArray.set domain dst_id dst_point
 
   let build_son ~debugMode id_by_type nb_id base inj2dst dst_id dst =
     let (inj_e2sup,free_id),sup =
@@ -1286,48 +1192,35 @@ module PreEnv = struct
   let  add_cc_to_sons ~debugMode ?origin env inj2dst dst_id dst point sons =
     let (nb_id',son) =
       build_son
-        ~debugMode env.id_by_type env.nb_id
+        ~debugMode env.Env.id_by_type env.Env.nb_id
         point.Env.content inj2dst dst_id dst in
     let () =
-      point.Env.sons <- List.rev_append sons [ son ] in {
-      used_by_a_begin_new = false;
-      sig_decl = env.sig_decl;
-      id_by_type = env.id_by_type;
-      nb_id = nb_id';
-      elementaries = env.elementaries;
-      single_agent_points = env.single_agent_points;
-      domain = put_fresh_point_in_domain
-          ~debugMode ~midpoint:false ?origin dst_id dst [] env.domain;
-    }
+      point.Env.sons <- List.rev_append sons [ son ] in
+    let () = env.Env.nb_id <- nb_id' in
+    put_fresh_point_in_domain
+      ~debugMode ~midpoint:false ?origin dst_id dst [] env.Env.domain
 
   let insert_mid_point
       ~debugMode ?origin env point visited sons
       inj_point2inf inf son_id inj_son2inf cc_son inj2cand cand_id cc_cand =
-    let domain_with_dst = put_fresh_point_in_domain
-        ~debugMode ~midpoint:false ?origin cand_id cc_cand [] env.domain in
-    let inf_id = fresh_cc_id domain_with_dst in
+    let () = put_fresh_point_in_domain
+        ~debugMode ~midpoint:false ?origin cand_id cc_cand [] env.Env.domain in
+    let inf_id = fresh_cc_id env.Env.domain in
     let (free_id,son1) =
       build_son
-        ~debugMode env.id_by_type env.nb_id inf inj2cand cand_id cc_cand in
+        ~debugMode env.Env.id_by_type env.Env.nb_id inf inj2cand cand_id cc_cand in
     let (free_id',son2) =
       build_son
-        ~debugMode env.id_by_type free_id
+        ~debugMode env.Env.id_by_type free_id
         inf (Renaming.inverse inj_son2inf) son_id cc_son in
-    let domain = put_fresh_point_in_domain
-        ~debugMode ~midpoint:true inf_id inf [ son1; son2 ] domain_with_dst in
+    let () = put_fresh_point_in_domain
+        ~debugMode ~midpoint:true inf_id inf [ son1; son2 ] env.Env.domain in
     let (nb_id',new_son) =
       build_son
-        ~debugMode env.id_by_type free_id'
+        ~debugMode env.Env.id_by_type free_id'
         point.Env.content inj_point2inf inf_id inf in
-    let () = point.Env.sons <- List.rev_append visited (new_son :: sons) in {
-      used_by_a_begin_new = false;
-      sig_decl = env.sig_decl;
-      id_by_type = env.id_by_type;
-      nb_id = nb_id';
-      elementaries = env.elementaries;
-      single_agent_points = env.single_agent_points;
-      domain;
-    }
+    let () = point.Env.sons <- List.rev_append visited (new_son :: sons) in
+    env.Env.nb_id <- nb_id'
 
   let rec insert_in_domain
       ~debugMode ?origin env base_id point inj2cand cand_id cc_cand =
@@ -1337,55 +1230,54 @@ module PreEnv = struct
       match are_compatible
               ~debugMode ~strict:true b point.Env.content c cc_cand with
       | Ok _ ->
-        let env' = ensure_point_is_obs ~debugMode ?origin env base_id point in
-        Error (env', inj2cand, point.Env.content, base_id)
+        let () = ensure_point_is_obs ~debugMode ?origin env base_id point in
+        Error (env,inj2cand, point.Env.content, base_id)
       | Error _ ->
         let rec insert_domain_sons visited = function
           | [] ->
-            let env' = add_cc_to_sons
+            let () = add_cc_to_sons
                 ~debugMode ?origin env inj2cand cand_id cc_cand point visited in
-            Ok env'
+            Ok ()
           | h :: sons ->
-            match Mods.IntMap.find_option h.Env.dst env.domain with
-            | None -> assert false
-            | Some point' ->
-              match present_in_dst ~debugMode cc_cand inj2cand h.Env.next with
-              | Some inj'2dst ->
-                insert_in_domain
-                  ~debugMode ?origin env h.Env.dst point'
-                  (Renaming.compose ~debugMode false h.Env.inj inj'2dst)
-                  cand_id cc_cand
-              | None ->
-                  (*match are_compatible
+            let point' = Mods.DynArray.get env.Env.domain h.Env.dst in
+            match present_in_dst ~debugMode cc_cand inj2cand h.Env.next with
+            | Some inj'2dst ->
+              insert_in_domain
+                ~debugMode ?origin env h.Env.dst point'
+                (Renaming.compose ~debugMode false h.Env.inj inj'2dst)
+                cand_id cc_cand
+            | None ->
+              (*match are_compatible
                           ~debugMode ~strict:false s point'.Env.content c' cc_cand with
                     | Error _ ->*) begin
-                  let inj_'2cand = Renaming.compose ~debugMode false h.Env.inj inj2cand in
-                  match rooted_infs ~debugMode inj_'2cand point'.Env.content cc_cand with
+                let inj_'2cand = Renaming.compose ~debugMode false h.Env.inj inj2cand in
+                match rooted_infs ~debugMode inj_'2cand point'.Env.content cc_cand with
+                | None -> assert false
+                | Some (inj_'2inf,inf) ->
+                  match Renaming.min_elt inj_'2inf with
                   | None -> assert false
-                  | Some (inj_'2inf,inf) ->
-                    match Renaming.min_elt inj_'2cand with
-                    | None -> assert false
-                    | Some (s,c') ->
-                      let b' = Renaming.apply ~debugMode h.Env.inj s in
+                  | Some (b',s) ->
+                    let b_in_inf = Renaming.apply ~debugMode h.Env.inj b' in
+                    match are_compatible
+                            ~debugMode ~strict:true b_in_inf point.Env.content s inf with
+                    | Ok _ -> insert_domain_sons (h::visited) sons
+                    | Error _ ->
                       match are_compatible
-                              ~debugMode ~strict:true b' point.Env.content s inf with
-                      | Ok _ -> insert_domain_sons (h::visited) sons
-                      | Error _ ->
+                              ~debugMode ~strict:false b_in_inf point.Env.content s inf with
+                      | Error _ -> assert false
+                      | Ok inj_point2inf ->
+                        let c_in_inf = Renaming.apply ~debugMode inj_'2cand b' in
                         match are_compatible
-                                ~debugMode ~strict:false b' point.Env.content s inf with
+                                ~debugMode ~strict:false s inf c_in_inf cc_cand with
                         | Error _ -> assert false
-                        | Ok inj_point2inf ->
-                          match are_compatible
-                                  ~debugMode ~strict:false s inf c' cc_cand with
-                          | Error _ -> assert false
-                          | Ok inj_inf2cand ->
-                            let env' = insert_mid_point
-                                ~debugMode env point visited sons
-                                inj_point2inf inf h.Env.dst
-                                inj_'2inf point'.Env.content inj_inf2cand cand_id cc_cand in
-                            Ok env'
-                end
-                  (*| Ok inj_p'2cand -> match insert_domain_sons sons with
+                        | Ok inj_inf2cand ->
+                          let env' = insert_mid_point
+                              ~debugMode env point visited sons
+                              inj_point2inf inf h.Env.dst
+                              inj_'2inf point'.Env.content inj_inf2cand cand_id cc_cand in
+                          Ok env'
+              end
+            (*| Ok inj_p'2cand -> match insert_domain_sons sons with
                     | Error _ as out -> out
                     | Ok result ->
                       let (inj2sup,fid),sup =
@@ -1401,10 +1293,10 @@ module PreEnv = struct
     | None -> assert false
     | Some (ag_id,ty) ->
       let point,r,cc,cc_id =
-        match env.single_agent_points.(ty) with
+        match env.Env.single_agent_points.(ty) with
         | None ->
           let deps = add_origin Operator.DepSet.empty origin in
-          let () = env.single_agent_points.(ty) <- Some (p_id,deps) in
+          let () = env.Env.single_agent_points.(ty) <- Some (p_id,deps) in
           ({ Env.content = element; Env.roots = [p_id,[ag_id],ty];
              Env.deps; Env.sons = []; },
            identity_injection element,
@@ -1412,83 +1304,66 @@ module PreEnv = struct
            p_id)
         | Some (id',deps) ->
           let deps = add_origin deps origin in
-          let () = env.single_agent_points.(ty) <- Some (id',deps) in
-          match Mods.IntMap.find_option id' env.domain with
+          let () = env.Env.single_agent_points.(ty) <- Some (id',deps) in
+          let point = Mods.DynArray.get env.Env.domain id' in
+          match find_root point.Env.content with
           | None -> assert false
-          | Some point ->
-            match find_root point.Env.content with
-            | None -> assert false
-            | Some (r_id,ty') ->
-              let () = assert (ty = ty') in
-              ({ Env.content = point.Env.content; Env.roots = point.Env.roots;
-                 Env.deps; Env.sons = point.Env.sons; },
-               Option_util.unsome
-                 Renaming.dummy
-                 (Renaming.add ~debugMode ag_id r_id (Renaming.empty ())),
-               point.Env.content,
-               id') in
-      ({
-        used_by_a_begin_new = false;
-        nb_id = env.nb_id;
-        sig_decl = env.sig_decl;
-        id_by_type = env.id_by_type;
-        elementaries = env.elementaries;
-        single_agent_points = env.single_agent_points;
-        domain = Mods.IntMap.add p_id point env.domain;
-      },r,cc,cc_id)
-
-  let debug_print f env =
-    Pp.array
-      Pp.comma
-      (fun ty f l ->
-        Format.fprintf f "%d: %t" ty
-                       (fun f ->
-                         Format.fprintf f "[";
-                         Pp.list
-                           Pp.comma
-                           (fun f a -> Format.fprintf f "%d" a) f l;
-                         Format.fprintf f "]"))
-      f env.id_by_type;
-    Format.fprintf f "used_by_a_begin_new = %B@,%a@," (env.used_by_a_begin_new)
-      (Mods.IntMap.print (Env.print_point ~noCounters:true env.sig_decl 0))
-      env.domain
+          | Some (r_id,ty') ->
+            let () = assert (ty = ty') in
+            ({ Env.content = point.Env.content; Env.roots = point.Env.roots;
+               Env.deps; Env.sons = point.Env.sons; },
+             Option_util.unsome
+               Renaming.dummy
+               (Renaming.add ~debugMode ag_id r_id (Renaming.empty ())),
+             point.Env.content,
+             id') in
+      let () = Mods.DynArray.set env.Env.domain p_id point in
+      (env,r,cc,cc_id)
 
   let add_cc ~debugMode ?origin env p_id element =
-    let rec add_cc_from_elems env = function
-      | [] -> (env, identity_injection element, element, p_id)
-      | (_, elem_id) :: elems ->
-        match Mods.IntMap.find_option elem_id env.domain with
-        | None -> assert false
-        | Some elem_point ->
-          let rec add_cc_from_matchings env = function
-            | [] -> add_cc_from_elems env elems
-            | inj2element::injs ->
-              (*let () = Format.printf "@[%a@]@." debug_print env
+    let rec add_cc_from_elems_ag ag =
+      if ag >= Array.length env.Env.elementaries
+      then  (env,identity_injection element, element, p_id)
+      else
+        let rec add_cc_from_elems_si si =
+          if si >= Array.length env.Env.elementaries.(ag)
+          then add_cc_from_elems_ag (succ ag)
+          else
+            let rec add_cc_from_elems = function
+              | [] -> add_cc_from_elems_si (succ si)
+              | (_, elem_id) :: elems ->
+                 let elem_point = Mods.DynArray.get env.Env.domain elem_id in
+                 let rec add_cc_from_matchings env = function
+                   | [] -> add_cc_from_elems elems
+                   | inj2element::injs ->
+                      (*let () = Format.printf "@[%a@]@." debug_print env
                               (print_cc ~noCounters:true ~dotnet:false ~full_species:false
                                 ~with_id:true ~cc_id:elem_id ~sigs:env.sig_decl)
                                 elem_point.Env.content
                                 (print_cc ~noCounters:true ~dotnet:false ~full_species:false
                                 ~with_id:true ~cc_id:p_id ~sigs:env.sig_decl)
                                 element in*)
-              match insert_in_domain
-                      ~debugMode ?origin
-                      env elem_id elem_point inj2element p_id element with
-              | Ok env' -> add_cc_from_matchings env' injs
-              | Error (env',_,_,p_id' as x) ->
-                if p_id <> p_id' then x
-                else add_cc_from_matchings env' injs in
-          add_cc_from_matchings
-            env (matchings ~debugMode elem_point.Env.content element) in
+                      match insert_in_domain
+                              ~debugMode ?origin
+                              env elem_id elem_point inj2element p_id element with
+                      | Ok () -> add_cc_from_matchings env injs
+                      | Error (_,_,_,p_id' as x) ->
+                         if p_id <> p_id' then x
+                         else add_cc_from_matchings env injs in
+                 add_cc_from_matchings
+                   env (matchings ~debugMode elem_point.Env.content element) in
+            add_cc_from_elems env.Env.elementaries.(ag).(si) in
+        add_cc_from_elems_si 0 in
     if is_single_agent element
     then add_single_agent ~debugMode ?origin p_id element env
-    else add_cc_from_elems env env.elementaries
+    else add_cc_from_elems_ag 0
 
 end
 
 (** Operation to create cc *)
 let check_dangling wk =
   if wk.dangling <> 0 then
-    raise (dangling_node ~sigs:wk.sigs wk.used_id wk.dangling)
+    raise (dangling_node ~sigs:wk.env.Env.sig_decl wk.used_id wk.dangling)
 
 let begin_new env = PreEnv.to_work env
 
@@ -1504,17 +1379,32 @@ let finish_elementary wk =
   let content =
     { nodes_by_type; nodes = wk.cc_nodes;
       recogn_nav = raw_to_navigation true nodes_by_type wk.cc_nodes} in
-  let point ={
+  let point = {
     Env.content;
     Env.roots = [];
     Env.deps = Operator.DepSet.empty;
     Env.sons = []
   } in
-  let cc_id = fresh_cc_id wk.cc_env in
-  let preenv = Mods.IntMap.add cc_id point wk.cc_env in
-  PreEnv.fresh
-    wk.sigs wk.reserved_id wk.free_id preenv
-    ((point,cc_id)::wk.singles) wk.agent_points
+  let cc_id = fresh_cc_id wk.env.Env.domain in
+  let () = Mods.DynArray.set wk.env.Env.domain cc_id point in
+  let () = wk.env.Env.nb_id <- wk.free_id in
+  let () = match content.recogn_nav with
+    | [] | ((Navigation.Existing _,_),_) :: _ -> assert false
+    | ((Navigation.Fresh _,_),_) :: _ :: _ -> ()
+    | [(Navigation.Fresh (_,ty1),s1),arr as step] ->
+       let sa1 = wk.env.Env.elementaries.(ty1) in
+       let () = sa1.(s1) <- (step,cc_id) :: sa1.(s1) in
+       match arr with
+       | Navigation.ToNode (Navigation.Fresh (_,ty2),s2) ->
+          if ty1 = ty2 && s1 <> s2 then
+            sa1.(s2) <- (step,cc_id) :: sa1.(s2)
+          else
+            let sa2 = wk.env.Env.elementaries.(ty2) in
+            sa2.(s2) <- (step,cc_id) :: sa2.(s2)
+       | Navigation.ToNode (Navigation.Existing _,s2) ->
+          sa1.(s2) <- (step,cc_id) :: sa1.(s2)
+       | Navigation.ToNothing | Navigation.ToInternal _ -> () in
+  ()
 
 let finish_new ~debugMode ?origin wk =
   let () = check_dangling wk in
@@ -1525,14 +1415,12 @@ let finish_new ~debugMode ?origin wk =
           List.rev_append wk.used_id.(i) wk.reserved_id.(i))
       (Array.length wk.used_id) in
   let nodes_by_type = Array.map List.rev wk.used_id in
+  let () = wk.env.Env.nb_id <- wk.free_id in
   let cc_candidate =
     { nodes_by_type; nodes = wk.cc_nodes;
       recogn_nav = raw_to_navigation true nodes_by_type wk.cc_nodes} in
-  let preenv =
-    PreEnv.fresh
-      wk.sigs wk.reserved_id wk.free_id wk.cc_env wk.singles wk.agent_points in
   PreEnv.add_cc
-    ~debugMode ?origin preenv (fresh_cc_id wk.cc_env) cc_candidate
+    ~debugMode ?origin wk.env (fresh_cc_id wk.env.Env.domain) cc_candidate
 
 let new_link wk ((x,_ as n1),i) ((y,_ as n2),j) =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_nodes in
@@ -1545,25 +1433,25 @@ let new_link wk ((x,_ as n1),i) ((y,_ as n2),j) =
     then { wk with dangling = 0 }
     else wk
   | ((Free | Link _),_), _ ->
-    raise (already_specified ~sigs:wk.sigs n1 i)
+    raise (already_specified ~sigs:wk.env.Env.sig_decl n1 i)
   | _, ((Free | Link _),_) ->
-    raise (already_specified ~sigs:wk.sigs n2 j)
+    raise (already_specified ~sigs:wk.env.Env.sig_decl n2 j)
 
 let new_free wk ((x,_ as n),i) =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_nodes in
   match x_n.(i) with
   | UnSpec,st -> let () = x_n.(i) <- (Free,st) in wk
-  | (Free | Link _),_ -> raise (already_specified ~sigs:wk.sigs n i)
+  | (Free | Link _),_ -> raise (already_specified ~sigs:wk.env.Env.sig_decl n i)
 
 let new_internal_state wk ((x,_ as n), i) va =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_nodes in
   let (l,s) = x_n.(i) in
-  if s >= 0 then raise (already_specified ~sigs:wk.sigs n i)
+  if s >= 0 then raise (already_specified ~sigs:wk.env.Env.sig_decl n i)
   else let () = x_n.(i) <- (l,va) in wk
 
 let new_node wk type_id =
   let () = check_dangling wk in
-  let arity = Signature.arity wk.sigs type_id in
+  let arity = Signature.arity wk.env.Env.sig_decl type_id in
   match wk.reserved_id.(type_id) with
   | h::t ->
     let () = wk.used_id.(type_id) <- h :: wk.used_id.(type_id) in
@@ -1571,8 +1459,7 @@ let new_node wk type_id =
     let node = (h,type_id) in
     (node,
      {
-       sigs = wk.sigs; cc_env = wk.cc_env; singles = wk.singles;
-       agent_points = wk.agent_points; reserved_id = wk.reserved_id;
+       env = wk.env; reserved_id = wk.reserved_id;
        used_id = wk.used_id; free_id = wk.free_id;
        dangling = if Mods.IntMap.is_empty wk.cc_nodes then 0 else h;
        cc_nodes = Mods.IntMap.add h (Array.make arity (UnSpec,-1)) wk.cc_nodes;
@@ -1582,8 +1469,7 @@ let new_node wk type_id =
     let node = (wk.free_id, type_id) in
     (node,
      {
-       sigs = wk.sigs; cc_env = wk.cc_env; singles = wk.singles;
-       agent_points = wk.agent_points; reserved_id = wk.reserved_id;
+       env = wk.env; reserved_id = wk.reserved_id;
        used_id = wk.used_id; free_id = succ wk.free_id;
        dangling = if Mods.IntMap.is_empty wk.cc_nodes then 0 else wk.free_id;
        cc_nodes =
@@ -1591,39 +1477,42 @@ let new_node wk type_id =
      })
 
 let minimal_env sigs contact_map =
-  Tools.array_fold_lefti
-    (fun ty ->
-       Tools.array_fold_lefti
-         (fun s acc (ints,links) ->
-            let w = begin_new acc in
+  let env = Env.empty sigs in
+  let () =
+    Array.iteri
+      (fun ty ->
+        Array.iteri
+          (fun s (ints,links) ->
+            let w = begin_new env in
             let n,w = new_node w ty in
             let w = new_free w (n,s) in
-            let acc' = finish_elementary w in
-            let acc'' =
-              Mods.IntSet.fold
-                (fun i acc ->
-                   let w = begin_new acc in
-                   let n,w = new_node w ty in
-                   let w = new_internal_state w (n,s) i in
-                   finish_elementary w) ints acc' in
-            Mods.Int2Set.fold
-              (fun (ty',s') acc ->
-                 let out =
-                   if ty < ty' || (ty = ty' && s <= s') then
-                     let w = begin_new acc in
-                     let n,w = new_node w ty in
-                     let n',w = new_node w ty' in
-                     let w = new_link w (n,s) (n',s') in
-                     finish_elementary w
-                   else acc in
-                 if ty = ty' && s < s' then
-                   let w = begin_new out in
-                   let n,w = new_node w ty in
-                   let w = new_link w (n,s) (n,s') in
-                   finish_elementary w
-                 else out) links acc''
-         ))
-    (PreEnv.empty sigs) contact_map
+            let () = finish_elementary w in
+            let () =
+              Mods.IntSet.iter
+                (fun i ->
+                  let w = begin_new env in
+                  let n,w = new_node w ty in
+                  let w = new_internal_state w (n,s) i in
+                  finish_elementary w) ints in
+            Mods.Int2Set.iter
+              (fun (ty',s') ->
+                let out =
+                  if ty < ty' || (ty = ty' && s <= s') then
+                    let w = begin_new env in
+                    let n,w = new_node w ty in
+                    let n',w = new_node w ty' in
+                    let w = new_link w (n,s) (n',s') in
+                    finish_elementary w
+                  else () in
+                if ty = ty' && s < s' then
+                  let w = begin_new env in
+                  let n,w = new_node w ty in
+                  let w = new_link w (n,s) (n,s') in
+                  finish_elementary w
+                else out) links
+      ))
+      contact_map in
+  env
 
 
 let fold_by_type f cc acc =
@@ -1640,15 +1529,14 @@ let fold_by_type f cc acc =
 
 let fold f cc acc = Mods.IntMap.fold f cc.nodes acc
 
-let finalize env =
-  let max_obs = fresh_cc_id env.PreEnv.domain in
-  let domain = Array.make max_obs (PreEnv.empty_point env.PreEnv.sig_decl) in
+(*let finalize env =
+  let max_obs = fresh_cc_id env.Env.domain in
+  let domain = Array.make max_obs (Env.empty_point env.Env.sig_decl) in
   let () =
-    Mods.IntMap.iter (fun id point -> domain.(id) <- point) env.PreEnv.domain in
+    Mods.IntMap.iter (fun id point -> domain.(id) <- point) env.Env.domain in
   let elementaries =
-    PreEnv.fill_elem env.PreEnv.sig_decl env.PreEnv.elementaries in
+    PreEnv.fill_elem env.Env.sig_decl env.Env.elementaries in
   {
-    Env.accurate =true;
     Env.sig_decl = env.PreEnv.sig_decl;
     Env.id_by_type = env.PreEnv.id_by_type;
     Env.max_obs;
@@ -1656,6 +1544,7 @@ let finalize env =
     Env.elementaries;
     Env.single_agent_points = env.PreEnv.single_agent_points;
   },{ stat_nodes = max_obs; PreEnv.stat_nav_steps = (*TODO*) 0 }
+ *)
 
 let merge_on_inf ~debugMode env m g1 g2 =
   let m_list = Renaming.to_list m in
@@ -1670,7 +1559,7 @@ let merge_on_inf ~debugMode env m g1 g2 =
   | Ok m' ->
      let (_,pushout) =
        merge_compatible
-         ~debugMode env.PreEnv.id_by_type env.PreEnv.nb_id m' g1 g2 in
+         ~debugMode env.Env.id_by_type env.Env.nb_id m' g1 g2 in
      Ok pushout
   | Error conflict -> Error conflict
 

@@ -63,11 +63,11 @@ val empty_cache: unit -> cache
 
 val representative:
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.cc
-  ->  cache * LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
+  sigs:Signature.s -> cache -> LKappa_auto.cache -> Pattern.Env.t -> reduction -> Pattern.cc
+  ->  cache * LKappa_auto.cache * Pattern.Env.t * Pattern.cc
 
 val equiv_class:
   ?parameters:Remanent_parameters_sig.parameters ->
   Model.t  ->
-  bool Mods.DynArray.t  -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.id ->
-  cache * LKappa_auto.cache * Pattern.PreEnv.t * bool Mods.DynArray.t  * (int * (Pattern.id * int) list)
+  bool Mods.DynArray.t  -> cache -> LKappa_auto.cache -> Pattern.Env.t -> reduction -> Pattern.id ->
+  cache * LKappa_auto.cache * Pattern.Env.t * bool Mods.DynArray.t  * (int * (Pattern.id * int) list)

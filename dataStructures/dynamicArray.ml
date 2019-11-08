@@ -16,6 +16,7 @@ module DynArray =
        type 'a t =
          {
            mutable array: 'a G.t;
+           mutable length: int;
            mutable current_size: int;
            default: int -> 'a
          }
@@ -23,14 +24,15 @@ module DynArray =
        let create n a =
          {
            array = G.create n a;
+           length = n;
            current_size = n;
            default = fun _ -> a;
          }
 
-       let length a = a.current_size
+       let length a = a.length
 
        let expand t =
-         let n = length t in
+         let n = t.current_size in
          let n' = max (n+1) (n*2) in
          let array' = G.init n' t.default in
          let () = G.blit t.array 0 array' 0 n in
@@ -41,8 +43,10 @@ module DynArray =
          if length a > i then G.get a.array i else a.default i
 
        let rec set a i v =
-         let n = length a in
-         if n>i then G.set a.array i v
+         let n = a.current_size in
+         if n>i then
+           let () = if i >= a.length then a.length <- succ i in
+           G.set a.array i v
          else
            let () = expand a in
            set a i v
@@ -52,6 +56,7 @@ module DynArray =
        let init n f =
          {
            array = G.init n f ;
+           length = n ;
            current_size = n ;
            default = f
          }
@@ -98,6 +103,7 @@ module DynArray =
        let copy a =
          {
            array = G.copy a.array ;
+           length = a.length ;
            current_size = a.current_size ;
            default = a.default ;
          }
@@ -111,8 +117,10 @@ module DynArray =
          else aux 0 start
 
        let of_list ~default l =
+         let current_size = List.length l in
          {
-           current_size = List.length l;
+           current_size;
+           length = current_size;
            array = G.of_list ~default l;
            default = fun _ -> default;
          }

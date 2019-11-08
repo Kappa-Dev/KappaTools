@@ -2105,7 +2105,7 @@ let compute_symmetries
       in
       let parameters = get_parameters state in
       let cache = LKappa_auto.init_cache () in
-      let cc_cache = Pattern.PreEnv.of_env (Model.domain env) in
+      let cc_cache = Model.domain env in
       let _cc_cache, chemical_species =
         Symmetry_interface.species_of_initial_state_env
           ~debugMode:false env contact_map_int

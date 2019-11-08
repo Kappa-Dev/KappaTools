@@ -17,10 +17,10 @@ val normalize_species:
   ?parameters:Remanent_parameters_sig.parameters ->
   sigs:Signature.s ->
   LKappa_auto.cache ->
-  Pattern.PreEnv.t ->
+  Pattern.Env.t ->
   int Symmetries_sig.site_partition array ->
   Pattern.cc ->
-  LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
+  LKappa_auto.cache * Pattern.Env.t * Pattern.cc
 
 val is_pattern_invariant_internal_states_permutation:
   ?parameters:Remanent_parameters_sig.parameters ->
@@ -59,10 +59,10 @@ val equiv_class_of_a_pattern:
   partitions_binding_states:(int -> int list list) ->
   partitions_full_states:(int -> int list list) ->
   LKappa_auto.cache ->
-  Pattern.PreEnv.t ->
+  Pattern.Env.t ->
   bool Mods.DynArray.t ->
   Pattern.id ->
-  LKappa_auto.cache * Pattern.PreEnv.t * bool Mods.DynArray.t *
+  LKappa_auto.cache * Pattern.Env.t * bool Mods.DynArray.t *
   (Pattern.id*int)  list
 
 
@@ -73,7 +73,7 @@ val equiv_class_of_a_species:
   partitions_binding_states:(int -> int list list) ->
   partitions_full_states:(int -> int list list) ->
   LKappa_auto.cache ->
-  Pattern.PreEnv.t ->
+  Pattern.Env.t ->
   bool Mods.DynArray.t ->
   Pattern.cc ->
-  LKappa_auto.cache * Pattern.PreEnv.t * bool Mods.DynArray.t * Pattern.cc list
+  LKappa_auto.cache * Pattern.Env.t * bool Mods.DynArray.t * Pattern.cc list

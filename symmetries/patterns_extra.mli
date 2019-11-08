@@ -1,18 +1,18 @@
 val raw_mixture_to_species:
   ?parameters:Remanent_parameters_sig.parameters ->
   ?sigs:Signature.s ->
-  Pattern.PreEnv.t ->
+  Pattern.Env.t ->
   Raw_mixture.t ->
   (int * int) list ->
-  Pattern.PreEnv.t * Pattern.cc * Pattern.id
+  Pattern.Env.t * Pattern.cc * Pattern.id
 
 val mixture_to_pattern:
   ?parameters:Remanent_parameters_sig.parameters ->
   ?sigs:Signature.s ->
-  Pattern.PreEnv.t ->
+  Pattern.Env.t ->
   LKappa.rule_mixture ->
   (int * int) list ->
-  Pattern.PreEnv.t * Pattern.cc * Pattern.id
+  Pattern.Env.t * Pattern.cc * Pattern.id
 
 val species_to_raw_mixture:
   ?parameters:Remanent_parameters_sig.parameters ->

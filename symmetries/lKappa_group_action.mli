@@ -146,4 +146,4 @@ val equiv_class:
 
 val saturate_domain_with_symmetric_patterns:
   debugMode:bool -> compileModeOn:bool -> Model.t -> bwd_bisim_info ->
-  Pattern.id array list -> Pattern.PreEnv.t -> Pattern.PreEnv.t
+  Pattern.id array list -> Pattern.Env.t -> Pattern.Env.t

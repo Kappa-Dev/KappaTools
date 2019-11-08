@@ -18,16 +18,16 @@
 
 val compile_bool:
   debugMode:bool -> compileModeOn:bool -> ?origin:Operator.rev_dep ->
-  Contact_map.t -> Pattern.PreEnv.t ->
+  Contact_map.t -> Pattern.Env.t ->
   (LKappa.rule_mixture, int) Alg_expr.bool Locality.annot ->
-  Pattern.PreEnv.t *
+  Pattern.Env.t *
   (Pattern.id array list,int) Alg_expr.bool Locality.annot
 
 val compile_modifications_no_track:
   debugMode:bool -> warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
-  compileModeOn:bool -> Contact_map.t -> Pattern.PreEnv.t ->
+  compileModeOn:bool -> Contact_map.t -> Pattern.Env.t ->
   (LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.modif_expr list ->
-  Pattern.PreEnv.t * Primitives.modification list
+  Pattern.Env.t * Primitives.modification list
 
 val compile_inits:
   debugMode:bool ->

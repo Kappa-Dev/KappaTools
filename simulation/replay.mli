@@ -38,5 +38,5 @@ val tests_pass_on : Edges.t ->
 (** exported for convenience. *)
 
 val cc_of_state :
-  debugMode:bool -> state -> Pattern.PreEnv.t ->
-  Pattern.PreEnv.t * ((int*int) list * Pattern.cc * Pattern.id) list
+  debugMode:bool -> state -> Pattern.Env.t ->
+  Pattern.Env.t * ((int*int) list * Pattern.cc * Pattern.id) list

@@ -571,16 +571,16 @@ let compile
 
   pause @@ fun () ->
   outputs (Data.Log "\t -observables");
-  let preenv,obs =
+  let domain,obs =
     obs_of_result
       ~debugMode ~compileModeOn contact_map preenv alg_deps result in
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
-  let domain,dom_stats = Pattern.finalize preenv in
+  (*let domain,dom_stats = Pattern.finalize preenv in
   outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.stat_nodes^
                      " (sub)observables "^
                      string_of_int dom_stats.Pattern.PreEnv.stat_nav_steps^
-                     " navigation steps"));
+                     " navigation steps"));*)
 
   let env =
     Model.init ~filenames:result.filenames domain tk_nd alg_nd alg_deps''

@@ -242,12 +242,13 @@ struct
   let preprocess = I.preprocess
 
   let reset compil network =
+    let dummy_species = I.dummy_chemical_species compil in
     {network with
       ode_variables = VarSet.empty ;
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
       id_of_ode_var = VarMap.empty ;
       species_tab = Mods.DynArray.create 0
-          (I.dummy_chemical_species compil,1) ;
+          (dummy_species,1) ;
       cache = I.empty_cache compil ;
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;
@@ -299,6 +300,7 @@ struct
     }
 
   let init compil =
+    let dummy_species = I.dummy_chemical_species compil in
     {
       rules = [] ;
       cc_to_rules = I.ObsMap.empty [];
@@ -308,8 +310,7 @@ struct
       ode_variables = VarSet.empty ;
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
       id_of_ode_var = VarMap.empty ;
-      species_tab = Mods.DynArray.create 0
-          (I.dummy_chemical_species compil,1) ;
+      species_tab = Mods.DynArray.create 0 (dummy_species,1) ;
       cache = I.empty_cache compil ;
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;

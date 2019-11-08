@@ -191,9 +191,9 @@ sig
 
   val species_of_initial_state_env  :
     debugMode:bool -> Model.t -> Contact_map.t ->
-    Pattern.PreEnv.t ->
+    Pattern.Env.t ->
     ('b * Primitives.elementary_rule) list ->
-    Pattern.PreEnv.t * Pattern.cc list
+    Pattern.Env.t * Pattern.cc list
 
   val species_of_initial_state : compil ->
     cache ->

@@ -49,3 +49,6 @@ module CharSet = CharSetMap.Set
 module CharMap = CharSetMap.Map
 
 module DynArray = DynamicArray.DynArray(LargeArray)
+(*let debug_print_dynarray pp f =
+  Format.fprintf
+    f "@[{ %a}@]" (DynArray.print ~trailing:Pp.space Pp.comma (fun _ -> pp))*)
