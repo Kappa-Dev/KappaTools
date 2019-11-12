@@ -1254,10 +1254,11 @@ module PreEnv = struct
                 match rooted_infs ~debugMode inj_'2cand point'.Env.content cc_cand with
                 | None -> assert false
                 | Some (inj_'2inf,inf) ->
-                  match Renaming.min_elt inj_'2inf with
+                  match Renaming.min_elt inj_'2cand with
                   | None -> assert false
-                  | Some (b',s) ->
+                  | Some (b',c_in_inf) ->
                     let b_in_inf = Renaming.apply ~debugMode h.Env.inj b' in
+                    let s = Renaming.apply ~debugMode inj_'2inf b' in
                     match are_compatible
                             ~debugMode ~strict:true b_in_inf point.Env.content s inf with
                     | Ok _ -> insert_domain_sons (h::visited) sons
@@ -1266,7 +1267,6 @@ module PreEnv = struct
                               ~debugMode ~strict:false b_in_inf point.Env.content s inf with
                       | Error _ -> assert false
                       | Ok inj_point2inf ->
-                        let c_in_inf = Renaming.apply ~debugMode inj_'2cand b' in
                         match are_compatible
                                 ~debugMode ~strict:false s inf c_in_inf cc_cand with
                         | Error _ -> assert false
