@@ -289,8 +289,7 @@ let intervene_simulation (code : string) : string Api.result Lwt.t =
          Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
       (fun manager _ ->
-        manager#simulation_intervention
-          { Api_types_t.intervention_code = code } >>=
+        manager#simulation_intervention code >>=
         (Api_common.result_bind_lwt
            ~ok:(fun out -> sync () >>=
                  Api_common.result_bind_lwt

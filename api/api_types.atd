@@ -36,7 +36,7 @@ type simulation_parameter = {
   store_trace : bool ;
 } <ocaml field_prefix="simulation_">
 
-type simulation_intervention = { intervention_code : string }
+type simulation_intervention = string
 
 type plot_limit = { plot_limit_offset <json name="offset"> : int nullable ;
                     plot_limit_points <json name="nb_points"> : int nullable ; }
@@ -49,19 +49,19 @@ type plot <ocaml module="Data"> = abstract
 type din_id = string
 type din <ocaml module="Data"> = abstract
 
-type din_catalog = { din_ids : din_id list }
+type din_catalog = din_id list
 
 (* file line *)
 type file_line <ocaml predef module="Data"> =
      { name : string nullable;
        text : string <json name="text"> } <ocaml field_prefix="file_line_">
-type file_line_catalog = { file_line_ids : string list }
+type file_line_catalog = string list
 type file_line_detail = file_line list
 
 type snapshot_id = string
 type snapshot <ocaml module="Data"> = abstract
 type snapshot_detail = snapshot
-type snapshot_catalog = { snapshot_ids : snapshot_id list }
+type snapshot_catalog = snapshot_id list
 
 (* log message *)
 type log_message = string

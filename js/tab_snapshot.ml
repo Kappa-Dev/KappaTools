@@ -155,10 +155,10 @@ let select_snapshot snapshot_js =
           (fun manager ->
              manager#simulation_catalog_snapshot >>=
              (Api_common.result_bind_lwt
-                ~ok:(fun  (snapshot_info : Api_types_t.snapshot_catalog) ->
+                ~ok:(fun snapshot_ids ->
                     try
                       let snapshot_id : string =
-                        List.nth snapshot_info.Api_types_t.snapshot_ids index in
+                        List.nth snapshot_ids index in
                       (manager#simulation_detail_snapshot snapshot_id)
                     with
                     | Failure f ->
@@ -225,9 +225,9 @@ let xml () =
            (fun manager ->
               manager#simulation_catalog_snapshot >>=
               (Api_common.result_bind_lwt
-                 ~ok:(fun (data : Api_types_t.snapshot_catalog) ->
+                 ~ok:(fun snapshot_ids ->
                      let () = ReactiveData.RList.set
-                         handle (select data.Api_types_t.snapshot_ids) in
+                         handle (select snapshot_ids) in
                      let () = select_snapshot snapshot_js in
                      Lwt.return (Result_util.ok ()))
               )

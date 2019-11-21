@@ -414,7 +414,7 @@ let perturbation
   : (string, Result_util.message list) Result_util.t Lwt.t =
   let () = ignore(system_process) in
   let lexbuf =
-    Lexing.from_string perturbation.Api_types_t.intervention_code
+    Lexing.from_string perturbation
   in
   Lwt.catch
     (fun () ->

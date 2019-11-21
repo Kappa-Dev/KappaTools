@@ -88,14 +88,14 @@ let _ = React.S.map
          ~ready:(fun manager _ ->
            manager#simulation_catalog_din >>=
            (Api_common.result_bind_lwt
-              ~ok:(fun (data : Api_types_t.din_catalog) ->
+              ~ok:(fun din_ids ->
                   let () = ReactiveData.RList.set
                       din_handle
                       (List.rev_map
                          (fun id -> Html.option
                              ~a:[ Html.a_value id ]
                              (Html.txt id))
-                         data.Api_types_t.din_ids) in
+                         din_ids) in
                   let () = select_din () in
                   Lwt.return (Result_util.ok ()))
            )

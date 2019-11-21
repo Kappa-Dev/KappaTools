@@ -55,9 +55,8 @@ class virtual manager_file_line
     Api_types_t.file_line_catalog Api.result =
     let file_lines : string list Mods.StringMap.t =
       detail.Api_types_t.simulation_output_file_lines in
-    let file_line_ids : string list =
+    let file_line_catalog : string list =
       List.map fst (Mods.StringMap.bindings file_lines) in
-    let file_line_catalog = { Api_types_t.file_line_ids } in
     Result_util.ok file_line_catalog
 
   method private get_file_line
@@ -93,9 +92,7 @@ class virtual manager_flux_map
     let flux_maps : Api_types_t.din list =
       detail.Api_types_t.simulation_output_dins in
     let flux_map_catalog =
-      { Api_types_t.din_ids =
-          List.map (fun f -> f.Data.din_data.Data.din_name)
-            flux_maps } in
+      List.map (fun f -> f.Data.din_data.Data.din_name) flux_maps in
     Result_util.ok flux_map_catalog
 
   method private get_flux_map
@@ -194,8 +191,7 @@ class virtual manager_snapshot
     let snapshots =
       detail.Api_types_t.simulation_output_snapshots in
     let snapshot_catalog =
-      { Api_types_t.snapshot_ids =
-          Mods.StringMap.fold (fun x _ acc -> x::acc) snapshots []} in
+      Mods.StringMap.fold (fun x _ acc -> x::acc) snapshots [] in
     Result_util.ok snapshot_catalog
   method private get_snapshot
       (snapshot_id : Api_types_t.snapshot_id)
