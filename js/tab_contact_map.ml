@@ -6,6 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+open Lwt.Infix
 module Html = Tyxml_js.Html5
 
 let display_id = "contact-map-display"
@@ -28,13 +29,14 @@ let extract_contact_map = function
 let contact_map_text =
   State_project.on_project_change_async
     ~on:tab_is_active None accuracy
-    (Result.Error Exception_without_parameter.empty_error_handler)
+    (Result_util.error [])
     (fun (manager : Api.concrete_manager) acc ->
-       Lwt_result.map
+       manager#get_contact_map acc >|=
+       Result_util.map
          (fun contact_json ->
-         let _,map_json = extract_contact_map contact_json in
-         Yojson.Basic.to_string map_json)
-         (manager#get_contact_map acc))
+            let _,map_json = extract_contact_map contact_json in
+            Yojson.Basic.to_string map_json)
+    )
 
 let configuration : Widget_export.configuration = {
   Widget_export.id = export_id ;
@@ -43,9 +45,9 @@ let configuration : Widget_export.configuration = {
       Widget_export.export_png ~svg_div_id:display_id ();
       Widget_export.export_json
         ~serialize_json:(fun () ->
-            match React.S.value contact_map_text with
-            | Result.Ok x -> x
-            | Result.Error _ -> "null")
+            Result_util.fold (React.S.value contact_map_text)
+              ~ok:(fun x -> x)
+              ~error:(fun _ -> "null"))
     ];
   Widget_export.show = React.S.const true;
 }
@@ -87,12 +89,12 @@ let onload () =
   let () = Widget_export.onload configuration in
   let _ =
     React.S.map
-      (function
-        | Result.Error mh  ->
+      (Result_util.fold
+        ~error:(fun mh  ->
           let () = State_error.add_error
-              "tab_contact_map" (Api_common.method_handler_errors mh) in
-          contactmap##clearData
-        | Result.Ok data -> contactmap##setData (Js.string data))
+              "tab_contact_map" mh in
+          contactmap##clearData)
+        ~ok:(fun data -> contactmap##setData (Js.string data)))
       contact_map_text in
   let () = (Tyxml_js.To_dom.of_select accuracy_chooser)##.onchange :=
       Dom_html.full_handler

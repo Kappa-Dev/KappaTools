@@ -16,7 +16,7 @@ function createWindow () {
   let sim_agent = require('url').format({
     protocol: 'file',
     slashes: true,
-    pathname: require('path').join(__dirname, '../bin/KaSimAgent'),
+    pathname: require('path').join(__dirname, '../bin/KappaSwitchman'),
     query: { label: 'Local' }
   })
   mainWindow.loadFile('index.html',{

@@ -460,9 +460,6 @@ class manager
          | x ->
            raise
              (Yojson.Basic.Util.Type_error ("Not a KaSa INIT response: ", x)))
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok x)
-      ~error:kasa_error
 
   method init_static_analyser compil =
     self#init_static_analyser_raw
@@ -479,9 +476,6 @@ class manager
          Format.sprintf "%s/v2/projects/%s/analyses/contact_map" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok x)
-      ~error:kasa_error
 
   method get_influence_map_raw accuracy =
     send
@@ -492,10 +486,7 @@ class manager
            url project_id (Public_data.accuracy_to_string accuracy)
        | None -> Format.sprintf "%s/v2/analyses/influence_map" url)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Yojson.Basic.to_string x))
-      ~error:kasa_error
+      (fun x -> x)
 
   method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
     send
@@ -519,11 +510,7 @@ class manager
          (match bwd with None -> "" | Some i -> "&bwd="^string_of_int i)
       )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          Lwt.return_ok (Public_data.local_influence_map_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.local_influence_map_of_json (Yojson.Basic.from_string x))
 
   method get_initial_node =
     send
@@ -535,13 +522,10 @@ class manager
          project_id
       )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          let o = JsonUtil.to_option
-              Public_data.refined_influence_node_of_json x in
-          Lwt.return_ok o)
-      ~error:kasa_error
+      (fun x ->
+         JsonUtil.to_option
+           Public_data.refined_influence_node_of_json
+           (Yojson.Basic.from_string x))
 
   method get_next_node short_id_opt =
     send
@@ -559,13 +543,9 @@ class manager
           )
       )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          let o = JsonUtil.to_option
-              Public_data.refined_influence_node_of_json x in
-          Lwt.return_ok o)
-      ~error:kasa_error
+      (fun x -> JsonUtil.to_option
+          Public_data.refined_influence_node_of_json
+          (Yojson.Basic.from_string x))
 
   method get_previous_node short_id_opt =
     send
@@ -582,13 +562,9 @@ class manager
              | None -> "")
            )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          let o = JsonUtil.to_option
-              Public_data.refined_influence_node_of_json x in
-          Lwt.return_ok o)
-      ~error:kasa_error
+      (fun x -> JsonUtil.to_option
+          Public_data.refined_influence_node_of_json
+          (Yojson.Basic.from_string x))
 
   method get_nodes_of_influence_map accuracy =
   send
@@ -599,31 +575,21 @@ class manager
          url project_id (Public_data.accuracy_to_string accuracy)
      | None -> Format.sprintf "%s/v2/analyses/all_nodes_of_influence_map" url)
     `GET
-    (fun x -> Yojson.Basic.from_string x)
-  >>= Result_util.fold
-    ~ok:(fun x -> Lwt.return_ok
-            (Public_data.nodes_of_influence_map_of_json x))
-    ~error:kasa_error
+    (fun x -> Public_data.nodes_of_influence_map_of_json (Yojson.Basic.from_string x))
 
   method get_dead_rules =
     send
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/dead_rules" url project_id)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Public_data.dead_rules_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.dead_rules_of_json (Yojson.Basic.from_string x))
 
   method get_dead_agents =
     send
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/dead_agents" url project_id)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Public_data.json_to_dead_agents x))
-      ~error:kasa_error
+      (fun x -> Public_data.json_to_dead_agents (Yojson.Basic.from_string x))
 
   method get_non_weakly_reversible_transitions =
     send
@@ -632,21 +598,14 @@ class manager
          "%s/v2/projects/%s/analyses/non_weakly_reversible_transitions"
          url project_id)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          Lwt.return_ok (Public_data.separating_transitions_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.separating_transitions_of_json (Yojson.Basic.from_string x))
 
   method get_constraints_list =
     send
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/constraints" url project_id)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Public_data.lemmas_list_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.lemmas_list_of_json (Yojson.Basic.from_string x))
 
   method get_potential_polymers accuracy_cm accuracy_scc =
     let options =
@@ -660,10 +619,7 @@ class manager
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/potential_polymers%s" url project_id options )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Public_data.scc_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.scc_of_json (Yojson.Basic.from_string x))
 
   method is_computing = is_computing request_count
 

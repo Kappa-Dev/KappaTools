@@ -7,5 +7,4 @@
 (******************************************************************************)
 
 include Ui_common.SubTab
-val contact_map_text :
-  (string, Exception_without_parameter.method_handler) Result.result React.S.t
+val contact_map_text : string Api.result React.S.t

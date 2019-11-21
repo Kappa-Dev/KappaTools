@@ -145,15 +145,14 @@ let export_config = {
                   ~label:__LOC__
                   (fun manager ->
                      let { accuracy; _ } = React.S.value model in
-                     Lwt_result.map
+                     manager#get_influence_map_raw accuracy >|=
+                     Result_util.map
                        (fun influences_string ->
                           let data = Js.string influences_string in
                           let () =
                             Common.saveFile
                               ~data ~mime:"application/json" ~filename in
-                          ())
-                       (manager#get_influence_map_raw accuracy) >>=
-                     fun x -> Lwt.return (Api_common.result_kasa x)))
+                          ())))
              >>= fun _ -> Lwt.return_unit));
     } ];
   Widget_export.show = React.S.const true;
@@ -442,18 +441,18 @@ let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
 
 let influence_sphere =
   State_project.on_project_change_async
-    ~on:tab_is_active dummy_model model (Result.Ok empty_sphere)
+    ~on:tab_is_active dummy_model model (Result_util.ok empty_sphere)
     (fun manager { rendering; accuracy; origin = origin_refined } ->
        match rendering with
        | DrawTabular _ ->
          let origin =
            Option_util.map
              Public_data.short_node_of_refined_node origin_refined in
-         Lwt_result.map
+         manager#get_local_influence_map
+           ?fwd:None ?bwd:None ?origin ~total:1 accuracy >|=
+         Result_util.map
            table_of_influences_json
-           (manager#get_local_influence_map
-              ?fwd:None ?bwd:None ?origin ~total:1 accuracy)
-       | DrawGraph _ -> Lwt.return (Result.Ok empty_sphere))
+       | DrawGraph _ -> Lwt.return (Result_util.ok empty_sphere))
 
 let content () =
   let accuracy_form =
@@ -520,9 +519,14 @@ let content () =
             (fun { rendering; origin; _ } sphere ->
                match rendering with
                | DrawGraph _ -> []
-               | DrawTabular () -> match sphere with
-                 | Result.Ok sphere -> [ draw_table origin sphere ]
-                 | Result.Error mh -> Utility.print_method_handler mh)
+               | DrawTabular () ->
+                 Result_util.fold
+                   sphere
+                   ~ok:(fun sphere -> [ draw_table origin sphere ])
+                   ~error:(fun error ->
+                       List.map
+                         (fun m -> Html.p [Html.txt (Format.asprintf "@[%a@]" Result_util.print_message m)])
+                         error))
             model influence_sphere));
     Widget_export.content export_config;
   ]
@@ -541,29 +545,29 @@ let _ =
                    Option_util.map
                      Public_data.short_node_of_refined_node origin_refined in
                  ((manager#get_local_influence_map
-                     ?fwd ?bwd ?origin ~total accuracy) >>= function
-                  | Result.Ok influences ->
-                    let buf = Buffer.create 1000 in
-                    let fmt = Format.formatter_of_buffer buf in
-                    let logger =
-                      Loggers.open_logger_from_formatter
-                        ~mode:Loggers.Js_Graph fmt in
-                    let logger_graph = Graph_loggers_sig.extend_logger logger in
-                    let () = json_to_graph logger_graph influences in
-                    let graph =
-                      Graph_loggers_sig.graph_of_logger logger_graph in
-                    let graph_json = Graph_json.to_json graph in
-                    let () = Loggers.flush_logger logger in
-                    let () = Loggers.close_logger logger in
-                    let () =
-                      influencemap##setData
-                        (Js.string (Yojson.Basic.to_string graph_json)) in
-                    Lwt_result.return ()
-                  | Result.Error e ->
-                    let () = influencemap##clearData in
-                    Lwt_result.fail e) >>=
-                 fun out -> Lwt.return (Api_common.result_kasa out)
-              )))
+                     ?fwd ?bwd ?origin ~total accuracy) >|=
+                  Result_util.fold
+                    ~ok:(fun influences ->
+                        let buf = Buffer.create 1000 in
+                        let fmt = Format.formatter_of_buffer buf in
+                        let logger =
+                          Loggers.open_logger_from_formatter
+                            ~mode:Loggers.Js_Graph fmt in
+                        let logger_graph = Graph_loggers_sig.extend_logger logger in
+                        let () = json_to_graph logger_graph influences in
+                        let graph =
+                          Graph_loggers_sig.graph_of_logger logger_graph in
+                        let graph_json = Graph_json.to_json graph in
+                        let () = Loggers.flush_logger logger in
+                        let () = Loggers.close_logger logger in
+                        let () =
+                          influencemap##setData
+                            (Js.string (Yojson.Basic.to_string graph_json)) in
+                        Result_util.ok ())
+                    ~error:(fun e ->
+                        let () = influencemap##clearData in
+                        Result_util.error e)
+              ))))
     (React.S.on ~eq:State_project.model_equal tab_is_active
        State_project.dummy_model State_project.model)
     model
@@ -634,12 +638,11 @@ let onload () =
                (State_project.with_project
                   ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
-                     (Lwt_result.map
-                        (fun origin ->
-                           update_model (fun m -> { m with origin }))
-                        manager#get_initial_node >>= fun out ->
-                      Lwt.return (Api_common.result_kasa out)
-                     )))
+                     manager#get_initial_node >|=
+                     Result_util.map
+                       (fun origin ->
+                          update_model (fun m -> { m with origin }))
+                  ))
            in Js._true
         )
   in
@@ -655,13 +658,12 @@ let onload () =
                (State_project.with_project
                   ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
-                     (Lwt_result.map
-                        (fun origin' ->
-                           update_model
-                             (fun m -> { m with origin = origin' }))
-                        (manager#get_next_node origin) >>=
-                      fun out -> Lwt.return (Api_common.result_kasa out)
-                     )))
+                     manager#get_next_node origin >|=
+                       Result_util.map
+                         (fun origin' ->
+                            update_model
+                              (fun m -> { m with origin = origin' }))
+                  ))
            in Js._true
         ) in
   let () =
@@ -676,13 +678,12 @@ let onload () =
                (State_project.with_project
                   ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
-                     (Lwt_result.map
-                        (fun origin' ->
-                           update_model
-                             (fun m -> { m with origin = origin' }))
-                        (manager#get_previous_node origin) >>=
-                      fun out -> Lwt.return (Api_common.result_kasa out)
-                     )))
+                     manager#get_previous_node origin >|=
+                     Result_util.map
+                       (fun origin' ->
+                          update_model
+                            (fun m -> { m with origin = origin' }))
+                  ))
            in Js._true
         )
   in

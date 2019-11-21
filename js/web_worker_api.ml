@@ -67,7 +67,8 @@ class manager () =
     method private post_message (message_text : string) : unit =
       sim_worker##postMessage(message_text)
     inherit Mpi_api.manager ()
-    inherit Kasa_client.new_client
+    inherit Kasa_client.new_uniform_client
+        ~is_running:(fun () -> true)
         ~post:(fun message_text ->
             let () = Common.debug (Js.string message_text) in
             kasa_worker##postMessage(message_text))
@@ -89,7 +90,7 @@ class manager () =
         ~ok:(fun out ->
             self#secret_simulation_load out overwrites >>=
             Api_common.result_bind_lwt
-              ~ok:(fun () -> self#init_static_analyser out >|= Api_common.result_kasa))
+              ~ok:(fun () -> self#init_static_analyser out))
 
     method is_running = is_running
     method terminate =

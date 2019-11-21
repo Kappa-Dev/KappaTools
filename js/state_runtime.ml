@@ -135,7 +135,8 @@ class embedded () : Api.concrete_manager =
             in
             Lwt.return_unit
         end : Kappa_facade.system_process)
-    inherit Kasa_client.new_client
+    inherit Kasa_client.new_uniform_client
+        ~is_running:(fun () -> true)
         ~post:(fun message_text -> kasa_worker##postMessage(message_text))
         kasa_mailbox
     inherit Kamoha_client.new_client
@@ -156,7 +157,7 @@ class embedded () : Api.concrete_manager =
         ~ok:(fun out ->
             self#secret_simulation_load out overwrites >>=
             Api_common.result_bind_lwt
-              ~ok:(fun () -> self#init_static_analyser out >|= Api_common.result_kasa))
+              ~ok:(fun () -> self#init_static_analyser out))
   end
 
 let state , set_state =

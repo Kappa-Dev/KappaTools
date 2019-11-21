@@ -124,9 +124,9 @@ let render_snapshot_graph
   | Graph ->
     let json : string = Data.string_of_snapshot snapshot in
     let contact_map =
-      match React.S.value Tab_contact_map.contact_map_text with
-      | Result.Ok x -> x
-      | Result.Error _ -> "null" in
+      Result_util.fold (React.S.value Tab_contact_map.contact_map_text)
+        ~ok:(fun x -> x)
+        ~error:(fun _ -> "null") in
     snapshot_js##setData ~contact_map:(Js.string contact_map) (Js.string json)
   | Kappa -> ()
 

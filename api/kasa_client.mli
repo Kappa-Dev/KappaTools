@@ -13,5 +13,9 @@ val receive : mailbox -> string -> unit
 val new_mailbox : unit -> mailbox
 val is_computing : mailbox -> bool
 
-class virtual new_client :
-  post:(string -> unit) -> mailbox -> Api.manager_static_analysis
+class new_client :
+  is_running:(unit -> bool) -> post:(string -> unit) -> mailbox ->
+  Api.manager_static_analysis
+class new_uniform_client :
+  is_running:(unit -> bool) -> post:(string -> unit) -> mailbox ->
+  Api.uniform_manager_static_analysis

@@ -21,7 +21,7 @@ let field_ref context field =
   (List.assoc "projectid" context.Webapp_common.arguments,
    List.assoc field context.Webapp_common.arguments)
 
-class new_manager : Api.concrete_manager =
+class new_manager =
   let re = Re.compile (Re.str "WebSim") in
   let sa_command = Re.replace_string re ~by:"KaSaAgent" Sys.argv.(0) in
   let sa_process = Lwt_process.open_process (sa_command,[|sa_command|]) in
@@ -76,6 +76,7 @@ class new_manager : Api.concrete_manager =
            sim_process#stdin)
     inherit Mpi_api.manager ()
     inherit Kasa_client.new_client
+        ~is_running:(fun () -> sa_process#state = Lwt_process.Running)
         ~post:(fun message_text ->
             Lwt.ignore_result
               (Lwt_io.atomic

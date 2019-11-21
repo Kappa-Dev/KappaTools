@@ -26,8 +26,9 @@ let content () =
       (fun (manager : Api.concrete_manager) () ->
          manager#get_potential_polymers
            (Some Public_data.High) (Some Public_data.High)
-         (*TODO: make these options tunable *) >>= function
-         | Result.Ok (_,_,scc) ->
+         (*TODO: make these options tunable *) >|=
+         Result_util.fold
+       ~ok:(fun (_,_,scc) ->
            let scc = List.rev_map List.rev scc in
            let output =
              if scc = [] || scc = [[]]
@@ -48,8 +49,11 @@ let content () =
                  Utility.print_string "The following bonds may form arbitrary long chains of agents:" list
                in list
            in
-           Lwt.return [Html.p output]
-         | Result.Error mh -> Lwt.return (Utility.print_method_handler mh)) in
+           [Html.p output])
+       ~error:(fun mh ->
+           List.map
+             (fun m -> Html.p [Html.txt (Format.asprintf "@[%a@]" Result_util.print_message m)])
+             mh)) in
   [ Tyxml_js.R.Html5.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
       (ReactiveData.RList.from_signal scc)

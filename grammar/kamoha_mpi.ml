@@ -15,7 +15,7 @@ type _ handle =
   | Ast : Ast.parsing_compil handle
 
 type box =
-    B : 'a handle * int * ('a,Result_util.message list) Result_util.t -> box
+    B : 'a handle * int * ('a, Result_util.message list) Result_util.t -> box
 
 let reply post write_v id v =
   let message =
