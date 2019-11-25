@@ -114,9 +114,10 @@ class new_manager =
       self#secret_project_parse >>=
       Api_common.result_bind_lwt
         ~ok:(fun out ->
-            self#secret_simulation_load out overwrites >>=
-            Api_common.result_bind_lwt
-              ~ok:(fun () -> self#init_static_analyser out >|= Api_common.result_kasa))
+            let load = self#secret_simulation_load out overwrites in
+            let init =
+              Lwt.map Api_common.result_kasa (self#init_static_analyser out) in
+            load >>= Api_common.result_bind_lwt ~ok:(fun () -> init))
   end
 
 let bind_projects f id projects =

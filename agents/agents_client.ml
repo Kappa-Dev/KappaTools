@@ -24,32 +24,37 @@ let post chan message_delimiter message_text =
           Lwt_io.write_char chan message_delimiter)
        chan)
 
-class t bin_dir message_delimiter =
+class t exec_command message_delimiter =
+  let switch_re = Re.compile (Re.str "KappaSwitchman") in
   let kamoha =
+    let command = Re.replace_string  switch_re ~by:"KaMoHa" exec_command in
     Lwt_process.open_process_full
-      (bin_dir ^ "KaMoHa",[|bin_dir^"KaMoHa";"--delimiter";Char.escaped message_delimiter|]) in
+      (command,[|command;"--delimiter";Char.escaped message_delimiter|]) in
   let kasim =
+    let command = Re.replace_string  switch_re ~by:"KaSimAgent" exec_command in
     Lwt_process.open_process_full
-      (bin_dir ^ "KaSimAgent",[|bin_dir^"KaSimAgent";"--delimiter";Char.escaped message_delimiter|]) in
-  let kastor =
+      (command,[|command;"--delimiter";Char.escaped message_delimiter|]) in
+  (*let kastor =
+    let command = Re.replace_string  switch_re ~by:"KaSimAgent" exec_command in
     Lwt_process.open_process_full
-      (bin_dir ^ "KaStor",[|bin_dir^"KaStor";"--delimiter";Char.escaped message_delimiter|]) in
+      (command,[|comman;"--delimiter";Char.escaped message_delimiter|]) in*)
   let kasa =
+    let command = Re.replace_string  switch_re ~by:"KaSaAgent" exec_command in
     Lwt_process.open_process_full
-      (bin_dir ^ "KaSaAgent",[|bin_dir^"KaSaAgent";"--delimiter";Char.escaped message_delimiter|]) in
+      (command,[|command;"--delimiter";Char.escaped message_delimiter|]) in
   let moha_mailbox = Kamoha_client.new_mailbox () in
   let sa_mailbox = Kasa_client.new_mailbox () in
-  let stor_state,update_stor_state = Kastor_client.init_state () in
+  (*let stor_state,update_stor_state = Kastor_client.init_state () in*)
   object(self)
     initializer
       let () =
         serve
           kamoha#stdout message_delimiter (Kamoha_client.receive moha_mailbox)
         |> Lwt.ignore_result in
-      let () =
+      (*let () =
         serve
           kastor#stdout message_delimiter (Kastor_client.receive update_stor_state)
-        |> Lwt.ignore_result in
+        |> Lwt.ignore_result in*)
       let () =
         serve
           kasa#stdout message_delimiter (Kasa_client.receive sa_mailbox)
@@ -60,27 +65,27 @@ class t bin_dir message_delimiter =
     method terminate =
       kamoha#terminate;
       kasim#terminate;
-      kastor#terminate;
+      (*kastor#terminate;*)
       kasa#terminate
 
     method is_running =
       kamoha#state = Lwt_process.Running &&
       kasim#state = Lwt_process.Running &&
-      kastor#state = Lwt_process.Running &&
+      (*kastor#state = Lwt_process.Running &&*)
       kasa#state = Lwt_process.Running
 
     method is_computing =
       self#sim_is_computing || Kasa_client.is_computing sa_mailbox ||
-      self#story_is_computing || Kamoha_client.is_computing moha_mailbox
+      (*self#story_is_computing ||*) Kamoha_client.is_computing moha_mailbox
 
     inherit Kasa_client.new_client
         ~is_running:(fun () -> kasa#state = Lwt_process.Running)
         ~post:(post kasa#stdin message_delimiter)
         sa_mailbox
 
-    inherit Kastor_client.new_client
+    (*inherit Kastor_client.new_client
         ~post:(post kastor#stdin message_delimiter)
-        stor_state
+        stor_state*)
 
     inherit Kamoha_client.new_client
         ~post:(post kamoha#stdin message_delimiter)
@@ -94,7 +99,8 @@ class t bin_dir message_delimiter =
       self#secret_project_parse >>=
       Api_common.result_bind_lwt
         ~ok:(fun out ->
-            self#secret_simulation_load out overwrites >>=
-            Api_common.result_bind_lwt
-              ~ok:(fun () -> self#init_static_analyser out >|= Api_common.result_kasa))
+            let load = self#secret_simulation_load out overwrites in
+            let init =
+              Lwt.map Api_common.result_kasa (self#init_static_analyser out) in
+            load >>= Api_common.result_bind_lwt ~ok:(fun () -> init))
   end

@@ -55,13 +55,13 @@ let reply post write_v id v =
          ]) () in
   post message
 
-let on_message bindir message_delimiter =
+let on_message exec_command message_delimiter =
   let post message =
     Lwt_io.atomic (fun f ->
         Lwt_io.write f message >>= fun () ->
         Lwt_io.write_char f message_delimiter)
       Lwt_io.stdout in
-  let manager = new Agents_client.t bindir message_delimiter in
+  let manager = new Agents_client.t exec_command message_delimiter in
   let () = at_exit (fun () -> manager#terminate) in
   let current_id = ref None in
   fun text ->
@@ -411,10 +411,6 @@ let () =
   let () = Arg.parse options
       (fun x -> raise (Arg.Bad ("Don't know what to do of "^x))) usage_msg in
   let () = Printexc.record_backtrace common_args.Common_args.backtrace in
-  let bindir =
-    let predir = Filename.dirname Sys.executable_name in
-    if Filename.is_implicit Sys.executable_name &&
-       predir = "." then "" else predir^"/" in
   Lwt_main.run
     (Agent_common.serve Lwt_io.stdin stdsim_args.Agent_args.delimiter
-       (on_message bindir stdsim_args.Agent_args.delimiter))
+       (on_message Sys.executable_name stdsim_args.Agent_args.delimiter))
