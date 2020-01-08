@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Dec 01 2018>
+   * Last modification: Time-stamp: <Jan 08 2020>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -2607,7 +2607,204 @@ let convert_scc_maps_into_set
   | error, None -> error, Ckappa_sig.PairAgentSite_map_and_set.Set.empty
   | error, Some set -> error, set
 
-let dot_of_contact_map ?logger parameters error
+  let print_list_of_lines parameters list =
+    List.iter
+      (fun line ->
+         let () =
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameters)
+             "%s" line
+         in
+         let () =
+           Loggers.print_newline
+             (Remanent_parameters.get_logger parameters)
+         in ())
+      list
+
+let gexf_of_contact_map ?logger parameters (error:Exception.method_handler) handler _scc_map contact_map =
+  let parameters_gexf =
+    match
+      logger
+    with
+    | None -> Remanent_parameters.open_contact_map_file parameters
+    | Some loggers -> Remanent_parameters.set_logger parameters loggers
+  in
+  let _ =
+    print_list_of_lines parameters_gexf
+      [
+        "<?xml version='1.0' encoding='utf-8'?>";
+        "<gexf version=\"1.2\" xmlns=\"http://www.gexf.net/1.2draft\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.w3.org/2001/XMLSchema-instance\">";
+        "<graph defaultedgetype=\"undirected\" mode=\"static\" name=\"\">";
+        "  <attributes class=\"node\" mode=\"static\">";
+        "    <attribute id=\"0\" title=\"Type\" type=\"string\" />";
+        "    <attribute id=\"1\" title=\"size\" type=\"integer\" />";
+        "  </attributes>";
+        "  <nodes> ";
+      ]
+  in
+  let error =
+    Ckappa_sig.Agent_map_and_set.Map.fold
+      (fun i site_map error ->
+         let error, agent_name =
+           Handler.translate_agent
+             ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+             parameters_gexf error handler i
+         in
+         let () =
+           print_list_of_lines parameters_gexf
+             [
+               "     <node id=\""^agent_name^"\" label=\""^agent_name^"\">";
+               "       <attvalues>";
+               "         <attvalue for=\"0\" value=\"Agent\" />";
+               "         <attvalue for=\"1\" value=\"10\" />";
+               "       </attvalues>";
+               "     </node>";
+             ]
+         in
+         let error =
+         Ckappa_sig.Site_map_and_set.Map.fold
+           (fun j _ error ->
+              let error, site =
+                Handler.translate_site parameters_gexf error handler i j
+              in
+              let error =
+                match site with
+                | Ckappa_sig.Counter _
+                | Ckappa_sig.Internal _ -> error
+                | Ckappa_sig.Binding site ->
+                  let site_name =
+                    agent_name^":"^site
+                  in
+                  let () =
+                    print_list_of_lines parameters_gexf
+                      [
+                        "     <node id=\""^site_name^"\"  label=\""^site_name^"\">";
+                        "       <attvalues>";
+                        "         <attvalue for=\"0\" value=\"Domaine\" />";
+                        "         <attvalue for=\"1\" value=\"1\" />";
+                        "       </attvalues>";
+                        "     </node>";
+                      ]
+                  in error
+           in error)
+           site_map
+           error
+         in
+         error)
+      contact_map error
+  in
+  let () = print_list_of_lines parameters_gexf ["   </nodes>";"   <edges>"] in
+  let error, counter  =
+    Ckappa_sig.Agent_map_and_set.Map.fold
+      (fun i site_map (error, counter) ->
+         let error, agent_name =
+           Handler.translate_agent
+             ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+             parameters_gexf error handler i
+         in
+         let error, counter  =
+           Ckappa_sig.Site_map_and_set.Map.fold
+             (fun j _ (error, counter) ->
+              let error, site =
+                Handler.translate_site
+                  parameters_gexf error handler i j in
+              let error, counter  =
+                match site with
+                | Ckappa_sig.Counter _
+                | Ckappa_sig.Internal _ -> error, counter
+                | Ckappa_sig.Binding site_name ->
+
+                  let site_name =
+                    agent_name^":"^site_name
+                  in
+                  let () =
+                    print_list_of_lines parameters_gexf
+                      [
+                        "     <edge id=\""^(string_of_int counter)^"\" source =\""^agent_name^"\" target=\""^site_name^"\" weight=\"10\" />";
+                      ]
+                  in
+                  error, counter+1
+              in
+              error, counter)
+             site_map
+             (error,counter)
+         in error, counter)
+      contact_map
+      (error,0)
+  in
+  let error, _counter  =
+    Ckappa_sig.Agent_map_and_set.Map.fold
+      (fun i site_map (error,counter) ->
+         let error, agent_name =
+           Handler.translate_agent
+             ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+             parameters_gexf error handler i
+         in
+         Ckappa_sig.Site_map_and_set.Map.fold
+           (fun j (_,b) (error,counter) ->
+              let error, site =
+                Handler.translate_site
+                  parameters_gexf error handler i j
+              in
+              let error, counter =
+                match site with
+                | Ckappa_sig.Internal _
+                | Ckappa_sig.Counter _ -> error, counter
+                | Ckappa_sig.Binding site_name  ->
+                  List.fold_left
+                    (fun (error, counter) (i',j') ->
+                       if Ckappa_sig.compare_agent_name i i' < 0
+                       || (Ckappa_sig.compare_agent_name i i' = 0 &&
+                           Ckappa_sig.compare_site_name j j' <= 0)
+                       then
+                       let error, agent_name' =
+                         Handler.translate_agent
+                           ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+                           parameters_gexf error handler i'
+                       in
+                       let error, site =
+                         Handler.translate_site
+                           parameters_gexf error handler i' j'
+                       in
+                       match site with
+                       | Ckappa_sig.Internal _
+                       | Ckappa_sig.Counter _ ->
+                         Exception.warn parameters_gexf error __POS__ Exit counter
+                       | Ckappa_sig.Binding site_name'  ->
+                         let () =
+                           print_list_of_lines parameters_gexf
+                           [
+                             "     <edge id=\""^(string_of_int counter)^"\" source =\""^agent_name^":"^site_name^"\" target=\""^agent_name'^":"^site_name'^"\" weight=\"1\" />";
+                           ]
+                       in error, counter+1
+                       else
+                         error, counter
+                    ) (error,counter)  b
+              in
+              error, counter )
+           site_map
+           (error, counter))
+      contact_map (error, counter)
+  in
+  let _ = print_list_of_lines parameters_gexf
+      [
+        "    </edges>";
+        "  </graph>";
+        "</gexf>"
+      ]
+  in
+  let () =
+    match
+      logger
+    with
+    | None -> Loggers.close_logger (Remanent_parameters.get_logger parameters_gexf)
+    | Some _ -> Loggers.flush_logger (Remanent_parameters.get_logger parameters_gexf)
+  in
+  error
+
+
+let dot_of_contact_map
+    ?logger parameters error
     handler scc_map contact_map =
   let parameters_dot =
     match

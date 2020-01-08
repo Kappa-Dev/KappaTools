@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 28 2018>
+  * Last modification: Time-stamp: <Jan 08 2020>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -56,6 +56,7 @@ let ext_format x =
   | Remanent_parameters_sig.DOT -> ".dot"
   | Remanent_parameters_sig.HTML -> ".html"
   | Remanent_parameters_sig.DIM -> ".dim.json"
+  | Remanent_parameters_sig.GEPHI -> ".gexf"
 
 let fetch_level_gen s r =
   match
@@ -76,6 +77,7 @@ let fetch_graph_format f =
   | "dot" -> Remanent_parameters_sig.DOT
   | "html" -> Remanent_parameters_sig.HTML
   | "dim" -> Remanent_parameters_sig.DIM
+  | "gephi" -> Remanent_parameters_sig.GEPHI
   | x ->
     let () = Printf.eprintf "%s is not a valid graph format !!!" x in raise Exit
 let fetch_accuracy_level r = fetch_level_gen "an accuracy" r
@@ -1029,6 +1031,7 @@ let open_influence_map_file  parameters =
       | Remanent_parameters_sig.DOT -> Loggers.DOT
       | Remanent_parameters_sig.HTML -> Loggers.HTML_Graph
       | Remanent_parameters_sig.DIM -> Loggers.Matrix
+      | Remanent_parameters_sig.GEPHI -> Loggers.GEPHI
     in
     let logger = Loggers.open_logger_from_channel ~mode:format channel
   in
@@ -1047,7 +1050,7 @@ let open_contact_map_file parameters =
       parameters
      with
        Remanent_parameters_sig.logger =
-       Loggers.open_logger_from_channel channel}
+         Loggers.open_logger_from_channel channel}
 
  let persistent_mode = false
 

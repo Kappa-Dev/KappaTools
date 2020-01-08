@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Nov 28 2018>
+  * Last modification:  Time-stamp: <Jan 07 2020>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -20,7 +20,7 @@ module CharMap = Mods.CharMap
 type called_from = KaSa | KaSim | Internalised | Server
 type accuracy_level = None | Low | Medium | High | Full
 type link_mode = Bound_indices | Site_address | Bound_type
-type graph_format = DOT | HTML | DIM
+type graph_format = DOT | HTML | DIM | GEPHI
 
 type reachability_output = Raw | Natural_language | Kappa
 type counters_domain = Mi | Non_relational | Abstract_multiset | Octagons

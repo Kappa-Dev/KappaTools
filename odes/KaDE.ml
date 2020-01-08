@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 19 2018>
+  * Last modification: Time-stamp: <Jan 08 2020>
 *)
 
 module A = Odes.Make (Symmetry_interface)
@@ -191,7 +191,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | Loggers.SBML
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML |
         Loggers.HTML_Tabular
-      | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+      | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular | Loggers.GEPHI
       | Loggers.XLS -> true,false
       | Loggers.Octave | Loggers.Matlab
       | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> false,false
@@ -344,7 +344,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           | Loggers.Js_Graph | Loggers.HTML
           | Loggers.HTML_Tabular
           | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-          | Loggers.XLS
+          | Loggers.XLS | Loggers.GEPHI
           | Loggers.Octave | Loggers.Matlab
           | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
         end
@@ -354,7 +354,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | Loggers.DOTNET
       | Loggers.SBML -> Loggers.open_infinite_buffer ~mode:backend ()
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
-      | Loggers.HTML_Tabular
+      | Loggers.HTML_Tabular | Loggers.GEPHI
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS -> pre_logger
       | Loggers.Octave | Loggers.Matlab

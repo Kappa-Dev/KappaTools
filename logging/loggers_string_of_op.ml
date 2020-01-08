@@ -11,7 +11,7 @@ let string_of_un_op logger op =
       | Loggers.Octave | Loggers.Matlab
       | Loggers.Maple | Loggers.Mathematica -> "-"
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI 
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -26,7 +26,7 @@ let string_of_un_op logger op =
       | Loggers.Maple | Loggers.Mathematica
         -> "log"
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -41,7 +41,7 @@ let string_of_un_op logger op =
         ->
         "sqrt"
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -55,7 +55,7 @@ let string_of_un_op logger op =
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica ->
         "exp"
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -69,7 +69,7 @@ let string_of_un_op logger op =
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         -> "sin"
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -84,7 +84,7 @@ let string_of_un_op logger op =
         ->
         "cos"
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -98,7 +98,7 @@ let string_of_un_op logger op =
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica  ->
         "tan"
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
       | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -113,7 +113,7 @@ let string_of_un_op logger op =
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica ->
         "floor"
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -133,7 +133,7 @@ let string_of_compare_op logger op =
       | Loggers.DOTNET
       | Loggers.Maple | Loggers.Mathematica -> "="
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -149,7 +149,7 @@ let string_of_compare_op logger op =
         ->
         "!="
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.Matrix
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -166,7 +166,7 @@ let string_of_compare_op logger op =
         "<"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -182,7 +182,7 @@ let string_of_compare_op logger op =
         ">"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -201,7 +201,7 @@ let string_of_bin_op logger op =
       | Loggers.Mathematica  -> "mod"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -216,7 +216,7 @@ let string_of_bin_op logger op =
         -> "max"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -232,7 +232,7 @@ let string_of_bin_op logger op =
         "min"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -246,7 +246,7 @@ let string_of_bin_op logger op =
       | Loggers.Maple | Loggers.Mathematica | Loggers.Octave | Loggers.Matlab -> "/"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -261,7 +261,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "+"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -276,7 +276,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "-"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -291,7 +291,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "*"
       | Loggers.Json
       | Loggers.Matrix
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -307,7 +307,7 @@ let string_of_bin_op logger op =
       | Loggers.Json
       | Loggers.Matrix
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.GEPHI
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
 
@@ -326,7 +326,7 @@ let string_of_bin_bool_op logger op =
       | Loggers.Json
       | Loggers.Matrix
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.GEPHI
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
   | Operator.OR ->
@@ -340,7 +340,7 @@ let string_of_bin_bool_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "|"
       | Loggers.Matrix
       | Loggers.Json
-      | Loggers.DOT
+      | Loggers.DOT | Loggers.GEPHI
       | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -360,6 +360,6 @@ let string_of_un_bool_op logger op =
       | Loggers.Json
       | Loggers.Matrix
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.GEPHI
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end

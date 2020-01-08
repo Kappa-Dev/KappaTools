@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Dec 22 2018>
+  * Last modification: Time-stamp: <Jan 08 2020>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1284,7 +1284,12 @@ let compute_raw_internal_contact_map show_title state =
 let dump_raw_internal_contact_map state handler =
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
-  let error = Print_handler.dot_of_contact_map parameters error handler in
+  let error =
+    match Remanent_parameters.get_cm_format parameters with
+      | DOT ->  Print_handler.dot_of_contact_map parameters error handler
+      | GEPHI -> Print_handler.gexf_of_contact_map parameters error handler
+      | _ -> let error, () = warn parameters error __POS__ Exit () in error
+  in
   Remanent_state.set_errors error state
 
 let get_raw_internal_contact_map  =
@@ -1707,8 +1712,13 @@ let output_internal_contact_map ?logger
   let scc_contact_map =
     Remanent_state.get_internal_scc_decomposition_map state in
   let error =
-    Preprocess.dot_of_contact_map
-      ?logger parameters error handler scc_contact_map contact_map
+    match Remanent_parameters.get_cm_format parameters with
+    | DOT ->    Preprocess.dot_of_contact_map
+                  ?logger parameters error handler scc_contact_map contact_map
+    | GEPHI ->  Preprocess.gexf_of_contact_map
+                                  ?logger parameters error handler scc_contact_map contact_map
+
+    | _ -> let error, () = warn parameters error __POS__ Exit () in error 
   in
   set_errors error state
 
@@ -2154,4 +2164,5 @@ let output_symmetries
     state
 
 let get_data = Remanent_state.get_data
-  end
+
+end

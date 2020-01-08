@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Dec 30 2018>
+  * Last modification: Time-stamp: <Jan 08 2020>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1647,6 +1647,7 @@ let agent_trace
                             Remanent_parameters.get_local_trace_format
                               parameters
                           with
+                          | Remanent_parameters_sig.GEPHI -> Loggers.GEPHI
                           | Remanent_parameters_sig.DIM -> Loggers.Matrix
                           | Remanent_parameters_sig.DOT -> Loggers.DOT
                           | Remanent_parameters_sig.HTML -> Loggers.HTML_Graph
@@ -1657,7 +1658,7 @@ let agent_trace
                         in
                         let logger =
                           Graph_loggers_sig.extend_logger logger
-                        in 
+                        in
                         let error =
                           print
                             logger parameters compil
