@@ -187,7 +187,7 @@ let onload () =
   let () =
       select_stories_dom##.onchange :=
         Dom_html.handler (fun _ ->
-            let () = Lwt.async set_a_story in Js._false) in
+            let _ = set_a_story () in Js._false) in
   let () =
       (Tyxml_js.To_dom.of_button launch_button)##.onclick :=
         Dom_html.handler (fun _ ->
