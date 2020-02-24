@@ -8,12 +8,12 @@
 
 open Lwt.Infix
 
-let refresh =
-  Api_common.result_bind_lwt
-    ~ok:(fun () ->
-        State_file.sync ~reset:true () >>=
-        fun r -> State_simulation.refresh () >>=
-        fun r' -> Lwt.return (Api_common.result_combine [r; r']))
+let refresh r =
+  let r' = State_file.sync ~reset:true () in
+  let r'' = State_simulation.refresh () in
+  r' >>= fun r' ->
+  r'' >>= fun r'' ->
+  Lwt.return (Api_common.result_combine [r; r'; r''])
 
 let create_project (project_id : string) : unit =
   Common.async
