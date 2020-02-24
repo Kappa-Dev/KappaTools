@@ -30,6 +30,7 @@ let rightsubpanel () =
        ; "influences",  None, (Tab_influences.navli ())
        ; "constraints", None, (Tab_constraints.navli ())
        ; "polymers",    None, (Tab_polymers.navli ())
+       ; "pattern",    None, (Tab_pattern.navli ())
        ];
      Ui_common.navcontent
        ~id:rightsubpanel_id
@@ -38,6 +39,7 @@ let rightsubpanel () =
        ; "influences",  [], (Tab_influences.content ())
        ; "constraints", [], (Tab_constraints.content ())
        ; "polymers", [], (Tab_polymers.content ())
+       ; "pattern", [], (Tab_pattern.content ())
        ]]
 
 let content () =
@@ -61,12 +63,14 @@ let childs_hide b =
     let () = Tab_contact_map.parent_hide () in
     let () = Tab_influences.parent_hide () in
     let () = Tab_constraints.parent_hide () in
-    Tab_polymers.parent_hide ()
+    let () = Tab_polymers.parent_hide () in
+    Tab_pattern.parent_hide ()
   else
     let () = Tab_contact_map.parent_shown () in
     let () = Tab_influences.parent_shown () in
     let () = Tab_constraints.parent_shown () in
-    Tab_polymers.parent_shown ()
+    let () = Tab_polymers.parent_shown () in
+    Tab_pattern.parent_shown ()
 
 let init_dead_rules () =
   React.S.l1
@@ -209,6 +213,7 @@ let onload () =
   let () = Tab_influences.onload () in
   let () = Tab_constraints.onload () in
   let () = Tab_polymers.onload () in
+  let () = Tab_pattern.onload () in
   let _ = React.S.map childs_hide Subpanel_editor.editor_full in
   let () = Common.jquery_on
       "#naveditor" "hide.bs.tab" (fun _ -> childs_hide true) in
@@ -222,4 +227,5 @@ let onresize () : unit =
   let () = Tab_influences.onresize () in
   let () = Tab_constraints.onresize () in
   let () = Tab_polymers.onresize () in
+  let () = Tab_pattern.onresize () in
   ()
