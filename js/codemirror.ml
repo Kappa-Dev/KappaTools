@@ -47,8 +47,8 @@ let () = List.iter create_handler
 
 class type position =
   object
-    method ch : int Js.t Js.readonly_prop
-    method line : int Js.t Js.readonly_prop
+    method ch : int Js.readonly_prop
+    method line : int Js.readonly_prop
   end
 
 class type dimension =
@@ -299,6 +299,8 @@ class type codemirror =
        unit) -> unit Js.meth
 
     method setCursor : position Js.t -> unit Js.meth
+
+    method getCursor : position Js.t Js.meth
 
     method setSelection : position Js.t -> position Js.t -> unit Js.meth
 

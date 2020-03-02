@@ -66,29 +66,30 @@ let dropdown (model : State_file.model) =
   let hide_on_empty l =
     if Mods.IntMap.is_empty model.State_file.directory then [] else l in
   let file_li =
+    let current_file_pos =
+      Option_util.map (fun {State_file.rank; _ } -> rank) model.State_file.current in
     List.map
-      (fun (rank, { State_file.id; State_file.local }) ->
+      (fun (rank, { State_file.name; State_file.local }) ->
          let compile = local = None in
-         let current_file = model.State_file.current in
          let li_class =
-           (if current_file = Some rank  then
+           (if current_file_pos = Some rank  then
               [ "active" ]
             else
               [])@["ui-state-sortable"]
          in
          Html.li
            ~a:[ Html.a_class li_class ;
-                element_set_filename id ; ]
-           [ Html.a ~a:[ element_set_filename id ; ]
+                element_set_filename name ; ]
+           [ Html.a ~a:[ element_set_filename name ; ]
                [ Html.div
                    ~a:[ Html.a_class [ "checkbox-control-div" ] ;
-                        element_set_filename  id ; ]
-                   [ file_checkbox id compile ;
+                        element_set_filename  name ; ]
+                   [ file_checkbox name compile ;
                      Html.span
                        ~a:[ Html.a_class [ "checkbox-control-label" ] ;
-                            element_set_filename id ;
+                            element_set_filename name ;
                           ]
-                       [ Html.cdata id ] ] ] ])
+                       [ Html.cdata name ] ] ] ])
       (Mods.IntMap.bindings model.State_file.directory) in
   let separator_li =
     hide_on_empty
@@ -148,7 +149,7 @@ let dropdown (model : State_file.model) =
   @ close_li
   @ export_li
 
-let content is_paused =
+let content =
   let li_list, li_handle = ReactiveData.RList.create [] in
   let _ =
     React.S.bind
@@ -170,12 +171,15 @@ let content is_paused =
              (Tyxml_js.R.filter_attrib
                 (Html.a_disabled ())
                 (React.S.l2
-                   (fun model is_paused ->
+                   (fun model file ->
                       match model.State_project.model_current_id with
-                      | Some _ -> is_paused
-                      | None -> true)
+                      | None -> true
+                      | Some _ ->
+                        match file.State_file.current with
+                        | None -> false
+                        | Some { State_file.out_of_sync; _ } -> out_of_sync)
                    State_project.model
-                   is_paused
+                   State_file.model
                 )
              );
            ]

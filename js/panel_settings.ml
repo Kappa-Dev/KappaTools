@@ -358,7 +358,11 @@ module ButtonStart : Ui_common.Div = struct
             Html.a_class [ "btn" ; "btn-default" ; ];
             (Tyxml_js.R.filter_attrib
                (Html.a_disabled ())
-               Subpanel_editor.is_paused
+               (React.S.map (function
+                    | { State_file.current = Some { State_file.out_of_sync; _ }; _ } ->
+                      out_of_sync
+                    | _ -> false)
+                   State_file.model)
             );
 
           ]
