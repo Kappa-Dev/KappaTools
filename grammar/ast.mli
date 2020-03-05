@@ -188,3 +188,10 @@ val compil_to_json : parsing_compil -> Yojson.Basic.t
 
 val write_parsing_compil : Bi_outbuf.t -> parsing_compil -> unit
 val read_parsing_compil : Yojson.lexer_state -> Lexing.lexbuf -> parsing_compil
+
+(** {6 mixture locations} *)
+type mixture_locator
+
+val feed_locator : parsing_compil -> mixture_locator
+
+val find_in_locator : string -> Locality.position -> mixture_locator -> mixture option

@@ -1289,3 +1289,94 @@ let write_parsing_compil b ast =
 
 let read_parsing_compil p lb =
   compil_of_json (Yojson.Basic.read_json p lb)
+
+type mixture_locator = mixture Locality.annot list
+
+let extract_agent_range = function
+  | Absent l -> l
+  | Present ((_,b),_sites,_) -> b
+
+let extract_mixture_range = function
+  | [] -> Locality.dummy
+  | [] :: _ -> Locality.dummy
+  | (h:: _) :: _ as m ->
+    let t = List_util.last (List_util.last m) in
+    Locality.merge (extract_agent_range h) (extract_agent_range t)
+
+let feed_one_mix acc m = (m,extract_mixture_range m)::acc
+let feed_one_expr = Alg_expr.fold_on_mixture feed_one_mix
+
+let feed_one_rule_content acc = function
+  | Edit { mix; delta_token } ->
+    List.fold_left
+      (fun acc (a,_) -> feed_one_expr acc a)
+      (feed_one_mix acc mix)
+      delta_token
+  | Arrow { lhs; rhs; rm_token; add_token } ->
+    List.fold_left
+      (fun acc (a,_) -> feed_one_expr acc a)
+      (List.fold_left
+         (fun acc (a,_) -> feed_one_expr acc a)
+         (feed_one_mix (feed_one_mix acc rhs) lhs)
+         rm_token)
+      add_token
+
+let feed_one_rule
+    acc { rewrite; k_def; k_op; k_un; k_op_un; bidirectional = _ } =
+  let one = feed_one_rule_content acc rewrite in
+  let two = feed_one_expr one k_def in
+  let three = Option_util.fold feed_one_expr two k_op in
+  let four = Option_util.fold
+      (fun acc (a,d) -> Option_util.fold feed_one_expr (feed_one_expr acc a) d)
+      three k_un in
+  Option_util.fold
+    (fun acc (a,d) -> Option_util.fold feed_one_expr (feed_one_expr acc a) d)
+    four k_op_un
+
+let feed_one_print_expr acc = function
+  | Primitives.Alg_pexpr x -> feed_one_expr acc x
+  | Primitives.Str_pexpr _ -> acc
+
+let feed_one_modif acc = function
+  | APPLY (n,(r,_)) -> feed_one_expr (feed_one_rule acc r) n
+  | UPDATE (_,n) -> feed_one_expr acc n
+  | STOP s -> List.fold_left feed_one_print_expr acc s
+  | SNAPSHOT s -> List.fold_left feed_one_print_expr acc s
+  | PRINT (f,s) ->
+    List.fold_left feed_one_print_expr (List.fold_left feed_one_print_expr acc f) s
+  | PLOTENTRY -> acc
+  | CFLOWLABEL _ -> acc
+  | CFLOWMIX (_,m) -> m::acc
+  | DIN (_,s) -> List.fold_left feed_one_print_expr acc s
+  | DINOFF s -> List.fold_left feed_one_print_expr acc s
+  | SPECIES_OF (_,p,m) -> List.fold_left feed_one_print_expr (m::acc) p
+
+let feed_one_perturbation acc ((_,cond,mods,rep),_) =
+  let one =
+    Option_util.fold (Alg_expr.fold_bool_on_mixture feed_one_mix) acc cond in
+  let two =
+    Option_util.fold (Alg_expr.fold_bool_on_mixture feed_one_mix) one rep in
+  List.fold_left feed_one_modif two mods
+
+let feed_locator
+    { filenames = _; volumes = _; configurations = _; tokens = _;
+      variables; signatures = _; rules; observables; init; perturbations } =
+  (*let zero = List.fold_left feed_one_agent [] signatures in*)
+  let one = List.fold_left feed_one_expr [] observables in
+  let two =
+    List.fold_left (fun acc (_,a) -> feed_one_expr acc a) one variables in
+  let three =
+    List.fold_left
+      (fun acc (a,m) ->
+         match m with
+         | INIT_TOK _ -> feed_one_expr acc a
+         | INIT_MIX m -> m::(feed_one_expr acc a))
+      two
+      init in
+  let four =
+    List.fold_left (fun acc (_,(r,_)) -> feed_one_rule acc r) three rules in
+  List.fold_left feed_one_perturbation four perturbations
+
+let find_in_locator file pos locator =
+  List.find_opt (fun (_,x) -> Locality.is_included_in file pos x) locator |>
+  Option_util.map fst
