@@ -447,6 +447,13 @@ class manager
       `DELETE
       (JsonUtil.read_of_string Yojson.Basic.read_null)
 
+  method mixture_at_position id { Locality.line; Locality.chr } =
+    send
+      ?timeout request_count
+      (Format.sprintf "%s/v2/projects/%s/files/%s/mixture?line=%i&chr=%i" url project_id id line chr)
+      `GET
+      (JsonUtil.read_of_string Kappa_mixtures.User_graph.read_connected_component)
+
   method project_overwrite file_id ast =
     send
       ?timeout request_count

@@ -16,7 +16,8 @@ type item = {
 type catalog = {
   elements : (string,item) Hashtbl.t;
   index : string option Mods.DynArray.t;
-  ast : Ast.parsing_compil option ref;
+  mutable ast : Ast.parsing_compil option;
+  mutable mixture_locator : Ast.mixture_locator option;
 }
 
 type catalog_item = {
@@ -44,7 +45,8 @@ let read_catalog_item p lb =
 let create () = {
   elements = Hashtbl.create 1;
   index = Mods.DynArray.create 1 None;
-  ast = ref None;
+  ast = None;
+  mixture_locator = None
 }
 
 let put ~position:(rank) ~id ~content catalog =
@@ -52,7 +54,8 @@ let put ~position:(rank) ~id ~content catalog =
   match Mods.DynArray.get catalog.index rank with
   | None ->
     let () = Mods.DynArray.set catalog.index rank (Some id) in
-    let () = catalog.ast := None in
+    let () = catalog.ast <- None in
+    let () = catalog.mixture_locator <- None in
     Result.Ok ()
   | Some aie ->
     Result.Error
@@ -78,7 +81,8 @@ let file_patch ~id content catalog =
   | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
   | [ { rank; _ } ] ->
     let () = Hashtbl.replace catalog.elements id { rank; content } in
-    let () = catalog.ast := None in
+    let () = catalog.ast <- None in
+    let () = catalog.mixture_locator <- None in
     Result.Ok ()
 
 let file_delete ~id catalog =
@@ -88,7 +92,8 @@ let file_delete ~id catalog =
   | [ { rank; _ } ] ->
       let () = Mods.DynArray.set catalog.index rank None in
       let () = Hashtbl.remove catalog.elements id in
-      let () = catalog.ast := None in
+      let () = catalog.ast <- None in
+      let () = catalog.mixture_locator <- None in
       Result.Ok ()
 
 let file_get ~id catalog =
@@ -106,7 +111,7 @@ let catalog catalog =
     catalog.index []
 
 let parse yield catalog =
-  match !(catalog.ast) with
+  match catalog.ast with
   | Some compile -> Lwt.return (Result_util.ok compile)
   | None ->
     Mods.DynArray.fold_righti
@@ -142,7 +147,8 @@ let parse yield catalog =
                  Lwt.return (compile,(Locality.dummy_annot message)::err))
       ) catalog.index (Lwt.return (Ast.empty_compil,[])) >>= function
     | compile, [] ->
-      let () = catalog.ast := Some compile in
+      let () = catalog.ast <- Some compile in
+      let () = catalog.mixture_locator <- Some (Ast.feed_locator compile) in
       Lwt.return (Result_util.ok compile)
     | _, err ->
       let err = List.map
@@ -163,4 +169,11 @@ let overwrite filename ast catalog =
       (fun i _ -> Mods.DynArray.set catalog.index i None)
       catalog.index in
   let () = Mods.DynArray.set catalog.index 0 (Some filename) in
-  catalog.ast := Some ast
+  let () = catalog.ast <- Some ast in
+  catalog.mixture_locator <- Some (Ast.feed_locator ast)
+
+let mixture_at_position filename pos catalog =
+  match Option_util.bind
+          (Ast.find_in_locator filename pos) catalog.mixture_locator with
+  | None -> [||]
+  | Some g -> Ast.mixture_to_user_graph g

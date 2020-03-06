@@ -13,6 +13,7 @@ type _ handle =
   | Catalog : Kfiles.catalog_item list handle
   | Info : (string * int) handle
   | Ast : Ast.parsing_compil handle
+  | Mixture : User_graph.connected_component handle
 
 type box =
     B : 'a handle * int * ('a, Result_util.message list) Result_util.t -> box
@@ -84,6 +85,13 @@ let on_message yield post =
                            JsonUtil.read_next_item Yojson.Basic.read_string st b in
                          let out = Kfiles.file_delete ~id catalog in
                          Lwt.return (B (Nothing, msg_id, lift_answer out))
+                       | "MixtureAt" ->
+                         let id =
+                           JsonUtil.read_next_item Yojson.Basic.read_string st b in
+                         let pos =
+                           JsonUtil.read_next_item Locality.read_position st b in
+                         let out = Kfiles.mixture_at_position id pos catalog in
+                         Lwt.return (B (Mixture, msg_id, Result_util.ok out))
                        | "ProjectParse" ->
                          Lwt.bind
                            (Kfiles.parse yield catalog)
@@ -111,6 +119,8 @@ let on_message yield post =
          | B (Catalog, msg_id, x) -> reply post write_catalog_items msg_id x
          | B (Nothing, msg_id, x) -> reply post Yojson.Basic.write_null msg_id x
          | B (Ast, msg_id, x) -> reply post Ast.write_parsing_compil msg_id x
+         | B (Mixture, msg_id, x) ->
+           reply post User_graph.write_connected_component msg_id x
          | B (Info, msg_id, x) ->
            reply post
              (JsonUtil.write_compact_pair

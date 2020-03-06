@@ -13,6 +13,7 @@ type _ handle =
   | Strings : string list handle
   | Catalog : Kfiles.catalog_item list handle
   | Info : (string * int) handle
+  | Mixture : User_graph.connected_component handle
   | Ast : Ast.parsing_compil handle
   | JSON : Yojson.Basic.t handle
   | Influence_map :
@@ -79,6 +80,9 @@ let receive mailbox x =
                 (read_result
                    (JsonUtil.read_compact_pair
                       Yojson.Basic.read_string Yojson.Basic.read_int) p lb)
+            | B (Mixture, thread) ->
+              Lwt.wakeup thread
+                (read_result User_graph.read_connected_component p lb)
             | B (Ast, thread) ->
               Lwt.wakeup thread
                 (read_result Ast.read_parsing_compil p lb)
@@ -228,6 +232,13 @@ class virtual new_client ~is_running ~post mailbox = object(self)
            (fun b -> Yojson.Basic.write_string b "ProjectOverwrite");
            (fun b -> Yojson.Basic.write_string b file_id);
            (fun b -> Ast.write_parsing_compil b ast);
+         ])
+  method mixture_at_position file_id pos =
+    self#message Mixture
+      (fun b -> JsonUtil.write_sequence b [
+           (fun b -> Yojson.Basic.write_string b "MixtureAt");
+           (fun b -> Yojson.Basic.write_string b file_id);
+           (fun b -> Locality.write_position b pos);
          ])
   (* KaSa *)
     method init_static_analyser_raw compil =

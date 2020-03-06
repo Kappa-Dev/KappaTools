@@ -414,6 +414,33 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
+        { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}/mixture" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let (project_id,file_id) = file_ref context in
+            let request = context.Webapp_common.request in
+            let uri = Cohttp.Request.uri request in
+            let line =
+              int_of_string
+                (Option_util.unsome "0" (Uri.get_query_param uri "line")) in
+            let chr =
+              int_of_string
+                (Option_util.unsome "0" (Uri.get_query_param uri "chr")) in
+            bind_projects
+              (fun manager ->
+                 manager#mixture_at_position file_id {Locality.line; Locality.chr})
+              project_id projects >>=
+            (Webapp_common.api_result_response
+               ~string_of_success:
+                 (JsonUtil.string_of_write
+                    (Kappa_mixtures.User_graph.write_connected_component)
+                    ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
     { Webapp_common.path = "/v2/projects/{projectid}/simulation" ;
       Webapp_common.operation =
         fun ~context ->

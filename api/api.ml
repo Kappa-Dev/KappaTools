@@ -28,6 +28,9 @@ class type virtual manager_model = object
 
   method project_overwrite : string -> Ast.parsing_compil -> unit result Lwt.t
 
+  method mixture_at_position :
+    string -> Locality.position -> User_graph.connected_component result Lwt.t
+
   method file_catalog : Kfiles.catalog_item list result Lwt.t
 
   method file_create : int -> string -> string -> unit result Lwt.t

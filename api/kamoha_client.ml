@@ -11,6 +11,7 @@ type _ handle =
   | Catalog : Kfiles.catalog_item list handle
   | Info : (string * int) handle
   | Ast : Ast.parsing_compil handle
+  | Mixture : User_graph.connected_component handle
 
 type box =
     B : 'a handle * ('a,Result_util.message list) Result_util.t Lwt.u -> box
@@ -44,7 +45,10 @@ let receive mailbox x =
                       Yojson.Basic.read_string Yojson.Basic.read_int) p lb)
             | B (Ast, thread) ->
               Lwt.wakeup thread
-                (read_result Ast.read_parsing_compil p lb) in
+                (read_result Ast.read_parsing_compil p lb)
+            | B (Mixture, thread) ->
+              Lwt.wakeup thread
+                (read_result User_graph.read_connected_component p lb) in
           Hashtbl.remove mailbox id))
     x
 
@@ -134,5 +138,13 @@ class virtual new_client ~post mailbox :
            (fun b -> Yojson.Basic.write_string b "ProjectOverwrite");
            (fun b -> Yojson.Basic.write_string b file_id);
            (fun b -> Ast.write_parsing_compil b ast);
+         ])
+
+  method mixture_at_position file_id pos =
+    self#message Mixture
+      (fun b -> JsonUtil.write_sequence b [
+           (fun b -> Yojson.Basic.write_string b "MixtureAt");
+           (fun b -> Yojson.Basic.write_string b file_id);
+           (fun b -> Locality.write_position b pos);
          ])
 end

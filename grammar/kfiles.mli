@@ -41,3 +41,6 @@ val parse :
   (Ast.parsing_compil, Result_util.message list) Result_util.t Lwt.t
 
 val overwrite : string -> Ast.parsing_compil -> catalog -> unit
+
+val mixture_at_position :
+  string -> Locality.position -> catalog -> User_graph.connected_component

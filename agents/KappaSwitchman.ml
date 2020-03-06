@@ -15,6 +15,7 @@ type _ handle =
   | Strings : string list handle
   | Catalog : Kfiles.catalog_item list handle
   | Info : (string * int) handle
+  | Mixture : Kappa_mixtures.User_graph.connected_component handle
   | Ast : Ast.parsing_compil handle
   | JSON : Yojson.Basic.t handle
   | Influence_map :
@@ -112,6 +113,13 @@ let on_message exec_command message_delimiter =
                            JsonUtil.read_next_item Yojson.Basic.read_string st b in
                          manager#file_delete id >>= fun out ->
                          Lwt.return (B (Nothing, msg_id, out))
+                       | "MixtureAt" ->
+                         let file =
+                           JsonUtil.read_next_item Yojson.Basic.read_string st b in
+                         let pos =
+                           JsonUtil.read_next_item Locality.read_position st b in
+                         manager#mixture_at_position file pos >>= fun out ->
+                         Lwt.return (B (Mixture, msg_id, out))
                        | "ProjectOverwrite" ->
                          let id =
                            JsonUtil.read_next_item Yojson.Basic.read_string st b in
@@ -318,6 +326,9 @@ let on_message exec_command message_delimiter =
          | B (Strings, msg_id, x) ->
            reply post (JsonUtil.write_list Yojson.Basic.write_string) msg_id x
          | B (Ast, msg_id, x) -> reply post Ast.write_parsing_compil msg_id x
+         | B (Mixture, msg_id, x) ->
+           reply
+             post (Kappa_mixtures.User_graph.write_connected_component) msg_id x
          | B (JSON, msg_id, x) -> reply post Yojson.Basic.write_json msg_id x
          | B (Info, msg_id, x) ->
            reply post
