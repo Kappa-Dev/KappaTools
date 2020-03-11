@@ -555,6 +555,7 @@ let refine_mixture_in_rule parameters error prefix_size empty_size tail_size mix
   error,mixture
 
 let refine_mixture parameters error mixture =
+  let mixture = List.flatten mixture in
   let remanent =
     collect_binding_label
       parameters
@@ -821,9 +822,12 @@ let translate_compil parameters error compil =
     let (ast_lhs,ast_rhs),(prefix,tail_lhs,tail_rhs) =
       match rule.Ast.rewrite with
       | Ast.Edit e ->
-        Ast.split_mixture e.Ast.mix, (List.length e.Ast.mix, 0, 0)
+        let (l,r) = Ast.split_mixture e.Ast.mix in
+        (List.flatten l, List.flatten r), (List.length e.Ast.mix, 0, 0)
       | Ast.Arrow a ->
-        (a.Ast.lhs,a.Ast.rhs), longuest_prefix a.Ast.lhs a.Ast.rhs in
+        let l = List.flatten a.Ast.lhs in
+        let r = List.flatten a.Ast.rhs in
+        (l,r), longuest_prefix l r in
     if
       Remanent_parameters.get_syntax_version parameters = Ast.V4
       && (tail_lhs>0 || tail_rhs>0 )

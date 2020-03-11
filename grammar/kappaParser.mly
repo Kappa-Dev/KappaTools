@@ -175,7 +175,7 @@ effect:
     | TRACK LABEL boolean
 	    {Ast.CFLOWLABEL ($3,($2,rhs_pos 2))}
     | TRACK pattern boolean
-	    {Ast.CFLOWMIX ($3,($2,rhs_pos 2))}
+	    {Ast.CFLOWMIX ($3,([$2],rhs_pos 2))}
     | FLUX nonempty_print_expr boolean
 	   {if $3 then Ast.DIN (Primitives.RELATIVE,$2) else Ast.DINOFF $2}
     | FLUX nonempty_print_expr STRING boolean
@@ -306,19 +306,19 @@ sum_token:
 
 rule_content:
   | pattern token_expr arrow pattern token_expr
-    {Ast.Arrow {Ast.lhs=$1; Ast.rm_token = $2; Ast.rhs=$4; Ast.add_token = $5},
+    {Ast.Arrow {Ast.lhs=[$1]; Ast.rm_token = $2; Ast.rhs=[$4]; Ast.add_token = $5},
      $3}
   | pattern token_expr arrow token_expr
-    {Ast.Arrow {Ast.lhs=$1; Ast.rm_token = $2; Ast.rhs=[]; Ast.add_token = $4},
+    {Ast.Arrow {Ast.lhs=[$1]; Ast.rm_token = $2; Ast.rhs=[]; Ast.add_token = $4},
      $3}
   | token_expr arrow pattern token_expr
-    {Ast.Arrow {Ast.lhs=[]; Ast.rm_token = $1; Ast.rhs=$3; Ast.add_token = $4},
+    {Ast.Arrow {Ast.lhs=[]; Ast.rm_token = $1; Ast.rhs=[$3]; Ast.add_token = $4},
      $2}
   | token_expr arrow token_expr
     {Ast.Arrow {Ast.lhs=[]; Ast.rm_token = $1; Ast.rhs=[]; Ast.add_token = $3},
      $2}
   | pattern token_expr
-    { Ast.Edit {Ast.mix = $1; Ast.delta_token = $2},false };
+    { Ast.Edit {Ast.mix = [$1]; Ast.delta_token = $2},false };
   | PIPE sum_token
     { Ast.Edit {Ast.mix = []; Ast.delta_token = $2},false };
 
@@ -421,9 +421,9 @@ pattern:
 
 non_empty_mixture:
     | ID OP_PAR interface_expression CL_PAR
-    { [Ast.Present (($1,rhs_pos 1), $3, None)] }
+    { [[Ast.Present (($1,rhs_pos 1), $3, None)]] }
     | ID OP_PAR interface_expression CL_PAR COMMA pattern
-    { Ast.Present (($1,rhs_pos 1), $3, None) :: $6}
+    { [Ast.Present (($1,rhs_pos 1), $3, None) :: $6]}
     ;
 
 mod_agent:

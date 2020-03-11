@@ -39,7 +39,7 @@ type agent =
   | Present of string Locality.annot * site list * agent_mod option
   | Absent of Locality.t
 
-type mixture = agent list
+type mixture = agent list list
 
 type edit_notation = {
   mix: mixture;

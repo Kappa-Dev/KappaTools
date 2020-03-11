@@ -202,8 +202,15 @@ agent:
 
 pattern:
   | agent COMMA annot pattern
-    { let (x,_,_) = $1 in let (y,pend,p) = $4 in (x::y,pend,p) }
-  | agent { let (x,pend,p) = $1 in ([x],pend,p) }
+{ let (x,_,_) = $1 in
+  match $4 with
+  | (y::z,pend,p) -> ((x::y)::z,pend,p)
+  | ([],_,_) ->
+     raise (ExceptionDefn.Internal_Error
+              (add_pos 4 ("assertion failure in pattern parsing"))) }
+  | agent BACKSLASH annot pattern
+{ let (x,_,_) = $1 in let (y,pend,p) = $4 in ([x]::y,pend,p) }
+  | agent { let (x,pend,p) = $1 in ([[x]],pend,p) }
   ;
 
 constant:
