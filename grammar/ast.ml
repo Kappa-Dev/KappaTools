@@ -479,6 +479,96 @@ let to_created_mixture =
          | Absent pos -> Absent pos
          | Present (n,s,_) -> Present (n,s,Some Create)))
 
+let to_dummy_user_link = function
+  | [] | [ LKappa.LNK_ANY, _ ] -> User_graph.WHATEVER
+  | [ LKappa.ANY_FREE, _ ] -> User_graph.LINKS []
+  | [ LKappa.LNK_VALUE (x, _), _ ] -> User_graph.LINKS [ ((-1,-1),x)]
+  | [ LKappa.LNK_FREE, _ ] -> User_graph.LINKS []
+  | [ LKappa.LNK_SOME, _ ] -> User_graph.SOME
+  | [ LKappa.LNK_TYPE ((ty,_), (si,_)), _ ] -> User_graph.TYPE (ty,si)
+  | _ :: _ :: _ -> assert false (* TODO *)
+
+let to_dummy_user_internal = function
+  | [] -> Some []
+  | [ (None, _) ] -> None
+  | [ (Some st, _) ] -> Some [st]
+  | _ :: _ :: _ as l -> Some (List_util.map_option fst l)
+
+let to_dummy_user_site = function
+  | Port { port_nme; port_int; port_int_mod = _; port_lnk; port_lnk_mod = _} -> {
+      User_graph.site_name = fst port_nme;
+      User_graph.site_type = User_graph.Port {
+          User_graph.port_links = to_dummy_user_link port_lnk;
+          User_graph.port_states = to_dummy_user_internal port_int;
+        };
+    }
+  | Counter { count_nme; count_test = _; count_delta = _ } -> {
+      User_graph.site_name = fst count_nme;
+      User_graph.site_type = User_graph.Counter (-1); (* TODO *)
+    }
+
+let to_dummy_user_agent = function
+  | Absent _ -> None
+  | Present ((na,_),s,_mods) -> Some {
+      User_graph.node_type = na;
+      User_graph.node_sites = Tools.array_map_of_list to_dummy_user_site s;
+    }
+
+let setup_link m ((line,row),site) va =
+  match m.(line).(row) with
+  | None -> ()
+  | Some { User_graph.node_sites ; _ } ->
+    let s = node_sites.(site) in
+    match s.User_graph.site_type with
+    | User_graph.Counter _ -> ()
+    | User_graph.Port p ->
+      node_sites.(site) <-
+        {
+          User_graph.site_name = s.User_graph.site_name;
+          User_graph.site_type = User_graph.Port {
+              User_graph.port_links = User_graph.LINKS [va];
+              User_graph.port_states = p.User_graph.port_states;
+            }
+        }
+
+let mixture_to_user_graph m =
+  let out =
+    Tools.array_map_of_list (Tools.array_map_of_list to_dummy_user_agent) m in
+  let acc =
+    Tools.array_fold_lefti
+      (fun line ->
+         Tools.array_fold_lefti
+           (fun row acc -> function
+              | None -> acc
+              | Some { User_graph.node_sites ; _ } ->
+                Tools.array_fold_lefti
+                  (fun site acc -> function
+                     | { User_graph.site_type = User_graph.Port
+                           { User_graph.port_links = User_graph.LINKS [];_};_} ->
+                       acc
+                     | { User_graph.site_type = User_graph.Port
+                           { User_graph.port_links = User_graph.LINKS (_::_::_);_};_} ->
+                       assert false
+                     | { User_graph.site_type = User_graph.Port
+                            { User_graph.port_links  = ( User_graph.WHATEVER
+                                                       | User_graph.SOME
+                                                       | User_graph.TYPE (_, _));_};_} -> acc
+                     | { User_graph.site_type = User_graph.Counter _;_} -> acc
+                     | { User_graph.site_type = User_graph.Port
+                             { User_graph.port_links = User_graph.LINKS [_,id];_};_} ->
+                       match Mods.IntMap.pop id acc with
+                       | (None, acc') -> Mods.IntMap.add id ((line,row),site) acc'
+                       | (Some va, acc') ->
+                         let va' = ((line,row),site) in
+                         let () = setup_link out va va' in
+                         let () = setup_link out va' va in
+                         acc')
+                  acc node_sites))
+      Mods.IntMap.empty
+      out in
+  let () = assert (Mods.IntMap.is_empty acc) in
+  out
+
 let init_to_json ~filenames f_mix f_var = function
   | INIT_MIX m ->
     `List [`String "mixture"; Locality.annot_to_yojson ~filenames f_mix m ]

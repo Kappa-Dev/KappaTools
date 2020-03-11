@@ -41,6 +41,8 @@ type agent =
 
 type mixture = agent list list
 
+val mixture_to_user_graph : mixture -> User_graph.connected_component
+
 type edit_notation = {
   mix: mixture;
   delta_token: ((mixture,string) Alg_expr.e Locality.annot
