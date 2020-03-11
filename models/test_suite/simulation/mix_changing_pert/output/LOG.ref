@@ -1,0 +1,19 @@
+Parsing not_found.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 4 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (10 agents)
+Done
++ Command line to rerun is: 'KaSim' '-d' 'output' '-seed' '20543' 'not_found.ka' '-syntax' '4'
+____________________________________________________________
+############################################################
+Simulation ended
