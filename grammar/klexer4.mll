@@ -46,6 +46,7 @@ rule token = parse
   | ';' { SEMICOLON }
   | '@' { AT }
   | ',' { COMMA }
+  | '\\' {BACKSLASH}
   | '(' { OP_PAR }
   | ')' { CL_PAR }
   | '[' { OP_BRA }
