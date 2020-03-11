@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 type links =
-  | LINKS of (int * int) list
+  | LINKS of ((int * int) * int) list
   | WHATEVER
   | SOME
   | TYPE of string * string
@@ -32,7 +32,18 @@ type cc_node = {
   node_sites: cc_site array;
 }
 
-type connected_component = cc_node option array
+type connected_component = cc_node option array array
+
+module LinkSetMap = SetMap.Make(struct
+    type t = (int * int) * int
+    let print =
+      Pp.pair
+        (Pp.pair Format.pp_print_int Format.pp_print_int)
+        Format.pp_print_int
+    let compare (x,y) (x',y') =
+      let c = Mods.int_pair_compare x x' in
+      if c=0 then Mods.int_compare y y' else c
+  end)
 
 let print_link (dandling,free_id) p f = function
   | WHATEVER -> Format.pp_print_string f "[#]"
@@ -41,7 +52,7 @@ let print_link (dandling,free_id) p f = function
   | LINKS [] -> Format.pp_print_string f "[.]"
   | LINKS l ->
     let myself =
-      ref (Mods.Int2Map.find_default Mods.Int2Map.empty p !dandling) in
+      ref (LinkSetMap.Map.find_default LinkSetMap.Map.empty p !dandling) in
     let () =
       Format.fprintf f"[%a]"
         (Pp.list
@@ -50,15 +61,15 @@ let print_link (dandling,free_id) p f = function
               let i =
                 if p = p' then -1 else
                   match Option_util.bind
-                          (Mods.Int2Map.find_option p)
-                          (Mods.Int2Map.find_option p' !dandling) with
+                          (LinkSetMap.Map.find_option p)
+                          (LinkSetMap.Map.find_option p' !dandling) with
                   | None ->
                     let () = incr free_id in
-                    let () = myself := Mods.Int2Map.add p' !free_id !myself in
+                    let () = myself := LinkSetMap.Map.add p' !free_id !myself in
                     !free_id
                   | Some va -> va in
               Format.fprintf f "%i" i)) l in
-    dandling := Mods.Int2Map.add p !myself !dandling
+    dandling := LinkSetMap.Map.add p !myself !dandling
 
 let print_port with_link node p id f =
   Format.fprintf f "%a%a"
@@ -91,8 +102,10 @@ let print_agent link node f = function
       ag.node_sites
 
 let print_cc f mix =
-  let link = Some (ref(Mods.Int2Map.empty),ref 0) in
-  Pp.array Pp.comma (print_agent link) f mix
+  let link = Some (ref(LinkSetMap.Map.empty),ref 0) in
+  Pp.array
+    (fun f -> Format.fprintf f "\\@ ")
+    (fun al -> Pp.array Pp.comma (fun ar -> print_agent link (al,ar))) f mix
 
 let get_color =
   let store = Hashtbl.create 10 in
@@ -106,44 +119,51 @@ let get_color =
 let print_dot_cc nb_cc f mix =
   Pp.array
     Pp.empty
-    (fun i f -> function
-       | None -> ()
-       | Some ag ->
-         Format.fprintf
-           f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
-           nb_cc i (print_agent None i) (Some ag)
-           (get_color ag.node_type);
-         Format.fprintf
-           f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;
+    (fun il -> Pp.array
+        Pp.empty
+        (fun ir f -> function
+           | None -> ()
+           | Some ag ->
+             Format.fprintf
+               f "node%d_%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
+               nb_cc il ir (print_agent None (il,ir)) (Some ag)
+               (get_color ag.node_type);
+             Format.fprintf
+               f "node%d_%d_%d -> counter%d [style=invis];@," nb_cc il ir nb_cc)) f mix;
   ignore @@
   Array.iteri
-    (fun a -> function
-       | None -> ()
-       | Some ag ->
-         Array.iteri
-           (fun s si ->
-              match si.site_type with
-              | Counter _ -> ()
-              | Port p ->
-                match p.port_links with
-                | WHATEVER -> assert false
-                | SOME -> assert false
-                | TYPE (_si,_ty) -> assert false
-                | LINKS links ->
-                  Pp.list
-                    Pp.empty
-                    (fun f (a',s') ->
-                       if a < a' || (a = a' && s < s') then
-                         match mix.(a') with
-                         | None -> assert false
-                         | Some ag' ->
-                           Format.fprintf
-                             f
-                             "node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];@,"
-                             nb_cc a nb_cc a' si.site_name
-                             ag'.node_sites.(s').site_name)
-                    f links)
-           ag.node_sites)
+    (fun al ->
+       Array.iteri
+         (fun ar -> function
+            | None -> ()
+            | Some ag ->
+              Array.iteri
+                (fun s si ->
+                   match si.site_type with
+                   | Counter _ -> ()
+                   | Port p ->
+                     match p.port_links with
+                     | WHATEVER -> assert false
+                     | SOME -> assert false
+                     | TYPE (_si,_ty) -> assert false
+                     | LINKS links ->
+                       Pp.list
+                         Pp.empty
+                         (fun f ((al',ar'),s') ->
+                            if al < al' ||
+                               (al = al' && (ar < ar' ||
+                                             (ar = ar' && s < s'))) then
+                              match mix.(al').(ar') with
+                              | None -> assert false
+                              | Some ag' ->
+                                Format.fprintf
+                                  f
+                                  "node%d_%d_%d -> node%d_%d_%d \
+                                   [taillabel=\"%s\", headlabel=\"%s\", dir=none];@,"
+                                  nb_cc al ar nb_cc al' ar' si.site_name
+                                  ag'.node_sites.(s').site_name)
+                         f links)
+                ag.node_sites))
     mix
 
 (*
@@ -169,7 +189,9 @@ let write_cc_port ob p =
           | LINKS l ->
             JsonUtil.write_list
               (JsonUtil.write_compact_pair
-                 Yojson.Basic.write_int Yojson.Basic.write_int) ob l)
+                 (JsonUtil.write_compact_pair
+                    Yojson.Basic.write_int Yojson.Basic.write_int)
+                 Yojson.Basic.write_int) ob l)
              ob p.port_links in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field
@@ -210,7 +232,9 @@ let links_of_yojson = function
     LINKS
       (JsonUtil.to_list
          (JsonUtil.compact_to_pair
-            (JsonUtil.to_int ?error_msg) (JsonUtil.to_int ?error_msg)) x)
+            (JsonUtil.compact_to_pair
+               (JsonUtil.to_int ?error_msg) (JsonUtil.to_int ?error_msg))
+            (JsonUtil.to_int ?error_msg)) x)
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect cc_port",x))
 
 let read_cc_port p lb =
@@ -272,9 +296,11 @@ let read_cc_node p lb =
        { node_type; node_sites })
     p lb
 
-let write_connected_component ob f = JsonUtil.write_array write_cc_node ob f
+let write_connected_component ob f =
+  JsonUtil.write_array (JsonUtil.write_array write_cc_node) ob f
 
-let read_connected_component ob f = Yojson.Basic.read_array read_cc_node ob f
+let read_connected_component ob f =
+  Yojson.Basic.read_array (Yojson.Basic.read_array read_cc_node) ob f
 
 let string_of_connected_component ?(len = 1024) x =
   let ob = Bi_outbuf.create len in

@@ -54,7 +54,7 @@ let print_snapshot ?uuid f s =
     s.snapshot_time
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "@[<hov 2>%%init: %i /*%i agents*/ %a@]" i
-           (Array.length mix)
+           (Array.fold_left (fun s e -> s + Array.length e) 0 mix)
            User_graph.print_cc mix))
     s.snapshot_agents
     (Pp.array Pp.space (fun _ f (na,el) ->

@@ -140,7 +140,7 @@ let site_type_to_json = function
         sitelinks,
         (match p.User_graph.port_links with
          | User_graph.LINKS l ->
-           JsonUtil.of_list (fun (x,y) -> `List [`Int x; `Int y]) l
+           JsonUtil.of_list (fun ((xl,xr),y) -> `List [`List [`Int xl; `Int xr]; `Int y]) l
          | User_graph.WHATEVER -> `Null
          | User_graph.SOME -> `Bool true
          | User_graph.TYPE (si,ty) ->
@@ -251,8 +251,7 @@ let contact_map_to_json contact_map =
      JsonUtil.of_pair
        ~lab1:accuracy_string ~lab2:map
        accuracy_to_json
-       (JsonUtil.of_array
-          site_node_to_json)
+       (JsonUtil.of_array (JsonUtil.of_array site_node_to_json))
        contact_map
     ]
 
@@ -268,7 +267,9 @@ let contact_map_of_json =
           accuracy_of_json
           (JsonUtil.to_array
              ~error_msg:(JsonUtil.build_msg "site nodes list")
-             site_node_of_json
+             (JsonUtil.to_array
+                ~error_msg:(JsonUtil.build_msg "site nodes list")
+                site_node_of_json)
           )
           json
   with

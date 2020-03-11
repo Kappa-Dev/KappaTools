@@ -446,7 +446,7 @@ let dump_c_compil state c_compil =
 
 (******************************************************************)
 
-let rename_link parameters handler error map (i,j) =
+let rename_link parameters handler error map ((_,i),j) =
   let error, agent =
     Handler.translate_agent
       ~message:"unknown agent type" ~ml_pos:(Some __POS__)
@@ -460,8 +460,8 @@ let rename_link parameters handler error map (i,j) =
       Mods.String2Map.find_option (agent,simplify_site site) map
   with
   | None ->
-    Exception.warn parameters error __POS__ Exit (0,0)
-  | Some (i,j) -> error, (i,j)
+    Exception.warn parameters error __POS__ Exit ((0,0),0)
+  | Some (i,j) -> error, ((0,i),j)
 
 let rename_links parameter handler error map = function
   | User_graph.LINKS l ->
@@ -1335,6 +1335,8 @@ let convert_contact_map_map_to_list sol =
               Tools.array_rev_of_list
                 (Mods.StringSetMap.Map.fold
                    (fun a (props,links) l ->
+                      let links =
+                        List.rev_map (fun (i,j) -> ((0,i),j)) (List.rev links) in
                       {
                         User_graph.site_name=a;
                         User_graph.site_type = User_graph.Port {
@@ -1397,7 +1399,7 @@ let convert_contact_map show_title state contact_map =
     reindex parameters error handler contact_map
   in
   Remanent_state.set_errors error state,
-  Array.of_list contact_map
+  [|Array.of_list contact_map|]
 
 let compute_contact_map
     ?(accuracy_level=Public_data.Low) _show_title =
@@ -1834,7 +1836,7 @@ let compute_raw_contact_map show_title state =
   let error, sol =
     reindex parameters error handler sol
   in
-  let sol = Array.of_list sol in
+  let sol = [|Array.of_list sol|] in
   Remanent_state.set_errors error
     (Remanent_state.set_contact_map Public_data.Low sol state),
   sol
@@ -1864,14 +1866,14 @@ let compute_signature show_title state =
              Array.fold_left
                (fun (state,acc) site ->
                   let x = site.User_graph.site_name in
-                  let states,binding =
+                  let states,rev_binding =
                     match site.User_graph.site_type with
                     | User_graph.Counter _ ->
                       failwith "KaSa does not deal with counters yet"
                     | User_graph.Port p ->
                       Option_util.unsome [] p.User_graph.port_states,
                       match p.User_graph.port_links with
-                      | User_graph.LINKS l -> l
+                      | User_graph.LINKS l -> List.rev_map (fun ((_,i),j) -> (i,j)) l
                       | SOME | WHATEVER | TYPE _ -> assert false in
                   let state, binding' =
                     List.fold_left
@@ -1889,7 +1891,7 @@ let compute_signature show_title state =
                              (Ckappa_sig.site_name_of_int y)
                          in
                          state,(Locality.dummy_annot sx, Locality.dummy_annot sy)::list)
-                      (state,[]) (List.rev binding)
+                      (state,[]) rev_binding
                   in
                   let states' =
                     NamedDecls.create
@@ -1907,7 +1909,7 @@ let compute_signature show_title state =
              NamedDecls.create
                (Array.of_list acc)
             ))::list)
-      (state,[]) l
+      (state,[]) l.(0)
   in
   let signature = Signature.create ~counters:[] true l in
   Remanent_state.set_signature signature state,

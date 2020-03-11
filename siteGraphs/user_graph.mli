@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 type links =
-  | LINKS of (int * int) list
+  | LINKS of ((int * int) * int) list
   | WHATEVER
   | SOME
   | TYPE of string * string
@@ -32,7 +32,7 @@ type cc_node = {
   node_sites: cc_site array;
 }
 
-type connected_component = cc_node option array
+type connected_component = cc_node option array array
 
 val print_cc : Format.formatter -> connected_component -> unit
 

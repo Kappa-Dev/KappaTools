@@ -65,7 +65,7 @@ class Site extends D3Object {
             let port = type[1];
 
 	    this.links = port.port_links.map(function(link) {
-                return new SiteLink(link[0],link[1]);
+                return new SiteLink(link[0][1],link[1]);
 	    });
 	    this.states = port.port_states.map(function(state) {
                 return new State(state, site);
@@ -321,11 +321,15 @@ class DataStorage {
         this.nodeCount = data.length;
         this.isSnapshot = isSnapshot;
         var tempData = [];
-        Object.keys(data).forEach(function(nodeData, i) {
-            let node = new Node(data[nodeData]);
-            node.setId(i);
-            tempData.push(node);
-        });
+	var i = 0;
+        data.forEach(function (line) {
+	    line.forEach(function (nodeData) {
+		let node = new Node(nodeData);
+		node.setId(i);
+		i++;
+		tempData.push(node)
+	    })
+	});
         this.data = tempData;
 
     }
