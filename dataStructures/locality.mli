@@ -35,6 +35,11 @@ val annot_to_yojson :
   ?filenames : int Mods.StringMap.t ->
   ('a -> Yojson.Basic.t) -> 'a annot -> Yojson.Basic.t
 
+val write_position : Bi_outbuf.t -> position -> unit
+
+val read_position :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> position
+
 val write_range : Bi_outbuf.t -> t -> unit
   (** Output a JSON value of type {!t}. *)
 

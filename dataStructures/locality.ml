@@ -67,6 +67,15 @@ let to_string loc = Format.asprintf "@[<h>%a@]" print loc
 let print_annot pr f (x,l) =
   Format.fprintf f "%a@ %a" print l pr x
 
+let read_position p lb =
+  match Yojson.Basic.from_lexbuf ~stream:true p lb with
+  | `Assoc [("line",`Int line);("chr", `Int chr)]
+  | `Assoc [("chr", `Int chr);("line",`Int line)] -> { line; chr }
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid position",x))
+
+let write_position ob { line; chr } =
+  Yojson.write_assoc ob [("line",`Int line);("chr", `Int chr)]
+
 let to_compact_yojson decls loc =
   if is_dummy loc then `Null
   else `Assoc
