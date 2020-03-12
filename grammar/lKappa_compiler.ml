@@ -820,10 +820,7 @@ let annotate_edit_mixture
     List.fold_left
       (List.fold_left
          (fun (lannot,acc,news) -> function
-            | Ast.Absent pos ->
-              raise
-                (ExceptionDefn.Malformed_Decl
-                   ("Absent agent cannot occurs in rule in edit notation",pos))
+            | Ast.Absent _ -> (lannot,acc,news)
             | Ast.Present (ty,sites,modif) ->
               let (intf,counts) = separate_sites sites in
               match modif with
