@@ -413,7 +413,7 @@ class manager
   method file_create pos id content =
     send
       ?timeout request_count
-      (Format.sprintf "%s/v2/projects/%s/files/%s/%i" url project_id id pos)
+      (Format.sprintf "%s/v2/projects/%s/files/%s/position/%i" url project_id id pos)
       `PUT ~data:(Yojson.Basic.to_string (`String content))
       (JsonUtil.read_of_string Yojson.Basic.read_null)
 
@@ -436,7 +436,7 @@ class manager
   method file_move pos id =
     send
       ?timeout request_count
-      (Format.sprintf "%s/v2/projects/%s/files/%s/%i" url project_id id pos)
+      (Format.sprintf "%s/v2/projects/%s/files/%s/position/%i" url project_id id pos)
       `POST
       (JsonUtil.read_of_string Yojson.Basic.read_null)
 

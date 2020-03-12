@@ -127,7 +127,7 @@ class KappaRest(KappaApi):
         return self._post(self.in_project('overwrite',file_id),ast)
 
     def file_create(self, file_):
-        return self._put(self.in_project('files', file_.get_id(), str(file_.get_position())), file_.get_content())
+        return self._put(self.in_project('files', file_.get_id(),'position',  str(file_.get_position())), file_.get_content())
 
     def file_delete(self, file_id):
         return self._delete(self.in_project('files', file_id))
