@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -61,7 +61,7 @@ val print_bool :
   Format.formatter -> ('a,'b) bool -> unit
 
 
-(** {6 Smart constructor } *)
+(** {2 Smart constructor } *)
 val const : Nbr.t -> ('a,'b) e Locality.annot
 val int : int -> ('a,'b) e Locality.annot
 val float : float -> ('a,'b) e Locality.annot
@@ -158,7 +158,7 @@ val fold_on_mixture :
 val fold_bool_on_mixture :
   ('a -> 'b -> 'a) -> 'a -> ('b, 'c) bool Locality.annot -> 'a
 
-(* Syntactic equality up to positions but not associativity and comutativity *)
+(** Syntactic equality up to positions but not associativity and comutativity *)
 val equal :
   ('a, 'b) e Locality.annot -> ('a, 'b) e Locality.annot -> pervasives_bool
 val equal_bool :

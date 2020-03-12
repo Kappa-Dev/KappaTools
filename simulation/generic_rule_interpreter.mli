@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -15,13 +15,13 @@ module Make (Instances:Instances_sig.S) : sig
   (** Clash means rectangular approximation failure
       Corrected means molecular ambiguity failure *)
 
-  (** {6 Initialisation} *)
+  (** {2 Initialisation} *)
 
   val empty :
     outputs:(Data.t -> unit) ->with_trace:bool ->
     Random.State.t -> Model.t -> Counter.t -> t
 
-  (** {6 algebraic expression computation} *)
+  (** {2 algebraic expression computation} *)
   (** [get_alg] is by default [Model.get_alg] but it is not hard
       wired because perturbations can redefined alg_expr.*)
 
@@ -34,7 +34,7 @@ module Make (Instances:Instances_sig.S) : sig
 
   val get_edges : t -> Edges.t
 
-  (** {6 Core} *)
+  (** {2 Core} *)
 
   val apply_given_rule :
     debugMode:bool -> outputs:(Data.t -> unit) ->
@@ -94,7 +94,7 @@ module Make (Instances:Instances_sig.S) : sig
 
   val send_instances_message : Instances.message -> t -> t
 
-  (** {6 Blocking events} *)
+  (** {2 Blocking events} *)
 
   type event_predicate =
     int option -> Matching.t ->
@@ -104,21 +104,21 @@ module Make (Instances:Instances_sig.S) : sig
 
   val set_events_to_block : event_predicate option -> t -> t
 
-  (** {6 Stories} *)
+  (** {2 Stories} *)
 
   val add_tracked :
     outputs:(Data.t -> unit) -> Pattern.id array -> string ->
     Instantiation.abstract Instantiation.test list list -> t -> t
   val remove_tracked : Pattern.id array -> string option -> t -> t
 
-  (** {6 Species} *)
+  (** {2 Species} *)
 
   val add_tracked_species :
     Pattern.id array -> string ->
     Instantiation.abstract Instantiation.test list list -> t -> t
   val remove_tracked_species : string -> t -> t
 
-  (** {6 Debugging} *)
+  (** {2 Debugging} *)
 
   type stats = { mixture_stats : Edges.stats }
 
@@ -127,7 +127,7 @@ module Make (Instances:Instances_sig.S) : sig
 
   val debug_print : Format.formatter -> t -> unit
 
-  (** {6 Internals } *)
+  (** {2 Internals } *)
   val apply_negative_transformation :
      ?mod_connectivity_store:Roots.mod_ccs_cache -> Instances.t ->
     (Instantiation.concrete Instantiation.site) list * Edges.t ->

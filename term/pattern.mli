@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -91,7 +91,7 @@ module PreEnv : sig
   val debug_print : Format.formatter -> t -> unit
 end
 
-(** {6 Create a connected component} *)
+(** {2 Create a connected component} *)
 type work (** type of a PreEnv during a pattern construction *)
 
 val empty_cc : Signature.s -> cc
@@ -115,7 +115,7 @@ val finish_new :
   debugMode:bool -> ?origin:Operator.rev_dep -> work ->
   (PreEnv.t*Renaming.t*cc*id)
 
-(** {6 Use a connected component } *)
+(** {2 Use a connected component } *)
 
 val compare_canonicals : id -> id -> int
 

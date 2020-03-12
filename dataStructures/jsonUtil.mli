@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -74,7 +74,7 @@ val read_variant:
   Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'b
 
 val smart_assoc: (string * Yojson.Basic.t) list -> Yojson.Basic.t
-(** Do not put fields whose value is 'null', '[]' or '{}' *)
+(** Do not put fields whose value is 'null', '[]' or '\{\}' *)
 
 val of_assoc:
   ('a  -> string * Yojson.Basic.t) -> 'a list -> Yojson.Basic.t
@@ -108,7 +108,7 @@ val read_compact_pair:
 val compact_to_pair :
   (Yojson.Basic.t -> 'a) -> (Yojson.Basic.t -> 'b) ->
   Yojson.Basic.t -> 'a * 'b
-  
+
 val of_triple:
     ?lab1:string -> ?lab2:string -> ?lab3:string ->
       ('a -> Yojson.Basic.t) -> ('b -> Yojson.Basic.t) ->

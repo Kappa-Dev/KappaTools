@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -22,7 +22,7 @@ val empty : Model.t -> t
 val debug_print : Format.formatter -> t -> unit
 
 
-(** {6 Updating the roots} *)
+(** {2 Updating the roots} *)
 
 val incorporate_extra_pattern : t -> Pattern.id -> IntCollection.t -> unit
 
@@ -38,7 +38,7 @@ val update_roots :
   Roots.mod_ccs_cache -> Pattern.Set.elt -> int -> unit
 
 
-(** {6 Counting instances} *)
+(** {2 Counting instances} *)
 
 val number_of_instances : ?rule_id:int -> t -> Pattern.id array -> int
 (** [number_of_instances ?rule_id state patterns] *)
@@ -48,7 +48,7 @@ val number_of_unary_instances_in_cc :
 (** [number_of_unary_instances_in_cc ?rule_id state (pat1, pat2) cc] *)
 
 
-(** {6 Picking instances} *)
+(** {2 Picking instances} *)
 
 val pick_unary_instance_in_cc :
 ?rule_id:int -> t -> Random.State.t -> Pattern.id * Pattern.id -> int -> int * int
@@ -68,7 +68,7 @@ val fold_picked_instance :
     the accumulator besomes `None`. *)
 
 
-(** {6 Enumerating instances} *)
+(** {2 Enumerating instances} *)
 
 val fold_instances :
   ?rule_id:int -> ?excp:(Pattern.id * int) ->
@@ -78,7 +78,7 @@ val fold_instances :
     Folds through every rectangular instance of an array of patterns. *)
 
 val fold_unary_instances :
-  ?rule_id:int -> t -> Pattern.id * Pattern.id -> 
+  ?rule_id:int -> t -> Pattern.id * Pattern.id ->
   init:'a -> (int * int -> 'a -> 'a) -> 'a
 (** [fold_unary_instances state (pat1, pat2) ~init f ]
     with [f (root1, root2) acc]. *)

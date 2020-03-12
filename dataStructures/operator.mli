@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -16,7 +16,7 @@ type bin_bool_op = AND | OR
 type un_bool_op = NOT
 type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
-(** {6 Printers} *)
+(** {2 Printers} *)
 
 val bin_alg_op_is_prefix : bin_alg_op -> bool
 val print_bin_alg_op :
@@ -36,7 +36,7 @@ val bin_bool_op_to_string : bin_bool_op -> string
 val un_bool_op_to_string : un_bool_op -> string
 val compare_op_to_string : compare_op -> string
 
-(** {6 Json } *)
+(** {2 Json } *)
 
 val bin_alg_op_to_json : bin_alg_op -> Yojson.Basic.t
 val bin_alg_op_of_json : Yojson.Basic.t -> bin_alg_op
@@ -51,7 +51,7 @@ val un_bool_op_of_json : Yojson.Basic.t -> un_bool_op
 val compare_op_to_json : compare_op -> Yojson.Basic.t
 val compare_op_of_json : Yojson.Basic.t -> compare_op
 
-(** {6 Dependencies management} *)
+(** {2 Dependencies management} *)
 
 type rev_dep = ALG of int | RULE of int | MODIF of int
 module DepSet : SetMap.Set with type elt = rev_dep

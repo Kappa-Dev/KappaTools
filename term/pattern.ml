@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -197,7 +197,7 @@ let are_compatible ~debugMode ?possibilities ~strict root1 cc1 root2 cc2 =
         true (Mods.IntMap.find_default [||] root2 cc2.nodes) in
     aux a_single_agent r [root1,root2]
 
-(** @returns injection from a to b *)
+(** @return injection from a to b *)
 let equal ~debugMode a b =
   match Tools.array_min_equal_not_null
           (Array.map (fun x -> List.length x,x) a.nodes_by_type)

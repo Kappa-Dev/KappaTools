@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -27,4 +27,4 @@ val connected_components_sum_of_ambiguous_rule :
 val lkappa_of_elementary_rule :
   Signature.s -> Pattern.Env.t -> Primitives.elementary_rule ->
   LKappa.rule_mixture * Raw_mixture.t
-  (** @Return: [(r_mix,r_create)] *)
+  (** @return: [(r_mix,r_create)] *)
