@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jan 08 2020>
+  * Last modification: Time-stamp: <Mar 18 2020>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -652,6 +652,38 @@ let get_ode_flow =
 (*influence_map*)
 (******************************************************************)
 
+let compute_pos_of_rules_and_vars show_title state =
+  let parameters = get_parameters state in
+  let state, compil = get_c_compilation state in
+  let state, handler = get_handler state in
+  let error = get_errors state in
+  let nrules = Handler.nrules parameters error handler in
+  let nvars = Handler.nvars parameters error handler in
+  let () = show_title state in
+  let rec aux pos of_int lift n (error,l) =
+    if n<0 then (error, l)
+    else
+      let error, p = pos parameters error handler compil (of_int n)  in
+      aux pos of_int lift (n-1) (error, (lift n,p)::l)
+  in
+  let error, l =
+    aux Handler.pos_of_rule
+      Ckappa_sig.rule_id_of_int (fun x -> Public_data.Rule x)
+      (nrules-1)
+      (aux Handler.pos_of_var Ckappa_sig.rule_id_of_int
+         (fun x -> Public_data.Var x)
+         (nvars-1) (error,[]))
+  in
+  Remanent_state.set_errors error
+    (Remanent_state.set_pos_of_rules_and_vars l state), l
+
+let get_pos_of_rules_and_vars  =
+      get_gen
+        ~log_prefix:"Summarize the position of rules and variables"
+        ~log_title:"Summarize the position of rules and variables"
+        Remanent_state.get_pos_of_rules_and_vars
+        compute_pos_of_rules_and_vars
+
 let compute_raw_internal_influence_map show_title state =
   let parameters = Remanent_state.get_parameters state in
   let state, compil = get_c_compilation state in
@@ -808,6 +840,7 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
+  let state, _ = compute_pos_of_rules_and_vars show_title state in
   let () = show_title state in
   let error,wake_up_map =
     Algebraic_construction.filter_influence
@@ -1027,6 +1060,7 @@ let compute_high_res_internal_influence_map show_title state =
     else error
   in
   Remanent_state.set_errors error state, (nodes, wake_up_map, inhibition_map)
+
 
 let get_high_res_internal_influence_map =
   get_gen
@@ -1720,7 +1754,7 @@ let output_internal_contact_map ?logger
     | GEPHI ->  Preprocess.gexf_of_contact_map
                                   ?logger parameters error handler scc_contact_map contact_map
 
-    | _ -> let error, () = warn parameters error __POS__ Exit () in error 
+    | _ -> let error, () = warn parameters error __POS__ Exit () in error
   in
   set_errors error state
 

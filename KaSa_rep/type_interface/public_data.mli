@@ -104,6 +104,9 @@ type ('rule, 'var) influence_node =
   | Rule of 'rule
   | Var of 'var
 
+type pos_of_rules_and_vars =
+  ((int,int) influence_node * Locality.t) list
+
 val short_node_of_refined_node:
   (rule, var) influence_node -> (int, int) influence_node
 

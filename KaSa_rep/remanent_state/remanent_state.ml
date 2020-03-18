@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Dec 22 2018>
+  * Last modification: Time-stamp: <Mar 18 2020>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -223,6 +223,7 @@ type ('static,'dynamic) state =
     refined_compilation : refined_compilation option ;
     c_compil : Cckappa_sig.compil option ;
     quark_map: quark_map option ;
+    pos_of_rules_and_vars: Public_data.pos_of_rules_and_vars option;
     internal_influence_map: internal_influence_map Public_data.AccuracyMap.t ;
     influence_map : Public_data.influence_map Public_data.AccuracyMap.t ;
     bidirectional_influence_map :
@@ -289,6 +290,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     internal_influence_map = Public_data.AccuracyMap.empty ;
     influence_map = Public_data.AccuracyMap.empty ;
     bidirectional_influence_map = Public_data.AccuracyMap.empty ;
+    pos_of_rules_and_vars = None ;
     local_influence_map_blackboard = None ;
     internal_contact_map = Public_data.AccuracyMap.empty ;
     internal_scc_decomposition = Public_data.AccuracyMap.empty ;
@@ -355,8 +357,12 @@ let get_map empty add of_json label json =
     empty l
 
 let get_contact_map_map state = state.contact_map
+let get_pos_of_rules_and_vars state = state.pos_of_rules_and_vars
 let get_influence_map_map state = state.influence_map
 let get_constraints_list state = state.constraints_list
+
+let set_pos_of_rules_and_vars l state =
+  {state with pos_of_rules_and_vars = Some l}
 let add_errors state l =
   (errors, Exception_without_parameter.to_json state.errors)::l
 

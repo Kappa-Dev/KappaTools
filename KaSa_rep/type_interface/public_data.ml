@@ -480,6 +480,8 @@ type ('rule,'var) influence_node =
   | Rule of 'rule
   | Var of 'var
 
+type pos_of_rules_and_vars = ((int,int) influence_node * Locality.t) list
+
 let influence_node_to_json rule_to_json var_to_json a =
   match a with
   | Var i ->

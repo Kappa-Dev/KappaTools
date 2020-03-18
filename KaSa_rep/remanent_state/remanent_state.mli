@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Dec 21 2018>
+  * Last modification: Time-stamp: <Mar 18 2020>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -56,6 +56,7 @@ type distance =
     bwd: int ;
     total: int
   }
+
 
 type local_influence_map_blackboard =
   {
@@ -228,6 +229,13 @@ val get_signature: ('static, 'compile) state -> Signature.s option
 val set_quark_map: quark_map -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_quark_map: ('static, 'compile) state -> quark_map option
+
+val set_pos_of_rules_and_vars:
+  Public_data.pos_of_rules_and_vars ->
+  ('static, 'compile) state -> ('static, 'compile) state
+
+val get_pos_of_rules_and_vars:
+  ('static, 'compile) state -> Public_data.pos_of_rules_and_vars option
 
 val set_internal_influence_map:
   Public_data.accuracy_level -> internal_influence_map ->
