@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 18 2020>
+  * Last modification: Time-stamp: <Mar 19 2020>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -660,21 +660,32 @@ let compute_pos_of_rules_and_vars show_title state =
   let nrules = Handler.nrules parameters error handler in
   let nvars = Handler.nvars parameters error handler in
   let () = show_title state in
-  let rec aux pos of_int lift n (error,l) =
+  let rec aux inc pos of_int lift n (error,l) =
     if n<0 then (error, l)
     else
-      let error, p = pos parameters error handler compil (of_int n)  in
-      aux pos of_int lift (n-1) (error, (lift n,p)::l)
+      let error, p = pos parameters error handler compil ((of_int (n+inc)))  in
+      aux inc pos of_int lift (n-1) (error, (lift n,p)::l)
   in
   let error, l =
-    aux Handler.pos_of_rule
+    aux 0 Handler.pos_of_rule
       Ckappa_sig.rule_id_of_int (fun x -> Public_data.Rule x)
       (nrules-1)
-      (aux Handler.pos_of_var Ckappa_sig.rule_id_of_int
+      (aux nrules Handler.pos_of_var Ckappa_sig.rule_id_of_int
          (fun x -> Public_data.Var x)
          (nvars-1) (error,[]))
   in
-  Remanent_state.set_errors error
+  let _ =
+    List.iter
+      (fun (x,y) ->
+         match x with
+           Public_data.Rule x ->
+           Printf.printf "Rule(%i) %s @." x (Locality.to_string y)
+         | Public_data.Var x ->
+           Printf.printf "Var(%i) %s @." x (Locality.to_string y))
+      l
+  in
+
+      Remanent_state.set_errors error
     (Remanent_state.set_pos_of_rules_and_vars l state), l
 
 let get_pos_of_rules_and_vars  =

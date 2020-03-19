@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Sep 24 2019>
+ * Last modification: Time-stamp: <Mar 19 2020>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -793,6 +793,8 @@ let refine_agent parameters error agent_set agent =
 let refine_var parameters error id_set var =
   match var with
   | ((string,pos),(alg,pos')) ->
+    let _ = Printf.printf "%s %s @." (Locality.to_string pos)
+        (Locality.to_string pos') in 
     let error,id_set = check_freshness parameters error "Label" string id_set in
     let error,alg' = alg_map (refine_mixture parameters) error alg
     in error,id_set,((string,pos),(alg',pos'))

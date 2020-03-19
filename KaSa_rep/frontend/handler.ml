@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Mar 18 2020>
+   * Last modification: Time-stamp: <Mar 19 2020>
    * *
    * Primitives to use a kappa handler
    *
@@ -357,7 +357,8 @@ let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id
   | None  -> Exception.warn parameters error __POS__ Exit
                (("VAR " ^ (Ckappa_sig.string_of_rule_id var_id)),Locality.dummy,Public_data.Variable,"",var_id)
   | Some var  ->
-    error,(fst var.Cckappa_sig.e_id_dot,snd var.Cckappa_sig.e_id_dot,
+    error,(fst var.Cckappa_sig.e_id_dot,
+           snd var.Cckappa_sig.e_id,
            Public_data.Variable,
            "" (* TO DO: string for the ast representation (from var.Cckappa_sig.c_variable?) *) ,
            var_id)
