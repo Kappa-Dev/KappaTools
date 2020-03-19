@@ -2324,7 +2324,6 @@ let translate_var parameters error handler (a,b) =
   let error,b' = alg_with_pos_map (lift_allowing_question_marks parameters handler) error b in
   let error,a_dot = Tools_kasa.make_id_compatible_with_dot_format parameters error (fst a) in
   error,
-  let _ = Printf.printf "%s @." (Locality.to_string (snd a)) in 
   {
     Cckappa_sig.e_id = a;
     Cckappa_sig.e_id_dot = a_dot,snd a;

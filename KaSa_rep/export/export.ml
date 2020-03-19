@@ -674,17 +674,8 @@ let compute_pos_of_rules_and_vars show_title state =
          (fun x -> Public_data.Var x)
          (nvars-1) (error,[]))
   in
-  let _ =
-    List.iter
-      (fun (x,y) ->
-         match x with
-           Public_data.Rule x ->
-           Printf.printf "Rule(%i) %s @." x (Locality.to_string y)
-         | Public_data.Var x ->
-           Printf.printf "Var(%i) %s @." x (Locality.to_string y))
-      l
-  in
-
+  let json = Public_data.pos_of_rules_and_vars_to_json l in
+  let _ = Public_data.pos_of_rules_and_vars_of_json json in
       Remanent_state.set_errors error
     (Remanent_state.set_pos_of_rules_and_vars l state), l
 

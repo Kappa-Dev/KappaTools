@@ -146,6 +146,11 @@ let on_message post text =
     let () = gState := state in
     send_response post id rules
 
+  | Some(id, (`List [ `String "INFLUENCE_MAP_NODES_LOCATION" ] | `String "INFLUENCE_MAP_NODES_LOCATION")) ->
+    let state, list = get_influence_map_nodes_location !gState in
+    let () = gState := state in
+    send_response post id list
+
   | Some(id, (`List [ `String "DEAD_RULES" ] | `String "DEAD_RULES")) ->
     let state, rules = get_dead_rules !gState in
     let () = gState := state in

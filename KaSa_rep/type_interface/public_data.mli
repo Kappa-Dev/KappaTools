@@ -107,6 +107,12 @@ type ('rule, 'var) influence_node =
 type pos_of_rules_and_vars =
   ((int,int) influence_node * Locality.t) list
 
+val pos_of_rules_and_vars_of_json:
+  Yojson.Basic.t -> pos_of_rules_and_vars
+
+val pos_of_rules_and_vars_to_json:
+  pos_of_rules_and_vars -> Yojson.Basic.t
+
 val short_node_of_refined_node:
   (rule, var) influence_node -> (int, int) influence_node
 
