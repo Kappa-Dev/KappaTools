@@ -23,6 +23,12 @@ val dummy : t
 val dummy_annot : 'a -> 'a annot
 val has_dummy_annot : 'a annot -> bool
 
+val merge : range -> range -> range
+(** [merge b e] creates the range from beginning of [b] to the end of [e]
+ (filename must match) *)
+
+val is_included_in : string -> position -> range -> bool
+
 val to_string: t -> string
 val print : Format.formatter -> t -> unit
 val print_annot :

@@ -148,3 +148,17 @@ let read_range p lb =
 
 let range_of_string s =
   read_range (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+
+let is_included_in file { line; chr } range =
+  file = range.file &&
+  line >= range.from_position.line &&
+  line <= range.to_position.line &&
+  (line <> range.from_position.line || chr >= range.from_position.chr) &&
+  (line <> range.to_position.line || chr <= range.to_position.chr)
+
+let merge b e =
+  let () = assert (b.file = e.file) in {
+    file = b.file;
+    from_position = b.from_position;
+    to_position = e.to_position;
+  }
