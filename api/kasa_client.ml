@@ -99,6 +99,15 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       Lwt_result.bind_result
         (self#message request)
         (fun x -> Result.Ok x)
+
+    method get_pos_of_rules_and_vars =
+      let request = `List [ `String "INFLUENCE_MAP_NODES_LOCATION" ] in
+      Lwt_result.bind_result
+        (self#message request)
+        (fun x ->
+           Result.Ok
+            (Public_data.pos_of_rules_and_vars_of_json x))
+
     method get_influence_map_raw accuracy =
       let request =
         `List ( `String "INFLUENCE_MAP" :: match accuracy with

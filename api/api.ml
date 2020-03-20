@@ -113,6 +113,8 @@ class type manager_static_analysis = object
 
   method get_contact_map :
     Public_data.accuracy_level option -> Yojson.Basic.t kasa_reply
+  method get_pos_of_rules_and_vars :
+      Public_data.pos_of_rules_and_vars kasa_reply
   method get_influence_map_raw :
     Public_data.accuracy_level option -> string kasa_reply
   method get_local_influence_map :
