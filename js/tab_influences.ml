@@ -49,6 +49,8 @@ let navli () = ReactiveData.RList.empty
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
+let track_cursor, set_track_cursor = React.S.create false
+
 let dummy_model = {
   rendering = DrawTabular ();
   accuracy = Some Public_data.Low;
@@ -61,9 +63,6 @@ let model, set_model = React.S.create dummy_model
 let total_input_id = "total_input"
 let fwd_input_id = "fwd_input"
 let bwd_input_id = "bwd_input"
-let recenter_id = "reset"
-let next_node_id = "next"
-let prev_node_id = "previous"
 
 let influence_node_label = function
   | Public_data.Rule r ->
@@ -122,30 +121,35 @@ let bwd_input =
                   Html.a_size 1;] ()
 
 let next_node =
-  Html.input ~a:[ Html.a_id next_node_id ;
-                  Html.a_input_type `Button;
-                  Html.a_value "Next";
-                  Html.a_title "Next";
-                  Html.a_class ["form-control"];
-                  Html.a_size 1;] ()
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Html.a_class ["form-control";"btn";"btn-default"];
+  ] [ Html.txt "Next" ]
 
 let prev_node =
-  Html.input ~a:[ Html.a_id prev_node_id ;
-                  Html.a_title "Previous";
-                  Html.a_value "Previous";
-                  Html.a_input_type `Button;
-                  Html.a_class ["form-control"];
-                  Html.a_size 1;] ()
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Html.a_class ["form-control";"btn";"btn-default"];
+  ] [ Html.txt "Previous" ]
 
 let recenter =
-  Html.input ~a:[
-    Html.a_id recenter_id ;
-                  Html.a_title "Reset";
-                  Html.a_value "Reset";
-                  Html.a_input_type `Button;
-                  Html.a_class ["form-control"];
-                  Html.a_size 1;]
-    ()
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Html.a_class ["form-control";"btn";"btn-default"];
+  ] [ Html.txt "Reset" ]
+
+let track_cursor_switch =
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Tyxml_js.R.Html5.a_class
+      (React.S.map (fun tc -> "form-control" :: "btn" :: "btn-default" ::
+                              if tc then ["active"] else []) track_cursor);
+    Html.a_onclick
+      (fun _ ->
+         let () = set_track_cursor (not (React.S.value track_cursor))
+         in true
+      );
+  ] [ Html.txt "Track cursor" ]
 
 let export_config = {
   Widget_export.id = "influence-export";
@@ -480,7 +484,9 @@ let content () =
               [Html.txt "Navigate"];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [prev_node];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [next_node];
-            Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter]]] in
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter];
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [track_cursor_switch];
+          ]] in
   let graph_form =
     Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
       [ Html.div
@@ -571,6 +577,22 @@ let _ =
        State_project.dummy_model State_project.model)
     model
 
+let _ =
+  State_file.with_current_pos
+    ~on:(React.S.Bool.(&&) tab_is_active track_cursor)
+    (fun filename cursor_pos ->
+       Some
+         (State_project.with_project
+            ~label:__LOC__
+            (fun (manager : Api.concrete_manager) ->
+               manager#get_influence_map_node_at ~filename cursor_pos >|=
+               Result_util.map
+                 (fun origin' ->
+                    update_model
+                      (fun m ->
+                         { m with origin = origin'; origin_label = None })))))
+    (Lwt.return (Result_util.ok ()))
+
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 
@@ -616,7 +638,7 @@ let onload () =
              Js._true
            with _ -> Js._false)
   in
-  let () = (Tyxml_js.To_dom.of_input bwd_input )##.onchange :=
+  let () = (Tyxml_js.To_dom.of_input bwd_input)##.onchange :=
                Dom_html.full_handler
                  (fun va _ ->
                     let va = Js.to_string va##.value in
@@ -629,7 +651,7 @@ let onload () =
                       Js._true
                     with _ -> Js._false) in
   let () =
-    (Tyxml_js.To_dom.of_input recenter )##.onclick :=
+    (Tyxml_js.To_dom.of_button recenter)##.onclick :=
       Dom_html.full_handler
         (fun _ _ ->
            let _ =
@@ -654,7 +676,7 @@ let onload () =
         )
   in
   let () =
-    (Tyxml_js.To_dom.of_input next_node )##.onclick :=
+    (Tyxml_js.To_dom.of_button next_node)##.onclick :=
       Dom_html.full_handler
         (fun _ _ ->
            let { origin; _ } = React.S.value model in
@@ -679,7 +701,7 @@ let onload () =
            in Js._true
         ) in
   let () =
-    (Tyxml_js.To_dom.of_input prev_node )##.onclick :=
+    (Tyxml_js.To_dom.of_button prev_node)##.onclick :=
       Dom_html.full_handler
         (fun _ _ ->
            let { origin; _ } = React.S.value model in
@@ -702,8 +724,7 @@ let onload () =
                               { m with origin; origin_label }))
                   ))
            in Js._true
-        )
-  in
+        ) in
   let () = Common.jquery_on
       "#navinfluences" "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in
