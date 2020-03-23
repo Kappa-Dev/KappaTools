@@ -842,7 +842,7 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
-  let state, _ = compute_pos_of_rules_and_vars show_title state in
+  let state, _ = compute_pos_of_rules_and_vars (fun _ -> ()) state in
   let () = show_title state in
   let error,wake_up_map =
     Algebraic_construction.filter_influence

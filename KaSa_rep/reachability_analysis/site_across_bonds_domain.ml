@@ -78,6 +78,8 @@ struct
       global : Analyzer_headers.global_dynamic_information ;
     }
 
+  let domain_name = "Site accross bonds domain"
+
   (*------------------------------------------------------------*)
   (** global static information.  Explain how to extract the handler for
       kappa expressions from a value of type static_information. Kappa
@@ -129,6 +131,7 @@ struct
       static with
       local_static_information = local
     }
+
 
   (***************************************************************************)
   (*STATIC INFORMATION*)
@@ -355,6 +358,17 @@ struct
         (get_local_dynamic_information dynamic) with
         store_value = value
       } dynamic
+
+      (** profiling *)
+        let get_log_info dynamic =
+          Analyzer_headers.get_log_info (get_global_dynamic_information dynamic)
+
+        let set_log_info log_info dynamic =
+          {
+            dynamic with
+            global = Analyzer_headers.set_log_info log_info
+                (get_global_dynamic_information dynamic)
+          }
 
   (***************************************************************************)
   (*TYPE*)
@@ -621,6 +635,13 @@ struct
   (***************************************************************************)
 
   let initialize static dynamic error =
+    let parameters = Analyzer_headers.get_parameter static in
+    let log_info = Analyzer_headers.get_log_info dynamic in
+    let error, log_info = StoryProfiling.StoryStats.add_event parameters error
+        (StoryProfiling.Domain_initialization domain_name)
+        None log_info
+    in
+    let dynamic = Analyzer_headers.set_log_info log_info dynamic in
     let init_local_static_information =
       {
         store_basic_static_information =
@@ -653,6 +674,12 @@ struct
         init_global_dynamic_information
         error
     in
+    let log_info = get_log_info dynamic in
+    let error, log_info = StoryProfiling.StoryStats.close_event parameters error
+        (StoryProfiling.Domain_initialization domain_name)
+        None log_info
+    in
+    let dynamic = set_log_info log_info dynamic in
     error, static, dynamic, []
 
   (***************************************************************************)
