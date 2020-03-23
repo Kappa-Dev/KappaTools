@@ -266,7 +266,7 @@ module Optimize_internalized (M:Internalized_mvbdu with type key = int and type 
   Internalized_mvbdu
   with type mvbdu = M.mvbdu and type key = int and type value = int
 
-module Make (M:Nul): Mvbdu with type key = int and type value = int
+module Make : Nul -> Mvbdu with type key = int and type value = int
 module Mvbdu:Mvbdu with type key = int and type value = int
 module IntMvbdu:Internalized_mvbdu with type key = int and type value = int and type mvbdu= Mvbdu.mvbdu
 module Optimized_Mvbdu:Mvbdu with type key = int and type value = int
