@@ -377,6 +377,11 @@ class manager
                     ~result_code:`Bad_request
                     "low level project_parse mustn't be used over HTTP")
 
+    method secret_get_pos_of_rules_and_vars =
+      Lwt.return (Api_common.result_error_msg
+                    ~result_code:`Bad_request
+                    "low level get_pos_of_rules_and_vars mustn't be used over HTTP")
+
     method project_parse overwrite =
       send
         ?timeout request_count
@@ -564,6 +569,18 @@ class manager
       `GET
       (fun x -> JsonUtil.to_option
           Public_data.refined_influence_node_of_json
+          (Yojson.Basic.from_string x))
+
+  method get_influence_map_node_at ~filename { Locality.line; Locality.chr } =
+    send
+      ?timeout request_count
+      (
+        Format.sprintf
+          "%s/v2/projects/%s/analyses/influence_map/node_at?file=%s&line=%i&chr=%i"
+          url project_id filename line chr)
+      `GET
+      (fun x -> JsonUtil.to_option
+          Public_data.short_influence_node_of_json
           (Yojson.Basic.from_string x))
 
   method get_nodes_of_influence_map accuracy =

@@ -21,6 +21,7 @@ type _ handle =
       (Public_data.accuracy_level * int * int option * int option *
        (Public_data.rule, Public_data.var) Public_data.influence_node option *
        Public_data.influence_map) handle
+  | Short_influence_node : (int,int) Public_data.influence_node option handle
   | Influence_node :
       (Public_data.rule, Public_data.var) Public_data.influence_node option handle
   | Influence_nodes :
@@ -178,6 +179,13 @@ let on_message exec_command message_delimiter =
                              Public_data.short_influence_node_of_json origin in
                          manager#get_next_node origin >>= fun out ->
                          Lwt.return (B (Influence_node, msg_id, Api_common.result_kasa out))
+                       | "INFLUENCE_MAP_NODE_AT" ->
+                         let filename =
+                           JsonUtil.read_next_item Yojson.Basic.read_string st b in
+                         let pos =
+                           JsonUtil.read_next_item Locality.read_position st b in
+                         manager#get_influence_map_node_at ~filename pos >>= fun out ->
+                         Lwt.return (B (Short_influence_node, msg_id, out))
                        | "INFLUENCE_MAP_ALL_NODES" ->
                          let accuracy_level =
                            JsonUtil.read_next_item Yojson.Basic.read_json st b in
@@ -322,6 +330,14 @@ let on_message exec_command message_delimiter =
              (fun b n ->
                 Yojson.Basic.write_json
                   b (Public_data.local_influence_map_to_json n))
+             msg_id x
+         | B (Short_influence_node, msg_id, x) ->
+           reply
+             post
+             (JsonUtil.write_option
+                (fun b n ->
+                   Yojson.Basic.write_json
+                     b (Public_data.short_influence_node_to_json n)))
              msg_id x
          | B (Influence_node, msg_id, x) ->
            reply

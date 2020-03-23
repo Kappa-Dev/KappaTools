@@ -160,6 +160,8 @@ class type uniform_manager_static_analysis = object
 
   method get_contact_map :
     Public_data.accuracy_level option -> Yojson.Basic.t result Lwt.t
+  method secret_get_pos_of_rules_and_vars :
+      Public_data.pos_of_rules_and_vars result Lwt.t
   method get_influence_map_raw :
     Public_data.accuracy_level option -> string result Lwt.t
   method get_local_influence_map :
@@ -218,6 +220,9 @@ class type concrete_manager = object
   inherit uniform_manager_static_analysis
   inherit manager_stories
   method project_parse : (string * Nbr.t) list -> unit result Lwt.t
+  method get_influence_map_node_at :
+    filename:string -> Locality.position -> (int,int) Public_data.influence_node
+      option result Lwt.t
   method is_running : bool
   method terminate : unit
   method is_computing : bool

@@ -241,6 +241,8 @@ class new_uniform_client ~is_running ~post (mailbox : mailbox):
       raw#get_next_node json >|= Api_common.result_kasa
     method get_previous_node json =
       raw#get_previous_node json >|= Api_common.result_kasa
+    method secret_get_pos_of_rules_and_vars =
+      raw# get_pos_of_rules_and_vars >|= Api_common.result_kasa
     method get_nodes_of_influence_map accuracy =
       raw#get_nodes_of_influence_map accuracy >|= Api_common.result_kasa
     method get_dead_rules =

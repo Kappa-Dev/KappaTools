@@ -151,13 +151,33 @@ class embedded () : Api.concrete_manager =
       ()(*TODO*)
     method is_computing = true (*TODO*)
 
+    val mutable kasa_locator = []
+
     method project_parse overwrites =
       self#secret_project_parse >>=
       Api_common.result_bind_lwt
         ~ok:(fun out ->
-            self#secret_simulation_load out overwrites >>=
-            Api_common.result_bind_lwt
-              ~ok:(fun () -> self#init_static_analyser out))
+            let load = self#secret_simulation_load out overwrites in
+            let init = self#init_static_analyser out in
+            let locators =
+              init >>= Result_util.fold
+                ~error:(fun e ->
+                    let () = kasa_locator <- [] in
+                    Lwt.return (Result_util.error e))
+                ~ok:(fun () ->
+                    self#secret_get_pos_of_rules_and_vars >>= Result_util.fold
+                      ~ok:(fun infos ->
+                          let () = kasa_locator <- infos in
+                          Lwt.return (Result_util.ok ()))
+                      ~error:(fun e ->
+                          let () = kasa_locator <- [] in
+                          Lwt.return (Result_util.error e))) in
+            load >>= Api_common.result_bind_lwt ~ok:(fun () -> locators))
+
+    method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
+      List.find_opt (fun (_,x) -> Locality.is_included_in filename pos x) kasa_locator |>
+      Option_util.map fst |> Result_util.ok ?status:None |> Lwt.return
+
   end
 
 let state , set_state =

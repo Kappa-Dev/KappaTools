@@ -19,6 +19,7 @@ type _ handle =
       (Public_data.accuracy_level * int * int option * int option *
        (Public_data.rule, Public_data.var) Public_data.influence_node option *
        Public_data.influence_map) handle
+  | Short_influence_node : (int,int) Public_data.influence_node option handle
   | Influence_node :
       (Public_data.rule, Public_data.var) Public_data.influence_node option handle
   | Influence_nodes :
@@ -87,6 +88,13 @@ let receive mailbox x =
               let json = read_result Yojson.Basic.read_json p lb in
               Lwt.wakeup thread
                 (Result_util.map Public_data.local_influence_map_of_json json)
+            | B (Short_influence_node, thread) ->
+              let json = read_result Yojson.Basic.read_json p lb in
+              Lwt.wakeup thread
+                (Result_util.map
+                   (JsonUtil.to_option
+                      Public_data.short_influence_node_of_json)
+                   json)
             | B (Influence_node, thread) ->
               let json = read_result Yojson.Basic.read_json p lb in
               Lwt.wakeup thread
@@ -208,6 +216,12 @@ class virtual new_client ~is_running ~post mailbox = object(self)
     Lwt.return
       (Api_common.result_error_msg "low level project_parse mustn't be used")
 
+  method secret_get_pos_of_rules_and_vars
+    : Public_data.pos_of_rules_and_vars Api.result Lwt.t =
+    Lwt.return
+      (Api_common.result_error_msg
+         "low level get_pos_of_rules_and_vars mustn't be used")
+
   method project_overwrite file_id ast =
     self#message Nothing
       (fun b -> JsonUtil.write_sequence b [
@@ -276,6 +290,13 @@ class virtual new_client ~is_running ~post mailbox = object(self)
              (fun b ->
                 Yojson.Basic.write_json
                   b (JsonUtil.of_option Public_data.short_influence_node_to_json json));
+         ])
+    method get_influence_map_node_at ~filename pos =
+      self#message Short_influence_node
+        (fun b -> JsonUtil.write_sequence b [
+             (fun b -> Yojson.Basic.write_string b "INFLUENCE_MAP_NODE_AT");
+           (fun b -> Yojson.Basic.write_string b filename);
+           (fun b -> Locality.write_position b pos);
          ])
     method get_nodes_of_influence_map accuracy =
       self#message Influence_nodes

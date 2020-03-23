@@ -95,12 +95,30 @@ class t exec_command message_delimiter =
     method private post_message txt = post kasim#stdin message_delimiter txt
     inherit Mpi_api.manager ()
 
+    val mutable kasa_locator = []
+
     method project_parse overwrites =
       self#secret_project_parse >>=
       Api_common.result_bind_lwt
         ~ok:(fun out ->
             let load = self#secret_simulation_load out overwrites in
-            let init =
-              Lwt.map Api_common.result_kasa (self#init_static_analyser out) in
-            load >>= Api_common.result_bind_lwt ~ok:(fun () -> init))
+            let init = self#init_static_analyser out in
+            let locators =
+              init >>= function
+              | Result.Error _ as e ->
+                let () = kasa_locator <- [] in
+                Lwt.return (Api_common.result_kasa e)
+              | Result.Ok () ->
+                self#get_pos_of_rules_and_vars >>= function
+                | Result.Ok infos ->
+                  let () = kasa_locator <- infos in
+                  Lwt.return (Result_util.ok ())
+                |Result.Error _ as e ->
+                  let () = kasa_locator <- [] in
+                  Lwt.return (Api_common.result_kasa e) in
+            load >>= Api_common.result_bind_lwt ~ok:(fun () -> locators))
+
+    method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
+      List.find_opt (fun (_,x) -> Locality.is_included_in filename pos x) kasa_locator |>
+      Option_util.map fst |> Result_util.ok ?status:None |> Lwt.return
   end
