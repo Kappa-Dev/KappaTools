@@ -40,6 +40,11 @@ type model = { current : active option ; directory : slot Mods.IntMap.t }
 val model : model React.signal
 val current_filename : string option React.signal
 
+val with_current_pos :
+  ?eq:('a -> 'a -> bool) -> ?on:bool React.signal ->
+  (string -> Locality.position -> 'a option) ->
+  'a -> 'a React.signal
+
 (* run on application init *)
 val init : unit -> unit Lwt.t
 (* to synch state of application with runtime *)

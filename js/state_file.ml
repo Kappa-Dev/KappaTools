@@ -30,6 +30,17 @@ let current_filename =
             (fun { name; _ } -> name) (Mods.IntMap.find_option x.rank m.directory))
         m.current) model
 
+let with_current_pos ?eq ?(on=React.S.const true) f default =
+  React.S.fmap
+    ?eq
+    (fun m -> Option_util.bind
+        (fun x -> Option_util.bind
+            (fun { name; _ } -> f name x.cursor_pos)
+            (Mods.IntMap.find_option x.rank m.directory))
+        m.current)
+    default
+    (React.S.on on blank_state model)
+
 let with_current_file f =
   let state = React.S.value model in
   match state.current with
