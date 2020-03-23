@@ -40,7 +40,8 @@ type model_rendering =
 type model = {
   rendering : model_rendering;
   accuracy : Public_data.accuracy_level option;
-  origin : (Public_data.rule, Public_data.var) Public_data.influence_node option;
+  origin : (int,int) Public_data.influence_node option;
+  origin_label : string option;
 }
 
 let navli () = ReactiveData.RList.empty
@@ -52,6 +53,7 @@ let dummy_model = {
   rendering = DrawTabular ();
   accuracy = Some Public_data.Low;
   origin = None;
+  origin_label = None;
 }
 
 let model, set_model = React.S.create dummy_model
@@ -62,6 +64,16 @@ let bwd_input_id = "bwd_input"
 let recenter_id = "reset"
 let next_node_id = "next"
 let prev_node_id = "previous"
+
+let influence_node_label = function
+  | Public_data.Rule r ->
+    if r.Public_data.rule_label = ""
+    then r.Public_data.rule_ast
+    else r.Public_data.rule_label
+  | Public_data.Var r ->
+    if r.Public_data.var_label = ""
+    then r.Public_data.var_ast
+    else r.Public_data.var_label
 
 let update_model_graph f =
   let m = React.S.value model in
@@ -84,7 +96,10 @@ let influencemap =
            let () =
              Subpanel_editor.set_move_cursor
                (Public_data.position_of_refined_influence_node node) in
-           { m with origin = Some node }))
+           let origin =
+             Some (Public_data.short_node_of_refined_node node) in
+           let origin_label = Some (influence_node_label node) in
+           { m with origin; origin_label }))
 
 let total_input =
   Html.input ~a:[
@@ -210,16 +225,6 @@ let is_center origin_short_opt node =
       a.Public_data.var_id = id
     | Public_data.Var _, Public_data.Rule _
     | Public_data.Rule _, Public_data.Var _ -> false
-
-let influence_node_label = function
-  | Public_data.Rule r ->
-    if r.Public_data.rule_label = ""
-    then r.Public_data.rule_ast
-    else r.Public_data.rule_label
-  | Public_data.Var r ->
-    if r.Public_data.var_label = ""
-    then r.Public_data.var_ast
-    else r.Public_data.var_label
 
 let json_to_graph logger (_,_,_,_,origin,influence_map) =
   let origin_short_opt =
@@ -402,7 +407,9 @@ let pop_cell = function
             let () =
               Subpanel_editor.set_move_cursor
                 (Public_data.position_of_refined_influence_node node) in
-            let () = update_model (fun m -> { m with origin = Some node }) in
+            let origin = Some (Public_data.short_node_of_refined_node node) in
+            let origin_label = Some (influence_node_label node) in
+            let () = update_model (fun m -> { m with origin; origin_label }) in
             true);
         Html.a_class [if positive then "success" else "danger"]
       ]
@@ -417,7 +424,7 @@ let rec fill_table acc by on =
     let line = Html.tr [ b; o ] in
     fill_table (line::acc) by' on'
 
-let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
+let draw_table origin_label { positive_on; positive_by; negative_on; negative_by } =
   let by =
     List_util.rev_map_append (fun x -> (x,false)) negative_by
       (List.rev_map (fun x -> (x,true)) positive_by) in
@@ -430,9 +437,7 @@ let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
     ~thead:(Html.thead [
         Html.tr
           [Html.th ~a:[Html.a_colspan 2]
-             [Html.cdata
-                (match origin with None -> "origin"|Some n -> influence_node_label n)
-             ]];
+             [Html.cdata (Option_util.unsome "origin" origin_label)]];
         Html.tr [
           Html.th [Html.cdata "is influenced by"];
           Html.th [Html.cdata "influences"]];
@@ -442,12 +447,9 @@ let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
 let influence_sphere =
   State_project.on_project_change_async
     ~on:tab_is_active dummy_model model (Result_util.ok empty_sphere)
-    (fun manager { rendering; accuracy; origin = origin_refined } ->
+    (fun manager { rendering; accuracy; origin; origin_label = _ } ->
        match rendering with
        | DrawTabular _ ->
-         let origin =
-           Option_util.map
-             Public_data.short_node_of_refined_node origin_refined in
          manager#get_local_influence_map
            ?fwd:None ?bwd:None ?origin ~total:1 accuracy >|=
          Result_util.map
@@ -516,13 +518,13 @@ let content () =
       ~a:[ Html.a_class ["panel-scroll"] ]
       (ReactiveData.RList.from_signal
          (React.S.l2
-            (fun { rendering; origin; _ } sphere ->
+            (fun { rendering; origin_label; _ } sphere ->
                match rendering with
                | DrawGraph _ -> []
                | DrawTabular () ->
                  Result_util.fold
                    sphere
-                   ~ok:(fun sphere -> [ draw_table origin sphere ])
+                   ~ok:(fun sphere -> [ draw_table origin_label sphere ])
                    ~error:(fun error ->
                        List.map
                          (fun m -> Html.p [Html.txt (Format.asprintf "@[%a@]" Result_util.print_message m)])
@@ -533,7 +535,7 @@ let content () =
 
 let _ =
   React.S.l2
-    (fun _ { rendering; accuracy; origin = origin_refined } ->
+    (fun _ { rendering; accuracy; origin; origin_label = _ } ->
        match rendering with
        | DrawTabular _ -> Lwt.return (Result_util.ok ())
        | DrawGraph { fwd; bwd; total } ->
@@ -541,9 +543,6 @@ let _ =
            (State_project.with_project
               ~label:__LOC__
               (fun (manager : Api.concrete_manager) ->
-                 let origin =
-                   Option_util.map
-                     Public_data.short_node_of_refined_node origin_refined in
                  ((manager#get_local_influence_map
                      ?fwd ?bwd ?origin ~total accuracy) >|=
                   Result_util.fold
@@ -640,8 +639,16 @@ let onload () =
                   (fun (manager : Api.concrete_manager) ->
                      manager#get_initial_node >|=
                      Result_util.map
-                       (fun origin ->
-                          update_model (fun m -> { m with origin }))
+                       (fun origin_refined ->
+                          let origin =
+                            Option_util.map
+                              Public_data.short_node_of_refined_node
+                              origin_refined in
+                          let origin_label =
+                            Option_util.map
+                              influence_node_label origin_refined in
+                          update_model
+                            (fun m -> { m with origin; origin_label }))
                   ))
            in Js._true
         )
@@ -650,9 +657,7 @@ let onload () =
     (Tyxml_js.To_dom.of_input next_node )##.onclick :=
       Dom_html.full_handler
         (fun _ _ ->
-           let origin =
-             let { origin; _ } = React.S.value model in
-             Option_util.map Public_data.short_node_of_refined_node origin in
+           let { origin; _ } = React.S.value model in
            let _ =
              State_error.wrap "influence_map_next_node"
                (State_project.with_project
@@ -660,9 +665,16 @@ let onload () =
                   (fun (manager : Api.concrete_manager) ->
                      manager#get_next_node origin >|=
                        Result_util.map
-                         (fun origin' ->
-                            update_model
-                              (fun m -> { m with origin = origin' }))
+                         (fun origin_refined ->
+                            let origin =
+                              Option_util.map
+                                Public_data.short_node_of_refined_node
+                                origin_refined in
+                            let origin_label =
+                              Option_util.map
+                                influence_node_label origin_refined in
+                            update_model (fun m ->
+                                { m with origin; origin_label }))
                   ))
            in Js._true
         ) in
@@ -670,9 +682,7 @@ let onload () =
     (Tyxml_js.To_dom.of_input prev_node )##.onclick :=
       Dom_html.full_handler
         (fun _ _ ->
-           let origin =
-             let { origin; _ } = React.S.value model in
-             Option_util.map Public_data.short_node_of_refined_node origin in
+           let { origin; _ } = React.S.value model in
            let _ =
              State_error.wrap "influence_map_prev_node"
                (State_project.with_project
@@ -680,9 +690,16 @@ let onload () =
                   (fun (manager : Api.concrete_manager) ->
                      manager#get_previous_node origin >|=
                      Result_util.map
-                       (fun origin' ->
-                          update_model
-                            (fun m -> { m with origin = origin' }))
+                       (fun origin_refined ->
+                          let origin =
+                            Option_util.map
+                              Public_data.short_node_of_refined_node
+                              origin_refined in
+                          let origin_label =
+                            Option_util.map
+                              influence_node_label origin_refined in
+                          update_model (fun m ->
+                              { m with origin; origin_label }))
                   ))
            in Js._true
         )
