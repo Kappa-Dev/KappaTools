@@ -47,6 +47,10 @@ module Make (Instances:Instances_sig.S) = struct
       (* set of ccs that have changed *)
     }
 
+  type instance =
+    bool * int *
+    (Kappa_terms.Matching.t * int list * Kappa_mixtures.Edges.path option) option
+
   type t =
     {
       mutable outdated : bool;
@@ -55,7 +59,7 @@ module Make (Instances:Instances_sig.S) = struct
       matchings_of_rule:
         (Matching.t * int list) list Mods.IntMap.t;
       unary_candidates: (* rule_id -> list of matchings *)
-       (Matching.t * Edges.path option) list Mods.IntMap.t;
+       (Matching.t * int list * Edges.path option) list Mods.IntMap.t;
       (* rule -> cc -> number_instances (activity per cc) *)
       nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
 
@@ -239,19 +243,19 @@ module Make (Instances:Instances_sig.S) = struct
     let from_patterns () =
       let pats = rule.Primitives.connected_components in
       Instances.fold_picked_instance ?rule_id
-        state.imp.instances random_state pats ~init:(Matching.empty,[])
-        (fun id pattern root (inj, rev_roots) ->
+        state.imp.instances random_state pats ~init:(Matching.empty,[],None)
+        (fun id pattern root (inj, rev_roots,_) ->
            match Matching.reconstruct
                    ~debugMode domain edges inj id pattern root with
            | None -> None
-           | Some inj' -> Some (inj',root::rev_roots)
+           | Some inj' -> Some (inj',root::rev_roots,None)
         ) in
     match rule_id with
     | None -> from_patterns ()
     | Some id ->
       match Mods.IntMap.find_option id state.matchings_of_rule with
       | Some [] -> None
-      | Some l -> Some (List_util.random random_state l)
+      | Some l -> let (a,b) = List_util.random random_state l in Some (a,b,None)
       | None -> from_patterns ()
 
   let adjust_rule_instances
@@ -302,8 +306,8 @@ module Make (Instances:Instances_sig.S) = struct
       ~debugMode state random_state domain edges ~rule_id rule =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
     | Some l ->
-      let inj,path = List_util.random random_state l in
-      Some inj,path
+      let inj,roots,path = List_util.random random_state l in
+      Some (inj,roots,path)
     | None ->
       let pat1 = rule.Primitives.connected_components.(0) in
       let pat2 = rule.Primitives.connected_components.(1) in
@@ -325,9 +329,11 @@ module Make (Instances:Instances_sig.S) = struct
         Matching.reconstruct
           ~debugMode domain edges Matching.empty 0 pattern1 root1 in
       match inj1 with
-      | None -> None,None
+      | None -> None
       | Some inj ->
-        Matching.reconstruct ~debugMode domain edges inj 1 pattern2 root2,None
+        match Matching.reconstruct ~debugMode domain edges inj 1 pattern2 root2 with
+        | None -> None
+        | Some inj_out -> Some (inj_out,[root2;root1],None)
 
   let adjust_unary_rule_instances
       ~debugMode ~rule_id ?max_distance state domain graph pats rule =
@@ -346,7 +352,7 @@ module Make (Instances:Instances_sig.S) = struct
              | None -> out
              | Some inj' ->
                match max_distance with
-               | None -> (inj',None)::list,succ len
+               | None -> (inj',[root2;root1],None)::list,succ len
                | Some _ ->
                  let nodes =
                    Matching.elements_with_types domain pats inj' in
@@ -355,7 +361,7 @@ module Make (Instances:Instances_sig.S) = struct
                  | None -> out
                  | Some _ as p ->
                    if is_blocked ~debugMode state ~rule_id rule inj' then out
-                   else (inj',p)::list,succ len
+                   else (inj',[root2;root1],p)::list,succ len
         ) in
     let unary_candidates =
       if len = 0 then Mods.IntMap.remove rule_id state.unary_candidates
@@ -918,21 +924,15 @@ module Make (Instances:Instances_sig.S) = struct
           state event_kind ?path rule (Model.signatures env) in
       Success state
 
-  let apply_given_unary_rule
-      ~debugMode ~outputs ~rule_id env counter state event_kind rule =
-    let () = assert (not state.outdated) in
-    let domain = Model.domain env in
-    let inj,path = pick_a_unary_rule_instance
-        ~debugMode state state.imp.random_state domain state.edges ~rule_id rule in
-    let state' =
-      {state with
-       outdated_elements =
-         Operator.DepSet.add (Operator.RULE rule_id) state.outdated_elements} in
-    match inj with
+  let apply_given_unary_instance
+      ~debugMode ~outputs ~rule_id env counter state event_kind rule = function
     | None -> Clash
-    | Some inj ->
-      let nodes = Matching.elements_with_types
-          domain rule.Primitives.connected_components inj in
+    | Some (inj,_rev_roots,path) ->
+      let () = assert (not state.outdated) in
+      let state' =
+        {state with
+         outdated_elements =
+           Operator.DepSet.add (Operator.RULE rule_id) state.outdated_elements} in
       match path with
       | Some _ ->
         transform_by_a_rule
@@ -944,6 +944,9 @@ module Make (Instances:Instances_sig.S) = struct
             (match dist_opt with
              | None -> None
              | Some d -> Some (max_dist_to_int counter state' d)) in
+        let domain = Model.domain env in
+        let nodes = Matching.elements_with_types
+            domain rule.Primitives.connected_components inj in
         if max_distance = None && state.imp.story_machinery = None then
           if Edges.in_same_connected_component
               (fst (List.hd nodes.(0))) (fst (List.hd nodes.(1))) state.edges then
@@ -952,21 +955,17 @@ module Make (Instances:Instances_sig.S) = struct
               event_kind ~path:None rule ~rule_id inj
           else Corrected
         else
-        match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
-        | None -> Corrected
-        | Some _ as path ->
-          transform_by_a_rule
-            ~debugMode outputs env counter state' event_kind ~path rule ~rule_id inj
+          match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
+          | None -> Corrected
+          | Some _ as path ->
+            transform_by_a_rule
+              ~debugMode outputs env counter state' event_kind ~path rule ~rule_id inj
 
-  let apply_given_rule
-      ~debugMode ~outputs ?rule_id env counter state event_kind rule =
-    let () = assert (not state.outdated) in
-    let domain = Model.domain env in
-    match pick_a_rule_instance
-            ~debugMode state state.imp.random_state
-            domain state.edges ?rule_id rule with
+  let apply_given_instance
+      ~debugMode ~outputs ?rule_id env counter state event_kind rule = function
     | None -> Clash
-    | Some (inj,rev_roots) ->
+    | Some (inj,rev_roots,_path) ->
+      let () = assert (not state.outdated) in
       let () =
         if debugMode then
           let roots = Tools.array_rev_of_list rev_roots in
@@ -989,6 +988,7 @@ module Make (Instances:Instances_sig.S) = struct
                  event_kind rule ?rule_id inj
            | _ -> failwith "apply_given_rule unary rule without 2 patterns")
         | Some dist ->
+          let domain = Model.domain env in
           let dist' = Some (max_dist_to_int counter state dist) in
           let nodes = Matching.elements_with_types
               domain rule.Primitives.connected_components inj in
@@ -999,6 +999,14 @@ module Make (Instances:Instances_sig.S) = struct
             transform_by_a_rule
               ~debugMode outputs env counter state event_kind rule ?rule_id inj
           | Some _ -> Corrected
+
+  let apply_given_rule
+      ~debugMode ~outputs ?rule_id env counter state event_kind rule =
+    let domain = Model.domain env in
+    let inst = pick_a_rule_instance
+        ~debugMode state state.imp.random_state domain state.edges ?rule_id rule in
+    apply_given_instance
+      ~debugMode ~outputs ?rule_id env counter state event_kind rule inst
 
   let force_rule ~debugMode ~outputs env counter state event_kind ?rule_id rule =
     match apply_given_rule
@@ -1094,25 +1102,35 @@ module Make (Instances:Instances_sig.S) = struct
         (Format.asprintf "%a" (Model.print_token ~env) i,x)) state.imp.tokens;
   }
 
-  let apply_rule
-      ~debugMode ~outputs ?maxConsecutiveBlocked ~maxConsecutiveClash
-      env counter graph =
-    let choice = pick_rule graph.imp.random_state graph in
+  let pick_an_instance ~debugMode env state =
+    let choice = pick_rule state.imp.random_state state in
     let rule_id = choice/2 in
     let rule = Model.get_rule env rule_id in
+    let domain = Model.domain env in
+    (choice mod 2 = 1,rule_id,
+     if choice mod 2 = 1
+     then pick_a_unary_rule_instance
+         ~debugMode state state.imp.random_state domain state.edges ~rule_id rule
+     else pick_a_rule_instance
+         ~debugMode state state.imp.random_state domain state.edges ~rule_id rule)
+
+  let apply_instance
+      ~debugMode ~outputs ?maxConsecutiveBlocked ~maxConsecutiveClash
+      env counter graph (is_unary,rule_id,instance) =
     let cause = Trace.RULE rule_id in
+    let rule = Model.get_rule env rule_id in
     let () =
       if debugMode then
         Format.printf
           "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
-          (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ") rule_id
+          (fun f -> if is_unary then Format.fprintf f "unary@ ") rule_id
           (Kappa_printer.decompiled_rule ~noCounters:true ~full:true env) rule
           (*Rule_interpreter.print_dist env graph rule_id*) in
-    let apply_rule =
-      if choice mod 2 = 1
-      then apply_given_unary_rule ~debugMode ~outputs ~rule_id
-      else apply_given_rule ~debugMode ~outputs ~rule_id in
-    match apply_rule env counter graph cause rule with
+    let apply_given =
+      if is_unary
+      then apply_given_unary_instance ~debugMode ~outputs ~rule_id
+      else apply_given_instance ~debugMode ~outputs ~rule_id in
+    match apply_given env counter graph cause rule instance with
     | Success (graph') ->
       let final_step = not (Counter.one_constructive_event counter) in
       (Some rule.Primitives.syntactic_rule,final_step,graph')
@@ -1122,7 +1140,7 @@ module Make (Instances:Instances_sig.S) = struct
           Counter.one_clashing_instance_event counter
         else if out = Blocked then
           Counter.one_blocked_event counter
-        else if choice mod 2 = 1
+        else if is_unary
         then Counter.one_no_more_unary_event counter
         else Counter.one_no_more_binary_event counter in
       if Counter.consecutive_null_event counter < maxConsecutiveClash &&
@@ -1132,7 +1150,7 @@ module Make (Instances:Instances_sig.S) = struct
       then (None,not continue,graph)
       else
         (None,not continue,
-         (if choice mod 2 = 1 then
+         (if is_unary then
             adjust_unary_rule_instances
               ~debugMode ~rule_id env counter graph rule
           else

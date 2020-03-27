@@ -11,6 +11,8 @@
 module Make (Instances:Instances_sig.S) : sig
   type t (**Abstract graph*)
 
+  type instance
+
   type result = Clash | Corrected | Blocked | Success of t
   (** Clash means rectangular approximation failure
       Corrected means molecular ambiguity failure *)
@@ -43,10 +45,13 @@ module Make (Instances:Instances_sig.S) : sig
   (** Returns the graph obtained by applying the rule.
       [rule_id] is mandatory if the rule has an unary rate.*)
 
-  val apply_rule :
+  val pick_an_instance :
+    debugMode:bool -> Kappa_terms.Model.t -> t -> instance
+
+  val apply_instance :
     debugMode:bool -> outputs:(Data.t -> unit) ->
     ?maxConsecutiveBlocked:int -> maxConsecutiveClash:int ->
-    Model.t -> Counter.t -> t -> int option * bool * t
+    Model.t -> Counter.t -> t -> instance -> int option * bool * t
   (** [apply_rule ~outputs ~maxConsecutiveClash ?is_blocked model counter st]
       Returns [(corresponding_syntactic_rule, is_final_step, new_state)].
       [is_final_step] is determined by the counter.

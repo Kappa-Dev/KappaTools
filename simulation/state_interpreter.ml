@@ -323,10 +323,10 @@ let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state =
       act_stack := [] in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
-
+  let picked_instance = Rule_interpreter.pick_an_instance ~debugMode env graph in
   let applied_rid_syntax,final_step,graph' =
-    Rule_interpreter.apply_rule
-      ~debugMode ~outputs ~maxConsecutiveClash env counter graph in
+    Rule_interpreter.apply_instance
+      ~debugMode ~outputs ~maxConsecutiveClash env counter graph picked_instance in
   match applied_rid_syntax with
   | None -> (final_step,graph',state)
   | Some syntax_rid ->
