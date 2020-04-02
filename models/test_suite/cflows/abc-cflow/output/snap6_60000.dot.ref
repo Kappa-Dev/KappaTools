@@ -1,7 +1,7 @@
 // Snapshot [Event: 60000]
 digraph G{
 subgraph cluster0{
-  counter0 [label = "2 instance(s)", shape=none];
+  counter0 [label = "1 instance(s)", shape=none];
   node0_0_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
   node0_0_0 -> counter0 [style=invis];
   node0_0_1 [label = "B(x)", color = "#6fd754", style=filled];
@@ -12,34 +12,26 @@ subgraph cluster0{
   node0_0_0 -> node0_0_2 [taillabel="c", headlabel="x2", dir=none];
   }
 subgraph cluster1{
-  counter1 [label = "1 instance(s)", shape=none];
-  node1_0_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
+  counter1 [label = "9999 instance(s)", shape=none];
+  node1_0_0 [label = "C(x1{p} x2{p})", color = "#e36019", style=filled];
   node1_0_0 -> counter1 [style=invis];
-  node1_0_1 [label = "C(x1{p} x2{u})", color = "#e36019", style=filled];
-  node1_0_1 -> counter1 [style=invis];
-  node1_0_0 -> node1_0_1 [taillabel="c", headlabel="x2", dir=none];
   }
 subgraph cluster2{
-  counter2 [label = "9997 instance(s)", shape=none];
-  node2_0_0 [label = "C(x1{p} x2{p})", color = "#e36019", style=filled];
+  counter2 [label = "726 instance(s)", shape=none];
+  node2_0_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
   node2_0_0 -> counter2 [style=invis];
+  node2_0_1 [label = "B(x)", color = "#6fd754", style=filled];
+  node2_0_1 -> counter2 [style=invis];
+  node2_0_0 -> node2_0_1 [taillabel="x", headlabel="x", dir=none];
   }
 subgraph cluster3{
-  counter3 [label = "723 instance(s)", shape=none];
-  node3_0_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
+  counter3 [label = "273 instance(s)", shape=none];
+  node3_0_0 [label = "B(x)", color = "#6fd754", style=filled];
   node3_0_0 -> counter3 [style=invis];
-  node3_0_1 [label = "B(x)", color = "#6fd754", style=filled];
-  node3_0_1 -> counter3 [style=invis];
-  node3_0_0 -> node3_0_1 [taillabel="x", headlabel="x", dir=none];
   }
 subgraph cluster4{
-  counter4 [label = "275 instance(s)", shape=none];
-  node4_0_0 [label = "B(x)", color = "#6fd754", style=filled];
+  counter4 [label = "273 instance(s)", shape=none];
+  node4_0_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
   node4_0_0 -> counter4 [style=invis];
-  }
-subgraph cluster5{
-  counter5 [label = "274 instance(s)", shape=none];
-  node5_0_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
-  node5_0_0 -> counter5 [style=invis];
   }
 }

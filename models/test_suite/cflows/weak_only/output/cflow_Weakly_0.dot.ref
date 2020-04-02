@@ -1,11 +1,11 @@
-/* Compression of 10 causal flows obtained in average at 2.001430E+01 t.u */
+/* Compression of 10 causal flows obtained in average at 2.001646E+01 t.u */
 /* Compressed causal flows were: [1;2;3;4;5;6;7;8;9;10] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_2 [label="$APPLY 10000 C(x1{u}[.] x2{u}[.])+", shape=invhouse, style=filled, fillcolor = green] ;
-node_3 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_7 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;

@@ -284,7 +284,7 @@ let initialize
            state0.perturbations_not_done_yet in
        return out)
 
-let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state =
+let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state instance =
   let prev_activity = Rule_interpreter.activity graph in
   let act_stack = ref [] in
   let finalize_registration my_syntax_rd_id =
@@ -323,10 +323,9 @@ let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state =
       act_stack := [] in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
-  let picked_instance = Rule_interpreter.pick_an_instance ~debugMode env graph in
   let applied_rid_syntax,final_step,graph' =
     Rule_interpreter.apply_instance
-      ~debugMode ~outputs ~maxConsecutiveClash env counter graph picked_instance in
+      ~debugMode ~outputs ~maxConsecutiveClash env counter graph instance in
   match applied_rid_syntax with
   | None -> (final_step,graph',state)
   | Some syntax_rid ->
@@ -446,6 +445,25 @@ let perturbate_with_backtrack
       (stop,graph',state')
     else (true,graph,state)
 
+let regular_loop_body
+    ~debugMode ~outputs ~maxConsecutiveClash env counter graph state dt =
+  let () =
+    let outputs counter' time =
+      let cand =
+        observables_values env graph (Counter.fake_time counter' time) in
+      if Array.length cand > 1 then outputs (Data.Plot cand) in
+    Counter.fill ~outputs counter ~dt in
+  let continue = Counter.one_time_advance counter dt in
+  let picked_instance =
+    Rule_interpreter.pick_an_instance ~debugMode env graph in
+  let (stop,graph',state') = perturbate
+      ~debugMode ~outputs ~is_alarm:false
+      env counter graph state state.time_dependent_perts in
+  if (not continue)||stop then (true,graph',state') else
+    one_rule
+      ~debugMode ~outputs ~maxConsecutiveClash
+      env counter graph' state' picked_instance
+
 let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
     env counter graph state =
   let activity = Rule_interpreter.activity graph in
@@ -487,42 +505,17 @@ let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
         let (stop,graph',state',dt',needs_backtrack) =
            perturbate_until_first_backtrack
              ~debugMode env counter ~outputs (false,graph,state,dt) in
-
-        begin
-          if needs_backtrack then
-            perturbate_with_backtrack
-              ~debugMode ~outputs env counter graph' state' state'.stopping_times
-          else
-            (*set time for apply rule *)
-            let () =
-              let outputs counter' time =
-                let cand = observables_values
-                    env graph' (Counter.fake_time counter' time) in
-                if Array.length cand > 1 then outputs (Data.Plot cand) in
-              Counter.fill ~outputs counter ~dt:dt' in
-            let continue = Counter.one_time_advance counter dt' in
-
-            if (not continue) || stop then (true,graph',state') else
-              one_rule
-                ~debugMode ~outputs ~maxConsecutiveClash
-                env counter graph' state'
-         end
-
+        if needs_backtrack then
+          perturbate_with_backtrack
+            ~debugMode ~outputs env counter graph' state' state'.stopping_times
+        else
+        if stop then (stop,graph',state')
+        else
+          regular_loop_body
+            ~debugMode ~outputs ~maxConsecutiveClash env counter graph' state' dt'
       | _ ->
-        let () =
-          let outputs counter' time =
-            let cand =
-              observables_values env graph (Counter.fake_time counter' time) in
-            if Array.length cand > 1 then outputs (Data.Plot cand) in
-          Counter.fill ~outputs counter ~dt in
-        let continue = Counter.one_time_advance counter dt in
-        let (stop,graph',state') = perturbate
-            ~debugMode ~outputs ~is_alarm:false
-            env counter graph state state.time_dependent_perts in
-        if (not continue)||stop then (true,graph',state') else
-          one_rule
-            ~debugMode ~outputs ~maxConsecutiveClash
-            env counter graph' state' in
+        regular_loop_body
+          ~debugMode ~outputs ~maxConsecutiveClash env counter graph state dt in
   out
 
 let end_of_simulation ~outputs env counter graph state =
