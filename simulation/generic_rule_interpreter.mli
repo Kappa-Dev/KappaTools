@@ -48,6 +48,8 @@ module Make (Instances:Instances_sig.S) : sig
   val pick_an_instance :
     debugMode:bool -> Kappa_terms.Model.t -> t -> instance
 
+  val is_correct_instance : Model.t -> t -> instance -> bool
+
   val apply_instance :
     debugMode:bool -> outputs:(Data.t -> unit) ->
     ?maxConsecutiveBlocked:int -> maxConsecutiveClash:int ->

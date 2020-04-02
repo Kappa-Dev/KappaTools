@@ -53,7 +53,7 @@ val one_constructive_event : t -> bool
 val one_clashing_instance_event : t -> bool
 val one_no_more_unary_event : t -> bool
 val one_no_more_binary_event : t -> bool
-val one_time_correction_event : t -> Nbr.t -> bool
+val one_time_correction_event : ?ti : Nbr.t -> t -> bool
 
 val inc_stories : t -> unit
 

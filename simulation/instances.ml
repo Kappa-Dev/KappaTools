@@ -32,9 +32,12 @@ let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
   Roots.update_roots
     state.roots is_add unary_ccs edges mod_connectivity pattern root
 
+(** {2 Checking instances} *)
 
+let is_valid state pat root =
+  IntCollection.mem root (Roots.of_pattern pat state.roots)
 
-(** {6 Compute the number of instances } *)
+(** {2 Compute the number of instances } *)
 
 let number_of_instances ?rule_id:_ st pats =
   Array.fold_left

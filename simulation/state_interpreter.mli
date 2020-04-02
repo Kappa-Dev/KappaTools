@@ -28,7 +28,7 @@ values of observables) *)
 val do_modifications :
   debugMode:bool -> outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
   Rule_interpreter.t -> t -> Primitives.modification list ->
-  (bool * Rule_interpreter.t * t)
+  (bool * Rule_interpreter.t * t * bool)
 
 val a_loop :
   debugMode:bool -> outputs:(Data.t -> unit) -> dumpIfDeadlocked:bool ->

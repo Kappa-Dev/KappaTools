@@ -615,6 +615,9 @@ let empty_path = []
 let singleton_path n s n' s' = [(n,s),(n',s')]
 let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l
 
+let is_valid_path p graph =
+  List.for_all (fun (((ag,_),s),((ag',_),s')) -> link_exists ag s ag' s' graph) p
+
 let breadth_first_traversal
     ~looping ?max_distance stop_on_find is_interesting links cache out todos =
   let rec look_each_site ((id,_ as ag),path as x) site (out,next as acc) =

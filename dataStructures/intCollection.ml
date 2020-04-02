@@ -57,3 +57,5 @@ let random rs s =
 
 let fold f s acc =
   Tools.recti (fun acc i -> f (Mods.DynArray.get s.bag i) acc) acc s.size
+
+let mem x s = Hashtbl.mem s.dict x

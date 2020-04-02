@@ -1114,6 +1114,21 @@ module Make (Instances:Instances_sig.S) = struct
      else pick_a_rule_instance
          ~debugMode state state.imp.random_state domain state.edges ~rule_id rule)
 
+  let is_correct_instance env graph (is_unary,rule_id,instance) =
+    match instance with
+    | None -> true
+    | Some (_inj,inv_roots,path) ->
+      let rule = Model.get_rule env rule_id in
+      let pats = rule.Primitives.connected_components in
+      Tools.array_fold_left2i (fun _ b cc r ->
+          b && Instances.is_valid graph.imp.instances cc r)
+        true pats (Tools.array_rev_of_list inv_roots) &&
+      (not is_unary || match path with
+        | Some p -> Edges.is_valid_path p graph.edges
+        | None -> match inv_roots with
+          | [ x; y ] -> Edges.in_same_connected_component x y graph.edges
+          | _ -> assert false)
+
   let apply_instance
       ~debugMode ~outputs ?maxConsecutiveBlocked ~maxConsecutiveClash
       env counter graph (is_unary,rule_id,instance) =

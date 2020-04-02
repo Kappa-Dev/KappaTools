@@ -196,8 +196,8 @@ let one_no_more_unary_event c =
 let one_clashing_instance_event c =
   let () = c.stat_null <- Efficiency.incr_clashing_instance c.stat_null in
   check_time c && check_events c
-let one_time_correction_event c ti =
-  match Nbr.to_float ti with
+let one_time_correction_event ?ti c =
+  match Option_util.bind Nbr.to_float ti with
   | None -> false
   | Some ti ->
     let () = c.time <- ti in

@@ -35,8 +35,11 @@ val merge_cc :
 
 val update_roots :
   t -> bool -> Pattern.Set.t -> Edges.t ->
-  Roots.mod_ccs_cache -> Pattern.Set.elt -> int -> unit
+  Roots.mod_ccs_cache -> Pattern.id -> int -> unit
 
+(** {2 Checking instances} *)
+
+val is_valid : t -> Pattern.id -> int -> bool
 
 (** {2 Counting instances} *)
 

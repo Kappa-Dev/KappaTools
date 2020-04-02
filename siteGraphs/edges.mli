@@ -76,6 +76,8 @@ val rev_path : path -> path
 val print_path :
   ?sigs:Signature.s -> Format.formatter -> path -> unit
 
+val is_valid_path : path -> t -> bool
+
 val are_connected :
   ?max_distance : int -> t -> Agent.t list -> Agent.t list -> path option
 (** [are_connected ?max_distance graph nodes_x nodes_y] *)

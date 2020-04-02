@@ -16,6 +16,7 @@ val is_empty : t -> bool
 
 val size : t -> int
 
+val mem : int -> t -> bool
 val add : int -> t -> unit
 val remove : int -> t -> unit
 
