@@ -1,49 +1,36 @@
-dist: xenial
+dist: bionic
 
 env:
   global:
     secure: "XBCnCpNZ9WfkvDLkwMeW/D/TphPpqDJQdSsC9UOK9HFR3rgBmCof36DlirrZeefF6YKTr3Exkbl/7jDUK7hAGoa1c5NbXqYFp4ne3pSo77G3jHbC0zEP5k2F15NKSo8P9x0QsKzi7Mg1liratz7u65jRqURaZG4kFMw4f0NfVGU="
+addons:
+  apt:
+    sources:
+      - sourceline: 'ppa:avsm/ppa'
+    packages:
+      - opam
+      - ocaml-nox
+  homebrew:
+    packages:
+      - opam
 
 matrix:
   include:
   - env: CHECKED=python
     language: python
-    addons:
-      apt:
-        sources:
-          - avsm
-        packages:
-          - aspcud
-          - opam
   - env: CHECKED=js
-    addons:
-      apt:
-        sources:
-          - avsm
-        packages:
-          - aspcud
-          - opam
   - env: USE_TK=1
     addons:
       apt:
-        sources:
-          - avsm
         packages:
-          - aspcud
-          - opam
           - tk-dev
   - env: CHECKED=native
     addons:
       apt:
-        sources:
-          - avsm
         packages:
-          - aspcud
-          - opam
           - gnuplot-nox
           - poppler-utils
           - graphviz
-          - latex-xcolor
           - texlive-latex-recommended
           - texlive-fonts-recommended
           - texlive-pictures
@@ -53,18 +40,11 @@ matrix:
   - env: CHECKED=windows
     addons:
       apt:
-        sources:
-          - avsm
         packages:
-          - aspcud
-          - opam
           - gcc-mingw-w64-x86-64
 
-before_install:
-  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then curl -LO https://github.com/ocaml/opam/releases/download/2.0.6/opam-2.0.6-x86_64-macos && sudo mv opam-2.0.6-x86_64-macos /usr/local/bin/opam && sudo chmod +x /usr/local/bin/opam ; fi"
-
 install:
-  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a --compiler=4.05.0 ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then opam remote add cross-windows git://github.com/ocaml-cross/opam-cross-windows ; fi"
   - eval $(opam env) && opam install -y dune num yojson lwt fmt logs re decompress
   - sh -c "if [ '$CHECKED' = native ] ; then opam install -y odoc ; fi"
