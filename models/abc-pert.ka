@@ -35,4 +35,3 @@
 %init: 'n_c' C()
 
 %mod: alarm 10.0 do $ADD 10000 C();
-%mod: alarm 3.0 do $SNAPSHOT "coucou.ka.gz";

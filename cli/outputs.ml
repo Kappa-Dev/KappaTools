@@ -144,42 +144,15 @@ let rec plot_now l =
     Data.print_plot_line ~is_tsv:fd.is_tsv Nbr.print_option fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
-let compress_it =
-  let q = De.Queue.create 4096 in
-  let w = De.make_window ~bits:15 in
-  fun filename channel txt ->
-  let encoder =
-    Gz.Def.encoder
-      (`String txt) (`Channel channel) ~ascii:true ?hcrc:None ~filename
-      ?comment:None ~mtime:(Int32.of_float (Unix.time ()))
-      Gz.Unix ~q ~w ~level:2 in
-  match Gz.Def.encode encoder with
-  | `Await _ | `Flush _-> assert false
-  | `End _e1 -> ()
-
 let snapshot s =
   if Filename.check_suffix s.Data.snapshot_file ".dot" then
     Kappa_files.with_snapshot
       s.Data.snapshot_file ".dot" s.Data.snapshot_event
       (Kappa_files.wrap_formatter (fun f -> Data.print_dot_snapshot ~uuid f s))
-  else if Filename.check_suffix s.Data.snapshot_file ".json.gz" then
-    Kappa_files.with_snapshot
-      s.Data.snapshot_file ".json.gz" s.Data.snapshot_event
-      (fun d ->
-         let filename = Filename.chop_extension s.Data.snapshot_file in
-         compress_it
-           filename d (JsonUtil.string_of_write Data.write_snapshot s))
   else if Filename.check_suffix s.Data.snapshot_file ".json" then
     Kappa_files.with_snapshot
       s.Data.snapshot_file ".json" s.Data.snapshot_event
       (fun d -> JsonUtil.write_to_channel Data.write_snapshot d s)
-  else if Filename.check_suffix s.Data.snapshot_file ".gz" then
-    Kappa_files.with_snapshot
-      s.Data.snapshot_file ".ka.gz" s.Data.snapshot_event
-      (fun d ->
-         let filename = Filename.chop_extension s.Data.snapshot_file in
-         compress_it filename d
-           (Format.asprintf "%a@." (Data.print_snapshot ~uuid) s))
   else
     Kappa_files.with_snapshot
       s.Data.snapshot_file ".ka" s.Data.snapshot_event
