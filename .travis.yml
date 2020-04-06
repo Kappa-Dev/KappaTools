@@ -3,31 +3,46 @@ dist: bionic
 env:
   global:
     secure: "XBCnCpNZ9WfkvDLkwMeW/D/TphPpqDJQdSsC9UOK9HFR3rgBmCof36DlirrZeefF6YKTr3Exkbl/7jDUK7hAGoa1c5NbXqYFp4ne3pSo77G3jHbC0zEP5k2F15NKSo8P9x0QsKzi7Mg1liratz7u65jRqURaZG4kFMw4f0NfVGU="
-addons:
-  apt:
-    sources:
-      - sourceline: 'ppa:avsm/ppa'
-    packages:
-      - opam
-      - ocaml-nox
-  homebrew:
-    packages:
-      - opam
 
 matrix:
   include:
   - env: CHECKED=python
     language: python
+    addons:
+      apt:
+        sources:
+          - sourceline: 'ppa:avsm/ppa'
+        packages:
+          - aspcud
+          - opam
   - env: CHECKED=js
+    addons:
+      apt:
+        sources:
+          - sourceline: 'ppa:avsm/ppa'
+        packages:
+          - aspcud
+          - opam
+          - ocaml-nox
   - env: USE_TK=1
     addons:
       apt:
+        sources:
+          - sourceline: 'ppa:avsm/ppa'
         packages:
+          - aspcud
+          - opam
+          - ocaml-nox
           - tk-dev
   - env: CHECKED=native
     addons:
       apt:
+        sources:
+          - sourceline: 'ppa:avsm/ppa'
         packages:
+          - aspcud
+          - opam
+          - ocaml-nox
           - gnuplot-nox
           - poppler-utils
           - graphviz
@@ -37,10 +52,20 @@ matrix:
           - tex4ht
   - os: osx
     env: CHECKED=MacOS
+    osx_image: xcode11
+    addons:
+      homebrew:
+        packages:
+          - opam
+          - ocaml
   - env: CHECKED=windows
     addons:
       apt:
+        sources:
+          - sourceline: 'ppa:avsm/ppa'
         packages:
+          - aspcud
+          - opam
           - gcc-mingw-w64-x86-64
 
 install:
