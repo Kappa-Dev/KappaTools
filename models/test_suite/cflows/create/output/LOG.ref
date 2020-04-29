@@ -23,23 +23,17 @@ ____________________________________________________________
 	- simplify the trace, 1553 events 
 		- start iteration 1, 1553 events remaining 
 				- alpha-conversion
-				- detecting siphons: nothing has changed 
+				- detecting siphons: +207 events 
 				- alpha-conversion
-				- cutting concurrent events: -1241 events 
-				- detecting pseudo inverse events: -4 events 
-		- start iteration 2, 308 events remaining 
-				- alpha-conversion
-				- detecting siphons: nothing has changed 
-				- alpha-conversion
-				- cutting concurrent events: -2 events 
+				- cutting concurrent events: -1451 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 3, 306 events remaining 
+		- start iteration 2, 309 events remaining 
 				- alpha-conversion
-				- detecting siphons: nothing has changed 
+				- detecting siphons: +68 events 
 				- alpha-conversion
-				- cutting concurrent events: nothing has changed 
+				- cutting concurrent events: -68 events 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 306 events remaining 
+	- a fixpoint has been reached, 309 events remaining 
 	- blackboard generation 
 	- computing causal past of each observed events (59)
 
@@ -48,17 +42,17 @@ ____________________________________________________________
 
 
 
-	 - weak flow compression (4)
+	 - weak flow compression (3)
 
 ____________________________________________________________
 ############################################################
 
-	 - strong flow compression (1)
+	 - strong flow compression (2)
 
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 1 weakly compressed flow
++ Pretty printing 2 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
 Simulation ended
 99.60% of event loops were productive. Null event cause:
