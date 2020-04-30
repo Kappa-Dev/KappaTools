@@ -14,9 +14,9 @@ done
 + Building initial state (400 agents)
 Done
 + Command line to rerun is: 'KaSim' '-u' 'event' '-l' '200' '-seed' '718860825' '-o' 'data.svg' '-d' 'output' '-p' '2' 'abbcd.ka' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 Simulation ended
-51.28% of event loops were productive. Null event cause:
-	Valid embedding but no longer unary when required: 2.63%
-	Clashing instance: 97.37%
+56.98% of event loops were productive. Null event cause:
+	Valid embedding but no longer unary when required: 0.66%
+	Clashing instance: 99.34%

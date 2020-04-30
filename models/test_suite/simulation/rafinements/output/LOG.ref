@@ -14,8 +14,8 @@ done
 + Building initial state (30000 agents)
 Done
 + Command line to rerun is: 'KaSim' '-p' '0.008' '-d' 'output' 'rafinements.ka' '-o' 'data.tsv' '-mode' 'batch' '--max-sharing' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 Simulation ended
 100.00% of event loops were productive. Null event cause:
 	Clashing instance: 83.33%

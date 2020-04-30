@@ -16,21 +16,21 @@ done
  (10000 agents)
 Done
 + Command line to rerun is: 'KaSim' '-l' '5' '-d' 'output' '-seed' '20543' 'repeat_time.ka' '-syntax' '4'
-____________________________________________________________
-########1st printing alarm at 0.7
+______________________________________________________________________
+#########1st printing alarm at 0.7
 2nd printing alarm at 0.7
 3rd printing alarm at 0.7
-########2nd printing alarm at 1.4
+##########2nd printing alarm at 1.4
 3rd printing alarm at 1.4
-########2nd printing alarm at 2.1
+##########2nd printing alarm at 2.1
 3rd printing alarm at 2.1
-#########2nd printing alarm at 2.8
+##########2nd printing alarm at 2.8
 3rd printing alarm at 2.8
-########2nd printing alarm at 3.5
+#########2nd printing alarm at 3.5
 3rd printing alarm at 3.5
-#########2nd printing alarm at 4.2
+##########2nd printing alarm at 4.2
 3rd printing alarm at 4.2
-########2nd printing alarm at 4.9
+##########2nd printing alarm at 4.9
 3rd printing alarm at 4.9
 ##
 Simulation ended

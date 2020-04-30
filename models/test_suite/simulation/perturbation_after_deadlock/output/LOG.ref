@@ -14,8 +14,8 @@ done
 + Building initial state (1 agents)
 Done
 + Command line to rerun is: 'KaSim' '-mode' 'batch' '-var' 'scale' '1e-4' '-d' 'output' '563.ka' '-seed' '358755241'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 Simulation ended
 0.00% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%

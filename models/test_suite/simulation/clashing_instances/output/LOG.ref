@@ -115,7 +115,7 @@ Rule rule has now 10000 instances.
  (100 agents)
 Done
 + Command line to rerun is: 'KaSim' '-u' 'event' '-l' '120' '-d' 'output' 'clashing_instances.ka' '-seed' '923639563' '--debug' '-syntax' '4'
-____________________________________________________________
+______________________________________________________________________
 Applied 0:
 A(), A(x[#])- @ 1
 On roots: 47 9
@@ -165,35 +165,35 @@ Rule rule has now 8649 instances.
 Obtained
 %init: 93 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 25 50
 Rule rule has now 8464 instances.
 Obtained
 %init: 92 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 28 21
 Rule rule has now 8281 instances.
 Obtained
 %init: 91 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 7 24
 Rule rule has now 8100 instances.
 Obtained
 %init: 90 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 11 83
 Rule rule has now 7921 instances.
 Obtained
 %init: 89 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 Applied 0:
 A(), A(x[#])- @ 1
@@ -251,35 +251,35 @@ Rule rule has now 6561 instances.
 Obtained
 %init: 81 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 25 28
 Rule rule has now 6400 instances.
 Obtained
 %init: 80 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 72 55
 Rule rule has now 6241 instances.
 Obtained
 %init: 79 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 86 20
 Rule rule has now 6084 instances.
 Obtained
 %init: 78 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 68 88
 Rule rule has now 5929 instances.
 Obtained
 %init: 77 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 26 62
 Rule rule has now 5776 instances.
@@ -335,35 +335,35 @@ Rule rule has now 4761 instances.
 Obtained
 %init: 69 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 93 40
 Rule rule has now 4624 instances.
 Obtained
 %init: 68 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 90 49
 Rule rule has now 4489 instances.
 Obtained
 %init: 67 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 77 39
 Rule rule has now 4356 instances.
 Obtained
 %init: 66 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 48 38
 Rule rule has now 4225 instances.
 Obtained
 %init: 65 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 27 10
 Rule rule has now 4096 instances.
@@ -419,35 +419,35 @@ Rule rule has now 3249 instances.
 Obtained
 %init: 57 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 63 29
 Rule rule has now 3136 instances.
 Obtained
 %init: 56 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 36 47
 Rule rule has now 3025 instances.
 Obtained
 %init: 55 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 96 36
 Rule rule has now 2916 instances.
 Obtained
 %init: 54 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 98 79
 Rule rule has now 2809 instances.
 Obtained
 %init: 53 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 35 95
 Rule rule has now 2704 instances.
@@ -505,35 +505,35 @@ Rule rule has now 2025 instances.
 Obtained
 %init: 45 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 0 46
 Rule rule has now 1936 instances.
 Obtained
 %init: 44 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 7 70
 Rule rule has now 1849 instances.
 Obtained
 %init: 43 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 25 18
 Rule rule has now 1764 instances.
 Obtained
 %init: 42 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 78 17
 Rule rule has now 1681 instances.
 Obtained
 %init: 41 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 91 32
 Rule rule has now 1600 instances.
@@ -591,35 +591,35 @@ Rule rule has now 1089 instances.
 Obtained
 %init: 33 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 58 15
 Rule rule has now 1024 instances.
 Obtained
 %init: 32 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 91 67
 Rule rule has now 961 instances.
 Obtained
 %init: 31 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 91 22
 Rule rule has now 900 instances.
 Obtained
 %init: 30 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 23 52
 Rule rule has now 841 instances.
 Obtained
 %init: 29 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 48 0
 Rule rule has now 784 instances.
@@ -675,35 +675,35 @@ Rule rule has now 441 instances.
 Obtained
 %init: 21 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 51 96
 Rule rule has now 400 instances.
 Obtained
 %init: 20 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 90 77
 Rule rule has now 361 instances.
 Obtained
 %init: 19 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 51 8
 Rule rule has now 324 instances.
 Obtained
 %init: 18 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 51 68
 Rule rule has now 289 instances.
 Obtained
 %init: 17 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 80 30
 Rule rule has now 256 instances.
@@ -759,49 +759,48 @@ Rule rule has now 81 instances.
 Obtained
 %init: 9 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 92 16
 Rule rule has now 64 instances.
 Obtained
 %init: 8 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 On roots: 73 85
 Rule rule has now 49 instances.
 Obtained
 %init: 7 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
 On roots: 90 92
 Rule rule has now 36 instances.
 Obtained
 %init: 6 A(x[.])
 
-#Applied 0:
+Applied 0:
 A(), A(x[#])- @ 1
 Applied 0:
 A(), A(x[#])- @ 1
-Rule rule has now 30 instances.
 Applied 0:
 A(), A(x[#])- @ 1
-On roots: 14 90
+On roots: 73 64
 Rule rule has now 25 instances.
 Obtained
 %init: 5 A(x[.])
 
-Applied 0:
+#Applied 0:
 A(), A(x[#])- @ 1
-On roots: 51 73
+On roots: 73 51
 Rule rule has now 16 instances.
 Obtained
 %init: 4 A(x[.])
 
 #Applied 0:
 A(), A(x[#])- @ 1
-On roots: 14 51
+On roots: 73 90
 Rule rule has now 9 instances.
 Obtained
 %init: 3 A(x[.])
@@ -810,14 +809,14 @@ Applied 0:
 A(), A(x[#])- @ 1
 Applied 0:
 A(), A(x[#])- @ 1
-On roots: 14 80
+On roots: 80 73
 Rule rule has now 4 instances.
 Obtained
 %init: 2 A(x[.])
 
 #Applied 0:
 A(), A(x[#])- @ 1
-On roots: 64 14
+On roots: 14 80
 Rule rule has now 1 instances.
 Obtained
 %init: 1 A(x[.])
@@ -826,8 +825,10 @@ Applied 0:
 A(), A(x[#])- @ 1
 Applied 0:
 A(), A(x[#])- @ 1
+Applied 0:
+A(), A(x[#])- @ 1
 Rule rule has now 0 instances.
-###########
+#############
 Simulation ended
-92.52% of event loops were productive. Null event cause:
+91.67% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%

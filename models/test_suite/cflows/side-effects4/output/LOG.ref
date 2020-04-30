@@ -14,8 +14,8 @@ done
 + Building initial state (12 agents)
 Done
 + Command line to rerun is: 'KaSim' 'side-effects.ka' '-u' 'e' '-l' '25' '-seed' '253329392' '-d' 'output' '--time-independent' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 + Loading trace
 	- removing events occurring after the last observable: -36 events 
 + No causal flow found

@@ -14,8 +14,8 @@ done
 + Building initial state (2 agents)
 Done
 + Command line to rerun is: 'KaSim' 'link_swapping.ka' '-seed' '924556145' '-u' 'event' '-l' '3' '-d' 'output' '--time-independent' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 + Loading trace
 	- removing events occurring after the last observable: nothing has changed 
 + Producing causal compressions
@@ -34,10 +34,10 @@ ____________________________________________________________
 
 	 - weak flow compression (1)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 + Pretty printing 1 weakly compressed flow
 Simulation ended
-50.00% of event loops were productive. Null event cause:
+60.00% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%

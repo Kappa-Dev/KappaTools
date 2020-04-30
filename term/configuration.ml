@@ -22,11 +22,11 @@ type t = {
 }
 
 let empty = {
-  progressSize = 60;
+  progressSize = 70;
   progressChar = '#';
   dumpIfDeadlocked = true;
   initial = None;
-  maxConsecutiveClash = 2;
+  maxConsecutiveClash = 3;
   seed = None;
   traceFileName = None;
   plotPeriod = None;

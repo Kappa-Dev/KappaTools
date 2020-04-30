@@ -14,8 +14,8 @@ done
 + Building initial state (2 agents)
 Done
 + Command line to rerun is: 'KaSim' '-i' 'observables.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '--time-independent' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 + Loading trace
 	- removing events occurring after the last observable: -10002 events 
 + No causal flow found
