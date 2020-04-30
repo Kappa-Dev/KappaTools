@@ -19,11 +19,10 @@ class BuildAgentsCommand(distutils.cmd.Command):
 
     description = 'compile Kappa agents'
     user_options = [
-        ('ocamlfind=', None, 'path to ocamlfind binary'),
     ]
 
     def initialize_options(self):
-        self.ocamlfind = 'ocamlfind'
+        ()
 
     def finalize_options(self):
         ()
@@ -39,20 +38,22 @@ class BuildAgentsCommand(distutils.cmd.Command):
 class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
     """Compile Kappa agent in addition of standard build"""
 
+    def append_a_binary(self,bin_dir,name):
+        file_in_src = os.path.join('bin',name)
+        if os.path.isfile(file_in_src):
+            distutils.file_util.copy_file(file_in_src, bin_dir, preserve_mode=0)
+            self.my_outputs.append(os.path.join(bin_dir, name))
+
+
     def run(self):
         self.my_outputs = []
         self.run_command('build_agents')
         bin_dir = os.path.join(self.build_lib, 'kappy/bin')
         distutils.dir_util.mkpath(bin_dir)
-        if os.path.isfile('bin/KaSimAgent'):
-            distutils.file_util.copy_file("bin/KaSimAgent", bin_dir)
-            self.my_outputs.append(os.path.join(bin_dir, "KaSimAgent"))
-        if os.path.isfile('bin/KaSaAgent'):
-            distutils.file_util.copy_file("bin/KaSaAgent", bin_dir)
-            self.my_outputs.append(os.path.join(bin_dir, "KaSaAgent"))
-        if os.path.isfile('bin/KaMoHa'):
-            distutils.file_util.copy_file("bin/KaMoHa", bin_dir)
-            self.my_outputs.append(os.path.join(bin_dir, "KaMoHa"))
+        self.append_a_binary(bin_dir,"KaSimAgent")
+        self.append_a_binary(bin_dir,"KappaSwitchman")
+        self.append_a_binary(bin_dir,"KaSaAgent")
+        self.append_a_binary(bin_dir,"KaMoHa")
         setuptools.command.build_ext.build_ext.run(self)
 
     def get_outputs(self):
@@ -66,7 +67,7 @@ def readme():
 
 setup(name='kappy',
       license='LGPLv3',
-      version='4.0.94',
+      version='4.1.0',
       description='Wrapper to interact with the Kappa tool suite',
       long_description=readme(),
       url='https://github.com/Kappa-Dev/KaSim.git',
