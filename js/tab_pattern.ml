@@ -71,8 +71,9 @@ let height_of_lines =
   Array.map
     (Array.fold_left
        (fun acc (v,sites) ->
-          let s = max_site_box ~only_site:false sites in
-          max acc (2. *. diag_box s +. diag_box v))
+          let s = diag_box (max_site_box ~only_site:false sites) in
+          let min_circ = s *. float_of_int (Array.length sites) in
+          max acc (s +. (max (s +. diag_box v) (min_circ /. pi))))
        0.)
 
 let width_of_rows sizes =
@@ -81,8 +82,11 @@ let width_of_rows sizes =
     let () =
       Array.iter
         (Array.iteri (fun i (v,sites) ->
-             let s = max_site_box ~only_site:false sites in
-             max_width.(i) <- max max_width.(i) (2. *. diag_box s +. diag_box v)))
+             let s = diag_box (max_site_box ~only_site:false sites) in
+             let min_circ = s *. float_of_int (Array.length sites) in
+             max_width.(i) <-
+               max
+                 max_width.(i) (s +. (max (s +. diag_box v) (min_circ /. pi)))))
         sizes in
     max_width
 
@@ -215,11 +219,17 @@ let svg_of_graph mix =
               | Some ag ->
                 let cx = left_x +. max_width.(j) /. 2. in
                 let (agbox,sites) = sizes.(i).(j) in
+                let max_site_diag =
+                  diag_box (max_site_box ~only_site:true sites) in
+                let diameter_to_read_ag_name =
+                  (diag_box agbox +. max_site_diag) in
+                let diameter_to_read_all_site_names =
+                  max_site_diag *. float_of_int (Array.length sites) /. pi in
                 let radius =
-                  (diag_box agbox +.
-                   diag_box (max_site_box ~only_site:true sites))
-                    /. 2. in
-                let sites,links' = svg_of_sites (i,j) cx cy radius sites links ag.node_sites in
+                  max diameter_to_read_ag_name diameter_to_read_all_site_names
+                  /. 2. in
+                let sites,links' =
+                  svg_of_sites (i,j) cx cy radius sites links ag.node_sites in
                 let n = svg_of_node cx cy radius "silver" ag.node_type in
                 let out = if sites = [] then n else Svg.g (n::sites) in
                 ((out::ags,links'),left_x +. max_width.(j)))
