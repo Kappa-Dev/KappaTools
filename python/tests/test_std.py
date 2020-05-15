@@ -4,7 +4,6 @@ from builtins import dict, str
 import inspect
 
 import kappy
-from kappy.kappa_std import BIN_DIR
 
 from util import _KappaClientTest, run_nose
 
@@ -13,7 +12,7 @@ class StdClientTest(_KappaClientTest):
     """ Integration test for kappa client"""
 
     def getRuntime(self):
-        return kappy.KappaStd(BIN_DIR)
+        return kappy.KappaStd()
 
 
 def test_docs():

@@ -82,11 +82,7 @@ setup(name='kappy',
           'build_ext': MyBuildExtCommand,
       },
       install_requires=['requests', 'future', 'nose'],
-      package_dir={'':'python'},
-      include_package_data=True,
-      data_files=[
-          ('python', ['python/README.rst']),
-      ],
+      package_dir={'kappy':'python/kappy'},
       packages=['kappy'],
       zip_safe=False,
       # This distribution contains binaries not built with
