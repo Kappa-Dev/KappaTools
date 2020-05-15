@@ -38,7 +38,6 @@ let print_initial_inputs ?uuid conf env inputs_form init =
             f r.Primitives.delta_tokens)) init
 
 type snapshot = {
-  snapshot_file : string;
   snapshot_event : int;
   snapshot_time : float;
   snapshot_agents : (int * User_graph.connected_component) list;
@@ -85,9 +84,6 @@ let print_dot_snapshot ?uuid f s =
 let write_snapshot ob s =
   let () = Bi_outbuf.add_char ob '{' in
   let () = JsonUtil.write_field
-      "snapshot_file" Yojson.Basic.write_string ob s.snapshot_file in
-  let () = JsonUtil.write_comma ob in
-  let () = JsonUtil.write_field
       "snapshot_event" Yojson.Basic.write_int ob s.snapshot_event in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field
@@ -108,26 +104,24 @@ let write_snapshot ob s =
   Bi_outbuf.add_char ob '}'
 
 let read_snapshot p lb =
-  let
-    snapshot_file,snapshot_event,snapshot_time,snapshot_agents,snapshot_tokens =
+  let snapshot_event,snapshot_time,snapshot_agents,snapshot_tokens =
     Yojson.Basic.read_fields
-      (fun (f,e,ti,a,t) key p lb ->
-         if key = "snapshot_file" then (Yojson.Basic.read_string p lb,e,ti,a,t)
-         else if key = "snapshot_event" then
-           (f,Yojson.Basic.read_int p lb,ti,a,t)
+      (fun (e,ti,a,t) key p lb ->
+         if key = "snapshot_event" then
+           (Yojson.Basic.read_int p lb,ti,a,t)
          else if key = "snapshot_time" then
-           (f,e,Yojson.Basic.read_number p lb,a,t)
+           (e,Yojson.Basic.read_number p lb,a,t)
          else if key = "snapshot_agents" then
-           (f,e,ti,Yojson.Basic.read_list
+           (e,ti,Yojson.Basic.read_list
               (JsonUtil.read_compact_pair
                  Yojson.Basic.read_int User_graph.read_connected_component) p lb,t)
          else let () = assert (key = "snapshot_tokens") in
-           (f,e,ti,a,Yojson.Basic.read_array
+           (e,ti,a,Yojson.Basic.read_array
               (JsonUtil.read_compact_pair Yojson.Basic.read_string Nbr.read_t)
               p lb)
       )
-      ("",-1,nan,[],[||]) p lb in
-  {snapshot_file;snapshot_event;snapshot_time;snapshot_agents;snapshot_tokens}
+      (-1,nan,[],[||]) p lb in
+  { snapshot_event; snapshot_time; snapshot_agents; snapshot_tokens }
 
 let string_of_snapshot = JsonUtil.string_of_write write_snapshot
 
@@ -135,7 +129,6 @@ let snapshot_of_string s =
   read_snapshot (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
 type din_data = {
-  din_name : string;
   din_kind : Primitives.din_kind;
   din_start : float;
   din_hits : int array;
@@ -149,9 +142,6 @@ type din = {
 
 let write_din ob f =
   let () = Bi_outbuf.add_char ob '{' in
-  let () = JsonUtil.write_field
-      "din_name" Yojson.Basic.write_string ob f.din_data.din_name in
-  let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field
       "din_kind" Primitives.write_din_kind ob f.din_data.din_kind in
   let () = JsonUtil.write_comma ob in
@@ -173,27 +163,25 @@ let write_din ob f =
   Bi_outbuf.add_char ob '}'
 
 let read_din p lb =
-  let
-    (din_name,din_kind,din_start,din_hits,din_fluxs,din_rules,din_end) =
+  let (din_kind,din_start,din_hits,din_fluxs,din_rules,din_end) =
     Yojson.Basic.read_fields
-      (fun (n,k,s,h,f,r,e) key p lb ->
-         if key = "din_name" then (Yojson.Basic.read_string p lb,k,s,h,f,r,e)
-         else if key = "din_kind" then
-           (n,Primitives.read_din_kind p lb,s,h,f,r,e)
+      (fun (k,s,h,f,r,e) key p lb ->
+         if key = "din_kind" then
+           (Primitives.read_din_kind p lb,s,h,f,r,e)
          else if key = "din_start" then
-           (n,k,Yojson.Basic.read_number p lb,h,f,r,e)
+           (k,Yojson.Basic.read_number p lb,h,f,r,e)
          else if key = "din_hits" then
-           (n,k,s,Yojson.Basic.read_array Yojson.Basic.read_int p lb,f,r,e)
+           (k,s,Yojson.Basic.read_array Yojson.Basic.read_int p lb,f,r,e)
          else if key = "din_fluxs" then
-           (n,k,s,h,Yojson.Basic.read_array
+           (k,s,h,Yojson.Basic.read_array
               (Yojson.Basic.read_array Yojson.Basic.read_number) p lb,r,e)
          else if key = "din_end" then
-           (n,k,s,h,f,r,Yojson.Basic.read_number p lb)
+           (k,s,h,f,r,Yojson.Basic.read_number p lb)
          else let () = assert (key = "din_rules") in
-           (n,k,s,h,f,Yojson.Basic.read_array Yojson.Basic.read_string p lb,e))
-      ("",Primitives.ABSOLUTE,nan,[||],[||],[||],nan) p lb in
+           (k,s,h,f,Yojson.Basic.read_array Yojson.Basic.read_string p lb,e))
+      (Primitives.ABSOLUTE,nan,[||],[||],[||],nan) p lb in
   { din_rules;din_end;
-    din_data={ din_name;din_kind;din_start;din_hits;din_fluxs } }
+    din_data={ din_kind; din_start; din_hits; din_fluxs } }
 
 let string_of_din = JsonUtil.string_of_write write_din
 
@@ -371,12 +359,12 @@ type file_line = {
 }
 
 type t =
-  | DIN of din
+  | DIN of string * din
   | DeltaActivities of int * (int * (float * float)) list
   | Plot of Nbr.t array (** Must have length >= 1 (at least [T] or [E]) *)
   | Print of file_line
   | TraceStep of Trace.step
-  | Snapshot of snapshot
+  | Snapshot of string * snapshot
   | Log of string
   | Species of string * float * User_graph.connected_component
   | Warning of Locality.t option*(Format.formatter -> unit)

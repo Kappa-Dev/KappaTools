@@ -6,10 +6,10 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let create_flux env counter din_kind din_name =
+let create_flux env counter din_kind =
   let size = Model.nb_syntactic_rules env + 1 in
   {
-    Data.din_name; Data.din_kind;
+    Data.din_kind;
     Data.din_start = Counter.current_time counter;
     Data.din_hits = Array.make size 0;
     Data.din_fluxs = Array.make_matrix size size 0.;
@@ -21,9 +21,6 @@ let incr_flux_flux of_rule on_rule v flux =
 
 let incr_flux_hit of_rule flux =
   flux.Data.din_hits.(of_rule) <- succ flux.Data.din_hits.(of_rule)
-
-let get_flux_name flux = flux.Data.din_name
-let flux_has_name name flux = flux.Data.din_name = name
 
 let stop_flux env counter din_data =
   let size = Model.nb_syntactic_rules env + 1 in

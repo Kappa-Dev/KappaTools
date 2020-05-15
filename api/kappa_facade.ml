@@ -47,7 +47,7 @@ type t =
     log_form : Format.formatter ;
     mutable plot : Data.plot ;
     mutable snapshots : Data.snapshot Mods.StringMap.t ;
-    mutable dins : Data.din list ;
+    mutable dins : (string * Data.din) list ;
     mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Result_util.message list ;
@@ -201,8 +201,8 @@ let parse (ast : Ast.parsing_compil) overwrite system_process =
 
 let outputs (simulation : t) =
   function
-  | Data.DIN flux_map ->
-    simulation.dins <- flux_map::simulation.dins
+  | Data.DIN (flux_name,flux_map) ->
+    simulation.dins <- (flux_name,flux_map)::simulation.dins
   | Data.DeltaActivities _ -> assert false
   | Data.Plot new_observables ->
     simulation.plot <- Data.add_plot_line new_observables simulation.plot
@@ -221,16 +221,15 @@ let outputs (simulation : t) =
           Mods.StringMap.add
             na (file_line.Data.file_line_text::lines) simulation.files
     end
-  | Data.Snapshot snapshot ->
+  | Data.Snapshot (filename,snapshot) ->
     let already_there x =
       Mods.StringMap.mem x simulation.snapshots in
     let snapshot_file =
       Tools.find_available_name
-        ~already_there snapshot.Data.snapshot_file
+        ~already_there filename
         ~facultative:(string_of_int snapshot.Data.snapshot_event) ~ext:None in
-    let snapshot' = { snapshot with Data.snapshot_file } in
     simulation.snapshots <-
-      Mods.StringMap.add snapshot_file snapshot' simulation.snapshots
+      Mods.StringMap.add snapshot_file snapshot simulation.snapshots
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.Warning (pos,msg) -> Data.print_warning ?pos simulation.log_form msg
   | Data.TraceStep st ->

@@ -14,7 +14,7 @@ type t = {
   mutable force_test_perturbations : int list;
   perturbations_not_done_yet : bool array;
   (* internal array for perturbate function (global to avoid useless alloc) *)
-  mutable flux: (Data.din_data) list;
+  mutable flux: (string*Data.din_data) list;
   with_delta_activities : bool;
 }
 
@@ -112,7 +112,7 @@ let do_modification
     let () = if pexpr <> [] then
         let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
         outputs (Data.Snapshot
-                   (Rule_interpreter.snapshot ~debugMode env counter file graph)) in
+                   (file,Rule_interpreter.snapshot ~debugMode env counter graph)) in
     (true,graph,state,extra)
   | Primitives.PRINT (pe_file,pe_expr) ->
     let file_opt =
@@ -134,7 +134,7 @@ let do_modification
       else Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
     let () = outputs
         (Data.Snapshot
-           (Rule_interpreter.snapshot ~debugMode env counter file graph)) in
+           (file,Rule_interpreter.snapshot ~debugMode env counter graph)) in
     (false, graph, state,extra)
   | Primitives.CFLOW (name,cc,tests) ->
     let name = match name with
@@ -161,7 +161,7 @@ let do_modification
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let () =
       if List.exists
-          (fun x -> Fluxmap.flux_has_name file x && x.Data.din_kind = rel)
+          (fun (name,x) -> file = name && x.Data.din_kind = rel)
           state.flux
       then outputs
           (Data.Warning
@@ -172,14 +172,14 @@ let do_modification
                   (Counter.current_time counter)
                   (Counter.current_event counter) file)) in
     let () = state.flux <-
-        Fluxmap.create_flux env counter rel file::state.flux in
+        (file,Fluxmap.create_flux env counter rel)::state.flux in
     (false, graph, state,extra)
   | Primitives.DINOFF s ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let (these,others) =
-      List.partition (Fluxmap.flux_has_name file) state.flux in
+      List.partition (fun (name,_) -> name = file) state.flux in
     let () = List.iter
-        (fun x -> outputs (Data.DIN (Fluxmap.stop_flux env counter x)))
+        (fun (name,x) -> outputs (Data.DIN (name,Fluxmap.stop_flux env counter x)))
         these in
     let () = state.flux <- others in
     (false, graph, state,extra)
@@ -302,7 +302,7 @@ let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state in
       let n_activity = Rule_interpreter.activity graph in
       let () =
         List.iter
-          (fun fl ->
+          (fun (_,fl) ->
              let () = Fluxmap.incr_flux_hit my_syntax_rd_id fl in
              match fl.Data.din_kind with
              | Primitives.ABSOLUTE | Primitives.RELATIVE -> ()
@@ -339,7 +339,7 @@ let one_rule ~debugMode ~outputs ~maxConsecutiveClash env counter graph state in
       | l,_ ->
         let () = act_stack := (syntax_rd_id,(old_act,new_act))::!act_stack in
         List.iter
-          (fun fl ->
+          (fun (_,fl) ->
              Fluxmap.incr_flux_flux syntax_rid syntax_rd_id
                (
                  let cand =
@@ -491,8 +491,8 @@ let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
           if dumpIfDeadlocked then
             outputs
               (Data.Snapshot
-                 (Rule_interpreter.snapshot
-                    ~debugMode env counter "deadlock.ka" graph)) in
+                 ("deadlock.ka",Rule_interpreter.snapshot
+                    ~debugMode env counter graph)) in
         let () =
           outputs
             (Data.Warning
@@ -533,7 +533,7 @@ let end_of_simulation ~outputs env counter graph state =
       if Array.length cand > 1 then outputs (Data.Plot cand) in
     Counter.fill ~outputs counter ~dt:0. in
   List.iter
-    (fun e ->
+    (fun (name,e) ->
        let () =
          outputs
            (Data.Warning
@@ -542,6 +542,6 @@ let end_of_simulation ~outputs env counter graph state =
                  Format.fprintf
                    f
                    "Tracking DIN into \"%s\" was not stopped before end of simulation"
-                   (Fluxmap.get_flux_name e))) in
-       outputs (Data.DIN (Fluxmap.stop_flux env counter e)))
+                   name)) in
+       outputs (Data.DIN (name,Fluxmap.stop_flux env counter e)))
     state.flux

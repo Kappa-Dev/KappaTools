@@ -89,22 +89,17 @@ class virtual manager_flux_map
   method private info_flux_map
       (detail : Api_data.simulation_detail_output) :
     Api_types_t.din_catalog Api.result =
-    let flux_maps : Api_types_t.din list =
-      detail.Api_types_t.simulation_output_dins in
     let flux_map_catalog =
-      List.map (fun f -> f.Data.din_data.Data.din_name) flux_maps in
+      List.map fst detail.Api_types_t.simulation_output_dins in
     Result_util.ok flux_map_catalog
 
   method private get_flux_map
       (flux_map_id : Api_types_t.din_id)
       (detail : Api_data.simulation_detail_output) :
     Api_types_t.din Api.result =
-    let flux_maps_list : Api_types_t.din list =
+    let flux_maps_list =
       detail.Api_types_t.simulation_output_dins in
-    let flux_maps_eq : Api_types_t.din -> bool =
-      fun flux_map ->
-        flux_map_id = flux_map.Data.din_data.Data.din_name in
-    try Result_util.ok (List.find flux_maps_eq flux_maps_list)
+    try Result_util.ok (List.assoc flux_map_id flux_maps_list)
     with Not_found ->
       let m : string = Format.sprintf "id %s not found" flux_map_id in
       Api_common.result_error_msg ~result_code:`Not_found m
@@ -328,15 +323,15 @@ class manager_simulation
               t.Api_types_t.simulation_output_file_lines in
           let () =
             List.iter
-              (fun din ->
+              (fun (din_name,din) ->
                  Fakezip.add_entry (Data.string_of_din ?len:None din)
-                   file (filename^"/"^din.Data.din_data.Data.din_name))
+                   file (filename^"/"^din_name))
             t.Api_types_t.simulation_output_dins in
           let () =
             Mods.StringMap.iter
-              (fun _ snapshot ->
+              (fun name snapshot ->
                  Fakezip.add_entry (Data.string_of_snapshot ?len:None snapshot)
-                   file (filename^"/"^snapshot.Data.snapshot_file))
+                   file (filename^"/"^name))
               t.Api_types_t.simulation_output_snapshots in
           let out = Fakezip.close_out file in
           Result_util.ok out

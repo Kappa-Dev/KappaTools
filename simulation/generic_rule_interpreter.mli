@@ -87,7 +87,7 @@ module Make (Instances:Instances_sig.S) : sig
       takes the list of perturbations to be tried and returns it updated *)
 
   val snapshot:
-    debugMode:bool -> Model.t -> Counter.t -> string -> t -> Data.snapshot
+    debugMode:bool -> Model.t -> Counter.t -> t -> Data.snapshot
 
   val print : Model.t -> Format.formatter -> t -> unit
 

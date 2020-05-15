@@ -1092,8 +1092,7 @@ module Make (Instances:Instances_sig.S) = struct
         (Matching.roots_of ~debugMode domain state.edges pattern) in
     { state with outdated = false }
 
-  let snapshot ~debugMode env counter fn state = {
-    Data.snapshot_file = fn;
+  let snapshot ~debugMode env counter state = {
     Data.snapshot_event = Counter.current_event counter;
     Data.snapshot_time = Counter.current_time counter;
     Data.snapshot_agents =
