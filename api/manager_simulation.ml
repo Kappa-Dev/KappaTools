@@ -298,6 +298,26 @@ class manager_simulation
                          (Kappa_facade.get_raw_trace t)))
 
     method simulation_outputs_zip =
+      let add_snapshot file filename name snapshot =
+        if Filename.check_suffix name ".dot" then
+          Fakezip.add_entry
+            (Format.asprintf "%a@." (Data.print_dot_snapshot ?uuid:None) snapshot)
+            file (filename^"/"^name)
+        else if Filename.check_suffix name ".json" then
+          Fakezip.add_entry (Data.string_of_snapshot ?len:None snapshot)
+            file (filename^"/"^name) else
+          let name' = Tools.chop_suffix_or_extension name ".ka" in
+          Fakezip.add_entry
+            (Format.asprintf "%a@." (Data.print_snapshot ?uuid:None) snapshot)
+            file (filename^"/"^name') in
+      let add_din file filename (din_name,flux) =
+        Fakezip.add_entry
+          (if Filename.check_suffix din_name ".html"
+           then Format.asprintf "%a@." Data.print_html_din flux
+           else if Filename.check_suffix din_name ".json"
+           then Data.string_of_din flux
+           else Format.asprintf "%a@." (Data.print_dot_din ?uuid:None) flux)
+          file (filename^"/"^din_name) in
       let projection t =
         try
           let filename = "simulation_outputs" in
@@ -323,15 +343,11 @@ class manager_simulation
               t.Api_types_t.simulation_output_file_lines in
           let () =
             List.iter
-              (fun (din_name,din) ->
-                 Fakezip.add_entry (Data.string_of_din ?len:None din)
-                   file (filename^"/"^din_name))
+              (add_din file filename)
             t.Api_types_t.simulation_output_dins in
           let () =
             Mods.StringMap.iter
-              (fun name snapshot ->
-                 Fakezip.add_entry (Data.string_of_snapshot ?len:None snapshot)
-                   file (filename^"/"^name))
+              (add_snapshot file filename)
               t.Api_types_t.simulation_output_snapshots in
           let out = Fakezip.close_out file in
           Result_util.ok out
