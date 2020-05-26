@@ -11,43 +11,43 @@ done
 	 -update_domain construction
 	 21 (sub)observables 37 navigation steps
 	 -initial conditions
-+ Building initial state (2048 agents)
++ Building initial state (2000 agents)
 Done
 + Command line to rerun is: 'KaSim' 'abc-cflow.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-p' '1000' '--time-independent' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 + Loading trace
-	- removing events occurring after the last observable: -89666 events 
+	- removing events occurring after the last observable: -89793 events 
 + Producing causal compressions
 	- splitting initial events: +1000 events 
-	- simplify the trace, 22344 events 
-		- start iteration 1, 22344 events remaining 
+	- simplify the trace, 22217 events 
+		- start iteration 1, 22217 events remaining 
 				- alpha-conversion
-				- detecting siphons: +1774 events 
+				- detecting siphons: +1788 events 
 				- alpha-conversion
-				- cutting concurrent events: -23982 events 
+				- cutting concurrent events: -23839 events 
 				- detecting pseudo inverse events: -2 events 
-		- start iteration 2, 134 events remaining 
+		- start iteration 2, 164 events remaining 
 				- alpha-conversion
 				- detecting siphons: +20 events 
 				- alpha-conversion
 				- cutting concurrent events: -21 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 3, 133 events remaining 
+		- start iteration 3, 163 events remaining 
 				- alpha-conversion
 				- detecting siphons: +20 events 
 				- alpha-conversion
 				- cutting concurrent events: -20 events 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 133 events remaining 
+	- a fixpoint has been reached, 163 events remaining 
 	- blackboard generation 
 	- computing causal past of each observed events (10)
 
 
-	 - weak flow compression (4)
+	 - weak flow compression (6)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 + Pretty printing 1 weakly compressed flow
 Simulation ended

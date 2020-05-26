@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -10,7 +10,7 @@ type key = int
 
 type t =
   | Empty
-  | Node of t * key * t * int * int
+  | Node of t * key * t * int * Int64.t
   (*Node(left,key,right,height,acc)*)
 
 let height = function
@@ -18,19 +18,19 @@ let height = function
   | Node(_,_,_,h,_) -> h
 
 let accval = function
-  | Empty -> 0
+  | Empty -> 0L
   | Node(_,_,_,_,acc) -> acc
 
 let total = accval
 
 let weight = function
-  | Empty -> 0
-  | Node(l,_,r,_,acc) -> acc - accval l - accval r
+  | Empty -> 0L
+  | Node(l,_,r,_,acc) -> Int64.sub (Int64.sub acc (accval l)) (accval r)
 
 let rec print f = function
   | Empty -> Pp.empty_set f
   | Node (l,k,r,_,acc) as x ->
-    Format.fprintf f "@[<hov 2><%d,%i(%i)>@,[%a@,|%a@,]"
+    Format.fprintf f "@[<hov 2><%d,%Li(%Li)>@,[%a@,|%a@,]"
       k acc (weight x) print l print r
 
 let create l key acc r =
@@ -47,8 +47,8 @@ let bal l x w r =
         let acc_r = accval r in
         if height ll >= height lr then
           create
-            ll lv (acc_l+w+acc_r)
-            (create lr x (w+accval lr+acc_r) r)
+            ll lv (Int64.add (Int64.add acc_l w) acc_r)
+            (create lr x (Int64.add (Int64.add w (accval lr)) acc_r) r)
         else
           begin
             match lr with
@@ -56,9 +56,9 @@ let bal l x w r =
             | Node(lrl, lrv, lrr, _,_)->
               let acc_lrr = accval lrr in
               create
-                (create ll lv (acc_l-acc_lrr) lrl)
-                lrv (acc_l+w+acc_r)
-                (create lrr x (acc_lrr+w+acc_r) r)
+                (create ll lv (Int64.sub acc_l acc_lrr) lrl)
+                lrv (Int64.add (Int64.add acc_l w) acc_r)
+                (create lrr x (Int64.add (Int64.add acc_lrr w) acc_r) r)
           end
     end
   else
@@ -70,8 +70,8 @@ let bal l x w r =
         let acc_l = accval l in
         if height rr >= height rl then
           create
-            (create l x (acc_l+w+accval rl) rl)
-            rv (acc_l+w+acc_r) rr
+            (create l x (Int64.add (Int64.add acc_l w) (accval rl)) rl)
+            rv (Int64.add (Int64.add acc_l w) acc_r) rr
         else
           begin
             match rl with
@@ -79,25 +79,26 @@ let bal l x w r =
             | Node(rll, rlv, rlr, _,_) ->
               let acc_rll = accval rll in
               create
-                (create l x (acc_l+w+acc_rll) rll)
-                rlv (acc_l+w+acc_r)
-                (create rlr rv (acc_r-acc_rll) rr)
+                (create l x (Int64.add (Int64.add acc_l w) acc_rll) rll)
+                rlv (Int64.add (Int64.add acc_l w) acc_r)
+                (create rlr rv (Int64.sub acc_r acc_rll) rr)
           end
     end
   else
     let acc_l = accval l in let acc_r = accval r in
-    create l x (acc_l+w+acc_r) r
+    create l x (Int64.add (Int64.add acc_l w) acc_r) r
 
 let empty = Empty
 let is_empty = function Empty -> true | Node _ -> false
 
 let rec add key weight = function
-  | Empty -> Node(Empty,key, Empty,1,weight)
+  | Empty -> Node(Empty,key, Empty,1,Int64.of_int weight)
   | Node(l, key', r, h,acc) ->
     if key = key' then
-      Node(l, key, r, h,weight + accval l + accval r)
+      Node(l, key, r, h,
+           Int64.add (Int64.add (Int64.of_int weight) (accval l)) (accval r))
     else
-      let weight' = acc - accval l - accval r in
+      let weight' = Int64.sub (Int64.sub acc (accval l)) (accval r) in
       if key < key' then
         bal (add key weight l) key' weight' r
       else
@@ -111,7 +112,8 @@ let rec find_acc aim_acc = function
       let acc_l = accval l in let acc_r = accval r in
       if acc_l > aim_acc then find_acc aim_acc l
       else
-      if (acc_r + acc_l) > aim_acc then find_acc (aim_acc - acc_l) r
+      if Int64.add acc_r acc_l > aim_acc
+      then find_acc (Int64.sub aim_acc acc_l) r
       else key
 
 let rec mem key = function
@@ -122,14 +124,14 @@ let rec mem key = function
 
 let rec min_binding = function
   | Empty -> raise Not_found
-  | Node(Empty, x, r,_,acc) -> (x, acc - accval r)
+  | Node(Empty, x, r,_,acc) -> (x, Int64.sub acc (accval r))
   | Node(l, _, _, _,_) -> min_binding l
 
 let rec remove_min_binding = function
   | Empty -> invalid_arg "Val_map.remove_min_elt"
   | Node(Empty, _, r, _,_) -> r
   | Node(l, x, r, _,acc) ->
-    let weight = acc - accval l - accval r in
+    let weight = Int64.sub (Int64.sub acc (accval l)) (accval r) in
     bal (remove_min_binding l) x weight r
 
 let merge t1 t2 =
@@ -145,7 +147,7 @@ let rec remove x = function
   | Node(l, v, r,_,acc) ->
     let c = compare x v in
     if c = 0 then merge l r else
-      let weight = acc - accval l - accval r in
+      let weight = Int64.sub (Int64.sub acc (accval l)) (accval r) in
       if c < 0 then bal (remove x l) v weight r
       else bal l v weight (remove x r)
 (*
@@ -162,7 +164,7 @@ let rec fold f m accu =
 (**Returns (key,value) at random in the tree*)
 let random state m =
   try
-    let r = Random.State.int state (accval m) in
+    let r = Random.State.int64 state (accval m) in
     find_acc r m
   with
   | Invalid_argument _ -> invalid_arg "Val_map.random_val"

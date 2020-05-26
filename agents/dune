@@ -46,6 +46,22 @@
           -open Kappa_agents)))
 
 (executable
+ (name KappaSwitchman)
+ (modules agents_client KappaSwitchman)
+ (libraries logs.lwt lwt.unix kappa_json_api kappa_cli kappa_agents
+            kappa_staticanalyses kappa-library.runtime)
+ (public_name KappaSwitchman)
+ (package kappa-agents)
+ (flags (:standard
+          -open Kappa_generic_toolset
+          -open Kappa_grammar
+          -open Kappa_cli
+          -open Kappa_kasa_type_interface
+	  -open Kappa_runtime
+          -open Kappa_json_api
+          -open Kappa_agents)))
+
+(executable
   (name KaSaAgent)
   (modules KaSaAgent)
   (libraries num str lwt.unix kappa_staticanalyses

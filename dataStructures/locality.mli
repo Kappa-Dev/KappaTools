@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -23,6 +23,12 @@ val dummy : t
 val dummy_annot : 'a -> 'a annot
 val has_dummy_annot : 'a annot -> bool
 
+val merge : range -> range -> range
+(** [merge b e] creates the range from beginning of [b] to the end of [e]
+ (filename must match) *)
+
+val is_included_in : string -> position -> range -> bool
+
 val to_string: t -> string
 val print : Format.formatter -> t -> unit
 val print_annot :
@@ -34,6 +40,11 @@ val annot_of_yojson :
 val annot_to_yojson :
   ?filenames : int Mods.StringMap.t ->
   ('a -> Yojson.Basic.t) -> 'a annot -> Yojson.Basic.t
+
+val write_position : Bi_outbuf.t -> position -> unit
+
+val read_position :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> position
 
 val write_range : Bi_outbuf.t -> t -> unit
   (** Output a JSON value of type {!t}. *)

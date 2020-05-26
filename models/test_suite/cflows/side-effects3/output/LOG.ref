@@ -11,11 +11,11 @@ done
 	 -update_domain construction
 	 10 (sub)observables 10 navigation steps
 	 -initial conditions
-+ Building initial state (16 agents)
++ Building initial state (12 agents)
 Done
 + Command line to rerun is: 'KaSim' '-i' 'side-effects.ka' '-seed' '501792230' '-u' 'event' '-l' '199' '-d' 'output' '-trace' 'trace.json' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 Simulation ended
 + Loading trace
 	- removing events occurring after the last observable: -89 events 
@@ -32,31 +32,31 @@ Stats:
 
 	 - causal flow compression (2)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 	- simplify the trace, 124 events 
 		- start iteration 1, 124 events remaining 
 				- alpha-conversion
-				- detecting siphons: nothing has changed 
+				- detecting siphons: +34 events 
 				- alpha-conversion
-				- cutting concurrent events: -37 events 
+				- cutting concurrent events: -46 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 2, 87 events remaining 
+		- start iteration 2, 112 events remaining 
 				- alpha-conversion
-				- detecting siphons: nothing has changed 
+				- detecting siphons: +34 events 
 				- alpha-conversion
-				- cutting concurrent events: nothing has changed 
+				- cutting concurrent events: -34 events 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 87 events remaining 
+	- a fixpoint has been reached, 112 events remaining 
 	- blackboard generation 
 	- computing causal past of each observed events (2)
 
 
 	 - weak flow compression (2)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 + Pretty printing 2 flows
 + Pretty printing 1 weakly compressed flow

@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -11,7 +11,7 @@ module Html = Tyxml_js.Html5
 
 let tab_is_active, set_tab_is_active = React.S.create false
 let current_snapshot, set_current_snapshot =
-  React.S.create (None : Data.snapshot option)
+  React.S.create (None : (string * Data.snapshot) option)
 
 type display_format = Kappa | Graph
 let string_to_display_format =
@@ -40,10 +40,9 @@ let configuration_template
     additional_handlers : Widget_export.configuration =
   let json_handler = Widget_export.export_json
       ~serialize_json:(fun () ->
-          (match
-             (React.S.value current_snapshot : Data.snapshot option) with
+          (match React.S.value current_snapshot with
           | None -> "null"
-          | Some s -> Data.string_of_snapshot s
+          | Some (_,s) -> Data.string_of_snapshot s
           )
         )
   in
@@ -54,10 +53,9 @@ let configuration_template
         fun (filename : string) ->
           let data =
             Js.string
-              (match
-                 (React.S.value current_snapshot : Data.snapshot option) with
+              (match React.S.value current_snapshot with
               | None -> ""
-              | Some s -> Api_data.api_snapshot_kappa s) in
+              | Some (_,s) -> Api_data.api_snapshot_kappa s) in
           Common.saveFile
             ~data
             ~mime:"application/json"
@@ -71,10 +69,9 @@ let configuration_template
         fun (filename : string) ->
           let data =
             Js.string
-              (match
-                 (React.S.value current_snapshot : Data.snapshot option) with
+              (match React.S.value current_snapshot with
               | None -> ""
-              | Some s -> Api_data.api_snapshot_dot s) in
+              | Some (_,s) -> Api_data.api_snapshot_dot s) in
           Common.saveFile
             ~data
             ~mime:"text/vnd.graphviz"
@@ -124,9 +121,9 @@ let render_snapshot_graph
   | Graph ->
     let json : string = Data.string_of_snapshot snapshot in
     let contact_map =
-      match React.S.value Tab_contact_map.contact_map_text with
-      | Result.Ok x -> x
-      | Result.Error _ -> "null" in
+      Result_util.fold (React.S.value Tab_contact_map.contact_map_text)
+        ~ok:(fun x -> x)
+        ~error:(fun _ -> "null") in
     snapshot_js##setData ~contact_map:(Js.string contact_map) (Js.string json)
   | Kappa -> ()
 
@@ -155,26 +152,25 @@ let select_snapshot snapshot_js =
           (fun manager ->
              manager#simulation_catalog_snapshot >>=
              (Api_common.result_bind_lwt
-                ~ok:(fun  (snapshot_info : Api_types_t.snapshot_catalog) ->
+                ~ok:(fun snapshot_ids ->
                     try
                       let snapshot_id : string =
-                        List.nth snapshot_info.Api_types_t.snapshot_ids index in
-                      (manager#simulation_detail_snapshot snapshot_id)
+                        List.nth snapshot_ids index in
+                      manager#simulation_detail_snapshot snapshot_id >>=
+                      Api_common.result_bind_lwt
+                        ~ok:(fun (snapshot : Data.snapshot) ->
+                            let () =
+                              set_current_snapshot
+                                (Some (snapshot_id,snapshot)) in
+                            let () = render_snapshot_graph
+                                snapshot_js snapshot in
+                             Lwt.return (Result_util.ok ()))
                     with
                     | Failure f ->
                       Lwt.return (Api_common.result_error_msg f)
                     | Invalid_argument f ->
                       Lwt.return (Api_common.result_error_msg f)
                   )
-             ) >>=
-             (Api_common.result_bind_lwt
-                ~ok:(fun (snapshot : Data.snapshot) ->
-                    let () = set_current_snapshot (Some snapshot) in
-                    let () = render_snapshot_graph
-                        snapshot_js
-                        snapshot
-                    in
-                    Lwt.return (Result_util.ok ()))
              )
           )
       in
@@ -188,7 +184,7 @@ let select (snapshots : Api_types_j.snapshot_id list) =
              @
              if (match (React.S.value current_snapshot) with
                  | None -> false
-                 | Some s -> s.Data.snapshot_file = snapshot_id)
+                 | Some (filename,_) -> filename = snapshot_id)
              then [Html.a_selected ()]
              else [])
          (Html.txt snapshot_id))
@@ -225,9 +221,9 @@ let xml () =
            (fun manager ->
               manager#simulation_catalog_snapshot >>=
               (Api_common.result_bind_lwt
-                 ~ok:(fun (data : Api_types_t.snapshot_catalog) ->
+                 ~ok:(fun snapshot_ids ->
                      let () = ReactiveData.RList.set
-                         handle (select data.Api_types_t.snapshot_ids) in
+                         handle (select snapshot_ids) in
                      let () = select_snapshot snapshot_js in
                      Lwt.return (Result_util.ok ()))
               )
@@ -248,7 +244,7 @@ let xml () =
              (fun snapshot ->
                 match snapshot with
                 | None -> ""
-                | Some snapshot -> snapshot.Data.snapshot_file)
+                | Some (snapshot_file,_) -> snapshot_file)
              current_snapshot)
       ]
   in
@@ -297,7 +293,7 @@ let xml () =
              (fun snapshot ->
                 match snapshot with
                 | None -> ""
-                | Some snapshot ->
+                | Some (_,snapshot) ->
                   Api_data.api_snapshot_kappa snapshot)
              current_snapshot)
       ]
@@ -369,9 +365,9 @@ let onload () : unit =
         set_display_format format in
       (match React.S.value current_snapshot with
       | None -> ()
-      | Some snapshot -> render_snapshot_graph
-                            (snapshot_js : Js_snapshot.snapshot Js.t)
-                            (snapshot : Data.snapshot))
+      | Some (_,snapshot) -> render_snapshot_graph
+                               (snapshot_js : Js_snapshot.snapshot Js.t)
+                               (snapshot : Data.snapshot))
     | None -> assert false
   in
   (* get initial value for display format *)

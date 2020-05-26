@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -606,7 +606,8 @@ although it is left unpecified in the left hand side"
 
 let refer_links_annot ?warning sigs links_annot mix =
   List.iter
-    (fun ra ->
+    (fun r ->
+       let ra = r.Counters_compiler.ra in
        Array.iteri
          (fun i -> function
             | (LKappa.LNK_VALUE (j,(-1,-1)),pos),mods ->
@@ -644,10 +645,7 @@ let final_rule_sanity
     match Mods.IntMap.root lhs_links_one with
     | None -> ()
     | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
-  let () =
-    refer_links_annot
-      ?warning sigs lhs_links_two
-      (List.map (fun r -> r.Counters_compiler.ra) mix) in
+  let () = refer_links_annot ?warning sigs lhs_links_two mix in
   match Mods.IntMap.root rhs_links_one with
   | None -> ()
   | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos
@@ -739,15 +737,14 @@ let annotate_lhs_with_diff_v3
       List.rev mix, List.rev cmix in
   aux
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
-    [] lhs rhs
+    [] (List.flatten lhs) (List.flatten rhs)
 
 let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
   let syntax_version = Ast.V4 in
   let rec aux links_annot mix cmix lhs rhs =
     match lhs,rhs with
     | [], [] ->
-      let () = final_rule_sanity ~warning sigs links_annot mix in
-      List.rev mix, List.rev cmix
+      links_annot, mix, cmix
     | Ast.Absent _::lt, Ast.Absent _:: rt -> aux links_annot mix cmix lt rt
     | Ast.Present ((_,pos as ty),sites,lmod) :: lt, Ast.Absent _ :: rt ->
       let () = LKappa.forbid_modification pos lmod in
@@ -788,8 +785,27 @@ let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
       raise
         (ExceptionDefn.Malformed_Decl
            ("Left hand side/right hand side agent mismatch",pos))
- in
-  aux
+  in
+  let rec aux_line links_annot mix cmix lhs rhs =
+    match lhs, rhs with
+    | [], [] ->
+      let () = final_rule_sanity ~warning sigs links_annot mix in
+      List.rev mix, List.rev cmix
+    | hl::tl, hr::tr ->
+      let (links_annot',mix', cmix') = aux links_annot mix cmix hl hr in
+      aux_line links_annot' mix' cmix' tl tr
+    | ((Ast.Present ((_,pos),_,_) | Ast.Absent pos)::_)::_, []
+    | [], ((Ast.Present ((_,pos),_,_) | Ast.Absent pos)::_)::_ ->
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ("Left hand side/right hand side agent mismatch",pos))
+    | []::_, []
+    | [], []::_ ->
+      raise
+        (ExceptionDefn.Internal_Error
+           (Locality.dummy_annot "Invariant violation in annotate_lhs_with..."))
+  in
+  aux_line
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
     [] [] lhs rhs
 
@@ -802,37 +818,62 @@ let annotate_edit_mixture
     ~warning ~syntax_version ~is_rule sigs ?contact_map m =
   let links_annot,mix,cmix =
     List.fold_left
-      (fun (lannot,acc,news) -> function
-         | Ast.Absent pos ->
-           raise
-             (ExceptionDefn.Malformed_Decl
-                ("Absent agent cannot occurs in rule in edit notation",pos))
-         | Ast.Present (ty,sites,modif) ->
-         let (intf,counts) = separate_sites sites in
-         match modif with
-         | None ->
-           let a,lannot' = annotate_edit_agent
-               ~warning ~syntax_version ~is_rule sigs
-               ?contact_map ty lannot intf counts in
-           (lannot',a::acc,news)
-         | Some Ast.Create ->
-           let rannot',x' = annotate_created_agent
-               ~warning ~syntax_version ~r_editStyle:true sigs
-               ?contact_map (snd lannot) ty intf in
-           let x'' =
-              Counters_compiler.annotate_created_counters
-               sigs ty counts (add_link_contact_map ?contact_map) x' in
-           ((fst lannot,rannot'),acc,x''::news)
-         | Some Ast.Erase ->
-           let ra,lannot' = annotate_dropped_agent
-               ~warning ~syntax_version ~r_editStyle:true sigs
-               (fst lannot) ty intf counts in
-           ((lannot',snd lannot),ra::acc,news))
-      (((Mods.IntMap.empty,Mods.IntMap.empty),
-        (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
-      m in
+      (List.fold_left
+         (fun (lannot,acc,news) -> function
+            | Ast.Absent _ -> (lannot,acc,news)
+            | Ast.Present (ty,sites,modif) ->
+              let (intf,counts) = separate_sites sites in
+              match modif with
+              | None ->
+                let a,lannot' = annotate_edit_agent
+                    ~warning ~syntax_version ~is_rule sigs
+                    ?contact_map ty lannot intf counts in
+                (lannot',a::acc,news)
+              | Some Ast.Create ->
+                let rannot',x' = annotate_created_agent
+                    ~warning ~syntax_version ~r_editStyle:true sigs
+                    ?contact_map (snd lannot) ty intf in
+                let x'' =
+                  Counters_compiler.annotate_created_counters
+                    sigs ty counts (add_link_contact_map ?contact_map) x' in
+                ((fst lannot,rannot'),acc,x''::news)
+              | Some Ast.Erase ->
+                let ra,lannot' = annotate_dropped_agent
+                    ~warning ~syntax_version ~r_editStyle:true sigs
+                    (fst lannot) ty intf counts in
+                ((lannot',snd lannot),ra::acc,news)))
+         (((Mods.IntMap.empty,Mods.IntMap.empty),
+           (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
+         m in
   let () = final_rule_sanity ?warning:None sigs links_annot mix in
   (List.rev mix, List.rev cmix)
+
+let annotate_created_mixture
+    ~warning ~syntax_version sigs ?contact_map m =
+  let (rhs_links_one,_),cmix =
+    List.fold_left
+      (List.fold_left
+         (fun (rannot,news) -> function
+            | Ast.Absent pos ->
+              raise
+                (ExceptionDefn.Malformed_Decl
+                   ("Absent agent cannot occurs in created mixtures",pos))
+            | Ast.Present (ty,sites,_modif) ->
+              let (intf,counts) = separate_sites sites in
+              let rannot',x' = annotate_created_agent
+                  ~warning ~syntax_version ~r_editStyle:true sigs
+                  ?contact_map rannot ty intf in
+              let x'' =
+                Counters_compiler.annotate_created_counters
+                  sigs ty counts (add_link_contact_map ?contact_map) x' in
+              (rannot',x''::news)))
+      ((Mods.IntMap.empty,Mods.IntMap.empty),[])
+      m in
+  let () =
+    match Mods.IntMap.root rhs_links_one with
+    | None -> ()
+    | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
+  List.rev cmix
 
 let give_rule_label bidirectional (id,set) printer r = function
   | None ->
@@ -861,15 +902,9 @@ let mixture_of_ast ~warning ~syntax_version sigs ?contact_map pos mix =
                      ("A mixture cannot create agents",pos))
 
 let raw_mixture_of_ast ~warning ~syntax_version sigs ?contact_map mix =
-  let created =
-    List.map (function
-        | Ast.Absent l -> Ast.Absent l
-        | Ast.Present (ty,sites,_) -> Ast.Present (ty,sites,Some Ast.Create))
-      mix in
-  let (a,b) =
-    annotate_edit_mixture
-      ~warning ~syntax_version ~is_rule:false sigs ?contact_map created in
-  snd (Counters_compiler.remove_counter_rule sigs a b)
+  let b =
+    annotate_created_mixture ~warning ~syntax_version sigs ?contact_map mix in
+  snd (Counters_compiler.remove_counter_rule sigs [] b)
 
 let convert_alg_var ?max_allowed_var algs lab pos =
   let i =
@@ -1322,7 +1357,7 @@ let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
       c.Ast.perturbations [] in
   let perts'' =
     if with_counters then
-      (Counters_compiler.counters_perturbations sigs c.Ast.signatures)@perts'
+      (Counters_compiler.counters_perturbations sigs [c.Ast.signatures])@perts'
     else perts' in
   let rules =
     List.rev_map

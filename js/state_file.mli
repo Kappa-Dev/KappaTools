@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -28,12 +28,22 @@ type refresh = { filename : string ; content : string ; line : int option ; }
 val refresh_file : refresh React.event
 (* Meta data of current file *)
 
-type slot = { local : string option ; id : string; }
+val cursor_activity : line:int -> ch:int -> unit
+val out_of_sync : bool -> unit
 
-type model = { current : int option ; directory : slot Mods.IntMap.t }
+type slot = { local : string option ; name : string; }
+
+type active = { rank : int; cursor_pos : Locality.position; out_of_sync : bool }
+
+type model = { current : active option ; directory : slot Mods.IntMap.t }
 
 val model : model React.signal
 val current_filename : string option React.signal
+
+val with_current_pos :
+  ?eq:('a -> 'a -> bool) -> ?on:bool React.signal ->
+  (string -> Locality.position -> 'a option) ->
+  'a -> 'a React.signal
 
 (* run on application init *)
 val init : unit -> unit Lwt.t

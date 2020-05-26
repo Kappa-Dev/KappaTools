@@ -124,7 +124,7 @@ let diff_list p a b =
 let compare_bool a b = compare a b < 0
 let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing =
-  List_util.merge_uniq (fun x y -> Pervasives.compare y x)
+  List_util.merge_uniq (fun x y -> Stdlib.compare y x)
 
 
 let closure_bottom_up_with_fold parameter handler log_info error event config prec is_obs f a  =

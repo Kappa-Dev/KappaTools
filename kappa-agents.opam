@@ -12,12 +12,12 @@ bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
 dev-repo: "git+https://github.com/Kappa-Dev/KaSim.git"
 
 depends : [
-  "ocaml" { >= "4.03.0" }
+  "ocaml" { >= "4.05.0" }
   "num"
   "re"
   "dune"
   "yojson" { >= "1.6.0" }
-  "lwt" { >= "2.6.0" }
+  "lwt" { >= "4.2.0" }
   "fmt"
   "logs"
   "kappa-library"

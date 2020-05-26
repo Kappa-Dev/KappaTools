@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -181,31 +181,14 @@ let set_show_non_weakly_reversible_transitions
     (fun param -> { param with show_non_weakly_reversible_transitions })
 
 let update_state me project_catalog default_parameters project_parameters =
-    me.project_manager#project_parse >>=
-    (Result_util.fold
-       ~ok:(fun project_parse ->
-           let init_sa =
-             me.project_manager#init_static_analyser project_parse in
-           let init_sim =
-             me.project_manager#simulation_load project_parse [] in
-           init_sim >>= Result_util.fold
-             ~ok: (fun () -> init_sa >>= fun out ->
-                    let () =
-                      set_state {
-                        project_current = Some me;
-                        project_catalog; default_parameters; project_parameters;
-                        project_version = 1;
-                      } in
-                    Lwt.return (Api_common.result_kasa out))
-             ~error: (fun errors -> Lwt.return (Result_util.error errors)))
-       ~error:(fun errors ->
-           let () = set_state {
-               project_current = Some me ;
-               project_catalog; default_parameters; project_parameters;
-               project_version = 1;
-             } in
-           Lwt.return (Api_common.result_messages errors))
-    )
+  me.project_manager#project_parse [] >>= fun out ->
+  let () =
+    set_state {
+      project_current = Some me;
+      project_catalog; default_parameters; project_parameters;
+      project_version = 1;
+    } in
+  Lwt.return out
 
 let computing_watcher manager setter =
   let delay = 1. in
@@ -281,23 +264,13 @@ let sync () : unit Api.result Lwt.t =
   match (React.S.value state).project_current with
   | None -> Lwt.return (Result_util.ok ())
   | Some current ->
-    current.project_manager#project_parse >>=
-    (Api_common.result_bind_lwt
-       ~ok:(fun project_parse ->
-           let init_sa =
-             current.project_manager#init_static_analyser project_parse in
-           let init_sim =
-             current.project_manager#simulation_load project_parse [] in
-           init_sim >>=
-           Api_common.result_bind_lwt
-             ~ok:(fun () ->
-                 init_sa >>= fun out ->
-                 let st = React.S.value state in
-                 let () =
-                   set_state {
-                     st with project_version = succ st.project_version;
-                   } in
-                Lwt.return (Api_common.result_kasa out))))
+    current.project_manager#project_parse [] >>= fun out ->
+    let st = React.S.value state in
+    let () =
+      set_state {
+        st with project_version = succ st.project_version;
+            } in
+    Lwt.return out
 
 let remove_files manager =
   manager#file_catalog >>=

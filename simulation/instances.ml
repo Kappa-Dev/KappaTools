@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -32,9 +32,12 @@ let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
   Roots.update_roots
     state.roots is_add unary_ccs edges mod_connectivity pattern root
 
+(** {2 Checking instances} *)
 
+let is_valid state pat root =
+  IntCollection.mem root (Roots.of_pattern pat state.roots)
 
-(** {6 Compute the number of instances } *)
+(** {2 Compute the number of instances } *)
 
 let number_of_instances ?rule_id:_ st pats =
   Array.fold_left

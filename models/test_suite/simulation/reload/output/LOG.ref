@@ -11,11 +11,11 @@ done
 	 -update_domain construction
 	 3 (sub)observables 0 navigation steps
 	 -initial conditions
-+ Building initial state (256 agents)
++ Building initial state (200 agents)
 Done
 + Command line to rerun is: 'KaSim' '-i' 'model.ka' '-l' '10' '-u' 'time' '-seed' '886009874' '-d' 'output'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 Simulation ended
 Parsing model.ka...
 done
@@ -32,9 +32,9 @@ done
 	 -update_domain construction
 	 3 (sub)observables 0 navigation steps
 	 -initial conditions
-+ Building initial state (256 agents)
++ Building initial state (200 agents)
 Done
 + Command line to rerun is: 'KaSim' '-i' 'model.ka' '-l' '15' '-u' 'time' '-mixture' 'output/snap_75.ka' '-o' 'data_2.csv' '-seed' '886009874' '-d' 'output'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 Simulation ended

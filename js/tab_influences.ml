@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -40,7 +40,8 @@ type model_rendering =
 type model = {
   rendering : model_rendering;
   accuracy : Public_data.accuracy_level option;
-  origin : (Public_data.rule, Public_data.var) Public_data.influence_node option;
+  origin : (int,int) Public_data.influence_node option;
+  origin_label : string option;
 }
 
 let navli () = ReactiveData.RList.empty
@@ -48,10 +49,13 @@ let navli () = ReactiveData.RList.empty
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
+let track_cursor, set_track_cursor = React.S.create false
+
 let dummy_model = {
   rendering = DrawTabular ();
   accuracy = Some Public_data.Low;
   origin = None;
+  origin_label = None;
 }
 
 let model, set_model = React.S.create dummy_model
@@ -59,9 +63,16 @@ let model, set_model = React.S.create dummy_model
 let total_input_id = "total_input"
 let fwd_input_id = "fwd_input"
 let bwd_input_id = "bwd_input"
-let recenter_id = "reset"
-let next_node_id = "next"
-let prev_node_id = "previous"
+
+let influence_node_label = function
+  | Public_data.Rule r ->
+    if r.Public_data.rule_label = ""
+    then r.Public_data.rule_ast
+    else r.Public_data.rule_label
+  | Public_data.Var r ->
+    if r.Public_data.var_label = ""
+    then r.Public_data.var_ast
+    else r.Public_data.var_label
 
 let update_model_graph f =
   let m = React.S.value model in
@@ -84,7 +95,10 @@ let influencemap =
            let () =
              Subpanel_editor.set_move_cursor
                (Public_data.position_of_refined_influence_node node) in
-           { m with origin = Some node }))
+           let origin =
+             Some (Public_data.short_node_of_refined_node node) in
+           let origin_label = Some (influence_node_label node) in
+           { m with origin; origin_label }))
 
 let total_input =
   Html.input ~a:[
@@ -107,30 +121,35 @@ let bwd_input =
                   Html.a_size 1;] ()
 
 let next_node =
-  Html.input ~a:[ Html.a_id next_node_id ;
-                  Html.a_input_type `Button;
-                  Html.a_value "Next";
-                  Html.a_title "Next";
-                  Html.a_class ["form-control"];
-                  Html.a_size 1;] ()
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Html.a_class ["form-control";"btn";"btn-default"];
+  ] [ Html.txt "Next" ]
 
 let prev_node =
-  Html.input ~a:[ Html.a_id prev_node_id ;
-                  Html.a_title "Previous";
-                  Html.a_value "Previous";
-                  Html.a_input_type `Button;
-                  Html.a_class ["form-control"];
-                  Html.a_size 1;] ()
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Html.a_class ["form-control";"btn";"btn-default"];
+  ] [ Html.txt "Previous" ]
 
 let recenter =
-  Html.input ~a:[
-    Html.a_id recenter_id ;
-                  Html.a_title "Reset";
-                  Html.a_value "Reset";
-                  Html.a_input_type `Button;
-                  Html.a_class ["form-control"];
-                  Html.a_size 1;]
-    ()
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Html.a_class ["form-control";"btn";"btn-default"];
+  ] [ Html.txt "Reset" ]
+
+let track_cursor_switch =
+  Html.button ~a:[
+    Html.a_button_type `Button;
+    Tyxml_js.R.Html5.a_class
+      (React.S.map (fun tc -> "form-control" :: "btn" :: "btn-default" ::
+                              if tc then ["active"] else []) track_cursor);
+    Html.a_onclick
+      (fun _ ->
+         let () = set_track_cursor (not (React.S.value track_cursor))
+         in true
+      );
+  ] [ Html.txt "Track cursor" ]
 
 let export_config = {
   Widget_export.id = "influence-export";
@@ -145,15 +164,14 @@ let export_config = {
                   ~label:__LOC__
                   (fun manager ->
                      let { accuracy; _ } = React.S.value model in
-                     Lwt_result.map
+                     manager#get_influence_map_raw accuracy >|=
+                     Result_util.map
                        (fun influences_string ->
                           let data = Js.string influences_string in
                           let () =
                             Common.saveFile
                               ~data ~mime:"application/json" ~filename in
-                          ())
-                       (manager#get_influence_map_raw accuracy) >>=
-                     fun x -> Lwt.return (Api_common.result_kasa x)))
+                          ())))
              >>= fun _ -> Lwt.return_unit));
     } ];
   Widget_export.show = React.S.const true;
@@ -211,16 +229,6 @@ let is_center origin_short_opt node =
       a.Public_data.var_id = id
     | Public_data.Var _, Public_data.Rule _
     | Public_data.Rule _, Public_data.Var _ -> false
-
-let influence_node_label = function
-  | Public_data.Rule r ->
-    if r.Public_data.rule_label = ""
-    then r.Public_data.rule_ast
-    else r.Public_data.rule_label
-  | Public_data.Var r ->
-    if r.Public_data.var_label = ""
-    then r.Public_data.var_ast
-    else r.Public_data.var_label
 
 let json_to_graph logger (_,_,_,_,origin,influence_map) =
   let origin_short_opt =
@@ -403,7 +411,9 @@ let pop_cell = function
             let () =
               Subpanel_editor.set_move_cursor
                 (Public_data.position_of_refined_influence_node node) in
-            let () = update_model (fun m -> { m with origin = Some node }) in
+            let origin = Some (Public_data.short_node_of_refined_node node) in
+            let origin_label = Some (influence_node_label node) in
+            let () = update_model (fun m -> { m with origin; origin_label }) in
             true);
         Html.a_class [if positive then "success" else "danger"]
       ]
@@ -418,7 +428,7 @@ let rec fill_table acc by on =
     let line = Html.tr [ b; o ] in
     fill_table (line::acc) by' on'
 
-let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
+let draw_table origin_label { positive_on; positive_by; negative_on; negative_by } =
   let by =
     List_util.rev_map_append (fun x -> (x,false)) negative_by
       (List.rev_map (fun x -> (x,true)) positive_by) in
@@ -431,9 +441,7 @@ let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
     ~thead:(Html.thead [
         Html.tr
           [Html.th ~a:[Html.a_colspan 2]
-             [Html.cdata
-                (match origin with None -> "origin"|Some n -> influence_node_label n)
-             ]];
+             [Html.cdata (Option_util.unsome "origin" origin_label)]];
         Html.tr [
           Html.th [Html.cdata "is influenced by"];
           Html.th [Html.cdata "influences"]];
@@ -442,18 +450,15 @@ let draw_table origin { positive_on; positive_by; negative_on; negative_by } =
 
 let influence_sphere =
   State_project.on_project_change_async
-    ~on:tab_is_active dummy_model model (Result.Ok empty_sphere)
-    (fun manager { rendering; accuracy; origin = origin_refined } ->
+    ~on:tab_is_active dummy_model model (Result_util.ok empty_sphere)
+    (fun manager { rendering; accuracy; origin; origin_label = _ } ->
        match rendering with
        | DrawTabular _ ->
-         let origin =
-           Option_util.map
-             Public_data.short_node_of_refined_node origin_refined in
-         Lwt_result.map
+         manager#get_local_influence_map
+           ?fwd:None ?bwd:None ?origin ~total:1 accuracy >|=
+         Result_util.map
            table_of_influences_json
-           (manager#get_local_influence_map
-              ?fwd:None ?bwd:None ?origin ~total:1 accuracy)
-       | DrawGraph _ -> Lwt.return (Result.Ok empty_sphere))
+       | DrawGraph _ -> Lwt.return (Result_util.ok empty_sphere))
 
 let content () =
   let accuracy_form =
@@ -479,7 +484,9 @@ let content () =
               [Html.txt "Navigate"];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [prev_node];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [next_node];
-            Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter]]] in
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter];
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [track_cursor_switch];
+          ]] in
   let graph_form =
     Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
       [ Html.div
@@ -517,19 +524,24 @@ let content () =
       ~a:[ Html.a_class ["panel-scroll"] ]
       (ReactiveData.RList.from_signal
          (React.S.l2
-            (fun { rendering; origin; _ } sphere ->
+            (fun { rendering; origin_label; _ } sphere ->
                match rendering with
                | DrawGraph _ -> []
-               | DrawTabular () -> match sphere with
-                 | Result.Ok sphere -> [ draw_table origin sphere ]
-                 | Result.Error mh -> Utility.print_method_handler mh)
+               | DrawTabular () ->
+                 Result_util.fold
+                   sphere
+                   ~ok:(fun sphere -> [ draw_table origin_label sphere ])
+                   ~error:(fun error ->
+                       List.map
+                         (fun m -> Html.p [Html.txt (Format.asprintf "@[%a@]" Result_util.print_message m)])
+                         error))
             model influence_sphere));
     Widget_export.content export_config;
   ]
 
 let _ =
   React.S.l2
-    (fun _ { rendering; accuracy; origin = origin_refined } ->
+    (fun _ { rendering; accuracy; origin; origin_label = _ } ->
        match rendering with
        | DrawTabular _ -> Lwt.return (Result_util.ok ())
        | DrawGraph { fwd; bwd; total } ->
@@ -537,36 +549,49 @@ let _ =
            (State_project.with_project
               ~label:__LOC__
               (fun (manager : Api.concrete_manager) ->
-                 let origin =
-                   Option_util.map
-                     Public_data.short_node_of_refined_node origin_refined in
                  ((manager#get_local_influence_map
-                     ?fwd ?bwd ?origin ~total accuracy) >>= function
-                  | Result.Ok influences ->
-                    let buf = Buffer.create 1000 in
-                    let fmt = Format.formatter_of_buffer buf in
-                    let logger =
-                      Loggers.open_logger_from_formatter
-                        ~mode:Loggers.Js_Graph fmt in
-                    let logger_graph = Graph_loggers_sig.extend_logger logger in
-                    let () = json_to_graph logger_graph influences in
-                    let graph =
-                      Graph_loggers_sig.graph_of_logger logger_graph in
-                    let graph_json = Graph_json.to_json graph in
-                    let () = Loggers.flush_logger logger in
-                    let () = Loggers.close_logger logger in
-                    let () =
-                      influencemap##setData
-                        (Js.string (Yojson.Basic.to_string graph_json)) in
-                    Lwt_result.return ()
-                  | Result.Error e ->
-                    let () = influencemap##clearData in
-                    Lwt_result.fail e) >>=
-                 fun out -> Lwt.return (Api_common.result_kasa out)
-              )))
+                     ?fwd ?bwd ?origin ~total accuracy) >|=
+                  Result_util.fold
+                    ~ok:(fun influences ->
+                        let buf = Buffer.create 1000 in
+                        let fmt = Format.formatter_of_buffer buf in
+                        let logger =
+                          Loggers.open_logger_from_formatter
+                            ~mode:Loggers.Js_Graph fmt in
+                        let logger_graph = Graph_loggers_sig.extend_logger logger in
+                        let () = json_to_graph logger_graph influences in
+                        let graph =
+                          Graph_loggers_sig.graph_of_logger logger_graph in
+                        let graph_json = Graph_json.to_json graph in
+                        let () = Loggers.flush_logger logger in
+                        let () = Loggers.close_logger logger in
+                        let () =
+                          influencemap##setData
+                            (Js.string (Yojson.Basic.to_string graph_json)) in
+                        Result_util.ok ())
+                    ~error:(fun e ->
+                        let () = influencemap##clearData in
+                        Result_util.error e)
+              ))))
     (React.S.on ~eq:State_project.model_equal tab_is_active
        State_project.dummy_model State_project.model)
     model
+
+let _ =
+  State_file.with_current_pos
+    ~on:(React.S.Bool.(&&) tab_is_active track_cursor)
+    (fun filename cursor_pos ->
+       Some
+         (State_project.with_project
+            ~label:__LOC__
+            (fun (manager : Api.concrete_manager) ->
+               manager#get_influence_map_node_at ~filename cursor_pos >|=
+               Result_util.map
+                 (fun origin' ->
+                    update_model
+                      (fun m ->
+                         { m with origin = origin'; origin_label = None })))))
+    (Lwt.return (Result_util.ok ()))
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
@@ -613,7 +638,7 @@ let onload () =
              Js._true
            with _ -> Js._false)
   in
-  let () = (Tyxml_js.To_dom.of_input bwd_input )##.onchange :=
+  let () = (Tyxml_js.To_dom.of_input bwd_input)##.onchange :=
                Dom_html.full_handler
                  (fun va _ ->
                     let va = Js.to_string va##.value in
@@ -626,7 +651,7 @@ let onload () =
                       Js._true
                     with _ -> Js._false) in
   let () =
-    (Tyxml_js.To_dom.of_input recenter )##.onclick :=
+    (Tyxml_js.To_dom.of_button recenter)##.onclick :=
       Dom_html.full_handler
         (fun _ _ ->
            let _ =
@@ -634,58 +659,72 @@ let onload () =
                (State_project.with_project
                   ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
-                     (Lwt_result.map
-                        (fun origin ->
-                           update_model (fun m -> { m with origin }))
-                        manager#get_initial_node >>= fun out ->
-                      Lwt.return (Api_common.result_kasa out)
-                     )))
+                     manager#get_initial_node >|=
+                     Result_util.map
+                       (fun origin_refined ->
+                          let origin =
+                            Option_util.map
+                              Public_data.short_node_of_refined_node
+                              origin_refined in
+                          let origin_label =
+                            Option_util.map
+                              influence_node_label origin_refined in
+                          update_model
+                            (fun m -> { m with origin; origin_label }))
+                  ))
            in Js._true
         )
   in
   let () =
-    (Tyxml_js.To_dom.of_input next_node )##.onclick :=
+    (Tyxml_js.To_dom.of_button next_node)##.onclick :=
       Dom_html.full_handler
         (fun _ _ ->
-           let origin =
-             let { origin; _ } = React.S.value model in
-             Option_util.map Public_data.short_node_of_refined_node origin in
+           let { origin; _ } = React.S.value model in
            let _ =
              State_error.wrap "influence_map_next_node"
                (State_project.with_project
                   ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
-                     (Lwt_result.map
-                        (fun origin' ->
-                           update_model
-                             (fun m -> { m with origin = origin' }))
-                        (manager#get_next_node origin) >>=
-                      fun out -> Lwt.return (Api_common.result_kasa out)
-                     )))
+                     manager#get_next_node origin >|=
+                       Result_util.map
+                         (fun origin_refined ->
+                            let origin =
+                              Option_util.map
+                                Public_data.short_node_of_refined_node
+                                origin_refined in
+                            let origin_label =
+                              Option_util.map
+                                influence_node_label origin_refined in
+                            update_model (fun m ->
+                                { m with origin; origin_label }))
+                  ))
            in Js._true
         ) in
   let () =
-    (Tyxml_js.To_dom.of_input prev_node )##.onclick :=
+    (Tyxml_js.To_dom.of_button prev_node)##.onclick :=
       Dom_html.full_handler
         (fun _ _ ->
-           let origin =
-             let { origin; _ } = React.S.value model in
-             Option_util.map Public_data.short_node_of_refined_node origin in
+           let { origin; _ } = React.S.value model in
            let _ =
              State_error.wrap "influence_map_prev_node"
                (State_project.with_project
                   ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
-                     (Lwt_result.map
-                        (fun origin' ->
-                           update_model
-                             (fun m -> { m with origin = origin' }))
-                        (manager#get_previous_node origin) >>=
-                      fun out -> Lwt.return (Api_common.result_kasa out)
-                     )))
+                     manager#get_previous_node origin >|=
+                     Result_util.map
+                       (fun origin_refined ->
+                          let origin =
+                            Option_util.map
+                              Public_data.short_node_of_refined_node
+                              origin_refined in
+                          let origin_label =
+                            Option_util.map
+                              influence_node_label origin_refined in
+                          update_model (fun m ->
+                              { m with origin; origin_label }))
+                  ))
            in Js._true
-        )
-  in
+        ) in
   let () = Common.jquery_on
       "#navinfluences" "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in

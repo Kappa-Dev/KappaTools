@@ -11,11 +11,11 @@ done
 	 -update_domain construction
 	 12 (sub)observables 6 navigation steps
 	 -initial conditions
-+ Building initial state (32 agents)
++ Building initial state (20 agents)
 Done
 + Command line to rerun is: 'KaSim' '-i' 'processive.ka' '-seed' '240056667' '-u' 'event' '-l' '30000' '-d' 'output' '--time-independent' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 + Loading trace
 	- removing events occurring after the last observable: -29517 events 
 + Producing causal compressions
@@ -31,21 +31,21 @@ Stats:
 
 	 - causal flow compression (10)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 	- simplify the trace, 513 events 
 		- start iteration 1, 513 events remaining 
 				- alpha-conversion
-				- detecting siphons: +48 events 
+				- detecting siphons: +55 events 
 				- alpha-conversion
-				- cutting concurrent events: -456 events 
-				- detecting pseudo inverse events: -18 events 
-		- start iteration 2, 87 events remaining 
+				- cutting concurrent events: -481 events 
+				- detecting pseudo inverse events: -6 events 
+		- start iteration 2, 81 events remaining 
 				- alpha-conversion
 				- detecting siphons: +6 events 
 				- alpha-conversion
-				- cutting concurrent events: -15 events 
+				- cutting concurrent events: -9 events 
 				- detecting pseudo inverse events: nothing has changed 
 		- start iteration 3, 78 events remaining 
 				- alpha-conversion
@@ -60,13 +60,13 @@ ____________________________________________________________
 
 	 - weak flow compression (3)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 	 - strong flow compression (3)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 + Pretty printing 10 flows
 + Pretty printing 3 weakly compressed flows

@@ -330,6 +330,7 @@ let string_of_variable ~side loggers variable =
   | Loggers.XLS
   | Loggers.SBML
   | Loggers.DOTNET
+  | Loggers.GEPHI
   | Loggers.Json -> ""
 
 let variable_of_derived_variable var id =
@@ -391,7 +392,7 @@ let forbidden_char c =
   (match get_encoding_format t
    with
      DOTNET -> true
-   | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
+   | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | GEPHI
    | Octave | Matlab | Maple | Mathematica | Json | SBML -> false)
   &&
   let rec aux k n =

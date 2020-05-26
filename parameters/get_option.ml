@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Nov 27 2018>
+  * Last modification: Time-stamp: <Jan 08 2020>
   * *
   * primitive to parse command-line options
   *
@@ -276,11 +276,12 @@ let options =
 
       "--contact-map-format",
       (Choice (["DOT","dot format";
+                "GEPHI","Gephi format";
                 (*"HTML","HTML format"*)],[],
                Config.contact_map_format)),
       "Tune the output format for the contact map",
       [output,2;contact_map,5],
-      Hidden;
+      Normal;
 
       "--contact-map-accuracy-level",
       (Choice

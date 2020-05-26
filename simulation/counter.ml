@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -100,9 +100,10 @@ end =
       let () = if t.clashing_instance > 0 then Format.fprintf
             f "\tClashing instance: %.2f%%@,"
             (100. *. (float_of_int t.clashing_instance) /. all) in
-      if t.time_correction > 0 then Format.fprintf
-          f "\tPerturbation interrupting time advance: %.2f%%@]@."
-          (100. *. (float_of_int t.time_correction) /. all)
+      let () = if t.time_correction > 0 then Format.fprintf
+            f "\tPerturbation interrupting time advance: %.2f%%@,"
+            (100. *. (float_of_int t.time_correction) /. all) in
+      Format.fprintf f "@]"
 
     let to_yojson t = `Assoc [
         "consecutive", `Int t.consecutive;
@@ -195,8 +196,8 @@ let one_no_more_unary_event c =
 let one_clashing_instance_event c =
   let () = c.stat_null <- Efficiency.incr_clashing_instance c.stat_null in
   check_time c && check_events c
-let one_time_correction_event c ti =
-  match Nbr.to_float ti with
+let one_time_correction_event ?ti c =
+  match Option_util.bind Nbr.to_float ti with
   | None -> false
   | Some ti ->
     let () = c.time <- ti in

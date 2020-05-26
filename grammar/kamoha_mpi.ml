@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -15,7 +15,7 @@ type _ handle =
   | Ast : Ast.parsing_compil handle
 
 type box =
-    B : 'a handle * int * ('a,Result_util.message list) Result_util.t -> box
+    B : 'a handle * int * ('a, Result_util.message list) Result_util.t -> box
 
 let reply post write_v id v =
   let message =

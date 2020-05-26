@@ -28,16 +28,16 @@ let shape_to_json shape =
   | Graph_loggers_sig.Invisible -> `String "Invisible"
   | Graph_loggers_sig.House -> `String "House"
   | Graph_loggers_sig.Invhouse -> `String "Invhouse"
-  | Graph_loggers_sig.Rect -> `String "Rect"
-  | Graph_loggers_sig.Ellipse -> `String "Ellipse"
-  | Graph_loggers_sig.Circle-> `String "Circle"
+  | Graph_loggers_sig.Rect -> `String "rect"
+  | Graph_loggers_sig.Ellipse -> `String "ellipse"
+  | Graph_loggers_sig.Circle-> `String "circle"
 
 let headkind_to_json headkind =
   match headkind with
-  | Graph_loggers_sig.Vee -> `String "Vee"
+  | Graph_loggers_sig.Vee -> `String "vee"
   | Graph_loggers_sig.Tee -> `String "Tee"
-  | Graph_loggers_sig.No_head -> `String "No_head"
-  | Graph_loggers_sig.Normal -> `String "Normal"
+  | Graph_loggers_sig.No_head -> `String "undirected"
+  | Graph_loggers_sig.Normal -> `String "normal"
 
 let linestyle_to_json linestyle =
   match linestyle with
@@ -117,18 +117,18 @@ let linestyle_of_json = function
   | `String "Dashed" -> Graph_loggers_sig.Dashed
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct headkind",x))
 let headkind_of_json = function
-  | `String "Vee" -> Graph_loggers_sig.Vee
+  | `String "vee" -> Graph_loggers_sig.Vee
   | `String "Tee" -> Graph_loggers_sig.Tee
-  | `String "No_head" -> Graph_loggers_sig.No_head
-  | `String "Normal" -> Graph_loggers_sig.Normal
+  | `String "undirected" -> Graph_loggers_sig.No_head
+  | `String "normal" -> Graph_loggers_sig.Normal
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct headkind",x))
 let shape_of_json = function
   | `String "Invisible" -> Graph_loggers_sig.Invisible
   | `String "House" -> Graph_loggers_sig.House
   | `String "Invhouse" -> Graph_loggers_sig.Invhouse
-  | `String "Rect" -> Graph_loggers_sig.Rect
-  | `String "Ellipse" -> Graph_loggers_sig.Ellipse
-  | `String "Circle" -> Graph_loggers_sig.Circle
+  | `String "rect" -> Graph_loggers_sig.Rect
+  | `String "ellipse" -> Graph_loggers_sig.Ellipse
+  | `String "circle" -> Graph_loggers_sig.Circle
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct shape",x))
 
 let direction_of_json = function

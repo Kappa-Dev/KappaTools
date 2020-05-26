@@ -1,10 +1,12 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
+
+open Lwt.Infix
 
 class manager () =
   let kasa_worker = Worker.create "KaSaWorker.js" in
@@ -65,7 +67,8 @@ class manager () =
     method private post_message (message_text : string) : unit =
       sim_worker##postMessage(message_text)
     inherit Mpi_api.manager ()
-    inherit Kasa_client.new_client
+    inherit Kasa_client.new_uniform_client
+        ~is_running:(fun () -> true)
         ~post:(fun message_text ->
             let () = Common.debug (Js.string message_text) in
             kasa_worker##postMessage(message_text))
@@ -80,6 +83,34 @@ class manager () =
             let () = Common.debug (Js.string message_text) in
             kastor_worker##postMessage(message_text))
         stor_state
+
+    val mutable kasa_locator = []
+
+    method project_parse overwrites =
+      self#secret_project_parse >>=
+      Api_common.result_bind_lwt
+        ~ok:(fun out ->
+            let load = self#secret_simulation_load out overwrites in
+            let init = self#init_static_analyser out in
+            let locators =
+              init >>= Result_util.fold
+                ~error:(fun e ->
+                    let () = kasa_locator <- [] in
+                    Lwt.return (Result_util.error e))
+                ~ok:(fun () ->
+                    self#secret_get_pos_of_rules_and_vars >>= Result_util.fold
+                      ~ok:(fun infos ->
+                          let () = kasa_locator <- infos in
+                          Lwt.return (Result_util.ok ()))
+                      ~error:(fun e ->
+                          let () = kasa_locator <- [] in
+                          Lwt.return (Result_util.error e))) in
+            load >>= Api_common.result_bind_lwt ~ok:(fun () -> locators))
+
+    method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
+      List.find_opt (fun (_,x) -> Locality.is_included_in filename pos x) kasa_locator |>
+      Option_util.map fst |> Result_util.ok ?status:None |> Lwt.return
+
     method is_running = is_running
     method terminate =
       let () = sim_worker##terminate in

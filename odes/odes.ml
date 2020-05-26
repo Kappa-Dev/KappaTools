@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 19 2018>
+  * Last modification: Time-stamp: <Jan 08 2020>
 *)
 
 let local_trace = false
@@ -1884,7 +1884,7 @@ let convert_obs parameters compil network =
       match Ode_loggers_sig.get_encoding_format logger with
       | Loggers.Octave | Loggers.Matlab ->
         Ode_loggers.print_newline logger
-      | Loggers.Mathematica
+      | Loggers.Mathematica | Loggers.GEPHI
       | Loggers.Maple | Loggers.SBML | Loggers.DOTNET
       | Loggers.TXT
       | Loggers.TXT_Tabular | Loggers.XLS
@@ -1916,7 +1916,7 @@ let convert_obs parameters compil network =
     | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph
     | Loggers.HTML | Loggers.HTML_Tabular | Loggers.DOT | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS
-    | Loggers.SBML | Loggers.DOTNET
+    | Loggers.SBML | Loggers.DOTNET | Loggers.GEPHI
     | Loggers.Json -> step=1
 
 
@@ -2193,7 +2193,7 @@ let convert_obs parameters compil network =
                     Ode_loggers_sig.Time_scale_factor Nbr.one;
                   Sbml_backend.line_dotnet logger logger_err
                 | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph
-                | Loggers.HTML
+                | Loggers.HTML | Loggers.GEPHI
                 | Loggers.HTML_Tabular| Loggers.DOT| Loggers.TXT
                 | Loggers.TXT_Tabular
                 | Loggers.XLS| Loggers.Maple| Loggers.Mathematica| Loggers.Json
@@ -2570,7 +2570,8 @@ let convert_obs parameters compil network =
                Ode_loggers.print_comment ~breakline logger s
                | Loggers.Matrix | Loggers.TXT
                | Loggers.TXT_Tabular | Loggers.XLS
-               | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.Js_Graph
+               | Loggers.DOT | Loggers.HTML
+               | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.GEPHI
                | Loggers.HTML_Tabular | Loggers.Json -> ()
 
            in
@@ -2698,6 +2699,7 @@ let convert_obs parameters compil network =
     match Ode_loggers_sig.get_encoding_format logger with
     | Loggers.Matrix | Loggers.TXT
     | Loggers.Maple | Loggers.Mathematica
+    | Loggers.GEPHI
     | Loggers.TXT_Tabular | Loggers.XLS
     | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.Js_Graph
     | Loggers.HTML_Tabular | Loggers.Json
@@ -3066,6 +3068,7 @@ let convert_obs parameters compil network =
                            I.print_token ~compil log id) id,
                       (Some "substance")
                     | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+                    | Loggers.GEPHI
                     | Loggers.Js_Graph
                     | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
                     | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
@@ -3096,7 +3099,7 @@ let convert_obs parameters compil network =
                       ) k, Some ""
                   | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
                   | Loggers.HTML_Tabular | Loggers.Json | Loggers.Js_Graph
-                  | Loggers.Maple
+                  | Loggers.Maple | Loggers.GEPHI
                   | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
                   | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
                   | Loggers.XLS
@@ -3170,6 +3173,7 @@ let convert_obs parameters compil network =
       | Loggers.TXT_Tabular | Loggers.XLS
       | Loggers.SBML
       | Loggers.Json
+      | Loggers.GEPHI
         -> ()
     in
     let () =

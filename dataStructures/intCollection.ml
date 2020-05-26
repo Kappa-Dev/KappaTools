@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -57,3 +57,5 @@ let random rs s =
 
 let fold f s acc =
   Tools.recti (fun acc i -> f (Mods.DynArray.get s.bag i) acc) acc s.size
+
+let mem x s = Hashtbl.mem s.dict x

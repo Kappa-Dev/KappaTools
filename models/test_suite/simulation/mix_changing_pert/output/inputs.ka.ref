@@ -1,0 +1,26 @@
+%def: "seed" "20543"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(st{a b c})
+
+%var:/*0*/ 'A_a' |A(st{a})|
+%var:/*1*/ 'A_b' |A(st{b})|
+%var:/*2*/ 'A_c' |A(st{c})|
+%plot: [T]
+%plot: A_a
+%plot: A_b
+%plot: A_c
+
+A(st{a/b}[#]) @ 1
+A(st{b/a}[#]) @ 1
+
+/*0*/%mod: ([T] > 2) do $APPLY |A(st{a})| A(st{a/c}[#]); $APPLY |A(st{b})| A(st{b/c}[#]); repeat [false]
+
+%init: 10 A(st{a}[.])
+
+%mod: [E] = 24 do $STOP;

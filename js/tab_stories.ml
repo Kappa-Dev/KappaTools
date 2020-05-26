@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -187,7 +187,7 @@ let onload () =
   let () =
       select_stories_dom##.onchange :=
         Dom_html.handler (fun _ ->
-            let () = Lwt.async set_a_story in Js._false) in
+            let _ = set_a_story () in Js._false) in
   let () =
       (Tyxml_js.To_dom.of_button launch_button)##.onclick :=
         Dom_html.handler (fun _ ->

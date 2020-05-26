@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Dec 22 2018>
+  * Last modification: Time-stamp: <Mar 19 2020>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -446,7 +446,7 @@ let dump_c_compil state c_compil =
 
 (******************************************************************)
 
-let rename_link parameters handler error map (i,j) =
+let rename_link parameters handler error map ((_,i),j) =
   let error, agent =
     Handler.translate_agent
       ~message:"unknown agent type" ~ml_pos:(Some __POS__)
@@ -460,8 +460,8 @@ let rename_link parameters handler error map (i,j) =
       Mods.String2Map.find_option (agent,simplify_site site) map
   with
   | None ->
-    Exception.warn parameters error __POS__ Exit (0,0)
-  | Some (i,j) -> error, (i,j)
+    Exception.warn parameters error __POS__ Exit ((0,0),0)
+  | Some (i,j) -> error, ((0,i),j)
 
 let rename_links parameter handler error map = function
   | User_graph.LINKS l ->
@@ -652,6 +652,40 @@ let get_ode_flow =
 (*influence_map*)
 (******************************************************************)
 
+let compute_pos_of_rules_and_vars show_title state =
+  let parameters = get_parameters state in
+  let state, compil = get_c_compilation state in
+  let state, handler = get_handler state in
+  let error = get_errors state in
+  let nrules = Handler.nrules parameters error handler in
+  let nvars = Handler.nvars parameters error handler in
+  let () = show_title state in
+  let rec aux inc pos of_int lift n (error,l) =
+    if n<0 then (error, l)
+    else
+      let error, p = pos parameters error handler compil ((of_int (n+inc)))  in
+      aux inc pos of_int lift (n-1) (error, (lift n,p)::l)
+  in
+  let error, l =
+    aux 0 Handler.pos_of_rule
+      Ckappa_sig.rule_id_of_int (fun x -> Public_data.Rule x)
+      (nrules-1)
+      (aux nrules Handler.pos_of_var Ckappa_sig.rule_id_of_int
+         (fun x -> Public_data.Var x)
+         (nvars-1) (error,[]))
+  in
+  let json = Public_data.pos_of_rules_and_vars_to_json l in
+  let _ = Public_data.pos_of_rules_and_vars_of_json json in
+      Remanent_state.set_errors error
+    (Remanent_state.set_pos_of_rules_and_vars l state), l
+
+let get_pos_of_rules_and_vars  =
+      get_gen
+        ~log_prefix:"Summarize the position of rules and variables"
+        ~log_title:"Summarize the position of rules and variables"
+        Remanent_state.get_pos_of_rules_and_vars
+        compute_pos_of_rules_and_vars
+
 let compute_raw_internal_influence_map show_title state =
   let parameters = Remanent_state.get_parameters state in
   let state, compil = get_c_compilation state in
@@ -808,6 +842,7 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
+  let state, _ = compute_pos_of_rules_and_vars (fun _ -> ()) state in
   let () = show_title state in
   let error,wake_up_map =
     Algebraic_construction.filter_influence
@@ -1027,6 +1062,7 @@ let compute_high_res_internal_influence_map show_title state =
     else error
   in
   Remanent_state.set_errors error state, (nodes, wake_up_map, inhibition_map)
+
 
 let get_high_res_internal_influence_map =
   get_gen
@@ -1284,7 +1320,12 @@ let compute_raw_internal_contact_map show_title state =
 let dump_raw_internal_contact_map state handler =
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
-  let error = Print_handler.dot_of_contact_map parameters error handler in
+  let error =
+    match Remanent_parameters.get_cm_format parameters with
+      | DOT ->  Print_handler.dot_of_contact_map parameters error handler
+      | GEPHI -> Print_handler.gexf_of_contact_map parameters error handler
+      | _ -> let error, () = warn parameters error __POS__ Exit () in error
+  in
   Remanent_state.set_errors error state
 
 let get_raw_internal_contact_map  =
@@ -1330,6 +1371,8 @@ let convert_contact_map_map_to_list sol =
               Tools.array_rev_of_list
                 (Mods.StringSetMap.Map.fold
                    (fun a (props,links) l ->
+                      let links =
+                        List.rev_map (fun (i,j) -> ((0,i),j)) (List.rev links) in
                       {
                         User_graph.site_name=a;
                         User_graph.site_type = User_graph.Port {
@@ -1392,7 +1435,7 @@ let convert_contact_map show_title state contact_map =
     reindex parameters error handler contact_map
   in
   Remanent_state.set_errors error state,
-  Array.of_list contact_map
+  [|Array.of_list contact_map|]
 
 let compute_contact_map
     ?(accuracy_level=Public_data.Low) _show_title =
@@ -1707,8 +1750,13 @@ let output_internal_contact_map ?logger
   let scc_contact_map =
     Remanent_state.get_internal_scc_decomposition_map state in
   let error =
-    Preprocess.dot_of_contact_map
-      ?logger parameters error handler scc_contact_map contact_map
+    match Remanent_parameters.get_cm_format parameters with
+    | DOT ->    Preprocess.dot_of_contact_map
+                  ?logger parameters error handler scc_contact_map contact_map
+    | GEPHI ->  Preprocess.gexf_of_contact_map
+                                  ?logger parameters error handler scc_contact_map contact_map
+
+    | _ -> let error, () = warn parameters error __POS__ Exit () in error
   in
   set_errors error state
 
@@ -1824,7 +1872,7 @@ let compute_raw_contact_map show_title state =
   let error, sol =
     reindex parameters error handler sol
   in
-  let sol = Array.of_list sol in
+  let sol = [|Array.of_list sol|] in
   Remanent_state.set_errors error
     (Remanent_state.set_contact_map Public_data.Low sol state),
   sol
@@ -1854,14 +1902,14 @@ let compute_signature show_title state =
              Array.fold_left
                (fun (state,acc) site ->
                   let x = site.User_graph.site_name in
-                  let states,binding =
+                  let states,rev_binding =
                     match site.User_graph.site_type with
                     | User_graph.Counter _ ->
                       failwith "KaSa does not deal with counters yet"
                     | User_graph.Port p ->
                       Option_util.unsome [] p.User_graph.port_states,
                       match p.User_graph.port_links with
-                      | User_graph.LINKS l -> l
+                      | User_graph.LINKS l -> List.rev_map (fun ((_,i),j) -> (i,j)) l
                       | SOME | WHATEVER | TYPE _ -> assert false in
                   let state, binding' =
                     List.fold_left
@@ -1879,7 +1927,7 @@ let compute_signature show_title state =
                              (Ckappa_sig.site_name_of_int y)
                          in
                          state,(Locality.dummy_annot sx, Locality.dummy_annot sy)::list)
-                      (state,[]) (List.rev binding)
+                      (state,[]) rev_binding
                   in
                   let states' =
                     NamedDecls.create
@@ -1897,7 +1945,7 @@ let compute_signature show_title state =
              NamedDecls.create
                (Array.of_list acc)
             ))::list)
-      (state,[]) l
+      (state,[]) l.(0)
   in
   let signature = Signature.create ~counters:[] true l in
   Remanent_state.set_signature signature state,
@@ -2154,4 +2202,5 @@ let output_symmetries
     state
 
 let get_data = Remanent_state.get_data
-  end
+
+end

@@ -1,10 +1,12 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
+
+open Lwt.Infix
 
 let usage_msg =
   "KaSim "^Version.version_string^":\n"^
@@ -13,25 +15,22 @@ let usage_msg =
 let tmp_trace = ref(None:string option)
 let remove_trace () = match !tmp_trace with None -> () | Some d -> Sys.remove d
 
-let rec waitpid_non_intr pid =
-  try Unix.waitpid [] pid
-  with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
-
 let batch_loop
     ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency
     progress env counter graph state =
   let rec iter graph state =
-    let stop,graph',state' =
-      State_interpreter.a_loop
-        ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
-        env counter graph state in
-    if stop then (graph',state')
+    Lwt.wrap4
+      (State_interpreter.a_loop
+        ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash)
+        env counter graph state >>= fun (stop,graph',state') ->
+    if stop then Lwt.return (graph',state')
     else
       let () = Progress_report.tick
           ~efficiency (Counter.current_time counter)
           (Counter.time_ratio counter)
           (Counter.current_event counter)
           (Counter.event_ratio counter) progress in
+      (*Lwt.pause () >>= fun () ->*)
       iter graph' state'
   in iter graph state
 
@@ -49,34 +48,35 @@ let interactive_loop
     if !user_interrupted ||
        Rule_interpreter.value_bool counter graph pause_criteria then
       let () = Sys.set_signal Sys.sigint old_sigint_behavior in
-      (false,graph,state)
+      let () = Format.print_newline () in Lwt.return (false,graph,state)
     else
-      let stop,graph',state' as out =
-        State_interpreter.a_loop ~debugMode ~outputs
-          ~dumpIfDeadlocked ~maxConsecutiveClash env counter graph state in
+      Lwt.wrap4 (State_interpreter.a_loop ~debugMode ~outputs
+                   ~dumpIfDeadlocked ~maxConsecutiveClash) env counter graph state >>=
+      fun (stop,graph',state' as out) ->
       if stop then
         let () = Sys.set_signal Sys.sigint old_sigint_behavior in
-        out
+        Lwt.return out
       else
         let () = Progress_report.tick
             ~efficiency (Counter.current_time counter)
             (Counter.time_ratio counter)
             (Counter.current_event counter)
             (Counter.event_ratio counter) progress in
+        (*Lwt.pause () >>= fun () ->*)
         iter graph' state'
   in iter graph state
 
 let finalize
     ~outputs dotFormat cflow_file trace_file
     progress env counter graph state stories_compression =
-  let () = State_interpreter.end_of_simulation
-      ~outputs env counter graph state in
-  let () = Progress_report.complete_progress_bar
-      (Counter.current_time counter) (Counter.current_event counter) progress in
-  let () = Outputs.close ~event:(Counter.current_event counter) () in
+  Lwt.wrap4 (State_interpreter.end_of_simulation
+               ~outputs) env counter graph state >>= fun () ->
+  Lwt.wrap3 Progress_report.complete_progress_bar
+    (Counter.current_time counter) (Counter.current_event counter) progress <&>
+  Lwt.wrap (Outputs.close ~event:(Counter.current_event counter)) >>= fun () ->
   match trace_file,stories_compression with
-  | None,_ -> ()
-  | Some _, None -> ()
+  | None,_ -> Lwt.return_unit
+  | Some _, None -> Lwt.return_unit
   | Some dump, Some (none,weak,strong) ->
     let args = ["-d"; Kappa_files.get_dir (); Kappa_files.path dump] in
     let args = if none then "--none" :: args else args in
@@ -97,20 +97,42 @@ let finalize
         let dir = if Filename.is_implicit Sys.executable_name &&
                      predir = "." then "" else predir^"/" in
         dir^"KaStor" in
-    let pid = Unix.create_process prog (Array.of_list (prog::args))
-        Unix.stdin Unix.stdout Unix.stderr in
+    let pid = Lwt_process.open_process_none
+        ~stdin:`Keep ~stdout:`Keep ~stderr:`Keep
+        (prog,(Array.of_list (prog::args))) in
     let _old_sigint_behavior =
       Sys.signal
-        Sys.sigint (Sys.Signal_handle (fun si -> Unix.kill pid si)) in
-    match waitpid_non_intr pid with
-    | _, Unix.WEXITED 127 ->
-      raise
+        Sys.sigint (Sys.Signal_handle (fun si -> pid#kill si)) in
+    pid#status >>= function
+    | Unix.WEXITED 127 ->
+      Lwt.fail
         (ExceptionDefn.Malformed_Decl
            (Locality.dummy_annot
               ("Executable '"^prog^"' can not be found to compute stories.")))
-    | _, Unix.WEXITED n -> if n <> 0 then exit n
-    | _, Unix.WSIGNALED n -> failwith ("Killed with signal "^string_of_int n)
-    | _, Unix.WSTOPPED n -> failwith ("Stopped with signal "^string_of_int n)
+    | Unix.WEXITED n -> if n <> 0 then exit n; Lwt.return_unit
+    | Unix.WSIGNALED n -> Lwt.fail_with ("Killed with signal "^string_of_int n)
+    | Unix.WSTOPPED n -> Lwt.fail_with ("Stopped with signal "^string_of_int n)
+
+
+let read_interactive_command =
+  let buffer = Buffer.create 256 in
+  let rec aux_read_command () =
+    Lwt_io.read_char_opt Lwt_io.stdin >>= function
+    | Some char ->
+        let () = Buffer.add_char buffer char in
+      if char = ';' then
+        let m = Buffer.contents buffer in
+        let () = Buffer.reset buffer in
+        Lwt.return m
+      else if char = '\n' then
+        Lwt_io.printf "> " >>= aux_read_command
+      else
+        aux_read_command ()
+    | None ->
+      let m = Buffer.contents buffer in
+      let () = Buffer.reset buffer in
+      Lwt.return m in
+  aux_read_command
 
 let () =
   let cli_args = Run_cli_args.default in
@@ -284,97 +306,99 @@ let () =
                (State_interpreter.observables_values env graph counter))
       | _ -> ()
     in
-    let () =
-      let progress = Progress_report.create
-          conf.Configuration.progressSize conf.Configuration.progressChar in
-      if stop then
-        finalize
-          ~outputs formatCflows cflowFile trace_file
-          progress env counter graph state story_compression
-      else if cli_args.Run_cli_args.batchmode then
-        let (graph',state') =
+    let progress = Progress_report.create
+        conf.Configuration.progressSize conf.Configuration.progressChar in
+    Lwt_main.run
+      ((if stop then
+          finalize
+            ~outputs formatCflows cflowFile trace_file
+            progress env counter graph state story_compression
+        else if cli_args.Run_cli_args.batchmode then
           batch_loop
             ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
             ~efficiency:kasim_args.Kasim_args.showEfficiency
-            progress env counter graph state in
-        finalize
-          ~outputs formatCflows cflowFile trace_file
-          progress env counter graph' state' story_compression
-      else
-        let lexbuf = Lexing.from_channel stdin in
-        let rec toplevel env graph state =
-          let () = Outputs.flush_warning () in
-          let () = Format.printf "@.> @?" in
-          let env',(stop,graph',state') =
-            try
-              let command = match cli_args.Run_cli_args.syntaxVersion with
-                | Ast.V3 ->
-                  KappaParser.interactive_command KappaLexer.token lexbuf
-                | Ast.V4 ->
-                  try Kparser4.interactive_command Klexer4.token lexbuf
-                  with ExceptionDefn.Syntax_Error r ->
-                    raise (ExceptionDefn.Malformed_Decl r) in
-              match command with
-              | Ast.RUN b ->
-                let env',graph',b'' =
-                  Evaluator.get_pause_criteria
-                    ~debugMode ~outputs
-                    ~max_sharing:kasim_args.Kasim_args.maxSharing
-                    ~syntax_version:(cli_args.Run_cli_args.syntaxVersion)
-                    contact_map env graph b in
-                let progress = Progress_report.create
-                    conf.Configuration.progressSize
-                    conf.Configuration.progressChar in
-                env',interactive_loop
-                  ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
-                  ~efficiency:kasim_args.Kasim_args.showEfficiency
-                  progress b'' env' counter graph' state
-              | Ast.QUIT -> env,(true,graph,state)
-              | Ast.MODIFY e ->
-                let e', (env',_ as o) =
-                  Evaluator.do_interactive_directives
-                    ~debugMode ~outputs
-                    ~max_sharing:kasim_args.Kasim_args.maxSharing
-                    ~syntax_version:cli_args.Run_cli_args.syntaxVersion
-                    contact_map env counter graph state e in
-                let () = Outputs.input_modifications
-                    env' (Counter.current_event counter) e' in
-                o
-            with
-            | ExceptionDefn.Syntax_Error (msg,pos) ->
-              let () = Pp.error Format.pp_print_string (msg,pos) in
-              env,(false,graph,state)
-            | ExceptionDefn.Malformed_Decl er ->
-              let () = Pp.error Format.pp_print_string er in
-              env,(false,graph,state) in
-          if stop then
-            finalize
-              ~outputs formatCflows cflowFile trace_file
-              progress env counter graph' state' story_compression
-          else
-            toplevel env' graph' state' in
-        let toplevel_intro () =
-          Format.printf
-            "@[KaSim@ toplevel:@ type@ `$RUN@ (optionally@ followed@ by@ a\
-             @ pause@ criteria)@ ;` to@ launch@ the@ simulation@ or@ a@ intervention\
-             @ effect@ (followed by its `;`) to@ perform@ it@]@." in
-        if cli_args.Run_cli_args.interactive then
-          let () = toplevel_intro () in toplevel env graph state
+            progress env counter graph state >>= fun (graph',state') ->
+          finalize
+            ~outputs formatCflows cflowFile trace_file
+            progress env counter graph' state' story_compression
         else
-          let (stop,graph',state') =
+          let rec toplevel env graph state =
+            let () = Outputs.flush_warning () in
+            Lwt.catch
+              (fun () ->
+                 read_interactive_command () >>= fun str ->
+                 let lexbuf = Lexing.from_string str in
+                 (match cli_args.Run_cli_args.syntaxVersion with
+                  | Ast.V3 ->
+                    Lwt.wrap2 KappaParser.interactive_command KappaLexer.token lexbuf
+                  | Ast.V4 ->
+                    try Lwt.return (Kparser4.interactive_command Klexer4.token lexbuf)
+                    with ExceptionDefn.Syntax_Error r ->
+                      Lwt.fail (ExceptionDefn.Malformed_Decl r)
+                       | e -> Lwt.fail e) >>= function
+                 | Ast.RUN b ->
+                   Lwt.wrap4
+                     (Evaluator.get_pause_criteria
+                        ~debugMode ~outputs
+                        ~max_sharing:kasim_args.Kasim_args.maxSharing
+                        ~syntax_version:(cli_args.Run_cli_args.syntaxVersion))
+                     contact_map env graph b >>= fun (env',graph',b'') ->
+                   let progress = Progress_report.create
+                       conf.Configuration.progressSize
+                       conf.Configuration.progressChar in
+                   interactive_loop
+                     ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+                     ~efficiency:kasim_args.Kasim_args.showEfficiency
+                     progress b'' env' counter graph' state >>=
+                   fun out -> Lwt.return (env',out)
+                 | Ast.QUIT -> Lwt.return (env,(true,graph,state))
+                 | Ast.MODIFY e ->
+                   Lwt.wrap6
+                     (Evaluator.do_interactive_directives
+                        ~debugMode ~outputs
+                        ~max_sharing:kasim_args.Kasim_args.maxSharing
+                        ~syntax_version:cli_args.Run_cli_args.syntaxVersion)
+                     contact_map env counter graph state e >>=
+                   fun (e', (env',_ as o)) ->
+                   Lwt_io.print "\xE2\x9C\x94 " >>= fun () ->
+                   let () = Outputs.input_modifications
+                       env' (Counter.current_event counter) e' in
+                   Lwt.return o)
+              (function
+                | ExceptionDefn.Syntax_Error (msg,pos) ->
+                  let () = Pp.error Format.pp_print_string (msg,pos) in
+                  Lwt.return (env,(false,graph,state))
+                | ExceptionDefn.Malformed_Decl er ->
+                  let () = Pp.error Format.pp_print_string er in
+                  Lwt.return (env,(false,graph,state))
+                | e -> Lwt.fail e) >>= fun (env',(stop,graph',state')) ->
+            if stop then
+              finalize
+                ~outputs formatCflows cflowFile trace_file
+                progress env counter graph' state' story_compression
+            else
+              toplevel env' graph' state' in
+          let toplevel_intro () =
+            Lwt_io.printf
+              "KaSim toplevel: type `$RUN (optionally followed by a pause \
+               criteria) ;` to launch the simulation or a intervention effect \
+               (followed by its `;`) to perform it\n> " in
+          if cli_args.Run_cli_args.interactive then
+            toplevel_intro () >>= fun () -> toplevel env graph state
+          else
             interactive_loop
               ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
               ~efficiency:kasim_args.Kasim_args.showEfficiency
-              progress Alg_expr.FALSE env counter graph state in
-          if stop then
-            finalize
-              ~outputs formatCflows cflowFile trace_file
-              progress env counter graph' state' story_compression
-          else
-            let () = toplevel_intro () in toplevel env graph' state' in
-    Format.printf "Simulation ended@.";
-    remove_trace ();
-    Counter.print_efficiency Format.std_formatter counter ;
+              progress Alg_expr.FALSE env counter graph state >>= fun (stop,graph',state') ->
+            if stop then
+              finalize
+                ~outputs formatCflows cflowFile trace_file
+                progress env counter graph' state' story_compression
+            else
+              toplevel_intro () >>= fun () -> toplevel env graph' state') >>= fun () ->
+       Lwt_io.printl "Simulation ended" >>= fun () ->
+       remove_trace ();
+       Lwt_io.print (Format.asprintf "%a" Counter.print_efficiency counter))
   with
   | ExceptionDefn.Malformed_Decl er ->
     let () = Outputs.close () in

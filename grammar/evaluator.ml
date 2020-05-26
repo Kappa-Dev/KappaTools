@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -38,10 +38,10 @@ let do_interactive_directives ~debugMode ~outputs ~max_sharing ~syntax_version
             ~debugMode fenv)
          graph
          (Primitives.extract_connected_components_modifications e'')) in
-  e'',
-  (env',
-   State_interpreter.do_modifications
-     ~debugMode ~outputs env' counter graph' state e'')
+  let (ostop,ograph,ostate,_) =
+       State_interpreter.do_modifications
+     ~debugMode ~outputs env' counter graph' state e'' in
+  e'', (env', (ostop, ograph, ostate))
 
 let get_pause_criteria
     ~debugMode ~outputs ~max_sharing ~syntax_version contact_map env graph b =

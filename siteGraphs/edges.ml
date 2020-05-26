@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -209,12 +209,10 @@ let copy graph =
 type stats = { nb_agents : int }
 
 let stats graph =
-  match graph.tables with
-  | None -> assert false
-  | Some tables -> {
-      nb_agents =
-        Mods.DynArray.length tables.sort - List.length (snd graph.free_id);
-    }
+  let (top_id, free_ids) = graph.free_id in
+  {
+    nb_agents = top_id - List.length free_ids;
+  }
 
 let add_agent ?id sigs ty graph =
   let ar = Signature.arity sigs ty in
@@ -616,6 +614,9 @@ let rec print_path ?sigs f = function
 let empty_path = []
 let singleton_path n s n' s' = [(n,s),(n',s')]
 let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l
+
+let is_valid_path p graph =
+  List.for_all (fun (((ag,_),s),((ag',_),s')) -> link_exists ag s ag' s' graph) p
 
 let breadth_first_traversal
     ~looping ?max_distance stop_on_find is_interesting links cache out todos =

@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -26,10 +26,10 @@ let content () =
     State_project.on_project_change_async ~on:tab_is_active
       () (React.S.const ()) []
       (fun (manager : Api.concrete_manager) () ->
-         (manager#get_constraints_list >>= function
-           | Result.Ok constraints ->
-             Lwt.return
-               (List.fold_left
+         (manager#get_constraints_list >|=
+          Result_util.fold
+           ~ok:(fun constraints ->
+                List.fold_left
                   (fun panels (a,b) ->
                      (*match b with
                         | [] -> panels
@@ -80,16 +80,17 @@ let content () =
                        ~a:[Html.a_class [ "panel"; "panel-default" ]] [title;content] ::
                      panels)
                   [] constraints)
-           | Result.Error r ->
+         ~error:(fun r ->
              let title = Html.div
                  ~a:[Html.a_class [ "panel-heading" ]] [Html.txt "KaSa has failed"] in
              let content = Html.div
                  ~a:[Html.a_class [ "panel-body"; "panel-pre" ]]
-                 (Utility.print_method_handler r) in
+                 (List.map
+                    (fun m -> Html.p [Html.txt (Format.asprintf "@[%a@]" Result_util.print_message m)])
+                 r) in
              let out = Html.div
                  ~a:[Html.a_class [ "panel"; "panel-danger" ]] [title;content] in
-             Lwt.return [out]) >>= fun out ->
-         Lwt.return out) in
+              [out]))) in
   [ Tyxml_js.R.Html5.div
       ~a:[Html.a_class ["panel-scroll"]]
       (ReactiveData.RList.from_signal constraints_div)

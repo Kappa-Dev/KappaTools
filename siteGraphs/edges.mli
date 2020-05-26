@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -75,6 +75,8 @@ val singleton_path : Agent.t -> int -> Agent.t -> int -> path
 val rev_path : path -> path
 val print_path :
   ?sigs:Signature.s -> Format.formatter -> path -> unit
+
+val is_valid_path : path -> t -> bool
 
 val are_connected :
   ?max_distance : int -> t -> Agent.t list -> Agent.t list -> path option

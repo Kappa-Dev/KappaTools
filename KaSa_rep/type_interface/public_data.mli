@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -103,6 +103,15 @@ type var =
 type ('rule, 'var) influence_node =
   | Rule of 'rule
   | Var of 'var
+
+type pos_of_rules_and_vars =
+  ((int,int) influence_node * Locality.t) list
+
+val pos_of_rules_and_vars_of_json:
+  Yojson.Basic.t -> pos_of_rules_and_vars
+
+val pos_of_rules_and_vars_to_json:
+  pos_of_rules_and_vars -> Yojson.Basic.t
 
 val short_node_of_refined_node:
   (rule, var) influence_node -> (int, int) influence_node

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Nov 05 2018>
+  * Last modification: Time-stamp: <Jan 07 2020>
 *)
 
 type rule = Primitives.elementary_rule
@@ -477,7 +477,7 @@ let string_of_var_id ?compil ?init_mode logger r =
     | Loggers.XLS | Loggers.SBML | Loggers.DOTNET
     | Loggers.DOT
     | Loggers.HTML | Loggers.HTML_Graph | Loggers.Js_Graph
-    | Loggers.HTML_Tabular
+    | Loggers.HTML_Tabular | Loggers.GEPHI 
     | Loggers.Json | Loggers.Matrix -> ""
   in
   let env = environment_opt compil in

@@ -492,7 +492,7 @@ class Render {
                             })
                             .attr("class", "stateText")
                             .attr("id", "stateText" + "a" + site.agent.id + "s" + site.id + "id" + state)
-                            .attr('alignment-baseline', "middle")
+                            .attr('dominant-baseline', "central")
                             .style("fill", d => site.agent.color.darker() )
                             .style('font-size', d => {
                                 let textSize = 2000 / (siteNum/4 + 6 * site.states.length - this.radius/25);
@@ -669,7 +669,7 @@ class Render {
                 else
                     return "end"; })
             .attr("class", "siteText siteText--normal")
-            .attr('alignment-baseline', "middle")
+            .attr('dominant-baseline', "central")
             .attr("transform", d => {
                 let xy = siteArc.centroid(d) ;
                 let angle = ( d.startAngle + d.endAngle + 3 * Math.PI ) / 2;

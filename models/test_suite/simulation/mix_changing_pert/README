@@ -1,0 +1,3 @@
+#!/bin/sh
+
+"${KAPPABIN}"KaSim -d output -seed 20543 not_found.ka -syntax 4 || exit 0

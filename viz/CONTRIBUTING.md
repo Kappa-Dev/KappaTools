@@ -45,7 +45,7 @@ JSON formats to represent contact maps, snapshots, (observed) patterns
 (and maybe at some point rule but not for now) follow the
 same squeleton:
 
-* a `graph` is an array of `agent`s or holes represented
+* a `graph` is an 2d matrix of `agent`s or holes represented
   by `null`. (There is no holes in contact_map and snapshots)
 
 * an `agent` is an object with 2 fields: a string "node_type" and an
@@ -86,28 +86,28 @@ connected to someone else is represented as
   * Explicit links are represented in a pointer format in THIS.
 
   That means that you give the destination of the edge by giving its
-  coordinates in the graph (the pair of int:
-  (position_of_the_agent_in_the_graph, id_of_the_site)).
+  coordinates in the graph (the pair of a pair of int and a int:
+  `(position_of_the_agent_in_the_matrix, id_of_the_site_in_the_agent)`).
 
 As an example, here the representation of the kappa graph `A(x[5]), B(b[5 8]), A(x[.] y[8])` (This example, while being a concise illustration, is impossible in Kappa outputs: having several links for 1 site is contact_map specific but having 2 agents of the same type as well as a free site is impossible in contact maps...)
 
 ```
-[
+[ [
     {
         "node_type":"A",
-        "node_sites":[{"site_name":"x","site_type":["port",{"port_links":[[1,0]],"port_states":[]}]}]
+        "node_sites":[{"site_name":"x","site_type":["port",{"port_links":[[[0,1],0]],"port_states":[]}]}]
     },
     {
         "node_type":"B",
-        "node_sites":[{"site_name":"b","site_type":["port",{"port_links":[[0,0],[2,1]],"port_states":[]}]}]
+        "node_sites":[{"site_name":"b","site_type":["port",{"port_links":[[[0,0],0],[[0,2],1]],"port_states":[]}]}]
     },
     {
         "node_type":"A",
         "node_sites":[
             {"site_name":"x","site_type":["port",{"port_links":[],"port_states":[]}]},
-            {"site_name":"y","site_type":["port",{"port_links":[[1,0]],"port_states":[]}]}
+            {"site_name":"y","site_type":["port",{"port_links":[[[0,1],0]],"port_states":[]}]}
         ]
     }
-]
+] ]
 ```
 

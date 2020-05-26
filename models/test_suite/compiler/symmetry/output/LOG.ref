@@ -11,6 +11,6 @@ done
 	 -update_domain construction
 	 9 (sub)observables 15 navigation steps
 	 -initial conditions
-+ Building initial state (1 agents)
++ Building initial state (0 agents)
 Done
 + Command line to rerun is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-l' '0' '-syntax' '4'

@@ -297,8 +297,8 @@ module Cflow_linker =
           let standalone =
             List.for_all
               (function
-                | (PI.Create _ | PI.Free _) -> true
-                | (PI.Mod_internal _ |PI.Bind_to _ | PI.Bind _ | PI.Remove _) -> false)
+                | (PI.Create _ | PI.Free _ | PI.Mod_internal _) -> true
+                | (PI.Bind_to _ | PI.Bind _ | PI.Remove _) -> false)
               this in
           let this = Trace.Init this in
           if standalone then
@@ -341,7 +341,7 @@ module Cflow_linker =
         match SiteMap.find_option s_name ag_info.internal_states with
         | None -> remanent,set
         | Some state_ref ->
-          if state_ref = state
+          if state_ref = state (* Back to the original internal state*)
           then
             begin
               if SiteSet.mem s_name ag_info.sites_with_wrong_internal_state
@@ -364,7 +364,7 @@ module Cflow_linker =
                 end
               else remanent,set
             end
-          else
+          else (* No longer the default state *)
             begin
               if SiteSet.mem s_name ag_info.sites_with_wrong_internal_state
               then

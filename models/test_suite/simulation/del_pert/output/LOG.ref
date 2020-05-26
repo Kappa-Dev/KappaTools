@@ -14,8 +14,8 @@ done
 + Building initial state (2 agents)
 Done
 + Command line to rerun is: 'KaSim' '-l' '3' '-d' 'output' '-seed' '199095194' 'del_pert.ka' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 Simulation ended
 0.00% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%

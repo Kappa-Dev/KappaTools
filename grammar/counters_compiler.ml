@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -112,7 +112,8 @@ let prepare_counters rules =
     | Ast.Edit _ -> r
     | Ast.Arrow a ->
       {r with Ast.rewrite =
-                Ast.Arrow {a with Ast.lhs = (fold a.Ast.rhs a.Ast.lhs)}} in
+                Ast.Arrow {a with
+                           Ast.lhs = [fold (List.flatten a.Ast.rhs) (List.flatten a.Ast.lhs)]}} in
   List.map (fun (s,(r,a)) -> (s,(aux r,a))) rules
 
 let counters_signature s agents =
@@ -241,6 +242,7 @@ let remove_variable_in_counters ~warning rules signatures =
          let k_un = update_pair_rate counters r.Ast.k_un in
          let k_op = update_opt_rate counters r.Ast.k_op in
          let k_op_un = update_pair_rate counters r.Ast.k_op_un in
+         let lhs = [lhs] in
          let append =
            if (counters = []) then None
            else
@@ -252,7 +254,7 @@ let remove_variable_in_counters ~warning rules signatures =
                | Ast.Arrow a -> Ast.Arrow {a with Ast.lhs});
             Ast.bidirectional = r.Ast.bidirectional;
             Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un},a)))
-      (remove_var_mixture mix) in
+      (remove_var_mixture (List.flatten mix)) in
   let rules = prepare_counters rules in
 
    enumerate rules remove_var_rule
@@ -491,8 +493,8 @@ let remove_counter_rule sigs mix created =
       List_util.rev_map_append
         (fun ag -> ag.ra) created (incrs_created@incrs_created') in
     (rule_agent_mix,raw_mix)
-  else (List.map (fun ag -> ag.ra) mix),
-       (List.map (fun ag -> ag.ra) created)
+  else (List.rev_map (fun ag -> ag.ra) (List.rev mix)),
+       (List.rev_map (fun ag -> ag.ra) (List.rev created))
 
 let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let (incr_type,_,incr_b,_) = Signature.incr_agent sigs in
@@ -533,16 +535,17 @@ let counter_perturbation sigs c ag_ty =
 
 let counters_perturbations sigs ast_sigs =
   List.fold_left
-    (fun acc -> function
-       | Ast.Absent _ -> acc
-       | Ast.Present (ag_ty,sites,_) ->
-         List.fold_left
-           (fun acc' site ->
-              match site with
-                Ast.Port _ -> acc'
-              | Ast.Counter c ->
-                ((counter_perturbation sigs c ag_ty),(snd ag_ty))::acc')
-           acc sites)
+    (List.fold_left
+       (fun acc -> function
+          | Ast.Absent _ -> acc
+          | Ast.Present (ag_ty,sites,_) ->
+            List.fold_left
+              (fun acc' site ->
+                 match site with
+                   Ast.Port _ -> acc'
+                 | Ast.Counter c ->
+                   ((counter_perturbation sigs c ag_ty),(snd ag_ty))::acc')
+              acc sites))
     [] ast_sigs
 
 let make_counter i name =

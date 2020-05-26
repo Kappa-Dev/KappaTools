@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -119,7 +119,7 @@ let cc_to_user_cc ~debugMode sigs cc =
           | Some _ -> (acc,indexes,pos))
          ([],r,0) cc in
   let cc_without_counters = Array.of_list (List.rev cc_list) in
-  Array.map
+  [|Array.map
     (fun ag -> Some {
          User_graph.node_type =
            Format.asprintf "%a" (Signature.print_agent sigs) ag.node_type;
@@ -150,14 +150,14 @@ let cc_to_user_cc ~debugMode sigs cc =
                               sigs (cc.(dn_id)).node_type with
                       | None ->
                         User_graph.Port
-                          {User_graph.port_links = User_graph.LINKS [(dn_id',s)];
+                          {User_graph.port_links = User_graph.LINKS [((0,dn_id'),s)];
                            User_graph.port_states}
                       | Some _ ->
                         User_graph.Counter (counter_value cc (dn_id,s) 0)
                })
              ag.node_sites;
        })
-    cc_without_counters
+    cc_without_counters|]
 
 let fold f x s =
   Mods.IntMap.fold (fun _ l acc ->

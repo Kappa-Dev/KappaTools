@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -55,9 +55,8 @@ class virtual manager_file_line
     Api_types_t.file_line_catalog Api.result =
     let file_lines : string list Mods.StringMap.t =
       detail.Api_types_t.simulation_output_file_lines in
-    let file_line_ids : string list =
+    let file_line_catalog : string list =
       List.map fst (Mods.StringMap.bindings file_lines) in
-    let file_line_catalog = { Api_types_t.file_line_ids } in
     Result_util.ok file_line_catalog
 
   method private get_file_line
@@ -90,24 +89,17 @@ class virtual manager_flux_map
   method private info_flux_map
       (detail : Api_data.simulation_detail_output) :
     Api_types_t.din_catalog Api.result =
-    let flux_maps : Api_types_t.din list =
-      detail.Api_types_t.simulation_output_dins in
     let flux_map_catalog =
-      { Api_types_t.din_ids =
-          List.map (fun f -> f.Data.din_data.Data.din_name)
-            flux_maps } in
+      List.map fst detail.Api_types_t.simulation_output_dins in
     Result_util.ok flux_map_catalog
 
   method private get_flux_map
       (flux_map_id : Api_types_t.din_id)
       (detail : Api_data.simulation_detail_output) :
     Api_types_t.din Api.result =
-    let flux_maps_list : Api_types_t.din list =
+    let flux_maps_list =
       detail.Api_types_t.simulation_output_dins in
-    let flux_maps_eq : Api_types_t.din -> bool =
-      fun flux_map ->
-        flux_map_id = flux_map.Data.din_data.Data.din_name in
-    try Result_util.ok (List.find flux_maps_eq flux_maps_list)
+    try Result_util.ok (List.assoc flux_map_id flux_maps_list)
     with Not_found ->
       let m : string = Format.sprintf "id %s not found" flux_map_id in
       Api_common.result_error_msg ~result_code:`Not_found m
@@ -194,8 +186,7 @@ class virtual manager_snapshot
     let snapshots =
       detail.Api_types_t.simulation_output_snapshots in
     let snapshot_catalog =
-      { Api_types_t.snapshot_ids =
-          Mods.StringMap.fold (fun x _ acc -> x::acc) snapshots []} in
+      Mods.StringMap.fold (fun x _ acc -> x::acc) snapshots [] in
     Result_util.ok snapshot_catalog
   method private get_snapshot
       (snapshot_id : Api_types_t.snapshot_id)
@@ -229,7 +220,7 @@ class manager_simulation
   Api.manager_simulation = object(self)
   val mutable simulation = None
 
-  method simulation_load text overwrites =
+  method secret_simulation_load text overwrites =
     let ast = text in
     let harakiri,_ = Lwt.task () in
     let _ =
@@ -307,6 +298,26 @@ class manager_simulation
                          (Kappa_facade.get_raw_trace t)))
 
     method simulation_outputs_zip =
+      let add_snapshot file filename name snapshot =
+        if Filename.check_suffix name ".dot" then
+          Fakezip.add_entry
+            (Format.asprintf "%a@." (Data.print_dot_snapshot ?uuid:None) snapshot)
+            file (filename^"/"^name)
+        else if Filename.check_suffix name ".json" then
+          Fakezip.add_entry (Data.string_of_snapshot ?len:None snapshot)
+            file (filename^"/"^name) else
+          let name' = Tools.chop_suffix_or_extension name ".ka" in
+          Fakezip.add_entry
+            (Format.asprintf "%a@." (Data.print_snapshot ?uuid:None) snapshot)
+            file (filename^"/"^name') in
+      let add_din file filename (din_name,flux) =
+        Fakezip.add_entry
+          (if Filename.check_suffix din_name ".html"
+           then Format.asprintf "%a@." Data.print_html_din flux
+           else if Filename.check_suffix din_name ".json"
+           then Data.string_of_din flux
+           else Format.asprintf "%a@." (Data.print_dot_din ?uuid:None) flux)
+          file (filename^"/"^din_name) in
       let projection t =
         try
           let filename = "simulation_outputs" in
@@ -332,15 +343,11 @@ class manager_simulation
               t.Api_types_t.simulation_output_file_lines in
           let () =
             List.iter
-              (fun din ->
-                 Fakezip.add_entry (Data.string_of_din ?len:None din)
-                   file (filename^"/"^din.Data.din_data.Data.din_name))
+              (add_din file filename)
             t.Api_types_t.simulation_output_dins in
           let () =
             Mods.StringMap.iter
-              (fun _ snapshot ->
-                 Fakezip.add_entry (Data.string_of_snapshot ?len:None snapshot)
-                   file (filename^"/"^snapshot.Data.snapshot_file))
+              (add_snapshot file filename)
               t.Api_types_t.simulation_output_snapshots in
           let out = Fakezip.close_out file in
           Result_util.ok out

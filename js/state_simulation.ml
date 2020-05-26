@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -289,8 +289,7 @@ let intervene_simulation (code : string) : string Api.result Lwt.t =
          Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
       (fun manager _ ->
-        manager#simulation_intervention
-          { Api_types_t.intervention_code = code } >>=
+        manager#simulation_intervention code >>=
         (Api_common.result_bind_lwt
            ~ok:(fun out -> sync () >>=
                  Api_common.result_bind_lwt

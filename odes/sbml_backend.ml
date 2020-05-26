@@ -8,7 +8,7 @@ let print_comment logger_fmt logger_buf (s:string) : unit =
     let () = Loggers.fprintf logger_buf "<!-- %s -->" s in
     let () = Loggers.print_newline logger_buf in ()
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
-  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular | Loggers.GEPHI
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
     ()
@@ -48,7 +48,7 @@ with
 | Loggers.DOTNET
 | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
 | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-| Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+| Loggers.XLS | Loggers.Octave | Loggers.Mathematica | Loggers.GEPHI
 | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
 
 let do_dotnet logger logger_err f =
@@ -59,7 +59,7 @@ let do_dotnet logger logger_err f =
   | Loggers.SBML
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica | Loggers.GEPHI
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
 
 let is_dotnet logger =
@@ -70,7 +70,7 @@ let is_dotnet logger =
   | Loggers.SBML
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica | Loggers.GEPHI
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
 
 let is_sbml logger =
@@ -81,7 +81,7 @@ let is_sbml logger =
     | Loggers.DOTNET
     | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
     | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-    | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+    | Loggers.XLS | Loggers.Octave | Loggers.Mathematica | Loggers.GEPHI
     | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
 
 let is_dotnet_or_sbml  logger =
@@ -92,7 +92,7 @@ let is_dotnet_or_sbml  logger =
   | Loggers.SBML -> true
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica | Loggers.GEPHI
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
 
 let do_dotnet_or_sbml logger logger_err f =
@@ -1273,7 +1273,7 @@ let maybe_time_dependent logger network var_rule =
     maybe_time_dependent_alg_expr_in_sbml logger expr network
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica | Loggers.GEPHI
   | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.DOTNET -> false
 
 let can_be_cast f =

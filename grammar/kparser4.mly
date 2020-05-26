@@ -1,6 +1,6 @@
 /******************************************************************************/
 /*  _  __ * The Kappa Language                                                */
-/* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  */
+/* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  */
 /* | ' /  *********************************************************************/
 /* | . \  * This file is distributed under the terms of the                   */
 /* |_|\_\ * GNU Lesser General Public License Version 3                       */
@@ -21,13 +21,13 @@
     let o = List.rev !internal_memory in let () = internal_memory := [] in o
 %}
 
-%token EOF COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR OP_BRA CL_BRA AT SEMICOLON LOG
+%token EOF COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR OP_BRA CL_BRA AT SEMICOLON
 %token PLUS MINUS MULT DIV MOD MAX MIN SINUS COSINUS TAN POW ABS SQRT EXPONENT
-%token OR AND NOT THEN ELSE DIFF EQUAL SMALLER GREATER TRUE FALSE INFINITY
+%token LOG OR AND NOT THEN ELSE DIFF EQUAL SMALLER GREATER TRUE FALSE INFINITY
 %token SHARP UNDERSCORE PIPE RAR LRAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
-%token COLON NEWLINE SIGNATURE TOKEN INIT LET OBS PLOT PERT CONFIG RUN APPLY
+%token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
-%token DO REPEAT ALARM
+%token DO REPEAT ALARM RUN LET
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID LABEL STRING
@@ -202,8 +202,15 @@ agent:
 
 pattern:
   | agent COMMA annot pattern
-    { let (x,_,_) = $1 in let (y,pend,p) = $4 in (x::y,pend,p) }
-  | agent { let (x,pend,p) = $1 in ([x],pend,p) }
+{ let (x,_,_) = $1 in
+  match $4 with
+  | (y::z,pend,p) -> ((x::y)::z,pend,p)
+  | ([],_,_) ->
+     raise (ExceptionDefn.Internal_Error
+              (add_pos 4 ("assertion failure in pattern parsing"))) }
+  | agent BACKSLASH annot pattern
+{ let (x,_,_) = $1 in let (y,pend,p) = $4 in ([x]::y,pend,p) }
+  | agent { let (x,pend,p) = $1 in ([[x]],pend,p) }
   ;
 
 constant:

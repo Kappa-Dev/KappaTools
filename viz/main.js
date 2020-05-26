@@ -9,15 +9,19 @@ function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1024,
-    height: 600,
-    webPreferences: {
-      // https://electronjs.org/docs/faq#i-can-not-use-jqueryrequirejsmeteorangularjs-in-electron
-      nodeIntegration: false
-    }
+    height: 600
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  let sim_agent = require('url').format({
+    protocol: 'file',
+    slashes: true,
+    pathname: require('path').join(__dirname, '../bin/KappaSwitchman'),
+    query: { label: 'Local' }
+  })
+  mainWindow.loadFile('index.html',{
+    query: { host: sim_agent }
+  })
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -30,11 +34,6 @@ function createWindow () {
     mainWindow = null
   })
 }
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -62,6 +61,9 @@ app.on('activate', function () {
 
 const Menu = require('electron').Menu
 
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   createWindow()
   createMenu()

@@ -1,13 +1,13 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
 type links =
-  | LINKS of (int * int) list
+  | LINKS of ((int * int) * int) list
   | WHATEVER
   | SOME
   | TYPE of string * string
@@ -32,7 +32,7 @@ type cc_node = {
   node_sites: cc_site array;
 }
 
-type connected_component = cc_node option array
+type connected_component = cc_node option array array
 
 val print_cc : Format.formatter -> connected_component -> unit
 

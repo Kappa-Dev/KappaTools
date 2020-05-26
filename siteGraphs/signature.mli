@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -41,7 +41,7 @@ val arity : s -> int -> int
 (** [arity sigs agent_id] *)
 
 val max_arity : s -> int
-(** [max_arity sigs] returns max {arities sigs i} *)
+(** [max_arity sigs] returns max {!arities sigs i} *)
 
 val num_of_agent : string Locality.annot -> s -> int
 val agent_of_num : int -> s -> string

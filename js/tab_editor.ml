@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -77,31 +77,31 @@ let init_dead_rules () =
             (fun (manager : Api.concrete_manager) ->
                if model.State_project.model_parameters.
                     State_project.show_dead_rules then
-                 manager#get_dead_rules >>= function
-                 | Result.Ok list ->
-                   let warnings =
-                     List.fold_left
-                       (fun acc rule ->
-                          if rule.Public_data.rule_hidden
-                          then acc
-                          else
-                            let text =
-                              "Dead rule "^
-                              if rule.Public_data.rule_label <> ""
-                              then (" '"^rule.Public_data.rule_label^"'")
-                              else if rule.Public_data.rule_ast <> ""
-                              then rule.Public_data.rule_ast
-                              else string_of_int rule.Public_data.rule_id in
-                            {
-                              Result_util.severity = Logs.Warning;
-                              Result_util.range =
-                                Some rule.Public_data.rule_position;
-                              Result_util.text;
-                            } :: acc) [] list in
-                   let warnings = List.rev warnings in
-                   Lwt.return (Api_common.result_messages warnings)
-                 | Result.Error mh ->
-                   Lwt.return (Api_common.method_handler_messages mh)
+                 manager#get_dead_rules >|=
+                 Result_util.fold
+                   ~ok:(fun list ->
+                       let warnings =
+                         List.fold_left
+                           (fun acc rule ->
+                              if rule.Public_data.rule_hidden
+                              then acc
+                              else
+                                let text =
+                                  "Dead rule "^
+                                  if rule.Public_data.rule_label <> ""
+                                  then (" '"^rule.Public_data.rule_label^"'")
+                                  else if rule.Public_data.rule_ast <> ""
+                                  then rule.Public_data.rule_ast
+                                  else string_of_int rule.Public_data.rule_id in
+                                {
+                                  Result_util.severity = Logs.Warning;
+                                  Result_util.range =
+                                    Some rule.Public_data.rule_position;
+                                  Result_util.text;
+                                } :: acc) [] list in
+                       List.rev warnings)
+                   ~error:(fun mh -> mh) >|=
+                 Api_common.result_messages ?result_code:None
                else
                  Lwt.return (Result_util.ok ()))
          ))
@@ -116,29 +116,29 @@ let init_dead_agents () =
             (fun (manager : Api.concrete_manager) ->
                if model.State_project.model_parameters.
                     State_project.show_dead_agents then
-                 manager#get_dead_agents >>= function
-                 | Result.Ok list ->
-                   let warnings =
-                     List.fold_left
-                       (fun acc agent ->
-                          let text =
-                            "Dead agent "^
-                            if agent.Public_data.agent_ast <> ""
-                            then agent.Public_data.agent_ast
-                            else string_of_int agent.Public_data.agent_id in
-                          List.fold_left
-                            (fun acc range ->
-                               {
-                                 Result_util.severity = Logs.Warning;
-                                 Result_util.range = Some range;
-                                 Result_util.text;
-                               } :: acc)
-                            acc agent.Public_data.agent_position)
-                       [] list in
-                   let warnings = List.rev warnings in
-                   Lwt.return (Api_common.result_messages warnings)
-                 | Result.Error mh ->
-                   Lwt.return (Api_common.method_handler_messages mh)
+                 manager#get_dead_agents >|=
+                 Result_util.fold
+                   ~ok:(fun list ->
+                       let warnings =
+                         List.fold_left
+                           (fun acc agent ->
+                              let text =
+                                "Dead agent "^
+                                if agent.Public_data.agent_ast <> ""
+                                then agent.Public_data.agent_ast
+                                else string_of_int agent.Public_data.agent_id in
+                              List.fold_left
+                                (fun acc range ->
+                                   {
+                                     Result_util.severity = Logs.Warning;
+                                     Result_util.range = Some range;
+                                     Result_util.text;
+                                   } :: acc)
+                                acc agent.Public_data.agent_position)
+                           [] list in
+                       List.rev warnings)
+                   ~error:(fun mh -> mh) >|=
+                 Api_common.result_messages ?result_code:None
                else
                  Lwt.return (Result_util.ok ()))
          ))
@@ -153,8 +153,9 @@ let init_non_weakly_reversible_transitions () =
             (fun (manager : Api.concrete_manager) ->
                if model.State_project.model_parameters.
                     State_project.show_non_weakly_reversible_transitions then
-                 manager#get_non_weakly_reversible_transitions >>= function
-                 | Result.Ok list ->
+                 manager#get_non_weakly_reversible_transitions >|=
+                 Result_util.fold
+                   ~ok:(fun list ->
                    let warnings =
                      List.fold_left
                        (fun acc (rule,context_list) ->
@@ -169,7 +170,6 @@ let init_non_weakly_reversible_transitions () =
                             let text =
                               Format.asprintf
                                 "Rule %s may induce non wealky reversible events in the following context%s:%s%a"
-                                
                                 (if rule.Public_data.rule_label <> ""
                                  then (" '"^rule.Public_data.rule_label^"'")
                                  else if rule.Public_data.rule_ast <> ""
@@ -191,9 +191,9 @@ let init_non_weakly_reversible_transitions () =
                                 Some rule.Public_data.rule_position;
                               Result_util.text;
                             } :: acc) [] list in
-                   let warnings = List.rev warnings in
-                   Lwt.return (Api_common.result_messages warnings)
-                 | Result.Error mh -> Lwt.return (Api_common.method_handler_messages mh)
+                   List.rev warnings)
+                   ~error:(fun mh -> mh) >|=
+                 Api_common.result_messages ?result_code:None
                else
                  Lwt.return (Result_util.ok ()))
          )

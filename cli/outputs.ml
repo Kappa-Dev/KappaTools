@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -25,12 +25,12 @@ let close_desc () =
   Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) print_desc;
   Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) species_desc
 
-let output_flux flux =
+let output_flux din_name flux =
   Kappa_files.with_flux
-    flux.Data.din_data.Data.din_name
-    (if Filename.check_suffix flux.Data.din_data.Data.din_name ".html"
+    din_name
+    (if Filename.check_suffix din_name ".html"
      then Kappa_files.wrap_formatter (fun f -> Data.print_html_din f flux)
-      else if Filename.check_suffix flux.Data.din_data.Data.din_name ".json"
+      else if Filename.check_suffix din_name ".json"
       then fun d -> JsonUtil.write_to_channel Data.write_din d flux
       else Kappa_files.wrap_formatter (fun f -> Data.print_dot_din ~uuid f flux))
 
@@ -144,18 +144,18 @@ let rec plot_now l =
     Data.print_plot_line ~is_tsv:fd.is_tsv Nbr.print_option fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
-let snapshot s =
-  if Filename.check_suffix s.Data.snapshot_file ".dot" then
+let snapshot file s =
+  if Filename.check_suffix file ".dot" then
     Kappa_files.with_snapshot
-      s.Data.snapshot_file ".dot" s.Data.snapshot_event
+      file ".dot" s.Data.snapshot_event
       (Kappa_files.wrap_formatter (fun f -> Data.print_dot_snapshot ~uuid f s))
-  else if Filename.check_suffix s.Data.snapshot_file ".json" then
+  else if Filename.check_suffix file ".json" then
     Kappa_files.with_snapshot
-      s.Data.snapshot_file ".json" s.Data.snapshot_event
+      file ".json" s.Data.snapshot_event
       (fun d -> JsonUtil.write_to_channel Data.write_snapshot d s)
   else
     Kappa_files.with_snapshot
-      s.Data.snapshot_file ".ka" s.Data.snapshot_event
+      file ".ka" s.Data.snapshot_event
       (Kappa_files.wrap_formatter (fun f -> Data.print_snapshot ~uuid f s))
 
 let print_species time f mixture =
@@ -165,8 +165,8 @@ let warning_buffer:
       (Locality.t option*(Format.formatter -> unit)) list ref = ref []
 
 let go = function
-  | Data.Snapshot s -> snapshot s
-  | Data.DIN f -> output_flux f
+  | Data.Snapshot (f,s) -> snapshot f s
+  | Data.DIN (n,f) -> output_flux n f
   | Data.DeltaActivities (r,flux) -> output_activities r flux
   | Data.Plot x -> plot_now x
   | Data.Print p ->
@@ -219,7 +219,7 @@ let close ?event () =
   close_desc ()
 
 let initial_inputs conf env init ~filename =
-  let inputs = Kappa_files.open_out_fresh filename "" ".ka" in
+  let inputs = Kappa_files.open_out_fresh filename [] "" ".ka" in
   let inputs_form = Format.formatter_of_out_channel inputs in
   let () =
     Data.print_initial_inputs ~uuid conf env inputs_form init in

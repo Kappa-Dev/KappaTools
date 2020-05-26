@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 
 env:
   global:
@@ -11,7 +11,7 @@ matrix:
     addons:
       apt:
         sources:
-          - avsm
+          - sourceline: 'ppa:avsm/ppa'
         packages:
           - aspcud
           - opam
@@ -19,52 +19,57 @@ matrix:
     addons:
       apt:
         sources:
-          - avsm
+          - sourceline: 'ppa:avsm/ppa'
         packages:
           - aspcud
           - opam
+          - ocaml-nox
   - env: USE_TK=1
     addons:
       apt:
         sources:
-          - avsm
+          - sourceline: 'ppa:avsm/ppa'
         packages:
           - aspcud
           - opam
+          - ocaml-nox
           - tk-dev
   - env: CHECKED=native
     addons:
       apt:
         sources:
-          - avsm
+          - sourceline: 'ppa:avsm/ppa'
         packages:
           - aspcud
           - opam
+          - ocaml-nox
           - gnuplot-nox
           - poppler-utils
           - graphviz
-          - latex-xcolor
           - texlive-latex-recommended
           - texlive-fonts-recommended
           - texlive-pictures
           - tex4ht
   - os: osx
     env: CHECKED=MacOS
+    osx_image: xcode11
+    addons:
+      homebrew:
+        packages:
+          - opam
+          - ocaml
   - env: CHECKED=windows
     addons:
       apt:
         sources:
-          - avsm
+          - sourceline: 'ppa:avsm/ppa'
         packages:
           - aspcud
           - opam
           - gcc-mingw-w64-x86-64
 
-before_install:
-  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then curl -LO https://github.com/ocaml/opam/releases/download/2.0.4/opam-2.0.4-x86_64-macos && sudo mv opam-2.0.4-x86_64-macos /usr/local/bin/opam && sudo chmod +x /usr/local/bin/opam ; fi"
-
 install:
-  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a --compiler=4.03.0 ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] || [ '$CHECKED' = python ] ; then opam init -a --compiler=4.07.0 ; else opam init -a ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then opam remote add cross-windows git://github.com/ocaml-cross/opam-cross-windows ; fi"
   - eval $(opam env) && opam install -y dune num yojson lwt fmt logs re
   - sh -c "if [ '$CHECKED' = native ] ; then opam install -y odoc ; fi"
@@ -72,7 +77,7 @@ install:
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] || [ '$CHECKED' = windows ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then opam install -y atdgen cohttp-lwt-unix ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then pip install -v . nose ; fi"
-  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-runtime-windows lwt-windows fmt-windows logs-windows re-windows ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 num-windows atdgen-runtime-windows.2.0.0 lwt-windows fmt-windows logs-windows re-windows ; fi"
 
 script:
   - make all

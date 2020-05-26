@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -21,7 +21,7 @@ let field_ref context field =
   (List.assoc "projectid" context.Webapp_common.arguments,
    List.assoc field context.Webapp_common.arguments)
 
-class new_manager : Api.concrete_manager =
+class new_manager =
   let re = Re.compile (Re.str "WebSim") in
   let sa_command = Re.replace_string re ~by:"KaSaAgent" Sys.argv.(0) in
   let sa_process = Lwt_process.open_process (sa_command,[|sa_command|]) in
@@ -76,6 +76,7 @@ class new_manager : Api.concrete_manager =
            sim_process#stdin)
     inherit Mpi_api.manager ()
     inherit Kasa_client.new_client
+        ~is_running:(fun () -> sa_process#state = Lwt_process.Running)
         ~post:(fun message_text ->
             Lwt.ignore_result
               (Lwt_io.atomic
@@ -109,6 +110,33 @@ class new_manager : Api.concrete_manager =
     method is_computing =
       self#sim_is_computing || Kasa_client.is_computing sa_mailbox ||
       self#story_is_computing
+
+    val mutable kasa_locator = []
+
+    method project_parse overwrites =
+      self#secret_project_parse >>=
+      Api_common.result_bind_lwt
+        ~ok:(fun out ->
+            let load = self#secret_simulation_load out overwrites in
+            let init = self#init_static_analyser out in
+            let locators =
+              init >>= function
+              | Result.Error _ as e ->
+                let () = kasa_locator <- [] in
+                Lwt.return (Api_common.result_kasa e)
+              | Result.Ok () ->
+                self#get_pos_of_rules_and_vars >>= function
+                | Result.Ok infos ->
+                  let () = kasa_locator <- infos in
+                  Lwt.return (Result_util.ok ())
+                |Result.Error _ as e ->
+                  let () = kasa_locator <- [] in
+                  Lwt.return (Api_common.result_kasa e) in
+            load >>= Api_common.result_bind_lwt ~ok:(fun () -> locators))
+
+    method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
+      List.find_opt (fun (_,x) -> Locality.is_included_in filename pos x) kasa_locator |>
+      Option_util.map fst |> Result_util.ok ?status:None |> Lwt.return
   end
 
 let bind_projects f id projects =
@@ -271,7 +299,7 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
-    { Webapp_common.path = "/v2/projects/{projectid}/load" ;
+    { Webapp_common.path = "/v2/projects/{projectid}/parse" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `POST ; ] in
         fun ~context:context ->
@@ -287,30 +315,11 @@ let route
                   | _, ([] | _::_::_) -> assert false
                   | x, [ n ] -> (x,Nbr.of_string n))
                 overwrites in
-            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
-            (JsonUtil.read_of_string (Ast.read_parsing_compil))
-            >>= fun ast ->
             bind_projects
-              (fun manager -> manager#simulation_load ast overwrites)
+              (fun manager -> manager#project_parse overwrites)
               project_id projects >>=
             (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
-          | `OPTIONS -> Webapp_common.options_respond methods
-          | _ -> Webapp_common.method_not_allowed_respond methods
-    };
-    { Webapp_common.path = "/v2/projects/{projectid}/parse" ;
-      Webapp_common.operation =
-        let methods = [ `OPTIONS ; `POST ; ] in
-        fun ~context:context ->
-          match context.Webapp_common.request.Cohttp.Request.meth with
-          | `POST ->
-            let project_id = project_ref context in
-            bind_projects
-              (fun manager -> manager#project_parse)
-              project_id projects >>=
-            (Webapp_common.api_result_response
-               ~string_of_success:(
-                 JsonUtil.string_of_write Ast.write_parsing_compil))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -382,7 +391,7 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
-    { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}/{filepos}" ;
+    { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}/position/{filepos}" ;
       Webapp_common.operation =
         fun ~context:context ->
           let methods = [ `OPTIONS ; `POST ; `PUT ] in
@@ -853,6 +862,37 @@ let route
               ~string_of_success:(fun x ->
                   let o = JsonUtil.of_option
                       Public_data.refined_influence_node_to_json x in
+                  Yojson.Basic.to_string o)
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/influence_map/node_at" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let project_id = project_ref context in
+            let request = context.Webapp_common.request in
+            let uri = Cohttp.Request.uri request in
+            let filename =
+              Option_util.unsome "" (Uri.get_query_param uri "file") in
+            let line =
+              int_of_string
+                (Option_util.unsome "0" (Uri.get_query_param uri "line")) in
+            let chr =
+              int_of_string
+                (Option_util.unsome "0" (Uri.get_query_param uri "chr")) in
+            bind_projects
+              (fun manager ->
+                 manager#get_influence_map_node_at
+                   ~filename { Locality.line; Locality.chr })
+              project_id projects >>=
+            Webapp_common.api_result_response
+              ~string_of_success:(fun x ->
+                  let o = JsonUtil.of_option
+                      Public_data.short_influence_node_to_json x in
                   Yojson.Basic.to_string o)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods

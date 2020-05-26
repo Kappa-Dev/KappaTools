@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -41,7 +41,7 @@ type agent =
   | Present of string Locality.annot * site list * agent_mod option
   | Absent of Locality.t
 
-type mixture = agent list
+type mixture = agent list list
 
 type edit_notation = {
   mix: mixture;
@@ -462,17 +462,112 @@ let agent_of_json filenames = function
       [],None)
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent",x))
 
-let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
+let print_ast_mix =
+  Pp.list
+    (fun f -> Format.fprintf f "\\@ ")
+    (Pp.list Pp.comma print_ast_agent)
 
 let to_erased_mixture =
-  List.map (function
-      | Absent pos -> Absent pos
-      | Present (n,s,_) -> Present (n,s,Some Erase))
+  List.map
+    (List.map (function
+         | Absent pos -> Absent pos
+         | Present (n,s,_) -> Present (n,s,Some Erase)))
 
 let to_created_mixture =
-  List.map (function
-      | Absent pos -> Absent pos
-      | Present (n,s,_) -> Present (n,s,Some Create))
+  List.map
+    (List.map (function
+         | Absent pos -> Absent pos
+         | Present (n,s,_) -> Present (n,s,Some Create)))
+
+let to_dummy_user_link = function
+  | [] | [ LKappa.LNK_ANY, _ ] -> User_graph.WHATEVER
+  | [ LKappa.ANY_FREE, _ ] -> User_graph.LINKS []
+  | [ LKappa.LNK_VALUE (x, _), _ ] -> User_graph.LINKS [ ((-1,-1),x)]
+  | [ LKappa.LNK_FREE, _ ] -> User_graph.LINKS []
+  | [ LKappa.LNK_SOME, _ ] -> User_graph.SOME
+  | [ LKappa.LNK_TYPE ((ty,_), (si,_)), _ ] -> User_graph.TYPE (ty,si)
+  | _ :: _ :: _ -> assert false (* TODO *)
+
+let to_dummy_user_internal = function
+  | [] -> Some []
+  | [ (None, _) ] -> None
+  | [ (Some st, _) ] -> Some [st]
+  | _ :: _ :: _ as l -> Some (List_util.map_option fst l)
+
+let to_dummy_user_site = function
+  | Port { port_nme; port_int; port_int_mod = _; port_lnk; port_lnk_mod = _} -> {
+      User_graph.site_name = fst port_nme;
+      User_graph.site_type = User_graph.Port {
+          User_graph.port_links = to_dummy_user_link port_lnk;
+          User_graph.port_states = to_dummy_user_internal port_int;
+        };
+    }
+  | Counter { count_nme; count_test = _; count_delta = _ } -> {
+      User_graph.site_name = fst count_nme;
+      User_graph.site_type = User_graph.Counter (-1); (* TODO *)
+    }
+
+let to_dummy_user_agent = function
+  | Absent _ -> None
+  | Present ((na,_),s,_mods) -> Some {
+      User_graph.node_type = na;
+      User_graph.node_sites = Tools.array_map_of_list to_dummy_user_site s;
+    }
+
+let setup_link m ((line,row),site) va =
+  match m.(line).(row) with
+  | None -> ()
+  | Some { User_graph.node_sites ; _ } ->
+    let s = node_sites.(site) in
+    match s.User_graph.site_type with
+    | User_graph.Counter _ -> ()
+    | User_graph.Port p ->
+      node_sites.(site) <-
+        {
+          User_graph.site_name = s.User_graph.site_name;
+          User_graph.site_type = User_graph.Port {
+              User_graph.port_links = User_graph.LINKS [va];
+              User_graph.port_states = p.User_graph.port_states;
+            }
+        }
+
+let mixture_to_user_graph m =
+  let out =
+    Tools.array_map_of_list (Tools.array_map_of_list to_dummy_user_agent) m in
+  let acc =
+    Tools.array_fold_lefti
+      (fun line ->
+         Tools.array_fold_lefti
+           (fun row acc -> function
+              | None -> acc
+              | Some { User_graph.node_sites ; _ } ->
+                Tools.array_fold_lefti
+                  (fun site acc -> function
+                     | { User_graph.site_type = User_graph.Port
+                           { User_graph.port_links = User_graph.LINKS [];_};_} ->
+                       acc
+                     | { User_graph.site_type = User_graph.Port
+                           { User_graph.port_links = User_graph.LINKS (_::_::_);_};_} ->
+                       assert false
+                     | { User_graph.site_type = User_graph.Port
+                            { User_graph.port_links  = ( User_graph.WHATEVER
+                                                       | User_graph.SOME
+                                                       | User_graph.TYPE (_, _));_};_} -> acc
+                     | { User_graph.site_type = User_graph.Counter _;_} -> acc
+                     | { User_graph.site_type = User_graph.Port
+                             { User_graph.port_links = User_graph.LINKS [_,id];_};_} ->
+                       match Mods.IntMap.pop id acc with
+                       | (None, acc') -> Mods.IntMap.add id ((line,row),site) acc'
+                       | (Some va, acc') ->
+                         let va' = ((line,row),site) in
+                         let () = setup_link out va va' in
+                         let () = setup_link out va' va in
+                         acc')
+                  acc node_sites))
+      Mods.IntMap.empty
+      out in
+  let () = assert (Mods.IntMap.is_empty acc) in
+  out
 
 let init_to_json ~filenames f_mix f_var = function
   | INIT_MIX m ->
@@ -702,9 +797,10 @@ let arrow_notation_of_yojson filenames f_mix f_var = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST arrow_notation",x))
 
 let edit_notation_to_yojson filenames r =
-  let mix_to_json = JsonUtil.of_list (agent_to_json filenames) in
+  let mix_to_json =
+    JsonUtil.of_list (JsonUtil.of_list (agent_to_json filenames)) in
   JsonUtil.smart_assoc [
-    "mix", JsonUtil.of_list (agent_to_json filenames) r.mix;
+    "mix", mix_to_json r.mix;
     "delta_token",
     JsonUtil.of_list
       (JsonUtil.of_pair
@@ -715,7 +811,8 @@ let edit_notation_to_yojson filenames r =
   ]
 
 let edit_notation_of_yojson filenames r =
-  let mix_of_json = JsonUtil.to_list (agent_of_json filenames) in
+  let mix_of_json =
+    JsonUtil.to_list (JsonUtil.to_list (agent_of_json filenames)) in
   match r with
   | `Assoc l as x when List.length l < 3 ->
     {
@@ -935,19 +1032,20 @@ let merge_sites =
 
 let merge_agents =
   List.fold_left
-    (fun acc -> function
-       | Absent _ -> acc
-       | Present ((na,_ as x),s,_) ->
-         let rec aux = function
-           | [] -> [Present
-                      (x,List.map
-                         (function
-                           | Port p -> Port {p with port_lnk = []}
-                           | Counter _ as x -> x) s,None)]
-           | Present ((na',_),s',_) :: t when String.compare na na' = 0 ->
-             Present (x,merge_sites s' s,None)::t
-           | (Present _ | Absent _ as h) :: t -> h :: aux t in
-         aux acc)
+    (List.fold_left
+       (fun acc -> function
+          | Absent _ -> acc
+          | Present ((na,_ as x),s,_) ->
+            let rec aux = function
+              | [] -> [Present
+                         (x,List.map
+                            (function
+                              | Port p -> Port {p with port_lnk = []}
+                              | Counter _ as x -> x) s,None)]
+              | Present ((na',_),s',_) :: t when String.compare na na' = 0 ->
+                Present (x,merge_sites s' s,None)::t
+              | (Present _ | Absent _ as h) :: t -> h :: aux t in
+            aux acc))
 
 let merge_tokens =
   List.fold_left
@@ -998,44 +1096,49 @@ let implicit_signature r =
   { r with signatures = ags; tokens = toks }
 
 let split_mixture m =
-    List.fold_right
-      (fun ag (lhs,rhs as pack) ->
-         match ag with
-         | Absent _ -> pack
-         | Present ((_,pos as na),intf,modif) ->
-           match modif with
-           | Some Create -> (Absent pos::lhs,Present (na,intf,None)::rhs)
-           | Some Erase -> (Present (na,intf,None)::lhs,Absent pos::rhs)
-           | None ->
-             let (intfl,intfr) =
-               List.fold_left
-                 (fun (l,r) -> function
-                    | Port p ->
-                      (Port {port_nme = p.port_nme;
-                             port_int = p.port_int;
-                             port_int_mod = None;
-                             port_lnk = p.port_lnk;
-                             port_lnk_mod=None}::l,
-                       Port {port_nme = p.port_nme;
-                             port_int =
-                               (match p.port_int_mod with
-                                | None -> p.port_int
-                                | Some (x,pos) -> [Some x,pos]);
-                             port_int_mod = None;
-                             port_lnk =
-                               (match p.port_lnk_mod with
-                                | None -> p.port_lnk
-                                | Some None ->
-                                  [ Locality.dummy_annot LKappa.LNK_FREE ]
-                                | Some (Some (i,pos))->
-                                  [ LKappa.LNK_VALUE (i,()),pos ]);
-                             port_lnk_mod=None}::r)
-                    | Counter c ->
-                      (Counter {c with count_delta = Locality.dummy_annot 0}::l,
-                       Counter {c with count_test = None}::r)
-                 ) ([],[]) intf in
-             (Present (na,intfl,None)::lhs,Present (na,intfr,None)::rhs)
-      ) m ([],[])
+  List.fold_right
+    (fun l (lhs,rhs) ->
+       let (ll,rr) = List.fold_right
+           (fun ag (lhs,rhs as pack) ->
+              match ag with
+              | Absent _ -> pack
+              | Present ((_,pos as na),intf,modif) ->
+                match modif with
+                | Some Create -> (Absent pos::lhs,Present (na,intf,None)::rhs)
+                | Some Erase -> (Present (na,intf,None)::lhs,Absent pos::rhs)
+                | None ->
+                  let (intfl,intfr) =
+                    List.fold_left
+                      (fun (l,r) -> function
+                         | Port p ->
+                           (Port {port_nme = p.port_nme;
+                                  port_int = p.port_int;
+                                  port_int_mod = None;
+                                  port_lnk = p.port_lnk;
+                                  port_lnk_mod=None}::l,
+                            Port {port_nme = p.port_nme;
+                                  port_int =
+                                    (match p.port_int_mod with
+                                     | None -> p.port_int
+                                     | Some (x,pos) -> [Some x,pos]);
+                                  port_int_mod = None;
+                                  port_lnk =
+                                    (match p.port_lnk_mod with
+                                     | None -> p.port_lnk
+                                     | Some None ->
+                                       [ Locality.dummy_annot LKappa.LNK_FREE ]
+                                     | Some (Some (i,pos))->
+                                       [ LKappa.LNK_VALUE (i,()),pos ]);
+                                  port_lnk_mod=None}::r)
+                         | Counter c ->
+                           (Counter
+                              {c with count_delta = Locality.dummy_annot 0}::l,
+                            Counter {c with count_test = None}::r)
+                      ) ([],[]) intf in
+                  (Present (na,intfl,None)::lhs,Present (na,intfr,None)::rhs)
+           ) l ([],[]) in
+       (ll::lhs,rr::rhs))
+    m ([],[])
 
 let compil_to_json c =
   let files =
@@ -1044,7 +1147,8 @@ let compil_to_json c =
     Tools.array_fold_lefti
       (fun i map x -> Mods.StringMap.add x i map)
       Mods.StringMap.empty files in
-  let mix_to_json = JsonUtil.of_list (agent_to_json filenames) in
+  let mix_to_json =
+    JsonUtil.of_list (JsonUtil.of_list (agent_to_json filenames)) in
   let var_to_json = JsonUtil.of_string in
   `Assoc
     [
@@ -1109,7 +1213,7 @@ let compil_of_json = function
           JsonUtil.to_array (JsonUtil.to_string ?error_msg:None)
             (List.assoc "filenames" l) in
         let mix_of_json =
-          JsonUtil.to_list (agent_of_json filenames) in
+          JsonUtil.to_list (JsonUtil.to_list (agent_of_json filenames)) in
         {
           filenames = List.tl (Array.to_list filenames);
           signatures =

@@ -15,4 +15,4 @@ Domain:
 Intial graph;
   %init: 100 A(x[.])
   
-Warning: A deadlock was reached after 99 events and 4.857865E+00s (Activity = 0.00000)
+Warning: A deadlock was reached after 99 events and 3.185893E+00s (Activity = 0.00000)

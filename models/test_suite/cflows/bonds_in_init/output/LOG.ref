@@ -11,11 +11,11 @@ done
 	 -update_domain construction
 	 28 (sub)observables 32 navigation steps
 	 -initial conditions
-+ Building initial state (64 agents)
++ Building initial state (40 agents)
 Done
 + Command line to rerun is: 'KaSim' 'bonds_in_init.ka' '-l' '40' '-seed' '611463625' '-d' 'output' '--time-independent' '-syntax' '4'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 + Loading trace
 	- removing events occurring after the last observable: -582 events 
 + Producing causal compressions
@@ -31,27 +31,27 @@ Stats:
 
 	 - causal flow compression (10)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 	- simplify the trace, 153 events 
 		- start iteration 1, 153 events remaining 
 				- alpha-conversion
-				- detecting siphons: nothing has changed 
+				- detecting siphons: +21 events 
 				- alpha-conversion
-				- cutting concurrent events: -51 events 
+				- cutting concurrent events: -71 events 
 				- detecting pseudo inverse events: -6 events 
-		- start iteration 2, 96 events remaining 
+		- start iteration 2, 97 events remaining 
 				- alpha-conversion
-				- detecting siphons: nothing has changed 
+				- detecting siphons: +8 events 
 				- alpha-conversion
-				- cutting concurrent events: -2 events 
+				- cutting concurrent events: -11 events 
 				- detecting pseudo inverse events: nothing has changed 
 		- start iteration 3, 94 events remaining 
 				- alpha-conversion
-				- detecting siphons: nothing has changed 
+				- detecting siphons: +8 events 
 				- alpha-conversion
-				- cutting concurrent events: nothing has changed 
+				- cutting concurrent events: -8 events 
 				- detecting pseudo inverse events: nothing has changed 
 	- a fixpoint has been reached, 94 events remaining 
 	- blackboard generation 
@@ -60,13 +60,13 @@ ____________________________________________________________
 
 	 - weak flow compression (6)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 	 - strong flow compression (3)
 
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 
 + Pretty printing 6 flows
 + Pretty printing 3 weakly compressed flows

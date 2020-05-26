@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -578,9 +578,9 @@ let compile
   pause @@ fun () ->
   let domain,dom_stats =
     Pattern.finalize ~debugMode ~max_sharing preenv contact_map in
-  outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.nodes^
+  outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.stat_nodes^
                      " (sub)observables "^
-                     string_of_int dom_stats.Pattern.PreEnv.nav_steps^
+                     string_of_int dom_stats.Pattern.PreEnv.stat_nav_steps^
                      " navigation steps"));
 
   let env =

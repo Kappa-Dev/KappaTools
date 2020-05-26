@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -74,20 +74,10 @@ class manager
     method private message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
-    | `ProjectLoad (ast,overwrite) ->
-      send
-        ?timeout request_count
-        (Format.asprintf "%s/v2/projects/%s/load%t" url project_id
-           (fun f -> match overwrite with
-              | [] -> ()
-              | l -> Format.fprintf f "?%a"
-                       (Pp.list
-                          (fun f -> Format.pp_print_string f "&")
-                          (fun f (vr,va) ->
-                             Format.fprintf f "%s=%a" vr Nbr.print va))
-           l))
-        `POST ~data:(Yojson.Basic.to_string (Ast.compil_to_json ast))
-        (fun _ -> `ProjectLoad)
+    | `ProjectLoad (_ast,_overwrite) ->
+      Lwt.return (Api_common.result_error_msg
+                    ~result_code:`Bad_request
+                    "low level project_load mustn't be used over HTTP")
     | `SimulationContinue pause_condition ->
       send
         ?timeout request_count
@@ -382,6 +372,31 @@ class manager
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
+    method secret_project_parse =
+      Lwt.return (Api_common.result_error_msg
+                    ~result_code:`Bad_request
+                    "low level project_parse mustn't be used over HTTP")
+
+    method secret_get_pos_of_rules_and_vars =
+      Lwt.return (Api_common.result_error_msg
+                    ~result_code:`Bad_request
+                    "low level get_pos_of_rules_and_vars mustn't be used over HTTP")
+
+    method project_parse overwrite =
+      send
+        ?timeout request_count
+        (Format.asprintf "%s/v2/projects/%s/parse%t" url project_id
+           (fun f -> match overwrite with
+              | [] -> ()
+              | l -> Format.fprintf f "?%a"
+                       (Pp.list
+                          (fun f -> Format.pp_print_string f "&")
+                          (fun f (vr,va) ->
+                             Format.fprintf f "%s=%a" vr Nbr.print va))
+                       l))
+        `POST
+        (JsonUtil.read_of_string Yojson.Basic.read_null)
+
   method terminate =
     Lwt.ignore_result (self#project_delete project_id)
 
@@ -398,7 +413,7 @@ class manager
   method file_create pos id content =
     send
       ?timeout request_count
-      (Format.sprintf "%s/v2/projects/%s/files/%s/%i" url project_id id pos)
+      (Format.sprintf "%s/v2/projects/%s/files/%s/position/%i" url project_id id pos)
       `PUT ~data:(Yojson.Basic.to_string (`String content))
       (JsonUtil.read_of_string Yojson.Basic.read_null)
 
@@ -421,7 +436,7 @@ class manager
   method file_move pos id =
     send
       ?timeout request_count
-      (Format.sprintf "%s/v2/projects/%s/files/%s/%i" url project_id id pos)
+      (Format.sprintf "%s/v2/projects/%s/files/%s/position/%i" url project_id id pos)
       `POST
       (JsonUtil.read_of_string Yojson.Basic.read_null)
 
@@ -431,13 +446,6 @@ class manager
       (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id id)
       `DELETE
       (JsonUtil.read_of_string Yojson.Basic.read_null)
-
-  method project_parse =
-    send
-      ?timeout request_count
-      (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
-      `POST
-      (JsonUtil.read_of_string Ast.read_parsing_compil)
 
   method project_overwrite file_id ast =
     send
@@ -457,9 +465,6 @@ class manager
          | x ->
            raise
              (Yojson.Basic.Util.Type_error ("Not a KaSa INIT response: ", x)))
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok x)
-      ~error:kasa_error
 
   method init_static_analyser compil =
     self#init_static_analyser_raw
@@ -476,9 +481,6 @@ class manager
          Format.sprintf "%s/v2/projects/%s/analyses/contact_map" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok x)
-      ~error:kasa_error
 
   method get_influence_map_raw accuracy =
     send
@@ -489,10 +491,7 @@ class manager
            url project_id (Public_data.accuracy_to_string accuracy)
        | None -> Format.sprintf "%s/v2/analyses/influence_map" url)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Yojson.Basic.to_string x))
-      ~error:kasa_error
+      (fun x -> x)
 
   method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
     send
@@ -516,11 +515,7 @@ class manager
          (match bwd with None -> "" | Some i -> "&bwd="^string_of_int i)
       )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          Lwt.return_ok (Public_data.local_influence_map_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.local_influence_map_of_json (Yojson.Basic.from_string x))
 
   method get_initial_node =
     send
@@ -532,13 +527,10 @@ class manager
          project_id
       )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          let o = JsonUtil.to_option
-              Public_data.refined_influence_node_of_json x in
-          Lwt.return_ok o)
-      ~error:kasa_error
+      (fun x ->
+         JsonUtil.to_option
+           Public_data.refined_influence_node_of_json
+           (Yojson.Basic.from_string x))
 
   method get_next_node short_id_opt =
     send
@@ -556,13 +548,9 @@ class manager
           )
       )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          let o = JsonUtil.to_option
-              Public_data.refined_influence_node_of_json x in
-          Lwt.return_ok o)
-      ~error:kasa_error
+      (fun x -> JsonUtil.to_option
+          Public_data.refined_influence_node_of_json
+          (Yojson.Basic.from_string x))
 
   method get_previous_node short_id_opt =
     send
@@ -579,13 +567,21 @@ class manager
              | None -> "")
            )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          let o = JsonUtil.to_option
-              Public_data.refined_influence_node_of_json x in
-          Lwt.return_ok o)
-      ~error:kasa_error
+      (fun x -> JsonUtil.to_option
+          Public_data.refined_influence_node_of_json
+          (Yojson.Basic.from_string x))
+
+  method get_influence_map_node_at ~filename { Locality.line; Locality.chr } =
+    send
+      ?timeout request_count
+      (
+        Format.sprintf
+          "%s/v2/projects/%s/analyses/influence_map/node_at?file=%s&line=%i&chr=%i"
+          url project_id filename line chr)
+      `GET
+      (fun x -> JsonUtil.to_option
+          Public_data.short_influence_node_of_json
+          (Yojson.Basic.from_string x))
 
   method get_nodes_of_influence_map accuracy =
   send
@@ -596,31 +592,21 @@ class manager
          url project_id (Public_data.accuracy_to_string accuracy)
      | None -> Format.sprintf "%s/v2/analyses/all_nodes_of_influence_map" url)
     `GET
-    (fun x -> Yojson.Basic.from_string x)
-  >>= Result_util.fold
-    ~ok:(fun x -> Lwt.return_ok
-            (Public_data.nodes_of_influence_map_of_json x))
-    ~error:kasa_error
+    (fun x -> Public_data.nodes_of_influence_map_of_json (Yojson.Basic.from_string x))
 
   method get_dead_rules =
     send
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/dead_rules" url project_id)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Public_data.dead_rules_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.dead_rules_of_json (Yojson.Basic.from_string x))
 
   method get_dead_agents =
     send
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/dead_agents" url project_id)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Public_data.json_to_dead_agents x))
-      ~error:kasa_error
+      (fun x -> Public_data.json_to_dead_agents (Yojson.Basic.from_string x))
 
   method get_non_weakly_reversible_transitions =
     send
@@ -629,21 +615,14 @@ class manager
          "%s/v2/projects/%s/analyses/non_weakly_reversible_transitions"
          url project_id)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x ->
-          Lwt.return_ok (Public_data.separating_transitions_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.separating_transitions_of_json (Yojson.Basic.from_string x))
 
   method get_constraints_list =
     send
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/constraints" url project_id)
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Public_data.lemmas_list_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.lemmas_list_of_json (Yojson.Basic.from_string x))
 
   method get_potential_polymers accuracy_cm accuracy_scc =
     let options =
@@ -657,10 +636,7 @@ class manager
       ?timeout request_count
       (Format.sprintf "%s/v2/projects/%s/analyses/potential_polymers%s" url project_id options )
       `GET
-      (fun x -> Yojson.Basic.from_string x)
-    >>= Result_util.fold
-      ~ok:(fun x -> Lwt.return_ok (Public_data.scc_of_json x))
-      ~error:kasa_error
+      (fun x -> Public_data.scc_of_json (Yojson.Basic.from_string x))
 
   method is_computing = is_computing request_count
 

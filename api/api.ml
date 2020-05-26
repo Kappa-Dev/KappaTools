@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -24,7 +24,7 @@ end
 
 class type virtual manager_model = object
   method virtual is_running : bool
-  method project_parse : Ast.parsing_compil result Lwt.t
+  method secret_project_parse : Ast.parsing_compil result Lwt.t
 
   method project_overwrite : string -> Ast.parsing_compil -> unit result Lwt.t
 
@@ -70,7 +70,7 @@ class type manager_snapshot = object
 end
 
 class type manager_simulation = object
-  method simulation_load :
+  method secret_simulation_load :
     Ast.parsing_compil -> (string * Nbr.t) list -> unit result Lwt.t
 
   method simulation_delete : unit result Lwt.t
@@ -106,14 +106,15 @@ end
 type 'a kasa_reply =
   ('a, Exception_without_parameter.method_handler) Lwt_result.t
 
-class type virtual manager_static_analysis = object
-  method virtual is_running : bool
+class type manager_static_analysis = object
   method init_static_analyser : Ast.parsing_compil -> unit kasa_reply
   method init_static_analyser_raw : string -> unit kasa_reply
   (** The string has to be the json corresponding to an [Ast.parsing_compil] *)
 
   method get_contact_map :
     Public_data.accuracy_level option -> Yojson.Basic.t kasa_reply
+  method get_pos_of_rules_and_vars :
+      Public_data.pos_of_rules_and_vars kasa_reply
   method get_influence_map_raw :
     Public_data.accuracy_level option -> string kasa_reply
   method get_local_influence_map :
@@ -152,6 +153,53 @@ class type virtual manager_static_analysis = object
       kasa_reply
 end
 
+class type uniform_manager_static_analysis = object
+  method init_static_analyser : Ast.parsing_compil -> unit result Lwt.t
+  method init_static_analyser_raw : string -> unit result Lwt.t
+  (** The string has to be the json corresponding to an [Ast.parsing_compil] *)
+
+  method get_contact_map :
+    Public_data.accuracy_level option -> Yojson.Basic.t result Lwt.t
+  method secret_get_pos_of_rules_and_vars :
+      Public_data.pos_of_rules_and_vars result Lwt.t
+  method get_influence_map_raw :
+    Public_data.accuracy_level option -> string result Lwt.t
+  method get_local_influence_map :
+    Public_data.accuracy_level option -> ?fwd:int -> ?bwd:int ->
+    ?origin:(int,int) Public_data.influence_node -> total:int ->
+    (Public_data.accuracy_level * int * int option * int option *
+     (Public_data.rule, Public_data.var) Public_data.influence_node
+       option *
+     Public_data.influence_map) result Lwt.t
+  method get_initial_node :
+    (Public_data.rule, Public_data.var) Public_data.influence_node
+      option result Lwt.t
+  method get_next_node :
+    (int,int) Public_data.influence_node option ->
+    (Public_data.rule, Public_data.var) Public_data.influence_node
+      option result Lwt.t
+  method get_previous_node :
+    (int,int) Public_data.influence_node option ->
+    (Public_data.rule, Public_data.var) Public_data.influence_node
+      option result Lwt.t
+  method get_nodes_of_influence_map :
+    Public_data.accuracy_level option ->
+    (Public_data.accuracy_level *
+     (Public_data.rule, Public_data.var) Public_data.influence_node
+       list) result Lwt.t
+  method get_dead_rules : Public_data.dead_rules result Lwt.t
+  method get_dead_agents: Public_data.dead_agents result Lwt.t
+  method get_non_weakly_reversible_transitions :
+    Public_data.separating_transitions result Lwt.t
+  method get_constraints_list :
+    (string * Public_data.agent list Public_data.lemma list) list result Lwt.t
+  method get_potential_polymers :
+    Public_data.accuracy_level option ->
+    Public_data.accuracy_level option ->
+    (Public_data.accuracy_level * Public_data.accuracy_level * Public_data.scc)
+      result Lwt.t
+end
+
 class type virtual manager_stories = object
   method virtual is_running : bool
   method config_story_computation :
@@ -169,8 +217,12 @@ end
 class type concrete_manager = object
   inherit manager_model
   inherit manager_simulation
-  inherit manager_static_analysis
+  inherit uniform_manager_static_analysis
   inherit manager_stories
+  method project_parse : (string * Nbr.t) list -> unit result Lwt.t
+  method get_influence_map_node_at :
+    filename:string -> Locality.position -> (int,int) Public_data.influence_node
+      option result Lwt.t
   method is_running : bool
   method terminate : unit
   method is_computing : bool

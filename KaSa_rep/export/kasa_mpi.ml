@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -145,6 +145,11 @@ let on_message post text =
     let state, rules = get_all_nodes_of_influence_map ~accuracy_level !gState in
     let () = gState := state in
     send_response post id rules
+
+  | Some(id, (`List [ `String "INFLUENCE_MAP_NODES_LOCATION" ] | `String "INFLUENCE_MAP_NODES_LOCATION")) ->
+    let state, list = get_influence_map_nodes_location !gState in
+    let () = gState := state in
+    send_response post id list
 
   | Some(id, (`List [ `String "DEAD_RULES" ] | `String "DEAD_RULES")) ->
     let state, rules = get_dead_rules !gState in

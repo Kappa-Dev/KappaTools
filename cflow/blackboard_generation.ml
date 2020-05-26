@@ -2785,7 +2785,7 @@ module Preblackboard =
         let _ =
           if debug_mode
           then
-            let _ = print_preblackboard parameter handler error blackboard in ()
+            let _ = print_preblackboard parameter handler log_info error blackboard in ()
         in
         error,log_info,blackboard
 

@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -53,7 +53,7 @@ val one_constructive_event : t -> bool
 val one_clashing_instance_event : t -> bool
 val one_no_more_unary_event : t -> bool
 val one_no_more_binary_event : t -> bool
-val one_time_correction_event : t -> Nbr.t -> bool
+val one_time_correction_event : ?ti : Nbr.t -> t -> bool
 
 val inc_stories : t -> unit
 

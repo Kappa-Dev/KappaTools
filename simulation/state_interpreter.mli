@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -28,7 +28,7 @@ values of observables) *)
 val do_modifications :
   debugMode:bool -> outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
   Rule_interpreter.t -> t -> Primitives.modification list ->
-  (bool * Rule_interpreter.t * t)
+  (bool * Rule_interpreter.t * t * bool)
 
 val a_loop :
   debugMode:bool -> outputs:(Data.t -> unit) -> dumpIfDeadlocked:bool ->

@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -10,7 +10,6 @@ open Codemirror
 module Html = Tyxml_js.Html5
 
 let editor_full , set_editor_full = React.S.create (false : bool)
-let is_paused , set_is_paused = React.S.create (false : bool)
 let filename , set_filename = React.S.create (None : string option)
 let move_cursor, set_move_cursor = React.E.create ()
 
@@ -34,7 +33,7 @@ let panel_heading =
   Html.div
     ~a:[ Html.a_class [ "btn-group" ] ;
          Html.Unsafe.string_attrib "role" "group" ; ]
-    (Menu_editor_file.content is_paused)
+    Menu_editor_file.content
   in
   let buttons =
     menu_editor_file_content ::
@@ -175,7 +174,7 @@ let onload () : unit =
       (fun _ -> Menu_editor_file_controller.export_current_file ()) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
-    let () = set_is_paused true in
+    let () = State_file.out_of_sync true in
     let () = match !timeout with
         None -> ()
       | Some timeout ->
@@ -190,8 +189,7 @@ let onload () : unit =
         5.0 *. 1000.0
     in
     let handle_timeout () =
-      let () = set_is_paused false in
-      let () = Common.info (Js.string "handle_timeout") in
+      let () = State_file.out_of_sync false in
       match React.S.value filename with
       | None -> ()
       | Some filename ->
@@ -206,6 +204,12 @@ let onload () : unit =
     ()
   in
   let () = codemirror##onChange(handler) in
+  let () = codemirror##onCursorActivity
+      (fun _codemirror ->
+         let pos = codemirror##getCursor in
+         let line = pos##.line in
+         let ch = pos##.ch in
+         State_file.cursor_activity ~line ~ch) in
   let toggle_button_dom : Dom_html.linkElement Js.t =
     Js.Unsafe.coerce
       (Js.Opt.get (Ui_common.document##getElementById (Js.string toggle_button_id))
@@ -230,7 +234,7 @@ let onload () : unit =
       (fun refresh ->
          let () = set_filename (Some refresh.State_file.filename) in
          let cand = Js.string refresh.State_file.content in
-         if not (React.S.value is_paused) && cand <> codemirror##getValue then
+         if cand <> codemirror##getValue then
            let () = codemirror##setValue cand in
            let () = match refresh.State_file.line with
              | None -> ()

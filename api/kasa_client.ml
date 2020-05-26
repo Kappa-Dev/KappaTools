@@ -1,10 +1,12 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
+
+open Lwt.Infix
 
 type mailbox =
   (int,
@@ -39,14 +41,13 @@ let new_mailbox () = Hashtbl.create 2
 
 let is_computing mailbox = Hashtbl.length mailbox <> 0
 
-class virtual new_client ~post (mailbox : mailbox) :
+class new_client ~is_running ~post (mailbox : mailbox) :
   Api.manager_static_analysis =
   object(self)
     val mutable id = 0
-    method virtual is_running : bool
 
     method private raw_message post request =
-      if self#is_running then
+      if is_running () then
         let result,feeder = Lwt.task () in
         let outbuf = Bi_outbuf.create 1024 in
         let () = Bi_outbuf.add_string outbuf "{id:" in
@@ -98,6 +99,15 @@ class virtual new_client ~post (mailbox : mailbox) :
       Lwt_result.bind_result
         (self#message request)
         (fun x -> Result.Ok x)
+
+    method get_pos_of_rules_and_vars =
+      let request = `List [ `String "INFLUENCE_MAP_NODES_LOCATION" ] in
+      Lwt_result.bind_result
+        (self#message request)
+        (fun x ->
+           Result.Ok
+            (Public_data.pos_of_rules_and_vars_of_json x))
+
     method get_influence_map_raw accuracy =
       let request =
         `List ( `String "INFLUENCE_MAP" :: match accuracy with
@@ -208,4 +218,41 @@ class virtual new_client ~post (mailbox : mailbox) :
       Lwt_result.bind_result
         (self#message request)
         (fun x -> Result.Ok (Public_data.scc_of_json x))
+  end
+
+class new_uniform_client ~is_running ~post (mailbox : mailbox):
+  Api.uniform_manager_static_analysis =
+  let raw = new new_client ~is_running ~post mailbox in
+  object
+    method init_static_analyser_raw compil =
+      raw#init_static_analyser_raw compil >|= Api_common.result_kasa
+    method init_static_analyser compil =
+      raw#init_static_analyser compil >|= Api_common.result_kasa
+    method get_contact_map accuracy =
+      raw#get_contact_map accuracy >|= Api_common.result_kasa
+    method get_influence_map_raw accuracy =
+      raw#get_influence_map_raw accuracy >|= Api_common.result_kasa
+    method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
+      raw#get_local_influence_map accuracy ?fwd ?bwd ?origin ~total >|=
+      Api_common.result_kasa
+    method get_initial_node =
+      raw#get_initial_node >|= Api_common.result_kasa
+    method get_next_node json =
+      raw#get_next_node json >|= Api_common.result_kasa
+    method get_previous_node json =
+      raw#get_previous_node json >|= Api_common.result_kasa
+    method secret_get_pos_of_rules_and_vars =
+      raw# get_pos_of_rules_and_vars >|= Api_common.result_kasa
+    method get_nodes_of_influence_map accuracy =
+      raw#get_nodes_of_influence_map accuracy >|= Api_common.result_kasa
+    method get_dead_rules =
+      raw#get_dead_rules >|= Api_common.result_kasa
+    method get_dead_agents =
+      raw#get_dead_agents >|= Api_common.result_kasa
+    method get_non_weakly_reversible_transitions =
+      raw#get_non_weakly_reversible_transitions >|= Api_common.result_kasa
+    method get_constraints_list =
+      raw#get_constraints_list >|= Api_common.result_kasa
+    method get_potential_polymers accuracy_cm accuracy_scc =
+      raw#get_potential_polymers accuracy_cm accuracy_scc >|= Api_common.result_kasa
   end

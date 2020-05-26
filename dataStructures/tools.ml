@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -212,7 +212,7 @@ let array_min_equal_not_null l1 l2 =
 
 let array_compare compare a b =
   let l = Array.length a in let l' = Array.length b in
-  let d = Pervasives.compare l l' in
+  let d = Stdlib.compare l l' in
   let rec aux_array_compare k =
     if k >= l then 0 else
       let o = compare a.(k) b.(k) in
@@ -294,6 +294,17 @@ let get_interval_list p i j =
 let lowercase = String.lowercase_ascii
 let capitalize = String.capitalize_ascii
 
+let string_split_on_char (delimiter : char) (s : string) : (string * string option) =
+  try
+    let index = String.index s delimiter in
+    let length = String.length s in
+    (String.sub s 0 index,
+     Some (String.sub
+             s
+             (index + 1)
+             (length - index - 1) ))
+  with Not_found -> (s,None)
+
 let smash_duplicate_in_ordered_list p l =
 
   let () = Format.fprintf Format.std_formatter "DUPL \n"  in
@@ -310,9 +321,14 @@ let smash_duplicate_in_ordered_list p l =
   | [] -> []
   | (h,n)::t -> aux t n h []
 
+let chop_suffix_or_extension name ext =
+  if Filename.check_suffix name ext
+  then Filename.chop_suffix name ext
+  else Filename.remove_extension name
+
 let find_available_name ~already_there name ~facultative ~ext =
-  let base = try Filename.chop_extension name
-      with Invalid_argument _ -> name in
+  let ext = match ext with Some e -> e | None -> Filename.extension name in
+  let base = chop_suffix_or_extension name ext in
   if already_there (base^ext) then
     let base' = if facultative <> "" then base^"_"^facultative else base in
     if already_there (base'^ext) then

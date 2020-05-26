@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -35,8 +35,11 @@ val merge_cc :
 
 val update_roots :
   t -> bool -> Pattern.Set.t -> Edges.t ->
-  Roots.mod_ccs_cache -> Pattern.Set.elt -> int -> unit
+  Roots.mod_ccs_cache -> Pattern.id -> int -> unit
 
+(** {6 Checking instances} *)
+
+val is_valid : t -> Pattern.id -> int -> bool
 
 (** {6 Counting instances} *)
 
@@ -46,7 +49,6 @@ val number_of_instances : ?rule_id:int -> t -> Pattern.id array -> int
 val number_of_unary_instances_in_cc :
   ?rule_id:int -> t -> Pattern.id * Pattern.id -> int -> int
 (** [number_of_unary_instances_in_cc ?rule_id state (pat1, pat2) cc] *)
-
 
 (** {6 Picking instances} *)
 

@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -33,7 +33,7 @@ let on_message
   in
   match message.Mpi_message_j.data with
   |  `ProjectLoad (text,overwrites) ->
-    manager#simulation_load text overwrites >>=
+    manager#secret_simulation_load text overwrites >>=
     (handler (fun () -> `ProjectLoad))
   | `SimulationContinue simulation_parameter ->
     (manager#simulation_continue simulation_parameter) >>=
@@ -105,7 +105,7 @@ class virtual  manager_base () : manager_base_type =
     method private virtual message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t
 
-    method simulation_load ast overwrite : unit Api.result Lwt.t =
+    method secret_simulation_load ast overwrite : unit Api.result Lwt.t =
       self#message (`ProjectLoad (ast,overwrite)) >>=
       Api_common.result_bind_lwt
         ~ok:(function

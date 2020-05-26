@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -64,15 +64,15 @@ let cast_un_op ?op_f ?op_i ?op_i64 x =
 
 let compare n1 n2 =
   match n1,n2 with
-  | (F x, F y) -> Pervasives.compare x y
-  | (I x, I y) -> Pervasives.compare x y
-  | (F x, I y) -> Pervasives.compare x (float_of_int y)
-  | (I x, F y) -> Pervasives.compare (float_of_int x) y
-  | (I x, I64 y) -> Pervasives.compare (Int64.of_int x) y
-  | (I64 x, I64 y) -> Pervasives.compare x y
-  | (I64 x, I y) -> Pervasives.compare x (Int64.of_int y)
-  | (F x, I64 y) -> Pervasives.compare x (Int64.to_float y)
-  | (I64 x, F y) -> Pervasives.compare (Int64.to_float x) y
+  | (F x, F y) -> Stdlib.compare x y
+  | (I x, I y) -> Stdlib.compare x y
+  | (F x, I y) -> Stdlib.compare x (float_of_int y)
+  | (I x, F y) -> Stdlib.compare (float_of_int x) y
+  | (I x, I64 y) -> Stdlib.compare (Int64.of_int x) y
+  | (I64 x, I64 y) -> Stdlib.compare x y
+  | (I64 x, I y) -> Stdlib.compare x (Int64.of_int y)
+  | (F x, I64 y) -> Stdlib.compare x (Int64.to_float y)
+  | (I64 x, F y) -> Stdlib.compare (Int64.to_float x) y
 
 let is_greater n1 n2 = compare n1 n2 > 0
 let is_smaller n1 n2 = compare n1 n2 < 0

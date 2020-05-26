@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -40,12 +40,10 @@ let navli () =
   Ui_common.badge (fun state -> (file_count state))
 
 let xml () =
-  let select file_line_info =
-    let file_ids : string list =
-      file_line_info.Api_types_j.file_line_ids in
+  let select file_line_ids =
     let lines = React.S.value current_file in
     let current_file_id : string =
-      match (file_ids,lines) with
+      match (file_line_ids,lines) with
       | [], _ -> assert false
       | (file::_,None) | (_::_,Some (file,_)) -> file in
     let file_options =
@@ -56,7 +54,7 @@ let xml () =
                  (if key = current_file_id then [Html.a_selected ()]
                   else  []))
              (Html.txt (Ui_common.option_label key)))
-        file_ids in
+        file_line_ids in
     let () = update_outputs current_file_id in
     Tyxml_js.Html.select
       ~a:[ Html.a_class ["form-control"] ; Html.a_id select_id ]
@@ -72,17 +70,17 @@ let xml () =
                 (fun manager ->
                    manager#simulation_catalog_file_line >>=
                    (Api_common.result_bind_lwt
-                      ~ok:(fun (file_line_info : Api_types_j.file_line_catalog) ->
+                      ~ok:(fun (file_line_ids : Api_types_j.file_line_catalog) ->
                           let () = ReactiveData.RList.set
                               handle
-                              (match file_line_info.Api_types_j.file_line_ids with
+                              (match file_line_ids with
                                | [] -> []
                                | key::[] ->
                                  let () = update_outputs key in
                                  [Html.h4
                                     [ Html.txt
                                         (Ui_common.option_label key)]]
-                               | _ :: _ :: _ -> [select file_line_info])
+                               | _ :: _ :: _ -> [select file_line_ids])
                           in
                           Lwt.return (Result_util.ok ())
                         )

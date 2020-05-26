@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -66,6 +66,15 @@ let to_string loc = Format.asprintf "@[<h>%a@]" print loc
 
 let print_annot pr f (x,l) =
   Format.fprintf f "%a@ %a" print l pr x
+
+let read_position p lb =
+  match Yojson.Basic.from_lexbuf ~stream:true p lb with
+  | `Assoc [("line",`Int line);("chr", `Int chr)]
+  | `Assoc [("chr", `Int chr);("line",`Int line)] -> { line; chr }
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid position",x))
+
+let write_position ob { line; chr } =
+  Yojson.write_assoc ob [("line",`Int line);("chr", `Int chr)]
 
 let to_compact_yojson decls loc =
   if is_dummy loc then `Null
@@ -139,3 +148,17 @@ let read_range p lb =
 
 let range_of_string s =
   read_range (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+
+let is_included_in file { line; chr } range =
+  file = range.file &&
+  line >= range.from_position.line &&
+  line <= range.to_position.line &&
+  (line <> range.from_position.line || chr >= range.from_position.chr) &&
+  (line <> range.to_position.line || chr <= range.to_position.chr)
+
+let merge b e =
+  let () = assert (b.file = e.file) in {
+    file = b.file;
+    from_position = b.from_position;
+    to_position = e.to_position;
+  }

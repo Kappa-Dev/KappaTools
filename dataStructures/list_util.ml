@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -21,6 +21,13 @@ let rec last = function
   | [] -> failwith "list_last"
   | [ x ] -> x
   | _ :: l -> last l
+
+let rec aux_pop_last acc = function
+  | [] -> failwith "list_pop_last"
+  | [ x ] -> (List.rev acc,x)
+  | h :: t -> aux_pop_last (h::acc) t
+
+let pop_last l = aux_pop_last [] l
 
 let cons_option h t  =
   match h with

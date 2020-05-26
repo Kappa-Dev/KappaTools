@@ -1,13 +1,12 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
 type snapshot = {
-  snapshot_file : string;
   snapshot_event : int;
   snapshot_time : float;
   snapshot_agents : (int * User_graph.connected_component) list;
@@ -15,7 +14,6 @@ type snapshot = {
 }
 
 type din_data = {
-  din_name : string;
   din_kind : Primitives.din_kind;
   din_start : float;
   din_hits : int array;
@@ -33,12 +31,12 @@ type file_line = {
 }
 
 type t =
-  | DIN of din
+  | DIN of string * din
   | DeltaActivities of int * (int * (float * float)) list
   | Plot of Nbr.t array (** Must have length >= 1 (at least [T] or [E]) *)
   | Print of file_line
   | TraceStep of Trace.step
-  | Snapshot of snapshot
+  | Snapshot of string * snapshot
   | Log of string
   | Species of string * float * User_graph.connected_component
   | Warning of Locality.t option*(Format.formatter -> unit)

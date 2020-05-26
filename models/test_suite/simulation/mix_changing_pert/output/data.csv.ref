@@ -1,0 +1,5 @@
+# Output of 'KaSim' '-d' 'output' '-seed' '20543' 'not_found.ka' '-syntax' '4'
+"[T]","A_a","A_b","A_c"
+0.,10,0,0
+1.,7,3,0
+2.,4,6,0

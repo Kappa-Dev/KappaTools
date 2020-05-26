@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -39,7 +39,9 @@ type agent =
   | Present of string Locality.annot * site list * agent_mod option
   | Absent of Locality.t
 
-type mixture = agent list
+type mixture = agent list list
+
+val mixture_to_user_graph : mixture -> User_graph.connected_component
 
 type edit_notation = {
   mix: mixture;

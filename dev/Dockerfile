@@ -6,8 +6,8 @@ RUN adduser -p '' opam && \
   passwd -l opam && \
   chown -R opam:opam /home/opam
 
-RUN curl -L https://github.com/ocaml/opam/archive/2.0.4.tar.gz | tar xz && \
-  cd opam-2.0.4 && make cold && make cold-install && cd .. && rm -rf opam-2.0.4
+RUN curl -L https://github.com/ocaml/opam/archive/2.0.6.tar.gz | tar xz && \
+  cd opam-2.0.6 && make cold && make cold-install && cd .. && rm -rf opam-2.0.6
 
 USER opam
 ENV HOME /home/opam

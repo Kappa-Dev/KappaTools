@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -9,8 +9,8 @@
 (** Utilities on files *)
 
 val open_out : string -> out_channel
-val open_out_fresh : string -> string -> string -> out_channel
-(** [open_out_fresh base facultative ext] *)
+val open_out_fresh : string -> string list -> string -> string -> out_channel
+(** [open_out_fresh base concat_list facultative ext] *)
 
 val path : string -> string
 val mk_dir_r : string -> unit
@@ -23,7 +23,6 @@ val set_marshalized : string -> unit
 val with_marshalized : (out_channel -> unit) -> unit
 
 val set_cflow : string -> unit
-val get_cflow : string list -> string -> string
 val with_cflow_file :
   string list -> string -> (Format.formatter -> unit) -> unit
 

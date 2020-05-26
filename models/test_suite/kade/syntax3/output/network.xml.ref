@@ -44,8 +44,8 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <species metaid="CMD19" id="s7" name="E(r!1), R(e~p!1,r!2), R(e~p!3,r!2), E(r!3)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD20" id="s8" name="R(e~p,r)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD21" id="s9" name="E(r!1), R(e~p,r!2), R(e~p!1,r!2)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD22" id="s10" name="E(r!1), R(e~u,r!2), R(e~p!1,r!2)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD23" id="s11" name="E(r!1), R(e~p,r!2), R(e~u!1,r!2)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD22" id="s10" name="E(r!1), R(e~p,r!2), R(e~u!1,r!2)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD23" id="s11" name="E(r!1), R(e~u,r!2), R(e~p!1,r!2)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD24" id="s12" name="R(e~p,r!1), R(e~p,r!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD25" id="s13" name="R(e~u,r!1), R(e~p,r!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD26" id="s14" name="R(e~u,r!1), R(e~u,r!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
@@ -132,7 +132,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
 <divide/><ci> s1 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>
@@ -180,7 +180,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
 <divide/><ci> s1 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>
@@ -205,7 +205,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
 <reaction id="re7" name="E() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD64" species="s6"/>
@@ -225,7 +225,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2) -->
 <reaction id="re8" name="E() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD68" species="s6"/>
@@ -245,14 +245,14 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~u!1,r) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~p!1,r) -->
 <reaction id="re9" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD72" species="s6"/>
 </listOfReactants>
 <listOfProducts>
 <speciesReference metaid="CMD73" species="s2"/>
-<speciesReference metaid="CMD74" species="s4"/>
+<speciesReference metaid="CMD74" species="s5"/>
 </listOfProducts>
 <listOfModifiers>
 <modifierSpeciesReference metaid="CMD75" species="s1"/>
@@ -268,35 +268,35 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s6 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s6 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : R(e~p?) -> R(e~u?) -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -->
-<reaction id="re10" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
+<!-- rule    : R(e~u!1), E(r!1) -> R(e~p!1), E(r!1) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -->
+<reaction id="re10" name="R(e~u!1), E(r!1) -> R(e~p!1), E(r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD84" species="s6"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD85" species="s1" stoichiometry="2"/>
+<speciesReference metaid="CMD85" species="s7" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k7 </ci><ci> s6 </ci></apply>
+<times/><ci> k2 </ci><ci> s6 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~p!1,r) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r) + E(r!1).R(e~u!1,r) -->
 <reaction id="re11" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD86" species="s6"/>
 </listOfReactants>
 <listOfProducts>
 <speciesReference metaid="CMD87" species="s2"/>
-<speciesReference metaid="CMD88" species="s5"/>
+<speciesReference metaid="CMD88" species="s4"/>
 </listOfProducts>
 <listOfModifiers>
 <modifierSpeciesReference metaid="CMD89" species="s1"/>
@@ -312,28 +312,28 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s6 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s6 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : R(e~u!1), E(r!1) -> R(e~p!1), E(r!1) -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -->
-<reaction id="re12" name="R(e~u!1), E(r!1) -> R(e~p!1), E(r!1)" reversible="false" fast="false">
+<!-- rule    : R(e~p?) -> R(e~u?) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -->
+<reaction id="re12" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD98" species="s6"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD99" species="s7" stoichiometry="2"/>
+<speciesReference metaid="CMD99" species="s1" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k2 </ci><ci> s6 </ci></apply>
+<times/><ci> k7 </ci><ci> s6 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : E() ->  -->
-<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> R(e~u,r!1).R(e~p,r!1) -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> R(e~u,r!1).R(e~p,r!1) -->
 <reaction id="re13" name="E() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD100" species="s10"/>
@@ -354,41 +354,40 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r) + R(e~u,r) -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r) -->
 <reaction id="re14" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD105" species="s10"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD106" species="s2"/>
-<speciesReference metaid="CMD107" species="s3"/>
+<speciesReference metaid="CMD106" species="s4"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD108" species="s1"/>
-<modifierSpeciesReference metaid="CMD109" species="s11"/>
-<modifierSpeciesReference metaid="CMD110" species="s15"/>
-<modifierSpeciesReference metaid="CMD111" species="s2"/>
-<modifierSpeciesReference metaid="CMD112" species="s4"/>
-<modifierSpeciesReference metaid="CMD113" species="s5"/>
-<modifierSpeciesReference metaid="CMD114" species="s6"/>
-<modifierSpeciesReference metaid="CMD115" species="s7"/>
-<modifierSpeciesReference metaid="CMD116" species="s9"/>
+<modifierSpeciesReference metaid="CMD107" species="s1"/>
+<modifierSpeciesReference metaid="CMD108" species="s11"/>
+<modifierSpeciesReference metaid="CMD109" species="s15"/>
+<modifierSpeciesReference metaid="CMD110" species="s2"/>
+<modifierSpeciesReference metaid="CMD111" species="s4"/>
+<modifierSpeciesReference metaid="CMD112" species="s5"/>
+<modifierSpeciesReference metaid="CMD113" species="s6"/>
+<modifierSpeciesReference metaid="CMD114" species="s7"/>
+<modifierSpeciesReference metaid="CMD115" species="s9"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s10 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s10 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e~p?) -> R(e~u?) -->
-<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
 <reaction id="re15" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD117" species="s10"/>
+<speciesReference metaid="CMD116" species="s10"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD118" species="s15"/>
+<speciesReference metaid="CMD117" species="s15"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -397,41 +396,14 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p!1,r) -->
-<reaction id="re16" name="R() -> " reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD119" species="s10"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD120" species="s5"/>
-</listOfProducts>
-<listOfModifiers>
-<modifierSpeciesReference metaid="CMD121" species="s1"/>
-<modifierSpeciesReference metaid="CMD122" species="s11"/>
-<modifierSpeciesReference metaid="CMD123" species="s15"/>
-<modifierSpeciesReference metaid="CMD124" species="s2"/>
-<modifierSpeciesReference metaid="CMD125" species="s4"/>
-<modifierSpeciesReference metaid="CMD126" species="s5"/>
-<modifierSpeciesReference metaid="CMD127" species="s6"/>
-<modifierSpeciesReference metaid="CMD128" species="s7"/>
-<modifierSpeciesReference metaid="CMD129" species="s9"/>
-</listOfModifiers>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s10 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
 <!-- rule    : R(e) -> R(e~u) -->
-<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
-<reaction id="re17" name="R(e) -> R(e~u)" reversible="false" fast="false">
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
+<reaction id="re16" name="R(e) -> R(e~u)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD130" species="s10"/>
+<speciesReference metaid="CMD118" species="s10"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD131" species="s10"/>
+<speciesReference metaid="CMD119" species="s15"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -441,14 +413,14 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: E(r) + E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
-<reaction id="re18" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
+<!-- reaction: E(r) + E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
+<reaction id="re17" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD132" species="s2"/>
-<speciesReference metaid="CMD133" species="s10"/>
+<speciesReference metaid="CMD120" species="s2"/>
+<speciesReference metaid="CMD121" species="s10"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD134" species="s6"/>
+<speciesReference metaid="CMD122" species="s6"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -459,19 +431,63 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : E() ->  -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> R(e~u,r!1).R(e~p,r!1) -->
-<reaction id="re19" name="E() -> " reversible="false" fast="false">
+<!-- rule    : R() ->  -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r) + R(e~p,r) -->
+<reaction id="re18" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD135" species="s11"/>
+<speciesReference metaid="CMD123" species="s10"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD136" species="s13"/>
+<speciesReference metaid="CMD124" species="s2"/>
+<speciesReference metaid="CMD125" species="s8"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD137" species="s1"/>
-<modifierSpeciesReference metaid="CMD138" species="s6"/>
-<modifierSpeciesReference metaid="CMD139" species="s7"/>
+<modifierSpeciesReference metaid="CMD126" species="s1"/>
+<modifierSpeciesReference metaid="CMD127" species="s11"/>
+<modifierSpeciesReference metaid="CMD128" species="s15"/>
+<modifierSpeciesReference metaid="CMD129" species="s2"/>
+<modifierSpeciesReference metaid="CMD130" species="s4"/>
+<modifierSpeciesReference metaid="CMD131" species="s5"/>
+<modifierSpeciesReference metaid="CMD132" species="s6"/>
+<modifierSpeciesReference metaid="CMD133" species="s7"/>
+<modifierSpeciesReference metaid="CMD134" species="s9"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s10 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e~u!1), E(r!1) -> R(e~p!1), E(r!1) -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2) -->
+<reaction id="re19" name="R(e~u!1), E(r!1) -> R(e~p!1), E(r!1)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD135" species="s10"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD136" species="s9"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k2 </ci><ci> s10 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : E() ->  -->
+<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> R(e~u,r!1).R(e~p,r!1) -->
+<reaction id="re20" name="E() -> " reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD137" species="s11"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD138" species="s13"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD139" species="s1"/>
+<modifierSpeciesReference metaid="CMD140" species="s6"/>
+<modifierSpeciesReference metaid="CMD141" species="s7"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -481,100 +497,40 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r) + R(e~p,r) -->
-<reaction id="re20" name="R() -> " reversible="false" fast="false">
+<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p!1,r) -->
+<reaction id="re21" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD140" species="s11"/>
+<speciesReference metaid="CMD142" species="s11"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD141" species="s2"/>
-<speciesReference metaid="CMD142" species="s8"/>
+<speciesReference metaid="CMD143" species="s5"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD143" species="s1"/>
-<modifierSpeciesReference metaid="CMD144" species="s10"/>
-<modifierSpeciesReference metaid="CMD145" species="s15"/>
-<modifierSpeciesReference metaid="CMD146" species="s2"/>
-<modifierSpeciesReference metaid="CMD147" species="s4"/>
-<modifierSpeciesReference metaid="CMD148" species="s5"/>
-<modifierSpeciesReference metaid="CMD149" species="s6"/>
-<modifierSpeciesReference metaid="CMD150" species="s7"/>
-<modifierSpeciesReference metaid="CMD151" species="s9"/>
+<modifierSpeciesReference metaid="CMD144" species="s1"/>
+<modifierSpeciesReference metaid="CMD145" species="s10"/>
+<modifierSpeciesReference metaid="CMD146" species="s15"/>
+<modifierSpeciesReference metaid="CMD147" species="s2"/>
+<modifierSpeciesReference metaid="CMD148" species="s4"/>
+<modifierSpeciesReference metaid="CMD149" species="s5"/>
+<modifierSpeciesReference metaid="CMD150" species="s6"/>
+<modifierSpeciesReference metaid="CMD151" species="s7"/>
+<modifierSpeciesReference metaid="CMD152" species="s9"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s11 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R(e~u!1), E(r!1) -> R(e~p!1), E(r!1) -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~p,r!2).R(e~p!1,r!2) -->
-<reaction id="re21" name="R(e~u!1), E(r!1) -> R(e~p!1), E(r!1)" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD152" species="s11"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD153" species="s9"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><ci> k2 </ci><ci> s11 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r) -->
-<reaction id="re22" name="R() -> " reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD154" species="s11"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD155" species="s4"/>
-</listOfProducts>
-<listOfModifiers>
-<modifierSpeciesReference metaid="CMD156" species="s1"/>
-<modifierSpeciesReference metaid="CMD157" species="s10"/>
-<modifierSpeciesReference metaid="CMD158" species="s15"/>
-<modifierSpeciesReference metaid="CMD159" species="s2"/>
-<modifierSpeciesReference metaid="CMD160" species="s4"/>
-<modifierSpeciesReference metaid="CMD161" species="s5"/>
-<modifierSpeciesReference metaid="CMD162" species="s6"/>
-<modifierSpeciesReference metaid="CMD163" species="s7"/>
-<modifierSpeciesReference metaid="CMD164" species="s9"/>
-</listOfModifiers>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s11 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R(e~p?) -> R(e~u?) -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
-<reaction id="re23" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD165" species="s11"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD166" species="s15"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><ci> k7 </ci><ci> s11 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s11 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e) -> R(e~u) -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
-<reaction id="re24" name="R(e) -> R(e~u)" reversible="false" fast="false">
+<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
+<reaction id="re22" name="R(e) -> R(e~u)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD167" species="s11"/>
+<speciesReference metaid="CMD153" species="s11"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD168" species="s15"/>
+<speciesReference metaid="CMD154" species="s11"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -584,14 +540,14 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: E(r) + E(r!1).R(e~p,r!2).R(e~u!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
-<reaction id="re25" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
+<!-- reaction: E(r) + E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~p!3,r!2).E(r!3) -->
+<reaction id="re23" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD169" species="s2"/>
-<speciesReference metaid="CMD170" species="s11"/>
+<speciesReference metaid="CMD155" species="s2"/>
+<speciesReference metaid="CMD156" species="s11"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD171" species="s6"/>
+<speciesReference metaid="CMD157" species="s6"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -599,6 +555,50 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <times/><ci> k1 </ci><apply>
 <times/><ci> s11 </ci><ci> s2 </ci></apply>
 </apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R() ->  -->
+<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r) + R(e~u,r) -->
+<reaction id="re24" name="R() -> " reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD158" species="s11"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD159" species="s2"/>
+<speciesReference metaid="CMD160" species="s3"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD161" species="s1"/>
+<modifierSpeciesReference metaid="CMD162" species="s10"/>
+<modifierSpeciesReference metaid="CMD163" species="s15"/>
+<modifierSpeciesReference metaid="CMD164" species="s2"/>
+<modifierSpeciesReference metaid="CMD165" species="s4"/>
+<modifierSpeciesReference metaid="CMD166" species="s5"/>
+<modifierSpeciesReference metaid="CMD167" species="s6"/>
+<modifierSpeciesReference metaid="CMD168" species="s7"/>
+<modifierSpeciesReference metaid="CMD169" species="s9"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s11 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e~p?) -> R(e~u?) -->
+<!-- reaction: E(r!1).R(e~u,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
+<reaction id="re25" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD170" species="s11"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD171" species="s15"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k7 </ci><ci> s11 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -624,40 +624,84 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u!1,r) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r) + R(e~u,r) -->
 <reaction id="re27" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD177" species="s15"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD178" species="s4"/>
+<speciesReference metaid="CMD178" species="s2"/>
+<speciesReference metaid="CMD179" species="s3"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD179" species="s1"/>
-<modifierSpeciesReference metaid="CMD180" species="s10"/>
-<modifierSpeciesReference metaid="CMD181" species="s11"/>
-<modifierSpeciesReference metaid="CMD182" species="s2"/>
-<modifierSpeciesReference metaid="CMD183" species="s4"/>
-<modifierSpeciesReference metaid="CMD184" species="s5"/>
-<modifierSpeciesReference metaid="CMD185" species="s6"/>
-<modifierSpeciesReference metaid="CMD186" species="s7"/>
-<modifierSpeciesReference metaid="CMD187" species="s9"/>
+<modifierSpeciesReference metaid="CMD180" species="s1"/>
+<modifierSpeciesReference metaid="CMD181" species="s10"/>
+<modifierSpeciesReference metaid="CMD182" species="s11"/>
+<modifierSpeciesReference metaid="CMD183" species="s2"/>
+<modifierSpeciesReference metaid="CMD184" species="s4"/>
+<modifierSpeciesReference metaid="CMD185" species="s5"/>
+<modifierSpeciesReference metaid="CMD186" species="s6"/>
+<modifierSpeciesReference metaid="CMD187" species="s7"/>
+<modifierSpeciesReference metaid="CMD188" species="s9"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s15 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s15 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e~u!1), E(r!1) -> R(e~p!1), E(r!1) -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
+<reaction id="re28" name="R(e~u!1), E(r!1) -> R(e~p!1), E(r!1)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD189" species="s15"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD190" species="s11"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k2 </ci><ci> s15 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R() ->  -->
+<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u!1,r) -->
+<reaction id="re29" name="R() -> " reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD191" species="s15"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD192" species="s4"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD193" species="s1"/>
+<modifierSpeciesReference metaid="CMD194" species="s10"/>
+<modifierSpeciesReference metaid="CMD195" species="s11"/>
+<modifierSpeciesReference metaid="CMD196" species="s2"/>
+<modifierSpeciesReference metaid="CMD197" species="s4"/>
+<modifierSpeciesReference metaid="CMD198" species="s5"/>
+<modifierSpeciesReference metaid="CMD199" species="s6"/>
+<modifierSpeciesReference metaid="CMD200" species="s7"/>
+<modifierSpeciesReference metaid="CMD201" species="s9"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s15 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e) -> R(e~u) -->
 <!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u,r!2) -->
-<reaction id="re28" name="R(e) -> R(e~u)" reversible="false" fast="false">
+<reaction id="re30" name="R(e) -> R(e~u)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD188" species="s15"/>
+<speciesReference metaid="CMD202" species="s15"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD189" species="s15"/>
+<speciesReference metaid="CMD203" species="s15"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -668,13 +712,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
 <!-- reaction: E(r) + E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u!1,r!2).R(e~u!3,r!2).E(r!3) -->
-<reaction id="re29" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
+<reaction id="re31" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD190" species="s2"/>
-<speciesReference metaid="CMD191" species="s15"/>
+<speciesReference metaid="CMD204" species="s2"/>
+<speciesReference metaid="CMD205" species="s15"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD192" species="s1" stoichiometry="2"/>
+<speciesReference metaid="CMD206" species="s1" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -682,50 +726,6 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <times/><ci> k1 </ci><apply>
 <times/><ci> s15 </ci><ci> s2 </ci></apply>
 </apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r) + R(e~u,r) -->
-<reaction id="re30" name="R() -> " reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD193" species="s15"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD194" species="s2"/>
-<speciesReference metaid="CMD195" species="s3"/>
-</listOfProducts>
-<listOfModifiers>
-<modifierSpeciesReference metaid="CMD196" species="s1"/>
-<modifierSpeciesReference metaid="CMD197" species="s10"/>
-<modifierSpeciesReference metaid="CMD198" species="s11"/>
-<modifierSpeciesReference metaid="CMD199" species="s2"/>
-<modifierSpeciesReference metaid="CMD200" species="s4"/>
-<modifierSpeciesReference metaid="CMD201" species="s5"/>
-<modifierSpeciesReference metaid="CMD202" species="s6"/>
-<modifierSpeciesReference metaid="CMD203" species="s7"/>
-<modifierSpeciesReference metaid="CMD204" species="s9"/>
-</listOfModifiers>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s15 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R(e~u!1), E(r!1) -> R(e~p!1), E(r!1) -->
-<!-- reaction: E(r!1).R(e~u!1,r!2).R(e~u,r!2) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
-<reaction id="re31" name="R(e~u!1), E(r!1) -> R(e~p!1), E(r!1)" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD205" species="s15"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD206" species="s10"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><ci> k2 </ci><ci> s15 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -753,7 +753,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
 <divide/><ci> s14 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>
@@ -822,7 +822,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
 <divide/><ci> s14 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>
@@ -868,13 +868,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~u,r) -->
+<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~p,r) -->
 <reaction id="re38" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD241" species="s13"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD242" species="s3"/>
+<speciesReference metaid="CMD242" species="s8"/>
 </listOfProducts>
 <listOfModifiers>
 <modifierSpeciesReference metaid="CMD243" species="s1"/>
@@ -891,34 +891,18 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s13 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R(e~p?) -> R(e~u?) -->
-<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~u,r!1) -->
-<reaction id="re39" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD253" species="s13"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD254" species="s14" stoichiometry="2"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><ci> k7 </ci><ci> s13 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s13 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e) -> R(e~u) -->
-<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~u,r!1) -->
-<reaction id="re40" name="R(e) -> R(e~u)" reversible="false" fast="false">
+<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~p,r!1) -->
+<reaction id="re39" name="R(e) -> R(e~u)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD255" species="s13"/>
+<speciesReference metaid="CMD253" species="s13"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD256" species="s14" stoichiometry="2"/>
+<speciesReference metaid="CMD254" species="s13"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -928,14 +912,14 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: E(r) + R(e~u,r!1).R(e~p,r!1) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
-<reaction id="re41" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
+<!-- reaction: E(r) + R(e~u,r!1).R(e~p,r!1) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2) -->
+<reaction id="re40" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD257" species="s2"/>
-<speciesReference metaid="CMD258" species="s13"/>
+<speciesReference metaid="CMD255" species="s2"/>
+<speciesReference metaid="CMD256" species="s13"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD259" species="s10"/>
+<speciesReference metaid="CMD257" species="s10"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -947,41 +931,57 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~p,r) -->
-<reaction id="re42" name="R() -> " reversible="false" fast="false">
+<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~u,r) -->
+<reaction id="re41" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD260" species="s13"/>
+<speciesReference metaid="CMD258" species="s13"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD261" species="s8"/>
+<speciesReference metaid="CMD259" species="s3"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD262" species="s1"/>
-<modifierSpeciesReference metaid="CMD263" species="s10"/>
-<modifierSpeciesReference metaid="CMD264" species="s11"/>
-<modifierSpeciesReference metaid="CMD265" species="s15"/>
-<modifierSpeciesReference metaid="CMD266" species="s2"/>
-<modifierSpeciesReference metaid="CMD267" species="s4"/>
-<modifierSpeciesReference metaid="CMD268" species="s5"/>
-<modifierSpeciesReference metaid="CMD269" species="s6"/>
-<modifierSpeciesReference metaid="CMD270" species="s7"/>
-<modifierSpeciesReference metaid="CMD271" species="s9"/>
+<modifierSpeciesReference metaid="CMD260" species="s1"/>
+<modifierSpeciesReference metaid="CMD261" species="s10"/>
+<modifierSpeciesReference metaid="CMD262" species="s11"/>
+<modifierSpeciesReference metaid="CMD263" species="s15"/>
+<modifierSpeciesReference metaid="CMD264" species="s2"/>
+<modifierSpeciesReference metaid="CMD265" species="s4"/>
+<modifierSpeciesReference metaid="CMD266" species="s5"/>
+<modifierSpeciesReference metaid="CMD267" species="s6"/>
+<modifierSpeciesReference metaid="CMD268" species="s7"/>
+<modifierSpeciesReference metaid="CMD269" species="s9"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s13 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s13 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e~p?) -> R(e~u?) -->
+<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~u,r!1) -->
+<reaction id="re42" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD270" species="s13"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD271" species="s14" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k7 </ci><ci> s13 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e) -> R(e~u) -->
-<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~p,r!1) -->
+<!-- reaction: R(e~u,r!1).R(e~p,r!1) -> R(e~u,r!1).R(e~u,r!1) -->
 <reaction id="re43" name="R(e) -> R(e~u)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD272" species="s13"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD273" species="s13"/>
+<speciesReference metaid="CMD273" species="s14" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -991,7 +991,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
-<!-- reaction: E(r) + R(e~u,r!1).R(e~p,r!1) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2) -->
+<!-- reaction: E(r) + R(e~u,r!1).R(e~p,r!1) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
 <reaction id="re44" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD274" species="s2"/>
@@ -1033,7 +1033,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
 <divide/><ci> s12 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>
@@ -1120,7 +1120,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
 <divide/><ci> s12 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>
@@ -1205,84 +1205,40 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r) + R(e~p,r) -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p!1,r) -->
 <reaction id="re54" name="R() -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD320" species="s9"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD321" species="s2"/>
-<speciesReference metaid="CMD322" species="s8"/>
+<speciesReference metaid="CMD321" species="s5"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD323" species="s1"/>
-<modifierSpeciesReference metaid="CMD324" species="s10"/>
-<modifierSpeciesReference metaid="CMD325" species="s11"/>
-<modifierSpeciesReference metaid="CMD326" species="s15"/>
-<modifierSpeciesReference metaid="CMD327" species="s2"/>
-<modifierSpeciesReference metaid="CMD328" species="s4"/>
-<modifierSpeciesReference metaid="CMD329" species="s5"/>
-<modifierSpeciesReference metaid="CMD330" species="s6"/>
-<modifierSpeciesReference metaid="CMD331" species="s7"/>
+<modifierSpeciesReference metaid="CMD322" species="s1"/>
+<modifierSpeciesReference metaid="CMD323" species="s10"/>
+<modifierSpeciesReference metaid="CMD324" species="s11"/>
+<modifierSpeciesReference metaid="CMD325" species="s15"/>
+<modifierSpeciesReference metaid="CMD326" species="s2"/>
+<modifierSpeciesReference metaid="CMD327" species="s4"/>
+<modifierSpeciesReference metaid="CMD328" species="s5"/>
+<modifierSpeciesReference metaid="CMD329" species="s6"/>
+<modifierSpeciesReference metaid="CMD330" species="s7"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s9 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R(e~p?) -> R(e~u?) -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2) -->
-<reaction id="re55" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD332" species="s9"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD333" species="s11"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><ci> k7 </ci><ci> s9 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R() ->  -->
-<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p!1,r) -->
-<reaction id="re56" name="R() -> " reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD334" species="s9"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD335" species="s5"/>
-</listOfProducts>
-<listOfModifiers>
-<modifierSpeciesReference metaid="CMD336" species="s1"/>
-<modifierSpeciesReference metaid="CMD337" species="s10"/>
-<modifierSpeciesReference metaid="CMD338" species="s11"/>
-<modifierSpeciesReference metaid="CMD339" species="s15"/>
-<modifierSpeciesReference metaid="CMD340" species="s2"/>
-<modifierSpeciesReference metaid="CMD341" species="s4"/>
-<modifierSpeciesReference metaid="CMD342" species="s5"/>
-<modifierSpeciesReference metaid="CMD343" species="s6"/>
-<modifierSpeciesReference metaid="CMD344" species="s7"/>
-</listOfModifiers>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s9 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s9 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e~p?) -> R(e~u?) -->
 <!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
-<reaction id="re57" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
+<reaction id="re55" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD345" species="s9"/>
+<speciesReference metaid="CMD331" species="s9"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD346" species="s10"/>
+<speciesReference metaid="CMD332" species="s11"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1293,12 +1249,12 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- rule    : R(e) -> R(e~u) -->
 <!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~u,r!2).R(e~p!1,r!2) -->
-<reaction id="re58" name="R(e) -> R(e~u)" reversible="false" fast="false">
+<reaction id="re56" name="R(e) -> R(e~u)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD347" species="s9"/>
+<speciesReference metaid="CMD333" species="s9"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD348" species="s10"/>
+<speciesReference metaid="CMD334" species="s11"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1309,13 +1265,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- rule    : E(r), R(e) -> E(r!1), R(e!1) -->
 <!-- reaction: E(r) + E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p!1,r!2).R(e~p!3,r!2).E(r!3) -->
-<reaction id="re59" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
+<reaction id="re57" name="E(r), R(e) -> E(r!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD349" species="s2"/>
-<speciesReference metaid="CMD350" species="s9"/>
+<speciesReference metaid="CMD335" species="s2"/>
+<speciesReference metaid="CMD336" species="s9"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD351" species="s7" stoichiometry="2"/>
+<speciesReference metaid="CMD337" species="s7" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1323,6 +1279,50 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <times/><ci> k1 </ci><apply>
 <times/><ci> s9 </ci><ci> s2 </ci></apply>
 </apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R() ->  -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r) + R(e~p,r) -->
+<reaction id="re58" name="R() -> " reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD338" species="s9"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD339" species="s2"/>
+<speciesReference metaid="CMD340" species="s8"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD341" species="s1"/>
+<modifierSpeciesReference metaid="CMD342" species="s10"/>
+<modifierSpeciesReference metaid="CMD343" species="s11"/>
+<modifierSpeciesReference metaid="CMD344" species="s15"/>
+<modifierSpeciesReference metaid="CMD345" species="s2"/>
+<modifierSpeciesReference metaid="CMD346" species="s4"/>
+<modifierSpeciesReference metaid="CMD347" species="s5"/>
+<modifierSpeciesReference metaid="CMD348" species="s6"/>
+<modifierSpeciesReference metaid="CMD349" species="s7"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s9 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e~p?) -> R(e~u?) -->
+<!-- reaction: E(r!1).R(e~p,r!2).R(e~p!1,r!2) -> E(r!1).R(e~p,r!2).R(e~u!1,r!2) -->
+<reaction id="re59" name="R(e~p?) -> R(e~u?)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD350" species="s9"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD351" species="s10"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k7 </ci><ci> s9 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -1394,7 +1394,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
 <divide/><ci> s7 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>
@@ -1442,7 +1442,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><apply>
 <divide/><ci> s7 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>
@@ -1487,7 +1487,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s8 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s8 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -1586,7 +1586,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s5 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s5 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -1709,7 +1709,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s4 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s4 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -1808,7 +1808,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s3 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s15</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s11</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s10</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s9</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s1</ci></apply><cn type="integer"> 2 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s6</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 2 </cn><ci>s7</ci></apply><cn type="integer"> 2 </cn></apply></apply></apply><ci> s3 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>

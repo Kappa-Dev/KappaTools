@@ -142,17 +142,34 @@ class _KappaClientTest(unittest.TestCase):
         runtime.add_model_file(fpath, 0, file_id)
 
         print("Parse project...")
-        ast = runtime.project_parse()
+        runtime.project_parse()
 
-        print("removing file and overwriting ast")
-        runtime.file_delete(file_id)
-        runtime.project_overwrite(ast,"plus.ka")
+        #print("removing file and overwriting ast")
+        #runtime.file_delete(file_id)
+        #runtime.project_overwrite(ast,"plus.ka")
 
         print("getting the model text back en reparse it")
-        gen_file = runtime.file_get("plus.ka")
-        runtime.file_delete("plus.ka")
+        gen_file = runtime.file_get(file_id)#"plus.ka")
+        runtime.file_delete(file_id)#"plus.ka")
         runtime.add_model_string(gen_file.file_content,file_id="final")
         runtime.project_parse()
+
+    def test_static_analyses(self):
+        print("Getting runtime...")
+        runtime = self.getRuntime()
+
+        print("Adding model file %s..." % "abc.ka")
+        fpath = path.join(MODELS_DIR, "abc-pert.ka")
+        runtime.add_model_file(fpath, 0)
+
+        print("Parse project...")
+        runtime.project_parse()
+
+        print("Get contact_map...")
+        cm = runtime.analyses_contact_map()
+
+        print("Get high accuracy influence_map...")
+        im = runtime.analyses_influence_map("medium")
 
 def run_nose(fname):
     import nose

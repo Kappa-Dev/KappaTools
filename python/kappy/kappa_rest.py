@@ -28,8 +28,6 @@ class KappaRest(KappaApi):
         if project_id is None:
             project_id = self.make_unique_id('project')
         self.project_id = project_id
-        self.project_ast = None
-        self.analyses_to_init = True
         if project_id not in self.project_info():
             self._project_create()
         return
@@ -119,36 +117,19 @@ class KappaRest(KappaApi):
         """
         return self._delete(self.in_project())
 
-    def _analyses_init(self):
-        if self.project_ast is None:
-            raise KappaError("Project not parsed since last modification")
-        result = self._put(self.in_project('analyses'), self.project_ast)
-        self.analyses_to_init = False
-        return result
-
     # Standardized API methods. Docs are provided by parent.
 
     def project_parse(self, **kwargs):
         overwrites = '&'.join('%s=%s' % (key, value) for (key, value) in kwargs.items())
-        reply = self._post(self.in_project('parse'))
-        self.project_ast = reply
-        self._post(self.in_project('?'.join(['load',overwrites])), reply)
-        return reply
+        return self._post(self.in_project('?'.join(['parse',overwrites])))
 
     def project_overwrite(self, ast, file_id="model.ka"):
-        self._post(self.in_project('overwrite',file_id),ast)
-        self.project_ast = ast
-        self.analyses_to_init = True
-        self._post(self.in_project('load'), ast)
+        return self._post(self.in_project('overwrite',file_id),ast)
 
     def file_create(self, file_):
-        self.project_ast = None
-        self.analyses_to_init = True
-        return self._put(self.in_project('files', file_.get_id(), str(file_.get_position())), file_.get_content())
+        return self._put(self.in_project('files', file_.get_id(),'position',  str(file_.get_position())), file_.get_content())
 
     def file_delete(self, file_id):
-        self.project_ast = None
-        self.analyses_to_init = True
         return self._delete(self.in_project('files', file_id))
 
     def file_get(self, file_id):
@@ -207,8 +188,6 @@ class KappaRest(KappaApi):
     def simulation_start(self, simulation_parameter=None):
         if simulation_parameter is None:
             simulation_parameter = self.get_default_sim_param()
-        if self.project_ast is None:
-            raise KappaError("Project not parsed since last modification")
         return self._post(self.in_project('simulation'),
                           simulation_parameter.toJSON())
 
@@ -217,34 +196,18 @@ class KappaRest(KappaApi):
                          pause_condition)
 
     def analyses_dead_rules(self):
-        if self.analyses_to_init:
-            self._analyses_init()
         return self._get(self.in_project('analyses', 'dead_rules'))
 
     def analyses_constraints_list(self):
-        if self.analyses_to_init:
-            self._analyses_init()
         return self._get(self.in_project('analyses', 'constraints'))
 
     def analyses_contact_map(self, accuracy=None):
-        if self.analyses_to_init:
-            self._analyses_init()
-        if accuracy is None:
-            cmd = "contact_map"
-        else:
-            cmd = "contact_map?accuracy=%s" % accuracy
+        cmd = "contact_map?accuracy=%s" % accuracy
         return self._get(self.in_project('analyses', cmd))
 
     def analyses_influence_map(self, accuracy=None):
-        if self.analyses_to_init:
-            self._analyses_init()
-        if accuracy is None:
-            cmd = "influence_map"
-        else:
-            cmd = "influence_map?accuracy=%s" % accuracy
+        cmd = "influence_map?accuracy=%s" % accuracy
         return self._get(self.in_project('analyses', cmd))
 
     def analyses_potential_polymers(self):
-        if self.analyses_to_init:
-            self._analyses_init()
         return self._get(self.in_project('analyses', "potential_polymers"))

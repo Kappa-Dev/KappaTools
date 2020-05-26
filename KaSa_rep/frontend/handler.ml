@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Sep 27 2018>
+   * Last modification: Time-stamp: <Mar 19 2020>
    * *
    * Primitives to use a kappa handler
    *
@@ -357,7 +357,8 @@ let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id
   | None  -> Exception.warn parameters error __POS__ Exit
                (("VAR " ^ (Ckappa_sig.string_of_rule_id var_id)),Locality.dummy,Public_data.Variable,"",var_id)
   | Some var  ->
-    error,(fst var.Cckappa_sig.e_id_dot,snd var.Cckappa_sig.e_id_dot,
+    error,(fst var.Cckappa_sig.e_id_dot,
+           snd var.Cckappa_sig.e_id,
            Public_data.Variable,
            "" (* TO DO: string for the ast representation (from var.Cckappa_sig.c_variable?) *) ,
            var_id)
@@ -394,6 +395,8 @@ let string_of_info ?with_rule:(with_rule=true)
   in
   s
 
+let pos_of_info (_,info,_,_,_) = info
+
 let string_of_rule ?with_rule:(with_rule=true)
     ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true)
     parameters error compiled rule_id =
@@ -407,6 +410,13 @@ let string_of_rule ?with_rule:(with_rule=true)
   string_of_info
     ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
 
+let pos_of_rule parameters error _ compiled rule_id =
+  let error, info =
+    info_of_rule parameters error compiled rule_id
+  in
+  error,
+  pos_of_info info
+
 let string_of_var ?with_rule:(with_rule=true)
     ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true) parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
   let kind =
@@ -419,6 +429,13 @@ let string_of_var ?with_rule:(with_rule=true)
   error,
   string_of_info
     ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
+
+let pos_of_var parameters error handler compiled rule_id =
+  let error, info =
+    info_of_var parameters error handler compiled rule_id
+  in
+  error,
+  pos_of_info info
 
 let convert_id rule var  parameters error handler compiled id =
   let int = Ckappa_sig.int_of_rule_id id in

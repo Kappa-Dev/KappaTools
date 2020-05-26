@@ -74,10 +74,8 @@ module Int_storage_imperatif:
   Storage with type key = int and type dimension = int
 
 (** expandable arrays (the size is still limited by max_int *)
-module Nearly_infinite_arrays
-  (Basic:Storage
-   with type dimension = int
-   and type key = int) :
+module Nearly_infinite_arrays :
+  (Storage with type dimension = int and type key = int) ->
   Storage with type key = int and type dimension = int
 
 

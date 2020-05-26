@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -64,6 +64,9 @@ let contactmapscc="contact map scc"
 let counter = "counter"
 let inf = "min"
 let sup = "max"
+let key = "key"
+let locality = "locality"
+
 (*******************)
 (* Accuracy levels *)
 (*******************)
@@ -140,7 +143,7 @@ let site_type_to_json = function
         sitelinks,
         (match p.User_graph.port_links with
          | User_graph.LINKS l ->
-           JsonUtil.of_list (fun (x,y) -> `List [`Int x; `Int y]) l
+           JsonUtil.of_list (fun ((xl,xr),y) -> `List [`List [`Int xl; `Int xr]; `Int y]) l
          | User_graph.WHATEVER -> `Null
          | User_graph.SOME -> `Bool true
          | User_graph.TYPE (si,ty) ->
@@ -251,8 +254,7 @@ let contact_map_to_json contact_map =
      JsonUtil.of_pair
        ~lab1:accuracy_string ~lab2:map
        accuracy_to_json
-       (JsonUtil.of_array
-          site_node_to_json)
+       (JsonUtil.of_array (JsonUtil.of_array site_node_to_json))
        contact_map
     ]
 
@@ -268,7 +270,9 @@ let contact_map_of_json =
           accuracy_of_json
           (JsonUtil.to_array
              ~error_msg:(JsonUtil.build_msg "site nodes list")
-             site_node_of_json
+             (JsonUtil.to_array
+                ~error_msg:(JsonUtil.build_msg "site nodes list")
+                site_node_of_json)
           )
           json
   with
@@ -479,6 +483,8 @@ type ('rule,'var) influence_node =
   | Rule of 'rule
   | Var of 'var
 
+type pos_of_rules_and_vars = ((int,int) influence_node * Locality.t) list
+
 let influence_node_to_json rule_to_json var_to_json a =
   match a with
   | Var i ->
@@ -505,6 +511,26 @@ let short_influence_node_of_json =
     (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "rule id"))
     (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "var id"))
 
+
+let pos_of_rules_and_vars_to_json =
+  JsonUtil.of_list
+    (JsonUtil.of_pair
+       ~lab1:key ~lab2:locality
+       short_influence_node_to_json
+       (fun loc ->
+          Locality.annot_to_yojson
+            JsonUtil.of_unit ((),loc))
+    )
+
+let pos_of_rules_and_vars_of_json =
+  JsonUtil.to_list
+    (JsonUtil.to_pair
+       ~lab1:key ~lab2:locality
+       short_influence_node_of_json
+       (fun x ->
+          snd (Locality.annot_of_yojson
+              (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
+              x))) 
 
 let refined_influence_node_to_json =
   influence_node_to_json rule_to_json var_to_json

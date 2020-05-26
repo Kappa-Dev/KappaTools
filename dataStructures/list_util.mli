@@ -1,12 +1,13 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
 val last : 'a list -> 'a
+val pop_last : 'a list -> 'a list * 'a
 val cons_option : 'a option -> 'a list -> 'a list
 val exists_uniq : ('a -> bool) -> 'a list -> bool
 

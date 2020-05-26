@@ -4,7 +4,7 @@
   <!--
 *****************************************************************************
 *  _  __ * The Kappa Language                                               *
-* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF *
+* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF *
 * | ' /  ********************************************************************
 * | . \  * This file is distributed under the terms of the                  *
 * |_|\_\ * GNU Lesser General Public License Version 3                      *
@@ -17,6 +17,7 @@
     <meta charset="utf-8"></meta>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
     <link rel="stylesheet" href="/javascript/bootstrap/css/bootstrap.min.css"></link>
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/CODEMIRROR_VERSION/codemirror.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/CODEMIRROR_VERSION/addon/mode/simple.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/CODEMIRROR_VERSION/addon/selection/active-line.js"></script>
@@ -43,6 +44,7 @@
     <script src="flux.js?RANDOM_NUMBER"></script>
     <script src="plot.js?RANDOM_NUMBER"></script>
     <script src="JsSim.js?RANDOM_NUMBER"></script>
+    <script>if (window.module) module = window.module;</script>
     <link rel="stylesheet" href="JsSim.css?RANDOM_NUMBER"></link>
    </head>
    <body class="flex-content">

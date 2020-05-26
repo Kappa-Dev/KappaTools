@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -8,7 +8,6 @@
 
 module Html = Tyxml_js.Html5
 
-val split : string -> char -> string * string option
 val print_newline: ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list
 val print_string:
   string Html.wrap ->

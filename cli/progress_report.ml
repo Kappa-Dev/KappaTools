@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -55,32 +55,30 @@ let pp_text delta_t time t_r event e_r f s =
       (String.make (max 0 (s.last_length - String.length string)) ' ') in
   s.last_length <- String.length string
 
+let rec aux_tick something s n =
+  if n <= 0 then
+    if something then Format.pp_print_flush Format.std_formatter () else ()
+  else
+    let () = Format.pp_print_char Format.std_formatter s.bar_char in
+    let () = inc_tick s in
+    aux_tick true s (pred n)
+
 let tick ~efficiency time t_r event e_r = function
   | Bar s ->
     let n_t = Option_util.unsome 0. t_r *. (float_of_int s.bar_size) in
     let n_e = Option_util.unsome 0. e_r *. (float_of_int s.bar_size) in
-    let n = ref (int_of_float (max n_t n_e) - s.ticks) in
-    while !n > 0 do
-      Format.fprintf Format.std_formatter "%c" s.bar_char;
-      inc_tick s; decr n
-    done;
-    Format.pp_print_flush Format.std_formatter ()
+    aux_tick false s (int_of_float (max n_t n_e) - s.ticks)
   | Text s ->
     let run = Sys.time () in
     let dt = run -. s.last_time in
-    if dt > 2. then
-      let () =
-        pp_text (if efficiency then Some dt else None)
+    if dt > 0.5 then
+      let () = pp_text (if efficiency then Some dt else None)
           time t_r event e_r Format.std_formatter s in
       let () = s.last_event_nb <- event in
       s.last_time <- Sys.time ()
 
 let complete_progress_bar time event t =
-  let () =
-    match t with
-    | Bar t ->
-      for _ = t.bar_size - t.ticks downto 1 do
-        Format.printf "%c" t.bar_char
-      done
-    | Text s -> pp_text None time None event None Format.std_formatter s in
+  (match t with
+   | Bar t -> aux_tick false t (t.bar_size - t.ticks)
+   | Text s -> pp_text None time None event None Format.std_formatter s);
   Format.pp_print_newline Format.std_formatter ()

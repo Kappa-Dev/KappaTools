@@ -11,11 +11,12 @@ done
 	 -update_domain construction
 	 18 (sub)observables 0 navigation steps
 	 -initial conditions
-+ Building initial state (512 agents)
++ Building initial state (300 agents)
 Done
 + Command line to rerun is: 'KaSim' '-u' 'e' '-l' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '2' 'a_bn_c.ka'
-____________________________________________________________
-############################################################
+______________________________________________________________________
+######################################################################
 Simulation ended
-74.35% of event loops were productive. Null event cause:
-	Valid embedding but no longer unary when required: 100.00%
+52.08% of event loops were productive. Null event cause:
+	Valid embedding but no longer unary when required: 99.46%
+	Clashing instance: 0.54%

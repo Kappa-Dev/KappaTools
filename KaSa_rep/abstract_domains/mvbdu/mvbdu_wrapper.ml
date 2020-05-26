@@ -253,7 +253,7 @@ module type Nul =
 sig
 end
 
-module Make (M:Nul)  =
+module Make (_:Nul) =
   (struct
     type key = int
     type value = int

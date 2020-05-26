@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2019 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -88,14 +88,14 @@ let _ = React.S.map
          ~ready:(fun manager _ ->
            manager#simulation_catalog_din >>=
            (Api_common.result_bind_lwt
-              ~ok:(fun (data : Api_types_t.din_catalog) ->
+              ~ok:(fun din_ids ->
                   let () = ReactiveData.RList.set
                       din_handle
                       (List.rev_map
                          (fun id -> Html.option
                              ~a:[ Html.a_value id ]
                              (Html.txt id))
-                         data.Api_types_t.din_ids) in
+                         din_ids) in
                   let () = select_din () in
                   Lwt.return (Result_util.ok ()))
            )
