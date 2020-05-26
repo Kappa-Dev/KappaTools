@@ -130,8 +130,6 @@ class KappaStd(KappaApi):
         finally:
             self.lock.release()
 
-    def _dispatch_model(self, data):
-=======
     def _dispatch(self, data):
         try:
             self.lock.acquire()

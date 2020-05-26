@@ -4,6 +4,9 @@
 import os
 import sys
 import json
+import glob
+import gzip
+import shutil
 
 from collections import defaultdict, OrderedDict
 ##
@@ -83,8 +86,9 @@ class KappaAgent:
     array of `site`s "node_sites". 
     "agent_sites"
     """
-    def __init__(self, agent):
+    def __init__(self, agent, label=None):
         self.type = agent["node_type"]
+        self.label = label
         sites_info = parse_node_sites(agent["node_sites"])
         self.site_names = sites_info[0]
         self.sites = sites_info[1]
@@ -96,14 +100,25 @@ class KappaAgent:
 
     def has_site(self, site_type, site_state_val=None):
         """
+        True if agent has site (optionally with a given state value).
         """
         if not site_type in self.site_names:
             return False
         if site_state_val is not None:
+            if type(site_state_val) != list:
+                site_state_val = list(site_state_val)
             # if asked, check that it has the desired site state
-            port_states = self.sites[site_type]["port_states"]
+            site_ind = self.site_names.index(site_type)
+            port_states = self.sites[site_ind]["port_states"]
             return (site_state_val == port_states)
         return True
+
+    def get_site_state(self, site_type):
+        if site_type not in self.site_names:
+            return None
+        site_ind = self.site_names.index(site_type)
+        site_state = self.sites[site_ind]["port_states"]
+        return site_state
 
     def get_sink(self, site_type):
         """
@@ -163,9 +178,12 @@ class KappaComplex:
         """
         Store complex as list of agent objects.
         """
+        n = 0
         for agent in self.comp:
-            agent_obj = KappaAgent(agent)
+            label = "%s_%d" %(agent["node_type"], n)
+            agent_obj = KappaAgent(agent, label=label)
             self.agents.append(agent_obj)
+            n += 1
 
     def __str__(self):
         agents_str = ",".join(map(str, self.agents))
@@ -218,6 +236,17 @@ class KappaComplex:
                 agents.append(agent)
         return agents
 
+    def get_sinks(self, agent):
+        """
+        Get all agents connected to given agent.
+        """
+        sinks = []
+        for site_name in agent.site_names:
+            sink = self.get_connected_agent(agent, site_name)
+            if sink is not None:
+                sinks.append(sink)
+        return sinks
+
     def get_connected_agent(self, agent, site_name):
         """
         Get all agents connected to agent_obj via the site 
@@ -251,27 +280,43 @@ class KappaSnapshot:
     """
     Kappa Snapshot object, parsed from json.
     """
-    def __init__(self, from_json=None, from_fname=None):
+    def __init__(self, from_json=None, from_fname=None, discard_json=True):
         if (not from_json) and (not from_fname):
             raise Exception("Need either JSON or filename.")
         self.fname = from_fname
+        self.discard_json = discard_json
         if from_json is None:
-            if not os.path.isfile(self.fname):
-                raise Exception("Cannot find snapshot file: %s" %(self.fname))
-            with open(self.fname) as file_in:
-                self.snapshot_str = file_in.read()
-            # read JSON snapshot from file (other formats not supported)
-            try:
-                self.snapshot_json = json.loads(self.snapshot_str)
-            except:
-                raise Exception("Is your snapshot in JSON format?")
+            self.snapshot_json = load_json_snap(self.fname)
         else:
             self.snapshot_json = from_json
         self.load_json()
         # make complexes
+        self.complexes = []
         self.load_complexes()
         # optional label
         self.label = ""
+        # order complexes by size
+        self.complexes = sorted(self.complexes, key=lambda c: c[1].size)
+
+    def get_complexes_by_size(self):
+        """
+        Get complexes by size (largest to smallest). Size here means
+        the number of agents.
+        """
+        return sorted(self.complexes, key=lambda c: c[1].size, reverse=True)
+
+    def get_complexes_by_abundance(self):
+        """
+        Get complexes by abundance (highest to lowest). Abundance here means copy number.
+        """
+        return sorted(self.complexes, key=lambda c: c[0], reverse=True)
+
+    def get_complexes_by_order(self, order_func):
+        """
+        Get complexes by user-defined ordering, as determined
+        by order_func.
+        """
+        return sorted(self.complexes, key=order_func)
             
     def load_json(self):
         self.snapshot_file = self.snapshot_json["snapshot_file"]
@@ -279,6 +324,14 @@ class KappaSnapshot:
         self.snapshot_time = self.snapshot_json["snapshot_time"]
         self.snapshot_agents = self.snapshot_json["snapshot_agents"]
         self.snapshot_tokens = self.snapshot_json["snapshot_tokens"]
+
+    def delete_raw_json(self):
+        """
+        Delete raw JSON to save space.
+        """
+        self.snapshot_agents = None
+        self.snapshot_tokens = None
+        self.snapshot_str = None
 
     def load_complexes(self, descending=True):
         """
@@ -293,14 +346,21 @@ class KappaSnapshot:
             self.complexes.append((complex_abundance, curr_complex))
         # sort complexes by abundance
         self.complexes.sort(key=lambda k: k[0], reverse=descending)
+        # after we've loaded complexes, delete raw JSON
+        if self.discard_json:
+            self.delete_raw_json()
         return self.complexes
 
-    def print_complexes(self, verbose=False):
+    def print_complexes(self, verbose=False, print_bonds=False):
         print("%d complexes in total" %(len(self.complexes)))
+        print("event %d" %(self.snapshot_event))
         for abundance, comp in self.complexes:
             agent_type_str = str(comp.get_agent_types())
             print("Complex(abundance=%d, size=%d, agent_types=%s)" \
                   %(abundance, comp.size, agent_type_str))
+            if print_bonds:
+                bonds_str = "-".join([agent.type for agent in comp.agents])
+                print(bonds_str)
             if verbose:
                 for agent in comp.agents:
                     print(" - agent: %s" %(str(agent)))
@@ -322,6 +382,72 @@ def get_chain_lens(complexes, agent_type):
         chain_len = count_chain_length(comp, agent_type)
         chain_lens.append(chain_lens)
     return chain_lens
+
+##
+## utilities for working with snapshot directories
+##
+def compress_with_gzip(fname, delete_original=True):
+    out_fname = None
+    with open(fname, "rb") as file_in:
+        out_fname = "%s.gz" %(fname)
+        with gzip.open(out_fname, "wb") as file_out:
+            shutil.copyfileobj(file_in, file_out)
+    if delete_original:
+        # delete original, uncompressed file if asked
+        os.unlink(fname)
+    return out_fname
+        
+def compress_snapshot_dir(dirname, snap_ext="json"):
+    if not os.path.isdir(dirname):
+        raise Exception("Cannot find directory %s" %(dirname))
+    snap_fnames = glob.glob(os.path.join(dirname, "*.%s" %(snap_ext)))
+    num_snaps = len(snap_fnames)
+    print("Compressing directory %s" %(dirname))
+    print("  - found %d files" %(num_snaps))
+    for snap_fname in snap_fnames:
+        compress_with_gzip(snap_fname)
+    print("compression complete.")
+
+def load_json_snap(snap_fname):
+    """
+    Load JSON snapshot file. Can be a plain JSON file (.json) or 
+    a compressed file (.json.gz).
+    """
+    if not os.path.isfile(snap_fname):
+        raise Exception("Cannot find snapshot file %s" %(snap_fname))
+    json_str = None
+    if snap_fname.endswith(".json.gz"):
+        # if it's compressed, uncompress first
+        with gzip.open(snap_fname, "rb") as file_in:
+            json_str = file_in.read()
+    else:
+        # read uncompressed file
+        with open(snap_fname, "r") as file_in:
+            json_str = file_in.read()
+    # return JSON object
+    snap_json = None
+    try:
+        snap_json = json.loads(json_str)
+    except:
+        raise Exception("Is your snapshot in JSON format?")
+    return snap_json
+
+def print_complexes(snap_fname, print_bonds=False):
+    if not os.path.isfile(snap_fname):
+        raise Exception("Cannot find snapshot file %s" %(snap_fname))
+    snap_obj = KappaSnapshot(from_fname=snap_fname)
+    snap_obj.print_complexes(print_bonds=print_bonds)
             
 if __name__ == "__main__":
-    pass
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-pc", "--print-complexes", type=str,
+                        help="Print complexes in snapshot (takes JSON filename).")
+    parser.add_argument("--compress-dir", type=str,
+                        help="Compress JSON snapshot files in given directory.")
+    args = parser.parse_args()
+    if args.print_complexes:
+        print_complexes(args.print_complexes)
+    if args.compress_dir:
+        compress_snapshot_dir(args.compress_dir)
+        
