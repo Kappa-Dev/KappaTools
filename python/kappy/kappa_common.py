@@ -11,6 +11,7 @@ from os import path, environ
 from time import sleep
 from datetime import datetime
 
+from .kappa_graph import KappaSnapshot
 
 if sys.version_info >= (3, 4):
     ABC = abc.ABC
@@ -405,7 +406,7 @@ class KappaApi(ABC):
         """
 
     @abc.abstractmethod
-    def simulation_snapshot(self, snapshot_id):
+    def simulation_snapshot(self, snapshot_id: str) -> KappaSnapshot :
         """
         Returns a given generated snapshot
         """

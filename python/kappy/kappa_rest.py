@@ -9,9 +9,10 @@ import json
 from os import path
 from requests import exceptions, request
 
-from kappy.kappa_common import KappaError, PlotLimit, KappaApi, File, \
+from .kappa_common import KappaError, PlotLimit, KappaApi, File, \
                                FileMetadata
 
+from .kappa_graph import KappaSnapshot
 
 @KappaApi._fix_docs
 class KappaRest(KappaApi):
@@ -171,8 +172,9 @@ class KappaRest(KappaApi):
         return self._get(self.in_project('simulation', 'snapshots'))
 
     def simulation_snapshot(self, snapshot_id):
-        return self._get(self.in_project('simulation', 'snapshots',
-                                         snapshot_id))
+        return KappaSnapshot.from_JSONDecoder(
+            self._get(self.in_project('simulation', 'snapshots',snapshot_id))
+        )
 
     def simulation_delete(self):
         return self._delete(self.in_project('simulation'))

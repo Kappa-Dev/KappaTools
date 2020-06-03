@@ -132,6 +132,34 @@ class _KappaClientTest(unittest.TestCase):
         self.assertEqual(351, len(last_status['series']))
         return
 
+    def test_export_snapshot(self):
+        print("Getting runtime...")
+        runtime = self.getRuntime()
+
+        model_file= "abc-cflow.ka"
+        print("Adding model file %s..." % model_file)
+        fpath = path.join(MODELS_DIR, model_file)
+        runtime.add_model_file(fpath)
+
+        print("Parse project...")
+        runtime.project_parse()
+
+        print("Start simulation...")
+        pause_condition = "[E] = 10005"
+        runtime.set_default_sim_param(0.1, pause_condition)
+        runtime.simulation_start()
+
+        print("Waiting for simulation to stop...")
+        simulation_info = runtime.wait_for_simulation_stop()
+
+        print("Check that expected snapshot had been generated...")
+        snap_name = "snap10.ka"
+        assert(snap_name in runtime.simulation_snapshots())
+
+        print(f"Snapshot is {runtime.simulation_snapshot(snap_name)}")
+
+        return
+
     def test_parsing_consistency(self):
         print("Getting runtime...")
         runtime = self.getRuntime()

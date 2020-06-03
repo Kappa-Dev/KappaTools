@@ -11,9 +11,10 @@ import json
 import os
 from io import DEFAULT_BUFFER_SIZE
 
-from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
+from .kappa_common import KappaError, PlotLimit, FileMetadata, File, \
                                KappaApi, KASIM_DIR, KAPPY_DIR
 
+from .kappa_graph import KappaSnapshot
 
 def find_agent_bin():
     agent_names = ['KappaSwitchman']
@@ -169,7 +170,9 @@ class KappaStd(KappaApi):
         return self._dispatch(["SimulationDetailPlot", parameter])
 
     def simulation_snapshot(self, snapshot_id):
-        return self._dispatch(["SimulationDetailSnapshot", snapshot_id])
+        return KappaSnapshot.from_JSONDecoder(
+            self._dispatch(["SimulationDetailSnapshot", snapshot_id])
+        )
 
     def simulation_info(self):
         return self._dispatch(["SimulationInfo"])
