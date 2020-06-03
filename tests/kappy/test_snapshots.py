@@ -9,6 +9,11 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class KappaSnapshotTest(unittest.TestCase):
 
+    def test_parse_string(self):
+        dimer = kappy.KappaComplex.from_string("A(y[_\n], a[1]{u}), B(b{# }[1] /*lool*/x{   p},y)")
+        assert(len(dimer) == 2)
+        return
+
     def test_parse_1d(self):
         with gzip.open(os.path.join(THIS_DIR,"snap_1d_polymers.json.gz")) as f:
             snap = kappy.KappaSnapshot.from_JSONDecoder(json.load(f))

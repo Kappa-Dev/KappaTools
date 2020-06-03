@@ -1,4 +1,13 @@
 from collections import abc
+import re
+
+ident_re =  r'[_~][a-zA-Z0-9_~+-]+|[a-zA-Z][a-zA-Z0-9_~+-]*'
+line_comment_re = r'//[^\n]*\n'
+non_nested_block_comment_re = r'/\*(?:[^*]*|\*+[^/])*\*/'
+whitespace_re = r'(?:' + line_comment_re + '|' + non_nested_block_comment_re + '|\s)+'
+
+class KappaSyntaxError(ValueError):
+    pass
 
 class KappaSite:
     """class for representing one site of a kappa agent (in a complex)"""
@@ -135,6 +144,50 @@ class KappaSite:
                           for x in raw_links ]
         return cls(links=links,internals=data[1]["port_states"])
 
+    @classmethod
+    def from_string_in_complex(cls, expression: str,
+                               position, dangling, completed):
+        # define patterns that make up a site
+        int_state_pat = \
+            r'(?: ?{ ?(' +ident_re+ r'|#) ?(?: ?(/ ?)(' +ident_re+ r') ?)?} ?)?'
+        bnd_state_pat = r' ?\[ ?(.|_|#|\d+) ?(?:(/ ?)(.|\d+) ?)?\] ?'
+        port_pat = r'^' + int_state_pat + bnd_state_pat + int_state_pat + r'$'
+        # parse assuming full site declaration, with bond state declared
+        g = re.match(port_pat, expression)
+        # if that fails, try parsing with bond state declared as a wildcard
+        if not g:
+            g = re.match(port_pat, expression + '[#]')
+        # if that fails, throw an error
+        if not g:
+            raise KappaSyntaxError('Invalid site declaration <'+expression+'>')
+        # figure out what type of bond operation is being performed
+        if g.group(4) == '.':
+            links = []
+        elif g.group(4) == '#':
+            links = None
+        elif g.group(4) == '_':
+            links = True
+        else:
+            link = int(g.group(4))
+            dst = dangling.pop(link,None)
+            if dst is None:
+                links = link
+                dangling[link] = position
+            else:
+                links = [ dst ]
+                completed[dst] = position
+        #if g.group(5): # if there's an operation
+        #    self._future_link = g.group(6)
+        # figure out what type of internal state operation is being performed
+        internals = None
+        if g.group(1) and not g.group(1) == '#':
+            internals = [ g.group(1) ]
+        #self._future_internal = g.group(3) if g.group(3) else ''
+        elif g.group(7) and not g.group(7) == '#':
+            internals = [ g.group(7) ]
+        #self._future_int_state = g.group(9) if g.group(9) else ''
+        return cls(links=links,internals=internals)
+
 class KappaAgent(abc.Sequence):
     """class for representing one kappa agent inside a complex
 
@@ -195,9 +248,51 @@ class KappaAgent(abc.Sequence):
         else:
             sites = dict([
                 x["site_name"],
-                KappaSite.from_JSONDecoder_in_complex(x["site_type"],complx,in_1d=in_1d)
+                KappaSite.from_JSONDecoder_in_complex(x["site_type"],
+                                                      complx, in_1d=in_1d)
             ] for x in data["node_sites"])
             return cls(data["node_type"],sites)
+
+    @classmethod
+    def from_string_in_complex(cls, expression: str,
+                               position, dangling, completed):
+        if re.match(r'^\.$', expression.strip()):
+            return None
+        else:
+            # Check if kappa expression's name & overall structure is valid
+            agent_name_pat = ident_re
+            agent_sign_pat = r'\(([^()]*)\)'
+            agent_oper_pat = r'(\+|-)?'
+            agent_pat = \
+                r'^(' +agent_name_pat+ r')' +agent_sign_pat+agent_oper_pat+ r'$'
+            matches = re.match(agent_pat, expression.strip())
+            if not matches:
+                matches = re.match(agent_pat, expression.strip() + '()')
+                if not matches:
+                    raise KappaSyntaxError('Invalid agent declaration <' +
+                                           expression + '>')
+
+            # process & assign to variables
+            agent_name = matches.group(1)
+            # process agent signature
+            ag_signature = matches.group(2)
+            if ag_signature == '':
+                site_list = []
+            else:
+                site_block_re = r'('+ident_re+')((?:\[[^\]]+\]|{[^}]+})+) ?,? ?'
+                site_list = re.finditer(site_block_re,ag_signature)
+            agent_signature = {}
+            for id, match in enumerate(site_list):
+                name=match.group(1)
+                site = KappaSite.from_string_in_complex(match.group(2),
+                                                        (position,name),
+                                                        dangling,
+                                                        completed)
+                agent_signature[name]=site
+            # process abundance operator, if present
+            #abundance_change = matches.group(3) if matches.group(3) else ''
+            return cls(agent_name,agent_signature)
+
 
 class KappaComplexIterator(abc.Iterator):
 
@@ -276,6 +371,7 @@ class KappaComplex(abc.Sequence):
 
     @classmethod
     def from_JSONDecoder(cls,data):
+        """ Build a KappaComplex from its JSON representation"""
         if len(data) > 0 and type(data[0]) is dict:
             return cls([ [
                 KappaAgent.from_JSONDecoder_in_complex(x,data,in_1d=True)
@@ -286,6 +382,35 @@ class KappaComplex(abc.Sequence):
                 KappaAgent.from_JSONDecoder_in_complex(x,data,in_1d=False)
                 for x in line
             ] for line in data ])
+
+    @classmethod
+    def from_string(cls,expression):
+        """Build a KappaComplex from its Kappa syntax"""
+        # remove comments, new_lines, multiple spaces
+        expression = re.sub(whitespace_re, ' ', expression)
+        # get the set of agents making up this complex
+        agent_name_pat = r' ?' + ident_re
+        agent_sign_pat = r' ?\([^()]*\)'
+        matches = re.findall(agent_name_pat+agent_sign_pat, expression.strip())
+        if len(matches) == 0:
+            raise KappaSyntaxError('Complex <' + self._raw_expression +
+                                   '> appears to have zero agents.')
+        agent_list = []
+        dangling = {}
+        completed = {}
+        for id, item in enumerate(matches):
+            agent = KappaAgent.from_string_in_complex(item,(0,id),
+                                                      dangling,
+                                                      completed)
+            agent_list.append(agent)
+        if len(dangling) is not 0:
+            raise KappaSyntaxError('Dangling link <' + str(dangling.popitem()) +
+                                   '> in complex <' + expression + '>.')
+        for (((col,row),si),dst) in completed.items():
+            site = agent_list[row][si]
+            agent_list[row]._sites[si] = KappaSite(links=[dst],
+                                                   internals=site.internal_states)
+        return cls([ agent_list ])
 
 class KappaSnapshot:
     """class for representing a kappa snapshot
