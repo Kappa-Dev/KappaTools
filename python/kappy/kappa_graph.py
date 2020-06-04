@@ -30,13 +30,30 @@ class KappaSite:
             else f"future_internal={self._future_internal!r}"
         )
 
+    @staticmethod
+    def __get_site_name(complx,x):
+        if type(x[0]) is list: ag = complx[x[0][0]][x[0][1]]
+        else: ag = complx[x[0]]
+        return ag["node_sites"][x[1]]["site_name"]
+
     @classmethod
-    def from_JSONDecoder(cls,data):
+    def from_JSONDecoder_in_complex(cls,data,complx,*,in_1d):
         if data[0] != "port":
             raise Exception("Can only handle port sites for now")
         raw_links = data[1]["port_links"]
         if type(raw_links) is not list: links = raw_links
-        else: links = [ (tuple(x[0]),x[1]) for x in raw_links ]
+        else:
+            if in_1d is None:
+                if len(raw_links) > 0 and type(raw_links[0][0]) is list:
+                    links = [ (tuple(x[0]),cls.__get_site_name(complx,x))
+                              for x in raw_links ]
+                else:
+                    links = [ ((0,x[0]),cls.__get_site_name(complx,x))
+                              for x in raw_links ]
+            else:
+                links = [ ((0,x[0]),cls.__get_site_name(complx,x)) if in_1d
+                          else (tuple(x[0]),cls.__get_site_name(complx,x))
+                          for x in raw_links ]
         return cls(links=links,internals=data[1]["port_states"])
 
 class KappaAgent:
@@ -53,11 +70,13 @@ class KappaAgent:
         )
 
     @classmethod
-    def from_JSONDecoder(cls,data):
+    def from_JSONDecoder_in_complex(cls,data,complx,*,in_1d):
         if data is None: return None
         else:
-            sites = dict([x["site_name"], KappaSite.from_JSONDecoder(x["site_type"])]
-                         for x in data["node_sites"])
+            sites = dict([
+                x["site_name"],
+                KappaSite.from_JSONDecoder_in_complex(x["site_type"],complx,in_1d=in_1d)
+            ] for x in data["node_sites"])
             return cls(data["node_type"],sites)
 
 class KappaComplex:
@@ -71,9 +90,16 @@ class KappaComplex:
 
     @classmethod
     def from_JSONDecoder(cls,data):
-        return cls([ [ KappaAgent.from_JSONDecoder(x) for x in line ]
-                     for line in data ])
-
+        if len(data) > 0 and type(data[0]) is dict:
+            return cls([ [
+                KappaAgent.from_JSONDecoder_in_complex(x,data,in_1d=True)
+                for x in data
+            ] ])
+        else:
+            return cls([ [
+                KappaAgent.from_JSONDecoder_in_complex(x,data,in_1d=False)
+                for x in line
+            ] for line in data ])
 
 class KappaSnapshot:
     """class for representing a kappa snapshot"""
