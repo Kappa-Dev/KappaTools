@@ -31,6 +31,52 @@ class KappaSite:
         )
 
     @staticmethod
+    def __str_link_in_complex(line, row, site, trailing, dst):
+        out = trailing.pop((((line,row),site),dst),None)
+        if out is None:
+            free = trailing[None]
+            trailing[(dst,((line,row),site))] = free
+            trailing[None] = free+1
+            return str(free)
+        else:
+            return str(out)
+
+    def __str_internals(self):
+        if self._internals is None:
+            if self._future_internal is None: out = ""
+            else: out = "{#/"+str(self._future_internal)+"}"
+            return out
+        elif len(self._internals) == 0:
+            assert(self._future_internal is None)
+            return ""
+        else:
+            head = "{"+ ", ".join(self._internals)
+            if self._future_internal is None: tail = "}"
+            else: tail = "/"+str(self._future_internal)+"}"
+            return head+tail
+
+    def _str_in_complex(self, line, row, site, trailing):
+        if self._future_link is None: mod = "]"
+        elif self._future_link is False: mod = "/.]"
+        else: mod = "/"+str(self.future_link)+"]"
+
+        if self._links is None:
+            if self._future_link is None: return self.__str_internals()
+            else: return "[#"+mod+self.__str_internals()
+        elif self._links is True: return "[_"+mod+self.__str_internals()
+        elif type(self._links) is list:
+            if len(self._links) == 0: return "[."+mod+self.__str_internals()
+            else:
+                links = ", ".join(
+                    [ self.__str_link_in_complex(line, row, site, trailing, x)
+                      for x in self._links ] )
+                return "["+links+mod+self.__str_internals()
+        else:
+            site = self._links["site_name"]
+            ag = self._links["agent_type"]
+            return "["+site+"."+ag+links+mod+self.__str_internals()
+
+    @staticmethod
     def __get_site_name(complx,x):
         if type(x[0]) is list: ag = complx[x[0][0]][x[0][1]]
         else: ag = complx[x[0]]
@@ -69,6 +115,11 @@ class KappaAgent:
             repr(self._sites)
         )
 
+    def _str_in_complex(self, line, row, trailing):
+        sites = [ n + s._str_in_complex(line, row, n, trailing)
+                  for (n , s) in self._sites.items() ]
+        return self._type + "(" + " ".join(sites) + ")"
+
     @classmethod
     def from_JSONDecoder_in_complex(cls,data,complx,*,in_1d):
         if data is None: return None
@@ -87,6 +138,14 @@ class KappaComplex:
 
     def __repr__(self):
         return "KappaComplex({})".format(repr(self._agents))
+
+    def __str__(self):
+        trailing = { None: 0 }
+        lines = [ [
+            "." if e is None else e._str_in_complex(l,r,trailing)
+            for (r,e) in enumerate(line)
+        ] for (l,line) in enumerate(self._agents) ]
+        return "\\ ".join(map(", ".join,lines))
 
     @classmethod
     def from_JSONDecoder(cls,data):
@@ -118,6 +177,17 @@ class KappaSnapshot:
             repr(self._complexes),
             repr(self._tokens)
         )
+
+    def __str__(self):
+        event = "// Snapshot [Event: {0:d}]\n".format(self._event)
+        time = '%def: "T0" "{0:f}"\n\n'.format(self._time)
+        complexes = "".join(
+            [ "%init: {0:d} {1}\n".format(n,c) for (n,c) in self._complexes ]
+        )
+        tokens = "".join(
+            [ "%init: {0:d} {1}\n".format(n,t) for (t,n) in self._tokens.items() ]
+        )
+        return event+time+complexes+tokens
 
     @classmethod
     def from_JSONDecoder(cls,data):
