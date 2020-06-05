@@ -107,6 +107,8 @@ class KappaAgent:
 
     [len] returns its number of sites.
 
+    [iter] returns an iterator over the tuple '(site_name : str, s : KappaSite)'
+
     Use 'self[site_name]' to get a site.
 """
 
@@ -125,6 +127,9 @@ class KappaAgent:
 
     def __getitem__(self,key : str):
         return self._sites[key]
+
+    def __iter__(self):
+        return iter(self._sites.items())
 
     def _str_in_complex(self, line, row, trailing):
         sites = [ n + s._str_in_complex(line, row, n, trailing)
