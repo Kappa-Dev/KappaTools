@@ -103,7 +103,12 @@ class KappaSite:
         return cls(links=links,internals=data[1]["port_states"])
 
 class KappaAgent:
-    """class for representing one kappa agent inside a complex"""
+    """class for representing one kappa agent inside a complex
+
+    [len] returns its number of sites.
+
+    Use 'self[site_name]' to get a site.
+"""
 
     def __init__(self, typ : str, sites : dict):
         self._type = typ
@@ -114,6 +119,12 @@ class KappaAgent:
             repr(self._type),
             repr(self._sites)
         )
+
+    def __len__(self):
+        return len(self._sites)
+
+    def __getitem__(self,key : str):
+        return self._sites[key]
 
     def _str_in_complex(self, line, row, trailing):
         sites = [ n + s._str_in_complex(line, row, n, trailing)
@@ -130,10 +141,44 @@ class KappaAgent:
             ] for x in data["node_sites"])
             return cls(data["node_type"],sites)
 
-class KappaComplex:
-    """class for representing a kappa connected component"""
+class KappaComplexIterator:
 
-    def __init__(self, agents : list):
+    def __init__(self, v, *, with_key):
+        self._with_key = with_key
+        self._line_iter = iter(v)
+        self._line = 0
+        self._row_iter = None
+
+    def __next__(self):
+        if self._row_iter is None:
+            self._row = 0
+            self._row_iter = iter(next(self._line_iter))
+        try:
+            o = next(self._row_iter)
+            self._row += 1
+            while o is None:
+                o = next(self._row_iter)
+                self._row += 1
+            return ((self._line,self._row),o) if self._with_key else o
+        except StopIteration:
+            self._line += 1
+            self._row_iter = None
+            self.__next__()
+
+class KappaComplex:
+    """Class for representing a Kappa connected component
+
+    The string representation is the corresponding Kappa code.
+
+    [len] returns its size (number of agent).
+
+    [iter] returns an iterator on the agents it contains. Use method
+ [items()] to get an iterator over the tuples (coordinate,agent).
+
+    Use 'self[coordinate]' to get the agent at 'coordinate'.
+    """
+
+    def __init__(self, agents):
         self._agents = agents
 
     def __repr__(self):
@@ -146,6 +191,24 @@ class KappaComplex:
             for (r,e) in enumerate(line)
         ] for (l,line) in enumerate(self._agents) ]
         return "\\ ".join(map(", ".join,lines))
+
+    def __getitem__(self,key):
+        if type(key) is tuple:
+            (l,r) = key
+            return self._agents[l][r]
+        else: return self._agents[0][key]
+
+    def __iter__(self):
+        return KappaComplexIterator(self._agents,with_key=False)
+
+    def __len__(self):
+        r = 0
+        for _ in self: r += 1
+        return r
+
+    def items(self):
+        """An iterator with coordinates"""
+        return KappaComplexIterator(self._agents,with_key=True)
 
     @classmethod
     def from_JSONDecoder(cls,data):
@@ -161,7 +224,10 @@ class KappaComplex:
             ] for line in data ])
 
 class KappaSnapshot:
-    """class for representing a kappa snapshot"""
+    """class for representing a kappa snapshot
+
+    The string representation is the corresponding Kappa code.
+    """
 
     def __init__(self, *, time : float, event : int,
                  complexes : list = [], tokens : dict = {}):
