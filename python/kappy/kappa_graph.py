@@ -1,5 +1,5 @@
 class KappaSite:
-    """class for representing one site of a kappa agent"""
+    """class for representing one site of a kappa agent (in a complex)"""
 
     def __init__(self,*,links=None,internals=None,
                  future_link=None,future_internal=None):
@@ -29,6 +29,35 @@ class KappaSite:
             "" if self._future_internal is None
             else f"future_internal={self._future_internal!r}"
         )
+
+    def get_internal_states(self):
+        return self._internals
+
+    def get_internal_state(self):
+        """return, if any, the internal state of the site when there can only
+be 1 by invarient (because it is a pattern/rule/snapshot/...)
+
+        return None if there is not.
+
+        """
+        if self._internals is None:
+            return None
+        elif len(self._internals) is 0:
+            return None
+        else:
+            assert len(self._internals) is 1
+            return self._internals[0]
+
+    def has_link(self):
+        """Linking state is neither free nor unspecified"""
+        return bool(self._links)
+
+    def neighbours_in_complex(self,complx):
+        """return the list of 'KappaAgent' connected to here in [complx]"""
+        if type(self._links) is list:
+            return [ complx[a] for (a,s) in self._links ]
+        else:
+            return []
 
     @staticmethod
     def __str_link_in_complex(line, row, site, trailing, dst):
@@ -130,6 +159,14 @@ class KappaAgent:
 
     def __iter__(self):
         return iter(self._sites.items())
+
+    def get_type(self) -> str:
+        """Get the type of the agent"""
+        return self._type
+
+    def get_neighbours_in_complex(self,complx):
+        """list the 'KappaAgent's connected here in [complx]"""
+        return [ el for (_,s) in self for el in s.neighbours_in_complex(complx) ]
 
     def _str_in_complex(self, line, row, trailing):
         sites = [ n + s._str_in_complex(line, row, n, trailing)
@@ -259,6 +296,50 @@ class KappaSnapshot:
             [ "%init: {0:d} {1}\n".format(n,t) for (t,n) in self._tokens.items() ]
         )
         return event+time+complexes+tokens
+
+    def get_time(self) -> float:
+        """Get the simulation time at which the snapshot was taken
+
+        """
+        return self._time
+
+    def get_event(self) -> float:
+        """Get after how many simulation event the snapshot was taken
+        """
+        return self._time
+
+    def get_complexes(self):
+        """Get the list of complexes. return a list of pairs '(abundance: int,
+        complex : KappaComplex)'
+
+        """
+        return self._complexes
+
+    def get_complexes_by_size(self):
+        """Get complexes by size (largest to smallest). Size here means the
+        number of agents.
+
+        """
+        return sorted(self._complexes, key=lambda c: len(c[1]), reverse=True)
+
+    def get_complexes_by_abundance(self):
+        """Get complexes by abundance (highest to lowest). Abundance here
+        means copy number.
+
+        """
+        return sorted(self._complexes, key=lambda c: c[0], reverse=True)
+
+    def get_tokens(self):
+        """Get the dictionnary of 'token : str -> abundance : int'
+
+        """
+        return self._tokens
+
+    def get_token_abundance(self,token : str):
+        """Get the abuance of 'token'
+
+        """
+        return self._tokens[token]
 
     @classmethod
     def from_JSONDecoder(cls,data):
