@@ -15,7 +15,7 @@ class KappaSnapshotTest(unittest.TestCase):
             # check repr
             re_entry = repr(snap)
             # get number of complexes
-            num_complexes = len(snap.get_complexes())
+            num_complexes = len(snap.complexes)
             assert(num_complexes == 10), "Expected 10 complexes in %s" %(fname)
             # get the most abundant complex, which should exist in 10 copies
             complexes_by_size = snap.get_complexes_by_size()

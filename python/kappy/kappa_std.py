@@ -37,9 +37,12 @@ class KappaStd(KappaApi):
 
     kappa_bin_path -- where to find kappa executables
         (None means use the binaries bundled in the package)
+
     delimiter -- What to use to delimit messages (must not appears in
         message body default '\\x1e')
+
     args -- arguments to pass to kappa executables
+
     """
     def __init__(self, kappa_bin_path=None, delimiter='\x1e', args=None):
         self.delimiter = delimiter
@@ -69,12 +72,12 @@ class KappaStd(KappaApi):
         self.message_id += 1
         return self.message_id
 
-    def read_stdout(self, agent_to_read):
-        """
-        Read from stdout of an agent. This function reads the
-        output in large chunks (the default buffer size) until it encounters
-        the delimiter. This is more efficient than reading the output
-        one character at a time.
+    def _read_stdout(self, agent_to_read):
+        """Read from stdout of an agent. This function reads the output in
+        large chunks (the default buffer size) until it encounters the
+        delimiter. This is more efficient than reading the output one
+        character at a time.
+
         """
         buff = bytearray()
         delim_val = self.delimiter.encode('utf-8')
@@ -94,7 +97,7 @@ class KappaStd(KappaApi):
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.switch_agent.stdin.write(message.encode('utf-8'))
             self.switch_agent.stdin.flush()
-            buff = self.read_stdout(self.switch_agent)
+            buff = self._read_stdout(self.switch_agent)
             response = json.loads(buff.decode('utf-8'))
             if isinstance(response,str):
                 raise KappaError(response)
@@ -112,7 +115,9 @@ class KappaStd(KappaApi):
     def shutdown(self):
         """Shut down kappa instance.
 
-        Given a key to a kappa service shutdown a running kappa instance.
+        Given a key to a kappa service shutdown a running kappa
+        instance.
+
         """
         if hasattr(self, 'switch_agent'):
             self.switch_agent.stdin.close()

@@ -1,3 +1,5 @@
+from collections import abc
+
 class KappaSite:
     """class for representing one site of a kappa agent (in a complex)"""
 
@@ -30,14 +32,14 @@ class KappaSite:
             else f"future_internal={self._future_internal!r}"
         )
 
-    def get_internal_states(self):
+    @property
+    def internal_states(self):
         return self._internals
 
     def get_internal_state(self):
-        """return, if any, the internal state of the site when there can only
-be 1 by invarient (because it is a pattern/rule/snapshot/...)
-
-        return None if there is not.
+        """:return: if any, the internal state of the site when there can only \
+        be 1 by invarient (because it is a pattern/rule/snapshot/...). \
+        None if there is not.
 
         """
         if self._internals is None:
@@ -53,7 +55,7 @@ be 1 by invarient (because it is a pattern/rule/snapshot/...)
         return bool(self._links)
 
     def neighbours_in_complex(self,complx):
-        """return the list of 'KappaAgent' connected to here in [complx]"""
+        """:return: the list of 'KappaAgent' connected to here in [complx]"""
         if type(self._links) is list:
             return [ complx[a] for (a,s) in self._links ]
         else:
@@ -131,7 +133,7 @@ be 1 by invarient (because it is a pattern/rule/snapshot/...)
                           for x in raw_links ]
         return cls(links=links,internals=data[1]["port_states"])
 
-class KappaAgent:
+class KappaAgent(abc.Sequence):
     """class for representing one kappa agent inside a complex
 
     [len] returns its number of sites.
@@ -183,7 +185,7 @@ class KappaAgent:
             ] for x in data["node_sites"])
             return cls(data["node_type"],sites)
 
-class KappaComplexIterator:
+class KappaComplexIterator(abc.Iterator):
 
     def __init__(self, v, *, with_key):
         self._with_key = with_key
@@ -207,7 +209,7 @@ class KappaComplexIterator:
             self._row_iter = None
             self.__next__()
 
-class KappaComplex:
+class KappaComplex(abc.Sequence):
     """Class for representing a Kappa connected component
 
     The string representation is the corresponding Kappa code.
@@ -215,9 +217,10 @@ class KappaComplex:
     [len] returns its size (number of agent).
 
     [iter] returns an iterator on the agents it contains. Use method
- [items()] to get an iterator over the tuples (coordinate,agent).
+    [items()] to get an iterator over the tuples (coordinate,agent).
 
     Use 'self[coordinate]' to get the agent at 'coordinate'.
+
     """
 
     def __init__(self, agents):
@@ -297,18 +300,22 @@ class KappaSnapshot:
         )
         return event+time+complexes+tokens
 
-    def get_time(self) -> float:
+    @property
+    def time(self) -> float:
         """Get the simulation time at which the snapshot was taken
 
         """
         return self._time
 
-    def get_event(self) -> float:
+    @property
+    def event(self) -> float:
         """Get after how many simulation event the snapshot was taken
+
         """
         return self._time
 
-    def get_complexes(self):
+    @property
+    def complexes(self):
         """Get the list of complexes. return a list of pairs '(abundance: int,
         complex : KappaComplex)'
 
@@ -329,7 +336,8 @@ class KappaSnapshot:
         """
         return sorted(self._complexes, key=lambda c: c[0], reverse=True)
 
-    def get_tokens(self):
+    @property
+    def tokens(self):
         """Get the dictionnary of 'token : str -> abundance : int'
 
         """

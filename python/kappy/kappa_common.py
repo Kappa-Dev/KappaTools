@@ -32,18 +32,14 @@ class FileMetadata(object):
     form FileMetaData(**metadata). If so, the dict must have arguments
     matching those below, including at least 'id' and 'position'.
 
-    Init
-    ----
-    id -- The id of corresponding file.
-    position -- where the file should be inserted in the middle of the
-        other files of the model.
-        When you add a file at position 'i' in a model that contains 'k >= i'
-        files, the new file is indeed at position 'i' and all the files at
-        position 'j>=i' are pushed at position 'j+1'.
+    :param id: The id of corresponding file.
 
-    Methods
-    -------
-    toJSON -- get a json (dict) representation of this data.
+    :position: where the file should be inserted in the middle of the
+        other files of the model.  When you add a file at position 'i'
+        in a model that contains 'k >= i' files, the new file is
+        indeed at position 'i' and all the files at position 'j>=i'
+        are pushed at position 'j+1'.
+
     """
 
     def __init__(self, id, position):
@@ -65,21 +61,9 @@ class FileMetadata(object):
 class File(object):
     """An object that represents a kappa file.
 
-    Init
-    ----
-    metadata -- this may be either a dict with keys matching the inits of
+    :param metadata: this may be either a dict with keys matching the inits of
         FileMetadata, or an existing FileMetadata object.
-    content -- The content of the file.
-
-    Class Methods
-    -------------
-    from_string -- get a file object from a string.
-
-    Methods
-    -------
-    get_id -- get the id of the file from the metadata.
-    get_position -- get the position of the file from the metadata.
-    get_content -- get the content of the file.
+    :param content: The content of the file.
     """
 
     def __init__(self, metadata, content):
@@ -96,18 +80,17 @@ class File(object):
 
     @classmethod
     def from_string(cls, content, position=1, file_id=None):
-        """
-        Convenience method to create a file from a string.
+        """Convenience method to create a file from a string.
 
         This file object's metadata will have the id 'inlined_input'.
 
-        Inputs
-        ------
-        content -- the content of the file (a string).
-        position -- (default 1) rank among all files of the model while parsing
+        :param content: the content of the file (a string).
+
+        :param position: rank among all files of the model while parsing
             see FileMetadata
-        file_id -- (default 'inlined_input') the file_id that will be used by
-            kappa.
+
+        :param file_id: the file_id that will be used by kappa.
+
         """
         if file_id is None:
             file_id = 'inlined_input'
@@ -115,15 +98,16 @@ class File(object):
 
     @classmethod
     def from_file(cls, fpath, position=1, file_id=None):
-        """
-        Convience method to create a kappa file object from a file on disk
+        """Convience method to create a kappa file object from a file on disk
 
-        Inputs
-        ------
-        fpath -- path to the file on disk
-        position -- (default 1) rank among all files of the model while parsing
-            see FileMetadata
-        file_id -- (default = fpath) the file_id that will be used by kappa.
+        :param fpath: path to the file on disk
+
+        :param position: (default 1) rank among all files of the model
+            while parsing see FileMetadata
+
+        :param file_id: (default = fpath) the file_id that will be
+        used by kappa.
+
         """
         if file_id is None:
             file_id = fpath
@@ -149,20 +133,23 @@ class File(object):
 class SimulationParameter(object):
     """Parameters needed to run a simulation
 
-    Init
-    ----
-    plot_period -- (float) How often values of observables should be computed
-        during the simulation
-    pause_condition -- (string representing a boolean kappa expression)
-        When the simulation will stop itself and wait for further actions.
-    seed -- (int optionnal) specify the seed of the random number generator
-        used by the simulator
-    store_trace -- (boolean) Because simulation traces become huge, you must
-       specify before starting a simulation whether you may query it later
+    :param plot_period: How often values of observables should be
+        computed during the simulation
+
+    :param pause_condition: (a boolean kappa expression) When the
+        simulation will stop itself and wait for further actions.
+
+    :param seed: specify the seed
+        of the random number generator used by the simulator
+
+    :param store_trace: Because simulation traces become huge, you
+        must specify before starting a simulation whether you may
+        query it later
+
     """
 
-    def __init__(self, plot_period, pause_condition, seed=None,
-                 store_trace=False):
+    def __init__(self, plot_period : float, pause_condition : str,
+                 seed : int = None, store_trace : bool =False):
         self.plot_period = plot_period
         self.pause_condition = pause_condition
         self.seed = seed
@@ -178,13 +165,12 @@ class SimulationParameter(object):
 class PlotLimit(object):
     """Parameters of plot query
 
-
-    Init
-    ----
-    points -- maximum number of column that the reply should
+    :param points: maximum number of column that the reply should \
        contains. (None means unlimited)
-    offset -- At what column number the reply should start
-       (None means return the end of the simulation)
+
+    :param offset: At what column number the reply should start \
+    (None means return the end of the simulation)
+
     """
 
     def __init__(self, offset=None, points=None):
@@ -228,8 +214,9 @@ class KappaApi(ABC):
     def _fix_docs(this_abc, child_class):
         """Make api method docs inheritted.
 
-        Specifically, insepect.getdoc will return values inheritted from this
-        abc for standardized api methods.
+        Specifically, insepect.getdoc will return values inheritted
+        from this abc for standardized api methods.
+
         """
         # After python 3.5, this is basically handled automatically
         if sys.version_info >= (3, 5):
@@ -276,6 +263,7 @@ class KappaApi(ABC):
 
         The parameters you specify will be used by default in simulations run
         by this client.
+
         """
         if len(args) is 1 and isinstance(args[0], SimulationParameter):
             self.__default_param = args[0]
@@ -303,6 +291,7 @@ class KappaApi(ABC):
         """Block until the simulation is done or timeout seconds exceeded.
 
         If the simulation stops before timeout, siminfo is returned.
+
         """
         start = datetime.now()
         while self.get_is_sim_running():
@@ -321,185 +310,172 @@ class KappaApi(ABC):
 
     @abc.abstractmethod
     def project_overwrite(self, ast, file_id="model.ka"):
-        """
-        Overwrite the project with the given AST
+        """Overwrite the project with the given AST
 
-        ast -- the ast in the format returned by project_parse
-        file_id -- a virtual file name in which the ast will be dump
+        :param ast: the ast in the format returned by project_parse
+
+        :param str file_id: a virtual file name in which the ast will be dump
+
         """
 
     @abc.abstractmethod
     def project_parse(self, **kwargs):
-        """
-        Parses the project
+        """Parses the project
 
-        kwargs -- list of algebraic variables to overwrite
-        Each element has the form variable_name=numerical_val
+        :param kwargs: list of algebraic variables to overwrite
+           Each element has the form variable_name=numerical_val
+
         """
 
     @abc.abstractmethod
     def file_create(self, file_object):
-        """
-        Add a file to the project
+        """Add a file to the project
 
-        file_object -- a Kappa_common.File
+        :param file_object: a Kappa_common.File
+
         """
 
     @abc.abstractmethod
     def file_delete(self, file_id):
-        """
-        Remove a file from the project
-        """
+        """Remove a file from the project"""
 
     @abc.abstractmethod
     def file_get(self, file_id):
-        """
-        Returns file file_id stored in the project
-        """
+        """Returns file file_id stored in the project"""
 
     @abc.abstractmethod
     def file_info(self):
-        """
-        Lists the files of the project (returns a FileMetadata array)
+        """Lists the files of the project (returns a FileMetadata array)
+
         """
 
     @abc.abstractmethod
     def simulation_delete(self):
-        """
-        Deletes running/paused simulation
+        """Deletes running/paused simulation
+
         """
 
     @abc.abstractmethod
     def simulation_file_line(self, file_line_id):
-        """
-        Returns the file file_line_id generated by $PRINT interventions
+        """Returns the file file_line_id generated by $PRINT interventions
+
         """
 
     @abc.abstractmethod
     def simulation_DIN(self, DIN_id):
-        """
-        Returns a given generated DIN
+        """Returns a given generated DIN
+
         """
 
     @abc.abstractmethod
     def simulation_log_messages(self):
-        """
-        Returns simulation log
+        """Returns simulation log
+
         """
 
     @abc.abstractmethod
     def simulation_plot(self, limit=None):
-        """
-        Returns the plot data of the simulation
+        """Returns the plot data of the simulation
 
         Note: No actual plot is produced as a result of this function call.
 
-        Inputs
-        ------
-        limit -- optionnal boundaries to only get a subplot
-        format: { offset : 100, nb_points : 500 }
-        returns the last points if offset is Null
+        :param limit: optionnal boundaries to only get a subplot
+        :param format: { offset : 100, nb_points : 500 }
+            returns the last points if offset is Null
 
-        Returns
-        -------
-        simulation_results -- a json containing the data from the simulation.
+        :returns: simulation_results -- a json containing the data from the simulation.
+
         """
 
     @abc.abstractmethod
     def simulation_snapshot(self, snapshot_id: str) -> KappaSnapshot :
-        """
-        Returns a given generated snapshot
+        """Returns a given generated snapshot
+
         """
 
     @abc.abstractmethod
     def simulation_info(self):
-        """
-        Returns state and progress of the simulation
+        """Returns state and progress of the simulation
+
         """
 
     @abc.abstractmethod
     def simulation_info_file_line(self):
-        """
-        Lists files generated by $PRINT during the simulation
+        """Lists files generated by $PRINT during the simulation
+
         """
 
     @abc.abstractmethod
     def simulation_DINs(self):
-        """
-        Lists DIN generated during the simulation
+        """Lists DIN generated during the simulation
+
         """
 
     @abc.abstractmethod
     def simulation_snapshots(self):
-        """
-        Lists snapshots generated during the simulation
+        """Lists snapshots generated during the simulation
+
         """
 
     @abc.abstractmethod
     def simulation_pause(self):
-        """
-        Pauses a simulation
+        """Pauses a simulation
+
         """
 
     @abc.abstractmethod
     def simulation_intervention(self, intervention_code):
-        """
-        Fires a intervention in a paused simulation
+        """Fires a intervention in a paused simulation
+
         """
 
     @abc.abstractmethod
     def simulation_start(self, simulation_parameter=None):
         """Start the simulation from the last parsed model.
 
-        Inputs
-        ------
-        simulation_parameter -- (optional) a kappa_common.SimulationParameter
+        :param simulation_parameter: a kappa_common.SimulationParameter
             instance. The default is set using the `set_default_sim_param`
             method.
         """
 
     @abc.abstractmethod
     def simulation_continue(self, pause_condition):
-        """
-        Restarts a paused simulation
+        """Restarts a paused simulation
+
         """
 
     @abc.abstractmethod
     def analyses_dead_rules(self):
-        """
-        Returns the dead rules of the last parsed model
+        """Returns the dead rules of the last parsed model
+
         """
 
     @abc.abstractmethod
     def analyses_constraints_list(self):
-        """
-        Returns a bunch of invarients on the last parsed model
+        """Returns a bunch of invarients on the last parsed model
+
         """
 
     @abc.abstractmethod
     def analyses_contact_map(self, accuracy=None):
-        """
-        Returns the contact of the last parsed model
+        """Returns the contact of the last parsed model
 
-        Input
-        -----
-        accuracy -- \"high\" means take into account reachability from
-           initial state. \"low\" means don't.
+        :param str accuracy: \"high\" means take into account
+           reachability from initial state. \"low\" means don't.
+
         """
 
     @abc.abstractmethod
     def analyses_influence_map(self, accuracy=None):
-        """
-        Returns the influence_map of the last parsed model
+        """Returns the influence_map of the last parsed model
 
-        Input
-        -----
-        accuracy -- level can be \"low\", \"medium\", \"high\" or \"full\".
-            Default is medium.
+        :param str accuracy: level can be \"low\", \"medium\",
+            \"high\" or \"full\".  Default is medium.
+
         """
 
     @abc.abstractmethod
     def analyses_potential_polymers(self):
-        """
-        Returns the list of potential polymers of the last parsed model
+        """Returns the list of potential polymers of the last parsed model
+
         """
