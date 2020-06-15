@@ -37,7 +37,7 @@ class KappaSite:
         return self._internals
 
     def get_internal_state(self):
-        """:return: if any, the internal state of the site when there can only \
+        """:returns: if any, the internal state of the site when there can only \
         be 1 by invarient (because it is a pattern/rule/snapshot/...). \
         None if there is not.
 
@@ -51,11 +51,13 @@ class KappaSite:
             return self._internals[0]
 
     def has_link(self):
-        """Linking state is neither free nor unspecified"""
+        """Is linking state neither free nor unspecified?"""
         return bool(self._links)
 
     def neighbours_in_complex(self,complx):
-        """:return: the list of 'KappaAgent' connected to here in [complx]"""
+        """:returns: the list of ``KappaAgent`` connected to here in ``complx``
+
+        """
         if type(self._links) is list:
             return [ complx[a] for (a,s) in self._links ]
         else:
@@ -136,12 +138,14 @@ class KappaSite:
 class KappaAgent(abc.Sequence):
     """class for representing one kappa agent inside a complex
 
-    [len] returns its number of sites.
+    ``abc.Sized``: ``len`` returns its number of sites.
 
-    [iter] returns an iterator over the tuple '(site_name : str, s : KappaSite)'
+    ``abc.Iterable``: ``iter`` returns an iterator over the tuple
+    ``(site_name : str, s : KappaSite)``
 
-    Use 'self[site_name]' to get a site.
-"""
+    Use ``self[site_name]`` to get a site.
+
+    """
 
     def __init__(self, typ : str, sites : dict):
         self._type = typ
@@ -167,7 +171,16 @@ class KappaAgent(abc.Sequence):
         return self._type
 
     def get_neighbours_in_complex(self,complx):
-        """list the 'KappaAgent's connected here in [complx]"""
+        """Destination of the edges.
+
+        :param KappaComplex complx: Complex ``self`` is part of
+
+        :returns: list of ``KappaAgent``
+
+        .. warning::
+          potential duplicates and self listing.
+
+        """
         return [ el for (_,s) in self for el in s.neighbours_in_complex(complx) ]
 
     def _str_in_complex(self, line, row, trailing):
@@ -214,12 +227,13 @@ class KappaComplex(abc.Sequence):
 
     The string representation is the corresponding Kappa code.
 
-    [len] returns its size (number of agent).
+    ``abc.Sized``: ``len`` returns the number of agent (the size).
 
-    [iter] returns an iterator on the agents it contains. Use method
-    [items()] to get an iterator over the tuples (coordinate,agent).
+    ``abc.Iterable``: ``iter`` returns an iterator on the agents it
+    contains. Use method ``items()`` to get an iterator over the
+    tuples ``(coordinate,agent)``.
 
-    Use 'self[coordinate]' to get the agent at 'coordinate'.
+    Use ``self[coordinate]`` to get the agent at ``coordinate``.
 
     """
 
@@ -316,35 +330,90 @@ class KappaSnapshot:
 
     @property
     def complexes(self):
-        """Get the list of complexes. return a list of pairs '(abundance: int,
-        complex : KappaComplex)'
+        """Get the list of complexes.
+
+        :returns: a list of pairs ``(abundance: int, complex : KappaComplex)``
 
         """
         return self._complexes
 
     def get_complexes_by_size(self):
-        """Get complexes by size (largest to smallest). Size here means the
+        """Get complexes by size. Size here means the
         number of agents.
 
+        :returns dict: ``size -> list_of_pair_abundance_complexes_of_that_size``
+
         """
-        return sorted(self._complexes, key=lambda c: len(c[1]), reverse=True)
+        out = {}
+        for (abundance,complx) in self._complexes:
+            size = len(complx)
+            out.setdefault(size,[]).append((abundance,complx))
+        return out
 
     def get_complexes_by_abundance(self):
-        """Get complexes by abundance (highest to lowest). Abundance here
+        """Get complexes by abundance. Abundance here
         means copy number.
 
+        :returns dict: ``abundance -> list_of_complexes_that_abundant``
+
         """
-        return sorted(self._complexes, key=lambda c: c[0], reverse=True)
+        out = {}
+        for (abundance,complx) in self._complexes:
+            out.setdefault(abundance,[]).append(complx)
+        return out
+
+    def get_largest_complexes(self):
+        """Returns a list of the largest KappaComplexes with their
+        abundance.
+
+        """
+        return (max(self.get_complexes_by_size().items(),
+                    key=lambda c: c[0]))
+
+    def get_smallest_complexes(self):
+        """Returns a list of the smallest KappaComplexeswith their
+        adundance.
+
+        """
+        return (min(self.get_complexes_by_size().items(),
+                    key=lambda c: c[0]))
+
+    def get_most_abundant_complexes(self):
+        """Returns a list of the most abundant KappaComplexes."""
+        return (max(self.get_complexes_by_abundance().items(),
+                    key=lambda c: c[0]))
+
+    def get_least_abundant_complexes(self):
+        """Returns a list of the least abundant KappaComplexes."""
+        return (min(self.get_complexes_by_abundance().items(),
+                    key=lambda c: c[0]))
+
+    def get_size_distribution(self):
+        """:returns dict: ``size : int -> number_of_complexes_of_that_size``
+
+        """
+        out = {}
+        for (abundance,complx) in self._complexes:
+            size = len(complx)
+            out[size] = out.get(size,0) + abundance
+        return out
+
+    def get_total_mass(self):
+        """Get the total number of agents"""
+        out = 0
+        for (abundance,complx) in self._complexes:
+            out += abundance * len(complx)
+        return out
 
     @property
     def tokens(self):
-        """Get the dictionnary of 'token : str -> abundance : int'
+        """Get the dictionnary ``token : str -> abundance : int``
 
         """
         return self._tokens
 
     def get_token_abundance(self,token : str):
-        """Get the abuance of 'token'
+        """Get the abundance of ``token``
 
         """
         return self._tokens[token]
