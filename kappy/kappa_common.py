@@ -34,7 +34,7 @@ class FileMetadata(object):
 
     :param id: The id of corresponding file.
 
-    :position: where the file should be inserted in the middle of the
+    :param position: where the file should be inserted in the middle of the
         other files of the model.  When you add a file at position 'i'
         in a model that contains 'k >= i' files, the new file is
         indeed at position 'i' and all the files at position 'j>=i'

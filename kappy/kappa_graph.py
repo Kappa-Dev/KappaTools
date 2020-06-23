@@ -36,7 +36,7 @@ class KappaSite:
     def internal_states(self):
         return self._internals
 
-    def get_internal_state(self):
+    def get_internal_state(self) -> str:
         """:returns: if any, the internal state of the site when there can only \
         be 1 by invarient (because it is a pattern/rule/snapshot/...). \
         None if there is not.
@@ -50,8 +50,8 @@ class KappaSite:
             assert len(self._internals) is 1
             return self._internals[0]
 
-    def has_link(self):
-        """Is linking state neither free nor unspecified?"""
+    def has_link(self) -> bool:
+        """:returns: whether the link state is neither free nor unspecified?"""
         return bool(self._links)
 
     def neighbours_in_complex(self,complx):
@@ -167,7 +167,7 @@ class KappaAgent(abc.Sequence):
         return iter(self._sites.items())
 
     def get_type(self) -> str:
-        """Get the type of the agent"""
+        """::returns: the type of the agent"""
         return self._type
 
     def get_neighbours_in_complex(self,complx):
@@ -228,13 +228,14 @@ class KappaComplex(abc.Sequence):
 
     The string representation is the corresponding Kappa code.
 
-    ``abc.Sized``: ``len`` returns the number of agent (the size).
+    ``abc.Sized``: ``len`` returns the number of agents in the complex
+    (the size).
 
     ``abc.Iterable``: ``iter`` returns an iterator on the agents it
     contains. Use method ``items()`` to get an iterator over the
-    tuples ``(coordinate,agent)``.
+    tuples ``(coordinates,agent)``.
 
-    Use ``self[coordinate]`` to get the agent at ``coordinate``.
+    Use ``self[coordinates]`` to get the agent at ``coordinates``.
 
     """
 
@@ -267,7 +268,10 @@ class KappaComplex(abc.Sequence):
         return r
 
     def items(self):
-        """An iterator with coordinates"""
+        """
+        :returns: an Iterator where the items are turples (coordinates,agent)
+
+        """
         return KappaComplexIterator(self._agents,with_key=True)
 
     @classmethod
@@ -339,10 +343,9 @@ class KappaSnapshot:
         return self._complexes
 
     def get_complexes_by_size(self):
-        """Get complexes by size. Size here means the
-        number of agents.
+        """Get complexes by size. Size here means the number of agents.
 
-        :returns dict: ``size -> list_of_pair_abundance_complexes_of_that_size``
+        :returns: dict ``size -> list_of_pair_abundance_complexes_of_that_size``
 
         """
         out = {}
@@ -352,10 +355,9 @@ class KappaSnapshot:
         return out
 
     def get_complexes_by_abundance(self):
-        """Get complexes by abundance. Abundance here
-        means copy number.
+        """Get complexes by abundance. Abundance here means copy number.
 
-        :returns dict: ``abundance -> list_of_complexes_that_abundant``
+        :returns: dict ``abundance -> list_of_complexes_that_abundant``
 
         """
         out = {}
@@ -364,33 +366,31 @@ class KappaSnapshot:
         return out
 
     def get_largest_complexes(self):
-        """Returns a list of the largest KappaComplexes with their
-        abundance.
+        """:returns: list of the largest KappaComplexes with their abundance.
 
         """
         return (max(self.get_complexes_by_size().items(),
                     key=lambda c: c[0]))
 
     def get_smallest_complexes(self):
-        """Returns a list of the smallest KappaComplexeswith their
-        adundance.
+        """:returns: list of the smallest KappaComplexes with their adundance.
 
         """
         return (min(self.get_complexes_by_size().items(),
                     key=lambda c: c[0]))
 
     def get_most_abundant_complexes(self):
-        """Returns a list of the most abundant KappaComplexes."""
+        """:returns: list of the most abundant KappaComplexes."""
         return (max(self.get_complexes_by_abundance().items(),
                     key=lambda c: c[0]))
 
     def get_least_abundant_complexes(self):
-        """Returns a list of the least abundant KappaComplexes."""
+        """:returns: list of the least abundant KappaComplexes."""
         return (min(self.get_complexes_by_abundance().items(),
                     key=lambda c: c[0]))
 
     def get_size_distribution(self):
-        """:returns dict: ``size : int -> number_of_complexes_of_that_size``
+        """:returns: dict ``size : int -> number_of_complexes_of_that_size``
 
         """
         out = {}
@@ -399,7 +399,7 @@ class KappaSnapshot:
             out[size] = out.get(size,0) + abundance
         return out
 
-    def get_total_mass(self):
+    def get_total_mass(self) -> int:
         """Get the total number of agents"""
         out = 0
         for (abundance,complx) in self._complexes:
@@ -413,7 +413,7 @@ class KappaSnapshot:
         """
         return self._tokens
 
-    def get_token_abundance(self,token : str):
+    def get_token_abundance(self,token : str) -> int:
         """Get the abundance of ``token``
 
         """

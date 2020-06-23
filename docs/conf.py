@@ -2,7 +2,7 @@ import sys
 
 extensions = ["sphinx.ext.autodoc","sphinx.ext.mathjax"]
 
-sys.path.append("python")
+sys.path.append(".")
 
 master_doc = "index"
 
