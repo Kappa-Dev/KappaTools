@@ -5,5 +5,5 @@
 
 (rule
     (targets git_version.ml)
-    (deps ../dev/get-git-version.ml)
+    (deps ../../dev/get-git-version.ml)
     (action (with-stdout-to %{targets} (run ocaml unix.cma %{deps}))))

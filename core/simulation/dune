@@ -9,5 +9,5 @@
 
 (rule
  (targets resource_strings.ml)
- (deps ../dev/generate-string.sh ../shared/flux.js ../viz/common.js)
+ (deps ../../dev/generate-string.sh ../../shared/flux.js ../../viz/common.js)
  (action (with-stdout-to %{targets} (run ocaml %{deps}))))
