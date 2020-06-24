@@ -15,10 +15,10 @@ SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)
 SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness) $(MANGENREP)version.tex
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
-RESOURCES_HTML=$(wildcard shared/*.js) $(wildcard viz/*.js) $(wildcard viz/*.css) js/favicon.ico js/package.json
+RESOURCES_HTML=$(wildcard shared/*.js) $(wildcard viz/*.js) $(wildcard viz/*.css) gui/favicon.ico gui/package.json
 
 APP_EXT?=cdn
-INDEX_HTML=js/use-$(APP_EXT).html
+INDEX_HTML=gui/use-$(APP_EXT).html
 ifeq ($(APP_EXT),local)
 SITE_EXTRAS= site/external site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist site/external/codemirror-$(CODEMIRROR_VERSION) site/external/dagre-d3 site/external/d3 site/external/jquery
 else
@@ -39,7 +39,7 @@ $(MANGENREP)version.tex: $(MANREP)version.tex.skel $(wildcard .git/refs/heads/*)
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-ide/Info.plist: ide/Info.plist.skel $(wildcard .git/refs/heads/*)
+gui/Info.plist: gui/Info.plist.skel $(wildcard .git/refs/heads/*)
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
@@ -78,7 +78,7 @@ site/external/jquery: externals.mk
 %.bc.js: $(filter-out _build/,$(wildcard */*.ml*))
 	dune build $@
 
-site/%.js: _build/default/js/%.bc.js site
+site/%.js: _build/default/gui/%.bc.js site
 	sed 's/.process.argv.length>0/.process.argv.length>1/' $< > $@
 
 site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/KaSimWorker.js  site/KaSaWorker.js site/KaStorWorker.js site/KaMoHaWorker.js
@@ -123,8 +123,8 @@ agents:
 	dune build --only-packages kappa-library,kappa-agents
 
 clean_ide:
-	rm -rf ide/Kappa.iconset
-	rm -f ide/Kappa.icns ide/Info.plist
+	rm -rf gui/Kappa.iconset
+	rm -f gui/Kappa.icns gui/Info.plist
 	rm -rf Kappapp.app Kappapp.app.zip
 	rm -rf KappaBin KappaBin.zip Kappapp Kappapp.tar.gz
 	rm -rf site
@@ -192,11 +192,11 @@ KappaBin.zip:
 	zip -y -r $@ KappaBin
 	rm -r KappaBin
 
-Kappapp.app: ide/Info.plist ide/Kappa.icns
+Kappapp.app: gui/Info.plist gui/Kappa.icns
 	+$(MAKE) clean
 	+$(MAKE) APP_EXT=local site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
-	+$(MAKE) ide/Kappa.icns ide/Info.plist
+	+$(MAKE) gui/Kappa.icns gui/Info.plist
 	FILE=$$(mktemp -t electronXXXX); FOLDER=$$(mktemp -t electron_unzipedXXXX); \
 	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-darwin-x64.zip && \
 	rm $$FOLDER && mkdir -p $$FOLDER && pushd $$FOLDER && unzip $$FILE && popd && mv $$FOLDER/Electron.app $@ && rm -r $$FOLDER
@@ -204,10 +204,10 @@ Kappapp.app: ide/Info.plist ide/Kappa.icns
 	mkdir $@/Contents/Resources/bin
 	cp bin/* $@/Contents/Resources/bin/
 	mv site $@/Contents/Resources/app/
-	mv ide/Kappa.icns $@/Contents/Resources/
-	mv ide/Info.plist $@/Contents/
+	mv gui/Kappa.icns $@/Contents/Resources/
+	mv gui/Info.plist $@/Contents/
 
-ide/Kappa.iconset: ide/Kappa-Logo.png
+gui/Kappa.iconset: gui/Kappa-Logo.png
 	rm -rf $@ && mkdir $@
 	sips -z 16 16     $< --out $@/icon_16x16.png
 	sips -z 32 32     $< --out $@/icon_16x16@2x.png
@@ -220,5 +220,5 @@ ide/Kappa.iconset: ide/Kappa-Logo.png
 	sips -z 512 512   $< --out $@/icon_512x512.png
 	cp $< $@/icon_512x512@2x.png
 
-ide/Kappa.icns: ide/Kappa.iconset
+gui/Kappa.icns: gui/Kappa.iconset
 	iconutil -c icns $<
