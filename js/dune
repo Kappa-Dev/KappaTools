@@ -2,13 +2,16 @@
  (name kappa_js_lib)
  (modules Common)
  (libraries js_of_ocaml-lwt)
+ (preprocess (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w @a
         -open Js_of_ocaml))
 
 (executable
  (name KaSimWorker)
+ (modes js)
  (modules KaSimWorker)
  (libraries kappa_js_lib kappa_json_api)
+ (preprocess (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w @a
         -open Js_of_ocaml
         -open Kappa_js_lib
@@ -16,8 +19,10 @@
 
 (executable
  (name KaSaWorker)
+ (modes js)
  (modules KaSaWorker)
  (libraries kappa_js_lib kappa_kasa_export)
+ (preprocess (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w @a
         -open Js_of_ocaml
         -open Kappa_js_lib
@@ -25,8 +30,10 @@
 
 (executable
  (name KaStorWorker)
+ (modes js)
  (modules KaStorWorker)
  (libraries kappa_js_lib kappa_cflow)
+ (preprocess (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w @a
         -open Js_of_ocaml
         -open Kappa_js_lib
@@ -34,12 +41,15 @@
 
 (executable
  (name KaMoHaWorker)
+ (modes js)
  (modules KaMoHaWorker)
  (libraries kappa_js_lib kappa_grammar)
+ (preprocess (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w @a))
 
 (executable
  (name JsSim)
+ (modes js)
  (modules :standard \ Common KaSimWorker KaSaWorker KaStorWorker KaMoHaWorker)
  (libraries js_of_ocaml-tyxml lwt_react kappa_js_lib kappa_json_api kappa_parameters)
  (preprocess (pps js_of_ocaml-ppx tyxml-ppx))

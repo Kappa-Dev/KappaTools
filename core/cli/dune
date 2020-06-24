@@ -2,11 +2,10 @@
   (name kappa_cli)
   (libraries lwt
 	     (select superargTk.ml from
-	       (labltk.jpf -> superargTk_tk.ml)
-	       ( -> superargTk_notk.ml))
+	       (labltk.jpf -> superargTk.tk.ml)
+	       ( -> superargTk.notk.ml))
 	     kappa_grammar
 	     kappa-library.runtime kappa_version)
-  (modules (:standard \ superargTk_tk superargTk_notk))
   (flags (:standard -w @a
      -open Kappa_version
 	 -open Kappa_generic_toolset
