@@ -4,7 +4,7 @@ include externals.mk
 
 MANREP= man/
 MANSCRIPTREP = $(MANREP)scripts/
-MANKAPPAMODELSREP = $(MANREP)models/
+MANKAPPAMODELSREP = $(MANREP)examples/
 MANIMGREP = $(MANREP)img/
 GENIMG = generated_img
 MANGENREP = $(MANREP)$(GENIMG)/
@@ -139,16 +139,16 @@ clean_doc:
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc clean_ide
 	dune clean
 	find . -name \*~ -delete
-	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
+	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration clean
 
 check:
 	dune runtest
-	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
-	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite all
+	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration clean
+	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration all
 
 build-tests:
 	dune promote
-	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite build
+	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration build
 
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete
@@ -182,13 +182,13 @@ KappaBin.zip:
 	mv site KappaBin/resources/app
 	mv KappaBin/electron.exe KappaBin/Kappapp.exe
 	mkdir KappaBin/resources/bin
-	cp _build/default.windows/main/KaSim.exe KappaBin/resources/bin/
-	cp _build/default.windows/KaSa_rep/main/KaSa.exe KappaBin/resources/bin/
-	cp _build/default.windows/agents/KaStor.exe KappaBin/resources/bin/
-	cp _build/default.windows/odes/KaDE.exe KappaBin/resources/bin/
-	cp _build/default.windows/agents/KaMoHa.exe KappaBin/resources/bin/
-	cp _build/default.windows/agents/KaSimAgent.exe KappaBin/resources/bin/
-	cp _build/default.windows/agents/KaSaAgent.exe KappaBin/resources/bin/
+	cp _build/default.windows/core/main/KaSim.exe KappaBin/resources/bin/
+	cp _build/default.windows/core/KaSa_rep/main/KaSa.exe KappaBin/resources/bin/
+	cp _build/default.windows/core/agents/KaStor.exe KappaBin/resources/bin/
+	cp _build/default.windows/core/odes/KaDE.exe KappaBin/resources/bin/
+	cp _build/default.windows/core/agents/KaMoHa.exe KappaBin/resources/bin/
+	cp _build/default.windows/core/agents/KaSimAgent.exe KappaBin/resources/bin/
+	cp _build/default.windows/core/agents/KaSaAgent.exe KappaBin/resources/bin/
 	zip -y -r $@ KappaBin
 	rm -r KappaBin
 

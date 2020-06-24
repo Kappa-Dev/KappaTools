@@ -90,13 +90,15 @@ let finalize
       then "--time-independent" :: args else args in
     let prog =
       let predir = Filename.dirname Sys.executable_name in
-      if Filename.basename predir = "main" &&
-         Filename.basename (Filename.dirname predir) = "default" then
-        predir^"/../agents/KaStor.exe"
-      else
-        let dir = if Filename.is_implicit Sys.executable_name &&
-                     predir = "." then "" else predir^"/" in
-        dir^"KaStor" in
+      let dir = if Filename.is_implicit Sys.executable_name &&
+                   predir = "." then "" else predir^"/" in
+      if Filename.basename predir = "main" then
+        let prepredir = Filename.dirname predir in
+        if Filename.basename prepredir = "core" &&
+           Filename.basename (Filename.dirname prepredir) = "default" then
+          prepredir^"/agents/KaStor.exe"
+        else dir^"KaStor"
+      else dir^"KaStor" in
     let pid = Lwt_process.open_process_none
         ~stdin:`Keep ~stdout:`Keep ~stderr:`Keep
         (prog,(Array.of_list (prog::args))) in
