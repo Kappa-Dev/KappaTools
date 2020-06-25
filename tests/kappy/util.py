@@ -19,7 +19,7 @@ def find_path(top_dir, fname, force_type=None):
     return None
 
 
-MODELS_DIR = find_path(kappy.kappa_common.KASIM_DIR, 'models', force_type='directory')
+MODELS_DIR = find_path(kappy.kappa_common.KASIM_DIR, 'examples', force_type='directory')
 assert MODELS_DIR is not None, "Could not find models folder."
 
 
@@ -53,7 +53,7 @@ class _KappaClientTest(unittest.TestCase):
         runtime = self.getRuntime()
         file_1_id = runtime.make_unique_id("file1.ka")
         file_2_id = runtime.make_unique_id("file2.ka")
-        test_dir = path.join(MODELS_DIR, "test_suite", "compiler",
+        test_dir = path.join(MODELS_DIR, "..", "tests", "integration", "compiler",
                              "file_order")
         f1_path = path.join(test_dir, 'file1.ka')
         runtime.add_model_file(f1_path, 1, file_1_id)

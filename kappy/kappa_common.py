@@ -21,7 +21,7 @@ else:
 
 KAPPY_DIR = path.dirname(path.abspath(__file__))
 KAPPY_DIR = environ.get('KAPPY_DIR', KAPPY_DIR)
-KASIM_DIR = path.normpath(path.join(KAPPY_DIR, *([path.pardir]*2)))
+KASIM_DIR = path.normpath(path.join(KAPPY_DIR, path.pardir))
 KASIM_DIR = environ.get('KASIM_DIR', KASIM_DIR)
 
 

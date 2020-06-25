@@ -83,7 +83,7 @@ script:
   - make all
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
-  - sh -c "if [ '$CHECKED' = python ] ; then dune build && cd python && nosetests -v ; fi"
+  - sh -c "if [ '$CHECKED' = python ] ; then dune build && nosetests -v tests/kappy ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make Kappapp.tar.gz site/index.html ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then make Kappapp.app ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then make KappaBin.zip ; fi"
