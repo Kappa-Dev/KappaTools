@@ -12,7 +12,7 @@ def should_build_agents():
     checking for existence of a .ml file. Ideally, this should
     be made into a flag.
     """
-    return os.path.isfile('agents/KaMoHa.ml')
+    return os.path.isfile('core/agents/KaMoHa.ml')
 
 class BuildAgentsCommand(distutils.cmd.Command):
     """Instruction to compile Kappa agents"""
@@ -62,7 +62,7 @@ class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
         return outputs
 
 def readme():
-    with open('python/README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 setup(name='kappy',
@@ -70,7 +70,7 @@ setup(name='kappy',
       version='4.1.0',
       description='Wrapper to interact with the Kappa tool suite',
       long_description=readme(),
-      url='https://github.com/Kappa-Dev/KaSim.git',
+      url='https://github.com/Kappa-Dev/KappaTools.git',
       author='Kappa-Dev',
       author_email='kappa-dev@listes.sc.univ-paris-diderot.fr',
       classifiers=[
@@ -82,11 +82,11 @@ setup(name='kappy',
           'build_ext': MyBuildExtCommand,
       },
       install_requires=['requests', 'future', 'nose'],
-      package_dir={'kappy':'python/kappy'},
+      package_dir={'kappy':'kappy'},
       packages=['kappy'],
       zip_safe=False,
       # This distribution contains binaries not built with
       # distutils. So we must create a dummy Extension object so when
       # we create a binary file it knows to make it platform-specific.
-      ext_modules=[distutils.core.Extension('kappy.dummy', sources = ['python/dummy.c'])],
+      ext_modules=[distutils.core.Extension('kappy.dummy', sources = ['kappy/dummy.c'])],
 )
