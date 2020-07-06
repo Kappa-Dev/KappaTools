@@ -934,7 +934,7 @@ decrease from $n_i$ and the concentration of token $t_i'$ will
 increase from $n_i'$.
 
 Importantly, the activity\index{activity} of a hybrid rule is still
-defined by $\ttt{|\textit{lhs}|*r}$, where $\ttt{|\textit{lhs}|}$ is
+defined by \ttt{|\textit{lhs}|*r}, where \ttt{|\textit{lhs}|} is
 the number of embeddings of the LHS of the rule in the mixture, and
 \emph{does not take into account the concentration of the tokens it
   mentions}. It is however possible to make its rate explicitly
@@ -1414,7 +1414,7 @@ of the simulation.
 
 In our ABC example, adding the instruction:
 \lstinline[language=kappa]!%mod:  [true] do $TRACK 'Cpp' [true];!
-\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{{\textquotesingle}Cpp{\textquotesingle}}, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule applications ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r{\textquotesingle}} between two rule applications $\ttt{r}$ and $\ttt{r{\textquotesingle}}$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show in Fig.~\ref{fig:cflow} an example of such causal flow.
+\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{{\textquotesingle}Cpp{\textquotesingle}}, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule applications ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r{\textquotesingle}} between two rule applications \ttt{r} and \ttt{r{\textquotesingle}} indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show in Fig.~\ref{fig:cflow} an example of such causal flow.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -1518,9 +1518,9 @@ Note that this simulation is now run for $k$ time units instead of $n$. Importan
 \section{Simulation parameters configuration}\label{sec:param}
 
 In the KF\index{Kappa file} (usually in a dedicated file) one may use expressions of the form:
-\[
-\hbox{\ttt{\%def: "}\textit{parameter\_name}\ttt{" "}\textit{parameter\_value}\ttt{"}}
-\]
+
+\hfill\hbox{\ttt{\%def: "}\textit{parameter\_name}\ttt{" "}\textit{parameter\_value}\ttt{"}}\hfill\null
+
 where tunable parameters are described in table~\ref{tab:parameters} (default values are given first in the possible values column).
 %%
 \begin{table}[ht]
@@ -1997,7 +1997,7 @@ KaSa protein2x2.ka --reset-all --compute-local-traces
 will perform the trace analysis on the model \texttt{protein2x2.ka}, and produce
 two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The  output repository can be changed thanks to the command line options \texttt{-{}-output-directory} and \texttt{-{}-output-local-trace-directory}. Moreover, file names are made of the prefix \texttt{Agent\_trace}, followed by  the kind of protein and the list of the sites of interest (the symbol `\texttt{\string^}' denotes a binding state, and the symbol `\texttt{\_}' an internal state).
 
-The transition system that describes the local traces for the agents of kind $P$ is descrided in Figure \ref{fig:trace-raw}. We notice that the nodes of this transition system are labelled with the states of the sites of $P$. The internal state of a site $x$ is denoted as $x{\sim}u$ (meaning that the site $x$ has state $u$, whereas the binding state of a site $x$ is denoted as $x!\textit{free}$, when the site is free, and as $x!K@x$ when the site $x$ is bound to the site $x$ of a given agent of kind $K$.
+The transition system that describes the local traces for the agents of kind $P$ is descrided in Figure \ref{fig:trace-raw}. We notice that the nodes of this transition system are labelled with the states of the sites of $P$. The internal state of a site $x$ is denoted as $x\{u\}$ (meaning that the site $x$ has state $u$, whereas the binding state of a site $x$ is denoted as $x[.]$, when the site is free, and as $x[x.K]$ when the site $x$ is bound to the site $x$ of a given agent of kind $K$.
 
 \begin{figure}[htbp]
 \centering
