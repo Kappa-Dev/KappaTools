@@ -169,7 +169,7 @@ let init_non_weakly_reversible_transitions () =
                             in
                             let text =
                               Format.asprintf
-                                "Rule %s may induce non wealky reversible events in the following context%s:%s%a"
+                                "Rule %s may induce non weakly reversible events in the following context%s:%s%a"
                                 (if rule.Public_data.rule_label <> ""
                                  then (" '"^rule.Public_data.rule_label^"'")
                                  else if rule.Public_data.rule_ast <> ""
