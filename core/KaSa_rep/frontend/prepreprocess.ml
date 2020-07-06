@@ -100,7 +100,7 @@ let pop_entry parameters error id (map,set) =
       in
       Exception.warn
         parameters error __POS__
-        ~message:"dandling bond detected"
+        ~message:"dangling bond detected"
         Exit (None,map)
     | Some [] ->
       Exception.warn
@@ -267,7 +267,7 @@ let translate_lnk_state parameters lnk_state remanent =
         let site = Ckappa_sig.LNK_SOME pos in
         let remanent =
           Exception.warn parameters error __POS__
-            ~message:"one dandling bond has been replaced by a wild card"
+            ~message:"one dangling bond has been replaced by a wild card"
             ~pos
             Exit
             remanent

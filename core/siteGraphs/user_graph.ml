@@ -45,14 +45,14 @@ module LinkSetMap = SetMap.Make(struct
       if c=0 then Mods.int_compare y y' else c
   end)
 
-let print_link (dandling,free_id) p f = function
+let print_link (dangling,free_id) p f = function
   | WHATEVER -> Format.pp_print_string f "[#]"
   | SOME -> Format.pp_print_string f "[_]"
   | TYPE (si,ty) -> Format.fprintf f "[%s.%s]" si ty
   | LINKS [] -> Format.pp_print_string f "[.]"
   | LINKS l ->
     let myself =
-      ref (LinkSetMap.Map.find_default LinkSetMap.Map.empty p !dandling) in
+      ref (LinkSetMap.Map.find_default LinkSetMap.Map.empty p !dangling) in
     let () =
       Format.fprintf f"[%a]"
         (Pp.list
@@ -62,14 +62,14 @@ let print_link (dandling,free_id) p f = function
                 if p = p' then -1 else
                   match Option_util.bind
                           (LinkSetMap.Map.find_option p)
-                          (LinkSetMap.Map.find_option p' !dandling) with
+                          (LinkSetMap.Map.find_option p' !dangling) with
                   | None ->
                     let () = incr free_id in
                     let () = myself := LinkSetMap.Map.add p' !free_id !myself in
                     !free_id
                   | Some va -> va in
               Format.fprintf f "%i" i)) l in
-    dandling := LinkSetMap.Map.add p !myself !dandling
+    dangling := LinkSetMap.Map.add p !myself !dangling
 
 let print_port with_link node p id f =
   Format.fprintf f "%a%a"
