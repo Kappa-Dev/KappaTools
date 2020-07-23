@@ -6,6 +6,18 @@ line_comment_re = r'//[^\n]*\n'
 non_nested_block_comment_re = r'/\*(?:[^*]*|\*+[^/])*\*/'
 whitespace_re = r'(?:' + line_comment_re + '|' + non_nested_block_comment_re + '|\s)+'
 
+def smallest_non_empty(dic):
+    out = None
+    for id,va in dic.items():
+        l = len(va)
+        if l > 0:
+            if out is None:
+                out = (id,va)
+            else:
+                if len(out[1]) > l:
+                    out = (id,va)
+    return out
+
 class KappaSyntaxError(ValueError):
     pass
 
@@ -40,6 +52,38 @@ class KappaSite:
             "" if self._future_internal is None
             else f"future_internal={self._future_internal!r}"
         )
+
+    def is_more_specific_than(self,ref,*,mapping=None,todos=None):
+        if ref._internals is None or \
+           all(x in self._internals for x in ref._internals):
+            if ref._links is None:
+                return True
+            elif ref._links is True:
+                return not (self._links is None or self._links == [])
+            elif type(ref._links) is list :
+                if type(self._links) is list:
+                    if len(ref._links) is 0:
+                        return len(self._links) is 0
+                    else:
+                        assert len(ref._links) is 1, \
+                            "Sigma graph compare not implemented"
+                        if len(self._links) is 1:
+                            assert mapping is not None, "Missing mapping"
+                            (r_ag,r_si) = ref._links[0]
+                            (ag,si) = self._links[0]
+                            ag_dst=mapping.get(r_ag)
+                            if not ag_dst:
+                                ag_dst=ag
+                                mapping[r_ag] = ag
+                                todos.append((r_ag,ag))
+                            return si == r_si and ag == ag_dst
+                        else: return False
+                else: return False
+            else:
+                site = ref._links["site_name"]
+                ag = ref._links["agent_type"]
+                assert False,"Sorry, I can't deal with site_types."
+        else: return False
 
     @property
     def internal_states(self):
@@ -219,6 +263,15 @@ class KappaAgent(abc.Sequence):
     def __iter__(self):
         return iter(self._sites.items())
 
+    def is_more_specific_than(self,ref,*,mapping=None,todos=None):
+        if ref._type==self._type:
+            return all (self._sites.get(na,KappaSite()).\
+                        is_more_specific_than(si,
+                                              mapping=mapping,
+                                              todos=todos)
+                        for na, si in ref._sites.items())
+        else: return False
+
     def get_type(self) -> str:
         """::returns: the type of the agent"""
         return self._type
@@ -330,6 +383,10 @@ class KappaComplex(abc.Sequence):
     contains. Use method ``items()`` to get an iterator over the
     tuples ``(coordinates,agent)``.
 
+    ``abc.Container``: ``x in y`` returns whether the pattern ``x``
+    occurs in ``y`` (in term of "Kappa embedding"). Use
+    ``y.find_pattern(x)`` to get the embeddings.
+
     Use ``self[coordinates]`` to get the agent at ``coordinates``.
 
     """
@@ -368,6 +425,49 @@ class KappaComplex(abc.Sequence):
 
         """
         return KappaComplexIterator(self._agents,with_key=True)
+
+    def agent_ids_of_type(self,type : str):
+        """:returns: the list of coordinates of agents of type ``type``"""
+        return [ id for (id,ag) in self.items() if ag.get_type() == type ]
+
+    def agent_ids_by_type(self):
+        """:returns: a dictionary from ``type : str`` to coordinates of agents \
+        of type ``type``
+
+        """
+        out = {}
+        for id,ag in self.items():
+            out.setdefault(ag.get_type(),[]).append(id)
+        return out
+
+    def contains_at_pos(self,id,ref,ref_id):
+        mapping={ ref_id : id }
+        todos=[(ref_id,id)]
+        while len(todos) > 0:
+            (rag,ag)=todos.pop()
+            if not self[ag].is_more_specific_than(ref[rag],
+                                                  mapping=mapping,
+                                                  todos=todos):
+                return None
+        return mapping
+
+    def find_pattern(self,ref):
+        """:returns: a list of dictionnary \
+        ``coordinates -> coordinates``. Each dictionnary represents an \
+        embedding of ``ref`` in the complex.
+
+        """
+        ag_ty,ref_ids = smallest_non_empty(ref.agent_ids_by_type())
+        candidates = self.agent_ids_of_type(ag_ty)
+        return [ x for x in [ self.contains_at_pos(cand,ref,ref_ids[0])
+                              for cand in candidates ]
+                 if x ]
+
+    def __contains__(self,pattern):
+        return not len(self.find_pattern(pattern)) == 0
+
+    def __eq__(a,b):
+        return a in b and b in a # Boss says efficient is not important
 
     @classmethod
     def from_JSONDecoder(cls,data):
