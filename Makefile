@@ -186,6 +186,7 @@ KappaBin.zip:
 	cp _build/default.windows/core/KaSa_rep/main/KaSa.exe KappaBin/resources/bin/
 	cp _build/default.windows/core/agents/KaStor.exe KappaBin/resources/bin/
 	cp _build/default.windows/core/odes/KaDE.exe KappaBin/resources/bin/
+	cp _build/default.windows/core/agents/KappaSwitchman.exe KappaBin/resources/bin/
 	cp _build/default.windows/core/agents/KaMoHa.exe KappaBin/resources/bin/
 	cp _build/default.windows/core/agents/KaSimAgent.exe KappaBin/resources/bin/
 	cp _build/default.windows/core/agents/KaSaAgent.exe KappaBin/resources/bin/
