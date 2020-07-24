@@ -181,7 +181,8 @@ class KappaAgent(abc.Sequence):
           potential duplicates and self listing.
 
         """
-        return [ el for (_,s) in self for el in s.neighbours_in_complex(complx) ]
+        return [ el for (_,s) in self
+                 for el in s.neighbours_in_complex(complx) ]
 
     def _str_in_complex(self, line, row, trailing):
         sites = [ n + s._str_in_complex(line, row, n, trailing)
@@ -208,7 +209,7 @@ class KappaComplexIterator(abc.Iterator):
 
     def __next__(self):
         if self._row_iter is None:
-            self._row = 0
+            self._row = -1
             self._row_iter = iter(next(self._line_iter))
         try:
             o = next(self._row_iter)
