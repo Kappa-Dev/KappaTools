@@ -85,6 +85,33 @@ class KappaSite:
                 assert False,"Sorry, I can't deal with site_types."
         else: return False
 
+    def is_equal(self,ref,*,mapping=None,todos=None):
+        if (isinstance(ref._internals, type(self._internals))
+            and ref._internals == self._internals):
+            if type(ref._links) is list :
+                if type(self._links) is list:
+                    if len(ref._links) is 0:
+                        return len(self._links) is 0
+                    else:
+                        assert len(ref._links) is 1, \
+                            "Sigma graph compare not implemented"
+                        if len(self._links) is 1:
+                            assert mapping is not None, "Missing mapping"
+                            (r_ag,r_si) = ref._links[0]
+                            (ag,si) = self._links[0]
+                            ag_dst=mapping.get(r_ag)
+                            if not ag_dst:
+                                ag_dst=ag
+                                mapping[r_ag] = ag
+                                todos.append((r_ag,ag))
+                            return si == r_si and ag == ag_dst
+                        else: return False
+                else: return False
+            else:
+                return (isinstance(ref._links,type(self._links))
+                        and ref._links == self._links)
+        else: return False
+
     @property
     def internal_states(self):
         return self._internals
@@ -272,6 +299,13 @@ class KappaAgent(abc.Sequence):
                         for na, si in ref._sites.items())
         else: return False
 
+    def is_equal(self,ref,*,mapping=None,todos=None):
+        if ref._type==self._type:
+            return all (self._sites.get(na,KappaSite()).\
+                        is_equal(si, mapping=mapping, todos=todos)
+                        for na, si in ref._sites.items())
+        else: return False
+
     def get_type(self) -> str:
         """::returns: the type of the agent"""
         return self._type
@@ -451,6 +485,15 @@ class KappaComplex(abc.Sequence):
                 return None
         return mapping
 
+    def __eq_rooted(self,id,ref,ref_id):
+        mapping={ ref_id : id }
+        todos=[(ref_id,id)]
+        while len(todos) > 0:
+            (rag,ag)=todos.pop()
+            if not self[ag].is_equal(ref[rag], mapping=mapping, todos=todos):
+                return None
+        return mapping
+
     def find_pattern(self,ref):
         """:returns: a list of dictionnary \
         ``coordinates -> coordinates``. Each dictionnary represents an \
@@ -466,8 +509,19 @@ class KappaComplex(abc.Sequence):
     def __contains__(self,pattern):
         return not len(self.find_pattern(pattern)) == 0
 
+    def __same_sum_formula(self,a_types,b_types):
+        return all(len(b_types.get(ty,[])) == len(ags)
+                   for ty, ags in a_types.items())
+
     def __eq__(a,b):
-        return a in b and b in a # Boss says efficient is not important
+        a_types = a.agent_ids_by_type()
+        b_types = b.agent_ids_by_type()
+        if a.__same_sum_formula(a_types,b_types):
+            ag_ty,ref_ids = smallest_non_empty(a_types)
+            ref_id=ref_ids[0]
+            candidates = b_types[ag_ty]
+            return any(b.__eq_rooted(cand,a,ref_id) for cand in candidates)
+        return False
 
     @classmethod
     def from_JSONDecoder(cls,data):
