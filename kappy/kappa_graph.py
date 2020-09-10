@@ -427,6 +427,15 @@ class KappaComplex(abc.Sequence):
 
     def __init__(self, agents):
         self._agents = agents
+        self._nodes_by_type = {}
+        i=0
+        for line in agents:
+            j=0
+            for el in line:
+                if el:
+                    self._nodes_by_type.setdefault(el.get_type(),[]).append((i,j))
+                j += 1
+            i += 1
 
     def __repr__(self):
         return "KappaComplex({})".format(repr(self._agents))
@@ -450,7 +459,9 @@ class KappaComplex(abc.Sequence):
 
     def __len__(self):
         r = 0
-        for _ in self: r += 1
+        for line in self._agents:
+            for el in line:
+                if el: r +=1
         return r
 
     def items(self):
@@ -462,17 +473,14 @@ class KappaComplex(abc.Sequence):
 
     def agent_ids_of_type(self,type : str):
         """:returns: the list of coordinates of agents of type ``type``"""
-        return [ id for (id,ag) in self.items() if ag.get_type() == type ]
+        return self._nodes_by_type[type]
 
     def agent_ids_by_type(self):
         """:returns: a dictionary from ``type : str`` to coordinates of agents \
         of type ``type``
 
         """
-        out = {}
-        for id,ag in self.items():
-            out.setdefault(ag.get_type(),[]).append(id)
-        return out
+        return self._nodes_by_type
 
     def contains_at_pos(self,id,ref,ref_id):
         mapping={ ref_id : id }
@@ -500,8 +508,8 @@ class KappaComplex(abc.Sequence):
         embedding of ``ref`` in the complex.
 
         """
-        ag_ty,ref_ids = smallest_non_empty(ref.agent_ids_by_type())
-        candidates = self.agent_ids_of_type(ag_ty)
+        ag_ty,ref_ids = smallest_non_empty(ref._nodes_by_type)
+        candidates = self._nodes_by_type.get(ag_ty,[])
         return [ x for x in [ self.contains_at_pos(cand,ref,ref_ids[0])
                               for cand in candidates ]
                  if x ]
@@ -509,17 +517,16 @@ class KappaComplex(abc.Sequence):
     def __contains__(self,pattern):
         return not len(self.find_pattern(pattern)) == 0
 
-    def __same_sum_formula(self,a_types,b_types):
-        return all(len(b_types.get(ty,[])) == len(ags)
-                   for ty, ags in a_types.items())
+    def __same_sum_formula(a,b):
+        return (len(a._nodes_by_type) == len(b._nodes_by_type) and
+                all(len(b._nodes_by_type.get(ty,[])) == len(ags)
+                    for ty, ags in a._nodes_by_type.items()))
 
     def __eq__(a,b):
-        a_types = a.agent_ids_by_type()
-        b_types = b.agent_ids_by_type()
-        if a.__same_sum_formula(a_types,b_types):
-            ag_ty,ref_ids = smallest_non_empty(a_types)
+        if a.__same_sum_formula(b):
+            ag_ty,ref_ids = smallest_non_empty(a._nodes_by_type)
             ref_id=ref_ids[0]
-            candidates = b_types[ag_ty]
+            candidates = b._nodes_by_type[ag_ty]
             return any(b.__eq_rooted(cand,a,ref_id) for cand in candidates)
         return False
 
