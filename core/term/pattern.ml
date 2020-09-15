@@ -9,21 +9,21 @@
 type sharing_level = No_sharing | Compatible_patterns | Max_sharing
 
 let sharing_level_of_yojson = function
-  | `String "no" -> No_sharing
+  | `String "no_sharing" -> No_sharing
   | `String "compatible_patterns" -> Compatible_patterns
-  | `String "max" -> Max_sharing
+  | `String "max_sharing" -> Max_sharing
   | x -> raise
            (Yojson.Basic.Util.Type_error ("Incorrect sharing_level",x))
 
 let write_sharing_level ob = function
-  | No_sharing -> Yojson.Basic.write_string ob "no"
+  | No_sharing -> Yojson.Basic.write_string ob "no_sharing"
   | Compatible_patterns -> Yojson.Basic.write_string ob "compatible_patterns"
-  | Max_sharing -> Yojson.Basic.write_string ob "max"
+  | Max_sharing -> Yojson.Basic.write_string ob "max_sharing"
 
 let string_of_sharing_level ?len:(_ = 1024) = function
-  | No_sharing -> "\"no\""
+  | No_sharing -> "\"no_sharing\""
   | Compatible_patterns -> "\"compatible_patterns\""
-  | Max_sharing -> "\"max\""
+  | Max_sharing -> "\"max_sharing\""
 
 let read_sharing_level p lb =
   sharing_level_of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)

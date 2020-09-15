@@ -120,9 +120,9 @@ class KappaRest(KappaApi):
 
     # Standardized API methods. Docs are provided by parent.
 
-    def project_parse(self, **kwargs):
+    def project_parse(self, sharing_level="compatible_patterns", **kwargs):
         overwrites = '&'.join('%s=%s' % (key, value) for (key, value) in kwargs.items())
-        return self._post(self.in_project('parse', '?'.join(["compatible_patterns", overwrites])))
+        return self._post(self.in_project('parse', '?'.join([sharing_level, overwrites])))
 
     def project_overwrite(self, ast, file_id="model.ka"):
         return self._post(self.in_project('overwrite',file_id),ast)

@@ -319,7 +319,7 @@ class KappaApi(ABC):
         """
 
     @abc.abstractmethod
-    def project_parse(self, **kwargs):
+    def project_parse(self, sharing_level="compatible_patterns", **kwargs):
         """Parses the project
 
         :param kwargs: list of algebraic variables to overwrite

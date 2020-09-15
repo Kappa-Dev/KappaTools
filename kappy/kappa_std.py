@@ -134,9 +134,9 @@ class KappaStd(KappaApi):
 
     # Standardized API methods. Docs are provided by parent.
 
-    def project_parse(self, **kwargs):
+    def project_parse(self, sharing_level = "compatible_patterns", **kwargs):
         overwrites = list(kwargs.items())
-        self._dispatch(["ProjectParse","compatible_patterns",overwrites])
+        self._dispatch(["ProjectParse",sharing_level,overwrites])
 
     def project_overwrite(self, ast, file_id="model.ka"):
         self._dispatch(["ProjectOverwrite",file_id,ast])
