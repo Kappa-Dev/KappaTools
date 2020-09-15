@@ -153,11 +153,12 @@ class embedded () : Api.concrete_manager =
 
     val mutable kasa_locator = []
 
-    method project_parse overwrites =
+    method project_parse ~patternSharing overwrites =
       self#secret_project_parse >>=
       Api_common.result_bind_lwt
         ~ok:(fun out ->
-            let load = self#secret_simulation_load out overwrites in
+            let load =
+              self#secret_simulation_load patternSharing out overwrites in
             let init = self#init_static_analyser out in
             let locators =
               init >>= Result_util.fold

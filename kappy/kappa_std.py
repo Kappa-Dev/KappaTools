@@ -136,7 +136,7 @@ class KappaStd(KappaApi):
 
     def project_parse(self, **kwargs):
         overwrites = list(kwargs.items())
-        self._dispatch(["ProjectParse",overwrites])
+        self._dispatch(["ProjectParse","compatible_patterns",overwrites])
 
     def project_overwrite(self, ast, file_id="model.ka"):
         self._dispatch(["ProjectOverwrite",file_id,ast])

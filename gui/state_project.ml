@@ -181,7 +181,8 @@ let set_show_non_weakly_reversible_transitions
     (fun param -> { param with show_non_weakly_reversible_transitions })
 
 let update_state me project_catalog default_parameters project_parameters =
-  me.project_manager#project_parse [] >>= fun out ->
+  me.project_manager#project_parse
+    ~patternSharing:Pattern.Compatible_patterns [] >>= fun out ->
   let () =
     set_state {
       project_current = Some me;
@@ -264,7 +265,8 @@ let sync () : unit Api.result Lwt.t =
   match (React.S.value state).project_current with
   | None -> Lwt.return (Result_util.ok ())
   | Some current ->
-    current.project_manager#project_parse [] >>= fun out ->
+    current.project_manager#project_parse
+      ~patternSharing:Pattern.Compatible_patterns [] >>= fun out ->
     let st = React.S.value state in
     let () =
       set_state {

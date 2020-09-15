@@ -42,6 +42,7 @@ type t =
     mutable pause_condition : (Pattern.id array list,int) Alg_expr.bool ;
     dumpIfDeadlocked : bool;
     maxConsecutiveClash : int;
+    patternSharing : Pattern.sharing_level;
     counter : Counter.t ;
     log_buffer : Buffer.t ;
     log_form : Format.formatter ;
@@ -65,11 +66,11 @@ type t =
   }
 
 let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
-    ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
+    ~dumpIfDeadlocked ~maxConsecutiveClash ~patternSharing ~env ~counter ~graph
     ~state ~init_l ~lastyield ~ast : t = {
   is_running = false; run_finalize = false; counter; log_buffer; log_form;
   pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
-  plot = Data.init_plot env;
+  patternSharing; plot = Data.init_plot env;
   snapshots = Mods.StringMap.empty;
   dins = [];
   species = Mods.StringMap.empty;
@@ -115,7 +116,7 @@ let catch_error handler = function
                    with _ -> "unspecified exception thrown") in
     handler (Api_common.error_msg message)
 
-let parse (ast : Ast.parsing_compil) overwrite system_process =
+let parse ~patternSharing (ast : Ast.parsing_compil) overwrite system_process =
   let yield = system_process#yield in
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
@@ -159,7 +160,8 @@ let parse (ast : Ast.parsing_compil) overwrite system_process =
               Eval.compile
                 ~debugMode:false ~pause:(fun f -> Lwt.bind (yield ()) f)
                 ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
-                ~outputs ~sharing:Pattern.Compatible_patterns sig_nd tk_nd contact_map result >>=
+                ~outputs ~sharing:patternSharing sig_nd tk_nd contact_map
+                result >>=
               (fun (env,with_trace,init_l) ->
                  let counter =
                    Counter.create
@@ -186,6 +188,7 @@ let parse (ast : Ast.parsing_compil) overwrite system_process =
                      ~ast ~env ~counter
                      ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
                      ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
+                     ~patternSharing
                      ~graph:(Rule_interpreter.empty
                                ~outputs ~with_trace
                                random_state env counter)
@@ -330,7 +333,7 @@ let start
         let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
         Lwt.wrap4 (Evaluator.get_pause_criteria
                      ~debugMode:false ~outputs:(outputs t)
-                     ~sharing:Pattern.Compatible_patterns ~syntax_version:Ast.V4)
+                     ~sharing:t.patternSharing ~syntax_version:Ast.V4)
           t.contact_map t.env t.graph pause >>=
         fun (env',graph',b'') ->
         let () = t.env <- env' in
@@ -427,7 +430,7 @@ let perturbation
            Lwt.wrap6
              (Evaluator.do_interactive_directives
                 ~debugMode:false ~outputs:(interactive_outputs log_form t)
-                ~sharing:Pattern.Compatible_patterns ~syntax_version:Ast.V4)
+                ~sharing:t.patternSharing ~syntax_version:Ast.V4)
              t.contact_map t.env t.counter t.graph t.state e >>=
            fun (e',(env',(_,graph'',state'))) ->
            let () = t.env <- env' in
@@ -468,7 +471,7 @@ let continue
            let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
            Lwt.wrap4 (Evaluator.get_pause_criteria
                         ~debugMode:false ~outputs:(outputs t)
-                        ~sharing:Pattern.Compatible_patterns ~syntax_version:Ast.V4)
+                        ~sharing:t.patternSharing ~syntax_version:Ast.V4)
              t.contact_map t.env t.graph pause >>=
            fun (env',graph',b'') ->
            let () = t.env <- env' in

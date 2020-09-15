@@ -74,7 +74,7 @@ class manager
     method private message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
-    | `ProjectLoad (_ast,_overwrite) ->
+    | `ProjectLoad _ ->
       Lwt.return (Api_common.result_error_msg
                     ~result_code:`Bad_request
                     "low level project_load mustn't be used over HTTP")
@@ -382,10 +382,14 @@ class manager
                     ~result_code:`Bad_request
                     "low level get_pos_of_rules_and_vars mustn't be used over HTTP")
 
-    method project_parse overwrite =
+    method project_parse ~patternSharing overwrite =
       send
         ?timeout request_count
-        (Format.asprintf "%s/v2/projects/%s/parse%t" url project_id
+        (Format.asprintf "%s/v2/projects/%s/parse/%s%t" url project_id
+           (match patternSharing with
+            | Pattern.No_sharing -> "no_sharing"
+            | Pattern.Compatible_patterns -> "compatible_patterns"
+            | Pattern.Max_sharing -> "max_sharing")
            (fun f -> match overwrite with
               | [] -> ()
               | l -> Format.fprintf f "?%a"

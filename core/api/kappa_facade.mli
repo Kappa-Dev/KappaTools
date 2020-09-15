@@ -26,6 +26,7 @@ type t
 class null_process : system_process
 
 val parse :
+  patternSharing:Pattern.sharing_level ->
   Ast.parsing_compil -> (string * Nbr.t) list -> system_process ->
   (t, Result_util.message list) Result_util.t Lwt.t
 

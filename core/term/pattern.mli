@@ -163,6 +163,27 @@ val fold:
 type sharing_level = No_sharing | Compatible_patterns | Max_sharing
 (** Heuristic to use on domain construction *)
 
+val write_sharing_level :
+  Bi_outbuf.t -> sharing_level -> unit
+  (** Output a JSON value of type {!sharing_level}. *)
+
+val string_of_sharing_level :
+  ?len:int -> sharing_level -> string
+  (** Serialize a value of type {!sharing_level}
+      into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+val read_sharing_level :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> sharing_level
+  (** Input JSON data of type {!sharing_level}. *)
+
+val sharing_level_of_string :
+  string -> sharing_level
+  (** Deserialize JSON data of type {!sharing_level}. *)
+
+
 val finalize :
   debugMode:bool -> sharing:sharing_level -> PreEnv.t -> Contact_map.t ->
   Env.t * PreEnv.stat

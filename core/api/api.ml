@@ -71,7 +71,8 @@ end
 
 class type manager_simulation = object
   method secret_simulation_load :
-    Ast.parsing_compil -> (string * Nbr.t) list -> unit result Lwt.t
+    Pattern.sharing_level -> Ast.parsing_compil -> (string * Nbr.t) list ->
+    unit result Lwt.t
 
   method simulation_delete : unit result Lwt.t
 
@@ -219,7 +220,9 @@ class type concrete_manager = object
   inherit manager_simulation
   inherit uniform_manager_static_analysis
   inherit manager_stories
-  method project_parse : (string * Nbr.t) list -> unit result Lwt.t
+  method project_parse :
+    patternSharing:Pattern.sharing_level -> (string * Nbr.t) list ->
+    unit result Lwt.t
   method get_influence_map_node_at :
     filename:string -> Locality.position -> (int,int) Public_data.influence_node
       option result Lwt.t

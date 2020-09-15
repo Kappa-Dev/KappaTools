@@ -18,8 +18,13 @@ type site_graph <ocaml module="User_graph" t="connected_component"> = abstract
 
 type nbr <ocaml module="Nbr" t="t"> = abstract
 type parsing_compil <ocaml module="Ast"> = abstract
+type sharing_level <ocaml from module="Pattern"> = abstract
 
-type project_parse = (parsing_compil * (string * nbr) list)
+type project_parse = {
+     pattern_sharing : sharing_level ;
+     ast : parsing_compil ;
+     variable_overwritten : (string * nbr) list ;
+}
 type kappa_code = string
 type simulation_seed = int
 

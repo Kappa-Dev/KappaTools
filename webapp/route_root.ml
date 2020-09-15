@@ -113,11 +113,12 @@ class new_manager =
 
     val mutable kasa_locator = []
 
-    method project_parse overwrites =
+    method project_parse ~patternSharing overwrites =
       self#secret_project_parse >>=
       Api_common.result_bind_lwt
         ~ok:(fun out ->
-            let load = self#secret_simulation_load out overwrites in
+            let load =
+              self#secret_simulation_load patternSharing out overwrites in
             let init = self#init_static_analyser out in
             let locators =
               init >>= function
@@ -299,13 +300,13 @@ let route
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
-    { Webapp_common.path = "/v2/projects/{projectid}/parse" ;
+    { Webapp_common.path = "/v2/projects/{projectid}/parse/{sharing}" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `POST ; ] in
         fun ~context:context ->
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `POST ->
-            let project_id = project_ref context in
+            let (project_id,sharing_level) = field_ref context "sharing" in
             let request = context.Webapp_common.request in
             let uri = Cohttp.Request.uri request in
             let overwrites = Uri.query uri in
@@ -316,7 +317,19 @@ let route
                   | x, [ n ] -> (x,Nbr.of_string n))
                 overwrites in
             bind_projects
-              (fun manager -> manager#project_parse overwrites)
+              (fun manager ->
+                 Api_common.result_bind_lwt
+                   ~ok:(fun patternSharing ->
+                      manager#project_parse ~patternSharing overwrites)
+                   (if sharing_level = "no_sharing" then
+                      Result_util.ok Kappa_terms.Pattern.No_sharing
+                    else if sharing_level = "max_sharing" then
+                      Result_util.ok Kappa_terms.Pattern.Max_sharing
+                    else if sharing_level = "compatible_patterns" then
+                      Result_util.ok Kappa_terms.Pattern.Compatible_patterns
+                    else Api_common.result_error_msg
+                        ~result_code:`Bad_request
+                        "Incorrect sharing level between patterns"))
               project_id projects >>=
             (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))

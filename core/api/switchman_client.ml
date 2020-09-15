@@ -338,15 +338,17 @@ class virtual new_client ~is_running ~post mailbox = object(self)
                   b (JsonUtil.of_option Public_data.accuracy_to_json accuracy_scc));
          ])
   (* KaSim *)
-    method secret_simulation_load (_ : Ast.parsing_compil) (_ : (string * Nbr.t) list) :
+    method secret_simulation_load
+        (_ : Pattern.sharing_level) (_ : Ast.parsing_compil) (_ : (string * Nbr.t) list) :
       unit Api.result Lwt.t =
       Lwt.return
       (Api_common.result_error_msg "low level simulation_load mustn't be used")
 
-    method project_parse overwrites =
+    method project_parse ~patternSharing overwrites =
       self#message Nothing
         (fun b -> JsonUtil.write_sequence b [
              (fun b -> Yojson.Basic.write_string b "ProjectParse");
+             (fun b -> Pattern.write_sharing_level b patternSharing);
              (fun b ->
                 JsonUtil.write_list
                   (JsonUtil.write_compact_pair Yojson.Basic.write_string Nbr.write_t)

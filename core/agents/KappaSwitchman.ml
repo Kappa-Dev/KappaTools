@@ -218,12 +218,16 @@ let on_message exec_command message_delimiter =
                          Lwt.return (B (Polymers_kasa, msg_id, Api_common.result_kasa out))
                        (* KaSim *)
                        |  "ProjectParse" ->
+                         let patternSharing =
+                           JsonUtil.read_next_item
+                             Kappa_terms.Pattern.read_sharing_level st b in
                          let overwrites =
                            JsonUtil.read_next_item
                              (Yojson.Basic.read_list
-                                (JsonUtil.read_compact_pair Yojson.Basic.read_string Nbr.read_t))
+                                (JsonUtil.read_compact_pair
+                                   Yojson.Basic.read_string Nbr.read_t))
                              st b in
-                         manager#project_parse overwrites >>=
+                         manager#project_parse ~patternSharing overwrites >>=
                          fun out -> Lwt.return (B (Nothing, msg_id, out))
                        | "SimulationContinue" ->
                          let simulation_parameter =

@@ -220,12 +220,13 @@ class manager_simulation
   Api.manager_simulation = object(self)
   val mutable simulation = None
 
-  method secret_simulation_load text overwrites =
+  method secret_simulation_load patternSharing text overwrites =
     let ast = text in
     let harakiri,_ = Lwt.task () in
     let _ =
       project#set_state
-        (Lwt.pick [ Kappa_facade.parse ast overwrites system_process;
+        (Lwt.pick [ Kappa_facade.parse
+                      ~patternSharing ast overwrites system_process;
                     harakiri >>= fun () ->
                     Lwt.return (Result_util.error
                                   [Api_common.error_msg

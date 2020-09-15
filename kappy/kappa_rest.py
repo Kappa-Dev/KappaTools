@@ -122,7 +122,7 @@ class KappaRest(KappaApi):
 
     def project_parse(self, **kwargs):
         overwrites = '&'.join('%s=%s' % (key, value) for (key, value) in kwargs.items())
-        return self._post(self.in_project('?'.join(['parse',overwrites])))
+        return self._post(self.in_project('parse', '?'.join(["compatible_patterns", overwrites])))
 
     def project_overwrite(self, ast, file_id="model.ka"):
         return self._post(self.in_project('overwrite',file_id),ast)
