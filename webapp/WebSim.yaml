@@ -7,7 +7,7 @@ info:
   license:
     name: LGPL
     url: 'http://www.gnu.org/licenses/lgpl-3.0.en.html'
-  version: 4.0.90
+  version: 4.1.0
 servers:
   - url: 'https://api.executableknowledge.org/kappa/v2'
     description: Example dev server
