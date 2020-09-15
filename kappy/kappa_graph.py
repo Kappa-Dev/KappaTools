@@ -8,7 +8,8 @@ whitespace_re = r'(?:' + line_comment_re + '|' + non_nested_block_comment_re + '
 
 def smallest_non_empty(dic):
     out = None
-    for id,va in dic.items():
+    for id in dic:
+        va = dic[id]
         l = len(va)
         if l > 0:
             if out is None:
@@ -293,17 +294,17 @@ class KappaAgent(abc.Sequence):
     def is_more_specific_than(self,ref,*,mapping=None,todos=None):
         if ref._type==self._type:
             return all (self._sites.get(na,KappaSite()).\
-                        is_more_specific_than(si,
+                        is_more_specific_than(ref._sites[na],
                                               mapping=mapping,
                                               todos=todos)
-                        for na, si in ref._sites.items())
+                        for na in ref._sites)
         else: return False
 
     def is_equal(self,ref,*,mapping=None,todos=None):
         if ref._type==self._type:
             return all (self._sites.get(na,KappaSite()).\
-                        is_equal(si, mapping=mapping, todos=todos)
-                        for na, si in ref._sites.items())
+                        is_equal(ref._sites[na], mapping=mapping, todos=todos)
+                        for na in ref._sites)
         else: return False
 
     def get_type(self) -> str:
@@ -325,8 +326,8 @@ class KappaAgent(abc.Sequence):
                  for el in s.neighbours_in_complex(complx) ]
 
     def _str_in_complex(self, line, row, trailing):
-        sites = [ n + s._str_in_complex(line, row, n, trailing)
-                  for (n , s) in self._sites.items() ]
+        sites = [ n + self._sites[n]._str_in_complex(line, row, n, trailing)
+                  for n in self._sites ]
         return self._type + "(" + " ".join(sites) + ")"
 
     @classmethod
@@ -404,6 +405,8 @@ class KappaComplexIterator(abc.Iterator):
             self._line += 1
             self._row_iter = None
             self.__next__()
+
+allocated_once_for_all_empty_list=[]
 
 class KappaComplex(abc.Sequence):
     """Class for representing a Kappa connected component
@@ -509,7 +512,7 @@ class KappaComplex(abc.Sequence):
 
         """
         ag_ty,ref_ids = smallest_non_empty(ref._nodes_by_type)
-        candidates = self._nodes_by_type.get(ag_ty,[])
+        candidates = self._nodes_by_type.get(ag_ty,allocated_once_for_all_empty_list)
         return [ x for x in [ self.contains_at_pos(cand,ref,ref_ids[0])
                               for cand in candidates ]
                  if x ]
@@ -518,16 +521,19 @@ class KappaComplex(abc.Sequence):
         return not len(self.find_pattern(pattern)) == 0
 
     def __same_sum_formula(a,b):
-        return (len(a._nodes_by_type) == len(b._nodes_by_type) and
-                all(len(b._nodes_by_type.get(ty,[])) == len(ags)
-                    for ty, ags in a._nodes_by_type.items()))
+        if len(a._nodes_by_type) != len(b._nodes_by_type): return False
+        for ty in a._nodes_by_type:
+            if (len(b._nodes_by_type.get(ty,allocated_once_for_all_empty_list))
+                != len(a._nodes_by_type[ty])):
+                return False
+        return True
 
     def __eq__(a,b):
         if a.__same_sum_formula(b):
             ag_ty,ref_ids = smallest_non_empty(a._nodes_by_type)
             ref_id=ref_ids[0]
-            candidates = b._nodes_by_type[ag_ty]
-            return any(b.__eq_rooted(cand,a,ref_id) for cand in candidates)
+            for cand in b._nodes_by_type[ag_ty]:
+                if b.__eq_rooted(cand,a,ref_id): return True
         return False
 
     @classmethod
@@ -601,7 +607,7 @@ class KappaSnapshot:
             [ "%init: {0:d} {1}\n".format(n,c) for (n,c) in self._complexes ]
         )
         tokens = "".join(
-            [ "%init: {0:d} {1}\n".format(n,t) for (t,n) in self._tokens.items() ]
+            [ "%init: {0:d} {1}\n".format(self._tokens[t],t) for t in self._tokens ]
         )
         return event+time+complexes+tokens
 
