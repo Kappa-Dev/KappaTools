@@ -14,7 +14,7 @@ opam install --deps-only -y kappa-agents
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do
     make clean
-    "${PYBIN}/pip" wheel . -w /io/wheelhouse/
+    "${PYBIN}/pip" wheel . -v -w /io/wheelhouse/
 done
 
 # Bundle external shared libraries into the wheels
