@@ -39,9 +39,9 @@ class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
     """Compile Kappa agent in addition of standard build"""
 
     def append_a_binary(self,bin_dir,name):
-        file_in_src = os.path.join('bin',name)
+        file_in_src = os.path.realpath(os.path.join('bin',name))
         if os.path.isfile(file_in_src):
-            distutils.file_util.copy_file(file_in_src, bin_dir, preserve_mode=0)
+            distutils.file_util.copy_file(file_in_src, os.path.join(bin_dir,name))
             self.my_outputs.append(os.path.join(bin_dir, name))
 
 
@@ -67,7 +67,7 @@ def readme():
 
 setup(name='kappy',
       license='LGPLv3',
-      version='4.1.0',
+      version='4.1.1',
       description='Wrapper to interact with the Kappa tool suite',
       long_description=readme(),
       url='https://github.com/Kappa-Dev/KappaTools.git',

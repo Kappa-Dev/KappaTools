@@ -4,8 +4,8 @@ set -e
 
 VERSION=$1
 
-curl -L https://github.com/Kappa-Dev/KaSim/archive/v${VERSION}.tar.gz | tar xz
-cd KaSim-${VERSION}
+curl -L https://github.com/Kappa-Dev/KappaTools/archive/v${VERSION}.tar.gz | tar xz
+cd KappaTools-${VERSION}
 opam pin add -n -y .
 opam install --deps-only -y kappa-agents
 
