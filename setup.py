@@ -67,7 +67,7 @@ def readme():
 
 setup(name='kappy',
       license='LGPLv3',
-      version='4.1.1',
+      version='4.1.2',
       description='Wrapper to interact with the Kappa tool suite',
       long_description=readme(),
       url='https://github.com/Kappa-Dev/KappaTools.git',
