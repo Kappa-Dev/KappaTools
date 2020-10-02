@@ -272,13 +272,15 @@ class KappaAgent(abc.Sequence):
 
     """
 
-    def __init__(self, typ : str, sites : dict):
+    def __init__(self, typ : str, id_witness, sites : dict):
         self._type = typ
+        self._id_witness = id_witness
         self._sites = sites
 
     def __repr__(self):
-        return "KappaAgent({},{})".format(
+        return "KappaAgent({},{},{})".format(
             repr(self._type),
+            repr(self._id_witness),
             repr(self._sites)
         )
 
@@ -311,6 +313,10 @@ class KappaAgent(abc.Sequence):
         """::returns: the type of the agent"""
         return self._type
 
+    def get_id_in_one_witness(self) -> int:
+        """::returns: the type of the agent"""
+        return self._id_witness
+
     def get_neighbours_in_complex(self,complx):
         """Destination of the edges.
 
@@ -328,7 +334,11 @@ class KappaAgent(abc.Sequence):
     def _str_in_complex(self, line, row, trailing):
         sites = [ n + self._sites[n]._str_in_complex(line, row, n, trailing)
                   for n in self._sites ]
-        return self._type + "(" + " ".join(sites) + ")"
+        if self._id_witness is not None:
+            witness = "x"+str(self._id_witness)+":"
+        else:
+            witness = ""
+        return witness + self._type + "(" + " ".join(sites) + ")"
 
     @classmethod
     def from_JSONDecoder_in_complex(cls,data,complx,*,in_1d):
@@ -339,7 +349,7 @@ class KappaAgent(abc.Sequence):
                 KappaSite.from_JSONDecoder_in_complex(x["site_type"],
                                                       complx, in_1d=in_1d)
             ] for x in data["node_sites"])
-            return cls(data["node_type"],sites)
+            return cls(data["node_type"],data.get("node_id_in_witness"),sites)
 
     @classmethod
     def from_string_in_complex(cls, expression: str,
@@ -379,7 +389,7 @@ class KappaAgent(abc.Sequence):
                 agent_signature[name]=site
             # process abundance operator, if present
             #abundance_change = matches.group(3) if matches.group(3) else ''
-            return cls(agent_name,agent_signature)
+            return cls(agent_name,None,agent_signature)
 
 
 class KappaComplexIterator(abc.Iterator):
