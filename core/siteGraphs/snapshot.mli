@@ -12,6 +12,7 @@ type cc_site = {
 }
 type cc_node = {
   node_type: int;
+  node_id_in_witness : int;
   node_sites: cc_site array;
 }
 type connected_component = cc_node array

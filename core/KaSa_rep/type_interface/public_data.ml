@@ -24,6 +24,7 @@ let sitetype = "site_type"
 let sitelinks = "port_links"
 let sitestates = "port_states"
 let sitenodename = "node_type"
+let sitenodeid = "node_id_in_witness"
 let sitenodesites = "node_sites"
 let hyp = "site graph"
 let refinement = "site graph list"
@@ -230,6 +231,10 @@ function
 | `Assoc l as x ->
   begin
     try
+      let node_id_in_witness =
+        let json = List.assoc_opt sitenodeid l in
+        Option_util.map (JsonUtil.to_int ?error_msg:None) json
+      in
       let node_type =
         let json = List.assoc sitenodename l in
         JsonUtil.to_string json
@@ -240,6 +245,7 @@ function
       in
       Some {
         User_graph.node_type;
+        User_graph.node_id_in_witness;
         User_graph.node_sites
       }
     with

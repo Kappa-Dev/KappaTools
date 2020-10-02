@@ -13,6 +13,6 @@ Domain:
   /*cc1*/ A/*1*/() [rate_of_rule [0]] -> ()
   /*cc2*/ A/*1*/(x[.]) -> ()
 Intial graph;
-  %init: 100 A(x[.])
+  %init: 100 x0:A(x[.])
   
 Warning: A deadlock was reached after 99 events and 3.185893E+00s (Activity = 0.00000)

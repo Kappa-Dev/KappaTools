@@ -485,7 +485,8 @@ let one_connected_component sigs ty node graph =
   let rec build id acc known =
     function
     | [] -> Tools.array_rev_map_of_list
-              (fun (node_type,sites) -> {
+              (fun (node_id_in_witness,node_type,sites) -> {
+                   Snapshot.node_id_in_witness;
                    Snapshot.node_type;
                    Snapshot.node_sites =
                      Tools.array_map_of_list
@@ -519,7 +520,7 @@ let one_connected_component sigs ty node graph =
                  ((link,
                    (Mods.DynArray.get graph.state node).(i)))::acc)
               (todos,[]) arity in
-          build (succ id) ((ty,ports)::acc) known' todos' in
+          build (succ id) ((node,ty,ports)::acc) known' todos' in
   build 0 [] Mods.IntMap.empty [node,ty]
 
 let species ~debugMode sigs root graph =

@@ -7,12 +7,13 @@
 (******************************************************************************)
 
 type cc_site = {
-     site_link: (int * int) option;
-     site_state: int option;
+  site_link: (int * int) option;
+  site_state: int option;
 }
 type cc_node = {
-     node_type: int;
-     node_sites: cc_site array;
+  node_type: int;
+  node_id_in_witness: int;
+  node_sites: cc_site array;
 }
 type connected_component = cc_node array
 
@@ -121,6 +122,7 @@ let cc_to_user_cc ~debugMode sigs cc =
   let cc_without_counters = Array.of_list (List.rev cc_list) in
   [|Array.map
     (fun ag -> Some {
+         User_graph.node_id_in_witness = Some ag.node_id_in_witness;
          User_graph.node_type =
            Format.asprintf "%a" (Signature.print_agent sigs) ag.node_type;
          User_graph.node_sites =

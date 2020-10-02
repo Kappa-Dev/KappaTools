@@ -17,5 +17,5 @@ Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/() [rate_of_rule [0]] -> ()
 Intial graph;
-  %init: 100 A()
+  %init: 100 x0:A()
   

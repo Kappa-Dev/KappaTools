@@ -32,8 +32,8 @@ On roots: 6 0
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 36 instances.
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 6 A(x[.] y[.])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[1] y[.])
+%init: 6 x1:A(x[.] y[.])
 
 ##Applied 0:
 A(x[./1]), A(x[./1]) @ 1
@@ -41,8 +41,8 @@ On roots: 3 2
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 16 instances.
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 4 instances.
 Obtained
-%init: 2 A(x[1] y[.]), A(x[1] y[.])
-%init: 4 A(x[.] y[.])
+%init: 2 x0:A(x[1] y[.]), x6:A(x[1] y[.])
+%init: 4 x1:A(x[.] y[.])
 
 ##Applied 1:
 A(x[1] y[./2]), A(x[1] y[./2]) @ 1
@@ -50,9 +50,9 @@ On roots: 2
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 2 instances.
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 4 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x3:A(x[1] y[2])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[1] y[.])
+%init: 4 x1:A(x[.] y[.])
 
 ###Applied 0:
 A(x[./1]), A(x[./1]) @ 1
@@ -60,9 +60,9 @@ On roots: 4 5
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 4 instances.
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 4 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 2 A(x[1] y[.]), A(x[1] y[.])
-%init: 2 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x3:A(x[1] y[2])
+%init: 2 x0:A(x[1] y[.]), x6:A(x[1] y[.])
+%init: 2 x1:A(x[.] y[.])
 
 ##Applied 2:
 A(x[1/3] y[2/4]), A(x[1/4] y[2/3]) @ 1
@@ -70,9 +70,9 @@ On roots: 2
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 0 instances.
 Rule GOAL has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 2 A(x[1] y[.]), A(x[1] y[.])
-%init: 2 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x3:A(x[2] y[1])
+%init: 2 x0:A(x[1] y[.]), x6:A(x[1] y[.])
+%init: 2 x1:A(x[.] y[.])
 
 ##Applied 1:
 A(x[1] y[./2]), A(x[1] y[./2]) @ 1
@@ -80,10 +80,10 @@ On roots: 6
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 2 instances.
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 2 A(x[.] y[.])
+%init: 1 x4:A(x[1] y[.]), x5:A(x[1] y[.])
+%init: 1 x2:A(x[1] y[2]), x3:A(x[2] y[1])
+%init: 1 x0:A(x[1] y[2]), x6:A(x[1] y[2])
+%init: 2 x1:A(x[.] y[.])
 
 ###Applied 0:
 A(x[./1]), A(x[./1]) @ 1
@@ -98,20 +98,20 @@ On roots: 2
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 9 instances.
 Rule GOAL has now 1 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[.] y[1]), A(x[1] y[.])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 2 A(x[.] y[.])
+%init: 1 x4:A(x[1] y[.]), x5:A(x[1] y[.])
+%init: 1 x2:A(x[.] y[1]), x3:A(x[1] y[.])
+%init: 1 x0:A(x[1] y[2]), x6:A(x[1] y[2])
+%init: 2 x1:A(x[.] y[.])
 
 ##Applied 0:
 A(x[./1]), A(x[./1]) @ 1
 On roots: 7 2
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 1 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[.]), A(x[2] y[.])
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x7:A(x[1] y[.]), x3:A(x[2] y[.])
+%init: 1 x4:A(x[1] y[.]), x5:A(x[1] y[.])
+%init: 1 x0:A(x[1] y[2]), x6:A(x[1] y[2])
+%init: 1 x1:A(x[.] y[.])
 
 ##Applied 1:
 A(x[1] y[./2]), A(x[1] y[./2]) @ 1
@@ -119,9 +119,9 @@ On roots: 4
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 0 instances.
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 4 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[.]), A(x[2] y[.])
-%init: 2 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x7:A(x[1] y[.]), x3:A(x[2] y[.])
+%init: 2 x0:A(x[1] y[2]), x6:A(x[1] y[2])
+%init: 1 x1:A(x[.] y[.])
 
 ###Applied 2:
 A(x[1/3] y[2/4]), A(x[1/4] y[2/3]) @ 1
@@ -129,10 +129,10 @@ On roots: 0
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 2 instances.
 Rule GOAL has now 3 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[.]), A(x[2] y[.])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 1 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x7:A(x[1] y[.]), x3:A(x[2] y[.])
+%init: 1 x4:A(x[1] y[2]), x5:A(x[1] y[2])
+%init: 1 x0:A(x[1] y[2]), x6:A(x[2] y[1])
+%init: 1 x1:A(x[.] y[.])
 
 ##Applied 2:
 A(x[1/3] y[2/4]), A(x[1/4] y[2/3]) @ 1
@@ -140,9 +140,9 @@ On roots: 4
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 0 instances.
 Rule GOAL has now 5 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[.]), A(x[2] y[.])
-%init: 2 A(x[1] y[2]), A(x[2] y[1])
-%init: 1 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x7:A(x[1] y[.]), x3:A(x[2] y[.])
+%init: 2 x0:A(x[1] y[2]), x6:A(x[2] y[1])
+%init: 1 x1:A(x[.] y[.])
 
 ##Applied 3:
 A(x[1/.]), A(y[1/.]) @ 1
@@ -151,9 +151,9 @@ Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 4 instances.
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 2 instances.
 Rule GOAL has now 4 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 2 A(x[1] y[2]), A(x[2] y[1])
-%init: 2 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[.]), x7:A(x[1] y[.])
+%init: 2 x0:A(x[1] y[2]), x6:A(x[2] y[1])
+%init: 2 x1:A(x[.] y[.])
 
 ###Applied 3:
 A(x[1/.]), A(y[1/.]) @ 1
@@ -161,20 +161,20 @@ On roots: 6
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 9 instances.
 Rule GOAL has now 3 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[1] y[.]), A(x[.] y[1])
-%init: 2 A(x[.] y[.])
+%init: 1 x4:A(x[1] y[2]), x5:A(x[2] y[1])
+%init: 1 x2:A(x[1] y[.]), x7:A(x[1] y[.])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[.] y[1])
+%init: 2 x1:A(x[.] y[.])
 
 ##Applied 0:
 A(x[./1]), A(x[./1]) @ 1
 On roots: 6 1
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 1 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[2] y[1]), A(x[2] y[.])
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[.] y[.])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[2] y[1]), x1:A(x[2] y[.])
+%init: 1 x4:A(x[1] y[2]), x5:A(x[2] y[1])
+%init: 1 x2:A(x[1] y[.]), x7:A(x[1] y[.])
+%init: 1 x3:A(x[.] y[.])
 
 ##Applied 3:
 A(x[1/.]), A(y[1/.]) @ 1
@@ -182,10 +182,10 @@ On roots: 5
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 4 instances.
 Rule GOAL has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[2] y[1]), A(x[2] y[.])
-%init: 1 A(x[1] y[.]), A(x[.] y[1])
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[.] y[.])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[2] y[1]), x1:A(x[2] y[.])
+%init: 1 x4:A(x[1] y[.]), x5:A(x[.] y[1])
+%init: 1 x2:A(x[1] y[.]), x7:A(x[1] y[.])
+%init: 1 x3:A(x[.] y[.])
 
 ###Applied 1:
 A(x[1] y[./2]), A(x[1] y[./2]) @ 1
@@ -193,10 +193,10 @@ On roots: 7
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 0 instances.
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[2] y[1]), A(x[2] y[.])
-%init: 1 A(x[1] y[.]), A(x[.] y[1])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[.] y[.])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[2] y[1]), x1:A(x[2] y[.])
+%init: 1 x4:A(x[1] y[.]), x5:A(x[.] y[1])
+%init: 1 x2:A(x[1] y[2]), x7:A(x[1] y[2])
+%init: 1 x3:A(x[.] y[.])
 
 ##Applied 2:
 A(x[1/3] y[2/4]), A(x[1/4] y[2/3]) @ 1
@@ -204,10 +204,10 @@ On roots: 2
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 0 instances.
 Rule GOAL has now 4 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[2] y[1]), A(x[2] y[.])
-%init: 1 A(x[1] y[.]), A(x[.] y[1])
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 1 A(x[.] y[.])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[2] y[1]), x1:A(x[2] y[.])
+%init: 1 x4:A(x[1] y[.]), x5:A(x[.] y[1])
+%init: 1 x2:A(x[1] y[2]), x7:A(x[2] y[1])
+%init: 1 x3:A(x[.] y[.])
 
 ##Applied 3:
 A(x[1/.]), A(y[1/.]) @ 1
@@ -215,9 +215,9 @@ On roots: 4
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 9 instances.
 Rule GOAL has now 3 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[2] y[1]), A(x[2] y[.])
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 3 A(x[.] y[.])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[2] y[1]), x1:A(x[2] y[.])
+%init: 1 x2:A(x[1] y[2]), x7:A(x[2] y[1])
+%init: 3 x3:A(x[.] y[.])
 
 ###Applied 3:
 A(x[1/.]), A(y[1/.]) @ 1
@@ -225,9 +225,9 @@ On roots: 2
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 16 instances.
 Rule GOAL has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[2] y[1]), A(x[2] y[.])
-%init: 1 A(x[.] y[1]), A(x[1] y[.])
-%init: 3 A(x[.] y[.])
+%init: 1 x0:A(x[1] y[.]), x6:A(x[2] y[1]), x1:A(x[2] y[.])
+%init: 1 x2:A(x[.] y[1]), x7:A(x[1] y[.])
+%init: 3 x3:A(x[.] y[.])
 
 ##Applied 0:
 A(x[./1]), A(x[./1]) @ 1
@@ -236,8 +236,8 @@ A(x[./1]), A(x[./1]) @ 1
 On roots: 4 2
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 4 instances.
 Obtained
-%init: 2 A(x[1] y[.]), A(x[2] y[1]), A(x[2] y[.])
-%init: 2 A(x[.] y[.])
+%init: 2 x0:A(x[1] y[.]), x6:A(x[2] y[1]), x1:A(x[2] y[.])
+%init: 2 x3:A(x[.] y[.])
 
 ##Applied 3:
 A(x[1/.]), A(y[1/.]) @ 1
@@ -246,9 +246,9 @@ Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 9 instances.
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 2 instances.
 Rule GOAL has now 1 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[.]), A(x[2] y[.])
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 3 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x4:A(x[1] y[.]), x7:A(x[2] y[.])
+%init: 1 x1:A(x[1] y[.]), x6:A(x[1] y[.])
+%init: 3 x0:A(x[.] y[.])
 
 ###Applied 1:
 A(x[1] y[./2]), A(x[1] y[./2]) @ 1
@@ -256,9 +256,9 @@ On roots: 1
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 0 instances.
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[.]), A(x[2] y[.])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 3 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x4:A(x[1] y[.]), x7:A(x[2] y[.])
+%init: 1 x1:A(x[1] y[2]), x6:A(x[1] y[2])
+%init: 3 x0:A(x[.] y[.])
 
 ##Applied 0:
 A(x[./1]), A(x[./1]) @ 1
@@ -266,10 +266,10 @@ On roots: 3 5
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 1 instances.
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[.]), A(x[2] y[.])
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x4:A(x[1] y[.]), x7:A(x[2] y[.])
+%init: 1 x3:A(x[1] y[.]), x5:A(x[1] y[.])
+%init: 1 x1:A(x[1] y[2]), x6:A(x[1] y[2])
+%init: 1 x0:A(x[.] y[.])
 
 ##Applied 3:
 A(x[1/.]), A(y[1/.]) @ 1
@@ -278,9 +278,9 @@ Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 4 instances.
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 4 instances.
 Rule GOAL has now 0 instances.
 Obtained
-%init: 2 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 2 A(x[.] y[.])
+%init: 2 x2:A(x[1] y[.]), x4:A(x[1] y[.])
+%init: 1 x1:A(x[1] y[2]), x6:A(x[1] y[2])
+%init: 2 x0:A(x[.] y[.])
 
 ###Applied 1:
 A(x[1] y[./2]), A(x[1] y[./2]) @ 1
@@ -288,9 +288,9 @@ On roots: 4
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 2 instances.
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 4 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 2 A(x[1] y[2]), A(x[1] y[2])
-%init: 2 A(x[.] y[.])
+%init: 1 x3:A(x[1] y[.]), x5:A(x[1] y[.])
+%init: 2 x1:A(x[1] y[2]), x6:A(x[1] y[2])
+%init: 2 x0:A(x[.] y[.])
 
 ##Applied 2:
 A(x[1/3] y[2/4]), A(x[1/4] y[2/3]) @ 1
@@ -298,10 +298,10 @@ On roots: 1
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 2 instances.
 Rule GOAL has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 2 A(x[.] y[.])
+%init: 1 x3:A(x[1] y[.]), x5:A(x[1] y[.])
+%init: 1 x2:A(x[1] y[2]), x4:A(x[1] y[2])
+%init: 1 x1:A(x[1] y[2]), x6:A(x[2] y[1])
+%init: 2 x0:A(x[.] y[.])
 
 ##Applied 1:
 A(x[1] y[./2]), A(x[1] y[./2]) @ 1
@@ -309,9 +309,9 @@ On roots: 5
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 0 instances.
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 4 instances.
 Obtained
-%init: 2 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 2 A(x[.] y[.])
+%init: 2 x2:A(x[1] y[2]), x4:A(x[1] y[2])
+%init: 1 x1:A(x[1] y[2]), x6:A(x[2] y[1])
+%init: 2 x0:A(x[.] y[.])
 
 ###Applied 0:
 A(x[./1]), A(x[./1]) @ 1
@@ -323,9 +323,9 @@ On roots: 5
 Rule A(x[1] y[2]), A(x[1] y[2]) -> A(x[1] y[2]), A(x[2] y[1]) has now 2 instances.
 Rule GOAL has now 4 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 2 A(x[1] y[2]), A(x[2] y[1])
-%init: 2 A(x[.] y[.])
+%init: 1 x2:A(x[1] y[2]), x4:A(x[1] y[2])
+%init: 2 x1:A(x[1] y[2]), x6:A(x[2] y[1])
+%init: 2 x0:A(x[.] y[.])
 
 ##Applied 3:
 A(x[1/.]), A(y[1/.]) @ 1
@@ -333,10 +333,10 @@ On roots: 6
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 9 instances.
 Rule GOAL has now 3 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[1] y[.]), A(x[.] y[1])
-%init: 2 A(x[.] y[.])
+%init: 1 x3:A(x[1] y[2]), x5:A(x[2] y[1])
+%init: 1 x2:A(x[1] y[2]), x4:A(x[1] y[2])
+%init: 1 x1:A(x[1] y[.]), x6:A(x[.] y[1])
+%init: 2 x0:A(x[.] y[.])
 
 ##Applied 0:
 A(x[./1]), A(x[./1]) @ 1
@@ -344,10 +344,10 @@ On roots: 7 0
 Rule A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) has now 1 instances.
 Rule A(x[1] y[.]), A(x[1] y[.]) -> A(x[1] y[1]), A(x[1] y[1]) has now 2 instances.
 Obtained
-%init: 1 A(x[1] y[2]), A(x[2] y[1])
-%init: 1 A(x[1] y[2]), A(x[1] y[2])
-%init: 1 A(x[1] y[.]), A(x[.] y[1])
-%init: 1 A(x[1] y[.]), A(x[1] y[.])
+%init: 1 x3:A(x[1] y[2]), x5:A(x[2] y[1])
+%init: 1 x2:A(x[1] y[2]), x4:A(x[1] y[2])
+%init: 1 x1:A(x[1] y[.]), x6:A(x[.] y[1])
+%init: 1 x0:A(x[1] y[.]), x7:A(x[1] y[.])
 
 ###
 + Loading trace

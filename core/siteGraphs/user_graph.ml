@@ -29,6 +29,7 @@ type cc_site = {
 
 type cc_node = {
   node_type: string;
+  node_id_in_witness: int option;
   node_sites: cc_site array;
 }
 
@@ -94,10 +95,12 @@ let print_intf with_link node =
           | Port p -> print_port with_link node p id f
           | Counter i -> Format.fprintf f "{=%i}" i))
 
-let print_agent link node f = function
+let print_agent with_id link node f = function
   | None -> Format.pp_print_string f "."
   | Some ag ->
-    Format.fprintf f "%s(@[<h>%a@])"
+    Format.fprintf f "%a%s(@[<h>%a@])"
+      (Pp.option ~with_space:false (fun f i -> Format.fprintf f "x%i:" i))
+      (if with_id then ag.node_id_in_witness else None)
       ag.node_type (print_intf link node)
       ag.node_sites
 
@@ -105,7 +108,7 @@ let print_cc f mix =
   let link = Some (ref(LinkSetMap.Map.empty),ref 0) in
   Pp.array
     (fun f -> Format.fprintf f "\\@ ")
-    (fun al -> Pp.array Pp.comma (fun ar -> print_agent link (al,ar))) f mix
+    (fun al -> Pp.array Pp.comma (fun ar -> print_agent true link (al,ar))) f mix
 
 let get_color =
   let store = Hashtbl.create 10 in
@@ -126,7 +129,7 @@ let print_dot_cc nb_cc f mix =
            | Some ag ->
              Format.fprintf
                f "node%d_%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
-               nb_cc il ir (print_agent None (il,ir)) (Some ag)
+               nb_cc il ir (print_agent false None (il,ir)) (Some ag)
                (get_color ag.node_type);
              Format.fprintf
                f "node%d_%d_%d -> counter%d [style=invis];@," nb_cc il ir nb_cc)) f mix;
@@ -278,6 +281,12 @@ let write_cc_node ob x =
        let () = JsonUtil.write_field
            "node_type" Yojson.Basic.write_string ob f.node_type in
        let () = JsonUtil.write_comma ob in
+       let () = match f.node_id_in_witness with
+         | None -> ()
+         | Some node_id ->
+           let () = JsonUtil.write_field
+               "node_id_in_witness" Yojson.Basic.write_int ob node_id in
+           JsonUtil.write_comma ob in
        let () = JsonUtil.write_field
            "node_sites" (JsonUtil.write_array write_cc_site) ob f.node_sites in
        Bi_outbuf.add_char ob '}')
@@ -286,14 +295,15 @@ let write_cc_node ob x =
 let read_cc_node p lb =
   JsonUtil.read_option
     (fun p lb ->
-       let (node_type,node_sites) =
+       let (node_id_in_witness,node_type,node_sites) =
          Yojson.Basic.read_fields
-           (fun (n,s) key p lb ->
-              if key = "node_type" then (Yojson.Basic.read_string p lb,s)
+           (fun (id,n,s) key p lb ->
+              if key = "node_id_in_witness" then (Some (Yojson.Basic.read_int p lb),n,s)
+              else if key = "node_type" then (id,Yojson.Basic.read_string p lb,s)
               else let () = assert (key = "node_sites") in
-                (n,Yojson.Basic.read_array read_cc_site p lb))
-           ("",[||]) p lb in
-       { node_type; node_sites })
+                (id,n,Yojson.Basic.read_array read_cc_site p lb))
+           (None,"",[||]) p lb in
+       { node_id_in_witness; node_type; node_sites })
     p lb
 
 let write_connected_component ob f =

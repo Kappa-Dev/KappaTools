@@ -1,6 +1,6 @@
 // Snapshot [Event: 92]
 %def: "T0" "1"
 
-%init: 92 /*1 agents*/ A(a{p}[.])
-%init: 9908 /*1 agents*/ A(a{u}[.])
+%init: 92 /*1 agents*/ x17:A(a{p}[.])
+%init: 9908 /*1 agents*/ x0:A(a{u}[.])
 

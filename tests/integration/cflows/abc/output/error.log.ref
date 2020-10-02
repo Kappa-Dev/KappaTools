@@ -119,9 +119,9 @@ Domain:
   /*cc20*/ C/*3*/(x2{u}) -> (-3(x1{p})->() 3 -3(x1{u})->() 2)
   /*cc21*/ C/*3*/(x2{p}) -> (-3(x1{p})->() 4)
 Intial graph;
-  %init: 10000 C(x1{u}[.] x2{u}[.])
-  %init: 1000 B(x[.])
-  %init: 1000 A(x[.] c[.])
+  %init: 10000 x2000:C(x1{u}[.] x2{u}[.])
+  %init: 1000 x1:B(x[.])
+  %init: 1000 x0:A(x[.] c[.])
   
 File "abc.ka", line 40, characters 12-18:
 Warning: [Emax] constant is evaluated to infinity
