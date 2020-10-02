@@ -1,26 +1,183 @@
 // Snapshot [Event: 200]
 %def: "T0" "1.52033"
 
-%init: 3 /*6 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[4] b[2] c[5]),
-  A(a{p}[4]), C(c[5]), C(c[3])
-%init: 7 /*5 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[.] b[2] c[4]),
-  C(c[4]), C(c[3])
-%init: 4 /*4 agents*/ B(a[.] b[1] c[2]), B(a[.] b[1] c[3]), C(c[3]), C(c[2])
-%init: 5 /*5 agents*/ A(a{p}[1]), B(a[1] b[2] c[.]), B(a[3] b[2] c[4]),
-  A(a{p}[3]), C(c[4])
-%init: 2 /*4 agents*/ A(a{p}[1]), B(a[1] b[2] c[.]), B(a[.] b[2] c[3]),
-  C(c[3])
-%init: 8 /*4 agents*/ A(a{p}[1]), B(a[1] b[2] c[3]), B(a[.] b[2] c[.]),
-  C(c[3])
-%init: 2 /*3 agents*/ B(a[.] b[1] c[.]), B(a[.] b[1] c[2]), C(c[2])
-%init: 11 /*3 agents*/ A(a{p}[1]), B(a[1] b[.] c[2]), C(c[2])
-%init: 3 /*2 agents*/ B(a[.] b[.] c[1]), C(c[1])
-%init: 41 /*1 agents*/ C(c[.])
-%init: 2 /*4 agents*/ A(a{u}[1]), B(a[1] b[2] c[.]), B(a[3] b[2] c[.]),
-  A(a{u}[3])
-%init: 2 /*3 agents*/ A(a{u}[1]), B(a[1] b[2] c[.]), B(a[.] b[2] c[.])
-%init: 2 /*2 agents*/ B(a[.] b[1] c[.]), B(a[.] b[1] c[.])
-%init: 10 /*2 agents*/ A(a{u}[1]), B(a[1] b[.] c[.])
-%init: 2 /*1 agents*/ B(a[.] b[.] c[.])
-%init: 40 /*1 agents*/ A(a{u}[.])
+%init: 1 /*6 agents*/ x2:A(a{p}[1]), x183:B(a[1] b[2] c[3]),
+  x173:B(a[4] b[2] c[5]), x50:A(a{p}[4]), x298:C(c[5]), x219:C(c[3])
+%init: 1 /*6 agents*/ x9:A(a{p}[1]), x171:B(a[1] b[2] c[3]),
+  x182:B(a[4] b[2] c[5]), x79:A(a{p}[4]), x287:C(c[5]), x233:C(c[3])
+%init: 1 /*6 agents*/ x48:A(a{p}[1]), x197:B(a[1] b[2] c[3]),
+  x166:B(a[4] b[2] c[5]), x80:A(a{p}[4]), x256:C(c[5]), x254:C(c[3])
+%init: 1 /*5 agents*/ x13:A(a{p}[1]), x140:B(a[1] b[2] c[3]),
+  x189:B(a[.] b[2] c[4]), x282:C(c[4]), x285:C(c[3])
+%init: 1 /*5 agents*/ x44:A(a{p}[1]), x145:B(a[1] b[2] c[3]),
+  x151:B(a[.] b[2] c[4]), x267:C(c[4]), x221:C(c[3])
+%init: 1 /*5 agents*/ x49:A(a{p}[1]), x121:B(a[1] b[2] c[3]),
+  x107:B(a[.] b[2] c[4]), x255:C(c[4]), x259:C(c[3])
+%init: 1 /*5 agents*/ x52:A(a{p}[1]), x155:B(a[1] b[2] c[3]),
+  x119:B(a[.] b[2] c[4]), x222:C(c[4]), x275:C(c[3])
+%init: 1 /*5 agents*/ x59:A(a{p}[1]), x192:B(a[1] b[2] c[3]),
+  x156:B(a[.] b[2] c[4]), x228:C(c[4]), x253:C(c[3])
+%init: 1 /*5 agents*/ x61:A(a{p}[1]), x177:B(a[1] b[2] c[3]),
+  x153:B(a[.] b[2] c[4]), x232:C(c[4]), x295:C(c[3])
+%init: 1 /*5 agents*/ x94:A(a{p}[1]), x185:B(a[1] b[2] c[3]),
+  x106:B(a[.] b[2] c[4]), x264:C(c[4]), x208:C(c[3])
+%init: 1 /*4 agents*/ x100:B(a[.] b[1] c[2]), x191:B(a[.] b[1] c[3]),
+  x224:C(c[3]), x203:C(c[2])
+%init: 1 /*4 agents*/ x105:B(a[.] b[1] c[2]), x180:B(a[.] b[1] c[3]),
+  x294:C(c[3]), x273:C(c[2])
+%init: 1 /*4 agents*/ x108:B(a[.] b[1] c[2]), x142:B(a[.] b[1] c[3]),
+  x243:C(c[3]), x236:C(c[2])
+%init: 1 /*4 agents*/ x169:B(a[.] b[1] c[2]), x187:B(a[.] b[1] c[3]),
+  x270:C(c[3]), x247:C(c[2])
+%init: 1 /*5 agents*/ x11:A(a{p}[1]), x103:B(a[1] b[2] c[.]),
+  x143:B(a[3] b[2] c[4]), x69:A(a{p}[3]), x246:C(c[4])
+%init: 1 /*5 agents*/ x17:A(a{p}[1]), x167:B(a[1] b[2] c[.]),
+  x144:B(a[3] b[2] c[4]), x27:A(a{p}[3]), x220:C(c[4])
+%init: 1 /*5 agents*/ x20:A(a{p}[1]), x136:B(a[1] b[2] c[.]),
+  x149:B(a[3] b[2] c[4]), x72:A(a{p}[3]), x225:C(c[4])
+%init: 1 /*5 agents*/ x36:A(a{p}[1]), x124:B(a[1] b[2] c[3]),
+  x116:B(a[4] b[2] c[.]), x53:A(a{p}[4]), x276:C(c[3])
+%init: 1 /*5 agents*/ x43:A(a{p}[1]), x194:B(a[1] b[2] c[3]),
+  x138:B(a[4] b[2] c[.]), x51:A(a{p}[4]), x288:C(c[3])
+%init: 1 /*4 agents*/ x12:A(a{p}[1]), x198:B(a[1] b[2] c[3]),
+  x193:B(a[.] b[2] c[.]), x239:C(c[3])
+%init: 1 /*4 agents*/ x34:A(a{p}[1]), x147:B(a[1] b[2] c[3]),
+  x133:B(a[.] b[2] c[.]), x240:C(c[3])
+%init: 1 /*4 agents*/ x37:A(a{p}[1]), x199:B(a[1] b[2] c[3]),
+  x160:B(a[.] b[2] c[.]), x201:C(c[3])
+%init: 1 /*4 agents*/ x47:A(a{p}[1]), x128:B(a[1] b[2] c[3]),
+  x129:B(a[.] b[2] c[.]), x216:C(c[3])
+%init: 1 /*4 agents*/ x55:A(a{p}[1]), x164:B(a[1] b[2] c[3]),
+  x115:B(a[.] b[2] c[.]), x229:C(c[3])
+%init: 1 /*4 agents*/ x60:A(a{p}[1]), x113:B(a[1] b[2] c[3]),
+  x126:B(a[.] b[2] c[.]), x209:C(c[3])
+%init: 1 /*4 agents*/ x62:A(a{p}[1]), x161:B(a[1] b[2] c[.]),
+  x111:B(a[.] b[2] c[3]), x289:C(c[3])
+%init: 1 /*4 agents*/ x68:A(a{p}[1]), x117:B(a[1] b[2] c[3]),
+  x118:B(a[.] b[2] c[.]), x284:C(c[3])
+%init: 1 /*4 agents*/ x73:A(a{p}[1]), x134:B(a[1] b[2] c[.]),
+  x176:B(a[.] b[2] c[3]), x215:C(c[3])
+%init: 1 /*4 agents*/ x93:A(a{p}[1]), x196:B(a[1] b[2] c[3]),
+  x132:B(a[.] b[2] c[.]), x211:C(c[3])
+%init: 1 /*3 agents*/ x101:B(a[.] b[1] c[.]), x178:B(a[.] b[1] c[2]),
+  x299:C(c[2])
+%init: 1 /*3 agents*/ x122:B(a[.] b[1] c[2]), x159:B(a[.] b[1] c[.]),
+  x263:C(c[2])
+%init: 1 /*3 agents*/ x1:A(a{p}[1]), x188:B(a[1] b[.] c[2]), x265:C(c[2])
+%init: 1 /*3 agents*/ x5:A(a{p}[1]), x146:B(a[1] b[.] c[2]), x235:C(c[2])
+%init: 1 /*3 agents*/ x8:A(a{p}[1]), x131:B(a[1] b[.] c[2]), x217:C(c[2])
+%init: 1 /*3 agents*/ x21:A(a{p}[1]), x174:B(a[1] b[.] c[2]), x249:C(c[2])
+%init: 1 /*3 agents*/ x23:A(a{p}[1]), x181:B(a[1] b[.] c[2]), x297:C(c[2])
+%init: 1 /*3 agents*/ x26:A(a{p}[1]), x110:B(a[1] b[.] c[2]), x291:C(c[2])
+%init: 1 /*3 agents*/ x28:A(a{p}[1]), x162:B(a[1] b[.] c[2]), x257:C(c[2])
+%init: 1 /*3 agents*/ x30:A(a{p}[1]), x114:B(a[1] b[.] c[2]), x260:C(c[2])
+%init: 1 /*3 agents*/ x32:A(a{p}[1]), x158:B(a[1] b[.] c[2]), x234:C(c[2])
+%init: 1 /*3 agents*/ x45:A(a{p}[1]), x123:B(a[1] b[.] c[2]), x296:C(c[2])
+%init: 1 /*3 agents*/ x65:A(a{p}[1]), x154:B(a[1] b[.] c[2]), x205:C(c[2])
+%init: 1 /*2 agents*/ x135:B(a[.] b[.] c[1]), x214:C(c[1])
+%init: 1 /*2 agents*/ x148:B(a[.] b[.] c[1]), x212:C(c[1])
+%init: 1 /*2 agents*/ x184:B(a[.] b[.] c[1]), x281:C(c[1])
+%init: 1 /*1 agents*/ x200:C(c[.])
+%init: 1 /*1 agents*/ x202:C(c[.])
+%init: 1 /*1 agents*/ x204:C(c[.])
+%init: 1 /*1 agents*/ x206:C(c[.])
+%init: 1 /*1 agents*/ x207:C(c[.])
+%init: 1 /*1 agents*/ x210:C(c[.])
+%init: 1 /*1 agents*/ x213:C(c[.])
+%init: 1 /*1 agents*/ x218:C(c[.])
+%init: 1 /*1 agents*/ x223:C(c[.])
+%init: 1 /*1 agents*/ x226:C(c[.])
+%init: 1 /*1 agents*/ x227:C(c[.])
+%init: 1 /*1 agents*/ x230:C(c[.])
+%init: 1 /*1 agents*/ x231:C(c[.])
+%init: 1 /*1 agents*/ x237:C(c[.])
+%init: 1 /*1 agents*/ x238:C(c[.])
+%init: 1 /*1 agents*/ x241:C(c[.])
+%init: 1 /*1 agents*/ x242:C(c[.])
+%init: 1 /*1 agents*/ x244:C(c[.])
+%init: 1 /*1 agents*/ x245:C(c[.])
+%init: 1 /*1 agents*/ x248:C(c[.])
+%init: 1 /*1 agents*/ x250:C(c[.])
+%init: 1 /*1 agents*/ x251:C(c[.])
+%init: 1 /*1 agents*/ x252:C(c[.])
+%init: 1 /*1 agents*/ x258:C(c[.])
+%init: 1 /*1 agents*/ x261:C(c[.])
+%init: 1 /*1 agents*/ x262:C(c[.])
+%init: 1 /*1 agents*/ x266:C(c[.])
+%init: 1 /*1 agents*/ x268:C(c[.])
+%init: 1 /*1 agents*/ x269:C(c[.])
+%init: 1 /*1 agents*/ x271:C(c[.])
+%init: 1 /*1 agents*/ x272:C(c[.])
+%init: 1 /*1 agents*/ x274:C(c[.])
+%init: 1 /*1 agents*/ x277:C(c[.])
+%init: 1 /*1 agents*/ x278:C(c[.])
+%init: 1 /*1 agents*/ x279:C(c[.])
+%init: 1 /*1 agents*/ x280:C(c[.])
+%init: 1 /*1 agents*/ x283:C(c[.])
+%init: 1 /*1 agents*/ x286:C(c[.])
+%init: 1 /*1 agents*/ x290:C(c[.])
+%init: 1 /*1 agents*/ x292:C(c[.])
+%init: 1 /*1 agents*/ x293:C(c[.])
+%init: 1 /*4 agents*/ x76:A(a{u}[1]), x104:B(a[1] b[2] c[.]),
+  x175:B(a[3] b[2] c[.]), x95:A(a{u}[3])
+%init: 1 /*4 agents*/ x89:A(a{u}[1]), x112:B(a[1] b[2] c[.]),
+  x195:B(a[3] b[2] c[.]), x90:A(a{u}[3])
+%init: 1 /*3 agents*/ x66:A(a{u}[1]), x130:B(a[1] b[2] c[.]),
+  x139:B(a[.] b[2] c[.])
+%init: 1 /*3 agents*/ x86:A(a{u}[1]), x190:B(a[1] b[2] c[.]),
+  x186:B(a[.] b[2] c[.])
+%init: 1 /*2 agents*/ x120:B(a[.] b[1] c[.]), x127:B(a[.] b[1] c[.])
+%init: 1 /*2 agents*/ x125:B(a[.] b[1] c[.]), x168:B(a[.] b[1] c[.])
+%init: 1 /*2 agents*/ x0:A(a{u}[1]), x152:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x3:A(a{u}[1]), x157:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x15:A(a{u}[1]), x172:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x16:A(a{u}[1]), x141:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x18:A(a{u}[1]), x137:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x19:A(a{u}[1]), x170:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x54:A(a{u}[1]), x109:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x71:A(a{u}[1]), x165:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x88:A(a{u}[1]), x163:B(a[1] b[.] c[.])
+%init: 1 /*2 agents*/ x99:A(a{u}[1]), x179:B(a[1] b[.] c[.])
+%init: 1 /*1 agents*/ x102:B(a[.] b[.] c[.])
+%init: 1 /*1 agents*/ x150:B(a[.] b[.] c[.])
+%init: 1 /*1 agents*/ x4:A(a{u}[.])
+%init: 1 /*1 agents*/ x6:A(a{u}[.])
+%init: 1 /*1 agents*/ x7:A(a{u}[.])
+%init: 1 /*1 agents*/ x10:A(a{u}[.])
+%init: 1 /*1 agents*/ x14:A(a{u}[.])
+%init: 1 /*1 agents*/ x22:A(a{u}[.])
+%init: 1 /*1 agents*/ x24:A(a{u}[.])
+%init: 1 /*1 agents*/ x25:A(a{u}[.])
+%init: 1 /*1 agents*/ x29:A(a{u}[.])
+%init: 1 /*1 agents*/ x31:A(a{u}[.])
+%init: 1 /*1 agents*/ x33:A(a{u}[.])
+%init: 1 /*1 agents*/ x35:A(a{u}[.])
+%init: 1 /*1 agents*/ x38:A(a{u}[.])
+%init: 1 /*1 agents*/ x39:A(a{u}[.])
+%init: 1 /*1 agents*/ x40:A(a{u}[.])
+%init: 1 /*1 agents*/ x41:A(a{u}[.])
+%init: 1 /*1 agents*/ x42:A(a{u}[.])
+%init: 1 /*1 agents*/ x46:A(a{u}[.])
+%init: 1 /*1 agents*/ x56:A(a{u}[.])
+%init: 1 /*1 agents*/ x57:A(a{u}[.])
+%init: 1 /*1 agents*/ x58:A(a{u}[.])
+%init: 1 /*1 agents*/ x63:A(a{u}[.])
+%init: 1 /*1 agents*/ x64:A(a{u}[.])
+%init: 1 /*1 agents*/ x67:A(a{u}[.])
+%init: 1 /*1 agents*/ x70:A(a{u}[.])
+%init: 1 /*1 agents*/ x74:A(a{u}[.])
+%init: 1 /*1 agents*/ x75:A(a{u}[.])
+%init: 1 /*1 agents*/ x77:A(a{u}[.])
+%init: 1 /*1 agents*/ x78:A(a{u}[.])
+%init: 1 /*1 agents*/ x81:A(a{u}[.])
+%init: 1 /*1 agents*/ x82:A(a{u}[.])
+%init: 1 /*1 agents*/ x83:A(a{u}[.])
+%init: 1 /*1 agents*/ x84:A(a{u}[.])
+%init: 1 /*1 agents*/ x85:A(a{u}[.])
+%init: 1 /*1 agents*/ x87:A(a{u}[.])
+%init: 1 /*1 agents*/ x91:A(a{u}[.])
+%init: 1 /*1 agents*/ x92:A(a{u}[.])
+%init: 1 /*1 agents*/ x96:A(a{u}[.])
+%init: 1 /*1 agents*/ x97:A(a{u}[.])
+%init: 1 /*1 agents*/ x98:A(a{u}[.])
 

@@ -1367,6 +1367,7 @@ let convert_contact_map_map_to_list sol =
     (Mods.StringSetMap.Map.fold
        (fun a data l ->
           { User_graph.node_type = a;
+            User_graph.node_id = None;
             User_graph.node_sites=
               Tools.array_rev_of_list
                 (Mods.StringSetMap.Map.fold

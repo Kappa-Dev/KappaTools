@@ -511,6 +511,7 @@ let to_dummy_user_agent = function
   | Absent _ -> None
   | Present ((na,_),s,_mods) -> Some {
       User_graph.node_type = na;
+      User_graph.node_id = None;
       User_graph.node_sites = Tools.array_map_of_list to_dummy_user_site s;
     }
 

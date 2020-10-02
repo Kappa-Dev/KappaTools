@@ -9,7 +9,7 @@
 
 %obs: 'Ap' |A(a{p})|
 
-%mod: [E]=[Emax] do $SNAPSHOT "abc.ka";
+%mod: [E]=[Emax] do $SNAPSHOT "abc.ka" [true];
 
 %init: 100 A(a{u})
 %init: 100 B()

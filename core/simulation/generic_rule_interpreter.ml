@@ -374,7 +374,7 @@ module Make (Instances:Instances_sig.S) = struct
       f "@[<v>%a@,%a@]"
       (Pp.list Pp.space (fun f (i,mix) ->
            Format.fprintf f "%%init: %i @[<h>%a@]" i User_graph.print_cc mix))
-      (Edges.build_user_snapshot ~debugMode:false sigs state.edges)
+      (Edges.build_user_snapshot ~debugMode:false ~raw:false sigs state.edges)
       (Pp.array Pp.space (fun i f el ->
            Format.fprintf
              f "%%init: %a %a"
@@ -1092,11 +1092,12 @@ module Make (Instances:Instances_sig.S) = struct
         (Matching.roots_of ~debugMode domain state.edges pattern) in
     { state with outdated = false }
 
-  let snapshot ~debugMode ~raw:_ env counter state = {
+  let snapshot ~debugMode ~raw env counter state = {
     Data.snapshot_event = Counter.current_event counter;
     Data.snapshot_time = Counter.current_time counter;
     Data.snapshot_agents =
-      Edges.build_user_snapshot ~debugMode (Model.signatures env) state.edges;
+      Edges.build_user_snapshot
+        ~debugMode ~raw (Model.signatures env) state.edges;
     Data.snapshot_tokens = Array.mapi (fun i x ->
         (Format.asprintf "%a" (Model.print_token ~env) i,x)) state.imp.tokens;
   }

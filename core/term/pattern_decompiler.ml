@@ -50,7 +50,7 @@ let of_snapshot g =
   out
 
 let patterns_of_mixture ~debugMode contact_map sigs pre_env e =
-  let snap = Edges.build_snapshot sigs e in
+  let snap = Edges.build_snapshot ~raw:false sigs e in
   let pre_env', acc =
     Snapshot.fold
       (fun (cc_cache,acc) i m ->

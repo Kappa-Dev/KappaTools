@@ -485,7 +485,8 @@ let one_connected_component sigs ty node graph =
   let rec build id acc known =
     function
     | [] -> Tools.array_rev_map_of_list
-              (fun (node_type,sites) -> {
+              (fun (node_id_in_witness,node_type,sites) -> {
+                   Snapshot.node_id_in_witness;
                    Snapshot.node_type;
                    Snapshot.node_sites =
                      Tools.array_map_of_list
@@ -519,7 +520,7 @@ let one_connected_component sigs ty node graph =
                  ((link,
                    (Mods.DynArray.get graph.state node).(i)))::acc)
               (todos,[]) arity in
-          build (succ id) ((ty,ports)::acc) known' todos' in
+          build (succ id) ((node,ty,ports)::acc) known' todos' in
   build 0 [] Mods.IntMap.empty [node,ty]
 
 let species ~debugMode sigs root graph =
@@ -534,33 +535,34 @@ let species ~debugMode sigs root graph =
                 ("Sort of node unavailable "^string_of_int root)))
       | Some ty ->
         Snapshot.cc_to_user_cc
-          ~debugMode sigs (one_connected_component sigs ty root tables) in
+          ~debugMode ~raw:true sigs (one_connected_component sigs ty root tables) in
     let () = Cache.reset (fst tables.caches) in
     specie
 
-let rec aux_build_snapshot sigs tables ccs node =
+let rec aux_build_snapshot raw sigs tables ccs node =
   if node = Mods.DynArray.length tables.sort then
     let () = Cache.reset (fst tables.caches) in
     ccs
   else
   if Cache.test (fst tables.caches) node
-  then aux_build_snapshot sigs tables ccs (succ node)
+  then aux_build_snapshot raw sigs tables ccs (succ node)
   else match Mods.DynArray.get tables.sort node with
-    | None -> aux_build_snapshot sigs tables ccs (succ node)
+    | None -> aux_build_snapshot raw sigs tables ccs (succ node)
     | Some ty ->
       let out =
         one_connected_component sigs ty node tables in
       aux_build_snapshot
-        sigs tables (Snapshot.increment_in_snapshot sigs out ccs) (succ node)
+        raw sigs tables
+        (Snapshot.increment_in_snapshot ~raw sigs out ccs) (succ node)
 
-let build_snapshot sigs graph =
+let build_snapshot ~raw sigs graph =
   match graph.tables with
   | None -> assert false
   | Some tables ->
-    aux_build_snapshot sigs tables Snapshot.empty 0
+    aux_build_snapshot raw sigs tables Snapshot.empty 0
 
-let build_user_snapshot ~debugMode sigs graph =
-  Snapshot.export ~debugMode sigs (build_snapshot sigs graph)
+let build_user_snapshot ~debugMode ~raw sigs graph =
+  Snapshot.export ~debugMode ~raw sigs (build_snapshot ~raw sigs graph)
 
 let debug_print f graph =
   match graph.tables with

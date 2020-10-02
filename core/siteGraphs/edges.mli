@@ -85,10 +85,10 @@ val are_connected :
 val species :
   debugMode:bool -> Signature.s -> int -> t -> User_graph.connected_component
 
-val build_snapshot : Signature.s -> t -> Snapshot.t
+val build_snapshot : raw:bool -> Signature.s -> t -> Snapshot.t
 
 val build_user_snapshot :
-  debugMode:bool -> Signature.s -> t ->
+  debugMode:bool -> raw:bool -> Signature.s -> t ->
   (int * User_graph.connected_component) list
 
 val debug_print : Format.formatter -> t -> unit

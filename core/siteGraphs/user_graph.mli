@@ -29,6 +29,7 @@ type cc_site = {
 
 type cc_node = {
   node_type: string;
+  node_id: int option;
   node_sites: cc_site array;
 }
 

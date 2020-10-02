@@ -7,12 +7,13 @@
 (******************************************************************************)
 
 type cc_site = {
-     site_link: (int * int) option;
-     site_state: int option;
+  site_link: (int * int) option;
+  site_state: int option;
 }
 type cc_node = {
-     node_type: int;
-     node_sites: cc_site array;
+  node_type: int;
+  node_id_in_witness: int;
+  node_sites: cc_site array;
 }
 type connected_component = cc_node array
 
@@ -78,7 +79,7 @@ type t =
 
 let empty = Mods.IntMap.empty
 
-let increment_in_snapshot sigs x s =
+let increment_in_snapshot ~raw sigs x s =
   let cbt_x = classify_by_type sigs x in
   let hs = coarse_hash cbt_x in
   let l = Mods.IntMap.find_default [] hs s in
@@ -87,7 +88,7 @@ let increment_in_snapshot sigs x s =
   | (n,cbt_y,y as h)::t ->
     if equal cbt_x x cbt_y y then (succ n,cbt_y,y)::t
     else h::aux_increment t in
-  Mods.IntMap.add hs (aux_increment l) s
+  Mods.IntMap.add hs (if raw then (1,cbt_x,x)::l else aux_increment l) s
 
 let rec counter_value cc (nid,sid) count =
   let ag = cc.(nid) in
@@ -99,7 +100,7 @@ let rec counter_value cc (nid,sid) count =
         | None -> acc
         | Some x -> counter_value cc x (acc+1)) count ag.node_sites
 
-let cc_to_user_cc ~debugMode sigs cc =
+let cc_to_user_cc ~debugMode ~raw sigs cc =
   let r = Renaming.empty () in
   let (cc_list,indexes,_) =
     Tools.array_fold_lefti
@@ -121,6 +122,7 @@ let cc_to_user_cc ~debugMode sigs cc =
   let cc_without_counters = Array.of_list (List.rev cc_list) in
   [|Array.map
     (fun ag -> Some {
+         User_graph.node_id = if raw then Some ag.node_id_in_witness else None;
          User_graph.node_type =
            Format.asprintf "%a" (Signature.print_agent sigs) ag.node_type;
          User_graph.node_sites =
@@ -164,6 +166,6 @@ let fold f x s =
       List.fold_left (fun a (nb, _, cc) -> f a nb cc) acc l)
     s x
 
-let export ~debugMode sigs s =
-  fold (fun a x y -> (x,cc_to_user_cc ~debugMode sigs y)::a) [] s
+let export ~debugMode ~raw sigs s =
+  fold (fun a x y -> (x,cc_to_user_cc ~debugMode ~raw sigs y)::a) [] s
 
