@@ -170,7 +170,9 @@ let get_compilation_from_pack ~warning kasim_args cli_args pack =
       | None ->
         Option_util.unsome (Configuration.DE 1) conf.Configuration.plotPeriod in
   let counter =
-    Counter.create ~init_t ?init_e ?max_time ?max_event ~plot_period in
+    Counter.create
+      ~init_t ?init_e ?max_time ?max_event
+      ~plot_period ~nb_rules:(Model.nb_rules env0) in
   let env =
     if cli_args.Run_cli_args.batchmode &&
        kasim_args.Kasim_args.marshalizeOutFile = None then

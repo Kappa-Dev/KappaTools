@@ -8,7 +8,7 @@
 
 module Efficiency : sig
   type t = {
-    mutable consecutive : int;
+    consecutive : int array;
     mutable consecutive_blocked : int;
     mutable no_more_binary : int;
     mutable no_more_unary : int;
@@ -16,18 +16,18 @@ module Efficiency : sig
     mutable time_correction : int
   }
 
-  val init: t
+  val init: int -> t
 
   val nb : t -> int
-  val nb_consecutive : t -> int
+  val nb_consecutive : rule_id:int -> t -> int
   val nb_consecutive_blocked : t -> int
   val print_detail : current_event:int -> Format.formatter -> t -> unit
-  val reset_consecutive : t -> t
+  val reset_consecutive : rule_id:int -> t -> t
   val reset_consecutive_blocked : t -> t
 
-  val incr_no_more_binary : t -> t
-  val incr_no_more_unary : t -> t
-  val incr_clashing_instance : t -> t
+  val incr_no_more_binary : rule_id:int -> t -> t
+  val incr_no_more_unary : rule_id:int -> t -> t
+  val incr_clashing_instance : rule_id:int -> t -> t
   val incr_time_correction : t -> t
   val incr_consecutive_blocked : t -> t
 
@@ -38,7 +38,7 @@ module Efficiency : sig
 end =
   struct
     type t = {
-      mutable consecutive : int;
+      consecutive : int array;
       mutable consecutive_blocked : int;
       mutable no_more_binary : int;
       mutable no_more_unary : int;
@@ -46,8 +46,8 @@ end =
       mutable time_correction : int
     }
 
-    let init = {
-      consecutive = 0;
+    let init size = {
+      consecutive = Array.make size 0;
       consecutive_blocked = 0;
       no_more_binary = 0;
       no_more_unary = 0;
@@ -57,29 +57,28 @@ end =
 
     let nb t =
       t.no_more_binary + t.no_more_unary + t.clashing_instance + t.time_correction
-    let nb_consecutive t = t.consecutive
+    let nb_consecutive ~rule_id t = t.consecutive.(rule_id)
     let nb_consecutive_blocked t = t.consecutive_blocked
-    let reset_consecutive t = let () = t.consecutive <- 0 in t
+    let reset_consecutive ~rule_id t = let () = t.consecutive.(rule_id) <- 0 in t
     let reset_consecutive_blocked t = let () = t.consecutive_blocked <- 0 in t
 
     let incr_consecutive_blocked t =
       let () = t.consecutive_blocked <- succ t.consecutive_blocked in
       t
-    let incr_no_more_binary t =
+    let incr_no_more_binary ~rule_id t =
       let () = t.no_more_binary <- succ t.no_more_binary in
-      let () = t.consecutive <- succ t.consecutive in
+      let () = t.consecutive.(rule_id) <- succ t.consecutive.(rule_id) in
       t
-    let incr_no_more_unary t =
+    let incr_no_more_unary ~rule_id t =
       let () = t.no_more_unary <- succ t.no_more_unary in
-      let () = t.consecutive <- succ t.consecutive in
+      let () = t.consecutive.(rule_id) <- succ t.consecutive.(rule_id) in
       t
-    let incr_clashing_instance t =
+    let incr_clashing_instance ~rule_id t =
       let () = t.clashing_instance <- succ t.clashing_instance in
-      let () = t.consecutive <- succ t.consecutive in
+      let () = t.consecutive.(rule_id) <- succ t.consecutive.(rule_id) in
       t
     let incr_time_correction t =
       let () = t.time_correction <- succ t.time_correction in
-      let () = t.consecutive <- succ t.consecutive in
       t
 
     let print_detail ~current_event f t =
@@ -106,7 +105,7 @@ end =
       Format.fprintf f "@]"
 
     let to_yojson t = `Assoc [
-        "consecutive", `Int t.consecutive;
+        "consecutive", JsonUtil.of_array JsonUtil.of_int t.consecutive;
         "consecutive_blocked", `Int t.consecutive_blocked;
         "no_more_binary", `Int t.no_more_binary;
         "no_more_unary", `Int t.no_more_unary;
@@ -117,7 +116,7 @@ end =
     let of_yojson = function
       | `Assoc l as x when List.length l = 6 -> {
           consecutive =
-            Yojson.Basic.Util.to_int
+            (JsonUtil.to_array Yojson.Basic.Util.to_int)
               (Yojson.Basic.Util.member "consecutive" x);
           consecutive_blocked =
               Yojson.Basic.Util.to_int
@@ -170,7 +169,7 @@ let current_story c = c.stories
 let current_time c = c.time
 let current_event c = c.events
 let nb_null_event c = Efficiency.nb c.stat_null
-let consecutive_null_event c = Efficiency.nb_consecutive c.stat_null
+let consecutive_null_event ~rule_id c = Efficiency.nb_consecutive ~rule_id c.stat_null
 let consecutive_blocked c = Efficiency.nb_consecutive_blocked c.stat_null
 let inc_stories c = c.stories <- (c.stories + 1)
 let inc_events c =c.events <- (c.events + 1)
@@ -182,19 +181,19 @@ let check_events c =
   match c.max_event with None -> true | Some max -> c.events < max
 let one_time_advance c dt =
   let () = c.time <- (c.time +. dt) in check_time c
-let one_constructive_event c =
-  let () = c.stat_null <- Efficiency.reset_consecutive c.stat_null in
+let one_constructive_event ~rule_id c =
+  let () = c.stat_null <- Efficiency.reset_consecutive ~rule_id c.stat_null in
   let () = c.stat_null <- Efficiency.reset_consecutive_blocked c.stat_null in
   let () = inc_events c in
   check_time c && check_events c
-let one_no_more_binary_event c =
-  let () = c.stat_null <- Efficiency.incr_no_more_binary c.stat_null in
+let one_no_more_binary_event ~rule_id c =
+  let () = c.stat_null <- Efficiency.incr_no_more_binary ~rule_id c.stat_null in
   check_time c && check_events c
-let one_no_more_unary_event c =
-  let () = c.stat_null <- Efficiency.incr_no_more_unary c.stat_null in
+let one_no_more_unary_event ~rule_id c =
+  let () = c.stat_null <- Efficiency.incr_no_more_unary ~rule_id c.stat_null in
   check_time c && check_events c
-let one_clashing_instance_event c =
-  let () = c.stat_null <- Efficiency.incr_clashing_instance c.stat_null in
+let one_clashing_instance_event ~rule_id c =
+  let () = c.stat_null <- Efficiency.incr_clashing_instance ~rule_id c.stat_null in
   check_time c && check_events c
 let one_time_correction_event ?ti c =
   match Option_util.bind Nbr.to_float ti with
@@ -241,11 +240,11 @@ let tracked_events (counter : t) : int option =
 
 let set_plot_period (t :t) plot_period : unit = t.plot_period <- plot_period
 
-let create ?(init_t=0.) ?(init_e=0) ?max_time ?max_event ~plot_period =
+let create ?(init_t=0.) ?(init_e=0) ?max_time ?max_event ~plot_period ~nb_rules =
   {time = init_t ;
    events = init_e ;
    stories = -1 ;
-   stat_null = Efficiency.init ;
+   stat_null = Efficiency.init nb_rules;
    plot_period = plot_period ;
    init_time = init_t ;
    init_event = init_e ;
@@ -258,7 +257,7 @@ let reinitialize counter =
   counter.events <- counter.init_event;
   counter.stories <- -1;
   counter.last_point <- 0;
-  counter.stat_null <- Efficiency.init
+  counter.stat_null <- Efficiency.init (Array.length counter.stat_null.Efficiency.consecutive)
 
 let current_simulation_info c = {
   Trace.Simulation_info.story_id = current_story c;

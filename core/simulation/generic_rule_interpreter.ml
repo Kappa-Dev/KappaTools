@@ -1146,18 +1146,18 @@ module Make (Instances:Instances_sig.S) = struct
       else apply_given_instance ~debugMode ~outputs ~rule_id in
     match apply_given env counter graph cause rule instance with
     | Success (graph') ->
-      let final_step = not (Counter.one_constructive_event counter) in
+      let final_step = not (Counter.one_constructive_event ~rule_id counter) in
       (Some rule.Primitives.syntactic_rule,final_step,graph')
     | (Clash | Corrected | Blocked) as out ->
       let continue =
         if out = Clash then
-          Counter.one_clashing_instance_event counter
+          Counter.one_clashing_instance_event ~rule_id counter
         else if out = Blocked then
           Counter.one_blocked_event counter
         else if is_unary
-        then Counter.one_no_more_unary_event counter
-        else Counter.one_no_more_binary_event counter in
-      if Counter.consecutive_null_event counter < maxConsecutiveClash &&
+        then Counter.one_no_more_unary_event ~rule_id counter
+        else Counter.one_no_more_binary_event ~rule_id counter in
+      if Counter.consecutive_null_event ~rule_id counter < maxConsecutiveClash &&
          (match maxConsecutiveBlocked with
             | None -> true
             | Some n -> Counter.consecutive_blocked counter < n)

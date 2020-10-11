@@ -167,7 +167,8 @@ let parse ~patternSharing (ast : Ast.parsing_compil) overwrite system_process =
                    Counter.create
                      ~init_t:(0. : float) ~init_e:(0 : int)
                      ?max_time:None ?max_event:None
-                     ~plot_period:(Configuration.DT 1.) in
+                     ~plot_period:(Configuration.DT 1.)
+                     ~nb_rules:(Model.nb_rules env) in
                  let theSeed =
                    match conf.Configuration.seed with
                    | None ->

@@ -10,7 +10,7 @@
 
 module Efficiency : sig
     type t = {
-      mutable consecutive : int;
+      consecutive : int array;
       mutable consecutive_blocked : int;
       mutable no_more_binary : int;
       mutable no_more_unary : int;
@@ -37,7 +37,7 @@ end
 type t
 val create : ?init_t:float -> ?init_e:int ->
   ?max_time:float -> ?max_event:int ->
-  plot_period:Configuration.period -> t
+  plot_period:Configuration.period -> nb_rules:int -> t
 
 val reinitialize : t -> unit
 
@@ -49,10 +49,10 @@ val fake_time : t -> float -> t
 
 val one_time_advance : t -> float -> bool
 val one_blocked_event : t -> bool
-val one_constructive_event : t -> bool
-val one_clashing_instance_event : t -> bool
-val one_no_more_unary_event : t -> bool
-val one_no_more_binary_event : t -> bool
+val one_constructive_event : rule_id:int -> t -> bool
+val one_clashing_instance_event : rule_id:int -> t -> bool
+val one_no_more_unary_event : rule_id:int -> t -> bool
+val one_no_more_binary_event : rule_id:int -> t -> bool
 val one_time_correction_event : ?ti : Nbr.t -> t -> bool
 
 val inc_stories : t -> unit
@@ -74,7 +74,7 @@ val current_time : t -> float
 val current_event : t -> int
 val current_story : t -> int
 val nb_null_event : t -> int
-val consecutive_null_event : t -> int
+val consecutive_null_event : rule_id:int -> t -> int
 val consecutive_blocked : t -> int
 
 val get_efficiency : t -> Efficiency.t
