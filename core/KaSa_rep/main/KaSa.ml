@@ -318,6 +318,8 @@ let main () =
       ||
       Remanent_parameters.get_backdoor_nbr_of_constraints parameters
       ||
+      Remanent_parameters.get_backdoor_nbr_of_nr_constraints parameters
+      ||
       Remanent_parameters.get_backdoor_nbr_of_influences parameters
      )
     then
@@ -401,6 +403,22 @@ let main () =
           let n_constraints =
             List.fold_left
               (fun n (_,l) -> n+List.length l)
+              0 constraints
+          in
+          Loggers.fprintf
+            (Remanent_parameters.get_logger_backdoor parameters)
+            "%i" n_constraints
+      in
+      let () =
+        if Remanent_parameters.get_backdoor_nbr_of_nr_constraints parameters
+        then
+          let _,constraints = Export_to_KaSa.get_constraints_list state in
+          let n_constraints =
+            List.fold_left
+              (fun n (x,l) ->
+                 if x = "nr"
+                 then n+List.length l
+                 else n)
               0 constraints
           in
           Loggers.fprintf

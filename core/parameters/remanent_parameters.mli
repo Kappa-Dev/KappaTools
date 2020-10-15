@@ -232,6 +232,7 @@ val get_int_interval_separator_symbol: Remanent_parameters_sig.parameters -> str
 val get_backdoor_nbr_of_scc: Remanent_parameters_sig.parameters -> bool
 val get_backdoor_average_size_of_scc: Remanent_parameters_sig.parameters -> bool
 val get_backdoor_nbr_of_constraints: Remanent_parameters_sig.parameters -> bool
+val get_backdoor_nbr_of_nr_constraints: Remanent_parameters_sig.parameters -> bool
 val get_backdoor_nbr_of_influences: Remanent_parameters_sig.parameters -> bool
 val get_backdoor_nbr_of_dead_rules: Remanent_parameters_sig.parameters -> bool
 val get_backdoor_nbr_of_rules: Remanent_parameters_sig.parameters -> bool

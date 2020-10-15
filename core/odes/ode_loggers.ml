@@ -2433,7 +2433,7 @@ let print_integrate ~nobs ~nodevar logger =
           "      vt = soln.x"^(instruction_sep logger);
           "      vy = soln.y"^(instruction_sep logger);
           "   elseif uiIsOctave";
-          "      soln = ode2r(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "      soln = ode23(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
           "      vt = soln.x"^(instruction_sep logger);
           "      vy = soln.y"^(instruction_sep logger);
           "   end";
@@ -2631,7 +2631,7 @@ let print_interpolate logger =
           "";
           "for j=1:nrows";
           "    for i=1:nodevar";
-          "        z(i)=vy(j,i)"^(instruction_sep logger);
+          "        z(i)=vy(i,j)"^(instruction_sep logger);
           "    end";
           "    h=ode_obs(z)"^(instruction_sep logger);
           "    for i=1:nobs";

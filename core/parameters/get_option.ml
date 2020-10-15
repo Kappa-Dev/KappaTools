@@ -399,6 +399,12 @@ let options =
       [],
       Hidden;
 
+      "--backdoor-dump-nbr-nr-constraints",
+      Bool Config.backdoor_nbr_of_nr_constraints,
+      "dump the number of non relational refinement constraints",
+      [],
+      Hidden;
+
       "--backdoor-dump-nbr-influences",
       Bool Config.backdoor_nbr_of_influences,
       "dump the number of influence relations",

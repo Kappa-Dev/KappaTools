@@ -113,6 +113,7 @@ type backdoors =
     backdoor_average_size_of_scc: bool;
     backdoor_nbr_of_influences: bool;
     backdoor_nbr_of_constraints: bool;
+    backdoor_nbr_of_nr_constraints: bool;
     backdoor_nbr_of_dead_rules: bool;
     backdoor_nbr_of_rules: bool;
     backdoor_nbr_of_non_weakly_reversible_transitions: bool;

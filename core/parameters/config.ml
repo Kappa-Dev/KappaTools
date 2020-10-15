@@ -138,6 +138,7 @@ let print_efficiency = ref false
 let backdoor_nbr_of_scc = ref false
 let backdoor_average_size_of_scc = ref false
 let backdoor_nbr_of_constraints = ref false
+let backdoor_nbr_of_nr_constraints = ref false
 let backdoor_nbr_of_influences = ref false
 let backdoor_nbr_of_rules = ref false
 let backdoor_nbr_of_dead_rules = ref false

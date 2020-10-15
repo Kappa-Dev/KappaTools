@@ -122,7 +122,7 @@ else
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+      soln = ode23(@ode_aux,[tinit tend],ode_init(),options);
       vt = soln.x;
       vy = soln.y;
    end
@@ -139,7 +139,7 @@ obs = zeros(nrows,nobs);
 
 for j=1:nrows
     for i=1:nodevar
-        z(i)=vy(j,i);
+        z(i)=vy(i,j);
     end
     h=ode_obs(z);
     for i=1:nobs
