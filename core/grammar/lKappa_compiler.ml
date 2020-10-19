@@ -1069,10 +1069,11 @@ let modif_expr_of_ast
     Ast.STOP
       (List.map
          (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),acc
-  | Ast.SNAPSHOT p ->
+  | Ast.SNAPSHOT (raw,p) ->
     Ast.SNAPSHOT
-      (List.map
-         (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),acc
+      (raw,
+       List.map (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),
+    acc
   | Ast.DIN (rel,p) ->
     Ast.DIN
       (rel,

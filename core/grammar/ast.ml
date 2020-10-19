@@ -84,7 +84,7 @@ type ('pattern,'mixture,'id,'rule) modif_expr =
       ('id Locality.annot *
        ('pattern,'id) Alg_expr.e Locality.annot)
   | STOP of ('pattern,'id) Alg_expr.e Primitives.print_expr list
-  | SNAPSHOT of ('pattern,'id) Alg_expr.e Primitives.print_expr list
+  | SNAPSHOT of bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | PRINT of
       (('pattern,'id) Alg_expr.e Primitives.print_expr list) *
        (('pattern,'id)  Alg_expr.e Primitives.print_expr list)
@@ -95,8 +95,8 @@ type ('pattern,'mixture,'id,'rule) modif_expr =
       Primitives.din_kind * ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | DINOFF of ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | SPECIES_OF of
-      (bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
-       * 'pattern Locality.annot)
+      bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
+      * 'pattern Locality.annot
 
 type ('pattern,'mixture,'id,'rule) perturbation =
   (Nbr.t option *
@@ -692,7 +692,9 @@ let print_modif f = function
   | UPDATE ((s,_),(n,_)) ->
     Format.fprintf f "$UPDATE '%s@' @[%a@];" s print_ast_alg_expr n
   | STOP p -> Format.fprintf f "$STOP%a;" print_print_expr p
-  | SNAPSHOT p -> Format.fprintf f "$SNAPSHOT%a;" print_print_expr p
+  | SNAPSHOT (raw,p) ->
+    Format.fprintf
+      f "$SNAPSHOT%a%t;" print_print_expr p (fun f -> if raw then Format.pp_print_string f " [true]")
   | PRINT ([],x) ->
     Format.fprintf f "$PRINTF%a" print_print_expr x
   | PRINT (file,x) ->
@@ -926,8 +928,8 @@ let modif_to_json filenames f_mix f_var = function
   | STOP l ->
     `List (`String "STOP" ::
            List.map (Primitives.print_expr_to_yojson ~filenames f_mix f_var) l)
-  | SNAPSHOT l ->
-    `List (`String "SNAPSHOT" ::
+  | SNAPSHOT (raw,l) ->
+    `List (`String (if raw then "RAW_SNAPSHOT" else "SNAPSHOT") ::
            List.map (Primitives.print_expr_to_yojson ~filenames f_mix f_var) l)
   | PRINT (file,expr) ->
     `List [ `String "PRINT";
@@ -972,7 +974,10 @@ let modif_of_json filenames f_mix f_var = function
     STOP (List.map (Primitives.print_expr_of_yojson ~filenames f_mix f_var) l)
   | `List (`String "SNAPSHOT" :: l) ->
     SNAPSHOT
-      (List.map (Primitives.print_expr_of_yojson ~filenames f_mix f_var) l)
+      (false,List.map (Primitives.print_expr_of_yojson ~filenames f_mix f_var) l)
+  | `List (`String "RAW_SNAPSHOT" :: l) ->
+    SNAPSHOT
+      (true,List.map (Primitives.print_expr_of_yojson ~filenames f_mix f_var) l)
   | `List [ `String "PRINT"; file; expr ] ->
      PRINT
        (JsonUtil.to_list

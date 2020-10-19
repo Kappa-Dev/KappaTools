@@ -670,7 +670,7 @@ let modif_map f_rule f_allowing_question_marks error alg =
         (error,[]) (List.rev list)
     in
     error,Ast.STOP list'
-  | Ast.SNAPSHOT list ->
+  | Ast.SNAPSHOT (raw,list) ->
     let error,list' =
       List.fold_left
         (fun (error,list) elt ->
@@ -678,7 +678,7 @@ let modif_map f_rule f_allowing_question_marks error alg =
            error,elt'::list)
         (error,[]) (List.rev list)
     in
-    error,Ast.SNAPSHOT list'
+    error,Ast.SNAPSHOT (raw,list')
   | Ast.PRINT (list1,list2) ->
     let error,list1' =
       List.fold_left
@@ -1014,7 +1014,7 @@ let translate_compil parameters error compil =
                       (error,[]) (List.rev l)
                   in
                   error,(Ast.STOP l')::list,rules_rev
-                | Ast.SNAPSHOT l ->
+                | Ast.SNAPSHOT (raw,l) ->
                   let error,l' =
                     List.fold_left
                       (fun (error,l) x ->
@@ -1023,7 +1023,7 @@ let translate_compil parameters error compil =
                       )
                       (error,[]) (List.rev l)
                   in
-                  error,(Ast.SNAPSHOT l')::list,rules_rev
+                  error,(Ast.SNAPSHOT (raw,l'))::list,rules_rev
                 | Ast.PRINT _ | Ast.DIN _ | Ast.DINOFF _ | Ast.CFLOWMIX _
                 | Ast.PLOTENTRY | Ast.CFLOWLABEL _ | Ast.SPECIES_OF _ ->
                   error,list,rules_rev (*to do*))

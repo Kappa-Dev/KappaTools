@@ -139,8 +139,10 @@ let modification ~noCounters ?env f m =
   | Primitives.UPDATE (id,(va,_)) ->
     Format.fprintf f "$UPDATE %a %a"
       (Model.print_alg ?env) id (alg_expr ~noCounters ?env) va
-  | Primitives.SNAPSHOT fn ->
-    Format.fprintf f "$SNAPSHOT %a" (print_expr ~noCounters ?env) fn
+  | Primitives.SNAPSHOT (raw,fn) ->
+    Format.fprintf
+      f "$SNAPSHOT %a%t" (print_expr ~noCounters ?env) fn
+      (fun f -> if raw then Format.pp_print_string f " [true]")
   | Primitives.STOP fn ->
     Format.fprintf f "$STOP %a" (print_expr ~noCounters ?env) fn
   | Primitives.DIN (kind,fn) ->

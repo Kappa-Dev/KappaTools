@@ -84,7 +84,7 @@ type ('pattern,'mixture,'id,'rule) modif_expr =
       ('id Locality.annot * ('pattern,'id) Alg_expr.e Locality.annot)
   (*TODO: pause*)
   | STOP of ('pattern,'id) Alg_expr.e Primitives.print_expr list
-  | SNAPSHOT of ('pattern,'id) Alg_expr.e Primitives.print_expr list
+  | SNAPSHOT of bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
   (*maybe later of mixture too*)
   | PRINT of
       (('pattern,'id) Alg_expr.e Primitives.print_expr list) *
@@ -96,8 +96,8 @@ type ('pattern,'mixture,'id,'rule) modif_expr =
       Primitives.din_kind * ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | DINOFF of ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | SPECIES_OF of
-      (bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
-       * 'pattern Locality.annot)
+      bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
+      * 'pattern Locality.annot
 
 type ('pattern,'mixture,'id,'rule) perturbation =
   (Nbr.t option *

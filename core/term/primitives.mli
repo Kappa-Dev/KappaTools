@@ -124,7 +124,7 @@ val din_kind_of_string :
 type modification =
   | ITER_RULE of alg_expr Locality.annot * elementary_rule
   | UPDATE of int * alg_expr Locality.annot
-  | SNAPSHOT of alg_expr print_expr list
+  | SNAPSHOT of bool * alg_expr print_expr list
   | STOP of alg_expr print_expr list
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list

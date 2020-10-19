@@ -233,7 +233,7 @@ effect:
                  Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
                  Ast.k_op=None; Ast.k_op_un=None}))
        }
-    | SNAPSHOT print_expr {Ast.SNAPSHOT $2}
+    | SNAPSHOT print_expr {Ast.SNAPSHOT (false,$2)}
     | STOP print_expr {Ast.STOP $2}
     | PRINTF print_expr SMALLER print_expr GREATER { Ast.PRINT ($2,$4) }
     | PLOTENTRY { Ast.PLOTENTRY }

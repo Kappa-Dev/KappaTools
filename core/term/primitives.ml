@@ -411,7 +411,7 @@ let din_kind_of_string s =
 type modification =
     ITER_RULE of alg_expr Locality.annot * elementary_rule
   | UPDATE of int * alg_expr Locality.annot
-  | SNAPSHOT of alg_expr print_expr list
+  | SNAPSHOT of bool * alg_expr print_expr list
   | STOP of alg_expr print_expr list
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
@@ -447,9 +447,10 @@ let modification_to_yojson ~filenames = function
              "var", `Int v;
              "value", Locality.annot_to_yojson ~filenames
                (alg_expr_to_yojson ~filenames) e ]
-  | SNAPSHOT f ->
+  | SNAPSHOT (raw,f) ->
     JsonUtil.smart_assoc [
       "action", `String "SNAPSHOT";
+      "raw", `Bool raw;
       "file", JsonUtil.of_list (print_t_expr_to_yojson ~filenames) f ]
   | STOP f ->
     JsonUtil.smart_assoc [
@@ -549,10 +550,17 @@ let modification_of_yojson ~filenames = function
   | `Assoc [ "action", `String "DINOFF" ] -> DINOFF []
   | `Assoc [ "action", `String "SNAPSHOT"; "file", `List l ]
   | `Assoc [ "file", `List l; "action", `String "SNAPSHOT" ] ->
-    SNAPSHOT (List.map (print_t_expr_of_yojson ~filenames) l)
+    SNAPSHOT (false,List.map (print_t_expr_of_yojson ~filenames) l)
+  | `Assoc [ "raw", `Bool raw; "action", `String "SNAPSHOT"; "file", `List l ]
+  | `Assoc [ "raw", `Bool raw; "file", `List l; "action", `String "SNAPSHOT" ]
+  | `Assoc [ "action", `String "SNAPSHOT"; "raw", `Bool raw; "file", `List l ]
+  | `Assoc [ "file", `List l; "raw", `Bool raw; "action", `String "SNAPSHOT" ]
+  | `Assoc [ "action", `String "SNAPSHOT"; "file", `List l; "raw", `Bool raw ]
+  | `Assoc [ "file", `List l; "action", `String "SNAPSHOT"; "raw", `Bool raw ] ->
+    SNAPSHOT (raw,List.map (print_t_expr_of_yojson ~filenames) l)
   | `Assoc [ "action", `String "SNAPSHOT"; "file", `Null ]
   | `Assoc [ "file", `Null; "action", `String "SNAPSHOT" ]
-  | `Assoc [ "action", `String "SNAPSHOT" ] -> SNAPSHOT []
+  | `Assoc [ "action", `String "SNAPSHOT" ] -> SNAPSHOT (false,[])
   | `Assoc [ "action", `String "STOP"; "file", `List l ]
   | `Assoc [ "file", `List l; "action", `String "STOP" ] ->
     STOP (List.map (print_t_expr_of_yojson ~filenames) l)
@@ -679,7 +687,7 @@ let extract_connected_components_modification acc = function
     extract_connected_components_rule
       (extract_connected_components_expr acc e) r
   | UPDATE (_,e) -> extract_connected_components_expr acc e
-  | SNAPSHOT p | STOP p | SPECIES_OFF p
+  | SNAPSHOT (_,p) | STOP p | SPECIES_OFF p
   | DIN (_,p) | DINOFF p -> extract_connected_components_print acc p
   | PRINT (fn,p) ->
     extract_connected_components_print
@@ -712,7 +720,7 @@ let fold_expr_rule f x r =
 let map_expr_modification f = function
   | ITER_RULE (e,r) -> ITER_RULE (f e, map_expr_rule f r)
   | UPDATE (i,e) -> UPDATE (i,f e)
-  | SNAPSHOT p -> SNAPSHOT (map_expr_print f p)
+  | SNAPSHOT (raw,p) -> SNAPSHOT (raw,map_expr_print f p)
   | STOP p -> STOP (map_expr_print f p)
   | PRINT (fn,p) -> PRINT (map_expr_print f fn, map_expr_print f p)
   | DIN (b,p) -> DIN (b,map_expr_print f p)
@@ -723,7 +731,7 @@ let map_expr_modification f = function
 let fold_expr_modification f x = function
   | ITER_RULE (e,r) -> fold_expr_rule f (f x e) r
   | UPDATE (_,e) -> f x e
-  | SNAPSHOT p -> fold_expr_print f x p
+  | SNAPSHOT (_,p) -> fold_expr_print f x p
   | STOP p -> fold_expr_print f x p
   | PRINT (fn,p) -> fold_expr_print f (fold_expr_print f x p) fn
   | DIN (_,p) -> fold_expr_print f x p

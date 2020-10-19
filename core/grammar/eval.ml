@@ -255,11 +255,11 @@ let effects_of_modif
       compile_alg
         ~debugMode ~compileModeOn contact_map domain alg_expr in
     (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
-  | SNAPSHOT pexpr ->
+  | SNAPSHOT (raw,pexpr) ->
     let (domain',pexpr') =
       compile_print_expr ~debugMode ~compileModeOn contact_map domain pexpr in
     (*when specializing snapshots to particular mixtures, add variables below*)
-    (domain', (Primitives.SNAPSHOT pexpr')::rev_effects)
+    (domain', (Primitives.SNAPSHOT (raw,pexpr'))::rev_effects)
   | STOP pexpr ->
     let (domain',pexpr') =
       compile_print_expr ~debugMode ~compileModeOn contact_map domain pexpr in

@@ -593,7 +593,8 @@ effect:
            { raise (ExceptionDefn.Syntax_Error
                       (add_pos 3 "Malformed intervention instruction, I was \
 expecting '$DEL alg_expression kappa_expression'")) }
-  | SNAPSHOT print_expr { let (s,pend,p) = $2 in (Ast.SNAPSHOT s,pend,p) }
+  | SNAPSHOT print_expr { let (s,pend,p) = $2 in (Ast.SNAPSHOT (false,s),pend,p) }
+  | SNAPSHOT print_expr boolean annot { let (s,_,_) = $2 in (Ast.SNAPSHOT ($3,s),end_pos 3,$4) }
   | STOP print_expr { let (s,pend,p) = $2 in (Ast.STOP s,pend,p) }
   | PRINTF print_expr GREATER print_expr
     { let (f,pend,p) = $4 in let (c,_,_) = $2 in (Ast.PRINT (f,c),pend,p) }

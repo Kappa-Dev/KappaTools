@@ -112,7 +112,8 @@ let do_modification
     let () = if pexpr <> [] then
         let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
         outputs (Data.Snapshot
-                   (file,Rule_interpreter.snapshot ~debugMode env counter graph)) in
+                   (file, Rule_interpreter.snapshot
+                      ~debugMode ~raw:false env counter graph)) in
     (true,graph,state,extra)
   | Primitives.PRINT (pe_file,pe_expr) ->
     let file_opt =
@@ -128,13 +129,13 @@ let do_modification
   | Primitives.PLOTENTRY ->
     let () = outputs (Data.Plot (observables_values env graph counter)) in
     (false, graph, state,extra)
-  | Primitives.SNAPSHOT pexpr  ->
+  | Primitives.SNAPSHOT (raw,pexpr)  ->
     let file =
       if pexpr = [] then "snap.ka"
       else Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
     let () = outputs
         (Data.Snapshot
-           (file,Rule_interpreter.snapshot ~debugMode env counter graph)) in
+           (file,Rule_interpreter.snapshot ~debugMode ~raw env counter graph)) in
     (false, graph, state,extra)
   | Primitives.CFLOW (name,cc,tests) ->
     let name = match name with
@@ -492,7 +493,7 @@ let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
             outputs
               (Data.Snapshot
                  ("deadlock.ka",Rule_interpreter.snapshot
-                    ~debugMode env counter graph)) in
+                    ~debugMode ~raw:false env counter graph)) in
         let () =
           outputs
             (Data.Warning
