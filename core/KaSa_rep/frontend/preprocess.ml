@@ -1,7 +1,7 @@
 (**
    * preprocess.ml
    * openkappa
-   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
+   * JÃ©rÃ´me Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
    * Last modification: Time-stamp: <Mar 19 2020>
@@ -2308,17 +2308,22 @@ let translate_init parameters error handler ((alg,pos_alg),init_t) =
       (lift_allowing_question_marks parameters handler) error alg in
   match
     init_t
-    with
+  with
     | Ast.INIT_MIX (mixture,pos') ->
     let error,c_mixture,_,_ = translate_mixture parameters error handler ~creation:true mixture in
     translate_pert_init error
       (alg,pos_alg) (c_alg,pos_alg) mixture c_mixture pos'
     | Ast.INIT_TOK _ -> (*TO DO*)
-       let error,dft = Cckappa_sig.dummy_init parameters error in
+      let error,dft = Cckappa_sig.dummy_init parameters error in
+      match Remanent_parameters.get_called_from parameters with
+      | Remanent_parameters_sig.KaSa ->
        Exception.warn
          parameters error __POS__
          ~message:"token are not supported yet" Exit dft
-
+      | Remanent_parameters_sig.KaSim
+      | Remanent_parameters_sig.Internalised
+      | Remanent_parameters_sig.Server ->
+        error, dft 
 
 let translate_var parameters error handler (a,b) =
   let error,b' = alg_with_pos_map (lift_allowing_question_marks parameters handler) error b in

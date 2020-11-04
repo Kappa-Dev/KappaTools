@@ -746,13 +746,16 @@ let alg_with_pos_with_option_map = with_option_map alg_with_pos_map
 let bool_with_pos_with_option_map = with_option_map bool_with_pos_map
 
 let refine_token parameters error token =
-  let error,token =
-    Exception.warn
-      parameters error __POS__
-      ~message:"Tokens are not implemented in KaSa yet"
-      Exit token
-  in
-  error,token
+  match Remanent_parameters.get_called_from parameters with
+| Remanent_parameters_sig.KaSa ->
+  Exception.warn
+    parameters error __POS__
+    ~message:"Tokens are not implemented in KaSa yet"
+    Exit token
+| Remanent_parameters_sig.KaSim
+| Remanent_parameters_sig.Internalised
+| Remanent_parameters_sig.Server ->
+  error, token
 
 let refine_init_t parameters error = function
   | Ast.INIT_MIX (mixture,pos) ->

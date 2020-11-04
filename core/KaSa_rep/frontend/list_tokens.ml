@@ -506,14 +506,17 @@ let rec scan_mixture parameters remanent mixture =
     scan_mixture parameters remanent mixture
 
 let scan_token parameters remanent _alg = (*TO DO*)
-  let error,remanent = remanent in
-  let error,remanent =
+  match Remanent_parameters.get_called_from parameters with
+  | Remanent_parameters_sig.KaSa ->
+    let error, remanent = remanent in
     Exception.warn
       parameters error __POS__
-      ~message:"scan_token is not implemented yet"
+      ~message:"Tokens are not implemented in KaSa yet"
       Exit remanent
-  in
-  error,remanent
+  | Remanent_parameters_sig.KaSim
+  | Remanent_parameters_sig.Internalised
+  | Remanent_parameters_sig.Server ->
+    remanent
 
 let scan_alg _parameters remanent _alg = (*TO DO*)
   remanent
