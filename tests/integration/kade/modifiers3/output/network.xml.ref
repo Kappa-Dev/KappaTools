@@ -142,40 +142,40 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : unbind -->
-<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{u}[.]) -->
-<reaction id="re6" name="unbind" reversible="false" fast="false">
+<!-- rule    : essai2 -->
+<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1]) -->
+<reaction id="re6" name="essai2" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD30" species="s4"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD31" species="s1"/>
-<speciesReference metaid="CMD32" species="s2"/>
-</listOfProducts>
-<listOfModifiers>
-<modifierSpeciesReference metaid="CMD33" species="s2"/>
-<modifierSpeciesReference metaid="CMD34" species="s5"/>
-</listOfModifiers>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply></apply><ci> s4 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : essai2 -->
-<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1]) -->
-<reaction id="re7" name="essai2" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD35" species="s4"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD36" species="s5"/>
+<speciesReference metaid="CMD31" species="s5"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> nT </ci><ci> s4 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : unbind -->
+<!-- reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{u}[.]) -->
+<reaction id="re7" name="unbind" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD32" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD33" species="s1"/>
+<speciesReference metaid="CMD34" species="s2"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD35" species="s2"/>
+<modifierSpeciesReference metaid="CMD36" species="s5"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply></apply><ci> s4 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>

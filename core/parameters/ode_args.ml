@@ -32,6 +32,7 @@ type t = {
   propagate_constants : bool ref ;
   print_efficiency : bool ref ;
   max_size_for_species : int option ref ;
+  csv_sep: string ref ;
 }
 
 let default : t =
@@ -65,6 +66,7 @@ let default : t =
     propagate_constants = ref false ;
     print_efficiency = ref false ;
     max_size_for_species = ref None ;
+    csv_sep = ref " ";
   }
 
 let combine l1 l2 =
@@ -151,6 +153,10 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
   Superarg.Bool t.propagate_constants,
   "propagate constants",
   [Common_args.output,9],Normal;
+  "--csv-separator",
+  Superarg.String t.csv_sep,
+  "separator symbol in CSV files",
+  [Common_args.output,10],Normal;
   "--rate-convention",
   Superarg.Choice (
     [ "KaSim","do not divide by anything";

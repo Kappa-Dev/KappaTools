@@ -46,7 +46,7 @@ val string_of_array_name: variable -> string
 
 type t
 
-val extend_logger: Loggers.t -> t
+val extend_logger: csv_sep:string -> Loggers.t -> t
 val get_encoding_format: t -> Loggers.encoding
 val fprintf: t -> ('a, Format.formatter, unit) format -> 'a
 val print_newline: t -> unit
@@ -85,5 +85,6 @@ val get_ode : mode:Loggers.encoding -> string
 
 val string_of_variable: side:side -> t -> variable -> string
 val variable_of_derived_variable: variable -> ode_var_id -> variable
+val csv_sep: t -> string
 
 val lift: t -> Loggers.t

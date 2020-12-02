@@ -37,13 +37,13 @@ global var
 var=zeros(nvar,1);
 global init
 init=sparse(nodevar,1);
-stoc=zeros(nrules,max_stoc_coef);
 global k
 global kd
 global kun
 global kdun
 global stoc
 
+stoc=zeros(nrules,max_stoc_coef);
 k=zeros(nrules,1);
 kd=zeros(nrules,1);
 kun=zeros(nrules,1);
@@ -111,7 +111,7 @@ if nonnegative
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options);
+      [vt,vy] = ode45(@ode_aux,[tinit tend],ode_init(),options);
    end
 else
    if uiIsMatlab
@@ -120,7 +120,7 @@ else
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      soln = ode23(@ode_aux,[tinit tend],ode_init(),options);
+      soln = ode45(@ode_aux,[tinit tend],ode_init(),options);
       vt = soln.x;
       vy = soln.y;
    end
@@ -155,11 +155,11 @@ filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE several_partners.ka -syntax 4 -d output -l 1 -p 0.01\n')
 fprintf(fid,'# ')
-fprintf(fid,'[T],')
+fprintf(fid,'[T] ')
 fprintf(fid,'\n')
 for j=1:n_points
     for i=1:nobs
-        fprintf(fid,'%f,',y(j,i));
+        fprintf(fid,'%f ',y(j,i));
     end
     fprintf(fid,'\n');
 end
@@ -217,22 +217,16 @@ dydt(3)=dydt(3)-k(3)*y(3);
 dydt(1)=dydt(1)+k(3)*y(3);
 
 % rule    : A(x[_]) -> .
-% reaction: A(x[1]).B(x[2],y[1]).A(x[2]) -> A(x[1]).B(x[.],y[1])
-
-dydt(5)=dydt(5)-k(3)*y(5);
-dydt(3)=dydt(3)+k(3)*y(5);
-
-% rule    : A(x[_]) -> .
 % reaction: A(x[1]).B(x[2],y[1]).A(x[2]) -> A(x[1]).B(x[1],y[.])
 
 dydt(5)=dydt(5)-k(3)*y(5);
 dydt(4)=dydt(4)+k(3)*y(5);
 
 % rule    : A(x[_]) -> .
-% reaction: A(x[1]).B(x[1],y[.]) -> B(x[.],y[.])
+% reaction: A(x[1]).B(x[2],y[1]).A(x[2]) -> A(x[1]).B(x[.],y[1])
 
-dydt(4)=dydt(4)-k(3)*y(4);
-dydt(1)=dydt(1)+k(3)*y(4);
+dydt(5)=dydt(5)-k(3)*y(5);
+dydt(3)=dydt(3)+k(3)*y(5);
 
 % rule    : A(x[.]), B(y[.]) -> A(x[1]), B(y[1])
 % reaction: A(x[.]) + A(x[1]).B(x[1],y[.]) -> A(x[1]).B(x[2],y[1]).A(x[2])
@@ -240,6 +234,12 @@ dydt(1)=dydt(1)+k(3)*y(4);
 dydt(4)=dydt(4)-k(2)*y(4)*y(2);
 dydt(2)=dydt(2)-k(2)*y(4)*y(2);
 dydt(5)=dydt(5)+k(2)*y(4)*y(2);
+
+% rule    : A(x[_]) -> .
+% reaction: A(x[1]).B(x[1],y[.]) -> B(x[.],y[.])
+
+dydt(4)=dydt(4)-k(3)*y(4);
+dydt(1)=dydt(1)+k(3)*y(4);
 
 % rule    : A(x[.]), B(x[.]) -> A(x[1]), B(x[1])
 % reaction: A(x[.]) + B(x[.],y[.]) -> A(x[1]).B(x[1],y[.])
@@ -323,22 +323,6 @@ jac(1,6)=jac(1,6)+jack(3,6)*y(3);
 jac(1,3)=jac(1,3)+k(3);
 
 % rule    : A(x[_]) -> .
-% reaction: A(x[1]).B(x[2],y[1]).A(x[2]) -> A(x[1]).B(x[.],y[1])
-
-jac(5,2)=jac(5,2)-jack(3,2)*y(5);
-jac(5,3)=jac(5,3)-jack(3,3)*y(5);
-jac(5,4)=jac(5,4)-jack(3,4)*y(5);
-jac(5,5)=jac(5,5)-jack(3,5)*y(5);
-jac(5,6)=jac(5,6)-jack(3,6)*y(5);
-jac(5,5)=jac(5,5)-k(3);
-jac(3,2)=jac(3,2)+jack(3,2)*y(5);
-jac(3,3)=jac(3,3)+jack(3,3)*y(5);
-jac(3,4)=jac(3,4)+jack(3,4)*y(5);
-jac(3,5)=jac(3,5)+jack(3,5)*y(5);
-jac(3,6)=jac(3,6)+jack(3,6)*y(5);
-jac(3,5)=jac(3,5)+k(3);
-
-% rule    : A(x[_]) -> .
 % reaction: A(x[1]).B(x[2],y[1]).A(x[2]) -> A(x[1]).B(x[1],y[.])
 
 jac(5,2)=jac(5,2)-jack(3,2)*y(5);
@@ -355,6 +339,35 @@ jac(4,6)=jac(4,6)+jack(3,6)*y(5);
 jac(4,5)=jac(4,5)+k(3);
 
 % rule    : A(x[_]) -> .
+% reaction: A(x[1]).B(x[2],y[1]).A(x[2]) -> A(x[1]).B(x[.],y[1])
+
+jac(5,2)=jac(5,2)-jack(3,2)*y(5);
+jac(5,3)=jac(5,3)-jack(3,3)*y(5);
+jac(5,4)=jac(5,4)-jack(3,4)*y(5);
+jac(5,5)=jac(5,5)-jack(3,5)*y(5);
+jac(5,6)=jac(5,6)-jack(3,6)*y(5);
+jac(5,5)=jac(5,5)-k(3);
+jac(3,2)=jac(3,2)+jack(3,2)*y(5);
+jac(3,3)=jac(3,3)+jack(3,3)*y(5);
+jac(3,4)=jac(3,4)+jack(3,4)*y(5);
+jac(3,5)=jac(3,5)+jack(3,5)*y(5);
+jac(3,6)=jac(3,6)+jack(3,6)*y(5);
+jac(3,5)=jac(3,5)+k(3);
+
+% rule    : A(x[.]), B(y[.]) -> A(x[1]), B(y[1])
+% reaction: A(x[.]) + A(x[1]).B(x[1],y[.]) -> A(x[1]).B(x[2],y[1]).A(x[2])
+
+jac(4,6)=jac(4,6)-jack(2,6)*y(4)*y(2);
+jac(4,4)=jac(4,4)-k(2)*y(2);
+jac(4,2)=jac(4,2)-k(2)*y(4);
+jac(2,6)=jac(2,6)-jack(2,6)*y(4)*y(2);
+jac(2,4)=jac(2,4)-k(2)*y(2);
+jac(2,2)=jac(2,2)-k(2)*y(4);
+jac(5,6)=jac(5,6)+jack(2,6)*y(4)*y(2);
+jac(5,4)=jac(5,4)+k(2)*y(2);
+jac(5,2)=jac(5,2)+k(2)*y(4);
+
+% rule    : A(x[_]) -> .
 % reaction: A(x[1]).B(x[1],y[.]) -> B(x[.],y[.])
 
 jac(4,2)=jac(4,2)-jack(3,2)*y(4);
@@ -369,19 +382,6 @@ jac(1,4)=jac(1,4)+jack(3,4)*y(4);
 jac(1,5)=jac(1,5)+jack(3,5)*y(4);
 jac(1,6)=jac(1,6)+jack(3,6)*y(4);
 jac(1,4)=jac(1,4)+k(3);
-
-% rule    : A(x[.]), B(y[.]) -> A(x[1]), B(y[1])
-% reaction: A(x[.]) + A(x[1]).B(x[1],y[.]) -> A(x[1]).B(x[2],y[1]).A(x[2])
-
-jac(4,6)=jac(4,6)-jack(2,6)*y(4)*y(2);
-jac(4,4)=jac(4,4)-k(2)*y(2);
-jac(4,2)=jac(4,2)-k(2)*y(4);
-jac(2,6)=jac(2,6)-jack(2,6)*y(4)*y(2);
-jac(2,4)=jac(2,4)-k(2)*y(2);
-jac(2,2)=jac(2,2)-k(2)*y(4);
-jac(5,6)=jac(5,6)+jack(2,6)*y(4)*y(2);
-jac(5,4)=jac(5,4)+k(2)*y(2);
-jac(5,2)=jac(5,2)+k(2)*y(4);
 
 % rule    : A(x[.]), B(x[.]) -> A(x[1]), B(x[1])
 % reaction: A(x[.]) + B(x[.],y[.]) -> A(x[1]).B(x[1],y[.])

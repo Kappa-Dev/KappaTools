@@ -37,13 +37,13 @@ global var
 var=zeros(nvar,1);
 global init
 init=sparse(nodevar,1);
-stoc=zeros(nrules,max_stoc_coef);
 global k
 global kd
 global kun
 global kdun
 global stoc
 
+stoc=zeros(nrules,max_stoc_coef);
 k=zeros(nrules,1);
 kd=zeros(nrules,1);
 kun=zeros(nrules,1);
@@ -115,7 +115,7 @@ if nonnegative
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options);
+      [vt,vy] = ode45(@ode_aux,[tinit tend],ode_init(),options);
    end
 else
    if uiIsMatlab
@@ -124,7 +124,7 @@ else
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      soln = ode23(@ode_aux,[tinit tend],ode_init(),options);
+      soln = ode45(@ode_aux,[tinit tend],ode_init(),options);
       vt = soln.x;
       vy = soln.y;
    end
@@ -159,13 +159,13 @@ filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE modifiers.ka -syntax 4 -d output -l 1 -p 0.1\n')
 fprintf(fid,'# ')
-fprintf(fid,'[T],')
-fprintf(fid,'t,')
-fprintf(fid,'T,')
+fprintf(fid,'[T] ')
+fprintf(fid,'t ')
+fprintf(fid,'T ')
 fprintf(fid,'\n')
 for j=1:n_points
     for i=1:nobs
-        fprintf(fid,'%f,',y(j,i));
+        fprintf(fid,'%f ',y(j,i));
     end
     fprintf(fid,'\n');
 end
@@ -247,18 +247,18 @@ dydt(4)=dydt(4)-k(1)*y(4);
 dydt(2)=dydt(2)+k(1)*y(4);
 dydt(2)=dydt(2)+k(1)*y(4);
 
+% rule    : essai2
+% reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1])
+
+dydt(4)=dydt(4)-k(2)*y(4);
+dydt(5)=dydt(5)+k(2)*y(4);
+
 % rule    : unbind
 % reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{u}[.])
 
 dydt(4)=dydt(4)-k(4)*y(4);
 dydt(1)=dydt(1)+k(4)*y(4);
 dydt(2)=dydt(2)+k(4)*y(4);
-
-% rule    : essai2
-% reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1])
-
-dydt(4)=dydt(4)-k(2)*y(4);
-dydt(5)=dydt(5)+k(2)*y(4);
 
 % rule    : essai
 % reaction: U(x[.],y{u}[.]) -> T(x[.])
@@ -388,6 +388,12 @@ jac(4,4)=jac(4,4)-k(1);
 jac(2,4)=jac(2,4)+k(1);
 jac(2,4)=jac(2,4)+k(1);
 
+% rule    : essai2
+% reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1])
+
+jac(4,4)=jac(4,4)-k(2);
+jac(5,4)=jac(5,4)+k(2);
+
 % rule    : unbind
 % reaction: U(x[1],y{u}[.]).T(x[1]) -> T(x[.]) + U(x[.],y{u}[.])
 
@@ -403,12 +409,6 @@ jac(2,2)=jac(2,2)+jack(4,2)*y(4);
 jac(2,4)=jac(2,4)+jack(4,4)*y(4);
 jac(2,5)=jac(2,5)+jack(4,5)*y(4);
 jac(2,4)=jac(2,4)+k(4);
-
-% rule    : essai2
-% reaction: U(x[1],y{u}[.]).T(x[1]) -> U(x[1],y{p}[.]).T(x[1])
-
-jac(4,4)=jac(4,4)-k(2);
-jac(5,4)=jac(5,4)+k(2);
 
 % rule    : essai
 % reaction: U(x[.],y{u}[.]) -> T(x[.])

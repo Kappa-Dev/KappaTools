@@ -332,12 +332,15 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       Kappa_files.open_out (Ode_loggers_sig.get_ode ~mode:backend)
     in
     let pre_logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
-    let logger = Ode_loggers_sig.extend_logger pre_logger in
+    let csv_sep =
+      !(ode_args.Ode_args.csv_sep)
+    in
+    let logger = Ode_loggers_sig.extend_logger ~csv_sep pre_logger in
     let logger_buffer =
         begin
           match backend with
           | Loggers.SBML ->
-            Ode_loggers_sig.extend_logger
+            Ode_loggers_sig.extend_logger ~csv_sep
               (Loggers.open_infinite_buffer ~mode:backend ())
           | Loggers.DOTNET
           | Loggers.Matrix | Loggers.HTML_Graph
@@ -346,7 +349,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
           | Loggers.XLS | Loggers.GEPHI
           | Loggers.Octave | Loggers.Matlab
-          | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
+          | Loggers.Mathematica | Loggers.Maple | Loggers.Json ->
+            logger
         end
     in
     let logger_err =

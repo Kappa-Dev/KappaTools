@@ -98,7 +98,8 @@ type t =
     const: VarSet.t ref;
     id_of_parameters: string VarMap.t ref;
     dangerous_parameters: VarSet.t ref ;
-    idset: Mods.StringSet.t ref
+    idset: Mods.StringSet.t ref ;
+    csv_sep: string;
   }
 
 let lift f a = f a.logger
@@ -119,7 +120,7 @@ let string_of_compare_op t = lift Loggers_string_of_op.string_of_compare_op t
 let string_of_un_bool_op t = lift Loggers_string_of_op.string_of_un_bool_op t
 let string_of_bin_bool_op t = lift Loggers_string_of_op.string_of_bin_bool_op t
 
-let extend_logger logger =
+let extend_logger ~csv_sep logger =
   {
     logger = logger ;
     id_map = ref StringMap.empty ;
@@ -130,7 +131,8 @@ let extend_logger logger =
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
     dangerous_parameters = ref VarSet.empty;
-    idset = ref Mods.StringSet.empty
+    idset = ref Mods.StringSet.empty;
+    csv_sep ;
   }
 
 let odeFileName  =
@@ -451,4 +453,5 @@ let is_dangerous_ode_variable t var =
 let get_fresh_meta_id logger = Tools.get_ref logger.fresh_meta_id
 let get_fresh_obs_id logger = Tools.get_ref logger.fresh_obs_id
 
+let csv_sep logger = logger.csv_sep
 let lift t = t.logger

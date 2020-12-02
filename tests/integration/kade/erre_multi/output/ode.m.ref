@@ -37,13 +37,13 @@ global var
 var=zeros(nvar,1);
 global init
 init=sparse(nodevar,1);
-stoc=zeros(nrules,max_stoc_coef);
 global k
 global kd
 global kun
 global kdun
 global stoc
 
+stoc=zeros(nrules,max_stoc_coef);
 k=zeros(nrules,1);
 kd=zeros(nrules,1);
 kun=zeros(nrules,1);
@@ -117,7 +117,7 @@ if nonnegative
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options);
+      [vt,vy] = ode45(@ode_aux,[tinit tend],ode_init(),options);
    end
 else
    if uiIsMatlab
@@ -126,7 +126,7 @@ else
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      soln = ode23(@ode_aux,[tinit tend],ode_init(),options);
+      soln = ode45(@ode_aux,[tinit tend],ode_init(),options);
       vt = soln.x;
       vy = soln.y;
    end
@@ -161,13 +161,13 @@ filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE erre.ka -syntax 4 -d output -l 1 -p 0.01\n')
 fprintf(fid,'# ')
-fprintf(fid,'[T],')
-fprintf(fid,'dimmers,')
-fprintf(fid,'monomers,')
+fprintf(fid,'[T] ')
+fprintf(fid,'dimmers ')
+fprintf(fid,'monomers ')
 fprintf(fid,'\n')
 for j=1:n_points
     for i=1:nobs
-        fprintf(fid,'%f,',y(j,i));
+        fprintf(fid,'%f ',y(j,i));
     end
     fprintf(fid,'\n');
 end
@@ -220,10 +220,10 @@ dydt(3)=dydt(3)+k(6)*y(6);
 dydt(4)=dydt(4)+k(6)*y(6);
 
 % rule    : R(r[_]) -> .
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[.],s[1])
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[1],s[.])
 
 dydt(6)=dydt(6)-k(5)*y(6);
-dydt(4)=dydt(4)+k(5)*y(6);
+dydt(3)=dydt(3)+k(5)*y(6);
 dydt(2)=dydt(2)+k(5)*y(6);
 
 % rule    : R(r[_]) -> R(r[.])
@@ -234,10 +234,10 @@ dydt(3)=dydt(3)+k(6)*y(6);
 dydt(4)=dydt(4)+k(6)*y(6);
 
 % rule    : R(r[_]) -> .
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[1],s[.])
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[.],s[1])
 
 dydt(6)=dydt(6)-k(5)*y(6);
-dydt(3)=dydt(3)+k(5)*y(6);
+dydt(4)=dydt(4)+k(5)*y(6);
 dydt(2)=dydt(2)+k(5)*y(6);
 
 % rule    : R(r[_]) -> R(r[.])
@@ -423,10 +423,10 @@ jac(3,6)=jac(3,6)+k(6);
 jac(4,6)=jac(4,6)+k(6);
 
 % rule    : R(r[_]) -> .
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[.],s[1])
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[1],s[.])
 
 jac(6,6)=jac(6,6)-k(5);
-jac(4,6)=jac(4,6)+k(5);
+jac(3,6)=jac(3,6)+k(5);
 jac(2,6)=jac(2,6)+k(5);
 
 % rule    : R(r[_]) -> R(r[.])
@@ -437,10 +437,10 @@ jac(3,6)=jac(3,6)+k(6);
 jac(4,6)=jac(4,6)+k(6);
 
 % rule    : R(r[_]) -> .
-% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[1],s[.])
+% reaction: R(e[1],r[2]).R(e[3],r[2]).E(r[.],s[1]).E(r[3],s[.]) -> E(r[.],s[.]) + R(e[1],r[.]).E(r[.],s[1])
 
 jac(6,6)=jac(6,6)-k(5);
-jac(3,6)=jac(3,6)+k(5);
+jac(4,6)=jac(4,6)+k(5);
 jac(2,6)=jac(2,6)+k(5);
 
 % rule    : R(r[_]) -> R(r[.])

@@ -207,7 +207,7 @@ sol =
 fid = OpenWrite[NotebookDirectory[]<>"data.csv"];
 Write[fid,"# KaDE expr.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend MATHEMATICA\n"];
 Write[fid,"# "];
-Write[fid,"[T],"];
+Write[fid,"[T] "];
 Write[fid,"\n"];
 For[j=tinit,j<tend,j=j+period,(Write[fid,(o1 /. First[sol])[j]];    Write[fid,"\n"];)];
 Close[fid];

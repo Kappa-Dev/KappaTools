@@ -388,6 +388,9 @@ let instruction_sep logger =
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS | Loggers.Json -> ""
 
+let csv_sep logger =
+  Ode_loggers_sig.csv_sep logger
+
 let initialize ~nodevar logger variable =
   let format = Ode_loggers_sig.get_encoding_format logger in
   match
@@ -2424,7 +2427,7 @@ let print_integrate ~nobs ~nodevar logger =
           "      vt = soln.x"^(instruction_sep logger);
           "      vy = soln.y"^(instruction_sep logger);
           "   elseif uiIsOctave";
-          "      [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "      [vt,vy] = ode45(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
           "   end";
           "else";
           "   if uiIsMatlab";
@@ -2433,7 +2436,7 @@ let print_integrate ~nobs ~nodevar logger =
           "      vt = soln.x"^(instruction_sep logger);
           "      vy = soln.y"^(instruction_sep logger);
           "   elseif uiIsOctave";
-          "      soln = ode23(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "      soln = ode45(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
           "      vt = soln.x"^(instruction_sep logger);
           "      vy = soln.y"^(instruction_sep logger);
           "   end";
@@ -2677,7 +2680,7 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
     let () =
       print_list logger
         (List.rev_map
-           (fun x -> "fprintf(fid,'"^x^",')")
+           (fun x -> "fprintf(fid,'"^x^(csv_sep logger )^"')")
            (List.rev titles))
     in
     let () =
@@ -2686,7 +2689,7 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
           "fprintf(fid,'\\n')";
           "for j=1:n_points";
           "    for i=1:nobs";
-          "        fprintf(fid,'%f,',y(j,i))"^(instruction_sep logger);
+          "        fprintf(fid,'%f"^(csv_sep logger )^"',y(j,i))"^(instruction_sep logger);
           "    end";
           "    fprintf(fid,'\\n')"^(instruction_sep logger);
           "end";
@@ -2703,7 +2706,7 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
     let () =
       print_list logger
         (List.rev_map
-           (fun x -> "fprintf(fid,\""^x^",\")"^(instruction_sep logger))
+           (fun x -> "fprintf(fid,\""^x^(csv_sep logger )^"\")"^(instruction_sep logger))
            (List.rev titles))
     in
     let () =
@@ -2719,7 +2722,9 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
            let () =
              Ode_loggers_sig.fprintf
                logger
-               "        fprintf(fid,\"%%f,\",eval(obs%i(t),sol(j)))%s" k
+               ("        fprintf(fid,\"%%f%s\",eval(obs%i(t),sol(j)))%s")
+               (csv_sep logger)
+               k
                (instruction_sep logger) in
            Ode_loggers_sig.print_newline logger)
         nobs
@@ -2743,7 +2748,7 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
   let () =
     print_list logger
       (List.rev_map
-         (fun x -> "Write[fid,\""^x^",\"]"^(instruction_sep logger))
+         (fun x -> "Write[fid,\""^x^(csv_sep logger )^"\"]"^(instruction_sep logger))
          (List.rev titles))
   in
   let () =

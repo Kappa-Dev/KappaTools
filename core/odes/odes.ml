@@ -2096,13 +2096,13 @@ let convert_obs parameters compil network =
                 ~nodevar logger_buffer
                 (Ode_loggers_sig.Init network.fresh_ode_var_id)
             in
+            let () = declare_rates_global logger_buffer network in
             let () =
               Ode_loggers.initialize
                 ~nodevar logger_buffer
                 (Ode_loggers_sig.Stochiometric_coef
                    (network.n_rules,network.max_stoch_coef))
             in
-            let () = declare_rates_global logger_buffer network in
             let () =
               Ode_loggers.initialize
                 ~nodevar logger_buffer

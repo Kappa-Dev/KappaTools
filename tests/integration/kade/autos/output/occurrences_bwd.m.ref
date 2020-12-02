@@ -37,13 +37,13 @@ global var
 var=zeros(nvar,1);
 global init
 init=sparse(nodevar,1);
-stoc=zeros(nrules,max_stoc_coef);
 global k
 global kd
 global kun
 global kdun
 global stoc
 
+stoc=zeros(nrules,max_stoc_coef);
 k=zeros(nrules,1);
 kd=zeros(nrules,1);
 kun=zeros(nrules,1);
@@ -113,7 +113,7 @@ if nonnegative
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options);
+      [vt,vy] = ode45(@ode_aux,[tinit tend],ode_init(),options);
    end
 else
    if uiIsMatlab
@@ -122,7 +122,7 @@ else
       vt = soln.x;
       vy = soln.y;
    elseif uiIsOctave
-      soln = ode23(@ode_aux,[tinit tend],ode_init(),options);
+      soln = ode45(@ode_aux,[tinit tend],ode_init(),options);
       vt = soln.x;
       vy = soln.y;
    end
@@ -157,14 +157,14 @@ filename = 'occurrences_bwd.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE autos.ka -d output -syntax 4 --output occurrences_bwd -l 1 -p 0.01 --rate-convention KaSim --with-symmetries Backward --output-plot occurrences_bwd.csv\n')
 fprintf(fid,'# ')
-fprintf(fid,'[T],')
-fprintf(fid,'cst,')
-fprintf(fid,'x_free,')
-fprintf(fid,'x_dimer,')
+fprintf(fid,'[T] ')
+fprintf(fid,'cst ')
+fprintf(fid,'x_free ')
+fprintf(fid,'x_dimer ')
 fprintf(fid,'\n')
 for j=1:n_points
     for i=1:nobs
-        fprintf(fid,'%f,',y(j,i));
+        fprintf(fid,'%f ',y(j,i));
     end
     fprintf(fid,'\n');
 end

@@ -204,10 +204,10 @@ sol :=
 fid := fopen ("data.csv",WRITE):
 fprintf(fid,"# KaDE expr.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend MAPLE\n"):
 fprintf(fid,"# "):
-fprintf(fid,"[T],"):
+fprintf(fid,"[T] "):
 fprintf(fid,"\n"):
 for j from tinit to tend by period  do
-        fprintf(fid,"%f,",eval(obs1(t),sol(j))):
+        fprintf(fid,"%f ",eval(obs1(t),sol(j))):
     fprintf(fid,"\n"):
 end:
 fclose(fid):
