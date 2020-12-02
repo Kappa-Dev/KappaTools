@@ -79,3 +79,5 @@ val find_available_name :
 val default_message_delimter : char
 
 val get_ref: int ref -> int
+
+val remove_double_elements: 'a list -> 'a list

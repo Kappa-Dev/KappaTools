@@ -346,3 +346,15 @@ let get_ref ref =
   let i = !ref in
   let () = ref := i+1 in
   i
+
+let remove_double_elements l =
+  let l = List.sort compare l in
+  let rec aux l accu old =
+    match
+      l, old
+    with
+    | [], _ -> accu
+    | h::t, Some h' when h=h' -> aux t accu old
+    | h::t, (None | Some _) -> aux t (h::accu) (Some h)
+  in
+  aux l [] None

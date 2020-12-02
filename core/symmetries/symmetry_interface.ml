@@ -255,7 +255,10 @@ let find_all_embeddings compil cc =
   let tr =
     Primitives.fully_specified_pattern_to_positive_transformations cc in
   let env = environment compil in
-  Evaluator.find_all_embeddings ~debugMode:compil.debugMode env tr
+  let l =
+    Evaluator.find_all_embeddings ~debugMode:true env tr
+  in
+  Tools.remove_double_elements l
 
 let add_fully_specified_to_graph ~debugMode sigs graph cc =
   let e,g =
@@ -477,7 +480,7 @@ let string_of_var_id ?compil ?init_mode logger r =
     | Loggers.XLS | Loggers.SBML | Loggers.DOTNET
     | Loggers.DOT
     | Loggers.HTML | Loggers.HTML_Graph | Loggers.Js_Graph
-    | Loggers.HTML_Tabular | Loggers.GEPHI 
+    | Loggers.HTML_Tabular | Loggers.GEPHI
     | Loggers.Json | Loggers.Matrix -> ""
   in
   let env = environment_opt compil in
