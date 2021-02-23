@@ -120,7 +120,7 @@ all:
 	dune build --only-packages kappa-library,kappa-binaries
 
 agents:
-	dune build --only-packages kappa-library,kappa-agents
+	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 
 clean_ide:
 	rm -rf gui/Kappa.iconset
@@ -136,7 +136,7 @@ clean_doc:
 	find man/scripts -name \*.witness -delete
 	rm -rf $(MANGENREP)
 
-clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc clean_ide
+clean: clean_doc clean_ide
 	dune clean
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration clean
@@ -149,10 +149,6 @@ check:
 build-tests:
 	dune promote
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration build
-
-temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
-	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete
-	rm -f grammar/kappaLexer.ml grammar/kappaParser.ml grammar/kappaParser.mli
 
 # https://electronjs.org/docs/tutorial/application-distribution
 
