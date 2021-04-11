@@ -1,0 +1,6 @@
+%agent: A(l, r)
+A(l[./1]), A(r[./1]) @ 1.0e-2 {1.0}
+A(l[1/.]), A(r[1/.]) @ 1.0
+%init: 1000 A()
+
+%mod: alarm 4.0 do $STOP "snap.ka" ;

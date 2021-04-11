@@ -159,7 +159,7 @@ let parse ~patternSharing (ast : Ast.parsing_compil) overwrite system_process =
                 | Data.Print _ -> assert false in
               Eval.compile
                 ~debugMode:false ~pause:(fun f -> Lwt.bind (yield ()) f)
-                ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
+                ~return:Lwt.return ?rescale_init:None ?overwrite_t0:None ~compileModeOn:false
                 ~outputs ~sharing:patternSharing sig_nd tk_nd contact_map
                 result >>=
               (fun (env,with_trace,init_l) ->

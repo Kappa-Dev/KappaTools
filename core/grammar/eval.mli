@@ -42,6 +42,7 @@ val compile :
           (Primitives.alg_expr * Primitives.elementary_rule) list -> 'b) ->
   sharing:Pattern.sharing_level -> debugMode:bool -> compileModeOn:bool ->
   ?overwrite_init:(LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
+  ?overwrite_t0: float ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t -> Contact_map.t ->
   ('c, LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.compil -> 'b
 

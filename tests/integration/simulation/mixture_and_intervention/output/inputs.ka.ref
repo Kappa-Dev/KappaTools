@@ -1,0 +1,20 @@
+%def: "seed" "574725003"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "T0" "1"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(l[r.A] r[l.A])
+
+%plot: [T]
+A(l[./1]), A(r[./1]) @ 0.01 {1.}
+A(l[1/.]), A(r[1/.]) @ 1.
+
+/*0*/%mod: alarm 4. ([T] > 1.) do $STOP "snap.ka"; repeat [false]
+
+%init: 1000 A(l[.] r[.])
+
+%mod: [E] = 5027 do $STOP;

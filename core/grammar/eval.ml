@@ -326,20 +326,21 @@ let compile_modifications_no_track =
 
 (* interventions without pre and post, but with alarm are not applied
 at initialisation *)
-let pert_not_init x y z =
+let pert_not_init overwrite_t0 x y z =
   match x,y,z with
   | _, Some p, _ -> p
   | Some _, None, None ->
     let t_var =
       Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR) in
-     let zero = Locality.dummy_annot (Alg_expr.CONST Nbr.zero) in
-     Locality.dummy_annot (Alg_expr.COMPARE_OP (Operator.GREATER,t_var,zero))
+    let t0 = Option_util.fold (fun _ x -> Nbr.F x) Nbr.zero overwrite_t0 in
+    let init_t = Locality.dummy_annot (Alg_expr.CONST t0) in
+    Locality.dummy_annot (Alg_expr.COMPARE_OP (Operator.GREATER,t_var,init_t))
   | None, None, None | Some _, None, Some _ | None, None, Some _ ->
-     Locality.dummy_annot (Alg_expr.TRUE)
+    Locality.dummy_annot (Alg_expr.TRUE)
 
 
 let pert_of_result
-    ~debugMode ~warning ast_algs ast_rules alg_deps ~compileModeOn
+    ~debugMode ~warning ?overwrite_t0 ast_algs ast_rules alg_deps ~compileModeOn
     contact_map domain res =
   let (domain, out_alg_deps, _, lpert,tracking_enabled) =
     List.fold_left
@@ -353,7 +354,7 @@ let pert_of_result
                         ("alarm has to be strictly greater than 0.0", pos)) else ()
           | None -> () in
         let origin = Operator.MODIF p_id in
-        let pre_expr' = pert_not_init alarm pre_expr opt_post in
+        let pre_expr' = pert_not_init overwrite_t0 alarm pre_expr opt_post in
         let (domain',pre) =
           compile_bool
             ~debugMode ~compileModeOn ~origin contact_map domain pre_expr' in
@@ -542,7 +543,7 @@ let init_kasa called_from sigs result =
 *)
 let compile
     ~outputs ~pause ~return ~sharing ~debugMode ~compileModeOn
-    ?overwrite_init ?rescale_init sigs_nd tk_nd contact_map result =
+    ?overwrite_init ?overwrite_t0 ?rescale_init sigs_nd tk_nd contact_map result =
   let warning ~pos msg = outputs (Data.Warning (Some pos,msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
   let preenv = Pattern.PreEnv.empty sigs_nd in
@@ -566,7 +567,7 @@ let compile
   outputs (Data.Log "\t -interventions");
   let (preenv,alg_deps'',pert,has_tracking) =
     pert_of_result
-      ~debugMode ~warning result.variables result.rules alg_deps' ~compileModeOn
+      ~debugMode ~warning ?overwrite_t0 result.variables result.rules alg_deps' ~compileModeOn
       contact_map preenv' result in
 
   pause @@ fun () ->

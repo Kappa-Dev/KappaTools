@@ -1,0 +1,25 @@
+Parsing foo_ruleset.ka...
+done
++ simulation parameters
++ Sanity checks
+Parsing foo_mixture.ka...
+done
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 4 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (1000 agents)
+Done
++ Command line to rerun is: 'KaSim' 'foo_ruleset.ka' '-mixture' 'foo_mixture.ka' '-mode' 'batch' '-d' 'output' '-syntax' '4' '-seed' '574725003'
+______________________________________________________________________
+######################################################################
+Simulation ended
+94.67% of event loops were productive. Null event cause:
+	Valid embedding but not binary when required: 0.35%
+	Clashing instance: 99.29%
+	Perturbation interrupting time advance: 0.35%

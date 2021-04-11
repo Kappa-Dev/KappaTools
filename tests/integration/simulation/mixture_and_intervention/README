@@ -1,0 +1,2 @@
+#!/bin/sh
+"${KAPPABIN}"KaSim foo_ruleset.ka -mixture foo_mixture.ka -mode batch -d output -syntax 4 -seed 574725003 || exit 0

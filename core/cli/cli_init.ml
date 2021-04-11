@@ -86,7 +86,7 @@ let get_pack_from_preprocessed_ast ~kasim_args ~compileModeOn preprocessed_ast =
       ~debugMode:!Parameter.debugModeOn
       ~sharing:kasim_args.Kasim_args.sharing
       ?rescale_init:kasim_args.Kasim_args.rescale
-      ?overwrite_init ~compileModeOn sigs_nd tk_nd contact_map result' in
+      ?overwrite_init ?overwrite_t0 ~compileModeOn sigs_nd tk_nd contact_map result' in
   let story_compression =
     if has_tracking && (n||w||s) then Some story_compression else None in
   (conf, env, contact_map, updated_vars, story_compression,
