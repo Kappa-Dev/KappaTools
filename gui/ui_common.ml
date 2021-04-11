@@ -310,7 +310,7 @@ let create_modal
     ~(title_label : string)
     ~(body : [< Html_types.div_content_fun ] Html.elt Html.list_wrap)
     ~(submit_label: string)
-    ~(submit: ('self Js.t, Dom_html.event Js.t) Dom.event_listener) :
+    ~(submit: ('self Js.t, _ Js.t) Dom.event_listener) :
   [> Html_types.div ] Html.elt =
   let button =
       Html.button

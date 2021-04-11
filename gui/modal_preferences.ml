@@ -206,7 +206,7 @@ let onload () =
   let () =
     (Tyxml_js.To_dom.of_form modal)##.onsubmit :=
       Dom_html.handler
-        (fun (_: Dom_html.event Js.t) ->
+        (fun (_ : _ Js.t) ->
            let () =
              Common.modal ~id:("#"^preferences_modal_id) ~action:"hide" in
            let () = set_action () in
