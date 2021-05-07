@@ -424,6 +424,8 @@ class type configuration =
     method styleActiveLine: bool Js.t Js.prop
     (* ADDON lint/lint.js *)
     method lint : lint_configuration Js.t Js.prop
+    (* ADDON edit/matchbrackets.js *)
+    method matchBrackets: bool Js.t Js.prop
   end
 let default_configuration : configuration Js.t  =
   (Js.Unsafe.js_expr "CodeMirror")##.defaults

@@ -141,6 +141,7 @@ let onload () : unit =
     configuration##.lineNumbers := Js._true;
     configuration##.lineWrapping := Js._true;
     configuration##.styleActiveLine := Js._true;
+    configuration##.matchBrackets := Js._true;
     configuration##.autofocus := Js._true;
     configuration##.gutters := gutter_option;
     configuration##.lint := lint_config;
