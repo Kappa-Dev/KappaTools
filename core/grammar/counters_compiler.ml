@@ -388,6 +388,10 @@ let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
   let () = ra.LKappa.ra_ports.(p_id) <- p in
   (adjust_delta,created)
 
+
+let pos_part i =
+  if i < 0 then 0 else i
+
 (* ag - agent with counters in a rule
    lnk_nb - the max link number used in the rule;
    incr_info - info on the incr agent from the signature
@@ -409,11 +413,11 @@ let remove_counter_agent sigs ag lnk_nb =
              | Ast.CEQ j ->
               (counter_becomes_port
                  sigs ag.ra id delta pos true j lnk_nb)::acc_incrs,
-              lnk_nb+1+j+(fst delta)
+              lnk_nb+1+j+(pos_part (fst delta)) (* JF: link ids were colliding after counter decrementations -> I do not think that we should add delta when negative *)
              | Ast.CGTE j ->
                (counter_becomes_port
                   sigs ag.ra id delta pos false j lnk_nb)::acc_incrs,
-               lnk_nb+1+j+(fst delta)
+               lnk_nb+1+j+(pos_part (fst delta)) (* JF: link ids were colliding after counter decrementations -> I do not think that we should add delta when negative *)
              | Ast.CVAR _ ->
                raise (ExceptionDefn.Internal_Error
                         ("Counter "^s^" should not have a var by now",pos')))
