@@ -2742,19 +2742,19 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
     print_list logger
       [
         "fid = OpenWrite[NotebookDirectory[]<>\""^data_file^"\"]"^(instruction_sep logger);
-        "Write[fid,\"# "^command_line^"\\n\"]"^(instruction_sep logger);
-        "Write[fid,\"# \"]"^(instruction_sep logger)]
+        "WriteString[fid, \"# "^command_line^"\\n\"]"^(instruction_sep logger);
+        "WriteString[fid, \"# \"]"^(instruction_sep logger)]
   in
   let () =
     print_list logger
       (List.rev_map
-         (fun x -> "Write[fid,\""^x^(csv_sep logger )^"\"]"^(instruction_sep logger))
+         (fun x -> "WriteString[fid, \""^x^(csv_sep logger )^"\"]"^(instruction_sep logger))
          (List.rev titles))
   in
   let () =
     print_list logger
       [
-        "Write[fid,\"\\n\"]"^(instruction_sep logger)
+        "WriteString[fid, \"\\n\"]"^(instruction_sep logger)
       ]
   in
   let () =
@@ -2762,21 +2762,25 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
       "For[j=tinit,j<tend,j=j+period,("
   in
   let () =
+    Ode_loggers_sig.print_newline logger
+  in
+  let () =
     repeat
       (fun _ k ->
          let () =
            Ode_loggers_sig.fprintf
              logger
-             "Write[fid,(o%i /. First[sol])[j]]%s" k
+             "    WriteString[fid, (o%i /. First[sol])[j], \" \"]%s" k
              (instruction_sep  logger)
          in
+         let () = Ode_loggers_sig.print_newline logger in
          ())
     nobs
   in
   let () =
     Ode_loggers_sig.fprintf
       logger
-      "    Write[fid,\"\\n\"]%s" (instruction_sep logger)
+      "    WriteString[fid, \"\\n\"]%s" (instruction_sep logger)
   in
   let () =
     Ode_loggers_sig.fprintf logger
