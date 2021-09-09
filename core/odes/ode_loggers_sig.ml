@@ -72,10 +72,10 @@ let string_of_array_name var =
   | N_obs -> "nobs"
   | N_rows -> "nrows"
   | N_rules -> "nrules"
-  | N_max_stoc_coef -> "maxstoccoef"
+  | N_max_stoc_coef -> "max_stoc_coef"
   | Tmp -> "tmp"
   | Current_time -> "t"
-  | Time_scale_factor -> "tcorrectdimmension"
+  | Time_scale_factor -> "t_correct_dimmension"
 
 
 module StringMap = Map.Make (struct type t = string let compare = compare end)
@@ -213,6 +213,10 @@ let string_of_variable_octave var =
 
 type side = LHS | RHS
 
+let rem_underscore s =
+  let l = String.split_on_char '_' s in
+  String.concat "" l
+
 let string_of_variable_mathematica ~side var =
   let side_ext =
     match side
@@ -262,7 +266,7 @@ let string_of_variable_mathematica ~side var =
   | Tmp
   | Current_time
   | Time_scale_factor ->
-    (string_of_array_name var)
+    rem_underscore (string_of_array_name var)
 
 let string_of_variable_maple var =
   match var with

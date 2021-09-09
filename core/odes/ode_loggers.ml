@@ -749,6 +749,20 @@ let dotnet_format format =
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
 
+let mathematica format =
+  match format with
+  | Loggers.Mathematica -> true
+  | Loggers.Maple
+  | Loggers.Matlab | Loggers.Octave
+  | Loggers.SBML | Loggers.DOTNET
+  | Loggers.Json
+  | Loggers.DOT | Loggers.GEPHI
+  | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
+
+
 let mathematica_maple format =
   match format with
   | Loggers.Mathematica | Loggers.Maple -> true
@@ -796,6 +810,12 @@ let associate_nonnegative logger bool =
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
+let replace_exp s =
+  let l = String.split_on_char 'e' s in
+  match l with
+  | [a;b] -> a^"*^"^b
+  | _ -> s
+
 let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id
     logger logger_err alg_expr network_handler  =
   let var = match init_mode with
@@ -820,6 +840,12 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id
           float_of_int (int_of_float f) = f
         then
           Ode_loggers_sig.fprintf logger "%i" (int_of_float f)
+        else
+        if mathematica format
+        then
+          let s = Printf.sprintf "%g" f in
+          let s = replace_exp s in
+          Ode_loggers_sig.fprintf logger "%s" s 
         else
           Ode_loggers_sig.fprintf logger "%g" f
       | Alg_expr.ALG_VAR x ->
