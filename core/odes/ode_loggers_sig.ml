@@ -72,10 +72,10 @@ let string_of_array_name var =
   | N_obs -> "nobs"
   | N_rows -> "nrows"
   | N_rules -> "nrules"
-  | N_max_stoc_coef -> "max_stoc_coef"
+  | N_max_stoc_coef -> "maxstoccoef"
   | Tmp -> "tmp"
   | Current_time -> "t"
-  | Time_scale_factor -> "t_correct_dimmension"
+  | Time_scale_factor -> "tcorrectdimmension"
 
 
 module StringMap = Map.Make (struct type t = string let compare = compare end)
