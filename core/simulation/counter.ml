@@ -240,7 +240,7 @@ let tracked_events (counter : t) : int option =
 
 let set_plot_period (t :t) plot_period : unit = t.plot_period <- plot_period
 
-let create ?(init_t=0.) ?(init_e=0) ?max_time ?max_event ~plot_period ~nb_rules =
+let create ?(init_t=0.) ?(init_e=0) ?max_time ?max_event ~plot_period ~nb_rules () =
   {time = init_t ;
    events = init_e ;
    stories = -1 ;

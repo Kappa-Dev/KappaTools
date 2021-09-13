@@ -238,7 +238,7 @@ val get_refinement: 'site_graph lemma -> 'site_graph list
 
 val string_of_binding_type:
   ?binding_type_symbol:string -> agent_name:string ->
-  site_name:string -> string
+  site_name:string -> unit -> string
 
 val string_of_label_list:
   location pair list -> string

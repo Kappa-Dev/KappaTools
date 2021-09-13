@@ -409,10 +409,10 @@ let channel_of_logger logger = logger.channel_opt
 
 let print_binding_type
     t ?binding_type_symbol:(binding_type_symbol=".")
-    ~agent_name ~site_name =
+    ~agent_name ~site_name () =
   fprintf t
     "%s"
-    (Public_data.string_of_binding_type ~binding_type_symbol ~agent_name ~site_name)
+    (Public_data.string_of_binding_type ~binding_type_symbol ~agent_name ~site_name ())
 
 let dump_json logger json =
   let channel_opt = channel_of_logger logger in

@@ -744,7 +744,7 @@ struct
                in
                let binding =
                  Public_data.string_of_binding_type
-                   ~binding_type_symbol ~agent_name ~site_name
+                   ~binding_type_symbol ~agent_name ~site_name ()
                in
                Loggers.fprintf logger
                  "%s%s%s%s"

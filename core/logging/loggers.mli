@@ -20,7 +20,7 @@ type encoding =
   | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular
   | DOT | TXT | TXT_Tabular | XLS
   | Octave | Matlab | Maple | Mathematica | SBML | DOTNET
-  | Json | GEPHI 
+  | Json | GEPHI
 
 module type FormatMap =
 sig
@@ -59,7 +59,7 @@ val flush_and_clean: t -> Format.formatter -> unit
 
 val print_binding_type:
   t -> ?binding_type_symbol:string -> agent_name:string ->
-  site_name:string -> unit
+  site_name:string -> unit -> unit
 
 val dump_json: t -> Yojson.Basic.t -> unit
 val to_json: t -> Yojson.Basic.t

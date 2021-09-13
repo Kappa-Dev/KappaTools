@@ -46,7 +46,7 @@ let print_binding_state parameter error binding_state =
     in
     let () =
       Loggers.print_binding_type (Remanent_parameters.get_logger parameter)
-        ~binding_type_symbol ~agent_name ~site_name
+        ~binding_type_symbol ~agent_name ~site_name ()
     in
     error
 
@@ -85,7 +85,7 @@ let print_link_state parameter error link =
       in
       let s =
         Public_data.string_of_binding_type
-          ~binding_type_symbol ~agent_name ~site_name
+          ~binding_type_symbol ~agent_name ~site_name ()
       in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -131,7 +131,7 @@ let print_link_state parameter error link =
     in
     let s =
       Public_data.string_of_binding_type
-        ~binding_type_symbol ~agent_name ~site_name
+        ~binding_type_symbol ~agent_name ~site_name ()
     in
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameter)

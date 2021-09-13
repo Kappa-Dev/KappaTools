@@ -37,7 +37,7 @@ end
 type t
 val create : ?init_t:float -> ?init_e:int ->
   ?max_time:float -> ?max_event:int ->
-  plot_period:Configuration.period -> nb_rules:int -> t
+  plot_period:Configuration.period -> nb_rules:int -> unit -> t
 
 val reinitialize : t -> unit
 

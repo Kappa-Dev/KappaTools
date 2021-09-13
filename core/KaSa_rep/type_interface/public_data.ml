@@ -536,7 +536,7 @@ let pos_of_rules_and_vars_of_json =
        (fun x ->
           snd (Locality.annot_of_yojson
               (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
-              x))) 
+              x)))
 
 let refined_influence_node_to_json =
   influence_node_to_json rule_to_json var_to_json
@@ -1052,6 +1052,7 @@ let string_of_binding_type
     ?binding_type_symbol:(binding_type_symbol=".")
     ~agent_name
     ~site_name
+    ()
   =
   Format.sprintf "%s%s%s" site_name binding_type_symbol agent_name
 

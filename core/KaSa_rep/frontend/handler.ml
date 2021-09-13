@@ -109,7 +109,7 @@ let translate_binding_type parameter error handler agent site =
   Public_data.string_of_binding_type
     ~binding_type_symbol
     ~agent_name
-    ~site_name
+    ~site_name ()
 
 let dual
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
