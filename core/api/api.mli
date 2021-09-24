@@ -115,12 +115,12 @@ class type manager_static_analysis = object
   method get_contact_map :
     Public_data.accuracy_level option -> Yojson.Basic.t kasa_reply
   method get_pos_of_rules_and_vars :
-    Public_data.pos_of_rules_and_vars kasa_reply 
+    Public_data.pos_of_rules_and_vars kasa_reply
   method get_influence_map_raw :
     Public_data.accuracy_level option -> string kasa_reply
   method get_local_influence_map :
-    Public_data.accuracy_level option -> ?fwd:int -> ?bwd:int ->
-    ?origin:(int,int) Public_data.influence_node -> total:int ->
+    ?fwd:int -> ?bwd:int -> ?origin:(int,int) Public_data.influence_node ->
+    total:int -> Public_data.accuracy_level option ->
     (Public_data.accuracy_level * int * int option * int option *
      (Public_data.rule, Public_data.var) Public_data.influence_node
        option *
@@ -166,8 +166,8 @@ class type uniform_manager_static_analysis = object
   method get_influence_map_raw :
     Public_data.accuracy_level option -> string result Lwt.t
   method get_local_influence_map :
-    Public_data.accuracy_level option -> ?fwd:int -> ?bwd:int ->
-    ?origin:(int,int) Public_data.influence_node -> total:int ->
+    ?fwd:int -> ?bwd:int -> ?origin:(int,int) Public_data.influence_node ->
+    total:int -> Public_data.accuracy_level option ->
     (Public_data.accuracy_level * int * int option * int option *
      (Public_data.rule, Public_data.var) Public_data.influence_node
        option *

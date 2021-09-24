@@ -256,7 +256,7 @@ class virtual new_client ~is_running ~post mailbox = object(self)
                 Yojson.Basic.write_json
                   b (JsonUtil.of_option Public_data.accuracy_to_json accuracy));
          ])
-    method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
+    method get_local_influence_map ?fwd ?bwd ?origin ~total accuracy =
       self#message Influence_map
         (fun b -> JsonUtil.write_sequence b [
              (fun b -> Yojson.Basic.write_string b "LOCAL_INFLUENCE_MAP");

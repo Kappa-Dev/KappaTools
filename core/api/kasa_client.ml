@@ -116,7 +116,7 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       Lwt_result.bind_result
         (self#message request)
         (fun x -> Result.Ok (Yojson.Basic.to_string x))
-    method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
+    method get_local_influence_map ?fwd ?bwd ?origin ~total accuracy =
           let request =
             `List ( `String "INFLUENCE_MAP" :: (
                 (fun accuracy l ->
@@ -232,8 +232,8 @@ class new_uniform_client ~is_running ~post (mailbox : mailbox):
       raw#get_contact_map accuracy >|= Api_common.result_kasa
     method get_influence_map_raw accuracy =
       raw#get_influence_map_raw accuracy >|= Api_common.result_kasa
-    method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
-      raw#get_local_influence_map accuracy ?fwd ?bwd ?origin ~total >|=
+    method get_local_influence_map ?fwd ?bwd ?origin ~total accuracy =
+      raw#get_local_influence_map ?fwd ?bwd ?origin ~total accuracy >|=
       Api_common.result_kasa
     method get_initial_node =
       raw#get_initial_node >|= Api_common.result_kasa

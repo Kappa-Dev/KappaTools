@@ -804,7 +804,7 @@ let route
                  match total with
                  | Some total ->
                    manager#get_local_influence_map
-                     accuracy ?fwd ?bwd ?origin ~total >>=
+                     ?fwd ?bwd ?origin ~total accuracy >>=
                    Webapp_common.kasa_response
                      ~string_of_success:(fun x ->
                          Yojson.Basic.to_string

@@ -10,7 +10,7 @@ let on_message ~none ~weak ~strong ~send_message =
   let parameter = ref
       (Compression_main.build_parameter
          ~called_from:Remanent_parameters_sig.Server
-         ~send_message ~none ~weak ~strong) in
+         ~send_message ~none ~weak ~strong ()) in
   fun text -> try
       JsonUtil.read_variant
         Yojson.Basic.read_string
@@ -31,7 +31,7 @@ let on_message ~none ~weak ~strong ~send_message =
                  Compression_main.build_parameter
                    ~called_from:Remanent_parameters_sig.Server
                    ~send_message
-                   ~none ~weak ~strong in
+                   ~none ~weak ~strong () in
              ()
            | "RUN" ->
              let env, steps =

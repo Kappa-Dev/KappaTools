@@ -74,7 +74,7 @@ let main () =
     let parameter =
       Compression_main.build_parameter
         ~called_from:Remanent_parameters_sig.KaSim ?send_message:None
-        ~none ~weak ~strong in
+        ~none ~weak ~strong () in
     let () =
       Loggers.fprintf (Compression_main.get_logger parameter)
         "+ Loading trace@." in

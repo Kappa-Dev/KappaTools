@@ -84,7 +84,7 @@ sig
   val set_all_stories_per_obs: parameter -> parameter
   val build_parameter: called_from:Remanent_parameters_sig.called_from ->
     ?send_message:(string -> unit) -> none:bool -> weak:bool -> strong:bool ->
-    parameter
+    unit -> parameter
   val string_of_exn: exn -> string option
   val is_server_mode: parameter -> bool
   val set_compression_weak: parameter -> parameter
@@ -187,7 +187,7 @@ module Cflow_handler =
         ?(send_message=fun x ->
             Loggers.fprintf Loggers.dummy_txt_logger "%s" x;
             Loggers.print_newline Loggers.dummy_txt_logger)
-        ~none ~weak ~strong =
+        ~none ~weak ~strong () =
       let server,out_server,out_channel,out_channel_err,out_channel_profiling,log_step_channel =
         match
           called_from

@@ -60,7 +60,7 @@ module type Cflow_handler =
     val set_all_stories_per_obs: parameter -> parameter
     val build_parameter: called_from:Remanent_parameters_sig.called_from ->
       ?send_message:(string -> unit) -> none:bool -> weak:bool -> strong:bool ->
-      parameter
+      unit -> parameter
     val string_of_exn: exn -> string option
     val is_server_mode: parameter -> bool
     val set_compression_weak: parameter -> parameter
