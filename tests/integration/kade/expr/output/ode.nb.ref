@@ -17,14 +17,14 @@
 
 tinit=0;
 tend=1;
-initialstep=1e-05;
+initialstep=1*^-05;
 maxstep=0.02;
 reltol=0.001;
 abstol=0.001;
 period=0.1;
 
 nodevar=6;
-max_stoc_coef=1;
+maxstoccoef=1;
 nvar=4;
 nobs=1;
 nrules=6;
@@ -205,11 +205,13 @@ sol =
 
 
 fid = OpenWrite[NotebookDirectory[]<>"data.csv"];
-Write[fid,"# KaDE expr.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend MATHEMATICA\n"];
-Write[fid,"# "];
-Write[fid,"[T] "];
-Write[fid,"\n"];
-For[j=tinit,j<tend,j=j+period,(Write[fid,(o1 /. First[sol])[j]];    Write[fid,"\n"];)];
+WriteString[fid, "# KaDE expr.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend MATHEMATICA\n"];
+WriteString[fid, "# "];
+WriteString[fid, "[T] "];
+WriteString[fid, "\n"];
+For[j=tinit,j<tend,j=j+period,(
+    WriteString[fid, (o1 /. First[sol])[j], " "];
+    WriteString[fid, "\n"];)];
 Close[fid];
 
 
