@@ -1,0 +1,16 @@
+module ParanoCharSet : Map_wrapper.Set_with_logs with type elt = char
+module ParanoCharMap : Map_wrapper.Map_with_logs with type elt = char
+module ParanoStringSet : Map_wrapper.Set_with_logs with type elt = string
+module ParanoStringMap : Map_wrapper.Map_with_logs with type elt = string
+module ParanoIntSet : Map_wrapper.Set_with_logs with type elt = int
+module ParanoIntMap : Map_wrapper.Map_with_logs with type elt = int
+module ParanoInt2Set : Map_wrapper.Set_with_logs with type elt = int * int
+module ParanoInt2Map : Map_wrapper.Map_with_logs with type elt = int * int
+module LoggedCharSet : Map_wrapper.Set_with_logs with type elt = char
+module LoggedCharMap : Map_wrapper.Map_with_logs with type elt = char
+module LoggedStringSet : Map_wrapper.Set_with_logs with type elt = string
+module LoggedStringMap : Map_wrapper.Map_with_logs with type elt = string
+module LoggedIntSet : Map_wrapper.Set_with_logs with type elt = int
+module LoggedIntMap : Map_wrapper.Map_with_logs with type elt = int
+module LoggedInt2Set : Map_wrapper.Set_with_logs with type elt = int * int
+module LoggedInt2Map : Map_wrapper.Map_with_logs with type elt = int * int

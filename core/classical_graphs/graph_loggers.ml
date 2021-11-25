@@ -228,7 +228,7 @@ let print_graph_preamble
           let () = print_preamble_shared_html_js f title in
           ()
       end
-    | Loggers.GEPHI 
+    | Loggers.GEPHI
     | Loggers.Matrix | Loggers.Json
     | Loggers.Mathematica | Loggers.Maple | Loggers.Matlab
     | Loggers.DOTNET | Loggers.Octave | Loggers.SBML
@@ -1238,3 +1238,5 @@ let print_one_to_n_relation
       idlist
   in
   ()
+
+let _ = let f t t' = t.edge_on_click, t'.node_on_click in f 

@@ -60,7 +60,6 @@ sig
     (value -> 'a * 'b -> key -> 'c -> 'c) -> ('a, 'b) dictionary -> 'c -> 'c
 end
 
-exception Association_is_existing_already_with_a_different_value
 exception Association_is_existing_with_the_same_value_in_a_different_location_memory
 exception Association_is_not_defined
 

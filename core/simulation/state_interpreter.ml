@@ -527,6 +527,7 @@ let a_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
   out
 
 let end_of_simulation ~outputs env counter graph state =
+  let _ = state.init_stopping_times in 
   let () =
     let outputs counter' time =
       let cand =
