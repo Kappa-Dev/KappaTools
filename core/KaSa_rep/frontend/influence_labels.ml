@@ -250,7 +250,7 @@ module Implicit =
        let empty_couple  = []
        let is_empty_couple x = x=[]
        let add_set = Set.add
-       let remove_set = Set.remove 
+       let remove_set = Set.remove
        let add_couple _remanent error _bool a b sol = error,(a,b)::sol
 
        let dump parameter error _handler a =
@@ -360,4 +360,4 @@ module Implicit =
            []
            set
 
-     end:Label_handler))
+     end:Label_handler with type label = L.label))

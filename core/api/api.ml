@@ -120,7 +120,7 @@ class type manager_static_analysis = object
     Public_data.accuracy_level option -> string kasa_reply
   method get_local_influence_map :
     ?fwd:int -> ?bwd:int -> ?origin:(int,int) Public_data.influence_node ->
-    total:int -> Public_data.accuracy_level option ->
+    total:int -> Public_data.accuracy_level option -> 
     (Public_data.accuracy_level * int * int option * int option *
      (Public_data.rule, Public_data.var) Public_data.influence_node
        option *

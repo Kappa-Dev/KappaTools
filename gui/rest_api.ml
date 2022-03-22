@@ -497,7 +497,7 @@ class manager
       `GET
       (fun x -> x)
 
-  method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
+  method get_local_influence_map  ?fwd ?bwd ?origin ~total accuracy =
     send
       ?timeout request_count
       (let s  =

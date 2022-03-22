@@ -123,7 +123,7 @@ type association_list_dic  = (int List_sig.cell, int List_sig.list) D_Associatio
 type range_list_dic = ((int option * int option) List_sig.cell, (int option * int option) List_sig.list)
 D_Range_list_skeleton.dictionary
 type variables_list_dic = (unit List_sig.cell, unit List_sig.list) D_Variables_list_skeleton.dictionary
-type handler   = (memo_tables, mvbdu_dic, association_list_dic, range_list_dic,variables_list_dic, bool, int) Memo_sig.handler
+type handler   = (memo_tables, mvbdu_dic, association_list_dic, range_list_dic, variables_list_dic, bool, int) Memo_sig.handler
 
 type unary_memoized_fun =
   (bool,

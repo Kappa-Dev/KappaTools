@@ -73,7 +73,7 @@ let print_site site list =
       in
       print_single_binding_state
         (Public_data.string_of_binding_type
-           ~binding_type_symbol ~agent_name ~site_name)
+           ~binding_type_symbol ~agent_name ~site_name ())
         list
     | Some (Public_data.Bound_to i) ->
       print_single_binding_state

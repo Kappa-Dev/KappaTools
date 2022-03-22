@@ -215,7 +215,7 @@ class virtual manager_snapshot
 end
 
 class manager_simulation
-    project
+    project 
     (system_process : Kappa_facade.system_process) :
   Api.manager_simulation = object(self)
   val mutable simulation = None

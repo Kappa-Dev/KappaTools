@@ -10,7 +10,7 @@ open Lwt.Infix
 
 let process_command (message_delimiter : char) : string -> unit Lwt.t =
   Kamoha_mpi.on_message
-    Lwt_main.yield
+    Lwt.pause
     (fun message ->
        Lwt_io.atomic (fun f ->
            Lwt_io.write f message >>= fun () ->

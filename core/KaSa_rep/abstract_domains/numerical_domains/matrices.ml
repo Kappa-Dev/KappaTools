@@ -226,9 +226,9 @@ let affiche_cons parameters (k,c,b) =
 
 type point =
   {coord:unit -> (trans*fraction) list;
-   proj:trans -> fraction;
+   (*proj:trans -> fraction;*)
    set:trans->fraction->unit;
-   affiche_point:unit -> unit;
+   (*affiche_point:unit -> unit;*)
    somme_point:point->unit};;
 
 type line = (trans list * (trans, Fraction.fraction) Hashtbl.t);;
@@ -250,7 +250,7 @@ let new_point parameters n =
   let somme_point ob =
     List.iter (fun (x,y)->set x (fplus y (read x))) (ob.coord ()) in
   {
-    proj=read;
+    (*proj=read;*)
     set=set;
     coord=
      (fun () ->
@@ -258,13 +258,13 @@ let new_point parameters n =
            (fun x->(x,read x))
            (List.sort p
               (Working_list_imperative.list entry))));
-    affiche_point =
+    (*  affiche_point =
       (fun () ->
          List.iter
            (fun x->
               affiche_frac parameters (read x))
-           (List.sort p (Working_list_imperative.list entry)));
-    somme_point=somme_point}
+           (List.sort p (Working_list_imperative.list entry)));*)
+        somme_point=somme_point}
 
 
 

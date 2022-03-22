@@ -13,7 +13,7 @@ type _ handle =
   | Strings : string list handle
   | Catalog : Kfiles.catalog_item list handle
   | Info : (string * int) handle
-  | Ast : Ast.parsing_compil handle
+  (*  | Ast : Ast.parsing_compil handle*)
   | JSON : Yojson.Basic.t handle
   | Influence_map :
       (Public_data.accuracy_level * int * int option * int option *
@@ -79,9 +79,9 @@ let receive mailbox x =
                 (read_result
                    (JsonUtil.read_compact_pair
                       Yojson.Basic.read_string Yojson.Basic.read_int) p lb)
-            | B (Ast, thread) ->
+                (*    | B (Ast, thread) ->
               Lwt.wakeup thread
-                (read_result Ast.read_parsing_compil p lb)
+                      (read_result Ast.read_parsing_compil p lb)*)
             | B (JSON, thread) ->
               Lwt.wakeup thread (read_result Yojson.Basic.read_json p lb)
             | B (Influence_map, thread) ->

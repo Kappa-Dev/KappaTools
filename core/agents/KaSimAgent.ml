@@ -15,7 +15,7 @@ class system_process () : Kappa_facade.system_process =
       Logs_lwt.info
         (fun m -> m "%s%a" msg
             (Pp.option (fun f e -> Fmt.pf f ": %s" (Printexc.to_string e))) exn)
-    method yield () : unit Lwt.t = Lwt_main.yield ()
+    method yield () : unit Lwt.t = Lwt.pause ()
     method min_run_duration () = 0.1
   end
 

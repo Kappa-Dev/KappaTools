@@ -52,7 +52,7 @@ type t =
     mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Result_util.message list ;
-    mutable trace : Bi_outbuf.t ;
+    (*mutable*) trace : Bi_outbuf.t ;
     inputs_buffer : Buffer.t;
     inputs_form : Format.formatter;
     ast : Ast.parsing_compil;

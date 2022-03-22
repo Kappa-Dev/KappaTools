@@ -38,7 +38,7 @@ type entry =
     crc: int32;
     uncompressed_size: int;
     compressed_size: int;
-    is_directory: bool;
+    (*is_directory: bool;*)
     file_offset: int32 }
 
 type out_file =
@@ -47,8 +47,8 @@ type out_file =
     mutable of_entries: entry list;
     of_comment: string }
 
-let filename_is_directory name =
-  String.length name > 0 && name.[String.length name - 1] = '/'
+(*let filename_is_directory name =
+  String.length name > 0 && name.[String.length name - 1] = '/'*)
 
 (* Convert between Unix dates and DOS dates *)
 
@@ -152,7 +152,7 @@ let add_entry_header ofile extra comment level mtime filename =
     crc = Int32.zero;
     uncompressed_size = 0;
     compressed_size = 0;
-    is_directory = filename_is_directory filename;
+    (*is_directory = filename_is_directory filename;*)
     file_offset = Int32.of_int pos }
 
 (* Write a data descriptor and update the entry *)
