@@ -519,3 +519,9 @@ val merge_variables_lists:
   unit List_sig.list ->
   Exception_without_parameter.method_handler *
   (handler * unit List_sig.list option)
+
+val print_boolean_mvbdu:
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.method_handler ->
+  bool Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.method_handler
