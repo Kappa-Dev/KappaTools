@@ -14,5 +14,5 @@ class type story_rendering =
   end
 
 let create_story_rendering (id : string) : story_rendering Js.t =
-  Js.Unsafe.new_obj (Js.Unsafe.variable "StoryRendering")
+  Js.Unsafe.new_obj (Js.Unsafe.pure_js_expr "StoryRendering")
     [| Js.Unsafe.inject (Js.string id) |]

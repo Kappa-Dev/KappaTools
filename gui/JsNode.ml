@@ -17,7 +17,7 @@ class type process_configuration =
   end
 
 let constructor_process_configuration : process_configuration Js.t Js.constr =
-  (Js.Unsafe.variable "Object")
+  (Js.Unsafe.pure_js_expr "Object")
 
 let create_process_configuration
     ?(onStdout : (Js.js_string Js.t -> unit) option)

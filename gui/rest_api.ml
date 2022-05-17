@@ -67,7 +67,7 @@ let kasa_error l =
        Exception_without_parameter.empty_error_handler l)
 
 class manager
-    ?(timeout:float option)
+    ~(timeout:float option)
     ~url ~project_id : Api.rest_manager =
   let request_count = ref 0 in
   object(self)

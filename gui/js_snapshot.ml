@@ -15,5 +15,5 @@ class type snapshot =
   end
 
 let create_snapshot (id : string) (coloring : unit Js.t) : snapshot Js.t =
-  Js.Unsafe.new_obj (Js.Unsafe.variable "Snapshot")
+  Js.Unsafe.new_obj (Js.Unsafe.pure_js_expr "Snapshot")
     [| Js.Unsafe.inject (Js.string id); Js.Unsafe.inject coloring |]

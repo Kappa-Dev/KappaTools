@@ -20,7 +20,7 @@ class type flux_configuration = object
   val shortLabels : bool Js.t Js.prop
 end
 let constructor_configuration : flux_configuration Js.t Js.constr =
-  (Js.Unsafe.variable "Object")
+  (Js.Unsafe.pure_js_expr "Object")
 let create_configuration
     ~(short_labels : bool)
     ~(begin_time_id : string)
@@ -82,7 +82,7 @@ class type flux_data = object
   val fluxs : int Js.js_array Js.js_array Js.t Js.prop
 end
 
-let constructor_data : flux_data Js.t Js.constr = (Js.Unsafe.variable "Object")
+let constructor_data : flux_data Js.t Js.constr = (Js.Unsafe.pure_js_expr "Object")
 let create_data ~(flux_begin_time : float)
     ~(flux_end_time : float)
     ~(normalized : bool)
@@ -107,5 +107,5 @@ class type flux_map = object
 end;;
 
 let create_flux_map (configuration : flux_configuration Js.t) : flux_map Js.t =
-  Js.Unsafe.new_obj (Js.Unsafe.variable "fluxMap")
+  Js.Unsafe.new_obj (Js.Unsafe.pure_js_expr "fluxMap")
     [| Js.Unsafe.inject configuration |]

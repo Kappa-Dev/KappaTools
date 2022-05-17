@@ -142,7 +142,7 @@ let ajax_request
          (Js.Opt.option
             (match timeout with
              | None -> None
-             | Some timeout -> Some (Js.float timeout)));
+             | Some timeout -> Some timeout));
     |]
 
 (* This is to handle errors being lost in asyncs

@@ -210,7 +210,7 @@ let create_manager ~is_new project_id =
        if is_valid_server then
          let () = State_settings.set_synch true in
          let manager = new Rest_api.manager
-           ?timeout:None ~url ~project_id in
+           ~timeout:None ~url ~project_id in
          (if is_new then
             manager#project_create
               { Api_types_j.project_parameter_project_id = project_id }
@@ -299,7 +299,7 @@ let init () =
        if is_valid_server then
          let () = State_settings.set_synch true in
          let manager = new Rest_api.manager
-           ?timeout:None ~url ~project_id:"" in
+           ~timeout:None ~url ~project_id:"" in
          manager#project_catalog >>=
          Result_util.fold
            ~ok:(fun projects -> Lwt.return projects)

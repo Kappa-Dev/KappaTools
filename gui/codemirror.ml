@@ -16,7 +16,7 @@ let create_handler label =
   let head : char = Char.uppercase_ascii (String.get label 0) in
   let tail : string = String.sub label 1 ((String.length label) -1) in
   let on_label = "on"^(Char.escaped head)^tail in
-  let wrapper handler = (Js.Unsafe.variable "this")##on label handler in
+  let wrapper handler = (Js.Unsafe.pure_js_expr "this")##on label handler in
   let () = Js.Unsafe.set prototype
       (Js.string on_label)
       wrapper
@@ -72,7 +72,7 @@ class type lint =
     method to_ : position Js.t Js.prop
   end
 
-let constructor_lint : lint Js.t Js.constr = (Js.Unsafe.variable "Object")
+let constructor_lint : lint Js.t Js.constr = (Js.Unsafe.pure_js_expr "Object")
 let create_lint ~(message : string)
     ~(severity : severity)
     ~(from : position Js.t)
@@ -98,7 +98,7 @@ class type change =
     method origin : string Js.t Js.prop
   end;;
 
-let constructor_change : change Js.t Js.constr = (Js.Unsafe.variable "Object")
+let constructor_change : change Js.t Js.constr = (Js.Unsafe.pure_js_expr "Object")
 let create_change () : change Js.t  = new%js constructor_change
 
 class type codemirror =
@@ -316,7 +316,7 @@ class type lint_configuration =
     method lintOnChange : bool Js.t Js.prop
   end
 let constructor_lint_configuration : lint_configuration Js.t Js.constr =
-  (Js.Unsafe.variable "Object")
+  (Js.Unsafe.pure_js_expr "Object")
 let create_lint_configuration () : lint_configuration Js.t  =
   new%js constructor_lint_configuration
 

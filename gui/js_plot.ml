@@ -16,5 +16,5 @@ class type observable_plot =
   end
 
 let create_observable_plot main_div_id : observable_plot Js.t =
-  Js.Unsafe.new_obj (Js.Unsafe.variable "ObservablePlot")
+  Js.Unsafe.new_obj (Js.Unsafe.pure_js_expr "ObservablePlot")
     [| Js.Unsafe.inject (Js.string main_div_id) |]
