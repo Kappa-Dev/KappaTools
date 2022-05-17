@@ -45,6 +45,14 @@ with_tk:bool -> ?title:msg -> t -> msg list -> msg list
 
 module StringMap:SetMap.Map with type elt = string
 module StringIntSet:SetMap.Set with type elt = string * int * (level option)
-val max_level_opt: level -> level option -> level
+module StringIntMap:SetMap.Map with type elt = string * int * (level option)
 
-val show_level: level -> bool 
+val max_level_opt: level -> level option -> level
+val show_level: level -> bool
+val expert_mode: bool ref
+val nokey: msg -> msg
+val order:
+  t ->
+  ((msg * spec * msg * (StringIntSet.elt * position) list * level) list * level) StringIntMap.t
+
+val cut_list: msg -> msg list
