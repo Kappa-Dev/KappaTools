@@ -5,7 +5,7 @@ type level =
 | Developper  (* only shown & accepted in developper mode *)
 | Hidden      (* never shown *)
 type category = string * position * (level option)
-type key = string 
+type key = string
 type msg = string
 
 type spec =
@@ -46,3 +46,5 @@ with_tk:bool -> ?title:msg -> t -> msg list -> msg list
 module StringMap:SetMap.Map with type elt = string
 module StringIntSet:SetMap.Set with type elt = string * int * (level option)
 val max_level_opt: level -> level option -> level
+
+val show_level: level -> bool 
