@@ -59,7 +59,7 @@ type din_catalog = din_id list
 (* file line *)
 type file_line <ocaml predef module="Data"> =
      { name : string nullable;
-       text : string <json name="text"> } <ocaml field_prefix="file_line_">
+       text <json name="text"> : string } <ocaml field_prefix="file_line_">
 type file_line_catalog = string list
 type file_line_detail = file_line list
 
