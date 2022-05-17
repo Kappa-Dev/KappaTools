@@ -1,3 +1,5 @@
+type box
+type 'a handle
 class virtual new_client :
   is_running:(unit -> bool) ->
   post:(string -> unit) ->
@@ -139,15 +141,14 @@ class virtual new_client :
       (unit, Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
     method secret_get_pos_of_rules_and_vars :
-      Kappa_kasa_type_interface.Public_data.pos_of_rules_and_vars
-      Kappa_json_api.Api.result Lwt.t
+      Public_data.pos_of_rules_and_vars Api.result Lwt.t
     method secret_project_parse :
-      Kappa_grammar.Ast.parsing_compil Kappa_json_api.Api.result Lwt.t
+      Ast.parsing_compil Api.result Lwt.t
     method secret_simulation_load :
       Kappa_terms.Pattern.sharing_level ->
       Kappa_grammar.Ast.parsing_compil ->
       (string * Kappa_generic_toolset.Nbr.t) list ->
-      unit Kappa_json_api.Api.result Lwt.t
+      unit Api.result Lwt.t
     method simulation_catalog_din :
       (string list, Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
@@ -177,7 +178,7 @@ class virtual new_client :
       (string, Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
     method simulation_detail_plot :
-      Kappa_json_api.Api_types_j.plot_parameter ->
+      Api_types_j.plot_parameter ->
       (Kappa_runtime.Data.plot,
        Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
@@ -191,7 +192,7 @@ class virtual new_client :
        Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
     method simulation_info :
-      (Kappa_json_api.Api_types_t.simulation_info,
+      (Api_types_t.simulation_info,
        Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
     method simulation_intervention :
@@ -203,7 +204,7 @@ class virtual new_client :
        Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
     method simulation_parameter :
-      (Kappa_json_api.Api_types_t.simulation_parameter,
+      (Api_types_t.simulation_parameter,
        Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
     method simulation_pause :
@@ -213,8 +214,8 @@ class virtual new_client :
       (string, Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
     method simulation_start :
-      Kappa_json_api.Api_types_j.simulation_parameter ->
-      (Kappa_json_api.Api_types_t.simulation_artifact,
+      Api_types_j.simulation_parameter ->
+      (Api_types_t.simulation_artifact,
        Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
   end
@@ -222,4 +223,4 @@ type mailbox
 
 val new_mailbox: unit -> mailbox
 val receive: mailbox -> string -> unit
-val is_computing: mailbox -> bool 
+val is_computing: mailbox -> bool
