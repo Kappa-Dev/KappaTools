@@ -122,8 +122,11 @@ module Make (Instances:Instances_sig.S) = struct
              outputs (Data.Warning
                         (Some (snd rule.Primitives.rate),
                          fun f ->
+                          let noCounters = false in
+
                            Format.fprintf f
-                             "Problematic rule rate replaced by 0"))
+                             "Problematic rule rate replaced by 0";
+                             (Kappa_printer.elementary_rule ~env ~noCounters f rule)))
            | Some rate -> set_activity (2*i) rate state)
       () env
 

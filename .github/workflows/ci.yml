@@ -26,7 +26,7 @@ jobs:
       - run: >
           opam depext --install --yes dune num yojson lwt fmt logs re
           odoc lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml ${{ matrix.additional-packages }}
+          js_of_ocaml-tyxml camlp-streams ${{ matrix.additional-packages }}
       - run: opam exec -- make all
       - run: opam exec -- make doc_html
       - run: opam exec -- make --jobs=2 check
