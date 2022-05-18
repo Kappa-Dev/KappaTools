@@ -10,7 +10,7 @@ open Lwt.Infix
 
 type t =
   { state_error_errors : Result_util.message list ;
-    state_error_location : string }
+    _state_error_location : string }
 let state_error, set_state_error = React.S.create ([] : t list)
 
 let clear_errors location =
@@ -33,7 +33,7 @@ let add_error (location : string) (errors : Result_util.message list) =
   let current_state_error : t list = React.S.value state_error in
   let new_state_error : t list =
     { state_error_errors = errors;
-      state_error_location =  location; }::current_state_error in
+      _state_error_location =  location; }::current_state_error in
   set_state_error new_state_error
 
 let errors : Result_util.message list React.signal =

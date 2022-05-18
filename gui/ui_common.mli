@@ -101,9 +101,4 @@ val label_news:
 
 val features: ?default:'a list -> (string * 'a) list -> 'a list
 val input_change:
-  < onchange : < set : ('a, #Dom_html.event Js.t)
-                             Dom_html.event_listener -> unit
-                     >
-                     Js.gen_prop ;
-          value : < get : Js.js_string Js.t  > Js.gen_prop  >
-        Js.t -> (string -> unit) -> unit
+  Dom_html.inputElement Js.t -> (string -> unit) -> unit

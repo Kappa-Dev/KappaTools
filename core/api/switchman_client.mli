@@ -219,7 +219,9 @@ class virtual new_client :
        Kappa_generic_toolset.Result_util.message list)
       Kappa_generic_toolset.Result_util.t Lwt.t
   end
-type mailbox
+
+type mailbox =
+    (int, box) Hashtbl.t
 
 val new_mailbox: unit -> mailbox
 val receive: mailbox -> string -> unit

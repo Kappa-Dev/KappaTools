@@ -17,5 +17,7 @@ val content:
 val export_png:  ?svg_style_id:string -> svg_div_id:string -> unit -> handler
 val export_json:  serialize_json:(unit -> string) -> handler
 val export_svg:  ?svg_style_id:string -> svg_div_id:string -> unit -> handler
-val export_data_label: configuration -> string 
+val export_data_label: configuration -> string
 val onload: configuration -> unit
+
+val inline_content: configuration -> [> `Button | `Div | `PCDATA ] Html.elt list
