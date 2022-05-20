@@ -8,7 +8,7 @@ empty_or_create ()
 }
 
 PLAYGROUND=$(mktemp -d -t kappaXXXX)
-git clone --depth 10 --quiet -b master https://${KAPPAGITHUBTOKEN}:@github.com/Kappa-Dev/Kappa-Dev.github.io.git ${PLAYGROUND}
+git clone --depth 10 --quiet -b master git@github.com:Kappa-Dev/Kappa-Dev.github.io.git ${PLAYGROUND}
 case $1 in
     native )
         empty_or_create ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}
@@ -24,7 +24,7 @@ case $1 in
         empty_or_create  ${PLAYGROUND}/docs/KaSim-API-${TRAVIS_BRANCH}
         cp -r _build/default/_doc/_html/kappa-library/* ${PLAYGROUND}/docs/KaSim-API-${TRAVIS_BRANCH}/
 
-        scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
+        scp -r \
             ${PLAYGROUND}/docs travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         ;;
     js )
@@ -55,7 +55,7 @@ case $1 in
             ${PLAYGROUND}/viz travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
         cp Kappapp.tar.gz ${PLAYGROUND}/binaries/
-        scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy ${PLAYGROUND}/binaries/Kappapp.tar.gz \
+        scp ${PLAYGROUND}/binaries/Kappapp.tar.gz \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
         ;;
     python )
@@ -65,15 +65,13 @@ case $1 in
     windows )
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
         cp KappaBin.zip ${PLAYGROUND}/binaries/
-        scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy ${PLAYGROUND}/binaries/KappaBin.zip \
+        scp ${PLAYGROUND}/binaries/KappaBin.zip \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
         ;;
     MacOS )
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
-        find Kappapp.app/Contents/ \( -name \*.app -or -name \*.framework \) -exec codesign -s - \{\} \; && \
-	    codesign -s - Kappapp.app && \
-            zip -y -r ${PLAYGROUND}/binaries/Kappapp.app.zip Kappapp.app
-        scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy ${PLAYGROUND}/binaries/Kappapp.app.zip \
+        cp Kappapp.app.zip ${PLAYGROUND}/binaries/
+        scp ${PLAYGROUND}/binaries/Kappapp.app.zip \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
         ;;
 esac

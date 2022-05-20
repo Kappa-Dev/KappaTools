@@ -13,82 +13,217 @@ jobs:
           -
           - labltk
     steps:
-      - uses: actions/checkout@v3
-      - uses: ocaml/setup-ocaml@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-      - run: sudo apt-get update
-      - run: >
-          sudo apt-get install --yes gnuplot-nox
-          poppler-utils graphviz texlive-latex-recommended
-          texlive-fonts-recommended texlive-pictures tex4ht
-          texlive-latex-extra
-      - run: >
-          opam depext --install --yes dune num yojson lwt fmt logs re
-          odoc lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml camlp-streams ${{ matrix.additional-packages }}
-      - run: opam exec -- make all
-      - run: opam exec -- make doc_html
-      - run: opam exec -- make --jobs=2 check
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes gnuplot-nox \
+            poppler-utils graphviz texlive-latex-recommended \
+            texlive-fonts-recommended texlive-pictures tex4ht \
+            texlive-latex-extra
+          opam depext --install --yes dune num yojson lwt fmt logs re \
+            odoc lwt_react tyxml-ppx js_of_ocaml-lwt \
+            js_of_ocaml-tyxml camlp-streams ${{ matrix.additional-packages }}
+      - name: Make Kappa
+        run: opam exec -- make all
+      - name: Make documentation
+        run: opam exec -- make doc_html
+      - name: Make check
+        run: opam exec -- make --jobs=2 check
+      - name: Archive documentation
+        uses: actions/upload-artifact@v3
+        if: matrix.ocaml-compiler == '4.14.x' && matrix.additional-packages == ''
+        with:
+          name: doc
+          path: |
+            man
+            _build/default/_doc/_html/kappa-library
 
   python:
-    strategy:
-      fail-fast: false
-      matrix:
-        additional-packages:
-          - atdgen
-          - atdgen.2.2.1
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: ocaml/setup-ocaml@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.13.x
-      - run: sudo apt-get update
-      - run: >
-          sudo apt-get install --yes gnuplot-nox
-          poppler-utils graphviz texlive-latex-recommended
-          texlive-fonts-recommended texlive-pictures tex4ht
-      - run: >
-          opam install --yes dune num yojson lwt fmt logs re
-          cohttp-lwt-unix ${{ matrix.additional-packages }}
-      - run: pip install nose
-      - run: opam exec -- make all
-      - run: opam exec -- dune build
-      - run: opam exec -- nosetests -v tests/kappy
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes gnuplot-nox \
+            poppler-utils graphviz texlive-latex-recommended \
+            texlive-fonts-recommended texlive-pictures tex4ht
+          opam install --yes dune num yojson lwt fmt logs re \
+            cohttp-lwt-unix atdgen
+          pip install nose
+      - name: Make Kappa
+        run: |
+          opam exec -- make all
+          opam exec -- dune build
+      - name: Nose tests
+        run: opam exec -- nosetests -v tests/kappy
 
   js:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
-        additional-packages:
-          - atdgen
-          - atdgen.2.2.1
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: ocaml/setup-ocaml@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.13.x
-      - run: >
+      - name: Install system dependencies
+        run: |
           sudo apt-get update
-
-          sudo apt-get install --yes gnuplot-nox
-          poppler-utils graphviz texlive-latex-recommended
-          texlive-fonts-recommended texlive-pictures tex4ht
-        if: matrix.os == 'ubuntu-latest'
-      - run: >
+          sudo apt-get install --yes gnuplot-nox \
+            poppler-utils graphviz texlive-latex-recommended \
+            texlive-fonts-recommended texlive-pictures tex4ht
+      - name: Install OPAM dependencies
+        run: >
           opam install --yes dune num yojson lwt fmt logs re
           lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml ${{ matrix.additional-packages }}
-      - run: opam exec -- make all
-      - run: opam exec -- make Kappapp.tar.gz site/index.html
-        if: matrix.os == 'ubuntu-latest'
-      - run: opam exec -- make Kappapp.app
-        if: matrix.os == 'macos-latest'
-      - run: opam exec -- make KappaBin.zip
-        if: matrix.os == 'windows-latest'
+          js_of_ocaml-tyxml atdgen
+      - name: Make Kappa
+        run: opam exec -- make all
+      - name: Make Javascript app
+        run: opam exec -- make Kappapp.tar.gz site/index.html
+      - name: Archive Javascript app
+        uses: actions/upload-artifact@v3
+        with:
+          name: js
+          path: |
+            site
+            viz
+            Kappapp.tar.gz
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.13.x
+      - name: Install OPAM dependencies
+        run: >
+          opam install --yes dune num yojson lwt fmt logs re
+          lwt_react tyxml-ppx js_of_ocaml-lwt
+          js_of_ocaml-tyxml atdgen
+      - name: Make Kappa
+        run: opam exec -- make all
+      - name: Make MacOS app
+        run: opam exec -- make Kappapp.app
+      - name: Sign MacOS binaries
+        run: |
+          find Kappapp.app/Contents/ \( -name \*.app -or -name \*.framework \) \
+            -exec codesign -s - \{\} \;
+          codesign -s - Kappapp.app
+          zip -y -r Kappapp.app.zip Kappapp.app
+      - name: Archive MacOS app
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos
+          path: |
+            site
+            viz
+            Kappapp.app.zip
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.13.x
+      - name: Install OPAM dependencies
+        run: >
+          opam install --yes dune num yojson lwt fmt logs re
+          lwt_react tyxml-ppx js_of_ocaml-lwt
+          js_of_ocaml-tyxml atdgen
+      - name: Make Kappa
+        run: opam exec -- make all
+      - name: Make Windows app
+        run: opam exec -- make KappaBin.zip
+      - name: Archive Windows app
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows
+          path: |
+            KappaBin.zip
+
+  deploy-docs:
+    needs: install-ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download doc artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: doc
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: ${{ secrets.DEPLOY_KEY }}
+          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
+      - run: dev/update-web.sh native
+
+  deploy-js:
+    needs: js
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download js artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: js
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: ${{ secrets.DEPLOY_KEY }}
+          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
+      - run: dev/update-web.sh js
+
+  deploy-macos:
+    needs: macos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download MacOS artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: macos
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: ${{ secrets.DEPLOY_KEY }}
+          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
+      - run: dev/update-web.sh MacOS
+
+  deploy-windows:
+    needs: windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: windows
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: ${{ secrets.DEPLOY_KEY }}
+          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
+      - run: dev/update-web.sh windows
