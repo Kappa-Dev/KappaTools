@@ -85,10 +85,10 @@ jobs:
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht
       - name: Install OPAM dependencies
-        run: >
-          opam install --yes dune num yojson lwt fmt logs re
-          lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml atdgen
+        run: |
+          opam install --yes dune num yojson lwt fmt logs re \
+            lwt_react tyxml-ppx js_of_ocaml-lwt \
+            js_of_ocaml-tyxml atdgen
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Javascript app
@@ -112,10 +112,10 @@ jobs:
         with:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
-        run: >
-          opam install --yes dune num yojson lwt fmt logs re
-          lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml atdgen
+        run: |
+          opam install --yes dune num yojson lwt fmt logs re \
+            lwt_react tyxml-ppx js_of_ocaml-lwt
+            js_of_ocaml-tyxml atdgen
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make MacOS app
@@ -145,12 +145,18 @@ jobs:
         with:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
-        run: >
-          opam install --yes dune num yojson lwt fmt logs re
-          lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml atdgen
+        run: |
+          opam install --yes dune num yojson lwt fmt logs re \
+            lwt_react tyxml-ppx js_of_ocaml-lwt \
+            js_of_ocaml-tyxml atdgen
       - name: Make Kappa
         run: opam exec -- make all
+      - name: Install cygwin zip package
+        run: |
+          C:\\hostedtoolcache\\windows\\cygwin\\3.3.4\\x86_64\\setup-x86_64.exe \
+            --quiet-mode --root D:\cygwin \
+            --site https://cygwin.mirror.constant.com \
+            --packages zip
       - name: Make Windows app
         run: opam exec -- make KappaBin.zip
       - name: Archive Windows app
