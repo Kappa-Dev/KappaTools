@@ -170,7 +170,7 @@ Kappapp.tar.gz:
 KappaBin.zip:
 	+$(MAKE) clean
 	+$(MAKE) APP_EXT=local site/index.html
-	dune build -x windows --only-packages kappa-library,kappa-binaries,kappa-agents
+	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	mkdir KappaBin
 	FILE=$$(mktemp -t electronXXXX); \
 	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
@@ -178,14 +178,14 @@ KappaBin.zip:
 	mv site KappaBin/resources/app
 	mv KappaBin/electron.exe KappaBin/Kappapp.exe
 	mkdir KappaBin/resources/bin
-	cp _build/default.windows/core/main/KaSim.exe KappaBin/resources/bin/
-	cp _build/default.windows/core/KaSa_rep/main/KaSa.exe KappaBin/resources/bin/
-	cp _build/default.windows/core/agents/KaStor.exe KappaBin/resources/bin/
-	cp _build/default.windows/core/odes/KaDE.exe KappaBin/resources/bin/
-	cp _build/default.windows/core/agents/KappaSwitchman.exe KappaBin/resources/bin/
-	cp _build/default.windows/core/agents/KaMoHa.exe KappaBin/resources/bin/
-	cp _build/default.windows/core/agents/KaSimAgent.exe KappaBin/resources/bin/
-	cp _build/default.windows/core/agents/KaSaAgent.exe KappaBin/resources/bin/
+	cp _build/default/core/main/KaSim.exe KappaBin/resources/bin/
+	cp _build/default/core/KaSa_rep/main/KaSa.exe KappaBin/resources/bin/
+	cp _build/default/core/agents/KaStor.exe KappaBin/resources/bin/
+	cp _build/default/core/odes/KaDE.exe KappaBin/resources/bin/
+	cp _build/default/core/agents/KappaSwitchman.exe KappaBin/resources/bin/
+	cp _build/default/core/agents/KaMoHa.exe KappaBin/resources/bin/
+	cp _build/default/core/agents/KaSimAgent.exe KappaBin/resources/bin/
+	cp _build/default/core/agents/KaSaAgent.exe KappaBin/resources/bin/
 	zip -y -r $@ KappaBin
 	rm -r KappaBin
 
