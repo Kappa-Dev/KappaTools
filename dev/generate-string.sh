@@ -9,7 +9,7 @@ let strip_nonalpha =
 
 (* https://www.rosettacode.org/wiki/Read_entire_file#OCaml *)
 let read_file filename =
-  let ic = open_in filename in
+  let ic = open_in_bin filename in
   let n = in_channel_length ic in
   let s = really_input_string ic n in
   let () = close_in ic in
