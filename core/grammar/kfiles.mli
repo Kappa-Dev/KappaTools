@@ -13,7 +13,7 @@ type catalog_item = {
   id : string;
 }
 
-val write_catalog_item : Bi_outbuf.t -> catalog_item -> unit
+val write_catalog_item : Buffer.t -> catalog_item -> unit
 val read_catalog_item : Yojson.lexer_state -> Lexing.lexbuf -> catalog_item
 
 val create : unit -> catalog

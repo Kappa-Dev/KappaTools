@@ -187,12 +187,12 @@ let of_yojson = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an Nbr",x))
 
 let write_t ob f =
-  Yojson.Basic.to_outbuf ob (to_yojson f)
+  Yojson.Basic.to_buffer ob (to_yojson f)
 
 let string_of_t ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
+  let ob = Buffer.create len in
   write_t ob x;
-  Bi_outbuf.contents ob
+  Buffer.contents ob
 
 let read_t p lb =
   of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)

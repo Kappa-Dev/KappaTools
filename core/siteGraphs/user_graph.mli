@@ -42,7 +42,7 @@ val print_dot_cc : int -> Format.formatter -> connected_component -> unit
 val links_of_yojson : Yojson.Basic.t -> links
 
 val write_connected_component :
-  Bi_outbuf.t -> connected_component -> unit
+  Buffer.t -> connected_component -> unit
   (** Output a JSON value of type {!connected_component}. *)
 
 val string_of_connected_component :

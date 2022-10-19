@@ -102,7 +102,7 @@ val din_kind_to_yojson : din_kind -> Yojson.Basic.t
 val din_kind_of_yojson : Yojson.Basic.t -> din_kind
 
 val write_din_kind :
-  Bi_outbuf.t -> din_kind -> unit
+  Buffer.t -> din_kind -> unit
   (** Output a JSON value of type {!din_kind}. *)
 
 val string_of_din_kind :

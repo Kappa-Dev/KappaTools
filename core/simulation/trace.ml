@@ -337,9 +337,9 @@ let write_json = JsonUtil.write_list write_step
 let read_json st b = List.rev (Yojson.Basic.read_list_rev read_step st b)
 
 let string_of_step ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
+  let ob = Buffer.create len in
   write_step ob x;
-  Bi_outbuf.contents ob
+  Buffer.contents ob
 
 let step_of_string s =
   read_step (Yojson.Safe.init_lexer ()) (Lexing.from_string s)

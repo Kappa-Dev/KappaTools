@@ -127,7 +127,7 @@ class virtual new_client :
     method private message :
       'a.
         'a handle ->
-        (Bi_outbuf.t -> unit) ->
+        (Buffer.t -> unit) ->
         ('a, Kappa_generic_toolset.Result_util.message list)
         Kappa_generic_toolset.Result_util.t Lwt.t
     method project_overwrite :

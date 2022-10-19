@@ -24,9 +24,9 @@ type ('a,'b) t = {
 }
 
 let write_severity ob x =
-  let () = Bi_outbuf.add_char ob '"' in
-  let () = Bi_outbuf.add_string ob (Logs.level_to_string (Some x)) in
-  Bi_outbuf.add_char ob '"'
+  let () = Buffer.add_char ob '"' in
+  let () = Buffer.add_string ob (Logs.level_to_string (Some x)) in
+  Buffer.add_char ob '"'
 
 let read_severity p lb =
   match Logs.level_of_string (Yojson.Basic.read_string p lb) with
@@ -36,13 +36,13 @@ let read_severity p lb =
     raise (Yojson.Json_error ("While reading severity: "^x))
 
 let write_status ob = function
-  | `OK -> Bi_outbuf.add_string ob "200"
-  | `Accepted -> Bi_outbuf.add_string ob "202"
-  | `Created -> Bi_outbuf.add_string ob "201"
-  | `Bad_request -> Bi_outbuf.add_string ob "400"
-  | `Conflict -> Bi_outbuf.add_string ob "409"
-  | `Not_found -> Bi_outbuf.add_string ob "404"
-  | `Request_timeout -> Bi_outbuf.add_string ob "408"
+  | `OK -> Buffer.add_string ob "200"
+  | `Accepted -> Buffer.add_string ob "202"
+  | `Created -> Buffer.add_string ob "201"
+  | `Bad_request -> Buffer.add_string ob "400"
+  | `Conflict -> Buffer.add_string ob "409"
+  | `Not_found -> Buffer.add_string ob "404"
+  | `Request_timeout -> Buffer.add_string ob "408"
 
 let read_status p lb =
   match Yojson.Basic.read_int p lb with
@@ -57,7 +57,7 @@ let read_status p lb =
                   ("Status "^string_of_int x^" is out of the scope of Kappa"))
 
 let write_message ob { severity; text; range } =
-  let () = Bi_outbuf.add_char ob '{' in
+  let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field "severity" write_severity ob severity in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field "text" Yojson.Basic.write_string ob text in
@@ -66,7 +66,7 @@ let write_message ob { severity; text; range } =
     | Some r ->
       let () = JsonUtil.write_comma ob in
       JsonUtil.write_field "range" Locality.write_range ob r in
-  Bi_outbuf.add_char ob '}'
+  Buffer.add_char ob '}'
 
 let read_message p lb =
   let (severity,text,range) =
@@ -87,25 +87,25 @@ let print_message f { range; text; _ } =
 
 let write_t write__ok write__error = fun ob -> function
   | { value = Result.Ok x; status; messages } ->
-    Bi_outbuf.add_string ob "[\"Ok\",";
+    Buffer.add_string ob "[\"Ok\",";
     write__ok ob x;
-    Bi_outbuf.add_char ob ',';
+    Buffer.add_char ob ',';
     write_status ob status;
-    Bi_outbuf.add_char ob ',';
+    Buffer.add_char ob ',';
     JsonUtil.write_list write_message ob messages;
-    Bi_outbuf.add_char ob ']'
+    Buffer.add_char ob ']'
   | { value = Result.Error x; status; messages } ->
-    Bi_outbuf.add_string ob "[\"Error\",";
+    Buffer.add_string ob "[\"Error\",";
     write__error ob x;
-    Bi_outbuf.add_char ob ',';
+    Buffer.add_char ob ',';
     write_status ob status;
-    Bi_outbuf.add_char ob ',';
+    Buffer.add_char ob ',';
     JsonUtil.write_list write_message ob messages;
-    Bi_outbuf.add_char ob ']'
+    Buffer.add_char ob ']'
 let string_of_t write__ok write__error ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
+  let ob = Buffer.create len in
   write_t write__ok write__error ob x;
-  Bi_outbuf.contents ob
+  Buffer.contents ob
 
 let read_t_content f p lb =
   let v = f p lb  in

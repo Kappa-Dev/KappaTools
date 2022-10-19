@@ -52,7 +52,7 @@ type t =
     mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Result_util.message list ;
-    (*mutable*) trace : Bi_outbuf.t ;
+    (*mutable*) trace : Buffer.t ;
     inputs_buffer : Buffer.t;
     inputs_form : Format.formatter;
     ast : Ast.parsing_compil;
@@ -76,7 +76,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
   species = Mods.StringMap.empty;
   files = Mods.StringMap.empty;
   error_messages = [];
-  trace = Bi_outbuf.create 1024;
+  trace = Buffer.create 1024;
   inputs_buffer; inputs_form; ast; contact_map; env; graph; state; init_l;
   lastyield;
 }
@@ -237,9 +237,8 @@ let outputs (simulation : t) =
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.Warning (pos,msg) -> Data.print_warning ?pos simulation.log_form msg
   | Data.TraceStep st ->
-    let () = Bi_outbuf.add_char simulation.trace
-        (if simulation.trace.Bi_outbuf.o_len = 0 &&
-            simulation.trace.Bi_outbuf.o_offs = 0 then '[' else ',') in
+    let () = Buffer.add_char simulation.trace
+        (if Buffer.length simulation.trace = 0 then '[' else ',') in
     Trace.write_step simulation.trace st
 
 let interactive_outputs formatter t = function
@@ -560,27 +559,27 @@ let efficiency t = Counter.get_efficiency t.counter
 let get_raw_trace t =
   JsonUtil.string_of_write
     (fun ob t ->
-       let () = Bi_outbuf.add_char ob '{' in
+       let () = Buffer.add_char ob '{' in
        let () = JsonUtil.write_field
            "dict" (fun ob () ->
-               let () = Bi_outbuf.add_char ob '{' in
-               let () = Bi_outbuf.add_string ob Agent.json_dictionnary in
+               let () = Buffer.add_char ob '{' in
+               let () = Buffer.add_string ob Agent.json_dictionnary in
                let () = JsonUtil.write_comma ob in
-               let () = Bi_outbuf.add_string ob Instantiation.json_dictionnary in
+               let () = Buffer.add_string ob Instantiation.json_dictionnary in
                let () = JsonUtil.write_comma ob in
-               let () = Bi_outbuf.add_string
+               let () = Buffer.add_string
                    ob Trace.Simulation_info.json_dictionnary in
                let () = JsonUtil.write_comma ob in
-               let () = Bi_outbuf.add_string ob Trace.json_dictionnary in
-               Bi_outbuf.add_char ob '}'
+               let () = Buffer.add_string ob Trace.json_dictionnary in
+               Buffer.add_char ob '}'
              ) ob () in
        let () = JsonUtil.write_comma ob in
        let () = JsonUtil.write_field
            "model" Yojson.Basic.write_json ob (Model.to_yojson t.env) in
        let () = JsonUtil.write_comma ob in
        let () = JsonUtil.write_field
-           "trace" Bi_outbuf.add_string ob (Bi_outbuf.contents t.trace) in
-       Bi_outbuf.add_char2 ob ']' '}'
+           "trace" Buffer.add_string ob (Buffer.contents t.trace) in
+       Buffer.add_string ob "]}"
     ) t
 
 let get_raw_ast t =

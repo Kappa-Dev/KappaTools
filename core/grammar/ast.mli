@@ -186,5 +186,5 @@ val to_created_mixture : mixture -> mixture
 val compil_of_json : Yojson.Basic.t -> parsing_compil
 val compil_to_json : parsing_compil -> Yojson.Basic.t
 
-val write_parsing_compil : Bi_outbuf.t -> parsing_compil -> unit
+val write_parsing_compil : Buffer.t -> parsing_compil -> unit
 val read_parsing_compil : Yojson.lexer_state -> Lexing.lexbuf -> parsing_compil

@@ -46,7 +46,7 @@ val print_snapshot : ?uuid: int -> Format.formatter -> snapshot -> unit
 val print_dot_snapshot : ?uuid: int -> Format.formatter -> snapshot -> unit
 
 val write_snapshot :
-  Bi_outbuf.t -> snapshot -> unit
+  Buffer.t -> snapshot -> unit
   (** Output a JSON value of type {!snapshot}. *)
 
 val string_of_snapshot :
@@ -69,7 +69,7 @@ val print_dot_din : ?uuid: int -> Format.formatter -> din -> unit
 
 val print_html_din : Format.formatter -> din -> unit
 
-val write_din : Bi_outbuf.t -> din -> unit
+val write_din : Buffer.t -> din -> unit
   (** Output a JSON value of type {!din}. *)
 
 val string_of_din : ?len:int -> din -> string
@@ -94,7 +94,7 @@ val add_plot_line : Nbr.t array -> plot -> plot
 
 val init_plot : Model.t -> plot
 
-val write_plot : Bi_outbuf.t -> plot -> unit
+val write_plot : Buffer.t -> plot -> unit
   (** Output a JSON value of type {!plot}. *)
 
 val string_of_plot : ?len:int -> plot -> string

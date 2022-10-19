@@ -395,12 +395,12 @@ let din_kind_of_yojson = function
            (Yojson.Basic.Util.Type_error ("Incorrect din_kind",x))
 
 let write_din_kind ob f =
-  Yojson.Basic.to_outbuf ob (din_kind_to_yojson f)
+  Yojson.Basic.to_buffer ob (din_kind_to_yojson f)
 
 let string_of_din_kind ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
+  let ob = Buffer.create len in
   write_din_kind ob x;
-  Bi_outbuf.contents ob
+  Buffer.contents ob
 
 let read_din_kind p lb =
   din_kind_of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)

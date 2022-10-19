@@ -25,11 +25,11 @@ type catalog_item = {
 }
 
 let write_catalog_item ob { position; id } =
-  let () = Bi_outbuf.add_char ob '{' in
+  let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field "id" Yojson.Basic.write_string ob id in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field "position" Yojson.Basic.write_int ob position in
-  Bi_outbuf.add_char ob '}'
+  Buffer.add_char ob '}'
 
 let read_catalog_item p lb =
   let (position,id,count) =

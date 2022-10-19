@@ -96,7 +96,7 @@ val step_to_yojson : step -> Yojson.Basic.t
 
 val json_dictionnary : string
 
-val write_step : Bi_outbuf.t -> step -> unit
+val write_step : Buffer.t -> step -> unit
   (** Output a JSON value of type {!step}. *)
 
 val string_of_step : ?len:int -> step -> string
@@ -112,7 +112,7 @@ val read_step :
 val step_of_string : string -> step
   (** Deserialize JSON data of type {!step}. *)
 
-val write_json : Bi_outbuf.t -> t -> unit
+val write_json : Buffer.t -> t -> unit
 val read_json : Yojson.Safe.lexer_state -> Lexing.lexbuf -> t
 
 val init_trace_file : uuid:int -> Model.t -> out_channel -> unit
