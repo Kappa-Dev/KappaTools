@@ -56,7 +56,7 @@ class virtual new_client ~post mailbox :
   method virtual is_running : bool
 
   method private message :
-    type a. a handle -> (Bi_outbuf.t -> unit) ->
+    type a. a handle -> (Buffer.t -> unit) ->
     (a, Result_util.message list) Result_util.t Lwt.t =
     fun handle request ->
     if self#is_running then

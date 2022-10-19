@@ -152,7 +152,7 @@ class virtual new_client ~is_running ~post mailbox = object(self)
   val mutable id = 0
 
   method private message :
-    type a. a handle -> (Bi_outbuf.t -> unit) ->
+    type a. a handle -> (Buffer.t -> unit) ->
     (a, Result_util.message list) Result_util.t Lwt.t =
     fun handle request ->
     if is_running () then

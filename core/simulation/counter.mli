@@ -18,7 +18,7 @@ module Efficiency : sig
       mutable time_correction : int
     }
 
-  val write_t : Bi_outbuf.t -> t -> unit
+  val write_t : Buffer.t -> t -> unit
   (** Output a JSON value of type {!t}. *)
 
   val string_of_t : ?len:int -> t -> string

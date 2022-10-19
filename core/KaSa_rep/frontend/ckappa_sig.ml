@@ -146,12 +146,12 @@ let rule_id_of_json json =
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "rule id",json))
 
 let write_c_rule_id ob f =
-  Yojson.Basic.to_outbuf ob (rule_id_to_json f)
+  Yojson.Basic.to_buffer ob (rule_id_to_json f)
 
 let string_of_c_rule_id ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
+  let ob = Buffer.create len in
   write_c_rule_id ob x;
-  Bi_outbuf.contents ob
+  Buffer.contents ob
 
 let read_c_rule_id p lb =
   rule_id_of_json (Yojson.Basic.from_lexbuf ~stream:true p lb)

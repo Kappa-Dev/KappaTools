@@ -82,7 +82,7 @@ let print_dot_snapshot ?uuid f s =
     s.snapshot_tokens
 
 let write_snapshot ob s =
-  let () = Bi_outbuf.add_char ob '{' in
+  let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field
       "snapshot_event" Yojson.Basic.write_int ob s.snapshot_event in
   let () = JsonUtil.write_comma ob in
@@ -101,7 +101,7 @@ let write_snapshot ob s =
       (JsonUtil.write_array
          (JsonUtil.write_compact_pair Yojson.Basic.write_string Nbr.write_t))
       ob s.snapshot_tokens in
-  Bi_outbuf.add_char ob '}'
+  Buffer.add_char ob '}'
 
 let read_snapshot p lb =
   let snapshot_event,snapshot_time,snapshot_agents,snapshot_tokens =
@@ -141,7 +141,7 @@ type din = {
 }
 
 let write_din ob f =
-  let () = Bi_outbuf.add_char ob '{' in
+  let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field
       "din_kind" Primitives.write_din_kind ob f.din_data.din_kind in
   let () = JsonUtil.write_comma ob in
@@ -160,7 +160,7 @@ let write_din ob f =
   let () = JsonUtil.write_field "din_fluxs"
       (JsonUtil.write_array (JsonUtil.write_array Yojson.Basic.write_float))
       ob f.din_data.din_fluxs in
-  Bi_outbuf.add_char ob '}'
+  Buffer.add_char ob '}'
 
 let read_din p lb =
   let (din_kind,din_start,din_hits,din_fluxs,din_rules,din_end) =
@@ -299,7 +299,7 @@ let init_plot env =
   { plot_legend; plot_series = []; }
 
 let write_plot ob f =
-  let () = Bi_outbuf.add_char ob '{' in
+  let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field "legend"
       (JsonUtil.write_array Yojson.Basic.write_string) ob f.plot_legend in
   let () = JsonUtil.write_comma ob in
@@ -307,7 +307,7 @@ let write_plot ob f =
       (JsonUtil.write_list (JsonUtil.write_array
                               (JsonUtil.write_option Yojson.Basic.write_float)))
       ob f.plot_series in
-  Bi_outbuf.add_char ob '}'
+  Buffer.add_char ob '}'
 
 let read_plot p lb =
   let (plot_legend,plot_series) =

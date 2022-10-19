@@ -49,13 +49,13 @@ class new_client ~is_running ~post (mailbox : mailbox) :
     method private raw_message post request =
       if is_running () then
         let result,feeder = Lwt.task () in
-        let outbuf = Bi_outbuf.create 1024 in
-        let () = Bi_outbuf.add_string outbuf "{id:" in
-        let () = Bi_outbuf.add_string outbuf (string_of_int id) in
-        let () = Bi_outbuf.add_string outbuf ",data:" in
+        let outbuf = Buffer.create 1024 in
+        let () = Buffer.add_string outbuf "{id:" in
+        let () = Buffer.add_string outbuf (string_of_int id) in
+        let () = Buffer.add_string outbuf ",data:" in
         let () = request outbuf in
-        let () = Bi_outbuf.add_string outbuf "}" in
-        let () = post (Bi_outbuf.contents outbuf) in
+        let () = Buffer.add_string outbuf "}" in
+        let () = post (Buffer.contents outbuf) in
         let () = Hashtbl.replace mailbox id feeder in
         let () = id <- id+1 in
         result
@@ -68,13 +68,13 @@ class new_client ~is_running ~post (mailbox : mailbox) :
                 Exit)
              Exception_without_parameter.empty_error_handler)
     method private message request =
-      self#raw_message post (fun outb -> Yojson.Basic.to_outbuf outb request)
+      self#raw_message post (fun outb -> Yojson.Basic.to_buffer outb request)
 
     method init_static_analyser_raw compil =
       let request outbuf =
-        let () = Bi_outbuf.add_string outbuf "[ \"INIT\", " in
-        let () = Bi_outbuf.add_string outbuf compil in
-        Bi_outbuf.add_string outbuf "]" in
+        let () = Buffer.add_string outbuf "[ \"INIT\", " in
+        let () = Buffer.add_string outbuf compil in
+        Buffer.add_string outbuf "]" in
       Lwt_result.bind_result
         (self#raw_message post request)
         (function

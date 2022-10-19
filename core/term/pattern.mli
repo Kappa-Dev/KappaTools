@@ -164,7 +164,7 @@ type sharing_level = No_sharing | Compatible_patterns | Max_sharing
 (** Heuristic to use on domain construction *)
 
 val write_sharing_level :
-  Bi_outbuf.t -> sharing_level -> unit
+  Buffer.t -> sharing_level -> unit
   (** Output a JSON value of type {!sharing_level}. *)
 
 val string_of_sharing_level :

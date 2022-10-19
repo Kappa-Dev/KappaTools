@@ -37,7 +37,7 @@ type c_counter_name
 
 val rule_id_to_json : c_rule_id -> Yojson.Basic.t
 val rule_id_of_json : Yojson.Basic.t -> c_rule_id
-val write_c_rule_id : Bi_outbuf.t -> c_rule_id -> unit
+val write_c_rule_id : Buffer.t -> c_rule_id -> unit
 val string_of_c_rule_id : ?len:int -> c_rule_id -> string
 val read_c_rule_id : Yojson.Safe.lexer_state -> Lexing.lexbuf -> c_rule_id
 val c_rule_id_of_string : string -> c_rule_id

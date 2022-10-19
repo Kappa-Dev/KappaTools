@@ -23,21 +23,21 @@ type ('a,'b) t = {
   messages : message list;
 }
 
-val write_message : Bi_outbuf.t -> message -> unit
+val write_message : Buffer.t -> message -> unit
 
 val read_message : Yojson.Safe.lexer_state -> Lexing.lexbuf -> message
 
 val print_message : Format.formatter -> message -> unit
 
 val write_t :
-  (Bi_outbuf.t -> 'ok -> unit) ->
-  (Bi_outbuf.t -> 'error -> unit) ->
-  Bi_outbuf.t -> ('ok, 'error) t -> unit
+  (Buffer.t -> 'ok -> unit) ->
+  (Buffer.t -> 'error -> unit) ->
+  Buffer.t -> ('ok, 'error) t -> unit
 (** Output a JSON value of type {!t}. *)
 
 val string_of_t :
-  (Bi_outbuf.t -> 'ok -> unit) ->
-  (Bi_outbuf.t -> 'error -> unit) ->
+  (Buffer.t -> 'ok -> unit) ->
+  (Buffer.t -> 'error -> unit) ->
   ?len:int -> ('ok, 'error) t -> string
 (** Serialize a value of type {!t} into a JSON string.  @param len
     specifies the initial length of the buffer used internally.

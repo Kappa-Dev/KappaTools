@@ -31,7 +31,7 @@ module Efficiency : sig
   val incr_time_correction : t -> t
   val incr_consecutive_blocked : t -> t
 
-  val write_t : Bi_outbuf.t -> t -> unit
+  val write_t : Buffer.t -> t -> unit
   val string_of_t : ?len:int -> t -> string
   val read_t : Yojson.Safe.lexer_state -> Lexing.lexbuf -> t
   val t_of_string : string -> t
@@ -138,12 +138,12 @@ end =
         raise (Yojson.Basic.Util.Type_error ("Invalid simulation efficiency",x))
 
     let write_t ob f =
-      Yojson.Basic.to_outbuf ob (to_yojson f)
+      Yojson.Basic.to_buffer ob (to_yojson f)
 
     let string_of_t ?(len = 1024) x =
-      let ob = Bi_outbuf.create len in
+      let ob = Buffer.create len in
       write_t ob x;
-      Bi_outbuf.contents ob
+      Buffer.contents ob
 
     let read_t p lb =
       of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)

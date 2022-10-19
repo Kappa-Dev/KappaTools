@@ -62,7 +62,7 @@ val to_yojson : t -> Yojson.Basic.t
 val of_yojson : Yojson.Basic.t -> t
 (** @raise Yojson.Basic.Util.Type_error if incorrect *)
 
-val write_t : Bi_outbuf.t -> t -> unit
+val write_t : Buffer.t -> t -> unit
 (** Output a JSON value of type {!t}. *)
 
 val string_of_t : ?len:int -> t -> string

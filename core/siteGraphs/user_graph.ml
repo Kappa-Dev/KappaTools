@@ -178,17 +178,17 @@ type connected_component = cc_node array
  *)
 
 let write_cc_port ob p =
-  let () = Bi_outbuf.add_char ob '{' in
+  let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field
       "port_links" (fun ob -> function
           | WHATEVER -> Yojson.Basic.write_null ob ()
           | SOME -> Yojson.Basic.write_bool ob true
           | TYPE (si,ty) ->
-            let () = Bi_outbuf.add_string ob "{\"site_name\":\"" in
-            let () = Bi_outbuf.add_string ob si in
-            let () = Bi_outbuf.add_string ob "\",\"agent_type\":\"" in
-            let () = Bi_outbuf.add_string ob ty in
-            Bi_outbuf.add_string ob "\"}"
+            let () = Buffer.add_string ob "{\"site_name\":\"" in
+            let () = Buffer.add_string ob si in
+            let () = Buffer.add_string ob "\",\"agent_type\":\"" in
+            let () = Buffer.add_string ob ty in
+            Buffer.add_string ob "\"}"
           | LINKS l ->
             JsonUtil.write_list
               (JsonUtil.write_compact_pair
@@ -201,28 +201,28 @@ let write_cc_port ob p =
       "port_states"
       (JsonUtil.write_option (JsonUtil.write_list Yojson.Basic.write_string))
       ob p.port_states in
-  Bi_outbuf.add_char ob '}'
+  Buffer.add_char ob '}'
 
 let write_site ob f =
-  let () = Bi_outbuf.add_char ob '[' in
+  let () = Buffer.add_char ob '[' in
   let () = match f.site_type with
     | Counter i ->
       let () = Yojson.Basic.write_string ob "counter" in
-      let () = Bi_outbuf.add_char ob ',' in
+      let () = Buffer.add_char ob ',' in
       Yojson.Basic.write_int ob i
     | Port p ->
       let () = Yojson.Basic.write_string ob "port" in
-      let () = Bi_outbuf.add_char ob ',' in
+      let () = Buffer.add_char ob ',' in
       write_cc_port ob p in
-  Bi_outbuf.add_char ob ']'
+  Buffer.add_char ob ']'
 
 let write_cc_site ob f =
-  let () = Bi_outbuf.add_char ob '{' in
+  let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field
       "site_name" Yojson.Basic.write_string ob f.site_name in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field "site_type" write_site ob f in
-  Bi_outbuf.add_char ob '}'
+  Buffer.add_char ob '}'
 
 let links_of_yojson = function
   | `Null -> WHATEVER
@@ -277,7 +277,7 @@ let read_cc_site p lb =
 let write_cc_node ob x =
   JsonUtil.write_option
     (fun ob f ->
-       let () = Bi_outbuf.add_char ob '{' in
+       let () = Buffer.add_char ob '{' in
        let () = JsonUtil.write_field
            "node_type" Yojson.Basic.write_string ob f.node_type in
        let () = JsonUtil.write_comma ob in
@@ -289,7 +289,7 @@ let write_cc_node ob x =
            JsonUtil.write_comma ob in
        let () = JsonUtil.write_field
            "node_sites" (JsonUtil.write_array write_cc_site) ob f.node_sites in
-       Bi_outbuf.add_char ob '}')
+       Buffer.add_char ob '}')
     ob x
 
 let read_cc_node p lb =
@@ -313,9 +313,9 @@ let read_connected_component ob f =
   Yojson.Basic.read_array (Yojson.Basic.read_array read_cc_node) ob f
 
 let string_of_connected_component ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
+  let ob = Buffer.create len in
   let () = write_connected_component ob x in
-  Bi_outbuf.contents ob
+  Buffer.contents ob
 
 let connected_component_of_string s =
   read_connected_component (Yojson.Safe.init_lexer ()) (Lexing.from_string s)

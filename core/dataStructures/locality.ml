@@ -135,12 +135,12 @@ let annot_of_yojson ?filenames f = function
   | `Assoc [ "val", x ] -> (f x, dummy)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
 
-let write_range ob f = Yojson.Basic.to_outbuf ob (to_compact_yojson None f)
+let write_range ob f = Yojson.Basic.to_buffer ob (to_compact_yojson None f)
 
 let string_of_range ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
+  let ob = Buffer.create len in
   write_range ob x;
-  Bi_outbuf.contents ob
+  Buffer.contents ob
 
 let read_range p lb =
   of_compact_yojson

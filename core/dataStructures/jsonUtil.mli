@@ -8,8 +8,8 @@
 
 (** Parsing utils *)
 
-val write_to_channel: (Bi_outbuf.t -> 'a -> unit) -> out_channel -> 'a -> unit
-val string_of_write: (Bi_outbuf.t -> 'a -> unit) -> ?len:int -> 'a -> string
+val write_to_channel: (Buffer.t -> 'a -> unit) -> out_channel -> 'a -> unit
+val string_of_write: (Buffer.t -> 'a -> unit) -> ?len:int -> 'a -> string
 
 val read_of_string:
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) -> string -> 'a
@@ -22,7 +22,7 @@ val read_next_item :
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a)
 
-val write_comma: Bi_outbuf.t -> unit
+val write_comma: Buffer.t -> unit
 
 (** Jsonify simple types *)
 
@@ -46,7 +46,7 @@ val to_option: (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a option
 (** Beware: `Null is reserved for None *)
 
 val write_option:
-  (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a option -> unit
+  (Buffer.t -> 'a -> unit) -> Buffer.t -> 'a option -> unit
 
 val read_option:
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
@@ -57,16 +57,16 @@ val of_list: ('a -> Yojson.Basic.t) -> 'a list -> Yojson.Basic.t
 val to_list:
   ?error_msg:string -> (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a list
 
-val write_list: (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a list -> unit
+val write_list: (Buffer.t -> 'a -> unit) -> Buffer.t -> 'a list -> unit
 
 val of_array: ('a -> Yojson.Basic.t) -> 'a array -> Yojson.Basic.t
 
 val to_array:
   ?error_msg:string -> (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a array
 
-val write_array: (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a array -> unit
+val write_array: (Buffer.t -> 'a -> unit) -> Buffer.t -> 'a array -> unit
 
-val write_sequence: Bi_outbuf.t -> (Bi_outbuf.t -> unit) list -> unit
+val write_sequence: Buffer.t -> (Buffer.t -> unit) list -> unit
 
 val read_variant:
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
@@ -84,7 +84,7 @@ val to_assoc:
   Yojson.Basic.t -> 'a list
 
 val write_field:
-  string -> (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a -> unit
+  string -> (Buffer.t -> 'a -> unit) -> Buffer.t -> 'a -> unit
 
 val of_pair:
   ?lab1:string -> ?lab2:string ->
@@ -97,8 +97,8 @@ val to_pair:
   Yojson.Basic.t -> 'a * 'b
 
 val write_compact_pair:
-  (Bi_outbuf.t -> 'a -> unit) -> (Bi_outbuf.t -> 'b -> unit) ->
-  Bi_outbuf.t -> 'a * 'b -> unit
+  (Buffer.t -> 'a -> unit) -> (Buffer.t -> 'b -> unit) ->
+  Buffer.t -> 'a * 'b -> unit
 
 val read_compact_pair:
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
