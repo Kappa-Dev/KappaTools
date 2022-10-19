@@ -1680,7 +1680,7 @@ let convert_obs parameters compil network =
         | [] -> ()
         | [a] ->
           let species, n = species_of_species_id network a in
-          let expr = to_var compil (from_nembed compil expr n) n in
+          let expr = to_var compil (from_nocc compil expr n) n in
           let comment =
             Format.asprintf "%a"
               (fun log  ->
@@ -1706,7 +1706,7 @@ let convert_obs parameters compil network =
                in
                let expr =
                  to_var compil
-                   (from_nembed compil
+                   (from_nocc compil
                       (Locality.dummy_annot (Alg_expr.ALG_VAR id'))
                       n) n in
                increment ~propagate_constants
