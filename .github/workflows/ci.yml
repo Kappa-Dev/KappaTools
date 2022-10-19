@@ -88,7 +88,7 @@ jobs:
         run: |
           opam install --yes dune num yojson lwt fmt logs re \
             lwt_react tyxml-ppx js_of_ocaml-lwt \
-            js_of_ocaml-tyxml atdgen
+            js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Javascript app
@@ -115,7 +115,7 @@ jobs:
         run: |
           opam install --yes dune num yojson lwt fmt logs re \
             lwt_react tyxml-ppx js_of_ocaml-lwt \
-            js_of_ocaml-tyxml atdgen
+            js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make MacOS app
@@ -148,7 +148,7 @@ jobs:
         run: >
           opam install --yes dune num yojson lwt fmt logs re
           lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml atdgen
+          js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
       - name: Install cygwin zip package
