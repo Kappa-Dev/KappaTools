@@ -151,14 +151,11 @@ jobs:
           js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
-      - name: Install cygwin zip package
-        run: >
-          C:\\hostedtoolcache\\windows\\cygwin\\3.3.4\\x86_64\\setup-x86_64.exe
-          --quiet-mode --root D:\cygwin
-          --site https://cygwin.mirror.constant.com
-          --packages zip
       - name: Make Windows app
-        run: opam exec -- make KappaBin.zip
+        run: |
+          opam exec -- make KappaBin
+          7z a -tzip KappaBin.zip KappaBin
+        # Note: Windows VMs on GitHub Action do not have zip command but provide 7z 
       - name: Archive Windows app
         uses: actions/upload-artifact@v3
         with:

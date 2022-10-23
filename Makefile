@@ -167,7 +167,7 @@ Kappapp.tar.gz:
 	tar czf $@ Kappapp
 	rm -r Kappapp
 
-KappaBin.zip:
+KappaBin:
 	+$(MAKE) clean
 	+$(MAKE) APP_EXT=local site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
@@ -186,6 +186,8 @@ KappaBin.zip:
 	cp _build/default/core/agents/KaMoHa.exe KappaBin/resources/bin/
 	cp _build/default/core/agents/KaSimAgent.exe KappaBin/resources/bin/
 	cp _build/default/core/agents/KaSaAgent.exe KappaBin/resources/bin/
+
+KappaBin.zip: KappaBin
 	zip -y -r $@ KappaBin
 	rm -r KappaBin
 
