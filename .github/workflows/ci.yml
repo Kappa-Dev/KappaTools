@@ -151,15 +151,9 @@ jobs:
           js_of_ocaml-tyxml atdgen
       - name: Make Kappa
         run: opam exec -- make all
-      - name: Install cygwin zip package (first step)
+      - name: Install cygwin zip package
         run: >
-          cd C:\\hostedtoolcache\\windows\\cygwin
-      - name: Install cygwin zip package (second step)
-        run: >
-          wget -N https://cygwin.com/setup-x86_64.exe
-      - name: Install cygwin zip package (third step)
-        run: >
-          setup-x86_64.exe
+          C:\\hostedtoolcache\\windows\\cygwin\\3.3.4\\x86_64\\setup-x86_64.exe
           --quiet-mode --root D:\cygwin
           --site https://cygwin.mirror.constant.com
           --packages zip
