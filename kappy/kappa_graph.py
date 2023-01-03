@@ -1,4 +1,7 @@
 from collections import abc
+
+collections.Callable = collection.abc.Callable 
+
 import re
 
 ident_re =  r'[_~][a-zA-Z0-9_~+-]+|[a-zA-Z][a-zA-Z0-9_~+-]*'

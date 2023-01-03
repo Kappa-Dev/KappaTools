@@ -113,7 +113,7 @@ jobs:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
         run: |
-          opam install --yes dune num yojson lwt fmt logs re \
+          opam install --yes dune num yojson result lwt fmt logs re \
             lwt_react tyxml-ppx js_of_ocaml-lwt \
             js_of_ocaml-tyxml atdgen
       - name: Make Kappa
@@ -146,7 +146,7 @@ jobs:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
         run: >
-          opam install --yes dune num yojson lwt fmt logs re
+          opam install --yes dune num yojson result lwt fmt logs re
           lwt_react tyxml-ppx js_of_ocaml-lwt
           js_of_ocaml-tyxml atdgen
       - name: Make Kappa
