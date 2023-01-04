@@ -265,7 +265,7 @@ class KappaApi(ABC):
         by this client.
 
         """
-        if len(args) is 1 and isinstance(args[0], SimulationParameter):
+        if len(args) == 1 and isinstance(args[0], SimulationParameter):
             self.__default_param = args[0]
         else:
             self.__default_param = SimulationParameter(*args, **kwargs)
