@@ -21,6 +21,7 @@ depends : [
   "stdlib-shims"
   "fmt"
   "logs"
+  "result"
 ]
 
 build: ["dune" "build" "-p" name "-j" jobs]

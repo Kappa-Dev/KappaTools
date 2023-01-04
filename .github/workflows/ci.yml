@@ -92,7 +92,7 @@ jobs:
         run: |
           opam install --yes dune num yojson result lwt fmt logs re \
             lwt_react tyxml-ppx js_of_ocaml-lwt \
-            js_of_ocaml-tyxml atdgen
+            js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Javascript app
@@ -119,7 +119,7 @@ jobs:
         run: |
           opam install --yes dune num yojson result lwt fmt logs re \
             lwt_react tyxml-ppx js_of_ocaml-lwt \
-            js_of_ocaml-tyxml atdgen
+            js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make MacOS app
@@ -152,17 +152,14 @@ jobs:
         run: >
           opam install --yes dune num yojson result lwt fmt logs re
           lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml atdgen
+          js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
-      - name: Install cygwin zip package
-        run: >
-          C:\\hostedtoolcache\\windows\\cygwin\\3.4.3\\x86_64\\setup-x86_64.exe
-          --quiet-mode --root D:\cygwin
-          --site https://cygwin.mirror.constant.com
-          --packages zip
       - name: Make Windows app
-        run: opam exec -- make KappaBin.zip
+        run: |
+          opam exec -- make KappaBin
+          7z a -tzip KappaBin.zip KappaBin
+        # Note: Windows VMs on GitHub Action do not have zip command but provide 7z 
       - name: Archive Windows app
         uses: actions/upload-artifact@v3
         with:
@@ -173,6 +170,7 @@ jobs:
   deploy-docs:
     needs: install-ubuntu
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -190,6 +188,7 @@ jobs:
   deploy-js:
     needs: js
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -207,6 +206,7 @@ jobs:
   deploy-macos:
     needs: macos
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -224,6 +224,7 @@ jobs:
   deploy-windows:
     needs: windows
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
