@@ -151,6 +151,9 @@ jobs:
           js_of_ocaml-tyxml atdgen
       - name: Make Kappa
         run: opam exec -- make all
+      - name: show content
+        run: >
+          DIR C:\\hostedtoolcache\\windows\\cygwin\\3.3.4\\x86_64\\
       - name: Install cygwin zip package
         run: >
           C:\\hostedtoolcache\\windows\\cygwin\\3.3.4\\x86_64\\setup-x86_64.exe
