@@ -52,7 +52,7 @@ class KappaRest(KappaApi):
         except exceptions.HTTPError as e:
             msg = e.read()
             raise KappaError(json.loads(msg, encoding='utf-8'))
-        details = r.json(encoding='utf-8')
+        details = r.json()
         if 400 <= r.status_code < 500:
             raise KappaError(details)
         else:

@@ -1,4 +1,5 @@
 from collections import abc
+
 import re
 
 ident_re =  r'[_~][a-zA-Z0-9_~+-]+|[a-zA-Z][a-zA-Z0-9_~+-]*'
@@ -63,12 +64,12 @@ class KappaSite:
                 return not (self._links is None or self._links == [])
             elif type(ref._links) is list :
                 if type(self._links) is list:
-                    if len(ref._links) is 0:
-                        return len(self._links) is 0
+                    if len(ref._links) == 0:
+                        return len(self._links) == 0
                     else:
-                        assert len(ref._links) is 1, \
+                        assert len(ref._links) == 1, \
                             "Sigma graph compare not implemented"
-                        if len(self._links) is 1:
+                        if len(self._links) == 1:
                             assert mapping is not None, "Missing mapping"
                             (r_ag,r_si) = ref._links[0]
                             (ag,si) = self._links[0]
@@ -91,12 +92,12 @@ class KappaSite:
             and ref._internals == self._internals):
             if type(ref._links) is list :
                 if type(self._links) is list:
-                    if len(ref._links) is 0:
-                        return len(self._links) is 0
+                    if len(ref._links) == 0:
+                        return len(self._links) == 0
                     else:
-                        assert len(ref._links) is 1, \
+                        assert len(ref._links) == 1, \
                             "Sigma graph compare not implemented"
-                        if len(self._links) is 1:
+                        if len(self._links) == 1:
                             assert mapping is not None, "Missing mapping"
                             (r_ag,r_si) = ref._links[0]
                             (ag,si) = self._links[0]
@@ -125,10 +126,10 @@ class KappaSite:
         """
         if self._internals is None:
             return None
-        elif len(self._internals) is 0:
+        elif len(self._internals) == 0:
             return None
         else:
-            assert len(self._internals) is 1
+            assert len(self._internals) == 1
             return self._internals[0]
 
     def has_link(self) -> bool:
@@ -580,7 +581,7 @@ class KappaComplex(abc.Sequence):
                                                       dangling,
                                                       completed)
             agent_list.append(agent)
-        if len(dangling) is not 0:
+        if len(dangling) != 0:
             raise KappaSyntaxError('Dangling link <' + str(dangling.popitem()) +
                                    '> in complex <' + expression + '>.')
         for (((col,row),si),dst) in completed.items():

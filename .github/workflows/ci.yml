@@ -66,6 +66,10 @@ jobs:
         run: |
           opam exec -- make all
           opam exec -- dune build
+      - name: Uninstall nose
+        run: opam exec -- pip uninstall -y nose
+      - name: Reinstall nose
+        run: "opam exec -- pip install nose-py3"
       - name: Nose tests
         run: opam exec -- nosetests -v tests/kappy
 
@@ -86,7 +90,7 @@ jobs:
             texlive-fonts-recommended texlive-pictures tex4ht
       - name: Install OPAM dependencies
         run: |
-          opam install --yes dune num yojson lwt fmt logs re \
+          opam install --yes dune num yojson result lwt fmt logs re \
             lwt_react tyxml-ppx js_of_ocaml-lwt \
             js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
@@ -113,7 +117,7 @@ jobs:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
         run: |
-          opam install --yes dune num yojson lwt fmt logs re \
+          opam install --yes dune num yojson result lwt fmt logs re \
             lwt_react tyxml-ppx js_of_ocaml-lwt \
             js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
@@ -146,7 +150,7 @@ jobs:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
         run: >
-          opam install --yes dune num yojson lwt fmt logs re
+          opam install --yes dune num yojson result lwt fmt logs re
           lwt_react tyxml-ppx js_of_ocaml-lwt
           js_of_ocaml-tyxml atdgen result
       - name: Make Kappa

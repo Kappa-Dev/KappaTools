@@ -16,7 +16,7 @@ depends : [
   "num"
   "re"
   "dune"
-  "yojson" { >= "1.6.0" }
+  "yojson" { >= "2.0" }
   "lwt" { >= "4.2.0" }
   "stdlib-shims"
   "fmt"

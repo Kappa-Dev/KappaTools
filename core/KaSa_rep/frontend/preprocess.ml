@@ -1920,6 +1920,8 @@ let translate_rule parameters error handler rule =
         in
         let error,(direct,reverse,actions,half_release_set,agent_type,lbondk,rbondk,dead) =
           match lhsk,rhsk with
+          | Some Cckappa_sig.Ghost, Some Cckappa_sig.Ghost
+          (* nothing *)
           | Some Cckappa_sig.Unknown_agent _, Some Cckappa_sig.Ghost -> (* suppression of a dead agent *)
             error, (
               direct,
@@ -2073,10 +2075,9 @@ let translate_rule parameters error handler rule =
                     | Some Cckappa_sig.Agent _| None -> false))
           | Some Cckappa_sig.Unknown_agent _, _
           | _, Some Cckappa_sig.Unknown_agent _
-          | Some Cckappa_sig.Ghost,Some Cckappa_sig.Ghost
           | _,Some Cckappa_sig.Dead_agent _ | None,_ | _,None ->
             ( Exception.warn
-               parameters error __POS__
+              parameters error __POS__
                ~pos:position
                Exit
                (direct,
@@ -2323,7 +2324,7 @@ let translate_init parameters error handler ((alg,pos_alg),init_t) =
       | Remanent_parameters_sig.KaSim
       | Remanent_parameters_sig.Internalised
       | Remanent_parameters_sig.Server ->
-        error, dft 
+        error, dft
 
 let translate_var parameters error handler (a,b) =
   let error,b' = alg_with_pos_map (lift_allowing_question_marks parameters handler) error b in

@@ -473,9 +473,9 @@ module Mat_inter =
                               begin
                                 match (I.read inter t).inf with
                                 | Minfinity | Infinity | Unknown ->
-                                let error, () =
+                                (*let error, () =
                                   Exception.warn parameters error __POS__ Exit ()
-                                in
+                                in*)
                                 error
                                 | Frac _ as f ->
                                   vide error side q
@@ -489,9 +489,9 @@ module Mat_inter =
                                    {num=(-(delta.num));den=delta.den}
                                    f) ((delta,f,t,Upper)::waiting)
                             | Infinity | Unknown ->
-                              let error, () =
+                              (*let error, () =
                                 Exception.warn parameters error __POS__ Exit ()
-                              in
+                              in*)
                               error
                         end
                       | 1, Lower | (-1), Upper  ->
@@ -502,9 +502,9 @@ module Mat_inter =
                             begin
                               match (I.read inter t).sup with
                               | Minfinity | Infinity | Unknown ->
-                                let error, () =
+                                (*let error, () =
                                   Exception.warn parameters error __POS__ Exit ()
-                                in
+                                in*)
                                 error
                               | Frac _ as f ->
                                 vide error side q
@@ -518,15 +518,15 @@ module Mat_inter =
                                  {num=(-(delta.num));den=delta.den}
                                  f) ((delta,f,t,Lower)::waiting)
                           | Minfinity | Unknown ->
-                            let error, () =
+                            (*let error, () =
                               Exception.warn parameters error __POS__ Exit ()
-                            in
+                            in*)
                             error
                         end
                       | _, (Lower | Upper) ->
-                      let error, () =
+                      (*let error, () =
                         Exception.warn parameters error __POS__ Exit ()
-                      in
+                      in*)
                       error
                      )
                  and vide2 error side t t_delta q somme =
@@ -555,9 +555,9 @@ module Mat_inter =
                              {num=(-(delta.num));den=delta.den}
                              ((I.read inter head).sup))
                     |  _, (Lower | Upper) ->
-                      let error, () =
+                      (*let error, () =
                       Exception.warn parameters error __POS__ Exit ()
-                      in
+                      in*)
                       error)
                  and vide_waiting error _side somme waiting =
                    List.fold_left
