@@ -159,7 +159,7 @@ jobs:
         run: |
           opam exec -- make KappaBin
           7z a -tzip KappaBin.zip KappaBin
-        # Note: Windows VMs on GitHub Action do not have zip command but provide 7z 
+        # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
       - name: Archive Windows app
         uses: actions/upload-artifact@v3
         with:
@@ -179,7 +179,7 @@ jobs:
         with:
           name: doc
       - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.DEPLOY_KEY }}
           known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
@@ -197,7 +197,7 @@ jobs:
         with:
           name: js
       - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.DEPLOY_KEY }}
           known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
@@ -215,7 +215,7 @@ jobs:
         with:
           name: macos
       - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.DEPLOY_KEY }}
           known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
@@ -233,7 +233,7 @@ jobs:
         with:
           name: windows
       - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.DEPLOY_KEY }}
           known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
