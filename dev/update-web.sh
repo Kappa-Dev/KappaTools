@@ -31,8 +31,8 @@ case $1 in
         empty_or_create ${PLAYGROUND}/try
         cp site/* ${PLAYGROUND}/try/
 	sed '/<\/head>/i \
-	<!--<!-- Piwik -->\
-	<script type="text/javascript">\
+	<!-- Piwik -->\
+	<!--<script type="text/javascript">\
 	var _paq = _paq || [];\
 	_paq.push(['\''trackPageView'\'']);\
 	_paq.push(['\''enableLinkTracking'\'']);\
@@ -44,8 +44,8 @@ case $1 in
 		g.type='\''text/javascript'\''; g.async=true; g.defer=true; g.src=u+'\''piwik.js'\''; s.parentNode.insertBefore(g,s);\
 	    })();\
 	</script>\
-	<noscript><p><img src="https://coutosuisse.fagny.fr/analytics/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>\
-	<!-- End Piwik Code -->-->\
+	<noscript><p><img src="https://coutosuisse.fagny.fr/analytics/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>-->\
+	<!-- End Piwik Code -->\
         ' site/index.html > ${PLAYGROUND}/try/index.html
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
