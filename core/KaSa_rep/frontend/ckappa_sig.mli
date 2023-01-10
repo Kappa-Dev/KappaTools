@@ -166,6 +166,8 @@ and link =
   | LNK_TYPE  of (string Locality.annot * string Locality.annot)
   | LNK_MISSING
 
+val skip_only: mixture -> bool
+
 type direction = Direct | Reverse
 
 type 'pattern rule =

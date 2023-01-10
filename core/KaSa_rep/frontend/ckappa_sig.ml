@@ -87,6 +87,12 @@ and link =
   | LNK_TYPE  of (string Locality.annot * string Locality.annot)
   | LNK_MISSING
 
+let rec skip_only mix =
+  match mix with
+    | EMPTY_MIX -> true
+    | SKIP mix -> skip_only mix
+    | COMMA _ | DOT _ | PLUS _ -> false
+
 type direction = Direct | Reverse
 
 type 'pattern rule =

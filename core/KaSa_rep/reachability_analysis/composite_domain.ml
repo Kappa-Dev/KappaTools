@@ -268,6 +268,12 @@ struct
             error, dynamic
         ) (error, dynamic) rule.Cckappa_sig.actions.Cckappa_sig.creation
     in
+    let error, dynamic =
+        if rule.Cckappa_sig.actions.Cckappa_sig.creation = []
+        && Ckappa_sig.skip_only rule.Cckappa_sig.rule_lhs.Cckappa_sig.c_mixture
+        then push_rule static dynamic error rule_id
+        else error, dynamic
+    in
     error, dynamic
 
   let scan_rule_creation static dynamic error =
