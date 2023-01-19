@@ -49,10 +49,50 @@ let update_rate counters (k,a) =
        Alg_expr.DIFF_TOKEN (((update_expr k1),a1),k2)
     | Alg_expr.DIFF_KAPPA_INSTANCE ((k,a),m) ->
        Alg_expr.DIFF_KAPPA_INSTANCE (((update_expr k),a),m)
-    | Alg_expr.ALG_VAR id| Alg_expr.TOKEN_ID id -> update_id id k
+    | Alg_expr.ALG_VAR id| Alg_expr.TOKEN_ID id ->
+      update_id id k
     | Alg_expr.STATE_ALG_OP _| Alg_expr.CONST _| Alg_expr.KAPPA_INSTANCE _ -> k
   in
   ((update_expr k),a)
+
+let collect_ids expr_list expr2_list=
+  let rec aux_expr expr acc =
+    match expr with
+    | Alg_expr.BIN_ALG_OP (_,(k1,_),(k2,_)) ->
+      aux_expr k2 (aux_expr k1 acc)
+    | Alg_expr.UN_ALG_OP (_,(k1,_))
+    | Alg_expr.DIFF_TOKEN((k1,_),_)
+    | Alg_expr.DIFF_KAPPA_INSTANCE((k1,_),_)->
+      aux_expr k1 acc
+    | Alg_expr.IF ((k1,_),(k2,_),(k3,_)) ->
+      aux_expr k3 (aux_expr k2 (aux_bool k1 acc))
+    | Alg_expr.ALG_VAR id| Alg_expr.TOKEN_ID id ->
+      aux_id id acc
+    | Alg_expr.STATE_ALG_OP _| Alg_expr.CONST _| Alg_expr.KAPPA_INSTANCE _ -> acc
+  and aux_id id acc = Mods.StringSet.add id acc
+  and aux_bool expr acc =
+    match expr with
+    | Alg_expr.TRUE | Alg_expr.FALSE -> acc
+    | Alg_expr.BIN_BOOL_OP (_,(k1,_),(k2,_)) -> aux_bool k2 (aux_bool k1 acc)
+    | Alg_expr.UN_BOOL_OP (_,(k,_)) -> aux_bool k acc
+    | Alg_expr.COMPARE_OP (_,(k1,_),(k2,_)) -> aux_expr k2 (aux_expr k1 acc)
+  in
+  List.fold_left
+    (fun acc expr2_opt ->
+       match expr2_opt with
+       | None -> acc
+       | Some ((expr1,_), None) -> aux_expr expr1 acc
+       | Some ((expr1,_),Some (expr2,_)) ->
+         aux_expr expr2 (aux_expr expr1 acc))
+      (List.fold_left
+        (fun acc expr_opt ->
+            match expr_opt with
+            | None -> acc
+            | Some (expr,_) -> aux_expr expr acc)
+        Mods.StringSet.empty expr_list)
+      expr2_list
+
+
 
 let name_match (s,_) (s',_) = (String.compare s s') = 0
 
@@ -176,14 +216,12 @@ let remove_variable_in_counters ~warning rules signatures =
     [(Ast.Counter {c with Ast.count_test=Some (Ast.CGTE 0,Locality.dummy)}), []]
   in
 
-  let remove_var_site counters =
+  let remove_var_site ids counters =
     function
       Ast.Port p -> [(Ast.Port p,[])]
     | Ast.Counter c ->
        let (delta,_) = c.Ast.count_delta in
        match c.Ast.count_test with
-         None ->
-         if (delta <0) then counter_gte_delta c delta else counter_gte_zero c
        | Some (Ast.CEQ v,_) ->
           if (delta >0 || abs(delta) <= v) then [(Ast.Counter c,[])]
           else
@@ -202,26 +240,31 @@ let remove_variable_in_counters ~warning rules signatures =
                      warning
                        ~pos (fun f -> Format.pp_print_string f error) in
           [(Ast.Counter c,[])]
-       | Some (Ast.CVAR x,a) ->
+       | Some (Ast.CVAR x,a) when Mods.StringSet.mem x ids ->
           enumerate_counter_tests x a c.Ast.count_delta
                (List.find
                   (fun c' -> name_match c.Ast.count_nme c'.Ast.count_nme)
-                  counters) in
-  let rec remove_var_sites counters = function
+                  counters)
+       | None | Some (Ast.CVAR _, _) ->
+         if (delta <0) then counter_gte_delta c delta else counter_gte_zero c
+  in
+  let rec remove_var_sites ids counters = function
     | [] -> []
     | s::t ->
        combinations
-         (remove_var_sites counters t) (remove_var_site counters s) in
-  let remove_var_agent = function
+         (remove_var_sites ids counters t) (remove_var_site ids counters s) in
+  let remove_var_agent ids = function
     | Ast.Absent l -> [Ast.Absent l,[]]
     | Ast.Present (s,sites,m) ->
       let counters = counters_signature s signatures in
-      let enumerate_sites = remove_var_sites counters sites in
+      let enumerate_sites = remove_var_sites ids counters sites in
       List.map
         (fun (sites',c) -> (Ast.Present (s,sites',m),c)) enumerate_sites in
-  let rec remove_var_mixture = function
+  let rec remove_var_mixture ids = function
     | [] -> []
-    | ag::t -> combinations (remove_var_mixture t) (remove_var_agent ag) in
+    | ag::t -> combinations
+                 (remove_var_mixture ids t)
+                 (remove_var_agent ids ag) in
 
   let update_opt_rate counters = function
     | None -> None
@@ -236,6 +279,10 @@ let remove_variable_in_counters ~warning rules signatures =
       match r.Ast.rewrite with
       | Ast.Edit r -> r.Ast.mix
       | Ast.Arrow r -> r.Ast.lhs in
+    let ids =
+      collect_ids
+        [Some r.Ast.k_def;r.Ast.k_op]
+        [r.Ast.k_un;r.Ast.k_op_un] in
     List.map
       (fun (lhs,counters) ->
          let k_def = update_rate counters r.Ast.k_def in
@@ -253,8 +300,8 @@ let remove_variable_in_counters ~warning rules signatures =
                | Ast.Edit e -> Ast.Edit {e with Ast.mix = lhs}
                | Ast.Arrow a -> Ast.Arrow {a with Ast.lhs});
             Ast.bidirectional = r.Ast.bidirectional;
-            Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un},a)))
-      (remove_var_mixture (List.flatten mix)) in
+             Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un},a)))
+      (remove_var_mixture ids (List.flatten mix)) in
   let rules = prepare_counters rules in
 
    enumerate rules remove_var_rule
