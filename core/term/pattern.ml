@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2023 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -253,15 +253,26 @@ let automorphisms ~debugMode a =
         | (None,_) -> acc
         | (Some r,_) -> r::acc) [] l
 
-let potential_pairing =
+let potential_pairing sigs =
   Tools.array_fold_left2i
-    (fun _ acc la -> List.fold_left
-        (fun acc b -> List.fold_left
-            (fun acc a -> Mods.Int2Set.add (a,b) acc) acc la) acc)
-    Mods.Int2Set.empty
+    (fun x acc la lb ->
+        if
+          Signature.is_counter_agent sigs x
+        then
+          acc
+        else
+          List.fold_left
+            (fun acc b ->
+                List.fold_left
+                  (fun acc a -> Mods.Int2Set.add (a,b) acc)
+                  acc la)
+            acc lb)
+     Mods.Int2Set.empty
 
-let matchings ~debugMode a b =
-  let possibilities = ref (potential_pairing a.nodes_by_type b.nodes_by_type) in
+let matchings ~debugMode sigs a b =
+  let possibilities =
+      ref (potential_pairing sigs a.nodes_by_type b.nodes_by_type)
+  in
   let rec for_one_root acc =
     match Mods.Int2Set.choose !possibilities with
     | None -> acc
@@ -362,9 +373,9 @@ let minimize ~debugMode cand_nbt cand_nodes ref_nbt =
       raw_to_navigation false nodes_by_type nodes; }
 
 (* returns a list of cc where each cc is included in cc1*)
-let infs ~debugMode cc1 cc2 =
+let infs ~debugMode sigs cc1 cc2 =
   let possibilities =
-    ref (potential_pairing cc1.nodes_by_type cc2.nodes_by_type) in
+    ref (potential_pairing sigs cc1.nodes_by_type cc2.nodes_by_type) in
   let rec aux rename nodes = function
     | [] -> nodes
     | (o,p as pair)::todos ->
@@ -1315,11 +1326,11 @@ module PreEnv = struct
     Mods.IntMap.add w (Mods.IntMap.add hash env_w_h env_w) env,r,out,out_id
 
   let rec saturate_one
-      ~debugMode ~sharing this max_l level (_,domain as acc) =
+      ~debugMode ~sharing sigs this max_l level (_,domain as acc) =
     function
     | [] -> if level < max_l then
         saturate_one
-          ~debugMode ~sharing this max_l (succ level) acc
+          ~debugMode ~sharing sigs this max_l (succ level) acc
           (Mods.IntMap.fold (fun _ -> List.rev_append)
              (Mods.IntMap.find_default Mods.IntMap.empty (succ level) domain)
              [])
@@ -1328,11 +1339,11 @@ module PreEnv = struct
       let news =
         match sharing with
         | No_sharing -> assert false
-        | Max_sharing -> infs ~debugMode this.element h.element
+        | Max_sharing -> infs sigs ~debugMode this.element h.element
         | Compatible_patterns ->
           List.rev_map
             (fun r -> intersection r this.element h.element)
-            (matchings ~debugMode this.element h.element) in
+            (matchings ~debugMode sigs this.element h.element) in
       let acc' =
         List.fold_left
           (fun (mid,acc) cc ->
@@ -1340,19 +1351,19 @@ module PreEnv = struct
              let x,_,_,id = add_cc ~debugMode ~toplevel:false acc id' cc in
              ((if id = id' then id else mid),x))
           acc news in
-       saturate_one ~debugMode ~sharing this max_l level acc' t
+       saturate_one ~debugMode ~sharing sigs this max_l level acc' t
   let rec saturate_level
-      ~debugMode ~sharing max_l level (_,domain as acc) =
+      ~debugMode ~sharing sigs max_l level (_,domain as acc) =
     if level < 2 then acc else
       match Mods.IntMap.find_option level domain with
-      | None -> saturate_level ~debugMode ~sharing max_l (pred level) acc
+      | None -> saturate_level ~debugMode ~sharing sigs max_l (pred level) acc
       | Some list ->
         let rec aux acc = function
-          | [] -> saturate_level ~debugMode ~sharing max_l (pred level) acc
+          | [] -> saturate_level ~debugMode ~sharing sigs max_l (pred level) acc
           | h::t ->
-            aux (saturate_one ~debugMode ~sharing h max_l level acc t) t in
+            aux (saturate_one ~debugMode ~sharing sigs h max_l level acc t) t in
         aux acc (Mods.IntMap.fold (fun _ -> List.rev_append) list [])
-  let saturate ~debugMode ~sharing domain =
+  let saturate ~debugMode ~sharing sigs domain =
     match Mods.IntMap.max_key domain with
     | None -> 0,domain
     | Some l ->
@@ -1364,7 +1375,7 @@ module PreEnv = struct
       match sharing with
       | No_sharing -> si,domain
       | Compatible_patterns | Max_sharing ->
-        saturate_level ~debugMode ~sharing l l (si,domain)
+        saturate_level ~debugMode ~sharing sigs l l (si,domain)
 
   let of_env env =
     let add_cc acc p =
@@ -1543,9 +1554,10 @@ let fold_by_type f cc acc =
 let fold f cc acc = Mods.IntMap.fold f cc.nodes acc
 
 let finalize ~debugMode ~sharing env contact_map =
+  let sigs = PreEnv.sigs env in
   let env = minimal_env ~debugMode env contact_map in
   let si,complete_domain =
-    PreEnv.saturate ~debugMode ~sharing env.PreEnv.domain in
+    PreEnv.saturate ~debugMode ~sharing sigs env.PreEnv.domain in
   let domain = Array.make (succ si) (PreEnv.empty_point env.PreEnv.sig_decl) in
   let singles =
     Mods.IntMap.find_default Mods.IntMap.empty 1 complete_domain in
@@ -1570,7 +1582,9 @@ let finalize ~debugMode ~sharing env contact_map =
                             Env.roots = x.roots; Env.deps = x.depending;} in
                       Mods.IntMap.fold (fun _ ll accl->
                           List.fold_left (fun acc e ->
-                              match matchings ~debugMode e.element x.element with
+                              match
+                                matchings ~debugMode sigs e.element x.element
+                              with
                               | [] -> acc
                               | injs ->
                                 List.fold_left

@@ -188,8 +188,8 @@ val finalize :
   debugMode:bool -> sharing:sharing_level -> PreEnv.t -> Contact_map.t ->
   Env.t * PreEnv.stat
 
-val infs : debugMode:bool -> t -> t -> t list
-val matchings : debugMode:bool -> t -> t -> Renaming.t list
+val infs : debugMode:bool -> Signature.s -> t -> t -> t list
+val matchings : debugMode:bool -> Signature.s -> t -> t -> Renaming.t list
 val merge_on_inf :
   debugMode:bool -> PreEnv.t -> Renaming.t -> t -> t ->
   t option * (t * int * t * int * int * bool) option
