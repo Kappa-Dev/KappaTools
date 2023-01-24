@@ -9,7 +9,7 @@ done
 	 -interventions
 	 -observables
 	 -update_domain construction
-	 17 (sub)observables 58 navigation steps
+	 17 (sub)observables 17 navigation steps
 	 -initial conditions
 + Building initial state (60 agents)
 Done
