@@ -4,4 +4,4 @@ JQUERY_VERSION:=3.5.0
 JQUERY_UI_VERSION:=1.12.1
 
 # https://github.com/electron/electron-api-demos/releases
-ELECTRON_VERSION:=4.2.12
+ELECTRON_VERSION:=9.1.0

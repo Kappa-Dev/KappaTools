@@ -127,7 +127,7 @@ jobs:
       - name: Sign MacOS binaries
         run: |
           find Kappapp.app/Contents/ \( -name \*.app -or -name \*.framework \) \
-            -exec codesign -s - \{\} \;
+            -exec codesign --deep -s - \{\} \;
           codesign -s - Kappapp.app
           zip -y -r Kappapp.app.zip Kappapp.app
       - name: Archive MacOS app
