@@ -64,7 +64,7 @@ site/external/codemirror-$(CODEMIRROR_VERSION): externals.mk
 
 site/external/d3: externals.mk
 	mkdir -p $@
-	curl -LsS -o $@/d3.v4.min.js http://d3js.org/d3.v4.min.js
+	curl -LsS -o $@/d3.v7.min.js http://d3js.org/d3.v7.min.js
 
 site/external/dagre-d3: externals.mk
 	mkdir -p $@
