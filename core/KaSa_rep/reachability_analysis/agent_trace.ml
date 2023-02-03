@@ -425,12 +425,36 @@ let compute_full_support parameters error handler ag_id rule =
         error, Mod (name,list,list',list'',list''')
     end
 
+let empty_hs parameters error hand_side  =
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+    parameters error
+    (fun _parameters error _ agent  b ->
+      match
+        agent
+      with
+        | Cckappa_sig.Ghost -> error, b
+        | Cckappa_sig.Dead_agent _
+        | Cckappa_sig.Unknown_agent _
+        | Cckappa_sig.Agent _ -> error, false )
+  hand_side.Cckappa_sig.views true
+
+let empty_rule parameters error _r_id rule =
+    let error, b =
+        empty_hs
+          parameters error  rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs
+    in
+    if b then
+      empty_hs
+        parameters error  rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_rhs
+    else error, b
+
 let build_support parameters error handler rules dead_rules =
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
     parameters error
     (fun parameters error r_id rule (map, creation, degradation) ->
        let error, b = dead_rules parameters error r_id in
-       if b then error, (map, creation, degradation)
+       let error, b' = empty_rule parameters error r_id rule in
+       if b || b' then error, (map, creation, degradation)
        else
          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
            parameters error
