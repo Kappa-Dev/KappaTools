@@ -9,19 +9,19 @@ jobs:
         ocaml-compiler:
           - 4.13.x
           - 4.14.x
+          - 5.0.x
         additional-packages:
-          -
           - labltk
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - run: sudo apt-get update
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
       - name: Install dependencies
         run: |
-          sudo apt-get update
           sudo apt-get install --yes gnuplot-nox \
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht \
@@ -49,13 +49,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - run: sudo apt-get update
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.13.x
       - name: Install dependencies
         run: |
-          sudo apt-get update
           sudo apt-get install --yes gnuplot-nox \
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht
@@ -78,13 +78,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - run: sudo apt-get update
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.13.x
       - name: Install system dependencies
         run: |
-          sudo apt-get update
           sudo apt-get install --yes gnuplot-nox \
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht
