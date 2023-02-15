@@ -150,18 +150,10 @@ let dropdown (model : State_file.model) =
   @ export_li
 
 let content =
-  let li_list, li_handle = ReactiveData.RList.create [] in
-  let _ =
-    React.S.bind
-      State_file.model
-      (fun model ->
-         let () =
-           ReactiveData.RList.set
-             li_handle
-             (dropdown model)
-         in
-         React.S.const ())
-  in
+  let li_list =
+    ReactiveData.RList.from_signal
+      (React.S.map
+         (fun model -> dropdown model) State_file.model) in
     [ Html.button
         ~a:[ Html.Unsafe.string_attrib "type" "button" ;
              Html.a_class [ "btn btn-default"; "dropdown-toggle" ] ;

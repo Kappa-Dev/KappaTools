@@ -87,60 +87,45 @@ let export_controls
 let document = Dom_html.window##.document
 
 let label_news tab_is_active counter =
-  let count =
-    React.S.map
-      (fun model ->
-         let simulation_info =
-           State_simulation.t_simulation_info model in
-         counter simulation_info)
-      State_simulation.model in
-  let bip = ref React.E.never in
-  let labels, set_labels = ReactiveData.RList.create [] in
-  let _ =
-    React.S.map
-      (fun tab_active ->
-         let () = React.E.stop !bip in
-         if tab_active then
-           ReactiveData.RList.set set_labels []
-         else
-           bip :=
-             React.E.map
-               (fun v ->
-                  ReactiveData.RList.set
-                    set_labels
-                    (if v > 0 then
-                       [ Html.txt " " ;
-                         Html.span
-                           ~a:[ Html.a_class ["label";"label-default"] ]
-                           [ Html.txt "New" ; ] ]
-                     else [])
-               )
-               (React.S.changes count)
-      )
-      tab_is_active in
-  labels
+  let last_value = ref
+      (let simulation_info =
+         State_simulation.t_simulation_info
+           (React.S.value State_simulation.model) in
+       counter simulation_info) in
+  ReactiveData.RList.from_signal
+    (React.S.l2
+       (fun tab_active model ->
+          if tab_active then []
+          else
+            let simulation_info =
+              State_simulation.t_simulation_info model in
+            let v = counter simulation_info in
+            if v <> !last_value && v > 0 then
+              let () = last_value := v in
+              [ Html.txt " " ;
+                Html.span
+                  ~a:[ Html.a_class ["label";"label-default"] ]
+                  [ Html.txt "New" ; ] ]
+            else [])
+       tab_is_active State_simulation.model)
 
 let badge
     (counter : Api_types_j.simulation_info option -> int) =
-  let badge, badge_handle = ReactiveData.RList.create [] in
-  let _ = React.S.map
-      (fun model ->
-         let simulation_info =
-           State_simulation.t_simulation_info model in
-         let count = counter simulation_info in
-         if count > 0  then
-           ReactiveData.RList.set
-             badge_handle
-             [ Html.txt " " ;
-               Html.span
-                 ~a:[ Html.a_class ["badge"] ; ]
-                 [ Html.txt (string_of_int count) ; ] ;
-             ]
-         else
-           ReactiveData.RList.set badge_handle []
-      )
-      State_simulation.model in
-  badge
+  ReactiveData.RList.from_signal
+    (React.S.map
+       (fun model ->
+          let simulation_info =
+            State_simulation.t_simulation_info model in
+          let count = counter simulation_info in
+          if count > 0  then
+            [ Html.txt " " ;
+              Html.span
+                ~a:[ Html.a_class ["badge"] ; ]
+                [ Html.txt (string_of_int count) ; ] ;
+            ]
+          else []
+       )
+       State_simulation.model)
 
 let arguments (key : string) : string list =
   List.map

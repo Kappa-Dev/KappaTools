@@ -64,7 +64,10 @@ let dropdown (model : State_runtime.model) =
           (Html.txt (State_runtime.spec_label spec)))
      model.State_runtime.model_runtimes)
 
-let backend_options, backend_handle = ReactiveData.RList.create []
+let backend_options =
+  ReactiveData.RList.from_signal
+    (React.S.map (fun list_t -> dropdown list_t) State_runtime.model)
+
 let backend_select =
   Tyxml_js.R.Html.select ~a:[Html.a_class ["form-control"]] backend_options
 
@@ -264,14 +267,6 @@ let onload () =
              Common.modal ~id:("#"^preferences_modal_id) ~action:"show" in
 
            Js._false) in
-
-  let _ =
-    React.S.bind
-      State_runtime.model
-      (fun list_t ->
-         let () =
-           ReactiveData.RList.set backend_handle (dropdown list_t) in
-         React.S.const ()) in
 
   let () = State_settings.updateFontSize ~delta:0. in
   let () =
