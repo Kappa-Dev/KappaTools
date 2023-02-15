@@ -105,7 +105,7 @@ class type codemirror =
   object
     method getValue : Js.js_string Js.t Js.meth
     method setValue : Js.js_string Js.t -> unit Js.meth
-    method focus    : unit Js.t Js.meth
+    method focus    : unit Js.meth
 
     (* Programmatically set the size of the editor (overriding the
        applicable CSS rules). width and height can be either numbers
@@ -304,7 +304,7 @@ class type codemirror =
 
     method setSelection : position Js.t -> position Js.t -> unit Js.meth
 
-    method performLint : unit Js.t Js.meth
+    method performLint : unit Js.meth
   end;;
 
 class type lint_configuration =
