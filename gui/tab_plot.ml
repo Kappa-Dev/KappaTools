@@ -231,6 +231,7 @@ let onload_plot_points_input
 
 let plot_ref = ref None
 let tab_is_active,set_tab_is_active = React.S.create false
+let dont_gc_me = ref []
 
 let onload () =
   let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
@@ -258,16 +259,17 @@ let onload () =
          else
            ())
   in
-  let _ =
-    React.S.l1
-      (fun simulation_model ->
-         let simulation_info = State_simulation.model_simulation_info simulation_model in
-         if has_plot simulation_info then
-           update_plot plot
-         else
-           ())
-      (React.S.on
-         tab_is_active State_simulation.dummy_model State_simulation.model) in
+  let () = dont_gc_me := [
+      React.S.l1
+        (fun simulation_model ->
+           let simulation_info = State_simulation.model_simulation_info simulation_model in
+           if has_plot simulation_info then
+             update_plot plot
+           else
+             ())
+        (React.S.on
+           tab_is_active State_simulation.dummy_model State_simulation.model)
+    ] in
   let () =
     Ui_common.input_change
       plot_offset_input_dom

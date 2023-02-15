@@ -200,6 +200,8 @@ let init_non_weakly_reversible_transitions () =
     )
     State_project.model
 
+let dont_gc_me = ref []
+
 let onload () =
   let () = Subpanel_editor.onload () in
   let _ = init_dead_rules () in
@@ -209,7 +211,8 @@ let onload () =
   let () = Tab_influences.onload () in
   let () = Tab_constraints.onload () in
   let () = Tab_polymers.onload () in
-  let _ = React.S.map childs_hide Subpanel_editor.editor_full in
+  let () =
+    dont_gc_me := [ React.S.map childs_hide Subpanel_editor.editor_full ] in
   let () = Common.jquery_on
       "#naveditor" "hide.bs.tab" (fun _ -> childs_hide true) in
   let () = Common.jquery_on

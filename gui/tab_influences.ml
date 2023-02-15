@@ -539,7 +539,7 @@ let content () =
     Widget_export.content export_config;
   ]
 
-let _ =
+let neither_gc_me =
   React.S.l2
     (fun _ { rendering; accuracy; origin; origin_label = _ } ->
        match rendering with
@@ -577,7 +577,7 @@ let _ =
        State_project.dummy_model State_project.model)
     model
 
-let _ =
+let nor_gc_me =
   State_file.with_current_pos
     ~on:(React.S.Bool.(&&) tab_is_active track_cursor)
     (fun filename cursor_pos ->
@@ -596,7 +596,10 @@ let _ =
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 
+let dont_gc_me = ref []
+
 let onload () =
+  let () = dont_gc_me := [ neither_gc_me; nor_gc_me ] in
   let () = Widget_export.onload export_config in
   let () = (Tyxml_js.To_dom.of_select rendering_chooser)##.onchange :=
       Dom_html.full_handler

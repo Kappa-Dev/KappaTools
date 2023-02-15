@@ -153,7 +153,7 @@ module DivErrorMessage : Ui_common.Div = struct
   let message_file_label_id = "panel_settings_message_file_label"
   let error_index, set_error_index = React.S.create None
 
-  let _ =
+  let dont_gc_me =
     React.S.l1
       (function
         | [] -> ()
@@ -166,6 +166,7 @@ module DivErrorMessage : Ui_common.Div = struct
 
   (* if there are less or no errors the index needs to be updated *)
   let sanitize_index (index : int option) errors : int option =
+    let () = ignore dont_gc_me in
     match (index,errors) with
     | None, [] -> None
     | None, _::_ -> Some 0
@@ -686,32 +687,35 @@ module RunningPanelLayout : Ui_common.Div = struct
      else None)
     $$ []))))
 
+  let dont_gc_me = ref []
+
   let content () : Html_types.div_content Tyxml_js.Html.elt list =
     let state_log , set_state_log = ReactiveData.RList.create [] in
-    let _ = Lwt_react.S.map_s
-        (fun _ ->
-           State_simulation.with_simulation_info
-             ~label:__LOC__
-             ~ready:
-               (fun manager status ->
-                  manager#simulation_efficiency >>=
-                  (Api_common.result_bind_lwt
-                     ~ok:(fun eff ->
-                         let current_event =
-                           status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event in
-                         let () =
-                           ReactiveData.RList.set
-                             set_state_log
-                             (efficiency_detail ~current_event eff) in
-                         Lwt.return (Result_util.ok ()))
-                  )
-               )
-             ~stopped:(fun _ ->
-                 let () = ReactiveData.RList.set set_state_log [] in
-                 Lwt.return (Result_util.ok ()))
-             ()
-        )
-        State_simulation.model in
+    let () = dont_gc_me := [
+        Lwt_react.S.map_s
+          (fun _ ->
+             State_simulation.with_simulation_info
+               ~label:__LOC__
+               ~ready:
+                 (fun manager status ->
+                    manager#simulation_efficiency >>=
+                    (Api_common.result_bind_lwt
+                       ~ok:(fun eff ->
+                           let current_event =
+                             status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event in
+                           let () =
+                             ReactiveData.RList.set
+                               set_state_log
+                               (efficiency_detail ~current_event eff) in
+                           Lwt.return (Result_util.ok ()))
+                    )
+                 )
+               ~stopped:(fun _ ->
+                   let () = ReactiveData.RList.set set_state_log [] in
+                   Lwt.return (Result_util.ok ()))
+               ()
+          )
+          State_simulation.model ] in
 
     [ [%html {|
      <div class="row" id="|}id{|">

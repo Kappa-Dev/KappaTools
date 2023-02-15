@@ -85,17 +85,20 @@ let parent_shown () = set_tab_is_active !tab_was_active
 let contactmap : Js_contact.contact_map Js.t =
   Js_contact.create_contact_map display_id State_settings.agent_coloring
 
+let dont_gc_me = ref []
+
 let onload () =
   let () = Widget_export.onload configuration in
-  let _ =
-    React.S.map
-      (Result_util.fold
-        ~error:(fun mh  ->
-          let () = State_error.add_error
-              "tab_contact_map" mh in
-          contactmap##clearData)
-        ~ok:(fun data -> contactmap##setData (Js.string data)))
-      contact_map_text in
+  let () = dont_gc_me := [
+      React.S.map
+        (Result_util.fold
+           ~error:(fun mh  ->
+               let () = State_error.add_error
+                   "tab_contact_map" mh in
+               contactmap##clearData)
+           ~ok:(fun data -> contactmap##setData (Js.string data)))
+        contact_map_text
+    ] in
   let () = (Tyxml_js.To_dom.of_select accuracy_chooser)##.onchange :=
       Dom_html.full_handler
         (fun va _ ->

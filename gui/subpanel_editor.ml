@@ -124,6 +124,9 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
   let () = codemirror##scrollTo Js.null (Js.some scrollLine) in
   ()
 
+let dont_gc_me_events = ref []
+let dont_gc_me_signals = ref []
+
 let onload () : unit =
   let () = Menu_editor_file.onload () in
   let lint_config =
@@ -150,7 +153,6 @@ let onload () : unit =
   let codemirror : codemirror Js.t =
     Codemirror.fromTextArea textarea configuration in
   let () = codemirror##setValue(Js.string "") in
-  let _ = React.S.map (fun _ -> codemirror##performLint) State_error.errors in
   let _ = Subpanel_editor_controller.with_file
       (Result_util.fold
          ~ok:(fun (content,id) ->
@@ -161,16 +163,6 @@ let onload () : unit =
              (* ignore if missing file *)
              Lwt.return (Result_util.ok ())))
   in
-  let _ = React.E.map
-      (fun pos ->
-         if Some pos.Locality.file = React.S.value filename then
-           let beg = pos.Locality.from_position in
-           let first =
-             new%js Codemirror.position (beg.Locality.line-1) beg.Locality.chr in
-           let en = pos.Locality.from_position in
-           let last =
-             new%js Codemirror.position (en.Locality.line-1) en.Locality.chr in
-           codemirror##setSelection first last) move_cursor in
   let () = Codemirror.commands##.save :=
       (fun _ -> Menu_editor_file_controller.export_current_file ()) in
   let timeout : Dom_html.timeout_id option ref = ref None in
@@ -222,27 +214,38 @@ let onload () : unit =
            let editor_full = React.S.value editor_full in
            let () = set_editor_full (not editor_full) in
            Js._true) in
-  let _ =
-    React.S.map
-      (fun model ->
-         match model.State_file.current with
-         | None -> Common.hide_codemirror ()
-         | Some _ -> Common.show_codemirror ())
-      State_file.model
-  in
-  let _ =
-    React.E.map
-      (fun refresh ->
-         let () = set_filename (Some refresh.State_file.filename) in
-         let cand = Js.string refresh.State_file.content in
-         if cand <> codemirror##getValue then
-           let () = codemirror##setValue cand in
-           let () = match refresh.State_file.line with
-             | None -> ()
-             | Some line -> jump_to_line codemirror line in
-           ())
-      State_file.refresh_file
-  in
+  let () = dont_gc_me_signals := [
+      React.S.map (fun _ -> codemirror##performLint) State_error.errors;
+      React.S.map
+        (fun model ->
+           match model.State_file.current with
+           | None -> Common.hide_codemirror ()
+           | Some _ -> Common.show_codemirror ())
+        State_file.model
+    ] in
+  let () = dont_gc_me_events := [
+      React.E.map
+        (fun pos ->
+           if Some pos.Locality.file = React.S.value filename then
+             let beg = pos.Locality.from_position in
+             let first =
+               new%js Codemirror.position (beg.Locality.line-1) beg.Locality.chr in
+             let en = pos.Locality.from_position in
+             let last =
+               new%js Codemirror.position (en.Locality.line-1) en.Locality.chr in
+             codemirror##setSelection first last) move_cursor;
+      React.E.map
+        (fun refresh ->
+           let () = set_filename (Some refresh.State_file.filename) in
+           let cand = Js.string refresh.State_file.content in
+           if cand <> codemirror##getValue then
+             let () = codemirror##setValue cand in
+             let () = match refresh.State_file.line with
+               | None -> ()
+               | Some line -> jump_to_line codemirror line in
+             ())
+        State_file.refresh_file
+    ] in
   ()
 
 let onresize () = ()

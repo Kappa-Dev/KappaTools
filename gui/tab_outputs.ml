@@ -39,6 +39,8 @@ let file_count state =
 let navli () =
   Ui_common.badge (fun state -> (file_count state))
 
+let dont_gc_me = ref []
+
 let xml () =
   let select file_line_ids =
     let lines = React.S.value current_file in
@@ -63,33 +65,34 @@ let xml () =
     Tyxml_js.R.Html.div
       ~a:[ Html.a_class ["list-group-item"] ]
       (let list, handle = ReactiveData.RList.create [] in
-       let _ = React.S.map
-           (fun _ ->
-              State_simulation.when_ready
-                ~label:__LOC__
-                (fun manager ->
-                   manager#simulation_catalog_file_line >>=
-                   (Api_common.result_bind_lwt
-                      ~ok:(fun (file_line_ids : Api_types_j.file_line_catalog) ->
-                          let () = ReactiveData.RList.set
-                              handle
-                              (match file_line_ids with
-                               | [] -> []
-                               | key::[] ->
-                                 let () = update_outputs key in
-                                 [Html.h4
-                                    [ Html.txt
-                                        (Ui_common.option_label key)]]
-                               | _ :: _ :: _ -> [select file_line_ids])
-                          in
-                          Lwt.return (Result_util.ok ())
-                        )
-                   )
-                )
-           )
-           (React.S.on
-              tab_is_active State_simulation.dummy_model State_simulation.model)
-       in
+       let () = dont_gc_me := [
+           React.S.map
+             (fun _ ->
+                State_simulation.when_ready
+                  ~label:__LOC__
+                  (fun manager ->
+                     manager#simulation_catalog_file_line >>=
+                     (Api_common.result_bind_lwt
+                        ~ok:(fun (file_line_ids : Api_types_j.file_line_catalog) ->
+                            let () = ReactiveData.RList.set
+                                handle
+                                (match file_line_ids with
+                                 | [] -> []
+                                 | key::[] ->
+                                   let () = update_outputs key in
+                                   [Html.h4
+                                      [ Html.txt
+                                          (Ui_common.option_label key)]]
+                                 | _ :: _ :: _ -> [select file_line_ids])
+                            in
+                            Lwt.return (Result_util.ok ())
+                          )
+                     )
+                  )
+             )
+             (React.S.on
+                tab_is_active State_simulation.dummy_model State_simulation.model)
+         ] in
        list
       )
   in

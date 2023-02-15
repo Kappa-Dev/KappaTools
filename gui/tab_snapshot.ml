@@ -211,26 +211,30 @@ let snapshot_class :
 let snapshot_js : Js_snapshot.snapshot Js.t =
   Js_snapshot.create_snapshot display_id State_settings.agent_coloring
 
+let dont_gc_me = ref []
+
 let xml () =
   let list, handle = ReactiveData.RList.create [] in
   (* populate select *)
-  let _ = React.S.map
-      (fun _ ->
-         State_simulation.when_ready
-           ~label:__LOC__
-           (fun manager ->
-              manager#simulation_catalog_snapshot >>=
-              (Api_common.result_bind_lwt
-                 ~ok:(fun snapshot_ids ->
-                     let () = ReactiveData.RList.set
-                         handle (select snapshot_ids) in
-                     let () = select_snapshot snapshot_js in
-                     Lwt.return (Result_util.ok ()))
-              )
-           )
-      )
-      (React.S.on
-         tab_is_active State_simulation.dummy_model State_simulation.model) in
+  let () = dont_gc_me := [
+      React.S.map
+        (fun _ ->
+           State_simulation.when_ready
+             ~label:__LOC__
+             (fun manager ->
+                manager#simulation_catalog_snapshot >>=
+                (Api_common.result_bind_lwt
+                   ~ok:(fun snapshot_ids ->
+                       let () = ReactiveData.RList.set
+                           handle (select snapshot_ids) in
+                       let () = select_snapshot snapshot_js in
+                       Lwt.return (Result_util.ok ()))
+                )
+             )
+        )
+        (React.S.on
+           tab_is_active State_simulation.dummy_model State_simulation.model)
+    ] in
   let snapshot_label =
     Html.h4
       ~a:[ Tyxml_js.R.Html.a_class

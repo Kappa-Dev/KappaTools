@@ -73,7 +73,7 @@ let select_din () =
     Js.to_string ((Tyxml_js.To_dom.of_select din_select)##.value) in
   update_din din_id
 
-let _ = React.S.map
+let dont_gc_me = React.S.map
     (fun _ ->
        State_simulation.with_simulation_info
          ~label:__LOC__
@@ -152,6 +152,7 @@ let navli () =
          state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_dins)
 
 let onload () =
+  let () = ignore dont_gc_me in
   let () =
     (Tyxml_js.To_dom.of_select din_select)##.onchange :=
       Dom.handler (fun _ -> let () = select_din () in Js._false) in
