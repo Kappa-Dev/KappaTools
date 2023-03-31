@@ -404,6 +404,13 @@ let is_agent (ag,ty) graph =
     | Some ty' -> let () = assert (ty = ty') in true
     | None -> false
 
+let is_agent_id ag graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let () = assert (Mods.Int2Set.is_empty graph.missings) in
+    Mods.DynArray.get tables.sort ag <> None
+
 let is_free ag s graph =
   match graph.tables with
   | None -> assert false

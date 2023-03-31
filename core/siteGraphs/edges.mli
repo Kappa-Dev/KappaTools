@@ -41,6 +41,9 @@ val remove_link : int -> int -> int -> int -> t -> t * (int*int) option
 val is_agent : Agent.t -> t -> bool
 (** [is_agent agent graph] *)
 
+val is_agent_id : int -> t -> bool
+(** [is_agent_id agent_id graph] *)
+
 val is_free : int -> int -> t -> bool
 (** [is_free agent_id site graph] *)
 
