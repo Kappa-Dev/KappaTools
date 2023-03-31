@@ -403,12 +403,14 @@ let is_agent (ag,ty) graph =
     match Mods.DynArray.get tables.sort ag with
     | Some ty' -> let () = assert (ty = ty') in true
     | None -> false
+
 let is_free ag s graph =
   match graph.tables with
   | None -> assert false
   | Some tables ->
     let () = assert (Mods.Int2Set.is_empty graph.missings) in
     let t = Mods.DynArray.get tables.connect ag in t <> [||] && t.(s) = None
+
 let is_internal i ag s graph =
   match graph.tables with
   | None -> assert false
@@ -418,6 +420,7 @@ let is_internal i ag s graph =
     t <> [||] && match t.(s) with
     | Some j -> j = i
     | None -> false
+
 let link_exists ag s ag' s' graph =
   match graph.tables with
   | None -> assert false
