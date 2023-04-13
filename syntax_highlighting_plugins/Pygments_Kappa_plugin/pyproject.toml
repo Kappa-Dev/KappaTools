@@ -1,0 +1,40 @@
+[build-system]
+    requires = ["setuptools >= 61.0"]
+    build-backend = "setuptools.build_meta"
+
+[project]
+name = "Pygments_Kappa_plugin"
+version = "0.3"
+description =  "Plugin for Pygments to highlight Kappa."
+readme = "README.md"
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Hector Medina"},
+    {email = "hector.f.medina.a@gmail.com"}
+]
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent",
+	"Environment :: Plugins",
+	"Intended Audience :: Science/Research"
+]
+dependencies = [
+    "Pygments >= 2.5.1"
+]
+[project.urls]
+    repository = "https://github.com/hmedina/Pygments_Kappa_plugin"
+
+
+[project.entry-points."pygments.lexers"]
+    kappa_lexer = "core.KappaLexer:KappaLexer"
+
+[project.entry-points."pygments.styles"]
+    kappa_style_demo = "core.KappaStyle:DemoStyle"
+    kappa_style_browser = "core.KappaStyle:KaSimInBrowserStyle"
+    kappa_style_edit = "core.KappaStyle:EditNotationDeltasStyle"
+    kappa_style_edit_dark = "core.KappaStyle:EditNotationDeltasStyleDark"
+
+[tool.setuptools]
+    packages = ["core"]
