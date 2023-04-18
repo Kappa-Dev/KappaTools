@@ -208,6 +208,31 @@ let is_step_triggerable_on_edges graph = function
 
 let is_step_triggerable state = is_step_triggerable_on_edges state.graph
 
+(* There is a subtelty when executing a sequence of actions. Indeed,
+   whenever a rule both creates and removes agents, there is currently
+   no guarantee that the creation actions are placed before the removal
+   actions in [event.Instantiation.actions]. This can be an issue in a
+   case where an event performs the following two actions for example:
+   ["create agent with id 8", "remove agent with id 8"]. In this case,
+   agent id 8 is not available when the creation action is performed and
+   so the [Edges] module throws an exception.
+
+   As a temporary fix, we make sure that all deletion actions are
+   executed first. This implicitly assumes that a step deleting an agent
+   cannot perform any other action involving this agent.
+
+   TODO: Shouldn't we rather ensure that actions are properly sorted in
+   the trace file in the first place?  *)
+let do_actions sigs st actions =
+  let is_removal =
+    let open Instantiation in
+    function
+      | Remove _ -> true
+      | Create _ | Mod_internal _ | Bind _ | Bind_to _ | Free _ -> false in
+  let removals, others = List.partition is_removal actions in
+  let do_in_order actions st = List.fold_left (do_action sigs) st actions in
+  st |> do_in_order removals |> do_in_order others
+
 let do_step sigs state = function
   | Trace.Subs _ -> state,{ unary_distances = None }
   | Trace.Rule (kind,event,info) ->
@@ -215,9 +240,8 @@ let do_step sigs state = function
       if state.connected_components = None then None
       else store_distances kind state.graph event.Instantiation.tests in
     let pregraph,connected_components =
-        List.fold_left
-           (do_action sigs) (state.graph,state.connected_components)
-           event.Instantiation.actions in
+      do_actions sigs (state.graph,state.connected_components)
+          event.Instantiation.actions in
     let graph =
       List.fold_left
         (fun graph ((id,_),s) -> Edges.add_free id s graph)
@@ -229,9 +253,8 @@ let do_step sigs state = function
     },{unary_distances}
   | Trace.Pert (_,event,info) ->
     let pregraph,connected_components =
-        List.fold_left
-           (do_action sigs) (state.graph,state.connected_components)
-           event.Instantiation.actions in
+      do_actions sigs (state.graph,state.connected_components)
+        event.Instantiation.actions in
     let graph =
       List.fold_left
         (fun graph ((id,_),s) -> Edges.add_free id s graph)
@@ -243,8 +266,7 @@ let do_step sigs state = function
     },{ unary_distances = None }
   | Trace.Init actions ->
     let graph,connected_components =
-      List.fold_left
-        (do_action sigs) (state.graph, state.connected_components) actions in
+      do_actions sigs (state.graph,state.connected_components) actions in
     { graph; connected_components; time = state.time; event = state.event; },
     { unary_distances = None }
   | Trace.Obs (_,_,info) ->
