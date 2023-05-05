@@ -33,28 +33,34 @@ type 'a action =
   | Free of 'a site
   | Remove of 'a
 
+(*  The semantics of concrete actions seems to be the following one.
+
+  - When an agent is removed, no other action is stored about it (including bond releasing).
+  - Created agents are created without default binding/internal states.
+  - Bonds are inserted thanks to two symmetric actions (Bind_to ...)  *)
+
 let weight action =
   match action with
-  | Create _ -> 2
+  | Create _ -> 1
   | Mod_internal _
   | Bind _
-  | Bind_to _ -> 3
-  | Free _ -> 0
-  | Remove _ -> 1
+  | Bind_to _
+  | Free _ -> 2
+  | Remove _ -> 0
 
 let weight_reverse action =
     match action with
     | Create _ -> 1
     | Mod_internal _
     | Bind _
-    | Bind_to _ -> 0
-    | Free _ -> 3
+    | Bind_to _
+    | Free _ -> 0
     | Remove _ -> 2
 
-let sort_concrete_action_list = Tools.sort_by_priority weight 3
-let sort_concrete_action_list_reverse = Tools.sort_by_priority weight_reverse 3
-let sort_abstract_action_list = Tools.sort_by_priority weight 3
-let sort_abstract_action_list_reverse = Tools.sort_by_priority weight_reverse 3
+let sort_concrete_action_list = Tools.sort_by_priority weight 2
+let sort_concrete_action_list_reverse = Tools.sort_by_priority weight_reverse 2
+let sort_abstract_action_list = Tools.sort_by_priority weight 2
+let sort_abstract_action_list_reverse = Tools.sort_by_priority weight_reverse 2
 
 type 'a binding_state =
   | ANY
@@ -126,7 +132,12 @@ let concretize_event ~debugMode inj2graph e =
     tests =
       List.map (List.rev_map (concretize_test ~debugMode inj2graph)) e.tests;
     actions =
-      List.rev_map (concretize_action ~debugMode inj2graph) e.actions;
+     (* actions are reordered the following way:
+        1) Remove actions
+        2) Creation actions
+        3) Anything else.*)
+    sort_abstract_action_list (
+      List.rev_map (concretize_action ~debugMode inj2graph) e.actions);
     side_effects_src = List.rev_map
         (fun ((pl,s),b) ->
            ((Matching.Agent.concretize ~debugMode inj2graph pl,s),
