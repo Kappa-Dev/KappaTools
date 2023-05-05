@@ -107,8 +107,14 @@ val subst_agent_in_concrete_side_effect:
   (concrete site * concrete binding_state)
 val subst_map_agent_in_concrete_event:
   (int -> int) -> concrete event -> concrete event
+
+(* In subst_map2_agent_in_concrete_event, the first renaming concerns the ids of the agent before the event, the second renaming the ones after the event.
+In the case when a removed agent and a created one have the same id, then
+the first renaming will be applied to anything related to the removed agent,
+the second one will be applied to anything related to the second one *)
 val subst_map2_agent_in_concrete_event:
   (int -> int) -> (int -> int) -> concrete event -> concrete event
+
 val subst_agent_in_concrete_event:
   int -> int -> concrete event -> concrete event
 

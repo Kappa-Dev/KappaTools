@@ -221,7 +221,11 @@ module Cflow_linker =
         | (Trace.Dummy _ | Trace.Subs _ | Trace.Init _) ->
           error,log_info,priorities.Priority.substitution
 
-    let subs_agent_in_event mapping mapping' = function
+    let subs_agent_in_event  mapping  mapping' = function
+      (* mapping -> before the event, including agents to be removed *)
+      (* mapping' -> after the event, including agents to be created *)
+      (* This is useful when one agent is removed, and one is created with the same id in a single event *)
+
       | Trace.Rule (a,event,info) ->
         Trace.Rule
           (a,
@@ -265,7 +269,9 @@ module Cflow_linker =
                        AgentIdMap.add x (max_id+1) mapping)
                     else (max x max_id,AgentIdSet.add x used,mapping))
                  (max_id,used,mapping) (Trace.creation_of_step event) in
-             let list = (subs_agent_in_event mapping mapping' event)::event_list in
+              (* mapping can be safely applied to all agents except the newly created ones *)
+              (* mapping' can be safely applied to all agents except the ones that have been just removes *)
+              let list = (subs_agent_in_event mapping mapping' event)::event_list in
              max_id,used,mapping',list)
           (0,AgentIdSet.empty,AgentIdMap.empty,[])
           event_list
