@@ -358,3 +358,34 @@ let remove_double_elements l =
     | h::t, (None | Some _) -> aux t (h::accu) (Some h)
   in
   aux l [] None
+
+let from_n_to_0 n =
+  let rec aux k acc =
+    if k>n then acc else aux (k+1) (k::acc)
+  in aux 0 []
+
+let clear a =
+  Array.iteri (fun i _ -> a.(i)<-[]) a
+
+let sort_by_priority f n =
+  let a = Array.make (n+1) [] in
+  let keys = from_n_to_0 n in
+  let sort l =
+    let rec aux l =
+      match l with
+        | [] -> ()
+        | h::t -> let k = f h in
+                  let () = a.(k) <- h::a.(k) in
+                  aux t
+    in
+    let () = aux l in
+    let output =
+      List.fold_left
+        (fun list key ->
+            List.fold_left
+              (fun list elt -> elt::list) list a.(key))
+        [] keys
+    in
+    let () = clear a in
+    output
+  in sort

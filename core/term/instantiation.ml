@@ -33,6 +33,29 @@ type 'a action =
   | Free of 'a site
   | Remove of 'a
 
+let weight action =
+  match action with
+  | Create _ -> 2
+  | Mod_internal _
+  | Bind _
+  | Bind_to _ -> 3
+  | Free _ -> 0
+  | Remove _ -> 1
+
+let weight_reverse action =
+    match action with
+    | Create _ -> 1
+    | Mod_internal _
+    | Bind _
+    | Bind_to _ -> 0
+    | Free _ -> 3
+    | Remove _ -> 2
+
+let sort_concrete_action_list = Tools.sort_by_priority weight 3
+let sort_concrete_action_list_reverse = Tools.sort_by_priority weight_reverse 3
+let sort_abstract_action_list = Tools.sort_by_priority weight 3
+let sort_abstract_action_list_reverse = Tools.sort_by_priority weight_reverse 3
+
 type 'a binding_state =
   | ANY
   | FREE
