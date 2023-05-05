@@ -38,6 +38,11 @@ type 'a action =
   | Free of 'a site
   | Remove of 'a
 
+val sort_concrete_action_list: concrete action list -> concrete action list
+val sort_concrete_action_list_reverse: concrete action list -> concrete action list
+val sort_abstract_action_list: concrete action list -> concrete action list
+val sort_abstract_action_list_reverse: concrete action list -> concrete action list
+
 type 'a binding_state =
   | ANY
   | FREE
