@@ -356,20 +356,30 @@ type 'alg_expr print_expr =
   | Alg_pexpr of 'alg_expr Locality.annot
 
 let print_expr_to_yojson ~filenames f_mix f_var = function
-  | Str_pexpr s -> Locality.annot_to_yojson ~filenames JsonUtil.of_string s
+  | Str_pexpr s ->
+    Locality.annot_to_yojson ~filenames JsonUtil.of_string s
   | Alg_pexpr a ->
-    Locality.annot_to_yojson ~filenames
-      (Alg_expr.e_to_yojson ~filenames f_mix f_var) a
+    `Assoc ["A",Locality.annot_to_yojson ~filenames
+      (Alg_expr.e_to_yojson ~filenames f_mix f_var) a]
+
 
 let print_expr_of_yojson ~filenames f_mix f_var x =
-  try Str_pexpr (Locality.annot_of_yojson
+  match x with
+    | `Assoc ["A",x] ->
+      begin
+        try Alg_pexpr (Locality.annot_of_yojson
+                 ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var) x)
+        with Yojson.Basic.Util.Type_error _ ->
+              raise (Yojson.Basic.Util.Type_error ("Incorrect print expr",x))
+      end
+    | x ->
+      begin
+        try Str_pexpr (Locality.annot_of_yojson
                    ~filenames (JsonUtil.to_string ?error_msg:None) x)
-  with Yojson.Basic.Util.Type_error _ ->
-  try Alg_pexpr (Locality.annot_of_yojson
-                   ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var) x)
-  with Yojson.Basic.Util.Type_error _ ->
-    raise (Yojson.Basic.Util.Type_error ("Incorrect print expr",x))
-
+        with Yojson.Basic.Util.Type_error _ ->
+            raise (Yojson.Basic.Util.Type_error ("Incorrect print expr",x))
+      end
+  
 let map_expr_print f x =
   List.map (function
       | Str_pexpr _ as x -> x
