@@ -558,6 +558,15 @@ let modification_of_yojson ~filenames = function
   | `Assoc [ "action", `String "SNAPSHOT"; "file", `List l; "raw", `Bool raw ]
   | `Assoc [ "file", `List l; "action", `String "SNAPSHOT"; "raw", `Bool raw ] ->
     SNAPSHOT (raw,List.map (print_t_expr_of_yojson ~filenames) l)
+    | `Assoc [ "raw", `Bool raw; "action", `String "SNAPSHOT"; "file", `Null ]
+    | `Assoc [ "raw", `Bool raw; "file", `Null; "action", `String "SNAPSHOT" ]
+    | `Assoc [ "action", `String "SNAPSHOT"; "raw", `Bool raw; "file", `Null]
+    | `Assoc [ "file", `Null; "raw", `Bool raw; "action", `String "SNAPSHOT" ]
+    | `Assoc [ "action", `String "SNAPSHOT"; "file", `Null; "raw", `Bool raw ]
+    | `Assoc [ "file", `Null; "action", `String "SNAPSHOT"; "raw", `Bool raw ]
+    | `Assoc [ "raw", `Bool raw; "action", `String "SNAPSHOT" ]
+    | `Assoc [ "action", `String "SNAPSHOT"; "raw", `Bool raw ] ->
+      SNAPSHOT (raw,[])
   | `Assoc [ "action", `String "SNAPSHOT"; "file", `Null ]
   | `Assoc [ "file", `Null; "action", `String "SNAPSHOT" ]
   | `Assoc [ "action", `String "SNAPSHOT" ] -> SNAPSHOT (false,[])
