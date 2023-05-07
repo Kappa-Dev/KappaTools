@@ -1,0 +1,8 @@
+#!/bin/sh
+
+"${KAPPABIN}"KaSim -i model.ka -seed 0 -d output -trace trace.json -syntax 4 || exit 0
+"${KAPPABIN}"KaStor -d output --none --weak --time-independent output/trace.json || exit 0
+cd output ; rm -f *.dat *.ka *.json *.txt *.html  # We only check that KaStor successfully parses the trace.
+
+# Check that trace files are properly parsed in the presence of $SNAPSHOT perturbations.
+# Added after: https://github.com/Kappa-Dev/KappaTools/issues/656
