@@ -275,7 +275,9 @@ and stringlist_of_caught_light x stack =
 
 type method_handler = {
   mh_caught_error_list:caught_exception list;
+  mh_caught_error_list_to_ui:caught_exception list;
   mh_uncaught_error_list:uncaught_exception list;
+  mh_uncaught_error_list_to_ui:uncaught_exception list;
 }
 
 let to_json method_handler =
@@ -284,9 +286,16 @@ let to_json method_handler =
       "caught",
       JsonUtil.of_list
         caught_exception_to_json method_handler.mh_caught_error_list;
+      "caught",
+      JsonUtil.of_list
+        caught_exception_to_json method_handler.mh_caught_error_list_to_ui;
       "uncaught",
       JsonUtil.of_list
         uncaught_exception_to_json method_handler.mh_uncaught_error_list;
+      "uncaught_to_ui",
+        JsonUtil.of_list
+          uncaught_exception_to_json method_handler.mh_uncaught_error_list_to_ui;
+
     ]
 
 let of_json =
@@ -298,13 +307,23 @@ let of_json =
           (JsonUtil.to_list caught_exception_of_json)
             (List.assoc "caught" l)
         in
+        let caught_to_ui =
+          (JsonUtil.to_list caught_exception_of_json)
+            (List.assoc "caught_to_ui" l)
+        in
         let uncaught =
           (JsonUtil.to_list uncaught_exception_of_json)
             (List.assoc "uncaught" l)
         in
+        let uncaught_to_ui =
+          (JsonUtil.to_list uncaught_exception_of_json)
+            (List.assoc "uncaught_to_ui" l)
+        in
         {
           mh_caught_error_list = caught ;
+          mh_caught_error_list_to_ui = caught_to_ui ;
           mh_uncaught_error_list = uncaught ;
+          mh_uncaught_error_list_to_ui = uncaught_to_ui ;
         }
       with
       | _ ->
@@ -317,12 +336,27 @@ let of_json =
 let empty_error_handler =
   {
     mh_caught_error_list=[];
+    mh_caught_error_list_to_ui=[];
     mh_uncaught_error_list=[];
+    mh_uncaught_error_list_to_ui=[];
   }
 
-let add_uncaught_error uncaught error = {error with mh_uncaught_error_list = uncaught::error.mh_uncaught_error_list}
-let get_caught_exception_list error = error.mh_caught_error_list
-let get_uncaught_exception_list error = error.mh_uncaught_error_list
+let add_uncaught_error_to_ui uncaught error = {error with mh_uncaught_error_list_to_ui = uncaught::error.mh_uncaught_error_list_to_ui}
+let add_uncaught_error_to_others uncaught error = {error with mh_uncaught_error_list = uncaught::error.mh_uncaught_error_list}
 
+let add_uncaught_error ?to_ui uncaught error =
+  let error =
+    match to_ui with
+      | Some false | None -> error
+      | Some true -> add_uncaught_error_to_ui uncaught error
+  in
+  add_uncaught_error_to_others uncaught error
+
+
+
+let get_caught_exception_list error = error.mh_caught_error_list
+let get_caught_exception_list_to_ui error = error.mh_caught_error_list_to_ui
+let get_uncaught_exception_list error = error.mh_uncaught_error_list
+let get_uncaught_exception_list_to_ui error = error.mh_uncaught_error_list_to_ui
 let is_empty_error_handler x =
   x.mh_caught_error_list=[] && x.mh_uncaught_error_list=[]

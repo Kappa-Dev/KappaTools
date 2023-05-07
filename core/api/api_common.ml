@@ -27,8 +27,8 @@ let result_error_exception
   result_error_msg ?severity ?result_code message
 
 let method_handler_errors ?severity mh =
-  let uncaught = Exception_without_parameter.get_uncaught_exception_list mh in
-  let caught = Exception_without_parameter.get_caught_exception_list mh in
+  let uncaught = Exception_without_parameter.get_uncaught_exception_list_to_ui mh in
+  let caught = Exception_without_parameter.get_caught_exception_list_to_ui mh in
   List.fold_right
     (fun x l ->
        error_msg ?severity

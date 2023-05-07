@@ -28,20 +28,21 @@ let safe_warn parameters _error_handler file_name message exn _default =
   let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   raise (Exception_without_parameter.Uncaught_exception uncaught)
 
-let unsafe_warn _parameters error_handler file_name message exn default =
+let unsafe_warn
+  _parameters error_handler ?to_ui  file_name message exn default =
   let uncaught = Exception_without_parameter.build_uncaught_exception ?file_name ?message exn in
-  Exception_without_parameter.add_uncaught_error uncaught error_handler, default ()
+  Exception_without_parameter.add_uncaught_error uncaught ?to_ui error_handler, default ()
 
-let warn_aux parameters error_handler file message exn default =
+let warn_aux parameters error_handler ?to_ui file message exn default =
   let error,dft =
     if Remanent_parameters.get_unsafe parameters
-    then unsafe_warn parameters error_handler file message exn default
+    then unsafe_warn parameters error_handler ?to_ui file message exn default
     else safe_warn parameters error_handler file message exn default
   in
   let () = Remanent_parameters.save_error_list parameters error in
   error,dft
 
-let warn_with_exn parameters error_handler (file,line,_,_) ?message:(message="") ?pos:(pos=None) exn default =
+let warn_with_exn parameters error_handler ?to_ui (file,line,_,_) ?message:(message="") ?pos:(pos=None) exn default =
   let liaison = if message = "" && pos = None then "" else ": " in
   let pos =
     match pos with
@@ -49,12 +50,12 @@ let warn_with_exn parameters error_handler (file,line,_,_) ?message:(message="")
     | Some s -> ", "^Locality.to_string s
   in
   warn_aux
-    parameters error_handler
+    parameters error_handler ?to_ui
     (Some file) (Some ("line "^(string_of_int line)^pos^liaison^message))
     exn default
 
-let warn parameters error_handler file_line ?message:(message="") ?pos exn default =
-  warn_with_exn parameters error_handler file_line ~message ~pos exn (fun () -> default)
+let warn parameters error_handler ?to_ui file_line ?message:(message="") ?pos exn default =
+  warn_with_exn parameters error_handler ?to_ui file_line ~message ~pos exn (fun () -> default)
 
 let print_for_KaSim parameters handlers =
   let parameters = Remanent_parameters.update_prefix parameters "error: " in
@@ -116,11 +117,12 @@ let _lift_error_logs_for_KaSa f =
               string_opt exn (fun  () -> ())))
 
 let check_point
-    (warn:Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Locality.t ->
-     exn -> unit -> method_handler * unit)
-    parameter error error' s ?message ?pos exn =
+    (warn:Remanent_parameters_sig.parameters -> method_handler
+          -> ?to_ui:bool -> 'a ->  ?message:string -> ?pos:Locality.t
+          -> exn -> unit -> method_handler * unit)
+    parameter error error' s ?to_ui ?message ?pos exn =
   if error==error'
   then error
   else
-    let error,() = warn parameter error' s ?message ?pos exn () in
+    let error,() = warn parameter error' ?to_ui s ?message ?pos exn () in
     error

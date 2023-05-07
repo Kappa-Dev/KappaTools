@@ -6,12 +6,12 @@ val empty_error_handler : method_handler
 val is_empty_error_handler : method_handler -> bool
 
 val warn_with_exn :
-  Remanent_parameters_sig.parameters -> method_handler ->
+  Remanent_parameters_sig.parameters -> method_handler -> ?to_ui:bool ->
   string * int * int * int  -> ?message:string -> ?pos:Locality.t option ->
   exn -> (unit -> 'a) -> method_handler * 'a
 
 val warn :
-  Remanent_parameters_sig.parameters -> method_handler ->
+  Remanent_parameters_sig.parameters -> method_handler -> ?to_ui:bool ->
   string * int * int * int  -> ?message:string -> ?pos:Locality.t ->
   exn -> 'a -> method_handler * 'a
 
@@ -23,7 +23,7 @@ val wrap : Remanent_parameters_sig.parameters ->
   method_handler -> string -> string option -> exn -> method_handler
 
 val check_point :
-  (Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Locality.t ->
+  (Remanent_parameters_sig.parameters -> method_handler -> ?to_ui:bool -> 'a -> ?message:string -> ?pos:Locality.t ->
    exn -> unit -> method_handler * unit) ->
   Remanent_parameters_sig.parameters -> method_handler -> method_handler ->
-  'a -> ?message:string -> ?pos:Locality.t -> exn -> method_handler
+  'a -> ?to_ui:bool -> ?message:string -> ?pos:Locality.t -> exn -> method_handler

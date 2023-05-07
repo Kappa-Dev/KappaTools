@@ -24,7 +24,7 @@ type method_handler
 val raise_exception: string option -> unit -> string option -> exn -> unit
 val build_uncaught_exception: ?file_name:string -> ?message:string -> exn -> uncaught_exception
 val build_caught_exception: string option -> string option -> exn -> string list -> caught_exception
-val add_uncaught_error: uncaught_exception -> method_handler -> method_handler
+val add_uncaught_error: ?to_ui:bool -> uncaught_exception -> method_handler -> method_handler
 val stringlist_of_exception: exn -> string list -> string list
 val stringlist_of_uncaught: uncaught_exception -> string list -> string list
 val stringlist_of_caught: caught_exception -> string list -> string list
@@ -38,7 +38,9 @@ val empty_error_handler: method_handler
 val is_empty_error_handler: method_handler -> bool
 
 val get_caught_exception_list: method_handler -> caught_exception list
+val get_caught_exception_list_to_ui: method_handler -> caught_exception list
 val get_uncaught_exception_list: method_handler -> uncaught_exception list
+val get_uncaught_exception_list_to_ui: method_handler -> uncaught_exception list
 
 val to_json: method_handler -> Yojson.Basic.t
 val of_json: Yojson.Basic.t -> method_handler
