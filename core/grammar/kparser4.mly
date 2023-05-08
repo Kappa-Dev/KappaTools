@@ -24,7 +24,7 @@
 %token EOF COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR OP_BRA CL_BRA AT SEMICOLON
 %token PLUS MINUS MULT DIV MOD MAX MIN SINUS COSINUS TAN POW ABS SQRT EXPONENT
 %token LOG OR AND NOT THEN ELSE DIFF EQUAL SMALLER GREATER TRUE FALSE INFINITY
-%token SHARP UNDERSCORE PIPE RAR LRAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
+%token SHARP UNDERSCORE PIPE RAR LRAR LAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
 %token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
 %token DO REPEAT ALARM RUN LET
@@ -493,6 +493,8 @@ init_declaration:
   | ID annot OP_CUR annot init_declaration CL_CUR annot
     { let (_,alg,init) = $5 in (Some ($1,rhs_pos 1),alg,init) }
 */
+  | ID LAR annot alg_expr
+    { let (v,_,_) = $4 in (v,Ast.INIT_TOK [$1,rhs_pos 1])}
   | error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos 1 "Malformed initial condition")) }
@@ -606,6 +608,26 @@ expecting '$DEL alg_expression kappa_expression'")) }
       let (pat,pendp,_) = $3 in
       (Ast.SPECIES_OF ($4,file,(pat, Locality.of_pos (start_pos 3) pendp)),
        pend,p) }
+  | ID annot LAR annot alg_expr {
+   let (v,pend,p) = $5 in
+   let tk = ($1,rhs_pos 1) in
+    (Ast.APPLY(Alg_expr.const Nbr.one,
+        ({Ast.rewrite =
+              Ast.Edit
+                  {Ast.mix=[];
+                   Ast.delta_token =
+                      [(Alg_expr.BIN_ALG_OP(Operator.MINUS,v,(Alg_expr.TOKEN_ID $1,rhs_pos 1)),rhs_pos 1),tk];
+                    };
+              Ast.bidirectional=false;
+              Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
+              Ast.k_op=None; Ast.k_op_un=None}, Locality.of_pos (start_pos  4) pend)),pend,p)
+   }
+
+   | ID annot LAR error
+     { raise (ExceptionDefn.Syntax_Error
+                (add_pos 3 "Malformed intervention instruction, I was \
+expecting 'ID <- alg_expression'")) }
+
   ;
 
 partial_effect_list:
@@ -685,7 +707,7 @@ model:
   | annot model_body { $2 }
   | error
     { raise (ExceptionDefn.Syntax_Error
-               (add_pos 1 "Incorrect beginning of sentence")) }
+               (add_pos 1 "Incorrect beginning of sentence !!!")) }
   ;
 
 interactive_command:
