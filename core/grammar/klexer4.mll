@@ -40,6 +40,7 @@ rule token = parse
   | "&&" { AND }
   | "||" { OR }
   | "<->" { LRAR }
+  | "<-" {LAR}
   | "->" { RAR }
   | "<>" { DIFF }
   | ':' { COLON }
