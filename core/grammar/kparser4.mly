@@ -628,7 +628,12 @@ idin:
 | ID annot LAR error
      { raise (ExceptionDefn.Syntax_Error
                 (add_pos 3 "Malformed intervention instruction, I was \
-expecting 'ID <- alg_expression'")) };
+expecting 'ID <- alg_expression'")) }
+| ID error
+        { raise (ExceptionDefn.Syntax_Error
+                   (add_pos 2 "Malformed intervention instruction, I was \
+   expecting 'ID <- alg_expression'")) };
+;
 
 effect_or_idin:
   | effect {$1}
@@ -683,7 +688,7 @@ perturbation_declaration:
   | perturbation_alarm DO annot effect_list perturbation_post
     { let (e,_,_) = $4 in let (post,_,_) = $5 in ($1,None,e,post) }
 
-  | perturbation_alarm bool_expr DO annot partial_effect_list_at_least_one_idin perturbation_post_closed 
+  | perturbation_alarm bool_expr DO annot partial_effect_list_at_least_one_idin perturbation_post_closed
     { let (pre,_,_) = $2 in
       let (e,_,_) = $5 in
       let (post,_,_) = $6 in
