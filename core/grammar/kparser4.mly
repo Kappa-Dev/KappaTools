@@ -608,7 +608,10 @@ expecting '$DEL alg_expression kappa_expression'")) }
       let (pat,pendp,_) = $3 in
       (Ast.SPECIES_OF ($4,file,(pat, Locality.of_pos (start_pos 3) pendp)),
        pend,p) }
-  | ID annot LAR annot alg_expr {
+  ;
+
+idin:
+| ID annot LAR annot alg_expr {
    let (v,pend,p) = $5 in
    let tk = ($1,rhs_pos 1) in
     (Ast.APPLY(Alg_expr.const Nbr.one,
@@ -622,19 +625,26 @@ expecting '$DEL alg_expression kappa_expression'")) }
               Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
               Ast.k_op=None; Ast.k_op_un=None}, Locality.of_pos (start_pos  4) pend)),pend,p)
    }
-
-   | ID annot LAR error
+| ID annot LAR error
      { raise (ExceptionDefn.Syntax_Error
                 (add_pos 3 "Malformed intervention instruction, I was \
-expecting 'ID <- alg_expression'")) }
+expecting 'ID <- alg_expression'")) };
 
-  ;
+effect_or_idin:
+  | effect {$1}
+  | idin {$1}
 
 partial_effect_list:
-  | effect SEMICOLON annot { let (e,_,_) = $1 in ([e],end_pos 2,$3) }
-  | effect { let (e,p,a) = $1 in ([e],p,a) }
-  | effect SEMICOLON annot partial_effect_list
+  | effect_or_idin SEMICOLON annot { let (e,_,_) = $1 in ([e],end_pos 2,$3) }
+  | effect_or_idin { let (e,p,a) = $1 in ([e],p,a) }
+  | effect_or_idin SEMICOLON annot partial_effect_list
     { let (e,_,_) = $1 in let (l,pend,a) = $4 in (e::l,pend,a) }
+
+partial_effect_list_at_least_one_idin:
+      | idin SEMICOLON annot { let (e,_,_) = $1 in ([e],end_pos 2,$3) }
+      | idin { let (e,p,a) = $1 in ([e],p,a) }
+      | idin SEMICOLON annot partial_effect_list
+          { let (e,_,_) = $1 in let (l,pend,a) = $4 in (e::l,pend,a) }
 
 effect_list:
   | OP_PAR annot partial_effect_list CL_PAR annot { $3 }
@@ -656,9 +666,12 @@ perturbation_alarm:
     { raise (ExceptionDefn.Syntax_Error (add_pos 3 "alarm takes a number as argument")) }
   ;
 
+perturbation_post_closed:
+  | REPEAT annot bool_expr { let (b,pend,p) = $3 in (Some b,pend,p) }
+
 perturbation_post:
   | { (None, Parsing.symbol_start_pos (),[]) }
-  | REPEAT annot bool_expr { let (b,pend,p) = $3 in (Some b,pend,p) }
+  | perturbation_post_closed {$1}
   ;
 
 perturbation_declaration:
@@ -669,6 +682,16 @@ perturbation_declaration:
       ($1,Some pre,e,post) }
   | perturbation_alarm DO annot effect_list perturbation_post
     { let (e,_,_) = $4 in let (post,_,_) = $5 in ($1,None,e,post) }
+
+  | perturbation_alarm bool_expr DO annot partial_effect_list_at_least_one_idin perturbation_post_closed 
+    { let (pre,_,_) = $2 in
+      let (e,_,_) = $5 in
+      let (post,_,_) = $6 in
+      ($1,Some pre,e,post) }
+  | perturbation_alarm DO annot partial_effect_list_at_least_one_idin perturbation_post_closed
+        { let (e,_,_) = $4 in
+          let (post,_,_) = $5 in
+          ($1,None,e,post) }
   ;
 
 sentence:
