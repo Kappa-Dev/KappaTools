@@ -640,6 +640,7 @@ effect_or_idin:
   | idin {$1}
 
 partial_effect_list:
+  | OP_PAR annot partial_effect_list CL_PAR annot { $3 }
   | effect_or_idin SEMICOLON annot { let (e,_,_) = $1 in ([e],end_pos 2,$3) }
   | effect_or_idin { let (e,p,a) = $1 in ([e],p,a) }
   | effect_or_idin SEMICOLON annot partial_effect_list
