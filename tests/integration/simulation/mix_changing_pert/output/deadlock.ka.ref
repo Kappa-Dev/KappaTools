@@ -1,5 +1,5 @@
 // Snapshot [Event: 24]
-%def: "T0" "2.33472"
+%def: "T0" "2.33471537032762"
 
 %init: 10 /*1 agents*/ A(st{c}[.])
 

@@ -1,5 +1,5 @@
 // Snapshot [Event: 5027]
-%def: "T0" "4"
+%def: "T0" "4.0"
 
 %init: 1 /*25 agents*/ A(l[1] r[2]), A(l[3] r[1]), A(l[.] r[3]),
   A(l[2] r[4]), A(l[4] r[5]), A(l[5] r[6]), A(l[6] r[7]), A(l[7] r[8]),

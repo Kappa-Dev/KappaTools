@@ -1,5 +1,5 @@
 // Snapshot [Event: 141489]
-%def: "T0" "2"
+%def: "T0" "2.0"
 
 %init: 2 /*13 agents*/ C(b[1] a[2]), B(a[3] c[1]), A(c[4] b[3]),
   C(b[5] a[4]), B(a[6] c[5]), A(c[7] b[6]), C(b[8] a[7]), B(a[9] c[8]),
