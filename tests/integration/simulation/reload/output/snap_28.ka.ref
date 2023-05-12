@@ -1,5 +1,5 @@
 // Snapshot [Event: 28]
-%def: "T0" "15"
+%def: "T0" "15.0"
 
 %init: 37 /*2 agents*/ B(s[1]), A(s[1])
 %init: 63 /*1 agents*/ B(s[.])
