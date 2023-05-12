@@ -146,3 +146,5 @@ val of_unix_error:
 
 val to_unix_error:
     Yojson.Basic.t -> Unix.error
+
+val std_json_string_of_float: float -> string

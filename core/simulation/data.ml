@@ -48,9 +48,9 @@ let print_snapshot ?uuid f s =
   let () = Format.fprintf
       f "@[<v>// Snapshot [Event: %d]@,"(*", Time: %f"*)s.snapshot_event in
   Format.fprintf
-    f "%a%%def: \"T0\" \"%g\"@,@,%a@,%a@]@."
+    f "%a%%def: \"T0\" \"%s\"@,@,%a@,%a@]@."
     (Pp.option ~with_space:false (fun f x -> Format.fprintf f "// \"uuid\" : \"%i\"@," x)) uuid
-    s.snapshot_time
+    (JsonUtil.std_json_string_of_float s.snapshot_time)
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "@[<hov 2>%%init: %i /*%i agents*/ %a@]" i
            (Array.fold_left (fun s e -> s + Array.length e) 0 mix)

@@ -564,3 +564,8 @@ let (to_unix_error : Yojson.Basic.t -> Unix.error) =
   | `Assoc ["EUNKNOWNERR",int] -> Unix.EUNKNOWNERR (to_int int)
   | x ->
     raise (Yojson.Basic.Util.Type_error (build_msg "unix error",x))
+
+let std_json_string_of_float x =
+    let ob = Buffer.create 20 in
+    Yojson.Basic.write_std_float ob x;
+    Buffer.contents ob
