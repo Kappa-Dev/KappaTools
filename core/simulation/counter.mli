@@ -42,6 +42,7 @@ val create : ?init_t:float -> ?init_e:int ->
 val reinitialize : t -> unit
 
 val current_simulation_info : t -> unit Trace.Simulation_info.t
+val next_step_simulation_info : t -> unit Trace.Simulation_info.t
 val next_story : t -> unit Trace.Simulation_info.t
 
 val fill : outputs:(t -> float -> unit) -> t -> dt:float -> unit

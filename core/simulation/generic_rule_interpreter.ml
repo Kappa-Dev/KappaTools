@@ -576,7 +576,7 @@ module Make (Instances:Instances_sig.S) = struct
   let step_of_event counter = function
     | Trace.INIT _,e -> (Trace.Init e.Instantiation.actions)
     | Trace.RULE r,x ->
-      (Trace.Rule (r,x,Counter.current_simulation_info counter))
+      (Trace.Rule (r,x,Counter.next_step_simulation_info counter))
     | Trace.PERT p,x ->
       (Trace.Pert (p,x,Counter.current_simulation_info counter))
 

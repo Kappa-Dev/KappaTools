@@ -259,10 +259,17 @@ let reinitialize counter =
   counter.last_point <- 0;
   counter.stat_null <- Efficiency.init (Array.length counter.stat_null.Efficiency.consecutive)
 
+let next_step_simulation_info c = {
+  Trace.Simulation_info.story_id = current_story c;
+  Trace.Simulation_info.story_time = current_time c;
+  Trace.Simulation_info.story_event = (current_event c)+1;
+  Trace.Simulation_info.profiling_info = ();
+}
+
 let current_simulation_info c = {
   Trace.Simulation_info.story_id = current_story c;
   Trace.Simulation_info.story_time = current_time c;
-  Trace.Simulation_info.story_event = current_event c+1;
+  Trace.Simulation_info.story_event = current_event c;
   Trace.Simulation_info.profiling_info = ();
 }
 
