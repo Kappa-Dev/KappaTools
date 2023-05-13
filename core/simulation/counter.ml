@@ -275,7 +275,7 @@ let current_simulation_info c = {
 
 let next_story c =
   let () = inc_stories c in
-  current_simulation_info c
+  next_step_simulation_info c
 
 let positive_plot_period counter =
   match plot_period counter with
