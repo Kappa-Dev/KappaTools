@@ -573,6 +573,11 @@ let link_only_one_occurence i pos =
            ("The link '"^string_of_int i^
             "' occurs only one time in the mixture.", pos))
 
+let link_should_be_removed i agent_name (na,pos) =
+    raise (ExceptionDefn.Malformed_Decl
+              ("The link '"^string_of_int i^
+                        "' should be made free in the site '"^na^"' of agent '"^agent_name^"', since it will made be free by side-effect.", pos))
+
 let copy_rule_agent a =
   let p = Array.copy a.ra_ports in
   let i = Array.copy a.ra_ints in

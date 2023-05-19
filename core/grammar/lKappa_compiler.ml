@@ -39,6 +39,12 @@ let rule_induces_link_permutation ~warning ~pos ?dst_ty sigs sort site =
         (Signature.print_site sigs sort) site
         (Signature.print_agent sigs) sort)
 
+let site_should_made_be_free i sigs ag_ty p_id pos =
+    LKappa.link_should_be_removed i
+          (let () = Format.fprintf Format.str_formatter "%a"
+            (Signature.print_agent sigs) ag_ty in Format.flush_str_formatter ())
+          ((let () = Format.fprintf Format.str_formatter "%a"
+            (Signature.print_site sigs ag_ty) p_id in Format.flush_str_formatter ()),pos)
 let build_link
     ?warn_on_swap sigs ?contact_map pos i ag_ty p_id switch
     (links_one,links_two) =
@@ -52,8 +58,8 @@ let build_link
         | LKappa.Linked j -> Some j
         | LKappa.Freed | LKappa.Erased | LKappa.Maintained -> None in
       ((LKappa.LNK_VALUE (i,(-1,-1)),pos),switch),
-      (Mods.IntMap.add i (ag_ty,p_id,new_link,pos) one',links_two)
-    | Some (dst_ty,dst_p,dst_id,_),one' ->
+      (Mods.IntMap.add i (ag_ty,p_id,new_link,pos,switch) one',links_two)
+    | Some (dst_ty,dst_p,dst_id,pos',switch'),one' ->
       if Signature.allowed_link ag_ty p_id dst_ty dst_p sigs then
         let () = add_link_contact_map ?contact_map ag_ty p_id dst_ty dst_p in
         let maintained = match switch with
@@ -68,6 +74,14 @@ let build_link
                      ~warning ~pos ~dst_ty sigs ag_ty p_id in
              not(link_swap)
           | LKappa.Freed | LKappa.Erased | LKappa.Maintained -> false in
+       let _check_compatibilty =
+          match switch, switch' with
+            | LKappa.Maintained, LKappa.Maintained -> ()
+            | LKappa.Maintained, (LKappa.Freed | LKappa.Erased | LKappa.Linked _) -> site_should_made_be_free i sigs ag_ty p_id pos
+            | (LKappa.Freed | LKappa.Erased | LKappa.Linked _), LKappa.Maintained -> site_should_made_be_free i sigs dst_ty dst_p pos'
+            | (LKappa.Freed | LKappa.Erased | LKappa.Linked _),
+              (LKappa.Freed | LKappa.Erased | LKappa.Linked _) -> ()
+          in
         ((LKappa.LNK_VALUE (i,(dst_p,dst_ty)),pos),
          if maintained then LKappa.Maintained else switch),
         (one',Mods.IntMap.add i (ag_ty,p_id,maintained) links_two)
@@ -644,11 +658,11 @@ let final_rule_sanity
   let () =
     match Mods.IntMap.root lhs_links_one with
     | None -> ()
-    | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
+    | Some (i,(_,_,_,pos,_)) -> LKappa.link_only_one_occurence i pos in
   let () = refer_links_annot ?warning sigs lhs_links_two mix in
   match Mods.IntMap.root rhs_links_one with
   | None -> ()
-  | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos
+  | Some (i,(_,_,_,pos,_)) -> LKappa.link_only_one_occurence i pos
 
 (*
 Is responsible for the check that:
@@ -872,7 +886,7 @@ let annotate_created_mixture
   let () =
     match Mods.IntMap.root rhs_links_one with
     | None -> ()
-    | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
+    | Some (i,(_,_,_,pos,_)) -> LKappa.link_only_one_occurence i pos in
   List.rev cmix
 
 let give_rule_label bidirectional (id,set) printer r = function
