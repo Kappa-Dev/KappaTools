@@ -117,7 +117,25 @@ let annotate_dropped_agent
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
-         let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
+         let () =
+             match p.Ast.port_lnk_mod, p.Ast.port_lnk with
+              | None,_ -> ()
+              | Some None,[LKappa.LNK_VALUE (_,()), _]
+                (* [i/.] is allowed in degraded agent.
+                   It will be checked later that the other site with link id i is also freed in the rule *)
+                (* Please note that a rule written as A(x[1])-,B(x[1/.])- is allowed *)
+                -> ()
+              | Some (None | Some _),
+                  ([]
+                  | [LKappa.LNK_VALUE (_,()), _]
+                  | [LKappa.ANY_FREE,_]
+                  | [LKappa.LNK_FREE,_]
+                  | [LKappa.LNK_ANY,_]
+                  | [LKappa.LNK_SOME,_]
+                  | [LKappa.LNK_TYPE (_, _),_]
+                  | _::_::_  )
+                -> LKappa.forbid_modification p_pos p.Ast.port_lnk_mod
+         in
          let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
 
          let () = match p.Ast.port_int with
