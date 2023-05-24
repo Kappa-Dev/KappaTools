@@ -11,6 +11,8 @@ type t = int * int
 
 type ag = t
 
+let make ~id ~sort = (id, sort)
+
 let print ?sigs ~with_id f (i,ty) =
   match sigs with
   | Some sigs ->

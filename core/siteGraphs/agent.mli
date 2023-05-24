@@ -11,6 +11,8 @@
 type t = int * int
 (** agent_id * agent_type *)
 
+val make : id:int -> sort:int -> t
+
 val compare : t -> t -> int
 
 val sort : t -> int
