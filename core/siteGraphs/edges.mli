@@ -70,6 +70,10 @@ val get_connected_component : int -> t -> int option
 
 val in_same_connected_component : int -> int -> t -> bool
 
+val iter_neighbors: (Agent.t -> unit) -> int -> t -> unit
+(** [iter_neighbors f ag graph] calls function [f] on all direct
+    neighbors of agent [ag] in [graph]. *)
+
 val all_agents_where : (Agent.t -> bool) -> t -> IntCollection.t
 
 type path = ((Agent.t * int) * (Agent.t * int)) list

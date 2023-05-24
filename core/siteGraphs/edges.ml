@@ -457,6 +457,13 @@ let link_destination ag s graph =
   | Some tables ->
     (Mods.DynArray.get tables.connect ag).(s)
 
+let iter_neighbors f ag graph =
+  match graph.tables with
+  | None -> assert false
+  | Some tables ->
+    let ag_table = Mods.DynArray.get tables.connect ag in
+    Array.iter (function None -> () | Some s -> f (fst s)) ag_table
+
 let all_agents_where f graph =
   match graph.tables with
   | None -> assert false
