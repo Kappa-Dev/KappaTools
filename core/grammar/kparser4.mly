@@ -654,6 +654,7 @@ partial_effect_list_at_least_one_idin:
 
 effect_list:
   | OP_PAR annot partial_effect_list CL_PAR annot { $3 }
+  | OP_PAR annot partial_effect_list CL_PAR annot SEMICOLON annot {let (e,_,_) =  $3 in e,end_pos 6,$7 }
   | effect SEMICOLON annot { let (e,_,_) = $1 in ([e],end_pos 2,$3) }
   | effect SEMICOLON annot effect_list
     { let (e,_,_) = $1 in let (l,pend,a) = $4 in (e::l,pend,a) }
