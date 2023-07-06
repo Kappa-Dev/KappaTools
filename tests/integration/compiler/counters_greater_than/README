@@ -1,0 +1,1 @@
+"${KAPPABIN}"KaSim -l 1 -seed 442310228 -d output counters_greater_than.ka -syntax 4 || true

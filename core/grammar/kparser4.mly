@@ -129,6 +129,7 @@ counter_modif:
 counter_test:
   | EQUAL annot INT { (Ast.CEQ $3,rhs_pos 3) }
   | GREATER annot EQUAL annot INT { (Ast.CGTE $5,rhs_pos 5) }
+  | GREATER annot INT { (Ast.CGT $3,rhs_pos 3) }
   | EQUAL annot ID { (Ast.CVAR $3,rhs_pos 3) }
   ;
 

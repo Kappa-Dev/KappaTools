@@ -1277,6 +1277,9 @@ let create_t sites incr_info =
              | Ast.CGTE _ ->
                 raise (ExceptionDefn.Internal_Error
                          ("Counter should not have >= in signature",pos))
+             | Ast.CGT _ ->
+                raise (ExceptionDefn.Internal_Error
+                         ("Counter should not have > in signature",pos))
              | Ast.CEQ j ->
                 (c.Ast.count_nme,
                 (NamedDecls.create [||],

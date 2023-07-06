@@ -1,0 +1,13 @@
+%agent:	A(c{=0 / +=3})
+
+%init: 1 A(c{=0})
+%init: 1 A(c{=1})
+%init: 1 A(c{=2})
+
+'greater_than_edit' A(c{>0/+=1}) @ 1
+
+'greater_than_arrow' A(c{>0}) -> A(c{+=1}) @ 1
+ 
+%obs: A1 |A(c{=0})|
+%obs: A2 |A(c{>0})|
+%obs: A3 |A(c{>=0})|

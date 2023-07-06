@@ -21,7 +21,7 @@ type port = {
   port_lnk_mod: int Locality.annot option option;
 }
 
-type counter_test = CEQ of int | CGTE of int | CVAR of string
+type counter_test = CEQ of int | CGTE of int | CGT of int | CVAR of string
 
 type counter = {
   count_nme: string Locality.annot;

@@ -172,7 +172,7 @@ let enumerate_counter_tests x a ((delta,_) as count_delta) c' =
   let (max,_) = c'.Ast.count_delta in
   let min =
     match c'.Ast.count_test with
-      None| Some (Ast.CGTE _,_)| Some (Ast.CVAR _,_) ->
+      None| Some (Ast.CGTE _,_) | Some (Ast.CGT _,_) | Some (Ast.CVAR _,_) ->
              raise
                (ExceptionDefn.Malformed_Decl
                   ("Invalid counter signature - have to specify min bound",
@@ -222,6 +222,9 @@ let remove_variable_in_counters ~warning rules signatures =
     | Ast.Counter c ->
        let (delta,_) = c.Ast.count_delta in
        match c.Ast.count_test with
+       | Some (Ast.CGT _,pos) ->
+          raise (ExceptionDefn.Internal_Error
+            ("Counter "^(fst c.Ast.count_nme)^" should not have a > test by now", pos))
        | Some (Ast.CEQ v,_) ->
           if (delta >0 || abs(delta) <= v) then [(Ast.Counter c,[])]
           else
@@ -316,8 +319,129 @@ let with_counters c =
       mix in
   with_counters_mix c.Ast.signatures
 
+let replace_greater_than c =
+  let process_mix =
+    let process_site = function
+      | Ast.Port _
+      | Ast.Counter Ast.{count_test = None; _}
+      | Ast.Counter Ast.{count_test = Some (CEQ _,_); _}
+      | Ast.Counter Ast.{count_test = Some (CVAR _,_); _}
+      | Ast.Counter Ast.{count_test = Some (CGTE _,_); _} as s -> s
+      | Ast.Counter Ast.{count_test = Some (CGT i,p); count_nme; count_delta} ->
+          Ast.Counter Ast.{count_nme; count_delta; count_test = Some (CGTE (i+1), p)}
+    in
+    let process_agent = function
+      | Ast.Absent _ as a -> a
+      | Ast.Present (n, ss, m) ->
+          Ast.Present (n, List.map process_site ss, m)
+    in
+    List.map (fun ags -> List.map process_agent ags)
+  in
+  let rec process_alg = function
+    | Alg_expr.STATE_ALG_OP _, _
+    | Alg_expr.ALG_VAR _, _
+    | Alg_expr.TOKEN_ID _, _
+    | Alg_expr.CONST _, _ as a -> a
+    | Alg_expr.BIN_ALG_OP (o, a1, a2), p ->
+        Alg_expr.BIN_ALG_OP (o, process_alg a1, process_alg a2), p
+    | Alg_expr.UN_ALG_OP (o, a), p ->
+        Alg_expr.UN_ALG_OP (o, process_alg a), p
+    | Alg_expr.IF (b, a1, a2), p ->
+        Alg_expr.IF (process_bool b, process_alg a1, process_alg a2), p
+    | Alg_expr.DIFF_TOKEN (a, id), p ->
+        Alg_expr.DIFF_TOKEN (process_alg a, id), p
+    | Alg_expr.KAPPA_INSTANCE m, p ->
+        Alg_expr.KAPPA_INSTANCE (process_mix m), p
+    | Alg_expr.DIFF_KAPPA_INSTANCE (a, m), p ->
+        Alg_expr.DIFF_KAPPA_INSTANCE (process_alg a, process_mix m), p
+  and process_bool = function
+    | Alg_expr.TRUE, _
+    | Alg_expr.FALSE, _ as b -> b
+    | Alg_expr.BIN_BOOL_OP (o, b1, b2), p ->
+        Alg_expr.BIN_BOOL_OP (o, process_bool b1, process_bool b2), p
+    | Alg_expr.UN_BOOL_OP (o, b), p ->
+        Alg_expr.UN_BOOL_OP (o, process_bool b), p
+    | Alg_expr.COMPARE_OP (o, a1, a2), p ->
+        Alg_expr.COMPARE_OP (o, process_alg a1, process_alg a2), p
+  in
+  let process_rule (r, l) =
+    let rewrite =
+      match r.Ast.rewrite with
+      | Ast.Edit e -> Ast.Edit Ast.{e with mix = process_mix e.mix}
+      | Ast.Arrow a -> Ast.Arrow Ast.{a with lhs = process_mix a.lhs}
+    in
+    let k_def = process_alg r.Ast.k_def in
+    let k_un =
+      match r.Ast.k_un with
+      | None -> None
+      | Some (alg, None) -> Some (process_alg alg, None)
+      | Some (alg1, Some alg2) -> Some (process_alg alg1, Some (process_alg alg2))
+    in
+    let k_op =
+      match r.Ast.k_op with
+      | None -> None
+      | Some alg -> Some (process_alg alg)
+    in
+    let k_op_un =
+      match r.Ast.k_op_un with
+      | None -> None
+      | Some (alg, None) -> Some (process_alg alg, None)
+      | Some (alg1, Some alg2) -> Some (process_alg alg1, Some (process_alg alg2))
+    in
+    (Ast.{r with rewrite; k_def; k_un; k_op; k_op_un}, l)
+  in
+
+  let process_rule_stmt (s, r) = s, process_rule r in
+  let process_variable_def (s, a) = s, process_alg a in
+  let process_init = function
+    | a, Ast.INIT_TOK t -> process_alg a, Ast.INIT_TOK t
+    | a, Ast.INIT_MIX m -> process_alg a, Ast.INIT_MIX m
+  in
+
+  let process_pexpr = function
+    | Primitives.Str_pexpr _ as e -> e
+    | Primitives.Alg_pexpr a -> Primitives.Alg_pexpr (process_alg a)
+  in
+  let process_pexprs = List.map process_pexpr in
+
+  let process_perturbation ((n, bool1, mods, bool2), l) =
+    let bool1 =
+      match bool1 with
+      | None -> None
+      | Some b -> Some (process_bool b)
+    in
+    let bool2 =
+      match bool2 with
+      | None -> None
+      | Some b -> Some (process_bool b)
+    in
+    let process_modif_expr = function
+      | Ast.PLOTENTRY | Ast.CFLOWLABEL _ | Ast.CFLOWMIX _ as e -> e
+      | Ast.APPLY (a, r) -> Ast.APPLY (process_alg a, process_rule r)
+      | Ast.UPDATE (p, a) -> Ast.UPDATE (p, process_alg a)
+      | Ast.STOP ps -> Ast.STOP (process_pexprs ps)
+      | Ast.SNAPSHOT (b, ps) -> Ast.SNAPSHOT (b, process_pexprs ps)
+      | Ast.PRINT (ps1, ps2) -> Ast.PRINT (process_pexprs ps1, process_pexprs ps2)
+      | Ast.DIN (k, ps) -> Ast.DIN (k, process_pexprs ps)
+      | Ast.DINOFF ps -> Ast.DINOFF (process_pexprs ps)
+      | Ast.SPECIES_OF (b, ps, p) -> Ast.SPECIES_OF (b, process_pexprs ps, p)
+    in
+    let mods = List.map process_modif_expr mods in
+    ((n, bool1, mods, bool2), l)
+  in
+
+  Ast.{c with
+     init = List.map process_init c.init;
+     observables = List.map process_alg c.observables;
+     variables = List.map process_variable_def c.variables;
+     perturbations = List.map process_perturbation c.perturbations;
+     rules = List.map process_rule_stmt c.rules;
+  }
+
+
 let compile ~warning ~debugMode c =
   if (with_counters c) then
+    let c = replace_greater_than c in
     let rules =
       remove_variable_in_counters ~warning c.Ast.rules c.Ast.signatures in
     let () =
@@ -457,6 +581,9 @@ let remove_counter_agent sigs ag lnk_nb =
                       ("Counter "^s^" should have a test by now",pos))
            | (Some (test,pos')), delta ->
              match test with
+             | Ast.CGT _ ->
+                raise (ExceptionDefn.Internal_Error
+                  ("Counter "^(fst counter.Ast.count_nme)^" should not have a > test by now", pos'))
              | Ast.CEQ j ->
               (counter_becomes_port
                  sigs ag.ra id delta pos true j lnk_nb)::acc_incrs,
@@ -487,8 +614,11 @@ let remove_counter_created_agent sigs ag lnk_nb =
                (Signature.print_agent sigs) raw_ag.Raw_mixture.a_type in
            LKappa.not_enough_specified
              ~status:"counter" ~side:"left" agent_name c.Ast.count_nme
-         | Some (test,_) ->
+         | Some (test,pos) ->
          match test with
+           | Ast.CGT _ ->
+              raise (ExceptionDefn.Internal_Error
+                ("Counter "^(fst c.Ast.count_nme)^" should not have a > test by now", pos))
            | Ast.CEQ j ->
              let p = Raw_mixture.VAL lnk in
              let () = ports.(p_id) <- p in

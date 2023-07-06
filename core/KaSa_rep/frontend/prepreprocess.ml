@@ -342,6 +342,7 @@ let translate_counter_test test =
   match test with
   | Ast.CEQ i -> Ckappa_sig.CEQ i
   | Ast.CGTE i -> Ckappa_sig.CGTE i
+  | Ast.CGT i -> Ckappa_sig.CGTE (i+1)
   | Ast.CVAR x -> Ckappa_sig.CVAR x
 
 let fst_opt a_opt =

@@ -1,0 +1,7 @@
+// Snapshot [Event: 3]
+%def: "T0" "0.35709268540166106"
+
+%init: 1 /*1 agents*/ A(c{=4})
+%init: 1 /*1 agents*/ A(c{=2})
+%init: 1 /*1 agents*/ A(c{=0})
+
