@@ -68,7 +68,7 @@ rule token = parse
   | integer as n { INT (int_of_string n) }
   | real as f { FLOAT (float_of_string f) }
   | '\'' ([^'\n' '\'']+ as x) '\''{ LABEL(x) }
-  | '\"' ([^'\n' '\"']+ as x) '\"'{ STRING(x) }
+  | '\"' ([^'\n' '\"']* as x) '\"'{ STRING(x) }
   | '\'' ([^'\n' '\'']+ as s) (eof | '\n')
     { raise (ExceptionDefn.Syntax_Error
       ("Unterminated label: "^s,
