@@ -50,6 +50,11 @@ models/test_suite/error
 models/test_suite/*/*/output/profiling.txt
 models/test_suite/*/*/output/profiling.html
 models/test_suite/*/*/output/compression_status.txt
+/tests/integration/error
+/tests/integration/*/*/error
+# Ignore all test outputs except the reference files.
+/tests/integration/*/*/output/*
+!/tests/integration/*/*/output/*.ref
 
 tests/integration/*/*/output/*.xml
 tests/integration/*/*/output/*.html
