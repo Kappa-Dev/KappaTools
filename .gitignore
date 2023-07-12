@@ -2,6 +2,7 @@ js/external
 todo.org
 *~
 _build/
+/build/
 .merlin
 ._d/
 ._ncdi/
@@ -83,7 +84,7 @@ site
 # python
 *.pyc
 dist/
-python/*.egg-info
+*.egg-info
 .idea
 
 # eclipse
