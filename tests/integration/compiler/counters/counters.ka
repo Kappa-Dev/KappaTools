@@ -44,3 +44,4 @@
 
 //counter in obs
 %obs: 'A1' |A(x{u}[.],c{>=1})|
+%obs: 'A2' |A(x{u}[.],c{=1})|

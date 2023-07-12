@@ -1,4 +1,4 @@
 # Output of 'KaSim' '-l' '1' '-seed' '442310228' '-d' 'output' 'counters.ka' '-syntax' '4'
-"[T]","A1"
-0.,0
-1.,2
+"[T]","A1","A2"
+0.,0,0
+1.,2,2

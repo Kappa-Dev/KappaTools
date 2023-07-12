@@ -27,6 +27,7 @@ digraph G{
 "r16" [shape=box fillcolor="#87ceeb" style=filled];
 
 "A1" [shape=ellipse fillcolor="#98fb98" style=filled];
+"A2" [shape=ellipse fillcolor="#98fb98" style=filled];
 "r1" -> "r4_" [label="[0->0];[1->1]" color="green"];
 "r1" -> "r6" [label="[0->0];[1->1]" color="green"];
 "r1" -> "r7" [label="[0->0];[1->1]" color="green"];
@@ -58,21 +59,25 @@ digraph G{
 "r11" -> "r1" [label="[0->0]" color="green"];
 "r11" -> "r2" [label="[0->0]" color="green"];
 "r11" -> "r10" [label="[0->0]" color="green"];
+"r11" -> "A2" [label="[0->0]" color="green"];
 "r12" -> "r1" [label="[0->0];[1->1];[2->0]" color="green"];
 "r12" -> "r2" [label="[0->0];[1->1];[2->0]" color="green"];
 "r12" -> "r10" [label="[0->0];[2->0]" color="green"];
 "r12" -> "r14" [label="[2->0]" color="green"];
 "r12" -> "r15" [label="[2->1]" color="green"];
 "r12" -> "r16" [label="[2->1]" color="green"];
+"r12" -> "A2" [label="[0->0]" color="green"];
 "r12bis" -> "r1" [label="[0->0];[1->0]" color="green"];
 "r12bis" -> "r2" [label="[0->0];[1->0]" color="green"];
 "r12bis" -> "r10" [label="[0->0];[1->0]" color="green"];
 "r12bis" -> "r14" [label="[1->0]" color="green"];
 "r12bis" -> "r15" [label="[1->1]" color="green"];
 "r12bis" -> "r16" [label="[1->1]" color="green"];
+"r12bis" -> "A2" [label="[0->0]" color="green"];
 "r16" -> "r1" [label="[0->0]" color="green"];
 "r16" -> "r2" [label="[0->0]" color="green"];
 "r16" -> "r10" [label="[0->0]" color="green"];
+"r16" -> "A2" [label="[0->0]" color="green"];
 "r1" -> "r2" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
 "r1" -> "r3" [label="[0->0]" color="red" arrowhead="tee"];
 "r1" -> "r4" [label="[0->0]" color="red" arrowhead="tee"];
@@ -85,6 +90,7 @@ digraph G{
 "r1" -> "r15" [label="[0->0];[0->1]" color="red" arrowhead="tee"];
 "r1" -> "r16" [label="[0->1]" color="red" arrowhead="tee"];
 "r1" -> "A1" [label="[0->0]" color="red" arrowhead="tee"];
+"r1" -> "A2" [label="[0->0]" color="red" arrowhead="tee"];
 "r2" -> "r1" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
 "r2" -> "r3" [label="[0->0]" color="red" arrowhead="tee"];
 "r2" -> "r4" [label="[0->0]" color="red" arrowhead="tee"];
@@ -97,6 +103,7 @@ digraph G{
 "r2" -> "r15" [label="[0->0];[0->1]" color="red" arrowhead="tee"];
 "r2" -> "r16" [label="[0->1]" color="red" arrowhead="tee"];
 "r2" -> "A1" [label="[0->0]" color="red" arrowhead="tee"];
+"r2" -> "A2" [label="[0->0]" color="red" arrowhead="tee"];
 "r3" -> "r4" [label="[0->0]" color="red" arrowhead="tee"];
 "r3" -> "r4bis" [label="[0->0]" color="red" arrowhead="tee"];
 "r3" -> "r10" [label="[0->0]" color="red" arrowhead="tee"];

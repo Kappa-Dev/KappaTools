@@ -469,6 +469,20 @@ let counter_value_cc cc (nid,sid) count =
   let nodes = cc.nodes in
   counter_value nodes (nid,sid) count
 
+(* !is_eq == is_gte *)
+let rec counter_is_eq nodes (nid,sid) is_eq =
+  match Mods.IntMap.find_option nid nodes with
+  | None -> is_eq
+  | Some ag ->
+     Tools.array_fold_lefti
+       (fun id acc (el,_) ->
+         if (id = sid) then acc && true
+         else
+           match el with
+           | UnSpec -> acc && false
+           | Free -> acc && true
+           | Link (dn,di) -> counter_is_eq nodes (dn,di) (acc && true)) is_eq ag
+
 let dotcomma dotnet =
   if dotnet
   then (fun fmt -> Format.fprintf fmt ",")
@@ -509,7 +523,13 @@ let print_cc
                 | Some sigs -> Signature.is_counter_agent sigs dst_ty
                                && not noCounters then
                 let counter = counter_value cc.nodes (dst_a,dst_p) 0 in
-                let () = Format.fprintf f "{=%d}" counter in
+                let is_eq = counter_is_eq cc.nodes (dst_a,dst_p) true in
+                let () =
+                  if is_eq then
+                    Format.fprintf f "{=%d}" counter
+                  else
+                    Format.fprintf f "{>=%d}" counter
+                in
                 true,out
               else
               let i,out' =

@@ -42,6 +42,8 @@ Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:
 Compilation:variables:0:A1: 
+Compilation:variables:1:
+Compilation:variables:1:A2: 
 Compilation:agent definition:0:A:
 Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 1, characters 8-9:
 Compilation:agent definition:       File "../../compiler/counters/counters.ka", line 4, characters 10-11:
@@ -977,9 +979,15 @@ Quarks:Var 0
 Quarks:var_id:0,agent_type:0
 Quarks:var_id:0,agent_type:0,site_type:0,state:0
 Quarks:var_id:0,agent_type:0,site_type:3,state:0
+Quarks:Var 1
+Quarks:var_id:1,agent_type:0
+Quarks:var_id:1,agent_type:0,site_type:0,state:0
+Quarks:var_id:1,agent_type:0,site_type:1,state:1
+Quarks:var_id:1,agent_type:0,site_type:3,state:0
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_var++**:agent_type:0,var:0->[0]
+Quarks:agent_var++**:agent_type:0,var:1->[0]
 Quarks:agent_test**:agent_type:0,rule:0->[0]
 Quarks:agent_test**:agent_type:0,rule:1->[0]
 Quarks:agent_test**:agent_type:0,rule:2->[0]
@@ -1013,7 +1021,10 @@ Quarks:agent_modif-:agent_type:0,rule:16->[0]
 Quarks:agent_modif-:agent_type:0,rule:17->[1]
 Quarks:agent_modif-:agent_type:0,rule:18->[1]
 Quarks:site_vars++**:agent_type:0,site_type:0,state:0,var:0->[0]
+Quarks:site_vars++**:agent_type:0,site_type:0,state:0,var:1->[0]
 Quarks:site_vars++**:agent_type:0,site_type:3,state:0,var:0->[0]
+Quarks:site_vars++**:agent_type:0,site_type:3,state:0,var:1->[0]
+Quarks:site_vars++**:agent_type:0,site_type:1,state:1,var:1->[0]
 Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:0->[0]
 Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:1->[0]
 Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:2->[0]
@@ -1133,21 +1144,25 @@ Influence_map:Wake_up_map:rule(11):'r10' A(x{u}[.]),.->A(x{u}[.]),A(x{u}[.],c=0,
 Influence_map:Wake_up_map:rule(12):'r11' .->A(x{u}[.],c=1,d=2) -> rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->0]
 Influence_map:Wake_up_map:rule(12):'r11' .->A(x{u}[.],c=1,d=2) -> rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1])[0->0]
 Influence_map:Wake_up_map:rule(12):'r11' .->A(x{u}[.],c=1,d=2) -> rule(11):'r10' A(x{u}[.]),.->A(x{u}[.]),A(x{u}[.],c=0,d=2)[0->0]
+Influence_map:Wake_up_map:rule(12):'r11' .->A(x{u}[.],c=1,d=2) -> var(1):'A2' A(x{u}[.],c=1)[0->0]
 Influence_map:Wake_up_map:rule(13):'r12' A(c=3,x[1]),B(x[1]),.->A(c-2,x[.]),B(x[.]),A(x[.],c=2,d=1) -> rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->0];[1->1];[2->0]
 Influence_map:Wake_up_map:rule(13):'r12' A(c=3,x[1]),B(x[1]),.->A(c-2,x[.]),B(x[.]),A(x[.],c=2,d=1) -> rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1])[0->0];[1->1];[2->0]
 Influence_map:Wake_up_map:rule(13):'r12' A(c=3,x[1]),B(x[1]),.->A(c-2,x[.]),B(x[.]),A(x[.],c=2,d=1) -> rule(11):'r10' A(x{u}[.]),.->A(x{u}[.]),A(x{u}[.],c=0,d=2)[0->0];[2->0]
 Influence_map:Wake_up_map:rule(13):'r12' A(c=3,x[1]),B(x[1]),.->A(c-2,x[.]),B(x[.]),A(x[.],c=2,d=1) -> rule(16):'r14' A(x{u}[.],c=2)->.[2->0]
 Influence_map:Wake_up_map:rule(13):'r12' A(c=3,x[1]),B(x[1]),.->A(c-2,x[.]),B(x[.]),A(x[.],c=2,d=1) -> rule(17):'r15' A(c>=1,x{u}[.]),A(x{u}[.],c=2)->A(c,x{u}[.]),.[2->1]
 Influence_map:Wake_up_map:rule(13):'r12' A(c=3,x[1]),B(x[1]),.->A(c-2,x[.]),B(x[.]),A(x[.],c=2,d=1) -> rule(18):'r16' .,A(x{u}[.],c=2)->A(x{u}[.],c=1),.[2->1]
+Influence_map:Wake_up_map:rule(13):'r12' A(c=3,x[1]),B(x[1]),.->A(c-2,x[.]),B(x[.]),A(x[.],c=2,d=1) -> var(1):'A2' A(x{u}[.],c=1)[0->0]
 Influence_map:Wake_up_map:rule(14):'r12bis' .,.->A(c=1),A(c=2) -> rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->0];[1->0]
 Influence_map:Wake_up_map:rule(14):'r12bis' .,.->A(c=1),A(c=2) -> rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1])[0->0];[1->0]
 Influence_map:Wake_up_map:rule(14):'r12bis' .,.->A(c=1),A(c=2) -> rule(11):'r10' A(x{u}[.]),.->A(x{u}[.]),A(x{u}[.],c=0,d=2)[0->0];[1->0]
 Influence_map:Wake_up_map:rule(14):'r12bis' .,.->A(c=1),A(c=2) -> rule(16):'r14' A(x{u}[.],c=2)->.[1->0]
 Influence_map:Wake_up_map:rule(14):'r12bis' .,.->A(c=1),A(c=2) -> rule(17):'r15' A(c>=1,x{u}[.]),A(x{u}[.],c=2)->A(c,x{u}[.]),.[1->1]
 Influence_map:Wake_up_map:rule(14):'r12bis' .,.->A(c=1),A(c=2) -> rule(18):'r16' .,A(x{u}[.],c=2)->A(x{u}[.],c=1),.[1->1]
+Influence_map:Wake_up_map:rule(14):'r12bis' .,.->A(c=1),A(c=2) -> var(1):'A2' A(x{u}[.],c=1)[0->0]
 Influence_map:Wake_up_map:rule(18):'r16' .,A(x{u}[.],c=2)->A(x{u}[.],c=1),. -> rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->0]
 Influence_map:Wake_up_map:rule(18):'r16' .,A(x{u}[.],c=2)->A(x{u}[.],c=1),. -> rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1])[0->0]
 Influence_map:Wake_up_map:rule(18):'r16' .,A(x{u}[.],c=2)->A(x{u}[.],c=1),. -> rule(11):'r10' A(x{u}[.]),.->A(x{u}[.]),A(x{u}[.],c=0,d=2)[0->0]
+Influence_map:Wake_up_map:rule(18):'r16' .,A(x{u}[.],c=2)->A(x{u}[.],c=1),. -> var(1):'A2' A(x{u}[.],c=1)[0->0]
 Influence_map:Inhibition_map:rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1])[0->0];[1->1]
 Influence_map:Inhibition_map:rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(2):'r3' A(x{u}[.])->A(x{p}[.],c+2)[0->0]
 Influence_map:Inhibition_map:rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(3):'r4' A(x{u}[.])->A(x{p}[.],c-2)[0->0]
@@ -1160,6 +1175,7 @@ Influence_map:Inhibition_map:rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> ru
 Influence_map:Inhibition_map:rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(17):'r15' A(c>=1,x{u}[.]),A(x{u}[.],c=2)->A(c,x{u}[.]),.[0->0];[0->1]
 Influence_map:Inhibition_map:rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(18):'r16' .,A(x{u}[.],c=2)->A(x{u}[.],c=1),.[0->1]
 Influence_map:Inhibition_map:rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> var(0):'A1' A(x{u}[.],c>=1)[0->0]
+Influence_map:Inhibition_map:rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> var(1):'A2' A(x{u}[.],c=1)[0->0]
 Influence_map:Inhibition_map:rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1]) -> rule(0):'r1' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->0];[1->1]
 Influence_map:Inhibition_map:rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1]) -> rule(2):'r3' A(x{u}[.])->A(x{p}[.],c+2)[0->0]
 Influence_map:Inhibition_map:rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1]) -> rule(3):'r4' A(x{u}[.])->A(x{p}[.],c-2)[0->0]
@@ -1172,6 +1188,7 @@ Influence_map:Inhibition_map:rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1])
 Influence_map:Inhibition_map:rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1]) -> rule(17):'r15' A(c>=1,x{u}[.]),A(x{u}[.],c=2)->A(c,x{u}[.]),.[0->0];[0->1]
 Influence_map:Inhibition_map:rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1]) -> rule(18):'r16' .,A(x{u}[.],c=2)->A(x{u}[.],c=1),.[0->1]
 Influence_map:Inhibition_map:rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1]) -> var(0):'A1' A(x{u}[.],c>=1)[0->0]
+Influence_map:Inhibition_map:rule(1):'r2' A(x[.],c:y,d:y1),B(x[.],c:y2)->A(x[1]),B(x[1]) -> var(1):'A2' A(x{u}[.],c=1)[0->0]
 Influence_map:Inhibition_map:rule(2):'r3' A(x{u}[.])->A(x{p}[.],c+2) -> rule(3):'r4' A(x{u}[.])->A(x{p}[.],c-2)[0->0]
 Influence_map:Inhibition_map:rule(2):'r3' A(x{u}[.])->A(x{p}[.],c+2) -> rule(4):'r4bis' A(x{u}[.])->A(x{p}[.],c-2)[0->0]
 Influence_map:Inhibition_map:rule(2):'r3' A(x{u}[.])->A(x{p}[.],c+2) -> rule(11):'r10' A(x{u}[.]),.->A(x{u}[.]),A(x{u}[.],c=0,d=2)[0->0]
