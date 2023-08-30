@@ -416,7 +416,7 @@ let main () =
           let n_constraints =
             List.fold_left
               (fun n (x,l) ->
-                 if x = "nr"
+                 if x <> "Views domain - non relational properties"
                  then n+List.length l
                  else n)
               0 constraints
