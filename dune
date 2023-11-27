@@ -1,0 +1,7 @@
+(env
+  (_ (flags (:standard -warn-error -69-67-37 -w +a -g))
+  (link_flags (:standard -g))
+  (js_of_ocaml (flags (:standard --no-inline --debug-info --source-map)) (link_flags (:standard)))
+  )
+)
+
