@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-(** Intermediate representation of model on wich sanity has been checked *)
+(** Intermediate representation of model on which sanity has been checked *)
 
 type ('a, 'annot) link =
   | ANY_FREE

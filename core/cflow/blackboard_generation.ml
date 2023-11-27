@@ -1044,13 +1044,13 @@ module Preblackboard : PreBlackboard = struct
         ~message:"Illegal state for a side-effects"
         (Failure "Blackboard_generation.side_effect") []
     | Free -> error, log_info, [ predicate_target_id, None, (Free, Unknown) ]
-    | Bound_to (pid, ag, ag_na, sname) ->
+    | Bound_to (pid, ag, agent_name, sname) ->
       ( error,
         log_info,
         [
           predicate_target_id, None, (s, Unknown);
           ( pid,
-            Some ((ag, ag_na), sname),
+            Some ((ag, agent_name), sname),
             ( Bound_to
                 ( predicate_target_id,
                   CI.Po.K.agent_id_of_site site,
@@ -1681,17 +1681,17 @@ module Preblackboard : PreBlackboard = struct
           | Instantiation.Is_Bound_to (site1, site2) ->
             let agent1 = CI.Po.K.agent_of_site site1 in
             let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in
-            let ag_name1 = CI.Po.K.agent_name_of_agent agent1 in
+            let agent_name1 = CI.Po.K.agent_name_of_agent agent1 in
             let site_name1 = CI.Po.K.site_name_of_site site1 in
             let agent2 = CI.Po.K.agent_of_site site2 in
             let ag_id2 = CI.Po.K.agent_id_of_agent agent2 in
-            let ag_name2 = CI.Po.K.agent_name_of_agent agent2 in
+            let agent_name2 = CI.Po.K.agent_name_of_agent agent2 in
             let site_name2 = CI.Po.K.site_name_of_site site2 in
             let weak1 =
-              Instantiation.Has_Binding_type (site1, (ag_name2, site_name2))
+              Instantiation.Has_Binding_type (site1, (agent_name2, site_name2))
             in
             let weak2 =
-              Instantiation.Has_Binding_type (site2, (ag_name1, site_name1))
+              Instantiation.Has_Binding_type (site2, (agent_name1, site_name1))
             in
             (match
                ( sure_agent ag_id1

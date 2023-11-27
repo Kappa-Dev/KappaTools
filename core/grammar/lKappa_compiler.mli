@@ -38,12 +38,7 @@ val init_of_ast :
   (Ast.mixture, Ast.mixture, string) Ast.init_statment list ->
   (LKappa.rule_agent list, Raw_mixture.t, int) Ast.init_statment list
 
-val compil_of_ast :
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
-  debugMode:bool ->
-  syntax_version:Ast.syntax_version ->
-  (string * Nbr.t) list ->
-  Ast.parsing_compil ->
+type ast_compiled_data =
   Signature.s
   * Contact_map.t
   * unit NamedDecls.t
@@ -55,13 +50,22 @@ val compil_of_ast :
       int,
       LKappa.rule )
     Ast.compil
+(** Data returned by [compil_of_ast] *)
+
+val compil_of_ast :
+  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  debugMode:bool ->
+  syntax_version:Ast.syntax_version ->
+  (string * Nbr.t) list ->
+  Ast.parsing_compil ->
+  ast_compiled_data
 (** [compil_of_ast variable_overwrite ast]
 
-    @return the signature of agent, the contact map, the signature of
-    tokens, an algebraic variable finder, algebraic variable on which
-    constant propagation is forbidden, and an Ast.compil where identifiers
-    are integers and not string, syntactic sugar on rules are expansed
-    (syntactic sugar on mixture are not)
+    @return a [ast_compiled_data] instance: the signature of agent, the
+    contact map, the signature of tokens, an algebraic variable finder,
+    algebraic variable on which constant propagation is forbidden, and an
+    Ast.compil where identifiers are integers and not string, syntactic
+    sugar on rules are expansed (syntactic sugar on mixture are not)
 
     This function sorts out longest prefix convention as well as ensure a
     lot of sanity on mixtures:

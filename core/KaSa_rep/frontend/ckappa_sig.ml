@@ -40,9 +40,9 @@ type mixture =
   | EMPTY_MIX
 
 and agent = {
-  ag_nme: string;
+  agent_name: string;
   ag_intf: interface;
-  ag_nme_pos: position; (*; ag_pos:position*)
+  agent_name_pos: position; (*; ag_pos:position*)
 }
 
 and interface =
@@ -51,17 +51,17 @@ and interface =
   | COUNTER_SEP of counter * interface
 
 and port = {
-  port_nme: string;
+  port_name: string;
   port_int: internal;
-  port_lnk: link;
+  port_link: link;
   (*port_pos: position ;*)
   port_free: bool option;
 }
 
 and counter = {
-  count_nme: string;
-  count_test: counter_test option;
-  count_delta: int option;
+  counter_name: string;
+  counter_test: counter_test option;
+  counter_delta: int option;
 }
 
 and counter_test = CEQ of int | CGTE of int | CVAR of string | UNKNOWN
@@ -152,7 +152,7 @@ let dummy_site_name_minus1 = -1 (*REMOVE:Use in views_domain*)
 let dummy_state_index_1 = 1
 
 let dummy_agent =
-  { ag_nme = ""; ag_intf = EMPTY_INTF; ag_nme_pos = Locality.dummy }
+  { agent_name = ""; ag_intf = EMPTY_INTF; agent_name_pos = Locality.dummy }
 
 let dummy_link_value = 1
 let fst_site = 1
@@ -160,9 +160,9 @@ let snd_site = 2
 let string_of_agent_name (a : c_agent_name) : string = string_of_int a
 let int_of_agent_name (a : c_agent_name) : int = a
 let agent_name_of_int (a : int) : c_agent_name = a
-let _int_of_lnk_value (a : c_link_value) : int = a
+let _int_of_link_value (a : c_link_value) : int = a
 let lnk_value_of_int (a : int) : c_link_value = a
-let next_lnk_value (i : c_link_value) : c_link_value = i + 1
+let next_link_value (i : c_link_value) : c_link_value = i + 1
 let site_name_of_int (a : int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
 let string_of_site_name (a : c_site_name) : string = string_of_int a
@@ -210,8 +210,8 @@ let rename_link parameters error f link =
   | LNK_MISSING | FREE | LNK_ANY _ | LNK_SOME _ | LNK_TYPE _ -> error, link
 
 let rename_port parameters error f port =
-  let error, port_lnk = rename_link parameters error f port.port_lnk in
-  error, { port with port_lnk }
+  let error, port_link = rename_link parameters error f port.port_link in
+  error, { port with port_link }
 
 let rec rename_interface parameters error f interface =
   match interface with
@@ -335,12 +335,12 @@ let join_link parameters error link1 link2 =
 
 let join_port parameters error port1 port2 =
   if
-    port1.port_nme = port2.port_nme
+    port1.port_name = port2.port_name
     && port1.port_int = port2.port_int
     && port1.port_free = port2.port_free
   then (
-    let error, lnk = join_link parameters error port1.port_lnk port2.port_lnk in
-    error, { port1 with port_lnk = lnk }
+    let error, lnk = join_link parameters error port1.port_link port2.port_link in
+    error, { port1 with port_link = lnk }
   ) else
     Exception.warn parameters error __POS__ Exit port1
 
@@ -354,13 +354,13 @@ let join_counter_test parameters error test1 test2 =
 
 let join_counter parameters error counter1 counter2 =
   if
-    counter1.count_nme = counter2.count_nme
-    && counter1.count_delta = counter2.count_delta
+    counter1.counter_name = counter2.counter_name
+    && counter1.counter_delta = counter2.counter_delta
   then (
     let error, test =
-      join_counter_test parameters error counter1.count_test counter2.count_test
+      join_counter_test parameters error counter1.counter_test counter2.counter_test
     in
-    error, { counter1 with count_test = test }
+    error, { counter1 with counter_test = test }
   ) else
     Exception.warn parameters error __POS__ Exit counter1
 
@@ -393,11 +393,11 @@ let join_interface parameters error interface1 interface2 =
     | EMPTY_INTF -> map_ports, map_counters
     | COUNTER_SEP (counter, interface) ->
       let map_counters =
-        Mods.StringMap.add counter.count_nme counter map_counters
+        Mods.StringMap.add counter.counter_name counter map_counters
       in
       collect interface map_ports map_counters
     | PORT_SEP (port, interface) ->
-      let map_ports = Mods.StringMap.add port.port_nme port map_ports in
+      let map_ports = Mods.StringMap.add port.port_name port map_ports in
       collect interface map_ports map_counters
   in
   let map_ports_1, map_counters_1 =
@@ -437,14 +437,14 @@ let join_interface parameters error interface1 interface2 =
   error, rev_interface_of_list list
 
 let join_agent parameters error agent1 agent2 =
-  if agent1.ag_nme = agent2.ag_nme then (
+  if agent1.agent_name = agent2.agent_name then (
     let error, interface =
       join_interface parameters error agent1.ag_intf agent2.ag_intf
     in
     error, { agent1 with ag_intf = interface }
   ) else
     Exception.warn parameters error __POS__
-      ?message:(Some (agent1.ag_nme ^ agent2.ag_nme))
+      ?message:(Some (agent1.agent_name ^ agent2.agent_name))
       Exit dummy_agent
 
 let rec join_mixture parameters error mixture1 mixture2 =
@@ -471,7 +471,7 @@ let rec join_mixture parameters error mixture1 mixture2 =
     Exception.warn parameters error __POS__ Exit EMPTY_MIX
 
 let add_agent parameters error agent_id agent_name mixture =
-  let agent = { dummy_agent with ag_nme = agent_name } in
+  let agent = { dummy_agent with agent_name = agent_name } in
   let k = int_of_agent_id agent_id in
   let rec aux k mixture =
     match mixture with
@@ -559,7 +559,7 @@ let rec has_site x interface =
   | EMPTY_INTF -> false
   | COUNTER_SEP (_, intf) -> has_site x intf
   | PORT_SEP (p, intf) ->
-    if p.port_nme = x then
+    if p.port_name = x then
       true
     else
       has_site x intf
@@ -569,7 +569,7 @@ let rec has_counter x interface =
   | EMPTY_INTF -> false
   | PORT_SEP (_, intf) -> has_site x intf
   | COUNTER_SEP (c, intf) ->
-    if c.count_nme = x then
+    if c.counter_name = x then
       true
     else
       has_counter x intf
@@ -582,8 +582,8 @@ let add_site parameters error agent_id site_name mixture =
       else (
         let port =
           {
-            port_nme = site_name;
-            port_lnk = LNK_ANY Locality.dummy;
+            port_name = site_name;
+            port_link = LNK_ANY Locality.dummy;
             port_int = [];
             port_free = None;
           }
@@ -600,7 +600,7 @@ let add_counter parameters error agent_id counter_name mixture =
         error, agent
       else (
         let counter =
-          { count_nme = counter_name; count_test = None; count_delta = None }
+          { counter_name = counter_name; counter_test = None; counter_delta = None }
         in
         let interface = COUNTER_SEP (counter, agent.ag_intf) in
         error, { agent with ag_intf = interface }
@@ -617,7 +617,7 @@ let mod_site_gen parameters error agent_id site_name f mixture =
           let error, intf = aux intf in
           error, COUNTER_SEP (counter, intf)
         | PORT_SEP (port, intf) ->
-          if port.port_nme = site_name then (
+          if port.port_name = site_name then (
             let error, port = f parameters error port in
             error, PORT_SEP (port, intf)
           ) else (
@@ -633,9 +633,9 @@ let add_binding_state parameters error agent_id site_name p state bool_opt
     mixture =
   mod_site_gen parameters error agent_id site_name
     (fun parameters error port ->
-      let error, b = p parameters error port.port_lnk in
+      let error, b = p parameters error port.port_link in
       if b then
-        error, { port with port_lnk = state; port_free = bool_opt }
+        error, { port with port_link = state; port_free = bool_opt }
       else
         Exception.warn parameters error __POS__ Exit port)
     mixture
@@ -688,7 +688,7 @@ let rec get_agent_name parameters error k mixture =
   | COMMA (agent, mixture) | DOT (_, agent, mixture) | PLUS (_, agent, mixture)
     ->
     if k = 0 then
-      error, agent.ag_nme
+      error, agent.agent_name
     else
       get_agent_name parameters error (k - 1) mixture
   | EMPTY_MIX -> Exception.warn parameters error __POS__ Exit ""

@@ -236,6 +236,7 @@ let computing_watcher manager setter =
 
 let add_project is_new project_id : unit Api.result Lwt.t =
   let state_va = React.S.value state in
+  (* TODO: Is it ok to get the value like this ? *)
   let catalog = state_va.project_catalog in
   (try
      Lwt.return

@@ -726,9 +726,10 @@ let agent_to_erased sigs r =
       | Some _ -> Some (Array.copy ra_ports, Array.copy ra_ints));
   }
 
-let to_erased sigs x = List.map (agent_to_erased sigs) x
+let to_erased (sigs : Signature.s) (x : rule_mixture) : rule_mixture =
+  List.map (agent_to_erased sigs) x
 
-let to_maintained x =
+let to_maintained (x : rule_mixture) : rule_mixture =
   List.map
     (fun r ->
       let ports = Array.map (fun (a, _) -> a, Maintained) r.ra_ports in
@@ -766,14 +767,14 @@ let to_raw_mixture sigs x =
         Array.mapi
           (fun j -> function
             | (LNK_SOME, pos | LNK_TYPE _, pos), _ ->
-              let ag_na =
+              let agent_name =
                 Format.asprintf "%a" (Signature.print_agent sigs) r.ra_type
               in
-              let p_na =
+              let port_name =
                 Format.asprintf "%a" (Signature.print_site sigs r.ra_type) j
               in
-              not_enough_specified ~status:"linking" ~side:"left" ag_na
-                (p_na, pos)
+              not_enough_specified ~status:"linking" ~side:"left" agent_name
+                (port_name, pos)
             | (LNK_VALUE (i, _), _), _ -> Raw_mixture.VAL i
             | ((LNK_ANY | ANY_FREE | LNK_FREE), _), _ -> Raw_mixture.FREE)
           r.ra_ports

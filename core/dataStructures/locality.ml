@@ -7,10 +7,8 @@
 (******************************************************************************)
 
 type position = { chr: int; line: int }
-type range = { file: string; from_position: position; to_position: position }
-type t = range
+type t = { file: string; from_position: position; to_position: position }
 type 'a annot = 'a * t
-type 'a maybe = ?pos:t -> 'a
 
 let of_pos start_location end_location =
   let () =

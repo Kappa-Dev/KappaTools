@@ -453,45 +453,45 @@ counter_test:
 port_expression:
     | ID internal_state link_state_mod
 	 { Ast.Port
-	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
-	    Ast.port_int_mod = None; Ast.port_lnk_mod = $3; } }
+	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=[];
+	    Ast.port_int_mod = None; Ast.port_link_mod = $3; } }
     | ID internal_state link_state link_state_mod
 	 { Ast.Port
-	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3;
-	    Ast.port_int_mod = None; Ast.port_lnk_mod = $4; } }
+	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=$3;
+	    Ast.port_int_mod = None; Ast.port_link_mod = $4; } }
     | ID internal_state DIV KAPPA_MRK link_state_mod
 	 { Ast.Port
-	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
-	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $5; } }
+	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=[];
+	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_link_mod = $5; } }
     | ID internal_state DIV KAPPA_MRK link_state link_state_mod
 	 { Ast.Port
-	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$5;
-	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $6; } }
+	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=$5;
+	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_link_mod = $6; } }
     | ID PLUS EQUAL INT
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = None;
-	   Ast.count_delta = ($4,rhs_pos 4)} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = None;
+	   Ast.counter_delta = ($4,rhs_pos 4)} }
     | ID PLUS EQUAL MINUS INT
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = None;
-	   Ast.count_delta = (-$5,rhs_pos 5)} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = None;
+	   Ast.counter_delta = (-$5,rhs_pos 5)} }
     | ID counter_test PLUS EQUAL INT
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = $2;
-	   Ast.count_delta = ($5,rhs_pos 5)} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = $2;
+	   Ast.counter_delta = ($5,rhs_pos 5)} }
    | ID counter_test PLUS EQUAL MINUS INT
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = $2;
-	   Ast.count_delta = (- $6,rhs_pos 6)} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = $2;
+	   Ast.counter_delta = (- $6,rhs_pos 6)} }
    | ID counter_test
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = $2;
-	   Ast.count_delta = Locality.dummy_annot 0} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = $2;
+	   Ast.counter_delta = Locality.dummy_annot 0} }
     ;
 
 internal_state:

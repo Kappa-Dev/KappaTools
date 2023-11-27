@@ -149,7 +149,7 @@ let print_port parameter error port =
   let _ =
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
-      "%s" port.Ckappa_sig.port_nme
+      "%s" port.Ckappa_sig.port_name
   in
   let _ =
     List.iter
@@ -165,17 +165,17 @@ let print_port parameter error port =
           (Remanent_parameters.get_close_internal_state parameter))
       port.Ckappa_sig.port_int
   in
-  let error = print_link_state parameter error port.Ckappa_sig.port_lnk in
+  let error = print_link_state parameter error port.Ckappa_sig.port_link in
   error
 
 let print_counter parameter error counter =
   let _ =
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
-      "%s" counter.Ckappa_sig.count_nme
+      "%s" counter.Ckappa_sig.counter_name
   in
   let _ =
-    match counter.Ckappa_sig.count_test with
+    match counter.Ckappa_sig.counter_test with
     | Some (Ckappa_sig.CEQ n) ->
       Loggers.fprintf
         (Remanent_parameters.get_logger parameter)
@@ -203,7 +203,7 @@ let print_counter parameter error counter =
     | Some Ckappa_sig.UNKNOWN | None -> ()
   in
   let () =
-    match counter.Ckappa_sig.count_delta with
+    match counter.Ckappa_sig.counter_delta with
     | Some 0 | None -> ()
     | Some n when n > 0 ->
       Loggers.fprintf
@@ -249,7 +249,7 @@ let print_agent parameter error agent =
   let () =
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
-      "%s%s" agent.Ckappa_sig.ag_nme
+      "%s%s" agent.Ckappa_sig.agent_name
       (Remanent_parameters.get_agent_open_symbol parameter)
   in
   let error = print_interface parameter error agent.Ckappa_sig.ag_intf in

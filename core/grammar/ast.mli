@@ -14,19 +14,20 @@ val merge_version : syntax_version -> syntax_version -> syntax_version
 type internal = string option Locality.annot list
 
 type port = {
-  port_nme: string Locality.annot;
+  (* TODO clarify what all this means *)
+  port_name: string Locality.annot;
   port_int: internal;
   port_int_mod: string Locality.annot option;
-  port_lnk: (string Locality.annot, unit) LKappa.link Locality.annot list;
-  port_lnk_mod: int Locality.annot option option;
+  port_link: (string Locality.annot, unit) LKappa.link Locality.annot list;
+  port_link_mod: int Locality.annot option option;
 }
 
 type counter_test = CEQ of int | CGTE of int | CVAR of string
 
 type counter = {
-  count_nme: string Locality.annot;
-  count_test: counter_test Locality.annot option;
-  count_delta: int Locality.annot;
+  counter_name: string Locality.annot;
+  counter_test: counter_test Locality.annot option;
+  counter_delta: int Locality.annot;
 }
 
 type site = Port of port | Counter of counter
@@ -58,8 +59,10 @@ type arrow_notation = {
 type rule_content = Edit of edit_notation | Arrow of arrow_notation
 
 type rule = {
+  (* TODO: is rewrite good naming ? as it contains the rule content, independently of the syntax, also rewrite vs edit *)
   rewrite: rule_content;
   bidirectional: bool;
+  (* rates *)
   k_def: (mixture, string) Alg_expr.e Locality.annot;
   k_un:
     ((mixture, string) Alg_expr.e Locality.annot

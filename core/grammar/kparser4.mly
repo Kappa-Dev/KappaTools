@@ -141,35 +141,35 @@ site_counter:
 
 site:
   | ID annot OP_BRA site_link annot OP_CUR annot site_internal annot
-    { let (port_lnk, port_lnk_mod) = $4 in
+    { let (port_link, port_link_mod) = $4 in
       let (port_int, port_int_mod) = $8 in
       Ast.Port
-        { Ast.port_nme=($1,rhs_pos 1); Ast.port_int;
-          Ast.port_lnk; Ast.port_int_mod; Ast.port_lnk_mod; } }
+        { Ast.port_name=($1,rhs_pos 1); Ast.port_int;
+          Ast.port_link; Ast.port_int_mod; Ast.port_link_mod; } }
   | ID annot OP_CUR annot site_internal annot OP_BRA site_link annot
     { let (port_int, port_int_mod) = $5 in
-      let (port_lnk, port_lnk_mod) = $8 in
+      let (port_link, port_link_mod) = $8 in
       Ast.Port
-        { Ast.port_nme=($1,rhs_pos 1); Ast.port_int;
-          Ast.port_lnk; Ast.port_int_mod; Ast.port_lnk_mod; } }
+        { Ast.port_name=($1,rhs_pos 1); Ast.port_int;
+          Ast.port_link; Ast.port_int_mod; Ast.port_link_mod; } }
   | ID annot OP_BRA site_link annot
-    { let (port_lnk, port_lnk_mod) = $4 in
+    { let (port_link, port_link_mod) = $4 in
       Ast.Port
-        { Ast.port_nme=($1,rhs_pos 1); Ast.port_int=[];
-          Ast.port_lnk; Ast.port_int_mod=None; Ast.port_lnk_mod; } }
+        { Ast.port_name=($1,rhs_pos 1); Ast.port_int=[];
+          Ast.port_link; Ast.port_int_mod=None; Ast.port_link_mod; } }
   | ID annot OP_CUR annot site_internal annot
     { let (port_int, port_int_mod) = $5 in
       Ast.Port
-        { Ast.port_nme=($1,rhs_pos 1);Ast.port_lnk=[];
-          Ast.port_int; Ast.port_int_mod; Ast.port_lnk_mod=None; } }
+        { Ast.port_name=($1,rhs_pos 1);Ast.port_link=[];
+          Ast.port_int; Ast.port_int_mod; Ast.port_link_mod=None; } }
   | ID annot OP_CUR annot site_counter
-    { let (count_test,count_delta) = $5 in
+    { let (counter_test,counter_delta) = $5 in
       Ast.Counter
-        { Ast.count_nme=($1,rhs_pos 1); Ast.count_test; Ast.count_delta } }
+        { Ast.counter_name=($1,rhs_pos 1); Ast.counter_test; Ast.counter_delta } }
   | ID annot
     { Ast.Port
-        { Ast.port_nme=($1,rhs_pos 1);Ast.port_lnk=[]; Ast.port_int=[];
-          Ast.port_int_mod=None; Ast.port_lnk_mod=None; } }
+        { Ast.port_name=($1,rhs_pos 1);Ast.port_link=[]; Ast.port_int=[];
+          Ast.port_int_mod=None; Ast.port_link_mod=None; } }
   ;
 
 interface:

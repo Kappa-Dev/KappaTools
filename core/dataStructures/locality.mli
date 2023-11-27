@@ -6,22 +6,26 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+(** Module for type Locality.t annotating structured data with the line range
+ * in a file which was used to define it *)
+
 type position = { chr: int; line: int }
-type range = { file: string; from_position: position; to_position: position }
-type t = range
+type t = { file: string; from_position: position; to_position: position }
 type 'a annot = 'a * t
-type 'a maybe = ?pos:t -> 'a
 
 val of_pos : Lexing.position -> Lexing.position -> t
 val dummy : t
 val dummy_annot : 'a -> 'a annot
 val has_dummy_annot : 'a annot -> bool
 
-val merge : range -> range -> range
+val merge : t -> t -> t
 (** [merge b e] creates the range from beginning of [b] to the end of [e]
  (filename must match) *)
 
-val is_included_in : string -> position -> range -> bool
+val is_included_in : string -> position -> t -> bool
+
+(** {2 I/O} *)
+
 val to_string : t -> string
 val print : Format.formatter -> t -> unit
 

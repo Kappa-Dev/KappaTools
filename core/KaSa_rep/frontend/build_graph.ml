@@ -330,7 +330,7 @@ let add_link parameters error agent_id site_name agent_id' site_name'
     in_progress =
   let handler = in_progress.kappa_handler in
   let lnk_id = in_progress.fresh_bond_id in
-  let fresh_bond_id = Ckappa_sig.next_lnk_value in_progress.fresh_bond_id in
+  let fresh_bond_id = Ckappa_sig.next_link_value in_progress.fresh_bond_id in
   let error, mixture =
     add_link parameters error handler in_progress.cckappa_only agent_id
       site_name agent_id' site_name' lnk_id in_progress.mixture

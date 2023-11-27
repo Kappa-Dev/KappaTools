@@ -16,19 +16,20 @@ let merge_version a b =
 type internal = string option Locality.annot list
 
 type port = {
-  port_nme: string Locality.annot;
+  port_name: string Locality.annot;
   port_int: internal;
   port_int_mod: string Locality.annot option;
-  port_lnk: (string Locality.annot, unit) LKappa.link Locality.annot list;
-  port_lnk_mod: int Locality.annot option option;
+  port_link: (string Locality.annot, unit) LKappa.link Locality.annot list;
+  port_link_mod: int Locality.annot option option;
 }
 
+(* TODO counter to test equality, greater ou var? *)
 type counter_test = CEQ of int | CGTE of int | CVAR of string
 
 type counter = {
-  count_nme: string Locality.annot;
-  count_test: counter_test Locality.annot option;
-  count_delta: int Locality.annot;
+  counter_name: string Locality.annot;
+  counter_test: counter_test Locality.annot option;
+  counter_delta: int Locality.annot;
 }
 
 type site = Port of port | Counter of counter
@@ -137,15 +138,15 @@ type ('pattern, 'mixture, 'id, 'rule) command =
 type ('agent, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
-  (*pattern declaration for reusing as variable in perturbations
-    or kinetic rate*)
-  signatures: 'agent list; (*agent signature declaration*)
+  (** pattern declaration for reusing as variable in perturbations
+    or kinetic rate *)
+  signatures: 'agent list; (** agent signature declaration *)
   rules: (string Locality.annot option * 'rule Locality.annot) list;
-  (*rules (possibly named)*)
+  (** rules (possibly named) *)
   observables: ('pattern, 'id) Alg_expr.e Locality.annot list;
-  (*list of patterns to plot*)
+  (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statment list;
-  (*initial graph declaration*)
+  (** initial graph declaration *)
   perturbations: ('pattern, 'mixture, 'id, 'rule) perturbation list;
   configurations: configuration list;
   tokens: string Locality.annot list;
@@ -163,16 +164,16 @@ let no_more_site_on_right error left right =
         List.exists
           (function
             | Counter _ -> false
-            | Port p' -> fst p.port_nme = fst p'.port_nme)
+            | Port p' -> fst p.port_name = fst p'.port_name)
           left
         ||
         let () =
           if error then
             raise
               (ExceptionDefn.Malformed_Decl
-                 ( "Site '" ^ fst p.port_nme
+                 ( "Site '" ^ fst p.port_name
                    ^ "' was not mentionned in the left-hand side.",
-                   snd p.port_nme ))
+                   snd p.port_name ))
         in
         false)
     right
@@ -232,11 +233,11 @@ let print_ast_internal mod_i f l =
       mod_i
 
 let print_ast_port f p =
-  Format.fprintf f "%s%a%a" (fst p.port_nme)
+  Format.fprintf f "%s%a%a" (fst p.port_name)
     (print_ast_internal p.port_int_mod)
     p.port_int
-    (print_ast_link p.port_lnk_mod)
-    p.port_lnk
+    (print_ast_link p.port_link_mod)
+    p.port_link
 
 let print_counter_test f = function
   | CEQ x, _ -> Format.fprintf f "=%i" x
@@ -250,11 +251,11 @@ let print_counter_delta test f (delta, _) =
       test delta
 
 let print_counter f c =
-  Format.fprintf f "%s{%a%a}" (fst c.count_nme)
+  Format.fprintf f "%s{%a%a}" (fst c.counter_name)
     (Pp.option ~with_space:false print_counter_test)
-    c.count_test
-    (print_counter_delta c.count_test)
-    c.count_delta
+    c.counter_test
+    (print_counter_delta c.counter_test)
+    c.counter_delta
 
 let print_ast_site f = function
   | Port p -> print_ast_port f p
@@ -301,7 +302,7 @@ let port_to_json filenames p =
   in
   JsonUtil.smart_assoc
     [
-      "port_nme", string_annot_to_json filenames p.port_nme;
+      "port_name", string_annot_to_json filenames p.port_name;
       ( "port_int",
         JsonUtil.smart_assoc
           [
@@ -311,7 +312,7 @@ let port_to_json filenames p =
                 p.port_int );
             "mod", mod_i p.port_int_mod;
           ] );
-      ( "port_lnk",
+      ( "port_link",
         JsonUtil.smart_assoc
           [
             ( "state",
@@ -321,8 +322,8 @@ let port_to_json filenames p =
                       (fun _ -> string_annot_to_json filenames)
                       (string_annot_to_json filenames)
                       (fun () -> [])))
-                p.port_lnk );
-            "mod", mod_l p.port_lnk_mod;
+                p.port_link );
+            "mod", mod_l p.port_link_mod;
           ] );
     ]
 
@@ -351,7 +352,7 @@ let build_port_of_json filenames n i l =
       JsonUtil.to_list (string_option_annot_of_json filenames) i, mod_i m
     | _ -> raise (Yojson.Basic.Util.Type_error ("Not internal states", i))
   in
-  let port_lnk, port_lnk_mod =
+  let port_link, port_link_mod =
     match l with
     | `Assoc [] | `Null -> [], None
     | `Assoc [ ("state", l) ] ->
@@ -378,45 +379,45 @@ let build_port_of_json filenames n i l =
   in
   Port
     {
-      port_nme = string_annot_of_json filenames n;
+      port_name = string_annot_of_json filenames n;
       port_int;
       port_int_mod;
-      port_lnk;
-      port_lnk_mod;
+      port_link;
+      port_link_mod;
     }
 
 let site_of_json filenames = function
-  | `Assoc [ ("count_nme", n); ("count_test", t); ("count_delta", d) ]
-  | `Assoc [ ("count_nme", n); ("count_delta", d); ("count_test", t) ]
-  | `Assoc [ ("count_test", t); ("count_nme", n); ("count_delta", d) ]
-  | `Assoc [ ("count_test", t); ("count_delta", d); ("count_nme", n) ]
-  | `Assoc [ ("count_delta", d); ("count_nme", n); ("count_test", t) ]
-  | `Assoc [ ("count_delta", d); ("count_test", t); ("count_nme", n) ] ->
+  | `Assoc [ ("counter_name", n); ("counter_test", t); ("counter_delta", d) ]
+  | `Assoc [ ("counter_name", n); ("counter_delta", d); ("counter_test", t) ]
+  | `Assoc [ ("counter_test", t); ("counter_name", n); ("counter_delta", d) ]
+  | `Assoc [ ("counter_test", t); ("counter_delta", d); ("counter_name", n) ]
+  | `Assoc [ ("counter_delta", d); ("counter_name", n); ("counter_test", t) ]
+  | `Assoc [ ("counter_delta", d); ("counter_test", t); ("counter_name", n) ] ->
     Counter
       {
-        count_nme =
+        counter_name =
           Locality.annot_of_yojson ~filenames Yojson.Basic.Util.to_string n;
-        count_test =
+        counter_test =
           JsonUtil.to_option
             (Locality.annot_of_yojson ~filenames counter_test_of_json)
             t;
-        count_delta =
+        counter_delta =
           Locality.annot_of_yojson ~filenames Yojson.Basic.Util.to_int d;
       }
-  | `Assoc [ ("port_nme", n); ("port_int", i); ("port_lnk", l) ]
-  | `Assoc [ ("port_nme", n); ("port_lnk", l); ("port_int", i) ]
-  | `Assoc [ ("port_int", i); ("port_nme", n); ("port_lnk", l) ]
-  | `Assoc [ ("port_lnk", l); ("port_nme", n); ("port_int", i) ]
-  | `Assoc [ ("port_int", i); ("port_lnk", l); ("port_nme", n) ]
-  | `Assoc [ ("port_lnk", l); ("port_int", i); ("port_nme", n) ] ->
+  | `Assoc [ ("port_name", n); ("port_int", i); ("port_link", l) ]
+  | `Assoc [ ("port_name", n); ("port_link", l); ("port_int", i) ]
+  | `Assoc [ ("port_int", i); ("port_name", n); ("port_link", l) ]
+  | `Assoc [ ("port_link", l); ("port_name", n); ("port_int", i) ]
+  | `Assoc [ ("port_int", i); ("port_link", l); ("port_name", n) ]
+  | `Assoc [ ("port_link", l); ("port_int", i); ("port_name", n) ] ->
     build_port_of_json filenames n i l
-  | `Assoc [ ("port_nme", n); ("port_int", i) ]
-  | `Assoc [ ("port_int", i); ("port_nme", n) ] ->
+  | `Assoc [ ("port_name", n); ("port_int", i) ]
+  | `Assoc [ ("port_int", i); ("port_name", n) ] ->
     build_port_of_json filenames n i `Null
-  | `Assoc [ ("port_nme", n); ("port_lnk", l) ]
-  | `Assoc [ ("port_lnk", l); ("port_nme", n) ] ->
+  | `Assoc [ ("port_name", n); ("port_link", l) ]
+  | `Assoc [ ("port_link", l); ("port_name", n) ] ->
     build_port_of_json filenames n `Null l
-  | `Assoc [ ("port_nme", n) ] -> build_port_of_json filenames n `Null `Null
+  | `Assoc [ ("port_name", n) ] -> build_port_of_json filenames n `Null `Null
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
 
 let site_to_json filenames = function
@@ -424,14 +425,14 @@ let site_to_json filenames = function
   | Counter c ->
     `Assoc
       [
-        ( "count_nme",
-          Locality.annot_to_yojson ~filenames JsonUtil.of_string c.count_nme );
-        ( "count_test",
+        ( "counter_name",
+          Locality.annot_to_yojson ~filenames JsonUtil.of_string c.counter_name );
+        ( "counter_test",
           JsonUtil.of_option
             (Locality.annot_to_yojson ~filenames counter_test_to_json)
-            c.count_test );
-        ( "count_delta",
-          Locality.annot_to_yojson ~filenames JsonUtil.of_int c.count_delta );
+            c.counter_test );
+        ( "counter_delta",
+          Locality.annot_to_yojson ~filenames JsonUtil.of_int c.counter_delta );
       ]
 
 let print_agent_mod f = function
@@ -440,8 +441,8 @@ let print_agent_mod f = function
 
 let print_ast_agent f = function
   | Absent _ -> Format.pp_print_string f "."
-  | Present ((ag_na, _), l, m) ->
-    Format.fprintf f "%s(%a)%a" ag_na
+  | Present ((agent_name, _), l, m) ->
+    Format.fprintf f "%s(%a)%a" agent_name
       (Pp.list (fun f -> Format.fprintf f " ") print_ast_site)
       l
       (Pp.option ~with_space:false print_agent_mod)
@@ -535,19 +536,19 @@ let to_dummy_user_internal = function
   | _ :: _ :: _ as l -> Some (List_util.map_option fst l)
 
 let to_dummy_user_site = function
-  | Port { port_nme; port_int; port_int_mod = _; port_lnk; port_lnk_mod = _ } ->
+  | Port { port_name; port_int; port_int_mod = _; port_link; port_link_mod = _ } ->
     {
-      User_graph.site_name = fst port_nme;
+      User_graph.site_name = fst port_name;
       User_graph.site_type =
         User_graph.Port
           {
-            User_graph.port_links = to_dummy_user_link port_lnk;
+            User_graph.port_links = to_dummy_user_link port_link;
             User_graph.port_states = to_dummy_user_internal port_int;
           };
     }
-  | Counter { count_nme; count_test = _; count_delta = _ } ->
+  | Counter { counter_name; counter_test = _; counter_delta = _ } ->
     {
-      User_graph.site_name = fst count_nme;
+      User_graph.site_name = fst counter_name;
       User_graph.site_type = User_graph.Counter (-1);
       (* TODO *)
     }
@@ -1174,12 +1175,12 @@ let merge_internals =
 
 let rec merge_sites_counter c = function
   | [] -> [ Counter c ]
-  | Counter c' :: _ as l when fst c.count_nme = fst c'.count_nme -> l
+  | Counter c' :: _ as l when fst c.counter_name = fst c'.counter_name -> l
   | ((Port _ | Counter _) as h) :: t -> h :: merge_sites_counter c t
 
 let rec merge_sites_port p = function
-  | [] -> [ Port { p with port_lnk = [] } ]
-  | Port h :: t when fst p.port_nme = fst h.port_nme ->
+  | [] -> [ Port { p with port_link = [] } ]
+  | Port h :: t when fst p.port_name = fst h.port_name ->
     Port
       {
         h with
@@ -1208,7 +1209,7 @@ let merge_agents =
                  ( x,
                    List.map
                      (function
-                       | Port p -> Port { p with port_lnk = [] }
+                       | Port p -> Port { p with port_link = [] }
                        | Counter _ as x -> x)
                      s,
                    None );
@@ -1288,35 +1289,35 @@ let split_mixture m =
                       | Port p ->
                         ( Port
                             {
-                              port_nme = p.port_nme;
+                              port_name = p.port_name;
                               port_int = p.port_int;
                               port_int_mod = None;
-                              port_lnk = p.port_lnk;
-                              port_lnk_mod = None;
+                              port_link = p.port_link;
+                              port_link_mod = None;
                             }
                           :: l,
                           Port
                             {
-                              port_nme = p.port_nme;
+                              port_name = p.port_name;
                               port_int =
                                 (match p.port_int_mod with
                                 | None -> p.port_int
                                 | Some (x, pos) -> [ Some x, pos ]);
                               port_int_mod = None;
-                              port_lnk =
-                                (match p.port_lnk_mod with
-                                | None -> p.port_lnk
+                              port_link =
+                                (match p.port_link_mod with
+                                | None -> p.port_link
                                 | Some None ->
                                   [ Locality.dummy_annot LKappa.LNK_FREE ]
                                 | Some (Some (i, pos)) ->
                                   [ LKappa.LNK_VALUE (i, ()), pos ]);
-                              port_lnk_mod = None;
+                              port_link_mod = None;
                             }
                           :: r )
                       | Counter c ->
-                        ( Counter { c with count_delta = Locality.dummy_annot 0 }
+                        ( Counter { c with counter_delta = Locality.dummy_annot 0 }
                           :: l,
-                          Counter { c with count_test = None } :: r ))
+                          Counter { c with counter_test = None } :: r ))
                     ([], []) intf
                 in
                 ( Present (na, intfl, None) :: lhs,

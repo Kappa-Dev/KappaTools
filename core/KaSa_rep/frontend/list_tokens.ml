@@ -92,12 +92,12 @@ let add_agent_declaration parameters error handler agent_id pos_opt =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
         error agent_id handler.Cckappa_sig.agents_annotation
     in
-    let error, (ag_name, list) =
+    let error, (agent_name, list) =
       match info_opt with
       | None -> Exception.warn parameters error __POS__ Exit ("", [])
       | Some info -> error, info
     in
-    let agent_annotation = ag_name, pos :: list in
+    let agent_annotation = agent_name, pos :: list in
     let error, agents_annotation =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set parameters
         error agent_id agent_annotation handler.Cckappa_sig.agents_annotation
@@ -287,8 +287,8 @@ let declare_dual parameter error handler ag site state ag' site' state' =
 
 let scan_agent parameters (error, handler) agent =
   let error, (handler, ag_id) =
-    declare_agent parameters error handler agent.Ckappa_sig.ag_nme
-      (Some agent.Ckappa_sig.ag_nme_pos)
+    declare_agent parameters error handler agent.Ckappa_sig.agent_name
+      (Some agent.Ckappa_sig.agent_name_pos)
   in
   let rec aux error interface handler =
     match interface with
@@ -296,11 +296,11 @@ let scan_agent parameters (error, handler) agent =
     | Ckappa_sig.COUNTER_SEP (counter, interface) ->
       let error, (handler, _, _c) =
         declare_site_with_counter parameters (error, handler) ag_id
-          counter.Ckappa_sig.count_nme
+          counter.Ckappa_sig.counter_name
       in
       aux error interface handler
     | Ckappa_sig.PORT_SEP (port, interface) ->
-      let site_name = port.Ckappa_sig.port_nme in
+      let site_name = port.Ckappa_sig.port_name in
       let error, handler =
         match port.Ckappa_sig.port_int with
         | [] -> error, handler
@@ -320,7 +320,7 @@ let scan_agent parameters (error, handler) agent =
           error, handler
       in
       let error, handler =
-        match port.Ckappa_sig.port_lnk with
+        match port.Ckappa_sig.port_link with
         | Ckappa_sig.LNK_MISSING | Ckappa_sig.FREE | Ckappa_sig.LNK_ANY _ ->
           error, handler
         | Ckappa_sig.LNK_VALUE (_, agent', site', _, _)
