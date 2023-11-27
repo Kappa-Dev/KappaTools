@@ -17,7 +17,7 @@ module Int_Set_and_Map = Map_wrapper.Make (Mods.IntSetMap)
 let local_trace = true
 let _ = local_trace
 
-type position = Locality.t
+type position = Loc.t
 type agent_name = string
 type site_name = string
 type internal_state = string
@@ -72,7 +72,7 @@ and link =
   | FREE
   | LNK_ANY of position
   | LNK_SOME of position
-  | LNK_TYPE of (string Locality.annoted * string Locality.annoted)
+  | LNK_TYPE of (string Loc.annoted * string Loc.annoted)
   | LNK_MISSING
 
 let rec skip_only mix =
@@ -84,7 +84,7 @@ let rec skip_only mix =
 type direction = Direct | Reverse
 
 type 'pattern rule = {
-  position: Locality.t;
+  position: Loc.t;
   prefix: int;
   interprete_delta: direction;
   delta: int;
@@ -95,8 +95,8 @@ type 'pattern rule = {
         substract delta to agents with id >= prefix in the lhs *)
   lhs: 'pattern;
   rhs: 'pattern;
-  k_def: ('pattern, string) Alg_expr.e Locality.annoted;
-  k_un: ('pattern, string) Alg_expr.e Locality.annoted option;
+  k_def: ('pattern, string) Alg_expr.e Loc.annoted;
+  k_un: ('pattern, string) Alg_expr.e Loc.annoted option;
   ast: string;
   ast_no_rate: string;
   original_ast: string;
@@ -152,7 +152,7 @@ let dummy_site_name_minus1 = -1 (*REMOVE:Use in views_domain*)
 let dummy_state_index_1 = 1
 
 let dummy_agent =
-  { agent_name = ""; ag_intf = EMPTY_INTF; agent_name_pos = Locality.dummy }
+  { agent_name = ""; ag_intf = EMPTY_INTF; agent_name_pos = Loc.dummy }
 
 let dummy_link_value = 1
 let fst_site = 1
@@ -312,14 +312,14 @@ let join_link parameters error link1 link2 =
     | (LNK_ANY _ | LNK_MISSING), _ -> error, link2
     | _, (LNK_ANY _ | LNK_MISSING) -> error, link1
     | FREE, _ | _, FREE ->
-      Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
+      Exception.warn parameters error __POS__ Exit (LNK_ANY Loc.dummy)
     | LNK_SOME _, _ -> error, link2
     | _, LNK_SOME _ -> error, link1
     | LNK_TYPE ((a, _), (b, _)), LNK_TYPE ((a', _), (b', _))
       when a = a' && b = b' ->
       error, link1
     | LNK_TYPE _, LNK_TYPE _ ->
-      Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
+      Exception.warn parameters error __POS__ Exit (LNK_ANY Loc.dummy)
     | LNK_VALUE (_, x, y, _, _), LNK_TYPE ((a, _), (b, _)) when x = a && b = y
       ->
       error, link1
@@ -330,7 +330,7 @@ let join_link parameters error link1 link2 =
       when ag = ag' && x = x' && y = y' ->
       error, link1
     | (LNK_VALUE _ | LNK_TYPE _), (LNK_VALUE _ | LNK_TYPE _) ->
-      Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
+      Exception.warn parameters error __POS__ Exit (LNK_ANY Loc.dummy)
   )
 
 let join_port parameters error port1 port2 =
@@ -339,7 +339,9 @@ let join_port parameters error port1 port2 =
     && port1.port_int = port2.port_int
     && port1.port_free = port2.port_free
   then (
-    let error, lnk = join_link parameters error port1.port_link port2.port_link in
+    let error, lnk =
+      join_link parameters error port1.port_link port2.port_link
+    in
     error, { port1 with port_link = lnk }
   ) else
     Exception.warn parameters error __POS__ Exit port1
@@ -358,7 +360,8 @@ let join_counter parameters error counter1 counter2 =
     && counter1.counter_delta = counter2.counter_delta
   then (
     let error, test =
-      join_counter_test parameters error counter1.counter_test counter2.counter_test
+      join_counter_test parameters error counter1.counter_test
+        counter2.counter_test
     in
     error, { counter1 with counter_test = test }
   ) else
@@ -471,7 +474,7 @@ let rec join_mixture parameters error mixture1 mixture2 =
     Exception.warn parameters error __POS__ Exit EMPTY_MIX
 
 let add_agent parameters error agent_id agent_name mixture =
-  let agent = { dummy_agent with agent_name = agent_name } in
+  let agent = { dummy_agent with agent_name } in
   let k = int_of_agent_id agent_id in
   let rec aux k mixture =
     match mixture with
@@ -583,7 +586,7 @@ let add_site parameters error agent_id site_name mixture =
         let port =
           {
             port_name = site_name;
-            port_link = LNK_ANY Locality.dummy;
+            port_link = LNK_ANY Loc.dummy;
             port_int = [];
             port_free = None;
           }
@@ -600,7 +603,7 @@ let add_counter parameters error agent_id counter_name mixture =
         error, agent
       else (
         let counter =
-          { counter_name = counter_name; counter_test = None; counter_delta = None }
+          { counter_name; counter_test = None; counter_delta = None }
         in
         let interface = COUNTER_SEP (counter, agent.ag_intf) in
         error, { agent with ag_intf = interface }
@@ -655,7 +658,7 @@ let add_binding_type parameters error agent_id site_name agent_name' site_name'
       match lnk with
       | LNK_MISSING | LNK_SOME _ | LNK_ANY _ -> error, true
       | FREE | LNK_VALUE _ | LNK_TYPE _ -> error, false)
-    (LNK_TYPE (Locality.annotate_with_dummy agent_name', Locality.annotate_with_dummy site_name'))
+    (LNK_TYPE (Loc.annot_with_dummy agent_name', Loc.annot_with_dummy site_name'))
     (Some false) mixture
 
 let add_bound parameters error agent_id site_name mixture =
@@ -664,7 +667,7 @@ let add_bound parameters error agent_id site_name mixture =
       match lnk with
       | LNK_MISSING | LNK_ANY _ -> error, true
       | LNK_SOME _ | FREE | LNK_VALUE _ | LNK_TYPE _ -> error, false)
-    (LNK_SOME Locality.dummy) (Some false) mixture
+    (LNK_SOME Loc.dummy) (Some false) mixture
 
 let add_pointer parameters error agent_id site_name agent_id' agent_name'
     site_name' lnk_value mixture =
@@ -675,7 +678,7 @@ let add_pointer parameters error agent_id site_name agent_id' agent_name'
       | LNK_TYPE ((agent_name'', _), (site_name'', _)) ->
         error, agent_name'' = agent_name' && site_name'' = site_name'
       | FREE | LNK_VALUE _ -> error, false)
-    (LNK_VALUE (agent_id', agent_name', site_name', lnk_value, Locality.dummy))
+    (LNK_VALUE (agent_id', agent_name', site_name', lnk_value, Loc.dummy))
     (Some false) mixture
 
 let rec get_agent_name parameters error k mixture =
@@ -876,7 +879,7 @@ type c_compil = {
   c_init: enriched_init Int_storage.Nearly_inf_Imperatif.t;
   (*initial graph declaration*)
   c_perturbations:
-    (c_mixture Locality.annoted, enriched_rule) perturbation
+    (c_mixture Loc.annoted, enriched_rule) perturbation
     Int_storage.Nearly_inf_Imperatif.t;
 }
 

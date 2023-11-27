@@ -10,8 +10,9 @@ let unsome default = function
   | None -> default
   | Some a -> a
 
-let unsome_or_raise = function
-  | None -> raise (Invalid_argument "unsome_or_raise was passed a None")
+let unsome_or_raise
+    ?(excep = Invalid_argument "unsome_or_raise was passed a None") = function
+  | None -> raise excep
   | Some a -> a
 
 let map f = function

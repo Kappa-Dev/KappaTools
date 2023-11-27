@@ -10,7 +10,7 @@
 
 (*val init_kasa :
   Remanent_parameters_sig.called_from -> Signature.s ->
-  (string Locality.annoted * Ast.port list, Ast.mixture, string, Ast.rule)
+  (string Loc.annoted * Ast.port list, Ast.mixture, string, Ast.rule)
     Ast.compil ->
   Primitives.contact_map * Export_to_KaSim.state
 *)
@@ -21,12 +21,12 @@ val compile_bool :
   ?origin:Operator.rev_dep ->
   Contact_map.t ->
   Pattern.PreEnv.t ->
-  (LKappa.rule_mixture, int) Alg_expr.bool Locality.annoted ->
-  Pattern.PreEnv.t * (Pattern.id array list, int) Alg_expr.bool Locality.annoted
+  (LKappa.rule_mixture, int) Alg_expr.bool Loc.annoted ->
+  Pattern.PreEnv.t * (Pattern.id array list, int) Alg_expr.bool Loc.annoted
 
 val compile_modifications_no_track :
   debug_mode:bool ->
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   compile_mode_on:bool ->
   Contact_map.t ->
   Pattern.PreEnv.t ->
@@ -35,12 +35,12 @@ val compile_modifications_no_track :
 
 val compile_inits :
   debug_mode:bool ->
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   ?rescale:float ->
   compile_mode_on:bool ->
   Contact_map.t ->
   Model.t ->
-  (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
+  (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement list ->
   (Primitives.alg_expr * Primitives.elementary_rule) list
 
 val compile :
@@ -55,7 +55,7 @@ val compile :
   debug_mode:bool ->
   compile_mode_on:bool ->
   ?overwrite_init:
-    (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
+    (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement list ->
   ?overwrite_t0:float ->
   ?rescale_init:float ->
   Signature.s ->

@@ -79,7 +79,7 @@ let rec exec_alg :
   | Alg_expr.DIFF_TOKEN _ | Alg_expr.DIFF_KAPPA_INSTANCE _ ->
     raise
       (ExceptionDefn.Internal_Error
-         ("Cannot evalutate derivatives in expression", Locality.dummy))
+         ("Cannot evalutate derivatives in expression", Loc.dummy))
 
 and exec_bool :
     type a.

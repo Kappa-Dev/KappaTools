@@ -159,7 +159,8 @@ let from_edge ~debug_mode domain graph ((out, cache) as acc) node site arrow =
         | Some (ids, ty) ->
           ( List.fold_left
               (fun acc id ->
-                (pid, (Renaming.apply ~debug_mode inj_point2graph id, ty)) :: acc)
+                (pid, (Renaming.apply ~debug_mode inj_point2graph id, ty))
+                :: acc)
               obs ids,
             Operator.DepSet.union rev_deps (Pattern.Env.deps point) )
       in

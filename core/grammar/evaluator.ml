@@ -27,11 +27,11 @@ let do_interactive_directives ~debug_mode ~outputs ~sharing ~syntax_version
     then
       raise
         (ExceptionDefn.Malformed_Decl
-           (Locality.annotate_with_dummy "Creating new link type is forbidden"))
+           (Loc.annot_with_dummy "Creating new link type is forbidden"))
   in
   let cc_preenv', e'' =
-    Eval.compile_modifications_no_track ~debug_mode ~warning ~compile_mode_on:false
-      contact_map cc_preenv e'
+    Eval.compile_modifications_no_track ~debug_mode ~warning
+      ~compile_mode_on:false contact_map cc_preenv e'
   in
   let env', graph' =
     if cc_preenv == cc_preenv' then
@@ -62,7 +62,8 @@ let get_pause_criteria ~debug_mode ~outputs ~sharing ~syntax_version contact_map
       (Model.signatures env) (Model.tokens_finder env) (Model.algs_finder env) b
   in
   let cc_preenv', ((b'', pos_b'') as bpos'') =
-    Eval.compile_bool ~debug_mode ~compile_mode_on:false contact_map cc_preenv b'
+    Eval.compile_bool ~debug_mode ~compile_mode_on:false contact_map cc_preenv
+      b'
   in
   let env', graph' =
     if cc_preenv == cc_preenv' then

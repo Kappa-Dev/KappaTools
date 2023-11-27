@@ -235,7 +235,7 @@ let on_message exec_command message_delimiter =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
                        let pos =
-                         JsonUtil.read_next_item Locality.read_position st b
+                         JsonUtil.read_next_item Loc.read_position st b
                        in
                        manager#get_influence_map_node_at ~filename pos
                        >>= fun out ->

@@ -175,7 +175,7 @@ let snapshot file s =
 let print_species time f mixture =
   Format.fprintf f "%g: @[<h>%a@]@." time User_graph.print_cc mixture
 
-let warning_buffer : (Locality.t option * (Format.formatter -> unit)) list ref =
+let warning_buffer : (Loc.t option * (Format.formatter -> unit)) list ref =
   ref []
 
 let go = function

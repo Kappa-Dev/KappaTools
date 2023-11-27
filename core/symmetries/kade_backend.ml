@@ -271,8 +271,8 @@ module Raw_mixture = struct
       | None -> Format.pp_print_int f s)
 
   let print_intf ~noCounters with_link ?sigs
-      ?(symbol_table = Symbol_table.symbol_table_V4) counter_agents (ag_ty : int) f
-      (ports, ints) =
+      ?(symbol_table = Symbol_table.symbol_table_V4) counter_agents
+      (ag_ty : int) f (ports, ints) =
     let rec aux empty i =
       if i < Array.length ports then (
         let () =
@@ -327,8 +327,8 @@ module Raw_mixture = struct
         else (
           let () = if some then Utils.print_agent_sep_comma symbol_table f in
           let () =
-            print_agent ~noCounters created true ?sigs ~symbol_table counter_agents
-              f h
+            print_agent ~noCounters created true ?sigs ~symbol_table
+              counter_agents f h
           in
           aux_print true t
         )
@@ -407,7 +407,7 @@ module LKappa = struct
     | LKappa.Freed ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy "Cannot erase all increment agents"))
+           (Loc.annot_with_dummy "Cannot erase all increment agents"))
     | LKappa.Maintained -> ()
     | LKappa.Erased -> ()
 
@@ -521,7 +521,7 @@ module LKappa = struct
                 | LKappa.LNK_TYPE _ | LKappa.LNK_SOME ->
                   raise
                     (ExceptionDefn.Internal_Error
-                       (Locality.annotate_with_dummy
+                       (Loc.annot_with_dummy
                           "Port a of __counter_agent agent not well specified")))))
           mix
     in
@@ -767,7 +767,7 @@ module LKappa = struct
       ?(symbol_table = Symbol_table.symbol_table_V4) pr_tok pr_var f r =
     Format.fprintf f "@[<h>%t%t%a%t@]"
       (fun f ->
-        if full || r.LKappa.r_editStyle then
+        if full || r.LKappa.r_edit_style then
           Format.fprintf f "%a%t%a"
             (print_rule_mixture ~noCounters sigs ~ltypes:false ~symbol_table
                r.LKappa.r_created)

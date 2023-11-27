@@ -49,7 +49,7 @@ type node_attribute = {
   node_width: int option;
   node_height: int option;
   node_shape: Graph_loggers_sig.shape option;
-  node_positions: Locality.t list;
+  node_positions: Loc.t list;
   node_contextual_help: string option;
   node_on_click: Yojson.Basic.t option;
 }
@@ -61,7 +61,7 @@ type edge_attribute = {
   edge_direction: Graph_loggers_sig.direction;
   edge_arrowhead: Graph_loggers_sig.headkind;
   edge_arrowtail: Graph_loggers_sig.headkind;
-  edge_positions: Locality.t list;
+  edge_positions: Loc.t list;
   edge_contextual_help: string option;
   edge_on_click: Yojson.Basic.t option;
 }

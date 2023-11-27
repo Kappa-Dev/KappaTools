@@ -178,11 +178,11 @@ let print_connected_component ?compil =
 let canonic_form x = x
 let connected_components_of_patterns = Array.to_list
 
-let connected_components_of_mixture_sigs ~debug_mode sigs cache contact_map_int e
-    =
+let connected_components_of_mixture_sigs ~debug_mode sigs cache contact_map_int
+    e =
   let cache, acc =
-    Pattern_decompiler.patterns_of_mixture ~debug_mode contact_map_int sigs cache
-      e
+    Pattern_decompiler.patterns_of_mixture ~debug_mode contact_map_int sigs
+      cache e
   in
   cache, acc
 
@@ -516,7 +516,8 @@ let get_obs_titles compil =
 
 let get_preprocessed_ast cli_args =
   let warning ~pos msg = Data.print_warning ~pos Format.err_formatter msg in
-  Cli_init.get_preprocessed_ast_from_cli_args ~warning ~debug_mode:false cli_args
+  Cli_init.get_preprocessed_ast_from_cli_args ~warning ~debug_mode:false
+    cli_args
 
 let to_preprocessed_ast x = x
 let get_ast cli_args = Cli_init.get_ast_from_cli_args cli_args
@@ -627,8 +628,8 @@ let species_of_initial_state_env ~debug_mode env contact_map_int cache list =
 
 let species_of_initial_state compil cache list =
   let cc_cache, list =
-    species_of_initial_state_env ~debug_mode:compil.debug_mode compil.environment
-      (contact_map compil) (get_cc_cache cache) list
+    species_of_initial_state_env ~debug_mode:compil.debug_mode
+      compil.environment (contact_map compil) (get_cc_cache cache) list
   in
   set_cc_cache cc_cache cache, list
 

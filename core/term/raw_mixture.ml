@@ -100,7 +100,9 @@ let print_link ~noCounters counter_agents f = function
   | VAL i ->
     (try
        let root = find counter_agents i in
-       let counter, (_, is_counter) = Mods.DynArray.get counter_agents.rank root in
+       let counter, (_, is_counter) =
+         Mods.DynArray.get counter_agents.rank root
+       in
        if is_counter && not noCounters then
          Format.fprintf f "{=%d}" counter
        else
@@ -115,7 +117,8 @@ let aux_pp_si sigs a s f i =
     | Some i -> Format.fprintf f "%i{%i}" s i
     | None -> Format.pp_print_int f s)
 
-let print_intf ~noCounters with_link ?sigs counter_agents ag_ty f (ports, ints) =
+let print_intf ~noCounters with_link ?sigs counter_agents ag_ty f (ports, ints)
+    =
   let rec aux empty i =
     if i < Array.length ports then (
       let () =
@@ -162,7 +165,9 @@ let print ~noCounters ~created ~initial_comma ?sigs f mix =
         aux_print some t
       else (
         let () = if some then Pp.comma f in
-        let () = print_agent ~noCounters created true ?sigs counter_agents f h in
+        let () =
+          print_agent ~noCounters created true ?sigs counter_agents f h
+        in
         aux_print true t
       )
   in

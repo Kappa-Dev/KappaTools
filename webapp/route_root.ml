@@ -160,7 +160,7 @@ class new_manager =
 
     method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
       List.find_opt
-        (fun (_, x) -> Locality.is_included_in filename pos x)
+        (fun (_, x) -> Loc.is_included_in filename pos x)
         kasa_locator
       |> Option_util.map fst
       |> Result_util.ok ?status:None
@@ -963,7 +963,7 @@ let route ~(shutdown_key : string option) : Webapp_common.route_handler list =
              bind_projects
                (fun manager ->
                  manager#get_influence_map_node_at ~filename
-                   { Locality.line; Locality.chr })
+                   { Loc.line; Loc.chr })
                project_id projects
              >>= Webapp_common.api_result_response ~string_of_success:(fun x ->
                      let o =

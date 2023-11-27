@@ -13,7 +13,7 @@ type preprocessed_ast = {
   cflowFile: string option;
   ast_compiled_data: LKappa_compiler.ast_compiled_data;
   overwrite_init:
-    (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list option;
+    (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement list option;
   overwrite_t0: float option;
 }
 
@@ -148,7 +148,7 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
     let d = open_in_bin marshalized_file in
     let () =
       if cli_args.Run_cli_args.inputKappaFileNames <> [] then
-        warning ~pos:Locality.dummy (fun f ->
+        warning ~pos:Loc.dummy (fun f ->
             Format.pp_print_string f
               "Simulation package loaded, all kappa files are ignored")
     in
@@ -160,9 +160,7 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
     let alg_overwrite =
       List.map
         (fun (s, v) ->
-          ( Model.num_of_alg
-              (Locality.annotate_with_dummy s)
-              compilation_result.env,
+          ( Model.num_of_alg (Loc.annot_with_dummy s) compilation_result.env,
             Alg_expr.CONST v ))
         kasim_args.Kasim_args.alg_var_overwrite
     in

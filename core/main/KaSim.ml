@@ -166,7 +166,7 @@ let finalize ~outputs dotFormat cflow_file trace_file progress env counter graph
     | Unix.WEXITED 127 ->
       Lwt.fail
         (ExceptionDefn.Malformed_Decl
-           (Locality.annotate_with_dummy
+           (Loc.annot_with_dummy
               ("Executable '" ^ prog ^ "' can not be found to compute stories.")))
     | Unix.WEXITED n ->
       if n <> 0 then exit n;
@@ -314,7 +314,8 @@ let () =
         Model.map_observables
           (fun o ->
             Format.asprintf "@[<h>%a@]"
-              (Kappa_printer.alg_expr ~noCounters:debug_mode ~env:init_result.env)
+              (Kappa_printer.alg_expr ~noCounters:debug_mode
+                 ~env:init_result.env)
               o)
           init_result.env
       in
@@ -444,7 +445,8 @@ let () =
              trace_file progress init_result.env counter graph state
              init_result.story_compression
          else if cli_args.Run_cli_args.batchmode then
-           batch_loop ~debug_mode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+           batch_loop ~debug_mode ~outputs ~dumpIfDeadlocked
+             ~maxConsecutiveClash
              ~efficiency:kasim_args.Kasim_args.showEfficiency progress
              init_result.env counter graph state
            >>= fun (graph', state') ->

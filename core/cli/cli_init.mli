@@ -13,7 +13,7 @@ type preprocessed_ast = {
   cflowFile: string option;
   ast_compiled_data: LKappa_compiler.ast_compiled_data;
   overwrite_init:
-    (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list option;
+    (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement list option;
   overwrite_t0: float option;
 }
 
@@ -33,7 +33,7 @@ type compilation_result = {
 
 (* TODO change calls to this *)
 val get_compilation :
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   debug_mode:bool ->
   ?compile_mode_on:bool ->
   ?kasim_args:Kasim_args.t ->
@@ -46,14 +46,14 @@ val get_ast_from_list_of_files :
 val get_ast_from_cli_args : Run_cli_args.t -> Ast.parsing_compil
 
 val get_preprocessed_ast_from_cli_args :
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   debug_mode:bool ->
   ?kasim_args:Kasim_args.t ->
   Run_cli_args.t ->
   preprocessed_ast
 
 val preprocess_ast :
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   debug_mode:bool ->
   ?kasim_args:Kasim_args.t ->
   Run_cli_args.t ->
@@ -61,7 +61,7 @@ val preprocess_ast :
   preprocessed_ast
 
 val get_compilation_from_preprocessed_ast :
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   ?compile_mode_on:bool ->
   ?kasim_args:Kasim_args.t ->
   Run_cli_args.t ->

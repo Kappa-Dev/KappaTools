@@ -1,6 +1,5 @@
 (library
-  (name kappa_classical_graphs)
-  (libraries yojson kappa-library.generic kappa_logging)
-  (flags (:standard -w @a
-    -open Kappa_generic_toolset
-    -open Kappa_logging)))
+ (name kappa_classical_graphs)
+ (libraries yojson kappa-library.generic kappa_logging)
+ (flags
+  (:standard -w @a -open Kappa_generic_toolset -open Kappa_logging)))

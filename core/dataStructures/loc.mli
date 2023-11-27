@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-(** Module for type Locality.t annotating structured data with the line range
+(** Module for type Loc.t annotating structured data with the line range
  * in a file which was used to define it *)
 
 type position = { chr: int; line: int }
@@ -14,14 +14,14 @@ type t = { file: string; from_position: position; to_position: position }
 type 'a annoted = 'a * t
 
 val v : 'a annoted -> 'a
-(** Extract value from Locality.annoted *)
+(** Extract value from Loc.annoted *)
 
 val get_annot : 'a annoted -> t
-(** Extract annotation from Locality.annoted *)
+(** Extract annotation from Loc.annoted *)
 
 val of_pos : Lexing.position -> Lexing.position -> t
 val dummy : t
-val annotate_with_dummy : 'a -> 'a annoted
+val annot_with_dummy : 'a -> 'a annoted
 val is_annoted_with_dummy : 'a annoted -> bool
 
 val merge : t -> t -> t

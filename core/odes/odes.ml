@@ -83,9 +83,8 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
   module VarMap = VarSetMap.Map
 
   type 'a decl =
-    | Var of var_id * string option * ('a, int) Alg_expr.e Locality.annoted
-    | Init_expr of
-        var_id * ('a, int) Alg_expr.e Locality.annoted * ode_var_id list
+    | Var of var_id * string option * ('a, int) Alg_expr.e Loc.annoted
+    | Init_expr of var_id * ('a, int) Alg_expr.e Loc.annoted * ode_var_id list
     | Dummy_decl
 
   let var_id_of_decl decl =
@@ -144,7 +143,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
     updated_cc_to_embedding_to_current_species: I.connected_component list;
     ode_variables: VarSet.t;
     reactions:
-      ((id list * id list * id Locality.annoted list * enriched_rule) * int) list;
+      ((id list * id list * id Loc.annoted list * enriched_rule) * int) list;
     ode_vars_tab: ode_var Mods.DynArray.t;
     id_of_ode_var: ode_var_id VarMap.t;
     fresh_ode_var_id: ode_var_id;
@@ -155,7 +154,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
     fresh_var_id: var_id;
     var_declaration: 'a decl list;
     n_rules: int;
-    obs: (obs_id * ('a, 'b) Alg_expr.e Locality.annoted) list;
+    obs: (obs_id * ('a, 'b) Alg_expr.e Loc.annoted) list;
     n_obs: int;
     time_homogeneous_obs: bool option;
     time_homogeneous_vars: bool option;
@@ -550,7 +549,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
             if n_embs = 0 then
               alg
             else (
-              let species = Locality.annotate_with_dummy (Alg_expr.KAPPA_INSTANCE id) in
+              let species = Loc.annot_with_dummy (Alg_expr.KAPPA_INSTANCE id) in
               let term =
                 target compil
                   (from (Alg_expr.mult (Alg_expr.int n_embs) species) nauto)
@@ -693,7 +692,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
         List.fold_left
           (fun (remanent, tokens) (_, b) ->
             let remanent, id = translate_token b remanent in
-            remanent, Locality.annotate_with_dummy id :: tokens)
+            remanent, Loc.annot_with_dummy id :: tokens)
           (remanent, []) tokens
       in
       let to_be_visited, network = remanent in
@@ -1083,7 +1082,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
   let convert_initial_state parameters compil intro network =
     let b, c = intro in
     let network, expr_init =
-      convert_alg_expr parameters compil network (Locality.annotate_with_dummy b)
+      convert_alg_expr parameters compil network (Loc.annot_with_dummy b)
     in
     ( expr_init,
       match I.token_vector_of_init c with
@@ -1263,7 +1262,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
         (fun network obs ->
           let network, expr_obs =
             convert_alg_expr parameters compil network
-              (Locality.annotate_with_dummy obs)
+              (Loc.annot_with_dummy obs)
           in
           inc_fresh_obs_id
             {
@@ -1292,8 +1291,8 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
     in
     { network with cache }, list
 
-  type ('a, 'b) rate = ('a, 'b) Alg_expr.e Locality.annoted
-  type ('a, 'b) stoc = int * ('a, 'b) Alg_expr.e Locality.annoted
+  type ('a, 'b) rate = ('a, 'b) Alg_expr.e Loc.annoted
+  type ('a, 'b) stoc = int * ('a, 'b) Alg_expr.e Loc.annoted
   type ('a, 'b) coef = R of ('a, 'b) rate | S of ('a, 'b) stoc
 
   type ('a, 'b) sort_rules_and_decl = {
@@ -1565,7 +1564,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
             let expr =
               to_var compil
                 (from_nocc compil
-                   (Locality.annotate_with_dummy (Alg_expr.ALG_VAR id'))
+                   (Loc.annot_with_dummy (Alg_expr.ALG_VAR id'))
                    n)
                 n
             in
@@ -1975,7 +1974,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                     (string_of_var_id ~compil logger)
                     logger logger_buffer logger_err
                     (Ode_loggers_sig.Init (get_last_ode_var_id network))
-                    (Locality.annotate_with_dummy
+                    (Loc.annot_with_dummy
                        (Alg_expr.STATE_ALG_OP Operator.TIME_VAR))
                     handler_init
                 in

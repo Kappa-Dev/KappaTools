@@ -265,7 +265,7 @@ let add_agent ?id sigs ty graph =
             | _, _ ->
               raise
                 (ExceptionDefn.Internal_Error
-                   (Locality.annotate_with_dummy
+                   (Loc.annot_with_dummy
                       ("Try to add an agent with a the free id "
                      ^ string_of_int id)))
           ) else
@@ -550,7 +550,7 @@ let in_same_connected_component ag ag' graph =
     | None ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy
+           (Loc.annot_with_dummy
               "in_same_connected_component while not tracking ccs"))
     | Some ccs -> Mods.DynArray.get ccs ag = Mods.DynArray.get ccs ag')
 
@@ -562,7 +562,7 @@ let get_connected_component ag graph =
     | None ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy
+           (Loc.annot_with_dummy
               "get_connected_component while not tracking ccs"))
     | Some ccs -> Mods.DynArray.get ccs ag)
 
@@ -627,7 +627,7 @@ let species ~debug_mode sigs root graph =
       | None ->
         raise
           (ExceptionDefn.Internal_Error
-             (Locality.annotate_with_dummy
+             (Loc.annot_with_dummy
                 ("Sort of node unavailable " ^ string_of_int root)))
       | Some ty ->
         Snapshot.cc_to_user_cc ~debug_mode ~raw:true sigs

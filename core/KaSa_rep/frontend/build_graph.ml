@@ -29,7 +29,7 @@ let add_agent parameters error handler cckappa_only agent_id agent_type mixture
       Cckappa_sig.agent_kasim_id = agent_id;
       Cckappa_sig.agent_name = agent_type;
       Cckappa_sig.agent_interface = Ckappa_sig.Site_map_and_set.Map.empty;
-      Cckappa_sig.agent_position = Locality.dummy;
+      Cckappa_sig.agent_position = Loc.dummy;
       Cckappa_sig.is_created = false;
     }
   in
@@ -45,7 +45,7 @@ let add_agent parameters error handler cckappa_only agent_id agent_type mixture
 let empty_port =
   {
     Cckappa_sig.site_name = Ckappa_sig.dummy_site_name;
-    Cckappa_sig.site_position = Locality.dummy;
+    Cckappa_sig.site_position = Loc.dummy;
     Cckappa_sig.site_free = None;
     Cckappa_sig.site_state =
       {
@@ -81,7 +81,7 @@ let add_site parameters error handler cckappa_only agent_id site_name mixture =
     let site =
       {
         Cckappa_sig.site_name;
-        Cckappa_sig.site_position = Locality.dummy;
+        Cckappa_sig.site_position = Loc.dummy;
         Cckappa_sig.site_free = None;
         Cckappa_sig.site_state =
           {

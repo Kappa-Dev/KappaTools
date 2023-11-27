@@ -11,33 +11,33 @@ type pervasives_bool = bool
 type ('mix, 'id) e =
   | BIN_ALG_OP of
       Operator.bin_alg_op
-      * ('mix, 'id) e Locality.annoted
-      * ('mix, 'id) e Locality.annoted
-  | UN_ALG_OP of Operator.un_alg_op * ('mix, 'id) e Locality.annoted
+      * ('mix, 'id) e Loc.annoted
+      * ('mix, 'id) e Loc.annoted
+  | UN_ALG_OP of Operator.un_alg_op * ('mix, 'id) e Loc.annoted
   | STATE_ALG_OP of Operator.state_alg_op
   | ALG_VAR of 'id
   | KAPPA_INSTANCE of 'mix
   | TOKEN_ID of 'id
   | CONST of Nbr.t
   | IF of
-      ('mix, 'id) bool Locality.annoted
-      * ('mix, 'id) e Locality.annoted
-      * ('mix, 'id) e Locality.annoted
-  | DIFF_TOKEN of (('mix, 'id) e Locality.annoted * 'id)
-  | DIFF_KAPPA_INSTANCE of (('mix, 'id) e Locality.annoted * 'mix)
+      ('mix, 'id) bool Loc.annoted
+      * ('mix, 'id) e Loc.annoted
+      * ('mix, 'id) e Loc.annoted
+  | DIFF_TOKEN of (('mix, 'id) e Loc.annoted * 'id)
+  | DIFF_KAPPA_INSTANCE of (('mix, 'id) e Loc.annoted * 'mix)
 
 and ('mix, 'id) bool =
   | TRUE
   | FALSE
   | BIN_BOOL_OP of
       Operator.bin_bool_op
-      * ('mix, 'id) bool Locality.annoted
-      * ('mix, 'id) bool Locality.annoted
-  | UN_BOOL_OP of Operator.un_bool_op * ('mix, 'id) bool Locality.annoted
+      * ('mix, 'id) bool Loc.annoted
+      * ('mix, 'id) bool Loc.annoted
+  | UN_BOOL_OP of Operator.un_bool_op * ('mix, 'id) bool Loc.annoted
   | COMPARE_OP of
       Operator.compare_op
-      * ('mix, 'id) e Locality.annoted
-      * ('mix, 'id) e Locality.annoted
+      * ('mix, 'id) e Loc.annoted
+      * ('mix, 'id) e Loc.annoted
 
 val e_to_yojson :
   filenames:int Mods.StringMap.t ->
@@ -83,42 +83,32 @@ val print_bool :
   ('a, 'b) bool ->
   unit
 
-val const : Nbr.t -> ('a, 'b) e Locality.annoted
+val const : Nbr.t -> ('a, 'b) e Loc.annoted
 (** {2 Smart constructor } *)
 
-val int : int -> ('a, 'b) e Locality.annoted
-val float : float -> ('a, 'b) e Locality.annoted
+val int : int -> ('a, 'b) e Loc.annoted
+val float : float -> ('a, 'b) e Loc.annoted
 
 val add :
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted
+  ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
 
 val minus :
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted
+  ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
 
 val mult :
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted
+  ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
 
 val div :
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted
+  ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
 
 val pow :
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted ->
-  ('a, 'b) e Locality.annoted
+  ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
 
-val ln : ('a, 'b) e Locality.annoted -> ('a, 'b) e Locality.annoted
-val uminus : ('a, 'b) e Locality.annoted -> ('a, 'b) e Locality.annoted
-val sin : ('a, 'b) e Locality.annoted -> ('a, 'b) e Locality.annoted
-val cos : ('a, 'b) e Locality.annoted -> ('a, 'b) e Locality.annoted
-val sqrt : ('a, 'b) e Locality.annoted -> ('a, 'b) e Locality.annoted
+val ln : ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
+val uminus : ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
+val sin : ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
+val cos : ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
+val sqrt : ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted
 
 val add_dep :
   Operator.DepSet.t
@@ -126,7 +116,7 @@ val add_dep :
   * Operator.DepSet.t array
   * Operator.DepSet.t array ->
   Operator.rev_dep ->
-  ('a, int) e Locality.annoted ->
+  ('a, int) e Loc.annoted ->
   Operator.DepSet.t
   * Operator.DepSet.t
   * Operator.DepSet.t array
@@ -139,7 +129,7 @@ val add_dep_bool :
   * Operator.DepSet.t array
   * Operator.DepSet.t array ->
   Operator.rev_dep ->
-  ('a, int) bool Locality.annoted ->
+  ('a, int) bool Loc.annoted ->
   Operator.DepSet.t
   * Operator.DepSet.t
   * Operator.DepSet.t array
@@ -147,16 +137,16 @@ val add_dep_bool :
 
 val setup_alg_vars_rev_dep :
   unit NamedDecls.t ->
-  (string Locality.annoted * ('a, int) e Locality.annoted) array ->
+  (string Loc.annoted * ('a, int) e Loc.annoted) array ->
   Operator.DepSet.t
   * Operator.DepSet.t
   * Operator.DepSet.t array
   * Operator.DepSet.t array
 
 val has_mix : ?var_decls:('b -> ('c, 'b) e) -> ('a, 'b) e -> pervasives_bool
-val is_constant : ('a, 'b) e Locality.annoted -> pervasives_bool
+val is_constant : ('a, 'b) e Loc.annoted -> pervasives_bool
 
-val is_time_homogeneous : ('a, 'b) e Locality.annoted -> pervasives_bool
+val is_time_homogeneous : ('a, 'b) e Loc.annoted -> pervasives_bool
 (** does not take into account symbolic propagation of expression *)
 
 val has_progress_dep :
@@ -165,31 +155,29 @@ val has_progress_dep :
   * Operator.DepSet.t
   * Operator.DepSet.t array
   * Operator.DepSet.t array ->
-  ('a, int) e Locality.annoted ->
+  ('a, int) e Loc.annoted ->
   pervasives_bool
 
-val extract_connected_components : ('a, 'b) e Locality.annoted -> 'a list
-
-val extract_connected_components_bool :
-  ('a, 'b) bool Locality.annoted -> 'a list
+val extract_connected_components : ('a, 'b) e Loc.annoted -> 'a list
+val extract_connected_components_bool : ('a, 'b) bool Loc.annoted -> 'a list
 
 val propagate_constant :
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   ?max_time:float ->
   ?max_events:int ->
   updated_vars:int list ->
-  vars:(string Locality.annoted * ('a, int) e Locality.annoted) array ->
-  ('a, int) e Locality.annoted ->
-  ('a, int) e Locality.annoted
+  vars:(string Loc.annoted * ('a, int) e Loc.annoted) array ->
+  ('a, int) e Loc.annoted ->
+  ('a, int) e Loc.annoted
 
 val propagate_constant_bool :
-  warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
+  warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   ?max_time:float ->
   ?max_events:int ->
   updated_vars:int list ->
-  vars:(string Locality.annoted * ('a, int) e Locality.annoted) array ->
-  ('a, int) bool Locality.annoted ->
-  ('a, int) bool Locality.annoted
+  vars:(string Loc.annoted * ('a, int) e Loc.annoted) array ->
+  ('a, int) bool Loc.annoted ->
+  ('a, int) bool Loc.annoted
 
 val is_equality_test_time :
   Operator.DepSet.t
@@ -200,26 +188,18 @@ val is_equality_test_time :
   pervasives_bool
 
 val map_on_mixture :
-  ('a -> ('c, 'b) e) ->
-  ('a, 'b) e Locality.annoted ->
-  ('c, 'b) e Locality.annoted
+  ('a -> ('c, 'b) e) -> ('a, 'b) e Loc.annoted -> ('c, 'b) e Loc.annoted
 
 val map_bool_on_mixture :
-  ('a -> ('c, 'b) e) ->
-  ('a, 'b) bool Locality.annoted ->
-  ('c, 'b) bool Locality.annoted
+  ('a -> ('c, 'b) e) -> ('a, 'b) bool Loc.annoted -> ('c, 'b) bool Loc.annoted
 
-val fold_on_mixture :
-  ('a -> 'b -> 'a) -> 'a -> ('b, 'c) e Locality.annoted -> 'a
+val fold_on_mixture : ('a -> 'b -> 'a) -> 'a -> ('b, 'c) e Loc.annoted -> 'a
 
 val fold_bool_on_mixture :
-  ('a -> 'b -> 'a) -> 'a -> ('b, 'c) bool Locality.annoted -> 'a
+  ('a -> 'b -> 'a) -> 'a -> ('b, 'c) bool Loc.annoted -> 'a
 
-val equal :
-  ('a, 'b) e Locality.annoted -> ('a, 'b) e Locality.annoted -> pervasives_bool
+val equal : ('a, 'b) e Loc.annoted -> ('a, 'b) e Loc.annoted -> pervasives_bool
 (** Syntactic equality up to positions but not associativity and comutativity *)
 
 val equal_bool :
-  ('a, 'b) bool Locality.annoted ->
-  ('a, 'b) bool Locality.annoted ->
-  pervasives_bool
+  ('a, 'b) bool Loc.annoted -> ('a, 'b) bool Loc.annoted -> pervasives_bool

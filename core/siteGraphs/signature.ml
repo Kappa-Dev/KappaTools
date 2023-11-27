@@ -311,8 +311,8 @@ let of_json v =
   | Some id ->
     let agent_signature = NamedDecls.elt_val agent_sigs id in
     let ports =
-      ( num_of_site ("a", Locality.dummy) agent_signature,
-        num_of_site ("b", Locality.dummy) agent_signature )
+      ( num_of_site ("a", Loc.dummy) agent_signature,
+        num_of_site ("b", Loc.dummy) agent_signature )
     in
     { agent_sigs; counter_agent_info = Some { id; arity = 2; ports } }
   | None -> { agent_sigs; counter_agent_info = None }

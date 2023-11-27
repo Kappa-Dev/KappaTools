@@ -35,7 +35,9 @@ let rec compile_alg ~debug_mode ~compile_mode_on domain (alg, pos) =
     let domain', a' = compile_alg ~debug_mode ~compile_mode_on domain a in
     domain', (Alg_expr.UN_ALG_OP (op, a'), pos)
   | Alg_expr.IF (cond, yes, no) ->
-    let domain', cond' = compile_bool ~debug_mode ~compile_mode_on domain cond in
+    let domain', cond' =
+      compile_bool ~debug_mode ~compile_mode_on domain cond
+    in
     let domain'', yes' = compile_alg ~debug_mode ~compile_mode_on domain' yes in
     let domain''', no' = compile_alg ~debug_mode ~compile_mode_on domain'' no in
     domain''', (Alg_expr.IF (cond', yes', no'), pos)
@@ -62,8 +64,8 @@ and compile_bool ~debug_mode ~compile_mode_on domain = function
 let compile_pure_alg ~debug_mode ~compile_mode_on (alg, pos) =
   snd @@ compile_alg ~debug_mode ~compile_mode_on None (alg, pos)
 
-let compile_alg ~debug_mode ~compile_mode_on ?origin contact_map domain (alg, pos)
-    =
+let compile_alg ~debug_mode ~compile_mode_on ?origin contact_map domain
+    (alg, pos) =
   match
     compile_alg ~debug_mode ~compile_mode_on
       (Some (origin, contact_map, domain))
@@ -72,8 +74,8 @@ let compile_alg ~debug_mode ~compile_mode_on ?origin contact_map domain (alg, po
   | Some (_, _, domain), alg -> domain, alg
   | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
-let compile_bool ~debug_mode ~compile_mode_on ?origin contact_map domain (alg, pos)
-    =
+let compile_bool ~debug_mode ~compile_mode_on ?origin contact_map domain
+    (alg, pos) =
   match
     compile_bool ~debug_mode ~compile_mode_on
       (Some (origin, contact_map, domain))
@@ -92,8 +94,8 @@ let tokenify ~debug_mode ~compile_mode_on contact_map domain l =
     l (domain, [])
 
 (* transform an LKappa rule into a Primitives rule *)
-let rules_of_ast ~debug_mode ~warning ?deps_machinery ~compile_mode_on contact_map
-    domain ~syntax_ref (rule, _) =
+let rules_of_ast ~debug_mode ~warning ?deps_machinery ~compile_mode_on
+    contact_map domain ~syntax_ref (rule, _) =
   let domain', delta_toks =
     tokenify ~debug_mode ~compile_mode_on contact_map domain
       rule.LKappa.r_delta_tokens
@@ -106,7 +108,9 @@ let rules_of_ast ~debug_mode ~warning ?deps_machinery ~compile_mode_on contact_m
     | Some (o, d) -> Some o, Some d
   in
   let unary_infos =
-    let crp = compile_pure_alg ~debug_mode ~compile_mode_on rule.LKappa.r_rate in
+    let crp =
+      compile_pure_alg ~debug_mode ~compile_mode_on rule.LKappa.r_rate
+    in
     match rule.LKappa.r_un_rate with
     | None -> fun _ -> crp, None
     | Some (((_, pos) as rate), dist) ->
@@ -201,7 +205,7 @@ let obs_of_result ~debug_mode ~compile_mode_on contact_map domain alg_deps res =
     domain, List.rev out
   else
     ( domain,
-      Locality.annotate_with_dummy (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
+      Loc.annot_with_dummy (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
       :: List.rev out )
 
 let compile_print_expr ~debug_mode ~compile_mode_on contact_map domain ex =
@@ -216,8 +220,8 @@ let compile_print_expr ~debug_mode ~compile_mode_on contact_map domain ex =
         domain', Primitives.Alg_pexpr alg :: out)
     ex (domain, [])
 
-let cflows_of_label ~debug_mode origin ~compile_mode_on contact_map domain on algs
-    rules (label, pos) rev_effects =
+let cflows_of_label ~debug_mode origin ~compile_mode_on contact_map domain on
+    algs rules (label, pos) rev_effects =
   let adds tests l x =
     if on then
       Primitives.CFLOW (Some label, x, tests) :: l
@@ -380,16 +384,16 @@ let pert_not_init overwrite_t0 x y z =
   | _, Some p, _ -> p
   | Some _, None, None ->
     let t_var =
-      Locality.annotate_with_dummy (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
+      Loc.annot_with_dummy (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
     in
     let t0 = Option_util.fold (fun _ x -> Nbr.F x) Nbr.zero overwrite_t0 in
-    let init_t = Locality.annotate_with_dummy (Alg_expr.CONST t0) in
-    Locality.annotate_with_dummy (Alg_expr.COMPARE_OP (Operator.GREATER, t_var, init_t))
+    let init_t = Loc.annot_with_dummy (Alg_expr.CONST t0) in
+    Loc.annot_with_dummy (Alg_expr.COMPARE_OP (Operator.GREATER, t_var, init_t))
   | None, None, None | Some _, None, Some _ | None, None, Some _ ->
-    Locality.annotate_with_dummy Alg_expr.TRUE
+    Loc.annot_with_dummy Alg_expr.TRUE
 
-let pert_of_result ~debug_mode ~warning ?overwrite_t0 ast_algs ast_rules alg_deps
-    ~compile_mode_on contact_map domain res =
+let pert_of_result ~debug_mode ~warning ?overwrite_t0 ast_algs ast_rules
+    alg_deps ~compile_mode_on contact_map domain res =
   let domain, out_alg_deps, _, lpert, tracking_enabled =
     List.fold_left
       (fun (domain, alg_deps, p_id, lpert, tracking_enabled)
@@ -458,7 +462,7 @@ let pert_of_result ~debug_mode ~warning ?overwrite_t0 ast_algs ast_rules alg_dep
         in
         let repeat =
           match opt with
-          | None -> Locality.annotate_with_dummy Alg_expr.FALSE
+          | None -> Loc.annot_with_dummy Alg_expr.FALSE
           | Some p -> p
         in
         let pert =
@@ -506,7 +510,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
               LKappa.r_delta_tokens = [];
               LKappa.r_rate = Alg_expr.const Nbr.zero;
               LKappa.r_un_rate = None;
-              LKappa.r_editStyle = true;
+              LKappa.r_edit_style = true;
             }
           in
           let preenv'', state' =
@@ -537,13 +541,13 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
               LKappa.r_delta_tokens;
               LKappa.r_rate = Alg_expr.const Nbr.zero;
               LKappa.r_un_rate = None;
-              LKappa.r_editStyle = false;
+              LKappa.r_edit_style = false;
             }
           in
           (match
-             rules_of_ast ~debug_mode ~warning ~compile_mode_on contact_map preenv
-               ~syntax_ref:0
-               (Locality.annotate_with_dummy fake_rule)
+             rules_of_ast ~debug_mode ~warning ~compile_mode_on contact_map
+               preenv ~syntax_ref:0
+               (Loc.annot_with_dummy fake_rule)
            with
           | domain'', _, [ compiled_rule ] ->
             (Alg_expr.CONST Nbr.one, compiled_rule), domain''
@@ -563,8 +567,8 @@ let compile_alg_vars ~debug_mode ~compile_mode_on contact_map domain vars =
       domain', (lbl_pos, alg))
     domain (Array.of_list vars)
 
-let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map domain
-    rules =
+let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map
+    domain rules =
   match
     List.fold_left
       (fun (domain, syntax_ref, deps_machinery, acc) (_, rule) ->
@@ -581,7 +585,7 @@ let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map dom
   | _, _, None, _ -> failwith "The origin of Eval.compile_rules has been lost"
 
 (*let translate_contact_map sigs kasa_contact_map =
-    let wdl = Locality.annotate_with_dummy in
+    let wdl = Loc.annot_with_dummy in
     let sol = Array.init
         (Signature.size sigs)
         (fun i -> Array.make (Signature.arity sigs i) ([],[])) in
@@ -649,7 +653,8 @@ let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
   pause @@ fun () ->
   outputs (Data.Log "\t -observables");
   let preenv, obs =
-    obs_of_result ~debug_mode ~compile_mode_on contact_map preenv alg_deps result
+    obs_of_result ~debug_mode ~compile_mode_on contact_map preenv alg_deps
+      result
   in
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->

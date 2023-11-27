@@ -365,8 +365,8 @@ module Make (Instances : Instances_sig.S) = struct
         | None -> None
         | Some inj_out -> Some (inj_out, [ root2; root1 ], None)))
 
-  let adjust_unary_rule_instances ~debug_mode ~rule_id ?max_distance state domain
-      graph pats rule =
+  let adjust_unary_rule_instances ~debug_mode ~rule_id ?max_distance state
+      domain graph pats rule =
     let pattern1 = pats.(0) in
     let pattern2 = pats.(1) in
     let cands, len =
@@ -381,7 +381,8 @@ module Make (Instances : Instances_sig.S) = struct
           | None -> out
           | Some inj ->
             (match
-               Matching.reconstruct ~debug_mode domain graph inj 1 pattern2 root2
+               Matching.reconstruct ~debug_mode domain graph inj 1 pattern2
+                 root2
              with
             | None -> out
             | Some inj' ->
@@ -468,7 +469,7 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.PositiveInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy "PositiveInternalized in negative update"))
+           (Loc.annot_with_dummy "PositiveInternalized in negative update"))
     | Primitives.Transformation.NegativeInternalized ((id, _), s) ->
       let _, edges' = Edges.remove_internal id s edges in
       side_effects, edges'
@@ -506,7 +507,7 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy "NegativeWhatEver in positive update"))
+           (Loc.annot_with_dummy "NegativeWhatEver in positive update"))
     | Primitives.Transformation.PositiveInternalized (n, s, i) ->
       let ((id, _) as nc) = Matching.Agent.concretize ~debug_mode inj2graph n in
       let edges' = Edges.add_internal id s i edges in
@@ -515,7 +516,7 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.NegativeInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy "NegativeInternalized in positive update"))
+           (Loc.annot_with_dummy "NegativeInternalized in positive update"))
 
   let apply_concrete_positive_transformation sigs ?mod_connectivity_store
       instances edges = function
@@ -533,14 +534,14 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy "NegativeWhatEver in positive update"))
+           (Loc.annot_with_dummy "NegativeWhatEver in positive update"))
     | Primitives.Transformation.PositiveInternalized ((id, _), s, i) ->
       let edges' = Edges.add_internal id s i edges in
       edges'
     | Primitives.Transformation.NegativeInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy "NegativeInternalized in positive update"))
+           (Loc.annot_with_dummy "NegativeInternalized in positive update"))
 
   let obs_from_transformation ~debug_mode domain edges acc = function
     | Primitives.Transformation.Agent nc ->
@@ -1085,8 +1086,8 @@ module Make (Instances : Instances_sig.S) = struct
               (fst (List.hd nodes.(1)))
               state.edges
           then
-            transform_by_a_rule ~debug_mode outputs env counter state' event_kind
-              ~path:None rule ~rule_id inj
+            transform_by_a_rule ~debug_mode outputs env counter state'
+              event_kind ~path:None rule ~rule_id inj
           else
             Corrected
         else (
@@ -1095,8 +1096,8 @@ module Make (Instances : Instances_sig.S) = struct
           with
           | None -> Corrected
           | Some _ as path ->
-            transform_by_a_rule ~debug_mode outputs env counter state' event_kind
-              ~path rule ~rule_id inj
+            transform_by_a_rule ~debug_mode outputs env counter state'
+              event_kind ~path rule ~rule_id inj
         ))
 
   let apply_given_instance ~debug_mode ~outputs ?rule_id env counter state
@@ -1114,8 +1115,8 @@ module Make (Instances : Instances_sig.S) = struct
       in
       (match rule.Primitives.unary_rate with
       | None ->
-        transform_by_a_rule ~debug_mode outputs env counter state event_kind rule
-          ?rule_id inj
+        transform_by_a_rule ~debug_mode outputs env counter state event_kind
+          rule ?rule_id inj
       | Some (_, max_distance) ->
         (match max_distance with
         | None ->
@@ -1143,8 +1144,8 @@ module Make (Instances : Instances_sig.S) = struct
               rule ?rule_id inj
           | Some _ -> Corrected)))
 
-  let apply_given_rule ~debug_mode ~outputs ?rule_id env counter state event_kind
-      rule =
+  let apply_given_rule ~debug_mode ~outputs ?rule_id env counter state
+      event_kind rule =
     let domain = Model.domain env in
     let inst =
       pick_a_rule_instance ~debug_mode state state.imp.random_state domain
@@ -1156,8 +1157,8 @@ module Make (Instances : Instances_sig.S) = struct
   let force_rule ~debug_mode ~outputs env counter state event_kind ?rule_id rule
       =
     match
-      apply_given_rule ~debug_mode ~outputs ?rule_id env counter state event_kind
-        rule
+      apply_given_rule ~debug_mode ~outputs ?rule_id env counter state
+        event_kind rule
     with
     | Success out -> Some out
     | Corrected | Blocked | Clash ->
@@ -1231,8 +1232,8 @@ module Make (Instances : Instances_sig.S) = struct
         rule.Primitives.unary_rate
     in
     let act, state =
-      adjust_unary_rule_instances ~debug_mode ~rule_id ?max_distance state domain
-        state.edges rule.Primitives.connected_components rule
+      adjust_unary_rule_instances ~debug_mode ~rule_id ?max_distance state
+        domain state.edges rule.Primitives.connected_components rule
     in
     let () =
       match rule.Primitives.unary_rate with

@@ -121,7 +121,7 @@ let reconstruction_navigation cc = cc.recogn_nav
 (** Errors *)
 let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
-    (Locality.annotate_with_dummy
+    (Loc.annot_with_dummy
        (Format.asprintf "Site %a of agent %a already specified"
           (Agent.print_site ?sigs x) i
           (Agent.print ?sigs ~with_id:false)
@@ -129,7 +129,7 @@ let already_specified ?sigs x i =
 
 let dangling_node ~sigs tys x =
   ExceptionDefn.Malformed_Decl
-    (Locality.annotate_with_dummy
+    (Loc.annot_with_dummy
        (Format.asprintf "Cannot proceed because last declared agent %a/*%i*/%a"
           (Signature.print_agent sigs)
           (raw_find_ty tys x) x Format.pp_print_string
@@ -313,7 +313,9 @@ let matchings ~debug_mode sigs a b =
     match Mods.Int2Set.choose !possibilities with
     | None -> acc
     | Some (x, y) ->
-      (match are_compatible ~debug_mode ~possibilities ~strict:false x a y b with
+      (match
+         are_compatible ~debug_mode ~possibilities ~strict:false x a y b
+       with
       | None, _ -> for_one_root acc
       | Some r, _ -> for_one_root (r :: acc))
   in
@@ -1418,7 +1420,9 @@ end = struct
       (*one should use a hash here*)
       | [] -> None
       | (st, cc_id) :: tail ->
-        (match Navigation.compatible_fresh_point ~debug_mode st node s arrow with
+        (match
+           Navigation.compatible_fresh_point ~debug_mode st node s arrow
+         with
         | None -> find_good_edge tail
         | Some inj' ->
           let dst = get domain cc_id in
@@ -1548,7 +1552,9 @@ module PreEnv = struct
       | ((Navigation.Fresh _, _), _) :: _ -> assert false
       | ((Navigation.Existing ag, si), Navigation.ToNothing) :: t ->
         (match
-           Mods.IntMap.find_option (Renaming.apply ~debug_mode inj' ag) dst.nodes
+           Mods.IntMap.find_option
+             (Renaming.apply ~debug_mode inj' ag)
+             dst.nodes
          with
         | None -> assert false
         | Some n ->
@@ -1558,7 +1564,9 @@ module PreEnv = struct
             None)
       | ((Navigation.Existing ag, si), Navigation.ToInternal i) :: t ->
         (match
-           Mods.IntMap.find_option (Renaming.apply ~debug_mode inj' ag) dst.nodes
+           Mods.IntMap.find_option
+             (Renaming.apply ~debug_mode inj' ag)
+             dst.nodes
          with
         | None -> assert false
         | Some n ->
@@ -1570,7 +1578,9 @@ module PreEnv = struct
           Navigation.ToNode (Navigation.Existing ag', si') )
         :: t ->
         (match
-           Mods.IntMap.find_option (Renaming.apply ~debug_mode inj' ag) dst.nodes
+           Mods.IntMap.find_option
+             (Renaming.apply ~debug_mode inj' ag)
+             dst.nodes
          with
         | None -> assert false
         | Some n ->
@@ -1582,7 +1592,9 @@ module PreEnv = struct
           Navigation.ToNode (Navigation.Fresh (ag', ty'), si') )
         :: t ->
         (match
-           Mods.IntMap.find_option (Renaming.apply ~debug_mode inj' ag) dst.nodes
+           Mods.IntMap.find_option
+             (Renaming.apply ~debug_mode inj' ag)
+             dst.nodes
          with
         | None -> assert false
         | Some n ->
@@ -1750,7 +1762,8 @@ module PreEnv = struct
       | None -> saturate_level ~debug_mode ~sharing sigs max_l (pred level) acc
       | Some list ->
         let rec aux acc = function
-          | [] -> saturate_level ~debug_mode ~sharing sigs max_l (pred level) acc
+          | [] ->
+            saturate_level ~debug_mode ~sharing sigs max_l (pred level) acc
           | h :: t ->
             aux (saturate_one ~debug_mode ~sharing sigs h max_l level acc t) t
         in
@@ -1848,8 +1861,8 @@ let raw_finish_new ~debug_mode ~toplevel ?origin wk =
     }
   in
   let preenv, r, out, out_id =
-    PreEnv.add_cc ~debug_mode ~toplevel ?origin wk.cc_env (fresh_cc_id wk.cc_env)
-      cc_candidate
+    PreEnv.add_cc ~debug_mode ~toplevel ?origin wk.cc_env
+      (fresh_cc_id wk.cc_env) cc_candidate
   in
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv, r, out, out_id
 

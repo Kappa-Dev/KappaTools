@@ -22,12 +22,12 @@ type 'links site_sig = {
 type t = bool array array site_sig NamedDecls.t
 (** Store of one agent signature *)
 
-(* TODO remove Locality annotations here ? *)
-val num_of_site : ?agent_name:string -> string Locality.annoted -> t -> int
+(* TODO remove Loc annotations here ? *)
+val num_of_site : ?agent_name:string -> string Loc.annoted -> t -> int
 val site_of_num : int -> t -> string
 val fold : (int -> string -> 'a -> 'a) -> 'a -> t -> 'a
 
-val num_of_internal_state : int -> string Locality.annoted -> t -> int
+val num_of_internal_state : int -> string Loc.annoted -> t -> int
 (** [num_of_internal_state site_id state_name signature] *)
 
 val internal_state_of_site_id : int -> int -> t -> string
@@ -41,8 +41,7 @@ type s
 
 (* TODO See what to be kept here? *)
 val create :
-  counters_per_agent:
-    (string Locality.annoted * string Locality.annoted list) list ->
+  counters_per_agent:(string Loc.annoted * string Loc.annoted list) list ->
   t NamedDecls.t ->
   s
 
@@ -57,18 +56,14 @@ val arity : s -> int -> int
 val max_arity : s -> int
 (** [max_arity sigs] returns max {!arities sigs i} *)
 
-val num_of_agent : string Locality.annoted -> s -> int
+val num_of_agent : string Loc.annoted -> s -> int
 val agent_of_num : int -> s -> string
 
-val id_of_site : string Locality.annoted -> string Locality.annoted -> s -> int
+val id_of_site : string Loc.annoted -> string Loc.annoted -> s -> int
 (** [id_of_site agent_type site_name sigs] *)
 
 val id_of_internal_state :
-  string Locality.annoted ->
-  string Locality.annoted ->
-  string Locality.annoted ->
-  s ->
-  int
+  string Loc.annoted -> string Loc.annoted -> string Loc.annoted -> s -> int
 (** [id_of_internal_state agent_type site_name state_name sigs] *)
 
 val internal_states_number : int -> int -> s -> int
@@ -82,7 +77,7 @@ val allowed_link : int -> int -> int -> int -> s -> bool
 (** {2 Counter specific} *)
 
 (** If there are counters in the signature, we define a single agent as the
- * counter agent, which will be used as _dummies_ to keep track of the value *)
+ * _counter agent_, which will be used as _dummies_ to keep track of the counter value *)
 
 val is_counter_agent : s -> int -> bool
 val ports_if_counter_agent : s -> int -> (int * int) option

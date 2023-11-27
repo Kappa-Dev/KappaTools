@@ -107,7 +107,7 @@ let compatible_fresh_point ~debug_mode e (sid, sty) ssite arrow =
   | _, ToNode (Existing _, _) ->
     raise
       (ExceptionDefn.Internal_Error
-         (Locality.annotate_with_dummy
+         (Loc.annot_with_dummy
             "Navigation.compatible_fresh_point does not deal with existing \
              arrow"))
   | ((Fresh (id, ty), site), x), ToNothing ->
@@ -343,7 +343,9 @@ let dst_is_okay ~debug_mode inj' graph root site = function
 
 let injection_for_one_more_edge ~debug_mode ?root inj graph = function
   | (Existing id, site), dst ->
-    dst_is_okay ~debug_mode inj graph (Renaming.apply ~debug_mode inj id) site dst
+    dst_is_okay ~debug_mode inj graph
+      (Renaming.apply ~debug_mode inj id)
+      site dst
   | (Fresh (id, rty), site), dst ->
     (match root with
     | Some (root, rty') when rty = rty' ->
@@ -356,7 +358,9 @@ let imperative_dst_is_okay ~debug_mode inj' graph root site = function
   | ToNothing -> Edges.is_free root site graph
   | ToInternal i -> Edges.is_internal i root site graph
   | ToNode (Existing id', site') ->
-    Edges.link_exists root site (Renaming.apply ~debug_mode inj' id') site' graph
+    Edges.link_exists root site
+      (Renaming.apply ~debug_mode inj' id')
+      site' graph
   | ToNode (Fresh (id', ty), site') ->
     (match Edges.exists_fresh root site ty site' graph with
     | None -> false

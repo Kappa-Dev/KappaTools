@@ -78,7 +78,7 @@ type rule = {
   rule_id: int;
   rule_label: string;
   rule_ast: string;
-  rule_position: Locality.t;
+  rule_position: Loc.t;
   rule_direction: rule_direction;
   rule_hidden: bool;
 }
@@ -87,11 +87,11 @@ type var = {
   var_id: int;
   var_label: string;
   var_ast: string;
-  var_position: Locality.t;
+  var_position: Loc.t;
 }
 
 type ('rule, 'var) influence_node = Rule of 'rule | Var of 'var
-type pos_of_rules_and_vars = ((int, int) influence_node * Locality.t) list
+type pos_of_rules_and_vars = ((int, int) influence_node * Loc.t) list
 
 val pos_of_rules_and_vars_of_json : Yojson.Basic.t -> pos_of_rules_and_vars
 val pos_of_rules_and_vars_to_json : pos_of_rules_and_vars -> Yojson.Basic.t
@@ -108,8 +108,7 @@ val refined_influence_node_of_json :
 val refined_influence_node_to_json :
   (rule, var) influence_node -> Yojson.Basic.t
 
-val position_of_refined_influence_node :
-  (rule, var) influence_node -> Locality.t
+val position_of_refined_influence_node : (rule, var) influence_node -> Loc.t
 
 module InfluenceNodeMap : SetMap.Map with type elt = (int, int) influence_node
 
@@ -157,7 +156,7 @@ val dead_rules_to_json : dead_rules -> Yojson.Basic.t
 type agent_kind = {
   agent_id: int;
   agent_ast: string;
-  agent_position: Locality.t list;
+  agent_position: Loc.t list;
 }
 
 type dead_agents = agent_kind list

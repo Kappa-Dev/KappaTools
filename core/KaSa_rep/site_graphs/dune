@@ -1,12 +1,21 @@
 (library
-  (name kappa_kasa_site_graphs)
-  (libraries yojson kappa_kasa_frontend)
-  (flags (:standard -w @a
-    -open Kappa_kasa_frontend
-    -open Kappa_kasa_kastor_toolset
-    -open Kappa_parameters
-    -open Kappa_errors
-    -open Kappa_logging
-    -open Kappa_generic_toolset
-    -open Kappa_kasa_type_interface
-     )))
+ (name kappa_kasa_site_graphs)
+ (libraries yojson kappa_kasa_frontend)
+ (flags
+  (:standard
+   -w
+   @a
+   -open
+   Kappa_kasa_frontend
+   -open
+   Kappa_kasa_kastor_toolset
+   -open
+   Kappa_parameters
+   -open
+   Kappa_errors
+   -open
+   Kappa_logging
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_kasa_type_interface)))

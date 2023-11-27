@@ -1,15 +1,27 @@
 (library
-  (name kappa_kasa_frontend )
-  (libraries kappa_kasa_kastor_toolset kappa_classical_graphs kappa_mvbdu)
-  (flags (:standard -w @a
-    -open Kappa_kasa_kastor_toolset
-    -open Kappa_generic_toolset
-    -open Kappa_parameters
-    -open Kappa_logging
-    -open Kappa_classical_graphs
-    -open Kappa_terms
-    -open Kappa_grammar
-    -open Kappa_errors
-    -open Kappa_mvbdu
-    -open Kappa_kasa_type_interface
-     )))
+ (name kappa_kasa_frontend)
+ (libraries kappa_kasa_kastor_toolset kappa_classical_graphs kappa_mvbdu)
+ (flags
+  (:standard
+   -w
+   @a
+   -open
+   Kappa_kasa_kastor_toolset
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_parameters
+   -open
+   Kappa_logging
+   -open
+   Kappa_classical_graphs
+   -open
+   Kappa_terms
+   -open
+   Kappa_grammar
+   -open
+   Kappa_errors
+   -open
+   Kappa_mvbdu
+   -open
+   Kappa_kasa_type_interface)))

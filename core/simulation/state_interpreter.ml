@@ -131,8 +131,8 @@ let do_modification ~debug_mode ~outputs env counter graph state extra
         outputs
           (Data.Snapshot
              ( file,
-               Rule_interpreter.snapshot ~debug_mode ~raw:false env counter graph
-             ))
+               Rule_interpreter.snapshot ~debug_mode ~raw:false env counter
+                 graph ))
       )
     in
     true, graph, state, extra
@@ -289,8 +289,8 @@ let do_modifications ~debug_mode ~outputs env counter graph state list =
   if stop then
     stop, graph, state, false
   else
-    perturbate ~debug_mode ~outputs ~is_alarm:false env counter graph state false
-      extra
+    perturbate ~debug_mode ~outputs ~is_alarm:false env counter graph state
+      false extra
 
 let initialize ~bind ~return ~debug_mode ~outputs env counter graph0 state0
     init_l =
@@ -326,7 +326,7 @@ let initialize ~bind ~return ~debug_mode ~outputs env counter graph0 state0
                     | Rule_interpreter.Blocked ->
                       raise
                         (ExceptionDefn.Internal_Error
-                           (Locality.annotate_with_dummy "Bugged initial rule")))
+                           (Loc.annot_with_dummy "Bugged initial rule")))
                   state value,
                 state0 )))
       (return (false, graph0, state0))
@@ -404,8 +404,8 @@ let one_rule ~debug_mode ~outputs ~maxConsecutiveClash env counter graph state
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
   let applied_rid_syntax, final_step, graph' =
-    Rule_interpreter.apply_instance ~debug_mode ~outputs ~maxConsecutiveClash env
-      counter graph instance
+    Rule_interpreter.apply_instance ~debug_mode ~outputs ~maxConsecutiveClash
+      env counter graph instance
   in
   match applied_rid_syntax with
   | None -> final_step, graph', state
@@ -557,8 +557,8 @@ let perturbate_with_backtrack ~debug_mode ~outputs env counter graph state =
     ) else
       true, graph, state
 
-let regular_loop_body ~debug_mode ~outputs ~maxConsecutiveClash env counter graph
-    state dt =
+let regular_loop_body ~debug_mode ~outputs ~maxConsecutiveClash env counter
+    graph state dt =
   let () =
     let outputs counter' time =
       let cand =
@@ -573,8 +573,8 @@ let regular_loop_body ~debug_mode ~outputs ~maxConsecutiveClash env counter grap
     Rule_interpreter.pick_an_instance ~debug_mode env graph
   in
   let stop, graph', state', mix_changed =
-    perturbate ~debug_mode ~outputs ~is_alarm:false env counter graph state false
-      state.time_dependent_perts
+    perturbate ~debug_mode ~outputs ~is_alarm:false env counter graph state
+      false state.time_dependent_perts
   in
   if (not continue) || stop then
     true, graph', state'
@@ -642,8 +642,8 @@ let a_loop ~debug_mode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash env
         else if stop then
           stop, graph', state'
         else
-          regular_loop_body ~debug_mode ~outputs ~maxConsecutiveClash env counter
-            graph' state' dt'
+          regular_loop_body ~debug_mode ~outputs ~maxConsecutiveClash env
+            counter graph' state' dt'
       | _ ->
         regular_loop_body ~debug_mode ~outputs ~maxConsecutiveClash env counter
           graph state dt

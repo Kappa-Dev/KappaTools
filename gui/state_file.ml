@@ -9,10 +9,10 @@
 open Lwt.Infix
 
 type slot = { local: string option; name: string }
-type active = { rank: int; cursor_pos: Locality.position; out_of_sync: bool }
+type active = { rank: int; cursor_pos: Loc.position; out_of_sync: bool }
 type model = { current: active option; directory: slot Mods.IntMap.t }
 
-let dummy_cursor_pos = { Locality.line = -1; Locality.chr = 0 }
+let dummy_cursor_pos = { Loc.line = -1; Loc.chr = 0 }
 let blank_state = { current = None; directory = Mods.IntMap.empty }
 let model, set_directory_state = React.S.create blank_state
 
@@ -323,7 +323,7 @@ let cursor_activity ~line ~ch =
           Some
             {
               rank;
-              cursor_pos = { Locality.line = succ line; chr = ch };
+              cursor_pos = { Loc.line = succ line; chr = ch };
               out_of_sync;
             };
         directory = v.directory;

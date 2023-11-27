@@ -84,7 +84,7 @@ object
 
   method get_influence_map_node_at :
     filename:string ->
-    Kappa_generic_toolset.Locality.position ->
+    Kappa_generic_toolset.Loc.position ->
     ( (int, int) Kappa_kasa_type_interface.Public_data.influence_node option,
       Kappa_generic_toolset.Result_util.message list )
     Kappa_generic_toolset.Result_util.t

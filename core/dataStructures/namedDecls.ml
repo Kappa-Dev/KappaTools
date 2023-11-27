@@ -34,7 +34,7 @@ let create_from_list ?forbidden l = create ?forbidden (Array.of_list l)
 
 (* TODO see if we should keep this *)
 let create_no_loc ?forbidden a =
-  Array.map (fun (x, y) -> (x, Locality.dummy), y) a |> create ?forbidden
+  Array.map (fun (x, y) -> (x, Loc.dummy), y) a |> create ?forbidden
 
 let size nd = Array.length nd.decls
 let elt_name nd i = fst nd.decls.(i)
@@ -82,7 +82,7 @@ let of_json aux = function
         (function
           | `Assoc [ ("name", `String x); ("decl", a) ]
           | `Assoc [ ("decl", a); ("name", `String x) ] ->
-            Locality.annotate_with_dummy x, aux a
+            Loc.annot_with_dummy x, aux a
           | x ->
             raise
               (Yojson.Basic.Util.Type_error ("Not a valid NamedDecl element", x)))

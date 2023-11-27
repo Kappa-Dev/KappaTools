@@ -44,7 +44,7 @@ let dummy =
     to_position = dummy_position;
   }
 
-let annotate_with_dummy x = x, dummy
+let annot_with_dummy x = x, dummy
 
 let is_dummy loc =
   loc.file = Lexing.dummy_pos.Lexing.pos_fname

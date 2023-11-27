@@ -46,10 +46,7 @@ module Make (I : Symmetry_interface_sig.Interface) : sig
 
   val get_reactions :
     ('a, 'b) network ->
-    ((ode_var_id list
-     * ode_var_id list
-     * ode_var_id Locality.annoted list
-     * I.rule)
+    ((ode_var_id list * ode_var_id list * ode_var_id Loc.annoted list * I.rule)
     * int)
     list
 

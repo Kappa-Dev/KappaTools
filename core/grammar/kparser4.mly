@@ -9,9 +9,9 @@
 %{
   let add_pos e x =
     (x,
-    Locality.of_pos (Parsing.symbol_start_pos ()) (Parsing.rhs_end_pos e))
+    Loc.of_pos (Parsing.symbol_start_pos ()) (Parsing.rhs_end_pos e))
   let rhs_pos i =
-    Locality.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
+    Loc.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
   let end_pos = Parsing.rhs_end_pos
   let start_pos = Parsing.rhs_start_pos
 
@@ -44,7 +44,7 @@
   <(Ast.mixture,Ast.mixture,string,Ast.rule) Ast.modif_expr list> standalone_effect_list
 
 %start standalone_bool_expr
-%type <(Ast.mixture,string) Alg_expr.bool Locality.annoted> standalone_bool_expr
+%type <(Ast.mixture,string) Alg_expr.bool Loc.annoted> standalone_bool_expr
 
 %%
 
@@ -134,7 +134,7 @@ counter_test:
 
 site_counter:
   | counter_modif annoted CL_CUR annoted { (None, $1) }
-  | counter_test annoted CL_CUR annoted { (Some $1, Locality.annotate_with_dummy 0) }
+  | counter_test annoted CL_CUR annoted { (Some $1, Loc.annot_with_dummy 0) }
   | counter_test annoted DIV annoted counter_modif annoted CL_CUR annoted
     { (Some $1,$5) }
   ;
@@ -182,9 +182,9 @@ interface:
   ;
 
 agent_modif:
-  | annoted { None,start_pos 1,$1 }
-  | annoted PLUS annoted { Some Ast.Create,end_pos 2,$3 }
-  | annoted MINUS annoted { Some Ast.Erase,end_pos 2,$3 }
+  | annoted { Ast.NoMod,start_pos 1,$1 }
+  | annoted PLUS annoted { Ast.Create,end_pos 2,$3 }
+  | annoted MINUS annoted { Ast.Erase,end_pos 2,$3 }
   ;
 
 agent:
@@ -271,7 +271,7 @@ alg_expr_up_to_prod:
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP (Operator.MODULO,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   ;
 
@@ -281,13 +281,13 @@ alg_expr_up_to_sum:
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP(Operator.MULT,x,y),
-       Locality.of_pos (start_pos 1) pend),
+       Loc.of_pos (start_pos 1) pend),
        pend,an) }
   | alg_expr_up_to_sum DIV annoted alg_expr_up_to_prod
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP(Operator.DIV,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   ;
 
@@ -297,13 +297,13 @@ alg_expr_up_to_if:
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP(Operator.SUM,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   | alg_expr_up_to_if MINUS annoted alg_expr_up_to_sum
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP(Operator.MINUS,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
 
 alg_expr:
@@ -312,7 +312,7 @@ alg_expr:
     { let (i,_,_) = $1 in
       let (t,_,_) = $4 in
   ((Alg_expr.IF(i,t,$7),
-    Locality.of_pos (start_pos 1) (end_pos 7)),end_pos 7,$8) }
+    Loc.of_pos (start_pos 1) (end_pos 7)),end_pos 7,$8) }
   ;
 
 boolean:
@@ -334,25 +334,25 @@ bool_expr_comp:
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.COMPARE_OP(Operator.GREATER,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   | alg_expr_up_to_if SMALLER annoted alg_expr
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.COMPARE_OP(Operator.SMALLER,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   | alg_expr_up_to_if EQUAL annoted alg_expr
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.COMPARE_OP(Operator.EQUAL,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   | alg_expr_up_to_if DIFF annoted alg_expr
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.COMPARE_OP(Operator.DIFF,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   ;
 
@@ -362,7 +362,7 @@ bool_expr_no_or:
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_BOOL_OP(Operator.AND,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   ;
 
@@ -372,7 +372,7 @@ bool_expr:
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_BOOL_OP(Operator.OR,x,y),
-        Locality.of_pos (start_pos 1) pend),
+        Loc.of_pos (start_pos 1) pend),
        pend,an) }
   ;
 
@@ -455,7 +455,7 @@ rule:
       ({
         Ast.rewrite;Ast.bidirectional;
         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
-      },Locality.of_pos (start_pos 1) pos_end) }
+      },Loc.of_pos (start_pos 1) pos_end) }
   | rule_content error
     { raise (ExceptionDefn.Syntax_Error (add_pos 2 "rule rate expected")) }
   ;
@@ -482,11 +482,11 @@ init_declaration:
   | alg_expr pattern
     { let (v,_,_) = $1 in
       let (p,pend,_) = $2 in
-      (v,Ast.INIT_MIX (p,Locality.of_pos (start_pos 2) pend)) }
+      (v,Ast.INIT_MIX (p,Loc.of_pos (start_pos 2) pend)) }
   | alg_expr OP_PAR annoted pattern CL_PAR annoted
     { let (v,_,_) = $1 in
       let (p,pend,_) = $4 in
-      (v,Ast.INIT_MIX (p,Locality.of_pos (start_pos 4) pend)) }
+      (v,Ast.INIT_MIX (p,Loc.of_pos (start_pos 4) pend)) }
   | alg_expr id_list
     { let (v,_,_) = $1 in (v,Ast.INIT_TOK $2) }
 /*
@@ -538,7 +538,7 @@ effect:
     { (Ast.CFLOWLABEL ($5,($3,rhs_pos 3)),end_pos 5,$6) }
   | TRACK annoted pattern boolean annoted
     { let (pat,epat,_) = $3 in
-      (Ast.CFLOWMIX ($4,(pat,Locality.of_pos (start_pos 3) epat)),end_pos 4, $5) }
+      (Ast.CFLOWMIX ($4,(pat,Loc.of_pos (start_pos 3) epat)),end_pos 4, $5) }
   | FLUX annoted nonempty_print_expr boolean annoted
     { let (p,_,_) = $3 in
       ((if $4 then Ast.DIN (Primitives.RELATIVE,p) else Ast.DINOFF p),
@@ -560,7 +560,7 @@ effect:
                 ({ Ast.rewrite; Ast.bidirectional = false;
                    Ast.k_def=Alg_expr.const Nbr.zero;Ast.k_un=None;
                    Ast.k_op=None; Ast.k_op_un=None},
-                 Locality.of_pos (start_pos 3) pend)),
+                 Loc.of_pos (start_pos 3) pend)),
       pend,an
     }
   | INTRO annoted alg_expr pattern
@@ -573,7 +573,7 @@ effect:
 		   Ast.bidirectional=false;
                    Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
                    Ast.k_op=None; Ast.k_op_un=None},
-                  Locality.of_pos (start_pos 4) pend)),
+                  Loc.of_pos (start_pos 4) pend)),
        pend,p) }
   | INTRO annoted error
     { raise (ExceptionDefn.Syntax_Error
@@ -589,7 +589,7 @@ effect:
 		 Ast.bidirectional=false;
                  Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
                  Ast.k_op=None; Ast.k_op_un=None},
-                Locality.of_pos (start_pos 4) pend)),
+                Loc.of_pos (start_pos 4) pend)),
        pend,p) }
   | DELETE annoted error
            { raise (ExceptionDefn.Syntax_Error
@@ -606,7 +606,7 @@ expecting '$DEL alg_expression kappa_expression'")) }
     {
       let (file,pend,p) = $7 in
       let (pat,pendp,_) = $3 in
-      (Ast.SPECIES_OF ($4,file,(pat, Locality.of_pos (start_pos 3) pendp)),
+      (Ast.SPECIES_OF ($4,file,(pat, Loc.of_pos (start_pos 3) pendp)),
        pend,p) }
   ;
 
@@ -623,7 +623,7 @@ idin:
                     };
               Ast.bidirectional=false;
               Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
-              Ast.k_op=None; Ast.k_op_un=None}, Locality.of_pos (start_pos  4) pend)),pend,p)
+              Ast.k_op=None; Ast.k_op_un=None}, Loc.of_pos (start_pos  4) pend)),pend,p)
    }
 | ID annoted LAR error
      { raise (ExceptionDefn.Syntax_Error
@@ -741,7 +741,7 @@ model:
   ;
 
 interactive_command:
-  | annoted RUN annoted SEMICOLON { Ast.RUN (Locality.annotate_with_dummy Alg_expr.FALSE) }
+  | annoted RUN annoted SEMICOLON { Ast.RUN (Loc.annot_with_dummy Alg_expr.FALSE) }
   | annoted RUN annoted bool_expr SEMICOLON { let (pause,_,_) = $4 in Ast.RUN pause }
   | annoted effect SEMICOLON { let (eff,_,_) = $2 in Ast.MODIFY [eff] }
   | annoted EOF { Ast.QUIT }

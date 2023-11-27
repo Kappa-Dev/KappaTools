@@ -1,46 +1,85 @@
 (library
-  (name kappa_staticanalyses)
-  (libraries unix kappa_species_count_enumeration kappa_reachability kappa_influence_map kappa_kasa_export)
-  (modules (:standard \ KaSa))
-  (flags (:standard -w @a
-  	 -open Kappa_generic_toolset
-     -open Kappa_mixtures
-     -open Kappa_terms
-  	 -open Kappa_runtime
-  	 -open Kappa_grammar
-     -open Kappa_cli
-     -open Kappa_profiling
-     -open Kappa_logging
-     -open Kappa_errors
-     -open Kappa_version
-     -open Kappa_kasa_kastor_toolset
-     -open Kappa_symmetries
-     -open Kappa_parameters
-     -open Kappa_reachability
-     -open Kappa_flow_analysis
-     -open Kappa_kasa_remanent_state
-     -open Kappa_mvbdu
-     -open Kappa_kasa_frontend
-     -open Kappa_kasa_site_graphs
-     -open Kappa_kasa_backend
-     -open Kappa_influence_map
-     -open Kappa_kasa_export
-     -open Kappa_kasa_type_interface
-     )))
-
+ (name kappa_staticanalyses)
+ (libraries
+  unix
+  kappa_species_count_enumeration
+  kappa_reachability
+  kappa_influence_map
+  kappa_kasa_export)
+ (modules
+  (:standard \ KaSa))
+ (flags
+  (:standard
+   -w
+   @a
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_mixtures
+   -open
+   Kappa_terms
+   -open
+   Kappa_runtime
+   -open
+   Kappa_grammar
+   -open
+   Kappa_cli
+   -open
+   Kappa_profiling
+   -open
+   Kappa_logging
+   -open
+   Kappa_errors
+   -open
+   Kappa_version
+   -open
+   Kappa_kasa_kastor_toolset
+   -open
+   Kappa_symmetries
+   -open
+   Kappa_parameters
+   -open
+   Kappa_reachability
+   -open
+   Kappa_flow_analysis
+   -open
+   Kappa_kasa_remanent_state
+   -open
+   Kappa_mvbdu
+   -open
+   Kappa_kasa_frontend
+   -open
+   Kappa_kasa_site_graphs
+   -open
+   Kappa_kasa_backend
+   -open
+   Kappa_influence_map
+   -open
+   Kappa_kasa_export
+   -open
+   Kappa_kasa_type_interface)))
 
 (executable
-  (name KaSa)
-  (libraries num yojson str kappa_staticanalyses kappa_kasa_frontend)
-  (modules KaSa)
-  (public_name KaSa)
-  (package kappa-binaries)
-  (flags (:standard
-  -open Kappa_logging
-  -open Kappa_errors
-  -open Kappa_parameters
-  -open Kappa_reachability
-  -open Kappa_staticanalyses
-  -open Kappa_kasa_frontend
-  -open Kappa_kasa_export
-  -open Kappa_kasa_type_interface)))
+ (name KaSa)
+ (libraries num yojson str kappa_staticanalyses kappa_kasa_frontend)
+ (modules KaSa)
+ (public_name KaSa)
+ (package kappa-binaries)
+ (flags
+  (:standard
+   -open
+   Kappa_logging
+   -open
+   Kappa_errors
+   -open
+   Kappa_parameters
+   -open
+   Kappa_reachability
+   -open
+   Kappa_staticanalyses
+   -open
+   Kappa_kasa_frontend
+   -open
+   Kappa_kasa_export
+   -open
+   Kappa_kasa_type_interface)))

@@ -1717,19 +1717,18 @@ functor
                               (Ckappa_sig.site_name_of_int y)
                           in
                           ( state,
-                            ( Locality.annotate_with_dummy sx,
-                              Locality.annotate_with_dummy sy )
+                            (Loc.annot_with_dummy sx, Loc.annot_with_dummy sy)
                             :: list ))
                         (state, []) rev_binding
                     in
                     let states' =
                       NamedDecls.create
                         (Tools.array_map_of_list
-                           (fun i -> Locality.annotate_with_dummy i, ())
+                           (fun i -> Loc.annot_with_dummy i, ())
                            states)
                     in
                     ( state,
-                      ( Locality.annotate_with_dummy x,
+                      ( Loc.annot_with_dummy x,
                         {
                           Signature.internal_state = states';
                           links = Some binding';
@@ -1739,7 +1738,7 @@ functor
                   (state, []) interface
               in
               ( state,
-                (Locality.annotate_with_dummy a, NamedDecls.create_from_list acc)
+                (Loc.annot_with_dummy a, NamedDecls.create_from_list acc)
                 :: list ))
           (state, []) l.(0)
       in

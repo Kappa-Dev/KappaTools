@@ -13,7 +13,7 @@ let of_snapshot g =
         let ra_type = ag.Snapshot.node_type in
         let ar = Array.length ag.Snapshot.node_sites in
         let ra_ports =
-          Array.make ar (Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Maintained)
+          Array.make ar (Loc.annot_with_dummy LKappa.LNK_FREE, LKappa.Maintained)
         in
         let ra_ints = Array.make ar LKappa.I_ANY in
         let pack' =
@@ -31,14 +31,14 @@ let of_snapshot g =
                 | Some va, dangling' ->
                   let () =
                     ra_ports.(id) <-
-                      ( Locality.annotate_with_dummy (LKappa.LNK_VALUE (va, (-1, -1))),
+                      ( Loc.annot_with_dummy (LKappa.LNK_VALUE (va, (-1, -1))),
                         LKappa.Maintained )
                   in
                   dangling', free_id
                 | None, dangling' ->
                   let () =
                     ra_ports.(id) <-
-                      ( Locality.annotate_with_dummy
+                      ( Loc.annot_with_dummy
                           (LKappa.LNK_VALUE (free_id, (-1, -1))),
                         LKappa.Maintained )
                   in
@@ -67,7 +67,8 @@ let patterns_of_mixture ~debug_mode contact_map sigs pre_env e =
       (fun (cc_cache, acc) i m ->
         match
           Pattern_compiler.connected_components_sum_of_ambiguous_mixture
-            ~debug_mode ~compile_mode_on:false contact_map cc_cache (of_snapshot m)
+            ~debug_mode ~compile_mode_on:false contact_map cc_cache
+            (of_snapshot m)
         with
         | cc_cache', [ ([| (_, x) |], _) ] ->
           cc_cache', Tools.recti (fun a _ -> x :: a) acc i

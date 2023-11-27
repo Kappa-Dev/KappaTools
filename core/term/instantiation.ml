@@ -236,7 +236,7 @@ let rec find_match tests actions ctests cactions = function
   | [] ->
     raise
       (ExceptionDefn.Internal_Error
-         (Locality.annotate_with_dummy "abstract and concret quarks don't match"))
+         (Loc.annot_with_dummy "abstract and concret quarks don't match"))
   | cid :: tl ->
     let ctests' =
       List.filter (fun test -> map_test (fun a -> Agent.id a = cid) test) ctests

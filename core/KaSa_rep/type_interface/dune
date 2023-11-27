@@ -1,6 +1,5 @@
 (library
-  (name kappa_kasa_type_interface)
-  (libraries yojson kappa-library.mixtures)
-  (flags (:standard -w @a
-    -open Kappa_generic_toolset
-    -open Kappa_mixtures)))
+ (name kappa_kasa_type_interface)
+ (libraries yojson kappa-library.mixtures)
+ (flags
+  (:standard -w @a -open Kappa_generic_toolset -open Kappa_mixtures)))

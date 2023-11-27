@@ -115,11 +115,11 @@ let reinitialize ~outputs random_state t =
     State_interpreter.empty ~with_delta_activities:false t.counter t.env
 
 let catch_error handler = function
-  | ExceptionDefn.Syntax_Error ((message, range) : string Locality.annoted) ->
+  | ExceptionDefn.Syntax_Error ((message, range) : string Loc.annoted) ->
     handler (Api_common.error_msg ~range message)
-  | ExceptionDefn.Malformed_Decl ((message, range) : string Locality.annoted) ->
+  | ExceptionDefn.Malformed_Decl ((message, range) : string Loc.annoted) ->
     handler (Api_common.error_msg ~range message)
-  | ExceptionDefn.Internal_Error ((message, range) : string Locality.annoted) ->
+  | ExceptionDefn.Internal_Error ((message, range) : string Loc.annoted) ->
     handler (Api_common.error_msg ~range message)
   | Invalid_argument error ->
     handler (Api_common.error_msg ("Runtime error " ^ error))

@@ -435,7 +435,7 @@ class manager ~(timeout : float option) ~url ~project_id : Api.rest_manager =
           JsonUtil.to_option Public_data.refined_influence_node_of_json
             (Yojson.Basic.from_string x))
 
-    method get_influence_map_node_at ~filename { Locality.line; Locality.chr } =
+    method get_influence_map_node_at ~filename { Loc.line; Loc.chr } =
       send ?timeout request_count
         (Format.sprintf
            "%s/v2/projects/%s/analyses/influence_map/node_at?file=%s&line=%i&chr=%i"

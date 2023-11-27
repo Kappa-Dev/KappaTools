@@ -33,15 +33,11 @@ type var_id = int
 type dead_agents = Public_data.agent_kind list
 
 val info_to_rule :
-  string
-  * Locality.t
-  * Public_data.rule_direction
-  * string
-  * Ckappa_sig.c_rule_id ->
+  string * Loc.t * Public_data.rule_direction * string * Ckappa_sig.c_rule_id ->
   Public_data.rule
 
 val info_to_agent :
-  string * Locality.t list * Ckappa_sig.c_agent_name -> Public_data.agent_kind
+  string * Loc.t list * Ckappa_sig.c_agent_name -> Public_data.agent_kind
 
 type separating_transitions = Public_data.separating_transitions
 

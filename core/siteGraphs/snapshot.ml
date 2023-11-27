@@ -141,7 +141,7 @@ let cc_to_user_cc ~debug_mode ~raw sigs cc =
               | None ->
                 raise
                   (ExceptionDefn.Internal_Error
-                     (Locality.annotate_with_dummy "Injectivity of renaming in snapshot"))
+                     (Loc.annot_with_dummy "Injectivity of renaming in snapshot"))
               | Some r -> r
             )
           in

@@ -1,9 +1,12 @@
 (library
-  (name kappa_version)
-  (libraries yojson result re)
-  (flags (:standard)))
+ (name kappa_version)
+ (libraries yojson result re)
+ (flags (:standard)))
 
 (rule
-    (targets git_version.ml)
-    (deps ../../dev/get-git-version.ml)
-    (action (with-stdout-to %{targets} (run ocaml unix.cma %{deps}))))
+ (targets git_version.ml)
+ (deps ../../dev/get-git-version.ml)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ocaml unix.cma %{deps}))))

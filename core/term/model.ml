@@ -10,10 +10,9 @@ type t = {
   filenames: string list;
   domain: Pattern.Env.t;
   tokens: unit NamedDecls.t;
-  algs: Primitives.alg_expr Locality.annoted NamedDecls.t;
-  observables: Primitives.alg_expr Locality.annoted array;
-  ast_rules:
-    (string Locality.annoted option * LKappa.rule Locality.annoted) array;
+  algs: Primitives.alg_expr Loc.annoted NamedDecls.t;
+  observables: Primitives.alg_expr Loc.annoted array;
+  ast_rules: (string Loc.annoted option * LKappa.rule Loc.annoted) array;
   rules: Primitives.elementary_rule array;
   interventions: Primitives.perturbation array;
   dependencies_in_time: Operator.DepSet.t;
@@ -226,18 +225,17 @@ let check_if_counter_is_filled_enough x =
   then
     raise
       (ExceptionDefn.Malformed_Decl
-         (Locality.annotate_with_dummy
-            "There is no way for the simulation to stop."))
+         (Loc.annot_with_dummy "There is no way for the simulation to stop."))
 
 let overwrite_vars alg_overwrite env =
   let algs' =
     Array.map
-      (fun (x, y) -> Locality.annotate_with_dummy x, y)
+      (fun (x, y) -> Loc.annot_with_dummy x, y)
       env.algs.NamedDecls.decls
   in
   let () =
     List.iter
-      (fun (i, v) -> algs'.(i) <- fst algs'.(i), Locality.annotate_with_dummy v)
+      (fun (i, v) -> algs'.(i) <- fst algs'.(i), Loc.annot_with_dummy v)
       alg_overwrite
   in
   { env with algs = NamedDecls.create algs' }
@@ -258,13 +256,11 @@ let fold_mixture_in_expr f =
 let propagate_constant ~warning ?max_time ?max_events ~updated_vars
     ~alg_overwrite x =
   let algs' =
-    Array.map
-      (fun (x, y) -> Locality.annotate_with_dummy x, y)
-      x.algs.NamedDecls.decls
+    Array.map (fun (x, y) -> Loc.annot_with_dummy x, y) x.algs.NamedDecls.decls
   in
   let () =
     List.iter
-      (fun (i, v) -> algs'.(i) <- fst algs'.(i), Locality.annotate_with_dummy v)
+      (fun (i, v) -> algs'.(i) <- fst algs'.(i), Loc.annot_with_dummy v)
       alg_overwrite
   in
   let () =
@@ -388,7 +384,7 @@ let of_yojson = function
          algs =
            NamedDecls.of_json
              (fun x ->
-               Locality.annotate_with_dummy
+               Loc.annot_with_dummy
                  (Alg_expr.e_of_yojson ~filenames kappa_instance_of_yojson
                     (JsonUtil.to_int ?error_msg:None)
                     x))
@@ -398,7 +394,7 @@ let of_yojson = function
            | `List o ->
              Tools.array_map_of_list
                (fun x ->
-                 Locality.annotate_with_dummy
+                 Loc.annot_with_dummy
                    (Alg_expr.e_of_yojson ~filenames kappa_instance_of_yojson
                       (JsonUtil.to_int ?error_msg:None)
                       x))
@@ -411,13 +407,10 @@ let of_yojson = function
              Tools.array_map_of_list
                (function
                  | `List [ `Null; r ] ->
-                   ( None,
-                     Locality.annotate_with_dummy
-                       (LKappa.rule_of_json ~filenames r) )
+                   None, Loc.annot_with_dummy (LKappa.rule_of_json ~filenames r)
                  | `List [ `String n; r ] ->
-                   ( Some (Locality.annotate_with_dummy n),
-                     Locality.annotate_with_dummy
-                       (LKappa.rule_of_json ~filenames r) )
+                   ( Some (Loc.annot_with_dummy n),
+                     Loc.annot_with_dummy (LKappa.rule_of_json ~filenames r) )
                  | _ -> raise Not_found)
                o
            | `Null -> [||]
