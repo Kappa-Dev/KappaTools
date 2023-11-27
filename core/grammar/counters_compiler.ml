@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type 'a rule_agent_counters = {
+type 'a with_ra_counters = {
   ra: 'a;
   ra_counters: (Ast.counter * LKappa.switching) option array;
 }

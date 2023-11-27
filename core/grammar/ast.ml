@@ -147,7 +147,7 @@ type ('agent, 'pattern, 'mixture, 'id, 'rule) compil = {
     or kinetic rate *)
   signatures: 'agent list;  (** agent signature declaration *)
   rules: (string Locality.annoted option * 'rule Locality.annoted) list;
-      (** rules (possibly named) *)
+      (** rules (possibly named): [name_option * rule_definition] *)
   observables: ('pattern, 'id) Alg_expr.e Locality.annoted list;
       (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statment list;

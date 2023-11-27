@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type 'a rule_agent_counters = {
+type 'a with_ra_counters = {
   ra: 'a;
   ra_counters: (Ast.counter * LKappa.switching) option array;
 }
@@ -24,8 +24,8 @@ val make_counter : int -> string -> Ast.counter
 
 val remove_counter_rule :
   Signature.s ->
-  LKappa.rule_agent rule_agent_counters list ->
-  Raw_mixture.agent rule_agent_counters list ->
+  LKappa.rule_agent with_ra_counters list ->
+  Raw_mixture.agent with_ra_counters list ->
   LKappa.rule_agent list * Raw_mixture.agent list
 
 val counters_perturbations :
@@ -45,7 +45,7 @@ val annotate_dropped_counters :
   int ->
   string ->
   (int -> unit) option ->
-  LKappa.rule_agent rule_agent_counters
+  LKappa.rule_agent with_ra_counters
 
 val annotate_edit_counters :
   Signature.s ->
@@ -53,7 +53,7 @@ val annotate_edit_counters :
   Ast.counter list ->
   LKappa.rule_agent ->
   (int -> int -> int -> int -> unit) ->
-  LKappa.rule_agent rule_agent_counters
+  LKappa.rule_agent with_ra_counters
 
 val annotate_created_counters :
   Signature.s ->
@@ -61,7 +61,7 @@ val annotate_created_counters :
   Ast.counter list ->
   (int -> int -> int -> int -> unit) ->
   Raw_mixture.agent ->
-  Raw_mixture.agent rule_agent_counters
+  Raw_mixture.agent with_ra_counters
 
 val annotate_counters_with_diff :
   Signature.s ->
@@ -70,7 +70,7 @@ val annotate_counters_with_diff :
   Ast.counter list ->
   LKappa.rule_agent ->
   (int -> int -> int -> int -> unit) ->
-  LKappa.rule_agent rule_agent_counters
+  LKappa.rule_agent with_ra_counters
 
 val add_counter_to_contact_map :
   Signature.s -> (int -> int -> int -> int -> unit) -> unit
