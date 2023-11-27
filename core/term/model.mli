@@ -130,8 +130,8 @@ val propagate_constant :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?max_time:float ->
   ?max_events:int ->
-  int list ->
-  (int * Primitives.alg_expr) list ->
+  updated_vars:int list ->
+  alg_overwrite:(int * Primitives.alg_expr) list ->
   t ->
   t
 (** [propagate_constant updated_vars overwrite_vars env] *)

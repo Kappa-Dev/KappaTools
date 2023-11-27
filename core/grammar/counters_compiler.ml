@@ -407,13 +407,13 @@ let has_counters (c : _ Ast.compil) : bool =
   in
   has_counters_mix c.Ast.signatures
 
-let compile ~warning ~debugMode c =
+let compile ~warning ~debug_mode c =
   if has_counters c then (
     let rules =
       remove_variable_in_counters ~warning c.Ast.rules c.Ast.signatures
     in
     let () =
-      if debugMode then (
+      if debug_mode then (
         let () = Format.printf "@.ast rules@." in
         List.iter
           (fun (s, (r, _)) ->

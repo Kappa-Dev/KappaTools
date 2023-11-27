@@ -16,8 +16,8 @@
 *)
 
 val compile_bool :
-  debugMode:bool ->
-  compileModeOn:bool ->
+  debug_mode:bool ->
+  compile_mode_on:bool ->
   ?origin:Operator.rev_dep ->
   Contact_map.t ->
   Pattern.PreEnv.t ->
@@ -25,19 +25,19 @@ val compile_bool :
   Pattern.PreEnv.t * (Pattern.id array list, int) Alg_expr.bool Locality.annoted
 
 val compile_modifications_no_track :
-  debugMode:bool ->
+  debug_mode:bool ->
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
-  compileModeOn:bool ->
+  compile_mode_on:bool ->
   Contact_map.t ->
   Pattern.PreEnv.t ->
   (LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
 
 val compile_inits :
-  debugMode:bool ->
+  debug_mode:bool ->
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?rescale:float ->
-  compileModeOn:bool ->
+  compile_mode_on:bool ->
   Contact_map.t ->
   Model.t ->
   (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
@@ -52,8 +52,8 @@ val compile :
      * (Primitives.alg_expr * Primitives.elementary_rule) list ->
     'b) ->
   sharing:Pattern.sharing_level ->
-  debugMode:bool ->
-  compileModeOn:bool ->
+  debug_mode:bool ->
+  compile_mode_on:bool ->
   ?overwrite_init:
     (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
   ?overwrite_t0:float ->
@@ -67,7 +67,7 @@ val compile :
 val build_initial_state :
   bind:('a -> (bool * Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->
   return:(bool * Rule_interpreter.t * State_interpreter.t -> 'a) ->
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   Counter.t ->
   Model.t ->

@@ -112,7 +112,7 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
       aux (ag_id + 1) tail (work, bond_map)
   in
   let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
-  let a, _, b, c = Pattern.finish_new ~debugMode:noCounters work in
+  let a, _, b, c = Pattern.finish_new ~debug_mode:noCounters work in
   let () =
     match sigs with
     | None -> ()
@@ -188,7 +188,7 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
       aux (ag_id + 1) tail (work, bond_map)
   in
   let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
-  let a, _, b, c = Pattern.finish_new ~debugMode:noCounters work in
+  let a, _, b, c = Pattern.finish_new ~debug_mode:noCounters work in
   let () =
     match sigs with
     | None -> ()

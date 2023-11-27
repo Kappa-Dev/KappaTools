@@ -87,12 +87,12 @@ val are_connected :
 (** [are_connected ?max_distance graph nodes_x nodes_y] *)
 
 val species :
-  debugMode:bool -> Signature.s -> int -> t -> User_graph.connected_component
+  debug_mode:bool -> Signature.s -> int -> t -> User_graph.connected_component
 
 val build_snapshot : raw:bool -> Signature.s -> t -> Snapshot.t
 
 val build_user_snapshot :
-  debugMode:bool ->
+  debug_mode:bool ->
   raw:bool ->
   Signature.s ->
   t ->

@@ -214,17 +214,20 @@ let annotate_dropped_agent ~warning ~syntax_version ~r_editStyle sigs
           lannot, pset'
         | ([ (LKappa.ANY_FREE, _) ] | []) when syntax_version = Ast.V3 ->
           let () =
-            ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Erased
+            ports.(p_id) <-
+              Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Erased
           in
           lannot, pset'
         | [ (LKappa.ANY_FREE, _) ] | [] ->
           let () =
-            ports.(p_id) <- Locality.annotate_with_dummy LKappa.ANY_FREE, LKappa.Erased
+            ports.(p_id) <-
+              Locality.annotate_with_dummy LKappa.ANY_FREE, LKappa.Erased
           in
           lannot, pset'
         | [ (LKappa.LNK_FREE, _) ] ->
           let () =
-            ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Erased
+            ports.(p_id) <-
+              Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Erased
           in
           lannot, pset'
         | [ (LKappa.LNK_VALUE (i, ()), pos) ] ->
@@ -357,7 +360,8 @@ let annotate_edit_agent ~warning ~syntax_version ~is_rule sigs ?contact_map
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let ports =
-    Array.make arity (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
+    Array.make arity
+      (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
   in
   let internals = Array.make arity LKappa.I_ANY in
   let scan_port (links_annot, pset) p =
@@ -394,7 +398,9 @@ let annotate_edit_agent ~warning ~syntax_version ~is_rule sigs ?contact_map
           translate_modification ~warning ?warn:None sigs ?contact_map ag_id
             p_id links_annot p.Ast.port_link_mod
         in
-        let () = ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, modif in
+        let () =
+          ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, modif
+        in
         links_annot'
       | [] when p.Ast.port_link_mod = None -> links_annot
       | [ (LKappa.ANY_FREE, _) ] | [] ->
@@ -405,7 +411,9 @@ let annotate_edit_agent ~warning ~syntax_version ~is_rule sigs ?contact_map
           translate_modification ~warning ?warn:None sigs ?contact_map ag_id
             p_id links_annot p.Ast.port_link_mod
         in
-        let () = ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, modif in
+        let () =
+          ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, modif
+        in
         links_annot'
       | [ (LKappa.LNK_TYPE (dst_p, dst_ty), pos) ] ->
         let modif, links_annot' =
@@ -490,7 +498,8 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let ports =
-    Array.make arity (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
+    Array.make arity
+      (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
   in
   let internals = Array.make arity LKappa.I_ANY in
   let register_port_modif p_id lnk1 p' ((lhs_links, rhs_links) as links_annot) =
@@ -573,18 +582,21 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
         ([ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ] | []) )
       when syntax_version = Ast.V3 ->
       let () =
-        ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Maintained
+        ports.(p_id) <-
+          Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Maintained
       in
       links_annot
     | ( [ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ],
         [ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ] ) ->
       let () =
-        ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Maintained
+        ports.(p_id) <-
+          Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Maintained
       in
       links_annot
     | [], [] ->
       let () =
-        ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained
+        ports.(p_id) <-
+          Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained
       in
       links_annot
     | ( [ (LKappa.LNK_VALUE (i, ()), pos) ],
@@ -642,7 +654,8 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
     | ( [ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ],
         [ (LKappa.LNK_VALUE (i, ()), pos) ] ) ->
       let () =
-        ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Linked i
+        ports.(p_id) <-
+          Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Linked i
       in
       let _, rhs_links' =
         build_link sigs ~warn_on_swap:warning ?contact_map pos i ag_id p_id
@@ -651,7 +664,8 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
       lhs_links, rhs_links'
     | [], [ (LKappa.LNK_VALUE (i, ()), pos) ] when syntax_version = Ast.V3 ->
       let () =
-        ports.(p_id) <- Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Linked i
+        ports.(p_id) <-
+          Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Linked i
       in
       let _, rhs_links' =
         build_link sigs ~warn_on_swap:warning ?contact_map pos i ag_id p_id
@@ -766,7 +780,9 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
         let port_name = p.Ast.port_name in
         let p_id = Signature.num_of_site ~agent_name port_name sign in
         let () = register_internal_modif p_id [] p in
-        register_port_modif p_id [ Locality.annotate_with_dummy LKappa.LNK_ANY ] p annoted)
+        register_port_modif p_id
+          [ Locality.annotate_with_dummy LKappa.LNK_ANY ]
+          p annoted)
       annoted rp_r
   in
 
@@ -1008,7 +1024,8 @@ let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
     | [] :: _, [] | [], [] :: _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.annotate_with_dummy "Invariant violation in annotate_lhs_with..."))
+           (Locality.annotate_with_dummy
+              "Invariant violation in annotate_lhs_with..."))
   in
   aux_line
     ( (Mods.IntMap.empty, Mods.IntMap.empty),
@@ -1231,7 +1248,8 @@ let assemble_rule ~warning ~syntax_version ~r_editStyle sigs tok algs r_mix
     List.rev_map
       (fun (al, (tk, pos)) ->
         ( alg_expr_of_ast ~warning ~syntax_version sigs tok algs
-            (Locality.annotate_with_dummy (Alg_expr.UN_ALG_OP (Operator.UMINUS, al))),
+            (Locality.annotate_with_dummy
+               (Alg_expr.UN_ALG_OP (Operator.UMINUS, al))),
           convert_token_name tk tok pos ))
       rm_tk
   in
@@ -1610,21 +1628,26 @@ let init_of_ast ~warning ~syntax_version sigs contact_map tok algs inits =
         init_of_ast ~warning ~syntax_version sigs tok contact_map ini ))
     inits
 
-type ast_compiled_data =
-  Signature.s
-  * Contact_map.t
-  * unit NamedDecls.t
-  * int Mods.StringMap.t
-  * int list
-  * ( Ast.agent,
+type ast_compiled_data = {
+  agents_sig: Signature.s;
+  contact_map: Contact_map.t;
+  token_names: unit NamedDecls.t;
+  alg_vars_finder: int Mods.StringMap.t;
+  updated_alg_vars: int list;
+  result:
+    ( Ast.agent,
       LKappa.rule_agent list,
       Raw_mixture.t,
       int,
       LKappa.rule )
-    Ast.compil
+    Ast.compil;
+      (** Compiled data where identifiers are i Ast.compil where identifiers
+     * are integers and not string, syntactic sugar on rules are expansed
+     * (syntactic sugar on mixture are not) *)
+}
 
-let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
-  let c, has_counters = Counters_compiler.compile ~warning ~debugMode c in
+let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite c =
+  let c, has_counters = Counters_compiler.compile ~warning ~debug_mode c in
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = [] then
       if has_counters then
@@ -1664,15 +1687,15 @@ let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
                ( "variable '" ^ x ^ "' is overwritten more than once",
                  Locality.dummy )))
   in
-  let overwrite', rev_algs =
+  let var_overwrite', rev_algs =
     overwrite_overwritten
-      (overwrite_overwritten (overwrite, []) c.Ast.variables)
+      (overwrite_overwritten (var_overwrite, []) c.Ast.variables)
       extra_vars
   in
   let alg_vars_over =
     List_util.rev_map_append
       (fun (x, v) -> Locality.annotate_with_dummy x, Alg_expr.const v)
-      overwrite' (List.rev rev_algs)
+      var_overwrite' (List.rev rev_algs)
   in
   let alg_vars_array = Array.of_list alg_vars_over in
   let algs =
@@ -1719,33 +1742,35 @@ let compil_of_ast ~warning ~debugMode ~syntax_version overwrite c =
             r_pos ) ))
       cleaned_rules
   in
-  ( sigs,
-    contact_map,
-    tk_nd,
-    algs,
-    updated_vars,
-    {
-      Ast.filenames = c.Ast.filenames;
-      Ast.variables =
-        Tools.array_fold_righti
-          (fun i (lab, expr) acc ->
-            ( lab,
-              alg_expr_of_ast ~warning ~syntax_version ~max_allowed_var:(pred i)
-                sigs tok algs expr )
-            :: acc)
-          alg_vars_array [];
-      Ast.rules;
-      Ast.observables =
-        List.rev_map
-          (fun expr ->
-            alg_expr_of_ast ~warning ~syntax_version sigs tok algs expr)
-          (List.rev c.Ast.observables);
-      Ast.init =
-        init_of_ast ~warning ~syntax_version sigs contact_map tok algs
-          c.Ast.init;
-      Ast.perturbations = perts'';
-      Ast.volumes = c.Ast.volumes;
-      Ast.tokens = c.Ast.tokens;
-      Ast.signatures = c.Ast.signatures;
-      Ast.configurations = c.Ast.configurations;
-    } )
+  {
+    agents_sig = sigs;
+    contact_map;
+    token_names = tk_nd;
+    alg_vars_finder = algs;
+    updated_alg_vars = updated_vars;
+    result =
+      {
+        filenames = c.filenames;
+        variables =
+          Tools.array_fold_righti
+            (fun i (lab, expr) acc ->
+              ( lab,
+                alg_expr_of_ast ~warning ~syntax_version
+                  ~max_allowed_var:(pred i) sigs tok algs expr )
+              :: acc)
+            alg_vars_array [];
+        rules;
+        observables =
+          List.rev_map
+            (fun expr ->
+              alg_expr_of_ast ~warning ~syntax_version sigs tok algs expr)
+            (List.rev c.observables);
+        init =
+          init_of_ast ~warning ~syntax_version sigs contact_map tok algs c.init;
+        perturbations = perts'';
+        volumes = c.volumes;
+        tokens = c.tokens;
+        signatures = c.signatures;
+        configurations = c.configurations;
+      };
+  }

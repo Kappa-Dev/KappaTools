@@ -24,7 +24,7 @@ val print_internal :
 val print_raw_internal :
   ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
 
-val rename : debugMode:bool -> Renaming.t -> t -> t
+val rename : debug_mode:bool -> Renaming.t -> t -> t
 val json_dictionnary : string
 val write_json : Buffer.t -> t -> unit
 val read_json : Yojson.Basic.lexer_state -> Lexing.lexbuf -> t

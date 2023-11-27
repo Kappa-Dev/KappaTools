@@ -38,34 +38,34 @@ val init_of_ast :
   (Ast.mixture, Ast.mixture, string) Ast.init_statment list ->
   (LKappa.rule_agent list, Raw_mixture.t, int) Ast.init_statment list
 
-type ast_compiled_data =
-  Signature.s
-  * Contact_map.t
-  * unit NamedDecls.t
-  * int Mods.StringMap.t
-  * int list
-  * ( Ast.agent,
+type ast_compiled_data = {
+  agents_sig: Signature.s;
+  contact_map: Contact_map.t;
+  token_names: unit NamedDecls.t;
+  alg_vars_finder: int Mods.StringMap.t;
+  updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)
+  result:
+    ( Ast.agent,
       LKappa.rule_agent list,
       Raw_mixture.t,
       int,
       LKappa.rule )
-    Ast.compil
-(** Data returned by [compil_of_ast] *)
+    Ast.compil;
+      (** Compiled data where identifiers are i Ast.compil where identifiers
+     * are integers and not string, syntactic sugar on rules are expansed
+     * (syntactic sugar on mixture are not) *)
+}
 
 val compil_of_ast :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
-  debugMode:bool ->
+  debug_mode:bool ->
   syntax_version:Ast.syntax_version ->
-  (string * Nbr.t) list ->
+  var_overwrite:(string * Nbr.t) list ->
   Ast.parsing_compil ->
   ast_compiled_data
 (** [compil_of_ast variable_overwrite ast]
 
-    @return a [ast_compiled_data] instance: the signature of agent, the
-    contact map, the signature of tokens, an algebraic variable finder,
-    algebraic variable on which constant propagation is forbidden, and an
-    Ast.compil where identifiers are integers and not string, syntactic
-    sugar on rules are expansed (syntactic sugar on mixture are not)
+    @return a [ast_compiled_data] instance:
 
     This function sorts out longest prefix convention as well as ensure a
     lot of sanity on mixtures:

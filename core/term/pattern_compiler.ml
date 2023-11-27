@@ -609,7 +609,7 @@ let incr_origin = function
   | (Operator.ALG _ | Operator.MODIF _) as x -> x
   | Operator.RULE i -> Operator.RULE (succ i)
 
-let connected_components_of_mixture ~debugMode created mix (env, origin) =
+let connected_components_of_mixture ~debug_mode created mix (env, origin) =
   let sigs = Pattern.PreEnv.sigs env in
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
@@ -658,24 +658,24 @@ let connected_components_of_mixture ~debugMode created mix (env, origin) =
         add_agents_in_cc sigs id wk Mods.IntMap.empty transformations
           links_transf instantiations' t [ h ]
       in
-      let env', inj, cc, cc_id = Pattern.finish_new ~debugMode ?origin wk_out in
+      let env', inj, cc, cc_id = Pattern.finish_new ~debug_mode ?origin wk_out in
       let added' =
         List_util.smart_map
-          (Primitives.Transformation.rename ~debugMode id inj)
+          (Primitives.Transformation.rename ~debug_mode id inj)
           added
       in
       let removed' =
         List_util.smart_map
-          (Primitives.Transformation.rename ~debugMode id inj)
+          (Primitives.Transformation.rename ~debug_mode id inj)
           removed
       in
       let event' =
-        Instantiation.rename_abstract_event ~debugMode id inj event
+        Instantiation.rename_abstract_event ~debug_mode id inj event
       in
       let l_t' =
         Mods.IntMap.map
           (fun ((p, s) as x) ->
-            let p' = Matching.Agent.rename ~debugMode id inj p in
+            let p' = Matching.Agent.rename ~debug_mode id inj p in
             if p == p' then
               x
             else
@@ -692,15 +692,15 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
     (find_implicit_infos contact_map
        (List.rev (List.rev_map LKappa.copy_rule_agent precomp_mixs)))
 
-let connected_components_sum_of_ambiguous_rule ~debugMode ~compileModeOn
+let connected_components_sum_of_ambiguous_rule ~debug_mode ~compile_mode_on
     contact_map env ?origin precomp_mixs created =
-  let noCounters = debugMode in
+  let noCounters = debug_mode in
   let sigs = Pattern.PreEnv.sigs env in
   let all_mixs =
     rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs
   in
   let () =
-    if compileModeOn then
+    if compile_mode_on then
       Format.eprintf "@[<v>_____(%i)@,%a@]@." (List.length all_mixs)
         (Pp.list Pp.cut (fun f x ->
              Format.fprintf f "@[%a%a@]"
@@ -712,13 +712,13 @@ let connected_components_sum_of_ambiguous_rule ~debugMode ~compileModeOn
         all_mixs
   in
   List_util.fold_right_map
-    (connected_components_of_mixture ~debugMode created)
+    (connected_components_of_mixture ~debug_mode created)
     all_mixs (env, origin)
 
-let connected_components_sum_of_ambiguous_mixture ~debugMode ~compileModeOn
+let connected_components_sum_of_ambiguous_mixture ~debug_mode ~compile_mode_on
     contact_map env ?origin mix =
   let rules, (cc_env, _) =
-    connected_components_sum_of_ambiguous_rule ~debugMode ~compileModeOn
+    connected_components_sum_of_ambiguous_rule ~debug_mode ~compile_mode_on
       contact_map env ?origin mix []
   in
   ( cc_env,

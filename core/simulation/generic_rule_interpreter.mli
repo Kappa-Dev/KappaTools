@@ -48,7 +48,7 @@ module Make (Instances : Instances_sig.S) : sig
   (** {2 Core} *)
 
   val apply_given_rule :
-    debugMode:bool ->
+    debug_mode:bool ->
     outputs:(Data.t -> unit) ->
     ?rule_id:int ->
     Model.t ->
@@ -60,11 +60,11 @@ module Make (Instances : Instances_sig.S) : sig
   (** Returns the graph obtained by applying the rule.
       [rule_id] is mandatory if the rule has an unary rate.*)
 
-  val pick_an_instance : debugMode:bool -> Kappa_terms.Model.t -> t -> instance
+  val pick_an_instance : debug_mode:bool -> Kappa_terms.Model.t -> t -> instance
   val is_correct_instance : Model.t -> t -> instance -> bool
 
   val apply_instance :
-    debugMode:bool ->
+    debug_mode:bool ->
     outputs:(Data.t -> unit) ->
     ?maxConsecutiveBlocked:int ->
     maxConsecutiveClash:int ->
@@ -80,7 +80,7 @@ module Make (Instances : Instances_sig.S) : sig
       a null event occured *)
 
   val force_rule :
-    debugMode:bool ->
+    debug_mode:bool ->
     outputs:(Data.t -> unit) ->
     Model.t ->
     Counter.t ->
@@ -94,12 +94,12 @@ module Make (Instances : Instances_sig.S) : sig
       side to do apply the rule and returns the remaining exact injections. *)
 
   val incorporate_extra_pattern :
-    debugMode:bool -> Pattern.Env.t -> t -> Pattern.id -> t
+    debug_mode:bool -> Pattern.Env.t -> t -> Pattern.id -> t
 
   val overwrite_var : int -> Counter.t -> t -> Primitives.alg_expr -> t
 
   val update_outdated_activities :
-    debugMode:bool ->
+    debug_mode:bool ->
     (int -> float -> float -> unit) ->
     Model.t ->
     Counter.t ->
@@ -118,13 +118,13 @@ module Make (Instances : Instances_sig.S) : sig
       takes the list of perturbations to be tried and returns it updated *)
 
   val snapshot :
-    debugMode:bool -> raw:bool -> Model.t -> Counter.t -> t -> Data.snapshot
+    debug_mode:bool -> raw:bool -> Model.t -> Counter.t -> t -> Data.snapshot
 
   val print : Model.t -> Format.formatter -> t -> unit
   val get_random_state : t -> Random.State.t
 
   val update_edges_from_actions :
-    debugMode:bool ->
+    debug_mode:bool ->
     outputs:(Data.t -> unit) ->
     Signature.s ->
     Counter.t ->
@@ -187,7 +187,7 @@ module Make (Instances : Instances_sig.S) : sig
   (** {2 Internals } *)
 
   val apply_positive_transformation :
-    debugMode:bool ->
+    debug_mode:bool ->
     Signature.s ->
     ?mod_connectivity_store:Roots.mod_ccs_cache ->
     Instances.t ->
@@ -209,7 +209,7 @@ module Make (Instances : Instances_sig.S) : sig
     Edges.t
 
   val obs_from_transformations :
-    debugMode:bool ->
+    debug_mode:bool ->
     Pattern.Env.t ->
     Edges.t ->
     Instantiation.concrete Primitives.Transformation.t list ->

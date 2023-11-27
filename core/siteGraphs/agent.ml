@@ -35,8 +35,8 @@ let print_raw_internal ?sigs (i, agent) site f id =
   | Some sigs -> Signature.print_internal_state sigs agent site f id
   | None -> Format.fprintf f "n%is%i~%i" i site id
 
-let rename ~debugMode inj (n_id, n_ty) =
-  Renaming.apply ~debugMode inj n_id, n_ty
+let rename ~debug_mode inj (n_id, n_ty) =
+  Renaming.apply ~debug_mode inj n_id, n_ty
 
 let sort (_, ty) = ty
 let id (id, _) = id

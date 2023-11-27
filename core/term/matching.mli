@@ -13,14 +13,14 @@ type matching = t
 
 val empty : t
 val debug_print : Format.formatter -> t -> unit
-val get : debugMode:bool -> Agent.t * int -> t -> int
+val get : debug_mode:bool -> Agent.t * int -> t -> int
 
 val reconstruct_renaming :
-  debugMode:bool -> Pattern.Env.t -> Edges.t -> Pattern.id -> int -> Renaming.t
+  debug_mode:bool -> Pattern.Env.t -> Edges.t -> Pattern.id -> int -> Renaming.t
 (** [reconstruct_renaming domain graph cc root] *)
 
 val reconstruct :
-  debugMode:bool ->
+  debug_mode:bool ->
   Pattern.Env.t ->
   Edges.t ->
   t ->
@@ -33,10 +33,10 @@ val reconstruct :
 val add_cc : t -> int -> Renaming.t -> t option
 
 val is_root_of :
-  debugMode:bool -> Pattern.Env.t -> Edges.t -> Agent.t -> Pattern.id -> bool
+  debug_mode:bool -> Pattern.Env.t -> Edges.t -> Agent.t -> Pattern.id -> bool
 
 val roots_of :
-  debugMode:bool -> Pattern.Env.t -> Edges.t -> Pattern.id -> IntCollection.t
+  debug_mode:bool -> Pattern.Env.t -> Edges.t -> Pattern.id -> IntCollection.t
 
 val elements_with_types :
   Pattern.Env.t -> Pattern.id array -> t -> Agent.t list array
@@ -56,7 +56,7 @@ val observables_from_agent :
     is a Instantiation.concrete *)
 
 val observables_from_free :
-  debugMode:bool ->
+  debug_mode:bool ->
   Pattern.Env.t ->
   Edges.t ->
   ((Pattern.id * (int * int)) list * Operator.DepSet.t) * cache ->
@@ -66,7 +66,7 @@ val observables_from_free :
 (** [observables_from_free domain graph sort agent site] *)
 
 val observables_from_internal :
-  debugMode:bool ->
+  debug_mode:bool ->
   Pattern.Env.t ->
   Edges.t ->
   ((Pattern.id * (int * int)) list * Operator.DepSet.t) * cache ->
@@ -77,7 +77,7 @@ val observables_from_internal :
 (** [observables_from_internal domain graph sort agent site internal_state] *)
 
 val observables_from_link :
-  debugMode:bool ->
+  debug_mode:bool ->
   Pattern.Env.t ->
   Edges.t ->
   ((Pattern.id * (int * int)) list * Operator.DepSet.t) * cache ->
@@ -95,10 +95,10 @@ module Agent : sig
     | Existing of Agent.t * int (* node, cc_id *)
     | Fresh of int * int (* type, id *)
 
-  val rename : debugMode:bool -> int -> Renaming.t -> t -> t
+  val rename : debug_mode:bool -> int -> Renaming.t -> t -> t
 
   val concretize :
-    debugMode:bool -> matching * int Mods.IntMap.t -> t -> int * int
+    debug_mode:bool -> matching * int Mods.IntMap.t -> t -> int * int
 
   val get_type : t -> int
   val get_id : t -> int

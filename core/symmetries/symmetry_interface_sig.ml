@@ -52,7 +52,7 @@ module type Interface = sig
   val symbol_table : compil -> Symbol_table.symbol_table
 
   val nbr_automorphisms_in_chemical_species :
-    debugMode:bool -> chemical_species -> int
+    debug_mode:bool -> chemical_species -> int
 
   val canonic_form : chemical_species -> canonic_species
   val connected_components_of_patterns : pattern -> connected_component list
@@ -140,7 +140,7 @@ module type Interface = sig
   val preprocess : Run_cli_args.t -> ast -> preprocessed_ast
 
   val get_compil :
-    debugMode:bool ->
+    debug_mode:bool ->
     dotnet:bool ->
     ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
@@ -169,7 +169,7 @@ module type Interface = sig
   val divide_rule_rate_by : cache -> compil -> rule -> cache * int
 
   val species_of_initial_state_env :
-    debugMode:bool ->
+    debug_mode:bool ->
     Model.t ->
     Contact_map.t ->
     Pattern.PreEnv.t ->

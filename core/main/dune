@@ -5,7 +5,7 @@
              kappa_version kappa_grammar kappa_cli)
   (public_name KaSim)
   (package kappa-binaries)
-(flags (:standard -w @a
+(flags (:standard -w @a-40-42
   -open Kappa_version
 	-open Kappa_generic_toolset
 	-open Kappa_mixtures

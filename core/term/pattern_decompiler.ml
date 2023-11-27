@@ -60,14 +60,14 @@ let of_snapshot g =
   in
   out
 
-let patterns_of_mixture ~debugMode contact_map sigs pre_env e =
+let patterns_of_mixture ~debug_mode contact_map sigs pre_env e =
   let snap = Edges.build_snapshot ~raw:false sigs e in
   let pre_env', acc =
     Snapshot.fold
       (fun (cc_cache, acc) i m ->
         match
           Pattern_compiler.connected_components_sum_of_ambiguous_mixture
-            ~debugMode ~compileModeOn:false contact_map cc_cache (of_snapshot m)
+            ~debug_mode ~compile_mode_on:false contact_map cc_cache (of_snapshot m)
         with
         | cc_cache', [ ([| (_, x) |], _) ] ->
           cc_cache', Tools.recti (fun a _ -> x :: a) acc i

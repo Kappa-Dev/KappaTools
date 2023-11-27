@@ -91,11 +91,11 @@ let cc_of_agent ag e work =
   let _, w, m, t = add_agent ag e (work, [], []) in
   working_todo (w, m, t)
 
-let cc_of_state ~debugMode s env =
+let cc_of_state ~debug_mode s env =
   let cc_of_root agent e' =
     let work = Pattern.begin_new e' in
     let morphism, work' = cc_of_agent agent s.graph work in
-    let en, _, c, i = Pattern.finish_new ~debugMode work' in
+    let en, _, c, i = Pattern.finish_new ~debug_mode work' in
     en, List.map (fun (cid, (aid, _)) -> cid, aid) morphism, c, i
   in
   match s.connected_components with

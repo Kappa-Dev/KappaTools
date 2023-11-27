@@ -12,7 +12,8 @@ type t = {
   tokens: unit NamedDecls.t;
   algs: Primitives.alg_expr Locality.annoted NamedDecls.t;
   observables: Primitives.alg_expr Locality.annoted array;
-  ast_rules: (string Locality.annoted option * LKappa.rule Locality.annoted) array;
+  ast_rules:
+    (string Locality.annoted option * LKappa.rule Locality.annoted) array;
   rules: Primitives.elementary_rule array;
   interventions: Primitives.perturbation array;
   dependencies_in_time: Operator.DepSet.t;
@@ -225,7 +226,8 @@ let check_if_counter_is_filled_enough x =
   then
     raise
       (ExceptionDefn.Malformed_Decl
-         (Locality.annotate_with_dummy "There is no way for the simulation to stop."))
+         (Locality.annotate_with_dummy
+            "There is no way for the simulation to stop."))
 
 let overwrite_vars alg_overwrite env =
   let algs' =
@@ -253,10 +255,12 @@ let fold_alg_expr f_alg f_bool x env =
 let fold_mixture_in_expr f =
   fold_alg_expr (Alg_expr.fold_on_mixture f) (Alg_expr.fold_bool_on_mixture f)
 
-let propagate_constant ~warning ?max_time ?max_events updated_vars alg_overwrite
-    x =
+let propagate_constant ~warning ?max_time ?max_events ~updated_vars
+    ~alg_overwrite x =
   let algs' =
-    Array.map (fun (x, y) -> Locality.annotate_with_dummy x, y) x.algs.NamedDecls.decls
+    Array.map
+      (fun (x, y) -> Locality.annotate_with_dummy x, y)
+      x.algs.NamedDecls.decls
   in
   let () =
     List.iter
@@ -269,7 +273,7 @@ let propagate_constant ~warning ?max_time ?max_events updated_vars alg_overwrite
         algs'.(i) <-
           ( na,
             Alg_expr.propagate_constant ~warning ?max_time ?max_events
-              updated_vars algs' v ))
+              ~updated_vars ~vars:algs' v ))
       algs'
   in
   {
@@ -279,23 +283,23 @@ let propagate_constant ~warning ?max_time ?max_events updated_vars alg_overwrite
     algs = NamedDecls.create algs';
     observables =
       Array.map
-        (Alg_expr.propagate_constant ~warning ?max_time ?max_events updated_vars
-           algs')
+        (Alg_expr.propagate_constant ~warning ?max_time ?max_events
+           ~updated_vars ~vars:algs')
         x.observables;
     ast_rules = x.ast_rules;
     rules =
       Array.map
         (Primitives.map_expr_rule
            (Alg_expr.propagate_constant ~warning ?max_time ?max_events
-              updated_vars algs'))
+              ~updated_vars ~vars:algs'))
         x.rules;
     interventions =
       Array.map
         (Primitives.map_expr_perturbation
            (Alg_expr.propagate_constant ~warning ?max_time ?max_events
-              updated_vars algs')
+              ~updated_vars ~vars:algs')
            (Alg_expr.propagate_constant_bool ~warning ?max_time ?max_events
-              updated_vars algs'))
+              ~updated_vars ~vars:algs'))
         x.interventions;
     dependencies_in_time = x.dependencies_in_time;
     dependencies_in_event = x.dependencies_in_event;
@@ -407,10 +411,13 @@ let of_yojson = function
              Tools.array_map_of_list
                (function
                  | `List [ `Null; r ] ->
-                   None, Locality.annotate_with_dummy (LKappa.rule_of_json ~filenames r)
+                   ( None,
+                     Locality.annotate_with_dummy
+                       (LKappa.rule_of_json ~filenames r) )
                  | `List [ `String n; r ] ->
                    ( Some (Locality.annotate_with_dummy n),
-                     Locality.annotate_with_dummy (LKappa.rule_of_json ~filenames r) )
+                     Locality.annotate_with_dummy
+                       (LKappa.rule_of_json ~filenames r) )
                  | _ -> raise Not_found)
                o
            | `Null -> [||]

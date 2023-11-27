@@ -438,7 +438,7 @@ type bwd_bisim_info =
   * bool Mods.DynArray.t
   * LKappa_auto.cache ref
 
-let saturate_domain_with_symmetric_patterns ~debugMode ~compileModeOn env
+let saturate_domain_with_symmetric_patterns ~debug_mode ~compile_mode_on env
     bwd_bisim_info ccs domain =
   let sigs = Model.signatures env in
   let contact_map = Model.contact_map env in
@@ -475,8 +475,8 @@ let saturate_domain_with_symmetric_patterns ~debugMode ~compileModeOn env
                   let rule_mixture = lkappa_rule.LKappa.r_mix in
                   let domain, _ =
                     Pattern_compiler
-                    .connected_components_sum_of_ambiguous_mixture ~debugMode
-                      ~compileModeOn contact_map domain ?origin:None
+                    .connected_components_sum_of_ambiguous_mixture ~debug_mode
+                      ~compile_mode_on contact_map domain ?origin:None
                       rule_mixture
                   in
                   domain)

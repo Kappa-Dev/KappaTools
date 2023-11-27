@@ -24,10 +24,10 @@ val to_yojson : abstract t -> Yojson.Basic.t
 val of_yojson : Yojson.Basic.t -> abstract t
 
 val rename :
-  debugMode:bool -> Renaming.t -> abstract t -> Renaming.t * abstract t
+  debug_mode:bool -> Renaming.t -> abstract t -> Renaming.t * abstract t
 
 val compatible_fresh_point :
-  debugMode:bool ->
+  debug_mode:bool ->
   abstract step ->
   Agent.t ->
   int ->
@@ -37,7 +37,7 @@ val compatible_fresh_point :
     is the image of the first *)
 
 val is_subnavigation :
-  debugMode:bool ->
+  debug_mode:bool ->
   Renaming.t ->
   abstract t ->
   abstract t ->
@@ -47,7 +47,7 @@ val is_subnavigation :
 val check_edge : Edges.t -> abstract step -> bool
 
 val injection_for_one_more_edge :
-  debugMode:bool ->
+  debug_mode:bool ->
   ?root:Agent.t ->
   Renaming.t ->
   Edges.t ->
@@ -55,7 +55,7 @@ val injection_for_one_more_edge :
   Renaming.t option
 
 val imperative_edge_is_valid :
-  debugMode:bool ->
+  debug_mode:bool ->
   ?root:Agent.t ->
   Renaming.t ->
   Edges.t ->
@@ -63,4 +63,4 @@ val imperative_edge_is_valid :
   bool
 
 val concretize :
-  debugMode:bool -> Agent.t -> Edges.t -> abstract t -> int t option
+  debug_mode:bool -> Agent.t -> Edges.t -> abstract t -> int t option

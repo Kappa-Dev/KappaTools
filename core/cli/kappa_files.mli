@@ -6,7 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-(** Utilities on files *)
+(** Utilities on files
+ * Stores file paths used by the kappa system and access to them *)
 
 val open_out : string -> out_channel
 

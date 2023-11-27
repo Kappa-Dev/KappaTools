@@ -169,14 +169,16 @@ val has_progress_dep :
   pervasives_bool
 
 val extract_connected_components : ('a, 'b) e Locality.annoted -> 'a list
-val extract_connected_components_bool : ('a, 'b) bool Locality.annoted -> 'a list
+
+val extract_connected_components_bool :
+  ('a, 'b) bool Locality.annoted -> 'a list
 
 val propagate_constant :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?max_time:float ->
   ?max_events:int ->
-  int list ->
-  (string Locality.annoted * ('a, int) e Locality.annoted) array ->
+  updated_vars:int list ->
+  vars:(string Locality.annoted * ('a, int) e Locality.annoted) array ->
   ('a, int) e Locality.annoted ->
   ('a, int) e Locality.annoted
 
@@ -184,8 +186,8 @@ val propagate_constant_bool :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   ?max_time:float ->
   ?max_events:int ->
-  int list ->
-  (string Locality.annoted * ('a, int) e Locality.annoted) array ->
+  updated_vars:int list ->
+  vars:(string Locality.annoted * ('a, int) e Locality.annoted) array ->
   ('a, int) bool Locality.annoted ->
   ('a, int) bool Locality.annoted
 
@@ -198,14 +200,17 @@ val is_equality_test_time :
   pervasives_bool
 
 val map_on_mixture :
-  ('a -> ('c, 'b) e) -> ('a, 'b) e Locality.annoted -> ('c, 'b) e Locality.annoted
+  ('a -> ('c, 'b) e) ->
+  ('a, 'b) e Locality.annoted ->
+  ('c, 'b) e Locality.annoted
 
 val map_bool_on_mixture :
   ('a -> ('c, 'b) e) ->
   ('a, 'b) bool Locality.annoted ->
   ('c, 'b) bool Locality.annoted
 
-val fold_on_mixture : ('a -> 'b -> 'a) -> 'a -> ('b, 'c) e Locality.annoted -> 'a
+val fold_on_mixture :
+  ('a -> 'b -> 'a) -> 'a -> ('b, 'c) e Locality.annoted -> 'a
 
 val fold_bool_on_mixture :
   ('a -> 'b -> 'a) -> 'a -> ('b, 'c) bool Locality.annoted -> 'a

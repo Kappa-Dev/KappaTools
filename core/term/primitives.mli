@@ -25,14 +25,14 @@ module Transformation : sig
   val equal : ('a -> 'b -> bool) -> 'a t -> 'b t -> bool
 
   val rename :
-    debugMode:bool ->
+    debug_mode:bool ->
     int ->
     Renaming.t ->
     Instantiation.abstract t ->
     Instantiation.abstract t
 
   val concretize :
-    debugMode:bool ->
+    debug_mode:bool ->
     Matching.t * int Mods.IntMap.t ->
     Instantiation.abstract t ->
     Instantiation.concrete t

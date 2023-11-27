@@ -6,7 +6,7 @@
 	       ( -> superargTk.notk.ml))
 	     kappa_grammar
 	     kappa-library.runtime kappa_version)
-  (flags (:standard -w @a
+  (flags (:standard -w @a-40-42
      -open Kappa_version
 	 -open Kappa_generic_toolset
 	   -open Kappa_mixtures

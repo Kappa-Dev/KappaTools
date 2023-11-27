@@ -221,17 +221,21 @@ functor
         in
         let () = cli.Run_cli_args.syntaxVersion <- syntax_version in
         let () = cli.Run_cli_args.inputKappaFileNames <- files in
-        let (_, env, contactmap, _, _, _, _, init), _ =
+        let compilation_result : Cli_init.compilation_result =
           Cli_init.get_compilation
             ~warning:(fun ~pos:_ _msg -> ())
-            ~debugMode:false cli
+            ~debug_mode:false cli
         in
         let state =
-          Remanent_state.set_init_state init
-            (Remanent_state.set_env (Some env)
-               (Remanent_state.set_contact_map_int (Some contactmap) state))
+          Remanent_state.set_init_state compilation_result.init_l
+            (Remanent_state.set_env (Some compilation_result.env)
+               (Remanent_state.set_contact_map_int
+                  (Some compilation_result.contact_map) state))
         in
-        state, Some (env : Model.t), Some init, Some contactmap
+        ( state,
+          Some (compilation_result.env : Model.t),
+          Some compilation_result.init_l,
+          Some compilation_result.contact_map )
 
     let compute_env show_title state =
       let state, env, _, _ = compute_env_init show_title state in
@@ -1713,7 +1717,8 @@ functor
                               (Ckappa_sig.site_name_of_int y)
                           in
                           ( state,
-                            (Locality.annotate_with_dummy sx, Locality.annotate_with_dummy sy)
+                            ( Locality.annotate_with_dummy sx,
+                              Locality.annotate_with_dummy sy )
                             :: list ))
                         (state, []) rev_binding
                     in
@@ -1724,12 +1729,13 @@ functor
                            states)
                     in
                     ( state,
-                      (Locality.annotate_with_dummy x, (states', binding', None)) :: acc
-                    ))
+                      (Locality.annotate_with_dummy x, (states', binding', None))
+                      :: acc ))
                   (state, []) interface
               in
               ( state,
-                (Locality.annotate_with_dummy a, NamedDecls.create (Array.of_list acc))
+                ( Locality.annotate_with_dummy a,
+                  NamedDecls.create (Array.of_list acc) )
                 :: list ))
           (state, []) l.(0)
       in
@@ -1907,7 +1913,7 @@ functor
         let cache = LKappa_auto.init_cache () in
         let cc_cache = Pattern.PreEnv.of_env (Model.domain env) in
         let _cc_cache, chemical_species =
-          Symmetry_interface.species_of_initial_state_env ~debugMode:false env
+          Symmetry_interface.species_of_initial_state_env ~debug_mode:false env
             contact_map_int cc_cache init
         in
         let state, contact_map = get_contact_map ~accuracy_level state in
