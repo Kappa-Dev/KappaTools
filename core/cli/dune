@@ -8,8 +8,8 @@
 	     kappa-library.runtime kappa_version)
   (flags (:standard -w @a-40-42
      -open Kappa_version
-	 -open Kappa_generic_toolset
+	   -open Kappa_generic_toolset
 	   -open Kappa_mixtures
      -open Kappa_terms
-	 -open Kappa_grammar
-	 -open Kappa_runtime)))
+	   -open Kappa_grammar
+	   -open Kappa_runtime)))

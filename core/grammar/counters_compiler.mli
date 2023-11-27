@@ -11,11 +11,14 @@ type 'a rule_agent_counters = {
   ra_counters: (Ast.counter * LKappa.switching) option array;
 }
 
+val has_counters : Ast.parsing_compil -> bool
+
+(* TODO: rename to ~remove_variable_in_counters *)
 val compile :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
   debug_mode:bool ->
   Ast.parsing_compil ->
-  Ast.parsing_compil * bool
+  Ast.parsing_compil
 
 val make_counter : int -> string -> Ast.counter
 

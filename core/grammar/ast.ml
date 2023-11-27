@@ -44,16 +44,19 @@ type mixture = agent list list
 type edit_notation = {
   mix: mixture;
   delta_token:
-    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted)
+    list;
 }
 
 type arrow_notation = {
   lhs: mixture;
   rm_token:
-    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted)
+    list;
   rhs: mixture;
   add_token:
-    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted)
+    list;
 }
 
 type rule_content = Edit of edit_notation | Arrow of arrow_notation
@@ -78,8 +81,10 @@ type rule = {
 let flip_label str = str ^ "_op"
 
 type ('pattern, 'mixture, 'id, 'rule) modif_expr =
-  | APPLY of (('pattern, 'id) Alg_expr.e Locality.annoted * 'rule Locality.annoted)
-  | UPDATE of ('id Locality.annoted * ('pattern, 'id) Alg_expr.e Locality.annoted)
+  | APPLY of
+      (('pattern, 'id) Alg_expr.e Locality.annoted * 'rule Locality.annoted)
+  | UPDATE of
+      ('id Locality.annoted * ('pattern, 'id) Alg_expr.e Locality.annoted)
   | STOP of ('pattern, 'id) Alg_expr.e Primitives.print_expr list
   | SNAPSHOT of bool * ('pattern, 'id) Alg_expr.e Primitives.print_expr list
   | PRINT of
@@ -138,15 +143,15 @@ type ('pattern, 'mixture, 'id, 'rule) command =
 type ('agent, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
-  (** pattern declaration for reusing as variable in perturbations
+      (** pattern declaration for reusing as variable in perturbations
     or kinetic rate *)
-  signatures: 'agent list; (** agent signature declaration *)
+  signatures: 'agent list;  (** agent signature declaration *)
   rules: (string Locality.annoted option * 'rule Locality.annoted) list;
-  (** rules (possibly named) *)
+      (** rules (possibly named) *)
   observables: ('pattern, 'id) Alg_expr.e Locality.annoted list;
-  (** list of patterns to plot *)
+      (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statment list;
-  (** initial graph declaration *)
+      (** initial graph declaration *)
   perturbations: ('pattern, 'mixture, 'id, 'rule) perturbation list;
   configurations: configuration list;
   tokens: string Locality.annoted list;
@@ -298,7 +303,8 @@ let port_to_json filenames p =
       | Some x -> Locality.yojson_of_annoted ~filenames JsonUtil.of_int x)
   in
   let mod_i =
-    JsonUtil.of_option (Locality.yojson_of_annoted ~filenames JsonUtil.of_string)
+    JsonUtil.of_option
+      (Locality.yojson_of_annoted ~filenames JsonUtil.of_string)
   in
   JsonUtil.smart_assoc
     [
@@ -339,7 +345,8 @@ let build_port_of_json filenames n i l =
   in
   let mod_i =
     JsonUtil.to_option
-      (Locality.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None))
+      (Locality.annoted_of_yojson ~filenames
+         (JsonUtil.to_string ?error_msg:None))
   in
   let port_int, port_int_mod =
     match i with
@@ -426,13 +433,15 @@ let site_to_json filenames = function
     `Assoc
       [
         ( "counter_name",
-          Locality.yojson_of_annoted ~filenames JsonUtil.of_string c.counter_name );
+          Locality.yojson_of_annoted ~filenames JsonUtil.of_string
+            c.counter_name );
         ( "counter_test",
           JsonUtil.of_option
             (Locality.yojson_of_annoted ~filenames counter_test_to_json)
             c.counter_test );
         ( "counter_delta",
-          Locality.yojson_of_annoted ~filenames JsonUtil.of_int c.counter_delta );
+          Locality.yojson_of_annoted ~filenames JsonUtil.of_int c.counter_delta
+        );
       ]
 
 let print_agent_mod f = function
@@ -536,7 +545,8 @@ let to_dummy_user_internal = function
   | _ :: _ :: _ as l -> Some (List_util.map_option fst l)
 
 let to_dummy_user_site = function
-  | Port { port_name; port_int; port_int_mod = _; port_link; port_link_mod = _ } ->
+  | Port { port_name; port_int; port_int_mod = _; port_link; port_link_mod = _ }
+    ->
     {
       User_graph.site_name = fst port_name;
       User_graph.site_type =
@@ -1070,7 +1080,9 @@ let modif_to_json filenames f_mix f_var = function
     `List [ `String "CFLOWLABEL"; `Bool b; string_annot_to_json filenames id ]
   | CFLOWMIX (b, m) ->
     `List
-      [ `String "CFLOW"; `Bool b; Locality.yojson_of_annoted ~filenames f_mix m ]
+      [
+        `String "CFLOW"; `Bool b; Locality.yojson_of_annoted ~filenames f_mix m;
+      ]
   | DIN (b, file) ->
     `List
       [
@@ -1263,7 +1275,7 @@ let sig_from_perts =
             p)
         acc p)
 
-let implicit_signature r =
+let infer_agent_signatures r =
   let acc = sig_from_inits (r.signatures, r.tokens) r.init in
   let acc' = sig_from_rules acc r.rules in
   let ags, toks = sig_from_perts acc' r.perturbations in
@@ -1308,14 +1320,20 @@ let split_mixture m =
                                 (match p.port_link_mod with
                                 | None -> p.port_link
                                 | Some None ->
-                                  [ Locality.annotate_with_dummy LKappa.LNK_FREE ]
+                                  [
+                                    Locality.annotate_with_dummy LKappa.LNK_FREE;
+                                  ]
                                 | Some (Some (i, pos)) ->
                                   [ LKappa.LNK_VALUE (i, ()), pos ]);
                               port_link_mod = None;
                             }
                           :: r )
                       | Counter c ->
-                        ( Counter { c with counter_delta = Locality.annotate_with_dummy 0 }
+                        ( Counter
+                            {
+                              c with
+                              counter_delta = Locality.annotate_with_dummy 0;
+                            }
                           :: l,
                           Counter { c with counter_test = None } :: r ))
                     ([], []) intf
@@ -1373,7 +1391,8 @@ let compil_to_json c =
           c.init );
       ( "perturbations",
         JsonUtil.of_list
-          (Locality.yojson_of_annoted ~filenames (fun (alarm, pre, modif, post) ->
+          (Locality.yojson_of_annoted ~filenames
+             (fun (alarm, pre, modif, post) ->
                `List
                  [
                    JsonUtil.of_option Nbr.to_yojson alarm;

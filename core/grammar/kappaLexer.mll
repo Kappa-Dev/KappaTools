@@ -193,13 +193,13 @@ and inline_comment = parse
 		   | '/' '*' {inline_comment lexbuf; inline_comment lexbuf}
 		   | _ {inline_comment lexbuf}
 {
-  let compile logger compil fic =
-    let d = open_in fic in
+  let compile logger compil file =
+    let d = open_in file in
     let lexbuf = Lexing.from_channel d in
-    let () = lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} in
-    let compil = { compil with Ast.filenames = fic :: compil.Ast.filenames } in
+    let () = lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = file} in
+    let compil = { compil with Ast.filenames = file :: compil.Ast.filenames } in
     try
-      let () = Format.fprintf logger "Parsing %s...@." fic in
+      let () = Format.fprintf logger "Parsing %s...@." file in
       let out = KappaParser.start_rule token lexbuf compil in
       let () = Format.fprintf logger "done@." in
       let () = close_in d in out

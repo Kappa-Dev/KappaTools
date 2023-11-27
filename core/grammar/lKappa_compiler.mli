@@ -84,3 +84,15 @@ val compil_of_ast :
 
     After this step, [Ast.ANY_FREE] is a synonym of "an [Ast.LNK_ANY]
     explicitely given by the user". *)
+
+(** {2 Utils to build signatures} *)
+
+type site_sig_with_links_as_lists =
+  (string Locality.annoted * string Locality.annoted) list Signature.site_sig
+(** Util type to store site signature with list links instead of array array links *)
+
+val agent_sigs_of_agent_sigs_with_links_as_lists :
+  build_contact_map:bool ->
+  site_sig_with_links_as_lists NamedDecls.t NamedDecls.t ->
+  Signature.t NamedDecls.t
+(** Helper to build signatures: for each entry, translate [(string Locality.annoted * string Locality.annoted) list] into [bool array array option] *)

@@ -6,9 +6,9 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type ('a, 'annoted) link =
+type ('a, 'annot) link =
   | ANY_FREE
-  | LNK_VALUE of int * 'annoted
+  | LNK_VALUE of int * 'annot
   | LNK_FREE
   | LNK_ANY
   | LNK_SOME
@@ -72,7 +72,8 @@ let link_of_json port_of_json type_of_json annoted_of_json = function
     LNK_TYPE (port_of_json x p, x)
   | `Null -> LNK_ANY
   | `String "SOME" -> LNK_SOME
-  | `List (`Int i :: (([] | _ :: _ :: _) as a)) -> LNK_VALUE (i, annoted_of_json a)
+  | `List (`Int i :: (([] | _ :: _ :: _) as a)) ->
+    LNK_VALUE (i, annoted_of_json a)
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect link", x))
 
 let print_link_annot ~ltypes sigs f (s, a) =
@@ -593,7 +594,8 @@ let rule_to_json ~filenames r =
       ( "delta_tokens",
         JsonUtil.of_list
           (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-             (Locality.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))
+             (Locality.yojson_of_annoted ~filenames
+                (lalg_expr_to_json filenames))
              JsonUtil.of_int)
           r.r_delta_tokens );
       ( "rate",
@@ -603,7 +605,8 @@ let rule_to_json ~filenames r =
       ( "unary_rate",
         JsonUtil.of_option
           (JsonUtil.of_pair
-             (Locality.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))
+             (Locality.yojson_of_annoted ~filenames
+                (lalg_expr_to_json filenames))
              (JsonUtil.of_option
                 (Locality.yojson_of_annoted ~filenames
                    (lalg_expr_to_json filenames))))

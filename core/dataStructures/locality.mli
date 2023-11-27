@@ -13,6 +13,12 @@ type position = { chr: int; line: int }
 type t = { file: string; from_position: position; to_position: position }
 type 'a annoted = 'a * t
 
+val v : 'a annoted -> 'a
+(** Extract value from Locality.annoted *)
+
+val get_annot : 'a annoted -> t
+(** Extract annotation from Locality.annoted *)
+
 val of_pos : Lexing.position -> Lexing.position -> t
 val dummy : t
 val annotate_with_dummy : 'a -> 'a annoted

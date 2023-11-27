@@ -75,13 +75,13 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
     overwrite_t0;
   }
 
-let get_ast_from_list_of_files syntax_version list =
-  let f =
+let get_ast_from_list_of_files syntax_version file_list =
+  let compiling_function =
     match syntax_version with
     | Ast.V4 -> Klexer4.compile Format.std_formatter
     | Ast.V3 -> KappaLexer.compile Format.std_formatter
   in
-  List.fold_left f Ast.empty_compil list
+  List.fold_left compiling_function Ast.empty_compil file_list
 
 let get_ast_from_cli_args cli_args =
   get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion
@@ -270,7 +270,8 @@ let get_compilation ~warning ~debug_mode ?(compile_mode_on = false)
       let preprocessed_ast =
         get_preprocessed_ast_from_cli_args ~warning ~debug_mode cli_args
       in
-      get_pack_from_preprocessed_ast kasim_args ~compile_mode_on preprocessed_ast
+      get_pack_from_preprocessed_ast kasim_args ~compile_mode_on
+        preprocessed_ast
     | marshalized_file ->
       get_pack_from_marshalizedfile ~warning kasim_args cli_args
         marshalized_file

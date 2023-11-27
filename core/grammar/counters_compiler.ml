@@ -270,7 +270,8 @@ let remove_variable_in_counters ~warning rules signatures =
   in
   let counter_gte_zero c =
     [
-      ( Ast.Counter { c with Ast.counter_test = Some (Ast.CGTE 0, Locality.dummy) },
+      ( Ast.Counter
+          { c with Ast.counter_test = Some (Ast.CGTE 0, Locality.dummy) },
         [] );
     ]
   in
@@ -392,43 +393,38 @@ let remove_variable_in_counters ~warning rules signatures =
 
   enumerate rules remove_var_rule
 
-let has_counters (c : _ Ast.compil) : bool =
-  let has_counters_mix mix =
-    List.exists
-      (function
-        | Ast.Absent _ -> false
-        | Ast.Present (_, ls, _) ->
-          List.exists
-            (function
-              | Ast.Counter _ -> true
-              | Ast.Port _ -> false)
-            ls)
-      mix
-  in
-  has_counters_mix c.Ast.signatures
+let has_counters compil =
+  List.exists
+    (function
+      | Ast.Absent _ -> false
+      | Ast.Present (_, sites, _) ->
+        List.exists
+          (function
+            | Ast.Counter _ -> true
+            | Ast.Port _ -> false)
+          sites)
+    compil.Ast.signatures
 
-let compile ~warning ~debug_mode c =
-  if has_counters c then (
-    let rules =
-      remove_variable_in_counters ~warning c.Ast.rules c.Ast.signatures
-    in
-    let () =
-      if debug_mode then (
-        let () = Format.printf "@.ast rules@." in
-        List.iter
-          (fun (s, (r, _)) ->
-            let label =
-              match s with
-              | None -> ""
-              | Some (l, _) -> l
-            in
-            Format.printf "@.%s = %a" label Ast.print_ast_rule r)
-          rules
-      )
-    in
-    { c with Ast.rules }, true
-  ) else
-    c, false
+let compile ~warning ~debug_mode compil =
+  let rules =
+    remove_variable_in_counters ~warning compil.Ast.rules compil.Ast.signatures
+  in
+  (* debug printing *)
+  let () =
+    if debug_mode then (
+      let () = Format.printf "@.ast rules@." in
+      List.iter
+        (fun (s, (r, _)) ->
+          let label =
+            match s with
+            | None -> ""
+            | Some (l, _) -> l
+          in
+          Format.printf "@.%s = %a" label Ast.print_ast_rule r)
+        rules
+    )
+  in
+  { compil with Ast.rules }
 
 let make_counter_agent sigs (first, (dst, ra_erased)) (last, equal) i j pos
     created =
@@ -719,7 +715,8 @@ let agent_with_max_counter sigs c ((agent_name, _) as ag_ty) =
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let ports =
-    Array.make arity (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
+    Array.make arity
+      (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
   in
   let internals = Array.make arity LKappa.I_ANY in
   let c_na = c.Ast.counter_name in
@@ -767,7 +764,10 @@ let counter_perturbation sigs c ag_ty =
         (val_of_counter, snd c.Ast.counter_name),
         (Alg_expr.CONST (Nbr.I 1), snd c.Ast.counter_name) )
   in
-  None, Some (pre, snd ag_ty), mods, Some (Locality.annotate_with_dummy Alg_expr.FALSE)
+  ( None,
+    Some (pre, snd ag_ty),
+    mods,
+    Some (Locality.annotate_with_dummy Alg_expr.FALSE) )
 
 let counters_perturbations sigs ast_sigs =
   List.fold_left
@@ -805,7 +805,7 @@ let annotate_dropped_counters sign counters ra arity agent_name aux =
         let port_name = c.Ast.counter_name in
         let p_id = Signature.num_of_site ~agent_name port_name sign in
         let () =
-          match Signature.counter_of_site_num p_id sign with
+          match Signature.counter_of_site_id p_id sign with
           | None -> LKappa.counter_misused agent_name c.Ast.counter_name
           | Some _ -> ()
         in
@@ -842,7 +842,7 @@ let annotate_edit_counters sigs ((agent_name, _) as ag_ty) counters ra
         let port_name = c.Ast.counter_name in
         let p_id = Signature.num_of_site ~agent_name port_name sign in
         let () =
-          match Signature.counter_of_site_num p_id sign with
+          match Signature.counter_of_site_id p_id sign with
           | None -> LKappa.counter_misused agent_name c.Ast.counter_name
           | Some _ -> ()
         in
@@ -918,7 +918,7 @@ let annotate_created_counters sigs ((agent_name, _) as ag_ty) counters
   let () =
     Array.iteri
       (fun p_id _ ->
-        match Signature.counter_of_site_num p_id sign with
+        match Signature.counter_of_site_id p_id sign with
         | Some (min, _) ->
           let c_name = Signature.site_of_num p_id sign in
           (try
@@ -958,7 +958,7 @@ let annotate_created_counters sigs ((agent_name, _) as ag_ty) counters
         let port_name = c.Ast.counter_name in
         let p_id = Signature.num_of_site ~agent_name port_name sign in
         let () =
-          match Signature.counter_of_site_num p_id sign with
+          match Signature.counter_of_site_id p_id sign with
           | None -> LKappa.counter_misused agent_name c.Ast.counter_name
           | Some _ -> ()
         in

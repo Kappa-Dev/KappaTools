@@ -1150,14 +1150,14 @@ module Make (Ord : OrderedType) : S with type elt = Ord.t = struct
             Some key
         )
 
-    (* let rec find_acc k m = *)
-    (*   match m with *)
-    (*     Private.Empty -> None *)
-    (*   | Private.Node (l, key, r, _, _) -> *)
-    (*      let s = size l in *)
-    (*      if k < s then find_acc k l *)
-    (*      else if k = s then Some key *)
-    (*      else find_acc (k - s - 1) r *)
+    (* let rec find_acc k m =
+         match m with
+         | Private.Empty -> None
+         | Private.Node (l, key, r, _, _) ->
+            let s = size l in
+            if k < s then find_acc k l
+              else if k = s then Some key
+              else find_acc (k - s - 1) r *)
 
     let random rs m =
       let s = size m in

@@ -44,16 +44,19 @@ val mixture_to_user_graph : mixture -> User_graph.connected_component
 type edit_notation = {
   mix: mixture;
   delta_token:
-    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted)
+    list;
 }
 
 type arrow_notation = {
   lhs: mixture;
   rm_token:
-    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted)
+    list;
   rhs: mixture;
   add_token:
-    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted)
+    list;
 }
 
 type rule_content = Edit of edit_notation | Arrow of arrow_notation
@@ -80,8 +83,10 @@ type rule = {
 val flip_label : string -> string
 
 type ('pattern, 'mixture, 'id, 'rule) modif_expr =
-  | APPLY of (('pattern, 'id) Alg_expr.e Locality.annoted * 'rule Locality.annoted)
-  | UPDATE of ('id Locality.annoted * ('pattern, 'id) Alg_expr.e Locality.annoted)
+  | APPLY of
+      (('pattern, 'id) Alg_expr.e Locality.annoted * 'rule Locality.annoted)
+  | UPDATE of
+      ('id Locality.annoted * ('pattern, 'id) Alg_expr.e Locality.annoted)
   (*TODO: pause*)
   | STOP of ('pattern, 'id) Alg_expr.e Primitives.print_expr list
   | SNAPSHOT of bool * ('pattern, 'id) Alg_expr.e Primitives.print_expr list
@@ -123,7 +128,7 @@ type ('pattern, 'mixture, 'id) init_statment =
 type ('agent, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent
   | TOKENSIG of string Locality.annoted
-  | VOLSIG of string * float * string (* type, volume, parameter*)
+  | VOLSIG of string * float * string  (** type, volume, parameter *)
   | INIT of ('pattern, 'mixture, 'id) init_statment
   | DECLARE of ('pattern, 'id) variable_def
   | OBS of ('pattern, 'id) variable_def (*for backward compatibility*)
@@ -140,14 +145,14 @@ type ('pattern, 'mixture, 'id, 'rule) command =
 type ('agent, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
-  (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
-  signatures: 'agent list;  (**agent signature declaration*)
+      (** pattern declaration for reusing as variable in perturbations or kinetic rate *)
+  signatures: 'agent list;  (** agent signature declarations *)
   rules: (string Locality.annoted option * 'rule Locality.annoted) list;
       (**rules (possibly named)*)
   observables: ('pattern, 'id) Alg_expr.e Locality.annoted list;
-  (*list of patterns to plot*)
+      (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statment list;
-  (*initial graph declaration*)
+      (** initial graph declaration *)
   perturbations: ('pattern, 'mixture, 'id, 'rule) perturbation list;
   configurations: configuration list;
   tokens: string Locality.annoted list;
@@ -163,8 +168,8 @@ val no_more_site_on_right : bool -> site list -> site list -> bool
 val split_mixture : mixture -> mixture * mixture
 (** @return (lhs,rhs) *)
 
-val implicit_signature : parsing_compil -> parsing_compil
-(** Infer agent signatures and tokens from init, rules and perturbations *)
+val infer_agent_signatures : parsing_compil -> parsing_compil
+(** Used when agent signatures is implicit: infer agent signatures and tokens from init, rules and perturbations *)
 
 (** {6 Printers} *)
 

@@ -10,6 +10,9 @@ type position = { chr: int; line: int }
 type t = { file: string; from_position: position; to_position: position }
 type 'a annoted = 'a * t
 
+let v (v, _) = v
+let get_annot (_, annot) = annot
+
 let of_pos start_location end_location =
   let () =
     assert (start_location.Lexing.pos_fname = end_location.Lexing.pos_fname)

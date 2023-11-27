@@ -7,37 +7,43 @@
 (******************************************************************************)
 
 (** Store definitions of agents *)
-(* TODO: here, we talk about agents, but is it actually agent signatures/definitions ? while instances are in agent.mli *)
 
-type t
-(** Store of one agent *)
+(* TODO: here, we talk about agents, but is it actually agent signatures/definitions ? while instances are in siteGraphs/agent.mli *)
+(* TODO document what is internal state *)
 
+(* TODO *)
+type 'links site_sig = {
+  internal_state: unit NamedDecls.t;
+  links: 'links option;
+  counters_info: (int * int) option;
+      (** If relevant: counter CEQ value * counter delta *)
+}
+
+type t = bool array array site_sig NamedDecls.t
+(** Store of one agent signature *)
+
+(* TODO remove Locality annotations here ? *)
 val num_of_site : ?agent_name:string -> string Locality.annoted -> t -> int
 val site_of_num : int -> t -> string
 val fold : (int -> string -> 'a -> 'a) -> 'a -> t -> 'a
 
 val num_of_internal_state : int -> string Locality.annoted -> t -> int
-(** [num_of_internal_state site_id state_name sign] *)
+(** [num_of_internal_state site_id state_name signature] *)
 
-val internal_state_of_num : int -> int -> t -> string
-val counter_of_site_num : int -> t -> (int * int) option
+val internal_state_of_site_id : int -> int -> t -> string
+(**[internal_state_of_site_id site_id value_id signature] *)
+
+val counter_of_site_id : int -> t -> (int * int) option
 val has_counter : t -> bool
 
 type s
 (** Store of all the agents, s as a plural *)
 
-type counters_before_signature =
-  (string Locality.annoted
-  * (unit NamedDecls.t
-    * (string Locality.annoted * string Locality.annoted) list
-    * (int * int) option)
-    NamedDecls.t)
-  list
-
+(* TODO See what to be kept here? *)
 val create :
-  counters:(string Locality.annoted * string Locality.annoted list) list ->
-  bool ->
-  counters_before_signature ->
+  counters_per_agent:
+    (string Locality.annoted * string Locality.annoted list) list ->
+  t NamedDecls.t ->
   s
 
 val size : s -> int
@@ -71,7 +77,7 @@ val internal_states_number : int -> int -> s -> int
 val default_internal_state : int -> int -> s -> int option
 
 val allowed_link : int -> int -> int -> int -> s -> bool
-(** [allowed_link ag1 s1 ag2 s2 sigs] *)
+(** [allowed_link ag1 s1 ag2 s2 sigs] evaluates to true if and only if it is allowed to create a link between site [s1] of agent [ag1] and site [s2] of agent [ag2] *)
 
 (** {2 Counter specific} *)
 

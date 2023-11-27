@@ -46,6 +46,7 @@ The field ra_syntax represents how the user describe the agent
 before compilation. Therefore, [compil_of_ast] in this module
 generates rule_agent where ra_syntax is [Some (Array.copy ra_ports,
 Array.copy ra_ints)]. *)
+(* TODO Reference to compil_of_ast here is weird *)
 
 type rule_mixture = rule_agent list
 

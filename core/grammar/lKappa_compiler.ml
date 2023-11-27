@@ -145,7 +145,7 @@ let annotate_dropped_agent ~warning ~syntax_version ~r_editStyle sigs
         let ((_, p_pos) as port_name) = p.Ast.port_name in
         let p_id = Signature.num_of_site ~agent_name port_name sign in
         let () =
-          match Signature.counter_of_site_num p_id sign with
+          match Signature.counter_of_site_id p_id sign with
           | Some _ -> LKappa.counter_misused agent_name p.Ast.port_name
           | None -> ()
         in
@@ -277,7 +277,7 @@ let annotate_created_agent ~warning ~syntax_version ~r_editStyle sigs
         let ((_, p_pos) as port_name) = p.Ast.port_name in
         let p_id = Signature.num_of_site ~agent_name port_name sign in
         let () =
-          match Signature.counter_of_site_num p_id sign with
+          match Signature.counter_of_site_id p_id sign with
           | Some _ -> LKappa.counter_misused agent_name p.Ast.port_name
           | None -> ()
         in
@@ -368,7 +368,7 @@ let annotate_edit_agent ~warning ~syntax_version ~is_rule sigs ?contact_map
     let port_name, _ = p.Ast.port_name in
     let p_id = Signature.num_of_site ~agent_name p.Ast.port_name sign in
     let () =
-      match Signature.counter_of_site_num p_id sign with
+      match Signature.counter_of_site_id p_id sign with
       | Some _ -> LKappa.counter_misused agent_name p.Ast.port_name
       | None -> ()
     in
@@ -745,7 +745,9 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
   in
   let find_in_r (na, pos) rp =
     let p', r =
-      List.partition (fun p -> String.compare (fst p.Ast.port_name) na = 0) rp
+      List.partition
+        (fun p -> String.compare (Locality.v p.Ast.port_name) na = 0)
+        rp
     in
     match p' with
     | [ p' ] -> p', r
@@ -1400,7 +1402,7 @@ let add_un_variable k_un acc rate_var =
   | None -> acc, None
   | Some (k, dist) ->
     let acc_un, k' =
-      if Alg_expr.has_mix (fst k) then
+      if Alg_expr.has_mix (Locality.v k) then
         ( (Locality.annotate_with_dummy rate_var, k) :: acc,
           Locality.annotate_with_dummy (Alg_expr.ALG_VAR rate_var) )
       else
@@ -1414,7 +1416,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
     give_rule_label r.Ast.bidirectional pack Ast.print_ast_rule r label_opt
   in
   let acc', k_def =
-    if Alg_expr.has_mix (fst r.Ast.k_def) then (
+    if Alg_expr.has_mix (Locality.v r.Ast.k_def) then (
       let rate_var = label ^ "_rate" in
       ( (Locality.annotate_with_dummy rate_var, r.Ast.k_def) :: acc,
         Locality.annotate_with_dummy (Alg_expr.ALG_VAR rate_var) )
@@ -1457,7 +1459,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
     in
     let acc''', rules'' =
       match r.Ast.bidirectional, r.Ast.k_op with
-      | true, Some k when Alg_expr.has_mix (fst k) ->
+      | true, Some k when Alg_expr.has_mix (Locality.v k) ->
         let rate_var = Ast.flip_label label ^ "_rate" in
         let rate_var_un = Ast.flip_label label ^ "_un_rate" in
         let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
@@ -1503,75 +1505,194 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
     in
     pack', acc''', rules''
 
-let create_t (sites : Ast.site list)
-    (incr_info : string Locality.annoted * string Locality.annoted) :
-    (unit NamedDecls.t
-    * (string Locality.annoted * string Locality.annoted) list
-    * (int * int) option)
-    NamedDecls.t
-    * string Locality.annoted list =
-  (* TODO: comment this better *)
-  let links_pre_nameddecls, counters =
+type site_sig_with_links_as_lists =
+  (string Locality.annoted * string Locality.annoted) list Signature.site_sig
+(** Temporary type to store site signature with list links instead of array array links *)
+
+(** [prepare_agent_sig ~sites evaluates to (site_sigs, counter_list) which describe data that can be used to create a Signature.t for a single agent*)
+let prepare_agent_sig ~(sites : Ast.site list) :
+    site_sig_with_links_as_lists NamedDecls.t * string Locality.annoted list =
+  let ( (site_sigs_pre_nameddecls :
+          (string Locality.annoted * site_sig_with_links_as_lists) list),
+        (counter_names : string Locality.annoted list) ) =
     List.fold_right
-      (fun site (acc_links, acc_counters) ->
+      (fun site (acc_site_sigs, acc_counter_names) ->
         match site with
+        (* TODO see if can remove Ast here *)
         | Ast.Port p ->
-          ( ( p.Ast.port_name,
-              ( NamedDecls.create
-                  (Tools.array_map_of_list
-                     (function
-                       | Some x, pos -> (x, pos), ()
-                       | None, pos ->
-                         raise
-                           (ExceptionDefn.Malformed_Decl
-                              ( "Forbidden internal state inside signature \
-                                 definition",
-                                pos )))
-                     p.Ast.port_int),
-                List.fold_left
-                  (fun acc_links' -> function
-                    | (LKappa.LNK_FREE | LKappa.ANY_FREE | LKappa.LNK_ANY), _ ->
-                      acc_links'
-                    | (LKappa.LNK_SOME | LKappa.LNK_VALUE _), pos ->
-                      raise
-                        (ExceptionDefn.Malformed_Decl
-                           ( "Forbidden link status inside signature definition",
-                             pos ))
-                    | LKappa.LNK_TYPE (a, b), _ -> (a, b) :: acc_links')
-                  [] p.Ast.port_link,
-                None ) )
-            :: acc_links,
-            acc_counters )
-        | Ast.Counter c ->
-          (match c.Ast.counter_test with
+          ( ( p.port_name,
+              {
+                Signature.internal_state =
+                  NamedDecls.create
+                    (Tools.array_map_of_list
+                       (function
+                         | Some x, pos -> (x, pos), ()
+                         | None, pos ->
+                           raise
+                             (ExceptionDefn.Malformed_Decl
+                                ( "Forbidden internal state inside signature \
+                                   definition",
+                                  pos )))
+                       p.port_int);
+                links =
+                  Some
+                    (List.fold_left
+                       (fun acc_links' -> function
+                         | ( (LKappa.LNK_FREE | LKappa.ANY_FREE | LKappa.LNK_ANY),
+                             _ ) ->
+                           acc_links'
+                         | (LKappa.LNK_SOME | LKappa.LNK_VALUE _), pos ->
+                           raise
+                             (ExceptionDefn.Malformed_Decl
+                                ( "Forbidden link status inside signature \
+                                   definition",
+                                  pos ))
+                         | LKappa.LNK_TYPE (a, b), _ -> (a, b) :: acc_links')
+                       [] p.port_link);
+                counters_info = None;
+              } )
+            :: acc_site_sigs,
+            acc_counter_names )
+        | Counter c ->
+          (* Here, only CEQ tests are accepted *)
+          (match c.counter_test with
           | None ->
-            let n, pos = c.Ast.counter_name in
+            let n, pos = c.counter_name in
             raise
               (ExceptionDefn.Internal_Error
                  ("Counter " ^ n ^ " should have a test in signature", pos))
           | Some (test, pos) ->
             (match test with
-            | Ast.CVAR _ ->
+            | CVAR _ ->
               raise
                 (ExceptionDefn.Internal_Error
                    ("Counter should not have a var in signature", pos))
-            | Ast.CGTE _ ->
+            | CGTE _ ->
               raise
                 (ExceptionDefn.Internal_Error
                    ("Counter should not have >= in signature", pos))
-            | Ast.CEQ j ->
-              ( ( c.Ast.counter_name,
-                  ( NamedDecls.create [||],
-                    [ incr_info ],
-                    Some (j, fst c.Ast.counter_delta) ) )
-                :: acc_links,
-                c.Ast.counter_name :: acc_counters ))))
+            | CEQ j ->
+              ( ( c.counter_name,
+                  {
+                    internal_state = NamedDecls.create [||];
+                    (* Agent with counter can link to port [b] on counter agent [__incr] *)
+                    links =
+                      Some
+                        [
+                          ( Locality.annotate_with_dummy "b",
+                            Locality.annotate_with_dummy "__incr" );
+                        ];
+                    counters_info = Some (j, Locality.v c.counter_delta);
+                  } )
+                :: acc_site_sigs,
+                c.counter_name :: acc_counter_names ))))
       sites ([], [])
   in
-  NamedDecls.create (Array.of_list links_pre_nameddecls), counters
+  NamedDecls.create_from_list site_sigs_pre_nameddecls, counter_names
+
+(** [make_counter_agent_site_sigs counters_per_agent] evaluates to
+  (counter_agent_name, site_sigs_counter_agent) which describe the counter
+      agent and its site signatures with possible links to other agents.
+      [counter_info] associates each agent to a list of counter ports, one for each defined counter *)
+let make_counter_agent_site_sigs
+    (counters_per_agent :
+      ((string * Locality.t) * (string * Locality.t) list) list) :
+    (string * Locality.t)
+    * ((string * Locality.t) * (string * Locality.t)) list Signature.site_sig
+      NamedDecls.t =
+  let counter_agent_name = "__incr", Locality.dummy in
+  let a_port_name = "a", Locality.dummy in
+  (* after port *)
+  let b_port_name = "b", Locality.dummy in
+
+  (* before port *)
+
+  (* Port [a] can link to port b of agent of type counter agent *)
+  let a_port_sig =
+    {
+      Signature.internal_state = NamedDecls.create [||];
+      links = Some [ b_port_name, counter_agent_name ];
+      counters_info = None;
+    }
+  in
+  (* Port [b] can link to port a of agent of type counter agent
+   * OR for each agent [agent_name] with counters, to their ports
+   * [agent_counter_port_name] *)
+  let b_links =
+    List.fold_right
+      (fun (agent_name, counters_from_agent) acc ->
+        List.map
+          (fun agent_counter_port_name -> agent_counter_port_name, agent_name)
+          counters_from_agent
+        @ acc)
+      counters_per_agent
+      [ a_port_name, counter_agent_name ]
+  in
+  let b_port_sig =
+    {
+      Signature.internal_state = NamedDecls.create [||];
+      links = Some b_links;
+      counters_info = None;
+    }
+  in
+  let site_sigs_counter_agent =
+    NamedDecls.create [| a_port_name, a_port_sig; b_port_name, b_port_sig |]
+  in
+  counter_agent_name, site_sigs_counter_agent
+
+let agent_sigs_of_agent_sigs_with_links_as_lists ~(build_contact_map : bool)
+    (agent_sigs_pre : site_sig_with_links_as_lists NamedDecls.t NamedDecls.t) :
+    Signature.t NamedDecls.t =
+  let size_sigs = NamedDecls.size agent_sigs_pre in
+  NamedDecls.mapi
+    (fun ag_id ag_name ->
+      NamedDecls.map (fun site_name_ag1 site_sig ->
+          if not build_contact_map then
+            { site_sig with Signature.links = None }
+          else (
+            (* Update links *)
+            (* TODO improve comment above *)
+            let site_links =
+              Array.init (size_sigs - ag_id) (fun i ->
+                  Array.make
+                    (NamedDecls.size
+                       (NamedDecls.elt_val agent_sigs_pre (i + ag_id)))
+                    false)
+            in
+            List.iter
+              (fun (((site_name_ag2, pos) as site_name), ((ag2_name, _) as ag)) ->
+                let ag2_id = NamedDecls.elt_id ~kind:"ag" agent_sigs_pre ag in
+                let site_id =
+                  NamedDecls.elt_id ~kind:"site name"
+                    (NamedDecls.elt_val agent_sigs_pre ag2_id)
+                    site_name
+                in
+                if ag2_id >= ag_id then
+                  site_links.(ag2_id - ag_id).(site_id) <- true;
+                let should_raise_for_missing_link =
+                  not
+                    (List.exists
+                       (fun ((x, _), (y, _)) ->
+                         x = site_name_ag1 && y = ag_name)
+                       ((NamedDecls.elt_val
+                           (NamedDecls.elt_val agent_sigs_pre ag2_id)
+                           site_id)
+                          .links |> Option_util.unsome_or_raise))
+                in
+                if should_raise_for_missing_link then
+                  raise
+                    (ExceptionDefn.Malformed_Decl
+                       ( Format.asprintf "No link to %s.%s from %s.%s."
+                           site_name_ag1 ag_name site_name_ag2 ag2_name,
+                         pos )))
+              (Option_util.unsome_or_raise site_sig.links);
+            { site_sig with Signature.links = Some site_links }
+          )))
+    agent_sigs_pre
 
 let create_sigs (l : Ast.agent list) : Signature.s =
-  let create_contact_map : bool =
+  (* Contact map should be built only if a specific link is described in the definition of signature *)
+  let build_contact_map : bool =
     List.fold_left
       (fun acc0 -> function
         | Ast.Absent pos ->
@@ -1584,42 +1705,55 @@ let create_sigs (l : Ast.agent list) : Signature.s =
               match site with
               | Ast.Counter _ -> acc1
               | Ast.Port p ->
-                acc1
-                || List.fold_left
-                     (fun acc2 -> function
-                       | (LKappa.LNK_FREE | LKappa.ANY_FREE | LKappa.LNK_ANY), _
-                         ->
-                         acc2
-                       | (LKappa.LNK_SOME | LKappa.LNK_VALUE _), pos ->
-                         raise
-                           (ExceptionDefn.Malformed_Decl
-                              ( "Forbidden link status inside a definition of \
-                                 signature",
-                                pos ))
-                       | LKappa.LNK_TYPE (_, _), _ -> true)
-                     false p.Ast.port_link)
+                List.fold_left
+                  (fun acc2 -> function
+                    | (LKappa.LNK_FREE | LKappa.ANY_FREE | LKappa.LNK_ANY), _ ->
+                      acc2
+                    | (LKappa.LNK_SOME | LKappa.LNK_VALUE _), pos ->
+                      raise
+                        (ExceptionDefn.Malformed_Decl
+                           ( "Forbidden link status inside a definition of \
+                              signature",
+                             pos ))
+                    | LKappa.LNK_TYPE (_, _), _ -> true)
+                  acc1 p.Ast.port_link)
             acc0 sites)
       false l
   in
-  let sigs, counters =
+
+  let ( (sigs_with_links_as_lists :
+          (string Locality.annoted * site_sig_with_links_as_lists NamedDecls.t)
+          list),
+        (counters_per_agent :
+          (string Locality.annoted * string Locality.annoted list) list) ) =
     List.fold_right
-      (fun agent (acc_sigs, acc_counters) ->
+      (fun agent (acc_sigs, acc_counters_per_agent) ->
         match agent with
-        | Ast.Absent _ -> acc_sigs, acc_counters
-        | Ast.Present (name, sites, _) ->
-          let links, counters_agent =
-            create_t sites (("b", Locality.dummy), ("__incr", Locality.dummy))
-          in
+        | Ast.Absent _ -> acc_sigs, acc_counters_per_agent
+        | Ast.Present (agent_name, sites, _) ->
+          let site_sigs_nd, counters_agent = prepare_agent_sig ~sites in
           let counters' =
             if counters_agent = [] then
-              acc_counters
+              acc_counters_per_agent
             else
-              (name, counters_agent) :: acc_counters
+              (agent_name, counters_agent) :: acc_counters_per_agent
           in
-          (name, links) :: acc_sigs, counters')
+          (agent_name, site_sigs_nd) :: acc_sigs, counters')
       l ([], [])
   in
-  Signature.create ~counters create_contact_map sigs
+
+  let agent_sigs : Signature.t NamedDecls.t =
+    (if counters_per_agent = [] then
+       sigs_with_links_as_lists
+     else
+       make_counter_agent_site_sigs counters_per_agent
+       :: sigs_with_links_as_lists)
+    |> NamedDecls.create_from_list
+    |> agent_sigs_of_agent_sigs_with_links_as_lists ~build_contact_map
+  in
+
+  (* TODO see agent_sigs namings *)
+  Signature.create ~counters_per_agent agent_sigs
 
 let init_of_ast ~warning ~syntax_version sigs contact_map tok algs inits =
   List.map
@@ -1646,20 +1780,33 @@ type ast_compiled_data = {
      * (syntactic sugar on mixture are not) *)
 }
 
-let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite c =
-  let c, has_counters = Counters_compiler.compile ~warning ~debug_mode c in
-  let c =
-    if c.Ast.signatures = [] && c.Ast.tokens = [] then
-      if has_counters then
-        raise
-          (ExceptionDefn.Malformed_Decl
-             ("implicit signature is incompatible with counters", Locality.dummy))
-      else
-        Ast.implicit_signature c
-    else
-      c
+let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
+    =
+  let has_counters = Counters_compiler.has_counters ast_compil in
+  let agent_sig_is_implicit =
+    ast_compil.Ast.signatures = [] && ast_compil.Ast.tokens = []
   in
-  let sigs = create_sigs c.Ast.signatures in
+  (* Infer agent signatures if the signature is implicit *)
+  let ast_compil =
+    if agent_sig_is_implicit && has_counters then
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ("implicit signature is incompatible with counters", Locality.dummy))
+    else if agent_sig_is_implicit then
+      Ast.infer_agent_signatures ast_compil
+    else
+      ast_compil
+  in
+  (* Compile counters into ast_compil *)
+  let ast_compil =
+    if has_counters then
+      Counters_compiler.compile ~warning ~debug_mode ast_compil
+    else
+      ast_compil
+  in
+
+  let sigs : Signature.s = create_sigs ast_compil.Ast.signatures in
+  (* Set an empty contact map *)
   let contact_map : (Mods.IntSet.t * Mods.Int2Set.t) array array =
     Array.init (Signature.size sigs) (fun i ->
         Array.init (Signature.arity sigs i) (fun s ->
@@ -1673,7 +1820,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite c =
     List.fold_left
       (name_and_purify_rule ~warning ~syntax_version sigs ~contact_map)
       ((0, Mods.StringSet.empty), [], [])
-      c.Ast.rules
+      ast_compil.Ast.rules
   in
   let overwrite_overwritten =
     List.fold_left (fun (over, acc) (((x, _), _) as e) ->
@@ -1689,7 +1836,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite c =
   in
   let var_overwrite', rev_algs =
     overwrite_overwritten
-      (overwrite_overwritten (var_overwrite, []) c.Ast.variables)
+      (overwrite_overwritten (var_overwrite, []) ast_compil.Ast.variables)
       extra_vars
   in
   let alg_vars_over =
@@ -1702,7 +1849,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite c =
     (NamedDecls.create ~forbidden:rule_names alg_vars_array).NamedDecls.finder
   in
   let tk_nd =
-    NamedDecls.create (Tools.array_map_of_list (fun x -> x, ()) c.Ast.tokens)
+    NamedDecls.create
+      (Tools.array_map_of_list (fun x -> x, ()) ast_compil.Ast.tokens)
   in
   let tok = tk_nd.NamedDecls.finder in
   let () =
@@ -1713,11 +1861,12 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite c =
   let perts', updated_vars =
     List_util.fold_right_map
       (perturbation_of_ast ~warning ~syntax_version sigs tok algs contact_map)
-      c.Ast.perturbations []
+      ast_compil.Ast.perturbations []
   in
   let perts'' =
     if has_counters then
-      Counters_compiler.counters_perturbations sigs [ c.Ast.signatures ]
+      Counters_compiler.counters_perturbations sigs
+        [ ast_compil.Ast.signatures ]
       @ perts'
     else
       perts'
@@ -1750,7 +1899,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite c =
     updated_alg_vars = updated_vars;
     result =
       {
-        filenames = c.filenames;
+        filenames = ast_compil.filenames;
         variables =
           Tools.array_fold_righti
             (fun i (lab, expr) acc ->
@@ -1764,13 +1913,14 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite c =
           List.rev_map
             (fun expr ->
               alg_expr_of_ast ~warning ~syntax_version sigs tok algs expr)
-            (List.rev c.observables);
+            (List.rev ast_compil.observables);
         init =
-          init_of_ast ~warning ~syntax_version sigs contact_map tok algs c.init;
+          init_of_ast ~warning ~syntax_version sigs contact_map tok algs
+            ast_compil.init;
         perturbations = perts'';
-        volumes = c.volumes;
-        tokens = c.tokens;
-        signatures = c.signatures;
-        configurations = c.configurations;
+        volumes = ast_compil.volumes;
+        tokens = ast_compil.tokens;
+        signatures = ast_compil.signatures;
+        configurations = ast_compil.configurations;
       };
   }

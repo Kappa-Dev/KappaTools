@@ -1729,17 +1729,27 @@ functor
                            states)
                     in
                     ( state,
-                      (Locality.annotate_with_dummy x, (states', binding', None))
+                      ( Locality.annotate_with_dummy x,
+                        {
+                          Signature.internal_state = states';
+                          links = Some binding';
+                          counters_info = None;
+                        } )
                       :: acc ))
                   (state, []) interface
               in
               ( state,
-                ( Locality.annotate_with_dummy a,
-                  NamedDecls.create (Array.of_list acc) )
+                (Locality.annotate_with_dummy a, NamedDecls.create_from_list acc)
                 :: list ))
           (state, []) l.(0)
       in
-      let signature = Signature.create ~counters:[] true l in
+
+      let agent_sigs =
+        LKappa_compiler.agent_sigs_of_agent_sigs_with_links_as_lists
+          ~build_contact_map:true
+          (NamedDecls.create_from_list l)
+      in
+      let signature = Signature.create ~counters_per_agent:[] agent_sigs in
       Remanent_state.set_signature signature state, signature
 
     let get_signature = get_gen Remanent_state.get_signature compute_signature
