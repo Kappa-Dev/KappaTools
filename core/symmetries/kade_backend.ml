@@ -232,13 +232,13 @@ end
 module Raw_mixture = struct
   include Raw_mixture
 
-  let print_link ~noCounters symbol_table incr_agents f = function
+  let print_link ~noCounters symbol_table counter_agents f = function
     | Raw_mixture.FREE -> Utils.print_free_site f symbol_table
     | Raw_mixture.VAL i ->
       (try
-         let root = Raw_mixture.find incr_agents i in
+         let root = Raw_mixture.find counter_agents i in
          let counter, (_, is_counter) =
-           Mods.DynArray.get incr_agents.Raw_mixture.rank root
+           Mods.DynArray.get counter_agents.Raw_mixture.rank root
          in
          if is_counter && not noCounters then
            Format.fprintf f "{=%d}" counter
@@ -271,7 +271,7 @@ module Raw_mixture = struct
       | None -> Format.pp_print_int f s)
 
   let print_intf ~noCounters with_link ?sigs
-      ?(symbol_table = Symbol_table.symbol_table_V4) incr_agents (ag_ty : int) f
+      ?(symbol_table = Symbol_table.symbol_table_V4) counter_agents (ag_ty : int) f
       (ports, ints) =
     let rec aux empty i =
       if i < Array.length ports then (
@@ -284,7 +284,7 @@ module Raw_mixture = struct
             (aux_pp_si sigs symbol_table ag_ty i)
             ints.(i)
             (if with_link then
-               print_link ~noCounters symbol_table incr_agents
+               print_link ~noCounters symbol_table counter_agents
              else
                fun _ _ ->
              ())
@@ -301,10 +301,10 @@ module Raw_mixture = struct
     | None -> Format.pp_print_int f a
 
   let print_agent ~noCounters created link ?sigs
-      ?(symbol_table = Symbol_table.symbol_table_V4) incr_agents f ag =
+      ?(symbol_table = Symbol_table.symbol_table_V4) counter_agents f ag =
     Format.fprintf f "%a%s@[<h>%a@]%s%t" (aux_pp_ag sigs) ag.Raw_mixture.a_type
       symbol_table.Symbol_table.agent_open
-      (print_intf ~noCounters link ?sigs ~symbol_table incr_agents
+      (print_intf ~noCounters link ?sigs ~symbol_table counter_agents
          ag.Raw_mixture.a_type) (ag.Raw_mixture.a_ports, ag.Raw_mixture.a_ints)
       symbol_table.Symbol_table.agent_close (fun f ->
         if created then Format.pp_print_string f "+")
@@ -312,7 +312,7 @@ module Raw_mixture = struct
 
   let print ~noCounters ~created ?sigs
       ?(symbol_table = Symbol_table.symbol_table_V4) f mix =
-    let incr_agents = Raw_mixture.union_find_counters sigs mix in
+    let counter_agents = Raw_mixture.union_find_counters sigs mix in
     let rec aux_print some = function
       | [] -> ()
       | h :: t ->
@@ -327,7 +327,7 @@ module Raw_mixture = struct
         else (
           let () = if some then Utils.print_agent_sep_comma symbol_table f in
           let () =
-            print_agent ~noCounters created true ?sigs ~symbol_table incr_agents
+            print_agent ~noCounters created true ?sigs ~symbol_table counter_agents
               f h
           in
           aux_print true t
@@ -522,7 +522,7 @@ module LKappa = struct
                   raise
                     (ExceptionDefn.Internal_Error
                        (Locality.annotate_with_dummy
-                          "Port a of __incr agent not well specified")))))
+                          "Port a of __counter_agent agent not well specified")))))
           mix
     in
     t

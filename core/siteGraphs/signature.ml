@@ -90,7 +90,7 @@ let one_to_json =
               signature.counters_info );
         ])
 
-let one_of_json =
+let one_of_json : Yojson.Basic.t -> bool array array site_sig NamedDecls.t =
   NamedDecls.of_json (function
     | `Assoc [ ("internal_state", a); ("links", b); ("counters_info", c) ] ->
       {
@@ -141,18 +141,24 @@ let one_of_json =
     | x ->
       raise (Yojson.Basic.Util.Type_error ("Problematic agent signature", x)))
 
-(* TODO rework this type: rename t, merge incr and incr_sites *)
-type s = { t: t NamedDecls.t; incr: int option; incr_sites: (int * int) option }
+type counter_agent_info = { id: int; arity: int; ports: int * int }
 
-let size sigs = NamedDecls.size sigs.t
-let get sigs agent_id = NamedDecls.elt_val sigs.t agent_id
+type s = {
+  agent_sigs: t NamedDecls.t;
+  counter_agent_info: counter_agent_info option;
+}
+
+let size sigs = NamedDecls.size sigs.agent_sigs
+let get sigs agent_id = NamedDecls.elt_val sigs.agent_sigs agent_id
 let arity sigs agent_id = NamedDecls.size (get sigs agent_id)
 
 let max_arity sigs =
-  NamedDecls.fold (fun _ _ x a -> max x (NamedDecls.size a)) 0 sigs.t
+  NamedDecls.fold (fun _ _ x a -> max x (NamedDecls.size a)) 0 sigs.agent_sigs
 
-let agent_of_num i sigs = NamedDecls.elt_name sigs.t i
-let num_of_agent name sigs = NamedDecls.elt_id ~kind:"agent" sigs.t name
+let agent_of_num i sigs = NamedDecls.elt_name sigs.agent_sigs i
+
+let num_of_agent name sigs =
+  NamedDecls.elt_id ~kind:"agent" sigs.agent_sigs name
 
 let id_of_site ((agent_name, _) as agent_ty) site_name sigs =
   let n = num_of_agent agent_ty sigs in
@@ -199,44 +205,36 @@ let rec allowed_link ag1 s1 ag2 s2 sigs =
 
 let create ~counters_per_agent agent_sigs =
   {
-    t = agent_sigs;
-    incr =
+    agent_sigs;
+    counter_agent_info =
       (if counters_per_agent = [] then
          None
        else
-         Some 0);
-    incr_sites =
-      (if counters_per_agent = [] then
-         None
-       else
-         Some (0, 1));
+         (* If there is a counter agent, we choose 0 for its agent id and 0 and 1 as its port ids *)
+         Some { id = 0; arity = 2; ports = 0, 1 });
   }
 
 let is_counter_agent sigs n_id =
-  match sigs.incr with
+  match sigs.counter_agent_info with
   | None -> false
-  | Some incr_id -> n_id = incr_id
+  | Some agent_info -> n_id = agent_info.id
 
 let ports_if_counter_agent sigs n_id =
-  if
-    match sigs.incr with
-    | None -> false
-    | Some incr_id -> n_id = incr_id
-  then
-    sigs.incr_sites
-  else
-    None
+  match sigs.counter_agent_info with
+  | None -> None
+  | Some agent_info ->
+    if n_id = agent_info.id then
+      Some agent_info.ports
+    else
+      None
 
 let site_is_counter sigs ag_ty id =
   counter_of_site_id id (get sigs ag_ty) <> None
 
-let incr_agent sigs =
-  match sigs.incr with
-  | None -> failwith "No incr agent"
-  | Some id ->
-    (match sigs.incr_sites with
-    | None -> failwith "Signature of counter inconsistent"
-    | Some (before, after) -> id, 2, before, after)
+let get_counter_agent_info sigs =
+  match sigs.counter_agent_info with
+  | None -> failwith "No counter agent"
+  | Some counter_agent_info -> counter_agent_info
 
 let print_agent sigs f ag_ty =
   Format.pp_print_string f @@ agent_of_num ag_ty sigs
@@ -299,19 +297,22 @@ let print f sigs =
   Format.fprintf f "@[<v>%a@]"
     (NamedDecls.print ~sep:Pp.space (fun i n f si ->
          Format.fprintf f "@[<h>%%agent: %s(%a)@]" n (print_one ~sigs i) si))
-    sigs.t
+    sigs.agent_sigs
 
-let to_json sigs = NamedDecls.to_json one_to_json sigs.t
+let to_json sigs = NamedDecls.to_json one_to_json sigs.agent_sigs
 
 let of_json v =
-  let t = NamedDecls.of_json one_of_json v in
-  let incr, incr_sites =
-    match Mods.StringMap.find_option "__incr" t.NamedDecls.finder with
-    | Some incr_id ->
-      let incr = NamedDecls.elt_val t incr_id in
-      let after = num_of_site ("a", Locality.dummy) incr in
-      let before = num_of_site ("b", Locality.dummy) incr in
-      Some incr_id, Some (before, after)
-    | None -> None, None
+  let agent_sigs : 'a site_sig NamedDecls.t NamedDecls.t =
+    NamedDecls.of_json one_of_json v
   in
-  { t; incr; incr_sites }
+  match
+    Mods.StringMap.find_option "__counter_agent" agent_sigs.NamedDecls.finder
+  with
+  | Some id ->
+    let agent_signature = NamedDecls.elt_val agent_sigs id in
+    let ports =
+      ( num_of_site ("a", Locality.dummy) agent_signature,
+        num_of_site ("b", Locality.dummy) agent_signature )
+    in
+    { agent_sigs; counter_agent_info = Some { id; arity = 2; ports } }
+  | None -> { agent_sigs; counter_agent_info = None }

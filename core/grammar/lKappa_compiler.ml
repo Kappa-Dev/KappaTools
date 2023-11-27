@@ -1668,12 +1668,12 @@ let prepare_agent_sig ~(sites : Ast.site list) :
               ( ( c.counter_name,
                   {
                     internal_state = NamedDecls.create [||];
-                    (* Agent with counter can link to port [b] on counter agent [__incr] *)
+                    (* Agent with counter can link to port [b] on counter agent [__counter_agent] *)
                     links =
                       Some
                         [
                           ( Locality.annotate_with_dummy "b",
-                            Locality.annotate_with_dummy "__incr" );
+                            Locality.annotate_with_dummy "__counter_agent" );
                         ];
                     counters_info = Some (j, Locality.v c.counter_delta);
                   } )
@@ -1693,7 +1693,7 @@ let make_counter_agent_site_sigs
     (string * Locality.t)
     * ((string * Locality.t) * (string * Locality.t)) list Signature.site_sig
       NamedDecls.t =
-  let counter_agent_name = "__incr", Locality.dummy in
+  let counter_agent_name = "__counter_agent", Locality.dummy in
   let a_port_name = "a", Locality.dummy in
   (* after port *)
   let b_port_name = "b", Locality.dummy in

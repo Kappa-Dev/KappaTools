@@ -428,8 +428,15 @@ let compile ~warning ~debug_mode compil =
 
 let make_counter_agent sigs (first, (dst, ra_erased)) (last, equal) i j pos
     created =
-  let ra_type, arity, incr_b, incr_a = Signature.incr_agent sigs in
-  let ra_ports = Array.make arity ((LKappa.LNK_FREE, pos), LKappa.Maintained) in
+  let counter_agent_info = Signature.get_counter_agent_info sigs in
+  let port_b = fst counter_agent_info.ports in
+  let port_a = snd counter_agent_info.ports in
+  let ra_type = counter_agent_info.id in
+
+  let ra_ports =
+    Array.make counter_agent_info.arity
+      ((LKappa.LNK_FREE, pos), LKappa.Maintained)
+  in
   let before_switch =
     if first && created then
       LKappa.Linked i
@@ -440,19 +447,19 @@ let make_counter_agent sigs (first, (dst, ra_erased)) (last, equal) i j pos
     if first then
       LKappa.LNK_VALUE (i, dst), pos
     else
-      LKappa.LNK_VALUE (i, (ra_type, incr_a)), pos
+      LKappa.LNK_VALUE (i, (ra_type, port_a)), pos
   in
-  let () = ra_ports.(incr_b) <- before, before_switch in
+  let () = ra_ports.(port_b) <- before, before_switch in
   let after =
     if last && equal then
       LKappa.LNK_FREE, pos
     else if last then
       LKappa.LNK_ANY, pos
     else
-      LKappa.LNK_VALUE (j, (ra_type, incr_b)), pos
+      LKappa.LNK_VALUE (j, (ra_type, port_b)), pos
   in
-  let () = ra_ports.(incr_a) <- after, LKappa.Maintained in
-  let ra_ints = Array.make arity LKappa.I_ANY in
+  let () = ra_ports.(port_a) <- after, LKappa.Maintained in
+  let ra_ints = Array.make counter_agent_info.arity LKappa.I_ANY in
   {
     LKappa.ra_type;
     ra_erased;
@@ -462,11 +469,13 @@ let make_counter_agent sigs (first, (dst, ra_erased)) (last, equal) i j pos
   }
 
 let raw_counter_agent (first, first_link) (last, last_link) i j sigs equal =
-  let incr_type, arity, incr_b, incr_a = Signature.incr_agent sigs in
-  let ports = Array.make arity Raw_mixture.FREE in
+  let counter_agent_info = Signature.get_counter_agent_info sigs in
+  let port_b = fst counter_agent_info.ports in
+  let port_a = snd counter_agent_info.ports in
+  let ports = Array.make counter_agent_info.arity Raw_mixture.FREE in
   let internals =
-    Array.init arity (fun i ->
-        Signature.default_internal_state incr_type i sigs)
+    Array.init counter_agent_info.arity (fun i ->
+        Signature.default_internal_state counter_agent_info.id i sigs)
   in
   let before =
     if first then
@@ -474,7 +483,7 @@ let raw_counter_agent (first, first_link) (last, last_link) i j sigs equal =
     else
       Raw_mixture.VAL i
   in
-  let () = ports.(incr_b) <- before in
+  let () = ports.(port_b) <- before in
   let after =
     if last && equal then
       Raw_mixture.FREE
@@ -483,9 +492,9 @@ let raw_counter_agent (first, first_link) (last, last_link) i j sigs equal =
     else
       Raw_mixture.VAL j
   in
-  let () = ports.(incr_a) <- after in
+  let () = ports.(port_a) <- after in
   {
-    Raw_mixture.a_type = incr_type;
+    Raw_mixture.a_type = counter_agent_info.id;
     Raw_mixture.a_ports = ports;
     Raw_mixture.a_ints = internals;
   }
@@ -519,12 +528,13 @@ let rec link_incr sigs i nb ag_info equal lnk pos delta =
   )
 
 let rec erase_incr sigs i incrs delta lnk =
-  let _, _, incr_b, _ = Signature.incr_agent sigs in
+  let counter_agent_info = Signature.get_counter_agent_info sigs in
+  let port_b = fst counter_agent_info.ports in
   match incrs with
   | hd :: tl ->
     if i = abs delta then (
-      let before, _ = hd.LKappa.ra_ports.(incr_b) in
-      let () = hd.LKappa.ra_ports.(incr_b) <- before, LKappa.Linked lnk in
+      let before, _ = hd.LKappa.ra_ports.(port_b) in
+      let () = hd.LKappa.ra_ports.(port_b) <- before, LKappa.Linked lnk in
       hd :: tl
     ) else (
       let () =
@@ -539,7 +549,6 @@ let rec erase_incr sigs i incrs delta lnk =
 
 let counter_becomes_port sigs ra p_id (delta, pos') pos equal test start_link_nb
     =
-  let incr_type, _, incr_b, _ = Signature.incr_agent sigs in
   let start_link_for_created = start_link_nb + test + 1 in
   let lnk_for_erased = start_link_nb + abs delta in
   let ag_info = (p_id, ra.LKappa.ra_type), ra.LKappa.ra_erased in
@@ -574,8 +583,11 @@ let counter_becomes_port sigs ra p_id (delta, pos') pos equal test start_link_nb
     else
       LKappa.Linked lnk_for_erased
   in
+  let counter_agent_info = Signature.get_counter_agent_info sigs in
+  let port_b = fst counter_agent_info.ports in
   let p =
-    (LKappa.LNK_VALUE (start_link_nb, (incr_b, incr_type)), pos), switch
+    ( (LKappa.LNK_VALUE (start_link_nb, (port_b, counter_agent_info.id)), pos),
+      switch )
   in
   let () = ra.LKappa.ra_ports.(p_id) <- p in
   adjust_delta, created
@@ -710,7 +722,6 @@ let remove_counter_rule sigs mix created =
       List.rev_map (fun ag -> ag.ra) (List.rev created) )
 
 let agent_with_max_counter sigs c ((agent_name, _) as ag_ty) =
-  let incr_type, _, incr_b, _ = Signature.incr_agent sigs in
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -726,7 +737,9 @@ let agent_with_max_counter sigs c ((agent_name, _) as ag_ty) =
   let incrs =
     link_incr sigs 0 (max_val' + 1) ((c_id, ag_id), false) false 1 pos (-1)
   in
-  let p = LKappa.LNK_VALUE (1, (incr_b, incr_type)), pos in
+  let counter_agent_info = Signature.get_counter_agent_info sigs in
+  let port_b = fst counter_agent_info.ports in
+  let p = LKappa.LNK_VALUE (1, (port_b, counter_agent_info.id)), pos in
   let () = ports.(c_id) <- p, LKappa.Maintained in
   let ra =
     {
@@ -791,8 +804,10 @@ let make_counter i name =
   }
 
 let add_counter_to_contact_map sigs add_link_contact_map =
-  let incr_id, _, incr_b, incr_a = Signature.incr_agent sigs in
-  add_link_contact_map incr_id incr_a incr_id incr_b
+  let counter_agent_info = Signature.get_counter_agent_info sigs in
+  let port_b = fst counter_agent_info.ports in
+  let port_a = snd counter_agent_info.ports in
+  add_link_contact_map counter_agent_info.id port_a counter_agent_info.id port_b
 
 let forbid_modification (delta, pos) =
   if delta != 0 then LKappa.forbid_modification pos (Some delta)
@@ -833,8 +848,9 @@ let annotate_edit_counters sigs ((agent_name, _) as ag_ty) counters ra
   let arity = Signature.arity sigs ag_id in
   let ra_counters = Array.make arity None in
   let register_counter_modif c_id =
-    let incr_id, _, incr_b, _ = Signature.incr_agent sigs in
-    add_link_contact_map ag_id c_id incr_id incr_b
+    let counter_agent_info = Signature.get_counter_agent_info sigs in
+    let port_b = fst counter_agent_info.ports in
+    add_link_contact_map ag_id c_id counter_agent_info.id port_b
   in
   let _ =
     List.fold_left
@@ -864,8 +880,9 @@ let annotate_counters_with_diff sigs ((agent_name, pos) as ag_ty) lc rc ra
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let register_counter_modif c c_id =
-    let incr_id, _, incr_b, _ = Signature.incr_agent sigs in
-    let () = add_link_contact_map ag_id c_id incr_id incr_b in
+    let counter_agent_info = Signature.get_counter_agent_info sigs in
+    let port_b = fst counter_agent_info.ports in
+    let () = add_link_contact_map ag_id c_id counter_agent_info.id port_b in
     c, LKappa.Maintained
   in
   let ra_counters = Array.make arity None in
@@ -949,8 +966,9 @@ let annotate_created_counters sigs ((agent_name, _) as ag_ty) counters
   in
 
   let register_counter_modif c_id =
-    let incr_id, _, incr_b, _ = Signature.incr_agent sigs in
-    add_link_contact_map ag_id c_id incr_id incr_b
+    let counter_agent_info = Signature.get_counter_agent_info sigs in
+    let port_b = fst counter_agent_info.ports in
+    add_link_contact_map ag_id c_id counter_agent_info.id port_b
   in
   let _ =
     List.fold_left

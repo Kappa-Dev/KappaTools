@@ -81,12 +81,17 @@ val allowed_link : int -> int -> int -> int -> s -> bool
 
 (** {2 Counter specific} *)
 
+(** If there are counters in the signature, we define a single agent as the
+ * counter agent, which will be used as _dummies_ to keep track of the value *)
+
 val is_counter_agent : s -> int -> bool
 val ports_if_counter_agent : s -> int -> (int * int) option
 val site_is_counter : s -> int -> int -> bool
 
-val incr_agent : s -> int * int * int * int
-(** id, arity, before, after *)
+type counter_agent_info = { id: int; arity: int; ports: int * int }
+
+val get_counter_agent_info : s -> counter_agent_info
+(** [counter_agent agent_sigs] *)
 
 (** {2 I/O} *)
 

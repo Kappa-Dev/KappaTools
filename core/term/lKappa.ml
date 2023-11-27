@@ -261,7 +261,7 @@ let union_find_counters sigs mix =
                 raise
                   (ExceptionDefn.Internal_Error
                      (Locality.annotate_with_dummy
-                        "Port a of __incr agent not well specified")))))
+                        "Port a of __counter_agent agent not well specified")))))
         mix
   in
   t
@@ -273,7 +273,7 @@ let print_rule_agent ~noCounters sigs ~ltypes counters created_counters f ag =
       if ag.ra_erased then Format.pp_print_string f "-")
 
 let print_rule_mixture ~noCounters sigs ~ltypes created f mix =
-  let incr_agents = union_find_counters (Some sigs) mix in
+  let counter_agents = union_find_counters (Some sigs) mix in
   let created_incr = Raw_mixture.union_find_counters (Some sigs) created in
   let rec aux_print some = function
     | [] -> ()
@@ -283,7 +283,7 @@ let print_rule_mixture ~noCounters sigs ~ltypes created f mix =
       else (
         let () = if some then Pp.comma f in
         let () =
-          print_rule_agent ~noCounters sigs ~ltypes incr_agents created_incr f h
+          print_rule_agent ~noCounters sigs ~ltypes counter_agents created_incr f h
         in
         aux_print true t
       )
