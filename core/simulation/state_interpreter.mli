@@ -8,16 +8,23 @@
 
 (**Event loop module*)
 
-type t (** Abstract state *)
+type t
+(** Abstract state *)
 
 val empty : with_delta_activities:bool -> Counter.t -> Model.t -> t
 (** [empty ~with_delta_activities env] *)
 
 val initialize :
   bind:('a -> (bool * Rule_interpreter.t * t -> 'a) -> 'a) ->
-  return:(bool * Rule_interpreter.t * t -> 'a) -> debugMode:bool ->
-  outputs:(Data.t -> unit) -> Model.t -> Counter.t -> Rule_interpreter.t -> t ->
-  (Primitives.alg_expr * Primitives.elementary_rule) list -> 'a
+  return:(bool * Rule_interpreter.t * t -> 'a) ->
+  debugMode:bool ->
+  outputs:(Data.t -> unit) ->
+  Model.t ->
+  Counter.t ->
+  Rule_interpreter.t ->
+  t ->
+  (Primitives.alg_expr * Primitives.elementary_rule) list ->
+  'a
 (** [initial env counter graph state] builds up the initial state *)
 
 val observables_values :
@@ -26,17 +33,32 @@ val observables_values :
 values of observables) *)
 
 val do_modifications :
-  debugMode:bool -> outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
-  Rule_interpreter.t -> t -> Primitives.modification list ->
-  (bool * Rule_interpreter.t * t * bool)
+  debugMode:bool ->
+  outputs:(Data.t -> unit) ->
+  Model.t ->
+  Counter.t ->
+  Rule_interpreter.t ->
+  t ->
+  Primitives.modification list ->
+  bool * Rule_interpreter.t * t * bool
 
 val a_loop :
-  debugMode:bool -> outputs:(Data.t -> unit) -> dumpIfDeadlocked:bool ->
-  maxConsecutiveClash:int -> Model.t -> Counter.t ->
-  Rule_interpreter.t -> t -> (bool * Rule_interpreter.t * t)
+  debugMode:bool ->
+  outputs:(Data.t -> unit) ->
+  dumpIfDeadlocked:bool ->
+  maxConsecutiveClash:int ->
+  Model.t ->
+  Counter.t ->
+  Rule_interpreter.t ->
+  t ->
+  bool * Rule_interpreter.t * t
 (** One event loop *)
 
 val end_of_simulation :
   outputs:(Data.t -> unit) ->
-  Model.t -> Counter.t -> Rule_interpreter.t -> t -> unit
+  Model.t ->
+  Counter.t ->
+  Rule_interpreter.t ->
+  t ->
+  unit
 (** What to do after stopping simulation. *)

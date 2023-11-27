@@ -11,54 +11,64 @@
 type t
 
 val init :
-  filenames : string list -> Pattern.Env.t -> unit NamedDecls.t ->
+  filenames:string list ->
+  Pattern.Env.t ->
+  unit NamedDecls.t ->
   Primitives.alg_expr Locality.annot NamedDecls.t ->
-  (Operator.DepSet.t * Operator.DepSet.t *
-     Operator.DepSet.t array * Operator.DepSet.t array) ->
-  ((string Locality.annot option * LKappa.rule Locality.annot) array *
-   Primitives.elementary_rule array) ->
-  Primitives.alg_expr Locality.annot array -> Primitives.perturbation array ->
-  Contact_map.t -> t
+  Operator.DepSet.t
+  * Operator.DepSet.t
+  * Operator.DepSet.t array
+  * Operator.DepSet.t array ->
+  (string Locality.annot option * LKappa.rule Locality.annot) array
+  * Primitives.elementary_rule array ->
+  Primitives.alg_expr Locality.annot array ->
+  Primitives.perturbation array ->
+  Contact_map.t ->
+  t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
 
-
 val deconstruct :
   t ->
-  string list * Pattern.Env.t * unit NamedDecls.t *
-  Primitives.alg_expr Locality.annot NamedDecls.t *
-  (Operator.DepSet.t * Operator.DepSet.t *
-   Operator.DepSet.t array * Operator.DepSet.t array) *
-  ((string Locality.annot option * LKappa.rule Locality.annot) array *
-   Primitives.elementary_rule array) *
-  Primitives.alg_expr Locality.annot array * Primitives.perturbation array *
-  Contact_map.t
+  string list
+  * Pattern.Env.t
+  * unit NamedDecls.t
+  * Primitives.alg_expr Locality.annot NamedDecls.t
+  * (Operator.DepSet.t
+    * Operator.DepSet.t
+    * Operator.DepSet.t array
+    * Operator.DepSet.t array)
+  * ((string Locality.annot option * LKappa.rule Locality.annot) array
+    * Primitives.elementary_rule array)
+  * Primitives.alg_expr Locality.annot array
+  * Primitives.perturbation array
+  * Contact_map.t
 
 val nb_tokens : t -> int
 val nb_algs : t -> int
 val nb_rules : t -> int
 val nb_syntactic_rules : t -> int
 val nb_perturbations : t -> int
-
 val domain : t -> Pattern.Env.t
 val get_obs : t -> Primitives.alg_expr Locality.annot array
 val get_rules : t -> Primitives.elementary_rule array
-
 val new_domain : Pattern.Env.t -> t -> t
 val signatures : t -> Signature.s
 val tokens_finder : t -> int Mods.StringMap.t
 val algs_finder : t -> int Mods.StringMap.t
 val contact_map : t -> Contact_map.t
-
 val get_alg : t -> int -> Primitives.alg_expr
 val get_algs : t -> (string * Primitives.alg_expr Locality.annot) array
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
-val get_ast_rule: t -> int -> LKappa.rule
-val get_ast_rule_with_label: t -> int ->
-  (string Locality.annot option * LKappa.rule Locality.annot)
-val get_ast_rule_rate_pos: unary:bool -> t -> int -> Locality.t
+val get_ast_rule : t -> int -> LKappa.rule
+
+val get_ast_rule_with_label :
+  t -> int -> string Locality.annot option * LKappa.rule Locality.annot
+
+val get_ast_rule_rate_pos : unary:bool -> t -> int -> Locality.t
 val map_observables : (Primitives.alg_expr -> 'a) -> t -> 'a array
+
 val fold_rules :
   (int -> 'a -> Primitives.elementary_rule -> 'a) -> 'a -> t -> 'a
 
@@ -69,9 +79,13 @@ val fold_perturbations :
 
 val get_alg_reverse_dependencies : t -> int -> Operator.DepSet.t
 val get_token_reverse_dependencies : t -> int -> Operator.DepSet.t
+
 val all_dependencies :
-  t -> (Operator.DepSet.t * Operator.DepSet.t *
-        Operator.DepSet.t array * Operator.DepSet.t array)
+  t ->
+  Operator.DepSet.t
+  * Operator.DepSet.t
+  * Operator.DepSet.t array
+  * Operator.DepSet.t array
 
 val num_of_agent : string Locality.annot -> t -> int
 val num_of_alg : string Locality.annot -> t -> int
@@ -82,8 +96,7 @@ val print_ast_rule :
   noCounters:bool -> ?env:t -> Format.formatter -> int -> unit
 (** The int is the ast_rule_id *)
 
-val print_rule :
-  noCounters:bool -> ?env:t -> Format.formatter -> int -> unit
+val print_rule : noCounters:bool -> ?env:t -> Format.formatter -> int -> unit
 (** Same as above but the int is this time the rule_id *)
 
 val print_agent : ?env:t -> Format.formatter -> int -> unit
@@ -91,29 +104,37 @@ val print_alg : ?env:t -> Format.formatter -> int -> unit
 val print_token : ?env:t -> Format.formatter -> int -> unit
 
 val print :
-  noCounters:bool -> (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
+  noCounters:bool ->
+  (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
   (t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
-  Format.formatter -> t -> unit
+  Format.formatter ->
+  t ->
+  unit
 
 val print_kappa :
-  noCounters:bool -> (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
+  noCounters:bool ->
+  (t -> Format.formatter -> Primitives.alg_expr -> unit) ->
   ?pr_rule:(t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
-  Format.formatter -> t -> unit
+  Format.formatter ->
+  t ->
+  unit
 
 val to_yojson : t -> Yojson.Basic.t
 val of_yojson : Yojson.Basic.t -> t
-
 val check_if_counter_is_filled_enough : t -> unit
 val overwrite_vars : (int * Primitives.alg_expr) list -> t -> t
+
 val propagate_constant :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->
-  ?max_time:float -> ?max_events:int ->
-  int list -> (int * Primitives.alg_expr) list -> t -> t
+  ?max_time:float ->
+  ?max_events:int ->
+  int list ->
+  (int * Primitives.alg_expr) list ->
+  t ->
+  t
 (** [propagate_constant updated_vars overwrite_vars env] *)
 
-val fold_mixture_in_expr :
-  ('a -> Pattern.id array list -> 'a) -> 'a -> t -> 'a
-
+val fold_mixture_in_expr : ('a -> Pattern.id array list -> 'a) -> 'a -> t -> 'a
 val unary_patterns : t -> Pattern.Set.t

@@ -10,5 +10,5 @@ exception Syntax_Error of string Locality.annot
 exception Malformed_Decl of string Locality.annot
 exception Internal_Error of string Locality.annot
 
-let warning_buffer:
-      (Locality.t option*(Format.formatter -> unit)) list ref = ref []
+let warning_buffer : (Locality.t option * (Format.formatter -> unit)) list ref =
+  ref []

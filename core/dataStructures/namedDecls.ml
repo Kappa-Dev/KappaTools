@@ -6,74 +6,76 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type 'a t =
-  { decls : (string *'a) array;
-    finder : int Mods.StringMap.t }
+type 'a t = { decls: (string * 'a) array; finder: int Mods.StringMap.t }
 
 let name_map_of_array ?forbidden a =
-  let bad = match forbidden with
+  let bad =
+    match forbidden with
     | None -> fun _ -> false
-    | Some s -> fun x -> Mods.StringSet.mem x s in
+    | Some s -> fun x -> Mods.StringSet.mem x s
+  in
   Tools.array_fold_lefti
-    (fun i map ((x,pos),_) ->
-       if bad x || Mods.StringMap.mem x map then
-         raise (ExceptionDefn.Malformed_Decl
-                  ("Label '"^x^"' already defined", pos))
-       else Mods.StringMap.add x i map)
+    (fun i map ((x, pos), _) ->
+      if bad x || Mods.StringMap.mem x map then
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ("Label '" ^ x ^ "' already defined", pos))
+      else
+        Mods.StringMap.add x i map)
     Mods.StringMap.empty a
 
-let create ?forbidden a = {
-  decls = Array.map (fun ((x,_),y) -> (x,y)) a;
-  finder = name_map_of_array ?forbidden a
-}
+let create ?forbidden a =
+  {
+    decls = Array.map (fun ((x, _), y) -> x, y) a;
+    finder = name_map_of_array ?forbidden a;
+  }
 
 let size nd = Array.length nd.decls
-
 let elt_name nd i = fst nd.decls.(i)
 
-let elt_id ?(kind="element") nd (s,pos) =
+let elt_id ?(kind = "element") nd (s, pos) =
   match Mods.StringMap.find_option s nd.finder with
   | Some x -> x
   | None ->
-    raise (ExceptionDefn.Malformed_Decl
-             (Format.asprintf "\"%s\" is not a declared %s." s kind,pos))
+    raise
+      (ExceptionDefn.Malformed_Decl
+         (Format.asprintf "\"%s\" is not a declared %s." s kind, pos))
 
 let print ~sep pp f nd =
-  Pp.array sep (fun i f (n,el) -> pp i n f el) f nd.decls
+  Pp.array sep (fun i f (n, el) -> pp i n f el) f nd.decls
+
 let debug_print pr f nd =
-  print ~sep:Pp.space (fun i n f el ->
-      Format.fprintf f "@[%i>%s: @[<2>%a@]@]"
-        i n pr el)
+  print ~sep:Pp.space
+    (fun i n f el -> Format.fprintf f "@[%i>%s: @[<2>%a@]@]" i n pr el)
     f nd
 
 let fold f acc nd =
-  Tools.array_fold_lefti
-    (fun i acc (na,x) -> f i na acc x)
-    acc nd.decls
+  Tools.array_fold_lefti (fun i acc (na, x) -> f i na acc x) acc nd.decls
 
-let mapi f nd = {
-  decls = Array.mapi (fun i (s,v) -> (s,f i s v)) nd.decls;
-  finder = nd.finder;
-}
+let mapi f nd =
+  {
+    decls = Array.mapi (fun i (s, v) -> s, f i s v) nd.decls;
+    finder = nd.finder;
+  }
 
 let to_json aux nd =
   `List
     (Array.fold_right
-       (fun (x,a) acc -> `Assoc ([("name",`String x);("decl",aux a)]):: acc)
-       nd.decls
-       [])
+       (fun (x, a) acc -> `Assoc [ "name", `String x; "decl", aux a ] :: acc)
+       nd.decls [])
 
 let of_json aux = function
   | `List l ->
     let decls =
       Tools.array_map_of_list
         (function
-          | (`Assoc ([("name",`String x);("decl",a)]) |
-             `Assoc ([("decl",a);("name",`String x)])) ->
-            (Locality.dummy_annot x, aux a)
+          | `Assoc [ ("name", `String x); ("decl", a) ]
+          | `Assoc [ ("decl", a); ("name", `String x) ] ->
+            Locality.dummy_annot x, aux a
           | x ->
-            raise (Yojson.Basic.Util.Type_error
-                     ("Not a valid NamedDecl element",x)))
-        l in
+            raise
+              (Yojson.Basic.Util.Type_error ("Not a valid NamedDecl element", x)))
+        l
+    in
     create decls
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a valid NamedDecl",x))
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a valid NamedDecl", x))

@@ -6,6 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val content : [> `Button | `Div | `Ul  | `A of [> `PCDATA | `Span ]] Tyxml_js.Html5.elt list
+val content :
+  [> `Button | `Div | `Ul | `A of [> `PCDATA | `Span ] ] Tyxml_js.Html5.elt list
 
 val onload : unit -> unit

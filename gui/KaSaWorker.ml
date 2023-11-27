@@ -7,8 +7,6 @@
 (******************************************************************************)
 
 let on_message (text_message : string) : unit =
-  Kasa_mpi.on_message
-    (fun s -> Worker.post_message s)
-    text_message
+  Kasa_mpi.on_message (fun s -> Worker.post_message s) text_message
 
 let () = Worker.set_onmessage on_message

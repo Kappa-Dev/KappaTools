@@ -4189,5 +4189,5 @@ A()=> [A(d:[1 .. 4])]
 B()=> [B(c:]-oo .. 0])]
 
 Some exceptions have been raised
-error: file_name: core/KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 340; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 340; exception:Exit
+error: file_name: core/KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 286; exception:Exit
+error: file_name: core/KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 286; exception:Exit

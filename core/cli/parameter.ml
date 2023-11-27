@@ -14,31 +14,34 @@ let defaultHeapSize = ref 5
 let debugModeOn = ref false
 
 (* expert option for stories *)
-  (** Memory **)
-  (* Number of potential states that are put in the cache per binding site, so as to handler with side effects in stories. None -> Unlimited cache *)
-  let cache_size = ref (None:int option)
 
-  (** Precomputation **)
-  (* Cut concurrent events (for all observables) before generating the blackboard *)
-  let do_global_cut = true
+(* Number of potential states that are put in the cache per binding site, so as to handler with side effects in stories. None -> Unlimited cache *)
 
-  (* Cut pseudo-inverse events *)
-  let cut_pseudo_inverse_event = true
+(** Memory **)
+let cache_size = ref (None : int option)
 
-  (* Cut concurrent events (for the current observale) before generating the blackboard *)
-  let do_local_cut = true
+(* Cut concurrent events (for all observables) before generating the blackboard *)
 
-  (* Cut separable components *)
-  let do_detect_separable_components = true
+(** Precomputation **)
+let do_global_cut = true
 
-  (** Propagation heuristics **)
-  (* Whenever we do not know whether an event has to be selected or, not, check whether this is not the last one that can parform a requested action *)
-  let look_up_for_better_cut = true
+(* Cut pseudo-inverse events *)
+let cut_pseudo_inverse_event = true
 
-  (* Whenever an event is removed, checked whether there is not only one left to perform a required action *)
-  let look_down_for_better_cut = true
+(* Cut concurrent events (for the current observale) before generating the blackboard *)
+let do_local_cut = true
 
-  let log_number_of_causal_flows = true
+(* Cut separable components *)
+let do_detect_separable_components = true
+
+(* Whenever we do not know whether an event has to be selected or, not, check whether this is not the last one that can parform a requested action *)
+
+(** Propagation heuristics **)
+let look_up_for_better_cut = true
+
+(* Whenever an event is removed, checked whether there is not only one left to perform a required action *)
+let look_down_for_better_cut = true
+let log_number_of_causal_flows = true
 
 (*User definable values*)
 let time_independent = ref false
@@ -51,5 +54,4 @@ let dump_grid_after_branching_during_weak_compression = false
 let dump_grid_after_branching_during_strong_compression = false
 let xlsweakFileName = "grid_weak_compression"
 let xlsstrongFileName = "grid_strong_compression"
-
 let get_cache_size () = !cache_size

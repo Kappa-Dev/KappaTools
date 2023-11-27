@@ -1,2 +1,2 @@
-val common_js: string
-val flux_js: string 
+val common_js : string
+val flux_js : string

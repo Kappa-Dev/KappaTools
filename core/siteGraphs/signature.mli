@@ -8,7 +8,8 @@
 
 (** Store definitions of agents *)
 
-type t (** Store of one agent *)
+type t
+(** Store of one agent *)
 
 val num_of_site : ?agent_name:string -> string Locality.annot -> t -> int
 val site_of_num : int -> t -> string
@@ -18,22 +19,25 @@ val num_of_internal_state : int -> string Locality.annot -> t -> int
 (** [num_of_internal_state site_id state_name sign] *)
 
 val internal_state_of_num : int -> int -> t -> string
-
 val counter_of_site : int -> t -> (int * int) option
 val has_counter : t -> bool
 
-type s (** Store of all the agents *)
+type s
+(** Store of all the agents *)
 
 val create :
   counters:(string Locality.annot * string Locality.annot list) list ->
   bool ->
-  (string Locality.annot *
-   (unit NamedDecls.t *
-    (string Locality.annot * string Locality.annot) list *
-      (int * int) option) NamedDecls.t) list ->
+  (string Locality.annot
+  * (unit NamedDecls.t
+    * (string Locality.annot * string Locality.annot) list
+    * (int * int) option)
+    NamedDecls.t)
+  list ->
   s
 
 val size : s -> int
+
 val get : s -> int -> t
 (** [get sigs agent_id] *)
 
@@ -50,8 +54,11 @@ val id_of_site : string Locality.annot -> string Locality.annot -> s -> int
 (** [id_of_site agent_type site_name sigs] *)
 
 val id_of_internal_state :
-  string Locality.annot -> string Locality.annot ->
-  string Locality.annot -> s -> int
+  string Locality.annot ->
+  string Locality.annot ->
+  string Locality.annot ->
+  s ->
+  int
 (** [id_of_internal_state agent_type site_name state_name sigs] *)
 
 val internal_states_number : int -> int -> s -> int
@@ -64,20 +71,20 @@ val allowed_link : int -> int -> int -> int -> s -> bool
 
 val print_agent : s -> Format.formatter -> int -> unit
 val print_site : s -> int -> Format.formatter -> int -> unit
-val print_internal_state :
-  s -> int -> int -> Format.formatter -> int -> unit
+val print_internal_state : s -> int -> int -> Format.formatter -> int -> unit
+
 val print_site_internal_state :
   s -> int -> int -> Format.formatter -> int option -> unit
 (** [print_site_internal_state sigs agent_type site_id f state_id]
 prints both the site and its internal state if it is not [None]. *)
 
 val print_counter : s -> int -> Format.formatter -> int -> unit
-
 val print : Format.formatter -> s -> unit
 val to_json : s -> Yojson.Basic.t
 val of_json : Yojson.Basic.t -> s
-
 val is_counter_agent : s -> int -> bool
-val ports_if_counter_agent : s -> int -> (int*int) option
+val ports_if_counter_agent : s -> int -> (int * int) option
 val site_is_counter : s -> int -> int -> bool
-val incr_agent : s -> (int * int * int * int) (** id, arity, before, after *)
+
+val incr_agent : s -> int * int * int * int
+(** id, arity, before, after *)

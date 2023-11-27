@@ -7,5 +7,9 @@
 (******************************************************************************)
 
 val on_message :
-  none:bool -> weak:bool -> strong:bool ->
-  send_message:(string -> unit) -> string -> unit
+  none:bool ->
+  weak:bool ->
+  strong:bool ->
+  send_message:(string -> unit) ->
+  string ->
+  unit

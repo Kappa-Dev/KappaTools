@@ -11,9 +11,9 @@ type t
 
 val print : Format.formatter -> t -> unit
 val random : Random.State.t -> t -> key
-val empty: t
-val is_empty: t -> bool
-val add: key -> int -> t -> t
-val mem: key -> t -> bool
+val empty : t
+val is_empty : t -> bool
+val add : key -> int -> t -> t
+val mem : key -> t -> bool
 val remove : key -> t -> t
 val total : t -> Int64.t

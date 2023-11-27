@@ -13,7 +13,7 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-val normalize_species:
+val normalize_species :
   ?parameters:Remanent_parameters_sig.parameters ->
   sigs:Signature.s ->
   LKappa_auto.cache ->
@@ -22,7 +22,7 @@ val normalize_species:
   Pattern.cc ->
   LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
 
-val is_pattern_invariant_internal_states_permutation:
+val is_pattern_invariant_internal_states_permutation :
   ?parameters:Remanent_parameters_sig.parameters ->
   env:Model.t ->
   agent_type:int ->
@@ -32,7 +32,7 @@ val is_pattern_invariant_internal_states_permutation:
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
 
-val is_pattern_invariant_binding_states_permutation:
+val is_pattern_invariant_binding_states_permutation :
   ?parameters:Remanent_parameters_sig.parameters ->
   env:Model.t ->
   agent_type:int ->
@@ -42,7 +42,7 @@ val is_pattern_invariant_binding_states_permutation:
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
 
-val is_pattern_invariant_full_states_permutation:
+val is_pattern_invariant_full_states_permutation :
   ?parameters:Remanent_parameters_sig.parameters ->
   env:Model.t ->
   agent_type:int ->
@@ -52,7 +52,7 @@ val is_pattern_invariant_full_states_permutation:
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
 
-val equiv_class_of_a_pattern:
+val equiv_class_of_a_pattern :
   ?parameters:Remanent_parameters_sig.parameters ->
   env:Model.t ->
   partitions_internal_states:(int -> int list list) ->
@@ -62,11 +62,12 @@ val equiv_class_of_a_pattern:
   Pattern.PreEnv.t ->
   bool Mods.DynArray.t ->
   Pattern.id ->
-  LKappa_auto.cache * Pattern.PreEnv.t * bool Mods.DynArray.t *
-  (Pattern.id*int)  list
+  LKappa_auto.cache
+  * Pattern.PreEnv.t
+  * bool Mods.DynArray.t
+  * (Pattern.id * int) list
 
-
-val equiv_class_of_a_species:
+val equiv_class_of_a_species :
   ?parameters:Remanent_parameters_sig.parameters ->
   sigs:Signature.s ->
   partitions_internal_states:(int -> int list list) ->

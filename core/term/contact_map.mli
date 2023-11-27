@@ -13,6 +13,5 @@ val print_kappa :
   noCounters:bool -> Signature.s -> Format.formatter -> t -> unit
 
 val print_cycles : Signature.s -> Format.formatter -> t -> unit
-
 val to_yojson : t -> Yojson.Basic.t
 val of_yojson : Yojson.Basic.t -> t

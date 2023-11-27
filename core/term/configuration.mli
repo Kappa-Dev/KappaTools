@@ -9,23 +9,25 @@
 type period = DE of int | DT of float
 
 type t = {
-  progressSize : int;
-  progressChar : char;
-  dumpIfDeadlocked : bool;
-  initial : float option;
-  maxConsecutiveClash : int;
-  outputFileName : string option;
-  plotPeriod : period option;
-  seed : int option;
-  traceFileName : string option;
-  deltaActivitiesFileName : string option;
+  progressSize: int;
+  progressChar: char;
+  dumpIfDeadlocked: bool;
+  initial: float option;
+  maxConsecutiveClash: int;
+  outputFileName: string option;
+  plotPeriod: period option;
+  seed: int option;
+  traceFileName: string option;
+  deltaActivitiesFileName: string option;
 }
 
 val empty : t
 
 val parse :
   ((string * Locality.t) * (string * Locality.t) list) list ->
-  t * (bool * bool * bool) *
-  string (*cflowFormat*) * string option (*cflowFile*)
+  t
+  * (bool * bool * bool)
+  * string (*cflowFormat*)
+  * string option (*cflowFile*)
 
 val print : Format.formatter -> t -> unit

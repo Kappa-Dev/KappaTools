@@ -17,5 +17,4 @@
 
 (** Abstract domain to over-approximate the set of reachable views *)
 
-
-module Domain:Analyzer_domain_sig.Domain
+module Domain : Analyzer_domain_sig.Domain

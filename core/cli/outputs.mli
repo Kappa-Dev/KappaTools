@@ -9,16 +9,20 @@
 (** Deal with simulation output *)
 
 val initialize :
-  string option -> string option -> (string * string * string array) option ->
-  Model.t -> unit
+  string option ->
+  string option ->
+  (string * string * string array) option ->
+  Model.t ->
+  unit
 
 val initial_inputs :
-  Configuration.t -> Model.t ->
+  Configuration.t ->
+  Model.t ->
   (Primitives.alg_expr * Primitives.elementary_rule) list ->
-  filename:string -> unit
+  filename:string ->
+  unit
 
 val input_modifications : Model.t -> int -> Primitives.modification list -> unit
-
 val go : Data.t -> unit
 val flush_warning : unit -> unit
 val close : ?event:int -> unit -> unit
