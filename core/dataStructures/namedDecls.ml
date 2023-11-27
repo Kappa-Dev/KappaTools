@@ -71,7 +71,7 @@ let of_json aux = function
         (function
           | `Assoc [ ("name", `String x); ("decl", a) ]
           | `Assoc [ ("decl", a); ("name", `String x) ] ->
-            Locality.dummy_annot x, aux a
+            Locality.annotate_with_dummy x, aux a
           | x ->
             raise
               (Yojson.Basic.Util.Type_error ("Not a valid NamedDecl element", x)))

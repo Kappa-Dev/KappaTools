@@ -194,7 +194,7 @@ type compil = {
   rules: enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
   (*rules (possibly named)*)
   observables:
-    (mixture, string) Alg_expr.e Locality.annot
+    (mixture, string) Alg_expr.e Locality.annoted
     Int_storage.Nearly_inf_Imperatif.t;
   (*list of patterns to plot*)
   init: enriched_init Int_storage.Nearly_inf_Imperatif.t;

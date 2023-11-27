@@ -377,7 +377,7 @@ let rule_to_json rule =
       label, JsonUtil.of_string rule.rule_label;
       ast, JsonUtil.of_string rule.rule_ast;
       ( position,
-        Locality.annot_to_yojson JsonUtil.of_unit ((), rule.rule_position) );
+        Locality.yojson_of_annoted JsonUtil.of_unit ((), rule.rule_position) );
       direction, direction_to_json rule.rule_direction;
       rule_hidden, JsonUtil.of_bool rule.rule_hidden;
     ]
@@ -391,7 +391,7 @@ let json_to_rule = function
          rule_ast = JsonUtil.to_string (List.assoc ast l);
          rule_position =
            snd
-             (Locality.annot_of_yojson
+             (Locality.annoted_of_yojson
                 (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
                 (List.assoc position l));
          rule_direction = json_to_direction (List.assoc direction l);
@@ -414,7 +414,7 @@ let var_to_json var =
       rule_id, JsonUtil.of_int var.var_id;
       label, JsonUtil.of_string var.var_label;
       ast, JsonUtil.of_string var.var_ast;
-      position, Locality.annot_to_yojson JsonUtil.of_unit ((), var.var_position);
+      position, Locality.yojson_of_annoted JsonUtil.of_unit ((), var.var_position);
     ]
 
 let json_to_var = function
@@ -426,7 +426,7 @@ let json_to_var = function
          var_ast = JsonUtil.to_string (List.assoc ast l);
          var_position =
            snd
-             (Locality.annot_of_yojson
+             (Locality.annoted_of_yojson
                 (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
                 (List.assoc position l));
        }
@@ -460,14 +460,14 @@ let short_influence_node_of_json =
 let pos_of_rules_and_vars_to_json =
   JsonUtil.of_list
     (JsonUtil.of_pair ~lab1:key ~lab2:locality short_influence_node_to_json
-       (fun loc -> Locality.annot_to_yojson JsonUtil.of_unit ((), loc)))
+       (fun loc -> Locality.yojson_of_annoted JsonUtil.of_unit ((), loc)))
 
 let pos_of_rules_and_vars_of_json =
   JsonUtil.to_list
     (JsonUtil.to_pair ~lab1:key ~lab2:locality short_influence_node_of_json
        (fun x ->
          snd
-           (Locality.annot_of_yojson
+           (Locality.annoted_of_yojson
               (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
               x)))
 
@@ -762,7 +762,7 @@ let json_to_agent_kind = function
              ~error_msg:(JsonUtil.build_msg "locality list")
              (fun json ->
                snd
-                 (Locality.annot_of_yojson
+                 (Locality.annoted_of_yojson
                     (JsonUtil.to_unit
                        ~error_msg:(JsonUtil.build_msg "locality"))
                     json))
@@ -779,7 +779,7 @@ let agent_kind_to_json agent_kind =
       ast, JsonUtil.of_string agent_kind.agent_ast;
       ( position_list,
         JsonUtil.of_list
-          (fun a -> Locality.annot_to_yojson JsonUtil.of_unit ((), a))
+          (fun a -> Locality.yojson_of_annoted JsonUtil.of_unit ((), a))
           agent_kind.agent_position );
     ]
 

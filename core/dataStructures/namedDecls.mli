@@ -15,11 +15,11 @@ type 'a t = private {
 }
 
 val create :
-  ?forbidden:Mods.StringSet.t -> (string Locality.annot * 'a) array -> 'a t
+  ?forbidden:Mods.StringSet.t -> (string Locality.annoted * 'a) array -> 'a t
 
 val size : 'a t -> int
 val elt_name : 'a t -> int -> string
-val elt_id : ?kind:string -> 'a t -> string Locality.annot -> int
+val elt_id : ?kind:string -> 'a t -> string Locality.annoted -> int
 val fold : (int -> string -> 'a -> 'b -> 'a) -> 'a -> 'b t -> 'a
 val mapi : (int -> string -> 'a -> 'b) -> 'a t -> 'b t
 

@@ -11,43 +11,43 @@ type pervasives_bool = bool
 type ('mix, 'id) e =
   | BIN_ALG_OP of
       Operator.bin_alg_op
-      * ('mix, 'id) e Locality.annot
-      * ('mix, 'id) e Locality.annot
-  | UN_ALG_OP of Operator.un_alg_op * ('mix, 'id) e Locality.annot
+      * ('mix, 'id) e Locality.annoted
+      * ('mix, 'id) e Locality.annoted
+  | UN_ALG_OP of Operator.un_alg_op * ('mix, 'id) e Locality.annoted
   | STATE_ALG_OP of Operator.state_alg_op
   | ALG_VAR of 'id
   | KAPPA_INSTANCE of 'mix
   | TOKEN_ID of 'id
   | CONST of Nbr.t
   | IF of
-      ('mix, 'id) bool Locality.annot
-      * ('mix, 'id) e Locality.annot
-      * ('mix, 'id) e Locality.annot
-  | DIFF_TOKEN of (('mix, 'id) e Locality.annot * 'id)
-  | DIFF_KAPPA_INSTANCE of (('mix, 'id) e Locality.annot * 'mix)
+      ('mix, 'id) bool Locality.annoted
+      * ('mix, 'id) e Locality.annoted
+      * ('mix, 'id) e Locality.annoted
+  | DIFF_TOKEN of (('mix, 'id) e Locality.annoted * 'id)
+  | DIFF_KAPPA_INSTANCE of (('mix, 'id) e Locality.annoted * 'mix)
 
 and ('mix, 'id) bool =
   | TRUE
   | FALSE
   | BIN_BOOL_OP of
       Operator.bin_bool_op
-      * ('mix, 'id) bool Locality.annot
-      * ('mix, 'id) bool Locality.annot
-  | UN_BOOL_OP of Operator.un_bool_op * ('mix, 'id) bool Locality.annot
+      * ('mix, 'id) bool Locality.annoted
+      * ('mix, 'id) bool Locality.annoted
+  | UN_BOOL_OP of Operator.un_bool_op * ('mix, 'id) bool Locality.annoted
   | COMPARE_OP of
       Operator.compare_op
-      * ('mix, 'id) e Locality.annot
-      * ('mix, 'id) e Locality.annot
+      * ('mix, 'id) e Locality.annoted
+      * ('mix, 'id) e Locality.annoted
 
 let rec e_to_yojson ~filenames f_mix f_id = function
   | BIN_ALG_OP (op, a, b) ->
     `List
       [
         Operator.bin_alg_op_to_json op;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           a;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           b;
       ]
@@ -55,7 +55,7 @@ let rec e_to_yojson ~filenames f_mix f_id = function
     `List
       [
         Operator.un_alg_op_to_json op;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           a;
       ]
@@ -68,13 +68,13 @@ let rec e_to_yojson ~filenames f_mix f_id = function
     `List
       [
         `String "IF";
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (bool_to_yojson ~filenames f_mix f_id)
           cond;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           yes;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           no;
       ]
@@ -82,7 +82,7 @@ let rec e_to_yojson ~filenames f_mix f_id = function
     `List
       [
         `String "DIFF_TOKEN";
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           expr;
         f_id token;
@@ -91,7 +91,7 @@ let rec e_to_yojson ~filenames f_mix f_id = function
     `List
       [
         `String "DIFF_MIXTURE";
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           expr;
         f_mix mixture;
@@ -104,7 +104,7 @@ and bool_to_yojson ~filenames f_mix f_id = function
     `List
       [
         Operator.un_bool_op_to_json op;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (bool_to_yojson ~filenames f_mix f_id)
           a;
       ]
@@ -112,10 +112,10 @@ and bool_to_yojson ~filenames f_mix f_id = function
     `List
       [
         Operator.bin_bool_op_to_json op;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (bool_to_yojson ~filenames f_mix f_id)
           a;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (bool_to_yojson ~filenames f_mix f_id)
           b;
       ]
@@ -123,10 +123,10 @@ and bool_to_yojson ~filenames f_mix f_id = function
     `List
       [
         Operator.compare_op_to_json op;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           a;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           b;
       ]
@@ -134,23 +134,23 @@ and bool_to_yojson ~filenames f_mix f_id = function
 let rec e_of_yojson ~filenames f_mix f_id = function
   | `List [ `String "DIFF_MIXTURE"; expr; mixture ] ->
     DIFF_KAPPA_INSTANCE
-      ( Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames
           (e_of_yojson ~filenames f_mix f_id)
           expr,
         f_mix mixture )
   | `List [ `String "DIFF_TOKEN"; expr; tok ] ->
     DIFF_TOKEN
-      ( Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames
           (e_of_yojson ~filenames f_mix f_id)
           expr,
         f_id tok )
   | `List [ op; a; b ] ->
     BIN_ALG_OP
       ( Operator.bin_alg_op_of_json op,
-        Locality.annot_of_yojson ~filenames
+        Locality.annoted_of_yojson ~filenames
           (e_of_yojson ~filenames f_mix f_id)
           a,
-        Locality.annot_of_yojson ~filenames
+        Locality.annoted_of_yojson ~filenames
           (e_of_yojson ~filenames f_mix f_id)
           b )
   | `List [ `String "VAR"; i ] -> ALG_VAR (f_id i)
@@ -159,18 +159,18 @@ let rec e_of_yojson ~filenames f_mix f_id = function
   | `List [ op; a ] ->
     UN_ALG_OP
       ( Operator.un_alg_op_of_json op,
-        Locality.annot_of_yojson ~filenames
+        Locality.annoted_of_yojson ~filenames
           (e_of_yojson ~filenames f_mix f_id)
           a )
   | `List [ `String "IF"; cond; yes; no ] ->
     IF
-      ( Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames
           (bool_of_yojson ~filenames f_mix f_id)
           cond,
-        Locality.annot_of_yojson ~filenames
+        Locality.annoted_of_yojson ~filenames
           (e_of_yojson ~filenames f_mix f_id)
           yes,
-        Locality.annot_of_yojson ~filenames
+        Locality.annoted_of_yojson ~filenames
           (e_of_yojson ~filenames f_mix f_id)
           no )
   | x ->
@@ -189,27 +189,27 @@ and bool_of_yojson ~filenames f_mix f_id = function
   | `List [ op; a ] ->
     UN_BOOL_OP
       ( Operator.un_bool_op_of_json op,
-        Locality.annot_of_yojson ~filenames
+        Locality.annoted_of_yojson ~filenames
           (bool_of_yojson ~filenames f_mix f_id)
           a )
   | `List [ op; a; b ] as x ->
     (try
        BIN_BOOL_OP
          ( Operator.bin_bool_op_of_json op,
-           Locality.annot_of_yojson ~filenames
+           Locality.annoted_of_yojson ~filenames
              (bool_of_yojson ~filenames f_mix f_id)
              a,
-           Locality.annot_of_yojson ~filenames
+           Locality.annoted_of_yojson ~filenames
              (bool_of_yojson ~filenames f_mix f_id)
              b )
      with Yojson.Basic.Util.Type_error _ ->
        (try
           COMPARE_OP
             ( Operator.compare_op_of_json op,
-              Locality.annot_of_yojson ~filenames
+              Locality.annoted_of_yojson ~filenames
                 (e_of_yojson ~filenames f_mix f_id)
                 a,
-              Locality.annot_of_yojson ~filenames
+              Locality.annoted_of_yojson ~filenames
                 (e_of_yojson ~filenames f_mix f_id)
                 b )
         with Yojson.Basic.Util.Type_error _ ->
@@ -267,24 +267,24 @@ and print_bool pr_mix pr_tok pr_var f = function
       (print pr_mix pr_tok pr_var)
       b
 
-let const n = Locality.dummy_annot (CONST n)
+let const n = Locality.annotate_with_dummy (CONST n)
 let int i = const (Nbr.I i)
 let float f = const (Nbr.F f)
-let add e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.SUM, e1, e2))
-let minus e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MINUS, e1, e2))
-let mult e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MULT, e1, e2))
-let div e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.DIV, e1, e2))
-let pow e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.POW, e1, e2))
-let log e1 = Locality.dummy_annot (UN_ALG_OP (Operator.LOG, e1))
+let add e1 e2 = Locality.annotate_with_dummy (BIN_ALG_OP (Operator.SUM, e1, e2))
+let minus e1 e2 = Locality.annotate_with_dummy (BIN_ALG_OP (Operator.MINUS, e1, e2))
+let mult e1 e2 = Locality.annotate_with_dummy (BIN_ALG_OP (Operator.MULT, e1, e2))
+let div e1 e2 = Locality.annotate_with_dummy (BIN_ALG_OP (Operator.DIV, e1, e2))
+let pow e1 e2 = Locality.annotate_with_dummy (BIN_ALG_OP (Operator.POW, e1, e2))
+let log e1 = Locality.annotate_with_dummy (UN_ALG_OP (Operator.LOG, e1))
 
 let ln e1 =
   (* JF: If I rememnber well *)
   div (log e1) (log (int 10))
 
-let sin e1 = Locality.dummy_annot (UN_ALG_OP (Operator.SINUS, e1))
-let cos e1 = Locality.dummy_annot (UN_ALG_OP (Operator.COSINUS, e1))
-let uminus e1 = Locality.dummy_annot (UN_ALG_OP (Operator.UMINUS, e1))
-let sqrt e1 = Locality.dummy_annot (UN_ALG_OP (Operator.SQRT, e1))
+let sin e1 = Locality.annotate_with_dummy (UN_ALG_OP (Operator.SINUS, e1))
+let cos e1 = Locality.annotate_with_dummy (UN_ALG_OP (Operator.COSINUS, e1))
+let uminus e1 = Locality.annotate_with_dummy (UN_ALG_OP (Operator.UMINUS, e1))
+let sqrt e1 = Locality.annotate_with_dummy (UN_ALG_OP (Operator.SQRT, e1))
 
 let rec add_dep ((in_t, in_e, toks_d, out) as x) d = function
   | BIN_ALG_OP (_, a, b), _ -> add_dep (add_dep x d a) d b

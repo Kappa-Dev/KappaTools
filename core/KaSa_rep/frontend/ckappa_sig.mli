@@ -151,7 +151,7 @@ and link =
   | FREE
   | LNK_ANY of position
   | LNK_SOME of position
-  | LNK_TYPE of (string Locality.annot * string Locality.annot)
+  | LNK_TYPE of (string Locality.annoted * string Locality.annoted)
   | LNK_MISSING
 
 val skip_only : mixture -> bool
@@ -170,8 +170,8 @@ type 'pattern rule = {
       substract delta to agents with id >= prefix in the lhs *)
   lhs: 'pattern;
   rhs: 'pattern;
-  k_def: ('pattern, string) Alg_expr.e Locality.annot;
-  k_un: ('pattern, string) Alg_expr.e Locality.annot option;
+  k_def: ('pattern, string) Alg_expr.e Locality.annoted;
+  k_un: ('pattern, string) Alg_expr.e Locality.annoted option;
   ast: string;
   ast_no_rate: string;
   original_ast: string;
@@ -425,7 +425,7 @@ type c_compil = {
   c_init: enriched_init Int_storage.Nearly_inf_Imperatif.t;
   (*initial graph declaration*)
   c_perturbations:
-    (c_mixture Locality.annot, enriched_rule) perturbation
+    (c_mixture Locality.annoted, enriched_rule) perturbation
     Int_storage.Nearly_inf_Imperatif.t;
 }
 

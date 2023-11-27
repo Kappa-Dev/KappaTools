@@ -28,7 +28,7 @@ val get_pause_criteria :
   Contact_map.t ->
   Model.t ->
   Rule_interpreter.t ->
-  (Ast.mixture, string) Alg_expr.bool Locality.annot ->
+  (Ast.mixture, string) Alg_expr.bool Locality.annoted ->
   Model.t * Rule_interpreter.t * (Pattern.id array list, int) Alg_expr.bool
 
 val find_all_embeddings :

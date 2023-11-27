@@ -166,7 +166,7 @@ let finalize ~outputs dotFormat cflow_file trace_file progress env counter graph
     | Unix.WEXITED 127 ->
       Lwt.fail
         (ExceptionDefn.Malformed_Decl
-           (Locality.dummy_annot
+           (Locality.annotate_with_dummy
               ("Executable '" ^ prog ^ "' can not be found to compute stories.")))
     | Unix.WEXITED n ->
       if n <> 0 then exit n;

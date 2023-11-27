@@ -14,14 +14,14 @@ val init :
   filenames:string list ->
   Pattern.Env.t ->
   unit NamedDecls.t ->
-  Primitives.alg_expr Locality.annot NamedDecls.t ->
+  Primitives.alg_expr Locality.annoted NamedDecls.t ->
   Operator.DepSet.t
   * Operator.DepSet.t
   * Operator.DepSet.t array
   * Operator.DepSet.t array ->
-  (string Locality.annot option * LKappa.rule Locality.annot) array
+  (string Locality.annoted option * LKappa.rule Locality.annoted) array
   * Primitives.elementary_rule array ->
-  Primitives.alg_expr Locality.annot array ->
+  Primitives.alg_expr Locality.annoted array ->
   Primitives.perturbation array ->
   Contact_map.t ->
   t
@@ -33,14 +33,14 @@ val deconstruct :
   string list
   * Pattern.Env.t
   * unit NamedDecls.t
-  * Primitives.alg_expr Locality.annot NamedDecls.t
+  * Primitives.alg_expr Locality.annoted NamedDecls.t
   * (Operator.DepSet.t
     * Operator.DepSet.t
     * Operator.DepSet.t array
     * Operator.DepSet.t array)
-  * ((string Locality.annot option * LKappa.rule Locality.annot) array
+  * ((string Locality.annoted option * LKappa.rule Locality.annoted) array
     * Primitives.elementary_rule array)
-  * Primitives.alg_expr Locality.annot array
+  * Primitives.alg_expr Locality.annoted array
   * Primitives.perturbation array
   * Contact_map.t
 
@@ -50,7 +50,7 @@ val nb_rules : t -> int
 val nb_syntactic_rules : t -> int
 val nb_perturbations : t -> int
 val domain : t -> Pattern.Env.t
-val get_obs : t -> Primitives.alg_expr Locality.annot array
+val get_obs : t -> Primitives.alg_expr Locality.annoted array
 val get_rules : t -> Primitives.elementary_rule array
 val new_domain : Pattern.Env.t -> t -> t
 val signatures : t -> Signature.s
@@ -58,13 +58,13 @@ val tokens_finder : t -> int Mods.StringMap.t
 val algs_finder : t -> int Mods.StringMap.t
 val contact_map : t -> Contact_map.t
 val get_alg : t -> int -> Primitives.alg_expr
-val get_algs : t -> (string * Primitives.alg_expr Locality.annot) array
+val get_algs : t -> (string * Primitives.alg_expr Locality.annoted) array
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
 val get_ast_rule : t -> int -> LKappa.rule
 
 val get_ast_rule_with_label :
-  t -> int -> string Locality.annot option * LKappa.rule Locality.annot
+  t -> int -> string Locality.annoted option * LKappa.rule Locality.annoted
 
 val get_ast_rule_rate_pos : unary:bool -> t -> int -> Locality.t
 val map_observables : (Primitives.alg_expr -> 'a) -> t -> 'a array
@@ -87,9 +87,9 @@ val all_dependencies :
   * Operator.DepSet.t array
   * Operator.DepSet.t array
 
-val num_of_agent : string Locality.annot -> t -> int
-val num_of_alg : string Locality.annot -> t -> int
-val num_of_token : string Locality.annot -> t -> int
+val num_of_agent : string Locality.annoted -> t -> int
+val num_of_alg : string Locality.annoted -> t -> int
+val num_of_token : string Locality.annoted -> t -> int
 val nums_of_rule : string -> t -> int list
 
 val print_ast_rule :

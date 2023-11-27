@@ -201,7 +201,7 @@ let obs_of_result ~debugMode ~compileModeOn contact_map domain alg_deps res =
     domain, List.rev out
   else
     ( domain,
-      Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
+      Locality.annotate_with_dummy (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
       :: List.rev out )
 
 let compile_print_expr ~debugMode ~compileModeOn contact_map domain ex =
@@ -380,13 +380,13 @@ let pert_not_init overwrite_t0 x y z =
   | _, Some p, _ -> p
   | Some _, None, None ->
     let t_var =
-      Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
+      Locality.annotate_with_dummy (Alg_expr.STATE_ALG_OP Operator.TIME_VAR)
     in
     let t0 = Option_util.fold (fun _ x -> Nbr.F x) Nbr.zero overwrite_t0 in
-    let init_t = Locality.dummy_annot (Alg_expr.CONST t0) in
-    Locality.dummy_annot (Alg_expr.COMPARE_OP (Operator.GREATER, t_var, init_t))
+    let init_t = Locality.annotate_with_dummy (Alg_expr.CONST t0) in
+    Locality.annotate_with_dummy (Alg_expr.COMPARE_OP (Operator.GREATER, t_var, init_t))
   | None, None, None | Some _, None, Some _ | None, None, Some _ ->
-    Locality.dummy_annot Alg_expr.TRUE
+    Locality.annotate_with_dummy Alg_expr.TRUE
 
 let pert_of_result ~debugMode ~warning ?overwrite_t0 ast_algs ast_rules alg_deps
     ~compileModeOn contact_map domain res =
@@ -458,7 +458,7 @@ let pert_of_result ~debugMode ~warning ?overwrite_t0 ast_algs ast_rules alg_deps
         in
         let repeat =
           match opt with
-          | None -> Locality.dummy_annot Alg_expr.FALSE
+          | None -> Locality.annotate_with_dummy Alg_expr.FALSE
           | Some p -> p
         in
         let pert =
@@ -543,7 +543,7 @@ let compile_inits ~debugMode ~warning ?rescale ~compileModeOn contact_map env
           (match
              rules_of_ast ~debugMode ~warning ~compileModeOn contact_map preenv
                ~syntax_ref:0
-               (Locality.dummy_annot fake_rule)
+               (Locality.annotate_with_dummy fake_rule)
            with
           | domain'', _, [ compiled_rule ] ->
             (Alg_expr.CONST Nbr.one, compiled_rule), domain''
@@ -581,7 +581,7 @@ let compile_rules ~debugMode ~warning alg_deps ~compileModeOn contact_map domain
   | _, _, None, _ -> failwith "The origin of Eval.compile_rules has been lost"
 
 (*let translate_contact_map sigs kasa_contact_map =
-    let wdl = Locality.dummy_annot in
+    let wdl = Locality.annotate_with_dummy in
     let sol = Array.init
         (Signature.size sigs)
         (fun i -> Array.make (Signature.arity sigs i) ([],[])) in

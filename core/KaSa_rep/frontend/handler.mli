@@ -84,7 +84,7 @@ val print_rule_or_var :
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
   Cckappa_sig.enriched_rule ->
-  'a * string Locality.annot option) ->
+  'a * string Locality.annoted option) ->
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
   Cckappa_sig.enriched_variable ->

@@ -12,11 +12,11 @@
 type t
 (** Store of one agent *)
 
-val num_of_site : ?agent_name:string -> string Locality.annot -> t -> int
+val num_of_site : ?agent_name:string -> string Locality.annoted -> t -> int
 val site_of_num : int -> t -> string
 val fold : (int -> string -> 'a -> 'a) -> 'a -> t -> 'a
 
-val num_of_internal_state : int -> string Locality.annot -> t -> int
+val num_of_internal_state : int -> string Locality.annoted -> t -> int
 (** [num_of_internal_state site_id state_name sign] *)
 
 val internal_state_of_num : int -> int -> t -> string
@@ -27,15 +27,15 @@ type s
 (** Store of all the agents, s as a plural *)
 
 type counters_before_signature =
-  (string Locality.annot
+  (string Locality.annoted
   * (unit NamedDecls.t
-    * (string Locality.annot * string Locality.annot) list
+    * (string Locality.annoted * string Locality.annoted) list
     * (int * int) option)
     NamedDecls.t)
   list
 
 val create :
-  counters:(string Locality.annot * string Locality.annot list) list ->
+  counters:(string Locality.annoted * string Locality.annoted list) list ->
   bool ->
   counters_before_signature ->
   s
@@ -51,16 +51,16 @@ val arity : s -> int -> int
 val max_arity : s -> int
 (** [max_arity sigs] returns max {!arities sigs i} *)
 
-val num_of_agent : string Locality.annot -> s -> int
+val num_of_agent : string Locality.annoted -> s -> int
 val agent_of_num : int -> s -> string
 
-val id_of_site : string Locality.annot -> string Locality.annot -> s -> int
+val id_of_site : string Locality.annoted -> string Locality.annoted -> s -> int
 (** [id_of_site agent_type site_name sigs] *)
 
 val id_of_internal_state :
-  string Locality.annot ->
-  string Locality.annot ->
-  string Locality.annot ->
+  string Locality.annoted ->
+  string Locality.annoted ->
+  string Locality.annoted ->
   s ->
   int
 (** [id_of_internal_state agent_type site_name state_name sigs] *)

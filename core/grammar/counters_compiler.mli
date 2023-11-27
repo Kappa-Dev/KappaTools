@@ -62,7 +62,7 @@ val annotate_created_counters :
 
 val annotate_counters_with_diff :
   Signature.s ->
-  string Locality.annot ->
+  string Locality.annoted ->
   Ast.counter list ->
   Ast.counter list ->
   LKappa.rule_agent ->

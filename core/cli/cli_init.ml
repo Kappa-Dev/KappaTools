@@ -162,7 +162,7 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
     let alg_overwrite =
       List.map
         (fun (s, v) ->
-          Model.num_of_alg (Locality.dummy_annot s) env, Alg_expr.CONST v)
+          Model.num_of_alg (Locality.annotate_with_dummy s) env, Alg_expr.CONST v)
         kasim_args.Kasim_args.alg_var_overwrite
     in
     match kasim_args.Kasim_args.initialMix with

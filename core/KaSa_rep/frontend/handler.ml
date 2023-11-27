@@ -213,7 +213,7 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
     let label_opt = rule.Cckappa_sig.e_rule_label in
     let error, (label, _) =
       Misc_sa.unsome (error, label_opt) (fun error ->
-          error, Locality.dummy_annot "")
+          error, Locality.annotate_with_dummy "")
     in
     let label =
       if label = "" then
@@ -706,7 +706,7 @@ let print_rule_or_var parameters error handler compiled print_rule print_var
       let error, label = get_label_of_rule parameters error rule in
       let error, (m1, _) =
         Misc_sa.unsome (error, label) (fun error ->
-            error, Locality.dummy_annot "")
+            error, Locality.annotate_with_dummy "")
       in
       let m1 =
         if m1 = "" then

@@ -121,7 +121,7 @@ let reconstruction_navigation cc = cc.recogn_nav
 (** Errors *)
 let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
-    (Locality.dummy_annot
+    (Locality.annotate_with_dummy
        (Format.asprintf "Site %a of agent %a already specified"
           (Agent.print_site ?sigs x) i
           (Agent.print ?sigs ~with_id:false)
@@ -129,7 +129,7 @@ let already_specified ?sigs x i =
 
 let dangling_node ~sigs tys x =
   ExceptionDefn.Malformed_Decl
-    (Locality.dummy_annot
+    (Locality.annotate_with_dummy
        (Format.asprintf "Cannot proceed because last declared agent %a/*%i*/%a"
           (Signature.print_agent sigs)
           (raw_find_ty tys x) x Format.pp_print_string

@@ -13,8 +13,8 @@ val bool_expr_of_ast :
   int Mods.StringMap.t ->
   int Mods.StringMap.t ->
   ?max_allowed_var:int ->
-  (Ast.mixture, string) Alg_expr.bool Locality.annot ->
-  (LKappa.rule_agent list, int) Alg_expr.bool Locality.annot
+  (Ast.mixture, string) Alg_expr.bool Locality.annoted ->
+  (LKappa.rule_agent list, int) Alg_expr.bool Locality.annoted
 
 val modif_expr_of_ast :
   warning:(pos:Locality.t -> (Format.formatter -> unit) -> unit) ->

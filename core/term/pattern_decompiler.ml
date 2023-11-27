@@ -13,7 +13,7 @@ let of_snapshot g =
         let ra_type = ag.Snapshot.node_type in
         let ar = Array.length ag.Snapshot.node_sites in
         let ra_ports =
-          Array.make ar (Locality.dummy_annot LKappa.LNK_FREE, LKappa.Maintained)
+          Array.make ar (Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Maintained)
         in
         let ra_ints = Array.make ar LKappa.I_ANY in
         let pack' =
@@ -31,14 +31,14 @@ let of_snapshot g =
                 | Some va, dangling' ->
                   let () =
                     ra_ports.(id) <-
-                      ( Locality.dummy_annot (LKappa.LNK_VALUE (va, (-1, -1))),
+                      ( Locality.annotate_with_dummy (LKappa.LNK_VALUE (va, (-1, -1))),
                         LKappa.Maintained )
                   in
                   dangling', free_id
                 | None, dangling' ->
                   let () =
                     ra_ports.(id) <-
-                      ( Locality.dummy_annot
+                      ( Locality.annotate_with_dummy
                           (LKappa.LNK_VALUE (free_id, (-1, -1))),
                         LKappa.Maintained )
                   in

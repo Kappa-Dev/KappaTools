@@ -95,7 +95,7 @@ let read_message p lb =
 
 let print_message f { range; text; _ } =
   match range with
-  | Some range -> Locality.print_annot Format.pp_print_string f (text, range)
+  | Some range -> Locality.print_annoted Format.pp_print_string f (text, range)
   | None -> Format.pp_print_string f text
 
 let write_t write__ok write__error ob = function

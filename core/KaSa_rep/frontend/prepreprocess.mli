@@ -13,7 +13,7 @@ val translate_compil :
     Ast.compil
 
 val modif_map :
-  ('a -> 'b Locality.annot -> 'a * 'c Locality.annot) ->
+  ('a -> 'b Locality.annoted -> 'a * 'c Locality.annoted) ->
   ('a -> 'd -> 'a * 'e) ->
   'a ->
   ('d, 'f, 'g, 'b) Ast.modif_expr ->

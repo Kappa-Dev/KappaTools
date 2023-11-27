@@ -326,7 +326,7 @@ let initialize ~bind ~return ~debugMode ~outputs env counter graph0 state0
                     | Rule_interpreter.Blocked ->
                       raise
                         (ExceptionDefn.Internal_Error
-                           (Locality.dummy_annot "Bugged initial rule")))
+                           (Locality.annotate_with_dummy "Bugged initial rule")))
                   state value,
                 state0 )))
       (return (false, graph0, state0))

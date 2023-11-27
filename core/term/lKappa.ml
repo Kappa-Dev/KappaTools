@@ -6,9 +6,9 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type ('a, 'annot) link =
+type ('a, 'annoted) link =
   | ANY_FREE
-  | LNK_VALUE of int * 'annot
+  | LNK_VALUE of int * 'annoted
   | LNK_FREE
   | LNK_ANY
   | LNK_SOME
@@ -26,10 +26,10 @@ type rule_internal =
 type rule_agent = {
   ra_type: int;
   ra_erased: bool;
-  ra_ports: ((int, int * int) link Locality.annot * switching) array;
+  ra_ports: ((int, int * int) link Locality.annoted * switching) array;
   ra_ints: rule_internal array;
   ra_syntax:
-    (((int, int * int) link Locality.annot * switching) array
+    (((int, int * int) link Locality.annoted * switching) array
     * rule_internal array)
     option;
 }
@@ -39,11 +39,11 @@ type rule_mixture = rule_agent list
 type rule = {
   r_mix: rule_mixture;
   r_created: Raw_mixture.t;
-  r_delta_tokens: ((rule_mixture, int) Alg_expr.e Locality.annot * int) list;
-  r_rate: (rule_mixture, int) Alg_expr.e Locality.annot;
+  r_delta_tokens: ((rule_mixture, int) Alg_expr.e Locality.annoted * int) list;
+  r_rate: (rule_mixture, int) Alg_expr.e Locality.annoted;
   r_un_rate:
-    ((rule_mixture, int) Alg_expr.e Locality.annot
-    * (rule_mixture, int) Alg_expr.e Locality.annot option)
+    ((rule_mixture, int) Alg_expr.e Locality.annoted
+    * (rule_mixture, int) Alg_expr.e Locality.annoted option)
     option;
   r_editStyle: bool;
 }
@@ -64,7 +64,7 @@ let link_to_json port_to_json type_to_json annot_to_json = function
   | LNK_SOME -> `String "SOME"
   | LNK_VALUE (i, a) -> `List (`Int i :: annot_to_json a)
 
-let link_of_json port_of_json type_of_json annot_of_json = function
+let link_of_json port_of_json type_of_json annoted_of_json = function
   | `String "ANY_FREE" -> ANY_FREE
   | `String "FREE" -> LNK_FREE
   | `List [ p; a ] ->
@@ -72,7 +72,7 @@ let link_of_json port_of_json type_of_json annot_of_json = function
     LNK_TYPE (port_of_json x p, x)
   | `Null -> LNK_ANY
   | `String "SOME" -> LNK_SOME
-  | `List (`Int i :: (([] | _ :: _ :: _) as a)) -> LNK_VALUE (i, annot_of_json a)
+  | `List (`Int i :: (([] | _ :: _ :: _) as a)) -> LNK_VALUE (i, annoted_of_json a)
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect link", x))
 
 let print_link_annot ~ltypes sigs f (s, a) =
@@ -165,7 +165,7 @@ let print_counter_delta counters j f switch =
   | Freed ->
     raise
       (ExceptionDefn.Internal_Error
-         (Locality.dummy_annot "Cannot erase all increment agents"))
+         (Locality.annotate_with_dummy "Cannot erase all increment agents"))
   | Maintained -> ()
   | Erased -> ()
 
@@ -259,7 +259,7 @@ let union_find_counters sigs mix =
               | LNK_TYPE _ | LNK_SOME ->
                 raise
                   (ExceptionDefn.Internal_Error
-                     (Locality.dummy_annot
+                     (Locality.annotate_with_dummy
                         "Port a of __incr agent not well specified")))))
         mix
   in
@@ -513,7 +513,7 @@ let rule_agent_to_json filenames a =
              (fun (e, s) c ->
                `List
                  [
-                   Locality.annot_to_yojson ~filenames
+                   Locality.yojson_of_annoted ~filenames
                      (link_to_json
                         (fun _ i -> `Int i)
                         (fun i -> `Int i)
@@ -540,7 +540,7 @@ let rule_agent_of_json filenames = function
            Tools.array_map_of_list
              (function
                | `List [ e; s ] ->
-                 ( Locality.annot_of_yojson ~filenames
+                 ( Locality.annoted_of_yojson ~filenames
                      (link_of_json
                         (fun _ -> Yojson.Basic.Util.to_int)
                         Yojson.Basic.Util.to_int
@@ -593,19 +593,19 @@ let rule_to_json ~filenames r =
       ( "delta_tokens",
         JsonUtil.of_list
           (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-             (Locality.annot_to_yojson ~filenames (lalg_expr_to_json filenames))
+             (Locality.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))
              JsonUtil.of_int)
           r.r_delta_tokens );
       ( "rate",
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (lalg_expr_to_json filenames)
           r.r_rate );
       ( "unary_rate",
         JsonUtil.of_option
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames (lalg_expr_to_json filenames))
+             (Locality.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))
              (JsonUtil.of_option
-                (Locality.annot_to_yojson ~filenames
+                (Locality.yojson_of_annoted ~filenames
                    (lalg_expr_to_json filenames))))
           r.r_un_rate );
       "editStyle", `Bool r.r_editStyle;
@@ -620,22 +620,22 @@ let rule_of_json ~filenames = function
          r_delta_tokens =
            JsonUtil.to_list
              (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                (Locality.annot_of_yojson ~filenames
+                (Locality.annoted_of_yojson ~filenames
                    (lalg_expr_of_json filenames))
                 (JsonUtil.to_int ?error_msg:None))
              (List.assoc "delta_tokens" l);
          r_rate =
-           Locality.annot_of_yojson ~filenames
+           Locality.annoted_of_yojson ~filenames
              (lalg_expr_of_json filenames)
              (List.assoc "rate" l);
          r_un_rate =
            (try
               JsonUtil.to_option
                 (JsonUtil.to_pair
-                   (Locality.annot_of_yojson ~filenames
+                   (Locality.annoted_of_yojson ~filenames
                       (lalg_expr_of_json filenames))
                    (JsonUtil.to_option
-                      (Locality.annot_of_yojson (lalg_expr_of_json filenames))))
+                      (Locality.annoted_of_yojson (lalg_expr_of_json filenames))))
                 (List.assoc "unary_rate" l)
             with Not_found -> None);
          r_editStyle = Yojson.Basic.Util.to_bool (List.assoc "editStyle" l);

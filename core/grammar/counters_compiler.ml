@@ -719,7 +719,7 @@ let agent_with_max_counter sigs c ((agent_name, _) as ag_ty) =
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let ports =
-    Array.make arity (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained)
+    Array.make arity (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
   in
   let internals = Array.make arity LKappa.I_ANY in
   let c_na = c.Ast.counter_name in
@@ -767,7 +767,7 @@ let counter_perturbation sigs c ag_ty =
         (val_of_counter, snd c.Ast.counter_name),
         (Alg_expr.CONST (Nbr.I 1), snd c.Ast.counter_name) )
   in
-  None, Some (pre, snd ag_ty), mods, Some (Locality.dummy_annot Alg_expr.FALSE)
+  None, Some (pre, snd ag_ty), mods, Some (Locality.annotate_with_dummy Alg_expr.FALSE)
 
 let counters_perturbations sigs ast_sigs =
   List.fold_left

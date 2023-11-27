@@ -292,12 +292,12 @@ end
 type alg_expr = (Pattern.id array list, int) Alg_expr.e
 
 type elementary_rule = {
-  rate: alg_expr Locality.annot;
-  unary_rate: (alg_expr Locality.annot * alg_expr option) option;
+  rate: alg_expr Locality.annoted;
+  unary_rate: (alg_expr Locality.annoted * alg_expr option) option;
   connected_components: Pattern.id array; (*id -> cc*)
   removed: Instantiation.abstract Transformation.t list;
   inserted: Instantiation.abstract Transformation.t list;
-  delta_tokens: (alg_expr Locality.annot * int) list;
+  delta_tokens: (alg_expr Locality.annoted * int) list;
   syntactic_rule: int;  (** [0] means generated for perturbation. *)
   instantiations: Instantiation.abstract Instantiation.event;
 }
@@ -319,13 +319,13 @@ let rule_to_yojson ~filenames r =
   JsonUtil.smart_assoc
     [
       ( "rate",
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (alg_expr_to_yojson ~filenames)
           r.rate );
       ( "unary_rate",
         JsonUtil.of_option
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (alg_expr_to_yojson ~filenames))
              (JsonUtil.of_option (alg_expr_to_yojson ~filenames)))
           r.unary_rate );
@@ -336,7 +336,7 @@ let rule_to_yojson ~filenames r =
       ( "delta_tokens",
         JsonUtil.of_list
           (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (alg_expr_to_yojson ~filenames))
              JsonUtil.of_int)
           r.delta_tokens );
@@ -351,13 +351,13 @@ let rule_of_yojson ~filenames r =
     (try
        {
          rate =
-           Locality.annot_of_yojson ~filenames
+           Locality.annoted_of_yojson ~filenames
              (alg_expr_of_yojson ~filenames)
              (List.assoc "rate" l);
          unary_rate =
            JsonUtil.to_option
              (JsonUtil.to_pair
-                (Locality.annot_of_yojson ~filenames
+                (Locality.annoted_of_yojson ~filenames
                    (alg_expr_of_yojson ~filenames))
                 (JsonUtil.to_option (alg_expr_of_yojson ~filenames)))
              (Yojson.Basic.Util.member "unary_rate" x);
@@ -373,7 +373,7 @@ let rule_of_yojson ~filenames r =
          delta_tokens =
            JsonUtil.to_list
              (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                (Locality.annot_of_yojson ~filenames
+                (Locality.annoted_of_yojson ~filenames
                    (alg_expr_of_yojson ~filenames))
                 (JsonUtil.to_int ?error_msg:None))
              (Yojson.Basic.Util.member "delta_tokens" x);
@@ -417,16 +417,16 @@ let fully_specified_pattern_to_positive_transformations cc =
   List.rev tr
 
 type 'alg_expr print_expr =
-  | Str_pexpr of string Locality.annot
-  | Alg_pexpr of 'alg_expr Locality.annot
+  | Str_pexpr of string Locality.annoted
+  | Alg_pexpr of 'alg_expr Locality.annoted
 
 let print_expr_to_yojson ~filenames f_mix f_var = function
-  | Str_pexpr s -> Locality.annot_to_yojson ~filenames JsonUtil.of_string s
+  | Str_pexpr s -> Locality.yojson_of_annoted ~filenames JsonUtil.of_string s
   | Alg_pexpr a ->
     `Assoc
       [
         ( "A",
-          Locality.annot_to_yojson ~filenames
+          Locality.yojson_of_annoted ~filenames
             (Alg_expr.e_to_yojson ~filenames f_mix f_var)
             a );
       ]
@@ -436,7 +436,7 @@ let print_expr_of_yojson ~filenames f_mix f_var x =
   | `Assoc [ ("A", x) ] ->
     (try
        Alg_pexpr
-         (Locality.annot_of_yojson ~filenames
+         (Locality.annoted_of_yojson ~filenames
             (Alg_expr.e_of_yojson ~filenames f_mix f_var)
             x)
      with Yojson.Basic.Util.Type_error _ ->
@@ -444,7 +444,7 @@ let print_expr_of_yojson ~filenames f_mix f_var x =
   | x ->
     (try
        Str_pexpr
-         (Locality.annot_of_yojson ~filenames
+         (Locality.annoted_of_yojson ~filenames
             (JsonUtil.to_string ?error_msg:None)
             x)
      with Yojson.Basic.Util.Type_error _ ->
@@ -491,8 +491,8 @@ let din_kind_of_string s =
   read_din_kind (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
 type modification =
-  | ITER_RULE of alg_expr Locality.annot * elementary_rule
-  | UPDATE of int * alg_expr Locality.annot
+  | ITER_RULE of alg_expr Locality.annoted * elementary_rule
+  | UPDATE of int * alg_expr Locality.annoted
   | SNAPSHOT of bool * alg_expr print_expr list
   | STOP of alg_expr print_expr list
   | CFLOW of
@@ -526,7 +526,7 @@ let modification_to_yojson ~filenames = function
       [
         "action", `String "ITER";
         ( "repeats",
-          Locality.annot_to_yojson ~filenames (alg_expr_to_yojson ~filenames) n
+          Locality.yojson_of_annoted ~filenames (alg_expr_to_yojson ~filenames) n
         );
         "rule", rule_to_yojson ~filenames r;
       ]
@@ -536,7 +536,7 @@ let modification_to_yojson ~filenames = function
         "action", `String "UPDATE";
         "var", `Int v;
         ( "value",
-          Locality.annot_to_yojson ~filenames (alg_expr_to_yojson ~filenames) e
+          Locality.yojson_of_annoted ~filenames (alg_expr_to_yojson ~filenames) e
         );
       ]
   | SNAPSHOT (raw, f) ->
@@ -645,7 +645,7 @@ let modification_of_yojson ~filenames = function
   | `Assoc [ ("value", e); ("action", `String "UPDATE"); ("var", `Int v) ]
   | `Assoc [ ("value", e); ("var", `Int v); ("action", `String "UPDATE") ] ->
     UPDATE
-      (v, Locality.annot_of_yojson ~filenames (alg_expr_of_yojson ~filenames) e)
+      (v, Locality.annoted_of_yojson ~filenames (alg_expr_of_yojson ~filenames) e)
   | `Assoc [ ("action", `String "ITER"); ("repeats", n); ("rule", r) ]
   | `Assoc [ ("action", `String "ITER"); ("rule", r); ("repeats", n) ]
   | `Assoc [ ("repeats", n); ("action", `String "ITER"); ("rule", r) ]
@@ -653,7 +653,7 @@ let modification_of_yojson ~filenames = function
   | `Assoc [ ("repeats", n); ("rule", r); ("action", `String "ITER") ]
   | `Assoc [ ("rule", r); ("repeats", n); ("action", `String "ITER") ] ->
     ITER_RULE
-      ( Locality.annot_of_yojson ~filenames (alg_expr_of_yojson ~filenames) n,
+      ( Locality.annoted_of_yojson ~filenames (alg_expr_of_yojson ~filenames) n,
         rule_of_yojson ~filenames r )
   | `Assoc [ ("action", `String "PLOTNOW") ] -> PLOTENTRY
   | `Assoc [ ("action", `String "DINOFF"); ("file", `List l) ]
@@ -744,9 +744,9 @@ let modification_of_yojson ~filenames = function
 
 type perturbation = {
   alarm: Nbr.t option;
-  precondition: (Pattern.id array list, int) Alg_expr.bool Locality.annot;
+  precondition: (Pattern.id array list, int) Alg_expr.bool Locality.annoted;
   effect: modification list;
-  repeat: (Pattern.id array list, int) Alg_expr.bool Locality.annot;
+  repeat: (Pattern.id array list, int) Alg_expr.bool Locality.annoted;
   needs_backtrack: bool;
 }
 
@@ -765,12 +765,12 @@ let perturbation_to_yojson ~filenames p =
     [
       "alarm", JsonUtil.of_option (fun n -> Nbr.to_yojson n) p.alarm;
       ( "condition",
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (bool_expr_to_yojson ~filenames)
           p.precondition );
       "effect", JsonUtil.of_list (modification_to_yojson ~filenames) p.effect;
       ( "repeat",
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (bool_expr_to_yojson ~filenames)
           p.repeat );
       "needs_backtrack", `Bool p.needs_backtrack;
@@ -782,7 +782,7 @@ let perturbation_of_yojson ~filenames = function
        {
          alarm = JsonUtil.to_option Nbr.of_yojson (List.assoc "alarm" l);
          precondition =
-           Locality.annot_of_yojson ~filenames
+           Locality.annoted_of_yojson ~filenames
              (bool_expr_of_yojson ~filenames)
              (List.assoc "condition" l);
          effect =
@@ -790,7 +790,7 @@ let perturbation_of_yojson ~filenames = function
              (modification_of_yojson ~filenames)
              (List.assoc "effect" l);
          repeat =
-           Locality.annot_of_yojson ~filenames
+           Locality.annoted_of_yojson ~filenames
              (bool_expr_of_yojson ~filenames)
              (List.assoc "repeat" l);
          needs_backtrack =

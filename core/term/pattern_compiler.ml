@@ -42,7 +42,7 @@ let find_implicit_infos contact_map ags =
         let or_ty = i, ty_id in
         let () =
           ports.(i) <-
-            Locality.dummy_annot (LKappa.LNK_VALUE (free_id, (p, a))), s
+            Locality.annotate_with_dummy (LKappa.LNK_VALUE (free_id, (p, a))), s
         in
         aux_one (succ free_id) previous current
           ((free_id, (p, a), or_ty, new_switch s) :: todos)
@@ -54,7 +54,7 @@ let find_implicit_infos contact_map ags =
             let ports' = Array.copy ports in
             let () =
               ports'.(i) <-
-                Locality.dummy_annot (LKappa.LNK_VALUE (free_id, (p, a))), s
+                Locality.annotate_with_dummy (LKappa.LNK_VALUE (free_id, (p, a))), s
             in
             let todos' = (free_id, (p, a), or_ty, new_switch s) :: todos in
             aux_one (succ free_id) prev' current todos' ag_tail ag ports'
@@ -111,7 +111,7 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
             let ports' = Array.copy ag.LKappa.ra_ports in
             let () =
               ports'.(i) <-
-                Locality.dummy_annot (LKappa.LNK_VALUE (id, dst_info)), p_switch
+                Locality.annotate_with_dummy (LKappa.LNK_VALUE (id, dst_info)), p_switch
             in
             ( List.rev_append prevs
                 ({
@@ -128,7 +128,7 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
             let ports' = Array.copy ag.LKappa.ra_ports in
             let () =
               ports'.(i) <-
-                Locality.dummy_annot (LKappa.LNK_VALUE (id, dst_info)), s
+                Locality.annotate_with_dummy (LKappa.LNK_VALUE (id, dst_info)), s
             in
             ( List.rev_append prevs
                 ({
@@ -154,7 +154,7 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
             | [ _ ], todo' ->
               let ports' = Array.copy ag.LKappa.ra_ports in
               let () =
-                ports'.(i) <- Locality.dummy_annot (LKappa.LNK_VALUE (id, x)), s
+                ports'.(i) <- Locality.annotate_with_dummy (LKappa.LNK_VALUE (id, x)), s
               in
               ( List.rev_append prevs
                   ({
@@ -178,12 +178,12 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
 let new_agent_with_one_link sigs ty_id port link dst_info switch =
   let arity = Signature.arity sigs ty_id in
   let ports =
-    Array.make arity (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained)
+    Array.make arity (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
   in
   let internals = Array.make arity LKappa.I_ANY in
   let () =
     ports.(port) <-
-      Locality.dummy_annot (LKappa.LNK_VALUE (link, dst_info)), switch
+      Locality.annotate_with_dummy (LKappa.LNK_VALUE (link, dst_info)), switch
   in
   {
     LKappa.ra_type = ty_id;
@@ -481,7 +481,7 @@ let rec add_agents_in_cc sigs id wk registered_links
         | ((LKappa.LNK_SOME | LKappa.LNK_TYPE _), _), _ ->
           raise
             (ExceptionDefn.Internal_Error
-               (Locality.dummy_annot
+               (Locality.annotate_with_dummy
                   "Try to create the connected components of an ambiguous \
                    mixture."))
         | (LKappa.LNK_VALUE (i, _), pos), s ->
@@ -733,7 +733,7 @@ let aux_lkappa_of_pattern free_id p =
     (fun ~pos ~agent_type intf (acc, lnk_pack) ->
       let ra_ports =
         Array.make (Array.length intf)
-          (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained)
+          (Locality.annotate_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
       in
       let ra_ints = Array.make (Array.length intf) LKappa.I_ANY in
       let out =
@@ -757,7 +757,7 @@ let aux_lkappa_of_pattern free_id p =
             | Pattern.Free ->
               let () =
                 ra_ports.(site) <-
-                  Locality.dummy_annot LKappa.LNK_FREE, LKappa.Maintained
+                  Locality.annotate_with_dummy LKappa.LNK_FREE, LKappa.Maintained
               in
               pack
             | Pattern.Link (dst_a, dst_s) ->
@@ -766,12 +766,12 @@ let aux_lkappa_of_pattern free_id p =
               | Some (id, dst_info) ->
                 let () =
                   ra_ports.(site) <-
-                    ( Locality.dummy_annot (LKappa.LNK_VALUE (id, dst_info)),
+                    ( Locality.annotate_with_dummy (LKappa.LNK_VALUE (id, dst_info)),
                       LKappa.Maintained )
                 in
                 let () =
                   (Mods.IntMap.find_default out dst_a acc').LKappa.ra_ports.(dst_s) <-
-                    ( Locality.dummy_annot (LKappa.LNK_VALUE (id, src_info)),
+                    ( Locality.annotate_with_dummy (LKappa.LNK_VALUE (id, src_info)),
                       LKappa.Maintained )
                 in
                 pack

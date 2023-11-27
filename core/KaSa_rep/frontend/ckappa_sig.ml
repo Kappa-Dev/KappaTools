@@ -72,7 +72,7 @@ and link =
   | FREE
   | LNK_ANY of position
   | LNK_SOME of position
-  | LNK_TYPE of (string Locality.annot * string Locality.annot)
+  | LNK_TYPE of (string Locality.annoted * string Locality.annoted)
   | LNK_MISSING
 
 let rec skip_only mix =
@@ -95,8 +95,8 @@ type 'pattern rule = {
         substract delta to agents with id >= prefix in the lhs *)
   lhs: 'pattern;
   rhs: 'pattern;
-  k_def: ('pattern, string) Alg_expr.e Locality.annot;
-  k_un: ('pattern, string) Alg_expr.e Locality.annot option;
+  k_def: ('pattern, string) Alg_expr.e Locality.annoted;
+  k_un: ('pattern, string) Alg_expr.e Locality.annoted option;
   ast: string;
   ast_no_rate: string;
   original_ast: string;
@@ -655,7 +655,7 @@ let add_binding_type parameters error agent_id site_name agent_name' site_name'
       match lnk with
       | LNK_MISSING | LNK_SOME _ | LNK_ANY _ -> error, true
       | FREE | LNK_VALUE _ | LNK_TYPE _ -> error, false)
-    (LNK_TYPE (Locality.dummy_annot agent_name', Locality.dummy_annot site_name'))
+    (LNK_TYPE (Locality.annotate_with_dummy agent_name', Locality.annotate_with_dummy site_name'))
     (Some false) mixture
 
 let add_bound parameters error agent_id site_name mixture =
@@ -876,7 +876,7 @@ type c_compil = {
   c_init: enriched_init Int_storage.Nearly_inf_Imperatif.t;
   (*initial graph declaration*)
   c_perturbations:
-    (c_mixture Locality.annot, enriched_rule) perturbation
+    (c_mixture Locality.annoted, enriched_rule) perturbation
     Int_storage.Nearly_inf_Imperatif.t;
 }
 

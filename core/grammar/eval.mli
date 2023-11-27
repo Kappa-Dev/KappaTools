@@ -10,7 +10,7 @@
 
 (*val init_kasa :
   Remanent_parameters_sig.called_from -> Signature.s ->
-  (string Locality.annot * Ast.port list, Ast.mixture, string, Ast.rule)
+  (string Locality.annoted * Ast.port list, Ast.mixture, string, Ast.rule)
     Ast.compil ->
   Primitives.contact_map * Export_to_KaSim.state
 *)
@@ -21,8 +21,8 @@ val compile_bool :
   ?origin:Operator.rev_dep ->
   Contact_map.t ->
   Pattern.PreEnv.t ->
-  (LKappa.rule_mixture, int) Alg_expr.bool Locality.annot ->
-  Pattern.PreEnv.t * (Pattern.id array list, int) Alg_expr.bool Locality.annot
+  (LKappa.rule_mixture, int) Alg_expr.bool Locality.annoted ->
+  Pattern.PreEnv.t * (Pattern.id array list, int) Alg_expr.bool Locality.annoted
 
 val compile_modifications_no_track :
   debugMode:bool ->

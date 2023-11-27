@@ -13,30 +13,30 @@ let merge_version a b =
   | V4, _ | _, V4 -> V4
   | V3, V3 -> V3
 
-type internal = string option Locality.annot list
+type internal = string option Locality.annoted list
 
 type port = {
-  port_name: string Locality.annot;
+  port_name: string Locality.annoted;
   port_int: internal;
-  port_int_mod: string Locality.annot option;
-  port_link: (string Locality.annot, unit) LKappa.link Locality.annot list;
-  port_link_mod: int Locality.annot option option;
+  port_int_mod: string Locality.annoted option;
+  port_link: (string Locality.annoted, unit) LKappa.link Locality.annoted list;
+  port_link_mod: int Locality.annoted option option;
 }
 
 (* TODO counter to test equality, greater ou var? *)
 type counter_test = CEQ of int | CGTE of int | CVAR of string
 
 type counter = {
-  counter_name: string Locality.annot;
-  counter_test: counter_test Locality.annot option;
-  counter_delta: int Locality.annot;
+  counter_name: string Locality.annoted;
+  counter_test: counter_test Locality.annoted option;
+  counter_delta: int Locality.annoted;
 }
 
 type site = Port of port | Counter of counter
 type agent_mod = Erase | Create
 
 type agent =
-  | Present of string Locality.annot * site list * agent_mod option
+  | Present of string Locality.annoted * site list * agent_mod option
   | Absent of Locality.t
 
 type mixture = agent list list
@@ -44,16 +44,16 @@ type mixture = agent list list
 type edit_notation = {
   mix: mixture;
   delta_token:
-    ((mixture, string) Alg_expr.e Locality.annot * string Locality.annot) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
 }
 
 type arrow_notation = {
   lhs: mixture;
   rm_token:
-    ((mixture, string) Alg_expr.e Locality.annot * string Locality.annot) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
   rhs: mixture;
   add_token:
-    ((mixture, string) Alg_expr.e Locality.annot * string Locality.annot) list;
+    ((mixture, string) Alg_expr.e Locality.annoted * string Locality.annoted) list;
 }
 
 type rule_content = Edit of edit_notation | Arrow of arrow_notation
@@ -61,16 +61,16 @@ type rule_content = Edit of edit_notation | Arrow of arrow_notation
 type rule = {
   rewrite: rule_content;
   bidirectional: bool;
-  k_def: (mixture, string) Alg_expr.e Locality.annot;
+  k_def: (mixture, string) Alg_expr.e Locality.annoted;
   k_un:
-    ((mixture, string) Alg_expr.e Locality.annot
-    * (mixture, string) Alg_expr.e Locality.annot option)
+    ((mixture, string) Alg_expr.e Locality.annoted
+    * (mixture, string) Alg_expr.e Locality.annoted option)
     option;
   (*k_1:radius_opt*)
-  k_op: (mixture, string) Alg_expr.e Locality.annot option;
+  k_op: (mixture, string) Alg_expr.e Locality.annoted option;
   k_op_un:
-    ((mixture, string) Alg_expr.e Locality.annot
-    * (mixture, string) Alg_expr.e Locality.annot option)
+    ((mixture, string) Alg_expr.e Locality.annoted
+    * (mixture, string) Alg_expr.e Locality.annoted option)
     option;
       (*rate for backward rule*)
 }
@@ -78,16 +78,16 @@ type rule = {
 let flip_label str = str ^ "_op"
 
 type ('pattern, 'mixture, 'id, 'rule) modif_expr =
-  | APPLY of (('pattern, 'id) Alg_expr.e Locality.annot * 'rule Locality.annot)
-  | UPDATE of ('id Locality.annot * ('pattern, 'id) Alg_expr.e Locality.annot)
+  | APPLY of (('pattern, 'id) Alg_expr.e Locality.annoted * 'rule Locality.annoted)
+  | UPDATE of ('id Locality.annoted * ('pattern, 'id) Alg_expr.e Locality.annoted)
   | STOP of ('pattern, 'id) Alg_expr.e Primitives.print_expr list
   | SNAPSHOT of bool * ('pattern, 'id) Alg_expr.e Primitives.print_expr list
   | PRINT of
       ('pattern, 'id) Alg_expr.e Primitives.print_expr list
       * ('pattern, 'id) Alg_expr.e Primitives.print_expr list
   | PLOTENTRY
-  | CFLOWLABEL of (bool * string Locality.annot)
-  | CFLOWMIX of (bool * 'pattern Locality.annot)
+  | CFLOWLABEL of (bool * string Locality.annoted)
+  | CFLOWMIX of (bool * 'pattern Locality.annoted)
   | DIN of
       Primitives.din_kind
       * ('pattern, 'id) Alg_expr.e Primitives.print_expr list
@@ -95,43 +95,43 @@ type ('pattern, 'mixture, 'id, 'rule) modif_expr =
   | SPECIES_OF of
       bool
       * ('pattern, 'id) Alg_expr.e Primitives.print_expr list
-      * 'pattern Locality.annot
+      * 'pattern Locality.annoted
 
 type ('pattern, 'mixture, 'id, 'rule) perturbation =
   (Nbr.t option
-  * ('pattern, 'id) Alg_expr.bool Locality.annot option
+  * ('pattern, 'id) Alg_expr.bool Locality.annoted option
   * ('pattern, 'mixture, 'id, 'rule) modif_expr list
-  * ('pattern, 'id) Alg_expr.bool Locality.annot option)
-  Locality.annot
+  * ('pattern, 'id) Alg_expr.bool Locality.annoted option)
+  Locality.annoted
 
-type configuration = string Locality.annot * string Locality.annot list
+type configuration = string Locality.annoted * string Locality.annoted list
 
 type ('pattern, 'id) variable_def =
-  string Locality.annot * ('pattern, 'id) Alg_expr.e Locality.annot
+  string Locality.annoted * ('pattern, 'id) Alg_expr.e Locality.annoted
 
 type ('mixture, 'id) init_t =
-  | INIT_MIX of 'mixture Locality.annot
-  | INIT_TOK of 'id Locality.annot list
+  | INIT_MIX of 'mixture Locality.annoted
+  | INIT_TOK of 'id Locality.annoted list
 
 type ('pattern, 'mixture, 'id) init_statment =
-  (*  string Locality.annot option * (*volume*)*)
-  ('pattern, 'id) Alg_expr.e Locality.annot * ('mixture, 'id) init_t
+  (*  string Locality.annoted option * (*volume*)*)
+  ('pattern, 'id) Alg_expr.e Locality.annoted * ('mixture, 'id) init_t
 
 type ('agent, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent
-  | TOKENSIG of string Locality.annot
+  | TOKENSIG of string Locality.annoted
   | VOLSIG of string * float * string (* type, volume, parameter*)
   | INIT of ('pattern, 'mixture, 'id) init_statment
   (*volume, init, position *)
   | DECLARE of ('pattern, 'id) variable_def
   | OBS of ('pattern, 'id) variable_def (*for backward compatibility*)
-  | PLOT of ('pattern, 'id) Alg_expr.e Locality.annot
+  | PLOT of ('pattern, 'id) Alg_expr.e Locality.annoted
   | PERT of ('pattern, 'mixture, 'id, 'rule) perturbation
   | CONFIG of configuration
-  | RULE of (string Locality.annot option * 'rule Locality.annot)
+  | RULE of (string Locality.annoted option * 'rule Locality.annoted)
 
 type ('pattern, 'mixture, 'id, 'rule) command =
-  | RUN of ('pattern, 'id) Alg_expr.bool Locality.annot
+  | RUN of ('pattern, 'id) Alg_expr.bool Locality.annoted
   | MODIFY of ('pattern, 'mixture, 'id, 'rule) modif_expr list
   | QUIT
 
@@ -141,15 +141,15 @@ type ('agent, 'pattern, 'mixture, 'id, 'rule) compil = {
   (** pattern declaration for reusing as variable in perturbations
     or kinetic rate *)
   signatures: 'agent list; (** agent signature declaration *)
-  rules: (string Locality.annot option * 'rule Locality.annot) list;
+  rules: (string Locality.annoted option * 'rule Locality.annoted) list;
   (** rules (possibly named) *)
-  observables: ('pattern, 'id) Alg_expr.e Locality.annot list;
+  observables: ('pattern, 'id) Alg_expr.e Locality.annoted list;
   (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statment list;
   (** initial graph declaration *)
   perturbations: ('pattern, 'mixture, 'id, 'rule) perturbation list;
   configurations: configuration list;
-  tokens: string Locality.annot list;
+  tokens: string Locality.annoted list;
   volumes: (string * float * string) list;
 }
 
@@ -262,16 +262,16 @@ let print_ast_site f = function
   | Counter c -> print_counter f c
 
 let string_annot_to_json filenames =
-  Locality.annot_to_yojson ~filenames JsonUtil.of_string
+  Locality.yojson_of_annoted ~filenames JsonUtil.of_string
 
-let string_annot_of_json filenames =
-  Locality.annot_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None)
+let string_annoted_of_json filenames =
+  Locality.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None)
 
 let string_option_annot_to_json filenames =
-  Locality.annot_to_yojson ~filenames (JsonUtil.of_option JsonUtil.of_string)
+  Locality.yojson_of_annoted ~filenames (JsonUtil.of_option JsonUtil.of_string)
 
-let string_option_annot_of_json filenames =
-  Locality.annot_of_yojson ~filenames
+let string_option_annoted_of_json filenames =
+  Locality.annoted_of_yojson ~filenames
     (JsonUtil.to_option (JsonUtil.to_string ?error_msg:None))
 
 let counter_test_to_json = function
@@ -295,10 +295,10 @@ let port_to_json filenames p =
   let mod_l =
     JsonUtil.of_option (function
       | None -> `String "FREE"
-      | Some x -> Locality.annot_to_yojson ~filenames JsonUtil.of_int x)
+      | Some x -> Locality.yojson_of_annoted ~filenames JsonUtil.of_int x)
   in
   let mod_i =
-    JsonUtil.of_option (Locality.annot_to_yojson ~filenames JsonUtil.of_string)
+    JsonUtil.of_option (Locality.yojson_of_annoted ~filenames JsonUtil.of_string)
   in
   JsonUtil.smart_assoc
     [
@@ -317,7 +317,7 @@ let port_to_json filenames p =
           [
             ( "state",
               JsonUtil.of_list
-                (Locality.annot_to_yojson ~filenames
+                (Locality.yojson_of_annoted ~filenames
                    (LKappa.link_to_json
                       (fun _ -> string_annot_to_json filenames)
                       (string_annot_to_json filenames)
@@ -333,23 +333,23 @@ let build_port_of_json filenames n i l =
       | `String "FREE" -> None
       | x ->
         Some
-          (Locality.annot_of_yojson ~filenames
+          (Locality.annoted_of_yojson ~filenames
              (JsonUtil.to_int ?error_msg:None)
              x))
   in
   let mod_i =
     JsonUtil.to_option
-      (Locality.annot_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None))
+      (Locality.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None))
   in
   let port_int, port_int_mod =
     match i with
     | `Assoc [] | `Null -> [], None
     | `Assoc [ ("state", i) ] ->
-      JsonUtil.to_list (string_option_annot_of_json filenames) i, None
+      JsonUtil.to_list (string_option_annoted_of_json filenames) i, None
     | `Assoc [ ("mod", m) ] -> [], mod_i m
     | `Assoc [ ("state", i); ("mod", m) ] | `Assoc [ ("mod", m); ("state", i) ]
       ->
-      JsonUtil.to_list (string_option_annot_of_json filenames) i, mod_i m
+      JsonUtil.to_list (string_option_annoted_of_json filenames) i, mod_i m
     | _ -> raise (Yojson.Basic.Util.Type_error ("Not internal states", i))
   in
   let port_link, port_link_mod =
@@ -357,10 +357,10 @@ let build_port_of_json filenames n i l =
     | `Assoc [] | `Null -> [], None
     | `Assoc [ ("state", l) ] ->
       ( JsonUtil.to_list
-          (Locality.annot_of_yojson ~filenames
+          (Locality.annoted_of_yojson ~filenames
              (LKappa.link_of_json
-                (fun _ -> string_annot_of_json filenames)
-                (string_annot_of_json filenames)
+                (fun _ -> string_annoted_of_json filenames)
+                (string_annoted_of_json filenames)
                 (fun _ -> ())))
           l,
         None )
@@ -368,10 +368,10 @@ let build_port_of_json filenames n i l =
     | `Assoc [ ("state", l); ("mod", m) ] | `Assoc [ ("mod", m); ("state", l) ]
       ->
       ( JsonUtil.to_list
-          (Locality.annot_of_yojson ~filenames
+          (Locality.annoted_of_yojson ~filenames
              (LKappa.link_of_json
-                (fun _ -> string_annot_of_json filenames)
-                (string_annot_of_json filenames)
+                (fun _ -> string_annoted_of_json filenames)
+                (string_annoted_of_json filenames)
                 (fun _ -> ())))
           l,
         mod_l m )
@@ -379,7 +379,7 @@ let build_port_of_json filenames n i l =
   in
   Port
     {
-      port_name = string_annot_of_json filenames n;
+      port_name = string_annoted_of_json filenames n;
       port_int;
       port_int_mod;
       port_link;
@@ -396,13 +396,13 @@ let site_of_json filenames = function
     Counter
       {
         counter_name =
-          Locality.annot_of_yojson ~filenames Yojson.Basic.Util.to_string n;
+          Locality.annoted_of_yojson ~filenames Yojson.Basic.Util.to_string n;
         counter_test =
           JsonUtil.to_option
-            (Locality.annot_of_yojson ~filenames counter_test_of_json)
+            (Locality.annoted_of_yojson ~filenames counter_test_of_json)
             t;
         counter_delta =
-          Locality.annot_of_yojson ~filenames Yojson.Basic.Util.to_int d;
+          Locality.annoted_of_yojson ~filenames Yojson.Basic.Util.to_int d;
       }
   | `Assoc [ ("port_name", n); ("port_int", i); ("port_link", l) ]
   | `Assoc [ ("port_name", n); ("port_link", l); ("port_int", i) ]
@@ -426,13 +426,13 @@ let site_to_json filenames = function
     `Assoc
       [
         ( "counter_name",
-          Locality.annot_to_yojson ~filenames JsonUtil.of_string c.counter_name );
+          Locality.yojson_of_annoted ~filenames JsonUtil.of_string c.counter_name );
         ( "counter_test",
           JsonUtil.of_option
-            (Locality.annot_to_yojson ~filenames counter_test_to_json)
+            (Locality.yojson_of_annoted ~filenames counter_test_to_json)
             c.counter_test );
         ( "counter_delta",
-          Locality.annot_to_yojson ~filenames JsonUtil.of_int c.counter_delta );
+          Locality.yojson_of_annoted ~filenames JsonUtil.of_int c.counter_delta );
       ]
 
 let print_agent_mod f = function
@@ -463,7 +463,7 @@ let agent_to_json filenames = function
   | Present (na, l, m) ->
     JsonUtil.smart_assoc
       [
-        "name", Locality.annot_to_yojson ~filenames JsonUtil.of_string na;
+        "name", Locality.yojson_of_annoted ~filenames JsonUtil.of_string na;
         "sig", JsonUtil.of_list (site_to_json filenames) l;
         "mod", (JsonUtil.of_option agent_mod_to_yojson) m;
       ]
@@ -477,28 +477,28 @@ let agent_of_json filenames = function
   | `Assoc [ ("mod", m); ("name", n); ("sig", s) ]
   | `Assoc [ ("mod", m); ("sig", s); ("name", n) ] ->
     Present
-      ( Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames
           (JsonUtil.to_string ?error_msg:None)
           n,
         JsonUtil.to_list (site_of_json filenames) s,
         (JsonUtil.to_option agent_mod_of_yojson) m )
   | `Assoc [ ("name", n); ("mod", m) ] | `Assoc [ ("mod", m); ("name", n) ] ->
     Present
-      ( Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames
           (JsonUtil.to_string ?error_msg:None)
           n,
         [],
         (JsonUtil.to_option agent_mod_of_yojson) m )
   | `Assoc [ ("name", n); ("sig", s) ] | `Assoc [ ("sig", s); ("name", n) ] ->
     Present
-      ( Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames
           (JsonUtil.to_string ?error_msg:None)
           n,
         JsonUtil.to_list (site_of_json filenames) s,
         None )
   | `Assoc [ ("name", n) ] ->
     Present
-      ( Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames
           (JsonUtil.to_string ?error_msg:None)
           n,
         [],
@@ -648,22 +648,22 @@ let mixture_to_user_graph m =
 
 let init_to_json ~filenames f_mix f_var = function
   | INIT_MIX m ->
-    `List [ `String "mixture"; Locality.annot_to_yojson ~filenames f_mix m ]
+    `List [ `String "mixture"; Locality.yojson_of_annoted ~filenames f_mix m ]
   | INIT_TOK t ->
     `List
       [
         `String "token";
-        JsonUtil.of_list (Locality.annot_to_yojson ~filenames f_var) t;
+        JsonUtil.of_list (Locality.yojson_of_annoted ~filenames f_var) t;
       ]
 
 let init_of_json ~filenames f_mix f_var = function
   | `List [ `String "mixture"; m ] ->
-    INIT_MIX (Locality.annot_of_yojson ~filenames f_mix m)
+    INIT_MIX (Locality.annoted_of_yojson ~filenames f_mix m)
   | `List [ `String "token"; t ] ->
     INIT_TOK
       (JsonUtil.to_list
          ~error_msg:(JsonUtil.build_msg "INIT_TOK")
-         (Locality.annot_of_yojson ~filenames f_var)
+         (Locality.annoted_of_yojson ~filenames f_var)
          t)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid Ast init statement", x))
 
@@ -862,7 +862,7 @@ let arrow_notation_to_yojson filenames f_mix f_var r =
       ( "rm_token",
         JsonUtil.of_list
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames f_mix f_var))
              (string_annot_to_json filenames))
           r.rm_token );
@@ -870,7 +870,7 @@ let arrow_notation_to_yojson filenames f_mix f_var r =
       ( "add_token",
         JsonUtil.of_list
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames f_mix f_var))
              (string_annot_to_json filenames))
           r.add_token );
@@ -883,17 +883,17 @@ let arrow_notation_of_yojson filenames f_mix f_var = function
       rm_token =
         JsonUtil.to_list
           (JsonUtil.to_pair
-             (Locality.annot_of_yojson ~filenames
+             (Locality.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames f_mix f_var))
-             (string_annot_of_json filenames))
+             (string_annoted_of_json filenames))
           (Yojson.Basic.Util.member "rm_token" x);
       rhs = f_mix (Yojson.Basic.Util.member "rhs" x);
       add_token =
         JsonUtil.to_list
           (JsonUtil.to_pair
-             (Locality.annot_of_yojson ~filenames
+             (Locality.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames f_mix f_var))
-             (string_annot_of_json filenames))
+             (string_annoted_of_json filenames))
           (Yojson.Basic.Util.member "add_token" x);
     }
   | x ->
@@ -909,7 +909,7 @@ let edit_notation_to_yojson filenames r =
       ( "delta_token",
         JsonUtil.of_list
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames mix_to_json JsonUtil.of_string))
              (string_annot_to_json filenames))
           r.delta_token );
@@ -926,10 +926,10 @@ let edit_notation_of_yojson filenames r =
       delta_token =
         JsonUtil.to_list
           (JsonUtil.to_pair
-             (Locality.annot_of_yojson ~filenames
+             (Locality.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames mix_of_json
                    (JsonUtil.to_string ?error_msg:None)))
-             (string_annot_of_json filenames))
+             (string_annoted_of_json filenames))
           (Yojson.Basic.Util.member "delta_token" x);
     }
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST edit_notation", x))
@@ -951,30 +951,30 @@ let rule_to_json filenames f_mix f_var r =
       "rewrite", rule_content_to_yojson filenames f_mix f_var r.rewrite;
       "bidirectional", `Bool r.bidirectional;
       ( "k_def",
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (Alg_expr.e_to_yojson ~filenames f_mix f_var)
           r.k_def );
       ( "k_un",
         JsonUtil.of_option
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames f_mix f_var))
              (JsonUtil.of_option
-                (Locality.annot_to_yojson ~filenames
+                (Locality.yojson_of_annoted ~filenames
                    (Alg_expr.e_to_yojson ~filenames f_mix f_var))))
           r.k_un );
       ( "k_op",
         JsonUtil.of_option
-          (Locality.annot_to_yojson ~filenames
+          (Locality.yojson_of_annoted ~filenames
              (Alg_expr.e_to_yojson ~filenames f_mix f_var))
           r.k_op );
       ( "k_op_un",
         JsonUtil.of_option
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames f_mix f_var))
              (JsonUtil.of_option
-                (Locality.annot_to_yojson ~filenames
+                (Locality.yojson_of_annoted ~filenames
                    (Alg_expr.e_to_yojson ~filenames f_mix f_var))))
           r.k_op_un );
     ]
@@ -990,30 +990,30 @@ let rule_of_json filenames f_mix f_var = function
            Yojson.Basic.Util.to_bool
              (Yojson.Basic.Util.member "bidirectional" x);
          k_def =
-           Locality.annot_of_yojson ~filenames
+           Locality.annoted_of_yojson ~filenames
              (Alg_expr.e_of_yojson ~filenames f_mix f_var)
              (Yojson.Basic.Util.member "k_def" x);
          k_un =
            JsonUtil.to_option
              (JsonUtil.to_pair
-                (Locality.annot_of_yojson ~filenames
+                (Locality.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames f_mix f_var))
                 (JsonUtil.to_option
-                   (Locality.annot_of_yojson ~filenames
+                   (Locality.annoted_of_yojson ~filenames
                       (Alg_expr.e_of_yojson ~filenames f_mix f_var))))
              (Yojson.Basic.Util.member "k_un" x);
          k_op =
            JsonUtil.to_option
-             (Locality.annot_of_yojson ~filenames
+             (Locality.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames f_mix f_var))
              (Yojson.Basic.Util.member "k_op" x);
          k_op_un =
            JsonUtil.to_option
              (JsonUtil.to_pair
-                (Locality.annot_of_yojson ~filenames
+                (Locality.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames f_mix f_var))
                 (JsonUtil.to_option
-                   (Locality.annot_of_yojson ~filenames
+                   (Locality.annoted_of_yojson ~filenames
                       (Alg_expr.e_of_yojson ~filenames f_mix f_var))))
              (Yojson.Basic.Util.member "k_op_un" x);
        }
@@ -1026,10 +1026,10 @@ let modif_to_json filenames f_mix f_var = function
     `List
       [
         `String "APPLY";
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (Alg_expr.e_to_yojson ~filenames f_mix f_var)
           alg;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames
           (rule_to_json filenames f_mix f_var)
           r;
       ]
@@ -1037,8 +1037,8 @@ let modif_to_json filenames f_mix f_var = function
     `List
       [
         `String "UPDATE";
-        Locality.annot_to_yojson ~filenames f_var id;
-        Locality.annot_to_yojson ~filenames
+        Locality.yojson_of_annoted ~filenames f_var id;
+        Locality.yojson_of_annoted ~filenames
           (Alg_expr.e_to_yojson ~filenames f_mix f_var)
           alg;
       ]
@@ -1070,7 +1070,7 @@ let modif_to_json filenames f_mix f_var = function
     `List [ `String "CFLOWLABEL"; `Bool b; string_annot_to_json filenames id ]
   | CFLOWMIX (b, m) ->
     `List
-      [ `String "CFLOW"; `Bool b; Locality.annot_to_yojson ~filenames f_mix m ]
+      [ `String "CFLOW"; `Bool b; Locality.yojson_of_annoted ~filenames f_mix m ]
   | DIN (b, file) ->
     `List
       [
@@ -1093,22 +1093,22 @@ let modif_to_json filenames f_mix f_var = function
         JsonUtil.of_list
           (Primitives.print_expr_to_yojson ~filenames f_mix f_var)
           l;
-        Locality.annot_to_yojson ~filenames f_mix m;
+        Locality.yojson_of_annoted ~filenames f_mix m;
       ]
 
 let modif_of_json filenames f_mix f_var = function
   | `List [ `String "APPLY"; alg; mix ] ->
     APPLY
-      ( Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames
           (Alg_expr.e_of_yojson ~filenames f_mix f_var)
           alg,
-        Locality.annot_of_yojson ~filenames
+        Locality.annoted_of_yojson ~filenames
           (rule_of_json filenames f_mix f_var)
           mix )
   | `List [ `String "UPDATE"; id; alg ] ->
     UPDATE
-      ( Locality.annot_of_yojson ~filenames f_var id,
-        Locality.annot_of_yojson ~filenames
+      ( Locality.annoted_of_yojson ~filenames f_var id,
+        Locality.annoted_of_yojson ~filenames
           (Alg_expr.e_of_yojson ~filenames f_mix f_var)
           alg )
   | `List (`String "STOP" :: l) ->
@@ -1130,9 +1130,9 @@ let modif_of_json filenames f_mix f_var = function
           expr )
   | `String "PLOTENTRY" -> PLOTENTRY
   | `List [ `String "CFLOWLABEL"; `Bool b; id ] ->
-    CFLOWLABEL (b, string_annot_of_json filenames id)
+    CFLOWLABEL (b, string_annoted_of_json filenames id)
   | `List [ `String "CFLOW"; `Bool b; m ] ->
-    CFLOWMIX (b, Locality.annot_of_yojson ~filenames f_mix m)
+    CFLOWMIX (b, Locality.annoted_of_yojson ~filenames f_mix m)
   | `List [ `String "DIN"; b; file ] ->
     DIN
       ( Primitives.din_kind_of_yojson b,
@@ -1148,7 +1148,7 @@ let modif_of_json filenames f_mix f_var = function
         JsonUtil.to_list
           (Primitives.print_expr_of_yojson ~filenames f_mix f_var)
           file,
-        Locality.annot_of_yojson ~filenames f_mix m )
+        Locality.annoted_of_yojson ~filenames f_mix m )
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid modification", x))
 
 let merge_internal_mod acc = function
@@ -1308,14 +1308,14 @@ let split_mixture m =
                                 (match p.port_link_mod with
                                 | None -> p.port_link
                                 | Some None ->
-                                  [ Locality.dummy_annot LKappa.LNK_FREE ]
+                                  [ Locality.annotate_with_dummy LKappa.LNK_FREE ]
                                 | Some (Some (i, pos)) ->
                                   [ LKappa.LNK_VALUE (i, ()), pos ]);
                               port_link_mod = None;
                             }
                           :: r )
                       | Counter c ->
-                        ( Counter { c with counter_delta = Locality.dummy_annot 0 }
+                        ( Counter { c with counter_delta = Locality.annotate_with_dummy 0 }
                           :: l,
                           Counter { c with counter_test = None } :: r ))
                     ([], []) intf
@@ -1349,36 +1349,36 @@ let compil_to_json c =
         JsonUtil.of_list
           (JsonUtil.of_pair
              (string_annot_to_json filenames)
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json)))
           c.variables );
       ( "rules",
         JsonUtil.of_list
           (JsonUtil.of_pair
              (JsonUtil.of_option (string_annot_to_json filenames))
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (rule_to_json filenames mix_to_json var_to_json)))
           c.rules );
       ( "observables",
         JsonUtil.of_list
-          (Locality.annot_to_yojson ~filenames
+          (Locality.yojson_of_annoted ~filenames
              (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
           c.observables );
       ( "init",
         JsonUtil.of_list
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames
+             (Locality.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
              (init_to_json ~filenames mix_to_json var_to_json))
           c.init );
       ( "perturbations",
         JsonUtil.of_list
-          (Locality.annot_to_yojson ~filenames (fun (alarm, pre, modif, post) ->
+          (Locality.yojson_of_annoted ~filenames (fun (alarm, pre, modif, post) ->
                `List
                  [
                    JsonUtil.of_option Nbr.to_yojson alarm;
                    JsonUtil.of_option
-                     (Locality.annot_to_yojson ~filenames
+                     (Locality.yojson_of_annoted ~filenames
                         (Alg_expr.bool_to_yojson ~filenames mix_to_json
                            var_to_json))
                      pre;
@@ -1386,7 +1386,7 @@ let compil_to_json c =
                      (modif_to_json filenames mix_to_json var_to_json)
                      modif;
                    JsonUtil.of_option
-                     (Locality.annot_to_yojson ~filenames
+                     (Locality.yojson_of_annoted ~filenames
                         (Alg_expr.bool_to_yojson ~filenames mix_to_json
                            var_to_json))
                      post;
@@ -1422,46 +1422,46 @@ let compil_of_json = function
          tokens =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST token sig")
-             (string_annot_of_json filenames)
+             (string_annoted_of_json filenames)
              (List.assoc "tokens" l);
          variables =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST variables")
              (JsonUtil.to_pair
-                (string_annot_of_json filenames)
-                (Locality.annot_of_yojson ~filenames
+                (string_annoted_of_json filenames)
+                (Locality.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json)))
              (List.assoc "variables" l);
          rules =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST rules")
              (JsonUtil.to_pair
-                (JsonUtil.to_option (string_annot_of_json filenames))
-                (Locality.annot_of_yojson ~filenames
+                (JsonUtil.to_option (string_annoted_of_json filenames))
+                (Locality.annoted_of_yojson ~filenames
                    (rule_of_json filenames mix_of_json var_of_json)))
              (List.assoc "rules" l);
          observables =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST observables")
-             (Locality.annot_of_yojson ~filenames
+             (Locality.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
              (List.assoc "observables" l);
          init =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST init")
              (JsonUtil.to_pair
-                (Locality.annot_of_yojson ~filenames
+                (Locality.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
                 (init_of_json ~filenames mix_of_json var_of_json))
              (List.assoc "init" l);
          perturbations =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST perturbations")
-             (Locality.annot_of_yojson ~filenames (function
+             (Locality.annoted_of_yojson ~filenames (function
                | `List [ alarm; pre; modif; post ] ->
                  ( JsonUtil.to_option Nbr.of_yojson alarm,
                    JsonUtil.to_option
-                     (Locality.annot_of_yojson ~filenames
+                     (Locality.annoted_of_yojson ~filenames
                         (Alg_expr.bool_of_yojson ~filenames mix_of_json
                            var_of_json))
                      pre,
@@ -1469,7 +1469,7 @@ let compil_of_json = function
                      (modif_of_json filenames mix_of_json var_of_json)
                      modif,
                    JsonUtil.to_option
-                     (Locality.annot_of_yojson ~filenames
+                     (Locality.annoted_of_yojson ~filenames
                         (Alg_expr.bool_of_yojson ~filenames mix_of_json
                            var_of_json))
                      post )
@@ -1480,8 +1480,8 @@ let compil_of_json = function
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST configuration")
              (JsonUtil.to_pair
-                (string_annot_of_json filenames)
-                (JsonUtil.to_list (string_annot_of_json filenames)))
+                (string_annoted_of_json filenames)
+                (JsonUtil.to_list (string_annoted_of_json filenames)))
              (List.assoc "configurations" l);
          volumes = [];
        }

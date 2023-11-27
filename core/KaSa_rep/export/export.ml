@@ -1713,23 +1713,23 @@ functor
                               (Ckappa_sig.site_name_of_int y)
                           in
                           ( state,
-                            (Locality.dummy_annot sx, Locality.dummy_annot sy)
+                            (Locality.annotate_with_dummy sx, Locality.annotate_with_dummy sy)
                             :: list ))
                         (state, []) rev_binding
                     in
                     let states' =
                       NamedDecls.create
                         (Tools.array_map_of_list
-                           (fun i -> Locality.dummy_annot i, ())
+                           (fun i -> Locality.annotate_with_dummy i, ())
                            states)
                     in
                     ( state,
-                      (Locality.dummy_annot x, (states', binding', None)) :: acc
+                      (Locality.annotate_with_dummy x, (states', binding', None)) :: acc
                     ))
                   (state, []) interface
               in
               ( state,
-                (Locality.dummy_annot a, NamedDecls.create (Array.of_list acc))
+                (Locality.annotate_with_dummy a, NamedDecls.create (Array.of_list acc))
                 :: list ))
           (state, []) l.(0)
       in

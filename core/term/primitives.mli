@@ -59,12 +59,12 @@ end
 type alg_expr = (Pattern.id array list, int) Alg_expr.e
 
 type elementary_rule = {
-  rate: alg_expr Locality.annot;
-  unary_rate: (alg_expr Locality.annot * alg_expr option) option;
+  rate: alg_expr Locality.annoted;
+  unary_rate: (alg_expr Locality.annoted * alg_expr option) option;
   connected_components: Pattern.id array;
   removed: Instantiation.abstract Transformation.t list;
   inserted: Instantiation.abstract Transformation.t list;
-  delta_tokens: (alg_expr Locality.annot * int) list;
+  delta_tokens: (alg_expr Locality.annoted * int) list;
   syntactic_rule: int;  (** [0] means generated for perturbation. *)
   instantiations: Instantiation.abstract Instantiation.event;
       (** In the reverse order on purpose so that we rev_map when we
@@ -87,8 +87,8 @@ val fully_specified_pattern_to_positive_transformations :
   Pattern.cc -> Instantiation.concrete Transformation.t list
 
 type 'alg_expr print_expr =
-  | Str_pexpr of string Locality.annot
-  | Alg_pexpr of 'alg_expr Locality.annot
+  | Str_pexpr of string Locality.annoted
+  | Alg_pexpr of 'alg_expr Locality.annoted
 
 val print_expr_to_yojson :
   filenames:int Mods.StringMap.t ->
@@ -126,8 +126,8 @@ val din_kind_of_string : string -> din_kind
 (** Deserialize JSON data of type {!din_kind}. *)
 
 type modification =
-  | ITER_RULE of alg_expr Locality.annot * elementary_rule
-  | UPDATE of int * alg_expr Locality.annot
+  | ITER_RULE of alg_expr Locality.annoted * elementary_rule
+  | UPDATE of int * alg_expr Locality.annoted
   | SNAPSHOT of bool * alg_expr print_expr list
   | STOP of alg_expr print_expr list
   | CFLOW of
@@ -148,9 +148,9 @@ type modification =
 
 type perturbation = {
   alarm: Nbr.t option;
-  precondition: (Pattern.id array list, int) Alg_expr.bool Locality.annot;
+  precondition: (Pattern.id array list, int) Alg_expr.bool Locality.annoted;
   effect: modification list;
-  repeat: (Pattern.id array list, int) Alg_expr.bool Locality.annot;
+  repeat: (Pattern.id array list, int) Alg_expr.bool Locality.annoted;
   needs_backtrack: bool;
 }
 
@@ -166,26 +166,26 @@ val extract_connected_components_modifications :
   modification list -> Pattern.id list
 
 val extract_connected_components_bool :
-  (Pattern.id array list, int) Alg_expr.bool Locality.annot -> Pattern.id list
+  (Pattern.id array list, int) Alg_expr.bool Locality.annoted -> Pattern.id list
 
 val map_expr_rule :
-  (alg_expr Locality.annot -> alg_expr Locality.annot) ->
+  (alg_expr Locality.annoted -> alg_expr Locality.annoted) ->
   elementary_rule ->
   elementary_rule
 
 val map_expr_perturbation :
-  (alg_expr Locality.annot -> alg_expr Locality.annot) ->
-  ((Pattern.id array list, int) Alg_expr.bool Locality.annot ->
-  (Pattern.id array list, int) Alg_expr.bool Locality.annot) ->
+  (alg_expr Locality.annoted -> alg_expr Locality.annoted) ->
+  ((Pattern.id array list, int) Alg_expr.bool Locality.annoted ->
+  (Pattern.id array list, int) Alg_expr.bool Locality.annoted) ->
   perturbation ->
   perturbation
 
 val fold_expr_rule :
-  ('a -> alg_expr Locality.annot -> 'a) -> 'a -> elementary_rule -> 'a
+  ('a -> alg_expr Locality.annoted -> 'a) -> 'a -> elementary_rule -> 'a
 
 val fold_expr_perturbation :
-  ('a -> alg_expr Locality.annot -> 'a) ->
-  ('a -> (Pattern.id array list, int) Alg_expr.bool Locality.annot -> 'a) ->
+  ('a -> alg_expr Locality.annoted -> 'a) ->
+  ('a -> (Pattern.id array list, int) Alg_expr.bool Locality.annoted -> 'a) ->
   'a ->
   perturbation ->
   'a

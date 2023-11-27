@@ -107,7 +107,7 @@ let compatible_fresh_point ~debugMode e (sid, sty) ssite arrow =
   | _, ToNode (Existing _, _) ->
     raise
       (ExceptionDefn.Internal_Error
-         (Locality.dummy_annot
+         (Locality.annotate_with_dummy
             "Navigation.compatible_fresh_point does not deal with existing \
              arrow"))
   | ((Fresh (id, ty), site), x), ToNothing ->

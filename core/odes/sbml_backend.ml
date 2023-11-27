@@ -576,7 +576,7 @@ let print_ci_with_id logger logger_err ci id =
 let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
     (alg_expr :
       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
-      Locality.annot)
+      Locality.annoted)
     (network :
       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
     =
@@ -814,7 +814,7 @@ and print_bool_expr_in_sbml string_of_var_id logger logger_err cond network =
 let rec substance_expr_in_sbml logger
     (alg_expr :
       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
-      Locality.annot)
+      Locality.annoted)
     (network :
       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
     =
@@ -880,7 +880,7 @@ and substance_bool_expr_in_sbml logger cond network =
 let rec maybe_time_dependent_alg_expr_in_sbml logger
     (alg_expr :
       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
-      Locality.annot)
+      Locality.annoted)
     (network :
       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
     =
@@ -1284,19 +1284,19 @@ let dump_kinetic_law ~propagate_constants string_of_var_id logger logger_err
             aux reactants))
 
 let negative_part expr =
-  Locality.dummy_annot
+  Locality.annotate_with_dummy
     (Alg_expr.UN_ALG_OP
        ( Operator.UMINUS,
-         Locality.dummy_annot
+         Locality.annotate_with_dummy
            (Alg_expr.BIN_ALG_OP
               ( Operator.MIN,
-                Locality.dummy_annot (Alg_expr.CONST Nbr.zero),
+                Locality.annotate_with_dummy (Alg_expr.CONST Nbr.zero),
                 expr )) ))
 
 let positive_part expr =
-  Locality.dummy_annot
+  Locality.annotate_with_dummy
     (Alg_expr.BIN_ALG_OP
-       (Operator.MAX, Locality.dummy_annot (Alg_expr.CONST Nbr.zero), expr))
+       (Operator.MAX, Locality.annotate_with_dummy (Alg_expr.CONST Nbr.zero), expr))
 
 let dump_token_vector convert logger logger_err network_handler rule_id
     token_vector =

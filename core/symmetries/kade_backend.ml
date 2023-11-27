@@ -407,7 +407,7 @@ module LKappa = struct
     | LKappa.Freed ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "Cannot erase all increment agents"))
+           (Locality.annotate_with_dummy "Cannot erase all increment agents"))
     | LKappa.Maintained -> ()
     | LKappa.Erased -> ()
 
@@ -521,7 +521,7 @@ module LKappa = struct
                 | LKappa.LNK_TYPE _ | LKappa.LNK_SOME ->
                   raise
                     (ExceptionDefn.Internal_Error
-                       (Locality.dummy_annot
+                       (Locality.annotate_with_dummy
                           "Port a of __incr agent not well specified")))))
           mix
     in

@@ -12,8 +12,8 @@ module type Lin_comb = sig
   type t
 
   val of_expr :
-    (id -> (mix, id) Alg_expr.e Locality.annot option) ->
-    (mix, id) Alg_expr.e Locality.annot ->
+    (id -> (mix, id) Alg_expr.e Locality.annoted option) ->
+    (mix, id) Alg_expr.e Locality.annoted ->
     t option
 
   val print :

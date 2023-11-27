@@ -41,7 +41,7 @@ let print_initial_inputs ?uuid conf env inputs_form init =
            (fun f (nb, tk) ->
              Format.fprintf f "@[<hov 2>%%init:@ @[%a@]@ %a@]"
                (Kappa_printer.alg_expr ~noCounters ~env)
-               (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
+               (fst (Alg_expr.mult (Locality.annotate_with_dummy n) nb))
                (Model.print_token ~env) tk)
            f r.Primitives.delta_tokens))
     init
@@ -449,7 +449,7 @@ let print_warning ?pos f msg =
   let pr f () = Format.fprintf f "Warning: @[%t@]" msg in
   match pos with
   | Some pos ->
-    Format.fprintf f "@[<v>%a@]@." (Locality.print_annot pr) ((), pos)
+    Format.fprintf f "@[<v>%a@]@." (Locality.print_annoted pr) ((), pos)
   | None -> Format.fprintf f "@[%a@]@." pr ()
 
 type file_line = { file_line_name: string option; file_line_text: string }

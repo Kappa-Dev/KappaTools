@@ -8,9 +8,9 @@
 
 (** Intermediate representation of model on which sanity has been checked *)
 
-type ('a, 'annot) link =
+type ('a, 'annoted) link =
   | ANY_FREE
-  | LNK_VALUE of int * 'annot
+  | LNK_VALUE of int * 'annoted
   | LNK_FREE
   | LNK_ANY
   | LNK_SOME
@@ -29,11 +29,11 @@ type rule_internal =
 type rule_agent = {
   ra_type: int; (*agent_id*)
   ra_erased: bool;
-  ra_ports: ((int, int * int) link Locality.annot * switching) array;
+  ra_ports: ((int, int * int) link Locality.annoted * switching) array;
   (*((link nb, (dst_site,dst_ag_type)), _) , switch*)
   ra_ints: rule_internal array;
   ra_syntax:
-    (((int, int * int) link Locality.annot * switching) array
+    (((int, int * int) link Locality.annoted * switching) array
     * rule_internal array)
     option;
 }
@@ -77,11 +77,11 @@ val print_rule_mixture :
 type rule = {
   r_mix: rule_mixture;
   r_created: Raw_mixture.t;
-  r_delta_tokens: ((rule_mixture, int) Alg_expr.e Locality.annot * int) list;
-  r_rate: (rule_mixture, int) Alg_expr.e Locality.annot;
+  r_delta_tokens: ((rule_mixture, int) Alg_expr.e Locality.annoted * int) list;
+  r_rate: (rule_mixture, int) Alg_expr.e Locality.annoted;
   r_un_rate:
-    ((rule_mixture, int) Alg_expr.e Locality.annot
-    * (rule_mixture, int) Alg_expr.e Locality.annot option)
+    ((rule_mixture, int) Alg_expr.e Locality.annoted
+    * (rule_mixture, int) Alg_expr.e Locality.annoted option)
     option;
   r_editStyle: bool;
 }

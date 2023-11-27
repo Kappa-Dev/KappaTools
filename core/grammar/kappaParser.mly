@@ -47,7 +47,7 @@
 %type <(Ast.mixture,Ast.mixture,string,Ast.rule) Ast.modif_expr list> standalone_effect_list
 
 %start standalone_bool_expr
-%type <(Ast.mixture,string) Alg_expr.bool Locality.annot> standalone_bool_expr
+%type <(Ast.mixture,string) Alg_expr.bool Locality.annoted> standalone_bool_expr
 
 %% /*Grammar rules*/
 
@@ -402,9 +402,9 @@ rate:
     | alg_expr OP_PAR alg_with_radius CL_PAR { ($1,Some $3) }
     | alg_expr {($1,None)}
     | OP_CUR alg_with_radius CL_CUR
-      {(Locality.dummy_annot (Alg_expr.CONST Nbr.zero),Some $2)}
+      {(Locality.annotate_with_dummy (Alg_expr.CONST Nbr.zero),Some $2)}
     | alg_expr OP_CUR CL_CUR
-      {($1,Some (Locality.dummy_annot (Alg_expr.CONST Nbr.zero),None))}
+      {($1,Some (Locality.annotate_with_dummy (Alg_expr.CONST Nbr.zero),None))}
     | {raise (ExceptionDefn.Syntax_Error (add_pos "missing rule rate"))}
     ;
 
@@ -491,7 +491,7 @@ port_expression:
          { Ast.Counter
 	   { Ast.counter_name = ($1,rhs_pos 1);
 	   Ast.counter_test = $2;
-	   Ast.counter_delta = Locality.dummy_annot 0} }
+	   Ast.counter_delta = Locality.annotate_with_dummy 0} }
     ;
 
 internal_state:
@@ -528,7 +528,7 @@ link_state:
 	| a_link_state {[$1]};
 
 interactive_command:
-	| RUN NEWLINE {Ast.RUN (Locality.dummy_annot Alg_expr.FALSE)}
+	| RUN NEWLINE {Ast.RUN (Locality.annotate_with_dummy Alg_expr.FALSE)}
 	| RUN bool_expr NEWLINE {Ast.RUN $2}
 	| effect_list NEWLINE {Ast.MODIFY $1}
 	| EOF {Ast.QUIT}

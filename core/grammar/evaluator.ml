@@ -27,7 +27,7 @@ let do_interactive_directives ~debugMode ~outputs ~sharing ~syntax_version
     then
       raise
         (ExceptionDefn.Malformed_Decl
-           (Locality.dummy_annot "Creating new link type is forbidden"))
+           (Locality.annotate_with_dummy "Creating new link type is forbidden"))
   in
   let cc_preenv', e'' =
     Eval.compile_modifications_no_track ~debugMode ~warning ~compileModeOn:false

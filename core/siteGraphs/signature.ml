@@ -182,9 +182,9 @@ let add_incr counters =
   counter_agent
 
 type counters_before_signature =
-  (string Locality.annot
+  (string Locality.annoted
   * (unit NamedDecls.t
-    * (string Locality.annot * string Locality.annot) list
+    * (string Locality.annoted * string Locality.annoted) list
     * (int * int) option)
     NamedDecls.t)
   list

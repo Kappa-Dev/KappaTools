@@ -108,11 +108,11 @@ module type Interface = sig
 
   val token_vector :
     rule ->
-    ((connected_component array list, int) Alg_expr.e Locality.annot * int) list
+    ((connected_component array list, int) Alg_expr.e Locality.annoted * int) list
 
   val token_vector_of_init :
     rule ->
-    ((connected_component array list, int) Alg_expr.e Locality.annot * int) list
+    ((connected_component array list, int) Alg_expr.e Locality.annoted * int) list
 
   val print_rule_id : Format.formatter -> rule_id -> unit
   val print_rule : ?compil:compil -> Format.formatter -> rule -> unit
@@ -129,7 +129,7 @@ module type Interface = sig
     compil ->
     rule ->
     rule_id_with_mode ->
-    (connected_component array list, int) Alg_expr.e Locality.annot option
+    (connected_component array list, int) Alg_expr.e Locality.annoted option
 
   val rate_name : compil -> rule -> rule_id_with_mode -> rule_name
   val apply : compil -> rule -> embedding_forest -> mixture -> mixture
@@ -157,7 +157,7 @@ module type Interface = sig
 
   val get_variables :
     compil ->
-    (string * (connected_component array list, int) Alg_expr.e Locality.annot)
+    (string * (connected_component array list, int) Alg_expr.e Locality.annoted)
     array
 
   val get_obs : compil -> (connected_component array list, int) Alg_expr.e list

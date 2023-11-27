@@ -468,7 +468,7 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.PositiveInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "PositiveInternalized in negative update"))
+           (Locality.annotate_with_dummy "PositiveInternalized in negative update"))
     | Primitives.Transformation.NegativeInternalized ((id, _), s) ->
       let _, edges' = Edges.remove_internal id s edges in
       side_effects, edges'
@@ -506,7 +506,7 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "NegativeWhatEver in positive update"))
+           (Locality.annotate_with_dummy "NegativeWhatEver in positive update"))
     | Primitives.Transformation.PositiveInternalized (n, s, i) ->
       let ((id, _) as nc) = Matching.Agent.concretize ~debugMode inj2graph n in
       let edges' = Edges.add_internal id s i edges in
@@ -515,7 +515,7 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.NegativeInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "NegativeInternalized in positive update"))
+           (Locality.annotate_with_dummy "NegativeInternalized in positive update"))
 
   let apply_concrete_positive_transformation sigs ?mod_connectivity_store
       instances edges = function
@@ -533,14 +533,14 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "NegativeWhatEver in positive update"))
+           (Locality.annotate_with_dummy "NegativeWhatEver in positive update"))
     | Primitives.Transformation.PositiveInternalized ((id, _), s, i) ->
       let edges' = Edges.add_internal id s i edges in
       edges'
     | Primitives.Transformation.NegativeInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "NegativeInternalized in positive update"))
+           (Locality.annotate_with_dummy "NegativeInternalized in positive update"))
 
   let obs_from_transformation ~debugMode domain edges acc = function
     | Primitives.Transformation.Agent nc ->
