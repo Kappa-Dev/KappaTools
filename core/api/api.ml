@@ -259,7 +259,7 @@ class type concrete_manager = object
 
   method get_influence_map_node_at :
     filename:string ->
-    Locality.position ->
+    Loc.position ->
     (int, int) Public_data.influence_node option result Lwt.t
 
   method is_running : bool

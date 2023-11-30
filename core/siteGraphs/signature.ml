@@ -6,121 +6,159 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type t =
-  (unit NamedDecls.t * bool array array option * (int * int) option)
-  NamedDecls.t
+type 'links site_sig = {
+  internal_state: unit NamedDecls.t;
+  links: 'links option;
+  counters_info: (int * int) option;
+      (** If relevant: counter CEQ value * counter delta *)
+}
+
+type t = bool array array site_sig NamedDecls.t
 
 let fold f = NamedDecls.fold (fun i n o _ -> f i n o)
 
-let num_of_site ?agent_name site_name sign =
+let num_of_site ?agent_name site_name signature =
   let kind =
     match agent_name with
     | None -> "site name"
     | Some agent_name -> "site name for agent " ^ agent_name
   in
-  NamedDecls.elt_id ~kind sign site_name
+  NamedDecls.elt_id ~kind signature site_name
 
-let site_of_num addr sign =
-  try NamedDecls.elt_name sign addr with Invalid_argument _ -> raise Not_found
-
-let num_of_internal_state site_id state sign =
-  try
-    let na, (nd, _, _) = sign.NamedDecls.decls.(site_id) in
-    NamedDecls.elt_id ~kind:("internal state for site " ^ na) nd state
+let site_of_num addr signature =
+  try NamedDecls.elt_name signature addr
   with Invalid_argument _ -> raise Not_found
 
-let internal_state_of_num site_num val_num sign =
+let num_of_internal_state site_id state signature =
   try
-    let _, (nd, _, _) = sign.NamedDecls.decls.(site_num) in
-    fst nd.NamedDecls.decls.(val_num)
+    let site_name, site_sig = signature.NamedDecls.decls.(site_id) in
+    NamedDecls.elt_id
+      ~kind:("internal state for site " ^ site_name)
+      site_sig.internal_state state
   with Invalid_argument _ -> raise Not_found
 
-let counter_of_site site_id sign =
+let internal_state_of_site_id site_id val_id signature =
   try
-    let _, (_, _, c) = sign.NamedDecls.decls.(site_id) in
-    c
+    let site_sig = NamedDecls.elt_val signature site_id in
+    NamedDecls.elt_name site_sig.internal_state val_id
   with Invalid_argument _ -> raise Not_found
 
-let has_counter sign =
+let counter_of_site_id site_id signature =
+  try (NamedDecls.elt_val signature site_id).counters_info
+  with Invalid_argument _ -> raise Not_found
+
+let has_counter signature =
   fold
     (fun p_id _ ok ->
       try
-        let _, (_, _, c) = sign.NamedDecls.decls.(p_id) in
-        ok || not (c = None)
+        let site_sig = NamedDecls.elt_val signature p_id in
+        ok || not (site_sig.counters_info = None)
       with Invalid_argument _ -> raise Not_found)
-    false sign
+    false signature
+
+(*
+let read_position p lb =
+  match Yojson.Basic.from_lexbuf ~stream:true p lb with
+  | `Assoc [ ("line", `Int line); ("chr", `Int chr) ]
+  | `Assoc [ ("chr", `Int chr); ("line", `Int line) ] ->
+    { line; chr }
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid position", x))
+
+let write_position ob { line; chr } =
+  Yojson.write_assoc ob [ "line", `Int line; "chr", `Int chr ]
+*)
 
 let one_to_json =
-  NamedDecls.to_json (fun (a, b, c) ->
-      `List
+  NamedDecls.to_json (fun signature ->
+      `Assoc
         [
-          NamedDecls.to_json (fun () -> `Null) a;
-          JsonUtil.of_option
-            (fun links ->
-              `List
-                (Array.fold_right
-                   (fun a acc ->
-                     `List (Array.fold_right (fun b c -> `Bool b :: c) a [])
-                     :: acc)
-                   links []))
-            b;
-          JsonUtil.of_option (fun (c1, c2) -> `List [ `Int c1; `Int c2 ]) c;
+          ( "internal_state",
+            NamedDecls.to_json (fun () -> `Null) signature.internal_state );
+          ( "links",
+            JsonUtil.of_option
+              (fun links ->
+                `List
+                  (Array.fold_right
+                     (fun a acc ->
+                       `List (Array.fold_right (fun b c -> `Bool b :: c) a [])
+                       :: acc)
+                     links []))
+              signature.links );
+          ( "counters_info",
+            JsonUtil.of_option
+              (fun (c1, c2) -> `List [ `Int c1; `Int c2 ])
+              signature.counters_info );
         ])
 
-let one_of_json =
+let one_of_json : Yojson.Basic.t -> bool array array site_sig NamedDecls.t =
   NamedDecls.of_json (function
-    | `List [ a; b; c ] ->
-      ( NamedDecls.of_json
-          (function
-            | `Null -> ()
-            | x ->
-              raise
-                (Yojson.Basic.Util.Type_error ("Problematic agent signature", x)))
-          a,
-        Yojson.Basic.Util.to_option
-          (function
-            | `List l ->
-              Tools.array_map_of_list
-                (function
-                  | `List l' ->
-                    Tools.array_map_of_list
-                      (function
-                        | `Bool b -> b
-                        | x ->
-                          raise
-                            (Yojson.Basic.Util.Type_error
-                               ("Problematic agent signature", x)))
-                      l'
-                  | x ->
-                    raise
-                      (Yojson.Basic.Util.Type_error
-                         ("Problematic agent signature", x)))
-                l
-            | x ->
-              raise
-                (Yojson.Basic.Util.Type_error ("Problematic agent signature", x)))
-          b,
-        Yojson.Basic.Util.to_option
-          (function
-            | `List [ `Int c1; `Int c2 ] -> c1, c2
-            | x ->
-              raise
-                (Yojson.Basic.Util.Type_error ("Problematic agent signature", x)))
-          c )
+    | `Assoc [ ("internal_state", a); ("links", b); ("counters_info", c) ] ->
+      {
+        internal_state =
+          NamedDecls.of_json
+            (function
+              | `Null -> ()
+              | x ->
+                raise
+                  (Yojson.Basic.Util.Type_error
+                     ("Problematic agent signature", x)))
+            a;
+        links =
+          Yojson.Basic.Util.to_option
+            (function
+              | `List l ->
+                Tools.array_map_of_list
+                  (function
+                    | `List l' ->
+                      Tools.array_map_of_list
+                        (function
+                          | `Bool b -> b
+                          | x ->
+                            raise
+                              (Yojson.Basic.Util.Type_error
+                                 ("Problematic agent signature", x)))
+                        l'
+                    | x ->
+                      raise
+                        (Yojson.Basic.Util.Type_error
+                           ("Problematic agent signature", x)))
+                  l
+              | x ->
+                raise
+                  (Yojson.Basic.Util.Type_error
+                     ("Problematic agent signature", x)))
+            b;
+        counters_info =
+          Yojson.Basic.Util.to_option
+            (function
+              | `List [ `Int c1; `Int c2 ] -> c1, c2
+              | x ->
+                raise
+                  (Yojson.Basic.Util.Type_error
+                     ("Problematic agent signature", x)))
+            c;
+      }
     | x ->
       raise (Yojson.Basic.Util.Type_error ("Problematic agent signature", x)))
 
-type s = { t: t NamedDecls.t; incr: int option; incr_sites: (int * int) option }
+type counter_agent_info = { id: int; arity: int; ports: int * int }
 
-let size sigs = NamedDecls.size sigs.t
-let get sigs agent_id = snd sigs.t.NamedDecls.decls.(agent_id)
+type s = {
+  agent_sigs: t NamedDecls.t;
+  counter_agent_info: counter_agent_info option;
+}
+
+let size sigs = NamedDecls.size sigs.agent_sigs
+let get sigs agent_id = NamedDecls.elt_val sigs.agent_sigs agent_id
 let arity sigs agent_id = NamedDecls.size (get sigs agent_id)
 
 let max_arity sigs =
-  NamedDecls.fold (fun _ _ x a -> max x (NamedDecls.size a)) 0 sigs.t
+  NamedDecls.fold (fun _ _ x a -> max x (NamedDecls.size a)) 0 sigs.agent_sigs
 
-let agent_of_num i sigs = NamedDecls.elt_name sigs.t i
-let num_of_agent name sigs = NamedDecls.elt_id ~kind:"agent" sigs.t name
+let agent_of_num i sigs = NamedDecls.elt_name sigs.agent_sigs i
+
+let num_of_agent name sigs =
+  NamedDecls.elt_id ~kind:"agent" sigs.agent_sigs name
 
 let id_of_site ((agent_name, _) as agent_ty) site_name sigs =
   let n = num_of_agent agent_ty sigs in
@@ -130,23 +168,23 @@ let site_of_id agent_id site_id sigs = site_of_num site_id (get sigs agent_id)
 
 let id_of_internal_state ((agent_name, _) as agent_ty) site_name state sigs =
   let n = num_of_agent agent_ty sigs in
-  let sign = get sigs n in
-  let site_id = num_of_site ~agent_name site_name sign in
-  num_of_internal_state site_id state sign
+  let signature = get sigs n in
+  let site_id = num_of_site ~agent_name site_name signature in
+  num_of_internal_state site_id state signature
 
 let internal_state_of_id agent_id id_site id_state sigs =
-  internal_state_of_num id_site id_state (get sigs agent_id)
+  internal_state_of_site_id id_site id_state (get sigs agent_id)
 
-let internal_states_number agent_id site_num sigs =
+let internal_states_number agent_id site_id sigs =
   try
-    let _, (nd, _, _) = (get sigs agent_id).NamedDecls.decls.(site_num) in
-    NamedDecls.size nd
+    let site_sig = NamedDecls.elt_val (get sigs agent_id) site_id in
+    NamedDecls.size site_sig.internal_state
   with Invalid_argument _ -> raise Not_found
 
 let default_internal_state agent_id site_id sigs =
   try
-    let _, (nd, _, _) = (get sigs agent_id).NamedDecls.decls.(site_id) in
-    if nd.NamedDecls.decls = [||] then
+    let site_sig = NamedDecls.elt_val (get sigs agent_id) site_id in
+    if NamedDecls.size site_sig.internal_state = 0 then
       None
     else
       Some 0
@@ -158,95 +196,45 @@ let rec allowed_link ag1 s1 ag2 s2 sigs =
     allowed_link ag2 s2 ag1 s1 sigs
   else (
     try
-      match (get sigs ag1).NamedDecls.decls.(s1) with
-      | _, (_, None, _) -> true
-      | _, (_, Some l, _) -> l.(ag2 - ag1).(s2)
+      match (NamedDecls.elt_val (get sigs ag1) s1).links with
+      | None -> true
+      | Some l -> l.(ag2 - ag1).(s2)
     with Invalid_argument _ ->
       invalid_arg "Signature.allowed_link: invalid site identifier"
   )
 
-let add_incr counters =
-  let annot = Locality.dummy in
-  let a_port = "a", annot in
-  let b_port = "b", annot in
-  let incr = "__incr", Locality.dummy in
-  let after = a_port, (NamedDecls.create [||], [ b_port, incr ], None) in
-  let before_lnks =
-    List.fold_right
-      (fun (ag, counts) acc -> List.map (fun c -> c, ag) counts @ acc)
-      counters
-      [ a_port, incr ]
-  in
-  let before = b_port, (NamedDecls.create [||], before_lnks, None) in
-  let lnks = NamedDecls.create [| after; before |] in
-  let counter_agent = incr, lnks in
-  counter_agent
-
-let create ~counters contact_map sigs =
-  let sigs' =
-    if counters <> [] then
-      add_incr counters :: sigs
-    else
-      sigs
-  in
-  let t = Array.of_list sigs' in
-  let raw = NamedDecls.create t in
-  let s = Array.length t in
-  let snd_of_third (_, a, _) = a in
+let create ~counters_per_agent agent_sigs =
   {
-    t =
-      NamedDecls.mapi
-        (fun ag ag_na ->
-          NamedDecls.mapi (fun _ si_na (ints, links, counts) ->
-              if not contact_map then
-                ints, None, counts
-              else (
-                let out =
-                  Array.init (s - ag) (fun i ->
-                      Array.make
-                        (NamedDecls.size (snd raw.NamedDecls.decls.(i + ag)))
-                        false)
-                in
-                let () =
-                  List.iter
-                    (fun (((site_name, pos) as site), ((agent_name, _) as agent)) ->
-                      let a = NamedDecls.elt_id ~kind:"agent" raw agent in
-                      let s =
-                        num_of_site ~agent_name site
-                          (snd raw.NamedDecls.decls.(a))
-                      in
-                      let () = if a >= ag then out.(a - ag).(s) <- true in
-                      if
-                        List.exists
-                          (fun ((x, _), (y, _)) -> x = si_na && y = ag_na)
-                          (snd_of_third
-                             (snd
-                                (snd raw.NamedDecls.decls.(a)).NamedDecls.decls.(
-                                s)))
-                      then
-                        ()
-                      else
-                        raise
-                          (ExceptionDefn.Malformed_Decl
-                             ( Format.asprintf "No link to %s.%s from %s.%s."
-                                 si_na ag_na site_name agent_name,
-                               pos )))
-                    links
-                in
-                ints, Some out, counts
-              )))
-        raw;
-    incr =
-      (if counters = [] then
+    agent_sigs;
+    counter_agent_info =
+      (if counters_per_agent = [] then
          None
        else
-         Some 0);
-    incr_sites =
-      (if counters = [] then
-         None
-       else
-         Some (0, 1));
+         (* If there is a counter agent, we choose 0 for its agent id and 0 and 1 as its port ids *)
+         Some { id = 0; arity = 2; ports = 0, 1 });
   }
+
+let is_counter_agent sigs n_id =
+  match sigs.counter_agent_info with
+  | None -> false
+  | Some agent_info -> n_id = agent_info.id
+
+let ports_if_counter_agent sigs n_id =
+  match sigs.counter_agent_info with
+  | None -> None
+  | Some agent_info ->
+    if n_id = agent_info.id then
+      Some agent_info.ports
+    else
+      None
+
+let site_is_counter sigs ag_ty id =
+  counter_of_site_id id (get sigs ag_ty) <> None
+
+let get_counter_agent_info sigs =
+  match sigs.counter_agent_info with
+  | None -> failwith "No counter agent"
+  | Some counter_agent_info -> counter_agent_info
 
 let print_agent sigs f ag_ty =
   Format.pp_print_string f @@ agent_of_num ag_ty sigs
@@ -265,11 +253,12 @@ let print_site_internal_state sigs ag_ty site f = function
       (internal_state_of_id ag_ty site id sigs)
 
 let print_counter sigs ag_ty f id =
-  match counter_of_site id (get sigs ag_ty) with
+  match counter_of_site_id id (get sigs ag_ty) with
   | None -> ()
   | Some (c1, c2) -> Format.fprintf f "{=%d/+=%d}" c1 c2
 
-let print_one ?sigs i f sign =
+let print_one ?(sigs : s option) (i : int) (f : Format.formatter)
+    (signature : t) =
   let pp_int f x =
     if NamedDecls.size x > 0 then
       Format.fprintf f "{%a}"
@@ -299,53 +288,31 @@ let print_one ?sigs i f sign =
   in
   (NamedDecls.print
      ~sep:(fun f -> Format.fprintf f ",@,")
-     (fun _ name f (ints, links, counts) ->
-       Format.fprintf f "%s%a%a%a" name pp_int ints (pp_link i) links pp_counts
-         counts))
-    f sign
+     (fun _ name f site_sig ->
+       Format.fprintf f "%s%a%a%a" name pp_int site_sig.internal_state
+         (pp_link i) site_sig.links pp_counts site_sig.counters_info))
+    f signature
 
 let print f sigs =
   Format.fprintf f "@[<v>%a@]"
     (NamedDecls.print ~sep:Pp.space (fun i n f si ->
          Format.fprintf f "@[<h>%%agent: %s(%a)@]" n (print_one ~sigs i) si))
-    sigs.t
+    sigs.agent_sigs
 
-let to_json sigs = NamedDecls.to_json one_to_json sigs.t
+let to_json sigs = NamedDecls.to_json one_to_json sigs.agent_sigs
 
 let of_json v =
-  let t = NamedDecls.of_json one_of_json v in
-  let incr, incr_sites =
-    match Mods.StringMap.find_option "__incr" t.NamedDecls.finder with
-    | Some incr_id ->
-      let incr = snd t.NamedDecls.decls.(incr_id) in
-      let after = num_of_site ("a", Locality.dummy) incr in
-      let before = num_of_site ("b", Locality.dummy) incr in
-      Some incr_id, Some (before, after)
-    | None -> None, None
+  let agent_sigs : 'a site_sig NamedDecls.t NamedDecls.t =
+    NamedDecls.of_json one_of_json v
   in
-  { t; incr; incr_sites }
-
-let is_counter_agent sigs n_id =
-  match sigs.incr with
-  | None -> false
-  | Some incr_id -> n_id = incr_id
-
-let ports_if_counter_agent sigs n_id =
-  if
-    match sigs.incr with
-    | None -> false
-    | Some incr_id -> n_id = incr_id
-  then
-    sigs.incr_sites
-  else
-    None
-
-let site_is_counter sigs ag_ty id = counter_of_site id (get sigs ag_ty) <> None
-
-let incr_agent sigs =
-  match sigs.incr with
-  | None -> failwith "No incr agent"
+  match
+    Mods.StringMap.find_option "__counter_agent" agent_sigs.NamedDecls.finder
+  with
   | Some id ->
-    (match sigs.incr_sites with
-    | None -> failwith "Signature of counter inconsistent"
-    | Some (before, after) -> id, 2, before, after)
+    let agent_signature = NamedDecls.elt_val agent_sigs id in
+    let ports =
+      ( num_of_site ("a", Loc.dummy) agent_signature,
+        num_of_site ("b", Loc.dummy) agent_signature )
+    in
+    { agent_sigs; counter_agent_info = Some { id; arity = 2; ports } }
+  | None -> { agent_sigs; counter_agent_info = None }

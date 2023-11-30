@@ -11,7 +11,7 @@ type t = {
   mutable domainOutputFile: string option;
   mutable traceFile: string option;
   mutable logFile: string option;
-  mutable compileMode: bool;
+  mutable compile_mode: bool;
   mutable sharing: Pattern.sharing_level;
   mutable showEfficiency: bool;
   mutable timeIndependent: bool;

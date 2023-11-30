@@ -6,38 +6,48 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+(** Module for type Loc.t annotating structured data with the line range
+ * in a file which was used to define it *)
+
 type position = { chr: int; line: int }
-type range = { file: string; from_position: position; to_position: position }
-type t = range
-type 'a annot = 'a * t
-type 'a maybe = ?pos:t -> 'a
+type t = { file: string; from_position: position; to_position: position }
+type 'a annoted = 'a * t
+
+val v : 'a annoted -> 'a
+(** Extract value from Loc.annoted *)
+
+val get_annot : 'a annoted -> t
+(** Extract annotation from Loc.annoted *)
 
 val of_pos : Lexing.position -> Lexing.position -> t
 val dummy : t
-val dummy_annot : 'a -> 'a annot
-val has_dummy_annot : 'a annot -> bool
+val annot_with_dummy : 'a -> 'a annoted
+val is_annoted_with_dummy : 'a annoted -> bool
 
-val merge : range -> range -> range
+val merge : t -> t -> t
 (** [merge b e] creates the range from beginning of [b] to the end of [e]
  (filename must match) *)
 
-val is_included_in : string -> position -> range -> bool
+val is_included_in : string -> position -> t -> bool
+
+(** {2 I/O} *)
+
 val to_string : t -> string
 val print : Format.formatter -> t -> unit
 
-val print_annot :
-  (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a annot -> unit
+val print_annoted :
+  (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a annoted -> unit
 
-val annot_of_yojson :
+val annoted_of_yojson :
   ?filenames:string array ->
   (Yojson.Basic.t -> 'a) ->
   Yojson.Basic.t ->
-  'a annot
+  'a annoted
 
-val annot_to_yojson :
+val yojson_of_annoted :
   ?filenames:int Mods.StringMap.t ->
   ('a -> Yojson.Basic.t) ->
-  'a annot ->
+  'a annoted ->
   Yojson.Basic.t
 
 val write_position : Buffer.t -> position -> unit

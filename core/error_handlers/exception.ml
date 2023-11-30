@@ -61,7 +61,7 @@ let warn_with_exn parameters error_handler ?to_ui (file, line, _, _)
   let pos =
     match pos with
     | None -> ""
-    | Some s -> ", " ^ Locality.to_string s
+    | Some s -> ", " ^ Loc.to_string s
   in
   warn_aux parameters error_handler ?to_ui (Some file)
     (Some ("line " ^ string_of_int line ^ pos ^ liaison ^ message))
@@ -177,7 +177,7 @@ let check_point
       ?to_ui:bool ->
       'a ->
       ?message:string ->
-      ?pos:Locality.t ->
+      ?pos:Loc.t ->
       exn ->
       unit ->
       method_handler * unit) parameter error error' s ?to_ui ?message ?pos exn =

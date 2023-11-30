@@ -16,7 +16,7 @@ module Int_Set_and_Map : Map_wrapper.S_with_logs with type elt = int
 
 (***************************************************************************)
 
-type position = Locality.t
+type position = Loc.t
 type agent_name = string
 type site_name = string
 type internal_state = string
@@ -50,7 +50,7 @@ val dummy_agent_id : c_agent_id
 val dummy_link_value : c_link_value
 val dummy_site_name_1 : c_site_name
 val dummy_site_name_minus1 : c_site_name
-val next_lnk_value : c_link_value -> c_link_value
+val next_link_value : c_link_value -> c_link_value
 val fst_site : c_site_name
 val snd_site : c_site_name
 val dummy_state_index_1 : c_state
@@ -120,9 +120,9 @@ type mixture =
   | EMPTY_MIX
 
 and agent = {
-  ag_nme: string;
+  agent_name: string;
   ag_intf: interface;
-  ag_nme_pos: position; (*; ag_pos:position*)
+  agent_name_pos: position; (*; ag_pos:position*)
 }
 
 and interface =
@@ -131,16 +131,16 @@ and interface =
   | COUNTER_SEP of counter * interface
 
 and port = {
-  port_nme: string;
+  port_name: string;
   port_int: internal;
-  port_lnk: link;
+  port_link: link;
   port_free: bool option;
 }
 
 and counter = {
-  count_nme: string;
-  count_test: counter_test option;
-  count_delta: int option;
+  counter_name: string;
+  counter_test: counter_test option;
+  counter_delta: int option;
 }
 
 and counter_test = CEQ of int | CGTE of int | CVAR of string | UNKNOWN
@@ -151,7 +151,7 @@ and link =
   | FREE
   | LNK_ANY of position
   | LNK_SOME of position
-  | LNK_TYPE of (string Locality.annot * string Locality.annot)
+  | LNK_TYPE of (string Loc.annoted * string Loc.annoted)
   | LNK_MISSING
 
 val skip_only : mixture -> bool
@@ -159,7 +159,7 @@ val skip_only : mixture -> bool
 type direction = Direct | Reverse
 
 type 'pattern rule = {
-  position: Locality.t;
+  position: Loc.t;
   prefix: int;
   interprete_delta: direction;
   delta: int;
@@ -170,8 +170,8 @@ type 'pattern rule = {
       substract delta to agents with id >= prefix in the lhs *)
   lhs: 'pattern;
   rhs: 'pattern;
-  k_def: ('pattern, string) Alg_expr.e Locality.annot;
-  k_un: ('pattern, string) Alg_expr.e Locality.annot option;
+  k_def: ('pattern, string) Alg_expr.e Loc.annoted;
+  k_un: ('pattern, string) Alg_expr.e Loc.annoted option;
   ast: string;
   ast_no_rate: string;
   original_ast: string;
@@ -425,7 +425,7 @@ type c_compil = {
   c_init: enriched_init Int_storage.Nearly_inf_Imperatif.t;
   (*initial graph declaration*)
   c_perturbations:
-    (c_mixture Locality.annot, enriched_rule) perturbation
+    (c_mixture Loc.annoted, enriched_rule) perturbation
     Int_storage.Nearly_inf_Imperatif.t;
 }
 

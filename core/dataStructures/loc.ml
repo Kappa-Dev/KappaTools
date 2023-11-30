@@ -7,10 +7,11 @@
 (******************************************************************************)
 
 type position = { chr: int; line: int }
-type range = { file: string; from_position: position; to_position: position }
-type t = range
-type 'a annot = 'a * t
-type 'a maybe = ?pos:t -> 'a
+type t = { file: string; from_position: position; to_position: position }
+type 'a annoted = 'a * t
+
+let v (v, _) = v
+let get_annot (_, annot) = annot
 
 let of_pos start_location end_location =
   let () =
@@ -43,14 +44,14 @@ let dummy =
     to_position = dummy_position;
   }
 
-let dummy_annot x = x, dummy
+let annot_with_dummy x = x, dummy
 
 let is_dummy loc =
   loc.file = Lexing.dummy_pos.Lexing.pos_fname
   && loc.from_position = dummy_position
   && loc.to_position = dummy_position
 
-let has_dummy_annot (_, loc) = is_dummy loc
+let is_annoted_with_dummy (_, loc) = is_dummy loc
 
 let print f loc =
   let pr_f f =
@@ -66,7 +67,7 @@ let print f loc =
     loc.to_position.chr
 
 let to_string loc = Format.asprintf "@[<h>%a@]" print loc
-let print_annot pr f (x, l) = Format.fprintf f "%a@ %a" print l pr x
+let print_annoted pr f (x, l) = Format.fprintf f "%a@ %a" print l pr x
 
 let read_position p lb =
   match Yojson.Basic.from_lexbuf ~stream:true p lb with
@@ -141,14 +142,14 @@ let of_compact_yojson ?(filenames = [||]) = function
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST arrow_notation", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location", x))
 
-let annot_to_yojson ?filenames f (x, l) =
+let yojson_of_annoted ?filenames f (x, l) =
   let jp = to_compact_yojson filenames l in
   if jp = `Null then
     `Assoc [ "val", f x ]
   else
     `Assoc [ "val", f x; "loc", jp ]
 
-let annot_of_yojson ?filenames f = function
+let annoted_of_yojson ?filenames f = function
   | `Assoc [ ("val", x); ("loc", l) ] | `Assoc [ ("loc", l); ("val", x) ] ->
     f x, of_compact_yojson ?filenames l
   | `Assoc [ ("val", x) ] -> f x, dummy

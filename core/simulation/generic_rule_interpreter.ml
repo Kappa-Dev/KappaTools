@@ -170,30 +170,30 @@ module Make (Instances : Instances_sig.S) = struct
     let () = initial_activity ~outputs env counter cand in
     cand
 
-  let concrete_actions_for_incomplete_inj ~debugMode rule matching =
+  let concrete_actions_for_incomplete_inj ~debug_mode rule matching =
     let abstract_actions =
       rule.Primitives.instantiations.Instantiation.actions
     in
     let inj = matching, Mods.IntMap.empty in
     List_util.map_option
-      (Instantiation.try_concretize_action ~debugMode inj)
+      (Instantiation.try_concretize_action ~debug_mode inj)
       abstract_actions
 
-  let concrete_tests ~debugMode rule matching =
+  let concrete_tests ~debug_mode rule matching =
     let abstract_tests =
       rule.Primitives.instantiations.Instantiation.tests |> List.concat
     in
     let inj = matching, Mods.IntMap.empty in
-    List.map (Instantiation.concretize_test ~debugMode inj) abstract_tests
+    List.map (Instantiation.concretize_test ~debug_mode inj) abstract_tests
 
-  let is_blocked ~debugMode state ?rule_id rule matching =
+  let is_blocked ~debug_mode state ?rule_id rule matching =
     match state.events_to_block with
     | None -> false
     | Some to_block ->
       let actions =
-        concrete_actions_for_incomplete_inj ~debugMode rule matching
+        concrete_actions_for_incomplete_inj ~debug_mode rule matching
       in
-      let tests = concrete_tests ~debugMode rule matching in
+      let tests = concrete_tests ~debug_mode rule matching in
       to_block rule_id matching tests actions
 
   let set_events_to_block predicate state =
@@ -204,23 +204,23 @@ module Make (Instances : Instances_sig.S) = struct
       unary_candidates = Mods.IntMap.empty;
     }
 
-  let instance_to_matching ~debugMode domain edges instance patterns =
+  let instance_to_matching ~debug_mode domain edges instance patterns =
     Tools.array_fold_lefti
       (fun i matching root ->
         match matching with
         | None -> None
         | Some matching ->
-          Matching.reconstruct ~debugMode domain edges matching i patterns.(i)
+          Matching.reconstruct ~debug_mode domain edges matching i patterns.(i)
             root)
       (Some Matching.empty) instance
 
-  let all_injections ~debugMode ?excp ?unary_rate ?rule_id state_insts domain
+  let all_injections ~debug_mode ?excp ?unary_rate ?rule_id state_insts domain
       edges patterna =
     let out =
       Instances.fold_instances ?excp ?rule_id state_insts patterna ~init:[]
         (fun instance acc ->
           match
-            instance_to_matching ~debugMode domain edges instance patterna
+            instance_to_matching ~debug_mode domain edges instance patterna
           with
           | None -> acc
           | Some matching ->
@@ -245,7 +245,7 @@ module Make (Instances : Instances_sig.S) = struct
   let pop_exact_matchings matchings_of_rule rule =
     snd (Mods.IntMap.pop rule matchings_of_rule)
 
-  let pick_a_rule_instance ~debugMode state random_state domain edges ?rule_id
+  let pick_a_rule_instance ~debug_mode state random_state domain edges ?rule_id
       rule =
     let from_patterns () =
       let pats = rule.Primitives.connected_components in
@@ -253,7 +253,7 @@ module Make (Instances : Instances_sig.S) = struct
         pats ~init:(Matching.empty, [], None)
         (fun id pattern root (inj, rev_roots, _) ->
           match
-            Matching.reconstruct ~debugMode domain edges inj id pattern root
+            Matching.reconstruct ~debug_mode domain edges inj id pattern root
           with
           | None -> None
           | Some inj' -> Some (inj', root :: rev_roots, None))
@@ -268,10 +268,10 @@ module Make (Instances : Instances_sig.S) = struct
         Some (a, b, None)
       | None -> from_patterns ())
 
-  let adjust_rule_instances ~debugMode ~rule_id ?unary_rate state domain edges
+  let adjust_rule_instances ~debug_mode ~rule_id ?unary_rate state domain edges
       ccs rule =
     let matches =
-      all_injections ~debugMode ?unary_rate ~rule_id state.imp.instances domain
+      all_injections ~debug_mode ?unary_rate ~rule_id state.imp.instances domain
         edges ccs
     in
     let matches =
@@ -280,7 +280,7 @@ module Make (Instances : Instances_sig.S) = struct
       else
         matches
         |> List.filter (fun (matching, _) ->
-               not (is_blocked ~debugMode state ~rule_id rule matching))
+               not (is_blocked ~debug_mode state ~rule_id rule matching))
     in
     ( List.length matches,
       {
@@ -327,7 +327,7 @@ module Make (Instances : Instances_sig.S) = struct
     in
     va, (nb_rectangular_instances_by_cc', unary_candidates')
 
-  let pick_a_unary_rule_instance ~debugMode state random_state domain edges
+  let pick_a_unary_rule_instance ~debug_mode state random_state domain edges
       ~rule_id rule =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
     | Some l ->
@@ -348,25 +348,25 @@ module Make (Instances : Instances_sig.S) = struct
       let root1, root2 = pick_unary_instance_in_cc cc_id in
 
       let () =
-        if debugMode then Format.printf "@[On roots:@ %i@ %i@]@." root1 root2
+        if debug_mode then Format.printf "@[On roots:@ %i@ %i@]@." root1 root2
       in
       let pattern1 = rule.Primitives.connected_components.(0) in
       let pattern2 = rule.Primitives.connected_components.(1) in
       let inj1 =
-        Matching.reconstruct ~debugMode domain edges Matching.empty 0 pattern1
+        Matching.reconstruct ~debug_mode domain edges Matching.empty 0 pattern1
           root1
       in
       (match inj1 with
       | None -> None
       | Some inj ->
         (match
-           Matching.reconstruct ~debugMode domain edges inj 1 pattern2 root2
+           Matching.reconstruct ~debug_mode domain edges inj 1 pattern2 root2
          with
         | None -> None
         | Some inj_out -> Some (inj_out, [ root2; root1 ], None)))
 
-  let adjust_unary_rule_instances ~debugMode ~rule_id ?max_distance state domain
-      graph pats rule =
+  let adjust_unary_rule_instances ~debug_mode ~rule_id ?max_distance state
+      domain graph pats rule =
     let pattern1 = pats.(0) in
     let pattern2 = pats.(1) in
     let cands, len =
@@ -374,14 +374,15 @@ module Make (Instances : Instances_sig.S) = struct
         (pattern1, pattern2) ~init:([], 0)
         (fun (root1, root2) ((list, len) as out) ->
           let inj1 =
-            Matching.reconstruct ~debugMode domain graph Matching.empty 0
+            Matching.reconstruct ~debug_mode domain graph Matching.empty 0
               pattern1 root1
           in
           match inj1 with
           | None -> out
           | Some inj ->
             (match
-               Matching.reconstruct ~debugMode domain graph inj 1 pattern2 root2
+               Matching.reconstruct ~debug_mode domain graph inj 1 pattern2
+                 root2
              with
             | None -> out
             | Some inj' ->
@@ -394,7 +395,7 @@ module Make (Instances : Instances_sig.S) = struct
                  with
                 | None -> out
                 | Some _ as p ->
-                  if is_blocked ~debugMode state ~rule_id rule inj' then
+                  if is_blocked ~debug_mode state ~rule_id rule inj' then
                     out
                   else
                     (inj', [ root2; root1 ], p) :: list, succ len))))
@@ -412,7 +413,7 @@ module Make (Instances : Instances_sig.S) = struct
     Format.fprintf f "@[<v>%a@,%a@]"
       (Pp.list Pp.space (fun f (i, mix) ->
            Format.fprintf f "%%init: %i @[<h>%a@]" i User_graph.print_cc mix))
-      (Edges.build_user_snapshot ~debugMode:false ~raw:false sigs state.edges)
+      (Edges.build_user_snapshot ~debug_mode:false ~raw:false sigs state.edges)
       (Pp.array Pp.space (fun i f el ->
            Format.fprintf f "%%init: %a %a" Nbr.print el
              (Model.print_token ~env) i))
@@ -468,12 +469,12 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.PositiveInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "PositiveInternalized in negative update"))
+           (Loc.annot_with_dummy "PositiveInternalized in negative update"))
     | Primitives.Transformation.NegativeInternalized ((id, _), s) ->
       let _, edges' = Edges.remove_internal id s edges in
       side_effects, edges'
 
-  let apply_positive_transformation ~debugMode sigs ?mod_connectivity_store
+  let apply_positive_transformation ~debug_mode sigs ?mod_connectivity_store
       instances (inj2graph, side_effects, edges) = function
     | Primitives.Transformation.Agent n ->
       let nc, inj2graph', edges' =
@@ -484,7 +485,7 @@ module Make (Instances : Instances_sig.S) = struct
       (inj2graph', side_effects, edges'), Primitives.Transformation.Agent nc
     | Primitives.Transformation.Freed (n, s) ->
       (*(n,s)-bottom*)
-      let ((id, _) as nc) = Matching.Agent.concretize ~debugMode inj2graph n in
+      let ((id, _) as nc) = Matching.Agent.concretize ~debug_mode inj2graph n in
       (*(A,23)*)
       let edges' = Edges.add_free id s edges in
       let side_effects' =
@@ -492,8 +493,8 @@ module Make (Instances : Instances_sig.S) = struct
       in
       (inj2graph, side_effects', edges'), Primitives.Transformation.Freed (nc, s)
     | Primitives.Transformation.Linked ((n, s), (n', s')) ->
-      let nc = Matching.Agent.concretize ~debugMode inj2graph n in
-      let nc' = Matching.Agent.concretize ~debugMode inj2graph n' in
+      let nc = Matching.Agent.concretize ~debug_mode inj2graph n in
+      let nc' = Matching.Agent.concretize ~debug_mode inj2graph n' in
       let edges', modif_cc = Edges.add_link nc s nc' s' edges in
       let side_effects' =
         List_util.smart_filter
@@ -506,16 +507,16 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "NegativeWhatEver in positive update"))
+           (Loc.annot_with_dummy "NegativeWhatEver in positive update"))
     | Primitives.Transformation.PositiveInternalized (n, s, i) ->
-      let ((id, _) as nc) = Matching.Agent.concretize ~debugMode inj2graph n in
+      let ((id, _) as nc) = Matching.Agent.concretize ~debug_mode inj2graph n in
       let edges' = Edges.add_internal id s i edges in
       ( (inj2graph, side_effects, edges'),
         Primitives.Transformation.PositiveInternalized (nc, s, i) )
     | Primitives.Transformation.NegativeInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "NegativeInternalized in positive update"))
+           (Loc.annot_with_dummy "NegativeInternalized in positive update"))
 
   let apply_concrete_positive_transformation sigs ?mod_connectivity_store
       instances edges = function
@@ -533,37 +534,37 @@ module Make (Instances : Instances_sig.S) = struct
     | Primitives.Transformation.NegativeWhatEver _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "NegativeWhatEver in positive update"))
+           (Loc.annot_with_dummy "NegativeWhatEver in positive update"))
     | Primitives.Transformation.PositiveInternalized ((id, _), s, i) ->
       let edges' = Edges.add_internal id s i edges in
       edges'
     | Primitives.Transformation.NegativeInternalized _ ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot "NegativeInternalized in positive update"))
+           (Loc.annot_with_dummy "NegativeInternalized in positive update"))
 
-  let obs_from_transformation ~debugMode domain edges acc = function
+  let obs_from_transformation ~debug_mode domain edges acc = function
     | Primitives.Transformation.Agent nc ->
       Matching.observables_from_agent domain edges acc nc
     | Primitives.Transformation.Freed (nc, s) ->
       (*(n,s)-bottom*)
-      Matching.observables_from_free ~debugMode domain edges acc nc s
+      Matching.observables_from_free ~debug_mode domain edges acc nc s
     | Primitives.Transformation.Linked ((nc, s), (nc', s')) ->
-      Matching.observables_from_link ~debugMode domain edges acc nc s nc' s'
+      Matching.observables_from_link ~debug_mode domain edges acc nc s nc' s'
     | Primitives.Transformation.PositiveInternalized (nc, s, i) ->
-      Matching.observables_from_internal ~debugMode domain edges acc nc s i
+      Matching.observables_from_internal ~debug_mode domain edges acc nc s i
     | Primitives.Transformation.NegativeInternalized (((id, _) as nc), s) ->
       let i = Edges.get_internal id s edges in
-      Matching.observables_from_internal ~debugMode domain edges acc nc s i
+      Matching.observables_from_internal ~debug_mode domain edges acc nc s i
     | Primitives.Transformation.NegativeWhatEver (((id, _) as nc), s) ->
       (match Edges.link_destination id s edges with
-      | None -> Matching.observables_from_free ~debugMode domain edges acc nc s
+      | None -> Matching.observables_from_free ~debug_mode domain edges acc nc s
       | Some (nc', s') ->
-        Matching.observables_from_link ~debugMode domain edges acc nc s nc' s')
+        Matching.observables_from_link ~debug_mode domain edges acc nc s nc' s')
 
-  let obs_from_transformations ~debugMode domain edges trans =
+  let obs_from_transformations ~debug_mode domain edges trans =
     List.fold_left
-      (obs_from_transformation ~debugMode domain edges)
+      (obs_from_transformation ~debug_mode domain edges)
       (([], Operator.DepSet.empty), Matching.empty_cache)
       trans
     |> fst
@@ -622,12 +623,12 @@ module Make (Instances : Instances_sig.S) = struct
     | Trace.PERT p, x ->
       Trace.Pert (p, x, Counter.current_simulation_info counter)
 
-  let store_event ~debugMode counter inj2graph new_tracked_obs_instances
+  let store_event ~debug_mode counter inj2graph new_tracked_obs_instances
       event_kind ?path extra_side_effects rule outputs = function
     | None -> ()
     | Some _ ->
       let cevent =
-        Instantiation.concretize_event ~debugMode inj2graph
+        Instantiation.concretize_event ~debug_mode inj2graph
           rule.Primitives.instantiations
       in
       let full_concrete_event =
@@ -656,7 +657,7 @@ module Make (Instances : Instances_sig.S) = struct
             (Data.TraceStep (Trace.Obs (i, x, Counter.next_story counter))))
         new_tracked_obs_instances
 
-  let get_species_obs ~debugMode sigs edges obs acc tracked =
+  let get_species_obs ~debug_mode sigs edges obs acc tracked =
     List.fold_left
       (fun acc (pattern, (root, _)) ->
         try
@@ -668,7 +669,7 @@ module Make (Instances : Instances_sig.S) = struct
                     Pattern.compare_canonicals pid pattern = 0 || ok)
                   false patterns
               then (
-                let spec = Edges.species ~debugMode sigs root edges in
+                let spec = Edges.species ~debug_mode sigs root edges in
                 (fn, patterns, spec) :: acc
               ) else
                 acc)
@@ -677,7 +678,7 @@ module Make (Instances : Instances_sig.S) = struct
         with Not_found -> acc)
       acc obs
 
-  let store_obs ~debugMode domain edges instances obs acc = function
+  let store_obs ~debug_mode domain edges instances obs acc = function
     | None -> acc
     | Some tracked ->
       List.fold_left
@@ -690,20 +691,20 @@ module Make (Instances : Instances_sig.S) = struct
                     let tests' =
                       List.map
                         (List.map
-                           (Instantiation.concretize_test ~debugMode
+                           (Instantiation.concretize_test ~debug_mode
                               (inj, Mods.IntMap.empty)))
                         tests
                     in
                     (ev, tests') :: acc)
                   acc
-                  (all_injections ~debugMode instances ~excp:(pattern, root)
+                  (all_injections ~debug_mode instances ~excp:(pattern, root)
                      domain edges patterns))
               acc
               (Pattern.ObsMap.get tracked pattern)
           with Not_found -> acc)
         acc obs
 
-  let update_edges ~debugMode outputs counter domain inj_nodes state event_kind
+  let update_edges ~debug_mode outputs counter domain inj_nodes state event_kind
       ?path rule sigs =
     let () = assert (not state.outdated) in
     let () = state.outdated <- true in
@@ -711,13 +712,13 @@ module Make (Instances : Instances_sig.S) = struct
     (*Negative update*)
     let concrete_removed =
       List.map
-        (Primitives.Transformation.concretize ~debugMode
+        (Primitives.Transformation.concretize ~debug_mode
            (inj_nodes, Mods.IntMap.empty))
         rule.Primitives.removed
     in
     let (del_obs, del_deps), _ =
       List.fold_left
-        (obs_from_transformation ~debugMode domain state.edges)
+        (obs_from_transformation ~debug_mode domain state.edges)
         (([], Operator.DepSet.empty), Matching.empty_cache)
         concrete_removed
     in
@@ -740,7 +741,7 @@ module Make (Instances : Instances_sig.S) = struct
       List.fold_left
         (fun (x, p) h ->
           let x', h' =
-            apply_positive_transformation ~debugMode
+            apply_positive_transformation ~debug_mode
               (Pattern.Env.signatures domain)
               ~mod_connectivity_store state.imp.instances x h
           in
@@ -757,7 +758,7 @@ module Make (Instances : Instances_sig.S) = struct
     in
     let (new_obs, new_deps), _ =
       List.fold_left
-        (obs_from_transformation ~debugMode domain edges'')
+        (obs_from_transformation ~debug_mode domain edges'')
         (([], Operator.DepSet.empty), Matching.empty_cache)
         concrete_inserted'
     in
@@ -771,17 +772,17 @@ module Make (Instances : Instances_sig.S) = struct
     in
     (*Store event*)
     let new_tracked_obs_instances =
-      store_obs ~debugMode domain edges'' state.imp.instances new_obs []
+      store_obs ~debug_mode domain edges'' state.imp.instances new_obs []
         state.imp.story_machinery
     in
     let () =
-      store_event ~debugMode counter final_inj2graph new_tracked_obs_instances
+      store_event ~debug_mode counter final_inj2graph new_tracked_obs_instances
         event_kind ?path remaining_side_effects rule outputs
         state.imp.story_machinery
     in
     (*Print species*)
     let species =
-      get_species_obs ~debugMode sigs edges'' new_obs [] state.imp.species
+      get_species_obs ~debug_mode sigs edges'' new_obs [] state.imp.species
     in
     let () =
       List.iter
@@ -804,7 +805,7 @@ module Make (Instances : Instances_sig.S) = struct
       events_to_block = state.events_to_block;
     }
 
-  let update_edges_from_actions ~debugMode ~outputs sigs counter domain state
+  let update_edges_from_actions ~debug_mode ~outputs sigs counter domain state
       (actions, side_effect_dst) =
     let () = assert (not state.outdated) in
     let () = state.outdated <- true in
@@ -817,7 +818,7 @@ module Make (Instances : Instances_sig.S) = struct
     in
     let (del_obs, del_deps), _ =
       List.fold_left
-        (obs_from_transformation ~debugMode domain state.edges)
+        (obs_from_transformation ~debug_mode domain state.edges)
         (([], Operator.DepSet.empty), Matching.empty_cache)
         concrete_removed
     in
@@ -850,7 +851,7 @@ module Make (Instances : Instances_sig.S) = struct
     in
     let (new_obs, new_deps), _ =
       List.fold_left
-        (obs_from_transformation ~debugMode domain edges')
+        (obs_from_transformation ~debug_mode domain edges')
         (([], Operator.DepSet.empty), Matching.empty_cache)
         concrete_inserted
     in
@@ -864,7 +865,7 @@ module Make (Instances : Instances_sig.S) = struct
     in
     (*Print species*)
     let species =
-      get_species_obs ~debugMode sigs edges' new_obs [] state.imp.species
+      get_species_obs ~debug_mode sigs edges' new_obs [] state.imp.species
     in
     let () =
       List.iter
@@ -891,10 +892,10 @@ module Make (Instances : Instances_sig.S) = struct
 
   (* cc_va is the number of embeddings. It only has
      to be multiplied by the rate constant of the rule *)
-  let store_activity ~debugMode store env counter state id syntax_id rate cc_va
+  let store_activity ~debug_mode store env counter state id syntax_id rate cc_va
       =
     let () =
-      if debugMode then
+      if debug_mode then
         Format.printf "@[%sule %a has now %i instances.@]@."
           (if id mod 2 = 1 then
              "Unary r"
@@ -924,7 +925,7 @@ module Make (Instances : Instances_sig.S) = struct
                     "Unary "
                   else
                     "")
-                 (Model.print_rule ~noCounters:debugMode ~env)
+                 (Model.print_rule ~noCounters:debug_mode ~env)
                  id act,
                Model.get_ast_rule_rate_pos ~unary env syntax_id ))
       )
@@ -933,7 +934,7 @@ module Make (Instances : Instances_sig.S) = struct
     let () = set_activity id act state in
     store syntax_id old_act act
 
-  let update_outdated_activities ~debugMode store env counter state known_perts
+  let update_outdated_activities ~debug_mode store env counter state known_perts
       =
     let () = assert (not state.outdated) in
     let unary_rule_update modified_cc instances i pack rule =
@@ -944,7 +945,7 @@ module Make (Instances : Instances_sig.S) = struct
           compute_unary_number instances pack modified_cc rule i
         in
         let () =
-          store_activity ~debugMode store env counter state
+          store_activity ~debug_mode store env counter state
             ((2 * i) + 1)
             rule.Primitives.syntactic_rule (fst unrate) (Int64.to_int va)
         in
@@ -965,7 +966,7 @@ module Make (Instances : Instances_sig.S) = struct
                 rule.Primitives.connected_components
             in
             let () =
-              store_activity ~debugMode store env counter state (2 * i)
+              store_activity ~debug_mode store env counter state (2 * i)
                 rule.Primitives.syntactic_rule (fst rule.Primitives.rate)
                 pattern_va
             in
@@ -1033,22 +1034,22 @@ module Make (Instances : Instances_sig.S) = struct
           state.outdated_elements injected';
     }
 
-  let transform_by_a_rule ~debugMode outputs env counter state event_kind ?path
+  let transform_by_a_rule ~debug_mode outputs env counter state event_kind ?path
       rule ?rule_id inj =
-    if is_blocked ~debugMode state ?rule_id rule inj then
+    if is_blocked ~debug_mode state ?rule_id rule inj then
       Blocked
     else (
       let state =
         update_tokens env counter state rule.Primitives.delta_tokens
       in
       let state =
-        update_edges ~debugMode outputs counter (Model.domain env) inj state
+        update_edges ~debug_mode outputs counter (Model.domain env) inj state
           event_kind ?path rule (Model.signatures env)
       in
       Success state
     )
 
-  let apply_given_unary_instance ~debugMode ~outputs ~rule_id env counter state
+  let apply_given_unary_instance ~debug_mode ~outputs ~rule_id env counter state
       event_kind rule = function
     | None -> Clash
     | Some (inj, _rev_roots, path) ->
@@ -1062,7 +1063,7 @@ module Make (Instances : Instances_sig.S) = struct
       in
       (match path with
       | Some _ ->
-        transform_by_a_rule ~debugMode outputs env counter state' event_kind
+        transform_by_a_rule ~debug_mode outputs env counter state' event_kind
           ~path rule ~rule_id inj
       | None ->
         let max_distance =
@@ -1085,8 +1086,8 @@ module Make (Instances : Instances_sig.S) = struct
               (fst (List.hd nodes.(1)))
               state.edges
           then
-            transform_by_a_rule ~debugMode outputs env counter state' event_kind
-              ~path:None rule ~rule_id inj
+            transform_by_a_rule ~debug_mode outputs env counter state'
+              event_kind ~path:None rule ~rule_id inj
           else
             Corrected
         else (
@@ -1095,17 +1096,17 @@ module Make (Instances : Instances_sig.S) = struct
           with
           | None -> Corrected
           | Some _ as path ->
-            transform_by_a_rule ~debugMode outputs env counter state' event_kind
-              ~path rule ~rule_id inj
+            transform_by_a_rule ~debug_mode outputs env counter state'
+              event_kind ~path rule ~rule_id inj
         ))
 
-  let apply_given_instance ~debugMode ~outputs ?rule_id env counter state
+  let apply_given_instance ~debug_mode ~outputs ?rule_id env counter state
       event_kind rule = function
     | None -> Clash
     | Some (inj, rev_roots, _path) ->
       let () = assert (not state.outdated) in
       let () =
-        if debugMode then (
+        if debug_mode then (
           let roots = Tools.array_rev_of_list rev_roots in
           Format.printf "@[On roots:@ @[%a@]@]@."
             (Pp.array Pp.space (fun _ -> Format.pp_print_int))
@@ -1114,8 +1115,8 @@ module Make (Instances : Instances_sig.S) = struct
       in
       (match rule.Primitives.unary_rate with
       | None ->
-        transform_by_a_rule ~debugMode outputs env counter state event_kind rule
-          ?rule_id inj
+        transform_by_a_rule ~debug_mode outputs env counter state event_kind
+          rule ?rule_id inj
       | Some (_, max_distance) ->
         (match max_distance with
         | None ->
@@ -1124,7 +1125,7 @@ module Make (Instances : Instances_sig.S) = struct
             if Edges.in_same_connected_component root0 root1 state.edges then
               Corrected
             else
-              transform_by_a_rule ~debugMode outputs env counter state
+              transform_by_a_rule ~debug_mode outputs env counter state
                 event_kind rule ?rule_id inj
           | _ -> failwith "apply_given_rule unary rule without 2 patterns")
         | Some dist ->
@@ -1139,25 +1140,25 @@ module Make (Instances : Instances_sig.S) = struct
                nodes.(1)
            with
           | None ->
-            transform_by_a_rule ~debugMode outputs env counter state event_kind
+            transform_by_a_rule ~debug_mode outputs env counter state event_kind
               rule ?rule_id inj
           | Some _ -> Corrected)))
 
-  let apply_given_rule ~debugMode ~outputs ?rule_id env counter state event_kind
-      rule =
+  let apply_given_rule ~debug_mode ~outputs ?rule_id env counter state
+      event_kind rule =
     let domain = Model.domain env in
     let inst =
-      pick_a_rule_instance ~debugMode state state.imp.random_state domain
+      pick_a_rule_instance ~debug_mode state state.imp.random_state domain
         state.edges ?rule_id rule
     in
-    apply_given_instance ~debugMode ~outputs ?rule_id env counter state
+    apply_given_instance ~debug_mode ~outputs ?rule_id env counter state
       event_kind rule inst
 
-  let force_rule ~debugMode ~outputs env counter state event_kind ?rule_id rule
+  let force_rule ~debug_mode ~outputs env counter state event_kind ?rule_id rule
       =
     match
-      apply_given_rule ~debugMode ~outputs ?rule_id env counter state event_kind
-        rule
+      apply_given_rule ~debug_mode ~outputs ?rule_id env counter state
+        event_kind rule
     with
     | Success out -> Some out
     | Corrected | Blocked | Clash ->
@@ -1171,7 +1172,7 @@ module Make (Instances : Instances_sig.S) = struct
           | Some d -> Some (loc, Some (max_dist_to_int counter state d)))
       in
       (match
-         all_injections ~debugMode ?rule_id ?unary_rate state.imp.instances
+         all_injections ~debug_mode ?rule_id ?unary_rate state.imp.instances
            (Model.domain env) state.edges rule.Primitives.connected_components
        with
       | [] ->
@@ -1189,7 +1190,7 @@ module Make (Instances : Instances_sig.S) = struct
       | l ->
         let h, _ = List_util.random state.imp.random_state l in
         let out =
-          transform_by_a_rule ~debugMode outputs env counter state event_kind
+          transform_by_a_rule ~debug_mode outputs env counter state event_kind
             rule ?rule_id h
         in
         (match out with
@@ -1197,7 +1198,7 @@ module Make (Instances : Instances_sig.S) = struct
         | Blocked -> None
         | Clash | Corrected -> assert false))
 
-  let adjust_rule_instances ~debugMode ~rule_id env counter state rule =
+  let adjust_rule_instances ~debug_mode ~rule_id env counter state rule =
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
     let unary_rate =
@@ -1209,11 +1210,11 @@ module Make (Instances : Instances_sig.S) = struct
         | Some d -> Some (loc, Some (max_dist_to_int counter state d)))
     in
     let act, state =
-      adjust_rule_instances ~debugMode ~rule_id ?unary_rate state domain
+      adjust_rule_instances ~debug_mode ~rule_id ?unary_rate state domain
         state.edges rule.Primitives.connected_components rule
     in
     let () =
-      store_activity ~debugMode
+      store_activity ~debug_mode
         (fun _ _ _ -> ())
         env counter state (2 * rule_id) rule.Primitives.syntactic_rule
         (fst rule.Primitives.rate) act
@@ -1221,7 +1222,7 @@ module Make (Instances : Instances_sig.S) = struct
     state
 
   (* Redefines `adjust_unary_rule_instances` *)
-  let adjust_unary_rule_instances ~debugMode ~rule_id env counter state rule =
+  let adjust_unary_rule_instances ~debug_mode ~rule_id env counter state rule =
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
     let max_distance =
@@ -1231,14 +1232,14 @@ module Make (Instances : Instances_sig.S) = struct
         rule.Primitives.unary_rate
     in
     let act, state =
-      adjust_unary_rule_instances ~debugMode ~rule_id ?max_distance state domain
-        state.edges rule.Primitives.connected_components rule
+      adjust_unary_rule_instances ~debug_mode ~rule_id ?max_distance state
+        domain state.edges rule.Primitives.connected_components rule
     in
     let () =
       match rule.Primitives.unary_rate with
       | None -> assert false
       | Some (unrate, _) ->
-        store_activity ~debugMode
+        store_activity ~debug_mode
           (fun _ _ _ -> ())
           env counter state
           ((2 * rule_id) + 1)
@@ -1246,20 +1247,20 @@ module Make (Instances : Instances_sig.S) = struct
     in
     state
 
-  let incorporate_extra_pattern ~debugMode domain state pattern =
+  let incorporate_extra_pattern ~debug_mode domain state pattern =
     let () = assert (not state.outdated) in
     let () =
       Instances.incorporate_extra_pattern state.imp.instances pattern
-        (Matching.roots_of ~debugMode domain state.edges pattern)
+        (Matching.roots_of ~debug_mode domain state.edges pattern)
     in
     { state with outdated = false }
 
-  let snapshot ~debugMode ~raw env counter state =
+  let snapshot ~debug_mode ~raw env counter state =
     {
       Data.snapshot_event = Counter.current_event counter;
       Data.snapshot_time = Counter.current_time counter;
       Data.snapshot_agents =
-        Edges.build_user_snapshot ~debugMode ~raw (Model.signatures env)
+        Edges.build_user_snapshot ~debug_mode ~raw (Model.signatures env)
           state.edges;
       Data.snapshot_tokens =
         Array.mapi
@@ -1267,7 +1268,7 @@ module Make (Instances : Instances_sig.S) = struct
           state.imp.tokens;
     }
 
-  let pick_an_instance ~debugMode env state =
+  let pick_an_instance ~debug_mode env state =
     let choice = pick_rule state.imp.random_state state in
     let rule_id = choice / 2 in
     let rule = Model.get_rule env rule_id in
@@ -1275,10 +1276,10 @@ module Make (Instances : Instances_sig.S) = struct
     ( choice mod 2 = 1,
       rule_id,
       if choice mod 2 = 1 then
-        pick_a_unary_rule_instance ~debugMode state state.imp.random_state
+        pick_a_unary_rule_instance ~debug_mode state state.imp.random_state
           domain state.edges ~rule_id rule
       else
-        pick_a_rule_instance ~debugMode state state.imp.random_state domain
+        pick_a_rule_instance ~debug_mode state state.imp.random_state domain
           state.edges ~rule_id rule )
 
   let is_correct_instance env graph (is_unary, rule_id, instance) =
@@ -1300,12 +1301,12 @@ module Make (Instances : Instances_sig.S) = struct
            | [ x; y ] -> Edges.in_same_connected_component x y graph.edges
            | _ -> assert false))
 
-  let apply_instance ~debugMode ~outputs ?maxConsecutiveBlocked
+  let apply_instance ~debug_mode ~outputs ?maxConsecutiveBlocked
       ~maxConsecutiveClash env counter graph (is_unary, rule_id, instance) =
     let cause = Trace.RULE rule_id in
     let rule = Model.get_rule env rule_id in
     let () =
-      if debugMode then
+      if debug_mode then
         Format.printf "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
           (fun f -> if is_unary then Format.fprintf f "unary@ ")
           rule_id
@@ -1315,9 +1316,9 @@ module Make (Instances : Instances_sig.S) = struct
     in
     let apply_given =
       if is_unary then
-        apply_given_unary_instance ~debugMode ~outputs ~rule_id
+        apply_given_unary_instance ~debug_mode ~outputs ~rule_id
       else
-        apply_given_instance ~debugMode ~outputs ~rule_id
+        apply_given_instance ~debug_mode ~outputs ~rule_id
     in
     match apply_given env counter graph cause rule instance with
     | Success graph' ->
@@ -1346,10 +1347,10 @@ module Make (Instances : Instances_sig.S) = struct
         ( None,
           not continue,
           if is_unary then
-            adjust_unary_rule_instances ~debugMode ~rule_id env counter graph
+            adjust_unary_rule_instances ~debug_mode ~rule_id env counter graph
               rule
           else
-            adjust_rule_instances ~debugMode ~rule_id env counter graph rule )
+            adjust_rule_instances ~debug_mode ~rule_id env counter graph rule )
 
   let aux_add_tracked patterns name tests state tpattern =
     let () = state.outdated <- true in

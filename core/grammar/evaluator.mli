@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 val do_interactive_directives :
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   sharing:Pattern.sharing_level ->
   syntax_version:Ast.syntax_version ->
@@ -21,18 +21,18 @@ val do_interactive_directives :
   * (Model.t * (bool * Rule_interpreter.t * State_interpreter.t))
 
 val get_pause_criteria :
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   sharing:Pattern.sharing_level ->
   syntax_version:Ast.syntax_version ->
   Contact_map.t ->
   Model.t ->
   Rule_interpreter.t ->
-  (Ast.mixture, string) Alg_expr.bool Locality.annot ->
+  (Ast.mixture, string) Alg_expr.bool Loc.annoted ->
   Model.t * Rule_interpreter.t * (Pattern.id array list, int) Alg_expr.bool
 
 val find_all_embeddings :
-  debugMode:bool ->
+  debug_mode:bool ->
   Model.t ->
   Instantiation.concrete Primitives.Transformation.t list ->
   (Pattern.id * Renaming.t) list

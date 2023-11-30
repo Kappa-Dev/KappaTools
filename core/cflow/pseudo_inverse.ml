@@ -42,8 +42,8 @@ module Pseudo_inv : Cut_pseudo_inverse = struct
     | Predicate_maps.Undefined -> "#Undef"
     | Predicate_maps.Present -> "#Here"
     | Predicate_maps.Free -> "#Free"
-    | Predicate_maps.Bound_to (ag, ag_name, s) ->
-      "Bound_to " ^ string_of_int ag ^ " " ^ string_of_int ag_name ^ " "
+    | Predicate_maps.Bound_to (ag, agent_name, s) ->
+      "Bound_to " ^ string_of_int ag ^ " " ^ string_of_int agent_name ^ " "
       ^ string_of_int s
 
   type pseudo_inv_blackboard = {

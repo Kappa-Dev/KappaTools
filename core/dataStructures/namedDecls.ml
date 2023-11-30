@@ -30,6 +30,12 @@ let create ?forbidden a =
     finder = name_map_of_array ?forbidden a;
   }
 
+let create_from_list ?forbidden l = create ?forbidden (Array.of_list l)
+
+(* TODO see if we should keep this *)
+let create_no_loc ?forbidden a =
+  Array.map (fun (x, y) -> (x, Loc.dummy), y) a |> create ?forbidden
+
 let size nd = Array.length nd.decls
 let elt_name nd i = fst nd.decls.(i)
 
@@ -52,11 +58,16 @@ let debug_print pr f nd =
 let fold f acc nd =
   Tools.array_fold_lefti (fun i acc (na, x) -> f i na acc x) acc nd.decls
 
+let map f nd =
+  { decls = Array.map (fun (s, v) -> s, f s v) nd.decls; finder = nd.finder }
+
 let mapi f nd =
   {
     decls = Array.mapi (fun i (s, v) -> s, f i s v) nd.decls;
     finder = nd.finder;
   }
+
+let elt_val nd i = snd nd.decls.(i)
 
 let to_json aux nd =
   `List
@@ -71,7 +82,7 @@ let of_json aux = function
         (function
           | `Assoc [ ("name", `String x); ("decl", a) ]
           | `Assoc [ ("decl", a); ("name", `String x) ] ->
-            Locality.dummy_annot x, aux a
+            Loc.annot_with_dummy x, aux a
           | x ->
             raise
               (Yojson.Basic.Util.Type_error ("Not a valid NamedDecl element", x)))

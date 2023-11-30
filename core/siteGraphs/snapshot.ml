@@ -126,7 +126,7 @@ let rec counter_value cc (nid, sid) count =
       ))
     count ag.node_sites
 
-let cc_to_user_cc ~debugMode ~raw sigs cc =
+let cc_to_user_cc ~debug_mode ~raw sigs cc =
   let r = Renaming.empty () in
   let cc_list, indexes, _ =
     Tools.array_fold_lefti
@@ -137,11 +137,11 @@ let cc_to_user_cc ~debugMode ~raw sigs cc =
             if i = pos then
               indexes
             else (
-              match Renaming.add ~debugMode i pos indexes with
+              match Renaming.add ~debug_mode i pos indexes with
               | None ->
                 raise
                   (ExceptionDefn.Internal_Error
-                     (Locality.dummy_annot "Injectivity of renaming in snapshot"))
+                     (Loc.annot_with_dummy "Injectivity of renaming in snapshot"))
               | Some r -> r
             )
           in
@@ -192,7 +192,7 @@ let cc_to_user_cc ~debugMode ~raw sigs cc =
                            }
                        | Some (dn_id, s) ->
                          let dn_id' =
-                           try Renaming.apply ~debugMode indexes dn_id
+                           try Renaming.apply ~debug_mode indexes dn_id
                            with Renaming.Undefined | Invalid_argument _ ->
                              dn_id
                          in
@@ -220,5 +220,5 @@ let fold f x s =
     (fun _ l acc -> List.fold_left (fun a (nb, _, cc) -> f a nb cc) acc l)
     s x
 
-let export ~debugMode ~raw sigs s =
-  fold (fun a x y -> (x, cc_to_user_cc ~debugMode ~raw sigs y) :: a) [] s
+let export ~debug_mode ~raw sigs s =
+  fold (fun a x y -> (x, cc_to_user_cc ~debug_mode ~raw sigs y) :: a) [] s

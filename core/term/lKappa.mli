@@ -6,11 +6,11 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-(** Intermediate representation of model on wich sanity has been checked *)
+(** Intermediate representation of model on which sanity has been checked *)
 
-type ('a, 'annot) link =
+type ('a, 'annoted) link =
   | ANY_FREE
-  | LNK_VALUE of int * 'annot
+  | LNK_VALUE of int * 'annoted
   | LNK_FREE
   | LNK_ANY
   | LNK_SOME
@@ -19,7 +19,7 @@ type ('a, 'annot) link =
 type switching = Linked of int | Freed | Maintained | Erased
 
 type rule_internal =
-  (*state*)
+  (* internal state of agent port *)
   | I_ANY
   | I_ANY_CHANGED of int
   | I_ANY_ERASED
@@ -29,11 +29,11 @@ type rule_internal =
 type rule_agent = {
   ra_type: int; (*agent_id*)
   ra_erased: bool;
-  ra_ports: ((int, int * int) link Locality.annot * switching) array;
+  ra_ports: ((int, int * int) link Loc.annoted * switching) array;
   (*((link nb, (dst_site,dst_ag_type)), _) , switch*)
   ra_ints: rule_internal array;
   ra_syntax:
-    (((int, int * int) link Locality.annot * switching) array
+    (((int, int * int) link Loc.annoted * switching) array
     * rule_internal array)
     option;
 }
@@ -46,24 +46,40 @@ The field ra_syntax represents how the user describe the agent
 before compilation. Therefore, [compil_of_ast] in this module
 generates rule_agent where ra_syntax is [Some (Array.copy ra_ports,
 Array.copy ra_ints)]. *)
+(* TODO Reference to compil_of_ast here is weird *)
 
 type rule_mixture = rule_agent list
+(** [rule_mixture] is the mixture description from the initial state of a rule *)
 
-val forbid_modification : Locality.t -> 'a option -> unit
-val several_internal_states : Locality.t -> 'a
+type rule = {
+  r_mix: rule_mixture;  (** Initial mixture state *)
+  r_created: Raw_mixture.t;  (** Mixture state after rule is applied *)
+  r_delta_tokens: ((rule_mixture, int) Alg_expr.e Loc.annoted * int) list;
+  r_rate: (rule_mixture, int) Alg_expr.e Loc.annoted;
+  r_un_rate:
+    ((rule_mixture, int) Alg_expr.e Loc.annoted
+    * (rule_mixture, int) Alg_expr.e Loc.annoted option)
+    option;
+  r_edit_style: bool;
+      (** If rule was written in edit style, else it's rewrite style *)
+}
 
-val not_enough_specified :
-  status:string -> side:string -> string -> string * Locality.t -> 'a
-
-val several_occurence_of_site : string -> string * Locality.t -> 'a
-val counter_misused : string -> string * Locality.t -> 'a
-val link_only_one_occurence : int -> Locality.t -> 'a
-val link_should_be_removed : int -> string -> string * Locality.t -> 'a
 val agent_to_erased : Signature.s -> rule_agent -> rule_agent
 val to_erased : Signature.s -> rule_mixture -> rule_mixture
 val to_maintained : rule_mixture -> rule_mixture
 val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t
 val copy_rule_agent : rule_agent -> rule_agent
+val max_link_id : rule_mixture -> int
+val raise_if_modification : Loc.t -> 'a option -> unit
+val raise_several_internal_states : Loc.t -> 'a
+
+val raise_not_enough_specified :
+  status:string -> side:string -> string -> string Loc.annoted -> 'a
+
+val raise_several_occurence_of_site : string -> string Loc.annoted -> 'a
+val raise_counter_misused : string -> string Loc.annoted -> 'a
+val raise_link_only_one_occurence : int -> Loc.t -> 'a
+val raise_link_should_be_removed : int -> string -> string Loc.annoted -> 'a
 
 val print_rule_mixture :
   noCounters:bool ->
@@ -73,18 +89,6 @@ val print_rule_mixture :
   Format.formatter ->
   rule_mixture ->
   unit
-
-type rule = {
-  r_mix: rule_mixture;
-  r_created: Raw_mixture.t;
-  r_delta_tokens: ((rule_mixture, int) Alg_expr.e Locality.annot * int) list;
-  r_rate: (rule_mixture, int) Alg_expr.e Locality.annot;
-  r_un_rate:
-    ((rule_mixture, int) Alg_expr.e Locality.annot
-    * (rule_mixture, int) Alg_expr.e Locality.annot option)
-    option;
-  r_editStyle: bool;
-}
 
 val print_link :
   ('a -> Format.formatter -> 'a -> unit) ->
@@ -130,4 +134,3 @@ val print_rule :
 
 val rule_to_json : filenames:int Mods.StringMap.t -> rule -> Yojson.Basic.t
 val rule_of_json : filenames:string array -> Yojson.Basic.t -> rule
-val max_link_id : rule_mixture -> int

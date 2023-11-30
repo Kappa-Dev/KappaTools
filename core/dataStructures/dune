@@ -2,4 +2,5 @@
  (name kappa_generic_toolset)
  (libraries yojson result logs stdlib-shims bigarray camlp-streams)
  (public_name kappa-library.generic)
- (flags (:standard -w @a)))
+ (flags
+  (:standard -w @a)))

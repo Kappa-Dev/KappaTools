@@ -69,9 +69,9 @@ let intervene_simulation () =
               Lwt.return_unit)
             ~error:(fun _ -> Lwt.return_unit))
 
-let focus_range (range : Locality.t) : unit =
-  let file_id = range.Locality.file in
-  let line = range.Locality.from_position.Locality.line in
+let focus_range (range : Loc.t) : unit =
+  let file_id = range.Loc.file in
+  let line = range.Loc.from_position.Loc.line in
   Common.async __LOC__ (fun () ->
       State_error.wrap ~append:true __LOC__
         (State_file.select_file file_id (Some line))

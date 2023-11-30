@@ -181,7 +181,7 @@ class embedded () : Api.concrete_manager =
 
     method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
       List.find_opt
-        (fun (_, x) -> Locality.is_included_in filename pos x)
+        (fun (_, x) -> Loc.is_included_in filename pos x)
         kasa_locator
       |> Option_util.map fst
       |> Result_util.ok ?status:None

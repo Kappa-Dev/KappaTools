@@ -70,11 +70,10 @@ let add i j map =
 
 let pop i map =
   match Mods.IntMap.find_option i map with
-  | None -> raise (ExceptionDefn.Internal_Error ("Illegal map", Locality.dummy))
+  | None -> raise (ExceptionDefn.Internal_Error ("Illegal map", Loc.dummy))
   | Some [ a; b ] -> Mods.IntMap.add i [ b ] map, a
   | Some [ a ] -> Mods.IntMap.remove i map, a
-  | Some _ ->
-    raise (ExceptionDefn.Internal_Error ("Illegal map", Locality.dummy))
+  | Some _ -> raise (ExceptionDefn.Internal_Error ("Illegal map", Loc.dummy))
 
 (*
 Raw_mixture.agent list ->
@@ -114,7 +113,7 @@ let enrich_binding_state raw_mixture =
   in
   let () =
     if not (Mods.IntMap.is_empty map) then
-      raise (ExceptionDefn.Internal_Error ("Illegal map", Locality.dummy))
+      raise (ExceptionDefn.Internal_Error ("Illegal map", Loc.dummy))
   in
   List.rev refined_raw_mixture_rev
 
@@ -211,7 +210,7 @@ let fold_symmetries_over_raw_mixture get set f raw_mixture covering_list accu =
         (ExceptionDefn.Internal_Error
            ( "Arguments of fold_symmetries_over_rw_mixture shall have the same \
               length",
-             Locality.dummy ))
+             Loc.dummy ))
     | h :: t, h' :: t' ->
       fold_symmetries_over_agent get set
         (fun _agent accu -> aux get set f t t' accu)

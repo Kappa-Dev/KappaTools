@@ -26,10 +26,10 @@ type rule_internal =
 type rule_agent = {
   ra_type: int;
   ra_erased: bool;
-  ra_ports: ((int, int * int) link Locality.annot * switching) array;
+  ra_ports: ((int, int * int) link Loc.annoted * switching) array;
   ra_ints: rule_internal array;
   ra_syntax:
-    (((int, int * int) link Locality.annot * switching) array
+    (((int, int * int) link Loc.annoted * switching) array
     * rule_internal array)
     option;
 }
@@ -39,13 +39,13 @@ type rule_mixture = rule_agent list
 type rule = {
   r_mix: rule_mixture;
   r_created: Raw_mixture.t;
-  r_delta_tokens: ((rule_mixture, int) Alg_expr.e Locality.annot * int) list;
-  r_rate: (rule_mixture, int) Alg_expr.e Locality.annot;
+  r_delta_tokens: ((rule_mixture, int) Alg_expr.e Loc.annoted * int) list;
+  r_rate: (rule_mixture, int) Alg_expr.e Loc.annoted;
   r_un_rate:
-    ((rule_mixture, int) Alg_expr.e Locality.annot
-    * (rule_mixture, int) Alg_expr.e Locality.annot option)
+    ((rule_mixture, int) Alg_expr.e Loc.annoted
+    * (rule_mixture, int) Alg_expr.e Loc.annoted option)
     option;
-  r_editStyle: bool;
+  r_edit_style: bool;
 }
 
 let print_link pr_port pr_type pr_annot f = function
@@ -64,7 +64,7 @@ let link_to_json port_to_json type_to_json annot_to_json = function
   | LNK_SOME -> `String "SOME"
   | LNK_VALUE (i, a) -> `List (`Int i :: annot_to_json a)
 
-let link_of_json port_of_json type_of_json annot_of_json = function
+let link_of_json port_of_json type_of_json annoted_of_json = function
   | `String "ANY_FREE" -> ANY_FREE
   | `String "FREE" -> LNK_FREE
   | `List [ p; a ] ->
@@ -72,7 +72,8 @@ let link_of_json port_of_json type_of_json annot_of_json = function
     LNK_TYPE (port_of_json x p, x)
   | `Null -> LNK_ANY
   | `String "SOME" -> LNK_SOME
-  | `List (`Int i :: (([] | _ :: _ :: _) as a)) -> LNK_VALUE (i, annot_of_json a)
+  | `List (`Int i :: (([] | _ :: _ :: _) as a)) ->
+    LNK_VALUE (i, annoted_of_json a)
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect link", x))
 
 let print_link_annot ~ltypes sigs f (s, a) =
@@ -165,7 +166,7 @@ let print_counter_delta counters j f switch =
   | Freed ->
     raise
       (ExceptionDefn.Internal_Error
-         (Locality.dummy_annot "Cannot erase all increment agents"))
+         (Loc.annot_with_dummy "Cannot erase all increment agents"))
   | Maintained -> ()
   | Erased -> ()
 
@@ -259,8 +260,8 @@ let union_find_counters sigs mix =
               | LNK_TYPE _ | LNK_SOME ->
                 raise
                   (ExceptionDefn.Internal_Error
-                     (Locality.dummy_annot
-                        "Port a of __incr agent not well specified")))))
+                     (Loc.annot_with_dummy
+                        "Port a of __counter_agent agent not well specified")))))
         mix
   in
   t
@@ -272,7 +273,7 @@ let print_rule_agent ~noCounters sigs ~ltypes counters created_counters f ag =
       if ag.ra_erased then Format.pp_print_string f "-")
 
 let print_rule_mixture ~noCounters sigs ~ltypes created f mix =
-  let incr_agents = union_find_counters (Some sigs) mix in
+  let counter_agents = union_find_counters (Some sigs) mix in
   let created_incr = Raw_mixture.union_find_counters (Some sigs) created in
   let rec aux_print some = function
     | [] -> ()
@@ -282,7 +283,8 @@ let print_rule_mixture ~noCounters sigs ~ltypes created f mix =
       else (
         let () = if some then Pp.comma f in
         let () =
-          print_rule_agent ~noCounters sigs ~ltypes incr_agents created_incr f h
+          print_rule_agent ~noCounters sigs ~ltypes counter_agents created_incr
+            f h
         in
         aux_print true t
       )
@@ -471,7 +473,7 @@ let print_rates ~noCounters sigs pr_tok pr_var f r =
 let print_rule ~noCounters ~full sigs pr_tok pr_var f r =
   Format.fprintf f "@[<h>%t%t%a%t@]"
     (fun f ->
-      if full || r.r_editStyle then
+      if full || r.r_edit_style then
         Format.fprintf f "%a%a"
           (print_rule_mixture ~noCounters sigs ~ltypes:false r.r_created)
           r.r_mix
@@ -513,7 +515,7 @@ let rule_agent_to_json filenames a =
              (fun (e, s) c ->
                `List
                  [
-                   Locality.annot_to_yojson ~filenames
+                   Loc.yojson_of_annoted ~filenames
                      (link_to_json
                         (fun _ i -> `Int i)
                         (fun i -> `Int i)
@@ -540,7 +542,7 @@ let rule_agent_of_json filenames = function
            Tools.array_map_of_list
              (function
                | `List [ e; s ] ->
-                 ( Locality.annot_of_yojson ~filenames
+                 ( Loc.annoted_of_yojson ~filenames
                      (link_of_json
                         (fun _ -> Yojson.Basic.Util.to_int)
                         Yojson.Basic.Util.to_int
@@ -593,22 +595,20 @@ let rule_to_json ~filenames r =
       ( "delta_tokens",
         JsonUtil.of_list
           (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-             (Locality.annot_to_yojson ~filenames (lalg_expr_to_json filenames))
+             (Loc.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))
              JsonUtil.of_int)
           r.r_delta_tokens );
       ( "rate",
-        Locality.annot_to_yojson ~filenames
-          (lalg_expr_to_json filenames)
-          r.r_rate );
+        Loc.yojson_of_annoted ~filenames (lalg_expr_to_json filenames) r.r_rate
+      );
       ( "unary_rate",
         JsonUtil.of_option
           (JsonUtil.of_pair
-             (Locality.annot_to_yojson ~filenames (lalg_expr_to_json filenames))
+             (Loc.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))
              (JsonUtil.of_option
-                (Locality.annot_to_yojson ~filenames
-                   (lalg_expr_to_json filenames))))
+                (Loc.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))))
           r.r_un_rate );
-      "editStyle", `Bool r.r_editStyle;
+      "edit_style", `Bool r.r_edit_style;
     ]
 
 let rule_of_json ~filenames = function
@@ -620,70 +620,69 @@ let rule_of_json ~filenames = function
          r_delta_tokens =
            JsonUtil.to_list
              (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                (Locality.annot_of_yojson ~filenames
-                   (lalg_expr_of_json filenames))
+                (Loc.annoted_of_yojson ~filenames (lalg_expr_of_json filenames))
                 (JsonUtil.to_int ?error_msg:None))
              (List.assoc "delta_tokens" l);
          r_rate =
-           Locality.annot_of_yojson ~filenames
+           Loc.annoted_of_yojson ~filenames
              (lalg_expr_of_json filenames)
              (List.assoc "rate" l);
          r_un_rate =
            (try
               JsonUtil.to_option
                 (JsonUtil.to_pair
-                   (Locality.annot_of_yojson ~filenames
+                   (Loc.annoted_of_yojson ~filenames
                       (lalg_expr_of_json filenames))
                    (JsonUtil.to_option
-                      (Locality.annot_of_yojson (lalg_expr_of_json filenames))))
+                      (Loc.annoted_of_yojson (lalg_expr_of_json filenames))))
                 (List.assoc "unary_rate" l)
             with Not_found -> None);
-         r_editStyle = Yojson.Basic.Util.to_bool (List.assoc "editStyle" l);
+         r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x))
 
-let forbid_modification pos = function
+let raise_if_modification pos = function
   | None -> ()
-  | Some _ ->
+  | _ ->
     raise
       (ExceptionDefn.Malformed_Decl ("A modification is forbidden here.", pos))
 
-let several_internal_states pos =
+let raise_several_internal_states pos =
   raise
     (ExceptionDefn.Malformed_Decl
        ("In a pattern, a site cannot have several internal states.", pos))
 
-let not_enough_specified ~status ~side agent_name (na, pos) =
+let raise_not_enough_specified ~status ~side agent_name (na, pos) =
   raise
     (ExceptionDefn.Malformed_Decl
        ( "The " ^ status ^ " state of agent '" ^ agent_name ^ "', site '" ^ na
          ^ "' on the " ^ side ^ " hand side is underspecified",
          pos ))
 
-let several_occurence_of_site agent_name (na, pos) =
+let raise_several_occurence_of_site agent_name (na, pos) =
   raise
     (ExceptionDefn.Malformed_Decl
        ( "Site '" ^ na ^ "' occurs more than once in this agent '" ^ agent_name
          ^ "'",
          pos ))
 
-let counter_misused agent_name (na, pos) =
+let raise_counter_misused agent_name (na, pos) =
   raise
     (ExceptionDefn.Malformed_Decl
        ( "Site '" ^ na ^ "' occurs both as port and as counter in '"
          ^ agent_name ^ "'",
          pos ))
 
-let link_only_one_occurence i pos =
+let raise_link_only_one_occurence i pos =
   raise
     (ExceptionDefn.Malformed_Decl
        ( "The link '" ^ string_of_int i
          ^ "' occurs only one time in the mixture.",
          pos ))
 
-let link_should_be_removed i agent_name (na, pos) =
+let raise_link_should_be_removed i agent_name (na, pos) =
   raise
     (ExceptionDefn.Malformed_Decl
        ( "The link '" ^ string_of_int i ^ "' should be made free in the site '"
@@ -726,9 +725,10 @@ let agent_to_erased sigs r =
       | Some _ -> Some (Array.copy ra_ports, Array.copy ra_ints));
   }
 
-let to_erased sigs x = List.map (agent_to_erased sigs) x
+let to_erased (sigs : Signature.s) (x : rule_mixture) : rule_mixture =
+  List.map (agent_to_erased sigs) x
 
-let to_maintained x =
+let to_maintained (x : rule_mixture) : rule_mixture =
   List.map
     (fun r ->
       let ports = Array.map (fun (a, _) -> a, Maintained) r.ra_ports in
@@ -766,14 +766,14 @@ let to_raw_mixture sigs x =
         Array.mapi
           (fun j -> function
             | (LNK_SOME, pos | LNK_TYPE _, pos), _ ->
-              let ag_na =
+              let agent_name =
                 Format.asprintf "%a" (Signature.print_agent sigs) r.ra_type
               in
-              let p_na =
+              let port_name =
                 Format.asprintf "%a" (Signature.print_site sigs r.ra_type) j
               in
-              not_enough_specified ~status:"linking" ~side:"left" ag_na
-                (p_na, pos)
+              raise_not_enough_specified ~status:"linking" ~side:"left"
+                agent_name (port_name, pos)
             | (LNK_VALUE (i, _), _), _ -> Raw_mixture.VAL i
             | ((LNK_ANY | ANY_FREE | LNK_FREE), _), _ -> Raw_mixture.FREE)
           r.ra_ports

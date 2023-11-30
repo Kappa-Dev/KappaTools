@@ -112,7 +112,7 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
       aux (ag_id + 1) tail (work, bond_map)
   in
   let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
-  let a, _, b, c = Pattern.finish_new ~debugMode:noCounters work in
+  let a, _, b, c = Pattern.finish_new ~debug_mode:noCounters work in
   let () =
     match sigs with
     | None -> ()
@@ -188,7 +188,7 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
       aux (ag_id + 1) tail (work, bond_map)
   in
   let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
-  let a, _, b, c = Pattern.finish_new ~debugMode:noCounters work in
+  let a, _, b, c = Pattern.finish_new ~debug_mode:noCounters work in
   let () =
     match sigs with
     | None -> ()
@@ -493,7 +493,7 @@ let pattern_to_mixture ?parameters ~sigs pattern =
     let (), list =
       Mods.IntMap.monadic_fold2 () ()
         (fun () () _ agent_type intf agent_list ->
-          let fst (a, _) = (a, Locality.dummy), LKappa.Maintained in
+          let fst (a, _) = (a, Loc.dummy), LKappa.Maintained in
           let snd (_, b) =
             match b with
             | None -> LKappa.I_ANY
@@ -562,7 +562,7 @@ let lkappa_init =
     LKappa.r_delta_tokens = [];
     LKappa.r_rate = Alg_expr.int 0;
     LKappa.r_un_rate = None;
-    LKappa.r_editStyle = true;
+    LKappa.r_edit_style = true;
   }
 
 let raw_mixture_to_lkappa_rule raw_mixture =
@@ -572,7 +572,7 @@ let raw_mixture_to_lkappa_rule raw_mixture =
     LKappa.r_delta_tokens = [];
     LKappa.r_rate = Alg_expr.int 0;
     LKappa.r_un_rate = None;
-    LKappa.r_editStyle = true;
+    LKappa.r_edit_style = true;
   }
 
 let rule_mixture_to_lkappa_rule rule_mixture =
@@ -582,7 +582,7 @@ let rule_mixture_to_lkappa_rule rule_mixture =
     LKappa.r_delta_tokens = [];
     LKappa.r_rate = Alg_expr.int 0;
     LKappa.r_un_rate = None;
-    LKappa.r_editStyle = true;
+    LKappa.r_edit_style = true;
   }
 
 (*convert a species into lkappa rule signature*)

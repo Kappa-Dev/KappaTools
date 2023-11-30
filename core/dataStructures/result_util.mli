@@ -19,7 +19,7 @@ type status =
 type message = {
   severity: Logs.level;
   text: string; (*should be an algebraic type*)
-  range: Locality.t option;
+  range: Loc.t option;
 }
 
 type ('a, 'b) t = {

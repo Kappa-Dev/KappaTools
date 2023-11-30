@@ -139,10 +139,10 @@ let parse yield catalog =
               | Invalid_argument error ->
                 Lwt.return
                   ( compile,
-                    Locality.dummy_annot ("Runtime error " ^ error) :: err )
+                    Loc.annot_with_dummy ("Runtime error " ^ error) :: err )
               | exn ->
                 let message = Printexc.to_string exn in
-                Lwt.return (compile, Locality.dummy_annot message :: err)))
+                Lwt.return (compile, Loc.annot_with_dummy message :: err)))
       catalog.index
       (Lwt.return (Ast.empty_compil, []))
     >>= ( function
@@ -154,7 +154,7 @@ let parse yield catalog =
         List.map
           (fun ((text, p) as x) ->
             let range =
-              if Locality.has_dummy_annot x then
+              if Loc.is_annoted_with_dummy x then
                 None
               else
                 Some p

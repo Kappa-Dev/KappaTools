@@ -1,14 +1,27 @@
 (library
-  (name kappa_influence_map)
-  (libraries kappa_kasa_frontend kappa_kasa_remanent_state  kappa_classical_graphs kappa-library.terms)
-  (flags (:standard)
-    -open Kappa_kasa_frontend
-    -open Kappa_kasa_remanent_state
-    -open Kappa_errors
-    -open Kappa_parameters
-    -open Kappa_logging
-    -open Kappa_classical_graphs
-    -open Kappa_kasa_kastor_toolset
-    -open Kappa_generic_toolset
-    -open Kappa_terms
-))
+ (name kappa_influence_map)
+ (libraries
+  kappa_kasa_frontend
+  kappa_kasa_remanent_state
+  kappa_classical_graphs
+  kappa-library.terms)
+ (flags
+  (:standard)
+  -open
+  Kappa_kasa_frontend
+  -open
+  Kappa_kasa_remanent_state
+  -open
+  Kappa_errors
+  -open
+  Kappa_parameters
+  -open
+  Kappa_logging
+  -open
+  Kappa_classical_graphs
+  -open
+  Kappa_kasa_kastor_toolset
+  -open
+  Kappa_generic_toolset
+  -open
+  Kappa_terms))

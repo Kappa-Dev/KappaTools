@@ -276,9 +276,7 @@ let json_to_graph logger (_, _, _, _, origin, influence_map) =
     match node with
     | Public_data.Rule r ->
       let pos = r.Public_data.rule_position in
-      let contextual_help =
-        Locality.to_string pos ^ " " ^ r.Public_data.rule_ast
-      in
+      let contextual_help = Loc.to_string pos ^ " " ^ r.Public_data.rule_ast in
       let fillcolor =
         if is_center origin_short_opt node then
           !Config.center_color
@@ -296,7 +294,7 @@ let json_to_graph logger (_, _, _, _, origin, influence_map) =
       ]
     | Public_data.Var r ->
       let pos = r.Public_data.var_position in
-      let contextual_help = Locality.to_string pos ^ r.Public_data.var_ast in
+      let contextual_help = Loc.to_string pos ^ r.Public_data.var_ast in
       let fillcolor =
         if is_center origin_short_opt node then
           !Config.center_color

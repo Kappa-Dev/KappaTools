@@ -1,7 +1,5 @@
 (library
-  (name kappa_profiling)
-  (libraries yojson result kappa_logging kappa_parameters kappa_errors)
-  (flags (:standard
-    -open Kappa_logging
-    -open Kappa_parameters
-    -open Kappa_errors )))
+ (name kappa_profiling)
+ (libraries yojson result kappa_logging kappa_parameters kappa_errors)
+ (flags
+  (:standard -open Kappa_logging -open Kappa_parameters -open Kappa_errors)))

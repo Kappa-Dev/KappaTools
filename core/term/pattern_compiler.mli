@@ -9,8 +9,8 @@
 (** Kappa pattern compiler *)
 
 val connected_components_sum_of_ambiguous_mixture :
-  debugMode:bool ->
-  compileModeOn:bool ->
+  debug_mode:bool ->
+  compile_mode_on:bool ->
   Contact_map.t ->
   Pattern.PreEnv.t ->
   ?origin:Operator.rev_dep ->
@@ -21,8 +21,8 @@ val connected_components_sum_of_ambiguous_mixture :
     list
 
 val connected_components_sum_of_ambiguous_rule :
-  debugMode:bool ->
-  compileModeOn:bool ->
+  debug_mode:bool ->
+  compile_mode_on:bool ->
   Contact_map.t ->
   Pattern.PreEnv.t ->
   ?origin:Operator.rev_dep ->

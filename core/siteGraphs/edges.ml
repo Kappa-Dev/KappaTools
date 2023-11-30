@@ -265,7 +265,7 @@ let add_agent ?id sigs ty graph =
             | _, _ ->
               raise
                 (ExceptionDefn.Internal_Error
-                   (Locality.dummy_annot
+                   (Loc.annot_with_dummy
                       ("Try to add an agent with a the free id "
                      ^ string_of_int id)))
           ) else
@@ -550,7 +550,7 @@ let in_same_connected_component ag ag' graph =
     | None ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot
+           (Loc.annot_with_dummy
               "in_same_connected_component while not tracking ccs"))
     | Some ccs -> Mods.DynArray.get ccs ag = Mods.DynArray.get ccs ag')
 
@@ -562,7 +562,7 @@ let get_connected_component ag graph =
     | None ->
       raise
         (ExceptionDefn.Internal_Error
-           (Locality.dummy_annot
+           (Loc.annot_with_dummy
               "get_connected_component while not tracking ccs"))
     | Some ccs -> Mods.DynArray.get ccs ag)
 
@@ -618,7 +618,7 @@ let one_connected_component sigs ty node graph =
   in
   build 0 [] Mods.IntMap.empty [ node, ty ]
 
-let species ~debugMode sigs root graph =
+let species ~debug_mode sigs root graph =
   match graph.tables with
   | None -> assert false
   | Some tables ->
@@ -627,10 +627,10 @@ let species ~debugMode sigs root graph =
       | None ->
         raise
           (ExceptionDefn.Internal_Error
-             (Locality.dummy_annot
+             (Loc.annot_with_dummy
                 ("Sort of node unavailable " ^ string_of_int root)))
       | Some ty ->
-        Snapshot.cc_to_user_cc ~debugMode ~raw:true sigs
+        Snapshot.cc_to_user_cc ~debug_mode ~raw:true sigs
           (one_connected_component sigs ty root tables)
     in
     let () = Cache.reset (fst tables.caches) in
@@ -657,8 +657,8 @@ let build_snapshot ~raw sigs graph =
   | None -> assert false
   | Some tables -> aux_build_snapshot raw sigs tables Snapshot.empty 0
 
-let build_user_snapshot ~debugMode ~raw sigs graph =
-  Snapshot.export ~debugMode ~raw sigs (build_snapshot ~raw sigs graph)
+let build_user_snapshot ~debug_mode ~raw sigs graph =
+  Snapshot.export ~debug_mode ~raw sigs (build_snapshot ~raw sigs graph)
 
 let debug_print f graph =
   match graph.tables with

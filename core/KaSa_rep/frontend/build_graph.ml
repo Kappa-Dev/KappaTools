@@ -29,7 +29,7 @@ let add_agent parameters error handler cckappa_only agent_id agent_type mixture
       Cckappa_sig.agent_kasim_id = agent_id;
       Cckappa_sig.agent_name = agent_type;
       Cckappa_sig.agent_interface = Ckappa_sig.Site_map_and_set.Map.empty;
-      Cckappa_sig.agent_position = Locality.dummy;
+      Cckappa_sig.agent_position = Loc.dummy;
       Cckappa_sig.is_created = false;
     }
   in
@@ -45,7 +45,7 @@ let add_agent parameters error handler cckappa_only agent_id agent_type mixture
 let empty_port =
   {
     Cckappa_sig.site_name = Ckappa_sig.dummy_site_name;
-    Cckappa_sig.site_position = Locality.dummy;
+    Cckappa_sig.site_position = Loc.dummy;
     Cckappa_sig.site_free = None;
     Cckappa_sig.site_state =
       {
@@ -81,7 +81,7 @@ let add_site parameters error handler cckappa_only agent_id site_name mixture =
     let site =
       {
         Cckappa_sig.site_name;
-        Cckappa_sig.site_position = Locality.dummy;
+        Cckappa_sig.site_position = Loc.dummy;
         Cckappa_sig.site_free = None;
         Cckappa_sig.site_state =
           {
@@ -330,7 +330,7 @@ let add_link parameters error agent_id site_name agent_id' site_name'
     in_progress =
   let handler = in_progress.kappa_handler in
   let lnk_id = in_progress.fresh_bond_id in
-  let fresh_bond_id = Ckappa_sig.next_lnk_value in_progress.fresh_bond_id in
+  let fresh_bond_id = Ckappa_sig.next_link_value in_progress.fresh_bond_id in
   let error, mixture =
     add_link parameters error handler in_progress.cckappa_only agent_id
       site_name agent_id' site_name' lnk_id in_progress.mixture

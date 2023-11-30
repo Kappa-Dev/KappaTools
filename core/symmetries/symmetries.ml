@@ -229,13 +229,13 @@ let translate_to_lkappa_representation env partitioned_contact_map =
     Mods.StringMap.iter
       (fun agent_string partition ->
         let ag_id =
-          Signature.num_of_agent (Locality.dummy_annot agent_string) signature
+          Signature.num_of_agent (Loc.annot_with_dummy agent_string) signature
         in
         let interface = Signature.get signature ag_id in
         let partition =
           Symmetries_sig.map
             (fun site_string ->
-              Signature.num_of_site (Locality.dummy_annot site_string) interface)
+              Signature.num_of_site (Loc.annot_with_dummy site_string) interface)
             partition
         in
         array.(ag_id) <- partition)

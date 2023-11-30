@@ -76,7 +76,7 @@ let plain_array pr_el f a =
   in
   Format.fprintf f "[|%t|]" (aux 0)
 
-let error pr x = eprintf "%a@." (Locality.print_annot pr) x
+let error pr x = eprintf "%a@." (Loc.print_annoted pr) x
 
 let list_to_string pr_sep pr_el () l =
   let rec aux () = function

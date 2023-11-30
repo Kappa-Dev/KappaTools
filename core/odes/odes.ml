@@ -5,8 +5,8 @@
 
 let local_trace = false
 
-let debug ~debugMode s =
-  if local_trace || debugMode then
+let debug ~debug_mode s =
+  if local_trace || debug_mode then
     Format.kfprintf
       (fun f -> Format.pp_print_break f 0 0)
       Format.err_formatter s
@@ -83,9 +83,8 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
   module VarMap = VarSetMap.Map
 
   type 'a decl =
-    | Var of var_id * string option * ('a, int) Alg_expr.e Locality.annot
-    | Init_expr of
-        var_id * ('a, int) Alg_expr.e Locality.annot * ode_var_id list
+    | Var of var_id * string option * ('a, int) Alg_expr.e Loc.annoted
+    | Init_expr of var_id * ('a, int) Alg_expr.e Loc.annoted * ode_var_id list
     | Dummy_decl
 
   let var_id_of_decl decl =
@@ -144,7 +143,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
     updated_cc_to_embedding_to_current_species: I.connected_component list;
     ode_variables: VarSet.t;
     reactions:
-      ((id list * id list * id Locality.annot list * enriched_rule) * int) list;
+      ((id list * id list * id Loc.annoted list * enriched_rule) * int) list;
     ode_vars_tab: ode_var Mods.DynArray.t;
     id_of_ode_var: ode_var_id VarMap.t;
     fresh_ode_var_id: ode_var_id;
@@ -155,7 +154,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
     fresh_var_id: var_id;
     var_declaration: 'a decl list;
     n_rules: int;
-    obs: (obs_id * ('a, 'b) Alg_expr.e Locality.annot) list;
+    obs: (obs_id * ('a, 'b) Alg_expr.e Loc.annoted) list;
     n_obs: int;
     time_homogeneous_obs: bool option;
     time_homogeneous_vars: bool option;
@@ -393,11 +392,11 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
     let network = inc_fresh_ode_var_id network in
     network
 
-  let add_new_canonic_species ~debugMode compil canonic species network =
+  let add_new_canonic_species ~debug_mode compil canonic species network =
     let () =
       Mods.DynArray.set network.species_tab
         (get_fresh_ode_var_id network)
-        (species, I.nbr_automorphisms_in_chemical_species ~debugMode species)
+        (species, I.nbr_automorphisms_in_chemical_species ~debug_mode species)
     in
     let var = species_to_var compil canonic in
     add_new_var var network
@@ -434,36 +433,36 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
     StoreMap.add key new_list store
 
   let translate_canonic_species compil canonic species remanent =
-    let debugMode = I.debug_mode compil in
+    let debug_mode = I.debug_mode compil in
     let var = species_to_var compil canonic in
     let id_opt = VarMap.find_option var (snd remanent).id_of_ode_var in
     match id_opt with
     | None ->
-      let () = debug ~debugMode "A NEW SPECIES IS DISCOVERED @." in
+      let () = debug ~debug_mode "A NEW SPECIES IS DISCOVERED @." in
       let () =
-        debug ~debugMode "canonic form: %a@."
+        debug ~debug_mode "canonic form: %a@."
           (fun x -> I.print_canonic_species ~compil x)
           canonic
       in
       let () =
-        debug ~debugMode "species: %a@.@."
+        debug ~debug_mode "species: %a@.@."
           (fun x -> I.print_chemical_species ~compil x)
           species
       in
       let to_be_visited, network = remanent in
       let network, id =
-        add_new_canonic_species ~debugMode compil canonic species network
+        add_new_canonic_species ~debug_mode compil canonic species network
       in
       (species :: to_be_visited, network), id
     | Some i ->
-      let () = debug ~debugMode "ALREADY SEEN SPECIES @." in
+      let () = debug ~debug_mode "ALREADY SEEN SPECIES @." in
       let () =
-        debug ~debugMode "canonic form: %a@."
+        debug ~debug_mode "canonic form: %a@."
           (fun x -> I.print_canonic_species ~compil x)
           canonic
       in
       let () =
-        debug ~debugMode "species: %a@.@."
+        debug ~debug_mode "species: %a@.@."
           (fun x -> I.print_chemical_species ~compil x)
           species
       in
@@ -550,7 +549,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
             if n_embs = 0 then
               alg
             else (
-              let species = Locality.dummy_annot (Alg_expr.KAPPA_INSTANCE id) in
+              let species = Loc.annot_with_dummy (Alg_expr.KAPPA_INSTANCE id) in
               let term =
                 target compil
                   (from (Alg_expr.mult (Alg_expr.int n_embs) species) nauto)
@@ -672,13 +671,13 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
 
   let add_reaction ?max_size parameters compil enriched_rule embedding_forest
       mixture remanent =
-    let debugMode = I.debug_mode compil in
+    let debug_mode = I.debug_mode compil in
     let rule = enriched_rule.rule in
-    let _ = debug ~debugMode "REACTANTS\n" in
+    let _ = debug ~debug_mode "REACTANTS\n" in
     let remanent, reactants =
       petrify_mixture parameters compil mixture remanent
     in
-    let _ = debug ~debugMode "PRODUCT\n" in
+    let _ = debug ~debug_mode "PRODUCT\n" in
     let products = I.apply compil rule embedding_forest mixture in
     let list, network = remanent in
     let cache, bool = I.valid_mixture compil network.cache ?max_size products in
@@ -693,7 +692,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
         List.fold_left
           (fun (remanent, tokens) (_, b) ->
             let remanent, id = translate_token b remanent in
-            remanent, Locality.dummy_annot id :: tokens)
+            remanent, Loc.annot_with_dummy id :: tokens)
           (remanent, []) tokens
       in
       let to_be_visited, network = remanent in
@@ -715,14 +714,14 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
 
   let initial_network ?max_size parameters compil network initial_states rules =
     let network = { network with has_empty_lhs = Some false } in
-    let debugMode = I.debug_mode compil in
+    let debug_mode = I.debug_mode compil in
     let l, network =
       List.fold_left
         (fun remanent enriched_rule ->
           match enriched_rule.lhs_cc with
           | [] ->
             let _, embed, mixture = I.disjoint_union compil [] in
-            let () = debug ~debugMode "add new reaction" in
+            let () = debug ~debug_mode "add new reaction" in
             let l, network = remanent in
             let remanent = l, { network with has_empty_lhs = Some true } in
             add_reaction ?max_size parameters compil enriched_rule embed mixture
@@ -763,7 +762,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
   let compute_reactions ?max_size ~smash_reactions parameters compil network
       rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
-    let debugMode = I.debug_mode compil in
+    let debug_mode = I.debug_mode compil in
     let n_rules = List.length rules in
     let cache = network.cache in
     let cache, max_coef, rules_rev =
@@ -809,7 +808,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
       | new_species :: to_be_visited ->
         let network = clean_embed_to_current_species network in
         let () =
-          debug ~debugMode "@[<v 2>@[test for the new species:@ %a@]"
+          debug ~debug_mode "@[<v 2>@[test for the new species:@ %a@]"
             (fun x -> I.print_chemical_species ~compil x)
             new_species
         in
@@ -828,7 +827,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                   (* regular application of tules, we store the
                      embeddings*)
                   let () =
-                    debug ~debugMode
+                    debug ~debug_mode
                       "@[<v 2>test for rule %i at pos %i (Aut:%i)@[%a@]"
                       (rule_id_of enriched_rule) pos
                       enriched_rule.divide_rate_by (I.print_rule ~compil)
@@ -836,11 +835,11 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                   in
                   match arity_of enriched_rule with
                   | Rule_modes.Usual | Rule_modes.Unary_refinement ->
-                    let () = debug ~debugMode "regular case" in
+                    let () = debug ~debug_mode "regular case" in
                     let store_new_embeddings =
                       (*List.fold_left
                         (fun store (cc_id,cc) ->
-                           let () = debug ~debugMode "find embeddings" in
+                           let () = debug ~debug_mode "find embeddings" in
                            let lembed =
                              I.find_embeddings compil cc new_species
                            in
@@ -869,11 +868,11 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                        species that contain at least one occurence of
                        new_species *)
                     let dump_store store =
-                      if local_trace || debugMode then
+                      if local_trace || debug_mode then
                         StoreMap.iter
                           (fun ((a, ar, dir), id, b) c ->
                             let () =
-                              debug ~debugMode
+                              debug ~debug_mode
                                 "@[<v 2>* rule:%i %s %s  cc:%i:@[%a@]:" a
                                 (match ar with
                                 | Rule_modes.Usual -> "@"
@@ -890,17 +889,17 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                             let () =
                               List.iter
                                 (fun (_, b) ->
-                                  debug ~debugMode "%a"
+                                  debug ~debug_mode "%a"
                                     (fun x ->
                                       I.print_chemical_species ~compil x)
                                     b)
                                 c
                             in
-                            let () = debug ~debugMode "@]" in
+                            let () = debug ~debug_mode "@]" in
                             ())
                           store
                     in
-                    let () = debug ~debugMode "new embeddings" in
+                    let () = debug ~debug_mode "new embeddings" in
                     let () = dump_store store_new_embeddings in
                     let _, new_embedding_list =
                       List.fold_left
@@ -931,9 +930,9 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                     let to_be_visited, network =
                       List.fold_left
                         (fun remanent list ->
-                          let () = debug ~debugMode "compute one refinement" in
+                          let () = debug ~debug_mode "compute one refinement" in
                           let () =
-                            debug ~debugMode "disjoint union @[<v>%a@]"
+                            debug ~debug_mode "disjoint union @[<v>%a@]"
                               (Pp.list Pp.space (fun f (_, _, s) ->
                                    I.print_chemical_species ~compil f s))
                               list
@@ -941,16 +940,16 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                           let _, embed, mixture =
                             I.disjoint_union compil list
                           in
-                          let () = debug ~debugMode "add new reaction" in
+                          let () = debug ~debug_mode "add new reaction" in
                           add_reaction ?max_size parameters compil enriched_rule
                             embed mixture remanent)
                         (to_be_visited, network) new_embedding_list
                     in
-                    let () = debug ~debugMode "@]" in
+                    let () = debug ~debug_mode "@]" in
                     store_all_embeddings, to_be_visited, network
                   | Rule_modes.Unary ->
                     (* unary application of binary rules *)
-                    let () = debug ~debugMode "unary case" in
+                    let () = debug ~debug_mode "unary case" in
                     let network =
                       add_embed_to_current_species cc embed network
                     in
@@ -981,27 +980,27 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                         fold_left_swap
                           (fun embed remanent ->
                             let () =
-                              debug ~debugMode "add new reaction (unary)"
+                              debug ~debug_mode "add new reaction (unary)"
                             in
                             let embed =
                               add_reaction ?max_size parameters compil
                                 enriched_rule embed mix remanent
                             in
                             let () =
-                              debug ~debugMode "end new reaction (unary)"
+                              debug ~debug_mode "end new reaction (unary)"
                             in
                             embed)
                           lembed (to_be_visited, network)
                       | None -> to_be_visited, network
                     in
-                    let () = debug ~debugMode "@]" in
+                    let () = debug ~debug_mode "@]" in
                     store_old_embeddings, to_be_visited, network)
                 (store_old_embeddings, to_be_visited, network)
                 pairs_rule_pos)
             (store, to_be_visited, network)
             all_ccs
         in
-        let () = debug ~debugMode "@]" in
+        let () = debug ~debug_mode "@]" in
         aux to_be_visited network store
     in
     let network = aux to_be_visited network store in
@@ -1069,7 +1068,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
         in
         { network with reactions }
     in
-    let () = debug ~debugMode "@]@." in
+    let () = debug ~debug_mode "@]@." in
     network
 
   let convert_tokens compil network =
@@ -1083,7 +1082,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
   let convert_initial_state parameters compil intro network =
     let b, c = intro in
     let network, expr_init =
-      convert_alg_expr parameters compil network (Locality.dummy_annot b)
+      convert_alg_expr parameters compil network (Loc.annot_with_dummy b)
     in
     ( expr_init,
       match I.token_vector_of_init c with
@@ -1263,7 +1262,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
         (fun network obs ->
           let network, expr_obs =
             convert_alg_expr parameters compil network
-              (Locality.dummy_annot obs)
+              (Loc.annot_with_dummy obs)
           in
           inc_fresh_obs_id
             {
@@ -1292,8 +1291,8 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
     in
     { network with cache }, list
 
-  type ('a, 'b) rate = ('a, 'b) Alg_expr.e Locality.annot
-  type ('a, 'b) stoc = int * ('a, 'b) Alg_expr.e Locality.annot
+  type ('a, 'b) rate = ('a, 'b) Alg_expr.e Loc.annoted
+  type ('a, 'b) stoc = int * ('a, 'b) Alg_expr.e Loc.annoted
   type ('a, 'b) coef = R of ('a, 'b) rate | S of ('a, 'b) stoc
 
   type ('a, 'b) sort_rules_and_decl = {
@@ -1565,7 +1564,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
             let expr =
               to_var compil
                 (from_nocc compil
-                   (Locality.dummy_annot (Alg_expr.ALG_VAR id'))
+                   (Loc.annot_with_dummy (Alg_expr.ALG_VAR id'))
                    n)
                 n
             in
@@ -1975,7 +1974,7 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
                     (string_of_var_id ~compil logger)
                     logger logger_buffer logger_err
                     (Ode_loggers_sig.Init (get_last_ode_var_id network))
-                    (Locality.dummy_annot
+                    (Loc.annot_with_dummy
                        (Alg_expr.STATE_ALG_OP Operator.TIME_VAR))
                     handler_init
                 in

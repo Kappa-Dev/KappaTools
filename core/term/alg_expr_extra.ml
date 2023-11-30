@@ -7,14 +7,14 @@
 (******************************************************************************)
 
 let divide_expr_by_int e i =
-  Locality.dummy_annot
+  Loc.annot_with_dummy
     (Alg_expr.BIN_ALG_OP
-       (Operator.DIV, e, Locality.dummy_annot (Alg_expr.CONST (Nbr.I i))))
+       (Operator.DIV, e, Loc.annot_with_dummy (Alg_expr.CONST (Nbr.I i))))
 
 type ('a, 'b) corrected_rate_const = {
   num: Nbr.t;
   den: Nbr.t;
-  var: ('a, 'b) Alg_expr.e Locality.annot option;
+  var: ('a, 'b) Alg_expr.e Loc.annoted option;
 }
 
 let rec simplify ?(root_only = false) expr =
@@ -364,29 +364,29 @@ let rec clean expr =
   let expr = fst expr in
   match expr with
   | Alg_expr.BIN_ALG_OP (op, a, b) ->
-    Locality.dummy_annot (Alg_expr.BIN_ALG_OP (op, clean a, clean b))
+    Loc.annot_with_dummy (Alg_expr.BIN_ALG_OP (op, clean a, clean b))
   | Alg_expr.UN_ALG_OP (op, a) ->
-    Locality.dummy_annot (Alg_expr.UN_ALG_OP (op, clean a))
+    Loc.annot_with_dummy (Alg_expr.UN_ALG_OP (op, clean a))
   | Alg_expr.DIFF_TOKEN (expr, dt) ->
-    Locality.dummy_annot (Alg_expr.DIFF_TOKEN (clean expr, dt))
+    Loc.annot_with_dummy (Alg_expr.DIFF_TOKEN (clean expr, dt))
   | Alg_expr.DIFF_KAPPA_INSTANCE (expr, dt) ->
-    Locality.dummy_annot (Alg_expr.DIFF_KAPPA_INSTANCE (clean expr, dt))
+    Loc.annot_with_dummy (Alg_expr.DIFF_KAPPA_INSTANCE (clean expr, dt))
   | Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
   | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ ->
-    Locality.dummy_annot expr
+    Loc.annot_with_dummy expr
   | Alg_expr.IF (cond, yes, no) ->
-    Locality.dummy_annot (Alg_expr.IF (clean_bool cond, clean yes, clean no))
+    Loc.annot_with_dummy (Alg_expr.IF (clean_bool cond, clean yes, clean no))
 
 and clean_bool expr_bool =
   let expr = fst expr_bool in
   match expr with
-  | Alg_expr.TRUE | Alg_expr.FALSE -> Locality.dummy_annot expr
+  | Alg_expr.TRUE | Alg_expr.FALSE -> Loc.annot_with_dummy expr
   | Alg_expr.UN_BOOL_OP (op, a) ->
-    Locality.dummy_annot (Alg_expr.UN_BOOL_OP (op, clean_bool a))
+    Loc.annot_with_dummy (Alg_expr.UN_BOOL_OP (op, clean_bool a))
   | Alg_expr.BIN_BOOL_OP (op, a, b) ->
-    Locality.dummy_annot (Alg_expr.BIN_BOOL_OP (op, clean_bool a, clean_bool b))
+    Loc.annot_with_dummy (Alg_expr.BIN_BOOL_OP (op, clean_bool a, clean_bool b))
   | Alg_expr.COMPARE_OP (op, a, b) ->
-    Locality.dummy_annot (Alg_expr.COMPARE_OP (op, clean a, clean b))
+    Loc.annot_with_dummy (Alg_expr.COMPARE_OP (op, clean a, clean b))
 
 let rec get_corrected_rate e =
   match e with
@@ -491,7 +491,7 @@ let dep empty add_mixture add_token union dep_env ?time_var expr =
 let rec diff_gen f_mix f_token f_symb f_time expr =
   match fst expr with
   | Alg_expr.IF (b, e1, e2) ->
-    Locality.dummy_annot
+    Loc.annot_with_dummy
       (Alg_expr.IF
          ( b,
            diff_gen f_mix f_token f_symb f_time e1,
@@ -572,7 +572,7 @@ let diff_token expr token =
     else
       Alg_expr.int 0
   in
-  let f_symb expr = Alg_expr.DIFF_TOKEN (expr, token), Locality.dummy in
+  let f_symb expr = Alg_expr.DIFF_TOKEN (expr, token), Loc.dummy in
   let f_time _ = Alg_expr.int 0 in
   diff_gen f_mix f_token f_symb f_time expr
 
@@ -584,9 +584,7 @@ let diff_mixture ?time_var expr mixture =
       Alg_expr.int 0
   in
   let f_token _ = Alg_expr.int 0 in
-  let f_symb expr =
-    Alg_expr.DIFF_KAPPA_INSTANCE (expr, mixture), Locality.dummy
-  in
+  let f_symb expr = Alg_expr.DIFF_KAPPA_INSTANCE (expr, mixture), Loc.dummy in
   let f_time () =
     match time_var with
     | Some b when mixture = b -> Alg_expr.int 1
@@ -596,7 +594,7 @@ let diff_mixture ?time_var expr mixture =
         (ExceptionDefn.Internal_Error
            ( "A time-dependent expression cannot be differentiated without \
               specifying a variable for time progress",
-             Locality.dummy ))
+             Loc.dummy ))
   in
   diff_gen f_mix f_token f_symb f_time expr
 

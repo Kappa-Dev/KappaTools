@@ -23,7 +23,7 @@ let empty_agent handler error =
       Cckappa_sig.agent_kasim_id = Ckappa_sig.dummy_agent_id;
       Cckappa_sig.agent_name = Ckappa_sig.dummy_agent_name;
       Cckappa_sig.agent_interface = interface;
-      Cckappa_sig.agent_position = Locality.dummy;
+      Cckappa_sig.agent_position = Loc.dummy;
       Cckappa_sig.is_created = false;
     } )
 
@@ -78,7 +78,7 @@ let empty_e_rule handler error =
       Cckappa_sig.e_rule_initial_direction = Ckappa_sig.Direct;
       Cckappa_sig.e_rule_rule =
         {
-          Ckappa_sig.position = Locality.dummy;
+          Ckappa_sig.position = Loc.dummy;
           Ckappa_sig.prefix = 0;
           Ckappa_sig.delta = 0;
           Ckappa_sig.interprete_delta = Ckappa_sig.Direct;
@@ -157,7 +157,7 @@ let translate_agent_sig parameters error handler agent
     (kasim_id : Ckappa_sig.c_agent_id) map =
   let error, (bool, output) =
     Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error
-      Ckappa_sig.compare_unit_agent_name agent.Ckappa_sig.ag_nme ()
+      Ckappa_sig.compare_unit_agent_name agent.Ckappa_sig.agent_name ()
       Misc_sa.const_unit handler.Cckappa_sig.agents_dic
   in
   let error, agent_name =
@@ -185,7 +185,7 @@ let translate_agent_sig parameters error handler agent
         let error, (bool, output) =
           Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
             Ckappa_sig.compare_unit_site_name
-            (Ckappa_sig.Counter counter.Ckappa_sig.count_nme) ()
+            (Ckappa_sig.Counter counter.Ckappa_sig.counter_name) ()
             Misc_sa.const_unit site_dic
         in
         let error, counter_name =
@@ -193,13 +193,14 @@ let translate_agent_sig parameters error handler agent
           | _, None | true, _ ->
             Exception.warn parameters error __POS__
               ~message:
-                (agent.Ckappa_sig.ag_nme ^ " " ^ counter.Ckappa_sig.count_nme)
+                (agent.Ckappa_sig.agent_name ^ " "
+               ^ counter.Ckappa_sig.counter_name)
               Exit Ckappa_sig.dummy_site_name
           | _, Some (i, _, _, _) -> error, i
         in
         let (error', c_interface), test =
           let test =
-            match counter.Ckappa_sig.count_test with
+            match counter.Ckappa_sig.counter_test with
             | Some (Ckappa_sig.CEQ i) -> [ Ckappa_sig.state_index_of_int i ]
             | Some (Ckappa_sig.CGTE _)
             | Some (Ckappa_sig.CVAR _)
@@ -210,7 +211,7 @@ let translate_agent_sig parameters error handler agent
           ( Ckappa_sig.Site_map_and_set.Map.add parameters error counter_name
               {
                 Cckappa_sig.site_name = counter_name;
-                Cckappa_sig.site_position = Locality.dummy;
+                Cckappa_sig.site_position = Loc.dummy;
                 Cckappa_sig.site_state = test;
                 Cckappa_sig.site_free = None;
               }
@@ -240,7 +241,7 @@ let translate_agent_sig parameters error handler agent
           let error, (bool, output) =
             Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
               Ckappa_sig.compare_unit_site_name
-              (Ckappa_sig.Internal port.Ckappa_sig.port_nme) ()
+              (Ckappa_sig.Internal port.Ckappa_sig.port_name) ()
               Misc_sa.const_unit site_dic
           in
           let error, site_name =
@@ -248,7 +249,7 @@ let translate_agent_sig parameters error handler agent
             | _, None | true, _ ->
               Exception.warn parameters error __POS__
                 ~message:
-                  (agent.Ckappa_sig.ag_nme ^ " " ^ port.Ckappa_sig.port_nme)
+                  (agent.Ckappa_sig.agent_name ^ " " ^ port.Ckappa_sig.port_name)
                 Exit Ckappa_sig.dummy_site_name
             | _, Some (i, _, _, _) -> error, i
           in
@@ -288,7 +289,7 @@ let translate_agent_sig parameters error handler agent
             Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
               {
                 Cckappa_sig.site_name;
-                Cckappa_sig.site_position = Locality.dummy;
+                Cckappa_sig.site_position = Loc.dummy;
                 (*port.Ckappa_sig.port_pos ;*)
                 Cckappa_sig.site_state = internal_list;
                 Cckappa_sig.site_free = port.Ckappa_sig.port_free;
@@ -302,14 +303,14 @@ let translate_agent_sig parameters error handler agent
           error, c_interface
       in
       let error, c_interface =
-        match port.Ckappa_sig.port_lnk with
+        match port.Ckappa_sig.port_link with
         | Ckappa_sig.LNK_ANY _ | Ckappa_sig.LNK_MISSING ->
           Exception.warn parameters error __POS__ Exit c_interface
         | Ckappa_sig.FREE ->
           let error, (bool, output) =
             Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
               Ckappa_sig.compare_unit_site_name
-              (Ckappa_sig.Binding port.Ckappa_sig.port_nme) ()
+              (Ckappa_sig.Binding port.Ckappa_sig.port_name) ()
               Misc_sa.const_unit site_dic
           in
           (match bool, output with
@@ -319,7 +320,7 @@ let translate_agent_sig parameters error handler agent
               Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
                 {
                   Cckappa_sig.site_name;
-                  Cckappa_sig.site_position = Locality.dummy;
+                  Cckappa_sig.site_position = Loc.dummy;
                   Cckappa_sig.site_state = [ Ckappa_sig.dummy_state_index ];
                   Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                 }
@@ -347,7 +348,7 @@ let translate_agent_sig parameters error handler agent
        Cckappa_sig.agent_kasim_id = kasim_id;
        Cckappa_sig.agent_name;
        Cckappa_sig.agent_interface = c_interface;
-       Cckappa_sig.agent_position = Locality.dummy;
+       Cckappa_sig.agent_position = Loc.dummy;
        Cckappa_sig.is_created = false;
      }
       : Cckappa_sig.agent_sig),
@@ -358,14 +359,14 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
     delta =
   let error, (bool, output) =
     Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error
-      Ckappa_sig.compare_unit_agent_name agent.Ckappa_sig.ag_nme ()
+      Ckappa_sig.compare_unit_agent_name agent.Ckappa_sig.agent_name ()
       Misc_sa.const_unit handler.Cckappa_sig.agents_dic
   in
   match bool, output with
   | _, None ->
     let error, ag =
       Exception.warn parameters error __POS__ Exit
-        (Cckappa_sig.Unknown_agent (agent.Ckappa_sig.ag_nme, kasim_id))
+        (Cckappa_sig.Unknown_agent (agent.Ckappa_sig.agent_name, kasim_id))
     in
     error, bond_list, question_marks, delta, ag
   | true, _ ->
@@ -373,7 +374,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
       bond_list,
       question_marks,
       delta,
-      Cckappa_sig.Unknown_agent (agent.Ckappa_sig.ag_nme, kasim_id) )
+      Cckappa_sig.Unknown_agent (agent.Ckappa_sig.agent_name, kasim_id) )
   | _, Some (agent_name, _, _, _) ->
     let error, site_dic =
       match
@@ -403,40 +404,41 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
           let error, (bool, output) =
             Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
               Ckappa_sig.compare_unit_site_name
-              (Ckappa_sig.Counter counter.Ckappa_sig.count_nme) ()
+              (Ckappa_sig.Counter counter.Ckappa_sig.counter_name) ()
               Misc_sa.const_unit site_dic
           in
           match bool, output with
           | _, None ->
             Exception.warn parameters error __POS__
               ~message:
-                (agent.Ckappa_sig.ag_nme ^ " " ^ counter.Ckappa_sig.count_nme)
+                (agent.Ckappa_sig.agent_name ^ " "
+               ^ counter.Ckappa_sig.counter_name)
               Exit
               (c_interface, dead_sites, dead_state_sites, delta)
           | true, _ ->
             let error, dead_sites =
               Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error
-                (Ckappa_sig.Counter counter.Ckappa_sig.count_nme) dead_sites
+                (Ckappa_sig.Counter counter.Ckappa_sig.counter_name) dead_sites
             in
             error, (c_interface, dead_sites, dead_state_sites, delta)
           | _, Some (site_name, _, _, _) ->
             let error, delta =
-              match counter.Ckappa_sig.count_delta with
+              match counter.Ckappa_sig.counter_delta with
               | None | Some 0 -> error, delta
               | Some n ->
                 Ckappa_sig.AgentsSite_map_and_set.Map.add parameters error
                   (k, agent_name, site_name) n delta
             in
             let error, c_interface =
-              match counter.Ckappa_sig.count_test with
+              match counter.Ckappa_sig.counter_test with
               | Some (Ckappa_sig.CEQ _) | Some (Ckappa_sig.CGTE _) ->
                 Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
                   {
                     Cckappa_sig.site_name;
                     Cckappa_sig.site_free = None;
-                    Cckappa_sig.site_position = Locality.dummy;
+                    Cckappa_sig.site_position = Loc.dummy;
                     Cckappa_sig.site_state =
-                      (match counter.Ckappa_sig.count_test with
+                      (match counter.Ckappa_sig.counter_test with
                       | Some (Ckappa_sig.CEQ i) ->
                         {
                           Cckappa_sig.min =
@@ -473,20 +475,20 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Internal port.Ckappa_sig.port_nme) ()
+                (Ckappa_sig.Internal port.Ckappa_sig.port_name) ()
                 Misc_sa.const_unit site_dic
             in
             (match bool, output with
             | _, None ->
               Exception.warn parameters error __POS__
                 ~message:
-                  (agent.Ckappa_sig.ag_nme ^ " " ^ port.Ckappa_sig.port_nme)
+                  (agent.Ckappa_sig.agent_name ^ " " ^ port.Ckappa_sig.port_name)
                 Exit
                 (c_interface, question_marks, dead_sites, dead_state_sites)
             | true, _ ->
               let error, dead_sites =
                 Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error
-                  (Ckappa_sig.Internal port.Ckappa_sig.port_nme) dead_sites
+                  (Ckappa_sig.Internal port.Ckappa_sig.port_name) dead_sites
               in
               error, (c_interface, question_marks, dead_sites, dead_state_sites)
             | _, Some (site_name, _, _, _) ->
@@ -510,7 +512,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                   Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
                     {
                       Cckappa_sig.site_name;
-                      Cckappa_sig.site_position = Locality.dummy;
+                      Cckappa_sig.site_position = Loc.dummy;
                       Cckappa_sig.site_free = None;
                       Cckappa_sig.site_state =
                         {
@@ -536,20 +538,20 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Internal port.Ckappa_sig.port_nme) ()
+                (Ckappa_sig.Internal port.Ckappa_sig.port_name) ()
                 Misc_sa.const_unit site_dic
             in
             (match bool, output with
             | _, None ->
               Exception.warn parameters error __POS__
                 ~message:
-                  (agent.Ckappa_sig.ag_nme ^ " " ^ port.Ckappa_sig.port_nme)
+                  (agent.Ckappa_sig.agent_name ^ " " ^ port.Ckappa_sig.port_name)
                 Exit
                 (c_interface, question_marks, dead_sites, dead_state_sites)
             | true, _ ->
               let error, dead_sites =
                 Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error
-                  (Ckappa_sig.Internal port.Ckappa_sig.port_nme) dead_sites
+                  (Ckappa_sig.Internal port.Ckappa_sig.port_name) dead_sites
               in
               error, (c_interface, question_marks, dead_sites, dead_state_sites)
             | _, Some (site_name, _, _, _) ->
@@ -562,8 +564,8 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                   (fun error ->
                     Exception.warn parameters error __POS__
                       ~message:
-                        (agent.Ckappa_sig.ag_nme ^ " "
-                       ^ port.Ckappa_sig.port_nme)
+                        (agent.Ckappa_sig.agent_name ^ " "
+                       ^ port.Ckappa_sig.port_name)
                       Exit
                       (Ckappa_sig.Dictionary_of_States.init ()))
               in
@@ -589,7 +591,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                   Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
                     {
                       Cckappa_sig.site_name;
-                      Cckappa_sig.site_position = Locality.dummy;
+                      Cckappa_sig.site_position = Loc.dummy;
                       Cckappa_sig.site_free = None;
                       Cckappa_sig.site_state =
                         {
@@ -617,12 +619,12 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                 question_marks,
                 dead_sites,
                 dead_link_sites ) ) =
-          match port.Ckappa_sig.port_lnk with
+          match port.Ckappa_sig.port_link with
           | Ckappa_sig.LNK_MISSING when creation ->
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Binding port.Ckappa_sig.port_nme) ()
+                (Ckappa_sig.Binding port.Ckappa_sig.port_name) ()
                 Misc_sa.const_unit site_dic
             in
             (match bool, output with
@@ -638,7 +640,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                 Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
                   {
                     Cckappa_sig.site_name;
-                    Cckappa_sig.site_position = Locality.dummy;
+                    Cckappa_sig.site_position = Loc.dummy;
                     Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                     Cckappa_sig.site_state =
                       {
@@ -662,7 +664,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Binding port.Ckappa_sig.port_nme) ()
+                (Ckappa_sig.Binding port.Ckappa_sig.port_name) ()
                 Misc_sa.const_unit site_dic
             in
             (match bool, output with
@@ -711,7 +713,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                   {
                     Cckappa_sig.site_name;
                     Cckappa_sig.site_free = port.Ckappa_sig.port_free;
-                    Cckappa_sig.site_position = Locality.dummy;
+                    Cckappa_sig.site_position = Loc.dummy;
                     Cckappa_sig.site_state =
                       {
                         Cckappa_sig.min = Some state_min;
@@ -734,7 +736,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Binding port.Ckappa_sig.port_nme) ()
+                (Ckappa_sig.Binding port.Ckappa_sig.port_name) ()
                 Misc_sa.const_unit site_dic
             in
             (match bool, output with
@@ -750,7 +752,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                 Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
                   {
                     Cckappa_sig.site_name;
-                    Cckappa_sig.site_position = Locality.dummy;
+                    Cckappa_sig.site_position = Loc.dummy;
                     Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                     Cckappa_sig.site_state =
                       {
@@ -774,15 +776,15 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Binding port.Ckappa_sig.port_nme) ()
+                (Ckappa_sig.Binding port.Ckappa_sig.port_name) ()
                 Misc_sa.const_unit site_dic
             in
             (match bool, output with
             | _, None ->
               Exception.warn parameters error __POS__
                 ~message:
-                  ("this site cannot be bound, " ^ agent.Ckappa_sig.ag_nme ^ " "
-                 ^ port.Ckappa_sig.port_nme)
+                  ("this site cannot be bound, " ^ agent.Ckappa_sig.agent_name
+                 ^ " " ^ port.Ckappa_sig.port_name)
                 ~pos Exit
                 ( c_interface,
                   bond_list,
@@ -792,7 +794,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             | true, _ ->
               let error, dead_sites =
                 Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error
-                  (Ckappa_sig.Binding port.Ckappa_sig.port_nme) dead_sites
+                  (Ckappa_sig.Binding port.Ckappa_sig.port_name) dead_sites
               in
               ( error,
                 ( c_interface,
@@ -810,7 +812,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
               | error, None ->
                 let error', dead_link_sites =
                   Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
-                    port.Ckappa_sig.port_lnk dead_link_sites
+                    port.Ckappa_sig.port_link dead_link_sites
                 in
                 ( Exception.check_point Exception.warn parameters error error'
                     __POS__
@@ -834,7 +836,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                 then (
                   let error', dead_link_sites =
                     Ckappa_sig.Site_map_and_set.Map.add parameters error
-                      site_name port.Ckappa_sig.port_lnk dead_link_sites
+                      site_name port.Ckappa_sig.port_link dead_link_sites
                   in
                   ( Exception.check_point Exception.warn parameters error error'
                       __POS__
@@ -864,7 +866,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                       {
                         Cckappa_sig.site_name;
                         Cckappa_sig.site_free = port.Ckappa_sig.port_free;
-                        Cckappa_sig.site_position = Locality.dummy;
+                        Cckappa_sig.site_position = Loc.dummy;
                         Cckappa_sig.site_state =
                           {
                             Cckappa_sig.min = Some state_min;
@@ -888,15 +890,15 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Binding port.Ckappa_sig.port_nme) ()
+                (Ckappa_sig.Binding port.Ckappa_sig.port_name) ()
                 Misc_sa.const_unit site_dic
             in
             (match bool, output with
             | _, None ->
               Exception.warn parameters error __POS__
                 ~message:
-                  ("this site cannot be bound, " ^ agent.Ckappa_sig.ag_nme ^ " "
-                 ^ port.Ckappa_sig.port_nme)
+                  ("this site cannot be bound, " ^ agent.Ckappa_sig.agent_name
+                 ^ " " ^ port.Ckappa_sig.port_name)
                 ~pos Exit
                 ( c_interface,
                   bond_list,
@@ -906,7 +908,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             | true, _ ->
               let error, dead_sites =
                 Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error
-                  (Ckappa_sig.Binding port.Ckappa_sig.port_nme) dead_sites
+                  (Ckappa_sig.Binding port.Ckappa_sig.port_name) dead_sites
               in
               ( error,
                 ( c_interface,
@@ -924,7 +926,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
               | error, None ->
                 let error', dead_link_sites =
                   Ckappa_sig.Site_map_and_set.Map.add parameters error site_name
-                    port.Ckappa_sig.port_lnk dead_link_sites
+                    port.Ckappa_sig.port_link dead_link_sites
                 in
                 ( Exception.check_point Exception.warn parameters error error'
                     __POS__
@@ -994,7 +996,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                         {
                           Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                           Cckappa_sig.site_name;
-                          Cckappa_sig.site_position = Locality.dummy;
+                          Cckappa_sig.site_position = Loc.dummy;
                           Cckappa_sig.site_state =
                             {
                               Cckappa_sig.min = Some i;
@@ -1019,7 +1021,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Binding port.Ckappa_sig.port_nme) ()
+                (Ckappa_sig.Binding port.Ckappa_sig.port_name) ()
                 Misc_sa.const_unit site_dic
             in
             let error, site_name =
@@ -1094,7 +1096,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
                     {
                       Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                       Cckappa_sig.site_name;
-                      Cckappa_sig.site_position = Locality.dummy;
+                      Cckappa_sig.site_position = Loc.dummy;
                       Cckappa_sig.site_state =
                         { Cckappa_sig.min = Some i; Cckappa_sig.max = Some i };
                     }
@@ -1145,7 +1147,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             Cckappa_sig.agent_kasim_id = kasim_id;
             Cckappa_sig.agent_name;
             Cckappa_sig.agent_interface = c_interface;
-            Cckappa_sig.agent_position = Locality.dummy;
+            Cckappa_sig.agent_position = Loc.dummy;
             Cckappa_sig.is_created = creation;
           }
       else
@@ -1154,7 +1156,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
               Cckappa_sig.agent_kasim_id = kasim_id;
               Cckappa_sig.agent_name;
               Cckappa_sig.agent_interface = c_interface;
-              Cckappa_sig.agent_position = Locality.dummy;
+              Cckappa_sig.agent_position = Loc.dummy;
               Cckappa_sig.is_created = creation;
             },
             dead_sites,
@@ -1632,7 +1634,7 @@ let translate_rule parameters error handler rule =
           error
           {
             Cckappa_sig.site_name;
-            Cckappa_sig.site_position = Locality.dummy;
+            Cckappa_sig.site_position = Loc.dummy;
             Cckappa_sig.site_free = None;
             Cckappa_sig.site_state =
               { Cckappa_sig.min = None; Cckappa_sig.max = None };

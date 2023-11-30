@@ -1,25 +1,50 @@
 (library
-  (name kappa_kasa_export)
-  (libraries kappa_flow_analysis kappa_reachability kappa_influence_map kappa_polymers_analysis  kappa_symmetries)
-  (flags (:standard)
-    -open Kappa_kasa_frontend
-    -open Kappa_kasa_remanent_state
-    -open Kappa_grammar
-    -open Kappa_terms
-    -open Kappa_logging
-    -open Kappa_generic_toolset
-    -open Kappa_errors
-    -open Kappa_reachability
-    -open Kappa_flow_analysis
-    -open Kappa_parameters
-    -open Kappa_kasa_kastor_toolset
-    -open Kappa_cli
-    -open Kappa_profiling
-    -open Kappa_mixtures
-    -open Kappa_influence_map
-    -open Kappa_polymers_analysis
-    -open Kappa_kasa_site_graphs
-    -open Kappa_kasa_backend
-    -open Kappa_symmetries
-    -open Kappa_kasa_type_interface
-))
+ (name kappa_kasa_export)
+ (libraries
+  kappa_flow_analysis
+  kappa_reachability
+  kappa_influence_map
+  kappa_polymers_analysis
+  kappa_symmetries)
+ (flags
+  (:standard)
+  -open
+  Kappa_kasa_frontend
+  -open
+  Kappa_kasa_remanent_state
+  -open
+  Kappa_grammar
+  -open
+  Kappa_terms
+  -open
+  Kappa_logging
+  -open
+  Kappa_generic_toolset
+  -open
+  Kappa_errors
+  -open
+  Kappa_reachability
+  -open
+  Kappa_flow_analysis
+  -open
+  Kappa_parameters
+  -open
+  Kappa_kasa_kastor_toolset
+  -open
+  Kappa_cli
+  -open
+  Kappa_profiling
+  -open
+  Kappa_mixtures
+  -open
+  Kappa_influence_map
+  -open
+  Kappa_polymers_analysis
+  -open
+  Kappa_kasa_site_graphs
+  -open
+  Kappa_kasa_backend
+  -open
+  Kappa_symmetries
+  -open
+  Kappa_kasa_type_interface))

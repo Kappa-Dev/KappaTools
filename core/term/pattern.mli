@@ -62,7 +62,7 @@ module Env : sig
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
   val get_elementary :
-    debugMode:bool ->
+    debug_mode:bool ->
     t ->
     Agent.t ->
     int ->
@@ -108,7 +108,7 @@ val new_internal_state : work -> Agent.t * int -> int -> work
 (** [new_link_type work (node,site) type] *)
 
 val finish_new :
-  debugMode:bool ->
+  debug_mode:bool ->
   ?origin:Operator.rev_dep ->
   work ->
   PreEnv.t * Renaming.t * cc * id
@@ -147,10 +147,10 @@ val reconstruction_navigation : t -> Navigation.abstract Navigation.t
 val find_ty : cc -> int -> int
 (** Abstraction leak, please do not use *)
 
-val automorphisms : debugMode:bool -> t -> Renaming.t list
+val automorphisms : debug_mode:bool -> t -> Renaming.t list
 
 val embeddings_to_fully_specified :
-  debugMode:bool -> Env.t -> id -> cc -> Renaming.t list
+  debug_mode:bool -> Env.t -> id -> cc -> Renaming.t list
 
 val size_of_cc : cc -> int
 
@@ -189,17 +189,17 @@ val sharing_level_of_string : string -> sharing_level
 (** Deserialize JSON data of type {!sharing_level}. *)
 
 val finalize :
-  debugMode:bool ->
+  debug_mode:bool ->
   sharing:sharing_level ->
   PreEnv.t ->
   Contact_map.t ->
   Env.t * PreEnv.stat
 
-val infs : debugMode:bool -> Signature.s -> t -> t -> t list
-val matchings : debugMode:bool -> Signature.s -> t -> t -> Renaming.t list
+val infs : debug_mode:bool -> Signature.s -> t -> t -> t list
+val matchings : debug_mode:bool -> Signature.s -> t -> t -> Renaming.t list
 
 val merge_on_inf :
-  debugMode:bool ->
+  debug_mode:bool ->
   PreEnv.t ->
   Renaming.t ->
   t ->

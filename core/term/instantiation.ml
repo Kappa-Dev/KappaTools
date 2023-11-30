@@ -77,73 +77,73 @@ let empty_event =
     connectivity_tests = [];
   }
 
-let concretize_binding_state ~debugMode inj2graph = function
+let concretize_binding_state ~debug_mode inj2graph = function
   | ANY -> ANY
   | FREE -> FREE
   | BOUND -> BOUND
   | BOUND_TYPE bt -> BOUND_TYPE bt
   | BOUND_to (pl, s) ->
-    BOUND_to (Matching.Agent.concretize ~debugMode inj2graph pl, s)
+    BOUND_to (Matching.Agent.concretize ~debug_mode inj2graph pl, s)
 
-let concretize_test ~debugMode inj2graph = function
-  | Is_Here pl -> Is_Here (Matching.Agent.concretize ~debugMode inj2graph pl)
+let concretize_test ~debug_mode inj2graph = function
+  | Is_Here pl -> Is_Here (Matching.Agent.concretize ~debug_mode inj2graph pl)
   | Has_Internal ((pl, s), i) ->
-    Has_Internal ((Matching.Agent.concretize ~debugMode inj2graph pl, s), i)
+    Has_Internal ((Matching.Agent.concretize ~debug_mode inj2graph pl, s), i)
   | Is_Free (pl, s) ->
-    Is_Free (Matching.Agent.concretize ~debugMode inj2graph pl, s)
+    Is_Free (Matching.Agent.concretize ~debug_mode inj2graph pl, s)
   | Is_Bound (pl, s) ->
-    Is_Bound (Matching.Agent.concretize ~debugMode inj2graph pl, s)
+    Is_Bound (Matching.Agent.concretize ~debug_mode inj2graph pl, s)
   | Has_Binding_type ((pl, s), t) ->
-    Has_Binding_type ((Matching.Agent.concretize ~debugMode inj2graph pl, s), t)
+    Has_Binding_type ((Matching.Agent.concretize ~debug_mode inj2graph pl, s), t)
   | Is_Bound_to ((pl, s), (pl', s')) ->
     Is_Bound_to
-      ( (Matching.Agent.concretize ~debugMode inj2graph pl, s),
-        (Matching.Agent.concretize ~debugMode inj2graph pl', s') )
+      ( (Matching.Agent.concretize ~debug_mode inj2graph pl, s),
+        (Matching.Agent.concretize ~debug_mode inj2graph pl', s') )
 
-let concretize_action ~debugMode inj2graph = function
+let concretize_action ~debug_mode inj2graph = function
   | Create (pl, i) ->
-    Create (Matching.Agent.concretize ~debugMode inj2graph pl, i)
+    Create (Matching.Agent.concretize ~debug_mode inj2graph pl, i)
   | Mod_internal ((pl, s), i) ->
-    Mod_internal ((Matching.Agent.concretize ~debugMode inj2graph pl, s), i)
+    Mod_internal ((Matching.Agent.concretize ~debug_mode inj2graph pl, s), i)
   | Bind ((pl, s), (pl', s')) ->
     Bind
-      ( (Matching.Agent.concretize ~debugMode inj2graph pl, s),
-        (Matching.Agent.concretize ~debugMode inj2graph pl', s') )
+      ( (Matching.Agent.concretize ~debug_mode inj2graph pl, s),
+        (Matching.Agent.concretize ~debug_mode inj2graph pl', s') )
   | Bind_to ((pl, s), (pl', s')) ->
     Bind_to
-      ( (Matching.Agent.concretize ~debugMode inj2graph pl, s),
-        (Matching.Agent.concretize ~debugMode inj2graph pl', s') )
-  | Free (pl, s) -> Free (Matching.Agent.concretize ~debugMode inj2graph pl, s)
-  | Remove pl -> Remove (Matching.Agent.concretize ~debugMode inj2graph pl)
+      ( (Matching.Agent.concretize ~debug_mode inj2graph pl, s),
+        (Matching.Agent.concretize ~debug_mode inj2graph pl', s') )
+  | Free (pl, s) -> Free (Matching.Agent.concretize ~debug_mode inj2graph pl, s)
+  | Remove pl -> Remove (Matching.Agent.concretize ~debug_mode inj2graph pl)
 
-let try_concretize_action ~debugMode inj2graph actions =
-  try Some (concretize_action ~debugMode inj2graph actions)
+let try_concretize_action ~debug_mode inj2graph actions =
+  try Some (concretize_action ~debug_mode inj2graph actions)
   with Not_found -> None
 (* The action is dealing with a fresh agent *)
 
-let concretize_event ~debugMode inj2graph e =
+let concretize_event ~debug_mode inj2graph e =
   {
     tests =
-      List.map (List.rev_map (concretize_test ~debugMode inj2graph)) e.tests;
+      List.map (List.rev_map (concretize_test ~debug_mode inj2graph)) e.tests;
     actions =
       (* actions are reordered the following way:
          1) Remove actions
          2) Creation actions
          3) Anything else.*)
       sort_abstract_action_list
-        (List.rev_map (concretize_action ~debugMode inj2graph) e.actions);
+        (List.rev_map (concretize_action ~debug_mode inj2graph) e.actions);
     side_effects_src =
       List.rev_map
         (fun ((pl, s), b) ->
-          ( (Matching.Agent.concretize ~debugMode inj2graph pl, s),
-            concretize_binding_state ~debugMode inj2graph b ))
+          ( (Matching.Agent.concretize ~debug_mode inj2graph pl, s),
+            concretize_binding_state ~debug_mode inj2graph b ))
         e.side_effects_src;
     side_effects_dst =
       List.rev_map
-        (fun (pl, s) -> Matching.Agent.concretize ~debugMode inj2graph pl, s)
+        (fun (pl, s) -> Matching.Agent.concretize ~debug_mode inj2graph pl, s)
         e.side_effects_dst;
     connectivity_tests =
-      List.rev_map (concretize_test ~debugMode inj2graph) e.connectivity_tests;
+      List.rev_map (concretize_test ~debug_mode inj2graph) e.connectivity_tests;
   }
 
 let map_test f = function
@@ -236,7 +236,7 @@ let rec find_match tests actions ctests cactions = function
   | [] ->
     raise
       (ExceptionDefn.Internal_Error
-         (Locality.dummy_annot "abstract and concret quarks don't match"))
+         (Loc.annot_with_dummy "abstract and concret quarks don't match"))
   | cid :: tl ->
     let ctests' =
       List.filter (fun test -> map_test (fun a -> Agent.id a = cid) test) ctests
@@ -254,7 +254,7 @@ let rec find_match tests actions ctests cactions = function
     else
       find_match tests actions ctests cactions tl
 
-let matching_abstract_concrete ~debugMode ae ce =
+let matching_abstract_concrete ~debug_mode ae ce =
   let ae_tests = List.flatten ae.tests in
   let ce_tests = List.flatten ce.tests in
   let abstract_ids =
@@ -287,7 +287,7 @@ let matching_abstract_concrete ~debugMode ae ce =
         let j =
           find_match tests actions ce_tests ce.actions (available_ids matching)
         in
-        Renaming.imperative_add ~debugMode i j matching)
+        Renaming.imperative_add ~debug_mode i j matching)
       true abstract_ids
   in
   if injective then
@@ -361,8 +361,8 @@ let subst_agent_in_concrete_test id id' x =
         j)
     x
 
-let rename_abstract_test ~debugMode id inj x =
-  subst_map_agent_in_test (Matching.Agent.rename ~debugMode id inj) x
+let rename_abstract_test ~debug_mode id inj x =
+  subst_map_agent_in_test (Matching.Agent.rename ~debug_mode id inj) x
 
 let subst_map2_agent_in_action f f' = function
   | Create (agent, list) as x ->
@@ -418,8 +418,8 @@ let subst_agent_in_concrete_action id id' x =
         j)
     x
 
-let rename_abstract_action ~debugMode id inj x =
-  subst_map_agent_in_action (Matching.Agent.rename ~debugMode id inj) x
+let rename_abstract_action ~debug_mode id inj x =
+  subst_map_agent_in_action (Matching.Agent.rename ~debug_mode id inj) x
 
 let subst_map_binding_state f = function
   | (ANY | FREE | BOUND | BOUND_TYPE _) as x -> x
@@ -450,8 +450,8 @@ let subst_agent_in_concrete_side_effect id id' x =
         j)
     x
 
-let rename_abstract_side_effect ~debugMode id inj x =
-  subst_map_agent_in_side_effect (Matching.Agent.rename ~debugMode id inj) x
+let rename_abstract_side_effect ~debug_mode id inj x =
+  subst_map_agent_in_side_effect (Matching.Agent.rename ~debug_mode id inj) x
 
 let subst_map_agent_in_event f e =
   {
@@ -499,8 +499,8 @@ let subst_agent_in_concrete_event id id' x =
         j)
     x
 
-let rename_abstract_event ~debugMode id inj x =
-  subst_map_agent_in_event (Matching.Agent.rename ~debugMode id inj) x
+let rename_abstract_event ~debug_mode id inj x =
+  subst_map_agent_in_event (Matching.Agent.rename ~debug_mode id inj) x
 
 let print_concrete_agent_site ?sigs f (agent, id) =
   Format.fprintf f "%a.%a"

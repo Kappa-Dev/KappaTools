@@ -799,7 +799,7 @@ let log_event id quarks event_kind steps =
                 | Instantiation.Remove _ ->
                   raise
                     (ExceptionDefn.Internal_Error
-                       (Locality.dummy_annot
+                       (Loc.annot_with_dummy
                           "init event has actions not allowed")))
               actions
           | Trace.Rule _ | Trace.Pert _ | Trace.Obs _ | Trace.Subs _

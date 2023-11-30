@@ -47,7 +47,7 @@ type options =
   | LineStyle of linestyle
   | OnClick of Yojson.Basic.t
   | Contextual_help of string
-  | Position of Locality.t list
+  | Position of Loc.t list
 
 type graph =
   (string * options list) list * (string * string * options list) list

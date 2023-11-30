@@ -115,11 +115,11 @@ let reinitialize ~outputs random_state t =
     State_interpreter.empty ~with_delta_activities:false t.counter t.env
 
 let catch_error handler = function
-  | ExceptionDefn.Syntax_Error ((message, range) : string Locality.annot) ->
+  | ExceptionDefn.Syntax_Error ((message, range) : string Loc.annoted) ->
     handler (Api_common.error_msg ~range message)
-  | ExceptionDefn.Malformed_Decl ((message, range) : string Locality.annot) ->
+  | ExceptionDefn.Malformed_Decl ((message, range) : string Loc.annoted) ->
     handler (Api_common.error_msg ~range message)
-  | ExceptionDefn.Internal_Error ((message, range) : string Locality.annot) ->
+  | ExceptionDefn.Internal_Error ((message, range) : string Loc.annoted) ->
     handler (Api_common.error_msg ~range message)
   | Invalid_argument error ->
     handler (Api_common.error_msg ("Runtime error " ^ error))
@@ -129,7 +129,8 @@ let catch_error handler = function
     in
     handler (Api_common.error_msg message)
 
-let parse ~patternSharing (ast : Ast.parsing_compil) overwrite system_process =
+let parse ~patternSharing (ast : Ast.parsing_compil) var_overwrite
+    system_process =
   let yield = system_process#yield in
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
@@ -140,21 +141,11 @@ let parse ~patternSharing (ast : Ast.parsing_compil) overwrite system_process =
   Lwt.catch
     (fun () ->
       Lwt.wrap2
-        (LKappa_compiler.compil_of_ast ~warning ~debugMode:false
-           ~syntax_version:Ast.V4)
-        overwrite ast
-      >>= fun ( sig_nd,
-                contact_map,
-                tk_nd,
-                _algs_nd,
-                _updated_vars,
-                (result :
-                  ( Ast.agent,
-                    LKappa.rule_agent list,
-                    Raw_mixture.t,
-                    int,
-                    LKappa.rule )
-                  Ast.compil) ) ->
+        (fun var_overwrite ->
+          LKappa_compiler.compil_of_ast ~warning ~debug_mode:false
+            ~syntax_version:Ast.V4 ~var_overwrite)
+        var_overwrite ast
+      >>= fun (ast_compiled_data : LKappa_compiler.ast_compiled_data) ->
       yield () >>= fun () ->
       (* The last yield is updated after the last yield.
          It is gotten here for the initial last yeild value. *)
@@ -170,11 +161,12 @@ let parse ~patternSharing (ast : Ast.parsing_compil) overwrite system_process =
           | Data.Print _ ->
             assert false
         in
-        Eval.compile ~debugMode:false
+        Eval.compile ~debug_mode:false
           ~pause:(fun f -> Lwt.bind (yield ()) f)
           ~return:Lwt.return ?rescale_init:None ?overwrite_t0:None
-          ~compileModeOn:false ~outputs ~sharing:patternSharing sig_nd tk_nd
-          contact_map result
+          ~compile_mode_on:false ~outputs ~sharing:patternSharing
+          ast_compiled_data.agents_sig ast_compiled_data.token_names
+          ast_compiled_data.contact_map ast_compiled_data.result
         >>= fun (env, with_trace, init_l) ->
         let counter =
           Counter.create
@@ -199,8 +191,8 @@ let parse ~patternSharing (ast : Ast.parsing_compil) overwrite system_process =
             env inputs_form init_l
         in
         let simulation =
-          create_t ~contact_map ~log_form ~log_buffer ~inputs_buffer
-            ~inputs_form ~ast ~env ~counter
+          create_t ~contact_map:ast_compiled_data.contact_map ~log_form
+            ~log_buffer ~inputs_buffer ~inputs_form ~ast ~env ~counter
             ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
             ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
             ~patternSharing
@@ -293,7 +285,7 @@ let run_simulation ~(system_process : system_process) ~(t : t) stopped :
                   < system_process#min_run_duration ()
              do
                let stop, graph', state' =
-                 State_interpreter.a_loop ~debugMode:false ~outputs:(outputs t)
+                 State_interpreter.a_loop ~debug_mode:false ~outputs:(outputs t)
                    ~dumpIfDeadlocked:t.dumpIfDeadlocked
                    ~maxConsecutiveClash:t.maxConsecutiveClash t.env t.counter
                    t.graph t.state
@@ -354,7 +346,7 @@ let start ~(system_process : system_process)
       try
         let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
         Lwt.wrap4
-          (Evaluator.get_pause_criteria ~debugMode:false ~outputs:(outputs t)
+          (Evaluator.get_pause_criteria ~debug_mode:false ~outputs:(outputs t)
              ~sharing:t.patternSharing ~syntax_version:Ast.V4)
           t.contact_map t.env t.graph pause
         >>= fun (env', graph', b'') ->
@@ -373,7 +365,7 @@ let start ~(system_process : system_process)
                 Eval.build_initial_state
                   ~bind:(fun x f ->
                     time_yield ~system_process ~t >>= fun () -> x >>= f)
-                  ~return:Lwt.return ~debugMode:false ~outputs:(outputs t)
+                  ~return:Lwt.return ~debug_mode:false ~outputs:(outputs t)
                   ~with_trace:parameter.Api_types_t.simulation_store_trace
                   ~with_delta_activities:false t.counter t.env random_state
                   t.init_l
@@ -443,7 +435,7 @@ let perturbation ~(system_process : system_process) ~(t : t)
           let log_buffer = Buffer.create 512 in
           let log_form = Format.formatter_of_buffer log_buffer in
           Lwt.wrap6
-            (Evaluator.do_interactive_directives ~debugMode:false
+            (Evaluator.do_interactive_directives ~debug_mode:false
                ~outputs:(interactive_outputs log_form t)
                ~sharing:t.patternSharing ~syntax_version:Ast.V4)
             t.contact_map t.env t.counter t.graph t.state e
@@ -483,7 +475,7 @@ let continue ~(system_process : system_process) ~(t : t)
         try
           let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
           Lwt.wrap4
-            (Evaluator.get_pause_criteria ~debugMode:false ~outputs:(outputs t)
+            (Evaluator.get_pause_criteria ~debug_mode:false ~outputs:(outputs t)
                ~sharing:t.patternSharing ~syntax_version:Ast.V4)
             t.contact_map t.env t.graph pause
           >>= fun (env', graph', b'') ->

@@ -533,7 +533,7 @@ let print_var parameters error handler var =
       Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s: " s
   in
   print_short_alg parameters error handler
-    (Locality.dummy_annot var.Cckappa_sig.c_variable)
+    (Loc.annot_with_dummy var.Cckappa_sig.c_variable)
 
 let print_variables parameters error handler var =
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.print parameters error
@@ -921,7 +921,7 @@ let print_agent_annotation parameters error handler =
                 (Remanent_parameters.get_logger parameters)
                 "%s       %s"
                 (Remanent_parameters.get_prefix parameters)
-                (Locality.to_string position)
+                (Loc.to_string position)
             in
             Loggers.print_newline (Remanent_parameters.get_logger parameters))
           locations

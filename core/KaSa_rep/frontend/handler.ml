@@ -205,7 +205,7 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
   | None ->
     Exception.warn parameters error __POS__ Exit
       ( "",
-        Locality.dummy,
+        Loc.dummy,
         Public_data.Dummy_rule_direction,
         "",
         Ckappa_sig.dummy_rule_id )
@@ -213,7 +213,7 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
     let label_opt = rule.Cckappa_sig.e_rule_label in
     let error, (label, _) =
       Misc_sa.unsome (error, label_opt) (fun error ->
-          error, Locality.dummy_annot "")
+          error, Loc.annot_with_dummy "")
     in
     let label =
       if label = "" then
@@ -268,7 +268,7 @@ let info_of_var parameters error handler compiled
   | None ->
     Exception.warn parameters error __POS__ Exit
       ( "VAR " ^ Ckappa_sig.string_of_rule_id var_id,
-        Locality.dummy,
+        Loc.dummy,
         Public_data.Variable,
         "",
         var_id )
@@ -291,10 +291,10 @@ let string_of_info ?(with_rule = true) ?(with_rule_name = true)
       ""
   in
   let pos =
-    if (not with_loc) || pos = Locality.dummy then
+    if (not with_loc) || pos = Loc.dummy then
       ""
     else
-      Locality.to_string pos
+      Loc.to_string pos
   in
   let ast =
     if not with_ast then
@@ -706,7 +706,7 @@ let print_rule_or_var parameters error handler compiled print_rule print_var
       let error, label = get_label_of_rule parameters error rule in
       let error, (m1, _) =
         Misc_sa.unsome (error, label) (fun error ->
-            error, Locality.dummy_annot "")
+            error, Loc.annot_with_dummy "")
       in
       let m1 =
         if m1 = "" then

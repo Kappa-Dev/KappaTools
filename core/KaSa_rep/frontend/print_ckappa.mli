@@ -9,7 +9,7 @@ val print_rule :
 val print_bool :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
-  (Ckappa_sig.mixture, string) Alg_expr.bool Locality.annot ->
+  (Ckappa_sig.mixture, string) Alg_expr.bool Loc.annoted ->
   Exception_without_parameter.method_handler
 
 val print_alg :

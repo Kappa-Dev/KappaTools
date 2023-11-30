@@ -37,7 +37,7 @@ let add_entry parameters id agent site index (error, map) =
     ((agent, site, index) :: old_list)
     map
 
-let add_entry_lnk parameters id agent site index (error, map) =
+let add_entry_link parameters id agent site index (error, map) =
   let error, old_list =
     Ckappa_sig.Lnk_id_map_and_set.Map.find_default_without_logs parameters error
       [] id map
@@ -116,22 +116,22 @@ let rec scan_interface parameters k agent interface
   | Ast.Counter counter :: interface ->
     let error, set_counters =
       check_freshness parameters error "Counter"
-        (fst counter.Ast.count_nme)
+        (fst counter.Ast.counter_name)
         set_counters
     in
     scan_interface parameters k agent interface
       ((error, a), (set_sites, set_counters))
   | Ast.Port port :: interface ->
     let error, set_sites =
-      check_freshness parameters error "Site" (fst port.Ast.port_nme) set_sites
+      check_freshness parameters error "Site" (fst port.Ast.port_name) set_sites
     in
     let remanent = error, a in
     scan_interface parameters k agent interface
-      ( (match port.Ast.port_lnk with
+      ( (match port.Ast.port_link with
         | [ (LKappa.LNK_VALUE (i, ()), _) ] ->
-          add_entry_lnk parameters
+          add_entry_link parameters
             (Ckappa_sig.lnk_value_of_int i)
-            agent (fst port.Ast.port_nme) k remanent
+            agent (fst port.Ast.port_name) k remanent
         | []
         | ( ( LKappa.LNK_ANY | LKappa.LNK_FREE | LKappa.LNK_TYPE _
             | LKappa.LNK_SOME | LKappa.ANY_FREE
@@ -176,7 +176,7 @@ let collect_binding_label parameters mixture f k remanent =
     map
     (error, (map, Ckappa_sig.Lnk_id_map_and_set.Set.empty))
 
-let translate_lnk_state parameters lnk_state remanent =
+let translate_link_state parameters lnk_state remanent =
   match lnk_state with
   | [ (LKappa.LNK_VALUE (id, ()), pos) ] ->
     let error, remanent = remanent in
@@ -222,10 +222,10 @@ let translate_lnk_state parameters lnk_state remanent =
 let translate_port is_signature parameters int_set port remanent =
   let error, map = remanent in
   let error, _ =
-    check_freshness parameters error "Site" (fst port.Ast.port_nme) int_set
+    check_freshness parameters error "Site" (fst port.Ast.port_name) int_set
   in
   let error', is_free =
-    match port.Ast.port_lnk with
+    match port.Ast.port_link with
     | [ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ] -> error, Some true
     | [] ->
       (match Remanent_parameters.get_syntax_version parameters with
@@ -242,12 +242,12 @@ let translate_port is_signature parameters int_set port remanent =
     if is_signature then
       Ckappa_sig.FREE, remanent
     else
-      translate_lnk_state parameters port.Ast.port_lnk (error', map)
+      translate_link_state parameters port.Ast.port_link (error', map)
   in
   ( {
-      Ckappa_sig.port_nme = fst port.Ast.port_nme;
+      Ckappa_sig.port_name = fst port.Ast.port_name;
       Ckappa_sig.port_int = List.rev_map fst (List.rev port.Ast.port_int);
-      Ckappa_sig.port_lnk = lnk;
+      Ckappa_sig.port_link = lnk;
       Ckappa_sig.port_free = is_free;
     },
     remanent )
@@ -266,15 +266,15 @@ let fst_opt a_opt =
 let translate_counter parameters error int_set counter =
   let error, _ =
     check_freshness parameters error "Counters"
-      (fst counter.Ast.count_nme)
+      (fst counter.Ast.counter_name)
       int_set
   in
   ( error,
     {
-      Ckappa_sig.count_nme = fst counter.Ast.count_nme;
-      Ckappa_sig.count_test = fst_opt counter.Ast.count_test;
-      Ckappa_sig.count_delta =
-        (let a = fst counter.Ast.count_delta in
+      Ckappa_sig.counter_name = fst counter.Ast.counter_name;
+      Ckappa_sig.counter_test = fst_opt counter.Ast.counter_test;
+      Ckappa_sig.counter_delta =
+        (let a = fst counter.Ast.counter_delta in
          if a = 0 then
            None
          else
@@ -312,15 +312,15 @@ let translate_interface parameters is_signature =
 let translate_agent parameters is_signature ag remanent =
   match ag with
   | Ast.Absent _pos -> None, remanent
-  | Ast.Present ((ag_nme, ag_nme_pos), intf, _modif) ->
+  | Ast.Present ((agent_name, agent_name_pos), intf, _modif) ->
     let interface, remanent =
       translate_interface parameters is_signature intf remanent
     in
     ( Some
         {
-          Ckappa_sig.ag_nme;
+          Ckappa_sig.agent_name;
           Ckappa_sig.ag_intf = interface;
-          Ckappa_sig.ag_nme_pos;
+          Ckappa_sig.agent_name_pos;
         },
       remanent )
 
@@ -381,7 +381,7 @@ let support_agent = function
       let rec scan intf list =
         match intf with
         | [] -> List.sort compare list
-        | Ast.Port port :: intf -> scan intf (fst port.Ast.port_nme :: list)
+        | Ast.Port port :: intf -> scan intf (fst port.Ast.port_name :: list)
         | Ast.Counter _ :: intf -> scan intf list
       in
       scan intfs []

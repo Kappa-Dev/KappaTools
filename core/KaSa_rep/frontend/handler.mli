@@ -16,13 +16,13 @@ val get_label_of_rule_txt :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
   Cckappa_sig.enriched_rule ->
-  Exception_without_parameter.method_handler * (string * Locality.t) option
+  Exception_without_parameter.method_handler * (string * Loc.t) option
 
 val get_label_of_rule_dot :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
   Cckappa_sig.enriched_rule ->
-  Exception_without_parameter.method_handler * (string * Locality.t) option
+  Exception_without_parameter.method_handler * (string * Loc.t) option
 
 val print_site_contact_map : ('a, 'a, 'a) Ckappa_sig.site_type -> 'a
 
@@ -84,7 +84,7 @@ val print_rule_or_var :
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
   Cckappa_sig.enriched_rule ->
-  'a * string Locality.annot option) ->
+  'a * string Loc.annoted option) ->
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
   Cckappa_sig.enriched_variable ->
@@ -120,7 +120,7 @@ val state_list :
 
 val last_site_of_agent :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -130,7 +130,7 @@ val last_site_of_agent :
 
 val last_state_of_site :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -141,7 +141,7 @@ val last_state_of_site :
 
 val translate_agent :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t ->
+  ?ka_pos:Loc.t ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -158,7 +158,7 @@ val string_of_agent :
 
 val is_counter :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -169,7 +169,7 @@ val is_counter :
 
 val is_internal_site :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -180,7 +180,7 @@ val is_internal_site :
 
 val is_binding_site :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -224,7 +224,7 @@ val string_of_site_update_views :
 
 val string_of_site_contact_map :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -308,7 +308,7 @@ val pos_of_var :
   Cckappa_sig.kappa_handler ->
   Cckappa_sig.compil ->
   Ckappa_sig.c_rule_id ->
-  Exception_without_parameter.method_handler * Locality.t
+  Exception_without_parameter.method_handler * Loc.t
 
 val pos_of_rule :
   Remanent_parameters_sig.parameters ->
@@ -316,7 +316,7 @@ val pos_of_rule :
   Cckappa_sig.kappa_handler ->
   Cckappa_sig.compil ->
   Ckappa_sig.c_rule_id ->
-  Exception_without_parameter.method_handler * Locality.t
+  Exception_without_parameter.method_handler * Loc.t
 
 val hide : Public_data.rule -> Public_data.rule
 
@@ -327,7 +327,7 @@ val info_of_agent :
   Cckappa_sig.compil ->
   Quark_type.agent_quark ->
   Exception_without_parameter.method_handler
-  * (string * Locality.t list * Quark_type.agent_quark)
+  * (string * Loc.t list * Quark_type.agent_quark)
 
 val info_of_rule :
   Remanent_parameters_sig.parameters ->
@@ -338,7 +338,7 @@ val info_of_rule :
   Ckappa_sig.c_rule_id ->
   Exception_without_parameter.method_handler
   * (string
-    * Locality.t
+    * Loc.t
     * Public_data.rule_direction
     * string
     * Ckappa_sig.c_rule_id)
@@ -359,7 +359,7 @@ val is_reverse :
 
 val complementary_interface :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -370,7 +370,7 @@ val complementary_interface :
 
 val dual :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -384,7 +384,7 @@ val dual :
 
 val translate_state :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
@@ -397,7 +397,7 @@ val translate_state :
 
 val translate_site :
   ?ml_pos:(string * int * int * int) option ->
-  ?ka_pos:Locality.t option ->
+  ?ka_pos:Loc.t option ->
   ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->

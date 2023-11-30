@@ -7,11 +7,11 @@
 (******************************************************************************)
 
 val error_msg :
-  ?severity:Logs.level -> ?range:Locality.range -> string -> Result_util.message
+  ?severity:Logs.level -> ?range:Loc.t -> string -> Result_util.message
 
 val result_error_msg :
   ?severity:Logs.level ->
-  ?range:Locality.range ->
+  ?range:Loc.t ->
   ?result_code:Result_util.status ->
   string ->
   'ok Api.result

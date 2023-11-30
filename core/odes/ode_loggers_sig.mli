@@ -59,10 +59,10 @@ val string_of_un_bool_op : t -> Operator.un_bool_op -> string
 val string_of_bin_bool_op : t -> Operator.bin_bool_op -> string
 
 val get_expr :
-  t -> variable -> (ode_var_id, ode_var_id) Alg_expr.e Locality.annot option
+  t -> variable -> (ode_var_id, ode_var_id) Alg_expr.e Loc.annoted option
 
 val set_expr :
-  t -> variable -> (ode_var_id, ode_var_id) Alg_expr.e Locality.annot -> unit
+  t -> variable -> (ode_var_id, ode_var_id) Alg_expr.e Loc.annoted -> unit
 
 val is_const : t -> variable -> bool
 val get_fresh_obs_id : t -> int

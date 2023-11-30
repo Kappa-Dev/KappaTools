@@ -19,11 +19,11 @@ let remove_trace () =
   | None -> ()
   | Some d -> Sys.remove d
 
-let batch_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+let batch_loop ~debug_mode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
     ~efficiency progress env counter graph state =
   let rec iter graph state =
     Lwt.wrap4
-      (State_interpreter.a_loop ~debugMode ~outputs ~dumpIfDeadlocked
+      (State_interpreter.a_loop ~debug_mode ~outputs ~dumpIfDeadlocked
          ~maxConsecutiveClash)
       env counter graph state
     >>= fun (stop, graph', state') ->
@@ -44,7 +44,7 @@ let batch_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
   in
   iter graph state
 
-let interactive_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+let interactive_loop ~debug_mode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
     ~efficiency progress pause_criteria env counter graph state =
   let user_interrupted = ref false in
   let old_sigint_behavior =
@@ -66,7 +66,7 @@ let interactive_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
       Lwt.return (false, graph, state)
     ) else
       Lwt.wrap4
-        (State_interpreter.a_loop ~debugMode ~outputs ~dumpIfDeadlocked
+        (State_interpreter.a_loop ~debug_mode ~outputs ~dumpIfDeadlocked
            ~maxConsecutiveClash)
         env counter graph state
       >>= fun ((stop, graph', state') as out) ->
@@ -166,7 +166,7 @@ let finalize ~outputs dotFormat cflow_file trace_file progress env counter graph
     | Unix.WEXITED 127 ->
       Lwt.fail
         (ExceptionDefn.Malformed_Decl
-           (Locality.dummy_annot
+           (Loc.annot_with_dummy
               ("Executable '" ^ prog ^ "' can not be found to compute stories.")))
     | Unix.WEXITED n ->
       if n <> 0 then exit n;
@@ -216,8 +216,8 @@ let () =
       | None -> ()
       | Some marshalizeOutFile -> Kappa_files.set_marshalized marshalizeOutFile
     in
-    let () = Parameter.debugModeOn := common_args.Common_args.debug in
-    let debugMode = common_args.Common_args.debug in
+    let () = Parameter.debug_modeOn := common_args.Common_args.debug in
+    let debug_mode = common_args.Common_args.debug in
     let () =
       Parameter.time_independent := kasim_args.Kasim_args.timeIndependent
     in
@@ -232,30 +232,30 @@ let () =
       exit 1
     );
     let () = Sys.catch_break true in
-    Printexc.record_backtrace (debugMode || common_args.Common_args.backtrace);
+    Printexc.record_backtrace (debug_mode || common_args.Common_args.backtrace);
 
     (*Possible backtrace*)
     let cpu_time = Sys.time () in
-    let ( (( conf,
-             env,
-             contact_map,
-             _,
-             story_compression,
-             formatCflows,
-             cflowFile,
-             init_l ) as init_result),
-          counter ) =
+    (* TODO: init_result here didn't contain counter option before change, should we change rep? *)
+    let init_result : Cli_init.compilation_result =
       let warning ~pos msg = Outputs.go (Data.Warning (Some pos, msg)) in
-      Cli_init.get_compilation ~warning ~debugMode
-        ~compileModeOn:kasim_args.Kasim_args.compileMode ~kasim_args cli_args
+      Cli_init.get_compilation ~warning ~debug_mode
+        ~compile_mode_on:kasim_args.Kasim_args.compile_mode ~kasim_args cli_args
+    in
+    let counter =
+      match init_result.counter_opt with
+      | None -> failwith "compilation_result here should contain counter info"
+      | Some c -> c
     in
     let () =
       if kasim_args.Kasim_args.showEfficiency then
         Format.printf " All that took %fs@." (Sys.time () -. cpu_time)
     in
 
-    let theSeed, seed_arg =
-      match kasim_args.Kasim_args.seedValue, conf.Configuration.seed with
+    let the_seed, seed_arg =
+      match
+        kasim_args.Kasim_args.seedValue, init_result.conf.Configuration.seed
+      with
       | Some seed, _ | None, Some seed -> seed, [||]
       | None, None ->
         let () = Format.printf "+ Self seeding...@." in
@@ -263,8 +263,8 @@ let () =
         let out = Random.bits () in
         out, [| "-seed"; string_of_int out |]
     in
-    let () = Random.init theSeed (*for reproducible  colors in dot snaphot*) in
-    let random_state = Random.State.make [| theSeed |] in
+    let () = Random.init the_seed (*for reproducible  colors in dot snaphot*) in
+    let random_state = Random.State.make [| the_seed |] in
 
     let () =
       if
@@ -272,7 +272,7 @@ let () =
         && Counter.max_time counter = None
         && Counter.max_events counter = None
       then
-        Model.check_if_counter_is_filled_enough env
+        Model.check_if_counter_is_filled_enough init_result.env
     in
 
     let command_line =
@@ -291,12 +291,13 @@ let () =
 
     let trace_file, user_trace_file =
       match
-        kasim_args.Kasim_args.traceFile, conf.Configuration.traceFileName
+        ( kasim_args.Kasim_args.traceFile,
+          init_result.conf.Configuration.traceFileName )
       with
       | (Some _ as x), _ -> x, x
       | _, (Some _ as x) -> x, x
       | None, None ->
-        (match story_compression with
+        (match init_result.story_compression with
         | None -> None, None
         | Some _ ->
           let () = tmp_trace := Some (Filename.temp_file "trace" ".json") in
@@ -304,7 +305,8 @@ let () =
     in
     let plot_file =
       Option_util.unsome
-        (Option_util.unsome "data.csv" conf.Configuration.outputFileName)
+        (Option_util.unsome "data.csv"
+           init_result.conf.Configuration.outputFileName)
         cli_args.Run_cli_args.outputDataFile
     in
     let plotPack =
@@ -312,9 +314,10 @@ let () =
         Model.map_observables
           (fun o ->
             Format.asprintf "@[<h>%a@]"
-              (Kappa_printer.alg_expr ~noCounters:debugMode ~env)
+              (Kappa_printer.alg_expr ~noCounters:debug_mode
+                 ~env:init_result.env)
               o)
-          env
+          init_result.env
       in
       if Array.length head > 1 then (
         let title = "Output of " ^ command_line in
@@ -322,19 +325,25 @@ let () =
       ) else
         None
     in
-    let dumpIfDeadlocked = conf.Configuration.dumpIfDeadlocked in
-    let maxConsecutiveClash = conf.Configuration.maxConsecutiveClash in
-    let deltaActivitiesFileName = conf.Configuration.deltaActivitiesFileName in
+    let dumpIfDeadlocked = init_result.conf.Configuration.dumpIfDeadlocked in
+    let maxConsecutiveClash =
+      init_result.conf.Configuration.maxConsecutiveClash
+    in
+    let deltaActivitiesFileName =
+      init_result.conf.Configuration.deltaActivitiesFileName
+    in
     let () =
-      if not kasim_args.Kasim_args.compileMode then (
+      if not kasim_args.Kasim_args.compile_mode then (
         match kasim_args.Kasim_args.logFile with
         | None -> ()
         | Some filename ->
           Outputs.initial_inputs
             {
-              Configuration.seed = Some theSeed;
-              Configuration.progressChar = conf.Configuration.progressChar;
-              Configuration.progressSize = conf.Configuration.progressSize;
+              Configuration.seed = Some the_seed;
+              Configuration.progressChar =
+                init_result.conf.Configuration.progressChar;
+              Configuration.progressSize =
+                init_result.conf.Configuration.progressSize;
               Configuration.dumpIfDeadlocked;
               Configuration.maxConsecutiveClash;
               Configuration.deltaActivitiesFileName;
@@ -347,13 +356,14 @@ let () =
               Configuration.plotPeriod = Some (Counter.plot_period counter);
               Configuration.outputFileName = Some plot_file;
             }
-            env init_l ~filename
+            init_result.env init_result.init_l ~filename
       )
     in
     Kappa_files.setCheckFileExists ~batchmode:cli_args.Run_cli_args.batchmode
       plot_file;
-    if not kasim_args.Kasim_args.compileMode then
-      Outputs.initialize deltaActivitiesFileName trace_file plotPack env;
+    if not kasim_args.Kasim_args.compile_mode then
+      Outputs.initialize deltaActivitiesFileName trace_file plotPack
+        init_result.env;
 
     let outputs = Outputs.go in
     let () =
@@ -366,9 +376,10 @@ let () =
       Eval.build_initial_state
         ~bind:(fun x f -> f x)
         ~return:(fun x -> x)
-        ~debugMode ~outputs counter env ~with_trace:(trace_file <> None)
+        ~debug_mode ~outputs counter init_result.env
+        ~with_trace:(trace_file <> None)
         ~with_delta_activities:(deltaActivitiesFileName <> None)
-        random_state init_l
+        random_state init_result.init_l
     in
     let () = Format.printf " (%a)" Rule_interpreter.print_stats graph in
     let () =
@@ -379,7 +390,7 @@ let () =
     Format.printf "@.Done@.+ Command line to rerun is: %s@." command_line;
 
     let () =
-      if kasim_args.Kasim_args.compileMode || debugMode then
+      if kasim_args.Kasim_args.compile_mode || debug_mode then
         Format.eprintf
           "@[<v>@[<v 2>Environment:@,\
            %a@]@,\
@@ -389,13 +400,13 @@ let () =
            %a@]@,\
            @[<v 2>Intial graph;@,\
            %a@]@]@."
-          (Kappa_printer.env ~noCounters:debugMode)
-          env
-          (Contact_map.print_cycles (Model.signatures env))
-          contact_map
-          (Pattern.Env.print ~noCounters:debugMode)
-          (Model.domain env)
-          (Rule_interpreter.print env)
+          (Kappa_printer.env ~noCounters:debug_mode)
+          init_result.env
+          (Contact_map.print_cycles (Model.signatures init_result.env))
+          init_result.contact_map
+          (Pattern.Env.print ~noCounters:debug_mode)
+          (Model.domain init_result.env)
+          (Rule_interpreter.print init_result.env)
           graph
     in
     (*------------------------------------------------------------*)
@@ -405,10 +416,10 @@ let () =
       | Some domainOutputFile ->
         Yojson.Basic.to_file
           (Kappa_files.path domainOutputFile)
-          (Pattern.Env.to_yojson (Model.domain env))
+          (Pattern.Env.to_yojson (Model.domain init_result.env))
     in
     Outputs.flush_warning ();
-    if kasim_args.Kasim_args.compileMode then (
+    if kasim_args.Kasim_args.compile_mode then (
       let () = remove_trace () in
       exit 0
     ) else
@@ -419,24 +430,29 @@ let () =
       | Some _ ->
         if Counter.positive_plot_period counter then
           Outputs.go
-            (Data.Plot (State_interpreter.observables_values env graph counter))
+            (Data.Plot
+               (State_interpreter.observables_values init_result.env graph
+                  counter))
       | _ -> ()
     in
     let progress =
-      Progress_report.create conf.Configuration.progressSize
-        conf.Configuration.progressChar
+      Progress_report.create init_result.conf.Configuration.progressSize
+        init_result.conf.Configuration.progressChar
     in
     Lwt_main.run
       ( (if stop then
-           finalize ~outputs formatCflows cflowFile trace_file progress env
-             counter graph state story_compression
+           finalize ~outputs init_result.formatCflow init_result.cflowFile
+             trace_file progress init_result.env counter graph state
+             init_result.story_compression
          else if cli_args.Run_cli_args.batchmode then
-           batch_loop ~debugMode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
-             ~efficiency:kasim_args.Kasim_args.showEfficiency progress env
-             counter graph state
+           batch_loop ~debug_mode ~outputs ~dumpIfDeadlocked
+             ~maxConsecutiveClash
+             ~efficiency:kasim_args.Kasim_args.showEfficiency progress
+             init_result.env counter graph state
            >>= fun (graph', state') ->
-           finalize ~outputs formatCflows cflowFile trace_file progress env
-             counter graph' state' story_compression
+           finalize ~outputs init_result.formatCflow init_result.cflowFile
+             trace_file progress init_result.env counter graph' state'
+             init_result.story_compression
          else (
            let rec toplevel env graph state =
              let () = Outputs.flush_warning () in
@@ -459,16 +475,17 @@ let () =
                  >>= function
                  | Ast.RUN b ->
                    Lwt.wrap4
-                     (Evaluator.get_pause_criteria ~debugMode ~outputs
+                     (Evaluator.get_pause_criteria ~debug_mode ~outputs
                         ~sharing:kasim_args.Kasim_args.sharing
                         ~syntax_version:cli_args.Run_cli_args.syntaxVersion)
-                     contact_map env graph b
+                     init_result.contact_map init_result.env graph b
                    >>= fun (env', graph', b'') ->
                    let progress =
-                     Progress_report.create conf.Configuration.progressSize
-                       conf.Configuration.progressChar
+                     Progress_report.create
+                       init_result.conf.Configuration.progressSize
+                       init_result.conf.Configuration.progressChar
                    in
-                   interactive_loop ~debugMode ~outputs ~dumpIfDeadlocked
+                   interactive_loop ~debug_mode ~outputs ~dumpIfDeadlocked
                      ~maxConsecutiveClash
                      ~efficiency:kasim_args.Kasim_args.showEfficiency progress
                      b'' env' counter graph' state
@@ -476,10 +493,11 @@ let () =
                  | Ast.QUIT -> Lwt.return (env, (true, graph, state))
                  | Ast.MODIFY e ->
                    Lwt.wrap6
-                     (Evaluator.do_interactive_directives ~debugMode ~outputs
+                     (Evaluator.do_interactive_directives ~debug_mode ~outputs
                         ~sharing:kasim_args.Kasim_args.sharing
                         ~syntax_version:cli_args.Run_cli_args.syntaxVersion)
-                     contact_map env counter graph state e
+                     init_result.contact_map init_result.env counter graph state
+                     e
                    >>= fun (e', ((env', _) as o)) ->
                    Lwt_io.print "\xE2\x9C\x94 " >>= fun () ->
                    let () =
@@ -498,8 +516,9 @@ let () =
                  | e -> Lwt.fail e)
              >>= fun (env', (stop, graph', state')) ->
              if stop then
-               finalize ~outputs formatCflows cflowFile trace_file progress env
-                 counter graph' state' story_compression
+               finalize ~outputs init_result.formatCflow init_result.cflowFile
+                 trace_file progress init_result.env counter graph' state'
+                 init_result.story_compression
              else
                toplevel env' graph' state'
            in
@@ -511,18 +530,21 @@ let () =
                 > "
            in
            if cli_args.Run_cli_args.interactive then
-             toplevel_intro () >>= fun () -> toplevel env graph state
+             toplevel_intro () >>= fun () ->
+             toplevel init_result.env graph state
            else
-             interactive_loop ~debugMode ~outputs ~dumpIfDeadlocked
+             interactive_loop ~debug_mode ~outputs ~dumpIfDeadlocked
                ~maxConsecutiveClash
                ~efficiency:kasim_args.Kasim_args.showEfficiency progress
-               Alg_expr.FALSE env counter graph state
+               Alg_expr.FALSE init_result.env counter graph state
              >>= fun (stop, graph', state') ->
              if stop then
-               finalize ~outputs formatCflows cflowFile trace_file progress env
-                 counter graph' state' story_compression
+               finalize ~outputs init_result.formatCflow init_result.cflowFile
+                 trace_file progress init_result.env counter graph' state'
+                 init_result.story_compression
              else
-               toplevel_intro () >>= fun () -> toplevel env graph' state'
+               toplevel_intro () >>= fun () ->
+               toplevel init_result.env graph' state'
          ))
       >>= fun () ->
         Lwt_io.printl "Simulation ended" >>= fun () ->

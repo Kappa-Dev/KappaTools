@@ -252,7 +252,7 @@ module DivErrorMessage : Ui_common.Div = struct
         in
         match range with
         | None -> ""
-        | Some range -> Format.sprintf "[%s]" range.Locality.file)
+        | Some range -> Format.sprintf "[%s]" range.Loc.file)
       error_index State_error.errors
 
   let file_label =

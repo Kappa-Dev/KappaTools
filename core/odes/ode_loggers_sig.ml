@@ -94,7 +94,7 @@ module VarSet = Set.Make (VarOrd)
 
 type t = {
   logger: Loggers.t;
-  env: (ode_var_id, ode_var_id) Alg_expr.e Locality.annot VarMap.t ref;
+  env: (ode_var_id, ode_var_id) Alg_expr.e Loc.annoted VarMap.t ref;
   id_map: int StringMap.t ref;
   fresh_meta_id: int ref;
   fresh_reaction_id: int ref;

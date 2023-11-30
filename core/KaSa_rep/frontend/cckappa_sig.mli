@@ -26,7 +26,7 @@ type kappa_handler = {
   nagents: Ckappa_sig.c_agent_name;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:
-    (string * Locality.t list)
+    (string * Loc.t list)
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
   interface_constraints:
     Ckappa_sig.agent_specification
@@ -194,8 +194,7 @@ type compil = {
   rules: enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
   (*rules (possibly named)*)
   observables:
-    (mixture, string) Alg_expr.e Locality.annot
-    Int_storage.Nearly_inf_Imperatif.t;
+    (mixture, string) Alg_expr.e Loc.annoted Int_storage.Nearly_inf_Imperatif.t;
   (*list of patterns to plot*)
   init: enriched_init Int_storage.Nearly_inf_Imperatif.t;
   (*initial graph declaration*)

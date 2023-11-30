@@ -8,9 +8,9 @@
 
 %{
   let add_pos x =
-    (x,Locality.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()))
+    (x,Loc.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()))
   let rhs_pos i =
-  Locality.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
+  Loc.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
 %}
 
 %token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR AT TYPE LAR
@@ -47,7 +47,7 @@
 %type <(Ast.mixture,Ast.mixture,string,Ast.rule) Ast.modif_expr list> standalone_effect_list
 
 %start standalone_bool_expr
-%type <(Ast.mixture,string) Alg_expr.bool Locality.annot> standalone_bool_expr
+%type <(Ast.mixture,string) Alg_expr.bool Loc.annoted> standalone_bool_expr
 
 %% /*Grammar rules*/
 
@@ -402,9 +402,9 @@ rate:
     | alg_expr OP_PAR alg_with_radius CL_PAR { ($1,Some $3) }
     | alg_expr {($1,None)}
     | OP_CUR alg_with_radius CL_CUR
-      {(Locality.dummy_annot (Alg_expr.CONST Nbr.zero),Some $2)}
+      {(Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),Some $2)}
     | alg_expr OP_CUR CL_CUR
-      {($1,Some (Locality.dummy_annot (Alg_expr.CONST Nbr.zero),None))}
+      {($1,Some (Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),None))}
     | {raise (ExceptionDefn.Syntax_Error (add_pos "missing rule rate"))}
     ;
 
@@ -421,15 +421,15 @@ pattern:
 
 non_empty_mixture:
     | ID OP_PAR interface_expression CL_PAR
-    { [[Ast.Present (($1,rhs_pos 1), $3, None)]] }
+    { [[Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod)]] }
     | ID OP_PAR interface_expression CL_PAR COMMA pattern
-    { [Ast.Present (($1,rhs_pos 1), $3, None) :: $6]}
+    { [Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod) :: $6]}
     ;
 
 mod_agent:
-	| { None }
-	| PLUS { Some Ast.Create }
-	| MINUS { Some Ast.Erase };
+	| { Ast.NoMod }
+	| PLUS { Ast.Create }
+	| MINUS { Ast.Erase };
 
 agent_expression:
     | mod_agent ID OP_PAR interface_expression CL_PAR
@@ -453,45 +453,45 @@ counter_test:
 port_expression:
     | ID internal_state link_state_mod
 	 { Ast.Port
-	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
-	    Ast.port_int_mod = None; Ast.port_lnk_mod = $3; } }
+	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=[];
+	    Ast.port_int_mod = None; Ast.port_link_mod = $3; } }
     | ID internal_state link_state link_state_mod
 	 { Ast.Port
-	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3;
-	    Ast.port_int_mod = None; Ast.port_lnk_mod = $4; } }
+	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=$3;
+	    Ast.port_int_mod = None; Ast.port_link_mod = $4; } }
     | ID internal_state DIV KAPPA_MRK link_state_mod
 	 { Ast.Port
-	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
-	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $5; } }
+	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=[];
+	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_link_mod = $5; } }
     | ID internal_state DIV KAPPA_MRK link_state link_state_mod
 	 { Ast.Port
-	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$5;
-	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $6; } }
+	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=$5;
+	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_link_mod = $6; } }
     | ID PLUS EQUAL INT
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = None;
-	   Ast.count_delta = ($4,rhs_pos 4)} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = None;
+	   Ast.counter_delta = ($4,rhs_pos 4)} }
     | ID PLUS EQUAL MINUS INT
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = None;
-	   Ast.count_delta = (-$5,rhs_pos 5)} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = None;
+	   Ast.counter_delta = (-$5,rhs_pos 5)} }
     | ID counter_test PLUS EQUAL INT
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = $2;
-	   Ast.count_delta = ($5,rhs_pos 5)} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = $2;
+	   Ast.counter_delta = ($5,rhs_pos 5)} }
    | ID counter_test PLUS EQUAL MINUS INT
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = $2;
-	   Ast.count_delta = (- $6,rhs_pos 6)} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = $2;
+	   Ast.counter_delta = (- $6,rhs_pos 6)} }
    | ID counter_test
          { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = $2;
-	   Ast.count_delta = Locality.dummy_annot 0} }
+	   { Ast.counter_name = ($1,rhs_pos 1);
+	   Ast.counter_test = $2;
+	   Ast.counter_delta = Loc.annot_with_dummy 0} }
     ;
 
 internal_state:
@@ -528,7 +528,7 @@ link_state:
 	| a_link_state {[$1]};
 
 interactive_command:
-	| RUN NEWLINE {Ast.RUN (Locality.dummy_annot Alg_expr.FALSE)}
+	| RUN NEWLINE {Ast.RUN (Loc.annot_with_dummy Alg_expr.FALSE)}
 	| RUN bool_expr NEWLINE {Ast.RUN $2}
 	| effect_list NEWLINE {Ast.MODIFY $1}
 	| EOF {Ast.QUIT}

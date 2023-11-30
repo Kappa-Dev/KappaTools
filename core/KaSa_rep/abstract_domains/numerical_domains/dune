@@ -1,11 +1,19 @@
 (library
-  (name kappa_numerical_domains)
-  (libraries kappa_kasa_frontend)
-  (flags (:standard -w @a
-    -open Kappa_parameters
-    -open Kappa_errors
-    -open Kappa_logging
-    -open Kappa_kasa_kastor_toolset
-    -open Kappa_generic_toolset
-    -open Kappa_kasa_frontend
-    )))
+ (name kappa_numerical_domains)
+ (libraries kappa_kasa_frontend)
+ (flags
+  (:standard
+   -w
+   @a
+   -open
+   Kappa_parameters
+   -open
+   Kappa_errors
+   -open
+   Kappa_logging
+   -open
+   Kappa_kasa_kastor_toolset
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_kasa_frontend)))

@@ -39,7 +39,7 @@ val cursor_activity : line:int -> ch:int -> unit
 val out_of_sync : bool -> unit
 
 type slot = { local: string option; name: string }
-type active = { rank: int; cursor_pos: Locality.position; out_of_sync: bool }
+type active = { rank: int; cursor_pos: Loc.position; out_of_sync: bool }
 type model = { current: active option; directory: slot Mods.IntMap.t }
 
 val model : model React.signal
@@ -48,7 +48,7 @@ val current_filename : string option React.signal
 val with_current_pos :
   ?eq:('a -> 'a -> bool) ->
   ?on:bool React.signal ->
-  (string -> Locality.position -> 'a option) ->
+  (string -> Loc.position -> 'a option) ->
   'a ->
   'a React.signal
 

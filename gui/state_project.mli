@@ -46,7 +46,7 @@ val init : string list -> unit Lwt.t
 (* run on application init *)
 
 val sync : unit -> unit Api.result Lwt.t
-(* to synch state of application with runtime *)
+(* to sync state of application with runtime *)
 
 val with_project :
   label:string ->

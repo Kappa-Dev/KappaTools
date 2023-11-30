@@ -121,7 +121,7 @@ let reconstruction_navigation cc = cc.recogn_nav
 (** Errors *)
 let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
-    (Locality.dummy_annot
+    (Loc.annot_with_dummy
        (Format.asprintf "Site %a of agent %a already specified"
           (Agent.print_site ?sigs x) i
           (Agent.print ?sigs ~with_id:false)
@@ -129,7 +129,7 @@ let already_specified ?sigs x i =
 
 let dangling_node ~sigs tys x =
   ExceptionDefn.Malformed_Decl
-    (Locality.dummy_annot
+    (Loc.annot_with_dummy
        (Format.asprintf "Cannot proceed because last declared agent %a/*%i*/%a"
           (Signature.print_agent sigs)
           (raw_find_ty tys x) x Format.pp_print_string
@@ -180,7 +180,7 @@ let weight cc =
   in
   links - (double / 2)
 
-let are_compatible ~debugMode ?possibilities ~strict root1 cc1 root2 cc2 =
+let are_compatible ~debug_mode ?possibilities ~strict root1 cc1 root2 cc2 =
   let tick x =
     match possibilities with
     | None -> ()
@@ -216,12 +216,12 @@ let are_compatible ~debugMode ?possibilities ~strict root1 cc1 root2 cc2 =
                  | Link (n1, s1), Link (n2, s2) ->
                    if s1 = s2 then
                      if Renaming.mem n1 ren then
-                       if Renaming.apply ~debugMode ren n1 = n2 then
+                       if Renaming.apply ~debug_mode ren n1 = n2 then
                          Some (true, todo, ren), None
                        else
                          None, Some (cc1, o, cc2, p, i, false)
                      else (
-                       match Renaming.add ~debugMode n1 n2 ren with
+                       match Renaming.add ~debug_mode n1 n2 ren with
                        | None -> None, Some (cc1, o, cc2, p, i, false)
                        | Some r' ->
                          if find_ty cc1 n1 = find_ty cc2 n2 then
@@ -240,7 +240,7 @@ let are_compatible ~debugMode ?possibilities ~strict root1 cc1 root2 cc2 =
       | None, conflict -> None, conflict
       | Some (one_edges', todos', ren'), _ -> aux one_edges' ren' todos')
   in
-  match Renaming.add ~debugMode root1 root2 (Renaming.empty ()) with
+  match Renaming.add ~debug_mode root1 root2 (Renaming.empty ()) with
   | None -> assert false
   | Some r ->
     let a_single_agent =
@@ -256,7 +256,7 @@ let are_compatible ~debugMode ?possibilities ~strict root1 cc1 root2 cc2 =
     aux a_single_agent r [ root1, root2 ]
 
 (** @return injection from a to b *)
-let equal ~debugMode a b =
+let equal ~debug_mode a b =
   match
     Tools.array_min_equal_not_null
       (Array.map (fun x -> List.length x, x) a.nodes_by_type)
@@ -274,11 +274,11 @@ let equal ~debugMode a b =
         match bool with
         | Some _ -> bool
         | None ->
-          let rename, _ = are_compatible ~debugMode ~strict:true h1 a ag b in
+          let rename, _ = are_compatible ~debug_mode ~strict:true h1 a ag b in
           rename)
       None ags
 
-let automorphisms ~debugMode a =
+let automorphisms ~debug_mode a =
   match
     Array.fold_left
       (fun acc x -> Tools.min_pos_int_not_zero acc (List.length x, x))
@@ -288,7 +288,7 @@ let automorphisms ~debugMode a =
   | _, (h :: _ as l) ->
     List.fold_left
       (fun acc ag ->
-        match are_compatible ~debugMode ~strict:true h a ag a with
+        match are_compatible ~debug_mode ~strict:true h a ag a with
         | None, _ -> acc
         | Some r, _ -> r :: acc)
       [] l
@@ -305,7 +305,7 @@ let potential_pairing sigs =
           acc lb)
     Mods.Int2Set.empty
 
-let matchings ~debugMode sigs a b =
+let matchings ~debug_mode sigs a b =
   let possibilities =
     ref (potential_pairing sigs a.nodes_by_type b.nodes_by_type)
   in
@@ -313,7 +313,9 @@ let matchings ~debugMode sigs a b =
     match Mods.Int2Set.choose !possibilities with
     | None -> acc
     | Some (x, y) ->
-      (match are_compatible ~debugMode ~possibilities ~strict:false x a y b with
+      (match
+         are_compatible ~debug_mode ~possibilities ~strict:false x a y b
+       with
       | None, _ -> for_one_root acc
       | Some r, _ -> for_one_root (r :: acc))
   in
@@ -395,29 +397,29 @@ let raw_to_navigation (full : bool) nodes_by_type nodes =
     build_for (true, []) (*wip*) [] (*already_done*) [ x ]
 (*todo*)
 
-let rec sub_minimize_renaming ~debugMode r = function
+let rec sub_minimize_renaming ~debug_mode r = function
   | [], _ -> r
   | _ :: _, [] -> assert false
   | (x :: q as l), y :: q' ->
     if x = y then (
-      match Renaming.add ~debugMode x y r with
-      | Some r' -> sub_minimize_renaming ~debugMode r' (q, q')
+      match Renaming.add ~debug_mode x y r with
+      | Some r' -> sub_minimize_renaming ~debug_mode r' (q, q')
       | None -> assert false
     ) else (
       let fsts, lst = List_util.pop_last l in
-      match Renaming.add ~debugMode lst y r with
-      | Some r' -> sub_minimize_renaming ~debugMode r' (fsts, q')
+      match Renaming.add ~debug_mode lst y r with
+      | Some r' -> sub_minimize_renaming ~debug_mode r' (fsts, q')
       | None -> assert false
     )
 
-let minimize_renaming ~debugMode dst_nbt ref_nbt =
+let minimize_renaming ~debug_mode dst_nbt ref_nbt =
   let re = Renaming.empty () in
   Tools.array_fold_lefti
-    (fun ty r ids -> sub_minimize_renaming ~debugMode r (ids, ref_nbt.(ty)))
+    (fun ty r ids -> sub_minimize_renaming ~debug_mode r (ids, ref_nbt.(ty)))
     re dst_nbt
 
-let minimize ~debugMode cand_nbt cand_nodes ref_nbt =
-  let re = minimize_renaming ~debugMode cand_nbt ref_nbt in
+let minimize ~debug_mode cand_nbt cand_nodes ref_nbt =
+  let re = minimize_renaming ~debug_mode cand_nbt ref_nbt in
   let re_img = Renaming.image re in
   let nodes_by_type =
     Array.map (List.filter (fun a -> Mods.IntSet.mem a re_img)) ref_nbt
@@ -428,11 +430,11 @@ let minimize ~debugMode cand_nbt cand_nodes ref_nbt =
         let sites' =
           Array.map
             (function
-              | Link (n, s), i -> Link (Renaming.apply ~debugMode re n, s), i
+              | Link (n, s), i -> Link (Renaming.apply ~debug_mode re n, s), i
               | ((UnSpec | Free), _) as x -> x)
             sites
         in
-        Mods.IntMap.add (Renaming.apply ~debugMode re id) sites' acc)
+        Mods.IntMap.add (Renaming.apply ~debug_mode re id) sites' acc)
       cand_nodes Mods.IntMap.empty
   in
   {
@@ -442,7 +444,7 @@ let minimize ~debugMode cand_nbt cand_nodes ref_nbt =
   }
 
 (* returns a list of cc where each cc is included in cc1*)
-let infs ~debugMode sigs cc1 cc2 =
+let infs ~debug_mode sigs cc1 cc2 =
   let possibilities =
     ref (potential_pairing sigs cc1.nodes_by_type cc2.nodes_by_type)
   in
@@ -480,7 +482,7 @@ let infs ~debugMode sigs cc1 cc2 =
               if s1 = s2 then
                 if Renaming.mem n1 ren then
                   ( acc,
-                    ( (if Renaming.apply ~debugMode ren n1 = n2 then
+                    ( (if Renaming.apply ~debug_mode ren n1 = n2 then
                          x
                        else
                          UnSpec),
@@ -489,7 +491,7 @@ let infs ~debugMode sigs cc1 cc2 =
                       else
                         -1 ) )
                 else (
-                  match Renaming.add ~debugMode n1 n2 ren with
+                  match Renaming.add ~debug_mode n1 n2 ren with
                   | None ->
                     ( acc,
                       ( UnSpec,
@@ -534,7 +536,7 @@ let infs ~debugMode sigs cc1 cc2 =
     match Mods.Int2Set.choose !possibilities with
     | None -> acc
     | Some (root1, root2) ->
-      (match Renaming.add ~debugMode root1 root2 (Renaming.empty ()) with
+      (match Renaming.add ~debug_mode root1 root2 (Renaming.empty ()) with
       | None -> assert false
       | Some r ->
         let nodes = aux r Mods.IntMap.empty [ root1, root2 ] in
@@ -547,7 +549,7 @@ let infs ~debugMode sigs cc1 cc2 =
                 (List.filter (fun a -> Mods.IntMap.mem a nodes))
                 cc1.nodes_by_type
             in
-            minimize ~debugMode nodes_by_type nodes cc1.nodes_by_type :: acc
+            minimize ~debug_mode nodes_by_type nodes cc1.nodes_by_type :: acc
           )
         in
         for_one_root acc')
@@ -890,7 +892,7 @@ let of_yojson sig_decl = function
   | `Null -> empty_cc sig_decl
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a pattern", x))
 
-let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
+let merge_compatible ~debug_mode reserved_ids free_id inj1_to_2 cc1 cc2 =
   let img = Renaming.image inj1_to_2 in
   let available_ids =
     Array.map
@@ -901,7 +903,7 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
     Array.map
       (List_util.map_option (fun id ->
            if Renaming.mem id inj1_to_2 then
-             Some (Renaming.apply ~debugMode inj1_to_2 id)
+             Some (Renaming.apply ~debug_mode inj1_to_2 id)
            else
              None))
       cc1.nodes_by_type
@@ -916,7 +918,7 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
 
   let get_cc2 j (((inj1, free_id), inj2, (todos1, todos2)) as pack) =
     if Renaming.mem j inj2 then
-      Renaming.apply ~debugMode inj2 j, pack
+      Renaming.apply ~debug_mode inj2 j, pack
     else (
       let ty = find_ty cc2 j in
       let img, free_id' =
@@ -938,11 +940,11 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
           h
       in
       ( img,
-        ( ( (match Renaming.add ~debugMode o img inj1 with
+        ( ( (match Renaming.add ~debug_mode o img inj1 with
             | Some x -> x
             | None -> assert false),
             free_id' ),
-          (match Renaming.add ~debugMode j img inj2 with
+          (match Renaming.add ~debug_mode j img inj2 with
           | Some x -> x
           | None -> assert false),
           (todos1, (j, img) :: todos2) ) )
@@ -951,7 +953,7 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
 
   let get_cc1 i (((inj1, free_id), inj2, (todos1, todos2)) as pack) =
     if Renaming.mem i inj1 then
-      Renaming.apply ~debugMode inj1 i, pack
+      Renaming.apply ~debug_mode inj1 i, pack
     else (
       let ty = find_ty cc1 i in
       let img, free_id' =
@@ -963,7 +965,7 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
       in
       let () = used_ids.(ty) <- img :: used_ids.(ty) in
       ( img,
-        ( ( (match Renaming.add ~debugMode i img inj1 with
+        ( ( (match Renaming.add ~debug_mode i img inj1 with
             | Some x -> x
             | None -> assert false),
             free_id' ),
@@ -1072,7 +1074,7 @@ let merge_compatible ~debugMode reserved_ids free_id inj1_to_2 cc1 cc2 =
       recogn_nav = raw_to_navigation false nodes_by_type nodes;
     } )
 
-let build_navigation_between ~debugMode inj_d_to_o cc_o cc_d =
+let build_navigation_between ~debug_mode inj_d_to_o cc_o cc_d =
   let rec handle_links discovered next_round recogn intern = function
     | [] ->
       if next_round = [] then
@@ -1080,7 +1082,7 @@ let build_navigation_between ~debugMode inj_d_to_o cc_o cc_d =
       else
         handle_links discovered [] recogn intern next_round
     | (((i, j, s), (n', s')) as h) :: todos ->
-      let n = Renaming.apply ~debugMode inj_d_to_o n' in
+      let n = Renaming.apply ~debug_mode inj_d_to_o n' in
       (match Mods.IntSet.mem j discovered, Mods.IntSet.mem n' discovered with
       | false, false ->
         handle_links discovered (h :: next_round) recogn intern todos
@@ -1184,7 +1186,7 @@ module Env : sig
   val to_navigation : t -> id -> Navigation.abstract Navigation.t
 
   val get_elementary :
-    debugMode:bool ->
+    debug_mode:bool ->
     t ->
     Agent.t ->
     int ->
@@ -1412,13 +1414,15 @@ end = struct
 
   let new_obs_map env f = Mods.DynArray.init env.max_obs f
 
-  let get_elementary ~debugMode domain ((_, ty) as node) s arrow =
+  let get_elementary ~debug_mode domain ((_, ty) as node) s arrow =
     let sa = domain.elementaries.(ty) in
     let rec find_good_edge = function
       (*one should use a hash here*)
       | [] -> None
       | (st, cc_id) :: tail ->
-        (match Navigation.compatible_fresh_point ~debugMode st node s arrow with
+        (match
+           Navigation.compatible_fresh_point ~debug_mode st node s arrow
+         with
         | None -> find_good_edge tail
         | Some inj' ->
           let dst = get domain cc_id in
@@ -1440,14 +1444,14 @@ let print ~noCounters ?domain ~with_id f id =
     print_cc ~noCounters ~sigs:(Env.signatures env) ?cc_id ~with_id f
       env.Env.domain.(id).Env.content
 
-let embeddings_to_fully_specified ~debugMode domain a_id b =
+let embeddings_to_fully_specified ~debug_mode domain a_id b =
   let a = domain.Env.domain.(a_id).Env.content in
   match find_root a with
   | None -> [ Renaming.empty () ]
   | Some (h, ty) ->
     List.fold_left
       (fun acc ag ->
-        match are_compatible ~debugMode ~strict:false h a ag b with
+        match are_compatible ~debug_mode ~strict:false h a ag b with
         | None, _ -> acc
         | Some r, _ -> r :: acc)
       [] b.nodes_by_type.(ty)
@@ -1542,13 +1546,15 @@ module PreEnv = struct
     in
     elementaries
 
-  let present_in_dst ~debugMode dst inj2dst nav =
+  let present_in_dst ~debug_mode dst inj2dst nav =
     let rec aux_present_in_dst inj' = function
       | [] -> Some inj'
       | ((Navigation.Fresh _, _), _) :: _ -> assert false
       | ((Navigation.Existing ag, si), Navigation.ToNothing) :: t ->
         (match
-           Mods.IntMap.find_option (Renaming.apply ~debugMode inj' ag) dst.nodes
+           Mods.IntMap.find_option
+             (Renaming.apply ~debug_mode inj' ag)
+             dst.nodes
          with
         | None -> assert false
         | Some n ->
@@ -1558,7 +1564,9 @@ module PreEnv = struct
             None)
       | ((Navigation.Existing ag, si), Navigation.ToInternal i) :: t ->
         (match
-           Mods.IntMap.find_option (Renaming.apply ~debugMode inj' ag) dst.nodes
+           Mods.IntMap.find_option
+             (Renaming.apply ~debug_mode inj' ag)
+             dst.nodes
          with
         | None -> assert false
         | Some n ->
@@ -1570,11 +1578,13 @@ module PreEnv = struct
           Navigation.ToNode (Navigation.Existing ag', si') )
         :: t ->
         (match
-           Mods.IntMap.find_option (Renaming.apply ~debugMode inj' ag) dst.nodes
+           Mods.IntMap.find_option
+             (Renaming.apply ~debug_mode inj' ag)
+             dst.nodes
          with
         | None -> assert false
         | Some n ->
-          if fst n.(si) = Link (Renaming.apply ~debugMode inj' ag', si') then
+          if fst n.(si) = Link (Renaming.apply ~debug_mode inj' ag', si') then
             aux_present_in_dst inj' t
           else
             None)
@@ -1582,14 +1592,16 @@ module PreEnv = struct
           Navigation.ToNode (Navigation.Fresh (ag', ty'), si') )
         :: t ->
         (match
-           Mods.IntMap.find_option (Renaming.apply ~debugMode inj' ag) dst.nodes
+           Mods.IntMap.find_option
+             (Renaming.apply ~debug_mode inj' ag)
+             dst.nodes
          with
         | None -> assert false
         | Some n ->
           (match n.(si) with
           | Link (agl, sil), _ ->
             if List.mem agl dst.nodes_by_type.(ty') && si' = sil then (
-              match Renaming.add ~debugMode ag' agl inj' with
+              match Renaming.add ~debug_mode ag' agl inj' with
               | None -> None
               | Some inj' -> aux_present_in_dst inj' t
             ) else
@@ -1598,7 +1610,7 @@ module PreEnv = struct
     in
     aux_present_in_dst inj2dst nav
 
-  let rec insert_navigation ~debugMode id_by_type nb_id domain dst_id dst
+  let rec insert_navigation ~debug_mode id_by_type nb_id domain dst_id dst
       inj2dst p_id =
     if p_id = dst_id then
       0
@@ -1607,18 +1619,18 @@ module PreEnv = struct
       let rec insert_nav_sons = function
         | [] ->
           let (inj_e2sup, _), sup =
-            merge_compatible ~debugMode id_by_type nb_id inj2dst
+            merge_compatible ~debug_mode id_by_type nb_id inj2dst
               point.Env.content dst
           in
-          (match equal ~debugMode sup dst with
+          (match equal ~debug_mode sup dst with
           | None -> assert false
           | Some inj_sup2dst ->
             let inj_dst2p =
               Renaming.inverse
-                (Renaming.compose ~debugMode false inj_e2sup inj_sup2dst)
+                (Renaming.compose ~debug_mode false inj_e2sup inj_sup2dst)
             in
             let nav =
-              build_navigation_between ~debugMode inj_dst2p point.Env.content
+              build_navigation_between ~debug_mode inj_dst2p point.Env.content
                 dst
             in
             let () =
@@ -1628,17 +1640,17 @@ module PreEnv = struct
             in
             List.length nav)
         | h :: t ->
-          (match present_in_dst ~debugMode dst inj2dst h.Env.next with
+          (match present_in_dst ~debug_mode dst inj2dst h.Env.next with
           | None -> insert_nav_sons t
           | Some inj_p'2dst ->
-            insert_navigation ~debugMode id_by_type nb_id domain dst_id dst
-              (Renaming.compose ~debugMode false h.Env.inj inj_p'2dst)
+            insert_navigation ~debug_mode id_by_type nb_id domain dst_id dst
+              (Renaming.compose ~debug_mode false h.Env.inj inj_p'2dst)
               h.Env.dst)
       in
       insert_nav_sons point.Env.sons
     )
 
-  let add_cc ~debugMode ~toplevel ?origin env p_id element =
+  let add_cc ~debug_mode ~toplevel ?origin env p_id element =
     let w = weight element in
     let hash = coarse_hash element in
     let rec aux = function
@@ -1651,8 +1663,8 @@ module PreEnv = struct
               Some
                 ( List.sort Mods.int_compare
                     (List.map
-                       (fun r -> Renaming.apply ~debugMode r rid)
-                       (automorphisms ~debugMode element)),
+                       (fun r -> Renaming.apply ~debug_mode r rid)
+                       (automorphisms ~debug_mode element)),
                   rty )
           ) else
             None
@@ -1669,7 +1681,7 @@ module PreEnv = struct
           element,
           p_id )
       | h :: t ->
-        (match equal ~debugMode element h.element with
+        (match equal ~debug_mode element h.element with
         | None ->
           let a, b, c, d = aux t in
           h :: a, b, c, d
@@ -1684,8 +1696,8 @@ module PreEnv = struct
                 Some
                   ( List.sort Mods.int_compare
                       (List.map
-                         (fun r -> Renaming.apply ~debugMode r rid)
-                         (automorphisms ~debugMode element)),
+                         (fun r -> Renaming.apply ~debug_mode r rid)
+                         (automorphisms ~debug_mode element)),
                     rty )
             )
           in
@@ -1706,11 +1718,11 @@ module PreEnv = struct
     in
     Mods.IntMap.add w (Mods.IntMap.add hash env_w_h env_w) env, r, out, out_id
 
-  let rec saturate_one ~debugMode ~sharing sigs this max_l level
+  let rec saturate_one ~debug_mode ~sharing sigs this max_l level
       ((_, domain) as acc) = function
     | [] ->
       if level < max_l then
-        saturate_one ~debugMode ~sharing sigs this max_l (succ level) acc
+        saturate_one ~debug_mode ~sharing sigs this max_l (succ level) acc
           (Mods.IntMap.fold
              (fun _ -> List.rev_append)
              (Mods.IntMap.find_default Mods.IntMap.empty (succ level) domain)
@@ -1721,17 +1733,17 @@ module PreEnv = struct
       let news =
         match sharing with
         | No_sharing -> assert false
-        | Max_sharing -> infs sigs ~debugMode this.element h.element
+        | Max_sharing -> infs sigs ~debug_mode this.element h.element
         | Compatible_patterns ->
           List.rev_map
             (fun r -> intersection r this.element h.element)
-            (matchings ~debugMode sigs this.element h.element)
+            (matchings ~debug_mode sigs this.element h.element)
       in
       let acc' =
         List.fold_left
           (fun (mid, acc) cc ->
             let id' = succ mid in
-            let x, _, _, id = add_cc ~debugMode ~toplevel:false acc id' cc in
+            let x, _, _, id = add_cc ~debug_mode ~toplevel:false acc id' cc in
             ( (if id = id' then
                  id
                else
@@ -1739,25 +1751,26 @@ module PreEnv = struct
               x ))
           acc news
       in
-      saturate_one ~debugMode ~sharing sigs this max_l level acc' t
+      saturate_one ~debug_mode ~sharing sigs this max_l level acc' t
 
-  let rec saturate_level ~debugMode ~sharing sigs max_l level
+  let rec saturate_level ~debug_mode ~sharing sigs max_l level
       ((_, domain) as acc) =
     if level < 2 then
       acc
     else (
       match Mods.IntMap.find_option level domain with
-      | None -> saturate_level ~debugMode ~sharing sigs max_l (pred level) acc
+      | None -> saturate_level ~debug_mode ~sharing sigs max_l (pred level) acc
       | Some list ->
         let rec aux acc = function
-          | [] -> saturate_level ~debugMode ~sharing sigs max_l (pred level) acc
+          | [] ->
+            saturate_level ~debug_mode ~sharing sigs max_l (pred level) acc
           | h :: t ->
-            aux (saturate_one ~debugMode ~sharing sigs h max_l level acc t) t
+            aux (saturate_one ~debug_mode ~sharing sigs h max_l level acc t) t
         in
         aux acc (Mods.IntMap.fold (fun _ -> List.rev_append) list [])
     )
 
-  let saturate ~debugMode ~sharing sigs domain =
+  let saturate ~debug_mode ~sharing sigs domain =
     match Mods.IntMap.max_key domain with
     | None -> 0, domain
     | Some l ->
@@ -1771,7 +1784,7 @@ module PreEnv = struct
       (match sharing with
       | No_sharing -> si, domain
       | Compatible_patterns | Max_sharing ->
-        saturate_level ~debugMode ~sharing sigs l l (si, domain))
+        saturate_level ~debug_mode ~sharing sigs l l (si, domain))
 
   let of_env env =
     let add_cc acc p =
@@ -1830,7 +1843,7 @@ let fresh_cc_id domain =
              List.fold_left (fun acc p -> max acc p.p_id) acc x))
        domain 0)
 
-let raw_finish_new ~debugMode ~toplevel ?origin wk =
+let raw_finish_new ~debug_mode ~toplevel ?origin wk =
   let () = check_dangling wk in
   (* rebuild env *)
   let () =
@@ -1848,13 +1861,13 @@ let raw_finish_new ~debugMode ~toplevel ?origin wk =
     }
   in
   let preenv, r, out, out_id =
-    PreEnv.add_cc ~debugMode ~toplevel ?origin wk.cc_env (fresh_cc_id wk.cc_env)
-      cc_candidate
+    PreEnv.add_cc ~debug_mode ~toplevel ?origin wk.cc_env
+      (fresh_cc_id wk.cc_env) cc_candidate
   in
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv, r, out, out_id
 
-let finish_new ~debugMode ?origin wk =
-  raw_finish_new ~debugMode ~toplevel:true ?origin wk
+let finish_new ~debug_mode ?origin wk =
+  raw_finish_new ~debug_mode ~toplevel:true ?origin wk
 
 let new_link wk (((x, _) as n1), i) (((y, _) as n2), j) =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_nodes in
@@ -1929,14 +1942,14 @@ let new_node wk type_id =
           Mods.IntMap.add wk.free_id (Array.make arity (UnSpec, -1)) wk.cc_nodes;
       } )
 
-let minimal_env ~debugMode env contact_map =
+let minimal_env ~debug_mode env contact_map =
   Tools.array_fold_lefti
     (fun ty ->
       Tools.array_fold_lefti (fun s acc (ints, links) ->
           let w = begin_new acc in
           let n, w = new_node w ty in
           let w = new_free w (n, s) in
-          let acc', _, _, _ = raw_finish_new ~debugMode ~toplevel:false w in
+          let acc', _, _, _ = raw_finish_new ~debug_mode ~toplevel:false w in
           let acc'' =
             Mods.IntSet.fold
               (fun i acc ->
@@ -1944,7 +1957,7 @@ let minimal_env ~debugMode env contact_map =
                 let n, w = new_node w ty in
                 let w = new_internal_state w (n, s) i in
                 let out, _, _, _ =
-                  raw_finish_new ~debugMode ~toplevel:false w
+                  raw_finish_new ~debug_mode ~toplevel:false w
                 in
                 out)
               ints acc'
@@ -1955,13 +1968,13 @@ let minimal_env ~debugMode env contact_map =
               let n, w = new_node w ty in
               let n', w = new_node w ty' in
               let w = new_link w (n, s) (n', s') in
-              let out, _, _, _ = raw_finish_new ~debugMode ~toplevel:false w in
+              let out, _, _, _ = raw_finish_new ~debug_mode ~toplevel:false w in
               if ty = ty' && s < s' then (
                 let w = begin_new out in
                 let n, w = new_node w ty in
                 let w = new_link w (n, s) (n, s') in
                 let out', _, _, _ =
-                  raw_finish_new ~debugMode ~toplevel:false w
+                  raw_finish_new ~debug_mode ~toplevel:false w
                 in
                 out'
               ) else
@@ -1981,11 +1994,11 @@ let fold_by_type f cc acc =
 
 let fold f cc acc = Mods.IntMap.fold f cc.nodes acc
 
-let finalize ~debugMode ~sharing env contact_map =
+let finalize ~debug_mode ~sharing env contact_map =
   let sigs = PreEnv.sigs env in
-  let env = minimal_env ~debugMode env contact_map in
+  let env = minimal_env ~debug_mode env contact_map in
   let si, complete_domain =
-    PreEnv.saturate ~debugMode ~sharing sigs env.PreEnv.domain
+    PreEnv.saturate ~debug_mode ~sharing sigs env.PreEnv.domain
   in
   let domain = Array.make (succ si) (PreEnv.empty_point env.PreEnv.sig_decl) in
   let singles = Mods.IntMap.find_default Mods.IntMap.empty 1 complete_domain in
@@ -2027,13 +2040,13 @@ let finalize ~debugMode ~sharing env contact_map =
                       List.fold_left
                         (fun acc e ->
                           match
-                            matchings ~debugMode sigs e.element x.element
+                            matchings ~debug_mode sigs e.element x.element
                           with
                           | [] -> acc
                           | injs ->
                             List.fold_left
                               (fun acc inj_e_x ->
-                                PreEnv.insert_navigation ~debugMode
+                                PreEnv.insert_navigation ~debug_mode
                                   env.PreEnv.id_by_type env.PreEnv.nb_id domain
                                   x.p_id x.element inj_e_x e.p_id
                                 + acc)
@@ -2077,7 +2090,7 @@ let finalize ~debugMode ~sharing env contact_map =
     },
     { stat_nodes = si; PreEnv.stat_nav_steps } )
 
-let merge_on_inf ~debugMode env m g1 g2 =
+let merge_on_inf ~debug_mode env m g1 g2 =
   let m_list = Renaming.to_list m in
   let root1, root2 = List.hd m_list in
   let pairing =
@@ -2087,11 +2100,11 @@ let merge_on_inf ~debugMode env m g1 g2 =
   in
   let possibilities = ref pairing in
   match
-    are_compatible ~debugMode ~possibilities ~strict:false root1 g1 root2 g2
+    are_compatible ~debug_mode ~possibilities ~strict:false root1 g1 root2 g2
   with
   | Some m', _ ->
     let _, pushout =
-      merge_compatible ~debugMode env.PreEnv.id_by_type env.PreEnv.nb_id m' g1
+      merge_compatible ~debug_mode env.PreEnv.id_by_type env.PreEnv.nb_id m' g1
         g2
     in
     Some pushout, None

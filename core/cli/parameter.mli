@@ -14,7 +14,7 @@ val look_down_for_better_cut : bool
 val log_number_of_causal_flows : bool
 val defaultLiftSetSize : int ref
 val defaultHeapSize : int ref
-val debugModeOn : bool ref
+val debug_modeOn : bool ref
 val do_global_cut : bool
 val cut_pseudo_inverse_event : bool
 val defaultExtArraySize : int ref

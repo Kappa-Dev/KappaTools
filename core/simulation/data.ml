@@ -41,7 +41,7 @@ let print_initial_inputs ?uuid conf env inputs_form init =
            (fun f (nb, tk) ->
              Format.fprintf f "@[<hov 2>%%init:@ @[%a@]@ %a@]"
                (Kappa_printer.alg_expr ~noCounters ~env)
-               (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
+               (fst (Alg_expr.mult (Loc.annot_with_dummy n) nb))
                (Model.print_token ~env) tk)
            f r.Primitives.delta_tokens))
     init
@@ -448,8 +448,7 @@ let export_plot ~is_tsv plot =
 let print_warning ?pos f msg =
   let pr f () = Format.fprintf f "Warning: @[%t@]" msg in
   match pos with
-  | Some pos ->
-    Format.fprintf f "@[<v>%a@]@." (Locality.print_annot pr) ((), pos)
+  | Some pos -> Format.fprintf f "@[<v>%a@]@." (Loc.print_annoted pr) ((), pos)
   | None -> Format.fprintf f "@[%a@]@." pr ()
 
 type file_line = { file_line_name: string option; file_line_text: string }
@@ -463,4 +462,4 @@ type t =
   | Snapshot of string * snapshot
   | Log of string
   | Species of string * float * User_graph.connected_component
-  | Warning of Locality.t option * (Format.formatter -> unit)
+  | Warning of Loc.t option * (Format.formatter -> unit)

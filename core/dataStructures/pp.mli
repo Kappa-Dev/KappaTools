@@ -75,7 +75,7 @@ val array :
   unit
 
 val plain_array : (formatter -> 'a -> unit) -> formatter -> 'a array -> unit
-val error : (formatter -> 'a -> unit) -> 'a Locality.annot -> unit
+val error : (formatter -> 'a -> unit) -> 'a Loc.annoted -> unit
 
 val list_to_string :
   (unit -> string) -> (unit -> 'a -> string) -> unit -> 'a list -> string

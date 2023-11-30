@@ -42,7 +42,7 @@ let emptyActs = ref true
 let init_activities env = function
   | None -> ()
   | Some s ->
-    let noCounters = !Parameter.debugModeOn in
+    let noCounters = !Parameter.debug_modeOn in
     let desc = Kappa_files.open_out s in
     let form = Format.formatter_of_out_channel desc in
     let nb_r = Model.nb_syntactic_rules env in
@@ -175,7 +175,7 @@ let snapshot file s =
 let print_species time f mixture =
   Format.fprintf f "%g: @[<h>%a@]@." time User_graph.print_cc mixture
 
-let warning_buffer : (Locality.t option * (Format.formatter -> unit)) list ref =
+let warning_buffer : (Loc.t option * (Format.formatter -> unit)) list ref =
   ref []
 
 let go = function
@@ -252,5 +252,5 @@ let input_modifications env event mods =
       (Format.formatter_of_out_channel inputs)
       "%%mod: [E] = %i do %a@." event
       (Pp.list ~trailing:Pp.colon Pp.colon
-         (Kappa_printer.modification ~noCounters:!Parameter.debugModeOn ~env))
+         (Kappa_printer.modification ~noCounters:!Parameter.debug_modeOn ~env))
       mods

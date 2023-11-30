@@ -11,7 +11,7 @@ let defaultExtArraySize = ref 5
 let defaultGraphSize = ref 5
 let defaultLiftSetSize = ref 5
 let defaultHeapSize = ref 5
-let debugModeOn = ref false
+let debug_modeOn = ref false
 
 (* expert option for stories *)
 

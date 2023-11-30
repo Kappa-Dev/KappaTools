@@ -42,7 +42,7 @@ let find_implicit_infos contact_map ags =
         let or_ty = i, ty_id in
         let () =
           ports.(i) <-
-            Locality.dummy_annot (LKappa.LNK_VALUE (free_id, (p, a))), s
+            Loc.annot_with_dummy (LKappa.LNK_VALUE (free_id, (p, a))), s
         in
         aux_one (succ free_id) previous current
           ((free_id, (p, a), or_ty, new_switch s) :: todos)
@@ -54,7 +54,7 @@ let find_implicit_infos contact_map ags =
             let ports' = Array.copy ports in
             let () =
               ports'.(i) <-
-                Locality.dummy_annot (LKappa.LNK_VALUE (free_id, (p, a))), s
+                Loc.annot_with_dummy (LKappa.LNK_VALUE (free_id, (p, a))), s
             in
             let todos' = (free_id, (p, a), or_ty, new_switch s) :: todos in
             aux_one (succ free_id) prev' current todos' ag_tail ag ports'
@@ -111,7 +111,7 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
             let ports' = Array.copy ag.LKappa.ra_ports in
             let () =
               ports'.(i) <-
-                Locality.dummy_annot (LKappa.LNK_VALUE (id, dst_info)), p_switch
+                Loc.annot_with_dummy (LKappa.LNK_VALUE (id, dst_info)), p_switch
             in
             ( List.rev_append prevs
                 ({
@@ -128,7 +128,7 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
             let ports' = Array.copy ag.LKappa.ra_ports in
             let () =
               ports'.(i) <-
-                Locality.dummy_annot (LKappa.LNK_VALUE (id, dst_info)), s
+                Loc.annot_with_dummy (LKappa.LNK_VALUE (id, dst_info)), s
             in
             ( List.rev_append prevs
                 ({
@@ -154,7 +154,7 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
             | [ _ ], todo' ->
               let ports' = Array.copy ag.LKappa.ra_ports in
               let () =
-                ports'.(i) <- Locality.dummy_annot (LKappa.LNK_VALUE (id, x)), s
+                ports'.(i) <- Loc.annot_with_dummy (LKappa.LNK_VALUE (id, x)), s
               in
               ( List.rev_append prevs
                   ({
@@ -178,12 +178,12 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
 let new_agent_with_one_link sigs ty_id port link dst_info switch =
   let arity = Signature.arity sigs ty_id in
   let ports =
-    Array.make arity (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained)
+    Array.make arity (Loc.annot_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
   in
   let internals = Array.make arity LKappa.I_ANY in
   let () =
     ports.(port) <-
-      Locality.dummy_annot (LKappa.LNK_VALUE (link, dst_info)), switch
+      Loc.annot_with_dummy (LKappa.LNK_VALUE (link, dst_info)), switch
   in
   {
     LKappa.ra_type = ty_id;
@@ -410,7 +410,7 @@ let rec add_agents_in_cc sigs id wk registered_links
   | [] ->
     (match Mods.IntMap.root registered_links with
     | None -> wk, transf, links_transf, instantiations, remains
-    | Some (key, _) -> link_occurence_failure key Locality.dummy)
+    | Some (key, _) -> link_occurence_failure key Loc.dummy)
   | ag :: ag_l ->
     let node, wk = Pattern.new_node wk ag.LKappa.ra_type in
     let place = Matching.Agent.Existing (node, id) in
@@ -481,7 +481,7 @@ let rec add_agents_in_cc sigs id wk registered_links
         | ((LKappa.LNK_SOME | LKappa.LNK_TYPE _), _), _ ->
           raise
             (ExceptionDefn.Internal_Error
-               (Locality.dummy_annot
+               (Loc.annot_with_dummy
                   "Try to create the connected components of an ambiguous \
                    mixture."))
         | (LKappa.LNK_VALUE (i, _), pos), s ->
@@ -559,7 +559,7 @@ let rec complete_with_creation sigs (removed, added) links_transf create_actions
     (match Mods.IntMap.root links_transf with
     | None ->
       List.rev_append actions create_actions, (List.rev removed, List.rev added)
-    | Some (i, _) -> link_occurence_failure i Locality.dummy)
+    | Some (i, _) -> link_occurence_failure i Loc.dummy)
   | ag :: ag_l ->
     let place = Matching.Agent.Fresh (ag.Raw_mixture.a_type, fresh) in
     let rec handle_ports added l_t actions intf site_id =
@@ -609,7 +609,7 @@ let incr_origin = function
   | (Operator.ALG _ | Operator.MODIF _) as x -> x
   | Operator.RULE i -> Operator.RULE (succ i)
 
-let connected_components_of_mixture ~debugMode created mix (env, origin) =
+let connected_components_of_mixture ~debug_mode created mix (env, origin) =
   let sigs = Pattern.PreEnv.sigs env in
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
@@ -658,24 +658,26 @@ let connected_components_of_mixture ~debugMode created mix (env, origin) =
         add_agents_in_cc sigs id wk Mods.IntMap.empty transformations
           links_transf instantiations' t [ h ]
       in
-      let env', inj, cc, cc_id = Pattern.finish_new ~debugMode ?origin wk_out in
+      let env', inj, cc, cc_id =
+        Pattern.finish_new ~debug_mode ?origin wk_out
+      in
       let added' =
         List_util.smart_map
-          (Primitives.Transformation.rename ~debugMode id inj)
+          (Primitives.Transformation.rename ~debug_mode id inj)
           added
       in
       let removed' =
         List_util.smart_map
-          (Primitives.Transformation.rename ~debugMode id inj)
+          (Primitives.Transformation.rename ~debug_mode id inj)
           removed
       in
       let event' =
-        Instantiation.rename_abstract_event ~debugMode id inj event
+        Instantiation.rename_abstract_event ~debug_mode id inj event
       in
       let l_t' =
         Mods.IntMap.map
           (fun ((p, s) as x) ->
-            let p' = Matching.Agent.rename ~debugMode id inj p in
+            let p' = Matching.Agent.rename ~debug_mode id inj p in
             if p == p' then
               x
             else
@@ -692,15 +694,15 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
     (find_implicit_infos contact_map
        (List.rev (List.rev_map LKappa.copy_rule_agent precomp_mixs)))
 
-let connected_components_sum_of_ambiguous_rule ~debugMode ~compileModeOn
+let connected_components_sum_of_ambiguous_rule ~debug_mode ~compile_mode_on
     contact_map env ?origin precomp_mixs created =
-  let noCounters = debugMode in
+  let noCounters = debug_mode in
   let sigs = Pattern.PreEnv.sigs env in
   let all_mixs =
     rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs
   in
   let () =
-    if compileModeOn then
+    if compile_mode_on then
       Format.eprintf "@[<v>_____(%i)@,%a@]@." (List.length all_mixs)
         (Pp.list Pp.cut (fun f x ->
              Format.fprintf f "@[%a%a@]"
@@ -712,13 +714,13 @@ let connected_components_sum_of_ambiguous_rule ~debugMode ~compileModeOn
         all_mixs
   in
   List_util.fold_right_map
-    (connected_components_of_mixture ~debugMode created)
+    (connected_components_of_mixture ~debug_mode created)
     all_mixs (env, origin)
 
-let connected_components_sum_of_ambiguous_mixture ~debugMode ~compileModeOn
+let connected_components_sum_of_ambiguous_mixture ~debug_mode ~compile_mode_on
     contact_map env ?origin mix =
   let rules, (cc_env, _) =
-    connected_components_sum_of_ambiguous_rule ~debugMode ~compileModeOn
+    connected_components_sum_of_ambiguous_rule ~debug_mode ~compile_mode_on
       contact_map env ?origin mix []
   in
   ( cc_env,
@@ -733,7 +735,7 @@ let aux_lkappa_of_pattern free_id p =
     (fun ~pos ~agent_type intf (acc, lnk_pack) ->
       let ra_ports =
         Array.make (Array.length intf)
-          (Locality.dummy_annot LKappa.LNK_ANY, LKappa.Maintained)
+          (Loc.annot_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
       in
       let ra_ints = Array.make (Array.length intf) LKappa.I_ANY in
       let out =
@@ -757,7 +759,7 @@ let aux_lkappa_of_pattern free_id p =
             | Pattern.Free ->
               let () =
                 ra_ports.(site) <-
-                  Locality.dummy_annot LKappa.LNK_FREE, LKappa.Maintained
+                  Loc.annot_with_dummy LKappa.LNK_FREE, LKappa.Maintained
               in
               pack
             | Pattern.Link (dst_a, dst_s) ->
@@ -766,12 +768,12 @@ let aux_lkappa_of_pattern free_id p =
               | Some (id, dst_info) ->
                 let () =
                   ra_ports.(site) <-
-                    ( Locality.dummy_annot (LKappa.LNK_VALUE (id, dst_info)),
+                    ( Loc.annot_with_dummy (LKappa.LNK_VALUE (id, dst_info)),
                       LKappa.Maintained )
                 in
                 let () =
                   (Mods.IntMap.find_default out dst_a acc').LKappa.ra_ports.(dst_s) <-
-                    ( Locality.dummy_annot (LKappa.LNK_VALUE (id, src_info)),
+                    ( Loc.annot_with_dummy (LKappa.LNK_VALUE (id, src_info)),
                       LKappa.Maintained )
                 in
                 pack
@@ -953,7 +955,7 @@ let lkappa_of_elementary_rule sigs domain r =
   in
   r_mix, r_created
 (*{
-  LKappa.r_mix; LKappa.r_created; LKappa.r_editStyle = true;
+  LKappa.r_mix; LKappa.r_created; LKappa.r_edit_style = true;
   LKappa.r_rate = r.Primitives.rate;
   LKappa.r_un_rate = r.Primitives.unary_rate;
   LKappa.r_delta_tokens = r.Primitives.delta_tokens;

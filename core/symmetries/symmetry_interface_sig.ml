@@ -52,7 +52,7 @@ module type Interface = sig
   val symbol_table : compil -> Symbol_table.symbol_table
 
   val nbr_automorphisms_in_chemical_species :
-    debugMode:bool -> chemical_species -> int
+    debug_mode:bool -> chemical_species -> int
 
   val canonic_form : chemical_species -> canonic_species
   val connected_components_of_patterns : pattern -> connected_component list
@@ -108,11 +108,11 @@ module type Interface = sig
 
   val token_vector :
     rule ->
-    ((connected_component array list, int) Alg_expr.e Locality.annot * int) list
+    ((connected_component array list, int) Alg_expr.e Loc.annoted * int) list
 
   val token_vector_of_init :
     rule ->
-    ((connected_component array list, int) Alg_expr.e Locality.annot * int) list
+    ((connected_component array list, int) Alg_expr.e Loc.annoted * int) list
 
   val print_rule_id : Format.formatter -> rule_id -> unit
   val print_rule : ?compil:compil -> Format.formatter -> rule -> unit
@@ -129,7 +129,7 @@ module type Interface = sig
     compil ->
     rule ->
     rule_id_with_mode ->
-    (connected_component array list, int) Alg_expr.e Locality.annot option
+    (connected_component array list, int) Alg_expr.e Loc.annoted option
 
   val rate_name : compil -> rule -> rule_id_with_mode -> rule_name
   val apply : compil -> rule -> embedding_forest -> mixture -> mixture
@@ -140,7 +140,7 @@ module type Interface = sig
   val preprocess : Run_cli_args.t -> ast -> preprocessed_ast
 
   val get_compil :
-    debugMode:bool ->
+    debug_mode:bool ->
     dotnet:bool ->
     ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
@@ -157,7 +157,7 @@ module type Interface = sig
 
   val get_variables :
     compil ->
-    (string * (connected_component array list, int) Alg_expr.e Locality.annot)
+    (string * (connected_component array list, int) Alg_expr.e Loc.annoted)
     array
 
   val get_obs : compil -> (connected_component array list, int) Alg_expr.e list
@@ -169,7 +169,7 @@ module type Interface = sig
   val divide_rule_rate_by : cache -> compil -> rule -> cache * int
 
   val species_of_initial_state_env :
-    debugMode:bool ->
+    debug_mode:bool ->
     Model.t ->
     Contact_map.t ->
     Pattern.PreEnv.t ->

@@ -36,7 +36,7 @@ val tests_pass_on :
 (** exported for convenience. *)
 
 val cc_of_state :
-  debugMode:bool ->
+  debug_mode:bool ->
   state ->
   Pattern.PreEnv.t ->
   Pattern.PreEnv.t * ((int * int) list * Pattern.cc * Pattern.id) list

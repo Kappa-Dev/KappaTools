@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let do_interactive_directives ~debugMode ~outputs ~sharing ~syntax_version
+let do_interactive_directives ~debug_mode ~outputs ~sharing ~syntax_version
     contact_map env counter graph state e =
   let warning ~pos msg = outputs (Data.Warning (Some pos, msg)) in
   let cc_preenv = Pattern.PreEnv.of_env (Model.domain env) in
@@ -27,33 +27,33 @@ let do_interactive_directives ~debugMode ~outputs ~sharing ~syntax_version
     then
       raise
         (ExceptionDefn.Malformed_Decl
-           (Locality.dummy_annot "Creating new link type is forbidden"))
+           (Loc.annot_with_dummy "Creating new link type is forbidden"))
   in
   let cc_preenv', e'' =
-    Eval.compile_modifications_no_track ~debugMode ~warning ~compileModeOn:false
-      contact_map cc_preenv e'
+    Eval.compile_modifications_no_track ~debug_mode ~warning
+      ~compile_mode_on:false contact_map cc_preenv e'
   in
   let env', graph' =
     if cc_preenv == cc_preenv' then
       env, graph
     else (
       let fenv, _ =
-        Pattern.finalize ~debugMode ~sharing cc_preenv' contact_map
+        Pattern.finalize ~debug_mode ~sharing cc_preenv' contact_map
       in
       ( Model.new_domain fenv env,
         List.fold_left
-          (Rule_interpreter.incorporate_extra_pattern ~debugMode fenv)
+          (Rule_interpreter.incorporate_extra_pattern ~debug_mode fenv)
           graph
           (Primitives.extract_connected_components_modifications e'') )
     )
   in
   let ostop, ograph, ostate, _ =
-    State_interpreter.do_modifications ~debugMode ~outputs env' counter graph'
+    State_interpreter.do_modifications ~debug_mode ~outputs env' counter graph'
       state e''
   in
   e'', (env', (ostop, ograph, ostate))
 
-let get_pause_criteria ~debugMode ~outputs ~sharing ~syntax_version contact_map
+let get_pause_criteria ~debug_mode ~outputs ~sharing ~syntax_version contact_map
     env graph b =
   let warning ~pos msg = outputs (Data.Warning (Some pos, msg)) in
   let cc_preenv = Pattern.PreEnv.of_env (Model.domain env) in
@@ -62,18 +62,19 @@ let get_pause_criteria ~debugMode ~outputs ~sharing ~syntax_version contact_map
       (Model.signatures env) (Model.tokens_finder env) (Model.algs_finder env) b
   in
   let cc_preenv', ((b'', pos_b'') as bpos'') =
-    Eval.compile_bool ~debugMode ~compileModeOn:false contact_map cc_preenv b'
+    Eval.compile_bool ~debug_mode ~compile_mode_on:false contact_map cc_preenv
+      b'
   in
   let env', graph' =
     if cc_preenv == cc_preenv' then
       env, graph
     else (
       let fenv, _ =
-        Pattern.finalize ~debugMode ~sharing cc_preenv' contact_map
+        Pattern.finalize ~debug_mode ~sharing cc_preenv' contact_map
       in
       ( Model.new_domain fenv env,
         List.fold_left
-          (Rule_interpreter.incorporate_extra_pattern ~debugMode fenv)
+          (Rule_interpreter.incorporate_extra_pattern ~debug_mode fenv)
           graph
           (Primitives.extract_connected_components_bool bpos'') )
     )
@@ -86,7 +87,7 @@ let get_pause_criteria ~debugMode ~outputs ~sharing ~syntax_version contact_map
   in
   env', graph', b''
 
-let find_all_embeddings ~debugMode env tr =
+let find_all_embeddings ~debug_mode env tr =
   let domain = Model.domain env in
   let dummy_instances = Instances.empty env in
   let graph =
@@ -97,9 +98,9 @@ let find_all_embeddings ~debugMode env tr =
       tr
   in
   let out, _ =
-    Rule_interpreter.obs_from_transformations ~debugMode domain graph tr
+    Rule_interpreter.obs_from_transformations ~debug_mode domain graph tr
   in
   List.map
     (fun (p, (root, _)) ->
-      p, Matching.reconstruct_renaming ~debugMode domain graph p root)
+      p, Matching.reconstruct_renaming ~debug_mode domain graph p root)
     out

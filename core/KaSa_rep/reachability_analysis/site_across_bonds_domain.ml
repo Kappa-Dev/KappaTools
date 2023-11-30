@@ -61,7 +61,7 @@ module Domain = struct
   (*--------------------------------------------------------------*)
 
   type local_dynamic_information = {
-    dumy: unit;
+    dummy: unit;
     store_value:
       Ckappa_sig.Views_bdu.mvbdu
       Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.t;
@@ -619,7 +619,7 @@ module Domain = struct
     in
     let init_local_dynamic_information =
       {
-        dumy = ();
+        dummy = ();
         store_value =
           Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
           .empty;

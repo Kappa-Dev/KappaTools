@@ -15,7 +15,7 @@ module Make (I : Symmetry_interface_sig.Interface) : sig
   val preprocess : Run_cli_args.t -> I.ast -> I.preprocessed_ast
 
   val get_compil :
-    debugMode:bool ->
+    debug_mode:bool ->
     dotnet:bool ->
     ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
     rule_rate_convention:Remanent_parameters_sig.rate_convention ->
@@ -46,10 +46,7 @@ module Make (I : Symmetry_interface_sig.Interface) : sig
 
   val get_reactions :
     ('a, 'b) network ->
-    ((ode_var_id list
-     * ode_var_id list
-     * ode_var_id Locality.annot list
-     * I.rule)
+    ((ode_var_id list * ode_var_id list * ode_var_id Loc.annoted list * I.rule)
     * int)
     list
 

@@ -32,7 +32,7 @@ let options =
         | _ as error ->
           raise
             (ExceptionDefn.Malformed_Decl
-               (Locality.dummy_annot
+               (Loc.annot_with_dummy
                   ("Value " ^ error
                  ^ " should be either \"html, dot\" or \"json\"")))),
       "Print stories in html format" );

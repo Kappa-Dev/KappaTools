@@ -17,7 +17,7 @@ val empty : with_delta_activities:bool -> Counter.t -> Model.t -> t
 val initialize :
   bind:('a -> (bool * Rule_interpreter.t * t -> 'a) -> 'a) ->
   return:(bool * Rule_interpreter.t * t -> 'a) ->
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   Model.t ->
   Counter.t ->
@@ -33,7 +33,7 @@ val observables_values :
 values of observables) *)
 
 val do_modifications :
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   Model.t ->
   Counter.t ->
@@ -43,7 +43,7 @@ val do_modifications :
   bool * Rule_interpreter.t * t * bool
 
 val a_loop :
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   dumpIfDeadlocked:bool ->
   maxConsecutiveClash:int ->

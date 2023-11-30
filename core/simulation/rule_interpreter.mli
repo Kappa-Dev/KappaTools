@@ -13,7 +13,7 @@ val empty :
   t
 
 val force_rule :
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   Model.t ->
   Counter.t ->
@@ -24,7 +24,7 @@ val force_rule :
   t option
 
 val update_outdated_activities :
-  debugMode:bool ->
+  debug_mode:bool ->
   (int -> float -> float -> unit) ->
   Model.t ->
   Counter.t ->
@@ -35,7 +35,7 @@ val update_outdated_activities :
 val overwrite_var : int -> Counter.t -> t -> Primitives.alg_expr -> t
 
 val snapshot :
-  debugMode:bool -> raw:bool -> Model.t -> Counter.t -> t -> Data.snapshot
+  debug_mode:bool -> raw:bool -> Model.t -> Counter.t -> t -> Data.snapshot
 
 val add_tracked :
   outputs:(Data.t -> unit) ->
@@ -60,7 +60,7 @@ val value_bool :
   Counter.t -> t -> (Pattern.id array list, int) Alg_expr.bool -> bool
 
 val apply_given_rule :
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   ?rule_id:int ->
   Model.t ->
@@ -71,12 +71,12 @@ val apply_given_rule :
   result
 
 val incorporate_extra_pattern :
-  debugMode:bool -> Pattern.Env.t -> t -> Pattern.id -> t
+  debug_mode:bool -> Pattern.Env.t -> t -> Pattern.id -> t
 
 val activity : t -> float
 
 val apply_instance :
-  debugMode:bool ->
+  debug_mode:bool ->
   outputs:(Data.t -> unit) ->
   ?maxConsecutiveBlocked:int ->
   maxConsecutiveClash:int ->
@@ -95,12 +95,12 @@ val apply_concrete_positive_transformation :
   Edges.t
 
 val print : Model.t -> Format.formatter -> t -> unit
-val pick_an_instance : debugMode:bool -> Kappa_terms.Model.t -> t -> instance
+val pick_an_instance : debug_mode:bool -> Kappa_terms.Model.t -> t -> instance
 val is_correct_instance : Kappa_terms.Model.t -> t -> instance -> bool
 val get_random_state : t -> Random.State.t
 
 val obs_from_transformations :
-  debugMode:bool ->
+  debug_mode:bool ->
   Kappa_terms.Pattern.Env.t ->
   Kappa_mixtures.Edges.t ->
   Instantiation.concrete Primitives.Transformation.t list ->
@@ -117,7 +117,7 @@ val apply_negative_transformation :
   Agent.t Instantiation.site list * Kappa_mixtures.Edges.t
 
 val apply_positive_transformation :
-  debugMode:bool ->
+  debug_mode:bool ->
   Kappa_mixtures.Signature.s ->
   ?mod_connectivity_store:Roots.mod_ccs_cache ->
   Instances.t ->

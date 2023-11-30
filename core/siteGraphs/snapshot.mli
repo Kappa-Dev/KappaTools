@@ -21,7 +21,7 @@ type connected_component = cc_node array
 type t
 
 val cc_to_user_cc :
-  debugMode:bool ->
+  debug_mode:bool ->
   raw:bool ->
   Signature.s ->
   connected_component ->
@@ -33,7 +33,7 @@ val increment_in_snapshot :
   raw:bool -> Signature.s -> connected_component -> t -> t
 
 val export :
-  debugMode:bool ->
+  debug_mode:bool ->
   raw:bool ->
   Signature.s ->
   t ->

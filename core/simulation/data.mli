@@ -32,7 +32,7 @@ type t =
   | Snapshot of string * snapshot
   | Log of string
   | Species of string * float * User_graph.connected_component
-  | Warning of Locality.t option * (Format.formatter -> unit)
+  | Warning of Loc.t option * (Format.formatter -> unit)
 
 val print_snapshot : ?uuid:int -> Format.formatter -> snapshot -> unit
 val print_dot_snapshot : ?uuid:int -> Format.formatter -> snapshot -> unit
@@ -113,4 +113,4 @@ val print_initial_inputs :
   unit
 
 val print_warning :
-  ?pos:Locality.t -> Format.formatter -> (Format.formatter -> unit) -> unit
+  ?pos:Loc.t -> Format.formatter -> (Format.formatter -> unit) -> unit

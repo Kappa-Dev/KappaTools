@@ -77,7 +77,7 @@ let directive_to_json option =
   | Graph_loggers_sig.Position p ->
     ( "position",
       JsonUtil.of_list
-        (fun json -> Locality.annot_to_yojson JsonUtil.of_unit ((), json))
+        (fun json -> Loc.yojson_of_annoted JsonUtil.of_unit ((), json))
         p )
   | Graph_loggers_sig.Contextual_help s ->
     "contextual help", JsonUtil.of_string s
@@ -165,7 +165,7 @@ let directive_of_json = function
       (JsonUtil.to_list
          (fun json ->
            snd
-             (Locality.annot_of_yojson
+             (Loc.annoted_of_yojson
                 (JsonUtil.to_unit
                    ?error_msg:(Some (JsonUtil.build_msg "position")))
                 json))

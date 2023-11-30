@@ -1,8 +1,8 @@
-type ('mix, 'id) anonamised_expr = ('mix, 'id) Alg_expr.e Locality.annot
+type ('mix, 'id) anonamised_expr = ('mix, 'id) Alg_expr.e Loc.annoted
 
-let rec anonamise (expr : ('mix, 'id) Alg_expr.e Locality.annot) :
+let rec anonamise (expr : ('mix, 'id) Alg_expr.e Loc.annoted) :
     ('mix, 'id) anonamised_expr =
-  Locality.dummy_annot
+  Loc.annot_with_dummy
     (match fst expr with
     | Alg_expr.BIN_ALG_OP (op, e1, e2) ->
       Alg_expr.BIN_ALG_OP (op, anonamise e1, anonamise e2)
@@ -17,7 +17,7 @@ let rec anonamise (expr : ('mix, 'id) Alg_expr.e Locality.annot) :
       Alg_expr.DIFF_KAPPA_INSTANCE (anonamise e, id))
 
 and anonamise_bool bool =
-  Locality.dummy_annot
+  Loc.annot_with_dummy
     (match fst bool with
     | (Alg_expr.TRUE | Alg_expr.FALSE) as e -> e
     | Alg_expr.BIN_BOOL_OP (op, b1, b2) ->

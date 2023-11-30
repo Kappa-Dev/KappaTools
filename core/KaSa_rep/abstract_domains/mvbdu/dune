@@ -1,10 +1,17 @@
 (library
-  (name kappa_mvbdu)
-  (libraries kappa_kasa_kastor_toolset kappa-library.generic)
-  (flags (:standard -w @a
-    -open Kappa_parameters
-    -open Kappa_errors
-    -open Kappa_logging
-    -open Kappa_kasa_kastor_toolset
-    -open Kappa_generic_toolset
-    )))
+ (name kappa_mvbdu)
+ (libraries kappa_kasa_kastor_toolset kappa-library.generic)
+ (flags
+  (:standard
+   -w
+   @a
+   -open
+   Kappa_parameters
+   -open
+   Kappa_errors
+   -open
+   Kappa_logging
+   -open
+   Kappa_kasa_kastor_toolset
+   -open
+   Kappa_generic_toolset)))

@@ -19,7 +19,7 @@ type t = {
   mutable domainOutputFile: string option;
   mutable traceFile: string option;
   mutable logFile: string option;
-  mutable compileMode: bool;
+  mutable compile_mode: bool;
   mutable sharing: Pattern.sharing_level;
   mutable showEfficiency: bool;
   mutable timeIndependent: bool;
@@ -37,7 +37,7 @@ let default : t =
     domainOutputFile = None;
     traceFile = None;
     logFile = Some "inputs";
-    compileMode = false;
+    compile_mode = false;
     sharing = Pattern.Compatible_patterns;
     showEfficiency = false;
     timeIndependent = false;
@@ -115,7 +115,7 @@ let options (t : t) : (string * Arg.spec * string) list =
       "Level of sharing computed between patterns during initialization \
        (None/Compatible/Max)" );
     ( "--compile",
-      Arg.Unit (fun () -> t.compileMode <- true),
+      Arg.Unit (fun () -> t.compile_mode <- true),
       "Display rule compilation as action list" );
     ( "-log",
       Arg.String (fun logFile -> t.logFile <- Some logFile),

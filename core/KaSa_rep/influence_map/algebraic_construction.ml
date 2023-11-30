@@ -36,7 +36,7 @@ let complete_interface parameters error handler proper_agent =
           Ckappa_sig.Site_map_and_set.Map.add parameters error site
             {
               Cckappa_sig.site_name = site;
-              Cckappa_sig.site_position = Locality.dummy;
+              Cckappa_sig.site_position = Loc.dummy;
               Cckappa_sig.site_free =
                 (if is_binding_site then
                    Some true

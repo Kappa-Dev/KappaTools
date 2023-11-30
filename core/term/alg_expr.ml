@@ -11,53 +11,47 @@ type pervasives_bool = bool
 type ('mix, 'id) e =
   | BIN_ALG_OP of
       Operator.bin_alg_op
-      * ('mix, 'id) e Locality.annot
-      * ('mix, 'id) e Locality.annot
-  | UN_ALG_OP of Operator.un_alg_op * ('mix, 'id) e Locality.annot
+      * ('mix, 'id) e Loc.annoted
+      * ('mix, 'id) e Loc.annoted
+  | UN_ALG_OP of Operator.un_alg_op * ('mix, 'id) e Loc.annoted
   | STATE_ALG_OP of Operator.state_alg_op
   | ALG_VAR of 'id
   | KAPPA_INSTANCE of 'mix
   | TOKEN_ID of 'id
   | CONST of Nbr.t
   | IF of
-      ('mix, 'id) bool Locality.annot
-      * ('mix, 'id) e Locality.annot
-      * ('mix, 'id) e Locality.annot
-  | DIFF_TOKEN of (('mix, 'id) e Locality.annot * 'id)
-  | DIFF_KAPPA_INSTANCE of (('mix, 'id) e Locality.annot * 'mix)
+      ('mix, 'id) bool Loc.annoted
+      * ('mix, 'id) e Loc.annoted
+      * ('mix, 'id) e Loc.annoted
+  | DIFF_TOKEN of (('mix, 'id) e Loc.annoted * 'id)
+  | DIFF_KAPPA_INSTANCE of (('mix, 'id) e Loc.annoted * 'mix)
 
 and ('mix, 'id) bool =
   | TRUE
   | FALSE
   | BIN_BOOL_OP of
       Operator.bin_bool_op
-      * ('mix, 'id) bool Locality.annot
-      * ('mix, 'id) bool Locality.annot
-  | UN_BOOL_OP of Operator.un_bool_op * ('mix, 'id) bool Locality.annot
+      * ('mix, 'id) bool Loc.annoted
+      * ('mix, 'id) bool Loc.annoted
+  | UN_BOOL_OP of Operator.un_bool_op * ('mix, 'id) bool Loc.annoted
   | COMPARE_OP of
       Operator.compare_op
-      * ('mix, 'id) e Locality.annot
-      * ('mix, 'id) e Locality.annot
+      * ('mix, 'id) e Loc.annoted
+      * ('mix, 'id) e Loc.annoted
 
 let rec e_to_yojson ~filenames f_mix f_id = function
   | BIN_ALG_OP (op, a, b) ->
     `List
       [
         Operator.bin_alg_op_to_json op;
-        Locality.annot_to_yojson ~filenames
-          (e_to_yojson ~filenames f_mix f_id)
-          a;
-        Locality.annot_to_yojson ~filenames
-          (e_to_yojson ~filenames f_mix f_id)
-          b;
+        Loc.yojson_of_annoted ~filenames (e_to_yojson ~filenames f_mix f_id) a;
+        Loc.yojson_of_annoted ~filenames (e_to_yojson ~filenames f_mix f_id) b;
       ]
   | UN_ALG_OP (op, a) ->
     `List
       [
         Operator.un_alg_op_to_json op;
-        Locality.annot_to_yojson ~filenames
-          (e_to_yojson ~filenames f_mix f_id)
-          a;
+        Loc.yojson_of_annoted ~filenames (e_to_yojson ~filenames f_mix f_id) a;
       ]
   | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
   | ALG_VAR i -> `List [ `String "VAR"; f_id i ]
@@ -68,21 +62,17 @@ let rec e_to_yojson ~filenames f_mix f_id = function
     `List
       [
         `String "IF";
-        Locality.annot_to_yojson ~filenames
+        Loc.yojson_of_annoted ~filenames
           (bool_to_yojson ~filenames f_mix f_id)
           cond;
-        Locality.annot_to_yojson ~filenames
-          (e_to_yojson ~filenames f_mix f_id)
-          yes;
-        Locality.annot_to_yojson ~filenames
-          (e_to_yojson ~filenames f_mix f_id)
-          no;
+        Loc.yojson_of_annoted ~filenames (e_to_yojson ~filenames f_mix f_id) yes;
+        Loc.yojson_of_annoted ~filenames (e_to_yojson ~filenames f_mix f_id) no;
       ]
   | DIFF_TOKEN (expr, token) ->
     `List
       [
         `String "DIFF_TOKEN";
-        Locality.annot_to_yojson ~filenames
+        Loc.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           expr;
         f_id token;
@@ -91,7 +81,7 @@ let rec e_to_yojson ~filenames f_mix f_id = function
     `List
       [
         `String "DIFF_MIXTURE";
-        Locality.annot_to_yojson ~filenames
+        Loc.yojson_of_annoted ~filenames
           (e_to_yojson ~filenames f_mix f_id)
           expr;
         f_mix mixture;
@@ -104,7 +94,7 @@ and bool_to_yojson ~filenames f_mix f_id = function
     `List
       [
         Operator.un_bool_op_to_json op;
-        Locality.annot_to_yojson ~filenames
+        Loc.yojson_of_annoted ~filenames
           (bool_to_yojson ~filenames f_mix f_id)
           a;
       ]
@@ -112,10 +102,10 @@ and bool_to_yojson ~filenames f_mix f_id = function
     `List
       [
         Operator.bin_bool_op_to_json op;
-        Locality.annot_to_yojson ~filenames
+        Loc.yojson_of_annoted ~filenames
           (bool_to_yojson ~filenames f_mix f_id)
           a;
-        Locality.annot_to_yojson ~filenames
+        Loc.yojson_of_annoted ~filenames
           (bool_to_yojson ~filenames f_mix f_id)
           b;
       ]
@@ -123,56 +113,41 @@ and bool_to_yojson ~filenames f_mix f_id = function
     `List
       [
         Operator.compare_op_to_json op;
-        Locality.annot_to_yojson ~filenames
-          (e_to_yojson ~filenames f_mix f_id)
-          a;
-        Locality.annot_to_yojson ~filenames
-          (e_to_yojson ~filenames f_mix f_id)
-          b;
+        Loc.yojson_of_annoted ~filenames (e_to_yojson ~filenames f_mix f_id) a;
+        Loc.yojson_of_annoted ~filenames (e_to_yojson ~filenames f_mix f_id) b;
       ]
 
 let rec e_of_yojson ~filenames f_mix f_id = function
   | `List [ `String "DIFF_MIXTURE"; expr; mixture ] ->
     DIFF_KAPPA_INSTANCE
-      ( Locality.annot_of_yojson ~filenames
-          (e_of_yojson ~filenames f_mix f_id)
-          expr,
+      ( Loc.annoted_of_yojson ~filenames (e_of_yojson ~filenames f_mix f_id) expr,
         f_mix mixture )
   | `List [ `String "DIFF_TOKEN"; expr; tok ] ->
     DIFF_TOKEN
-      ( Locality.annot_of_yojson ~filenames
-          (e_of_yojson ~filenames f_mix f_id)
-          expr,
+      ( Loc.annoted_of_yojson ~filenames (e_of_yojson ~filenames f_mix f_id) expr,
         f_id tok )
   | `List [ op; a; b ] ->
     BIN_ALG_OP
       ( Operator.bin_alg_op_of_json op,
-        Locality.annot_of_yojson ~filenames
-          (e_of_yojson ~filenames f_mix f_id)
-          a,
-        Locality.annot_of_yojson ~filenames
-          (e_of_yojson ~filenames f_mix f_id)
-          b )
+        Loc.annoted_of_yojson ~filenames (e_of_yojson ~filenames f_mix f_id) a,
+        Loc.annoted_of_yojson ~filenames (e_of_yojson ~filenames f_mix f_id) b
+      )
   | `List [ `String "VAR"; i ] -> ALG_VAR (f_id i)
   | `List [ `String "TOKEN"; i ] -> TOKEN_ID (f_id i)
   | `List [ `String "MIX"; cc ] -> KAPPA_INSTANCE (f_mix cc)
   | `List [ op; a ] ->
     UN_ALG_OP
       ( Operator.un_alg_op_of_json op,
-        Locality.annot_of_yojson ~filenames
-          (e_of_yojson ~filenames f_mix f_id)
-          a )
+        Loc.annoted_of_yojson ~filenames (e_of_yojson ~filenames f_mix f_id) a
+      )
   | `List [ `String "IF"; cond; yes; no ] ->
     IF
-      ( Locality.annot_of_yojson ~filenames
+      ( Loc.annoted_of_yojson ~filenames
           (bool_of_yojson ~filenames f_mix f_id)
           cond,
-        Locality.annot_of_yojson ~filenames
-          (e_of_yojson ~filenames f_mix f_id)
-          yes,
-        Locality.annot_of_yojson ~filenames
-          (e_of_yojson ~filenames f_mix f_id)
-          no )
+        Loc.annoted_of_yojson ~filenames (e_of_yojson ~filenames f_mix f_id) yes,
+        Loc.annoted_of_yojson ~filenames (e_of_yojson ~filenames f_mix f_id) no
+      )
   | x ->
     (try STATE_ALG_OP (Operator.state_alg_op_of_json x)
      with Yojson.Basic.Util.Type_error _ ->
@@ -189,27 +164,27 @@ and bool_of_yojson ~filenames f_mix f_id = function
   | `List [ op; a ] ->
     UN_BOOL_OP
       ( Operator.un_bool_op_of_json op,
-        Locality.annot_of_yojson ~filenames
+        Loc.annoted_of_yojson ~filenames
           (bool_of_yojson ~filenames f_mix f_id)
           a )
   | `List [ op; a; b ] as x ->
     (try
        BIN_BOOL_OP
          ( Operator.bin_bool_op_of_json op,
-           Locality.annot_of_yojson ~filenames
+           Loc.annoted_of_yojson ~filenames
              (bool_of_yojson ~filenames f_mix f_id)
              a,
-           Locality.annot_of_yojson ~filenames
+           Loc.annoted_of_yojson ~filenames
              (bool_of_yojson ~filenames f_mix f_id)
              b )
      with Yojson.Basic.Util.Type_error _ ->
        (try
           COMPARE_OP
             ( Operator.compare_op_of_json op,
-              Locality.annot_of_yojson ~filenames
+              Loc.annoted_of_yojson ~filenames
                 (e_of_yojson ~filenames f_mix f_id)
                 a,
-              Locality.annot_of_yojson ~filenames
+              Loc.annoted_of_yojson ~filenames
                 (e_of_yojson ~filenames f_mix f_id)
                 b )
         with Yojson.Basic.Util.Type_error _ ->
@@ -267,24 +242,24 @@ and print_bool pr_mix pr_tok pr_var f = function
       (print pr_mix pr_tok pr_var)
       b
 
-let const n = Locality.dummy_annot (CONST n)
+let const n = Loc.annot_with_dummy (CONST n)
 let int i = const (Nbr.I i)
 let float f = const (Nbr.F f)
-let add e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.SUM, e1, e2))
-let minus e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MINUS, e1, e2))
-let mult e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MULT, e1, e2))
-let div e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.DIV, e1, e2))
-let pow e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.POW, e1, e2))
-let log e1 = Locality.dummy_annot (UN_ALG_OP (Operator.LOG, e1))
+let add e1 e2 = Loc.annot_with_dummy (BIN_ALG_OP (Operator.SUM, e1, e2))
+let minus e1 e2 = Loc.annot_with_dummy (BIN_ALG_OP (Operator.MINUS, e1, e2))
+let mult e1 e2 = Loc.annot_with_dummy (BIN_ALG_OP (Operator.MULT, e1, e2))
+let div e1 e2 = Loc.annot_with_dummy (BIN_ALG_OP (Operator.DIV, e1, e2))
+let pow e1 e2 = Loc.annot_with_dummy (BIN_ALG_OP (Operator.POW, e1, e2))
+let log e1 = Loc.annot_with_dummy (UN_ALG_OP (Operator.LOG, e1))
 
 let ln e1 =
   (* JF: If I rememnber well *)
   div (log e1) (log (int 10))
 
-let sin e1 = Locality.dummy_annot (UN_ALG_OP (Operator.SINUS, e1))
-let cos e1 = Locality.dummy_annot (UN_ALG_OP (Operator.COSINUS, e1))
-let uminus e1 = Locality.dummy_annot (UN_ALG_OP (Operator.UMINUS, e1))
-let sqrt e1 = Locality.dummy_annot (UN_ALG_OP (Operator.SQRT, e1))
+let sin e1 = Loc.annot_with_dummy (UN_ALG_OP (Operator.SINUS, e1))
+let cos e1 = Loc.annot_with_dummy (UN_ALG_OP (Operator.COSINUS, e1))
+let uminus e1 = Loc.annot_with_dummy (UN_ALG_OP (Operator.UMINUS, e1))
+let sqrt e1 = Loc.annot_with_dummy (UN_ALG_OP (Operator.SQRT, e1))
 
 let rec add_dep ((in_t, in_e, toks_d, out) as x) d = function
   | BIN_ALG_OP (_, a, b), _ -> add_dep (add_dep x d a) d b
@@ -409,12 +384,13 @@ let setup_alg_vars_rev_dep toks vars =
     (fun i x (_, y) -> add_dep x (Operator.ALG i) y)
     (in_t, in_e, toks_d, out) vars
 
-let rec propagate_constant ~warning ?max_time ?max_events updated_vars vars =
+let rec propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars =
   function
   | (BIN_ALG_OP (op, a, b), pos) as x ->
     (match
-       ( propagate_constant ~warning ?max_time ?max_events updated_vars vars a,
-         propagate_constant ~warning ?max_time ?max_events updated_vars vars b )
+       ( propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars a,
+         propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars b
+       )
      with
     | (CONST c1, _), (CONST c2, _) -> CONST (Nbr.of_bin_alg_op op c1 c2), pos
     | ( (( ( BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
@@ -431,7 +407,7 @@ let rec propagate_constant ~warning ?max_time ?max_events updated_vars vars =
         BIN_ALG_OP (op, a', b'), pos)
   | (UN_ALG_OP (op, a), pos) as x ->
     (match
-       propagate_constant ~warning ?max_time ?max_events updated_vars vars a
+       propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars a
      with
     | CONST c, _ -> CONST (Nbr.of_un_alg_op op c), pos
     | ( ( DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _
@@ -443,7 +419,7 @@ let rec propagate_constant ~warning ?max_time ?max_events updated_vars vars =
         UN_ALG_OP (op, a'), pos)
   | (DIFF_TOKEN (a, t), pos) as x ->
     (match
-       propagate_constant ~warning ?max_time ?max_events updated_vars vars a
+       propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars a
      with
     | CONST _, _ ->
       (* the derivative of a constant is zero *)
@@ -457,7 +433,7 @@ let rec propagate_constant ~warning ?max_time ?max_events updated_vars vars =
         DIFF_TOKEN (a', t), pos)
   | (DIFF_KAPPA_INSTANCE (a, m), pos) as x ->
     (match
-       propagate_constant ~warning ?max_time ?max_events updated_vars vars a
+       propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars a
      with
     | CONST _, _ ->
       (* the derivative of a constant is zero *)
@@ -513,29 +489,29 @@ let rec propagate_constant ~warning ?max_time ?max_events updated_vars vars =
   | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _) as x -> x
   | IF (cond, yes, no), pos ->
     (match
-       propagate_constant_bool ~warning ?max_time ?max_events updated_vars vars
-         cond
+       propagate_constant_bool ~warning ?max_time ?max_events ~updated_vars
+         ~vars cond
      with
     | TRUE, _ ->
-      propagate_constant ~warning ?max_time ?max_events updated_vars vars yes
+      propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars yes
     | FALSE, _ ->
-      propagate_constant ~warning ?max_time ?max_events updated_vars vars no
+      propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars no
     | ((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _), _) as cond' ->
       ( IF
           ( cond',
-            propagate_constant ~warning ?max_time ?max_events updated_vars vars
-              yes,
-            propagate_constant ~warning ?max_time ?max_events updated_vars vars
-              no ),
+            propagate_constant ~warning ?max_time ?max_events ~updated_vars
+              ~vars yes,
+            propagate_constant ~warning ?max_time ?max_events ~updated_vars
+              ~vars no ),
         pos ))
 
-and propagate_constant_bool ~warning ?max_time ?max_events updated_vars vars =
+and propagate_constant_bool ~warning ?max_time ?max_events ~updated_vars ~vars =
   function
   | ((TRUE | FALSE), _) as x -> x
   | UN_BOOL_OP (op, a), pos ->
     (match
-       ( propagate_constant_bool ~warning ?max_time ?max_events updated_vars
-           vars a,
+       ( propagate_constant_bool ~warning ?max_time ?max_events ~updated_vars
+           ~vars a,
          op )
      with
     | (TRUE, _), Operator.NOT -> FALSE, pos
@@ -544,18 +520,19 @@ and propagate_constant_bool ~warning ?max_time ?max_events updated_vars vars =
       UN_BOOL_OP (op, a'), pos)
   | BIN_BOOL_OP (op, a, b), pos ->
     (match
-       ( propagate_constant_bool ~warning ?max_time ?max_events updated_vars
-           vars a,
+       ( propagate_constant_bool ~warning ?max_time ?max_events ~updated_vars
+           ~vars a,
          op )
      with
     | (TRUE, _), Operator.OR -> TRUE, pos
     | (FALSE, _), Operator.AND -> FALSE, pos
     | (TRUE, _), Operator.AND | (FALSE, _), Operator.OR ->
-      propagate_constant_bool ~warning ?max_time ?max_events updated_vars vars b
+      propagate_constant_bool ~warning ?max_time ?max_events ~updated_vars ~vars
+        b
     | (((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _), _) as a'), _ ->
       (match
-         ( propagate_constant_bool ~warning ?max_time ?max_events updated_vars
-             vars b,
+         ( propagate_constant_bool ~warning ?max_time ?max_events ~updated_vars
+             ~vars b,
            op )
        with
       | (TRUE, _), Operator.OR -> TRUE, pos
@@ -565,10 +542,10 @@ and propagate_constant_bool ~warning ?max_time ?max_events updated_vars vars =
         BIN_BOOL_OP (op, a', b'), pos))
   | COMPARE_OP (op, a, b), pos ->
     let a' =
-      propagate_constant ~warning ?max_time ?max_events updated_vars vars a
+      propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars a
     in
     let b' =
-      propagate_constant ~warning ?max_time ?max_events updated_vars vars b
+      propagate_constant ~warning ?max_time ?max_events ~updated_vars ~vars b
     in
     (match a', b' with
     | (CONST n1, _), (CONST n2, _) ->

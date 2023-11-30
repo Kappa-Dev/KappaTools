@@ -19,7 +19,7 @@ type status =
 type message = {
   severity: Logs.level;
   text: string; (*should be an algebraic type*)
-  range: Locality.t option;
+  range: Loc.t option;
 }
 
 type ('a, 'b) t = {
@@ -73,7 +73,7 @@ let write_message ob { severity; text; range } =
     | None -> ()
     | Some r ->
       let () = JsonUtil.write_comma ob in
-      JsonUtil.write_field "range" Locality.write_range ob r
+      JsonUtil.write_field "range" Loc.write_range ob r
   in
   Buffer.add_char ob '}'
 
@@ -86,7 +86,7 @@ let read_message p lb =
         else if key = "text" then
           s, Yojson.Basic.read_string p lb, r
         else if key = "range" then
-          s, t, Some (Locality.read_range p lb)
+          s, t, Some (Loc.read_range p lb)
         else
           raise (Yojson.Json_error ("No field " ^ key ^ " expected in message")))
       (Logs.App, "", None) p lb
@@ -95,7 +95,7 @@ let read_message p lb =
 
 let print_message f { range; text; _ } =
   match range with
-  | Some range -> Locality.print_annot Format.pp_print_string f (text, range)
+  | Some range -> Loc.print_annoted Format.pp_print_string f (text, range)
   | None -> Format.pp_print_string f text
 
 let write_t write__ok write__error ob = function

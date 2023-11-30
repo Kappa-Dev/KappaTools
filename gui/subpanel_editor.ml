@@ -76,9 +76,7 @@ let content () =
     ]
 
 let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
-  let position p =
-    new%js Codemirror.position (p.Locality.line - 1) p.Locality.chr
-  in
+  let position p = new%js Codemirror.position (p.Loc.line - 1) p.Loc.chr in
   let hydrate (error : Api_types_j.message) : lint Js.t option =
     match error.Result_util.range with
     | None -> None
@@ -86,7 +84,7 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
       (match React.S.value State_file.current_filename with
       | None -> None
       | Some file_id ->
-        if range.Locality.file = file_id then
+        if range.Loc.file = file_id then
           Some
             (Codemirror.create_lint
                ~message:error.Result_util.text
@@ -100,8 +98,8 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
                  | Logs.Warning -> Codemirror.Warning
                  | Logs.Info -> Codemirror.Warning
                  | Logs.Debug -> Codemirror.Warning)
-               ~from:(position range.Locality.from_position)
-               ~to_:(position range.Locality.to_position))
+               ~from:(position range.Loc.from_position)
+               ~to_:(position range.Loc.to_position))
         else
           None)
   in
@@ -245,16 +243,14 @@ let onload () : unit =
       [
         React.E.map
           (fun pos ->
-            if Some pos.Locality.file = React.S.value filename then (
-              let beg = pos.Locality.from_position in
+            if Some pos.Loc.file = React.S.value filename then (
+              let beg = pos.Loc.from_position in
               let first =
-                new%js Codemirror.position
-                  (beg.Locality.line - 1) beg.Locality.chr
+                new%js Codemirror.position (beg.Loc.line - 1) beg.Loc.chr
               in
-              let en = pos.Locality.from_position in
+              let en = pos.Loc.from_position in
               let last =
-                new%js Codemirror.position
-                  (en.Locality.line - 1) en.Locality.chr
+                new%js Codemirror.position (en.Loc.line - 1) en.Loc.chr
               in
               codemirror##setSelection first last
             ))

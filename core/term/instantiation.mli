@@ -73,35 +73,35 @@ type 'a event = {
 val empty_event : 'a event
 
 val rename_abstract_test :
-  debugMode:bool -> int -> Renaming.t -> abstract test -> abstract test
+  debug_mode:bool -> int -> Renaming.t -> abstract test -> abstract test
 
 val rename_abstract_action :
-  debugMode:bool -> int -> Renaming.t -> abstract action -> abstract action
+  debug_mode:bool -> int -> Renaming.t -> abstract action -> abstract action
 
 val rename_abstract_event :
-  debugMode:bool -> int -> Renaming.t -> abstract event -> abstract event
+  debug_mode:bool -> int -> Renaming.t -> abstract event -> abstract event
 
 val rename_abstract_side_effect :
-  debugMode:bool ->
+  debug_mode:bool ->
   int ->
   Renaming.t ->
   (Matching.Agent.t * 'a) * Matching.Agent.t binding_state ->
   (Matching.Agent.t * 'a) * Matching.Agent.t binding_state
 
 val concretize_test :
-  debugMode:bool ->
+  debug_mode:bool ->
   Matching.t * int Mods.IntMap.t ->
   abstract test ->
   concrete test
 
 val concretize_action :
-  debugMode:bool ->
+  debug_mode:bool ->
   Matching.t * int Mods.IntMap.t ->
   abstract action ->
   concrete action
 
 val try_concretize_action :
-  debugMode:bool ->
+  debug_mode:bool ->
   Matching.t * int Mods.IntMap.t ->
   abstract action ->
   concrete action option
@@ -110,13 +110,13 @@ val try_concretize_action :
     that is involved in the action that is being concretized. *)
 
 val concretize_event :
-  debugMode:bool ->
+  debug_mode:bool ->
   Matching.t * int Mods.IntMap.t ->
   abstract event ->
   concrete event
 
 val matching_abstract_concrete :
-  debugMode:bool -> abstract event -> concrete event -> Renaming.t option
+  debug_mode:bool -> abstract event -> concrete event -> Renaming.t option
 
 val subst_map_agent_in_concrete_test :
   (int -> int) -> concrete test -> concrete test

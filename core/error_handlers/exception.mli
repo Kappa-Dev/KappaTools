@@ -11,7 +11,7 @@ val warn_with_exn :
   ?to_ui:bool ->
   string * int * int * int ->
   ?message:string ->
-  ?pos:Locality.t option ->
+  ?pos:Loc.t option ->
   exn ->
   (unit -> 'a) ->
   method_handler * 'a
@@ -22,7 +22,7 @@ val warn :
   ?to_ui:bool ->
   string * int * int * int ->
   ?message:string ->
-  ?pos:Locality.t ->
+  ?pos:Loc.t ->
   exn ->
   'a ->
   method_handler * 'a
@@ -49,7 +49,7 @@ val check_point :
   ?to_ui:bool ->
   'a ->
   ?message:string ->
-  ?pos:Locality.t ->
+  ?pos:Loc.t ->
   exn ->
   unit ->
   method_handler * unit) ->
@@ -59,6 +59,6 @@ val check_point :
   'a ->
   ?to_ui:bool ->
   ?message:string ->
-  ?pos:Locality.t ->
+  ?pos:Loc.t ->
   exn ->
   method_handler

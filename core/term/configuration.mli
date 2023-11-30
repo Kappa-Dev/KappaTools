@@ -24,7 +24,7 @@ type t = {
 val empty : t
 
 val parse :
-  ((string * Locality.t) * (string * Locality.t) list) list ->
+  ((string * Loc.t) * (string * Loc.t) list) list ->
   t
   * (bool * bool * bool)
   * string (*cflowFormat*)

@@ -1,15 +1,28 @@
 (library
-  (name kappa_cli)
-  (libraries lwt
-	     (select superargTk.ml from
-	       (labltk.jpf -> superargTk.tk.ml)
-	       ( -> superargTk.notk.ml))
-	     kappa_grammar
-	     kappa-library.runtime kappa_version)
-  (flags (:standard -w @a
-     -open Kappa_version
-	 -open Kappa_generic_toolset
-	   -open Kappa_mixtures
-     -open Kappa_terms
-	 -open Kappa_grammar
-	 -open Kappa_runtime)))
+ (name kappa_cli)
+ (libraries
+  lwt
+  (select
+   superargTk.ml
+   from
+   (labltk.jpf -> superargTk.tk.ml)
+   (-> superargTk.notk.ml))
+  kappa_grammar
+  kappa-library.runtime
+  kappa_version)
+ (flags
+  (:standard
+   -w
+   @a-40-42
+   -open
+   Kappa_version
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_mixtures
+   -open
+   Kappa_terms
+   -open
+   Kappa_grammar
+   -open
+   Kappa_runtime)))

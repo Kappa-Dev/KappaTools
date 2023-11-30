@@ -13,4 +13,4 @@ val start_simulation : unit -> unit
 val intervene_simulation : unit -> unit
 val simulation_trace : unit -> unit
 val simulation_outputs : unit -> unit
-val focus_range : Locality.range -> unit
+val focus_range : Loc.t -> unit

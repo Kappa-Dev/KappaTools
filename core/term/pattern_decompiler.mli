@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 val patterns_of_mixture :
-  debugMode:bool ->
+  debug_mode:bool ->
   Contact_map.t ->
   Signature.s ->
   Pattern.PreEnv.t ->

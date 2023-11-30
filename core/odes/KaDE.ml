@@ -37,7 +37,7 @@ let main ?(called_from = Remanent_parameters_sig.Server) () =
     let () = Run_cli_args.copy_from_gui cli_args_gui cli_args in
     let () = cli_args.Run_cli_args.inputKappaFileNames <- files in
     let () = Kappa_files.set_dir cli_args.Run_cli_args.outputDirectory in
-    let () = Parameter.debugModeOn := common_args.Common_args.debug in
+    let () = Parameter.debug_modeOn := common_args.Common_args.debug in
     let backend =
       match Tools.lowercase !(ode_args.Ode_args.backend) with
       | "octave" -> Loggers.Octave
@@ -216,7 +216,7 @@ let main ?(called_from = Remanent_parameters_sig.Server) () =
             (Remanent_parameters.get_trace parameters')
         in
         let compil =
-          A.get_compil ~debugMode:common_args.Common_args.debug ~dotnet
+          A.get_compil ~debug_mode:common_args.Common_args.debug ~dotnet
             ~reaction_rate_convention ~rule_rate_convention ~show_reactions
             ~count ~internal_meaning ~compute_jacobian cli_args preprocessed_ast
         in
@@ -234,7 +234,7 @@ let main ?(called_from = Remanent_parameters_sig.Server) () =
                  algebraic expressions... @."
             in
             let compil =
-              A.get_compil ~debugMode:common_args.Common_args.debug ~dotnet
+              A.get_compil ~debug_mode:common_args.Common_args.debug ~dotnet
                 ?bwd_bisim ~reaction_rate_convention ~rule_rate_convention
                 ~show_reactions ~count ~internal_meaning ~compute_jacobian
                 cli_args preprocessed_ast
@@ -254,7 +254,7 @@ let main ?(called_from = Remanent_parameters_sig.Server) () =
         network, compil
       else (
         let compil =
-          A.get_compil ~debugMode:common_args.Common_args.debug ~dotnet
+          A.get_compil ~debug_mode:common_args.Common_args.debug ~dotnet
             ~reaction_rate_convention ~rule_rate_convention ~show_reactions
             ~count ~internal_meaning ~compute_jacobian cli_args preprocessed_ast
         in

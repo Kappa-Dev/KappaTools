@@ -346,7 +346,7 @@ class virtual new_client ~is_running ~post mailbox =
             [
               (fun b -> Yojson.Basic.write_string b "INFLUENCE_MAP_NODE_AT");
               (fun b -> Yojson.Basic.write_string b filename);
-              (fun b -> Locality.write_position b pos);
+              (fun b -> Loc.write_position b pos);
             ])
 
     method get_nodes_of_influence_map accuracy =

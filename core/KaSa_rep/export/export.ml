@@ -221,17 +221,21 @@ functor
         in
         let () = cli.Run_cli_args.syntaxVersion <- syntax_version in
         let () = cli.Run_cli_args.inputKappaFileNames <- files in
-        let (_, env, contactmap, _, _, _, _, init), _ =
+        let compilation_result : Cli_init.compilation_result =
           Cli_init.get_compilation
             ~warning:(fun ~pos:_ _msg -> ())
-            ~debugMode:false cli
+            ~debug_mode:false cli
         in
         let state =
-          Remanent_state.set_init_state init
-            (Remanent_state.set_env (Some env)
-               (Remanent_state.set_contact_map_int (Some contactmap) state))
+          Remanent_state.set_init_state compilation_result.init_l
+            (Remanent_state.set_env (Some compilation_result.env)
+               (Remanent_state.set_contact_map_int
+                  (Some compilation_result.contact_map) state))
         in
-        state, Some (env : Model.t), Some init, Some contactmap
+        ( state,
+          Some (compilation_result.env : Model.t),
+          Some compilation_result.init_l,
+          Some compilation_result.contact_map )
 
     let compute_env show_title state =
       let state, env, _, _ = compute_env_init show_title state in
@@ -1713,27 +1717,38 @@ functor
                               (Ckappa_sig.site_name_of_int y)
                           in
                           ( state,
-                            (Locality.dummy_annot sx, Locality.dummy_annot sy)
+                            (Loc.annot_with_dummy sx, Loc.annot_with_dummy sy)
                             :: list ))
                         (state, []) rev_binding
                     in
                     let states' =
                       NamedDecls.create
                         (Tools.array_map_of_list
-                           (fun i -> Locality.dummy_annot i, ())
+                           (fun i -> Loc.annot_with_dummy i, ())
                            states)
                     in
                     ( state,
-                      (Locality.dummy_annot x, (states', binding', None)) :: acc
-                    ))
+                      ( Loc.annot_with_dummy x,
+                        {
+                          Signature.internal_state = states';
+                          links = Some binding';
+                          counters_info = None;
+                        } )
+                      :: acc ))
                   (state, []) interface
               in
               ( state,
-                (Locality.dummy_annot a, NamedDecls.create (Array.of_list acc))
+                (Loc.annot_with_dummy a, NamedDecls.create_from_list acc)
                 :: list ))
           (state, []) l.(0)
       in
-      let signature = Signature.create ~counters:[] true l in
+
+      let agent_sigs =
+        LKappa_compiler.agent_sigs_of_agent_sigs_with_links_as_lists
+          ~build_contact_map:true
+          (NamedDecls.create_from_list l)
+      in
+      let signature = Signature.create ~counters_per_agent:[] agent_sigs in
       Remanent_state.set_signature signature state, signature
 
     let get_signature = get_gen Remanent_state.get_signature compute_signature
@@ -1907,7 +1922,7 @@ functor
         let cache = LKappa_auto.init_cache () in
         let cc_cache = Pattern.PreEnv.of_env (Model.domain env) in
         let _cc_cache, chemical_species =
-          Symmetry_interface.species_of_initial_state_env ~debugMode:false env
+          Symmetry_interface.species_of_initial_state_env ~debug_mode:false env
             contact_map_int cc_cache init
         in
         let state, contact_map = get_contact_map ~accuracy_level state in

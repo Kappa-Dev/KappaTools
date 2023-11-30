@@ -64,7 +64,7 @@ val associate :
   Loggers.t ->
   Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
-  Locality.annot ->
+  Loc.annoted ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t ->
   unit
 
@@ -76,7 +76,7 @@ val increment :
   Loggers.t ->
   Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
-  Locality.annot ->
+  Loc.annoted ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t ->
   unit
 
@@ -179,11 +179,11 @@ val print_alg_expr_few_parenthesis :
   Ode_loggers_sig.t ->
   Loggers.t ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
-  Locality.annot ->
+  Loc.annoted ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t ->
   unit
 
 val is_time :
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
-  Locality.annot ->
+  Loc.annoted ->
   bool

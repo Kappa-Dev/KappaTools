@@ -1,19 +1,41 @@
 (executable
-  (name KaDE)
-  (libraries num yojson str kappa-library.runtime kappa_grammar kappa_cli kappa_staticanalyses kappa_kasa_export )
-  (public_name KaDE)
-  (package kappa-binaries)
-  (flags (:standard
-	-open Kappa_generic_toolset
-	-open Kappa_mixtures
-	-open Kappa_terms
-	-open Kappa_runtime
-	-open Kappa_grammar
-	-open Kappa_cli
-	-open Kappa_logging
-  -open Kappa_parameters
-	-open Kappa_staticanalyses
-  -open Kappa_symmetries
-  -open Kappa_reachability
-  -open Kappa_kasa_export
-  -open Kappa_kasa_type_interface)))
+ (name KaDE)
+ (libraries
+  num
+  yojson
+  str
+  kappa-library.runtime
+  kappa_grammar
+  kappa_cli
+  kappa_staticanalyses
+  kappa_kasa_export)
+ (public_name KaDE)
+ (package kappa-binaries)
+ (flags
+  (:standard
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_mixtures
+   -open
+   Kappa_terms
+   -open
+   Kappa_runtime
+   -open
+   Kappa_grammar
+   -open
+   Kappa_cli
+   -open
+   Kappa_logging
+   -open
+   Kappa_parameters
+   -open
+   Kappa_staticanalyses
+   -open
+   Kappa_symmetries
+   -open
+   Kappa_reachability
+   -open
+   Kappa_kasa_export
+   -open
+   Kappa_kasa_type_interface)))
