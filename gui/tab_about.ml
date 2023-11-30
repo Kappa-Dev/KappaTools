@@ -10,7 +10,9 @@ module Html = Tyxml_js.Html5
 
 let navli () = ReactiveData.RList.empty
 
-let content () = [%html {|
+let content () =
+  [%html
+    {|
 <h2>The Kappa Language</h2>
 <p>Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF<p>
 <p>Kappa Language software is distributed under the terms of the <a target="_blank" href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License Version 3</a>.
@@ -36,5 +38,4 @@ let content () = [%html {|
 |}]
 
 let onload () = ()
-
 let onresize () = ()

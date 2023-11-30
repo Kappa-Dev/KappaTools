@@ -27,6 +27,7 @@ man/zzKaSim_manual.ps
 man/generated_img/
 
 # test suite
+# TODO: should we remove these for tests/integration ones?
 models/test_suite/*/*/output/*.xml
 models/test_suite/*/*/output/*.html
 models/test_suite/*/*/output/*.diff
@@ -49,6 +50,32 @@ models/test_suite/*/*/output/profiling.txt
 models/test_suite/*/*/output/profiling.html
 models/test_suite/*/*/output/compression_status.txt
 
+tests/integration/*/*/output/*.xml
+tests/integration/*/*/output/*.html
+tests/integration/*/*/output/*.diff
+tests/integration/*/*/output/*.dot
+tests/integration/*/*/output/*.dat
+tests/integration/*/*/output/*.ka
+tests/integration/*/*/output/*.json
+tests/integration/*/*/output/*.m
+tests/integration/*/*/output/ode.m
+tests/integration/*/*/output/ode.mws
+tests/integration/*/*/output/ode.nb
+tests/integration/*/*/output/data.csv
+tests/integration/*/*/output/data.tsv
+tests/integration/*/*/output/data.svg
+tests/integration/*/*/output/LOG
+tests/integration/simulation/*/output/stream.txt
+tests/integration/*/*/output/example
+tests/integration/*/*/output/error.log
+tests/integration/*/*/error
+tests/integration/error
+tests/integration/*/*/output/profiling.txt
+tests/integration/*/*/output/profiling.html
+tests/integration/*/*/output/compression_status.txt
+tests/integration/*/*/output/network.net
+tests/integration/*/*/output/data_2.csv
+
 # generated code
 site
 *.install
@@ -67,3 +94,9 @@ python/*.egg-info
 
 # MacOS
 .DS_Store
+
+# manual build
+man/KaSim_manual.ilg
+man/KaSim_manual.ind
+man/scripts/inputs~0.ka
+man/scripts/ode.m

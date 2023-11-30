@@ -7,8 +7,7 @@
 (******************************************************************************)
 
 let on_message =
-  Kastor_mpi.on_message
-    ~none:false ~weak:true ~strong:false
+  Kastor_mpi.on_message ~none:false ~weak:true ~strong:false
     ~send_message:Worker.post_message
 
 let () = Worker.set_onmessage on_message

@@ -6,9 +6,9 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+val create_flux : Model.t -> Counter.t -> Primitives.din_kind -> Data.din_data
 (** Flux map *)
-val create_flux :
-  Model.t -> Counter.t -> Primitives.din_kind -> Data.din_data
+
 val stop_flux : Model.t -> Counter.t -> Data.din_data -> Data.din
 
 val incr_flux_flux : int -> int -> float -> Data.din_data -> unit

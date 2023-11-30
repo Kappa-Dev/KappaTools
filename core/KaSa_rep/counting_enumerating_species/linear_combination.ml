@@ -1,1 +1,1 @@
-type 'a linear_combination = (int * 'a) list 
+type 'a linear_combination = (int * 'a) list

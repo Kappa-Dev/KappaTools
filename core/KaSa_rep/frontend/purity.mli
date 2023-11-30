@@ -1,1 +1,1 @@
-val local_trace:bool 
+val local_trace : bool

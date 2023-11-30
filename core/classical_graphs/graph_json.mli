@@ -16,5 +16,5 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-val to_json: Graph_loggers_sig.graph -> Yojson.Basic.t
+val to_json : Graph_loggers_sig.graph -> Yojson.Basic.t
 val of_json : Yojson.Basic.t -> Graph_loggers_sig.graph

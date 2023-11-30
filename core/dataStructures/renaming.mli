@@ -18,7 +18,6 @@ val dummy : t
 val empty : unit -> t
 val is_identity : t -> bool
 val identity : int list -> t
-
 val image : t -> Mods.IntSet.t
 
 val cyclic_permutation_from_list : stop_at:int -> int list -> t
@@ -39,6 +38,7 @@ val apply : debugMode:bool -> t -> int -> int
 (** @raise Undefined *)
 
 val mem : int -> t -> bool
+
 val inverse : t -> t
 (** @raise NotBijective *)
 
@@ -46,12 +46,11 @@ val compare : t -> t -> int
 val equal : t -> t -> bool
 val min_elt : t -> (int * int) option
 val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a
-val to_list : t -> (int*int) list
+val to_list : t -> (int * int) list
 
 val print : Format.formatter -> t -> unit
 (** prints only non identity points *)
 
 val print_full : Format.formatter -> t -> unit
-
 val to_yojson : t -> Yojson.Basic.t
 val of_yojson : Yojson.Basic.t -> t

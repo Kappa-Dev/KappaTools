@@ -9,26 +9,26 @@
 (** Kappa numbers (either float, int or int64) and operations on them *)
 
 type t = F of float | I of int | I64 of Int64.t
+
 val compare : t -> t -> int
 val is_greater : t -> t -> bool
 val is_smaller : t -> t -> bool
 val is_equal : t -> t -> bool
-
 val add : t -> t -> t
 val sub : t -> t -> t
 val mult : t -> t -> t
+
 val internal_div : t -> t -> t
 (** euler division when only int are involved, float div else *)
 
 val rem : t -> t -> t
 val pow : t -> t -> t
-
 val min : t -> t -> t
 val max : t -> t -> t
-
 val succ : t -> t
 val pred : t -> t
 val neg : t -> t
+
 val to_float : t -> float option
 (** [None] when infinity or Not a Number *)
 
@@ -55,10 +55,12 @@ val maybe_iteri : (t -> 'a -> 'a option) -> 'a -> t -> 'a
 or [f] returns [None] *)
 
 val to_string : t -> string
+
 val of_string : string -> t
 (** @raise Failure "float_of_string" *)
 
 val to_yojson : t -> Yojson.Basic.t
+
 val of_yojson : Yojson.Basic.t -> t
 (** @raise Yojson.Basic.Util.Type_error if incorrect *)
 

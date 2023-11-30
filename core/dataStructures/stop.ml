@@ -6,16 +6,12 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type ('a,'b) stop =
-    Stop of 'b
-  | Success of 'a
+type ('a, 'b) stop = Stop of 'b | Success of 'a
 
 let success a = Success a
 let stop a = Stop a
 
 let success_or_stop f g x =
-  match x
-  with
+  match x with
   | Success a -> f a
-  | Stop a -> g a 
- 	       
+  | Stop a -> g a

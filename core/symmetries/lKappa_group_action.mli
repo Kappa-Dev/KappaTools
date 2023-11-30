@@ -22,7 +22,7 @@
     to_be_checked is an array of boolean: false means that there is no rule corresponding to this hash, or that this rule is already in an orbit;
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 
-val check_orbit_internal_state_permutation:
+val check_orbit_internal_state_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
@@ -31,11 +31,14 @@ val check_orbit_internal_state_permutation:
   site1:int ->
   site2:int ->
   LKappa.rule ->
-  correct:(int array) -> (*what i have to divide to get gamma *)
+  correct:int array ->
+  (*what i have to divide to get gamma *)
   Affine_combinations.aff_combination Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
-  counter:(int array) -> (*counter the number of array of orbit*)
-  bool array -> (LKappa_auto.cache * int array * bool array) * bool
+  counter:int array ->
+  (*counter the number of array of orbit*)
+  bool array ->
+  (LKappa_auto.cache * int array * bool array) * bool
 
 (**
    check_orbit_binding_state_permutation ~agent_type ~site1 ~site2 rule
@@ -47,7 +50,7 @@ val check_orbit_internal_state_permutation:
     to_be_checked is an array of boolean: false means that there is no rule corresponding to this hash, or that this rule is already in an orbit;
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 
-val check_orbit_binding_state_permutation:
+val check_orbit_binding_state_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
@@ -56,11 +59,12 @@ val check_orbit_binding_state_permutation:
   site1:int ->
   site2:int ->
   LKappa.rule ->
-  correct:(int array) ->
+  correct:int array ->
   Affine_combinations.aff_combination Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
-  counter:(int array) ->
-  bool array -> (LKappa_auto.cache * int array * bool array) * bool
+  counter:int array ->
+  bool array ->
+  (LKappa_auto.cache * int array * bool array) * bool
 
 (**
    check_orbit_full_permutation ~agent_type ~site1 ~site2 rule
@@ -72,7 +76,7 @@ val check_orbit_binding_state_permutation:
     to_be_checked is an array of boolean: false means that there is no rule corresponding to this hash, or that this rule is already in an orbit;
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 
-val check_orbit_full_permutation:
+val check_orbit_full_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
@@ -81,13 +85,14 @@ val check_orbit_full_permutation:
   site1:int ->
   site2:int ->
   LKappa.rule ->
-  correct:(int array) ->
+  correct:int array ->
   Affine_combinations.aff_combination Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
-  counter:(int array) ->
-  bool array -> (LKappa_auto.cache * int array * bool array) * bool
+  counter:int array ->
+  bool array ->
+  (LKappa_auto.cache * int array * bool array) * bool
 
-val is_invariant_internal_states_permutation:
+val is_invariant_internal_states_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
@@ -99,7 +104,7 @@ val is_invariant_internal_states_permutation:
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
 
-val is_invariant_binding_states_permutation:
+val is_invariant_binding_states_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
@@ -111,7 +116,7 @@ val is_invariant_binding_states_permutation:
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
 
-val is_invariant_full_states_permutation:
+val is_invariant_full_states_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
@@ -122,10 +127,11 @@ val is_invariant_full_states_permutation:
   LKappa.rule ->
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
-
 
 type bwd_bisim_info =
-  int Symmetries_sig.site_partition array * bool Mods.DynArray.t * (LKappa_auto.cache ref)
+  int Symmetries_sig.site_partition array
+  * bool Mods.DynArray.t
+  * LKappa_auto.cache ref
 
 val swap_binding_state_regular : int -> int -> int -> LKappa.rule_agent -> unit
 val swap_internal_state_regular : int -> int -> int -> LKappa.rule_agent -> unit
@@ -134,7 +140,7 @@ val swap_binding_state_created : int -> int -> int -> Raw_mixture.agent -> unit
 val swap_internal_state_created : int -> int -> int -> Raw_mixture.agent -> unit
 val swap_full_created : int -> int -> int -> Raw_mixture.agent -> unit
 
-val equiv_class:
+val equiv_class :
   LKappa_auto.cache ->
   bool Mods.DynArray.t ->
   LKappa.rule ->
@@ -144,6 +150,11 @@ val equiv_class:
   convention:Remanent_parameters_sig.rate_convention ->
   LKappa_auto.cache * bool Mods.DynArray.t * (LKappa.rule * int) list
 
-val saturate_domain_with_symmetric_patterns:
-  debugMode:bool -> compileModeOn:bool -> Model.t -> bwd_bisim_info ->
-  Pattern.id array list -> Pattern.PreEnv.t -> Pattern.PreEnv.t
+val saturate_domain_with_symmetric_patterns :
+  debugMode:bool ->
+  compileModeOn:bool ->
+  Model.t ->
+  bwd_bisim_info ->
+  Pattern.id array list ->
+  Pattern.PreEnv.t ->
+  Pattern.PreEnv.t

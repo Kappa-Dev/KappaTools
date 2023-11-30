@@ -10,16 +10,16 @@
 
 type t
 
-val empty : with_connected_components : bool -> t
+val empty : with_connected_components:bool -> t
 
 val copy : t -> t
 (** You'd better NOT use that on the state of a simulation *)
 
-type stats = { nb_agents : int }
+type stats = { nb_agents: int }
 
 val stats : t -> stats
 
-val add_agent : ?id:int ->  Signature.s -> int -> t -> int * t
+val add_agent : ?id:int -> Signature.s -> int -> t -> int * t
 (** [add_agent ?id sigs agent_type graph] *)
 
 val add_free : int -> int -> t -> t
@@ -28,14 +28,15 @@ val add_free : int -> int -> t -> t
 val add_internal : int -> int -> int -> t -> t
 (** [add_internal agent_id site internal_state graph] *)
 
-val add_link : Agent.t -> int -> Agent.t -> int -> t -> t * (int*int) option
+val add_link : Agent.t -> int -> Agent.t -> int -> t -> t * (int * int) option
 (** [add_link ag1 s1 ag2 s2 t]
  Some (i,j) as second returned element means cc j is now merged into cc i *)
 
 val remove_agent : int -> t -> t
 val remove_free : int -> int -> t -> t
 val remove_internal : int -> int -> t -> int * t
-val remove_link : int -> int -> int -> int -> t -> t * (int*int) option
+
+val remove_link : int -> int -> int -> int -> t -> t * (int * int) option
 (** Some (i,j) as second returned element means separate "new" cc j from cc i *)
 
 val is_agent : Agent.t -> t -> bool
@@ -63,30 +64,26 @@ val get_internal : int -> int -> t -> int
 (** [get_internal ag site graph] *)
 
 val get_sites : int -> t -> int
-
 val get_sort : int -> t -> int
-
 val get_connected_component : int -> t -> int option
-
 val in_same_connected_component : int -> int -> t -> bool
 
-val iter_neighbors: (Agent.t -> unit) -> int -> t -> unit
+val iter_neighbors : (Agent.t -> unit) -> int -> t -> unit
 (** [iter_neighbors f ag graph] calls function [f] on all direct
     neighbors of agent [ag] in [graph]. *)
 
 val all_agents_where : (Agent.t -> bool) -> t -> IntCollection.t
 
 type path = ((Agent.t * int) * (Agent.t * int)) list
+
 val empty_path : path
 val singleton_path : Agent.t -> int -> Agent.t -> int -> path
 val rev_path : path -> path
-val print_path :
-  ?sigs:Signature.s -> Format.formatter -> path -> unit
-
+val print_path : ?sigs:Signature.s -> Format.formatter -> path -> unit
 val is_valid_path : path -> t -> bool
 
 val are_connected :
-  ?max_distance : int -> t -> Agent.t list -> Agent.t list -> path option
+  ?max_distance:int -> t -> Agent.t list -> Agent.t list -> path option
 (** [are_connected ?max_distance graph nodes_x nodes_y] *)
 
 val species :
@@ -95,7 +92,10 @@ val species :
 val build_snapshot : raw:bool -> Signature.s -> t -> Snapshot.t
 
 val build_user_snapshot :
-  debugMode:bool -> raw:bool -> Signature.s -> t ->
+  debugMode:bool ->
+  raw:bool ->
+  Signature.s ->
+  t ->
   (int * User_graph.connected_component) list
 
 val debug_print : Format.formatter -> t -> unit
