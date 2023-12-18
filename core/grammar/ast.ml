@@ -24,20 +24,19 @@ type port = {
 }
 
 (* TODO change name, CVAR is not a test? *)
+(* TODO discriminate between counter definition and counter test ? *)
+(* TODO: change this to CTYPE = CTEST (CTESTTYPE * int) | CVAR string? *)
 
-(** What test is done by the counter expression
- * - CEQ: If counter value is equal to the specified value
- * - CGTE: If counter value is greater or equal to the specified value
- * - CVAR: Not a test, but defines a variable to be used in the rule rates *)
-type counter_test = CEQ of int | CGTE of int | CVAR of string
+type counter_test = CEQ of int | CGTE of int | CLTE of int | CVAR of string
 
 type counter = {
   counter_name: string Loc.annoted;
   counter_test: counter_test Loc.annoted option;
-      (** In a rule: what test is done, in an agent declaration: the initial value *)
+      (** In a rule: what test is done, in an agent declaration: the min value, in an init declaration: the init value, None if absent *)
   counter_delta: int Loc.annoted;
-      (** In a rule: change in counter value, in an agent declaration: max value of the counter *)
+      (** In a rule: change in counter value, in an agent declaration: max value of the counter, 0 if absent *)
 }
+(** Counter syntax from AST, present in 3 contexts with different meanings: agent definition, species init declaration, rule *)
 
 type site = Port of port | Counter of counter
 type agent_mod = NoMod | Erase | Create
@@ -46,6 +45,7 @@ type agent =
   | Present of string Loc.annoted * site list * agent_mod
   | Absent of Loc.t
 
+(* TODO: document why list list *)
 type mixture = agent list list
 
 type edit_notation = {
@@ -249,6 +249,7 @@ let print_ast_port f p =
 let print_counter_test f = function
   | CEQ x, _ -> Format.fprintf f "=%i" x
   | CGTE x, _ -> Format.fprintf f ">=%i" x
+  | CLTE x, _ -> Format.fprintf f "<=%i" x
   | CVAR x, _ -> Format.fprintf f "=%s" x
 
 let print_counter_delta test f (delta, _) =
@@ -284,6 +285,7 @@ let string_option_annoted_of_json filenames =
 let counter_test_to_json = function
   | CEQ x -> `Assoc [ "test", `String "eq"; "val", `Int x ]
   | CGTE x -> `Assoc [ "test", `String "gte"; "val", `Int x ]
+  | CLTE x -> `Assoc [ "test", `String "lte"; "val", `Int x ]
   | CVAR x -> `Assoc [ "test", `String "eq"; "val", `String x ]
 
 let counter_test_of_json = function
@@ -293,6 +295,9 @@ let counter_test_of_json = function
   | `Assoc [ ("val", `Int x); ("test", `String "gte") ]
   | `Assoc [ ("test", `String "gte"); ("val", `Int x) ] ->
     CGTE x
+  | `Assoc [ ("val", `Int x); ("test", `String "gle") ]
+  | `Assoc [ ("test", `String "gle"); ("val", `Int x) ] ->
+    CLTE x
   | `Assoc [ ("test", `String "eq"); ("val", `String x) ]
   | `Assoc [ ("val", `String x); ("test", `String "eq") ] ->
     CVAR x

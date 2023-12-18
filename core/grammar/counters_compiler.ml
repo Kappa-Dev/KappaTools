@@ -218,7 +218,8 @@ let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
   let max_value : int = Loc.v counter_def.counter_delta in
   let min_value : int =
     match counter_def.counter_test with
-    | None | Some (Ast.CGTE _, _) | Some (Ast.CVAR _, _) ->
+    | None | Some (Ast.CGTE _, _) | Some (Ast.CLTE _, _) | Some (Ast.CVAR _, _)
+      ->
       raise
         (ExceptionDefn.Malformed_Decl
            ( "Invalid counter signature - have to specify min bound",
@@ -275,6 +276,8 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
             (ExceptionDefn.Malformed_Decl
                ( "Counter " ^ Loc.v c.counter_name ^ " becomes negative",
                  Loc.get_annot c.counter_name ))
+      | Some (Ast.CLTE _value, _annot) ->
+        failwith "not implemented" (* TODO NOW *)
       | Some (Ast.CGTE value, annot) ->
         if value + delta < 0 then
           raise
@@ -591,7 +594,7 @@ let rec erase_incr (sigs : Signature.s) (i : int) (incrs : LKappa.rule_mixture)
     )
   | [] -> []
 
-(** Returns mixtures for agnet with site changed from counter to port, as well as new [link_nb] after previous additions
+(** Returns mixtures for agent with site changed from counter to port, as well as new [link_nb] after previous additions
  * Used by [compile_counter_in_rule_agent]*)
 let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
     (p_id : int) (counter : Ast.counter) (start_link_nb : int) :
@@ -628,6 +631,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
              Loc.get_annot counter_test ))
     | Ast.CEQ j -> j, true
     | Ast.CGTE j -> j, false
+    | Ast.CLTE _j -> failwith "not implemented" (* TODO now *)
   in
   let start_link_for_created : int = start_link_nb + test + 1 in
   let link_for_erased : int = start_link_nb + abs delta in
@@ -720,7 +724,7 @@ let compile_counter_in_raw_agent (sigs : Signature.s)
             agent_name c.Ast.counter_name
         | Some (test, _) ->
           (match test with
-          | Ast.CGTE _ | Ast.CVAR _ ->
+          | Ast.CGTE _ | Ast.CLTE _ | Ast.CVAR _ ->
             let agent_name =
               Format.asprintf "@[%a@]"
                 (Signature.print_agent sigs)

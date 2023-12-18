@@ -27,6 +27,7 @@ val print :
 val to_json : t -> Yojson.Basic.t
 val of_json : Yojson.Basic.t -> t
 
+(* TODO Change this to have equal bool as sum type *)
 type incr_t = {
   father: int Mods.DynArray.t;
   rank: (int * (bool * bool)) Mods.DynArray.t;
