@@ -1,0 +1,21 @@
+%agent: A(c{=0 / += 7})
+%agent: B()
+
+'rule_a' A(c{<=2}) -> A(c{+=1}) @ 1
+'rule_b' A(c{>=5}) -> A(c{-=1}) @ 1
+'rule_c' A(c{=3}) -> A(c{+=1}) @ 1
+'rule_aa' A(c{<=1}),. -> ., B() @ 0.2
+
+%init: 10 A(c{=0})
+%init: 10 A(c{=7})
+
+// %obs: 'A' |A()|
+%obs: 'B' |B()|
+%obs: 'A0' |A(c{=0})|
+%obs: 'A1' |A(c{=1})|
+%obs: 'A2' |A(c{=2})|
+%obs: 'A3' |A(c{=3})|
+%obs: 'A4' |A(c{=4})|
+%obs: 'A5' |A(c{=5})|
+%obs: 'A6' |A(c{=6})|
+%obs: 'A7' |A(c{=7})|
