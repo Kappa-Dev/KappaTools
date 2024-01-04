@@ -218,7 +218,8 @@ let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
   let max_value : int = Loc.v counter_def.counter_delta in
   let min_value : int =
     match counter_def.counter_test with
-    | None | Some (Ast.CGTE _, _) | Some (Ast.CVAR _, _) ->
+    | None | Some (Ast.CGTE _, _) | Some (Ast.CLTE _, _) | Some (Ast.CVAR _, _)
+      ->
       raise
         (ExceptionDefn.Malformed_Decl
            ( "Invalid counter signature - have to specify min bound",
@@ -275,6 +276,8 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
             (ExceptionDefn.Malformed_Decl
                ( "Counter " ^ Loc.v c.counter_name ^ " becomes negative",
                  Loc.get_annot c.counter_name ))
+      | Some (Ast.CLTE _value, _annot) ->
+        failwith "not implemented" (* TODO NOW *)
       | Some (Ast.CGTE value, annot) ->
         if value + delta < 0 then
           raise
@@ -557,7 +560,7 @@ let rec add_incr (i : int) (first_link : int) (last_link : int) (delta : int)
   )
 
 let rec link_incr (sigs : Signature.s) (i : int) (nb : int)
-    (ag_info : (int * int) * bool) (equal : bool) (lnk : int) (loc : Loc.t)
+    (ag_info : (int * int) * bool) (equal : bool) (link : int) (loc : Loc.t)
     (delta : int) : LKappa.rule_mixture =
   if i = nb then
     []
@@ -565,38 +568,73 @@ let rec link_incr (sigs : Signature.s) (i : int) (nb : int)
     let is_first = i = 0 in
     let is_last = i = nb - 1 in
     let ra_agent =
-      make_counter_agent sigs (is_first, ag_info) (is_last, equal) (lnk + i)
-        (lnk + i + 1)
+      make_counter_agent sigs (is_first, ag_info) (is_last, equal) (link + i)
+        (link + i + 1)
         loc (delta > 0)
     in
-    ra_agent :: link_incr sigs (i + 1) nb ag_info equal lnk loc delta
+    ra_agent :: link_incr sigs (i + 1) nb ag_info equal link loc delta
   )
 
 let rec erase_incr (sigs : Signature.s) (i : int) (incrs : LKappa.rule_mixture)
-    (delta : int) (lnk : int) : LKappa.rule_mixture =
+    (delta : int) (link : int) : LKappa.rule_mixture =
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b = fst counter_agent_info.ports in
   match incrs with
   | incr :: incr_s ->
     if i = abs delta then (
       let before, _ = incr.LKappa.ra_ports.(port_b) in
-      incr.LKappa.ra_ports.(port_b) <- before, LKappa.Linked lnk;
+      incr.LKappa.ra_ports.(port_b) <- before, LKappa.Linked link;
       incr :: incr_s
     ) else (
       Array.iteri
         (fun i (a, _) -> incr.LKappa.ra_ports.(i) <- a, LKappa.Erased)
         incr.LKappa.ra_ports;
       let rule_agent = { incr with LKappa.ra_erased = true } in
-      rule_agent :: erase_incr sigs (i + 1) incr_s delta lnk
+      rule_agent :: erase_incr sigs (i + 1) incr_s delta link
     )
   | [] -> []
 
+(** Returns mixtures for agent with site changed from counter to port, as well as new [link_nb] after previous additions
+ * Used by [compile_counter_in_rule_agent]*)
 let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
-    (p_id : int) ((delta, loc_delta) : int Loc.annoted) (loc : Loc.t)
-    (equal : bool) (test : int) (start_link_nb : int) :
-    LKappa.rule_mixture * Raw_mixture.t =
+    (p_id : int) (counter : Ast.counter) (start_link_nb : int) :
+    (LKappa.rule_mixture * Raw_mixture.t) * int =
+  (* Returns positive part of value *)
+  let positive_part (i : int) : int =
+    if i < 0 then
+      0
+    else
+      i
+  in
+
+  let loc : Loc.t = Loc.get_annot counter.Ast.counter_name in
+  let (delta, loc_delta) : int * Loc.t = counter.Ast.counter_delta in
+  let counter_test : Ast.counter_test Loc.annoted =
+    Option_util.unsome_or_raise
+      ~excep:
+        (ExceptionDefn.Internal_Error
+           ( "Counter "
+             ^ Loc.v counter.Ast.counter_name
+             ^ " should have a test by now",
+             loc ))
+      counter.Ast.counter_test
+  in
+  let (test, equal) : int * bool =
+    match Loc.v counter_test with
+    | Ast.CVAR _ ->
+      raise
+        (ExceptionDefn.Internal_Error
+           ( "Counter "
+             ^ Loc.v counter.Ast.counter_name
+             ^ " defines a variable, which should have been replaced by CEQ \
+                conditions after rule splitting",
+             Loc.get_annot counter_test ))
+    | Ast.CEQ j -> j, true
+    | Ast.CGTE j -> j, false
+    | Ast.CLTE _j -> failwith "not implemented" (* TODO now *)
+  in
   let start_link_for_created : int = start_link_nb + test + 1 in
-  let lnk_for_erased : int = start_link_nb + abs delta in
+  let link_for_erased : int = start_link_nb + abs delta in
   let ag_info : (int * int) * bool =
     (p_id, ra.LKappa.ra_type), ra.LKappa.ra_erased
   in
@@ -606,7 +644,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
   in
   let adjust_delta : LKappa.rule_mixture =
     if delta < 0 then
-      erase_incr sigs 0 test_incr delta lnk_for_erased
+      erase_incr sigs 0 test_incr delta link_for_erased
     else
       test_incr
   in
@@ -628,14 +666,16 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
     else if delta > 0 then
       LKappa.Linked start_link_for_created
     else
-      LKappa.Linked lnk_for_erased
+      LKappa.Linked link_for_erased
   in
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b : int = fst counter_agent_info.ports in
   ra.LKappa.ra_ports.(p_id) <-
     ( (LKappa.LNK_VALUE (start_link_nb, (port_b, counter_agent_info.id)), loc),
       switch );
-  adjust_delta, created
+  let new_link_nb : int = start_link_nb + 1 + test + positive_part delta in
+
+  (adjust_delta, created), new_link_nb
 
 (** Compiles the counter precondition in a left hand side mixture of a rule into a mixture which tests dummy positions
  * rule_agent_ - agent with counters in a rule
@@ -646,52 +686,16 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
 let compile_counter_in_rule_agent (sigs : Signature.s)
     (rule_agent_ : LKappa.rule_agent with_agent_counters) (lnk_nb : int) :
     LKappa.rule_mixture * Raw_mixture.t * int =
-  (* Returns positive part of value *)
-  let positive_part (i : int) : int =
-    if i < 0 then
-      0
-    else
-      i
-  in
-
   let (incrs, lnk_nb') : (LKappa.rule_mixture * Raw_mixture.t) list * int =
     Tools.array_fold_lefti
       (fun id (acc_incrs, lnk_nb) -> function
         | None -> acc_incrs, lnk_nb
         | Some (counter, _) ->
-          let loc = Loc.get_annot counter.Ast.counter_name in
-          let test =
-            Option_util.unsome_or_raise
-              ~excep:
-                (ExceptionDefn.Internal_Error
-                   ( "Counter "
-                     ^ Loc.v counter.Ast.counter_name
-                     ^ " should have a test by now",
-                     loc ))
-              counter.Ast.counter_test
+          let new_incrs, new_lnk_nb =
+            counter_becomes_port sigs rule_agent_.agent id counter lnk_nb
           in
-          let delta = counter.Ast.counter_delta in
-          (match Loc.v test with
-          | Ast.CEQ j ->
-            ( counter_becomes_port sigs rule_agent_.agent id delta loc true j
-                lnk_nb
-              :: acc_incrs,
-              lnk_nb + 1 + j + positive_part (Loc.v delta) )
-            (* JF: link ids were colliding after counter decrementations -> I do not think that we should add delta when negative *)
-          | Ast.CGTE j ->
-            ( counter_becomes_port sigs rule_agent_.agent id delta loc false j
-                lnk_nb
-              :: acc_incrs,
-              lnk_nb + 1 + j + positive_part (Loc.v delta) )
-            (* JF: link ids were colliding after counter decrementations -> I do not think that we should add delta when negative *)
-          | Ast.CVAR _ ->
-            raise
-              (ExceptionDefn.Internal_Error
-                 ( "Counter "
-                   ^ Loc.v counter.Ast.counter_name
-                   ^ " defines a variable, which should have been replaced by \
-                      CEQ conditions after rule splitting",
-                   Loc.get_annot test ))))
+          new_incrs :: acc_incrs, new_lnk_nb
+        (* JF: link ids were colliding after counter decrementations -> I do not think that we should add delta when negative *))
       ([], lnk_nb) rule_agent_.counters
   in
   let (als, bls) : LKappa.rule_mixture * Raw_mixture.t =
@@ -720,19 +724,19 @@ let compile_counter_in_raw_agent (sigs : Signature.s)
             agent_name c.Ast.counter_name
         | Some (test, _) ->
           (match test with
-          | Ast.CEQ j ->
-            let p = Raw_mixture.VAL lnk_nb in
-            let () = ports.(p_id) <- p in
-            let incrs = add_incr 0 lnk_nb (lnk_nb + j) (j + 1) true sigs in
-            acc @ incrs, lnk_nb + j + 1
-          | Ast.CGTE _ | Ast.CVAR _ ->
+          | Ast.CGTE _ | Ast.CLTE _ | Ast.CVAR _ ->
             let agent_name =
               Format.asprintf "@[%a@]"
                 (Signature.print_agent sigs)
                 raw_agent.Raw_mixture.a_type
             in
             LKappa.raise_not_enough_specified ~status:"counter" ~side:"left"
-              agent_name c.Ast.counter_name)))
+              agent_name c.Ast.counter_name
+          | Ast.CEQ j ->
+            let p = Raw_mixture.VAL lnk_nb in
+            let () = ports.(p_id) <- p in
+            let incrs = add_incr 0 lnk_nb (lnk_nb + j) (j + 1) true sigs in
+            acc @ incrs, lnk_nb + j + 1)))
     ([], lnk_nb) raw_agent_.counters
 
 let raw_agent_has_counters (ag_ : 'a with_agent_counters) : bool =

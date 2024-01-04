@@ -22,7 +22,12 @@ type port = {
 }
 (** Describe a port from an agent. [_int] references the internal state of the port, [_link], the possible links that can be made to this port, [_mod] to the changes in a rule that would be made to the state, used only in edit_notation  *)
 
-type counter_test = CEQ of int | CGTE of int | CVAR of string
+(** What test is done by the counter expression
+ * - CEQ: If counter value is equal to the specified value
+ * - CGTE: If counter value is greater or equal to the specified value
+ * - CLTE: If counter value is less or equal to the specified value
+ * - CVAR: Not a test, but defines a variable to be used in the rule rates *)
+type counter_test = CEQ of int | CGTE of int | CLTE of int | CVAR of string
 
 type counter = {
   counter_name: string Loc.annoted;

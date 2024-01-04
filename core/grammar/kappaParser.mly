@@ -448,6 +448,7 @@ interface_expression:
 counter_test:
    | TYPE INT { Some (Ast.CEQ $2,rhs_pos 2)}
    | TYPE GREATER INT { Some (Ast.CGTE $3,rhs_pos 3)}
+   | TYPE SMALLER INT { Some (Ast.CLTE $3,rhs_pos 3)}
    | TYPE ID { Some (Ast.CVAR $2,rhs_pos 2)}
 
 port_expression:

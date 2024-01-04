@@ -12,6 +12,8 @@ type 'a annoted = 'a * t
 
 let v (v, _) = v
 let get_annot (_, annot) = annot
+let copy_annot (_, loc) a = a, loc
+let map_annot f (a, loc) = f a, loc
 
 let of_pos start_location end_location =
   let () =

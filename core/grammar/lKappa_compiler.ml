@@ -1637,7 +1637,7 @@ let prepare_agent_sig ~(sites : Ast.site list) :
             :: acc_site_sigs,
             acc_counter_names )
         | Counter c ->
-          (* Here, only CEQ tests are accepted *)
+          (* We are reading here a signature, only CEQ tests are accepted *)
           (match c.counter_test with
           | None ->
             let n, pos = c.counter_name in
@@ -1654,6 +1654,10 @@ let prepare_agent_sig ~(sites : Ast.site list) :
               raise
                 (ExceptionDefn.Internal_Error
                    ("Counter should not have >= in signature", pos))
+            | CLTE _ ->
+              raise
+                (ExceptionDefn.Internal_Error
+                   ("Counter should not have <= in signature", pos))
             | CEQ j ->
               ( ( c.counter_name,
                   {
@@ -1856,8 +1860,358 @@ type ast_compiled_data = {
      * (syntactic sugar on mixture are not) *)
 }
 
+(** Evaluates to a ast_compil where clte tests have been changed to cgte tests.
+ * For this, for each counter where a CLTE test is present, whose values are in [\[a, b\]], initialized at [i] and add a new counter belonging in [a, b] initialized at [a+b-i].
+ * Each test [> value] is then translated into a test to the "inverted" counter as [< a+b-value].
+ * Each delta [+ delta] is translated into a [- delta] *)
+let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
+  let counter_fold (f : 'a list -> string -> Ast.counter -> 'a list) : 'a list =
+    List.fold_left
+      (fun acc1 rule_def ->
+        let rule : Ast.rule = rule_def |> snd |> Loc.v in
+        match rule.rewrite with
+        | Ast.Edit _ -> acc1 (* no counter test allowed in edit rule *)
+        | Ast.Arrow content ->
+          List.fold_left
+            (fun acc2 agent_list ->
+              List.fold_left
+                (fun acc3 agent ->
+                  match agent with
+                  | Ast.Absent _ -> acc3
+                  | Ast.Present (agent_name, site_list, _) ->
+                    List.fold_left
+                      (fun acc4 site ->
+                        match site with
+                        | Ast.Port _ -> acc4
+                        | Counter counter -> f acc4 (Loc.v agent_name) counter)
+                      acc3 site_list)
+                acc2 agent_list)
+            acc1 content.lhs)
+      [] ast_compil.rules
+  in
+
+  let inverted_counter_suffix = "__inverted" in
+  let inverted_counter_name (name : string) : string =
+    name ^ inverted_counter_suffix
+  in
+
+  (* Find counters that have CLTE tests, and build list: agent_name, counter_name, sum_bounds_ref list.
+   * sum_bounds_ref is then filled when reading the signature and used to specify for inverted counter init value or test value as [sum_bounds_ref - value] *)
+  let counters_with_clte_tests : (string * string * int ref) list =
+    counter_fold (fun acc agent_name counter ->
+        let counter_name = Loc.v counter.counter_name in
+        (* Forbid prefix to avoid nonsense in counter definition *)
+        if String.ends_with ~suffix:inverted_counter_suffix counter_name then
+          raise
+            (ExceptionDefn.Malformed_Decl
+               ( "cannot end counter name by \"" ^ inverted_counter_suffix ^ "\"",
+                 Loc.get_annot counter.counter_name ));
+        (* Return counter name along with matching agent_name *)
+        match Option_util.map Loc.v counter.counter_test with
+        | Some (Ast.CLTE _) ->
+          if
+            List.exists
+              (fun (agent_name2, counter_name2, _) ->
+                String.equal agent_name agent_name2
+                && String.equal counter_name counter_name2)
+              acc
+          then
+            acc
+          else
+            (agent_name, counter_name, ref 0) :: acc
+        | Some (Ast.CEQ _) | Some (Ast.CGTE _) | Some (Ast.CVAR _) | None -> acc)
+  in
+
+  (* Create opposite counters that have the same tests *)
+  let signatures : Ast.agent list =
+    List.map
+      (fun agent ->
+        match agent with
+        | Ast.Absent _ -> agent
+        | Present (agent_name_, site_list, agent_mod) ->
+          let agent_name = Loc.v agent_name_ in
+          let counters_with_clte_tests_from_agent :
+              (string * string * int ref) list =
+            List.filter
+              (fun (agent_name_counter, _, _) ->
+                agent_name = agent_name_counter)
+              counters_with_clte_tests
+          in
+          let new_counter_sites : Ast.site list =
+            List.fold_left
+              (fun acc (_, counter_name, sum_bounds_ref) ->
+                (* Find counter to invert *)
+                let counter_orig : Ast.counter =
+                  List.find_map
+                    (fun site ->
+                      match site with
+                      | Ast.Port _ -> None
+                      | Counter counter ->
+                        if Loc.v counter.counter_name = counter_name then
+                          Some counter
+                        else
+                          None)
+                    site_list
+                  |> Option_util.unsome_or_raise
+                in
+
+                (* Make inverted counter declaration *)
+                let counter_name : string Loc.annoted =
+                  Loc.map_annot
+                    (fun name -> inverted_counter_name name)
+                    counter_orig.counter_name
+                in
+                let counter_test = counter_orig.counter_test in
+                let counter_delta = counter_orig.counter_delta in
+
+                (* Write in sum_bounds_ref the sum of the counter bounds above *)
+                let inf_bound =
+                  match
+                    counter_test |> Option_util.unsome_or_raise |> Loc.v
+                  with
+                  | CGTE _ | CLTE _ | CVAR _ ->
+                    raise
+                      (ExceptionDefn.Malformed_Decl
+                         ( "Counter should have CEQ test value in signature \
+                            statement",
+                           Loc.get_annot counter_name ))
+                  | CEQ value -> value
+                in
+                let sup_bound = Loc.v counter_delta in
+                sum_bounds_ref := inf_bound + sup_bound;
+
+                Ast.Counter { counter_name; counter_test; counter_delta } :: acc)
+              [] counters_with_clte_tests_from_agent
+          in
+
+          Ast.Present (agent_name_, site_list @ new_counter_sites, agent_mod))
+      ast_compil.signatures
+  in
+
+  (* In rules, we need to replace the counter tests and the counter modifications *)
+  let replace_counter_by_invert (mix : Ast.mixture) : Ast.mixture =
+    List.map
+      (fun agent_list ->
+        List.map
+          (fun agent ->
+            match agent with
+            | Ast.Absent _ -> agent
+            | Present (agent_name_, site_list, agent_mod) ->
+              let agent_name : string = Loc.v agent_name_ in
+              let counters_with_clte_tests_from_agent :
+                  (string * string * int ref) list =
+                List.filter
+                  (fun (agent_name_counter, _, _) ->
+                    agent_name = agent_name_counter)
+                  counters_with_clte_tests
+              in
+              (* Add delta to counter as opposite deltas to counter_delta *)
+              let (added_sites, site_list_with_opposite_deltas) :
+                  Ast.site list * Ast.site list =
+                List.fold_left_map
+                  (fun acc site ->
+                    match site with
+                    | Ast.Port _ -> acc, site
+                    | Counter counter ->
+                      (match
+                         List.find_opt
+                           (fun (_, name, _) ->
+                             String.equal (Loc.v counter.counter_name) name)
+                           counters_with_clte_tests_from_agent
+                       with
+                      | None -> acc, site
+                      | Some (_, _, sum_bounds_ref) ->
+                        (* As we know that this counter uses a CLTE test, We introduce the inverted counter *)
+                        (* [clte_value_or_none] discriminates the case where this site in this expression has a CLTE test *)
+                        let clte_value_or_none =
+                          match counter.counter_test with
+                          | None -> None
+                          | Some test ->
+                            (match Loc.v test with
+                            | Ast.CEQ _ | CGTE _ | CVAR _ -> None
+                            | Ast.CLTE value -> Some value)
+                        in
+                        (match clte_value_or_none with
+                        | None ->
+                          (* If there is a test, it doesn't need inversion: we add inverted counter without test *)
+                          if Loc.v counter.counter_delta == 0 then
+                            acc, site
+                          else (
+                            (* If the counter value is changing, we need to add it to the inverted counter *)
+                            let inverted_counter_site =
+                              Ast.Counter
+                                {
+                                  counter_name =
+                                    Loc.map_annot inverted_counter_name
+                                      counter.counter_name;
+                                  counter_test = None;
+                                  counter_delta =
+                                    Loc.map_annot
+                                      (fun delta -> -delta)
+                                      counter.counter_delta;
+                                }
+                            in
+                            inverted_counter_site :: acc, site
+                          )
+                        | Some value ->
+                          (* The test is CLTE, we invert it *)
+
+                          (* Site with inverted counter with CGTE test instead of CLTE test *)
+                          let new_site =
+                            Ast.Counter
+                              {
+                                counter_name =
+                                  Loc.map_annot inverted_counter_name
+                                    counter.counter_name;
+                                counter_test =
+                                  Some
+                                    (Ast.CGTE (!sum_bounds_ref - value)
+                                    |> Loc.copy_annot
+                                         (Option_util.unsome_or_raise
+                                            counter.counter_test));
+                                counter_delta =
+                                  Loc.map_annot
+                                    (fun delta -> -delta)
+                                    counter.counter_delta;
+                              }
+                          in
+                          if Loc.v counter.counter_delta == 0 then
+                            acc, new_site
+                          else (
+                            (* If the counter value is changing, we need to add it to the original counter too *)
+                            let original_counter_site =
+                              Ast.Counter { counter with counter_test = None }
+                            in
+                            original_counter_site :: acc, new_site
+                          ))))
+                  [] site_list
+              in
+              let new_site_list : Ast.site list =
+                site_list_with_opposite_deltas @ added_sites
+              in
+              Ast.Present (agent_name_, new_site_list, agent_mod))
+          agent_list)
+      mix
+  in
+  let rules : (string Loc.annoted option * Ast.rule Loc.annoted) list =
+    List.map
+      (fun rule_def ->
+        ( fst rule_def,
+          Loc.map_annot
+            (fun (rule : Ast.rule) ->
+              let rewrite =
+                match rule.rewrite with
+                | Edit content ->
+                  Ast.Edit
+                    { content with mix = replace_counter_by_invert content.mix }
+                | Arrow content ->
+                  Arrow
+                    {
+                      content with
+                      lhs = replace_counter_by_invert content.lhs;
+                      rhs = replace_counter_by_invert content.rhs;
+                    }
+              in
+              { rule with rewrite })
+            (snd rule_def) ))
+      ast_compil.rules
+  in
+
+  let add_inverted_counter_to_init_mixture (mix : Ast.mixture) : Ast.mixture =
+    List.map
+      (fun agent_list ->
+        List.map
+          (fun agent ->
+            match agent with
+            | Ast.Absent _ -> agent
+            | Present (agent_name_, site_list, agent_mod) ->
+              let agent_name : string = Loc.v agent_name_ in
+              let counters_with_clte_tests_from_agent :
+                  (string * string * int ref) list =
+                List.filter
+                  (fun (agent_name_counter, _, _) ->
+                    agent_name = agent_name_counter)
+                  counters_with_clte_tests
+              in
+              (* Add delta to counter as opposite deltas to counter_delta *)
+              let added_sites : Ast.site list =
+                List.fold_left
+                  (fun acc site ->
+                    match site with
+                    | Ast.Port _ -> acc
+                    | Counter counter ->
+                      (match
+                         List.find_opt
+                           (fun (_, name, _) ->
+                             String.equal (Loc.v counter.counter_name) name)
+                           counters_with_clte_tests_from_agent
+                       with
+                      | None -> acc
+                      | Some (_, _, sum_bounds_ref) ->
+                        (* As we know that this counter uses a CLTE test, We introduce the inverted counter *)
+                        (match counter.counter_test with
+                        | None ->
+                          raise
+                            (ExceptionDefn.Malformed_Decl
+                               ( "Counter should have CEQ test value in init \
+                                  statement",
+                                 Loc.get_annot counter.counter_name ))
+                        | Some test ->
+                          (match Loc.v test with
+                          | Ast.CGTE _ | CLTE _ | CVAR _ ->
+                            raise
+                              (ExceptionDefn.Malformed_Decl
+                                 ( "Counter should have CEQ test value in init \
+                                    statement",
+                                   Loc.get_annot test ))
+                          | Ast.CEQ value ->
+                            if Loc.v counter.counter_delta <> 0 then
+                              raise
+                                (ExceptionDefn.Malformed_Decl
+                                   ( "Counter delta should be 0 in init \
+                                      statement",
+                                     Loc.get_annot test ))
+                            else
+                              Ast.Counter
+                                {
+                                  counter_name =
+                                    Loc.map_annot inverted_counter_name
+                                      counter.counter_name;
+                                  counter_test =
+                                    Some
+                                      (Loc.copy_annot test
+                                         (Ast.CEQ (!sum_bounds_ref - value)));
+                                  counter_delta =
+                                    counter.counter_delta
+                                    (* 0 with annot as tested above *);
+                                }
+                              :: acc))))
+                  [] site_list
+              in
+              let new_site_list : Ast.site list = site_list @ added_sites in
+              Ast.Present (agent_name_, new_site_list, agent_mod))
+          agent_list)
+      mix
+  in
+  let init : (Ast.mixture, Ast.mixture, string) Ast.init_statement list =
+    List.map
+      (fun (quantity_alg_expr, init_kind) ->
+        ( quantity_alg_expr,
+          match init_kind with
+          | Ast.INIT_TOK _ -> init_kind
+          | INIT_MIX mix_ ->
+            INIT_MIX (Loc.map_annot add_inverted_counter_to_init_mixture mix_) ))
+      ast_compil.init
+  in
+
+  { ast_compil with signatures; rules; init }
+
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
+  (* TODO test this *)
+  (* Translate CLTE tests in ast_compil into CGTE tests *)
+  let ast_compil = translate_clte_into_cgte ast_compil in
+
   let has_counters = Counters_compiler.has_counters ast_compil in
   let agent_sig_is_implicit =
     ast_compil.Ast.signatures = [] && ast_compil.Ast.tokens = []

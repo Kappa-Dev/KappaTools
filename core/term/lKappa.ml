@@ -192,18 +192,16 @@ let print_rule_intf ~noCounters sigs ~show_erased ~ltypes ag_ty f
                  Mods.DynArray.get counters.Raw_mixture.rank root
                in
                if is_counter' && not noCounters then (
-                 let () =
-                   Format.fprintf f "%t%a{%a%a}"
-                     (if empty then
-                        Pp.empty
-                      else
-                        Pp.space)
-                     (Signature.print_site sigs ag_ty)
-                     i print_counter_test
-                     (c - 1, eq)
-                     (print_counter_delta created_counters j)
-                     switch
-                 in
+                 Format.fprintf f "%t%a{%a%a}"
+                   (if empty then
+                      Pp.empty
+                    else
+                      Pp.space)
+                   (Signature.print_site sigs ag_ty)
+                   i print_counter_test
+                   (c - 1, eq)
+                   (print_counter_delta created_counters j)
+                   switch;
                  true
                ) else
                  false

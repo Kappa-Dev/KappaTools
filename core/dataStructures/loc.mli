@@ -19,6 +19,12 @@ val v : 'a annoted -> 'a
 val get_annot : 'a annoted -> t
 (** Extract annotation from Loc.annoted *)
 
+val copy_annot : 'b annoted -> 'a -> 'a annoted
+(** Create annoted variable with same annotation as existing variable *)
+
+val map_annot : ('a -> 'b) -> 'a annoted -> 'b annoted
+(** Apply operation on variable and keep annotation *)
+
 val of_pos : Lexing.position -> Lexing.position -> t
 val dummy : t
 val annot_with_dummy : 'a -> 'a annoted

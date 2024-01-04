@@ -59,7 +59,7 @@ jobs:
           sudo apt-get install --yes gnuplot-nox \
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht
-          opam install --yes dune num yojson lwt fmt logs re \
+          opam install --yes dune num yojson result lwt fmt logs re \
             cohttp-lwt-unix atdgen
           pip install nose
       - name: Make Kappa
