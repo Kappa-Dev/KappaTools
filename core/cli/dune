@@ -1,7 +1,7 @@
 (library
  (name kappa_cli)
  (libraries
-  lwt
+  unix lwt
   (select
    superargTk.ml
    from
