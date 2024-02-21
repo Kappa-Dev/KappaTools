@@ -231,7 +231,7 @@ let computing_watcher manager setter =
     else
       Js_of_ocaml_lwt.Lwt_js.sleep delay >>= loop
   in
-  let () = Lwt.async loop in
+  let () = Common.async __LOC__ loop in
   cancelled
 
 let add_project is_new project_id : unit Api.result Lwt.t =
