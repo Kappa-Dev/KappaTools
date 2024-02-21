@@ -1,34 +1,54 @@
 (library
  (name kappa_json_api)
- (libraries atdgen-runtime lwt
-            kappa_grammar kappa_kasa_type_interface kappa_cflow)
- (flags (:standard -w +a
-          -open Kappa_generic_toolset
-          -open Kappa_mixtures
-          -open Kappa_terms
-          -open Kappa_grammar
-          -open Kappa_runtime
-          -open Kappa_parameters
-          -open Kappa_kasa_type_interface
-          -open Kappa_classical_graphs
-          -open Kappa_cflow)))
+ (libraries
+  atdgen-runtime
+  lwt
+  kappa_grammar
+  kappa_kasa_type_interface
+  kappa_cflow)
+ (flags
+  (:standard
+   -w
+   +a-40-42
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_mixtures
+   -open
+   Kappa_terms
+   -open
+   Kappa_grammar
+   -open
+   Kappa_runtime
+   -open
+   Kappa_parameters
+   -open
+   Kappa_kasa_type_interface
+   -open
+   Kappa_classical_graphs
+   -open
+   Kappa_cflow)))
 
 (rule
-  (targets api_types_j.ml api_types_j.mli)
-  (deps    api_types.atd)
-  (action  (run atdgen -j -j-std %{deps})))
+ (targets api_types_j.ml api_types_j.mli)
+ (deps api_types.atd)
+ (action
+  (run atdgen -j -j-std %{deps})))
 
 (rule
-  (targets api_types_t.ml api_types_t.mli)
-  (deps    api_types.atd)
-  (action  (run atdgen -t %{deps})))
+ (targets api_types_t.ml api_types_t.mli)
+ (deps api_types.atd)
+ (action
+  (run atdgen -t %{deps})))
 
 (rule
-  (targets mpi_message_j.ml mpi_message_j.mli)
-  (deps    mpi_message.atd)
-  (action  (run atdgen -j -j-std %{deps})))
+ (targets mpi_message_j.ml mpi_message_j.mli)
+ (deps mpi_message.atd)
+ (action
+  (run atdgen -j -j-std %{deps})))
 
 (rule
-  (targets mpi_message_t.ml mpi_message_t.mli)
-  (deps    mpi_message.atd)
-  (action  (run atdgen -t %{deps})))
+ (targets mpi_message_t.ml mpi_message_t.mli)
+ (deps mpi_message.atd)
+ (action
+  (run atdgen -t %{deps})))

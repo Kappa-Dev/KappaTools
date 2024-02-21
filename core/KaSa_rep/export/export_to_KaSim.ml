@@ -11,27 +11,22 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-module type Type =
-sig
+module type Type = sig
   type state
+  type contact_map = Public_data.contact_map
 
-  type contact_map =
-    Public_data.contact_map
-
-  val init:
+  val init :
     ?compil:Ast.parsing_compil ->
     called_from:Remanent_parameters_sig.called_from ->
-    unit -> state
+    unit ->
+    state
 
-  val get_contact_map:
-    ?accuracy_level: Public_data.accuracy_level -> state -> state * contact_map
+  val get_contact_map :
+    ?accuracy_level:Public_data.accuracy_level -> state -> state * contact_map
 
-  val get_dead_rules:
-    state -> state * Public_data.dead_rules 
-
-  val dump_errors_light: state -> unit
-
-  val flush_errors: state -> state
+  val get_dead_rules : state -> state * Public_data.dead_rules
+  val dump_errors_light : state -> unit
+  val flush_errors : state -> state
 end
 
 include Export

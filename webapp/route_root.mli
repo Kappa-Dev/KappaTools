@@ -6,5 +6,4 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val route :
-  shutdown_key:string option -> Webapp_common.route_handler list
+val route : shutdown_key:string option -> Webapp_common.route_handler list

@@ -1,0 +1,19 @@
+Parsing counters_smaller_than.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 28 (sub)observables 58 navigation steps
+	 -initial conditions
++ Building initial state (200 agents)
+Done
++ Command line to rerun is: 'KaSim' '-l' '1' 'counters_smaller_than.ka' '-seed' '23014' '-d' 'output' '-syntax' '4'
+______________________________________________________________________
+######################################################################
+Simulation ended

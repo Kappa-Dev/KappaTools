@@ -1,0 +1,44 @@
+%def: "seed" "23014"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+
+%agent: A(c{=0/+=7} c__inverted{=0/+=7})
+%agent: B()
+
+%var:/*0*/ 'B' |B()|
+%var:/*1*/ 'A0' |A(c{=0})|
+%var:/*2*/ 'A1' |A(c{=1})|
+%var:/*3*/ 'A2' |A(c{=2})|
+%var:/*4*/ 'A3' |A(c{=3})|
+%var:/*5*/ 'A4' |A(c{=4})|
+%var:/*6*/ 'A5' |A(c{=5})|
+%var:/*7*/ 'A6' |A(c{=6})|
+%var:/*8*/ 'A7' |A(c{=7})|
+%plot: [T]
+%plot: B
+%plot: A0
+%plot: A1
+%plot: A2
+%plot: A3
+%plot: A4
+%plot: A5
+%plot: A6
+%plot: A7
+
+'rule_a' A(c{>=0/+=1} c__inverted{>=5/+=-1}) @ 1
+'rule_b' A(c{>=5/+=-1} c__inverted{>=0/+=1}) @ 1
+'rule_c' A(c{=3/+=1} c__inverted{>=1/+=-1}) @ 1
+'rule_aa' A(c[#] c__inverted{>=6})-, B()+ @ 0.2
+
+/*0*/%mod: (|A(c__inverted{=8})| = 1) do $PRINTF ""; $PRINTF "Counter c__inverted of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+/*1*/%mod: (|A(c{=8})| = 1) do $PRINTF ""; $PRINTF "Counter c of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+
+%init: 10 A(c{=0} c__inverted{=7})
+%init: 10 A(c{=7} c__inverted{=0})
+
+%mod: [E] = 19 do $STOP;

@@ -1,15 +1,34 @@
 (executable
-  (name KaSim)
-  (libraries lwt.unix fmt num yojson
-             kappa-library.generic kappa-library.mixtures kappa-library.terms kappa-library.runtime
-             kappa_version kappa_grammar kappa_cli)
-  (public_name KaSim)
-  (package kappa-binaries)
-(flags (:standard -w @a
-  -open Kappa_version
-	-open Kappa_generic_toolset
-	-open Kappa_mixtures
-	-open Kappa_terms
-	-open Kappa_runtime
-	-open Kappa_grammar
-	-open Kappa_cli)))
+ (name KaSim)
+ (libraries
+  lwt.unix
+  fmt
+  num
+  yojson
+  kappa-library.generic
+  kappa-library.mixtures
+  kappa-library.terms
+  kappa-library.runtime
+  kappa_version
+  kappa_grammar
+  kappa_cli)
+ (public_name KaSim)
+ (package kappa-binaries)
+ (flags
+  (:standard
+   -w
+   @a-40-42
+   -open
+   Kappa_version
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_mixtures
+   -open
+   Kappa_terms
+   -open
+   Kappa_runtime
+   -open
+   Kappa_grammar
+   -open
+   Kappa_cli)))

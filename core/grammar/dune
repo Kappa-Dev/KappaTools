@@ -1,12 +1,19 @@
 (library
-  (name kappa_grammar)
-  (libraries yojson result lwt
-    kappa-library.generic kappa-library.runtime)
-  (flags (:standard -w @a
-    -open Kappa_generic_toolset
-    -open Kappa_mixtures
-    -open Kappa_terms
-    -open Kappa_runtime)))
+ (name kappa_grammar)
+ (libraries yojson result lwt kappa-library.generic kappa-library.runtime)
+ (flags
+  (:standard
+   -w
+   @a-40-42
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_mixtures
+   -open
+   Kappa_terms
+   -open
+   Kappa_runtime)))
 
 (ocamlyacc kparser4 kappaParser)
+
 (ocamllex klexer4 kappaLexer)

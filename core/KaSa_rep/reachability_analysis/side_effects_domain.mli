@@ -17,4 +17,4 @@
 
 (** This domain tracks which rules can be applied, and warns other domains at the first application of a rule *)
 
-module Domain:Analyzer_domain_sig.Domain
+module Domain : Analyzer_domain_sig.Domain

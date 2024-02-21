@@ -17,8 +17,7 @@
 
 (** Abstract domain to over-approximate the set of reachable views *)
 
-
-module Domain_affine_equalities_and_intervalles:Analyzer_domain_sig.Domain
-module Domain_octagons:Analyzer_domain_sig.Domain
-module Domain_non_relational:Analyzer_domain_sig.Domain
-module Domain_abstract_multisets:Analyzer_domain_sig.Domain
+module Domain_affine_equalities_and_intervalles : Analyzer_domain_sig.Domain
+module Domain_octagons : Analyzer_domain_sig.Domain
+module Domain_non_relational : Analyzer_domain_sig.Domain
+module Domain_abstract_multisets : Analyzer_domain_sig.Domain

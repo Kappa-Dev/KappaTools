@@ -1,10 +1,23 @@
 (library
-  (name kappa_parameters)
-  (libraries yojson result kappa_version kappa_cli  kappa-library.generic kappa_classical_graphs)
-  (flags (:standard)
-    -open Kappa_cli
-    -open Kappa_version
-    -open Kappa_grammar
-    -open Kappa_generic_toolset
-    -open Kappa_logging
-    -open Kappa_classical_graphs))
+ (name kappa_parameters)
+ (libraries
+  yojson
+  result
+  kappa_version
+  kappa_cli
+  kappa-library.generic
+  kappa_classical_graphs)
+ (flags
+  (:standard)
+  -open
+  Kappa_cli
+  -open
+  Kappa_version
+  -open
+  Kappa_grammar
+  -open
+  Kappa_generic_toolset
+  -open
+  Kappa_logging
+  -open
+  Kappa_classical_graphs))

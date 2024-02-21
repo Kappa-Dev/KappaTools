@@ -1,8 +1,22 @@
 (library
-  (name kappa_kasa_kastor_toolset)
-  (libraries str yojson result kappa_logging kappa_parameters kappa_errors kappa-library.generic)
-  (flags (:standard -w @a
-    -open Kappa_logging
-    -open Kappa_parameters
-    -open Kappa_errors
-    -open Kappa_generic_toolset)))
+ (name kappa_kasa_kastor_toolset)
+ (libraries
+  str
+  yojson
+  result
+  kappa_logging
+  kappa_parameters
+  kappa_errors
+  kappa-library.generic)
+ (flags
+  (:standard
+   -w
+   @a
+   -open
+   Kappa_logging
+   -open
+   Kappa_parameters
+   -open
+   Kappa_errors
+   -open
+   Kappa_generic_toolset)))

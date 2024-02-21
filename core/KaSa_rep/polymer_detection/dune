@@ -1,11 +1,17 @@
 (library
-  (name kappa_polymers_analysis)
-  (libraries kappa_kasa_remanent_state)
-  (flags (:standard)
-    -open Kappa_parameters
-    -open Kappa_errors
-    -open Kappa_kasa_remanent_state
-    -open Kappa_kasa_frontend
-    -open Kappa_logging
-    -open Kappa_kasa_kastor_toolset
-))
+ (name kappa_polymers_analysis)
+ (libraries kappa_kasa_remanent_state)
+ (flags
+  (:standard)
+  -open
+  Kappa_parameters
+  -open
+  Kappa_errors
+  -open
+  Kappa_kasa_remanent_state
+  -open
+  Kappa_kasa_frontend
+  -open
+  Kappa_logging
+  -open
+  Kappa_kasa_kastor_toolset))

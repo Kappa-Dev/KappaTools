@@ -1,37 +1,55 @@
 (library
-  (name kappa_agents)
-  (modules agent_common app_args)
-  (libraries logs.fmt lwt.unix kappa-library.generic)
-  (flags (:standard -w @a
-    -open Kappa_generic_toolset)))
+ (name kappa_agents)
+ (modules agent_common app_args)
+ (libraries logs.fmt lwt.unix kappa-library.generic)
+ (flags
+  (:standard -w @a -open Kappa_generic_toolset)))
 
 (executable
-  (name KaStor)
-  (modules KaStor)
-  (libraries yojson lwt.unix kappa_cflow kappa_agents)
-  (public_name KaStor)
-  (package kappa-binaries)
-  (flags (:standard
-    -open Kappa_generic_toolset
-    -open Kappa_runtime
-    -open Kappa_cli
-    -open Kappa_logging
-    -open Kappa_cflow
-    -open Kappa_agents
-    -open Kappa_parameters)))
+ (name KaStor)
+ (modules KaStor)
+ (libraries yojson lwt.unix kappa_cflow kappa_agents)
+ (public_name KaStor)
+ (package kappa-binaries)
+ (flags
+  (:standard
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_runtime
+   -open
+   Kappa_cli
+   -open
+   Kappa_logging
+   -open
+   Kappa_cflow
+   -open
+   Kappa_agents
+   -open
+   Kappa_parameters)))
 
 (executable
-  (name KaSimAgent)
-  (modules KaSimAgent)
-  (libraries logs.lwt logs.fmt lwt.unix
-             kappa_json_api kappa-library.runtime kappa_agents)
-  (public_name KaSimAgent)
-  (package kappa-agents)
-  (flags (:standard
-    -open Kappa_generic_toolset
-    -open Kappa_cli
-    -open Kappa_agents
-    -open Kappa_json_api)))
+ (name KaSimAgent)
+ (modules KaSimAgent)
+ (libraries
+  logs.lwt
+  logs.fmt
+  lwt.unix
+  kappa_json_api
+  kappa-library.runtime
+  kappa_agents)
+ (public_name KaSimAgent)
+ (package kappa-agents)
+ (flags
+  (:standard
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_cli
+   -open
+   Kappa_agents
+   -open
+   Kappa_json_api)))
 
 (executable
  (name KaMoHa)
@@ -39,44 +57,80 @@
  (libraries logs.lwt lwt.unix kappa_grammar kappa_cli kappa_agents)
  (public_name KaMoHa)
  (package kappa-agents)
- (flags (:standard
-          -open Kappa_generic_toolset
-          -open Kappa_grammar
-          -open Kappa_cli
-          -open Kappa_agents)))
+ (flags
+  (:standard
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_grammar
+   -open
+   Kappa_cli
+   -open
+   Kappa_agents)))
 
 (executable
  (name KappaSwitchman)
  (modules agents_client KappaSwitchman)
- (libraries logs.lwt lwt.unix kappa_json_api kappa_cli kappa_agents
-            kappa_staticanalyses kappa-library.runtime)
+ (libraries
+  logs.lwt
+  lwt.unix
+  kappa_json_api
+  kappa_cli
+  kappa_agents
+  kappa_staticanalyses
+  kappa-library.runtime)
  (public_name KappaSwitchman)
  (package kappa-agents)
- (flags (:standard
-          -open Kappa_generic_toolset
-          -open Kappa_grammar
-          -open Kappa_cli
-          -open Kappa_kasa_type_interface
-	  -open Kappa_runtime
-          -open Kappa_json_api
-          -open Kappa_agents)))
+ (flags
+  (:standard
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_grammar
+   -open
+   Kappa_cli
+   -open
+   Kappa_kasa_type_interface
+   -open
+   Kappa_runtime
+   -open
+   Kappa_json_api
+   -open
+   Kappa_agents)))
 
 (executable
-  (name KaSaAgent)
-  (modules KaSaAgent)
-  (libraries num str lwt.unix kappa_staticanalyses
-             kappa_json_api kappa_agents)
-  (public_name KaSaAgent)
-  (package kappa-agents)
-  (flags (:standard
-           -open Kappa_logging
-           -open Kappa_errors
-           -open Kappa_parameters
-           -open Kappa_reachability
-           -open Kappa_staticanalyses
-           -open Kappa_kasa_frontend
-           -open Kappa_kasa_export
-           -open Kappa_kasa_type_interface
-           -open Kappa_agents
-           -open Kappa_cli
-           -open Kappa_json_api)))
+ (name KaSaAgent)
+ (modules KaSaAgent)
+ (libraries
+  num
+  str
+  lwt.unix
+  kappa_staticanalyses
+  kappa_json_api
+  kappa_agents)
+ (public_name KaSaAgent)
+ (package kappa-agents)
+ (flags
+  (:standard
+   -open
+   Kappa_logging
+   -open
+   Kappa_errors
+   -open
+   Kappa_parameters
+   -open
+   Kappa_reachability
+   -open
+   Kappa_staticanalyses
+   -open
+   Kappa_kasa_frontend
+   -open
+   Kappa_kasa_export
+   -open
+   Kappa_kasa_type_interface
+   -open
+   Kappa_agents
+   -open
+   Kappa_cli
+   -open
+   Kappa_json_api)))

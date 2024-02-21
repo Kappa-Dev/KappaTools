@@ -11,7 +11,8 @@
 type t
 
 val create : int -> char -> t
+
 val tick :
-  efficiency:bool ->
-  float -> float option -> int -> float option -> t -> unit
+  efficiency:bool -> float -> float option -> int -> float option -> t -> unit
+
 val complete_progress_bar : float -> int -> t -> unit

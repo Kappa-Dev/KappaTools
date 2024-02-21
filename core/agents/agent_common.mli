@@ -7,5 +7,4 @@
 (******************************************************************************)
 
 val lwt_reporter : Lwt_io.output_channel option -> Logs.reporter
-
 val serve : Lwt_io.input_channel -> char -> (string -> unit Lwt.t) -> unit Lwt.t

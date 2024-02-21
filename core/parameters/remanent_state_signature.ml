@@ -14,16 +14,10 @@
 
 type rule_key = int
 
-type engine_state =
-  {
-    command_line : string option;
-    wake_up_map  : (rule_key -> rule_key list) option;
-  }
+type engine_state = {
+  command_line: string option;
+  wake_up_map: (rule_key -> rule_key list) option;
+}
 
-let empty_engine_state =
-  {
-    command_line = None ;
-    wake_up_map  = None ;
-  }
-
+let empty_engine_state = { command_line = None; wake_up_map = None }
 let wake_up_map error engine_state = error, engine_state.wake_up_map

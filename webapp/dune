@@ -1,23 +1,44 @@
 (executable
-  (name WebSim)
-  (libraries num str lwt.unix cohttp-lwt-unix
-             kappa_staticanalyses
-             kappa_json_api kappa_agents)
-  (public_name WebSim)
-  (package kappa-server)
-  (flags (:standard
-           -open Kappa_generic_toolset
-           -open Kappa_version
-           -open Kappa_runtime
-           -open Kappa_grammar
-           -open Kappa_logging
-           -open Kappa_errors
-           -open Kappa_parameters
-           -open Kappa_reachability
-           -open Kappa_staticanalyses
-           -open Kappa_kasa_frontend
-           -open Kappa_kasa_export
-           -open Kappa_kasa_type_interface
-           -open Kappa_agents
-           -open Kappa_cli
-           -open Kappa_json_api)))
+ (name WebSim)
+ (libraries
+  num
+  str
+  lwt.unix
+  cohttp-lwt-unix
+  kappa_staticanalyses
+  kappa_json_api
+  kappa_agents)
+ (public_name WebSim)
+ (package kappa-server)
+ (flags
+  (:standard
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_version
+   -open
+   Kappa_runtime
+   -open
+   Kappa_grammar
+   -open
+   Kappa_logging
+   -open
+   Kappa_errors
+   -open
+   Kappa_parameters
+   -open
+   Kappa_reachability
+   -open
+   Kappa_staticanalyses
+   -open
+   Kappa_kasa_frontend
+   -open
+   Kappa_kasa_export
+   -open
+   Kappa_kasa_type_interface
+   -open
+   Kappa_agents
+   -open
+   Kappa_cli
+   -open
+   Kappa_json_api)))
