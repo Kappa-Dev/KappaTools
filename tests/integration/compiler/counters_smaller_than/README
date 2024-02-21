@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSim -l 1 counters_smaller_than.ka -seed 23014 -d output -syntax 4 || true

@@ -8,10 +8,8 @@
 
 val get_client_id : unit -> string
 val set_client_id : string -> unit
-
 val updateFontSize : delta:float -> unit
 val set_parameters_as_default : unit -> unit
-
 val synch : bool React.signal
 val set_synch : ?step:React.step -> bool -> unit
 

@@ -6,12 +6,11 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-
-let url_args ?(default = [] ) key  : string list =
+let url_args ?(default = []) key : string list =
   (* Hosts the user specified on the url in the form
      key=...&key=..&...
   *)
   let args = Url.Current.arguments in
-  match (List.map snd (List.filter (fun (k,_) -> k = key) args)) with
+  match List.map snd (List.filter (fun (k, _) -> k = key) args) with
   | [] -> default
   | some -> some

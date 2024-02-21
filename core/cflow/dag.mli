@@ -19,26 +19,58 @@
   * et en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-
 type canonical_form
 type graph
-val compare_canonic: canonical_form -> canonical_form -> int
-val graph_of_grid:
-  (Causal.grid,graph) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
-val canonicalize: (graph,canonical_form) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
 
-module type StoryTable =
-  sig
-    type table
+val compare_canonic : canonical_form -> canonical_form -> int
 
-    val fold_table:
-      ((Trace.t,StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,'a,'a) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.ternary, table, 'a, 'a) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.ternary
-    val init_table: table Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.zeroary
-    val count_stories: table -> int
-    val add_story: (Causal.grid,Trace.t,StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,table,table) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.quaternary
-    val hash_list: (table, table) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
+val graph_of_grid :
+  ( Causal.grid,
+    graph )
+  Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
 
-    val sort_list: (table, (Trace.t * Causal.grid * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
-  end
+val canonicalize :
+  ( graph,
+    canonical_form )
+  Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
 
-module StoryTable:StoryTable
+module type StoryTable = sig
+  type table
+
+  val fold_table :
+    ( ( Trace.t,
+        StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,
+        'a,
+        'a )
+      Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.ternary,
+      table,
+      'a,
+      'a )
+    Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.ternary
+
+  val init_table :
+    table Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.zeroary
+
+  val count_stories : table -> int
+
+  val add_story :
+    ( Causal.grid,
+      Trace.t,
+      StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,
+      table,
+      table )
+    Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.quaternary
+
+  val hash_list :
+    (table, table) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
+
+  val sort_list :
+    ( table,
+      (Trace.t
+      * Causal.grid
+      * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list)
+      list )
+    Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
+end
+
+module StoryTable : StoryTable

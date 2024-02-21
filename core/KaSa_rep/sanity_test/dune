@@ -1,10 +1,17 @@
 (tests
-  (names sanity_test)
-  (libraries num str kappa_mvbdu kappa_species_count_enumeration)
-  (flags (:standard
-           -open Kappa_generic_toolset
-           -open Kappa_kasa_kastor_toolset
-           -open Kappa_parameters
-           -open Kappa_errors
-           -open Kappa_mvbdu
-           -open Kappa_species_count_enumeration)))
+ (names sanity_test)
+ (libraries num str kappa_mvbdu kappa_species_count_enumeration)
+ (flags
+  (:standard
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_kasa_kastor_toolset
+   -open
+   Kappa_parameters
+   -open
+   Kappa_errors
+   -open
+   Kappa_mvbdu
+   -open
+   Kappa_species_count_enumeration)))

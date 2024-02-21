@@ -13,15 +13,18 @@
 
 module A =
   (val Domain_selection.select_domain
-      ~reachability_parameters:{
-        Remanent_parameters_sig.views = true;
-        Remanent_parameters_sig.site_across_bonds = true;
-        Remanent_parameters_sig.parallel_bonds = true;
-        Remanent_parameters_sig.dynamic_contact_map = true;
-        Remanent_parameters_sig.counters = true;
-        Remanent_parameters_sig.counter_domain = Remanent_parameters_sig.Mi; 
-      } ())
-include Export.Export(A)
+         ~reachability_parameters:
+           {
+             Remanent_parameters_sig.views = true;
+             Remanent_parameters_sig.site_across_bonds = true;
+             Remanent_parameters_sig.parallel_bonds = true;
+             Remanent_parameters_sig.dynamic_contact_map = true;
+             Remanent_parameters_sig.counters = true;
+             Remanent_parameters_sig.counter_domain = Remanent_parameters_sig.Mi;
+           }
+         ())
+
+include Export.Export (A)
 
 let init ?compil () =
   init ?compil ~called_from:Remanent_parameters_sig.Server ()

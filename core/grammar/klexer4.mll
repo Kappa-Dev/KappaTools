@@ -40,6 +40,7 @@ rule token = parse
   | "&&" { AND }
   | "||" { OR }
   | "<->" { LRAR }
+  | "<-" {LAR}
   | "->" { RAR }
   | "<>" { DIFF }
   | ':' { COLON }
@@ -67,16 +68,16 @@ rule token = parse
   | integer as n { INT (int_of_string n) }
   | real as f { FLOAT (float_of_string f) }
   | '\'' ([^'\n' '\'']+ as x) '\''{ LABEL(x) }
-  | '\"' ([^'\n' '\"']+ as x) '\"'{ STRING(x) }
+  | '\"' ([^'\n' '\"']* as x) '\"'{ STRING(x) }
   | '\'' ([^'\n' '\'']+ as s) (eof | '\n')
     { raise (ExceptionDefn.Syntax_Error
       ("Unterminated label: "^s,
-       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+       Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf)))}
   | '\"' ([^'\n' '\"']+ as s) (eof | '\n')
     { raise (ExceptionDefn.Syntax_Error
       ("Unterminated string: "^s,
-       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+       Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf)))}
   | id as str { keyword_or_id str }
   | '%' (id as lab) ':' {
@@ -91,7 +92,7 @@ rule token = parse
     | "token" -> TOKEN
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown directive: "^s,
-       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+       Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf)))
     }
   | '[' blank* '?' blank* ']' { THEN }
@@ -120,7 +121,7 @@ rule token = parse
     | "not" -> NOT
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown primitive: "^s,
-       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+       Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf)))
     }
   | '$' (id as s) {
@@ -140,13 +141,13 @@ rule token = parse
     | "SPECIES_OF" -> SPECIES_OF
     | s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown intervention: "^s,
-       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+       Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf)))
     }
   | eof { lexbuf.Lexing.lex_eof_reached <- true; EOF }
   | _ as c { raise (ExceptionDefn.Syntax_Error
       ("Unknown character: "^String.make 1 c,
-       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+       Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf))) }
 
 and inline_comment acc = parse
@@ -164,7 +165,7 @@ and inline_comment acc = parse
   | (('*' | '/')? '\"' [^'\n' '\"']+ (eof | '\n')) as x
     { raise (ExceptionDefn.Syntax_Error
       ("Unterminated string in comment: "^x,
-       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+       Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf)))}
   | '/' '*'
     { inline_comment ("*/"::(inline_comment ["/*"] lexbuf):: acc) lexbuf }

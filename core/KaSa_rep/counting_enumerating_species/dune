@@ -1,12 +1,19 @@
 (library
-  (name kappa_species_count_enumeration)
-  (libraries num kappa_kasa_remanent_state kappa-library.generic)
-  (flags (:standard)
-    -open Kappa_parameters
-    -open Kappa_errors
-    -open Kappa_kasa_remanent_state
-    -open Kappa_kasa_frontend
-    -open Kappa_logging
-    -open Kappa_generic_toolset
-    -open Kappa_kasa_kastor_toolset
-))
+ (name kappa_species_count_enumeration)
+ (libraries num kappa_kasa_remanent_state kappa-library.generic)
+ (flags
+  (:standard)
+  -open
+  Kappa_parameters
+  -open
+  Kappa_errors
+  -open
+  Kappa_kasa_remanent_state
+  -open
+  Kappa_kasa_frontend
+  -open
+  Kappa_logging
+  -open
+  Kappa_generic_toolset
+  -open
+  Kappa_kasa_kastor_toolset))

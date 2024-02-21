@@ -1,19 +1,37 @@
 (library
-  (name kappa_reachability)
-  (libraries kappa_kasa_remanent_state kappa_numerical_domains kappa_classical_graphs kappa_kasa_backend)
-  (flags (:standard)
-  -open Kappa_kasa_kastor_toolset
-  -open Kappa_kasa_frontend
-  -open Kappa_generic_toolset
-  -open Kappa_parameters
-  -open Kappa_kasa_site_graphs
-  -open Kappa_kasa_remanent_state
-  -open Kappa_errors
-  -open Kappa_profiling
-  -open Kappa_mvbdu
-  -open Kappa_numerical_domains
-  -open Kappa_logging
-  -open Kappa_classical_graphs
-  -open Kappa_kasa_backend
-  -open Kappa_kasa_type_interface
-))
+ (name kappa_reachability)
+ (libraries
+  kappa_kasa_remanent_state
+  kappa_numerical_domains
+  kappa_classical_graphs
+  kappa_kasa_backend)
+ (flags
+  (:standard)
+  -open
+  Kappa_kasa_kastor_toolset
+  -open
+  Kappa_kasa_frontend
+  -open
+  Kappa_generic_toolset
+  -open
+  Kappa_parameters
+  -open
+  Kappa_kasa_site_graphs
+  -open
+  Kappa_kasa_remanent_state
+  -open
+  Kappa_errors
+  -open
+  Kappa_profiling
+  -open
+  Kappa_mvbdu
+  -open
+  Kappa_numerical_domains
+  -open
+  Kappa_logging
+  -open
+  Kappa_classical_graphs
+  -open
+  Kappa_kasa_backend
+  -open
+  Kappa_kasa_type_interface))

@@ -20,17 +20,28 @@ module BA = Bigarray.Array1
 type bigstring =
   (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
-type t =
- {mutable buffer : bigstring;
-  mutable position : int;
-  mutable length : int;
-  initial_buffer : bigstring}
+type t = {
+  mutable buffer: bigstring;
+  mutable position: int;
+  mutable length: int;
+  initial_buffer: bigstring;
+}
 
 let create n =
- let n = if n < 1 then 1 else n in
- let n = if n > Sys.max_string_length then Sys.max_string_length else n in
- let s = BA.create Bigarray.char Bigarray.c_layout n in
- {buffer = s; position = 0; length = n; initial_buffer = s}
+  let n =
+    if n < 1 then
+      1
+    else
+      n
+  in
+  let n =
+    if n > Sys.max_string_length then
+      Sys.max_string_length
+    else
+      n
+  in
+  let s = BA.create Bigarray.char Bigarray.c_layout n in
+  { buffer = s; position = 0; length = n; initial_buffer = s }
 
 let contents b =
   let out = BA.create Bigarray.char Bigarray.c_layout b.position in
@@ -54,32 +65,33 @@ let blit src srcoff dst dstoff len =
 
 let nth b ofs =
   if ofs < 0 || ofs >= b.position then
-   invalid_arg "Buffer.nth"
-  else BA.unsafe_get b.buffer ofs
-
+    invalid_arg "Buffer.nth"
+  else
+    BA.unsafe_get b.buffer ofs
 
 let length b = b.position
-
 let clear b = b.position <- 0
 
 let reset b =
-  b.position <- 0; b.buffer <- b.initial_buffer;
+  b.position <- 0;
+  b.buffer <- b.initial_buffer;
   b.length <- BA.dim b.buffer
 
 let resize b more =
   let len = b.length in
   let new_len = ref len in
-  while b.position + more > !new_len do new_len := 2 * !new_len done;
-  if !new_len > Sys.max_string_length then begin
-    if b.position + more <= Sys.max_string_length
-    then new_len := Sys.max_string_length
-    else failwith "Buffer.add: cannot grow buffer"
-  end;
+  while b.position + more > !new_len do
+    new_len := 2 * !new_len
+  done;
+  if !new_len > Sys.max_string_length then
+    if b.position + more <= Sys.max_string_length then
+      new_len := Sys.max_string_length
+    else
+      failwith "Buffer.add: cannot grow buffer";
   let new_buffer = BA.create Bigarray.char Bigarray.c_layout !new_len in
   (* PR#6148: let's keep using [blit] rather than [unsafe_blit] in
      this tricky function that is slow anyway. *)
-  BA.blit (BA.sub b.buffer 0 b.position)
-    (BA.sub  new_buffer 0 b.position);
+  BA.blit (BA.sub b.buffer 0 b.position) (BA.sub new_buffer 0 b.position);
   b.buffer <- new_buffer;
   b.length <- !new_len
 
@@ -170,12 +182,12 @@ let add_char b c =
 *)
 
 let add_substring b s offset len =
-  if offset < 0 || len < 0 || offset > String.length s - len
-  then invalid_arg "Buffer.add_substring/add_subbytes";
+  if offset < 0 || len < 0 || offset > String.length s - len then
+    invalid_arg "Buffer.add_substring/add_subbytes";
   let new_position = b.position + len in
   if new_position > b.length then resize b len;
   for i = 0 to len - 1 do
-    BA.unsafe_set b.buffer (b.position+i) (String.get s (offset + i))
+    BA.unsafe_set b.buffer (b.position + i) (String.get s (offset + i))
   done;
   b.position <- new_position
 
@@ -209,76 +221,76 @@ let output_buffer oc b =
   output oc (Lwt_bytes.to_bytes b.buffer) 0 b.position
 *)
 (*let closing = function
-  | '(' -> ')'
-  | '{' -> '}'
-  | _ -> assert false
+    | '(' -> ')'
+    | '{' -> '}'
+    | _ -> assert false
 
-(* opening and closing: open and close characters, typically ( and )
-   k: balance of opening and closing chars
-   s: the string where we are searching
-   start: the index where we start the search. *)
-let advance_to_closing opening closing k s start =
-  let rec advance k i lim =
-    if i >= lim then raise Not_found else
-    if s.[i] = opening then advance (k + 1) (i + 1) lim else
-    if s.[i] = closing then
-      if k = 0 then i else advance (k - 1) (i + 1) lim
-    else advance k (i + 1) lim in
-  advance k start (String.length s)
+  (* opening and closing: open and close characters, typically ( and )
+     k: balance of opening and closing chars
+     s: the string where we are searching
+     start: the index where we start the search. *)
+  let advance_to_closing opening closing k s start =
+    let rec advance k i lim =
+      if i >= lim then raise Not_found else
+      if s.[i] = opening then advance (k + 1) (i + 1) lim else
+      if s.[i] = closing then
+        if k = 0 then i else advance (k - 1) (i + 1) lim
+      else advance k (i + 1) lim in
+    advance k start (String.length s)
 
-let advance_to_non_alpha s start =
-  let rec advance i lim =
-    if i >= lim then lim else
-    match s.[i] with
-    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' -> advance (i + 1) lim
-    | _ -> i in
-  advance start (String.length s)
-
-(* We are just at the beginning of an ident in s, starting at start. *)
-let find_ident s start lim =
-  if start >= lim then raise Not_found else
-  match s.[start] with
-  (* Parenthesized ident ? *)
-  | '(' | '{' as c ->
-     let new_start = start + 1 in
-     let stop = advance_to_closing c (closing c) 0 s new_start in
-     String.sub s new_start (stop - start - 1), stop + 1
-  (* Regular ident *)
-  | _ ->
-     let stop = advance_to_non_alpha s (start + 1) in
-     String.sub s start (stop - start), stop
-
-(* Substitute $ident, $(ident), or ${ident} in s,
-    according to the function mapping f. *)
-let add_substitute b f s =
-  let lim = String.length s in
-  let rec subst previous i =
-    if i < lim then begin
+  let advance_to_non_alpha s start =
+    let rec advance i lim =
+      if i >= lim then lim else
       match s.[i] with
-      | '$' as current when previous = '\\' ->
-         add_char b current;
-         subst ' ' (i + 1)
-      | '$' ->
-         let j = i + 1 in
-         let ident, next_i = find_ident s j lim in
-         add_string b (f ident);
-         subst ' ' next_i
-      | current when previous == '\\' ->
-         add_char b '\\';
-         add_char b current;
-         subst ' ' (i + 1)
-      | '\\' as current ->
-         subst current (i + 1)
-      | current ->
-         add_char b current;
-         subst current (i + 1)
-    end else
-    if previous = '\\' then add_char b previous in
-  subst ' ' 0
+      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' -> advance (i + 1) lim
+      | _ -> i in
+    advance start (String.length s)
 
-let truncate b len =
-    if len < 0 || len > length b then
-      invalid_arg "Buffer.truncate"
-    else
-      b.position <- len
+  (* We are just at the beginning of an ident in s, starting at start. *)
+  let find_ident s start lim =
+    if start >= lim then raise Not_found else
+    match s.[start] with
+    (* Parenthesized ident ? *)
+    | '(' | '{' as c ->
+       let new_start = start + 1 in
+       let stop = advance_to_closing c (closing c) 0 s new_start in
+       String.sub s new_start (stop - start - 1), stop + 1
+    (* Regular ident *)
+    | _ ->
+       let stop = advance_to_non_alpha s (start + 1) in
+       String.sub s start (stop - start), stop
+
+  (* Substitute $ident, $(ident), or ${ident} in s,
+      according to the function mapping f. *)
+  let add_substitute b f s =
+    let lim = String.length s in
+    let rec subst previous i =
+      if i < lim then begin
+        match s.[i] with
+        | '$' as current when previous = '\\' ->
+           add_char b current;
+           subst ' ' (i + 1)
+        | '$' ->
+           let j = i + 1 in
+           let ident, next_i = find_ident s j lim in
+           add_string b (f ident);
+           subst ' ' next_i
+        | current when previous == '\\' ->
+           add_char b '\\';
+           add_char b current;
+           subst ' ' (i + 1)
+        | '\\' as current ->
+           subst current (i + 1)
+        | current ->
+           add_char b current;
+           subst current (i + 1)
+      end else
+      if previous = '\\' then add_char b previous in
+    subst ' ' 0
+
+  let truncate b len =
+      if len < 0 || len > length b then
+        invalid_arg "Buffer.truncate"
+      else
+        b.position <- len
 *)

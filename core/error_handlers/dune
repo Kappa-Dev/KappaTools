@@ -1,7 +1,16 @@
 (library
-  (name kappa_errors)
-  (libraries yojson result kappa-library.generic kappa_logging kappa_parameters)
-  (flags (:standard
-    -open Kappa_generic_toolset
-    -open Kappa_logging
-    -open Kappa_parameters )))
+ (name kappa_errors)
+ (libraries
+  yojson
+  result
+  kappa-library.generic
+  kappa_logging
+  kappa_parameters)
+ (flags
+  (:standard
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_logging
+   -open
+   Kappa_parameters)))

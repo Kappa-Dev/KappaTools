@@ -20,26 +20,26 @@
   * This file is distributed under the terms of the GNU Library
   * General Public License *)
 
-module type Event =
-  sig
-    type event
-    type eid
-    type 'a t
-    val key_of_event: event -> eid option
-    val init: int -> 'a -> 'a t
-    val set: 'a t -> eid -> 'a -> 'a t
-    val get: 'a t -> eid -> 'a
-  end
+module type Event = sig
+  type event
+  type eid
+  type 'a t
 
-module type Blacklist =
-  sig
-    type t
-    module Event: Event
+  val key_of_event : event -> eid option
+  val init : int -> 'a -> 'a t
+  val set : 'a t -> eid -> 'a -> 'a t
+  val get : 'a t -> eid -> 'a
+end
 
-    val init: int -> t
-    val black_list: Event.event -> t -> t
-    val is_black_listed: Event.event -> t -> bool
-  end
+module type Blacklist = sig
+  type t
 
-module Make:
-  functor (Event:Event) -> (Blacklist with type Event.event = Event.event)
+  module Event : Event
+
+  val init : int -> t
+  val black_list : Event.event -> t -> t
+  val is_black_listed : Event.event -> t -> bool
+end
+
+module Make : functor (Event : Event) ->
+  Blacklist with type Event.event = Event.event

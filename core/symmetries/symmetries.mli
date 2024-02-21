@@ -17,15 +17,13 @@
 (*TYPE*)
 (*******************************************************************)
 
-type equivalence_classes =
-  int Symmetries_sig.site_partition array
+type equivalence_classes = int Symmetries_sig.site_partition array
 
-type symmetries =
-  {
-    rules: equivalence_classes;
-    rules_and_initial_states: equivalence_classes option;
-    rules_and_alg_expr: equivalence_classes option
-  }
+type symmetries = {
+  rules: equivalence_classes;
+  rules_and_initial_states: equivalence_classes option;
+  rules_and_alg_expr: equivalence_classes option;
+}
 
 type reduction =
   | Ground
@@ -44,30 +42,44 @@ val refine_partitioned_contact_map_in_lkappa_representation :
   'b Symmetries_sig.site_partition array ->
   'a * 'b Symmetries_sig.site_partition array
 
-val detect_symmetries:
+val detect_symmetries :
   Remanent_parameters_sig.parameters ->
   Model.t ->
   LKappa_auto.cache ->
   Remanent_parameters_sig.rate_convention ->
   Pattern.cc list ->
   Primitives.elementary_rule list ->
-  Public_data.contact_map  ->
+  Public_data.contact_map ->
   LKappa_auto.cache * symmetries
 
-val print_symmetries:
+val print_symmetries :
   Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit
 
 type cache
 
-val empty_cache: unit -> cache
+val empty_cache : unit -> cache
 
-val representative:
+val representative :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.cc
-  ->  cache * LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
+  sigs:Signature.s ->
+  cache ->
+  LKappa_auto.cache ->
+  Pattern.PreEnv.t ->
+  reduction ->
+  Pattern.cc ->
+  cache * LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
 
-val equiv_class:
+val equiv_class :
   ?parameters:Remanent_parameters_sig.parameters ->
-  Model.t  ->
-  bool Mods.DynArray.t  -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.id ->
-  cache * LKappa_auto.cache * Pattern.PreEnv.t * bool Mods.DynArray.t  * (int * (Pattern.id * int) list)
+  Model.t ->
+  bool Mods.DynArray.t ->
+  cache ->
+  LKappa_auto.cache ->
+  Pattern.PreEnv.t ->
+  reduction ->
+  Pattern.id ->
+  cache
+  * LKappa_auto.cache
+  * Pattern.PreEnv.t
+  * bool Mods.DynArray.t
+  * (int * (Pattern.id * int) list)

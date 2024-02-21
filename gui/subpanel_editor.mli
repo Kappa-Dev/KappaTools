@@ -7,6 +7,6 @@
 (******************************************************************************)
 
 val editor_full : bool React.signal
-val set_move_cursor : ?step:React.step -> Locality.t -> unit
+val set_move_cursor : ?step:React.step -> Loc.t -> unit
 
 include Ui_common.Panel

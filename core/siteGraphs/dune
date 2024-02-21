@@ -2,4 +2,5 @@
  (name kappa_mixtures)
  (libraries kappa_generic_toolset)
  (public_name kappa-library.mixtures)
- (flags (:standard -w @a -open Kappa_generic_toolset)))
+ (flags
+  (:standard -w @a-40-42 -open Kappa_generic_toolset)))

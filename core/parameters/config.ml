@@ -1,4 +1,4 @@
- (**
+(**
   * config.ml
   * openkappa
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
@@ -17,30 +17,34 @@
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
-let date="<2015.01.23"
+let date = "<2015.01.23"
 let version = "4.01"
-
 let output_directory = ref "output"
 let output_cm_directory = ref "output"
 let output_im_directory = ref "output"
 let output_local_trace_directory = ref "output"
-
 let unsafe = ref true
 let trace = ref false
 let syntax_version = ref "V4"
 let dump_error_as_soon_as_they_occur = ref false
 let log = ref stdout
 let formatter = ref Format.std_formatter
-let file = ref (None:string option)
+let file = ref (None : string option)
 let link_mode = ref Remanent_parameters_sig.Bound_indices
-
 
 (** influence map *)
 let do_influence_map = ref true
+
 let rule_shape = ref Graph_loggers_sig.Rect
-let rule_color = ref Graph_loggers_sig.LightSkyBlue (*"#87ceeb" (* light sky blue *)*)
+
+let rule_color =
+  ref Graph_loggers_sig.LightSkyBlue (*"#87ceeb" (* light sky blue *)*)
+
 let variable_shape = ref Graph_loggers_sig.Ellipse
-let variable_color = ref Graph_loggers_sig.PaleGreen (* "#98fb98" (*Pale green*)*)
+
+let variable_color =
+  ref Graph_loggers_sig.PaleGreen (* "#98fb98" (*Pale green*)*)
+
 let center_color = ref Graph_loggers_sig.Red
 let wake_up_color = ref Graph_loggers_sig.Green (*"#00ff00" (*Green *)*)
 let inhibition_color = ref Graph_loggers_sig.Red (*"#ff0000" (*red*)*)
@@ -50,16 +54,13 @@ let influence_map_file = ref "influence"
 let influence_map_format = ref "DOT"
 let prompt_full_var_def = ref false
 let prompt_full_rule_def = ref false
-let make_labels_compatible_with_dot =
-  ref
-    [
-      '\"', ['\\';'\"'];
-      '\\', ['\\';'\\']
-    ]
 
+let make_labels_compatible_with_dot =
+  ref [ '\"', [ '\\'; '\"' ]; '\\', [ '\\'; '\\' ] ]
 
 (** contact map*)
 let do_contact_map = ref true
+
 let do_scc = ref false
 let pure_contact = ref false
 let contact_map_file = ref "contact"
@@ -70,8 +71,8 @@ let internal_site_shape = ref Graph_loggers_sig.Ellipse
 let internal_site_color = ref Graph_loggers_sig.Green
 let counter_site_shape = ref Graph_loggers_sig.House
 let counter_site_color = ref Graph_loggers_sig.Grey
-let agent_shape_array = ref ([||]:Graph_loggers_sig.shape option array)
-let agent_color_array = ref ([||]:Graph_loggers_sig.color option array)
+let agent_shape_array = ref ([||] : Graph_loggers_sig.shape option array)
+let agent_color_array = ref ([||] : Graph_loggers_sig.color option array)
 let agent_shape_def = ref Graph_loggers_sig.Rect
 let agent_color_def = ref Graph_loggers_sig.Blue
 let link_color = ref Graph_loggers_sig.Black
@@ -80,9 +81,12 @@ let influence_arrow = ref Graph_loggers_sig.Normal
 
 (**flow of information: internal; external flow*)
 let do_ODE_flow_of_information = ref false
+
 let do_stochastic_flow_of_information = ref false
+
 (*covering classes: this parameter does not matter if it is true/false*)
 let do_site_dependencies = ref false
+
 (*set to true if one wants to print covering classes*)
 let dump_site_dependencies = ref false
 
@@ -97,9 +101,7 @@ let dump_reachability_analysis_static = ref false
 let dump_reachability_analysis_dynamic = ref false
 let dump_reachability_analysis_diff = ref false
 let dump_reachability_analysis_wl = ref false
-
 let hide_reverse_rule_without_label_from_dead_rules = ref true
-
 let hide_one_d_relations_from_cartesian_decomposition = ref true
 let smash_relations = ref true
 let use_natural_language = ref "kappa"
@@ -111,7 +113,6 @@ let add_singular_microstates = ref false
 let do_not_compress_trivial_losanges = ref false
 let local_trace_prefix = ref "Agent_trace_"
 let local_trace_format = ref "DOT"
-
 let compute_separating_transitions = ref false
 
 (** accuracy *)
@@ -122,8 +123,6 @@ let with_parallel_bonds_analysis = ref true
 let with_dynamic_contact_map = ref "dynamic"
 let with_counters_analysis = ref true
 let counter_analysis_domain = ref "mi"
-
-
 let view_accuracy_level = ref "High"
 let influence_map_accuracy_level = ref "Direct"
 let contact_map_accuracy_level = ref "Low"

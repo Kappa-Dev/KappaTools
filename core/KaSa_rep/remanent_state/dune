@@ -1,20 +1,41 @@
 (library
-  (name kappa_kasa_remanent_state)
-  (libraries kappa_kasa_site_graphs kappa_symmetries kappa_profiling kappa_flow_analysis)
-  (flags (:standard -w @a
-    -open Kappa_terms
-    -open Kappa_grammar
-    -open Kappa_kasa_frontend
-    -open Kappa_logging
-    -open Kappa_kasa_kastor_toolset
-    -open Kappa_generic_toolset
-    -open Kappa_kasa_site_graphs
-    -open Kappa_symmetries
-    -open Kappa_parameters
-    -open Kappa_errors
-    -open Kappa_profiling
-    -open Kappa_mixtures
-    -open Kappa_flow_analysis
-    -open Kappa_mvbdu
-    -open Kappa_kasa_type_interface
-     )))
+ (name kappa_kasa_remanent_state)
+ (libraries
+  kappa_kasa_site_graphs
+  kappa_symmetries
+  kappa_profiling
+  kappa_flow_analysis)
+ (flags
+  (:standard
+   -w
+   @a
+   -open
+   Kappa_terms
+   -open
+   Kappa_grammar
+   -open
+   Kappa_kasa_frontend
+   -open
+   Kappa_logging
+   -open
+   Kappa_kasa_kastor_toolset
+   -open
+   Kappa_generic_toolset
+   -open
+   Kappa_kasa_site_graphs
+   -open
+   Kappa_symmetries
+   -open
+   Kappa_parameters
+   -open
+   Kappa_errors
+   -open
+   Kappa_profiling
+   -open
+   Kappa_mixtures
+   -open
+   Kappa_flow_analysis
+   -open
+   Kappa_mvbdu
+   -open
+   Kappa_kasa_type_interface)))

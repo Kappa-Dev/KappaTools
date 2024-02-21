@@ -1,0 +1,24 @@
+Parsing model.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 3 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (1 agents)
+Done
++ Command line to rerun is: 'KaSim' '-i' 'model.ka' '-seed' '0' '-d' 'output' '-trace' 'trace.json' '-syntax' '4'
+______________________________________________________________________
+######################################################################
+Simulation ended
++ Loading trace
+	- removing events occurring after the last observable: -31 events 
++ No causal flow found
++ Pretty printing 0 flow
++ Pretty printing 0 weakly compressed flow

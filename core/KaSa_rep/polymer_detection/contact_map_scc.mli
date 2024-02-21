@@ -16,34 +16,35 @@
 type edge
 type converted_contact_map
 
-val convert_contact_map:
+val convert_contact_map :
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Remanent_state.internal_contact_map ->
   Exception.method_handler * converted_contact_map
 
-val mixture_of_edge:
+val mixture_of_edge :
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Cckappa_sig.kappa_handler ->
-  edge -> Exception.method_handler * Cckappa_sig.mixture
+  edge ->
+  Exception.method_handler * Cckappa_sig.mixture
 
-val filter_edges_in_converted_contact_map:
+val filter_edges_in_converted_contact_map :
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
-  Cckappa_sig.kappa_handler -> 
+  Cckappa_sig.kappa_handler ->
   'static ->
   'dynamic ->
   (Remanent_parameters_sig.parameters ->
-   Exception.method_handler ->
-   'static ->
-   'dynamic ->
-   Cckappa_sig.mixture ->
-   Exception.method_handler * 'dynamic * bool) ->
+  Exception.method_handler ->
+  'static ->
+  'dynamic ->
+  Cckappa_sig.mixture ->
+  Exception.method_handler * 'dynamic * bool) ->
   converted_contact_map ->
   Exception.method_handler * 'dynamic * converted_contact_map
 
-val compute_graph_scc:
+val compute_graph_scc :
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   converted_contact_map ->

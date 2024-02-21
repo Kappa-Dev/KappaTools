@@ -20,47 +20,47 @@
   * This file is distributed under the terms of the GNU Library
   * General Public License *)
 
-module type Event =
-  sig
-    type event
-    type eid
-    type 'a t
-    val key_of_event: event -> eid option
-    val init: int -> 'a -> 'a t
-    val set: 'a t -> eid -> 'a -> 'a t
-    val get: 'a t -> eid -> 'a
-  end
-module type Blacklist =
-  sig
-    type t
-    module Event: Event
+module type Event = sig
+  type event
+  type eid
+  type 'a t
 
-    val init: int -> t
-    val black_list: Event.event -> t -> t
-    val is_black_listed: Event.event -> t -> bool
-  end
+  val key_of_event : event -> eid option
+  val init : int -> 'a -> 'a t
+  val set : 'a t -> eid -> 'a -> 'a t
+  val get : 'a t -> eid -> 'a
+end
+
+module type Blacklist = sig
+  type t
+
+  module Event : Event
+
+  val init : int -> t
+  val black_list : Event.event -> t -> t
+  val is_black_listed : Event.event -> t -> bool
+end
 
 module Make =
-  functor (Event:Event) ->
-    struct
-      module Event = Event
-      type t = bool Event.t
-      let init n = Event.init n false
+functor
+  (Event : Event)
+  ->
+  struct
+    module Event = Event
 
-      let black_list event t =
-	match
-	  Event.key_of_event event
-	with
-	| None -> t
-	| Some eid ->
-	  let t = Event.set t eid true in
-	  t
+    type t = bool Event.t
 
-      let is_black_listed event t =
-	match
-	  Event.key_of_event event
-	with
-	| None -> false
-	| Some eid -> Event.get t eid
+    let init n = Event.init n false
 
-     end
+    let black_list event t =
+      match Event.key_of_event event with
+      | None -> t
+      | Some eid ->
+        let t = Event.set t eid true in
+        t
+
+    let is_black_listed event t =
+      match Event.key_of_event event with
+      | None -> false
+      | Some eid -> Event.get t eid
+  end

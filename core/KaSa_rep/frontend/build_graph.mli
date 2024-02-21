@@ -14,38 +14,53 @@
 
 type in_progress
 
-val init:
+val init :
   ?cckappa_only:bool ->
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Cckappa_sig.kappa_handler ->
   Exception.method_handler * in_progress
 
-val add_agent:
-  Remanent_parameters_sig.parameters -> Exception.method_handler ->
-  Ckappa_sig.c_agent_name -> in_progress ->
+val add_agent :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Ckappa_sig.c_agent_name ->
+  in_progress ->
   Exception.method_handler * Ckappa_sig.c_agent_id * in_progress
 
-val add_site:
-  Remanent_parameters_sig.parameters -> Exception.method_handler ->
-  Ckappa_sig.c_agent_id -> Ckappa_sig.c_site_name -> in_progress ->
+val add_site :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_site_name ->
+  in_progress ->
   Exception.method_handler * in_progress
 
-val add_free:
-    Remanent_parameters_sig.parameters -> Exception.method_handler ->
-    Ckappa_sig.c_agent_id -> Ckappa_sig.c_site_name -> in_progress ->
-    Exception.method_handler * in_progress
-
-val add_internal_state:
-  Remanent_parameters_sig.parameters -> Exception.method_handler ->
-  Ckappa_sig.c_agent_id -> Ckappa_sig.c_site_name -> Ckappa_sig.c_state -> in_progress ->
+val add_free :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_site_name ->
+  in_progress ->
   Exception.method_handler * in_progress
 
-val add_link:
-Remanent_parameters_sig.parameters -> Exception.method_handler ->
-Ckappa_sig.c_agent_id -> Ckappa_sig.c_site_name ->
-Ckappa_sig.c_agent_id -> Ckappa_sig.c_site_name ->
-in_progress ->
-Exception.method_handler * in_progress
+val add_internal_state :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_site_name ->
+  Ckappa_sig.c_state ->
+  in_progress ->
+  Exception.method_handler * in_progress
 
-val export: in_progress -> Cckappa_sig.mixture
+val add_link :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_site_name ->
+  Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_site_name ->
+  in_progress ->
+  Exception.method_handler * in_progress
+
+val export : in_progress -> Cckappa_sig.mixture

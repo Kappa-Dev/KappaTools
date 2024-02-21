@@ -6,4 +6,4 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-include (Generic_rule_interpreter.Make(Instances))
+include Generic_rule_interpreter.Make (Instances)

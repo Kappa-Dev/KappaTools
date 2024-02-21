@@ -1,0 +1,28 @@
+%agent: timer(s{tik, tok})      %init: 1 timer()
+timer(s{tik}) <-> timer(s{tok}) @ 1, 1
+
+%mod: [E] = 1 do $SNAPSHOT ;
+%mod: [E] = 2 do $SNAPSHOT [true] ;
+%mod: [E] = 3 do $SNAPSHOT [false] ;
+%mod: [E] = 4 do $SNAPSHOT [true] ; repeat [true]
+%mod: [E] = 5 do $SNAPSHOT [true] ; repeat [false]
+%mod: [E] = 6 do $SNAPSHOT [false] ; repeat [true]
+%mod: [E] = 7 do $SNAPSHOT [false] ; repeat [false]
+
+%mod: [E] = 11 do $SNAPSHOT "snap_".[E].".ka" ;
+%mod: [E] = 12 do $SNAPSHOT "snap_".[E].".ka" [true]  ;
+%mod: [E] = 13 do $SNAPSHOT "snap_".[E].".ka" [false] ;
+%mod: [E] = 14 do $SNAPSHOT "snap_".[E].".ka" [true]  ; repeat [true]
+%mod: [E] = 15 do $SNAPSHOT "snap_".[E].".ka" [true]  ; repeat [false]
+%mod: [E] = 16 do $SNAPSHOT "snap_".[E].".ka" [false] ; repeat [true]
+%mod: [E] = 17 do $SNAPSHOT "snap_".[E].".ka" [false] ; repeat [false]
+
+%mod: [E] = 21 do $SNAPSHOT "snap_".[E].".json" ;
+%mod: [E] = 22 do $SNAPSHOT "snap_".[E].".json" [true]  ;
+%mod: [E] = 23 do $SNAPSHOT "snap_".[E].".json" [false] ;
+%mod: [E] = 24 do $SNAPSHOT "snap_".[E].".json" [true]  ; repeat [true]
+%mod: [E] = 25 do $SNAPSHOT "snap_".[E].".json" [true]  ; repeat [false]
+%mod: [E] = 26 do $SNAPSHOT "snap_".[E].".json" [false] ; repeat [true]
+%mod: [E] = 27 do $SNAPSHOT "snap_".[E].".json" [false] ; repeat [false]
+
+%mod: [E] = 30 do $STOP ;

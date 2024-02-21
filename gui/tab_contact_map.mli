@@ -7,4 +7,5 @@
 (******************************************************************************)
 
 include Ui_common.SubTab
+
 val contact_map_text : string Api.result React.S.t

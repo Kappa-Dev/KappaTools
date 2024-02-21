@@ -21,7 +21,7 @@ val set_errors : append:bool -> string -> Api_types_j.errors -> unit
     @param location of error the macro __LOC__ is expected.
     @paramer errors to be saved
  *)
-*)
+ *)
 
 val has_errors : unit -> bool
 (** Return true if errors are present. *)

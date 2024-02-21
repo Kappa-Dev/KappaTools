@@ -6,24 +6,22 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let route_handler
-    ?(shutdown_key : string option  = None)
-    ()
-  :
+let route_handler ?(shutdown_key : string option = None) () :
     Cohttp_lwt_unix.Server.conn ->
     Cohttp.Request.t ->
     Cohttp_lwt.Body.t ->
-    (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t
-  =
+    (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t =
   let intermediate =
-    Webapp_common.route_handler (Route_root.route ~shutdown_key) in
-  fun (conn : Cohttp_lwt_unix.Server.conn)
-    (request : Cohttp.Request.t)
-    (body : Cohttp_lwt.Body.t)
-    ->
-      let context = { Webapp_common.arguments = []
-                    ; Webapp_common.connection = conn
-                    ; Webapp_common.request = request
-                    ; Webapp_common.body = body }
-      in
-      intermediate ~context
+    Webapp_common.route_handler (Route_root.route ~shutdown_key)
+  in
+  fun (conn : Cohttp_lwt_unix.Server.conn) (request : Cohttp.Request.t)
+      (body : Cohttp_lwt.Body.t) ->
+    let context =
+      {
+        Webapp_common.arguments = [];
+        Webapp_common.connection = conn;
+        Webapp_common.request;
+        Webapp_common.body;
+      }
+    in
+    intermediate ~context

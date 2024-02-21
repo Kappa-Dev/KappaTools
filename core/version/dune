@@ -1,7 +1,7 @@
 (library
-  (name kappa_version)
-  (libraries yojson result re)
-  (flags (:standard)))
+ (name kappa_version)
+ (libraries yojson result re)
+ (flags (:standard)))
 
 (rule
     (targets git_version.ml)

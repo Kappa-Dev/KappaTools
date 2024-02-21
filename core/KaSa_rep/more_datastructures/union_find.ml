@@ -13,52 +13,56 @@
     * en Automatique.  All rights reserved.  This file is distributed
     *  under the terms of the GNU Library General Public License *)
 
-module type Union_find =
-sig
+module type Union_find = sig
   type key
   type dimension
   type t
-  val create:
+
+  val create :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     dimension ->
     Exception.method_handler * t
 
-  val union_list:
+  val union_list :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     t ->
     key list ->
     Exception.method_handler * t
 
-  val iteri:
+  val iteri :
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->
     (Remanent_parameters_sig.parameters ->
-     Exception.method_handler ->
-     key -> key -> Exception.method_handler) ->
-    t -> Exception.method_handler
+    Exception.method_handler ->
+    key ->
+    key ->
+    Exception.method_handler) ->
+    t ->
+    Exception.method_handler
 
-  val get_representent:
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  key ->
-  t ->
-  Exception.method_handler * t * key
+  val get_representent :
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    key ->
+    t ->
+    Exception.method_handler * t * key
 end
 
 module Make =
-  functor (Storage:Int_storage.Storage) ->
-    (*    functor (Map: Map_wrapper.Map_with_logs) ->*)
-    (struct
-
+functor
+  (Storage : Int_storage.Storage)
+  ->
+  (*    functor (Map: Map_wrapper.Map_with_logs) ->*)
+    (
+    struct
       type key = Storage.key
       type t = key Storage.t
       type dimension = Storage.dimension
 
       let create parameters error n =
-        Storage.init parameters error n (fun _ e x -> e,x)
-
+        Storage.init parameters error n (fun _ e x -> e, x)
 
       (************************************************************************************)
       (* findSet(e): which return a pointer to the representative of the set
@@ -69,27 +73,19 @@ module Make =
       let findSet parameter error e t =
         let pointToRoot parameter error root l t =
           List.fold_left
-            (fun (error, t) i ->
-               Storage.set parameter error i root t)
-            (error, t)
-            l
+            (fun (error, t) i -> Storage.set parameter error i root t)
+            (error, t) l
         in
         let rec helper parameter error e l t =
-          let error, parent =
-            Storage.unsafe_get parameter error e t
-          in
-          match parent
-          with
-          | None -> error, (t,e)
-          | Some p when p <> e ->
-            helper parameter error p (e::l) t
+          let error, parent = Storage.unsafe_get parameter error e t in
+          match parent with
+          | None -> error, (t, e)
+          | Some p when p <> e -> helper parameter error p (e :: l) t
           | Some p ->
-            begin
-              (* base case: we hit the root node make all collected nodes on the
-                 path point to the root. And return the root afterwards *)
-              let error, t = pointToRoot parameter error p l t in
-              error, (t, p)
-            end
+            (* base case: we hit the root node make all collected nodes on the
+               path point to the root. And return the root afterwards *)
+            let error, t = pointToRoot parameter error p l t in
+            error, (t, p)
         in
         helper parameter error e [] t
 
@@ -102,9 +98,7 @@ module Make =
       let union parameter error x y t =
         let error, (t, root_x) = findSet parameter error x t in
         let error, (t, root_y) = findSet parameter error y t in
-          Storage.set parameter error root_x root_y t
-
-
+        Storage.set parameter error root_x root_y t
 
       (*let eq_classes_map parameter error a =
         (*  let classes = Cckappa_sig.Site_map_and_set.Map.empty in*)
@@ -163,7 +157,7 @@ module Make =
       (************************************************************************************)
       (* compute union-find in a list*)
 
-      let union_list parameter error a (list: key list) =
+      let union_list parameter error a (list : key list) =
         match list with
         | [] -> error, a
         | t :: q ->
@@ -173,10 +167,12 @@ module Make =
             | t' :: q' ->
               let error, union_array = union parameter error t t' a in
               aux parameter q' error union_array
-          in aux parameter q error a
+          in
+          aux parameter q error a
 
       let iteri = Storage.iter
-
-    end: Union_find with type key = Storage.key
-                     and type t = Storage.key Storage.t
-                     and type dimension = Storage.dimension)
+    end :
+      Union_find
+        with type key = Storage.key
+         and type t = Storage.key Storage.t
+         and type dimension = Storage.dimension)

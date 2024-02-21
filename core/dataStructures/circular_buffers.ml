@@ -1,27 +1,22 @@
-type 'a t =
-  {
-    size: int;
-    default: 'a;
-    mutable start: int;
-    mutable final: int;
-    content: 'a array
-  }
+type 'a t = {
+  size: int;
+  default: 'a;
+  mutable start: int;
+  mutable final: int;
+  content: 'a array;
+}
 
 let create i default =
   let size = max i 2 in
-  {
-    size = size;
-    default = default;
-    start = 0;
-    final = 0;
-    content = Array.make size default
-  }
+  { size; default; start = 0; final = 0; content = Array.make size default }
 
 let succ i t =
-  if i = t.size-1 then 0 else succ i
+  if i = t.size - 1 then
+    0
+  else
+    succ i
 
 let full t = succ t.final t = t.start
-
 let free_one t = t.start <- succ t.start t
 
 let add x t =
@@ -32,18 +27,20 @@ let add x t =
 
 let iter f t =
   let rec aux i =
-    if i <> t.final
-    then
-      let () = f (t.content.(i)) in
+    if i <> t.final then (
+      let () = f t.content.(i) in
       aux (succ i t)
+    )
   in
   aux t.start
 
 let clean t =
   let rec aux k =
-    if k = t.size then t
-    else
-      let () = t.content.(k)<- t.default in
-      aux (k+1)
+    if k = t.size then
+      t
+    else (
+      let () = t.content.(k) <- t.default in
+      aux (k + 1)
+    )
   in
   aux 0

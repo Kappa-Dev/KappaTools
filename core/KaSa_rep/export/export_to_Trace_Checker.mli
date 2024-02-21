@@ -12,20 +12,16 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-
 type state
 
-val init:
-  ?compil:Ast.parsing_compil -> unit -> state
+val init : ?compil:Ast.parsing_compil -> unit -> state
 
-val query_inhibition_map:
+val query_inhibition_map :
   ?accuracy_level:Public_data.accuracy_level ->
   state ->
   Remanent_state.rule_id ->
   Remanent_state.rule_id ->
   state * (Public_data.location * Public_data.location) list
 
-val dump_errors_light: state -> unit
-
-
-val flush_errors: state -> state
+val dump_errors_light : state -> unit
+val flush_errors : state -> state
