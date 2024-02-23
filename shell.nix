@@ -8,16 +8,12 @@
 ##             this directory.
 ##
 
-with import <nixpkgs> {
-##  Building on Apple computers with ARM chips fails. Set the
-##  system type to x86_64 and use Rosetta by uncommenting the
-##  following line.
-#
-#  system = "x86_64-darwin";
-};
+with import <nixpkgs> {};
 clangStdenv.mkDerivation {
   name = "kappa";
-  buildInputs = [
+  buildInputs = lib.optionals clangStdenv.isDarwin [
+   darwin.apple_sdk.frameworks.CoreServices
+  ] ++ [
     gmp.dev
     opam
     pkg-config
