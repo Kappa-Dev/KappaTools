@@ -32,7 +32,7 @@ val remove_file : unit -> unit Api.result Lwt.t
 *)
 type refresh = { filename: string; content: string; line: int option }
 
-val refresh_file : refresh React.event
+val register_refresh_file_hook : (refresh -> unit) -> unit
 (* Meta data of current file *)
 
 val cursor_activity : line:int -> ch:int -> unit

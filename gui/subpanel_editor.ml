@@ -11,7 +11,10 @@ module Html = Tyxml_js.Html5
 
 let editor_full, set_editor_full = React.S.create (false : bool)
 let filename, set_filename = React.S.create (None : string option)
-let move_cursor, set_move_cursor = React.E.create ()
+
+let move_cursor_hook = ref None
+
+let set_move_cursor loc = Option.iter (fun f -> f loc) !move_cursor_hook
 
 let file_label =
   Tyxml_js.R.Html.txt
@@ -128,7 +131,6 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
   let () = codemirror##scrollTo Js.null (Js.some scrollLine) in
   ()
 
-let dont_gc_me_events = ref []
 let dont_gc_me_signals = ref []
 
 let onload () : unit =
@@ -158,7 +160,7 @@ let onload () : unit =
     Codemirror.fromTextArea textarea configuration
   in
   let () = codemirror##setValue (Js.string "") in
-  let _ =
+  let () =
     Subpanel_editor_controller.with_file
       (Result_util.fold
          ~ok:(fun (content, id) ->
@@ -239,9 +241,21 @@ let onload () : unit =
       ]
   in
   let () =
-    dont_gc_me_events :=
-      [
-        React.E.map
+        State_file.register_refresh_file_hook
+          (fun refresh ->
+            let () = set_filename (Some refresh.State_file.filename) in
+            let cand = Js.string refresh.State_file.content in
+            if cand <> codemirror##getValue then (
+              let () = codemirror##setValue cand in
+              let () =
+                match refresh.State_file.line with
+                | None -> ()
+                | Some line -> jump_to_line codemirror line
+              in
+              ()
+          )) in
+let () =
+  move_cursor_hook := Some
           (fun pos ->
             if Some pos.Loc.file = React.S.value filename then (
               let beg = pos.Loc.from_position in
@@ -254,22 +268,6 @@ let onload () : unit =
               in
               codemirror##setSelection first last
             ))
-          move_cursor;
-        React.E.map
-          (fun refresh ->
-            let () = set_filename (Some refresh.State_file.filename) in
-            let cand = Js.string refresh.State_file.content in
-            if cand <> codemirror##getValue then (
-              let () = codemirror##setValue cand in
-              let () =
-                match refresh.State_file.line with
-                | None -> ()
-                | Some line -> jump_to_line codemirror line
-              in
-              ()
-            ))
-          State_file.refresh_file;
-      ]
   in
   ()
 
