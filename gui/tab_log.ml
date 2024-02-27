@@ -7,7 +7,6 @@
 (******************************************************************************)
 
 module Html = Tyxml_js.Html5
-open Lwt.Infix
 
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
@@ -22,29 +21,30 @@ let line_count state =
 let navli () =
   Ui_common.label_news tab_is_active (fun state -> line_count state)
 
-let dont_gc_me = ref []
-
 let content () =
-  let state_log, set_state_log = React.S.create ("" : string) in
-  let () =
-    dont_gc_me :=
-      [
-        Lwt_react.S.map_s
-          (fun _ ->
-            State_simulation.with_simulation_info ~label:__LOC__
-              ~ready:(fun manager _ ->
-                manager#simulation_detail_log_message
-                >>= Api_common.result_bind_lwt
-                      ~ok:(fun (log_messages : Api_types_j.log_message) ->
-                        let () = set_state_log log_messages in
-                        Lwt.return (Result_util.ok ())))
-              ~stopped:(fun _ ->
-                let () = set_state_log "" in
-                Lwt.return (Result_util.ok ()))
-              ())
-          (React.S.on tab_is_active State_simulation.dummy_model
-             State_simulation.model);
-      ]
+  let state_log =
+    React.S.bind
+      (React.S.on
+         tab_is_active State_simulation.dummy_model State_simulation.model)
+      (fun _ ->
+        React.S.hold
+          ""
+          (Lwt_react.E.from (fun () ->
+               Lwt.map (fun x -> match x.Result_util.value with
+                                 | Ok x -> x
+                                 | Error list ->
+                                    String.concat "\n"
+                                      (List.map
+                                         (fun Result_util.{text; _ } -> text)
+                                         list))
+                 (State_simulation.with_simulation_info ~label:__LOC__
+                    ~ready:(fun manager _ ->
+                      manager#simulation_detail_log_message)
+                    ~stopped:(fun _ ->
+                      Lwt.return (Result_util.ok ""))
+                    ~initializing:(fun _ ->
+                      Lwt.return (Result_util.ok ""))
+                    ()))))
   in
   [
     Html.div
