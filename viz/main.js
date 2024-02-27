@@ -13,7 +13,7 @@ function createWindow () {
       contextIsolation: false,
     },
     width: 1024,
-    height: 600
+    height: 768
   })
 
   // and load the index.html of the app.
@@ -24,7 +24,10 @@ function createWindow () {
     query: { label: 'Local' }
   })
   mainWindow.loadFile('index.html',{
-    query: { host: sim_agent }
+    query: {
+      host: sim_agent,
+      // level: "debug",
+    }
   })
 
   // Open the DevTools.
