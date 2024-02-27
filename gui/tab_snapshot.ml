@@ -81,7 +81,7 @@ let configuration_template id additional_handlers : Widget_export.configuration
         (fun model ->
           let simulation_info = State_simulation.model_simulation_info model in
           snapshot_count simulation_info > 0)
-        State_simulation.model;
+        (React.S.on tab_is_active State_simulation.dummy_model State_simulation.model);
   }
 
 (* Only allow the export of non-graphical data. *)
@@ -195,28 +195,29 @@ let snapshot_class :
 let snapshot_js : Js_snapshot.snapshot Js.t =
   Js_snapshot.create_snapshot display_id State_settings.agent_coloring
 
-let dont_gc_me = ref []
-
 let xml () =
-  let list, handle = ReactiveData.RList.create [] in
-  (* populate select *)
-  let () =
-    dont_gc_me :=
-      [
-        React.S.map
-          (fun _ ->
-            State_simulation.when_ready ~label:__LOC__ (fun manager ->
-                manager#simulation_catalog_snapshot
-                >>= Api_common.result_bind_lwt ~ok:(fun snapshot_ids ->
-                        let () =
-                          ReactiveData.RList.set handle (select snapshot_ids)
-                        in
-                        let () = select_snapshot snapshot_js in
-                        Lwt.return (Result_util.ok ()))))
-          (React.S.on tab_is_active State_simulation.dummy_model
-             State_simulation.model);
-      ]
-  in
+  let list =
+    ReactiveData.RList.from_event
+      []
+      (Lwt_react.E.map_s
+         (fun _ ->
+           let () = select_snapshot snapshot_js in
+           Lwt.map
+             (Result_util.fold
+                ~ok:(fun x -> ReactiveData.RList.Set x)
+                ~error:(fun _ -> ReactiveData.RList.Set []))
+             (State_simulation.with_simulation_info
+                ~label:__LOC__
+                ~stopped:(fun _ -> Lwt.return (Result_util.ok []))
+                ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
+                ~ready:(fun manager _ ->
+                  manager#simulation_catalog_snapshot
+                  >>= Api_common.result_bind_lwt ~ok:(fun snapshot_ids ->
+                          Lwt.return (Result_util.ok (select snapshot_ids))))
+                ()))
+         (React.S.changes
+            (React.S.on
+               tab_is_active State_simulation.dummy_model State_simulation.model))) in
   let snapshot_label =
     Html.h4
       ~a:
