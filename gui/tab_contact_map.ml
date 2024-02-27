@@ -25,13 +25,24 @@ let extract_contact_map = function
     acc, contact
   | _ -> failwith "Wrong ugly contact_map extractor"
 
+let contactmap : Js_contact.contact_map Js.t =
+  Js_contact.create_contact_map display_id State_settings.agent_coloring
+
 let contact_map_text =
   State_project.on_project_change_async ~on:tab_is_active None accuracy
-    (Result_util.error []) (fun (manager : Api.concrete_manager) acc ->
+    "null" (fun (manager : Api.concrete_manager) acc ->
       manager#get_contact_map acc
-      >|= Result_util.map (fun contact_json ->
+      >|= Result_util.fold
+            ~error:(fun mh ->
+              let () = State_error.add_error "tab_contact_map" mh in
+              let () = contactmap##clearData in
+              "null")
+            ~ok:(fun contact_json ->
               let _, map_json = extract_contact_map contact_json in
-              Yojson.Basic.to_string map_json))
+              let data =Yojson.Basic.to_string map_json in
+              let () = contactmap##setData (Js.string data) in
+              data))
+
 
 let configuration : Widget_export.configuration =
   {
@@ -40,11 +51,8 @@ let configuration : Widget_export.configuration =
       [
         Widget_export.export_svg ~svg_div_id:display_id ();
         Widget_export.export_png ~svg_div_id:display_id ();
-        Widget_export.export_json ~serialize_json:(fun () ->
-            Result_util.fold
-              (React.S.value contact_map_text)
-              ~ok:(fun x -> x)
-              ~error:(fun _ -> "null"));
+        Widget_export.export_json
+          ~serialize_json:(fun () -> React.S.value contact_map_text);
       ];
     Widget_export.show = React.S.const true;
   }
@@ -101,25 +109,8 @@ let content () =
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 
-let contactmap : Js_contact.contact_map Js.t =
-  Js_contact.create_contact_map display_id State_settings.agent_coloring
-
-let dont_gc_me = ref []
-
 let onload () =
   let () = Widget_export.onload configuration in
-  let () =
-    dont_gc_me :=
-      [
-        React.S.map
-          (Result_util.fold
-             ~error:(fun mh ->
-               let () = State_error.add_error "tab_contact_map" mh in
-               contactmap##clearData)
-             ~ok:(fun data -> contactmap##setData (Js.string data)))
-          contact_map_text;
-      ]
-  in
   let () =
     (Tyxml_js.To_dom.of_select accuracy_chooser)##.onchange
     := Dom_html.full_handler (fun va _ ->

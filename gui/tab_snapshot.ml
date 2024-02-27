@@ -105,12 +105,7 @@ let render_snapshot_graph (snapshot_js : Js_snapshot.snapshot Js.t)
   match React.S.value display_format with
   | Graph ->
     let json : string = Data.string_of_snapshot snapshot in
-    let contact_map =
-      Result_util.fold
-        (React.S.value Tab_contact_map.contact_map_text)
-        ~ok:(fun x -> x)
-        ~error:(fun _ -> "null")
-    in
+    let contact_map = React.S.value Tab_contact_map.contact_map_text in
     snapshot_js##setData ~contact_map:(Js.string contact_map) (Js.string json)
   | Kappa -> ()
 
