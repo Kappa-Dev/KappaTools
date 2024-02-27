@@ -313,11 +313,9 @@ function childrenValue(element,selector,map){
 }
 
 function hideCodeMirror(){
-    var cm = $('.CodeMirror')[0].CodeMirror;
-    $(cm.getWrapperElement()).hide();
+    $.each($('.CodeMirror'),(_,cm) => $(cm.CodeMirror.getWrapperElement()).hide());
 }
 
 function showCodeMirror(){
-    var cm = $('.CodeMirror')[0].CodeMirror;
-    $(cm.getWrapperElement()).show();
+    $.each($('.CodeMirror'),(_,cm) => $(cm.CodeMirror.getWrapperElement()).show());
 }

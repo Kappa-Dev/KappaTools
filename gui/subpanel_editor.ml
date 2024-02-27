@@ -70,8 +70,10 @@ let content () =
               (React.S.map
                  (fun model ->
                    match model.State_file.current with
-                   | None -> [ "no-panel-body"; "flex-content" ]
-                   | Some _ -> [ "panel-body"; "flex-content" ])
+                   | None -> let () = Common.hide_codemirror () in
+                             [ "no-panel-body"; "flex-content" ]
+                   | Some _ -> let () = Common.show_codemirror () in
+                               [ "panel-body"; "flex-content" ])
                  State_file.model);
             Html.a_id editor_panel_id;
           ]
@@ -232,12 +234,6 @@ let onload () : unit =
     dont_gc_me_signals :=
       [
         React.S.map (fun _ -> codemirror##performLint) State_error.errors;
-        React.S.map
-          (fun model ->
-            match model.State_file.current with
-            | None -> Common.hide_codemirror ()
-            | Some _ -> Common.show_codemirror ())
-          State_file.model;
       ]
   in
   let () =
