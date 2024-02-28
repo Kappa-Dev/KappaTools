@@ -6,10 +6,10 @@
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/Kappa-Dev/KaSim",
-  "author": "GitHub",
+  "repository": "https://github.com/Kappa-Dev/KappaTools",
+  "author": "Kappa Devs",
   "license": "LGPL-3.0",
   "devDependencies": {
-    "electron": "^20.0.1"
+    "electron": "^29.0.1"
   }
 }
