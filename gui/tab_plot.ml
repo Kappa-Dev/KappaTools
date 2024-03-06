@@ -17,6 +17,8 @@ type offset = { offset_current: int; offset_max: int }
 let offset, set_offset = React.S.create (None : offset option)
 let default_point = 1000
 let point, set_points = React.S.create default_point
+let tab_is_active, set_tab_is_active = React.S.create false
+let plot_ref = ref None
 
 let has_plot (state : Api_types_j.simulation_info option) : bool =
   match state with
@@ -53,35 +55,6 @@ let export mime filename =
               let () = Common.saveFile ~data ~mime ~filename in
               Lwt.return (Result_util.ok ())))
 
-let configuration () : Widget_export.configuration =
-  {
-    Widget_export.id = export_id;
-    Widget_export.handlers =
-      [
-        Widget_export.export_svg ~svg_div_id:div_display_id ();
-        Widget_export.export_png ~svg_div_id:div_display_id ();
-        {
-          Widget_export.suffix = "json";
-          Widget_export.label = "json";
-          Widget_export.export = export_json;
-        };
-        {
-          Widget_export.suffix = "csv";
-          Widget_export.label = "csv";
-          Widget_export.export = export "text/csv";
-        };
-        {
-          Widget_export.suffix = "tsv";
-          Widget_export.label = "tsv";
-          Widget_export.export = export "text/tsv";
-        };
-      ];
-    show =
-      React.S.map
-        (fun model -> has_plot (State_simulation.model_simulation_info model))
-        State_simulation.model;
-  }
-
 let plot_points_input_id = "plot_points_input"
 
 let plot_points_input =
@@ -115,45 +88,6 @@ let plot_offset_input =
         Html.a_placeholder "offset";
       ]
     ()
-
-let xml () =
-  let export_controls = Widget_export.inline_content (configuration ()) in
-  [%html
-    {|
-  <div class="navcontent-view flex-content" id="|} div_display_id
-      {|"></div>
-
-  <div class="navcontent-controls">
-    <form class="form-inline" id=|}
-      export_id
-      {|>
-      |}
-      export_controls
-      {|
-      <div class="form-group">
-        <label class="sr-only" for=|}
-      plot_points_input_id
-      {|>Row to plot</label>
-        <div class="input-group">
-          <span class="input-group-addon">Points</span>
-          |}
-      [ plot_points_input ]
-      {|
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="sr-only" for=|}
-      plot_offset_input_id
-      {|>Selected window</label>
-        |}
-      [ plot_offset_input ]
-      {|
-      </div>
-    </form>
-    </div> |}]
-
-let content () : [> Html_types.div ] Html.elt list =
-  [ Ui_common.toggle_element (fun s -> has_plot s) (xml ()) ]
 
 let simulation_info_offset_max (simulation_info : Api_types_j.simulation_info) :
     int =
@@ -271,9 +205,77 @@ let onload_plot_points_input (js_plot : Js_plot.observable_plot Js.t) : unit =
   in
   ()
 
-let plot_ref = ref None
-let tab_is_active, set_tab_is_active = React.S.create false
-let dont_gc_me = ref []
+let configuration () : Widget_export.configuration =
+  {
+    Widget_export.id = export_id;
+    Widget_export.handlers =
+      [
+        Widget_export.export_svg ~svg_div_id:div_display_id ();
+        Widget_export.export_png ~svg_div_id:div_display_id ();
+        {
+          Widget_export.suffix = "json";
+          Widget_export.label = "json";
+          Widget_export.export = export_json;
+        };
+        {
+          Widget_export.suffix = "csv";
+          Widget_export.label = "csv";
+          Widget_export.export = export "text/csv";
+        };
+        {
+          Widget_export.suffix = "tsv";
+          Widget_export.label = "tsv";
+          Widget_export.export = export "text/tsv";
+        };
+      ];
+    show =
+      React.S.map
+        (fun model ->
+          let out = has_plot (State_simulation.model_simulation_info model) in
+          let () = if out then Option.iter update_plot !plot_ref in
+          out)
+        (React.S.on tab_is_active State_simulation.dummy_model
+           State_simulation.model);
+  }
+
+let xml () =
+  let export_controls = Widget_export.inline_content (configuration ()) in
+  [%html
+    {|
+  <div class="navcontent-view flex-content" id="|} div_display_id
+      {|"></div>
+
+  <div class="navcontent-controls">
+    <form class="form-inline" id=|}
+      export_id
+      {|>
+      |}
+      export_controls
+      {|
+      <div class="form-group">
+        <label class="sr-only" for=|}
+      plot_points_input_id
+      {|>Row to plot</label>
+        <div class="input-group">
+          <span class="input-group-addon">Points</span>
+          |}
+      [ plot_points_input ]
+      {|
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="sr-only" for=|}
+      plot_offset_input_id
+      {|>Selected window</label>
+        |}
+      [ plot_offset_input ]
+      {|
+      </div>
+    </form>
+    </div> |}]
+
+let content () : [> Html_types.div ] Html.elt list =
+  [ Ui_common.toggle_element (fun s -> has_plot s) (xml ()) ]
 
 let onload () =
   let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
@@ -300,22 +302,6 @@ let onload () =
           update_plot plot
         else
           ())
-  in
-  let () =
-    dont_gc_me :=
-      [
-        React.S.l1
-          (fun simulation_model ->
-            let simulation_info =
-              State_simulation.model_simulation_info simulation_model
-            in
-            if has_plot simulation_info then
-              update_plot plot
-            else
-              ())
-          (React.S.on tab_is_active State_simulation.dummy_model
-             State_simulation.model);
-      ]
   in
   let () =
     Ui_common.input_change plot_offset_input_dom (fun value ->
