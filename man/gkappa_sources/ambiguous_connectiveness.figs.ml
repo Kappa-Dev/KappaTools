@@ -31,11 +31,11 @@ let build_rule = build_rule ~hgap:(Some 0.4)
 let [ (r, [ (left, []); (right, []) ]) ], signature =
   add_in_signature
     [
-      ( "$\text{\raisebox{.5ex}{\agent{\small A}{}}}$",
+      ( "$\\text{\\raisebox{.5ex}{\\agent{\\small A}{}}}$",
         [ Shape "hexagon" ],
         [
-          "$\text{\site{\small l}{}{}}$", [ Direction ne ], [];
-          "$\text{\site{\small r}{}{}}$", [ Direction se ], [];
+          "$\\text{\\site{\\small l}{}{}}$", [ Direction ne ], [];
+          "$\\text{\\site{\\small r}{}{}}$", [ Direction se ], [];
         ] );
     ]
     (snd (init config))
@@ -102,7 +102,7 @@ let f bool =
             (if bool then
                "$1$"
              else
-               "$1\{1\}$");
+               "$1\\{1\\}$");
         ]
       (fun _ -> ([], [], []), lhs')
       (fun _ -> ([], [], []), rhs')

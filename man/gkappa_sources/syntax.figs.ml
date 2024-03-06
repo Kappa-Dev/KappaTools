@@ -32,16 +32,16 @@ let config =
 let [ (a, [ (x, []); (y, [ yu; yp ]); (z, [ zu; zp ]) ]) ], signature =
   add_in_signature
     [
-      ( "$\texttt{A}$",
+      ( "$\\texttt{A}$",
         [ Shape "ellipse" ],
         [
-          "$\texttt{x}$", [ Direction n ], [];
-          ( "$\texttt{y}$",
+          "$\\texttt{x}$", [ Direction n ], [];
+          ( "$\\texttt{y}$",
             [ Direction se ],
-            [ "$\texttt{u}$", []; "$\texttt{p}$", [] ] );
-          ( "$\texttt{z}$",
+            [ "$\\texttt{u}$", []; "$\\texttt{p}$", [] ] );
+          ( "$\\texttt{z}$",
             [ Direction sw ],
-            [ "$\texttt{0}$", []; "$\texttt{1}$", [] ] );
+            [ "$\\texttt{0}$", []; "$\\texttt{1}$", [] ] );
         ] );
     ]
     (snd (init config))

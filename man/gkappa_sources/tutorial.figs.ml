@@ -36,22 +36,22 @@ let ( [ (a, [ (a_x, []) ]); (b, [ (b_x, []); (b_y, [ b_y_u; b_y_p ]) ]) ],
       signature ) =
   add_in_signature
     [
-      ( "$\text{\agent{A}{}}$",
+      ( "$\\text{\\agent{A}{}}$",
         [
           Shape "circle";
           Width (0.13 *. config.agent_width);
           Height (0.16 *. config.agent_width);
         ],
-        [ "$\text{\site{l}{}{}}$", [ Direction e ], [] ] );
-      ( "$\text{\agent{B}{}}$",
+        [ "$\\text{\\site{l}{}{}}$", [ Direction e ], [] ] );
+      ( "$\\text{\\agent{B}{}}$",
         [
           Shape "rectangle";
           Height (0.24 *. config.agent_height);
           Width (0.15 *. config.agent_width);
         ],
         [
-          "$\text{\site{r}{}{}}$", [ Direction w ], [];
-          ( "$\text{\site{l}{}{}}$",
+          "$\\text{\\site{r}{}{}}$", [ Direction w ], [];
+          ( "$\\text{\\site{l}{}{}}$",
             [ Direction e ],
             [ "u", [ Direction ne ]; "p", [ Direction ne ] ] );
         ] );
@@ -148,15 +148,15 @@ let _ = dump "ref.ladot" graph
 let [ (a, [ (a_n, []); (a_e, [ u; p ]) ]) ], signature =
   add_in_signature
     [
-      ( "$\text{\agent{A}{}}$",
+      ( "$\\text{\\agent{A}{}}$",
         [
           Shape "circle";
           Width (0.13 *. config.agent_width);
           Height (0.16 *. config.agent_width);
         ],
         [
-          "$\text{\site{n}{}{}}$", [ Direction n ], [];
-          ( "$\text{\site{n}{}{}}$",
+          "$\\text{\\site{n}{}{}}$", [ Direction n ], [];
+          ( "$\\text{\\site{n}{}{}}$",
             [ Direction e ],
             [ "u", [ Direction ne ]; "p", [ Direction ne ] ] );
         ] );
@@ -198,15 +198,15 @@ let _ = build_rule ~file:"auto.ladot" ~directives:[ Comment "$k$" ] g left right
 let [ (a, [ (a_x, []); (a_y, []) ]) ], signature =
   add_in_signature
     [
-      ( "$\text{\agent{A}{}}$",
+      ( "$\\text{\\agent{A}{}}$",
         [
           Shape "rectangle";
           Width (0.10 *. config.agent_width);
           Height (0.16 *. config.agent_width);
         ],
         [
-          "$\text{\site{a}{}{}}$", [ Direction ne ], [];
-          "$\text{\site{b}{}{}}$", [ Direction se ], [];
+          "$\\text{\\site{a}{}{}}$", [ Direction ne ], [];
+          "$\\text{\\site{b}{}{}}$", [ Direction se ], [];
         ] );
     ]
     (snd (init config))
