@@ -13,8 +13,7 @@ let tab_is_active, set_tab_is_active = React.S.create false
 let din_id, set_din_id = React.S.create ""
 
 let din_list =
-  ReactiveData.RList.from_event
-    []
+  ReactiveData.RList.from_event []
     (Lwt_react.E.map_s
        (fun _ ->
          Lwt.map
@@ -22,16 +21,14 @@ let din_list =
               ~ok:(fun din_ids ->
                 let out =
                   List.rev_map
-                    (fun id ->
-                      Html.option ~a:[ Html.a_value id ] (Html.txt id))
-                    din_ids in
+                    (fun id -> Html.option ~a:[ Html.a_value id ] (Html.txt id))
+                    din_ids
+                in
                 ReactiveData.RList.Set out)
               ~error:(fun _ -> ReactiveData.RList.Set []))
            (State_simulation.with_simulation_info ~label:__LOC__
-              ~stopped:(fun _ ->
-                Lwt.return (Result_util.ok []))
-              ~initializing:(fun _ ->
-                Lwt.return (Result_util.ok []))
+              ~stopped:(fun _ -> Lwt.return (Result_util.ok []))
+              ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
               ~ready:(fun manager _ -> manager#simulation_catalog_din)
               ()))
        (React.S.changes
@@ -42,54 +39,47 @@ let din_select =
   Tyxml_js.R.Html5.select ~a:[ Html.a_class [ "form-control" ] ] din_list
 
 let din_data =
-  React.S.bind
-    (ReactiveData.RList.signal din_list)
-    (function
-     | [] -> React.S.const None
-     | (_ :: _) ->
-        let () =
-          set_din_id
-            (Js.to_string (Tyxml_js.To_dom.of_select din_select)##.value) in
-        React.S.bind
-          din_id
-          (fun din_id ->
-            React.S.hold
-              None
-              (Lwt_react.E.from
-                 (fun () ->
-                   Lwt.map
-                     (Result_util.fold
-                        ~ok:(fun x -> x)
-                        ~error:(fun _ -> None))
-                     (State_simulation.with_simulation_info
-                        ~label:__LOC__
-                        ~stopped:(fun _ -> Lwt.return (Result_util.ok None))
-                        ~initializing:(fun _ -> Lwt.return (Result_util.ok None))
-                        ~ready:(fun manager _ ->
-                          Lwt.map
-                            (Result_util.map Option.some)
-                            (manager#simulation_detail_din din_id))
-                        ())))))
+  React.S.bind (ReactiveData.RList.signal din_list) (function
+    | [] -> React.S.const None
+    | _ :: _ ->
+      let () =
+        set_din_id (Js.to_string (Tyxml_js.To_dom.of_select din_select)##.value)
+      in
+      React.S.bind din_id (fun din_id ->
+          React.S.hold None
+            (Lwt_react.E.from (fun () ->
+                 Lwt.map
+                   (Result_util.fold ~ok:(fun x -> x) ~error:(fun _ -> None))
+                   (State_simulation.with_simulation_info ~label:__LOC__
+                      ~stopped:(fun _ -> Lwt.return (Result_util.ok None))
+                      ~initializing:(fun _ -> Lwt.return (Result_util.ok None))
+                      ~ready:(fun manager _ ->
+                        Lwt.map
+                          (Result_util.map Option.some)
+                          (manager#simulation_detail_din din_id))
+                      ())))))
 
 let din_header =
   ReactiveData.RList.from_signal
     (React.S.map
        (function
-        | None -> []
-        | Some din ->
-           [ Html.tr
+         | None -> []
+         | Some din ->
+           [
+             Html.tr
                (Html.th [ Html.txt "affects" ]
-                :: Array.fold_right
-                     (fun r acc -> Html.th [ Html.txt r ] :: acc)
-                     din.Data.din_rules [])])
+               :: Array.fold_right
+                    (fun r acc -> Html.th [ Html.txt r ] :: acc)
+                    din.Data.din_rules []);
+           ])
        din_data)
 
 let din_table =
   ReactiveData.RList.from_signal
     (React.S.map
        (function
-        | None -> []
-        | Some din ->
+         | None -> []
+         | Some din ->
            let open Data in
            let all = din.din_data.din_kind = Primitives.PROBABILITY in
            let body =
@@ -99,27 +89,27 @@ let din_table =
                    Html.tr
                      (Html.th
                         [
-                       Html.txt
-                         (din.din_rules.(i) ^ " ("
-                          ^ string_of_int din.din_data.din_hits.(i)
-                          ^ " hits)");
+                          Html.txt
+                            (din.din_rules.(i) ^ " ("
+                            ^ string_of_int din.din_data.din_hits.(i)
+                            ^ " hits)");
                         ]
-                      :: Array.fold_right
-                           (fun v acc ->
-                             Html.td
-                               ~a:
-                               [
-                                 Html.a_class
-                                   (if v > 0. then
-                                      [ "success" ]
-                                    else if v < 0. then
-                                      [ "info" ]
-                                    else
-                                      []);
-                               ]
-                               [ Html.txt (string_of_float v) ]
-                             :: acc)
-                           data [])
+                     :: Array.fold_right
+                          (fun v acc ->
+                            Html.td
+                              ~a:
+                                [
+                                  Html.a_class
+                                    (if v > 0. then
+                                       [ "success" ]
+                                     else if v < 0. then
+                                       [ "info" ]
+                                     else
+                                       []);
+                                ]
+                              [ Html.txt (string_of_float v) ]
+                            :: acc)
+                          data [])
                    :: acc
                  else
                    acc)
@@ -199,7 +189,8 @@ let onload () =
     := Dom.handler (fun _ ->
            let () =
              set_din_id
-               (Js.to_string (Tyxml_js.To_dom.of_select din_select)##.value) in
+               (Js.to_string (Tyxml_js.To_dom.of_select din_select)##.value)
+           in
            Js._false)
   in
   let () = Widget_export.onload export_configuration in

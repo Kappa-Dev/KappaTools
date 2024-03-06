@@ -81,7 +81,8 @@ let configuration_template id additional_handlers : Widget_export.configuration
         (fun model ->
           let simulation_info = State_simulation.model_simulation_info model in
           snapshot_count simulation_info > 0)
-        (React.S.on tab_is_active State_simulation.dummy_model State_simulation.model);
+        (React.S.on tab_is_active State_simulation.dummy_model
+           State_simulation.model);
   }
 
 (* Only allow the export of non-graphical data. *)
@@ -192,8 +193,7 @@ let snapshot_js : Js_snapshot.snapshot Js.t =
 
 let xml () =
   let list =
-    ReactiveData.RList.from_event
-      []
+    ReactiveData.RList.from_event []
       (Lwt_react.E.map_s
          (fun _ ->
            let () = select_snapshot snapshot_js in
@@ -201,8 +201,7 @@ let xml () =
              (Result_util.fold
                 ~ok:(fun x -> ReactiveData.RList.Set x)
                 ~error:(fun _ -> ReactiveData.RList.Set []))
-             (State_simulation.with_simulation_info
-                ~label:__LOC__
+             (State_simulation.with_simulation_info ~label:__LOC__
                 ~stopped:(fun _ -> Lwt.return (Result_util.ok []))
                 ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
                 ~ready:(fun manager _ ->
@@ -211,8 +210,9 @@ let xml () =
                           Lwt.return (Result_util.ok (select snapshot_ids))))
                 ()))
          (React.S.changes
-            (React.S.on
-               tab_is_active State_simulation.dummy_model State_simulation.model))) in
+            (React.S.on tab_is_active State_simulation.dummy_model
+               State_simulation.model)))
+  in
   let snapshot_label =
     Html.h4
       ~a:

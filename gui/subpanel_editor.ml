@@ -11,9 +11,7 @@ module Html = Tyxml_js.Html5
 
 let editor_full, set_editor_full = React.S.create (false : bool)
 let filename, set_filename = React.S.create (None : string option)
-
 let move_cursor_hook = ref None
-
 let set_move_cursor loc = Option.iter (fun f -> f loc) !move_cursor_hook
 
 let file_label =
@@ -70,10 +68,12 @@ let content () =
               (React.S.map
                  (fun model ->
                    match model.State_file.current with
-                   | None -> let () = Common.hide_codemirror () in
-                             [ "no-panel-body"; "flex-content" ]
-                   | Some _ -> let () = Common.show_codemirror () in
-                               [ "panel-body"; "flex-content" ])
+                   | None ->
+                     let () = Common.hide_codemirror () in
+                     [ "no-panel-body"; "flex-content" ]
+                   | Some _ ->
+                     let () = Common.show_codemirror () in
+                     [ "panel-body"; "flex-content" ])
                  State_file.model);
             Html.a_id editor_panel_id;
           ]
@@ -232,38 +232,37 @@ let onload () : unit =
   in
   let () =
     dont_gc_me_signals :=
-      [
-        React.S.map (fun _ -> codemirror##performLint) State_error.errors;
-      ]
+      [ React.S.map (fun _ -> codemirror##performLint) State_error.errors ]
   in
   let () =
-        State_file.register_refresh_file_hook
-          (fun refresh ->
-            let () = set_filename (Some refresh.State_file.filename) in
-            let cand = Js.string refresh.State_file.content in
-            if cand <> codemirror##getValue then (
-              let () = codemirror##setValue cand in
-              let () =
-                match refresh.State_file.line with
-                | None -> ()
-                | Some line -> jump_to_line codemirror line
-              in
-              ()
-          )) in
-let () =
-  move_cursor_hook := Some
-          (fun pos ->
-            if Some pos.Loc.file = React.S.value filename then (
-              let beg = pos.Loc.from_position in
-              let first =
-                new%js Codemirror.position (beg.Loc.line - 1) beg.Loc.chr
-              in
-              let en = pos.Loc.from_position in
-              let last =
-                new%js Codemirror.position (en.Loc.line - 1) en.Loc.chr
-              in
-              codemirror##setSelection first last
-            ))
+    State_file.register_refresh_file_hook (fun refresh ->
+        let () = set_filename (Some refresh.State_file.filename) in
+        let cand = Js.string refresh.State_file.content in
+        if cand <> codemirror##getValue then (
+          let () = codemirror##setValue cand in
+          let () =
+            match refresh.State_file.line with
+            | None -> ()
+            | Some line -> jump_to_line codemirror line
+          in
+          ()
+        ))
+  in
+  let () =
+    move_cursor_hook :=
+      Some
+        (fun pos ->
+          if Some pos.Loc.file = React.S.value filename then (
+            let beg = pos.Loc.from_position in
+            let first =
+              new%js Codemirror.position (beg.Loc.line - 1) beg.Loc.chr
+            in
+            let en = pos.Loc.from_position in
+            let last =
+              new%js Codemirror.position (en.Loc.line - 1) en.Loc.chr
+            in
+            codemirror##setSelection first last
+          ))
   in
   ()
 

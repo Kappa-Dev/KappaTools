@@ -24,26 +24,22 @@ let navli () =
 let content () =
   let state_log =
     React.S.bind
-      (React.S.on
-         tab_is_active State_simulation.dummy_model State_simulation.model)
-      (fun _ ->
-        React.S.hold
-          ""
+      (React.S.on tab_is_active State_simulation.dummy_model
+         State_simulation.model) (fun _ ->
+        React.S.hold ""
           (Lwt_react.E.from (fun () ->
-               Lwt.map (fun x -> match x.Result_util.value with
-                                 | Ok x -> x
-                                 | Error list ->
-                                    String.concat "\n"
-                                      (List.map
-                                         (fun Result_util.{text; _ } -> text)
-                                         list))
+               Lwt.map
+                 (fun x ->
+                   match x.Result_util.value with
+                   | Ok x -> x
+                   | Error list ->
+                     String.concat "\n"
+                       (List.map (fun Result_util.{ text; _ } -> text) list))
                  (State_simulation.with_simulation_info ~label:__LOC__
                     ~ready:(fun manager _ ->
                       manager#simulation_detail_log_message)
-                    ~stopped:(fun _ ->
-                      Lwt.return (Result_util.ok ""))
-                    ~initializing:(fun _ ->
-                      Lwt.return (Result_util.ok ""))
+                    ~stopped:(fun _ -> Lwt.return (Result_util.ok ""))
+                    ~initializing:(fun _ -> Lwt.return (Result_util.ok ""))
                     ()))))
   in
   [

@@ -29,8 +29,8 @@ let contactmap : Js_contact.contact_map Js.t =
   Js_contact.create_contact_map display_id State_settings.agent_coloring
 
 let contact_map_text =
-  State_project.on_project_change_async ~on:tab_is_active None accuracy
-    "null" (fun (manager : Api.concrete_manager) acc ->
+  State_project.on_project_change_async ~on:tab_is_active None accuracy "null"
+    (fun (manager : Api.concrete_manager) acc ->
       manager#get_contact_map acc
       >|= Result_util.fold
             ~error:(fun mh ->
@@ -39,10 +39,9 @@ let contact_map_text =
               "null")
             ~ok:(fun contact_json ->
               let _, map_json = extract_contact_map contact_json in
-              let data =Yojson.Basic.to_string map_json in
+              let data = Yojson.Basic.to_string map_json in
               let () = contactmap##setData (Js.string data) in
               data))
-
 
 let configuration : Widget_export.configuration =
   {
@@ -51,8 +50,8 @@ let configuration : Widget_export.configuration =
       [
         Widget_export.export_svg ~svg_div_id:display_id ();
         Widget_export.export_png ~svg_div_id:display_id ();
-        Widget_export.export_json
-          ~serialize_json:(fun () -> React.S.value contact_map_text);
+        Widget_export.export_json ~serialize_json:(fun () ->
+            React.S.value contact_map_text);
       ];
     Widget_export.show = React.S.const true;
   }
