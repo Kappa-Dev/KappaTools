@@ -147,7 +147,7 @@ jobs:
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.13.x
+          ocaml-compiler: 4.14.x
       - name: Install OPAM dependencies
         run: >
           opam install --yes dune num yojson result lwt fmt logs re
