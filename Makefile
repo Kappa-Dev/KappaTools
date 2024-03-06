@@ -101,11 +101,11 @@ site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/KaSimWorker.js 
 	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }
 
 %.witness: %.sh $(MANGENREP) $(MODELS) %.gplot
-	cd $(dir $@) && KAPPABIN="$(CURDIR)/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
+	cd $(dir $@) && KAPPABIN="$(CURDIR)/_build/install/default/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
 %.witness: %.sh $(MANGENREP) $(MODELS)
-	cd $(dir $@) && KAPPABIN="$(CURDIR)/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
+	cd $(dir $@) && KAPPABIN="$(CURDIR)/_build/install/default/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
 doc: $(MANGENREP) man/KaSim_manual.pdf
@@ -118,6 +118,7 @@ profiling:
 
 all:
 	dune build --only-packages kappa-library,kappa-binaries
+	ln -n -s _build/install/default/bin bin
 
 agents:
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
@@ -137,18 +138,19 @@ clean_doc:
 	rm -rf $(MANGENREP)
 
 clean: clean_doc clean_ide
+	rm -f bin
 	dune clean
 	find . -name \*~ -delete
-	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration clean
+	+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration clean
 
 check:
 	dune runtest
-	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration clean
-	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration all
+	@+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration clean
+	@+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration all
 
 build-tests:
 	dune promote
-	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C tests/integration build
+	@+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration build
 
 # https://electronjs.org/docs/tutorial/application-distribution
 
@@ -163,7 +165,7 @@ Kappapp.tar.gz:
 	mv Kappapp/electron Kappapp/kappapp
 	mv site Kappapp/resources/app
 	mkdir Kappapp/resources/bin
-	cp bin/* Kappapp/resources/bin/
+	cp _build/install/default/bin/* Kappapp/resources/bin/
 	tar czf $@ Kappapp
 	rm -r Kappapp
 
@@ -201,7 +203,7 @@ Kappapp.app: gui/Info.plist gui/Kappa.icns
 	rm $$FOLDER && mkdir -p $$FOLDER && pushd $$FOLDER && unzip $$FILE && popd && mv $$FOLDER/Electron.app $@ && rm -r $$FOLDER
 	rm -r $@/Contents/Resources/*.lproj/
 	mkdir $@/Contents/Resources/bin
-	cp bin/* $@/Contents/Resources/bin/
+	cp _build/install/default/bin/* $@/Contents/Resources/bin/
 	mv site $@/Contents/Resources/app/
 	mv gui/Kappa.icns $@/Contents/Resources/
 	mv gui/Info.plist $@/Contents/
