@@ -1,4 +1,4 @@
-.DEFAULT_GOAL := all
+DEFAULT_GOAL := all
 
 include externals.mk
 
@@ -117,11 +117,11 @@ profiling:
 	@+$(MAKE) EXTRAFLAGS="-pkg landmarks.ppx -pkg landmarks" OCAML_LANDMARKS="auto,allocation" all
 
 all:
-	dune build --only-packages kappa-library,kappa-binaries
+	dune build --only-packages kappa-library,kappa-binaries @install
 	ln -n -s _build/install/default/bin bin
 
 agents:
-	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
+	dune build --only-packages kappa-library,kappa-binaries,kappa-agents @install
 
 clean_ide:
 	rm -rf gui/Kappa.iconset

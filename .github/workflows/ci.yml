@@ -65,7 +65,7 @@ jobs:
       - name: Make Kappa
         run: |
           opam exec -- make all
-          opam exec -- dune build
+          opam exec -- dune build @install
       - name: Uninstall nose
         run: opam exec -- pip uninstall -y nose
       - name: Reinstall nose
