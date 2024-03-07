@@ -9,4 +9,4 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ocaml -I +unix unix.cma %{deps}))))
+   (run ocaml unix.cma %{deps}))))
