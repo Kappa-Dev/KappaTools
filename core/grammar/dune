@@ -8,7 +8,7 @@
    -open
    Kappa_data_structures
    -open
-   Kappa_mixtures
+   Kappa_site_graphs
    -open
    Kappa_terms
    -open

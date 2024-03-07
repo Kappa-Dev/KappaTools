@@ -49,7 +49,7 @@ module Make (Instances : Instances_sig.S) = struct
   type instance =
     bool
     * int
-    * (Kappa_terms.Matching.t * int list * Kappa_mixtures.Edges.path option)
+    * (Kappa_terms.Matching.t * int list * Kappa_site_graphs.Edges.path option)
       option
 
   type t = {

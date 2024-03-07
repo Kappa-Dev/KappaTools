@@ -35,7 +35,7 @@
   -open
   Kappa_profiling
   -open
-  Kappa_mixtures
+  Kappa_site_graphs
   -open
   Kappa_influence_map
   -open

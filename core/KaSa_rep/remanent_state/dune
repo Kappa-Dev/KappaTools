@@ -32,7 +32,7 @@
    -open
    Kappa_profiling
    -open
-   Kappa_mixtures
+   Kappa_site_graphs
    -open
    Kappa_flow_analysis
    -open
