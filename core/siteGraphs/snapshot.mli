@@ -21,6 +21,7 @@ type connected_component = cc_node array
 type t
 
 val cc_to_user_cc :
+  ?keep_inverted_counters:bool ->
   debug_mode:bool ->
   raw:bool ->
   Signature.s ->

@@ -1860,6 +1860,9 @@ type ast_compiled_data = {
      * (syntactic sugar on mixture are not) *)
 }
 
+let inverted_counter_name (name : string) : string =
+  name ^ Signature.inverted_counter_suffix
+
 (** Evaluates to a ast_compil where clte tests have been changed to cgte tests.
  * For this, for each counter where a CLTE test is present, whose values are in [\[a, b\]], initialized at [i] and add a new counter belonging in [a, b] initialized at [a+b-i].
  * Each test [> value] is then translated into a test to the "inverted" counter as [< a+b-value].
@@ -1890,21 +1893,20 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
       [] ast_compil.rules
   in
 
-  let inverted_counter_suffix = "__inverted" in
-  let inverted_counter_name (name : string) : string =
-    name ^ inverted_counter_suffix
-  in
-
   (* Find counters that have CLTE tests, and build list: agent_name, counter_name, sum_bounds_ref list.
    * sum_bounds_ref is then filled when reading the signature and used to specify for inverted counter init value or test value as [sum_bounds_ref - value] *)
   let counters_with_clte_tests : (string * string * int ref) list =
     counter_fold (fun acc agent_name counter ->
         let counter_name = Loc.v counter.counter_name in
         (* Forbid prefix to avoid nonsense in counter definition *)
-        if String.ends_with ~suffix:inverted_counter_suffix counter_name then
+        if
+          String.ends_with ~suffix:Signature.inverted_counter_suffix
+            counter_name
+        then
           raise
             (ExceptionDefn.Malformed_Decl
-               ( "cannot end counter name by \"" ^ inverted_counter_suffix ^ "\"",
+               ( "cannot end counter name by \""
+                 ^ Signature.inverted_counter_suffix ^ "\"",
                  Loc.get_annot counter.counter_name ));
         (* Return counter name along with matching agent_name *)
         match Option_util.map Loc.v counter.counter_test with

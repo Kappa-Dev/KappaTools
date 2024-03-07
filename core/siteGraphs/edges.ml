@@ -567,8 +567,12 @@ let get_connected_component ag graph =
     | Some ccs -> Mods.DynArray.get ccs ag)
 
 (** The snapshot machinery *)
-let one_connected_component sigs ty node graph =
-  let rec build id acc known = function
+let one_connected_component (sigs : Signature.s) (ty : int) (node : int)
+    (graph : tables) : Snapshot.cc_node array =
+  let rec build (id : int)
+      (acc : (int * int * (Edge.t option * int option) list) list)
+      (known : int Mods.IntMap.t) : (int * int) list -> Snapshot.cc_node array =
+    function
     | [] ->
       Tools.array_rev_map_of_list
         (fun (node_id_in_witness, node_type, sites) ->
@@ -636,28 +640,32 @@ let species ~debug_mode sigs root graph =
     let () = Cache.reset (fst tables.caches) in
     specie
 
-let rec aux_build_snapshot raw sigs tables ccs node =
+let rec aux_build_snapshot (raw : bool) (sigs : Signature.s) (tables : tables)
+    (ccs : Snapshot.t) (node : int) : Snapshot.t =
   if node = Mods.DynArray.length tables.sort then (
+    (* We went through all nodes, we return the full snapshot *)
     let () = Cache.reset (fst tables.caches) in
     ccs
   ) else if Cache.test (fst tables.caches) node then
+    (* Already in cache, we continue to the next node *)
     aux_build_snapshot raw sigs tables ccs (succ node)
   else (
     match Mods.DynArray.get tables.sort node with
     | None -> aux_build_snapshot raw sigs tables ccs (succ node)
-    | Some ty ->
+    | Some (ty : int) ->
       let out = one_connected_component sigs ty node tables in
       aux_build_snapshot raw sigs tables
         (Snapshot.increment_in_snapshot ~raw sigs out ccs)
         (succ node)
   )
 
-let build_snapshot ~raw sigs graph =
+let build_snapshot ~(raw : bool) (sigs : Signature.s) (graph : t) : Snapshot.t =
   match graph.tables with
   | None -> assert false
   | Some tables -> aux_build_snapshot raw sigs tables Snapshot.empty 0
 
-let build_user_snapshot ~debug_mode ~raw sigs graph =
+let build_user_snapshot ~(debug_mode : bool) ~(raw : bool) (sigs : Signature.s)
+    (graph : t) : (int * User_graph.connected_component) list =
   Snapshot.export ~debug_mode ~raw sigs (build_snapshot ~raw sigs graph)
 
 let debug_print f graph =

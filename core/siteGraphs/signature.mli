@@ -88,6 +88,9 @@ type counter_agent_info = { id: int; arity: int; ports: int * int }
 val get_counter_agent_info : s -> counter_agent_info
 (** [counter_agent agent_sigs] *)
 
+val inverted_counter_suffix : string
+(** Suffix added to counter names to make an inverted counter name when needed for a <= test *)
+
 (** {2 I/O} *)
 
 val print_agent : s -> Format.formatter -> int -> unit
