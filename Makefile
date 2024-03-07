@@ -117,7 +117,7 @@ profiling:
 	@+$(MAKE) EXTRAFLAGS="-pkg landmarks.ppx -pkg landmarks" OCAML_LANDMARKS="auto,allocation" all
 
 all:
-	dune build --only-packages kappa-library,kappa-binaries
+	dune build --only-packages kappa-library,kappa-binaries @install
 	ln -n -s _build/install/default/bin bin
 
 agents:
