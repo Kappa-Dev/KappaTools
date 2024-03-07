@@ -1,6 +1,6 @@
 (library
  (name kappa_mixtures)
- (libraries kappa_generic_toolset)
+ (libraries kappa_data_structures)
  (public_name kappa-library.mixtures)
  (flags
-  (:standard -w @a-40-42 -open Kappa_generic_toolset)))
+  (:standard -w @a-40-42 -open Kappa_data_structures)))

@@ -3,7 +3,7 @@
  (modules agent_common app_args)
  (libraries logs.fmt lwt.unix kappa-library.generic)
  (flags
-  (:standard -w @a -open Kappa_generic_toolset)))
+  (:standard -w @a -open Kappa_data_structures)))
 
 (executable
  (name KaStor)
@@ -14,7 +14,7 @@
  (flags
   (:standard
    -open
-   Kappa_generic_toolset
+   Kappa_data_structures
    -open
    Kappa_runtime
    -open
@@ -43,7 +43,7 @@
  (flags
   (:standard
    -open
-   Kappa_generic_toolset
+   Kappa_data_structures
    -open
    Kappa_cli
    -open
@@ -60,7 +60,7 @@
  (flags
   (:standard
    -open
-   Kappa_generic_toolset
+   Kappa_data_structures
    -open
    Kappa_grammar
    -open
@@ -84,7 +84,7 @@
  (flags
   (:standard
    -open
-   Kappa_generic_toolset
+   Kappa_data_structures
    -open
    Kappa_grammar
    -open

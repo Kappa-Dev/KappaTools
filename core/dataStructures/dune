@@ -1,5 +1,5 @@
 (library
- (name kappa_generic_toolset)
+ (name kappa_data_structures)
  (libraries unix yojson result logs stdlib-shims bigarray camlp-streams)
  (public_name kappa-library.generic)
  (flags

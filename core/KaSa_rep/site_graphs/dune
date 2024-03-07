@@ -16,6 +16,6 @@
    -open
    Kappa_logging
    -open
-   Kappa_generic_toolset
+   Kappa_data_structures
    -open
    Kappa_kasa_type_interface)))

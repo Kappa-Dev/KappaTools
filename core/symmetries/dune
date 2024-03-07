@@ -12,7 +12,7 @@
   -open
   Kappa_parameters
   -open
-  Kappa_generic_toolset
+  Kappa_data_structures
   -open
   Kappa_logging
   -open
