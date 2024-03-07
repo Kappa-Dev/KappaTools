@@ -13,7 +13,7 @@
    -w
    @a
    -open
-   Kappa_generic_toolset
+   Kappa_data_structures
    -open
    Kappa_mixtures
    -open

@@ -105,7 +105,7 @@ val obs_from_transformations :
   Kappa_mixtures.Edges.t ->
   Instantiation.concrete Primitives.Transformation.t list ->
   (Kappa_terms.Pattern.id * Instantiation.concrete) list
-  * Kappa_generic_toolset.Operator.DepSet.t
+  * Kappa_data_structures.Operator.DepSet.t
 
 val print_stats : Format.formatter -> t -> unit
 
@@ -121,11 +121,11 @@ val apply_positive_transformation :
   Kappa_mixtures.Signature.s ->
   ?mod_connectivity_store:Roots.mod_ccs_cache ->
   Instances.t ->
-  (Kappa_terms.Matching.t * int Kappa_generic_toolset.Mods.IntMap.t)
+  (Kappa_terms.Matching.t * int Kappa_data_structures.Mods.IntMap.t)
   * Agent.t Instantiation.site list
   * Kappa_mixtures.Edges.t ->
   Instantiation.abstract Primitives.Transformation.t ->
-  ((Kappa_terms.Matching.t * int Kappa_generic_toolset.Mods.IntMap.t)
+  ((Kappa_terms.Matching.t * int Kappa_data_structures.Mods.IntMap.t)
   * Agent.t Instantiation.site list
   * Kappa_mixtures.Edges.t)
   * Agent.t Primitives.Transformation.t

@@ -22,6 +22,6 @@
   -open
   Kappa_kasa_kastor_toolset
   -open
-  Kappa_generic_toolset
+  Kappa_data_structures
   -open
   Kappa_terms))

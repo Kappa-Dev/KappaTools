@@ -111,7 +111,7 @@
   -open
   Kappa_json_api
   -open
-  Kappa_generic_toolset
+  Kappa_data_structures
   -open
   Kappa_terms
   -open
