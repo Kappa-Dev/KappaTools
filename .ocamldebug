@@ -8,7 +8,7 @@ load_printer "biniou.cma"
 load_printer "yojson.cma"
 load_printer "logs.cma"
 load_printer "kappa_data_structures.cma"
-load_printer "kappa_mixtures.cma"
+load_printer "kappa_site_graphs.cma"
 load_printer "kappa_terms.cma"
 load_printer "kappa_runtime.cma"
 
@@ -21,6 +21,6 @@ install_printer Kappa_data_structures.ValMap.print
 install_printer Kappa_data_structures.Renaming.print_full
 install_printer Kappa_data_structures.Random_tree.debug_print
 install_printer Kappa_data_structures.Operator.DepSet.print
-install_printer Kappa_mixtures.Edges.debug_print
+install_printer Kappa_site_graphs.Edges.debug_print
 install_printer Kappa_terms.Matching.debug_print
 install_printer Kappa_runtime.Rule_interpreter.debug_print

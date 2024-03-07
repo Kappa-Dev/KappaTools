@@ -102,7 +102,7 @@ val get_random_state : t -> Random.State.t
 val obs_from_transformations :
   debug_mode:bool ->
   Kappa_terms.Pattern.Env.t ->
-  Kappa_mixtures.Edges.t ->
+  Kappa_site_graphs.Edges.t ->
   Instantiation.concrete Primitives.Transformation.t list ->
   (Kappa_terms.Pattern.id * Instantiation.concrete) list
   * Kappa_data_structures.Operator.DepSet.t
@@ -112,20 +112,20 @@ val print_stats : Format.formatter -> t -> unit
 val apply_negative_transformation :
   ?mod_connectivity_store:Roots.mod_ccs_cache ->
   Instances.t ->
-  Agent.t Instantiation.site list * Kappa_mixtures.Edges.t ->
+  Agent.t Instantiation.site list * Kappa_site_graphs.Edges.t ->
   Agent.t Primitives.Transformation.t ->
-  Agent.t Instantiation.site list * Kappa_mixtures.Edges.t
+  Agent.t Instantiation.site list * Kappa_site_graphs.Edges.t
 
 val apply_positive_transformation :
   debug_mode:bool ->
-  Kappa_mixtures.Signature.s ->
+  Kappa_site_graphs.Signature.s ->
   ?mod_connectivity_store:Roots.mod_ccs_cache ->
   Instances.t ->
   (Kappa_terms.Matching.t * int Kappa_data_structures.Mods.IntMap.t)
   * Agent.t Instantiation.site list
-  * Kappa_mixtures.Edges.t ->
+  * Kappa_site_graphs.Edges.t ->
   Instantiation.abstract Primitives.Transformation.t ->
   ((Kappa_terms.Matching.t * int Kappa_data_structures.Mods.IntMap.t)
   * Agent.t Instantiation.site list
-  * Kappa_mixtures.Edges.t)
+  * Kappa_site_graphs.Edges.t)
   * Agent.t Primitives.Transformation.t

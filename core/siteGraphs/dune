@@ -1,5 +1,5 @@
 (library
- (name kappa_mixtures)
+ (name kappa_site_graphs)
  (libraries kappa_data_structures)
  (public_name kappa-library.mixtures)
  (flags
