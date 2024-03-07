@@ -126,13 +126,15 @@ let rec counter_value cc (nid, sid) count =
       ))
     count ag.node_sites
 
-let cc_to_user_cc ~debug_mode ~raw sigs cc =
-  let r = Renaming.empty () in
-  let cc_list, indexes, _ =
+let cc_to_user_cc ?(keep_inverted_counters : bool = false) ~debug_mode ~raw sigs
+    cc =
+  let r : Renaming.t = Renaming.empty () in
+  let (cc_list_without_counters, indexes, _) : cc_node list * Renaming.t * int =
     Tools.array_fold_lefti
       (fun i (acc, indexes, pos) ag ->
-        match Signature.ports_if_counter_agent sigs ag.node_type with
-        | None ->
+        if Signature.is_counter_agent sigs ag.node_type then
+          acc, indexes, pos
+        else (
           let indexes' =
             if i = pos then
               indexes
@@ -146,13 +148,74 @@ let cc_to_user_cc ~debug_mode ~raw sigs cc =
             )
           in
           ag :: acc, indexes', pos + 1
-        | Some _ -> acc, indexes, pos)
+        ))
       ([], r, 0) cc
   in
-  let cc_without_counters = Array.of_list (List.rev cc_list) in
+  let cc_without_counters : cc_node array =
+    Array.of_list (List.rev cc_list_without_counters)
+  in
   [|
     Array.map
       (fun ag ->
+        let node_sites_all : User_graph.cc_site array =
+          Array.mapi
+            (fun id si ->
+              {
+                User_graph.site_name =
+                  Format.asprintf "%a"
+                    (Signature.print_site sigs ag.node_type)
+                    id;
+                User_graph.site_type =
+                  (let port_states =
+                     match si.site_state with
+                     | None -> Some []
+                     | Some s ->
+                       Some
+                         [
+                           Format.asprintf "%a"
+                             (Signature.print_internal_state sigs ag.node_type
+                                id)
+                             s;
+                         ]
+                   in
+                   match si.site_link with
+                   | None ->
+                     User_graph.Port
+                       {
+                         User_graph.port_links = User_graph.LINKS [];
+                         User_graph.port_states;
+                       }
+                   | Some (dn_id, s) ->
+                     let dn_id' =
+                       try Renaming.apply ~debug_mode indexes dn_id
+                       with Renaming.Undefined | Invalid_argument _ -> dn_id
+                     in
+                     if Signature.is_counter_agent sigs cc.(dn_id).node_type
+                     then
+                       User_graph.Counter (counter_value cc (dn_id, s) 0)
+                     else
+                       User_graph.Port
+                         {
+                           User_graph.port_links =
+                             User_graph.LINKS [ (0, dn_id'), s ];
+                           User_graph.port_states;
+                         });
+              })
+            ag.node_sites
+        in
+        let node_sites : User_graph.cc_site array =
+          if keep_inverted_counters then
+            node_sites_all
+          else
+            (* Remove inverted counters from user snapshot *)
+            node_sites_all |> Array.to_list
+            |> List.filter (fun (site : User_graph.cc_site) : bool ->
+                   not
+                     (String.ends_with ~suffix:Signature.inverted_counter_suffix
+                        site.site_name))
+            |> Array.of_list
+        in
+
         Some
           {
             User_graph.node_id =
@@ -162,55 +225,7 @@ let cc_to_user_cc ~debug_mode ~raw sigs cc =
                  None);
             User_graph.node_type =
               Format.asprintf "%a" (Signature.print_agent sigs) ag.node_type;
-            User_graph.node_sites =
-              Array.mapi
-                (fun id si ->
-                  {
-                    User_graph.site_name =
-                      Format.asprintf "%a"
-                        (Signature.print_site sigs ag.node_type)
-                        id;
-                    User_graph.site_type =
-                      (let port_states =
-                         match si.site_state with
-                         | None -> Some []
-                         | Some s ->
-                           Some
-                             [
-                               Format.asprintf "%a"
-                                 (Signature.print_internal_state sigs
-                                    ag.node_type id)
-                                 s;
-                             ]
-                       in
-                       match si.site_link with
-                       | None ->
-                         User_graph.Port
-                           {
-                             User_graph.port_links = User_graph.LINKS [];
-                             User_graph.port_states;
-                           }
-                       | Some (dn_id, s) ->
-                         let dn_id' =
-                           try Renaming.apply ~debug_mode indexes dn_id
-                           with Renaming.Undefined | Invalid_argument _ ->
-                             dn_id
-                         in
-                         (match
-                            Signature.ports_if_counter_agent sigs
-                              cc.(dn_id).node_type
-                          with
-                         | None ->
-                           User_graph.Port
-                             {
-                               User_graph.port_links =
-                                 User_graph.LINKS [ (0, dn_id'), s ];
-                               User_graph.port_states;
-                             }
-                         | Some _ ->
-                           User_graph.Counter (counter_value cc (dn_id, s) 0)));
-                  })
-                ag.node_sites;
+            User_graph.node_sites;
           })
       cc_without_counters;
   |]

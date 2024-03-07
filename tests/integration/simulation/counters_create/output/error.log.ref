@@ -63,5 +63,5 @@ Domain:
         3
        -2(c[a.!__counter_agent-5])->() 2)
 Intial graph;
-  %init: 1 A(c{=0} c__inverted{=10})
+  %init: 1 A(c{=0})
   

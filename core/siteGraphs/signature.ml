@@ -236,6 +236,8 @@ let get_counter_agent_info sigs =
   | None -> failwith "No counter agent"
   | Some counter_agent_info -> counter_agent_info
 
+let inverted_counter_suffix : string = "__inverted"
+
 let print_agent sigs f ag_ty =
   Format.pp_print_string f @@ agent_of_num ag_ty sigs
 
