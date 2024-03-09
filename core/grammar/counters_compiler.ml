@@ -24,7 +24,7 @@ type raw_mixture_with_agent_counters =
 let combinations_of_var_setup (ls1 : ('a list * 'b list) list)
     (ls2 : ('a * 'b list) list) : ('a list * 'b list) list =
   if ls1 = [] then
-    List.fold_left (fun acc (b, ds) -> ([ b ], ds) :: acc) [] ls2
+    raise Exit (*List.fold_left (fun acc (b, ds) -> ([ b ], ds) :: acc) [] ls2*)
   else
     List.fold_left
       (fun acc (a, cs) ->
@@ -316,7 +316,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   let rec split_for_each_counter_var_value_sites (ids : Mods.StringSet.t)
       (counter_defs : Ast.counter list) :
       Ast.site list -> (Ast.site list * (string * int) list) list = function
-    | [] -> []
+    | [] -> [[],[]]
     | s :: t ->
       combinations_of_var_setup
         (split_for_each_counter_var_value_sites ids counter_defs t)
@@ -337,7 +337,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   in
   let rec split_for_each_counter_var_value_mixture (ids : Mods.StringSet.t) :
       Ast.agent list -> (Ast.agent list * (string * int) list) list = function
-    | [] -> []
+    | [] -> [[],[]]
     | ast_agent :: t ->
       combinations_of_var_setup
         (split_for_each_counter_var_value_mixture ids t)
