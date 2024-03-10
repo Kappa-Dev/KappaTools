@@ -1,0 +1,28 @@
+_____(1)
+A()+
+_____(1)
+B(c{>=4})
+Environment:
+  
+  %agent: A()
+  %agent: B(x c{=0/+=3})
+  
+  %plot: [T]
+  A()+ @ 1
+  /*0*/%mod: (|B(c{=4})| = 1) do $PRINTF ""; $PRINTF "Counter c of agent B reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+  Rules:
+    0: (ast: 1)  --  ++ A/*ν 0*/ @1
+Polymers:
+  __counter_agent.a-b.
+Domain:
+  /*cc0*/  -> ()
+  /*cc1*/ B/*1*/(c{=4}) [intervention [0]] -> ()
+  /*cc2*/  -> ()
+  /*cc3*/  -> ()
+  /*cc4*/  -> ()
+  /*cc5*/  -> ()
+  /*cc6*/ B/*1*/(x[.]) -> ()
+  /*cc7*/ B/*1*/(c[.]) -> ()
+Intial graph;
+  
+  

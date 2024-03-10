@@ -1,0 +1,1 @@
+"${KAPPABIN}"KaSim --compile counters_empty_interface.ka || true

@@ -1,0 +1,17 @@
+Parsing counters_enumerate.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 9 navigation steps
+	 -initial conditions
++ Self seeding...
++ Building initial state (40 agents)
+Done
++ Command line to rerun is: 'KaSim' '--compile' 'counters_enumerate.ka' -seed 202629756

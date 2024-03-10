@@ -1,0 +1,1 @@
+"${KAPPABIN}"KaSim --compile counters_enumerate.ka || true
