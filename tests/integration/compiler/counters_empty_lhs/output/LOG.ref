@@ -11,7 +11,6 @@ done
 	 -update_domain construction
 	 7 (sub)observables 0 navigation steps
 	 -initial conditions
-+ Self seeding...
 + Building initial state (0 agents)
 Done
-+ Command line to rerun is: 'KaSim' '--compile' 'counters_empty_lhs.ka' -seed 897249907
++ Command line to rerun is: 'KaSim' '--compile' 'counters_empty_lhs.ka' '-seed' '897249907'

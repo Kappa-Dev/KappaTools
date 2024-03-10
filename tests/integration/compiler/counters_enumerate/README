@@ -1,1 +1,1 @@
-"${KAPPABIN}"KaSim --compile counters_enumerate.ka || true
+"${KAPPABIN}"KaSim --compile counters_enumerate.ka -seed 897249907 || true
