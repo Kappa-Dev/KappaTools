@@ -433,19 +433,9 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   let rules = prepare_counters rules in
 
   List.fold_left
-    (fun acc (rule_name, ((rule_content, _) as rule_annoted)) ->
-      let new_rules_from_rule =
-        if
-          (* Per counter syntax, these rules cannot contain counter vars that need to be considered when removing CVAR counter tests *)
-          match rule_content.Ast.rewrite with
-          | Ast.Edit _ -> false
-          | Ast.Arrow a -> a.lhs = []
-        then
-          [ None, rule_annoted ]
-        else
-          split_for_each_counter_var_value_rule rule_name rule_annoted
-      in
-      new_rules_from_rule @ acc)
+    (fun acc (rule_name, rule_annoted) ->
+        (split_for_each_counter_var_value_rule rule_name rule_annoted)
+ @ acc)
     [] rules
   (* TODO: is rev relevant here? *)
   |> List.rev
