@@ -41,24 +41,8 @@ let rightsubpanel () =
         ];
     ]
 
-let content () =
-  [
-    Html.div
-      ~a:
-        [
-          Tyxml_js.R.Html.a_class
-            (React.S.bind Subpanel_editor.editor_full (fun editor_full ->
-                 React.S.const
-                   (if editor_full then
-                      [ "col-md-12"; "flex-content" ]
-                    else
-                      [ "col-md-6"; "flex-content" ])));
-        ]
-      [ Subpanel_editor.content () ];
-    rightsubpanel ();
-  ]
-
-let childs_hide b =
+(** [childs_hide b] triggers change the state of child tabs to hide if b is True, or else to show *)
+let childs_hide (b : bool) : unit =
   if b then (
     let () = Tab_contact_map.parent_hide () in
     let () = Tab_influences.parent_hide () in
@@ -71,11 +55,30 @@ let childs_hide b =
     Tab_polymers.parent_shown ()
   )
 
+let content () =
+  [
+    Html.div
+      ~a:
+        [
+          Tyxml_js.R.Html.a_class
+            (React.S.bind Subpanel_editor.editor_full (fun editor_full ->
+                 (* child hiding set here to avoid "gc" *)
+                 let () = childs_hide editor_full in
+                 React.S.const
+                   (if editor_full then
+                      [ "col-md-12"; "flex-content" ]
+                    else
+                      [ "col-md-6"; "flex-content" ])));
+        ]
+      [ Subpanel_editor.content () ];
+    rightsubpanel ();
+  ]
+
 let init_dead_rules () =
   React.S.l1
     (fun model ->
       State_error.wrap ~append:true "tab_editor_dead_rule"
-        (State_project.with_project ~label:__LOC__
+        (State_project.eval_with_project ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
              if
                model.State_project.model_parameters
@@ -121,7 +124,7 @@ let init_dead_agents () =
   React.S.l1
     (fun model ->
       State_error.wrap ~append:true "tab_editor_dead_agent"
-        (State_project.with_project ~label:__LOC__
+        (State_project.eval_with_project ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
              if
                model.State_project.model_parameters
@@ -163,7 +166,7 @@ let init_non_weakly_reversible_transitions () =
   React.S.l1
     (fun model ->
       State_error.wrap ~append:true "tab_editor_dead_rule"
-        (State_project.with_project ~label:__LOC__
+        (State_project.eval_with_project ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
              if
                model.State_project.model_parameters
@@ -219,8 +222,6 @@ let init_non_weakly_reversible_transitions () =
                Lwt.return (Result_util.ok ()))))
     State_project.model
 
-let dont_gc_me = ref []
-
 let onload () =
   let () = Subpanel_editor.onload () in
   let _ = init_dead_rules () in
@@ -230,9 +231,6 @@ let onload () =
   let () = Tab_influences.onload () in
   let () = Tab_constraints.onload () in
   let () = Tab_polymers.onload () in
-  let () =
-    dont_gc_me := [ React.S.map childs_hide Subpanel_editor.editor_full ]
-  in
   let () =
     Common.jquery_on "#naveditor" "hide.bs.tab" (fun _ -> childs_hide true)
   in

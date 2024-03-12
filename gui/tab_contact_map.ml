@@ -25,22 +25,25 @@ let extract_contact_map = function
     acc, contact
   | _ -> failwith "Wrong ugly contact_map extractor"
 
-let contactmap : Js_contact.contact_map Js.t =
+let contact_map_js : Js_contact.contact_map Js.t =
   Js_contact.create_contact_map display_id State_settings.agent_coloring
 
-let contact_map_text =
+let contact_map_text : string React.signal =
   State_project.on_project_change_async ~on:tab_is_active None accuracy "null"
-    (fun (manager : Api.concrete_manager) acc ->
+    (fun
+      (manager : Api.concrete_manager)
+      (acc : Public_data.accuracy_level option)
+    ->
       manager#get_contact_map acc
       >|= Result_util.fold
             ~error:(fun mh ->
               let () = State_error.add_error "tab_contact_map" mh in
-              let () = contactmap##clearData in
+              let () = contact_map_js##clearData in
               "null")
             ~ok:(fun contact_json ->
               let _, map_json = extract_contact_map contact_json in
               let data = Yojson.Basic.to_string map_json in
-              let () = contactmap##setData (Js.string data) in
+              let () = contact_map_js##setData (Js.string data) in
               data))
 
 let configuration : Widget_export.configuration =
@@ -129,4 +132,5 @@ let onload () =
   in
   ()
 
-let onresize () : unit = if React.S.value tab_is_active then contactmap##redraw
+let onresize () : unit =
+  if React.S.value tab_is_active then contact_map_js##redraw

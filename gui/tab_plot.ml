@@ -28,7 +28,7 @@ let has_plot (state : Api_types_j.simulation_info option) : bool =
     > 0
 
 let export_json filename =
-  State_simulation.when_ready ~label:__LOC__ (fun manager ->
+  State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       manager#simulation_detail_plot
         {
           Api_types_j.plot_limit_offset = None;
@@ -42,7 +42,7 @@ let export_json filename =
               Lwt.return (Result_util.ok ())))
 
 let export mime filename =
-  State_simulation.when_ready ~label:__LOC__ (fun manager ->
+  State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       manager#simulation_detail_plot
         {
           Api_types_j.plot_limit_offset = None;
@@ -149,7 +149,7 @@ let plot_parameter () : Api_types_j.plot_parameter =
   }
 
 let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
-  State_simulation.when_ready ~label:__LOC__ (fun manager ->
+  State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       let () = update_offset true in
       manager#simulation_detail_plot (plot_parameter ())
       >>= Api_common.result_bind_lwt ~ok:(fun (plot : Api_types_t.plot) ->

@@ -6,6 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+open Lwt.Infix
 module Html = Tyxml_js.Html5
 
 let tab_is_active, set_tab_is_active = React.S.create false
@@ -23,24 +24,23 @@ let navli () =
 
 let content () =
   let state_log =
+    (* We get the signal of log messages for current simulation model. The bind allows to change the signal to the new simulation model when it changes *)
     React.S.bind
       (React.S.on tab_is_active State_simulation.dummy_model
          State_simulation.model) (fun _ ->
         React.S.hold ""
           (Lwt_react.E.from (fun () ->
-               Lwt.map
-                 (fun x ->
-                   match x.Result_util.value with
-                   | Ok x -> x
-                   | Error list ->
-                     String.concat "\n"
-                       (List.map (fun Result_util.{ text; _ } -> text) list))
-                 (State_simulation.with_simulation_info ~label:__LOC__
-                    ~ready:(fun manager _ ->
-                      manager#simulation_detail_log_message)
-                    ~stopped:(fun _ -> Lwt.return (Result_util.ok ""))
-                    ~initializing:(fun _ -> Lwt.return (Result_util.ok ""))
-                    ()))))
+               State_simulation.eval_with_sim_manager_and_info ~label:__LOC__
+                 ~ready:(fun manager _ -> manager#simulation_detail_log_message)
+                 ~stopped:(fun _ -> Lwt.return (Result_util.ok ""))
+                 ~initializing:(fun _ -> Lwt.return (Result_util.ok ""))
+                 ()
+               >|= fun (x : string Api.result) ->
+               match x.Result_util.value with
+               | Ok x -> x
+               | Error list ->
+                 String.concat "\n"
+                   (List.map (fun Result_util.{ text; _ } -> text) list))))
   in
   [
     Html.div

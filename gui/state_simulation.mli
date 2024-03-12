@@ -25,12 +25,13 @@ val model_simulation_state : t -> model_state
 val init : unit -> unit Lwt.t
 val refresh : unit -> unit Api.result Lwt.t
 
-val with_simulation :
+val eval_with_sim_manager :
   label:string ->
   (Api.concrete_manager -> t -> 'a Api.result Lwt.t) ->
   'a Api.result Lwt.t
+(** [eval_with_sim_manager ~label handler] evaluates the function [handler] applied to the [concrete_manager] of current project and current [simulation_state] *)
 
-val with_simulation_info :
+val eval_with_sim_manager_and_info :
   label:string ->
   ?stopped:(Api.concrete_manager -> 'a Api.result Lwt.t) ->
   ?initializing:(Api.concrete_manager -> 'a Api.result Lwt.t) ->
@@ -38,8 +39,9 @@ val with_simulation_info :
     (Api.concrete_manager -> Api_types_j.simulation_info -> 'a Api.result Lwt.t) ->
   unit ->
   'a Api.result Lwt.t
+(** [eval_with_sim_manager_and_info ~label ~stopped ~initializing ~ready] evaluates the function in argument matching the current [simulation_state], applied to the [concrete_manager] of current project *)
 
-val when_ready :
+val eval_when_ready :
   label:string ->
   ?handler:(unit Api.result -> unit Lwt.t) ->
   (Api.concrete_manager -> unit Api.result Lwt.t) ->

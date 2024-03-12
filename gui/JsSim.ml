@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let onload _ =
+let onload (_ : 'a) : bool Js.t =
   let () = State_ui.onload () in
   let main = Ui_common.id_dom "main" in
   let () =
