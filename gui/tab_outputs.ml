@@ -13,8 +13,8 @@ let select_id = "output-select-id"
 let tab_is_active, set_tab_is_active = React.S.create false
 let current_file, set_current_file = React.S.create None
 
-let update_outputs key : unit =
-  State_simulation.when_ready ~label:__LOC__ (fun manager ->
+let update_outputs (key : string) : unit =
+  State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       manager#simulation_detail_file_line key
       >>= Api_common.result_bind_lwt ~ok:(fun lines ->
               let () = set_current_file (Some (key, lines)) in
@@ -28,17 +28,16 @@ let file_count state =
       .Api_types_t.simulation_output_file_lines
 
 let navli () = Ui_common.badge (fun state -> file_count state)
-let dont_gc_me = ref []
 
 let xml () =
-  let select file_line_ids =
-    let lines = React.S.value current_file in
+  let select (file_line_ids : string list) : [> Html_types.select ] Html.elt =
+    let lines : (string * string list) option = React.S.value current_file in
     let current_file_id : string =
       match file_line_ids, lines with
       | [], _ -> assert false
       | file :: _, None | _ :: _, Some (file, _) -> file
     in
-    let file_options =
+    let file_options : [> Html_types.selectoption ] Html.elt list =
       List.map
         (fun key ->
           Html.option
@@ -60,36 +59,37 @@ let xml () =
   let file_select =
     Tyxml_js.R.Html.div
       ~a:[ Html.a_class [ "list-group-item" ] ]
-      (let list, handle = ReactiveData.RList.create [] in
-       let () =
-         dont_gc_me :=
-           [
-             React.S.map
-               (fun _ ->
-                 State_simulation.when_ready ~label:__LOC__ (fun manager ->
-                     manager#simulation_catalog_file_line
-                     >>= Api_common.result_bind_lwt
-                           ~ok:(fun
-                               (file_line_ids : Api_types_j.file_line_catalog)
-                             ->
-                             let () =
-                               ReactiveData.RList.set handle
-                                 (match file_line_ids with
-                                 | [] -> []
-                                 | key :: [] ->
-                                   let () = update_outputs key in
-                                   [
-                                     Html.h4
-                                       [ Html.txt (Ui_common.option_label key) ];
-                                   ]
-                                 | _ :: _ :: _ -> [ select file_line_ids ])
-                             in
-                             Lwt.return (Result_util.ok ()))))
+      (ReactiveData.RList.from_event []
+         (Lwt_react.E.map_s
+            (fun _ ->
+              State_simulation.eval_with_sim_manager_and_info ~label:__LOC__
+                ~stopped:(fun _ -> Lwt.return (Result_util.ok []))
+                ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
+                ~ready:(fun manager _ ->
+                  manager#simulation_catalog_file_line
+                  >>= Api_common.result_bind_lwt
+                        ~ok:(fun
+                            (file_line_ids : Api_types_j.file_line_catalog) ->
+                          let select_file : [> `H4 | `Select ] Html.elt list =
+                            (* TODO: name *)
+                            match file_line_ids with
+                            | [] -> []
+                            | key :: [] ->
+                              let () = update_outputs key in
+                              [
+                                Html.h4
+                                  [ Html.txt (Ui_common.option_label key) ];
+                              ]
+                            | _ :: _ :: _ -> [ select file_line_ids ]
+                          in
+                          Lwt.return (Result_util.ok select_file)))
+                ()
+              >|= Result_util.fold
+                    ~ok:(fun x -> ReactiveData.RList.Set x)
+                    ~error:(fun _ -> ReactiveData.RList.Set []))
+            (React.S.changes
                (React.S.on tab_is_active State_simulation.dummy_model
-                  State_simulation.model);
-           ]
-       in
-       list)
+                  State_simulation.model))))
   in
   let file_content =
     [

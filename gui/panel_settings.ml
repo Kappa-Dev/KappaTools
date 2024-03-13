@@ -754,7 +754,7 @@ module RunningPanelLayout : Ui_common.Div = struct
         [
           Lwt_react.S.map_s
             (fun _ ->
-              State_simulation.with_simulation_info ~label:__LOC__
+              State_simulation.eval_with_sim_manager_and_info ~label:__LOC__
                 ~ready:(fun manager status ->
                   manager#simulation_efficiency
                   >>= Api_common.result_bind_lwt ~ok:(fun eff ->

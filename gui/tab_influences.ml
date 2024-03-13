@@ -190,7 +190,7 @@ let export_config =
             (fun filename ->
               Lwt.ignore_result
                 ( State_error.wrap "influence_map_export"
-                    (State_project.with_project ~label:__LOC__ (fun manager ->
+                    (State_project.eval_with_project ~label:__LOC__ (fun manager ->
                          let { accuracy; _ } = React.S.value model in
                          manager#get_influence_map_raw accuracy
                          >|= Result_util.map (fun influences_string ->
@@ -618,7 +618,7 @@ let neither_gc_me =
       | DrawTabular _ -> Lwt.return (Result_util.ok ())
       | DrawGraph { fwd; bwd; total } ->
         State_error.wrap ~append:true "influence_map"
-          (State_project.with_project ~label:__LOC__
+          (State_project.eval_with_project ~label:__LOC__
              (fun (manager : Api.concrete_manager) ->
                manager#get_local_influence_map ?fwd ?bwd ?origin ~total accuracy
                >|= Result_util.fold
@@ -656,7 +656,7 @@ let nor_gc_me =
     ~on:(React.S.Bool.( && ) tab_is_active track_cursor)
     (fun filename cursor_pos ->
       Some
-        (State_project.with_project ~label:__LOC__
+        (State_project.eval_with_project ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
              manager#get_influence_map_node_at ~filename cursor_pos
              >|= Result_util.map (fun origin' ->
@@ -742,7 +742,7 @@ let onload () =
     := Dom_html.full_handler (fun _ _ ->
            let _ =
              State_error.wrap "influence_map_recenter"
-               (State_project.with_project ~label:__LOC__
+               (State_project.eval_with_project ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
                     manager#get_initial_node
                     >|= Result_util.map (fun origin_refined ->
@@ -766,7 +766,7 @@ let onload () =
            let { origin; _ } = React.S.value model in
            let _ =
              State_error.wrap "influence_map_next_node"
-               (State_project.with_project ~label:__LOC__
+               (State_project.eval_with_project ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
                     manager#get_next_node origin
                     >|= Result_util.map (fun origin_refined ->
@@ -790,7 +790,7 @@ let onload () =
            let { origin; _ } = React.S.value model in
            let _ =
              State_error.wrap "influence_map_prev_node"
-               (State_project.with_project ~label:__LOC__
+               (State_project.eval_with_project ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
                     manager#get_previous_node origin
                     >|= Result_util.map (fun origin_refined ->

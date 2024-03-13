@@ -56,7 +56,9 @@ let spawn_process (configuration : process_configuration Js.t) :
     (Js.Unsafe.js_expr "spawnProcess")
     [| Js.Unsafe.inject configuration |]
 
-let launch_agent onClose message_delimiter command args handler =
+let launch_agent (onClose : unit -> unit) (message_delimiter : char)
+    (command : string) (args : string list) (handler : string -> unit) :
+    < kill : unit Js.meth ; write : Js.js_string Js.t -> unit Js.meth > Js.t =
   let buffer = Buffer.create 512 in
   let rec onStdout msg =
     match Tools.string_split_on_char message_delimiter (Js.to_string msg) with

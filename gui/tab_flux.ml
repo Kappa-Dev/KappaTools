@@ -26,7 +26,7 @@ let din_list =
                 in
                 ReactiveData.RList.Set out)
               ~error:(fun _ -> ReactiveData.RList.Set []))
-           (State_simulation.with_simulation_info ~label:__LOC__
+           (State_simulation.eval_with_sim_manager_and_info ~label:__LOC__
               ~stopped:(fun _ -> Lwt.return (Result_util.ok []))
               ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
               ~ready:(fun manager _ -> manager#simulation_catalog_din)
@@ -50,7 +50,7 @@ let din_data =
             (Lwt_react.E.from (fun () ->
                  Lwt.map
                    (Result_util.fold ~ok:(fun x -> x) ~error:(fun _ -> None))
-                   (State_simulation.with_simulation_info ~label:__LOC__
+                   (State_simulation.eval_with_sim_manager_and_info ~label:__LOC__
                       ~stopped:(fun _ -> Lwt.return (Result_util.ok None))
                       ~initializing:(fun _ -> Lwt.return (Result_util.ok None))
                       ~ready:(fun manager _ ->
@@ -126,7 +126,7 @@ let din =
 
 let export_current_din to_string mime filename =
   let din_id = Js.to_string (Tyxml_js.To_dom.of_select din_select)##.value in
-  State_simulation.when_ready ~label:__LOC__ (fun manager ->
+  State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       manager#simulation_detail_din din_id
       >>= Api_common.result_bind_lwt ~ok:(fun din ->
               let data = Js.string (to_string din) in

@@ -48,7 +48,7 @@ val init : string list -> unit Lwt.t
 val sync : unit -> unit Api.result Lwt.t
 (* to sync state of application with runtime *)
 
-val with_project :
+val eval_with_project :
   label:string ->
   (Api.concrete_manager -> 'a Api.result Lwt.t) ->
   'a Api.result Lwt.t

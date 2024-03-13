@@ -543,7 +543,7 @@ let init existing_projects : unit Lwt.t =
   in
   add_projects existing_projects >>= fun () -> add_projects projects
 
-let with_project :
+let eval_with_project :
       'a.
       label:string ->
       (Api.concrete_manager -> 'a Api.result Lwt.t) ->

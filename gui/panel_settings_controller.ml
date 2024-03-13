@@ -78,7 +78,7 @@ let focus_range (range : Loc.t) : unit =
       >>= fun _ -> Lwt.return_unit)
 
 let simulation_trace () =
-  State_simulation.when_ready ~label:__LOC__ (fun manager ->
+  State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       State_error.wrap __LOC__ manager#simulation_raw_trace
       >>= Api_common.result_bind_lwt ~ok:(fun data_string ->
               let data = Js.string data_string in
@@ -89,7 +89,7 @@ let simulation_trace () =
               Lwt.return (Result_util.ok ())))
 
 let simulation_outputs () =
-  State_simulation.when_ready ~label:__LOC__ (fun manager ->
+  State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       State_error.wrap __LOC__ manager#simulation_outputs_zip
       >>= Api_common.result_bind_lwt ~ok:(fun data_bigstring ->
               let data = Typed_array.Bigstring.to_arrayBuffer data_bigstring in

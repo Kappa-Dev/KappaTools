@@ -113,7 +113,7 @@ let lift_result = function
   | Result.Error e -> Api_common.result_error_msg e
 
 let do_update_compression_level () =
-  State_project.with_project ~label:"Config compression" (fun manager ->
+  State_project.eval_with_project ~label:"Config compression" (fun manager ->
       let causal = Js.to_bool none_box##.checked in
       let weak = Js.to_bool weak_box##.checked in
       let strong = Js.to_bool strong_box##.checked in
@@ -136,7 +136,7 @@ let set_a_story =
       let id = int_of_string va in
       if !pred_id <> id then (
         let () = pred_id := id in
-        State_project.with_project ~label:"Launch stories" (fun manager ->
+        State_project.eval_with_project ~label:"Launch stories" (fun manager ->
             match Mods.IntMap.find_option id manager#story_list with
             | None -> Lwt.return (Result_util.ok ())
             | Some (_cm, d, v) ->
@@ -169,7 +169,7 @@ let set_a_story =
     )
 
 let rec inspect_stories () =
-  State_project.with_project ~label:"Stories list" (fun manager ->
+  State_project.eval_with_project ~label:"Stories list" (fun manager ->
       let () =
         list_control
           (Mods.IntMap.fold
@@ -179,7 +179,7 @@ let rec inspect_stories () =
       let () = log_control manager#story_log in
       set_a_story ())
   >>= fun _ ->
-  State_project.with_project ~label:"Stories computing" (fun manager ->
+  State_project.eval_with_project ~label:"Stories computing" (fun manager ->
       Lwt.return (Result_util.ok manager#is_computing))
   >>= Result_util.fold
         ~ok:(fun b ->
@@ -218,7 +218,7 @@ let onload () =
     (Tyxml_js.To_dom.of_button launch_button)##.onclick
     := Dom_html.handler (fun _ ->
            let _ =
-             State_project.with_project ~label:"Launch stories" (fun manager ->
+             State_project.eval_with_project ~label:"Launch stories" (fun manager ->
                  if manager#story_is_computing then
                    Lwt.return (Result_util.ok ())
                  else

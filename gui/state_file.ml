@@ -62,7 +62,7 @@ let with_current_file f =
 let get_file () : (string * string) Api.result Lwt.t =
   with_current_file (fun _state active -> function
     | { local = None; name } ->
-      State_project.with_project ~label:"get_file" (fun manager ->
+      State_project.eval_with_project ~label:"get_file" (fun manager ->
           manager#file_get name
           >>= Api_common.result_bind_lwt ~ok:(fun (text, rank') ->
                   if active.rank = rank' then
@@ -109,7 +109,7 @@ let update_directory ~reset current catalog =
 
 let create_file ~(filename : string) ~(content : string) : unit Api.result Lwt.t
     =
-  State_project.with_project ~label:"create_file" (fun manager ->
+  State_project.eval_with_project ~label:"create_file" (fun manager ->
       manager#file_catalog
       >>= Api_common.result_bind_lwt ~ok:(fun catalog ->
               let matching_file =
@@ -162,7 +162,7 @@ let rec choose_file choice = function
 
 let select_file (filename : string) (line : int option) : unit Api.result Lwt.t
     =
-  State_project.with_project ~label:"select_file" (fun manager ->
+  State_project.eval_with_project ~label:"select_file" (fun manager ->
       manager#file_catalog
       >>= Api_common.result_bind_lwt ~ok:(fun catalog ->
               Api_common.result_bind_lwt
@@ -204,7 +204,7 @@ let set_content (content : string) : unit Api.result Lwt.t =
             directory = state.directory;
           }
       in
-      State_project.with_project ~label:"set_content" (fun manager ->
+      State_project.eval_with_project ~label:"set_content" (fun manager ->
           manager#file_update name content))
 
 let set_compile file_id (compile : bool) : unit Api.result Lwt.t =
@@ -221,7 +221,7 @@ let set_compile file_id (compile : bool) : unit Api.result Lwt.t =
         Mods.IntMap.add rank { local = None; name } state.directory
       in
       let () = set_directory_state { current = state.current; directory } in
-      State_project.with_project ~label:"set_compile" (fun manager ->
+      State_project.eval_with_project ~label:"set_compile" (fun manager ->
           manager#file_create rank name content)
     ) else
       Lwt.return (Result_util.ok ())
@@ -229,7 +229,7 @@ let set_compile file_id (compile : bool) : unit Api.result Lwt.t =
     if compile then
       Lwt.return (Result_util.ok ())
     else
-      State_project.with_project ~label:"set_compile" (fun manager ->
+      State_project.eval_with_project ~label:"set_compile" (fun manager ->
           manager#file_get name
           >>= Api_common.result_bind_lwt ~ok:(fun (content, rank') ->
                   if rank = rank' then (
@@ -241,7 +241,7 @@ let set_compile file_id (compile : bool) : unit Api.result Lwt.t =
                     let () =
                       set_directory_state { current = state.current; directory }
                     in
-                    State_project.with_project ~label:"set_compile'"
+                    State_project.eval_with_project ~label:"set_compile'"
                       (fun manager -> manager#file_delete name)
                   ) else (
                     let error_msg =
@@ -264,7 +264,7 @@ let remove_file () : unit Api.result Lwt.t =
       match local with
       | Some _ -> x
       | None ->
-        State_project.with_project ~label:"remove_file" (fun manager ->
+        State_project.eval_with_project ~label:"remove_file" (fun manager ->
             manager#file_delete name >>= fun y ->
             x >>= fun x -> Lwt.return (Api_common.result_combine [ x; y ])))
 
@@ -286,7 +286,7 @@ let do_a_move state file_id rank =
       | x -> x
     in
     if local = None then
-      State_project.with_project ~label:"remove_file" (fun manager ->
+      State_project.eval_with_project ~label:"remove_file" (fun manager ->
           manager#file_move rank file_id
           >>= Api_common.result_bind_lwt ~ok:(fun () ->
                   Lwt.return (Result_util.ok { current; directory })))
@@ -346,7 +346,7 @@ let out_of_sync out_of_sync =
       }
 
 let sync ?(reset = false) () : unit Api.result Lwt.t =
-  State_project.with_project ~label:"select_file" (fun manager ->
+  State_project.eval_with_project ~label:"select_file" (fun manager ->
       manager#file_catalog
       >>= Api_common.result_bind_lwt ~ok:(fun catalog ->
               let cand = (React.S.value model).current in

@@ -110,27 +110,29 @@ let render_snapshot_graph (snapshot_js : Js_snapshot.snapshot Js.t)
     snapshot_js##setData ~contact_map:(Js.string contact_map) (Js.string json)
   | Kappa -> ()
 
-let select_snapshot snapshot_js =
-  let index =
+let select_snapshot (snapshot_js : Js_snapshot.snapshot Js.t) : unit =
+  let index : int Js.opt =
     Js.Opt.bind
       (Ui_common.document##getElementById (Js.string select_id))
       (fun dom ->
         let snapshot_select_dom : Dom_html.inputElement Js.t =
           Js.Unsafe.coerce dom
         in
-        let fileindex = Js.to_string snapshot_select_dom##.value in
+        let fileindex : string = Js.to_string snapshot_select_dom##.value in
         try Js.some (int_of_string fileindex) with _ -> Js.null)
   in
   let () = Common.debug index in
-  let model = React.S.value State_simulation.model in
-  let simulation_output = State_simulation.model_simulation_info model in
+  let model : State_simulation.t = React.S.value State_simulation.model in
+  let simulation_output : Api_types_t.simulation_info option =
+    State_simulation.model_simulation_info model
+  in
   match simulation_output with
   | None -> ()
   | Some state ->
-    let index = Js.Opt.get index (fun _ -> 0) in
+    let index : int = Js.Opt.get index (fun _ -> 0) in
     if snapshot_count (Some state) > 0 then (
       let () =
-        State_simulation.when_ready ~label:__LOC__ (fun manager ->
+        State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
             manager#simulation_catalog_snapshot
             >>= Api_common.result_bind_lwt ~ok:(fun snapshot_ids ->
                     try
@@ -154,7 +156,8 @@ let select_snapshot snapshot_js =
       ()
     )
 
-let select (snapshots : Api_types_j.snapshot_id list) =
+let select (snapshots : Api_types_j.snapshot_id list) :
+    [> Html_types.selectoption ] Html.elt list =
   List.mapi
     (fun i snapshot_id ->
       Html.option
@@ -197,18 +200,17 @@ let xml () =
       (Lwt_react.E.map_s
          (fun _ ->
            let () = select_snapshot snapshot_js in
-           Lwt.map
-             (Result_util.fold
-                ~ok:(fun x -> ReactiveData.RList.Set x)
-                ~error:(fun _ -> ReactiveData.RList.Set []))
-             (State_simulation.with_simulation_info ~label:__LOC__
-                ~stopped:(fun _ -> Lwt.return (Result_util.ok []))
-                ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
-                ~ready:(fun manager _ ->
-                  manager#simulation_catalog_snapshot
-                  >>= Api_common.result_bind_lwt ~ok:(fun snapshot_ids ->
-                          Lwt.return (Result_util.ok (select snapshot_ids))))
-                ()))
+           State_simulation.eval_with_sim_manager_and_info ~label:__LOC__
+             ~stopped:(fun _ -> Lwt.return (Result_util.ok []))
+             ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
+             ~ready:(fun manager _ ->
+               manager#simulation_catalog_snapshot
+               >>= Api_common.result_bind_lwt ~ok:(fun snapshot_ids ->
+                       Lwt.return (Result_util.ok (select snapshot_ids))))
+             ()
+           >|= Result_util.fold
+                 ~ok:(fun x -> ReactiveData.RList.Set x)
+                 ~error:(fun _ -> ReactiveData.RList.Set []))
          (React.S.changes
             (React.S.on tab_is_active State_simulation.dummy_model
                State_simulation.model)))
