@@ -151,6 +151,7 @@ let annotate_dropped_agent ~warning ~syntax_version ~r_edit_style sigs
       (fun (lannot, pset) p ->
         let ((_, p_pos) as port_name) = p.Ast.port_name in
         let p_id = Signature.num_of_site ~agent_name port_name sign in
+        let _ = Format.printf "LKAPPA COMPILER 154: %i @." p_id in
         let () =
           match Signature.counter_of_site_id p_id sign with
           | Some _ -> LKappa.raise_counter_misused agent_name p.Ast.port_name
@@ -262,9 +263,17 @@ let annotate_dropped_agent ~warning ~syntax_version ~r_edit_style sigs
       ra_syntax = Some (Array.copy ports, Array.copy internals);
     }
   in
-  ( Counters_compiler.annotate_dropped_counters sign counts ra arity agent_name
-      None,
-    lannot )
+  let () = Format.printf "LKAPPA COMPILER 265 lannot @." in
+  let () =
+    Mods.IntMap.iter (fun i (a,b,_,_,_) ->
+      Format.printf "%i -> (%i,%i,,,) @." i a b) (fst lannot)
+  in
+  let () =
+    Mods.IntMap.iter (fun i (a,b,c) ->
+      Format.printf "%i -> (%i,%i,%s) @." i a b (if c then "TRUE" else "FALSE")) (snd lannot)
+  in
+  Counters_compiler.annotate_dropped_counters sign counts ra arity agent_name None lannot 
+
 
 let annotate_created_agent ~warning ~syntax_version ~r_edit_style sigs
     ?contact_map rannot ((agent_name, _) as ag_ty) intf =

@@ -47,8 +47,10 @@ val annotate_dropped_counters :
   LKappa.rule_agent ->
   int ->
   string ->
-  (int -> unit) option ->
-  LKappa.rule_agent with_agent_counters
+  (int -> unit) option -> (int * int * int option * Loc.t * LKappa.switching) Mods.IntMap.t *
+         (int * int * bool) Mods.IntMap.t ->
+  LKappa.rule_agent with_agent_counters * ((int * int * int option * Loc.t * LKappa.switching) Mods.IntMap.t *
+         (int * int * bool) Mods.IntMap.t)
 
 val annotate_edit_counters :
   Signature.s ->

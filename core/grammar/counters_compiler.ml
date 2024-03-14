@@ -889,11 +889,11 @@ let add_counter_to_contact_map sigs add_link_contact_map =
 let raise_if_modification (delta, loc) =
   if delta != 0 then LKappa.raise_if_modification loc (Some delta)
 
-let annotate_dropped_counters sign ast_counters ra arity agent_name aux =
+let annotate_dropped_counters sign ast_counters ra arity agent_name aux lannot =
   let ra_counters = Array.make arity None in
-  let _ =
+  let _, lannot =
     List.fold_left
-      (fun pset c ->
+      (fun (pset,lannot) c ->
         let port_name = c.Ast.counter_name in
         let p_id = Signature.num_of_site ~agent_name port_name sign in
         let () =
@@ -916,7 +916,7 @@ let annotate_dropped_counters sign ast_counters ra arity agent_name aux =
         pset')
       Mods.IntSet.empty ast_counters
   in
-  { agent = ra; counters = ra_counters }
+  { agent = ra; counters = ra_counters }, lannot
 
 let annotate_edit_counters sigs ((agent_name, _) as ag_ty) counters ra
     add_link_contact_map =
