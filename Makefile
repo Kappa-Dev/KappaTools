@@ -154,7 +154,7 @@ build-tests:
 
 # https://electronjs.org/docs/tutorial/application-distribution
 
-Kappapp.tar.gz:
+Kappapp:
 	+$(MAKE) clean
 	+$(MAKE) APP_EXT=local site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
@@ -166,8 +166,11 @@ Kappapp.tar.gz:
 	mv site Kappapp/resources/app
 	mkdir Kappapp/resources/bin
 	cp _build/install/default/bin/* Kappapp/resources/bin/
+
+Kappapp.tar.gz: Kappapp
 	tar czf $@ Kappapp
 	rm -r Kappapp
+
 
 KappaBin:
 	+$(MAKE) clean
