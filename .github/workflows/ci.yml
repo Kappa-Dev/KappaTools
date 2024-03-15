@@ -27,7 +27,7 @@ jobs:
             texlive-fonts-recommended texlive-pictures tex4ht \
             texlive-latex-extra
           opam depext --install --yes dune num yojson lwt fmt logs re \
-            odoc lwt_react tyxml-ppx js_of_ocaml-lwt \
+            odoc lwt_react tyxml-ppx js_of_ocaml-lwt=5.4.0 \
             js_of_ocaml-tyxml camlp-streams ${{ matrix.additional-packages }}
       - name: Make Kappa
         run: opam exec -- make all
@@ -91,7 +91,7 @@ jobs:
       - name: Install OPAM dependencies
         run: |
           opam install --yes dune num yojson result lwt fmt logs re \
-            lwt_react tyxml-ppx js_of_ocaml-lwt \
+            lwt_react tyxml-ppx js_of_ocaml-lwt=5.4.0 \
             js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
@@ -118,7 +118,7 @@ jobs:
       - name: Install OPAM dependencies
         run: |
           opam install --yes dune num yojson result lwt fmt logs re \
-            lwt_react tyxml-ppx js_of_ocaml-lwt \
+            lwt_react tyxml-ppx js_of_ocaml-lwt=5.4.0 \
             js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
@@ -151,7 +151,7 @@ jobs:
       - name: Install OPAM dependencies
         run: >
           opam install --yes dune num yojson result lwt fmt logs re
-          lwt_react tyxml-ppx js_of_ocaml-lwt
+          lwt_react tyxml-ppx js_of_ocaml-lwt=5.4.0
           js_of_ocaml-tyxml atdgen result
       - name: Make Kappa
         run: opam exec -- make all
