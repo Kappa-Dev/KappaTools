@@ -119,4 +119,7 @@
   -open
   Kappa_logging
   -open
-  Kappa_cflow))
+  Kappa_cflow
+  )
+ (js_of_ocaml (flags --disable globaldeadcode --disable deadcode))
+ )
