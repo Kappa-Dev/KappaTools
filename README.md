@@ -3,7 +3,7 @@ src="https://rawgithub.com/Kappa-Dev/KaSim/master/man/img/KaSim-Logo.svg"
 alt="KaSim logo" title="Stochastic Kappa Simulator" align="right" height="90"/>
 # KappaTools
 
-[![Build Status](https://api.travis-ci.com/Kappa-Dev/KappaTools.svg?branch=master)](https://travis-ci.com/Kappa-Dev/KappaTools)
+[![Build Status](https://github.com/Kappa-Dev/KappaTools/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Kappa-Dev/KappaTools/actions/workflows/ci.yml?query=branch%3Amaster)
 [![Join the chat at https://gitter.im/Kappa-Dev/KaSim](https://badges.gitter.im/Kappa-Dev/KaSim.svg)](https://gitter.im/Kappa-Dev/KaSim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 KaSim is a stochastic simulator for rule-based models written in Kappa. KaSa is

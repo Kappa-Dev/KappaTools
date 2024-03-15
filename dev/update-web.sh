@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# NOTE: below are references to travis, but travis is no longer responsible for te deploys but github actions
+
 set -e
 
 empty_or_create ()
