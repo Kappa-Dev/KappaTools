@@ -240,14 +240,10 @@ let outputs (simulation : t) = function
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.Warning (pos, msg) -> Data.print_warning ?pos simulation.log_form msg
   | Data.TraceStep st ->
-    let () =
-      Buffer.add_char simulation.trace
-        (if Buffer.length simulation.trace = 0 then
-           '['
-         else
-           ',')
-    in
-    Trace.write_step simulation.trace st
+    if Buffer.length simulation.trace <> 0 then (
+      let () = Buffer.add_char simulation.trace ',' in
+      Trace.write_step simulation.trace st
+    )
 
 let interactive_outputs formatter t = function
   | Data.Log s -> Format.fprintf formatter "%s@." s
@@ -558,7 +554,7 @@ let outputs ~(system_process : system_process) ~(t : t) :
 
 let efficiency t = Counter.get_efficiency t.counter
 
-let get_raw_trace t =
+let get_raw_trace (t : t) : string =
   JsonUtil.string_of_write
     (fun ob t ->
       let () = Buffer.add_char ob '{' in
@@ -586,7 +582,7 @@ let get_raw_trace t =
       let () = JsonUtil.write_comma ob in
       let () =
         JsonUtil.write_field "trace" Buffer.add_string ob
-          (Buffer.contents t.trace)
+          ("[" ^ Buffer.contents t.trace)
       in
       Buffer.add_string ob "]}")
     t
