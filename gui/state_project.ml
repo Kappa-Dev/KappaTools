@@ -208,7 +208,7 @@ let set_show_non_weakly_reversible_transitions
 let update_state me project_catalog default_parameters project_parameters =
   me.project_manager#project_parse ~patternSharing:Pattern.Compatible_patterns
     []
-  >>= fun out ->
+  >>=
   let () =
     set_state
       {
@@ -217,6 +217,15 @@ let update_state me project_catalog default_parameters project_parameters =
         default_parameters;
         project_parameters;
         project_version = 1;
+      }
+  in
+  fun out ->
+    let st = React.S.value state in
+    let () =
+      set_state
+      { st with
+        project_current = Some me;
+        project_version = (st.project_version + 1);
       }
   in
   Lwt.return out
