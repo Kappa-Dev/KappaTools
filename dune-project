@@ -18,10 +18,10 @@
   (synopsis "Public internals of the Kappa tool suite")
   (depends
    (ocaml ( >= 4.05.0 ))
-   num
-   re
    (yojson ( >= 2.0 ))
    (lwt ( >= 4.2.0 ))
+   num
+   re
    stdlib-shims
    fmt
    logs
@@ -34,11 +34,11 @@
   (name kappa-binaries)
   (synopsis "Command line interfaces of the Kappa tool suite")
   (depends
-   (ocaml ( >= 4.04.0 ))
-   num
-   re
+   (ocaml ( >= 4.05.0 ))
    (yojson ( >= 1.6.0 ))
    (lwt ( >= 4.2.0 ))
+   num
+   re
    fmt
    logs
    kappa-library
@@ -52,33 +52,57 @@
   (synopsis "Backends for an interactive use of the Kappa tool suite")
   (depends
    (ocaml ( >= 4.05.0 ))
+   (yojson ( >= 1.6.0 ))
+   (lwt (>= 4.2.0))
    num
    re
-   (yojson ( >= 1.6.0 ))
-   (lwt ( >= 4.2.0 ))
    fmt
    logs
-   kappa-library
    atdgen-runtime
    atdgen ; TODO: find a way to specify as build dependency only, as with the `build` package variable in opam
+   kappa-library
    )
 )
 
 (package
   (name kappa-server)
-  (synopsis "HTTP server to query the Kappa tool suite")
+  (synopsis "REST server for an interactive use of the Kappa tool suite")
   (depends
    (ocaml ( >= 4.05.0 ))
-   num
-   re
    (yojson ( >= 1.6.0 ))
    (lwt ( >= 4.2.0 ))
+   num
+   re
    fmt
    logs
+   cohttp-lwt-unix
    kappa-binaries
    kappa-agents
-   cohttp-lwt-unix
+   )
+  ; does not build executables as there seem to be no way to build js exes in a package
+)
+
+(package
+  (name kappa-webapp)
+  (synopsis "Browser app for an interactive use of the Kappa tool suite")
+  (depends
+   (ocaml ( >= 4.05.0 ))
+   (yojson ( >= 1.6.0 ))
+   (lwt ( >= 4.2.0 ))
+   num
+   re
+   fmt
+   logs
    atdgen-runtime
    atdgen ; TODO: find a way to specify as build dependency only, as with the `build` package variable in opam
+   lwt_react
+   tyxml-ppx
+   js_of_ocaml
+   js_of_ocaml-ppx
+   js_of_ocaml-lwt
+   js_of_ocaml-tyxml
+   kappa-binaries
+   kappa-agents
    )
+  ; does not build executables as there seem to be no way to build js exes in a package
 )

@@ -22,11 +22,11 @@ doc:
 bug-reports: "https://github.com/Kappa-Dev/KappaTools/issues"
 depends: [
   "dune" {>= "2.9"}
-  "ocaml" {>= "4.04.0"}
-  "num"
-  "re"
+  "ocaml" {>= "4.05.0"}
   "yojson" {>= "1.6.0"}
   "lwt" {>= "4.2.0"}
+  "num"
+  "re"
   "fmt"
   "logs"
   "kappa-library"
