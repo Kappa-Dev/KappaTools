@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
+<title>Output of 'KaSim' 'counters_create.ka' '-o' 'data.svg' '-d' 'output' '-seed' '322460359' '-l' '2' '--debug'</title>
+
+<style type="text/css" >
+<![CDATA[
+#legend text {text-anchor:end; baseline-shift:-.4em;}
+#axis_t text {text-anchor:middle; baseline-shift:-1em;}
+#axis_va text {text-anchor:end; baseline-shift:-.4em;}
+#axes {color:black;stroke:currentColor;stroke-size:1px;}
+#axes text {stroke:none;fill:currentColor;}
+]]>
+</style>
+
+<defs>
+<path id="plus" class="point" stroke="currentColor" d="M-3.5,0 h7 M0,-3.5 v7"/>
+<path id="cross" class="point" stroke="currentColor" d="M-3.5,-3.5 L3.5,3.5 M3.5,-3.5 L-3.5,3.5"/>
+<circle id="point" class="point" r="2.5" stroke="none" fill="currentColor"/>
+</defs>
+
+<g id="axes">
+<g id="axis_va">
+  <title>Observable values</title>
+  <path d="M 70,10 L 70,575"/>
+  <text x="62.000000" y="292.500000">0</text>
+  <line x1="65.000000" y1="292.500000" x2="75.000000" y2="292.500000"/>
+  <text x="62.000000" y="236.000000">0.222</text>
+  <line x1="65.000000" y1="236.000000" x2="75.000000" y2="236.000000"/>
+  <text x="62.000000" y="179.500000">0.444</text>
+  <line x1="65.000000" y1="179.500000" x2="75.000000" y2="179.500000"/>
+  <text x="62.000000" y="123.000000">0.667</text>
+  <line x1="65.000000" y1="123.000000" x2="75.000000" y2="123.000000"/>
+  <text x="62.000000" y="66.500000">0.889</text>
+  <line x1="65.000000" y1="66.500000" x2="75.000000" y2="66.500000"/>
+  <text x="62.000000" y="10.000000">1.11</text>
+  <line x1="65.000000" y1="10.000000" x2="75.000000" y2="10.000000"/>
+  <text x="62.000000" y="-46.500000">1.33</text>
+  <line x1="65.000000" y1="-46.500000" x2="75.000000" y2="-46.500000"/>
+  <text x="62.000000" y="-103.000000">1.56</text>
+  <line x1="65.000000" y1="-103.000000" x2="75.000000" y2="-103.000000"/>
+  <text x="62.000000" y="-159.500000">1.78</text>
+  <line x1="65.000000" y1="-159.500000" x2="75.000000" y2="-159.500000"/>
+  <text x="62.000000" y="-216.000000">2</text>
+  <line x1="65.000000" y1="-216.000000" x2="75.000000" y2="-216.000000"/>
+  </g>
+<g id="axis_t">
+  <title>Time (arbitrary unit)</title>
+  <path d="M 70,575 L 790,575"/>
+  <text x="70.000000" y="583.000000">0</text>
+  <line x1="70.000000" y1="570.000000" x2="70.000000" y2="580.000000"/>
+  <text x="135.454545" y="583.000000">0.182</text>
+  <line x1="135.454545" y1="570.000000" x2="135.454545" y2="580.000000"/>
+  <text x="200.909091" y="583.000000">0.364</text>
+  <line x1="200.909091" y1="570.000000" x2="200.909091" y2="580.000000"/>
+  <text x="266.363636" y="583.000000">0.545</text>
+  <line x1="266.363636" y1="570.000000" x2="266.363636" y2="580.000000"/>
+  <text x="331.818182" y="583.000000">0.727</text>
+  <line x1="331.818182" y1="570.000000" x2="331.818182" y2="580.000000"/>
+  <text x="397.272727" y="583.000000">0.909</text>
+  <line x1="397.272727" y1="570.000000" x2="397.272727" y2="580.000000"/>
+  <text x="462.727273" y="583.000000">1.09</text>
+  <line x1="462.727273" y1="570.000000" x2="462.727273" y2="580.000000"/>
+  <text x="528.181818" y="583.000000">1.27</text>
+  <line x1="528.181818" y1="570.000000" x2="528.181818" y2="580.000000"/>
+  <text x="593.636364" y="583.000000">1.45</text>
+  <line x1="593.636364" y1="570.000000" x2="593.636364" y2="580.000000"/>
+  <text x="659.090909" y="583.000000">1.64</text>
+  <line x1="659.090909" y1="570.000000" x2="659.090909" y2="580.000000"/>
+  <text x="724.545455" y="583.000000">1.82</text>
+  <line x1="724.545455" y1="570.000000" x2="724.545455" y2="580.000000"/>
+  <text x="790.000000" y="583.000000">2</text>
+  <line x1="790.000000" y1="570.000000" x2="790.000000" y2="580.000000"/>
+  </g>
+</g>
+
+<g id="legend">
+  
+  <text x="785" y="10">B</text>
+  <use xlink:href="#plus" style="color:blue" x="793" y="10"/>
+</g>
+
+<g id="data">
+<g id="data_0" style="color:blue">
+  <use xlink:href="#plus" x="790.000000" y="292.500000">
+  <title>B t=2 v=0</title></use>
+  <use xlink:href="#plus" x="430.000000" y="292.500000">
+  <title>B t=1 v=0</title></use>
+  <use xlink:href="#plus" x="70.000000" y="292.500000">
+  <title>B t=0 v=0</title></use>
+  </g>
+</g>
+
+</svg>

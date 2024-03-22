@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaSim -l 1 counters_smaller_than.ka -d output --compile || true
+
+# BUG

@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSim counters_deg.ka  -seed 322460359 || exit 0

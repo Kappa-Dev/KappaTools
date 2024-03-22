@@ -1,0 +1,25 @@
+Parsing counters_create.ka...
+done
++ simulation parameters
++ Sanity checks
+
+ast rules
+
+tick = . -> A(c{=0}) @ 1
+ = A(c__inverted{>=1/+=-1} c{>=0/+=1}), . -> A(c{+=1} c__inverted{+=-1}), B() @ 1+ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 13 (sub)observables 25 navigation steps
+	 -initial conditions
++ Building initial stateOn roots: 
+Rule A(c[1] c__inverted[3]), __counter_agent(a[1]), __counter_agent(a[3] b[4]), __counter_agent(a[4]), ., . -> A(c[2] c__inverted[4]), __counter_agent(a[1]), ., __counter_agent(a[4]), B(), __counter_agent(a[2] b[1]) has now 1 instances.
+ (13 agents)
+Done
++ Command line to rerun is: 'KaSim' 'counters_create.ka' '-o' 'data.svg' '-d' 'output' '-seed' '322460359' '-l' '2' '--debug'
+______________________________________________________________________
+######################################################################
+Simulation ended

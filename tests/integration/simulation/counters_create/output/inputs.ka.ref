@@ -1,0 +1,25 @@
+%def: "seed" "322460359"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.svg"
+
+
+%agent: A(c{=0/+=10} c__inverted{=0/+=10})
+%agent: B()
+
+%var:/*0*/ 'B' |B()|
+%plot: [T]
+%plot: B
+
+'tick' A(c{=0} c__inverted{=0})+ @ 1
+A(c{>=0/+=1} c__inverted{>=1/+=-1}), B()+ @ 1
+
+/*0*/%mod: (|A(c__inverted{=11})| = 1) do $PRINTF ""; $PRINTF "Counter c__inverted of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+/*1*/%mod: (|A(c{=11})| = 1) do $PRINTF ""; $PRINTF "Counter c of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+
+%init: 1 A(c{=0} c__inverted{=10})
+
+%mod: [E] = 0 do $STOP;
