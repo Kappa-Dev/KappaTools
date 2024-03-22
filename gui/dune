@@ -6,10 +6,13 @@
   (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w +a -open Js_of_ocaml))
 
+(rule (with-stdout-to js_of_ocaml_flags.Unix (echo "(:standard --disable globaldeadcode --disable deadcode)")))
+(rule (with-stdout-to js_of_ocaml_flags.Win32 (echo ":standard")))
+
 (executable
  (name KaSimWorker)
  (modes js)
- (js_of_ocaml (flags :standard --disable globaldeadcode --disable deadcode))
+ (js_of_ocaml (flags (:include js_of_ocaml_flags.%{os_type})))
  (modules KaSimWorker)
  (libraries kappa_js_lib kappa_json_api)
  (preprocess
@@ -28,7 +31,7 @@
 (executable
  (name KaSaWorker)
  (modes js)
- (js_of_ocaml (flags :standard --disable globaldeadcode --disable deadcode))
+ (js_of_ocaml (flags (:include js_of_ocaml_flags.%{os_type})))
  (modules KaSaWorker)
  (libraries kappa_js_lib kappa_kasa_export)
  (preprocess
@@ -47,7 +50,7 @@
 (executable
  (name KaStorWorker)
  (modes js)
- (js_of_ocaml (flags :standard --disable globaldeadcode --disable deadcode))
+ (js_of_ocaml (flags (:include js_of_ocaml_flags.%{os_type})))
  (modules KaStorWorker)
  (libraries kappa_js_lib kappa_cflow)
  (preprocess
@@ -66,7 +69,7 @@
 (executable
  (name KaMoHaWorker)
  (modes js)
- (js_of_ocaml (flags :standard --disable globaldeadcode --disable deadcode))
+ (js_of_ocaml (flags (:include js_of_ocaml_flags.%{os_type})))
  (modules KaMoHaWorker)
  (libraries kappa_js_lib kappa_grammar)
  (preprocess
@@ -76,7 +79,7 @@
 (executable
  (name JsSim)
  (modes js)
- (js_of_ocaml (flags :standard --disable globaldeadcode --disable deadcode))
+ (js_of_ocaml (flags (:include js_of_ocaml_flags.%{os_type})))
  (modules
   :standard
   \
