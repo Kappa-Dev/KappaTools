@@ -472,8 +472,13 @@ let make_counter_agent sigs (is_first, (dst, ra_erased)) (is_last, equal) i j
       ((LKappa.LNK_FREE, loc), LKappa.Maintained)
   in
   let before_switch =
-    if is_first && created then
-      LKappa.Linked i
+    if is_first then
+      if created then
+         LKappa.Linked i
+      else if ra_erased then
+         LKappa.Erased
+      else
+         LKappa.Maintained
     else
       LKappa.Maintained
   in
@@ -492,7 +497,14 @@ let make_counter_agent sigs (is_first, (dst, ra_erased)) (is_last, equal) i j
     else
       LKappa.LNK_VALUE (j, (ra_type, port_b)), loc
   in
-  let () = ra_ports.(port_a) <- after, LKappa.Maintained in
+  let () =
+    ra_ports.(port_a) <-
+      ( after,
+        if ra_erased then
+          LKappa.Erased
+        else
+          LKappa.Maintained )
+  in
   let ra_ints = Array.make counter_agent_info.arity LKappa.I_ANY in
   {
     LKappa.ra_type;
@@ -652,7 +664,10 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
 
   let switch : LKappa.switching =
     if delta = 0 then
-      LKappa.Maintained
+      if ra.LKappa.ra_erased then
+        LKappa.Erased
+      else
+        LKappa.Maintained
     else if delta > 0 then
       LKappa.Linked start_link_for_created
     else
