@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
+      matrix: # 2x2 versions ran here, with 2 different ocaml versions and with/without labltk
         ocaml-compiler:
           - 4.13.x
           - 4.14.x
@@ -26,9 +26,9 @@ jobs:
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht \
             texlive-latex-extra
-          opam depext --install --yes dune num yojson lwt fmt logs re \
-            odoc lwt_react tyxml-ppx js_of_ocaml-lwt \
-            js_of_ocaml-tyxml camlp-streams ${{ matrix.additional-packages }}
+          opam depext --install --yes dune odoc camlp-streams \
+            ${{ matrix.additional-packages }}
+          opam install --yes . --deps-only --locked
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make documentation
@@ -59,8 +59,8 @@ jobs:
           sudo apt-get install --yes gnuplot-nox \
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht
-          opam install --yes dune num yojson result lwt fmt logs re \
-            cohttp-lwt-unix atdgen
+          opam install --yes dune
+          opam install --yes . --deps-only --locked
           pip install nose
       - name: Make Kappa
         run: |
@@ -90,21 +90,24 @@ jobs:
             texlive-fonts-recommended texlive-pictures tex4ht
       - name: Install OPAM dependencies
         run: |
-          opam install --yes dune num yojson result lwt fmt logs re \
-            lwt_react tyxml-ppx js_of_ocaml-lwt \
-            js_of_ocaml-tyxml atdgen result
+          opam install --yes dune
+          opam install --yes . --deps-only --locked
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Javascript app
-        run: opam exec -- make Kappapp.tar.gz build/site/index.html
+        run: |
+          opam exec -- make Kappapp.tar.gz build/site/index.html
+          cp -r gui/viz .
+          mv build/Kappapp.tar.gz .
+          mv build/site .
       - name: Archive Javascript app
         uses: actions/upload-artifact@v3
         with:
           name: js
           path: |
-            build/site
+            site
             viz
-            build/Kappapp.tar.gz
+            Kappapp.tar.gz
 
   macos:
     runs-on: macos-latest
@@ -117,13 +120,16 @@ jobs:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
         run: |
-          opam install --yes dune num yojson result lwt fmt logs re \
-            lwt_react tyxml-ppx js_of_ocaml-lwt \
-            js_of_ocaml-tyxml atdgen result
+          opam install --yes dune
+          opam install --yes . --deps-only --locked
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make MacOS app
-        run: opam exec -- make Kappapp.app
+        run: |
+          opam exec -- make Kappapp.app
+          cp -r gui/viz .
+          mv build/Kappapp.app .
+          mv build/site .
       - name: Sign MacOS binaries
         run: |
           find Kappapp.app/Contents/ \( -name \*.app -or -name \*.framework \) \
@@ -135,9 +141,9 @@ jobs:
         with:
           name: macos
           path: |
-            build/site
+            site
             viz
-            build/Kappapp.app.zip
+            Kappapp.app.zip
 
   windows:
     runs-on: windows-latest
@@ -149,15 +155,17 @@ jobs:
         with:
           ocaml-compiler: 4.14.x
       - name: Install OPAM dependencies
-        run: >
-          opam install --yes dune num yojson result lwt fmt logs re
-          lwt_react tyxml-ppx js_of_ocaml-lwt
-          js_of_ocaml-tyxml atdgen result
+        run: |
+          # install unpinned deps as those pinned in .locked are not available
+          # Note: failure with $opam install --yes . --deps-only
+          # TODO: specific library pin for windows build (few updates on windows, so low priority)
+          opam install --yes dune num yojson result lwt fmt logs re lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen result cohttp-lwt-unix
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Windows app
         run: |
           opam exec -- make KappaBin
+          mv build/KappaBin .
           7z a -tzip KappaBin.zip KappaBin
         # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
       - name: Archive Windows app
