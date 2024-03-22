@@ -22,12 +22,12 @@
    (lwt ( >= 4.2.0 ))
    num
    re
-   stdlib-shims
    fmt
    logs
+   stdlib-shims
    result
+   ; If adding unpinned libs: consider pinning them in binaries below
    )
-   ; no need to declare dependancies in `dune` files: generated automatically
 )
 
 (package

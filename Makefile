@@ -153,7 +153,6 @@ build-tests:
 
 build/Kappapp:
 	mkdir -p build/Kappapp
-	+$(MAKE) clean
 	+$(MAKE) APP_EXT=local build/site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	FILE=$$(mktemp -t electronXXXX); \
@@ -164,7 +163,10 @@ build/Kappapp:
 	mkdir build/Kappapp/resources/bin
 	cp _build/install/default/bin/* build/Kappapp/resources/bin/
 
-Kappapp: build/Kappapp
+Kappapp:
+	# make clean before to be sure things are rebuilt   TODO improve?
+	+$(MAKE) clean
+	+$(MAKE) build/Kappapp
 
 build/Kappapp.tar.gz: build/Kappapp
 	tar czf $@ build/Kappapp
@@ -174,7 +176,6 @@ Kappapp.tar.gz: build/Kappapp.tar.gz
 
 build/KappaBin:
 	mkdir -p build/KappaBin
-	+$(MAKE) clean
 	+$(MAKE) APP_EXT=local build/site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	FILE=$$(mktemp -t electronXXXX); \
@@ -192,7 +193,10 @@ build/KappaBin:
 	cp _build/default/core/agents/KaSimAgent.exe build/KappaBin/resources/bin/
 	cp _build/default/core/agents/KaSaAgent.exe build/KappaBin/resources/bin/
 
-KappaBin: build/KappaBin
+KappaBin:
+	# make clean before to be sure things are rebuilt   TODO improve?
+	+$(MAKE) clean
+	+$(MAKE) build/KappaBin
 
 build/KappaBin.zip: build/KappaBin
 	zip -y -r $@ build/KappaBin
@@ -201,7 +205,7 @@ build/KappaBin.zip: build/KappaBin
 KappaBin.zip: build/KappaBin.zip
 
 build/Kappapp.app: build/Info.plist build/Kappa.icns
-	+$(MAKE) clean
+	# do not call make clean here or deps will be erased
 	+$(MAKE) APP_EXT=local build/site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	+$(MAKE) build/Kappa.icns build/Info.plist
@@ -215,7 +219,10 @@ build/Kappapp.app: build/Info.plist build/Kappa.icns
 	mv build/Kappa.icns $@/Contents/Resources/
 	mv build/Info.plist $@/Contents/
 
-Kappapp.app: build/Kappapp.app
+Kappapp.app:
+	# make clean before to be sure things are rebuilt   TODO improve?
+	+$(MAKE) clean
+	+$(MAKE) build/Kappapp.app
 
 build/Info.plist: gui/Info.plist.skel $(wildcard .git/refs/heads/*)
 	mkdir -p build
@@ -236,6 +243,6 @@ build/Kappa.iconset: gui/Kappa-Logo.png
 	sips -z 512 512   $< --out $@/icon_512x512.png
 	cp $< $@/icon_512x512@2x.png
 
-build/Kappa.icns: gui/Kappa.iconset
+build/Kappa.icns: build/Kappa.iconset
 	mkdir -p build
 	iconutil -c icns $<
