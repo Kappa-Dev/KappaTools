@@ -16,7 +16,7 @@
 ; Generate resource_strings.ml with the content of some files
 (rule
  (targets resource_strings.ml)
- (deps ../../dev/load_files_into_ocaml_string_vars.sh ../../shared/flux.js ../../viz/common.js)
+ (deps ../../dev/load_files_into_ocaml_string_vars.sh ../../gui/shared/flux.js ../../gui/viz/common.js)
  (action
   (with-stdout-to
    %{targets}

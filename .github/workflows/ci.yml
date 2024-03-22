@@ -96,15 +96,15 @@ jobs:
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Javascript app
-        run: opam exec -- make Kappapp.tar.gz site/index.html
+        run: opam exec -- make Kappapp.tar.gz build/site/index.html
       - name: Archive Javascript app
         uses: actions/upload-artifact@v3
         with:
           name: js
           path: |
-            site
+            build/site
             viz
-            Kappapp.tar.gz
+            build/Kappapp.tar.gz
 
   macos:
     runs-on: macos-latest
@@ -135,9 +135,9 @@ jobs:
         with:
           name: macos
           path: |
-            site
+            build/site
             viz
-            Kappapp.app.zip
+            build/Kappapp.app.zip
 
   windows:
     runs-on: windows-latest

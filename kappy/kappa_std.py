@@ -12,14 +12,19 @@ import os
 from io import DEFAULT_BUFFER_SIZE
 
 from .kappa_common import KappaError, PlotLimit, FileMetadata, File, \
-                               KappaApi, KASIM_DIR, KAPPY_DIR
+    KappaApi, KASIM_DIR, KAPPY_DIR
 
 from .kappa_graph import KappaSnapshot
 
+
 def find_agent_bin():
+    potential_dirs = []
+    for base_dir in [KAPPY_DIR, KASIM_DIR]:
+        for dune_build_dir in ['', '_build/install/default', '_build/default']:
+            potential_dirs.append(os.path.join(base_dir, dune_build_dir))
     agent_names = ['KappaSwitchman']
     bin_dir = None
-    for potential_dir in [KAPPY_DIR, KASIM_DIR]:
+    for potential_dir in potential_dirs:
         bin_dir = os.path.join(potential_dir, 'bin')
         if not os.path.exists(bin_dir):
             continue
@@ -30,6 +35,7 @@ def find_agent_bin():
 
 
 BIN_DIR = find_agent_bin()
+
 
 @KappaApi._fix_docs
 class KappaStd(KappaApi):
@@ -44,6 +50,7 @@ class KappaStd(KappaApi):
     args -- arguments to pass to kappa executables
 
     """
+
     def __init__(self, kappa_bin_path=None, delimiter='\x1e', args=None):
         self.delimiter = delimiter
         if kappa_bin_path is None:
@@ -53,8 +60,8 @@ class KappaStd(KappaApi):
                 raise KappaError("Kappa binaries not found.")
             kappa_bin_path = BIN_DIR
         switch_args = [os.path.join(kappa_bin_path, "KappaSwitchman"),
-                    "--delimiter",
-                    "\\x{:02x}".format(ord(self.delimiter)) ]
+                       "--delimiter",
+                       "\\x{:02x}".format(ord(self.delimiter))]
         if args:
             switch_args = switch_args + args
         self.lock = threading.Lock()
@@ -86,26 +93,27 @@ class KappaStd(KappaApi):
             buff.extend(c)
             c = agent_to_read.stdout.read1(DEFAULT_BUFFER_SIZE)
         # strip the end character
-        if c: buff.extend(c[0:-1])
+        if c:
+            buff.extend(c[0:-1])
         return buff
 
     def _dispatch(self, data):
         try:
             self.lock.acquire()
             message_id = self._get_message_id()
-            message = [ message_id, data]
+            message = [message_id, data]
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.switch_agent.stdin.write(message.encode('utf-8'))
             self.switch_agent.stdin.flush()
             buff = self._read_stdout(self.switch_agent)
             response = json.loads(buff.decode('utf-8'))
-            if isinstance(response,str):
+            if isinstance(response, str):
                 raise KappaError(response)
             elif response[0] != message_id:
                 raise KappaError(
-                        "expect id {0} got {1}".format(response[0],
-                                                       message_id)
-                        )
+                    "expect id {0} got {1}".format(response[0],
+                                                   message_id)
+                )
             else:
                 return self.projection(response[1])
 
@@ -134,22 +142,23 @@ class KappaStd(KappaApi):
 
     # Standardized API methods. Docs are provided by parent.
 
-    def project_parse(self, sharing_level = "compatible_patterns", **kwargs):
+    def project_parse(self, sharing_level="compatible_patterns", **kwargs):
         overwrites = list(kwargs.items())
-        self._dispatch(["ProjectParse",sharing_level,overwrites])
+        self._dispatch(["ProjectParse", sharing_level, overwrites])
 
     def project_overwrite(self, ast, file_id="model.ka"):
-        self._dispatch(["ProjectOverwrite",file_id,ast])
+        self._dispatch(["ProjectOverwrite", file_id, ast])
 
     def file_create(self, file_):
-        return self._dispatch(["FileCreate", file_.get_position(), file_.get_id(), file_.get_content()])
+        return self._dispatch(
+            ["FileCreate", file_.get_position(), file_.get_id(), file_.get_content()])
 
     def file_delete(self, file_id):
         return self._dispatch(["FileDelete", file_id])
 
     def file_get(self, file_id):
         f = self._dispatch(["FileGet", file_id])
-        return File(FileMetadata(file_id,f[1]),f[0])
+        return File(FileMetadata(file_id, f[1]), f[0])
 
     def file_info(self):
         info = self._dispatch(["FileCatalog"])
@@ -220,5 +229,6 @@ class KappaStd(KappaApi):
         cmd = ["INFLUENCE_MAP", accuracy]
         return self._dispatch(cmd)
 
-    def analyses_potential_polymers(self, accuracy_cm="high", accuracy_scc="high"):
-        return self._dispatch(["POLYMERS",accuracy_cm, accuracy_scc])
+    def analyses_potential_polymers(
+            self, accuracy_cm="high", accuracy_scc="high"):
+        return self._dispatch(["POLYMERS", accuracy_cm, accuracy_scc])
