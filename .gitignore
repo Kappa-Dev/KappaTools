@@ -1,3 +1,4 @@
+build
 js/external
 todo.org
 *~
@@ -7,12 +8,7 @@ bin
 .merlin
 ._d/
 ._ncdi/
-Kappapp.app
 
-#server
-ide/Kappa.icns
-ide/Kappa.iconset/
-ide/Info.plist
 
 # doc
 *.log
@@ -84,7 +80,6 @@ tests/integration/*/*/output/network.net
 tests/integration/*/*/output/data_2.csv
 
 # generated code
-site
 *.install
 
 # python
