@@ -31,7 +31,7 @@ case $1 in
         ;;
     js )
         empty_or_create ${PLAYGROUND}/try
-        cp build/site/* ${PLAYGROUND}/try/
+        cp site/* ${PLAYGROUND}/try/
 	sed '/<\/head>/i \
 	<!-- Piwik -->\
 	<!--<script type="text/javascript">\
@@ -48,7 +48,7 @@ case $1 in
 	</script>\
 	<noscript><p><img src="https://coutosuisse.fagny.fr/analytics/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>-->\
 	<!-- End Piwik Code -->\
-        ' build/site/index.html > ${PLAYGROUND}/try/index.html
+        ' site/index.html > ${PLAYGROUND}/try/index.html
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         empty_or_create ${PLAYGROUND}/viz
@@ -56,7 +56,7 @@ case $1 in
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/viz travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
-        cp build/Kappapp.tar.gz ${PLAYGROUND}/binaries/
+        cp Kappapp.tar.gz ${PLAYGROUND}/binaries/
         scp ${PLAYGROUND}/binaries/Kappapp.tar.gz \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
         ;;
@@ -66,13 +66,13 @@ case $1 in
         ;;
     windows )
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
-        cp build/KappaBin.zip ${PLAYGROUND}/binaries/
+        cp KappaBin.zip ${PLAYGROUND}/binaries/
         scp ${PLAYGROUND}/binaries/KappaBin.zip \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
         ;;
     MacOS )
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
-        cp build/Kappapp.app.zip ${PLAYGROUND}/binaries/
+        cp Kappapp.app.zip ${PLAYGROUND}/binaries/
         scp ${PLAYGROUND}/binaries/Kappapp.app.zip \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
         ;;
