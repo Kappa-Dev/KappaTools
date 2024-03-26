@@ -159,7 +159,7 @@ build/Kappapp:
 	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-linux-x64.zip && \
 	unzip $$FILE -d build/Kappapp
 	mv build/Kappapp/electron build/Kappapp/kappapp
-	cp -r build/site build/Kappapp/resources/app
+	mv build/site build/Kappapp/resources/app
 	mkdir build/Kappapp/resources/bin
 	cp _build/install/default/bin/* build/Kappapp/resources/bin/
 
@@ -181,7 +181,7 @@ build/KappaBin:
 	FILE=$$(mktemp -t electronXXXX); \
 	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
 	unzip $$FILE -d build/KappaBin
-	cp -r build/site build/KappaBin/resources/app
+	mv build/site build/KappaBin/resources/app
 	mv build/KappaBin/electron.exe build/KappaBin/Kappapp.exe
 	mkdir build/KappaBin/resources/bin
 	cp _build/default/core/main/KaSim.exe build/KappaBin/resources/bin/
@@ -215,7 +215,7 @@ build/Kappapp.app: build/Info.plist build/Kappa.icns
 	rm -r $@/Contents/Resources/*.lproj/
 	mkdir $@/Contents/Resources/bin
 	cp _build/install/default/bin/* $@/Contents/Resources/bin/
-	cp -r build/site $@/Contents/Resources/app/
+	mv build/site $@/Contents/Resources/app/
 	mv build/Kappa.icns $@/Contents/Resources/
 	mv build/Info.plist $@/Contents/
 

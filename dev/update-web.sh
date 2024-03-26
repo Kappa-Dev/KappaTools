@@ -52,7 +52,7 @@ case $1 in
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         empty_or_create ${PLAYGROUND}/viz
-        cp gui/viz/* ${PLAYGROUND}/viz/
+        cp viz/* ${PLAYGROUND}/viz/
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/viz travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
