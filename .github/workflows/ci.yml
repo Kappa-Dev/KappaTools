@@ -14,7 +14,7 @@ jobs:
           - labltk
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
@@ -36,7 +36,7 @@ jobs:
       - name: Make check
         run: opam exec -- make --jobs=2 check
       - name: Archive documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: matrix.ocaml-compiler == '4.14.x' && matrix.additional-packages == ''
         with:
           name: doc
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
@@ -77,7 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
@@ -101,7 +101,7 @@ jobs:
           mv build/Kappapp.tar.gz .
           mv build/site .
       - name: Archive Javascript app
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: js
           path: |
@@ -113,7 +113,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
@@ -137,7 +137,7 @@ jobs:
           codesign -s - Kappapp.app
           zip -y -r Kappapp.app.zip Kappapp.app
       - name: Archive MacOS app
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos
           path: |
@@ -149,7 +149,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
@@ -169,7 +169,7 @@ jobs:
           7z a -tzip KappaBin.zip KappaBin
         # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
       - name: Archive Windows app
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows
           path: |
@@ -181,9 +181,9 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download doc artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: doc
       - name: Install SSH Key
@@ -199,9 +199,9 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download js artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: js
       - name: Install SSH Key
@@ -217,9 +217,9 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download MacOS artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: macos
       - name: Install SSH Key
@@ -235,9 +235,9 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download Windows artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: windows
       - name: Install SSH Key
