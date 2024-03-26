@@ -10,9 +10,10 @@ from os import path
 from requests import exceptions, request
 
 from .kappa_common import KappaError, PlotLimit, KappaApi, File, \
-                               FileMetadata
+    FileMetadata
 
 from .kappa_graph import KappaSnapshot
+
 
 @KappaApi._fix_docs
 class KappaRest(KappaApi):
@@ -24,6 +25,7 @@ class KappaRest(KappaApi):
     endpoint -- The url to the kappa server.
     project_id -- An identifier for this particular project.
     """
+
     def __init__(self, endpoint, project_id=None):
         self.url = "{0}/v2".format(endpoint)
         if project_id is None:
@@ -121,21 +123,22 @@ class KappaRest(KappaApi):
     # Standardized API methods. Docs are provided by parent.
 
     def project_parse(self, sharing_level="compatible_patterns", **kwargs):
-        overwrites = '&'.join('%s=%s' % (key, value) for (key, value) in kwargs.items())
+        overwrites = '&'.join('%s=%s' % (key, value)
+                              for (key, value) in kwargs.items())
         return self._post(self.in_project('parse', '?'.join([sharing_level, overwrites])))
 
     def project_overwrite(self, ast, file_id="model.ka"):
-        return self._post(self.in_project('overwrite',file_id),ast)
+        return self._post(self.in_project('overwrite', file_id), ast)
 
     def file_create(self, file_):
-        return self._put(self.in_project('files', file_.get_id(),'position',  str(file_.get_position())), file_.get_content())
+        return self._put(self.in_project('files', file_.get_id(), 'position',  str(file_.get_position())), file_.get_content())
 
     def file_delete(self, file_id):
         return self._delete(self.in_project('files', file_id))
 
     def file_get(self, file_id):
         f = self._get(self.in_project('files', file_id))
-        return File(FileMetadata(file_id,f[1]),f[0])
+        return File(FileMetadata(file_id, f[1]), f[0])
 
     def file_info(self):
         info = self._get(self.in_project('files'))
@@ -173,7 +176,7 @@ class KappaRest(KappaApi):
 
     def simulation_snapshot(self, snapshot_id):
         return KappaSnapshot.from_JSONDecoder(
-            self._get(self.in_project('simulation', 'snapshots',snapshot_id))
+            self._get(self.in_project('simulation', 'snapshots', snapshot_id))
         )
 
     def simulation_delete(self):
