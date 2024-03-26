@@ -148,8 +148,8 @@ class SimulationParameter(object):
 
     """
 
-    def __init__(self, plot_period : float, pause_condition : str,
-                 seed : int = None, store_trace : bool =False):
+    def __init__(self, plot_period: float, pause_condition: str,
+                 seed: int = None, store_trace: bool = False):
         self.plot_period = plot_period
         self.pause_condition = pause_condition
         self.seed = seed
@@ -199,6 +199,7 @@ class PlotLimit(object):
 
 class KappaError(Exception):
     """ Error returned from the Kappa server"""
+
     def __init__(self, errors):
         Exception.__init__(self, errors)
         self.errors = errors
@@ -206,6 +207,7 @@ class KappaError(Exception):
 
 class KappaApi(ABC):
     """General api for a kappa interface."""
+
     def __init__(self):
         self.__default_param = None
         return
@@ -388,7 +390,7 @@ class KappaApi(ABC):
         """
 
     @abc.abstractmethod
-    def simulation_snapshot(self, snapshot_id: str) -> KappaSnapshot :
+    def simulation_snapshot(self, snapshot_id: str) -> KappaSnapshot:
         """Returns a given generated snapshot
 
         """
