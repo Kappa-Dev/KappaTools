@@ -127,9 +127,7 @@ jobs:
       - name: Make MacOS app
         run: |
           opam exec -- make Kappapp.app
-          cp -r gui/viz .
           mv build/Kappapp.app .
-          mv build/site .
       - name: Sign MacOS binaries
         run: |
           find Kappapp.app/Contents/ \( -name \*.app -or -name \*.framework \) \
@@ -141,8 +139,6 @@ jobs:
         with:
           name: macos
           path: |
-            site
-            viz
             Kappapp.app.zip
 
   windows:
