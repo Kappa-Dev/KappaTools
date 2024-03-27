@@ -1,5 +1,5 @@
 _____(1)
-A(c{=0} c__inverted{=0})+
+A(c{=0} c__inverted{=7})+
 _____(1)
 A(c{>=0/+=1} c__inverted{>=1/+=-1})
 _____(1)
@@ -11,7 +11,7 @@ Environment:
   %agent: A(c{=0/+=7} c__inverted{=0/+=7})
   
   %plot: [T]
-  A(c{=0} c__inverted{=0})+ @ 1
+  A(c{=0} c__inverted{=7})+ @ 1
   A(c{>=0/+=1} c__inverted{>=1/+=-1}) @ 1
   
   /*0*/%mod: (|A(c__inverted{=8})| = 1) do $PRINTF ""; $PRINTF "Counter c__inverted of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
@@ -22,7 +22,21 @@ Environment:
          __counter_agent/*ν 1*/.a = A/*ν 0*/.c,
          __counter_agent/*ν 1*/.b = ⊥, __counter_agent/*ν 2*/,
          __counter_agent/*ν 2*/.a = A/*ν 0*/.c__inverted,
-         __counter_agent/*ν 2*/.b = ⊥
+         __counter_agent/*ν 3*/,
+         __counter_agent/*ν 3*/.a = __counter_agent/*ν 2*/.b,
+         __counter_agent/*ν 4*/,
+         __counter_agent/*ν 4*/.a = __counter_agent/*ν 3*/.b,
+         __counter_agent/*ν 5*/,
+         __counter_agent/*ν 5*/.a = __counter_agent/*ν 4*/.b,
+         __counter_agent/*ν 6*/,
+         __counter_agent/*ν 6*/.a = __counter_agent/*ν 5*/.b,
+         __counter_agent/*ν 7*/,
+         __counter_agent/*ν 7*/.a = __counter_agent/*ν 6*/.b,
+         __counter_agent/*ν 8*/,
+         __counter_agent/*ν 8*/.a = __counter_agent/*ν 7*/.b,
+         __counter_agent/*ν 9*/,
+         __counter_agent/*ν 9*/.a = __counter_agent/*ν 8*/.b,
+         __counter_agent/*ν 9*/.b = ⊥
       @1
     1: (ast: 2) 0: /*cc1*/ A/*1*/(c{=0} c__inverted{=1})
       -- __counter_agent/*4*//*0*/.a = A/*1*//*0*/.c,

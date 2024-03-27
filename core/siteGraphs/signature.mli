@@ -91,6 +91,9 @@ val get_counter_agent_info : s -> counter_agent_info
 val inverted_counter_suffix : string
 (** Suffix added to counter names to make an inverted counter name when needed for a <= test *)
 
+val is_inverted_counter : string -> bool
+(** Tests if a counter is a inverted counter, and should be hidden from the user *)
+
 (** {2 I/O} *)
 
 val print_agent : s -> Format.formatter -> int -> unit
