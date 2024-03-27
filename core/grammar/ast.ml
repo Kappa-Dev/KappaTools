@@ -295,8 +295,8 @@ let counter_test_of_json = function
   | `Assoc [ ("val", `Int x); ("test", `String "gte") ]
   | `Assoc [ ("test", `String "gte"); ("val", `Int x) ] ->
     CGTE x
-  | `Assoc [ ("val", `Int x); ("test", `String "gle") ]
-  | `Assoc [ ("test", `String "gle"); ("val", `Int x) ] ->
+  | `Assoc [ ("val", `Int x); ("test", `String "lte") ]
+  | `Assoc [ ("test", `String "lte"); ("val", `Int x) ] ->
     CLTE x
   | `Assoc [ ("test", `String "eq"); ("val", `String x) ]
   | `Assoc [ ("val", `String x); ("test", `String "eq") ] ->

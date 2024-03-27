@@ -257,7 +257,7 @@ let translate_counter_test test =
   | Ast.CEQ i -> Ckappa_sig.CEQ i
   | Ast.CGTE i -> Ckappa_sig.CGTE i
   | Ast.CVAR x -> Ckappa_sig.CVAR x
-  | Ast.CLTE _i -> failwith "CLTE not yet implemented" (* TODO *)
+  | Ast.CLTE _i -> Ckappa_sig.UNKNOWN (* TODO: integrate this in kasa?*)
 
 let fst_opt a_opt =
   match a_opt with
