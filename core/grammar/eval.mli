@@ -61,7 +61,7 @@ val compile :
   Signature.s ->
   unit NamedDecls.t ->
   Contact_map.t ->
-  ('c, LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.compil ->
+  ('c, 'd, LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.compil ->
   'b
 
 val build_initial_state :

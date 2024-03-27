@@ -43,6 +43,7 @@ type separating_transitions = Public_data.separating_transitions
 
 type refined_compilation =
   ( Ckappa_sig.agent,
+    Ckappa_sig.agent_sig,
     Ckappa_sig.mixture,
     Ckappa_sig.mixture,
     string,

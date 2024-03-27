@@ -185,7 +185,7 @@ let translate_agent_sig parameters error handler agent
         let error, (bool, output) =
           Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
             Ckappa_sig.compare_unit_site_name
-            (Ckappa_sig.Counter counter.Ckappa_sig.counter_name) ()
+            (Ckappa_sig.Counter counter.Ckappa_sig.counter_sig_name) ()
             Misc_sa.const_unit site_dic
         in
         let error, counter_name =
@@ -194,19 +194,12 @@ let translate_agent_sig parameters error handler agent
             Exception.warn parameters error __POS__
               ~message:
                 (agent.Ckappa_sig.agent_name ^ " "
-               ^ counter.Ckappa_sig.counter_name)
+               ^ counter.Ckappa_sig.counter_sig_name)
               Exit Ckappa_sig.dummy_site_name
           | _, Some (i, _, _, _) -> error, i
         in
         let (error', c_interface), test =
-          let test =
-            match counter.Ckappa_sig.counter_test with
-            | Some (Ckappa_sig.CEQ i) -> [ Ckappa_sig.state_index_of_int i ]
-            | Some (Ckappa_sig.CGTE _)
-            | Some (Ckappa_sig.CVAR _)
-            | Some Ckappa_sig.UNKNOWN
-            | None ->
-              []
+          let test = [ Ckappa_sig.state_index_of_int counter.Ckappa_sig.counter_sig_default ]
           in
           ( Ckappa_sig.Site_map_and_set.Map.add parameters error counter_name
               {
@@ -2221,12 +2214,12 @@ let translate_c_compil parameters error handler compil =
     List.fold_left
       (fun (error, list, map) agent ->
         let error, ag, map =
-          translate_agent_sig parameters error handler agent
+          translate_agent_sig parameters error handler (agent:Ckappa_sig.agent_sig)
             Ckappa_sig.dummy_agent_id map
         in
         error, ag :: list, map)
       (error, [], Ckappa_sig.AgentSite_map_and_set.Map.empty)
-      compil.Ast.signatures
+      (compil.Ast.signatures:Ckappa_sig.agent_sig list)
   in
   let error, c_variables =
     List.fold_left

@@ -6,11 +6,17 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type counter_info =
+  {
+    counter_info_min: int option;
+    counter_info_max: int option;
+    counter_default_value: int
+  }
+
 type 'links site_sig = {
   internal_state: unit NamedDecls.t;
   links: 'links option;
-  counters_info: (int * int) option;
-      (** If relevant: counter CEQ value * counter delta *)
+  counters_info: counter_info option;
 }
 
 type t = bool array array site_sig NamedDecls.t
@@ -86,7 +92,7 @@ let one_to_json =
               signature.links );
           ( "counters_info",
             JsonUtil.of_option
-              (fun (c1, c2) -> `List [ `Int c1; `Int c2 ])
+              (fun c -> `Assoc [ "min", JsonUtil.of_option (fun x -> `Int x) c.counter_info_min; "max", JsonUtil.of_option (fun x -> `Int x) c.counter_info_max; "default", `Int c.counter_default_value;])
               signature.counters_info );
         ])
 
@@ -131,7 +137,24 @@ let one_of_json : Yojson.Basic.t -> bool array array site_sig NamedDecls.t =
         counters_info =
           Yojson.Basic.Util.to_option
             (function
-              | `List [ `Int c1; `Int c2 ] -> c1, c2
+              | `Assoc [ "min", c1_opt; "max", c2_opt; "default", `Int c3] ->
+                {
+                  counter_info_min = Yojson.Basic.Util.to_option
+                                (function
+                                  | `Int c -> c
+                                  | x ->
+                                    raise
+                                      (Yojson.Basic.Util.Type_error
+                                         ("Problematic agent signature", x))) c1_opt ;
+                  counter_info_max = Yojson.Basic.Util.to_option
+                                (function
+                                  | `Int c -> c
+                                  | x ->
+                                    raise
+                                      (Yojson.Basic.Util.Type_error
+                                         ("Problematic agent signature", x))) c2_opt ;
+                  counter_default_value = c3
+              }
               | x ->
                 raise
                   (Yojson.Basic.Util.Type_error
@@ -257,10 +280,20 @@ let print_site_internal_state sigs ag_ty site f = function
       (site_of_id ag_ty site sigs)
       (internal_state_of_id ag_ty site id sigs)
 
-let print_counter sigs ag_ty f id =
-  match counter_of_site_id id (get sigs ag_ty) with
+let pp_counts f = function
   | None -> ()
-  | Some (c1, c2) -> Format.fprintf f "{=%d/+=%d}" c1 c2
+  | Some c ->
+    match c.counter_info_min, c.counter_info_max with
+      | Some i, Some j when i=c.counter_default_value ->
+           Format.fprintf f "{=%d/+=%d}" i j
+      | i_opt, j_opt ->
+           Format.fprintf f "{-=%s/=%d/+=%s}"
+            (match i_opt with None -> "-oo" | Some i -> Format.sprintf "%d" i)
+            c.counter_default_value
+            (match j_opt with None -> "-oo" | Some i -> Format.sprintf "%d" i)
+
+let print_counter sigs ag_ty f id =
+  pp_counts f (counter_of_site_id id (get sigs ag_ty))
 
 let print_one ?(sigs : s option) (i : int) (f : Format.formatter)
     (signature : t) =
@@ -286,10 +319,6 @@ let print_one ?(sigs : s option) (i : int) (f : Format.formatter)
                          (print_site sigs (i + ag))
                          si (print_agent sigs) (i + ag))))
             links)
-  in
-  let pp_counts f = function
-    | None -> ()
-    | Some (c1, c2) -> Format.fprintf f "{=%d/+=%d}" c1 c2
   in
   (NamedDecls.print
      ~sep:(fun f -> Format.fprintf f ",@,")

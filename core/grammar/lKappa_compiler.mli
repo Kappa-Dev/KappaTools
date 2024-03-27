@@ -46,6 +46,7 @@ type ast_compiled_data = {
   updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)
   result:
     ( Ast.agent,
+      Ast.agent_sig, 
       LKappa.rule_agent list,
       Raw_mixture.t,
       int,
