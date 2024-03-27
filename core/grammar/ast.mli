@@ -35,12 +35,25 @@ type counter = {
   counter_delta: int Loc.annoted;
 }
 
-type site = Port of port | Counter of counter
+type counter_sig = {
+  counter_sig_name: string Loc.annoted;
+  counter_sig_min: int option Loc.annoted option ;
+  counter_sig_max: int option Loc.annoted option ;
+  counter_sig_visible: bool;
+  counter_sig_default: int;
+}
+
+val op_counter_sig: counter_sig -> string Loc.annoted -> counter_sig
+
+type 'counter site = Port of port | Counter of 'counter
 type agent_mod = NoMod | Erase | Create
 
-type agent =
-  | Present of string Loc.annoted * site list * agent_mod
+type 'counter parametric_agent =
+  | Present of string Loc.annoted * 'counter site list * agent_mod
   | Absent of Loc.t
+
+type agent = counter parametric_agent
+type agent_sig = counter_sig parametric_agent
 
 type mixture = agent list list
 
@@ -125,8 +138,8 @@ type ('mixture, 'id) init_t =
 type ('pattern, 'mixture, 'id) init_statement =
   ('pattern, 'id) Alg_expr.e Loc.annoted * ('mixture, 'id) init_t
 
-type ('agent, 'pattern, 'mixture, 'id, 'rule) instruction =
-  | SIG of 'agent
+type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
+  | SIG of 'agent_sig
   | TOKENSIG of string Loc.annoted
   | VOLSIG of string * float * string  (** type, volume, parameter *)
   | INIT of ('pattern, 'mixture, 'id) init_statement
@@ -142,11 +155,11 @@ type ('pattern, 'mixture, 'id, 'rule) command =
   | MODIFY of ('pattern, 'mixture, 'id, 'rule) modif_expr list
   | QUIT
 
-type ('agent, 'pattern, 'mixture, 'id, 'rule) compil = {
+type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
       (** pattern declaration for reusing as variable in perturbations or kinetic rate *)
-  signatures: 'agent list;  (** agent signature declarations *)
+  signatures: 'agent_sig list;  (** agent signature declarations *)
   rules: (string Loc.annoted option * 'rule Loc.annoted) list;
       (**rules (possibly named)*)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
@@ -159,11 +172,11 @@ type ('agent, 'pattern, 'mixture, 'id, 'rule) compil = {
   volumes: (string * float * string) list;
 }
 
-type parsing_compil = (agent, mixture, mixture, string, rule) compil
-type parsing_instruction = (agent, mixture, mixture, string, rule) instruction
+type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
+type parsing_instruction = (agent, agent_sig, mixture, mixture, string, rule) instruction
 
 val empty_compil : parsing_compil
-val no_more_site_on_right : bool -> site list -> site list -> bool
+val no_more_site_on_right : bool -> 'a site list -> 'a site list -> bool
 
 val split_mixture : mixture -> mixture * mixture
 (** @return (lhs,rhs) *)

@@ -30,7 +30,7 @@ type compilation_result = {
 }
 
 let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
-    (ast : (_, _, _, _, _) Ast.compil) : preprocessed_ast =
+    (ast : (_, _, _, _, _, _) Ast.compil) : preprocessed_ast =
   let () = Format.printf "+ simulation parameters@." in
   let conf, story_compression, formatCflow, cflowFile =
     Configuration.parse ast.Ast.configurations
@@ -89,7 +89,7 @@ let get_ast_from_cli_args cli_args =
 
 let get_preprocessed_ast_from_cli_args ~warning ~debug_mode
     ?(kasim_args = Kasim_args.default) cli_args =
-  let ast : (Ast.agent, Ast.mixture, Ast.mixture, string, Ast.rule) Ast.compil =
+  let ast : (Ast.agent, Ast.agent_sig, Ast.mixture, Ast.mixture, string, Ast.rule) Ast.compil =
     get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion
       cli_args.Run_cli_args.inputKappaFileNames
   in

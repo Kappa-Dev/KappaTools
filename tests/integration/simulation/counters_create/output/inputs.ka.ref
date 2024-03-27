@@ -7,7 +7,7 @@
 %def: "outputFileName" "data.svg"
 
 
-%agent: A(c{=0/+=10} c__inverted{=0/+=10})
+%agent: A(c{=0/+=10} c__inverted{-=0/=10/+=10})
 %agent: B()
 
 %var:/*0*/ 'B' |B()|

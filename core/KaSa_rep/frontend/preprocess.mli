@@ -103,6 +103,7 @@ val translate_c_compil :
   Exception_without_parameter.method_handler ->
   Cckappa_sig.kappa_handler ->
   ( Ckappa_sig.agent,
+    Ckappa_sig.agent_sig,
     Ckappa_sig.mixture,
     Ckappa_sig.mixture,
     string,

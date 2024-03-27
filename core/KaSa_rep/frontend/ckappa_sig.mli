@@ -112,23 +112,27 @@ val compare_unit_agent_site : unit -> unit -> int
 
 type binding_state = Free | Lnk_type of agent_name * site_name
 
-type mixture =
+type  mixture =
   | SKIP of mixture
   | COMMA of agent * mixture
   | DOT of c_agent_id * agent * mixture
   | PLUS of c_agent_id * agent * mixture
   | EMPTY_MIX
 
-and agent = {
+and 'counter parametric_agent = {
   agent_name: string;
-  ag_intf: interface;
+  ag_intf: 'counter interface;
   agent_name_pos: position; (*; ag_pos:position*)
 }
 
-and interface =
+and agent_sig = counter_sig parametric_agent
+and agent = counter parametric_agent
+
+and 'counter interface =
   | EMPTY_INTF
-  | PORT_SEP of port * interface
-  | COUNTER_SEP of counter * interface
+  | PORT_SEP of port * 'counter interface
+  | COUNTER_SEP of 'counter * 'counter interface
+
 
 and port = {
   port_name: string;
@@ -142,6 +146,15 @@ and counter = {
   counter_test: counter_test option;
   counter_delta: int option;
 }
+
+and counter_sig =
+  {
+    counter_sig_name: string;
+    counter_sig_default: int;
+    counter_sig_min: int option option;
+    counter_sig_max: int option option;
+    counter_visible: bool;
+  }
 
 and counter_test = CEQ of int | CGTE of int | CVAR of string | UNKNOWN
 and internal = string option list
@@ -187,8 +200,8 @@ type ('pattern, 'rule) modif_expr =
 
 type 'pattern variable = ('pattern, string) Ast.variable_def
 
-type ('agent, 'pattern, 'mixture, 'rule) compil =
-  ('agent, 'pattern, 'mixture, string, 'rule) Ast.compil
+type ('agent, 'agent_sig, 'pattern, 'mixture, 'rule) compil =
+  ('agent, 'agent_sig, 'pattern, 'mixture, string, 'rule) Ast.compil
 
 type ('a, 'b, 'c) site_type = Internal of 'a | Binding of 'b | Counter of 'c
 type site = (site_name, site_name, site_name) site_type
@@ -415,7 +428,7 @@ type enriched_init = {
 type c_compil = {
   c_variables: c_variable Int_storage.Nearly_inf_Imperatif.t;
   (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
-  c_signatures: (agent * position) Int_storage.Nearly_inf_Imperatif.t;
+  c_signatures: (agent_sig * position) Int_storage.Nearly_inf_Imperatif.t;
   (*agent signature declaration*)
   c_rules: enriched_rule Int_storage.Nearly_inf_Imperatif.t;
   (*rules (possibly named)*)

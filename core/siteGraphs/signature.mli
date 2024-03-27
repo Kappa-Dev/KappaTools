@@ -12,10 +12,18 @@
 (* TODO document what is internal state *)
 
 (* TODO *)
+
+type counter_info =
+  {
+    counter_info_min: int option;
+    counter_info_max: int option;
+    counter_default_value: int
+  }
+
 type 'links site_sig = {
   internal_state: unit NamedDecls.t;
   links: 'links option;
-  counters_info: (int * int) option;
+  counters_info: counter_info option;
       (** If relevant: counter CEQ value * counter delta *)
 }
 
@@ -33,7 +41,7 @@ val num_of_internal_state : int -> string Loc.annoted -> t -> int
 val internal_state_of_site_id : int -> int -> t -> string
 (**[internal_state_of_site_id site_id value_id signature] *)
 
-val counter_of_site_id : int -> t -> (int * int) option
+val counter_of_site_id : int -> t -> counter_info option
 val has_counter : t -> bool
 
 type s

@@ -140,6 +140,54 @@ site_counter:
     { (Some $1,$5) }
   ;
 
+site_counter_sig:
+    | EQUAL annoted INT  annoted DIV annoted counter_modif annoted CL_CUR annoted
+      { Some (Some ($3),rhs_pos 3),match $7 with (a,loc) -> Some (Some (a),loc) }
+    | EQUAL annoted INT  annoted CL_CUR annoted
+        { Some (Some ($3),rhs_pos 3),None }
+    ;
+
+  site_sig:
+    | ID annoted OP_BRA site_link annoted OP_CUR annoted site_internal annoted
+      { let (port_link, port_link_mod) = $4 in
+        let (port_int, port_int_mod) = $8 in
+        Ast.Port
+          { Ast.port_name=($1,rhs_pos 1); Ast.port_int;
+            Ast.port_link; Ast.port_int_mod; Ast.port_link_mod; } }
+    | ID annoted OP_CUR annoted site_internal annoted OP_BRA site_link annoted
+      { let (port_int, port_int_mod) = $5 in
+        let (port_link, port_link_mod) = $8 in
+        Ast.Port
+          { Ast.port_name=($1,rhs_pos 1); Ast.port_int;
+            Ast.port_link; Ast.port_int_mod; Ast.port_link_mod; } }
+    | ID annoted OP_BRA site_link annoted
+      { let (port_link, port_link_mod) = $4 in
+        Ast.Port
+          { Ast.port_name=($1,rhs_pos 1); Ast.port_int=[];
+            Ast.port_link; Ast.port_int_mod=None; Ast.port_link_mod; } }
+    | ID annoted OP_CUR annoted site_internal annoted
+      { let (port_int, port_int_mod) = $5 in
+        Ast.Port
+          { Ast.port_name=($1,rhs_pos 1);Ast.port_link=[];
+            Ast.port_int; Ast.port_int_mod; Ast.port_link_mod=None; } }
+    | ID annoted OP_CUR annoted site_counter_sig
+      { let (counter_sig_min,counter_sig_max) = $5 in
+        Ast.Counter
+          { Ast.counter_sig_name=($1,rhs_pos 1);
+            Ast.counter_sig_min;
+            Ast.counter_sig_max;
+            Ast.counter_sig_default=
+                (match counter_sig_min with
+                  | None | Some (None, _)-> 0
+                  | Some (Some i,_) -> i );
+            Ast.counter_sig_visible=true;
+            } }
+    | ID annoted
+      { Ast.Port
+          { Ast.port_name=($1,rhs_pos 1);Ast.port_link=[]; Ast.port_int=[];
+            Ast.port_int_mod=None; Ast.port_link_mod=None; } }
+    ;
+
 site:
   | ID annoted OP_BRA site_link annoted OP_CUR annoted site_internal annoted
     { let (port_link, port_link_mod) = $4 in
@@ -182,6 +230,15 @@ interface:
   | site COMMA annoted interface { $1 :: $4 }
   ;
 
+interface_sig:
+    | { [] }
+    | error
+      { raise (ExceptionDefn.Syntax_Error
+                 (add_pos 1 ("Malformed site expression"))) }
+    | site_sig interface_sig { $1 :: $2 }
+    | site_sig COMMA annoted interface_sig { $1 :: $4 }
+    ;
+
 agent_modif:
   | annoted { Ast.NoMod,start_pos 1,$1 }
   | annoted PLUS annoted { Ast.Create,end_pos 2,$3 }
@@ -201,6 +258,18 @@ agent:
                (add_pos 3 ("Malformed agent '"^$1^"'"))) }
   ;
 
+agent_sig:
+    | DOT annoted { (Ast.Absent (rhs_pos 1),end_pos 1,$2) }
+    | ID annoted OP_PAR annoted interface_sig CL_PAR agent_modif
+      { let modif,pend,an = $7 in
+        (Ast.Present (($1,rhs_pos 1), $5, modif),pend,an) }
+    | ID annoted COLON annoted ID annoted OP_PAR annoted interface_sig CL_PAR agent_modif
+      { let modif,pend,an = $11 in
+        (Ast.Present (($5,rhs_pos 5), $9, modif),pend,an) }
+    | ID annoted error
+      { raise (ExceptionDefn.Syntax_Error
+                 (add_pos 3 ("Malformed agent '"^$1^"'"))) }
+    ;
 pattern:
   | agent COMMA annoted pattern
 { let (x,_,_) = $1 in
@@ -708,7 +777,7 @@ sentence:
   | LABEL annoted EQUAL annoted alg_expr
     { let (v,_,_) = $5 in add (Ast.DECLARE (($1,rhs_pos 1),v)) }
   | rule { add (Ast.RULE (None,$1)) }
-  | SIGNATURE annoted agent { let (a,_,_) = $3 in add (Ast.SIG a) }
+  | SIGNATURE annoted agent_sig { let (a,_,_) = $3 in add (Ast.SIG a) }
   | SIGNATURE annoted error
     { raise
         (ExceptionDefn.Syntax_Error (add_pos 3 "Malformed agent signature")) }

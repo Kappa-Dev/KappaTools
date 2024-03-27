@@ -213,23 +213,20 @@ let counters_signature s agents =
 (** [split_cvar_counter_in_rules_per_value var_name annot counter_delta counter_def] translates a counter CVAR whose value acts upon the rate expression into a rule per possible value, that are selected by a CEQ expression.
  * *)
 let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
-    (counter_delta : int Loc.annoted) (counter_def : Ast.counter) :
-    (Ast.site * (string * int) list) list =
-  let max_value : int = Loc.v counter_def.counter_delta in
-  let min_value : int =
-    match counter_def.counter_test with
-    | None | Some (Ast.CGTE _, _) | Some (Ast.CLTE _, _) | Some (Ast.CVAR _, _)
-      ->
+    (counter_delta : int Loc.annoted) (counter_def : Ast.counter_sig) :
+    (Ast.counter Ast.site * (string * int) list) list =
+  let min_value, max_value =
+    match counter_def.counter_sig_min, counter_def.counter_sig_max with
+    | Some (Some min_loc, _), Some (Some max_loc, _) -> min_loc, max_loc
+    | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
       raise
         (ExceptionDefn.Malformed_Decl
-           ( "Invalid counter signature - have to specify min bound",
-             Loc.get_annot counter_def.counter_name ))
-    | Some (Ast.CEQ min_value, _) -> min_value
+           ( "Invalid counter signature - have to specify min/max bound",
+             Loc.get_annot counter_def.counter_sig_name ))
   in
-
   (* Make CEQ counters with all possible values of variable *)
   let rec make_ceq_counters_from_var_values (value : int) :
-      (Ast.site * (string * int) list) list =
+      (Ast.counter Ast.site * (string * int) list) list =
     if value > max_value then
       []
     else if
@@ -238,7 +235,7 @@ let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
     then
       ( Ast.Counter
           {
-            Ast.counter_name = counter_def.counter_name;
+            Ast.counter_name = counter_def.counter_sig_name;
             counter_test = Some (Ast.CEQ value, annot);
             counter_delta;
           },
@@ -266,7 +263,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   let split_for_each_counter_var_value_site ids counter_defs = function
     | Ast.Port p -> [ Ast.Port p, [] ]
     | Ast.Counter c ->
-      let delta = Loc.v c.counter_delta in
+      let delta = Loc.v c.Ast.counter_delta in
       (match c.counter_test with
       | Some (Ast.CEQ value, _) ->
         if delta > 0 || abs delta <= value then
@@ -291,10 +288,10 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
         [ Ast.Counter c, [] ]
       | Some (Ast.CVAR var_name, annot) when Mods.StringSet.mem var_name ids ->
         (* If the variable is present in an rate definition expression *)
-        let counter_def : Ast.counter =
+        let counter_def : Ast.counter_sig =
           List.find
             (fun counter ->
-              name_match c.Ast.counter_name counter.Ast.counter_name)
+              name_match c.Ast.counter_name counter.Ast.counter_sig_name)
             counter_defs
         in
 
@@ -314,8 +311,9 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   in
 
   let rec split_for_each_counter_var_value_sites (ids : Mods.StringSet.t)
-      (counter_defs : Ast.counter list) :
-      Ast.site list -> (Ast.site list * (string * int) list) list = function
+      (counter_defs : Ast.counter_sig list) :
+      Ast.counter Ast.site list ->
+      (Ast.counter Ast.site list * (string * int) list) list = function
     | [] -> [ [], [] ]
     | s :: t ->
       combinations_of_var_setup
@@ -815,7 +813,7 @@ let compile_counter_in_rule (sigs : Signature.s)
     ( List.rev_map (fun rule_agent_ -> rule_agent_.agent) (List.rev mix),
       List.rev_map (fun raw_agent_ -> raw_agent_.agent) (List.rev created) )
 
-let rule_agent_with_max_counter sigs c ((agent_name, _) as agent_type) :
+let rule_agent_with_max_counter sigs c ((agent_name, loc_ag) as agent_type) :
     LKappa.rule_mixture =
   let ag_id = Signature.num_of_agent agent_type sigs in
   let sign = Signature.get sigs ag_id in
@@ -824,9 +822,18 @@ let rule_agent_with_max_counter sigs c ((agent_name, _) as agent_type) :
     Array.make arity (Loc.annot_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
   in
   let internals = Array.make arity LKappa.I_ANY in
-  let c_na = c.Ast.counter_name in
+  let c_na = c.Ast.counter_sig_name in
   let c_id = Signature.num_of_site ~agent_name c_na sign in
-  let max_val, loc = c.Ast.counter_delta in
+  let max_val, loc =
+    match c.Ast.counter_sig_max with
+    | Some (Some max, loc) -> max, loc
+    | None | Some (None, _) ->
+      raise
+        (ExceptionDefn.Internal_Error
+           ( "Counter " ^ fst c_na ^ " in " ^ agent_name
+             ^ " should have an upper bound",
+             loc_ag ))
+  in
   let max_val' = max_val + 1 in
   let incrs =
     link_incr sigs 0 (max_val' + 1) ((c_id, ag_id), false) false 1 loc (-1)
@@ -847,11 +854,12 @@ let rule_agent_with_max_counter sigs c ((agent_name, _) as agent_type) :
   ra :: incrs
 
 let counter_perturbation sigs c agent_type =
-  let annot = Loc.get_annot c.Ast.counter_name in
+  let annot = Loc.get_annot c.Ast.counter_sig_name in
   let filename = [ Primitives.Str_pexpr ("counter_perturbation.ka", annot) ] in
   let stop_message =
-    "Counter " ^ Loc.v c.Ast.counter_name ^ " of agent " ^ Loc.v agent_type
-    ^ " reached maximum"
+    "Counter "
+    ^ Loc.v c.Ast.counter_sig_name
+    ^ " of agent " ^ Loc.v agent_type ^ " reached maximum"
   in
   let mods =
     [
@@ -1024,18 +1032,12 @@ let annotate_created_counters sigs ((agent_name, _) as agent_type) counter_list
     Array.make arity None
   in
 
-  (* register all counters (specified or not) with min value *)
+  (* register all counters (specified or not) with default value *)
   Array.iteri
     (fun port_id _ ->
       match Signature.counter_of_site_id port_id agent_signature with
-      | Some (counter_min, counter_max) ->
+      | Some counter_info ->
         let counter_name = Signature.site_of_num port_id agent_signature in
-        let default_init_value =
-          if Signature.is_inverted_counter counter_name then
-            counter_max
-          else
-            counter_min
-        in
         (try
            (* find counter matching port *)
            let c : Ast.counter =
@@ -1056,9 +1058,11 @@ let annotate_created_counters sigs ((agent_name, _) as agent_type) counter_list
            ra_counters.(port_id) <-
              Some
                ( {
-                   Ast.counter_name = counter_name, Loc.dummy;
+                   Ast.counter_name = counter_name |> Loc.annot_with_dummy;
                    Ast.counter_test =
-                     Some (Ast.CEQ default_init_value, Loc.dummy);
+                     Some
+                       (Ast.CEQ counter_info.counter_default_value
+                      |> Loc.annot_with_dummy);
                    Ast.counter_delta = 0, Loc.dummy;
                  },
                  LKappa.Maintained ))

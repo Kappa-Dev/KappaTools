@@ -7,7 +7,7 @@
 %def: "outputFileName" "data.csv"
 
 
-%agent: A(c{=0/+=7} c__inverted{=0/+=7})
+%agent: A(c{=0/+=7} c__inverted{-=0/=7/+=7})
 %agent: B()
 
 %var:/*0*/ 'B' |B()|

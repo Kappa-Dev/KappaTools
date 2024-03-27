@@ -101,7 +101,7 @@ start_rule:
     ;
 
 instruction:
-    | SIGNATURE agent_expression {Ast.SIG $2}
+    | SIGNATURE agent_expression_sig {Ast.SIG $2}
     | TOKEN ID {Ast.TOKENSIG ($2,rhs_pos 2)}
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
 				(add_pos "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
@@ -431,12 +431,23 @@ mod_agent:
 	| PLUS { Ast.Create }
 	| MINUS { Ast.Erase };
 
+agent_expression_sig:
+  | ID OP_PAR interface_expression_sig CL_PAR {Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod)}
+  | ID error { raise (ExceptionDefn.Syntax_Error
+       (add_pos ("Malformed agent '"^$1^"'")))}
+
 agent_expression:
     | mod_agent ID OP_PAR interface_expression CL_PAR
 	 {Ast.Present (($2,rhs_pos 2), $4, $1)}
     | mod_agent ID error
 	 { raise (ExceptionDefn.Syntax_Error
 		    (add_pos ("Malformed agent '"^$2^"'")))}
+    ;
+
+interface_expression_sig:
+    /*empty*/ {[]}
+    | port_expression_sig COMMA interface_expression_sig {$1::$3}
+    | port_expression_sig {[$1]}
     ;
 
 interface_expression:
@@ -494,6 +505,77 @@ port_expression:
 	   Ast.counter_test = $2;
 	   Ast.counter_delta = Loc.annot_with_dummy 0} }
     ;
+
+port_expression_sig:
+   | ID internal_state link_state_mod
+    	 { Ast.Port
+    	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=[];
+    	    Ast.port_int_mod = None; Ast.port_link_mod = $3; } }
+  | ID internal_state link_state link_state_mod
+    	 { Ast.Port
+    	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=$3;
+    	    Ast.port_int_mod = None; Ast.port_link_mod = $4; } }
+  | ID internal_state DIV KAPPA_MRK link_state_mod
+    	 { Ast.Port
+    	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=[];
+    	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_link_mod = $5; } }
+  | ID internal_state DIV KAPPA_MRK link_state link_state_mod
+    	 { Ast.Port
+    	   {Ast.port_name=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_link=$5;
+    	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_link_mod = $6; } }
+  | ID PLUS EQUAL INT
+             { Ast.Counter
+    	   { Ast.counter_sig_name = ($1,rhs_pos 1);
+           Ast.counter_sig_min = None;
+           Ast.counter_sig_max = Some (Some $4, rhs_pos 4);
+           Ast.counter_sig_default = $4;
+           Ast.counter_sig_visible = true}}
+  | ID PLUS EQUAL MINUS INT
+        {Ast.Counter
+  { Ast.counter_sig_name = ($1,rhs_pos 1);
+    Ast.counter_sig_min = None;
+    Ast.counter_sig_max = Some (Some (-$5), rhs_pos 5);
+    Ast.counter_sig_default = -$5;
+    Ast.counter_sig_visible = true}}
+  | ID counter_test PLUS EQUAL INT
+       { let min =
+            match $2 with
+                      | Some (Ast.CEQ i,_) -> i
+                      | None | Some ((CGTE _|CLTE _|CVAR _), _) -> raise (ExceptionDefn.Syntax_Error
+                      (add_pos "Issue counters in signature"))
+        in Ast.Counter
+         { Ast.counter_sig_name = ($1,rhs_pos 1);
+           Ast.counter_sig_min = Some (Some min, rhs_pos 2);
+           Ast.counter_sig_max = Some (Some $5, rhs_pos 5);
+           Ast.counter_sig_default = min;
+           Ast.counter_sig_visible = true}}
+  | ID counter_test PLUS EQUAL MINUS INT
+      { let min =
+           match $2 with
+                     | Some (Ast.CEQ i,_) -> i
+                     | None | Some ((CGTE _|CLTE _|CVAR _), _) -> raise (ExceptionDefn.Syntax_Error
+                     (add_pos "Issue counters in signature"))
+       in
+        Ast.Counter
+        { Ast.counter_sig_name = ($1,rhs_pos 1);
+          Ast.counter_sig_min = Some (Some min, rhs_pos 2);
+          Ast.counter_sig_max = Some (Some (-$6), rhs_pos 6);
+          Ast.counter_sig_default = min ;
+          Ast.counter_sig_visible = true}}
+  | ID counter_test
+      { let min =
+           match $2 with
+                     | Some (Ast.CEQ i,_) -> i
+                     | None | Some ((CGTE _|CLTE _|CVAR _), _) -> raise (ExceptionDefn.Syntax_Error
+                     (add_pos "Issue counters in signature"))
+       in
+       Ast.Counter
+  { Ast.counter_sig_name = ($1,rhs_pos 1);
+    Ast.counter_sig_min = Some (Some min, rhs_pos 2);
+    Ast.counter_sig_max = None;
+    Ast.counter_sig_default = min;
+    Ast.counter_sig_visible = true}}
+
 
 internal_state:
   /*empty*/ {[]}

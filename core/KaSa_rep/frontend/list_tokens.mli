@@ -6,6 +6,7 @@ val scan_compil :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
   ( Ckappa_sig.agent,
+    Ckappa_sig.agent_sig,
     Ckappa_sig.mixture,
     Ckappa_sig.mixture,
     'a,
