@@ -27,7 +27,7 @@ type port = {
  * - CGTE: If counter value is greater or equal to the specified value
  * - CLTE: If counter value is less or equal to the specified value
  * - CVAR: Not a test, but defines a variable to be used in the rule rates *)
-type counter_test = CEQ of int | CGTE of int | CLTE of int | CVAR of string
+type counter_test = CEQ of int | CGTE of int | CGT of int | CLTE of int | CVAR of string
 
 type counter = {
   counter_name: string Loc.annoted;

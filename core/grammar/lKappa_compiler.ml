@@ -1941,7 +1941,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             acc
           else
             (agent_name, counter_name, ref 0) :: acc
-        | Some (Ast.CEQ _) | Some (Ast.CGTE _) | Some (Ast.CVAR _) | None -> acc)
+        | Some (Ast.CEQ _ | Ast.CGT _ | Ast.CGTE _ | Ast.CVAR _) | None -> acc)
   in
 
   (* Create opposite counters that have the same tests *)
@@ -1991,7 +1991,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                   match
                     counter_test |> Option_util.unsome_or_raise |> Loc.v
                   with
-                  | CGTE _ | CLTE _ | CVAR _ ->
+                  | CGT _ | CGTE _ | CLTE _ | CVAR _ ->
                     raise
                       (ExceptionDefn.Malformed_Decl
                          ( "Counter should have CEQ test value in signature \

@@ -209,7 +209,7 @@ let counters_signature s agents =
         | Ast.Counter c -> c :: acc
         | Ast.Port _ -> acc)
       [] sites'
-
+    
 (** [split_cvar_counter_in_rules_per_value var_name annot counter_delta counter_def] translates a counter CVAR whose value acts upon the rate expression into a rule per possible value, that are selected by a CEQ expression.
  * *)
 let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
@@ -218,7 +218,7 @@ let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
   let max_value : int = Loc.v counter_def.counter_delta in
   let min_value : int =
     match counter_def.counter_test with
-    | None | Some (Ast.CGTE _, _) | Some (Ast.CLTE _, _) | Some (Ast.CVAR _, _)
+    | None | Some (Ast.CGTE _, _) | Some (Ast.CGT _,_) | Some (Ast.CLTE _, _) | Some (Ast.CVAR _, _)
       ->
       raise
         (ExceptionDefn.Malformed_Decl
@@ -278,6 +278,9 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
                  Loc.get_annot c.counter_name ))
       | Some (Ast.CLTE _value, _annot) ->
         failwith "not implemented" (* TODO NOW *)
+      | Some (Ast.CGT _,pos) ->
+          raise (ExceptionDefn.Internal_Error
+            ("Counter "^(fst c.Ast.count_nme)^" should not have a > test by now", pos))
       | Some (Ast.CGTE value, annot) ->
         if value + delta < 0 then
           raise
@@ -460,6 +463,151 @@ let split_counter_variables_into_separate_rules ~warning ~debug_mode
   );
   { compil with Ast.rules }
 
+let with_counters c =
+  let with_counters_mix mix =
+    List.exists
+      (function
+        | Ast.Absent _ -> false
+        | Ast.Present (_,ls,_) ->
+        List.exists (function Ast.Counter _ -> true | Ast.Port _ -> false) ls)
+      mix in
+  with_counters_mix c.Ast.signatures
+
+let replace_greater_than c =
+  let process_mix =
+    let process_site = function
+      | Ast.Port _
+      | Ast.Counter Ast.{count_test = None; _}
+      | Ast.Counter Ast.{count_test = Some (CEQ _,_); _}
+      | Ast.Counter Ast.{count_test = Some (CVAR _,_); _}
+      | Ast.Counter Ast.{count_test = Some (CGTE _,_); _} as s -> s
+      | Ast.Counter Ast.{count_test = Some (CGT i,p); count_nme; count_delta} ->
+          Ast.Counter Ast.{count_nme; count_delta; count_test = Some (CGTE (i+1), p)}
+    in
+    let process_agent = function
+      | Ast.Absent _ as a -> a
+      | Ast.Present (n, ss, m) ->
+          Ast.Present (n, List.map process_site ss, m)
+    in
+    List.map (fun ags -> List.map process_agent ags)
+  in
+  let rec process_alg = function
+    | Alg_expr.STATE_ALG_OP _, _
+    | Alg_expr.ALG_VAR _, _
+    | Alg_expr.TOKEN_ID _, _
+    | Alg_expr.CONST _, _ as a -> a
+    | Alg_expr.BIN_ALG_OP (o, a1, a2), p ->
+        Alg_expr.BIN_ALG_OP (o, process_alg a1, process_alg a2), p
+    | Alg_expr.UN_ALG_OP (o, a), p ->
+        Alg_expr.UN_ALG_OP (o, process_alg a), p
+    | Alg_expr.IF (b, a1, a2), p ->
+        Alg_expr.IF (process_bool b, process_alg a1, process_alg a2), p
+    | Alg_expr.DIFF_TOKEN (a, id), p ->
+        Alg_expr.DIFF_TOKEN (process_alg a, id), p
+    | Alg_expr.KAPPA_INSTANCE m, p ->
+        Alg_expr.KAPPA_INSTANCE (process_mix m), p
+    | Alg_expr.DIFF_KAPPA_INSTANCE (a, m), p ->
+        Alg_expr.DIFF_KAPPA_INSTANCE (process_alg a, process_mix m), p
+  and process_bool = function
+    | Alg_expr.TRUE, _
+    | Alg_expr.FALSE, _ as b -> b
+    | Alg_expr.BIN_BOOL_OP (o, b1, b2), p ->
+        Alg_expr.BIN_BOOL_OP (o, process_bool b1, process_bool b2), p
+    | Alg_expr.UN_BOOL_OP (o, b), p ->
+        Alg_expr.UN_BOOL_OP (o, process_bool b), p
+    | Alg_expr.COMPARE_OP (o, a1, a2), p ->
+        Alg_expr.COMPARE_OP (o, process_alg a1, process_alg a2), p
+  in
+  let process_rule (r, l) =
+    let rewrite =
+      match r.Ast.rewrite with
+      | Ast.Edit e -> Ast.Edit Ast.{e with mix = process_mix e.mix}
+      | Ast.Arrow a -> Ast.Arrow Ast.{a with lhs = process_mix a.lhs}
+    in
+    let k_def = process_alg r.Ast.k_def in
+    let k_un =
+      match r.Ast.k_un with
+      | None -> None
+      | Some (alg, None) -> Some (process_alg alg, None)
+      | Some (alg1, Some alg2) -> Some (process_alg alg1, Some (process_alg alg2))
+    in
+    let k_op =
+      match r.Ast.k_op with
+      | None -> None
+      | Some alg -> Some (process_alg alg)
+    in
+    let k_op_un =
+      match r.Ast.k_op_un with
+      | None -> None
+      | Some (alg, None) -> Some (process_alg alg, None)
+      | Some (alg1, Some alg2) -> Some (process_alg alg1, Some (process_alg alg2))
+    in
+    (Ast.{r with rewrite; k_def; k_un; k_op; k_op_un}, l)
+  in
+
+  let process_rule_stmt (s, r) = s, process_rule r in
+  let process_variable_def (s, a) = s, process_alg a in
+  let process_init = function
+    | a, Ast.INIT_TOK t -> process_alg a, Ast.INIT_TOK t
+    | a, Ast.INIT_MIX m -> process_alg a, Ast.INIT_MIX m
+  in
+
+  let process_pexpr = function
+    | Primitives.Str_pexpr _ as e -> e
+    | Primitives.Alg_pexpr a -> Primitives.Alg_pexpr (process_alg a)
+  in
+  let process_pexprs = List.map process_pexpr in
+
+  let process_perturbation ((n, bool1, mods, bool2), l) =
+    let bool1 =
+      match bool1 with
+      | None -> None
+      | Some b -> Some (process_bool b)
+    in
+    let bool2 =
+      match bool2 with
+      | None -> None
+      | Some b -> Some (process_bool b)
+    in
+    let process_modif_expr = function
+      | Ast.PLOTENTRY | Ast.CFLOWLABEL _ | Ast.CFLOWMIX _ as e -> e
+      | Ast.APPLY (a, r) -> Ast.APPLY (process_alg a, process_rule r)
+      | Ast.UPDATE (p, a) -> Ast.UPDATE (p, process_alg a)
+      | Ast.STOP ps -> Ast.STOP (process_pexprs ps)
+      | Ast.SNAPSHOT (b, ps) -> Ast.SNAPSHOT (b, process_pexprs ps)
+      | Ast.PRINT (ps1, ps2) -> Ast.PRINT (process_pexprs ps1, process_pexprs ps2)
+      | Ast.DIN (k, ps) -> Ast.DIN (k, process_pexprs ps)
+      | Ast.DINOFF ps -> Ast.DINOFF (process_pexprs ps)
+      | Ast.SPECIES_OF (b, ps, p) -> Ast.SPECIES_OF (b, process_pexprs ps, p)
+    in
+    let mods = List.map process_modif_expr mods in
+    ((n, bool1, mods, bool2), l)
+  in
+
+  Ast.{c with
+     init = List.map process_init c.init;
+     observables = List.map process_alg c.observables;
+     variables = List.map process_variable_def c.variables;
+     perturbations = List.map process_perturbation c.perturbations;
+     rules = List.map process_rule_stmt c.rules;
+  }
+
+
+let compile ~warning ~debugMode c =
+  if (with_counters c) then
+    let c = replace_greater_than c in
+    let rules =
+      remove_variable_in_counters ~warning c.Ast.rules c.Ast.signatures in
+    let () =
+      if debugMode then
+        let () = Format.printf "@.ast rules@." in
+        List.iter (fun (s,(r,_)) ->
+            let label = match s with None -> "" | Some (l,_) -> l in
+            Format.printf "@.%s = %a" label Ast.print_ast_rule r)
+          rules in
+    ({c with Ast.rules},true)
+  else (c,false)
+
 let make_counter_agent sigs (is_first, (dst, ra_erased)) (is_last, equal) i j
     loc (created : bool) : LKappa.rule_agent =
   let counter_agent_info = Signature.get_counter_agent_info sigs in
@@ -631,6 +779,12 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
                 conditions after rule splitting",
              Loc.get_annot counter_test ))
     | Ast.CEQ j -> j, true
+    | Ast.CGT j ->  
+       raise (ExceptionDefn.Internal_Error
+               ( "Counter "
+             ^ Loc.v counter.Ast.counter_name
+             ^ " should not have a > test by now", Loc.get_annot counter_test))
+        
     | Ast.CGTE j -> j, false
     | Ast.CLTE _j -> failwith "not implemented" (* TODO now *)
   in
@@ -692,7 +846,7 @@ let compile_counter_in_rule_agent (sigs : Signature.s)
     LKappa.rule_mixture * Raw_mixture.t * int =
   let (incrs, lnk_nb') : (LKappa.rule_mixture * Raw_mixture.t) list * int =
     Tools.array_fold_lefti
-      (fun id (acc_incrs, lnk_nb) -> function
+    (fun id (acc_incrs, lnk_nb) -> function
         | None -> acc_incrs, lnk_nb
         | Some (counter, _) ->
           let new_incrs, new_lnk_nb =
@@ -706,6 +860,7 @@ let compile_counter_in_rule_agent (sigs : Signature.s)
     List.fold_left (fun (als, bls) (a, b) -> a @ als, b @ bls) ([], []) incrs
   in
   als, bls, lnk_nb'
+          
 
 (** Compiles the counter value change in the right hand side of a rule into dummy chain changes *)
 let compile_counter_in_raw_agent (sigs : Signature.s)
@@ -755,9 +910,9 @@ let rule_agent_has_counters (rule_agent : LKappa.rule_agent)
  * both with counter information, and returns two mixtures for a new rule without counters, having compiled the counter logic inside the rule.
  *
  * - adds increment agents to the rule_agent mixture
-   - adds increment agents to the raw mixture
-   - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
-     to the increments *)
+ * - adds increment agents to the raw mixture
+ * - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
+ *   to the increments *)
 let compile_counter_in_rule (sigs : Signature.s)
     (mix : rule_mixture_with_agent_counters)
     (created : raw_mixture_with_agent_counters) :

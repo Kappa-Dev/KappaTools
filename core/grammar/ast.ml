@@ -23,11 +23,7 @@ type port = {
   port_link_mod: int Loc.annoted option option;
 }
 
-(* TODO change name, CVAR is not a test? *)
-(* TODO discriminate between counter definition and counter test ? *)
-(* TODO: change this to CTYPE = CTEST (CTESTTYPE * int) | CVAR string? *)
-
-type counter_test = CEQ of int | CGTE of int | CLTE of int | CVAR of string
+type counter_test = CEQ of int | CGTE of int | CLTE of int  | CGT of int | CVAR of string
 
 type counter = {
   counter_name: string Loc.annoted;
@@ -249,6 +245,7 @@ let print_ast_port f p =
 let print_counter_test f = function
   | CEQ x, _ -> Format.fprintf f "=%i" x
   | CGTE x, _ -> Format.fprintf f ">=%i" x
+  | CGT x, _ -> Format.fprintf f ">%i" x
   | CLTE x, _ -> Format.fprintf f "<=%i" x
   | CVAR x, _ -> Format.fprintf f "=%s" x
 
@@ -285,6 +282,7 @@ let string_option_annoted_of_json filenames =
 let counter_test_to_json = function
   | CEQ x -> `Assoc [ "test", `String "eq"; "val", `Int x ]
   | CGTE x -> `Assoc [ "test", `String "gte"; "val", `Int x ]
+  | CGT x -> `Assoc [ "test", `String "gt"; "val", `Int x ]
   | CLTE x -> `Assoc [ "test", `String "lte"; "val", `Int x ]
   | CVAR x -> `Assoc [ "test", `String "eq"; "val", `String x ]
 
@@ -295,6 +293,9 @@ let counter_test_of_json = function
   | `Assoc [ ("val", `Int x); ("test", `String "gte") ]
   | `Assoc [ ("test", `String "gte"); ("val", `Int x) ] ->
     CGTE x
+  | `Assoc [ "val", `Int x; "test", `String "gt" ]
+  | `Assoc [ "test", `String "gt"; "val", `Int x ] -> 
+     CGT x
   | `Assoc [ ("val", `Int x); ("test", `String "gle") ]
   | `Assoc [ ("test", `String "gle"); ("val", `Int x) ] ->
     CLTE x
