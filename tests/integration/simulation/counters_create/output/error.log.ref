@@ -9,7 +9,7 @@ Environment:
   %plot: [T]
   %plot: B
   
-  'tick' A(c[2] c__inverted[3])+, __counter_agent(a[2] b[.])+, __counter_agent(a[3] b[.])+ @ 1
+  'tick' A(c[2] c__inverted[3])+, __counter_agent(a[2] b[.])+, __counter_agent(a[3] b[4])+, __counter_agent(a[4] b[5])+, __counter_agent(a[5] b[6])+, __counter_agent(a[6] b[7])+, __counter_agent(a[7] b[8])+, __counter_agent(a[8] b[9])+, __counter_agent(a[9] b[10])+, __counter_agent(a[10] b[11])+, __counter_agent(a[11] b[12])+, __counter_agent(a[12] b[13])+, __counter_agent(a[13] b[.])+ @ 1
   A(c[1/2] c__inverted[3/4]), __counter_agent(a[1/1]), __counter_agent(a[3] b[4])-, __counter_agent(a[4/4]), B()+, __counter_agent(a[2] b[1])+ @ 1
   
   /*0*/%mod: (|A(c__inverted[1]), __counter_agent(a[1] b[2]), __counter_agent(a[2] b[3]), __counter_agent(a[3] b[4]), __counter_agent(a[4] b[5]), __counter_agent(a[5] b[6]), __counter_agent(a[6] b[7]), __counter_agent(a[7] b[8]), __counter_agent(a[8] b[9]), __counter_agent(a[9] b[10]), __counter_agent(a[10] b[11]), __counter_agent(a[11] b[12]), __counter_agent(a[12])| = 1) do $PRINTF ""; $PRINTF "Counter c__inverted of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
@@ -20,7 +20,27 @@ Environment:
          __counter_agent/*ν 1*/.a = A/*ν 0*/.c,
          __counter_agent/*ν 1*/.b = ⊥, __counter_agent/*ν 2*/,
          __counter_agent/*ν 2*/.a = A/*ν 0*/.c__inverted,
-         __counter_agent/*ν 2*/.b = ⊥
+         __counter_agent/*ν 3*/,
+         __counter_agent/*ν 3*/.a = __counter_agent/*ν 2*/.b,
+         __counter_agent/*ν 4*/,
+         __counter_agent/*ν 4*/.a = __counter_agent/*ν 3*/.b,
+         __counter_agent/*ν 5*/,
+         __counter_agent/*ν 5*/.a = __counter_agent/*ν 4*/.b,
+         __counter_agent/*ν 6*/,
+         __counter_agent/*ν 6*/.a = __counter_agent/*ν 5*/.b,
+         __counter_agent/*ν 7*/,
+         __counter_agent/*ν 7*/.a = __counter_agent/*ν 6*/.b,
+         __counter_agent/*ν 8*/,
+         __counter_agent/*ν 8*/.a = __counter_agent/*ν 7*/.b,
+         __counter_agent/*ν 9*/,
+         __counter_agent/*ν 9*/.a = __counter_agent/*ν 8*/.b,
+         __counter_agent/*ν 10*/,
+         __counter_agent/*ν 10*/.a = __counter_agent/*ν 9*/.b,
+         __counter_agent/*ν 11*/,
+         __counter_agent/*ν 11*/.a = __counter_agent/*ν 10*/.b,
+         __counter_agent/*ν 12*/,
+         __counter_agent/*ν 12*/.a = __counter_agent/*ν 11*/.b,
+         __counter_agent/*ν 12*/.b = ⊥
       @1
     1: (ast: 2)
       0: /*cc2*/ A/*2*/(c[1] c__inverted[2]),

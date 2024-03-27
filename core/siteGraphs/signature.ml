@@ -214,16 +214,16 @@ let create ~counters_per_agent agent_sigs =
          Some { id = 0; arity = 2; ports = 0, 1 });
   }
 
-let is_counter_agent sigs n_id =
+let is_counter_agent sigs agent_id =
   match sigs.counter_agent_info with
   | None -> false
-  | Some agent_info -> n_id = agent_info.id
+  | Some agent_info -> agent_id = agent_info.id
 
-let ports_if_counter_agent sigs n_id =
+let ports_if_counter_agent sigs agent_id =
   match sigs.counter_agent_info with
   | None -> None
   | Some agent_info ->
-    if n_id = agent_info.id then
+    if agent_id = agent_info.id then
       Some agent_info.ports
     else
       None
@@ -237,6 +237,9 @@ let get_counter_agent_info sigs =
   | Some counter_agent_info -> counter_agent_info
 
 let inverted_counter_suffix : string = "__inverted"
+
+let is_inverted_counter (counter_name : string) : bool =
+  String.ends_with ~suffix:inverted_counter_suffix counter_name
 
 let print_agent sigs f ag_ty =
   Format.pp_print_string f @@ agent_of_num ag_ty sigs
