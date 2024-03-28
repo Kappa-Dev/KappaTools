@@ -17,6 +17,8 @@ type rule_mixture_with_agent_counters =
 type raw_mixture_with_agent_counters =
   Raw_mixture.agent with_agent_counters list
 
+type cvar_value = { name: string; value: int }
+
 (** [combinations_of_var_setup ls1 ls2]
  * Each element of [ls1] describes a setup of counter variables, with the first element of the tuple being the list of entities to be used in the model, where variables have been removed from counters, and the second one the mapping of variables to their values, that allows to know which instance of model entities would be chosen in this given setup.
  * [ls2] adds a new entity with different kinds according to the variable values given in the list as second member of the tuple, which is then combined in this function with the other setups, combining the different variable values which those already defined.
@@ -34,10 +36,12 @@ let combinations_of_var_setup (ls1 : ('a list * 'b list) list)
 let update_rate counter_var_values (k, a) =
   let update_id s k =
     let counters_matching_s, _ =
-      List.partition (fun (s', _) -> String.compare s s' = 0) counter_var_values
+      List.partition
+        (fun var_value -> String.compare s var_value.name = 0)
+        counter_var_values
     in
     match counters_matching_s with
-    | [ (_, x) ] -> Alg_expr.CONST (Nbr.I x)
+    | [ var_value ] -> Alg_expr.CONST (Nbr.I var_value.value)
     | [] -> k
     | _ :: _ ->
       raise
@@ -214,7 +218,7 @@ let counters_signature s agents =
  * *)
 let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
     (counter_delta : int Loc.annoted) (counter_def : Ast.counter_sig) :
-    (Ast.counter Ast.site * (string * int) list) list =
+    (Ast.counter Ast.site * cvar_value list) list =
   let (min_value, max_value) : int * int =
     match counter_def.counter_sig_min, counter_def.counter_sig_max with
     | Some (Some min_loc, _), Some (Some max_loc, _) -> min_loc, max_loc
@@ -226,7 +230,7 @@ let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
   in
   (* Make CEQ counters with all possible values of variable *)
   let rec make_ceq_counters_from_var_values (value : int) :
-      (Ast.counter Ast.site * (string * int) list) list =
+      (Ast.counter Ast.site * cvar_value list) list =
     if value > max_value then
       []
     else if
@@ -239,7 +243,7 @@ let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
             counter_test = Some (Ast.CEQ value, annot);
             counter_delta;
           },
-        [ var_name, value ] )
+        [ { name = var_name; value } ] )
       :: make_ceq_counters_from_var_values (value + 1)
     else
       make_ceq_counters_from_var_values (value + 1)
@@ -313,7 +317,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   let rec split_for_each_counter_var_value_sites (ids : Mods.StringSet.t)
       (counter_defs : Ast.counter_sig list) :
       Ast.counter Ast.site list ->
-      (Ast.counter Ast.site list * (string * int) list) list = function
+      (Ast.counter Ast.site list * cvar_value list) list = function
     | [] -> [ [], [] ]
     | s :: t ->
       combinations_of_var_setup
@@ -321,7 +325,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
         (split_for_each_counter_var_value_site ids counter_defs s)
   in
   let split_for_each_counter_var_value_agent (ids : Mods.StringSet.t) :
-      Ast.agent -> (Ast.agent * (string * int) list) list = function
+      Ast.agent -> (Ast.agent * cvar_value list) list = function
     | Ast.Absent l -> [ Ast.Absent l, [] ]
     | Ast.Present (agent_name, sites, modif) ->
       let counter_defs = counters_signature agent_name signatures in
@@ -334,7 +338,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
         sites_for_each_counter_var_values
   in
   let rec split_for_each_counter_var_value_mixture (ids : Mods.StringSet.t) :
-      Ast.agent list -> (Ast.agent list * (string * int) list) list = function
+      Ast.agent list -> (Ast.agent list * cvar_value list) list = function
     | [] -> [ [], [] ]
     | ast_agent :: t ->
       combinations_of_var_setup
@@ -381,7 +385,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
     let ids = collect_ids exprs_from_rates in
 
     let mixture_for_each_counter_var_value :
-        (Ast.agent list * (string * int) list) list =
+        (Ast.agent list * cvar_value list) list =
       split_for_each_counter_var_value_mixture ids (List.flatten mix_lhs)
     in
     List.map
@@ -400,7 +404,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
             let counters_ids_as_string =
               List.fold_left
                 (* TODO should we add a separator. maybe also add name of variable? *)
-                  (fun acc (_, i) -> string_of_int i ^ acc)
+                  (fun acc var_value -> string_of_int var_value.value ^ acc)
                 "" counter_var_values
             in
 
