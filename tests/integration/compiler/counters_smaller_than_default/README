@@ -1,4 +1,2 @@
 #Command-line:
 "${KAPPABIN}"KaSim -l 1 counters_smaller_than.ka -d output --compile -seed 352860854 || true
-
-# BUG

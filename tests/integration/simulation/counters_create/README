@@ -1,5 +1,2 @@
 #Command-line:
 "${KAPPABIN}"KaSim counters_create.ka  -o data.svg -d output -seed 322460359 -l 2 --debug || exit 0
-
-#BUG, should create some B()
-#   But interted part of the counter is no set up with the proper initialisation value.

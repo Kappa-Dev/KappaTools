@@ -1,0 +1,18 @@
+%def: "seed" "322460359"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+
+%agent: A(c{=0/+=0})
+
+%plot: [T]
+'tick' A(c{=0})- @ 1
+/*0*/%mod: (|A(c{=1})| = 1) do $PRINTF ""; $PRINTF "Counter c of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+
+%init: 1 A(c{=0})
+
+%mod: [E] = 1 do $STOP;

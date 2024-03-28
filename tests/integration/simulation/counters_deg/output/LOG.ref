@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (2 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'counters_deg.ka' '-seed' '322460359'
++ Command line to rerun is: 'KaSim' 'counters_deg.ka' '-d' 'output' '-seed' '322460359'
 ______________________________________________________________________
 ######################################################################
 Simulation ended
