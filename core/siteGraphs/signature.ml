@@ -6,17 +6,16 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type counter_info =
-  {
-    counter_info_min: int option;
-    counter_info_max: int option;
-    counter_default_value: int
-  }
+type counter_info = {
+  counter_info_min: int option;
+  counter_info_max: int option;
+  counter_default_value: int;
+}
 
 type 'links site_sig = {
   internal_state: unit NamedDecls.t;
   links: 'links option;
-  counters_info: counter_info option;
+  counter_info: counter_info option;
 }
 
 type t = bool array array site_sig NamedDecls.t
@@ -50,7 +49,7 @@ let internal_state_of_site_id site_id val_id signature =
   with Invalid_argument _ -> raise Not_found
 
 let counter_of_site_id site_id signature =
-  try (NamedDecls.elt_val signature site_id).counters_info
+  try (NamedDecls.elt_val signature site_id).counter_info
   with Invalid_argument _ -> raise Not_found
 
 let has_counter signature =
@@ -58,7 +57,7 @@ let has_counter signature =
     (fun p_id _ ok ->
       try
         let site_sig = NamedDecls.elt_val signature p_id in
-        ok || not (site_sig.counters_info = None)
+        ok || not (site_sig.counter_info = None)
       with Invalid_argument _ -> raise Not_found)
     false signature
 
@@ -90,15 +89,23 @@ let one_to_json =
                        :: acc)
                      links []))
               signature.links );
-          ( "counters_info",
+          ( "counter_info",
             JsonUtil.of_option
-              (fun c -> `Assoc [ "min", JsonUtil.of_option (fun x -> `Int x) c.counter_info_min; "max", JsonUtil.of_option (fun x -> `Int x) c.counter_info_max; "default", `Int c.counter_default_value;])
-              signature.counters_info );
+              (fun c ->
+                `Assoc
+                  [
+                    ( "min",
+                      JsonUtil.of_option (fun x -> `Int x) c.counter_info_min );
+                    ( "max",
+                      JsonUtil.of_option (fun x -> `Int x) c.counter_info_max );
+                    "default", `Int c.counter_default_value;
+                  ])
+              signature.counter_info );
         ])
 
 let one_of_json : Yojson.Basic.t -> bool array array site_sig NamedDecls.t =
   NamedDecls.of_json (function
-    | `Assoc [ ("internal_state", a); ("links", b); ("counters_info", c) ] ->
+    | `Assoc [ ("internal_state", a); ("links", b); ("counter_info", c) ] ->
       {
         internal_state =
           NamedDecls.of_json
@@ -134,27 +141,32 @@ let one_of_json : Yojson.Basic.t -> bool array array site_sig NamedDecls.t =
                   (Yojson.Basic.Util.Type_error
                      ("Problematic agent signature", x)))
             b;
-        counters_info =
+        counter_info =
           Yojson.Basic.Util.to_option
             (function
-              | `Assoc [ "min", c1_opt; "max", c2_opt; "default", `Int c3] ->
+              | `Assoc
+                  [ ("min", c1_opt); ("max", c2_opt); ("default", `Int c3) ] ->
                 {
-                  counter_info_min = Yojson.Basic.Util.to_option
-                                (function
-                                  | `Int c -> c
-                                  | x ->
-                                    raise
-                                      (Yojson.Basic.Util.Type_error
-                                         ("Problematic agent signature", x))) c1_opt ;
-                  counter_info_max = Yojson.Basic.Util.to_option
-                                (function
-                                  | `Int c -> c
-                                  | x ->
-                                    raise
-                                      (Yojson.Basic.Util.Type_error
-                                         ("Problematic agent signature", x))) c2_opt ;
-                  counter_default_value = c3
-              }
+                  counter_info_min =
+                    Yojson.Basic.Util.to_option
+                      (function
+                        | `Int c -> c
+                        | x ->
+                          raise
+                            (Yojson.Basic.Util.Type_error
+                               ("Problematic agent signature", x)))
+                      c1_opt;
+                  counter_info_max =
+                    Yojson.Basic.Util.to_option
+                      (function
+                        | `Int c -> c
+                        | x ->
+                          raise
+                            (Yojson.Basic.Util.Type_error
+                               ("Problematic agent signature", x)))
+                      c2_opt;
+                  counter_default_value = c3;
+                }
               | x ->
                 raise
                   (Yojson.Basic.Util.Type_error
@@ -280,20 +292,24 @@ let print_site_internal_state sigs ag_ty site f = function
       (site_of_id ag_ty site sigs)
       (internal_state_of_id ag_ty site id sigs)
 
-let pp_counts f = function
+let print_counter_info f = function
   | None -> ()
   | Some c ->
-    match c.counter_info_min, c.counter_info_max with
-      | Some i, Some j when i=c.counter_default_value ->
-           Format.fprintf f "{=%d/+=%d}" i j
-      | i_opt, j_opt ->
-           Format.fprintf f "{-=%s/=%d/+=%s}"
-            (match i_opt with None -> "-oo" | Some i -> Format.sprintf "%d" i)
-            c.counter_default_value
-            (match j_opt with None -> "-oo" | Some i -> Format.sprintf "%d" i)
+    (match c.counter_info_min, c.counter_info_max with
+    | Some i, Some j when i = c.counter_default_value ->
+      Format.fprintf f "{=%d/+=%d}" i j
+    | i_opt, j_opt ->
+      Format.fprintf f "{-=%s/=%d/+=%s}"
+        (match i_opt with
+        | None -> "-oo"
+        | Some i -> Format.sprintf "%d" i)
+        c.counter_default_value
+        (match j_opt with
+        | None -> "-oo"
+        | Some i -> Format.sprintf "%d" i))
 
 let print_counter sigs ag_ty f id =
-  pp_counts f (counter_of_site_id id (get sigs ag_ty))
+  print_counter_info f (counter_of_site_id id (get sigs ag_ty))
 
 let print_one ?(sigs : s option) (i : int) (f : Format.formatter)
     (signature : t) =
@@ -324,7 +340,7 @@ let print_one ?(sigs : s option) (i : int) (f : Format.formatter)
      ~sep:(fun f -> Format.fprintf f ",@,")
      (fun _ name f site_sig ->
        Format.fprintf f "%s%a%a%a" name pp_int site_sig.internal_state
-         (pp_link i) site_sig.links pp_counts site_sig.counters_info))
+         (pp_link i) site_sig.links print_counter_info site_sig.counter_info))
     f signature
 
 let print f sigs =

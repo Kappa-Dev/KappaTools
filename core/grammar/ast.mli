@@ -37,14 +37,15 @@ type counter = {
 
 type counter_sig = {
   counter_sig_name: string Loc.annoted;
-  counter_sig_min: int option Loc.annoted option ;
-  counter_sig_max: int option Loc.annoted option ;
+  counter_sig_min: int option Loc.annoted option;
+  counter_sig_max: int option Loc.annoted option;
   counter_sig_visible: bool;
   counter_sig_default: int;
 }
 
-val op_counter_sig: counter_sig -> string Loc.annoted -> counter_sig
+val make_inverted_counter_sig : counter_sig -> string Loc.annoted -> counter_sig
 
+(* Site type, with custom definition of counter type: used with `counter` and `counter_sig` *)
 type 'counter site = Port of port | Counter of 'counter
 type agent_mod = NoMod | Erase | Create
 
@@ -54,7 +55,6 @@ type 'counter parametric_agent =
 
 type agent = counter parametric_agent
 type agent_sig = counter_sig parametric_agent
-
 type mixture = agent list list
 
 val mixture_to_user_graph : mixture -> User_graph.connected_component
@@ -173,7 +173,9 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
-type parsing_instruction = (agent, agent_sig, mixture, mixture, string, rule) instruction
+
+type parsing_instruction =
+  (agent, agent_sig, mixture, mixture, string, rule) instruction
 
 val empty_compil : parsing_compil
 val no_more_site_on_right : bool -> 'a site list -> 'a site list -> bool

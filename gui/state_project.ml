@@ -223,12 +223,13 @@ let update_state me project_catalog default_parameters project_parameters =
     let st = React.S.value state in
     let () =
       set_state
-      { st with
-        project_current = Some me;
-        project_version = (st.project_version + 1);
-      }
-  in
-  Lwt.return out
+        {
+          st with
+          project_current = Some me;
+          project_version = st.project_version + 1;
+        }
+    in
+    Lwt.return out
 
 let computing_watcher manager setter =
   let delay = 1. in

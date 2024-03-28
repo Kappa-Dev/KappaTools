@@ -3,7 +3,13 @@ val model :
 
 val compile :
   Format.formatter ->
-  (Ast.agent, Ast.agent_sig, Ast.mixture, Ast.mixture, string, Ast.rule) Ast.compil ->
+  ( Ast.agent,
+    Ast.agent_sig,
+    Ast.mixture,
+    Ast.mixture,
+    string,
+    Ast.rule )
+  Ast.compil ->
   string ->
   Ast.parsing_compil
 

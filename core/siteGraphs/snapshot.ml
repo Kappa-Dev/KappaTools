@@ -210,7 +210,7 @@ let cc_to_user_cc ?(keep_inverted_counters : bool = false) ~debug_mode ~raw sigs
             (* Remove inverted counters from user snapshot *)
             node_sites_all |> Array.to_list
             |> List.filter (fun (site : User_graph.cc_site) : bool ->
-                   not(Signature.is_inverted_counter site.site_name))
+                   not (Signature.is_inverted_counter site.site_name))
             |> Array.of_list
         in
 

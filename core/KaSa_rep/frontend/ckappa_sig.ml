@@ -47,6 +47,7 @@ and 'counter parametric_agent = {
 
 and agent = counter parametric_agent
 and agent_sig = counter_sig parametric_agent
+
 and 'counter interface =
   | EMPTY_INTF
   | PORT_SEP of port * 'counter interface
@@ -65,14 +66,15 @@ and counter = {
   counter_test: counter_test option;
   counter_delta: int option;
 }
-and counter_sig =
-  {
-    counter_sig_name: string;
-    counter_sig_default: int;
-    counter_sig_min: int option option;
-    counter_sig_max: int option option;
-    counter_visible: bool;
-  }
+
+and counter_sig = {
+  counter_sig_name: string;
+  counter_sig_default: int;
+  counter_sig_min: int option option;
+  counter_sig_max: int option option;
+  counter_visible: bool;
+}
+
 and counter_test = CEQ of int | CGTE of int | CVAR of string | UNKNOWN
 and internal = string option list
 

@@ -40,55 +40,56 @@ type counter = {
 
 type counter_sig = {
   counter_sig_name: string Loc.annoted;
-  counter_sig_min: int option Loc.annoted option ;
-  counter_sig_max: int option Loc.annoted option ;
+  counter_sig_min: int option Loc.annoted option;
+  counter_sig_max: int option Loc.annoted option;
   counter_sig_visible: bool;
   counter_sig_default: int;
 }
 
-
-let translate c =
-  let min,def =
+let counter_sig_of_counter (c : counter) : counter_sig =
+  let (counter_sig_min, counter_sig_default) : (int option * Loc.t) option * int
+      =
     match c.counter_test with
-      | Some (CEQ i,loc) -> (Some (Some i,loc)), i
-      | None | Some ((CGTE _ | CLTE _ | CVAR _),_)-> None, 0
+    | Some (CEQ i, loc) -> Some (Some i, loc), i
+    | None | Some ((CGTE _ | CLTE _ | CVAR _), _) -> None, 0
   in
-  let max =
+  let counter_sig_max =
     match c.counter_delta with
-      | i, loc -> Some (Some i,loc)
+    | i, loc -> Some (Some i, loc)
   in
   {
     counter_sig_name = c.counter_name;
-    counter_sig_min = min ;
-    counter_sig_max = max ;
-    counter_sig_default = def ;
-    counter_sig_visible = true
+    counter_sig_min;
+    counter_sig_max;
+    counter_sig_default;
+    counter_sig_visible = true;
   }
 
-let op_counter_sig counter name =
-    { counter with counter_sig_name = name ; counter_sig_visible = false ;
+let make_inverted_counter_sig (counter : counter_sig)
+    (counter_sig_name : string Loc.annoted) : counter_sig =
+  {
+    counter with
+    counter_sig_name;
+    counter_sig_visible = false;
     counter_sig_default =
-      match
-        counter.counter_sig_max, counter.counter_sig_min
-      with
-        | Some (Some max, _), Some (Some min, _) ->
+      (match counter.counter_sig_max, counter.counter_sig_min with
+      | Some (Some max, _), Some (Some min, _) ->
         max - counter.counter_sig_default + min
-        | (None | Some (None, _)), _ | _, (None | Some (None, _))-> failwith "unbounded counters not implemented yet"
-    }
+      | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
+        failwith "unbounded counters not implemented yet");
+  }
 
 type 'counter site = Port of port | Counter of 'counter
 
-let map_counters_in_site f =
-  function
-      | Port _ as x -> x
-      | Counter co -> Counter (f co)
+let map_counters_in_site f = function
+  | Port _ as x -> x
+  | Counter co -> Counter (f co)
 
 type agent_mod = NoMod | Erase | Create
 
 type 'counter parametric_agent =
   | Present of string Loc.annoted * 'counter site list * agent_mod
   | Absent of Loc.t
-
 
 type agent = counter parametric_agent
 type agent_sig = counter_sig parametric_agent
@@ -209,7 +210,9 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
-type parsing_instruction = (agent, agent_sig, mixture, mixture, string, rule) instruction
+
+type parsing_instruction =
+  (agent, agent_sig, mixture, mixture, string, rule) instruction
 
 let no_more_site_on_right error left right =
   List.for_all
@@ -300,20 +303,20 @@ let print_counter_test f = function
   | CLTE x, _ -> Format.fprintf f "<=%i" x
   | CVAR x, _ -> Format.fprintf f "=%s" x
 
-let print_counter_min f (x,_) =
+let print_counter_min f (x, _) =
   match x with
-    | Some x -> Format.fprintf f "=%d" x
-    | None -> Format.fprintf f "=-oo"
+  | Some x -> Format.fprintf f "=%d" x
+  | None -> Format.fprintf f "=-oo"
 
-let print_counter_max f (x,_) =
+let print_counter_max f (x, _) =
   match x with
-    | Some x -> Format.fprintf f "/%d" x
-    | None -> Format.fprintf f "/+oo"
+  | Some x -> Format.fprintf f "/%d" x
+  | None -> Format.fprintf f "/+oo"
 
 let print_counter_default min f x =
-    match min with
-      | Some ((Some i),_) when i=x -> ()
-      | None | Some _ -> Format.fprintf f "(%d)" x
+  match min with
+  | Some (Some i, _) when i = x -> ()
+  | None | Some _ -> Format.fprintf f "(%d)" x
 
 let print_counter_delta test f (delta, _) =
   if delta <> 0 then
@@ -329,13 +332,13 @@ let print_counter f c =
     c.counter_delta
 
 let print_counter_sig f c =
-    Format.fprintf f "%s{%a%a}%a" (fst c.counter_sig_name)
-        (Pp.option ~with_space:false print_counter_min)
-        c.counter_sig_min
-        (Pp.option ~with_space:false print_counter_max)
-        c.counter_sig_max
-        (print_counter_default c.counter_sig_min)
-        c.counter_sig_default
+  Format.fprintf f "%s{%a%a}%a" (fst c.counter_sig_name)
+    (Pp.option ~with_space:false print_counter_min)
+    c.counter_sig_min
+    (Pp.option ~with_space:false print_counter_max)
+    c.counter_sig_max
+    (print_counter_default c.counter_sig_min)
+    c.counter_sig_default
 
 let print_ast_site ~print_counter f = function
   | Port p -> print_ast_port f p
@@ -468,62 +471,207 @@ let build_port_of_json filenames n i l =
       port_link_mod;
     }
 
-
 let site_sig_of_json filenames = function
-    | `Assoc [ ("counter_sig_name", n); ("counter_min", min); ("counter_max", max) ; ("counter_default", default)]
-    | `Assoc [ ("counter_sig_name", n); ("counter_min", min); ("counter_default", default); ("counter_max", max) ]
-    | `Assoc [ ("counter_sig_name", n); ("counter_max", max); ("counter_default", default); ("counter_min", min) ]
-    | `Assoc [ ("counter_sig_name", n); ("counter_max", max); ("counter_min", min); ("counter_default", default) ]
-    | `Assoc [ ("counter_sig_name", n);("counter_default", default);("counter_min", min); ("counter_max", max)]
-    | `Assoc [ ("counter_sig_name", n);("counter_default", default);("counter_max", max); ("counter_min", min)]
-    | `Assoc [ ("counter_min", min); ("counter_sig_name", n); ("counter_default", default); ("counter_max", max)]
-    | `Assoc [ ("counter_min", min); ("counter_sig_name", n); ("counter_max", max); ("counter_default", default)]
-    | `Assoc [ ("counter_min", min); ("counter_max", max); ("counter_default", default); ("counter_sig_name", n)]
-    | `Assoc [ ("counter_min", min); ("counter_max", max); ("counter_sig_name", n); ("counter_default", default)]
-    | `Assoc [ ("counter_min", min); ("counter_default", default); ("counter_max", max); ("counter_sig_name", n)]
-    | `Assoc [ ("counter_min", min); ("counter_default", default); ("counter_sig_name", n); ("counter_max", max)]
-    | `Assoc [ ("counter_max", max); ("counter_sig_name", n); ("counter_min", min); ("counter_default", default)]
-    | `Assoc [ ("counter_max", max); ("counter_sig_name", n); ("counter_default", default); ("counter_min", min)]
-    | `Assoc [ ("counter_max", max); ("counter_min", min); ("counter_sig_name", n); ("counter_default", default)]
-    | `Assoc [ ("counter_max", max); ("counter_min", min); ("counter_default", default); ("counter_sig_name", n)]
-    | `Assoc [ ("counter_max", max); ("counter_default", default); ("counter_min", min); ("counter_sig_name", n)]
-    | `Assoc [ ("counter_max", max); ("counter_default", default); ("counter_sig_name", n) ; ("counter_min", min)]
-    | `Assoc [ ("counter_default", default); ("counter_max", max); ("counter_sig_name", n); ("counter_min", min)]
-    | `Assoc [ ("counter_default", default); ("counter_max", max); ("counter_min", min); ("counter_sig_name", n)]
-    | `Assoc [ ("counter_default", default); ("counter_min", min); ("counter_sig_name", n); ("counter_max", max)]
-    | `Assoc [ ("counter_default", default); ("counter_min", min); ("counter_max", max); ("counter_sig_name", n)]
-    | `Assoc [ ("counter_default", default); ("counter_sig_name", n); ("counter_min", min); ("counter_max", max)]
-    | `Assoc [ ("counter_default", default); ("counter_sig_name", n); ("counter_max", max); ("counter_min", min)]
-  ->
-  Counter
-    {
-      counter_sig_name =
-        Loc.annoted_of_yojson ~filenames Yojson.Basic.Util.to_string n;
-      counter_sig_min =
-        Yojson.Basic.Util.to_option (Loc.annoted_of_yojson ~filenames
-          (Yojson.Basic.Util.to_option Yojson.Basic.Util.to_int)) min;
-      counter_sig_max =
-      Yojson.Basic.Util.to_option (Loc.annoted_of_yojson ~filenames
-        (Yojson.Basic.Util.to_option Yojson.Basic.Util.to_int)) max;
-      counter_sig_default = Yojson.Basic.Util.to_int default;
-      counter_sig_visible = true
-    }
-
-    | `Assoc [ ("port_name", n); ("port_int", i); ("port_link", l) ]
-    | `Assoc [ ("port_name", n); ("port_link", l); ("port_int", i) ]
-    | `Assoc [ ("port_int", i); ("port_name", n); ("port_link", l) ]
-    | `Assoc [ ("port_link", l); ("port_name", n); ("port_int", i) ]
-    | `Assoc [ ("port_int", i); ("port_link", l); ("port_name", n) ]
-    | `Assoc [ ("port_link", l); ("port_int", i); ("port_name", n) ] ->
-      build_port_of_json filenames n i l
-    | `Assoc [ ("port_name", n); ("port_int", i) ]
-    | `Assoc [ ("port_int", i); ("port_name", n) ] ->
-      build_port_of_json filenames n i `Null
-    | `Assoc [ ("port_name", n); ("port_link", l) ]
-    | `Assoc [ ("port_link", l); ("port_name", n) ] ->
-      build_port_of_json filenames n `Null l
-    | `Assoc [ ("port_name", n) ] -> build_port_of_json filenames n `Null `Null
-    | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
+  | `Assoc
+      [
+        ("counter_sig_name", n);
+        ("counter_min", min);
+        ("counter_max", max);
+        ("counter_default", default);
+      ]
+  | `Assoc
+      [
+        ("counter_sig_name", n);
+        ("counter_min", min);
+        ("counter_default", default);
+        ("counter_max", max);
+      ]
+  | `Assoc
+      [
+        ("counter_sig_name", n);
+        ("counter_max", max);
+        ("counter_default", default);
+        ("counter_min", min);
+      ]
+  | `Assoc
+      [
+        ("counter_sig_name", n);
+        ("counter_max", max);
+        ("counter_min", min);
+        ("counter_default", default);
+      ]
+  | `Assoc
+      [
+        ("counter_sig_name", n);
+        ("counter_default", default);
+        ("counter_min", min);
+        ("counter_max", max);
+      ]
+  | `Assoc
+      [
+        ("counter_sig_name", n);
+        ("counter_default", default);
+        ("counter_max", max);
+        ("counter_min", min);
+      ]
+  | `Assoc
+      [
+        ("counter_min", min);
+        ("counter_sig_name", n);
+        ("counter_default", default);
+        ("counter_max", max);
+      ]
+  | `Assoc
+      [
+        ("counter_min", min);
+        ("counter_sig_name", n);
+        ("counter_max", max);
+        ("counter_default", default);
+      ]
+  | `Assoc
+      [
+        ("counter_min", min);
+        ("counter_max", max);
+        ("counter_default", default);
+        ("counter_sig_name", n);
+      ]
+  | `Assoc
+      [
+        ("counter_min", min);
+        ("counter_max", max);
+        ("counter_sig_name", n);
+        ("counter_default", default);
+      ]
+  | `Assoc
+      [
+        ("counter_min", min);
+        ("counter_default", default);
+        ("counter_max", max);
+        ("counter_sig_name", n);
+      ]
+  | `Assoc
+      [
+        ("counter_min", min);
+        ("counter_default", default);
+        ("counter_sig_name", n);
+        ("counter_max", max);
+      ]
+  | `Assoc
+      [
+        ("counter_max", max);
+        ("counter_sig_name", n);
+        ("counter_min", min);
+        ("counter_default", default);
+      ]
+  | `Assoc
+      [
+        ("counter_max", max);
+        ("counter_sig_name", n);
+        ("counter_default", default);
+        ("counter_min", min);
+      ]
+  | `Assoc
+      [
+        ("counter_max", max);
+        ("counter_min", min);
+        ("counter_sig_name", n);
+        ("counter_default", default);
+      ]
+  | `Assoc
+      [
+        ("counter_max", max);
+        ("counter_min", min);
+        ("counter_default", default);
+        ("counter_sig_name", n);
+      ]
+  | `Assoc
+      [
+        ("counter_max", max);
+        ("counter_default", default);
+        ("counter_min", min);
+        ("counter_sig_name", n);
+      ]
+  | `Assoc
+      [
+        ("counter_max", max);
+        ("counter_default", default);
+        ("counter_sig_name", n);
+        ("counter_min", min);
+      ]
+  | `Assoc
+      [
+        ("counter_default", default);
+        ("counter_max", max);
+        ("counter_sig_name", n);
+        ("counter_min", min);
+      ]
+  | `Assoc
+      [
+        ("counter_default", default);
+        ("counter_max", max);
+        ("counter_min", min);
+        ("counter_sig_name", n);
+      ]
+  | `Assoc
+      [
+        ("counter_default", default);
+        ("counter_min", min);
+        ("counter_sig_name", n);
+        ("counter_max", max);
+      ]
+  | `Assoc
+      [
+        ("counter_default", default);
+        ("counter_min", min);
+        ("counter_max", max);
+        ("counter_sig_name", n);
+      ]
+  | `Assoc
+      [
+        ("counter_default", default);
+        ("counter_sig_name", n);
+        ("counter_min", min);
+        ("counter_max", max);
+      ]
+  | `Assoc
+      [
+        ("counter_default", default);
+        ("counter_sig_name", n);
+        ("counter_max", max);
+        ("counter_min", min);
+      ] ->
+    Counter
+      {
+        counter_sig_name =
+          Loc.annoted_of_yojson ~filenames Yojson.Basic.Util.to_string n;
+        counter_sig_min =
+          Yojson.Basic.Util.to_option
+            (Loc.annoted_of_yojson ~filenames
+               (Yojson.Basic.Util.to_option Yojson.Basic.Util.to_int))
+            min;
+        counter_sig_max =
+          Yojson.Basic.Util.to_option
+            (Loc.annoted_of_yojson ~filenames
+               (Yojson.Basic.Util.to_option Yojson.Basic.Util.to_int))
+            max;
+        counter_sig_default = Yojson.Basic.Util.to_int default;
+        counter_sig_visible = true;
+      }
+  | `Assoc [ ("port_name", n); ("port_int", i); ("port_link", l) ]
+  | `Assoc [ ("port_name", n); ("port_link", l); ("port_int", i) ]
+  | `Assoc [ ("port_int", i); ("port_name", n); ("port_link", l) ]
+  | `Assoc [ ("port_link", l); ("port_name", n); ("port_int", i) ]
+  | `Assoc [ ("port_int", i); ("port_link", l); ("port_name", n) ]
+  | `Assoc [ ("port_link", l); ("port_int", i); ("port_name", n) ] ->
+    build_port_of_json filenames n i l
+  | `Assoc [ ("port_name", n); ("port_int", i) ]
+  | `Assoc [ ("port_int", i); ("port_name", n) ] ->
+    build_port_of_json filenames n i `Null
+  | `Assoc [ ("port_name", n); ("port_link", l) ]
+  | `Assoc [ ("port_link", l); ("port_name", n) ] ->
+    build_port_of_json filenames n `Null l
+  | `Assoc [ ("port_name", n) ] -> build_port_of_json filenames n `Null `Null
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
 
 let site_of_json filenames = function
   | `Assoc [ ("counter_name", n); ("counter_test", t); ("counter_delta", d) ]
@@ -560,41 +708,35 @@ let site_of_json filenames = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
 
 let counter_to_json ~filenames c =
-`Assoc
-  [
-    ( "counter_name",
-      Loc.yojson_of_annoted ~filenames JsonUtil.of_string c.counter_name );
-    ( "counter_test",
-      JsonUtil.of_option
-        (Loc.yojson_of_annoted ~filenames counter_test_to_json)
-        c.counter_test );
-    ( "counter_delta",
-      Loc.yojson_of_annoted ~filenames JsonUtil.of_int c.counter_delta );
-  ]
+  `Assoc
+    [
+      ( "counter_name",
+        Loc.yojson_of_annoted ~filenames JsonUtil.of_string c.counter_name );
+      ( "counter_test",
+        JsonUtil.of_option
+          (Loc.yojson_of_annoted ~filenames counter_test_to_json)
+          c.counter_test );
+      ( "counter_delta",
+        Loc.yojson_of_annoted ~filenames JsonUtil.of_int c.counter_delta );
+    ]
 
 let counter_sig_to_json ~filenames c =
   `Assoc
-  [
-    ( "counter_sig_name",
-      Loc.yojson_of_annoted ~filenames JsonUtil.of_string c.counter_sig_name );
-    ( "counter_min",
-      JsonUtil.of_option
-        (Loc.yojson_of_annoted ~filenames
-            (JsonUtil.of_option JsonUtil.of_int))
-        c.counter_sig_min)
-        ;
-    ( "counter_max",
-          JsonUtil.of_option
-            (Loc.yojson_of_annoted ~filenames
-                (JsonUtil.of_option JsonUtil.of_int))
-            c.counter_sig_max)
-            ;
-    ( "counter_default",
-          JsonUtil.of_int
-              c.counter_sig_default)
-                  ;
-
-  ]
+    [
+      ( "counter_sig_name",
+        Loc.yojson_of_annoted ~filenames JsonUtil.of_string c.counter_sig_name );
+      ( "counter_min",
+        JsonUtil.of_option
+          (Loc.yojson_of_annoted ~filenames
+             (JsonUtil.of_option JsonUtil.of_int))
+          c.counter_sig_min );
+      ( "counter_max",
+        JsonUtil.of_option
+          (Loc.yojson_of_annoted ~filenames
+             (JsonUtil.of_option JsonUtil.of_int))
+          c.counter_sig_max );
+      "counter_default", JsonUtil.of_int c.counter_sig_default;
+    ]
 
 let site_to_json ~counter_to_json filenames = function
   | Port p -> port_to_json filenames p
@@ -630,7 +772,10 @@ let agent_to_json ~counter_to_json ~filter filenames = function
     JsonUtil.smart_assoc
       [
         "name", Loc.yojson_of_annoted ~filenames JsonUtil.of_string na;
-        "sig", JsonUtil.of_list (site_to_json ~counter_to_json filenames) (List.filter filter l);
+        ( "sig",
+          JsonUtil.of_list
+            (site_to_json ~counter_to_json filenames)
+            (List.filter filter l) );
         "mod", agent_mod_to_yojson m;
       ]
 
@@ -664,15 +809,20 @@ let agent_of_json ~site_of_json filenames = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
 
 let agent_sig_of_json = agent_of_json ~site_of_json:site_sig_of_json
-let agent_sig_to_json = agent_to_json ~counter_to_json:counter_sig_to_json ~filter:(fun c ->
-    match c with Counter c -> c.counter_sig_visible | Port _ -> true )
+
+let agent_sig_to_json =
+  agent_to_json ~counter_to_json:counter_sig_to_json ~filter:(fun c ->
+      match c with
+      | Counter c -> c.counter_sig_visible
+      | Port _ -> true)
 
 let agent_of_json = agent_of_json ~site_of_json
 let agent_to_json = agent_to_json ~counter_to_json ~filter:(fun _ -> true)
 
-
 let print_ast_mix ~print_counter =
-  Pp.list (fun f -> Format.fprintf f "\\@ ") (Pp.list Pp.comma (print_ast_agent ~print_counter))
+  Pp.list
+    (fun f -> Format.fprintf f "\\@ ")
+    (Pp.list Pp.comma (print_ast_agent ~print_counter))
 
 let to_erased_mixture =
   List.map
@@ -838,7 +988,9 @@ let print_tok pr_mix pr_tok pr_var f ((nb, _), (n, _)) =
   Format.fprintf f "%a %a" (Alg_expr.print pr_mix pr_tok pr_var) nb pr_tok n
 
 let print_one_size tk f mix =
-  Format.fprintf f "%a%t%a" (print_ast_mix ~print_counter) mix
+  Format.fprintf f "%a%t%a"
+    (print_ast_mix ~print_counter)
+    mix
     (fun f ->
       match tk with
       | [] -> ()
@@ -917,7 +1069,8 @@ let print_configuration f ((n, _), l) =
 let print_init f = function
   | (n, _), INIT_MIX (m, _) ->
     Format.fprintf f "@[%%init: @[%a@]@ @[%a@]@]" print_ast_alg_expr n
-      (print_ast_mix ~print_counter) m
+      (print_ast_mix ~print_counter)
+      m
   | (n, _), INIT_TOK t ->
     Format.fprintf f "@[%%init: %a %a@]" print_ast_alg_expr n
       (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
@@ -964,7 +1117,9 @@ let print_modif f = function
        else
          "[false]")
   | CFLOWMIX (on, (p, _)) ->
-    Format.fprintf f "$TRACK @[%a@] %s;" (print_ast_mix ~print_counter) p
+    Format.fprintf f "$TRACK @[%a@] %s;"
+      (print_ast_mix ~print_counter)
+      p
       (if on then
          "[true]"
        else
@@ -977,7 +1132,9 @@ let print_modif f = function
         | Primitives.PROBABILITY -> Format.fprintf f "\"probability\" ")
   | DINOFF p -> Format.fprintf f "$DIN%a [false]" print_print_expr p
   | SPECIES_OF (on, p, (m, _)) ->
-    Format.fprintf f "$SPECIES_OF @[%a@] %s >%a;" (print_ast_mix ~print_counter) m
+    Format.fprintf f "$SPECIES_OF @[%a@] %s >%a;"
+      (print_ast_mix ~print_counter)
+      m
       (if on then
          "[true]"
        else
@@ -1001,7 +1158,9 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space print_configuration)
     c.configurations
     (Pp.list Pp.space (fun f a ->
-         Format.fprintf f "@[%%agent:@ @[%a@]@]" (print_ast_agent ~print_counter:print_counter_sig) a))
+         Format.fprintf f "@[%%agent:@ @[%a@]@]"
+           (print_ast_agent ~print_counter:print_counter_sig)
+           a))
     c.signatures
     (Pp.list Pp.space (fun f (s, _) -> Format.fprintf f "%%token: %s" s))
     c.tokens
@@ -1337,11 +1496,12 @@ let merge_internals =
       else
         y :: acc)
 
-let rec merge_sites_counter   c =
-  function
+let rec merge_sites_counter c = function
   | [] -> [ Counter c ]
-  | Counter c' :: _ as l when fst c.counter_sig_name = fst c'.counter_sig_name -> l
-  | ((Port _ | Counter _) as h) :: t -> h :: merge_sites_counter   c t
+  | Counter c' :: _ as l when fst c.counter_sig_name = fst c'.counter_sig_name
+    ->
+    l
+  | ((Port _ | Counter _) as h) :: t -> h :: merge_sites_counter c t
 
 let rec merge_sites_port p = function
   | [] -> [ Port { p with port_link = [] } ]
@@ -1360,13 +1520,13 @@ let rec merge_sites_port p = function
 let merge_sites =
   List.fold_left (fun acc -> function
     | Port p -> merge_sites_port p acc
-    | Counter c -> merge_sites_counter  (translate c) acc)
+    | Counter c -> merge_sites_counter (counter_sig_of_counter c) acc)
 
 let merge_agents =
   List.fold_left
-    (List.fold_left (fun (acc:agent_sig list) -> function
+    (List.fold_left (fun (acc : agent_sig list) -> function
        | Absent _ -> acc
-       | Present (((na, _) as x), ((s:counter site list)), _) ->
+       | Present (((na, _) as x), (s : counter site list), _) ->
          let rec aux = function
            | [] ->
              [
@@ -1375,7 +1535,8 @@ let merge_agents =
                    List.map
                      (function
                        | Port p -> Port { p with port_link = [] }
-                       | Counter _ as x -> map_counters_in_site translate x)
+                       | Counter _ as x ->
+                         map_counters_in_site counter_sig_of_counter x)
                      s,
                    NoMod );
              ]
@@ -1656,5 +1817,4 @@ let compil_of_json = function
 
 let write_parsing_compil b ast = Yojson.Basic.write_json b (compil_to_json ast)
 let read_parsing_compil p lb = compil_of_json (Yojson.Basic.read_json p lb)
-
 let print_ast_mix = print_ast_mix ~print_counter

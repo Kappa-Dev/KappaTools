@@ -13,17 +13,16 @@
 
 (* TODO *)
 
-type counter_info =
-  {
-    counter_info_min: int option;
-    counter_info_max: int option;
-    counter_default_value: int
-  }
+type counter_info = {
+  counter_info_min: int option;
+  counter_info_max: int option;
+  counter_default_value: int;
+}
 
 type 'links site_sig = {
   internal_state: unit NamedDecls.t;
   links: 'links option;
-  counters_info: counter_info option;
+  counter_info: counter_info option;
       (** If relevant: counter CEQ value * counter delta *)
 }
 

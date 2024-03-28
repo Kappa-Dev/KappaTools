@@ -296,7 +296,7 @@ let scan_agent ~get_counter_name parameters (error, handler) agent =
     | Ckappa_sig.COUNTER_SEP (counter, interface) ->
       let error, (handler, _, _c) =
         declare_site_with_counter parameters (error, handler) ag_id
-              (get_counter_name counter)
+          (get_counter_name counter)
       in
       aux error interface handler
     | Ckappa_sig.PORT_SEP (port, interface) ->
@@ -368,9 +368,9 @@ let scan_agent ~get_counter_name parameters (error, handler) agent =
 
 let get_counter_name c = c.Ckappa_sig.counter_name
 let get_counter_name_sig c = c.Ckappa_sig.counter_sig_name
-
 let scan_agent_sig = scan_agent ~get_counter_name:get_counter_name_sig
 let scan_agent = scan_agent ~get_counter_name
+
 let rec scan_mixture parameters remanent mixture =
   match mixture with
   | Ckappa_sig.EMPTY_MIX -> remanent
@@ -479,7 +479,10 @@ let scan_compil parameters error compil =
     remanent
   in
   let remanent = empty_handler parameters error in
-  let remanent = scan_declarations parameters remanent (compil.Ast.signatures:Ckappa_sig.agent_sig list) in
+  let remanent =
+    scan_declarations parameters remanent
+      (compil.Ast.signatures : Ckappa_sig.agent_sig list)
+  in
   let remanent = scan_initial_states parameters remanent compil.Ast.init in
   let remanent =
     scan_observables scan_tested_mixture parameters remanent

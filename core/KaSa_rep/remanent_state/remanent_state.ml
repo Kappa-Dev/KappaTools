@@ -21,7 +21,7 @@ type initial_state = (Primitives.alg_expr * Primitives.elementary_rule) list
 
 type refined_compilation =
   ( Ckappa_sig.agent,
-    Ckappa_sig.agent_sig, 
+    Ckappa_sig.agent_sig,
     Ckappa_sig.mixture,
     Ckappa_sig.mixture,
     string,

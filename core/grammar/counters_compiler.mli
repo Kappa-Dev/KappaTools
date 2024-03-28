@@ -38,7 +38,7 @@ val compile_counter_in_rule :
 
 val counters_perturbations :
   Signature.s ->
-  Ast.agent_sig list list->
+  Ast.agent_sig list list ->
   (LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.perturbation list
 
 val annotate_dropped_counters :

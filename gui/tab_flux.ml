@@ -50,7 +50,8 @@ let din_data =
             (Lwt_react.E.from (fun () ->
                  Lwt.map
                    (Result_util.fold ~ok:(fun x -> x) ~error:(fun _ -> None))
-                   (State_simulation.eval_with_sim_manager_and_info ~label:__LOC__
+                   (State_simulation.eval_with_sim_manager_and_info
+                      ~label:__LOC__
                       ~stopped:(fun _ -> Lwt.return (Result_util.ok None))
                       ~initializing:(fun _ -> Lwt.return (Result_util.ok None))
                       ~ready:(fun manager _ ->

@@ -215,7 +215,7 @@ let counters_signature s agents =
 let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
     (counter_delta : int Loc.annoted) (counter_def : Ast.counter_sig) :
     (Ast.counter Ast.site * (string * int) list) list =
-  let min_value, max_value =
+  let (min_value, max_value) : int * int =
     match counter_def.counter_sig_min, counter_def.counter_sig_max with
     | Some (Some min_loc, _), Some (Some max_loc, _) -> min_loc, max_loc
     | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
