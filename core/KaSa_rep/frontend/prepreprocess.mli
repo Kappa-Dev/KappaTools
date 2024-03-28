@@ -3,7 +3,13 @@ val local_trace : bool
 val translate_compil :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.method_handler ->
-  (Ast.agent, Ast.agent_sig, Ast.mixture, Ast.agent list list, string, Ast.rule) Ast.compil ->
+  ( Ast.agent,
+    Ast.agent_sig,
+    Ast.mixture,
+    Ast.agent list list,
+    string,
+    Ast.rule )
+  Ast.compil ->
   Exception_without_parameter.method_handler
   * ( Ckappa_sig.agent,
       Ckappa_sig.agent_sig,

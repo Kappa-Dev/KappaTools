@@ -89,7 +89,14 @@ let get_ast_from_cli_args cli_args =
 
 let get_preprocessed_ast_from_cli_args ~warning ~debug_mode
     ?(kasim_args = Kasim_args.default) cli_args =
-  let ast : (Ast.agent, Ast.agent_sig, Ast.mixture, Ast.mixture, string, Ast.rule) Ast.compil =
+  let ast :
+      ( Ast.agent,
+        Ast.agent_sig,
+        Ast.mixture,
+        Ast.mixture,
+        string,
+        Ast.rule )
+      Ast.compil =
     get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion
       cli_args.Run_cli_args.inputKappaFileNames
   in

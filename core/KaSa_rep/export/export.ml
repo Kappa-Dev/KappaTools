@@ -1732,7 +1732,7 @@ functor
                         {
                           Signature.internal_state = states';
                           links = Some binding';
-                          counters_info = None;
+                          counter_info = None;
                         } )
                       :: acc ))
                   (state, []) interface

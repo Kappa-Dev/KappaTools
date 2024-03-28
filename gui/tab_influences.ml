@@ -190,7 +190,8 @@ let export_config =
             (fun filename ->
               Lwt.ignore_result
                 ( State_error.wrap "influence_map_export"
-                    (State_project.eval_with_project ~label:__LOC__ (fun manager ->
+                    (State_project.eval_with_project ~label:__LOC__
+                       (fun manager ->
                          let { accuracy; _ } = React.S.value model in
                          manager#get_influence_map_raw accuracy
                          >|= Result_util.map (fun influences_string ->

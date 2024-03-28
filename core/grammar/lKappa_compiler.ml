@@ -1655,37 +1655,38 @@ let prepare_agent_sig ~(sites : Ast.counter_sig Ast.site list) :
                                   pos ))
                          | LKappa.LNK_TYPE (a, b), _ -> (a, b) :: acc_links')
                        [] p.port_link);
-                counters_info = None;
+                counter_info = None;
               } )
             :: acc_site_sigs,
             acc_counter_names )
         | Counter c ->
           (* We are reading here a signature, only CEQ tests are accepted *)
-          (    ( ( c.Ast.counter_sig_name,
-                  {
-                    internal_state = NamedDecls.create [||];
-                    (* Agent with counter can link to port [b] on counter agent [__counter_agent] *)
-                    links =
-                      Some
-                        [
-                          ( Loc.annot_with_dummy "b",
-                            Loc.annot_with_dummy "__counter_agent" );
-                        ];
-                    counters_info = Some (
-                              {counter_info_min=
-                                (match c.Ast.counter_sig_min with
-                                  | Some (Some i,_) -> Some i
-                                  | None | Some (None,_) -> None);
-                               counter_info_max=
-                               (match c.Ast.counter_sig_max with
-                                 | Some (Some i,_) -> Some i
-                                 | None | Some (None,_) -> None);
-
-                               counter_default_value=c.Ast.counter_sig_default;
-
-                  } )})
-                :: acc_site_sigs,
-                c.counter_sig_name :: acc_counter_names )))
+          ( ( c.Ast.counter_sig_name,
+              {
+                internal_state = NamedDecls.create [||];
+                (* Agent with counter can link to port [b] on counter agent [__counter_agent] *)
+                links =
+                  Some
+                    [
+                      ( Loc.annot_with_dummy "b",
+                        Loc.annot_with_dummy "__counter_agent" );
+                    ];
+                counter_info =
+                  Some
+                    {
+                      counter_info_min =
+                        (match c.Ast.counter_sig_min with
+                        | Some (Some i, _) -> Some i
+                        | None | Some (None, _) -> None);
+                      counter_info_max =
+                        (match c.Ast.counter_sig_max with
+                        | Some (Some i, _) -> Some i
+                        | None | Some (None, _) -> None);
+                      counter_default_value = c.Ast.counter_sig_default;
+                    };
+              } )
+            :: acc_site_sigs,
+            c.counter_sig_name :: acc_counter_names ))
       sites ([], [])
   in
   NamedDecls.create_from_list site_sigs_pre_nameddecls, counter_names
@@ -1711,7 +1712,7 @@ let make_counter_agent_site_sigs
     {
       Signature.internal_state = NamedDecls.create [||];
       links = Some [ b_port_name, counter_agent_name ];
-      counters_info = None;
+      counter_info = None;
     }
   in
   (* Port [b] can link to port a of agent of type counter agent
@@ -1731,7 +1732,7 @@ let make_counter_agent_site_sigs
     {
       Signature.internal_state = NamedDecls.create [||];
       links = Some b_links;
-      counters_info = None;
+      counter_info = None;
     }
   in
   let site_sigs_counter_agent =
@@ -1867,7 +1868,13 @@ type ast_compiled_data = {
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;
   result:
-    (Ast.agent, Ast.agent_sig, LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.compil;
+    ( Ast.agent,
+      Ast.agent_sig,
+      LKappa.rule_mixture,
+      Raw_mixture.t,
+      int,
+      LKappa.rule )
+    Ast.compil;
       (** Compiled data where identifiers are i Ast.compil where identifiers
      * are integers and not string, syntactic sugar on rules are expansed
      * (syntactic sugar on mixture are not) *)
@@ -1959,7 +1966,8 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                       match site with
                       | Ast.Port _ -> None
                       | Counter counter ->
-                        if Loc.v counter.Ast.counter_sig_name = counter_name then
+                        if Loc.v counter.Ast.counter_sig_name = counter_name
+                        then
                           Some counter
                         else
                           None)
@@ -1976,28 +1984,29 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                 let counter_sig_min = counter_orig.counter_sig_min in
                 let counter_sig_max = counter_orig.counter_sig_max in
                 let counter_sig_default, inf_bound, sup_bound =
-                    match counter_sig_min, counter_sig_max with
-                      | Some (Some min,_), Some (Some max,_) ->
-                        max + min - counter_orig.counter_sig_default, min, max
-                      | (None | (Some (None,_))),_
-                      | _,  (None | (Some (None,_))) ->
+                  match counter_sig_min, counter_sig_max with
+                  | Some (Some min, _), Some (Some max, _) ->
+                    max + min - counter_orig.counter_sig_default, min, max
+                  | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
                     raise
-                        (ExceptionDefn.Malformed_Decl
-                           ( "Cannot take the opposite of an unbounded counters \ ",
-                             Loc.get_annot counter_orig.counter_sig_name ));
-
+                      (ExceptionDefn.Malformed_Decl
+                         ( "Cannot take the opposite of an unbounded counters  ",
+                           Loc.get_annot counter_orig.counter_sig_name ))
                 in
+
                 let counter_sig_visible = false in
                 (* Write in sum_bounds_ref the sum of the counter bounds above *)
                 sum_bounds_ref := inf_bound + sup_bound;
 
-                Ast.Counter {
-                  Ast.counter_sig_name;
-                  Ast.counter_sig_min;
-                  Ast.counter_sig_max;
-                  Ast.counter_sig_default;
-                  Ast.counter_sig_visible}::acc)
-
+                Ast.Counter
+                  {
+                    Ast.counter_sig_name;
+                    Ast.counter_sig_min;
+                    Ast.counter_sig_max;
+                    Ast.counter_sig_default;
+                    Ast.counter_sig_visible;
+                  }
+                :: acc)
               [] counters_with_clte_tests_from_agent
           in
 
@@ -2205,7 +2214,9 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                               :: acc))))
                   [] site_list
               in
-              let new_site_list : Ast.counter Ast.site list = site_list @ added_sites in
+              let new_site_list : Ast.counter Ast.site list =
+                site_list @ added_sites
+              in
               Ast.Present (agent_name_, new_site_list, agent_mod))
           agent_list)
       mix

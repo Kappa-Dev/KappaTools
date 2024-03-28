@@ -218,7 +218,8 @@ let onload () =
     (Tyxml_js.To_dom.of_button launch_button)##.onclick
     := Dom_html.handler (fun _ ->
            let _ =
-             State_project.eval_with_project ~label:"Launch stories" (fun manager ->
+             State_project.eval_with_project ~label:"Launch stories"
+               (fun manager ->
                  if manager#story_is_computing then
                    Lwt.return (Result_util.ok ())
                  else

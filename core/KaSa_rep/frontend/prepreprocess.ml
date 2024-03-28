@@ -118,8 +118,7 @@ let rec scan_interface ~get_counter_name parameters k agent interface
   | [] -> remanent
   | Ast.Counter counter :: interface ->
     let error, set_counters =
-      check_freshness parameters error "Counter"
-        (get_counter_name counter)
+      check_freshness parameters error "Counter" (get_counter_name counter)
         set_counters
     in
     scan_interface ~get_counter_name parameters k agent interface
@@ -181,7 +180,6 @@ let collect_binding_label parameters mixture f k remanent =
         error, (map, set))
     map
     (error, (map, Ckappa_sig.Lnk_id_map_and_set.Set.empty))
-
 
 let translate_link_state parameters lnk_state remanent =
   match lnk_state with
@@ -289,29 +287,28 @@ let translate_counter parameters error int_set counter =
            Some a);
     } )
 
-let translate_counter_sig parameters error int_set (counter:Ast.counter_sig) =
-    let error, _ =
-        check_freshness parameters error "Counters"
-          (fst counter.Ast.counter_sig_name)
-          int_set
-    in
-    let fetch x =
-      match x with
-        | Some (x,_) -> Some x
-        | None -> None
-    in
-      ( error,
-        {
-          Ckappa_sig.counter_sig_name = fst counter.Ast.counter_sig_name;
-          Ckappa_sig.counter_sig_max = fetch counter.Ast.counter_sig_max;
-          Ckappa_sig.counter_sig_min = fetch counter.Ast.counter_sig_min;
-          Ckappa_sig.counter_sig_default = counter.Ast.counter_sig_default;
-          Ckappa_sig.counter_visible = counter.Ast.counter_sig_visible;
-        } )
+let translate_counter_sig parameters error int_set (counter : Ast.counter_sig) =
+  let error, _ =
+    check_freshness parameters error "Counters"
+      (fst counter.Ast.counter_sig_name)
+      int_set
+  in
+  let fetch x =
+    match x with
+    | Some (x, _) -> Some x
+    | None -> None
+  in
+  ( error,
+    {
+      Ckappa_sig.counter_sig_name = fst counter.Ast.counter_sig_name;
+      Ckappa_sig.counter_sig_max = fetch counter.Ast.counter_sig_max;
+      Ckappa_sig.counter_sig_min = fetch counter.Ast.counter_sig_min;
+      Ckappa_sig.counter_sig_default = counter.Ast.counter_sig_default;
+      Ckappa_sig.counter_visible = counter.Ast.counter_sig_visible;
+    } )
 
-
-let rec translate_interface ~translate_counter parameters is_signature int_set_sites
-    int_set_counters interface remanent =
+let rec translate_interface ~translate_counter parameters is_signature
+    int_set_sites int_set_counters interface remanent =
   match interface with
   | [] -> Ckappa_sig.EMPTY_INTF, remanent
   | Ast.Counter counter :: interface ->
@@ -320,8 +317,8 @@ let rec translate_interface ~translate_counter parameters is_signature int_set_s
       translate_counter parameters error int_set_counters counter
     in
     let interface, remanent =
-      translate_interface ~translate_counter parameters is_signature int_set_sites int_set_counters
-        interface (error, a)
+      translate_interface ~translate_counter parameters is_signature
+        int_set_sites int_set_counters interface (error, a)
     in
     Ckappa_sig.COUNTER_SEP (counter, interface), remanent
   | Ast.Port port :: interface ->
@@ -329,21 +326,22 @@ let rec translate_interface ~translate_counter parameters is_signature int_set_s
       translate_port is_signature parameters int_set_sites port remanent
     in
     let interface, remanent =
-      translate_interface ~translate_counter parameters is_signature int_set_sites int_set_counters
-        interface remanent
+      translate_interface ~translate_counter parameters is_signature
+        int_set_sites int_set_counters interface remanent
     in
     Ckappa_sig.PORT_SEP (port, interface), remanent
 
-let translate_interface ~translate_counter  parameters is_signature =
-  translate_interface ~translate_counter parameters is_signature Mods.StringSet.empty
-    Mods.StringSet.empty
+let translate_interface ~translate_counter parameters is_signature =
+  translate_interface ~translate_counter parameters is_signature
+    Mods.StringSet.empty Mods.StringSet.empty
 
 let translate_agent ~translate_counter parameters is_signature ag remanent =
   match ag with
   | Ast.Absent _pos -> None, remanent
   | Ast.Present ((agent_name, agent_name_pos), intf, _modif) ->
     let interface, remanent =
-      translate_interface ~translate_counter parameters is_signature intf remanent
+      translate_interface ~translate_counter parameters is_signature intf
+        remanent
     in
     ( Some
         {
@@ -368,7 +366,9 @@ let rec translate_mixture_zero_zero parameters mixture remanent tail_size =
   match mixture with
   | [] -> build_skip tail_size Ckappa_sig.EMPTY_MIX, remanent
   | agent :: mixture ->
-    let agent_opt, remanent = translate_agent ~translate_counter parameters false agent remanent in
+    let agent_opt, remanent =
+      translate_agent ~translate_counter parameters false agent remanent
+    in
     let mixture, remanent =
       translate_mixture_zero_zero parameters mixture remanent tail_size
     in
@@ -399,8 +399,12 @@ let rec translate_mixture ~translate_counter parameters mixture remanent =
   match mixture with
   | [] -> Ckappa_sig.EMPTY_MIX, remanent
   | agent :: mixture ->
-    let agent_opt, remanent = translate_agent ~translate_counter parameters false agent remanent in
-    let mixture, remanent = translate_mixture ~translate_counter parameters mixture remanent in
+    let agent_opt, remanent =
+      translate_agent ~translate_counter parameters false agent remanent
+    in
+    let mixture, remanent =
+      translate_mixture ~translate_counter parameters mixture remanent
+    in
     add_agent agent_opt mixture remanent
 
 let support_agent = function
@@ -463,12 +467,13 @@ let refine_mixture_in_rule parameters error prefix_size empty_size tail_size
       (error, Ckappa_sig.Lnk_id_map_and_set.Map.empty)
   in
   let mixture, (error, _map) =
-    translate_mixture_in_rule  parameters mixture remanent prefix_size empty_size
+    translate_mixture_in_rule parameters mixture remanent prefix_size empty_size
       tail_size
   in
   error, mixture
 
-let refine_mixture ~collect_binding_label ~translate_counter parameters error (mixture:Ast.agent list list) =
+let refine_mixture ~collect_binding_label ~translate_counter parameters error
+    (mixture : Ast.agent list list) =
   let mixture = List.flatten mixture in
   let remanent =
     collect_binding_label parameters mixture
@@ -476,7 +481,9 @@ let refine_mixture ~collect_binding_label ~translate_counter parameters error (m
       Ckappa_sig.dummy_agent_id
       (error, Ckappa_sig.Lnk_id_map_and_set.Map.empty)
   in
-  let mixture, (error, _map) = translate_mixture ~translate_counter parameters mixture remanent in
+  let mixture, (error, _map) =
+    translate_mixture ~translate_counter parameters mixture remanent
+  in
   error, mixture
 
 (*let refine_mixture_sig = refine_mixture ~collect_binding_label:collect_binding_label_sig ~translate_counter:translate_counter_sig*)
@@ -686,7 +693,7 @@ let refine_init_t parameters error = function
     in
     error, Ast.INIT_TOK tk_l'
 
-let refine_agent_sig  parameters error agent_set agent =
+let refine_agent_sig parameters error agent_set agent =
   let error, agent_set =
     match agent with
     | Ast.Absent _ -> error, agent_set
@@ -699,7 +706,8 @@ let refine_agent_sig  parameters error agent_set agent =
   in
 
   let agent, (error, _map) =
-    translate_agent ~translate_counter:translate_counter_sig parameters true agent
+    translate_agent ~translate_counter:translate_counter_sig parameters true
+      agent
       (error, (map, Ckappa_sig.Lnk_id_map_and_set.Set.empty))
   in
   error, agent_set, agent
@@ -730,9 +738,15 @@ let dump_rule_no_rate rule =
   let () = Format.pp_print_flush fmt () in
   Buffer.contents buf
 
-let translate_compil parameters error (compil:(Ast.agent, Ast.agent_sig, Ast.mixture, Ast.agent list list,
-             string, Ast.rule)
-            Ast.compil) =
+let translate_compil parameters error
+    (compil :
+      ( Ast.agent,
+        Ast.agent_sig,
+        Ast.mixture,
+        Ast.agent list list,
+        string,
+        Ast.rule )
+      Ast.compil) =
   let translate_rule error (rule, pos) =
     let (ast_lhs, ast_rhs), (prefix, tail_lhs, tail_rhs) =
       match rule.Ast.rewrite with
@@ -803,7 +817,10 @@ let translate_compil parameters error (compil:(Ast.agent, Ast.agent_sig, Ast.mix
   let error, _agent_set, signatures_rev =
     List.fold_left
       (fun (error, agent_set, list) agent ->
-        let error, agent_set, (agent:Ckappa_sig.counter_sig Ckappa_sig.parametric_agent option) =
+        let ( error,
+              agent_set,
+              (agent :
+                Ckappa_sig.counter_sig Ckappa_sig.parametric_agent option) ) =
           refine_agent_sig parameters error agent_set agent
         in
         match agent with
@@ -924,7 +941,7 @@ let translate_compil parameters error (compil:(Ast.agent, Ast.agent_sig, Ast.mix
             error, Some b'
         in
         let error, o' =
-          bool_with_pos_with_option_map (refine_mixture  parameters) error o
+          bool_with_pos_with_option_map (refine_mixture parameters) error o
         in
         let error, m', rules_rev' =
           List.fold_left

@@ -199,7 +199,11 @@ let translate_agent_sig parameters error handler agent
           | _, Some (i, _, _, _) -> error, i
         in
         let (error', c_interface), test =
-          let test = [ Ckappa_sig.state_index_of_int counter.Ckappa_sig.counter_sig_default ]
+          let test =
+            [
+              Ckappa_sig.state_index_of_int
+                counter.Ckappa_sig.counter_sig_default;
+            ]
           in
           ( Ckappa_sig.Site_map_and_set.Map.add parameters error counter_name
               {
@@ -2214,12 +2218,13 @@ let translate_c_compil parameters error handler compil =
     List.fold_left
       (fun (error, list, map) agent ->
         let error, ag, map =
-          translate_agent_sig parameters error handler (agent:Ckappa_sig.agent_sig)
+          translate_agent_sig parameters error handler
+            (agent : Ckappa_sig.agent_sig)
             Ckappa_sig.dummy_agent_id map
         in
         error, ag :: list, map)
       (error, [], Ckappa_sig.AgentSite_map_and_set.Map.empty)
-      (compil.Ast.signatures:Ckappa_sig.agent_sig list)
+      (compil.Ast.signatures : Ckappa_sig.agent_sig list)
   in
   let error, c_variables =
     List.fold_left

@@ -112,7 +112,7 @@ val compare_unit_agent_site : unit -> unit -> int
 
 type binding_state = Free | Lnk_type of agent_name * site_name
 
-type  mixture =
+type mixture =
   | SKIP of mixture
   | COMMA of agent * mixture
   | DOT of c_agent_id * agent * mixture
@@ -133,7 +133,6 @@ and 'counter interface =
   | PORT_SEP of port * 'counter interface
   | COUNTER_SEP of 'counter * 'counter interface
 
-
 and port = {
   port_name: string;
   port_int: internal;
@@ -147,14 +146,13 @@ and counter = {
   counter_delta: int option;
 }
 
-and counter_sig =
-  {
-    counter_sig_name: string;
-    counter_sig_default: int;
-    counter_sig_min: int option option;
-    counter_sig_max: int option option;
-    counter_visible: bool;
-  }
+and counter_sig = {
+  counter_sig_name: string;
+  counter_sig_default: int;
+  counter_sig_min: int option option;
+  counter_sig_max: int option option;
+  counter_visible: bool;
+}
 
 and counter_test = CEQ of int | CGTE of int | CVAR of string | UNKNOWN
 and internal = string option list
