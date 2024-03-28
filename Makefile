@@ -120,6 +120,8 @@ all:
 	dune build --only-packages kappa-library,kappa-binaries @install
 	dune build @install
 	# Note: removed ./bin symlink used by kappy, as it caused build issues with dune deleting files
+	mkdir -p bin
+	cp -f _build/install/default/bin/* bin/
 
 agents:
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents @install
