@@ -6,6 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let map_opt f opt = match opt with | None -> None | Some a -> Some (f a)
+
 (* TODO originally_from term/lKappa.ml, see if it makes sense here *)
 let raise_if_modification_agent (pos : Loc.t) = function
   | Ast.NoMod -> ()
@@ -2241,30 +2243,6 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
           agent_list)
       mix
   in
-  let rules : (string Loc.annoted option * Ast.rule Loc.annoted) list =
-    List.map
-      (fun rule_def ->
-        ( fst rule_def,
-          Loc.map_annot
-            (fun (rule : Ast.rule) ->
-              let rewrite =
-                match rule.rewrite with
-                | Edit content ->
-                  Ast.Edit
-                    { content with mix = replace_counter_by_invert content.mix }
-                | Arrow content ->
-                  Arrow
-                    {
-                      content with
-                      lhs = replace_counter_by_invert content.lhs;
-                      rhs = replace_counter_by_invert content.rhs;
-                    }
-              in
-              { rule with rewrite })
-            (snd rule_def) ))
-      ast_compil.rules
-  in
-
   let add_inverted_counter_to_init_mixture (mix : Ast.mixture) : Ast.mixture =
     List.map
       (fun agent_list ->
@@ -2343,6 +2321,45 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
           agent_list)
       mix
   in
+
+  let map_expr expr =
+      Alg_expr.map_on_mixture
+        (fun x -> Alg_expr.KAPPA_INSTANCE (replace_counter_by_invert x))
+        expr
+  in
+  let map_bexpr expr =
+      Alg_expr.map_bool_on_mixture
+        (fun x -> Alg_expr.KAPPA_INSTANCE (replace_counter_by_invert x))
+        expr
+  in
+  let map_rule rule =
+    let rewrite =
+      match rule.Ast.rewrite with
+      | Edit content ->
+        Ast.Edit
+          { content with mix = replace_counter_by_invert content.mix }
+      | Arrow content ->
+        Arrow
+          {
+            content with
+            lhs = replace_counter_by_invert content.lhs;
+            rhs = replace_counter_by_invert content.rhs;
+          }
+    in
+    let k_def = map_expr rule.k_def in
+    let k_op = map_opt map_expr rule.k_op in
+    let k_un = map_opt (fun (a,b) -> map_expr a, map_opt map_expr b) rule.k_un in
+    let k_op_un = map_opt (fun (a,b) -> map_expr a, map_opt map_expr b) rule.k_op_un in
+    { rule with rewrite ; k_def ; k_op ; k_un ; k_op_un}
+  in
+  let rules : (string Loc.annoted option * Ast.rule Loc.annoted) list =
+    List.rev_map
+      (fun rule_def ->
+         fst rule_def,
+          Loc.map_annot map_rule (snd rule_def))
+      (List.rev ast_compil.rules)
+  in
+
   let init : (Ast.mixture, Ast.mixture, string) Ast.init_statement list =
     List.map
       (fun (quantity_alg_expr, init_kind) ->
@@ -2353,10 +2370,39 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             INIT_MIX (Loc.map_annot add_inverted_counter_to_init_mixture mix_) ))
       ast_compil.init
   in
-  let variables = ast_compil.variables in
-     (*('pattern, 'id) variable_def list;*)
-  let observables = ast_compil.observables in
-  let perturbations = ast_compil.perturbations in
+  let variables =
+    List.rev_map
+        (fun (a, b) -> (a, map_expr b))
+        (List.rev ast_compil.variables)
+  in
+  let observables = List.rev_map map_expr (List.rev ast_compil.observables) in
+  let map_print a =
+      match a with
+      | Primitives.Str_pexpr _ -> a
+      | Alg_pexpr e -> Alg_pexpr (map_expr e)
+  in
+  let map_modif modif =
+      match modif with
+      | Ast.APPLY (a,r) -> Ast.APPLY (map_expr a,Loc.map_annot map_rule r )
+      | UPDATE (a,e) -> UPDATE (a,map_expr e)
+      | STOP l -> STOP (List.rev_map map_print (List.rev l))
+      | SNAPSHOT (b,l) -> SNAPSHOT (b,List.rev_map map_print (List.rev l))
+      | PRINT (l,l') ->
+          PRINT(List.rev_map map_print (List.rev l),List.rev_map map_print (List.rev l'))
+      | PLOTENTRY
+      | CFLOWLABEL _ -> modif
+      | CFLOWMIX (b,mixture) -> CFLOWMIX(b,
+        Loc.map_annot replace_counter_by_invert mixture)
+      | DIN (a, l) -> DIN(a, List.rev_map map_print (List.rev l))
+      | DINOFF l -> DINOFF(List.rev_map map_print (List.rev l))
+      | SPECIES_OF (b,l,m) ->
+        SPECIES_OF(b,List.rev_map map_print l,Loc.map_annot replace_counter_by_invert m)
+  in
+  let perturbations =
+    List.rev_map
+      (fun ((a,b,c,d), ext)-> (a,map_opt map_bexpr b,List.rev_map map_modif (List.rev c),map_opt map_bexpr d ),ext)
+      (List.rev ast_compil.perturbations)
+  in
   {ast_compil with signatures; rules; init; variables; observables; perturbations}
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
