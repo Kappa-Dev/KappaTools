@@ -392,7 +392,7 @@ let () =
     let () =
       if kasim_args.Kasim_args.compile_mode || debug_mode then
         Format.eprintf
-          "@[<v>@[<v 2>Environment:@,\
+          "@[<v>@[<v 2>XXEnvironment:@,\
            %a@]@,\
            @[<v 2>Polymers:@,\
            %a@]@,\

@@ -142,7 +142,7 @@ module Pattern = struct
                  | Some sigs ->
                    Signature.is_counter_agent sigs dst_ty && not noCounters
                then (
-                 let counter = Pattern.counter_value_cc cc (dst_a, dst_p) 0 in
+                 let counter = Pattern.counter_value_cc sigs cc (dst_a, dst_p) in
                  let () = Format.fprintf f "{=%d}" counter in
                  (* to do: add symbols in symbol table for counters *)
                  true, out

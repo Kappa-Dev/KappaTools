@@ -593,24 +593,30 @@ let intersection renaming cc1 cc2 =
     recogn_nav = raw_to_navigation false nodes_by_type nodes;
   }
 
-let rec counter_value nodes (nid, sid) count =
-  match Mods.IntMap.find_option nid nodes with
-  | None -> count
-  | Some ag ->
-    Tools.array_fold_lefti
-      (fun id acc (el, _) ->
-        if id = sid then
-          acc
-        else (
-          match el with
-          | UnSpec | Free -> acc
-          | Link (dn, di) -> counter_value nodes (dn, di) (acc + 1)
-        ))
-      count ag
+type extremity = Open | Closed
 
-let counter_value_cc cc (nid, sid) count =
+let fetch_exit_site _sigs sid = sid+1
+let rec counter_value sigs nodes (nid, sid) count =
+  match Mods.IntMap.find_option nid nodes with
+  | None -> failwith "pending bonds encountered when computing the length of a chain (counters)"
+  | Some ag ->
+    let other = fetch_exit_site sigs sid in
+    let (el,_) = ag.(other) in
+    match el with
+      | UnSpec -> count, Open
+      | Free -> count, Closed
+      | Link (dn, di) ->
+             counter_value sigs nodes (dn, di) (count + 1)
+
+let counter_value sigs nodes (nid, sid) =
+  counter_value sigs nodes (nid, sid) 0
+
+let counter_value_cc sigs cc (nid, sid) =
   let nodes = cc.nodes in
-  counter_value nodes (nid, sid) count
+  let count, extremity = counter_value sigs nodes (nid, sid) in
+  let () = match extremity with Open -> failwith "pending bonds encountered when computing the length of a chain (counters)"
+                              | Closed -> ()
+  in count
 
 let dotcomma dotnet =
   if dotnet then
@@ -661,8 +667,12 @@ let print_cc ~noCounters ?(dotnet = false) ?(full_species = false) ?sigs ?cc_id
                | Some sigs ->
                  Signature.is_counter_agent sigs dst_ty && not noCounters
              then (
-               let counter = counter_value cc.nodes (dst_a, dst_p) 0 in
-               let () = Format.fprintf f "{=%d}" counter in
+               let (counter,kind) = counter_value sigs cc.nodes (dst_a, dst_p) in
+               let () =
+                  Format.fprintf f "{%s%d}"
+                    (match kind with Closed -> "=" | Open -> ">=")
+                    counter
+               in
                true, out
              ) else (
                let i, out' =
@@ -740,7 +750,8 @@ let print_cc_as_id sigs f cc =
            | Link (dst_a, dst_p) ->
              let dst_ty = find_ty cc dst_a in
              if Signature.is_counter_agent sigs dst_ty then (
-               let counter = counter_value cc.nodes (dst_a, dst_p) 0 in
+               let counter,extremity  = counter_value sigs cc.nodes (dst_a, dst_p)  in
+               let () = match extremity with Open -> failwith ("bonds should not be opened") | Closed -> () in
                let () = Format.fprintf f "~+%d" counter in
                true, out
              ) else (

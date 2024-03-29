@@ -634,7 +634,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
              Loc.get_annot counter_test ))
     | Ast.CEQ j -> j, true
     | Ast.CGTE j -> j, false
-    | Ast.CLTE _j -> failwith "not implemented" (* TODO now *)
+    | Ast.CLTE _j -> failwith "not implemented A " (* TODO now *)
   in
   let start_link_for_created : int = start_link_nb + test + 1 in
   let link_for_erased : int = start_link_nb + abs delta in
