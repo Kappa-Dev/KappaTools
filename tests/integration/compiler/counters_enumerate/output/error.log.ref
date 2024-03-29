@@ -33,7 +33,7 @@ Environment:
   B(c{=1}), A()+ @ 1
   B(c{=2}), A()+ @ 2
   
-  /*0*/%mod: (|B(c{=3})| = 1) do $PRINTF ""; $PRINTF "Counter c of agent B reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+  /*0*/%mod: (|B(c{>=3})| = 1) do $PRINTF ""; $PRINTF "Counter c of agent B reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
   Rules:
     0: (ast: 1) 0: /*cc1*/ A/*1*/() -- A/*1*//*0*/ ++  @1
     1: (ast: 2)  --  ++ A/*ν 0*/ @1
@@ -56,11 +56,11 @@ Domain:
   /*cc2*/ B/*2*/(c{=0}) [rate_of_rule [2] rate_of_rule [5]] -> ()
   /*cc3*/ B/*2*/(c{=1}) [rate_of_rule [3] rate_of_rule [6]] -> ()
   /*cc4*/ B/*2*/(c{=2}) [rate_of_rule [4] rate_of_rule [7]] -> ()
-  /*cc5*/ B/*2*/(c{=3}) [intervention [0]] -> ()
+  /*cc5*/ B/*2*/(c{>=3}) [intervention [0]] -> ()
   /*cc6*/  -> ()
   /*cc7*/  -> ()
   /*cc8*/  -> ()
-  /*cc9*/ B/*2*/(c{=0})
+  /*cc9*/ B/*2*/(c{>=0})
     -> (-3(b[a.!__counter_agent-4])->-4(b[a.!__counter_agent-5])->-5(b[a.!__counter_agent-6])->()
         5
        -3(b[a.!__counter_agent-4])->-4(b[a.!__counter_agent-5])->-5(b[.])->()
