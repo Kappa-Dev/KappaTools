@@ -1888,31 +1888,153 @@ let inverted_counter_name (name : string) : string =
  * Each test [> value] is then translated into a test to the "inverted" counter as [< a+b-value].
  * Each delta [+ delta] is translated into a [- delta] *)
 let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
-  let counter_fold (f : 'a list -> string -> Ast.counter -> 'a list) : 'a list =
+  let counter_fold_in_mixture f acc mixture =
     List.fold_left
-      (fun acc1 rule_def ->
-        let rule : Ast.rule = rule_def |> snd |> Loc.v in
-        match rule.rewrite with
-        | Ast.Edit _ -> acc1 (* no counter test allowed in edit rule *)
-        | Ast.Arrow content ->
-          List.fold_left
-            (fun acc2 agent_list ->
+      (fun acc2 agent_list ->
+        List.fold_left
+          (fun acc3 agent ->
+            match agent with
+            | Ast.Absent _ -> acc3
+            | Ast.Present (agent_name, site_list, _) ->
               List.fold_left
-                (fun acc3 agent ->
-                  match agent with
-                  | Ast.Absent _ -> acc3
-                  | Ast.Present (agent_name, site_list, _) ->
-                    List.fold_left
-                      (fun acc4 site ->
-                        match site with
-                        | Ast.Port _ -> acc4
-                        | Counter counter -> f acc4 (Loc.v agent_name) counter)
-                      acc3 site_list)
-                acc2 agent_list)
-            acc1 content.lhs)
-      [] ast_compil.rules
+                (fun acc4 site ->
+                  match site with
+                  | Ast.Port _ -> acc4
+                  | Counter counter -> f acc4 (Loc.v agent_name) counter)
+              acc3 site_list)
+        acc2 agent_list)
+      acc mixture
   in
-
+  let rec counter_fold_in_expr f acc expr =
+    match Loc.v expr with
+    | Alg_expr.BIN_ALG_OP (_, e1, e2) ->
+        counter_fold_in_expr f (counter_fold_in_expr f acc e1) e2
+    | UN_ALG_OP (_, e) | DIFF_TOKEN (e, _) ->
+        counter_fold_in_expr f acc e
+    | STATE_ALG_OP _ | ALG_VAR _ | TOKEN_ID _ | CONST _ -> acc
+    | KAPPA_INSTANCE mixture ->
+        counter_fold_in_mixture f acc mixture
+    | IF (eb, e1, e2) ->
+        counter_fold_in_bexpr f (counter_fold_in_expr f (counter_fold_in_expr f acc e1) e2) eb
+    | DIFF_KAPPA_INSTANCE (e, mixture) ->
+        counter_fold_in_expr f (counter_fold_in_mixture f acc mixture) e
+  and counter_fold_in_bexpr f acc bexpr =
+    match Loc.v bexpr with
+    | TRUE | FALSE -> acc
+    | BIN_BOOL_OP (_, be1, be2) ->
+        counter_fold_in_bexpr f (counter_fold_in_bexpr f acc be1) be2
+    | UN_BOOL_OP (_, be) ->
+        counter_fold_in_bexpr f acc be
+    | COMPARE_OP (_, e1, e2) ->
+        counter_fold_in_expr f (counter_fold_in_expr f acc e1) e2
+  in
+  let counter_fold_in_bexpr_opt f acc bexpr =
+    match bexpr with
+      | None -> acc
+      | Some e -> counter_fold_in_bexpr f acc e
+  in
+  let counter_fold_in_rule f acc rule =
+    let rule : Ast.rule = rule |> Loc.v in
+    let acc =
+      match rule.rewrite with
+      | Ast.Edit _ -> acc (* no counter test allowed in edit rule *) (* to do *)
+      | Ast.Arrow content -> counter_fold_in_mixture f acc content.lhs
+    in
+    let acc =
+      match rule.k_un with None -> acc
+        | Some (e, Some e') ->
+          counter_fold_in_expr f (counter_fold_in_expr f acc e' ) e
+        | Some (e, None) -> counter_fold_in_expr f acc e
+    in
+    let acc = counter_fold_in_expr f acc rule.k_def in
+    let acc =
+      match rule.k_op_un with None -> acc
+        | Some (e, Some e') ->
+          counter_fold_in_expr f (counter_fold_in_expr f acc e' ) e
+        | Some (e, None) -> counter_fold_in_expr f acc e
+    in
+    let acc=
+      match rule.k_op with None -> acc
+        | Some e -> counter_fold_in_expr f acc e
+    in
+    acc
+  in
+  let counter_fold_in_variable f acc variable_def =
+    counter_fold_in_expr f acc (snd variable_def)
+  in
+  let counter_fold_in_observable f acc obs_def =
+    counter_fold_in_expr f acc obs_def
+  in
+  let counter_fold_in_init f acc init =
+    let e,_ = init in
+    counter_fold_in_expr f acc e
+  in
+  let counter_fold_in_print f (acc:'a list) p =
+    match p with
+    | Primitives.Str_pexpr _ -> acc
+    | Alg_pexpr e -> counter_fold_in_expr f acc e
+  in
+  let counter_fold_in_mod f acc mod_def =
+    match mod_def with
+    | Ast.APPLY (e,r) ->
+       counter_fold_in_expr f (counter_fold_in_rule f acc r) e
+    | UPDATE (_,e) ->
+       counter_fold_in_expr f acc e
+    | STOP l | SNAPSHOT (_,l) | DIN (_, l) | DINOFF l ->
+       List.fold_left (counter_fold_in_print f) acc l
+    | PRINT (l, l') ->
+       List.fold_left
+          (counter_fold_in_print f)
+          ((List.fold_left (counter_fold_in_print f) acc l'):'a list)
+           l
+    | PLOTENTRY
+    | CFLOWLABEL _ -> acc
+    | CFLOWMIX (_, p) ->
+      counter_fold_in_mixture f acc (Loc.v p)
+    | SPECIES_OF (_, l, m) ->
+        List.fold_left
+            (counter_fold_in_print f)
+            (counter_fold_in_mixture f acc (Loc.v m))
+            l
+  in
+  let counter_fold_in_perturbation f acc perturbation =
+    let (_,b1_opt,mod_list,b2_opt) = Loc.v perturbation  in
+    counter_fold_in_bexpr_opt f
+      (counter_fold_in_bexpr_opt f
+          (List.fold_left
+              (counter_fold_in_mod f)
+              acc mod_list)
+          b2_opt)
+      b1_opt
+  in
+  let counter_fold (f : 'a list -> string -> Ast.counter -> 'a list) : 'a list =
+    let l1 =
+      List.fold_left
+        (fun acc r -> counter_fold_in_rule f acc (snd r))
+        [] ast_compil.rules
+    in
+    let l2 =
+      List.fold_left
+          (counter_fold_in_variable f)
+          l1 ast_compil.variables
+    in
+    let l3 =
+      List.fold_left
+          (counter_fold_in_observable f)
+          l2 ast_compil.observables
+    in
+    let l4 =
+      List.fold_left
+          (counter_fold_in_init f)
+          l3 ast_compil.init
+    in
+    let l5 =
+      List.fold_left
+          (counter_fold_in_perturbation f)
+          l4 ast_compil.perturbations
+    in
+    l5
+  in
   (* Find counters that have CLTE tests, and build list: agent_name, counter_name, sum_bounds_ref list.
    * sum_bounds_ref is then filled when reading the signature and used to specify for inverted counter init value or test value as [sum_bounds_ref - value] *)
   let counters_with_clte_tests : (string * string * int ref) list =
@@ -2231,8 +2353,11 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             INIT_MIX (Loc.map_annot add_inverted_counter_to_init_mixture mix_) ))
       ast_compil.init
   in
-
-  { ast_compil with signatures; rules; init }
+  let variables = ast_compil.variables in
+     (*('pattern, 'id) variable_def list;*)
+  let observables = ast_compil.observables in
+  let perturbations = ast_compil.perturbations in
+  {ast_compil with signatures; rules; init; variables; observables; perturbations}
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
