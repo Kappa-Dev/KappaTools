@@ -222,11 +222,13 @@ let init_non_weakly_reversible_transitions () =
                Lwt.return (Result_util.ok ()))))
     State_project.model
 
+let dont_gc_me = ref []
+
 let onload () =
   let () = Subpanel_editor.onload () in
-  let _ = init_dead_rules () in
-  let _ = init_dead_agents () in
-  let _ = init_non_weakly_reversible_transitions () in
+  dont_gc_me := init_dead_rules () :: !dont_gc_me;
+  dont_gc_me := init_dead_agents () :: !dont_gc_me;
+  dont_gc_me := init_non_weakly_reversible_transitions () :: !dont_gc_me;
   let () = Tab_contact_map.onload () in
   let () = Tab_influences.onload () in
   let () = Tab_constraints.onload () in

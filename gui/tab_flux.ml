@@ -12,7 +12,8 @@ module Html = Tyxml_js.Html5
 let tab_is_active, set_tab_is_active = React.S.create false
 let din_id, set_din_id = React.S.create ""
 
-let din_list =
+let din_list :
+    [< Html_types.select_content_fun > `Option ] Html.elt ReactiveData.RList.t =
   ReactiveData.RList.from_event []
     (Lwt_react.E.map_s
        (fun _ ->
@@ -35,10 +36,10 @@ let din_list =
           (React.S.on tab_is_active State_simulation.dummy_model
              State_simulation.model)))
 
-let din_select =
+let din_select : [> Html_types.select ] Html.elt =
   Tyxml_js.R.Html5.select ~a:[ Html.a_class [ "form-control" ] ] din_list
 
-let din_data =
+let din_data : Data.din option React.signal =
   React.S.bind (ReactiveData.RList.signal din_list) (function
     | [] -> React.S.const None
     | _ :: _ ->
@@ -60,7 +61,7 @@ let din_data =
                           (manager#simulation_detail_din din_id))
                       ())))))
 
-let din_header =
+let din_header : Html_types.tr Html.elt ReactiveData.RList.t =
   ReactiveData.RList.from_signal
     (React.S.map
        (function
@@ -75,7 +76,7 @@ let din_header =
            ])
        din_data)
 
-let din_table =
+let din_table : Html_types.tbody Html.elt ReactiveData.RList.t =
   ReactiveData.RList.from_signal
     (React.S.map
        (function
@@ -119,13 +120,14 @@ let din_table =
            [ Html.tbody body ])
        din_data)
 
-let din =
+let din : [> Html_types.tablex ] Html.elt =
   let thead = React.S.const (Tyxml_js.R.Html5.thead din_header) in
   Tyxml_js.R.Html5.tablex
     ~a:[ Html.a_class [ "table"; "table-condensed"; "table-bordered" ] ]
     ~thead din_table
 
-let export_current_din to_string mime filename =
+let export_current_din (to_string : Data.din -> string) (mime : string)
+    (filename : string) : unit =
   let din_id = Js.to_string (Tyxml_js.To_dom.of_select din_select)##.value in
   State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       manager#simulation_detail_din din_id
@@ -134,7 +136,7 @@ let export_current_din to_string mime filename =
               let () = Common.saveFile ~data ~mime ~filename in
               Lwt.return (Result_util.ok ())))
 
-let export_configuration =
+let export_configuration : Widget_export.configuration =
   {
     Widget_export.id = "din-export";
     Widget_export.show = React.S.const true;
@@ -165,7 +167,7 @@ let export_configuration =
       ];
   }
 
-let content () =
+let content () : [> Html_types.div ] Html.elt list =
   [
     Html.div
       ~a:[ Html.a_class [ "flex_content"; "table-responsive" ] ]
@@ -176,7 +178,7 @@ let content () =
       ];
   ]
 
-let navli () =
+let navli () : [> `PCDATA | `Span ] Html.elt ReactiveData.RList.t =
   Ui_common.badge (fun state ->
       match state with
       | None -> 0
@@ -184,17 +186,13 @@ let navli () =
         state.Api_types_j.simulation_info_output
           .Api_types_j.simulation_output_dins)
 
-let onload () =
-  let () =
-    (Tyxml_js.To_dom.of_select din_select)##.onchange
-    := Dom.handler (fun _ ->
-           let () =
-             set_din_id
-               (Js.to_string (Tyxml_js.To_dom.of_select din_select)##.value)
-           in
-           Js._false)
-  in
-  let () = Widget_export.onload export_configuration in
+let onload () : 'a =
+  (Tyxml_js.To_dom.of_select din_select)##.onchange
+  := Dom.handler (fun _ ->
+         set_din_id
+           ((Tyxml_js.To_dom.of_select din_select)##.value |> Js.to_string);
+         Js._false);
+  Widget_export.onload export_configuration;
   let () =
     Common.jquery_on "#navDIN" "shown.bs.tab" (fun _ -> set_tab_is_active true)
   in
