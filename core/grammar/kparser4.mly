@@ -180,7 +180,7 @@ site_counter_sig:
                 (match counter_sig_min with
                   | None | Some (None, _)-> 0
                   | Some (Some i,_) -> i );
-            Ast.counter_sig_visible=true;
+            Ast.counter_sig_visible=Ast.Visible;
             } }
     | ID annoted
       { Ast.Port

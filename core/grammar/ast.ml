@@ -36,13 +36,27 @@ type counter = {
   counter_delta: int Loc.annoted;
       (** In a rule: change in counter value, in an agent declaration: max value of the counter, 0 if absent *)
 }
+
+
+type hidden_info =
+  {
+    from_sig_name: string Loc.annoted;
+    convert_value: (int -> int);
+    convert_delta: (int -> int);
+    convert_test: (counter_test option -> counter_test option);
+    convert_back_value: (int -> int);
+    convert_back_delta: (int -> int);
+    convert_back_test: (counter_test option -> counter_test option)
+  }
 (** Counter syntax from AST, present in 3 contexts with different meanings: agent definition, species init declaration, rule *)
+
+type visible = Visible | Hidden of hidden_info
 
 type counter_sig = {
   counter_sig_name: string Loc.annoted;
   counter_sig_min: int option Loc.annoted option;
   counter_sig_max: int option Loc.annoted option;
-  counter_sig_visible: bool;
+  counter_sig_visible: visible;
   counter_sig_default: int;
 }
 
@@ -62,21 +76,48 @@ let counter_sig_of_counter (c : counter) : counter_sig =
     counter_sig_min;
     counter_sig_max;
     counter_sig_default;
-    counter_sig_visible = true;
+    counter_sig_visible = Visible;
   }
 
 let make_inverted_counter_sig (counter : counter_sig)
     (counter_sig_name : string Loc.annoted) : counter_sig =
+  let f_int =
+  (match counter.counter_sig_max, counter.counter_sig_min with
+  | Some (Some max, _), Some (Some min, _) ->
+    fun i -> max - i + min
+  | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
+    failwith "unbounded counters not implemented yet");
+  in
+  let f_op i = -i in
   {
     counter with
     counter_sig_name;
-    counter_sig_visible = false;
+    counter_sig_visible =
+      Hidden
+      {
+        from_sig_name=counter.counter_sig_name;
+        convert_value=f_int;
+        convert_delta=f_op;
+        convert_test=(fun x ->
+                        match x with
+                        | None | Some (CVAR _) -> None
+                        | Some (CEQ i) -> Some (CEQ (f_int i))
+                        | Some (CGTE i) -> Some (CLTE (f_int i))
+                        | Some (CLTE i) -> Some (CGTE (f_int i)));
+        convert_back_value=f_int;
+        convert_back_delta=f_op;
+        convert_back_test=(fun x ->
+                        match x with
+                        | None -> None
+                        | Some (CVAR _) -> failwith "there should be no variable in inverted counters"
+                        | Some (CEQ i) -> Some (CEQ (f_int i))
+                        | Some (CGTE i) -> Some (CLTE (f_int i))
+                        | Some (CLTE i) -> Some (CGTE (f_int i)));
+      }
+    ;
     counter_sig_default =
-      (match counter.counter_sig_max, counter.counter_sig_min with
-      | Some (Some max, _), Some (Some min, _) ->
-        max - counter.counter_sig_default + min
-      | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
-        failwith "unbounded counters not implemented yet");
+      f_int counter.counter_sig_default
+
   }
 
 type 'counter site = Port of port | Counter of 'counter
@@ -655,7 +696,7 @@ let site_sig_of_json filenames = function
                (Yojson.Basic.Util.to_option Yojson.Basic.Util.to_int))
             max;
         counter_sig_default = Yojson.Basic.Util.to_int default;
-        counter_sig_visible = true;
+        counter_sig_visible = Visible;
       }
   | `Assoc [ ("port_name", n); ("port_int", i); ("port_link", l) ]
   | `Assoc [ ("port_name", n); ("port_link", l); ("port_int", i) ]
@@ -810,10 +851,11 @@ let agent_of_json ~site_of_json filenames = function
 
 let agent_sig_of_json = agent_of_json ~site_of_json:site_sig_of_json
 
+(* TO DO Transfer back inverted counters *)
 let agent_sig_to_json =
   agent_to_json ~counter_to_json:counter_sig_to_json ~filter:(fun c ->
       match c with
-      | Counter c -> c.counter_sig_visible
+      | Counter c -> c.counter_sig_visible=Visible
       | Port _ -> true)
 
 let agent_of_json = agent_of_json ~site_of_json

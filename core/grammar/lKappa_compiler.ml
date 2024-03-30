@@ -2118,7 +2118,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                            Loc.get_annot counter_orig.counter_sig_name ))
                 in
 
-                let counter_sig_visible = false in
+                let counter_sig_visible = Ast.Visible in
                 (* Write in sum_bounds_ref the sum of the counter bounds above *)
                 sum_bounds_ref := inf_bound + sup_bound;
 

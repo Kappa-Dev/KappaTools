@@ -529,14 +529,14 @@ port_expression_sig:
            Ast.counter_sig_min = None;
            Ast.counter_sig_max = Some (Some $4, rhs_pos 4);
            Ast.counter_sig_default = $4;
-           Ast.counter_sig_visible = true}}
+           Ast.counter_sig_visible = Ast.Visible}}
   | ID PLUS EQUAL MINUS INT
         {Ast.Counter
   { Ast.counter_sig_name = ($1,rhs_pos 1);
     Ast.counter_sig_min = None;
     Ast.counter_sig_max = Some (Some (-$5), rhs_pos 5);
     Ast.counter_sig_default = -$5;
-    Ast.counter_sig_visible = true}}
+    Ast.counter_sig_visible = Ast.Visible}}
   | ID counter_test PLUS EQUAL INT
        { let min =
             match $2 with
@@ -548,7 +548,7 @@ port_expression_sig:
            Ast.counter_sig_min = Some (Some min, rhs_pos 2);
            Ast.counter_sig_max = Some (Some $5, rhs_pos 5);
            Ast.counter_sig_default = min;
-           Ast.counter_sig_visible = true}}
+           Ast.counter_sig_visible = Ast.Visible}}
   | ID counter_test PLUS EQUAL MINUS INT
       { let min =
            match $2 with
@@ -561,7 +561,7 @@ port_expression_sig:
           Ast.counter_sig_min = Some (Some min, rhs_pos 2);
           Ast.counter_sig_max = Some (Some (-$6), rhs_pos 6);
           Ast.counter_sig_default = min ;
-          Ast.counter_sig_visible = true}}
+          Ast.counter_sig_visible = Ast.Visible}}
   | ID counter_test
       { let min =
            match $2 with
@@ -574,7 +574,7 @@ port_expression_sig:
     Ast.counter_sig_min = Some (Some min, rhs_pos 2);
     Ast.counter_sig_max = None;
     Ast.counter_sig_default = min;
-    Ast.counter_sig_visible = true}}
+    Ast.counter_sig_visible = Ast.Visible}}
 
 
 internal_state:
