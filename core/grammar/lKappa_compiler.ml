@@ -1971,7 +1971,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     let e,_ = init in
     counter_fold_in_expr f acc e
   in
-  let counter_fold_in_print f (acc:'a list) p =
+  let counter_fold_in_print f acc p =
     match p with
     | Primitives.Str_pexpr _ -> acc
     | Alg_pexpr e -> counter_fold_in_expr f acc e
@@ -1987,7 +1987,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     | PRINT (l, l') ->
        List.fold_left
           (counter_fold_in_print f)
-          ((List.fold_left (counter_fold_in_print f) acc l'):'a list)
+          ((List.fold_left (counter_fold_in_print f) acc l'))
            l
     | PLOTENTRY
     | CFLOWLABEL _ -> acc
@@ -2009,11 +2009,11 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
           b2_opt)
       b1_opt
   in
-  let counter_fold (f : 'a list -> string -> Ast.counter -> 'a list) : 'a list =
+  let counter_fold f init  =
     let l1 =
       List.fold_left
         (fun acc r -> counter_fold_in_rule f acc (snd r))
-        [] ast_compil.rules
+        init ast_compil.rules
     in
     let l2 =
       List.fold_left
@@ -2039,8 +2039,9 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   in
   (* Find counters that have CLTE tests, and build list: agent_name, counter_name, sum_bounds_ref list.
    * sum_bounds_ref is then filled when reading the signature and used to specify for inverted counter init value or test value as [sum_bounds_ref - value] *)
-  let counters_with_clte_tests : (string * string * int ref) list =
-    counter_fold (fun acc agent_name counter ->
+  let counters_with_clte_tests : (string * string * int ref) list *
+    Mods.StringSet.t Mods.StringMap.t =
+    counter_fold (fun (acc,m) agent_name counter ->
         let counter_name = Loc.v counter.counter_name in
         (* Forbid prefix to avoid nonsense in counter definition *)
         if Signature.is_inverted_counter counter_name then
@@ -2052,29 +2053,28 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
         (* Return counter name along with matching agent_name *)
         match Option_util.map Loc.v counter.counter_test with
         | Some (Ast.CLTE _) ->
+          let sites = Mods.StringMap.find_default Mods.StringSet.empty agent_name m in
           if
-            List.exists
-              (fun (agent_name2, counter_name2, _) ->
-                String.equal agent_name agent_name2
-                && String.equal counter_name counter_name2)
-              acc
+            Mods.StringSet.mem counter_name sites
           then
-            acc
+            acc,m
           else
-            (agent_name, counter_name, ref 0) :: acc
-        | Some (Ast.CEQ _) | Some (Ast.CGTE _) | Some (Ast.CVAR _) | None -> acc)
+            (agent_name, counter_name, ref 0) :: acc,
+            Mods.StringMap.add agent_name
+                (Mods.StringSet.add counter_name sites)
+                m
+        | Some (Ast.CEQ _) | Some (Ast.CGTE _) | Some (Ast.CVAR _) | None -> acc,m) ([],Mods.StringMap.empty)
   in
-
   let add (x,y) data map =
-         Mods.StringMap.add
-           x
-           (Mods.StringMap.add y data
-                 (Mods.StringMap.find_default Mods.StringMap.empty x map))
-           map
+      Mods.StringMap.add
+        x
+        (Mods.StringMap.add y data
+              (Mods.StringMap.find_default Mods.StringMap.empty x map))
+        map
   in
   (* Create opposite counters that have the same tests *)
   let (signatures : Ast.agent_sig list),
-      (map : Ast.conversion_info Mods.StringMap.t Mods.StringMap.t)=
+      (signature_map : Ast.conversion_info Mods.StringMap.t Mods.StringMap.t)=
     List.fold_left
       (fun (acc,map) agent ->
         match agent with
@@ -2082,17 +2082,15 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
         | Present (agent_name_, site_list, agent_mod) ->
           let agent_name = Loc.v agent_name_ in
           let counters_with_clte_tests_from_agent :
-              (string * string * int ref) list =
-            List.filter
-              (fun (agent_name_counter, _, _) ->
-                agent_name = agent_name_counter)
-              counters_with_clte_tests
+              Mods.StringSet.t  =
+            Mods.StringMap.find_default
+              Mods.StringSet.empty  agent_name (snd counters_with_clte_tests)
           in
           let (new_counter_sites : Ast.counter_sig Ast.site list),
               map
             =
-            List.fold_left
-              (fun (acc,map) (_, counter_name, sum_bounds_ref) ->
+            Mods.StringSet.fold
+              (fun counter_name (acc,map) ->
                 (* Find counter to invert *)
                 let counter_orig : Ast.counter_sig =
                   List.find_map
@@ -2131,14 +2129,14 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                   {
                     Ast.from_sig_name = counter_orig.counter_sig_name;
                     convert_value = BASIS_MINUS_INPUT (inf_bound + sup_bound);
-                    convert_delta = BASIS_MINUS_INPUT (inf_bound + sup_bound)
+                    convert_delta = BASIS_MINUS_INPUT 0
                   }
                 in
                 let counter_sig_visible =
                       Ast.From_clte_elimination convert_info
                 in
                 (* Write in sum_bounds_ref the sum of the counter bounds above *)
-                sum_bounds_ref := inf_bound + sup_bound;
+              (*  sum_bounds_ref := inf_bound + sup_bound;*)
                 let counter =
                   {
                     Ast.counter_sig_name;
@@ -2149,16 +2147,19 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                   }
                 in
                 (Ast.Counter counter)::acc,
-                add (agent_name,Loc.v counter_orig.counter_sig_name) convert_info map)
-              ([],map) (List.rev counters_with_clte_tests_from_agent)
+                add
+                  (agent_name,Loc.v counter_orig.counter_sig_name)
+                  convert_info map)
+              counters_with_clte_tests_from_agent
+              ([],map)
           in
           (Ast.Present (agent_name_, site_list @ new_counter_sites, agent_mod))::acc,
            map)
       ([], Mods.StringMap.empty) (List.rev ast_compil.signatures)
   in
-  let _ = map in
 
   (* In rules, we need to replace the counter tests and the counter modifications *)
+
   let replace_counter_by_invert (mix : Ast.mixture) : Ast.mixture =
     List.map
       (fun agent_list ->
@@ -2169,11 +2170,8 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             | Present (agent_name_, site_list, agent_mod) ->
               let agent_name : string = Loc.v agent_name_ in
               let counters_with_clte_tests_from_agent :
-                  (string * string * int ref) list =
-                List.filter
-                  (fun (agent_name_counter, _, _) ->
-                    agent_name = agent_name_counter)
-                  counters_with_clte_tests
+                Ast.conversion_info Mods.StringMap.t =
+                Mods.StringMap.find_default Mods.StringMap.empty agent_name signature_map
               in
               (* Add delta to counter as opposite deltas to counter_delta *)
               let (added_sites, site_list_with_opposite_deltas) :
@@ -2184,13 +2182,13 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                     | Ast.Port _ -> acc, site
                     | Counter counter ->
                       (match
-                         List.find_opt
-                           (fun (_, name, _) ->
-                             String.equal (Loc.v counter.Ast.counter_name) name)
-                           counters_with_clte_tests_from_agent
+                         Mods.StringMap.find_option
+                          (Loc.v counter.Ast.counter_name)
+                          counters_with_clte_tests_from_agent
                        with
-                      | None -> acc, site
-                      | Some (_, _, sum_bounds_ref) ->
+                      | None ->
+                          acc, site
+                      | Some convert_info ->
                         (* As we know that this counter uses a CLTE test, We introduce the inverted counter *)
                         (* [clte_value_or_none] discriminates the case where this site in this expression has a CLTE test *)
                         let clte_value_or_none =
@@ -2212,13 +2210,15 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                               Ast.Counter
                                 {
                                   Ast.counter_name =
-                                    Loc.map_annot inverted_counter_name
+                                    Loc.map_annot
+                                      inverted_counter_name
                                       counter.counter_name;
                                   Ast.counter_test = None;
                                   Ast.counter_delta =
                                     Loc.map_annot
-                                      (fun delta -> -delta)
-                                      counter.counter_delta;
+                                      (Ast.apply_int
+                                          convert_info.Ast.convert_delta)
+                                          counter.counter_delta;
                                 }
                             in
                             inverted_counter_site :: acc, site
@@ -2235,14 +2235,16 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                     counter.counter_name;
                                 Ast.counter_test =
                                   Some
-                                    (Ast.CGTE (!sum_bounds_ref - value)
+                                    (Ast.CGTE (Ast.apply_int
+                                        convert_info.Ast.convert_value value)
                                     |> Loc.copy_annot
                                          (Option_util.unsome_or_raise
                                             counter.counter_test));
                                 Ast.counter_delta =
                                   Loc.map_annot
-                                    (fun delta -> -delta)
-                                    counter.counter_delta;
+                                    (Ast.apply_int
+                                        convert_info.Ast.convert_delta)
+                                        counter.counter_delta;
                               }
                           in
                           if Loc.v counter.counter_delta == 0 then
@@ -2272,13 +2274,18 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             | Ast.Absent _ -> agent
             | Present (agent_name_, site_list, agent_mod) ->
               let agent_name : string = Loc.v agent_name_ in
-              let counters_with_clte_tests_from_agent :
+                let counters_with_clte_tests_from_agent :
+                Ast.conversion_info Mods.StringMap.t =
+                Mods.StringMap.find_default Mods.StringMap.empty agent_name signature_map
+              in
+(*
+      let counters_with_clte_tests_from_agent :
                   (string * string * int ref) list =
                 List.filter
                   (fun (agent_name_counter, _, _) ->
                     agent_name = agent_name_counter)
-                  counters_with_clte_tests
-              in
+                  (fst counters_with_clte_tests)
+              in*)
               (* Add delta to counter as opposite deltas to counter_delta *)
               let added_sites : Ast.counter Ast.site list =
                 List.fold_left
@@ -2286,14 +2293,13 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                     match site with
                     | Ast.Port _ -> acc
                     | Counter counter ->
-                      (match
-                         List.find_opt
-                           (fun (_, name, _) ->
-                             String.equal (Loc.v counter.Ast.counter_name) name)
-                           counters_with_clte_tests_from_agent
-                       with
+                      (
+                      match
+                         Mods.StringMap.find_option
+                           (Loc.v counter.Ast.counter_name) counters_with_clte_tests_from_agent
+                      with
                       | None -> acc
-                      | Some (_, _, sum_bounds_ref) ->
+                      | Some info  ->
                         (* As we know that this counter uses a CLTE test, We introduce the inverted counter *)
                         (match counter.counter_test with
                         | None ->
@@ -2326,7 +2332,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                   Ast.counter_test =
                                     Some
                                       (Loc.copy_annot test
-                                         (Ast.CEQ (!sum_bounds_ref - value)));
+                                         (Ast.CEQ (Ast.apply_int info.Ast.convert_value value)));
                                   Ast.counter_delta =
                                     counter.Ast.counter_delta
                                     (* 0 with annot as tested above *);
