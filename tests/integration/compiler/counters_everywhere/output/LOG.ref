@@ -1,0 +1,19 @@
+Parsing counter_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 28 (sub)observables 45 navigation steps
+	 -initial conditions
++ Building initial state (215 agents)
+Done
++ Command line to rerun is: 'KaSim' '-l' '1' '-seed' '92067277' '-d' 'output' 'counter_2.ka' '-syntax' '4'
+______________________________________________________________________
+######################################################################
+Simulation ended

@@ -1,0 +1,33 @@
+%def: "seed" "92067277"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+
+%agent: A(s1{u p} s2{u p} c{=0/+=2} c__inverted{-=0/=2/+=2})
+
+%var:/*0*/ 'k' |A(c__inverted{>=1})|
+%var:/*1*/ 'kk' |A()|
+%var:/*2*/ 'r5: A(c{>=3/+=1} c__inverted{>=1/+=-1}) -> A(c{+=1} c__inverted{+=-1}) @ |A(c__inverted{>=1})|_rate' |A(c__inverted{>=1})|
+%var:/*3*/ 'r4: A(c{>=2/+=1} c__inverted{>=1/+=-1}) -> A(c{+=1} c__inverted{+=-1}) @ |A(c{>=1})|_rate' |A(c{>=1})|
+%plot: [T]
+%plot: k
+%plot: kk
+
+A(s1{u/p}[#] c{=0/+=1} c__inverted{>=1/+=-1}) @ (3 * (7 ^ 0))
+A(s1{u/p}[#] c{=1/+=1} c__inverted{>=1/+=-1}) @ (3 * (7 ^ 1))
+A(s2{u/p}[.] c{=0/+=1} c__inverted{>=1/+=-1}) @ (3 * (7 ^ 0))
+A(s2{u/p}[.] c{=1/+=1} c__inverted{>=1/+=-1}) @ (3 * (7 ^ 1))
+A(c{>=2/+=1} c__inverted{>=1/+=-1}) @ 'r4: A(c{>=2/+=1} c__inverted{>=1/+=-1}) -> A(c{+=1} c__inverted{+=-1}) @ |A(c{>=1})|_rate'
+A(c{>=3/+=1} c__inverted{>=1/+=-1}) @ 'r5: A(c{>=3/+=1} c__inverted{>=1/+=-1}) -> A(c{+=1} c__inverted{+=-1}) @ |A(c__inverted{>=1})|_rate'
+
+/*0*/%mod: (|A(c__inverted{>=3})| = 1) do $PRINTF ""; $PRINTF "Counter c__inverted of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+/*1*/%mod: (|A(c{>=3})| = 1) do $PRINTF ""; $PRINTF "Counter c of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+
+%init: 40 A(s1{u}[.] s2{u}[.] c{=0} c__inverted{=2})
+%init: 3 A(s1{u}[.] s2{u}[.] c{=0} c__inverted{=2})
+
+%mod: [E] = 86 do $STOP;
