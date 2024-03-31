@@ -793,16 +793,16 @@ let agent_mod_of_yojson = function
   | x ->
     raise (Yojson.Basic.Util.Type_error ("Incorrect agent modification", x))
 
-let agent_to_json ~counter_to_json ~filter filenames = function
+let agent_to_json ~counter_to_json filenames = function
   | Absent _ -> `Null
   | Present (na, l, m) ->
     JsonUtil.smart_assoc
       [
         "name", Loc.yojson_of_annoted ~filenames JsonUtil.of_string na;
-        ( "sig",
+        "sig",
           JsonUtil.of_list
             (site_to_json ~counter_to_json filenames)
-            (List.filter filter l) );
+            l;
         "mod", agent_mod_to_yojson m;
       ]
 
@@ -839,13 +839,10 @@ let agent_sig_of_json = agent_of_json ~site_of_json:site_sig_of_json
 
 (* TO DO Transfer back inverted counters *)
 let agent_sig_to_json =
-  agent_to_json ~counter_to_json:counter_sig_to_json ~filter:(fun c ->
-      match c with
-      | Counter c -> c.counter_sig_visible=From_original_ast
-      | Port _ -> true)
+  agent_to_json ~counter_to_json:counter_sig_to_json
 
 let agent_of_json = agent_of_json ~site_of_json
-let agent_to_json = agent_to_json ~counter_to_json ~filter:(fun _ -> true)
+let agent_to_json = agent_to_json ~counter_to_json 
 
 let print_ast_mix ~print_counter =
   Pp.list

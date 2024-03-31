@@ -2039,9 +2039,9 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   in
   (* Find counters that have CLTE tests, and build list: agent_name, counter_name, sum_bounds_ref list.
    * sum_bounds_ref is then filled when reading the signature and used to specify for inverted counter init value or test value as [sum_bounds_ref - value] *)
-  let counters_with_clte_tests : (string * string * int ref) list *
+  let counters_with_clte_tests :
     Mods.StringSet.t Mods.StringMap.t =
-    counter_fold (fun (acc,m) agent_name counter ->
+    counter_fold (fun map agent_name counter ->
         let counter_name = Loc.v counter.counter_name in
         (* Forbid prefix to avoid nonsense in counter definition *)
         if Signature.is_inverted_counter counter_name then
@@ -2053,17 +2053,16 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
         (* Return counter name along with matching agent_name *)
         match Option_util.map Loc.v counter.counter_test with
         | Some (Ast.CLTE _) ->
-          let sites = Mods.StringMap.find_default Mods.StringSet.empty agent_name m in
+          let sites = Mods.StringMap.find_default Mods.StringSet.empty agent_name map in
           if
             Mods.StringSet.mem counter_name sites
           then
-            acc,m
+            map
           else
-            (agent_name, counter_name, ref 0) :: acc,
             Mods.StringMap.add agent_name
                 (Mods.StringSet.add counter_name sites)
-                m
-        | Some (Ast.CEQ _) | Some (Ast.CGTE _) | Some (Ast.CVAR _) | None -> acc,m) ([],Mods.StringMap.empty)
+                map
+        | Some (Ast.CEQ _) | Some (Ast.CGTE _) | Some (Ast.CVAR _) | None -> map) Mods.StringMap.empty
   in
   let add (x,y) data map =
       Mods.StringMap.add
@@ -2074,7 +2073,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   in
   (* Create opposite counters that have the same tests *)
   let (signatures : Ast.agent_sig list),
-      (signature_map : Ast.conversion_info Mods.StringMap.t Mods.StringMap.t)=
+      (counter_conversion_info_map : Ast.conversion_info Mods.StringMap.t Mods.StringMap.t)=
     List.fold_left
       (fun (acc,map) agent ->
         match agent with
@@ -2084,7 +2083,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
           let counters_with_clte_tests_from_agent :
               Mods.StringSet.t  =
             Mods.StringMap.find_default
-              Mods.StringSet.empty  agent_name (snd counters_with_clte_tests)
+              Mods.StringSet.empty  agent_name counters_with_clte_tests
           in
           let (new_counter_sites : Ast.counter_sig Ast.site list),
               map
@@ -2136,7 +2135,6 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                       Ast.From_clte_elimination convert_info
                 in
                 (* Write in sum_bounds_ref the sum of the counter bounds above *)
-              (*  sum_bounds_ref := inf_bound + sup_bound;*)
                 let counter =
                   {
                     Ast.counter_sig_name;
@@ -2171,7 +2169,8 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
               let agent_name : string = Loc.v agent_name_ in
               let counters_with_clte_tests_from_agent :
                 Ast.conversion_info Mods.StringMap.t =
-                Mods.StringMap.find_default Mods.StringMap.empty agent_name signature_map
+                Mods.StringMap.find_default
+                  Mods.StringMap.empty agent_name counter_conversion_info_map
               in
               (* Add delta to counter as opposite deltas to counter_delta *)
               let (added_sites, site_list_with_opposite_deltas) :
@@ -2276,7 +2275,8 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
               let agent_name : string = Loc.v agent_name_ in
                 let counters_with_clte_tests_from_agent :
                 Ast.conversion_info Mods.StringMap.t =
-                Mods.StringMap.find_default Mods.StringMap.empty agent_name signature_map
+                Mods.StringMap.find_default
+                  Mods.StringMap.empty agent_name counter_conversion_info_map
               in
 (*
       let counters_with_clte_tests_from_agent :
