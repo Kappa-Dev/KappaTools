@@ -72,7 +72,7 @@ and counter_sig = {
   counter_sig_default: int;
   counter_sig_min: int option option;
   counter_sig_max: int option option;
-  counter_visible: Ast.visible;
+  counter_visible: Ast.origine;
 }
 
 and counter_test = CEQ of int | CGTE of int | CVAR of string | UNKNOWN

@@ -35,24 +35,24 @@ type counter = {
   counter_delta: int Loc.annoted;
 }
 
-type hidden_info =
+type translate_int = BASIS_MINUS_INPUT of int
+
+val apply_int: translate_int -> int -> int
+
+type conversion_info =
   {
     from_sig_name: string Loc.annoted;
-    convert_value: (int -> int);
-    convert_delta: (int -> int);
-    convert_test: (counter_test option -> counter_test option);
-    convert_back_value: (int -> int);
-    convert_back_delta: (int -> int);
-    convert_back_test: (counter_test option -> counter_test option)
+    convert_value: translate_int;
+    convert_delta: translate_int;
   }
 
-type visible = Visible | Hidden of hidden_info
+type origine = From_original_ast | From_clte_elimination of conversion_info
 
 type counter_sig = {
   counter_sig_name: string Loc.annoted;
   counter_sig_min: int option Loc.annoted option;
   counter_sig_max: int option Loc.annoted option;
-  counter_sig_visible: visible;
+  counter_sig_visible: origine;
   counter_sig_default: int;
 }
 

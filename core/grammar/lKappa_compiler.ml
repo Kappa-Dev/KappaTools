@@ -2065,12 +2065,20 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
         | Some (Ast.CEQ _) | Some (Ast.CGTE _) | Some (Ast.CVAR _) | None -> acc)
   in
 
+  let add (x,y) data map =
+         Mods.StringMap.add
+           x
+           (Mods.StringMap.add y data
+                 (Mods.StringMap.find_default Mods.StringMap.empty x map))
+           map
+  in
   (* Create opposite counters that have the same tests *)
-  let signatures : Ast.agent_sig list =
-    List.map
-      (fun agent ->
+  let (signatures : Ast.agent_sig list),
+      (map : Ast.conversion_info Mods.StringMap.t Mods.StringMap.t)=
+    List.fold_left
+      (fun (acc,map) agent ->
         match agent with
-        | Ast.Absent _ -> agent
+        | Ast.Absent _ -> agent::acc, map
         | Present (agent_name_, site_list, agent_mod) ->
           let agent_name = Loc.v agent_name_ in
           let counters_with_clte_tests_from_agent :
@@ -2080,9 +2088,11 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                 agent_name = agent_name_counter)
               counters_with_clte_tests
           in
-          let new_counter_sites : Ast.counter_sig Ast.site list =
+          let (new_counter_sites : Ast.counter_sig Ast.site list),
+              map
+            =
             List.fold_left
-              (fun acc (_, counter_name, sum_bounds_ref) ->
+              (fun (acc,map) (_, counter_name, sum_bounds_ref) ->
                 (* Find counter to invert *)
                 let counter_orig : Ast.counter_sig =
                   List.find_map
@@ -2117,12 +2127,19 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                          ( "Cannot take the opposite of an unbounded counters  ",
                            Loc.get_annot counter_orig.counter_sig_name ))
                 in
-
-                let counter_sig_visible = Ast.Visible in
+                let convert_info =
+                  {
+                    Ast.from_sig_name = counter_orig.counter_sig_name;
+                    convert_value = BASIS_MINUS_INPUT (inf_bound + sup_bound);
+                    convert_delta = BASIS_MINUS_INPUT (inf_bound + sup_bound)
+                  }
+                in
+                let counter_sig_visible =
+                      Ast.From_clte_elimination convert_info
+                in
                 (* Write in sum_bounds_ref the sum of the counter bounds above *)
                 sum_bounds_ref := inf_bound + sup_bound;
-
-                Ast.Counter
+                let counter =
                   {
                     Ast.counter_sig_name;
                     Ast.counter_sig_min;
@@ -2130,13 +2147,16 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                     Ast.counter_sig_default;
                     Ast.counter_sig_visible;
                   }
-                :: acc)
-              [] counters_with_clte_tests_from_agent
+                in
+                (Ast.Counter counter)::acc,
+                add (agent_name,Loc.v counter_orig.counter_sig_name) convert_info map)
+              ([],map) (List.rev counters_with_clte_tests_from_agent)
           in
-
-          Ast.Present (agent_name_, site_list @ new_counter_sites, agent_mod))
-      ast_compil.signatures
+          (Ast.Present (agent_name_, site_list @ new_counter_sites, agent_mod))::acc,
+           map)
+      ([], Mods.StringMap.empty) (List.rev ast_compil.signatures)
   in
+  let _ = map in
 
   (* In rules, we need to replace the counter tests and the counter modifications *)
   let replace_counter_by_invert (mix : Ast.mixture) : Ast.mixture =
