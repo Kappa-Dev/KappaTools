@@ -38,6 +38,7 @@ type counter = {
 type translate_int = BASIS_MINUS_INPUT of int
 
 val apply_int: translate_int -> int -> int
+val reorder_bounds: translate_int -> ('a * 'a ) -> ('a * 'a)
 
 type conversion_info =
   {

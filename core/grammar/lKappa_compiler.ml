@@ -1889,6 +1889,10 @@ let inverted_counter_name (name : string) : string =
  * For this, for each counter where a CLTE test is present, whose values are in [\[a, b\]], initialized at [i] and add a new counter belonging in [a, b] initialized at [a+b-i].
  * Each test [> value] is then translated into a test to the "inverted" counter as [< a+b-value].
  * Each delta [+ delta] is translated into a [- delta] *)
+
+
+
+
 let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   let counter_fold_in_mixture f acc mixture =
     List.fold_left
@@ -2112,10 +2116,9 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                     (fun name -> inverted_counter_name name)
                     counter_orig.counter_sig_name
                 in
-                let counter_sig_min = counter_orig.counter_sig_min in
-                let counter_sig_max = counter_orig.counter_sig_max in
-                let counter_sig_default, inf_bound, sup_bound =
-                  match counter_sig_min, counter_sig_max with
+                let _counter_sig_default, inf_bound, sup_bound =
+                  match counter_orig.counter_sig_min, counter_orig.counter_sig_max
+                  with
                   | Some (Some min, _), Some (Some max, _) ->
                     max + min - counter_orig.counter_sig_default, min, max
                   | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
@@ -2124,11 +2127,25 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                          ( "Cannot take the opposite of an unbounded counters  ",
                            Loc.get_annot counter_orig.counter_sig_name ))
                 in
+                let convert_value = Ast.BASIS_MINUS_INPUT (inf_bound + sup_bound) in
+                let convert_delta = Ast.BASIS_MINUS_INPUT 0 in
+                let update x =
+                  match x with
+                    | None -> None
+                    | Some (None,loc) -> Some (None,loc)
+                    | Some (Some i,loc) -> Some (Some (Ast.apply_int convert_value i), loc)
+                in
+                let ref_min,ref_max =
+                    Ast.reorder_bounds convert_value (counter_orig.counter_sig_min,counter_orig.counter_sig_max) in
+                let counter_sig_min = update ref_min in
+                let counter_sig_max = update ref_max in
+                let counter_sig_default =
+                    Ast.apply_int convert_value counter_orig.counter_sig_default in
                 let convert_info =
                   {
                     Ast.from_sig_name = counter_orig.counter_sig_name;
-                    convert_value = BASIS_MINUS_INPUT (inf_bound + sup_bound);
-                    convert_delta = BASIS_MINUS_INPUT 0
+                    convert_value ;
+                    convert_delta ;
                   }
                 in
                 let counter_sig_visible =

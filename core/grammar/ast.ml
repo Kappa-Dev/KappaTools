@@ -43,6 +43,10 @@ let apply_int t i =
   match t with
     | BASIS_MINUS_INPUT d -> d - i
 
+let reorder_bounds t (i,j) =
+  match t with
+    | BASIS_MINUS_INPUT _ -> j,i
+
 type conversion_info =
       {
         from_sig_name: string Loc.annoted;
@@ -842,7 +846,7 @@ let agent_sig_to_json =
   agent_to_json ~counter_to_json:counter_sig_to_json
 
 let agent_of_json = agent_of_json ~site_of_json
-let agent_to_json = agent_to_json ~counter_to_json 
+let agent_to_json = agent_to_json ~counter_to_json
 
 let print_ast_mix ~print_counter =
   Pp.list
