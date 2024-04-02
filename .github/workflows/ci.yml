@@ -28,9 +28,7 @@ jobs:
             texlive-latex-extra
           opam depext --install --yes dune odoc camlp-streams \
             ${{ matrix.additional-packages }}
-          cd pinned_libs/default
-          opam install --yes . --deps-only
-          cd ../..
+          opam install --yes pinned_libs/default --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make documentation
@@ -61,9 +59,7 @@ jobs:
           sudo apt-get install --yes gnuplot-nox \
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht
-          cd pinned_libs/default
-          opam install --yes . --deps-only
-          cd ../..
+          opam install --yes pinned_libs/default --deps-only
           pip install nose
       - name: Make Kappa
         run: |
@@ -93,9 +89,7 @@ jobs:
             texlive-fonts-recommended texlive-pictures tex4ht
       - name: Install OPAM dependencies
         run: |
-          cd pinned_libs/default
-          opam install --yes . --deps-only
-          cd ../..
+          opam install --yes pinned_libs/default --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Javascript app
@@ -124,9 +118,7 @@ jobs:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
         run: |
-          cd pinned_libs/default
-          opam install --yes . --deps-only
-          cd ../..
+          opam install --yes pinned_libs/default --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make MacOS app
@@ -157,9 +149,7 @@ jobs:
           ocaml-compiler: 4.14.x
       - name: Install OPAM dependencies
         run: |
-          cd pinned_libs/windows
-          opam install --yes . --deps-only
-          cd ../..
+          opam install --yes pinned_libs/windows --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Windows app
