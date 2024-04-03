@@ -37,35 +37,16 @@ type counter = {
       (** In a rule: change in counter value, in an agent declaration: max value of the counter, 0 if absent *)
 }
 
-type translate_int = BASIS_MINUS_INPUT of int
-
 let apply_int t i =
   match t with
-    | BASIS_MINUS_INPUT d -> d - i
+    | Counters_info.BASIS_MINUS_INPUT d -> d - i
 
 let reorder_bounds t (i,j) =
   match t with
-    | BASIS_MINUS_INPUT _ -> j,i
+    | Counters_info.BASIS_MINUS_INPUT _ -> j,i
 
-type conversion_info =
-      {
-        from_sig_name: string Loc.annoted;
-        convert_value: translate_int;
-        convert_delta: translate_int;
-      }
-(** Counter syntax from AST, present in 3 contexts with different meanings: agent definition, species init declaration, rule *)
 
-type origine = From_original_ast | From_clte_elimination of conversion_info
-
-type counter_sig = {
-  counter_sig_name: string Loc.annoted;
-  counter_sig_min: int option Loc.annoted option;
-  counter_sig_max: int option Loc.annoted option;
-  counter_sig_visible: origine;
-  counter_sig_default: int;
-}
-
-let counter_sig_of_counter (c : counter) : counter_sig =
+let counter_sig_of_counter (c : counter) : Counters_info.counter_sig =
   let (counter_sig_min, counter_sig_default) : (int option * Loc.t) option * int
       =
     match c.counter_test with
@@ -77,23 +58,23 @@ let counter_sig_of_counter (c : counter) : counter_sig =
     | i, loc -> Some (Some i, loc)
   in
   {
-    counter_sig_name = c.counter_name;
+    Counters_info.counter_sig_name = c.counter_name;
     counter_sig_min;
     counter_sig_max;
     counter_sig_default;
     counter_sig_visible = From_original_ast;
   }
 
-let make_inverted_counter_sig (counter : counter_sig)
-    (counter_sig_name : string Loc.annoted) : counter_sig =
+let make_inverted_counter_sig (counter : Counters_info.counter_sig)
+    (counter_sig_name : string Loc.annoted) : Counters_info.counter_sig =
   let f_int =
     match counter.counter_sig_max, counter.counter_sig_min with
     | Some (Some max, _), Some (Some min, _) ->
-      BASIS_MINUS_INPUT (max+min)
+      Counters_info.BASIS_MINUS_INPUT (max+min)
     | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
       failwith "unbounded counters not implemented yet"
   in
-  let f_op = BASIS_MINUS_INPUT 0 in
+  let f_op = Counters_info.BASIS_MINUS_INPUT 0 in
   {
     counter with
     counter_sig_name;
@@ -123,7 +104,7 @@ type 'counter parametric_agent =
   | Absent of Loc.t
 
 type agent = counter parametric_agent
-type agent_sig = counter_sig parametric_agent
+type agent_sig = Counters_info.counter_sig parametric_agent
 
 (* TODO: document why list list *)
 type mixture = agent list list
@@ -363,13 +344,13 @@ let print_counter f c =
     c.counter_delta
 
 let print_counter_sig f c =
-  Format.fprintf f "%s{%a%a}%a" (fst c.counter_sig_name)
+  Format.fprintf f "%s{%a%a}%a" (fst c.Counters_info.counter_sig_name)
     (Pp.option ~with_space:false print_counter_min)
-    c.counter_sig_min
+    c.Counters_info.counter_sig_min
     (Pp.option ~with_space:false print_counter_max)
-    c.counter_sig_max
+    c.Counters_info.counter_sig_max
     (print_counter_default c.counter_sig_min)
-    c.counter_sig_default
+    c.Counters_info.counter_sig_default
 
 let print_ast_site ~print_counter f = function
   | Port p -> print_ast_port f p
@@ -673,7 +654,7 @@ let site_sig_of_json filenames = function
       ] ->
     Counter
       {
-        counter_sig_name =
+        Counters_info.counter_sig_name =
           Loc.annoted_of_yojson ~filenames Yojson.Basic.Util.to_string n;
         counter_sig_min =
           Yojson.Basic.Util.to_option
@@ -755,18 +736,18 @@ let counter_sig_to_json ~filenames c =
   `Assoc
     [
       ( "counter_sig_name",
-        Loc.yojson_of_annoted ~filenames JsonUtil.of_string c.counter_sig_name );
+        Loc.yojson_of_annoted ~filenames JsonUtil.of_string c.Counters_info.counter_sig_name );
       ( "counter_min",
         JsonUtil.of_option
           (Loc.yojson_of_annoted ~filenames
              (JsonUtil.of_option JsonUtil.of_int))
-          c.counter_sig_min );
+          c.Counters_info.counter_sig_min );
       ( "counter_max",
         JsonUtil.of_option
           (Loc.yojson_of_annoted ~filenames
              (JsonUtil.of_option JsonUtil.of_int))
-          c.counter_sig_max );
-      "counter_default", JsonUtil.of_int c.counter_sig_default;
+          c.Counters_info.counter_sig_max );
+      "counter_default", JsonUtil.of_int c.Counters_info.counter_sig_default;
     ]
 
 let site_to_json ~counter_to_json filenames = function
@@ -1527,7 +1508,7 @@ let merge_internals =
 
 let rec merge_sites_counter c = function
   | [] -> [ Counter c ]
-  | Counter c' :: _ as l when fst c.counter_sig_name = fst c'.counter_sig_name
+  | Counter c' :: _ as l when fst c.Counters_info.counter_sig_name = fst c'.Counters_info.counter_sig_name
     ->
     l
   | ((Port _ | Counter _) as h) :: t -> h :: merge_sites_counter c t

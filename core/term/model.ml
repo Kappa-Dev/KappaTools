@@ -20,10 +20,11 @@ type t = {
   algs_reverse_dependencies: Operator.DepSet.t array;
   tokens_reverse_dependencies: Operator.DepSet.t array;
   contact_map: Contact_map.t;
+  counters_info: Counters_info.t;
 }
 
 let init ~filenames domain tokens algs (deps_in_t, deps_in_e, tok_rd, alg_rd)
-    (ast_rules, rules) observables interventions contact_map =
+    (ast_rules, rules) observables interventions contact_map counters_info =
   {
     filenames;
     domain;
@@ -38,6 +39,7 @@ let init ~filenames domain tokens algs (deps_in_t, deps_in_e, tok_rd, alg_rd)
     dependencies_in_event = deps_in_e;
     interventions;
     contact_map;
+    counters_info;
   }
 
 let deconstruct env =
@@ -52,7 +54,8 @@ let deconstruct env =
     (env.ast_rules, env.rules),
     env.observables,
     env.interventions,
-    env.contact_map )
+    env.contact_map,
+    env.counters_info)
 
 let domain env = env.domain
 let get_obs env = env.observables
@@ -63,6 +66,8 @@ let tokens_finder env = env.tokens.NamedDecls.finder
 let algs_finder env = env.algs.NamedDecls.finder
 let contact_map env = env.contact_map
 let num_of_agent nme env = Signature.num_of_agent nme (signatures env)
+let counters_info env = env.counters_info
+let counter_info env i j = (counters_info env).(i).(j)
 
 let fold_rules f x env =
   Tools.array_fold_lefti (fun i x rule -> f i x rule) x env.rules
@@ -289,6 +294,7 @@ let propagate_constant ~warning ?max_time ?max_events ~updated_vars
            (Alg_expr.propagate_constant ~warning ?max_time ?max_events
               ~updated_vars ~vars:algs'))
         x.rules;
+    counters_info = x.counters_info;
     interventions =
       Array.map
         (Primitives.map_expr_perturbation
@@ -377,9 +383,13 @@ let of_yojson = function
            (JsonUtil.to_string ?error_msg:None)
            (List.assoc "filenames" l)
        in
+       let domain = Pattern.Env.of_yojson (List.assoc "update" l) in
        {
          filenames = List.tl (Array.to_list filenames);
          domain = Pattern.Env.of_yojson (List.assoc "update" l);
+         counters_info =
+            (try Counters_info.of_yojson (List.assoc "counters_info" l)
+            with Not_found -> Counters_info.default_backward_compatibility domain) ; 
          tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
          algs =
            NamedDecls.of_json

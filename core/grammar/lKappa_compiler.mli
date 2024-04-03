@@ -10,6 +10,7 @@ val bool_expr_of_ast :
   warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   syntax_version:Ast.syntax_version ->
   Signature.s ->
+  Counters_info.t ->
   int Mods.StringMap.t ->
   int Mods.StringMap.t ->
   ?max_allowed_var:int ->
@@ -20,6 +21,7 @@ val modif_expr_of_ast :
   warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   syntax_version:Ast.syntax_version ->
   Signature.s ->
+  Counters_info.t ->
   int Mods.StringMap.t ->
   int Mods.StringMap.t ->
   Contact_map.t ->
@@ -32,6 +34,7 @@ val init_of_ast :
   warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
   syntax_version:Ast.syntax_version ->
   Signature.s ->
+  Counters_info.t ->
   Contact_map.t ->
   int Mods.StringMap.t ->
   int Mods.StringMap.t ->
@@ -41,6 +44,7 @@ val init_of_ast :
 type ast_compiled_data = {
   agents_sig: Signature.s;
   contact_map: Contact_map.t;
+  counters_info: Counters_info.counter_sig option Array.t Array.t;
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)

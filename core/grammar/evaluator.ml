@@ -14,7 +14,7 @@ let do_interactive_directives ~debug_mode ~outputs ~sharing ~syntax_version
   let e', _ =
     List_util.fold_right_map
       (LKappa_compiler.modif_expr_of_ast ~warning ~syntax_version
-         (Model.signatures env) (Model.tokens_finder env)
+         (Model.signatures env) (Model.counters_info env) (Model.tokens_finder env)
          (Model.algs_finder env) contact_map')
       e []
   in
@@ -59,7 +59,7 @@ let get_pause_criteria ~debug_mode ~outputs ~sharing ~syntax_version contact_map
   let cc_preenv = Pattern.PreEnv.of_env (Model.domain env) in
   let b' =
     LKappa_compiler.bool_expr_of_ast ~warning ~syntax_version
-      (Model.signatures env) (Model.tokens_finder env) (Model.algs_finder env) b
+      (Model.signatures env) (Model.counters_info env) (Model.tokens_finder env) (Model.algs_finder env) b
   in
   let cc_preenv', ((b'', pos_b'') as bpos'') =
     Eval.compile_bool ~debug_mode ~compile_mode_on:false contact_map cc_preenv

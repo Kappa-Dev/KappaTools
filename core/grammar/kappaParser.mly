@@ -525,18 +525,18 @@ port_expression_sig:
     	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_link_mod = $6; } }
   | ID PLUS EQUAL INT
              { Ast.Counter
-    	   { Ast.counter_sig_name = ($1,rhs_pos 1);
-           Ast.counter_sig_min = None;
-           Ast.counter_sig_max = Some (Some $4, rhs_pos 4);
-           Ast.counter_sig_default = $4;
-           Ast.counter_sig_visible = Ast.From_original_ast}}
+    	   { Counters_info.counter_sig_name = ($1,rhs_pos 1);
+           Counters_info.counter_sig_min = None;
+           Counters_info.counter_sig_max = Some (Some $4, rhs_pos 4);
+           Counters_info.counter_sig_default = $4;
+           Counters_info.counter_sig_visible = Counters_info.From_original_ast}}
   | ID PLUS EQUAL MINUS INT
         {Ast.Counter
-  { Ast.counter_sig_name = ($1,rhs_pos 1);
-    Ast.counter_sig_min = None;
-    Ast.counter_sig_max = Some (Some (-$5), rhs_pos 5);
-    Ast.counter_sig_default = -$5;
-    Ast.counter_sig_visible = Ast.From_original_ast}}
+  { Counters_info.counter_sig_name = ($1,rhs_pos 1);
+    Counters_info.counter_sig_min = None;
+    Counters_info.counter_sig_max = Some (Some (-$5), rhs_pos 5);
+    Counters_info.counter_sig_default = -$5;
+    Counters_info.counter_sig_visible = Counters_info.From_original_ast}}
   | ID counter_test PLUS EQUAL INT
        { let min =
             match $2 with
@@ -544,11 +544,11 @@ port_expression_sig:
                       | None | Some ((CGTE _|CLTE _|CVAR _), _) -> raise (ExceptionDefn.Syntax_Error
                       (add_pos "Issue counters in signature"))
         in Ast.Counter
-         { Ast.counter_sig_name = ($1,rhs_pos 1);
-           Ast.counter_sig_min = Some (Some min, rhs_pos 2);
-           Ast.counter_sig_max = Some (Some $5, rhs_pos 5);
-           Ast.counter_sig_default = min;
-           Ast.counter_sig_visible = Ast.From_original_ast}}
+         { Counters_info.counter_sig_name = ($1,rhs_pos 1);
+           Counters_info.counter_sig_min = Some (Some min, rhs_pos 2);
+           Counters_info.counter_sig_max = Some (Some $5, rhs_pos 5);
+           Counters_info.counter_sig_default = min;
+           Counters_info.counter_sig_visible = Counters_info.From_original_ast}}
   | ID counter_test PLUS EQUAL MINUS INT
       { let min =
            match $2 with
@@ -557,11 +557,11 @@ port_expression_sig:
                      (add_pos "Issue counters in signature"))
        in
         Ast.Counter
-        { Ast.counter_sig_name = ($1,rhs_pos 1);
-          Ast.counter_sig_min = Some (Some min, rhs_pos 2);
-          Ast.counter_sig_max = Some (Some (-$6), rhs_pos 6);
-          Ast.counter_sig_default = min ;
-          Ast.counter_sig_visible = Ast.From_original_ast}}
+        { Counters_info.counter_sig_name = ($1,rhs_pos 1);
+          Counters_info.counter_sig_min = Some (Some min, rhs_pos 2);
+          Counters_info.counter_sig_max = Some (Some (-$6), rhs_pos 6);
+          Counters_info.counter_sig_default = min ;
+          Counters_info.counter_sig_visible = Counters_info.From_original_ast}}
   | ID counter_test
       { let min =
            match $2 with
@@ -570,11 +570,11 @@ port_expression_sig:
                      (add_pos "Issue counters in signature"))
        in
        Ast.Counter
-  { Ast.counter_sig_name = ($1,rhs_pos 1);
-    Ast.counter_sig_min = Some (Some min, rhs_pos 2);
-    Ast.counter_sig_max = None;
-    Ast.counter_sig_default = min;
-    Ast.counter_sig_visible = Ast.From_original_ast}}
+  { Counters_info.counter_sig_name = ($1,rhs_pos 1);
+    Counters_info.counter_sig_min = Some (Some min, rhs_pos 2);
+    Counters_info.counter_sig_max = None;
+    Counters_info.counter_sig_default = min;
+    Counters_info.counter_sig_visible = Counters_info.From_original_ast}}
 
 
 internal_state:

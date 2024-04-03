@@ -24,6 +24,7 @@ val init :
   Primitives.alg_expr Loc.annoted array ->
   Primitives.perturbation array ->
   Contact_map.t ->
+  Counters_info.counter_sig option array array ->
   t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
@@ -43,6 +44,7 @@ val deconstruct :
   * Primitives.alg_expr Loc.annoted array
   * Primitives.perturbation array
   * Contact_map.t
+  * Counters_info.counter_sig option array array
 
 val nb_tokens : t -> int
 val nb_algs : t -> int
@@ -57,6 +59,8 @@ val signatures : t -> Signature.s
 val tokens_finder : t -> int Mods.StringMap.t
 val algs_finder : t -> int Mods.StringMap.t
 val contact_map : t -> Contact_map.t
+val counters_info : t -> Counters_info.t
+val counter_info : t -> int -> int -> Counters_info.counter_sig option
 val get_alg : t -> int -> Primitives.alg_expr
 val get_algs : t -> (string * Primitives.alg_expr Loc.annoted) array
 val get_perturbation : t -> int -> Primitives.perturbation

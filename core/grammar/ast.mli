@@ -35,19 +35,19 @@ type counter = {
   counter_delta: int Loc.annoted;
 }
 
-type translate_int = BASIS_MINUS_INPUT of int
+(*type translate_int = BASIS_MINUS_INPUT of int*)
 
-val apply_int: translate_int -> int -> int
-val reorder_bounds: translate_int -> ('a * 'a ) -> ('a * 'a)
+val apply_int: Counters_info.translate_int -> int -> int
+val reorder_bounds: Counters_info.translate_int -> ('a * 'a ) -> ('a * 'a)
 
-type conversion_info =
+(*type conversion_info =
   {
     from_sig_name: string Loc.annoted;
     convert_value: translate_int;
     convert_delta: translate_int;
-  }
+  }*)
 
-type origine = From_original_ast | From_clte_elimination of conversion_info
+(*type origine = From_original_ast | From_clte_elimination of conversion_info
 
 type counter_sig = {
   counter_sig_name: string Loc.annoted;
@@ -55,9 +55,9 @@ type counter_sig = {
   counter_sig_max: int option Loc.annoted option;
   counter_sig_visible: origine;
   counter_sig_default: int;
-}
+}*)
 
-val make_inverted_counter_sig : counter_sig -> string Loc.annoted -> counter_sig
+val make_inverted_counter_sig : Counters_info.counter_sig -> string Loc.annoted -> Counters_info.counter_sig
 
 (* Site type, with custom definition of counter type: used with `counter` and `counter_sig` *)
 type 'counter site = Port of port | Counter of 'counter
@@ -68,7 +68,7 @@ type 'counter parametric_agent =
   | Absent of Loc.t
 
 type agent = counter parametric_agent
-type agent_sig = counter_sig parametric_agent
+type agent_sig = Counters_info.counter_sig parametric_agent
 type mixture = agent list list
 
 val mixture_to_user_graph : mixture -> User_graph.connected_component

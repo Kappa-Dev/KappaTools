@@ -145,6 +145,11 @@ site_counter_sig:
       { Some (Some ($3),rhs_pos 3),match $7 with (a,loc) -> Some (Some (a),loc) }
     | EQUAL annoted INT  annoted CL_CUR annoted
         { Some (Some ($3),rhs_pos 3),None }
+    | EQUAL annoted MINUS annoted INT  annoted DIV annoted counter_modif annoted CL_CUR annoted
+          { Some (Some (-$5),rhs_pos 5),match $9 with (a,loc) -> Some (Some (a),loc) }
+    | EQUAL annoted MINUS annoted INT  annoted CL_CUR annoted
+            { Some (Some ($5),rhs_pos 5),None }
+        ;
     ;
 
   site_sig:
@@ -173,14 +178,14 @@ site_counter_sig:
     | ID annoted OP_CUR annoted site_counter_sig
       { let (counter_sig_min,counter_sig_max) = $5 in
         Ast.Counter
-          { Ast.counter_sig_name=($1,rhs_pos 1);
-            Ast.counter_sig_min;
-            Ast.counter_sig_max;
-            Ast.counter_sig_default=
+          { Counters_info.counter_sig_name=($1,rhs_pos 1);
+            Counters_info.counter_sig_min;
+            Counters_info.counter_sig_max;
+            Counters_info.counter_sig_default=
                 (match counter_sig_min with
                   | None | Some (None, _)-> 0
                   | Some (Some i,_) -> i );
-            Ast.counter_sig_visible=Ast.From_original_ast;
+            Counters_info.counter_sig_visible=Counters_info.From_original_ast;
             } }
     | ID annoted
       { Ast.Port

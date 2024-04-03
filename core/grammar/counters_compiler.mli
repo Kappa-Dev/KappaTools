@@ -31,7 +31,7 @@ val split_counter_variables_into_separate_rules :
 val make_counter : int -> string -> Ast.counter
 
 val compile_counter_in_rule :
-  Signature.s ->
+  Signature.s -> Counters_info.counter_sig option Array.t Array.t ->
   LKappa.rule_agent with_agent_counters list ->
   Raw_mixture.agent with_agent_counters list ->
   LKappa.rule_agent list * Raw_mixture.agent list
