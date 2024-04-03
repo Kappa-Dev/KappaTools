@@ -110,7 +110,7 @@ let pop_entry parameters error id (map, set) =
   )
 
 let get_counter_name counter = fst counter.Ast.counter_name
-let get_counter_name_sig counter = fst counter.Ast.counter_sig_name
+let get_counter_name_sig counter = fst counter.Counters_info.counter_sig_name
 
 let rec scan_interface ~get_counter_name parameters k agent interface
     (((error, a), (set_sites, set_counters)) as remanent) =
@@ -287,10 +287,10 @@ let translate_counter parameters error int_set counter =
            Some a);
     } )
 
-let translate_counter_sig parameters error int_set (counter : Ast.counter_sig) =
+let translate_counter_sig parameters error int_set (counter : Counters_info.counter_sig) =
   let error, _ =
     check_freshness parameters error "Counters"
-      (fst counter.Ast.counter_sig_name)
+      (fst counter.Counters_info.counter_sig_name)
       int_set
   in
   let fetch x =
@@ -300,11 +300,11 @@ let translate_counter_sig parameters error int_set (counter : Ast.counter_sig) =
   in
   ( error,
     {
-      Ckappa_sig.counter_sig_name = fst counter.Ast.counter_sig_name;
-      Ckappa_sig.counter_sig_max = fetch counter.Ast.counter_sig_max;
-      Ckappa_sig.counter_sig_min = fetch counter.Ast.counter_sig_min;
-      Ckappa_sig.counter_sig_default = counter.Ast.counter_sig_default;
-      Ckappa_sig.counter_visible = counter.Ast.counter_sig_visible;
+      Ckappa_sig.counter_sig_name = fst counter.Counters_info.counter_sig_name;
+      Ckappa_sig.counter_sig_max = fetch counter.Counters_info.counter_sig_max;
+      Ckappa_sig.counter_sig_min = fetch counter.Counters_info.counter_sig_min;
+      Ckappa_sig.counter_sig_default = counter.Counters_info.counter_sig_default;
+      Ckappa_sig.counter_visible = counter.Counters_info.counter_sig_visible;
     } )
 
 let rec translate_interface ~translate_counter parameters is_signature

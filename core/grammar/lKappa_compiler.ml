@@ -1152,22 +1152,22 @@ let give_rule_label bidirectional (id, set) printer r = function
     ) else
       (id, set'), lab
 
-let mixture_of_ast ~warning ~syntax_version sigs ?contact_map (pos : Loc.t)
+let mixture_of_ast ~warning ~syntax_version sigs counters_info  ?contact_map (pos : Loc.t)
     (mix : Ast.mixture) =
   match
     annotate_edit_mixture ~warning ~syntax_version ~is_rule:false sigs
       ?contact_map mix
   with
-  | r, [] -> fst (Counters_compiler.compile_counter_in_rule sigs r [])
+  | r, [] -> fst (Counters_compiler.compile_counter_in_rule sigs counters_info r [])
   | _, _ ->
     raise (ExceptionDefn.Internal_Error ("A mixture cannot create agents", pos))
 
-let raw_mixture_of_ast ~warning ~syntax_version sigs ?contact_map
+let raw_mixture_of_ast ~warning ~syntax_version sigs (counters_info : Counters_info.t) ?contact_map
     (mix : Ast.mixture) =
   let b =
     annotate_created_mixture ~warning ~syntax_version sigs ?contact_map mix
   in
-  snd (Counters_compiler.compile_counter_in_rule sigs [] b)
+  snd (Counters_compiler.compile_counter_in_rule sigs counters_info [] b)
 
 let convert_alg_var ?max_allowed_var algs lab pos =
   let i =
@@ -1194,80 +1194,80 @@ let convert_token_name tk_name tok pos =
     raise
       (ExceptionDefn.Malformed_Decl (tk_name ^ " is not a declared token", pos))
 
-let rec alg_expr_of_ast ~warning ~syntax_version sigs tok algs ?max_allowed_var
+let rec alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs ?max_allowed_var
     (alg, pos) =
   ( (match alg with
     | Alg_expr.KAPPA_INSTANCE ast ->
       Alg_expr.KAPPA_INSTANCE
-        (mixture_of_ast ~warning ~syntax_version sigs pos ast)
+        (mixture_of_ast ~warning ~syntax_version sigs counters_info pos ast)
     | Alg_expr.ALG_VAR lab ->
       Alg_expr.ALG_VAR (convert_alg_var ?max_allowed_var algs lab pos)
     | Alg_expr.TOKEN_ID tk_name ->
       Alg_expr.TOKEN_ID (convert_token_name tk_name tok pos)
     | Alg_expr.DIFF_KAPPA_INSTANCE (expr, ast) ->
       Alg_expr.DIFF_KAPPA_INSTANCE
-        ( alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var expr,
-          mixture_of_ast ~warning ~syntax_version sigs pos ast )
+          mixture_of_ast ~warning ~syntax_version sigs counters_info pos ast )
     | Alg_expr.DIFF_TOKEN (expr, tk_name) ->
       Alg_expr.DIFF_TOKEN
-        ( alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var expr,
           convert_token_name tk_name tok pos )
     | (Alg_expr.STATE_ALG_OP _ | Alg_expr.CONST _) as x -> x
     | Alg_expr.BIN_ALG_OP (op, a, b) ->
       Alg_expr.BIN_ALG_OP
         ( op,
-          alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var a,
-          alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var b )
     | Alg_expr.UN_ALG_OP (op, a) ->
       Alg_expr.UN_ALG_OP
         ( op,
-          alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var a )
     | Alg_expr.IF (cond, yes, no) ->
       Alg_expr.IF
-        ( bool_expr_of_ast ~warning ~syntax_version sigs tok algs
+        ( bool_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var cond,
-          alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var yes,
-          alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var no )),
     pos )
 
-and bool_expr_of_ast ~warning ~syntax_version sigs tok algs ?max_allowed_var =
+and bool_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs ?max_allowed_var =
   function
   | ((Alg_expr.TRUE | Alg_expr.FALSE), _) as x -> x
   | Alg_expr.BIN_BOOL_OP (op, x, y), pos ->
     ( Alg_expr.BIN_BOOL_OP
         ( op,
-          bool_expr_of_ast ~warning ~syntax_version sigs tok algs
+          bool_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var x,
-          bool_expr_of_ast ~warning ~syntax_version sigs tok algs
+          bool_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var y ),
       pos )
   | Alg_expr.UN_BOOL_OP (op, x), pos ->
     ( Alg_expr.UN_BOOL_OP
         ( op,
-          bool_expr_of_ast ~warning ~syntax_version sigs tok algs
+          bool_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var x ),
       pos )
   | Alg_expr.COMPARE_OP (op, x, y), pos ->
     ( Alg_expr.COMPARE_OP
         ( op,
-          alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var x,
-          alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var y ),
       pos )
 
-let print_expr_of_ast ~warning ~syntax_version sigs tok algs = function
+let print_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs = function
   | Primitives.Str_pexpr _ as x -> x
   | Primitives.Alg_pexpr x ->
     Primitives.Alg_pexpr
-      (alg_expr_of_ast ~warning ~syntax_version sigs tok algs x)
+      (alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs x)
 
 (* Intermediate representation for a rule, used between internal translations *)
 type rule_inter_rep = {
@@ -1290,37 +1290,40 @@ type rule_inter_rep = {
 
 (** [assemble_rule] translates a rule_inter_rep into a LKappa.rule *)
 let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
-    (sigs : Signature.s) (tok : int Mods.StringMap.t)
+    (sigs : Signature.s) counters_info (tok : int Mods.StringMap.t)
     (algs : int Mods.StringMap.t) : LKappa.rule =
+  let () = Format.printf "ASSEMBLE RULE @." in
   let (r_mix, r_created) : LKappa.rule_mixture * Raw_mixture.t =
-    Counters_compiler.compile_counter_in_rule sigs rule.mixture rule.created_mix
+    Counters_compiler.compile_counter_in_rule sigs counters_info rule.mixture rule.created_mix
   in
+  let () = Format.printf "COUNTER COMPILED @." in
+
   let r_delta_tokens =
     List.rev_map
       (fun (al, (tk, pos)) ->
-        ( alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             (Loc.annot_with_dummy (Alg_expr.UN_ALG_OP (Operator.UMINUS, al))),
           convert_token_name tk tok pos ))
       rule.rm_token
     |> List_util.rev_map_append
          (fun (al, (tk, pos)) ->
-           ( alg_expr_of_ast ~warning ~syntax_version sigs tok algs al,
+           ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs al,
              convert_token_name tk tok pos ))
          rule.add_token
     |> List.rev
   in
   let r_rate =
-    alg_expr_of_ast ~warning ~syntax_version sigs tok algs rule.k_def
+    alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs rule.k_def
   in
   let r_un_rate =
     let r_dist d =
-      alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+      alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
         ?max_allowed_var:None d
     in
     Option_util.map
       (fun (un_rate', dist) ->
         let un_rate'' =
-          alg_expr_of_ast ~warning ~syntax_version sigs tok algs
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
             ?max_allowed_var:None un_rate'
         in
         match dist with
@@ -1337,7 +1340,7 @@ let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
     r_un_rate;
   }
 
-let modif_expr_of_ast ~warning ~syntax_version sigs tok algs contact_map modif
+let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs contact_map modif
     acc =
   match modif with
   | Ast.APPLY (nb, (ast_rule, pos)) ->
@@ -1377,8 +1380,8 @@ let modif_expr_of_ast ~warning ~syntax_version sigs tok algs contact_map modif
         }
     in
     ( Ast.APPLY
-        ( alg_expr_of_ast ~warning ~syntax_version sigs tok algs nb,
-          (assemble_rule ~warning ~syntax_version rule sigs tok algs, pos) ),
+        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs nb,
+          (assemble_rule ~warning ~syntax_version rule sigs counters_info tok algs, pos) ),
       acc )
   | Ast.UPDATE ((lab, pos), how) ->
     let i =
@@ -1389,71 +1392,71 @@ let modif_expr_of_ast ~warning ~syntax_version sigs tok algs contact_map modif
         (Mods.StringMap.find_option lab algs)
     in
     ( Ast.UPDATE
-        ((i, pos), alg_expr_of_ast ~warning ~syntax_version sigs tok algs how),
+        ((i, pos), alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs how),
       i :: acc )
   | Ast.STOP p ->
     ( Ast.STOP
-        (List.map (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),
+        (List.map (print_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs) p),
       acc )
   | Ast.SNAPSHOT (raw, p) ->
     ( Ast.SNAPSHOT
         ( raw,
-          List.map (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p
+          List.map (print_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs) p
         ),
       acc )
   | Ast.DIN (rel, p) ->
     ( Ast.DIN
         ( rel,
-          List.map (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p
+          List.map (print_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs) p
         ),
       acc )
   | Ast.DINOFF p ->
     ( Ast.DINOFF
-        (List.map (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p),
+        (List.map (print_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs) p),
       acc )
   | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_, _)) as x -> x, acc
   | Ast.PRINT (p, p') ->
     ( Ast.PRINT
-        ( List.map (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p,
-          List.map (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p'
+        ( List.map (print_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs) p,
+          List.map (print_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs) p'
         ),
       acc )
   | Ast.CFLOWMIX (b, (m, pos)) ->
-    ( Ast.CFLOWMIX (b, (mixture_of_ast ~warning ~syntax_version sigs pos m, pos)),
+    ( Ast.CFLOWMIX (b, (mixture_of_ast ~warning ~syntax_version sigs counters_info pos m, pos)),
       acc )
   | Ast.SPECIES_OF (b, p, (m, pos)) ->
     ( Ast.SPECIES_OF
         ( b,
-          List.map (print_expr_of_ast ~warning ~syntax_version sigs tok algs) p,
-          (mixture_of_ast ~warning ~syntax_version sigs pos m, pos) ),
+          List.map (print_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs) p,
+          (mixture_of_ast ~warning ~syntax_version sigs counters_info pos m, pos) ),
       acc )
 
-let perturbation_of_ast ~warning ~syntax_version sigs tok algs contact_map
+let perturbation_of_ast ~warning ~syntax_version sigs counters_info tok algs contact_map
     ((alarm, pre, mods, post), pos) up_vars :
     (_, _, _, _) Ast.perturbation * int list =
   let mods', up_vars' =
     List_util.fold_right_map
-      (modif_expr_of_ast ~warning ~syntax_version sigs tok algs contact_map)
+      (modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs contact_map)
       mods up_vars
   in
   let max_allowed_var = None in
   ( ( ( alarm,
         Option_util.map
-          (bool_expr_of_ast ~warning ~syntax_version sigs tok algs
+          (bool_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
              ?max_allowed_var)
           pre,
         mods',
         Option_util.map
-          (bool_expr_of_ast ~warning ~syntax_version sigs tok algs
+          (bool_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
              ?max_allowed_var)
           post ),
       pos ),
     up_vars' )
 
-let init_of_ast ~warning ~syntax_version sigs tok contact_map = function
+let init_of_ast ~warning ~syntax_version sigs counters_info tok contact_map = function
   | Ast.INIT_MIX (who, pos) ->
     Ast.INIT_MIX
-      (raw_mixture_of_ast ~warning ~syntax_version sigs ~contact_map who, pos)
+      (raw_mixture_of_ast ~warning ~syntax_version sigs counters_info ~contact_map who, pos)
   | Ast.INIT_TOK lab ->
     Ast.INIT_TOK
       (List.map
@@ -1618,7 +1621,7 @@ type site_sig_with_links_as_lists =
 (** Temporary type to store site signature with list links instead of array array links *)
 
 (** [prepare_agent_sig ~sites evaluates to (site_sigs, counter_list) which describe data that can be used to create a Signature.t for a single agent*)
-let prepare_agent_sig ~(sites : Ast.counter_sig Ast.site list) :
+let prepare_agent_sig ~(sites : Counters_info.counter_sig Ast.site list) :
     site_sig_with_links_as_lists NamedDecls.t * string Loc.annoted list =
   let ( (site_sigs_pre_nameddecls :
           (string Loc.annoted * site_sig_with_links_as_lists) list),
@@ -1663,7 +1666,7 @@ let prepare_agent_sig ~(sites : Ast.counter_sig Ast.site list) :
             acc_counter_names )
         | Counter c ->
           (* We are reading here a signature, only CEQ tests are accepted *)
-          ( ( c.Ast.counter_sig_name,
+          ( ( c.Counters_info.counter_sig_name,
               {
                 internal_state = NamedDecls.create [||];
                 (* Agent with counter can link to port [b] on counter agent [__counter_agent] *)
@@ -1677,14 +1680,14 @@ let prepare_agent_sig ~(sites : Ast.counter_sig Ast.site list) :
                   Some
                     {
                       counter_info_min =
-                        (match c.Ast.counter_sig_min with
+                        (match c.Counters_info.counter_sig_min with
                         | Some (Some i, _) -> Some i
                         | None | Some (None, _) -> None);
                       counter_info_max =
-                        (match c.Ast.counter_sig_max with
+                        (match c.Counters_info.counter_sig_max with
                         | Some (Some i, _) -> Some i
                         | None | Some (None, _) -> None);
-                      counter_default_value = c.Ast.counter_sig_default;
+                      counter_default_value = c.Counters_info.counter_sig_default;
                     };
               } )
             :: acc_site_sigs,
@@ -1856,16 +1859,17 @@ let create_sigs (l : Ast.agent_sig list) : Signature.s =
   (* TODO see agent_sigs namings *)
   Signature.create ~counters_per_agent agent_sigs
 
-let init_of_ast ~warning ~syntax_version sigs contact_map tok algs inits =
+let init_of_ast ~warning ~syntax_version sigs counters_info contact_map tok algs inits =
   List.map
     (fun (expr, ini) ->
-      ( alg_expr_of_ast ~warning ~syntax_version sigs tok algs expr,
-        init_of_ast ~warning ~syntax_version sigs tok contact_map ini ))
+      ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs expr,
+        init_of_ast ~warning ~syntax_version sigs counters_info tok contact_map ini ))
     inits
 
 type ast_compiled_data = {
   agents_sig: Signature.s;
   contact_map: Contact_map.t;
+  counters_info: Counters_info.t;
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;
@@ -2077,7 +2081,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   in
   (* Create opposite counters that have the same tests *)
   let (signatures : Ast.agent_sig list),
-      (counter_conversion_info_map : Ast.conversion_info Mods.StringMap.t Mods.StringMap.t)=
+      (counter_conversion_info_map : Counters_info.conversion_info Mods.StringMap.t Mods.StringMap.t)=
     List.fold_left
       (fun (acc,map) agent ->
         match agent with
@@ -2089,19 +2093,19 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             Mods.StringMap.find_default
               Mods.StringSet.empty  agent_name counters_with_clte_tests
           in
-          let (new_counter_sites : Ast.counter_sig Ast.site list),
+          let (new_counter_sites : Counters_info.counter_sig Ast.site list),
               map
             =
             Mods.StringSet.fold
               (fun counter_name (acc,map) ->
                 (* Find counter to invert *)
-                let counter_orig : Ast.counter_sig =
+                let counter_orig : Counters_info.counter_sig =
                   List.find_map
                     (fun site ->
                       match site with
                       | Ast.Port _ -> None
                       | Counter counter ->
-                        if Loc.v counter.Ast.counter_sig_name = counter_name
+                        if Loc.v counter.Counters_info.counter_sig_name = counter_name
                         then
                           Some counter
                         else
@@ -2127,8 +2131,8 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                          ( "Cannot take the opposite of an unbounded counters  ",
                            Loc.get_annot counter_orig.counter_sig_name ))
                 in
-                let convert_value = Ast.BASIS_MINUS_INPUT (inf_bound + sup_bound) in
-                let convert_delta = Ast.BASIS_MINUS_INPUT 0 in
+                let convert_value = Counters_info.BASIS_MINUS_INPUT (inf_bound + sup_bound) in
+                let convert_delta = Counters_info.BASIS_MINUS_INPUT 0 in
                 let update x =
                   match x with
                     | None -> None
@@ -2143,22 +2147,22 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                     Ast.apply_int convert_value counter_orig.counter_sig_default in
                 let convert_info =
                   {
-                    Ast.from_sig_name = counter_orig.counter_sig_name;
+                    Counters_info.from_sig_name = counter_orig.counter_sig_name;
                     convert_value ;
                     convert_delta ;
                   }
                 in
                 let counter_sig_visible =
-                      Ast.From_clte_elimination convert_info
+                      Counters_info.From_clte_elimination convert_info
                 in
                 (* Write in sum_bounds_ref the sum of the counter bounds above *)
                 let counter =
                   {
-                    Ast.counter_sig_name;
-                    Ast.counter_sig_min;
-                    Ast.counter_sig_max;
-                    Ast.counter_sig_default;
-                    Ast.counter_sig_visible;
+                    Counters_info.counter_sig_name;
+                    Counters_info.counter_sig_min;
+                    Counters_info.counter_sig_max;
+                    Counters_info.counter_sig_default;
+                    Counters_info.counter_sig_visible;
                   }
                 in
                 (Ast.Counter counter)::acc,
@@ -2185,7 +2189,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             | Present (agent_name_, site_list, agent_mod) ->
               let agent_name : string = Loc.v agent_name_ in
               let counters_with_clte_tests_from_agent :
-                Ast.conversion_info Mods.StringMap.t =
+                Counters_info.conversion_info Mods.StringMap.t =
                 Mods.StringMap.find_default
                   Mods.StringMap.empty agent_name counter_conversion_info_map
               in
@@ -2233,7 +2237,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                   Ast.counter_delta =
                                     Loc.map_annot
                                       (Ast.apply_int
-                                          convert_info.Ast.convert_delta)
+                                          convert_info.Counters_info.convert_delta)
                                           counter.counter_delta;
                                 }
                             in
@@ -2252,14 +2256,14 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                 Ast.counter_test =
                                   Some
                                     (Ast.CGTE (Ast.apply_int
-                                        convert_info.Ast.convert_value value)
+                                        convert_info.Counters_info.convert_value value)
                                     |> Loc.copy_annot
                                          (Option_util.unsome_or_raise
                                             counter.counter_test));
                                 Ast.counter_delta =
                                   Loc.map_annot
                                     (Ast.apply_int
-                                        convert_info.Ast.convert_delta)
+                                        convert_info.Counters_info.convert_delta)
                                         counter.counter_delta;
                               }
                           in
@@ -2291,7 +2295,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             | Present (agent_name_, site_list, agent_mod) ->
               let agent_name : string = Loc.v agent_name_ in
                 let counters_with_clte_tests_from_agent :
-                Ast.conversion_info Mods.StringMap.t =
+                Counters_info.conversion_info Mods.StringMap.t =
                 Mods.StringMap.find_default
                   Mods.StringMap.empty agent_name counter_conversion_info_map
               in
@@ -2349,7 +2353,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                   Ast.counter_test =
                                     Some
                                       (Loc.copy_annot test
-                                         (Ast.CEQ (Ast.apply_int info.Ast.convert_value value)));
+                                         (Ast.CEQ (Ast.apply_int info.Counters_info.convert_value value)));
                                   Ast.counter_delta =
                                     counter.Ast.counter_delta
                                     (* 0 with annot as tested above *);
@@ -2452,7 +2456,9 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
   (* TODO test this *)
   (* Translate CLTE tests in ast_compil into CGTE tests *)
+  let () = Format.printf "START COMPIL OF AST @." in
   let ast_compil = translate_clte_into_cgte ast_compil in
+  let () = Format.printf "ELIMINATION of <= done  @." in
 
   let has_counters = Counters_compiler.has_counters ast_compil in
   let agent_sig_is_implicit =
@@ -2469,6 +2475,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     else
       ast_compil
   in
+let () = Format.printf "AGENT SIGNATURE INFERED @." in
   (* Remove counter equality test with a variable by splitting in one rule per variable value *)
   let ast_compil =
     if has_counters then
@@ -2477,9 +2484,23 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     else
       ast_compil
   in
+  let () = Format.printf "EQUALITY TESTS REMOVED @." in
 
   let agents_sig : Signature.s = create_sigs ast_compil.Ast.signatures in
   (* Set an empty contact map *)
+  let () = Format.printf "AGENT SIG @." in
+  let counters_info =
+    let size = Signature.size agents_sig in
+    let t = Array.make size [||] in
+    let rec aux k =
+      if k=size then ()
+      else
+        let () = t.(k)<-Array.make (Signature.arity agents_sig k) None in
+        aux (k+1)
+    in
+    let () = aux 0 in
+    t
+  in
   let contact_map : (Mods.IntSet.t * Mods.Int2Set.t) array array =
     Array.init (Signature.size agents_sig) (fun i ->
         Array.init (Signature.arity agents_sig i) (fun s ->
@@ -2502,6 +2523,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     in
     snd acc.rule_names, acc.extra_vars, acc.cleaned_rules
   in
+  let () = Format.printf "RULES ARE CLEANED  @." in
+
   let overwrite_vars (var_overwrite : (string * Nbr.t) list)
       (vars : (Ast.mixture, string) Ast.variable_def list) :
       (string * Nbr.t) list * (Ast.mixture, string) Ast.variable_def list =
@@ -2539,7 +2562,9 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     alg_vars_array |> NamedDecls.create ~forbidden:rule_names |> fun nd ->
     nd.NamedDecls.finder
   in
-  let token_names =
+  let () = Format.printf "ALG VARS DONE @." in
+
+let token_names =
     ast_compil.Ast.tokens
     |> Tools.array_map_of_list (fun x -> x, ())
     |> NamedDecls.create
@@ -2549,10 +2574,11 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   if has_counters then
     Counters_compiler.add_counter_to_contact_map agents_sig
       (add_link_contact_map ~contact_map);
+      let () = Format.printf "TOKEN DONE @." in
 
   let pertubations_without_counters, updated_alg_vars =
     List_util.fold_right_map
-      (perturbation_of_ast ~warning ~syntax_version agents_sig tokens_finder
+      (perturbation_of_ast ~warning ~syntax_version agents_sig counters_info tokens_finder
          alg_vars_finder contact_map)
       ast_compil.Ast.perturbations []
   in
@@ -2564,41 +2590,43 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     else
       pertubations_without_counters
   in
+  let () = Format.printf "BEFORE RULES @." in
 
   let rules =
     List.rev_map
       (fun (rule : rule_inter_rep) ->
         ( rule.label_opt,
-          ( assemble_rule ~warning ~syntax_version rule agents_sig tokens_finder
+          ( assemble_rule ~warning ~syntax_version rule agents_sig counters_info tokens_finder
               alg_vars_finder,
             rule.pos ) ))
       cleaned_rules
   in
+  let () = Format.printf "RULES DONE @." in
 
   let variables =
     Tools.array_fold_righti
       (fun i (lab, expr) acc ->
         ( lab,
           alg_expr_of_ast ~warning ~syntax_version ~max_allowed_var:(pred i)
-            agents_sig tokens_finder alg_vars_finder expr )
+            agents_sig counters_info tokens_finder alg_vars_finder expr )
         :: acc)
       alg_vars_array []
   in
   let observables =
     List.rev_map
       (fun expr ->
-        alg_expr_of_ast ~warning ~syntax_version agents_sig tokens_finder
+        alg_expr_of_ast ~warning ~syntax_version agents_sig counters_info tokens_finder
           alg_vars_finder expr)
       (List.rev ast_compil.observables)
   in
   let init =
-    init_of_ast ~warning ~syntax_version agents_sig contact_map tokens_finder
-      alg_vars_finder ast_compil.init
+    init_of_ast ~warning ~syntax_version agents_sig counters_info contact_map tokens_finder alg_vars_finder ast_compil.init
   in
 
   {
     agents_sig;
     contact_map;
+    counters_info;
     token_names;
     alg_vars_finder;
     updated_alg_vars;

@@ -20,6 +20,7 @@ type preprocessed_ast = {
 (* TODO contact map is also in env *)
 type compilation_result = {
   conf: Configuration.t;
+  counters_info: Counters_info.t; 
   env: Model.t;
   contact_map: Contact_map.t;
   updated_alg_vars: int list;
