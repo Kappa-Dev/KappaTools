@@ -80,7 +80,8 @@ let content () =
         [ textarea ];
     ]
 
-let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
+let error_lint (errors : Result_util.message list) :
+    Codemirror.lint Js.t Js.js_array Js.t =
   let position p = new%js Codemirror.position (p.Loc.line - 1) p.Loc.chr in
   let hydrate (error : Api_types_j.message) : lint Js.t option =
     match error.Result_util.range with
@@ -117,8 +118,6 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
             | Some value -> value :: acc)
           [] errors))
 
-let setup_lint _ _ _ = error_lint (React.S.value State_error.errors)
-
 (* http://stackoverflow.com/questions/10575343/codemirror-is-it-possible-to-scroll-to-a-line-so-that-it-is-in-the-middle-of-w *)
 let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
   let position : position Js.t = new%js Codemirror.position line 0 in
@@ -133,12 +132,14 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
   let () = codemirror##scrollTo Js.null (Js.some scrollLine) in
   ()
 
-let dont_gc_me_signals = ref []
-
 let onload () : unit =
   let () = Menu_editor_file.onload () in
   let lint_config = Codemirror.create_lint_configuration () in
-  let () = lint_config##.getAnnotations := setup_lint in
+  let () =
+    Common.Hooked.register State_error.errors (fun errors ->
+        let setup_lint _ _ _ = error_lint errors in
+        lint_config##.getAnnotations := setup_lint)
+  in
   let () = lint_config##.lintOnChange := Js._false in
   let configuration = Codemirror.default_configuration in
   let gutter_options =
@@ -231,8 +232,8 @@ let onload () : unit =
            Js._true)
   in
   let () =
-    dont_gc_me_signals :=
-      [ React.S.map (fun _ -> codemirror##performLint) State_error.errors ]
+    Common.Hooked.register State_error.errors (fun _errors ->
+        codemirror##performLint)
   in
   let () =
     State_file.register_refresh_file_hook (fun refresh ->
