@@ -178,21 +178,18 @@ module DivErrorMessage : Ui_common.Div = struct
   let message_nav_inc_id = "panel_settings_message_nav_inc_id"
   let message_nav_dec_id = "panel_settings_message_nav_dec_id"
   let message_file_label_id = "panel_settings_message_file_label"
-  let error_index, set_error_index = React.S.create None
+  let error_index = Common.Hooked.make None
 
-  let dont_gc_me =
-    React.S.l1
-      (function
-        | [] -> ()
-        | _ :: _ ->
-          (match React.S.value error_index with
-          | None -> set_error_index (Some 0)
-          | Some _ -> ()))
-      State_error.errors
+  let () =
+    Common.Hooked.register State_error.errors (function
+      | [] -> ()
+      | _ :: _ ->
+        (match Common.Hooked.v error_index with
+        | None -> Common.Hooked.set error_index (Some 0)
+        | Some _ -> ()))
 
   (* if there are less or no errors the index needs to be updated *)
   let sanitize_index (index : int option) errors : int option =
-    let () = ignore dont_gc_me in
     match index, errors with
     | None, [] -> None
     | None, _ :: _ -> Some 0
@@ -200,11 +197,11 @@ module DivErrorMessage : Ui_common.Div = struct
     | Some index, error ->
       let length = List.length error in
       if index > length then (
-        let () = set_error_index (Some 0) in
+        let () = Common.Hooked.set error_index (Some 0) in
         Some 0
       ) else if 0 > index then (
         let index = Some (List.length error - 1) in
-        let () = set_error_index index in
+        let () = Common.Hooked.set error_index index in
         index
       ) else
         Some index
@@ -214,7 +211,7 @@ module DivErrorMessage : Ui_common.Div = struct
       (fun n -> Some (List.nth errors n))
       (sanitize_index index errors)
 
-  let mesage_nav_text =
+  let message_nav_text =
     React.S.l2
       (fun index error ->
         match index, error with
@@ -223,11 +220,12 @@ module DivErrorMessage : Ui_common.Div = struct
         | None, _ :: _ -> ""
         | Some index, (_ :: _ as errors) ->
           Format.sprintf "%d/%d" (index + 1) (List.length errors))
-      error_index State_error.errors
+      (Common.Hooked.to_signal error_index)
+      (Common.Hooked.to_signal State_error.errors)
 
   let a_class =
     Tyxml_js.R.Html.a_class
-      (React.S.bind State_error.errors (fun error ->
+      (React.S.bind (Common.Hooked.to_signal State_error.errors) (fun error ->
            React.S.const
              (match error with
              | [] | [ _ ] -> [ "hide" ]
@@ -240,7 +238,7 @@ module DivErrorMessage : Ui_common.Div = struct
     Html.span ~a:[ Html.a_id message_nav_inc_id; a_class ] [ Html.txt " » " ]
 
   let message_nav =
-    [ message_nav_dec; Tyxml_js.R.Html.txt mesage_nav_text; message_nav_inc ]
+    [ message_nav_dec; Tyxml_js.R.Html.txt message_nav_text; message_nav_inc ]
 
   let file_label_text =
     React.S.l2
@@ -253,7 +251,8 @@ module DivErrorMessage : Ui_common.Div = struct
         match range with
         | None -> ""
         | Some range -> Format.sprintf "[%s]" range.Loc.file)
-      error_index State_error.errors
+      (Common.Hooked.to_signal error_index)
+      (Common.Hooked.to_signal State_error.errors)
 
   let file_label =
     Html.span
@@ -270,7 +269,8 @@ module DivErrorMessage : Ui_common.Div = struct
         match get_message index error with
         | None -> ""
         | Some message -> Format.sprintf " %s " message.Result_util.text)
-      error_index State_error.errors
+      (Common.Hooked.to_signal error_index)
+      (Common.Hooked.to_signal State_error.errors)
 
   let error_message =
     Html.span
@@ -283,7 +283,8 @@ module DivErrorMessage : Ui_common.Div = struct
         [
           Html.a_id id;
           Tyxml_js.R.Html.a_class
-            (React.S.bind State_error.errors (fun error ->
+            (React.S.bind (Common.Hooked.to_signal State_error.errors)
+               (fun error ->
                  React.S.const
                    (match error with
                    | [] -> [ "alert-sm"; "alert" ]
@@ -302,8 +303,8 @@ module DivErrorMessage : Ui_common.Div = struct
             let () = Common.debug (Js.string "file_click_handler") in
             let message : Api_types_t.message option =
               get_message
-                (React.S.value error_index)
-                (React.S.value State_error.errors)
+                (Common.Hooked.v error_index)
+                (Common.Hooked.v State_error.errors)
             in
             let range =
               Option_util.bind
@@ -326,14 +327,14 @@ module DivErrorMessage : Ui_common.Div = struct
             let () = Common.debug (Js.string "index_click_handler") in
             let index : int option =
               sanitize_index
-                (React.S.value error_index)
-                (React.S.value State_error.errors)
+                (Common.Hooked.v error_index)
+                (Common.Hooked.v State_error.errors)
             in
             let index = Option_util.map delta index in
             let index : int option =
-              sanitize_index index (React.S.value State_error.errors)
+              sanitize_index index (Common.Hooked.v State_error.errors)
             in
-            let () = set_error_index index in
+            let () = Common.Hooked.set error_index index in
             Js._true)
     in
     ()

@@ -26,7 +26,7 @@ val set_errors : append:bool -> string -> Api_types_j.errors -> unit
 val has_errors : unit -> bool
 (** Return true if errors are present. *)
 
-val errors : Result_util.message list React.signal
+val errors : Result_util.message list Common.Hooked.t
 (** Signal containing the error. *)
 
 val add_error : string -> Result_util.message list -> unit

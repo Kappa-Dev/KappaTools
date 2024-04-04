@@ -1,7 +1,7 @@
 (library
  (name kappa_js_lib)
  (modules Common)
- (libraries js_of_ocaml-lwt)
+ (libraries js_of_ocaml-lwt lwt_react)
  (preprocess
   (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w +a -open Js_of_ocaml))
