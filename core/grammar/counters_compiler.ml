@@ -303,7 +303,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
                ( "Counter " ^ Loc.v c.counter_name ^ " becomes greater than the maximal value " ^ (string_of_int max_value),
                  Loc.get_annot c.counter_name ))
       | Some (Ast.CLTE _value, _annot) ->
-        failwith "not implemented" (* TODO NOW *)
+        raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy "not implemented")) (* TODO NOW *)
       | Some (Ast.CGTE value, annot) ->
         if value + delta < min_value then
           raise
@@ -311,7 +311,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
                ( "Counter " ^ Loc.v c.counter_name ^ " becomes less than tha minimal value " ^ (string_of_int min_value),
                  Loc.get_annot c.counter_name ));
         if value = min_value then (
-          let error = "Counter " ^ Loc.v c.counter_name ^ ":>" ^ (string_of_int min_value) ^ "  always holds" in
+          let error = "Counter " ^ Loc.v c.counter_name ^ "=>" ^ (string_of_int min_value) ^ "  always holds" in
           warning ~pos:annot (fun f -> Format.pp_print_string f error)
         );
         [ Ast.Counter c, [] ]
@@ -565,7 +565,6 @@ let raw_counter_agent (is_first, first_link) (is_last, last_link) i j sigs equal
 
 let rec add_incr (i : int) (first_link : int) (last_link : int) (min_value : int) (delta : int)
     (equal : bool) (sigs : Signature.s) : Raw_mixture.agent list =
-  let () = Format.printf "ADD_INCR i:%i first:%i last_link:%i min_value:%i delta:%i @." i first_link last_link min_value delta in
   if i = delta then
     []
   else (
@@ -586,11 +585,11 @@ let rec link_incr (sigs : Signature.s) (i : int) (nb : int)
   if i = nb then
     []
   else (
-    let is_first = i = min_value  in
-    let is_last = i = min_value + nb - 1 in
+    let is_first = i = 0  in
+    let is_last = i = nb - 1 in
     let ra_agent =
-      make_counter_agent sigs (is_first, ag_info) (is_last, equal) (link + i - min_value)
-        (link + i + 1 - min_value)
+      make_counter_agent sigs (is_first, ag_info) (is_last, equal) (link + i )
+        (link + i + 1 )
         loc (delta > 0)
     in
     ra_agent :: link_incr sigs (i + 1) nb ag_info equal link loc min_value delta
@@ -660,7 +659,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
              Loc.get_annot counter_test ))
     | Ast.CEQ j -> j, true
     | Ast.CGTE j -> j, false
-    | Ast.CLTE _j -> failwith "not implemented" (* TODO now *)
+    | Ast.CLTE _j -> raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy  "not implemented")) (* TODO now *)
   in
   let start_link_for_created : int = start_link_nb + test + 1 in
   let link_for_erased : int = start_link_nb + abs delta in
@@ -669,7 +668,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
   in
 
   let test_incr : LKappa.rule_mixture =
-    link_incr sigs 0 (test + 1) ag_info equal start_link_nb loc min_value delta
+    link_incr sigs 0 (test + 1 - min_value) ag_info equal start_link_nb loc min_value delta
   in
   let adjust_delta : LKappa.rule_mixture =
     if delta < 0 then
@@ -684,10 +683,10 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
       []
   in
 
-  if test + delta < 0 then
+  if test + delta < min_value  then
     raise
       (ExceptionDefn.Internal_Error
-         ("Counter test should be greater then abs(delta)", loc_delta));
+         ("Counter test + delta should be greater than min_value", loc_delta));
 
   let switch : LKappa.switching =
     if delta = 0 then
@@ -716,19 +715,18 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
    returns: agent with explicit counters; created incr agents;
             the next link number to use *)
 let compile_counter_in_rule_agent (sigs : Signature.s)
-    (counters_sig : Counters_info.counter_sig option Array.t Array.t)
+    (counters_defs : Counters_info.counter_sig option Array.t )
     (rule_agent_ : LKappa.rule_agent with_agent_counters) (lnk_nb : int) :
     LKappa.rule_mixture * Raw_mixture.t * int =
-  let rule_agent : LKappa.rule_agent = rule_agent_.agent in
-  let counter_defs = counters_sig.(rule_agent.LKappa.ra_type) in
   let (incrs, lnk_nb') : (LKappa.rule_mixture * Raw_mixture.t) list * int =
     Tools.array_fold_lefti
       (fun id (acc_incrs, lnk_nb) -> function
         | None -> acc_incrs, lnk_nb
         | Some (counter, _) ->
           begin
-            match counter_defs.(id) with
-              | None -> failwith "Internal error"
+            match counters_defs.(id) with
+              | None ->
+                  raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy  "SIGNATURE of COUNTERS IS NOT INITIALIZED"))
               | Some counter_sig ->
 
           (*let counter_defs = (Signature.get sigs rule_agent.ra_type) in*)
@@ -754,7 +752,7 @@ let compile_counter_in_rule_agent (sigs : Signature.s)
   als, bls, lnk_nb'
 
 (** Compiles the counter value change in the right hand side of a rule into dummy chain changes *)
-let compile_counter_in_raw_agent (sigs : Signature.s)
+let compile_counter_in_raw_agent (sigs : Signature.s) (counters_info: Counters_info.t)
     (raw_agent_ : Raw_mixture.agent with_agent_counters) (lnk_nb : int) :
     Raw_mixture.agent list * int =
   let raw_agent : Raw_mixture.agent = raw_agent_.agent in
@@ -773,23 +771,27 @@ let compile_counter_in_raw_agent (sigs : Signature.s)
           LKappa.raise_not_enough_specified ~status:"counter" ~side:"left"
             agent_name c.Ast.counter_name
         | Some (test, _) ->
-          (match test with
+          (let agent_name =
+                  Format.asprintf "@[%a@]"
+                          (Signature.print_agent sigs)
+                          raw_agent.Raw_mixture.a_type
+           in
+           let counter_name = Format.sprintf "@[%s@]" (Loc.v c.Ast.counter_name) in
+            match test with
           | Ast.CGTE _ | Ast.CLTE _ | Ast.CVAR _ ->
-            let agent_name =
-              Format.asprintf "@[%a@]"
-                (Signature.print_agent sigs)
-                raw_agent.Raw_mixture.a_type
-            in
             LKappa.raise_not_enough_specified ~status:"counter" ~side:"left"
               agent_name c.Ast.counter_name
           | Ast.CEQ j ->
             let p = Raw_mixture.VAL lnk_nb in
             let () = ports.(port_id) <- p in
-            let min_value = -2 in (* TO DO *)
-            let () = Format.printf "INCRCEQ (=%i) link:%i min_value:%i@." j lnk_nb  min_value in
+            let counter_sig = Counters_info.get_counter_sig sigs counters_info  raw_agent.Raw_mixture.a_type port_id in
+            let min_value =
+                match counter_sig.Counters_info.counter_sig_min with
+                  | None | Some (None, _) ->
+                    raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy (Format.asprintf "Counter %s of agent %s should have a lower bound" counter_name agent_name)))
+                  | Some (Some min_value,_) -> min_value
+            in
             let incrs = add_incr 0 (lnk_nb) (lnk_nb + j - min_value) min_value (j + 1 - min_value) true sigs in
-            let () = Format.printf "END INCR @." in
-
             acc @ incrs, lnk_nb + j + 1)))
     ([], lnk_nb) raw_agent_.counters
 
@@ -826,24 +828,24 @@ let compile_counter_in_rule (sigs : Signature.s)
           max m (LKappa.max_link_id [ rule_agent_.agent ]))
         0 mix
     in
-    let () = Format.printf "STEP 1 @." in
     let (incrs, incrs_created, lnk_nb') :
         LKappa.rule_mixture * Raw_mixture.t * int =
       List.fold_left
         (fun (mix_incr, created_incr, lnk_nb) rule_agent_ ->
+          let rule_agent : LKappa.rule_agent = rule_agent_.agent in
+          let counter_defs = counters_info.(rule_agent.LKappa.ra_type) in
           let mix_incr_new, created_incr_new, lnk_nb' =
-            compile_counter_in_rule_agent sigs counters_info rule_agent_ lnk_nb
+            compile_counter_in_rule_agent sigs counter_defs rule_agent_ lnk_nb
           in
           mix_incr_new @ mix_incr, created_incr_new @ created_incr, lnk_nb' + 1)
         ([], [], lnk_nb + 1)
         mix
     in
-    let () = Format.printf "STEP 2 @." in
     let incrs_created' : Raw_mixture.t =
       List.fold_left
         (fun (created_incr, lnk_nb) raw_agent_ ->
           let created_incr_new, lnk_nb'' =
-            compile_counter_in_raw_agent sigs raw_agent_ lnk_nb
+            compile_counter_in_raw_agent sigs counters_info raw_agent_ lnk_nb
           in
           created_incr_new @ created_incr, lnk_nb'')
         ([], lnk_nb' + 1)
@@ -851,7 +853,6 @@ let compile_counter_in_rule (sigs : Signature.s)
       |> fst
       (* We drop the lnk_nb as we don't need in the following *)
     in
-    let () = Format.printf "STEP 3 @." in
 
     (* Return initial mixtures with new agents in rule from counter compilation *)
     let rule_agent_mix : LKappa.rule_mixture =
@@ -901,7 +902,7 @@ let rule_agent_with_max_counter sigs c ((agent_name, loc_ag) as agent_type) :
                loc_ag ))
   in
   let incrs =
-    link_incr sigs 0 (max_val' + 1) ((c_id, ag_id), false) false 1 loc min_value (-1)
+    link_incr sigs 0 (max_val' + 1 - min_value) ((c_id, ag_id), false) false 1 loc min_value (-1)
   in
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b = fst counter_agent_info.ports in

@@ -126,10 +126,14 @@ counter_modif:
   | MINUS annoted EQUAL annoted INT { (- $5, rhs_pos 5) }
   ;
 
+zint:
+    | INT {$1}
+    | MINUS annoted INT {-$3}
+
 counter_test:
-  | EQUAL annoted INT { (Ast.CEQ $3,rhs_pos 3) }
-  | GREATER annoted EQUAL annoted INT { (Ast.CGTE $5,rhs_pos 5) }
-  | SMALLER annoted EQUAL annoted INT { (Ast.CLTE $5,rhs_pos 5) }
+  | EQUAL annoted zint { (Ast.CEQ $3,rhs_pos 3) }
+  | GREATER annoted EQUAL annoted zint { (Ast.CGTE $5,rhs_pos 5) }
+  | SMALLER annoted EQUAL annoted zint{ (Ast.CLTE $5,rhs_pos 5) }
   | EQUAL annoted ID { (Ast.CVAR $3,rhs_pos 3) }
   ;
 
@@ -141,16 +145,11 @@ site_counter:
   ;
 
 site_counter_sig:
-    | EQUAL annoted INT  annoted DIV annoted counter_modif annoted CL_CUR annoted
+    | EQUAL annoted zint  annoted DIV annoted counter_modif annoted CL_CUR annoted
       { Some (Some ($3),rhs_pos 3),match $7 with (a,loc) -> Some (Some (a),loc) }
-    | EQUAL annoted INT  annoted CL_CUR annoted
+    | EQUAL annoted zint  annoted CL_CUR annoted
         { Some (Some ($3),rhs_pos 3),None }
-    | EQUAL annoted MINUS annoted INT  annoted DIV annoted counter_modif annoted CL_CUR annoted
-          { Some (Some (-$5),rhs_pos 5),match $9 with (a,loc) -> Some (Some (a),loc) }
-    | EQUAL annoted MINUS annoted INT  annoted CL_CUR annoted
-            { Some (Some ($5),rhs_pos 5),None }
-        ;
-    ;
+      ;
 
   site_sig:
     | ID annoted OP_BRA site_link annoted OP_CUR annoted site_internal annoted

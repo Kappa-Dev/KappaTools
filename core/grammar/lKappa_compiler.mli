@@ -44,7 +44,7 @@ val init_of_ast :
 type ast_compiled_data = {
   agents_sig: Signature.s;
   contact_map: Contact_map.t;
-  counters_info: Counters_info.counter_sig option Array.t Array.t;
+  counters_info: Counters_info.t;
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)

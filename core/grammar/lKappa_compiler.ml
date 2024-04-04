@@ -1292,11 +1292,9 @@ type rule_inter_rep = {
 let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
     (sigs : Signature.s) counters_info (tok : int Mods.StringMap.t)
     (algs : int Mods.StringMap.t) : LKappa.rule =
-  let () = Format.printf "ASSEMBLE RULE @." in
   let (r_mix, r_created) : LKappa.rule_mixture * Raw_mixture.t =
     Counters_compiler.compile_counter_in_rule sigs counters_info rule.mixture rule.created_mix
   in
-  let () = Format.printf "COUNTER COMPILED @." in
 
   let r_delta_tokens =
     List.rev_map
@@ -2081,7 +2079,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   in
   (* Create opposite counters that have the same tests *)
   let (signatures : Ast.agent_sig list),
-      (counter_conversion_info_map : Counters_info.conversion_info Mods.StringMap.t Mods.StringMap.t)=
+      (counter_conversion_info_map : Counters_info.counter_sig Mods.StringMap.t Mods.StringMap.t)=
     List.fold_left
       (fun (acc,map) agent ->
         match agent with
@@ -2168,7 +2166,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                 (Ast.Counter counter)::acc,
                 add
                   (agent_name,Loc.v counter_orig.counter_sig_name)
-                  convert_info map)
+                  counter map)
               counters_with_clte_tests_from_agent
               ([],map)
           in
@@ -2189,7 +2187,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             | Present (agent_name_, site_list, agent_mod) ->
               let agent_name : string = Loc.v agent_name_ in
               let counters_with_clte_tests_from_agent :
-                Counters_info.conversion_info Mods.StringMap.t =
+                Counters_info.counter_sig Mods.StringMap.t =
                 Mods.StringMap.find_default
                   Mods.StringMap.empty agent_name counter_conversion_info_map
               in
@@ -2208,9 +2206,12 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                        with
                       | None ->
                           acc, site
-                      | Some convert_info ->
+                      | Some counter_sig' ->
                         (* As we know that this counter uses a CLTE test, We introduce the inverted counter *)
                         (* [clte_value_or_none] discriminates the case where this site in this expression has a CLTE test *)
+                        let conversion_info =
+                          Counters_info.get_conversion_info counter_sig'
+                        in
                         let clte_value_or_none =
                           match counter.counter_test with
                           | None -> None
@@ -2226,6 +2227,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                             acc, site
                           else (
                             (* If the counter value is changing, we need to add it to the inverted counter *)
+
                             let inverted_counter_site =
                               Ast.Counter
                                 {
@@ -2237,7 +2239,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                   Ast.counter_delta =
                                     Loc.map_annot
                                       (Ast.apply_int
-                                          convert_info.Counters_info.convert_delta)
+                                          conversion_info.Counters_info.convert_delta)
                                           counter.counter_delta;
                                 }
                             in
@@ -2256,14 +2258,14 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                 Ast.counter_test =
                                   Some
                                     (Ast.CGTE (Ast.apply_int
-                                        convert_info.Counters_info.convert_value value)
+                                        conversion_info.Counters_info.convert_value value)
                                     |> Loc.copy_annot
                                          (Option_util.unsome_or_raise
                                             counter.counter_test));
                                 Ast.counter_delta =
                                   Loc.map_annot
                                     (Ast.apply_int
-                                        convert_info.Counters_info.convert_delta)
+                                        conversion_info.Counters_info.convert_delta)
                                         counter.counter_delta;
                               }
                           in
@@ -2295,7 +2297,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             | Present (agent_name_, site_list, agent_mod) ->
               let agent_name : string = Loc.v agent_name_ in
                 let counters_with_clte_tests_from_agent :
-                Counters_info.conversion_info Mods.StringMap.t =
+                Counters_info.counter_sig Mods.StringMap.t =
                 Mods.StringMap.find_default
                   Mods.StringMap.empty agent_name counter_conversion_info_map
               in
@@ -2320,7 +2322,8 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                            (Loc.v counter.Ast.counter_name) counters_with_clte_tests_from_agent
                       with
                       | None -> acc
-                      | Some info  ->
+                      | Some counter_sig  ->
+                          let counter_info = Counters_info.get_conversion_info counter_sig in
                         (* As we know that this counter uses a CLTE test, We introduce the inverted counter *)
                         (match counter.counter_test with
                         | None ->
@@ -2353,7 +2356,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                   Ast.counter_test =
                                     Some
                                       (Loc.copy_annot test
-                                         (Ast.CEQ (Ast.apply_int info.Counters_info.convert_value value)));
+                                         (Ast.CEQ (Ast.apply_int counter_info.Counters_info.convert_value value)));
                                   Ast.counter_delta =
                                     counter.Ast.counter_delta
                                     (* 0 with annot as tested above *);
@@ -2450,16 +2453,14 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
       (fun ((a,b,c,d), ext)-> (a,map_opt map_bexpr b,List.rev_map map_modif (List.rev c),map_opt map_bexpr d ),ext)
       (List.rev ast_compil.perturbations)
   in
-  {ast_compil with signatures; rules; init; variables; observables; perturbations}
+  {ast_compil with signatures; rules; init; variables; observables; perturbations}, counter_conversion_info_map
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
   (* TODO test this *)
   (* Translate CLTE tests in ast_compil into CGTE tests *)
-  let () = Format.printf "START COMPIL OF AST @." in
-  let ast_compil = translate_clte_into_cgte ast_compil in
-  let () = Format.printf "ELIMINATION of <= done  @." in
 
+  let ast_compil, counter_conversion_info_map  = translate_clte_into_cgte ast_compil in
   let has_counters = Counters_compiler.has_counters ast_compil in
   let agent_sig_is_implicit =
     ast_compil.Ast.signatures = [] && ast_compil.Ast.tokens = []
@@ -2475,7 +2476,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     else
       ast_compil
   in
-let () = Format.printf "AGENT SIGNATURE INFERED @." in
   (* Remove counter equality test with a variable by splitting in one rule per variable value *)
   let ast_compil =
     if has_counters then
@@ -2484,11 +2484,9 @@ let () = Format.printf "AGENT SIGNATURE INFERED @." in
     else
       ast_compil
   in
-  let () = Format.printf "EQUALITY TESTS REMOVED @." in
 
   let agents_sig : Signature.s = create_sigs ast_compil.Ast.signatures in
   (* Set an empty contact map *)
-  let () = Format.printf "AGENT SIG @." in
   let counters_info =
     let size = Signature.size agents_sig in
     let t = Array.make size [||] in
@@ -2500,6 +2498,36 @@ let () = Format.printf "AGENT SIGNATURE INFERED @." in
     in
     let () = aux 0 in
     t
+  in
+  let () =
+      Mods.StringMap.iter
+          (fun agent_name m ->
+              let agent_name = Loc.annot_with_dummy agent_name in
+              let agent_id = Signature.num_of_agent agent_name agents_sig  in
+              Mods.StringMap.iter
+                (fun site_name counter_sig ->
+                  let site_id = Signature.id_of_site agent_name (Loc.annot_with_dummy site_name) agents_sig in
+                  counters_info.(agent_id).(site_id)<-Some counter_sig)
+          m) counter_conversion_info_map
+  in
+  let () =
+      List.iter
+        (function
+          | Ast.Present (agent_name, interface, _) ->
+              let agent_id = Signature.num_of_agent agent_name agents_sig  in
+
+              List.iter
+                  (function
+                      | Ast.Port _ -> ()
+                      | Ast.Counter counter_sig ->
+                            let site_name = counter_sig.Counters_info.counter_sig_name in
+                            let site_id = Signature.id_of_site agent_name site_name agents_sig in
+                            counters_info.(agent_id).(site_id)<-Some counter_sig)
+                    interface
+          | Ast.Absent _ -> ()
+
+        )
+      ast_compil.Ast.signatures
   in
   let contact_map : (Mods.IntSet.t * Mods.Int2Set.t) array array =
     Array.init (Signature.size agents_sig) (fun i ->
@@ -2523,7 +2551,6 @@ let () = Format.printf "AGENT SIGNATURE INFERED @." in
     in
     snd acc.rule_names, acc.extra_vars, acc.cleaned_rules
   in
-  let () = Format.printf "RULES ARE CLEANED  @." in
 
   let overwrite_vars (var_overwrite : (string * Nbr.t) list)
       (vars : (Ast.mixture, string) Ast.variable_def list) :
@@ -2562,9 +2589,8 @@ let () = Format.printf "AGENT SIGNATURE INFERED @." in
     alg_vars_array |> NamedDecls.create ~forbidden:rule_names |> fun nd ->
     nd.NamedDecls.finder
   in
-  let () = Format.printf "ALG VARS DONE @." in
 
-let token_names =
+  let token_names =
     ast_compil.Ast.tokens
     |> Tools.array_map_of_list (fun x -> x, ())
     |> NamedDecls.create
@@ -2574,7 +2600,6 @@ let token_names =
   if has_counters then
     Counters_compiler.add_counter_to_contact_map agents_sig
       (add_link_contact_map ~contact_map);
-      let () = Format.printf "TOKEN DONE @." in
 
   let pertubations_without_counters, updated_alg_vars =
     List_util.fold_right_map
@@ -2590,7 +2615,6 @@ let token_names =
     else
       pertubations_without_counters
   in
-  let () = Format.printf "BEFORE RULES @." in
 
   let rules =
     List.rev_map
@@ -2601,7 +2625,6 @@ let token_names =
             rule.pos ) ))
       cleaned_rules
   in
-  let () = Format.printf "RULES DONE @." in
 
   let variables =
     Tools.array_fold_righti
@@ -2612,6 +2635,7 @@ let token_names =
         :: acc)
       alg_vars_array []
   in
+
   let observables =
     List.rev_map
       (fun expr ->
@@ -2619,6 +2643,7 @@ let token_names =
           alg_vars_finder expr)
       (List.rev ast_compil.observables)
   in
+
   let init =
     init_of_ast ~warning ~syntax_version agents_sig counters_info contact_map tokens_finder alg_vars_finder ast_compil.init
   in
