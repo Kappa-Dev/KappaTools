@@ -27,6 +27,7 @@ val check_orbit_internal_state_permutation :
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
+  ?counters_info:Counters_info.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -55,6 +56,7 @@ val check_orbit_binding_state_permutation :
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
+  ?counters_info:Counters_info.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -81,6 +83,7 @@ val check_orbit_full_permutation :
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
+  ?counters_info:Counters_info.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -97,6 +100,7 @@ val is_invariant_internal_states_permutation :
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
+  ?counters_info:Counters_info.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -109,6 +113,7 @@ val is_invariant_binding_states_permutation :
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
+  ?counters_info:Counters_info.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->

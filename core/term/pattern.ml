@@ -1185,6 +1185,7 @@ module Env : sig
 
   type t = {
     sig_decl: Signature.s;
+    counters_info: Counters_info.t;
     id_by_type: int list array;
     max_obs: int;
     domain: point array;
@@ -1205,6 +1206,7 @@ module Env : sig
     (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
+  val counters_info : t -> Counters_info.t
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
   val print : noCounters:bool -> Format.formatter -> t -> unit
   val to_yojson : t -> Yojson.Basic.t
@@ -1230,6 +1232,7 @@ end = struct
 
   type t = {
     sig_decl: Signature.s;
+    counters_info: Counters_info.t;
     id_by_type: int list array;
     max_obs: int;
     domain: point array;
@@ -1238,6 +1241,8 @@ end = struct
   }
 
   let signatures env = env.sig_decl
+
+  let counters_info env = env.counters_info
 
   let print ~noCounters f env =
     let pp_point p_id f p =
@@ -1365,6 +1370,8 @@ end = struct
       (try
          {
            sig_decl;
+           counters_info = [||]; (* TO DO *)
+           (* Si json le prendre, sinon le synthétiser avec l'ancien fonctionnement *)
            single_agent_points =
              (match List.assoc "single_agents" l with
              | `List l ->
@@ -1476,6 +1483,7 @@ type prepoint = {
 
 type work = {
   sigs: Signature.s;
+  counters: Counters_info.t;
   cc_env: prepoint list Mods.IntMap.t Mods.IntMap.t;
   reserved_id: int list array;
   used_id: int list array;
@@ -1487,6 +1495,7 @@ type work = {
 module PreEnv = struct
   type t = {
     sig_decl: Signature.s;
+    counters_info: Counters_info.t;
     id_by_type: int list array;
     nb_id: int;
     domain: prepoint list Mods.IntMap.t Mods.IntMap.t;
@@ -1495,12 +1504,14 @@ module PreEnv = struct
 
   type stat = { stat_nodes: int; stat_nav_steps: int }
 
-  let fresh sigs id_by_type nb_id domain =
-    { sig_decl = sigs; id_by_type; nb_id; domain; used_by_a_begin_new = false }
+  let counters_info preenv = preenv.counters_info 
 
-  let empty sigs =
+  let fresh sigs counters_info id_by_type nb_id domain =
+    { sig_decl = sigs; counters_info  ; id_by_type; nb_id; domain; used_by_a_begin_new = false }
+
+  let empty sigs counters_info =
     let nbt' = Array.make (Signature.size sigs) [] in
-    fresh sigs nbt' 1 Mods.IntMap.empty
+    fresh sigs counters_info nbt' 1 Mods.IntMap.empty
 
   let check_vitality env = assert (env.used_by_a_begin_new = false)
 
@@ -1509,6 +1520,7 @@ module PreEnv = struct
     let () = env.used_by_a_begin_new <- true in
     {
       sigs = env.sig_decl;
+      counters = env.counters_info;
       cc_env = env.domain;
       reserved_id = env.id_by_type;
       used_id = Array.make (Array.length env.id_by_type) [];
@@ -1822,6 +1834,7 @@ module PreEnv = struct
     in
     {
       sig_decl = env.Env.sig_decl;
+      counters_info = Env.counters_info env;
       nb_id = succ (Array.fold_left (List.fold_left max) 0 env.Env.id_by_type);
       id_by_type = env.Env.id_by_type;
       domain = domain';
@@ -1875,7 +1888,7 @@ let raw_finish_new ~debug_mode ~toplevel ?origin wk =
     PreEnv.add_cc ~debug_mode ~toplevel ?origin wk.cc_env
       (fresh_cc_id wk.cc_env) cc_candidate
   in
-  PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv, r, out, out_id
+  PreEnv.fresh wk.sigs wk.counters wk.reserved_id wk.free_id preenv, r, out, out_id
 
 let finish_new ~debug_mode ?origin wk =
   raw_finish_new ~debug_mode ~toplevel:true ?origin wk
@@ -1923,6 +1936,7 @@ let new_node wk type_id =
     ( node,
       {
         sigs = wk.sigs;
+        counters = wk.counters;
         cc_env = wk.cc_env;
         reserved_id = wk.reserved_id;
         used_id = wk.used_id;
@@ -1940,6 +1954,7 @@ let new_node wk type_id =
     ( node,
       {
         sigs = wk.sigs;
+        counters = wk.counters ;
         cc_env = wk.cc_env;
         reserved_id = wk.reserved_id;
         used_id = wk.used_id;
@@ -2093,6 +2108,7 @@ let finalize ~debug_mode ~sharing env contact_map =
   in
   ( {
       Env.sig_decl = env.PreEnv.sig_decl;
+      Env.counters_info = env.PreEnv.counters_info;
       Env.id_by_type = env.PreEnv.id_by_type;
       Env.max_obs = fresh_cc_id env.PreEnv.domain;
       Env.domain;

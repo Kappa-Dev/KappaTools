@@ -553,7 +553,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
             (Alg_expr.CONST Nbr.one, compiled_rule), domain''
           | _, _, _ -> assert false))
       inits
-      (Pattern.PreEnv.empty (Model.signatures env))
+      (Pattern.PreEnv.empty (Model.signatures env) (Model.counters_info env))
   in
   init_l
 
@@ -626,7 +626,7 @@ let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
     =
   let warning ~pos msg = outputs (Data.Warning (Some pos, msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
-  let preenv = Pattern.PreEnv.empty sigs_nd in
+  let preenv = Pattern.PreEnv.empty sigs_nd counters_info in
   outputs (Data.Log "\t -variable declarations");
   let preenv', alg_a =
     compile_alg_vars ~debug_mode ~compile_mode_on contact_map preenv

@@ -70,6 +70,7 @@ module Env : sig
     (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
+  val counters_info: t -> Counters_info.t
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
   val to_navigation : t -> id -> Navigation.abstract Navigation.t
   val print : noCounters:bool -> Format.formatter -> t -> unit
@@ -82,8 +83,9 @@ module PreEnv : sig
   type stat = { stat_nodes: int; stat_nav_steps: int }
 
   val sigs : t -> Signature.s
+  val counters_info : t -> Counters_info.t
   val of_env : Env.t -> t
-  val empty : Signature.s -> t
+  val empty : Signature.s -> Counters_info.t -> t
   val debug_print : Format.formatter -> t -> unit
 end
 

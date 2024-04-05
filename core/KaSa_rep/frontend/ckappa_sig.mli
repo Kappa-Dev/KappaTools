@@ -151,7 +151,7 @@ and counter_sig = {
   counter_sig_default: int;
   counter_sig_min: int option option;
   counter_sig_max: int option option;
-  counter_visible: Counters_info.origine;
+  counter_visible: Counters_info.origin;
 }
 
 and counter_test = CEQ of int | CGTE of int | CVAR of string | UNKNOWN

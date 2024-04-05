@@ -8,7 +8,6 @@ val raw_mixture_to_species :
 
 val mixture_to_pattern :
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?sigs:Signature.s ->
   Pattern.PreEnv.t ->
   LKappa.rule_mixture ->
   (int * int) list ->
@@ -23,6 +22,7 @@ val species_to_raw_mixture :
 val pattern_to_mixture :
   ?parameters:Remanent_parameters_sig.parameters ->
   sigs:Signature.s ->
+  counters_info:Counters_info.t ->
   Pattern.cc ->
   (LKappa.rule_mixture * (int * int) list) option
 
@@ -50,6 +50,7 @@ val species_to_lkappa_rule_and_unspec :
 val pattern_to_lkappa_rule :
   ?parameters:Remanent_parameters_sig.parameters ->
   sigs:Signature.s ->
+  counters_info:Counters_info.t -> 
   Pattern.cc ->
   LKappa.rule
 

@@ -699,6 +699,7 @@ let connected_components_sum_of_ambiguous_rule ~debug_mode ~compile_mode_on
     contact_map env ?origin precomp_mixs created =
   let noCounters = debug_mode in
   let sigs = Pattern.PreEnv.sigs env in
+  let counters_info = Pattern.PreEnv.counters_info env in 
   let all_mixs =
     rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs
   in
@@ -707,7 +708,7 @@ let connected_components_sum_of_ambiguous_rule ~debug_mode ~compile_mode_on
       Format.eprintf "@[<v>_____(%i)@,%a@]@." (List.length all_mixs)
         (Pp.list Pp.cut (fun f x ->
              Format.fprintf f "@[%a%a@]"
-               (LKappa.print_rule_mixture ~noCounters sigs ~ltypes:true created)
+               (LKappa.print_rule_mixture ~noCounters sigs counters_info ~ltypes:true created)
                x
                (Raw_mixture.print ~noCounters ~created:true
                   ~initial_comma:(x <> []) ~sigs)

@@ -2135,14 +2135,14 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                   match x with
                     | None -> None
                     | Some (None,loc) -> Some (None,loc)
-                    | Some (Some i,loc) -> Some (Some (Ast.apply_int convert_value i), loc)
+                    | Some (Some i,loc) -> Some (Some (Counters_info.apply_int convert_value i), loc)
                 in
                 let ref_min,ref_max =
-                    Ast.reorder_bounds convert_value (counter_orig.counter_sig_min,counter_orig.counter_sig_max) in
+                    Counters_info.reorder_bounds convert_value (counter_orig.counter_sig_min,counter_orig.counter_sig_max) in
                 let counter_sig_min = update ref_min in
                 let counter_sig_max = update ref_max in
                 let counter_sig_default =
-                    Ast.apply_int convert_value counter_orig.counter_sig_default in
+                    Counters_info.apply_int convert_value counter_orig.counter_sig_default in
                 let convert_info =
                   {
                     Counters_info.from_sig_name = counter_orig.counter_sig_name;
@@ -2238,7 +2238,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                   Ast.counter_test = None;
                                   Ast.counter_delta =
                                     Loc.map_annot
-                                      (Ast.apply_int
+                                      (Counters_info.apply_int
                                           conversion_info.Counters_info.convert_delta)
                                           counter.counter_delta;
                                 }
@@ -2257,14 +2257,14 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                     counter.counter_name;
                                 Ast.counter_test =
                                   Some
-                                    (Ast.CGTE (Ast.apply_int
+                                    (Ast.CGTE (Counters_info.apply_int
                                         conversion_info.Counters_info.convert_value value)
                                     |> Loc.copy_annot
                                          (Option_util.unsome_or_raise
                                             counter.counter_test));
                                 Ast.counter_delta =
                                   Loc.map_annot
-                                    (Ast.apply_int
+                                    (Counters_info.apply_int
                                         conversion_info.Counters_info.convert_delta)
                                         counter.counter_delta;
                               }
@@ -2356,7 +2356,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                                   Ast.counter_test =
                                     Some
                                       (Loc.copy_annot test
-                                         (Ast.CEQ (Ast.apply_int counter_info.Counters_info.convert_value value)));
+                                         (Ast.CEQ (Counters_info.apply_int counter_info.Counters_info.convert_value value)));
                                   Ast.counter_delta =
                                     counter.Ast.counter_delta
                                     (* 0 with annot as tested above *);

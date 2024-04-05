@@ -85,6 +85,7 @@ val raise_link_should_be_removed : int -> string -> string Loc.annoted -> 'a
 val print_rule_mixture :
   noCounters:bool ->
   Signature.s ->
+  Counters_info.t ->
   ltypes:bool ->
   Raw_mixture.t ->
   Format.formatter ->
@@ -117,6 +118,7 @@ val link_of_json :
 val print_rates :
   noCounters:bool ->
   Signature.s ->
+  Counters_info.t ->
   (Format.formatter -> int -> unit) ->
   (Format.formatter -> int -> unit) ->
   Format.formatter ->
@@ -127,6 +129,7 @@ val print_rule :
   noCounters:bool ->
   full:bool ->
   Signature.s ->
+  Counters_info.t -> 
   (Format.formatter -> int -> unit) ->
   (Format.formatter -> int -> unit) ->
   Format.formatter ->

@@ -151,13 +151,14 @@ let print_ast_rule ~noCounters ?env f i =
   | None -> Format.fprintf f "__ast_rule_%i" i
   | Some env ->
     let sigs = signatures env in
+    let counters_info = counters_info env in
     if i = 0 then
       Format.pp_print_string f "Interventions"
     else (
       match env.ast_rules.(pred i) with
       | Some (na, _), _ -> Format.pp_print_string f na
       | None, (r, _) ->
-        LKappa.print_rule ~noCounters ~full:false sigs (print_token ~env)
+        LKappa.print_rule ~noCounters ~full:false sigs counters_info (print_token ~env)
           (print_alg ~env) f r
     )
 
@@ -171,6 +172,7 @@ let map_observables f env = Array.map (fun (x, _) -> f x) env.observables
 
 let print_kappa ~noCounters pr_alg ?pr_rule pr_pert f env =
   let sigs = signatures env in
+  let counters_info = counters_info env in
   Format.fprintf f "@[<v>%a@,%a%t@,%a%t%a@,%t%t%a@]"
     (Contact_map.print_kappa ~noCounters sigs)
     env.contact_map
@@ -194,7 +196,7 @@ let print_kappa ~noCounters pr_alg ?pr_rule pr_pert f env =
               (Pp.option ~with_space:false (fun f (na, _) ->
                    Format.fprintf f "'%s' " na))
               na
-              (LKappa.print_rule ~noCounters ~full:true sigs (print_token ~env)
+              (LKappa.print_rule ~noCounters ~full:true sigs counters_info (print_token ~env)
                  (print_alg ~env))
               e)
           f env.ast_rules
@@ -389,7 +391,7 @@ let of_yojson = function
          domain = Pattern.Env.of_yojson (List.assoc "update" l);
          counters_info =
             (try Counters_info.of_yojson (List.assoc "counters_info" l)
-            with Not_found -> Counters_info.default_backward_compatibility domain) ; 
+            with Not_found -> Pattern.Env.counters_info  domain) ;
          tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
          algs =
            NamedDecls.of_json

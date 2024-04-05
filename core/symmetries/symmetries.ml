@@ -470,7 +470,7 @@ let cannonic_form_from_syntactic_rules rule_cache env rate_convention
 (******************************************************************)
 (*detect_symmetries*)
 
-let check_invariance_gen p ?trace ?fmt ?fmt_err ?sigs ~to_be_checked ~counter
+let check_invariance_gen p ?trace ?fmt ?fmt_err ?sigs ?counters_info ~to_be_checked ~counter
     ~correct ~rates
     (hash_and_rule_list :
       (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list) cache agent_type
@@ -482,7 +482,8 @@ let check_invariance_gen p ?trace ?fmt ?fmt_err ?sigs ~to_be_checked ~counter
       let id = LKappa_auto.RuleCache.int_of_hashed_list hash in
       if to_be_checked.(id) then (
         let (cache, counter, to_be_checked), b =
-          p ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2 rule ~correct
+          p ?trace ?fmt ?fmt_err ?sigs ?counters_info
+            ~agent_type ~site1 ~site2 rule ~correct
             rates cache ~counter to_be_checked
         in
         if b then
@@ -495,18 +496,19 @@ let check_invariance_gen p ?trace ?fmt ?fmt_err ?sigs ~to_be_checked ~counter
   aux hash_and_rule_list (cache, to_be_checked, counter)
 
 let check_invariance_internal_states ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
-    (hash_and_rule_list :
+    ?counters_info (hash_and_rule_list :
       (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list)
     (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_internal_state_permutation ?trace ?fmt
-    ?fmt_err ?sigs ~to_be_checked ~counter ~correct ~rates hash_and_rule_list
+    ?fmt_err ?sigs ?counters_info ~to_be_checked ~counter ~correct ~rates hash_and_rule_list
     cache agent_type site1 site2
 
 let check_invariance_binding_states ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
-    hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
+    ?counters_info hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen LKappa_group_action.check_orbit_binding_state_permutation
-    ?trace ?fmt ?fmt_err ?sigs ~to_be_checked ~counter ~correct ~rates
+    ?trace ?fmt ?fmt_err ?sigs ?counters_info
+    ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_both ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
