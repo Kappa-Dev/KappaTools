@@ -127,19 +127,18 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
   in
   a, b, c
 
-let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
+let mixture_to_pattern ?parameters preenv mix unspec =
   let noCounters = do_trace parameters in
+  let sigs = Pattern.PreEnv.sigs preenv in
+  let counters_info = Pattern.PreEnv.counters_info preenv in
   let () = trace_print ?parameters "Translation from mixture to pattern" in
   let () = trace_print ?parameters "INPUT:" in
   let () =
-    match sigs with
-    | None -> Format.fprintf Format.std_formatter "No sigs @."
-    | Some sigs ->
       safe_print_str __POS__ ?parameters
         (fun fmt ->
-          LKappa.print_rule_mixture ~noCounters ~ltypes:true sigs [] fmt mix)
+          LKappa.print_rule_mixture ~noCounters ~ltypes:true sigs counters_info [] fmt mix)
         (fun fmt ->
-          LKappa.print_rule_mixture ~noCounters ~ltypes:true sigs [] fmt mix)
+          LKappa.print_rule_mixture ~noCounters ~ltypes:true sigs counters_info [] fmt mix)
   in
   let unspec =
     List.fold_left
@@ -190,9 +189,6 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
   let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
   let a, _, b, c = Pattern.finish_new ~debug_mode:noCounters work in
   let () =
-    match sigs with
-    | None -> ()
-    | Some sigs ->
       let () = trace_print ?parameters "OUTPUT:" in
       let () =
         if noCounters then (
@@ -202,7 +198,7 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
       in
       let () =
         safe_print_str __POS__ ?parameters
-          (fun fmt -> Pattern.print_cc ~noCounters ~sigs ~with_id:true fmt b)
+          (fun fmt -> Pattern.print_cc ~noCounters ~sigs  ~with_id:true fmt b)
           (fun fmt -> Pattern.print_cc ~noCounters ~with_id:true fmt b)
       in
       ()
@@ -422,7 +418,7 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
     in
     Some (output, unspec)
 
-let pattern_to_mixture ?parameters ~sigs pattern =
+let pattern_to_mixture ?parameters ~sigs ~counters_info pattern =
   let noCounters = do_trace parameters in
   let () = trace_print ?parameters "Translation from pattern to mixture" in
   let () = trace_print ?parameters "INPUT:" in
@@ -531,21 +527,22 @@ let pattern_to_mixture ?parameters ~sigs pattern =
     let () =
       safe_print_str __POS__ ?parameters
         (fun fmt ->
-          LKappa.print_rule_mixture ~noCounters sigs ~ltypes:false [] fmt output)
+          LKappa.print_rule_mixture ~noCounters sigs counters_info ~ltypes:false [] fmt output)
         (fun fmt ->
-          LKappa.print_rule_mixture ~noCounters sigs ~ltypes:false [] fmt output)
+          LKappa.print_rule_mixture ~noCounters sigs counters_info ~ltypes:false [] fmt output)
     in
     Some (output, unspec)
 
 let pattern_id_to_mixture ?parameters env id =
   let sigs = Model.signatures env in
+  let counters_info = Model.counters_info env in
   let point_opt =
     try Some (Pattern.Env.get (Model.domain env) id) with _ -> None
   in
   match point_opt with
   | None -> None
   | Some point ->
-    pattern_to_mixture ?parameters ~sigs (Pattern.Env.content point)
+    pattern_to_mixture ?parameters ~sigs ~counters_info (Pattern.Env.content point)
 
 let pattern_id_to_cc env id =
   let point_opt =
@@ -598,27 +595,30 @@ let species_to_lkappa_rule_and_unspec ?parameters ~sigs species =
 let species_to_lkappa_rule ?parameters ~sigs species =
   fst (species_to_lkappa_rule_and_unspec ?parameters ~sigs species)
 
-let pattern_to_lkappa_rule_and_unspec ?parameters ~sigs cc =
-  let some_pair = pattern_to_mixture ?parameters ~sigs cc in
+let pattern_to_lkappa_rule_and_unspec ?parameters ~sigs ~counters_info cc =
+  let some_pair = pattern_to_mixture ?parameters ~sigs ~counters_info cc in
   match some_pair with
   | None -> lkappa_init, []
   | Some (rule_mixture, unspec) ->
     let lkappa_rule = rule_mixture_to_lkappa_rule rule_mixture in
     lkappa_rule, unspec
 
-let pattern_to_lkappa_rule ?parameters ~sigs cc =
-  fst (pattern_to_lkappa_rule_and_unspec ?parameters ~sigs cc)
+let pattern_to_lkappa_rule ?parameters ~sigs ~counters_info cc =
+  fst (pattern_to_lkappa_rule_and_unspec ?parameters ~sigs ~counters_info cc)
 
 let pattern_id_to_lkappa_rule ?parameters env id =
   let sigs = Model.signatures env in
+  let counters_info = Model.counters_info env in
   match pattern_id_to_cc env id with
   | None -> lkappa_init
   | Some cc ->
-    let lkappa_rule = pattern_to_lkappa_rule ?parameters ~sigs cc in
+    let lkappa_rule = pattern_to_lkappa_rule ?parameters ~sigs ~counters_info cc in
     lkappa_rule
 
 let pattern_id_to_lkappa_rule_and_unspec ?parameters env id =
   let sigs = Model.signatures env in
+  let counters_info = Model.counters_info env in
   match pattern_id_to_cc env id with
   | None -> lkappa_init, []
-  | Some cc -> pattern_to_lkappa_rule_and_unspec ?parameters ~sigs cc
+  | Some cc -> pattern_to_lkappa_rule_and_unspec
+                  ?parameters ~sigs ~counters_info cc

@@ -37,14 +37,6 @@ type counter = {
       (** In a rule: change in counter value, in an agent declaration: max value of the counter, 0 if absent *)
 }
 
-let apply_int t i =
-  match t with
-    | Counters_info.BASIS_MINUS_INPUT d -> d - i
-
-let reorder_bounds t (i,j) =
-  match t with
-    | Counters_info.BASIS_MINUS_INPUT _ -> j,i
-
 
 let counter_sig_of_counter (c : counter) : Counters_info.counter_sig =
   let (counter_sig_min, counter_sig_default) : (int option * Loc.t) option * int
@@ -87,7 +79,7 @@ let make_inverted_counter_sig (counter : Counters_info.counter_sig)
       }
     ;
     counter_sig_default =
-      apply_int f_int counter.counter_sig_default
+      Counters_info.apply_int f_int counter.counter_sig_default
 
   }
 
