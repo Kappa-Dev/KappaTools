@@ -14,13 +14,12 @@ type t = {
 }
 
 let state_error = Hooked.S.create []
-let set_state_error state_error_new = Hooked.S.set state_error state_error_new
 
 let clear_errors location =
   let () =
     Common.debug (Js.string (Format.sprintf "Clear_errors %s " location))
   in
-  set_state_error []
+  Hooked.S.set state_error []
 
 let has_errors () =
   match Hooked.S.v state_error with
@@ -42,7 +41,7 @@ let add_error (location : string) (errors : Result_util.message list) =
     { state_error_errors = errors; _state_error_location = location }
     :: current_state_error
   in
-  set_state_error new_state_error
+  Hooked.S.set state_error new_state_error
 
 let errors =
   Hooked.S.bind state_error (fun state_error ->
