@@ -1,6 +1,6 @@
 (library
  (name kappa_js_lib)
- (modules Common)
+ (modules Common Hooked)
  (libraries js_of_ocaml-lwt lwt_react)
  (preprocess
   (pps js_of_ocaml-ppx tyxml-ppx))
@@ -104,6 +104,7 @@
   :standard
   \
   Common
+  Hooked
   KaSimWorker
   KaSaWorker
   KaStorWorker
