@@ -445,6 +445,9 @@ let fromTextArea (dom : Dom_html.element Js.t)
     (Js.Unsafe.inject dom)
     (Js.Unsafe.inject configuration)
 
+let setLintConfig (cm : codemirror Js.t) =
+  (Js.Unsafe.js_expr "CodeMirror") ## LintState cm
+
 class type commands = object
   method save : (codemirror Js.t -> unit) Js.prop
 end

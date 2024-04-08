@@ -11,7 +11,7 @@ module Html = Tyxml_js.Html5
 
 let editor_full, set_editor_full = React.S.create (false : bool)
 let filename, set_filename = React.S.create (None : string option)
-let move_cursor_hook = Hooked.E.create ()
+let move_cursor_hook = Hooked.E.create ~debug:"move_cursor_hook" ()
 
 let file_label =
   Tyxml_js.R.Html.txt
@@ -134,10 +134,10 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
 let onload () : unit =
   let () = Menu_editor_file.onload () in
   let lint_config = Codemirror.create_lint_configuration () in
+
   let () =
-    Hooked.S.register State_error.errors (fun errors ->
-        let setup_lint _ _ _ = error_lint errors in
-        lint_config##.getAnnotations := setup_lint)
+    lint_config##.getAnnotations := fun _ _ _ ->
+    error_lint (Hooked.S.v State_error.errors)
   in
   let () = lint_config##.lintOnChange := Js._false in
   let configuration = Codemirror.default_configuration in
@@ -250,6 +250,7 @@ let onload () : unit =
   in
   let () =
     Hooked.E.register move_cursor_hook (fun pos ->
+        let () = Common.debug "hook move cursor!" in
         if Some pos.Loc.file = React.S.value filename then (
           let beg = pos.Loc.from_position in
           let first =

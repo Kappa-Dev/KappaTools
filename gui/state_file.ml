@@ -18,7 +18,7 @@ let model, set_directory_state = React.S.create blank_state
 
 type refresh = { filename: string; content: string; line: int option }
 
-let refresh_file_hook = Hooked.E.create ()
+let refresh_file_hook = Hooked.E.create ~debug:"refresh_file_hook" ()
 
 let current_filename =
   React.S.map
@@ -86,8 +86,7 @@ let send_refresh (line : int option) : unit Api.result Lwt.t =
       >>= Api_common.result_bind_lwt ~ok:(fun (content, filename) ->
               let () = Common.debug content in
               let () =
-                Hooked.E.send refresh_file_hook
-                  { filename; content; line }
+                Hooked.E.send refresh_file_hook { filename; content; line }
               in
               Lwt.return (Result_util.ok ()))
 

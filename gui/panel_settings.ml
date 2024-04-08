@@ -178,15 +178,16 @@ module DivErrorMessage : Ui_common.Div = struct
   let message_nav_inc_id = "panel_settings_message_nav_inc_id"
   let message_nav_dec_id = "panel_settings_message_nav_dec_id"
   let message_file_label_id = "panel_settings_message_file_label"
-  let error_index = Hooked.S.create None
+  let error_index = Hooked.S.create ~debug:"error_index" None
 
   let () =
-    Hooked.S.register State_error.errors (function
-      | [] -> ()
-      | _ :: _ ->
-        (match Hooked.S.v error_index with
-        | None -> Hooked.S.set error_index (Some 0)
-        | Some _ -> ()))
+    Hooked.S.register State_error.errors (fun errors ->
+        match errors with
+        | [] -> ()
+        | _ :: _ ->
+          (match Hooked.S.v error_index with
+          | None -> Hooked.S.set error_index (Some 0)
+          | Some _ -> ()))
 
   (* if there are less or no errors the index needs to be updated *)
   let sanitize_index (index : int option) errors : int option =
@@ -302,8 +303,7 @@ module DivErrorMessage : Ui_common.Div = struct
         Dom.handler (fun _ ->
             let () = Common.debug (Js.string "file_click_handler") in
             let message : Api_types_t.message option =
-              get_message
-                (Hooked.S.v error_index)
+              get_message (Hooked.S.v error_index)
                 (Hooked.S.v State_error.errors)
             in
             let range =
@@ -326,8 +326,7 @@ module DivErrorMessage : Ui_common.Div = struct
         Dom.handler (fun _ ->
             let () = Common.debug (Js.string "index_click_handler") in
             let index : int option =
-              sanitize_index
-                (Hooked.S.v error_index)
+              sanitize_index (Hooked.S.v error_index)
                 (Hooked.S.v State_error.errors)
             in
             let index = Option_util.map delta index in
