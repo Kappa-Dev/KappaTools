@@ -13,12 +13,8 @@ type t = {
   _state_error_location: string;
 }
 
-let state_error = Common.Hooked.make []
-
-(* TODO clean this *)
-(* TODO: move hook logic into a dedicated module *)
-let set_state_error state_error_new =
-  Common.Hooked.set state_error state_error_new
+let state_error = Hooked.S.create []
+let set_state_error state_error_new = Hooked.S.set state_error state_error_new
 
 let clear_errors location =
   let () =
@@ -27,7 +23,7 @@ let clear_errors location =
   set_state_error []
 
 let has_errors () =
-  match Common.Hooked.v state_error with
+  match Hooked.S.v state_error with
   | [] -> false
   | _ :: _ -> true
 
@@ -41,15 +37,15 @@ let add_error (location : string) (errors : Result_util.message list) =
             (Pp.list Pp.space Result_util.print_message)
             errors))
   in
-  let current_state_error : t list = Common.Hooked.v state_error in
+  let current_state_error : t list = Hooked.S.v state_error in
   let new_state_error : t list =
     { state_error_errors = errors; _state_error_location = location }
     :: current_state_error
   in
   set_state_error new_state_error
 
-let errors : Result_util.message list Common.Hooked.t =
-  Common.Hooked.create state_error (fun state_error ->
+let errors =
+  Hooked.S.bind state_error (fun state_error ->
       List.fold_left
         (fun acc value -> value.state_error_errors @ acc)
         [] state_error)

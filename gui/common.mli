@@ -43,20 +43,3 @@ val children_value :
 
 val hide_codemirror : unit -> unit
 val show_codemirror : unit -> unit
-
-(** Attach hooks to a value, called when value changes
- *
- * Can be used to imitate the React signals logic, but avoiding to be "GC'ed" *)
-module Hooked : sig
-  type 'a t
-
-  val make : ?eq:('a -> 'a -> bool) -> 'a -> 'a t
-  val register : 'a t -> ('a -> unit) -> unit
-  val v : 'a t -> 'a
-  val set : 'a t -> 'a -> unit
-
-  val create : 'a t -> ('a -> 'b) -> 'b t
-  (** Create new hooked built on changes of this one, mimicking the propagation of the signal *)
-
-  val to_signal : 'a t -> 'a React.signal
-end

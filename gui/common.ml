@@ -167,34 +167,3 @@ let hide_codemirror () : unit =
 
 let show_codemirror () : unit =
   Js.Unsafe.fun_call (Js.Unsafe.js_expr "showCodeMirror") [||]
-
-module Hooked = struct
-  type 'a t = {
-    value: 'a ref;
-    hooks: ('a -> unit) list ref;
-    eq: 'a -> 'a -> bool;
-    signal: 'a React.signal;
-    set_signal: ?step:React.step -> 'a -> unit;
-  }
-
-  let make ?(eq : 'a -> 'a -> bool = ( = )) (a : 'a) : 'a t =
-    let signal, set_signal = React.S.create a in
-    { value = ref a; hooks = ref []; eq; signal; set_signal }
-
-  let register hooked f = hooked.hooks := f :: !(hooked.hooks)
-  let v hooked = !(hooked.value)
-
-  let set hooked value =
-    if not (hooked.eq value !(hooked.value)) then (
-      List.iter (fun f -> f value) !(hooked.hooks);
-      hooked.value := value;
-      hooked.set_signal value
-    )
-
-  let create hooked f =
-    let new_hooked = make (f (v hooked)) in
-    register hooked (fun value -> set new_hooked (f value));
-    new_hooked
-
-  let to_signal hooked = hooked.signal
-end

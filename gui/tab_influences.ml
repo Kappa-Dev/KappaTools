@@ -89,7 +89,7 @@ let influencemap =
               (Yojson.Basic.from_string (Js.to_string x))
           in
           let () =
-            Subpanel_editor.set_move_cursor
+            Hooked.E.send Subpanel_editor.move_cursor_hook
               (Public_data.position_of_refined_influence_node node)
           in
           let origin = Some (Public_data.short_node_of_refined_node node) in
@@ -430,7 +430,7 @@ let pop_cell = function
           [
             Html.a_onclick (fun _ ->
                 let () =
-                  Subpanel_editor.set_move_cursor
+                  Hooked.E.send Subpanel_editor.move_cursor_hook
                     (Public_data.position_of_refined_influence_node node)
                 in
                 let origin =

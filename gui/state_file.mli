@@ -6,34 +6,34 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-(* Create a file *)
 val create_file : filename:string -> content:string -> unit Api.result Lwt.t
+(** Create a file *)
 
-(* Set current file to file with the specified name *)
 val select_file : string -> int option -> unit Api.result Lwt.t
+(** Set current file to file with the specified name *)
 
-(* Update content of current file *)
 val set_content : string -> unit Api.result Lwt.t
+(** Update content of current file *)
 
-(* Update compile of the file of rank [k] *)
 val set_compile : string -> bool -> unit Api.result Lwt.t
+(** Update compile of the file of rank [k] *)
 
-(* Update the position of a file *)
 val order_files : string list -> unit Api.result Lwt.t
+(** Update the position of a file *)
 
-(* get current file *)
 val get_file : unit -> (string * string) Api.result Lwt.t
+(** get current file *)
 
-(* remove current file from project *)
 val remove_file : unit -> unit Api.result Lwt.t
+(** remove current file from project *)
 
-(* Get current file - the name is not specified to force
+type refresh = { filename: string; content: string; line: int option }
+(** Get current file - the name is not specified to force
    the selection of the file before the fetch.
 *)
-type refresh = { filename: string; content: string; line: int option }
 
-val register_refresh_file_hook : (refresh -> unit) -> unit
-(* Meta data of current file *)
+val refresh_file_hook : refresh Hooked.E.t
+(** Meta data of current file *)
 
 val cursor_activity : line:int -> ch:int -> unit
 val out_of_sync : bool -> unit
@@ -52,8 +52,8 @@ val with_current_pos :
   'a ->
   'a React.signal
 
-(* run on application init *)
 val init : unit -> unit Lwt.t
+(** run on application init *)
 
-(* to synch state of application with runtime *)
 val sync : ?reset:bool -> unit -> unit Api.result Lwt.t
+(** to synch state of application with runtime *)

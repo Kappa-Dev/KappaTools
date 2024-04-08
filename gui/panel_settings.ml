@@ -178,14 +178,14 @@ module DivErrorMessage : Ui_common.Div = struct
   let message_nav_inc_id = "panel_settings_message_nav_inc_id"
   let message_nav_dec_id = "panel_settings_message_nav_dec_id"
   let message_file_label_id = "panel_settings_message_file_label"
-  let error_index = Common.Hooked.make None
+  let error_index = Hooked.S.create None
 
   let () =
-    Common.Hooked.register State_error.errors (function
+    Hooked.S.register State_error.errors (function
       | [] -> ()
       | _ :: _ ->
-        (match Common.Hooked.v error_index with
-        | None -> Common.Hooked.set error_index (Some 0)
+        (match Hooked.S.v error_index with
+        | None -> Hooked.S.set error_index (Some 0)
         | Some _ -> ()))
 
   (* if there are less or no errors the index needs to be updated *)
@@ -197,11 +197,11 @@ module DivErrorMessage : Ui_common.Div = struct
     | Some index, error ->
       let length = List.length error in
       if index > length then (
-        let () = Common.Hooked.set error_index (Some 0) in
+        let () = Hooked.S.set error_index (Some 0) in
         Some 0
       ) else if 0 > index then (
         let index = Some (List.length error - 1) in
-        let () = Common.Hooked.set error_index index in
+        let () = Hooked.S.set error_index index in
         index
       ) else
         Some index
@@ -220,12 +220,12 @@ module DivErrorMessage : Ui_common.Div = struct
         | None, _ :: _ -> ""
         | Some index, (_ :: _ as errors) ->
           Format.sprintf "%d/%d" (index + 1) (List.length errors))
-      (Common.Hooked.to_signal error_index)
-      (Common.Hooked.to_signal State_error.errors)
+      (Hooked.S.to_react_signal error_index)
+      (Hooked.S.to_react_signal State_error.errors)
 
   let a_class =
     Tyxml_js.R.Html.a_class
-      (React.S.bind (Common.Hooked.to_signal State_error.errors) (fun error ->
+      (React.S.bind (Hooked.S.to_react_signal State_error.errors) (fun error ->
            React.S.const
              (match error with
              | [] | [ _ ] -> [ "hide" ]
@@ -251,8 +251,8 @@ module DivErrorMessage : Ui_common.Div = struct
         match range with
         | None -> ""
         | Some range -> Format.sprintf "[%s]" range.Loc.file)
-      (Common.Hooked.to_signal error_index)
-      (Common.Hooked.to_signal State_error.errors)
+      (Hooked.S.to_react_signal error_index)
+      (Hooked.S.to_react_signal State_error.errors)
 
   let file_label =
     Html.span
@@ -269,8 +269,8 @@ module DivErrorMessage : Ui_common.Div = struct
         match get_message index error with
         | None -> ""
         | Some message -> Format.sprintf " %s " message.Result_util.text)
-      (Common.Hooked.to_signal error_index)
-      (Common.Hooked.to_signal State_error.errors)
+      (Hooked.S.to_react_signal error_index)
+      (Hooked.S.to_react_signal State_error.errors)
 
   let error_message =
     Html.span
@@ -283,7 +283,7 @@ module DivErrorMessage : Ui_common.Div = struct
         [
           Html.a_id id;
           Tyxml_js.R.Html.a_class
-            (React.S.bind (Common.Hooked.to_signal State_error.errors)
+            (React.S.bind (Hooked.S.to_react_signal State_error.errors)
                (fun error ->
                  React.S.const
                    (match error with
@@ -303,8 +303,8 @@ module DivErrorMessage : Ui_common.Div = struct
             let () = Common.debug (Js.string "file_click_handler") in
             let message : Api_types_t.message option =
               get_message
-                (Common.Hooked.v error_index)
-                (Common.Hooked.v State_error.errors)
+                (Hooked.S.v error_index)
+                (Hooked.S.v State_error.errors)
             in
             let range =
               Option_util.bind
@@ -327,14 +327,14 @@ module DivErrorMessage : Ui_common.Div = struct
             let () = Common.debug (Js.string "index_click_handler") in
             let index : int option =
               sanitize_index
-                (Common.Hooked.v error_index)
-                (Common.Hooked.v State_error.errors)
+                (Hooked.S.v error_index)
+                (Hooked.S.v State_error.errors)
             in
             let index = Option_util.map delta index in
             let index : int option =
-              sanitize_index index (Common.Hooked.v State_error.errors)
+              sanitize_index index (Hooked.S.v State_error.errors)
             in
-            let () = Common.Hooked.set error_index index in
+            let () = Hooked.S.set error_index index in
             Js._true)
     in
     ()

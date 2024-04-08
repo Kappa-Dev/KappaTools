@@ -11,8 +11,7 @@ module Html = Tyxml_js.Html5
 
 let editor_full, set_editor_full = React.S.create (false : bool)
 let filename, set_filename = React.S.create (None : string option)
-let move_cursor_hook = ref None
-let set_move_cursor loc = Option.iter (fun f -> f loc) !move_cursor_hook
+let move_cursor_hook = Hooked.E.create ()
 
 let file_label =
   Tyxml_js.R.Html.txt
@@ -136,7 +135,7 @@ let onload () : unit =
   let () = Menu_editor_file.onload () in
   let lint_config = Codemirror.create_lint_configuration () in
   let () =
-    Common.Hooked.register State_error.errors (fun errors ->
+    Hooked.S.register State_error.errors (fun errors ->
         let setup_lint _ _ _ = error_lint errors in
         lint_config##.getAnnotations := setup_lint)
   in
@@ -232,11 +231,11 @@ let onload () : unit =
            Js._true)
   in
   let () =
-    Common.Hooked.register State_error.errors (fun _errors ->
+    Hooked.S.register State_error.errors (fun _errors ->
         codemirror##performLint)
   in
   let () =
-    State_file.register_refresh_file_hook (fun refresh ->
+    Hooked.E.register State_file.refresh_file_hook (fun refresh ->
         let () = set_filename (Some refresh.State_file.filename) in
         let cand = Js.string refresh.State_file.content in
         if cand <> codemirror##getValue then (
@@ -250,20 +249,16 @@ let onload () : unit =
         ))
   in
   let () =
-    move_cursor_hook :=
-      Some
-        (fun pos ->
-          if Some pos.Loc.file = React.S.value filename then (
-            let beg = pos.Loc.from_position in
-            let first =
-              new%js Codemirror.position (beg.Loc.line - 1) beg.Loc.chr
-            in
-            let en = pos.Loc.from_position in
-            let last =
-              new%js Codemirror.position (en.Loc.line - 1) en.Loc.chr
-            in
-            codemirror##setSelection first last
-          ))
+    Hooked.E.register move_cursor_hook (fun pos ->
+        if Some pos.Loc.file = React.S.value filename then (
+          let beg = pos.Loc.from_position in
+          let first =
+            new%js Codemirror.position (beg.Loc.line - 1) beg.Loc.chr
+          in
+          let en = pos.Loc.from_position in
+          let last = new%js Codemirror.position (en.Loc.line - 1) en.Loc.chr in
+          codemirror##setSelection first last
+        ))
   in
   ()
 
