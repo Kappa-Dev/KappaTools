@@ -125,13 +125,14 @@ val print_cc :
   ?dotnet:bool ->
   ?full_species:bool ->
   ?sigs:Signature.s ->
+  ?counters_info:Counters_info.t ->
   ?cc_id:id ->
   with_id:bool ->
   Format.formatter ->
   t ->
   unit
 
-val print_cc_as_id : Signature.s -> Format.formatter -> t -> unit
+val print_cc_as_id : Signature.s -> Counters_info.t -> Format.formatter -> t -> unit
 
 val print :
   noCounters:bool ->
@@ -213,4 +214,4 @@ val length : t -> int
 module Set : SetMap.Set with type elt = id
 module Map : SetMap.Map with type elt = id
 
-val counter_value_cc : Signature.s option -> cc -> Mods.IntMap.elt * int -> int
+val counter_value_cc : Signature.s option -> Counters_info.counter_sig -> cc -> Mods.IntMap.elt * int -> int

@@ -148,18 +148,18 @@ let print_rule_link sigs ~show_erased ~ltypes f ((e, _), s) =
     s
 
 let print_counter_test f = function
-  | c, min_value, true, convert -> Format.fprintf f "=%i" (Counters_info.apply_origin_to_value convert (c+min_value))
+  | c, min_value, true, _convert -> Format.fprintf f "=%i" ((*Counters_info.apply_origin_to_value convert*) (c+min_value) )
   | c, min_value, false, convert ->
-  let i = (Counters_info.apply_origin_to_value convert (c+min_value)) in
+  let i = ((*Counters_info.apply_origin_to_value convert*) (c+min_value)) in
   match convert with
       | Counters_info.From_original_ast ->
         Format.fprintf f ">=%i" i
       | Counters_info.From_clte_elimination x ->
         match x.Counters_info.convert_value with
           | Counters_info.BASIS_MINUS_INPUT _ ->
-            Format.fprintf f "<=%i" i
+            Format.fprintf f ">=%i" i
 
-let print_counter_delta counters convert j f switch =
+let print_counter_delta counters _convert j f switch =
   match switch with
   | Linked i ->
     let root = Raw_mixture.find counters i in
@@ -170,7 +170,7 @@ let print_counter_delta counters convert j f switch =
       else
         j - i
     in
-    Format.fprintf f "/+=%d" (Counters_info.apply_origin_to_delta convert delta)
+    Format.fprintf f "/+=%d" delta
   | Freed ->
     raise
       (ExceptionDefn.Internal_Error
@@ -427,11 +427,11 @@ let print_agent_rhs ~ltypes sigs f ag =
       (print_intf_rhs ~ltypes sigs ag.ra_type)
       (ag.ra_ports, ag.ra_ints)
 
-let print_rhs ~noCounters ~ltypes sigs created f mix =
+let print_rhs ~noCounters ~ltypes sigs counters_info created f mix =
   let rec aux empty = function
     | [] ->
       Raw_mixture.print ~noCounters ~initial_comma:(not empty) ~created:false
-        ~sigs f created
+        ~sigs ~counters_info f created
     | h :: t ->
       if h.ra_erased then (
         let () =
@@ -498,7 +498,7 @@ let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
           (print_rule_mixture ~noCounters sigs counters_info ~ltypes:false r.r_created)
           r.r_mix
           (Raw_mixture.print ~noCounters ~created:true
-             ~initial_comma:(r.r_mix <> []) ~sigs)
+             ~initial_comma:(r.r_mix <> []) ~sigs ~counters_info )
           r.r_created
       else
         Format.fprintf f "%a%t%a -> %a"
@@ -507,7 +507,7 @@ let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
           (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
           (Pp.list Pp.comma (fun f _ -> Format.pp_print_string f "."))
           r.r_created
-          (print_rhs ~noCounters ~ltypes:false sigs r.r_created)
+          (print_rhs ~noCounters ~ltypes:false sigs counters_info r.r_created)
           r.r_mix)
     (fun f ->
       match r.r_delta_tokens with

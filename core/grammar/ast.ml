@@ -57,32 +57,6 @@ let counter_sig_of_counter (c : counter) : Counters_info.counter_sig =
     counter_sig_visible = From_original_ast;
   }
 
-let make_inverted_counter_sig (counter : Counters_info.counter_sig)
-    (counter_sig_name : string Loc.annoted) : Counters_info.counter_sig =
-  let f_int =
-    match counter.counter_sig_max, counter.counter_sig_min with
-    | Some (Some max, _), Some (Some min, _) ->
-      Counters_info.BASIS_MINUS_INPUT (max+min)
-    | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
-      failwith "unbounded counters not implemented yet"
-  in
-  let f_op = Counters_info.BASIS_MINUS_INPUT 0 in
-  {
-    counter with
-    counter_sig_name;
-    counter_sig_visible =
-      From_clte_elimination
-      {
-        from_sig_name=counter.counter_sig_name;
-        convert_value=f_int;
-        convert_delta=f_op;
-      }
-    ;
-    counter_sig_default =
-      Counters_info.apply_int f_int counter.counter_sig_default
-
-  }
-
 type 'counter site = Port of port | Counter of 'counter
 
 let map_counters_in_site f = function

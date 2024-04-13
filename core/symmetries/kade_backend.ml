@@ -98,9 +98,9 @@ module Pattern = struct
   let print_internal_state symbol_table ?sigs ag p fmt st =
     Utils.print_internal_state symbol_table (print_internal ?sigs ag p) fmt st
 
-  let print_cc ?(full_species = false) ?sigs ?cc_id ~noCounters ~with_id
+  let print_cc ?(full_species = false) ?sigs ?counters_info ?cc_id ~noCounters ~with_id
       ?(symbol_table = Symbol_table.symbol_table_V4) f cc =
-    let print_intf ((ag_i, _) as ag) link_ids neigh =
+    let print_intf ((ag_i, ag_t) as ag) link_ids neigh =
       snd
         (Tools.array_fold_lefti
            (fun p (not_empty, ((free, link_ids) as out)) (el, st) ->
@@ -142,7 +142,13 @@ module Pattern = struct
                  | Some sigs ->
                    Signature.is_counter_agent sigs dst_ty && not noCounters
                then (
-                 let counter = Pattern.counter_value_cc sigs cc (dst_a, dst_p) in
+                 let counter_sig =
+                    match sigs, counters_info with
+                    | Some sigs, Some counters_info ->
+                      Counters_info.get_counter_sig sigs counters_info ag_t p
+                  | None, _ | _,None -> assert false
+                 in
+                 let counter = Pattern.counter_value_cc sigs counter_sig cc (dst_a, dst_p) in
                  let () = Format.fprintf f "{=%d}" counter in
                  (* to do: add symbols in symbol table for counters *)
                  true, out

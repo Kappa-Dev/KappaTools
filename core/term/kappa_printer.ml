@@ -56,7 +56,7 @@ let print_expr_val alg_val f e =
 
 let decompiled_rule ~noCounters ~full env f r =
   let sigs = Model.signatures env in
-  let counters_info = Model.counters_info env in 
+  let counters_info = Model.counters_info env in
   let r_mix, r_created =
     Pattern_compiler.lkappa_of_elementary_rule sigs (Model.domain env) r
   in
@@ -68,7 +68,7 @@ let decompiled_rule ~noCounters ~full env f r =
     (LKappa.print_rule_mixture ~noCounters sigs counters_info ~ltypes:false r_created)
     r_mix
     (Raw_mixture.print ~noCounters ~created:true ~initial_comma:(r_mix <> [])
-       ~sigs)
+       ~sigs ~counters_info)
     r_created
     (if r.Primitives.delta_tokens <> [] then
        fun f ->

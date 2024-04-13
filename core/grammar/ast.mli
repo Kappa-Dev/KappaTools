@@ -35,7 +35,7 @@ type counter = {
   counter_delta: int Loc.annoted;
 }
 
-val make_inverted_counter_sig : Counters_info.counter_sig -> string Loc.annoted -> Counters_info.counter_sig
+(*val make_inverted_counter_sig : Counters_info.counter_sig -> string Loc.annoted -> Counters_info.counter_sig*)
 
 (* Site type, with custom definition of counter type: used with `counter` and `counter_sig` *)
 type 'counter site = Port of port | Counter of 'counter

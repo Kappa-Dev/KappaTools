@@ -303,7 +303,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
                ( "Counter " ^ Loc.v c.counter_name ^ " becomes greater than the maximal value " ^ (string_of_int max_value),
                  Loc.get_annot c.counter_name ))
       | Some (Ast.CLTE _value, _annot) ->
-        raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy "not implemented")) (* TODO NOW *)
+        raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy "<= Should have been removed not implemented")) (* TODO NOW *)
       | Some (Ast.CGTE value, annot) ->
         if value + delta < min_value then
           raise
@@ -597,6 +597,7 @@ let rec link_incr (sigs : Signature.s) (i : int) (nb : int)
 
 let rec erase_incr (sigs : Signature.s) (i : int) (incrs : LKappa.rule_mixture)
     (delta : int) (link : int) : LKappa.rule_mixture =
+
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b = fst counter_agent_info.ports in
   match incrs with
@@ -637,7 +638,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
   in
   let loc : Loc.t = Loc.get_annot counter.Ast.counter_name in
   let (delta, loc_delta) : int * Loc.t = counter.Ast.counter_delta in
-  let counter_test : Ast.counter_test Loc.annoted =
+    let counter_test : Ast.counter_test Loc.annoted =
     Option_util.unsome_or_raise
       ~excep:
         (ExceptionDefn.Internal_Error
@@ -659,10 +660,10 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
              Loc.get_annot counter_test ))
     | Ast.CEQ j -> j, true
     | Ast.CGTE j -> j, false
-    | Ast.CLTE _j -> raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy  "not implemented")) (* TODO now *)
+    | Ast.CLTE _j -> raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy  "PORT : <= should have been removed, not implemented")) (* TODO now *)
   in
-  let start_link_for_created : int = start_link_nb + test + 1 in
-  let link_for_erased : int = start_link_nb + abs delta in
+  let start_link_for_created : int = start_link_nb + (test - min_value + 1) in
+  let link_for_erased : int = start_link_nb + (abs delta) (*+ min_value*) in
   let ag_info : (int * int) * bool =
     (port_id, ra.LKappa.ra_type), ra.LKappa.ra_erased
   in
@@ -704,7 +705,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
   ra.LKappa.ra_ports.(port_id) <-
     ( (LKappa.LNK_VALUE (start_link_nb, (port_b, counter_agent_info.id)), loc),
       switch );
-  let new_link_nb : int = start_link_nb + 1 + test + positive_part delta in
+  let new_link_nb : int = start_link_nb + 1 + test + positive_part delta - min_value in
 
   (adjust_delta, created), new_link_nb
 
@@ -1104,7 +1105,7 @@ let annotate_created_counters sigs ((agent_name, _) as agent_type) counter_list
       match Signature.counter_of_site_id port_id agent_signature with
       | Some counter_info ->
         let counter_name = Signature.site_of_num port_id agent_signature in
-        (try
+          (try
            (* find counter matching port *)
            let c : Ast.counter =
              List.find
