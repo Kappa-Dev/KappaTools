@@ -2118,7 +2118,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                     (fun name -> inverted_counter_name name)
                     counter_orig.counter_sig_name
                 in
-                let _counter_sig_default, inf_bound, sup_bound =
+                let _counter_sig_default, _inf_bound, _sup_bound =
                   match counter_orig.counter_sig_min, counter_orig.counter_sig_max
                   with
                   | Some (Some min, _), Some (Some max, _) ->
@@ -2129,7 +2129,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                          ( "Cannot take the opposite of an unbounded counters  ",
                            Loc.get_annot counter_orig.counter_sig_name ))
                 in
-                let convert_value = Counters_info.BASIS_MINUS_INPUT (inf_bound + sup_bound) in
+                let convert_value = Counters_info.BASIS_MINUS_INPUT 0 (*(inf_bound + sup_bound)*) in
                 let convert_delta = Counters_info.BASIS_MINUS_INPUT 0 in
                 let update x =
                   match x with
@@ -2227,7 +2227,6 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                             acc, site
                           else (
                             (* If the counter value is changing, we need to add it to the inverted counter *)
-
                             let inverted_counter_site =
                               Ast.Counter
                                 {
@@ -2460,7 +2459,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   (* TODO test this *)
   (* Translate CLTE tests in ast_compil into CGTE tests *)
 
-  let ast_compil, counter_conversion_info_map  = translate_clte_into_cgte ast_compil in
+  let ast_compil, _counter_conversion_info_map  = translate_clte_into_cgte ast_compil in
   let has_counters = Counters_compiler.has_counters ast_compil in
   let agent_sig_is_implicit =
     ast_compil.Ast.signatures = [] && ast_compil.Ast.tokens = []
@@ -2499,7 +2498,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     let () = aux 0 in
     t
   in
-  let () =
+  (*let () =
       Mods.StringMap.iter
           (fun agent_name m ->
               let agent_name = Loc.annot_with_dummy agent_name in
@@ -2509,7 +2508,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
                   let site_id = Signature.id_of_site agent_name (Loc.annot_with_dummy site_name) agents_sig in
                   counters_info.(agent_id).(site_id)<-Some counter_sig)
           m) counter_conversion_info_map
-  in
+  in*)
   let () =
       List.iter
         (function

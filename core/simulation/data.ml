@@ -19,6 +19,7 @@ let print_initial_inputs ?uuid conf env inputs_form init =
       env
   in
   let sigs = Model.signatures env in
+  let counters_info = Model.counters_info env in
   Format.fprintf inputs_form "@.@[<v>%a@]@."
     (Pp.list Pp.space (fun f (n, r) ->
          let _, ins_fresh =
@@ -31,7 +32,7 @@ let print_initial_inputs ?uuid conf env inputs_form init =
                  (Kappa_printer.alg_expr ~noCounters ~env)
                  n
                  (Raw_mixture.print ~noCounters ~created:false
-                    ~initial_comma:false ~sigs)
+                    ~initial_comma:false ~sigs ~counters_info)
                  ins_fresh
              in
              if r.Primitives.delta_tokens <> [] then Format.pp_print_space f ()

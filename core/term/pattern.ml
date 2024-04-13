@@ -608,12 +608,20 @@ let rec counter_value sigs nodes (nid, sid) count =
       | Link (dn, di) ->
              counter_value sigs nodes (dn, di) (count + 1)
 
-let counter_value sigs nodes (nid, sid) =
-  counter_value sigs nodes (nid, sid) 0
+let counter_value sigs min_value nodes (nid, sid) =
+  let a,b = counter_value sigs nodes (nid, sid) 0 in
+  min_value + a, b
 
-let counter_value_cc sigs cc (nid, sid) =
+let counter_value_cc sigs counter_sig cc (nid, sid) =
+  let min_value = counter_sig.Counters_info.counter_sig_min in
+  let min_value =
+    match min_value with
+    | None -> assert false
+    | Some (None, _) -> assert false
+    | Some (Some min_value,_) -> min_value
+  in
   let nodes = cc.nodes in
-  let count, extremity = counter_value sigs nodes (nid, sid) in
+  let count, extremity = counter_value sigs min_value nodes (nid, sid) in
   let () = match extremity with Open -> failwith "pending bonds encountered when computing the length of a chain (counters)"
                               | Closed -> ()
   in count
@@ -625,9 +633,9 @@ let dotcomma dotnet =
   else
     Pp.space
 
-let print_cc ~noCounters ?(dotnet = false) ?(full_species = false) ?sigs ?cc_id
+let print_cc ~noCounters ?(dotnet = false) ?(full_species = false) ?sigs ?counters_info ?cc_id
     ~with_id f cc =
-  let print_intf ((ag_i, _) as ag) link_ids neigh =
+  let print_intf ((ag_i, ag_t) as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
          (fun p (not_empty, ((free, link_ids) as out)) (el, st) ->
@@ -667,7 +675,17 @@ let print_cc ~noCounters ?(dotnet = false) ?(full_species = false) ?sigs ?cc_id
                | Some sigs ->
                  Signature.is_counter_agent sigs dst_ty && not noCounters
              then (
-               let (counter,kind) = counter_value sigs cc.nodes (dst_a, dst_p) in
+               match sigs, counters_info with
+                | None, _ | _, None -> assert false
+                | Some sigs, Some counters_info ->
+                let min_value =
+                  let counter_sig = Counters_info.get_counter_sig sigs counters_info ag_t p in
+                  match counter_sig.Counters_info.counter_sig_min with
+                  | None -> assert false
+                  | Some (None, _) -> assert false
+                  | Some (Some min_value,_) -> min_value
+                in
+               let (counter,kind) = counter_value sigs min_value cc.nodes (dst_a, dst_p) in
                let () =
                   Format.fprintf f "{%s%d}"
                     (match kind with Closed -> "=" | Open -> ">=")
@@ -724,8 +742,8 @@ let print_cc ~noCounters ?(dotnet = false) ?(full_species = false) ?sigs ?cc_id
   in
   ()
 
-let print_cc_as_id sigs f cc =
-  let print_intf ((ag_i, _) as ag) link_ids neigh =
+let print_cc_as_id sigs counters_info f cc =
+  let print_intf ((ag_i, ag_t) as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
          (fun p (not_empty, ((free, link_ids) as out)) (el, st) ->
@@ -750,7 +768,14 @@ let print_cc_as_id sigs f cc =
            | Link (dst_a, dst_p) ->
              let dst_ty = find_ty cc dst_a in
              if Signature.is_counter_agent sigs dst_ty then (
-               let counter,extremity  = counter_value sigs cc.nodes (dst_a, dst_p)  in
+               let min_value =
+                let counter_sig = Counters_info.get_counter_sig sigs counters_info ag_t p in
+                match counter_sig.Counters_info.counter_sig_min with
+                  | None -> assert false
+                  | Some (None, _) -> assert false
+                  | Some (Some min_value,_) -> min_value
+               in
+               let counter,extremity  = counter_value sigs min_value cc.nodes (dst_a, dst_p)  in
                let () = match extremity with Open -> failwith ("bonds should not be opened") | Closed -> () in
                let () = Format.fprintf f "~+%d" counter in
                true, out
@@ -1248,7 +1273,7 @@ end = struct
     let pp_point p_id f p =
       Format.fprintf f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
         (fun x ->
-          print_cc ~noCounters ~sigs:env.sig_decl ~cc_id:p_id ~with_id:true x)
+          print_cc ~noCounters ~sigs:env.sig_decl ~counters_info:env.counters_info ~cc_id:p_id ~with_id:true x)
         p.content
         (fun f ->
           if p.roots <> None then
@@ -1459,7 +1484,7 @@ let print ~noCounters ?domain ~with_id f id =
       else
         None
     in
-    print_cc ~noCounters ~sigs:(Env.signatures env) ?cc_id ~with_id f
+    print_cc ~noCounters ~sigs:(Env.signatures env) ~counters_info:(Env.counters_info env) ?cc_id ~with_id f
       env.Env.domain.(id).Env.content
 
 let embeddings_to_fully_specified ~debug_mode domain a_id b =
@@ -1504,7 +1529,7 @@ module PreEnv = struct
 
   type stat = { stat_nodes: int; stat_nav_steps: int }
 
-  let counters_info preenv = preenv.counters_info 
+  let counters_info preenv = preenv.counters_info
 
   let fresh sigs counters_info id_by_type nb_id domain =
     { sig_decl = sigs; counters_info  ; id_by_type; nb_id; domain; used_by_a_begin_new = false }

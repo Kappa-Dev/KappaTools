@@ -20,6 +20,7 @@ val print :
   created:bool ->
   initial_comma:bool ->
   ?sigs:Signature.s ->
+  ?counters_info:Counters_info.t -> 
   Format.formatter ->
   t ->
   unit

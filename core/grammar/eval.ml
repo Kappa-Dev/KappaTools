@@ -500,6 +500,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
         match init_t with
         | INIT_MIX (raw_mix, mix_pos) ->
           let sigs = Model.signatures env in
+          let counters_info = Model.counters_info env in 
           let preenv', alg' =
             compile_alg ~debug_mode ~compile_mode_on contact_map preenv alg
           in
@@ -525,7 +526,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
                 (ExceptionDefn.Malformed_Decl
                    ( Format.asprintf "initial mixture %a is partially defined"
                        (Raw_mixture.print ~noCounters:debug_mode ~created:true
-                          ~initial_comma:false ~sigs)
+                          ~initial_comma:false ~sigs ~counters_info)
                        raw_mix,
                      mix_pos ))
           in
