@@ -792,8 +792,10 @@ let compile_counter_in_raw_agent (sigs : Signature.s) (counters_info: Counters_i
                     raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy (Format.asprintf "Counter %s of agent %s should have a lower bound" counter_name agent_name)))
                   | Some (Some min_value,_) -> min_value
             in
-            let incrs = add_incr 0 (lnk_nb) (lnk_nb + j - min_value) min_value (j + 1 - min_value) true sigs in
-            acc @ incrs, lnk_nb + j + 1)))
+            let corrected_j = j - min_value in
+            let final_lnk_nb = lnk_nb + corrected_j in
+            let incrs = add_incr 0 lnk_nb final_lnk_nb  min_value (corrected_j + 1) true sigs in
+            acc @ incrs, final_lnk_nb + 1)))
     ([], lnk_nb) raw_agent_.counters
 
 let raw_agent_has_counters (ag_ : 'a with_agent_counters) : bool =
@@ -842,6 +844,7 @@ let compile_counter_in_rule (sigs : Signature.s)
         ([], [], lnk_nb + 1)
         mix
     in
+
     let incrs_created' : Raw_mixture.t =
       List.fold_left
         (fun (created_incr, lnk_nb) raw_agent_ ->
@@ -854,7 +857,6 @@ let compile_counter_in_rule (sigs : Signature.s)
       |> fst
       (* We drop the lnk_nb as we don't need in the following *)
     in
-
     (* Return initial mixtures with new agents in rule from counter compilation *)
     let rule_agent_mix : LKappa.rule_mixture =
       List_util.rev_map_append (fun rule_agent_ -> rule_agent_.agent) mix incrs
