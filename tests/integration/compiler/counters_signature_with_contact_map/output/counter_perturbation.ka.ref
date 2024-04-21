@@ -1,15 +1,15 @@
 // Snapshot [Event: 39]
 %def: "T0" "2.3010139423073865"
 
-%init: 1 /*2 agents*/ A(x[1] c{=3} d{=1}), B(x[1] c{=3})
-%init: 1 /*2 agents*/ A(x[1] c{=2} d{=1}), B(x[1] c{=3})
-%init: 1 /*2 agents*/ A(x[1] c{=2} d{=1}), B(x[1] c{=2})
-%init: 1 /*2 agents*/ A(x[1] c{=3} d{=1}), B(x[1] c{=1})
-%init: 3 /*2 agents*/ A(x[1] c{=0} d{=1}), B(x[1] c{=0})
+%init: 1 /*2 agents*/ A(x[1] c{=3} d{=0}), B(x[1] c{=3})
+%init: 1 /*2 agents*/ A(x[1] c{=2} d{=0}), B(x[1] c{=3})
+%init: 1 /*2 agents*/ A(x[1] c{=2} d{=0}), B(x[1] c{=2})
+%init: 1 /*2 agents*/ A(x[1] c{=3} d{=0}), B(x[1] c{=1})
+%init: 3 /*2 agents*/ A(x[1] c{=0} d{=0}), B(x[1] c{=0})
 %init: 1 /*1 agents*/ B(x[.] c{=4})
 %init: 1 /*1 agents*/ B(x[.] c{=2})
 %init: 1 /*1 agents*/ B(x[.] c{=1})
-%init: 1 /*1 agents*/ A(x[.] c{=3} d{=1})
-%init: 1 /*1 agents*/ A(x[.] c{=2} d{=1})
-%init: 1 /*1 agents*/ A(x[.] c{=1} d{=1})
+%init: 1 /*1 agents*/ A(x[.] c{=3} d{=0})
+%init: 1 /*1 agents*/ A(x[.] c{=2} d{=0})
+%init: 1 /*1 agents*/ A(x[.] c{=1} d{=0})
 

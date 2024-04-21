@@ -1,2 +1,2 @@
-File "counters.ka", line 38, characters 25-26:
-Warning: Counter c:>0 always holds
+File "counters.ka", line 23, characters 12-13:
+Counter c becomes less than the   minimal value 0
