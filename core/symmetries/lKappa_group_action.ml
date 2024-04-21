@@ -495,7 +495,7 @@ let check_orbit ~trace ~fmt ~fmt_err ~sigs ~counters_info
     site1 site2 rule correct rates cache counter to_be_checked :
     (LKappa_auto.cache * int array * bool array) * bool =
   let () =
-    do_print ?trace ?fmt ?sigs (fun sigs counters_info fmt ->
+    do_print ?trace ?fmt ?sigs ?counters_info (fun sigs counters_info fmt ->
         let () = Format.fprintf fmt "Check an orbit@." in
         let () = Format.fprintf fmt "Permutation of the sites " in
         let () = Signature.print_site sigs agent fmt site1 in
@@ -639,7 +639,7 @@ let check_orbit_binding_state_permutation ?trace ?fmt ?fmt_err ?sigs ?counters_i
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_full_permutation ?trace ?fmt ?fmt_err ?sigs ?counters_info ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked =
-  check_orbit ~trace ~fmt ~fmt_err ~sigs ~counters_info 
+  check_orbit ~trace ~fmt ~fmt_err ~sigs ~counters_info
     ( potential_positions_for_swapping_full,
       swap_full_regular,
       swap_full_regular,

@@ -122,14 +122,20 @@ let print_intf ~noCounters with_link ?sigs ?counters_info  counter_agents ag_ty 
   let rec aux empty i =
     if i < Array.length ports then (
       let min_value =
+        if noCounters then None
+        else 
         match sigs, counters_info with
           | None, _ | _, None -> None
           | Some sigs, Some counters_info ->
-              let counter_sig = Counters_info.get_counter_sig sigs counters_info ag_ty i in
-              match counter_sig.Counters_info.counter_sig_min with
+              if Signature.site_is_counter sigs ag_ty i
+              then
+                let counter_sig = Counters_info.get_counter_sig sigs counters_info ag_ty i in
+                match   counter_sig.Counters_info.counter_sig_min
+                with
                 | None
                 | Some (None, _) -> None
                 | Some (Some i,_) -> Some i
+              else None
       in
       let () =
         Format.fprintf f "%t%a%a"

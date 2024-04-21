@@ -511,10 +511,10 @@ let check_invariance_binding_states ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
-let check_invariance_both ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
+let check_invariance_both ~correct ~rates ?trace ?fmt ?fmt_err ?sigs ?counters_info
     hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen LKappa_group_action.check_orbit_full_permutation ?trace
-    ?fmt ?fmt_err ?sigs ~to_be_checked ~counter ~correct ~rates
+    ?fmt ?fmt_err ?sigs ?counters_info ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let print_symmetries_gen parameters env contact_map partitioned_contact_map
@@ -588,6 +588,7 @@ let detect_symmetries (parameters : Remanent_parameters_sig.parameters) env
     Loggers.formatter_of_logger (Remanent_parameters.get_logger_err parameters)
   in
   let sigs = Model.signatures env in
+  let counters_info = Model.counters_info env in
   let lkappa_rule_list =
     List.fold_left
       (fun current_list species ->
@@ -635,11 +636,11 @@ let detect_symmetries (parameters : Remanent_parameters_sig.parameters) env
   let (cache, _, _), refined_partitioned_contact_map =
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked, counter)
-      (check_invariance_internal_states ?trace ?fmt ?fmt_err ~sigs ~correct
+      (check_invariance_internal_states ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct
          ~rates hash_and_rule_list)
-      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~sigs ~correct
+      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct
          ~rates hash_and_rule_list)
-      (check_invariance_both ?trace ?fmt ?fmt_err ~sigs ~correct ~rates
+      (check_invariance_both ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct ~rates
          hash_and_rule_list)
       p'
   in
@@ -657,11 +658,11 @@ let detect_symmetries (parameters : Remanent_parameters_sig.parameters) env
     let rates = rates_init in
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked_init, counter_init)
-      (check_invariance_internal_states ?trace ?fmt ?fmt_err ~sigs ~correct
+      (check_invariance_internal_states ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct
          ~rates hash_and_rule_list_init)
-      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~sigs ~correct
+      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct
          ~rates hash_and_rule_list_init)
-      (check_invariance_both ?trace ?fmt ?fmt_err ~sigs ~correct ~rates
+      (check_invariance_both ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct ~rates
          hash_and_rule_list_init)
       refined_partitioned_contact_map_copy
   in
