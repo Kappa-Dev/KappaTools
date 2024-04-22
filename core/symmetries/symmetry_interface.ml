@@ -72,9 +72,9 @@ let hash_rule_weight get set f cache compil rule =
     cache, n
 
 let get_representative parameters compil cache symmetries species =
-  let sigs = Model.signatures compil.environment in
+  let env = compil.environment in
   let rep_cache, rule_cache, cc_cache, species =
-    Symmetries.representative ~parameters ~sigs (get_sym_cache cache)
+    Symmetries.representative ~parameters ~env (get_sym_cache cache)
       (get_rule_cache cache) (get_cc_cache cache) symmetries species
   in
   let cache =
@@ -86,7 +86,7 @@ let get_representative parameters compil cache symmetries species =
 let equiv_class_of_pattern parameters compil cache symmetries pattern =
   let env = compil.environment in
   let rep_cache, rule_cache, cc_cache, seen_pattern, equiv_class =
-    Symmetries.equiv_class ~parameters env cache.seen_pattern
+    Symmetries.equiv_class ~parameters ~env cache.seen_pattern
       (get_sym_cache cache) (get_rule_cache cache) (get_cc_cache cache)
       symmetries pattern
   in
@@ -533,7 +533,7 @@ let saturate_domain_with_symmetric_patterns ~debug_mode bwd_bisim_info env =
     Model.fold_mixture_in_expr
       (fun domain ccs ->
         LKappa_group_action.saturate_domain_with_symmetric_patterns ~debug_mode
-          ~compile_mode_on:false env bwd_bisim_info ccs domain)
+          ~compile_mode_on:false ~env bwd_bisim_info ccs domain)
       (Pattern.PreEnv.of_env (Model.domain env))
       env
   in
@@ -664,8 +664,10 @@ let divide_rule_rate_by cache compil rule =
 
 let detect_symmetries parameters compil cache chemical_species contact_map =
   let rule_cache = get_rule_cache cache in
+  let env = compil.environment in
   let rule_cache, symmetries =
-    Symmetries.detect_symmetries parameters compil.environment rule_cache
+    Symmetries.detect_symmetries
+      ~parameters ~env rule_cache
       compil.rule_rate_convention chemical_species (get_rules compil)
       contact_map
   in
@@ -673,7 +675,7 @@ let detect_symmetries parameters compil cache chemical_species contact_map =
 
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in
-  Symmetries.print_symmetries parameters env symmetries
+  Symmetries.print_symmetries ~parameters ~env symmetries
 
 let valid_mixture compil cc_cache ?max_size mixture =
   match max_size with

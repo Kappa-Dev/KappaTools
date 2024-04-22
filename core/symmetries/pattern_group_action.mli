@@ -15,7 +15,7 @@
 
 val normalize_species :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
+  env:Model.t ->
   LKappa_auto.cache ->
   Pattern.PreEnv.t ->
   int Symmetries_sig.site_partition array ->
@@ -69,7 +69,7 @@ val equiv_class_of_a_pattern :
 
 val equiv_class_of_a_species :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
+  env:Model.t ->
   partitions_internal_states:(int -> int list list) ->
   partitions_binding_states:(int -> int list list) ->
   partitions_full_states:(int -> int list list) ->

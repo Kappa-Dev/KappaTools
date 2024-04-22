@@ -43,8 +43,8 @@ val refine_partitioned_contact_map_in_lkappa_representation :
   'a * 'b Symmetries_sig.site_partition array
 
 val detect_symmetries :
-  Remanent_parameters_sig.parameters ->
-  Model.t ->
+  parameters:Remanent_parameters_sig.parameters ->
+  env:Model.t ->
   LKappa_auto.cache ->
   Remanent_parameters_sig.rate_convention ->
   Pattern.cc list ->
@@ -53,7 +53,8 @@ val detect_symmetries :
   LKappa_auto.cache * symmetries
 
 val print_symmetries :
-  Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit
+  parameters:Remanent_parameters_sig.parameters ->
+  env:Model.t -> symmetries -> unit
 
 type cache
 
@@ -61,7 +62,7 @@ val empty_cache : unit -> cache
 
 val representative :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
+  env:Model.t ->
   cache ->
   LKappa_auto.cache ->
   Pattern.PreEnv.t ->
@@ -71,7 +72,7 @@ val representative :
 
 val equiv_class :
   ?parameters:Remanent_parameters_sig.parameters ->
-  Model.t ->
+  env:Model.t ->
   bool Mods.DynArray.t ->
   cache ->
   LKappa_auto.cache ->

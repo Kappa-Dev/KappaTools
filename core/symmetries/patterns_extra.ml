@@ -55,14 +55,15 @@ let declare_bond work ag_pos site bond_id map =
         Mods.IntMap.add bond_id ((ag_pos, site) :: old) map )
     | [] | _ :: _ :: _ -> assert false)
 
-let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
+let raw_mixture_to_species ?parameters ?env preenv mix unspec =
   let noCounters = do_trace parameters in
   let () = trace_print ?parameters "Translation from raw_mixture to pattern" in
   let () = trace_print ?parameters "INPUT:" in
   let () =
-    match sigs with
+    match env with
     | None -> ()
-    | Some sigs ->
+    | Some env ->
+      let sigs = Model.signatures env in
       safe_print_str __POS__ ?parameters
         (fun fmt ->
           Raw_mixture.print ~noCounters ~created:false ~initial_comma:false
@@ -114,13 +115,15 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
   let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
   let a, _, b, c = Pattern.finish_new ~debug_mode:noCounters work in
   let () =
-    match sigs with
+    match env with
     | None -> ()
-    | Some sigs ->
+    | Some env ->
+      let sigs = Model.signatures env in
+      let counters_info = Model.counters_info env in
       let () = trace_print ?parameters "OUTPUT:" in
       let () =
         safe_print_str __POS__ ?parameters
-          (fun fmt -> Pattern.print_cc ~noCounters ~sigs ~with_id:false fmt b)
+          (fun fmt -> Pattern.print_cc ~noCounters ~sigs ~counters_info  ~with_id:false fmt b)
           (fun fmt -> Pattern.print_cc ~noCounters ~with_id:false fmt b)
       in
       ()
@@ -306,7 +309,7 @@ let parse pattern =
   in
   agent_list, site_list, agent_type_map, bond_map
 
-let species_to_raw_mixture ?parameters ~sigs pattern =
+let species_to_raw_mixture ?parameters ~env pattern =
   let noCounters = do_trace parameters in
   let () = trace_print ?parameters "Translation from patten to raw_mixture" in
   let () =
@@ -314,7 +317,7 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
     let () =
       safe_print_str __POS__ ?parameters
         (fun fmt ->
-          Pattern.print_cc ~noCounters ~sigs ~with_id:false fmt pattern)
+          Pattern.print_cc ~noCounters ~sigs:(Model.signatures env) ~with_id:false fmt pattern)
         (fun fmt -> Pattern.print_cc ~noCounters ~with_id:false fmt pattern)
     in
     ()
@@ -328,7 +331,7 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
           if ag_type = -1 then
             0
           else
-            Signature.arity sigs ag_type
+            Signature.arity (Model.signatures env) ag_type
         in
         Array.make n_site (Raw_mixture.FREE, None))
       agent_type_map
@@ -411,20 +414,24 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
       safe_print_str __POS__ ?parameters
         (fun fmt ->
           Raw_mixture.print ~noCounters ~created:false ~initial_comma:false
-            ~sigs fmt output)
+            ~sigs:(Model.signatures env)
+            ~counters_info:(Model.counters_info env)
+            fmt output)
         (fun fmt ->
           Raw_mixture.print ~noCounters ~created:false ~initial_comma:false fmt
             output)
     in
     Some (output, unspec)
 
-let pattern_to_mixture ?parameters ~sigs ~counters_info pattern =
+let pattern_to_mixture ?parameters ~env pattern =
   let noCounters = do_trace parameters in
+  let sigs = Model.signatures env in
+  let counters_info = Model.counters_info env in
   let () = trace_print ?parameters "Translation from pattern to mixture" in
   let () = trace_print ?parameters "INPUT:" in
   let () =
     safe_print_str __POS__ ?parameters
-      (fun fmt -> Pattern.print_cc ~noCounters ~sigs ~with_id:false fmt pattern)
+      (fun fmt -> Pattern.print_cc ~noCounters ~sigs ~counters_info ~with_id:false fmt pattern)
       (fun fmt -> Pattern.print_cc ~noCounters ~with_id:false fmt pattern)
   in
   let _agent_list, site_list, agent_type_map, bond_map = parse pattern in
@@ -533,16 +540,14 @@ let pattern_to_mixture ?parameters ~sigs ~counters_info pattern =
     in
     Some (output, unspec)
 
-let pattern_id_to_mixture ?parameters env id =
-  let sigs = Model.signatures env in
-  let counters_info = Model.counters_info env in
+let pattern_id_to_mixture ?parameters ~env id =
   let point_opt =
     try Some (Pattern.Env.get (Model.domain env) id) with _ -> None
   in
   match point_opt with
   | None -> None
   | Some point ->
-    pattern_to_mixture ?parameters ~sigs ~counters_info (Pattern.Env.content point)
+    pattern_to_mixture ?parameters ~env (Pattern.Env.content point)
 
 let pattern_id_to_cc env id =
   let point_opt =
@@ -584,41 +589,37 @@ let rule_mixture_to_lkappa_rule rule_mixture =
 
 (*convert a species into lkappa rule signature*)
 
-let species_to_lkappa_rule_and_unspec ?parameters ~sigs species =
-  let some_pair = species_to_raw_mixture ?parameters ~sigs species in
+let species_to_lkappa_rule_and_unspec ?parameters ~env species =
+  let some_pair = species_to_raw_mixture ?parameters ~env species in
   match some_pair with
   | None -> lkappa_init, []
   | Some (raw_mixture, unspec) ->
     let lkappa_rule = raw_mixture_to_lkappa_rule raw_mixture in
     lkappa_rule, unspec
 
-let species_to_lkappa_rule ?parameters ~sigs species =
-  fst (species_to_lkappa_rule_and_unspec ?parameters ~sigs species)
+let species_to_lkappa_rule ?parameters ~env species =
+  fst (species_to_lkappa_rule_and_unspec ?parameters ~env species)
 
-let pattern_to_lkappa_rule_and_unspec ?parameters ~sigs ~counters_info cc =
-  let some_pair = pattern_to_mixture ?parameters ~sigs ~counters_info cc in
+let pattern_to_lkappa_rule_and_unspec ?parameters ~env cc =
+  let some_pair = pattern_to_mixture ?parameters ~env cc in
   match some_pair with
   | None -> lkappa_init, []
   | Some (rule_mixture, unspec) ->
     let lkappa_rule = rule_mixture_to_lkappa_rule rule_mixture in
     lkappa_rule, unspec
 
-let pattern_to_lkappa_rule ?parameters ~sigs ~counters_info cc =
-  fst (pattern_to_lkappa_rule_and_unspec ?parameters ~sigs ~counters_info cc)
+let pattern_to_lkappa_rule ?parameters ~env cc =
+  fst (pattern_to_lkappa_rule_and_unspec ?parameters ~env cc)
 
-let pattern_id_to_lkappa_rule ?parameters env id =
-  let sigs = Model.signatures env in
-  let counters_info = Model.counters_info env in
+let pattern_id_to_lkappa_rule ?parameters ~env id =
   match pattern_id_to_cc env id with
   | None -> lkappa_init
   | Some cc ->
-    let lkappa_rule = pattern_to_lkappa_rule ?parameters ~sigs ~counters_info cc in
+    let lkappa_rule = pattern_to_lkappa_rule ?parameters ~env cc in
     lkappa_rule
 
-let pattern_id_to_lkappa_rule_and_unspec ?parameters env id =
-  let sigs = Model.signatures env in
-  let counters_info = Model.counters_info env in
+let pattern_id_to_lkappa_rule_and_unspec ?parameters ~env id =
   match pattern_id_to_cc env id with
   | None -> lkappa_init, []
   | Some cc -> pattern_to_lkappa_rule_and_unspec
-                  ?parameters ~sigs ~counters_info cc
+                  ?parameters ~env cc
