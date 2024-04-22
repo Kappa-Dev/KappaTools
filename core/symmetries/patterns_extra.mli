@@ -1,6 +1,6 @@
 val raw_mixture_to_species :
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?sigs:Signature.s ->
+  ?env:Model.t ->
   Pattern.PreEnv.t ->
   Raw_mixture.t ->
   (int * int) list ->
@@ -15,20 +15,19 @@ val mixture_to_pattern :
 
 val species_to_raw_mixture :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
+  env:Model.t ->
   Pattern.cc ->
   (Raw_mixture.t * (int * int) list) option
 
 val pattern_to_mixture :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
-  counters_info:Counters_info.t ->
+  env:Model.t ->
   Pattern.cc ->
   (LKappa.rule_mixture * (int * int) list) option
 
 val pattern_id_to_mixture :
   ?parameters:Remanent_parameters_sig.parameters ->
-  Model.t ->
+  env:Model.t ->
   Pattern.id ->
   (LKappa.rule_mixture * (int * int) list) option
 
@@ -37,31 +36,30 @@ val raw_mixture_to_lkappa_rule : Raw_mixture.t -> LKappa.rule
 
 val species_to_lkappa_rule :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
+  env:Model.t ->
   Pattern.t ->
   LKappa.rule
 
 val species_to_lkappa_rule_and_unspec :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
+  env:Model.t ->
   Pattern.t ->
   LKappa.rule * (int * int) list
 
 val pattern_to_lkappa_rule :
   ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
-  counters_info:Counters_info.t -> 
+  env:Model.t ->
   Pattern.cc ->
   LKappa.rule
 
 val pattern_id_to_lkappa_rule :
   ?parameters:Remanent_parameters_sig.parameters ->
-  Model.t ->
+  env:Model.t ->
   Pattern.id ->
   LKappa.rule
 
 val pattern_id_to_lkappa_rule_and_unspec :
   ?parameters:Remanent_parameters_sig.parameters ->
-  Model.t ->
+  env:Model.t ->
   Pattern.id ->
   LKappa.rule * (int * int) list

@@ -26,8 +26,7 @@ val check_orbit_internal_state_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
-  ?sigs:Signature.s ->
-  ?counters_info:Counters_info.t ->
+  ?env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -55,8 +54,7 @@ val check_orbit_binding_state_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
-  ?sigs:Signature.s ->
-  ?counters_info:Counters_info.t ->
+  ?env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -82,8 +80,7 @@ val check_orbit_full_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
-  ?sigs:Signature.s ->
-  ?counters_info:Counters_info.t ->
+  ?env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -99,8 +96,7 @@ val is_invariant_internal_states_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
-  ?sigs:Signature.s ->
-  ?counters_info:Counters_info.t ->
+  ?env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -112,8 +108,7 @@ val is_invariant_binding_states_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
-  ?sigs:Signature.s ->
-  ?counters_info:Counters_info.t ->
+  ?env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -125,7 +120,7 @@ val is_invariant_full_states_permutation :
   ?trace:bool ->
   ?fmt:Format.formatter ->
   ?fmt_err:Format.formatter ->
-  ?sigs:Signature.s ->
+  ?env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -158,7 +153,7 @@ val equiv_class :
 val saturate_domain_with_symmetric_patterns :
   debug_mode:bool ->
   compile_mode_on:bool ->
-  Model.t ->
+  env:Model.t ->
   bwd_bisim_info ->
   Pattern.id array list ->
   Pattern.PreEnv.t ->

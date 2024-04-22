@@ -470,7 +470,7 @@ let cannonic_form_from_syntactic_rules rule_cache env rate_convention
 (******************************************************************)
 (*detect_symmetries*)
 
-let check_invariance_gen p ?trace ?fmt ?fmt_err ?sigs ?counters_info ~to_be_checked ~counter
+let check_invariance_gen p ?trace ?fmt ?fmt_err ?env ~to_be_checked ~counter
     ~correct ~rates
     (hash_and_rule_list :
       (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list) cache agent_type
@@ -482,7 +482,7 @@ let check_invariance_gen p ?trace ?fmt ?fmt_err ?sigs ?counters_info ~to_be_chec
       let id = LKappa_auto.RuleCache.int_of_hashed_list hash in
       if to_be_checked.(id) then (
         let (cache, counter, to_be_checked), b =
-          p ?trace ?fmt ?fmt_err ?sigs ?counters_info
+          p ?trace ?fmt ?fmt_err ?env
             ~agent_type ~site1 ~site2 rule ~correct
             rates cache ~counter to_be_checked
         in
@@ -495,26 +495,25 @@ let check_invariance_gen p ?trace ?fmt ?fmt_err ?sigs ?counters_info ~to_be_chec
   in
   aux hash_and_rule_list (cache, to_be_checked, counter)
 
-let check_invariance_internal_states ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
-    ?counters_info (hash_and_rule_list :
+let check_invariance_internal_states ~correct ~rates ?trace ?fmt ?fmt_err ?env (hash_and_rule_list :
       (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list)
     (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_internal_state_permutation ?trace ?fmt
-    ?fmt_err ?sigs ?counters_info ~to_be_checked ~counter ~correct ~rates hash_and_rule_list
+    ?fmt_err ?env ~to_be_checked ~counter ~correct ~rates hash_and_rule_list
     cache agent_type site1 site2
 
-let check_invariance_binding_states ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
-    ?counters_info hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
+let check_invariance_binding_states ~correct ~rates ?trace ?fmt ?fmt_err ?env hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen LKappa_group_action.check_orbit_binding_state_permutation
-    ?trace ?fmt ?fmt_err ?sigs ?counters_info
+    ?trace ?fmt ?fmt_err ?env
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
-let check_invariance_both ~correct ~rates ?trace ?fmt ?fmt_err ?sigs ?counters_info
+let check_invariance_both ~correct ~rates ?trace ?fmt ?fmt_err ?env
     hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen LKappa_group_action.check_orbit_full_permutation ?trace
-    ?fmt ?fmt_err ?sigs ?counters_info ~to_be_checked ~counter ~correct ~rates
+    ?fmt ?fmt_err ?env
+    ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let print_symmetries_gen parameters env contact_map partitioned_contact_map
@@ -577,7 +576,7 @@ let initial_value_of_arrays cannonic_list arrays =
       ())
     cannonic_list
 
-let detect_symmetries (parameters : Remanent_parameters_sig.parameters) env
+let detect_symmetries ~parameters ~env
     cache rate_convention chemical_species get_rules contact_map =
   (*-------------------------------------------------------------*)
   let trace = Some (Remanent_parameters.get_trace parameters) in
@@ -587,13 +586,11 @@ let detect_symmetries (parameters : Remanent_parameters_sig.parameters) env
   let fmt_err =
     Loggers.formatter_of_logger (Remanent_parameters.get_logger_err parameters)
   in
-  let sigs = Model.signatures env in
-  let counters_info = Model.counters_info env in
   let lkappa_rule_list =
     List.fold_left
       (fun current_list species ->
         let lkappa =
-          Patterns_extra.species_to_lkappa_rule ~parameters ~sigs species
+          Patterns_extra.species_to_lkappa_rule ~parameters ~env species
         in
         lkappa :: current_list)
       [] chemical_species
@@ -636,11 +633,11 @@ let detect_symmetries (parameters : Remanent_parameters_sig.parameters) env
   let (cache, _, _), refined_partitioned_contact_map =
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked, counter)
-      (check_invariance_internal_states ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct
+      (check_invariance_internal_states ?trace ?fmt ?fmt_err ~env ~correct
          ~rates hash_and_rule_list)
-      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct
+      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~env ~correct
          ~rates hash_and_rule_list)
-      (check_invariance_both ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct ~rates
+      (check_invariance_both ?trace ?fmt ?fmt_err ~env ~correct ~rates
          hash_and_rule_list)
       p'
   in
@@ -658,11 +655,11 @@ let detect_symmetries (parameters : Remanent_parameters_sig.parameters) env
     let rates = rates_init in
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked_init, counter_init)
-      (check_invariance_internal_states ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct
+      (check_invariance_internal_states ?trace ?fmt ?fmt_err ~env ~correct
          ~rates hash_and_rule_list_init)
-      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct
+      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~env ~correct
          ~rates hash_and_rule_list_init)
-      (check_invariance_both ?trace ?fmt ?fmt_err ~sigs ~counters_info ~correct ~rates
+      (check_invariance_both ?trace ?fmt ?fmt_err ~env ~correct ~rates
          hash_and_rule_list_init)
       refined_partitioned_contact_map_copy
   in
@@ -747,7 +744,7 @@ type cache = {
 
 let empty_cache () = { rep = CcMap.empty; equiv_class = CcIdMap.empty }
 
-let representative ?parameters ~sigs cache rule_cache preenv_cache symmetries
+let representative ?parameters ~env cache rule_cache preenv_cache symmetries
     species =
   match symmetries with
   | Ground -> cache, rule_cache, preenv_cache, species
@@ -756,13 +753,13 @@ let representative ?parameters ~sigs cache rule_cache preenv_cache symmetries
     | Some species -> cache, rule_cache, preenv_cache, species
     | None ->
       let rule_cache, preenv_cache, species' =
-        Pattern_group_action.normalize_species ?parameters ~sigs rule_cache
+        Pattern_group_action.normalize_species ?parameters ~env rule_cache
           preenv_cache sym species
       in
       let cache = { cache with rep = CcMap.add species species' cache.rep } in
       cache, rule_cache, preenv_cache, species')
 
-let equiv_class ?parameters env array cache rule_cache preenv_cache symmetries
+let equiv_class ?parameters ~env array cache rule_cache preenv_cache symmetries
     pattern =
   match symmetries with
   | Ground -> cache, rule_cache, preenv_cache, array, (1, [ pattern, 1 ])
@@ -813,7 +810,7 @@ let equiv_class ?parameters env array cache rule_cache preenv_cache symmetries
         array,
         (w, equiv_class) ))
 
-let print_symmetries parameters env symmetries =
+let print_symmetries ~parameters ~env symmetries =
   let log = Remanent_parameters.get_logger parameters in
   let () = Loggers.fprintf log "Symmetries:" in
   let () = Loggers.print_newline log in

@@ -1930,7 +1930,7 @@ functor
           Remanent_parameters.get_rate_convention parameters
         in
         let _cache, symmetries =
-          Symmetries.detect_symmetries parameters env cache rate_convention
+          Symmetries.detect_symmetries ~parameters ~env cache rate_convention
             chemical_species rules contact_map
         in
         state, Some symmetries
@@ -1952,7 +1952,7 @@ functor
       match sym, env with
       | None, _ | _, None -> state
       | Some sym, Some env ->
-        let () = Symmetries.print_symmetries parameters env sym in
+        let () = Symmetries.print_symmetries ~parameters ~env sym in
         state
 
     let get_data = Remanent_state.get_data
