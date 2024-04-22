@@ -74,3 +74,5 @@ val default_message_delimter : char
 val get_ref : int ref -> int
 val remove_double_elements : 'a list -> 'a list
 val sort_by_priority : ('a -> int) -> int -> 'a list -> 'a list
+
+val map_opt: ('a -> 'b) -> 'a option -> 'b option 
