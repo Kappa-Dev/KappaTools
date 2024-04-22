@@ -98,8 +98,14 @@ module Pattern = struct
   let print_internal_state symbol_table ?sigs ag p fmt st =
     Utils.print_internal_state symbol_table (print_internal ?sigs ag p) fmt st
 
-  let print_cc ?(full_species = false) ?sigs ?counters_info ?cc_id ~noCounters ~with_id
+  let print_cc ?(full_species = false) ?domain ?cc_id ~noCounters ~with_id
       ?(symbol_table = Symbol_table.symbol_table_V4) f cc =
+    let sigs =
+      Tools.map_opt Pattern.Env.signatures domain
+    in
+    let counters_info =
+      Tools.map_opt Pattern.Env.counters_info domain
+    in
     let print_intf ((ag_i, ag_t) as ag) link_ids neigh =
       snd
         (Tools.array_fold_lefti
@@ -214,7 +220,7 @@ module Pattern = struct
           None
       in
       print_cc
-        ~sigs:(Pattern.Env.signatures env)
+        ?domain
         ?cc_id ~noCounters ~with_id ~symbol_table f
         (Pattern.Env.content (Pattern.Env.get env id))
 end

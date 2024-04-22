@@ -153,8 +153,7 @@ let print_chemical_species ?compil f =
          | None -> false
          | Some c -> c.debug_mode)
        ~full_species:true
-       ?sigs:(Option_util.map Model.signatures (environment_opt compil))
-       ?counters_info:(Option_util.map Model.counters_info (environment_opt compil))
+       ?domain:(domain_opt compil)
        ?cc_id:None ~symbol_table:(symbol_table_opt compil) ~with_id:false)
 
 let print_token ?compil fmt k =
