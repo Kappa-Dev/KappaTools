@@ -1,0 +1,63 @@
+%def: "seed" "92067277"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+
+%agent: A(x{=-3/+=2} x__inverted{-=-2/=3/+=3})
+
+%var:/*0*/ '=-3' |A(x{=-3})|
+%var:/*1*/ '=-2' |A(x{=-2})|
+%var:/*2*/ '=-1' |A(x{=-1})|
+%var:/*3*/ '=0' |A(x{=0})|
+%var:/*4*/ '=1' |A(x{=1})|
+%var:/*5*/ '=2' |A(x{=2})|
+%var:/*6*/ '>=-3' |A(x{>=-3})|
+%var:/*7*/ '>=-2' |A(x{>=-2})|
+%var:/*8*/ '>=-1' |A(x{>=-1})|
+%var:/*9*/ '>=0' |A(x{>=0})|
+%var:/*10*/ '>=1' |A(x{>=1})|
+%var:/*11*/ '>=2' |A(x{>=2})|
+%var:/*12*/ '<=-3' |A(x__inverted{>=3})|
+%var:/*13*/ '<=-2' |A(x__inverted{>=2})|
+%var:/*14*/ '<=-1' |A(x__inverted{>=1})|
+%var:/*15*/ '<=0' |A(x__inverted{>=0})|
+%var:/*16*/ '<=1' |A(x__inverted{>=-1})|
+%var:/*17*/ '<=2' |A(x__inverted{>=-2})|
+%var:/*18*/ 'r1: A(x__inverted{>=-1/+=-1} x{>=-3/+=1}) -> A(x{+=1} x__inverted{+=-1}) @ |A(x{=-1})|_rate' |A(x{=-1})|
+%plot: [T]
+%plot: '=-3'
+%plot: '=-2'
+%plot: '=-1'
+%plot: '=0'
+%plot: '=1'
+%plot: '=2'
+%plot: '>=-3'
+%plot: '>=-2'
+%plot: '>=-1'
+%plot: '>=0'
+%plot: '>=1'
+%plot: '>=2'
+%plot: '<=-3'
+%plot: '<=-2'
+%plot: '<=-1'
+%plot: '<=0'
+%plot: '<=1'
+%plot: '<=2'
+
+A(x{=-3} x__inverted{=3})+ @ 100
+A(x{>=-3/+=1} x__inverted{>=-1/+=-1}) @ 'r1: A(x__inverted{>=-1/+=-1} x{>=-3/+=1}) -> A(x{+=1} x__inverted{+=-1}) @ |A(x{=-1})|_rate'
+A(x{>=-1/+=-1} x__inverted{>=-2/+=1}) @ 1
+A(x[#] x__inverted{>=0})- @ 0.1
+A(x{>=-3} x__inverted{>=-1}) @ 2
+A(x{>=-1}) @ 1
+
+/*0*/%mod: (|A(x__inverted{>=4})| = 1) do $PRINTF ""; $PRINTF "Counter x__inverted of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+/*1*/%mod: (|A(x{>=3})| = 1) do $PRINTF ""; $PRINTF "Counter x of agent A reached maximum"; $STOP "counter_perturbation.ka"; repeat [false]
+
+%init: 1 A(x{=-3} x__inverted{=3})
+
+%mod: [E] = 25863 do $STOP;
