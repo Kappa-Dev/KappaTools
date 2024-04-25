@@ -170,20 +170,28 @@ let set_a_story =
 
 let rec inspect_stories () =
   State_project.eval_with_project ~label:"Stories list" (fun manager ->
-      let () =
-        list_control
-          (Mods.IntMap.fold
-             (fun id (cm, _, _) acc -> (id, cm) :: acc)
-             manager#story_list [])
+      let story_list_from_manager =
+        Mods.IntMap.fold
+          (fun id (cm, _, _) acc -> (id, cm) :: acc)
+          manager#story_list []
       in
-      let () = log_control manager#story_log in
+      let () = list_control story_list_from_manager in
+      let log_lines =
+        if manager#is_computing then
+          "Computing stories…" :: manager#story_log
+        else
+          (* TODO: check if story_log below should be live and isn't? *)
+          (string_of_int (List.length story_list_from_manager) ^ " stories")
+          :: manager#story_log
+      in
+      let () = log_control log_lines in
       set_a_story ())
   >>= fun _ ->
   State_project.eval_with_project ~label:"Stories computing" (fun manager ->
       Lwt.return (Result_util.ok manager#is_computing))
   >>= Result_util.fold
-        ~ok:(fun b ->
-          if b && React.S.value tab_is_active then
+        ~ok:(fun is_computing ->
+          if is_computing && React.S.value tab_is_active then
             Js_of_ocaml_lwt.Lwt_js.sleep 3. >>= inspect_stories
           else
             Lwt.return_unit)
