@@ -242,10 +242,9 @@ let outputs (simulation : t) = function
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.Warning (pos, msg) -> Data.print_warning ?pos simulation.log_form msg
   | Data.TraceStep st ->
-    if Buffer.length simulation.trace <> 0 then (
-      let () = Buffer.add_char simulation.trace ',' in
-      Trace.write_step simulation.trace st
-    )
+    if Buffer.length simulation.trace <> 0 then
+      Buffer.add_char simulation.trace ',';
+    Trace.write_step simulation.trace st
 
 let interactive_outputs formatter t = function
   | Data.Log s -> Format.fprintf formatter "%s@." s
