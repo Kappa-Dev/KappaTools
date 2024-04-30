@@ -6,18 +6,18 @@ Should be done in each considered brower and in the electron app, and importantl
 
 ## TODOs : to add to the procedure
 Doesn't show up at the time of writing:
-- Stories
 - outputs
 
 ## Not tested in the procedure
 - file menu
-- contact map subpanel: accuracy, export, hide guide lines
-- influences subpanel: navigation, graph parameters
-- missing test data in subpanels: 3 last constraints + polymers
-- sim controls: pause if, all outputs, get trace
+- new project
+- in contact map subpanel: accuracy, export, hide guide lines
+- in influences subpanel: navigation, graph parameters
+- no check for missing test data in subpanels: 3 last constraints + polymers
+- in sim controls: pause if, all outputs, get trace
 - plot export
 - DIN export
-- new project
+
 
 ## Test procedure
 
@@ -55,8 +55,7 @@ Second level: what to check additionnally
 - Change to Snapshot tab, enter $SNAPSHOT in the Simulation perturbation and click intervention, see that the snapshot shows up
 - Click on kappa and change display to graph, play with the graph settings
 - Change back to kappa, continue/stop the simulation, make a new snapshot, and test to switch between snapshot
-- Go to outputs, run > $PRINT "time: ".[T]  and  > $PLOTENTRY   see that it shows up  
-- TODO: this currently doesn't work, adapt this when it does
+- TODO: this currently doesn't work, adapt this when it does : - Go to outputs, run > $PRINT "time: ".[T]  and  > $PLOTENTRY   see that it shows up  
 - Go back to log tab and see the previous interventions show up
 
 #### Stories
