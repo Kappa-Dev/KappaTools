@@ -12,6 +12,62 @@ a static analyser for Kappa models.
 Kappy is a python library to launch and analyse runs and outputs of
 Kappa models.
 
+
+## Quick startup
+
+If you are new to Kappa, the easiest way to start experimenting with it is using the webapp.
+
+<p align="center">
+<img alt="Editor screenshot with contact map" src="./dev/screenshots/editor1.png" width="45%">
+<img alt= "Plot screenshot" src="./dev/screenshots/plot.png" width="45%">
+</p>
+<p align="center">
+<img alt="Editor screenshot with contact map 2" src="./dev/screenshots/editor2.png" width="45%">
+<img alt="Stories screenshot" src="./dev/screenshots/story.png" width="45%">
+</p>
+
+
+It's available [directly in your browser](https://tools.kappalanguage.org/try/?model=https%3A//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka),
+or for more performance as a downloadable [electron app](https://tools.kappalanguage.org/nightly-builds/), available for MacOS, Windows and Linux.
+
+Kappa tools are also available as Command-Line Interface programs, which you can either build following the [instructions below](#core-tools),
+or find the binaries included with the [electron app](https://tools.kappalanguage.org/nightly-builds/) in subdir `resources/bin`.
+
+If you would like to use python to interact with the Kappa tools, the `kappy` lib is where to look. Here's an example of its usage with `ipython`
+
+```python
+In [2]: import kappy
+
+In [3]: model_text = "%agent: A(x)\nA(x[.]), A(x[.]) <-> A(x[1]), A(x[1]) @ 1e-2,1\n%plot: |A(x[.])|\n%init: 100 A()"
+
+In [4]: kappa_client = kappy.KappaStd()
+
+In [5]: kappa_client.add_model_string(model_text)
+Out[5]: [...]
+
+In [6]: kappa_client.project_parse()
+Out[6]: [...]
+
+In [7]: kappa_client.simulation_start(kappy.SimulationParameter(.1,"[T] > 10"))
+Out[7]: {'simulation_artifact_simulation_seed': 297327779}
+
+In [8]: kappa_client.wait_for_simulation_stop()
+Out[8]: [...]
+
+In [9]: kappa_client.simulation_plot()
+Out[9]:
+  [6.7, 48.0],
+[...]
+  [0.4, 60.0],
+  [0.3, 50.0],
+  [0.2, 64.0],
+  [0.1, 62.0],
+  [0.0, 100.0]]}
+```
+
+See the [install instructions](#kappy) to start using kappy.
+
+
 ## User manual
 See [documentation page on kappalanguage.org](https://kappalanguage.org/documentation).
 
@@ -40,7 +96,9 @@ are built for these platforms by the continuous integration tools.
 If you want or need your own build,
  - Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml
    package manager) and initialize it (by issuing `opam init`)
- - In the source directory, install all the dependencies by `opam install --deps-only .`
+ - In the source directory, install all the dependencies by `opam install 
+   --deps-only pinned_libs/default` if your OS is OSX or linux, or `opam 
+   install --deps-only pinned_libs/windows` if your OS is Windows.
  - `dune build`
 
 You can be more fine grained if you only need the command-line tools
