@@ -8,11 +8,6 @@ Should be done in each considered brower and in the electron app, and importantl
 Doesn't show up at the time of writing:
 - outputs
 
-## Not tested in the procedure
-- in contact map subpanel: accuracy, hide guide lines
-- in influences subpanel: graph parameters are untested
-- in subpanels: 3 last constraints + polymers 
-
 
 ## Test procedure
 
@@ -38,7 +33,7 @@ Second level: what to check additionnally
 - Contact map is present, see that it changes when clicked on - interactive mode - show all states
 - export to svg and check the picture
 - Go to influences: is it populated?
-- Change rendering to graph, change accuracy to high, see that it changes
+- Change rendering to graph, change accuracy to high, see that it changes; play with size radius controls
 - Change back to Tabular, click Track cursor. click on different rules in the editor to see that it changes in the subpanel; click on previous/next similarly
 - export to json and check that info is present in the file
 - Go to constraints subpanel, see that the two views domain are populated
@@ -87,3 +82,9 @@ Second level: what to check additionnally
 - Click new project, enter a name
 - Load a file e.g. abc.ka, run the simulation, check e.g. the plot
 - go back to project `default`, check editor, log and plot tabs didn't change
+
+#### Other subpanel analysis tools
+- Load https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/poly.ka and see the polymers subpanel show info about chain possibilities
+- Load https://www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/local_views/local_views_slide_69.ka , check in the constraints panel that info is shown for all except counters (or https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/large/sos/sos.ka )
+- Load https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/tests/integration/compiler/counters_2_levels/counter_2.ka , check that counters info show in constraints panel
+- Load https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/large/minikai/minikai_counters.ka change accuracy contact map: d shows up or not
