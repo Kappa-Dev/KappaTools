@@ -73,3 +73,17 @@ val read_range : Yojson.Safe.lexer_state -> Lexing.lexbuf -> t
 
 val range_of_string : string -> t
 (** Deserialize JSON data of type {!t}. *)
+
+(** Annoted yojson helpers *)
+
+val string_annoted_to_json :
+  filenames:int Mods.StringMap.t -> string annoted -> Yojson.Basic.t
+
+val string_annoted_of_json :
+  filenames:string array -> Yojson.Basic.t -> string annoted
+
+val string_option_annoted_to_json :
+  filenames:int Mods.StringMap.t -> string option annoted -> Yojson.Basic.t
+
+val string_option_annoted_of_json :
+  filenames:string array -> Yojson.Basic.t -> string option annoted

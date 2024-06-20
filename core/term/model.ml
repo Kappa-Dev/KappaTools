@@ -55,7 +55,7 @@ let deconstruct env =
     env.observables,
     env.interventions,
     env.contact_map,
-    env.counters_info)
+    env.counters_info )
 
 let domain env = env.domain
 let get_obs env = env.observables
@@ -158,8 +158,8 @@ let print_ast_rule ~noCounters ?env f i =
       match env.ast_rules.(pred i) with
       | Some (na, _), _ -> Format.pp_print_string f na
       | None, (r, _) ->
-        LKappa.print_rule ~noCounters ~full:false sigs counters_info (print_token ~env)
-          (print_alg ~env) f r
+        LKappa.print_rule ~noCounters ~full:false sigs counters_info
+          (print_token ~env) (print_alg ~env) f r
     )
 
 let print_rule ~noCounters ?env f id =
@@ -196,8 +196,8 @@ let print_kappa ~noCounters pr_alg ?pr_rule pr_pert f env =
               (Pp.option ~with_space:false (fun f (na, _) ->
                    Format.fprintf f "'%s' " na))
               na
-              (LKappa.print_rule ~noCounters ~full:true sigs counters_info (print_token ~env)
-                 (print_alg ~env))
+              (LKappa.print_rule ~noCounters ~full:true sigs counters_info
+                 (print_token ~env) (print_alg ~env))
               e)
           f env.ast_rules
       | Some pr_rule ->
@@ -390,8 +390,9 @@ let of_yojson = function
          filenames = List.tl (Array.to_list filenames);
          domain = Pattern.Env.of_yojson (List.assoc "update" l);
          counters_info =
-            (try Counters_info.of_yojson (List.assoc "counters_info" l)
-            with Not_found -> Pattern.Env.counters_info  domain) ;
+           (try
+              Counters_info.of_yojson ~filenames (List.assoc "counters_info" l)
+            with Not_found -> Pattern.Env.counters_info domain);
          tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
          algs =
            NamedDecls.of_json

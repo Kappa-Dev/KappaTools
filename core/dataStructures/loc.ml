@@ -184,3 +184,18 @@ let merge b e =
     from_position = b.from_position;
     to_position = e.to_position;
   }
+
+(** Annoted yojson helpers *)
+
+let string_annoted_to_json ~filenames =
+  yojson_of_annoted ~filenames JsonUtil.of_string
+
+let string_annoted_of_json ~filenames =
+  annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None)
+
+let string_option_annoted_to_json ~filenames =
+  yojson_of_annoted ~filenames (JsonUtil.of_option JsonUtil.of_string)
+
+let string_option_annoted_of_json ~filenames =
+  annoted_of_yojson ~filenames
+    (JsonUtil.to_option (JsonUtil.to_string ?error_msg:None))
