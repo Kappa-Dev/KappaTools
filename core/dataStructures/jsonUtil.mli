@@ -74,7 +74,7 @@ val read_variant :
   'b
 
 val smart_assoc : (string * Yojson.Basic.t) list -> Yojson.Basic.t
-(** Do not put fields whose value is 'null', '[]' or '\{\}' *)
+(** Similar to of_assoc, but does not include fields whose value is 'null', '[]' or '\{\}' *)
 
 val of_assoc : ('a -> string * Yojson.Basic.t) -> 'a list -> Yojson.Basic.t
 

@@ -37,7 +37,6 @@ type counter = {
       (** In a rule: change in counter value, in an agent declaration: max value of the counter, 0 if absent *)
 }
 
-
 let counter_sig_of_counter (c : counter) : Counters_info.counter_sig =
   let (counter_sig_min, counter_sig_default) : (int option * Loc.t) option * int
       =
@@ -310,7 +309,8 @@ let print_counter f c =
     c.counter_delta
 
 let print_counter_sig f c =
-  Format.fprintf f "%s{%a%a}%a" (fst c.Counters_info.counter_sig_name)
+  Format.fprintf f "%s{%a%a}%a"
+    (fst c.Counters_info.counter_sig_name)
     (Pp.option ~with_space:false print_counter_min)
     c.Counters_info.counter_sig_min
     (Pp.option ~with_space:false print_counter_max)
@@ -321,19 +321,6 @@ let print_counter_sig f c =
 let print_ast_site ~print_counter f = function
   | Port p -> print_ast_port f p
   | Counter c -> print_counter f c
-
-let string_annot_to_json filenames =
-  Loc.yojson_of_annoted ~filenames JsonUtil.of_string
-
-let string_annoted_of_json filenames =
-  Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None)
-
-let string_option_annot_to_json filenames =
-  Loc.yojson_of_annoted ~filenames (JsonUtil.of_option JsonUtil.of_string)
-
-let string_option_annoted_of_json filenames =
-  Loc.annoted_of_yojson ~filenames
-    (JsonUtil.to_option (JsonUtil.to_string ?error_msg:None))
 
 let counter_test_to_json = function
   | CEQ x -> `Assoc [ "test", `String "eq"; "val", `Int x ]
@@ -367,13 +354,13 @@ let port_to_json filenames p =
   in
   JsonUtil.smart_assoc
     [
-      "port_name", string_annot_to_json filenames p.port_name;
+      "port_name", Loc.string_annoted_to_json ~filenames p.port_name;
       ( "port_int",
         JsonUtil.smart_assoc
           [
             ( "state",
               JsonUtil.of_list
-                (string_option_annot_to_json filenames)
+                (Loc.string_option_annoted_to_json ~filenames)
                 p.port_int );
             "mod", mod_i p.port_int_mod;
           ] );
@@ -384,8 +371,8 @@ let port_to_json filenames p =
               JsonUtil.of_list
                 (Loc.yojson_of_annoted ~filenames
                    (LKappa.link_to_json
-                      (fun _ -> string_annot_to_json filenames)
-                      (string_annot_to_json filenames)
+                      (fun _ -> Loc.string_annoted_to_json ~filenames)
+                      (Loc.string_annoted_to_json ~filenames)
                       (fun () -> [])))
                 p.port_link );
             "mod", mod_l p.port_link_mod;
@@ -408,11 +395,11 @@ let build_port_of_json filenames n i l =
     match i with
     | `Assoc [] | `Null -> [], None
     | `Assoc [ ("state", i) ] ->
-      JsonUtil.to_list (string_option_annoted_of_json filenames) i, None
+      JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) i, None
     | `Assoc [ ("mod", m) ] -> [], mod_i m
     | `Assoc [ ("state", i); ("mod", m) ] | `Assoc [ ("mod", m); ("state", i) ]
       ->
-      JsonUtil.to_list (string_option_annoted_of_json filenames) i, mod_i m
+      JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) i, mod_i m
     | _ -> raise (Yojson.Basic.Util.Type_error ("Not internal states", i))
   in
   let port_link, port_link_mod =
@@ -422,8 +409,8 @@ let build_port_of_json filenames n i l =
       ( JsonUtil.to_list
           (Loc.annoted_of_yojson ~filenames
              (LKappa.link_of_json
-                (fun _ -> string_annoted_of_json filenames)
-                (string_annoted_of_json filenames)
+                (fun _ -> Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames)
                 (fun _ -> ())))
           l,
         None )
@@ -433,8 +420,8 @@ let build_port_of_json filenames n i l =
       ( JsonUtil.to_list
           (Loc.annoted_of_yojson ~filenames
              (LKappa.link_of_json
-                (fun _ -> string_annoted_of_json filenames)
-                (string_annoted_of_json filenames)
+                (fun _ -> Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames)
                 (fun _ -> ())))
           l,
         mod_l m )
@@ -442,7 +429,7 @@ let build_port_of_json filenames n i l =
   in
   Port
     {
-      port_name = string_annoted_of_json filenames n;
+      port_name = Loc.string_annoted_of_json ~filenames n;
       port_int;
       port_int_mod;
       port_link;
@@ -702,7 +689,8 @@ let counter_sig_to_json ~filenames c =
   `Assoc
     [
       ( "counter_sig_name",
-        Loc.yojson_of_annoted ~filenames JsonUtil.of_string c.Counters_info.counter_sig_name );
+        Loc.yojson_of_annoted ~filenames JsonUtil.of_string
+          c.Counters_info.counter_sig_name );
       ( "counter_min",
         JsonUtil.of_option
           (Loc.yojson_of_annoted ~filenames
@@ -750,10 +738,7 @@ let agent_to_json ~counter_to_json filenames = function
     JsonUtil.smart_assoc
       [
         "name", Loc.yojson_of_annoted ~filenames JsonUtil.of_string na;
-        "sig",
-          JsonUtil.of_list
-            (site_to_json ~counter_to_json filenames)
-            l;
+        "sig", JsonUtil.of_list (site_to_json ~counter_to_json filenames) l;
         "mod", agent_mod_to_yojson m;
       ]
 
@@ -789,9 +774,7 @@ let agent_of_json ~site_of_json filenames = function
 let agent_sig_of_json = agent_of_json ~site_of_json:site_sig_of_json
 
 (* TO DO Transfer back inverted counters *)
-let agent_sig_to_json =
-  agent_to_json ~counter_to_json:counter_sig_to_json
-
+let agent_sig_to_json = agent_to_json ~counter_to_json:counter_sig_to_json
 let agent_of_json = agent_of_json ~site_of_json
 let agent_to_json = agent_to_json ~counter_to_json
 
@@ -1166,7 +1149,7 @@ let arrow_notation_to_yojson filenames f_mix f_var r =
           (JsonUtil.of_pair
              (Loc.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames f_mix f_var))
-             (string_annot_to_json filenames))
+             (Loc.string_annoted_to_json ~filenames))
           r.rm_token );
       "rhs", f_mix r.rhs;
       ( "add_token",
@@ -1174,7 +1157,7 @@ let arrow_notation_to_yojson filenames f_mix f_var r =
           (JsonUtil.of_pair
              (Loc.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames f_mix f_var))
-             (string_annot_to_json filenames))
+             (Loc.string_annoted_to_json ~filenames))
           r.add_token );
     ]
 
@@ -1187,7 +1170,7 @@ let arrow_notation_of_yojson filenames f_mix f_var = function
           (JsonUtil.to_pair
              (Loc.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames f_mix f_var))
-             (string_annoted_of_json filenames))
+             (Loc.string_annoted_of_json ~filenames))
           (Yojson.Basic.Util.member "rm_token" x);
       rhs = f_mix (Yojson.Basic.Util.member "rhs" x);
       add_token =
@@ -1195,7 +1178,7 @@ let arrow_notation_of_yojson filenames f_mix f_var = function
           (JsonUtil.to_pair
              (Loc.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames f_mix f_var))
-             (string_annoted_of_json filenames))
+             (Loc.string_annoted_of_json ~filenames))
           (Yojson.Basic.Util.member "add_token" x);
     }
   | x ->
@@ -1213,7 +1196,7 @@ let edit_notation_to_yojson filenames r =
           (JsonUtil.of_pair
              (Loc.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames mix_to_json JsonUtil.of_string))
-             (string_annot_to_json filenames))
+             (Loc.string_annoted_to_json ~filenames))
           r.delta_token );
     ]
 
@@ -1231,7 +1214,7 @@ let edit_notation_of_yojson filenames r =
              (Loc.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames mix_of_json
                    (JsonUtil.to_string ?error_msg:None)))
-             (string_annoted_of_json filenames))
+             (Loc.string_annoted_of_json ~filenames))
           (Yojson.Basic.Util.member "delta_token" x);
     }
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST edit_notation", x))
@@ -1367,7 +1350,10 @@ let modif_to_json filenames f_mix f_var = function
       ]
   | PLOTENTRY -> `String "PLOTENTRY"
   | CFLOWLABEL (b, id) ->
-    `List [ `String "CFLOWLABEL"; `Bool b; string_annot_to_json filenames id ]
+    `List
+      [
+        `String "CFLOWLABEL"; `Bool b; Loc.string_annoted_to_json ~filenames id;
+      ]
   | CFLOWMIX (b, m) ->
     `List [ `String "CFLOW"; `Bool b; Loc.yojson_of_annoted ~filenames f_mix m ]
   | DIN (b, file) ->
@@ -1429,7 +1415,7 @@ let modif_of_json filenames f_mix f_var = function
           expr )
   | `String "PLOTENTRY" -> PLOTENTRY
   | `List [ `String "CFLOWLABEL"; `Bool b; id ] ->
-    CFLOWLABEL (b, string_annoted_of_json filenames id)
+    CFLOWLABEL (b, Loc.string_annoted_of_json ~filenames id)
   | `List [ `String "CFLOW"; `Bool b; m ] ->
     CFLOWMIX (b, Loc.annoted_of_yojson ~filenames f_mix m)
   | `List [ `String "DIN"; b; file ] ->
@@ -1474,8 +1460,9 @@ let merge_internals =
 
 let rec merge_sites_counter c = function
   | [] -> [ Counter c ]
-  | Counter c' :: _ as l when fst c.Counters_info.counter_sig_name = fst c'.Counters_info.counter_sig_name
-    ->
+  | Counter c' :: _ as l
+    when fst c.Counters_info.counter_sig_name
+         = fst c'.Counters_info.counter_sig_name ->
     l
   | ((Port _ | Counter _) as h) :: t -> h :: merge_sites_counter c t
 
@@ -1646,18 +1633,19 @@ let compil_to_json c =
     [
       "filenames", JsonUtil.of_array JsonUtil.of_string files;
       "signatures", JsonUtil.of_list (agent_sig_to_json filenames) c.signatures;
-      "tokens", JsonUtil.of_list (string_annot_to_json filenames) c.tokens;
+      ( "tokens",
+        JsonUtil.of_list (Loc.string_annoted_to_json ~filenames) c.tokens );
       ( "variables",
         JsonUtil.of_list
           (JsonUtil.of_pair
-             (string_annot_to_json filenames)
+             (Loc.string_annoted_to_json ~filenames)
              (Loc.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json)))
           c.variables );
       ( "rules",
         JsonUtil.of_list
           (JsonUtil.of_pair
-             (JsonUtil.of_option (string_annot_to_json filenames))
+             (JsonUtil.of_option (Loc.string_annoted_to_json ~filenames))
              (Loc.yojson_of_annoted ~filenames
                 (rule_to_json filenames mix_to_json var_to_json)))
           c.rules );
@@ -1697,8 +1685,8 @@ let compil_to_json c =
       ( "configurations",
         JsonUtil.of_list
           (JsonUtil.of_pair
-             (string_annot_to_json filenames)
-             (JsonUtil.of_list (string_annot_to_json filenames)))
+             (Loc.string_annoted_to_json ~filenames)
+             (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
     ]
 
@@ -1724,13 +1712,13 @@ let compil_of_json = function
          tokens =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST token sig")
-             (string_annoted_of_json filenames)
+             (Loc.string_annoted_of_json ~filenames)
              (List.assoc "tokens" l);
          variables =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST variables")
              (JsonUtil.to_pair
-                (string_annoted_of_json filenames)
+                (Loc.string_annoted_of_json ~filenames)
                 (Loc.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json)))
              (List.assoc "variables" l);
@@ -1738,7 +1726,7 @@ let compil_of_json = function
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST rules")
              (JsonUtil.to_pair
-                (JsonUtil.to_option (string_annoted_of_json filenames))
+                (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
                 (Loc.annoted_of_yojson ~filenames
                    (rule_of_json filenames mix_of_json var_of_json)))
              (List.assoc "rules" l);
@@ -1782,8 +1770,8 @@ let compil_of_json = function
            JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "AST configuration")
              (JsonUtil.to_pair
-                (string_annoted_of_json filenames)
-                (JsonUtil.to_list (string_annoted_of_json filenames)))
+                (Loc.string_annoted_of_json ~filenames)
+                (JsonUtil.to_list (Loc.string_annoted_of_json ~filenames)))
              (List.assoc "configurations" l);
          volumes = [];
        }
