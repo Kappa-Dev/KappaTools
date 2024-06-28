@@ -2,7 +2,7 @@ name: ci
 on: [push]
 jobs:
   install-ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix: # 2x2 versions ran here, with 2 different ocaml versions and with/without labltk
@@ -45,7 +45,7 @@ jobs:
             _build/default/_doc/_html/kappa-library
 
   python:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,7 +73,7 @@ jobs:
         run: opam exec -- nosetests -v tests/kappy
 
   js:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -139,7 +139,7 @@ jobs:
             Kappapp.app.zip
 
   windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -167,7 +167,7 @@ jobs:
 
   deploy-docs:
     needs: install-ubuntu
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
@@ -185,7 +185,7 @@ jobs:
 
   deploy-js:
     needs: js
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
@@ -203,7 +203,7 @@ jobs:
 
   deploy-macos:
     needs: macos
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
@@ -221,7 +221,7 @@ jobs:
 
   deploy-windows:
     needs: windows
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
