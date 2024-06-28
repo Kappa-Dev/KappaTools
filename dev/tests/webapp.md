@@ -20,12 +20,12 @@ Second level: what to check additionnally
 #### Load and editor
 - open the app
 - load file https://tools.kappalanguage.org/try/?model=https%3A//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka
-- make an error in the file, for instance delete last character in line 21 > %obs: 'Cuu' |C(x1{u},x2{u})| 
-  check that the error is displayed in the gutter, in the code underlined in red, at the bottom right : > 1/1[abc.ka] Illegal definition of variable 'Cuu' 
+- make an error in the file, for instance delete last character in line 21 `%obs: 'Cuu' |C(x1{u},x2{u})|`
+  check that the error is displayed in the gutter, in the code underlined in red, at the bottom right : `1/1[abc.ka] Illegal definition of variable 'Cuu' `
 - undo the error e.g. ctrl+z
-- add at the end of the file: > %agent: D(a{u p})
+- add at the end of the file: `%agent: D(a{u p})`
   - check that warning dead agent is shown in the gutter and at the bottom right
-- add > 'd' D(a{p}) -> D(a{u}) @ 1
+- add `'d' D(a{p}) -> D(a{u}) @ 1`
   - check that the dead rule warning show up in the same way
 - delete those lines
 - click twice on toggle to check the opening/closure
@@ -39,7 +39,7 @@ Second level: what to check additionnally
 - Change back to Tabular, click Track cursor. click on different rules in the editor to see that it changes in the subpanel; click on previous/next similarly
 - export to json and check that info is present in the file
 - Go to constraints subpanel, see that the two views domain are populated
-- Go to polymers, see that it shows > The size of biomolecular compounds is uniformly bounded.
+- Go to polymers, see that it shows `The size of biomolecular compounds is uniformly bounded.`
 
 #### Simulation, plot
 - Add `[T] > 10` in `Pause if`, click on start, see that it showed "running" with events and time, and now Paused
@@ -57,18 +57,18 @@ Second level: what to check additionnally
 - Change to Snapshot tab, enter $SNAPSHOT in the Simulation perturbation and click intervention, see that the snapshot shows up
 - Click on kappa and change display to graph, play with the graph settings
 - Change back to kappa, continue/pause the simulation, make a new snapshot, and test to switch between snapshot
-- TODO: this currently doesn't work, adapt this when it does : - Go to outputs, run > $PRINT "time: ".[T]  and  > $PLOTENTRY   see that it shows up  
+- TODO: this currently doesn't work, adapt this when it does : - Go to outputs, run `$PRINT "time: ".[T] ` and  `$PLOTENTRY` see that it shows up  
 - Go back to log tab and see the previous interventions show up
 - Click on `All outputs` in the simutation, check that the following files are present and not empty: log.txt, inputs.ka, flux.json, flux.html, data.csv, snap and snap_xxxxxx
 
 #### Files
 - Hit clear to clear up the simulation
-- File>export and download the file
+- File>export and download the file as abc.ka
 - Reload the app (or close the file), file> open, open back the file
 - File> new enter a name as `test.ka`, fill with the contents: https://www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/causality/causality_slide_10.ka
   - See the update of the contact map with both
 - Start simulation, See if both file show up on the plot tab
-- Select file abc.ka, close it
+- Select file abc.ka, close it, see update in contact map
 
 #### Stories
 - Click get trace at the bottom and check file, json with empty trace
