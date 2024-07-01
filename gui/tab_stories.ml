@@ -81,12 +81,12 @@ let log_panel =
   [
     Ui_common.navtabs "storylognavtab"
       [
-        "story_computation_log", None, ReactiveData.RList.empty;
+        "stories_computation_log", None, ReactiveData.RList.empty;
         "story_info_log", None, ReactiveData.RList.empty;
       ];
     Ui_common.navcontent [ "panel-scroll" ]
       [
-        "story_computation_log", [], [ log_div ];
+        "stories_computation_log", [], [ log_div ];
         "story_info_log", [ "panel-pre" ], [ Tyxml_js.R.Html5.txt current_info ];
       ];
   ]
