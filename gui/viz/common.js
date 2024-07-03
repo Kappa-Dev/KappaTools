@@ -67,7 +67,7 @@ var stdsimProcesses = [];
 
 function spawnProcess(param){
     const spawn = require('child_process').spawn;
-    const process = spawn(param.command, param.args);
+    const process = spawn(param.command, param.args, {shell: true});
     // log pid
     function failure(param,message){
 	if(param.onError){
