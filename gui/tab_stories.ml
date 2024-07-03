@@ -176,8 +176,9 @@ let rec inspect_stories () =
           manager#story_list []
       in
       let () = list_control story_list_from_manager in
+      let manager_is_computing = manager#is_computing in
       let log_lines =
-        if manager#is_computing then
+        if manager_is_computing then
           "Computing stories…" :: manager#story_log
         else
           (* TODO: check if story_log below should be live and isn't? *)
@@ -185,10 +186,8 @@ let rec inspect_stories () =
           :: manager#story_log
       in
       let () = log_control log_lines in
-      set_a_story ())
-  >>= fun _ ->
-  State_project.eval_with_project ~label:"Stories computing" (fun manager ->
-      Lwt.return (Result_util.ok manager#is_computing))
+      set_a_story () >>= fun _ ->
+      Lwt.return (Result_util.ok manager_is_computing))
   >>= Result_util.fold
         ~ok:(fun is_computing ->
           if is_computing && React.S.value tab_is_active then
