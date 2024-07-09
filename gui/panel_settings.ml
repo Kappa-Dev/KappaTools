@@ -301,7 +301,10 @@ module DivErrorMessage : Ui_common.Div = struct
     let () =
       dom##.onclick :=
         Dom.handler (fun _ ->
-            let () = Common.debug (Js.string "file_click_handler") in
+            let () =
+              Common.debug ~loc:__LOC__
+                (Js.string "[Panel_settings] clicked file_click_handler")
+            in
             let message : Api_types_t.message option =
               get_message (Hooked.S.v error_index)
                 (Hooked.S.v State_error.errors)
@@ -324,7 +327,10 @@ module DivErrorMessage : Ui_common.Div = struct
     let () =
       dom##.onclick :=
         Dom.handler (fun _ ->
-            let () = Common.debug (Js.string "index_click_handler") in
+            let () =
+              Common.debug ~loc:__LOC__
+                (Js.string "[Panel_settings] clicked index_click_handler")
+            in
             let index : int option =
               sanitize_index (Hooked.S.v error_index)
                 (Hooked.S.v State_error.errors)

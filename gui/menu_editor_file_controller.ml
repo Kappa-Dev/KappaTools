@@ -21,7 +21,12 @@ let create_file ?(text = Lwt.return (Js.string "")) (file_id : string) : unit =
       >>= fun _ -> Lwt.return_unit)
 
 let set_file (file_id : string) : unit =
-  let () = Common.debug (Js.string (Format.sprintf "set_file:%s" file_id)) in
+  let () =
+    Common.debug ~loc:__LOC__
+      (Js.string
+         (Format.sprintf "[Menu_editor_file_controller.set_file] file `%s`"
+            file_id))
+  in
   Common.async __LOC__ (fun () ->
       State_error.wrap ~append:true __LOC__
         ( State_file.select_file file_id None >>= fun r ->

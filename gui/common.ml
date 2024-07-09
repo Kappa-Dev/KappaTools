@@ -17,23 +17,35 @@ let toss : 'a 'b. 'a -> 'b =
 let id value =
   Js.Unsafe.fun_call (Js.Unsafe.js_expr "id") [| Js.Unsafe.inject value |]
 
-let debug value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "debug") [| Js.Unsafe.inject value |]
+let debug ~loc value =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "debug")
+    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
 
-let info value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "info") [| Js.Unsafe.inject value |]
+let log ~loc value =
+  Js.Unsafe.fun_call (Js.Unsafe.js_expr "log")
+    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
 
-let notice value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "notice") [| Js.Unsafe.inject value |]
+let info ~loc value =
+  Js.Unsafe.fun_call (Js.Unsafe.js_expr "info")
+    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
 
-let warning value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "warning") [| Js.Unsafe.inject value |]
+let warn ~loc value =
+  Js.Unsafe.fun_call (Js.Unsafe.js_expr "warn")
+    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
 
-let error value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "error") [| Js.Unsafe.inject value |]
+let error ~loc value =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "error")
+    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
 
-let fatal value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "fatal") [| Js.Unsafe.inject value |]
+let log_group label =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "log_group")
+    [| Js.Unsafe.inject label |]
+
+let log_group_end () : unit =
+  Js.Unsafe.fun_call (Js.Unsafe.js_expr "log_group_end") [||]
 
 let jquery_on (selector : string) (event : string) handler =
   Js.Unsafe.fun_call
@@ -106,11 +118,11 @@ let ajax_request ?(timeout : float option) ~(url : string) ~(meth : meth)
       Js.Unsafe.inject
         (Js.wrap_callback (fun status response ->
              let () =
-               debug
+               debug ~loc:__LOC__
                  (Js.string
                     ("request " ^ url ^ " answer: " ^ string_of_int status))
              in
-             let () = debug response in
+             let () = debug ~loc:__LOC__ response in
              handler status (Js.to_string response)));
       Js.Unsafe.inject
         (Js.Opt.option
@@ -126,8 +138,10 @@ let ajax_request ?(timeout : float option) ~(url : string) ~(meth : meth)
 let async loc (task : unit -> 'a Lwt.t) : unit =
   Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
       Lwt.catch task (fun exn ->
-          let () = info (Js.string (loc ^ Printexc.to_string exn)) in
-          let () = debug (Js.string (Printexc.get_backtrace ())) in
+          let () =
+            info ~loc:__LOC__ (Js.string (loc ^ Printexc.to_string exn))
+          in
+          let () = debug ~loc:__LOC__ (Js.string (Printexc.get_backtrace ())) in
           Lwt.return_unit))
 
 let guid () : string =

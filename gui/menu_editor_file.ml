@@ -214,7 +214,9 @@ let content =
 let order_files (element : Dom_html.element Js.t) =
   let filenames : string list =
     Common.children_value element "li[data-file-id]" (fun element ->
-        let () = Common.debug element in
+        let () = Common.log_group "[Menu_editor_file.order_files]" in
+        let () = Common.debug ~loc:__LOC__ element in
+        let () = Common.log_group_end () in
         Js.Opt.case
           (element_get_filename element)
           (fun () -> failwith "missing filename")
@@ -266,7 +268,13 @@ let onload () =
   let () =
     Common.jquery_on "span[data-file-id]" "click"
       (Dom_html.handler (fun (event : Dom_html.event Js.t) ->
-           (* let () = Common.debug event in *)
+           (*
+           let () =
+             Common.log_group "[Menu_editor_file] clicked span[data-file-id]"
+           in
+           let () = Common.debug ~loc:__LOC__ event in
+           let () = Common.log_group_end () in
+*)
            let target : Dom_html.element Js.t Js.opt = event##.target in
            let file_id : Js.js_string Js.t Js.opt =
              Js.Opt.bind target (fun (element : Dom_html.element Js.t) ->
@@ -290,7 +298,9 @@ let onload () =
             if file_dropdown_menu_id = id then
               order_files element
             else
-              Common.debug (Format.sprintf "unexpected id %s" id)))
+              Common.debug ~loc:__LOC__
+                (Format.sprintf
+                   "[Menu_editor_file] file dropdown : unexpected id %s" id)))
   in
   let () =
     Common.jquery_on
@@ -313,7 +323,13 @@ let onload () =
              Js.Opt.case file_id
                (fun _ -> ())
                (fun file_id ->
-                 let () = Common.debug file_id in
+                 let () =
+                   Common.log_group
+                     "[Menu_editor_file] triggered \
+                      input.file_compile_checkbox, file_id:"
+                 in
+                 let () = Common.debug ~loc:__LOC__ file_id in
+                 let () = Common.log_group_end () in
                  let () =
                    Menu_editor_file_controller.set_file_compile
                      (Js.to_string file_id) is_checked

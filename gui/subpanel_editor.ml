@@ -250,7 +250,6 @@ let onload () : unit =
   in
   let () =
     Hooked.E.register move_cursor_hook (fun pos ->
-        let () = Common.debug "hook move cursor!" in
         if Some pos.Loc.file = React.S.value filename then (
           let beg = pos.Loc.from_position in
           let first =

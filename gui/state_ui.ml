@@ -22,7 +22,7 @@ let rec loop (h : unit -> unit Lwt.t) (t : float) () : unit Lwt.t =
 
 let loop_sync () : unit Lwt.t =
   if React.S.value State_settings.synch then (
-    let () = Common.debug (Js.string "loop sync") in
+    let () = Common.debug ~loc:__LOC__ (Js.string "[State_ui.loop_sync]") in
     sync ()
   ) else
     Lwt.return_unit

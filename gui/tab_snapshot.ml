@@ -102,7 +102,11 @@ let format_select_id = "format_select_id"
 
 let render_snapshot_graph (snapshot_js : Js_snapshot.snapshot Js.t)
     (snapshot : Data.snapshot) : unit =
-  let () = Common.debug (Js.string (Data.string_of_snapshot snapshot)) in
+  let () = Common.log_group "Render snapshot" in
+  let () =
+    Common.debug ~loc:__LOC__ (Js.string (Data.string_of_snapshot snapshot))
+  in
+  let () = Common.log_group_end () in
   match React.S.value display_format with
   | Graph ->
     let json : string = Data.string_of_snapshot snapshot in
@@ -121,7 +125,9 @@ let select_snapshot (snapshot_js : Js_snapshot.snapshot Js.t) : unit =
         let fileindex : string = Js.to_string snapshot_select_dom##.value in
         try Js.some (int_of_string fileindex) with _ -> Js.null)
   in
-  let () = Common.debug index in
+  let () = Common.log_group "Select snapshot" in
+  let () = Common.debug ~loc:__LOC__ index in
+  let () = Common.log_group_end () in
   let model : State_simulation.t = React.S.value State_simulation.model in
   let simulation_output : Api_types_t.simulation_info option =
     State_simulation.model_simulation_info model
@@ -358,7 +364,9 @@ let onload () : unit =
   let () =
     snapshot_select_dom##.onchange
     := Dom_html.handler (fun _ ->
-           let () = Common.debug "onchange" in
+           let () =
+             Common.debug ~loc:__LOC__ "Trigger of snapshot_select_dom"
+           in
            let () = select_snapshot snapshot_js in
            Js._true)
   in

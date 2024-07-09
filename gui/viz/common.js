@@ -4,7 +4,7 @@ var wrap = function(fn){
     return function(){
         try { return fn.apply(this, arguments);
             } catch(ex){
-                error(ex.stack);
+                console.error(ex.stack);
                 throw ex;
             }
     };
@@ -45,21 +45,29 @@ var args = function () {
     var found = false;
     window.level = {};
 
-    var levels = ["debug","info","notice","warning","error","fatal" ];
+    var levels = ["debug","info","log","warn","error"];
     for (var i in levels){
         var level = levels[i];
         // allow other modules to access levels via window.level[level]
         window.level[level] = level;
         if(args.level && args.level === level) { found = true; }
         if(found) {
-            window[level] = function(x){
-                console.log(x);
-            }
+            // returning the function in a bind.call allows to keep the line info
+            window[level] = function(){
+              return Function.prototype.bind.call(console[level], console);
+            }();
         } else {
             window[level] = function(x){ }
         }
     }
+
+  window.log_group = function(x){console.group(x)};
+  window.log_group_end = function(){console.groupEnd()};
 })();
+
+
+
+
 // https://medium.com/@graeme_boy/how-to-optimize-cpu-intensive-work-in-node-js-cdc09099ed41#.2vhd0cp4g
 // http://www.codingdefined.com/2014/08/difference-between-fork-spawn-and-exec.html
 // param {command,args,onStdout,onStderr,onClose}
@@ -68,25 +76,32 @@ var stdsimProcesses = [];
 function spawnProcess(param){
     const spawn = require('child_process').spawn;
     const process = spawn(param.command, param.args, {shell: true});
-    // log pid
-    function failure(param,message){
-	if(param.onError){
-	    debug(message);
-	    param.onError();
-	}
-	return null;
+
+  function spawnFailure(param,message){
+    if(param.onError){
+        // pid is logged here
+        console.error(message);
+        param.onError();
     }
+    return null;
+  }
+
     try {
 	process.stdout.setEncoding('utf8');
-	debug(`spawned process ${param.command} ${param.args} pid ${process.pid}`);
+	console.debug(`spawned process ${param.command} ${param.args} pid ${process.pid}`);
 	if(param.onStdout) {
 	    process.stdout.on('data',
 			      function (data) {
-				  debug(data);
+				  console.group(`received stdout from process with command ${param.command} pid ${process.pid}:`);
+          console.debug(data);
+          console.groupEnd();
 				  param.onStdout(data); } );
 	}
 	if(param.onStderr) {
 	    process.stderr.on('data',function (data) {
+				console.group(`received stderr from process with command ${param.command} pid ${process.pid}:`);
+        console.error(data);
+        console.groupEnd();
 		param.onStderr(`${data}`);
 	    } );
 	}
@@ -97,17 +112,21 @@ function spawnProcess(param){
 	    process.on('error',param.onError);
 	}
 	if(process && process.pid) {
-	    return { write : function(data){ debug(data);
-					     process.stdin.write(data); } ,
+	    return { 
+        write : function(data){ 
+				  console.group(`send data to process with command ${param.command} pid ${process.pid}:`);
+          console.debug(data);
+          console.groupEnd();
+			    process.stdin.write(data); } ,
 		     kill : function(){ process.kill(); }
 		   };
 	} else {
-	    return failure(param,
+	    return spawnFailure(param,
 			  `spawned failed ${param.command} ${param.args} pid ${process.pid}`);
 	}
 	stdsimProcesses.push(process);
     } catch(err){
-	return failure(param,err.message);
+	return spawnFailure(param,err.message);
     }
 }
 
@@ -177,7 +196,7 @@ function plotPNG(plotDivId,title,plotName,plotStyleId){
               document.body.removeChild(a);
           };
           image.onerror = function(e){
-              debug(e);
+              console.error("Error when plotting PNG: ", e);
           }
           image.src = imgsrc;
 
@@ -250,7 +269,9 @@ function ajaxRequest(url,type,data,handler,timeout){
 	parameter.timeout = timeout;
     }
     if(data){ parameter.data = data; }
-    debug(parameter);
+    console.group("ajax request: ");
+    console.debug(parameter);
+    console.groupEnd();
     $.ajax(parameter)
      .done(function( data, textStatus, jqXHR )
 	   { var status = jqXHR.status;

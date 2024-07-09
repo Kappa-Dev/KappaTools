@@ -387,8 +387,13 @@ let rec init_plot_period (arg : string list) : unit =
   | h :: t ->
     (try set_plot_period (float_of_string h)
      with Failure _ ->
-       let msg = Format.sprintf "failed to parse init_plot_period '%s'" h in
-       let () = Common.debug (Js.string msg) in
+       let msg =
+         Format.sprintf
+           "[State_project.init_plot_period] failed to parse init_plot_period \
+            '%s'"
+           h
+       in
+       let () = Common.error ~loc:__LOC__ (Js.string msg) in
        init_plot_period t)
 
 let init_pause_condition (arg : string list) : unit =
@@ -402,8 +407,11 @@ let rec init_model_seed (arg : string list) : unit =
   | h :: t ->
     (try set_plot_period (float_of_string h)
      with Failure _ ->
-       let msg = Format.sprintf "failed to parse model_seed '%s'" h in
-       let () = Common.debug (Js.string msg) in
+       let msg =
+         Format.sprintf
+           "[State_project.init_model_seed] failed to parse model_seed '%s'" h
+       in
+       let () = Common.error ~loc:__LOC__ (Js.string msg) in
        init_model_seed t)
 
 let init_store_trace (arg : string list) : unit =
@@ -546,8 +554,8 @@ let init existing_projects : unit Lwt.t =
                   errors
               in
               let () =
-                Common.debug
-                  (Js.string (Format.sprintf "State_project.init 2 : %s" msg))
+                Common.error ~loc:__LOC__
+                  (Js.string (Format.sprintf "[State_project.init] 2 : %s" msg))
               in
               add_projects projects)
   in

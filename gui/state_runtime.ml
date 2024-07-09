@@ -30,7 +30,10 @@ let read_spec : string -> spec option = function
   | "WebWorker" -> Some WebWorker
   | "Embedded" -> Some Embedded
   | url ->
-    let () = Common.debug (Js.string (Format.sprintf "parse_remote: %s" url)) in
+    let () =
+      Common.log_group
+        (Format.sprintf "[State_runtime.read_spec] parse_remote: %s" url)
+    in
     let format_url url =
       let length = String.length url in
       if length > 0 && String.get url (length - 1) == '/' then
@@ -44,10 +47,13 @@ let read_spec : string -> spec option = function
           http.Url.hu_path_string
       in
       let () =
-        Common.debug (Js.string (Format.sprintf "cleaned : %s" cleaned))
+        Common.debug ~loc:__LOC__
+          (Js.string (Format.sprintf "cleaned : %s" cleaned))
       in
       format_url cleaned
     in
+    let () = Common.log_group_end () in
+
     (match Url.url_of_string url with
     | None -> None
     | Some parsed ->
@@ -122,8 +128,10 @@ class embedded () : Api.concrete_manager =
            method log ?exn (msg : string) =
              let () = ignore exn in
              let () =
-               Common.debug
-                 (Js.string (Format.sprintf "embedded_manager#log: %s" msg))
+               Common.debug ~loc:__LOC__
+                 (Js.string
+                    (Format.sprintf
+                       "[State_runtime.embedded] embedded_manager#log: %s" msg))
              in
              Lwt.return_unit
          end
@@ -204,8 +212,11 @@ let create_manager ~is_new project_id =
   | Remote { label = _; protocol = HTTP url } ->
     let version_url : string = Format.sprintf "%s/v2" url in
     let () =
-      Common.debug
-        (Js.string (Format.sprintf "set_runtime_url: %s" version_url))
+      Common.debug ~loc:__LOC__
+        (Js.string
+           (Format.sprintf
+              "[State_runtime.create_manager] set_runtime_url HTTP: %s"
+              version_url))
     in
     Js_of_ocaml_lwt.XmlHttpRequest.perform_raw
       ~response_type:XmlHttpRequest.Text version_url
@@ -231,15 +242,27 @@ let create_manager ~is_new project_id =
       Lwt.return (Api_common.result_error_msg error_msg)
     )
   | Remote { label; protocol = CLI cli } ->
-    let () = Common.debug (Js.string ("set_runtime_url: " ^ cli.url)) in
+    let () =
+      Common.debug ~loc:__LOC__
+        (Js.string
+           ("[State_runtime.create_manager] set_runtime_url CLI: " ^ cli.url))
+    in
     (try
        let js_node_runtime = new JsNode.manager cli.command cli.args in
        if js_node_runtime#is_running then (
-         let () = Common.debug (Js.string "set_runtime_url:sucess") in
+         let () =
+           Common.debug ~loc:__LOC__
+             (Js.string
+                "[State_runtime.create_manager] set_runtime_url: success")
+         in
          let () = State_settings.set_synch false in
          Lwt.return (Result_util.ok (js_node_runtime :> Api.concrete_manager))
        ) else (
-         let () = Common.debug (Js.string "set_runtime_url:failure") in
+         let () =
+           Common.debug ~loc:__LOC__
+             (Js.string
+                "[State_runtime.create_manager] set_runtime_url: failure")
+         in
          let error_msg : string =
            Format.sprintf "Could not start cli runtime %s " label
          in
@@ -299,8 +322,10 @@ let init () =
   | Remote { label = _; protocol = HTTP url } ->
     let version_url : string = Format.sprintf "%s/v2" url in
     let () =
-      Common.debug
-        (Js.string (Format.sprintf "set_runtime_url: %s" version_url))
+      Common.debug ~loc:__LOC__
+        (Js.string
+           (Format.sprintf "[State_runtime.init] set_runtime_url: %s"
+              version_url))
     in
     Js_of_ocaml_lwt.XmlHttpRequest.perform_raw
       ~response_type:XmlHttpRequest.Text version_url
