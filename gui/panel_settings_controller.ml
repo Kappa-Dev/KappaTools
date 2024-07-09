@@ -33,7 +33,10 @@ let pause_simulation () =
 
 let stop_simulation () =
   Common.async __LOC__ (fun () ->
-      let () = Common.debug (Js.string "subpanel_editor_controller.stop") in
+      let () =
+        Common.debug ~loc:__LOC__
+          (Js.string "[subpanel_editor_controller.stop_simulation]")
+      in
       State_error.wrap __LOC__ (State_simulation.stop_simulation ())
       >>= fun _ -> Lwt.return_unit)
 

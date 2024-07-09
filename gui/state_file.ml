@@ -84,7 +84,9 @@ let send_refresh (line : int option) : unit Api.result Lwt.t =
     else
       get_file ()
       >>= Api_common.result_bind_lwt ~ok:(fun (content, filename) ->
-              let () = Common.debug content in
+              let () = Common.log_group "Refresh file" in
+              let () = Common.debug ~loc:__LOC__ content in
+              let () = Common.log_group_end () in
               let () =
                 Hooked.E.send refresh_file_hook { filename; content; line }
               in
@@ -380,11 +382,12 @@ let load_default () : unit Lwt.t =
         ~error:(fun errors ->
           let msg =
             Format.asprintf
-              "State_file.load_default : creating default file error@ @[<v>%a@]"
+              "[State_file.load_default]: creating default file error@ \
+               @[<v>%a@]"
               (Pp.list Pp.space Result_util.print_message)
               errors
           in
-          let () = Common.debug (Js.string msg) in
+          let () = Common.error ~loc:__LOC__ (Js.string msg) in
           Lwt.return_unit)
 
 let load_models () : unit Lwt.t =
@@ -443,8 +446,8 @@ let load_models () : unit Lwt.t =
               errors
           in
           let () =
-            Common.debug
-              (Js.string (Format.sprintf "State_file.load_model %s" msg))
+            Common.error ~loc:__LOC__
+              (Js.string (Format.sprintf "[State_file.load_model] %s" msg))
           in
           add_models models load_file)
   in

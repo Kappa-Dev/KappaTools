@@ -9,8 +9,10 @@
 class system_process () : Kappa_facade.system_process =
   object
     method log ?exn (msg : string) =
-      let () = Common.debug exn in
-      let () = Common.debug msg in
+      let () = Common.log_group "KaSimWorker log: exn and msg" in
+      let () = Common.debug ~loc:__LOC__ exn in
+      let () = Common.debug ~loc:__LOC__ msg in
+      let () = Common.log_group_end () in
       Lwt.return_unit
 
     method yield () : unit Lwt.t = Js_of_ocaml_lwt.Lwt_js.yield ()

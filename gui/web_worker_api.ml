@@ -24,7 +24,9 @@ class manager () =
         kasa_worker##.onmessage :=
           Dom.handler (fun response_message ->
               let response_text = response_message##.data in
-              let () = Common.debug response_text in
+              let () = Common.log_group "Message received from kasa_worker" in
+              let () = Common.debug ~loc:__LOC__ response_text in
+              Common.log_group_end ();
               let () = Kasa_client.receive kasa_mailbox response_text in
               Js._true)
       in
@@ -32,7 +34,9 @@ class manager () =
         kamoha_worker##.onmessage :=
           Dom.handler (fun response_message ->
               let response_text = response_message##.data in
-              let () = Common.debug response_text in
+              let () = Common.log_group "Message received from kamoha_worker" in
+              let () = Common.debug ~loc:__LOC__ response_text in
+              Common.log_group_end ();
               let () = Kamoha_client.receive kamoha_mailbox response_text in
               Js._true)
       in
@@ -40,7 +44,9 @@ class manager () =
         kastor_worker##.onmessage :=
           Dom.handler (fun response_message ->
               let response_text = response_message##.data in
-              let () = Common.debug response_text in
+              let () = Common.log_group "Message received from kastor_worker" in
+              let () = Common.debug ~loc:__LOC__ response_text in
+              Common.log_group_end ();
               let () = Kastor_client.receive update_stor_state response_text in
               Js._true)
       in
@@ -89,21 +95,27 @@ class manager () =
       Kasa_client.new_uniform_client
         ~is_running:(fun () -> true)
         ~post:(fun message_text ->
-          let () = Common.debug (Js.string message_text) in
+          let () = Common.log_group "Message posted to kasa_worker" in
+          let () = Common.debug ~loc:__LOC__ (Js.string message_text) in
+          let () = Common.log_group_end () in
           kasa_worker##postMessage message_text)
         kasa_mailbox
 
     inherit
       Kamoha_client.new_client
         ~post:(fun message_text ->
-          let () = Common.debug (Js.string message_text) in
+          let () = Common.log_group "Message posted to kamoha_worker" in
+          let () = Common.debug ~loc:__LOC__ (Js.string message_text) in
+          let () = Common.log_group_end () in
           kamoha_worker##postMessage message_text)
         kamoha_mailbox
 
     inherit
       Kastor_client.new_client
         ~post:(fun message_text ->
-          let () = Common.debug (Js.string message_text) in
+          let () = Common.log_group "Message posted to kastor_worker" in
+          let () = Common.debug ~loc:__LOC__ (Js.string message_text) in
+          let () = Common.log_group_end () in
           kastor_worker##postMessage message_text)
         stor_state
 

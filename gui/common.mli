@@ -8,12 +8,13 @@
 
 val toss : 'a -> 'b
 val id : 'a -> 'b
-val debug : 'a -> 'b
-val info : 'a -> 'b
-val notice : 'a -> 'b
-val warning : 'a -> 'b
-val error : 'a -> 'b
-val fatal : 'a -> 'b
+val debug : loc:string -> 'a -> 'b
+val info : loc:string -> 'a -> 'b
+val log : loc:string -> 'a -> 'b
+val warn : loc:string -> 'a -> 'b
+val error : loc:string -> 'a -> 'b
+val log_group : string -> unit
+val log_group_end : unit -> unit
 val jquery_on : string -> string -> 'a -> 'b
 val option_string : string option -> Js.js_string Js.t Js.opt
 val plotPNG : ?plotStyleId:string -> string -> string -> string -> unit

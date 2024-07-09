@@ -122,7 +122,11 @@ let update_offset (update_offset_input : bool) : unit =
           let plot_offset_input_dom =
             Tyxml_js.To_dom.of_input plot_offset_input
           in
-          let () = Common.debug (Js.string (string_of_int offset_current)) in
+          let () =
+            Common.debug ~loc:__LOC__
+              (Js.string
+                 ("[Tab_plot.update_offset] " ^ string_of_int offset_current))
+          in
           let () =
             plot_offset_input_dom##.value
             := Js.string (string_of_int offset_current)

@@ -17,9 +17,10 @@ let state_error = Hooked.S.create ~debug:"state_error" []
 
 let clear_errors location =
   let () =
-    Common.debug (Js.string (Format.sprintf "Clear_errors %s " location))
+    Common.debug ~loc:__LOC__
+      (Js.string (Format.sprintf "Clear_errors %s " location))
   in
-  Hooked.S.set ~debug:"clear_errors" state_error []
+  Hooked.S.set ~debug:"[State_error.clear_errors]" state_error []
 
 let has_errors () =
   match Hooked.S.v state_error with
@@ -29,9 +30,10 @@ let has_errors () =
 let add_error (location : string) (errors : Result_util.message list) =
   (* log location and errors if debugging is enabled *)
   let () =
-    Common.debug
+    Common.debug ~loc:__LOC__
       (Js.string
-         (Format.asprintf "set_errors { location : \"%s\" , errors : [@[%a@]] }"
+         (Format.asprintf
+            "[State_error.add_error] { location : \"%s\" , errors : [@[%a@]] }"
             location
             (Pp.list Pp.space Result_util.print_message)
             errors))
@@ -41,7 +43,7 @@ let add_error (location : string) (errors : Result_util.message list) =
     { state_error_errors = errors; _state_error_location = location }
     :: current_state_error
   in
-  Hooked.S.set ~debug:"add_errors" state_error new_state_error
+  Hooked.S.set ~debug:"add_error" state_error new_state_error
 
 let errors =
   Hooked.S.bind ~debug:"errors" state_error (fun state_error ->

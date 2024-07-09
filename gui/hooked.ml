@@ -1,3 +1,5 @@
+let debug_printing = false
+
 module S = struct
   type 'a t = {
     mutable value: 'a;
@@ -11,10 +13,13 @@ module S = struct
   let _debug_string (hooked : 'a t) : string = hooked.debug
 
   let _log hooked s =
-    let () =
-      Common.debug (Printf.sprintf "[Hooked.S %s] %s" (_debug_string hooked) s)
-    in
-    ()
+    if debug_printing then (
+      let () =
+        Common.debug ~loc:__LOC__
+          (Printf.sprintf "[Hooked.S %s] %s" (_debug_string hooked) s)
+      in
+      ()
+    )
 
   let create ?(debug : string = "unnamed signal")
       ?(eq : 'a -> 'a -> bool = ( = )) (a : 'a) : 'a t =
@@ -72,10 +77,13 @@ module E = struct
   let _debug_string (hooked : 'a t) : string = hooked.debug
 
   let _log hooked s =
-    let () =
-      Common.debug (Printf.sprintf "[Hooked.E %s] %s" (_debug_string hooked) s)
-    in
-    ()
+    if debug_printing then (
+      let () =
+        Common.debug ~loc:__LOC__
+          (Printf.sprintf "[Hooked.E %s] %s" (_debug_string hooked) s)
+      in
+      ()
+    )
 
   let create ?(debug : string = "unnamed event") () : 'a t =
     let event, send_event = React.E.create () in
