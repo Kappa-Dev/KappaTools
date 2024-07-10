@@ -540,8 +540,11 @@ let init existing_projects : unit Lwt.t =
   let projects = Common_state.url_args ~default:[ "default" ] "project" in
   let rec add_projects projects : unit Lwt.t =
     match projects with
-    | [] -> Lwt.return_unit
+    | [] ->
+      Common.log_group_end ();
+      Lwt.return_unit
     | project :: projects ->
+      let () = Common.debug ~loc:__LOC__ ("add project `" ^ project ^ "`") in
       add_project
         (List.for_all (fun x -> x <> project) existing_projects)
         project
@@ -559,6 +562,7 @@ let init existing_projects : unit Lwt.t =
               in
               add_projects projects)
   in
+  let () = Common.log_group "[State_project.init] add projects" in
   add_projects existing_projects >>= fun () -> add_projects projects
 
 let eval_with_project :

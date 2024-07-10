@@ -77,6 +77,12 @@ function spawnProcess(param){
     const spawn = require('child_process').spawn;
     const process = spawn(param.command, param.args, {shell: true});
 
+  process.on('spawn', () => {debug("[Process] SPAWNED", param.command)});
+  process.on('exit', () => {error("[Process] EXIT", param.command)});
+  process.on('error', () => {error("[Process] ERROR", param.command)});
+  process.on('close', () => {error("[Process] CLOSE", param.command)});
+  process.on('message', () => {debug("[Process] MESSAGE", param.command)});
+
   function spawnFailure(param,message){
     if(param.onError){
         // pid is logged here
