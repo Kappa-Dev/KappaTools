@@ -1,4 +1,4 @@
-
+"use strict";
 // http://stackoverflow.com/questions/326596/how-do-i-wrap-a-function-in-javascript
 var wrap = function(fn){
     return function(){
@@ -75,12 +75,12 @@ var stdsimProcesses = [];
 
 function spawnProcess(param){
     const spawn = require('child_process').spawn;
-    const process = spawn(param.command, param.args, {shell: true});
+    const process = spawn(param.command, param.args);
 
   process.on('spawn', () => {debug("[Process] SPAWNED", param.command)});
-  process.on('exit', () => {error("[Process] EXIT", param.command)});
-  process.on('error', () => {error("[Process] ERROR", param.command)});
-  process.on('close', () => {error("[Process] CLOSE", param.command)});
+  process.on('exit', (code) => {error("[Process] EXIT", param.command, "code:", code, '' + process.stderr.read())});
+  process.on('error', (error) => {error("[Process] ERROR", param.command, "error:", error, '' + process.stderr.read())});
+  process.on('close', (code) => {error("[Process] CLOSE", param.command, "code:", code)});
   process.on('message', () => {debug("[Process] MESSAGE", param.command)});
 
   function spawnFailure(param,message){
@@ -98,16 +98,12 @@ function spawnProcess(param){
 	if(param.onStdout) {
 	    process.stdout.on('data',
 			      function (data) {
-				  console.group(`received stdout from process with command ${param.command} pid ${process.pid}:`);
-          console.debug(data);
-          console.groupEnd();
+				  console.debug(`received stdout from process with command ${param.command} pid ${process.pid}:`, data);
 				  param.onStdout(data); } );
 	}
 	if(param.onStderr) {
 	    process.stderr.on('data',function (data) {
-				console.group(`received stderr from process with command ${param.command} pid ${process.pid}:`);
-        console.error(data);
-        console.groupEnd();
+				console.error(`received stderr from process with command ${param.command} pid ${process.pid}:`, data);
 		param.onStderr(`${data}`);
 	    } );
 	}
@@ -120,9 +116,7 @@ function spawnProcess(param){
 	if(process && process.pid) {
 	    return { 
         write : function(data){ 
-				  console.group(`send data to process with command ${param.command} pid ${process.pid}:`);
-          console.debug(data);
-          console.groupEnd();
+				  console.debug(`send data to process with command ${param.command} pid ${process.pid}:`, data);
 			    process.stdin.write(data); } ,
 		     kill : function(){ process.kill(); }
 		   };

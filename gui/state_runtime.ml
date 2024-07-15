@@ -56,7 +56,31 @@ let read_spec : string -> spec option = function
 
     (match Url.url_of_string url with
     | None -> None
-    | Some parsed ->
+    | Some raw_parsed ->
+      (* On windows, removes the leading `/` left by js_of_ocaml url parsing on file:///C:/path` windows URLs *)
+      let clean_parsed_when_on_windows raw_parsed =
+        match raw_parsed with
+        | Url.Http _ | Url.Https _ -> raw_parsed
+        | Url.File file_url ->
+          if
+            file_url.Url.fu_path_string.[0] == '/'
+            && file_url.Url.fu_path_string.[2] == ':'
+          then (
+            let () =
+              Common.debug ~loc:__LOC__
+                "Windows file address translated from js_of_ocaml error"
+            in
+            Url.File
+              {
+                file_url with
+                Url.fu_path_string =
+                  String.sub file_url.Url.fu_path_string 1
+                    (String.length file_url.Url.fu_path_string - 1);
+              }
+          ) else
+            raw_parsed
+      in
+      let parsed = clean_parsed_when_on_windows raw_parsed in
       let protocol : protocol =
         match parsed with
         | Url.Http http -> HTTP ("http://" ^ cleaned_url http)
