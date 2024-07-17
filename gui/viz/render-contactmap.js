@@ -22,7 +22,8 @@ class ContactMap {
         let w = d3.select(this.id).node().getBoundingClientRect().width - margin.left - margin.right;
         let h = d3.select(this.id).node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5 - 34 - 15;
         if (map.data) {
-	    map.clearData();
+	          map.clearData();
+
             let layout = new Layout(map, new Dimension(w, h), margin);
             let renderer = new Render(root, layout, tip, this.coloring, this.selection, this.nodemapping);
             renderer.generateLinks();
@@ -35,7 +36,7 @@ class ContactMap {
         map.data = new DataStorage(JSON.parse(response),0);
         map.data.sortNodes();
         map.data.sortSites();
-	map.redraw();
+	      map.redraw();
     }
 
     // for snapshot contact maps

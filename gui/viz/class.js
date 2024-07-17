@@ -420,7 +420,12 @@ class DataStorage {
             find(d.name, d);
         });
 
-        return d3.hierarchy(map[""]);
+        // Prevent root to be undefined when the contact map is empty (seemingly only with electron)
+        let root = map[""];
+        if (!root) {
+          root = {name: "root", children: []};
+        }
+        return d3.hierarchy(root);
     }
 
     generateForceDirectedNodes() {
