@@ -17,11 +17,13 @@ First level of dashes: what to do
 
 Second level: what to check additionnally
 
+#### Open the app
+- open the app with argument `?level=debug`, open the browser console. If on electron, this is done by modifying `main.js`. use it in the following to check if operations trigger errors that would not be visible in the interface
+
 #### Load and editor
-- open the app
 - load file https://tools.kappalanguage.org/try/?model=https%3A//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka
 - make an error in the file, for instance delete last character in line 21 `%obs: 'Cuu' |C(x1{u},x2{u})|`
-  check that the error is displayed in the gutter, in the code underlined in red, at the bottom right : `1/1[abc.ka] Illegal definition of variable 'Cuu' `
+  check that the error is displayed in the gutter on the left, and in the code underlined in red, and at the bottom right : `1/1[abc.ka] Illegal definition of variable 'Cuu' `
 - undo the error e.g. ctrl+z
 - add at the end of the file: `%agent: D(a{u p})`
   - check that warning dead agent is shown in the gutter and at the bottom right
@@ -29,10 +31,12 @@ Second level: what to check additionnally
   - check that the dead rule warning show up in the same way
 - delete those lines
 - click twice on toggle to check the opening/closure
+- Resize the window and see that no error is shown in the console
 
 
 #### Right subpanel
 - Contact map is present, see that it changes when clicked on - interactive mode - show all states
+- zoom with mouse wheel, reset with button `Reset Zoom`
 - export to svg and check the picture
 - Go to influences: is it populated?
 - Change rendering to graph, change accuracy to high, see that it changes; play with size radius controls
@@ -64,7 +68,7 @@ Second level: what to check additionnally
 #### Files
 - Hit clear to clear up the simulation
 - File>export and download the file as abc.ka
-- Reload the app (or close the file), file> open, open back the file
+- Close the file, then file> open, open back the file
 - File> new enter a name as `test.ka`, fill with the contents: https://www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/causality/causality_slide_10.ka
   - See the update of the contact map with both
 - Start simulation, See if both file show up on the plot tab
@@ -89,6 +93,6 @@ Second level: what to check additionnally
 
 #### Other subpanel analysis tools
 - Load https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/poly.ka and see the polymers subpanel show info about chain possibilities
-- Load https://www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/local_views/local_views_slide_69.ka , check in the constraints panel that info is shown for all except counters (or https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/large/sos/sos.ka )
+- Load https://www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/local_views/local_views_slide_69.ka , check in the constraints panel that info is shown for all except counters, that the last rule is flagged as a dead rule
 - Load https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/tests/integration/compiler/counters_2_levels/counter_2.ka , check that counters info show in constraints panel
 - Load https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/large/minikai/minikai_counters.ka change accuracy contact map: d shows up or not
