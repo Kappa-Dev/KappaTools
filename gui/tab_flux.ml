@@ -179,7 +179,7 @@ let content () : [> Html_types.div ] Html.elt list =
   ]
 
 let navli () : [> `PCDATA | `Span ] Html.elt ReactiveData.RList.t =
-  Ui_common.badge (fun state ->
+  Ui_common_with_sim.badge (fun state ->
       match state with
       | None -> 0
       | Some state ->

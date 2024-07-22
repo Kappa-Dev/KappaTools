@@ -30,7 +30,7 @@ let snapshot_count (state : Api_types_j.simulation_info option) : int =
     state.Api_types_j.simulation_info_output
       .Api_types_j.simulation_output_snapshots
 
-let navli () = Ui_common.badge (fun state -> snapshot_count state)
+let navli () = Ui_common_with_sim.badge (fun state -> snapshot_count state)
 let select_id = "snapshot-select-id"
 let display_id = "snapshot-map-display"
 
@@ -352,7 +352,11 @@ let xml () =
   |}]
 
 let content () =
-  [ Ui_common.toggle_element (fun state -> snapshot_count state > 0) (xml ()) ]
+  [
+    Ui_common_with_sim.toggle_element
+      (fun state -> snapshot_count state > 0)
+      (xml ());
+  ]
 
 let onload () : unit =
   let snapshot_select_dom : Dom_html.inputElement Js.t =

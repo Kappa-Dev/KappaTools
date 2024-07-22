@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let nav_tab_id = "navtabs"
+let navtabs_id = "navtabs"
 
 let navtabs () =
   let story_class =
@@ -20,7 +20,7 @@ let navtabs () =
          State_project.model)
   in
   Tyxml_js.To_dom.of_ul
-  @@ Ui_common.navtabs nav_tab_id
+  @@ Ui_common.navtabs navtabs_id
        [
          "editor", None, Tab_editor.navli ();
          "log", None, Tab_log.navli ();

@@ -99,7 +99,7 @@ let content () =
                 in
                 List.rev_append acc [ li_new; li_prefs ])
               State_project.model));
-      Ui_common.create_modal ~id:project_id_modal_id ~title_label:"New Project"
+      Ui_common.create_modal_text_input ~id:project_id_modal_id ~title_label:"New Project"
         ~body:
           [
             [%html

@@ -8,6 +8,41 @@
 
 open Lwt.Infix
 
+(** Manages worker message reception.
+
+    Opens modal to avert the user by default, can be disabled to keep original exception in developer tools by providing to the app the `?no_exc_modal=true` argument *)
+let worker_onmessage ~(debug_printing : bool) ~(worker_name : string)
+    ~(exception_creates_modal : bool) ~(worker_receive_f : string -> unit) :
+    ( (string, string) Worker.worker Js.t,
+      string Worker.messageEvent Js.t )
+    Dom.event_listener =
+  let process_message
+      (response_message :
+        < data : < get : string ; .. > Js.gen_prop ; .. > Js.t) : bool Js.t =
+    let response_text = response_message##.data in
+    if debug_printing then (
+      let () = Common.log_group ("Message received from " ^ worker_name) in
+      let () = Common.debug ~loc:__LOC__ response_text in
+      Common.log_group_end ()
+    );
+    let () = worker_receive_f response_text in
+    Js._true
+  in
+  let handler_f : string Worker.messageEvent Js.t -> bool Js.t =
+    if exception_creates_modal then (
+      fun response_message ->
+    try process_message response_message
+    with _ as e ->
+      Ui_common.open_modal_error ~is_critical:true
+        ~error_content:
+          ("Worker " ^ worker_name ^ " raised the following exception: \r"
+         ^ Printexc.to_string e);
+      raise e
+    ) else
+      process_message
+  in
+  Dom.handler handler_f
+
 class manager () =
   let kasa_worker = Worker.create "KaSaWorker.js" in
   let kasa_mailbox = Kasa_client.new_mailbox () in
@@ -15,74 +50,56 @@ class manager () =
   let kamoha_mailbox = Kamoha_client.new_mailbox () in
   let kastor_worker = Worker.create "KaStorWorker.js" in
   let stor_state, update_stor_state = Kastor_client.init_state () in
+
   object (self)
     val sim_worker = Worker.create "KaSimWorker.js"
     val mutable is_running = true
 
     initializer
-      let () =
-        kasa_worker##.onmessage :=
-          Dom.handler (fun response_message ->
-              let response_text = response_message##.data in
-              let () = Common.log_group "Message received from kasa_worker" in
-              let () = Common.debug ~loc:__LOC__ response_text in
-              Common.log_group_end ();
-              let () = Kasa_client.receive kasa_mailbox response_text in
-              Js._true)
+      (* The url argument `no_exc_modal=true` disables exception modals to keep exception info clear in console. *)
+      let no_exc_modal_arg : string list =
+        Common_state.url_args "no_exc_modal"
       in
-      let () =
-        kamoha_worker##.onmessage :=
-          Dom.handler (fun response_message ->
-              let response_text = response_message##.data in
-              let () = Common.log_group "Message received from kamoha_worker" in
-              let () = Common.debug ~loc:__LOC__ response_text in
-              Common.log_group_end ();
-              let () = Kamoha_client.receive kamoha_mailbox response_text in
-              Js._true)
+      let send_worker_exceptions_to_modal =
+        not
+          (match no_exc_modal_arg with
+          | s :: _ when String.equal s "true" -> true
+          | _ -> false)
       in
-      let () =
-        kastor_worker##.onmessage :=
-          Dom.handler (fun response_message ->
-              let response_text = response_message##.data in
-              let () = Common.log_group "Message received from kastor_worker" in
-              let () = Common.debug ~loc:__LOC__ response_text in
-              Common.log_group_end ();
-              let () = Kastor_client.receive update_stor_state response_text in
-              Js._true)
+
+      kasa_worker##.onmessage :=
+        worker_onmessage ~debug_printing:true ~worker_name:"kasa_worker"
+          ~exception_creates_modal:send_worker_exceptions_to_modal
+          ~worker_receive_f:(Kasa_client.receive kasa_mailbox);
+      kamoha_worker##.onmessage :=
+        worker_onmessage ~debug_printing:true ~worker_name:"kamoha_worker"
+          ~exception_creates_modal:send_worker_exceptions_to_modal
+          ~worker_receive_f:(Kamoha_client.receive kamoha_mailbox);
+      kastor_worker##.onmessage :=
+        worker_onmessage ~debug_printing:true ~worker_name:"kastor_worker"
+          ~exception_creates_modal:send_worker_exceptions_to_modal
+          ~worker_receive_f:(Kastor_client.receive update_stor_state);
+      sim_worker##.onmessage :=
+        worker_onmessage ~debug_printing:false ~worker_name:"sim_worker"
+          ~exception_creates_modal:send_worker_exceptions_to_modal
+          ~worker_receive_f:self#receive;
+
+      let onerror ~worker_name =
+        Dom.handler (fun _ ->
+            let error_string : string =
+              "Error in " ^ worker_name ^ ", it might not be running anymore."
+            in
+            let () = Common.debug ~loc:__LOC__ error_string in
+            Ui_common.open_modal_error ~is_critical:false
+              ~error_content:error_string;
+
+            let () = is_running <- false in
+            Js._true)
       in
-      let () =
-        sim_worker##.onmessage :=
-          Dom.handler
-            (fun (response_message : string Worker.messageEvent Js.t) ->
-              let response_text : string = response_message##.data in
-              let () = self#receive response_text in
-              Js._true)
-      in
-      let () =
-        sim_worker##.onerror :=
-          Dom.handler (fun _ ->
-              let () = is_running <- false in
-              Js._true)
-      in
-      let () =
-        kasa_worker##.onerror :=
-          Dom.handler (fun _ ->
-              let () = is_running <- false in
-              Js._true)
-      in
-      let () =
-        kamoha_worker##.onerror :=
-          Dom.handler (fun _ ->
-              let () = is_running <- false in
-              Js._true)
-      in
-      let () =
-        kastor_worker##.onerror :=
-          Dom.handler (fun _ ->
-              let () = is_running <- false in
-              Js._true)
-      in
-      ()
+      sim_worker##.onerror := onerror ~worker_name:"sim_worker";
+      kasa_worker##.onerror := onerror ~worker_name:"kasa_worker";
+      kamoha_worker##.onerror := onerror ~worker_name:"kamoha_worker";
+      kastor_worker##.onerror := onerror ~worker_name:"kastor_worker"
 
     method private sleep timeout = Js_of_ocaml_lwt.Lwt_js.sleep timeout
 

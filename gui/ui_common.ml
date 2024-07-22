@@ -8,21 +8,6 @@
 
 module Html = Tyxml_js.Html5
 
-let toggle_element (projection : Api_types_j.simulation_info option -> bool)
-    (content : [< Html_types.div_content_fun ] Html.elt Html.list_wrap) =
-  Html.div
-    ~a:
-      [
-        Tyxml_js.R.Html.a_class
-          (React.S.bind State_simulation.model (fun model ->
-               React.S.const
-                 (if projection (State_simulation.t_simulation_info model) then
-                    [ "show" ]
-                  else
-                    [ "hidden" ])));
-      ]
-    content
-
 let option_label label =
   if String.length label > 10 then
     String.sub label 0 7 ^ "..."
@@ -92,53 +77,6 @@ let export_controls ~(export_select_id : string) ~(export_filename_id : string)
 
 let document = Dom_html.window##.document
 
-let label_news tab_is_active counter =
-  let last_value =
-    ref
-      (let simulation_info =
-         State_simulation.t_simulation_info
-           (React.S.value State_simulation.model)
-       in
-       counter simulation_info)
-  in
-  ReactiveData.RList.from_signal
-    (React.S.l2
-       (fun tab_active model ->
-         if tab_active then
-           []
-         else (
-           let simulation_info = State_simulation.t_simulation_info model in
-           let v = counter simulation_info in
-           if v <> !last_value && v > 0 then (
-             let () = last_value := v in
-             [
-               Html.txt " ";
-               Html.span
-                 ~a:[ Html.a_class [ "label"; "label-default" ] ]
-                 [ Html.txt "New" ];
-             ]
-           ) else
-             []
-         ))
-       tab_is_active State_simulation.model)
-
-let badge (counter : Api_types_j.simulation_info option -> int) =
-  ReactiveData.RList.from_signal
-    (React.S.map
-       (fun model ->
-         let simulation_info = State_simulation.t_simulation_info model in
-         let count = counter simulation_info in
-         if count > 0 then
-           [
-             Html.txt " ";
-             Html.span
-               ~a:[ Html.a_class [ "badge" ] ]
-               [ Html.txt (string_of_int count) ];
-           ]
-         else
-           [])
-       State_simulation.model)
-
 let arguments (key : string) : string list =
   List.map snd (List.filter (fun (k, _) -> key = k) Url.Current.arguments)
 
@@ -176,13 +114,13 @@ let navli label force_class decorations =
         text;
     ]
 
-let navtabs nav_tab_id = function
+let navtabs navtabs_id = function
   | [] | (_, Some _, _) :: _ -> Common.toss "ui_common.navtabs : missing tabs"
   | (ti, None, l) :: t ->
     Html.ul
       ~a:
         [
-          Html.a_id nav_tab_id;
+          Html.a_id navtabs_id;
           Html.a_class [ "nav"; "nav-tabs" ];
           Html.Unsafe.string_attrib "role" "tablist";
         ]
@@ -221,7 +159,7 @@ let navcontent ?id classes = function
       (onenavcontent t true cl c
       :: List.map (fun (t, cl, c) -> onenavcontent t false cl c) l)
 
-let level ?debug ?info ?notice ?warning ?error ?fatal () : 'a list =
+let level ?debug ?info ?log ?warning ?error () : 'a list =
   let level : string list = arguments "level" in
   let extract key value =
     match value with
@@ -232,9 +170,8 @@ let level ?debug ?info ?notice ?warning ?error ?fatal () : 'a list =
       else
         []
   in
-  extract "debug" debug @ extract "info" info @ extract "notice" notice
-  @ extract "warning" warning @ extract "error" error @ extract "fatal" fatal
-  @ []
+  extract "debug" debug @ extract "info" info @ extract "log" log
+  @ extract "warning" warning @ extract "error" error @ []
 
 let features ?(default = []) (options : (string * 'a) list) : 'a list =
   let features : string list = arguments "feature" in
@@ -299,7 +236,7 @@ let id_dom (id : string) : 'a Js.t =
            (Format.sprintf "ui_common.id_dom : could not find id %s" id))
       : Dom_html.element Js.t)
 
-let create_modal ~(id : string) ~(title_label : string)
+let create_modal_text_input ~(id : string) ~(title_label : string)
     ~(body : [< Html_types.div_content_fun ] Html.elt Html.list_wrap)
     ~(submit_label : string) ~(submit : ('self Js.t, _ Js.t) Dom.event_listener)
     : [> Html_types.div ] Html.elt =
@@ -364,3 +301,112 @@ let create_modal ~(id : string) ~(title_label : string)
           ]
         [ form ];
     ]
+
+let create_modal_error ~(id : string) ~(is_critical : bool)
+    ~(error_content : string) : [> Html_types.div ] Html.elt =
+  let button_type : string =
+    if is_critical then
+      "btn-danger"
+    else
+      "btn-primary"
+  in
+  let button =
+    Html.button
+      ~a:
+        [
+          Html.a_button_type `Button;
+          Html.a_class [ "btn"; button_type ];
+          Html.Unsafe.string_attrib "data-dismiss" "modal";
+        ]
+      [ Html.txt "Return to app" ]
+  in
+
+  let title_label =
+    if is_critical then
+      "Critical error."
+    else
+      "Error."
+  in
+
+  let body =
+    [
+      Html.txt
+        ("The Kappa app has encountered a "
+        ^ (if is_critical then
+             "critical "
+           else
+             "")
+        ^ "error:");
+      Html.pre [ Html.code [ Html.txt error_content ] ];
+    ]
+  in
+
+  (* TODO simplify *)
+  let backdrop_attrib =
+    if is_critical then
+      Html.Unsafe.string_attrib "data-backdrop" "static"
+    else
+      Html.Unsafe.string_attrib "data-backdrop" "true"
+  in
+
+  let form =
+    Html.form
+      ~a:[ Html.a_class [ "modal-content" ] ]
+      [
+        Html.div
+          ~a:[ Html.a_class [ "modal-header" ] ]
+          [
+            Html.button
+              ~a:
+                [
+                  Html.Unsafe.string_attrib "type" "button";
+                  Html.a_class [ "close" ];
+                  Html.Unsafe.string_attrib "data-dismiss" "modal";
+                  Html.Unsafe.string_attrib "aria-label" "Close";
+                ]
+              [
+                Html.span
+                  ~a:[ Html.Unsafe.string_attrib "aria-hidden" "true" ]
+                  [ Html.entity "times" ];
+              ];
+            Html.h4 [ Html.cdata title_label ];
+          ];
+        Html.div ~a:[ Html.a_class [ "modal-body" ] ] body;
+        Html.div ~a:[ Html.a_class [ "modal-footer" ] ] [ button ];
+      ]
+  in
+  Html.div
+    ~a:
+      [
+        Html.a_class [ "modal"; "fade" ];
+        Html.a_id id;
+        Html.Unsafe.string_attrib "tabindex" "-1";
+        Html.Unsafe.string_attrib "role" "dialog";
+        backdrop_attrib;
+      ]
+    [
+      Html.div
+        ~a:
+          [
+            Html.a_class [ "modal-dialog" ];
+            Html.Unsafe.string_attrib "role" "document";
+          ]
+        [ form ];
+    ]
+
+let () = Random.self_init ()
+let index_modal = ref 0
+
+let new_modal_error_id () =
+  incr index_modal;
+  "modal_error_id-" ^ string_of_int !index_modal
+
+let open_modal_error ~(is_critical : bool) ~(error_content : string) : unit =
+  let id = new_modal_error_id () in
+
+  let modal =
+    Tyxml_js.To_dom.of_div (create_modal_error ~id ~is_critical ~error_content)
+  in
+  let main = id_dom "main" in
+  Dom.appendChild main modal;
+  Common.modal ~id:("#" ^ id) ~action:"show"

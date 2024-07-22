@@ -197,7 +197,7 @@ let content =
     Tyxml_js.R.Html.ul
       ~a:[ Html.a_id file_dropdown_menu_id; Html.a_class [ "dropdown-menu" ] ]
       li_list;
-    Ui_common.create_modal ~id:file_new_modal_id ~title_label:"New File"
+    Ui_common.create_modal_text_input ~id:file_new_modal_id ~title_label:"New File"
       ~body:
         [ [%html {|<div class="input-group">|} [ file_new_input ] {|</div>|}] ]
       ~submit_label:"Create File"

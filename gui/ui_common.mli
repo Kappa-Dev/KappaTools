@@ -8,21 +8,12 @@
 
 module Html = Tyxml_js.Html5
 
-val toggle_element :
-  (Api_types_j.simulation_info option -> bool) ->
-  [< Html_types.div_content_fun ] Html.elt list ->
-  [> Html_types.div ] Html.elt
-
 val export_controls :
   export_select_id:string ->
   export_filename_id:string ->
   export_button_id:string ->
   export_data_label:string ->
   [> Html_types.div ] Html.elt
-
-val badge :
-  (Api_types_j.simulation_info option -> int) ->
-  [> `PCDATA | `Span ] Html.elt Tyxml_js.Wrap.tlist
 
 val arguments : string -> string list
 val version : ?test:'a option -> prod:'a -> dev:'a -> 'a
@@ -79,20 +70,27 @@ val navtabs :
 val level :
   ?debug:'a ->
   ?info:'a ->
-  ?notice:'a ->
+  ?log:'a ->
   ?warning:'a ->
   ?error:'a ->
-  ?fatal:'a ->
   unit ->
   'a list
 
-val create_modal :
+val create_modal_text_input :
   id:string ->
   title_label:string ->
   body:[< Html_types.div_content_fun ] Html.elt list ->
   submit_label:string ->
   submit:('a Js.t, Dom_html.submitEvent Js.t) Dom_html.event_listener ->
   [> Html_types.div ] Html.elt
+
+val create_modal_error :
+  id:string ->
+  is_critical:bool ->
+  error_content:string ->
+  [> Html_types.div ] Html.elt
+
+val open_modal_error : is_critical:bool -> error_content:string -> unit
 
 val navcontent :
   ?id:string ->
@@ -101,11 +99,5 @@ val navcontent :
   [> Html_types.div ] Html.elt
 
 val option_label : string -> string
-
-val label_news :
-  bool Tyxml_js.Wrap.t ->
-  (Api_types_j.simulation_info option -> int) ->
-  [> `PCDATA | `Span ] Html.elt Tyxml_js.Wrap.tlist
-
 val features : ?default:'a list -> (string * 'a) list -> 'a list
 val input_change : Dom_html.inputElement Js.t -> (string -> unit) -> unit
