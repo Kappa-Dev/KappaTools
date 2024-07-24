@@ -65,6 +65,21 @@ var args = function () {
   window.log_group_end = function(){console.groupEnd()};
 })();
 
+var modal_next_id = 1;
+
+// Duplicated in ocaml in ui_common.ml. TODO: merge the logic?
+function modalError(error_str) {
+  const modal_id = 'modal_error_id-' + modal_next_id.toString();
+  modal_next_id += 1;
+
+  const h = '<div class="modal fade in" id="' + modal_id 
+    + '" tabindex="-1" role="dialog" data-backdrop="static" style="display: block;"><div class="modal-dialog" role="document"><form class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button><h4>Critical error.</h4></div><div class="modal-body">The Kappa app has encountered a critical error:<pre><code>'
+    + error_str
+    + '</code></pre>The app will not behave properly after this, please save your files to avoid data loss and reload the app. Consider <a href="https://github.com/Kappa-Dev/KappaTools/issues">opening an issue</a>.</div><div class="modal-footer"><button type="button" class="btn btn-danger" data-dismiss="modal">Return to app</button></div></form></div></div>';
+
+  document.body.insertAdjacentHTML( 'afterbegin', h );
+  $('#' +modal_id).modal()
+}
 
 
 
@@ -78,8 +93,15 @@ function spawnProcess(param){
     const process = spawn(param.command, param.args);
 
   process.on('spawn', () => {debug("[Process] SPAWNED", param.command)});
-  process.on('exit', (code) => {error("[Process] EXIT", param.command, "code:", code, '' + process.stderr.read())});
-  process.on('error', (error) => {error("[Process] ERROR", param.command, "error:", error, '' + process.stderr.read())});
+  process.on('exit', (code) => {
+    var error_str = "[Process] EXIT " + param.command + " code: " + code + ' ' + process.stderr.read();
+    error(error_str);
+    modalError(error_str);
+  });
+  process.on('error', (error) => {
+    var error_str = "[Process] ERROR " + param.command + " error: " + error + ' ' + process.stderr.read();
+    error(error_str);
+  });
   process.on('close', (code) => {error("[Process] CLOSE", param.command, "code:", code)});
   process.on('message', () => {debug("[Process] MESSAGE", param.command)});
 
@@ -87,6 +109,7 @@ function spawnProcess(param){
     if(param.onError){
         // pid is logged here
         console.error(message);
+        modalError(message);
         param.onError();
     }
     return null;

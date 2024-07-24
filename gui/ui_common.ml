@@ -302,6 +302,7 @@ let create_modal_text_input ~(id : string) ~(title_label : string)
         [ form ];
     ]
 
+(* Duplicated in js in common.js. TODO: merge the logic? *)
 let create_modal_error ~(id : string) ~(is_critical : bool)
     ~(error_content : string) : [> Html_types.div ] Html.elt =
   let button_type : string =
@@ -339,9 +340,25 @@ let create_modal_error ~(id : string) ~(is_critical : bool)
         ^ "error:");
       Html.pre [ Html.code [ Html.txt error_content ] ];
     ]
+    @
+    if is_critical then
+      [
+        Html.txt
+          "The app will not behave properly after this, please save your files \
+           to avoid data loss and reload the app. Please consider ";
+        Html.a
+          ~a:
+            [
+              Html.Unsafe.string_attrib "href"
+                "https://github.com/Kappa-Dev/KappaTools/issues";
+            ]
+          [ Html.txt "opening an issue" ];
+        Html.txt ".";
+      ]
+    else
+      []
   in
 
-  (* TODO simplify *)
   let backdrop_attrib =
     if is_critical then
       Html.Unsafe.string_attrib "data-backdrop" "static"
