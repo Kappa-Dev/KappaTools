@@ -98,6 +98,6 @@ val navcontent :
   (string * string list * [< Html_types.div_content_fun ] Html.elt list) list ->
   [> Html_types.div ] Html.elt
 
-val option_label : string -> string
+val option_label : ?max_size:int -> string -> string
 val features : ?default:'a list -> (string * 'a) list -> 'a list
 val input_change : Dom_html.inputElement Js.t -> (string -> unit) -> unit

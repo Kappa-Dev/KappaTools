@@ -4,12 +4,6 @@ For now, tests to be done manually in the app
 
 Should be done in each considered brower and in the electron app, and importantly at least on windows and mac
 
-## TODOs : to add to the procedure
-Doesn't show up at the time of writing:
-- outputs
-
-## Not tested in the procedure
-
 
 ## Test procedure
 
@@ -61,7 +55,7 @@ Second level: what to check additionnally
 - Change to Snapshot tab, enter $SNAPSHOT in the Simulation perturbation and click intervention, see that the snapshot shows up
 - Click on kappa and change display to graph, play with the graph settings
 - Change back to kappa, continue/pause the simulation, make a new snapshot, and test to switch between snapshot
-- TODO: this currently doesn't work, adapt this when it does : - Go to outputs, run `$PRINT "time: ".[T] ` and  `$PLOTENTRY` see that it shows up  
+- Go to outputs, run `$PRINT "time: ".[T] > "time.txt"` and  `$PRINT 'AB' > "ab.txt"` see that it shows up, run a bit the simulation, run one of them again, check that we can see all values
 - Go back to log tab and see the previous interventions show up
 - Click on `All outputs` in the simutation, check that the following files are present and not empty: log.txt, inputs.ka, flux.json, flux.html, data.csv, snap and snap_xxxxxx
 

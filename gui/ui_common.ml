@@ -8,9 +8,9 @@
 
 module Html = Tyxml_js.Html5
 
-let option_label label =
-  if String.length label > 10 then
-    String.sub label 0 7 ^ "..."
+let option_label ?(max_size = 24) label =
+  if String.length label > max_size then
+    String.sub label 0 (max_size - 1) ^ "..."
   else
     label
 
