@@ -23,7 +23,8 @@ type _ handle =
         * (Public_data.rule, Public_data.var) Public_data.influence_node option
         * Public_data.influence_map)
         handle
-  | Short_influence_node : (int, int) Public_data.influence_node option handle
+  (* Commented as unused at the moment. See warning 37 *)
+  (*   | Short_influence_node : (int, int) Public_data.influence_node option handle *)
   | Influence_node
       : (Public_data.rule, Public_data.var) Public_data.influence_node option
         handle
@@ -99,12 +100,14 @@ let receive mailbox x =
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread
                (Result_util.map Public_data.local_influence_map_of_json json)
+           (*
            | B (Short_influence_node, thread) ->
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread
                (Result_util.map
                   (JsonUtil.to_option Public_data.short_influence_node_of_json)
                   json)
+*)
            | B (Influence_node, thread) ->
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread
@@ -342,7 +345,7 @@ class virtual new_client ~is_running ~post mailbox =
             ])
 
     method get_influence_map_node_at ~filename pos =
-      self#message Short_influence_node (fun b ->
+      self#message Influence_node (fun b ->
           JsonUtil.write_sequence b
             [
               (fun b -> Yojson.Basic.write_string b "INFLUENCE_MAP_NODE_AT");

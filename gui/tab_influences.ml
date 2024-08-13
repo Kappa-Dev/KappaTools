@@ -13,19 +13,19 @@ type model_graph = { fwd: int option; bwd: int option; total: int }
 
 type influence_sphere = {
   positive_on:
-    ((Public_data.rule, Public_data.var) Public_data.influence_node
+    (Public_data.refined_influence_node
     * Public_data.location Public_data.pair list)
     list;
   negative_on:
-    ((Public_data.rule, Public_data.var) Public_data.influence_node
+    (Public_data.refined_influence_node
     * Public_data.location Public_data.pair list)
     list;
   positive_by:
-    ((Public_data.rule, Public_data.var) Public_data.influence_node
+    (Public_data.refined_influence_node
     * Public_data.location Public_data.pair list)
     list;
   negative_by:
-    ((Public_data.rule, Public_data.var) Public_data.influence_node
+    (Public_data.refined_influence_node
     * Public_data.location Public_data.pair list)
     list;
 }
@@ -38,7 +38,7 @@ type model_rendering = DrawGraph of model_graph | DrawTabular of unit
 type model = {
   rendering: model_rendering;
   accuracy: Public_data.accuracy_level option;
-  origin: (int, int) Public_data.influence_node option;
+  origin: Public_data.short_influence_node option;
   origin_label: string option;
 }
 
@@ -155,7 +155,7 @@ let recenter =
         Html.a_button_type `Button;
         Html.a_class [ "form-control"; "btn"; "btn-default" ];
       ]
-    [ Html.txt "Reset" ]
+    [ Html.txt "First node" ]
 
 let track_cursor_switch =
   Html.button
@@ -462,32 +462,38 @@ let rec fill_table acc by on =
     fill_table (line :: acc) by' on'
   )
 
-let draw_table origin_label
+let draw_table origin_label_opt
     { positive_on; positive_by; negative_on; negative_by } =
-  let by =
-    List_util.rev_map_append
-      (fun x -> x, false)
-      negative_by
-      (List.rev_map (fun x -> x, true) positive_by)
+  let origin_label, outs =
+    match origin_label_opt with
+    | None ->
+      if not (React.S.value track_cursor) then
+        "Navigate through the nodes using the controls above.", []
+      else
+        "Click on a rule or variable in the editor.", []
+    | Some label ->
+      let by =
+        List_util.rev_map_append
+          (fun x -> x, false)
+          negative_by
+          (List.rev_map (fun x -> x, true) positive_by)
+      in
+      let on =
+        List_util.rev_map_append
+          (fun x -> x, false)
+          negative_on
+          (List.rev_map (fun x -> x, true) positive_on)
+      in
+      let outs = fill_table [] by on in
+      label, outs
   in
-  let on =
-    List_util.rev_map_append
-      (fun x -> x, false)
-      negative_on
-      (List.rev_map (fun x -> x, true) positive_on)
-  in
-  let outs = fill_table [] by on in
   Html.tablex
     ~a:[ Html.a_class [ "table" ] ]
     ~thead:
       (Html.thead
          [
            Html.tr
-             [
-               Html.th
-                 ~a:[ Html.a_colspan 2 ]
-                 [ Html.cdata (Option_util.unsome "origin" origin_label) ];
-             ];
+             [ Html.th ~a:[ Html.a_colspan 2 ] [ Html.cdata origin_label ] ];
            Html.tr
              [
                Html.th [ Html.cdata "is influenced by" ];
@@ -652,17 +658,23 @@ let neither_gc_me =
        State_project.dummy_model State_project.model)
     model
 
+let update_model_with_origin_refined origin_refined =
+  let origin =
+    Option_util.map Public_data.short_node_of_refined_node origin_refined
+  in
+  let origin_label = Option_util.map influence_node_label origin_refined in
+  update_model (fun m -> { m with origin; origin_label })
+
 let nor_gc_me =
   State_file.with_current_pos
     ~on:(React.S.Bool.( && ) tab_is_active track_cursor)
     (fun filename cursor_pos ->
       Some
-        (State_project.eval_with_project ~label:__LOC__
-           (fun (manager : Api.concrete_manager) ->
-             manager#get_influence_map_node_at ~filename cursor_pos
-             >|= Result_util.map (fun origin' ->
-                     update_model (fun m ->
-                         { m with origin = origin'; origin_label = None })))))
+        (State_error.wrap "influence_map_node_at"
+           (State_project.eval_with_project ~label:__LOC__
+              (fun (manager : Api.concrete_manager) ->
+                manager#get_influence_map_node_at ~filename cursor_pos
+                >|= Result_util.map update_model_with_origin_refined))))
     (Lwt.return (Result_util.ok ()))
 
 let parent_hide () = set_tab_is_active false
@@ -746,18 +758,7 @@ let onload () =
                (State_project.eval_with_project ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
                     manager#get_initial_node
-                    >|= Result_util.map (fun origin_refined ->
-                            let origin =
-                              Option_util.map
-                                Public_data.short_node_of_refined_node
-                                origin_refined
-                            in
-                            let origin_label =
-                              Option_util.map influence_node_label
-                                origin_refined
-                            in
-                            update_model (fun m ->
-                                { m with origin; origin_label }))))
+                    >|= Result_util.map update_model_with_origin_refined))
            in
            Js._true)
   in
@@ -770,18 +771,7 @@ let onload () =
                (State_project.eval_with_project ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
                     manager#get_next_node origin
-                    >|= Result_util.map (fun origin_refined ->
-                            let origin =
-                              Option_util.map
-                                Public_data.short_node_of_refined_node
-                                origin_refined
-                            in
-                            let origin_label =
-                              Option_util.map influence_node_label
-                                origin_refined
-                            in
-                            update_model (fun m ->
-                                { m with origin; origin_label }))))
+                    >|= Result_util.map update_model_with_origin_refined))
            in
            Js._true)
   in
@@ -794,18 +784,7 @@ let onload () =
                (State_project.eval_with_project ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
                     manager#get_previous_node origin
-                    >|= Result_util.map (fun origin_refined ->
-                            let origin =
-                              Option_util.map
-                                Public_data.short_node_of_refined_node
-                                origin_refined
-                            in
-                            let origin_label =
-                              Option_util.map influence_node_label
-                                origin_refined
-                            in
-                            update_model (fun m ->
-                                { m with origin; origin_label }))))
+                    >|= Result_util.map update_model_with_origin_refined))
            in
            Js._true)
   in

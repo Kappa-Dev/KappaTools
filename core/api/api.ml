@@ -115,36 +115,32 @@ class type manager_static_analysis = object
   method get_local_influence_map :
     ?fwd:int ->
     ?bwd:int ->
-    ?origin:(int, int) Public_data.influence_node ->
+    ?origin:Public_data.short_influence_node ->
     total:int ->
     Public_data.accuracy_level option ->
     (Public_data.accuracy_level
     * int
     * int option
     * int option
-    * (Public_data.rule, Public_data.var) Public_data.influence_node option
+    * Public_data.refined_influence_node option
     * Public_data.influence_map)
     result
     Lwt.t
 
   method get_initial_node :
-    (Public_data.rule, Public_data.var) Public_data.influence_node option result
-    Lwt.t
+    Public_data.refined_influence_node option result Lwt.t
 
   method get_next_node :
-    (int, int) Public_data.influence_node option ->
-    (Public_data.rule, Public_data.var) Public_data.influence_node option result
-    Lwt.t
+    Public_data.short_influence_node option ->
+    Public_data.refined_influence_node option result Lwt.t
 
   method get_previous_node :
-    (int, int) Public_data.influence_node option ->
-    (Public_data.rule, Public_data.var) Public_data.influence_node option result
-    Lwt.t
+    Public_data.short_influence_node option ->
+    Public_data.refined_influence_node option result Lwt.t
 
   method get_nodes_of_influence_map :
     Public_data.accuracy_level option ->
-    (Public_data.accuracy_level
-    * (Public_data.rule, Public_data.var) Public_data.influence_node list)
+    (Public_data.accuracy_level * Public_data.refined_influence_node list)
     result
     Lwt.t
 
@@ -197,7 +193,7 @@ class type concrete_manager = object
   method get_influence_map_node_at :
     filename:string ->
     Loc.position ->
-    (int, int) Public_data.influence_node option result Lwt.t
+    Public_data.refined_influence_node option result Lwt.t
 
   method is_running : bool
   method terminate : unit

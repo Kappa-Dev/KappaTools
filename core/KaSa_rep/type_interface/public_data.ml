@@ -436,8 +436,7 @@ let json_to_var = function
 type ('rule, 'var) influence_node = Rule of 'rule | Var of 'var
 type short_influence_node = (int, int) influence_node
 type refined_influence_node = (rule, var) influence_node
-type pos_of_rules_and_vars = short_influence_node Loc.annoted list
-type pos_of_rules_and_vars_refined = refined_influence_node Loc.annoted list
+type pos_of_rules_and_vars = refined_influence_node Loc.annoted list
 
 let influence_node_to_json rule_to_json var_to_json a =
   match a with
@@ -459,32 +458,18 @@ let short_influence_node_of_json =
     (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "rule id"))
     (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "var id"))
 
-let pos_of_rules_and_vars_to_json =
-  JsonUtil.of_list
-    (JsonUtil.of_pair ~lab1:key ~lab2:locality short_influence_node_to_json
-       (fun loc -> Loc.yojson_of_annoted JsonUtil.of_unit ((), loc)))
-
-let pos_of_rules_and_vars_of_json =
-  JsonUtil.to_list
-    (JsonUtil.to_pair ~lab1:key ~lab2:locality short_influence_node_of_json
-       (fun x ->
-         snd
-           (Loc.annoted_of_yojson
-              (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
-              x)))
-
 let refined_influence_node_to_json =
   influence_node_to_json rule_to_json var_to_json
 
 let refined_influence_node_of_json =
   influence_node_of_json json_to_rule json_to_var
 
-let pos_of_rules_and_vars_refined_to_json =
+let pos_of_rules_and_vars_to_json =
   JsonUtil.of_list
     (JsonUtil.of_pair ~lab1:key ~lab2:locality refined_influence_node_to_json
        (fun loc -> Loc.yojson_of_annoted JsonUtil.of_unit ((), loc)))
 
-let pos_of_rules_and_vars_refined_of_json =
+let pos_of_rules_and_vars_of_json =
   JsonUtil.to_list
     (JsonUtil.to_pair ~lab1:key ~lab2:locality refined_influence_node_of_json
        (fun x ->

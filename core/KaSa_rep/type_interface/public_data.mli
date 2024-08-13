@@ -93,18 +93,10 @@ type var = {
 type ('rule, 'var) influence_node = Rule of 'rule | Var of 'var
 type short_influence_node = (int, int) influence_node
 type refined_influence_node = (rule, var) influence_node
-type pos_of_rules_and_vars = short_influence_node Loc.annoted list
-type pos_of_rules_and_vars_refined = refined_influence_node Loc.annoted list
+type pos_of_rules_and_vars = refined_influence_node Loc.annoted list
 
 val pos_of_rules_and_vars_of_json : Yojson.Basic.t -> pos_of_rules_and_vars
 val pos_of_rules_and_vars_to_json : pos_of_rules_and_vars -> Yojson.Basic.t
-
-val pos_of_rules_and_vars_refined_of_json :
-  Yojson.Basic.t -> pos_of_rules_and_vars_refined
-
-val pos_of_rules_and_vars_refined_to_json :
-  pos_of_rules_and_vars_refined -> Yojson.Basic.t
-
 val short_node_of_refined_node : refined_influence_node -> short_influence_node
 val short_influence_node_of_json : Yojson.Basic.t -> short_influence_node
 val short_influence_node_to_json : short_influence_node -> Yojson.Basic.t
