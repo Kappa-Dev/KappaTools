@@ -22,11 +22,7 @@ type message = {
   range: Loc.t option;
 }
 
-type ('a, 'b) t = {
-  value: ('a, 'b) Result.result;
-  status: status;
-  messages: message list;
-}
+type ('a, 'b) t = { value: ('a, 'b) Result.result; status: status }
 
 val write_message : Buffer.t -> message -> unit
 val read_message : Yojson.Safe.lexer_state -> Lexing.lexbuf -> message

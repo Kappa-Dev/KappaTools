@@ -54,11 +54,10 @@ let result_bind_lwt :
     ('ok, 'a_code) Api_types_t.result ->
     ('a_ok, 'a_code) Api_types_t.result Lwt.t =
  fun ~(ok : 'ok -> ('a_ok, 'a_code) Api_types_t.result Lwt.t)
-     { Result_util.value; status; messages } ->
+     { Result_util.value; status } ->
   match value with
   | Result.Ok data -> ok data
-  | Result.Error e ->
-    Lwt.return { Result_util.value = Result.Error e; status; messages }
+  | Result.Error e -> Lwt.return { Result_util.value = Result.Error e; status }
 
 let rec result_fold_lwt :
     f:
