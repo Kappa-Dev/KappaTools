@@ -22,11 +22,7 @@ type message = {
   range: Loc.t option;
 }
 
-type ('a, 'b) t = {
-  value: ('a, 'b) Result.result;
-  status: status;
-  messages: message list;
-}
+type ('a, 'b) t = { value: ('a, 'b) Result.result; status: status }
 
 let write_severity ob x =
   let () = Buffer.add_char ob '"' in
@@ -99,21 +95,17 @@ let print_message f { range; text; _ } =
   | None -> Format.pp_print_string f text
 
 let write_t write__ok write__error ob = function
-  | { value = Result.Ok x; status; messages } ->
+  | { value = Result.Ok x; status } ->
     Buffer.add_string ob "[\"Ok\",";
     write__ok ob x;
     Buffer.add_char ob ',';
     write_status ob status;
-    Buffer.add_char ob ',';
-    JsonUtil.write_list write_message ob messages;
     Buffer.add_char ob ']'
-  | { value = Result.Error x; status; messages } ->
+  | { value = Result.Error x; status } ->
     Buffer.add_string ob "[\"Error\",";
     write__error ob x;
     Buffer.add_char ob ',';
     write_status ob status;
-    Buffer.add_char ob ',';
-    JsonUtil.write_list write_message ob messages;
     Buffer.add_char ob ']'
 
 let string_of_t write__ok write__error ?(len = 1024) x =
@@ -125,8 +117,7 @@ let read_t_content f p lb =
   let v = f p lb in
   let () = JsonUtil.read_between_spaces Yojson.Basic.read_comma p lb in
   let s = read_status p lb in
-  let () = JsonUtil.read_between_spaces Yojson.Basic.read_comma p lb in
-  v, s, Yojson.Basic.read_list read_message p lb
+  v, s
 
 let read_t read__ok read__error p lb =
   let aux_read_t closing p lb =
@@ -139,11 +130,11 @@ let read_t read__ok read__error p lb =
           Yojson.Basic.read_space p lb;
           match String.sub s pos len with
           | "Ok" ->
-            let v, status, messages = read_t_content read__ok p lb in
-            { value = Result.Ok v; status; messages }
+            let v, status = read_t_content read__ok p lb in
+            { value = Result.Ok v; status }
           | "Error" ->
-            let v, status, messages = read_t_content read__error p lb in
-            { value = Result.Error v; status; messages }
+            let v, status = read_t_content read__error p lb in
+            { value = Result.Error v; status }
           | x ->
             raise
               (Yojson.Json_error
@@ -164,8 +155,8 @@ let t_of_string read__ok read__error s =
   read_t read__ok read__error (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
 let lift ?(ok_status = `OK) ?(error_status = `Bad_request) = function
-  | Result.Ok _ as value -> { value; status = ok_status; messages = [] }
-  | Result.Error _ as value -> { value; status = error_status; messages = [] }
+  | Result.Ok _ as value -> { value; status = ok_status }
+  | Result.Error _ as value -> { value; status = error_status }
 
 let fold ~(ok : 'ok -> 'a) ~(error : 'error -> 'a) : ('ok, 'error) t -> 'a =
   function
@@ -181,36 +172,30 @@ let bind :
     (a, err) t =
  fun ?overwrite_status ?(error_status = `Bad_request) ok -> function
   | { value = Result.Error _; _ } as e -> e
-  | { value = Result.Ok o; status; messages } ->
+  | { value = Result.Ok o; status } ->
     (match ok o with
-    | Result.Error _ as value -> { value; status = error_status; messages }
+    | Result.Error _ as value -> { value; status = error_status }
     | Result.Ok _ as value ->
       (match overwrite_status with
-      | None -> { value; status; messages }
-      | Some status -> { value; status; messages }))
+      | None -> { value; status }
+      | Some status -> { value; status }))
 
 let map : type ok a err. (ok -> a) -> (ok, err) t -> (a, err) t =
  fun ok -> function
-  | { value = Result.Ok o; status; messages } ->
-    { value = Result.Ok (ok o); status; messages }
+  | { value = Result.Ok o; status } -> { value = Result.Ok (ok o); status }
   | { value = Result.Error _; _ } as e -> e
 
 let map2 :
     type a b ok err. (a -> b -> ok) -> (a, err) t -> (b, err) t -> (ok, err) t =
  fun f a b ->
   match a, b with
-  | ( { value = Result.Ok a; messages; _ },
-      { value = Result.Ok b; status; messages = m' } ) ->
-    {
-      value = Result.Ok (f a b);
-      status;
-      messages = List.rev_append (List.rev m') messages;
-    }
+  | { value = Result.Ok a; _ }, { value = Result.Ok b; status } ->
+    { value = Result.Ok (f a b); status }
   | ({ value = Result.Error _; _ } as e), _ -> e
   | { value = Result.Ok _; _ }, ({ value = Result.Error _; _ } as e) -> e
 
 let error ?(status = `Bad_request) (error : 'error) : ('ok, 'error) t =
-  { value = Result.Error error; status; messages = [] }
+  { value = Result.Error error; status }
 
 let ok ?(status = `OK) (ok : 'ok) : ('ok, 'error) t =
-  { value = Result.Ok ok; status; messages = [] }
+  { value = Result.Ok ok; status }
