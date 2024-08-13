@@ -28,7 +28,6 @@ module type Type = sig
     state * Yojson.Basic.t
 
   val get_influence_map_nodes_location : state -> state * Yojson.Basic.t
-  val get_influence_map_nodes_location_refined : state -> state * Yojson.Basic.t
 
   val get_influence_map :
     ?accuracy_level:Public_data.accuracy_level ->

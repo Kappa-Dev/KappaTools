@@ -598,6 +598,57 @@ functor
     (*influence_map*)
     (******************************************************************)
 
+    let nrules state =
+      let parameters = Remanent_state.get_parameters state in
+      let state, handler = get_handler state in
+      let error = get_errors state in
+      state, Handler.nrules parameters error handler
+
+    let nvars state =
+      let parameters = Remanent_state.get_parameters state in
+      let state, handler = get_handler state in
+      let error = get_errors state in
+      state, Handler.nvars parameters error handler
+
+    (** Convert a id from type in option `Rule of int` or `Var of int` to an flattened id of type`int`  *)
+    let flattened_id_of_short_node state short_node =
+      let state, nrules = nrules state in
+      ( state,
+        match short_node with
+        | Public_data.Rule a -> a
+        | Public_data.Var a -> a + nrules )
+
+    let flattened_id_of_short_node_opt state short_node_opt =
+      let parameters = get_parameters state in
+      let error = get_errors state in
+      let error, (state, flattened_id) =
+        match short_node_opt with
+        | Some short_node -> error, flattened_id_of_short_node state short_node
+        | None -> Exception.warn parameters error __POS__ Exit (state, 0)
+      in
+      let state = set_errors error state in
+      state, flattened_id
+
+    let refined_node_of_flattened_id state flattened_id =
+      let parameters = get_parameters state in
+      let state, handler = get_handler state in
+      let state, compil = get_c_compilation state in
+      let error = get_errors state in
+      let state, nrules = nrules state in
+      let state, nvars = nvars state in
+      let error, refined_id_opt =
+        if flattened_id < nrules + nvars then (
+          let error, refined_id =
+            refined_node_of_flattened_id parameters error handler compil
+              (Ckappa_sig.rule_id_of_int flattened_id)
+          in
+          error, Some refined_id
+        ) else
+          Exception.warn parameters error __POS__ Exit None
+      in
+      let state = set_errors error state in
+      state, refined_id_opt
+
     let compute_pos_of_rules_and_vars show_title state =
       let parameters = get_parameters state in
       let state, compil = get_c_compilation state in
@@ -616,7 +667,7 @@ functor
           aux inc pos of_int lift (n - 1) (error, (lift n, p) :: l)
         )
       in
-      let error, l =
+      let error, short_nodes =
         aux 0 Handler.pos_of_rule Ckappa_sig.rule_id_of_int
           (fun x -> Public_data.Rule x)
           (nrules - 1)
@@ -624,11 +675,29 @@ functor
              (fun x -> Public_data.Var x)
              (nvars - 1) (error, []))
       in
-      let json = Public_data.pos_of_rules_and_vars_to_json l in
+
+      (* change short_nodes to refined_nodes *)
+      let current_state = ref state in
+      let refined_nodes =
+        short_nodes
+        |> List.map
+             (Loc.map_annot (fun short_node ->
+                  let state, flattened_id =
+                    flattened_id_of_short_node !current_state short_node
+                  in
+                  let state, refined_node_opt =
+                    refined_node_of_flattened_id state flattened_id
+                  in
+                  current_state := state;
+                  Option_util.unsome_or_raise refined_node_opt))
+      in
+      let state = !current_state in
+
+      let json = Public_data.pos_of_rules_and_vars_to_json refined_nodes in
       let _ = Public_data.pos_of_rules_and_vars_of_json json in
       ( Remanent_state.set_errors error
-          (Remanent_state.set_pos_of_rules_and_vars l state),
-        l )
+          (Remanent_state.set_pos_of_rules_and_vars refined_nodes state),
+        refined_nodes )
 
     let get_pos_of_rules_and_vars =
       get_gen ~log_prefix:"Summarize the position of rules and variables"
@@ -998,18 +1067,6 @@ functor
       get_gen
         (Remanent_state.get_influence_map accuracy_level)
         (compute_influence_map ~accuracy_level ~do_we_show_title ~log_title)
-
-    let nrules state =
-      let parameters = Remanent_state.get_parameters state in
-      let state, handler = get_handler state in
-      let error = get_errors state in
-      state, Handler.nrules parameters error handler
-
-    let nvars state =
-      let parameters = Remanent_state.get_parameters state in
-      let state, handler = get_handler state in
-      let error = get_errors state in
-      state, Handler.nvars parameters error handler
 
     let convert_to_birectional_influence_map show_title state influence_map =
       let () = show_title state in

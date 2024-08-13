@@ -10,7 +10,8 @@ open Lwt.Infix
 
 (** Manages worker message reception.
 
-    Opens modal to avert the user by default, can be disabled to keep original exception in developer tools by providing to the app the `?no_exc_modal=true` argument *)
+    Manages the message reception, and opens an error modal to avert the user by default.
+    The modal can be disabled to keep original exception in developer tools by providing to the app the `?no_exc_modal=true` argument *)
 let worker_onmessage ~(debug_printing : bool) ~(worker_name : string)
     ~(exception_creates_modal : bool) ~(worker_receive_f : string -> unit) :
     ( (string, string) Worker.worker Js.t,
@@ -69,7 +70,7 @@ class type concrete_manager_without_kasim = object
   method get_influence_map_node_at :
     filename:string ->
     Loc.position ->
-    (int, int) Public_data.influence_node option Api.lwt_result
+    Public_data.refined_influence_node option Api.lwt_result
 
   method is_running : bool
   method terminate : unit

@@ -238,7 +238,7 @@ let on_message exec_command message_delimiter =
                        in
                        manager#get_influence_map_node_at ~filename pos
                        >>= fun out ->
-                       Lwt.return (B (Short_influence_node, msg_id, out))
+                       Lwt.return (B (Influence_node, msg_id, out))
                      | "INFLUENCE_MAP_ALL_NODES" ->
                        let accuracy_level =
                          JsonUtil.read_next_item Yojson.Basic.read_json st b
