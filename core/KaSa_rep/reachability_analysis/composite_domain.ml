@@ -20,38 +20,38 @@ module type Composite_domain = sig
   val initialize :
     Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
-    Exception.method_handler ->
-    Exception.method_handler * static_information * dynamic_information
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * static_information * dynamic_information
 
   type 'a zeroary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
-    Exception.method_handler * dynamic_information * 'a
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'a
 
   type ('a, 'b) unary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.method_handler * dynamic_information * 'b
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'b
 
   type ('a, 'b, 'c) binary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
-    Exception.method_handler * dynamic_information * 'c
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'c
 
   type ('a, 'b, 'c, 'd) ternary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
     'c ->
-    Exception.method_handler * dynamic_information * 'd
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
   val next_rule : Ckappa_sig.c_rule_id option zeroary
   val add_initial_state : (Analyzer_headers.initial_state, unit) unary
@@ -121,32 +121,32 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   type 'a zeroary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
-    Exception.method_handler * dynamic_information * 'a
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'a
 
   type ('a, 'b) unary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.method_handler * dynamic_information * 'b
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'b
 
   type ('a, 'b, 'c) binary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
-    Exception.method_handler * dynamic_information * 'c
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'c
 
   type ('a, 'b, 'c, 'd) ternary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
     'c ->
-    Exception.method_handler * dynamic_information * 'd
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
   (** push r_id in the working_list *)
 
@@ -390,7 +390,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
               Communication.add_site parameter error agent site
                 modified_sites_blackboard
             in
-            let (error : Exception.method_handler), set =
+            let (error : Exception.exceptions_caught_and_uncaught), set =
               get_partner parameter error (agent, site) dyn_bonds
             in
             Ckappa_sig.AgentSite_map_and_set.Set.fold

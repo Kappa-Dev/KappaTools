@@ -131,7 +131,7 @@ let export_current_din (to_string : Data.din -> string) (mime : string)
   let din_id = Js.to_string (Tyxml_js.To_dom.of_select din_select)##.value in
   State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       manager#simulation_detail_din din_id
-      >>= Api_common.result_bind_lwt ~ok:(fun din ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun din ->
               let data = Js.string (to_string din) in
               let () = Common.saveFile ~data ~mime ~filename in
               Lwt.return (Result_util.ok ())))

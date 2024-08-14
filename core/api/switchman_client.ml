@@ -240,14 +240,15 @@ class virtual new_client ~is_running ~post mailbox =
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "FileCatalog") ])
 
-    method secret_project_parse : Ast.parsing_compil Api.result Lwt.t =
+    method secret_project_parse : Ast.parsing_compil Api.lwt_result =
       Lwt.return
-        (Api_common.result_error_msg "low level project_parse mustn't be used")
+        (Api_common.err_result_of_string
+           "low level project_parse mustn't be used")
 
     method secret_get_pos_of_rules_and_vars
-        : Public_data.pos_of_rules_and_vars Api.result Lwt.t =
+        : Public_data.pos_of_rules_and_vars Api.lwt_result =
       Lwt.return
-        (Api_common.result_error_msg
+        (Api_common.err_result_of_string
            "low level get_pos_of_rules_and_vars mustn't be used")
 
     method project_overwrite file_id ast =
@@ -398,9 +399,10 @@ class virtual new_client ~is_running ~post mailbox =
     (* KaSim *)
     method secret_simulation_load (_ : Pattern.sharing_level)
         (_ : Ast.parsing_compil) (_ : (string * Nbr.t) list)
-        : unit Api.result Lwt.t =
+        : unit Api.lwt_result =
       Lwt.return
-        (Api_common.result_error_msg "low level simulation_load mustn't be used")
+        (Api_common.err_result_of_string
+           "low level simulation_load mustn't be used")
 
     method project_parse ~patternSharing overwrites =
       self#message Nothing (fun b ->

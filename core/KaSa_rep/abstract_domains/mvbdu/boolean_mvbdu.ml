@@ -145,9 +145,9 @@ type unary_memoized_fun =
     association_list_dic,
     range_list_dic,
     variables_list_dic,
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     bool ->
-    Exception.method_handler * (bool Mvbdu_sig.mvbdu, bool) Mvbdu_sig.premvbdu,
+    Exception.exceptions_caught_and_uncaught * (bool Mvbdu_sig.mvbdu, bool) Mvbdu_sig.premvbdu,
     memo_tables,
     memo_tables,
     int )
@@ -1166,7 +1166,7 @@ let extensional_description_of_association_list _parameters error handler list =
     error handler list
 
 let extensional_description_of_range_list _parameters
-    (error : Exception.method_handler)
+    (error : Exception.exceptions_caught_and_uncaught)
     (handler : Remanent_parameters_sig.parameters)
     (list : (memo_tables, 'a, 'b, 'c, 'd, 'e, 'f) Memo_sig.handler)
     (x : (int option * int option) List_sig.list) =
@@ -1392,7 +1392,7 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
         },
         output ) )
 
-let print_boolean_mvbdu parameters (error : Exception.method_handler) =
+let print_boolean_mvbdu parameters (error : Exception.exceptions_caught_and_uncaught) =
   Mvbdu_core.print_mvbdu error
     (fun error parameters a ->
       let _ =
@@ -1415,9 +1415,9 @@ let print_boolean_mvbdu parameters (error : Exception.method_handler) =
 
 let (f :
       Remanent_parameters_sig.parameters ->
-      Exception.method_handler ->
+      Exception.exceptions_caught_and_uncaught ->
       bool Mvbdu_sig.mvbdu ->
-      Exception.method_handler) =
+      Exception.exceptions_caught_and_uncaught) =
   print_boolean_mvbdu
 
 let print_hash1 p error log = Hash_1.print p error print_boolean_mvbdu log
@@ -1518,7 +1518,7 @@ let print_gen log parameters error (title, print_hash, l) =
       print_hash (Remanent_parameters.update_prefix parameters pref) error x)
     error l
 
-let print_memo (error : Exception.method_handler) handler parameters =
+let print_memo (error : Exception.exceptions_caught_and_uncaught) handler parameters =
   let error, l1, l2, l3, l4, l5, l6, l7, l8, l9 = split_memo error handler in
   let () =
     Loggers.fprintf

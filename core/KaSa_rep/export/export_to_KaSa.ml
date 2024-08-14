@@ -14,7 +14,7 @@
 module type Type = sig
   type state
   type parameters = Remanent_parameters_sig.parameters
-  type errors = Exception.method_handler
+  type errors = Exception.exceptions_caught_and_uncaught
   type internal_contact_map
   type internal_scc_decomposition = Remanent_state.internal_scc_decomposition
   type contact_map = Public_data.contact_map

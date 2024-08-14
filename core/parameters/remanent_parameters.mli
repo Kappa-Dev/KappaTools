@@ -356,7 +356,7 @@ val get_compression_status_logger :
 
 val save_error_list :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   unit
 
 val save_progress_bar :

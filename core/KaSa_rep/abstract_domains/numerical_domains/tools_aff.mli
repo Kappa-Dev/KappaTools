@@ -6,9 +6,9 @@ val true_map : ('a -> 'b) -> 'a list -> 'b list
 
 val max_of_list :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   'a list ->
-  Exception_without_parameter.method_handler * 'a option
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'a option
 
 val sum_list : int list -> int
 val member2 : 'a -> ('a * 'b) list -> bool
@@ -19,11 +19,11 @@ val forall : ('a -> bool) -> 'a list -> bool
 
 val tr :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   'a list ->
   'a list ->
   'a ->
-  Exception_without_parameter.method_handler * 'a option
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'a option
 
 val paire_of_list : 'a list -> 'b list -> ('a * 'b) list -> ('a * 'b) list
 val produit_predicat : ('a -> 'a -> bool) -> 'a * 'a -> 'a * 'a -> bool

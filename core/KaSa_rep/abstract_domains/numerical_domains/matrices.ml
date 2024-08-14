@@ -12,17 +12,17 @@ module type Matrice = sig
 
   val mat_of_var_list :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     var list ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 
   val make : Remanent_parameters_sig.parameters -> int -> matrice
 
   val affiche :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val affiche_cons :
     Remanent_parameters_sig.parameters ->
@@ -34,68 +34,68 @@ module type Matrice = sig
 
   val plonge :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     var list ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 
   val copy :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 
   val normalise :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val push :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     var ->
     Fraction.fraction ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val pushbool :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     var ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 
   val new_copy_ligne :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     line ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val new_empty_ligne :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val n_ligne : matrice -> int
 
   val get_line :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     int ->
-    Exception.method_handler * line
+    Exception.exceptions_caught_and_uncaught * line
 
   val get_trans_list : line -> Occu1.trans list
 
   val merge :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     matrice ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 
   val pivot : matrice -> int -> var
   val read_val : matrice -> int -> var -> Fraction.fraction
@@ -103,65 +103,65 @@ module type Matrice = sig
 
   val swap :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     int ->
     int ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val mulligne :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     int ->
     Fraction.fraction ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val del_ligne : matrice -> int -> unit
   val del_last_ligne : matrice -> unit
 
   val union :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     matrice ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 
   val get_all_key : matrice -> var list
   val is_key : matrice -> var -> bool
 
   val decomp_affine :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
-    Exception.method_handler * (point * matrice)
+    Exception.exceptions_caught_and_uncaught * (point * matrice)
 
   val somme_affine :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     matrice ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 
   val insert_0 :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 
   val equal :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     matrice ->
-    Exception.method_handler * bool
+    Exception.exceptions_caught_and_uncaught * bool
 
   val abstract_away :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     matrice ->
     var list ->
-    Exception.method_handler * matrice
+    Exception.exceptions_caught_and_uncaught * matrice
 end
 
 module Matrice = struct
@@ -569,8 +569,8 @@ module Matrice = struct
       | [] -> failwith "compteur_pivot_3"
     )
 
-  let normalise parameters (error : Exception.method_handler) m =
-    let rec aux (error : Exception.method_handler) k =
+  let normalise parameters (error : Exception.exceptions_caught_and_uncaught) m =
+    let rec aux (error : Exception.exceptions_caught_and_uncaught) k =
       if k > !(m.nligne) then (
         del_last_ligne m;
         error
@@ -615,11 +615,11 @@ module Matrice = struct
     in
     aux error 1
 
-  let rec push parameters (error : Exception.method_handler) m j k =
+  let rec push parameters (error : Exception.exceptions_caught_and_uncaught) m j k =
     if Working_list_imperative.member j (get_all_entry m) then (
       let rec aux error i =
         if i > !(m.nligne) then
-          (error : Exception.method_handler)
+          (error : Exception.exceptions_caught_and_uncaught)
         else (
           let rep = read_val m i Affine_cst in
           let r = read_val m i j in
@@ -888,7 +888,7 @@ module Matrice = struct
     in
     union parameters error nm m
 
-  let pushbool parameters (error : Exception.method_handler) m a =
+  let pushbool parameters (error : Exception.exceptions_caught_and_uncaught) m a =
     let error, m2 = copy parameters error m in
     let error =
       new_copy_ligne parameters error m2

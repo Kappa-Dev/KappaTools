@@ -35,47 +35,47 @@ module type Domain = sig
   val initialize :
     Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
-    Exception.method_handler ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught
     * static_information
     * dynamic_information
     * Communication.event list
 
   val complete_wake_up_relation :
     static_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Common_static.site_to_rules_tmp ->
-    Exception.method_handler * Common_static.site_to_rules_tmp
+    Exception.exceptions_caught_and_uncaught * Common_static.site_to_rules_tmp
 
   type 'a zeroary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
-    Exception.method_handler * dynamic_information * 'a
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'a
 
   type ('a, 'b) unary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.method_handler * dynamic_information * 'b
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'b
 
   type ('a, 'b, 'c) binary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
-    Exception.method_handler * dynamic_information * 'c
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'c
 
   type ('a, 'b, 'c, 'd) ternary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
     'c ->
-    Exception.method_handler * dynamic_information * 'd
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
   val add_initial_state :
     (Analyzer_headers.initial_state, Communication.event list) unary
@@ -117,9 +117,9 @@ module type Domain = sig
   val print :
     ?dead_rules:
       (Remanent_parameters_sig.parameters ->
-      Exception.method_handler ->
+      Exception.exceptions_caught_and_uncaught ->
       Ckappa_sig.c_rule_id ->
-      Exception.method_handler * bool) ->
+      Exception.exceptions_caught_and_uncaught * bool) ->
     (Loggers.t, unit) unary
 
   val maybe_reachable :
@@ -133,15 +133,15 @@ module type Domain = sig
     static_information ->
     dynamic_information ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Ckappa_sig.c_rule_id ->
-    Exception.method_handler * bool
+    Exception.exceptions_caught_and_uncaught * bool
 
   val get_side_effects :
     static_information ->
     dynamic_information ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Ckappa_sig.c_rule_id ->
-    Exception.method_handler * Ckappa_sig.side_effects option
+    Exception.exceptions_caught_and_uncaught * Ckappa_sig.side_effects option
 end

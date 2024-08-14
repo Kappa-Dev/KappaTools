@@ -142,35 +142,35 @@ module type StoryStats = sig
 
   val add_event :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     step_kind ->
     (unit -> int) option ->
     log_info ->
-    Exception.method_handler * log_info
+    Exception.exceptions_caught_and_uncaught * log_info
 
   val close_event :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     step_kind ->
     (unit -> int) option ->
     log_info ->
-    Exception.method_handler * log_info
+    Exception.exceptions_caught_and_uncaught * log_info
 
   val add_event_opt :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     step_kind option ->
     (unit -> int) option ->
     log_info ->
-    Exception.method_handler * log_info
+    Exception.exceptions_caught_and_uncaught * log_info
 
   val close_event_opt :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     step_kind option ->
     (unit -> int) option ->
     log_info ->
-    Exception.method_handler * log_info
+    Exception.exceptions_caught_and_uncaught * log_info
 
   val set_time : log_info -> log_info
   val set_step_time : log_info -> log_info

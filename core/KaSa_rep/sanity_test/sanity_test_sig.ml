@@ -13,13 +13,13 @@
    * under the terms of the GNU Library General Public License *)
 
 type ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist) f =
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   (bool Mvbdu_sig.cell -> bool Mvbdu_sig.cell -> int) ->
   bool Mvbdu_sig.skeleton ->
   bool Mvbdu_sig.cell ->
   (int -> bool Mvbdu_sig.mvbdu) ->
   ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist, bool, int) Memo_sig.handler ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * (int
     * bool Mvbdu_sig.cell
     * bool Mvbdu_sig.mvbdu
@@ -34,13 +34,13 @@ type ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist) f =
     option
 
 type ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist) g =
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   (int List_sig.cell -> int List_sig.cell -> int) ->
   int List_sig.skeleton ->
   int List_sig.cell ->
   (int -> int List_sig.list) ->
   ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist, bool, int) Memo_sig.handler ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * (int
     * int List_sig.cell
     * int List_sig.list
@@ -55,13 +55,13 @@ type ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist) g =
     option
 
 type ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist) h =
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   (unit List_sig.cell -> unit List_sig.cell -> int) ->
   unit List_sig.skeleton ->
   unit List_sig.cell ->
   (int -> unit List_sig.list) ->
   ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist, bool, int) Memo_sig.handler ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * (int
     * unit List_sig.cell
     * unit List_sig.list
@@ -77,7 +77,7 @@ type ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist) h =
 
 type ('mvbdu_handler, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist, 'data) remanent = {
   mvbdu_handler: 'mvbdu_handler;
-  error: Exception.method_handler;
+  error: Exception.exceptions_caught_and_uncaught;
   output: out_channel;
   allocate_mvbdu: ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist) f;
   allocate_uniquely_mvbdu: ('data, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist) f;
@@ -93,7 +93,7 @@ type ('mvbdu_handler, 'dicmvbdu, 'diclist, 'dicrlist, 'dicvlist, 'data) remanent
 
 let initial_remanent make_mvbdu_handler make_allocate_mvbdu
     make_allocate_association_list make_allocate_variables_list =
-  let error = Exception.empty_error_handler in
+  let error = Exception.empty_exceptions_caught_and_uncaught in
   let error, handler = make_mvbdu_handler error in
   {
     output = stdout;

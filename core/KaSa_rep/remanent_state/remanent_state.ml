@@ -212,7 +212,7 @@ type ('static, 'dynamic) state = {
   dead_agents: dead_agents option;
   ode_flow: Ode_fragmentation_type.ode_frag option;
   ctmc_flow: flow option;
-  errors: Exception.method_handler;
+  errors: Exception.exceptions_caught_and_uncaught;
   internal_constraints_list: internal_constraints_list option;
   constraints_list: constraints_list option;
   symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
@@ -229,7 +229,7 @@ let get_data state =
 let create_state ?errors ?env ?init_state ?reset parameters init =
   let error =
     match errors with
-    | None -> Exception.empty_error_handler
+    | None -> Exception.empty_exceptions_caught_and_uncaught
     | Some error -> error
   in
   let error, handler_bdu =

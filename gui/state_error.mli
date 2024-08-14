@@ -31,5 +31,5 @@ val errors : Result_util.message list Hooked.S.t
 
 val add_error : string -> Result_util.message list -> unit
 
-val wrap : ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t
+val wrap : ?append:bool -> string -> 'a Api.lwt_result -> 'a Api.lwt_result
 (** This displays the error *)

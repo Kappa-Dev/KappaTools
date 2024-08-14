@@ -6,44 +6,44 @@ module type Hash = sig
 
   val add :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     'a ->
     int ->
     'a hash ->
-    Exception.method_handler * 'a hash
+    Exception.exceptions_caught_and_uncaught * 'a hash
 
   val overwrite :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     'a ->
     int ->
     'a hash ->
-    Exception.method_handler * 'a hash
+    Exception.exceptions_caught_and_uncaught * 'a hash
 
   val add_or_overwrite :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     'a ->
     int ->
     'a hash ->
-    Exception.method_handler * 'a hash
+    Exception.exceptions_caught_and_uncaught * 'a hash
 
   val find_option :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     'a hash ->
-    Exception.method_handler * (int * 'a) option
+    Exception.exceptions_caught_and_uncaught * (int * 'a) option
 
   val find_option_without_logs :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     'a hash ->
-    Exception.method_handler * (int * 'a) option
+    Exception.exceptions_caught_and_uncaught * (int * 'a) option
 
   val find_option_log_on_the_fly : key -> 'a hash -> (int * 'a) option
   val iter : (key -> 'a -> int -> unit) -> 'a hash -> unit

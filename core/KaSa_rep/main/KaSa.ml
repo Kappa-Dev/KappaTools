@@ -13,7 +13,7 @@
 
 let main () =
   let start_time = Sys.time () in
-  let errors = Exception.empty_error_handler in
+  let errors = Exception.empty_exceptions_caught_and_uncaught in
   let _, parameters, _ = Get_option.get_option errors in
   let module A =
     (val Domain_selection.select_domain

@@ -12,12 +12,12 @@
  * en Automatique.  All rights reserved.  This file is distributed
  *  under the terms of the GNU Library General Public License *)
 
-type method_handler = Exception_without_parameter.method_handler
+type exceptions_caught_and_uncaught = Exception_without_parameter.exceptions_caught_and_uncaught
 
-let empty_error_handler = Exception_without_parameter.empty_error_handler
-let is_empty_error_handler = Exception_without_parameter.is_empty_error_handler
+let empty_exceptions_caught_and_uncaught = Exception_without_parameter.empty_exceptions_caught_and_uncaught
+let is_empty_exceptions_caught_and_uncaught = Exception_without_parameter.is_empty_exceptions_caught_and_uncaught
 
-let safe_warn parameters _error_handler file_name message exn _default =
+let safe_warn parameters _exceptions_caught_and_uncaught file_name message exn _default =
   let uncaught =
     Exception_without_parameter.build_uncaught_exception ?file_name ?message exn
   in
@@ -33,24 +33,24 @@ let safe_warn parameters _error_handler file_name message exn _default =
   let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   raise (Exception_without_parameter.Uncaught_exception uncaught)
 
-let unsafe_warn _parameters error_handler ?to_ui file_name message exn default =
+let unsafe_warn _parameters exceptions_caught_and_uncaught ?to_ui file_name message exn default =
   let uncaught =
     Exception_without_parameter.build_uncaught_exception ?file_name ?message exn
   in
-  ( Exception_without_parameter.add_uncaught_error uncaught ?to_ui error_handler,
+  ( Exception_without_parameter.add_uncaught_error uncaught ?to_ui exceptions_caught_and_uncaught,
     default () )
 
-let warn_aux parameters error_handler ?to_ui file message exn default =
+let warn_aux parameters exceptions_caught_and_uncaught ?to_ui file message exn default =
   let error, dft =
     if Remanent_parameters.get_unsafe parameters then
-      unsafe_warn parameters error_handler ?to_ui file message exn default
+      unsafe_warn parameters exceptions_caught_and_uncaught ?to_ui file message exn default
     else
-      safe_warn parameters error_handler file message exn default
+      safe_warn parameters exceptions_caught_and_uncaught file message exn default
   in
   let () = Remanent_parameters.save_error_list parameters error in
   error, dft
 
-let warn_with_exn parameters error_handler ?to_ui (file, line, _, _)
+let warn_with_exn parameters exceptions_caught_and_uncaught ?to_ui (file, line, _, _)
     ?(message = "") ?(pos = None) exn default =
   let liaison =
     if message = "" && pos = None then
@@ -63,13 +63,13 @@ let warn_with_exn parameters error_handler ?to_ui (file, line, _, _)
     | None -> ""
     | Some s -> ", " ^ Loc.to_string s
   in
-  warn_aux parameters error_handler ?to_ui (Some file)
+  warn_aux parameters exceptions_caught_and_uncaught ?to_ui (Some file)
     (Some ("line " ^ string_of_int line ^ pos ^ liaison ^ message))
     exn default
 
-let warn parameters error_handler ?to_ui file_line ?(message = "") ?pos exn
+let warn parameters exceptions_caught_and_uncaught ?to_ui file_line ?(message = "") ?pos exn
     default =
-  warn_with_exn parameters error_handler ?to_ui file_line ~message ~pos exn
+  warn_with_exn parameters exceptions_caught_and_uncaught ?to_ui file_line ~message ~pos exn
     (fun () -> default)
 
 let print_for_KaSim parameters handlers =
@@ -173,14 +173,14 @@ let _lift_error_logs_for_KaSa f =
 let check_point
     (warn :
       Remanent_parameters_sig.parameters ->
-      method_handler ->
+      exceptions_caught_and_uncaught ->
       ?to_ui:bool ->
       'a ->
       ?message:string ->
       ?pos:Loc.t ->
       exn ->
       unit ->
-      method_handler * unit) parameter error error' s ?to_ui ?message ?pos exn =
+      exceptions_caught_and_uncaught * unit) parameter error error' s ?to_ui ?message ?pos exn =
   if error == error' then
     error
   else (

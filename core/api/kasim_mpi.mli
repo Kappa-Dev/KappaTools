@@ -6,10 +6,5 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type mailbox
-
-val new_mailbox : unit -> mailbox
-val receive : mailbox -> string -> unit
-val is_computing : mailbox -> bool
-
-class virtual new_client : post:(string -> unit) -> mailbox -> Api.manager_model
+val on_message :
+  Api.manager_simulation -> (string -> unit Lwt.t) -> string -> unit Lwt.t

@@ -38,7 +38,7 @@ functor
       Remanent_state.reachability_result
 
     type parameters = Remanent_parameters_sig.parameters
-    type errors = Exception.method_handler
+    type errors = Exception.exceptions_caught_and_uncaught
     type internal_contact_map = Remanent_state.internal_contact_map
     type internal_scc_decomposition = Remanent_state.internal_scc_decomposition
     type internal_influence_map = Remanent_state.internal_influence_map
@@ -79,7 +79,7 @@ functor
         (match called_from with
         | Remanent_parameters_sig.Internalised | Remanent_parameters_sig.Server
         | Remanent_parameters_sig.KaSim | Remanent_parameters_sig.KaSa ->
-          let errors = Exception.empty_error_handler in
+          let errors = Exception.empty_exceptions_caught_and_uncaught in
           let errors, parameters, files = Get_option.get_option errors in
           let log = Remanent_parameters.get_logger parameters in
           let _ =
@@ -203,7 +203,7 @@ functor
     let lift_wo_handler f parameter error _handler x = f parameter error x
 
     let flush_errors state =
-      Remanent_state.set_errors Exception.empty_error_handler state
+      Remanent_state.set_errors Exception.empty_exceptions_caught_and_uncaught state
 
     let compute_env_init show_title
         (state :

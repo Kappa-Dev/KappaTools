@@ -38,11 +38,11 @@ type initial_state = Cckappa_sig.enriched_init
 val initialize_global_information :
   Remanent_parameters_sig.parameters ->
   StoryProfiling.StoryStats.log_info ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Mvbdu_wrapper.Mvbdu.handler ->
   Cckappa_sig.compil ->
   Cckappa_sig.kappa_handler ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * global_static_information
   * global_dynamic_information
 
@@ -211,9 +211,9 @@ val set_project_modified_map :
   global_static_information
 
 val compute_initial_state :
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   global_static_information ->
-  Exception.method_handler * initial_state list
+  Exception.exceptions_caught_and_uncaught * initial_state list
 
 val get_kappa_handler : global_static_information -> Cckappa_sig.kappa_handler
 val get_cc_code : global_static_information -> Cckappa_sig.compil
@@ -236,12 +236,12 @@ val set_log_info :
 
 val dummy_dead_rules :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_rule_id ->
-  Exception.method_handler * bool
+  Exception.exceptions_caught_and_uncaught * bool
 
 val dummy_side_effects :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_rule_id ->
-  Exception.method_handler * Ckappa_sig.side_effects option
+  Exception.exceptions_caught_and_uncaught * Ckappa_sig.side_effects option

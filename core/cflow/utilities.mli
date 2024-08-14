@@ -22,7 +22,7 @@
 
 module S : Generic_branch_and_cut_solver.Solver
 
-type error_log = Exception.method_handler
+type error_log = Exception.exceptions_caught_and_uncaught
 
 val error_init : error_log
 (** error_init is an empty log of errors *)

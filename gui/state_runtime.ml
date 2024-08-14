@@ -6,29 +6,27 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Lwt.Infix
-
 type cli = { url: string; command: string; args: string list }
 type protocol = HTTP of string | CLI of cli
 type remote = { label: string; protocol: protocol }
-type spec = WebWorker | Embedded | Remote of remote
+type spec = KasimAsWebWorker | KaSimAsEmbedded | Remote of remote
 type state = { state_current: spec; state_runtimes: spec list }
 type model = { model_current: spec; model_runtimes: spec list }
 
 let spec_label : spec -> string = function
-  | WebWorker -> "WebWorker"
-  | Embedded -> "Embedded"
+  | KasimAsWebWorker -> "KasimAsWebWorker"
+  | KaSimAsEmbedded -> "KaSimAsEmbedded"
   | Remote remote -> remote.label
 
 let spec_id : spec -> string = function
-  | WebWorker -> "WebWorker"
-  | Embedded -> "Embedded"
+  | KasimAsWebWorker -> "KasimAsWebWorker"
+  | KaSimAsEmbedded -> "KaSimAsEmbedded"
   | Remote { label = _; protocol = HTTP http } -> http
   | Remote { label = _; protocol = CLI cli } -> cli.url
 
 let read_spec : string -> spec option = function
-  | "WebWorker" -> Some WebWorker
-  | "Embedded" -> Some Embedded
+  | "KasimAsWebWorker" -> Some KasimAsWebWorker
+  | "KaSimAsEmbedded" -> Some KaSimAsEmbedded
   | url ->
     let () =
       Common.log_group
@@ -108,132 +106,28 @@ let read_spec : string -> spec option = function
       in
       Some (Remote { label; protocol }))
 
-class embedded () : Api.concrete_manager =
-  let kasa_worker = Worker.create "KaSaWorker.js" in
-  let kasa_mailbox = Kasa_client.new_mailbox () in
-  let kamoha_worker = Worker.create "KaMoHaWorker.js" in
-  let kamoha_mailbox = Kamoha_client.new_mailbox () in
-  let kastor_worker = Worker.create "KaStorWorker.js" in
-  let stor_state, update_stor_state = Kastor_client.init_state () in
-  object (self)
-    initializer
-      let () =
-        kasa_worker##.onmessage :=
-          Dom.handler
-            (fun (response_message : string Worker.messageEvent Js.t) ->
-              let response_text : string = response_message##.data in
-              let () = Kasa_client.receive kasa_mailbox response_text in
-              Js._true)
-      in
-      let () =
-        kamoha_worker##.onmessage :=
-          Dom.handler
-            (fun (response_message : string Worker.messageEvent Js.t) ->
-              let response_text : string = response_message##.data in
-              let () = Kamoha_client.receive kamoha_mailbox response_text in
-              Js._true)
-      in
-      let () =
-        kastor_worker##.onmessage :=
-          Dom.handler
-            (fun (response_message : string Worker.messageEvent Js.t) ->
-              let response_text : string = response_message##.data in
-              let () = Kastor_client.receive update_stor_state response_text in
-              Js._true)
-      in
-      ()
-
-    inherit
-      Api_runtime.manager
-        (object
-           method min_run_duration () = 0.1
-           method yield = Js_of_ocaml_lwt.Lwt_js.yield
-
-           method log ?exn (msg : string) =
-             let () = ignore exn in
-             let () =
-               Common.debug ~loc:__LOC__
-                 (Js.string
-                    (Format.sprintf
-                       "[State_runtime.embedded] embedded_manager#log: %s" msg))
-             in
-             Lwt.return_unit
-         end
-          : Kappa_facade.system_process)
-
-    inherit
-      Kasa_client.new_uniform_client
-        ~is_running:(fun () -> true)
-        ~post:(fun message_text -> kasa_worker##postMessage message_text)
-        kasa_mailbox
-
-    inherit
-      Kamoha_client.new_client
-        ~post:(fun message_text -> kamoha_worker##postMessage message_text)
-        kamoha_mailbox
-
-    inherit
-      Kastor_client.new_client
-        ~post:(fun message_text -> kastor_worker##postMessage message_text)
-        stor_state
-
-    method is_running = true
-
-    method terminate =
-      let () = kasa_worker##terminate in
-      () (*TODO*)
-
-    method is_computing = true (*TODO*)
-    val mutable kasa_locator = []
-
-    method project_parse ~patternSharing overwrites =
-      self#secret_project_parse
-      >>= Api_common.result_bind_lwt ~ok:(fun out ->
-              let load =
-                self#secret_simulation_load patternSharing out overwrites
-              in
-              let init = self#init_static_analyser out in
-              let locators =
-                init
-                >>= Result_util.fold
-                      ~error:(fun e ->
-                        let () = kasa_locator <- [] in
-                        Lwt.return (Result_util.error e))
-                      ~ok:(fun () ->
-                        self#secret_get_pos_of_rules_and_vars
-                        >>= Result_util.fold
-                              ~ok:(fun infos ->
-                                let () = kasa_locator <- infos in
-                                Lwt.return (Result_util.ok ()))
-                              ~error:(fun e ->
-                                let () = kasa_locator <- [] in
-                                Lwt.return (Result_util.error e)))
-              in
-              load >>= Api_common.result_bind_lwt ~ok:(fun () -> locators))
-
-    method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
-      List.find_opt
-        (fun (_, x) -> Loc.is_included_in filename pos x)
-        kasa_locator
-      |> Option_util.map fst
-      |> Result_util.ok ?status:None
-      |> Lwt.return
-  end
-
 let state, set_state =
   React.S.create
-    { state_current = WebWorker; state_runtimes = [ WebWorker; Embedded ] }
+    {
+      state_current = KasimAsWebWorker;
+      state_runtimes = [ KasimAsWebWorker; KaSimAsEmbedded ];
+    }
 
 let create_manager ~is_new _project_id =
   (* Line below to specify unused var, as je cannot change the named argument to _is_new *)
   let _unused = is_new in
 
   match (React.S.value state).state_current with
-  | WebWorker ->
+  | KasimAsWebWorker ->
     Lwt.return
-      (Result_util.ok (new Web_worker_api.manager () : Api.concrete_manager))
-  | Embedded ->
-    Lwt.return (Result_util.ok (new embedded () : Api.concrete_manager))
+      (Result_util.ok
+         (new Runtime_web_workers.runtime_kasim_as_web_worker ()
+           : Api.concrete_manager))
+  | KaSimAsEmbedded ->
+    Lwt.return
+      (Result_util.ok
+         (new Runtime_web_workers.runtime_kasim_embedded_in_main_thread ()
+           : Api.concrete_manager))
   | Remote { label = _; protocol = HTTP url } ->
     let error_msg : string =
       Format.sprintf
@@ -247,7 +141,9 @@ let create_manager ~is_new _project_id =
            ("[State_runtime.create_manager] set_runtime_url CLI: " ^ cli.url))
     in
     (try
-       let js_node_runtime = new JsNode.manager cli.command cli.args in
+       let js_node_runtime =
+         new Runtime_processes.manager cli.command cli.args
+       in
        if js_node_runtime#is_running then (
          let () =
            Common.debug ~loc:__LOC__
@@ -264,9 +160,9 @@ let create_manager ~is_new _project_id =
          let error_msg : string =
            Format.sprintf "Could not start cli runtime %s " label
          in
-         Lwt.return (Api_common.result_error_msg error_msg)
+         Lwt.return (Api_common.err_result_of_string error_msg)
        )
-     with Failure x -> Lwt.return (Api_common.result_error_msg x))
+     with Failure x -> Lwt.return (Api_common.err_result_of_string x))
 
 let set_spec runtime =
   let current_state = React.S.value state in
@@ -279,7 +175,7 @@ let create_spec ~load (id : string) : unit Api.result =
     let error_msg : string =
       Format.sprintf "Failed to create spec: could not parse identifier %s" id
     in
-    Api_common.result_error_msg error_msg
+    Api_common.err_result_of_string error_msg
   | Some runtime ->
     let current_state = React.S.value state in
     let () =
@@ -316,7 +212,8 @@ let init () =
   in
   let () = add_urls hosts true in
   match (React.S.value state).state_current with
-  | Remote { protocol = CLI _; _ } | WebWorker | Embedded -> Lwt.return_nil
+  | Remote { protocol = CLI _; _ } | KasimAsWebWorker | KaSimAsEmbedded ->
+    Lwt.return_nil
   | Remote { label = _; protocol = HTTP url } ->
     let error_msg : string =
       Format.sprintf

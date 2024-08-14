@@ -68,7 +68,7 @@ module LI :
 module LLI = Map_wrapper.Make (I)
 
 let () =
-  let error = Exception.empty_error_handler in
+  let error = Exception.empty_exceptions_caught_and_uncaught in
   let parameters =
     Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.KaSa
       ()

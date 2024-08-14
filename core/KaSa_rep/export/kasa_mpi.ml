@@ -41,14 +41,17 @@ let send_exception post ?id e =
               (Exception_without_parameter.add_uncaught_error
                  (Exception_without_parameter.build_uncaught_exception
                     ~file_name:"kasa_mpi" e)
-                 Exception_without_parameter.empty_error_handler) );
+                 Exception_without_parameter
+                 .empty_exceptions_caught_and_uncaught) );
         ])
   in
   post (Yojson.Basic.to_string reply)
 
 let send_response post id x =
   let reply =
-    if Exception_without_parameter.is_empty_error_handler (get_errors !gState)
+    if
+      Exception_without_parameter.is_empty_exceptions_caught_and_uncaught
+        (get_errors !gState)
     then
       `Assoc [ "id", `Int id; "code", `String "SUCCESS"; "data", x ]
     else
@@ -226,7 +229,8 @@ let on_message post text =
               (Exception_without_parameter.add_uncaught_error
                  (Exception_without_parameter.build_uncaught_exception
                     ~file_name:"kasa_mpi" ~message Exit)
-                 Exception_without_parameter.empty_error_handler) );
+                 Exception_without_parameter
+                 .empty_exceptions_caught_and_uncaught) );
         ]
     in
     post (Yojson.Basic.to_string reply)

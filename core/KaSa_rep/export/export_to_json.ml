@@ -64,13 +64,13 @@ module type Type = sig
   val get_dead_agents : state -> state * Yojson.Basic.t
   val get_separating_transitions : state -> state * Yojson.Basic.t
   val get_constraints_list : state -> state * Yojson.Basic.t
-  val get_errors : state -> Exception_without_parameter.method_handler
+  val get_errors : state -> Exception_without_parameter.exceptions_caught_and_uncaught
   val get_errors_json : state -> Yojson.Basic.t
   val to_json : state -> Yojson.Basic.t
 
   val of_json :
     Yojson.Basic.t ->
-    Exception_without_parameter.method_handler
+    Exception_without_parameter.exceptions_caught_and_uncaught
     * Public_data.contact_map Public_data.AccuracyMap.t
     * Public_data.influence_map Public_data.AccuracyMap.t
     * Public_data.dead_rules option

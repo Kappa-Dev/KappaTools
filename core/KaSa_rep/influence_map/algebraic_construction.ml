@@ -12,7 +12,7 @@
    * en Automatique.  All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-exception False of Exception.method_handler
+exception False of Exception.exceptions_caught_and_uncaught
 
 let complete_interface parameters error handler proper_agent =
   if proper_agent.Cckappa_sig.is_created then (
@@ -270,7 +270,7 @@ let check ~allow_dead_agent parameters error handler mixture1 mixture2 (i, j) =
     Exception.warn parameters error __POS__ ~message:"Missing rule" Exit None
   | Some (_, inj1, inj2) -> check_agent error [ i, j ] (inj1, inj2)
 
-exception Pass of Exception.method_handler
+exception Pass of Exception.exceptions_caught_and_uncaught
 
 let is_shift_required bool rule =
   match rule.Cckappa_sig.e_rule_initial_direction with

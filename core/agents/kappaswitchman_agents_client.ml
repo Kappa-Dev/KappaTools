@@ -27,23 +27,26 @@ let post chan message_delimiter message_text =
          Lwt_io.write_char chan message_delimiter)
        chan)
 
+(* Manager of part of Api.concrete_manager, interfacing with processes of kamoha, kasim, kasa, but not kastor
+   kastor is directly run by the main thread in the runtime_processes module
+   Does not match exactly Api.concrete_manager as kastor is missing *)
 class t exec_command message_delimiter =
   let switch_re = Re.compile (Re.str "KappaSwitchman") in
-  let kamoha =
+  let kamoha_process =
     let command = Re.replace_string switch_re ~by:"KaMoHa" exec_command in
     Lwt_process.open_process_full
       (command, [| command; "--delimiter"; Char.escaped message_delimiter |])
   in
-  let kasim =
+  let kasim_process =
     let command = Re.replace_string switch_re ~by:"KaSimAgent" exec_command in
     Lwt_process.open_process_full
       (command, [| command; "--delimiter"; Char.escaped message_delimiter |])
   in
-  (*let kastor =
+  (*let kastor_process =
     let command = Re.replace_string  switch_re ~by:"KaSimAgent" exec_command in
     Lwt_process.open_process_full
       (command,[|comman;"--delimiter";Char.escaped message_delimiter|]) in*)
-  let kasa =
+  let kasa_process =
     let command = Re.replace_string switch_re ~by:"KaSaAgent" exec_command in
     Lwt_process.open_process_full
       (command, [| command; "--delimiter"; Char.escaped message_delimiter |])
@@ -54,31 +57,33 @@ class t exec_command message_delimiter =
   object (self)
     initializer
       let () =
-        serve kamoha#stdout message_delimiter
+        serve kamoha_process#stdout message_delimiter
           (Kamoha_client.receive moha_mailbox)
         |> Lwt.ignore_result
       in
       (*let () =
         serve
-          kastor#stdout message_delimiter (Kastor_client.receive update_stor_state)
+          kastor_process#stdout message_delimiter (Kastor_client.receive update_stor_state)
         |> Lwt.ignore_result in*)
       let () =
-        serve kasa#stdout message_delimiter (Kasa_client.receive sa_mailbox)
+        serve kasa_process#stdout message_delimiter
+          (Kasa_client.receive sa_mailbox)
         |> Lwt.ignore_result
       in
-      serve kasim#stdout message_delimiter self#receive |> Lwt.ignore_result
+      serve kasim_process#stdout message_delimiter self#receive
+      |> Lwt.ignore_result
 
     method terminate =
-      kamoha#terminate;
-      kasim#terminate;
-      (*kastor#terminate;*)
-      kasa#terminate
+      kamoha_process#terminate;
+      kasim_process#terminate;
+      (*kastor_process#terminate;*)
+      kasa_process#terminate
 
     method is_running =
-      kamoha#state = Lwt_process.Running
-      && kasim#state = Lwt_process.Running
-      && (*kastor#state = Lwt_process.Running &&*)
-      kasa#state = Lwt_process.Running
+      kamoha_process#state = Lwt_process.Running
+      && kasim_process#state = Lwt_process.Running
+      && (*kastor_process#state = Lwt_process.Running &&*)
+      kasa_process#state = Lwt_process.Running
 
     method is_computing =
       self#sim_is_computing
@@ -87,48 +92,56 @@ class t exec_command message_delimiter =
 
     inherit
       Kasa_client.new_client
-        ~is_running:(fun () -> kasa#state = Lwt_process.Running)
-        ~post:(post kasa#stdin message_delimiter)
+        ~is_running:(fun () -> kasa_process#state = Lwt_process.Running)
+        ~post:(post kasa_process#stdin message_delimiter)
         sa_mailbox
 
     (*inherit Kastor_client.new_client
-        ~post:(post kastor#stdin message_delimiter)
+        ~post:(post kastor_process#stdin message_delimiter)
         stor_state*)
 
     inherit
       Kamoha_client.new_client
-        ~post:(post kamoha#stdin message_delimiter)
+        ~post:(post kamoha_process#stdin message_delimiter)
         moha_mailbox
 
     method private sleep timeout = Lwt_unix.sleep timeout
-    method private post_message txt = post kasim#stdin message_delimiter txt
-    inherit Mpi_api.manager ()
+
+    inherit
+      Kasim_client.new_client
+        ~post:(fun message_text ->
+          post kasim_process#stdin message_delimiter message_text)
+        ()
+
     val mutable kasa_locator = []
 
     method project_parse ~patternSharing overwrites =
       self#secret_project_parse
-      >>= Api_common.result_bind_lwt ~ok:(fun out ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun out ->
               let load =
                 self#secret_simulation_load patternSharing out overwrites
               in
               let init = self#init_static_analyser out in
               let locators =
-                init >>= function
-                | Result.Error _ as e ->
+                init >>= fun result ->
+                match result.value with
+                | Result.Error _ ->
                   let () = kasa_locator <- [] in
-                  Lwt.return (Api_common.result_kasa e)
+                  Lwt.return result
                 | Result.Ok () ->
-                  self#get_pos_of_rules_and_vars >>= ( function
+                  (* TODO: check why secret, use sth else *)
+                  self#secret_get_pos_of_rules_and_vars >>= fun result ->
+                  (match result.value with
                   | Result.Ok infos ->
                     let () = kasa_locator <- infos in
                     Lwt.return (Result_util.ok ())
-                  | Result.Error _ as e ->
+                  | Result.Error _ ->
                     let () = kasa_locator <- [] in
-                    Lwt.return (Api_common.result_kasa e) )
+                    Lwt.return (Result_util.map (fun _ -> ()) result))
               in
-              load >>= Api_common.result_bind_lwt ~ok:(fun () -> locators))
+              load >>= Api_common.result_bind_with_lwt ~ok:(fun () -> locators))
 
-    method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
+    method get_influence_map_node_at ~filename pos : _ Api.lwt_result =
       List.find_opt
         (fun (_, x) -> Loc.is_included_in filename pos x)
         kasa_locator

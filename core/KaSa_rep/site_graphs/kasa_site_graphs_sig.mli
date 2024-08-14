@@ -34,117 +34,117 @@ module type Site_graph = sig
 
   val add_agent :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     Ckappa_sig.c_agent_name ->
     t ->
-    Exception.method_handler * agent_id * t
+    Exception.exceptions_caught_and_uncaught * agent_id * t
 
   val add_site :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
     Ckappa_sig.c_site_name ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val add_state :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
     Ckappa_sig.c_site_name ->
     Ckappa_sig.c_state ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val add_bound_to_unknown :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
     Ckappa_sig.c_site_name ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val add_bond :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
     Ckappa_sig.c_site_name ->
     agent_id ->
     Ckappa_sig.c_site_name ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val add_bond_type :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
     Ckappa_sig.c_site_name ->
     Ckappa_sig.c_agent_name ->
     Ckappa_sig.c_site_name ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val add_counter_range :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
     Ckappa_sig.c_site_name ->
     ?inf:int ->
     ?sup:int ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val to_string :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
-    Exception.method_handler * string
+    Exception.exceptions_caught_and_uncaught * string
 
   val print :
     Loggers.t ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val print_agent :
     Loggers.t ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     string ->
     (string option * binding_state option * (int option * int option) option)
     Wrapped_modules.LoggedStringMap.t ->
     bool ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val print_list :
     Loggers.t ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     t list ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val has_a_counter :
     Remanent_parameters_sig.parameters ->
-    Exception_without_parameter.method_handler ->
+    Exception_without_parameter.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     Ckappa_sig.c_agent_name ->
     Ckappa_sig.c_site_name ->
-    Exception_without_parameter.method_handler * bool
+    Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
   val has_a_binding_state :
     Remanent_parameters_sig.parameters ->
-    Exception_without_parameter.method_handler ->
+    Exception_without_parameter.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     Ckappa_sig.c_agent_name ->
     Ckappa_sig.c_site_name ->
-    Exception_without_parameter.method_handler * bool
+    Exception_without_parameter.exceptions_caught_and_uncaught * bool
 end

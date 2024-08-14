@@ -24,5 +24,5 @@ val print_site_graph :
   ([> `PCDATA ] as 'a) Html.elt list ->
   'a Html.elt list
 
-val print_method_handler :
-  Exception_without_parameter.method_handler -> [> Html_types.p ] Html.elt list
+val print_exceptions_caught_and_uncaught :
+  Exception_without_parameter.exceptions_caught_and_uncaught -> [> Html_types.p ] Html.elt list

@@ -34,7 +34,7 @@ let close_project project_id : unit =
 let set_manager (runtime_id : string) : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__
-        (Api_common.result_bind_lwt
+        (Api_common.result_bind_with_lwt
            ~ok:(fun () -> Lwt.return (Result_util.ok ()))
            (State_runtime.create_spec ~load:true runtime_id))
       >>= fun _ -> Lwt.return_unit)

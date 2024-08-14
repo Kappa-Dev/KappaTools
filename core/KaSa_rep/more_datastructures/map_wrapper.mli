@@ -13,59 +13,59 @@ module type Set_with_logs = sig
 
   val add :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val add_when_not_in :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val remove :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val minus :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val union :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val disjoint_union :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val inter :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val diff :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val cardinal : t -> int
   val mem : elt -> t -> bool
@@ -97,259 +97,259 @@ module type Map_with_logs = sig
 
   val find_option :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a t ->
-    Exception.method_handler * 'a option
+    Exception.exceptions_caught_and_uncaught * 'a option
 
   val find_default :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     elt ->
     'a t ->
-    Exception.method_handler * 'a
+    Exception.exceptions_caught_and_uncaught * 'a
 
   val find_default_without_logs :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     elt ->
     'a t ->
-    Exception.method_handler * 'a
+    Exception.exceptions_caught_and_uncaught * 'a
 
   val find_option_without_logs :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a t ->
-    Exception.method_handler * 'a option
+    Exception.exceptions_caught_and_uncaught * 'a option
 
   val add :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val overwrite :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val add_or_overwrite :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val remove :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val remove_or_not :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val update :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a t ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val map2 :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.method_handler * 'c) ->
+    Exception.exceptions_caught_and_uncaught * 'c) ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'b ->
-    Exception.method_handler * 'c) ->
+    Exception.exceptions_caught_and_uncaught * 'c) ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
-    Exception.method_handler * 'c) ->
+    Exception.exceptions_caught_and_uncaught * 'c) ->
     'a t ->
     'b t ->
-    Exception.method_handler * 'c t
+    Exception.exceptions_caught_and_uncaught * 'c t
 
   val map2z :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'a ->
-    Exception.method_handler * 'a) ->
+    Exception.exceptions_caught_and_uncaught * 'a) ->
     'a t ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val fold2z :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'b ->
     'c ->
-    Exception.method_handler * 'c) ->
+    Exception.exceptions_caught_and_uncaught * 'c) ->
     'a t ->
     'b t ->
     'c ->
-    Exception.method_handler * 'c
+    Exception.exceptions_caught_and_uncaught * 'c
 
   val fold2 :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'c ->
-    Exception.method_handler * 'c) ->
+    Exception.exceptions_caught_and_uncaught * 'c) ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'b ->
     'c ->
-    Exception.method_handler * 'c) ->
+    Exception.exceptions_caught_and_uncaught * 'c) ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'b ->
     'c ->
-    Exception.method_handler * 'c) ->
+    Exception.exceptions_caught_and_uncaught * 'c) ->
     'a t ->
     'b t ->
     'c ->
-    Exception.method_handler * 'c
+    Exception.exceptions_caught_and_uncaught * 'c
 
   val fold2_sparse :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'b ->
     'c ->
-    Exception.method_handler * 'c) ->
+    Exception.exceptions_caught_and_uncaught * 'c) ->
     'a t ->
     'b t ->
     'c ->
-    Exception.method_handler * 'c
+    Exception.exceptions_caught_and_uncaught * 'c
 
   val iter2_sparse :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'b ->
-    Exception.method_handler) ->
+    Exception.exceptions_caught_and_uncaught) ->
     'a t ->
     'b t ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val diff :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a t ->
     'a t ->
-    Exception.method_handler * 'a t * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t * 'a t
 
   val diff_pred :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     ('a -> 'a -> bool) ->
     'a t ->
     'a t ->
-    Exception.method_handler * 'a t * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t * 'a t
 
   val merge :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a t ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val union :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a t ->
     'a t ->
-    Exception.method_handler * 'a t
+    Exception.exceptions_caught_and_uncaught * 'a t
 
   val fold_restriction :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (elt ->
     'a ->
-    Exception.method_handler * 'b ->
-    Exception.method_handler * 'b) ->
+    Exception.exceptions_caught_and_uncaught * 'b ->
+    Exception.exceptions_caught_and_uncaught * 'b) ->
     set ->
     'a t ->
     'b ->
-    Exception.method_handler * 'b
+    Exception.exceptions_caught_and_uncaught * 'b
 
   val fold_restriction_with_missing_associations :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (elt ->
     'a ->
-    Exception.method_handler * 'b ->
-    Exception.method_handler * 'b) ->
-    (elt -> Exception.method_handler * 'b -> Exception.method_handler * 'b) ->
+    Exception.exceptions_caught_and_uncaught * 'b ->
+    Exception.exceptions_caught_and_uncaught * 'b) ->
+    (elt -> Exception.exceptions_caught_and_uncaught * 'b -> Exception.exceptions_caught_and_uncaught * 'b) ->
     set ->
     'a t ->
     'b ->
-    Exception.method_handler * 'b
+    Exception.exceptions_caught_and_uncaught * 'b
 
   val iter : (elt -> 'a -> unit) -> 'a t -> unit
 
   val iter2 :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
-    Exception.method_handler) ->
+    Exception.exceptions_caught_and_uncaught) ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'b ->
-    Exception.method_handler) ->
+    Exception.exceptions_caught_and_uncaught) ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'b ->
-    Exception.method_handler) ->
+    Exception.exceptions_caught_and_uncaught) ->
     'a t ->
     'b t ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val fold : (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
   val mapi : (elt -> 'a -> 'b) -> 'a t -> 'b t
@@ -404,83 +404,83 @@ module type Projection = sig
   val proj_map :
     (elt_a -> elt_b) ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'b ->
     ('b -> 'a -> 'b) ->
     'a map_a ->
-    Exception.method_handler * 'b map_b
+    Exception.exceptions_caught_and_uncaught * 'b map_b
   (** proj_map f init merge map is a map mapping each element b
       to the result of the itteration of the function merge over the image in map of the element a in f such that f(a)=b, starting with the element init. *)
 
   val monadic_proj_map :
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt_a ->
-    Exception.method_handler * elt_b) ->
+    Exception.exceptions_caught_and_uncaught * elt_b) ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'b ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'b ->
     'a ->
-    Exception.method_handler * 'b) ->
+    Exception.exceptions_caught_and_uncaught * 'b) ->
     'a map_a ->
-    Exception.method_handler * 'b map_b
+    Exception.exceptions_caught_and_uncaught * 'b map_b
 
   val monadic_proj_map_i :
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt_a ->
-    Exception.method_handler * elt_b) ->
+    Exception.exceptions_caught_and_uncaught * elt_b) ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'b ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'b ->
     elt_a ->
     'a ->
-    Exception.method_handler * 'b) ->
+    Exception.exceptions_caught_and_uncaught * 'b) ->
     'a map_a ->
-    Exception.method_handler * 'b map_b
+    Exception.exceptions_caught_and_uncaught * 'b map_b
 
   val proj_set :
     (elt_a -> elt_b) ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     set_a ->
-    Exception.method_handler * set_b
+    Exception.exceptions_caught_and_uncaught * set_b
   (** proj_set f set is the set \{f(a) | a\in S\} *)
 
   val monadic_proj_set :
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt_a ->
-    Exception.method_handler * elt_b) ->
+    Exception.exceptions_caught_and_uncaught * elt_b) ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     set_a ->
-    Exception.method_handler * set_b
+    Exception.exceptions_caught_and_uncaught * set_b
 
   val partition_set :
     (elt_a -> elt_b) ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     set_a ->
-    Exception.method_handler * set_a map_b
+    Exception.exceptions_caught_and_uncaught * set_a map_b
   (** partition_set f set is the map mapping any element b with an antecedent for f in the set set, into the set of its antecedents, ie
       to the set \{a\in set | f(a)=b\}. *)
 
   val monadic_partition_set :
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt_a ->
-    Exception.method_handler * elt_b) ->
+    Exception.exceptions_caught_and_uncaught * elt_b) ->
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     set_a ->
-    Exception.method_handler * set_a map_b
+    Exception.exceptions_caught_and_uncaught * set_a map_b
 end
 
 module Proj (A : S_with_logs) (B : S_with_logs) :
@@ -502,33 +502,33 @@ module type Projection2 = sig
 
   val proj2 :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (elt_a -> elt_b) ->
     (elt_a -> elt_c) ->
     'b ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'b ->
     'a ->
     'b) ->
     'a map_a ->
-    Exception.method_handler * 'b map_c map_b
+    Exception.exceptions_caught_and_uncaught * 'b map_c map_b
 
   val proj2_monadic :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'mvbdu_handler ->
     (elt_a -> elt_b) ->
     (elt_a -> elt_c) ->
     'b ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'mvbdu_handler ->
     'b ->
     'a ->
-    Exception.method_handler * 'mvbdu_handler * 'b) ->
+    Exception.exceptions_caught_and_uncaught * 'mvbdu_handler * 'b) ->
     'a map_a ->
-    Exception.method_handler * 'mvbdu_handler * 'b map_c map_b
+    Exception.exceptions_caught_and_uncaught * 'mvbdu_handler * 'b map_c map_b
 end
 
 module Proj2 (A : S_with_logs) (B : S_with_logs) (C : S_with_logs) :

@@ -100,69 +100,69 @@ type memo_unary
 val last_entry :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
-  Exception_without_parameter.method_handler * int
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * int
 
 val print_memo :
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
 
 val extensional_description_of_mvbdu :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler * (handler * (int * int) list list)
+  Exception_without_parameter.exceptions_caught_and_uncaught * (handler * (int * int) list list)
 
 val extensional_description_of_range_list :
   'g ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   handler ->
   (int option * int option) List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * (int * (int option * int option)) list option)
 
 val extensional_description_of_association_list :
   'a ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   handler ->
   int List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * (int * int) list option)
 
 val extensional_description_of_variables_list :
   'a ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   handler ->
   'h List_sig.list ->
-  Exception_without_parameter.method_handler * (handler * int list option)
+  Exception_without_parameter.exceptions_caught_and_uncaught * (handler * int list option)
 
 val overwrite_association_lists :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
   int List_sig.list ->
   int List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * int List_sig.list option)
 
 val length :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
   'g List_sig.list ->
-  Exception_without_parameter.method_handler * (handler * int)
+  Exception_without_parameter.exceptions_caught_and_uncaught * (handler * int)
 
 val f :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
 
 val mvbdu_cartesian_decomposition_depth :
   ('a -> 'b -> 'c -> 'd -> 'e * 'f * 'g) ->
@@ -181,30 +181,30 @@ val mvbdu_cartesian_decomposition_depth :
 
 val variables_of_mvbdu :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
   'c Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * unit List_sig.list option)
 
 val project_abstract_away :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   handler ->
   bool Mvbdu_sig.mvbdu ->
   'b List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val project_keep_only :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   handler ->
   bool Mvbdu_sig.mvbdu ->
   'b List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val memo_keep_head_only :
@@ -220,37 +220,37 @@ val memo_keep_head_only :
 
 val redefine :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   handler ->
   bool Mvbdu_sig.mvbdu ->
   int List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val redefine_range :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   handler ->
   bool Mvbdu_sig.mvbdu ->
   (int option * int option) List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val monotonicaly_rename :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   handler ->
   bool Mvbdu_sig.mvbdu ->
   int List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val range_list_allocate :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   ((int option * int option) List_sig.cell ->
   (int option * int option) List_sig.cell ->
   int) ->
@@ -258,7 +258,7 @@ val range_list_allocate :
   (int option * int option) List_sig.cell ->
   (int -> (int option * int option) List_sig.list) ->
   handler ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (int
     * (int option * int option) List_sig.cell
     * (int option * int option) List_sig.list
@@ -268,161 +268,161 @@ val range_list_allocate :
 val boolean_mvbdu_nsnd :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_nfst :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_snd :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_fst :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_nand :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_and :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_or :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_nor :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_constant_bi_false :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_constant_bi_true :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_nis_implied :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_is_implied :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_nimply :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_imply :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_equiv :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_xor :
   Remanent_parameters_sig.parameters ->
   handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val boolean_mvbdu_constant_true :
@@ -435,10 +435,10 @@ val boolean_mvbdu_constant_true :
     bool,
     'a )
   Memo_sig.handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (( memo_tables,
        mvbdu_dic,
        association_list_dic,
@@ -459,10 +459,10 @@ val boolean_mvbdu_constant_false :
     bool,
     'a )
   Memo_sig.handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (( memo_tables,
        mvbdu_dic,
        association_list_dic,
@@ -475,8 +475,8 @@ val boolean_mvbdu_constant_false :
 
 val init_remanent :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * ( memo_tables,
       ('a, 'b) D_mvbdu_skeleton.dictionary,
       ('c, 'd) D_Association_list_skeleton.dictionary,
@@ -496,9 +496,9 @@ val boolean_mvbdu_false :
     'b,
     'c )
   Memo_sig.handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (( 'a,
        mvbdu_dic,
        association_list_dic,
@@ -519,9 +519,9 @@ val boolean_mvbdu_true :
     'b,
     'c )
   Memo_sig.handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (( 'a,
        mvbdu_dic,
        association_list_dic,
@@ -542,10 +542,10 @@ val boolean_mvbdu_not :
     bool,
     'a )
   Memo_sig.handler ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (( memo_tables,
        mvbdu_dic,
        association_list_dic,
@@ -558,24 +558,24 @@ val boolean_mvbdu_not :
 
 val association_list_allocate :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   (int List_sig.cell -> int List_sig.cell -> int) ->
   D_Association_list_skeleton.value ->
   int List_sig.cell ->
   (int -> int List_sig.list) ->
   handler ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (int * int List_sig.cell * int List_sig.list * handler) option
 
 val variables_list_allocate :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   (unit List_sig.cell -> unit List_sig.cell -> int) ->
   D_Variables_list_skeleton.value ->
   unit List_sig.cell ->
   (int -> unit List_sig.list) ->
   handler ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (int * unit List_sig.cell * unit List_sig.list * handler) option
 
 val print_mvbdu :
@@ -583,31 +583,31 @@ val print_mvbdu :
 
 val clean_head :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val keep_head_only :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
 val merge_variables_lists :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
   unit List_sig.list ->
   unit List_sig.list ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * unit List_sig.list option)
 
 val print_boolean_mvbdu :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught

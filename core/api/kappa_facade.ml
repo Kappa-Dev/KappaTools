@@ -385,7 +385,7 @@ let start ~(system_process : system_process)
         in
         Lwt.return (Result_util.ok ())
       with ExceptionDefn.Syntax_Error (message, range) ->
-        Lwt.return (Api_common.result_error_msg ~range message))
+        Lwt.return (Api_common.err_result_of_string ~range message))
     (catch_error (fun e ->
          let () = t.error_messages <- [ e ] in
          Lwt.return (Result_util.error [ e ])))
@@ -425,7 +425,7 @@ let perturbation ~(system_process : system_process) ~(t : t)
   Lwt.catch
     (fun () ->
       if t.is_running then
-        Lwt.return (Api_common.result_error_msg msg_process_not_paused)
+        Lwt.return (Api_common.err_result_of_string msg_process_not_paused)
       else (
         try
           let e = Kparser4.standalone_effect_list Klexer4.token lexbuf in
@@ -456,7 +456,7 @@ let perturbation ~(system_process : system_process) ~(t : t)
           in
           Lwt.return (Result_util.ok (Buffer.contents log_buffer))
         with ExceptionDefn.Syntax_Error (message, range) ->
-          Lwt.return (Api_common.result_error_msg ~range message)
+          Lwt.return (Api_common.err_result_of_string ~range message)
       ))
     (catch_error (fun e -> Lwt.return (Result_util.error [ e ])))
 
@@ -494,7 +494,7 @@ let continue ~(system_process : system_process) ~(t : t)
           in
           Lwt.return (Result_util.ok ())
         with ExceptionDefn.Syntax_Error (message, range) ->
-          Lwt.return (Api_common.result_error_msg ~range message)
+          Lwt.return (Api_common.err_result_of_string ~range message)
       ))
     (catch_error (fun e -> Lwt.return (Result_util.error [ e ])))
 

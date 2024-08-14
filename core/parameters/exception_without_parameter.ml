@@ -251,28 +251,28 @@ and stringlist_of_caught_light x stack =
         :: stringlist_of_uncaught_light x.uncaught_exception ("; " :: stack)))
        x.calling_stack
 
-type method_handler = {
-  mh_caught_error_list: caught_exception list;
-  mh_caught_error_list_to_ui: caught_exception list;
-  mh_uncaught_error_list: uncaught_exception list;
-  mh_uncaught_error_list_to_ui: uncaught_exception list;
+type exceptions_caught_and_uncaught = {
+  caught_error_list: caught_exception list;
+  caught_error_list_to_ui: caught_exception list;
+  uncaught_error_list: uncaught_exception list;
+  uncaught_error_list_to_ui: uncaught_exception list;
 }
 
-let to_json method_handler =
+let to_json exceptions_caught_and_uncaught =
   `Assoc
     [
       ( "caught",
         JsonUtil.of_list caught_exception_to_json
-          method_handler.mh_caught_error_list );
+          exceptions_caught_and_uncaught.caught_error_list );
       ( "caught",
         JsonUtil.of_list caught_exception_to_json
-          method_handler.mh_caught_error_list_to_ui );
+          exceptions_caught_and_uncaught.caught_error_list_to_ui );
       ( "uncaught",
         JsonUtil.of_list uncaught_exception_to_json
-          method_handler.mh_uncaught_error_list );
+          exceptions_caught_and_uncaught.uncaught_error_list );
       ( "uncaught_to_ui",
         JsonUtil.of_list uncaught_exception_to_json
-          method_handler.mh_uncaught_error_list_to_ui );
+          exceptions_caught_and_uncaught.uncaught_error_list_to_ui );
     ]
 
 let of_json = function
@@ -293,10 +293,10 @@ let of_json = function
            (List.assoc "uncaught_to_ui" l)
        in
        {
-         mh_caught_error_list = caught;
-         mh_caught_error_list_to_ui = caught_to_ui;
-         mh_uncaught_error_list = uncaught;
-         mh_uncaught_error_list_to_ui = uncaught_to_ui;
+         caught_error_list = caught;
+         caught_error_list_to_ui = caught_to_ui;
+         uncaught_error_list = uncaught;
+         uncaught_error_list_to_ui = uncaught_to_ui;
        }
      with _ ->
        raise
@@ -304,26 +304,22 @@ let of_json = function
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "error handler", x))
 
-let empty_error_handler =
+let empty_exceptions_caught_and_uncaught =
   {
-    mh_caught_error_list = [];
-    mh_caught_error_list_to_ui = [];
-    mh_uncaught_error_list = [];
-    mh_uncaught_error_list_to_ui = [];
+    caught_error_list = [];
+    caught_error_list_to_ui = [];
+    uncaught_error_list = [];
+    uncaught_error_list_to_ui = [];
   }
 
 let add_uncaught_error_to_ui uncaught error =
   {
     error with
-    mh_uncaught_error_list_to_ui =
-      uncaught :: error.mh_uncaught_error_list_to_ui;
+    uncaught_error_list_to_ui = uncaught :: error.uncaught_error_list_to_ui;
   }
 
 let add_uncaught_error_to_others uncaught error =
-  {
-    error with
-    mh_uncaught_error_list = uncaught :: error.mh_uncaught_error_list;
-  }
+  { error with uncaught_error_list = uncaught :: error.uncaught_error_list }
 
 let add_uncaught_error ?to_ui uncaught error =
   let error =
@@ -333,10 +329,10 @@ let add_uncaught_error ?to_ui uncaught error =
   in
   add_uncaught_error_to_others uncaught error
 
-let get_caught_exception_list error = error.mh_caught_error_list
-let get_caught_exception_list_to_ui error = error.mh_caught_error_list_to_ui
-let get_uncaught_exception_list error = error.mh_uncaught_error_list
-let get_uncaught_exception_list_to_ui error = error.mh_uncaught_error_list_to_ui
+let get_caught_exception_list error = error.caught_error_list
+let get_caught_exception_list_to_ui error = error.caught_error_list_to_ui
+let get_uncaught_exception_list error = error.uncaught_error_list
+let get_uncaught_exception_list_to_ui error = error.uncaught_error_list_to_ui
 
-let is_empty_error_handler x =
-  x.mh_caught_error_list = [] && x.mh_uncaught_error_list = []
+let is_empty_exceptions_caught_and_uncaught x =
+  x.caught_error_list = [] && x.uncaught_error_list = []

@@ -207,74 +207,74 @@ type state = (internal_state, binding_state, counter_state) site_type
 
 val rename_link :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   (Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
-  Exception.method_handler * c_agent_id) ->
+  Exception.exceptions_caught_and_uncaught * c_agent_id) ->
   link ->
-  Exception.method_handler * link
+  Exception.exceptions_caught_and_uncaught * link
 
 val rename_mixture :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   (Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
-  Exception.method_handler * c_agent_id) ->
+  Exception.exceptions_caught_and_uncaught * c_agent_id) ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val join_link :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   link ->
   link ->
-  Exception.method_handler * link
+  Exception.exceptions_caught_and_uncaught * link
 
 val join_mixture :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   mixture ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val add_agent :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
   agent_name ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val add_site :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
   site_name ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val add_counter :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
   counter_name ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val add_internal_state :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
   site_name ->
   internal_state ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val add_link :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
   ?agent_name:agent_name ->
   site_name ->
@@ -283,33 +283,33 @@ val add_link :
   site_name ->
   c_link_value ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val add_binding_type :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
   site_name ->
   agent_name ->
   site_name ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val add_bound :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
   site_name ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 val add_free :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   c_agent_id ->
   site_name ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.exceptions_caught_and_uncaught * mixture
 
 (*******************************************************)
 (*C type*)
@@ -455,9 +455,9 @@ val array_of_list_rule_id :
     'a Rule_nearly_Inf_Int_storage_Imperatif.t )
   Int_storage.ternary ->
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'a list ->
-  Exception.method_handler * 'a Rule_nearly_Inf_Int_storage_Imperatif.t
+  Exception.exceptions_caught_and_uncaught * 'a Rule_nearly_Inf_Int_storage_Imperatif.t
 
 (***************************************************************************)
 

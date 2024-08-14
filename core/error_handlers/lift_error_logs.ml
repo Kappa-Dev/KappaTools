@@ -14,7 +14,7 @@ let lift_gen_unary dump f a =
     Remanent_parameters.dummy_parameters
       ~called_from:Remanent_parameters_sig.KaSa ()
   in
-  let error = Exception.empty_error_handler in
+  let error = Exception.empty_exceptions_caught_and_uncaught in
   let error, output = f parameters error a in
   let _ = dump parameters error in
   output
@@ -24,7 +24,7 @@ let lift_gen_binary dump f a b =
     Remanent_parameters.dummy_parameters
       ~called_from:Remanent_parameters_sig.KaSa ()
   in
-  let error = Exception.empty_error_handler in
+  let error = Exception.empty_exceptions_caught_and_uncaught in
   let error, output = f parameters error a b in
   let _ = dump parameters error in
   output
@@ -34,7 +34,7 @@ let lift_gen_ternary dump f a b c =
     Remanent_parameters.dummy_parameters
       ~called_from:Remanent_parameters_sig.KaSa ()
   in
-  let error = Exception.empty_error_handler in
+  let error = Exception.empty_exceptions_caught_and_uncaught in
   let error, output = f parameters error a b c in
   let _ = dump parameters error in
   output

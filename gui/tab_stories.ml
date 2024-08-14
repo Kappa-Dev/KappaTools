@@ -110,7 +110,7 @@ let content () =
 
 let lift_result = function
   | Result.Ok x -> Result_util.ok x
-  | Result.Error e -> Api_common.result_error_msg e
+  | Result.Error e -> Api_common.err_result_of_string e
 
 let do_update_compression_level () =
   State_project.eval_with_project ~label:"Config compression" (fun manager ->
@@ -231,7 +231,7 @@ let onload () =
                    Lwt.return (Result_util.ok ())
                  else
                    manager#simulation_raw_trace
-                   >>= Api_common.result_bind_lwt ~ok:(fun trace ->
+                   >>= Api_common.result_bind_with_lwt ~ok:(fun trace ->
                            manager#raw_launch_story_computation trace
                            >|= lift_result))
            in
