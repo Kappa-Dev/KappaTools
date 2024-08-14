@@ -7,79 +7,79 @@ module type Dictionary = sig
 
   val member :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     value ->
     ('a, 'b) dictionary ->
-    Exception.method_handler * bool
+    Exception.exceptions_caught_and_uncaught * bool
 
   val allocate :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     ('a -> 'a -> key) ->
     value ->
     'a ->
     (key -> 'b) ->
     ('a, 'b) dictionary ->
-    Exception.method_handler * (key * 'a * 'b * ('a, 'b) dictionary) option
+    Exception.exceptions_caught_and_uncaught * (key * 'a * 'b * ('a, 'b) dictionary) option
 
   val allocate_uniquely :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     ('a -> 'a -> key) ->
     value ->
     'a ->
     (key -> 'b) ->
     ('a, 'b) dictionary ->
-    Exception.method_handler * (key * 'a * 'b * ('a, 'b) dictionary) option
+    Exception.exceptions_caught_and_uncaught * (key * 'a * 'b * ('a, 'b) dictionary) option
 
-  (*  val allocate_f_id: Exception.method_handler -> ('a -> 'a -> int) -> value -> (int -> 'a) -> 'a dictionary -> Exception.method_handler * (int * 'a * 'a dictionary) option*)
+  (*  val allocate_f_id: Exception.exceptions_caught_and_uncaught -> ('a -> 'a -> int) -> value -> (int -> 'a) -> 'a dictionary -> Exception.exceptions_caught_and_uncaught * (int * 'a * 'a dictionary) option*)
   val allocate_bool :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     ('a -> 'a -> key) ->
     value ->
     'a ->
     (key -> 'b) ->
     ('a, 'b) dictionary ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * (bool * (key * 'a * 'b * ('a, 'b) dictionary) option)
 
   val unsafe_allocate :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     value ->
     'a ->
     (key -> 'b) ->
     ('a, 'b) dictionary ->
-    Exception.method_handler * (key * 'a * 'b * ('a, 'b) dictionary)
+    Exception.exceptions_caught_and_uncaught * (key * 'a * 'b * ('a, 'b) dictionary)
 
   val translate :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     ('a, 'b) dictionary ->
-    Exception.method_handler * (value * 'a * 'b) option
+    Exception.exceptions_caught_and_uncaught * (value * 'a * 'b) option
 
   val stabilize : ('a, 'b) dictionary -> ('a, 'b) dictionary
 
   val iter :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     value ->
     'a ->
     'b ->
-    Exception.method_handler) ->
+    Exception.exceptions_caught_and_uncaught) ->
     ('a, 'b) dictionary ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val last_entry :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     ('a, 'b) dictionary ->
-    Exception.method_handler * key
+    Exception.exceptions_caught_and_uncaught * key
 
   val fold :
     (value -> 'a * 'b -> key -> 'c -> 'c) -> ('a, 'b) dictionary -> 'c -> 'c

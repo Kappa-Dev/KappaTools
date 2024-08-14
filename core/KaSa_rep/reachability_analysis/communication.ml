@@ -94,18 +94,18 @@ end
 
 type 'a fold =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * ((Remanent_parameters_sig.parameters ->
      Ckappa_sig.c_state ->
      Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
-     Exception.method_handler * 'a ->
-     Exception.method_handler * 'a) ->
-    Exception.method_handler ->
+     Exception.exceptions_caught_and_uncaught * 'a ->
+     Exception.exceptions_caught_and_uncaught * 'a) ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.method_handler * 'a)
+    Exception.exceptions_caught_and_uncaught * 'a)
     Usual_domains.flat_lattice
 
 type prefold = { fold: 'a. 'a fold }
@@ -116,20 +116,20 @@ type precondition = {
   the_rule_is_applied_for_the_first_time: Usual_domains.maybe_bool;
   state_of_sites_in_precondition:
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Analyzer_headers.global_dynamic_information ->
     path ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * Analyzer_headers.global_dynamic_information
     * Ckappa_sig.c_state list Usual_domains.flat_lattice;
   cache_state_of_sites:
     Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t;
   partner_map:
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Ckappa_sig.c_agent_name ->
     Ckappa_sig.c_site_name ->
     Ckappa_sig.c_state ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
       Usual_domains.flat_lattice;
   partner_fold: 'a. 'a fold;
@@ -191,7 +191,7 @@ let fold_over_potential_partners parameters error precondition agent_type site f
 
 let overwrite_potential_partners_map
     (_parameters : Remanent_parameters_sig.parameters)
-    (error : Exception.method_handler) precondition f (fold : prefold) =
+    (error : Exception.exceptions_caught_and_uncaught) precondition f (fold : prefold) =
   ( error,
     {
       precondition with

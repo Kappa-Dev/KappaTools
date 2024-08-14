@@ -210,8 +210,8 @@ val empty_actions : actions
 
 val dummy_init :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
-  Exception_without_parameter.method_handler * enriched_init
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * enriched_init
 
 (*******************************************************)
 (*JOIN*)
@@ -219,13 +219,13 @@ val dummy_init :
 
 val rename_mixture :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   (Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
-  Exception_without_parameter.method_handler * Ckappa_sig.c_agent_id) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_agent_id) ->
   mixture ->
-  Exception_without_parameter.method_handler * mixture
+  Exception_without_parameter.exceptions_caught_and_uncaught * mixture
 
 (*******************************************************)
 (* JOIN MIXTURE *)
@@ -233,18 +233,18 @@ val rename_mixture :
 
 val join_mixture :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   (Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
-  Exception_without_parameter.method_handler * Ckappa_sig.c_agent_id) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_agent_id) ->
   (Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
-  Exception_without_parameter.method_handler * Ckappa_sig.c_agent_id) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_agent_id) ->
   mixture ->
   mixture ->
-  Exception_without_parameter.method_handler * mixture
+  Exception_without_parameter.exceptions_caught_and_uncaught * mixture
 
 (*******************************************************)
 (* ADD *)
@@ -252,27 +252,27 @@ val join_mixture :
 
 val add_port :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_site_name ->
   Ckappa_sig.c_state option ->
   Ckappa_sig.c_state option ->
   Ckappa_sig.c_state interval port ->
-  Exception_without_parameter.method_handler * Ckappa_sig.c_state interval port
+  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_state interval port
 
 val add_state :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_site_name ->
   Ckappa_sig.c_state option ->
   Ckappa_sig.c_state interval port ->
-  Exception_without_parameter.method_handler * Ckappa_sig.c_state interval port
+  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_state interval port
 
 val add_agent_interface :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_site_name ->
   Ckappa_sig.c_state interval port Ckappa_sig.Site_map_and_set.Map.t ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.c_state interval port Ckappa_sig.Site_map_and_set.Map.t
 
 val max_state_index_option_min :

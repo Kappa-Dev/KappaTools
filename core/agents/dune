@@ -70,7 +70,7 @@
 
 (executable
  (name KappaSwitchman)
- (modules agents_client KappaSwitchman)
+ (modules kappaswitchman_mpi kappaswitchman_agents_client KappaSwitchman)
  (libraries
   logs.lwt
   lwt.unix

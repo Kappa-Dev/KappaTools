@@ -5,34 +5,34 @@ module type Union_find = sig
 
   val create :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     dimension ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val union_list :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
     key list ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val iteri :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     key ->
-    Exception.method_handler) ->
+    Exception.exceptions_caught_and_uncaught) ->
     t ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val get_representent :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     key ->
     t ->
-    Exception.method_handler * t * key
+    Exception.exceptions_caught_and_uncaught * t * key
 end
 
 module Make : functor (Storage : Int_storage.Storage) ->

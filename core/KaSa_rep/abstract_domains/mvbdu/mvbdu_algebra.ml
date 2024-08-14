@@ -13,7 +13,7 @@
    * under the terms of the GNU Library General Public License *)
 
 (*TEST*)
-(*let test_print_boolean_mvbdu (error:Exception.method_handler) =
+(*let test_print_boolean_mvbdu (error:Exception.exceptions_caught_and_uncaught) =
   Mvbdu_core.print_mvbdu error
     (fun error parameters a ->
       let _ =
@@ -858,16 +858,16 @@ let not_recursive_not_memoize_unary f g allocate =
 let not_recursive_memoize_unary f g (get_handler : 'a -> 'b)
     (update_handler : 'b -> 'a -> 'a)
     (get_storage :
-      Exception.method_handler ->
+      Exception.exceptions_caught_and_uncaught ->
       'c ->
       'b ->
-      Exception.method_handler * 'd option)
+      Exception.exceptions_caught_and_uncaught * 'd option)
     (set_storage :
-      Exception.method_handler ->
+      Exception.exceptions_caught_and_uncaught ->
       'c ->
       'd ->
       'b ->
-      Exception.method_handler * 'b) allocate =
+      Exception.exceptions_caught_and_uncaught * 'b) allocate =
   let store _parameters error handler key value =
     let storage = get_handler handler in
     let error, storage' = set_storage error key value storage in
@@ -909,19 +909,19 @@ let not_recursive_memoize_unary f g (get_handler : 'a -> 'b)
 
 let a =
   (not_recursive_memoize_unary
-    : (Exception.method_handler -> 'handler -> 'g) ->
-      (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'e) ->
+    : (Exception.exceptions_caught_and_uncaught -> 'handler -> 'g) ->
+      (Remanent_parameters_sig.parameters -> Exception.exceptions_caught_and_uncaught -> 'e) ->
       ('handler -> 'dic) ->
       ('dic -> 'handler -> 'handler) ->
-      (Exception.method_handler ->
+      (Exception.exceptions_caught_and_uncaught ->
       'c ->
       'dic ->
-      Exception.method_handler * 'd option) ->
-      (Exception.method_handler ->
+      Exception.exceptions_caught_and_uncaught * 'd option) ->
+      (Exception.exceptions_caught_and_uncaught ->
       'c ->
       'd ->
       'dic ->
-      Exception.method_handler * 'dic) ->
+      Exception.exceptions_caught_and_uncaught * 'dic) ->
       'h ->
       'f)
 

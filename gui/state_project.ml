@@ -244,7 +244,7 @@ let computing_watcher manager setter =
   let () = Common.async __LOC__ loop in
   cancelled
 
-let add_project is_new project_id : unit Api.result Lwt.t =
+let add_project is_new project_id : unit Api.lwt_result =
   let state_va = React.S.value state in
   (* TODO: Is it ok to get the value like this ? *)
   let catalog = state_va.project_catalog in
@@ -256,7 +256,7 @@ let add_project is_new project_id : unit Api.result Lwt.t =
             state_va.project_parameters ))
    with Not_found ->
      State_runtime.create_manager ~is_new project_id
-     >>= Api_common.result_bind_lwt ~ok:(fun project_manager ->
+     >>= Api_common.result_bind_with_lwt ~ok:(fun project_manager ->
              let project_is_computing, set_computes = React.S.create true in
              let project_watcher_cancel =
                computing_watcher project_manager (set_computes ?step:None)
@@ -275,7 +275,7 @@ let add_project is_new project_id : unit Api.result Lwt.t =
                  state_va.project_parameters
              in
              Lwt.return (Result_util.ok (me, me :: catalog, params))))
-  >>= Api_common.result_bind_lwt ~ok:(fun (me, catalog, params) ->
+  >>= Api_common.result_bind_with_lwt ~ok:(fun (me, catalog, params) ->
           update_state me catalog state_va.default_parameters params)
 
 let create_project project_id = add_project true project_id
@@ -317,7 +317,7 @@ let model : model React.signal =
       })
     state
 
-let sync () : unit Api.result Lwt.t =
+let sync () : unit Api.lwt_result =
   match (React.S.value state).project_current with
   | None -> Lwt.return (Result_util.ok ())
   | Some current ->
@@ -330,7 +330,7 @@ let sync () : unit Api.result Lwt.t =
 
 let remove_files manager =
   manager#file_catalog
-  >>= Api_common.result_bind_lwt ~ok:(fun catalog ->
+  >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->
           Lwt_list.iter_p
             (fun m ->
               manager#file_delete m.Kfiles.id >>= fun _ -> Lwt.return_unit)
@@ -378,7 +378,7 @@ let remove_project project_id =
     Lwt.return (Api_common.result_combine [ out'; out'' ])
   with Not_found ->
     Lwt.return
-      (Api_common.result_error_msg
+      (Api_common.err_result_of_string
          ("Project " ^ project_id ^ " does not exists"))
 
 let rec init_plot_period (arg : string list) : unit =
@@ -568,15 +568,15 @@ let init existing_projects : unit Lwt.t =
 let eval_with_project :
       'a.
       label:string ->
-      (Api.concrete_manager -> 'a Api.result Lwt.t) ->
-      'a Api.result Lwt.t =
+      (Api.concrete_manager -> 'a Api.lwt_result) ->
+      'a Api.lwt_result =
  fun ~label handler ->
   match (React.S.value state).project_current with
   | None ->
     let error_msg : string =
       Format.sprintf "Failed %s due to unavailable project." label
     in
-    Lwt.return (Api_common.result_error_msg error_msg)
+    Lwt.return (Api_common.err_result_of_string error_msg)
   | Some current -> handler current.project_manager
 
 let on_project_change_async ?eq ~on ?(others_eq = ( = )) init_others others

@@ -74,18 +74,18 @@ type precondition
 
 type 'a fold =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * ((Remanent_parameters_sig.parameters ->
      Ckappa_sig.c_state ->
      Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
-     Exception.method_handler * 'a ->
-     Exception.method_handler * 'a) ->
-    Exception.method_handler ->
+     Exception.exceptions_caught_and_uncaught * 'a ->
+     Exception.exceptions_caught_and_uncaught * 'a) ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.method_handler * 'a)
+    Exception.exceptions_caught_and_uncaught * 'a)
     Usual_domains.flat_lattice
 
 val dummy_precondition : precondition
@@ -95,22 +95,22 @@ val is_the_rule_applied_for_the_first_time :
 
 val the_rule_is_applied_for_the_first_time :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   precondition ->
-  Exception.method_handler * precondition
+  Exception.exceptions_caught_and_uncaught * precondition
 
 val the_rule_is_not_applied_for_the_first_time :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   precondition ->
-  Exception.method_handler * precondition
+  Exception.exceptions_caught_and_uncaught * precondition
 
 (*val get_state_of_site:
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Analyzer_headers.global_dynamic_information ->
   precondition ->
   path ->
-  Exception.method_handler * Analyzer_headers.global_dynamic_information * precondition *
+  Exception.exceptions_caught_and_uncaught * Analyzer_headers.global_dynamic_information * precondition *
     Ckappa_sig.c_state list Usual_domains.flat_lattice*)
 
 type prefold = { fold: 'a. 'a fold }
@@ -122,129 +122,129 @@ type prefold = { fold: 'a. 'a fold }
 val refine_information_about_state_of_sites_in_precondition :
   precondition ->
   (Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Analyzer_headers.global_dynamic_information ->
   path ->
   Ckappa_sig.c_state list Usual_domains.flat_lattice ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * Analyzer_headers.global_dynamic_information
   * Ckappa_sig.c_state list Usual_domains.flat_lattice) ->
   precondition
 
 val get_potential_partner :
   precondition ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   Ckappa_sig.c_state ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * precondition
   * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
     Usual_domains.flat_lattice
 
 val fold_over_potential_partners :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   precondition ->
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   (Remanent_parameters_sig.parameters ->
   Ckappa_sig.c_state ->
   Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
-  Exception.method_handler * 'a ->
-  Exception.method_handler * 'a) ->
+  Exception.exceptions_caught_and_uncaught * 'a ->
+  Exception.exceptions_caught_and_uncaught * 'a) ->
   'a ->
-  Exception.method_handler * precondition * 'a Usual_domains.top_or_not
+  Exception.exceptions_caught_and_uncaught * precondition * 'a Usual_domains.top_or_not
 
 val overwrite_potential_partners_map :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   precondition ->
-  (Exception.method_handler ->
+  (Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   Ckappa_sig.c_state ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
     Usual_domains.flat_lattice) ->
   prefold ->
-  Exception.method_handler * precondition
+  Exception.exceptions_caught_and_uncaught * precondition
 
 val get_state_of_site :
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   precondition ->
   Analyzer_headers.global_static_information ->
   Analyzer_headers.global_dynamic_information ->
   path_in_pattern ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * Analyzer_headers.global_dynamic_information
   * precondition
   * Ckappa_sig.c_state list Usual_domains.flat_lattice
 
 val follow_path_inside_cc :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   Cckappa_sig.mixture ->
   path ->
-  Exception.method_handler * output
+  Exception.exceptions_caught_and_uncaught * output
 
 val get_state_of_site_in_precondition :
   ('static -> Analyzer_headers.global_static_information) ->
   ('dynamic -> Analyzer_headers.global_dynamic_information) ->
   (Analyzer_headers.global_dynamic_information -> 'dynamic -> 'dynamic) ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'static ->
   'dynamic ->
   Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   precondition ->
-  Exception.method_handler * 'dynamic * precondition * Ckappa_sig.c_state list
+  Exception.exceptions_caught_and_uncaught * 'dynamic * precondition * Ckappa_sig.c_state list
 
 val get_state_of_site_in_postcondition :
   ('static -> Analyzer_headers.global_static_information) ->
   ('dynamic -> Analyzer_headers.global_dynamic_information) ->
   (Analyzer_headers.global_dynamic_information -> 'dynamic -> 'b) ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'static ->
   'dynamic ->
   Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   precondition ->
-  Exception.method_handler * 'b * precondition * Ckappa_sig.c_state list
+  Exception.exceptions_caught_and_uncaught * 'b * precondition * Ckappa_sig.c_state list
 
 val add_rule :
   ?local_trace:bool ->
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.compil ->
   Cckappa_sig.kappa_handler ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_rule_id ->
   event list ->
-  Exception.method_handler * event list
+  Exception.exceptions_caught_and_uncaught * event list
 
 type site_working_list
 
 val init_sites_working_list :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  Exception.method_handler * site_working_list
+  Exception.exceptions_caught_and_uncaught ->
+  Exception.exceptions_caught_and_uncaught * site_working_list
 
 val clear_sites_working_list :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   site_working_list ->
-  Exception.method_handler * site_working_list
+  Exception.exceptions_caught_and_uncaught * site_working_list
 
 val add_site :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   site_working_list ->
-  Exception.method_handler * site_working_list
+  Exception.exceptions_caught_and_uncaught * site_working_list
 
 val fold_sites :
   ( ( Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name,
@@ -259,4 +259,4 @@ val fold_sites :
 
 (*val get_dead_rules:
   'static -> 'dynamic ->
-  (Remanent_parameters_sig.parameters -> Exception.method_handler -> Ckappa_sig.c_rule_id -> Exception.method_handler * bool)*)
+  (Remanent_parameters_sig.parameters -> Exception.exceptions_caught_and_uncaught -> Ckappa_sig.c_rule_id -> Exception.exceptions_caught_and_uncaught * bool)*)

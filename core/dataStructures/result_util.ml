@@ -22,6 +22,16 @@ type message = {
   range: Loc.t option;
 }
 
+(* Note(AP): On choice of Result_util.t
+   I think this definition was an error, as it forces to redefine functions to use the structure, as well as impedes the interaction with lwt results, where we could have used the lwt_result primitives instead of new functions with different argument order, and presence of both Api.result and Api.result Lwt.t (See api_common.mli).
+   We could have used instead: `type ('a, 'b) t = ('a, status * 'b) Result.result` or similar with a record or else.
+   This is complex as we have 'b which is in some places a record of lists of exceptions  Exception_without_parameter.exceptions_caught_and_uncaught , sometimes made up to record an error, and sometimes a Api.result, with 'b a Result_util.message list.
+   (Initially the record also contained a now-removed `message` field, which was unused as the messages were stored in the 'b)
+
+   This is a lot of work for few benefits now, but that makes using results a bit painful.
+   Seems best to used Api.result for new stuff in the webapp, update to it when it's not, and maybe keep the result with the exceptions where it's used.
+*)
+
 type ('a, 'b) t = { value: ('a, 'b) Result.result; status: status }
 
 let write_severity ob x =

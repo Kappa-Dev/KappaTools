@@ -212,15 +212,15 @@ object
     Lwt.t
 
   method secret_get_pos_of_rules_and_vars :
-    Public_data.pos_of_rules_and_vars Api.result Lwt.t
+    Public_data.pos_of_rules_and_vars Api.lwt_result
 
-  method secret_project_parse : Ast.parsing_compil Api.result Lwt.t
+  method secret_project_parse : Ast.parsing_compil Api.lwt_result
 
   method secret_simulation_load :
     Kappa_terms.Pattern.sharing_level ->
     Kappa_grammar.Ast.parsing_compil ->
     (string * Kappa_data_structures.Nbr.t) list ->
-    unit Api.result Lwt.t
+    unit Api.lwt_result
 
   method simulation_catalog_din :
     ( string list,

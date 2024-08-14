@@ -115,7 +115,7 @@ let init_dead_rules () =
                        in
                        List.rev warnings)
                      ~error:(fun mh -> mh)
-               >|= Api_common.result_messages ?result_code:None
+               >|= Api_common.err_result_of_msgs ?result_code:None
              else
                Lwt.return (Result_util.ok ()))))
     State_project.model
@@ -157,7 +157,7 @@ let init_dead_agents () =
                        in
                        List.rev warnings)
                      ~error:(fun mh -> mh)
-               >|= Api_common.result_messages ?result_code:None
+               >|= Api_common.err_result_of_msgs ?result_code:None
              else
                Lwt.return (Result_util.ok ()))))
     State_project.model
@@ -217,7 +217,7 @@ let init_non_weakly_reversible_transitions () =
                        in
                        List.rev warnings)
                      ~error:(fun mh -> mh)
-               >|= Api_common.result_messages ?result_code:None
+               >|= Api_common.err_result_of_msgs ?result_code:None
              else
                Lwt.return (Result_util.ok ()))))
     State_project.model

@@ -18,7 +18,7 @@ module D = Dag.StoryTable
 module S = Generic_branch_and_cut_solver.Solver
 module P = StoryProfiling.StoryStats
 
-type error_log = Exception.method_handler
+type error_log = Exception.exceptions_caught_and_uncaught
 type parameter = S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = S.PH.B.PB.CI.Po.K.H.handler
 type profiling_info = P.log_info
@@ -267,9 +267,9 @@ let lift_to_care_about_ambiguities f requirement effect parameters
           ?print_if_zero:shall_we ->
           S.PH.B.PB.CI.Po.K.H.handler ->
           StoryProfiling.StoryStats.log_info ->
-          Exception.method_handler ->
+          Exception.exceptions_caught_and_uncaught ->
           trace ->
-          Exception.method_handler * StoryProfiling.StoryStats.log_info * trace)
+          Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * trace)
         parameters ~shall_we_compute ~shall_we_compute_profiling_information
         ~print_if_zero kappa_handler profiling_info error trace
     in
@@ -395,7 +395,7 @@ type observable_hit = {
 let get_event_list_from_observable_hit a = a.list_of_events
 let get_runtime_info_from_observable_hit a = a.runtime_info
 let _get_list_order a = a.list_of_actions
-let error_init = Exception.empty_error_handler
+let error_init = Exception.empty_exceptions_caught_and_uncaught
 
 let extract_observable_hits_from_musical_notation a ?shall_we_compute:_
     ?shall_we_compute_profiling_information:_ ?print_if_zero:_ b profiling_info

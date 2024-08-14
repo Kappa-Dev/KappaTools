@@ -64,9 +64,9 @@ let launch_agent (onClose : unit -> unit) (message_delimiter : char)
     match Tools.string_split_on_char message_delimiter (Js.to_string msg) with
     | prefix, None -> Buffer.add_string buffer prefix
     | prefix, Some suffix ->
-      let () = Buffer.add_string buffer prefix in
-      let () = handler (Buffer.contents buffer) in
-      let () = Buffer.reset buffer in
+      Buffer.add_string buffer prefix;
+      handler (Buffer.contents buffer);
+      Buffer.reset buffer;
       onStdout (Js.string suffix)
   in
   let configuration : process_configuration Js.t =
@@ -75,10 +75,13 @@ let launch_agent (onClose : unit -> unit) (message_delimiter : char)
   Js.Opt.case
     (spawn_process configuration)
     (fun () ->
-      let () = onClose () in
+      onClose ();
       failwith ("Launching '" ^ command ^ "' failed"))
     (fun x -> x)
 
+(** Manager here is communicating with processes of `kastor` and `switchman`, which itself calls the other cli agents 
+    Kastor is not included with the others as it can be communicated to in raw, and it doesn't have an internal state.
+ *)
 class manager ?(message_delimiter : char = Tools.default_message_delimter)
   (command : string) (args : string list) :
   Api.concrete_manager =
@@ -101,9 +104,8 @@ class manager ?(message_delimiter : char = Tools.default_message_delimter)
     method is_running = !running_ref
 
     method terminate =
-      let () = switch_process##kill in
-      let () = stor_process##kill in
-      ()
+      switch_process##kill;
+      stor_process##kill
 
     method is_computing =
       Switchman_client.is_computing switch_mailbox || self#story_is_computing

@@ -6,14 +6,19 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-(* Manage kappa projects. Kappa project consists
+(** Manage kappa projects. Kappa project consists
    of a set of kappa files and simulations that
    are run using the kappa code.
 *)
 
+(* TODO: try here to avoid separating exception in other namespace:
+   open Api_common
+*)
+
 type compression_modes = { causal: bool; weak: bool; strong: bool }
-type 'ok result = ('ok, Result_util.message list) Result_util.t
 type project_id = string
+type 'ok result = ('ok, Result_util.message list) Result_util.t
+type 'ok lwt_result = 'ok result Lwt.t
 
 class type manager_environment = object
   method environment_info : unit -> Api_types_t.environment_info result Lwt.t
@@ -92,75 +97,7 @@ class type manager_simulation = object
   inherit manager_snapshot
 end
 
-type 'a kasa_reply =
-  ('a, Exception_without_parameter.method_handler) Lwt_result.t
-
 class type manager_static_analysis = object
-  method init_static_analyser : Ast.parsing_compil -> unit kasa_reply
-
-  method init_static_analyser_raw : string -> unit kasa_reply
-  (** The string has to be the json corresponding to an [Ast.parsing_compil] *)
-
-  method get_contact_map :
-    Public_data.accuracy_level option -> Yojson.Basic.t kasa_reply
-
-  method get_pos_of_rules_and_vars :
-    Public_data.pos_of_rules_and_vars kasa_reply
-
-  method get_influence_map_raw :
-    Public_data.accuracy_level option -> string kasa_reply
-
-  method get_local_influence_map :
-    ?fwd:int ->
-    ?bwd:int ->
-    ?origin:(int, int) Public_data.influence_node ->
-    total:int ->
-    Public_data.accuracy_level option ->
-    (Public_data.accuracy_level
-    * int
-    * int option
-    * int option
-    * (Public_data.rule, Public_data.var) Public_data.influence_node option
-    * Public_data.influence_map)
-    kasa_reply
-
-  method get_initial_node :
-    (Public_data.rule, Public_data.var) Public_data.influence_node option
-    kasa_reply
-
-  method get_next_node :
-    (int, int) Public_data.influence_node option ->
-    (Public_data.rule, Public_data.var) Public_data.influence_node option
-    kasa_reply
-
-  method get_previous_node :
-    (int, int) Public_data.influence_node option ->
-    (Public_data.rule, Public_data.var) Public_data.influence_node option
-    kasa_reply
-
-  method get_nodes_of_influence_map :
-    Public_data.accuracy_level option ->
-    (Public_data.accuracy_level
-    * (Public_data.rule, Public_data.var) Public_data.influence_node list)
-    kasa_reply
-
-  method get_dead_rules : Public_data.dead_rules kasa_reply
-  method get_dead_agents : Public_data.dead_agents kasa_reply
-
-  method get_non_weakly_reversible_transitions :
-    Public_data.separating_transitions kasa_reply
-
-  method get_constraints_list :
-    (string * Public_data.agent list Public_data.lemma list) list kasa_reply
-
-  method get_potential_polymers :
-    Public_data.accuracy_level option ->
-    Public_data.accuracy_level option ->
-    (Public_data.accuracy_level * Public_data.accuracy_level * Public_data.scc)
-    kasa_reply
-end
-
-class type uniform_manager_static_analysis = object
   method init_static_analyser : Ast.parsing_compil -> unit result Lwt.t
 
   method init_static_analyser_raw : string -> unit result Lwt.t
@@ -247,10 +184,10 @@ class type virtual manager_stories = object
 end
 
 class type concrete_manager = object
-  inherit manager_model
-  inherit manager_simulation
-  inherit uniform_manager_static_analysis
-  inherit manager_stories
+  inherit manager_model (* kamoha *)
+  inherit manager_simulation (* kasim *)
+  inherit manager_static_analysis (* kasa *)
+  inherit manager_stories (* kastor *)
 
   method project_parse :
     patternSharing:Pattern.sharing_level ->

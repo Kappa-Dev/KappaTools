@@ -83,7 +83,7 @@ let focus_range (range : Loc.t) : unit =
 let simulation_trace () =
   State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       State_error.wrap __LOC__ manager#simulation_raw_trace
-      >>= Api_common.result_bind_lwt ~ok:(fun data_string ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun data_string ->
               let data = Js.string data_string in
               let () =
                 Common.saveFile ~data ~mime:"application/octet-stream"
@@ -94,7 +94,7 @@ let simulation_trace () =
 let simulation_outputs () =
   State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       State_error.wrap __LOC__ manager#simulation_outputs_zip
-      >>= Api_common.result_bind_lwt ~ok:(fun data_bigstring ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun data_bigstring ->
               let data = Typed_array.Bigstring.to_arrayBuffer data_bigstring in
               let () =
                 Common.saveFile ~data ~mime:"application/zip"

@@ -16,7 +16,7 @@ let current_file, set_current_file = React.S.create None
 let update_outputs (key : string) : unit =
   State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       manager#simulation_detail_file_line key
-      >>= Api_common.result_bind_lwt ~ok:(fun lines ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun lines ->
               let () = set_current_file (Some (key, lines)) in
               Lwt.return (Result_util.ok ())))
 
@@ -67,7 +67,7 @@ let xml () =
                 ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
                 ~ready:(fun manager _ ->
                   manager#simulation_catalog_file_line
-                  >>= Api_common.result_bind_lwt
+                  >>= Api_common.result_bind_with_lwt
                         ~ok:(fun
                             (file_line_ids : Api_types_j.file_line_catalog) ->
                           let select_file : [> `H4 | `Select ] Html.elt list =

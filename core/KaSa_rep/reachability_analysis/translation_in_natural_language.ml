@@ -30,9 +30,9 @@ type token =
 
 type rename_sites =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.Site_map_and_set.Map.elt ->
-  Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt
+  Exception.exceptions_caught_and_uncaught * Ckappa_sig.Site_map_and_set.Map.elt
 
 (****************************************************************************)
 

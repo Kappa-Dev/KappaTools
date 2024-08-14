@@ -17,50 +17,50 @@ type in_progress
 val init :
   ?cckappa_only:bool ->
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
-  Exception.method_handler * in_progress
+  Exception.exceptions_caught_and_uncaught * in_progress
 
 val add_agent :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_name ->
   in_progress ->
-  Exception.method_handler * Ckappa_sig.c_agent_id * in_progress
+  Exception.exceptions_caught_and_uncaught * Ckappa_sig.c_agent_id * in_progress
 
 val add_site :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   in_progress ->
-  Exception.method_handler * in_progress
+  Exception.exceptions_caught_and_uncaught * in_progress
 
 val add_free :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   in_progress ->
-  Exception.method_handler * in_progress
+  Exception.exceptions_caught_and_uncaught * in_progress
 
 val add_internal_state :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   Ckappa_sig.c_state ->
   in_progress ->
-  Exception.method_handler * in_progress
+  Exception.exceptions_caught_and_uncaught * in_progress
 
 val add_link :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   in_progress ->
-  Exception.method_handler * in_progress
+  Exception.exceptions_caught_and_uncaught * in_progress
 
 val export : in_progress -> Cckappa_sig.mixture

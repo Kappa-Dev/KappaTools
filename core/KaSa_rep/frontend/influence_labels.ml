@@ -17,21 +17,21 @@ module type Labels = sig
 
   val label_of_int :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     int ->
-    Exception.method_handler * label
+    Exception.exceptions_caught_and_uncaught * label
 
   val to_string :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     label ->
-    Exception.method_handler * string
+    Exception.exceptions_caught_and_uncaught * string
 
   val dump :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     label ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val print : Format.formatter -> label -> unit
   val int_of_label : label -> int
@@ -69,9 +69,9 @@ module type Label_handler = sig
 
   val label_of_int :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     int ->
-    Exception.method_handler * label
+    Exception.exceptions_caught_and_uncaught * label
 
   val member : label -> label_set -> bool
   val empty : label_set
@@ -82,26 +82,26 @@ module type Label_handler = sig
 
   val add_couple :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     bool ->
     label_set ->
     label_set ->
     label_set_couple ->
-    Exception.method_handler * label_set_couple
+    Exception.exceptions_caught_and_uncaught * label_set_couple
 
   val dump :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     label_set ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val dump_couple :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     label_set_couple ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val filter_couple :
     Remanent_parameters_sig.parameters ->
@@ -113,17 +113,17 @@ module type Label_handler = sig
 
   val to_string :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     label_set ->
-    Exception.method_handler * string list
+    Exception.exceptions_caught_and_uncaught * string list
 
   val to_string_couple :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     label_set_couple ->
-    Exception.method_handler * string list
+    Exception.exceptions_caught_and_uncaught * string list
 
   val convert_label_set_couple : label_set_couple -> (int * int) list
 end

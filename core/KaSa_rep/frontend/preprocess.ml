@@ -2462,7 +2462,7 @@ let print_list_of_lines parameters list =
       ())
     list
 
-let gexf_of_contact_map ?logger parameters (error : Exception.method_handler)
+let gexf_of_contact_map ?logger parameters (error : Exception.exceptions_caught_and_uncaught)
     handler _scc_map contact_map =
   let parameters_gexf =
     match logger with

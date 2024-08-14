@@ -13,58 +13,58 @@ module type Tabinter = sig
 
   val affiche :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
 
   val copy :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
-    Exception.method_handler * intervalle_tab
+    Exception.exceptions_caught_and_uncaught * intervalle_tab
 
   val clef : intervalle_tab -> var list
 
   val wide_place :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
     intervalle_tab ->
-    Exception.method_handler * var list
+    Exception.exceptions_caught_and_uncaught * var list
 
   val union_place :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
     intervalle_tab ->
-    Exception.method_handler * var list
+    Exception.exceptions_caught_and_uncaught * var list
 
   val union :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
     intervalle_tab ->
-    Exception.method_handler * intervalle_tab
+    Exception.exceptions_caught_and_uncaught * intervalle_tab
 
   val inter :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
     intervalle_tab ->
-    Exception.method_handler * intervalle_tab
+    Exception.exceptions_caught_and_uncaught * intervalle_tab
 
   val somme :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
     intervalle_tab ->
-    Exception.method_handler * intervalle_tab
+    Exception.exceptions_caught_and_uncaught * intervalle_tab
 
   val int_of_var_list :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     var list ->
-    Exception.method_handler * intervalle_tab
+    Exception.exceptions_caught_and_uncaught * intervalle_tab
 
   val push : intervalle_tab -> var -> Fraction.fraction -> intervalle_tab
   val pushbool : intervalle_tab -> var -> intervalle_tab
@@ -72,17 +72,17 @@ module type Tabinter = sig
 
   val merge :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
     intervalle_tab ->
-    Exception.method_handler * intervalle_tab
+    Exception.exceptions_caught_and_uncaught * intervalle_tab
 
   val abstract_away :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     intervalle_tab ->
     var list ->
-    Exception.method_handler * intervalle_tab
+    Exception.exceptions_caught_and_uncaught * intervalle_tab
 end
 
 module Tabinter = struct

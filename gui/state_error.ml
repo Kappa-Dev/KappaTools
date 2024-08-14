@@ -52,7 +52,7 @@ let errors =
         [] state_error)
 
 let wrap :
-      'a. ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t =
+      'a. ?append:bool -> string -> 'a Api.lwt_result -> 'a Api.lwt_result =
  fun ?(append = false) loc r ->
   r
   >>=
@@ -61,4 +61,4 @@ let wrap :
     ~ok:(fun r -> Lwt.return (Result_util.ok r))
     ~error:(fun errors ->
       let () = add_error loc errors in
-      Lwt.return (Api_common.result_messages errors))
+      Lwt.return (Api_common.err_result_of_msgs errors))

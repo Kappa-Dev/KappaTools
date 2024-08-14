@@ -39,19 +39,19 @@ val set_show_dead_rules : bool -> unit
 val set_show_dead_agents : bool -> unit
 val set_show_non_weakly_reversible_transitions : bool -> unit
 val set_parameters_as_default : unit -> unit
-val set_project : string -> unit Api.result Lwt.t
-val create_project : string -> unit Api.result Lwt.t
-val remove_project : string -> unit Api.result Lwt.t
+val set_project : string -> unit Api.lwt_result
+val create_project : string -> unit Api.lwt_result
+val remove_project : string -> unit Api.lwt_result
 val init : string list -> unit Lwt.t
 (* run on application init *)
 
-val sync : unit -> unit Api.result Lwt.t
+val sync : unit -> unit Api.lwt_result
 (* to sync state of application with runtime *)
 
 val eval_with_project :
   label:string ->
-  (Api.concrete_manager -> 'a Api.result Lwt.t) ->
-  'a Api.result Lwt.t
+  (Api.concrete_manager -> 'a Api.lwt_result) ->
+  'a Api.lwt_result
 
 val on_project_change_async :
   ?eq:('a -> 'a -> bool) ->

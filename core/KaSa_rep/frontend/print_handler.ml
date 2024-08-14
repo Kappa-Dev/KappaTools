@@ -177,7 +177,7 @@ let print_handler parameters error handler =
   in
   error
 
-let dot_of_contact_map ?loggers parameters (error : Exception.method_handler)
+let dot_of_contact_map ?loggers parameters (error : Exception.exceptions_caught_and_uncaught)
     handler =
   let parameters_dot =
     match loggers with
@@ -393,7 +393,7 @@ let print_list_of_lines parameters list =
       ())
     list
 
-let gexf_of_contact_map ?loggers parameters (error : Exception.method_handler)
+let gexf_of_contact_map ?loggers parameters (error : Exception.exceptions_caught_and_uncaught)
     handler =
   let parameters_gexf =
     match loggers with

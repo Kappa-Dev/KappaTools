@@ -13,20 +13,20 @@
    * under the terms of the GNU Library General Public License *)
 
 type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'f, 'g) memoized_fun = {
-  f: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'c;
+  f: Remanent_parameters_sig.parameters -> Exception.exceptions_caught_and_uncaught -> 'c;
   store:
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     ('f, 'b, 'blist, 'rlist, 'vlist, 'a, 'g) handler ->
     'd ->
     'a Mvbdu_sig.mvbdu ->
-    Exception.method_handler * ('f, 'b, 'blist, 'rlist, 'vlist, 'a, 'g) handler;
+    Exception.exceptions_caught_and_uncaught * ('f, 'b, 'blist, 'rlist, 'vlist, 'a, 'g) handler;
   get:
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     ('f, 'b, 'blist, 'rlist, 'vlist, 'a, 'g) handler ->
     'd ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * (('f, 'b, 'blist, 'rlist, 'vlist, 'a, 'g) handler
       * 'a Mvbdu_sig.mvbdu option);
 }
@@ -52,8 +52,8 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_memoized_fun =
     'rlist,
     'vlist,
     'a ->
-    Exception.method_handler
-    * (Exception.method_handler -> Exception.method_handler * 'c),
+    Exception.exceptions_caught_and_uncaught
+    * (Exception.exceptions_caught_and_uncaught -> Exception.exceptions_caught_and_uncaught * 'c),
     'a Mvbdu_sig.mvbdu,
     'd,
     'e )
@@ -66,7 +66,7 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) binary_memoized_fun =
     'rlist,
     'vlist,
     ('a ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_memoized_fun)
     pair,
     'a Mvbdu_sig.mvbdu * 'a Mvbdu_sig.mvbdu,
@@ -81,8 +81,8 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_other_memoized_fun =
     'rlist,
     'vlist,
     'a ->
-    Exception.method_handler
-    * (Exception.method_handler -> Exception.method_handler * 'a Mvbdu_sig.cell),
+    Exception.exceptions_caught_and_uncaught
+    * (Exception.exceptions_caught_and_uncaught -> Exception.exceptions_caught_and_uncaught * 'a Mvbdu_sig.cell),
     'd * 'a Mvbdu_sig.mvbdu,
     'c,
     'e )
@@ -90,31 +90,31 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_other_memoized_fun =
 
 type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) reset = {
   empty_range_list:
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_memoized_fun;
   empty_association_list:
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_memoized_fun;
   empty_variables_list:
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_memoized_fun;
   leaf:
     'a ->
-    Exception.method_handler
-    * (Exception.method_handler -> Exception.method_handler * 'a Mvbdu_sig.cell);
+    Exception.exceptions_caught_and_uncaught
+    * (Exception.exceptions_caught_and_uncaught -> Exception.exceptions_caught_and_uncaught * 'a Mvbdu_sig.cell);
   clean_head:
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_memoized_fun;
   build_false:
     int ->
     int ->
-    Exception.method_handler
-    * (Exception.method_handler -> Exception.method_handler * 'a Mvbdu_sig.cell);
+    Exception.exceptions_caught_and_uncaught
+    * (Exception.exceptions_caught_and_uncaught -> Exception.exceptions_caught_and_uncaught * 'a Mvbdu_sig.cell);
   build_true:
     int ->
     int ->
     'a Mvbdu_sig.mvbdu ->
     'a Mvbdu_sig.mvbdu ->
-    Exception.method_handler
-    * (Exception.method_handler -> Exception.method_handler * 'a Mvbdu_sig.cell);
+    Exception.exceptions_caught_and_uncaught
+    * (Exception.exceptions_caught_and_uncaught -> Exception.exceptions_caught_and_uncaught * 'a Mvbdu_sig.cell);
 }

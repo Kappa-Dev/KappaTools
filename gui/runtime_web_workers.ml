@@ -43,7 +43,53 @@ let worker_onmessage ~(debug_printing : bool) ~(worker_name : string)
   in
   Dom.handler handler_f
 
-class manager () =
+let no_exc_modal_arg : string list = Common_state.url_args "no_exc_modal"
+
+let send_worker_exceptions_to_modal =
+  not
+    (match no_exc_modal_arg with
+    | s :: _ when String.equal s "true" -> true
+    | _ -> false)
+
+let onerror ~worker_name ~apply_onerror =
+  Dom.handler (fun _ ->
+      let error_string : string =
+        "Error in " ^ worker_name ^ ", it might not be running anymore."
+      in
+      let () = Common.debug ~loc:__LOC__ error_string in
+      Ui_common.open_modal_error ~is_critical:false ~error_content:error_string;
+      apply_onerror ();
+      Js._true)
+
+class type concrete_manager_without_kasim = object
+  inherit Api.manager_model
+  inherit Api.manager_static_analysis
+  inherit Api.manager_stories
+
+  method get_influence_map_node_at :
+    filename:string ->
+    Loc.position ->
+    (int, int) Public_data.influence_node option Api.lwt_result
+
+  method is_running : bool
+  method terminate : unit
+  method is_computing : bool
+
+  (* protected: used in inheritance, so cannot be private,  *)
+  method private apply_onerror : unit
+
+  method private project_parse_without_kasim :
+    simulation_load:
+      (Pattern.sharing_level ->
+      Ast.parsing_compil ->
+      (string * Nbr.t) list ->
+      unit Api.lwt_result) ->
+    patternSharing:Pattern.sharing_level ->
+    (string * Nbr.t) list ->
+    unit Api.lwt_result
+end
+
+class virtual manager_without_kasim () : concrete_manager_without_kasim =
   let kasa_worker = Worker.create "KaSaWorker.js" in
   let kasa_mailbox = Kasa_client.new_mailbox () in
   let kamoha_worker = Worker.create "KaMoHaWorker.js" in
@@ -52,21 +98,11 @@ class manager () =
   let stor_state, update_stor_state = Kastor_client.init_state () in
 
   object (self)
-    val sim_worker = Worker.create "KaSimWorker.js"
     val mutable is_running = true
+    method private apply_onerror = is_running <- false
 
     initializer
       (* The url argument `no_exc_modal=true` disables exception modals to keep exception info clear in console. *)
-      let no_exc_modal_arg : string list =
-        Common_state.url_args "no_exc_modal"
-      in
-      let send_worker_exceptions_to_modal =
-        not
-          (match no_exc_modal_arg with
-          | s :: _ when String.equal s "true" -> true
-          | _ -> false)
-      in
-
       kasa_worker##.onmessage :=
         worker_onmessage ~debug_printing:true ~worker_name:"kasa_worker"
           ~exception_creates_modal:send_worker_exceptions_to_modal
@@ -79,37 +115,16 @@ class manager () =
         worker_onmessage ~debug_printing:true ~worker_name:"kastor_worker"
           ~exception_creates_modal:send_worker_exceptions_to_modal
           ~worker_receive_f:(Kastor_client.receive update_stor_state);
-      sim_worker##.onmessage :=
-        worker_onmessage ~debug_printing:false ~worker_name:"sim_worker"
-          ~exception_creates_modal:send_worker_exceptions_to_modal
-          ~worker_receive_f:self#receive;
 
-      let onerror ~worker_name =
-        Dom.handler (fun _ ->
-            let error_string : string =
-              "Error in " ^ worker_name ^ ", it might not be running anymore."
-            in
-            let () = Common.debug ~loc:__LOC__ error_string in
-            Ui_common.open_modal_error ~is_critical:false
-              ~error_content:error_string;
-
-            let () = is_running <- false in
-            Js._true)
-      in
-      sim_worker##.onerror := onerror ~worker_name:"sim_worker";
-      kasa_worker##.onerror := onerror ~worker_name:"kasa_worker";
-      kamoha_worker##.onerror := onerror ~worker_name:"kamoha_worker";
-      kastor_worker##.onerror := onerror ~worker_name:"kastor_worker"
-
-    method private sleep timeout = Js_of_ocaml_lwt.Lwt_js.sleep timeout
-
-    method private post_message (message_text : string) : unit =
-      sim_worker##postMessage message_text
-
-    inherit Mpi_api.manager ()
+      let apply_onerror () = self#apply_onerror in
+      kasa_worker##.onerror := onerror ~worker_name:"kasa_worker" ~apply_onerror;
+      kamoha_worker##.onerror :=
+        onerror ~worker_name:"kamoha_worker" ~apply_onerror;
+      kastor_worker##.onerror :=
+        onerror ~worker_name:"kastor_worker" ~apply_onerror
 
     inherit
-      Kasa_client.new_uniform_client
+      Kasa_client.new_client
         ~is_running:(fun () -> true)
         ~post:(fun message_text ->
           let () = Common.log_group "Message posted to kasa_worker" in
@@ -138,11 +153,12 @@ class manager () =
 
     val mutable kasa_locator = []
 
-    method project_parse ~patternSharing overwrites =
+    method private project_parse_without_kasim ~simulation_load ~patternSharing
+        overwrites =
       self#secret_project_parse
-      >>= Api_common.result_bind_lwt ~ok:(fun out ->
-              let load =
-                self#secret_simulation_load patternSharing out overwrites
+      >>= Api_common.result_bind_with_lwt ~ok:(fun out ->
+              let load : unit Api.lwt_result =
+                simulation_load patternSharing out overwrites
               in
               let init = self#init_static_analyser out in
               let locators =
@@ -161,9 +177,9 @@ class manager () =
                                 let () = kasa_locator <- [] in
                                 Lwt.return (Result_util.error e)))
               in
-              load >>= Api_common.result_bind_lwt ~ok:(fun () -> locators))
+              load >>= Api_common.result_bind_with_lwt ~ok:(fun () -> locators))
 
-    method get_influence_map_node_at ~filename pos : _ Api.result Lwt.t =
+    method get_influence_map_node_at ~filename pos : _ Api.lwt_result =
       List.find_opt
         (fun (_, x) -> Loc.is_included_in filename pos x)
         kasa_locator
@@ -172,13 +188,85 @@ class manager () =
       |> Lwt.return
 
     method is_running = is_running
-
-    method terminate =
-      let () = sim_worker##terminate in
-      kasa_worker##terminate
+    method terminate = kasa_worker##terminate
 
     method is_computing =
-      self#sim_is_computing
-      || Kasa_client.is_computing kasa_mailbox
-      || self#story_is_computing
+      Kasa_client.is_computing kasa_mailbox || self#story_is_computing
+  end
+
+class runtime_kasim_as_web_worker () : Api.concrete_manager =
+  let kasim_worker = Worker.create "KaSimWorker.js" in
+  object (self)
+    inherit manager_without_kasim () as without_kasim
+
+    initializer
+      kasim_worker##.onmessage :=
+        worker_onmessage ~debug_printing:false ~worker_name:"kasim_worker"
+          ~exception_creates_modal:send_worker_exceptions_to_modal
+          ~worker_receive_f:self#receive;
+      let apply_onerror () = without_kasim#apply_onerror in
+      kasim_worker##.onerror :=
+        onerror ~worker_name:"kasim_worker" ~apply_onerror
+
+    inherit
+      Kasim_client.new_client
+        ~post:(fun message_text ->
+          let () = Common.log_group "Message posted to kasim_worker" in
+          let () = Common.debug ~loc:__LOC__ (Js.string message_text) in
+          let () = Common.log_group_end () in
+          kasim_worker##postMessage message_text)
+        ()
+
+    method private sleep timeout = Js_of_ocaml_lwt.Lwt_js.sleep timeout
+
+    method terminate =
+      without_kasim#terminate;
+      kasim_worker##terminate
+
+    method is_computing = without_kasim#is_computing || self#sim_is_computing
+
+    method project_parse ~patternSharing overwrites =
+      let simulation_load patternSharing out overwrites =
+        self#secret_simulation_load patternSharing out overwrites
+      in
+      without_kasim#project_parse_without_kasim ~simulation_load ~patternSharing
+        overwrites
+  end
+
+class runtime_kasim_embedded_in_main_thread () : Api.concrete_manager =
+  let system_process : Kappa_facade.system_process =
+    object
+      method min_run_duration () = 0.1
+      method yield = Js_of_ocaml_lwt.Lwt_js.yield
+
+      method log ?exn (msg : string) =
+        let () = ignore exn in
+        let () =
+          Common.debug ~loc:__LOC__
+            (Js.string
+               (Format.sprintf
+                  "[State_runtime.embedded] embedded_manager#log: %s" msg))
+        in
+        Lwt.return_unit
+    end
+  in
+  object (self)
+    inherit manager_without_kasim () as without_kasim
+
+    (* Use embedded kasim runtime here *)
+    inherit Kasim_runtime.manager system_process
+    method is_running = true
+
+    method terminate =
+      without_kasim#terminate;
+      () (*TODO*)
+
+    method is_computing = true (*TODO*)
+
+    method project_parse ~patternSharing overwrites =
+      let simulation_load patternSharing out overwrites =
+        self#secret_simulation_load patternSharing out overwrites
+      in
+      without_kasim#project_parse_without_kasim ~simulation_load ~patternSharing
+        overwrites
   end

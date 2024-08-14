@@ -37,49 +37,49 @@ module type Mvbdu = sig
   type 'output constant =
     Remanent_parameters_sig.parameters ->
     handler ->
-    Exception.method_handler ->
-    Exception.method_handler * handler * 'output
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
 
   type ('input, 'output) unary =
     Remanent_parameters_sig.parameters ->
     handler ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'input ->
-    Exception.method_handler * handler * 'output
+    Exception.exceptions_caught_and_uncaught * handler * 'output
 
   type ('input1, 'input2, 'output) binary =
     Remanent_parameters_sig.parameters ->
     handler ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'input1 ->
     'input2 ->
-    Exception.method_handler * handler * 'output
+    Exception.exceptions_caught_and_uncaught * handler * 'output
 
   type ('input1, 'input2, 'input3, 'output) ternary =
     Remanent_parameters_sig.parameters ->
     handler ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'input1 ->
     'input2 ->
     'input3 ->
-    Exception.method_handler * handler * 'output
+    Exception.exceptions_caught_and_uncaught * handler * 'output
 
   val init :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
-    Exception.method_handler * handler
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * handler
 
   val is_init : unit -> bool
 
   val get_handler :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
-    Exception.method_handler * handler
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * handler
 
   val reset :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
-    Exception.method_handler * handler
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * handler
 
   val equal : mvbdu -> mvbdu -> bool
   val equal_with_logs : (mvbdu, mvbdu, bool) binary
@@ -209,34 +209,34 @@ module type Mvbdu = sig
 
   val store_by_variables_list :
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'data ->
     List_sig.hash_key ->
     'map ->
-    Exception.method_handler * 'data) ->
+    Exception.exceptions_caught_and_uncaught * 'data) ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     List_sig.hash_key ->
     'data ->
     'map ->
-    Exception.method_handler * 'map) ->
+    Exception.exceptions_caught_and_uncaught * 'map) ->
     'data ->
     ('data, 'data, 'data) binary ->
     (hconsed_variables_list, 'data, 'map, 'map) ternary
 
   val store_by_mvbdu :
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'data ->
     Mvbdu_sig.hash_key ->
     'map ->
-    Exception.method_handler * 'data) ->
+    Exception.exceptions_caught_and_uncaught * 'data) ->
     (Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Mvbdu_sig.hash_key ->
     'data ->
     'map ->
-    Exception.method_handler * 'map) ->
+    Exception.exceptions_caught_and_uncaught * 'map) ->
     'data ->
     ('data, 'data, 'data) binary ->
     (mvbdu, 'data, 'map, 'map) ternary
@@ -271,7 +271,7 @@ module type Internalized_mvbdu = sig
   val import_handler : handler -> unit
 
   val export_handler :
-    Exception.method_handler -> Exception.method_handler * handler option
+    Exception.exceptions_caught_and_uncaught -> Exception.exceptions_caught_and_uncaught * handler option
 
   val is_init : unit -> bool
   val equal : mvbdu -> mvbdu -> bool

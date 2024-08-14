@@ -10,9 +10,9 @@ val sub_convexe : intervalle -> intervalle -> bool
 
 val string_of_intervalle :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   intervalle ->
-  Exception_without_parameter.method_handler * string
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
 
 val contient_zero : intervalle -> bool
 

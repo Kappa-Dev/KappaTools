@@ -22,11 +22,11 @@ module type Analyzer = sig
   val main :
     Remanent_parameters_sig.parameters ->
     StoryProfiling.StoryStats.log_info ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Ckappa_sig.Views_bdu.handler ->
     Cckappa_sig.compil ->
     Cckappa_sig.kappa_handler ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * StoryProfiling.StoryStats.log_info
     * static_information
     * dynamic_information
@@ -34,26 +34,26 @@ module type Analyzer = sig
   val export :
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     ('static, 'dynamic) Analyzer_headers.kasa_state ->
-    Exception.method_handler
+    Exception.exceptions_caught_and_uncaught
     * dynamic_information
     * ('static, 'dynamic) Analyzer_headers.kasa_state
 
   val print :
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Loggers.t ->
-    Exception.method_handler * dynamic_information
+    Exception.exceptions_caught_and_uncaught * dynamic_information
 
   val maybe_reachable :
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Analyzer_headers.pattern_matching_flag ->
     Cckappa_sig.mixture ->
-    Exception.method_handler * dynamic_information * bool
+    Exception.exceptions_caught_and_uncaught * dynamic_information * bool
 end
 
 (***************************************************************************)

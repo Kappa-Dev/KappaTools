@@ -17,57 +17,57 @@
 
 type ('a, 'b) unary =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'a ->
-  Exception.method_handler * 'b
+  Exception.exceptions_caught_and_uncaught * 'b
 
 type ('a, 'b, 'c) binary =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'a ->
   'b ->
-  Exception.method_handler * 'c
+  Exception.exceptions_caught_and_uncaught * 'c
 
 type ('a, 'b, 'c, 'd) ternary =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'a ->
   'b ->
   'c ->
-  Exception.method_handler * 'd
+  Exception.exceptions_caught_and_uncaught * 'd
 
 type ('a, 'b, 'c, 'd, 'e) quaternary =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'a ->
   'b ->
   'c ->
   'd ->
-  Exception.method_handler * 'e
+  Exception.exceptions_caught_and_uncaught * 'e
 
 type ('a, 'b, 'c, 'd, 'e, 'f, 'g) sexternary =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'a ->
   'b ->
   'c ->
   'd ->
   'e ->
   'f ->
-  Exception.method_handler * 'g
+  Exception.exceptions_caught_and_uncaught * 'g
 
 type 'a unary_no_output =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'a ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
 
 type ('a, 'b) binary_no_output =
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'a ->
   'b ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
 
 module type Storage = sig
   type 'a t

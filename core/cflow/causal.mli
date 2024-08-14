@@ -73,40 +73,40 @@ val cut :
   Remanent_parameters_sig.parameters ->
   'a ->
   StoryProfiling.StoryStats.log_info ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   (int * int * int) list ->
   grid ->
-  Exception.method_handler * StoryProfiling.StoryStats.log_info * config
+  Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * config
 
 val enrich_grid :
   Remanent_parameters_sig.parameters ->
   'a ->
   StoryProfiling.StoryStats.log_info ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Graph_closure.config ->
   grid ->
-  Exception.method_handler * StoryProfiling.StoryStats.log_info * enriched_grid
+  Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * enriched_grid
 
 val fold_over_causal_past_of_obs :
   Remanent_parameters_sig.parameters ->
   'a ->
   StoryProfiling.StoryStats.log_info ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Graph_closure.config ->
   grid ->
   (Remanent_parameters_sig.parameters ->
   'a ->
   StoryProfiling.StoryStats.log_info ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Graph_closure.M.elt ->
   int list ->
   'b ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * StoryProfiling.StoryStats.log_info
   * ('b, 'c) Stop.stop) ->
   'b ->
-  ( Exception.method_handler * StoryProfiling.StoryStats.log_info * 'b,
-    Exception.method_handler * StoryProfiling.StoryStats.log_info * 'c )
+  ( Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'b,
+    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'c )
   Stop.stop
 
 val debug_print_grid : Format.formatter -> grid -> unit
@@ -116,13 +116,13 @@ val pretty_print :
   Remanent_parameters_sig.parameters ->
   'a ->
   StoryProfiling.StoryStats.log_info ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Model.t ->
   Graph_closure.config ->
   string ->
   string ->
   (Trace.t * grid * 'b Trace.Simulation_info.t list) list ->
-  Exception.method_handler * StoryProfiling.StoryStats.log_info
+  Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info
 (** [pretty_print err_fmt env config_closure compression_type label story_list
                   state env] *)
 

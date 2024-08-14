@@ -25,16 +25,16 @@ module type Work_list = sig
 
   val push :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     elt ->
     t ->
-    Exception.method_handler * t
+    Exception.exceptions_caught_and_uncaught * t
 
   val pop :
     Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     t ->
-    Exception.method_handler * (elt option * t)
+    Exception.exceptions_caught_and_uncaught * (elt option * t)
 
   val fold_left : ('a -> elt -> 'a) -> 'a -> t -> 'a
   val print_wl : Remanent_parameters_sig.parameters -> t -> unit

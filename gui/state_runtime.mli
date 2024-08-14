@@ -34,7 +34,7 @@ val create_spec : load:bool -> string -> unit Api.result
 *)
 
 val create_manager :
-  is_new:bool -> string -> Api.concrete_manager Api.result Lwt.t
+  is_new:bool -> string -> Api.concrete_manager Api.lwt_result
 (** Create a runtime to be used by the system *)
 
 val init : unit -> string list Lwt.t

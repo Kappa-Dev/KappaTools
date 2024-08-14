@@ -668,7 +668,7 @@ let print_rule_dot parameters error _rule_id m1 m2 rule =
   in
   error
 
-let print_var_dot parameters (error : Exception.method_handler) _var_id m1 m2
+let print_var_dot parameters (error : Exception.exceptions_caught_and_uncaught) _var_id m1 m2
     var =
   let error =
     if m1 <> "" && not (Remanent_parameters.get_prompt_full_var_def parameters)

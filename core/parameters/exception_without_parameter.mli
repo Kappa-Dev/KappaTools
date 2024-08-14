@@ -20,7 +20,7 @@ type caught_exception
 
 exception Caught_exception of caught_exception
 
-type method_handler
+type exceptions_caught_and_uncaught
 
 val raise_exception : string option -> unit -> string option -> exn -> unit
 
@@ -31,7 +31,7 @@ val build_caught_exception :
   string option -> string option -> exn -> string list -> caught_exception
 
 val add_uncaught_error :
-  ?to_ui:bool -> uncaught_exception -> method_handler -> method_handler
+  ?to_ui:bool -> uncaught_exception -> exceptions_caught_and_uncaught -> exceptions_caught_and_uncaught
 
 val stringlist_of_exception : exn -> string list -> string list
 val stringlist_of_uncaught : uncaught_exception -> string list -> string list
@@ -40,14 +40,14 @@ val stringlist_of_caught_light : caught_exception -> string list -> string list
 val pp_exception : Format.formatter -> exn -> unit
 val pp_uncaught : Format.formatter -> uncaught_exception -> unit
 val pp_caught : Format.formatter -> caught_exception -> unit
-val empty_error_handler : method_handler
-val is_empty_error_handler : method_handler -> bool
-val get_caught_exception_list : method_handler -> caught_exception list
-val get_caught_exception_list_to_ui : method_handler -> caught_exception list
-val get_uncaught_exception_list : method_handler -> uncaught_exception list
+val empty_exceptions_caught_and_uncaught : exceptions_caught_and_uncaught
+val is_empty_exceptions_caught_and_uncaught : exceptions_caught_and_uncaught -> bool
+val get_caught_exception_list : exceptions_caught_and_uncaught -> caught_exception list
+val get_caught_exception_list_to_ui : exceptions_caught_and_uncaught -> caught_exception list
+val get_uncaught_exception_list : exceptions_caught_and_uncaught -> uncaught_exception list
 
 val get_uncaught_exception_list_to_ui :
-  method_handler -> uncaught_exception list
+  exceptions_caught_and_uncaught -> uncaught_exception list
 
-val to_json : method_handler -> Yojson.Basic.t
-val of_json : Yojson.Basic.t -> method_handler
+val to_json : exceptions_caught_and_uncaught -> Yojson.Basic.t
+val of_json : Yojson.Basic.t -> exceptions_caught_and_uncaught

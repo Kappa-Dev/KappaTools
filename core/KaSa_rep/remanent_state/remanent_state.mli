@@ -111,7 +111,7 @@ val to_json : ('static, 'dynamic) state -> Yojson.Basic.t
 
 val of_json :
   Yojson.Basic.t ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * Public_data.contact_map Public_data.AccuracyMap.t
   * Public_data.influence_map Public_data.AccuracyMap.t
   * Public_data.dead_rules option
@@ -119,7 +119,7 @@ val of_json :
   * Public_data.separating_transitions option
 
 val create_state :
-  ?errors:Exception.method_handler ->
+  ?errors:Exception.exceptions_caught_and_uncaught ->
   ?env:Model.t option ->
   ?init_state:initial_state ->
   ?reset:bool ->
@@ -187,10 +187,10 @@ val set_c_compil :
   Cckappa_sig.compil -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_c_compil : ('static, 'compile) state -> Cckappa_sig.compil option
-val get_errors : ('static, 'compile) state -> Exception.method_handler
+val get_errors : ('static, 'compile) state -> Exception.exceptions_caught_and_uncaught
 
 val set_errors :
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   ('static, 'compile) state ->
   ('static, 'compile) state
 

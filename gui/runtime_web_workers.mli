@@ -6,10 +6,5 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type mailbox
-
-val new_mailbox : unit -> mailbox
-val receive : mailbox -> string -> unit
-val is_computing : mailbox -> bool
-
-class virtual new_client : post:(string -> unit) -> mailbox -> Api.manager_model
+class runtime_kasim_as_web_worker : unit -> Api.concrete_manager
+class runtime_kasim_embedded_in_main_thread : unit -> Api.concrete_manager

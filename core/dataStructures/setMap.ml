@@ -264,52 +264,52 @@ module type Map = sig
 
   val monadic_fold2 :
     'parameters ->
-    'method_handler ->
+    'exceptions_caught_and_uncaught ->
     ('parameters ->
-    'method_handler ->
+    'exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'b ->
     'c ->
-    'method_handler * 'c) ->
-    ('parameters -> 'method_handler -> elt -> 'a -> 'c -> 'method_handler * 'c) ->
-    ('parameters -> 'method_handler -> elt -> 'b -> 'c -> 'method_handler * 'c) ->
+    'exceptions_caught_and_uncaught * 'c) ->
+    ('parameters -> 'exceptions_caught_and_uncaught -> elt -> 'a -> 'c -> 'exceptions_caught_and_uncaught * 'c) ->
+    ('parameters -> 'exceptions_caught_and_uncaught -> elt -> 'b -> 'c -> 'exceptions_caught_and_uncaught * 'c) ->
     'a t ->
     'b t ->
     'c ->
-    'method_handler * 'c
+    'exceptions_caught_and_uncaught * 'c
 
   val monadic_fold2_sparse :
     'parameters ->
-    'method_handler ->
+    'exceptions_caught_and_uncaught ->
     ('parameters ->
-    'method_handler ->
+    'exceptions_caught_and_uncaught ->
     elt ->
     'a ->
     'b ->
     'c ->
-    'method_handler * 'c) ->
+    'exceptions_caught_and_uncaught * 'c) ->
     'a t ->
     'b t ->
     'c ->
-    'method_handler * 'c
+    'exceptions_caught_and_uncaught * 'c
 
   val monadic_iter2_sparse :
     'parameters ->
-    'method_handler ->
-    ('parameters -> 'method_handler -> elt -> 'a -> 'b -> 'method_handler) ->
+    'exceptions_caught_and_uncaught ->
+    ('parameters -> 'exceptions_caught_and_uncaught -> elt -> 'a -> 'b -> 'exceptions_caught_and_uncaught) ->
     'a t ->
     'b t ->
-    'method_handler
+    'exceptions_caught_and_uncaught
 
   val monadic_fold_restriction :
     'parameters ->
-    'method_handler ->
-    ('parameters -> 'method_handler -> elt -> 'a -> 'b -> 'method_handler * 'b) ->
+    'exceptions_caught_and_uncaught ->
+    ('parameters -> 'exceptions_caught_and_uncaught -> elt -> 'a -> 'b -> 'exceptions_caught_and_uncaught * 'b) ->
     set ->
     'a t ->
     'b ->
-    'method_handler * 'b
+    'exceptions_caught_and_uncaught * 'b
 
   val mapi : (elt -> 'a -> 'b) -> 'a t -> 'b t
   val map : ('a -> 'b) -> 'a t -> 'b t
@@ -2186,30 +2186,30 @@ module type Projection = sig
 
   val proj_map_monadic :
     'parameters ->
-    'method_handler ->
+    'exceptions_caught_and_uncaught ->
     (elt_a -> elt_b) ->
     'b ->
-    ('parameters -> 'method_handler -> 'b -> 'a -> 'method_handler * 'b) ->
+    ('parameters -> 'exceptions_caught_and_uncaught -> 'b -> 'a -> 'exceptions_caught_and_uncaught * 'b) ->
     'a map_a ->
-    'method_handler * 'b map_b
+    'exceptions_caught_and_uncaught * 'b map_b
 
   val proj_set : (elt_a -> elt_b) -> set_a -> set_b
 
   val proj_set_monadic :
     'parameters ->
-    'method_handler ->
-    ('parameters -> 'method_handler -> elt_a -> 'method_handler * elt_b) ->
+    'exceptions_caught_and_uncaught ->
+    ('parameters -> 'exceptions_caught_and_uncaught -> elt_a -> 'exceptions_caught_and_uncaught * elt_b) ->
     set_a ->
-    'method_handler * set_b
+    'exceptions_caught_and_uncaught * set_b
 
   val partition_set : (elt_a -> elt_b) -> set_a -> set_a map_b
 
   val partition_set_monadic :
     'parameters ->
-    'method_handler ->
-    ('parameters -> 'method_handler -> elt_a -> 'method_handler * elt_b) ->
+    'exceptions_caught_and_uncaught ->
+    ('parameters -> 'exceptions_caught_and_uncaught -> elt_a -> 'exceptions_caught_and_uncaught * elt_b) ->
     set_a ->
-    'method_handler * set_a map_b
+    'exceptions_caught_and_uncaught * set_a map_b
 end
 
 module Proj (A : S) (B : S) = struct
@@ -2338,13 +2338,13 @@ module type Projection2 = sig
 
   val proj2_monadic :
     'parameters ->
-    'method_handler ->
+    'exceptions_caught_and_uncaught ->
     (elt_a -> elt_b) ->
     (elt_a -> elt_c) ->
     'b ->
-    ('parameters -> 'method_handler -> 'b -> 'a -> 'method_handler * 'b) ->
+    ('parameters -> 'exceptions_caught_and_uncaught -> 'b -> 'a -> 'exceptions_caught_and_uncaught * 'b) ->
     'a map_a ->
-    'method_handler * 'b map_c map_b
+    'exceptions_caught_and_uncaught * 'b map_c map_b
 end
 
 module Proj2 (A : S) (B : S) (C : S) = struct

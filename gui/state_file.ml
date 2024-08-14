@@ -48,42 +48,42 @@ let with_current_file f =
   match state.current with
   | None ->
     let error_msg : string = "Attempt to fetch file with none selected." in
-    Lwt.return (Api_common.result_error_msg error_msg)
+    Lwt.return (Api_common.err_result_of_string error_msg)
   | Some active ->
     (match Mods.IntMap.find_option active.rank state.directory with
     | None ->
       let error_msg : string =
         "Internal inconsistentcy: No file at selected rank."
       in
-      Lwt.return (Api_common.result_error_msg error_msg)
+      Lwt.return (Api_common.err_result_of_string error_msg)
     | Some x -> f state active x)
 
-let get_file () : (string * string) Api.result Lwt.t =
+let get_file () : (string * string) Api.lwt_result =
   with_current_file (fun _state active -> function
     | { local = None; name } ->
       State_project.eval_with_project ~label:"get_file" (fun manager ->
           manager#file_get name
-          >>= Api_common.result_bind_lwt ~ok:(fun (text, rank') ->
+          >>= Api_common.result_bind_with_lwt ~ok:(fun (text, rank') ->
                   if active.rank = rank' then
                     Lwt.return (Result_util.ok (text, name))
                   else (
                     let error_msg = "Inconsistency in rank while get_file." in
-                    Lwt.return (Api_common.result_error_msg error_msg)
+                    Lwt.return (Api_common.err_result_of_string error_msg)
                   )))
     | { local = Some text; name } -> Lwt.return (Result_util.ok (text, name)))
 
-let send_refresh (line : int option) : unit Api.result Lwt.t =
+let send_refresh (line : int option) : unit Api.lwt_result =
   (* only send refresh if there is a current file *)
   match (React.S.value model).current with
   | None -> Lwt.return (Result_util.ok ())
   | Some { out_of_sync; _ } ->
     if out_of_sync then
       Lwt.return
-        (Api_common.result_error_msg
+        (Api_common.err_result_of_string
            "File was not in sync. Switching may lead to data lost.")
     else
       get_file ()
-      >>= Api_common.result_bind_lwt ~ok:(fun (content, filename) ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun (content, filename) ->
               let () = Common.log_group "Refresh file" in
               let () = Common.debug ~loc:__LOC__ content in
               let () = Common.log_group_end () in
@@ -106,11 +106,11 @@ let update_directory ~reset current catalog =
   in
   set_directory_state { current; directory }
 
-let create_file ~(filename : string) ~(content : string) : unit Api.result Lwt.t
+let create_file ~(filename : string) ~(content : string) : unit Api.lwt_result
     =
   State_project.eval_with_project ~label:"create_file" (fun manager ->
       manager#file_catalog
-      >>= Api_common.result_bind_lwt ~ok:(fun catalog ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->
               let matching_file =
                 List.filter
                   (fun file_metadata -> filename = file_metadata.Kfiles.id)
@@ -124,17 +124,17 @@ let create_file ~(filename : string) ~(content : string) : unit Api.result Lwt.t
                     0 catalog
                 in
                 manager#file_create (succ max_pos) filename content
-                >>= Api_common.result_bind_lwt ~ok:(fun () ->
+                >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                         manager#file_catalog
-                        >>= Api_common.result_bind_lwt ~ok:(fun catalog' ->
+                        >>= Api_common.result_bind_with_lwt ~ok:(fun catalog' ->
                                 Lwt.return
                                   (Result_util.ok (catalog', succ max_pos))))
               | metadata :: _ ->
                 manager#file_update filename content
-                >>= Api_common.result_bind_lwt ~ok:(fun () ->
+                >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                         Lwt.return
                           (Result_util.ok (catalog, metadata.Kfiles.position))))
-              >>= Api_common.result_bind_lwt ~ok:(fun (catalog, current) ->
+              >>= Api_common.result_bind_with_lwt ~ok:(fun (catalog, current) ->
                       let () =
                         update_directory ~reset:false
                           (Some
@@ -152,19 +152,19 @@ let rec choose_file choice = function
     let error_msg : string =
       Format.sprintf "Failed to switch file %s." choice
     in
-    Api_common.result_error_msg error_msg
+    Api_common.err_result_of_string error_msg
   | { Kfiles.id; position } :: t ->
     if choice = id then
       Result_util.ok position
     else
       choose_file choice t
 
-let select_file (filename : string) (line : int option) : unit Api.result Lwt.t
+let select_file (filename : string) (line : int option) : unit Api.lwt_result
     =
   State_project.eval_with_project ~label:"select_file" (fun manager ->
       manager#file_catalog
-      >>= Api_common.result_bind_lwt ~ok:(fun catalog ->
-              Api_common.result_bind_lwt
+      >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->
+              Api_common.result_bind_with_lwt
                 ~ok:(fun rank ->
                   let () =
                     update_directory ~reset:false
@@ -179,7 +179,7 @@ let select_file (filename : string) (line : int option) : unit Api.result Lwt.t
                   send_refresh line)
                 (choose_file filename catalog)))
 
-let set_content (content : string) : unit Api.result Lwt.t =
+let set_content (content : string) : unit Api.lwt_result =
   with_current_file (fun state active -> function
     | { local = Some _; name } ->
       let directory =
@@ -206,14 +206,14 @@ let set_content (content : string) : unit Api.result Lwt.t =
       State_project.eval_with_project ~label:"set_content" (fun manager ->
           manager#file_update name content))
 
-let set_compile file_id (compile : bool) : unit Api.result Lwt.t =
+let set_compile file_id (compile : bool) : unit Api.lwt_result =
   let state = React.S.value model in
   match
     Mods.IntMap.filter_one (fun _ { name; _ } -> name = file_id) state.directory
   with
   | None ->
     let error_msg = "Internal inconsistency: No file " ^ file_id in
-    Lwt.return (Api_common.result_error_msg error_msg)
+    Lwt.return (Api_common.err_result_of_string error_msg)
   | Some (rank, { local = Some content; name }) ->
     if compile then (
       let directory =
@@ -230,7 +230,7 @@ let set_compile file_id (compile : bool) : unit Api.result Lwt.t =
     else
       State_project.eval_with_project ~label:"set_compile" (fun manager ->
           manager#file_get name
-          >>= Api_common.result_bind_lwt ~ok:(fun (content, rank') ->
+          >>= Api_common.result_bind_with_lwt ~ok:(fun (content, rank') ->
                   if rank = rank' then (
                     let directory =
                       Mods.IntMap.add rank
@@ -246,10 +246,10 @@ let set_compile file_id (compile : bool) : unit Api.result Lwt.t =
                     let error_msg =
                       "Inconsistency in rank while set_compile."
                     in
-                    Lwt.return (Api_common.result_error_msg error_msg)
+                    Lwt.return (Api_common.err_result_of_string error_msg)
                   )))
 
-let remove_file () : unit Api.result Lwt.t =
+let remove_file () : unit Api.lwt_result =
   with_current_file (fun state active { local; name } ->
       let directory = Mods.IntMap.remove active.rank state.directory in
       let current =
@@ -273,7 +273,7 @@ let do_a_move state file_id rank =
   with
   | None ->
     let error_msg = "Internal inconsistency: No file " ^ file_id in
-    Lwt.return (Api_common.result_error_msg error_msg)
+    Lwt.return (Api_common.err_result_of_string error_msg)
   | Some (rank', ({ local; _ } as x)) ->
     let directory =
       Mods.IntMap.add rank x (Mods.IntMap.remove rank' state.directory)
@@ -287,7 +287,7 @@ let do_a_move state file_id rank =
     if local = None then
       State_project.eval_with_project ~label:"remove_file" (fun manager ->
           manager#file_move rank file_id
-          >>= Api_common.result_bind_lwt ~ok:(fun () ->
+          >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                   Lwt.return (Result_util.ok { current; directory })))
     else
       Lwt.return (Result_util.ok { current; directory })
@@ -299,19 +299,19 @@ let rec set_position state file_id rank =
       Lwt.return (Result_util.ok state)
     else
       set_position state name (succ rank)
-      >>= Api_common.result_bind_lwt ~ok:(fun state' ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun state' ->
               do_a_move state' file_id rank)
   | None -> do_a_move state file_id rank
 
-let order_files (filenames : string list) : unit Api.result Lwt.t =
-  let rec _order_file filenames state index : unit Api.result Lwt.t =
+let order_files (filenames : string list) : unit Api.lwt_result =
+  let rec _order_file filenames state index : unit Api.lwt_result =
     match filenames with
     | [] ->
       let () = set_directory_state state in
       Lwt.return (Result_util.ok ())
     | file_id :: tail ->
       set_position state file_id index
-      >>= Api_common.result_bind_lwt ~ok:(fun state' ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun state' ->
               _order_file tail state' (index + 1))
   in
   _order_file filenames (React.S.value model) 0
@@ -344,10 +344,10 @@ let out_of_sync out_of_sync =
         directory = v.directory;
       }
 
-let sync ?(reset = false) () : unit Api.result Lwt.t =
+let sync ?(reset = false) () : unit Api.lwt_result =
   State_project.eval_with_project ~label:"select_file" (fun manager ->
       manager#file_catalog
-      >>= Api_common.result_bind_lwt ~ok:(fun catalog ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->
               let cand = (React.S.value model).current in
               let pos =
                 if
@@ -401,7 +401,7 @@ let load_models () : unit Lwt.t =
       >>= (fun content ->
             if content.Js_of_ocaml_lwt.XmlHttpRequest.code <> 200 then
               Lwt.return
-                (Api_common.result_error_msg
+                (Api_common.err_result_of_string
                    (Format.sprintf "bad response code %d fetching url %s"
                       content.Js_of_ocaml_lwt.XmlHttpRequest.code model))
             else (
@@ -410,7 +410,7 @@ let load_models () : unit Lwt.t =
               with
               | None ->
                 Lwt.return
-                  (Api_common.result_error_msg
+                  (Api_common.err_result_of_string
                      (Format.sprintf "failed to retrieve url %s" model))
               | Some u ->
                 let filename =
@@ -425,9 +425,9 @@ let load_models () : unit Lwt.t =
                 Lwt.return (Result_util.ok (filename, filecontent))
             ))
       >>= (* add content *)
-      Api_common.result_bind_lwt ~ok:(fun (filename, content) ->
+      Api_common.result_bind_with_lwt ~ok:(fun (filename, content) ->
           create_file ~filename ~content
-          >>= Api_common.result_bind_lwt ~ok:(fun () ->
+          >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                   Lwt.return (Result_util.ok filename)))
       >>= (* select model if needed *)
       Result_util.fold

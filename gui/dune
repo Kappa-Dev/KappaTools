@@ -120,7 +120,7 @@
  (flags
   :standard
   -w
-  +a
+  @a-7-70
   -open
   Js_of_ocaml
   -open

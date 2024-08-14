@@ -140,11 +140,11 @@ let select_snapshot (snapshot_js : Js_snapshot.snapshot Js.t) : unit =
       let () =
         State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
             manager#simulation_catalog_snapshot
-            >>= Api_common.result_bind_lwt ~ok:(fun snapshot_ids ->
+            >>= Api_common.result_bind_with_lwt ~ok:(fun snapshot_ids ->
                     try
                       let snapshot_id : string = List.nth snapshot_ids index in
                       manager#simulation_detail_snapshot snapshot_id
-                      >>= Api_common.result_bind_lwt
+                      >>= Api_common.result_bind_with_lwt
                             ~ok:(fun (snapshot : Data.snapshot) ->
                               let () =
                                 set_current_snapshot
@@ -155,9 +155,9 @@ let select_snapshot (snapshot_js : Js_snapshot.snapshot Js.t) : unit =
                               in
                               Lwt.return (Result_util.ok ()))
                     with
-                    | Failure f -> Lwt.return (Api_common.result_error_msg f)
+                    | Failure f -> Lwt.return (Api_common.err_result_of_string f)
                     | Invalid_argument f ->
-                      Lwt.return (Api_common.result_error_msg f)))
+                      Lwt.return (Api_common.err_result_of_string f)))
       in
       ()
     )
@@ -211,7 +211,7 @@ let xml () =
              ~initializing:(fun _ -> Lwt.return (Result_util.ok []))
              ~ready:(fun manager _ ->
                manager#simulation_catalog_snapshot
-               >>= Api_common.result_bind_lwt ~ok:(fun snapshot_ids ->
+               >>= Api_common.result_bind_with_lwt ~ok:(fun snapshot_ids ->
                        Lwt.return (Result_util.ok (select snapshot_ids))))
              ()
            >|= Result_util.fold

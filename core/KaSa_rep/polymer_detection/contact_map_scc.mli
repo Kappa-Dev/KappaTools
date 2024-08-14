@@ -18,34 +18,34 @@ type converted_contact_map
 
 val convert_contact_map :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Remanent_state.internal_contact_map ->
-  Exception.method_handler * converted_contact_map
+  Exception.exceptions_caught_and_uncaught * converted_contact_map
 
 val mixture_of_edge :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   edge ->
-  Exception.method_handler * Cckappa_sig.mixture
+  Exception.exceptions_caught_and_uncaught * Cckappa_sig.mixture
 
 val filter_edges_in_converted_contact_map :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   'static ->
   'dynamic ->
   (Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   'static ->
   'dynamic ->
   Cckappa_sig.mixture ->
-  Exception.method_handler * 'dynamic * bool) ->
+  Exception.exceptions_caught_and_uncaught * 'dynamic * bool) ->
   converted_contact_map ->
-  Exception.method_handler * 'dynamic * converted_contact_map
+  Exception.exceptions_caught_and_uncaught * 'dynamic * converted_contact_map
 
 val compute_graph_scc :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   converted_contact_map ->
-  Exception.method_handler * Remanent_state.internal_scc_decomposition
+  Exception.exceptions_caught_and_uncaught * Remanent_state.internal_scc_decomposition

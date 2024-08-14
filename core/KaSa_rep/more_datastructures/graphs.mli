@@ -12,11 +12,11 @@ type ('node_label, 'edge_label) graph
 
 val create :
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   (node -> 'node_label) ->
   node list ->
   (node * 'edge_label * node) list ->
-  Exception.method_handler * ('node_label, 'edge_label) graph
+  Exception.exceptions_caught_and_uncaught * ('node_label, 'edge_label) graph
 
 val add_bridges :
   ?low:int Nodearray.t ->
@@ -25,12 +25,12 @@ val add_bridges :
   ?scc:int Nodearray.t ->
   ('a * 'b * 'a -> 'c -> 'c) ->
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   ('a -> string) ->
   ('b -> string) ->
   ('a, 'b) graph ->
   'c ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * int Nodearray.t
   * int Nodearray.t
   * bool Nodearray.t
@@ -42,10 +42,10 @@ val compute_scc :
   ?pre:int Nodearray.t ->
   ?on_stack:bool Nodearray.t ->
   Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   ('a -> string) ->
   ('a, 'b) graph ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
   * int Nodearray.t
   * int Nodearray.t
   * bool Nodearray.t

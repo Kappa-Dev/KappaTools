@@ -53,46 +53,46 @@ module type Cflow_handler = sig
     parameter ->
     handler ->
     StoryProfiling.StoryStats.log_info ->
-    Exception.method_handler ->
-    Exception.method_handler * StoryProfiling.StoryStats.log_info * 'a
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'a
 
   type ('a, 'b) unary =
     parameter ->
     handler ->
     StoryProfiling.StoryStats.log_info ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.method_handler * StoryProfiling.StoryStats.log_info * 'b
+    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'b
 
   type ('a, 'b, 'c) binary =
     parameter ->
     handler ->
     StoryProfiling.StoryStats.log_info ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
-    Exception.method_handler * StoryProfiling.StoryStats.log_info * 'c
+    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'c
 
   type ('a, 'b, 'c, 'd) ternary =
     parameter ->
     handler ->
     StoryProfiling.StoryStats.log_info ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
     'c ->
-    Exception.method_handler * StoryProfiling.StoryStats.log_info * 'd
+    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'd
 
   type ('a, 'b, 'c, 'd, 'e) quaternary =
     parameter ->
     handler ->
     StoryProfiling.StoryStats.log_info ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
     'c ->
     'd ->
-    Exception.method_handler * StoryProfiling.StoryStats.log_info * 'e
+    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'e
 
   val do_not_bound_itterations : parameter -> parameter
   val set_itteration_bound : parameter -> int -> parameter
@@ -164,11 +164,11 @@ module type Cflow_handler = sig
   val set_reset_progress_bar : parameter -> (unit -> unit) -> parameter
 
   val save_error_log :
-    parameter -> Exception_without_parameter.method_handler -> unit
+    parameter -> Exception_without_parameter.exceptions_caught_and_uncaught -> unit
 
   val set_save_error_log :
     parameter ->
-    (Exception_without_parameter.method_handler -> unit) ->
+    (Exception_without_parameter.exceptions_caught_and_uncaught -> unit) ->
     parameter
   (*  val dump_json: parameter -> Yojson.Basic.t -> unit*)
 

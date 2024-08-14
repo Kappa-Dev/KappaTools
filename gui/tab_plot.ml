@@ -34,7 +34,7 @@ let export_json filename =
           Api_types_j.plot_limit_offset = None;
           Api_types_j.plot_limit_points = None;
         }
-      >>= Api_common.result_bind_lwt ~ok:(fun (plot : Api_types_t.plot) ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun (plot : Api_types_t.plot) ->
               let data = Js.string (Data.string_of_plot plot) in
               let () =
                 Common.saveFile ~data ~mime:"application/json" ~filename
@@ -48,7 +48,7 @@ let export mime filename =
           Api_types_j.plot_limit_offset = None;
           Api_types_j.plot_limit_points = None;
         }
-      >>= Api_common.result_bind_lwt ~ok:(fun (plot : Api_types_t.plot) ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun (plot : Api_types_t.plot) ->
               let data =
                 Js.string (Data.export_plot ~is_tsv:(mime = "text/tsv") plot)
               in
@@ -156,7 +156,7 @@ let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
   State_simulation.eval_when_ready ~label:__LOC__ (fun manager ->
       let () = update_offset true in
       manager#simulation_detail_plot (plot_parameter ())
-      >>= Api_common.result_bind_lwt ~ok:(fun (plot : Api_types_t.plot) ->
+      >>= Api_common.result_bind_with_lwt ~ok:(fun (plot : Api_types_t.plot) ->
               let data = Js.string (Data.string_of_plot plot) in
               let () = js_plot##setData data in
               Lwt.return (Result_util.ok ())))

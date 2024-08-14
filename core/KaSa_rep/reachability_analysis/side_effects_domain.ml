@@ -65,32 +65,32 @@ module Domain = struct
   type 'a zeroary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
-    Exception.method_handler * dynamic_information * 'a
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'a
 
   type ('a, 'b) unary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.method_handler * dynamic_information * 'b
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'b
 
   type ('a, 'b, 'c) binary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
-    Exception.method_handler * dynamic_information * 'c
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'c
 
   type ('a, 'b, 'c, 'd) ternary =
     static_information ->
     dynamic_information ->
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
     'c ->
-    Exception.method_handler * dynamic_information * 'd
+    Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
   (**************************************************************************)
   (** [get_scan_rule_set static] *)

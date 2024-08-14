@@ -2,7 +2,7 @@ val local_trace : bool
 
 val translate_compil :
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   ( Ast.agent,
     Ast.agent_sig,
     Ast.mixture,
@@ -10,7 +10,7 @@ val translate_compil :
     string,
     Ast.rule )
   Ast.compil ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * ( Ckappa_sig.agent,
       Ckappa_sig.agent_sig,
       Ckappa_sig.mixture,
@@ -34,40 +34,40 @@ val add_entry :
   'a ->
   'b ->
   'c ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * ('a * 'b * 'c) list Ckappa_sig.Agent_id_map_and_set.Map.t ->
-  Exception_without_parameter.method_handler
+  Exception_without_parameter.exceptions_caught_and_uncaught
   * ('a * 'b * 'c) list Ckappa_sig.Agent_id_map_and_set.Map.t
 
 val map_with_pos :
-  ('a -> 'b -> 'c -> Exception_without_parameter.method_handler * 'e) ->
+  ('a -> 'b -> 'c -> Exception_without_parameter.exceptions_caught_and_uncaught * 'e) ->
   'a ->
   'b ->
   'c * 'f ->
-  Exception_without_parameter.method_handler * ('e * 'f)
+  Exception_without_parameter.exceptions_caught_and_uncaught * ('e * 'f)
 
 val alg_map :
-  (Exception_without_parameter.method_handler ->
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
   'b ->
-  Exception_without_parameter.method_handler * 'c) ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'c) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('b, 'd) Alg_expr.e ->
-  Exception_without_parameter.method_handler * ('c, 'd) Alg_expr.e
+  Exception_without_parameter.exceptions_caught_and_uncaught * ('c, 'd) Alg_expr.e
 
 val bool_map :
-  (Exception_without_parameter.method_handler ->
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
   'b ->
-  Exception_without_parameter.method_handler * 'c) ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'c) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('b, 'd) Alg_expr.bool ->
-  Exception_without_parameter.method_handler * ('c, 'd) Alg_expr.bool
+  Exception_without_parameter.exceptions_caught_and_uncaught * ('c, 'd) Alg_expr.bool
 
 val with_option_map :
   ('a ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   'c ->
-  Exception_without_parameter.method_handler * 'd) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'd) ->
   'a ->
-  Exception_without_parameter.method_handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   'c option ->
-  Exception_without_parameter.method_handler * 'd option
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'd option

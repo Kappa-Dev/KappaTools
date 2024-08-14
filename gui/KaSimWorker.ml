@@ -19,12 +19,12 @@ class system_process () : Kappa_facade.system_process =
     method min_run_duration () = 0.1
   end
 
-let sytem_process : Kappa_facade.system_process = new system_process ()
-let manager : Api.manager_simulation = new Api_runtime.manager sytem_process
+let system_process_ : Kappa_facade.system_process = new system_process ()
+let manager : Api.manager_simulation = new Kasim_runtime.manager system_process_
 
 let on_message (text_message : string) : unit =
   Lwt.ignore_result
-    (Mpi_api.on_message manager
+    (Kasim_mpi.on_message manager
        (fun s ->
          let () = Worker.post_message s in
          Lwt.return_unit)

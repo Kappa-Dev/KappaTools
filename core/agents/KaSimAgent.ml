@@ -23,11 +23,11 @@ class system_process () : Kappa_facade.system_process =
 
 (* set up handlers for v2 *)
 let process_comand_v2 (message_delimiter : char) : string -> unit Lwt.t =
-  let sytem_process : Kappa_facade.system_process = new system_process () in
+  let system_process_ : Kappa_facade.system_process = new system_process () in
   let manager : Api.manager_simulation =
-    new Api_runtime.manager sytem_process
+    new Kasim_runtime.manager system_process_
   in
-  Mpi_api.on_message manager (fun message ->
+  Kasim_mpi.on_message manager (fun message ->
       Lwt_io.atomic
         (fun f ->
           Lwt_io.write f message >>= fun () ->

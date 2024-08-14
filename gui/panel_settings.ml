@@ -763,7 +763,7 @@ module RunningPanelLayout : Ui_common.Div = struct
               State_simulation.eval_with_sim_manager_and_info ~label:__LOC__
                 ~ready:(fun manager status ->
                   manager#simulation_efficiency
-                  >>= Api_common.result_bind_lwt ~ok:(fun eff ->
+                  >>= Api_common.result_bind_with_lwt ~ok:(fun eff ->
                           let current_event =
                             status.Api_types_j.simulation_info_progress
                               .Api_types_j.simulation_progress_event

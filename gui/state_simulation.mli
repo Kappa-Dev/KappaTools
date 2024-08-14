@@ -23,32 +23,32 @@ val model_simulation_state : t -> model_state
 
 (* run on application init *)
 val init : unit -> unit Lwt.t
-val refresh : unit -> unit Api.result Lwt.t
+val refresh : unit -> unit Api.lwt_result
 
 val eval_with_sim_manager :
   label:string ->
-  (Api.concrete_manager -> t -> 'a Api.result Lwt.t) ->
-  'a Api.result Lwt.t
+  (Api.concrete_manager -> t -> 'a Api.lwt_result) ->
+  'a Api.lwt_result
 (** [eval_with_sim_manager ~label handler] evaluates the function [handler] applied to the [concrete_manager] of current project and current [simulation_state] *)
 
 val eval_with_sim_manager_and_info :
   label:string ->
-  ?stopped:(Api.concrete_manager -> 'a Api.result Lwt.t) ->
-  ?initializing:(Api.concrete_manager -> 'a Api.result Lwt.t) ->
+  ?stopped:(Api.concrete_manager -> 'a Api.lwt_result) ->
+  ?initializing:(Api.concrete_manager -> 'a Api.lwt_result) ->
   ?ready:
-    (Api.concrete_manager -> Api_types_j.simulation_info -> 'a Api.result Lwt.t) ->
+    (Api.concrete_manager -> Api_types_j.simulation_info -> 'a Api.lwt_result) ->
   unit ->
-  'a Api.result Lwt.t
+  'a Api.lwt_result
 (** [eval_with_sim_manager_and_info ~label ~stopped ~initializing ~ready] evaluates the function in argument matching the current [simulation_state], applied to the [concrete_manager] of current project *)
 
 val eval_when_ready :
   label:string ->
   ?handler:(unit Api.result -> unit Lwt.t) ->
-  (Api.concrete_manager -> unit Api.result Lwt.t) ->
+  (Api.concrete_manager -> unit Api.lwt_result) ->
   unit
 
-val continue_simulation : string -> unit Api.result Lwt.t
-val pause_simulation : unit -> unit Api.result Lwt.t
-val stop_simulation : unit -> unit Api.result Lwt.t
-val start_simulation : Api_types_j.simulation_parameter -> unit Api.result Lwt.t
-val intervene_simulation : string -> string Api.result Lwt.t
+val continue_simulation : string -> unit Api.lwt_result
+val pause_simulation : unit -> unit Api.lwt_result
+val stop_simulation : unit -> unit Api.lwt_result
+val start_simulation : Api_types_j.simulation_parameter -> unit Api.lwt_result
+val intervene_simulation : string -> string Api.lwt_result

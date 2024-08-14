@@ -32,37 +32,37 @@ type static = {
 val print_restriction :
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   restriction ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
 
 val print_agent_restriction :
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   restriction Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.t ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
 
 val print_rule_restriction :
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   restriction Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.t
   Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.t ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
 
 val print_restrictions :
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   restriction Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif.t
   Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.t
   Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.t ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught
 
 val print :
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
-  Exception.method_handler ->
+  Exception.exceptions_caught_and_uncaught ->
   static ->
-  Exception.method_handler
+  Exception.exceptions_caught_and_uncaught

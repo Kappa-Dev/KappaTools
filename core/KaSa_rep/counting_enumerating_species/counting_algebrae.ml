@@ -33,7 +33,7 @@ module type Enumeration = sig
   val square : abstract_species_set -> abstract_species_set
 
   val print :
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     out_channel ->
     (out_channel -> puzzle_hole -> unit) ->
@@ -41,7 +41,7 @@ module type Enumeration = sig
     unit
 
   val print_short :
-    Exception.method_handler ->
+    Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     out_channel ->
     (out_channel -> puzzle_hole -> unit) ->
