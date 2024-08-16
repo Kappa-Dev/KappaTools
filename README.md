@@ -149,16 +149,6 @@ Do:
 
 ```python
 import kappy
-client = kappy.KappaRest("http\://url_of/the_server","project_name")
-```
-
-to get a kappa client that uses the REST API hosted by
-*http://url_of/the_server* and deals with project *project_name*.
-
-or do:
-
-```python
-import kappy
 client = kappy.KappaStd()
 ```
 

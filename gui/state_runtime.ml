@@ -224,47 +224,22 @@ let state, set_state =
   React.S.create
     { state_current = WebWorker; state_runtimes = [ WebWorker; Embedded ] }
 
-let create_manager ~is_new project_id =
+let create_manager ~is_new _project_id =
+  (* Line below to specify unused var, as je cannot change the named argument to _is_new *)
+  let _unused = is_new in
+
   match (React.S.value state).state_current with
   | WebWorker ->
-    let () = State_settings.set_synch false in
     Lwt.return
       (Result_util.ok (new Web_worker_api.manager () : Api.concrete_manager))
   | Embedded ->
-    let () = State_settings.set_synch false in
     Lwt.return (Result_util.ok (new embedded () : Api.concrete_manager))
   | Remote { label = _; protocol = HTTP url } ->
-    let version_url : string = Format.sprintf "%s/v2" url in
-    let () =
-      Common.debug ~loc:__LOC__
-        (Js.string
-           (Format.sprintf
-              "[State_runtime.create_manager] set_runtime_url HTTP: %s"
-              version_url))
+    let error_msg : string =
+      Format.sprintf
+        "REST server is not supported anymore and url \"%s\" was provided." url
     in
-    Js_of_ocaml_lwt.XmlHttpRequest.perform_raw
-      ~response_type:XmlHttpRequest.Text version_url
-    >>= fun frame ->
-    let is_valid_server : bool =
-      frame.Js_of_ocaml_lwt.XmlHttpRequest.code = 200
-    in
-    if is_valid_server then (
-      let () = State_settings.set_synch true in
-      let manager = new Rest_api.manager ~timeout:None ~url ~project_id in
-      (if is_new then
-         manager#project_create
-           { Api_types_j.project_parameter_project_id = project_id }
-       else
-         Lwt.return (Result_util.ok ()))
-      >>= Api_common.result_bind_lwt ~ok:(fun () ->
-              Lwt.return (Result_util.ok (manager :> Api.concrete_manager)))
-    ) else (
-      let error_msg : string =
-        Format.sprintf "Bad Response %d from %s "
-          frame.Js_of_ocaml_lwt.XmlHttpRequest.code url
-      in
-      Lwt.return (Api_common.result_error_msg error_msg)
-    )
+    Lwt.return (Api_common.err_result_of_string error_msg)
   | Remote { label; protocol = CLI cli } ->
     let () =
       Common.debug ~loc:__LOC__
@@ -279,7 +254,6 @@ let create_manager ~is_new project_id =
              (Js.string
                 "[State_runtime.create_manager] set_runtime_url: success")
          in
-         let () = State_settings.set_synch false in
          Lwt.return (Result_util.ok (js_node_runtime :> Api.concrete_manager))
        ) else (
          let () =
@@ -344,28 +318,12 @@ let init () =
   match (React.S.value state).state_current with
   | Remote { protocol = CLI _; _ } | WebWorker | Embedded -> Lwt.return_nil
   | Remote { label = _; protocol = HTTP url } ->
-    let version_url : string = Format.sprintf "%s/v2" url in
-    let () =
-      Common.debug ~loc:__LOC__
-        (Js.string
-           (Format.sprintf "[State_runtime.init] set_runtime_url: %s"
-              version_url))
+    let error_msg : string =
+      Format.sprintf
+        "REST server is not supported anymore and url \"%s\" was provided." url
     in
-    Js_of_ocaml_lwt.XmlHttpRequest.perform_raw
-      ~response_type:XmlHttpRequest.Text version_url
-    >>= fun frame ->
-    let is_valid_server : bool =
-      frame.Js_of_ocaml_lwt.XmlHttpRequest.code = 200
-    in
-    if is_valid_server then (
-      let () = State_settings.set_synch true in
-      let manager = new Rest_api.manager ~timeout:None ~url ~project_id:"" in
-      manager#project_catalog
-      >>= Result_util.fold
-            ~ok:(fun projects -> Lwt.return projects)
-            ~error:(fun _ -> Lwt.return_nil)
-    ) else
-      Lwt.return_nil
+    let () = Common.error ~loc:__LOC__ (Js.string error_msg) in
+    Lwt.return_nil
 
 (* to sync state of application with runtime *)
 let sync () = Lwt.return_unit

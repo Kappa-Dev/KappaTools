@@ -6,12 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val get_client_id : unit -> string
-val set_client_id : string -> unit
 val updateFontSize : delta:float -> unit
 val set_parameters_as_default : unit -> unit
-val synch : bool React.signal
-val set_synch : ?step:React.step -> bool -> unit
 
 val init : unit -> unit Lwt.t
 (** run on application init *)
@@ -19,6 +15,7 @@ val init : unit -> unit Lwt.t
 val sync : unit -> unit Lwt.t
 (** to synch state of application with runtime *)
 
+(* TODO: move to state_project? *)
 val agent_coloring : unit Js.t
 (** In reality d3color Js.js_array Js.t.
 

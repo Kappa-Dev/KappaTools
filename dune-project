@@ -65,24 +65,6 @@
 )
 
 (package
-  (name kappa-server)
-  (synopsis "REST server for an interactive use of the Kappa tool suite")
-  (depends
-   (ocaml ( >= 4.05.0 ))
-   (yojson ( >= 1.6.0 ))
-   (lwt ( >= 4.2.0 ))
-   num
-   re
-   fmt
-   logs
-   cohttp-lwt-unix
-   kappa-binaries
-   kappa-agents
-   )
-  ; does not build executables as there seem to be no way to build js exes in a package
-)
-
-(package
   (name kappa-webapp)
   (synopsis "Browser app for an interactive use of the Kappa tool suite")
   (depends

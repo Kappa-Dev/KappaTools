@@ -10,7 +10,6 @@ module Html = Tyxml_js.Html5
 
 let configuration_seed_input_id = "simulation_seed_input"
 let preferences_modal_id = "preferences_modal"
-let settings_client_id_input_id = "settings-client-id-input"
 let preferences_button = Html.a [ Html.txt "Preferences" ]
 
 let option_seed_input =
@@ -32,8 +31,7 @@ let decrease_font =
   Html.button
     ~a:
       [
-        Html.a_button_type `Button;
-        Html.a_class [ "btn"; "btn-default"; "btn-sm" ];
+        Html.a_button_type `Button; Html.a_class [ "btn"; "btn-default"; "btn" ];
       ]
     [ Html.txt "-" ]
 
@@ -45,23 +43,6 @@ let increase_font =
         Html.a_class [ "btn"; "btn-default"; "btn-lg" ];
       ]
     [ Html.txt "+" ]
-
-let settings_client_id_input =
-  Html.input
-    ~a:
-      [
-        Html.a_id settings_client_id_input_id;
-        Html.a_input_type `Text;
-        Html.a_class [ "form-control" ];
-        Html.a_placeholder "client id";
-        Html.a_size 40;
-      ]
-    ()
-
-let settings_client_id_input_dom =
-  Tyxml_js.To_dom.of_input settings_client_id_input
-
-let option_http_synch = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 
 let dropdown (model : State_runtime.model) =
   let current_id = State_runtime.spec_id model.State_runtime.model_current in
@@ -92,7 +73,7 @@ let%html bodies =
     <div class="form-group">
     <label class="col-md-2">Font size</label>
     <div class="col-md-5">|}
-    [ decrease_font; increase_font ]
+    [ decrease_font; Html.txt "  "; increase_font ]
     {|</div>
     </div>
     <div class="form-group">
@@ -110,25 +91,11 @@ let%html bodies =
     [ option_seed_input ]
     {|</div>
     </div>
+    <h4>Stories</h4>
     <div class="form-group">
     <div class="col-md-offset-2 col-md-5 checkbox"><label>|}
     [ option_withtrace ]
     {|Store trace
-    </label></div>
-    </div>
-    <h4>HTTPS backend</h4>
-    <div class="form-group">
-    <label class="col-md-2" for="|}
-    settings_client_id_input_id
-    {|">Client id</label>
-    <div class="col-md-5">|}
-    [ settings_client_id_input ]
-    {|</div>
-    </div>
-    <div class="form-group">
-    <div class="col-md-offset-2 col-md-5 checkbox"><label>|}
-    [ option_http_synch ]
-    {|Auto synch
     </label></div>
     </div>
     <h4>Static analyses</h4>
@@ -218,139 +185,79 @@ let content () =
   ]
 
 let set_action () =
-  let settings_client_id = Js.to_string settings_client_id_input_dom##.value in
-  let () = State_settings.set_client_id settings_client_id in
-
-  let synch_checkbox_dom = Tyxml_js.To_dom.of_input option_http_synch in
-  let is_checked = Js.to_bool synch_checkbox_dom##.checked in
-  let () = State_settings.set_synch is_checked in
-
   let input = Tyxml_js.To_dom.of_input option_seed_input in
-  let value : string = Js.to_string input##.value in
-  let model_seed = try Some (int_of_string value) with Failure _ -> None in
-  let () = State_project.set_seed model_seed in
+  let input_value : string = Js.to_string input##.value in
+  let model_seed =
+    try Some (int_of_string input_value) with Failure _ -> None
+  in
+  State_project.set_seed model_seed;
+  State_project.set_store_trace
+    (Js.to_bool (Tyxml_js.To_dom.of_input option_withtrace)##.checked);
+  State_project.set_show_dead_rules
+    (Js.to_bool (Tyxml_js.To_dom.of_input option_withdeadrules)##.checked);
+  State_project.set_show_dead_agents
+    (Js.to_bool (Tyxml_js.To_dom.of_input option_withdeadagents)##.checked);
+  State_project.set_show_non_weakly_reversible_transitions
+    (Js.to_bool (Tyxml_js.To_dom.of_input option_withirreversible)##.checked);
 
-  let () =
-    State_project.set_store_trace
-      (Js.to_bool (Tyxml_js.To_dom.of_input option_withtrace)##.checked)
-  in
-  let () =
-    State_project.set_show_dead_rules
-      (Js.to_bool (Tyxml_js.To_dom.of_input option_withdeadrules)##.checked)
-  in
-  let () =
-    State_project.set_show_dead_agents
-      (Js.to_bool (Tyxml_js.To_dom.of_input option_withdeadagents)##.checked)
-  in
-  let () =
-    State_project.set_show_non_weakly_reversible_transitions
-      (Js.to_bool (Tyxml_js.To_dom.of_input option_withirreversible)##.checked)
-  in
-
-  let () =
-    Panel_projects_controller.set_manager
-      (Js.to_string (Tyxml_js.To_dom.of_select backend_select)##.value)
-  in
-  ()
+  Panel_projects_controller.set_manager
+    (Js.to_string (Tyxml_js.To_dom.of_select backend_select)##.value)
 
 let set_and_save_action () =
-  let () = set_action () in
-
-  let () = State_settings.set_parameters_as_default () in
-  let () = State_project.set_parameters_as_default () in
-
-  ()
+  set_action ();
+  State_settings.set_parameters_as_default ();
+  State_project.set_parameters_as_default ()
 
 let onload () =
-  let () =
-    (Tyxml_js.To_dom.of_form modal)##.onsubmit
-    := Dom_html.handler (fun (_ : _ Js.t) ->
-           let () =
-             Common.modal ~id:("#" ^ preferences_modal_id) ~action:"hide"
-           in
-           let () = set_action () in
-           Js._false)
-  in
-  let () =
-    (Tyxml_js.To_dom.of_button save_button)##.onclick
-    := Dom_html.handler (fun _ ->
-           let () = set_and_save_action () in
-           Js._false)
-  in
-  let () =
-    (Tyxml_js.To_dom.of_a preferences_button)##.onclick
-    := Dom_html.handler (fun _ ->
-           let sp = React.S.value State_project.model in
-           let () =
-             settings_client_id_input_dom##.value
-             := Js.string (State_settings.get_client_id ())
-           in
+  (Tyxml_js.To_dom.of_form modal)##.onsubmit
+  := Dom_html.handler (fun (_ : _ Js.t) ->
+         let () =
+           Common.modal ~id:("#" ^ preferences_modal_id) ~action:"hide"
+         in
+         let () = set_action () in
+         Js._false);
+  (Tyxml_js.To_dom.of_button save_button)##.onclick
+  := Dom_html.handler (fun _ ->
+         let () = set_and_save_action () in
+         Js._false);
+  (Tyxml_js.To_dom.of_a preferences_button)##.onclick
+  := Dom_html.handler (fun _ ->
+         let sp = React.S.value State_project.model in
+         let input = Tyxml_js.To_dom.of_input option_seed_input in
+         input##.value :=
+           Js.string
+             (match sp.State_project.model_parameters.State_project.seed with
+             | None -> ""
+             | Some model_seed -> string_of_int model_seed);
 
-           let input = Tyxml_js.To_dom.of_input option_seed_input in
-           let () =
-             input##.value :=
-               Js.string
-                 (match
-                    sp.State_project.model_parameters.State_project.seed
-                  with
-                 | None -> ""
-                 | Some model_seed -> string_of_int model_seed)
-           in
+         (Tyxml_js.To_dom.of_input option_withtrace)##.checked
+         := Js.bool sp.State_project.model_parameters.State_project.store_trace;
+         (Tyxml_js.To_dom.of_input option_withdeadagents)##.checked
+         := Js.bool
+              sp.State_project.model_parameters.State_project.show_dead_agents;
+         (Tyxml_js.To_dom.of_input option_withdeadrules)##.checked
+         := Js.bool
+              sp.State_project.model_parameters.State_project.show_dead_rules;
+         (Tyxml_js.To_dom.of_input option_withirreversible)##.checked
+         := Js.bool
+              sp.State_project.model_parameters
+                .State_project.show_non_weakly_reversible_transitions;
 
-           let () =
-             (Tyxml_js.To_dom.of_input option_withtrace)##.checked
-             := Js.bool
-                  sp.State_project.model_parameters.State_project.store_trace
-           in
-           let () =
-             (Tyxml_js.To_dom.of_input option_withdeadagents)##.checked
-             := Js.bool
-                  sp.State_project.model_parameters
-                    .State_project.show_dead_agents
-           in
-           let () =
-             (Tyxml_js.To_dom.of_input option_withdeadrules)##.checked
-             := Js.bool
-                  sp.State_project.model_parameters
-                    .State_project.show_dead_rules
-           in
-           let () =
-             (Tyxml_js.To_dom.of_input option_withirreversible)##.checked
-             := Js.bool
-                  sp.State_project.model_parameters
-                    .State_project.show_non_weakly_reversible_transitions
-           in
+         (Tyxml_js.To_dom.of_select backend_select)##.value
+         := Js.string
+              (State_runtime.spec_id
+                 (React.S.value State_runtime.model).State_runtime.model_current);
 
-           let () =
-             (Tyxml_js.To_dom.of_input option_http_synch)##.checked
-             := Js.bool (React.S.value State_settings.synch)
-           in
-           let () =
-             (Tyxml_js.To_dom.of_select backend_select)##.value
-             := Js.string
-                  (State_runtime.spec_id
-                     (React.S.value State_runtime.model)
-                       .State_runtime.model_current)
-           in
+         Common.modal ~id:("#" ^ preferences_modal_id) ~action:"show";
 
-           let () =
-             Common.modal ~id:("#" ^ preferences_modal_id) ~action:"show"
-           in
-
-           Js._false)
-  in
+         Js._false);
 
   let () = State_settings.updateFontSize ~delta:0. in
-  let () =
-    (Tyxml_js.To_dom.of_button increase_font)##.onclick
-    := Dom_html.handler (fun _ ->
-           let () = State_settings.updateFontSize ~delta:0.2 in
-           Js._false)
-  in
-  let () =
-    (Tyxml_js.To_dom.of_button decrease_font)##.onclick
-    := Dom_html.handler (fun _ ->
-           let () = State_settings.updateFontSize ~delta:(-0.2) in
-           Js._false)
-  in
-  ()
+  (Tyxml_js.To_dom.of_button increase_font)##.onclick
+  := Dom_html.handler (fun _ ->
+         let () = State_settings.updateFontSize ~delta:0.2 in
+         Js._false);
+  (Tyxml_js.To_dom.of_button decrease_font)##.onclick
+  := Dom_html.handler (fun _ ->
+         let () = State_settings.updateFontSize ~delta:(-0.2) in
+         Js._false)
