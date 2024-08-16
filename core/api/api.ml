@@ -266,11 +266,3 @@ class type concrete_manager = object
   method terminate : unit
   method is_computing : bool
 end
-
-class type rest_manager = object
-  inherit manager_environment
-  inherit concrete_manager
-  method project_catalog : string list result Lwt.t
-  method project_create : Api_types_t.project_parameter -> unit result Lwt.t
-  method project_delete : project_id -> unit result Lwt.t
-end

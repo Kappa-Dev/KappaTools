@@ -67,7 +67,8 @@ def main():
     try:
         project_id = "{0}-{1}".format(cmd,str(uuid.uuid1()))
         if url and url.startswith('http'):
-            runtime = kappy.KappaRest(url,project_id)
+            raise ValueError("KappaRest is not supported anymore, please provide the path to local executables. The url argument should not start with `http`.")
+
         else:
             runtime = kappy.KappaStd(url)
         print("project_id : {0}".format(project_id))
