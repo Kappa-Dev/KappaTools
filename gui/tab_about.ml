@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
-(* | |/ / * Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | |/ / * Copyright 2010-2024 CNRS - Harvard Medical School - INRIA - IRIF  *)
 (* | ' /  *********************************************************************)
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
@@ -14,7 +14,7 @@ let content () =
   [%html
     {|
 <h2>The Kappa Language</h2>
-<p>Copyright 2010-2020 CNRS - Harvard Medical School - INRIA - IRIF<p>
+<p>Copyright 2010-2024 CNRS - Harvard Medical School - INRIA - IRIF<p>
 <p>Kappa Language software is distributed under the terms of the <a target="_blank" href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License Version 3</a>.
  Source code is published on <a target="_blank" href="https://github.com/Kappa-Dev/KaSim">https://github.com/Kappa-Dev/KaSim</a>.</p>
 
@@ -34,7 +34,7 @@ let content () =
 </ul>
 
 <h3>Nominal contribution</h3>
-<dl class="dl-horizontal"><dt>Pierre Boutillier</dt><dd>General design and maintenance, protocols</dd><dt>Xing Li</dt><dd>Outputs visualizations, General layout</dd><dt>Mutaamba Maasha</dt><dd>Transparent multi backend architecture, protocols, Output visualizations, General layout</dd></dl>
+<dl class="dl-horizontal"><dt>Pierre Boutillier</dt><dd>General design and maintenance, protocols</dd><dt>Xing Li</dt><dd>Outputs visualizations, General layout</dd><dt>Mutaamba Maasha</dt><dd>Transparent multi backend architecture, protocols, Output visualizations, General layout</dd><dt>Antoine Pouille</dt><dd>Maintenance and improvements</dd></dl>
 |}]
 
 let onload () = ()
