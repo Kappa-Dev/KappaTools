@@ -157,12 +157,13 @@ class virtual manager_without_kasim () : concrete_manager_without_kasim =
         overwrites =
       self#secret_project_parse
       >>= Api_common.result_bind_with_lwt ~ok:(fun out ->
+              (* load the sim so that kasa can run on it *)
               let load : unit Api.lwt_result =
                 simulation_load patternSharing out overwrites
               in
-              let init = self#init_static_analyser out in
+              let init_kasa = self#init_static_analyser out in
               let locators =
-                init
+                init_kasa
                 >>= Result_util.fold
                       ~error:(fun e ->
                         let () = kasa_locator <- [] in

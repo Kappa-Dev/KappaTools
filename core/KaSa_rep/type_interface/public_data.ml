@@ -434,7 +434,10 @@ let json_to_var = function
   | x -> raise (Yojson.Basic.Util.Type_error ("var", x))
 
 type ('rule, 'var) influence_node = Rule of 'rule | Var of 'var
-type pos_of_rules_and_vars = ((int, int) influence_node * Loc.t) list
+type short_influence_node = (int, int) influence_node
+type refined_influence_node = (rule, var) influence_node
+type pos_of_rules_and_vars = short_influence_node Loc.annoted list
+type pos_of_rules_and_vars_refined = refined_influence_node Loc.annoted list
 
 let influence_node_to_json rule_to_json var_to_json a =
   match a with
@@ -476,6 +479,20 @@ let refined_influence_node_to_json =
 let refined_influence_node_of_json =
   influence_node_of_json json_to_rule json_to_var
 
+let pos_of_rules_and_vars_refined_to_json =
+  JsonUtil.of_list
+    (JsonUtil.of_pair ~lab1:key ~lab2:locality refined_influence_node_to_json
+       (fun loc -> Loc.yojson_of_annoted JsonUtil.of_unit ((), loc)))
+
+let pos_of_rules_and_vars_refined_of_json =
+  JsonUtil.to_list
+    (JsonUtil.to_pair ~lab1:key ~lab2:locality refined_influence_node_of_json
+       (fun x ->
+         snd
+           (Loc.annoted_of_yojson
+              (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
+              x)))
+
 let short_node_of_refined_node = function
   | Rule rule -> Rule rule.rule_id
   | Var var -> Var var.var_id
@@ -485,7 +502,7 @@ let position_of_refined_influence_node = function
   | Var v -> v.var_position
 
 module InfluenceNodeSetMap = SetMap.Make (struct
-  type t = (int, int) influence_node
+  type t = short_influence_node
 
   let compare = compare
 
@@ -519,7 +536,7 @@ type half_influence_map =
   location pair list InfluenceNodeMap.t InfluenceNodeMap.t
 
 type influence_map = {
-  nodes: (rule, var) influence_node list;
+  nodes: refined_influence_node list;
   positive: half_influence_map;
   negative: half_influence_map;
 }

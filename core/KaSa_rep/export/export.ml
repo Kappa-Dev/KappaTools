@@ -203,7 +203,8 @@ functor
     let lift_wo_handler f parameter error _handler x = f parameter error x
 
     let flush_errors state =
-      Remanent_state.set_errors Exception.empty_exceptions_caught_and_uncaught state
+      Remanent_state.set_errors Exception.empty_exceptions_caught_and_uncaught
+        state
 
     let compute_env_init show_title
         (state :
@@ -492,11 +493,11 @@ functor
       else
         Public_data.Direct a
 
-    let convert_id_short parameters error handler compiled id =
-      Handler.convert_id_short parameters error handler compiled id
+    let short_node_of_flattened_id parameters error handler compiled id =
+      Handler.short_node_of_flattened_id parameters error handler compiled id
 
-    let convert_id_refined parameters error handler compiled id =
-      Handler.convert_id_refined parameters error handler compiled id
+    let refined_node_of_flattened_id parameters error handler compiled id =
+      Handler.refined_node_of_flattened_id parameters error handler compiled id
 
     (******************************************************************)
     (*quark map *)
@@ -693,12 +694,12 @@ functor
       Ckappa_sig.PairRule_setmap.Map.fold
         (fun (x, y) list (error, map) ->
           let error, x =
-            Handler.convert_id_short parameters error handler compiled
+            Handler.short_node_of_flattened_id parameters error handler compiled
               (Ckappa_sig.rule_id_of_int
                  (int_of_string (Ckappa_sig.string_of_rule_id x)))
           in
           let error, y =
-            Handler.convert_id_short parameters error handler compiled
+            Handler.short_node_of_flattened_id parameters error handler compiled
               (Ckappa_sig.rule_id_of_int
                  (int_of_string (Ckappa_sig.string_of_rule_id y)))
           in
@@ -729,7 +730,8 @@ functor
         List.fold_left
           (fun (error, list) id ->
             let error, head =
-              Handler.convert_id_refined parameters error handler compiled id
+              Handler.refined_node_of_flattened_id parameters error handler
+                compiled id
             in
             error, head :: list)
           (error, []) (List.rev nodes)

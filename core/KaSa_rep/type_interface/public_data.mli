@@ -91,32 +91,34 @@ type var = {
 }
 
 type ('rule, 'var) influence_node = Rule of 'rule | Var of 'var
-type pos_of_rules_and_vars = ((int, int) influence_node * Loc.t) list
+type short_influence_node = (int, int) influence_node
+type refined_influence_node = (rule, var) influence_node
+type pos_of_rules_and_vars = short_influence_node Loc.annoted list
+type pos_of_rules_and_vars_refined = refined_influence_node Loc.annoted list
 
 val pos_of_rules_and_vars_of_json : Yojson.Basic.t -> pos_of_rules_and_vars
 val pos_of_rules_and_vars_to_json : pos_of_rules_and_vars -> Yojson.Basic.t
 
-val short_node_of_refined_node :
-  (rule, var) influence_node -> (int, int) influence_node
+val pos_of_rules_and_vars_refined_of_json :
+  Yojson.Basic.t -> pos_of_rules_and_vars_refined
 
-val short_influence_node_of_json : Yojson.Basic.t -> (int, int) influence_node
-val short_influence_node_to_json : (int, int) influence_node -> Yojson.Basic.t
+val pos_of_rules_and_vars_refined_to_json :
+  pos_of_rules_and_vars_refined -> Yojson.Basic.t
 
-val refined_influence_node_of_json :
-  Yojson.Basic.t -> (rule, var) influence_node
+val short_node_of_refined_node : refined_influence_node -> short_influence_node
+val short_influence_node_of_json : Yojson.Basic.t -> short_influence_node
+val short_influence_node_to_json : short_influence_node -> Yojson.Basic.t
+val refined_influence_node_of_json : Yojson.Basic.t -> refined_influence_node
+val refined_influence_node_to_json : refined_influence_node -> Yojson.Basic.t
+val position_of_refined_influence_node : refined_influence_node -> Loc.t
 
-val refined_influence_node_to_json :
-  (rule, var) influence_node -> Yojson.Basic.t
-
-val position_of_refined_influence_node : (rule, var) influence_node -> Loc.t
-
-module InfluenceNodeMap : SetMap.Map with type elt = (int, int) influence_node
+module InfluenceNodeMap : SetMap.Map with type elt = short_influence_node
 
 type location = Direct of int | Side_effect of int
 type 'a pair = 'a * 'a
 
 type influence_map = {
-  nodes: (rule, var) influence_node list;
+  nodes: refined_influence_node list;
   positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t;
   negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t;
 }
@@ -125,17 +127,17 @@ val influence_map_to_json : accuracy_level * influence_map -> Yojson.Basic.t
 val influence_map_of_json : Yojson.Basic.t -> accuracy_level * influence_map
 
 val nodes_of_influence_map_to_json :
-  accuracy_level * (rule, var) influence_node list -> Yojson.Basic.t
+  accuracy_level * refined_influence_node list -> Yojson.Basic.t
 
 val nodes_of_influence_map_of_json :
-  Yojson.Basic.t -> accuracy_level * (rule, var) influence_node list
+  Yojson.Basic.t -> accuracy_level * refined_influence_node list
 
 val local_influence_map_to_json :
   accuracy_level
   * int
   * int option
   * int option
-  * (rule, var) influence_node option
+  * refined_influence_node option
   * influence_map ->
   Yojson.Basic.t
 
@@ -145,7 +147,7 @@ val local_influence_map_of_json :
   * int
   * int option
   * int option
-  * (rule, var) influence_node option
+  * refined_influence_node option
   * influence_map
 
 type dead_rules = rule list
