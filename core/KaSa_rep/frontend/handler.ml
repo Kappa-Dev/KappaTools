@@ -362,7 +362,7 @@ let pos_of_var parameters error handler compiled rule_id =
   let error, info = info_of_var parameters error handler compiled rule_id in
   error, pos_of_info info
 
-let convert_id rule var parameters error handler compiled id =
+let node_of_flattened_id_using rule var parameters error handler compiled id =
   let int = Ckappa_sig.int_of_rule_id id in
   let nrules = nrules parameters error handler in
   if int < nrules then (
@@ -375,13 +375,13 @@ let convert_id rule var parameters error handler compiled id =
     error, Public_data.Var (var e b a d c)
   )
 
-let convert_id_short =
-  convert_id
+let short_node_of_flattened_id =
+  node_of_flattened_id_using
     (fun a _ _ _ _ -> Ckappa_sig.int_of_rule_id a)
     (fun a _ _ _ _ -> Ckappa_sig.int_of_rule_id a)
 
-let convert_id_refined =
-  convert_id
+let refined_node_of_flattened_id =
+  node_of_flattened_id_using
     (fun a b d e c ->
       {
         Public_data.rule_id = Ckappa_sig.int_of_rule_id a;
@@ -668,8 +668,8 @@ let print_rule_dot parameters error _rule_id m1 m2 rule =
   in
   error
 
-let print_var_dot parameters (error : Exception.exceptions_caught_and_uncaught) _var_id m1 m2
-    var =
+let print_var_dot parameters (error : Exception.exceptions_caught_and_uncaught)
+    _var_id m1 m2 var =
   let error =
     if m1 <> "" && not (Remanent_parameters.get_prompt_full_var_def parameters)
     then (

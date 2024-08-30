@@ -28,6 +28,7 @@ module type Type = sig
     state * Yojson.Basic.t
 
   val get_influence_map_nodes_location : state -> state * Yojson.Basic.t
+  val get_influence_map_nodes_location_refined : state -> state * Yojson.Basic.t
 
   val get_influence_map :
     ?accuracy_level:Public_data.accuracy_level ->
@@ -44,27 +45,26 @@ module type Type = sig
     ?bwd:int ->
     ?fwd:int ->
     total:int ->
-    ?origin:(int, int) Public_data.influence_node ->
+    ?origin:Public_data.short_influence_node ->
     state ->
     state * Yojson.Basic.t
 
-  val origin_of_influence_map : state -> state * Yojson.Basic.t
+  val default_origin_of_influence_map : state -> state * Yojson.Basic.t
 
   val next_node_in_influence_map :
-    state ->
-    (int, int) Public_data.influence_node option ->
-    state * Yojson.Basic.t
+    state -> Public_data.short_influence_node option -> state * Yojson.Basic.t
 
   val previous_node_in_influence_map :
-    state ->
-    (int, int) Public_data.influence_node option ->
-    state * Yojson.Basic.t
+    state -> Public_data.short_influence_node option -> state * Yojson.Basic.t
 
   val get_dead_rules : state -> state * Yojson.Basic.t
   val get_dead_agents : state -> state * Yojson.Basic.t
   val get_separating_transitions : state -> state * Yojson.Basic.t
   val get_constraints_list : state -> state * Yojson.Basic.t
-  val get_errors : state -> Exception_without_parameter.exceptions_caught_and_uncaught
+
+  val get_errors :
+    state -> Exception_without_parameter.exceptions_caught_and_uncaught
+
   val get_errors_json : state -> Yojson.Basic.t
   val to_json : state -> Yojson.Basic.t
 
@@ -112,7 +112,31 @@ functor
       let state, nodes = get_all_nodes_of_influence_map ~accuracy_level state in
       state, Public_data.nodes_of_influence_map_to_json (accuracy_level, nodes)
 
-    let convert_id_refined state i =
+    (** Convert a id from type in option `Rule of int` or `Var of int` to an flattened id of type`int`  *)
+    let flattened_id_of_short_node state short_node =
+      let state, nrules = nrules state in
+      ( state,
+        match short_node with
+        | Public_data.Rule a -> a
+        | Public_data.Var a -> a + nrules )
+
+    let flattened_id_of_short_node_opt state short_node_opt =
+      let parameters = get_parameters state in
+      let error = get_errors state in
+      let error, (state, flattened_id) =
+        match short_node_opt with
+        | Some short_node -> error, flattened_id_of_short_node state short_node
+        | None -> Exception.warn parameters error __POS__ Exit (state, 0)
+      in
+      let state = set_errors error state in
+      state, flattened_id
+
+    let refined_node_of_flattened_id
+        (state :
+          (A.static_information, A.dynamic_information) Remanent_state.state)
+        (i : int) :
+        (A.static_information, A.dynamic_information) Remanent_state.state
+        * Public_data.refined_influence_node option =
       let parameters = get_parameters state in
       let state, handler = get_handler state in
       let state, compil = get_c_compilation state in
@@ -122,7 +146,7 @@ functor
       let error, refined_id_opt =
         if i < nrules + nvars then (
           let error, refined_id =
-            convert_id_refined parameters error handler compil
+            refined_node_of_flattened_id parameters error handler compil
               (Ckappa_sig.rule_id_of_int i)
           in
           error, Some refined_id
@@ -132,32 +156,37 @@ functor
       let state = set_errors error state in
       state, refined_id_opt
 
-    let origin_of_influence_map state = convert_id_refined state 0
+    let default_origin_of_influence_map state =
+      refined_node_of_flattened_id state 0
+
+    let short_default_origin_of_influence_map state =
+      let state, origin_opt = default_origin_of_influence_map state in
+      state, Option_util.map Public_data.short_node_of_refined_node origin_opt
+
+    (* helper for managing ids of both rules and vars *)
+    let flattened_id_of_short_node_opt_or_default_origin state short_node_opt =
+      let state, short_node_opt =
+        match short_node_opt with
+        | Some _ -> state, short_node_opt
+        | None -> short_default_origin_of_influence_map state
+      in
+      flattened_id_of_short_node_opt state short_node_opt
 
     let get_local_influence_map ?(accuracy_level = Public_data.Low) ?bwd ?fwd
         ~total ?origin state =
-      let state, rule_id_int =
-        match origin with
-        | Some (Public_data.Rule a) -> state, a
-        | Some (Public_data.Var a) ->
-          let state, n = nrules state in
-          state, a + n
-        | None -> state, 0
+      let state, flattened_id =
+        flattened_id_of_short_node_opt_or_default_origin state origin
       in
-      let rule_id = Ckappa_sig.rule_id_of_int rule_id_int in
+      let node_id = Ckappa_sig.rule_id_of_int flattened_id in
       let state, influence_map =
-        get_local_influence_map ~accuracy_level ?fwd ?bwd ~total rule_id state
+        get_local_influence_map ~accuracy_level ?fwd ?bwd ~total node_id state
       in
-      let state, origin = convert_id_refined state rule_id_int in
+      let state, origin = refined_node_of_flattened_id state flattened_id in
       ( state,
         Public_data.local_influence_map_to_json
           (accuracy_level, total, bwd, fwd, origin, influence_map) )
 
-    let short_origin_of_influence_map state =
-      let state, origin_opt = origin_of_influence_map state in
-      state, Option_util.map Public_data.short_node_of_refined_node origin_opt
-
-    let previous_node_in_influence_map state short_id_opt =
+    let previous_node_in_influence_map state short_node_opt =
       let state, nrules = nrules state in
       let state, nvars = nvars state in
       let n = nrules + nvars - 1 in
@@ -165,24 +194,14 @@ functor
         if n = -1 then
           state, None
         else (
-          let state, short_id_opt =
-            match short_id_opt with
-            | None -> short_origin_of_influence_map state
-            | Some _ -> state, short_id_opt
+          let state, id_int =
+            flattened_id_of_short_node_opt_or_default_origin state
+              short_node_opt
           in
-          let parameters = get_parameters state in
-          let error = get_errors state in
-          let error, id_int =
-            match short_id_opt with
-            | Some (Public_data.Rule a) -> error, a
-            | Some (Public_data.Var a) -> error, a + nrules
-            | None -> Exception.warn parameters error __POS__ Exit 0
-          in
-          let state = set_errors error state in
           if id_int = 0 then
-            convert_id_refined state (max 0 n)
+            refined_node_of_flattened_id state (max 0 n)
           else
-            convert_id_refined state (id_int - 1)
+            refined_node_of_flattened_id state (id_int - 1)
         )
       in
       let json =
@@ -190,7 +209,7 @@ functor
       in
       state, json
 
-    let next_node_in_influence_map state short_id_opt =
+    let next_node_in_influence_map state short_node_opt =
       let state, nrules = nrules state in
       let state, nvars = nvars state in
       let n = nrules + nvars - 1 in
@@ -198,24 +217,14 @@ functor
         if n = -1 then
           state, None
         else (
-          let state, short_id_opt =
-            match short_id_opt with
-            | None -> short_origin_of_influence_map state
-            | Some _ -> state, short_id_opt
+          let state, id_int =
+            flattened_id_of_short_node_opt_or_default_origin state
+              short_node_opt
           in
-          let parameters = get_parameters state in
-          let error = get_errors state in
-          let error, id_int =
-            match short_id_opt with
-            | Some (Public_data.Rule a) -> error, a
-            | Some (Public_data.Var a) -> error, a + nrules
-            | None -> Exception.warn parameters error __POS__ Exit 0
-          in
-          let state = set_errors error state in
           if id_int = n then
-            origin_of_influence_map state
+            default_origin_of_influence_map state
           else
-            convert_id_refined state (id_int + 1)
+            refined_node_of_flattened_id state (id_int + 1)
         )
       in
       let json =
@@ -223,9 +232,29 @@ functor
       in
       state, json
 
-    let origin_of_influence_map state =
-      let state, node = origin_of_influence_map state in
+    let default_origin_of_influence_map state =
+      let state, node = default_origin_of_influence_map state in
       state, JsonUtil.of_option Public_data.refined_influence_node_to_json node
+
+    let get_influence_map_nodes_location_refined state =
+      (* need reference to update state in each func in a simple map *)
+      let state, short_node_loc_list = get_pos_of_rules_and_vars state in
+      let current_state = ref state in
+      let refined_node_loc_list =
+        short_node_loc_list
+        |> List.map
+             (Loc.map_annot (fun short_node ->
+                  let state, flattened_id =
+                    flattened_id_of_short_node !current_state short_node
+                  in
+                  let state, refined_node_opt =
+                    refined_node_of_flattened_id state flattened_id
+                  in
+                  current_state := state;
+                  Option_util.unsome_or_raise refined_node_opt))
+        |> Public_data.pos_of_rules_and_vars_refined_to_json
+      in
+      !current_state, refined_node_loc_list
 
     let get_dead_rules state =
       let state, rules = get_dead_rules state in

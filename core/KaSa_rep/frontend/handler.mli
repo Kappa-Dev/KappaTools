@@ -16,13 +16,15 @@ val get_label_of_rule_txt :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.enriched_rule ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * (string * Loc.t) option
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (string * Loc.t) option
 
 val get_label_of_rule_dot :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.enriched_rule ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * (string * Loc.t) option
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (string * Loc.t) option
 
 val print_site_contact_map : ('a, 'a, 'a) Ckappa_sig.site_type -> 'a
 
@@ -108,7 +110,8 @@ val id_of_binding_type :
   Ckappa_sig.c_site_name ->
   Quark_type.agent_quark ->
   Ckappa_sig.c_site_name ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_state
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_state
 
 val state_list :
   Remanent_parameters_sig.parameters ->
@@ -116,7 +119,8 @@ val state_list :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Quark_type.agent_quark ->
   Ckappa_sig.c_site_name ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_state list
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_state list
 
 val last_site_of_agent :
   ?ml_pos:(string * int * int * int) option ->
@@ -126,7 +130,8 @@ val last_site_of_agent :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   Quark_type.agent_quark ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_site_name
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_site_name
 
 val last_state_of_site :
   ?ml_pos:(string * int * int * int) option ->
@@ -137,7 +142,8 @@ val last_state_of_site :
   Cckappa_sig.kappa_handler ->
   Quark_type.agent_quark ->
   Ckappa_sig.c_site_name ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_state
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_state
 
 val translate_agent :
   ?ml_pos:(string * int * int * int) option ->
@@ -284,7 +290,7 @@ val string_of_rule_or_var :
   Ckappa_sig.c_rule_id ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
-val convert_id_refined :
+val refined_node_of_flattened_id :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
@@ -293,7 +299,7 @@ val convert_id_refined :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (Public_data.rule, Public_data.var) Public_data.influence_node
 
-val convert_id_short :
+val short_node_of_flattened_id :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
@@ -366,7 +372,8 @@ val complementary_interface :
   Cckappa_sig.kappa_handler ->
   Quark_type.agent_quark ->
   Ckappa_sig.c_site_name list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_site_name list
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_site_name list
 
 val dual :
   ?ml_pos:(string * int * int * int) option ->

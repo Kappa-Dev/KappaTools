@@ -134,7 +134,7 @@ let on_message post text =
       ( id,
         ( `List [ `String "INFLUENCE_MAP_ORIGINAL_NODE" ]
         | `String "INFLUENCE_MAP_ORIGINAL_NODE" ) ) ->
-    let state, im = origin_of_influence_map !gState in
+    let state, im = default_origin_of_influence_map !gState in
     let () = gState := state in
     send_response post id im
   | Some (id, `List [ `String "INFLUENCE_MAP_NEXT_NODE"; origin ]) ->

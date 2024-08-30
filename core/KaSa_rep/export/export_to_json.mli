@@ -28,6 +28,7 @@ module type Type = sig
     state * Yojson.Basic.t
 
   val get_influence_map_nodes_location : state -> state * Yojson.Basic.t
+  val get_influence_map_nodes_location_refined : state -> state * Yojson.Basic.t
 
   val get_influence_map :
     ?accuracy_level:Public_data.accuracy_level ->
@@ -44,27 +45,26 @@ module type Type = sig
     ?bwd:int ->
     ?fwd:int ->
     total:int ->
-    ?origin:(int, int) Public_data.influence_node ->
+    ?origin:Public_data.short_influence_node ->
     state ->
     state * Yojson.Basic.t
 
-  val origin_of_influence_map : state -> state * Yojson.Basic.t
+  val default_origin_of_influence_map : state -> state * Yojson.Basic.t
 
   val next_node_in_influence_map :
-    state ->
-    (int, int) Public_data.influence_node option ->
-    state * Yojson.Basic.t
+    state -> Public_data.short_influence_node option -> state * Yojson.Basic.t
 
   val previous_node_in_influence_map :
-    state ->
-    (int, int) Public_data.influence_node option ->
-    state * Yojson.Basic.t
+    state -> Public_data.short_influence_node option -> state * Yojson.Basic.t
 
   val get_dead_rules : state -> state * Yojson.Basic.t
   val get_dead_agents : state -> state * Yojson.Basic.t
   val get_separating_transitions : state -> state * Yojson.Basic.t
   val get_constraints_list : state -> state * Yojson.Basic.t
-  val get_errors : state -> Exception_without_parameter.exceptions_caught_and_uncaught
+
+  val get_errors :
+    state -> Exception_without_parameter.exceptions_caught_and_uncaught
+
   val get_errors_json : state -> Yojson.Basic.t
   val to_json : state -> Yojson.Basic.t
 

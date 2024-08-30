@@ -118,18 +118,18 @@ class t exec_command message_delimiter =
     method project_parse ~patternSharing overwrites =
       self#secret_project_parse
       >>= Api_common.result_bind_with_lwt ~ok:(fun out ->
+              (* load the sim so that kasa can run on it *)
               let load =
                 self#secret_simulation_load patternSharing out overwrites
               in
-              let init = self#init_static_analyser out in
+              let init_kasa = self#init_static_analyser out in
               let locators =
-                init >>= fun result ->
+                init_kasa >>= fun result ->
                 match result.value with
                 | Result.Error _ ->
                   let () = kasa_locator <- [] in
                   Lwt.return result
                 | Result.Ok () ->
-                  (* TODO: check why secret, use sth else *)
                   self#secret_get_pos_of_rules_and_vars >>= fun result ->
                   (match result.value with
                   | Result.Ok infos ->
