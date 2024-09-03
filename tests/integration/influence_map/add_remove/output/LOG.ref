@@ -9,7 +9,7 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule label (File "add_remove.ka", line 4, characters 8-62:) will never be applied.
+rule label (File "add_remove.ka", line 4, characters 0-62:) will never be applied.
 rule File "add_remove.ka", line 5, characters 0-28: will never be applied.
 rule File "add_remove.ka", line 6, characters 0-28: will never be applied.
 rule File "add_remove.ka", line 7, characters 0-28: will never be applied.
@@ -48,7 +48,7 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule label (File "add_remove.ka", line 4, characters 8-62:) will never be applied.
+rule label (File "add_remove.ka", line 4, characters 0-62:) will never be applied.
 rule File "add_remove.ka", line 5, characters 0-28: will never be applied.
 rule File "add_remove.ka", line 6, characters 0-28: will never be applied.
 rule File "add_remove.ka", line 7, characters 0-28: will never be applied.

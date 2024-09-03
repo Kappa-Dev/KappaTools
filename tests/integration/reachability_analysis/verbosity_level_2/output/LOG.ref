@@ -41,7 +41,7 @@ Reachability analysis...
 
 		rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:) is applied for the first time
 
-	Applying rule KO (File "../verbosity.ka", line 8, characters 5-49:):
+	Applying rule KO (File "../verbosity.ka", line 8, characters 0-49:):
 		the precondition is not satisfied yet
 
 	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.]) (File "../verbosity.ka", line 1, characters 0-35:):
@@ -68,7 +68,7 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule KO (File "../verbosity.ka", line 8, characters 5-49:) will never be applied.
+rule KO (File "../verbosity.ka", line 8, characters 0-49:) will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 

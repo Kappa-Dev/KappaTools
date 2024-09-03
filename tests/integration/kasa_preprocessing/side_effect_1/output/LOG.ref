@@ -346,19 +346,19 @@ Influence_map:Inhibition_map:rule(3):'r3' A(y[1]),C(x[1]),.->.,.,C(x[.]) -> rule
 Influence_map:Inhibition_map:rule(3):'r3' A(y[1]),C(x[1]),.->.,.,C(x[.]) -> rule(2):'r2' A(x[1]),B(x[1]),.->.,.,B(x[.])[0*->1];[0->0]
 Reachability analysis...
 
-	Applying rule r2 (File "side_effect.ka", line 13, characters 5-42:):
+	Applying rule r2 (File "side_effect.ka", line 13, characters 0-42:):
 		the precondition is not satisfied yet
 
-	Applying rule r3 (File "side_effect.ka", line 14, characters 5-42:):
+	Applying rule r3 (File "side_effect.ka", line 14, characters 0-42:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "side_effect.ka", line 11, characters 5-21:) will never be applied.
-rule r1 (File "side_effect.ka", line 12, characters 5-45:) will never be applied.
-rule r2 (File "side_effect.ka", line 13, characters 5-42:) will never be applied.
-rule r3 (File "side_effect.ka", line 14, characters 5-42:) will never be applied.
+rule r0 (File "side_effect.ka", line 11, characters 0-21:) will never be applied.
+rule r1 (File "side_effect.ka", line 12, characters 0-45:) will never be applied.
+rule r2 (File "side_effect.ka", line 13, characters 0-42:) will never be applied.
+rule r3 (File "side_effect.ka", line 14, characters 0-42:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

@@ -140,9 +140,9 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "covering_class_trivial.ka", line 7, characters 5-50:) will never be applied.
-rule r1 (File "covering_class_trivial.ka", line 8, characters 5-50:) will never be applied.
-rule r2 (File "covering_class_trivial.ka", line 9, characters 5-67:) will never be applied.
+rule r0 (File "covering_class_trivial.ka", line 7, characters 0-50:) will never be applied.
+rule r1 (File "covering_class_trivial.ka", line 8, characters 0-50:) will never be applied.
+rule r2 (File "covering_class_trivial.ka", line 9, characters 0-67:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

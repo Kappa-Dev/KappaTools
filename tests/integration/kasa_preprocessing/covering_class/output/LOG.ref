@@ -250,9 +250,9 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "covering_class.ka", line 10, characters 5-66:) will never be applied.
-rule r1 (File "covering_class.ka", line 11, characters 5-45:) will never be applied.
-rule r2 (File "covering_class.ka", line 12, characters 5-45:) will never be applied.
+rule r0 (File "covering_class.ka", line 10, characters 0-66:) will never be applied.
+rule r1 (File "covering_class.ka", line 11, characters 0-45:) will never be applied.
+rule r2 (File "covering_class.ka", line 12, characters 0-45:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

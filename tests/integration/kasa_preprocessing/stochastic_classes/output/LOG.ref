@@ -440,10 +440,10 @@ Influence_map:Inhibition_map:rule(6):'r6' F(x{u}[.])->. -> rule(7):'r7' F(y{p}[.
 Influence_map:Inhibition_map:rule(7):'r7' F(y{p}[.])->. -> rule(6):'r6' F(x{u}[.])->.[0->0]
 Reachability analysis...
 
-	Applying rule r1 (File "stochastic_create.ka", line 8, characters 5-38:):
+	Applying rule r1 (File "stochastic_create.ka", line 8, characters 0-38:):
 		the precondition is satisfied
 
-		rule r1 (File "stochastic_create.ka", line 8, characters 5-38:) is applied for the first time
+		rule r1 (File "stochastic_create.ka", line 8, characters 0-38:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -483,10 +483,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x{u})
 
 
-	Applying rule r3 (File "stochastic_create.ka", line 10, characters 5-32:):
+	Applying rule r3 (File "stochastic_create.ka", line 10, characters 0-32:):
 		the precondition is satisfied
 
-		rule r3 (File "stochastic_create.ka", line 10, characters 5-32:) is applied for the first time
+		rule r3 (File "stochastic_create.ka", line 10, characters 0-32:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -526,43 +526,43 @@ EXTENSIONAL DESCRIPTION:
 		D(x{u})
 
 
-	Applying rule r6 (File "stochastic_create.ka", line 13, characters 5-24:):
+	Applying rule r6 (File "stochastic_create.ka", line 13, characters 0-24:):
 		the precondition is not satisfied yet
 
-	Applying rule r7 (File "stochastic_create.ka", line 14, characters 5-24:):
+	Applying rule r7 (File "stochastic_create.ka", line 14, characters 0-24:):
 		the precondition is not satisfied yet
 
-	Applying rule r4 (File "stochastic_create.ka", line 11, characters 5-32:):
+	Applying rule r4 (File "stochastic_create.ka", line 11, characters 0-32:):
 		the precondition is not satisfied yet
 
-	Applying rule r5 (File "stochastic_create.ka", line 12, characters 5-37:):
+	Applying rule r5 (File "stochastic_create.ka", line 12, characters 0-37:):
 		the precondition is not satisfied yet
 
-	Applying rule r2 (File "stochastic_create.ka", line 9, characters 5-49:):
+	Applying rule r2 (File "stochastic_create.ka", line 9, characters 0-49:):
 		the precondition is not satisfied yet
 
-	Applying rule r1 (File "stochastic_create.ka", line 8, characters 5-38:):
+	Applying rule r1 (File "stochastic_create.ka", line 8, characters 0-38:):
 		the precondition is satisfied
 
-	Applying rule r8 (File "stochastic_create.ka", line 15, characters 5-55:):
+	Applying rule r8 (File "stochastic_create.ka", line 15, characters 0-55:):
 		the precondition is not satisfied yet
 
-	Applying rule r0 (File "stochastic_create.ka", line 7, characters 5-57:):
+	Applying rule r0 (File "stochastic_create.ka", line 7, characters 0-57:):
 		the precondition is not satisfied yet
 
-	Applying rule r3 (File "stochastic_create.ka", line 10, characters 5-32:):
+	Applying rule r3 (File "stochastic_create.ka", line 10, characters 0-32:):
 		the precondition is satisfied
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "stochastic_create.ka", line 7, characters 5-57:) will never be applied.
-rule r2 (File "stochastic_create.ka", line 9, characters 5-49:) will never be applied.
-rule r4 (File "stochastic_create.ka", line 11, characters 5-32:) will never be applied.
-rule r5 (File "stochastic_create.ka", line 12, characters 5-37:) will never be applied.
-rule r6 (File "stochastic_create.ka", line 13, characters 5-24:) will never be applied.
-rule r7 (File "stochastic_create.ka", line 14, characters 5-24:) will never be applied.
-rule r8 (File "stochastic_create.ka", line 15, characters 5-55:) will never be applied.
+rule r0 (File "stochastic_create.ka", line 7, characters 0-57:) will never be applied.
+rule r2 (File "stochastic_create.ka", line 9, characters 0-49:) will never be applied.
+rule r4 (File "stochastic_create.ka", line 11, characters 0-32:) will never be applied.
+rule r5 (File "stochastic_create.ka", line 12, characters 0-37:) will never be applied.
+rule r6 (File "stochastic_create.ka", line 13, characters 0-24:) will never be applied.
+rule r7 (File "stochastic_create.ka", line 14, characters 0-24:) will never be applied.
+rule r8 (File "stochastic_create.ka", line 15, characters 0-55:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

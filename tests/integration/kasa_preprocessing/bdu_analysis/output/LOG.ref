@@ -477,10 +477,10 @@ Influence_map:Inhibition_map:rule(6):'r6' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> ru
 Influence_map:Inhibition_map:rule(6):'r6' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(7):'r7' A(x[.],y[.]),C(x[.])->A(x[.],y[1]),C(x[1])[0->0]
 Reachability analysis...
 
-	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 5-33:):
+	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 0-33:):
 		the precondition is satisfied
 
-		rule r0 (File "bdu_analysis.ka", line 9, characters 5-33:) is applied for the first time
+		rule r0 (File "bdu_analysis.ka", line 9, characters 0-33:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -569,10 +569,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x{u},x[.])
 
 
-	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 5-32:):
+	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 0-32:):
 		the precondition is satisfied
 
-		rule r1 (File "bdu_analysis.ka", line 10, characters 5-32:) is applied for the first time
+		rule r1 (File "bdu_analysis.ka", line 10, characters 0-32:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -680,10 +680,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x[x.A])
 
 
-	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 5-34:):
+	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 0-34:):
 		the precondition is satisfied
 
-		rule r2 (File "bdu_analysis.ka", line 11, characters 5-34:) is applied for the first time
+		rule r2 (File "bdu_analysis.ka", line 11, characters 0-34:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -733,10 +733,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x[y.A])
 
 
-	Applying rule r3 (File "bdu_analysis.ka", line 12, characters 5-17:):
+	Applying rule r3 (File "bdu_analysis.ka", line 12, characters 0-17:):
 		the precondition is satisfied
 
-		rule r3 (File "bdu_analysis.ka", line 12, characters 5-17:) is applied for the first time
+		rule r3 (File "bdu_analysis.ka", line 12, characters 0-17:) is applied for the first time
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -776,10 +776,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x[.])
 
 
-	Applying rule r4 (File "bdu_analysis.ka", line 13, characters 5-21:):
+	Applying rule r4 (File "bdu_analysis.ka", line 13, characters 0-21:):
 		the precondition is satisfied
 
-		rule r4 (File "bdu_analysis.ka", line 13, characters 5-21:) is applied for the first time
+		rule r4 (File "bdu_analysis.ka", line 13, characters 0-21:) is applied for the first time
 
 		Updating the views for A(x[],y[])
 
@@ -787,10 +787,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},x[])
 
-	Applying rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:):
+	Applying rule r5 (File "bdu_analysis.ka", line 14, characters 0-29:):
 		the precondition is satisfied
 
-		rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:) is applied for the first time
+		rule r5 (File "bdu_analysis.ka", line 14, characters 0-29:) is applied for the first time
 
 		Updating the views for A(x[],y[])
 
@@ -798,10 +798,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},x[])
 
-	Applying rule r6 (File "bdu_analysis.ka", line 15, characters 5-44:):
+	Applying rule r6 (File "bdu_analysis.ka", line 15, characters 0-44:):
 		the precondition is satisfied
 
-		rule r6 (File "bdu_analysis.ka", line 15, characters 5-44:) is applied for the first time
+		rule r6 (File "bdu_analysis.ka", line 15, characters 0-44:) is applied for the first time
 
 		Updating the views for A(x[],y[])
 
@@ -839,10 +839,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x[])
 
-	Applying rule r7 (File "bdu_analysis.ka", line 16, characters 5-56:):
+	Applying rule r7 (File "bdu_analysis.ka", line 16, characters 0-56:):
 		the precondition is satisfied
 
-		rule r7 (File "bdu_analysis.ka", line 16, characters 5-56:) is applied for the first time
+		rule r7 (File "bdu_analysis.ka", line 16, characters 0-56:) is applied for the first time
 
 		Updating the views for A(x[],y[])
 
@@ -852,28 +852,19 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x[])
 
-	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 5-33:):
+	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 0-33:):
 		the precondition is satisfied
 
-	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 5-32:):
+	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 5-34:):
+	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 0-34:):
 		the precondition is satisfied
 
-	Applying rule r3 (File "bdu_analysis.ka", line 12, characters 5-17:):
+	Applying rule r3 (File "bdu_analysis.ka", line 12, characters 0-17:):
 		the precondition is satisfied
 
-	Applying rule r4 (File "bdu_analysis.ka", line 13, characters 5-21:):
-		the precondition is satisfied
-
-		Updating the views for A(x[],y[])
-
-		Updating the views for A(y{},x[])
-
-		Updating the views for A(x{},x[])
-
-	Applying rule r5 (File "bdu_analysis.ka", line 14, characters 5-29:):
+	Applying rule r4 (File "bdu_analysis.ka", line 13, characters 0-21:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -882,7 +873,16 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},x[])
 
-	Applying rule r6 (File "bdu_analysis.ka", line 15, characters 5-44:):
+	Applying rule r5 (File "bdu_analysis.ka", line 14, characters 0-29:):
+		the precondition is satisfied
+
+		Updating the views for A(x[],y[])
+
+		Updating the views for A(y{},x[])
+
+		Updating the views for A(x{},x[])
+
+	Applying rule r6 (File "bdu_analysis.ka", line 15, characters 0-44:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])

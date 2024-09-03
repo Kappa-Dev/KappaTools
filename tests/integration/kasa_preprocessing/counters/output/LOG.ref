@@ -1275,10 +1275,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x[.])
 
 
-	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
+	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 0-61:):
 		the precondition is satisfied
 
-		rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:) is applied for the first time
+		rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 0-61:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 	Dealing with creation
@@ -1331,10 +1331,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x{u},c:=0,d:=2,x[.])
 
 
-	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 0-33:):
 		the precondition is satisfied
 
-		rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:) is applied for the first time
+		rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 0-33:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1385,13 +1385,13 @@ EXTENSIONAL DESCRIPTION:
 		A(x{u},c:=1,d:=2,x[.])
 
 
-	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 0-67:):
 		the precondition is not satisfied yet
 
-	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 0-39:):
 		the precondition is satisfied
 
-		rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:) is applied for the first time
+		rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 0-39:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1443,17 +1443,17 @@ EXTENSIONAL DESCRIPTION:
 		A(x{u},c:=2,d:=0,x[.])
 
 
-	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
+	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 0-46:):
 		the precondition is satisfied
 
-		rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:) is applied for the first time
+		rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 0-46:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 0-45:):
 		the precondition is satisfied
 
-		rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:) is applied for the first time
+		rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 0-45:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
@@ -1599,19 +1599,19 @@ EXTENSIONAL DESCRIPTION:
 		B(x[x.A])
 
 
-	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 0-84:):
 		the precondition is satisfied
 
-		rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:) is applied for the first time
+		rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 0-84:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
+	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 0-40:):
 		the precondition is satisfied
 
-		rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:) is applied for the first time
+		rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 0-40:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
@@ -1737,36 +1737,36 @@ EXTENSIONAL DESCRIPTION:
 		A(x{p},c:=2,d:=0,x[.])
 
 
-	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
+	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 0-44:):
 		the precondition is satisfied
 
-		rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:) is applied for the first time
+		rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 0-44:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
+	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 0-47:):
 		the precondition is satisfied
 
-		rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:) is applied for the first time
+		rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 0-47:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 0-63:):
 		the precondition is satisfied
 
-		rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:) is applied for the first time
+		rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
+	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 0-47:):
 		the precondition is not satisfied yet
 
-	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
+	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 0-58:):
 		the precondition is satisfied
 
-		rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:) is applied for the first time
+		rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 0-58:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
@@ -1841,13 +1841,13 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x[])
 
-	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
+	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 0-71:):
 		the precondition is not satisfied yet
 
-	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
+	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 0-71:):
 		the precondition is satisfied
 
-		rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:) is applied for the first time
+		rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 0-71:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
@@ -1901,10 +1901,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x[])
 
-	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
+	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 0-47:):
 		the precondition is satisfied
 
-		rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:) is applied for the first time
+		rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 0-47:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
@@ -1979,10 +1979,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x{p},c:=3,d:=0,x[.])
 
 
-	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
+	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 0-54:):
 		the precondition is satisfied
 
-		rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:) is applied for the first time
+		rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 0-54:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
@@ -2055,37 +2055,37 @@ EXTENSIONAL DESCRIPTION:
 		A(x{p},c:=1,d:=1,x[.])
 
 
-	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
+	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 0-27:):
 		the precondition is satisfied
 
-		rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:) is applied for the first time
+		rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 0-27:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
+	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 0-46:):
 		the precondition is satisfied
 
-		rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:) is applied for the first time
+		rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 0-46:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
+	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 0-61:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 0-33:):
 		the precondition is satisfied
 
-	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 0-67:):
 		the precondition is not satisfied yet
 
-	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 0-39:):
 		the precondition is satisfied
 
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 0-45:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
@@ -2343,19 +2343,19 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x[])
 
-	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
+	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 0-46:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 0-84:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
+	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 0-40:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
@@ -2450,24 +2450,24 @@ EXTENSIONAL DESCRIPTION:
 		A(x{p},c:=4,d:=0,x[.])
 
 
-	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
+	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 0-44:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
+	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 0-47:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
+	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 0-58:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
@@ -2522,30 +2522,30 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x[])
 
-	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
+	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 0-47:):
 		the precondition is not satisfied yet
 
-	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
+	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 0-71:):
 		the precondition is not satisfied yet
 
-	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
+	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 0-71:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
+	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 0-47:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
+	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 0-54:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 0-45:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
@@ -2623,10 +2623,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x[])
 
-	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 0-67:):
 		the precondition is satisfied
 
-		rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:) is applied for the first time
+		rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 0-67:) is applied for the first time
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
@@ -2681,30 +2681,30 @@ EXTENSIONAL DESCRIPTION:
 		A(x{u},c:=2,d:=1,x[.])
 
 
-	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
+	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 0-61:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 0-33:):
 		the precondition is satisfied
 
-	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 0-39:):
 		the precondition is satisfied
 
-	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
+	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
+	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 0-46:):
+		the precondition is satisfied
+
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 0-84:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
@@ -2759,7 +2759,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x[])
 
-	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
+	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 0-40:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
@@ -2812,36 +2812,36 @@ EXTENSIONAL DESCRIPTION:
 		A(x{p},c:=2,d:=1,x[.])
 
 
-	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
+	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 0-46:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
+	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 0-44:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 0-47:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 0-58:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 0-45:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
@@ -2896,173 +2896,173 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x[])
 
-	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
+	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 0-71:):
 		the precondition is not satisfied yet
 
-	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
+	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 0-71:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
+	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 0-47:):
 		the precondition is not satisfied yet
 
-	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
+	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 0-47:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
+	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 0-54:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 0-67:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
-		the precondition is satisfied
-
-	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
-		the precondition is satisfied
-
-	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 0-84:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 5-44:):
+	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 0-61:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 6-46:):
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 0-33:):
+		the precondition is satisfied
+
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 0-39:):
+		the precondition is satisfied
+
+	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 5-45:):
+	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 0-46:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-		Updating the views for B(x[])
+		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 5-58:):
+	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 0-40:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-		Updating the views for B(x[])
-
-	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 8-47:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 5-84:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-		Updating the views for B(x[])
-
-	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 6-63:):
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:):
+	Applying rule r4 (File "../../compiler/counters/counters.ka", line 17, characters 0-44:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r16 (File "../../compiler/counters/counters.ka", line 43, characters 0-46:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r1 (File "../../compiler/counters/counters.ka", line 8, characters 0-45:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r6 (File "../../compiler/counters/counters.ka", line 23, characters 0-58:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r4bis (File "../../compiler/counters/counters.ka", line 18, characters 0-47:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r2 (File "../../compiler/counters/counters.ka", line 11, characters 0-84:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r4_ (File "../../compiler/counters/counters.ka", line 19, characters 0-63:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+		Updating the views for B(x[])
+
+	Applying rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 0-71:):
 		the precondition is not satisfied yet
 
-	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 5-71:):
+	Applying rule r8 (File "../../compiler/counters/counters.ka", line 25, characters 0-71:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 6-67:):
+	Applying rule r12 (File "../../compiler/counters/counters.ka", line 31, characters 0-67:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
 		Updating the views for B(x[])
 
-	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 5-40:):
+	Applying rule r3 (File "../../compiler/counters/counters.ka", line 14, characters 0-40:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:):
+	Applying rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 0-47:):
 		the precondition is not satisfied yet
 
-	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 5-47:):
+	Applying rule r9 (File "../../compiler/counters/counters.ka", line 26, characters 0-47:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 6-61:):
+	Applying rule r10 (File "../../compiler/counters/counters.ka", line 29, characters 0-61:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 6-33:):
+	Applying rule r11 (File "../../compiler/counters/counters.ka", line 30, characters 0-33:):
 		the precondition is satisfied
 
-	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 9-39:):
+	Applying rule r12bis (File "../../compiler/counters/counters.ka", line 32, characters 0-39:):
 		the precondition is satisfied
 
-	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 11-54:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},c:=,d:=,x[])
-
-	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 6-27:):
+	Applying rule get_zero (File "../../compiler/counters/counters.ka", line 38, characters 0-54:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
 
-	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 6-46:):
+	Applying rule r14 (File "../../compiler/counters/counters.ka", line 41, characters 0-27:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},c:=,d:=,x[])
+
+	Applying rule r15 (File "../../compiler/counters/counters.ka", line 42, characters 0-46:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},c:=,d:=,x[])
@@ -3072,8 +3072,8 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 5-47:) will never be applied.
-rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 5-71:) will never be applied.
+rule r5 (File "../../compiler/counters/counters.ka", line 22, characters 0-47:) will never be applied.
+rule r7 (File "../../compiler/counters/counters.ka", line 24, characters 0-71:) will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 

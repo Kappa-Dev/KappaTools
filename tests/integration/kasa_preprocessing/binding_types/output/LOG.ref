@@ -309,9 +309,9 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "binding_types.ka", line 11, characters 5-52:) will never be applied.
-rule r0_op (File "binding_types.ka", line 11, characters 5-52:) will never be applied.
-rule r1 (File "binding_types.ka", line 12, characters 5-45:) will never be applied.
+rule r0 (File "binding_types.ka", line 11, characters 0-52:) will never be applied.
+rule r0_op (File "binding_types.ka", line 11, characters 0-52:) will never be applied.
+rule r1 (File "binding_types.ka", line 12, characters 0-45:) will never be applied.
 rule File "binding_types.ka", line 13, characters 0-50: will never be applied.
 
 ------------------------------------------------------------

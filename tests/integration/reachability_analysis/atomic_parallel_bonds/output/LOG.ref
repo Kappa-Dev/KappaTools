@@ -215,10 +215,10 @@ EXTENSIONAL DESCRIPTION:
 		B(z[.],t[.])
 
 
-	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 5-63:):
+	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
-		rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 5-63:) is applied for the first time
+		rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 0-63:) is applied for the first time
 
 		Updating the views for A(z[],t[])
 
@@ -280,7 +280,7 @@ EXTENSIONAL DESCRIPTION:
 		B(z[z.A],t[t.A])
 
 
-	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 5-63:):
+	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(z[],t[])

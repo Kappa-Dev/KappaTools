@@ -1,3 +1,4 @@
+# To run this not through the repo root Makefile, please provide the $KAPPABIN path
 OUTPUT_PATH:=output
 ERROR:=error
 
@@ -17,7 +18,10 @@ help:
 	@echo 'make svg:       recursively build all svg from existing dot files'
 	@echo 'make clean:     recursively clean everything but the reference files'
 	@echo 'make clean_all: recursively clean everything including the reference files'
+	@echo
+	@echo 'To run this from this directory and not from the root Makefile, please specify the KAPPABIN path in the environment.'
 
+# Run `README` scripts and generate `LOG`s and `error.log`s
 %/$(OUTPUT_PATH)/LOG: %/README #$(shell which "$(KAPPABIN)KaSim") $(shell which "$(KAPPABIN)KaSa")
 	@[ -d $(dir $<)$(OUTPUT_PATH) ] || mkdir $(dir $<)$(OUTPUT_PATH)
 	@find $(dir $<)$(OUTPUT_PATH) -mindepth 1 \( -not -name \*.ref \) -delete
@@ -42,6 +46,7 @@ help:
 	diff -q $(basename $@).ref - || true
 	diff -u $(basename $@).ref - > $@ || true
 
+# Run the scripts and compare the outputs by generating `%.diff`s
 %/$(ERROR): %/$(OUTPUT_PATH)/LOG
 	@rm -f $@
 	@+$(MAKE) $$(find $(dir $@)$(OUTPUT_PATH) \( -not -type d -and -not -name \*.diff.\* \) -print \
@@ -56,9 +61,10 @@ error: $(DIRS_OF_TEST:=/$(ERROR))
 
 all: error
 	@if [ -s $< ] ; then \
-	if [ $$(cat $< | wc -l) -gt 1500 ] ; then echo "Error file too big" ; else cat $< ; fi && exit 2 ; \
+	if [ $$(cat $< | wc -l) -gt 1500 ] ; then echo "Some tests FAILED, but output is NOT DISPLAYED because its size exceeds limit." ; else cat $< ; fi && exit 2 ; \
 	else echo "No difference has been found" ; fi
 
+# Generate the `.ref` files from the current version of Kappa
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)

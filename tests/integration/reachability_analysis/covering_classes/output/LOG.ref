@@ -914,10 +914,10 @@ Influence_map:Inhibition_map:rule(12):'r12' C(y[_])->. -> rule(7):'r7' C(x[_])->
 Influence_map:Inhibition_map:rule(12):'r12' C(y[_])->. -> rule(11):'r11' C(y{p}[1]),A(y{u}[1])->C(y{p}[1]),A(y{p}[1])[0*->1];[0->0]
 Reachability analysis...
 
-	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-32:):
+	Applying rule r0 (File "covering_classes.ka", line 1, characters 0-32:):
 		the precondition is satisfied
 
-		rule r0 (File "covering_classes.ka", line 1, characters 5-32:) is applied for the first time
+		rule r0 (File "covering_classes.ka", line 1, characters 0-32:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1064,10 +1064,10 @@ EXTENSIONAL DESCRIPTION:
 		A(y{u},x[.])
 
 
-	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-32:):
+	Applying rule r1 (File "covering_classes.ka", line 2, characters 0-32:):
 		the precondition is satisfied
 
-		rule r1 (File "covering_classes.ka", line 2, characters 5-32:) is applied for the first time
+		rule r1 (File "covering_classes.ka", line 2, characters 0-32:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1127,10 +1127,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x{u},x[.])
 
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-32:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 0-32:):
 		the precondition is satisfied
 
-		rule r2 (File "covering_classes.ka", line 3, characters 5-32:) is applied for the first time
+		rule r2 (File "covering_classes.ka", line 3, characters 0-32:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1277,13 +1277,13 @@ EXTENSIONAL DESCRIPTION:
 		C(x{u},x[.])
 
 
-	Applying rule r3 (File "covering_classes.ka", line 4, characters 5-23:):
+	Applying rule r3 (File "covering_classes.ka", line 4, characters 0-23:):
 		the precondition is not satisfied yet
 
-	Applying rule r4 (File "covering_classes.ka", line 5, characters 5-49:):
+	Applying rule r4 (File "covering_classes.ka", line 5, characters 0-49:):
 		the precondition is satisfied
 
-		rule r4 (File "covering_classes.ka", line 5, characters 5-49:) is applied for the first time
+		rule r4 (File "covering_classes.ka", line 5, characters 0-49:) is applied for the first time
 
 		Updating the views for A(x[],y[])
 
@@ -1405,19 +1405,19 @@ EXTENSIONAL DESCRIPTION:
 		B(x{p},x[x.A])
 
 
-	Applying rule r5 (File "covering_classes.ka", line 6, characters 5-71:):
+	Applying rule r5 (File "covering_classes.ka", line 6, characters 0-71:):
 		the precondition is not satisfied yet
 
-	Applying rule r6 (File "covering_classes.ka", line 7, characters 5-55:):
+	Applying rule r6 (File "covering_classes.ka", line 7, characters 0-55:):
 		the precondition is not satisfied yet
 
-	Applying rule r8 (File "covering_classes.ka", line 9, characters 5-23:):
+	Applying rule r8 (File "covering_classes.ka", line 9, characters 0-23:):
 		the precondition is not satisfied yet
 
-	Applying rule r9 (File "covering_classes.ka", line 10, characters 5-49:):
+	Applying rule r9 (File "covering_classes.ka", line 10, characters 0-49:):
 		the precondition is satisfied
 
-		rule r9 (File "covering_classes.ka", line 10, characters 5-49:) is applied for the first time
+		rule r9 (File "covering_classes.ka", line 10, characters 0-49:) is applied for the first time
 
 		Updating the views for A(y{},y[])
 
@@ -1540,31 +1540,31 @@ EXTENSIONAL DESCRIPTION:
 		B(y{p},y[y.A])
 
 
-	Applying rule r10 (File "covering_classes.ka", line 11, characters 6-72:):
+	Applying rule r10 (File "covering_classes.ka", line 11, characters 0-72:):
 		the precondition is not satisfied yet
 
-	Applying rule r11 (File "covering_classes.ka", line 12, characters 6-56:):
+	Applying rule r11 (File "covering_classes.ka", line 12, characters 0-56:):
 		the precondition is not satisfied yet
 
-	Applying rule r7 (File "covering_classes.ka", line 8, characters 5-21:):
+	Applying rule r7 (File "covering_classes.ka", line 8, characters 0-21:):
 		the precondition is not satisfied yet
 
-	Applying rule r12 (File "covering_classes.ka", line 13, characters 6-22:):
+	Applying rule r12 (File "covering_classes.ka", line 13, characters 0-22:):
 		the precondition is not satisfied yet
 
-	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-32:):
+	Applying rule r0 (File "covering_classes.ka", line 1, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-32:):
+	Applying rule r1 (File "covering_classes.ka", line 2, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-32:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r3 (File "covering_classes.ka", line 4, characters 5-23:):
+	Applying rule r3 (File "covering_classes.ka", line 4, characters 0-23:):
 		the precondition is satisfied
 
-		rule r3 (File "covering_classes.ka", line 4, characters 5-23:) is applied for the first time
+		rule r3 (File "covering_classes.ka", line 4, characters 0-23:) is applied for the first time
 
 		Updating the views for A(x[],y[])
 
@@ -1630,7 +1630,7 @@ EXTENSIONAL DESCRIPTION:
 		B(y{p},y[.])
 
 
-	Applying rule r4 (File "covering_classes.ka", line 5, characters 5-49:):
+	Applying rule r4 (File "covering_classes.ka", line 5, characters 0-49:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -1641,10 +1641,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x{},x[])
 
-	Applying rule r5 (File "covering_classes.ka", line 6, characters 5-71:):
+	Applying rule r5 (File "covering_classes.ka", line 6, characters 0-71:):
 		the precondition is satisfied
 
-		rule r5 (File "covering_classes.ka", line 6, characters 5-71:) is applied for the first time
+		rule r5 (File "covering_classes.ka", line 6, characters 0-71:) is applied for the first time
 
 		Updating the views for A(x[],y[])
 
@@ -1859,10 +1859,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x{p},x[x.A])
 
 
-	Applying rule r6 (File "covering_classes.ka", line 7, characters 5-55:):
+	Applying rule r6 (File "covering_classes.ka", line 7, characters 0-55:):
 		the precondition is satisfied
 
-		rule r6 (File "covering_classes.ka", line 7, characters 5-55:) is applied for the first time
+		rule r6 (File "covering_classes.ka", line 7, characters 0-55:) is applied for the first time
 
 		Updating the views for C(x[],y[])
 
@@ -1937,10 +1937,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(y{},x[])
 
-	Applying rule r8 (File "covering_classes.ka", line 9, characters 5-23:):
+	Applying rule r8 (File "covering_classes.ka", line 9, characters 0-23:):
 		the precondition is satisfied
 
-		rule r8 (File "covering_classes.ka", line 9, characters 5-23:) is applied for the first time
+		rule r8 (File "covering_classes.ka", line 9, characters 0-23:) is applied for the first time
 
 		Updating the views for A(y{},y[])
 
@@ -1977,7 +1977,7 @@ EXTENSIONAL DESCRIPTION:
 		C(x{p},x[.])
 
 
-	Applying rule r9 (File "covering_classes.ka", line 10, characters 5-49:):
+	Applying rule r9 (File "covering_classes.ka", line 10, characters 0-49:):
 		the precondition is satisfied
 
 		Updating the views for A(y{},y[])
@@ -1988,10 +1988,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(y{},y[])
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-32:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r3 (File "covering_classes.ka", line 4, characters 5-23:):
+	Applying rule r3 (File "covering_classes.ka", line 4, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -2000,10 +2000,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(y{},x[])
 
-	Applying rule r7 (File "covering_classes.ka", line 8, characters 5-21:):
+	Applying rule r7 (File "covering_classes.ka", line 8, characters 0-21:):
 		the precondition is satisfied
 
-		rule r7 (File "covering_classes.ka", line 8, characters 5-21:) is applied for the first time
+		rule r7 (File "covering_classes.ka", line 8, characters 0-21:) is applied for the first time
 
 		Updating the views for C(x[],y[])
 
@@ -2040,10 +2040,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x{p},x[.])
 
 
-	Applying rule r10 (File "covering_classes.ka", line 11, characters 6-72:):
+	Applying rule r10 (File "covering_classes.ka", line 11, characters 0-72:):
 		the precondition is satisfied
 
-		rule r10 (File "covering_classes.ka", line 11, characters 6-72:) is applied for the first time
+		rule r10 (File "covering_classes.ka", line 11, characters 0-72:) is applied for the first time
 
 		Updating the views for A(y{},y[])
 
@@ -2263,10 +2263,10 @@ EXTENSIONAL DESCRIPTION:
 		C(y{p},x[x.A])
 
 
-	Applying rule r11 (File "covering_classes.ka", line 12, characters 6-56:):
+	Applying rule r11 (File "covering_classes.ka", line 12, characters 0-56:):
 		the precondition is satisfied
 
-		rule r11 (File "covering_classes.ka", line 12, characters 6-56:) is applied for the first time
+		rule r11 (File "covering_classes.ka", line 12, characters 0-56:) is applied for the first time
 
 		Updating the views for C(x[],y[])
 
@@ -2342,10 +2342,10 @@ EXTENSIONAL DESCRIPTION:
 		A(y{p},x[x.C])
 
 
-	Applying rule r12 (File "covering_classes.ka", line 13, characters 6-22:):
+	Applying rule r12 (File "covering_classes.ka", line 13, characters 0-22:):
 		the precondition is satisfied
 
-		rule r12 (File "covering_classes.ka", line 13, characters 6-22:) is applied for the first time
+		rule r12 (File "covering_classes.ka", line 13, characters 0-22:) is applied for the first time
 
 		Updating the views for C(x[],y[])
 
@@ -2382,13 +2382,13 @@ EXTENSIONAL DESCRIPTION:
 		A(y{p},y[.])
 
 
-	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-32:):
+	Applying rule r1 (File "covering_classes.ka", line 2, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-32:):
+	Applying rule r0 (File "covering_classes.ka", line 1, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r5 (File "covering_classes.ka", line 6, characters 5-71:):
+	Applying rule r5 (File "covering_classes.ka", line 6, characters 0-71:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -2407,7 +2407,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x{},x[])
 
-	Applying rule r4 (File "covering_classes.ka", line 5, characters 5-49:):
+	Applying rule r4 (File "covering_classes.ka", line 5, characters 0-49:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -2446,7 +2446,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x{},x[])
 
-	Applying rule r6 (File "covering_classes.ka", line 7, characters 5-55:):
+	Applying rule r6 (File "covering_classes.ka", line 7, characters 0-55:):
 		the precondition is satisfied
 
 		Updating the views for C(x[],y[])
@@ -2465,7 +2465,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(y{},x[])
 
-	Applying rule r8 (File "covering_classes.ka", line 9, characters 5-23:):
+	Applying rule r8 (File "covering_classes.ka", line 9, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for A(y{},y[])
@@ -2474,10 +2474,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y[])
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-32:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r3 (File "covering_classes.ka", line 4, characters 5-23:):
+	Applying rule r3 (File "covering_classes.ka", line 4, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -2515,7 +2515,7 @@ EXTENSIONAL DESCRIPTION:
 		C(y{p},y[.])
 
 
-	Applying rule r7 (File "covering_classes.ka", line 8, characters 5-21:):
+	Applying rule r7 (File "covering_classes.ka", line 8, characters 0-21:):
 		the precondition is satisfied
 
 		Updating the views for C(x[],y[])
@@ -2524,7 +2524,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x{},x[])
 
-	Applying rule r9 (File "covering_classes.ka", line 10, characters 5-49:):
+	Applying rule r9 (File "covering_classes.ka", line 10, characters 0-49:):
 		the precondition is satisfied
 
 		Updating the views for A(y{},y[])
@@ -2563,7 +2563,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(y{},y[])
 
-	Applying rule r10 (File "covering_classes.ka", line 11, characters 6-72:):
+	Applying rule r10 (File "covering_classes.ka", line 11, characters 0-72:):
 		the precondition is satisfied
 
 		Updating the views for A(y{},y[])
@@ -2582,7 +2582,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(y{},x[])
 
-	Applying rule r11 (File "covering_classes.ka", line 12, characters 6-56:):
+	Applying rule r11 (File "covering_classes.ka", line 12, characters 0-56:):
 		the precondition is satisfied
 
 		Updating the views for C(x[],y[])
@@ -2601,7 +2601,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(y{},x[])
 
-	Applying rule r12 (File "covering_classes.ka", line 13, characters 6-22:):
+	Applying rule r12 (File "covering_classes.ka", line 13, characters 0-22:):
 		the precondition is satisfied
 
 		Updating the views for C(x[],y[])
@@ -2610,7 +2610,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x{},y[])
 
-	Applying rule r5 (File "covering_classes.ka", line 6, characters 5-71:):
+	Applying rule r5 (File "covering_classes.ka", line 6, characters 0-71:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -2629,10 +2629,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x{},x[])
 
-	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-32:):
+	Applying rule r0 (File "covering_classes.ka", line 1, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r4 (File "covering_classes.ka", line 5, characters 5-49:):
+	Applying rule r4 (File "covering_classes.ka", line 5, characters 0-49:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -2643,13 +2643,13 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x{},x[])
 
-	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-32:):
+	Applying rule r1 (File "covering_classes.ka", line 2, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-32:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 0-32:):
 		the precondition is satisfied
 
-	Applying rule r3 (File "covering_classes.ka", line 4, characters 5-23:):
+	Applying rule r3 (File "covering_classes.ka", line 4, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for A(x[],y[])
@@ -2658,7 +2658,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(y{},x[])
 
-	Applying rule r6 (File "covering_classes.ka", line 7, characters 5-55:):
+	Applying rule r6 (File "covering_classes.ka", line 7, characters 0-55:):
 		the precondition is satisfied
 
 		Updating the views for C(x[],y[])
@@ -2677,7 +2677,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(y{},x[])
 
-	Applying rule r8 (File "covering_classes.ka", line 9, characters 5-23:):
+	Applying rule r8 (File "covering_classes.ka", line 9, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for A(y{},y[])
@@ -2686,7 +2686,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y[])
 
-	Applying rule r7 (File "covering_classes.ka", line 8, characters 5-21:):
+	Applying rule r7 (File "covering_classes.ka", line 8, characters 0-21:):
 		the precondition is satisfied
 
 		Updating the views for C(x[],y[])
@@ -2695,7 +2695,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x{},x[])
 
-	Applying rule r9 (File "covering_classes.ka", line 10, characters 5-49:):
+	Applying rule r9 (File "covering_classes.ka", line 10, characters 0-49:):
 		the precondition is satisfied
 
 		Updating the views for A(y{},y[])

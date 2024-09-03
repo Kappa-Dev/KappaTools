@@ -117,17 +117,17 @@ Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Reachability analysis...
 
-	Applying rule r0 (File "haft_unbinding.ka", line 11, characters 5-31:):
+	Applying rule r0 (File "haft_unbinding.ka", line 11, characters 0-31:):
 		the precondition is not satisfied yet
 
-	Applying rule r1 (File "haft_unbinding.ka", line 12, characters 5-34:):
+	Applying rule r1 (File "haft_unbinding.ka", line 12, characters 0-34:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "haft_unbinding.ka", line 11, characters 5-31:) will never be applied.
-rule r1 (File "haft_unbinding.ka", line 12, characters 5-34:) will never be applied.
+rule r0 (File "haft_unbinding.ka", line 11, characters 0-31:) will never be applied.
+rule r1 (File "haft_unbinding.ka", line 12, characters 0-34:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 
