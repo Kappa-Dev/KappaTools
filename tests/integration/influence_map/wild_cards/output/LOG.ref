@@ -145,13 +145,13 @@ Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Reachability analysis...
 
-	Applying rule r1 (File "wild_cards.ka", line 5, characters 5-68:):
+	Applying rule r1 (File "wild_cards.ka", line 5, characters 0-68:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r1 (File "wild_cards.ka", line 5, characters 5-68:) will never be applied.
+rule r1 (File "wild_cards.ka", line 5, characters 0-68:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

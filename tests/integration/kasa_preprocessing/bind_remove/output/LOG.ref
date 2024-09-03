@@ -157,14 +157,14 @@ Influence_map:Wake_up_map:rule(0):'r0' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(
 Influence_map:Wake_up_map:rule(1):'r1' B(x[_]),.->.,C(x[.]) -> rule(0):'r0' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0*->0]
 Reachability analysis...
 
-	Applying rule r1 (File "create1.ka", line 12, characters 5-31:):
+	Applying rule r1 (File "create1.ka", line 12, characters 0-31:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "create1.ka", line 11, characters 5-45:) will never be applied.
-rule r1 (File "create1.ka", line 12, characters 5-31:) will never be applied.
+rule r0 (File "create1.ka", line 11, characters 0-45:) will never be applied.
+rule r1 (File "create1.ka", line 12, characters 0-31:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

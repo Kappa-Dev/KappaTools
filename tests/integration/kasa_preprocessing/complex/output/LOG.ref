@@ -499,10 +499,10 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "complex.ka", line 11, characters 5-66:) will never be applied.
-rule r0_op (File "complex.ka", line 11, characters 5-66:) will never be applied.
-rule r1 (File "complex.ka", line 12, characters 5-78:) will never be applied.
-rule r1_op (File "complex.ka", line 12, characters 5-78:) will never be applied.
+rule r0 (File "complex.ka", line 11, characters 0-66:) will never be applied.
+rule r0_op (File "complex.ka", line 11, characters 0-66:) will never be applied.
+rule r1 (File "complex.ka", line 12, characters 0-78:) will never be applied.
+rule r1_op (File "complex.ka", line 12, characters 0-78:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

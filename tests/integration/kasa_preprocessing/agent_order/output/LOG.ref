@@ -171,14 +171,14 @@ Influence_map:Inhibition_map:rule(1):'remove' A(x[.]),A(x[.]),.,.->A(x[.]),.,B(x
 Influence_map:Inhibition_map:rule(1):'remove' A(x[.]),A(x[.]),.,.->A(x[.]),.,B(x[.]),A(x[.]) -> rule(1):'remove' A(x[.]),A(x[.]),.,.->A(x[.]),.,B(x[.]),A(x[.])[1->0]
 Reachability analysis...
 
-	Applying rule remove (File "agent_order.ka", line 6, characters 9-61:):
+	Applying rule remove (File "agent_order.ka", line 6, characters 0-61:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule bind (File "agent_order.ka", line 5, characters 7-45:) will never be applied.
-rule remove (File "agent_order.ka", line 6, characters 9-61:) will never be applied.
+rule bind (File "agent_order.ka", line 5, characters 0-45:) will never be applied.
+rule remove (File "agent_order.ka", line 6, characters 0-61:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

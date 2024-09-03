@@ -202,10 +202,10 @@ Influence_map:Inhibition_map:rule(3):'bind' A(x[.]),A(x[.])->A(x[1]),A(x[1]) -> 
 Influence_map:Inhibition_map:rule(3):'bind' A(x[.]),A(x[.])->A(x[1]),A(x[1]) -> rule(3):'bind' A(x[.]),A(x[.])->A(x[1]),A(x[1])[0->1];[1->0]
 Reachability analysis...
 
-	Applying rule create (File "bdu_ex.ka", line 7, characters 9-28:):
+	Applying rule create (File "bdu_ex.ka", line 7, characters 0-28:):
 		the precondition is satisfied
 
-		rule create (File "bdu_ex.ka", line 7, characters 9-28:) is applied for the first time
+		rule create (File "bdu_ex.ka", line 7, characters 0-28:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -246,10 +246,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x{u},y{u},x[.])
 
 
-	Applying rule x (File "bdu_ex.ka", line 8, characters 4-32:):
+	Applying rule x (File "bdu_ex.ka", line 8, characters 0-32:):
 		the precondition is satisfied
 
-		rule x (File "bdu_ex.ka", line 8, characters 4-32:) is applied for the first time
+		rule x (File "bdu_ex.ka", line 8, characters 0-32:) is applied for the first time
 
 		Updating the views for A(x{},y{},x[])
 
@@ -291,10 +291,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x{p},y{u},x[.])
 
 
-	Applying rule y (File "bdu_ex.ka", line 9, characters 4-49:):
+	Applying rule y (File "bdu_ex.ka", line 9, characters 0-49:):
 		the precondition is satisfied
 
-		rule y (File "bdu_ex.ka", line 9, characters 4-49:) is applied for the first time
+		rule y (File "bdu_ex.ka", line 9, characters 0-49:) is applied for the first time
 
 		Updating the views for A(x{},y{},x[])
 
@@ -336,10 +336,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x{p},y{p},x[.])
 
 
-	Applying rule bind (File "bdu_ex.ka", line 10, characters 7-45:):
+	Applying rule bind (File "bdu_ex.ka", line 10, characters 0-45:):
 		the precondition is satisfied
 
-		rule bind (File "bdu_ex.ka", line 10, characters 7-45:) is applied for the first time
+		rule bind (File "bdu_ex.ka", line 10, characters 0-45:) is applied for the first time
 
 		Updating the views for A(x{},y{},x[])
 
@@ -410,20 +410,20 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y{},x[])
 
-	Applying rule create (File "bdu_ex.ka", line 7, characters 9-28:):
+	Applying rule create (File "bdu_ex.ka", line 7, characters 0-28:):
 		the precondition is satisfied
 
-	Applying rule x (File "bdu_ex.ka", line 8, characters 4-32:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},y{},x[])
-
-	Applying rule y (File "bdu_ex.ka", line 9, characters 4-49:):
+	Applying rule x (File "bdu_ex.ka", line 8, characters 0-32:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},x[])
 
-	Applying rule bind (File "bdu_ex.ka", line 10, characters 7-45:):
+	Applying rule y (File "bdu_ex.ka", line 9, characters 0-49:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},y{},x[])
+
+	Applying rule bind (File "bdu_ex.ka", line 10, characters 0-45:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},x[])

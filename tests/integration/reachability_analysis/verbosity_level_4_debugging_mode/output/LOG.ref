@@ -338,7 +338,7 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule . -> A(x{u}[.] y{u}[.] z{u}[.]) (File "../verbosity.ka", line 1, characters 0-35:) is applied for the first time
-				(rule KO (File "../verbosity.ka", line 8, characters 5-49:)) should be investigated 
+				(rule KO (File "../verbosity.ka", line 8, characters 0-49:)) should be investigated 
 				(rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:)) should be investigated 
 				(rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:)) should be investigated 
 				(rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:)) should be investigated 
@@ -391,7 +391,7 @@ EXTENSIONAL DESCRIPTION:
 			(rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:)) should be investigated
 			(rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:)) should be investigated
 			(rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:)) should be investigated
-			(rule KO (File "../verbosity.ka", line 8, characters 5-49:)) should be investigated
+			(rule KO (File "../verbosity.ka", line 8, characters 0-49:)) should be investigated
 			(rule . -> A(x{u}[.] y{u}[.] z{u}[.]) (File "../verbosity.ka", line 1, characters 0-35:)) should be investigated
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:):
@@ -670,7 +670,7 @@ EXTENSIONAL DESCRIPTION:
 
 			(rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:)) should be investigated
 
-	Applying rule KO (File "../verbosity.ka", line 8, characters 5-49:):
+	Applying rule KO (File "../verbosity.ka", line 8, characters 0-49:):
 		the precondition is not satisfied yet
 
 	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.]) (File "../verbosity.ka", line 1, characters 0-35:):
@@ -709,7 +709,7 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule KO (File "../verbosity.ka", line 8, characters 5-49:) will never be applied.
+rule KO (File "../verbosity.ka", line 8, characters 0-49:) will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 

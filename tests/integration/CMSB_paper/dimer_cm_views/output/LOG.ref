@@ -9,7 +9,7 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule obs (File "../dimer.ka", line 13, characters 5-39:) will never be applied.
+rule obs (File "../dimer.ka", line 13, characters 0-39:) will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 

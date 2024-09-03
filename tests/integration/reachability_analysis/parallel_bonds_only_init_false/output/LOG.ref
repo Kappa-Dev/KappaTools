@@ -224,8 +224,8 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Inhibition_map:rule(0):'r0' A(z[.],t[.]),B(z[.],t[.])->A(z[1],t[.]),B(z[1],t[.]) -> rule(1):'r1' A(z[.],t[.]),B(z[.],t[.])->A(z[.],t[1]),B(z[.],t[1])[0->0];[1->1]
 Influence_map:Inhibition_map:rule(1):'r1' A(z[.],t[.]),B(z[.],t[.])->A(z[.],t[1]),B(z[.],t[1]) -> rule(0):'r0' A(z[.],t[.]),B(z[.],t[.])->A(z[1],t[.]),B(z[1],t[.])[0->0];[1->1]
 Reachability analysis...
-				(rule r1 (File "parallel_bonds.ka", line 9, characters 5-63:)) should be investigated 
-				(rule r0 (File "parallel_bonds.ka", line 8, characters 5-63:)) should be investigated 
+				(rule r1 (File "parallel_bonds.ka", line 9, characters 0-63:)) should be investigated 
+				(rule r0 (File "parallel_bonds.ka", line 8, characters 0-63:)) should be investigated 
 
 	Views in initial state:
 
@@ -256,10 +256,10 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		A(z[.],t[.])
 
-			(rule r0 (File "parallel_bonds.ka", line 8, characters 5-63:)) should be investigated
-			(rule r1 (File "parallel_bonds.ka", line 9, characters 5-63:)) should be investigated
-				(rule r1 (File "parallel_bonds.ka", line 9, characters 5-63:)) should be investigated 
-				(rule r0 (File "parallel_bonds.ka", line 8, characters 5-63:)) should be investigated 
+			(rule r0 (File "parallel_bonds.ka", line 8, characters 0-63:)) should be investigated
+			(rule r1 (File "parallel_bonds.ka", line 9, characters 0-63:)) should be investigated
+				(rule r1 (File "parallel_bonds.ka", line 9, characters 0-63:)) should be investigated 
+				(rule r0 (File "parallel_bonds.ka", line 8, characters 0-63:)) should be investigated 
 
 	Views in initial state:
 
@@ -382,10 +382,10 @@ EXTENSIONAL DESCRIPTION:
 		A(t[1],z[z.B]),B(t[1],z[.])
 		B(t[.],z[1]),A(t[t.B],z[1])
 		B(t[1],z[.]),A(t[1],z[z.B])
-	Applying rule r0 (File "parallel_bonds.ka", line 8, characters 5-63:):
+	Applying rule r0 (File "parallel_bonds.ka", line 8, characters 0-63:):
 		the precondition is satisfied
 
-		rule r0 (File "parallel_bonds.ka", line 8, characters 5-63:) is applied for the first time
+		rule r0 (File "parallel_bonds.ka", line 8, characters 0-63:) is applied for the first time
 
 		Updating the views for A(z[],t[])
 
@@ -423,12 +423,12 @@ EXTENSIONAL DESCRIPTION:
 		A(t[.],z[1]),B(t[.],z[1])
 		B(t[.],z[1]),A(t[.],z[1])
 
-			(rule r0 (File "parallel_bonds.ka", line 8, characters 5-63:)) should be investigated
+			(rule r0 (File "parallel_bonds.ka", line 8, characters 0-63:)) should be investigated
 
-	Applying rule r1 (File "parallel_bonds.ka", line 9, characters 5-63:):
+	Applying rule r1 (File "parallel_bonds.ka", line 9, characters 0-63:):
 		the precondition is satisfied
 
-		rule r1 (File "parallel_bonds.ka", line 9, characters 5-63:) is applied for the first time
+		rule r1 (File "parallel_bonds.ka", line 9, characters 0-63:) is applied for the first time
 
 		Updating the views for A(z[],t[])
 
@@ -466,16 +466,16 @@ EXTENSIONAL DESCRIPTION:
 		A(t[1],z[.]),B(t[1],z[.])
 		B(t[1],z[.]),A(t[1],z[.])
 
-			(rule r1 (File "parallel_bonds.ka", line 9, characters 5-63:)) should be investigated
+			(rule r1 (File "parallel_bonds.ka", line 9, characters 0-63:)) should be investigated
 
-	Applying rule r0 (File "parallel_bonds.ka", line 8, characters 5-63:):
+	Applying rule r0 (File "parallel_bonds.ka", line 8, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(z[],t[])
 
 		Updating the views for B(z[],t[])
 
-	Applying rule r1 (File "parallel_bonds.ka", line 9, characters 5-63:):
+	Applying rule r1 (File "parallel_bonds.ka", line 9, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(z[],t[])

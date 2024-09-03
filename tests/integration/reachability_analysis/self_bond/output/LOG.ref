@@ -872,10 +872,10 @@ EXTENSIONAL DESCRIPTION:
 		F(z[.],t[.])
 
 
-	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 5-63:):
+	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 0-63:):
 		the precondition is satisfied
 
-		rule r1 (File "parallel_bonds.ka", line 14, characters 5-63:) is applied for the first time
+		rule r1 (File "parallel_bonds.ka", line 14, characters 0-63:) is applied for the first time
 
 		Updating the views for A(z[],t[])
 
@@ -909,10 +909,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z[],t[])
 
-	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 5-69:):
+	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 0-69:):
 		the precondition is satisfied
 
-		rule r6 (File "parallel_bonds.ka", line 19, characters 5-69:) is applied for the first time
+		rule r6 (File "parallel_bonds.ka", line 19, characters 0-69:) is applied for the first time
 
 		Updating the views for F(z[],t[])
 
@@ -1004,10 +1004,10 @@ EXTENSIONAL DESCRIPTION:
 		F(z[t.F],t[.])
 
 
-	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 5-69:):
+	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 0-69:):
 		the precondition is satisfied
 
-		rule r5 (File "parallel_bonds.ka", line 18, characters 5-69:) is applied for the first time
+		rule r5 (File "parallel_bonds.ka", line 18, characters 0-69:) is applied for the first time
 
 		Updating the views for E(z[],t[])
 
@@ -1099,10 +1099,10 @@ EXTENSIONAL DESCRIPTION:
 		E(z[.],t[t.E])
 
 
-	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 5-69:):
+	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 0-69:):
 		the precondition is satisfied
 
-		rule r4 (File "parallel_bonds.ka", line 17, characters 5-69:) is applied for the first time
+		rule r4 (File "parallel_bonds.ka", line 17, characters 0-69:) is applied for the first time
 
 		Updating the views for D(z[],t[])
 
@@ -1194,10 +1194,10 @@ EXTENSIONAL DESCRIPTION:
 		D(z[.],t[t.D])
 
 
-	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 5-69:):
+	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 0-69:):
 		the precondition is satisfied
 
-		rule r3 (File "parallel_bonds.ka", line 16, characters 5-69:) is applied for the first time
+		rule r3 (File "parallel_bonds.ka", line 16, characters 0-69:) is applied for the first time
 
 		Updating the views for C(z[],t[])
 
@@ -1289,10 +1289,10 @@ EXTENSIONAL DESCRIPTION:
 		C(z[t.C],t[.])
 
 
-	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 5-63:):
+	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 0-63:):
 		the precondition is satisfied
 
-		rule r2 (File "parallel_bonds.ka", line 15, characters 5-63:) is applied for the first time
+		rule r2 (File "parallel_bonds.ka", line 15, characters 0-63:) is applied for the first time
 
 		Updating the views for B(z[],t[])
 
@@ -1326,14 +1326,14 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(z[],t[])
 
-	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 5-63:):
+	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(z[],t[])
 
 		Updating the views for A(z[],t[])
 
-	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 5-69:):
+	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 0-69:):
 		the precondition is satisfied
 
 		Updating the views for F(z[],t[])
@@ -1342,7 +1342,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for F(z[],t[])
 
-	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 5-69:):
+	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 0-69:):
 		the precondition is satisfied
 
 		Updating the views for E(z[],t[])
@@ -1351,7 +1351,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for E(z[],t[])
 
-	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 5-69:):
+	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 0-69:):
 		the precondition is satisfied
 
 		Updating the views for D(z[],t[])
@@ -1360,7 +1360,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for D(z[],t[])
 
-	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 5-69:):
+	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 0-69:):
 		the precondition is satisfied
 
 		Updating the views for C(z[],t[])
@@ -1369,7 +1369,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(z[],t[])
 
-	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 5-63:):
+	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for B(z[],t[])

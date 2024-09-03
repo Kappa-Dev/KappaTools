@@ -472,10 +472,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x{u},z[.],t[.])
 
 
-	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:):
+	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
-		rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:) is applied for the first time
+		rule r1 (File "parallel_bonds.ka", line 7, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},z[],t[])
 
@@ -557,10 +557,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x{u},z[z.A],t[.])
 
 
-	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:):
+	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 0-63:):
 		the precondition is satisfied
 
-		rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:) is applied for the first time
+		rule r2 (File "parallel_bonds.ka", line 8, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},z[],t[])
 
@@ -642,10 +642,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x{u},z[z.A],t[t.A])
 
 
-	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:):
+	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 0-36:):
 		the precondition is satisfied
 
-		rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:) is applied for the first time
+		rule r3 (File "parallel_bonds.ka", line 9, characters 0-36:) is applied for the first time
 
 		Updating the views for A(x{},z[],t[])
 
@@ -729,30 +729,30 @@ EXTENSIONAL DESCRIPTION:
 		A(x{u},z[.],t[t.B])
 
 
-	Applying rule r4 (File "parallel_bonds.ka", line 10, characters 5-41:):
+	Applying rule r4 (File "parallel_bonds.ka", line 10, characters 0-41:):
 		the precondition is satisfied
 
-		rule r4 (File "parallel_bonds.ka", line 10, characters 5-41:) is applied for the first time
+		rule r4 (File "parallel_bonds.ka", line 10, characters 0-41:) is applied for the first time
 
 		Updating the views for A(x{},z[],t[])
 
 		Updating the views for B(x{},z[],t[])
 
-	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 5-63:):
-		the precondition is satisfied
-
-		Updating the views for A(x{},z[],t[])
-
-		Updating the views for B(x{},z[],t[])
-
-	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 5-63:):
+	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},z[],t[])
 
 		Updating the views for B(x{},z[],t[])
 
-	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 5-36:):
+	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 0-63:):
+		the precondition is satisfied
+
+		Updating the views for A(x{},z[],t[])
+
+		Updating the views for B(x{},z[],t[])
+
+	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 0-36:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},z[],t[])
