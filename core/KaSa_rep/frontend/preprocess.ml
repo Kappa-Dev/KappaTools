@@ -1030,7 +1030,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             in
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error
-                Ckappa_sig.compare_unit_agent_name (fst agent') ()
+                Ckappa_sig.compare_unit_agent_name (Loc.v agent') ()
                 Misc_sa.const_unit handler.Cckappa_sig.agents_dic
             in
             let error, agent_name' =
@@ -1053,7 +1053,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             let error, (bool, output) =
               Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error
                 Ckappa_sig.compare_unit_site_name
-                (Ckappa_sig.Binding (fst site'))
+                (Ckappa_sig.Binding (Loc.v site'))
                 () Misc_sa.const_unit site_dic'
             in
             let error, site_name' =
@@ -2151,28 +2151,32 @@ let translate_init parameters error handler ((alg, pos_alg), init_t) =
     | Remanent_parameters_sig.Server ->
       error, dft)
 
-let translate_var parameters error handler (a, b) =
-  let error, b' =
-    alg_with_pos_map (lift_allowing_question_marks parameters handler) error b
+let translate_var parameters error handler (var_name, var_expr) =
+  let error, var_expr' =
+    alg_with_pos_map
+      (lift_allowing_question_marks parameters handler)
+      error var_expr
   in
-  let error, a_dot =
-    Tools_kasa.make_id_compatible_with_dot_format parameters error (fst a)
+  let error, var_name_dot =
+    Tools_kasa.make_id_compatible_with_dot_format parameters error
+      (Loc.v var_name)
   in
   ( error,
     {
-      Cckappa_sig.e_id = a;
-      Cckappa_sig.e_id_dot = a_dot, snd a;
-      Cckappa_sig.c_variable = fst b;
-      Cckappa_sig.e_variable = a, b';
+      Cckappa_sig.e_id = var_name;
+      Cckappa_sig.e_id_dot = var_name_dot;
+      Cckappa_sig.c_variable = Loc.v var_expr;
+      Cckappa_sig.e_variable = var_name, var_expr';
+      Cckappa_sig.expr_loc = Loc.get_annot var_expr;
     } )
 
-let translate_obs parameters error handler (a, b) =
-  let error, a' =
+let translate_obs parameters error handler (obs_name, obs_expr) =
+  let error, obs_name' =
     Prepreprocess.alg_map
       (lift_allowing_question_marks parameters handler)
-      error a
+      error obs_name
   in
-  error, (a', b)
+  error, (obs_name', obs_expr)
 
 let bool_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.bool_map
 
@@ -2462,8 +2466,9 @@ let print_list_of_lines parameters list =
       ())
     list
 
-let gexf_of_contact_map ?logger parameters (error : Exception.exceptions_caught_and_uncaught)
-    handler _scc_map contact_map =
+let gexf_of_contact_map ?logger parameters
+    (error : Exception.exceptions_caught_and_uncaught) handler _scc_map
+    contact_map =
   let parameters_gexf =
     match logger with
     | None -> Remanent_parameters.open_contact_map_file parameters

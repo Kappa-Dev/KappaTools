@@ -657,26 +657,34 @@ functor
       let nrules = Handler.nrules parameters error handler in
       let nvars = Handler.nvars parameters error handler in
       let () = show_title state in
-      let rec aux inc pos of_int lift n (error, l) =
-        if n < 0 then
+      let rec aux id_offset pos_of_node_id id_of_int short_node_of_id current_id
+          (error, l) =
+        if current_id < 0 then
           error, l
         else (
+          let flattened_id = current_id + id_offset in
           let error, p =
-            pos parameters error handler compil (of_int (n + inc))
+            pos_of_node_id parameters error handler compil
+              (id_of_int flattened_id)
           in
-          aux inc pos of_int lift (n - 1) (error, (lift n, p) :: l)
+          aux id_offset pos_of_node_id id_of_int short_node_of_id
+            (current_id - 1)
+            (error, (short_node_of_id current_id, p) :: l)
         )
+      in
+
+      let error, short_nodes_var =
+        aux nrules Handler.pos_of_var Ckappa_sig.rule_id_of_int
+          (fun x -> Public_data.Var x)
+          (nvars - 1) (error, [])
       in
       let error, short_nodes =
         aux 0 Handler.pos_of_rule Ckappa_sig.rule_id_of_int
           (fun x -> Public_data.Rule x)
-          (nrules - 1)
-          (aux nrules Handler.pos_of_var Ckappa_sig.rule_id_of_int
-             (fun x -> Public_data.Var x)
-             (nvars - 1) (error, []))
+          (nrules - 1) (error, short_nodes_var)
       in
 
-      (* change short_nodes to refined_nodes *)
+      (* convert short_nodes to refined_nodes *)
       let current_state = ref state in
       let refined_nodes =
         short_nodes
@@ -693,10 +701,12 @@ functor
       in
       let state = !current_state in
 
+      (* Test json conversion *)
       let json = Public_data.pos_of_rules_and_vars_to_json refined_nodes in
       let _ = Public_data.pos_of_rules_and_vars_of_json json in
-      ( Remanent_state.set_errors error
-          (Remanent_state.set_pos_of_rules_and_vars refined_nodes state),
+
+      ( Remanent_state.set_pos_of_rules_and_vars refined_nodes state
+        |> Remanent_state.set_errors error,
         refined_nodes )
 
     let get_pos_of_rules_and_vars =

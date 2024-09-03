@@ -121,9 +121,10 @@ type mixture = {
 
 type enriched_variable = {
   e_id: string * Ckappa_sig.position;
-  e_id_dot: string * Ckappa_sig.position;
+  e_id_dot: string;  (** Variable id cleaned to be used in dot export *)
   c_variable: (Ckappa_sig.mixture, string) Alg_expr.e;
   e_variable: (mixture, string) Ast.variable_def;
+  expr_loc: Loc.t;
 }
 
 type counter_action = {

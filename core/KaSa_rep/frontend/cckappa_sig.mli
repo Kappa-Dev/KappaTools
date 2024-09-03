@@ -114,9 +114,10 @@ type mixture = {
 
 type enriched_variable = {
   e_id: string * Ckappa_sig.position;
-  e_id_dot: string * Ckappa_sig.position;
+  e_id_dot: string;
   c_variable: (Ckappa_sig.mixture, string) Alg_expr.e;
   e_variable: (mixture, string) Ast.variable_def;
+  expr_loc: Loc.t;
 }
 
 type counter_action = {
@@ -223,7 +224,8 @@ val rename_mixture :
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_agent_id) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_agent_id) ->
   mixture ->
   Exception_without_parameter.exceptions_caught_and_uncaught * mixture
 
@@ -237,11 +239,13 @@ val join_mixture :
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_agent_id) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_agent_id) ->
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_agent_id ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_agent_id) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_agent_id) ->
   mixture ->
   mixture ->
   Exception_without_parameter.exceptions_caught_and_uncaught * mixture
@@ -257,7 +261,8 @@ val add_port :
   Ckappa_sig.c_state option ->
   Ckappa_sig.c_state option ->
   Ckappa_sig.c_state interval port ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_state interval port
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_state interval port
 
 val add_state :
   Remanent_parameters_sig.parameters ->
@@ -265,7 +270,8 @@ val add_state :
   Ckappa_sig.c_site_name ->
   Ckappa_sig.c_state option ->
   Ckappa_sig.c_state interval port ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * Ckappa_sig.c_state interval port
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_state interval port
 
 val add_agent_interface :
   Remanent_parameters_sig.parameters ->

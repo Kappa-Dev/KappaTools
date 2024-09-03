@@ -211,7 +211,7 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
         Ckappa_sig.dummy_rule_id )
   | Some rule ->
     let label_opt = rule.Cckappa_sig.e_rule_label in
-    let error, (label, _) =
+    let error, (label, label_annot) =
       Misc_sa.unsome (error, label_opt) (fun error ->
           error, Loc.annot_with_dummy "")
     in
@@ -224,7 +224,9 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
         | Ckappa_sig.Reverse -> Ast.flip_label label
       )
     in
-    let position = rule.Cckappa_sig.e_rule_rule.Ckappa_sig.position in
+    let position =
+      Loc.merge label_annot rule.Cckappa_sig.e_rule_rule.Ckappa_sig.position
+    in
     let direction =
       match rule.Cckappa_sig.e_rule_initial_direction with
       | Ckappa_sig.Direct -> Public_data.Direct_rule
@@ -274,8 +276,9 @@ let info_of_var parameters error handler compiled
         var_id )
   | Some var ->
     ( error,
-      ( fst var.Cckappa_sig.e_id_dot,
-        snd var.Cckappa_sig.e_id,
+      ( (* Use variable name compatible with dot export *)
+        var.Cckappa_sig.e_id_dot,
+        Loc.merge (Loc.get_annot var.Cckappa_sig.e_id) var.Cckappa_sig.expr_loc,
         Public_data.Variable,
         ""
         (* TO DO: string for the ast representation (from var.Cckappa_sig.c_variable?) *),
@@ -615,10 +618,10 @@ let get_label_of_rule_dot _parameters error rule =
   error, rule.Cckappa_sig.e_rule_label_dot
 
 let get_label_of_var_txt _parameters error rule =
-  error, fst rule.Cckappa_sig.e_id
+  error, Loc.v rule.Cckappa_sig.e_id
 
 let get_label_of_var_dot _parameters error rule =
-  error, fst rule.Cckappa_sig.e_id_dot
+  error, rule.Cckappa_sig.e_id_dot
 
 let print_rule_txt parameters error rule_id m1 _m2 rule =
   let m = "'" ^ m1 ^ "' " in

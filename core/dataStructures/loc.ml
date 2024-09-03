@@ -178,12 +178,18 @@ let is_included_in file { line; chr } range =
   && (line <> range.to_position.line || chr <= range.to_position.chr)
 
 let merge b e =
-  let () = assert (b.file = e.file) in
-  {
-    file = b.file;
-    from_position = b.from_position;
-    to_position = e.to_position;
-  }
+  if is_dummy b then
+    e
+  else if is_dummy e then
+    b
+  else (
+    let () = assert (b.file = e.file) in
+    {
+      file = b.file;
+      from_position = b.from_position;
+      to_position = e.to_position;
+    }
+  )
 
 (** Annoted yojson helpers *)
 
