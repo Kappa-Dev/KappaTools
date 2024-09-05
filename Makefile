@@ -17,6 +17,10 @@ MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
 RESOURCES_HTML=$(wildcard gui/shared/*.js) $(wildcard gui/viz/*.js) $(wildcard gui/viz/*.css) gui/favicon.ico gui/package.json
 
+# `APP_EXT` defines where to fetch the js libs.
+#   `local` is to download them from the dev website e.g. github and saving them locally.
+#   `cdn` uses `cdnjs.cloudfare.com` to fetch the libs
+#   `debian` and `deploy` are also available
 APP_EXT?=cdn
 INDEX_HTML=gui/use-$(APP_EXT).html
 ifeq ($(APP_EXT),local)
