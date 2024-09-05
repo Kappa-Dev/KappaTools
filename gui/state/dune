@@ -1,0 +1,44 @@
+(include ../dune_js_of_ocaml_flags.inc)
+
+(library
+ (name kappa_webapp_state)
+ (libraries 
+  js_of_ocaml-tyxml
+  lwt_react
+  kappa_webapp_lib
+  kappa_json_api
+  kappa_parameters)
+ (preprocess
+  (pps js_of_ocaml-ppx tyxml-ppx))
+ (flags
+  (:standard
+   -w
+   @a-7-70
+   -open
+   Js_of_ocaml
+   -open
+   Js_of_ocaml_tyxml
+   -open
+   Kappa_webapp_lib
+   -open
+   Kappa_json_api
+   -open
+   Kappa_data_structures
+   -open
+   Kappa_terms
+   -open
+   Kappa_grammar
+   -open
+   Kappa_runtime
+   -open
+   Kappa_errors
+   -open
+   Kappa_kasa_type_interface
+   -open
+   Kappa_parameters
+   -open
+   Kappa_classical_graphs
+   -open
+   Kappa_logging
+   -open
+   Kappa_cflow)))

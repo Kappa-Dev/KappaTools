@@ -11,7 +11,9 @@ module Html = Tyxml_js.Html5
 
 let editor_full, set_editor_full = React.S.create (false : bool)
 let filename, set_filename = React.S.create (None : string option)
-let move_cursor_hook = Hooked.E.create ~debug:"move_cursor_hook" ()
+
+let move_cursor_hook, move_cursor_hook_send =
+  Hooked.E.create ~debug:"move_cursor_hook" ()
 
 let file_label =
   Tyxml_js.R.Html.txt
@@ -137,7 +139,7 @@ let onload () : unit =
 
   let () =
     lint_config##.getAnnotations := fun _ _ _ ->
-    error_lint (Hooked.S.v State_error.errors)
+    error_lint (Hooked.S.value State_error.errors)
   in
   let () = lint_config##.lintOnChange := Js._false in
   let configuration = Codemirror.default_configuration in

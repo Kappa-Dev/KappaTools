@@ -178,15 +178,15 @@ module DivErrorMessage : Ui_common.Div = struct
   let message_nav_inc_id = "panel_settings_message_nav_inc_id"
   let message_nav_dec_id = "panel_settings_message_nav_dec_id"
   let message_file_label_id = "panel_settings_message_file_label"
-  let error_index = Hooked.S.create ~debug:"error_index" None
+  let error_index, error_index_set = Hooked.S.create ~debug:"error_index" None
 
   let () =
     Hooked.S.register State_error.errors (fun errors ->
         match errors with
         | [] -> ()
         | _ :: _ ->
-          (match Hooked.S.v error_index with
-          | None -> Hooked.S.set error_index (Some 0)
+          (match Hooked.S.value error_index with
+          | None -> error_index_set (Some 0)
           | Some _ -> ()))
 
   (* if there are less or no errors the index needs to be updated *)
@@ -198,11 +198,11 @@ module DivErrorMessage : Ui_common.Div = struct
     | Some index, error ->
       let length = List.length error in
       if index > length then (
-        let () = Hooked.S.set error_index (Some 0) in
+        let () = error_index_set (Some 0) in
         Some 0
       ) else if 0 > index then (
         let index = Some (List.length error - 1) in
-        let () = Hooked.S.set error_index index in
+        let () = error_index_set index in
         index
       ) else
         Some index
@@ -306,8 +306,9 @@ module DivErrorMessage : Ui_common.Div = struct
                 (Js.string "[Panel_settings] clicked file_click_handler")
             in
             let message : Api_types_t.message option =
-              get_message (Hooked.S.v error_index)
-                (Hooked.S.v State_error.errors)
+              get_message
+                (Hooked.S.value error_index)
+                (Hooked.S.value State_error.errors)
             in
             let range =
               Option_util.bind
@@ -332,14 +333,15 @@ module DivErrorMessage : Ui_common.Div = struct
                 (Js.string "[Panel_settings] clicked index_click_handler")
             in
             let index : int option =
-              sanitize_index (Hooked.S.v error_index)
-                (Hooked.S.v State_error.errors)
+              sanitize_index
+                (Hooked.S.value error_index)
+                (Hooked.S.value State_error.errors)
             in
             let index = Option_util.map delta index in
             let index : int option =
-              sanitize_index index (Hooked.S.v State_error.errors)
+              sanitize_index index (Hooked.S.value State_error.errors)
             in
-            let () = Hooked.S.set error_index index in
+            let () = error_index_set index in
             Js._true)
     in
     ()
