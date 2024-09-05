@@ -139,9 +139,22 @@ let async loc (task : unit -> 'a Lwt.t) : unit =
   Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
       Lwt.catch task (fun exn ->
           let () =
-            info ~loc:__LOC__ (Js.string (loc ^ Printexc.to_string exn))
+            warn ~loc:__LOC__
+              (Js.string
+                 ("Async error at " ^ loc ^ ":\n" ^ Printexc.to_string exn))
           in
-          let () = debug ~loc:__LOC__ (Js.string (Printexc.get_backtrace ())) in
+          let log_trace =
+            if Printexc.backtrace_status () then (
+              let trace = Printexc.get_backtrace () in
+              if String.length trace > 0 then
+                "Backtrace: " ^ trace
+              else
+                "Couldn't get backtrace while backtrace record is enabled, \
+                 might be because of jsoo or react :/"
+            ) else
+              "Enable backtrace recording to (hopefully?) get backtrace"
+          in
+          let () = warn ~loc:__LOC__ (Js.string log_trace) in
           Lwt.return_unit))
 
 let guid () : string =

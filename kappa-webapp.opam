@@ -38,6 +38,7 @@ depends: [
   "js_of_ocaml-lwt" {= "5.7.0"}
   "js_of_ocaml-ppx" {= "5.7.0"}
   "js_of_ocaml-tyxml" {= "5.7.0"}
+  "ppx_inline_test" {= "v0.15.1"}
   "kappa-binaries"
   "kappa-agents"
   "odoc" {with-doc}

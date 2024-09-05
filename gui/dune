@@ -1,11 +1,3 @@
-(library
- (name kappa_js_lib)
- (modules Common Hooked)
- (libraries js_of_ocaml-lwt lwt_react)
- (preprocess
-  (pps js_of_ocaml-ppx tyxml-ppx))
- (flags :standard -w +a -open Js_of_ocaml))
-
 (rule
  (with-stdout-to
   js_of_ocaml_flags
@@ -18,7 +10,7 @@
   (flags
    (:include js_of_ocaml_flags)))
  (modules KaSimWorker)
- (libraries kappa_js_lib kappa_json_api)
+ (libraries kappa_webapp_lib kappa_json_api)
  (preprocess
   (pps js_of_ocaml-ppx tyxml-ppx))
  (flags
@@ -28,7 +20,7 @@
   -open
   Js_of_ocaml
   -open
-  Kappa_js_lib
+  Kappa_webapp_lib
   -open
   Kappa_json_api))
 
@@ -39,7 +31,7 @@
   (flags
    (:include js_of_ocaml_flags)))
  (modules KaSaWorker)
- (libraries kappa_js_lib kappa_kasa_export)
+ (libraries kappa_webapp_lib kappa_kasa_export)
  (preprocess
   (pps js_of_ocaml-ppx tyxml-ppx))
  (flags
@@ -49,7 +41,7 @@
   -open
   Js_of_ocaml
   -open
-  Kappa_js_lib
+  Kappa_webapp_lib
   -open
   Kappa_kasa_export))
 
@@ -60,7 +52,7 @@
   (flags
    (:include js_of_ocaml_flags)))
  (modules KaStorWorker)
- (libraries kappa_js_lib kappa_cflow)
+ (libraries kappa_webapp_lib kappa_cflow)
  (preprocess
   (pps js_of_ocaml-ppx tyxml-ppx))
  (flags
@@ -70,7 +62,7 @@
   -open
   Js_of_ocaml
   -open
-  Kappa_js_lib
+  Kappa_webapp_lib
   -open
   Kappa_cflow))
 
@@ -81,7 +73,7 @@
   (flags
    (:include js_of_ocaml_flags)))
  (modules KaMoHaWorker)
- (libraries kappa_js_lib kappa_grammar)
+ (libraries kappa_webapp_lib kappa_grammar)
  (preprocess
   (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w +a))
@@ -95,8 +87,6 @@
  (modules
   :standard
   \
-  Common
-  Hooked
   KaSimWorker
   KaSaWorker
   KaStorWorker
@@ -104,9 +94,10 @@
  (libraries
   js_of_ocaml-tyxml
   lwt_react
-  kappa_js_lib
+  kappa_webapp_lib
   kappa_json_api
-  kappa_parameters)
+  kappa_parameters
+  kappa_webapp_ui)
  (preprocess
   (pps js_of_ocaml-ppx tyxml-ppx))
  (flags
@@ -118,7 +109,7 @@
   -open
   Js_of_ocaml_tyxml
   -open
-  Kappa_js_lib
+  Kappa_webapp_lib
   -open
   Kappa_json_api
   -open
@@ -140,4 +131,11 @@
   -open
   Kappa_logging
   -open
-  Kappa_cflow))
+  Kappa_cflow
+  -open 
+  Kappa_webapp_ui
+  -open
+  Kappa_webapp_ui
+  -open
+  Kappa_webapp_state
+  ))

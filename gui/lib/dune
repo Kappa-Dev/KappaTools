@@ -1,0 +1,28 @@
+(library
+ (name kappa_webapp_lib)
+ (preprocess
+  (pps 
+    js_of_ocaml-ppx 
+    tyxml-ppx 
+    ppx_inline_test
+  ))
+ (libraries 
+  js_of_ocaml-lwt 
+  lwt_react
+  js_of_ocaml-tyxml 
+  ppx_inline_test
+  kappa_webapp_lib_no_js
+  kappa_parameters
+  kappa_kasa_type_interface)
+ (flags :standard -w +a 
+  -open 
+  Js_of_ocaml
+  -open
+  Js_of_ocaml_tyxml
+  -open
+  Kappa_kasa_type_interface
+  -open
+  Kappa_parameters
+ ))
+
+

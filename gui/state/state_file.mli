@@ -45,12 +45,15 @@ type model = { current: active option; directory: slot Mods.IntMap.t }
 val model : model React.signal
 val current_filename : string option React.signal
 
+val apply_on_current_pos_of_model :
+  (string -> Loc.position -> 'a) -> model -> 'a option
+
 val with_current_pos :
   ?eq:('a -> 'a -> bool) ->
-  ?on:bool React.signal ->
-  (string -> Loc.position -> 'a option) ->
+  ?on:bool Hooked.signal ->
+  (string -> Loc.position -> 'a) ->
   'a ->
-  'a React.signal
+  'a Hooked.signal
 
 val init : unit -> unit Lwt.t
 (** run on application init *)

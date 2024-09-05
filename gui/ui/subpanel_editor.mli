@@ -7,6 +7,6 @@
 (******************************************************************************)
 
 val editor_full : bool React.signal
-val move_cursor_hook : Loc.t Hooked.E.t
+val move_cursor_hook_send : Loc.t -> unit
 
 include Ui_common.Panel

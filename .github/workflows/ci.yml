@@ -95,7 +95,7 @@ jobs:
       - name: Make Javascript app
         run: |
           opam exec -- make Kappapp.tar.gz build/site/index.html
-          cp -r gui/viz .
+          cp -r gui/js_lib/viz .
           mv build/Kappapp.tar.gz .
           mv build/site .
       - name: Archive Javascript app
