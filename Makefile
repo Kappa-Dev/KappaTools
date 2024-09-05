@@ -178,7 +178,7 @@ Kappapp:
 
 build/Kappapp.tar.gz: build/Kappapp
 	tar -C build -czf $@ Kappapp
-	rm -r build/Kappapp
+	rm -rf build/Kappapp
 
 Kappapp.tar.gz: build/Kappapp.tar.gz
 
@@ -208,7 +208,7 @@ KappaBin:
 
 build/KappaBin.zip: build/KappaBin
 	zip -y -r $@ build/KappaBin
-	rm -r build/KappaBin
+	rm -rf build/KappaBin
 
 KappaBin.zip: build/KappaBin.zip
 

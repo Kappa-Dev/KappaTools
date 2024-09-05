@@ -6,6 +6,15 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+(* TODO: clean *)
+let debug_warn (title : string) data =
+  if String.length title > 0 then (
+    let () = Common.warn ~loc:__LOC__ ("Print `" ^ title ^ "`:") in
+    ();
+    let () = Common.warn ~loc:__LOC__ data in
+    ()
+  )
+
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
@@ -43,9 +52,14 @@ type model = {
 }
 
 let navli () = ReactiveData.RList.empty
-let tab_is_active, set_tab_is_active = React.S.create false
+
+let tab_is_active, set_tab_is_active =
+  Hooked.S.create ~debug:"tab_is_active" false
+
+let tab_is_active_signal = Hooked.S.to_react_signal tab_is_active
 let tab_was_active = ref false
-let track_cursor, set_track_cursor = React.S.create false
+let track_cursor, track_cursor_set = Hooked.S.create ~debug:"track_cursor" false
+let track_cursor_signal = Hooked.S.to_react_signal track_cursor
 
 let dummy_model =
   {
@@ -55,7 +69,8 @@ let dummy_model =
     origin_label = None;
   }
 
-let model, set_model = React.S.create dummy_model
+let model, set_model = Hooked.S.create ~debug:"model" dummy_model
+let model_signal = Hooked.S.to_react_signal model
 let total_input_id = "total_input"
 let fwd_input_id = "fwd_input"
 let bwd_input_id = "bwd_input"
@@ -73,12 +88,12 @@ let influence_node_label = function
       r.Public_data.var_label
 
 let update_model_graph f =
-  let m = React.S.value model in
+  let m = Hooked.S.value model in
   match m.rendering with
   | DrawTabular _ -> ()
   | DrawGraph g -> set_model { m with rendering = DrawGraph (f g) }
 
-let update_model f = set_model (f (React.S.value model))
+let update_model f = set_model (f (Hooked.S.value model))
 let display_id = "influence_map_display"
 
 let influencemap =
@@ -89,7 +104,7 @@ let influencemap =
               (Yojson.Basic.from_string (Js.to_string x))
           in
           let () =
-            Hooked.E.send Subpanel_editor.move_cursor_hook
+            Subpanel_editor.move_cursor_hook_send
               (Public_data.position_of_refined_influence_node node)
           in
           let origin = Some (Public_data.short_node_of_refined_node node) in
@@ -157,24 +172,46 @@ let recenter =
       ]
     [ Html.txt "First node" ]
 
+(* TODO: clean this *)
+let switch_class elt_id add_list remove_list =
+  let dom_elt : 'a Js.t = Ui_common.id_dom elt_id |> Js.Unsafe.coerce in
+  List.iter
+    (fun (class_str : string) ->
+      Js.Unsafe.meth_call dom_elt##.classList "add"
+        [| Js.string class_str |> Js.Unsafe.coerce |])
+    add_list;
+  List.iter
+    (fun (class_str : string) ->
+      Js.Unsafe.meth_call dom_elt##.classList "remove"
+        [| Js.string class_str |> Js.Unsafe.coerce |])
+    remove_list
+
 let track_cursor_switch =
+  let track_cursor_switch_id = "track_cursor_switch_id" in
+  let () =
+    Hooked.S.register track_cursor (fun track_enabled ->
+        let add_list, remove_list =
+          if track_enabled then
+            [ "btn-light"; "active" ], [ "btn-default" ]
+          else
+            [ "btn-default" ], [ "btn-light"; "active" ]
+        in
+        switch_class track_cursor_switch_id add_list remove_list)
+  in
+  let on_click _ =
+    let () = track_cursor_set (not (Hooked.S.value track_cursor)) in
+    if Hooked.S.value track_cursor then
+      update_model (fun m -> { m with origin = None; origin_label = None });
+    true
+  in
+  (* html*)
   Html.button
     ~a:
       [
+        Html.a_id track_cursor_switch_id;
         Html.a_button_type `Button;
-        Tyxml_js.R.Html5.a_class
-          (React.S.map
-             (fun tc ->
-               "form-control" :: "btn" :: "btn-default"
-               ::
-               (if tc then
-                  [ "active" ]
-                else
-                  []))
-             track_cursor);
-        Html.a_onclick (fun _ ->
-            let () = set_track_cursor (not (React.S.value track_cursor)) in
-            true);
+        Html.a_class [ "form-control"; "btn"; "btn-default" ];
+        Html.a_onclick on_click;
       ]
     [ Html.txt "Track cursor" ]
 
@@ -192,7 +229,7 @@ let export_config =
                 ( State_error.wrap "influence_map_export"
                     (State_project.eval_with_project ~label:__LOC__
                        (fun manager ->
-                         let { accuracy; _ } = React.S.value model in
+                         let { accuracy; _ } = Hooked.S.value model in
                          manager#get_influence_map_raw accuracy
                          >|= Result_util.map (fun influences_string ->
                                  let data = Js.string influences_string in
@@ -210,7 +247,7 @@ let export_config =
 let rendering_chooser_id = "influence-rendering"
 
 let rendering_chooser =
-  let { rendering; _ } = React.S.value model in
+  let { rendering; _ } = Hooked.S.value model in
   Html.select
     ~a:[ Html.a_class [ "form-control" ]; Html.a_id rendering_chooser_id ]
     [
@@ -235,7 +272,7 @@ let rendering_chooser =
 let accuracy_chooser_id = "influence-accuracy"
 
 let accuracy_chooser =
-  let { accuracy; _ } = React.S.value model in
+  let { accuracy; _ } = Hooked.S.value model in
   let option_gen x =
     Html.option
       ~a:
@@ -430,7 +467,7 @@ let pop_cell = function
           [
             Html.a_onclick (fun _ ->
                 let () =
-                  Hooked.E.send Subpanel_editor.move_cursor_hook
+                  Subpanel_editor.move_cursor_hook_send
                     (Public_data.position_of_refined_influence_node node)
                 in
                 let origin =
@@ -464,10 +501,13 @@ let rec fill_table acc by on =
 
 let draw_table origin_label_opt
     { positive_on; positive_by; negative_on; negative_by } =
+  let () = Common.warn ~loc:__LOC__ "DRAW TABLE" in
+  debug_warn "origin_label_opt" origin_label_opt;
   let origin_label, outs =
     match origin_label_opt with
     | None ->
-      if not (React.S.value track_cursor) then
+      debug_warn "track_cursor_when_draw_table" (track_cursor |> Hooked.S.value);
+      if not (track_cursor |> Hooked.S.value) then
         "Navigate through the nodes using the controls above.", []
       else
         "Click on a rule or variable in the editor.", []
@@ -502,8 +542,12 @@ let draw_table origin_label_opt
          ])
     [ Html.tbody outs ]
 
-let influence_sphere =
-  State_project.on_project_change_async ~on:tab_is_active dummy_model model
+let influence_sphere :
+    (influence_sphere, Result_util.message list) Result_util.t React.signal =
+  State_project.on_project_change_async
+    ~on:(tab_is_active_signal |> React.S.trace (debug_warn "tab_is_active"))
+    dummy_model
+    (model_signal |> React.S.trace (debug_warn "on project model_signal"))
     (Result_util.ok empty_sphere)
     (fun manager { rendering; accuracy; origin; origin_label = _ } ->
       match rendering with
@@ -570,38 +614,69 @@ let content () =
           ];
       ]
   in
+  let influence_style_id = "influence_style_id" in
+  (*
+  let () =
+    Hooked.S.register model (fun track_enabled ->
+        let dom_elt : 'a Js.t =
+          Ui_common.id_dom influence_style_id |> Js.Unsafe.coerce
+        in
+        dom_elt##.classList :=
+          let meth =
+            if track_enabled then
+              "add"
+            else
+              "remove"
+          in
+          let out =
+            Js.Unsafe.meth_call dom_elt##.classList meth
+              [| Js.string "active" |> Js.Unsafe.coerce |]
+          in
+          let () = Common.warn ~loc:__LOC__ "CALL STUFF draw style" in
+          let () = Common.warn ~loc:__LOC__ dom_elt in
+          out)
+  in
+
+*)
   [
     accuracy_form;
     Html.div
       ~a:
         [
+          Html.a_id influence_style_id;
           Tyxml_js.R.Html5.a_class
             (React.S.map
                (fun { rendering; _ } ->
                  match rendering with
                  | DrawGraph _ -> [ "flex-content" ]
                  | DrawTabular _ -> [])
-               model);
+               model_signal);
+          (* Hidden if tabular *)
           Tyxml_js.R.filter_attrib (Html.a_hidden ())
             (React.S.map
                (fun { rendering; _ } ->
                  match rendering with
                  | DrawGraph _ -> false
                  | DrawTabular _ -> true)
-               model);
+               model_signal);
         ]
       [
         graph_form;
         Html.div ~a:[ Html.a_id display_id; Html.a_class [ "flex-content" ] ] [];
       ];
     Tyxml_js.R.Html5.div
-      ~a:[ Html.a_class [ "panel-scroll" ] ]
+      ~a:
+        [
+          Html.a_id "TODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODO";
+          Html.a_class [ "panel-scroll" ];
+        ]
       (ReactiveData.RList.from_signal
-         (React.S.l2
-            (fun { rendering; origin_label; _ } sphere ->
+         (React.S.l3
+            (fun { rendering; origin_label; _ } sphere _ ->
               match rendering with
               | DrawGraph _ -> []
               | DrawTabular () ->
+                debug_warn "" "DRAW TABULAR";
                 Result_util.fold sphere
                   ~ok:(fun sphere -> [ draw_table origin_label sphere ])
                   ~error:(fun error ->
@@ -614,48 +689,50 @@ let content () =
                                  Result_util.print_message m);
                           ])
                       error))
-            model influence_sphere));
+            model_signal influence_sphere track_cursor_signal));
     Widget_export.content export_config;
   ]
 
+(* TODO: graph stuff that might be BROKEN *)
 let neither_gc_me =
-  React.S.l2
+  Hooked.S.l2
     (fun _ { rendering; accuracy; origin; origin_label = _ } ->
       match rendering with
       | DrawTabular _ -> Lwt.return (Result_util.ok ())
       | DrawGraph { fwd; bwd; total } ->
-        State_error.wrap ~append:true "influence_map"
-          (State_project.eval_with_project ~label:__LOC__
-             (fun (manager : Api.concrete_manager) ->
-               manager#get_local_influence_map ?fwd ?bwd ?origin ~total accuracy
-               >|= Result_util.fold
-                     ~ok:(fun influences ->
-                       let buf = Buffer.create 1000 in
-                       let fmt = Format.formatter_of_buffer buf in
-                       let logger =
-                         Loggers.open_logger_from_formatter
-                           ~mode:Loggers.Js_Graph fmt
-                       in
-                       let logger_graph =
-                         Graph_loggers_sig.extend_logger logger
-                       in
-                       let () = json_to_graph logger_graph influences in
-                       let graph =
-                         Graph_loggers_sig.graph_of_logger logger_graph
-                       in
-                       let graph_json = Graph_json.to_json graph in
-                       let () = Loggers.flush_logger logger in
-                       let () = Loggers.close_logger logger in
-                       let () =
-                         influencemap##setData
-                           (Js.string (Yojson.Basic.to_string graph_json))
-                       in
-                       Result_util.ok ())
-                     ~error:(fun e ->
-                       let () = influencemap##clearData in
-                       Result_util.error e))))
-    (React.S.on ~eq:State_project.model_equal tab_is_active
-       State_project.dummy_model State_project.model)
+        State_project.eval_with_project ~label:__LOC__
+          (fun (manager : Api.concrete_manager) ->
+            let () = Common.warn ~loc:__LOC__ "influence_map logger" in
+            manager#get_local_influence_map ?fwd ?bwd ?origin ~total accuracy
+            >|= Result_util.fold
+                  ~ok:(fun influences ->
+                    let buf = Buffer.create 1000 in
+                    let fmt = Format.formatter_of_buffer buf in
+                    let logger =
+                      Loggers.open_logger_from_formatter ~mode:Loggers.Js_Graph
+                        fmt
+                    in
+                    let logger_graph = Graph_loggers_sig.extend_logger logger in
+                    let () = json_to_graph logger_graph influences in
+                    let graph =
+                      Graph_loggers_sig.graph_of_logger logger_graph
+                    in
+                    let graph_json = Graph_json.to_json graph in
+                    let () = Loggers.flush_logger logger in
+                    let () = Loggers.close_logger logger in
+                    let () =
+                      influencemap##setData
+                        (Js.string (Yojson.Basic.to_string graph_json))
+                    in
+                    Result_util.ok ())
+                  ~error:(fun e ->
+                    let () = influencemap##clearData in
+                    Result_util.error e))
+        |> State_error.wrap ~append:true "influence_map")
+    (Hooked.S.on ~eq:State_project.model_equal tab_is_active
+       State_project.dummy_model
+       (Hooked.S.of_react_signal ~eq:State_project.model_equal
+          ~debug:"State_project.model in state_project" State_project.model))
     model
 
 let update_model_with_origin_refined origin_refined =
@@ -665,24 +742,29 @@ let update_model_with_origin_refined origin_refined =
   let origin_label = Option_util.map influence_node_label origin_refined in
   update_model (fun m -> { m with origin; origin_label })
 
-let nor_gc_me =
+(* Update influence map node according to cursor_pos *)
+let _ =
   State_file.with_current_pos
-    ~on:(React.S.Bool.( && ) tab_is_active track_cursor)
+    ~on:(Hooked.S.l2 ( && ) tab_is_active track_cursor)
     (fun filename cursor_pos ->
-      Some
-        (State_error.wrap "influence_map_node_at"
-           (State_project.eval_with_project ~label:__LOC__
-              (fun (manager : Api.concrete_manager) ->
-                manager#get_influence_map_node_at ~filename cursor_pos
-                >|= Result_util.map update_model_with_origin_refined))))
+      let () = Common.warn ~loc:__LOC__ "track_cursor triggered" in
+      State_error.wrap "influence_map_node_at"
+        (State_project.eval_with_project ~label:__LOC__
+           (fun (manager : Api.concrete_manager) ->
+             let () =
+               Common.warn ~loc:__LOC__ "track_cursor eval_with_project"
+             in
+             manager#get_influence_map_node_at ~filename cursor_pos
+             >|= Result_util.map update_model_with_origin_refined)))
     (Lwt.return (Result_util.ok ()))
+  |> Hooked.S.to_react_signal
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 let dont_gc_me = ref []
 
 let onload () =
-  let () = dont_gc_me := [ neither_gc_me; nor_gc_me ] in
+  let () = dont_gc_me := [ neither_gc_me ] in
   let () = Widget_export.onload export_config in
   let () =
     (Tyxml_js.To_dom.of_select rendering_chooser)##.onchange
@@ -765,7 +847,7 @@ let onload () =
   let () =
     (Tyxml_js.To_dom.of_button next_node)##.onclick
     := Dom_html.full_handler (fun _ _ ->
-           let { origin; _ } = React.S.value model in
+           let { origin; _ } = Hooked.S.value model in
            let _ =
              State_error.wrap "influence_map_next_node"
                (State_project.eval_with_project ~label:__LOC__
@@ -778,7 +860,7 @@ let onload () =
   let () =
     (Tyxml_js.To_dom.of_button prev_node)##.onclick
     := Dom_html.full_handler (fun _ _ ->
-           let { origin; _ } = React.S.value model in
+           let { origin; _ } = Hooked.S.value model in
            let _ =
              State_error.wrap "influence_map_prev_node"
                (State_project.eval_with_project ~label:__LOC__

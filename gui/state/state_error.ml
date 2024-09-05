@@ -13,17 +13,17 @@ type t = {
   _state_error_location: string;
 }
 
-let state_error = Hooked.S.create ~debug:"state_error" []
+let state_error, state_error_set = Hooked.S.create ~debug:"state_error" []
 
 let clear_errors location =
   let () =
     Common.debug ~loc:__LOC__
       (Js.string (Format.sprintf "Clear_errors %s " location))
   in
-  Hooked.S.set ~debug:"[State_error.clear_errors]" state_error []
+  state_error_set ~debug:"[State_error.clear_errors]" []
 
 let has_errors () =
-  match Hooked.S.v state_error with
+  match Hooked.S.value state_error with
   | [] -> false
   | _ :: _ -> true
 
@@ -38,21 +38,23 @@ let add_error (location : string) (errors : Result_util.message list) =
             (Pp.list Pp.space Result_util.print_message)
             errors))
   in
-  let current_state_error : t list = Hooked.S.v state_error in
+  let current_state_error : t list = Hooked.S.value state_error in
   let new_state_error : t list =
     { state_error_errors = errors; _state_error_location = location }
     :: current_state_error
   in
-  Hooked.S.set ~debug:"add_error" state_error new_state_error
+  state_error_set ~debug:"add_error" new_state_error
 
 let errors =
-  Hooked.S.bind ~debug:"errors" state_error (fun state_error ->
+  Hooked.S.map ~debug:"errors"
+    (fun state_error ->
       List.fold_left
         (fun acc value -> value.state_error_errors @ acc)
         [] state_error)
+    state_error
 
-let wrap :
-      'a. ?append:bool -> string -> 'a Api.lwt_result -> 'a Api.lwt_result =
+let wrap : 'a. ?append:bool -> string -> 'a Api.lwt_result -> 'a Api.lwt_result
+    =
  fun ?(append = false) loc r ->
   r
   >>=

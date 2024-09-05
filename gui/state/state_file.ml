@@ -14,11 +14,13 @@ type model = { current: active option; directory: slot Mods.IntMap.t }
 
 let dummy_cursor_pos = { Loc.line = -1; Loc.chr = 0 }
 let blank_state = { current = None; directory = Mods.IntMap.empty }
-let model, set_directory_state = React.S.create blank_state
+let model_hooked, set_directory_state = Hooked.S.create blank_state
+let model = Hooked.S.to_react_signal model_hooked
 
 type refresh = { filename: string; content: string; line: int option }
 
-let refresh_file_hook = Hooked.E.create ~debug:"refresh_file_hook" ()
+let refresh_file_hook, refresh_file_hook_send =
+  Hooked.E.create ~debug:"refresh_file_hook" ()
 
 let current_filename =
   React.S.map
@@ -31,17 +33,20 @@ let current_filename =
         m.current)
     model
 
-let with_current_pos ?eq ?(on = React.S.const true) f default =
-  React.S.fmap ?eq
-    (fun m ->
-      Option_util.bind
-        (fun x ->
-          Option_util.bind
-            (fun { name; _ } -> f name x.cursor_pos)
-            (Mods.IntMap.find_option x.rank m.directory))
-        m.current)
+let apply_on_current_pos_of_model f m =
+  let () = Common.warn ~loc:__LOC__ "apply_on_pos_of_model" in
+  Option_util.bind
+    (fun x ->
+      Option_util.map
+        (fun { name; _ } -> f name x.cursor_pos)
+        (Mods.IntMap.find_option x.rank m.directory))
+    m.current
+
+let with_current_pos ?eq ?(on = Hooked.S.const true) f default =
+  Hooked.S.fmap ?eq
+    (apply_on_current_pos_of_model f)
     default
-    (React.S.on on blank_state model)
+    (Hooked.S.on on blank_state model_hooked)
 
 let with_current_file f =
   let state = React.S.value model in
@@ -87,9 +92,7 @@ let send_refresh (line : int option) : unit Api.lwt_result =
               let () = Common.log_group "Refresh file" in
               let () = Common.debug ~loc:__LOC__ content in
               let () = Common.log_group_end () in
-              let () =
-                Hooked.E.send refresh_file_hook { filename; content; line }
-              in
+              let () = refresh_file_hook_send { filename; content; line } in
               Lwt.return (Result_util.ok ()))
 
 let update_directory ~reset current catalog =
@@ -106,8 +109,7 @@ let update_directory ~reset current catalog =
   in
   set_directory_state { current; directory }
 
-let create_file ~(filename : string) ~(content : string) : unit Api.lwt_result
-    =
+let create_file ~(filename : string) ~(content : string) : unit Api.lwt_result =
   State_project.eval_with_project ~label:"create_file" (fun manager ->
       manager#file_catalog
       >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->
@@ -159,8 +161,7 @@ let rec choose_file choice = function
     else
       choose_file choice t
 
-let select_file (filename : string) (line : int option) : unit Api.lwt_result
-    =
+let select_file (filename : string) (line : int option) : unit Api.lwt_result =
   State_project.eval_with_project ~label:"select_file" (fun manager ->
       manager#file_catalog
       >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->

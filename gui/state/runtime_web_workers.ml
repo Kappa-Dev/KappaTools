@@ -34,7 +34,7 @@ let worker_onmessage ~(debug_printing : bool) ~(worker_name : string)
       fun response_message ->
     try process_message response_message
     with _ as e ->
-      Ui_common.open_modal_error ~is_critical:true
+      Kappa_webapp_lib.Ui_common.open_modal_error ~is_critical:true
         ~error_content:
           ("Worker " ^ worker_name ^ " raised the following exception: \r"
          ^ Printexc.to_string e);
