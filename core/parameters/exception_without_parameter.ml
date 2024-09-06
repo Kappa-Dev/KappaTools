@@ -243,7 +243,7 @@ let to_json exceptions_caught_and_uncaught =
       ( "caught",
         JsonUtil.of_list caught_exception_to_json
           exceptions_caught_and_uncaught.caught_error_list );
-      ( "caught",
+      ( "caught_to_ui",
         JsonUtil.of_list caught_exception_to_json
           exceptions_caught_and_uncaught.caught_error_list_to_ui );
       ( "uncaught",
