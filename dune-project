@@ -2,20 +2,20 @@
 (generate_opam_files)
 
 (name kappa-tool-suite)
-(version 4.1~dev) ; could be removed and generated at release time instead using dune-release
+(version 4.1.3) ; could be removed and generated at release time instead using dune-release
 (source (github Kappa-Dev/KappaTools)) ; no need to specifybug-reports and dev-repo
 (license LGPL-3.0-only)
 (authors
   "Jean Krivine" "Jérôme Feret" "Pierre Boutillier"
   "Ioana Cristescu" "Mutaamba Maasha" "Lý Kim Quyên" "Antoine Pouille")
 (maintainers "Antoine Pouille <antoine.a.pouille@inria.fr>"
-             "Pierre Boutillier <pierre.boutillier@laposte.net>")
+             "Jérôme Feret <jerome.feret@info.ens.psl.eu>")
 (homepage https://kappalanguage.org/)
 (documentation https://kappalanguage.org/sites/kappalanguage.org/files/inline-files/Kappa_Manual.pdf)
 
 (package
   (name kappa-library)
-  (synopsis "Public internals of the Kappa tool suite")
+  (synopsis "Public internals of the Kappa tool suite. Use this package to use kappa as a lib")
   (depends
    (ocaml ( >= 4.05.0 ))
    (yojson ( >= 2.0 ))
@@ -32,7 +32,7 @@
 
 (package
   (name kappa-binaries)
-  (synopsis "Command line interfaces of the Kappa tool suite")
+  (synopsis "Command line interfaces of the Kappa tool suite. Use this package if you want the CLI kappa tools")
   (depends
    (ocaml ( >= 4.05.0 ))
    (yojson ( >= 1.6.0 ))
@@ -49,7 +49,7 @@
 
 (package
   (name kappa-agents)
-  (synopsis "Backends for an interactive use of the Kappa tool suite")
+  (synopsis "Backends for an interactive use of the Kappa tool suite. Used by the kappa-webapp, probably not relevant else. Previously used by deprecated kappa-server")
   (depends
    (ocaml ( >= 4.05.0 ))
    (yojson ( >= 1.6.0 ))
@@ -66,7 +66,7 @@
 
 (package
   (name kappa-webapp)
-  (synopsis "Browser app for an interactive use of the Kappa tool suite")
+  (synopsis "Browser app for an interactive use of the Kappa tool suite. Best way to start with the kappa language")
   (depends
    (ocaml ( >= 4.05.0 ))
    (yojson ( >= 1.6.0 ))
