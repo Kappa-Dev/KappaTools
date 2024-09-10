@@ -144,12 +144,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 4.14.x
       - name: Install OPAM dependencies
         run: |
-          opam install --yes pinned_libs/windows --deps-only
+          opam install --yes pinned_libs/default --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Windows app
