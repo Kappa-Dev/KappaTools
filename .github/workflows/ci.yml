@@ -149,13 +149,13 @@ jobs:
           ocaml-compiler: 4.14.x
       - name: Install OPAM dependencies
         run: |
-          opam install --yes pinned_libs/default --deps-only
+          opam install --yes .\pinned_libs\default --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Windows app
         run: |
           opam exec -- make KappaBin
-          mv build/KappaBin .
+          mv .\build\KappaBin .
           7z a -tzip KappaBin.zip KappaBin
         # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
       - name: Archive Windows app
