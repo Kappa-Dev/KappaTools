@@ -28,7 +28,7 @@ jobs:
             texlive-latex-extra
           opam depext --install --yes dune odoc camlp-streams \
             ${{ matrix.additional-packages }}
-          opam install --yes pinned_libs/default --deps-only
+          opam install --yes . --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make documentation
@@ -59,7 +59,7 @@ jobs:
           sudo apt-get install --yes gnuplot-nox \
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht
-          opam install --yes pinned_libs/default --deps-only
+          opam install --yes . --deps-only
           pip install nose
       - name: Make Kappa
         run: |
@@ -89,7 +89,7 @@ jobs:
             texlive-fonts-recommended texlive-pictures tex4ht
       - name: Install OPAM dependencies
         run: |
-          opam install --yes pinned_libs/default --deps-only
+          opam install --yes . --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Javascript app
@@ -118,7 +118,7 @@ jobs:
           ocaml-compiler: 4.13.x
       - name: Install OPAM dependencies
         run: |
-          opam install --yes pinned_libs/default --deps-only
+          opam install --yes . --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make MacOS app
@@ -144,20 +144,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 4.14.x
       - name: Install OPAM dependencies
         run: |
-          opam install --yes pinned_libs/windows --deps-only
+          opam install --yes . --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Windows app
         run: |
           opam exec -- make KappaBin
-          mv build/KappaBin .
+          # Note: This runs powershell thus the different path syntax
+          mv .\build\KappaBin .
+          # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
           7z a -tzip KappaBin.zip KappaBin
-        # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
       - name: Archive Windows app
         uses: actions/upload-artifact@v4
         with:

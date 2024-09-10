@@ -6,25 +6,17 @@
   (pps js_of_ocaml-ppx tyxml-ppx))
  (flags :standard -w +a -open Js_of_ocaml))
 
-; Windows build only has access to 4.0.0, where --disable flags don't exist yet in jsoo
-; TODO: better distinguish this, as this should depend on jsoo version and not OS
-
 (rule
  (with-stdout-to
-  js_of_ocaml_flags.Unix
+  js_of_ocaml_flags
   (echo "(:standard --disable globaldeadcode --disable deadcode)")))
-
-(rule
- (with-stdout-to
-  js_of_ocaml_flags.Win32
-  (echo ":standard")))
 
 (executable
  (name KaSimWorker)
  (modes js)
  (js_of_ocaml
   (flags
-   (:include js_of_ocaml_flags.%{os_type})))
+   (:include js_of_ocaml_flags)))
  (modules KaSimWorker)
  (libraries kappa_js_lib kappa_json_api)
  (preprocess
@@ -45,7 +37,7 @@
  (modes js)
  (js_of_ocaml
   (flags
-   (:include js_of_ocaml_flags.%{os_type})))
+   (:include js_of_ocaml_flags)))
  (modules KaSaWorker)
  (libraries kappa_js_lib kappa_kasa_export)
  (preprocess
@@ -66,7 +58,7 @@
  (modes js)
  (js_of_ocaml
   (flags
-   (:include js_of_ocaml_flags.%{os_type})))
+   (:include js_of_ocaml_flags)))
  (modules KaStorWorker)
  (libraries kappa_js_lib kappa_cflow)
  (preprocess
@@ -87,7 +79,7 @@
  (modes js)
  (js_of_ocaml
   (flags
-   (:include js_of_ocaml_flags.%{os_type})))
+   (:include js_of_ocaml_flags)))
  (modules KaMoHaWorker)
  (libraries kappa_js_lib kappa_grammar)
  (preprocess
@@ -99,7 +91,7 @@
  (modes js)
  (js_of_ocaml
   (flags
-   (:include js_of_ocaml_flags.%{os_type})))
+   (:include js_of_ocaml_flags)))
  (modules
   :standard
   \
