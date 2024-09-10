@@ -83,3 +83,28 @@
    kappa-library
    )
 )
+
+(package
+  (name kappa-webapp)
+  (synopsis "Browser app for an interactive use of the Kappa tool suite. Best way to start with the kappa language")
+  (depends
+   (ocaml ( >= 4.05.0 ))
+   (yojson ( >= 1.6.0 ))
+   (lwt ( >= 4.2.0 ))
+   num
+   re
+   fmt
+   logs
+   atdgen-runtime
+   atdgen ; TODO: find a way to specify as build dependency only, as with the `build` package variable in opam
+   lwt_react
+   tyxml-ppx
+   js_of_ocaml
+   js_of_ocaml-ppx
+   js_of_ocaml-lwt
+   js_of_ocaml-tyxml
+   kappa-binaries
+   kappa-agents
+   )
+  ; does not build executables as there seem to be no way to build js exes in a package
+)
