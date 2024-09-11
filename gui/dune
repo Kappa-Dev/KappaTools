@@ -1,5 +1,6 @@
 (library
  (name kappa_js_lib)
+ (public_name kappa-webapp.kappa_js_lib)
  (modules Common Hooked)
  (libraries js_of_ocaml-lwt lwt_react)
  (preprocess

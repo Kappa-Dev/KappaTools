@@ -23,7 +23,7 @@ doc:
 bug-reports: "https://github.com/Kappa-Dev/KappaTools/issues"
 depends: [
   "dune" {>= "2.9"}
-  "ocaml" {>= "4.05.0"}
+  "ocaml" {>= "4.13.0"}
   "yojson" {= "2.1.0"}
   "lwt" {= "5.7.0"}
   "num" {= "1.5"}
@@ -33,6 +33,9 @@ depends: [
   "atdgen" {= "2.15.0"}
   "atdgen-runtime" {= "2.15.0"}
   "kappa-library"
+  "result" {= "1.5"}
+  "stdlib-shims" {= "0.3.0"}
+  "camlp-streams" {= "5.0.1"}
   "odoc" {with-doc}
 ]
 build: [

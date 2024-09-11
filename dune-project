@@ -17,15 +17,16 @@
   (name kappa-library)
   (synopsis "Public internals of the Kappa tool suite. Use this package to use kappa as a lib")
   (depends
-   (ocaml ( >= 4.05.0 ))
+   (ocaml ( >= 4.13.0 ))
    (yojson ( >= 2.0 ))
    (lwt ( >= 4.2.0 ))
    num
    re
    fmt
    logs
-   stdlib-shims
    result
+   stdlib-shims
+   camlp-streams
    ; If adding unpinned libs: consider pinning them in binaries below
    )
 )
@@ -34,14 +35,18 @@
   (name kappa-binaries)
   (synopsis "Command line interfaces of the Kappa tool suite. Use this package if you want the CLI kappa tools")
   (depends
-   (ocaml ( >= 4.05.0 ))
+   (ocaml ( >= 4.13.0 ))
    (yojson ( = 2.1.0 ))
    (lwt ( = 5.7.0 ))
    (num ( = 1.5 ))
    (re ( = 1.11.0 ))
    (fmt ( = 0.9.0 ))
-   (logs ( = 0.7.0 ))
+   (logs ( = 0.7.0 ))  
    kappa-library
+   ; Added to pin version of lib used in kappa-library
+   (result ( = 1.5 ))
+   (stdlib-shims ( = 0.3.0 ))
+   (camlp-streams ( = 5.0.1 ))
    )
   (depopts
     labltk)
@@ -51,7 +56,7 @@
   (name kappa-agents)
   (synopsis "Backends for an interactive use of the Kappa tool suite. Used by the kappa-webapp, probably not relevant else. Previously used by deprecated kappa-server")
   (depends
-   (ocaml ( >= 4.05.0 ))
+   (ocaml ( >= 4.13.0 ))
    (yojson ( = 2.1.0 ))
    (lwt ( = 5.7.0 ))
    (num ( = 1.5 ))
@@ -61,6 +66,10 @@
    (atdgen ( = 2.15.0 )) ; TODO: find a way to specify as build dependency only, as with the `build` package variable in opam
    (atdgen-runtime ( = 2.15.0 ))
    kappa-library
+   ; Added to pin version of lib used in kappa-library
+   (result ( = 1.5 ))
+   (stdlib-shims ( = 0.3.0 ))
+   (camlp-streams ( = 5.0.1 ))
    )
 )
 
@@ -68,7 +77,7 @@
   (name kappa-webapp)
   (synopsis "Browser app for an interactive use of the Kappa tool suite. Best way to start with the kappa language")
   (depends
-   (ocaml ( >= 4.05.0 ))
+   (ocaml ( >= 4.13.0 ))
    (dune ( = 3.14.0 ))
    (yojson ( = 2.1.0 ))
    (lwt ( = 5.7.0 ))
@@ -87,5 +96,5 @@
    kappa-binaries
    kappa-agents
    )
-  ; does not build executables as there seem to be no way to build js exes in a package ?
+  ; does not build executables as there seem to be no way to build js exes in a package ? TODO: see if we can do something
 )
