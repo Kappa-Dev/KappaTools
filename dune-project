@@ -17,7 +17,7 @@
   (name kappa-library)
   (synopsis "Public internals of the Kappa tool suite. Use this package to use kappa as a lib")
   (depends
-   (ocaml ( >= 4.13.0 ))
+   (ocaml (and ( >= 4.13.0) ( < 5.0.0 )))
    (yojson ( >= 2.0 ))
    (lwt ( >= 4.2.0 ))
    num
@@ -35,7 +35,7 @@
   (name kappa-binaries)
   (synopsis "Command line interfaces of the Kappa tool suite. Use this package if you want the CLI kappa tools")
   (depends
-   (ocaml ( >= 4.13.0 ))
+   (ocaml (and ( >= 4.13.0) ( < 5.0.0 )))
    (yojson ( = 2.1.0 ))
    (lwt ( = 5.7.0 ))
    (num ( = 1.5 ))
@@ -56,7 +56,7 @@
   (name kappa-agents)
   (synopsis "Backends for an interactive use of the Kappa tool suite. Used by the kappa-webapp, probably not relevant else. Previously used by deprecated kappa-server")
   (depends
-   (ocaml ( >= 4.13.0 ))
+   (ocaml (and ( >= 4.13.0) ( < 5.0.0 )))
    (yojson ( = 2.1.0 ))
    (lwt ( = 5.7.0 ))
    (num ( = 1.5 ))
@@ -77,7 +77,7 @@
   (name kappa-webapp)
   (synopsis "Browser app for an interactive use of the Kappa tool suite. Best way to start with the kappa language")
   (depends
-   (ocaml ( >= 4.13.0 ))
+   (ocaml (and ( >= 4.13.0) ( < 5.0.0 )))
    (dune ( = 3.14.0 ))
    (yojson ( = 2.1.0 ))
    (lwt ( = 5.7.0 ))

@@ -23,7 +23,7 @@ doc:
 bug-reports: "https://github.com/Kappa-Dev/KappaTools/issues"
 depends: [
   "dune" {>= "2.9"}
-  "ocaml" {>= "4.13.0"}
+  "ocaml" {>= "4.13.0" & < "5.0.0"}
   "yojson" {= "2.1.0"}
   "lwt" {= "5.7.0"}
   "num" {= "1.5"}
