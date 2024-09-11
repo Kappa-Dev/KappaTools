@@ -142,11 +142,13 @@ clean: clean_doc clean_ide
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration clean
 
+# Run all tests
 check:
 	dune runtest
 	+$(MAKE) --no-print-directory KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration clean
 	+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration all
 
+# Change test results to match current implementation
 build-tests:
 	dune promote
 	+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration build

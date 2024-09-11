@@ -52,7 +52,9 @@ module Simulation_info = struct
     JsonUtil.write_sequence ob
       [
         (fun o -> Yojson.Basic.write_int o x.story_id);
-        (fun o -> Yojson.Basic.write_float o x.story_time);
+        (* "Only" 13 significant digits as max prec causes issues with opam CI on freebsd.
+         * (See https://opam.ci.ocaml.org/github/ocaml/opam-repository/commit/91b8837bd693ab7fb62215fa396e96923b98d443/variant/freebsd,freebsd-ocaml-4.14-amd64,kappa-binaries.4.1.3,tests ) *)
+        (fun o -> Yojson.Basic.write_float_prec 13 o x.story_time);
         (fun o -> Yojson.Basic.write_int o x.story_event);
         (fun o -> f o x.profiling_info);
       ]
