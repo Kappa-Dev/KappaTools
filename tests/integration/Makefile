@@ -21,6 +21,9 @@ help:
 	@echo
 	@echo 'To run this from this directory and not from the root Makefile, please specify the KAPPABIN path in the environment.'
 
+# NOTE: COMMENT THIS TO DEBUG
+MAKEFLAGS += --no-print-directory
+
 # Run `README` scripts and generate `LOG`s and `error.log`s
 %/$(OUTPUT_PATH)/LOG: %/README #$(shell which "$(KAPPABIN)KaSim") $(shell which "$(KAPPABIN)KaSa")
 	@[ -d $(dir $<)$(OUTPUT_PATH) ] || mkdir $(dir $<)$(OUTPUT_PATH)
@@ -49,8 +52,13 @@ help:
 # Run the scripts and compare the outputs by generating `%.diff`s
 %/$(ERROR): %/$(OUTPUT_PATH)/LOG
 	@rm -f $@
+	@# Generate the diffs
 	@+$(MAKE) $$(find $(dir $@)$(OUTPUT_PATH) \( -not -type d -and -not -name \*.diff.\* \) -print \
 		| sed -e 's/^\(.*\).ref/\1/g' | sort | uniq | sed -e 's/$$/.diff/')
+	@# Remove the LOG files to avoid large display of removal of intermediate files at end of `make`
+	@rm -f $+
+	@# Create a temp file and put the content of the diffs
+	@# then if the diffs were not empty, add info about the test, and then the diffs
 	@TMP=$$(mktemp -t error_file-XXXXXX) ; cat $(dir $@)$(OUTPUT_PATH)/*.diff > $$TMP ;\
 	if [ -s $$TMP ] ; then echo ****$(dir $(dir $@))**** > $@ ;\
 	  echo  >> $@ ; cat $(dir $(dir $@))README >> $@ ; echo >> $@ ; cat $$TMP >> $@ ; \
@@ -77,14 +85,15 @@ build:
 .PHONY: clean clean_all
 
 clean:
-	find "$(CURDIR)" \( -name \#\* -or -name \*~ -or -name \*.sxw \) -delete
-	for i in $(DIRS_OF_TEST:=/$(OUTPUT_PATH)) ;\
+	# deleting remaining temporary test files
+	@find "$(CURDIR)" \( -name \#\* -or -name \*~ -or -name \*.sxw \) -delete
+	@for i in $(DIRS_OF_TEST:=/$(OUTPUT_PATH)) ;\
 	  do [ -d $${i} ] && find $${i} -mindepth 1 \( -not -name \*.ref \) -delete || true;\
 	done
-	rm -f $(DIRS_OF_TEST:=/$(ERROR)) error
+	@rm -f $(DIRS_OF_TEST:=/$(ERROR)) error
 
 clean_all: clean
-	rm -rf $(DIRS_OF_TEST:=/$(OUTPUT_PATH))
+	@rm -rf $(DIRS_OF_TEST:=/$(OUTPUT_PATH))
 
 %.pdf: %.dot
 	dot -Tpdf $< -o $@

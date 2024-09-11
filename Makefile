@@ -144,12 +144,12 @@ clean: clean_doc clean_ide
 
 check:
 	dune runtest
-	@+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration clean
-	@+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration all
+	+$(MAKE) --no-print-directory KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration clean
+	+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration all
 
 build-tests:
 	dune promote
-	@+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration build
+	+$(MAKE) KAPPABIN="$(CURDIR)/_build/install/default/bin/" -C tests/integration build
 
 # https://electronjs.org/docs/tutorial/application-distribution
 
