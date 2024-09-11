@@ -61,7 +61,8 @@ error: $(DIRS_OF_TEST:=/$(ERROR))
 
 all: error
 	@if [ -s $< ] ; then \
-	if [ $$(cat $< | wc -l) -gt 1500 ] ; then echo "Some tests FAILED, but output is NOT DISPLAYED because its size exceeds limit." ; else cat $< ; fi && exit 2 ; \
+	cat $< | head -n 1500; \
+	if [ $$(cat $< | wc -l) -gt 1500 ] ; then echo "...\nOutput above was TRUNCATED its size exceeds limit." ; fi && exit 2 ; \
 	else echo "No difference has been found" ; fi
 
 # Generate the `.ref` files from the current version of Kappa
