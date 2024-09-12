@@ -1,3 +1,5 @@
-#Command-line:
-"${KAPPABIN}"KaSim json.ka -seed 840540685 -l 5 -d output -trace /tmp/cflow-json-trace.json -syntax 4 || exit 0
-"${KAPPABIN}"KaStor --weak -format json /tmp/cflow-json-trace.json -d output --time-independent || exit 0
+#!/bin/sh
+TRACE_FILE="./tmp__cflow-json-trace.json"
+"${KAPPABIN}"KaSim json.ka -seed 840540685 -l 5 -d output -trace ${TRACE_FILE} -syntax 4 || exit 0
+"${KAPPABIN}"KaStor --weak -format json ${TRACE_FILE} -d output --time-independent || exit 0
+rm -f ${TRACE_FILE}

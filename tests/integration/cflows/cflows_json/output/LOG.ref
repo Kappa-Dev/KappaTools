@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (2000 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'json.ka' '-seed' '840540685' '-l' '5' '-d' 'output' '-trace' '/tmp/cflow-json-trace.json' '-syntax' '4'
++ Command line to rerun is: 'KaSim' 'json.ka' '-seed' '840540685' '-l' '5' '-d' 'output' '-trace' './tmp__cflow-json-trace.json' '-syntax' '4'
 ______________________________________________________________________
 ######################################################################
 Simulation ended

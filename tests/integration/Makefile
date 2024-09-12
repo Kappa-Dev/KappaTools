@@ -1,3 +1,4 @@
+# This is meant to be run from `make check` or `make build-tests` in root directory
 # To run this not through the repo root Makefile, please provide the $KAPPABIN path
 OUTPUT_PATH:=output
 ERROR:=error
@@ -19,6 +20,7 @@ help:
 	@echo 'make clean:     recursively clean everything but the reference files'
 	@echo 'make clean_all: recursively clean everything including the reference files'
 	@echo
+	@echo 'This is meant to be run from `make check` or `make build-tests` in root directory'
 	@echo 'To run this from this directory and not from the root Makefile, please specify the KAPPABIN path in the environment.'
 
 # NOTE: COMMENT THIS TO DEBUG

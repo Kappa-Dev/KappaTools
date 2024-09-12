@@ -1,7 +1,5 @@
 #!/bin/sh
-
-BLOB=/tmp/KaSim-test-blob-$(basename $PWD)
-
+BLOB=./tmp__KaSim-test-blob-$(basename $PWD)
 "${KAPPABIN}"KaSim --compile -make-sim ${BLOB} -seed 496408597 -d output model.ka -syntax 4 && \
 "${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 958076642 -d output -syntax 4 && \
 "${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 458154606 -d output -var init 300 -syntax 4 || exit 0

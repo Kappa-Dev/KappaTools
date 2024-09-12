@@ -1,4 +1,4 @@
-# Output of 'KaSim' 'json.ka' '-seed' '840540685' '-l' '5' '-d' 'output' '-trace' '/tmp/cflow-json-trace.json' '-syntax' '4'
+# Output of 'KaSim' 'json.ka' '-seed' '840540685' '-l' '5' '-d' 'output' '-trace' './tmp__cflow-json-trace.json' '-syntax' '4'
 "[T]","ApBp","ABA"
 0.,0,0
 1.,66,0

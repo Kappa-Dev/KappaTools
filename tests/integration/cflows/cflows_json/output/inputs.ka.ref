@@ -5,7 +5,7 @@
 %def: "progressBarSymbol" "#"
 %def: "plotPeriod" "1" "t.u."
 %def: "outputFileName" "data.csv"
-%def: "traceFileName" "/tmp/cflow-json-trace.json"
+%def: "traceFileName" "./tmp__cflow-json-trace.json"
 
 %agent: A(a{u p}[a.B b.B])
 %agent: B(a{u p}[a.A] b[a.A])
