@@ -5,10 +5,13 @@
   result
   kappa_version
   kappa_cli
+  kappa_utils
   kappa-library.generic
   kappa_classical_graphs)
  (flags
   (:standard)
+  -open
+  Kappa_utils
   -open
   Kappa_cli
   -open

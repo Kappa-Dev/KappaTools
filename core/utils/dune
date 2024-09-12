@@ -1,0 +1,6 @@
+(library
+ (name kappa_utils)
+ (libraries unix yojson result logs stdlib-shims bigarray camlp-streams)
+ (public_name kappa-library.utils)
+ (flags
+  (:standard -w @a)))

@@ -154,31 +154,10 @@ let raise_exception file_name _key message exn =
   raise (Uncaught_exception { file_name; message; alarm = exn })
 
 let rec pp_exception f = function
-  | Exit -> Format.pp_print_string f "Exit"
-  | Not_found -> Format.pp_print_string f "Not_found"
-  | Arg.Bad x -> Format.fprintf f "Arg.Bad(%s)" x
-  | Sys.Break -> Format.pp_print_string f "Sys.Break"
-  | Stack.Empty -> Format.pp_print_string f "Stack.Empty"
-  | Queue.Empty -> Format.pp_print_string f "Queue.Empty"
-  | Stream.Error x -> Format.fprintf f "Stream.Error %s" x
-  | Stream.Failure -> Format.pp_print_string f "Stream.Failure"
-  | Arg.Help x -> Format.fprintf f "Arg.Help(%s)" x
-  | Parsing.Parse_error -> Format.pp_print_string f "Parsing.Parse_error"
-  | Scanf.Scan_failure x -> Format.fprintf f "Scanf.Scan.failure(%s)" x
-  | Lazy.Undefined -> Format.pp_print_string f "Lazy.Undefined"
-  | UnixLabels.Unix_error (er, x, y) ->
-    Format.fprintf f "UnixLabels.Unix_error(%s,%s,%s)"
-      (UnixLabels.error_message er)
-      x y
-  | Unix.Unix_error (er, x, y) ->
-    Format.fprintf f "Unix.Unix_error(%s,%s,%s)" (Unix.error_message er) x y
-  | Failure x -> Format.fprintf f "Failure(%s)" x
-  | Stack_overflow -> Format.pp_print_string f "Stack_overflow"
   | Uncaught_exception x ->
     Format.fprintf f "Uncaught_exception(%a)" pp_uncaught x
   | Caught_exception x -> Format.fprintf f "Caught_exception(%a)" pp_caught x
-  | exc -> Format.pp_print_string f (Printexc.to_string exc)
-
+  | exc -> Utils.pp_exception f exc
 and pp_uncaught f x =
   let with_space = false in
   Format.fprintf f "@[<h>%a%aexception:@ %a@]"

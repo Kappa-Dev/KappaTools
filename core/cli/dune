@@ -8,6 +8,7 @@
    from
    (labltk.jpf -> superargTk.tk.ml)
    (-> superargTk.notk.ml))
+  kappa_utils
   kappa_grammar
   kappa-library.runtime
   kappa_version)
@@ -18,6 +19,8 @@
    -open
    Kappa_version
    -open
+   Kappa_utils
+   -open
    Kappa_data_structures
    -open
    Kappa_site_graphs
@@ -26,4 +29,5 @@
    -open
    Kappa_grammar
    -open
-   Kappa_runtime)))
+   Kappa_runtime
+   )))

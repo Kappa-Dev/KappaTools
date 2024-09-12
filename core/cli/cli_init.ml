@@ -209,10 +209,12 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
       }
   with
   | ExceptionDefn.Malformed_Decl _ as e -> raise e
-  | _exn ->
+  | exn ->
     Format.printf
       "Simulation package seems to have been created with a different version \
        of KaSim, aborting...";
+    Format.eprintf "Exception raised when opening marshalized file: ";
+    Utils.pp_exception Format.err_formatter exn;
     exit 1
 
 let get_compilation_from_pack ~warning kasim_args cli_args
