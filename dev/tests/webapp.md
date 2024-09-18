@@ -15,7 +15,7 @@ Second level: what to check additionnally
 - open the app with argument `?level=debug`, open the browser console. If on electron, this is done by modifying `main.js`. use it in the following to check if operations trigger errors that would not be visible in the interface
 
 #### Load and editor
-- load file https://tools.kappalanguage.org/try/?model=https%3A//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka
+- load file https://raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka
 - make an error in the file, for instance delete last character in line 21 `%obs: 'Cuu' |C(x1{u},x2{u})|`
   check that the error is displayed in the gutter on the left, and in the code underlined in red, and at the bottom right : `1/1[abc.ka] Illegal definition of variable 'Cuu' `
 - undo the error e.g. ctrl+z
@@ -32,7 +32,7 @@ Second level: what to check additionnally
 - Contact map is present, see that it changes when clicked on - interactive mode - show all states
 - zoom with mouse wheel, reset with button `Reset Zoom`
 - export to svg and check the picture
-- Go to influences: is it populated?
+- Go to influences: click on a Navgation control. does it populate? 
 - Change rendering to graph, change accuracy to high, see that it changes; play with size radius controls
 - Change back to Tabular, click Track cursor. click on different rules in the editor to see that it changes in the subpanel; click on previous/next similarly
 - export to json and check that info is present in the file
@@ -53,15 +53,15 @@ Second level: what to check additionnally
 - Change to DIN tab, check that a table is populated and that we can switch to the second table
 - Export to json and check the file 
 - Change to Snapshot tab, enter $SNAPSHOT in the Simulation perturbation and click intervention, see that the snapshot shows up
-- Click on kappa and change display to graph, play with the graph settings
+- Click on the selector with `kappa` and change display to `graph`, play with the graph settings
 - Change back to kappa, continue/pause the simulation, make a new snapshot, and test to switch between snapshot
 - Go to outputs, run `$PRINT "time: ".[T] > "time.txt"` and  `$PRINT 'AB' > "ab.txt"` see that it shows up, run a bit the simulation, run one of them again, check that we can see all values
 - Go back to log tab and see the previous interventions show up
-- Click on `All outputs` in the simutation, check that the following files are present and not empty: log.txt, inputs.ka, flux.json, flux.html, data.csv, snap and snap_xxxxxx
+- Click on `All outputs` in the simulation controls at the bottom, check that the following files are present and not empty: log.txt, inputs.ka, flux.json, flux.html, data.csv, snap and snap_xxxxxx
 
 #### Files
 - Hit clear to clear up the simulation
-- File>export and download the file as abc.ka
+- File>export and download the file e.g. as abc.ka
 - Close the file, then file> open, open back the file
 - File> new enter a name as `test.ka`, fill with the contents: https://www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/causality/causality_slide_10.ka
   - See the update of the contact map with both
@@ -72,7 +72,7 @@ Second level: what to check additionnally
 - Click get trace at the bottom and check file, json with empty trace
 - If not done in previous section, Copy/paste in the editor https://www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/causality/causality_slide_10.ka
 - Go to preferences, enable store trace, click Set
-- clear/start the simulation, it stops because of last `%obs`
+- clear/start the simulation, it stops because of last `%mod`
 - Click get trace at the bottom and check the file contains a non empty trace section (TODO: reference?)
 - Go to the stories tab, click launch
 - See that the computation log show up, that a story graph appears on the right
