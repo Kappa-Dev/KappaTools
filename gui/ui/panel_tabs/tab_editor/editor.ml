@@ -40,7 +40,7 @@ let panel_heading =
         [
           Html.a_class [ "btn-group" ]; Html.Unsafe.string_attrib "role" "group";
         ]
-      Menu_editor_file.content
+      Editor_menu_file.content
   in
   let buttons = menu_editor_file_content :: [ toggle_button ] in
   [%html
@@ -134,7 +134,7 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
   ()
 
 let onload () : unit =
-  let () = Menu_editor_file.onload () in
+  let () = Editor_menu_file.onload () in
   let lint_config = Codemirror.create_lint_configuration () in
 
   let () =
@@ -165,7 +165,7 @@ let onload () : unit =
   in
   let () = codemirror##setValue (Js.string "") in
   let () =
-    Subpanel_editor_controller.with_file
+    Editor_controller.with_file
       (Result_util.fold
          ~ok:(fun (content, id) ->
            let () = set_filename (Some id) in
@@ -177,7 +177,7 @@ let onload () : unit =
   in
   let () =
     Codemirror.commands##.save :=
-      fun _ -> Menu_editor_file_controller.export_current_file ()
+      fun _ -> Editor_menu_file_controller.export_current_file ()
   in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler codemirror change =
@@ -199,7 +199,7 @@ let onload () : unit =
       match React.S.value filename with
       | None -> ()
       | Some filename ->
-        Subpanel_editor_controller.set_content ~filename
+        Editor_controller.set_content ~filename
           ~filecontent:(Js.to_string codemirror##getValue)
     in
     let () =

@@ -279,7 +279,7 @@ let xml () =
     </div> |}]
 
 let content () : [> Html_types.div ] Html.elt list =
-  [ Ui_react_sim_status.toggle_element (fun s -> has_plot s) (xml ()) ]
+  [ Ui_track_sim_status.toggle_element (fun s -> has_plot s) (xml ()) ]
 
 let onload () =
   let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
@@ -330,7 +330,7 @@ let plot_count = function
     state.simulation_info_output.simulation_output_plot
 
 let navli () =
-  Ui_react_sim_status.label_news tab_is_active (fun state -> plot_count state)
+  Ui_track_sim_status.label_news tab_is_active (fun state -> plot_count state)
 
 let onresize () =
   (* recalcuate size *)

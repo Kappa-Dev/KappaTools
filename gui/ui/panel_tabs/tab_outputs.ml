@@ -27,7 +27,7 @@ let file_count state =
     state.Api_types_t.simulation_info_output
       .Api_types_t.simulation_output_file_lines
 
-let navli () = Ui_react_sim_status.badge (fun state -> file_count state)
+let navli () = Ui_track_sim_status.badge (fun state -> file_count state)
 
 let xml () =
   let select (file_line_ids : string list) : [> Html_types.select ] Html.elt =
@@ -126,7 +126,7 @@ let select_outputs () : unit =
   update_outputs fileindex
 
 let content () =
-  [ Ui_react_sim_status.toggle_element (fun t -> file_count t > 0) (xml ()) ]
+  [ Ui_track_sim_status.toggle_element (fun t -> file_count t > 0) (xml ()) ]
 
 let onload () =
   let () =

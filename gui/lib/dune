@@ -11,7 +11,7 @@
   lwt_react
   js_of_ocaml-tyxml 
   ppx_inline_test
-  kappa_webapp_lib_no_js
+  kappa_webapp_lib_no_jsoo
   kappa_parameters
   kappa_kasa_type_interface)
  (flags :standard -w +a 

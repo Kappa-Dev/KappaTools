@@ -30,7 +30,7 @@ let snapshot_count (state : Api_types_j.simulation_info option) : int =
     state.Api_types_j.simulation_info_output
       .Api_types_j.simulation_output_snapshots
 
-let navli () = Ui_react_sim_status.badge (fun state -> snapshot_count state)
+let navli () = Ui_track_sim_status.badge (fun state -> snapshot_count state)
 let select_id = "snapshot-select-id"
 let display_id = "snapshot-map-display"
 
@@ -110,7 +110,7 @@ let render_snapshot_graph (snapshot_js : Js_snapshot.snapshot Js.t)
   match React.S.value display_format with
   | Graph ->
     let json : string = Data.string_of_snapshot snapshot in
-    let contact_map = React.S.value Tab_contact_map.contact_map_text in
+    let contact_map = React.S.value Subtab_contact_map.contact_map_text in
     snapshot_js##setData ~contact_map:(Js.string contact_map) (Js.string json)
   | Kappa -> ()
 
@@ -155,7 +155,8 @@ let select_snapshot (snapshot_js : Js_snapshot.snapshot Js.t) : unit =
                               in
                               Lwt.return (Result_util.ok ()))
                     with
-                    | Failure f -> Lwt.return (Api_common.err_result_of_string f)
+                    | Failure f ->
+                      Lwt.return (Api_common.err_result_of_string f)
                     | Invalid_argument f ->
                       Lwt.return (Api_common.err_result_of_string f)))
       in
@@ -198,7 +199,7 @@ let snapshot_class :
        State_simulation.model)
 
 let snapshot_js : Js_snapshot.snapshot Js.t =
-  Js_snapshot.create_snapshot display_id State_settings.agent_coloring
+  Js_snapshot.create_snapshot display_id State_preferences.agent_coloring
 
 let xml () =
   let list =
@@ -353,7 +354,7 @@ let xml () =
 
 let content () =
   [
-    Ui_react_sim_status.toggle_element
+    Ui_track_sim_status.toggle_element
       (fun state -> snapshot_count state > 0)
       (xml ());
   ]

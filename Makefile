@@ -15,14 +15,14 @@ SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)
 SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness) $(MANGENREP)version.tex
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
-RESOURCES_HTML=$(wildcard gui/shared/*.js) $(wildcard gui/viz/*.js) $(wildcard gui/viz/*.css) gui/favicon.ico gui/package.json
+RESOURCES_HTML=$(wildcard gui/js_lib/*.js) $(wildcard gui/js_lib/viz/*.js) $(wildcard gui/resources/*.css) gui/resources/favicon.ico gui/entry_point/package.json gui/entry_point/main.js
 
 # `APP_EXT` defines where to fetch the js libs.
 #   `local` is to download them from the dev website e.g. github and saving them locally.
 #   `cdn` uses `cdnjs.cloudfare.com` to fetch the libs
 #   `debian` and `deploy` are also available
 APP_EXT?=cdn
-INDEX_HTML=gui/use-$(APP_EXT).html
+INDEX_HTML=gui/entry_point/use-$(APP_EXT).html
 ifeq ($(APP_EXT),local)
 SITE_EXTRAS= build/site/external build/site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist build/site/external/codemirror-$(CODEMIRROR_VERSION) build/site/external/dagre-d3 build/site/external/d3 build/site/external/jquery
 else
@@ -232,12 +232,12 @@ Kappapp.app:
 	+$(MAKE) clean
 	+$(MAKE) build/Kappapp.app
 
-build/Info.plist: gui/Info.plist.skel $(wildcard .git/refs/heads/*)
+build/Info.plist: gui/resources/Info.plist.skel $(wildcard .git/refs/heads/*)
 	mkdir -p build
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-build/Kappa.iconset: gui/Kappa-Logo.png
+build/Kappa.iconset: gui/resources/Kappa-Logo.png
 	mkdir -p build
 	rm -rf $@ && mkdir $@
 	sips -z 16 16     $< --out $@/icon_16x16.png
