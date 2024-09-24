@@ -173,7 +173,7 @@ Kappapp:
 	+$(MAKE) build/Kappapp
 
 build/Kappapp.tar.gz: build/Kappapp
-	tar czf $@ build/Kappapp
+	tar -C build -czf $@ Kappapp
 	rm -r build/Kappapp
 
 Kappapp.tar.gz: build/Kappapp.tar.gz
