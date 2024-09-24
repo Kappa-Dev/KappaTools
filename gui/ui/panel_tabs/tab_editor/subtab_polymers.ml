@@ -15,7 +15,7 @@ let tab_was_active = ref false
 let site a = [ a, None, Some (Public_data.Bound_to 1), None ]
 
 let print_edge ((a, b), (c, d)) list =
-  Utility.print_newline (Utility.print_site_graph [ a, site b; c, site d ] list)
+  Html_utility.print_newline (Html_utility.print_site_graph [ a, site b; c, site d ] list)
 
 let content () =
   let scc =
@@ -29,23 +29,23 @@ let content () =
                 let scc = List.rev_map List.rev scc in
                 let output =
                   if scc = [] || scc = [ [] ] then
-                    Utility.print_string
+                    Html_utility.print_string
                       "The size of biomolecular compounds is uniformly bounded."
                       []
                   else (
                     let list =
                       List.fold_left
                         (fun list list_edges ->
-                          let list = Utility.print_newline list in
+                          let list = Html_utility.print_newline list in
                           List.fold_left
                             (fun list ((a, b), (c, d)) ->
                               print_edge ((a, b), (c, d)) list)
                             list list_edges)
                         [] scc
                     in
-                    let list = Utility.print_newline list in
+                    let list = Html_utility.print_newline list in
                     let list =
-                      Utility.print_string
+                      Html_utility.print_string
                         "The following bonds may form arbitrary long chains of \
                          agents:"
                         list

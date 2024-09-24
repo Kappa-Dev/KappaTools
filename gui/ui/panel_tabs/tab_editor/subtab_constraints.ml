@@ -40,32 +40,32 @@ let content () =
                           let list =
                             match conclusion with
                             | [ site_graph ] ->
-                              Utility.print_site_graph site_graph
-                                (Utility.print_newline list)
+                              Html_utility.print_site_graph site_graph
+                                (Html_utility.print_newline list)
                             | _ :: _ | [] ->
-                              let list = Utility.print_newline list in
-                              let list = Utility.print_string " ]" list in
+                              let list = Html_utility.print_newline list in
+                              let list = Html_utility.print_string " ]" list in
                               let list =
                                 snd
                                   (List.fold_left
                                      (fun (bool, list) a ->
                                        let list =
                                          if bool then
-                                           Utility.print_string " v " list
+                                           Html_utility.print_string " v " list
                                          else
                                            list
                                        in
                                        let list =
-                                         Utility.print_site_graph a list
+                                         Html_utility.print_site_graph a list
                                        in
                                        true, list)
                                      (false, list) (List.rev conclusion))
                               in
-                              let list = Utility.print_string "[ " list in
+                              let list = Html_utility.print_string "[ " list in
                               list
                           in
-                          let list = Utility.print_string "  =>  " list in
-                          let list = Utility.print_site_graph hyp list in
+                          let list = Html_utility.print_string "  =>  " list in
+                          let list = Html_utility.print_site_graph hyp list in
                           list)
                         [] (List.rev b)
                     in

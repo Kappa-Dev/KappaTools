@@ -24,7 +24,7 @@ let set_file (file_id : string) : unit =
   let () =
     Common.debug ~loc:__LOC__
       (Js.string
-         (Format.sprintf "[Menu_editor_file_controller.set_file] file `%s`"
+         (Format.sprintf "[Editor_menu_file_controller.set_file] file `%s`"
             file_id))
   in
   Common.async __LOC__ (fun () ->

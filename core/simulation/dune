@@ -19,8 +19,8 @@
  (targets resource_strings.ml)
  (deps
   ../../dev/load_files_into_ocaml_string_vars.sh
-  ../../gui/shared/flux.js
-  ../../gui/viz/common.js)
+  ../../gui/js_lib/flux.js
+  ../../gui/js_lib/viz/common.js)
  (action
   (with-stdout-to
    %{targets}

@@ -12,22 +12,22 @@ let onload (_ : 'a) : bool Js.t =
   let () =
     Dom.appendChild main (Tyxml_js.To_dom.of_div (Panel_projects.content ()))
   in
-  let () = Dom.appendChild main (Panel_tab.navtabs ()) in
-  let () = Dom.appendChild main (Panel_tab.navcontents ()) in
+  let () = Dom.appendChild main (Panel_tabs.navtabs ()) in
+  let () = Dom.appendChild main (Panel_tabs.navcontents ()) in
   let () =
-    Dom.appendChild main (Tyxml_js.To_dom.of_div (Panel_settings.content ()))
+    Dom.appendChild main (Tyxml_js.To_dom.of_div (Panel_preferences.content ()))
   in
 
   let () = Panel_projects.onload () in
-  let () = Panel_tab.onload () in
-  let () = Panel_settings.onload () in
+  let () = Panel_tabs.onload () in
+  let () = Panel_preferences.onload () in
 
   let _ =
     Dom_html.window##.onresize :=
       Dom_html.handler (fun _ ->
           let () = Panel_projects.onresize () in
-          let () = Panel_tab.onresize () in
-          let () = Panel_settings.onresize () in
+          let () = Panel_tabs.onresize () in
+          let () = Panel_preferences.onresize () in
           Js._true)
   in
   Js._true

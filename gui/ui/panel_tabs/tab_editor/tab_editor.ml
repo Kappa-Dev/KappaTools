@@ -17,7 +17,7 @@ let rightsubpanel () =
     ~a:
       [
         Tyxml_js.R.Html.a_class
-          (React.S.bind Subpanel_editor.editor_full (fun editor_full ->
+          (React.S.bind Editor.editor_full (fun editor_full ->
                React.S.const
                  (if editor_full then
                     [ "hidden" ]
@@ -27,32 +27,32 @@ let rightsubpanel () =
     [
       Ui_common.navtabs "subnavtab"
         [
-          "contact_map", None, Tab_contact_map.navli ();
-          "influences", None, Tab_influences.navli ();
-          "constraints", None, Tab_constraints.navli ();
-          "polymers", None, Tab_polymers.navli ();
+          "contact_map", None, Subtab_contact_map.navli ();
+          "influences", None, Subtab_influences.navli ();
+          "constraints", None, Subtab_constraints.navli ();
+          "polymers", None, Subtab_polymers.navli ();
         ];
       Ui_common.navcontent ~id:rightsubpanel_id []
         [
-          "contact_map", [], Tab_contact_map.content ();
-          "influences", [], Tab_influences.content ();
-          "constraints", [], Tab_constraints.content ();
-          "polymers", [], Tab_polymers.content ();
+          "contact_map", [], Subtab_contact_map.content ();
+          "influences", [], Subtab_influences.content ();
+          "constraints", [], Subtab_constraints.content ();
+          "polymers", [], Subtab_polymers.content ();
         ];
     ]
 
 (** [childs_hide b] triggers change the state of child tabs to hide if b is True, or else to show *)
 let childs_hide (b : bool) : unit =
   if b then (
-    let () = Tab_contact_map.parent_hide () in
-    let () = Tab_influences.parent_hide () in
-    let () = Tab_constraints.parent_hide () in
-    Tab_polymers.parent_hide ()
+    let () = Subtab_contact_map.parent_hide () in
+    let () = Subtab_influences.parent_hide () in
+    let () = Subtab_constraints.parent_hide () in
+    Subtab_polymers.parent_hide ()
   ) else (
-    let () = Tab_contact_map.parent_shown () in
-    let () = Tab_influences.parent_shown () in
-    let () = Tab_constraints.parent_shown () in
-    Tab_polymers.parent_shown ()
+    let () = Subtab_contact_map.parent_shown () in
+    let () = Subtab_influences.parent_shown () in
+    let () = Subtab_constraints.parent_shown () in
+    Subtab_polymers.parent_shown ()
   )
 
 let content () =
@@ -61,7 +61,7 @@ let content () =
       ~a:
         [
           Tyxml_js.R.Html.a_class
-            (React.S.bind Subpanel_editor.editor_full (fun editor_full ->
+            (React.S.bind Editor.editor_full (fun editor_full ->
                  (* child hiding set here to avoid "gc" *)
                  let () = childs_hide editor_full in
                  React.S.const
@@ -70,7 +70,7 @@ let content () =
                     else
                       [ "col-md-6"; "flex-content" ])));
         ]
-      [ Subpanel_editor.content () ];
+      [ Editor.content () ];
     rightsubpanel ();
   ]
 
@@ -225,14 +225,14 @@ let init_non_weakly_reversible_transitions () =
 let dont_gc_me = ref []
 
 let onload () =
-  let () = Subpanel_editor.onload () in
+  let () = Editor.onload () in
   dont_gc_me := init_dead_rules () :: !dont_gc_me;
   dont_gc_me := init_dead_agents () :: !dont_gc_me;
   dont_gc_me := init_non_weakly_reversible_transitions () :: !dont_gc_me;
-  let () = Tab_contact_map.onload () in
-  let () = Tab_influences.onload () in
-  let () = Tab_constraints.onload () in
-  let () = Tab_polymers.onload () in
+  let () = Subtab_contact_map.onload () in
+  let () = Subtab_influences.onload () in
+  let () = Subtab_constraints.onload () in
+  let () = Subtab_polymers.onload () in
   let () =
     Common.jquery_on "#naveditor" "hide.bs.tab" (fun _ -> childs_hide true)
   in
@@ -242,9 +242,9 @@ let onload () =
   ()
 
 let onresize () : unit =
-  let () = Subpanel_editor.onresize () in
-  let () = Tab_contact_map.onresize () in
-  let () = Tab_influences.onresize () in
-  let () = Tab_constraints.onresize () in
-  let () = Tab_polymers.onresize () in
+  let () = Editor.onresize () in
+  let () = Subtab_contact_map.onresize () in
+  let () = Subtab_influences.onresize () in
+  let () = Subtab_constraints.onresize () in
+  let () = Subtab_polymers.onresize () in
   ()

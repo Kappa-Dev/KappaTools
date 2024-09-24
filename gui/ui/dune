@@ -1,4 +1,4 @@
-(include ../dune_js_of_ocaml_flags.inc)
+(include_subdirs unqualified)
 
 (library
  (name kappa_webapp_ui)

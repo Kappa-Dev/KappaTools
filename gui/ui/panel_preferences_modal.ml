@@ -205,7 +205,7 @@ let set_action () =
 
 let set_and_save_action () =
   set_action ();
-  State_settings.set_parameters_as_default ();
+  State_preferences.set_parameters_as_default ();
   State_project.set_parameters_as_default ()
 
 let onload () =
@@ -252,12 +252,12 @@ let onload () =
 
          Js._false);
 
-  let () = State_settings.updateFontSize ~delta:0. in
+  let () = State_preferences.updateFontSize ~delta:0. in
   (Tyxml_js.To_dom.of_button increase_font)##.onclick
   := Dom_html.handler (fun _ ->
-         let () = State_settings.updateFontSize ~delta:0.2 in
+         let () = State_preferences.updateFontSize ~delta:0.2 in
          Js._false);
   (Tyxml_js.To_dom.of_button decrease_font)##.onclick
   := Dom_html.handler (fun _ ->
-         let () = State_settings.updateFontSize ~delta:(-0.2) in
+         let () = State_preferences.updateFontSize ~delta:(-0.2) in
          Js._false)

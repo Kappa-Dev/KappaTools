@@ -204,7 +204,7 @@ let content =
       ~submit:
         (Dom_html.handler (fun _ ->
              let filename : string = Js.to_string file_new_input_dom##.value in
-             let () = Menu_editor_file_controller.create_file filename in
+             let () = Editor_menu_file_controller.create_file filename in
              let () =
                Common.modal ~id:("#" ^ file_new_modal_id) ~action:"hide"
              in
@@ -214,7 +214,7 @@ let content =
 let order_files (element : Dom_html.element Js.t) =
   let filenames : string list =
     Common.children_value element "li[data-file-id]" (fun element ->
-        let () = Common.log_group "[Menu_editor_file.order_files]" in
+        let () = Common.log_group "[Editor_menu_file.order_files]" in
         let () = Common.debug ~loc:__LOC__ element in
         let () = Common.log_group_end () in
         Js.Opt.case
@@ -222,7 +222,7 @@ let order_files (element : Dom_html.element Js.t) =
           (fun () -> failwith "missing filename")
           Js.to_string)
   in
-  let () = Menu_editor_file_controller.order_files filenames in
+  let () = Editor_menu_file_controller.order_files filenames in
   ()
 
 let file_select_handler _ _ : unit Lwt.t =
@@ -231,7 +231,7 @@ let file_select_handler _ _ : unit Lwt.t =
   let file = Js.Opt.get (files##item 0) (fun () -> assert false) in
   let file_id = Js.to_string file##.name in
   let () =
-    Menu_editor_file_controller.create_file
+    Editor_menu_file_controller.create_file
       ~text:(Js_of_ocaml_lwt.File.readAsText file)
       file_id
   in
@@ -256,13 +256,13 @@ let onload () =
   let () =
     Common.jquery_on ("#" ^ file_close_li_id) "click"
       (Dom_html.handler (fun _ ->
-           let () = Menu_editor_file_controller.close_file () in
+           let () = Editor_menu_file_controller.close_file () in
            Js._false))
   in
   let () =
     Common.jquery_on ("#" ^ file_export_li_id) "click"
       (Dom_html.handler (fun _ ->
-           let () = Menu_editor_file_controller.export_current_file () in
+           let () = Editor_menu_file_controller.export_current_file () in
            Js._false))
   in
   let () =
@@ -270,7 +270,7 @@ let onload () =
       (Dom_html.handler (fun (event : Dom_html.event Js.t) ->
            (*
            let () =
-             Common.log_group "[Menu_editor_file] clicked span[data-file-id]"
+             Common.log_group "[Editor_menu_file] clicked span[data-file-id]"
            in
            let () = Common.debug ~loc:__LOC__ event in
            let () = Common.log_group_end () in
@@ -284,7 +284,7 @@ let onload () =
              Js.Opt.case file_id
                (fun _ -> ())
                (fun file_id ->
-                 Menu_editor_file_controller.set_file (Js.to_string file_id))
+                 Editor_menu_file_controller.set_file (Js.to_string file_id))
            in
            Js._false))
   in
@@ -300,7 +300,7 @@ let onload () =
             else
               Common.debug ~loc:__LOC__
                 (Format.sprintf
-                   "[Menu_editor_file] file dropdown : unexpected id %s" id)))
+                   "[Editor_menu_file] file dropdown : unexpected id %s" id)))
   in
   let () =
     Common.jquery_on
@@ -325,13 +325,13 @@ let onload () =
                (fun file_id ->
                  let () =
                    Common.log_group
-                     "[Menu_editor_file] triggered \
+                     "[Editor_menu_file] triggered \
                       input.file_compile_checkbox, file_id:"
                  in
                  let () = Common.debug ~loc:__LOC__ file_id in
                  let () = Common.log_group_end () in
                  let () =
-                   Menu_editor_file_controller.set_file_compile
+                   Editor_menu_file_controller.set_file_compile
                      (Js.to_string file_id) is_checked
                  in
                  ())

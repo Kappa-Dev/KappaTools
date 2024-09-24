@@ -1,5 +1,3 @@
-(include ../dune_js_of_ocaml_flags.inc)
-
 (library
  (name kappa_webapp_state)
  (libraries 

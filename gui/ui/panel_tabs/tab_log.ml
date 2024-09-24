@@ -20,7 +20,7 @@ let line_count state =
     state.simulation_info_output.simulation_output_log_messages
 
 let navli () =
-  Ui_react_sim_status.label_news tab_is_active (fun state -> line_count state)
+  Ui_track_sim_status.label_news tab_is_active (fun state -> line_count state)
 
 let content () =
   let state_log =
