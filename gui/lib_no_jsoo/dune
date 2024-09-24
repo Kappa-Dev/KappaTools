@@ -1,5 +1,5 @@
 (library
- (name kappa_webapp_lib_no_js)
+ (name kappa_webapp_lib_no_jsoo)
  (inline_tests)
  (preprocess
   (pps 

@@ -22,7 +22,7 @@ let project_id_input =
     ()
 
 let li_new = Html.li [ Html.a [ Html.cdata "New project" ] ]
-let li_prefs = Html.li (Modal_preferences.content ())
+let li_prefs = Html.li (Panel_preferences_modal.content ())
 let project_id_input_dom = Tyxml_js.To_dom.of_input project_id_input
 
 let content () =
@@ -121,7 +121,7 @@ let content () =
     ]
 
 let onload () =
-  let () = Modal_preferences.onload () in
+  let () = Panel_preferences_modal.onload () in
   let () =
     Common.jquery_on
       ("#" ^ project_id_modal_id)

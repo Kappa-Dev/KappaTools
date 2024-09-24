@@ -23,7 +23,7 @@ let visible_on_states ?(a_class = [])
            a_class @ hidden_class))
 
 module FormPerturbation : Ui_common.Div = struct
-  let id = "panel_settings_perturbation"
+  let id = "panel_preferences_perturbation"
 
   let input =
     Html.input
@@ -71,7 +71,7 @@ module FormPerturbation : Ui_common.Div = struct
     let () =
       form_dom##.onsubmit :=
         Dom.handler (fun _ ->
-            let () = Panel_settings_controller.intervene_simulation () in
+            let () = Panel_preferences_controller.intervene_simulation () in
             Js._false)
     in
     let () = input_dom##.onchange := Dom.handler handler in
@@ -85,7 +85,7 @@ let signal_change input_dom signal_handler =
         Js._true)
 
 module InputPauseCondition : Ui_common.Div = struct
-  let id = "panel_settings_pause_condition"
+  let id = "panel_preferences_pause_condition"
 
   let input =
     Html.input
@@ -121,7 +121,7 @@ module InputPauseCondition : Ui_common.Div = struct
 end
 
 module InputPlotPeriod : Ui_common.Div = struct
-  let id = "panel_settings_plot_period"
+  let id = "panel_preferences_plot_period"
 
   let format_float_string value =
     let n = string_of_float value in
@@ -175,9 +175,9 @@ end
 
 module DivErrorMessage : Ui_common.Div = struct
   let id = "configuration_error_div"
-  let message_nav_inc_id = "panel_settings_message_nav_inc_id"
-  let message_nav_dec_id = "panel_settings_message_nav_dec_id"
-  let message_file_label_id = "panel_settings_message_file_label"
+  let message_nav_inc_id = "panel_preferences_message_nav_inc_id"
+  let message_nav_dec_id = "panel_preferences_message_nav_dec_id"
+  let message_file_label_id = "panel_preferences_message_file_label"
   let error_index, error_index_set = Hooked.S.create ~debug:"error_index" None
 
   let () =
@@ -303,7 +303,7 @@ module DivErrorMessage : Ui_common.Div = struct
         Dom.handler (fun _ ->
             let () =
               Common.debug ~loc:__LOC__
-                (Js.string "[Panel_settings] clicked file_click_handler")
+                (Js.string "[Panel_preferences] clicked file_click_handler")
             in
             let message : Api_types_t.message option =
               get_message
@@ -317,7 +317,7 @@ module DivErrorMessage : Ui_common.Div = struct
             in
             let () =
               match range with
-              | Some range -> Panel_settings_controller.focus_range range
+              | Some range -> Panel_preferences_controller.focus_range range
               | None -> ()
             in
             Js._true)
@@ -330,7 +330,7 @@ module DivErrorMessage : Ui_common.Div = struct
         Dom.handler (fun _ ->
             let () =
               Common.debug ~loc:__LOC__
-                (Js.string "[Panel_settings] clicked index_click_handler")
+                (Js.string "[Panel_preferences] clicked index_click_handler")
             in
             let index : int option =
               sanitize_index
@@ -364,7 +364,7 @@ module DivErrorMessage : Ui_common.Div = struct
 end
 
 module ButtonStart : Ui_common.Div = struct
-  let id = "panel_settings_start_button"
+  let id = "panel_preferences_start_button"
 
   let button =
     Html.button
@@ -393,7 +393,7 @@ module ButtonStart : Ui_common.Div = struct
     let () =
       start_button_dom##.onclick :=
         Dom.handler (fun _ ->
-            let () = Panel_settings_controller.start_simulation () in
+            let () = Panel_preferences_controller.start_simulation () in
             Js._true)
     in
 
@@ -401,7 +401,7 @@ module ButtonStart : Ui_common.Div = struct
 end
 
 module ButtonClear : Ui_common.Div = struct
-  let id = "panel_settings_clear_button"
+  let id = "panel_preferences_clear_button"
 
   let button =
     Html.button
@@ -420,14 +420,14 @@ module ButtonClear : Ui_common.Div = struct
     let () =
       dom##.onclick :=
         Dom.handler (fun _ ->
-            let () = Panel_settings_controller.stop_simulation () in
+            let () = Panel_preferences_controller.stop_simulation () in
             Js._true)
     in
     ()
 end
 
 module ButtonPause : Ui_common.Div = struct
-  let id = "panel_settings_pause_button"
+  let id = "panel_preferences_pause_button"
 
   let button =
     Html.button
@@ -446,14 +446,14 @@ module ButtonPause : Ui_common.Div = struct
     let () =
       button_dom##.onclick :=
         Dom.handler (fun _ ->
-            let () = Panel_settings_controller.pause_simulation () in
+            let () = Panel_preferences_controller.pause_simulation () in
             Js._true)
     in
     ()
 end
 
 module ButtonTrace : Ui_common.Div = struct
-  let id = "panel_settings_get_trace_button"
+  let id = "panel_preferences_get_trace_button"
 
   let button =
     Html.button
@@ -483,14 +483,14 @@ module ButtonTrace : Ui_common.Div = struct
     let () =
       button_dom##.onclick :=
         Dom.handler (fun _ ->
-            let () = Panel_settings_controller.simulation_trace () in
+            let () = Panel_preferences_controller.simulation_trace () in
             Js._true)
     in
     ()
 end
 
 module ButtonOutputs : Ui_common.Div = struct
-  let id = "panel_settings_outputs_button"
+  let id = "panel_preferences_outputs_button"
 
   let button =
     Html.button
@@ -509,14 +509,14 @@ module ButtonOutputs : Ui_common.Div = struct
     let () =
       button_dom##.onclick :=
         Dom.handler (fun _ ->
-            let () = Panel_settings_controller.simulation_outputs () in
+            let () = Panel_preferences_controller.simulation_outputs () in
             Js._true)
     in
     ()
 end
 
 module ButtonContinue : Ui_common.Div = struct
-  let id = "panel_settings_continue_button"
+  let id = "panel_preferences_continue_button"
 
   let button =
     Html.button
@@ -535,7 +535,7 @@ module ButtonContinue : Ui_common.Div = struct
     let () =
       button_dom##.onclick :=
         Dom.handler (fun _ ->
-            let () = Panel_settings_controller.continue_simulation () in
+            let () = Panel_preferences_controller.continue_simulation () in
             Js._true)
     in
     ()
