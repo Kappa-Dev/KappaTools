@@ -44,7 +44,8 @@ val translate :
   Exception.exceptions_caught_and_uncaught ->
   rename_sites ->
   Ckappa_sig.Views_bdu.mvbdu ->
-  Exception.exceptions_caught_and_uncaught * (Ckappa_sig.Views_bdu.handler * token)
+  Exception.exceptions_caught_and_uncaught
+  * (Ckappa_sig.Views_bdu.handler * token)
 
 val print :
   ?beginning_of_sentence:bool ->

@@ -269,7 +269,9 @@ let lift_to_care_about_ambiguities f requirement effect parameters
           StoryProfiling.StoryStats.log_info ->
           Exception.exceptions_caught_and_uncaught ->
           trace ->
-          Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * trace)
+          Exception.exceptions_caught_and_uncaught
+          * StoryProfiling.StoryStats.log_info
+          * trace)
         parameters ~shall_we_compute ~shall_we_compute_profiling_information
         ~print_if_zero kappa_handler profiling_info error trace
     in

@@ -409,7 +409,7 @@ let rec add_agents_in_cc sigs id wk registered_links
     ((removed, added) as transf) links_transf instantiations remains = function
   | [] ->
     (match Mods.IntMap.root registered_links with
-    | None ->  wk, transf, links_transf, instantiations, remains
+    | None -> wk, transf, links_transf, instantiations, remains
     | Some (key, _) -> link_occurence_failure key Loc.dummy)
   | ag :: ag_l ->
     let node, wk = Pattern.new_node wk ag.LKappa.ra_type in
@@ -485,7 +485,7 @@ let rec add_agents_in_cc sigs id wk registered_links
                   "Try to create the connected components of an ambiguous \
                    mixture."))
         | (LKappa.LNK_VALUE (i, _), pos), s ->
-          ( match Mods.IntMap.find_option i r_l with
+          (match Mods.IntMap.find_option i r_l with
           | Some ((node', site') as dst) ->
             let dst_place = Matching.Agent.Existing (node', id), site' in
             let wk'' = Pattern.new_link wk' (node, site_id) dst in
@@ -547,8 +547,7 @@ let rec add_agents_in_cc sigs id wk registered_links
                 when List.for_all (fun x -> not (is_linked_on i x)) acc ->
                 handle_ports wk' r_l' c_l transf' l_t' re' (n :: acc)
                   (succ site_id)
-              | _, _ ->
-                  link_occurence_failure i pos)))
+              | _, _ -> link_occurence_failure i pos)))
       )
     in
     handle_ports wk registered_links Mods.IntMap.empty transf' links_transf
@@ -708,7 +707,8 @@ let connected_components_sum_of_ambiguous_rule ~debug_mode ~compile_mode_on
       Format.eprintf "@[<v>_____(%i)@,%a@]@." (List.length all_mixs)
         (Pp.list Pp.cut (fun f x ->
              Format.fprintf f "@[%a%a@]"
-               (LKappa.print_rule_mixture ~noCounters sigs counters_info ~ltypes:true created)
+               (LKappa.print_rule_mixture ~noCounters sigs counters_info
+                  ~ltypes:true created)
                x
                (Raw_mixture.print ~noCounters ~created:true
                   ~initial_comma:(x <> []) ~sigs ~counters_info)

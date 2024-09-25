@@ -269,7 +269,8 @@ module type Internalized_mvbdu = sig
   val import_handler : handler -> unit
 
   val export_handler :
-    Exception.exceptions_caught_and_uncaught -> Exception.exceptions_caught_and_uncaught * handler option
+    Exception.exceptions_caught_and_uncaught ->
+    Exception.exceptions_caught_and_uncaught * handler option
 
   val is_init : unit -> bool
   val equal : mvbdu -> mvbdu -> bool

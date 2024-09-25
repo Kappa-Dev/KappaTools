@@ -635,8 +635,8 @@ module ListTable : StoryTable = struct
   let count_stories list =
     List.fold_left (fun n l -> n + List.length (snd l)) 0 list
 
-  let fold_table parameter handler log_info (error : Exception.exceptions_caught_and_uncaught) g
-      list a =
+  let fold_table parameter handler log_info
+      (error : Exception.exceptions_caught_and_uncaught) g list a =
     List.fold_left
       (fun a (_, l) ->
         List.fold_left

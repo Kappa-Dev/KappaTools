@@ -65,7 +65,8 @@ let decompiled_rule ~noCounters ~full env f r =
     Format.fprintf f "%a %a" pr_alg va (Model.print_token ~env) tok
   in
   Format.fprintf f "%a%a%t%a%t"
-    (LKappa.print_rule_mixture ~noCounters sigs counters_info ~ltypes:false r_created)
+    (LKappa.print_rule_mixture ~noCounters sigs counters_info ~ltypes:false
+       r_created)
     r_mix
     (Raw_mixture.print ~noCounters ~created:true ~initial_comma:(r_mix <> [])
        ~sigs ~counters_info)

@@ -1,6 +1,6 @@
 (library
  (name kappa_webapp_state)
- (libraries 
+ (libraries
   js_of_ocaml-tyxml
   lwt_react
   kappa_webapp_lib

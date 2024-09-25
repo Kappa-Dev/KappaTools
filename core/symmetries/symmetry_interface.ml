@@ -152,9 +152,8 @@ let print_chemical_species ?compil f =
          (match compil with
          | None -> false
          | Some c -> c.debug_mode)
-       ~full_species:true
-       ?domain:(domain_opt compil)
-       ?cc_id:None ~symbol_table:(symbol_table_opt compil) ~with_id:false)
+       ~full_species:true ?domain:(domain_opt compil) ?cc_id:None
+       ~symbol_table:(symbol_table_opt compil) ~with_id:false)
 
 let print_token ?compil fmt k =
   Format.fprintf fmt "%a" (Model.print_token ?env:(environment_opt compil)) k
@@ -666,8 +665,7 @@ let detect_symmetries parameters compil cache chemical_species contact_map =
   let rule_cache = get_rule_cache cache in
   let env = compil.environment in
   let rule_cache, symmetries =
-    Symmetries.detect_symmetries
-      ~parameters ~env rule_cache
+    Symmetries.detect_symmetries ~parameters ~env rule_cache
       compil.rule_rate_convention chemical_species (get_rules compil)
       contact_map
   in

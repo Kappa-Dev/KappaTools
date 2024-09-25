@@ -1,9 +1,12 @@
 (** Time-stamp: <Jul 02 2016>*)
 
-type exceptions_caught_and_uncaught = Exception_without_parameter.exceptions_caught_and_uncaught
+type exceptions_caught_and_uncaught =
+  Exception_without_parameter.exceptions_caught_and_uncaught
 
 val empty_exceptions_caught_and_uncaught : exceptions_caught_and_uncaught
-val is_empty_exceptions_caught_and_uncaught : exceptions_caught_and_uncaught -> bool
+
+val is_empty_exceptions_caught_and_uncaught :
+  exceptions_caught_and_uncaught -> bool
 
 val warn_with_exn :
   Remanent_parameters_sig.parameters ->
@@ -27,7 +30,8 @@ val warn :
   'a ->
   exceptions_caught_and_uncaught * 'a
 
-val print : Remanent_parameters_sig.parameters -> exceptions_caught_and_uncaught -> unit
+val print :
+  Remanent_parameters_sig.parameters -> exceptions_caught_and_uncaught -> unit
 
 val print_errors_light_for_kasim :
   Remanent_parameters_sig.parameters -> exceptions_caught_and_uncaught -> unit

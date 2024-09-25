@@ -274,8 +274,18 @@ module type Map = sig
     'b ->
     'c ->
     'exceptions_caught_and_uncaught * 'c) ->
-    ('parameters -> 'exceptions_caught_and_uncaught -> elt -> 'a -> 'c -> 'exceptions_caught_and_uncaught * 'c) ->
-    ('parameters -> 'exceptions_caught_and_uncaught -> elt -> 'b -> 'c -> 'exceptions_caught_and_uncaught * 'c) ->
+    ('parameters ->
+    'exceptions_caught_and_uncaught ->
+    elt ->
+    'a ->
+    'c ->
+    'exceptions_caught_and_uncaught * 'c) ->
+    ('parameters ->
+    'exceptions_caught_and_uncaught ->
+    elt ->
+    'b ->
+    'c ->
+    'exceptions_caught_and_uncaught * 'c) ->
     'a t ->
     'b t ->
     'c ->
@@ -299,7 +309,12 @@ module type Map = sig
   val monadic_iter2_sparse :
     'parameters ->
     'exceptions_caught_and_uncaught ->
-    ('parameters -> 'exceptions_caught_and_uncaught -> elt -> 'a -> 'b -> 'exceptions_caught_and_uncaught) ->
+    ('parameters ->
+    'exceptions_caught_and_uncaught ->
+    elt ->
+    'a ->
+    'b ->
+    'exceptions_caught_and_uncaught) ->
     'a t ->
     'b t ->
     'exceptions_caught_and_uncaught
@@ -307,7 +322,12 @@ module type Map = sig
   val monadic_fold_restriction :
     'parameters ->
     'exceptions_caught_and_uncaught ->
-    ('parameters -> 'exceptions_caught_and_uncaught -> elt -> 'a -> 'b -> 'exceptions_caught_and_uncaught * 'b) ->
+    ('parameters ->
+    'exceptions_caught_and_uncaught ->
+    elt ->
+    'a ->
+    'b ->
+    'exceptions_caught_and_uncaught * 'b) ->
     set ->
     'a t ->
     'b ->
@@ -372,7 +392,11 @@ module type Projection = sig
     'exceptions_caught_and_uncaught ->
     (elt_a -> elt_b) ->
     'b ->
-    ('parameters -> 'exceptions_caught_and_uncaught -> 'b -> 'a -> 'exceptions_caught_and_uncaught * 'b) ->
+    ('parameters ->
+    'exceptions_caught_and_uncaught ->
+    'b ->
+    'a ->
+    'exceptions_caught_and_uncaught * 'b) ->
     'a map_a ->
     'exceptions_caught_and_uncaught * 'b map_b
 
@@ -382,7 +406,10 @@ module type Projection = sig
   val proj_set_monadic :
     'parameters ->
     'exceptions_caught_and_uncaught ->
-    ('parameters -> 'exceptions_caught_and_uncaught -> elt_a -> 'exceptions_caught_and_uncaught * elt_b) ->
+    ('parameters ->
+    'exceptions_caught_and_uncaught ->
+    elt_a ->
+    'exceptions_caught_and_uncaught * elt_b) ->
     set_a ->
     'exceptions_caught_and_uncaught * set_b
 
@@ -393,7 +420,10 @@ module type Projection = sig
   val partition_set_monadic :
     'parameters ->
     'exceptions_caught_and_uncaught ->
-    ('parameters -> 'exceptions_caught_and_uncaught -> elt_a -> 'exceptions_caught_and_uncaught * elt_b) ->
+    ('parameters ->
+    'exceptions_caught_and_uncaught ->
+    elt_a ->
+    'exceptions_caught_and_uncaught * elt_b) ->
     set_a ->
     'exceptions_caught_and_uncaught * set_a map_b
 end
@@ -427,7 +457,11 @@ module type Projection2 = sig
     (elt_a -> elt_b) ->
     (elt_a -> elt_c) ->
     'b ->
-    ('parameters -> 'exceptions_caught_and_uncaught -> 'b -> 'a -> 'exceptions_caught_and_uncaught * 'b) ->
+    ('parameters ->
+    'exceptions_caught_and_uncaught ->
+    'b ->
+    'a ->
+    'exceptions_caught_and_uncaught * 'b) ->
     'a map_a ->
     'exceptions_caught_and_uncaught * 'b map_c map_b
 end

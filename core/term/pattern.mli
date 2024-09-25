@@ -70,7 +70,7 @@ module Env : sig
     (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
-  val counters_info: t -> Counters_info.t
+  val counters_info : t -> Counters_info.t
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
   val to_navigation : t -> id -> Navigation.abstract Navigation.t
   val print : noCounters:bool -> Format.formatter -> t -> unit
@@ -132,7 +132,8 @@ val print_cc :
   t ->
   unit
 
-val print_cc_as_id : Signature.s -> Counters_info.t -> Format.formatter -> t -> unit
+val print_cc_as_id :
+  Signature.s -> Counters_info.t -> Format.formatter -> t -> unit
 
 val print :
   noCounters:bool ->
@@ -214,4 +215,9 @@ val length : t -> int
 module Set : SetMap.Set with type elt = id
 module Map : SetMap.Map with type elt = id
 
-val counter_value_cc : Signature.s option -> Counters_info.counter_sig -> cc -> Mods.IntMap.elt * int -> int
+val counter_value_cc :
+  Signature.s option ->
+  Counters_info.counter_sig ->
+  cc ->
+  Mods.IntMap.elt * int ->
+  int

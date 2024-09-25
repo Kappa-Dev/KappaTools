@@ -427,7 +427,8 @@ module Domain = struct
 
   (* ignore the flag *)
   (* Please check that each agent type occuring in the pattern is reachable *)
-  exception False of Exception.exceptions_caught_and_uncaught * dynamic_information
+  exception
+    False of Exception.exceptions_caught_and_uncaught * dynamic_information
 
   let maybe_reachable static dynamic error _flag pattern precondition =
     let parameters = get_parameter static in

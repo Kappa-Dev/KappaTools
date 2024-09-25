@@ -287,7 +287,8 @@ let translate_counter parameters error int_set counter =
            Some a);
     } )
 
-let translate_counter_sig parameters error int_set (counter : Counters_info.counter_sig) =
+let translate_counter_sig parameters error int_set
+    (counter : Counters_info.counter_sig) =
   let error, _ =
     check_freshness parameters error "Counters"
       (fst counter.Counters_info.counter_sig_name)

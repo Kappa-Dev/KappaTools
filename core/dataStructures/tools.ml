@@ -464,4 +464,7 @@ let sort_by_priority f n =
   in
   sort
 
-let map_opt f opt = match opt with | None -> None | Some a -> Some (f a)
+let map_opt f opt =
+  match opt with
+  | None -> None
+  | Some a -> Some (f a)

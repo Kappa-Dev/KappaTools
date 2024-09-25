@@ -500,7 +500,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
         match init_t with
         | INIT_MIX (raw_mix, mix_pos) ->
           let sigs = Model.signatures env in
-          let counters_info = Model.counters_info env in 
+          let counters_info = Model.counters_info env in
           let preenv', alg' =
             compile_alg ~debug_mode ~compile_mode_on contact_map preenv alg
           in
@@ -623,8 +623,8 @@ let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map
     Export_to_KaSim.flush_errors kasa_state
 *)
 let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
-    ?overwrite_init ?overwrite_t0 ?rescale_init sigs_nd counters_info tk_nd contact_map result
-    =
+    ?overwrite_init ?overwrite_t0 ?rescale_init sigs_nd counters_info tk_nd
+    contact_map result =
   let warning ~pos msg = outputs (Data.Warning (Some pos, msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
   let preenv = Pattern.PreEnv.empty sigs_nd counters_info in

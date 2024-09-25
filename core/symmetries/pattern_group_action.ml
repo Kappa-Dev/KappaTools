@@ -360,8 +360,7 @@ let equiv_class_gen ?parameters ~partitions_internal_states
   in
   cache, preenv, seen, l
 
-let equiv_class_of_a_species ?parameters ~env
-    ~partitions_internal_states
+let equiv_class_of_a_species ?parameters ~env ~partitions_internal_states
     ~partitions_binding_states ~partitions_full_states cache preenv seen species
     =
   equiv_class_gen ?parameters ~partitions_internal_states
@@ -380,6 +379,6 @@ let equiv_class_of_a_pattern ?parameters ~env ~partitions_internal_states
       Patterns_extra.pattern_id_to_lkappa_rule_and_unspec ?parameters ~env
         pattern)
     (fun a b c ->
-      Patterns_extra.mixture_to_pattern ?parameters  a b.LKappa.r_mix c)
+      Patterns_extra.mixture_to_pattern ?parameters a b.LKappa.r_mix c)
     (fun (_, a, b) -> a, b)
     cache preenv seen species

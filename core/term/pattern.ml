@@ -595,21 +595,24 @@ let intersection renaming cc1 cc2 =
 
 type extremity = Open | Closed
 
-let fetch_exit_site _sigs sid = sid+1
+let fetch_exit_site _sigs sid = sid + 1
+
 let rec counter_value sigs nodes (nid, sid) count =
   match Mods.IntMap.find_option nid nodes with
-  | None -> failwith "pending bonds encountered when computing the length of a chain (counters)"
+  | None ->
+    failwith
+      "pending bonds encountered when computing the length of a chain \
+       (counters)"
   | Some ag ->
     let other = fetch_exit_site sigs sid in
-    let (el,_) = ag.(other) in
-    match el with
-      | UnSpec -> count, Open
-      | Free -> count, Closed
-      | Link (dn, di) ->
-             counter_value sigs nodes (dn, di) (count + 1)
+    let el, _ = ag.(other) in
+    (match el with
+    | UnSpec -> count, Open
+    | Free -> count, Closed
+    | Link (dn, di) -> counter_value sigs nodes (dn, di) (count + 1))
 
 let counter_value sigs min_value nodes (nid, sid) =
-  let a,b = counter_value sigs nodes (nid, sid) 0 in
+  let a, b = counter_value sigs nodes (nid, sid) 0 in
   min_value + a, b
 
 let counter_value_cc sigs counter_sig cc (nid, sid) =
@@ -618,13 +621,19 @@ let counter_value_cc sigs counter_sig cc (nid, sid) =
     match min_value with
     | None -> assert false
     | Some (None, _) -> assert false
-    | Some (Some min_value,_) -> min_value
+    | Some (Some min_value, _) -> min_value
   in
   let nodes = cc.nodes in
   let count, extremity = counter_value sigs min_value nodes (nid, sid) in
-  let () = match extremity with Open -> failwith "pending bonds encountered when computing the length of a chain (counters)"
-                              | Closed -> ()
-  in count
+  let () =
+    match extremity with
+    | Open ->
+      failwith
+        "pending bonds encountered when computing the length of a chain \
+         (counters)"
+    | Closed -> ()
+  in
+  count
 
 let dotcomma dotnet =
   if dotnet then
@@ -633,8 +642,8 @@ let dotcomma dotnet =
   else
     Pp.space
 
-let print_cc ~noCounters ?(dotnet = false) ?(full_species = false) ?sigs ?counters_info ?cc_id
-    ~with_id f cc =
+let print_cc ~noCounters ?(dotnet = false) ?(full_species = false) ?sigs
+    ?counters_info ?cc_id ~with_id f cc =
   let print_intf ((ag_i, ag_t) as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
@@ -676,22 +685,28 @@ let print_cc ~noCounters ?(dotnet = false) ?(full_species = false) ?sigs ?counte
                  Signature.is_counter_agent sigs dst_ty && not noCounters
              then (
                match sigs, counters_info with
-                | None, _ | _, None -> assert false
-                | Some sigs, Some counters_info ->
-                let min_value =
-                  let counter_sig = Counters_info.get_counter_sig sigs counters_info ag_t p in
-                  match counter_sig.Counters_info.counter_sig_min with
-                  | None -> assert false
-                  | Some (None, _) -> assert false
-                  | Some (Some min_value,_) -> min_value
-                in
-               let (counter,kind) = counter_value sigs min_value cc.nodes (dst_a, dst_p) in
-               let () =
-                  Format.fprintf f "{%s%d}"
-                    (match kind with Closed -> "=" | Open -> ">=")
-                    counter
-               in
-               true, out
+               | None, _ | _, None -> assert false
+               | Some sigs, Some counters_info ->
+                 let min_value =
+                   let counter_sig =
+                     Counters_info.get_counter_sig sigs counters_info ag_t p
+                   in
+                   match counter_sig.Counters_info.counter_sig_min with
+                   | None -> assert false
+                   | Some (None, _) -> assert false
+                   | Some (Some min_value, _) -> min_value
+                 in
+                 let counter, kind =
+                   counter_value sigs min_value cc.nodes (dst_a, dst_p)
+                 in
+                 let () =
+                   Format.fprintf f "{%s%d}"
+                     (match kind with
+                     | Closed -> "="
+                     | Open -> ">=")
+                     counter
+                 in
+                 true, out
              ) else (
                let i, out' =
                  match Mods.Int2Map.find_option (dst_a, dst_p) link_ids with
@@ -769,14 +784,22 @@ let print_cc_as_id sigs counters_info f cc =
              let dst_ty = find_ty cc dst_a in
              if Signature.is_counter_agent sigs dst_ty then (
                let min_value =
-                let counter_sig = Counters_info.get_counter_sig sigs counters_info ag_t p in
-                match counter_sig.Counters_info.counter_sig_min with
-                  | None -> assert false
-                  | Some (None, _) -> assert false
-                  | Some (Some min_value,_) -> min_value
+                 let counter_sig =
+                   Counters_info.get_counter_sig sigs counters_info ag_t p
+                 in
+                 match counter_sig.Counters_info.counter_sig_min with
+                 | None -> assert false
+                 | Some (None, _) -> assert false
+                 | Some (Some min_value, _) -> min_value
                in
-               let counter,extremity  = counter_value sigs min_value cc.nodes (dst_a, dst_p)  in
-               let () = match extremity with Open -> failwith ("bonds should not be opened") | Closed -> () in
+               let counter, extremity =
+                 counter_value sigs min_value cc.nodes (dst_a, dst_p)
+               in
+               let () =
+                 match extremity with
+                 | Open -> failwith "bonds should not be opened"
+                 | Closed -> ()
+               in
                let () = Format.fprintf f "~+%d" counter in
                true, out
              ) else (
@@ -1266,14 +1289,14 @@ end = struct
   }
 
   let signatures env = env.sig_decl
-
   let counters_info env = env.counters_info
 
   let print ~noCounters f env =
     let pp_point p_id f p =
       Format.fprintf f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
         (fun x ->
-          print_cc ~noCounters ~sigs:env.sig_decl ~counters_info:env.counters_info ~cc_id:p_id ~with_id:true x)
+          print_cc ~noCounters ~sigs:env.sig_decl
+            ~counters_info:env.counters_info ~cc_id:p_id ~with_id:true x)
         p.content
         (fun f ->
           if p.roots <> None then
@@ -1395,7 +1418,8 @@ end = struct
       (try
          {
            sig_decl;
-           counters_info = [||]; (* TO DO *)
+           counters_info = [||];
+           (* TO DO *)
            (* Si json le prendre, sinon le synthétiser avec l'ancien fonctionnement *)
            single_agent_points =
              (match List.assoc "single_agents" l with
@@ -1484,7 +1508,8 @@ let print ~noCounters ?domain ~with_id f id =
       else
         None
     in
-    print_cc ~noCounters ~sigs:(Env.signatures env) ~counters_info:(Env.counters_info env) ?cc_id ~with_id f
+    print_cc ~noCounters ~sigs:(Env.signatures env)
+      ~counters_info:(Env.counters_info env) ?cc_id ~with_id f
       env.Env.domain.(id).Env.content
 
 let embeddings_to_fully_specified ~debug_mode domain a_id b =
@@ -1532,7 +1557,14 @@ module PreEnv = struct
   let counters_info preenv = preenv.counters_info
 
   let fresh sigs counters_info id_by_type nb_id domain =
-    { sig_decl = sigs; counters_info  ; id_by_type; nb_id; domain; used_by_a_begin_new = false }
+    {
+      sig_decl = sigs;
+      counters_info;
+      id_by_type;
+      nb_id;
+      domain;
+      used_by_a_begin_new = false;
+    }
 
   let empty sigs counters_info =
     let nbt' = Array.make (Signature.size sigs) [] in
@@ -1913,7 +1945,10 @@ let raw_finish_new ~debug_mode ~toplevel ?origin wk =
     PreEnv.add_cc ~debug_mode ~toplevel ?origin wk.cc_env
       (fresh_cc_id wk.cc_env) cc_candidate
   in
-  PreEnv.fresh wk.sigs wk.counters wk.reserved_id wk.free_id preenv, r, out, out_id
+  ( PreEnv.fresh wk.sigs wk.counters wk.reserved_id wk.free_id preenv,
+    r,
+    out,
+    out_id )
 
 let finish_new ~debug_mode ?origin wk =
   raw_finish_new ~debug_mode ~toplevel:true ?origin wk
@@ -1979,7 +2014,7 @@ let new_node wk type_id =
     ( node,
       {
         sigs = wk.sigs;
-        counters = wk.counters ;
+        counters = wk.counters;
         cc_env = wk.cc_env;
         reserved_id = wk.reserved_id;
         used_id = wk.used_id;

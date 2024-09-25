@@ -76,7 +76,9 @@ val cut :
   Exception.exceptions_caught_and_uncaught ->
   (int * int * int) list ->
   grid ->
-  Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * config
+  Exception.exceptions_caught_and_uncaught
+  * StoryProfiling.StoryStats.log_info
+  * config
 
 val enrich_grid :
   Remanent_parameters_sig.parameters ->
@@ -85,7 +87,9 @@ val enrich_grid :
   Exception.exceptions_caught_and_uncaught ->
   Graph_closure.config ->
   grid ->
-  Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * enriched_grid
+  Exception.exceptions_caught_and_uncaught
+  * StoryProfiling.StoryStats.log_info
+  * enriched_grid
 
 val fold_over_causal_past_of_obs :
   Remanent_parameters_sig.parameters ->
@@ -105,8 +109,12 @@ val fold_over_causal_past_of_obs :
   * StoryProfiling.StoryStats.log_info
   * ('b, 'c) Stop.stop) ->
   'b ->
-  ( Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'b,
-    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'c )
+  ( Exception.exceptions_caught_and_uncaught
+    * StoryProfiling.StoryStats.log_info
+    * 'b,
+    Exception.exceptions_caught_and_uncaught
+    * StoryProfiling.StoryStats.log_info
+    * 'c )
   Stop.stop
 
 val debug_print_grid : Format.formatter -> grid -> unit
