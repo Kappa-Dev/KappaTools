@@ -87,7 +87,6 @@ build:
 .PHONY: clean clean_all
 
 clean:
-	# deleting remaining temporary test files
 	@find "$(CURDIR)" \( -name \#\* -or -name \*~ -or -name \*.sxw \) -delete
 	@for i in $(DIRS_OF_TEST:=/$(OUTPUT_PATH)) ;\
 	  do [ -d $${i} ] && find $${i} -mindepth 1 \( -not -name \*.ref \) -delete || true;\

@@ -25,4 +25,5 @@ val print_site_graph :
   'a Html.elt list
 
 val print_exceptions_caught_and_uncaught :
-  Exception_without_parameter.exceptions_caught_and_uncaught -> [> Html_types.p ] Html.elt list
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  [> Html_types.p ] Html.elt list

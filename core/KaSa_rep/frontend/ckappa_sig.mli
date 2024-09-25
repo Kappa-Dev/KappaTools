@@ -457,7 +457,8 @@ val array_of_list_rule_id :
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
   'a list ->
-  Exception.exceptions_caught_and_uncaught * 'a Rule_nearly_Inf_Int_storage_Imperatif.t
+  Exception.exceptions_caught_and_uncaught
+  * 'a Rule_nearly_Inf_Int_storage_Imperatif.t
 
 (***************************************************************************)
 

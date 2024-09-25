@@ -158,6 +158,7 @@ let rec pp_exception f = function
     Format.fprintf f "Uncaught_exception(%a)" pp_uncaught x
   | Caught_exception x -> Format.fprintf f "Caught_exception(%a)" pp_caught x
   | exc -> Utils.pp_exception f exc
+
 and pp_uncaught f x =
   let with_space = false in
   Format.fprintf f "@[<h>%a%aexception:@ %a@]"

@@ -84,7 +84,8 @@ module type Mat_inter = sig
     Exception.exceptions_caught_and_uncaught ->
     prod ->
     var ->
-    Exception.exceptions_caught_and_uncaught * (Fraction.ffraction * Fraction.ffraction) option
+    Exception.exceptions_caught_and_uncaught
+    * (Fraction.ffraction * Fraction.ffraction) option
 
   val is_infinite : prod -> var -> bool
 

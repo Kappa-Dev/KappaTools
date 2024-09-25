@@ -569,7 +569,8 @@ module Matrice = struct
       | [] -> failwith "compteur_pivot_3"
     )
 
-  let normalise parameters (error : Exception.exceptions_caught_and_uncaught) m =
+  let normalise parameters (error : Exception.exceptions_caught_and_uncaught) m
+      =
     let rec aux (error : Exception.exceptions_caught_and_uncaught) k =
       if k > !(m.nligne) then (
         del_last_ligne m;
@@ -615,7 +616,8 @@ module Matrice = struct
     in
     aux error 1
 
-  let rec push parameters (error : Exception.exceptions_caught_and_uncaught) m j k =
+  let rec push parameters (error : Exception.exceptions_caught_and_uncaught) m j
+      k =
     if Working_list_imperative.member j (get_all_entry m) then (
       let rec aux error i =
         if i > !(m.nligne) then
@@ -888,7 +890,8 @@ module Matrice = struct
     in
     union parameters error nm m
 
-  let pushbool parameters (error : Exception.exceptions_caught_and_uncaught) m a =
+  let pushbool parameters (error : Exception.exceptions_caught_and_uncaught) m a
+      =
     let error, m2 = copy parameters error m in
     let error =
       new_copy_ligne parameters error m2

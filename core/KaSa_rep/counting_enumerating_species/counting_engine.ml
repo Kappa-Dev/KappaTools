@@ -17,13 +17,17 @@ let verbose_mode = false
 
 type ('hole, 'brick) hole_handler = {
   dual:
-    Exception.exceptions_caught_and_uncaught -> 'hole -> Exception.exceptions_caught_and_uncaught * 'hole list;
+    Exception.exceptions_caught_and_uncaught ->
+    'hole ->
+    Exception.exceptions_caught_and_uncaught * 'hole list;
   dual_and_self:
     Exception.exceptions_caught_and_uncaught ->
     'hole ->
     Exception.exceptions_caught_and_uncaught * 'hole list * bool;
   interface_of_brick:
-    Exception.exceptions_caught_and_uncaught -> 'brick -> Exception.exceptions_caught_and_uncaught * 'hole list;
+    Exception.exceptions_caught_and_uncaught ->
+    'brick ->
+    Exception.exceptions_caught_and_uncaught * 'hole list;
   print_hole: out_channel -> 'hole -> unit;
 }
 
@@ -68,7 +72,8 @@ functor
         Interfaces.Map.t;
     }
 
-    let print_handler exceptions_caught_and_uncaught kappa_handler hole_handler =
+    let print_handler exceptions_caught_and_uncaught kappa_handler hole_handler
+        =
       {
         Counting_print.iter_map1 = Puzzle_hole_map_and_set.Map.iter;
         Counting_print.iter_map2 = Interfaces.Map.iter;
@@ -98,25 +103,28 @@ functor
     let find_dependence parameters error hole graph =
       Puzzle_hole_map_and_set.Map.find_default parameters error [] hole graph
 
-    let add_dependence parameters exceptions_caught_and_uncaught hole interface graph =
+    let add_dependence parameters exceptions_caught_and_uncaught hole interface
+        graph =
       let exceptions_caught_and_uncaught, old_interface_list =
         find_dependence parameters exceptions_caught_and_uncaught hole graph
       in
-      Puzzle_hole_map_and_set.Map.add parameters exceptions_caught_and_uncaught hole
+      Puzzle_hole_map_and_set.Map.add parameters exceptions_caught_and_uncaught
+        hole
         (interface :: old_interface_list)
         graph
 
-    let add_species parameters exceptions_caught_and_uncaught _hole_handler species holeset
-        interface interface_map =
+    let add_species parameters exceptions_caught_and_uncaught _hole_handler
+        species holeset interface interface_map =
       let exceptions_caught_and_uncaught, (old, old_holeset) =
-        Interfaces.Map.find_default_without_logs parameters exceptions_caught_and_uncaught
+        Interfaces.Map.find_default_without_logs parameters
+          exceptions_caught_and_uncaught
           (E.nil, Puzzle_hole_map_and_set.Set.empty)
           interface interface_map
       in
       let new_species = E.sum old species in
       let exceptions_caught_and_uncaught, new_hole_set =
-        Puzzle_hole_map_and_set.Set.union parameters exceptions_caught_and_uncaught old_holeset
-          holeset
+        Puzzle_hole_map_and_set.Set.union parameters
+          exceptions_caught_and_uncaught old_holeset holeset
       in
       Interfaces.Map.add parameters exceptions_caught_and_uncaught interface
         (new_species, new_hole_set)
@@ -124,9 +132,12 @@ functor
 
     let remove_species parameters hole self state =
       let species = state.species in
-      let exceptions_caught_and_uncaught = state.exceptions_caught_and_uncaught in
+      let exceptions_caught_and_uncaught =
+        state.exceptions_caught_and_uncaught
+      in
       let exceptions_caught_and_uncaught, interface_other =
-        Puzzle_hole_map_and_set.Map.add parameters exceptions_caught_and_uncaught hole 1
+        Puzzle_hole_map_and_set.Map.add parameters
+          exceptions_caught_and_uncaught hole 1
           Puzzle_hole_map_and_set.Map.empty
       in
       let exceptions_caught_and_uncaught, k =
@@ -139,16 +150,19 @@ functor
           Exception.warn parameters state.exceptions_caught_and_uncaught __POS__
             ~message:"unknown interface in remove_species" Exit state
         in
-        { state with exceptions_caught_and_uncaught }, (E.nil, Puzzle_hole_map_and_set.Set.empty)
+        ( { state with exceptions_caught_and_uncaught },
+          (E.nil, Puzzle_hole_map_and_set.Set.empty) )
       | Some k ->
         let exceptions_caught_and_uncaught, species =
-          Interfaces.Map.remove parameters exceptions_caught_and_uncaught (interface_other, self)
-            species
+          Interfaces.Map.remove parameters exceptions_caught_and_uncaught
+            (interface_other, self) species
         in
         { state with species; exceptions_caught_and_uncaught }, k
 
     let add_interface parameters hole_handler interface species holeset state =
-      let exceptions_caught_and_uncaught = state.exceptions_caught_and_uncaught in
+      let exceptions_caught_and_uncaught =
+        state.exceptions_caught_and_uncaught
+      in
       let interface_other, interface_self = interface in
       let empty_interface_other =
         Puzzle_hole_map_and_set.Map.for_all (fun _ x -> x = 0) interface_other
@@ -169,8 +183,8 @@ functor
       (*1*)
       if empty_interface_other then (
         let exceptions_caught_and_uncaught, species =
-          add_species parameters state.exceptions_caught_and_uncaught hole_handler species
-            holeset
+          add_species parameters state.exceptions_caught_and_uncaught
+            hole_handler species holeset
             (interface_other, interface_self)
             state.species
         in
@@ -187,7 +201,8 @@ functor
             match hole with
             | None ->
               let exceptions_caught_and_uncaught, state =
-                Exception.warn parameters state.exceptions_caught_and_uncaught __POS__ Exit state
+                Exception.warn parameters state.exceptions_caught_and_uncaught
+                  __POS__ Exit state
               in
               { state with exceptions_caught_and_uncaught }
             | Some (hole, _) ->
@@ -203,8 +218,8 @@ functor
         if Interfaces.Set.mem interface state.dependence_graph.interfaces then (
           (*4*)
           let exceptions_caught_and_uncaught, species =
-            add_species parameters exceptions_caught_and_uncaught hole_handler species holeset
-              interface state.species
+            add_species parameters exceptions_caught_and_uncaught hole_handler
+              species holeset interface state.species
           in
           { state with species; exceptions_caught_and_uncaught }
         ) else (
@@ -217,17 +232,19 @@ functor
                 if n = 0 then
                   exceptions_caught_and_uncaught, graph
                 else
-                  add_dependence parameters exceptions_caught_and_uncaught hole interface graph)
+                  add_dependence parameters exceptions_caught_and_uncaught hole
+                    interface graph)
               interface_other
-              (exceptions_caught_and_uncaught, state.dependence_graph.dependences)
+              ( exceptions_caught_and_uncaught,
+                state.dependence_graph.dependences )
           in
           let exceptions_caught_and_uncaught, interfaces =
-            Interfaces.Set.add parameters exceptions_caught_and_uncaught interface
-              state.dependence_graph.interfaces
+            Interfaces.Set.add parameters exceptions_caught_and_uncaught
+              interface state.dependence_graph.interfaces
           in
           let exceptions_caught_and_uncaught, species =
-            add_species parameters exceptions_caught_and_uncaught hole_handler species holeset
-              interface state.species
+            add_species parameters exceptions_caught_and_uncaught hole_handler
+              species holeset interface state.species
           in
           {
             state with
@@ -271,22 +288,28 @@ functor
       in
       let output = old + delta in
       if output = 0 then
-        Puzzle_hole_map_and_set.Map.remove parameters exceptions_caught_and_uncaught x map
+        Puzzle_hole_map_and_set.Map.remove parameters
+          exceptions_caught_and_uncaught x map
       else
-        Puzzle_hole_map_and_set.Map.add parameters exceptions_caught_and_uncaught x output map
+        Puzzle_hole_map_and_set.Map.add parameters
+          exceptions_caught_and_uncaught x output map
 
     let init parameters hole_handler _print_handler empty_state
         linear_combination =
-      let exceptions_caught_and_uncaught = empty_state.exceptions_caught_and_uncaught in
+      let exceptions_caught_and_uncaught =
+        empty_state.exceptions_caught_and_uncaught
+      in
       List.fold_left
         (fun state (n, i) ->
           let exceptions_caught_and_uncaught, interface =
             hole_handler.interface_of_brick exceptions_caught_and_uncaught i
           in
           let exceptions_caught_and_uncaught, partition =
-            let rec aux list exceptions_caught_and_uncaught other self_other self =
+            let rec aux list exceptions_caught_and_uncaught other self_other
+                self =
               match list with
-              | [] -> exceptions_caught_and_uncaught, Some (other, self_other, self)
+              | [] ->
+                exceptions_caught_and_uncaught, Some (other, self_other, self)
               | (elt : E.puzzle_hole) :: tail ->
                 let exceptions_caught_and_uncaught, dual_other, can_self =
                   hole_handler.dual_and_self exceptions_caught_and_uncaught elt
@@ -305,9 +328,11 @@ functor
                   in
                   aux tail exceptions_caught_and_uncaught other self_other self
                 | true, true ->
-                  aux tail exceptions_caught_and_uncaught other (elt :: self_other) self)
+                  aux tail exceptions_caught_and_uncaught other
+                    (elt :: self_other) self)
             in
-            aux interface exceptions_caught_and_uncaught Puzzle_hole_map_and_set.Map.empty []
+            aux interface exceptions_caught_and_uncaught
+              Puzzle_hole_map_and_set.Map.empty []
               Puzzle_hole_map_and_set.Map.empty
           in
           match partition with
@@ -317,15 +342,20 @@ functor
               List.fold_left
                 (fun (exceptions_caught_and_uncaught, interface_list) elt ->
                   List.fold_left
-                    (fun (exceptions_caught_and_uncaught, list) (prefix1, prefix2) ->
+                    (fun (exceptions_caught_and_uncaught, list)
+                         (prefix1, prefix2) ->
                       let exceptions_caught_and_uncaught, sol1 =
-                        inc parameters exceptions_caught_and_uncaught elt 1 prefix1
+                        inc parameters exceptions_caught_and_uncaught elt 1
+                          prefix1
                       in
                       let exceptions_caught_and_uncaught, sol2 =
-                        inc parameters exceptions_caught_and_uncaught elt 1 prefix2
+                        inc parameters exceptions_caught_and_uncaught elt 1
+                          prefix2
                       in
-                      exceptions_caught_and_uncaught, (sol1, prefix2) :: (prefix1, sol2) :: list)
-                    (exceptions_caught_and_uncaught, []) interface_list)
+                      ( exceptions_caught_and_uncaught,
+                        (sol1, prefix2) :: (prefix1, sol2) :: list ))
+                    (exceptions_caught_and_uncaught, [])
+                    interface_list)
                 (exceptions_caught_and_uncaught, [ other, self ])
                 self_other
             in
@@ -353,13 +383,16 @@ functor
             abstract_species)
         state.species E.nil
 
-    let induction parameters exceptions_caught_and_uncaught hole_handler print_handler state =
+    let induction parameters exceptions_caught_and_uncaught hole_handler
+        print_handler state =
       let rec aux state =
         let _ = trace_state "Induction\n" " " print_handler state in
         match state.to_visit with
         | [] -> state
         | (hole, formula, forbidden, self) :: q ->
-          let exceptions_caught_and_uncaught, dual_list = hole_handler.dual exceptions_caught_and_uncaught hole in
+          let exceptions_caught_and_uncaught, dual_list =
+            hole_handler.dual exceptions_caught_and_uncaught hole
+          in
           let state = { state with exceptions_caught_and_uncaught } in
           let state, _ = remove_species parameters hole self state in
           let state = { state with to_visit = q } in
@@ -380,30 +413,33 @@ functor
                     | interface :: tail ->
                       (match
                          Interfaces.Map.find_option_without_logs parameters
-                           exceptions_caught_and_uncaught interface state.species
+                           exceptions_caught_and_uncaught interface
+                           state.species
                        with
                       | exceptions_caught_and_uncaught, None ->
                         aux3 tail { state with exceptions_caught_and_uncaught }
-                      | exceptions_caught_and_uncaught, Some (abstract_species_set, hole_set) ->
+                      | ( exceptions_caught_and_uncaught,
+                          Some (abstract_species_set, hole_set) ) ->
                         if
                           Puzzle_hole_map_and_set.Set.mem hole hole_set
                           || Puzzle_hole_map_and_set.Set.mem dual forbidden
                         then
-                          infinite_state parameters exceptions_caught_and_uncaught
+                          infinite_state parameters
+                            exceptions_caught_and_uncaught
                         else (
                           let new_abstract_species =
                             E.combine formula hole dual abstract_species_set
                           in
                           let exceptions_caught_and_uncaught, new_interface =
                             let exceptions_caught_and_uncaught, new_other =
-                              inc parameters exceptions_caught_and_uncaught dual (-1)
-                                (fst interface)
+                              inc parameters exceptions_caught_and_uncaught dual
+                                (-1) (fst interface)
                             in
                             let exceptions_caught_and_uncaught, new_self =
                               Puzzle_hole_map_and_set.Map.map2z parameters
                                 exceptions_caught_and_uncaught
-                                (fun _paramters exceptions_caught_and_uncaught x y ->
-                                  exceptions_caught_and_uncaught, x + y)
+                                (fun _paramters exceptions_caught_and_uncaught x
+                                     y -> exceptions_caught_and_uncaught, x + y)
                                 (snd interface) self
                             in
                             exceptions_caught_and_uncaught, (new_other, new_self)
@@ -430,8 +466,8 @@ functor
       in
       aux state
 
-    let count parameters exceptions_caught_and_uncaught kappa_handler hole_handler print_handler
-        linear_combination =
+    let count parameters exceptions_caught_and_uncaught kappa_handler
+        hole_handler print_handler linear_combination =
       let empty_state = empty_state exceptions_caught_and_uncaught in
       let print_handler =
         print_handler exceptions_caught_and_uncaught kappa_handler hole_handler
@@ -443,12 +479,14 @@ functor
       in
       let _ = trace_state "\nInitial state\n" " " print_handler init_state in
       let final_state =
-        induction parameters exceptions_caught_and_uncaught hole_handler print_handler init_state
+        induction parameters exceptions_caught_and_uncaught hole_handler
+          print_handler init_state
       in
       let _ = trace_state "\nFinal state\n" " " print_handler final_state in
       let sol = conclude final_state in
       let _ =
-        E.print exceptions_caught_and_uncaught kappa_handler stdout hole_handler.print_hole sol
+        E.print exceptions_caught_and_uncaught kappa_handler stdout
+          hole_handler.print_hole sol
       in
       sol
   end

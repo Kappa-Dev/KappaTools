@@ -482,8 +482,7 @@ let check_invariance_gen p ?trace ?fmt ?fmt_err ?env ~to_be_checked ~counter
       let id = LKappa_auto.RuleCache.int_of_hashed_list hash in
       if to_be_checked.(id) then (
         let (cache, counter, to_be_checked), b =
-          p ?trace ?fmt ?fmt_err ?env
-            ~agent_type ~site1 ~site2 rule ~correct
+          p ?trace ?fmt ?fmt_err ?env ~agent_type ~site1 ~site2 rule ~correct
             rates cache ~counter to_be_checked
         in
         if b then
@@ -495,7 +494,8 @@ let check_invariance_gen p ?trace ?fmt ?fmt_err ?env ~to_be_checked ~counter
   in
   aux hash_and_rule_list (cache, to_be_checked, counter)
 
-let check_invariance_internal_states ~correct ~rates ?trace ?fmt ?fmt_err ?env (hash_and_rule_list :
+let check_invariance_internal_states ~correct ~rates ?trace ?fmt ?fmt_err ?env
+    (hash_and_rule_list :
       (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list)
     (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen
@@ -503,17 +503,16 @@ let check_invariance_internal_states ~correct ~rates ?trace ?fmt ?fmt_err ?env (
     ?fmt_err ?env ~to_be_checked ~counter ~correct ~rates hash_and_rule_list
     cache agent_type site1 site2
 
-let check_invariance_binding_states ~correct ~rates ?trace ?fmt ?fmt_err ?env hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
+let check_invariance_binding_states ~correct ~rates ?trace ?fmt ?fmt_err ?env
+    hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen LKappa_group_action.check_orbit_binding_state_permutation
-    ?trace ?fmt ?fmt_err ?env
-    ~to_be_checked ~counter ~correct ~rates
+    ?trace ?fmt ?fmt_err ?env ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_both ~correct ~rates ?trace ?fmt ?fmt_err ?env
     hash_and_rule_list (cache, to_be_checked, counter) agent_type site1 site2 =
   check_invariance_gen LKappa_group_action.check_orbit_full_permutation ?trace
-    ?fmt ?fmt_err ?env
-    ~to_be_checked ~counter ~correct ~rates
+    ?fmt ?fmt_err ?env ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let print_symmetries_gen parameters env contact_map partitioned_contact_map
@@ -576,8 +575,8 @@ let initial_value_of_arrays cannonic_list arrays =
       ())
     cannonic_list
 
-let detect_symmetries ~parameters ~env
-    cache rate_convention chemical_species get_rules contact_map =
+let detect_symmetries ~parameters ~env cache rate_convention chemical_species
+    get_rules contact_map =
   (*-------------------------------------------------------------*)
   let trace = Some (Remanent_parameters.get_trace parameters) in
   let fmt =
@@ -635,8 +634,8 @@ let detect_symmetries ~parameters ~env
       (cache, to_be_checked, counter)
       (check_invariance_internal_states ?trace ?fmt ?fmt_err ~env ~correct
          ~rates hash_and_rule_list)
-      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~env ~correct
-         ~rates hash_and_rule_list)
+      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~env ~correct ~rates
+         hash_and_rule_list)
       (check_invariance_both ?trace ?fmt ?fmt_err ~env ~correct ~rates
          hash_and_rule_list)
       p'
@@ -657,8 +656,8 @@ let detect_symmetries ~parameters ~env
       (cache, to_be_checked_init, counter_init)
       (check_invariance_internal_states ?trace ?fmt ?fmt_err ~env ~correct
          ~rates hash_and_rule_list_init)
-      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~env ~correct
-         ~rates hash_and_rule_list_init)
+      (check_invariance_binding_states ?trace ?fmt ?fmt_err ~env ~correct ~rates
+         hash_and_rule_list_init)
       (check_invariance_both ?trace ?fmt ?fmt_err ~env ~correct ~rates
          hash_and_rule_list_init)
       refined_partitioned_contact_map_copy

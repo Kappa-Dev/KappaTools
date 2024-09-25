@@ -48,4 +48,5 @@ val compute_graph_scc :
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
   converted_contact_map ->
-  Exception.exceptions_caught_and_uncaught * Remanent_state.internal_scc_decomposition
+  Exception.exceptions_caught_and_uncaught
+  * Remanent_state.internal_scc_decomposition

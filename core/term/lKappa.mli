@@ -64,7 +64,6 @@ type rule = {
       (** If rule was written in edit style, else it's rewrite style *)
 }
 
-
 val agent_to_erased : Signature.s -> rule_agent -> rule_agent
 val to_erased : Signature.s -> rule_mixture -> rule_mixture
 val to_maintained : rule_mixture -> rule_mixture
@@ -129,7 +128,7 @@ val print_rule :
   noCounters:bool ->
   full:bool ->
   Signature.s ->
-  Counters_info.t -> 
+  Counters_info.t ->
   (Format.formatter -> int -> unit) ->
   (Format.formatter -> int -> unit) ->
   Format.formatter ->

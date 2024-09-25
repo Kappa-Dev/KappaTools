@@ -17,7 +17,7 @@
    these exceptions did not stop execution, so `uncaught` and `caught` may not
    be good naming here. `caught` here basically add a trace to uncaught info
    TODO: revamp/rename this?
-   *)
+*)
 
 type uncaught_exception
 

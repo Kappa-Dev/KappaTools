@@ -917,7 +917,8 @@ module Domain = struct
 
   (****************************************************************)
 
-  exception False of Exception.exceptions_caught_and_uncaught * dynamic_information
+  exception
+    False of Exception.exceptions_caught_and_uncaught * dynamic_information
 
   (****************************************************************)
   (*compute condition of bdu whether or not it is enable by doing the

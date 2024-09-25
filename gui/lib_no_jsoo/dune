@@ -2,16 +2,6 @@
  (name kappa_webapp_lib_no_jsoo)
  (inline_tests)
  (preprocess
-  (pps 
-    ppx_inline_test
-  ))
- (libraries 
-   unix
-   lwt_react
-   ppx_inline_test)
- (flags :standard -w +a-69
-  -open
-  Ppx_inline_test
- ))
-
-
+  (pps ppx_inline_test))
+ (libraries unix lwt_react ppx_inline_test)
+ (flags :standard -w +a-69 -open Ppx_inline_test))

@@ -5,7 +5,8 @@ val generic_zeroary :
   'd Mvbdu_sig.cell ->
   (int -> 'd Mvbdu_sig.mvbdu) ->
   'e ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('f * 'g * 'h * 'e) option) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('f * 'g * 'h * 'e) option) ->
   'e ->
   ('i ->
   'a * (('d Mvbdu_sig.mvbdu, 'd) Mvbdu_sig.precell, 'd) Mvbdu_sig.premvbdu) ->
@@ -505,7 +506,8 @@ val a :
   'h Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * ('a, 'b, 'd, 'f, 'g, 'h, 'i) Memo_sig.handler) ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * 'h Mvbdu_sig.mvbdu option) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * 'h Mvbdu_sig.mvbdu option) ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   'c ->
   'h Mvbdu_sig.mvbdu ->

@@ -46,7 +46,8 @@ let update_rate counter_var_values (k, a) =
     | _ :: _ ->
       raise
         (ExceptionDefn.Malformed_Decl
-           (Format.sprintf  "Counter variable %s appears twice in rule" s,Loc.dummy))
+           ( Format.sprintf "Counter variable %s appears twice in rule" s,
+             Loc.dummy ))
   in
 
   let rec update_bool_expr k =
@@ -218,8 +219,8 @@ let counters_signature s agents =
 (** [split_cvar_counter_in_rules_per_value var_name annot counter_delta counter_def] translates a counter CVAR whose value acts upon the rate expression into a rule per possible value, that are selected by a CEQ expression.
  * *)
 let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
-    (counter_delta : int Loc.annoted) (counter_def : Counters_info.counter_sig) :
-    (Ast.counter Ast.site * cvar_value list) list =
+    (counter_delta : int Loc.annoted) (counter_def : Counters_info.counter_sig)
+    : (Ast.counter Ast.site * cvar_value list) list =
   let (min_value, max_value) : int * int =
     match counter_def.counter_sig_min, counter_def.counter_sig_max with
     | Some (Some min_loc, _), Some (Some max_loc, _) -> min_loc, max_loc
@@ -275,43 +276,57 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
           counter_defs
       in
       let (min_value, max_value) : int * int =
-        match counter_def.Counters_info.counter_sig_min, counter_def.Counters_info.counter_sig_max with
+        match
+          ( counter_def.Counters_info.counter_sig_min,
+            counter_def.Counters_info.counter_sig_max )
+        with
         | Some (Some min_loc, _), Some (Some max_loc, _) -> min_loc, max_loc
         | (None | Some (None, _)), _ | _, (None | Some (None, _)) ->
           raise
             (ExceptionDefn.Malformed_Decl
-              ( "Invalid counter signature - have to specify min/max bound",
-                Loc.get_annot counter_def.Counters_info.counter_sig_name ))
+               ( "Invalid counter signature - have to specify min/max bound",
+                 Loc.get_annot counter_def.Counters_info.counter_sig_name ))
       in
       let delta = Loc.v c.Ast.counter_delta in
       (match c.counter_test with
       | Some (Ast.CEQ value, _) ->
-        if (delta > 0 || min_value <= value + delta)
+        if
+          (delta > 0 || min_value <= value + delta)
           && (delta < 0 || value + delta <= max_value)
         then
-            [ Ast.Counter c, [] ]
-        else
-          if (delta > 0 || min_value <= value + delta)
-          then
-            raise
-              (ExceptionDefn.Malformed_Decl
-                ( "Counter " ^ Loc.v c.counter_name ^ " becomes less than the   minimal value " ^ (string_of_int min_value),
-                  Loc.get_annot c.counter_name ))
-          else
+          [ Ast.Counter c, [] ]
+        else if delta > 0 || min_value <= value + delta then
           raise
             (ExceptionDefn.Malformed_Decl
-               ( "Counter " ^ Loc.v c.counter_name ^ " becomes greater than the maximal value " ^ (string_of_int max_value),
+               ( "Counter " ^ Loc.v c.counter_name
+                 ^ " becomes less than the   minimal value "
+                 ^ string_of_int min_value,
+                 Loc.get_annot c.counter_name ))
+        else
+          raise
+            (ExceptionDefn.Malformed_Decl
+               ( "Counter " ^ Loc.v c.counter_name
+                 ^ " becomes greater than the maximal value "
+                 ^ string_of_int max_value,
                  Loc.get_annot c.counter_name ))
       | Some (Ast.CLTE _value, _annot) ->
-        raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy "<= Should have been removed not implemented")) (* TODO NOW *)
+        raise
+          (ExceptionDefn.Internal_Error
+             (Loc.annot_with_dummy "<= Should have been removed not implemented"))
+        (* TODO NOW *)
       | Some (Ast.CGTE value, annot) ->
         if value + delta < min_value then
           raise
             (ExceptionDefn.Malformed_Decl
-               ( "Counter " ^ Loc.v c.counter_name ^ " becomes less than tha minimal value " ^ (string_of_int min_value),
+               ( "Counter " ^ Loc.v c.counter_name
+                 ^ " becomes less than tha minimal value "
+                 ^ string_of_int min_value,
                  Loc.get_annot c.counter_name ));
         if value = min_value then (
-          let error = "Counter " ^ Loc.v c.counter_name ^ "=>" ^ (string_of_int min_value) ^ "  always holds" in
+          let error =
+            "Counter " ^ Loc.v c.counter_name ^ "=>" ^ string_of_int min_value
+            ^ "  always holds"
+          in
           warning ~pos:annot (fun f -> Format.pp_print_string f error)
         );
         [ Ast.Counter c, [] ]
@@ -322,12 +337,16 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
       | None | Some (Ast.CVAR _, _) ->
         if delta < 0 then (
           let counter_delta : Ast.counter =
-            { c with counter_test = Some (Ast.CGTE (abs delta + min_value), Loc.dummy) }
+            {
+              c with
+              counter_test = Some (Ast.CGTE (abs delta + min_value), Loc.dummy);
+            }
           in
           [ Ast.Counter counter_delta, [] ]
         ) else
           [
-            ( Ast.Counter { c with counter_test = Some (Ast.CGTE min_value, Loc.dummy) },
+            ( Ast.Counter
+                { c with counter_test = Some (Ast.CGTE min_value, Loc.dummy) },
               [] );
           ])
   in
@@ -563,8 +582,9 @@ let raw_counter_agent (is_first, first_link) (is_last, last_link) i j sigs equal
     Raw_mixture.a_ints = internals;
   }
 
-let rec add_incr (i : int) (first_link : int) (last_link : int) (min_value : int) (delta : int)
-    (equal : bool) (sigs : Signature.s) : Raw_mixture.agent list =
+let rec add_incr (i : int) (first_link : int) (last_link : int)
+    (min_value : int) (delta : int) (equal : bool) (sigs : Signature.s) :
+    Raw_mixture.agent list =
   if i = delta then
     []
   else (
@@ -585,11 +605,11 @@ let rec link_incr (sigs : Signature.s) (i : int) (nb : int)
   if i = nb then
     []
   else (
-    let is_first = i = 0  in
+    let is_first = i = 0 in
     let is_last = i = nb - 1 in
     let ra_agent =
-      make_counter_agent sigs (is_first, ag_info) (is_last, equal) (link + i )
-        (link + i + 1 )
+      make_counter_agent sigs (is_first, ag_info) (is_last, equal) (link + i)
+        (link + i + 1)
         loc (delta > 0)
     in
     ra_agent :: link_incr sigs (i + 1) nb ag_info equal link loc min_value delta
@@ -597,7 +617,6 @@ let rec link_incr (sigs : Signature.s) (i : int) (nb : int)
 
 let rec erase_incr (sigs : Signature.s) (i : int) (incrs : LKappa.rule_mixture)
     (delta : int) (link : int) : LKappa.rule_mixture =
-
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b = fst counter_agent_info.ports in
   match incrs with
@@ -618,7 +637,8 @@ let rec erase_incr (sigs : Signature.s) (i : int) (incrs : LKappa.rule_mixture)
 (** Returns mixtures for agent with site changed from counter to port, as well as new [link_nb] after previous additions
  * Used by [compile_counter_in_rule_agent]*)
 let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
-    (port_id : int) (counter_def : Counters_info.counter_sig)  (counter : Ast.counter) (start_link_nb : int) :
+    (port_id : int) (counter_def : Counters_info.counter_sig)
+    (counter : Ast.counter) (start_link_nb : int) :
     (LKappa.rule_mixture * Raw_mixture.t) * int =
   (* Returns positive part of value *)
   let positive_part (i : int) : int =
@@ -638,7 +658,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
   in
   let loc : Loc.t = Loc.get_annot counter.Ast.counter_name in
   let (delta, loc_delta) : int * Loc.t = counter.Ast.counter_delta in
-    let counter_test : Ast.counter_test Loc.annoted =
+  let counter_test : Ast.counter_test Loc.annoted =
     Option_util.unsome_or_raise
       ~excep:
         (ExceptionDefn.Internal_Error
@@ -660,16 +680,23 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
              Loc.get_annot counter_test ))
     | Ast.CEQ j -> j, true
     | Ast.CGTE j -> j, false
-    | Ast.CLTE _j -> raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy  "PORT : <= should have been removed, not implemented")) (* TODO now *)
+    | Ast.CLTE _j ->
+      raise
+        (ExceptionDefn.Internal_Error
+           (Loc.annot_with_dummy
+              "PORT : <= should have been removed, not implemented"))
+    (* TODO now *)
   in
   let start_link_for_created : int = start_link_nb + (test - min_value + 1) in
-  let link_for_erased : int = start_link_nb + (abs delta) (*+ min_value*) in
+  let link_for_erased : int = start_link_nb + abs delta (*+ min_value*) in
   let ag_info : (int * int) * bool =
     (port_id, ra.LKappa.ra_type), ra.LKappa.ra_erased
   in
 
   let test_incr : LKappa.rule_mixture =
-    link_incr sigs 0 (test + 1 - min_value) ag_info equal start_link_nb loc min_value delta
+    link_incr sigs 0
+      (test + 1 - min_value)
+      ag_info equal start_link_nb loc min_value delta
   in
   let adjust_delta : LKappa.rule_mixture =
     if delta < 0 then
@@ -684,7 +711,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
       []
   in
 
-  if test + delta < min_value  then
+  if test + delta < min_value then
     raise
       (ExceptionDefn.Internal_Error
          ("Counter test + delta should be greater than min_value", loc_delta));
@@ -705,7 +732,9 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
   ra.LKappa.ra_ports.(port_id) <-
     ( (LKappa.LNK_VALUE (start_link_nb, (port_b, counter_agent_info.id)), loc),
       switch );
-  let new_link_nb : int = start_link_nb + 1 + test + positive_part delta - min_value in
+  let new_link_nb : int =
+    start_link_nb + 1 + test + positive_part delta - min_value
+  in
 
   (adjust_delta, created), new_link_nb
 
@@ -716,7 +745,7 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
    returns: agent with explicit counters; created incr agents;
             the next link number to use *)
 let compile_counter_in_rule_agent (sigs : Signature.s)
-    (counters_defs : Counters_info.counter_sig option Array.t )
+    (counters_defs : Counters_info.counter_sig option Array.t)
     (rule_agent_ : LKappa.rule_agent with_agent_counters) (lnk_nb : int) :
     LKappa.rule_mixture * Raw_mixture.t * int =
   let (incrs, lnk_nb') : (LKappa.rule_mixture * Raw_mixture.t) list * int =
@@ -724,26 +753,27 @@ let compile_counter_in_rule_agent (sigs : Signature.s)
       (fun id (acc_incrs, lnk_nb) -> function
         | None -> acc_incrs, lnk_nb
         | Some (counter, _) ->
-          begin
-            match counters_defs.(id) with
-              | None ->
-                  raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy  "SIGNATURE of COUNTERS IS NOT INITIALIZED"))
-              | Some counter_sig ->
-
-          (*let counter_defs = (Signature.get sigs rule_agent.ra_type) in*)
-          (*let counter_defs = (* TO DO *)
-           {
-            Counters_info.counter_sig_name =  Loc.annot_with_dummy "";
-            counter_sig_min = None;
-            counter_sig_max = None;
-            counter_sig_visible = Ast.From_original_ast;
-            counter_sig_default = 0;
-          } in*)
-          let new_incrs, new_lnk_nb =
-            counter_becomes_port sigs rule_agent_.agent id counter_sig counter lnk_nb
-          in
-          new_incrs :: acc_incrs, new_lnk_nb
-          end
+          (match counters_defs.(id) with
+          | None ->
+            raise
+              (ExceptionDefn.Internal_Error
+                 (Loc.annot_with_dummy
+                    "SIGNATURE of COUNTERS IS NOT INITIALIZED"))
+          | Some counter_sig ->
+            (*let counter_defs = (Signature.get sigs rule_agent.ra_type) in*)
+            (*let counter_defs = (* TO DO *)
+               {
+                Counters_info.counter_sig_name =  Loc.annot_with_dummy "";
+                counter_sig_min = None;
+                counter_sig_max = None;
+                counter_sig_visible = Ast.From_original_ast;
+                counter_sig_default = 0;
+              } in*)
+            let new_incrs, new_lnk_nb =
+              counter_becomes_port sigs rule_agent_.agent id counter_sig counter
+                lnk_nb
+            in
+            new_incrs :: acc_incrs, new_lnk_nb)
         (* JF: link ids were colliding after counter decrementations -> I do not think that we should add delta when negative *))
       ([], lnk_nb) rule_agent_.counters
   in
@@ -753,7 +783,8 @@ let compile_counter_in_rule_agent (sigs : Signature.s)
   als, bls, lnk_nb'
 
 (** Compiles the counter value change in the right hand side of a rule into dummy chain changes *)
-let compile_counter_in_raw_agent (sigs : Signature.s) (counters_info: Counters_info.t)
+let compile_counter_in_raw_agent (sigs : Signature.s)
+    (counters_info : Counters_info.t)
     (raw_agent_ : Raw_mixture.agent with_agent_counters) (lnk_nb : int) :
     Raw_mixture.agent list * int =
   let raw_agent : Raw_mixture.agent = raw_agent_.agent in
@@ -772,29 +803,42 @@ let compile_counter_in_raw_agent (sigs : Signature.s) (counters_info: Counters_i
           LKappa.raise_not_enough_specified ~status:"counter" ~side:"left"
             agent_name c.Ast.counter_name
         | Some (test, _) ->
-          (let agent_name =
-                  Format.asprintf "@[%a@]"
-                          (Signature.print_agent sigs)
-                          raw_agent.Raw_mixture.a_type
-           in
-           let counter_name = Format.sprintf "@[%s@]" (Loc.v c.Ast.counter_name) in
-            match test with
+          let agent_name =
+            Format.asprintf "@[%a@]"
+              (Signature.print_agent sigs)
+              raw_agent.Raw_mixture.a_type
+          in
+          let counter_name =
+            Format.sprintf "@[%s@]" (Loc.v c.Ast.counter_name)
+          in
+          (match test with
           | Ast.CGTE _ | Ast.CLTE _ | Ast.CVAR _ ->
             LKappa.raise_not_enough_specified ~status:"counter" ~side:"left"
               agent_name c.Ast.counter_name
           | Ast.CEQ j ->
             let p = Raw_mixture.VAL lnk_nb in
             let () = ports.(port_id) <- p in
-            let counter_sig = Counters_info.get_counter_sig sigs counters_info  raw_agent.Raw_mixture.a_type port_id in
+            let counter_sig =
+              Counters_info.get_counter_sig sigs counters_info
+                raw_agent.Raw_mixture.a_type port_id
+            in
             let min_value =
-                match counter_sig.Counters_info.counter_sig_min with
-                  | None | Some (None, _) ->
-                    raise (ExceptionDefn.Internal_Error (Loc.annot_with_dummy (Format.asprintf "Counter %s of agent %s should have a lower bound" counter_name agent_name)))
-                  | Some (Some min_value,_) -> min_value
+              match counter_sig.Counters_info.counter_sig_min with
+              | None | Some (None, _) ->
+                raise
+                  (ExceptionDefn.Internal_Error
+                     (Loc.annot_with_dummy
+                        (Format.asprintf
+                           "Counter %s of agent %s should have a lower bound"
+                           counter_name agent_name)))
+              | Some (Some min_value, _) -> min_value
             in
             let corrected_j = j - min_value in
             let final_lnk_nb = lnk_nb + corrected_j in
-            let incrs = add_incr 0 lnk_nb final_lnk_nb  min_value (corrected_j + 1) true sigs in
+            let incrs =
+              add_incr 0 lnk_nb final_lnk_nb min_value (corrected_j + 1) true
+                sigs
+            in
             acc @ incrs, final_lnk_nb + 1)))
     ([], lnk_nb) raw_agent_.counters
 
@@ -895,17 +939,20 @@ let rule_agent_with_max_counter sigs c ((agent_name, loc_ag) as agent_type) :
   in
   let max_val' = max_val + 1 in
   let min_value =
-      match c.Counters_info.counter_sig_min with
-      | Some (Some min, _) -> min
-      | None | Some (None, _) ->
-        raise
-          (ExceptionDefn.Internal_Error
-             ( "Counter " ^ fst c_na ^ " in " ^ agent_name
-               ^ " should have a lower bound",
-               loc_ag ))
+    match c.Counters_info.counter_sig_min with
+    | Some (Some min, _) -> min
+    | None | Some (None, _) ->
+      raise
+        (ExceptionDefn.Internal_Error
+           ( "Counter " ^ fst c_na ^ " in " ^ agent_name
+             ^ " should have a lower bound",
+             loc_ag ))
   in
   let incrs =
-    link_incr sigs 0 (max_val' + 1 - min_value) ((c_id, ag_id), false) false 1 loc min_value (-1)
+    link_incr sigs 0
+      (max_val' + 1 - min_value)
+      ((c_id, ag_id), false)
+      false 1 loc min_value (-1)
   in
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b = fst counter_agent_info.ports in
@@ -1107,7 +1154,7 @@ let annotate_created_counters sigs ((agent_name, _) as agent_type) counter_list
       match Signature.counter_of_site_id port_id agent_signature with
       | Some counter_info ->
         let counter_name = Signature.site_of_num port_id agent_signature in
-          (try
+        (try
            (* find counter matching port *)
            let c : Ast.counter =
              List.find

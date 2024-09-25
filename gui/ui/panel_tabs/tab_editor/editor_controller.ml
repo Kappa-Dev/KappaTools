@@ -8,8 +8,7 @@
 
 open Lwt.Infix
 
-let with_file (handler : (string * string) Api.result -> unit Api.lwt_result)
-    =
+let with_file (handler : (string * string) Api.result -> unit Api.lwt_result) =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__ (State_file.get_file () >>= handler) >>= fun _ ->
       Lwt.return_unit)

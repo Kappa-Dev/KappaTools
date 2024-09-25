@@ -15,11 +15,10 @@
 
 let local_trace = false
 
-let do_print ?trace ?fmt ?env  f =
-  match (local_trace, trace), fmt, env  with
+let do_print ?trace ?fmt ?env f =
+  match (local_trace, trace), fmt, env with
   | (true, _ | _, Some true), Some fmt, Some env -> f env fmt
-  | (false, (Some false | None)), _, _
-  | _, None, _ | _, _, None  -> ()
+  | (false, (Some false | None)), _, _ | _, None, _ | _, _, None -> ()
 
 let binding_equal ((a_t, _), a_m) ((b_t, _), b_m) = a_t = b_t && a_m = b_m
 
@@ -193,9 +192,7 @@ let for_all_elt_permutation ~fmt_err ~env (positions : int list)
       let rule_tail = shift ~fmt_err ~env rule_tail in
       next ~fmt_err ~env (agent_id + 1) rule_tail pos_id positions_tail accu
     | pos_head :: pos_tail when agent_id = pos_head ->
-      (match
-         apply_head_predicate ~fmt_err ~env f f_raw accu rule_tail rule
-       with
+      (match apply_head_predicate ~fmt_err ~env f f_raw accu rule_tail rule with
       | accu, false -> accu, false
       | accu, true ->
         let rule_tail = shift ~fmt_err ~env rule_tail in
@@ -253,7 +250,8 @@ let for_all_over_orbit ~trace ~fmt ~fmt_err ~env (positions : int list)
             0 positions accu
         else (
           let () =
-            backtrack ~fmt_err ~env sigma_inv sigma_raw_inv counter positions rule
+            backtrack ~fmt_err ~env sigma_inv sigma_raw_inv counter positions
+              rule
           in
           accu, false
         )
@@ -621,7 +619,8 @@ let check_orbit ~trace ~fmt ~fmt_err ~env
 let weight ~correct ~card_stabilizer ~rate =
   Affine_combinations.div_scal rate (correct * card_stabilizer)
 
-let check_orbit_internal_state_permutation ?trace ?fmt ?fmt_err ?env  ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked =
+let check_orbit_internal_state_permutation ?trace ?fmt ?fmt_err ?env ~agent_type
+    ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked =
   check_orbit ~trace ~fmt ~fmt_err ~env
     ( potential_positions_for_swapping_internal_states,
       swap_internal_state_regular,
@@ -640,7 +639,8 @@ let check_orbit_binding_state_permutation ?trace ?fmt ?fmt_err ?env ~agent_type
       swap_binding_state_created )
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
-let check_orbit_full_permutation ?trace ?fmt ?fmt_err ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked =
+let check_orbit_full_permutation ?trace ?fmt ?fmt_err ?env ~agent_type ~site1
+    ~site2 rule ~correct rates cache ~counter to_be_checked =
   check_orbit ~trace ~fmt ~fmt_err ~env
     ( potential_positions_for_swapping_full,
       swap_full_regular,

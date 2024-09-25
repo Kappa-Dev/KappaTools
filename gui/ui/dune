@@ -2,7 +2,7 @@
 
 (library
  (name kappa_webapp_ui)
- (libraries 
+ (libraries
   js_of_ocaml-tyxml
   lwt_react
   kappa_webapp_lib
@@ -43,6 +43,5 @@
    Kappa_logging
    -open
    Kappa_cflow
-   -open 
-   Kappa_webapp_state
-   )))
+   -open
+   Kappa_webapp_state)))

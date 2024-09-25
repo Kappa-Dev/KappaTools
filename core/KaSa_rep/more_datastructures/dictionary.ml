@@ -37,7 +37,8 @@ module type Dictionary = sig
     'a ->
     (key -> 'b) ->
     ('a, 'b) dictionary ->
-    Exception.exceptions_caught_and_uncaught * (key * 'a * 'b * ('a, 'b) dictionary) option
+    Exception.exceptions_caught_and_uncaught
+    * (key * 'a * 'b * ('a, 'b) dictionary) option
 
   val allocate_uniquely :
     Remanent_parameters_sig.parameters ->
@@ -47,7 +48,8 @@ module type Dictionary = sig
     'a ->
     (key -> 'b) ->
     ('a, 'b) dictionary ->
-    Exception.exceptions_caught_and_uncaught * (key * 'a * 'b * ('a, 'b) dictionary) option
+    Exception.exceptions_caught_and_uncaught
+    * (key * 'a * 'b * ('a, 'b) dictionary) option
 
   (*  val allocate_f_id: Exception.exceptions_caught_and_uncaught -> ('a -> 'a -> int) -> value -> (int -> 'a) -> 'a dictionary -> Exception.exceptions_caught_and_uncaught * (int * 'a * 'a dictionary) option*)
   val allocate_bool :
@@ -68,7 +70,8 @@ module type Dictionary = sig
     'a ->
     (key -> 'b) ->
     ('a, 'b) dictionary ->
-    Exception.exceptions_caught_and_uncaught * (key * 'a * 'b * ('a, 'b) dictionary)
+    Exception.exceptions_caught_and_uncaught
+    * (key * 'a * 'b * ('a, 'b) dictionary)
 
   val translate :
     Remanent_parameters_sig.parameters ->

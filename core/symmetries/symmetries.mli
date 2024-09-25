@@ -54,7 +54,9 @@ val detect_symmetries :
 
 val print_symmetries :
   parameters:Remanent_parameters_sig.parameters ->
-  env:Model.t -> symmetries -> unit
+  env:Model.t ->
+  symmetries ->
+  unit
 
 type cache
 
