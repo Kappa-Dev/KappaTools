@@ -1,6 +1,25 @@
 name: ci
 on: [push]
 jobs:
+  lint-ocamlformat:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.14.x
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          opam depext --install --yes dune
+          opam install --yes ocamlformat=0.26.2
+      - name: Run format check
+        run: |
+          # needs `opam exec --` as `dune` is not in the shell PATH
+          opam exec -- dune fmt --preview
+
   install-ubuntu:
     runs-on: ubuntu-22.04
     strategy:
