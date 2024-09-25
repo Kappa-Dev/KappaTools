@@ -32,7 +32,7 @@ endif
 .PHONY: all agents clean check build-tests doc clean_doc debug
 .PHONY: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 .PHONY: profiling kappalib install-lib
-.PHONY: Kappapp Kappapp.tar.gz KappaBin KappaBin.zip Kappapp.app
+.PHONY: Kappapp Kappapp.tar.gz KappappWin KappappWin.zip Kappapp.app
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
@@ -171,6 +171,7 @@ build/Kappapp:
 	mkdir build/Kappapp/resources/bin
 	cp _build/install/default/bin/* build/Kappapp/resources/bin/
 
+## Electron build for linux
 Kappapp:
 	# make clean before to be sure things are rebuilt   TODO improve?
 	+$(MAKE) clean
@@ -182,35 +183,36 @@ build/Kappapp.tar.gz: build/Kappapp
 
 Kappapp.tar.gz: build/Kappapp.tar.gz
 
-build/KappaBin:
-	mkdir -p build/KappaBin
+build/KappappWin:
+	mkdir -p build/KappappWin
 	+$(MAKE) APP_EXT=local build/site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	FILE=$$(mktemp -t electronXXXX); \
 	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
-	unzip $$FILE -d build/KappaBin
-	mv build/site build/KappaBin/resources/app
-	mv build/KappaBin/electron.exe build/KappaBin/Kappapp.exe
-	mkdir build/KappaBin/resources/bin
-	cp _build/default/core/main/KaSim.exe build/KappaBin/resources/bin/
-	cp _build/default/core/KaSa_rep/main/KaSa.exe build/KappaBin/resources/bin/
-	cp _build/default/core/agents/KaStor.exe build/KappaBin/resources/bin/
-	cp _build/default/core/odes/KaDE.exe build/KappaBin/resources/bin/
-	cp _build/default/core/agents/KappaSwitchman.exe build/KappaBin/resources/bin/
-	cp _build/default/core/agents/KaMoHa.exe build/KappaBin/resources/bin/
-	cp _build/default/core/agents/KaSimAgent.exe build/KappaBin/resources/bin/
-	cp _build/default/core/agents/KaSaAgent.exe build/KappaBin/resources/bin/
+	unzip $$FILE -d build/KappappWin
+	mv build/site build/KappappWin/resources/app
+	mv build/KappappWin/electron.exe build/KappappWin/Kappapp.exe
+	mkdir build/KappappWin/resources/bin
+	cp _build/default/core/main/KaSim.exe build/KappappWin/resources/bin/
+	cp _build/default/core/KaSa_rep/main/KaSa.exe build/KappappWin/resources/bin/
+	cp _build/default/core/agents/KaStor.exe build/KappappWin/resources/bin/
+	cp _build/default/core/odes/KaDE.exe build/KappappWin/resources/bin/
+	cp _build/default/core/agents/KappaSwitchman.exe build/KappappWin/resources/bin/
+	cp _build/default/core/agents/KaMoHa.exe build/KappappWin/resources/bin/
+	cp _build/default/core/agents/KaSimAgent.exe build/KappappWin/resources/bin/
+	cp _build/default/core/agents/KaSaAgent.exe build/KappappWin/resources/bin/
 
-KappaBin:
+## Electron build for windows
+KappappWin:
 	# make clean before to be sure things are rebuilt   TODO improve?
 	+$(MAKE) clean
-	+$(MAKE) build/KappaBin
+	+$(MAKE) build/KappappWin
 
-build/KappaBin.zip: build/KappaBin
-	zip -y -r $@ build/KappaBin
-	rm -rf build/KappaBin
+build/KappappWin.zip: build/KappappWin
+	zip -y -r $@ build/KappappWin
+	rm -rf build/KappappWin
 
-KappaBin.zip: build/KappaBin.zip
+KappappWin.zip: build/KappappWin.zip
 
 build/Kappapp.app: build/Info.plist build/Kappa.icns
 	# do not call make clean here or deps will be erased
@@ -227,6 +229,7 @@ build/Kappapp.app: build/Info.plist build/Kappa.icns
 	mv build/Kappa.icns $@/Contents/Resources/
 	mv build/Info.plist $@/Contents/
 
+# Electron build for MacOS 10.15 
 Kappapp.app:
 	# make clean before to be sure things are rebuilt   TODO improve?
 	+$(MAKE) clean
@@ -254,3 +257,11 @@ build/Kappa.iconset: gui/resources/Kappa-Logo.png
 build/Kappa.icns: build/Kappa.iconset
 	mkdir -p build
 	iconutil -c icns $<
+
+.PHONY: Kappapp_for_linux Kappapp_for_macos10.15 Kappapp_for_windows
+
+Kappapp_for_linux: Kappapp
+
+Kappapp_for_macos10.15: Kappapp.app
+
+Kappapp_for_windows: KappappWin
