@@ -10,6 +10,7 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.14.x
+          dune-cache: true
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -20,7 +21,7 @@ jobs:
           # needs `opam exec --` as `dune` is not in the shell PATH
           opam exec -- dune fmt --preview
 
-  install-ubuntu:
+  cli-and-doc:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -38,6 +39,7 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          dune-cache: true
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -72,6 +74,7 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.13.x
+          dune-cache: true
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -91,7 +94,7 @@ jobs:
       - name: Nose tests
         run: opam exec -- nosetests -v tests/kappy
 
-  js:
+  webapp-ubuntu:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -100,6 +103,7 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.13.x
+          dune-cache: true
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -107,8 +111,7 @@ jobs:
             poppler-utils graphviz texlive-latex-recommended \
             texlive-fonts-recommended texlive-pictures tex4ht
       - name: Install OPAM dependencies
-        run: |
-          opam install --yes . --deps-only
+        run: opam install --yes . --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Javascript app
@@ -126,7 +129,7 @@ jobs:
             viz
             Kappapp.tar.gz
 
-  macos:
+  webapp-macos:
     runs-on: macos-13
     steps:
       - name: Checkout
@@ -135,9 +138,9 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.13.x
+          dune-cache: true
       - name: Install OPAM dependencies
-        run: |
-          opam install --yes . --deps-only
+        run: opam install --yes . --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make MacOS app
@@ -154,10 +157,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: |
-            Kappapp.app.zip
+          path: Kappapp.app.zip
 
-  windows:
+  webapp-windows:
     runs-on: windows-2022
     steps:
       - name: Checkout
@@ -166,29 +168,31 @@ jobs:
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 4.14.x
+          dune-cache: true
       - name: Install OPAM dependencies
-        run: |
-          opam install --yes . --deps-only
+        run: opam install --yes . --deps-only
       - name: Make Kappa
         run: opam exec -- make all
       - name: Make Windows app
         run: |
-          opam exec -- make KappaBin
+          opam exec -- make KappappWin
           # Note: This runs powershell thus the different path syntax
-          mv .\build\KappaBin .
+          mv .\build\KappappWin .
           # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
-          7z a -tzip KappaBin.zip KappaBin
+          7z a -tzip KappappWin.zip KappappWin
       - name: Archive Windows app
         uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: |
-            KappaBin.zip
+          path: KappappWin.zip
 
-  deploy-docs:
-    needs: install-ubuntu
-    runs-on: ubuntu-22.04
+  deploy:
+    needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows]
     if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        deploy-name: [doc, online-ui, linux, macos, windows]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -201,58 +205,13 @@ jobs:
         with:
           key: ${{ secrets.DEPLOY_KEY }}
           known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
-      - run: dev/update-web.sh native
+      - run: dev/upload-website.sh ${{matrix.deploy-name}}
 
-  deploy-js:
-    needs: js
-    runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download js artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: js
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.DEPLOY_KEY }}
-          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
-      - run: dev/update-web.sh js
-
-  deploy-macos:
-    needs: macos
-    runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download MacOS artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: macos
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.DEPLOY_KEY }}
-          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
-      - run: dev/update-web.sh MacOS
-
-  deploy-windows:
-    needs: windows
-    runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: windows
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.DEPLOY_KEY }}
-          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
-      - run: dev/update-web.sh windows
+# TODO: see if add cache        
+#       # from https://github.com/hazelgrove/hazel/blob/868f673119827a35ec67fad5e7e0d5135ce91d4c/.github/workflows/deploy_branches.yml#L19-L29
+#       - name: Retrieve the switch environment if cached
+#         id: opam-cache-switch
+#         uses: actions/cache@v4
+#         with:
+#           path: '_opam'
+#           key: ${{ runner.os }}-opam-${{ env.cache-name }}-${{ matrix.ocaml-compiler }}-${{ matrix.additional-packages}}-${{ hashFiles('*.opam') }}

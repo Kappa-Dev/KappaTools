@@ -12,7 +12,7 @@ empty_or_create ()
 PLAYGROUND=$(mktemp -d -t kappaXXXX)
 git clone --depth 10 --quiet -b master git@github.com:Kappa-Dev/Kappa-Dev.github.io.git ${PLAYGROUND}
 case $1 in
-    native )
+    doc )
         empty_or_create ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}
         cp man/*.htm man/*.css ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/
 	cp man/KaSim_manual.pdf ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}.pdf
@@ -29,7 +29,7 @@ case $1 in
         scp -r \
             ${PLAYGROUND}/docs travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         ;;
-    js )
+    online-ui )
         empty_or_create ${PLAYGROUND}/try
         cp site/* ${PLAYGROUND}/try/
 	sed '/<\/head>/i \
@@ -51,30 +51,32 @@ case $1 in
         ' site/index.html > ${PLAYGROUND}/try/index.html
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
+
+        # Upload /viz interface alongside /try
         empty_or_create ${PLAYGROUND}/viz
         cp viz/* ${PLAYGROUND}/viz/
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/viz travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
+        ;;
+    linux )
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
-        cp Kappapp.tar.gz ${PLAYGROUND}/binaries/
-        scp ${PLAYGROUND}/binaries/Kappapp.tar.gz \
+        cp Kappapp.tar.gz ${PLAYGROUND}/binaries/Kappapp_linux.tar.gz
+        scp ${PLAYGROUND}/binaries/Kappapp_linux.tar.gz \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
-        ;;
-    python )
-        ;;
-    '' )
         ;;
     windows )
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
-        cp KappaBin.zip ${PLAYGROUND}/binaries/
-        scp ${PLAYGROUND}/binaries/KappaBin.zip \
+        cp KappappWin.zip ${PLAYGROUND}/binaries/Kappapp_windows.zip
+        scp ${PLAYGROUND}/binaries/Kappapp_windows.zip \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
         ;;
-    MacOS )
+    macos )
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
-        cp Kappapp.app.zip ${PLAYGROUND}/binaries/
-        scp ${PLAYGROUND}/binaries/Kappapp.app.zip \
+        cp Kappapp.app.zip ${PLAYGROUND}/binaries/Kappapp_macos10.15.app.zip
+        scp ${PLAYGROUND}/binaries/Kappapp_macos10.15.app.zip \
             travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
+        ;;
+    '' )
         ;;
 esac
 COMMITNAME=$(git show --pretty=oneline -s --no-color)
