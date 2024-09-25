@@ -177,8 +177,8 @@ let print_handler parameters error handler =
   in
   error
 
-let dot_of_contact_map ?loggers parameters (error : Exception.exceptions_caught_and_uncaught)
-    handler =
+let dot_of_contact_map ?loggers parameters
+    (error : Exception.exceptions_caught_and_uncaught) handler =
   let parameters_dot =
     match loggers with
     | None -> Remanent_parameters.open_contact_map_file parameters
@@ -393,8 +393,8 @@ let print_list_of_lines parameters list =
       ())
     list
 
-let gexf_of_contact_map ?loggers parameters (error : Exception.exceptions_caught_and_uncaught)
-    handler =
+let gexf_of_contact_map ?loggers parameters
+    (error : Exception.exceptions_caught_and_uncaught) handler =
   let parameters_gexf =
     match loggers with
     | None -> Remanent_parameters.open_contact_map_file parameters

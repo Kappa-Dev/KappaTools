@@ -324,7 +324,8 @@ let get_agent_close_symbol parameter =
     "%s"
     (Remanent_parameters.get_agent_close_symbol parameter)
 
-let rec print_alg parameter (error : Exception.exceptions_caught_and_uncaught) alg =
+let rec print_alg parameter (error : Exception.exceptions_caught_and_uncaught)
+    alg =
   match alg with
   | Alg_expr.BIN_ALG_OP (op, (alg1, _), (alg2, _)) ->
     let () = get_agent_open_symbol parameter in
@@ -395,7 +396,8 @@ let rec print_alg parameter (error : Exception.exceptions_caught_and_uncaught) a
     let () = get_agent_close_symbol parameter in
     error
 
-and print_bool parameter (error : Exception.exceptions_caught_and_uncaught) = function
+and print_bool parameter (error : Exception.exceptions_caught_and_uncaught) =
+  function
   | Alg_expr.TRUE, _ ->
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameter) "[true]"

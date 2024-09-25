@@ -28,4 +28,3 @@ let pp_exception f = function
   | Failure x -> Format.fprintf f "Failure(%s)" x
   | Stack_overflow -> Format.pp_print_string f "Stack_overflow"
   | exc -> Format.pp_print_string f (Printexc.to_string exc)
-

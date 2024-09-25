@@ -100,12 +100,8 @@ module Pattern = struct
 
   let print_cc ?(full_species = false) ?domain ?cc_id ~noCounters ~with_id
       ?(symbol_table = Symbol_table.symbol_table_V4) f cc =
-    let sigs =
-      Tools.map_opt Pattern.Env.signatures domain
-    in
-    let counters_info =
-      Tools.map_opt Pattern.Env.counters_info domain
-    in
+    let sigs = Tools.map_opt Pattern.Env.signatures domain in
+    let counters_info = Tools.map_opt Pattern.Env.counters_info domain in
     let print_intf ((ag_i, ag_t) as ag) link_ids neigh =
       snd
         (Tools.array_fold_lefti
@@ -149,12 +145,14 @@ module Pattern = struct
                    Signature.is_counter_agent sigs dst_ty && not noCounters
                then (
                  let counter_sig =
-                    match sigs, counters_info with
-                    | Some sigs, Some counters_info ->
-                      Counters_info.get_counter_sig sigs counters_info ag_t p
-                  | None, _ | _,None -> assert false
+                   match sigs, counters_info with
+                   | Some sigs, Some counters_info ->
+                     Counters_info.get_counter_sig sigs counters_info ag_t p
+                   | None, _ | _, None -> assert false
                  in
-                 let counter = Pattern.counter_value_cc sigs counter_sig cc (dst_a, dst_p) in
+                 let counter =
+                   Pattern.counter_value_cc sigs counter_sig cc (dst_a, dst_p)
+                 in
                  let () = Format.fprintf f "{=%d}" counter in
                  (* to do: add symbols in symbol table for counters *)
                  true, out
@@ -219,9 +217,7 @@ module Pattern = struct
         else
           None
       in
-      print_cc
-        ?domain
-        ?cc_id ~noCounters ~with_id ~symbol_table f
+      print_cc ?domain ?cc_id ~noCounters ~with_id ~symbol_table f
         (Pattern.Env.content (Pattern.Env.get env id))
 end
 

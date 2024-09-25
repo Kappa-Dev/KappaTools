@@ -40,7 +40,10 @@ val add_entry :
   * ('a * 'b * 'c) list Ckappa_sig.Agent_id_map_and_set.Map.t
 
 val map_with_pos :
-  ('a -> 'b -> 'c -> Exception_without_parameter.exceptions_caught_and_uncaught * 'e) ->
+  ('a ->
+  'b ->
+  'c ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'e) ->
   'a ->
   'b ->
   'c * 'f ->
@@ -52,7 +55,8 @@ val alg_map :
   Exception_without_parameter.exceptions_caught_and_uncaught * 'c) ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('b, 'd) Alg_expr.e ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('c, 'd) Alg_expr.e
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('c, 'd) Alg_expr.e
 
 val bool_map :
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -60,7 +64,8 @@ val bool_map :
   Exception_without_parameter.exceptions_caught_and_uncaught * 'c) ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('b, 'd) Alg_expr.bool ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('c, 'd) Alg_expr.bool
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('c, 'd) Alg_expr.bool
 
 val with_option_map :
   ('a ->

@@ -191,7 +191,8 @@ let fold_over_potential_partners parameters error precondition agent_type site f
 
 let overwrite_potential_partners_map
     (_parameters : Remanent_parameters_sig.parameters)
-    (error : Exception.exceptions_caught_and_uncaught) precondition f (fold : prefold) =
+    (error : Exception.exceptions_caught_and_uncaught) precondition f
+    (fold : prefold) =
   ( error,
     {
       precondition with

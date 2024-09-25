@@ -147,7 +147,8 @@ type unary_memoized_fun =
     variables_list_dic,
     Exception.exceptions_caught_and_uncaught ->
     bool ->
-    Exception.exceptions_caught_and_uncaught * (bool Mvbdu_sig.mvbdu, bool) Mvbdu_sig.premvbdu,
+    Exception.exceptions_caught_and_uncaught
+    * (bool Mvbdu_sig.mvbdu, bool) Mvbdu_sig.premvbdu,
     memo_tables,
     memo_tables,
     int )
@@ -1392,7 +1393,8 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
         },
         output ) )
 
-let print_boolean_mvbdu parameters (error : Exception.exceptions_caught_and_uncaught) =
+let print_boolean_mvbdu parameters
+    (error : Exception.exceptions_caught_and_uncaught) =
   Mvbdu_core.print_mvbdu error
     (fun error parameters a ->
       let _ =
@@ -1518,7 +1520,8 @@ let print_gen log parameters error (title, print_hash, l) =
       print_hash (Remanent_parameters.update_prefix parameters pref) error x)
     error l
 
-let print_memo (error : Exception.exceptions_caught_and_uncaught) handler parameters =
+let print_memo (error : Exception.exceptions_caught_and_uncaught) handler
+    parameters =
   let error, l1, l2, l3, l4, l5, l6, l7, l8, l9 = split_memo error handler in
   let () =
     Loggers.fprintf

@@ -148,16 +148,16 @@ let print_rule_link sigs ~show_erased ~ltypes f ((e, _), s) =
     s
 
 let print_counter_test f = function
-  | c, min_value, true, _convert -> Format.fprintf f "=%i" ((*Counters_info.apply_origin_to_value convert*) (c+min_value) )
+  | c, min_value, true, _convert ->
+    Format.fprintf f "=%i"
+      ((*Counters_info.apply_origin_to_value convert*) c + min_value)
   | c, min_value, false, convert ->
-  let i = ((*Counters_info.apply_origin_to_value convert*) (c+min_value)) in
-  match convert with
-      | Counters_info.From_original_ast ->
-        Format.fprintf f ">=%i" i
-      | Counters_info.From_clte_elimination x ->
-        match x.Counters_info.convert_value with
-          | Counters_info.BASIS_MINUS_INPUT _ ->
-            Format.fprintf f ">=%i" i
+    let i = (*Counters_info.apply_origin_to_value convert*) c + min_value in
+    (match convert with
+    | Counters_info.From_original_ast -> Format.fprintf f ">=%i" i
+    | Counters_info.From_clte_elimination x ->
+      (match x.Counters_info.convert_value with
+      | Counters_info.BASIS_MINUS_INPUT _ -> Format.fprintf f ">=%i" i))
 
 let print_counter_delta counters _convert j f switch =
   match switch with
@@ -201,18 +201,22 @@ let print_rule_intf ~noCounters sigs counters_info ~show_erased ~ltypes ag_ty f
                in
                if is_counter' && not noCounters then (
                  let counter_sig =
-                     Counters_info.get_counter_sig sigs
-                        counters_info ag_ty i
+                   Counters_info.get_counter_sig sigs counters_info ag_ty i
                  in
                  let min_value =
-                    match counter_sig.Counters_info.counter_sig_min with
-                      | None | Some (None, _) ->
-                        let msg =
-                          Format.asprintf
-                            "Counter %a in agent %a should have a lower bound" (Signature.print_site sigs ag_ty) i
-                            (Signature.print_agent sigs) ag_ty
-                        in raise (ExceptionDefn.Syntax_Error (Loc.annot_with_dummy msg))
-                      | Some (Some min_value,_) -> min_value
+                   match counter_sig.Counters_info.counter_sig_min with
+                   | None | Some (None, _) ->
+                     let msg =
+                       Format.asprintf
+                         "Counter %a in agent %a should have a lower bound"
+                         (Signature.print_site sigs ag_ty)
+                         i
+                         (Signature.print_agent sigs)
+                         ag_ty
+                     in
+                     raise
+                       (ExceptionDefn.Syntax_Error (Loc.annot_with_dummy msg))
+                   | Some (Some min_value, _) -> min_value
                  in
                  Format.fprintf f "%t%a{%a%a}"
                    (if empty then
@@ -221,8 +225,12 @@ let print_rule_intf ~noCounters sigs counters_info ~show_erased ~ltypes ag_ty f
                       Pp.space)
                    (Signature.print_site sigs ag_ty)
                    i print_counter_test
-                   (c - 1 , min_value, eq, counter_sig.Counters_info.counter_sig_visible)
-                   (print_counter_delta created_counters counter_sig.Counters_info.counter_sig_visible j)
+                   ( c - 1,
+                     min_value,
+                     eq,
+                     counter_sig.Counters_info.counter_sig_visible )
+                   (print_counter_delta created_counters
+                      counter_sig.Counters_info.counter_sig_visible j)
                    switch;
                  true
                ) else
@@ -286,11 +294,12 @@ let union_find_counters sigs mix =
   in
   t
 
-let print_rule_agent ~noCounters sigs counters_info ~ltypes counters created_counters f ag =
+let print_rule_agent ~noCounters sigs counters_info ~ltypes counters
+    created_counters f ag =
   Format.fprintf f "%a(@[<h>%a@])%t" (Signature.print_agent sigs) ag.ra_type
-    (print_rule_intf ~noCounters sigs counters_info ~show_erased:false ~ltypes ag.ra_type)
-    (ag.ra_ports, ag.ra_ints, counters, created_counters) (fun f ->
-      if ag.ra_erased then Format.pp_print_string f "-")
+    (print_rule_intf ~noCounters sigs counters_info ~show_erased:false ~ltypes
+       ag.ra_type) (ag.ra_ports, ag.ra_ints, counters, created_counters)
+    (fun f -> if ag.ra_erased then Format.pp_print_string f "-")
 
 let print_rule_mixture ~noCounters sigs counters_info ~ltypes created f mix =
   let counter_agents = union_find_counters (Some sigs) mix in
@@ -303,8 +312,8 @@ let print_rule_mixture ~noCounters sigs counters_info ~ltypes created f mix =
       else (
         let () = if some then Pp.comma f in
         let () =
-          print_rule_agent ~noCounters sigs counters_info ~ltypes counter_agents created_incr
-            f h
+          print_rule_agent ~noCounters sigs counters_info ~ltypes counter_agents
+            created_incr f h
         in
         aux_print true t
       )
@@ -484,7 +493,8 @@ let print_rates ~noCounters sigs counters_info pr_tok pr_var f r =
                  (Alg_expr.print
                     (fun f m ->
                       Format.fprintf f "|%a|"
-                        (print_rule_mixture ~noCounters sigs counters_info ~ltypes [])
+                        (print_rule_mixture ~noCounters sigs counters_info
+                           ~ltypes [])
                         m)
                     pr_tok pr_var)
                  md))
@@ -495,10 +505,11 @@ let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
     (fun f ->
       if full || r.r_edit_style then
         Format.fprintf f "%a%a"
-          (print_rule_mixture ~noCounters sigs counters_info ~ltypes:false r.r_created)
+          (print_rule_mixture ~noCounters sigs counters_info ~ltypes:false
+             r.r_created)
           r.r_mix
           (Raw_mixture.print ~noCounters ~created:true
-             ~initial_comma:(r.r_mix <> []) ~sigs ~counters_info )
+             ~initial_comma:(r.r_mix <> []) ~sigs ~counters_info)
           r.r_created
       else
         Format.fprintf f "%a%t%a -> %a"
@@ -518,12 +529,14 @@ let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
            (Alg_expr.print
               (fun f m ->
                 Format.fprintf f "|%a|"
-                  (print_rule_mixture ~noCounters sigs counters_info ~ltypes:false [])
+                  (print_rule_mixture ~noCounters sigs counters_info
+                     ~ltypes:false [])
                   m)
               pr_tok pr_var)
            nb pr_tok tk))
     r.r_delta_tokens
-    (fun f -> if full then print_rates ~noCounters sigs counters_info pr_tok pr_var f r)
+    (fun f ->
+      if full then print_rates ~noCounters sigs counters_info pr_tok pr_var f r)
 
 let rule_agent_to_json filenames a =
   `Assoc

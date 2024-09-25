@@ -54,7 +54,9 @@ module type Cflow_handler = sig
     handler ->
     StoryProfiling.StoryStats.log_info ->
     Exception.exceptions_caught_and_uncaught ->
-    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'a
+    Exception.exceptions_caught_and_uncaught
+    * StoryProfiling.StoryStats.log_info
+    * 'a
 
   type ('a, 'b) unary =
     parameter ->
@@ -62,7 +64,9 @@ module type Cflow_handler = sig
     StoryProfiling.StoryStats.log_info ->
     Exception.exceptions_caught_and_uncaught ->
     'a ->
-    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'b
+    Exception.exceptions_caught_and_uncaught
+    * StoryProfiling.StoryStats.log_info
+    * 'b
 
   type ('a, 'b, 'c) binary =
     parameter ->
@@ -71,7 +75,9 @@ module type Cflow_handler = sig
     Exception.exceptions_caught_and_uncaught ->
     'a ->
     'b ->
-    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'c
+    Exception.exceptions_caught_and_uncaught
+    * StoryProfiling.StoryStats.log_info
+    * 'c
 
   type ('a, 'b, 'c, 'd) ternary =
     parameter ->
@@ -81,7 +87,9 @@ module type Cflow_handler = sig
     'a ->
     'b ->
     'c ->
-    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'd
+    Exception.exceptions_caught_and_uncaught
+    * StoryProfiling.StoryStats.log_info
+    * 'd
 
   type ('a, 'b, 'c, 'd, 'e) quaternary =
     parameter ->
@@ -92,7 +100,9 @@ module type Cflow_handler = sig
     'b ->
     'c ->
     'd ->
-    Exception.exceptions_caught_and_uncaught * StoryProfiling.StoryStats.log_info * 'e
+    Exception.exceptions_caught_and_uncaught
+    * StoryProfiling.StoryStats.log_info
+    * 'e
 
   val do_not_bound_itterations : parameter -> parameter
   val set_itteration_bound : parameter -> int -> parameter
@@ -164,7 +174,9 @@ module type Cflow_handler = sig
   val set_reset_progress_bar : parameter -> (unit -> unit) -> parameter
 
   val save_error_log :
-    parameter -> Exception_without_parameter.exceptions_caught_and_uncaught -> unit
+    parameter ->
+    Exception_without_parameter.exceptions_caught_and_uncaught ->
+    unit
 
   val set_save_error_log :
     parameter ->

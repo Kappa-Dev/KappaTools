@@ -187,7 +187,9 @@ val set_c_compil :
   Cckappa_sig.compil -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_c_compil : ('static, 'compile) state -> Cckappa_sig.compil option
-val get_errors : ('static, 'compile) state -> Exception.exceptions_caught_and_uncaught
+
+val get_errors :
+  ('static, 'compile) state -> Exception.exceptions_caught_and_uncaught
 
 val set_errors :
   Exception.exceptions_caught_and_uncaught ->

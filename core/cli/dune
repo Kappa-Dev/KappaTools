@@ -29,5 +29,4 @@
    -open
    Kappa_grammar
    -open
-   Kappa_runtime
-   )))
+   Kappa_runtime)))

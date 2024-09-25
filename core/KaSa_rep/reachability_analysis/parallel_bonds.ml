@@ -1280,8 +1280,8 @@ module Domain = struct
 
   let stabilize _static dynamic error = error, dynamic, ()
 
-  let print ?dead_rules static dynamic (error : Exception.exceptions_caught_and_uncaught)
-      loggers =
+  let print ?dead_rules static dynamic
+      (error : Exception.exceptions_caught_and_uncaught) loggers =
     let _ = dead_rules in
     let kappa_handler = get_kappa_handler static in
     let parameters = get_parameter static in

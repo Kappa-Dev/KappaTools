@@ -15,7 +15,8 @@ let tab_was_active = ref false
 let site a = [ a, None, Some (Public_data.Bound_to 1), None ]
 
 let print_edge ((a, b), (c, d)) list =
-  Html_utility.print_newline (Html_utility.print_site_graph [ a, site b; c, site d ] list)
+  Html_utility.print_newline
+    (Html_utility.print_site_graph [ a, site b; c, site d ] list)
 
 let content () =
   let scc =

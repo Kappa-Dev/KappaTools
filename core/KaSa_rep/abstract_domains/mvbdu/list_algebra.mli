@@ -11,7 +11,8 @@ val overwrite :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'c ->
   'b List_sig.list * 'b List_sig.list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('c * 'b List_sig.list option)) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('c * 'b List_sig.list option)) ->
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'c ->
@@ -23,7 +24,8 @@ val overwrite :
   'c ->
   'b List_sig.list ->
   'b List_sig.list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('c * 'b List_sig.list option)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('c * 'b List_sig.list option)
 
 val length :
   'a ->
@@ -40,7 +42,8 @@ val extensional_without_asso :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'a ->
   'b List_sig.list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('a * int list option)) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('a * int list option)) ->
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'a ->
@@ -51,14 +54,16 @@ val extensional_without_asso :
   Remanent_parameters_sig.parameters ->
   'a ->
   'b List_sig.list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('a * int list option)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('a * int list option)
 
 val extensional_with_asso :
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'a ->
   'b List_sig.list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('a * (int * 'b) list option)) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('a * (int * 'b) list option)) ->
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'a ->
@@ -69,7 +74,8 @@ val extensional_with_asso :
   Remanent_parameters_sig.parameters ->
   'a ->
   'b List_sig.list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('a * (int * 'b) list option)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('a * (int * 'b) list option)
 
 val build_reversed_sorted_list :
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -84,7 +90,8 @@ val build_reversed_sorted_list :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'c ->
   (int * 'b) list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('c * 'b List_sig.list)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('c * 'b List_sig.list)
 
 val build_sorted_list :
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -99,7 +106,8 @@ val build_sorted_list :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'c ->
   (int * 'b) list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('c * 'b List_sig.list)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('c * 'b List_sig.list)
 
 val build_list :
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -114,7 +122,8 @@ val build_list :
   Remanent_parameters_sig.parameters ->
   'c ->
   (int * 'b) list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('c * 'b List_sig.list)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('c * 'b List_sig.list)
 
 val print_variables_list :
   Remanent_parameters_sig.parameters -> 'a List_sig.list -> unit

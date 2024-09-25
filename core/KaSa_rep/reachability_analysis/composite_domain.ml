@@ -21,7 +21,9 @@ module type Composite_domain = sig
     Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
-    Exception.exceptions_caught_and_uncaught * static_information * dynamic_information
+    Exception.exceptions_caught_and_uncaught
+    * static_information
+    * dynamic_information
 
   type 'a zeroary =
     static_information ->

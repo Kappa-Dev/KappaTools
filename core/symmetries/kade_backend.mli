@@ -17,7 +17,7 @@ module Pattern : sig
 
   val print_cc :
     ?full_species:bool ->
-    ?domain:Pattern.Env.t -> 
+    ?domain:Pattern.Env.t ->
     ?cc_id:Pattern.id ->
     noCounters:bool ->
     with_id:bool ->

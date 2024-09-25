@@ -10,7 +10,7 @@
    -open
    Kappa_data_structures
    -open
-   Kappa_site_graphs 
+   Kappa_site_graphs
    -open
    Kappa_parameters
    -open

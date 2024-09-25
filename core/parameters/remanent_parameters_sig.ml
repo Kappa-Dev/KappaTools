@@ -164,7 +164,8 @@ type parameters = {
   profiler: Loggers.t;
   compression_status: Loggers.t;
   print_efficiency: bool;
-  save_error_list: Exception_without_parameter.exceptions_caught_and_uncaught -> unit;
+  save_error_list:
+    Exception_without_parameter.exceptions_caught_and_uncaught -> unit;
   save_progress_bar: bool * int * int * int -> unit;
   reset_progress_bar: unit -> unit;
   save_current_phase_title: string -> unit;

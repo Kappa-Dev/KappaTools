@@ -104,7 +104,10 @@ let print_link ~noCounters ?min_value counter_agents f = function
          Mods.DynArray.get counter_agents.rank root
        in
        if is_counter && not noCounters then
-         Format.fprintf f "{=%d}" (match min_value with None -> counter | Some m -> m+counter)
+         Format.fprintf f "{=%d}"
+           (match min_value with
+           | None -> counter
+           | Some m -> m + counter)
        else
          Format.fprintf f "[%i]" i
      with Invalid_argument _ -> Format.fprintf f "[%i]" i)
@@ -117,25 +120,27 @@ let aux_pp_si sigs a s f i =
     | Some i -> Format.fprintf f "%i{%i}" s i
     | None -> Format.pp_print_int f s)
 
-let print_intf ~noCounters with_link ?sigs ?counters_info  counter_agents ag_ty f (ports, ints)
-    =
+let print_intf ~noCounters with_link ?sigs ?counters_info counter_agents ag_ty f
+    (ports, ints) =
   let rec aux empty i =
     if i < Array.length ports then (
       let min_value =
-        if noCounters then None
-        else 
-        match sigs, counters_info with
+        if noCounters then
+          None
+        else (
+          match sigs, counters_info with
           | None, _ | _, None -> None
           | Some sigs, Some counters_info ->
-              if Signature.site_is_counter sigs ag_ty i
-              then
-                let counter_sig = Counters_info.get_counter_sig sigs counters_info ag_ty i in
-                match   counter_sig.Counters_info.counter_sig_min
-                with
-                | None
-                | Some (None, _) -> None
-                | Some (Some i,_) -> Some i
-              else None
+            if Signature.site_is_counter sigs ag_ty i then (
+              let counter_sig =
+                Counters_info.get_counter_sig sigs counters_info ag_ty i
+              in
+              match counter_sig.Counters_info.counter_sig_min with
+              | None | Some (None, _) -> None
+              | Some (Some i, _) -> Some i
+            ) else
+              None
+        )
       in
       let () =
         Format.fprintf f "%t%a%a"
@@ -161,7 +166,8 @@ let aux_pp_ag sigs f a =
   | Some sigs -> Signature.print_agent sigs f a
   | None -> Format.pp_print_int f a
 
-let print_agent ~noCounters created link ?sigs ?counters_info counter_agents f ag =
+let print_agent ~noCounters created link ?sigs ?counters_info counter_agents f
+    ag =
   Format.fprintf f "%a(@[<h>%a@])%t" (aux_pp_ag sigs) ag.a_type
     (print_intf ~noCounters link ?sigs ?counters_info counter_agents ag.a_type)
     (ag.a_ports, ag.a_ints) (fun f ->
@@ -182,7 +188,8 @@ let print ~noCounters ~created ~initial_comma ?sigs ?counters_info f mix =
       else (
         let () = if some then Pp.comma f in
         let () =
-          print_agent ~noCounters created true ?sigs ?counters_info counter_agents f h
+          print_agent ~noCounters created true ?sigs ?counters_info
+            counter_agents f h
         in
         aux_print true t
       )

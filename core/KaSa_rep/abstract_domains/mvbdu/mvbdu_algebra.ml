@@ -910,7 +910,9 @@ let not_recursive_memoize_unary f g (get_handler : 'a -> 'b)
 let a =
   (not_recursive_memoize_unary
     : (Exception.exceptions_caught_and_uncaught -> 'handler -> 'g) ->
-      (Remanent_parameters_sig.parameters -> Exception.exceptions_caught_and_uncaught -> 'e) ->
+      (Remanent_parameters_sig.parameters ->
+      Exception.exceptions_caught_and_uncaught ->
+      'e) ->
       ('handler -> 'dic) ->
       ('dic -> 'handler -> 'handler) ->
       (Exception.exceptions_caught_and_uncaught ->

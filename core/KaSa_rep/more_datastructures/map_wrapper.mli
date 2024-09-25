@@ -320,7 +320,9 @@ module type Map_with_logs = sig
     'a ->
     Exception.exceptions_caught_and_uncaught * 'b ->
     Exception.exceptions_caught_and_uncaught * 'b) ->
-    (elt -> Exception.exceptions_caught_and_uncaught * 'b -> Exception.exceptions_caught_and_uncaught * 'b) ->
+    (elt ->
+    Exception.exceptions_caught_and_uncaught * 'b ->
+    Exception.exceptions_caught_and_uncaught * 'b) ->
     set ->
     'a t ->
     'b ->

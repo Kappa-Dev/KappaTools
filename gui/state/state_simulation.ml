@@ -77,9 +77,7 @@ let eval_with_sim_manager_and_info ~(label : string)
     ?(initializing : Api.concrete_manager -> 'a Api.lwt_result =
       fun _ -> fail_lwt "Simulation initalizing")
     ?(ready :
-        Api.concrete_manager ->
-        Api_types_j.simulation_info ->
-        'a Api.lwt_result =
+        Api.concrete_manager -> Api_types_j.simulation_info -> 'a Api.lwt_result =
       fun _ _ -> fail_lwt "Simulation ready") () : 'a Api.lwt_result =
   eval_with_sim_manager ~label (fun manager s ->
       match s.simulation_state with
@@ -210,7 +208,8 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
           (* set state to initalize *)
           let () = update_simulation_state SIMULATION_STATE_INITALIZING in
           manager#simulation_start simulation_parameter
-          >>= Api_common.result_bind_with_lwt ~ok:(fun _ -> manager#simulation_info)
+          >>= Api_common.result_bind_with_lwt ~ok:(fun _ ->
+                  manager#simulation_info)
           >>= Api_common.result_bind_with_lwt ~ok:(fun simulation_status ->
                   let simulation_state =
                     SIMULATION_STATE_READY simulation_status

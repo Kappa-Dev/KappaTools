@@ -908,8 +908,8 @@ functor
           | None -> Exception.warn parameters error __POS__ Exit intervalle_opt)
         back_site (error, None)
 
-    let print ?dead_rules static dynamic (error : Exception.exceptions_caught_and_uncaught)
-        loggers =
+    let print ?dead_rules static dynamic
+        (error : Exception.exceptions_caught_and_uncaught) loggers =
       let _ = dead_rules in
       let kappa_handler = get_kappa_handler static in
       let counter_set = get_counters_set static in

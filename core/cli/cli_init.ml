@@ -19,7 +19,7 @@ type preprocessed_ast = {
 
 type compilation_result = {
   conf: Configuration.t;
-  counters_info: Counters_info.t; 
+  counters_info: Counters_info.t;
   env: Model.t;
   contact_map: Contact_map.t;
   updated_alg_vars: int list;
@@ -61,8 +61,7 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
       let conf, _, _, _ = Configuration.parse compil.Ast.configurations in
       ( Some
           (LKappa_compiler.init_of_ast ~warning ~syntax_version
-             ast_compiled_data.agents_sig
-             ast_compiled_data.counters_info
+             ast_compiled_data.agents_sig ast_compiled_data.counters_info
              ast_compiled_data.contact_map
              ast_compiled_data.token_names.NamedDecls.finder
              ast_compiled_data.alg_vars_finder compil.Ast.init),
@@ -191,8 +190,7 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
         LKappa_compiler.init_of_ast ~warning
           ~syntax_version:cli_args.Run_cli_args.syntaxVersion
           (Model.signatures compilation_result.env)
-          compilation_result.counters_info
-          compilation_result.contact_map
+          compilation_result.counters_info compilation_result.contact_map
           (Model.tokens_finder compilation_result.env)
           (Model.algs_finder compilation_result.env)
           compil.Ast.init

@@ -84,13 +84,7 @@
  (js_of_ocaml
   (flags
    (:include js_of_ocaml_flags)))
- (modules
-  :standard
-  \
-  KaSimWorker
-  KaSaWorker
-  KaStorWorker
-  KaMoHaWorker)
+ (modules :standard \ KaSimWorker KaSaWorker KaStorWorker KaMoHaWorker)
  (libraries
   js_of_ocaml-tyxml
   lwt_react
@@ -132,10 +126,9 @@
   Kappa_logging
   -open
   Kappa_cflow
-  -open 
-  Kappa_webapp_ui
   -open
   Kappa_webapp_ui
   -open
-  Kappa_webapp_state
-  ))
+  Kappa_webapp_ui
+  -open
+  Kappa_webapp_state))

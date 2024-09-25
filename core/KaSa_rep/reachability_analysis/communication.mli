@@ -154,7 +154,9 @@ val fold_over_potential_partners :
   Exception.exceptions_caught_and_uncaught * 'a ->
   Exception.exceptions_caught_and_uncaught * 'a) ->
   'a ->
-  Exception.exceptions_caught_and_uncaught * precondition * 'a Usual_domains.top_or_not
+  Exception.exceptions_caught_and_uncaught
+  * precondition
+  * 'a Usual_domains.top_or_not
 
 val overwrite_potential_partners_map :
   Remanent_parameters_sig.parameters ->
@@ -200,7 +202,10 @@ val get_state_of_site_in_precondition :
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   precondition ->
-  Exception.exceptions_caught_and_uncaught * 'dynamic * precondition * Ckappa_sig.c_state list
+  Exception.exceptions_caught_and_uncaught
+  * 'dynamic
+  * precondition
+  * Ckappa_sig.c_state list
 
 val get_state_of_site_in_postcondition :
   ('static -> Analyzer_headers.global_static_information) ->
@@ -213,7 +218,10 @@ val get_state_of_site_in_postcondition :
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   precondition ->
-  Exception.exceptions_caught_and_uncaught * 'b * precondition * Ckappa_sig.c_state list
+  Exception.exceptions_caught_and_uncaught
+  * 'b
+  * precondition
+  * Ckappa_sig.c_state list
 
 val add_rule :
   ?local_trace:bool ->

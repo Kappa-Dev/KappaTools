@@ -114,7 +114,8 @@ val extensional_description_of_mvbdu :
   handler ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * (handler * (int * int) list list)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (handler * (int * int) list list)
 
 val extensional_description_of_range_list :
   'g ->
@@ -140,7 +141,8 @@ val extensional_description_of_variables_list :
   Remanent_parameters_sig.parameters ->
   handler ->
   'h List_sig.list ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * (handler * int list option)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (handler * int list option)
 
 val overwrite_association_lists :
   Remanent_parameters_sig.parameters ->
