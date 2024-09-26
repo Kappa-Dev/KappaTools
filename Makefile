@@ -1,6 +1,6 @@
 DEFAULT_GOAL := all
 
-include externals.mk
+include external_deps_versions.mk
 
 MANREP= man/
 MANSCRIPTREP = $(MANREP)scripts/
@@ -51,29 +51,29 @@ build/site: $(RESOURCES_HTML)
 build/site/external: build/site
 	mkdir -p $@
 
-build/site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist: externals.mk
+build/site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist: external_deps_versions.mk
 	mkdir -p build/site/external
 	FILE=$$(mktemp -t bootstrapXXXX); \
 	curl -LsS -o $$FILE https://github.com/twbs/bootstrap/releases/download/v$(BOOTSTRAP_VERSION)/bootstrap-$(BOOTSTRAP_VERSION)-dist.zip && \
 	rm -rf $@ && unzip -d $(dir $@) $$FILE && rm $$FILE
 	touch $@
 
-build/site/external/codemirror-$(CODEMIRROR_VERSION): externals.mk
+build/site/external/codemirror-$(CODEMIRROR_VERSION): external_deps_versions.mk
 	mkdir -p build/site/external
 	FILE=$$(mktemp -t codemirrorXXXX); \
 	curl -LsS -o $$FILE http://codemirror.net/codemirror-$(CODEMIRROR_VERSION).zip &&\
 	rm -rf $@ && unzip -d $(dir $@) $$FILE && rm $$FILE
 	touch $@
 
-build/site/external/d3: externals.mk
+build/site/external/d3: external_deps_versions.mk
 	mkdir -p $@
 	curl -LsS -o $@/d3.v4.min.js http://d3js.org/d3.v4.min.js
 
-build/site/external/dagre-d3: externals.mk
+build/site/external/dagre-d3: external_deps_versions.mk
 	mkdir -p $@
 	curl -LsS -o $@/dagre-d3.min.js https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js
 
-build/site/external/jquery: externals.mk
+build/site/external/jquery: external_deps_versions.mk
 	mkdir -p $@
 	curl -LsS -o build/site/external/jquery/jquery.js https://code.jquery.com/jquery-$(JQUERY_VERSION).min.js
 	curl -LsS -o build/site/external/jquery/jquery-ui.min.js http://code.jquery.com/ui/$(JQUERY_UI_VERSION)/jquery-ui.min.js

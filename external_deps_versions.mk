@@ -3,5 +3,5 @@ BOOTSTRAP_VERSION:=3.4.1
 JQUERY_VERSION:=3.7.1
 JQUERY_UI_VERSION:=1.13.2
 
-# https://github.com/electron/electron-api-demos/releases
+# https://github.com/electron/electron/releases
 ELECTRON_VERSION:=29.0.1
