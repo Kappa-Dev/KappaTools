@@ -56,14 +56,14 @@ Create a new release draft
 
 - Title:
 ```
-Kappa Software Suite version 4.1.3
+Kappa Software Suite version v4.1.3
 ```
 
 - Text:
 ```
 v4.1.3
 
-Kappa Software Suite version 4.1.3
+Kappa Software Suite version v4.1.3
 ```
 
 Set last release as previous tag, then click _Generate release notes_ and edit results to keep what's relevant
@@ -74,12 +74,17 @@ Add files for:
 Kappapp_for_linux.tar.gz
 Kappapp_for_mac_os_10.15.zip
 Kappapp_for_windows.zip
+```
+taken from nightly builds: https://tools.kappalanguage.org/nightly-builds/
+
+Source code from release tag https://github.com/Kappa-Dev/KappaTools/releases/tag/v4.1.3 should appear automatically
+
+```
 Source code (zip)
 Source code (tar.gz) 
 ```
 
-electron are from nightly builds: https://tools.kappalanguage.org/nightly-builds/
-Source code from release tag https://github.com/Kappa-Dev/KappaTools/releases/tag/v4.1.3
+
 
 ### Pip
 

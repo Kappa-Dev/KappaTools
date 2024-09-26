@@ -1,0 +1,15 @@
+// Snapshot [Event: 14599]
+%def: "T0" "30.003207872859807"
+
+%init: 60 /*3 agents*/ A(x[1] c[2]), B(x[1]), C(x1{p}[.] x2{u}[2])
+%init: 111 /*3 agents*/ B(x[1]), A(x[1] c[2]), C(x1{u}[2] x2{u}[.])
+%init: 20 /*2 agents*/ A(x[.] c[1]), C(x1{u}[1] x2{u}[.])
+%init: 112 /*2 agents*/ A(x[.] c[1]), C(x1{p}[.] x2{u}[1])
+%init: 1852 /*1 agents*/ C(x1{p}[.] x2{p}[.])
+%init: 2107 /*1 agents*/ C(x1{p}[.] x2{u}[.])
+%init: 5738 /*1 agents*/ C(x1{u}[.] x2{u}[.])
+%init: 223 /*2 agents*/ A(x[1] c[.]), B(x[1])
+%init: 606 /*1 agents*/ B(x[.])
+%init: 474 /*1 agents*/ A(x[.] c[.])
+
+

@@ -9,6 +9,7 @@
 module Html = Tyxml_js.Html5
 
 let project_id_modal_id = "menu-editor-project-id-modal"
+let projects_tabs_id = "projects_tabs"
 
 let project_id_input =
   Html.input
@@ -29,7 +30,11 @@ let content () =
   Html.div
     [
       Tyxml_js.R.Html5.ul
-        ~a:[ Html.a_class [ "nav"; "nav-tabs"; "nav-justified" ] ]
+        ~a:
+          [
+            Html.a_id projects_tabs_id;
+            Html.a_class [ "nav"; "nav-tabs"; "nav-justified" ];
+          ]
         (ReactiveData.RList.from_signal
            (React.S.map
               (fun model ->

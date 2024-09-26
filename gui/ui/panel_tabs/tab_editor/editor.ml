@@ -190,9 +190,10 @@ let onload () : unit =
     let delay : float =
       if (Js.str_array change##.text)##.length > 1 || State_error.has_errors ()
       then
-        1.0 *. 1000.0
+        (* Not sure why this logic for errors *)
+        0.9 *. 1000.0
       else
-        5.0 *. 1000.0
+        1.0 *. 1000.0
     in
     let handle_timeout () =
       let () = State_file.out_of_sync false in

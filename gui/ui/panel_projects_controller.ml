@@ -8,11 +8,14 @@
 
 open Lwt.Infix
 
-let refresh r =
-  let r' = State_file.sync ~reset:true () in
-  let r'' = State_simulation.refresh () in
-  r' >>= fun r' ->
-  r'' >>= fun r'' -> Lwt.return (Api_common.result_combine [ r; r'; r'' ])
+let refresh result_before =
+  let lwt_result_state_file_sync = State_file.sync ~reset:true () in
+  let lwt_result_simulation_refresh = State_simulation.refresh () in
+  lwt_result_state_file_sync >>= fun result_state_file_sync ->
+  lwt_result_simulation_refresh >>= fun result_simulation_refresh ->
+  Lwt.return
+    (Api_common.result_combine
+       [ result_before; result_state_file_sync; result_simulation_refresh ])
 
 let create_project (project_id : string) : unit =
   Common.async __LOC__ (fun () ->

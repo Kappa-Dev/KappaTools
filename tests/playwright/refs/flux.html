@@ -1,0 +1,633 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Dynamic influence map</title>
+  <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" charset="utf-8"></script>
+  <style>
+    .chord path {
+    fill-opacity: .67;
+    stroke: #000;
+    stroke-width: .5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+  <h1>Dynamic influence map
+      <small>between t = <span id="begin_time"></span>s and t = <span id="end_time"></span>s (<span id="nb_events"></span> events)</small></h1>
+  <div id="flux_container"></div>
+  <form>
+    <div class="form-group">
+      <label for="correction">Correction</label>
+      <select id="select_correction" class="form-control" id="correction">
+      <option value="none">None</option>
+      <option value="hits">Rule occurences</option>
+      <option value="time">Time</option>
+    </select>
+    </div>
+    <input id="toggle_selected_rules" type="button" value="Toggle selected rules">
+    <label class="checkbox-inline">
+      <input id="checkbox_self_influence" type="checkbox">
+      Rules self influence
+    </label>
+  </form>
+  <form id="menu"></form>
+  <script>
+    "use strict";
+// http://stackoverflow.com/questions/326596/how-do-i-wrap-a-function-in-javascript
+var wrap = function(fn){
+    return function(){
+        try { return fn.apply(this, arguments);
+            } catch(ex){
+                console.error(ex.stack);
+                throw ex;
+            }
+    };
+};
+
+var assert = function(condition, message) {
+    if (!condition) {
+        message = message || "Assertion failed";
+        if (typeof Error !== "undefined") {
+            throw new Error(message);
+        }
+        throw message; // Fallback
+    }
+}
+
+// http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
+var args = function () {
+    var query_string = {};
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+        var pair = vars[i].split("=");
+        if (typeof query_string[pair[0]] === "undefined") {
+            query_string[pair[0]] = decodeURIComponent(pair[1]);
+        } else if (typeof query_string[pair[0]] === "string") {
+            var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
+            query_string[pair[0]] = arr;
+        } else {
+            query_string[pair[0]].push(decodeURIComponent(pair[1]));
+        }
+    }
+    return query_string;
+}();
+
+// add logging functions
+// in the url place level=debug for most verbose
+(function(){
+    var found = false;
+    window.level = {};
+
+    var levels = ["debug","info","log","warn","error"];
+    for (var i in levels){
+        var level = levels[i];
+        // allow other modules to access levels via window.level[level]
+        window.level[level] = level;
+        if(args.level && args.level === level) { found = true; }
+        if(found) {
+            // returning the function in a bind.call allows to keep the line info
+            window[level] = function(){
+              return Function.prototype.bind.call(console[level], console);
+            }();
+        } else {
+            window[level] = function(x){ }
+        }
+    }
+
+  window.log_group = function(x){console.group(x)};
+  window.log_group_end = function(){console.groupEnd()};
+})();
+
+var modal_next_id = 1;
+
+// Duplicated in ocaml in ui_common.ml. TODO: merge the logic?
+function modalError(error_str) {
+  const modal_id = 'modal_error_id-' + modal_next_id.toString();
+  modal_next_id += 1;
+
+  const h = '<div class="modal fade in" id="' + modal_id 
+    + '" tabindex="-1" role="dialog" data-backdrop="static" style="display: block;"><div class="modal-dialog" role="document"><form class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button><h4>Critical error.</h4></div><div class="modal-body">The Kappa app has encountered a critical error:<pre><code>'
+    + error_str
+    + '</code></pre>The app will not behave properly after this, please save your files to avoid data loss and reload the app. Consider <a href="https://github.com/Kappa-Dev/KappaTools/issues">opening an issue</a>.</div><div class="modal-footer"><button type="button" class="btn btn-danger" data-dismiss="modal">Return to app</button></div></form></div></div>';
+
+  document.body.insertAdjacentHTML( 'afterbegin', h );
+  $('#' +modal_id).modal()
+}
+
+
+
+// https://medium.com/@graeme_boy/how-to-optimize-cpu-intensive-work-in-node-js-cdc09099ed41#.2vhd0cp4g
+// http://www.codingdefined.com/2014/08/difference-between-fork-spawn-and-exec.html
+// param {command,args,onStdout,onStderr,onClose}
+var stdsimProcesses = [];
+
+function spawnProcess(param){
+    const spawn = require('child_process').spawn;
+    const process = spawn(param.command, param.args);
+
+  process.on('spawn', () => {debug("[Process] SPAWNED", param.command)});
+  process.on('exit', (code) => {
+    var error_str = "[Process] EXIT " + param.command + " code: " + code + ' ' + process.stderr.read();
+    error(error_str);
+    modalError(error_str);
+  });
+  process.on('error', (error) => {
+    var error_str = "[Process] ERROR " + param.command + " error: " + error + ' ' + process.stderr.read();
+    error(error_str);
+  });
+  process.on('close', (code) => {error("[Process] CLOSE", param.command, "code:", code)});
+  process.on('message', () => {debug("[Process] MESSAGE", param.command)});
+
+  function spawnFailure(param,message){
+    if(param.onError){
+        // pid is logged here
+        console.error(message);
+        modalError(message);
+        param.onError();
+    }
+    return null;
+  }
+
+    try {
+	process.stdout.setEncoding('utf8');
+	console.debug(`spawned process ${param.command} ${param.args} pid ${process.pid}`);
+	if(param.onStdout) {
+	    process.stdout.on('data',
+			      function (data) {
+				  console.debug(`received stdout from process with command ${param.command} pid ${process.pid}:`, data);
+				  param.onStdout(data); } );
+	}
+	if(param.onStderr) {
+	    process.stderr.on('data',function (data) {
+				console.error(`received stderr from process with command ${param.command} pid ${process.pid}:`, data);
+		param.onStderr(`${data}`);
+	    } );
+	}
+	if(param.onClose){
+	    process.on('close',param.onClose);
+	}
+	if(param.onError){
+	    process.on('error',param.onError);
+	}
+	if(process && process.pid) {
+	    return { 
+        write : function(data){ 
+				  console.debug(`send data to process with command ${param.command} pid ${process.pid}:`, data);
+			    process.stdin.write(data); } ,
+		     kill : function(){ process.kill(); }
+		   };
+	} else {
+	    return spawnFailure(param,
+			  `spawned failed ${param.command} ${param.args} pid ${process.pid}`);
+	}
+	stdsimProcesses.push(process);
+    } catch(err){
+	return spawnFailure(param,err.message);
+    }
+}
+
+function jqueryOn(selector,event,handler){
+    $(document.body).on(event,
+			selector,
+			function (e) { handler(e); });
+
+}
+
+// http://stackoverflow.com/questions/22395357/how-to-compare-two-arrays-are-equal-using-javascript-or-jquery
+function is_same(array1,array2){
+    var same =
+    (array1.length == array2.length)
+	&&
+	array1.every(function(element, index) {
+            return element === array2[index];
+	});
+    return same;
+}
+/* needed to add the stylesheet to the export */
+var cssTextToken = "/* stylesheet : a5f23ffb-e635-435c-ae44-c10779c2a843 */";
+function createSVGDefs(svg){
+    var svgDefs = svg.append('defs')
+	             .append("style")
+	             .attr("type","text/css")
+	             .text(cssTextToken);
+    return svgDefs;
+}
+function plotPNG(plotDivId,title,plotName,plotStyleId){
+    try { var html = d3.select("#"+plotDivId)
+                       .select("svg")
+                       .attr("title", title)
+                       .attr("version", 1.1)
+                       .attr("xmlns", "http://www.w3.org/2000/svg")
+                       .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+                       .node()
+                       .outerHTML;
+          var style = plotStyleId?d3.select("#"+plotStyleId).text():"";
+          style = "<![CDATA["+style+"]]>";
+          html = html.replace(cssTextToken,style);
+          var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+          var canvas = document.createElement("canvas");
+          var width = parseInt(d3.select("#"+plotDivId)
+			         .select("svg")
+			         .style("width")
+  			         .replace("px", ""));
+          var height = parseInt(d3.select("#"+plotDivId)
+				  .select("svg")
+				  .style("height")
+				  .replace("px", ""));
+          canvas.width = width; // get original canvas width
+          canvas.height = height; //get original canvas height
+          var context = canvas.getContext("2d");
+          var image = new Image(width, height);
+          image.onload = function() {
+              context.fillStyle = "white";
+              context.fillRect(0, 0, width, height);
+              context.drawImage(image, 0, 0, width, height);
+              var canvasdata = canvas.toDataURL("image/png");
+              var a = document.createElement("a");
+              a.style = "display: none";
+              document.body.appendChild(a);
+              a.download = plotName;
+              a.href = canvasdata;
+              a.click();
+              document.body.removeChild(a);
+          };
+          image.onerror = function(e){
+              console.error("Error when plotting PNG: ", e);
+          }
+          image.src = imgsrc;
+
+        } catch (e) {
+            alert(e);
+        }
+}
+
+function saveFile(data,mime,filename){
+    var blob = new Blob([data], {type: mime });
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    a.href = url;
+    a.download = filename;
+    a.click();
+    document.body.removeChild(a);
+}
+
+function plotSVG(plotDivId,title,plotName,plotStyleId){
+        try { var html = d3.select("#"+plotDivId)
+                           .select("svg")
+                           //.attr("title", title)
+                           .attr("version", 1.1)
+                           .attr("xmlns", "http://www.w3.org/2000/svg")
+                           .node()
+                           .outerHTML;
+              var style = plotStyleId?d3.select("#"+plotStyleId).text():"";
+              style = "<![CDATA["+style+"]]>";
+              html = html.replace(cssTextToken,style);
+	      var header =
+		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+              + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"
+              + "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
+	      html = header+html;
+              saveFile(html,"image/svg+xml",plotName);
+        } catch (e) {
+            alert(e);
+        }
+}
+
+// http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+function hashCode(s){
+    s = s+s+s+s+s+s+s;
+    var hash = 0;
+    if (s.length == 0) return hash;
+    var i = 0;
+    for (i = 0; i < s.length; i++) {
+        var char = s.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}
+
+// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+function hashColor(s){
+    var hashInt = hashCode(s);
+    if (hashInt < 0)
+    { hashInt = 0xFFFFFFFF + hashInt + 1; }
+    var hashColor = hashInt.toString(16);
+    var hashString = String("000000" + hashColor).slice(-6);
+    return "#"+hashString;
+}
+
+function ajaxRequest(url,type,data,handler,timeout){
+    var parameter = { url : url , type : type };
+    if(timeout){
+	parameter.timeout = timeout;
+    }
+    if(data){ parameter.data = data; }
+    console.group("ajax request: ");
+    console.debug(parameter);
+    console.groupEnd();
+    $.ajax(parameter)
+     .done(function( data, textStatus, jqXHR )
+	   { var status = jqXHR.status;
+	     var response_text = jqXHR.responseText;
+	     wrap(handler(status,response_text));
+	   })
+     .fail(function(jqXHR, textStatus, errorThrown )
+	   { var status = jqXHR.status;
+	     var response_text = jqXHR.responseText;
+	     if(textStatus==="timeout") {
+		 wrap(handler(408,"Timeout"));
+	     } else {
+		 wrap(handler(status,response_text));
+	     }
+	   });
+
+}
+/* Apply an action to a modal window. */
+function modal(id,action){
+    $(id).modal(action);
+}
+// http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript/2117523#2117523
+/* Used primarily to create a client id */
+function guid(){
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+	var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+	return v.toString(16);
+    });
+}
+/* Throw an exception */
+function toss(e){ throw e; }
+
+/* Return the data of an element. */
+function elementData(element,label){
+    var result = $(element).data(label);
+    return result;
+}
+
+/* create a jquery ui sort */
+function createSort(id,handler){
+    $("#"+id).sortable({
+        items : "li:not(.ui-sort-disabled)",
+	change : function() {
+	    var list = $(this).closest('ul');
+	    /* used to pin elements to the top */
+	    var topAnchor = $(list).find('.ui-sort-top-anchor');
+	    /* used to pin elements to the bottom */
+	    var bottomAnchor = $(list).find('.ui-sort-bottom-anchor');
+	    $(list).prepend($(topAnchor).detach());
+	    $(list).append($(bottomAnchor).detach());
+	}
+    });
+    $("#"+id).on("sortupdate",handler);
+}
+/* apply a map over the child nodes */
+function childrenValue(element,selector,map){
+    var result = [];
+    $(element).children(selector).each(function(index){ result.push(map(this)); })
+    return result;
+}
+
+function hideCodeMirror(){
+    $.each($('.CodeMirror'),(_,cm) => $(cm.CodeMirror.getWrapperElement()).hide());
+}
+
+function showCodeMirror(){
+    $.each($('.CodeMirror'),(_,cm) => $(cm.CodeMirror.getWrapperElement()).show());
+}
+
+    </script>
+  <script>
+    "use strict"
+
+function fluxMap(configuration) {
+    var that = this;
+    this.configuration = configuration;
+    this.selfInfluence = false;
+    this.flux = { "din_start" : 0.0, "din_end" : 0.0,
+		  "din_kind" : "ABSOLUTE",
+		  "din_rules" : [],
+		  "din_hits" : [],
+		  "din_fluxs" : [] };
+
+    this.setFlux = function(flux){
+	if(!is_same(that.flux.din_rules,flux.din_rules)){
+	    that.selectedRules = flux.din_rules.map(function (v,i) {return (i !== 0);});
+	    that.flux = flux;
+            that.render_controls();
+	} else {
+	    that.flux = flux;
+	}
+        that.render();
+    };
+
+    this.aClick = function(id) {
+        that.selectedRules[id] = (that.selectedRules[id]) ? false : true;
+        that.drawDIM();
+    };
+    this.toggleSelfInfluence = function() {
+        that.selfInfluence = (that.selfInfluence) ? false : true;
+        that.drawDIM();
+    };
+
+    this.toggleSelectedRules = function() {
+	that.selectedRules.forEach(function (b,i,a) {a[i] = (b) ? false : true; });
+	that.render_controls();
+	that.drawDIM();
+    };
+
+    this.filterRules = function(val,id) {
+        return that.selectedRules[id];
+    };
+
+    this.pointValue = function(i,j,e) {
+        var correction = document.getElementById(that.configuration.selectCorrectionId).value;
+        if (that.selfInfluence || i !== j)
+        {   if (correction === "hits")
+            {return (that.flux.din_hits[i] === 0.) ? 0 : Math.abs(e) / that.flux.din_hits[i];}
+            else if (correction === "time")
+            {return Math.abs(e) / (that.flux.din_end - that.flux.din_start);}
+            else {return Math.abs(e);}
+        }
+        else {return 0;}
+    };
+
+    this.fade = function fade(svg,opacity)
+    { return function(g, i) { svg
+                              .selectAll(".chord path")
+                              .filter(function(d) { return d.source.index != i && d.target.index != i; })
+                              .transition().style("opacity", opacity); }; };
+
+    var svg = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("#flux_container").append("svg");
+    this.drawDIM = function(){
+        var matrix = that.flux.din_fluxs
+            .map(function(a,i){return a.map(function (e,j)
+                                            {return that.pointValue (i,j,e)})
+                               .filter(that.filterRules);}).filter(that.filterRules),
+            rules = that.flux.din_rules.filter(that.filterRules),
+            color = that.flux.din_fluxs.map(function(a)
+                                   {return a.map(function (x) {return (x < 0) ? "#FF0000" : "#00FF00";})
+                                    .filter(that.filterRules);}).filter(that.filterRules);
+	var width = configuration.width?configuration.width:960,
+            height = configuration.height?configuration.height:700,
+            innerRadius = Math.min(width, height) * .37,
+	    outerRadius = innerRadius + 8;
+        svg.attr("width", width)
+           .attr("height", height)
+	   .select("g")
+	   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        svg.selectAll("*").remove();
+
+
+	var formatValue = d3.formatPrefix(",.0", 1e3);
+
+	var chord = d3.chord()
+	    .padAngle(0.05)
+	    .sortSubgroups(d3.descending);
+
+	var arc = d3.arc()
+	    .innerRadius(innerRadius)
+	    .outerRadius(outerRadius);
+
+	var ribbon = d3.ribbon()
+	    .radius(innerRadius);
+
+	var color = d3.scaleOrdinal()
+	    .domain(d3.range(matrix.length))
+	    .range(["#FF0000" , "#00FF00"]);
+
+	var g = svg.append("g")
+	    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+	    .datum(chord(matrix));
+	var group = g.append("g")
+	    .attr("class", "groups")
+	    .selectAll("g")
+	    .data(function(chords) { return chords.groups; })
+	    .enter().append("g");
+
+	group.append("path")
+	    .style("fill", function(d) { return d3.rgb("#000000"); })
+	    .style("stroke", function(){ return d3.rgb("#000000"); } )
+	    .attr("d", arc);
+
+        var legends = group.append("g");
+        legends.append("text")
+	    .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
+                .attr("dy", ".1em")
+	    .attr("transform", function(d) {
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+		    + "translate(" + (innerRadius + 10) + ")"
+		    + (d.angle > Math.PI ? "rotate(180)" : ""); })
+	    .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+	    .text(function(d) { return rules[d.index]; });
+        legends.append("path").style("fill", "#222222").attr("d", arc)
+            .on("mouseover", that.fade(svg,.1)).on("mouseout", that.fade(svg,1));
+
+	var ribbon = g.append("g")
+	    .attr("class", "ribbons")
+	    .selectAll("path")
+	    .data(function(chords) { return chords; })
+	    .enter().append("path")
+	    .attr("d", ribbon)
+	    .style("fill", function(d) { return color(d.target.index); })
+	    .style("stroke", function(d) { return d3.rgb(color(d.target.index)).darker(); });
+
+
+	ribbon.data(function(chords){ return chords; })
+	    .enter()
+  	    .append("text")
+	    .each(function(d) { d.labelAngle = ( d.source.startAngle + d.source.endAngle) / 2; })
+                .attr("dy", ".1em")
+            .attr("transform", function(d) {
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+                    + "translate(" + (innerRadius - 10) + ")"
+                    + (d.labelAngle > Math.PI ? "rotate(180)" : ""); })
+            .style("text-anchor", function(d) { return d.labelAngle > Math.PI ? null : "end" ; })
+            .text(function (d) { return d.source.value.toExponential(2);});
+
+    };
+
+    this.render_other = function(){
+        that.drawDIM();
+    };
+    this.render_controls = function(){
+        var rulesCheckboxes = document.getElementById(that.configuration.rulesCheckboxesId);
+
+        while (rulesCheckboxes.hasChildNodes()){
+            rulesCheckboxes.removeChild(rulesCheckboxes.lastChild);
+        };
+        var correction_select =
+	    document.getElementById(that.configuration.selectCorrectionId);
+	correction_select.value = "none";
+	if (that.flux.din_kind !== "ABSOLUTE")
+	    correction_select.style.visibility="hidden";
+	else
+	    correction_select.style.visibility="visible";
+        that.selectedRules.forEach(function (val,id,a) {
+            var group = document.createElement("div")
+            group.setAttribute("class","input-group");
+            var boxbox = document.createElement("label"),
+                box = document.createElement("input");
+            boxbox.setAttribute("class","checkbox-inline")
+            box.setAttribute("type", "checkbox");
+            if (val) {box.setAttribute("checked","")};
+            box.addEventListener("change",function () { that.aClick(id);});
+            boxbox.appendChild(box);
+            boxbox.appendChild(document.createTextNode(
+		that.flux.din_rules[id].concat(" (",that.flux.din_hits[id]," occurences)")));
+            group.appendChild(boxbox);
+            rulesCheckboxes.appendChild(group);
+        });
+    };
+
+    this.render_labels = function(){
+        d3.select("#"+that.configuration.beginTimeId).text(that.flux.din_start);
+        d3.select("#"+that.configuration.endTimeId).text(that.flux.din_end);
+        d3.select("#"+that.configuration.nbEventsId).text(that.flux.din_hits.reduce(function (acc,v) {return acc + v;},0));
+
+    };
+    this.add_handlers = function(){
+        d3.select("#"+that.configuration.selectCorrectionId).on("change",function() { that.drawDIM()});
+        d3.select("#"+that.configuration.checkboxSelfInfluenceId).on("click",function() { that.toggleSelfInfluence()});
+	d3.select("#"+that.configuration.toggleRulesId).on("click",function() { that.toggleSelectedRules()});
+    };
+
+    this.exportJSON = function(filename){
+	try { var json = JSON.stringify(that.flux);
+	      saveFile(json,"application/json",filename);
+	} catch (e) {
+	    alert(e);
+	}
+    }
+
+    this.render = function() {
+        that.render_labels();
+        that.render_other();
+    };
+    that.add_handlers();
+
+}
+
+    </script>
+  <script>
+    "use strict"
+    var flux =
+    {"din_kind":"RELATIVE","din_start":0.0,"din_end":20.00021766512038,"din_rules":["Interventions","a.b","a..b","ab.c","mod x1","a.c","mod x2"],"din_hits":[0,966,588,2914,2760,1009,884],"din_fluxs":[[0.0,0.0,0.0,0.0,0.0,0.0,0.0],[0.0,-0.0028316014806302227,0.00878563707510651,0.012096090211148913,0.0,-0.0013732239825951132,-0.001120711836289344],[0.0,0.0030482886086714723,-0.0031766577929135307,-0.003080667143393017,0.0,0.0009307447455612669,0.0006086339129079075],[0.0,0.0,0.0,-0.005977707253740112,0.009106047902004793,0.0,0.0],[0.0,0.0,0.0,0.005164627168617127,-0.007137585017126658,0.0035201991930734295,0.0],[0.0,0.0,0.0,0.0,0.0,-0.0029604403468851364,0.02842743177189605],[0.0,0.0,0.0,0.0,0.0,0.0018000493621993419,-0.023387476384430707]]};
+    var ids = {"beginTimeId" : "begin_time", "endTimeId" : "end_time",
+               "selectCorrectionId" : "select_correction",
+               "nbEventsId" : "nb_events", "rulesCheckboxesId" : "menu",
+               "toggleRulesId" : "toggle_selected_rules",
+               "checkboxSelfInfluenceId" : "checkbox_self_influence"};
+    window.onload = function(){ var flux_map = new fluxMap(ids);
+                                flux_map.setFlux(flux); }; 
+    
+  </script>
+  </div>
+</body>
+</html>
