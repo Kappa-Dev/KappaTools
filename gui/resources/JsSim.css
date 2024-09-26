@@ -6,8 +6,10 @@ html {
     height: 100%;
 }
 
+/* Use only safe fonts to avoid CI testing issues https://www.w3schools.com/csSref/css_websafe_fonts.php */
 body {
     height: 100%;
+    font-family: Arial, sans-serif;
 }
 
 .flex-content {
@@ -32,7 +34,7 @@ body {
 .kappa-code {
     white-space : pre-wrap;
     word-break: break-all;
-    font-family: monospace;
+    font-family: 'Courier New', monospace;
 }
 
 .clickable { cursor: pointer; cursor: hand; }
@@ -127,14 +129,14 @@ rect { stroke-width: 2; }
              fill-opacity:0.5;
              stroke-width : 2;
 }
-.node-text { font: 10px sans-serif; }
+.node-text { font-size: 10px; }
 .node-proof {
               opacity : 0.0;
 }
 .site-rect {  stroke-width:1;
               stroke: #000;
 }
-.site-text { font: 8x sans-serif; }
+.site-text { font-size: 8px; }
 
 .node-proof { opacity : 0.0;
             }
@@ -239,7 +241,7 @@ rect { stroke-width: 2; }
 #contact-map-display {
     -moz-osx-font-smoothing:grayscale;
     -webkit-font-smoothing:antialiased;
-    font: 14px helvetica, arial, sans-serif;
+    font: 14px Arial, sans-serif;
     display: inline-block;
     position: relative;
     width: 100%;
@@ -256,6 +258,11 @@ form {
     fill: none;
     stroke: transparent;
 }
+
+#din_table_id {
+    font-variant-numeric: tabular-nums;
+}
+
 .snap-tooltip {
     position: absolute;			
     text-align: right;		
@@ -263,6 +270,7 @@ form {
     bottom: 0;
     right: 0;
     pointer-events: none;	
+    font-variant-numeric: tabular-nums;
 }
 
 .tooltip {

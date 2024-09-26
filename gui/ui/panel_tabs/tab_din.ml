@@ -120,10 +120,16 @@ let din_table : Html_types.tbody Html.elt ReactiveData.RList.t =
            [ Html.tbody body ])
        din_data)
 
+let din_table_id = "din-table-id"
+
 let din : [> Html_types.tablex ] Html.elt =
   let thead = React.S.const (Tyxml_js.R.Html5.thead din_header) in
   Tyxml_js.R.Html5.tablex
-    ~a:[ Html.a_class [ "table"; "table-condensed"; "table-bordered" ] ]
+    ~a:
+      [
+        Html.a_class [ "table"; "table-condensed"; "table-bordered" ];
+        Html.a_id din_table_id;
+      ]
     ~thead din_table
 
 let export_current_din (to_string : Data.din -> string) (mime : string)
