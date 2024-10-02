@@ -23,32 +23,67 @@ const referencesDir = 'tests/playwright/refs/'
 
 async function open_app_with_model(page: Page, url_protocol_relative: string) {
   await page.goto(url + arg_set_model + url_protocol_relative);
-  await expect(page.getByRole('button', { name: 'Show All States' })).toBeVisible();
+  await expect(page.locator('.nodeArcPath').first()).toBeVisible();
 }
 
 function get_error_field(page: Page) {
   return page.locator('#configuration_error_div');
 }
 
-// TODO: fix unused warning
+async function set_pause_if(page: Page, s: string) {
+  await page.getByPlaceholder('[T] >').click();
+  await page.getByPlaceholder('[T] >').fill(s);
+  await page.getByPlaceholder('[T] >').press('Enter');
+}
+
+
 async function write_ref(download: Download, fileName: string) {
   const filePath = await download.path();
-  expect(filePath).toBeTruthy();
+  expect.soft(filePath).toBeTruthy();
   const refFilePath = path.join(referencesDir, fileName);
   fs.copyFileSync(filePath, refFilePath);
 }
 
 async function compare_download_to_ref(download: Download, fileName: string) {
   const filePath = await download.path();
-  expect(filePath).toBeTruthy();
+  expect.soft(filePath).toBeTruthy();
   const refFilePath = path.join(referencesDir, fileName);
   const downloadedContent = await fs.promises.readFile(filePath, 'utf8');
   const referenceContent = await fs.promises.readFile(refFilePath, 'utf8');
-  expect(downloadedContent).toBe(referenceContent);
+  expect.soft(downloadedContent).toBe(referenceContent);
 }
 
+async function testExports(page: Page, exportLocatorPrefix: string, fileBaseName: string, extensions: string[], writeRef: boolean = false) {
+  const exportFilenameLoc = page.locator(exportLocatorPrefix + "_filename");
+  const exportSelectLoc = page.locator(exportLocatorPrefix + "_select");
 
-test.describe('Editor', () => {
+  for (const extension of extensions) {
+    const fileName = `${fileBaseName}.${extension}`;
+    await exportSelectLoc.selectOption(extension);
+    await exportFilenameLoc.click();
+    await exportFilenameLoc.fill(fileName);
+
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'export' }).click();
+    const download = await downloadPromise;
+
+    if (writeRef || process.env.UPDATE_EXPORTS === 'true') {
+      await write_ref(download, fileName);
+    }
+    await compare_download_to_ref(download, fileName);
+  }
+}
+
+async function setSeed(page: Page, seed: number) {
+  await page.getByRole('list').locator('a').nth(2).click();
+  await page.getByRole('spinbutton', { name: 'Seed' }).click();
+  await page.getByRole('spinbutton', { name: 'Seed' }).fill(seed.toString());
+  await page.getByRole('button', { name: 'Set', exact: true }).click();
+  // wait for modal to close
+  await expect(page.locator('div:nth-child(5) > .col-md-2')).toBeHidden();
+}
+
+test.describe('Editor tab', () => {
 
   test('editor', async ({ page }) => {
     await open_app_with_model(page, abc_ka);
@@ -119,12 +154,7 @@ test.describe('Editor', () => {
     await expect.soft(contact_map).toHaveScreenshot();
 
     //export
-    const mapFileName = 'map.svg'
-    await page.locator('#export_contact-export_filename').fill(mapFileName);
-    const downloadPromise = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'export' }).click();
-    const download = await downloadPromise;
-    await compare_download_to_ref(download, mapFileName);
+    await testExports(page, '#export_contact-export', 'map', ['svg', 'png', 'json']);
   });
 
   test('influences', async ({ page }) => {
@@ -159,13 +189,7 @@ test.describe('Editor', () => {
     await page.getByRole('button', { name: 'Previous' }).click();
     await expect.soft(page.locator('#influences-table')).toHaveScreenshot();
     //export
-    await page.locator('#export_influence-export_filename').click();
-    const fileName = 'influences.json'
-    await page.locator('#export_influence-export_filename').fill(fileName);
-    const downloadPromise = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'export' }).click();
-    const download = await downloadPromise;
-    await compare_download_to_ref(download, fileName);
+    await testExports(page, '#export_influence-export', 'influences', ['json']);
   });
 
   test('constraints_and_polymers', async ({ page }) => {
@@ -190,4 +214,104 @@ C(x2)  =>  [ C(x2{u}) v C(x2{p}) ]
       "The size of biomolecular compounds is uniformly bounded."
     );
   });
-}) 
+})
+
+test.describe('Simulation tools', () => {
+
+  test('Simulation, plot', async ({ page }) => {
+    async function wait_for_sim_stop(page: Page) {
+      await page.waitForTimeout(200);
+      await expect(page.getByRole('button', { name: 'intervention' })).toBeVisible({ timeout: 20000 });
+    }
+    await open_app_with_model(page, abc_ka);
+    await setSeed(page, 1);
+    // Run simulation to 30, then 100, then test plot options
+    await set_pause_if(page, '[T] > 30');
+    await page.getByRole('button', { name: 'start' }).click();
+    await wait_for_sim_stop(page);
+    await page.getByRole('tab', { name: 'plot New' }).click();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await set_pause_if(page, '[T] > 100');
+    await page.getByRole('button', { name: 'continue' }).click();
+    await wait_for_sim_stop(page);
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.getByRole('checkbox', { name: 'Log X' }).check();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.getByRole('checkbox', { name: 'Log Y' }).check();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.getByRole('checkbox', { name: 'Log X' }).uncheck();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.getByRole('checkbox', { name: 'Log Y' }).uncheck();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.locator('#plot-axis-select').getByRole('combobox').selectOption('0');
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.locator('#plot-axis-select').getByRole('combobox').selectOption('4');
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.getByRole('spinbutton', { name: 'Row to plot' }).click();
+    await page.getByRole('spinbutton', { name: 'Row to plot' }).fill('50');
+    await page.getByRole('spinbutton', { name: 'Row to plot' }).press('Enter');
+    await page.locator('.panel-footer').click(); // needed for update
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.getByRole('spinbutton', { name: 'Row to plot' }).click();
+    await page.getByRole('spinbutton', { name: 'Row to plot' }).fill('1000'); // previous default value
+    await page.getByRole('spinbutton', { name: 'Row to plot' }).press('Enter');
+    await page.locator('.panel-footer').click(); // needed for update
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+
+    await testExports(page, '#export_plot-export', 'plot', ['svg', 'csv', 'json', 'tsv', 'png']);
+
+    // Test larger plots, slider
+    await set_pause_if(page, '[T] > 2000');
+    await page.getByRole('button', { name: 'continue' }).click();
+    await wait_for_sim_stop(page);
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.getByRole('button', { name: 'continue' }).click();
+    await page.getByPlaceholder('offset').fill('0');
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await page.getByPlaceholder('offset').fill('83');
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+
+    await set_pause_if(page, '');
+    await page.getByRole('button', { name: 'continue' }).click();
+    await expect.soft(page.locator('.row > .col-xs-3').first()).toHaveText("events");
+    await expect.soft(page.locator('.col-md-5 > div:nth-child(2) > .col-xs-3')).toHaveText("time");
+    await page.getByRole('button', { name: 'pause' }).click();
+  });
+
+  test('DIN', async ({ page }) => {
+    await open_app_with_model(page, abc_ka);
+    await setSeed(page, 1);
+
+    async function expectScreenShotDINTable() {
+      await expect.soft(page.getByRole('cell', { name: 'affects' })).toBeVisible();
+      await expect.soft(page.locator('#DIN div').first()).toHaveScreenshot({ mask: [page.locator('#export_din-export_form')] });
+    }
+
+    // Run simulation to 30, then 100, then test plot options
+    await set_pause_if(page, '[T] > 30');
+    await page.getByRole('button', { name: 'start' }).click();
+    await page.getByRole('tab', { name: 'DIN' }).click();
+    await expectScreenShotDINTable();
+
+    await testExports(page, '#export_din-export', 'flux', ['json', 'dot', 'html']);
+
+    await set_pause_if(page, '[T] > 60');
+    await page.getByRole('button', { name: 'continue' }).click();
+    await expectScreenShotDINTable();
+    await page.getByRole('combobox').first().selectOption('flux.json');
+    await expectScreenShotDINTable();
+
+    await testExports(page, '#export_din-export', 'flux_json', ['json', 'dot', 'html']);
+
+    await page.getByRole('combobox').first().selectOption('flux.html');
+    await expectScreenShotDINTable();
+  });
+
+  test('snapshots, outputs', async ({ page }) => {
+    await open_app_with_model(page, abc_ka);
+    await setSeed(page, 1);
+    // Run simulation to 30, then 100, then test plot options
+    set_pause_if(page, '[T] > 30');
+  });
+});
+
