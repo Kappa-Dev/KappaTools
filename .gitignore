@@ -102,3 +102,8 @@ man/KaSim_manual.ilg
 man/KaSim_manual.ind
 man/scripts/inputs~0.ka
 man/scripts/ode.m
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
