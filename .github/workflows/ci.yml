@@ -123,7 +123,7 @@ jobs:
       - name: Archive Javascript app
         uses: actions/upload-artifact@v4
         with:
-          name: js
+          name: linux
           path: |
             site
             viz
@@ -199,13 +199,14 @@ jobs:
       - name: Download doc artifact
         uses: actions/download-artifact@v4
         with:
-          name: doc
+          name: ${{matrix.deploy-name}}
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.DEPLOY_KEY }}
           known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
-      - run: dev/upload-website.sh ${{matrix.deploy-name}}
+      - name: Run deploy script
+        run: dev/deploy-to-website.sh ${{matrix.deploy-name}}
 
 # TODO: see if add cache        
 #       # from https://github.com/hazelgrove/hazel/blob/868f673119827a35ec67fad5e7e0d5135ce91d4c/.github/workflows/deploy_branches.yml#L19-L29
