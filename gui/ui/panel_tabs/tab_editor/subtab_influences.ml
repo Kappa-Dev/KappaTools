@@ -6,15 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-(* TODO: clean *)
-let debug_warn (title : string) data =
-  if String.length title > 0 then (
-    let () = Common.warn ~loc:__LOC__ ("Print `" ^ title ^ "`:") in
-    ();
-    let () = Common.warn ~loc:__LOC__ data in
-    ()
-  )
-
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
@@ -501,12 +492,9 @@ let rec fill_table acc by on =
 
 let draw_table origin_label_opt
     { positive_on; positive_by; negative_on; negative_by } =
-  let () = Common.warn ~loc:__LOC__ "DRAW TABLE" in
-  debug_warn "origin_label_opt" origin_label_opt;
   let origin_label, outs =
     match origin_label_opt with
     | None ->
-      debug_warn "track_cursor_when_draw_table" (track_cursor |> Hooked.S.value);
       if not (track_cursor |> Hooked.S.value) then
         "Navigate through the nodes using the controls above.", []
       else
@@ -544,11 +532,8 @@ let draw_table origin_label_opt
 
 let influence_sphere :
     (influence_sphere, Result_util.message list) Result_util.t React.signal =
-  State_project.on_project_change_async
-    ~on:(tab_is_active_signal |> React.S.trace (debug_warn "tab_is_active"))
-    dummy_model
-    (model_signal |> React.S.trace (debug_warn "on project model_signal"))
-    (Result_util.ok empty_sphere)
+  State_project.on_project_change_async ~on:tab_is_active_signal dummy_model
+    model_signal (Result_util.ok empty_sphere)
     (fun manager { rendering; accuracy; origin; origin_label = _ } ->
       match rendering with
       | DrawTabular _ ->
@@ -615,29 +600,6 @@ let content () =
       ]
   in
   let influence_style_id = "influence_style_id" in
-  (*
-  let () =
-    Hooked.S.register model (fun track_enabled ->
-        let dom_elt : 'a Js.t =
-          Ui_common.id_dom influence_style_id |> Js.Unsafe.coerce
-        in
-        dom_elt##.classList :=
-          let meth =
-            if track_enabled then
-              "add"
-            else
-              "remove"
-          in
-          let out =
-            Js.Unsafe.meth_call dom_elt##.classList meth
-              [| Js.string "active" |> Js.Unsafe.coerce |]
-          in
-          let () = Common.warn ~loc:__LOC__ "CALL STUFF draw style" in
-          let () = Common.warn ~loc:__LOC__ dom_elt in
-          out)
-  in
-
-*)
   [
     accuracy_form;
     Html.div
@@ -676,7 +638,6 @@ let content () =
               match rendering with
               | DrawGraph _ -> []
               | DrawTabular () ->
-                debug_warn "" "DRAW TABULAR";
                 Result_util.fold sphere
                   ~ok:(fun sphere -> [ draw_table origin_label sphere ])
                   ~error:(fun error ->
@@ -702,7 +663,6 @@ let neither_gc_me =
       | DrawGraph { fwd; bwd; total } ->
         State_project.eval_with_project ~label:__LOC__
           (fun (manager : Api.concrete_manager) ->
-            let () = Common.warn ~loc:__LOC__ "influence_map logger" in
             manager#get_local_influence_map ?fwd ?bwd ?origin ~total accuracy
             >|= Result_util.fold
                   ~ok:(fun influences ->
@@ -747,13 +707,9 @@ let _ =
   State_file.with_current_pos
     ~on:(Hooked.S.l2 ( && ) tab_is_active track_cursor)
     (fun filename cursor_pos ->
-      let () = Common.warn ~loc:__LOC__ "track_cursor triggered" in
       State_error.wrap "influence_map_node_at"
         (State_project.eval_with_project ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
-             let () =
-               Common.warn ~loc:__LOC__ "track_cursor eval_with_project"
-             in
              manager#get_influence_map_node_at ~filename cursor_pos
              >|= Result_util.map update_model_with_origin_refined)))
     (Lwt.return (Result_util.ok ()))

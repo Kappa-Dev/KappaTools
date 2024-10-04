@@ -1,5 +1,5 @@
 (* TODO: move this as a parameter *)
-let debug_printing = true
+let debug_printing = false
 
 module type DebugPrint = sig
   val debug_print : string -> unit

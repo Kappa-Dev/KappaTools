@@ -34,7 +34,6 @@ let current_filename =
     model
 
 let apply_on_current_pos_of_model f m =
-  let () = Common.warn ~loc:__LOC__ "apply_on_pos_of_model" in
   Option_util.bind
     (fun x ->
       Option_util.map
