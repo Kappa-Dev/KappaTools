@@ -938,7 +938,7 @@ let init_of_json ~filenames f_mix f_var = function
   | `List [ `String "token"; t ] ->
     INIT_TOK
       (JsonUtil.to_list
-         ~error_msg:(JsonUtil.build_msg "INIT_TOK")
+         ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "INIT_TOK")
          (Loc.annoted_of_yojson ~filenames f_var)
          t)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid Ast init statement", x))
@@ -1706,17 +1706,17 @@ let compil_of_json = function
          filenames = List.tl (Array.to_list filenames);
          signatures =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "AST signature")
+             ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST signature")
              (agent_sig_of_json filenames)
              (List.assoc "signatures" l);
          tokens =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "AST token sig")
+             ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST token sig")
              (Loc.string_annoted_of_json ~filenames)
              (List.assoc "tokens" l);
          variables =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "AST variables")
+             ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST variables")
              (JsonUtil.to_pair
                 (Loc.string_annoted_of_json ~filenames)
                 (Loc.annoted_of_yojson ~filenames
@@ -1724,7 +1724,7 @@ let compil_of_json = function
              (List.assoc "variables" l);
          rules =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "AST rules")
+             ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST rules")
              (JsonUtil.to_pair
                 (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
                 (Loc.annoted_of_yojson ~filenames
@@ -1732,13 +1732,14 @@ let compil_of_json = function
              (List.assoc "rules" l);
          observables =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "AST observables")
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json "AST observables")
              (Loc.annoted_of_yojson ~filenames
                 (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
              (List.assoc "observables" l);
          init =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "AST init")
+             ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST init")
              (JsonUtil.to_pair
                 (Loc.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
@@ -1746,7 +1747,8 @@ let compil_of_json = function
              (List.assoc "init" l);
          perturbations =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "AST perturbations")
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json "AST perturbations")
              (Loc.annoted_of_yojson ~filenames (function
                | `List [ alarm; pre; modif; post ] ->
                  ( JsonUtil.to_option Nbr.of_yojson alarm,
@@ -1768,7 +1770,8 @@ let compil_of_json = function
              (List.assoc "perturbations" l);
          configurations =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "AST configuration")
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json "AST configuration")
              (JsonUtil.to_pair
                 (Loc.string_annoted_of_json ~filenames)
                 (JsonUtil.to_list (Loc.string_annoted_of_json ~filenames)))

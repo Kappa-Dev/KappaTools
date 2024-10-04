@@ -103,7 +103,7 @@ let rec exn_of_json (json : Yojson.Basic.t) =
      with _ ->
        raise
          (Yojson.Basic.Util.Type_error
-            (JsonUtil.build_msg "unix labels error", json)))
+            (JsonUtil.exn_msg_cant_import_from_json "unix labels error", json)))
   | `Assoc [ ("Unix.Unix_error", `Assoc l) ] when List.length l = 3 ->
     (try
        Unix.Unix_error
@@ -112,7 +112,8 @@ let rec exn_of_json (json : Yojson.Basic.t) =
            JsonUtil.to_string (List.assoc "trd" l) )
      with _ ->
        raise
-         (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "unix error", json)))
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "unix error", json)))
   | `Assoc [ ("Failure", x) ] -> Failure (JsonUtil.to_string x)
   | `Assoc [ ("Stack_overflow", `Null) ] -> Stack_overflow
   | `Assoc [ ("Caught", x) ] -> Caught_exception (caught_exception_of_json x)
@@ -120,7 +121,9 @@ let rec exn_of_json (json : Yojson.Basic.t) =
     Uncaught_exception (uncaught_exception_of_json x)
   | `Assoc [ ("Unknown", `Null) ] -> Failure "Unknown"
   | _ ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "exception", json))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "exception", json))
 
 and uncaught_exception_of_json json =
   let a, b, c =
@@ -256,7 +259,7 @@ let to_json exceptions_caught_and_uncaught =
     ]
 
 let of_json = function
-  | `Assoc l as x when List.length l = 2 ->
+  | `Assoc l as x when List.length l = 4 ->
     (try
        let caught =
          (JsonUtil.to_list caught_exception_of_json) (List.assoc "caught" l)
@@ -280,9 +283,12 @@ let of_json = function
        }
      with _ ->
        raise
-         (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "error handler", x)))
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "error handler", x)))
   | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "error handler", x))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "error handler", x))
 
 let empty_exceptions_caught_and_uncaught =
   {

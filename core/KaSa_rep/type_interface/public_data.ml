@@ -99,7 +99,8 @@ let accuracy_of_json json =
   | Some x -> x
   | None ->
     raise
-      (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "accuracy level", json))
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "accuracy level", json))
 
 (******************************************************************)
 
@@ -187,10 +188,12 @@ let site_type_of_json = function
        User_graph.Port { User_graph.port_links; User_graph.port_states }
      with _ ->
        raise
-         (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node type", x)))
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "site node type", x)))
   | x ->
     raise
-      (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node type", x))
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "site node type", x))
 
 let site_of_json = function
   | `Assoc l as x ->
@@ -205,9 +208,13 @@ let site_of_json = function
        in
        { User_graph.site_name; User_graph.site_type }
      with _ ->
-       raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node", x)))
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "site node", x)))
   | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node", x))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "site node", x))
 
 let site_node_sites_to_json list = JsonUtil.of_array site_to_json list
 
@@ -240,9 +247,13 @@ let site_node_of_json = function
        in
        Some { User_graph.node_type; User_graph.node_id; User_graph.node_sites }
      with _ ->
-       raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node", x)))
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "site node", x)))
   | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node", x))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "site node", x))
 
 let contact_map_to_json contact_map =
   `Assoc
@@ -258,19 +269,24 @@ let contact_map_of_json = function
     (try
        let json = List.assoc contactmap l in
        JsonUtil.to_pair ~lab1:accuracy_string ~lab2:map
-         ~error_msg:(JsonUtil.build_msg "contact map")
+         ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "contact map")
          accuracy_of_json
          (JsonUtil.to_array
-            ~error_msg:(JsonUtil.build_msg "site nodes list")
+            ~error_msg:
+              (JsonUtil.exn_msg_cant_import_from_json "site nodes list")
             (JsonUtil.to_array
-               ~error_msg:(JsonUtil.build_msg "site nodes list")
+               ~error_msg:
+                 (JsonUtil.exn_msg_cant_import_from_json "site nodes list")
                site_node_of_json))
          json
      with _ ->
        raise
-         (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map", x)))
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "contact map", x)))
   | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map", x))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "contact map", x))
 
 (**********************************************************)
 (*strongly connected component*)
@@ -326,10 +342,11 @@ let scc_of_json = function
      with _ ->
        raise
          (Yojson.Basic.Util.Type_error
-            (JsonUtil.build_msg "scc decomposition", x)))
+            (JsonUtil.exn_msg_cant_import_from_json "scc decomposition", x)))
   | x ->
     raise
-      (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "scc decomposition", x))
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "scc decomposition", x))
 
 (******************************************************************************)
 
@@ -391,13 +408,17 @@ let json_to_rule = function
          rule_position =
            snd
              (Loc.annoted_of_yojson
-                (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
+                (JsonUtil.to_unit
+                   ~error_msg:
+                     (JsonUtil.exn_msg_cant_import_from_json "locality"))
                 (List.assoc position l));
          rule_direction = json_to_direction (List.assoc direction l);
          rule_hidden = JsonUtil.to_bool (List.assoc rule_hidden l);
        }
      with Not_found ->
-       raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg " rule", x)))
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json " rule", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("rule", x))
 
 type var = {
@@ -426,11 +447,15 @@ let json_to_var = function
          var_position =
            snd
              (Loc.annoted_of_yojson
-                (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
+                (JsonUtil.to_unit
+                   ~error_msg:
+                     (JsonUtil.exn_msg_cant_import_from_json "locality"))
                 (List.assoc position l));
        }
      with Not_found ->
-       raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg " var", x)))
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json " var", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("var", x))
 
 type ('rule, 'var) influence_node = Rule of 'rule | Var of 'var
@@ -455,8 +480,10 @@ let short_influence_node_to_json =
 
 let short_influence_node_of_json =
   influence_node_of_json
-    (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "rule id"))
-    (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "var id"))
+    (JsonUtil.to_int
+       ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "rule id"))
+    (JsonUtil.to_int
+       ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "var id"))
 
 let refined_influence_node_to_json =
   influence_node_to_json rule_to_json var_to_json
@@ -475,7 +502,8 @@ let pos_of_rules_and_vars_of_json =
        (fun x ->
          snd
            (Loc.annoted_of_yojson
-              (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
+              (JsonUtil.to_unit
+                 ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "locality"))
               x)))
 
 let short_node_of_refined_node = function
@@ -549,15 +577,18 @@ let half_influence_map_to_json =
 
 let half_influence_map_of_json =
   InfluenceNodeMap.of_json
-    ~error_msg:(JsonUtil.build_msg "activation or inhibition map")
+    ~error_msg:
+      (JsonUtil.exn_msg_cant_import_from_json "activation or inhibition map")
     ~lab_key:source ~lab_value:target_map short_influence_node_of_json
     (InfluenceNodeMap.of_json ~lab_key:target ~lab_value:location_pair_list
        ~error_msg:"map of lists of pairs of locations"
        short_influence_node_of_json
        (JsonUtil.to_list ~error_msg:"list of pair of locations"
           (JsonUtil.to_pair ~error_msg:"" ~lab1:rhs ~lab2:lhs
-             (location_of_json ~error_msg:(JsonUtil.build_msg "location"))
-             (location_of_json ~error_msg:(JsonUtil.build_msg "location")))))
+             (location_of_json
+                ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "location"))
+             (location_of_json
+                ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "location")))))
 
 (* Influence map *)
 
@@ -593,7 +624,8 @@ let nodes_of_influence_map_of_json = function
     (try
        let json = List.assoc nodesofinfluencemap l in
        JsonUtil.to_pair ~lab1:accuracy_string ~lab2:map
-         ~error_msg:(JsonUtil.build_msg "nodes of influence map1")
+         ~error_msg:
+           (JsonUtil.exn_msg_cant_import_from_json "nodes of influence map1")
          accuracy_of_json
          (function
            | `Assoc l as x when List.length l = 1 ->
@@ -601,20 +633,24 @@ let nodes_of_influence_map_of_json = function
               with Not_found ->
                 raise
                   (Yojson.Basic.Util.Type_error
-                     (JsonUtil.build_msg "nodes of influence map", x)))
+                     ( JsonUtil.exn_msg_cant_import_from_json
+                         "nodes of influence map",
+                       x )))
            | x ->
              raise
                (Yojson.Basic.Util.Type_error
-                  (JsonUtil.build_msg "nodes of influence map", x)))
+                  ( JsonUtil.exn_msg_cant_import_from_json
+                      "nodes of influence map",
+                    x )))
          json
      with _ ->
        raise
          (Yojson.Basic.Util.Type_error
-            (JsonUtil.build_msg "nodes of influence map", x)))
+            (JsonUtil.exn_msg_cant_import_from_json "nodes of influence map", x)))
   | x ->
     raise
       (Yojson.Basic.Util.Type_error
-         (JsonUtil.build_msg "nodes of influence map", x))
+         (JsonUtil.exn_msg_cant_import_from_json "nodes of influence map", x))
 
 let local_influence_map_to_json influence_map =
   let accuracy, total, bwd, fwd, origin_opt, influence_map = influence_map in
@@ -646,7 +682,7 @@ let influence_map_of_json = function
     (try
        let json = List.assoc influencemap l in
        JsonUtil.to_pair ~lab1:accuracy_string ~lab2:map
-         ~error_msg:(JsonUtil.build_msg "influence map1")
+         ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "influence map1")
          accuracy_of_json
          (function
            | `Assoc l as x when List.length l = 3 ->
@@ -660,17 +696,20 @@ let influence_map_of_json = function
               with Not_found ->
                 raise
                   (Yojson.Basic.Util.Type_error
-                     (JsonUtil.build_msg "influence map", x)))
+                     (JsonUtil.exn_msg_cant_import_from_json "influence map", x)))
            | x ->
              raise
                (Yojson.Basic.Util.Type_error
-                  (JsonUtil.build_msg "influence map", x)))
+                  (JsonUtil.exn_msg_cant_import_from_json "influence map", x)))
          json
      with _ ->
        raise
-         (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map", x)))
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "influence map", x)))
   | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map", x))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "influence map", x))
 
 let local_influence_map_of_json = function
   | `Assoc l as x ->
@@ -680,13 +719,13 @@ let local_influence_map_of_json = function
        | `Assoc l' ->
          let accuracy = accuracy_of_json (List.assoc accuracy_string l') in
          let total = JsonUtil.to_int (List.assoc total_string l') in
-         let error_msg = JsonUtil.build_msg "fwd radius" in
+         let error_msg = JsonUtil.exn_msg_cant_import_from_json "fwd radius" in
          let fwd =
            JsonUtil.to_option
              (JsonUtil.to_int ~error_msg)
              (List.assoc fwd_string l')
          in
-         let error_msg = JsonUtil.build_msg "bwd radius" in
+         let error_msg = JsonUtil.exn_msg_cant_import_from_json "bwd radius" in
          let bwd =
            JsonUtil.to_option
              (JsonUtil.to_int ~error_msg)
@@ -709,22 +748,30 @@ let local_influence_map_of_json = function
                 with Not_found ->
                   raise
                     (Yojson.Basic.Util.Type_error
-                       (JsonUtil.build_msg "local influence map", x)))
+                       ( JsonUtil.exn_msg_cant_import_from_json
+                           "local influence map",
+                         x )))
              | x ->
                raise
                  (Yojson.Basic.Util.Type_error
-                    (JsonUtil.build_msg "local influence map", x)))
+                    ( JsonUtil.exn_msg_cant_import_from_json
+                        "local influence map",
+                      x )))
              (List.assoc map l')
          in
          accuracy, total, fwd, bwd, origin, influence_map
        | _ ->
          raise
-           (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map", x))
+           (Yojson.Basic.Util.Type_error
+              (JsonUtil.exn_msg_cant_import_from_json "influence map", x))
      with _ ->
        raise
-         (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map", x)))
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "influence map", x)))
   | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map", x))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "influence map", x))
 
 (***************)
 (* dead rules  *)
@@ -739,8 +786,13 @@ let dead_rules_of_json = function
   | `Assoc [ (s, json) ] as x when s = dead_rules ->
     (try JsonUtil.to_list json_to_rule json
      with Not_found ->
-       raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_rules, x)))
-  | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_rules, x))
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json dead_rules, x)))
+  | x ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json dead_rules, x))
 
 (***************)
 (* dead agents *)
@@ -760,17 +812,20 @@ let json_to_agent_kind = function
          agent_ast = JsonUtil.to_string (List.assoc ast l);
          agent_position =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "locality list")
+             ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "locality list")
              (fun json ->
                snd
                  (Loc.annoted_of_yojson
                     (JsonUtil.to_unit
-                       ~error_msg:(JsonUtil.build_msg "locality"))
+                       ~error_msg:
+                         (JsonUtil.exn_msg_cant_import_from_json "locality"))
                     json))
              (List.assoc position_list l);
        }
      with Not_found ->
-       raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "agent kind", x)))
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "agent kind", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("agent kind", x))
 
 let agent_kind_to_json agent_kind =
@@ -793,9 +848,13 @@ let json_to_dead_agents = function
   | `Assoc [ (s, json) ] as x when s = dead_agents ->
     (try JsonUtil.to_list json_to_agent_kind json
      with Not_found ->
-       raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_agents, x)))
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json dead_agents, x)))
   | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg dead_agents, x))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json dead_agents, x))
 
 (*************************************)
 (* non weakly reversible transitions *)
@@ -981,11 +1040,11 @@ let lemmas_list_of_json_gen interface_of_json = function
      with _ ->
        raise
          (Yojson.Basic.Util.Type_error
-            (JsonUtil.build_msg "refinement lemmas list", x)))
+            (JsonUtil.exn_msg_cant_import_from_json "refinement lemmas list", x)))
   | x ->
     raise
       (Yojson.Basic.Util.Type_error
-         (JsonUtil.build_msg "refinement lemmas list", x))
+         (JsonUtil.exn_msg_cant_import_from_json "refinement lemmas list", x))
 
 let lemmas_list_of_json json =
   lemmas_list_of_json_gen interface_light_of_json json

@@ -379,7 +379,10 @@ let line_to_json line = `Assoc [ "line", JsonUtil.of_string line ]
 let line_of_json json =
   match json with
   | `Assoc [ ("line", `String s) ] -> s
-  | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "line", json))
+  | _ ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "line", json))
 
 let gen_iter iter list =
   let output = ref [] in

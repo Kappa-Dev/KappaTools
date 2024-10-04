@@ -2188,7 +2188,7 @@ module Make (Ord : OrderedType) : S with type elt = Ord.t = struct
       JsonUtil.of_map ~lab_key ~lab_value ~fold
 
     let of_json ?(lab_key = "key") ?(lab_value = "value")
-        ?(error_msg = JsonUtil.build_msg "map") =
+        ?(error_msg = JsonUtil.exn_msg_cant_import_from_json "map") =
       JsonUtil.to_map ~lab_key ~lab_value ~error_msg ~add ~empty
   end
 end

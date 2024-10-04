@@ -33,16 +33,18 @@ let read_next_item f st b =
   let () = Yojson.Basic.read_comma st b in
   read_between_spaces f st b
 
-let build_msg s = "Not a correct " ^ s
+let exn_msg_cant_import_from_json s =
+  "Not a correct `" ^ s ^ "`: couldn't import from json."
+
 let of_string (s : string) = `String s
 
-let to_string ?(error_msg = build_msg "string") = function
+let to_string ?(error_msg = exn_msg_cant_import_from_json "string") = function
   | `String (s : string) -> s
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg, x))
 
 let of_int (s : int) = `Int s
 
-let to_int ?(error_msg = build_msg "int") = function
+let to_int ?(error_msg = exn_msg_cant_import_from_json "int") = function
   | `Int (s : int) -> s
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg, x))
 
@@ -53,14 +55,14 @@ let of_bool (s : bool) =
      else
        "false")
 
-let to_bool ?(error_msg = build_msg "boolean") = function
+let to_bool ?(error_msg = exn_msg_cant_import_from_json "boolean") = function
   | `String "true" -> true
   | `String "false" -> false
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg, x))
 
 let of_unit () = `Null
 
-let to_unit ?(error_msg = build_msg "unit") = function
+let to_unit ?(error_msg = exn_msg_cant_import_from_json "unit") = function
   | `Null -> ()
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg, x))
 
@@ -85,7 +87,8 @@ let read_option f p lb =
 
 let of_list to_json l = `List (List.rev_map to_json (List.rev l))
 
-let to_list ?(error_msg = build_msg "list") of_json = function
+let to_list ?(error_msg = exn_msg_cant_import_from_json "list") of_json =
+  function
   | `List l as x ->
     (try List.rev_map of_json (List.rev l)
      with Not_found -> raise (Yojson.Basic.Util.Type_error (error_msg, x)))
@@ -115,7 +118,8 @@ let write_list f ob l =
 let of_array to_json a =
   `List (Array.fold_right (fun x acc -> to_json x :: acc) a [])
 
-let to_array ?(error_msg = build_msg "array") of_json = function
+let to_array ?(error_msg = exn_msg_cant_import_from_json "array") of_json =
+  function
   | `List l -> Tools.array_map_of_list of_json l
   | `Null -> [||]
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg, x))
@@ -168,7 +172,8 @@ let smart_assoc l =
 
 let of_assoc to_json l = `Assoc (List.rev_map to_json (List.rev l))
 
-let to_assoc ?(error_msg = build_msg "association") of_json json =
+let to_assoc ?(error_msg = exn_msg_cant_import_from_json "association") of_json
+    json =
   match json with
   | `Assoc l as x ->
     (try List.rev_map of_json (List.rev l)
@@ -185,7 +190,8 @@ let of_pair ?(lab1 = "first") ?(lab2 = "second") to_json1 to_json2 (a, b) =
   `Assoc [ lab1, to_json1 a; lab2, to_json2 b ]
 
 let to_triple ?(lab1 = "first") ?(lab2 = "second") ?(lab3 = "third")
-    ?(error_msg = build_msg "triple") of_json1 of_json2 of_json3 = function
+    ?(error_msg = exn_msg_cant_import_from_json "triple") of_json1 of_json2
+    of_json3 = function
   | `Assoc l as x when List.length l = 3 ->
     (try
        ( of_json1 (List.assoc lab1 l),
@@ -198,8 +204,9 @@ let of_triple ?(lab1 = "first") ?(lab2 = "second") ?(lab3 = "third") to_json1
     to_json2 to_json3 (a, b, c) =
   `Assoc [ lab1, to_json1 a; lab2, to_json2 b; lab3, to_json3 c ]
 
-let to_pair ?(lab1 = "first") ?(lab2 = "second") ?(error_msg = build_msg "pair")
-    of_json1 of_json2 = function
+let to_pair ?(lab1 = "first") ?(lab2 = "second")
+    ?(error_msg = exn_msg_cant_import_from_json "pair") of_json1 of_json2 =
+  function
   | `Assoc l as x when List.length l = 2 ->
     (try of_json1 (List.assoc lab1 l), of_json2 (List.assoc lab2 l)
      with Not_found -> raise (Yojson.Basic.Util.Type_error (error_msg, x)))
@@ -235,8 +242,8 @@ let of_map ?(lab_key = "key") ?(lab_value = "value") ~fold key_to_json
           map []))
 
 let to_map ?(lab_key = "key") ?(lab_value = "value")
-    ?(error_msg = build_msg "map") ~add ~empty json_to_key json_to_value =
-  function
+    ?(error_msg = exn_msg_cant_import_from_json "map") ~add ~empty json_to_key
+    json_to_value = function
   | `List l ->
     List.fold_left
       (fun map x ->
@@ -394,7 +401,10 @@ let (to_unix_label : Yojson.Basic.t -> UnixLabels.error) = function
   | `Assoc [ ("ELOOP", `Null) ] -> UnixLabels.ELOOP
   | `Assoc [ ("EOVERFLOW", `Null) ] -> UnixLabels.EOVERFLOW
   | `Assoc [ ("EUNKNOWNERR", int) ] -> UnixLabels.EUNKNOWNERR (to_int int)
-  | x -> raise (Yojson.Basic.Util.Type_error (build_msg "unix labels error", x))
+  | x ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         (exn_msg_cant_import_from_json "unix labels error", x))
 
 let of_unix_error = function
   | Unix.E2BIG -> `Assoc [ "E2BIG", `Null ]
@@ -537,7 +547,10 @@ let (to_unix_error : Yojson.Basic.t -> Unix.error) = function
   | `Assoc [ ("ELOOP", `Null) ] -> Unix.ELOOP
   | `Assoc [ ("EOVERFLOW", `Null) ] -> Unix.EOVERFLOW
   | `Assoc [ ("EUNKNOWNERR", int) ] -> Unix.EUNKNOWNERR (to_int int)
-  | x -> raise (Yojson.Basic.Util.Type_error (build_msg "unix error", x))
+  | x ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         (exn_msg_cant_import_from_json "unix error", x))
 
 let std_json_string_of_float x =
   let ob = Buffer.create 20 in

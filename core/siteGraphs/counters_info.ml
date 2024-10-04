@@ -141,10 +141,12 @@ let conversion_info_of_yojson ~filenames = function
        { from_sig_name; convert_value; convert_delta }
      with _ ->
        raise
-         (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "conversion_info", x)))
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json "conversion_info", x)))
   | x ->
     raise
-      (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "conversion_info", x))
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "conversion_info", x))
 
 let origin_to_yojson ~filenames origin =
   match origin with
@@ -166,7 +168,8 @@ let origin_of_yojson ~filenames origin_json =
       (conversion_info_of_yojson ~filenames conversion_info_json)
   | _ ->
     raise
-      (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "origin", origin_json))
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "origin", origin_json))
 
 let counter_sig_name_str = "counter_sig_name"
 let counter_sig_min_str = "counter_sig_min"
@@ -224,10 +227,11 @@ let counter_sig_option_of_yojson ~filenames =
        with _ ->
          raise
            (Yojson.Basic.Util.Type_error
-              (JsonUtil.build_msg "conversion_info", x)))
+              (JsonUtil.exn_msg_cant_import_from_json "conversion_info", x)))
     | x ->
       raise
-        (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "conversion_info", x)))
+        (Yojson.Basic.Util.Type_error
+           (JsonUtil.exn_msg_cant_import_from_json "conversion_info", x)))
 
 let to_yojson ~filenames (t : t) : Yojson.Basic.t =
   JsonUtil.of_array

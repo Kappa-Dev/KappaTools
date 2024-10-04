@@ -167,7 +167,8 @@ let directive_of_json = function
            snd
              (Loc.annoted_of_yojson
                 (JsonUtil.to_unit
-                   ?error_msg:(Some (JsonUtil.build_msg "position")))
+                   ?error_msg:
+                     (Some (JsonUtil.exn_msg_cant_import_from_json "position")))
                 json))
          pos_list)
   | "contextual help", contextual_help ->
@@ -177,7 +178,7 @@ let directive_of_json = function
 
 let directives_of_json directives =
   JsonUtil.to_assoc
-    ~error_msg:(JsonUtil.build_msg "list of directives")
+    ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "list of directives")
     directive_of_json directives
 
 let id_of_json = function
@@ -204,10 +205,14 @@ let edge_of_json = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct edge", x))
 
 let nodes_of_json =
-  JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "node list") node_of_json
+  JsonUtil.to_list
+    ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "node list")
+    node_of_json
 
 let edges_of_json =
-  JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "edge list") edge_of_json
+  JsonUtil.to_list
+    ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "edge list")
+    edge_of_json
 
 let of_json = function
   | `Assoc l as x when List.length l = 2 ->

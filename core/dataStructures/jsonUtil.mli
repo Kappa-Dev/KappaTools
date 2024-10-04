@@ -30,7 +30,7 @@ val write_comma : Buffer.t -> unit
 
 (** Jsonify simple types *)
 
-val build_msg : string -> string
+val exn_msg_cant_import_from_json : string -> string
 val of_string : string -> Yojson.Basic.t
 val to_string : ?error_msg:string -> Yojson.Basic.t -> string
 val of_int : int -> Yojson.Basic.t

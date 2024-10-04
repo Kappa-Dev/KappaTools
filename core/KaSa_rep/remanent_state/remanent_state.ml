@@ -298,7 +298,8 @@ let add_map get title label to_json state l =
              | `Assoc [ (s, m) ] when s = label -> m
              | x ->
                raise
-                 (Yojson.Basic.Util.Type_error (JsonUtil.build_msg title, x))))
+                 (Yojson.Basic.Util.Type_error
+                    (JsonUtil.exn_msg_cant_import_from_json title, x))))
         (List.rev y) )
     :: l
   )
@@ -344,7 +345,10 @@ let add_triple title label to_json =
     ->
       match to_json l with
       | `Assoc [ (s, m) ] when s = label -> m
-      | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg title, x)))
+      | x ->
+        raise
+          (Yojson.Basic.Util.Type_error
+             (JsonUtil.exn_msg_cant_import_from_json title, x)))
 
 let add_list_triple title lable to_json =
   JsonUtil.of_list (add_triple title lable to_json)
@@ -435,7 +439,7 @@ let of_json = function
       with Not_found ->
         raise
           (Yojson.Basic.Util.Type_error
-             (JsonUtil.build_msg "no error handler", json))
+             (JsonUtil.exn_msg_cant_import_from_json "no error handler", json))
     in
     let contact_maps =
       try
@@ -474,7 +478,8 @@ let of_json = function
       separating_transitions )
   | x ->
     raise
-      (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "remanent state", x))
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "remanent state", x))
 
 let do_event_gen f phase n state =
   let error, log_info =

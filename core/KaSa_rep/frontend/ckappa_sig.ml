@@ -138,7 +138,9 @@ let rule_id_of_json json =
   match json with
   | `Assoc [ (s, json) ] when s = "rule_id" -> Yojson.Basic.Util.to_int json
   | _ ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "rule id", json))
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json "rule id", json))
 
 let write_c_rule_id ob f = Yojson.Basic.to_buffer ob (rule_id_to_json f)
 
