@@ -34,9 +34,9 @@ let worker_onmessage ~(debug_printing : bool) ~(worker_name : string)
       fun response_message ->
     try process_message response_message
     with _ as e ->
-      Kappa_webapp_lib.Ui_common.open_modal_error ~is_critical:true
+      Kappa_webapp_lib.Ui_common.open_modal_error ~is_critical:false
         ~error_content:
-          ("Worker " ^ worker_name ^ " raised the following exception: \r"
+          ("Worker `" ^ worker_name ^ "` raised the following exception: \r"
          ^ Printexc.to_string e);
       raise e
     ) else
@@ -54,9 +54,7 @@ let send_worker_exceptions_to_modal =
 
 let onerror ~worker_name ~apply_onerror =
   Dom.handler (fun _ ->
-      let error_string : string =
-        "Error in " ^ worker_name ^ ", it might not be running anymore."
-      in
+      let error_string : string = "Error in `" ^ worker_name ^ "`:" in
       let () = Common.debug ~loc:__LOC__ error_string in
       Ui_common.open_modal_error ~is_critical:false ~error_content:error_string;
       apply_onerror ();

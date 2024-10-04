@@ -344,16 +344,8 @@ let create_modal_error ~(id : string) ~(is_critical : bool)
     if is_critical then
       [
         Html.txt
-          "The app will not behave properly after this, please save your files \
-           to avoid data loss and reload the app. Please consider ";
-        Html.a
-          ~a:
-            [
-              Html.Unsafe.string_attrib "href"
-                "https://github.com/Kappa-Dev/KappaTools/issues";
-            ]
-          [ Html.txt "opening an issue" ];
-        Html.txt ".";
+          "Some parts of the app might not behave properly after this. In this \
+           case, save your work and reload the app.";
       ]
     else
       []
