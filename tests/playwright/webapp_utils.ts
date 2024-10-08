@@ -1,9 +1,10 @@
-import { expect, type Page, type Download } from '@playwright/test';
+import { expect, type Page, type Download, type Locator } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import yauzl from 'yauzl';
 
 // TODO: uniformize all functions to camlcase, take care of induced collisions
+// Note: waitForTimeout should not be used to await loading of the page, but here is only used to wait for the trigger of the action before having a expect, should be ok
 
 // const url = 'https://tools.kappalanguage.org/try/'
 const url = 'http://127.0.0.1:12345/index.html'
@@ -11,9 +12,33 @@ const arg_set_model = '?model=https%3A'
 
 const referencesDir = 'tests/playwright/refs/'
 
+function timeout_of_options(options?: { timeout?: number | undefined; visible?: boolean | undefined; } | undefined) {
+  var timeout = 5000;
+  if (options !== undefined) {
+    if (options.timeout !== undefined) {
+      timeout = options.timeout;
+    }
+  }
+  return timeout;
+}
+
+// Used as playwright does not seemed to offer a way to have this logic
+async function expect_locator_toHaveInnerHtml(page: Page, locator: Locator, value: any, timeout: number) {
+  const end_time = Date.now() + timeout;
+  var is_equal = false;
+  while (Date.now() < end_time && !(is_equal)) {
+    const html = (await locator.innerHTML());
+    is_equal = (html == value);
+    expect.soft(html).toBe(value);
+    await page.waitForTimeout(1000);
+  }
+  expect(is_equal).toBeTruthy();
+}
+
 export async function wait_for_project_ready_status(page: Page, options?: { timeout?: number | undefined; visible?: boolean | undefined; } | undefined) {
   // wait for icon in project to be checkmark
-  await expect(page.getByRole('list').locator('a').first()).toHaveClass("glyphicon glyphicon-ok", options);
+  const timeout = timeout_of_options(options);
+  await expect_locator_toHaveInnerHtml(page, page.getByRole('list').locator('a').first(), "<span class=\"glyphicon glyphicon-ok\"></span> default<button class=\"close\">×</button>", timeout);
 }
 
 export async function wait_for_sim_stop(page: Page, options?: { timeout?: number | undefined; visible?: boolean | undefined; } | undefined) {
