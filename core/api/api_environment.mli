@@ -24,8 +24,8 @@ class type project = object
     Api_types_j.simulation_parameter -> Kappa_facade.t -> unit
 
   method get_simulation : unit -> simulation option
-  method get_state : unit -> parse_state option Lwt.t
-  method set_state : parse_state Lwt.t -> unit
+  method get_parse_state : unit -> parse_state option Lwt.t
+  method set_parse_state : parse_state Lwt.t -> unit
 end
 
 class type environment = object

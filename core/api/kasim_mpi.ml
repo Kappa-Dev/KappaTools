@@ -29,9 +29,10 @@ let on_message (manager : Api.manager_simulation)
     post_message text
   in
   match message.Mpi_message_j.data with
-  | `ProjectLoad Api_types_t.{ pattern_sharing; ast; variable_overwritten } ->
+  | `SimulationLoad Api_types_t.{ pattern_sharing; ast; variable_overwritten }
+    ->
     manager#secret_simulation_load pattern_sharing ast variable_overwritten
-    >>= handler (fun () -> `ProjectLoad)
+    >>= handler (fun () -> `SimulationLoad)
   | `SimulationContinue simulation_parameter ->
     manager#simulation_continue simulation_parameter
     >>= handler (fun () -> `SimulationContinue)

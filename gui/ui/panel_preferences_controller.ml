@@ -9,6 +9,10 @@
 open Lwt.Infix
 
 let create_simulation_parameter param : Api_types_j.simulation_parameter =
+  Common.debug ~loc:__LOC__
+    (Js.string
+       ("[panel_preferences_controller.create_simulation_parameter] seed = "
+       ^ Common.string_of_option string_of_int param.State_project.seed));
   {
     Api_types_j.simulation_plot_period = param.State_project.plot_period;
     Api_types_j.simulation_pause_condition = param.State_project.pause_condition;
@@ -33,15 +37,15 @@ let pause_simulation () =
 
 let stop_simulation () =
   Common.async __LOC__ (fun () ->
-      let () =
-        Common.debug ~loc:__LOC__
-          (Js.string "[subpanel_editor_controller.stop_simulation]")
-      in
+      Common.debug ~loc:__LOC__
+        (Js.string "[subpanel_editor_controller.stop_simulation]");
       State_error.wrap __LOC__ (State_simulation.stop_simulation ())
       >>= fun _ -> Lwt.return_unit)
 
 let start_simulation () =
   Common.async __LOC__ (fun () ->
+      Common.debug ~loc:__LOC__
+        (Js.string "[panel_preferences_controller.start_simulation]");
       let simulation_parameter =
         create_simulation_parameter
           (React.S.value State_project.model).State_project.model_parameters
@@ -59,16 +63,14 @@ let intervene_simulation () =
         (State_simulation.intervene_simulation model_perturbation)
       >>= Result_util.fold
             ~ok:(fun text ->
-              let () =
-                State_error.add_error __LOC__
-                  [
-                    {
-                      Result_util.severity = Logs.Info;
-                      Result_util.range = None;
-                      Result_util.text;
-                    };
-                  ]
-              in
+              State_error.add_error __LOC__
+                [
+                  {
+                    Result_util.severity = Logs.Info;
+                    Result_util.range = None;
+                    Result_util.text;
+                  };
+                ];
               Lwt.return_unit)
             ~error:(fun _ -> Lwt.return_unit))
 
@@ -85,10 +87,8 @@ let simulation_trace () =
       State_error.wrap __LOC__ manager#simulation_raw_trace
       >>= Api_common.result_bind_with_lwt ~ok:(fun data_string ->
               let data = Js.string data_string in
-              let () =
-                Common.saveFile ~data ~mime:"application/octet-stream"
-                  ~filename:"trace.json"
-              in
+              Common.saveFile ~data ~mime:"application/octet-stream"
+                ~filename:"trace.json";
               Lwt.return (Result_util.ok ())))
 
 let simulation_outputs () =

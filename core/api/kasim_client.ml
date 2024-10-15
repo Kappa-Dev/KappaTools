@@ -25,10 +25,10 @@ class virtual manager_simulation_msg () : manager_simulation_msg_type =
     method secret_simulation_load pattern_sharing ast variable_overwritten
         : unit Api.lwt_result =
       self#message
-        (`ProjectLoad
+        (`SimulationLoad
           Api_types_t.{ pattern_sharing; ast; variable_overwritten })
       >>= Api_common.result_bind_with_lwt ~ok:(function
-            | `ProjectLoad -> Lwt.return (Result_util.ok ())
+            | `SimulationLoad -> Lwt.return (Result_util.ok ())
             | response ->
               Lwt.return
                 (Api_common.err_result_of_exception (BadResponse response)))

@@ -44,9 +44,10 @@ class project : Api_environment.project =
           (new simulation runtime_state simulation_parameter
             :> Api_environment.simulation)
 
-    method set_state (state : Api_environment.parse_state Lwt.t) =
+    method set_parse_state (state : Api_environment.parse_state Lwt.t) =
       let () = Lwt.cancel _state in
       _state <- (state >>= fun x -> Lwt.return (Some x))
 
-    method get_state () : Api_environment.parse_state option Lwt.t = _state
+    method get_parse_state () : Api_environment.parse_state option Lwt.t =
+      _state
   end

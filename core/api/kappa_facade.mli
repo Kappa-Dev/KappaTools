@@ -35,7 +35,10 @@ val start :
   system_process:system_process ->
   parameter:Api_types_t.simulation_parameter ->
   t:t ->
-  (unit, Result_util.message list) Result_util.t Lwt.t
+  (int, Result_util.message list) Result_util.t Lwt.t
+(** Start the simulation from the parameters and using the parsed state.
+
+        Returns the seed used, as it is defined here if non specified *)
 
 val pause :
   system_process:system_process ->

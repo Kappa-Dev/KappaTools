@@ -155,12 +155,13 @@ class virtual manager_without_kasim () : concrete_manager_without_kasim =
     method private project_parse_without_kasim ~simulation_load ~patternSharing
         overwrites =
       self#secret_project_parse
-      >>= Api_common.result_bind_with_lwt ~ok:(fun out ->
+      >>= Api_common.result_bind_with_lwt
+            ~ok:(fun (parsing_compil : Ast.parsing_compil) ->
               (* load the sim so that kasa can run on it *)
               let load : unit Api.lwt_result =
-                simulation_load patternSharing out overwrites
+                simulation_load patternSharing parsing_compil overwrites
               in
-              let init_kasa = self#init_static_analyser out in
+              let init_kasa = self#init_static_analyser parsing_compil in
               let locators =
                 init_kasa
                 >>= Result_util.fold
@@ -226,8 +227,10 @@ class runtime_kasim_as_web_worker () : Api.concrete_manager =
     method is_computing = without_kasim#is_computing || self#sim_is_computing
 
     method project_parse ~patternSharing overwrites =
-      let simulation_load patternSharing out overwrites =
-        self#secret_simulation_load patternSharing out overwrites
+      let simulation_load (patternSharing : Pattern.sharing_level)
+          (parsing_compil : Ast.parsing_compil)
+          (overwrites : (string * Nbr.t) list) =
+        self#secret_simulation_load patternSharing parsing_compil overwrites
       in
       without_kasim#project_parse_without_kasim ~simulation_load ~patternSharing
         overwrites
@@ -240,13 +243,11 @@ class runtime_kasim_embedded_in_main_thread () : Api.concrete_manager =
       method yield = Js_of_ocaml_lwt.Lwt_js.yield
 
       method log ?exn (msg : string) =
-        let () = ignore exn in
-        let () =
-          Common.debug ~loc:__LOC__
-            (Js.string
-               (Format.sprintf
-                  "[State_runtime.embedded] embedded_manager#log: %s" msg))
-        in
+        ignore exn;
+        Common.debug ~loc:__LOC__
+          (Js.string
+             (Format.sprintf "[State_runtime.embedded] embedded_manager#log: %s"
+                msg));
         Lwt.return_unit
     end
   in
@@ -264,8 +265,8 @@ class runtime_kasim_embedded_in_main_thread () : Api.concrete_manager =
     method is_computing = true (*TODO*)
 
     method project_parse ~patternSharing overwrites =
-      let simulation_load patternSharing out overwrites =
-        self#secret_simulation_load patternSharing out overwrites
+      let simulation_load patternSharing parsing_compil overwrites =
+        self#secret_simulation_load patternSharing parsing_compil overwrites
       in
       without_kasim#project_parse_without_kasim ~simulation_load ~patternSharing
         overwrites

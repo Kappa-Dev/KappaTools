@@ -1,3 +1,4 @@
+(* TODO: change in this file nullable to option? https://atd.readthedocs.io/en/latest/atd-language.html#language-overview *)
 type ('ok,'error) result <ocaml from module="Result_util" t="t"> = abstract
 
 type message <ocaml from module="Result_util"> = abstract

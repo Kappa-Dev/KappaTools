@@ -198,7 +198,7 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
   eval_with_sim_manager_and_info ~label:"start_simulation"
     ~stopped:(fun manager ->
       let on_error error_msgs : unit Api.lwt_result =
-        let () = update_simulation_state SIMULATION_STATE_STOPPED in
+        update_simulation_state SIMULATION_STATE_STOPPED;
         (* turn the lights off *)
         manager#simulation_delete >>= fun _ ->
         Lwt.return (Api_common.err_result_of_msgs error_msgs)
@@ -206,7 +206,7 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
       Lwt.catch
         (fun () ->
           (* set state to initalize *)
-          let () = update_simulation_state SIMULATION_STATE_INITALIZING in
+          update_simulation_state SIMULATION_STATE_INITALIZING;
           manager#simulation_start simulation_parameter
           >>= Api_common.result_bind_with_lwt ~ok:(fun _ ->
                   manager#simulation_info)
@@ -214,12 +214,12 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
                   let simulation_state =
                     SIMULATION_STATE_READY simulation_status
                   in
-                  let () = update_simulation_state simulation_state in
+                  update_simulation_state simulation_state;
                   Lwt.return (Result_util.ok ()))
           >>= Result_util.fold
                 ~ok:(fun _ -> Lwt.return (Result_util.ok ()))
                 ~error:(fun error_msg ->
-                  let () = update_simulation_state SIMULATION_STATE_STOPPED in
+                  update_simulation_state SIMULATION_STATE_STOPPED;
                   on_error error_msg)
           >>= Api_common.result_bind_with_lwt ~ok:sync)
         (function

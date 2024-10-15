@@ -28,7 +28,7 @@ end
 class null_process : system_process =
   object
     method log ?exn (_ : string) =
-      let () = ignore exn in
+      ignore exn;
       Lwt.return_unit
 
     method yield () = Lwt.return_unit
@@ -39,6 +39,7 @@ type t = {
   mutable is_running: bool;
   mutable run_finalize: bool;
   mutable pause_condition: (Pattern.id array list, int) Alg_expr.bool;
+  parsed_seed: int option;
   dumpIfDeadlocked: bool;
   maxConsecutiveClash: int;
   patternSharing: Pattern.sharing_level;
@@ -55,10 +56,10 @@ type t = {
   (*mutable*) trace: Buffer.t;
   inputs_buffer: Buffer.t;
   inputs_form: Format.formatter;
-  ast: Ast.parsing_compil;
+  parsing_compil: Ast.parsing_compil;
   contact_map: Contact_map.t;
   mutable env: Model.t;
-  mutable graph: Rule_interpreter.t;
+  mutable graph: Rule_interpreter.t option;
   mutable state: State_interpreter.t;
   init_l: (Primitives.alg_expr * Primitives.elementary_rule) list;
   mutable lastyield: float;
@@ -67,14 +68,15 @@ type t = {
 
 let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
     ~dumpIfDeadlocked ~maxConsecutiveClash ~patternSharing ~env ~counter ~graph
-    ~state ~init_l ~lastyield ~ast : t =
+    ~state ~init_l ~lastyield ~parsing_compil ~parsed_seed : t =
   {
     is_running = false;
     run_finalize = false;
+    pause_condition = Alg_expr.FALSE;
+    parsed_seed;
     counter;
     log_buffer;
     log_form;
-    pause_condition = Alg_expr.FALSE;
     dumpIfDeadlocked;
     maxConsecutiveClash;
     patternSharing;
@@ -87,7 +89,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
     trace = Buffer.create 1024;
     inputs_buffer;
     inputs_form;
-    ast;
+    parsing_compil;
     contact_map;
     env;
     graph;
@@ -97,9 +99,9 @@ let create_t ~log_form ~log_buffer ~contact_map ~inputs_buffer ~inputs_form
   }
 
 let reinitialize ~outputs random_state t =
-  let () = Counter.reinitialize t.counter in
-  (* let () = Format.pp_print_flush t.log_form () in
-     let () = Buffer.reset t.log_buffer in*)
+  Counter.reinitialize t.counter;
+  (* Format.pp_print_flush t.log_form ();
+     Buffer.reset t.log_buffer;*)
   t.is_running <- false;
   t.run_finalize <- false;
   t.pause_condition <- Alg_expr.FALSE;
@@ -109,10 +111,19 @@ let reinitialize ~outputs random_state t =
   t.files <- Mods.StringMap.empty;
   t.error_messages <- [];
   t.graph <-
-    Rule_interpreter.empty ~outputs ~with_trace:false random_state t.env
-      t.counter;
+    Some
+      (Rule_interpreter.empty ~outputs ~with_trace:false random_state t.env
+         t.counter);
   t.state <-
     State_interpreter.empty ~with_delta_activities:false t.counter t.env
+
+let get_graph (t : t) : Rule_interpreter.t =
+  Option_util.unsome_or_raise
+    ~excep:
+      (Failure "No rule interpreter info ready: simulation not started properly")
+    t.graph
+
+let set_graph (t : t) (graph : Rule_interpreter.t) = t.graph <- Some graph
 
 let catch_error handler = function
   | ExceptionDefn.Syntax_Error ((message, range) : string Loc.annoted) ->
@@ -129,14 +140,14 @@ let catch_error handler = function
     in
     handler (Api_common.error_msg message)
 
-let parse ~patternSharing (ast : Ast.parsing_compil) var_overwrite
+let parse ~patternSharing (parsing_compil : Ast.parsing_compil) var_overwrite
     system_process =
   let yield = system_process#yield in
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
   let inputs_buffer = Buffer.create 512 in
   let inputs_form = Format.formatter_of_buffer inputs_buffer in
-  let conf, _, _, _ = Configuration.parse ast.Ast.configurations in
+  let conf, _, _, _ = Configuration.parse parsing_compil.Ast.configurations in
   let warning ~pos msg = Data.print_warning ~pos log_form msg in
   Lwt.catch
     (fun () ->
@@ -144,7 +155,7 @@ let parse ~patternSharing (ast : Ast.parsing_compil) var_overwrite
         (fun var_overwrite ->
           LKappa_compiler.compil_of_ast ~warning ~debug_mode:false
             ~syntax_version:Ast.V4 ~var_overwrite)
-        var_overwrite ast
+        var_overwrite parsing_compil
       >>= fun (ast_compiled_data : LKappa_compiler.ast_compiled_data) ->
       yield () >>= fun () ->
       (* The last yield is updated after the last yield.
@@ -168,7 +179,7 @@ let parse ~patternSharing (ast : Ast.parsing_compil) var_overwrite
           ast_compiled_data.agents_sig ast_compiled_data.counters_info
           ast_compiled_data.token_names ast_compiled_data.contact_map
           ast_compiled_data.result
-        >>= fun (env, with_trace, init_l) ->
+        >>= fun (env, _with_trace, init_l) ->
         let counter =
           Counter.create
             ~init_t:(0. : float)
@@ -176,33 +187,20 @@ let parse ~patternSharing (ast : Ast.parsing_compil) var_overwrite
             ?max_time:None ?max_event:None ~plot_period:(Configuration.DT 1.)
             ~nb_rules:(Model.nb_rules env) ()
         in
-        let theSeed =
-          match conf.Configuration.seed with
-          | None ->
-            let () = Random.self_init () in
-            let out = Random.bits () in
-            let () = Format.fprintf log_form "Random seed used: %i@." out in
-            out
-          | Some theSeed -> theSeed
-        in
-        let random_state = Random.State.make [| theSeed |] in
-        let () =
-          Data.print_initial_inputs ?uuid:None
-            { conf with Configuration.seed = Some theSeed }
-            env inputs_form init_l
-        in
-        let simulation =
+
+        let parsed_seed = conf.Configuration.seed in
+        Data.print_initial_inputs ?uuid:None
+          { conf with Configuration.seed = parsed_seed }
+          env inputs_form init_l;
+        let simulation : t =
           create_t ~contact_map:ast_compiled_data.contact_map ~log_form
-            ~log_buffer ~inputs_buffer ~inputs_form ~ast ~env ~counter
-            ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
+            ~log_buffer ~inputs_buffer ~inputs_form ~parsing_compil ~env
+            ~counter ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
             ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
-            ~patternSharing
-            ~graph:
-              (Rule_interpreter.empty ~outputs ~with_trace random_state env
-                 counter)
+            ~patternSharing ~graph:None
             ~state:
               (State_interpreter.empty ~with_delta_activities:false counter env)
-            ~init_l ~lastyield
+            ~init_l ~lastyield ~parsed_seed
         in
         Lwt.return (Result_util.ok simulation)
       with e ->
@@ -257,67 +255,66 @@ let interactive_outputs formatter t = function
 let time_yield ~(system_process : system_process) ~(t : t) : unit Lwt.t =
   let time = Sys.time () in
   if time -. t.lastyield > system_process#min_run_duration () then (
-    let () = t.lastyield <- time in
+    t.lastyield <- time;
     system_process#yield ()
   ) else
     Lwt.return_unit
 
 let finalize_simulation ~(t : t) : unit =
   State_interpreter.end_of_simulation ~outputs:(outputs t) t.env t.counter
-    t.graph t.state
+    (get_graph t) t.state
 
 let run_simulation ~(system_process : system_process) ~(t : t) stopped :
     unit Lwt.t =
   Lwt.catch
     (fun () ->
       let rstop = ref stopped in
-      let () = t.is_running <- true in
+      t.is_running <- true;
       let rec iter () =
         (try
-           let () =
-             while
-               (not !rstop)
-               && Sys.time () -. t.lastyield
-                  < system_process#min_run_duration ()
-             do
-               let stop, graph', state' =
-                 State_interpreter.a_loop ~debug_mode:false ~outputs:(outputs t)
-                   ~dumpIfDeadlocked:t.dumpIfDeadlocked
-                   ~maxConsecutiveClash:t.maxConsecutiveClash t.env t.counter
-                   t.graph t.state
-               in
-               rstop :=
-                 stop
-                 || Rule_interpreter.value_bool t.counter graph'
-                      t.pause_condition;
-               t.graph <- graph';
-               t.state <- state'
-             done
-           in
+           while
+             (not !rstop)
+             && Sys.time () -. t.lastyield < system_process#min_run_duration ()
+           do
+             let stop, graph', state' =
+               State_interpreter.a_loop ~debug_mode:false ~outputs:(outputs t)
+                 ~dumpIfDeadlocked:t.dumpIfDeadlocked
+                 ~maxConsecutiveClash:t.maxConsecutiveClash t.env t.counter
+                 (get_graph t) t.state
+             in
+             rstop :=
+               stop
+               || Rule_interpreter.value_bool t.counter graph' t.pause_condition;
+             set_graph t graph';
+             t.state <- state'
+           done;
            Lwt.return_unit
          with e -> Lwt.fail e)
         >>= fun () ->
         if !rstop then (
-          let () = t.is_running <- false in
+          t.is_running <- false;
           Lwt.return_unit
-        ) else if t.is_running then
+        ) else if t.is_running then (
           system_process#yield () >>= fun () ->
-          let () = t.lastyield <- Sys.time () in
+          t.lastyield <- Sys.time ();
           iter ()
-        else
+        ) else
           Lwt.return_unit
       in
       iter () >>= fun () ->
-      let () = if t.run_finalize then finalize_simulation ~t in
+      if t.run_finalize then finalize_simulation ~t;
       Lwt.return_unit)
     (catch_error (fun e ->
-         let () = t.is_running <- false in
-         let () = t.error_messages <- [ e ] in
+         t.is_running <- false;
+         t.error_messages <- [ e ];
          Lwt.return_unit))
 
+(** Start the simulation from the parameters and using the parsed state.
+
+        Returns the seed used, as it is defined here if non specified *)
 let start ~(system_process : system_process)
     ~(parameter : Api_types_t.simulation_parameter) ~(t : t) :
-    (unit, Result_util.message list) Result_util.t Lwt.t =
+    (int, Result_util.message list) Result_util.t Lwt.t =
   let lexbuf =
     Lexing.from_string parameter.Api_types_t.simulation_pause_condition
   in
@@ -332,86 +329,100 @@ let start ~(system_process : system_process)
                Counter.set_max_events
                  t.counter
                  parameter.Api_types_j.simulation_max_events
-               in*)
-      let random_state =
+               in *)
+      let simulation_seed : int =
         match parameter.Api_types_t.simulation_seed with
-        | None -> Random.State.make_self_init ()
-        | Some seed -> Random.State.make [| seed |]
+        | Some user_seed ->
+          Format.fprintf t.log_form "User-set seed used for simulation: %i@."
+            user_seed;
+          (match t.parsed_seed with
+          | Some parsed_seed ->
+            Format.fprintf t.log_form "WARNING: ignored seed from parsing: %i@."
+              parsed_seed
+          | None -> ());
+          user_seed
+        | None ->
+          (match t.parsed_seed with
+          | Some parsed_seed ->
+            Format.fprintf t.log_form "Parsed seed set for simulation: %i@."
+              parsed_seed;
+            parsed_seed
+          | None ->
+            (* init random to generate seed *)
+            Random.self_init ();
+            let random_seed = Random.bits () in
+            Format.fprintf t.log_form "Random seed used for simulation: %i@."
+              random_seed;
+            random_seed)
       in
-      let () = reinitialize random_state ~outputs:(outputs t) t in
+      let random_state = Random.State.make [| simulation_seed |] in
+      reinitialize random_state ~outputs:(outputs t) t;
       try
         let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
         Lwt.wrap4
           (Evaluator.get_pause_criteria ~debug_mode:false ~outputs:(outputs t)
              ~sharing:t.patternSharing ~syntax_version:Ast.V4)
-          t.contact_map t.env t.graph pause
+          t.contact_map t.env (get_graph t) pause
         >>= fun (env', graph', b'') ->
-        let () = t.env <- env' in
-        let () = t.graph <- graph' in
-        let () = t.pause_condition <- b'' in
-        let () =
-          Counter.set_plot_period t.counter
-            (Configuration.DT parameter.Api_types_t.simulation_plot_period)
-        in
-        let () =
-          Lwt.async (fun () ->
-              try
-                (* exception raised by build_initial_state must have been
-                   raised with Lwt.fail. Something is wrong for now... *)
-                Eval.build_initial_state
-                  ~bind:(fun x f ->
-                    time_yield ~system_process ~t >>= fun () -> x >>= f)
-                  ~return:Lwt.return ~debug_mode:false ~outputs:(outputs t)
-                  ~with_trace:parameter.Api_types_t.simulation_store_trace
-                  ~with_delta_activities:false t.counter t.env random_state
-                  t.init_l
-                >>= fun (stop, graph, state) ->
-                let () =
-                  t.graph <- graph;
-                  t.state <- state
-                in
-                let first_obs =
-                  State_interpreter.observables_values t.env graph t.counter
-                in
-                let () = t.plot <- Data.add_plot_line first_obs t.plot in
-                run_simulation ~system_process ~t stop
-              with e ->
-                catch_error
-                  (fun e ->
-                    let () = t.error_messages <- [ e ] in
-                    Lwt.return_unit)
-                  e)
-        in
-        Lwt.return (Result_util.ok ())
+        t.env <- env';
+        set_graph t graph';
+        t.pause_condition <- b'';
+        Counter.set_plot_period t.counter
+          (Configuration.DT parameter.Api_types_t.simulation_plot_period);
+        Lwt.async (fun () ->
+            try
+              (* exception raised by build_initial_state must have been
+                 raised with Lwt.fail. Something is wrong for now... *)
+              Eval.build_initial_state
+                ~bind:(fun x f ->
+                  time_yield ~system_process ~t >>= fun () -> x >>= f)
+                ~return:Lwt.return ~debug_mode:false ~outputs:(outputs t)
+                ~with_trace:parameter.Api_types_t.simulation_store_trace
+                ~with_delta_activities:false t.counter t.env random_state
+                t.init_l
+              >>= fun (stop, graph, state) ->
+              set_graph t graph;
+              t.state <- state;
+              let first_obs =
+                State_interpreter.observables_values t.env (get_graph t)
+                  t.counter
+              in
+              t.plot <- Data.add_plot_line first_obs t.plot;
+              run_simulation ~system_process ~t stop
+            with e ->
+              catch_error
+                (fun e ->
+                  t.error_messages <- [ e ];
+                  Lwt.return_unit)
+                e);
+        Lwt.return (Result_util.ok simulation_seed)
       with ExceptionDefn.Syntax_Error (message, range) ->
         Lwt.return (Api_common.err_result_of_string ~range message))
     (catch_error (fun e ->
-         let () = t.error_messages <- [ e ] in
+         t.error_messages <- [ e ];
          Lwt.return (Result_util.error [ e ])))
 
 let pause ~(system_process : system_process) ~(t : t) :
     (unit, Result_util.message list) Result_util.t Lwt.t =
-  let () = ignore system_process in
-  let () = ignore t in
-  let () =
-    if t.is_running then
-      t.is_running <- false
-    else
-      ()
-  in
+  ignore system_process;
+  ignore t;
+  if t.is_running then
+    t.is_running <- false
+  else
+    ();
   Lwt.return (Result_util.ok ())
 
 let stop ~(system_process : system_process) ~(t : t) :
     (unit, Result_util.message list) Result_util.t Lwt.t =
-  let () = ignore system_process in
-  let () = ignore t in
+  ignore system_process;
+  ignore t;
   Lwt.catch
     (fun () ->
-      let () = t.run_finalize <- true in
+      t.run_finalize <- true;
       if t.is_running then
         pause ~system_process ~t
       else (
-        let () = finalize_simulation ~t in
+        finalize_simulation ~t;
         Lwt.return (Result_util.ok ())
       ))
     (catch_error (fun e -> Lwt.return (Result_util.error [ e ])))
@@ -419,7 +430,7 @@ let stop ~(system_process : system_process) ~(t : t) :
 let perturbation ~(system_process : system_process) ~(t : t)
     ~(perturbation : Api_types_t.simulation_intervention) :
     (string, Result_util.message list) Result_util.t Lwt.t =
-  let () = ignore system_process in
+  ignore system_process;
   let lexbuf = Lexing.from_string perturbation in
   Lwt.catch
     (fun () ->
@@ -434,25 +445,21 @@ let perturbation ~(system_process : system_process) ~(t : t)
             (Evaluator.do_interactive_directives ~debug_mode:false
                ~outputs:(interactive_outputs log_form t)
                ~sharing:t.patternSharing ~syntax_version:Ast.V4)
-            t.contact_map t.env t.counter t.graph t.state e
+            t.contact_map t.env t.counter (get_graph t) t.state e
           >>= fun (e', (env', (_, graph'', state'))) ->
-          let () = t.env <- env' in
-          let () = t.graph <- graph'' in
-          let () = t.state <- state' in
-          let () =
-            Format.fprintf t.log_form "%%mod: [E] = %i do %a@."
-              (Counter.current_event t.counter)
-              (Pp.list ~trailing:Pp.colon Pp.colon
-                 (Kappa_printer.modification ~noCounters:false ~env:t.env))
-              e'
-          in
-          let () =
-            Format.fprintf t.inputs_form "%%mod: [E] = %i do %a@."
-              (Counter.current_event t.counter)
-              (Pp.list ~trailing:Pp.colon Pp.colon
-                 (Kappa_printer.modification ~noCounters:false ~env:t.env))
-              e'
-          in
+          t.env <- env';
+          set_graph t graph'';
+          t.state <- state';
+          Format.fprintf t.log_form "%%mod: [E] = %i do %a@."
+            (Counter.current_event t.counter)
+            (Pp.list ~trailing:Pp.colon Pp.colon
+               (Kappa_printer.modification ~noCounters:false ~env:t.env))
+            e';
+          Format.fprintf t.inputs_form "%%mod: [E] = %i do %a@."
+            (Counter.current_event t.counter)
+            (Pp.list ~trailing:Pp.colon Pp.colon
+               (Kappa_printer.modification ~noCounters:false ~env:t.env))
+            e';
           Lwt.return (Result_util.ok (Buffer.contents log_buffer))
         with ExceptionDefn.Syntax_Error (message, range) ->
           Lwt.return (Api_common.err_result_of_string ~range message)
@@ -473,11 +480,11 @@ let continue ~(system_process : system_process) ~(t : t)
           Lwt.wrap4
             (Evaluator.get_pause_criteria ~debug_mode:false ~outputs:(outputs t)
                ~sharing:t.patternSharing ~syntax_version:Ast.V4)
-            t.contact_map t.env t.graph pause
+            t.contact_map t.env (get_graph t) pause
           >>= fun (env', graph', b'') ->
-          let () = t.env <- env' in
-          let () = t.graph <- graph' in
-          let () = t.pause_condition <- b'' in
+          t.env <- env';
+          set_graph t graph';
+          t.pause_condition <- b'';
           (*let () =
             Counter.set_max_time
             t.counter
@@ -500,8 +507,8 @@ let continue ~(system_process : system_process) ~(t : t)
 let progress ~(system_process : system_process) ~(t : t) :
     (Api_types_t.simulation_progress, Result_util.message list) Result_util.t
     Lwt.t =
-  let () = ignore system_process in
-  let () = ignore t in
+  ignore system_process;
+  ignore t;
   match t.error_messages with
   | [] ->
     Lwt.catch
@@ -531,8 +538,8 @@ let progress ~(system_process : system_process) ~(t : t) :
 let outputs ~(system_process : system_process) ~(t : t) :
     (Api_data.simulation_detail_output, Result_util.message list) Result_util.t
     Lwt.t =
-  let () = ignore system_process in
-  let () = ignore t in
+  ignore system_process;
+  ignore t;
   match t.error_messages with
   | [] ->
     Lwt.catch
@@ -557,34 +564,26 @@ let efficiency t = Counter.get_efficiency t.counter
 let get_raw_trace (t : t) : string =
   JsonUtil.string_of_write
     (fun ob t ->
-      let () = Buffer.add_char ob '{' in
-      let () =
-        JsonUtil.write_field "dict"
-          (fun ob () ->
-            let () = Buffer.add_char ob '{' in
-            let () = Buffer.add_string ob Agent.json_dictionnary in
-            let () = JsonUtil.write_comma ob in
-            let () = Buffer.add_string ob Instantiation.json_dictionnary in
-            let () = JsonUtil.write_comma ob in
-            let () =
-              Buffer.add_string ob Trace.Simulation_info.json_dictionnary
-            in
-            let () = JsonUtil.write_comma ob in
-            let () = Buffer.add_string ob Trace.json_dictionnary in
-            Buffer.add_char ob '}')
-          ob ()
-      in
-      let () = JsonUtil.write_comma ob in
-      let () =
-        JsonUtil.write_field "model" Yojson.Basic.write_json ob
-          (Model.to_yojson t.env)
-      in
-      let () = JsonUtil.write_comma ob in
-      let () =
-        JsonUtil.write_field "trace" Buffer.add_string ob
-          ("[" ^ Buffer.contents t.trace)
-      in
+      Buffer.add_char ob '{';
+      JsonUtil.write_field "dict"
+        (fun ob () ->
+          Buffer.add_char ob '{';
+          Buffer.add_string ob Agent.json_dictionnary;
+          JsonUtil.write_comma ob;
+          Buffer.add_string ob Instantiation.json_dictionnary;
+          JsonUtil.write_comma ob;
+          Buffer.add_string ob Trace.Simulation_info.json_dictionnary;
+          JsonUtil.write_comma ob;
+          Buffer.add_string ob Trace.json_dictionnary;
+          Buffer.add_char ob '}')
+        ob ();
+      JsonUtil.write_comma ob;
+      JsonUtil.write_field "model" Yojson.Basic.write_json ob
+        (Model.to_yojson t.env);
+      JsonUtil.write_comma ob;
+      JsonUtil.write_field "trace" Buffer.add_string ob
+        ("[" ^ Buffer.contents t.trace);
       Buffer.add_string ob "]}")
     t
 
-let get_raw_ast t = Yojson.Basic.to_string (Ast.compil_to_json t.ast)
+let get_raw_ast t = Yojson.Basic.to_string (Ast.compil_to_json t.parsing_compil)

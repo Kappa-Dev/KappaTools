@@ -18,34 +18,53 @@ let id value =
   Js.Unsafe.fun_call (Js.Unsafe.js_expr "id") [| Js.Unsafe.inject value |]
 
 let debug ~loc value =
-  Js.Unsafe.fun_call
-    (Js.Unsafe.js_expr "debug")
-    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  let () =
+    Js.Unsafe.fun_call
+      (Js.Unsafe.js_expr "debug")
+      [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  in
+  ()
 
 let log ~loc value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "log")
-    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  let () =
+    Js.Unsafe.fun_call (Js.Unsafe.js_expr "log")
+      [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  in
+  ()
 
 let info ~loc value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "info")
-    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  let () =
+    Js.Unsafe.fun_call (Js.Unsafe.js_expr "info")
+      [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  in
+  ()
 
 let warn ~loc value =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "warn")
-    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  let () =
+    Js.Unsafe.fun_call (Js.Unsafe.js_expr "warn")
+      [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  in
+  ()
 
 let error ~loc value =
-  Js.Unsafe.fun_call
-    (Js.Unsafe.js_expr "error")
-    [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  let () =
+    Js.Unsafe.fun_call
+      (Js.Unsafe.js_expr "error")
+      [| Js.Unsafe.inject value; Js.Unsafe.inject (Js.string ("\n  " ^ loc)) |]
+  in
+  ()
 
 let log_group label =
-  Js.Unsafe.fun_call
-    (Js.Unsafe.js_expr "log_group")
-    [| Js.Unsafe.inject label |]
+  let () =
+    Js.Unsafe.fun_call
+      (Js.Unsafe.js_expr "log_group")
+      [| Js.Unsafe.inject label |]
+  in
+  ()
 
 let log_group_end () : unit =
-  Js.Unsafe.fun_call (Js.Unsafe.js_expr "log_group_end") [||]
+  let () = Js.Unsafe.fun_call (Js.Unsafe.js_expr "log_group_end") [||] in
+  ()
 
 let jquery_on (selector : string) (event : string) handler =
   Js.Unsafe.fun_call
@@ -194,3 +213,8 @@ let hide_codemirror () : unit =
 
 let show_codemirror () : unit =
   Js.Unsafe.fun_call (Js.Unsafe.js_expr "showCodeMirror") [||]
+
+let string_of_option string_of_value i_opt =
+  match i_opt with
+  | None -> "None"
+  | Some i -> "Some " ^ string_of_value i

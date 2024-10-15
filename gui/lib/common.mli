@@ -8,11 +8,11 @@
 
 val toss : 'a -> 'b
 val id : 'a -> 'b
-val debug : loc:string -> 'a -> 'b
-val info : loc:string -> 'a -> 'b
-val log : loc:string -> 'a -> 'b
-val warn : loc:string -> 'a -> 'b
-val error : loc:string -> 'a -> 'b
+val debug : loc:string -> 'a -> unit
+val info : loc:string -> 'a -> unit
+val log : loc:string -> 'a -> unit
+val warn : loc:string -> 'a -> unit
+val error : loc:string -> 'a -> unit
 val log_group : string -> unit
 val log_group_end : unit -> unit
 val jquery_on : string -> string -> 'a -> 'b
@@ -44,3 +44,6 @@ val children_value :
 
 val hide_codemirror : unit -> unit
 val show_codemirror : unit -> unit
+
+(* simple print of int option *)
+val string_of_option : ('a -> string) -> 'a option -> string

@@ -8,16 +8,6 @@
 
 open Lwt.Infix
 
-(* addd seed to parameter *)
-let patch_parameter (simulation_parameter : Api_types_t.simulation_parameter) :
-    Api_types_t.simulation_parameter * int =
-  match simulation_parameter.Api_types_t.simulation_seed with
-  | None ->
-    let () = Random.self_init () in
-    let seed = Random.bits () in
-    { simulation_parameter with Api_types_t.simulation_seed = Some seed }, seed
-  | Some seed -> simulation_parameter, seed
-
 let bind_simulation simulation handler =
   match simulation with
   | Some (_, simulation) -> handler simulation
@@ -194,72 +184,74 @@ class virtual manager_snapshot (system_process : Kappa_facade.system_process) =
         : Api_types_t.snapshot Api.lwt_result)
   end
 
-class manager_simulation project (system_process : Kappa_facade.system_process) :
+class manager_simulation (project : Api_environment.project)
+  (system_process : Kappa_facade.system_process) :
   Api.manager_simulation =
   object (self)
     val mutable simulation = None
 
-    method secret_simulation_load patternSharing text overwrites =
-      let ast = text in
+    method secret_simulation_load patternSharing parsing_compil overwrites =
+      (* TODO: understand why this logic : where is the call to check for modified files? *)
       let harakiri, _ = Lwt.task () in
-      let _ =
-        project#set_state
-          (Lwt.pick
-             [
-               Kappa_facade.parse ~patternSharing ast overwrites system_process;
-               ( harakiri >>= fun () ->
-                 Lwt.return
-                   (Result_util.error
-                      [
-                        Api_common.error_msg "Parse cancelled by modified files";
-                      ]) );
-             ])
-      in
+      Lwt.pick
+        [
+          Kappa_facade.parse ~patternSharing parsing_compil overwrites
+            system_process;
+          ( harakiri >>= fun () ->
+            Result_util.error
+              [ Api_common.error_msg "Parse cancelled by modified files" ]
+            |> Lwt.return );
+        ]
+      |> project#set_parse_state;
       Lwt.return (Result_util.ok ())
 
     method simulation_delete : unit Api.lwt_result =
       self#simulation_stop >>= fun _ ->
-      let () = simulation <- None in
+      simulation <- None;
       Lwt.return (Result_util.ok ())
 
     method simulation_start
         (simulation_parameter : Api_types_t.simulation_parameter)
         : Api_types_t.simulation_artifact Api.lwt_result =
-      let simulation_parameter, simulation_seed =
-        patch_parameter simulation_parameter
-      in
       match simulation with
       | Some _ ->
         Lwt.return
           (Api_common.err_result_of_string ~result_code:`Conflict
              "A simulation already exists")
       | None ->
-        project#get_state () >>= ( function
+        (* from Api_environment *)
+        project#get_parse_state () >>= ( function
         | None ->
           Lwt.return
             (Api_common.err_result_of_string
                "Cannot start simulation: Parse not done")
-        | Some parse ->
-          Result_util.fold
-            ~ok:(fun (facade : Kappa_facade.t) ->
-              Kappa_facade.start ~system_process ~parameter:simulation_parameter
-                ~t:facade
-              >>= Result_util.fold
-                    ~ok:(fun () ->
-                      let () =
-                        simulation <- Some (simulation_parameter, facade)
-                      in
-                      Lwt.return
-                        (Result_util.ok
+        | Some (parse : Api_environment.parse_state) ->
+          parse
+          |> Result_util.fold
+               ~ok:(fun (facade : Kappa_facade.t) ->
+                 Kappa_facade.start ~system_process
+                   ~parameter:simulation_parameter ~t:facade
+                 >>= Result_util.fold
+                       ~ok:(fun (simulation_seed : int) ->
+                         (* set simulation state *)
+                         let simulation_parameter_with_seed =
                            {
-                             Api_types_t.simulation_artifact_simulation_seed =
-                               simulation_seed;
-                           }))
-                    ~error:(fun errors ->
-                      Lwt.return (Api_common.err_result_of_msgs errors)))
-            ~error:(fun errors ->
-              Lwt.return (Api_common.err_result_of_msgs errors))
-            parse )
+                             simulation_parameter with
+                             simulation_seed = Some simulation_seed;
+                           }
+                         in
+                         simulation <-
+                           Some (simulation_parameter_with_seed, facade);
+                         (* return simulation artifact with seed *)
+                         {
+                           Api_types_t.simulation_artifact_simulation_seed =
+                             simulation_seed;
+                         }
+                         |> Result_util.ok |> Lwt.return)
+                       ~error:(fun errors ->
+                         Lwt.return (Api_common.err_result_of_msgs errors)))
+               ~error:(fun errors ->
+                 Lwt.return (Api_common.err_result_of_msgs errors)) )
 
     method simulation_parameter
         : Api_types_t.simulation_parameter Api.lwt_result =

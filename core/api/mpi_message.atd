@@ -39,7 +39,7 @@ type snapshot_catalog <ocaml from="Api_types"> = abstract
 type simulation_artifact <ocaml from="Api_types"> = abstract
 
 type request = [
-	       | ProjectLoad of project_parse
+	       | SimulationLoad of project_parse
                | SimulationContinue of string
                | SimulationDelete
                | SimulationDetailFileLine of string
@@ -69,7 +69,7 @@ type rest_request = [
      ]
 
 type response_content = [
-   | ProjectLoad
+   | SimulationLoad
    | SimulationDetailFileLine of string list
    | SimulationDetailDIN of din
    | SimulationDetailLogMessage of log_message

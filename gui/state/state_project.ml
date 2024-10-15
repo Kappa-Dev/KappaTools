@@ -189,7 +189,12 @@ let set_plot_period plot_period =
 let set_pause_condition pause_condition =
   update_parameters (fun param -> { param with pause_condition })
 
-let set_seed seed = update_parameters (fun param -> { param with seed })
+let set_seed seed =
+  Common.debug ~loc:__LOC__
+    (Js.string
+       ("[state_project.set_seed] set seed to "
+       ^ Common.string_of_option string_of_int seed));
+  update_parameters (fun param -> { param with seed })
 
 let set_store_trace store_trace =
   update_parameters (fun param -> { param with store_trace })
@@ -208,40 +213,28 @@ let set_show_non_weakly_reversible_transitions
 let update_state me project_catalog default_parameters project_parameters =
   me.project_manager#project_parse ~patternSharing:Pattern.Compatible_patterns
     []
-  >>=
-  let () =
-    set_state
-      {
-        project_current = Some me;
-        project_catalog;
-        default_parameters;
-        project_parameters;
-        project_version = 1;
-      }
-  in
-  fun out ->
-    let st = React.S.value state in
-    let () =
-      set_state
-        {
-          st with
-          project_current = Some me;
-          project_version = st.project_version + 1;
-        }
-    in
-    Lwt.return out
+  >>= fun (out : unit Api.result) ->
+  set_state
+    {
+      project_current = Some me;
+      project_catalog;
+      default_parameters;
+      project_parameters;
+      project_version = 1;
+    };
+  Lwt.return out
 
 let computing_watcher manager setter =
   let delay = 1. in
   let cancelled = ref false in
   let rec loop () =
-    let () = setter manager#is_computing in
+    setter manager#is_computing;
     if !cancelled then
       Lwt.return_unit
     else
       Js_of_ocaml_lwt.Lwt_js.sleep delay >>= loop
   in
-  let () = Common.async __LOC__ loop in
+  Common.async __LOC__ loop;
   cancelled
 
 let add_project is_new project_id : unit Api.lwt_result =
