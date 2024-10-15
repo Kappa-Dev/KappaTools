@@ -236,6 +236,21 @@ let id_dom (id : string) : 'a Js.t =
            (Format.sprintf "ui_common.id_dom : could not find id %s" id))
       : Dom_html.element Js.t)
 
+let switch_class elt_id add_list remove_list =
+  let dom_elt : 'a Js.t = id_dom elt_id |> Js.Unsafe.coerce in
+  List.iter
+    (fun (class_str : string) ->
+      Js.Unsafe.meth_call dom_elt##.classList "add"
+        [| Js.string class_str |> Js.Unsafe.coerce |])
+    add_list;
+  List.iter
+    (fun (class_str : string) ->
+      Js.Unsafe.meth_call dom_elt##.classList "remove"
+        [| Js.string class_str |> Js.Unsafe.coerce |])
+    remove_list
+
+(* modals *)
+
 let create_modal_text_input ~(id : string) ~(title_label : string)
     ~(body : [< Html_types.div_content_fun ] Html.elt Html.list_wrap)
     ~(submit_label : string) ~(submit : ('self Js.t, _ Js.t) Dom.event_listener)

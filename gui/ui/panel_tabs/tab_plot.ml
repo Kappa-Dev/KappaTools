@@ -99,7 +99,7 @@ let simulation_info_offset_max (simulation_info : Api_types_j.simulation_info) :
 
 let update_offset (update_offset_input : bool) : unit =
   let simulation_model = React.S.value State_simulation.model in
-  let simulation_info = State_simulation.t_simulation_info simulation_model in
+  let simulation_info = State_simulation.get_simulation_info simulation_model in
   match simulation_info with
   | None -> ()
   | Some simulation_info ->
@@ -235,7 +235,7 @@ let configuration () : Widget_export.configuration =
     show =
       React.S.map
         (fun model ->
-          let out = has_plot (State_simulation.model_simulation_info model) in
+          let out = has_plot (State_simulation.get_simulation_info model) in
           let () = if out then Option.iter update_plot !plot_ref in
           out)
         (React.S.on tab_is_active State_simulation.dummy_model
@@ -300,7 +300,7 @@ let onload () =
         let () = set_tab_is_active true in
         let simulation_model = React.S.value State_simulation.model in
         let simulation_info =
-          State_simulation.model_simulation_info simulation_model
+          State_simulation.get_simulation_info simulation_model
         in
         if has_plot simulation_info then
           update_plot plot
@@ -339,7 +339,7 @@ let onresize () =
     | None -> ()
     | Some plot ->
       let model = React.S.value State_simulation.model in
-      (match State_simulation.model_simulation_info model with
+      (match State_simulation.get_simulation_info model with
       | None -> ()
       | Some _ -> update_plot plot)
   in

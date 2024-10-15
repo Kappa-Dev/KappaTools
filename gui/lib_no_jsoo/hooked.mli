@@ -14,6 +14,7 @@ module type S = sig
     'a t * (?debug:string -> 'a -> unit)
 
   val register : 'a t -> ('a -> unit) -> unit
+  val register_lwt : 'a t -> ('a -> unit Lwt.t) -> unit
   val value : 'a t -> 'a
   val set : ?debug:string -> 'a t -> 'a -> unit
 

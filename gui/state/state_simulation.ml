@@ -8,6 +8,7 @@
 
 open Lwt.Infix
 
+(* private simulation state *)
 type simulation_state =
   | SIMULATION_STATE_STOPPED (* simulation is unavailable *)
   | SIMULATION_STATE_INITALIZING (* simulation is blocked on an operation *)
@@ -16,19 +17,16 @@ type simulation_state =
 
 type t = { simulation_state: simulation_state }
 
-let t_simulation_state simulation = simulation.simulation_state
-
-let t_simulation_info simulation : Api_types_j.simulation_info option =
+let get_simulation_info simulation : Api_types_j.simulation_info option =
   match simulation.simulation_state with
   | SIMULATION_STATE_STOPPED -> None
   | SIMULATION_STATE_INITALIZING -> None
   | SIMULATION_STATE_READY simulation_info -> Some simulation_info
 
-type state = t
-type model = state
-type model_state = STOPPED | INITALIZING | RUNNING | PAUSED
+(* public simulation status *)
+type simulation_status = STOPPED | INITALIZING | RUNNING | PAUSED
 
-let model_state_to_string = function
+let simulation_status_to_string = function
   | STOPPED -> "Stopped"
   | INITALIZING -> "Initalizing"
   | RUNNING -> "Running"
@@ -36,11 +34,8 @@ let model_state_to_string = function
 
 let dummy_model = { simulation_state = SIMULATION_STATE_STOPPED }
 
-let model_simulation_info model : Api_types_j.simulation_info option =
-  t_simulation_info model
-
-let model_simulation_state model : model_state =
-  match t_simulation_state model with
+let model_simulation_state model : simulation_status =
+  match model.simulation_state with
   | SIMULATION_STATE_STOPPED -> STOPPED
   | SIMULATION_STATE_INITALIZING -> INITALIZING
   | SIMULATION_STATE_READY simulation_info ->
@@ -52,13 +47,15 @@ let model_simulation_state model : model_state =
     else
       PAUSED
 
+(* private state *)
 let state, set_state = React.S.create dummy_model
+
+(* public model *)
+let model = state
 
 let update_simulation_state (simulation_state : simulation_state) : unit =
   let () = set_state { simulation_state } in
   ()
-
-let model : model React.signal = state
 
 let eval_with_sim_manager :
       'a.

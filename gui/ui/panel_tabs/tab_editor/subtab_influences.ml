@@ -163,32 +163,16 @@ let recenter =
       ]
     [ Html.txt "First node" ]
 
-(* TODO: clean this *)
-let switch_class elt_id add_list remove_list =
-  let dom_elt : 'a Js.t = Ui_common.id_dom elt_id |> Js.Unsafe.coerce in
-  List.iter
-    (fun (class_str : string) ->
-      Js.Unsafe.meth_call dom_elt##.classList "add"
-        [| Js.string class_str |> Js.Unsafe.coerce |])
-    add_list;
-  List.iter
-    (fun (class_str : string) ->
-      Js.Unsafe.meth_call dom_elt##.classList "remove"
-        [| Js.string class_str |> Js.Unsafe.coerce |])
-    remove_list
-
 let track_cursor_switch =
   let track_cursor_switch_id = "track_cursor_switch_id" in
-  let () =
-    Hooked.S.register track_cursor (fun track_enabled ->
-        let add_list, remove_list =
-          if track_enabled then
-            [ "btn-light"; "active" ], [ "btn-default" ]
-          else
-            [ "btn-default" ], [ "btn-light"; "active" ]
-        in
-        switch_class track_cursor_switch_id add_list remove_list)
-  in
+  Hooked.S.register track_cursor (fun track_enabled ->
+      let add_list, remove_list =
+        if track_enabled then
+          [ "btn-light"; "active" ], [ "btn-default" ]
+        else
+          [ "btn-default" ], [ "btn-light"; "active" ]
+      in
+      Ui_common.switch_class track_cursor_switch_id add_list remove_list);
   let on_click _ =
     let () = track_cursor_set (not (Hooked.S.value track_cursor)) in
     if Hooked.S.value track_cursor then

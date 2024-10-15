@@ -8,18 +8,14 @@
 
 type t
 
-val t_simulation_info : t -> Api_types_j.simulation_info option
+val get_simulation_info : t -> Api_types_j.simulation_info option
+val dummy_model : t
+val model : t React.signal
 
-type model = t
+type simulation_status = STOPPED | INITALIZING | RUNNING | PAUSED
 
-val dummy_model : model
-val model : model React.signal
-val model_simulation_info : model -> Api_types_j.simulation_info option
-
-type model_state = STOPPED | INITALIZING | RUNNING | PAUSED
-
-val model_state_to_string : model_state -> string
-val model_simulation_state : t -> model_state
+val simulation_status_to_string : simulation_status -> string
+val model_simulation_state : t -> simulation_status
 
 (* run on application init *)
 val init : unit -> unit Lwt.t

@@ -16,7 +16,8 @@ let toggle_element (projection : Api_types_j.simulation_info option -> bool)
         Tyxml_js.R.Html.a_class
           (React.S.bind State_simulation.model (fun model ->
                React.S.const
-                 (if projection (State_simulation.t_simulation_info model) then
+                 (if projection (State_simulation.get_simulation_info model)
+                  then
                     [ "show" ]
                   else
                     [ "hidden" ])));
@@ -27,7 +28,7 @@ let label_news tab_is_active counter =
   let last_value =
     ref
       (let simulation_info =
-         State_simulation.t_simulation_info
+         State_simulation.get_simulation_info
            (React.S.value State_simulation.model)
        in
        counter simulation_info)
@@ -38,7 +39,7 @@ let label_news tab_is_active counter =
          if tab_active then
            []
          else (
-           let simulation_info = State_simulation.t_simulation_info model in
+           let simulation_info = State_simulation.get_simulation_info model in
            let v = counter simulation_info in
            if v <> !last_value && v > 0 then (
              let () = last_value := v in
@@ -57,7 +58,7 @@ let badge (counter : Api_types_j.simulation_info option -> int) =
   ReactiveData.RList.from_signal
     (React.S.map
        (fun model ->
-         let simulation_info = State_simulation.t_simulation_info model in
+         let simulation_info = State_simulation.get_simulation_info model in
          let count = counter simulation_info in
          if count > 0 then
            [

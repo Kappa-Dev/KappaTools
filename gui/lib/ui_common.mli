@@ -56,8 +56,12 @@ module type Panel = sig
   val onresize : unit -> unit
 end
 
-val id_dom : string -> 'a Js.t
 val document : Dom_html.document Js.t
+val id_dom : string -> 'a Js.t
+
+val switch_class : string -> string list -> string list -> unit
+(** [switch_class elt_id add_list remove_list] adds and removes classes 
+    to DOM element with id `elt_id` *)
 
 val navtabs :
   string ->

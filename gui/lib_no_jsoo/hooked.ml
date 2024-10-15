@@ -15,6 +15,7 @@ module type S = sig
     'a t * (?debug:string -> 'a -> unit)
 
   val register : 'a t -> ('a -> unit) -> unit
+  val register_lwt : 'a t -> ('a -> unit Lwt.t) -> unit
   val value : 'a t -> 'a
   val set : ?debug:string -> 'a t -> 'a -> unit
 
@@ -57,6 +58,7 @@ module MakeS (D : DebugPrint) : S = struct
   type 'a t = {
     mutable value: 'a;
     mutable hooks: ('a -> unit) list;
+    mutable hooks_lwt: ('a -> unit Lwt.t) list;
     eq: 'a -> 'a -> bool;
     signal: 'a React.signal;
     set_signal: ?step:React.step -> 'a -> unit;
@@ -79,6 +81,7 @@ module MakeS (D : DebugPrint) : S = struct
       {
         value = a;
         hooks = [];
+        hooks_lwt = [];
         eq;
         signal;
         set_signal;
@@ -93,9 +96,17 @@ module MakeS (D : DebugPrint) : S = struct
     _log hooked "register";
     hooked.hooks <- f :: hooked.hooks
 
+  let register_lwt hooked f =
+    _log hooked "register";
+    hooked.hooks_lwt <- f :: hooked.hooks_lwt
+
   let value hooked =
     _log hooked "value";
     hooked.value
+
+  let call_hooks hooked =
+    List.iter (fun f -> f hooked.value) hooked.hooks;
+    List.iter (fun f -> f hooked.value |> ignore) hooked.hooks_lwt
 
   let set ?(debug = "") hooked value =
     let value_changed = hooked.eq value hooked.value in
@@ -108,7 +119,7 @@ module MakeS (D : DebugPrint) : S = struct
               "")
            (List.length hooked.hooks));
       hooked.value <- value;
-      List.iter (fun f -> f value) hooked.hooks;
+      call_hooks hooked;
       hooked.set_signal value
     ) else
       _log hooked "set NO change"

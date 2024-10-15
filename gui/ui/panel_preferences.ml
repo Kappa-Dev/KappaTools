@@ -11,7 +11,8 @@ open Lwt.Infix
 open List_util.Infix
 
 let visible_on_states ?(a_class = [])
-    (state : State_simulation.model_state list) : string list React.signal =
+    (state : State_simulation.simulation_status list) : string list React.signal
+    =
   let hidden_class = [ "hidden" ] in
   let visible_class = [ "visible" ] in
   React.S.bind State_simulation.model (fun model ->
@@ -551,7 +552,7 @@ module DivStatusIndicator : Ui_common.Div = struct
           Tyxml_js.R.Html.txt
             (React.S.bind State_simulation.model (fun model ->
                  let label =
-                   State_simulation.model_state_to_string
+                   State_simulation.simulation_status_to_string
                      (State_simulation.model_simulation_state model)
                  in
                  React.S.const label));
@@ -589,7 +590,7 @@ module RunningPanelLayout : Ui_common.Div = struct
     progress_bar
       (React.S.map
          (fun model ->
-           let simulation_info = State_simulation.model_simulation_info model in
+           let simulation_info = State_simulation.get_simulation_info model in
            let time_percent : int option =
              Option_util.bind
                (fun (status : Api_types_j.simulation_info) ->
@@ -602,7 +603,7 @@ module RunningPanelLayout : Ui_common.Div = struct
          State_simulation.model)
       (React.S.map
          (fun model ->
-           let simulation_info = State_simulation.model_simulation_info model in
+           let simulation_info = State_simulation.get_simulation_info model in
            let time : float option =
              Option_util.map
                (fun (status : Api_types_j.simulation_info) ->
@@ -618,7 +619,7 @@ module RunningPanelLayout : Ui_common.Div = struct
     progress_bar
       (React.S.map
          (fun model ->
-           let simulation_info = State_simulation.model_simulation_info model in
+           let simulation_info = State_simulation.get_simulation_info model in
            let event_percentage : int option =
              Option_util.bind
                (fun (status : Api_types_j.simulation_info) ->
@@ -633,7 +634,7 @@ module RunningPanelLayout : Ui_common.Div = struct
          State_simulation.model)
       (React.S.map
          (fun model ->
-           let simulation_info = State_simulation.model_simulation_info model in
+           let simulation_info = State_simulation.get_simulation_info model in
            let event : int option =
              Option_util.map
                (fun (status : Api_types_j.simulation_info) ->
@@ -665,7 +666,7 @@ module RunningPanelLayout : Ui_common.Div = struct
     Tyxml_js.R.Html.txt
       (React.S.map
          (fun model ->
-           let simulation_info = State_simulation.model_simulation_info model in
+           let simulation_info = State_simulation.get_simulation_info model in
            match tracked_events simulation_info with
            | Some tracked_events -> string_of_int tracked_events
            | None -> " ")
@@ -675,7 +676,7 @@ module RunningPanelLayout : Ui_common.Div = struct
     Tyxml_js.R.Html.txt
       (React.S.map
          (fun model ->
-           let simulation_info = State_simulation.model_simulation_info model in
+           let simulation_info = State_simulation.get_simulation_info model in
            match tracked_events simulation_info with
            | Some _ -> "tracked events"
            | None -> " ")

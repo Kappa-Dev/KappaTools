@@ -253,7 +253,7 @@ class virtual new_client ~post () : manager_simulation_mpi =
         in
         result
       ) else
-        Lwt.return (Api_common.err_result_of_string "Kappa has died")
+        Lwt.return (Api_common.err_result_of_string "Kasim has died")
 
     method private sim_is_computing = not (IntMap.is_empty context.mailboxes)
   end

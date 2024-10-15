@@ -79,7 +79,7 @@ let configuration_template id additional_handlers : Widget_export.configuration
     Widget_export.show =
       React.S.map
         (fun model ->
-          let simulation_info = State_simulation.model_simulation_info model in
+          let simulation_info = State_simulation.get_simulation_info model in
           snapshot_count simulation_info > 0)
         (React.S.on tab_is_active State_simulation.dummy_model
            State_simulation.model);
@@ -130,7 +130,7 @@ let select_snapshot (snapshot_js : Js_snapshot.snapshot Js.t) : unit =
   let () = Common.log_group_end () in
   let model : State_simulation.t = React.S.value State_simulation.model in
   let simulation_output : Api_types_t.simulation_info option =
-    State_simulation.model_simulation_info model
+    State_simulation.get_simulation_info model
   in
   match simulation_output with
   | None -> ()
@@ -190,7 +190,7 @@ let snapshot_class :
  fun ~empty ~single ~multiple ->
   React.S.map
     (fun model ->
-      let simulation_info = State_simulation.model_simulation_info model in
+      let simulation_info = State_simulation.get_simulation_info model in
       match snapshot_count simulation_info with
       | 0 -> empty ()
       | 1 -> single ()

@@ -159,7 +159,7 @@ let parse ~patternSharing (parsing_compil : Ast.parsing_compil) var_overwrite
       >>= fun (ast_compiled_data : LKappa_compiler.ast_compiled_data) ->
       yield () >>= fun () ->
       (* The last yield is updated after the last yield.
-         It is gotten here for the initial last yeild value. *)
+         It is gotten here for the initial last yield value. *)
       let lastyield = Sys.time () in
       try
         (* exception raised by compile must have used Lwt.fail.
