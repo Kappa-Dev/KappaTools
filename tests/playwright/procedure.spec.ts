@@ -43,28 +43,30 @@ test.describe('Editor tab', () => {
       " invalid internal state or missing '}' ",
     ]);
     await editor_cancel();
-    await utils.expect_error(page, [
-      " «  » ",
-      "",
-    ]);
+    await utils.expect_no_error(page);
     await editor_to_line(24);
     await editor.fill('\n%agent: D(a{u p})');
+
     await utils.expect_error(page, [
       " « 1/1 » [abc.ka] Dead agent D ",
       " Dead agent D ",
     ]);
+
     await editor_to_line(25);
+    await editor.fill("\n%init: 10 D()");
+    await utils.expect_no_error(page);
+
+    await editor_to_line(26);
     await editor.fill("\n'd' D(a{p}) -> D(a{u}) @ 1");
+    // await page.locator('#panel_preferences_message_nav_inc_id').click();
     await utils.expect_error(page, [
-      " « 1/4 » [abc.ka] Dead agent D ",
-      " Dead agent D ",
+      " « 1/1 » [abc.ka] Dead rule 'd' ",
+      " Dead rule 'd' ",
     ]);
     await editor_cancel();
     await editor_cancel();
-    await utils.expect_error(page, [
-      " «  » ",
-      "",
-    ]);
+    await editor_cancel();
+    await utils.expect_no_error(page);
   });
 
   test('contact_map', async ({ page }) => {
@@ -366,7 +368,23 @@ test.describe('Simulation tools', () => {
 
     // check log page
     await page.getByRole('tab', { name: 'log New' }).click();
-    await expect(page.locator('#log div')).toHaveText("TODO");
+    await expect(page.locator('#log div')).toHaveText(
+      `+ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 21 (sub)observables 37 navigation steps
+	 -initial conditions
+Random seed used: 994697968
+%mod: [E] = 14599 do $PRINTF ("time: ".[T]) > "time.txt";
+
+%mod: [E] = 14599 do $PRINTF (AB) > "ab.txt";
+
+%mod: [E] = 28929 do $PRINTF ("time: ".[T]) > "time.txt";
+
+%mod: [E] = 28929 do $PRINTF (AB) > "ab.txt"; `);
 
     await page.locator('#output-select-id').selectOption('time.txt');
     await expect(page.getByRole('paragraph')).toHaveText("TODO");

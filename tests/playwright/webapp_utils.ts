@@ -29,7 +29,6 @@ async function expect_locator_toHaveInnerHtml(page: Page, locator: Locator, valu
   while (Date.now() < end_time && !(is_equal)) {
     const html = (await locator.innerHTML());
     is_equal = (html == value);
-    expect.soft(html).toBe(value);
     await page.waitForTimeout(1000);
   }
   expect(is_equal).toBeTruthy();
@@ -90,6 +89,13 @@ export function get_error_field(page: Page) {
 
 export async function expect_error(page: Page, text: string[]): Promise<void> {
   await expect.soft(get_error_field(page)).toHaveText(text);
+}
+
+export async function expect_no_error(page: Page): Promise<void> {
+  await expect_error(page, [
+    " «  » ",
+    "",
+  ]);
 }
 
 export async function set_pause_if(page: Page, s: string) {
