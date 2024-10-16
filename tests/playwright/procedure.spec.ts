@@ -124,10 +124,14 @@ test.describe('Editor tab', () => {
     await utils.testExports(page, '#export_influence-export', 'influences', ['json']);
   });
 
+  function constraint_locator(page: Page, n: number) {
+    return (page.locator('#constraints > .panel-scroll > div > .panel-body').nth(n));
+  }
+
   test('constraints_and_polymers_1', async ({ page }) => {
     await utils.open_app_with_model(page, abc_ka);
     await page.getByRole('tab', { name: 'constraints' }).click();
-    await expect.soft(page.locator('.panel-scroll > div > .panel-body').first()).toHaveText(
+    await expect.soft(constraint_locator(page, 0)).toHaveText(
       `A(c)  =>  [ A(c[.]) v A(c[x1.C]) v A(c[x2.C]) ]
 A(x)  =>  [ A(x[.]) v A(x[x.B]) ]
 B(x)  =>  [ B(x[.]) v B(x[x.A]) ]
@@ -137,7 +141,7 @@ C(x2)  =>  [ C(x2[.]) v C(x2[c.A]) ]
 C(x2)  =>  [ C(x2{u}) v C(x2{p}) ]
 `
     );
-    await expect.soft(page.locator('div:nth-child(2) > .panel-body')).toHaveText(
+    await expect.soft(constraint_locator(page, 1)).toHaveText(
       "C()  =>  [ C(x1{p}[.],x2{u}[.]) v C(x1{p}[.],x2{u}[c.A]) v C(x1{p}[.],x2{p}[.]) v C(x1{u}[c.A],x2{u}[.]) v C(x1{u}[.],x2{u}[.]) ]"
 
     );
@@ -149,54 +153,64 @@ C(x2)  =>  [ C(x2{u}) v C(x2{p}) ]
 
   test('constraints_and_polymers_2', async ({ page }) => {
     await utils.open_app_with_model(page, poly_ka);
-    await page.getByRole('tab', { name: 'constraints' }).click();
     await page.getByRole('tab', { name: 'polymers' }).click();
     await expect.soft(page.getByRole('paragraph')).toHaveText(
-      "The size of biomolecular compounds is uniformly bounded."
-    );
+      `The following bonds may form arbitrary long chains of agents:
+
+C(a[1]),A(c[1])
+B(c[1]),C(b[1])
+A(b[1]),B(a[1])
+
+B(a[1]),A(b[1])
+C(b[1]),B(c[1])
+A(c[1]),C(a[1])
+
+`);
   });
 
   test('constraints_and_polymers_3', async ({ page }) => {
     await utils.open_app_with_model(page, local_views_slide_69_ka, true);
     await page.getByRole('tab', { name: 'constraints' }).click();
-    await expect.soft(page.locator('.panel-scroll > div > .panel-body').first()).toHaveText(
-      `A(c)  =>  [ A(c[.]) v A(c[x1.C]) v A(c[x2.C]) ]
-A(x)  =>  [ A(x[.]) v A(x[x.B]) ]
-B(x)  =>  [ B(x[.]) v B(x[x.A]) ]
-C(x1)  =>  [ C(x1{u}) v C(x1{p}) ]
-C(x1)  =>  [ C(x1[.]) v C(x1[c.A]) ]
-C(x2)  =>  [ C(x2[.]) v C(x2[c.A]) ]
-C(x2)  =>  [ C(x2{u}) v C(x2{p}) ]
+    await expect.soft(constraint_locator(page, 0)).toHaveText(
+      `E(x)  =>  [ E(x[.]) v E(x[x.R]) ]
+R(C)  =>  [ R(C[.]) v R(C[CN.R]) ]
+R(CN)  =>  [ R(CN[.]) v R(CN[C.R]) ]
+R(CR)  =>  [ R(CR[.]) v R(CR[CR.R]) ]
+R(x)  =>  [ R(x[.]) v R(x[x.E]) ]
 `
     );
-    await expect.soft(page.locator('div:nth-child(2) > .panel-body')).toHaveText(
-      "C()  =>  [ C(x1{p}[.],x2{u}[.]) v C(x1{p}[.],x2{u}[c.A]) v C(x1{p}[.],x2{p}[.]) v C(x1{u}[c.A],x2{u}[.]) v C(x1{u}[.],x2{u}[.]) ]"
-
+    await expect.soft(constraint_locator(page, 1)).toHaveText(
+      `R()  =>  [ R(C[.],CN[C.R],CR[CR.R]) v R(C[.],CN[.],CR[CR.R]) v R(C[CN.R],CN[.],CR[CR.R]) v R(C[.],CN[.],CR[.]) ]
+R(CR[CR.R])  =>  R(CR[CR.R],x[x.E])
+`
     );
-    await expect.soft(page.locator('div:nth-child(3) > .panel-body')).toHaveText(
-      "C()  =>  [ C(x1{p}[.],x2{u}[.]) v C(x1{p}[.],x2{u}[c.A]) v C(x1{p}[.],x2{p}[.]) v C(x1{u}[c.A],x2{u}[.]) v C(x1{u}[.],x2{u}[.]) ]"
-
+    await expect.soft(constraint_locator(page, 2)).toHaveText(
+      `R(CR[1]),R(CR[1])  =>  [ R(C[CN.R],CR[1]),R(C[.],CR[1]) v R(C[.],CR[1]),R(C[.],CR[1]) v R(C[.],CR[1]),R(C[CN.R],CR[1]) ]
+R(CR[1]),R(CR[1])  =>  [ R(CN[C.R],CR[1]),R(CN[.],CR[1]) v R(CN[.],CR[1]),R(CN[.],CR[1]) v R(CN[.],CR[1]),R(CN[C.R],CR[1]) ]
+`
     );
-    await expect.soft(page.locator('div:nth-child(4) > .panel-body')).toHaveText(
-      "C()  =>  [ C(x1{p}[.],x2{u}[.]) v C(x1{p}[.],x2{u}[c.A]) v C(x1{p}[.],x2{p}[.]) v C(x1{u}[c.A],x2{u}[.]) v C(x1{u}[.],x2{u}[.]) ]"
 
+    // TODO delete await page.locator('div:nth-child(3) > .CodeMirror-line > span > span:nth-child(7)').scrollIntoViewIfNeeded();
+    await expect.soft(constraint_locator(page, 3)).toHaveText(
+      `R(C[CN.R],CR[CR.R])  =>  R(C[2],CR[1]),R(CN[2],CR[1])
+R(CN[C.R],CR[CR.R])  =>  R(CN[2],CR[1]),R(C[2],CR[1])
+`
     );
-    await expect.soft(page.locator('div:nth-child(5) > .panel-body')).toHaveText(
-      "C()  =>  [ C(x1{p}[.],x2{u}[.]) v C(x1{p}[.],x2{u}[c.A]) v C(x1{p}[.],x2{p}[.]) v C(x1{u}[c.A],x2{u}[.]) v C(x1{u}[.],x2{u}[.]) ]"
-
+    await expect.soft(constraint_locator(page, 4)).toHaveText(
+      ""
     );
     await utils.expect_error(page, [
-      " « 1/4 » [abc.ka] Dead agent D ",
-      " Dead agent D ",
+      " « 1/1 » [model.ka] Dead rule R(CR[1] C[2]), R(CN[2]), R(CR[1]) -> R(CR[1] C[2]), R(CN[2]), R(CR[1]) ",
+      " Dead rule R(CR[1] C[2]), R(CN[2]), R(CR[1]) -> R(CR[1] C[2]), R(CN[2]), R(CR[1]) "
     ]);
   });
 
   test('constraints_and_polymers_4', async ({ page }) => {
     await utils.open_app_with_model(page, counter_2_ka);
     await page.getByRole('tab', { name: 'constraints' }).click();
-    await expect.soft(page.locator('div:nth-child(5) > .panel-body')).toHaveText(
-      "C()  =>  [ C(x1{p}[.],x2{u}[.]) v C(x1{p}[.],x2{u}[c.A]) v C(x1{p}[.],x2{p}[.]) v C(x1{u}[c.A],x2{u}[.]) v C(x1{u}[.],x2{u}[.]) ]"
-
+    await expect.soft(constraint_locator(page, 4)).toHaveText(
+      `A()  =>  A(c{[0 .. 2]})
+`
     );
   });
 

@@ -74,6 +74,7 @@ export async function open_app_with_model(page: Page, url_protocol_relative: str
   if (paste_in_editor) {
     // download the file and paste it in the editor
     await page.goto(url);
+    await wait_for_project_ready_status(page);
     await input_in_editor_from_url(page, url_protocol_relative);
   } else {
     // provide the file as model argument (ok with github domains, but e.g. not di.ens.fr)
