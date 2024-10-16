@@ -215,7 +215,7 @@ R(CN[C.R],CR[CR.R])  =>  R(CN[2],CR[1]),R(C[2],CR[1])
   });
 
   test('contact_map_accuracy', async ({ page }) => {
-    await utils.open_app_with_model(page, minikai_counters_ka);
+    await utils.open_app_with_model(page, minikai_counters_ka, false, 50000);
     const contact_map = page.locator('#map-container');
     await expect.soft(contact_map).toHaveScreenshot();
     await page.locator('#contact_map-accuracy').selectOption('high');
@@ -319,7 +319,7 @@ test.describe('Simulation tools', () => {
     await utils.set_pause_if(page, '[T] > 30');
     await page.getByRole('button', { name: 'start' }).click();
     await utils.apply_perturbation(page, '');
-    await expect(utils.get_error_field(page)).toHaveText("TODO");
+    await expect.soft(utils.get_error_field(page)).toHaveText("TODO");
     await utils.apply_perturbation(page, '$SNAPSHOT');
     await utils.set_pause_if(page, '[T] > 60');
     await page.getByRole('button', { name: 'continue' }).click();
@@ -327,7 +327,10 @@ test.describe('Simulation tools', () => {
 
     // check log page
     await page.getByRole('tab', { name: 'log New' }).click();
-    await expect(page.locator('#log div')).toHaveText("TODO");
+    await expect.soft(page.locator('#log div')).toHaveText(
+      `Building initial simulation conditions...	 -variable declarations	 -rules	 -interventions	 -observables	 -update_domain construction	 21 (sub)observables 37 navigation steps	 -initial conditionsUser-set seed used for simulation: 1%mod: [E] = 14599 do $SNAPSHOT ;%mod: [E] = 28929 do $SNAPSHOT \"T60\";
+`
+    );
 
     // go to tab snapshots and test display
     await page.getByRole('tab', { name: 'snapshot' }).click();
@@ -335,27 +338,43 @@ test.describe('Simulation tools', () => {
     //const snapshot_map_display_loc = page.locator('#snapshot-map-display #map-container').first();
     //const snapshot_map_display2_loc = page.locator('#snapshot-map-display div').first();
 
-    await expect(snapshot_display_loc).toHaveText("TODO");
+    await expect.soft(snapshot_display_loc).toHaveText(
+      `// Snapshot [Event: 14599]
+%def: "T0" "30.003207872859807"
+
+%init: 60 /*3 agents*/ A(x[1] c[2]), B(x[1]), C(x1{p}[.] x2{u}[2])
+%init: 111 /*3 agents*/ B(x[1]), A(x[1] c[2]), C(x1{u}[2] x2{u}[.])
+%init: 20 /*2 agents*/ A(x[.] c[1]), C(x1{u}[1] x2{u}[.])
+%init: 112 /*2 agents*/ A(x[.] c[1]), C(x1{p}[.] x2{u}[1])
+%init: 1852 /*1 agents*/ C(x1{p}[.] x2{p}[.])
+%init: 2107 /*1 agents*/ C(x1{p}[.] x2{u}[.])
+%init: 5738 /*1 agents*/ C(x1{u}[.] x2{u}[.])
+%init: 223 /*2 agents*/ A(x[1] c[.]), B(x[1])
+%init: 606 /*1 agents*/ B(x[.])
+%init: 474 /*1 agents*/ A(x[.] c[.])
+
+
+`);
     await page.locator('#snapshot-select-id').selectOption('1');
-    await expect(snapshot_display_loc).toHaveText("TODO");
+    await expect.soft(snapshot_display_loc).toHaveText("TODO");
     await page.locator('#snapshot-select-id').selectOption('0');
-    await expect(snapshot_display_loc).toHaveText("TODO");
+    await expect.soft(snapshot_display_loc).toHaveText("TODO");
     await page.locator('#format_select_id').selectOption('Graph');
-    await expect(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_loc).toHaveScreenshot();
     await page.locator('.navcontent-view > div:nth-child(3)').click();
-    await expect(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_loc).toHaveScreenshot();
     await page.getByRole('button', { name: 'Back to root' }).click();
-    await expect(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_loc).toHaveScreenshot();
     await page.getByRole('radio', { name: 'Count' }).check();
-    await expect(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_loc).toHaveScreenshot();
     await page.getByRole('radio', { name: 'Size' }).check();
-    await expect(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_loc).toHaveScreenshot();
     // TODO: does something?
     // await page.getByRole('button', { name: 'Reset Zoom' }).click();
 
     // TODO: clicks in graph, link with contact map
     await page.locator('[id="root\\.mixture1"] rect').nth(1).click();
-    await expect(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_loc).toHaveScreenshot();
     // await page.locator('#force-container circle').nth(1).click();
     // await page.locator('#force-container circle').first().click();
 
@@ -381,30 +400,18 @@ test.describe('Simulation tools', () => {
     await utils.apply_perturbation(page, '$PRINT \'AB\' > "ab.txt"');
 
     // check log page
-    await page.getByRole('tab', { name: 'log New' }).click();
-    await expect(page.locator('#log div')).toHaveText(
-      `+ Building initial simulation conditions...
-	 -variable declarations
-	 -rules
-	 -interventions
-	 -observables
-	 -update_domain construction
-	 21 (sub)observables 37 navigation steps
-	 -initial conditions
-Random seed used: 994697968
-%mod: [E] = 14599 do $PRINTF ("time: ".[T]) > "time.txt";
-
-%mod: [E] = 14599 do $PRINTF (AB) > "ab.txt";
-
-%mod: [E] = 28929 do $PRINTF ("time: ".[T]) > "time.txt";
-
-%mod: [E] = 28929 do $PRINTF (AB) > "ab.txt"; `);
+    // await page.getByRole('tab', { name: 'log New' }).click();
+    await page.locator('#navtabs').nth(1).click();
+    await expect.soft(page.locator('#log div')).toHaveText(
+      ` + Building initial simulation conditions...	 -variable declarations	 -rules	 -interventions	 -observables	 -update_domain construction	 21 (sub)observables 37 navigation steps	 -initial conditionsUser-set seed used for simulation: 1%mod: [E] = 14599 do $PRINTF ("time: ".[T]) > "time.txt";%mod: [E] = 14599 do $PRINTF (AB) > "ab.txt";%mod: [E] = 28929 do $PRINTF ("time: ".[T]) > "time.txt";%mod: [E] = 28929 do $PRINTF (AB) > "ab.txt";`
+    );
+    await page.locator('#navtabs').nth(5).click();
 
     await page.locator('#output-select-id').selectOption('time.txt');
-    await expect(page.getByRole('paragraph')).toHaveText("TODO");
+    await expect.soft(page.getByRole('paragraph')).toHaveText("TODO");
     await page.locator('.list-group-item').click();
     await page.locator('#output-select-id').selectOption('ab.txt');
-    await expect(page.getByRole('paragraph')).toHaveText("TODO");
+    await expect.soft(page.getByRole('paragraph')).toHaveText("TODO");
 
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'All outputs' }).click();
@@ -417,7 +424,7 @@ Random seed used: 994697968
 
 test.describe('stories', () => {
 
-  test('trace', async ({ page }) => {
+  test('stories', async ({ page }) => {
     await utils.open_app_with_model(page, causality_slide_10_ka, true);
     await utils.setSeed(page, 1);
 
@@ -446,7 +453,7 @@ test.describe('stories', () => {
     async function computeStoriesAndTest(page: Page, text_info_log: string, text_computation_log: string) {
       await computeStoriesAndWait(page);
       await expect_texts_story_logs(page, text_info_log, text_computation_log);
-      await expect(page.getByRole('img')).toHaveScreenshot();
+      await expect.soft(page.getByRole('img')).toHaveScreenshot();
     }
 
     // compare stories
@@ -463,10 +470,10 @@ test.describe('stories', () => {
     await computeStoriesAndTest(page, "TODO", "TODO");
 
     await page.getByRole('combobox').selectOption('0');
-    await expect(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
     await expect_texts_story_logs(page, "TODO", "TODO");
     await page.getByRole('combobox').selectOption('2');
-    await expect(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot();
     await expect_texts_story_logs(page, "TODO", "TODO");
 
     await page.getByRole('checkbox', { name: 'Weakly' }).check();

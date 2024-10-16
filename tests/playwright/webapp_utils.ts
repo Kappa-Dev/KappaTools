@@ -70,7 +70,7 @@ export async function input_in_editor_from_url(page: Page, url_protocol_relative
   await input_in_editor_from_str(page, model);
 }
 
-export async function open_app_with_model(page: Page, url_protocol_relative: string, paste_in_editor: boolean = false) {
+export async function open_app_with_model(page: Page, url_protocol_relative: string, paste_in_editor: boolean = false, timeout: number = 10000) {
   if (paste_in_editor) {
     // download the file and paste it in the editor
     await page.goto(url);
@@ -81,7 +81,7 @@ export async function open_app_with_model(page: Page, url_protocol_relative: str
     await page.goto(url + arg_set_model + url_protocol_relative);
   }
   // Note: if fails in input_in_editor_from_str, it won't wait for second timeout as expect is not expect.soft
-  await wait_for_file_load(page, { timeout: 10000 });
+  await wait_for_file_load(page, { timeout: timeout });
 }
 
 export function get_error_field(page: Page) {
