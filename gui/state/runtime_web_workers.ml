@@ -224,7 +224,9 @@ class runtime_kasim_as_web_worker () : Api.concrete_manager =
       without_kasim#terminate;
       kasim_worker##terminate
 
-    method is_computing = without_kasim#is_computing || self#sim_is_computing
+    method is_computing =
+      without_kasim#is_computing || self#sim_is_computing
+      || self#story_is_computing
 
     method project_parse ~patternSharing overwrites =
       let simulation_load (patternSharing : Pattern.sharing_level)
@@ -236,6 +238,7 @@ class runtime_kasim_as_web_worker () : Api.concrete_manager =
         overwrites
   end
 
+(* TODO: deprecate this? *)
 class runtime_kasim_embedded_in_main_thread () : Api.concrete_manager =
   let system_process : Kappa_facade.system_process =
     object
@@ -262,7 +265,8 @@ class runtime_kasim_embedded_in_main_thread () : Api.concrete_manager =
       without_kasim#terminate;
       () (*TODO*)
 
-    method is_computing = true (*TODO*)
+    method is_computing =
+      without_kasim#is_computing || self#is_computing || self#story_is_computing
 
     method project_parse ~patternSharing overwrites =
       let simulation_load patternSharing parsing_compil overwrites =

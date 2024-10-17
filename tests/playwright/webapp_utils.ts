@@ -22,22 +22,42 @@ function timeout_of_options(options?: { timeout?: number | undefined; visible?: 
   return timeout;
 }
 
+// TODO: test for contains and not ==
+
 // Used as playwright does not seemed to offer a way to have this logic
-async function expect_locator_toHaveInnerHtml(page: Page, locator: Locator, value: any, timeout: number) {
-  const end_time = Date.now() + timeout;
-  var is_equal = false;
+async function expect_locator_toHaveInnerHtml(page: Page, locator: Locator, value: any, timeout: number, retry_timeout: number = 500, allow_include: boolean = false) {
+  const end_time: number = Date.now() + timeout;
+  var is_equal: boolean = false;
   while (Date.now() < end_time && !(is_equal)) {
     const html = (await locator.innerHTML());
-    is_equal = (html == value);
-    await page.waitForTimeout(1000);
+    if (allow_include) {
+      is_equal = (html.includes(value));
+    } else {
+      is_equal = (html == value);
+    };
+    await page.waitForTimeout(retry_timeout);
   }
   expect(is_equal).toBeTruthy();
 }
 
-export async function wait_for_project_ready_status(page: Page, options?: { timeout?: number | undefined; visible?: boolean | undefined; } | undefined) {
-  // wait for icon in project to be checkmark
+export async function wait_for_project_ready_status(page: Page, options?: { timeout?: number | undefined; visible?: boolean | undefined; } | undefined, check_busy: boolean = false, project_name: string | undefined) {
   const timeout = timeout_of_options(options);
-  await expect_locator_toHaveInnerHtml(page, page.getByRole('list').locator('a').first(), "<span class=\"glyphicon glyphicon-ok\"></span> default<button class=\"close\">×</button>", timeout);
+  const locator_first_tab = page.getByRole('list').locator('a').first();
+
+  if (check_busy) {
+    // wait for the icon to go to busy state before waiting to be back to ready state
+    // [retry_timeout] is low to try not to miss if the change to "refresh" is fast
+    // (useful for stories computation that at the moment don't change the icon state rightaway)
+    await expect_locator_toHaveInnerHtml(page, locator_first_tab, "\"glyphicon glyphicon-refresh\"", timeout, 50, true);
+  }
+
+  // wait for project change if provided
+  if (project_name !== undefined) {
+    await expect_locator_toHaveInnerHtml(page, locator_first_tab, project_name, timeout, 500, true);
+  }
+
+  // wait for icon in project to be checkmark
+  await expect_locator_toHaveInnerHtml(page, locator_first_tab, "\"glyphicon glyphicon-ok\"", timeout, 500, true);
 }
 
 export async function wait_for_sim_stop(page: Page, options?: { timeout?: number | undefined; visible?: boolean | undefined; } | undefined) {
@@ -85,7 +105,8 @@ export async function open_app_with_model(page: Page, url_protocol_relative: str
 }
 
 export function get_error_field(page: Page) {
-  return page.locator('#configuration_error_div');
+  // return page.locator('#configuration_error_div');
+  return page.locator('#configuration_alert_div');
 }
 
 export async function expect_error(page: Page, text: string[]): Promise<void> {
@@ -94,8 +115,7 @@ export async function expect_error(page: Page, text: string[]): Promise<void> {
 
 export async function expect_no_error(page: Page): Promise<void> {
   await expect_error(page, [
-    " «  » ",
-    "",
+    " «  » "
   ]);
 }
 

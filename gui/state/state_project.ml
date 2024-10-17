@@ -210,13 +210,13 @@ let set_show_non_weakly_reversible_transitions
   update_parameters (fun param ->
       { param with show_non_weakly_reversible_transitions })
 
-let update_state me project_catalog default_parameters project_parameters =
-  me.project_manager#project_parse ~patternSharing:Pattern.Compatible_patterns
-    []
+let update_state project project_catalog default_parameters project_parameters =
+  project.project_manager#project_parse
+    ~patternSharing:Pattern.Compatible_patterns []
   >>= fun (out : unit Api.result) ->
   set_state
     {
-      project_current = Some me;
+      project_current = Some project;
       project_catalog;
       default_parameters;
       project_parameters;
@@ -224,8 +224,9 @@ let update_state me project_catalog default_parameters project_parameters =
     };
   Lwt.return out
 
-let computing_watcher manager setter =
+let computing_watcher (manager : Api.concrete_manager) (setter : bool -> unit) =
   let delay = 1. in
+  (* Note: cancel logic seems not to be implemented? *)
   let cancelled = ref false in
   let rec loop () =
     setter manager#is_computing;
@@ -254,7 +255,7 @@ let add_project is_new project_id : unit Api.lwt_result =
              let project_watcher_cancel =
                computing_watcher project_manager (set_computes ?step:None)
              in
-             let me =
+             let project : a_project =
                {
                  project_id;
                  project_manager;
@@ -267,9 +268,9 @@ let add_project is_new project_id : unit Api.lwt_result =
                Mods.StringMap.add project_id default_parameters
                  state_va.project_parameters
              in
-             Lwt.return (Result_util.ok (me, me :: catalog, params))))
-  >>= Api_common.result_bind_with_lwt ~ok:(fun (me, catalog, params) ->
-          update_state me catalog state_va.default_parameters params)
+             Lwt.return (Result_util.ok (project, project :: catalog, params))))
+  >>= Api_common.result_bind_with_lwt ~ok:(fun (project, catalog, params) ->
+          update_state project catalog state_va.default_parameters params)
 
 let create_project project_id = add_project true project_id
 let set_project project_id = add_project false project_id

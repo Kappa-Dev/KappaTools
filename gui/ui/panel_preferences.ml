@@ -175,7 +175,11 @@ module InputPlotPeriod : Ui_common.Div = struct
 end
 
 module DivErrorMessage : Ui_common.Div = struct
-  let id = "configuration_error_div"
+  let id_error = "configuration_error_div"
+  let id_alert = "configuration_alert_div"
+  let id = id_error
+  (* TODO: clean this id matter *)
+
   let message_nav_inc_id = "panel_preferences_message_nav_inc_id"
   let message_nav_dec_id = "panel_preferences_message_nav_dec_id"
   let message_file_label_id = "panel_preferences_message_file_label"
@@ -276,14 +280,14 @@ module DivErrorMessage : Ui_common.Div = struct
 
   let error_message =
     Html.span
-      ~a:[ Html.a_id id; Html.a_class [ "error-span" ] ]
+      ~a:[ Html.a_id id_error; Html.a_class [ "error-span" ] ]
       [ Tyxml_js.R.Html.txt error_message_text ]
 
   let alert_messages =
     Html.div
       ~a:
         [
-          Html.a_id id;
+          Html.a_id id_alert;
           Tyxml_js.R.Html.a_class
             (React.S.bind (Hooked.S.to_react_signal State_error.errors)
                (fun error ->
