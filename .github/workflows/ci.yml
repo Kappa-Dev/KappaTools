@@ -191,8 +191,30 @@ jobs:
           name: windows
           path: KappappWin.zip
 
+  webapp-playwright-test:
+    needs: [cli-and-doc, webapp-ubuntu]
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npx playwright test
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
   deploy:
-    needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows]
+    needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows, webapp-playwright-test]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-22.04
     strategy:
