@@ -95,10 +95,12 @@ test.describe('Editor tab', () => {
     const opts_screen = { threshold: 0.4 }
     await utils.open_app_with_model(page, abc_ka);
     await page.locator('#navinfluences').click();
-    await expect.soft(page.locator('#influences-table')).toHaveScreenshot();
+    const table = page.locator('#influences-table');
+
+    await expect.soft(table).toHaveScreenshot();
     await expect.soft(page.getByRole('cell', { name: 'Navigate through the nodes' })).toBeVisible();
     await page.getByRole('button', { name: 'First node' }).click();
-    await expect.soft(page.locator('#influences-table')).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot();
     await page.locator('#influence-rendering').selectOption('graph');
     await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.locator('#influence-accuracy').selectOption('high');
@@ -112,13 +114,13 @@ test.describe('Editor tab', () => {
     await page.getByRole('button', { name: 'Track cursor' }).click();
     await page.locator('div:nth-child(10) > .CodeMirror-line > span > span:nth-child(7)').scrollIntoViewIfNeeded();
     await page.locator('div:nth-child(10) > .CodeMirror-line > span > span:nth-child(7)').click();
-    await expect.soft(page.locator('#influences-table')).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot();
     await page.locator('div:nth-child(11) > .CodeMirror-line > span > span:nth-child(7)').click();
-    await expect.soft(page.locator('#influences-table')).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot();
     await page.getByRole('button', { name: 'Next' }).click();
-    await expect.soft(page.locator('#influences-table')).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot();
     await page.getByRole('button', { name: 'Previous' }).click();
-    await expect.soft(page.locator('#influences-table')).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot();
     //export
     await utils.testExports(page, '#export_influence-export', 'influences', ['json']);
   });
@@ -331,9 +333,8 @@ test.describe('Simulation tools', () => {
 
     // go to tab snapshots and test display
     await page.locator('#navsnapshot').click();
-    const snapshot_display_loc = page.locator('.navcontent-view > .panel-scroll').first();
-    //const snapshot_map_display_loc = page.locator('#snapshot-map-display #map-container').first();
-    //const snapshot_map_display2_loc = page.locator('#snapshot-map-display div').first();
+    const snapshot_display_text_loc = page.locator('.navcontent-view > .panel-scroll').first();
+    const snapshot_display_graph_loc = page.locator('.navcontent-view > div:nth-child(3)');
 
     const snapshot0 = `// Snapshot [Event: 14599]
 %def: "T0" "30.003207872859807"
@@ -369,27 +370,27 @@ test.describe('Simulation tools', () => {
 
 `;
 
-    await expect.soft(snapshot_display_loc).toHaveText(snapshot0);
+    await expect.soft(snapshot_display_text_loc).toHaveText(snapshot0);
     await page.locator('#snapshot-select-id').selectOption('1');
-    await expect.soft(snapshot_display_loc).toHaveText(snapshot1);
+    await expect.soft(snapshot_display_text_loc).toHaveText(snapshot1);
     await page.locator('#snapshot-select-id').selectOption('0');
-    await expect.soft(snapshot_display_loc).toHaveText(snapshot0);
+    await expect.soft(snapshot_display_text_loc).toHaveText(snapshot0);
     await page.locator('#format_select_id').selectOption('Graph');
-    await expect.soft(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
     await page.locator('.navcontent-view > div:nth-child(3)').click();
-    await expect.soft(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
     await page.getByRole('button', { name: 'Back to root' }).click();
-    await expect.soft(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
     await page.getByRole('radio', { name: 'Count' }).check();
-    await expect.soft(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
     await page.getByRole('radio', { name: 'Size' }).check();
-    await expect.soft(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
     // TODO: does something?
     // await page.getByRole('button', { name: 'Reset Zoom' }).click();
 
     // TODO: clicks in graph, link with contact map
     await page.locator('[id="root\\.mixture1"] rect').nth(1).click();
-    await expect.soft(snapshot_display_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
     // await page.locator('#force-container circle').nth(1).click();
     // await page.locator('#force-container circle').first().click();
 
@@ -673,9 +674,20 @@ test.describe('projects_and_files', () => {
     await utils.open_app_with_model(page, causality_slide_10_ka, true);
     await utils.setSeed(page, 1);
 
+    // project tab is `a` in `list`, `list` contains "active" class info, `a` is clickable
+    const locator_project_tabs_list = page.locator('#projects_tabs');
+    const locator_project_tabs_text = locator_project_tabs_list.locator('a');
+    async function change_for_project(n: number) {
+      await locator_project_tabs_text.nth(n).click();
+      // await page.waitForTimeout(2000);
+      await expect(locator_project_tabs_list.locator('li').nth(n)).toHaveClass("active", { timeout: 10000 });
+    }
+
     // open new project
     const project_name = 'new_project'
-    await page.getByRole('list').locator('a').nth(1).click();
+    // click new project button on second tab at startup
+    await locator_project_tabs_text.nth(1).click();
+    // fill project name entry
     await page.getByPlaceholder('project new').click();
     await page.getByPlaceholder('project new').fill(project_name);
     await page.getByPlaceholder('project new').press('Enter');
@@ -684,18 +696,16 @@ test.describe('projects_and_files', () => {
     await page.locator('#menu-editor-file-new-li').click();
     await page.getByRole('textbox', { name: 'file name' }).click();
     await page.getByRole('textbox', { name: 'file name' }).fill('abc.ka');
-    await page.getByRole('button', { name: 'Create File' }).click();
+    await page.getByRole('textbox', { name: 'file name' }).press('Enter');
     await page.locator('.CodeMirror-scroll').click();
     await utils.input_in_editor_from_url(page, abc_ka);
 
     // switch and check contact_map change
     const contact_map = page.locator('#map-container');
     await expect.soft(contact_map).toHaveScreenshot();
-    await page.getByRole('list').locator('a').nth(1).click();
-    await page.waitForTimeout(2000);
+    await change_for_project(1);
     await expect.soft(contact_map).toHaveScreenshot();
-    await page.getByRole('list').locator('a').first().click();
-    await page.waitForTimeout(2000);
+    await change_for_project(0);
     await expect.soft(contact_map).toHaveScreenshot();
 
     // TODO: Could also check simulation results

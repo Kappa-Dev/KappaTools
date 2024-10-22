@@ -40,11 +40,11 @@ async function expect_locator_toHaveInnerHtml(page: Page, locator: Locator, valu
   expect(is_equal).toBeTruthy();
 }
 
-export async function wait_for_project_ready_status(page: Page, options?: { timeout?: number | undefined; visible?: boolean | undefined; } | undefined, check_busy: boolean = false, project_name: string | undefined) {
+export async function wait_for_project_ready_status(page: Page, options?: { timeout?: number | undefined; visible?: boolean | undefined; } | undefined, check_busy_first: boolean = false, project_name: string | undefined = undefined) {
   const timeout = timeout_of_options(options);
   const locator_first_tab = page.getByRole('list').locator('a').first();
 
-  if (check_busy) {
+  if (check_busy_first) {
     // wait for the icon to go to busy state before waiting to be back to ready state
     // [retry_timeout] is low to try not to miss if the change to "refresh" is fast
     // (useful for stories computation that at the moment don't change the icon state rightaway)
