@@ -140,22 +140,61 @@ export async function apply_perturbation(page: Page, s: string) {
   await page.getByRole('button', { name: 'intervention' }).click();
 }
 
+// Write in `referencesDir` the file named `fileName` as a copy of `filePath`
 export async function write_ref(filePath: string, fileName: string) {
   expect.soft(filePath).toBeTruthy();
   const refFilePath = path.join(referencesDir, fileName);
   fs.copyFileSync(filePath, refFilePath);
 }
 
-export async function compare_download_to_ref(download: Download, fileName: string, writeRef: boolean = false) {
+export function regex_of_str(s: string, option: string = "g"): RegExp {
+  try {
+    const r = new RegExp(s, option);
+    return r;
+  } catch (error) {
+    // Next line: assert(false) through playwright
+    expect(false).toBe(true);
+  }
+  return /should_not_happen/;
+}
+
+function escape_string_for_regex(s: string): string {
+  return s.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+// Returns a regex matching [s] with matches of [pattern] replaced by the [pattern]
+// Used to avoid mismatching colors in exports, as it's different according to how playwright is run…
+function regex_matching_str_with_pattern_replaced(s: string, pattern: string): RegExp {
+  const s_escaped = escape_string_for_regex(s);
+  console.error(s_escaped);
+  const regex_pattern = regex_of_str(pattern, "g");
+  console.error(regex_pattern);
+  return regex_of_str(s_escaped.replace(regex_pattern, pattern), "");
+}
+
+export async function compare_download_to_ref(download: Download, fileName: string, pattern_ignore: string = "", writeRef: boolean = false) {
   const filePath = await download.path();
   expect.soft(filePath).toBeTruthy();
   if (writeRef || process.env.UPDATE_EXPORTS === 'true') {
+    console.info(`Writing ref file: ${fileName}`);
     await write_ref(filePath, fileName);
   }
   const refFilePath = path.join(referencesDir, fileName);
   const downloadedContent = await fs.promises.readFile(filePath, 'utf8');
   const referenceContent = await fs.promises.readFile(refFilePath, 'utf8');
-  expect.soft(downloadedContent).toBe(referenceContent);
+
+  if (pattern_ignore == "") {
+    expect.soft(downloadedContent).toBe(referenceContent);
+  } else {
+    const regex_ref_test: RegExp = regex_matching_str_with_pattern_replaced(referenceContent, pattern_ignore);
+
+    // TODO : clean this
+    console.error(regex_ref_test);
+
+    expect.soft(downloadedContent).toMatch(regex_ref_test);
+
+  }
+
 }
 
 export async function write_str_ref(test: string, fileName: string) {
@@ -182,11 +221,14 @@ export async function compare_str_to_ref(text: string, fileName: string, writeRe
   expect.soft(text).toBe(referenceContent);
 }
 
-export async function testExports(page: Page, exportLocatorPrefix: string, fileBaseName: string, extensions: string[], writeRef: boolean = false) {
+export async function testExports(page: Page, exportLocatorPrefix: string, fileBaseName: string, extensions: string[], pattern_ignores: string[] = [], writeRef: boolean = false) {
   const exportFilenameLoc = page.locator(exportLocatorPrefix + "_filename");
   const exportSelectLoc = page.locator(exportLocatorPrefix + "_select");
 
-  for (const extension of extensions) {
+  const pattern_ignores_present = pattern_ignores.length == extensions.length;
+
+  for (let i = 0; i < extensions.length; i++) {
+    const extension = extensions[i];
     const fileName = `${fileBaseName}.${extension}`;
     await exportSelectLoc.selectOption(extension);
     await exportFilenameLoc.click();
@@ -196,7 +238,8 @@ export async function testExports(page: Page, exportLocatorPrefix: string, fileB
     await page.getByRole('button', { name: 'export' }).click();
     const download = await downloadPromise;
 
-    await compare_download_to_ref(download, fileName, writeRef);
+    const pattern_ignore = pattern_ignores_present ? pattern_ignores[i] : "";
+    await compare_download_to_ref(download, fileName, writeRef, pattern_ignore);
   }
 }
 
