@@ -75,7 +75,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'lighttpd -f ~/inria/etc/lighttpd.conf -D',
+    command: 'lighttpd -f ./tests/playwright/lighttpd.conf -D',
     url: 'http://127.0.0.1:12345/index.html',
     // reuseExistingServer: !process.env.CI,
   },

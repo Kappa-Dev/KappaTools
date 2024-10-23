@@ -193,6 +193,7 @@ jobs:
 
   webapp-playwright-test:
     needs: [cli-and-doc, webapp-ubuntu]
+    # if: github.ref == 'refs/heads/master'
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -201,7 +202,10 @@ jobs:
       with:
         node-version: lts/*
     - name: Install dependencies
-      run: npm ci
+      run:  |
+        npm ci
+        sudo apt-get update
+        sudo apt-get install lighttpd
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
