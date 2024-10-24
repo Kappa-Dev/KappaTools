@@ -77,6 +77,6 @@ export default defineConfig({
   webServer: {
     command: 'lighttpd -f ./tests/playwright/lighttpd.conf -D',
     url: 'http://127.0.0.1:12345/index.html',
-    // reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true, // !process.env.CI,
   },
 });

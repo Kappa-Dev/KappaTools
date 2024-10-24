@@ -208,8 +208,22 @@ jobs:
         sudo apt-get install lighttpd
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+    - name: Download online-ui
+      uses: actions/download-artifact@v4
+      with:
+        name: online-ui
+    - name: Setup webapp server
+      run: |
+        > echo '
+          include_shell "/usr/share/lighttpd/create-mime.conf.pl" 
+          server.document-root = "./site"
+          server.port = 12345
+          server.username = "root"
+          server.groupname = "root"
+          ' > lighttpd.conf
+        lighttpd -f lighttpd.conf -D
     - name: Run Playwright tests
-      run: npx playwright test
+      run: DEBUG=pw:webserver npx playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
@@ -227,7 +241,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download doc artifact
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{matrix.deploy-name}}
