@@ -611,11 +611,7 @@ let content () =
         Html.div ~a:[ Html.a_id display_id; Html.a_class [ "flex-content" ] ] [];
       ];
     Tyxml_js.R.Html5.div
-      ~a:
-        [
-          Html.a_id "TODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODO";
-          Html.a_class [ "panel-scroll" ];
-        ]
+      ~a:[ Html.a_id "influences-table"; Html.a_class [ "panel-scroll" ] ]
       (ReactiveData.RList.from_signal
          (React.S.l3
             (fun { rendering; origin_label; _ } sphere _ ->

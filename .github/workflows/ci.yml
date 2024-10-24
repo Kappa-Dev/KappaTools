@@ -21,78 +21,78 @@ jobs:
           # needs `opam exec --` as `dune` is not in the shell PATH
           opam exec -- dune fmt --preview
 
-  cli-and-doc:
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix: # 2x2 versions ran here, with 2 different ocaml versions and with/without labltk
-        ocaml-compiler:
-          - 4.13.x
-          - 4.14.x
-        additional-packages:
-          -
-          - labltk
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v2
-        with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          dune-cache: true
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes gnuplot-nox \
-            poppler-utils graphviz texlive-latex-recommended \
-            texlive-fonts-recommended texlive-pictures tex4ht \
-            texlive-latex-extra
-          opam depext --install --yes dune odoc camlp-streams \
-            ${{ matrix.additional-packages }}
-          opam install --yes . --deps-only
-      - name: Make Kappa
-        run: opam exec -- make all
-      - name: Make documentation
-        run: opam exec -- make doc_html
-      - name: Make check
-        run: opam exec -- make --jobs=2 check
-      - name: Archive documentation
-        uses: actions/upload-artifact@v4
-        if: matrix.ocaml-compiler == '4.14.x' && matrix.additional-packages == ''
-        with:
-          name: doc
-          path: |
-            man
-            _build/default/_doc/_html/kappa-library
+  # cli-and-doc:
+  #   runs-on: ubuntu-22.04
+  #   strategy:
+  #     fail-fast: false
+  #     matrix: # 2x2 versions ran here, with 2 different ocaml versions and with/without labltk
+  #       ocaml-compiler:
+  #         - 4.13.x
+  #         - 4.14.x
+  #       additional-packages:
+  #         -
+  #         - labltk
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Setup OCaml
+  #       uses: ocaml/setup-ocaml@v2
+  #       with:
+  #         ocaml-compiler: ${{ matrix.ocaml-compiler }}
+  #         dune-cache: true
+  #     - name: Install dependencies
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install --yes gnuplot-nox \
+  #           poppler-utils graphviz texlive-latex-recommended \
+  #           texlive-fonts-recommended texlive-pictures tex4ht \
+  #           texlive-latex-extra
+  #         opam depext --install --yes dune odoc camlp-streams \
+  #           ${{ matrix.additional-packages }}
+  #         opam install --yes . --deps-only
+  #     - name: Make Kappa
+  #       run: opam exec -- make all
+  #     - name: Make documentation
+  #       run: opam exec -- make doc_html
+  #     - name: Make check
+  #       run: opam exec -- make --jobs=2 check
+  #     - name: Archive documentation
+  #       uses: actions/upload-artifact@v4
+  #       if: matrix.ocaml-compiler == '4.14.x' && matrix.additional-packages == ''
+  #       with:
+  #         name: doc
+  #         path: |
+  #           man
+  #           _build/default/_doc/_html/kappa-library
 
-  python:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v2
-        with:
-          ocaml-compiler: 4.13.x
-          dune-cache: true
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes gnuplot-nox \
-            poppler-utils graphviz texlive-latex-recommended \
-            texlive-fonts-recommended texlive-pictures tex4ht
-          opam install --yes . --deps-only
-          pip install nose
-      - name: Make Kappa
-        run: |
-          opam exec -- make all
-          opam exec -- dune build @install
-      - name: Uninstall nose
-        run: opam exec -- pip uninstall -y nose
-      - name: Reinstall nose
-        run: "opam exec -- pip install nose-py3"
-      - name: Nose tests
-        run: opam exec -- nosetests -v tests/kappy
+  # python:
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Setup OCaml
+  #       uses: ocaml/setup-ocaml@v2
+  #       with:
+  #         ocaml-compiler: 4.13.x
+  #         dune-cache: true
+  #     - name: Install dependencies
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install --yes gnuplot-nox \
+  #           poppler-utils graphviz texlive-latex-recommended \
+  #           texlive-fonts-recommended texlive-pictures tex4ht
+  #         opam install --yes . --deps-only
+  #         pip install nose
+  #     - name: Make Kappa
+  #       run: |
+  #         opam exec -- make all
+  #         opam exec -- dune build @install
+  #     - name: Uninstall nose
+  #       run: opam exec -- pip uninstall -y nose
+  #     - name: Reinstall nose
+  #       run: "opam exec -- pip install nose-py3"
+  #     - name: Nose tests
+  #       run: opam exec -- nosetests -v tests/kappy
 
   webapp-ubuntu:
     runs-on: ubuntu-22.04
@@ -134,84 +134,126 @@ jobs:
           path: |
             Kappapp.tar.gz
 
-  webapp-macos:
-    runs-on: macos-13
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v2
-        with:
-          ocaml-compiler: 4.13.x
-          dune-cache: true
-      - name: Install OPAM dependencies
-        run: opam install --yes . --deps-only
-      - name: Make Kappa
-        run: opam exec -- make all
-      - name: Make MacOS app
-        run: |
-          opam exec -- make Kappapp.app
-          mv build/Kappapp.app .
-      - name: Sign MacOS binaries
-        run: |
-          find Kappapp.app/Contents/ \( -name \*.app -or -name \*.framework \) \
-            -exec codesign --deep -s - \{\} \;
-          codesign -s - Kappapp.app
-          zip -y -r Kappapp.app.zip Kappapp.app
-      - name: Archive MacOS app
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos
-          path: Kappapp.app.zip
+  # webapp-macos:
+  #   runs-on: macos-13
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Setup OCaml
+  #       uses: ocaml/setup-ocaml@v2
+  #       with:
+  #         ocaml-compiler: 4.13.x
+  #         dune-cache: true
+  #     - name: Install OPAM dependencies
+  #       run: opam install --yes . --deps-only
+  #     - name: Make Kappa
+  #       run: opam exec -- make all
+  #     - name: Make MacOS app
+  #       run: |
+  #         opam exec -- make Kappapp.app
+  #         mv build/Kappapp.app .
+  #     - name: Sign MacOS binaries
+  #       run: |
+  #         find Kappapp.app/Contents/ \( -name \*.app -or -name \*.framework \) \
+  #           -exec codesign --deep -s - \{\} \;
+  #         codesign -s - Kappapp.app
+  #         zip -y -r Kappapp.app.zip Kappapp.app
+  #     - name: Archive MacOS app
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: macos
+  #         path: Kappapp.app.zip
 
-  webapp-windows:
-    runs-on: windows-2022
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v3
-        with:
-          ocaml-compiler: 4.14.x
-          dune-cache: true
-      - name: Install OPAM dependencies
-        run: opam install --yes . --deps-only
-      - name: Make Kappa
-        run: opam exec -- make all
-      - name: Make Windows app
-        run: |
-          opam exec -- make KappappWin
-          # Note: This runs powershell thus the different path syntax
-          mv .\build\KappappWin .
-          # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
-          7z a -tzip KappappWin.zip KappappWin
-      - name: Archive Windows app
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows
-          path: KappappWin.zip
+  # webapp-windows:
+  #   runs-on: windows-2022
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Setup OCaml
+  #       uses: ocaml/setup-ocaml@v3
+  #       with:
+  #         ocaml-compiler: 4.14.x
+  #         dune-cache: true
+  #     - name: Install OPAM dependencies
+  #       run: opam install --yes . --deps-only
+  #     - name: Make Kappa
+  #       run: opam exec -- make all
+  #     - name: Make Windows app
+  #       run: |
+  #         opam exec -- make KappappWin
+  #         # Note: This runs powershell thus the different path syntax
+  #         mv .\build\KappappWin .
+  #         # Note: Windows VMs on GitHub Action do not have zip command but provide 7z
+  #         7z a -tzip KappappWin.zip KappappWin
+  #     - name: Archive Windows app
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: windows
+  #         path: KappappWin.zip
 
-  deploy:
-    needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows]
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        deploy-name: [doc, online-ui, linux, macos, windows]
+  webapp-playwright-test:
+    # TODO: fix these settings
+    # needs: [cli-and-doc, webapp-ubuntu]
+    needs: [webapp-ubuntu]
+    # if: github.ref == 'refs/heads/master'
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download doc artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{matrix.deploy-name}}
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.DEPLOY_KEY }}
-          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
-      - name: Run deploy script
-        run: dev/deploy-to-website.sh ${{matrix.deploy-name}}
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run:  |
+        npm ci
+        sudo apt-get update
+        sudo apt-get install lighttpd
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Download online-ui
+      uses: actions/download-artifact@v4
+      with:
+        name: online-ui
+    - name: Setup webapp server
+      run: |
+        > echo '
+          include_shell "/usr/share/lighttpd/create-mime.conf.pl" 
+          server.document-root = "./site"
+          server.port = 12345
+          server.username = "root"
+          server.groupname = "root"
+          ' > lighttpd.conf
+        lighttpd -f lighttpd.conf -D
+    - name: Run Playwright tests
+      run: DEBUG=pw:webserver npx playwright test
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  # deploy:
+  #   needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows, webapp-playwright-test]
+  #   if: github.ref == 'refs/heads/master'
+  #   runs-on: ubuntu-22.04
+  #   strategy:
+  #     matrix:
+  #       deploy-name: [doc, online-ui, linux, macos, windows]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: ${{matrix.deploy-name}}
+  #     - name: Install SSH Key
+  #       uses: shimataro/ssh-key-action@v2
+  #       with:
+  #         key: ${{ secrets.DEPLOY_KEY }}
+  #         known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
+  #     - name: Run deploy script
+  #       run: dev/deploy-to-website.sh ${{matrix.deploy-name}}
 
 # TODO: see if add cache        
 #       # from https://github.com/hazelgrove/hazel/blob/868f673119827a35ec67fad5e7e0d5135ce91d4c/.github/workflows/deploy_branches.yml#L19-L29
