@@ -2844,8 +2844,12 @@ module Make (I : Symmetry_interface_sig.Interface) = struct
           Sbml_backend.do_dotnet logger logger_err (fun log _ ->
               Ode_loggers.print_newline log)
         in
+        let () = Sbml_backend.line_dotnet_or_sbml logger logger_err in
         let () =
           Sbml_backend.open_box_dotnet logger logger_err "begin groups"
+        in
+        let () =
+          Sbml_backend.line_dotnet logger logger_err
         in
         let () =
           Sbml_backend.do_dotnet logger logger_err (fun log _ ->
