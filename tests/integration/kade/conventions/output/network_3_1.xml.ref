@@ -118,5 +118,6 @@ no correcion is applied on reaction rates
 </kineticLaw>
 </reaction>
 </listOfReactions>
+
 </model>
 </sbml>

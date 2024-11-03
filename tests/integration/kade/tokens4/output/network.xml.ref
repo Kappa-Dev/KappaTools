@@ -99,5 +99,6 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
 </listOfReactions>
+
 </model>
 </sbml>

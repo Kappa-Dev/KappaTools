@@ -236,5 +236,6 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 </listOfReactions>
+
 </model>
 </sbml>
