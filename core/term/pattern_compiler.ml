@@ -122,7 +122,8 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
                    LKappa.ra_syntax = ag.LKappa.ra_syntax;
                  }
                 :: ag_tail),
-              todo )
+              todo,
+              false )
             :: acc
           ) else if s = LKappa.Erased && p_switch = LKappa.Freed then (
             let ports' = Array.copy ag.LKappa.ra_ports in
@@ -139,7 +140,8 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
                    LKappa.ra_syntax = ag.LKappa.ra_syntax;
                  }
                 :: ag_tail),
-              todo )
+              todo,
+              false )
             :: acc
           ) else
             acc
@@ -165,7 +167,8 @@ let complete_with_candidate outs prevs ag ag_tail id todo p_id dst_info p_switch
                      LKappa.ra_syntax = ag.LKappa.ra_syntax;
                    }
                   :: ag_tail),
-                todo' )
+                todo',
+                false )
               :: acc
             | [], _ -> acc
             | _ :: _ :: _, _ -> assert false
@@ -194,15 +197,17 @@ let new_agent_with_one_link sigs ty_id port link dst_info switch =
   }
 
 let rec add_one_implicit_info sigs id (((port, ty_id), dst_info, s) as info) acc
-    out todo = function
+    fresh_only_acc out todo = function
   | [] ->
     ( List.rev_append acc
         [ new_agent_with_one_link sigs ty_id port id dst_info s ],
-      todo )
+      todo,
+      fresh_only_acc )
     :: out
   | ag :: ag_tail ->
     let out_tail =
-      add_one_implicit_info sigs id info (ag :: acc) out todo ag_tail
+      add_one_implicit_info sigs id info (ag :: acc) fresh_only_acc out todo
+        ag_tail
     in
     if ty_id = ag.LKappa.ra_type then
       complete_with_candidate out_tail acc ag ag_tail id todo port dst_info s
@@ -212,11 +217,13 @@ let rec add_one_implicit_info sigs id (((port, ty_id), dst_info, s) as info) acc
 let add_implicit_infos sigs l =
   let rec aux acc = function
     | [] -> acc
-    | (m, []) :: t -> aux (m :: acc) t
-    | (m, (id, info, dst_info, s) :: todo') :: t ->
-      aux acc (add_one_implicit_info sigs id (info, dst_info, s) [] t todo' m)
+    | (m, [], only_fresh) :: t -> aux ((m, only_fresh) :: acc) t
+    | (m, (id, info, dst_info, s) :: todo', only_fresh) :: t ->
+      aux acc
+        (add_one_implicit_info sigs id (info, dst_info, s) [] only_fresh t todo'
+           m)
   in
-  aux [] l
+  aux [] (List.rev_map (fun (a, b) -> a, b, true) (List.rev l))
 
 let is_linked_on_port me i id = function
   | (LKappa.LNK_VALUE (j, _), _), _ when i = j -> id <> me
@@ -609,7 +616,8 @@ let incr_origin = function
   | (Operator.ALG _ | Operator.MODIF _) as x -> x
   | Operator.RULE i -> Operator.RULE (succ i)
 
-let connected_components_of_mixture ~debug_mode created mix (env, origin) =
+let connected_components_of_mixture ~debug_mode created (mix, bool) (env, origin)
+    =
   let sigs = Pattern.PreEnv.sigs env in
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
@@ -635,10 +643,11 @@ let connected_components_of_mixture ~debug_mode created mix (env, origin) =
         complete_with_creation sigs transformations' links_transf [] actions' 0
           created
       in
-      ( ( origin,
-          Tools.array_rev_of_list acc,
-          { instantiations with Instantiation.actions = actions'' },
-          transformations'' ),
+      ( ( ( origin,
+            Tools.array_rev_of_list acc,
+            { instantiations with Instantiation.actions = actions'' },
+            transformations'' ),
+          bool ),
         (env, Option_util.map incr_origin origin) )
     | h :: t ->
       let wk = Pattern.begin_new env in
@@ -705,7 +714,7 @@ let connected_components_sum_of_ambiguous_rule ~debug_mode ~compile_mode_on
   let () =
     if compile_mode_on then
       Format.eprintf "@[<v>_____(%i)@,%a@]@." (List.length all_mixs)
-        (Pp.list Pp.cut (fun f x ->
+        (Pp.list Pp.cut (fun f (x, _) ->
              Format.fprintf f "@[%a%a@]"
                (LKappa.print_rule_mixture ~noCounters sigs counters_info
                   ~ltypes:true created)
@@ -728,7 +737,7 @@ let connected_components_sum_of_ambiguous_mixture ~debug_mode ~compile_mode_on
   ( cc_env,
     List.rev_map
       (function
-        | _, l, event, ([], []) -> l, event.Instantiation.tests
+        | (_, l, event, ([], [])), _b -> l, event.Instantiation.tests
         | _ -> assert false)
       rules )
 

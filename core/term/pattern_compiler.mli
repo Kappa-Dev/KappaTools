@@ -28,11 +28,12 @@ val connected_components_sum_of_ambiguous_rule :
   ?origin:Operator.rev_dep ->
   LKappa.rule_mixture ->
   Raw_mixture.t ->
-  (Operator.rev_dep option
-  * (Pattern.id * Pattern.cc) array
-  * Instantiation.abstract Instantiation.event
-  * (Instantiation.abstract Primitives.Transformation.t list
-    * Instantiation.abstract Primitives.Transformation.t list))
+  ((Operator.rev_dep option
+   * (Pattern.id * Pattern.cc) array
+   * Instantiation.abstract Instantiation.event
+   * (Instantiation.abstract Primitives.Transformation.t list
+     * Instantiation.abstract Primitives.Transformation.t list))
+  * bool)
   list
   * (Pattern.PreEnv.t * Operator.rev_dep option)
 

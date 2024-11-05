@@ -122,14 +122,15 @@ let rules_of_ast ~debug_mode ~warning ?deps_machinery ~compile_mode_on
           Some d'
       in
       let unrate = compile_pure_alg ~debug_mode ~compile_mode_on rate in
-      fun ccs ->
+      fun (ccs, bool) ->
         (match Array.length ccs with
         | 0 | 1 ->
           let () =
-            warning ~pos (fun f ->
-                Format.pp_print_text f
-                  "Useless molecular ambiguity, the rules is always considered \
-                   as unary.")
+            if not bool then
+              warning ~pos (fun f ->
+                  Format.pp_print_text f
+                    "Useless molecular ambiguity, the rules is always \
+                     considered as unary.")
           in
           unrate, None
         | 2 -> crp, Some (unrate, dist')
@@ -140,9 +141,9 @@ let rules_of_ast ~debug_mode ~warning ?deps_machinery ~compile_mode_on
                  ^ " connected components.",
                  pos )))
   in
-  let build deps (origin, ccs, syntax, (neg, pos)) =
+  let build deps ((origin, ccs, syntax, (neg, pos)), bool) =
     let ccs' = Array.map fst ccs in
-    let rate, unrate = unary_infos ccs' in
+    let rate, unrate = unary_infos (ccs', bool) in
     ( Option_util.map
         (fun x ->
           let origin =
@@ -643,7 +644,6 @@ let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
       preenv' result.Ast.rules
   in
   let rule_nd = Array.of_list compiled_rules in
-
   pause @@ fun () ->
   outputs (Data.Log "\t -interventions");
   let preenv, alg_deps'', pert, has_tracking =
