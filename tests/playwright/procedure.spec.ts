@@ -2,8 +2,10 @@
 // Note: trace snapshots that should be taken by playwright are not (absent on right of ui `npx playwright test --ui`)
 
 // TODO: test with embedded Kasim? deprecate it?
+// TODO: split this in multiple files?
 
-import { test, expect, type Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
+import { test, RUN_DOWNLOADS_IN_ELECTRON } from './project_electron_param';
 
 import * as utils from './webapp_utils';
 
@@ -20,13 +22,19 @@ const abc_ka = '//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples
 const poly_ka = '//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/poly.ka'
 const local_views_slide_69_ka = '//www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/local_views/local_views_slide_69.ka'
 const counter_2_ka = '//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/tests/integration/compiler/counters_2_levels/counter_2.ka'
-const minikai_counters_ka = '//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/large/minikai/minikai_counters.ka'
 const causality_slide_10_ka = '//www.di.ens.fr/~feret/teaching/2023-2024/MPRI.2.19/activities/causality/causality_slide_10.ka'
 
 test.describe('Editor tab', () => {
 
-  test('editor', async ({ page }) => {
-    await utils.open_app_with_model(page, abc_ka);
+  test('open_file_from_url', async ({ page, run_in_electron }) => {
+    test.skip(run_in_electron, "Not relevant in electron: opening url would use the server instead of the electron app.");
+
+    await utils.open_app_with_model(page, abc_ka, run_in_electron, false);
+  });
+
+
+  test('editor', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model(page, abc_ka, run_in_electron);
 
     const editor = page.locator('#editor-panel').getByRole('textbox');
     async function editor_to_line(n: number): Promise<void> {
@@ -40,9 +48,9 @@ test.describe('Editor tab', () => {
     await editor_to_line(21);
     // Make a syntax error
     await editor.press('Backspace');
-    // (useless comment to match brackets { {)
+    // (useless comment to match brackets in editor { )
     await utils.expect_error(page, [
-      " « 1/1 » [abc.ka] invalid internal state or missing '}' "
+      " « 1/1 » [model.ka] invalid internal state or missing '}' "
     ]);
     await editor_cancel();
     await utils.expect_no_error(page);
@@ -50,7 +58,7 @@ test.describe('Editor tab', () => {
     await editor.fill('\n%agent: D(a{u p})');
 
     await utils.expect_error(page, [
-      " « 1/1 » [abc.ka] Dead agent D "
+      " « 1/1 » [model.ka] Dead agent D "
     ]);
 
     await editor_to_line(25);
@@ -61,7 +69,7 @@ test.describe('Editor tab', () => {
     await editor.fill("\n'd' D(a{p}) -> D(a{u}) @ 1");
     // await page.locator('#panel_preferences_message_nav_inc_id').click();
     await utils.expect_error(page, [
-      " « 1/1 » [abc.ka] Dead rule 'd' "
+      " « 1/1 » [model.ka] Dead rule 'd' "
     ]);
     await editor_cancel();
     await editor_cancel();
@@ -69,9 +77,9 @@ test.describe('Editor tab', () => {
     await utils.expect_no_error(page);
   });
 
-  test('contact_map', async ({ page, browserName }) => {
+  test('contact_map', async ({ page, run_in_electron, browserName }) => {
+    await utils.open_app_with_model(page, abc_ka, run_in_electron);
     const opts_screen = { maxDiffPixels: 60 }
-    await utils.open_app_with_model(page, abc_ka);
     const contact_map = page.locator('#map-container');
     await expect.soft(contact_map).toHaveScreenshot(opts_screen);
     await page.getByRole('checkbox', { name: 'Interactive Mode' }).check();
@@ -89,18 +97,19 @@ test.describe('Editor tab', () => {
     await page.getByRole('button', { name: 'Reset Zoom' }).click();
     await expect.soft(contact_map).toHaveScreenshot(opts_screen);
 
-    await utils.testExports(page, '#export_contact-export', 'map', ['svg', 'json'], undefined, browserName);
-
-    // await utils.testExports(page, '#export_contact-export', 'map', ['png'], undefined, browserName);
-    // TODO: pngs doesn't match on CI's chromium and firefox. check if we can test them in some way.
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      await utils.testExports(page, '#export_contact-export', 'map', ['svg', 'json'], undefined, browserName);
+      // await utils.testExports(page, '#export_contact-export', 'map', ['png'], undefined, browserName);
+      // TODO: pngs doesn't match on CI's chromium and firefox. check if we can test them in some way.
+    }
 
   });
 
-  test('influences', async ({ page }) => {
+  test('influences', async ({ page, run_in_electron }) => {
     const opts_screen = { maxDiffPixels: 60 }
     const opts_screen_lenient = { maxDiffPixels: 150, threshold: 0.4 }
 
-    await utils.open_app_with_model(page, abc_ka);
+    await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await page.locator('#navinfluences').click();
     const table = page.locator('#influences-table');
 
@@ -129,15 +138,17 @@ test.describe('Editor tab', () => {
     await page.getByRole('button', { name: 'Previous' }).click();
     await expect.soft(table).toHaveScreenshot();
     //export
-    await utils.testExports(page, '#export_influence-export', 'influences', ['json']);
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      await utils.testExports(page, '#export_influence-export', 'influences', ['json']);
+    }
   });
 
   function constraint_locator(page: Page, n: number) {
     return (page.locator('#constraints > .panel-scroll > div > .panel-body').nth(n));
   }
 
-  test('constraints_and_polymers_1', async ({ page }) => {
-    await utils.open_app_with_model(page, abc_ka);
+  test('constraints_and_polymers_1', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await page.locator('#navconstraints').click();
     await expect.soft(constraint_locator(page, 0)).toHaveText(
       `A(c)  =>  [ A(c[.]) v A(c[x1.C]) v A(c[x2.C]) ]
@@ -159,8 +170,8 @@ C(x2)  =>  [ C(x2{u}) v C(x2{p}) ]
     );
   });
 
-  test('constraints_and_polymers_2', async ({ page }) => {
-    await utils.open_app_with_model(page, poly_ka);
+  test('constraints_and_polymers_2', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model(page, poly_ka, run_in_electron);
     await page.locator('#navpolymers').click();
     await expect.soft(page.getByRole('paragraph')).toHaveText(
       `The following bonds may form arbitrary long chains of agents:
@@ -176,8 +187,8 @@ A(c[1]),C(a[1])
 `);
   });
 
-  test('constraints_and_polymers_3', async ({ page }) => {
-    await utils.open_app_with_model(page, local_views_slide_69_ka, true, 20000);
+  test('constraints_and_polymers_3', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model(page, local_views_slide_69_ka, run_in_electron, true, 20000);
     await page.locator('#navconstraints').click();
     await expect.soft(constraint_locator(page, 0)).toHaveText(
       `E(x)  =>  [ E(x[.]) v E(x[x.R]) ]
@@ -212,8 +223,8 @@ R(CN[C.R],CR[CR.R])  =>  R(CN[2],CR[1]),R(C[2],CR[1])
     ]);
   });
 
-  test('constraints_and_polymers_4', async ({ page }) => {
-    await utils.open_app_with_model(page, counter_2_ka);
+  test('constraints_and_polymers_4', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model(page, counter_2_ka, run_in_electron);
     await page.locator('#navconstraints').click();
     await expect.soft(constraint_locator(page, 4)).toHaveText(
       `A()  =>  A(c{[0 .. 2]})
@@ -221,10 +232,17 @@ R(CN[C.R],CR[CR.R])  =>  R(CN[2],CR[1]),R(C[2],CR[1])
     );
   });
 
-  test('contact_map_accuracy', async ({ page }) => {
-    // TODO: find a smaller example so that execution is faster
-    test.setTimeout(180000)
-    await utils.open_app_with_model(page, minikai_counters_ka, false, 120000);
+  test('contact_map_accuracy', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model_from_text(page,
+      `%agent: A(x,c,d)
+%agent: B(x,y)
+%agent: C(x1{u p},x2{u p})
+'a.b' A(x[.]),B(x[.]) -> A(x[1]),B(x[1]) @ 'on_rate' //A binds B
+'a..b' A(x[1/.]),B(x[1/.]) @ 'off_rate' //AB dissociation
+'never_occuring' A(d[1]),B(y[1]) -> A(d[.]), B(y[.]) @ 1
+%init: 12 A(),B()
+%init: 13 C()`
+      , run_in_electron);
     const contact_map = page.locator('#map-container');
     await expect.soft(contact_map).toHaveScreenshot();
     await page.locator('#contact_map-accuracy').selectOption('high');
@@ -235,8 +253,8 @@ R(CN[C.R],CR[CR.R])  =>  R(CN[2],CR[1]),R(C[2],CR[1])
 
 test.describe('Simulation tools', () => {
 
-  test('Simulation, plot', async ({ page, browserName }) => {
-    await utils.open_app_with_model(page, abc_ka);
+  test('Simulation, plot', async ({ page, run_in_electron, browserName }) => {
+    await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await utils.setSeed(page, 1);
     // Run simulation to 30, then 100, then test plot options
     await utils.set_pause_if(page, '[T] > 30');
@@ -271,11 +289,13 @@ test.describe('Simulation tools', () => {
     await page.locator('.panel-footer').click(); // needed for update
     await expect.soft(page.getByRole('img')).toHaveScreenshot();
 
-    await utils.testExports(page, '#export_plot-export', 'plot', ['csv', 'json', 'tsv'], undefined);
-    await utils.testExports(page, '#export_plot-export', 'plot', ['svg'], undefined, browserName);
-    if (browserName != "chromium") {
-      await utils.testExports(page, '#export_plot-export', 'plot', ['png'], undefined, browserName);
-      // TODO: pngs doesn't match on CI's chromium. check if we can test them in some way
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      await utils.testExports(page, '#export_plot-export', 'plot', ['csv', 'json', 'tsv'], undefined);
+      await utils.testExports(page, '#export_plot-export', 'plot', ['svg'], undefined, browserName);
+      if (browserName != "chromium") {
+        await utils.testExports(page, '#export_plot-export', 'plot', ['png'], undefined, browserName);
+        // TODO: pngs doesn't match on CI's chromium. check if we can test them in some way
+      }
     }
 
     // Test larger plots, slider
@@ -296,8 +316,8 @@ test.describe('Simulation tools', () => {
     await page.getByRole('button', { name: 'pause' }).click();
   });
 
-  test('DIN', async ({ page, browserName }) => {
-    await utils.open_app_with_model(page, abc_ka);
+  test('DIN', async ({ page, run_in_electron, browserName }) => {
+    await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await utils.setSeed(page, 1);
 
     async function expectScreenShotDINTable(chromium_maxDiffPixels: number = 0) {
@@ -326,7 +346,9 @@ test.describe('Simulation tools', () => {
     await page.locator('#navDIN').click();
     await expectScreenShotDINTable(350);
 
-    await utils.testExports(page, '#export_din-export', 'flux', ['json', 'dot', 'html']);
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      await utils.testExports(page, '#export_din-export', 'flux', ['json', 'dot', 'html']);
+    }
 
     await utils.set_pause_if(page, '[T] > 60');
     await page.getByRole('button', { name: 'continue' }).click();
@@ -338,14 +360,16 @@ test.describe('Simulation tools', () => {
     await page.getByRole('combobox').first().selectOption('flux.json');
     await expectScreenShotDINTable(3000);
 
-    await utils.testExports(page, '#export_din-export', 'flux_json', ['json', 'dot', 'html']);
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      await utils.testExports(page, '#export_din-export', 'flux_json', ['json', 'dot', 'html']);
+    }
 
     await page.getByRole('combobox').first().selectOption('flux.html');
     await expectScreenShotDINTable(350);
   });
 
-  test('snapshots', async ({ page, browserName }) => {
-    await utils.open_app_with_model(page, abc_ka);
+  test('snapshots', async ({ page, run_in_electron, browserName }) => {
+    await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await utils.setSeed(page, 1);
 
     // Generate two snapshots
@@ -430,28 +454,30 @@ test.describe('Simulation tools', () => {
     // await page.locator('#force-container circle').first().click();
 
     // Test exports
-    await page.locator('#format_select_id').selectOption('Kappa');
-    await utils.testExports(page, "#export_snapshot_kappa", "snapshot_kappa", ["json", "kappa", "dot"],
-      ['', '', '"#\\w{5,6}"']);
-    await page.locator('#format_select_id').selectOption('Graph');
-    await utils.testExports(page, "#export_snapshot_graph", "snapshot_graph", ["json", "kappa", "dot"], ['', '', '"#\\w{5,6}"']);
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      await page.locator('#format_select_id').selectOption('Kappa');
+      await utils.testExports(page, "#export_snapshot_kappa", "snapshot_kappa", ["json", "kappa", "dot"],
+        ['', '', '"#\\w{5,6}"']);
+      await page.locator('#format_select_id').selectOption('Graph');
+      await utils.testExports(page, "#export_snapshot_graph", "snapshot_graph", ["json", "kappa", "dot"], ['', '', '"#\\w{5,6}"']);
 
-    await utils.testExports(page, "#export_snapshot_graph", "snapshot_graph", ["svg"],
-      ['<svg class="svg.*'], browserName);
-    if (browserName != "chromium") {
-      await utils.testExports(page, "#export_snapshot_graph", "snapshot_graph", ["png"],
-        undefined, browserName);
-      // TODO: pngs doesn't match on CI's chromium. check if we can test them in some way
+      await utils.testExports(page, "#export_snapshot_graph", "snapshot_graph", ["svg"],
+        ['<svg class="svg.*'], browserName);
+      if (browserName != "chromium") {
+        await utils.testExports(page, "#export_snapshot_graph", "snapshot_graph", ["png"],
+          undefined, browserName);
+        // TODO: pngs doesn't match on CI's chromium. check if we can test them in some way
+      }
+      // note: dot and svg export have special change as there is variance on their outputs if ran in playwright through the cli or through --ui …
+      // dot : don't check colors, svg: only check there is a svg header
+      // TODO: more complete match for svg, where the difference seems to be in the sizes…
+      // Graphics are different between firefox and chrome… and on chrome png is also different between --ui and cli uuuuuh
     }
-    // note: dot and svg export have special change as there is variance on their outputs if ran in playwright through the cli or through --ui …
-    // dot : don't check colors, svg: only check there is a svg header
-    // TODO: more complete match for svg, where the difference seems to be in the sizes…
-    // Graphics are different between firefox and chrome… and on chrome png is also different between --ui and cli uuuuuh
 
   });
 
-  test('outputs', async ({ page }) => {
-    await utils.open_app_with_model(page, abc_ka);
+  test('outputs', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await utils.setSeed(page, 1);
 
     // Generate two snapshots
@@ -486,19 +512,20 @@ test.describe('Simulation tools', () => {
     await page.locator('#output-select-id').selectOption('ab.txt');
     await expect.soft(outputs_display).toHaveText("394393");
 
-    const downloadPromise = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'All outputs' }).click();
-    const download = await downloadPromise;
-
-    utils.compare_zip_files_list_with_ref(download, []);
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      const downloadPromise = page.waitForEvent('download');
+      await page.getByRole('button', { name: 'All outputs' }).click();
+      const download = await downloadPromise;
+      utils.compare_zip_files_list_with_ref(download, []);
+    }
   });
 
 });
 
 test.describe('stories', () => {
 
-  async function setup_stories(page: Page) {
-    await utils.open_app_with_model(page, causality_slide_10_ka, true);
+  async function setup_stories(page: Page, run_in_electron: boolean) {
+    await utils.open_app_with_model(page, causality_slide_10_ka, run_in_electron, true);
     await utils.setSeed(page, 1);
 
     // Enable trace
@@ -540,8 +567,8 @@ test.describe('stories', () => {
   }
 
 
-  test('Empty', async ({ page }) => {
-    await setup_stories(page);
+  test('Empty', async ({ page, run_in_electron }) => {
+    await setup_stories(page, run_in_electron);
     // No screenshot test as no stories causes no image to locate
     await computeStoriesAndTest(page, "", `Starting Compression
 Compression completed
@@ -549,8 +576,8 @@ Compression completed
 `, false);
   });
 
-  test('Weakly', async ({ page }) => {
-    await setup_stories(page);
+  test('Weakly', async ({ page, run_in_electron }) => {
+    await setup_stories(page, run_in_electron);
     await page.getByRole('checkbox', { name: 'Weakly' }).check();
     await computeStoriesAndTest(page,
       `ids: 11, 19, 24, 29, 33, 36, 37, 39, 49, 52, 55
@@ -567,8 +594,8 @@ Compression completed
 `);
   });
 
-  test('Strongly', async ({ page }) => {
-    await setup_stories(page);
+  test('Strongly', async ({ page, run_in_electron }) => {
+    await setup_stories(page, run_in_electron);
     await page.getByRole('checkbox', { name: 'Strongly' }).check();
     await computeStoriesAndTest(page,
       `ids: 11, 19, 24, 29, 33, 36, 37, 39, 49, 52, 55, 5, 8, 21, 27, 28, 30, 31,
@@ -603,8 +630,8 @@ Compression completed
 
   });
 
-  test('Causal + select stories', async ({ page }) => {
-    await setup_stories(page);
+  test('Causal + select stories', async ({ page, run_in_electron }) => {
+    await setup_stories(page, run_in_electron);
     await page.getByRole('checkbox', { name: 'Causal' }).check();
     const computation_log = `Starting Compression
 Start one causal compression
@@ -689,8 +716,8 @@ event=5200, 3184, 2246`,
       computation_log);
   });
 
-  test('Weakly + Strongly', async ({ page }) => {
-    await setup_stories(page);
+  test('Weakly + Strongly', async ({ page, run_in_electron }) => {
+    await setup_stories(page, run_in_electron);
     await page.getByRole('checkbox', { name: 'Weakly' }).check();
     await page.getByRole('checkbox', { name: 'Strongly' }).check();
     await computeStoriesAndTest(page,
@@ -712,19 +739,21 @@ Compression completed
 `);
   });
 
-  test('Trace download', async ({ page }) => {
-    await setup_stories(page);
-    const downloadPromise = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'get trace' }).click();
-    const download = await downloadPromise;
-    await utils.compare_download_to_ref(download, "stories_trace");
+  test('Trace download', async ({ page, run_in_electron }) => {
+    await setup_stories(page, run_in_electron);
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      const downloadPromise = page.waitForEvent('download');
+      await page.getByRole('button', { name: 'get trace' }).click();
+      const download = await downloadPromise;
+      await utils.compare_download_to_ref(download, "stories_trace");
+    }
   });
 
 });
 
 test.describe('projects_and_files', () => {
-  test('project', async ({ page }) => {
-    await utils.open_app_with_model(page, causality_slide_10_ka, true);
+  test('project', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model(page, causality_slide_10_ka, run_in_electron, true);
     await utils.setSeed(page, 1);
 
     // project tab is `a` in `list`, `list` contains "active" class info, `a` is clickable
@@ -770,36 +799,38 @@ test.describe('projects_and_files', () => {
     // TODO: Could also check simulation results
   });
 
-  test('files', async ({ page }) => {
-    await utils.open_app_with_model(page, abc_ka, false);
+  test('files', async ({ page, run_in_electron }) => {
+    await utils.open_app_with_model(page, abc_ka, run_in_electron, false);
     await utils.setSeed(page, 1);
 
-    // download file
-    await page.getByRole('button', { name: 'File' }).click();
-    const downloadPromise = page.waitForEvent('download');
-    await page.locator('#menu-editor-file-export-li').click();
-    const download = await downloadPromise;
-    await utils.compare_download_to_ref(download, "abc_download.ka");
-    const downloaded_path = await download.path();
+    // TODO: see if we can adapt part of this to electron?
+    if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
+      // download file
+      await page.getByRole('button', { name: 'File' }).click();
+      const downloadPromise = page.waitForEvent('download');
+      await page.locator('#menu-editor-file-export-li').click();
+      const download = await downloadPromise;
+      await utils.compare_download_to_ref(download, "abc_download.ka");
+      const downloaded_path = await download.path();
 
-    // close it, and reopen it
-    await page.getByRole('button', { name: 'File' }).click();
-    await page.locator('#menu-editor-file-close-li').click();
-    await page.getByRole('button', { name: 'File' }).click();
-    const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.locator('#menu-editor-file-open-li').click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(downloaded_path);
+      // close it, and reopen it
+      await page.getByRole('button', { name: 'File' }).click();
+      await page.locator('#menu-editor-file-close-li').click();
+      await page.getByRole('button', { name: 'File' }).click();
+      const fileChooserPromise = page.waitForEvent('filechooser');
+      await page.locator('#menu-editor-file-open-li').click();
+      const fileChooser = await fileChooserPromise;
+      await fileChooser.setFiles(downloaded_path);
 
-    // write other file and check contact map
-    await page.getByRole('button', { name: 'File' }).click();
-    await page.locator('#menu-editor-file-new-li').click();
-    await page.getByRole('textbox', { name: 'file name' }).click();
-    await page.getByRole('textbox', { name: 'file name' }).fill('test.ka');
-    await page.getByRole('textbox', { name: 'file name' }).press('Enter');
-    await page.locator('.CodeMirror-scroll').click();
-    await utils.input_in_editor_from_str(page,
-      `%agent: K(x)
+      // write other file and check contact map
+      await page.getByRole('button', { name: 'File' }).click();
+      await page.locator('#menu-editor-file-new-li').click();
+      await page.getByRole('textbox', { name: 'file name' }).click();
+      await page.getByRole('textbox', { name: 'file name' }).fill('test.ka');
+      await page.getByRole('textbox', { name: 'file name' }).press('Enter');
+      await page.locator('.CodeMirror-scroll').click();
+      await utils.input_in_editor_from_str(page,
+        `%agent: K(x)
 %agent: S(a b{u p} c{u p})
 %init: 1000 K()
 %init: 1000 S()
@@ -810,20 +841,22 @@ test.describe('projects_and_files', () => {
 %obs: 'S++' |S(b{p} c{p})|
 %mod: [true] do $TRACK 'S++' [true] ;
 `
-    );
-    await utils.wait_for_file_load(page, { timeout: 10000 });
-    const contact_map = page.locator('#map-container');
+      );
+      await utils.wait_for_file_load(page, { timeout: 10000 });
+      const contact_map = page.locator('#map-container');
 
-    const opts_screen = { maxDiffPixels: 150 }
-    await expect.soft(contact_map).toHaveScreenshot(opts_screen);
+      const opts_screen = { maxDiffPixels: 150 }
+      await expect.soft(contact_map).toHaveScreenshot(opts_screen);
 
-    // TODO: fix this flaky test: sometimes the graph doesn't show, bug?
-    // simulate and test screenshot
-    // await utils.set_pause_if(page, '[T] > 30');
-    // await page.getByRole('button', { name: 'start' }).click();
-    // await utils.wait_for_sim_stop(page, { timeout: 20000 });
-    // await page.locator('#navplot').click();
-    // await expect.soft(page.getByRole('img')).toHaveScreenshot();
+      // TODO: fix this flaky test: sometimes the graph doesn't show, bug?
+      // simulate and test screenshot
+      // await utils.set_pause_if(page, '[T] > 30');
+      // await page.getByRole('button', { name: 'start' }).click();
+      // await utils.wait_for_sim_stop(page, { timeout: 20000 });
+      // await page.locator('#navplot').click();
+      // await expect.soft(page.getByRole('img')).toHaveScreenshot();
+      //
+    }
   });
 
 });
