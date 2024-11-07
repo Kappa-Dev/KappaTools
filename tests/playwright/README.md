@@ -24,3 +24,11 @@ UPDATE_EXPORTS=true npx playwright test --update-snapshots
 UPDATE_EXPORTS=true npx playwright test --update-snapshots --project firefox
 UPDATE_EXPORTS=true npx playwright test procedure.spec.ts:449 --update-snapshots
 ```
+
+### Electron
+
+Local tests with electron need to have access to the actual screen, it seems. 
+So they should be run with `-j 1` to have a single worker, and the electron window has to stay visible at least.
+
+Downloads open a dialog that is not handled by playwright, so there is no testing of electron downloads.
+They may be enabled and completed manually by changing the boolean in `project_electron_param.ts` (untested).

@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import type { TestOptions } from './tests/playwright/project_electron_param';
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -11,7 +13,7 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-export default defineConfig({
+export default defineConfig<TestOptions>({
   testDir: './tests/playwright',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -33,6 +35,7 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
+  // See https://playwright.dev/docs/test-parameterize#parameterized-projects for electron param definition
   projects: [
     {
       name: 'chromium',
@@ -43,6 +46,12 @@ export default defineConfig({
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
+
+    // TODO: try having electron tests working
+    // {
+    //   name: 'electron',
+    //   use: { run_in_electron: true },
+    // },
 
     // TODO: try making the app work on webkit
     /*

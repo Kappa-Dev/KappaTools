@@ -1,12 +1,14 @@
 "use strict";
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow } = require('electron')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-function createWindow () {
+// Don't open the window rightaway (with show:false below)
+// See https://zeke.github.io/electron.atom.io/docs/api/browser-window/#using-ready-to-show-event
+function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     webPreferences: {
@@ -14,7 +16,8 @@ function createWindow () {
       contextIsolation: false,
     },
     width: 1024,
-    height: 768
+    height: 768,
+    show: false,
   })
 
   // and load the index.html of the app.
@@ -24,7 +27,7 @@ function createWindow () {
     pathname: require('path').join(__dirname, '../bin/KappaSwitchman'),
     query: { label: 'Local' }
   })
-  mainWindow.loadFile('index.html',{
+  mainWindow.loadFile('index.html', {
     query: {
       host: sim_agent,
       // level: "debug",
@@ -35,16 +38,21 @@ function createWindow () {
   // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
+  mainWindow.on('closed', function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+  mainWindow.once('ready-to-show', () => {
+    // TODO: put this back conditionnally
+    // mainWindow.show()
+  })
 }
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function () {
+app.on('window-all-closed', function() {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
@@ -52,7 +60,7 @@ app.on('window-all-closed', function () {
   }
 })
 
-app.on('activate', function () {
+app.on('activate', function() {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
