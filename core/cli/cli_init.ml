@@ -48,9 +48,9 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
     LKappa_compiler.compil_of_ast ~warning ~debug_mode ~syntax_version
       ~var_overwrite ast
   in
-  let overwrite_init, overwrite_t0 =
+  let overwrite_init, overwrite_t0_in_files =
     match initialMix with
-    | None -> None, None
+    | None -> None, conf.Configuration.initial
     | Some file ->
       let compil =
         match syntax_version with
@@ -66,6 +66,20 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
              ast_compiled_data.token_names.NamedDecls.finder
              ast_compiled_data.alg_vars_finder compil.Ast.init),
         conf.Configuration.initial )
+  in
+  let overwrite_t0_cli =
+    Option_util.bind
+      (fun kasim_args ->
+        match kasim_args.Kasim_args.unit with
+        | Kasim_args.Time -> cli_args.Run_cli_args.minValue
+        | Kasim_args.Event -> None)
+      kasim_args
+  in
+  let overwrite_t0 =
+    if overwrite_t0_cli = None then
+      overwrite_t0_in_files
+    else
+      overwrite_t0_cli
   in
   {
     conf;
@@ -176,7 +190,9 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
         kasim_args.Kasim_args.alg_var_overwrite
     in
     match kasim_args.Kasim_args.initialMix with
-    | None -> { compilation_result; alg_overwrite; overwrite_t0 = None }
+    | None ->
+      let overwrite_t0 = compilation_result.conf.Configuration.initial in
+      { compilation_result; alg_overwrite; overwrite_t0 }
     | Some file ->
       let compil =
         get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion [ file ]
@@ -217,16 +233,11 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
 
 let get_compilation_from_pack ~warning kasim_args cli_args
     (pack : compilation_pack) : compilation_result =
-  let init_t_from_files =
-    Option_util.unsome
-      (Option_util.unsome 0. pack.compilation_result.conf.Configuration.initial)
-      pack.overwrite_t0
-  in
-  let init_t, max_time, init_e, max_event, plot_period =
+  let init_t = Option_util.unsome 0. pack.overwrite_t0 in
+  let max_time, init_e, max_event, plot_period =
     match kasim_args.Kasim_args.unit with
     | Kasim_args.Time ->
-      ( Option_util.unsome init_t_from_files cli_args.Run_cli_args.minValue,
-        cli_args.Run_cli_args.maxValue,
+      ( cli_args.Run_cli_args.maxValue,
         None,
         None,
         (match cli_args.Run_cli_args.plotPeriod with
@@ -235,8 +246,7 @@ let get_compilation_from_pack ~warning kasim_args cli_args
           Option_util.unsome (Configuration.DT 1.)
             pack.compilation_result.conf.Configuration.plotPeriod) )
     | Kasim_args.Event ->
-      ( init_t_from_files,
-        None,
+      ( None,
         Some
           (int_of_float (Option_util.unsome 0. cli_args.Run_cli_args.minValue)),
         Option_util.map int_of_float cli_args.Run_cli_args.maxValue,
