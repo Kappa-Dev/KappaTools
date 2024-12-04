@@ -27,7 +27,7 @@
 %token SHARP UNDERSCORE PIPE RAR LRAR LAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
 %token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
-%token DO REPEAT ALARM RUN LET
+%token DO REPEAT ALARM RUN LET BOOLEAN IMPLICATION IF
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID LABEL STRING
@@ -500,6 +500,18 @@ rule_content:
       (Ast.Edit {Ast.mix; Ast.delta_token},false,pend,an) }
   ;
 
+  guard_list:
+  | ID annoted COMMA annoted guard_list {}
+  | ID annoted IMPLICATION {}
+  | NOT annoted ID annoted COMMA annoted guard_list {}
+  | NOT annoted ID annoted IMPLICATION {}
+  ;
+
+  rule_guard_content:
+  | IF annoted guard_list annoted rule_guard_content { print_string "1";$5 }
+  | rule_content { print_string "3";$1 }
+  ;
+
 alg_with_radius:
   | alg_expr { let (x,_,_) = $1 in (x,None) }
   | alg_expr COLON annoted alg_expr
@@ -523,14 +535,14 @@ birate:
   ;
 
 rule:
-  | rule_content birate
+   | rule_guard_content birate
     { let (k_def,k_un,k_op,k_op_un,pos_end,_annot) = $2 in
       let (rewrite,bidirectional,_,_) = $1 in
       ({
         Ast.rewrite;Ast.bidirectional;
         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
       },Loc.of_pos (start_pos 1) pos_end) }
-  | rule_content error
+  | rule_guard_content error
     { raise (ExceptionDefn.Syntax_Error (add_pos 2 "rule rate expected")) }
   ;
 
@@ -800,6 +812,7 @@ an algebraic expression is expected")) }
   | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
   | CONFIG annoted STRING annoted value_list
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
+  | BOOLEAN annoted ID annoted { add (Ast.BOOLEAN ($3,rhs_pos 3)) }
   ;
 
 model_body:

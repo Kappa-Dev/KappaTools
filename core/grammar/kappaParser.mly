@@ -95,6 +95,9 @@ start_rule:
 		      | Ast.CONFIG (param_name,value_list) ->
 			 {r with
 			  Ast.configurations = (param_name,value_list)::r.Ast.configurations}
+		      | Ast.BOOLEAN param_name ->
+          {r with
+			  Ast.booleans = param_name::r.Ast.booleans}
 		  }
     | error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}
