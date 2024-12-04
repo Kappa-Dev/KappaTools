@@ -2730,5 +2730,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         tokens = ast_compil.tokens;
         signatures = ast_compil.signatures;
         configurations = ast_compil.configurations;
+        booleans = ast_compil.booleans;
       };
   }

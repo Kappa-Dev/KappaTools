@@ -162,6 +162,7 @@ type ('agent, 'agent_id, 'pattern, 'mixture, 'id, 'rule) instruction =
   | PERT of ('pattern, 'mixture, 'id, 'rule) perturbation
   | CONFIG of configuration
   | RULE of (string Loc.annoted option * 'rule Loc.annoted)
+  | BOOLEAN of string Loc.annoted
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -184,6 +185,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
+  booleans: string Loc.annoted list;
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -225,6 +227,7 @@ let empty_compil =
     configurations = [];
     tokens = [];
     volumes = [];
+    booleans = [];
   }
 
 (*
@@ -1113,7 +1116,7 @@ let print_perturbation f ((alarm, cond, modif, rep), _) =
     rep
 
 let print_parsing_compil_kappa f c =
-  Format.fprintf f "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@]@."
+  Format.fprintf f "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@]@."
     (Pp.list Pp.space print_configuration)
     c.configurations
     (Pp.list Pp.space (fun f a ->
@@ -1139,6 +1142,8 @@ let print_parsing_compil_kappa f c =
     c.perturbations
     (Pp.list Pp.space print_init)
     c.init
+    (Pp.list Pp.space (fun f (s, _) -> Format.fprintf f "%%bool: %s" s))
+    c.booleans
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
   JsonUtil.smart_assoc
@@ -1688,6 +1693,8 @@ let compil_to_json c =
              (Loc.string_annoted_to_json ~filenames)
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
+      ( "booleans",
+        JsonUtil.of_list (Loc.string_annoted_to_json ~filenames) c.booleans );
     ]
 
 let compil_of_json = function
@@ -1777,6 +1784,11 @@ let compil_of_json = function
                 (JsonUtil.to_list (Loc.string_annoted_of_json ~filenames)))
              (List.assoc "configurations" l);
          volumes = [];
+         booleans =
+           JsonUtil.to_list
+             ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST booleans sig")
+             (Loc.string_annoted_of_json ~filenames)
+             (List.assoc "booleans" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST", x)))

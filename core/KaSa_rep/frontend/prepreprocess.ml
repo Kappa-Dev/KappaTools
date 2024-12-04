@@ -1005,4 +1005,5 @@ let translate_compil parameters error
       Ast.configurations = compil.Ast.configurations;
       Ast.tokens = compil.Ast.tokens;
       Ast.volumes = compil.Ast.volumes;
+      Ast.booleans = compil.Ast.booleans;
     } )
