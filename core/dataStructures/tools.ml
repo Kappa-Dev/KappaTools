@@ -14,12 +14,14 @@ let float_is_zero x =
 let pow i j =
   let () = assert (0 <= j) in
   let rec aux i k accu =
+    (* i_0^j_0 = accu*i^k *)
     if k = 0 then
       accu
     else if k land 1 = 0 then
-      aux i (k / 2) accu * accu
+      aux (i * i) (k / 2) accu (* n^(2m) = (n^2)^m *)
     else
-      aux i (k / 2) (i * accu * accu)
+      aux (i * i) (k / 2) (i * accu)
+    (* n^(2m+1) = n*n^{2*m} = n*(n^2)^m *)
   in
   aux i j 1
 
