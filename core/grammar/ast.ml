@@ -1142,7 +1142,7 @@ let print_parsing_compil_kappa f c =
     c.perturbations
     (Pp.list Pp.space print_init)
     c.init
-    (Pp.list Pp.space (fun f (s, _) -> Format.fprintf f "%%bool: %s" s))
+    (Pp.list Pp.space (fun f (s, _) -> Format.fprintf f "%%comp_param: %s" s))
     c.booleans
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
@@ -1786,7 +1786,8 @@ let compil_of_json = function
          volumes = [];
          booleans =
            JsonUtil.to_list
-             ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST booleans sig")
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json "AST booleans sig")
              (Loc.string_annoted_of_json ~filenames)
              (List.assoc "booleans" l);
        }

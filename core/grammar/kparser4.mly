@@ -27,7 +27,7 @@
 %token SHARP UNDERSCORE PIPE RAR LRAR LAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
 %token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
-%token DO REPEAT ALARM RUN LET BOOLEAN IMPLICATION IF
+%token DO REPEAT ALARM RUN LET BOOLEAN SHARP_OP_BRA IF
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID LABEL STRING
@@ -502,14 +502,14 @@ rule_content:
 
   guard_list:
   | ID annoted COMMA annoted guard_list {}
-  | ID annoted IMPLICATION {}
+  | ID annoted CL_BRA {}
   | NOT annoted ID annoted COMMA annoted guard_list {}
-  | NOT annoted ID annoted IMPLICATION {}
+  | NOT annoted ID annoted CL_BRA {}
   ;
 
   rule_guard_content:
-  | IF annoted guard_list annoted rule_guard_content { print_string "1";$5 }
-  | rule_content { print_string "3";$1 }
+  | SHARP_OP_BRA annoted guard_list annoted rule_guard_content { $5 }
+  | rule_content { $1 }
   ;
 
 alg_with_radius:

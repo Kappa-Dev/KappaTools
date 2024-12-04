@@ -42,7 +42,6 @@ rule token = parse
   | "<->" { LRAR }
   | "<-" {LAR}
   | "->" { RAR }
-  | "-->" { IMPLICATION }
   | "<>" { DIFF }
   | ':' { COLON }
   | ';' { SEMICOLON }
@@ -91,7 +90,7 @@ rule token = parse
     | "obs" -> OBS
     | "def" -> CONFIG
     | "token" -> TOKEN
-    | "bool" -> BOOLEAN
+    | "comp_param" -> BOOLEAN
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown directive: "^s,
        Loc.of_pos (Lexing.lexeme_start_p lexbuf)
@@ -121,7 +120,6 @@ rule token = parse
     | "Emax" -> EMAX
     | "Tmax" -> TMAX
     | "not" -> NOT
-    | "if" -> print_string "if";IF
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown primitive: "^s,
        Loc.of_pos (Lexing.lexeme_start_p lexbuf)
@@ -147,6 +145,7 @@ rule token = parse
        Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf)))
     }
+  | "#[" { SHARP_OP_BRA }
   | eof { lexbuf.Lexing.lex_eof_reached <- true; EOF }
   | _ as c { raise (ExceptionDefn.Syntax_Error
       ("Unknown character: "^String.make 1 c,
