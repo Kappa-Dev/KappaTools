@@ -500,15 +500,30 @@ rule_content:
       (Ast.Edit {Ast.mix; Ast.delta_token},false,pend,an) }
   ;
 
-  guard_list:
-  | ID annoted COMMA annoted guard_list {}
-  | ID annoted CL_BRA {}
-  | NOT annoted ID annoted COMMA annoted guard_list {}
-  | NOT annoted ID annoted CL_BRA {}
+(**Boolean expression containing compiler parameters*)
+small_params_bool_expr:
+  | OP_PAR annoted params_bool_expr CL_PAR annoted { }
+  | TRUE annoted { }
+  | FALSE annoted { }
+  | ID annoted { }
+  | NOT annoted small_params_bool_expr
+    { }
+  ;
+
+params_bool_expr_no_or:
+  | small_params_bool_expr { }
+  | small_params_bool_expr AND annoted params_bool_expr_no_or
+    {  }
+  ;
+
+params_bool_expr:
+  | params_bool_expr_no_or CL_BRA { }
+  | params_bool_expr_no_or OR annoted params_bool_expr annoted CL_BRA
+    { }
   ;
 
   rule_guard_content:
-  | SHARP_OP_BRA annoted guard_list annoted rule_guard_content { $5 }
+  | SHARP_OP_BRA annoted params_bool_expr annoted rule_guard_content { $5 }
   | rule_content { $1 }
   ;
 
