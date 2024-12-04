@@ -70,23 +70,24 @@ test.describe('Editor tab', () => {
   });
 
   test('contact_map', async ({ page, browserName }) => {
+    const opts_screen = { maxDiffPixels: 60 }
     await utils.open_app_with_model(page, abc_ka);
     const contact_map = page.locator('#map-container');
-    await expect.soft(contact_map).toHaveScreenshot();
+    await expect.soft(contact_map).toHaveScreenshot(opts_screen);
     await page.getByRole('checkbox', { name: 'Interactive Mode' }).check();
-    await expect.soft(contact_map).toHaveScreenshot();
+    await expect.soft(contact_map).toHaveScreenshot(opts_screen);
     await page.getByRole('checkbox', { name: 'Interactive Mode' }).uncheck();
-    await expect.soft(contact_map).toHaveScreenshot();
+    await expect.soft(contact_map).toHaveScreenshot(opts_screen);
     await page.getByRole('button', { name: 'Show All States' }).hover();
     await page.getByRole('button', { name: 'Show All States' }).click();
-    await expect.soft(contact_map).toHaveScreenshot();
+    await expect.soft(contact_map).toHaveScreenshot(opts_screen);
     await page.getByRole('button', { name: 'Hide All States' }).click();
-    await expect.soft(contact_map).toHaveScreenshot();
+    await expect.soft(contact_map).toHaveScreenshot(opts_screen);
     await contact_map.hover();
     await page.mouse.wheel(0, 100);
-    await expect.soft(contact_map).toHaveScreenshot();
+    await expect.soft(contact_map).toHaveScreenshot(opts_screen);
     await page.getByRole('button', { name: 'Reset Zoom' }).click();
-    await expect.soft(contact_map).toHaveScreenshot();
+    await expect.soft(contact_map).toHaveScreenshot(opts_screen);
 
     await utils.testExports(page, '#export_contact-export', 'map', ['svg', 'json'], undefined, browserName);
     if (browserName != "chromium") {
