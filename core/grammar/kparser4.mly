@@ -500,7 +500,7 @@ rule_content:
       (Ast.Edit {Ast.mix; Ast.delta_token},false,pend,an) }
   ;
 
-(**Boolean expression containing compiler parameters*)
+/*Boolean expression containing compiler parameters*/
 small_guard_bool_expr:
   | OP_PAR annoted guard_bool_expr CL_PAR annoted { $3 }
   | TRUE annoted { LKappa.True }
