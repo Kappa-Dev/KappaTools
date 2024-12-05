@@ -36,6 +36,6 @@ let append_to_ast_compil rev_instr compil =
           r with
           Ast.configurations = (param_name, value_list) :: r.Ast.configurations;
         }
-      | Ast.BOOLEAN bools_sig ->
-        { r with Ast.booleans = bools_sig :: r.Ast.booleans })
+      | Ast.GUARD_PARAM params_sig ->
+        { r with Ast.guard_params = params_sig :: r.Ast.guard_params })
     compil (List.rev rev_instr)

@@ -8,6 +8,11 @@
 
 (** Compiled representation of a full Kappa model *)
 
+type rule_with_label_and_guard =
+  string Loc.annoted option
+  * string LKappa.guard option
+  * LKappa.rule Loc.annoted
+
 type t
 
 val init :
@@ -19,8 +24,7 @@ val init :
   * Operator.DepSet.t
   * Operator.DepSet.t array
   * Operator.DepSet.t array ->
-  (string Loc.annoted option * LKappa.rule Loc.annoted) array
-  * Primitives.elementary_rule array ->
+  rule_with_label_and_guard array * Primitives.elementary_rule array ->
   Primitives.alg_expr Loc.annoted array ->
   Primitives.perturbation array ->
   Contact_map.t ->
@@ -39,8 +43,7 @@ val deconstruct :
     * Operator.DepSet.t
     * Operator.DepSet.t array
     * Operator.DepSet.t array)
-  * ((string Loc.annoted option * LKappa.rule Loc.annoted) array
-    * Primitives.elementary_rule array)
+  * (rule_with_label_and_guard array * Primitives.elementary_rule array)
   * Primitives.alg_expr Loc.annoted array
   * Primitives.perturbation array
   * Contact_map.t
@@ -66,10 +69,7 @@ val get_algs : t -> (string * Primitives.alg_expr Loc.annoted) array
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
 val get_ast_rule : t -> int -> LKappa.rule
-
-val get_ast_rule_with_label :
-  t -> int -> string Loc.annoted option * LKappa.rule Loc.annoted
-
+val get_ast_rule_with_label : t -> int -> rule_with_label_and_guard
 val get_ast_rule_rate_pos : unary:bool -> t -> int -> Loc.t
 val map_observables : (Primitives.alg_expr -> 'a) -> t -> 'a array
 

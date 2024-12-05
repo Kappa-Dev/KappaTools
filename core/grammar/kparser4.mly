@@ -27,7 +27,7 @@
 %token SHARP UNDERSCORE PIPE RAR LRAR LAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
 %token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
-%token DO REPEAT ALARM RUN LET BOOLEAN SHARP_OP_BRA IF
+%token DO REPEAT ALARM RUN LET GUARD_PARAM SHARP_OP_BRA IF
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID LABEL STRING
@@ -501,30 +501,30 @@ rule_content:
   ;
 
 (**Boolean expression containing compiler parameters*)
-small_params_bool_expr:
-  | OP_PAR annoted params_bool_expr CL_PAR annoted { }
-  | TRUE annoted { }
-  | FALSE annoted { }
-  | ID annoted { }
-  | NOT annoted small_params_bool_expr
-    { }
+small_guard_bool_expr:
+  | OP_PAR annoted guard_bool_expr CL_PAR annoted { $3 }
+  | TRUE annoted { LKappa.True }
+  | FALSE annoted { LKappa.False }
+  | ID annoted { LKappa.Param $1 }
+  | NOT annoted small_guard_bool_expr
+    { LKappa.Not $3 }
   ;
 
-params_bool_expr_no_or:
-  | small_params_bool_expr { }
-  | small_params_bool_expr AND annoted params_bool_expr_no_or
-    {  }
+guard_bool_expr_no_or:
+  | small_guard_bool_expr { $1 }
+  | small_guard_bool_expr AND annoted guard_bool_expr_no_or
+    { LKappa.And ($1, $4)}
   ;
 
-params_bool_expr:
-  | params_bool_expr_no_or CL_BRA { }
-  | params_bool_expr_no_or OR annoted params_bool_expr annoted CL_BRA
-    { }
+guard_bool_expr:
+  | guard_bool_expr_no_or { $1 }
+  | guard_bool_expr_no_or OR annoted guard_bool_expr
+    { LKappa.Or ($1, $4) }
   ;
 
-  rule_guard_content:
-  | SHARP_OP_BRA annoted params_bool_expr annoted rule_guard_content { $5 }
-  | rule_content { $1 }
+rule_guard_and_content:
+  | SHARP_OP_BRA annoted guard_bool_expr CL_BRA annoted rule_content {Some $3, $6 }
+  | rule_content { None, $1 }
   ;
 
 alg_with_radius:
@@ -550,14 +550,14 @@ birate:
   ;
 
 rule:
-   | rule_guard_content birate
+   | rule_guard_and_content birate
     { let (k_def,k_un,k_op,k_op_un,pos_end,_annot) = $2 in
-      let (rewrite,bidirectional,_,_) = $1 in
-      ({
+      let guard,(rewrite,bidirectional,_,_) = $1 in
+      guard,({
         Ast.rewrite;Ast.bidirectional;
         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
       },Loc.of_pos (start_pos 1) pos_end) }
-  | rule_guard_content error
+  | rule_guard_and_content error
     { raise (ExceptionDefn.Syntax_Error (add_pos 2 "rule rate expected")) }
   ;
 
@@ -804,10 +804,10 @@ perturbation_declaration:
 
 sentence:
   | LABEL annoted rule
-    { add (Ast.RULE(Some ($1, rhs_pos 1),$3)) }
+    { add (let guard, rule = $3 in Ast.RULE(Some ($1, rhs_pos 1),guard, rule)) }
   | LABEL annoted EQUAL annoted alg_expr
     { let (v,_,_) = $5 in add (Ast.DECLARE (($1,rhs_pos 1),v)) }
-  | rule { add (Ast.RULE (None,$1)) }
+  | rule { let guard,rule = $1 in add (Ast.RULE (None, guard, rule)) }
   | SIGNATURE annoted agent_sig { let (a,_,_) = $3 in add (Ast.SIG a) }
   | SIGNATURE annoted error
     { raise
@@ -827,7 +827,7 @@ an algebraic expression is expected")) }
   | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
   | CONFIG annoted STRING annoted value_list
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
-  | BOOLEAN annoted ID annoted { add (Ast.BOOLEAN ($3,rhs_pos 3)) }
+  | GUARD_PARAM annoted ID annoted { add (Ast.GUARD_PARAM ($3,rhs_pos 3)) }
   ;
 
 model_body:

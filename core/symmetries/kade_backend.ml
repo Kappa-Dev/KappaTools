@@ -945,8 +945,8 @@ module Model = struct
         Format.pp_print_string f "Interventions"
       else (
         match Model.get_ast_rule_with_label env i with
-        | Some (na, _), _ -> Format.pp_print_string f na
-        | None, (r, _) ->
+        | Some (na, _), _, (*TODO*) _ -> Format.pp_print_string f na
+        | None, _, (r, _) ->
           LKappa.print_rule ~noCounters ~full:false sigs ?symbol_table
             (Model.print_token ~env) (Model.print_alg ~env) f r
       )

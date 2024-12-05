@@ -161,8 +161,11 @@ type ('agent, 'agent_id, 'pattern, 'mixture, 'id, 'rule) instruction =
   | PLOT of ('pattern, 'id) Alg_expr.e Loc.annoted
   | PERT of ('pattern, 'mixture, 'id, 'rule) perturbation
   | CONFIG of configuration
-  | RULE of (string Loc.annoted option * 'rule Loc.annoted)
-  | BOOLEAN of string Loc.annoted
+  | RULE of
+      (string Loc.annoted option
+      * string LKappa.guard option
+      * 'rule Loc.annoted)
+  | GUARD_PARAM of string Loc.annoted
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -175,8 +178,10 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
       (** pattern declaration for reusing as variable in perturbations
     or kinetic rate *)
   signatures: 'agent_sig list;  (** agent signature declaration *)
-  rules: (string Loc.annoted option * 'rule Loc.annoted) list;
-      (** rules (possibly named): [name_option * rule_definition] *)
+  rules:
+    (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
+    list;
+      (** rules (possibly named, possibly with a guard): [name_option * rule_definition] *)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statement list;
@@ -185,7 +190,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
-  booleans: string Loc.annoted list;
+  guard_params: string Loc.annoted list;
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -227,7 +232,7 @@ let empty_compil =
     configurations = [];
     tokens = [];
     volumes = [];
-    booleans = [];
+    guard_params = [];
   }
 
 (*
@@ -1132,7 +1137,8 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space (fun f (a, _) ->
          Format.fprintf f "@[%%plot:@ @[%a@]@]" print_ast_alg_expr a))
     c.observables
-    (Pp.list Pp.space (fun f (s, (r, _)) ->
+    (Pp.list Pp.space (fun f (s, _guard (*TODO*), (r, _)) ->
+         (*TODO print g*)
          Format.fprintf f "@[@[%a%a@]@]"
            (Pp.option ~with_space:false (fun f (s, _) ->
                 Format.fprintf f "'%s'@ " s))
@@ -1142,8 +1148,8 @@ let print_parsing_compil_kappa f c =
     c.perturbations
     (Pp.list Pp.space print_init)
     c.init
-    (Pp.list Pp.space (fun f (s, _) -> Format.fprintf f "%%comp_param: %s" s))
-    c.booleans
+    (Pp.list Pp.space (fun f (s, _) -> Format.fprintf f "%%guard_param: %s" s))
+    c.guard_params
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
   JsonUtil.smart_assoc
@@ -1310,6 +1316,14 @@ let rule_of_json filenames f_mix f_var = function
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule", x))
+
+let guard_to_json _filenames _g =
+  (*TODO*)
+  `List []
+
+let guard_of_json _filenames _j =
+  (*TODO*)
+  LKappa.True
 
 let modif_to_json filenames f_mix f_var = function
   | APPLY (alg, r) ->
@@ -1545,7 +1559,7 @@ let sig_from_rule (ags, toks) r =
     in
     merge_agents ags' a.lhs, merge_tokens toks' a.rm_token
 
-let sig_from_rules = List.fold_left (fun p (_, (r, _)) -> sig_from_rule p r)
+let sig_from_rules = List.fold_left (fun p (_, _, (r, _)) -> sig_from_rule p r)
 
 let sig_from_perts =
   List.fold_left (fun acc ((_, _, p, _), _) ->
@@ -1649,8 +1663,9 @@ let compil_to_json c =
           c.variables );
       ( "rules",
         JsonUtil.of_list
-          (JsonUtil.of_pair
+          (JsonUtil.of_triple
              (JsonUtil.of_option (Loc.string_annoted_to_json ~filenames))
+             (JsonUtil.of_option (guard_to_json filenames))
              (Loc.yojson_of_annoted ~filenames
                 (rule_to_json filenames mix_to_json var_to_json)))
           c.rules );
@@ -1693,8 +1708,9 @@ let compil_to_json c =
              (Loc.string_annoted_to_json ~filenames)
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
-      ( "booleans",
-        JsonUtil.of_list (Loc.string_annoted_to_json ~filenames) c.booleans );
+      ( "guard_params",
+        JsonUtil.of_list (Loc.string_annoted_to_json ~filenames) c.guard_params
+      );
     ]
 
 let compil_of_json = function
@@ -1732,8 +1748,9 @@ let compil_of_json = function
          rules =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST rules")
-             (JsonUtil.to_pair
+             (JsonUtil.to_triple
                 (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
+                (JsonUtil.to_option (guard_of_json filenames))
                 (Loc.annoted_of_yojson ~filenames
                    (rule_of_json filenames mix_of_json var_of_json)))
              (List.assoc "rules" l);
@@ -1784,12 +1801,12 @@ let compil_of_json = function
                 (JsonUtil.to_list (Loc.string_annoted_of_json ~filenames)))
              (List.assoc "configurations" l);
          volumes = [];
-         booleans =
+         guard_params =
            JsonUtil.to_list
              ~error_msg:
-               (JsonUtil.exn_msg_cant_import_from_json "AST booleans sig")
+               (JsonUtil.exn_msg_cant_import_from_json "AST guard_params sig")
              (Loc.string_annoted_of_json ~filenames)
-             (List.assoc "booleans" l);
+             (List.assoc "guard_params" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST", x)))

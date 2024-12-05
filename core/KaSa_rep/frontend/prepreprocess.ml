@@ -846,7 +846,7 @@ let translate_compil parameters error
   in
   let error, _id_set, rules_rev =
     List.fold_left
-      (fun (error, id_set, list) (id, (rule, p)) ->
+      (fun (error, id_set, list) (id, guard, (rule, p)) ->
         let error, id_set =
           match id with
           | None -> error, id_set
@@ -914,9 +914,11 @@ let translate_compil parameters error
                   Ckappa_sig.from_a_biderectional_rule = rule.Ast.bidirectional;
                 } )
             in
-            error, id_set, (id, (reverse, p)) :: (id, (direct, p)) :: list
+            ( error,
+              id_set,
+              (id, guard, (reverse, p)) :: (id, guard, (direct, p)) :: list )
           ) else
-            error, id_set, (id, (direct, p)) :: list)
+            error, id_set, (id, guard, (direct, p)) :: list)
       (error, id_set, []) compil.Ast.rules
   in
   let error, init_rev =
@@ -957,7 +959,7 @@ let translate_compil parameters error
                 | error, Some m' ->
                   ( error,
                     Ast.APPLY (a', (m', p)) :: list,
-                    (None, (m', p)) :: rules_rev ))
+                    (None, None, (m', p)) :: rules_rev ))
               | Ast.UPDATE (x, y) ->
                 let error, y' =
                   alg_with_pos_map (refine_mixture parameters) error y
@@ -1005,5 +1007,5 @@ let translate_compil parameters error
       Ast.configurations = compil.Ast.configurations;
       Ast.tokens = compil.Ast.tokens;
       Ast.volumes = compil.Ast.volumes;
-      Ast.booleans = compil.Ast.booleans;
+      Ast.guard_params = compil.Ast.guard_params;
     } )

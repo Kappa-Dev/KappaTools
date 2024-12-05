@@ -67,6 +67,7 @@ let empty_rule handler error =
       diff_direct = empty_direct;
       diff_reverse = empty_reverse;
       actions = Cckappa_sig.empty_actions;
+      guard = None;
     } )
 
 let empty_e_rule handler error =
@@ -1471,7 +1472,7 @@ let check_freeness parameters lhs source (error, half_release_set) =
           source half_release_set))
 
 let translate_rule parameters error handler rule =
-  let label, (rule, position) = rule in
+  let label, guard, (rule, position) = rule in
   let direction = rule.Ckappa_sig.interprete_delta in
   let error, c_rule_lhs, question_marks_l, delta_l =
     translate_mixture parameters error handler ~creation:false
@@ -2059,6 +2060,7 @@ let translate_rule parameters error handler rule =
           Cckappa_sig.actions;
           Cckappa_sig.diff_direct = direct;
           Cckappa_sig.diff_reverse = reverse;
+          Cckappa_sig.guard;
         };
     } )
 
@@ -2202,7 +2204,9 @@ let translate_perturb parameters error handler
         let error, elt' =
           Prepreprocess.modif_map
             (fun error ((_, pos) as x) ->
-              let err, r = translate_rule parameters error handler (None, x) in
+              let err, r =
+                translate_rule parameters error handler (None, None, x)
+              in
               err, (r.Cckappa_sig.e_rule_c_rule, pos))
             (lift_allowing_question_marks parameters handler)
             error elt

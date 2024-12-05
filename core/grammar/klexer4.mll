@@ -90,7 +90,7 @@ rule token = parse
     | "obs" -> OBS
     | "def" -> CONFIG
     | "token" -> TOKEN
-    | "comp_param" -> BOOLEAN
+    | "guard_param" -> GUARD_PARAM
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown directive: "^s,
        Loc.of_pos (Lexing.lexeme_start_p lexbuf)

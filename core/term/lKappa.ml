@@ -48,6 +48,14 @@ type rule = {
   r_edit_style: bool;
 }
 
+type 'id guard =
+  | True
+  | False
+  | Param of 'id
+  | Not of 'id guard
+  | And of 'id guard * 'id guard
+  | Or of 'id guard * 'id guard
+
 let print_link pr_port pr_type pr_annot f = function
   | ANY_FREE -> Format.pp_print_string f "#"
   | LNK_TYPE (p, a) -> Format.fprintf f "%a.%a" (pr_port a) p pr_type a

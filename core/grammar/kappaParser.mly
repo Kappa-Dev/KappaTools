@@ -58,10 +58,12 @@ newline:
 start_rule:
     | newline {$1}
     | LABEL rule_expression newline
-        {let out = (Some ($1, rhs_pos 1),$2) in
+        {let (guard, rule) = $2 in
+          let out = (Some ($1, rhs_pos 1), guard, rule) in
 	fun c -> let r = $3 c in {r with Ast.rules = out::r.Ast.rules}}
     | rule_expression newline
-        {fun c -> let r = $2 c in {r with Ast.rules = (None,$1)::r.Ast.rules}}
+        {let (guard, rule) = $1 in
+          fun c -> let r = $2 c in {r with Ast.rules = (None, guard, rule)::r.Ast.rules}}
     | LABEL EQUAL alg_expr newline
         {let out = (($1,rhs_pos 1),$3) in
 	fun c -> let r = $4 c in {r with Ast.variables = out::r.Ast.variables}}
@@ -95,9 +97,9 @@ start_rule:
 		      | Ast.CONFIG (param_name,value_list) ->
 			 {r with
 			  Ast.configurations = (param_name,value_list)::r.Ast.configurations}
-		      | Ast.BOOLEAN param_name ->
+		      | Ast.GUARD_PARAM param_name ->
           {r with
-			  Ast.booleans = param_name::r.Ast.booleans}
+			  Ast.guard_params = param_name::r.Ast.guard_params}
 		  }
     | error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}
@@ -328,8 +330,8 @@ rule_content:
 rule_expression:
   | rule_content birate
     { let (k_def,k_un,k_op,k_op_un) = $2 in
-      let rewrite,bidirectional = $1 in
-      add_pos {
+      let (rewrite,bidirectional) = $1 in
+      None, add_pos {
         Ast.rewrite;Ast.bidirectional;
         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
       } };

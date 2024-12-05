@@ -197,7 +197,7 @@ let prepare_counters rules =
             };
       }
   in
-  List.map (fun (s, (r, a)) -> s, (aux r, a)) rules
+  List.map (fun (s, g, (r, a)) -> s, g, (aux r, a)) rules
 
 let counters_signature s agents =
   match
@@ -398,8 +398,12 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   (* TODO [split_for_each_counter_var_value_rule] rule evalues to a list of rules with their names *)
   let split_for_each_counter_var_value_rule
       (rule_name : string Loc.annoted option)
+      (rule_guard : string LKappa.guard option)
       ((rule, annot) : Ast.rule Loc.annoted) :
-      (string Loc.annoted option * Ast.rule Loc.annoted) list =
+      (string Loc.annoted option
+      * string LKappa.guard option
+      * Ast.rule Loc.annoted)
+      list =
     let mix_lhs =
       match rule.rewrite with
       | Ast.Edit content -> content.mix
@@ -454,6 +458,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
         in
 
         ( new_rule_name,
+          rule_guard,
           ( {
               Ast.rewrite =
                 (match rule.rewrite with
@@ -471,8 +476,9 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
 
   let rules = prepare_counters rules in
   List.fold_left
-    (fun acc (rule_name, rule_annoted) ->
-      split_for_each_counter_var_value_rule rule_name rule_annoted @ acc)
+    (fun acc (rule_name, rule_guard, rule_annoted) ->
+      split_for_each_counter_var_value_rule rule_name rule_guard rule_annoted
+      @ acc)
     [] rules
   (* TODO: is rev relevant here? *)
   |> List.rev
@@ -487,7 +493,7 @@ let split_counter_variables_into_separate_rules ~warning ~debug_mode
   if debug_mode then (
     Format.printf "@.ast rules@.";
     List.iter
-      (fun (s, (r, _)) ->
+      (fun (s, _, (r, _)) ->
         let label =
           match s with
           | None -> ""

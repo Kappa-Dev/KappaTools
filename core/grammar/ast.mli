@@ -140,8 +140,11 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
   | PLOT of ('pattern, 'id) Alg_expr.e Loc.annoted
   | PERT of ('pattern, 'mixture, 'id, 'rule) perturbation
   | CONFIG of configuration
-  | RULE of (string Loc.annoted option * 'rule Loc.annoted)
-  | BOOLEAN of string Loc.annoted
+  | RULE of
+      (string Loc.annoted option
+      * string LKappa.guard option
+      * 'rule Loc.annoted)
+  | GUARD_PARAM of string Loc.annoted
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -153,7 +156,9 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   variables: ('pattern, 'id) variable_def list;
       (** pattern declaration for reusing as variable in perturbations or kinetic rate *)
   signatures: 'agent_sig list;  (** agent signature declarations *)
-  rules: (string Loc.annoted option * 'rule Loc.annoted) list;
+  rules:
+    (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
+    list;
       (**rules (possibly named)*)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
@@ -163,7 +168,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
-  booleans: string Loc.annoted list;
+  guard_params: string Loc.annoted list;
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil

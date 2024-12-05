@@ -1290,6 +1290,7 @@ type rule_inter_rep = {
     * ((Ast.mixture, string) Alg_expr.e * Loc.t) option)
     option;
   pos: Loc.t;
+  guard: string LKappa.guard option;
 }
 (** Intermediate representation for rule type *)
 
@@ -1350,6 +1351,7 @@ let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
     contact_map modif acc =
   match modif with
   | Ast.APPLY (nb, (ast_rule, pos)) ->
+    (* TODO maybe add guard?*)
     let rule : rule_inter_rep =
       match ast_rule.Ast.rewrite with
       | Ast.Edit rule_content ->
@@ -1367,6 +1369,7 @@ let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
           k_def = ast_rule.k_def;
           k_un = ast_rule.k_un;
           pos;
+          guard = None;
         }
       | Ast.Arrow rule_content ->
         let mixture, created_mix =
@@ -1383,6 +1386,7 @@ let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
           k_def = ast_rule.k_def;
           k_un = ast_rule.k_un;
           pos;
+          guard = None;
         }
     in
     ( Ast.APPLY
@@ -1528,8 +1532,10 @@ type acc_function_rules = {
 (** [name_and_purify] compiles the rules from Ast.rules into rule_inter_rep, called in a fold *)
 let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
     (acc : acc_function_rules)
-    ((label_opt, (ast_rule, r_pos)) :
-      string Loc.annoted option * Ast.rule Loc.annoted) : acc_function_rules =
+    ((label_opt, guard, (ast_rule, r_pos)) :
+      string Loc.annoted option
+      * string LKappa.guard option
+      * Ast.rule Loc.annoted) : acc_function_rules =
   let rule_names', rule_label =
     give_rule_label ast_rule.bidirectional acc.rule_names Ast.print_ast_rule
       ast_rule label_opt
@@ -1572,6 +1578,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
           k_def;
           k_un;
           pos = r_pos;
+          guard;
         }
         :: acc.cleaned_rules;
     }
@@ -1591,6 +1598,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
         k_def;
         k_un;
         pos = r_pos;
+        guard;
       }
       :: acc.cleaned_rules
     in
@@ -1618,6 +1626,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
             k_def = Loc.annot_with_dummy (Alg_expr.ALG_VAR rate_var);
             k_un = k_op_un;
             pos = r_pos;
+            guard;
           }
           :: rules' )
       | true, Some rate ->
@@ -1641,6 +1650,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
             k_def = rate;
             k_un = k_op_un;
             pos = r_pos;
+            guard;
           }
           :: rules' )
       | false, None -> acc'', rules'
@@ -2054,7 +2064,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   let counter_fold f init =
     let l1 =
       List.fold_left
-        (fun acc r -> counter_fold_in_rule f acc (snd r))
+        (fun acc (_, _, r) -> counter_fold_in_rule f acc r)
         init ast_compil.rules
     in
     let l2 =
@@ -2449,9 +2459,14 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     in
     { rule with rewrite; k_def; k_op; k_un; k_op_un }
   in
-  let rules : (string Loc.annoted option * Ast.rule Loc.annoted) list =
+  let rules :
+      (string Loc.annoted option
+      * string LKappa.guard option
+      * Ast.rule Loc.annoted)
+      list =
     List.rev_map
-      (fun rule_def -> fst rule_def, Loc.map_annot map_rule (snd rule_def))
+      (fun (name, guard, rule_def) ->
+        name, guard, Loc.map_annot map_rule rule_def)
       (List.rev ast_compil.rules)
   in
 
@@ -2682,6 +2697,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     List.rev_map
       (fun (rule : rule_inter_rep) ->
         ( rule.label_opt,
+          rule.guard,
           ( assemble_rule ~warning ~syntax_version rule agents_sig counters_info
               tokens_finder alg_vars_finder,
             rule.pos ) ))
@@ -2730,6 +2746,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         tokens = ast_compil.tokens;
         signatures = ast_compil.signatures;
         configurations = ast_compil.configurations;
-        booleans = ast_compil.booleans;
+        guard_params = ast_compil.guard_params;
       };
   }
