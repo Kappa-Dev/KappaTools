@@ -573,7 +573,7 @@ let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map
     domain rules =
   match
     List.fold_left
-      (fun (domain, syntax_ref, deps_machinery, acc) (_, _guard (*TODO*), rule) ->
+      (fun (domain, syntax_ref, deps_machinery, acc) (_, _guard (*rTODO*), rule) ->
         let domain', origin', cr =
           rules_of_ast ~debug_mode ~warning ?deps_machinery ~compile_mode_on
             contact_map domain ~syntax_ref rule

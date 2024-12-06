@@ -1351,7 +1351,7 @@ let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
     contact_map modif acc =
   match modif with
   | Ast.APPLY (nb, (ast_rule, pos)) ->
-    (* TODO maybe add guard?*)
+    (* rTODO maybe add guard?*)
     let rule : rule_inter_rep =
       match ast_rule.Ast.rewrite with
       | Ast.Edit rule_content ->

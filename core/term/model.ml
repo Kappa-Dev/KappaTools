@@ -156,7 +156,7 @@ let print_token ?env f id =
   | Some env -> Format.fprintf f "%s" (NamedDecls.elt_name env.tokens id)
 
 let print_ast_rule ~noCounters ?env f i =
-  (*TODO print guard*)
+  (*rTODO print guard*)
   match env with
   | None -> Format.fprintf f "__ast_rule_%i" i
   | Some env ->
@@ -202,7 +202,7 @@ let print_kappa ~noCounters pr_alg ?pr_rule pr_pert f env =
       | None ->
         Pp.array Pp.space ~trailing:Pp.space
           (fun _ f (na, _guard, (e, _)) ->
-            (*TODO print guard*)
+            (*rTODO print guard*)
             Format.fprintf f "%a%a"
               (Pp.option ~with_space:false (fun f (na, _) ->
                    Format.fprintf f "'%s' " na))
@@ -358,7 +358,7 @@ let to_yojson env =
         `List
           (Array.fold_right
              (fun (n, _guard, (r, _)) l ->
-               (*TODO add guard*)
+               (*rTODO add guard*)
                `List
                  [
                    (match n with
@@ -433,11 +433,11 @@ let of_yojson = function
                (function
                  | `List [ `Null; r ] ->
                    ( None,
-                     None (*TODO*),
+                     None (*rTODO*),
                      Loc.annot_with_dummy (LKappa.rule_of_json ~filenames r) )
                  | `List [ `String n; r ] ->
                    ( Some (Loc.annot_with_dummy n),
-                     None (*TODO*),
+                     None (*rTODO*),
                      Loc.annot_with_dummy (LKappa.rule_of_json ~filenames r) )
                  | _ -> raise Not_found)
                o

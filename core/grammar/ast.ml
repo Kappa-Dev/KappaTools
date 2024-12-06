@@ -1318,11 +1318,11 @@ let rule_of_json filenames f_mix f_var = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule", x))
 
 let guard_to_json _filenames _g =
-  (*TODO*)
+  (*rTODO*)
   `List []
 
 let guard_of_json _filenames _j =
-  (*TODO*)
+  (*rTODO*)
   LKappa.True
 
 let modif_to_json filenames f_mix f_var = function
