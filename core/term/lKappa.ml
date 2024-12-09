@@ -510,7 +510,6 @@ let print_rates ~noCounters sigs counters_info pr_tok pr_var f r =
           max_dist)
 
 let rec print_guard f g =
-  (*rTODO test*)
   match g with
   | True -> Format.fprintf f "TRUE"
   | False -> Format.fprintf f "FALSE"
@@ -518,6 +517,9 @@ let rec print_guard f g =
   | And (a, b) -> Format.fprintf f "@[%a && %a@]" print_guard a print_guard b
   | Or (a, b) -> Format.fprintf f "@[(%a || %a)@]" print_guard a print_guard b
   | Not a -> Format.fprintf f "@[[not] %a@]" print_guard a
+
+let print_guard f g =
+  Format.fprintf f "/*if*/ %a /*then*/@ " print_guard g
 
 let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
   Format.fprintf f "@[<h>%t%t%t%a%t@]"
@@ -694,7 +696,7 @@ let rule_of_json ~filenames = function
                 (List.assoc "unary_rate" l)
             with Not_found -> None);
          r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
-         r_guard = None (*TODO List.assoc_opt "guard" l;*);
+         r_guard = None (*rTODO List.assoc_opt "guard" l;*);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x)))

@@ -1137,12 +1137,13 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space (fun f (a, _) ->
          Format.fprintf f "@[%%plot:@ @[%a@]@]" print_ast_alg_expr a))
     c.observables
-    (Pp.list Pp.space (fun f (s, _guard (*TODO*), (r, _)) ->
-         (*TODO print g*)
-         Format.fprintf f "@[@[%a%a@]@]"
+    (Pp.list Pp.space (fun f (s, guard, (r, _)) ->
+         Format.fprintf f "@[@[%a%a%a@]@]"
            (Pp.option ~with_space:false (fun f (s, _) ->
                 Format.fprintf f "'%s'@ " s))
-           s print_ast_rule r))
+           s
+           (Pp.option ~with_space:false LKappa.print_guard)
+           guard print_ast_rule r))
     c.rules
     (Pp.list Pp.space print_perturbation)
     c.perturbations
