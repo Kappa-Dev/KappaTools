@@ -1345,6 +1345,7 @@ let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
     r_delta_tokens;
     r_rate;
     r_un_rate;
+    r_guard = rule.guard;
   }
 
 let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs

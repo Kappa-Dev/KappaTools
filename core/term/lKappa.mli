@@ -51,6 +51,14 @@ Array.copy ra_ints)]. *)
 type rule_mixture = rule_agent list
 (** [rule_mixture] is the mixture description from the initial state of a rule *)
 
+type 'id guard =
+  | True
+  | False
+  | Param of 'id
+  | Not of 'id guard
+  | And of 'id guard * 'id guard
+  | Or of 'id guard * 'id guard
+
 type rule = {
   r_mix: rule_mixture;  (** Initial mixture state *)
   r_created: Raw_mixture.t;  (** Mixture state after rule is applied *)
@@ -62,15 +70,9 @@ type rule = {
     option;
   r_edit_style: bool;
       (** If rule was written in edit style, else it's rewrite style *)
+  r_guard: string guard option;
+      (** There could be a guard that defines if this rule is active or not. *)
 }
-
-type 'id guard =
-  | True
-  | False
-  | Param of 'id
-  | Not of 'id guard
-  | And of 'id guard * 'id guard
-  | Or of 'id guard * 'id guard
 
 val agent_to_erased : Signature.s -> rule_agent -> rule_agent
 val to_erased : Signature.s -> rule_mixture -> rule_mixture
@@ -131,6 +133,8 @@ val print_rates :
   Format.formatter ->
   rule ->
   unit
+
+val print_guard : Format.formatter -> string guard -> unit
 
 val print_rule :
   noCounters:bool ->

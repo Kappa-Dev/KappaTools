@@ -573,6 +573,7 @@ let lkappa_init =
     LKappa.r_rate = Alg_expr.int 0;
     LKappa.r_un_rate = None;
     LKappa.r_edit_style = true;
+    LKappa.r_guard = None;
   }
 
 let raw_mixture_to_lkappa_rule raw_mixture =
@@ -583,6 +584,7 @@ let raw_mixture_to_lkappa_rule raw_mixture =
     LKappa.r_rate = Alg_expr.int 0;
     LKappa.r_un_rate = None;
     LKappa.r_edit_style = true;
+    LKappa.r_guard = None;
   }
 
 let rule_mixture_to_lkappa_rule rule_mixture =
@@ -593,6 +595,7 @@ let rule_mixture_to_lkappa_rule rule_mixture =
     LKappa.r_rate = Alg_expr.int 0;
     LKappa.r_un_rate = None;
     LKappa.r_edit_style = true;
+    LKappa.r_guard = None;
   }
 
 (*convert a species into lkappa rule signature*)

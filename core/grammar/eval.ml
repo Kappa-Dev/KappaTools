@@ -513,6 +513,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
               LKappa.r_rate = Alg_expr.const Nbr.zero;
               LKappa.r_un_rate = None;
               LKappa.r_edit_style = true;
+              LKappa.r_guard = None;
             }
           in
           let preenv'', state' =
@@ -544,6 +545,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
               LKappa.r_rate = Alg_expr.const Nbr.zero;
               LKappa.r_un_rate = None;
               LKappa.r_edit_style = false;
+              LKappa.r_guard = None;
             }
           in
           (match

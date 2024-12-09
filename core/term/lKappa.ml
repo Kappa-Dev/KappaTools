@@ -36,6 +36,14 @@ type rule_agent = {
 
 type rule_mixture = rule_agent list
 
+type 'id guard =
+  | True
+  | False
+  | Param of 'id
+  | Not of 'id guard
+  | And of 'id guard * 'id guard
+  | Or of 'id guard * 'id guard
+
 type rule = {
   r_mix: rule_mixture;
   r_created: Raw_mixture.t;
@@ -46,15 +54,8 @@ type rule = {
     * (rule_mixture, int) Alg_expr.e Loc.annoted option)
     option;
   r_edit_style: bool;
+  r_guard: string guard option;
 }
-
-type 'id guard =
-  | True
-  | False
-  | Param of 'id
-  | Not of 'id guard
-  | And of 'id guard * 'id guard
-  | Or of 'id guard * 'id guard
 
 let print_link pr_port pr_type pr_annot f = function
   | ANY_FREE -> Format.pp_print_string f "#"
@@ -508,8 +509,22 @@ let print_rates ~noCounters sigs counters_info pr_tok pr_var f r =
                  md))
           max_dist)
 
+let rec print_guard f g =
+  (*rTODO test*)
+  match g with
+  | True -> Format.fprintf f "TRUE"
+  | False -> Format.fprintf f "FALSE"
+  | Param i -> Format.fprintf f "%s" i
+  | And (a, b) -> Format.fprintf f "@[%a && %a@]" print_guard a print_guard b
+  | Or (a, b) -> Format.fprintf f "@[(%a || %a)@]" print_guard a print_guard b
+  | Not a -> Format.fprintf f "@[[not] %a@]" print_guard a
+
 let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
-  Format.fprintf f "@[<h>%t%t%a%t@]"
+  Format.fprintf f "@[<h>%t%t%t%a%t@]"
+    (fun f ->
+      match r.r_guard with
+      | None -> ()
+      | Some g -> print_guard f g)
     (fun f ->
       if full || r.r_edit_style then
         Format.fprintf f "%a%a"
@@ -679,6 +694,7 @@ let rule_of_json ~filenames = function
                 (List.assoc "unary_rate" l)
             with Not_found -> None);
          r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
+         r_guard = None (*TODO List.assoc_opt "guard" l;*);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x)))
