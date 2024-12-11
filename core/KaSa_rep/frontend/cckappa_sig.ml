@@ -41,6 +41,7 @@ type kappa_handler = {
     Ckappa_sig
     .Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
     .t;
+  guard_parameters: string list;
 }
 
 type 'a interval = { min: 'a option; max: 'a option }

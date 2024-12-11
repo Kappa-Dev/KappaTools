@@ -59,6 +59,7 @@ let empty_handler parameters error =
       Cckappa_sig.sites;
       Cckappa_sig.states_dic;
       Cckappa_sig.dual;
+      Cckappa_sig.guard_parameters = [];
     } )
 
 let create_binding_state_dictionary parameters error =
@@ -428,6 +429,18 @@ let scan_perts scan_mixt parameters =
             remanent)
         remanent m)
 
+let scan_guard (error, handler) guard =
+  match guard with
+  | None -> error, handler
+  | Some guard ->
+    let guard_parameters = Ast.guard_params_from_guard guard in
+    ( error,
+      {
+        handler with
+        Cckappa_sig.guard_parameters =
+          Ast.merge_guards guard_parameters handler.Cckappa_sig.guard_parameters;
+      } )
+
 let scan_rules scan_mixt parameters a b =
   let _ =
     if Remanent_parameters.get_trace parameters then (
@@ -443,10 +456,12 @@ let scan_rules scan_mixt parameters a b =
     )
   in
   List.fold_left
-    (fun remanent (_, _, (rule, _)) ->
-      scan_mixture parameters
-        (scan_mixt parameters remanent rule.Ckappa_sig.lhs)
-        rule.Ckappa_sig.rhs)
+    (fun remanent (_, guard, (rule, _)) ->
+      scan_guard
+        (scan_mixture parameters
+           (scan_mixt parameters remanent rule.Ckappa_sig.lhs)
+           rule.Ckappa_sig.rhs)
+        guard)
     a b
 
 let reverse_agents_annotation parameters (error, remanent) =
