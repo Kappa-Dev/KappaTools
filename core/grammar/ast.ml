@@ -190,7 +190,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
-  guard_param_values: (string Loc.annoted * bool) list; (** The guard parameters that have a defined value (true or false).*)
+  guard_param_values: (string Loc.annoted * bool) list;
+      (** The guard parameters that have a defined value (true or false).*)
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -1149,7 +1150,8 @@ let print_parsing_compil_kappa f c =
     c.perturbations
     (Pp.list Pp.space print_init)
     c.init
-    (Pp.list Pp.space (fun f ((s, _), b) -> Format.fprintf f "%%guard_param: %s -> %b" s b))
+    (Pp.list Pp.space (fun f ((s, _), b) ->
+         Format.fprintf f "%%guard_param: %s -> %b" s b))
     c.guard_param_values
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
@@ -1583,21 +1585,21 @@ let merge_guards g1 g2 =
   List.sort_uniq String.compare guards
 
 let rec guard_params_from_guard = function
-| LKappa.True | LKappa.False -> []
-| Param id -> [id]
-| Not guard -> guard_params_from_guard guard
-| And (g1, g2) | Or (g1, g2) ->
-  let gp1 = guard_params_from_guard g1 in
-  let gp2 = guard_params_from_guard g2 in
-  merge_guards gp1 gp2
+  | LKappa.True | LKappa.False -> []
+  | Param id -> [ id ]
+  | Not guard -> guard_params_from_guard guard
+  | And (g1, g2) | Or (g1, g2) ->
+    let gp1 = guard_params_from_guard g1 in
+    let gp2 = guard_params_from_guard g2 in
+    merge_guards gp1 gp2
 
 let get_list_of_guard_parameters r =
-  List.fold_left (fun guard_params (_, guard, (_, _)) ->
-    match guard with
-    | None -> guard_params
-    | Some g ->
-    merge_guards guard_params (guard_params_from_guard g)
-    ) [] r
+  List.fold_left
+    (fun guard_params (_, guard, (_, _)) ->
+      match guard with
+      | None -> guard_params
+      | Some g -> merge_guards guard_params (guard_params_from_guard g))
+    [] r
 
 let split_mixture m =
   List.fold_right
@@ -1731,8 +1733,11 @@ let compil_to_json c =
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
       ( "guard_param_values",
-        JsonUtil.of_list ( JsonUtil.of_pair (Loc.string_annoted_to_json ~filenames) JsonUtil.of_bool) c.guard_param_values
-      );
+        JsonUtil.of_list
+          (JsonUtil.of_pair
+             (Loc.string_annoted_to_json ~filenames)
+             JsonUtil.of_bool)
+          c.guard_param_values );
     ]
 
 let compil_of_json = function
@@ -1826,9 +1831,17 @@ let compil_of_json = function
          guard_param_values =
            JsonUtil.to_list
              ~error_msg:
-               (JsonUtil.exn_msg_cant_import_from_json "AST guard_param_values sig")
-             (JsonUtil.to_pair ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST guard_param_values sig")
-             (Loc.string_annoted_of_json ~filenames) (JsonUtil.to_bool ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST guard_param_values boolean value")))
+               (JsonUtil.exn_msg_cant_import_from_json
+                  "AST guard_param_values sig")
+             (JsonUtil.to_pair
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST guard_param_values sig")
+                (Loc.string_annoted_of_json ~filenames)
+                (JsonUtil.to_bool
+                   ~error_msg:
+                     (JsonUtil.exn_msg_cant_import_from_json
+                        "AST guard_param_values boolean value")))
              (List.assoc "guard_param_values" l);
        }
      with Not_found ->

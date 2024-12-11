@@ -2729,8 +2729,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       tokens_finder alg_vars_finder ast_compil.init
   in
 
-  let guard_params = Ast.get_list_of_guard_parameters ast_compil.rules
-in
+  let guard_params = Ast.get_list_of_guard_parameters ast_compil.rules in
 
   {
     agents_sig;

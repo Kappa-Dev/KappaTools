@@ -37,5 +37,8 @@ let append_to_ast_compil rev_instr compil =
           Ast.configurations = (param_name, value_list) :: r.Ast.configurations;
         }
       | Ast.GUARD_PARAM (params_sig, b) ->
-        { r with Ast.guard_param_values = (params_sig, b) :: r.Ast.guard_param_values })
+        {
+          r with
+          Ast.guard_param_values = (params_sig, b) :: r.Ast.guard_param_values;
+        })
     compil (List.rev rev_instr)

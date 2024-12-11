@@ -518,8 +518,7 @@ let rec print_guard f g =
   | Or (a, b) -> Format.fprintf f "@[(%a || %a)@]" print_guard a print_guard b
   | Not a -> Format.fprintf f "@[[not] %a@]" print_guard a
 
-let print_guard f g =
-  Format.fprintf f "/*if*/ %a /*then*/@ " print_guard g
+let print_guard f g = Format.fprintf f "/*if*/ %a /*then*/@ " print_guard g
 
 let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
   Format.fprintf f "@[<h>%t%t%t%a%t@]"
