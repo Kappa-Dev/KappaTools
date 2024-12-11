@@ -48,6 +48,7 @@ type ast_compiled_data = {
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)
+  guard_params: string list; (** all guard parameters that are present in any guard in the code *) (*rTODO make it an int list*)
   result:
     ( Ast.agent,
       Ast.agent_sig,

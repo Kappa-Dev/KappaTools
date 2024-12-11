@@ -1923,6 +1923,7 @@ type ast_compiled_data = {
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;
+  guard_params: string list;
   result:
     ( Ast.agent,
       Ast.agent_sig,
@@ -2728,6 +2729,9 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       tokens_finder alg_vars_finder ast_compil.init
   in
 
+  let guard_params = Ast.get_list_of_guard_parameters ast_compil.rules
+in
+
   {
     agents_sig;
     contact_map;
@@ -2735,6 +2739,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     token_names;
     alg_vars_finder;
     updated_alg_vars;
+    guard_params;
     result =
       {
         filenames = ast_compil.filenames;
@@ -2747,6 +2752,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         tokens = ast_compil.tokens;
         signatures = ast_compil.signatures;
         configurations = ast_compil.configurations;
-        guard_params = ast_compil.guard_params;
+        guard_param_values = ast_compil.guard_param_values;
       };
   }

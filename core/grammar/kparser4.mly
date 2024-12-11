@@ -827,7 +827,7 @@ an algebraic expression is expected")) }
   | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
   | CONFIG annoted STRING annoted value_list
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
-  | GUARD_PARAM annoted ID annoted { add (Ast.GUARD_PARAM ($3,rhs_pos 3)) }
+  | GUARD_PARAM annoted ID annoted boolean annoted { add (Ast.GUARD_PARAM (($3,rhs_pos 3), $5)) }
   ;
 
 model_body:

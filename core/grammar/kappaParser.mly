@@ -97,9 +97,9 @@ start_rule:
 		      | Ast.CONFIG (param_name,value_list) ->
 			 {r with
 			  Ast.configurations = (param_name,value_list)::r.Ast.configurations}
-		      | Ast.GUARD_PARAM param_name ->
+		      | Ast.GUARD_PARAM (param_name,b) ->
           {r with
-			  Ast.guard_params = param_name::r.Ast.guard_params}
+			  Ast.guard_param_values = (param_name,b)::r.Ast.guard_param_values}
 		  }
     | error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}
