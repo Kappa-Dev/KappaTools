@@ -408,7 +408,7 @@ module Domain = struct
           store_list_of_site_type_in_covering_classes
       with
       | error, None -> error, []
-      | error, Some l -> error, l
+      | error, Some l -> error, Ckappa_sig.to_site_list l
     in
     let error, wake_up =
       List.fold_left
@@ -579,11 +579,11 @@ module Domain = struct
           (fun (error, bool) site_type ->
             let error, site_string =
               try
-                Handler.string_of_site_update_views parameters error
-                  handler_kappa agent_type site_type
+                Handler.string_of_site_or_guard parameters error handler_kappa
+                  ~add_parentheses:true agent_type site_type
               with _ ->
                 Exception.warn parameters error __POS__ Exit
-                  (Ckappa_sig.string_of_site_name site_type)
+                  (Ckappa_sig.string_of_site_or_guard site_type)
             in
             let () =
               Loggers.fprintf log "%s%s"
@@ -616,7 +616,7 @@ module Domain = struct
               store_list_of_site_type_in_covering_classes
           with
           | error, None -> error, []
-          | error, Some l -> error, l
+          | error, Some l -> error, Ckappa_sig.to_site_list l
         in
         List.fold_left
           (fun (error, modified_sites) site ->
@@ -1113,9 +1113,9 @@ module Domain = struct
     (* compute the list of cv_id documenting site_name *)
     let error, cv_list =
       match
-        Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameters
-          error
-          (agent_type, path.Communication.site) (*site:v*)
+        Ckappa_sig.AgentSiteOrGuard_map_and_set.Map.find_option_without_logs
+          parameters error
+          (agent_type, Ckappa_sig.Site path.Communication.site) (*site:v*)
           store_covering_classes_id
       with
       | error, None ->
@@ -1329,8 +1329,9 @@ module Domain = struct
         | error, Some (state, _, _, _) ->
           let error, cv_list =
             match
-              Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-                parameters error (agent_type_in, site_path)
+              Ckappa_sig.AgentSiteOrGuard_map_and_set.Map
+              .find_option_without_logs parameters error
+                (agent_type_in, Ckappa_sig.Site site_path)
                 store_covering_classes_id
             with
             | error, None -> Exception.warn parameters error __POS__ Exit []
@@ -2160,9 +2161,9 @@ module Domain = struct
     in
     let error, cv_list =
       match
-        Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameters
-          error
-          (agent_type, path.Communication.site)
+        Ckappa_sig.AgentSiteOrGuard_map_and_set.Map.find_option_without_logs
+          parameters error
+          (agent_type, Ckappa_sig.Site path.Communication.site)
           store_covering_classes_id
       with
       | error, None ->

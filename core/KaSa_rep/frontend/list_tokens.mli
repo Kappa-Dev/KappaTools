@@ -9,7 +9,7 @@ val scan_compil :
     Ckappa_sig.agent_sig,
     Ckappa_sig.mixture,
     Ckappa_sig.mixture,
-    'a,
+    string,
     Ckappa_sig.mixture Ckappa_sig.rule )
   Ast.compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught

@@ -79,17 +79,20 @@ let store_covering_classes_modification_update_aux parameters error
 let store_covering_classes_modification_update parameters error
     store_test_modification_map store_covering_classes_id =
   let error, store_result =
-    Ckappa_sig.AgentSite_map_and_set.Map.fold
+    Ckappa_sig.AgentSiteOrGuard_map_and_set.Map.fold
       (fun (agent_type_cv, site_type_cv) l2 store_result ->
-        List.fold_left
-          (fun (error, store_current_result) cv_id ->
-            let error, result =
-              store_covering_classes_modification_update_aux parameters error
-                agent_type_cv site_type_cv cv_id store_test_modification_map
-                store_current_result
-            in
-            error, result)
-          store_result l2
+        match site_type_cv with
+        | Ckappa_sig.Guard_p _ -> store_result
+        | Ckappa_sig.Site site_type_cv ->
+          List.fold_left
+            (fun (error, store_current_result) cv_id ->
+              let error, result =
+                store_covering_classes_modification_update_aux parameters error
+                  agent_type_cv site_type_cv cv_id store_test_modification_map
+                  store_current_result
+              in
+              error, result)
+            store_result l2
         (*REMARK: when it is folding inside a list, start with empty result,
           because the add_link function has already called the old result.*))
       store_covering_classes_id
@@ -135,7 +138,7 @@ let store_covering_classes_modification_side_effects parameters error
                 (fun parameters error _agent_type_cv remanent store_result ->
                   let cv_dic = remanent.Covering_classes_type.store_dic in
                   let error, store_result =
-                    Covering_classes_type.Dictionary_of_List_sites.fold
+                    Covering_classes_type.Dictionary_of_List_sites_or_guard.fold
                       (fun _list_of_site_type ((), ()) cv_id
                            (error, store_result) ->
                         (*get a set of rule_id in update(c)*)

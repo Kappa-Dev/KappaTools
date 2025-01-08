@@ -32,6 +32,8 @@ type c_rule_id
 type c_agent_id
 type c_link_value
 type c_counter_name
+type c_guard_parameter
+type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
 
 (****************************************************************************)
 
@@ -45,6 +47,8 @@ val string_of_c_link_value : c_link_value -> string
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
 val dummy_state_index : c_state
+val dummy_state_index_true : c_state
+val dummy_state_index_false : c_state
 val dummy_rule_id : c_rule_id
 val dummy_agent_id : c_agent_id
 val dummy_link_value : c_link_value
@@ -61,9 +65,12 @@ val string_of_agent_id : c_agent_id -> string
 val site_name_of_int : int -> c_site_name
 val int_of_site_name : c_site_name -> int
 val string_of_site_name : c_site_name -> string
+val string_of_site_or_guard : c_site_or_guard_p -> string
 val state_index_of_int : int -> c_state
 val int_of_state_index : c_state -> int
 val string_of_state_index : c_state -> string
+val guard_parameter_of_int : int -> c_guard_parameter
+val int_of_guard_parameter : c_guard_parameter -> int
 
 val string_of_state_index_option_min :
   Remanent_parameters_sig.parameters -> c_state option -> string
@@ -311,6 +318,8 @@ val add_free :
   mixture ->
   Exception.exceptions_caught_and_uncaught * mixture
 
+val to_site_list : c_site_or_guard_p list -> c_site_name list
+
 (*******************************************************)
 (*C type*)
 (*******************************************************)
@@ -360,6 +369,9 @@ type c_port = {
   c_site_position: position;
   c_site_interval: c_state interval;
 }
+
+module SiteOrGuard_map_and_set :
+  Map_wrapper.S_with_logs with type elt = c_site_or_guard_p
 
 module Site_map_and_set : Map_wrapper.S_with_logs with type elt = c_site_name
 
@@ -552,6 +564,9 @@ module PairAgentSite_map_and_set :
 
 module AgentSite_map_and_set :
   Map_wrapper.S_with_logs with type elt = c_agent_name * c_site_name
+
+module AgentSiteOrGuard_map_and_set :
+  Map_wrapper.S_with_logs with type elt = c_agent_name * c_site_or_guard_p
 
 module Agents_map_and_set :
   Map_wrapper.S_with_logs with type elt = c_agent_id * c_agent_name

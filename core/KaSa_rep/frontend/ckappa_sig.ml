@@ -31,6 +31,8 @@ type c_rule_id = int
 type c_link_value = int
 type c_counter_name = int
 type binding_state = Free | Lnk_type of agent_name * site_name
+type c_guard_parameter = int
+type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
 
 type mixture =
   | SKIP of mixture
@@ -158,6 +160,8 @@ let c_rule_id_of_string s =
 let dummy_agent_name = 0
 let dummy_site_name = 0
 let dummy_state_index = 0
+let dummy_state_index_true = 1
+let dummy_state_index_false = 2
 let dummy_rule_id = 0
 let dummy_agent_id = 0
 let dummy_site_name_1 = 1
@@ -179,9 +183,16 @@ let next_link_value (i : c_link_value) : c_link_value = i + 1
 let site_name_of_int (a : int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
 let string_of_site_name (a : c_site_name) : string = string_of_int a
+
+let string_of_site_or_guard (a : c_site_or_guard_p) : string =
+  match a with
+  | Site s | Guard_p s -> string_of_int s
+
 let state_index_of_int (a : int) : c_state = a
 let int_of_state_index (a : c_state) : int = a
 let string_of_state_index (a : c_state) : string = string_of_int a
+let guard_parameter_of_int (a : int) : c_guard_parameter = a
+let int_of_guard_parameter (a : c_guard_parameter) : int = a
 
 let string_of_state_index_option_min parameters a =
   match a with
@@ -812,6 +823,19 @@ type c_port = {
   c_site_interval: c_state interval;
 }
 
+let pp_print_site_or_guard_p state site =
+  Format.pp_print_string state
+    (match site with
+    | Site s -> "Site " ^ Int.to_string s
+    | Guard_p g -> "Guard_p " ^ Int.to_string g)
+
+module SiteOrGuard_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_site_or_guard_p
+
+  let compare = compare
+  let print = pp_print_site_or_guard_p
+end))
+
 module Site_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   type t = c_site_name
 
@@ -944,6 +968,13 @@ let array_of_list_rule_id create set parameters error list =
     | t :: q -> aux q (next_rule_id k) (set parameters (fst a) k t (snd a))
   in
   aux list dummy_rule_id a
+
+let to_site_list site_or_guard_list =
+  List.filter_map
+    (function
+      | Site s -> Some s
+      | Guard_p _ -> None)
+    site_or_guard_list
 
 (***************************************************************************)
 (*MODULE*)
@@ -1130,6 +1161,13 @@ module AgentSite_map_and_set = Map_wrapper.Make (SetMap.Make (struct
 
   let compare = compare
   let print = Pp.pair Format.pp_print_int Format.pp_print_int
+end))
+
+module AgentSiteOrGuard_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_agent_name * c_site_or_guard_p
+
+  let compare = compare
+  let print = Pp.pair Format.pp_print_int pp_print_site_or_guard_p
 end))
 
 module Agents_map_and_set = Map_wrapper.Make (SetMap.Make (struct

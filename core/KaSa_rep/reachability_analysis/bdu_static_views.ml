@@ -123,7 +123,7 @@ let add_dependency_site parameters map_new_index_forward site state
     (error, store_result) =
   let error, site' =
     match
-      Ckappa_sig.Site_map_and_set.Map.find_option parameters error site
+      Ckappa_sig.SiteOrGuard_map_and_set.Map.find_option parameters error site
         map_new_index_forward
     with
     | error, None ->
@@ -132,6 +132,14 @@ let add_dependency_site parameters map_new_index_forward site state
   in
   Ckappa_sig.Site_map_and_set.Map.add parameters error site' state store_result
 
+let to_site_or_guard_map parameters error site_map =
+  Ckappa_sig.Site_map_and_set.Map.fold
+    (fun site value (error, new_set) ->
+      Ckappa_sig.SiteOrGuard_map_and_set.Map.add parameters error
+        (Ckappa_sig.Site site) value new_set)
+    site_map
+    (error, Ckappa_sig.SiteOrGuard_map_and_set.Map.empty)
+
 let get_pair_cv_map_with_missing_association_creation parameters error agent
     triple_list =
   List.fold_left
@@ -139,10 +147,13 @@ let get_pair_cv_map_with_missing_association_creation parameters error agent
       let error, (map_new_index_forward, _) =
         Common_map.new_index_pair_map parameters error list
       in
+      let error, agent_interface =
+        to_site_or_guard_map parameters error agent.Cckappa_sig.agent_interface
+      in
       (*----------------------------------------------------*)
       let error', map_res =
         try
-          Ckappa_sig.Site_map_and_set.Map
+          Ckappa_sig.SiteOrGuard_map_and_set.Map
           .fold_restriction_with_missing_associations parameters error
             (fun site port m ->
               match
@@ -153,10 +164,15 @@ let get_pair_cv_map_with_missing_association_creation parameters error agent
                 add_dependency_site parameters map_new_index_forward site a m
               | Some _, Some _ | None, _ | _, None -> raise Exit)
             (fun site ->
-              add_dependency_site parameters map_new_index_forward site
-                Ckappa_sig.dummy_state_index)
-            set agent.Cckappa_sig.agent_interface
-            Ckappa_sig.Site_map_and_set.Map.empty
+              match site with
+              | Ckappa_sig.Site _ ->
+                add_dependency_site parameters map_new_index_forward site
+                  Ckappa_sig.dummy_state_index
+              | Ckappa_sig.Guard_p _ ->
+                add_dependency_site parameters map_new_index_forward site
+                  Ckappa_sig.dummy_state_index_true
+              (*rTODO does that mean that all parameters are true?*))
+            set agent_interface Ckappa_sig.Site_map_and_set.Map.empty
         with Exit ->
           Exception.warn parameters error __POS__ Exit
             Ckappa_sig.Site_map_and_set.Map.empty
@@ -274,9 +290,12 @@ let get_pair_cv_map_with_restriction_modification parameters error agent
       let error, (map_new_index_forward, _) =
         Common_map.new_index_pair_map parameters error list
       in
+      let error, agent_interface =
+        to_site_or_guard_map parameters error agent.Cckappa_sig.agent_interface
+      in
       (*-----------------------------------------------------------*)
       let error, map_res =
-        Ckappa_sig.Site_map_and_set.Map.fold_restriction parameters error
+        Ckappa_sig.SiteOrGuard_map_and_set.Map.fold_restriction parameters error
           (fun site port (error, store_result) ->
             let state = port.Cckappa_sig.site_state.Cckappa_sig.min in
             let error, () =
@@ -286,7 +305,7 @@ let get_pair_cv_map_with_restriction_modification parameters error agent
                 Exception.warn parameters error __POS__ Exit ()
             in
             let error, site' =
-              Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
+              Ckappa_sig.SiteOrGuard_map_and_set.Map.find_default_without_logs
                 parameters error Ckappa_sig.dummy_site_name site
                 map_new_index_forward
             in
@@ -295,8 +314,7 @@ let get_pair_cv_map_with_restriction_modification parameters error agent
                 store_result
             in
             error, map_res)
-          set agent.Cckappa_sig.agent_interface
-          Ckappa_sig.Site_map_and_set.Map.empty
+          set agent_interface Ckappa_sig.Site_map_and_set.Map.empty
       in
       error, (cv_id, map_res) :: current_list)
     (error, []) triple_list
@@ -398,11 +416,14 @@ let get_triple_map parameters error pair_list triple_list =
       let error', map_res =
         List.fold_left
           (fun (error, map_res) (_, (site, state)) ->
-            if Ckappa_sig.Site_map_and_set.Set.mem site set then (
+            if
+              Ckappa_sig.SiteOrGuard_map_and_set.Set.mem (Ckappa_sig.Site site)
+                set
+            then (
               let error, site' =
-                Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
-                  parameters error Ckappa_sig.dummy_site_name site
-                  map_new_index_forward
+                Ckappa_sig.SiteOrGuard_map_and_set.Map.find_default_without_logs
+                  parameters error Ckappa_sig.dummy_site_name
+                  (Ckappa_sig.Site site) map_new_index_forward
               in
               let error, old =
                 Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
@@ -530,7 +551,10 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
           let rec aux error site list output =
             match list with
             | [] -> error, output
-            | h :: t ->
+            | Ckappa_sig.Guard_p _ :: t ->
+              (*rTODO what is this for?*)
+              aux error site t output
+            | Ckappa_sig.Site h :: t ->
               let key = agent_type', h in
               let error, old =
                 match
@@ -604,22 +628,24 @@ let get_pair_cv_map_with_restriction_views parameters error agent triple_list =
       let error, (map_new_index_forward, _) =
         Common_map.new_index_pair_map parameters error list
       in
+      let error, agent_interface =
+        to_site_or_guard_map parameters error agent.Cckappa_sig.agent_interface
+      in
       (*----------------------------------------------------------*)
       let error', map_res =
-        Ckappa_sig.Site_map_and_set.Map.fold_restriction parameters error
+        Ckappa_sig.SiteOrGuard_map_and_set.Map.fold_restriction parameters error
           (fun site port (error, store_result) ->
             let state = port.Cckappa_sig.site_state in
             let error, site' =
-              Ckappa_sig.Site_map_and_set.Map.find_default parameters error
-                Ckappa_sig.dummy_site_name site map_new_index_forward
+              Ckappa_sig.SiteOrGuard_map_and_set.Map.find_default parameters
+                error Ckappa_sig.dummy_site_name site map_new_index_forward
             in
             let error, map_res =
               Ckappa_sig.Site_map_and_set.Map.add parameters error site' state
                 store_result
             in
             error, map_res)
-          set agent.Cckappa_sig.agent_interface
-          Ckappa_sig.Site_map_and_set.Map.empty
+          set agent_interface Ckappa_sig.Site_map_and_set.Map.empty
       in
       let error =
         Exception.check_point Exception.warn parameters error error' __POS__

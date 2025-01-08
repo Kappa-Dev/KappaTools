@@ -157,6 +157,7 @@ type common_views = {
 let empty_rule = Ckappa_sig.Rule_map_and_set.Map.empty
 let empty_site = Ckappa_sig.Site_map_and_set.Map.empty
 let empty_agentsite = Ckappa_sig.AgentSite_map_and_set.Map.empty
+let empty_agentsiteorguard = Ckappa_sig.AgentSiteOrGuard_map_and_set.Map.empty
 let empty_agentrule = Ckappa_sig.AgentRule_map_and_set.Map.empty
 
 let init_modification_views =
