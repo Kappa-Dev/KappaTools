@@ -1923,7 +1923,7 @@ type ast_compiled_data = {
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;
-  guard_params: string list;
+  nr_guard_params: int;
   result:
     ( Ast.agent,
       Ast.agent_sig,
@@ -2531,6 +2531,30 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     },
     counter_conversion_info_map )
 
+let rec guard_param_to_int guard_params g =
+  match g with
+  | LKappa.True -> LKappa.True
+  | LKappa.False -> LKappa.False
+  | Param p ->
+    (match List.find_index (fun x -> String.equal p x) guard_params with
+    | Some i -> Param i
+    | None ->
+      raise
+        (ExceptionDefn.Malformed_Decl ("Unknown guard parameter", Loc.dummy)))
+  | Not g1 -> Not (guard_param_to_int guard_params g1)
+  | And (g1, g2) ->
+    And (guard_param_to_int guard_params g1, guard_param_to_int guard_params g2)
+  | Or (g1, g2) ->
+    Or (guard_param_to_int guard_params g1, guard_param_to_int guard_params g2)
+
+let guard_params_to_int_option guard_params g =
+  Option.map (guard_param_to_int guard_params) g
+
+let guard_params_to_int_in_rules guard_params rules =
+  List.map
+    (fun (r1, g, r2) -> r1, guard_params_to_int_option guard_params g, r2)
+    rules
+
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
   (* TODO test this *)
@@ -2728,8 +2752,9 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     init_of_ast ~warning ~syntax_version agents_sig counters_info contact_map
       tokens_finder alg_vars_finder ast_compil.init
   in
-
   let guard_params = Ast.get_list_of_guard_parameters ast_compil.rules in
+  (*rTODO this is never really used you have to rethink this*)
+  let rules = guard_params_to_int_in_rules guard_params rules in
 
   {
     agents_sig;
@@ -2738,7 +2763,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     token_names;
     alg_vars_finder;
     updated_alg_vars;
-    guard_params;
+    nr_guard_params = List.length guard_params;
     result =
       {
         filenames = ast_compil.filenames;

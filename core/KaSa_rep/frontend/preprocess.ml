@@ -2241,10 +2241,16 @@ let translate_c_compil parameters error handler compil =
         error, var :: list)
       (error, []) compil.Ast.variables
   in
+  let guard_params = Ast.get_list_of_guard_parameters compil.Ast.rules in
   let error, c_rules =
     List.fold_left
-      (fun (error, list) rule ->
-        let error, c_rule = translate_rule parameters error handler rule in
+      (fun (error, list) (r1, guard, r2) ->
+        let error, c_rule =
+          translate_rule parameters error handler
+            ( r1,
+              LKappa_compiler.guard_params_to_int_option guard_params guard,
+              r2 )
+        in
         error, c_rule :: list)
       (error, []) compil.Ast.rules
   in

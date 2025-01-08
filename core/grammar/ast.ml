@@ -179,7 +179,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
     or kinetic rate *)
   signatures: 'agent_sig list;  (** agent signature declaration *)
   rules:
-    (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
+    (string Loc.annoted option * 'id LKappa.guard option * 'rule Loc.annoted)
     list;
       (** rules (possibly named, possibly with a guard): [name_option * rule_definition] *)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;

@@ -48,9 +48,8 @@ type ast_compiled_data = {
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)
-  guard_params: string list;
-      (** all guard parameters that are present in any guard in the code *)
-  (*rTODO make it an int list*)
+  nr_guard_params: int;
+      (** how many guard parameters are present in any guard in the code (numbered from 0 to guard_params - 1) *)
   result:
     ( Ast.agent,
       Ast.agent_sig,
@@ -63,6 +62,9 @@ type ast_compiled_data = {
      * are integers and not string, syntactic sugar on rules are expansed
      * (syntactic sugar on mixture are not) *)
 }
+
+val guard_params_to_int_option :
+  string list -> string LKappa.guard option -> int LKappa.guard option
 
 val compil_of_ast :
   warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->

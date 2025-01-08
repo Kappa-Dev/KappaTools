@@ -212,6 +212,16 @@ val string_of_site :
   Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
+val string_of_site_or_guard :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  ?state:Ckappa_sig.c_state ->
+  ?add_parentheses:bool ->
+  Quark_type.agent_quark ->
+  Ckappa_sig.c_site_or_guard_p ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
+
 val string_of_site_in_file_name :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
