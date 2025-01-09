@@ -368,6 +368,7 @@ val info_of_rule :
     * Loc.t
     * Public_data.rule_direction
     * string
+    * string LKappa.guard option
     * Ckappa_sig.c_rule_id)
 
 val has_no_label :

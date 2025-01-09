@@ -204,6 +204,7 @@ type compil = {
   (*initial graph declaration*)
   perturbations:
     (mixture, rule) Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t;
+  guard_params: string list;(*rTODO make this a Int_storage not a list*)
 }
 
 (*******************************************************)

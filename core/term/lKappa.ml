@@ -509,6 +509,15 @@ let print_rates ~noCounters sigs counters_info pr_tok pr_var f r =
                  md))
           max_dist)
 
+let rec string_of_guard g =
+  match g with
+  | True -> "TRUE"
+  | False -> "FALSE"
+  | Param i -> i
+  | And (a, b) -> string_of_guard a ^ " && " ^ string_of_guard b
+  | Or (a, b) -> string_of_guard a ^ " || " ^ string_of_guard b
+  | Not a ->  "[not] " ^ string_of_guard a
+
 let rec print_guard f g =
   match g with
   | True -> Format.fprintf f "TRUE"

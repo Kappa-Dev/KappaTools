@@ -63,6 +63,9 @@ type ast_compiled_data = {
      * (syntactic sugar on mixture are not) *)
 }
 
+val guard_param_to_string :
+  string list -> int LKappa.guard -> string LKappa.guard
+
 val guard_params_to_int_option :
   string list -> string LKappa.guard option -> int LKappa.guard option
 

@@ -134,6 +134,7 @@ val print_rates :
   rule ->
   unit
 
+val string_of_guard : string guard -> string
 val print_guard : Format.formatter -> string guard -> unit
 
 val print_rule :

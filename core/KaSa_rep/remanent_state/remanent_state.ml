@@ -53,7 +53,7 @@ let scc = "scc"
 
 type dead_rules = Public_data.dead_rules
 
-let info_to_rule (s1, loc, direction, s2, id) =
+let info_to_rule (s1, loc, direction, s2, _guard, id) =
   {
     Public_data.rule_id = Ckappa_sig.int_of_rule_id id;
     Public_data.rule_position = loc;

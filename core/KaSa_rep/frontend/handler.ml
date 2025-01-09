@@ -209,6 +209,7 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
         Loc.dummy,
         Public_data.Dummy_rule_direction,
         "",
+        None,
         Ckappa_sig.dummy_rule_id )
   | Some rule ->
     let label_opt = rule.Cckappa_sig.e_rule_label in
@@ -241,7 +242,9 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
       | false, true -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast
       | false, false -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast_no_rate
     in
-    error, (label, position, direction, ast, rule_id)
+    let guard_params = compiled.Cckappa_sig.guard_params in
+    let guard = Option.map (LKappa_compiler.guard_param_to_string guard_params) rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.guard in
+    error, (label, position, direction, ast, guard, rule_id)
 
 let hide rule = { rule with Public_data.rule_hidden = true }
 
@@ -274,6 +277,7 @@ let info_of_var parameters error handler compiled
         Loc.dummy,
         Public_data.Variable,
         "",
+        None,
         var_id )
   | Some var ->
     ( error,
@@ -283,11 +287,12 @@ let info_of_var parameters error handler compiled
         Public_data.Variable,
         ""
         (* TO DO: string for the ast representation (from var.Cckappa_sig.c_variable?) *),
+        None,
         var_id ) )
 
 let string_of_info ?(with_rule = true) ?(with_rule_name = true)
     ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true)
-    ?(kind = "rule ") (label, pos, _direction, ast, id) =
+    ?(kind = "rule ") (label, pos, _direction, ast, guard, id) =
   let label =
     if with_rule_name then
       label
@@ -318,14 +323,18 @@ let string_of_info ?(with_rule = true) ?(with_rule_name = true)
     else
       kind
   in
+  let guard =
+    match guard with
+    | None -> ""
+    | Some guard -> "#[" ^ LKappa.string_of_guard guard ^ "]" in
   let s =
     match label, pos, ast, id with
-    | "", "", "", s | "", "", s, _ | "", s, "", _ | s, "", _, _ -> prefix ^ s
-    | "", s2, s1, _ | s1, s2, _, _ -> prefix ^ s1 ^ " (" ^ s2 ^ ")"
+    | "", "", "", s | "", "", s, _ | "", s, "", _ | s, "", _, _ -> prefix ^ guard  ^ s
+    | "", s2, s1, _ | s1, s2, _, _ -> prefix ^ guard ^ s1 ^ " (" ^ s2 ^ ")"
   in
   s
 
-let pos_of_info (_, info, _, _, _) = info
+let pos_of_info (_, info, _, _, _, _) = info
 
 let string_of_rule ?(with_rule = true) ?(with_rule_name = true)
     ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true) parameters
@@ -370,10 +379,10 @@ let node_of_flattened_id_using rule var parameters error handler compiled id =
   let int = Ckappa_sig.int_of_rule_id id in
   let nrules = nrules parameters error handler in
   if int < nrules then (
-    let error, (a, b, c, d, e) = info_of_rule parameters error compiled id in
+    let error, (a, b, c, d, _, e) = info_of_rule parameters error compiled id in
     error, Public_data.Rule (rule e b a d c)
   ) else (
-    let error, (a, b, c, d, e) =
+    let error, (a, b, c, d, _, e) =
       info_of_var parameters error handler compiled id
     in
     error, Public_data.Var (var e b a d c)
