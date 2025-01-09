@@ -2329,7 +2329,7 @@ let translate_c_compil parameters error handler compil =
       Cckappa_sig.observables = c_observables;
       Cckappa_sig.init = c_inits;
       Cckappa_sig.perturbations = c_perturbations;
-      Cckappa_sig.guard_params = guard_params;
+      Cckappa_sig.guard_params;
     } )
 
 let declare_agent parameters error ag sol =

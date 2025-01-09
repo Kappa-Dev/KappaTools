@@ -516,7 +516,7 @@ let rec string_of_guard g =
   | Param i -> i
   | And (a, b) -> string_of_guard a ^ " && " ^ string_of_guard b
   | Or (a, b) -> string_of_guard a ^ " || " ^ string_of_guard b
-  | Not a ->  "[not] " ^ string_of_guard a
+  | Not a -> "[not] " ^ string_of_guard a
 
 let rec print_guard f g =
   match g with

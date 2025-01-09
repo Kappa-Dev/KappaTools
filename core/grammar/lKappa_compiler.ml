@@ -2538,19 +2538,25 @@ let rec guard_param_conversion convert guard_params g =
   | Param p -> Param (convert p guard_params)
   | Not g1 -> Not (guard_param_conversion convert guard_params g1)
   | And (g1, g2) ->
-    And (guard_param_conversion convert guard_params g1, guard_param_conversion convert guard_params g2)
+    And
+      ( guard_param_conversion convert guard_params g1,
+        guard_param_conversion convert guard_params g2 )
   | Or (g1, g2) ->
-    Or (guard_param_conversion convert guard_params g1 , guard_param_conversion convert guard_params g2)
+    Or
+      ( guard_param_conversion convert guard_params g1,
+        guard_param_conversion convert guard_params g2 )
 
-let guard_param_to_int = guard_param_conversion (fun p guard_params -> match List.find_index (fun x -> String.equal p x) guard_params with
-    | Some i -> i
-    | None ->
-      raise
-        (ExceptionDefn.Malformed_Decl ("Unknown guard parameter", Loc.dummy)))
+let guard_param_to_int =
+  guard_param_conversion (fun p guard_params ->
+      match List.find_index (fun x -> String.equal p x) guard_params with
+      | Some i -> i
+      | None ->
+        raise
+          (ExceptionDefn.Malformed_Decl ("Unknown guard parameter", Loc.dummy)))
 
-let guard_param_to_string = guard_param_conversion (fun p guard_params ->
-  List.nth guard_params p (*rTODO error handling*)
-  )
+let guard_param_to_string =
+  guard_param_conversion (fun p guard_params ->
+      List.nth guard_params p (*rTODO error handling*))
 
 let guard_params_to_int_option guard_params g =
   Option.map (guard_param_to_int guard_params) g

@@ -243,7 +243,11 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
       | false, false -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast_no_rate
     in
     let guard_params = compiled.Cckappa_sig.guard_params in
-    let guard = Option.map (LKappa_compiler.guard_param_to_string guard_params) rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.guard in
+    let guard =
+      Option.map
+        (LKappa_compiler.guard_param_to_string guard_params)
+        rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.guard
+    in
     error, (label, position, direction, ast, guard, rule_id)
 
 let hide rule = { rule with Public_data.rule_hidden = true }
@@ -326,10 +330,12 @@ let string_of_info ?(with_rule = true) ?(with_rule_name = true)
   let guard =
     match guard with
     | None -> ""
-    | Some guard -> "#[" ^ LKappa.string_of_guard guard ^ "]" in
+    | Some guard -> "#[" ^ LKappa.string_of_guard guard ^ "]"
+  in
   let s =
     match label, pos, ast, id with
-    | "", "", "", s | "", "", s, _ | "", s, "", _ | s, "", _, _ -> prefix ^ guard  ^ s
+    | "", "", "", s | "", "", s, _ | "", s, "", _ | s, "", _, _ ->
+      prefix ^ guard ^ s
     | "", s2, s1, _ | s1, s2, _, _ -> prefix ^ guard ^ s1 ^ " (" ^ s2 ^ ")"
   in
   s
