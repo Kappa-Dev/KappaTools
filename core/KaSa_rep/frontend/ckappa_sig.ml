@@ -34,6 +34,9 @@ type binding_state = Free | Lnk_type of agent_name * site_name
 type c_guard_parameter = int
 type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
 
+type c_guard_p_then_site =
+  int (*the first n elements are guards, the last ones are sites*)
+
 type mixture =
   | SKIP of mixture
   | COMMA of agent * mixture
@@ -192,7 +195,29 @@ let state_index_of_int (a : int) : c_state = a
 let int_of_state_index (a : c_state) : int = a
 let string_of_state_index (a : c_state) : string = string_of_int a
 let guard_parameter_of_int (a : int) : c_guard_parameter = a
+let guard_p_then_site_of_int (a : int) : c_guard_p_then_site = a
+let int_of_guard_p_then_site (a : c_guard_p_then_site) : int = a
+
+let guard_p_then_site_of_site (a : c_site_name) (nr_guard_p : int) :
+    c_guard_p_then_site =
+  guard_parameter_of_int (int_of_site_name a + nr_guard_p)
+
+let guard_p_then_site_of_guard (a : c_guard_parameter) : c_guard_p_then_site = a
+
+let guard_p_then_site_of_site_or_guard_p (a : c_site_or_guard_p)
+    (nr_guard_p : int) : c_guard_p_then_site =
+  match a with
+  | Site s -> guard_p_then_site_of_site s nr_guard_p
+  | Guard_p s -> guard_p_then_site_of_guard s
+
 let int_of_guard_parameter (a : c_guard_parameter) : int = a
+
+let site_or_guard_p_of_guard_p_then_site (a : c_guard_p_then_site)
+    (nr_guard_p : int) : c_site_or_guard_p =
+  if a < nr_guard_p then
+    Guard_p a
+  else
+    Site (a - nr_guard_p)
 
 let string_of_state_index_option_min parameters a =
   match a with
@@ -843,6 +868,13 @@ module Site_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   let print = Format.pp_print_int
 end))
 
+module GuardSite_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_guard_p_then_site
+
+  let compare = compare
+  let print = Format.pp_print_int
+end))
+
 type c_interface = c_port Site_map_and_set.Map.t
 
 type c_proper_agent = {
@@ -932,6 +964,7 @@ let next_rule_id = succ
 let next_agent_id = succ
 let next_agent_name = succ
 let next_site_name = succ
+let next_guard_or_site_name = succ
 let next_state_index = succ
 let compare_rule_id = compare
 let compare_agent_id = compare
@@ -1002,6 +1035,12 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
      and type dimension = int * int =
   Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
 
+module Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
+  Int_storage.Storage
+    with type key = c_agent_name * c_guard_p_then_site
+     and type dimension = int * int =
+  Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+
 module Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage
     with type key = c_agent_name * c_site_name
@@ -1023,6 +1062,13 @@ module Site_type_nearly_Inf_Int_storage_Imperatif :
 module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_site_name and type dimension = int =
   Int_storage.Quick_key_list (Site_type_nearly_Inf_Int_storage_Imperatif)
+
+(*guard parameters or site: the first n indexes are the guards, and the remaining are the sites*)
+module GuardPOrSite_nearly_Inf_Int_storage_Imperatif :
+  Int_storage.Storage
+    with type key = c_guard_p_then_site
+     and type dimension = int =
+  Int_storage.Nearly_inf_Imperatif
 
 (*state*)
 module State_index_nearly_Inf_Int_storage_Imperatif :
@@ -1252,7 +1298,7 @@ end))
 
 module Views_bdu :
   Mvbdu_wrapper.Mvbdu
-    with type key = c_site_name
+    with type key = c_guard_p_then_site
      and type value = c_state
     with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu =
   Mvbdu_wrapper.Mvbdu

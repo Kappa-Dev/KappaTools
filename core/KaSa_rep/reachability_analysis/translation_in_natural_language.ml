@@ -15,24 +15,28 @@
 let trace = false
 let _ = trace
 
+let get_nr_guard_parameters kappa_handler =
+  kappa_handler.Cckappa_sig.nguard_params
+
 type token =
-  | Range of Ckappa_sig.c_site_name * Ckappa_sig.c_state list
+  (*rTODO maybe change this*)
+  | Range of Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state list
   | Equiv of
-      (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
+      * (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
   | Imply of
-      (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
+      * (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
   | Partition of
-      (Ckappa_sig.c_site_name * (Ckappa_sig.c_state * token list) list)
+      (Ckappa_sig.c_guard_p_then_site * (Ckappa_sig.c_state * token list) list)
   | No_known_translation of
-      (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list
+      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state) list list
 
 type rename_sites =
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
-  Ckappa_sig.Site_map_and_set.Map.elt ->
-  Exception.exceptions_caught_and_uncaught * Ckappa_sig.Site_map_and_set.Map.elt
+  Ckappa_sig.c_guard_p_then_site ->
+  Exception.exceptions_caught_and_uncaught * Ckappa_sig.c_guard_p_then_site
 
 (****************************************************************************)
 
@@ -439,54 +443,85 @@ let rec print ?beginning_of_sentence:(beggining = true)
       ""
   in
   let log = Remanent_parameters.get_logger parameters in
+  let nr_guard_params = get_nr_guard_parameters handler_kappa in
   let error, () =
     match translation with
     | Range (site_type, state_list) ->
-      if dim_min <= 1 then (
-        match Remanent_parameters.get_backend_mode parameters with
-        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-          let error, t =
-            Site_graphs.KaSa_site_graph.add_site parameters error handler_kappa
-              agent_id site_type t
-          in
-          let error =
-            Site_graphs.KaSa_site_graph.print log parameters error t
-          in
-          let () = Loggers.fprintf log " => " in
-          let should_use_bracket =
-            match state_list with
-            | [] | [ _ ] -> false
-            | _ :: _ -> true
-          in
-          let () = if should_use_bracket then Loggers.fprintf log "[ " in
-          let error, _bool =
-            List.fold_left
-              (fun (error, bool) state ->
-                let () = if bool then Loggers.fprintf log " v " in
-                let error, t =
-                  Site_graphs.KaSa_site_graph.add_state parameters error
-                    handler_kappa agent_id site_type state t
+      (match
+         Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_type
+           nr_guard_params
+       with
+      | Guard_p _ -> error, () (*rTODO print guards*)
+      | Site site_type ->
+        if dim_min <= 1 then (
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+            let error, t =
+              Site_graphs.KaSa_site_graph.add_site parameters error
+                handler_kappa agent_id site_type t
+            in
+            let error =
+              Site_graphs.KaSa_site_graph.print log parameters error t
+            in
+            let () = Loggers.fprintf log " => " in
+            let should_use_bracket =
+              match state_list with
+              | [] | [ _ ] -> false
+              | _ :: _ -> true
+            in
+            let () = if should_use_bracket then Loggers.fprintf log "[ " in
+            let error, _bool =
+              List.fold_left
+                (fun (error, bool) state ->
+                  let () = if bool then Loggers.fprintf log " v " in
+                  let error, t =
+                    Site_graphs.KaSa_site_graph.add_state parameters error
+                      handler_kappa agent_id site_type state t
+                  in
+                  let error =
+                    Site_graphs.KaSa_site_graph.print log parameters error t
+                  in
+                  error, true)
+                (error, false) state_list
+            in
+            let () = if should_use_bracket then Loggers.fprintf log " ]" in
+            let () = Loggers.print_newline log in
+            error, ()
+          | Remanent_parameters_sig.Natural_language ->
+            let error', site_string =
+              Handler.string_of_site_in_natural_language parameters error
+                handler_kappa agent_type site_type
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'
+                __POS__ Exit
+            in
+            let rec aux list error =
+              match list with
+              | [] -> Exception.warn parameters error __POS__ Exit ()
+              | [ state ] ->
+                let error', state_string =
+                  Handler.string_of_state_fully_deciphered parameters error
+                    handler_kappa agent_type site_type state
                 in
                 let error =
-                  Site_graphs.KaSa_site_graph.print log parameters error t
+                  Exception.check_point Exception.warn parameters error error'
+                    __POS__ Exit
                 in
-                error, true)
-              (error, false) state_list
-          in
-          let () = if should_use_bracket then Loggers.fprintf log " ]" in
-          let () = Loggers.print_newline log in
-          error, ()
-        | Remanent_parameters_sig.Natural_language ->
-          let error', site_string =
-            Handler.string_of_site_in_natural_language parameters error
-              handler_kappa agent_type site_type
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          let rec aux list error =
-            match list with
+                error, Loggers.fprintf log " and %s.%s" state_string endofline
+              | state :: tail ->
+                let error', state_string =
+                  Handler.string_of_state_fully_deciphered parameters error
+                    handler_kappa agent_type site_type state
+                in
+                let error =
+                  Exception.check_point Exception.warn parameters error error'
+                    __POS__ Exit
+                in
+                let () = Loggers.fprintf log " %s," state_string in
+                aux tail error
+            in
+            (match state_list with
             | [] -> Exception.warn parameters error __POS__ Exit ()
             | [ state ] ->
               let error', state_string =
@@ -497,39 +532,101 @@ let rec print ?beginning_of_sentence:(beggining = true)
                 Exception.check_point Exception.warn parameters error error'
                   __POS__ Exit
               in
-              error, Loggers.fprintf log " and %s.%s" state_string endofline
-            | state :: tail ->
-              let error', state_string =
+              ( error,
+                Loggers.fprintf log "%s%s %sis always %s.%s"
+                  (Remanent_parameters.get_prefix parameters)
+                  (cap site_string) (in_agent agent_string) state_string
+                  endofline )
+            | [ state1; state2 ] ->
+              let error', state_string1 =
                 Handler.string_of_state_fully_deciphered parameters error
-                  handler_kappa agent_type site_type state
+                  handler_kappa agent_type site_type state1
               in
               let error =
                 Exception.check_point Exception.warn parameters error error'
                   __POS__ Exit
               in
-              let () = Loggers.fprintf log " %s," state_string in
-              aux tail error
-          in
-          (match state_list with
-          | [] -> Exception.warn parameters error __POS__ Exit ()
-          | [ state ] ->
-            let error', state_string =
-              Handler.string_of_state_fully_deciphered parameters error
-                handler_kappa agent_type site_type state
+              let error', state_string2 =
+                Handler.string_of_state_fully_deciphered parameters error
+                  handler_kappa agent_type site_type state2
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error'
+                  __POS__ Exit
+              in
+              ( error,
+                Loggers.fprintf log "%s%s %sranges over %s and %s.%s"
+                  (Remanent_parameters.get_prefix parameters)
+                  (cap site_string) (in_agent agent_string) state_string1
+                  state_string2 endofline )
+            | list ->
+              let () =
+                Loggers.fprintf log "%s%s %sranges over"
+                  (Remanent_parameters.get_prefix parameters)
+                  (cap site_string) (in_agent agent_string)
+              in
+              aux list error)
+        ) else
+          error, ())
+    | Equiv ((site1, state1), (site2, state2)) ->
+      (match
+         ( Ckappa_sig.site_or_guard_p_of_guard_p_then_site site1 nr_guard_params,
+           Ckappa_sig.site_or_guard_p_of_guard_p_then_site site2 nr_guard_params
+         )
+       with
+      | Guard_p _, _ -> error, () (*rTODO print guards*)
+      | _, Guard_p _ -> error, ()
+      | Site site1, Site site2 ->
+        if dim_min <= 2 then (
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+            let error, t' =
+              Site_graphs.KaSa_site_graph.add_state parameters error
+                handler_kappa agent_id site1 state1 t
+            in
+            let error, t'' =
+              Site_graphs.KaSa_site_graph.add_state parameters error
+                handler_kappa agent_id site2 state2 t
+            in
+            let error =
+              Site_graphs.KaSa_site_graph.print
+                (Remanent_parameters.get_logger parameters)
+                parameters error t'
+            in
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                " <=> "
+            in
+            let error =
+              Site_graphs.KaSa_site_graph.print
+                (Remanent_parameters.get_logger parameters)
+                parameters error t''
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+            error, ()
+          | Remanent_parameters_sig.Natural_language ->
+            let error', site_string1 =
+              Handler.string_of_site_in_natural_language parameters error
+                handler_kappa agent_type site1
             in
             let error =
               Exception.check_point Exception.warn parameters error error'
                 __POS__ Exit
             in
-            ( error,
-              Loggers.fprintf log "%s%s %sis always %s.%s"
-                (Remanent_parameters.get_prefix parameters)
-                (cap site_string) (in_agent agent_string) state_string endofline
-            )
-          | [ state1; state2 ] ->
             let error', state_string1 =
               Handler.string_of_state_fully_deciphered parameters error
-                handler_kappa agent_type site_type state1
+                handler_kappa agent_type site1 state1
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'
+                __POS__ Exit
+            in
+            let error', site_string2 =
+              Handler.string_of_site_in_natural_language parameters error
+                handler_kappa agent_type site2
             in
             let error =
               Exception.check_point Exception.warn parameters error error'
@@ -537,224 +634,164 @@ let rec print ?beginning_of_sentence:(beggining = true)
             in
             let error', state_string2 =
               Handler.string_of_state_fully_deciphered parameters error
-                handler_kappa agent_type site_type state2
+                handler_kappa agent_type site2 state2
             in
             let error =
               Exception.check_point Exception.warn parameters error error'
                 __POS__ Exit
             in
             ( error,
-              Loggers.fprintf log "%s%s %sranges over %s and %s.%s"
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                "%s%s%s is %s, if and only if, %s is %s.%s"
                 (Remanent_parameters.get_prefix parameters)
-                (cap site_string) (in_agent agent_string) state_string1
-                state_string2 endofline )
-          | list ->
-            let () =
-              Loggers.fprintf log "%s%s %sranges over"
-                (Remanent_parameters.get_prefix parameters)
-                (cap site_string) (in_agent agent_string)
-            in
-            aux list error)
-      ) else
-        error, ()
-    | Equiv ((site1, state1), (site2, state2)) ->
-      if dim_min <= 2 then (
-        match Remanent_parameters.get_backend_mode parameters with
-        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-          let error, t' =
-            Site_graphs.KaSa_site_graph.add_state parameters error handler_kappa
-              agent_id site1 state1 t
-          in
-          let error, t'' =
-            Site_graphs.KaSa_site_graph.add_state parameters error handler_kappa
-              agent_id site2 state2 t
-          in
-          let error =
-            Site_graphs.KaSa_site_graph.print
-              (Remanent_parameters.get_logger parameters)
-              parameters error t'
-          in
-          let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters) " <=> "
-          in
-          let error =
-            Site_graphs.KaSa_site_graph.print
-              (Remanent_parameters.get_logger parameters)
-              parameters error t''
-          in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
-          error, ()
-        | Remanent_parameters_sig.Natural_language ->
-          let error', site_string1 =
-            Handler.string_of_site_in_natural_language parameters error
-              handler_kappa agent_type site1
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          let error', state_string1 =
-            Handler.string_of_state_fully_deciphered parameters error
-              handler_kappa agent_type site1 state1
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          let error', site_string2 =
-            Handler.string_of_site_in_natural_language parameters error
-              handler_kappa agent_type site2
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          let error', state_string2 =
-            Handler.string_of_state_fully_deciphered parameters error
-              handler_kappa agent_type site2 state2
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          ( error,
-            Loggers.fprintf
-              (Remanent_parameters.get_logger parameters)
-              "%s%s%s is %s, if and only if, %s is %s.%s"
-              (Remanent_parameters.get_prefix parameters)
-              (cap (in_agent_comma agent_string))
-              site_string1 state_string1 site_string2 state_string2 endofline )
-      ) else
-        error, ()
+                (cap (in_agent_comma agent_string))
+                site_string1 state_string1 site_string2 state_string2 endofline
+            )
+        ) else
+          error, ())
     | Imply ((site1, state1), (site2, state2)) ->
-      if dim_min <= 2 then (
-        match Remanent_parameters.get_backend_mode parameters with
-        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-          let error, t =
-            Site_graphs.KaSa_site_graph.add_state parameters error handler_kappa
-              agent_id site1 state1 t
-          in
-          let error, t' =
-            Site_graphs.KaSa_site_graph.add_state parameters error handler_kappa
-              agent_id site2 state2 t
-          in
-          let error =
-            Site_graphs.KaSa_site_graph.print
-              (Remanent_parameters.get_logger parameters)
-              parameters error t
-          in
-          let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
-          in
-          let error =
-            Site_graphs.KaSa_site_graph.print
-              (Remanent_parameters.get_logger parameters)
-              parameters error t'
-          in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
-          error, ()
-        | Remanent_parameters_sig.Natural_language ->
-          let error', site_string1 =
-            Handler.string_of_site_in_natural_language parameters error
-              handler_kappa agent_type site1
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          let error', state_string1 =
-            Handler.string_of_state_fully_deciphered parameters error
-              handler_kappa agent_type site1 state1
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          let error', site_string2 =
-            Handler.string_of_site_in_natural_language parameters error
-              handler_kappa agent_type site2
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          let error', state_string2 =
-            Handler.string_of_state_fully_deciphered parameters error
-              handler_kappa agent_type site2 state2
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          ( error,
-            Loggers.fprintf
-              (Remanent_parameters.get_logger parameters)
-              "%s%s%s is %s whenever %s is %s.%s"
-              (Remanent_parameters.get_prefix parameters)
-              (cap (in_agent_comma agent_string))
-              site_string2 state_string2 site_string1 state_string1 endofline )
-      ) else
-        error, ()
-    | Partition (v, list) ->
-      (*let () =
-        Loggers.fprintf log
-          "%s%s%s" (Remanent_parameters.get_prefix parameters)
-          (cap (in_agent_colon agent_string)) endofline
-        in*)
-      let error, site_string =
-        Handler.string_of_site_in_natural_language parameters error
-          handler_kappa agent_type v
-      in
-      let parameters = Remanent_parameters.update_prefix parameters tab in
-      let error =
-        List.fold_left
-          (fun error (a, list) ->
-            let error, parameters =
-              match Remanent_parameters.get_backend_mode parameters with
-              | Remanent_parameters_sig.Natural_language ->
-                let error, state_string =
-                  Handler.string_of_state_fully_deciphered parameters error
-                    handler_kappa agent_type v a
-                in
-                let () =
-                  Loggers.fprintf log "%swhen %s is equal to %s, then:%s%s"
-                    (Remanent_parameters.get_prefix parameters)
-                    site_string state_string endofline beginenumeration
-                in
-                let parameters =
-                  Remanent_parameters.update_prefix parameters
-                    (tab ^ beginenum ^ " ")
-                in
-                error, parameters
-              | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-                error, parameters
+      (match
+         ( Ckappa_sig.site_or_guard_p_of_guard_p_then_site site1 nr_guard_params,
+           Ckappa_sig.site_or_guard_p_of_guard_p_then_site site2 nr_guard_params
+         )
+       with
+      | Guard_p _, _ -> error, () (*rTODO print guards*)
+      | _, Guard_p _ -> error, ()
+      | Site site1, Site site2 ->
+        if dim_min <= 2 then (
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+            let error, t =
+              Site_graphs.KaSa_site_graph.add_state parameters error
+                handler_kappa agent_id site1 state1 t
             in
             let error, t' =
               Site_graphs.KaSa_site_graph.add_state parameters error
-                handler_kappa agent_id v a t
+                handler_kappa agent_id site2 state2 t
             in
             let error =
-              List.fold_left
-                (fun error token ->
-                  let error =
-                    print ~beginning_of_sentence:false ~prompt_agent_type:false
-                      ~html_mode ~show_dep_with_dimmension_higher_than:0
-                      parameters handler_kappa error agent_string agent_type
-                      agent_id token t'
-                  in
-                  let () = Loggers.fprintf log "%s" endenum in
-                  error)
-                error list
+              Site_graphs.KaSa_site_graph.print
+                (Remanent_parameters.get_logger parameters)
+                parameters error t
             in
-            let () = Loggers.fprintf log "%s" endenumeration in
-            error)
-          error list
-      in
-      error, ()
+            let () =
+              Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
+            in
+            let error =
+              Site_graphs.KaSa_site_graph.print
+                (Remanent_parameters.get_logger parameters)
+                parameters error t'
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+            error, ()
+          | Remanent_parameters_sig.Natural_language ->
+            let error', site_string1 =
+              Handler.string_of_site_in_natural_language parameters error
+                handler_kappa agent_type site1
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'
+                __POS__ Exit
+            in
+            let error', state_string1 =
+              Handler.string_of_state_fully_deciphered parameters error
+                handler_kappa agent_type site1 state1
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'
+                __POS__ Exit
+            in
+            let error', site_string2 =
+              Handler.string_of_site_in_natural_language parameters error
+                handler_kappa agent_type site2
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'
+                __POS__ Exit
+            in
+            let error', state_string2 =
+              Handler.string_of_state_fully_deciphered parameters error
+                handler_kappa agent_type site2 state2
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'
+                __POS__ Exit
+            in
+            ( error,
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                "%s%s%s is %s whenever %s is %s.%s"
+                (Remanent_parameters.get_prefix parameters)
+                (cap (in_agent_comma agent_string))
+                site_string2 state_string2 site_string1 state_string1 endofline
+            )
+        ) else
+          error, ())
+    | Partition (v, list) ->
+      (match
+         Ckappa_sig.site_or_guard_p_of_guard_p_then_site v nr_guard_params
+       with
+      | Guard_p _ -> error, () (*rTODO print guards*)
+      | Site v ->
+        (*let () =
+          Loggers.fprintf log
+            "%s%s%s" (Remanent_parameters.get_prefix parameters)
+            (cap (in_agent_colon agent_string)) endofline
+          in*)
+        let error, site_string =
+          Handler.string_of_site_in_natural_language parameters error
+            handler_kappa agent_type v
+        in
+        let parameters = Remanent_parameters.update_prefix parameters tab in
+        let error =
+          List.fold_left
+            (fun error (a, list) ->
+              let error, parameters =
+                match Remanent_parameters.get_backend_mode parameters with
+                | Remanent_parameters_sig.Natural_language ->
+                  let error, state_string =
+                    Handler.string_of_state_fully_deciphered parameters error
+                      handler_kappa agent_type v a
+                  in
+                  let () =
+                    Loggers.fprintf log "%swhen %s is equal to %s, then:%s%s"
+                      (Remanent_parameters.get_prefix parameters)
+                      site_string state_string endofline beginenumeration
+                  in
+                  let parameters =
+                    Remanent_parameters.update_prefix parameters
+                      (tab ^ beginenum ^ " ")
+                  in
+                  error, parameters
+                | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+                  error, parameters
+              in
+              let error, t' =
+                Site_graphs.KaSa_site_graph.add_state parameters error
+                  handler_kappa agent_id v a t
+              in
+              let error =
+                List.fold_left
+                  (fun error token ->
+                    let error =
+                      print ~beginning_of_sentence:false
+                        ~prompt_agent_type:false ~html_mode
+                        ~show_dep_with_dimmension_higher_than:0 parameters
+                        handler_kappa error agent_string agent_type agent_id
+                        token t'
+                    in
+                    let () = Loggers.fprintf log "%s" endenum in
+                    error)
+                  error list
+              in
+              let () = Loggers.fprintf log "%s" endenumeration in
+              error)
+            error list
+        in
+        error, ())
     | No_known_translation list ->
       (match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
@@ -776,8 +813,14 @@ let rec print ?beginning_of_sentence:(beggining = true)
               let error, t' =
                 List.fold_left
                   (fun (error, t) (site, state) ->
-                    Site_graphs.KaSa_site_graph.add_state parameters error
-                      handler_kappa agent_id site state t)
+                    match
+                      Ckappa_sig.site_or_guard_p_of_guard_p_then_site site
+                        nr_guard_params
+                    with
+                    | Guard_p _ -> error, t (*rTODO print guards*)
+                    | Site site ->
+                      Site_graphs.KaSa_site_graph.add_state parameters error
+                        handler_kappa agent_id site state t)
                   (error, t) state_list
               in
               let error =
@@ -804,30 +847,48 @@ let rec print ?beginning_of_sentence:(beggining = true)
               let rec aux l error =
                 match l with
                 | [ (a, _) ] ->
-                  let error, string =
-                    Handler.string_of_site_in_natural_language parameters error
-                      handler_kappa agent_type a
-                  in
-                  let () = Loggers.fprintf log ", and %s, " string in
-                  error, ()
+                  (match
+                     Ckappa_sig.site_or_guard_p_of_guard_p_then_site a
+                       nr_guard_params
+                   with
+                  | Guard_p _ -> error, () (*rTODO print guards*)
+                  | Site a ->
+                    let error, string =
+                      Handler.string_of_site_in_natural_language parameters
+                        error handler_kappa agent_type a
+                    in
+                    let () = Loggers.fprintf log ", and %s, " string in
+                    error, ())
                 | [] -> Exception.warn parameters error __POS__ Exit ()
                 | (a, _) :: b ->
-                  let error, string =
-                    Handler.string_of_site_in_natural_language parameters error
-                      handler_kappa agent_type a
-                  in
-                  let () = Loggers.fprintf log ", %s" string in
-                  aux b error
+                  (match
+                     Ckappa_sig.site_or_guard_p_of_guard_p_then_site a
+                       nr_guard_params
+                   with
+                  | Guard_p _ -> error, () (*rTODO print guards*)
+                  | Site a ->
+                    let error, string =
+                      Handler.string_of_site_in_natural_language parameters
+                        error handler_kappa agent_type a
+                    in
+                    let () = Loggers.fprintf log ", %s" string in
+                    aux b error)
               in
               match head with
               | [] | [ _ ] -> Exception.warn parameters error __POS__ Exit ()
               | (a, _) :: b ->
-                let error, string =
-                  Handler.string_of_site_in_natural_language parameters error
-                    handler_kappa agent_type a
-                in
-                let () = Loggers.fprintf log "%s" string in
-                aux b error
+                (match
+                   Ckappa_sig.site_or_guard_p_of_guard_p_then_site a
+                     nr_guard_params
+                 with
+                | Guard_p _ -> error, () (*rTODO print guards*)
+                | Site a ->
+                  let error, string =
+                    Handler.string_of_site_in_natural_language parameters error
+                      handler_kappa agent_type a
+                  in
+                  let () = Loggers.fprintf log "%s" string in
+                  aux b error)
             in
             let () =
               Loggers.fprintf log
@@ -842,35 +903,41 @@ let rec print ?beginning_of_sentence:(beggining = true)
                   let error, bool =
                     List.fold_left
                       (fun (error, bool) (site_type, state) ->
-                        let error', site_string =
-                          Handler.string_of_site parameters error handler_kappa
-                            agent_type site_type
-                        in
-                        let error =
-                          Exception.check_point Exception.warn parameters error
-                            error' __POS__ Exit
-                        in
-                        let error', state_string =
-                          Handler.string_of_state_fully_deciphered parameters
-                            error handler_kappa agent_type site_type state
-                        in
-                        let error =
-                          Exception.check_point Exception.warn parameters error
-                            error' __POS__ Exit
-                        in
-                        (*---------------------------------------------*)
-                        let () =
-                          if bool then
-                            Loggers.fprintf log ","
-                          else
-                            Loggers.fprintf log "%s%s("
-                              (Remanent_parameters.get_prefix parameters)
-                              agent_string
-                        in
-                        let () =
-                          Loggers.fprintf log "%s%s" site_string state_string
-                        in
-                        error, true)
+                        match
+                          Ckappa_sig.site_or_guard_p_of_guard_p_then_site
+                            site_type nr_guard_params
+                        with
+                        | Guard_p _ -> error, bool (*rTODO print guards*)
+                        | Site site_type ->
+                          let error', site_string =
+                            Handler.string_of_site parameters error
+                              handler_kappa agent_type site_type
+                          in
+                          let error =
+                            Exception.check_point Exception.warn parameters
+                              error error' __POS__ Exit
+                          in
+                          let error', state_string =
+                            Handler.string_of_state_fully_deciphered parameters
+                              error handler_kappa agent_type site_type state
+                          in
+                          let error =
+                            Exception.check_point Exception.warn parameters
+                              error error' __POS__ Exit
+                          in
+                          (*---------------------------------------------*)
+                          let () =
+                            if bool then
+                              Loggers.fprintf log ","
+                            else
+                              Loggers.fprintf log "%s%s("
+                                (Remanent_parameters.get_prefix parameters)
+                                agent_string
+                          in
+                          let () =
+                            Loggers.fprintf log "%s%s" site_string state_string
+                          in
+                          error, true)
                       (error, false) l
                   in
                   (*----------------------------------------------------*)
@@ -889,146 +956,175 @@ let rec print ?beginning_of_sentence:(beggining = true)
 let rec convert_views_internal_constraints_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa error
     agent_string agent_type agent_id translation t current_list =
+  let nr_guard_params = get_nr_guard_parameters handler_kappa in
   let error, current_list =
     match translation with
     | Range (site_type, state_list) ->
-      if dim_min <= 1 then (
-        match Remanent_parameters.get_backend_mode parameters with
-        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-          (*hyp*)
-          (*-----------------------------------------------------*)
-          let error, t =
-            Site_graphs.KaSa_site_graph.add_site parameters error handler_kappa
-              agent_id site_type t
-          in
-          let error'', refinement =
-            List.fold_left
-              (fun (error, c_list) state ->
-                let error', t' =
-                  Site_graphs.KaSa_site_graph.add_state parameters error
-                    handler_kappa agent_id site_type state t
-                in
-                let error =
-                  Exception.check_point Exception.warn parameters error error'
-                    __POS__ Exit
-                in
-                error, t' :: c_list)
-              (error, []) state_list
-          in
-          let lemma = { Public_data.hyp = t; Public_data.refinement } in
-          let current_list = lemma :: current_list in
-          let error =
-            Exception.check_point Exception.warn parameters error error''
-              __POS__ Exit
-          in
-          error, current_list
-        | Remanent_parameters_sig.Natural_language ->
+      (match
+         Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_type
+           nr_guard_params
+       with
+      | Guard_p _ -> error, current_list (*rTODO guards*)
+      | Site site_type ->
+        if dim_min <= 1 then (
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+            (*hyp*)
+            (*-----------------------------------------------------*)
+            let error, t =
+              Site_graphs.KaSa_site_graph.add_site parameters error
+                handler_kappa agent_id site_type t
+            in
+            let error'', refinement =
+              List.fold_left
+                (fun (error, c_list) state ->
+                  let error', t' =
+                    Site_graphs.KaSa_site_graph.add_state parameters error
+                      handler_kappa agent_id site_type state t
+                  in
+                  let error =
+                    Exception.check_point Exception.warn parameters error error'
+                      __POS__ Exit
+                  in
+                  error, t' :: c_list)
+                (error, []) state_list
+            in
+            let lemma = { Public_data.hyp = t; Public_data.refinement } in
+            let current_list = lemma :: current_list in
+            let error =
+              Exception.check_point Exception.warn parameters error error''
+                __POS__ Exit
+            in
+            error, current_list
+          | Remanent_parameters_sig.Natural_language ->
+            (*let _ =
+                Loggers.fprintf (Remanent_parameters.get_logger parameters) "Natural_language\n"
+              in*)
+            error, current_list
+        ) else
           (*let _ =
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) "Natural_language\n"
+              Loggers.fprintf (Remanent_parameters.get_logger parameters) "test\n"
             in*)
-          error, current_list
-      ) else
-        (*let _ =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters) "test\n"
-          in*)
-        error, current_list
+          error, current_list)
     | Equiv ((site1, state1), (site2, state2)) ->
-      if dim_min <= 2 then (
-        match Remanent_parameters.get_backend_mode parameters with
-        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-          let error', t' =
-            Site_graphs.KaSa_site_graph.add_state parameters error handler_kappa
-              agent_id site1 state1 t
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          (*--------------------------------------------------*)
-          let error''', t'' =
-            Site_graphs.KaSa_site_graph.add_state parameters error handler_kappa
-              agent_id site2 state2 t
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error'''
-              __POS__ Exit
-          in
-          (*--------------------------------------------------*)
-          let lemma =
-            { Public_data.hyp = t'; Public_data.refinement = [ t'' ] }
-          in
-          let current_list = lemma :: current_list in
-          error, List.rev current_list
-        | Remanent_parameters_sig.Natural_language -> error, current_list
-      ) else
-        error, current_list
-    | Imply ((site1, state1), (site2, state2)) ->
-      if dim_min <= 2 then (
-        match Remanent_parameters.get_backend_mode parameters with
-        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-          let error', t =
-            Site_graphs.KaSa_site_graph.add_state parameters error handler_kappa
-              agent_id site1 state1 t
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          (*--------------------------------------------------*)
-          let error''', t' =
-            Site_graphs.KaSa_site_graph.add_state parameters error handler_kappa
-              agent_id site2 state2 t
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error'''
-              __POS__ Exit
-          in
-          (*--------------------------------------------------*)
-          let lemma =
-            {
-              (*Remanent_state.hyp = site_graph ;
-                Remanent_state.refinement = [site_graph']*)
-              Public_data.hyp = t;
-              Public_data.refinement = [ t' ];
-            }
-          in
-          let current_list = lemma :: current_list in
-          error, List.rev current_list
-        | Remanent_parameters_sig.Natural_language -> error, current_list
-      ) else
-        error, current_list
-    | Partition (site_type, list) ->
-      let error, current_list =
-        List.fold_left
-          (fun (error, current_list) (state, list) ->
+      (match
+         ( Ckappa_sig.site_or_guard_p_of_guard_p_then_site site1 nr_guard_params,
+           Ckappa_sig.site_or_guard_p_of_guard_p_then_site site2 nr_guard_params
+         )
+       with
+      | Guard_p _, _ -> error, current_list (*rTODO guards*)
+      | _, Guard_p _ -> error, current_list (*rTODO guards*)
+      | Site site1, Site site2 ->
+        if dim_min <= 2 then (
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
             let error', t' =
               Site_graphs.KaSa_site_graph.add_state parameters error
-                handler_kappa agent_id site_type state t
+                handler_kappa agent_id site1 state1 t
             in
             let error =
               Exception.check_point Exception.warn parameters error error'
                 __POS__ Exit
             in
-            let error'', current_list =
-              List.fold_left
-                (fun (error, current_list) token ->
-                  convert_views_internal_constraints_list_aux
-                    ~show_dep_with_dimmension_higher_than:0 parameters
-                    handler_kappa error agent_string agent_type agent_id token
-                    t' current_list)
-                (error, current_list) list
+            (*--------------------------------------------------*)
+            let error''', t'' =
+              Site_graphs.KaSa_site_graph.add_state parameters error
+                handler_kappa agent_id site2 state2 t
             in
             let error =
-              Exception.check_point Exception.warn parameters error error''
+              Exception.check_point Exception.warn parameters error error'''
                 __POS__ Exit
             in
-            (*let _ =
-                Loggers.fprintf (Remanent_parameters.get_logger parameters) "test1\n"
-              in*)
-            error, current_list)
-          (error, current_list) list
-      in
-      error, current_list
+            (*--------------------------------------------------*)
+            let lemma =
+              { Public_data.hyp = t'; Public_data.refinement = [ t'' ] }
+            in
+            let current_list = lemma :: current_list in
+            error, List.rev current_list
+          | Remanent_parameters_sig.Natural_language -> error, current_list
+        ) else
+          error, current_list)
+    | Imply ((site1, state1), (site2, state2)) ->
+      (match
+         ( Ckappa_sig.site_or_guard_p_of_guard_p_then_site site1 nr_guard_params,
+           Ckappa_sig.site_or_guard_p_of_guard_p_then_site site2 nr_guard_params
+         )
+       with
+      | Guard_p _, _ -> error, current_list (*rTODO guards*)
+      | _, Guard_p _ -> error, current_list (*rTODO guards*)
+      | Site site1, Site site2 ->
+        if dim_min <= 2 then (
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+            let error', t =
+              Site_graphs.KaSa_site_graph.add_state parameters error
+                handler_kappa agent_id site1 state1 t
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'
+                __POS__ Exit
+            in
+            (*--------------------------------------------------*)
+            let error''', t' =
+              Site_graphs.KaSa_site_graph.add_state parameters error
+                handler_kappa agent_id site2 state2 t
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'''
+                __POS__ Exit
+            in
+            (*--------------------------------------------------*)
+            let lemma =
+              {
+                (*Remanent_state.hyp = site_graph ;
+                  Remanent_state.refinement = [site_graph']*)
+                Public_data.hyp = t;
+                Public_data.refinement = [ t' ];
+              }
+            in
+            let current_list = lemma :: current_list in
+            error, List.rev current_list
+          | Remanent_parameters_sig.Natural_language -> error, current_list
+        ) else
+          error, current_list)
+    | Partition (site_type, list) ->
+      (match
+         Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_type
+           nr_guard_params
+       with
+      | Guard_p _ -> error, current_list (*rTODO guards*)
+      | Site site_type ->
+        let error, current_list =
+          List.fold_left
+            (fun (error, current_list) (state, list) ->
+              let error', t' =
+                Site_graphs.KaSa_site_graph.add_state parameters error
+                  handler_kappa agent_id site_type state t
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error'
+                  __POS__ Exit
+              in
+              let error'', current_list =
+                List.fold_left
+                  (fun (error, current_list) token ->
+                    convert_views_internal_constraints_list_aux
+                      ~show_dep_with_dimmension_higher_than:0 parameters
+                      handler_kappa error agent_string agent_type agent_id token
+                      t' current_list)
+                  (error, current_list) list
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error''
+                  __POS__ Exit
+              in
+              (*let _ =
+                  Loggers.fprintf (Remanent_parameters.get_logger parameters) "test1\n"
+                in*)
+              error, current_list)
+            (error, current_list) list
+        in
+        error, current_list)
     | No_known_translation list ->
       (match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
@@ -1039,15 +1135,21 @@ let rec convert_views_internal_constraints_list_aux
                 let error, t' =
                   List.fold_left
                     (fun (error, t') (site, state) ->
-                      let error', t' =
-                        Site_graphs.KaSa_site_graph.add_state parameters error
-                          handler_kappa agent_id site state t'
-                      in
-                      let error =
-                        Exception.check_point Exception.warn parameters error
-                          error' __POS__ Exit
-                      in
-                      error, t')
+                      match
+                        Ckappa_sig.site_or_guard_p_of_guard_p_then_site site
+                          nr_guard_params
+                      with
+                      | Guard_p _ -> error, t' (*rTODO guards*)
+                      | Site site ->
+                        let error', t' =
+                          Site_graphs.KaSa_site_graph.add_state parameters error
+                            handler_kappa agent_id site state t'
+                        in
+                        let error =
+                          Exception.check_point Exception.warn parameters error
+                            error' __POS__ Exit
+                        in
+                        error, t')
                     (error, t) state_list
                 in
                 let refinement = t' :: current_list in
@@ -1079,11 +1181,17 @@ let convert_views_internal_constraints_list
   let error =
     Exception.check_point Exception.warn parameters error error' __POS__ Exit
   in
+  let nr_guard_params = get_nr_guard_parameters handler_kappa in
   let error, t =
     match translation with
     | Range (site, _) ->
-      Site_graphs.KaSa_site_graph.add_site parameters error handler_kappa
-        agent_id site t
+      (match
+         Ckappa_sig.site_or_guard_p_of_guard_p_then_site site nr_guard_params
+       with
+      | Guard_p _ -> error, t (*rTODO guards*)
+      | Site site ->
+        Site_graphs.KaSa_site_graph.add_site parameters error handler_kappa
+          agent_id site t)
     | Equiv _ | Imply _ | Partition _ | No_known_translation _ -> error, t
   in
   convert_views_internal_constraints_list_aux

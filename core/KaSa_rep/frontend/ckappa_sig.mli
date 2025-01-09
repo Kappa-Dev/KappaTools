@@ -34,6 +34,7 @@ type c_link_value
 type c_counter_name
 type c_guard_parameter
 type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
+type c_guard_p_then_site
 
 (****************************************************************************)
 
@@ -55,8 +56,8 @@ val dummy_link_value : c_link_value
 val dummy_site_name_1 : c_site_name
 val dummy_site_name_minus1 : c_site_name
 val next_link_value : c_link_value -> c_link_value
-val fst_site : c_site_name
-val snd_site : c_site_name
+val fst_site : c_guard_p_then_site (*rTODO maybe add nr_guard_params?*)
+val snd_site : c_guard_p_then_site
 val dummy_state_index_1 : c_state
 val string_of_agent_name : c_agent_name -> string
 val int_of_agent_name : c_agent_name -> int
@@ -70,7 +71,18 @@ val state_index_of_int : int -> c_state
 val int_of_state_index : c_state -> int
 val string_of_state_index : c_state -> string
 val guard_parameter_of_int : int -> c_guard_parameter
+val guard_p_then_site_of_int : int -> c_guard_p_then_site
+val int_of_guard_p_then_site : c_guard_p_then_site -> int
+val guard_p_then_site_of_site : c_site_name -> int -> c_guard_p_then_site
+val guard_p_then_site_of_guard : c_guard_parameter -> c_guard_p_then_site
+
+val guard_p_then_site_of_site_or_guard_p :
+  c_site_or_guard_p -> int -> c_guard_p_then_site
+
 val int_of_guard_parameter : c_guard_parameter -> int
+
+val site_or_guard_p_of_guard_p_then_site :
+  c_guard_p_then_site -> int -> c_site_or_guard_p
 
 val string_of_state_index_option_min :
   Remanent_parameters_sig.parameters -> c_state option -> string
@@ -91,6 +103,7 @@ val next_agent_id : c_agent_id -> c_agent_id
 val next_agent_name : c_agent_name -> c_agent_name
 val next_rule_id : c_rule_id -> c_rule_id
 val next_site_name : c_site_name -> c_site_name
+val next_guard_or_site_name : c_guard_p_then_site -> c_guard_p_then_site
 val next_state_index : c_state -> c_state
 val pred_site_name : c_site_name -> c_site_name
 val pred_agent_name : c_agent_name -> c_agent_name
@@ -375,6 +388,9 @@ module SiteOrGuard_map_and_set :
 
 module Site_map_and_set : Map_wrapper.S_with_logs with type elt = c_site_name
 
+module GuardSite_map_and_set :
+  Map_wrapper.S_with_logs with type elt = c_guard_p_then_site
+
 type c_interface = c_port Site_map_and_set.Map.t
 
 type c_proper_agent = {
@@ -485,6 +501,11 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
     with type key = c_agent_name * c_site_name
      and type dimension = int * int
 
+module Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
+  Int_storage.Storage
+    with type key = c_agent_name * c_guard_p_then_site
+     and type dimension = int * int
+
 module Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage
     with type key = c_agent_name * c_site_name
@@ -500,6 +521,11 @@ module Site_type_nearly_Inf_Int_storage_Imperatif :
 
 module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_site_name and type dimension = int
+
+module GuardPOrSite_nearly_Inf_Int_storage_Imperatif :
+  Int_storage.Storage
+    with type key = c_guard_p_then_site
+     and type dimension = int
 
 module State_index_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_state and type dimension = int
@@ -586,7 +612,9 @@ module AgentsSitePState_map_and_set :
     with type elt = c_agent_id * c_agent_name * c_site_name * pair_of_states
 
 module Views_bdu :
-  Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state
+  Mvbdu_wrapper.Mvbdu
+    with type key = c_guard_p_then_site
+     and type value = c_state
 
 module Views_intbdu :
   Mvbdu_wrapper.Internalized_mvbdu

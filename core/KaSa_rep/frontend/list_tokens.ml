@@ -53,6 +53,7 @@ let empty_handler parameters error =
       Cckappa_sig.nvars = 0;
       Cckappa_sig.nagents = Ckappa_sig.dummy_agent_name;
       Cckappa_sig.nrules = 0;
+      Cckappa_sig.nguard_params = 0;
       Cckappa_sig.agents_dic = Ckappa_sig.Dictionary_of_agents.init ();
       Cckappa_sig.agents_annotation = agent_annotation;
       Cckappa_sig.interface_constraints = int_constraints;
@@ -506,8 +507,16 @@ let scan_compil parameters error compil =
   let remanent =
     scan_perts scan_tested_mixture parameters remanent compil.Ast.perturbations
   in
-  let remanent =
+  let error, remanent =
     scan_rules scan_tested_mixture parameters remanent compil.Ast.rules
+  in
+  let remanent =
+    ( error,
+      {
+        remanent with
+        Cckappa_sig.nguard_params =
+          List.length remanent.Cckappa_sig.guard_parameters;
+      } )
   in
   let remanent = reverse_agents_annotation parameters remanent in
   remanent

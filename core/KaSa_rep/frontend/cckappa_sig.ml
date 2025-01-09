@@ -24,6 +24,7 @@ type kappa_handler = {
   nrules: int;
   nvars: int;
   nagents: Ckappa_sig.c_agent_name;
+  nguard_params: int;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:
     (string * Loc.t list)

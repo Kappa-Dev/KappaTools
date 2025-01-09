@@ -16,6 +16,7 @@ let local_trace = false
 let nrules _parameter _error handler = handler.Cckappa_sig.nrules
 let nvars _parameter _error handler = handler.Cckappa_sig.nvars
 let nagents _parameter _error handler = handler.Cckappa_sig.nagents
+let get_nr_guard_parameters handler = handler.Cckappa_sig.nguard_params
 
 let check_pos parameter ka_pos ml_pos message error error' =
   match ml_pos with
@@ -619,6 +620,19 @@ let string_of_site_contact_map ?(ml_pos = None) ?(ka_pos = None) ?(message = "")
       agent_name site_int
   in
   error, print_site_contact_map site_type
+
+let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
+    ?(message = "") parameter error handler_kappa agent_name site_or_guard_int =
+  let nr_guard_params = get_nr_guard_parameters handler_kappa in
+  match
+    Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_or_guard_int
+      nr_guard_params
+  with
+  | Ckappa_sig.Site s ->
+    string_of_site_contact_map ~ml_pos ~ka_pos ~message parameter error
+      handler_kappa agent_name s
+  | Ckappa_sig.Guard_p g ->
+    string_of_guard g handler_kappa.Cckappa_sig.guard_parameters error
 
 let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple in

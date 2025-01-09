@@ -249,6 +249,17 @@ val string_of_site_contact_map :
   Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
+val string_of_site_or_guard_contact_map :
+  ?ml_pos:(string * int * int * int) option ->
+  ?ka_pos:Loc.t option ->
+  ?message:string ->
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Quark_type.agent_quark ->
+  Ckappa_sig.c_guard_p_then_site ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
+
 val string_of_site_in_natural_language :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->

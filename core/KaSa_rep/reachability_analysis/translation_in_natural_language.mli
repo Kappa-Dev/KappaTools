@@ -13,23 +13,23 @@
  * under the terms of the GNU Library General Public License *)
 
 type token =
-  | Range of Ckappa_sig.c_site_name * Ckappa_sig.c_state list
+  | Range of Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state list
   | Equiv of
-      (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
+      * (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
   | Imply of
-      (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
+      * (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
   | Partition of
-      (Ckappa_sig.c_site_name * (Ckappa_sig.c_state * token list) list)
+      (Ckappa_sig.c_guard_p_then_site * (Ckappa_sig.c_state * token list) list)
   | No_known_translation of
-      (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list
+      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state) list list
 
 type rename_sites =
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
-  Ckappa_sig.Site_map_and_set.Map.elt ->
-  Exception.exceptions_caught_and_uncaught * Ckappa_sig.Site_map_and_set.Map.elt
+  Ckappa_sig.c_guard_p_then_site ->
+  Exception.exceptions_caught_and_uncaught * Ckappa_sig.c_guard_p_then_site
 
 val non_relational :
   Remanent_parameters_sig.parameters ->
