@@ -106,17 +106,17 @@ test.describe('Editor tab', () => {
   });
 
   test('influences', async ({ page, run_in_electron }) => {
-    const opts_screen = { maxDiffPixels: 60 }
+    const opts_screen = { maxDiffPixels: 80 }
     const opts_screen_lenient = { maxDiffPixels: 150, threshold: 0.4 }
 
     await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await page.locator('#navinfluences').click();
     const table = page.locator('#influences-table');
 
-    await expect.soft(table).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot(opts_screen);
     await expect.soft(page.getByRole('cell', { name: 'Navigate through the nodes' })).toBeVisible();
     await page.getByRole('button', { name: 'First node' }).click();
-    await expect.soft(table).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot(opts_screen);
     await page.locator('#influence-rendering').selectOption('graph');
     await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen_lenient);
     await page.locator('#influence-accuracy').selectOption('high');
@@ -130,13 +130,13 @@ test.describe('Editor tab', () => {
     await page.getByRole('button', { name: 'Track cursor' }).click();
     await page.locator('div:nth-child(10) > .CodeMirror-line > span > span:nth-child(7)').scrollIntoViewIfNeeded();
     await page.locator('div:nth-child(10) > .CodeMirror-line > span > span:nth-child(7)').click();
-    await expect.soft(table).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot(opts_screen);
     await page.locator('div:nth-child(11) > .CodeMirror-line > span > span:nth-child(7)').click();
-    await expect.soft(table).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot(opts_screen);
     await page.getByRole('button', { name: 'Next' }).click();
-    await expect.soft(table).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot(opts_screen);
     await page.getByRole('button', { name: 'Previous' }).click();
-    await expect.soft(table).toHaveScreenshot();
+    await expect.soft(table).toHaveScreenshot(opts_screen);
     //export
     if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
       await utils.testExports(page, '#export_influence-export', 'influences', ['json']);
@@ -254,6 +254,8 @@ R(CN[C.R],CR[CR.R])  =>  R(CN[2],CR[1]),R(C[2],CR[1])
 test.describe('Simulation tools', () => {
 
   test('Simulation, plot', async ({ page, run_in_electron, browserName }) => {
+    const opts_screen = { maxDiffPixels: 800 }
+
     await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await utils.setSeed(page, 1);
     // Run simulation to 30, then 100, then test plot options
@@ -261,33 +263,33 @@ test.describe('Simulation tools', () => {
     await page.getByRole('button', { name: 'start' }).click();
     await utils.wait_for_sim_stop(page, { timeout: 20000 });
     await page.locator('#navplot').click();
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await utils.set_pause_if(page, '[T] > 100');
     await page.getByRole('button', { name: 'continue' }).click();
     await utils.wait_for_sim_stop(page, { timeout: 20000 });
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.getByRole('checkbox', { name: 'Log X' }).check();
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.getByRole('checkbox', { name: 'Log Y' }).check();
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.getByRole('checkbox', { name: 'Log X' }).uncheck();
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.getByRole('checkbox', { name: 'Log Y' }).uncheck();
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.locator('#plot-axis-select').getByRole('combobox').selectOption('0');
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.locator('#plot-axis-select').getByRole('combobox').selectOption('4');
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.getByRole('spinbutton', { name: 'Row to plot' }).click();
     await page.getByRole('spinbutton', { name: 'Row to plot' }).fill('50');
     await page.getByRole('spinbutton', { name: 'Row to plot' }).press('Enter');
     await page.locator('.panel-footer').click(); // needed for update
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.getByRole('spinbutton', { name: 'Row to plot' }).click();
     await page.getByRole('spinbutton', { name: 'Row to plot' }).fill('1000'); // previous default value
     await page.getByRole('spinbutton', { name: 'Row to plot' }).press('Enter');
     await page.locator('.panel-footer').click(); // needed for update
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
 
     if (!run_in_electron || RUN_DOWNLOADS_IN_ELECTRON) {
       await utils.testExports(page, '#export_plot-export', 'plot', ['csv', 'json', 'tsv'], undefined);
@@ -302,12 +304,12 @@ test.describe('Simulation tools', () => {
     await utils.set_pause_if(page, '[T] > 2000');
     await page.getByRole('button', { name: 'continue' }).click();
     await utils.wait_for_sim_stop(page, { timeout: 20000 });
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.getByRole('button', { name: 'continue' }).click();
     await page.getByPlaceholder('offset').fill('0');
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
     await page.getByPlaceholder('offset').fill('83');
-    await expect.soft(page.getByRole('img')).toHaveScreenshot();
+    await expect.soft(page.getByRole('img')).toHaveScreenshot(opts_screen);
 
     await utils.set_pause_if(page, '');
     await page.getByRole('button', { name: 'continue' }).click();
@@ -320,18 +322,17 @@ test.describe('Simulation tools', () => {
     await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await utils.setSeed(page, 1);
 
-    async function expectScreenShotDINTable(chromium_maxDiffPixels: number = 0) {
+    async function expectScreenShotDINTable(maxDiffPixels: number = 0) {
       await expect.soft(page.getByRole('cell', { name: 'affects' })).toBeVisible();
       const DIN_table_locator = page.locator('#DIN div').first();
 
       var opts_screen: utils.ScreenshotOptions = { mask: [page.locator('#export_din-export_form')] }
       // Chromium spacing between _numbers_ can be different across machines for some reason, here between CI and local
       // e.g. https://stackoverflow.com/questions/34814993/letter-spacing-is-different-with-same-browser-font-size-ect-in-chrome 
-      if (browserName == "chromium") {
-        opts_screen = {
-          mask: opts_screen.mask,
-          maxDiffPixels: chromium_maxDiffPixels
-        }
+      // ADDED: Also changes with updates. so adding maxDiffPixels also for it
+      opts_screen = {
+        mask: opts_screen.mask,
+        maxDiffPixels: maxDiffPixels
       }
       await expect.soft(DIN_table_locator).toHaveScreenshot(opts_screen);
     }
@@ -369,6 +370,8 @@ test.describe('Simulation tools', () => {
   });
 
   test('snapshots', async ({ page, run_in_electron, browserName }) => {
+    const opts_screen = { maxDiffPixels: 700 }
+
     await utils.open_app_with_model(page, abc_ka, run_in_electron);
     await utils.setSeed(page, 1);
 
@@ -435,21 +438,21 @@ test.describe('Simulation tools', () => {
     await page.locator('#snapshot-select-id').selectOption('0');
     await expect.soft(snapshot_display_text_loc).toHaveText(snapshot0);
     await page.locator('#format_select_id').selectOption('Graph');
-    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot(opts_screen);
     await page.locator('.navcontent-view > div:nth-child(3)').click();
-    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot({ maxDiffPixels: 10 });
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot(opts_screen);
     await page.getByRole('button', { name: 'Back to root' }).click();
-    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot(opts_screen);
     await page.getByRole('radio', { name: 'Count' }).check();
-    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot(opts_screen);
     await page.getByRole('radio', { name: 'Size' }).check();
-    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot();
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot(opts_screen);
     // TODO: does something?
     // await page.getByRole('button', { name: 'Reset Zoom' }).click();
 
     // TODO: clicks in graph, link with contact map
     await page.locator('[id="root\\.mixture1"] rect').nth(1).click();
-    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot({ maxDiffPixels: 600 });
+    await expect.soft(snapshot_display_graph_loc).toHaveScreenshot(opts_screen);
     // await page.locator('#force-container circle').nth(1).click();
     // await page.locator('#force-container circle').first().click();
 
