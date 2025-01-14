@@ -232,6 +232,10 @@ module Domain = struct
     let error, result_static = get_bdu_analysis_static static error in
     error, result_static.Bdu_static_views.store_modif_list_restriction_map
 
+    let get_store_guard_bdu static error =
+      let error, result_static = get_bdu_analysis_static static error in
+      error, result_static.Bdu_static_views.store_guard_bdu
+
   let get_site_to_renamed_site_list static error =
     let error, result_static = get_bdu_analysis_static static error in
     error, result_static.Bdu_static_views.site_to_renamed_site_list
@@ -2475,7 +2479,7 @@ module Domain = struct
   (***********************************************************)
   (*deal with views*)
 
-  let compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X =
+  let compute_bdu_update_aux static dynamic error rule_id bdu_test list_a bdu_X =
     let parameters = get_parameter static in
     let parameter_views =
       Remanent_parameters.update_prefix parameters "\t\t\t"
@@ -2490,9 +2494,18 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_redefine parameter_views handler error
         bdu_inter list_a
     in
-    (*do the union of bdu_redefine and bdu_X*)
+    (*conjunction with the guard*)
+    let error, store_guard_bdu = get_store_guard_bdu static error in
+    let error, handler, bdu_with_guard =
+    match Ckappa_sig.Rule_setmap.Map.find_option rule_id store_guard_bdu with
+    | None -> error, handler, bdu_redefine
+    | Some guard_bdu ->
+      Ckappa_sig.Views_bdu.mvbdu_and parameter_views handler error
+      bdu_redefine guard_bdu
+    in
+    (*do the union of bdu_with_guard and bdu_X*)
     let error, handler, bdu_result =
-      Ckappa_sig.Views_bdu.mvbdu_or parameter_views handler error bdu_redefine
+      Ckappa_sig.Views_bdu.mvbdu_or parameter_views handler error bdu_with_guard
         bdu_X
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -2500,9 +2513,9 @@ module Domain = struct
 
   (*************************************************************)
 
-  let compute_bdu_update_views static dynamic error bdu_test list_a bdu_X =
+  let compute_bdu_update_views static dynamic error rule_id bdu_test list_a bdu_X =
     let error, dynamic, bdu_result =
-      compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X
+      compute_bdu_update_aux static dynamic error rule_id bdu_test list_a bdu_X
     in
     error, dynamic, bdu_result
 
@@ -2608,7 +2621,7 @@ module Domain = struct
             | error, None -> error, dynamic, bdu_X
             | error, Some list_a ->
               let error, dynamic, bdu_update =
-                compute_bdu_update_views static dynamic error bdu_test list_a
+                compute_bdu_update_views static dynamic error rule_id bdu_test list_a
                   bdu_X
               in
               error, dynamic, bdu_update
