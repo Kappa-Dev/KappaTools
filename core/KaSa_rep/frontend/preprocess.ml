@@ -2248,7 +2248,7 @@ let translate_c_compil parameters error handler compil =
         let error, c_rule =
           translate_rule parameters error handler
             ( r1,
-              LKappa_compiler.guard_params_to_int_option guard_params guard,
+              LKappa_compiler.guard_params_to_int_option Ckappa_sig.guard_parameter_of_int guard_params guard,
               r2 )
         in
         error, c_rule :: list)

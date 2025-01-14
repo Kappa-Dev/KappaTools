@@ -281,6 +281,7 @@ let store_remanent parameters error covering_class _modified_map remanent
     @ List.init nr_guard_params (fun x ->
           Ckappa_sig.Guard_p (Ckappa_sig.guard_parameter_of_int x))
   in
+  (*-------------------------------------------------------------------------*)
   (* current state of remanent*)
   let pointer_backward =
     remanent.Covering_classes_type.store_pointer_backward
