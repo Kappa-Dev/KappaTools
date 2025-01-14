@@ -969,16 +969,8 @@ let next_state_index = succ
 let compare_rule_id = compare
 let compare_agent_id = compare
 let compare_site_name = compare
-let compare_guard_p = compare
 let compare_state_index = compare
 let compare_agent_name = compare
-
-let compare_site_or_guard a b =
-  match a,b with
-  | Site a, Site b -> compare_site_name a b
-  | Guard_p a, Guard_p b -> compare_guard_p a b
-  | Guard_p _ , _ -> -1
-  | Site _, _ -> 1
 
 let compare_state_index_option_min a b =
   match a, b with

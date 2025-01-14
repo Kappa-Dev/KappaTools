@@ -2554,16 +2554,17 @@ let guard_param_to_int f =
         raise
           (ExceptionDefn.Malformed_Decl ("Unknown guard parameter", Loc.dummy)))
 
-let guard_param_to_string =
+let guard_param_to_string f =
   guard_param_conversion (fun p guard_params ->
-      List.nth guard_params p (*rTODO error handling*))
+      List.nth guard_params (f p) (*rTODO error handling*))
 
 let guard_params_to_int_option f guard_params g =
   Option.map (guard_param_to_int f guard_params) g
 
 let guard_params_to_int_in_rules guard_params rules =
   List.map
-    (fun (r1, g, r2) -> r1, guard_params_to_int_option (fun x -> x) guard_params g, r2)
+    (fun (r1, g, r2) ->
+      r1, guard_params_to_int_option (fun x -> x) guard_params g, r2)
     rules
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil

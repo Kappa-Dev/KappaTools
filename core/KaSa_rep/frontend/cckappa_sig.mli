@@ -152,7 +152,7 @@ type rule = {
   diff_direct: diff_views;
   diff_reverse: diff_views;
   actions: actions;
-  guard: int LKappa.guard option;
+  guard: Ckappa_sig.c_guard_parameter LKappa.guard option;
 }
 
 type modif_expr =

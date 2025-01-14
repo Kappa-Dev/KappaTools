@@ -64,10 +64,13 @@ type ast_compiled_data = {
 }
 
 val guard_param_to_string :
-  string list -> int LKappa.guard -> string LKappa.guard
+  ('a -> int) -> string list -> 'a LKappa.guard -> string LKappa.guard
 
 val guard_params_to_int_option :
-  (int -> 'a) -> string list -> string LKappa.guard option -> 'a LKappa.guard option
+  (int -> 'a) ->
+  string list ->
+  string LKappa.guard option ->
+  'a LKappa.guard option
 
 val compil_of_ast :
   warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->

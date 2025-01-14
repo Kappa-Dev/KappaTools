@@ -53,8 +53,7 @@ type bdu_analysis_static = {
   store_proj_bdu_test_restriction:
     Ckappa_sig.Views_bdu.mvbdu Covering_classes_type.AgentsCV_setmap.Map.t
     Ckappa_sig.Rule_setmap.Map.t;
-  store_guard_bdu:
-    Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t;
+  store_guard_bdu: Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t;
   site_to_renamed_site_list:
     (Covering_classes_type.cv_id * Ckappa_sig.c_guard_p_then_site) list
     Ckappa_sig
@@ -80,6 +79,7 @@ let init_bdu_analysis_static parameters error =
       store_proj_bdu_potential_restriction_map =
         Ckappa_sig.Rule_setmap.Map.empty;
       store_proj_bdu_test_restriction = Ckappa_sig.Rule_setmap.Map.empty;
+      store_guard_bdu = Ckappa_sig.Rule_setmap.Map.empty;
       site_to_renamed_site_list = init_site_to_renamed_site_list;
     }
   in
@@ -811,32 +811,52 @@ let collect_proj_bdu_test_restriction parameters handler_kappa handler error
 
 let rec guard_to_bdu parameters error handler_bdu guard =
   match guard with
-  | Kappa_terms.LKappa.True -> Ckappa_sig.Views_bdu.mvbdu_true parameters handler_bdu error
-  | Kappa_terms.LKappa.False -> Ckappa_sig.Views_bdu.mvbdu_false parameters handler_bdu error
+  | Kappa_terms.LKappa.True ->
+    Ckappa_sig.Views_bdu.mvbdu_true parameters handler_bdu error
+  | Kappa_terms.LKappa.False ->
+    Ckappa_sig.Views_bdu.mvbdu_false parameters handler_bdu error
   | Kappa_terms.LKappa.Param a ->
     let error, handler_bdu, association_list =
-    Ckappa_sig.Views_bdu.build_association_list parameters handler_bdu error [Ckappa_sig.guard_p_then_site_of_guard a, Ckappa_sig.dummy_state_index_true] in
-    Ckappa_sig.Views_bdu.mvbdu_of_hconsed_asso parameters handler_bdu error association_list
+      Ckappa_sig.Views_bdu.build_association_list parameters handler_bdu error
+        [
+          ( Ckappa_sig.guard_p_then_site_of_guard a,
+            Ckappa_sig.dummy_state_index_true );
+        ]
+    in
+    Ckappa_sig.Views_bdu.mvbdu_of_hconsed_asso parameters handler_bdu error
+      association_list
   | Kappa_terms.LKappa.Not g1 ->
-  let error, handler_bdu, mvbdu1 = guard_to_bdu parameters error handler_bdu g1 in
-  Ckappa_sig.Views_bdu.mvbdu_not parameters handler_bdu error mvbdu1
+    let error, handler_bdu, mvbdu1 =
+      guard_to_bdu parameters error handler_bdu g1
+    in
+    Ckappa_sig.Views_bdu.mvbdu_not parameters handler_bdu error mvbdu1
   | Kappa_terms.LKappa.And (g1, g2) ->
-    let error, handler_bdu, mvbdu1 = guard_to_bdu parameters error handler_bdu g1 in
-    let error, handler_bdu, mvbdu2 = guard_to_bdu parameters error handler_bdu g2 in
- Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 mvbdu2
+    let error, handler_bdu, mvbdu1 =
+      guard_to_bdu parameters error handler_bdu g1
+    in
+    let error, handler_bdu, mvbdu2 =
+      guard_to_bdu parameters error handler_bdu g2
+    in
+    Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 mvbdu2
   | Kappa_terms.LKappa.Or (g1, g2) ->
-    let error, handler_bdu, mvbdu1 = guard_to_bdu parameters error handler_bdu g1 in
-    let error, handler_bdu, mvbdu2 = guard_to_bdu parameters error handler_bdu g2 in
- Ckappa_sig.Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
+    let error, handler_bdu, mvbdu1 =
+      guard_to_bdu parameters error handler_bdu g1
+    in
+    let error, handler_bdu, mvbdu2 =
+      guard_to_bdu parameters error handler_bdu g2
+    in
+    Ckappa_sig.Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
 
-
-let collect_guard_bdu parameters handler_bdu error
-     rule_id rule store_guard_bdu =
+let collect_guard_bdu parameters handler_bdu error rule_id rule store_guard_bdu
+    =
   match rule.Cckappa_sig.guard with
   | None -> (error, handler_bdu), store_guard_bdu
   | Some guard ->
-    let error, handler_bdu, bdu = guard_to_bdu parameters error handler_bdu guard in
-    (error, handler_bdu), Ckappa_sig.Rule_setmap.Map.add rule_id bdu store_guard_bdu
+    let error, handler_bdu, bdu =
+      guard_to_bdu parameters error handler_bdu guard
+    in
+    ( (error, handler_bdu),
+      Ckappa_sig.Rule_setmap.Map.add rule_id bdu store_guard_bdu )
 
 (***************************************************************************)
 
@@ -921,11 +941,11 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
       rule_id rule (*store_new_index_pair_map*)
       store_remanent_triple store_result.store_proj_bdu_test_restriction
   in
-   (*------------------------------------------------------------------------*)
-   let (error, handler_bdu), store_guard_bdu =
-   collect_guard_bdu parameters handler_bdu error
-     rule_id rule store_result.store_guard_bdu
- in
+  (*------------------------------------------------------------------------*)
+  let (error, handler_bdu), store_guard_bdu =
+    collect_guard_bdu parameters handler_bdu error rule_id rule
+      store_result.store_guard_bdu
+  in
   (*------------------------------------------------------------------------*)
   let error, log_info =
     StoryProfiling.StoryStats.close_event parameters error

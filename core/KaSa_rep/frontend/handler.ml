@@ -245,7 +245,8 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
     let guard_params = compiled.Cckappa_sig.guard_params in
     let guard =
       Option.map
-        (LKappa_compiler.guard_param_to_string guard_params)
+        (LKappa_compiler.guard_param_to_string Ckappa_sig.int_of_guard_parameter
+           guard_params)
         rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.guard
     in
     error, (label, position, direction, ast, guard, rule_id)
