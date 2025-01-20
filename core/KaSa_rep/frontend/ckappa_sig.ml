@@ -186,6 +186,7 @@ let next_link_value (i : c_link_value) : c_link_value = i + 1
 let site_name_of_int (a : int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
 let string_of_site_name (a : c_site_name) : string = string_of_int a
+let string_of_guard_p_then_site (a : c_guard_p_then_site) : string = string_of_int a
 
 let string_of_site_or_guard (a : c_site_or_guard_p) : string =
   match a with

@@ -18,6 +18,9 @@ let _ = trace
 let get_nr_guard_parameters kappa_handler =
   kappa_handler.Cckappa_sig.nguard_params
 
+let get_guard_parameters kappa_handler =
+  kappa_handler.Cckappa_sig.guard_parameters
+
 type token =
   (*rTODO maybe change this*)
   | Range of Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state list
@@ -444,6 +447,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
   in
   let log = Remanent_parameters.get_logger parameters in
   let nr_guard_params = get_nr_guard_parameters handler_kappa in
+  let guard_parameters = get_guard_parameters handler_kappa in
   let error, () =
     match translation with
     | Range (site_type, state_list) ->
@@ -451,7 +455,26 @@ let rec print ?beginning_of_sentence:(beggining = true)
          Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_type
            nr_guard_params
        with
-      | Guard_p _ -> error, () (*rTODO print guards*)
+      | Guard_p guard_param ->
+        let guard_p_string =
+          List.nth guard_parameters
+            (Ckappa_sig.int_of_guard_parameter guard_param)
+          (*rTODO error handling*)
+        in
+        let state_list_string =
+          List.map
+            (fun s ->
+              match Ckappa_sig.int_of_state_index s with
+              | 0 -> "false"
+              | 1 -> "true"
+              | _ -> "(error: guard_state > 1)")
+            state_list
+        in
+        Loggers.fprintf log "DDM%s{%s}" guard_p_string
+          (List.fold_left
+             (fun string state -> string ^ ", " ^ state)
+             "" state_list_string);
+        error, () (*rTODO print guards*)
       | Site site_type ->
         if dim_min <= 1 then (
           match Remanent_parameters.get_backend_mode parameters with

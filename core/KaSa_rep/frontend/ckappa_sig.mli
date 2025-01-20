@@ -67,6 +67,7 @@ val site_name_of_int : int -> c_site_name
 val int_of_site_name : c_site_name -> int
 val string_of_site_name : c_site_name -> string
 val string_of_site_or_guard : c_site_or_guard_p -> string
+val string_of_guard_p_then_site : c_guard_p_then_site -> string
 val state_index_of_int : int -> c_state
 val int_of_state_index : c_state -> int
 val string_of_state_index : c_state -> string

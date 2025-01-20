@@ -587,8 +587,18 @@ let string_of_site parameter error handler_kappa ?state
   in
   error, print_site parameter ?state ~add_parentheses site_type
 
-let string_of_guard g guard_params error =
-  error, List.nth guard_params (Ckappa_sig.int_of_guard_parameter g)
+let string_of_guard g guard_params ?state error =
+  let guard_param_name =
+    List.nth guard_params (Ckappa_sig.int_of_guard_parameter g)
+  in
+  match state with
+  | None -> error, guard_param_name
+  | Some s ->
+    (match Ckappa_sig.int_of_state_index s with
+    | 0 -> error, guard_param_name ^ "{false}"
+    | 1 -> error, guard_param_name ^ "{true}"
+    | _ -> error, guard_param_name ^ "{undefined}")
+
 (*rTODO error handling*)
 
 let string_of_site_or_guard parameter error handler_kappa ?state
@@ -598,7 +608,7 @@ let string_of_site_or_guard parameter error handler_kappa ?state
     string_of_site parameter error handler_kappa ?state ~add_parentheses
       agent_type s
   | Ckappa_sig.Guard_p g ->
-    string_of_guard g handler_kappa.Cckappa_sig.guard_parameters error
+    string_of_guard g handler_kappa.Cckappa_sig.guard_parameters ?state error
 
 (*this function used in views_domain*)
 let string_of_site_update_views parameter error handler_kappa agent_type

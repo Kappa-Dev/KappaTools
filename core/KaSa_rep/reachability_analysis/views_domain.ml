@@ -304,9 +304,11 @@ module Domain = struct
     let potential_side_effects = get_potential_side_effects static in
     let log_info = get_log_info dynamic in
     let remanent_triple = get_remanent_triple static in
+    let site_correspondence = get_site_correspondence_array static in
     let error, (handler_bdu, log_info, result) =
       Bdu_static_views.scan_rule_set parameters log_info handler_bdu error
         kappa_handler compiled potential_side_effects remanent_triple
+        site_correspondence
     in
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
@@ -845,11 +847,11 @@ module Domain = struct
   (*build bdu restriction for initial state *)
 
   let bdu_build static dynamic error
-      (pair_list : (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state) list) =
+      (pair_list : (Ckappa_sig.c_guard_p_then_site * (Ckappa_sig.c_state option * Ckappa_sig.c_state option)) list) =
     let parameters = get_parameter static in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_result =
-      Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters handler error
+      Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters handler error
         pair_list
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -888,13 +890,22 @@ module Domain = struct
                 in
                 let error, (dynamic, event_list) =
                   List.fold_left
-                    (fun (error, (dynamic, event_list)) (cv_id, map_res) ->
+                    (fun (error, (dynamic, event_list))
+                         (cv_id, map_res, guard_p_list) ->
                       let error, pair_list =
                         Ckappa_sig.GuardSite_map_and_set.Map.fold
                           (fun site' state (error, current_list) ->
-                            let pair_list = (site', state) :: current_list in
+                            let pair_list = (site', (Some state, Some state)) :: current_list in
                             error, pair_list)
                           map_res (error, [])
+                      in
+                      (*add all guard parameters with values true and false to the initial state*)
+                      let pair_list =
+                        pair_list
+                        @ List.map
+                            (fun guard ->
+                              guard, (Some Ckappa_sig.dummy_state_index_false, Some Ckappa_sig.dummy_state_index_true))
+                            guard_p_list
                       in
                       let error, dynamic, bdu_init =
                         bdu_build static dynamic error pair_list
@@ -2479,8 +2490,8 @@ module Domain = struct
   (***********************************************************)
   (*deal with views*)
 
-  let compute_bdu_update_aux static dynamic error rule_id bdu_test list_a bdu_X
-      =
+  let compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X
+      bdu_guard =
     let parameters = get_parameter static in
     let parameter_views =
       Remanent_parameters.update_prefix parameters "\t\t\t"
@@ -2496,15 +2507,10 @@ module Domain = struct
         bdu_inter list_a
     in
     (*conjunction with the guard*)
-    let error, store_guard_bdu = get_store_guard_bdu static error in
     let error, handler, bdu_with_guard =
-      match Ckappa_sig.Rule_setmap.Map.find_option rule_id store_guard_bdu with
-      | None -> error, handler, bdu_redefine
-      | Some guard_bdu ->
-        Ckappa_sig.Views_bdu.mvbdu_and parameter_views handler error
-          bdu_redefine guard_bdu
+      Ckappa_sig.Views_bdu.mvbdu_and parameter_views handler error bdu_guard
+        bdu_redefine
     in
-    (*do the union of bdu_with_guard and bdu_X*)
     let error, handler, bdu_result =
       Ckappa_sig.Views_bdu.mvbdu_or parameter_views handler error bdu_with_guard
         bdu_X
@@ -2514,20 +2520,27 @@ module Domain = struct
 
   (*************************************************************)
 
-  let compute_bdu_update_views static dynamic error rule_id bdu_test list_a
-      bdu_X =
+  let compute_bdu_update_views static dynamic error bdu_test list_a bdu_X
+      bdu_guard =
     let error, dynamic, bdu_result =
-      compute_bdu_update_aux static dynamic error rule_id bdu_test list_a bdu_X
+      compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X
+        bdu_guard
     in
     error, dynamic, bdu_result
 
   (***************************************************************)
 
-  let compute_bdu_update_creation static dynamic error bdu_creation bdu_X =
+  let compute_bdu_update_creation static dynamic error bdu_creation bdu_X
+      bdu_guard =
     let parameters = get_parameter static in
     let handler = get_mvbdu_handler dynamic in
+    let error, handler, bdu_with_guard =
+      Ckappa_sig.Views_bdu.mvbdu_and parameters handler error bdu_creation
+        bdu_guard
+    in
     let error, handler, bdu_result =
-      Ckappa_sig.Views_bdu.mvbdu_or parameters handler error bdu_creation bdu_X
+      Ckappa_sig.Views_bdu.mvbdu_or parameters handler error bdu_with_guard
+        bdu_X
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_result
@@ -2565,6 +2578,7 @@ module Domain = struct
     let error, store_proj_bdu_test_restriction =
       get_store_proj_bdu_test_restriction static error
     in
+    let error, store_guard_bdu = get_store_guard_bdu static error in
     let error, proj_bdu_test_restriction =
       match
         Ckappa_sig.Rule_setmap.Map.find_option rule_id
@@ -2613,6 +2627,19 @@ module Domain = struct
             | None -> error, bdu_true
             | Some bdu -> error, bdu
           in
+          let error, bdu_guard =
+            match
+              Ckappa_sig.Rule_setmap.Map.find_option rule_id store_guard_bdu
+            with
+            | None -> error, bdu_true
+            | Some map_guard_bdu ->
+              (match
+                 Covering_classes_type.AgentCV_setmap.Map.find_option
+                   (agent_type, cv_id) map_guard_bdu
+               with
+              | None -> error, bdu_true
+              | Some guard_bdu -> error, guard_bdu)
+          in
           let error, dynamic, bdu_update =
             match
               Covering_classes_type.AgentsRuleCV_map_and_set.Map
@@ -2623,8 +2650,8 @@ module Domain = struct
             | error, None -> error, dynamic, bdu_X
             | error, Some list_a ->
               let error, dynamic, bdu_update =
-                compute_bdu_update_views static dynamic error rule_id bdu_test
-                  list_a bdu_X
+                compute_bdu_update_views static dynamic error bdu_test list_a
+                  bdu_X bdu_guard
               in
               error, dynamic, bdu_update
           in
@@ -2653,6 +2680,7 @@ module Domain = struct
       | None -> error, Covering_classes_type.AgentCV_setmap.Map.empty
       | Some map -> error, map
     in
+    let error, store_guard_bdu = get_store_guard_bdu static error in
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
       Covering_classes_type.AgentCV_setmap.Map.fold
@@ -2660,6 +2688,7 @@ module Domain = struct
           let error, dynamic, bdu_false =
             get_mvbdu_false static dynamic error
           in
+          let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
           let fixpoint_result = get_fixpoint_result dynamic in
           let error, bdu_X =
             match
@@ -2670,8 +2699,22 @@ module Domain = struct
             | error, None -> error, bdu_false
             | error, Some bdu -> error, bdu
           in
+          let error, bdu_guard =
+            match
+              Ckappa_sig.Rule_setmap.Map.find_option rule_id store_guard_bdu
+            with
+            | None -> error, bdu_true
+            | Some map_guard_bdu ->
+              (match
+                 Covering_classes_type.AgentCV_setmap.Map.find_option
+                   (agent_type, cv_id) map_guard_bdu
+               with
+              | None -> error, bdu_true
+              | Some guard_bdu -> error, guard_bdu)
+          in
           let error, dynamic, bdu_update =
             compute_bdu_update_creation static dynamic error bdu_creation bdu_X
+              bdu_guard
           in
           let error, dynamic, event_list =
             add_link ~title:"Dealing with creation" error static dynamic
@@ -2774,6 +2817,7 @@ module Domain = struct
             | error, Some bdu -> error, bdu
           in
           let error, dynamic, bdu_update =
+            (*rTODO add guard bdu*)
             compute_bdu_update_side_effects static dynamic error bdu_test
               list_modif bdu_X
           in
