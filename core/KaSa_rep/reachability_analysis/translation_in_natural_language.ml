@@ -100,8 +100,6 @@ let try_partitioning parameters handler error
         Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler error
           proj_in
       in
-      print_string "LENGTH: ";
-      print_int (List.length list_asso);
       let error =
         Exception.check_point Exception.warn parameters error error_4 __POS__
           Exit
