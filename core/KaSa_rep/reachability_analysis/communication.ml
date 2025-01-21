@@ -124,6 +124,14 @@ type precondition = {
     * Ckappa_sig.c_state list Usual_domains.flat_lattice;
   cache_state_of_sites:
     Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t;
+  (* rTODO state_of_guard_parameters_in_precondition:
+     Remanent_parameters_sig.parameters ->
+     Exception.exceptions_caught_and_uncaught ->
+     Analyzer_headers.global_dynamic_information ->
+     Exception.exceptions_caught_and_uncaught
+     * Analyzer_headers.global_dynamic_information
+     * Ckappa_sig.Views_bdu.mvbdu; *)
+  cache_state_of_guard_parameters: Ckappa_sig.Views_bdu.mvbdu option;
   partner_map:
     Exception.exceptions_caught_and_uncaught ->
     Ckappa_sig.c_agent_name ->
@@ -158,6 +166,14 @@ let the_rule_is_applied_for_the_first_time p e wp =
 let the_rule_is_not_applied_for_the_first_time p e wp =
   the_rule_is_or_not_applied_for_the_first_time false p e wp
 
+let get_state_of_guard_parameters parameters handler error precondition =
+  match precondition.cache_state_of_guard_parameters with
+  | None -> Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
+  | Some bdu -> error, handler, bdu
+
+let set_state_of_guard_parameters precondition bdu =
+  { precondition with cache_state_of_guard_parameters = Some bdu }
+
 let dummy_precondition =
   {
     precondition_dummy = ();
@@ -165,6 +181,7 @@ let dummy_precondition =
     state_of_sites_in_precondition =
       (fun _ error dynamic _ -> error, dynamic, Usual_domains.Any);
     cache_state_of_sites = PathMap.empty Usual_domains.Any;
+    cache_state_of_guard_parameters = None;
     partner_map = (fun error _ _ _ -> error, Usual_domains.Any);
     partner_fold = (fun _ error _ _ -> error, Usual_domains.Any);
   }

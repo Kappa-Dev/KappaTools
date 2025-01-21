@@ -105,6 +105,18 @@ val the_rule_is_not_applied_for_the_first_time :
   precondition ->
   Exception.exceptions_caught_and_uncaught * precondition
 
+val get_state_of_guard_parameters :
+  Remanent_parameters_sig.parameters ->
+  Ckappa_sig.Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  precondition ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * Ckappa_sig.Views_bdu.mvbdu
+
+val set_state_of_guard_parameters :
+  precondition -> Ckappa_sig.Views_bdu.mvbdu -> precondition
+
 (*val get_state_of_site:
   Exception.exceptions_caught_and_uncaught ->
   Analyzer_headers.global_dynamic_information ->
