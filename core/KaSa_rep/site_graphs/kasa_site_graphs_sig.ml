@@ -10,27 +10,22 @@ module type Site_graph = sig
     | Binding_type of string * string
     | Bound_to of bond_index
 
+  type string_version =
+    ((string
+     * (string option * binding_state option * (int option * int option) option)
+       Wrapped_modules.LoggedStringMap.t)
+    * string option Wrapped_modules.LoggedStringMap.t)
+    Ckappa_sig.Agent_id_map_and_set.Map.t
+
   val binding_state_to_json : binding_state -> Yojson.Basic.t
   val binding_state_of_json : Yojson.Basic.t -> binding_state
   val int_of_bond_index : bond_index -> int
   val bond_index_of_int : int -> bond_index
   val empty : t
+  val get_string_version : t -> string_version
 
-  val get_string_version :
-    t ->
-    (string
-    * (string option * binding_state option * (int option * int option) option)
-      Wrapped_modules.LoggedStringMap.t)
-    Ckappa_sig.Agent_id_map_and_set.Map.t
-
-  val set_string_version :
-    (*FIXME*)
-    (string
-    * (string option * binding_state option * (int option * int option) option)
-      Wrapped_modules.LoggedStringMap.t)
-    Ckappa_sig.Agent_id_map_and_set.Map.t ->
-    t ->
-    t
+  val set_string_version : (*FIXME*)
+                           string_version -> t -> t
 
   val add_agent :
     Remanent_parameters_sig.parameters ->
@@ -40,12 +35,12 @@ module type Site_graph = sig
     t ->
     Exception.exceptions_caught_and_uncaught * agent_id * t
 
-  val add_site :
+  val add_site_or_guard :
     Remanent_parameters_sig.parameters ->
     Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
-    Ckappa_sig.c_site_name ->
+    Ckappa_sig.c_guard_p_then_site ->
     t ->
     Exception.exceptions_caught_and_uncaught * t
 
@@ -58,6 +53,16 @@ module type Site_graph = sig
     Ckappa_sig.c_state ->
     t ->
     Exception.exceptions_caught_and_uncaught * t
+
+  val add_state_or_guard :
+    Remanent_parameters_sig.parameters ->
+    Exception_without_parameter.exceptions_caught_and_uncaught ->
+    Cckappa_sig.kappa_handler ->
+    agent_id ->
+    Ckappa_sig.c_guard_p_then_site ->
+    Ckappa_sig.c_state ->
+    t ->
+    Exception_without_parameter.exceptions_caught_and_uncaught * t
 
   val add_bound_to_unknown :
     Remanent_parameters_sig.parameters ->
@@ -121,6 +126,7 @@ module type Site_graph = sig
     string ->
     (string option * binding_state option * (int option * int option) option)
     Wrapped_modules.LoggedStringMap.t ->
+    string option Wrapped_modules.LoggedStringMap.t ->
     bool ->
     Exception.exceptions_caught_and_uncaught
 

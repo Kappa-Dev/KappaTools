@@ -95,10 +95,10 @@ let print_internal_pattern ?logger parameters error kappa_handler list =
 let print_for_list logger parameter error t =
   let error, _ =
     List.fold_left
-      (fun (error, bool) (agent_string, site_map) ->
+      (fun (error, bool) ((agent_string, site_map), guard_map) ->
         let error =
           Site_graphs.KaSa_site_graph.print_agent logger parameter error
-            agent_string site_map bool
+            agent_string site_map guard_map bool
         in
         error, true)
       (error, false) t
@@ -172,7 +172,7 @@ let _print_pattern ?logger parameters error _kappa_handler list =
 let site_graph_to_list error string_version =
   let error, current_list =
     Ckappa_sig.Agent_id_map_and_set.Map.fold
-      (fun _ (agent_string, site_map) (error, current_list) ->
+      (fun _ ((agent_string, site_map), _guardmap) (error, current_list) ->
         (*-----------------------------------------*)
         let site_graph = (agent_string, site_map) :: current_list in
         error, site_graph)

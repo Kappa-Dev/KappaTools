@@ -186,7 +186,9 @@ let next_link_value (i : c_link_value) : c_link_value = i + 1
 let site_name_of_int (a : int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
 let string_of_site_name (a : c_site_name) : string = string_of_int a
-let string_of_guard_p_then_site (a : c_guard_p_then_site) : string = string_of_int a
+
+let string_of_guard_p_then_site (a : c_guard_p_then_site) : string =
+  string_of_int a
 
 let string_of_site_or_guard (a : c_site_or_guard_p) : string =
   match a with
@@ -237,6 +239,16 @@ let int_of_agent_id (a : c_agent_id) : int = a
 let agent_id_of_int (a : int) : c_agent_id = a
 let string_of_agent_id (a : c_agent_id) : string = string_of_int a
 let string_of_c_link_value (a : c_link_value) : string = string_of_int a
+
+let bool_of_state_index parameter error (a : c_state) =
+  match a with
+  | 0 -> error, false
+  | 1 -> error, true
+  | _ -> Exception.warn parameter error __POS__ Exit false
+
+let string_of_guard_state parameter error (a : c_state) =
+  let error, bool = bool_of_state_index parameter error a in
+  error, string_of_bool bool
 
 let get_agent_shape n_sites parameters =
   Misc_sa.fetch_array (int_of_site_name n_sites)
@@ -864,6 +876,13 @@ end))
 
 module Site_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   type t = c_site_name
+
+  let compare = compare
+  let print = Format.pp_print_int
+end))
+
+module GuardP_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_guard_parameter
 
   let compare = compare
   let print = Format.pp_print_int

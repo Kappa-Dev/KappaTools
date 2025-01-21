@@ -91,6 +91,18 @@ val string_of_state_index_option_min :
 val string_of_state_index_option_max :
   Remanent_parameters_sig.parameters -> c_state option -> string
 
+val bool_of_state_index :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  c_state ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * bool
+
+val string_of_guard_state :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  c_state ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * counter_name
+
 val int_of_rule_id : c_rule_id -> int
 val rule_id_of_int : int -> c_rule_id
 val string_of_rule_id : c_rule_id -> string
@@ -391,6 +403,9 @@ module Site_map_and_set : Map_wrapper.S_with_logs with type elt = c_site_name
 
 module GuardSite_map_and_set :
   Map_wrapper.S_with_logs with type elt = c_guard_p_then_site
+
+module GuardP_map_and_set :
+  Map_wrapper.S_with_logs with type elt = c_guard_parameter
 
 type c_interface = c_port Site_map_and_set.Map.t
 

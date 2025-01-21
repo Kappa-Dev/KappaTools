@@ -502,6 +502,12 @@ let get_link_to_some_1 symbol = symbol.Symbol_table.link_to_some
 let get_internal_state_symbol_1 symbol =
   symbol.Symbol_table.internal_state_symbol
 
+let get_open_guard_parameter_1 symbol = symbol.Symbol_table.open_internal_state
+
+let get_close_guard_parameter_1 symbol =
+  symbol.Symbol_table.close_internal_state
+(*rTODO add open_guard_parameter and close...*)
+
 let get_open_internal_state_1 symbol = symbol.Symbol_table.open_internal_state
 let get_close_internal_state_1 symbol = symbol.Symbol_table.close_internal_state
 let get_free_1 symbol = symbol.Symbol_table.free
@@ -923,6 +929,12 @@ let get_open_internal_state =
 
 let get_close_internal_state =
   upgrade_from_symbols_field get_close_internal_state_1
+
+let get_open_guard_parameter =
+  upgrade_from_symbols_field get_open_guard_parameter_1
+
+let get_close_guard_parameter =
+  upgrade_from_symbols_field get_close_guard_parameter_1
 
 let get_link_to_any = upgrade_from_symbols_field get_link_to_any_1
 let get_link_to_some = upgrade_from_symbols_field get_link_to_some_1

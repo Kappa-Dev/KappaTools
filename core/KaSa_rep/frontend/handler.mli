@@ -268,6 +268,14 @@ val string_of_site_in_natural_language :
   Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
+val string_of_site_or_guard_in_natural_language :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Quark_type.agent_quark ->
+  Ckappa_sig.c_guard_p_then_site ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
+
 val string_of_state :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -283,6 +291,15 @@ val string_of_state_fully_deciphered :
   Cckappa_sig.kappa_handler ->
   Quark_type.agent_quark ->
   Ckappa_sig.c_site_name ->
+  Ckappa_sig.c_state ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
+
+val string_of_state_fully_deciphered_with_guard :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.c_agent_name ->
+  Ckappa_sig.c_guard_p_then_site ->
   Ckappa_sig.c_state ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
@@ -453,3 +470,5 @@ val nrules :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   int
+
+val get_nr_guard_parameters : Cckappa_sig.kappa_handler -> int
