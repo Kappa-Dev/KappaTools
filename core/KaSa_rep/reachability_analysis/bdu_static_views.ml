@@ -860,7 +860,6 @@ let rec guard_to_bdu parameters error handler_bdu guard map1 =
     in
     Ckappa_sig.Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
 
-
 let collect_guard_bdu parameters handler_bdu error rule_id rule store_guard_bdu
     site_correspondence =
   match rule.Cckappa_sig.guard with
@@ -875,7 +874,6 @@ let collect_guard_bdu parameters handler_bdu error rule_id rule store_guard_bdu
             Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.fold
               parameters error
               (fun parameters error cv_id (map1, _) (handler_bdu, map_guard_bdu) ->
-
                 let error, handler_bdu, bdu =
                   guard_to_bdu parameters error handler_bdu guard map1
                 in
