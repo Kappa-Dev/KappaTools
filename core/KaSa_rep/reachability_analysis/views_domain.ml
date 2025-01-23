@@ -2631,7 +2631,7 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_redefine parameter_views handler error
         bdu_inter list_a
     in
-    (*conjunction with the guard rTODO is this obsolete now?*)
+    (*conjunction with the guard*)
     let error, handler, bdu_with_guard =
       Ckappa_sig.Views_bdu.mvbdu_and parameter_views handler error bdu_guard
         bdu_redefine
@@ -2694,8 +2694,11 @@ module Domain = struct
   (***************************************************************)
 
   let compute_bdu_update_side_effects static dynamic error bdu_test list_a bdu_X
-      bdu_guard =
+      bdu_guard precondition_guard_bdu map1 =
     let parameters = get_parameter static in
+    let nr_guard_parameters =
+      Covering_classes_main.get_nr_guard_parameters (get_kappa_handler static)
+    in
     let parameter_views =
       Remanent_parameters.update_prefix parameters "\t\t\t"
     in
@@ -2713,6 +2716,15 @@ module Domain = struct
     let error, handler, bdu_with_guard =
       Ckappa_sig.Views_bdu.mvbdu_and parameter_views handler error bdu_guard
         bdu_redefine
+    in
+    (* add guard information from the precondition*)
+    let error, handler, renamed_precondition_guard_bdu =
+      rename_guards_to_bdu_names parameters error handler precondition_guard_bdu
+        map1 nr_guard_parameters
+    in
+    let error, handler, bdu_with_guard =
+      Ckappa_sig.Views_bdu.mvbdu_and parameter_views handler error
+        bdu_with_guard renamed_precondition_guard_bdu
     in
     (*do the union of bdu_redefine and bdu_X*)
     let error, handler, bdu_result =
@@ -2927,6 +2939,12 @@ module Domain = struct
     let nr_guard_params =
       Covering_classes_main.get_nr_guard_parameters (get_kappa_handler static)
     in
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, precondition_guard_bdu =
+      Communication.get_state_of_guard_parameters parameters bdu_handler error
+        precondition
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     let site = Ckappa_sig.guard_p_then_site_of_site site nr_guard_params in
     let error, site_to_site_list = get_site_to_renamed_site_list static error in
     let error, site_list_opt =
@@ -2942,6 +2960,11 @@ module Domain = struct
     let error, dynamic, event_list =
       List.fold_left
         (fun (error, dynamic, event_list) (cv_id, site') ->
+          let error, (map1, _) =
+            get_list_of_sites_correspondence_map parameters error agent_name
+              cv_id
+              (get_site_correspondence_array static)
+          in
           let list_test = [ site', state ] in
           let list_modif = [ site', Ckappa_sig.dummy_state_index ] in
           let handler = get_mvbdu_handler dynamic in
@@ -2972,9 +2995,8 @@ module Domain = struct
             get_bdu_guard error static rule_id agent_name cv_id bdu_true
           in
           let error, dynamic, bdu_update =
-            (*rTODO add guard bdu*)
             compute_bdu_update_side_effects static dynamic error bdu_test
-              list_modif bdu_X bdu_guard
+              list_modif bdu_X bdu_guard precondition_guard_bdu map1
           in
           let error, dynamic, event_list =
             add_link ~title:"Dealing with side effects" error static dynamic

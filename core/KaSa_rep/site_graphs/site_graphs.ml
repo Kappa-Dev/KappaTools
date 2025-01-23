@@ -510,7 +510,6 @@ module KaSa_site_graph = struct
           t.string_version
       in
       error, { t with guard_params; string_version }
-  (*rTODO maybe I need to change string_version, or maybe not?*)
 
   let add_state_or_guard parameter error kappa_handler agent_id site_or_guard
       state t =
@@ -665,7 +664,7 @@ module KaSa_site_graph = struct
       Loggers.fprintf logger "%s%s" agent_string
         (Remanent_parameters.get_agent_open_symbol parameter)
     in
-    let bool2 =
+    let _ =
       Wrapped_modules.LoggedStringMap.fold
         (fun site_string (internal, binding, counter) bool ->
           let () =
@@ -758,6 +757,10 @@ module KaSa_site_graph = struct
           true)
         site_map false
     in
+    let () =
+      Loggers.fprintf logger "%s"
+        (Remanent_parameters.get_agent_close_symbol parameter)
+    in
     (*print guard parameters*)
     let _ =
       Wrapped_modules.LoggedStringMap.fold
@@ -778,11 +781,7 @@ module KaSa_site_graph = struct
                 (Remanent_parameters.get_close_guard_parameter parameter)
           in
           true)
-        guard_map (bool || bool2)
-    in
-    let () =
-      Loggers.fprintf logger "%s"
-        (Remanent_parameters.get_agent_close_symbol parameter)
+        guard_map true
     in
     error
 
