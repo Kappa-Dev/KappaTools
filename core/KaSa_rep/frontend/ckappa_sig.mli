@@ -57,7 +57,7 @@ val dummy_link_value : c_link_value
 val dummy_site_name_1 : c_site_name
 val dummy_site_name_minus1 : c_site_name
 val next_link_value : c_link_value -> c_link_value
-val fst_site : c_guard_p_then_site (*rTODO maybe add nr_guard_params?*)
+val fst_site : c_guard_p_then_site
 val snd_site : c_guard_p_then_site
 val dummy_state_index_1 : c_state
 val string_of_agent_name : c_agent_name -> string

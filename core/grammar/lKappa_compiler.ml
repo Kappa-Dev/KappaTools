@@ -2767,7 +2767,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       tokens_finder alg_vars_finder ast_compil.init
   in
   let guard_params = Ast.get_list_of_guard_parameters ast_compil.rules in
-  (*rTODO this is never really used you have to rethink this*)
+  (*rTODO this is never really used*)
   let rules = guard_params_to_int_in_rules guard_params rules in
 
   {
