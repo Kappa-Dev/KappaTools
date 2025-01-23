@@ -162,6 +162,7 @@ let c_rule_id_of_string s =
 
 let dummy_agent_name = 0
 let dummy_site_name = 0
+let dummy_site_or_guard_name = 0
 let dummy_state_index = 0
 let dummy_state_index_true = 1
 let dummy_state_index_false = 0

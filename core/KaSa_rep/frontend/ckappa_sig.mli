@@ -47,6 +47,7 @@ val c_rule_id_of_string : string -> c_rule_id
 val string_of_c_link_value : c_link_value -> string
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
+val dummy_site_or_guard_name : c_guard_p_then_site
 val dummy_state_index : c_state
 val dummy_state_index_true : c_state
 val dummy_state_index_false : c_state

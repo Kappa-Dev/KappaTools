@@ -325,15 +325,12 @@ module Domain = struct
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
     let static = set_domain_static result static in
-    let nr_guard_params =
-      Covering_classes_main.get_nr_guard_parameters kappa_handler
-    in
     (*-----------------------------------------------------------------------*)
     (*pattern*)
     (*-----------------------------------------------------------------------*)
     let error, result =
       Bdu_static_views.scan_rule_set_pattern parameters error remanent_triple
-        compiled nr_guard_params
+        compiled
     in
     let static = set_domain_static_pattern result static in
     error, static, dynamic
@@ -877,9 +874,6 @@ module Domain = struct
   let build_init_restriction static dynamic error init_state =
     let parameters = get_parameter static in
     let store_remanent_triple = get_remanent_triple static in
-    let nr_guard_params =
-      Covering_classes_main.get_nr_guard_parameters (get_kappa_handler static)
-    in
     let error, (dynamic, event_list) =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
         error
@@ -901,7 +895,7 @@ module Domain = struct
                 let error, get_pair_list =
                   Bdu_static_views
                   .get_pair_cv_map_with_missing_association_creation parameters
-                    error agent triple_list nr_guard_params
+                    error agent triple_list
                 in
                 let error, (dynamic, event_list) =
                   List.fold_left
@@ -1088,7 +1082,7 @@ module Domain = struct
   (*****************************************************************)
   (*MOVE in static?*)
 
-  let get_new_site_name parameters error site_name nr_guard_parameters
+  let get_new_site_name parameters error site_name
       (*store_new_index_pair_map*)
         map1 =
     let error, new_site_name =
@@ -1098,8 +1092,7 @@ module Domain = struct
       with
       | error, None ->
         Exception.warn parameters error __POS__ Exit
-          (Ckappa_sig.guard_p_then_site_of_site Ckappa_sig.dummy_site_name
-             nr_guard_parameters)
+          Ckappa_sig.dummy_site_or_guard_name
       | error, Some i -> error, i
     in
     error, new_site_name
@@ -1117,13 +1110,10 @@ module Domain = struct
 
   (*****************************************************************)
 
-  let step_list_empty kappa_handler dynamic parameters error agent_id agent_type
-      site_name cv_list fixpoint_result proj_bdu_test_restriction bdu_false
-      bdu_true site_correspondence =
+  let step_list_empty dynamic parameters error agent_id agent_type site_name
+      cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true
+      site_correspondence =
     (*------------------------------------------------------------*)
-    let nr_guard_params =
-      Covering_classes_main.get_nr_guard_parameters kappa_handler
-    in
     let error, dynamic, bdu =
       List.fold_left
         (fun (error, dynamic, bdu) cv_id ->
@@ -1132,7 +1122,7 @@ module Domain = struct
               cv_id site_correspondence
           in
           let error, new_site_name =
-            get_new_site_name parameters error site_name nr_guard_params map1
+            get_new_site_name parameters error site_name map1
           in
           (*--------------------------------------------------------------*)
           (* fetch the bdu for the agent type and the cv_id in
@@ -1259,8 +1249,8 @@ module Domain = struct
     in
     (*---------------------------------------------------------------------*)
     let error, dynamic, new_answer =
-      step_list_empty kappa_handler dynamic parameters error
-        path.Communication.agent_id agent_type
+      step_list_empty dynamic parameters error path.Communication.agent_id
+        agent_type
         (Ckappa_sig.guard_p_then_site_of_site path.Communication.site
            nr_guard_params)
         cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true
@@ -1501,7 +1491,7 @@ module Domain = struct
                 let error, new_site_name_z =
                   get_new_site_name parameters error
                     (to_guard_or_site site_path)
-                    nr_guard_params map1
+                    map1
                 in
                 let error, handler, singleton =
                   Ckappa_sig.Views_bdu.build_variables_list parameters handler
@@ -1512,7 +1502,7 @@ module Domain = struct
                     (*site y is in CV, *)
                     let error, new_site_name_y =
                       get_new_site_name parameters error
-                        (to_guard_or_site site_in) nr_guard_params map1
+                        (to_guard_or_site site_in) map1
                     in
                     let error, handler, mvbdu_B_y =
                       Ckappa_sig.Views_bdu
@@ -2156,7 +2146,7 @@ module Domain = struct
   (************************************************************************)
 
   let build_bdu_test_pattern parameters error pattern site_correspondence
-      dynamic nr_guard_params =
+      dynamic =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
       error
       (fun parameters error _agent_id agent (dynamic, current_list) ->
@@ -2168,7 +2158,7 @@ module Domain = struct
           let agent_type = agent.Cckappa_sig.agent_name in
           let error, get_pair_list =
             Bdu_static_views.get_pair_cv_map_with_restriction_views parameters
-              error agent site_correspondence nr_guard_params
+              error agent site_correspondence
           in
           (*build bdu_test*)
           let error, (dynamic, list) =
@@ -2214,7 +2204,7 @@ module Domain = struct
     in
     let error, (dynamic, list) =
       build_bdu_test_pattern parameters error pattern site_correspondence
-        dynamic nr_guard_params
+        dynamic
     in
     (*--------------------------------------------------*)
     let error, dynamic, bdu =
@@ -2230,7 +2220,7 @@ module Domain = struct
               let error, new_site_name =
                 get_new_site_name parameters error
                   (to_guard_or_site site_name)
-                  nr_guard_params map1
+                  map1
               in
               let error, bdu_X =
                 match
@@ -2352,9 +2342,6 @@ module Domain = struct
     let site_correspondence = get_remanent_triple static in
     let site_correspondence_map = get_site_correspondence_array static in
     let store_covering_classes_id = get_covering_classes_id static in
-    let nr_guard_params =
-      Covering_classes_main.get_nr_guard_parameters kappa_handler
-    in
     (*---------------------------------------------------------*)
     (* Why an arbitrary patterns would be stored in that map *)
     (* For each view, you have to collect the set of sites *)
@@ -2390,7 +2377,7 @@ module Domain = struct
                 in
                 let error, get_pair_list =
                   Bdu_static_views.get_pair_cv_map_with_restriction_views
-                    parameters error agent site_correspondence nr_guard_params
+                    parameters error agent site_correspondence
                 in
                 (*build bdu_test*)
                 let error, dynamic =
