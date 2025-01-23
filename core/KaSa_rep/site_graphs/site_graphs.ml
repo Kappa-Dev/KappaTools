@@ -665,7 +665,7 @@ module KaSa_site_graph = struct
       Loggers.fprintf logger "%s%s" agent_string
         (Remanent_parameters.get_agent_open_symbol parameter)
     in
-    let _ =
+    let bool2 =
       Wrapped_modules.LoggedStringMap.fold
         (fun site_string (internal, binding, counter) bool ->
           let () =
@@ -778,7 +778,7 @@ module KaSa_site_graph = struct
                 (Remanent_parameters.get_close_guard_parameter parameter)
           in
           true)
-        guard_map false
+        guard_map (bool || bool2)
     in
     let () =
       Loggers.fprintf logger "%s"
