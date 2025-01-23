@@ -277,9 +277,9 @@ let store_remanent parameters error covering_class _modified_map remanent
     nr_guard_params =
   (*add each variable that occurs in a guard to each covering class*)
   let covering_class_with_guard_p =
-    List.map (fun x -> Ckappa_sig.Site x) covering_class
-    @ List.init nr_guard_params (fun x ->
-          Ckappa_sig.Guard_p (Ckappa_sig.guard_parameter_of_int x))
+    List.init nr_guard_params (fun x ->
+        Ckappa_sig.Guard_p (Ckappa_sig.guard_parameter_of_int x))
+    @ List.map (fun x -> Ckappa_sig.Site x) covering_class
   in
   (*-------------------------------------------------------------------------*)
   (* current state of remanent*)
