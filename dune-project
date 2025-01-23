@@ -63,7 +63,7 @@
    (re ( = 1.11.0 ))
    (fmt ( = 0.9.0 ))
    (logs ( = 0.7.0 ))
-   (atdgen ( = 2.15.0 )) ; TODO: find a way to specify as build dependency only, as with the `build` package variable in opam
+   (atdgen (and :build ( = 2.15.0 )))
    (atdgen-runtime ( = 2.15.0 ))
    kappa-library
    ; Added to pin version of lib used in kappa-library
@@ -87,7 +87,7 @@
    (fmt ( = 0.9.0 ))
    (logs ( = 0.7.0 ))
    (atdgen-runtime ( = 2.15.0 ))
-   (atdgen ( = 2.15.0 )) ; TODO: find a way to specify as build dependency only, as with the `build` package variable in opam
+   (atdgen (and :build ( = 2.15.0 )))
    (tyxml-ppx ( = 4.6.0 ))
    (js_of_ocaml ( = 5.7.0 ))
    (js_of_ocaml-lwt ( = 5.7.0 ))
