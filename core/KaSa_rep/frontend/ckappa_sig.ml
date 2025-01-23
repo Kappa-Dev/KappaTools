@@ -198,13 +198,13 @@ let string_of_site_or_guard (a : c_site_or_guard_p) : string =
 let state_index_of_int (a : int) : c_state = a
 let int_of_state_index (a : c_state) : int = a
 let string_of_state_index (a : c_state) : string = string_of_int a
-let guard_parameter_of_int (a : int) : c_guard_parameter = a
+let guard_parameter_of_int (a : int) : c_guard_parameter = a + 1
 let guard_p_then_site_of_int (a : int) : c_guard_p_then_site = a
 let int_of_guard_p_then_site (a : c_guard_p_then_site) : int = a
 
 let guard_p_then_site_of_site (a : c_site_name) (nr_guard_p : int) :
     c_guard_p_then_site =
-  guard_parameter_of_int (int_of_site_name a + nr_guard_p)
+  a + nr_guard_p + 1
 
 let guard_p_then_site_of_guard (a : c_guard_parameter) : c_guard_p_then_site = a
 
@@ -214,14 +214,14 @@ let guard_p_then_site_of_site_or_guard_p (a : c_site_or_guard_p)
   | Site s -> guard_p_then_site_of_site s nr_guard_p
   | Guard_p s -> guard_p_then_site_of_guard s
 
-let int_of_guard_parameter (a : c_guard_parameter) : int = a
+let int_of_guard_parameter (a : c_guard_parameter) : int = a - 1
 
 let site_or_guard_p_of_guard_p_then_site (a : c_guard_p_then_site)
     (nr_guard_p : int) : c_site_or_guard_p =
-  if a < nr_guard_p then
+  if a < nr_guard_p + 1 then
     Guard_p a
   else
-    Site (a - nr_guard_p)
+    Site (a - nr_guard_p - 1)
 
 let string_of_state_index_option_min parameters a =
   match a with
