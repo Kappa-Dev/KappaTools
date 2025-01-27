@@ -534,6 +534,5 @@ let scan_compil parameters error compil =
   let error, remanent =
     scan_rules scan_tested_mixture parameters remanent compil.Ast.rules
   in
-  let remanent = reverse_agents_annotation parameters (error, remanent)
-in
+  let remanent = reverse_agents_annotation parameters (error, remanent) in
   remanent

@@ -2556,8 +2556,7 @@ let guard_param_to_int f =
 
 let guard_param_to_string f =
   guard_param_conversion (fun p guard_params ->
-      List.nth guard_params (f p)
-      (*rTODO error handling*))
+      List.nth guard_params (f p) (*rTODO error handling*))
 
 let guard_params_to_int_option f guard_params g =
   Option.map (guard_param_to_int f guard_params) g
