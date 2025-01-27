@@ -18,6 +18,7 @@ module Int_Set_and_Map : Map_wrapper.S_with_logs with type elt = int
 
 type position = Loc.t
 type agent_name = string
+type guard_name = string
 type site_name = string
 type internal_state = string
 type counter_name = string
@@ -47,6 +48,7 @@ val c_rule_id_of_string : string -> c_rule_id
 val string_of_c_link_value : c_link_value -> string
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
+val dummy_guard_parameter : c_guard_parameter
 val dummy_site_or_guard_name : c_guard_p_then_site
 val dummy_state_index : c_state
 val dummy_state_index_true : c_state
@@ -75,16 +77,19 @@ val string_of_state_index : c_state -> string
 val guard_parameter_of_int : int -> c_guard_parameter
 val guard_p_then_site_of_int : int -> c_guard_p_then_site
 val int_of_guard_p_then_site : c_guard_p_then_site -> int
-val guard_p_then_site_of_site : c_site_name -> int -> c_guard_p_then_site
+
+val guard_p_then_site_of_site :
+  c_site_name -> c_guard_parameter -> c_guard_p_then_site
+
 val guard_p_then_site_of_guard : c_guard_parameter -> c_guard_p_then_site
 
 val guard_p_then_site_of_site_or_guard_p :
-  c_site_or_guard_p -> int -> c_guard_p_then_site
+  c_site_or_guard_p -> c_guard_parameter -> c_guard_p_then_site
 
 val int_of_guard_parameter : c_guard_parameter -> int
 
 val site_or_guard_p_of_guard_p_then_site :
-  c_guard_p_then_site -> int -> c_site_or_guard_p
+  c_guard_p_then_site -> c_guard_parameter -> c_site_or_guard_p
 
 val string_of_state_index_option_min :
   Remanent_parameters_sig.parameters -> c_state option -> string
@@ -117,6 +122,7 @@ val next_agent_id : c_agent_id -> c_agent_id
 val next_agent_name : c_agent_name -> c_agent_name
 val next_rule_id : c_rule_id -> c_rule_id
 val next_site_name : c_site_name -> c_site_name
+val next_guard_p_name : c_guard_parameter -> c_guard_parameter
 val next_guard_or_site_name : c_guard_p_then_site -> c_guard_p_then_site
 val next_state_index : c_state -> c_state
 val pred_site_name : c_site_name -> c_site_name
@@ -129,6 +135,7 @@ val compare_state_index : c_state -> c_state -> int
 val compare_state_index_option_min : c_state option -> c_state option -> int
 val compare_state_index_option_max : c_state option -> c_state option -> int
 val compare_agent_name : c_agent_name -> c_agent_name -> int
+val compare_guard_parameter : c_guard_parameter -> c_guard_parameter -> int
 
 val get_agent_shape :
   c_site_name -> Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
@@ -136,8 +143,10 @@ val get_agent_shape :
 val get_agent_color :
   c_site_name -> Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 
+val get_list_of_guard_parameters : c_guard_parameter -> c_guard_parameter list
 val compare_unit : unit -> unit -> int
 val compare_unit_agent_name : unit -> unit -> c_agent_name
+val compare_unit_guard_parameter : unit -> unit -> c_guard_parameter
 val compare_unit_site_name : unit -> unit -> c_site_name
 val compare_unit_state_index : unit -> unit -> c_state
 val compare_unit_agent_site : unit -> unit -> int
@@ -361,6 +370,11 @@ type internal_state_specification = { string: internal_state option }
 
 module Dictionary_of_agents :
   Dictionary.Dictionary with type key = c_agent_name and type value = agent_name
+
+module Dictionary_of_guards :
+  Dictionary.Dictionary
+    with type key = c_guard_parameter
+     and type value = guard_name
 
 module Dictionary_of_sites :
   Dictionary.Dictionary with type key = c_site_name and type value = site

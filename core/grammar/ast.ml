@@ -1584,13 +1584,13 @@ let merge_guards g1 g2 =
   let guards = List.merge String.compare g1 g2 in
   List.sort_uniq String.compare guards
 
-let rec guard_params_from_guard = function
+let rec guard_params_list_from_guard = function
   | LKappa.True | LKappa.False -> []
   | Param id -> [ id ]
-  | Not guard -> guard_params_from_guard guard
+  | Not guard -> guard_params_list_from_guard guard
   | And (g1, g2) | Or (g1, g2) ->
-    let gp1 = guard_params_from_guard g1 in
-    let gp2 = guard_params_from_guard g2 in
+    let gp1 = guard_params_list_from_guard g1 in
+    let gp2 = guard_params_list_from_guard g2 in
     merge_guards gp1 gp2
 
 let get_list_of_guard_parameters r =
@@ -1598,7 +1598,7 @@ let get_list_of_guard_parameters r =
     (fun guard_params (_, guard, (_, _)) ->
       match guard with
       | None -> guard_params
-      | Some g -> merge_guards guard_params (guard_params_from_guard g))
+      | Some g -> merge_guards guard_params (guard_params_list_from_guard g))
     [] r
 
 let split_mixture m =

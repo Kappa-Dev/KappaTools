@@ -19,6 +19,7 @@ let _ = local_trace
 
 type position = Loc.t
 type agent_name = string
+type guard_name = string
 type site_name = string
 type internal_state = string
 type counter_name = string
@@ -162,6 +163,7 @@ let c_rule_id_of_string s =
 
 let dummy_agent_name = 0
 let dummy_site_name = 0
+let dummy_guard_parameter = 0
 let dummy_site_or_guard_name = 0
 let dummy_state_index = 0
 let dummy_state_index_true = 1
@@ -202,14 +204,14 @@ let guard_parameter_of_int (a : int) : c_guard_parameter = a + 1
 let guard_p_then_site_of_int (a : int) : c_guard_p_then_site = a
 let int_of_guard_p_then_site (a : c_guard_p_then_site) : int = a
 
-let guard_p_then_site_of_site (a : c_site_name) (nr_guard_p : int) :
-    c_guard_p_then_site =
+let guard_p_then_site_of_site (a : c_site_name) (nr_guard_p : c_guard_parameter)
+    : c_guard_p_then_site =
   a + nr_guard_p + 1
 
 let guard_p_then_site_of_guard (a : c_guard_parameter) : c_guard_p_then_site = a
 
 let guard_p_then_site_of_site_or_guard_p (a : c_site_or_guard_p)
-    (nr_guard_p : int) : c_guard_p_then_site =
+    (nr_guard_p : c_guard_parameter) : c_guard_p_then_site =
   match a with
   | Site s -> guard_p_then_site_of_site s nr_guard_p
   | Guard_p s -> guard_p_then_site_of_guard s
@@ -217,7 +219,7 @@ let guard_p_then_site_of_site_or_guard_p (a : c_site_or_guard_p)
 let int_of_guard_parameter (a : c_guard_parameter) : int = a - 1
 
 let site_or_guard_p_of_guard_p_then_site (a : c_guard_p_then_site)
-    (nr_guard_p : int) : c_site_or_guard_p =
+    (nr_guard_p : c_guard_parameter) : c_site_or_guard_p =
   if a < nr_guard_p + 1 then
     Guard_p a
   else
@@ -260,6 +262,9 @@ let get_agent_color n_sites parameters =
   Misc_sa.fetch_array (int_of_site_name n_sites)
     (Remanent_parameters.get_agent_color_array parameters)
     (Remanent_parameters.get_agent_color_def parameters)
+
+let get_list_of_guard_parameters n_guard_p =
+  List.init (int_of_guard_parameter n_guard_p) guard_parameter_of_int
 
 (***************************************************************)
 (*RENAME*)
@@ -822,9 +827,22 @@ module Kasim_agent_name = struct
   let print = Format.pp_print_string
 end
 
+module Guard_name = struct
+  type t = guard_name
+
+  let compare = compare
+  let print = Format.pp_print_string
+end
+
 module Dictionary_of_agents :
   Dictionary.Dictionary with type key = c_agent_name and type value = agent_name =
   Dictionary.Dictionary_of_Ord (Kasim_agent_name)
+
+module Dictionary_of_guards :
+  Dictionary.Dictionary
+    with type key = c_guard_parameter
+     and type value = guard_name =
+  Dictionary.Dictionary_of_Ord (Guard_name)
 
 module Dictionary_of_sites :
   Dictionary.Dictionary with type key = c_site_name and type value = site =
@@ -985,6 +1003,7 @@ let next_rule_id = succ
 let next_agent_id = succ
 let next_agent_name = succ
 let next_site_name = succ
+let next_guard_p_name = succ
 let next_guard_or_site_name = succ
 let next_state_index = succ
 let compare_rule_id = compare
@@ -992,6 +1011,7 @@ let compare_agent_id = compare
 let compare_site_name = compare
 let compare_state_index = compare
 let compare_agent_name = compare
+let compare_guard_parameter = compare
 
 let compare_state_index_option_min a b =
   match a, b with
@@ -1010,6 +1030,7 @@ let compare_state_index_option_max a b =
 let compare_unit_agent_site _ _ = 0
 let compare_unit _ _ = 0
 let compare_unit_agent_name _ _ = dummy_agent_name
+let compare_unit_guard_parameter _ _ = dummy_guard_parameter
 let compare_unit_site_name _ _ = dummy_site_name
 let compare_unit_state_index _ _ = dummy_state_index
 

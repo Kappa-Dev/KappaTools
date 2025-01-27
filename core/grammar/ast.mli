@@ -185,8 +185,7 @@ val split_mixture : mixture -> mixture * mixture
 val infer_agent_signatures : parsing_compil -> parsing_compil
 (** Used when agent signatures is implicit: infer agent signatures and tokens from init, rules and perturbations *)
 
-val merge_guards : string list -> string list -> string list
-val guard_params_from_guard : string LKappa.guard -> string list
+val guard_params_list_from_guard : string LKappa.guard -> string list
 
 val get_list_of_guard_parameters :
   (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)

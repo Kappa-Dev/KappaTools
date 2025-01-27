@@ -19,12 +19,13 @@ type site =
   Ckappa_sig.site_type
 
 type state_dic = (unit, unit) Ckappa_sig.Dictionary_of_States.dictionary
+type guard_p_dic = (unit, unit) Ckappa_sig.Dictionary_of_guards.dictionary
 
 type kappa_handler = {
   nrules: int;
   nvars: int;
   nagents: Ckappa_sig.c_agent_name;
-  nguard_params: int;
+  nguard_params: Ckappa_sig.c_guard_parameter;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:
     (string * Loc.t list)
@@ -42,7 +43,7 @@ type kappa_handler = {
     Ckappa_sig
     .Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
     .t;
-  guard_parameters: string list;
+  guard_parameters_dic: guard_p_dic;
 }
 
 type 'a interval = { min: 'a option; max: 'a option }

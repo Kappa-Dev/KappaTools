@@ -276,9 +276,9 @@ let length_sorted (l : Ckappa_sig.c_site_name list list) :
 let store_remanent parameters error covering_class _modified_map remanent
     nr_guard_params =
   (*add each variable that occurs in a guard to each covering class*)
+  let guard_p_list = Ckappa_sig.get_list_of_guard_parameters nr_guard_params in
   let covering_class_with_guard_p =
-    List.init nr_guard_params (fun x ->
-        Ckappa_sig.Guard_p (Ckappa_sig.guard_parameter_of_int x))
+    List.map (fun x -> Ckappa_sig.Guard_p x) guard_p_list
     @ List.map (fun x -> Ckappa_sig.Site x) covering_class
   in
   (*-------------------------------------------------------------------------*)
@@ -719,7 +719,9 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
         in
         let nr_guard_parameters = get_nr_guard_parameters handler_kappa in
         let size_map1 =
-          1 + Ckappa_sig.int_of_site_name last_site + nr_guard_parameters
+          1
+          + Ckappa_sig.int_of_site_name last_site
+          + Ckappa_sig.int_of_guard_parameter nr_guard_parameters
         in
         let size_map2 = 1 + List.length list in
         let error, array =

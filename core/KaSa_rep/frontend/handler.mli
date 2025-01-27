@@ -471,4 +471,5 @@ val nrules :
   Cckappa_sig.kappa_handler ->
   int
 
-val get_nr_guard_parameters : Cckappa_sig.kappa_handler -> int
+val get_nr_guard_parameters :
+  Cckappa_sig.kappa_handler -> Ckappa_sig.c_guard_parameter

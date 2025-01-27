@@ -17,7 +17,6 @@ let nrules _parameter _error handler = handler.Cckappa_sig.nrules
 let nvars _parameter _error handler = handler.Cckappa_sig.nvars
 let nagents _parameter _error handler = handler.Cckappa_sig.nagents
 let get_nr_guard_parameters handler = handler.Cckappa_sig.nguard_params
-let get_guard_parameters handler = handler.Cckappa_sig.guard_parameters
 
 let check_pos parameter ka_pos ml_pos message error error' =
   match ml_pos with
@@ -601,15 +600,22 @@ let string_of_site parameter error handler_kappa ?state
   in
   error, print_site parameter ?state ~add_parentheses site_type
 
-let string_of_guard parameter guardp guard_params ?state error =
-  let guard_param_name =
-    List.nth guard_params (Ckappa_sig.int_of_guard_parameter guardp)
+let string_of_guard parameters guardp kappa_handler ?state error =
+  let guard_p_dic = kappa_handler.Cckappa_sig.guard_parameters_dic in
+  let error, output =
+    Ckappa_sig.Dictionary_of_guards.translate parameters error guardp
+      guard_p_dic
+  in
+  let error, guard_param_name =
+    match output with
+    | None -> Exception.warn parameters error __POS__ Exit ""
+    | Some (guard_param_name, (), ()) -> error, guard_param_name
   in
   match state with
   | None -> error, guard_param_name
   | Some s ->
     let error, guard_string =
-      Ckappa_sig.string_of_guard_state parameter error s
+      Ckappa_sig.string_of_guard_state parameters error s
     in
     error, guard_param_name ^ "{" ^ guard_string ^ "}"
 
@@ -620,8 +626,7 @@ let string_of_site_or_guard parameter error handler_kappa ?state
     string_of_site parameter error handler_kappa ?state ~add_parentheses
       agent_type s
   | Ckappa_sig.Guard_p g ->
-    string_of_guard parameter g handler_kappa.Cckappa_sig.guard_parameters
-      ?state error
+    string_of_guard parameter g handler_kappa ?state error
 
 (*this function used in views_domain*)
 let string_of_site_update_views parameter error handler_kappa agent_type
@@ -645,7 +650,6 @@ let string_of_site_in_natural_language parameter error handler_kapp agent_type
 let string_of_site_or_guard_in_natural_language parameter error handler_kapp
     agent_type (site_or_guard_int : Ckappa_sig.c_guard_p_then_site) =
   let nr_guard_parameters = get_nr_guard_parameters handler_kapp in
-  let guard_parameters = get_guard_parameters handler_kapp in
   match
     Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_or_guard_int
       nr_guard_parameters
@@ -654,9 +658,7 @@ let string_of_site_or_guard_in_natural_language parameter error handler_kapp
     string_of_site_in_natural_language parameter error handler_kapp agent_type
       site_int
   | Ckappa_sig.Guard_p guardp ->
-    let error, string =
-      string_of_guard parameter guardp guard_parameters error
-    in
+    let error, string = string_of_guard parameter guardp handler_kapp error in
     error, "the value of the guard parameter " ^ string
 
 let string_of_site_in_file_name parameter error handler_kapp agent_type
@@ -687,8 +689,7 @@ let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
   | Ckappa_sig.Site s ->
     string_of_site_contact_map ~ml_pos ~ka_pos ~message parameter error
       handler_kappa agent_name s
-  | Ckappa_sig.Guard_p g ->
-    string_of_guard parameter g handler_kappa.Cckappa_sig.guard_parameters error
+  | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
 
 let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple in

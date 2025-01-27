@@ -958,7 +958,7 @@ module Domain = struct
   let project_bdu_keep_only_guard_parameters parameters error handler bdu
       nr_guard_parameters map1 =
     let guard_parameter_list =
-      List.init nr_guard_parameters Ckappa_sig.guard_parameter_of_int
+      Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
     in
     let error, (guard_parameter_renamed_list, rename_back_list) =
       List.fold_left
@@ -2582,7 +2582,7 @@ module Domain = struct
   let rename_guards_to_bdu_names parameters error handler bdu map1
       nr_guard_parameters =
     let guard_parameter_list =
-      List.init nr_guard_parameters Ckappa_sig.guard_parameter_of_int
+      Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
     in
     let error, renaming_list =
       List.fold_left_map
