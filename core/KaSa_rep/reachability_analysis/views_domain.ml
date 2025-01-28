@@ -1011,6 +1011,12 @@ module Domain = struct
     let nr_guard_parameters =
       Covering_classes_main.get_nr_guard_parameters handler_kappa
     in
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, state_guard_parameters =
+      Communication.get_state_of_guard_parameters parameters bdu_handler error
+        precondition
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     let error, dynamic, _, bdu_guard =
       Covering_classes_type.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) bdu_test
@@ -1072,7 +1078,7 @@ module Domain = struct
         ( error,
           dynamic,
           Covering_classes_type.AgentIDCV_map_and_set.Map.empty,
-          bdu_true )
+          state_guard_parameters )
     in
     let precondition =
       Communication.set_state_of_guard_parameters precondition bdu_guard
@@ -2330,6 +2336,7 @@ module Domain = struct
 
   let maybe_reachable_aux static dynamic error (pattern : Cckappa_sig.mixture)
       precondition =
+    (*rTODO add guards*)
     let parameters = get_parameter static in
     (*-----------------------------------------------------------*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
