@@ -33,7 +33,8 @@ module Domain = struct
   (* This array is statically allocated *)
   (* Why do you use extensive arrays ? *)
   type local_dynamic_information =
-    bool Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
+    Ckappa_sig.Views_bdu.mvbdu
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
 
   type dynamic_information = {
     local: local_dynamic_information;
@@ -72,10 +73,46 @@ module Domain = struct
   let set_global_dynamic_information gdynamic dynamic =
     { dynamic with global = gdynamic }
 
+  let get_mvbdu_handler dynamic =
+    Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
+
+  let set_mvbdu_handler handler dynamic =
+    {
+      dynamic with
+      global =
+        Analyzer_headers.set_mvbdu_handler handler
+          (get_global_dynamic_information dynamic);
+    }
+
+  let get_state_of_guard_parameters parameters dynamic error precondition =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, state_guard_parameters =
+      Communication.get_state_of_guard_parameters parameters bdu_handler error
+        precondition
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, state_guard_parameters
+
   (** dead rule local dynamic information*)
   let get_seen_agent dynamic = dynamic.local
 
   let set_seen_agent seen_agent dynamic = { dynamic with local = seen_agent }
+
+  let is_false_mvbdu parameters error dynamic mvbdu =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, mvbdu_false =
+      Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, Ckappa_sig.Views_bdu.equal mvbdu mvbdu_false
+
+  let is_true_mvbdu parameters error dynamic mvbdu =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, mvbdu_true =
+      Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, Ckappa_sig.Views_bdu.equal mvbdu mvbdu_true
 
   (*--------------------------------------------------------------------*)
 
@@ -244,13 +281,18 @@ module Domain = struct
         (Handler.nagents parameters error kappa_handler)
       - 1
     in
+    let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+    let error, bdu_handler, mvbdu_false =
+      Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+    in
+    let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     let error, init_seen_agents_array =
       if nagents < 0 then
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters
           error 0
       else
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init parameters
-          error nagents (fun _ error _ -> error, false)
+          error nagents (fun _ error _ -> error, mvbdu_false)
     in
     let init_global_dynamic_information =
       { global = dynamic; local = init_seen_agents_array }
@@ -278,72 +320,87 @@ module Domain = struct
     the rule *)
 
   let add_event_list static dynamic error (agent_type : Ckappa_sig.c_agent_name)
-      event_list =
+      event_list bdu_guard =
     let parameters = get_parameter static in
     let map = get_agents_without_interface static in
     let log = Remanent_parameters.get_logger parameters in
     let local = get_seen_agent dynamic in
-    let error, bool =
+    let error, mvbdu_opt =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
         error agent_type local
     in
-    match bool with
-    | Some false ->
-      let error, local =
-        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set parameters
-          error agent_type true local
-      in
-      let dynamic = set_seen_agent local dynamic in
-      let error, rule_id_list =
-        match
-          Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs parameters
-            error agent_type map
-        with
-        | error, None -> error, []
-        | error, Some l -> error, l
-      in
-      let error, bool =
-        if
-          local_trace
-          || Remanent_parameters.get_dump_reachability_analysis_wl parameters
-        then
-          List.fold_left
-            (fun (error, _) rule_id ->
-              let compiled = get_compil static in
-              let error, rule_id_string =
-                try Handler.string_of_rule parameters error compiled rule_id
-                with _ ->
-                  Exception.warn parameters error __POS__ Exit
-                    (Ckappa_sig.string_of_rule_id rule_id)
-              in
-              let title = "" in
-              let tab =
-                if title = "" then
-                  "\t\t\t\t"
-                else
-                  "\t\t\t"
-              in
-              let () =
-                Loggers.fprintf log "%s%s(%s) should be investigated "
-                  (Remanent_parameters.get_prefix parameters)
-                  tab rule_id_string
-              in
-              let () = Loggers.print_newline log in
-              error, true)
-            (error, false) rule_id_list
-        else
-          error, false
-      in
-      let () = if bool then Loggers.print_newline log in
-      let event_list =
-        List.fold_left
-          (fun event_list rule_id ->
-            Communication.Check_rule rule_id :: event_list)
-          event_list rule_id_list
-      in
-      error, (dynamic, event_list)
-    | Some true -> error, (dynamic, event_list)
+    let bdu_handler = get_mvbdu_handler dynamic in
+    match mvbdu_opt with
     | None -> Exception.warn parameters error __POS__ Exit (dynamic, event_list)
+    | Some old_mvbdu ->
+      let error, dynamic, is_true =
+        is_true_mvbdu parameters error dynamic old_mvbdu
+      in
+      if is_true then
+        error, (dynamic, event_list)
+      else (
+        let error, (bdu_handler, new_mvbdu) =
+          let error, bdu_handler, new_mvbdu =
+            Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error old_mvbdu
+              bdu_guard
+          in
+          error, (bdu_handler, new_mvbdu)
+        in
+        let error, local =
+          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set parameters
+            error agent_type new_mvbdu local
+        in
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+        let dynamic = set_seen_agent local dynamic in
+        let error, rule_id_list =
+          match
+            Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs parameters
+              error agent_type map
+          with
+          | error, None -> error, []
+          | error, Some l -> error, l
+        in
+        let error, bool =
+          if
+            local_trace
+            || Remanent_parameters.get_dump_reachability_analysis_wl parameters
+          then
+            List.fold_left
+              (fun (error, _) rule_id ->
+                let compiled = get_compil static in
+                let error, rule_id_string =
+                  try Handler.string_of_rule parameters error compiled rule_id
+                  with _ ->
+                    Exception.warn parameters error __POS__ Exit
+                      (Ckappa_sig.string_of_rule_id rule_id)
+                in
+                let title = "" in
+                let tab =
+                  if title = "" then
+                    "\t\t\t\t"
+                  else
+                    "\t\t\t"
+                in
+                let () =
+                  Loggers.fprintf log "%s%s(%s) should be investigated "
+                    (Remanent_parameters.get_prefix parameters)
+                    tab rule_id_string
+                in
+                let () = Loggers.print_newline log in
+                error, true)
+              (error, false) rule_id_list
+          else
+            error, false
+        in
+        let () = if bool then Loggers.print_newline log in
+        let event_list =
+          List.fold_left
+            (fun event_list rule_id ->
+              Communication.Check_rule rule_id :: event_list)
+            event_list rule_id_list
+        in
+        error, (dynamic, event_list)
+      )
 
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
@@ -362,8 +419,14 @@ module Domain = struct
             Exception.warn parameters error __POS__ Exit (dynamic, event_list)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
+            let bdu_handler = get_mvbdu_handler dynamic in
+            let error, bdu_handler, mvbdu_true =
+              Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+            in
+            let dynamic = set_mvbdu_handler bdu_handler dynamic in
             let error, (dynamic, event_list) =
               add_event_list static dynamic error agent_type event_list
+                mvbdu_true
             in
             error, (dynamic, event_list))
         init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
@@ -393,6 +456,28 @@ module Domain = struct
   (* This primitive should not change the list of the agent type
      which have been seen*)
 
+  let refine_mvbdu_of_agent parameters error agent_type dynamic new_mvbdu =
+    let local = get_seen_agent dynamic in
+    let error, mvbdu =
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
+        error agent_type local
+    in
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, bdu_result =
+      match mvbdu with
+      | Some mvbdu ->
+        let error, bdu_handler, bdu_inter =
+          Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error mvbdu
+            new_mvbdu
+        in
+        error, bdu_handler, bdu_inter
+      | None ->
+        let error, () = Exception.warn parameters error __POS__ Exit () in
+        Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, bdu_result
+
   let is_enabled static dynamic error rule_id precondition =
     let parameters = get_parameter static in
     let domain_static = get_domain_static_information static in
@@ -404,24 +489,32 @@ module Domain = struct
       | error, None -> error, (Usual_domains.Not_bot [], [])
       | error, Some (l1, l2) -> error, (l1, l2)
     in
+    let error, dynamic, state_guard_parameters =
+      get_state_of_guard_parameters parameters dynamic error precondition
+    in
     match bot_or_not with
     | Usual_domains.Bot -> error, dynamic, None
     | Usual_domains.Not_bot l ->
-      List.fold_left
-        (fun (error, dynamic, s) agent_type ->
-          let local = get_seen_agent dynamic in
-          let error, bool =
-            Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
-              parameters error agent_type local
-          in
-          match bool with
-          | Some true -> error, dynamic, s
-          | Some false -> error, dynamic, None
-          | None ->
-            let error, () = Exception.warn parameters error __POS__ Exit () in
-            error, dynamic, None)
-        (error, dynamic, Some precondition)
-        l
+      let error, dynamic, state_guard_parameters =
+        List.fold_left
+          (fun (error, dynamic, state_guard_parameters) agent_type ->
+            refine_mvbdu_of_agent parameters error agent_type dynamic
+              state_guard_parameters)
+          (error, dynamic, state_guard_parameters)
+          l
+      in
+      let error, dynamic, is_false =
+        is_false_mvbdu parameters error dynamic state_guard_parameters
+      in
+      if is_false then
+        error, dynamic, None
+      else (
+        let precondition =
+          Communication.set_state_of_guard_parameters precondition
+            state_guard_parameters
+        in
+        error, dynamic, Some precondition
+      )
 
   (***********************************************************)
 
@@ -432,31 +525,33 @@ module Domain = struct
 
   let maybe_reachable static dynamic error _flag pattern precondition =
     let parameters = get_parameter static in
+    let error, dynamic, state_guard_parameters =
+      get_state_of_guard_parameters parameters dynamic error precondition
+    in
     try
-      let error, dynamic =
+      let error, (dynamic, _) =
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameters error
-          (fun parameters error _agent_id agent dynamic ->
+          (fun parameters error _agent_id agent (dynamic, current_mvbdu) ->
             match agent with
             | Cckappa_sig.Unknown_agent _ | Cckappa_sig.Ghost
             | Cckappa_sig.Dead_agent (_, _, _, _) ->
-              error, dynamic
+              error, (dynamic, current_mvbdu)
             | Cckappa_sig.Agent agent ->
-              let local = get_seen_agent dynamic in
               let agent_type = agent.Cckappa_sig.agent_name in
-              let error, bool =
-                Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
-                  parameters error agent_type local
+              let error, dynamic, current_mvbdu =
+                refine_mvbdu_of_agent parameters error agent_type dynamic
+                  current_mvbdu
               in
-              (match bool with
-              | Some true -> error, dynamic
-              | Some false -> raise (False (error, dynamic))
-              | None ->
-                let error, () =
-                  Exception.warn parameters error __POS__ Exit ()
-                in
-                error, dynamic))
-          pattern.Cckappa_sig.views dynamic
+              let error, dynamic, is_false =
+                is_false_mvbdu parameters error dynamic current_mvbdu
+              in
+              if is_false then
+                raise (False (error, dynamic))
+              else
+                error, (dynamic, current_mvbdu))
+          pattern.Cckappa_sig.views
+          (dynamic, state_guard_parameters)
       in
       error, dynamic, Some precondition
     with False (error, dynamic) -> error, dynamic, None
@@ -468,12 +563,15 @@ module Domain = struct
       rule. event_list need to be updated, add rules that this agents
       apply. *)
 
-  (*JF: just declare each agent types in that list to be seen *)
+  (*JF: just declare each agent types in that list to be seen if the guards parameters have the right value. *)
 
   let apply_rule static dynamic error rule_id precondition =
     let parameters = get_parameter static in
     let event_list = [] in
     let domain_static = get_domain_static_information static in
+    let error, dynamic, state_guard_parameters =
+      get_state_of_guard_parameters parameters dynamic error precondition
+    in
     let error, list_created =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameters
@@ -487,6 +585,7 @@ module Domain = struct
         (fun (error, (dynamic, event_list)) agent_type ->
           let error, (dynamic, event_list) =
             add_event_list static dynamic error agent_type event_list
+              state_guard_parameters
           in
           error, (dynamic, event_list))
         (error, (dynamic, event_list))
@@ -503,24 +602,28 @@ module Domain = struct
     error, dynamic, event_list'
 
   let export static dynamic error kasa_state =
+    (*rTODO add guards*)
     let parameters = get_parameter static in
     let handler = get_kappa_handler static in
     let compil = get_compil static in
     let array = get_seen_agent dynamic in
-    let error, list =
+    let error, (dynamic, list) =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
         error
-        (fun _parameters error agent bool list ->
-          if bool then
-            error, list
+        (fun _parameters error agent mvbdu (dynamic, list) ->
+          let error, dynamic, is_false =
+            is_false_mvbdu parameters error dynamic mvbdu
+          in
+          if is_false then
+            error, (dynamic, list)
           else (
             let error, info =
               Handler.info_of_agent parameters error handler compil agent
             in
             let agent = Remanent_state.info_to_agent info in
-            error, agent :: list
+            error, (dynamic, agent :: list)
           ))
-        array []
+        array (dynamic, [])
     in
     error, dynamic, Remanent_state.set_dead_agents list kasa_state
 
@@ -539,7 +642,19 @@ module Domain = struct
       let error, bool =
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
           error
-          (fun _parameters error _k bool bool' -> error, bool && bool')
+          (fun _parameters error _k mvbdu bool' ->
+            if not bool' then
+              error, false
+            else (
+              let error, _, is_true =
+                is_true_mvbdu parameters error dynamic mvbdu
+              in
+              ( error,
+                if is_true then
+                  bool'
+                else
+                  false )
+            ))
           result true
       in
       if not bool then (
@@ -559,30 +674,48 @@ module Domain = struct
             "------------------------------------------------------------"
         in
         let () = Loggers.print_newline loggers in
-        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.iter parameters
-          error
-          (fun parameters error k bool ->
-            if bool then
-              error
-            else (
-              let error', agent_string =
-                try Handler.string_of_agent parameters error handler k
-                with _ ->
-                  Exception.warn parameters error __POS__ Exit
-                    (Ckappa_sig.string_of_agent_name k)
-              in
-              let error =
-                Exception.check_point Exception.warn parameters error error'
-                  __POS__ Exit
-              in
-              let () =
-                Loggers.fprintf loggers "%s cannot occur in the model"
-                  agent_string
-              in
-              let () = Loggers.print_newline loggers in
-              error
-            ))
-          result
+        fst
+        @@ Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
+             parameters error
+             (fun parameters error k mvbdu dynamic ->
+               let error, dynamic, is_true =
+                 is_true_mvbdu parameters error dynamic mvbdu
+               in
+               if is_true then
+                 error, dynamic
+               else (
+                 let error', agent_string =
+                   try Handler.string_of_agent parameters error handler k
+                   with _ ->
+                     Exception.warn parameters error __POS__ Exit
+                       (Ckappa_sig.string_of_agent_name k)
+                 in
+                 let error =
+                   Exception.check_point Exception.warn parameters error error'
+                     __POS__ Exit
+                 in
+                 let error, dynamic, is_false =
+                   is_false_mvbdu parameters error dynamic mvbdu
+                 in
+                 let error =
+                   if is_false then (
+                     let () =
+                       Loggers.fprintf loggers "%s cannot occur in the model"
+                         agent_string
+                     in
+                     error
+                   ) else (
+                     let () =
+                       Loggers.fprintf loggers "%s can occur in the model if "
+                         agent_string
+                     in
+                     error
+                   )
+                 in
+                 let () = Loggers.print_newline loggers in
+                 error, dynamic
+               ))
+             result dynamic
       ) else (
         let () =
           Loggers.fprintf loggers
