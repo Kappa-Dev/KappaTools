@@ -88,31 +88,6 @@ let init_bdu_analysis_static parameters error =
   in
   error, init_bdu_analysis_static
 
-(***************************************************************************)
-(* bdu operations that restrict the values of the guards to 0 and 1*)
-(** Returns the disjunction of the two mvbdus but the values of each variable are restricted to the values 0 and 1.
-  Used for the guard parameters, which model boolean values. *)
-
-let mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-    bdu_restriction =
-  let error, handler_bdu, or_bdu =
-    Ckappa_sig.Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
-  in
-  (*all guard parameters must have value 0 or 1*)
-  Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error or_bdu
-    bdu_restriction
-
-let mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2 =
-  Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 mvbdu2
-
-let mvbdu_not_for_guards parameters handler_bdu error mvbdu bdu_restriction =
-  let error, handler_bdu, not_bdu =
-    Ckappa_sig.Views_bdu.mvbdu_not parameters handler_bdu error mvbdu
-  in
-  (*all guard parameters must have value 0 or 1*)
-  Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error not_bdu
-    bdu_restriction
-
 let get_bdu_guard store_guard_bdu rule_id agent_type cv_id bdu_true =
   match Ckappa_sig.Rule_setmap.Map.find_option rule_id store_guard_bdu with
   | None -> bdu_true, bdu_true
@@ -146,7 +121,7 @@ let add_dependency_triple_bdu parameters handler error
     (agent_type, rule_id, cv_id) bdu store_result guard_bdu restriction_bdu =
   (*add guard information*)
   let error, handler, bdu =
-    mvbdu_and_for_guards parameters handler error bdu guard_bdu
+    Common_static.mvbdu_and_for_guards parameters handler error bdu guard_bdu
   in
   let error, handler, bdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters handler error
@@ -158,7 +133,8 @@ let add_dependency_triple_bdu parameters handler error
   in
   (* In the case when the agent is created twice, we take the union *)
   let error, handler, bdu_new =
-    mvbdu_or_for_guards parameters handler error old_bdu bdu restriction_bdu
+    Common_static.mvbdu_or_for_guards parameters handler error old_bdu bdu
+      restriction_bdu
   in
   let store_result =
     Covering_classes_type.AgentRuleCV_setmap.Map.add
@@ -328,7 +304,8 @@ let collect_proj_bdu_creation_restriction_map parameters handler_bdu error
       bdu_true
       (fun parameters (error, handler_bdu) bdu bdu' ->
         let error, handler_bdu, bdu_union =
-          mvbdu_and_for_guards parameters handler_bdu error bdu bdu'
+          Common_static.mvbdu_and_for_guards parameters handler_bdu error bdu
+            bdu'
         in
         (error, handler_bdu), bdu_union)
       store_bdu_creation_restriction_map
@@ -569,13 +546,14 @@ let store_bdu_potential_restriction_map_aux parameters handler error
                             bdu_true
                         in
                         let error, handler, bdu_potential_effect_with_guards =
-                          mvbdu_and_for_guards parameters handler error
-                            guard_bdu bdu_potential_effect
+                          Common_static.mvbdu_and_for_guards parameters handler
+                            error guard_bdu bdu_potential_effect
                         in
                         (*union of bdu and bdu effect*)
                         let error, handler, bdu =
-                          mvbdu_or_for_guards parameters handler error bdu
-                            bdu_potential_effect_with_guards restriction_bdu
+                          Common_static.mvbdu_or_for_guards parameters handler
+                            error bdu bdu_potential_effect_with_guards
+                            restriction_bdu
                         in
                         error, handler, bdu)
                       (error, handler, bdu_false)
@@ -816,8 +794,8 @@ let collect_bdu_test_restriction_map parameters handler error rule_id rule
                     bdu_true
                 in
                 let error, handler, bdu_test_with_guards =
-                  mvbdu_and_for_guards parameters handler error guard_bdu
-                    bdu_test
+                  Common_static.mvbdu_and_for_guards parameters handler error
+                    guard_bdu bdu_test
                 in
                 let error, store_result =
                   ( error,
@@ -859,7 +837,7 @@ let collect_proj_bdu_test_restriction parameters handler_kappa error rule_id
       bdu_true
       (fun parameters (error, handler) bdu bdu' ->
         let error, handler, bdu_union =
-          mvbdu_and_for_guards parameters handler error bdu bdu'
+          Common_static.mvbdu_and_for_guards parameters handler error bdu bdu'
         in
         (error, handler), bdu_union)
       store_bdu_test_restriction_map
@@ -923,11 +901,13 @@ let guard_to_bdu parameters error handler_bdu guard map1 n_guard_p =
         association_list
     | Kappa_terms.LKappa.Not g1 ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
-      mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
+      Common_static.mvbdu_not_for_guards parameters handler_bdu error mvbdu1
+        bdu_restriction
     | Kappa_terms.LKappa.And (g1, g2) ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
       let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
-      mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+      Common_static.mvbdu_and_for_guards parameters handler_bdu error mvbdu1
+        mvbdu2
     | Kappa_terms.LKappa.Or (g1, g2) ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
       let () =
@@ -940,8 +920,8 @@ let guard_to_bdu parameters error handler_bdu guard map1 n_guard_p =
       in
       let () = Ckappa_sig.Views_bdu.print parameters mvbdu2 in
       let error, handler, result =
-        mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-          bdu_restriction
+        Common_static.mvbdu_or_for_guards parameters handler_bdu error mvbdu1
+          mvbdu2 bdu_restriction
       in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameters) "result\n"

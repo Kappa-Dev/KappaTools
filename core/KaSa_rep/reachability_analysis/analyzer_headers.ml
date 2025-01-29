@@ -25,6 +25,8 @@ type global_static_information = {
   global_parameter: Remanent_parameters_sig.parameters;
   global_common_views: Common_static.common_views;
   global_wake_up_relation: Common_static.site_to_rules;
+  global_guard_mvbdus: Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t;
+  global_restriction_mvbdu: Ckappa_sig.Views_bdu.mvbdu;
 }
 
 let add_wake_up_relation static wake =
@@ -254,15 +256,26 @@ let compute_initial_state error static =
   error, List.rev init
 
 (*****************************************************************************)
-(*RULE*)
+(*MVBDU OF THE GUARDS*)
 (*****************************************************************************)
 
 let get_mvbdu_handler dynamic = dynamic.mvbdu_handler
 let set_mvbdu_handler handler dynamic = { dynamic with mvbdu_handler = handler }
+
+let set_guard_mvbdus guard_mvbdus static =
+  { static with global_guard_mvbdus = guard_mvbdus }
+
+let set_restriction_mvbdu restriction_mvbdu static =
+  { static with global_restriction_mvbdu = restriction_mvbdu }
+
+(*****************************************************************************)
+(*RULE*)
+(*****************************************************************************)
+
 let get_log_info dynamic = dynamic.log_info
 let set_log_info log_info dynamic = { dynamic with log_info }
 
-let scan_rule static error =
+let scan_rule static error mvbdu_handler =
   let parameters = get_parameter static in
   let kappa_handler = get_kappa_handler static in
   let compilation = get_cc_code static in
@@ -270,22 +283,39 @@ let scan_rule static error =
     Common_static.scan_rule_set parameters error kappa_handler compilation
   in
   let static = set_common_views store_result static in
-  error, static
+  let error, mvbdu_handler, restriction_mvbdu =
+    Common_static.compute_restriction_mvbdu parameters error mvbdu_handler
+      kappa_handler
+  in
+  let static = set_restriction_mvbdu restriction_mvbdu static in
+  let error, mvbdu_handler, guard_mvbdus =
+    Common_static.collect_guard_mvbdus parameters error mvbdu_handler
+      compilation restriction_mvbdu
+  in
+  let static = set_guard_mvbdus guard_mvbdus static in
+  error, mvbdu_handler, static
 
 let initialize_global_information parameters log_info error mvbdu_handler
     compilation kappa_handler =
   let error, init_common = Common_static.init_common_views parameters error in
   let error, wake_up = Common_static.empty_site_to_rules parameters error in
+  let error, mvbdu_handler, restriction_mvbdu =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters mvbdu_handler error
+  in
   let init_global_static =
     {
       global_compilation_result = { cc_code = compilation; kappa_handler };
       global_parameter = parameters;
       global_common_views = init_common;
       global_wake_up_relation = wake_up;
+      global_guard_mvbdus = Ckappa_sig.Rule_setmap.Map.empty;
+      global_restriction_mvbdu = restriction_mvbdu;
     }
   in
+  let error, mvbdu_handler, static =
+    scan_rule init_global_static error mvbdu_handler
+  in
   let init_dynamic = { dynamic_dummy = (); mvbdu_handler; log_info } in
-  let error, static = scan_rule init_global_static error in
   error, static, init_dynamic
 
 let dummy_dead_rules _ error _ = error, false

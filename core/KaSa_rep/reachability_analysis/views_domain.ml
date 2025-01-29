@@ -308,7 +308,7 @@ module Domain = struct
     in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_or =
-      Bdu_static_views.mvbdu_or_for_guards parameters handler error bdu1 bdu2
+      Common_static.mvbdu_or_for_guards parameters handler error bdu1 bdu2
         restriction_bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -927,7 +927,7 @@ module Domain = struct
                       in
                       let handler = get_mvbdu_handler dynamic in
                       let error, handler, bdu_init_with_guards =
-                        Bdu_static_views.mvbdu_and_for_guards parameters handler
+                        Common_static.mvbdu_and_for_guards parameters handler
                           error restriction_bdu bdu_init
                       in
                       let dynamic = set_mvbdu_handler handler dynamic in
@@ -1049,8 +1049,8 @@ module Domain = struct
           (*bdu intersection*)
           let handler = get_mvbdu_handler dynamic in
           let error, handler, bdu_inter =
-            Bdu_static_views.mvbdu_and_for_guards parameters handler error
-              bdu_test bdu_X
+            Common_static.mvbdu_and_for_guards parameters handler error bdu_test
+              bdu_X
           in
           let dynamic = set_mvbdu_handler handler dynamic in
           if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false then
@@ -1067,7 +1067,7 @@ module Domain = struct
                 bdu_inter nr_guard_parameters map1
             in
             let error, handler, result_bdu_guard =
-              Bdu_static_views.mvbdu_and_for_guards parameters handler error
+              Common_static.mvbdu_and_for_guards parameters handler error
                 result_bdu_guard bdu_proj_guard
             in
             (* intersect result with the current guard bdu*)
@@ -1155,7 +1155,7 @@ module Domain = struct
           (*Bdu_X and Bdu_test*)
           let handler = Analyzer_headers.get_mvbdu_handler dynamic in
           let error, handler, bdu_test_X =
-            Bdu_static_views.mvbdu_and_for_guards parameters handler error bdu_X
+            Common_static.mvbdu_and_for_guards parameters handler error bdu_X
               bdu_test
           in
           (* compute the projection over new_site_name *)
@@ -1178,7 +1178,7 @@ module Domain = struct
           in
           (* conjunction between bdu and bdu'*)
           let error, handler, bdu =
-            Bdu_static_views.mvbdu_and_for_guards parameters handler error bdu
+            Common_static.mvbdu_and_for_guards parameters handler error bdu
               bdu_renamed
           in
           let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
@@ -1516,8 +1516,8 @@ module Domain = struct
                         handler error
                         [ new_site_name_y, state ]
                     in
-                    Bdu_static_views.mvbdu_and_for_guards parameters handler
-                      error bdu_X mvbdu_B_y
+                    Common_static.mvbdu_and_for_guards parameters handler error
+                      bdu_X mvbdu_B_y
                   ) else
                     error, handler, bdu_X
                 in
@@ -1535,7 +1535,7 @@ module Domain = struct
                     bdu_proj new_site_name_1
                 in
                 let error, handler, bdu =
-                  Bdu_static_views.mvbdu_and_for_guards parameters handler error
+                  Common_static.mvbdu_and_for_guards parameters handler error
                     bdu bdu_renamed
                 in
                 let dynamic =
@@ -2238,7 +2238,7 @@ module Domain = struct
               in
               let handler = Analyzer_headers.get_mvbdu_handler dynamic in
               let error, handler, bdu_test_X =
-                Bdu_static_views.mvbdu_and_for_guards parameters handler error
+                Common_static.mvbdu_and_for_guards parameters handler error
                   bdu_X bdu_test
               in
               let error, handler, singleton =
@@ -2261,8 +2261,8 @@ module Domain = struct
               in
               (* conjunction between bdu and bdu'*)
               let error, handler, bdu =
-                Bdu_static_views.mvbdu_and_for_guards parameters handler error
-                  bdu bdu_renamed
+                Common_static.mvbdu_and_for_guards parameters handler error bdu
+                  bdu_renamed
               in
               let dynamic =
                 Analyzer_headers.set_mvbdu_handler handler dynamic
@@ -2425,8 +2425,8 @@ module Domain = struct
                         (*if it does not overlap then answer false, otherwise
                           continue*)
                         let error, handler, bdu_inter =
-                          Bdu_static_views.mvbdu_and_for_guards parameters
-                            handler error bdu_test bdu_X
+                          Common_static.mvbdu_and_for_guards parameters handler
+                            error bdu_test bdu_X
                         in
                         let dynamic = set_mvbdu_handler handler dynamic in
                         (*check if it is overlap or not?*)
@@ -2628,7 +2628,7 @@ module Domain = struct
     in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_inter =
-      Bdu_static_views.mvbdu_and_for_guards parameter_views handler error bdu_X
+      Common_static.mvbdu_and_for_guards parameter_views handler error bdu_X
         bdu_test
     in
     (*redefine with modification list*)
@@ -2642,7 +2642,7 @@ module Domain = struct
         map1 nr_guard_parameters
     in
     let error, handler, bdu_with_guard =
-      Bdu_static_views.mvbdu_and_for_guards parameter_views handler error
+      Common_static.mvbdu_and_for_guards parameter_views handler error
         bdu_redefine renamed_precondition_guard_bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -2677,8 +2677,8 @@ module Domain = struct
         map1 nr_guard_parameters
     in
     let error, handler, bdu_with_guard =
-      Bdu_static_views.mvbdu_and_for_guards parameters handler error
-        bdu_creation renamed_precondition_guard_bdu
+      Common_static.mvbdu_and_for_guards parameters handler error bdu_creation
+        renamed_precondition_guard_bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     let error, dynamic, bdu_result =
@@ -2700,7 +2700,7 @@ module Domain = struct
     in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_inter =
-      Bdu_static_views.mvbdu_and_for_guards parameter_views handler error bdu_X
+      Common_static.mvbdu_and_for_guards parameter_views handler error bdu_X
         bdu_test
     in
     (*redefine with modification list*)
@@ -2714,7 +2714,7 @@ module Domain = struct
         map1 nr_guard_parameters
     in
     let error, handler, bdu_with_guard =
-      Bdu_static_views.mvbdu_and_for_guards parameter_views handler error
+      Common_static.mvbdu_and_for_guards parameter_views handler error
         bdu_redefine renamed_precondition_guard_bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -3102,7 +3102,7 @@ module Domain = struct
               Ckappa_sig.Views_bdu.store_by_variables_list
                 Wrapped_modules.LoggedIntMap.find_default_without_logs
                 Wrapped_modules.LoggedIntMap.add_or_overwrite mvbdu_true
-                Bdu_static_views.mvbdu_and_for_guards parameters handler error
+                Common_static.mvbdu_and_for_guards parameters handler error
                 hconsed_vars renamed_mvbdu cv_map
             in
             let error, output =
