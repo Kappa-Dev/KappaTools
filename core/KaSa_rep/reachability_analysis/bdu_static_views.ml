@@ -1067,8 +1067,13 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
       nr_guard_params store_results.site_to_renamed_site_list
   in
   ( error,
-    (handler_bdu, log_info, { store_results with site_to_renamed_site_list;
-    store_guard_restriction_bdu }) )
+    ( handler_bdu,
+      log_info,
+      {
+        store_results with
+        site_to_renamed_site_list;
+        store_guard_restriction_bdu;
+      } ) )
 
 (***************************************************************************)
 (*PATTERN*)

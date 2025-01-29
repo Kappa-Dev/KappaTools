@@ -1122,6 +1122,14 @@ let mvbdu_not_for_guards parameters handler_bdu error mvbdu bdu_restriction =
   Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error not_bdu
     bdu_restriction
 
+let mvbdu_is_true_for_guards parameters handler_bdu error mvbdu bdu_restriction
+    =
+  let error, handler_bdu, inter_mvbdu =
+    Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error mvbdu
+      bdu_restriction
+  in
+  error, handler_bdu, Ckappa_sig.Views_bdu.equal inter_mvbdu bdu_restriction
+
 let compute_restriction_mvbdu parameters error mvbdu_handler kappa_handler =
   let n_guard_p = Handler.get_nr_guard_parameters kappa_handler in
   let guard_p_list = Ckappa_sig.get_list_of_guard_parameters n_guard_p in
@@ -1165,23 +1173,11 @@ let guard_to_bdu parameters error handler_bdu guard bdu_restriction =
       mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2
     | Kappa_terms.LKappa.Or (g1, g2) ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) "mvbdu1\n"
-      in
-      let () = Ckappa_sig.Views_bdu.print parameters mvbdu1 in
       let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) "mvbdu2\n"
-      in
-      let () = Ckappa_sig.Views_bdu.print parameters mvbdu2 in
       let error, handler, result =
         mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
           bdu_restriction
       in
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) "result\n"
-      in
-      let () = Ckappa_sig.Views_bdu.print parameters result in
       error, handler, result
   in
   aux error handler_bdu guard
