@@ -218,6 +218,13 @@ val compute_initial_state :
 val get_kappa_handler : global_static_information -> Cckappa_sig.kappa_handler
 val get_cc_code : global_static_information -> Cckappa_sig.compil
 
+val get_guard_mvbdus :
+  global_static_information ->
+  Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t
+
+val get_restriction_mvbdu :
+  global_static_information -> Ckappa_sig.Views_bdu.mvbdu
+
 val get_mvbdu_handler :
   global_dynamic_information -> Mvbdu_wrapper.Mvbdu.handler
 

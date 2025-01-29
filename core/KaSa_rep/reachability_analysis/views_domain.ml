@@ -95,6 +95,11 @@ module Domain = struct
   let get_potential_side_effects static =
     lift Analyzer_headers.get_potential_side_effects static
 
+  let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
+
+  let get_restriction_mvbdu static =
+    lift Analyzer_headers.get_restriction_mvbdu static
+
   let get_predicate_covering_classes static =
     static.domain_static_information_covering_class
 
@@ -230,9 +235,9 @@ module Domain = struct
     let result_static = get_bdu_analysis_static static in
     result_static.Bdu_static_views.store_modif_list_restriction_map
 
-  let get_store_guard_bdu static =
+  let get_store_guard_restriction_bdu static =
     let result_static = get_bdu_analysis_static static in
-    result_static.Bdu_static_views.store_guard_bdu
+    result_static.Bdu_static_views.store_guard_restriction_bdu
 
   let get_site_to_renamed_site_list static =
     let result_static = get_bdu_analysis_static static in
@@ -293,11 +298,11 @@ module Domain = struct
     error, set_mvbdu_handler handler_bdu dynamic, bdu_true
 
   let get_restriction_bdu error static dynamic agent_type cv_id =
-    let store_guard_bdu = get_store_guard_bdu static in
+    let restriction_guard_bdu = get_store_guard_restriction_bdu static in
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
-    let _, restriction_bdu =
-      Bdu_static_views.get_bdu_guard store_guard_bdu Ckappa_sig.dummy_rule_id
-        agent_type cv_id bdu_true
+    let restriction_bdu =
+      Bdu_static_views.get_bdu_guard restriction_guard_bdu agent_type cv_id
+        bdu_true
     in
     error, dynamic, restriction_bdu
 
@@ -326,10 +331,12 @@ module Domain = struct
     let log_info = get_log_info dynamic in
     let remanent_triple = get_remanent_triple static in
     let site_correspondence = get_site_correspondence_array static in
+    let guard_mvbdus = get_guard_mvbdus static in
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, (handler_bdu, log_info, result) =
       Bdu_static_views.scan_rule_set parameters log_info handler_bdu error
         kappa_handler compiled potential_side_effects remanent_triple
-        site_correspondence
+        site_correspondence guard_mvbdus restriction_bdu
     in
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in

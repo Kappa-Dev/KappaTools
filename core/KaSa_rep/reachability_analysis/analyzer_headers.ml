@@ -268,6 +268,9 @@ let set_guard_mvbdus guard_mvbdus static =
 let set_restriction_mvbdu restriction_mvbdu static =
   { static with global_restriction_mvbdu = restriction_mvbdu }
 
+let get_guard_mvbdus static = static.global_guard_mvbdus
+let get_restriction_mvbdu static = static.global_restriction_mvbdu
+
 (*****************************************************************************)
 (*RULE*)
 (*****************************************************************************)
