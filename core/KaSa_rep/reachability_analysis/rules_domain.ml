@@ -430,7 +430,7 @@ module Domain = struct
               let error', rule_string =
                 try
                   Handler.string_of_rule parameters error compiled k
-                    ~with_ast:false ~with_guard:false
+                    ~with_ast:false
                 with _ ->
                   Exception.warn parameters error __POS__ Exit
                     (Ckappa_sig.string_of_rule_id k)

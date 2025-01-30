@@ -145,7 +145,7 @@ let add_creation parameters error r_id ag_id mvbdu transition_system =
 let dump_edge logger parameters error compil key key' label =
   let error, rule_name =
     if Remanent_parameters.get_show_rule_names_in_local_traces parameters then
-      Handler.string_of_rule ~with_loc:false ~with_rule:false ~with_ast:false ~with_guard:false
+      Handler.string_of_rule ~with_loc:false ~with_rule:false ~with_ast:false
         parameters error compil (fst label)
     else
       error, ""
@@ -994,7 +994,7 @@ let print logger parameters compil handler_kappa handler error transition_system
             match label with
             | Rule r, _, _ ->
               Handler.string_of_rule ~with_loc:false ~with_rule:false
-                ~with_ast:false ~with_guard:false parameters error compil r
+                ~with_ast:false parameters error compil r
             | Init _, _, _ -> error, ""
           ) else
             error, ""
@@ -1018,7 +1018,7 @@ let print logger parameters compil handler_kappa handler error transition_system
             match label with
             | Rule r, _, _ ->
               Handler.string_of_rule ~with_loc:false ~with_rule:false
-                ~with_ast:false ~with_guard:false parameters error compil r
+                ~with_ast:false parameters error compil r
             | Init _, _, _ -> error, ""
           ) else
             error, ""
@@ -1042,7 +1042,7 @@ let print logger parameters compil handler_kappa handler error transition_system
             match label with
             | Rule r, _, _ ->
               Handler.string_of_rule ~with_loc:false ~with_rule:false
-                ~with_ast:false ~with_guard:false parameters error compil r
+                ~with_ast:false parameters error compil r
             | Init _, _, _ -> error, ""
           ) else
             error, ""

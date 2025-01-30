@@ -297,7 +297,7 @@ let info_of_var parameters error handler compiled
 
 let string_of_info ?(with_rule = true) ?(with_rule_name = true)
     ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true)
-    ?(kind = "rule ") ?(with_guard = true) (label, pos, _direction, ast, guard, id) =
+    ?(kind = "rule ") (label, pos, _direction, ast, guard, id) =
   let label =
     if with_rule_name then
       label
@@ -329,12 +329,13 @@ let string_of_info ?(with_rule = true) ?(with_rule_name = true)
       kind
   in
   let guard =
-    if with_guard then
-    match guard with
-    | None -> ""
-    | Some guard -> "#[" ^ LKappa.string_of_guard guard ^ "]"
-  else ""
-in
+    if with_ast then (
+      match guard with
+      | None -> ""
+      | Some guard -> "#[" ^ LKappa.string_of_guard guard ^ "]"
+    ) else
+      ""
+  in
   let s =
     match label, pos, ast, id with
     | "", "", "", s | "", "", s, _ | "", s, "", _ | s, "", _, _ ->
@@ -346,7 +347,7 @@ in
 let pos_of_info (_, info, _, _, _, _) = info
 
 let string_of_rule ?(with_rule = true) ?(with_rule_name = true)
-    ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true) ?(with_guard = true) parameters
+    ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true) parameters
     error compiled rule_id =
   let kind =
     if with_rule then
@@ -356,7 +357,7 @@ let string_of_rule ?(with_rule = true) ?(with_rule_name = true)
   in
   let error, info = info_of_rule parameters error compiled rule_id in
   ( error,
-    string_of_info ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind ~with_guard info
+    string_of_info ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
   )
 
 let pos_of_rule parameters error _ compiled rule_id =

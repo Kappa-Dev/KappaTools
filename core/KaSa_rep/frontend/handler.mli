@@ -325,7 +325,6 @@ val string_of_rule :
   ?with_rule_id:bool ->
   ?with_loc:bool ->
   ?with_ast:bool ->
-  ?with_guard:bool ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.compil ->
