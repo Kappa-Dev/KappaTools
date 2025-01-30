@@ -663,10 +663,51 @@ module Domain = struct
   (**************************************************************************)
   let stabilize _static dynamic error = error, dynamic, ()
 
+  let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
+    let nr_guard_parameters = Handler.get_nr_guard_parameters kappa_handler in
+    let error, _, mvbdu_extensional =
+      Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters bdu_handler error
+        mvbdu
+    in
+    let loggers = Remanent_parameters.get_logger parameters in
+    let () = Loggers.fprintf loggers "[ " in
+    let _, error =
+      List.fold_left
+        (fun (bool, error) valuations_list ->
+          if bool then Loggers.fprintf loggers " v ";
+          let _, error =
+            List.fold_left
+              (fun (bool, error) (guard_name, value) ->
+                let error, _ =
+                  match
+                    Ckappa_sig.site_or_guard_p_of_guard_p_then_site guard_name
+                      nr_guard_parameters
+                  with
+                  | Ckappa_sig.Guard_p guard_name ->
+                    let error, guard_string =
+                      Handler.string_of_guard parameters guard_name
+                        kappa_handler ~state:value error
+                    in
+                    if bool then Loggers.fprintf loggers ", ";
+                    let () = Loggers.fprintf loggers "%s" guard_string in
+                    error, ()
+                  | Ckappa_sig.Site _ ->
+                    Exception.warn parameters error __POS__ Exit ()
+                in
+                true, error)
+              (false, error) valuations_list
+          in
+          true, error)
+        (false, error) mvbdu_extensional
+    in
+    let () = Loggers.fprintf loggers " ]" in
+    error
+
   let print_dead_agent loggers static dynamic error =
     let parameters = get_parameter static in
     let result = get_seen_agent dynamic in
     let handler = get_kappa_handler static in
+    let bdu_handler = get_mvbdu_handler dynamic in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
       let error, bool =
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
@@ -736,12 +777,12 @@ module Domain = struct
                      in
                      error
                    ) else (
-                     let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
                      let () =
-                       Loggers.fprintf loggers "%s can occur in the model if "
+                       Loggers.fprintf loggers "%s can occur in the model if \n"
                          agent_string
                      in
-                     error
+                     print_guard_mvbdu parameters error handler bdu_handler
+                       mvbdu
                    )
                  in
                  let () = Loggers.print_newline loggers in

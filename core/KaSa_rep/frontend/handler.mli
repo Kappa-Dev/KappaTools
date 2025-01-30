@@ -162,6 +162,14 @@ val string_of_agent :
   Quark_type.agent_quark ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
+val string_of_guard :
+  Remanent_parameters_sig.parameters ->
+  Ckappa_sig.c_guard_parameter ->
+  Cckappa_sig.kappa_handler ->
+  ?state:Ckappa_sig.c_state ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
+
 val is_counter :
   ?ml_pos:(string * int * int * int) option ->
   ?ka_pos:Loc.t option ->
