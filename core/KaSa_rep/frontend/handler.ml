@@ -297,7 +297,7 @@ let info_of_var parameters error handler compiled
 
 let string_of_info ?(with_rule = true) ?(with_rule_name = true)
     ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true)
-    ?(kind = "rule ") (label, pos, _direction, ast, guard, id) =
+    ?(kind = "rule ") ?(with_guard = true) (label, pos, _direction, ast, guard, id) =
   let label =
     if with_rule_name then
       label
@@ -329,10 +329,12 @@ let string_of_info ?(with_rule = true) ?(with_rule_name = true)
       kind
   in
   let guard =
+    if with_guard then
     match guard with
     | None -> ""
     | Some guard -> "#[" ^ LKappa.string_of_guard guard ^ "]"
-  in
+  else ""
+in
   let s =
     match label, pos, ast, id with
     | "", "", "", s | "", "", s, _ | "", s, "", _ | s, "", _, _ ->
@@ -344,7 +346,7 @@ let string_of_info ?(with_rule = true) ?(with_rule_name = true)
 let pos_of_info (_, info, _, _, _, _) = info
 
 let string_of_rule ?(with_rule = true) ?(with_rule_name = true)
-    ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true) parameters
+    ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true) ?(with_guard = true) parameters
     error compiled rule_id =
   let kind =
     if with_rule then
@@ -354,7 +356,7 @@ let string_of_rule ?(with_rule = true) ?(with_rule_name = true)
   in
   let error, info = info_of_rule parameters error compiled rule_id in
   ( error,
-    string_of_info ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
+    string_of_info ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind ~with_guard info
   )
 
 let pos_of_rule parameters error _ compiled rule_id =
@@ -690,6 +692,45 @@ let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
     string_of_site_contact_map ~ml_pos ~ka_pos ~message parameter error
       handler_kappa agent_name s
   | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
+
+let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
+  let nr_guard_parameters = get_nr_guard_parameters kappa_handler in
+  let error, _, mvbdu_extensional =
+    Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters bdu_handler error mvbdu
+  in
+  let loggers = Remanent_parameters.get_logger parameters in
+  let () = Loggers.fprintf loggers "[ " in
+  let _, error =
+    List.fold_left
+      (fun (bool, error) valuations_list ->
+        if bool then Loggers.fprintf loggers " v ";
+        let _, error =
+          List.fold_left
+            (fun (bool, error) (guard_name, value) ->
+              let error, _ =
+                match
+                  Ckappa_sig.site_or_guard_p_of_guard_p_then_site guard_name
+                    nr_guard_parameters
+                with
+                | Ckappa_sig.Guard_p guard_name ->
+                  let error, guard_string =
+                    string_of_guard parameters guard_name kappa_handler
+                      ~state:value error
+                  in
+                  if bool then Loggers.fprintf loggers ", ";
+                  let () = Loggers.fprintf loggers "%s" guard_string in
+                  error, ()
+                | Ckappa_sig.Site _ ->
+                  Exception.warn parameters error __POS__ Exit ()
+              in
+              true, error)
+            (false, error) valuations_list
+        in
+        true, error)
+      (false, error) mvbdu_extensional
+  in
+  let () = Loggers.fprintf loggers " ]" in
+  error
 
 let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple in

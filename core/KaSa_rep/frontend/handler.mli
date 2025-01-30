@@ -203,6 +203,14 @@ val is_binding_site :
   Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
+val print_guard_mvbdu :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+
 val print_labels :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -317,6 +325,7 @@ val string_of_rule :
   ?with_rule_id:bool ->
   ?with_loc:bool ->
   ?with_ast:bool ->
+  ?with_guard:bool ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.compil ->

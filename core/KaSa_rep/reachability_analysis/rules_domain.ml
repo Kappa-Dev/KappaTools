@@ -30,7 +30,8 @@ module Domain = struct
   (* This array is statically allocated *)
   (* Why do you use extensive arrays ? *)
   type local_dynamic_information =
-    bool Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t
+    Ckappa_sig.Views_bdu.mvbdu
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t
 
   type dynamic_information = {
     local: local_dynamic_information;
@@ -47,6 +48,12 @@ module Domain = struct
   let lift f x = f (get_global_static_information x)
   let get_parameter static = lift Analyzer_headers.get_parameter static
   let get_compil static = lift Analyzer_headers.get_cc_code static
+  let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
+
+  let get_restriction_mvbdu static =
+    lift Analyzer_headers.get_restriction_mvbdu static
+
+  let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
@@ -56,11 +63,60 @@ module Domain = struct
   let set_global_dynamic_information gdynamic dynamic =
     { dynamic with global = gdynamic }
 
+  let get_mvbdu_handler dynamic =
+    Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
+
+  let set_mvbdu_handler handler dynamic =
+    {
+      dynamic with
+      global =
+        Analyzer_headers.set_mvbdu_handler handler
+          (get_global_dynamic_information dynamic);
+    }
+
+  let get_state_of_guard_parameters parameters dynamic error precondition =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, state_guard_parameters =
+      Communication.get_state_of_guard_parameters parameters bdu_handler error
+        precondition
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, state_guard_parameters
+
+  let set_state_of_guard_parameters precondition state_guard_parameters =
+    Communication.set_state_of_guard_parameters precondition
+      state_guard_parameters
+
+  let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
+    let handler = get_mvbdu_handler dynamic in
+    let error, handler, bdu_guard =
+      Bdu_static_views.get_bdu_guard_original_names guard_mvbdus rule_id
+        parameters handler error
+    in
+    let dynamic = set_mvbdu_handler handler dynamic in
+    error, dynamic, bdu_guard
+
   (** dead rule local dynamic information*)
   let get_dead_rule dynamic = dynamic.local
 
   let set_dead_rule dead_rule dynamic = { dynamic with local = dead_rule }
 
+  let is_false_mvbdu parameters error dynamic mvbdu =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, mvbdu_false =
+      Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, Ckappa_sig.Views_bdu.equal mvbdu mvbdu_false
+
+  let is_true_mvbdu parameters error dynamic mvbdu bdu_restriction =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, is_true =
+      Common_static.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
+        bdu_restriction
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, is_true
   (*--------------------------------------------------------------------*)
 
   type 'a zeroary =
@@ -103,13 +159,18 @@ module Domain = struct
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let parameters = Analyzer_headers.get_parameter static in
     let nrules = Handler.nrules parameters error kappa_handler in
+    let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+    let error, bdu_handler, mvbdu_false =
+      Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+    in
+    let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     let error, init_dead_rule_array =
       if nrules = 0 then
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create parameters error
           0
       else
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.init parameters error
-          (nrules - 1) (fun _ error _ -> error, false)
+          (nrules - 1) (fun _ error _ -> error, mvbdu_false)
     in
     let init_global_dynamic_information =
       { global = dynamic; local = init_dead_rule_array }
@@ -135,23 +196,54 @@ module Domain = struct
       precondition =
     let parameters = get_parameter static in
     let bool_array = get_dead_rule dynamic in
-    let error, bool =
+    let error, mvbdu =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error
         rule_id bool_array
     in
-    match bool with
-    | Some false | None ->
+    match mvbdu with
+    | None ->
       let error, precondition =
         Communication.the_rule_is_applied_for_the_first_time
           (get_parameter static) error precondition
       in
       error, dynamic, Some precondition
-    | Some true ->
-      let error, precondition =
-        Communication.the_rule_is_not_applied_for_the_first_time
-          (get_parameter static) error precondition
+    | Some mvbdu ->
+      let error, dynamic, is_false =
+        is_false_mvbdu parameters error dynamic mvbdu
       in
-      error, dynamic, Some precondition
+      if is_false then (
+        let error, precondition =
+          Communication.the_rule_is_applied_for_the_first_time
+            (get_parameter static) error precondition
+        in
+        error, dynamic, Some precondition
+      ) else (
+        let error, precondition =
+          Communication.the_rule_is_not_applied_for_the_first_time
+            (get_parameter static) error precondition
+        in
+        let guard_mvbdus = get_guard_mvbdus static in
+        let error, dynamic, guard_bdu =
+          get_bdu_guard parameters dynamic error guard_mvbdus rule_id
+        in
+        let error, dynamic, state_of_guard_parameters =
+          get_state_of_guard_parameters parameters dynamic error precondition
+        in
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let error, bdu_handler, guard_bdu_inter =
+          Common_static.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+            guard_bdu
+        in
+        let error, bdu_handler, guard_bdu_inter =
+          Common_static.mvbdu_and_for_guards parameters bdu_handler error
+            guard_bdu_inter state_of_guard_parameters
+        in
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+        let precondition =
+          set_state_of_guard_parameters precondition guard_bdu_inter
+        in
+        error, dynamic, Some precondition
+      )
 
   (***********************************************************)
 
@@ -180,12 +272,22 @@ module Domain = struct
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error
           rule_id dead_rule_array
       with
-      | error, Some false ->
+      | error, Some mvbdu ->
+        let error, dynamic, state_guard_parameters =
+          get_state_of_guard_parameters parameters dynamic error precondition
+        in
+        let restriction_mvbdu = get_restriction_mvbdu static in
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let error, bdu_handler, bdu_union =
+          Common_static.mvbdu_or_for_guards parameters bdu_handler error mvbdu
+            state_guard_parameters restriction_mvbdu
+        in
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
         let error, dead_rule_array =
           Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set parameters error
-            rule_id true dead_rule_array
+            rule_id bdu_union dead_rule_array
         in
-        let dynamic =
+        let error, dynamic =
           let log = Remanent_parameters.get_logger parameters in
           if
             local_trace
@@ -193,19 +295,24 @@ module Domain = struct
             || Remanent_parameters.get_dump_reachability_analysis_iteration
                  parameters
           then (
-            let () = Loggers.print_newline log in
-            let () =
-              Loggers.fprintf log "\t\t%s is applied for the first time"
-                rule_id_string
+            let error, dynamic, is_false =
+              is_false_mvbdu parameters error dynamic mvbdu
             in
-            let () = Loggers.print_newline log in
-            dynamic
+            if is_false then (
+              let () = Loggers.print_newline log in
+              let () =
+                Loggers.fprintf log "\t\t%s is applied for the first time"
+                  rule_id_string
+              in
+              let () = Loggers.print_newline log in
+              error, dynamic
+            ) else
+              error, dynamic
           ) else
-            dynamic
+            error, dynamic
         in
         let dynamic = set_dead_rule dead_rule_array dynamic in
         error, dynamic
-      | error, Some true -> error, dynamic
       | error, None -> Exception.warn parameters error __POS__ Exit dynamic
     in
     error, dynamic, (precondition, event_list)
@@ -224,6 +331,7 @@ module Domain = struct
   let stabilize _static dynamic error = error, dynamic, ()
 
   let export static dynamic error kasa_state =
+    (*rTODO add mvbdu information?*)
     let parameters = get_parameter static in
     let hide_reverse_rule =
       Remanent_parameters.get_hide_reverse_rule_without_label_from_dead_rules
@@ -232,12 +340,13 @@ module Domain = struct
     let original = hide_reverse_rule in
     let compil = get_compil static in
     let array = get_dead_rule dynamic in
-    let error, list =
+    let error, (list, dynamic) =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
-        (fun _parameters error i bool list ->
-          if bool then
-            error, list
-          else (
+        (fun _parameters error i mvbdu (list, dynamic) ->
+          let error, dynamic, is_false =
+            is_false_mvbdu parameters error dynamic mvbdu
+          in
+          if is_false then (
             let error, info =
               Handler.info_of_rule ~original ~with_rates:false parameters error
                 compil i
@@ -251,9 +360,10 @@ module Domain = struct
               else
                 rule
             in
-            error, rule :: list
-          ))
-        array []
+            error, (rule :: list, dynamic)
+          ) else
+            error, (list, dynamic))
+        array ([], dynamic)
     in
     error, dynamic, Remanent_state.set_dead_rules list kasa_state
 
@@ -263,10 +373,20 @@ module Domain = struct
     let parameters = get_parameter static in
     let result = get_dead_rule dynamic in
     let compiled = get_compil static in
+    let kappa_handler = get_kappa_handler static in
+    let bdu_handler = get_mvbdu_handler dynamic in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
       let error, bool =
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
-          (fun _parameters error _k bool bool' -> error, bool && bool')
+          (fun _parameters error _k mvbdu bool' ->
+            let error, _, is_true =
+              is_true_mvbdu parameters error dynamic mvbdu
+                (get_restriction_mvbdu static)
+            in
+            if is_true then
+              error, bool'
+            else
+              error, false)
           result true
       in
       if not bool then (
@@ -299,14 +419,18 @@ module Domain = struct
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
         in
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.iter parameters error
-          (fun parameters error k bool ->
-            if bool then
+          (fun parameters error k mvbdu ->
+            let error, _, is_true =
+              is_true_mvbdu parameters error dynamic mvbdu
+                (get_restriction_mvbdu static)
+            in
+            if is_true then
               error
             else (
               let error', rule_string =
                 try
                   Handler.string_of_rule parameters error compiled k
-                    ~with_ast:false
+                    ~with_ast:false ~with_guard:false
                 with _ ->
                   Exception.warn parameters error __POS__ Exit
                     (Ckappa_sig.string_of_rule_id k)
@@ -315,10 +439,26 @@ module Domain = struct
                 Exception.check_point Exception.warn parameters error error'
                   __POS__ Exit
               in
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  "%s will never be applied." rule_string
+              let error, _, is_false =
+                is_false_mvbdu parameters error dynamic mvbdu
+              in
+              let error =
+                if is_false then (
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters)
+                      "%s will never be applied." rule_string
+                  in
+                  error
+                ) else (
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters)
+                      "%s could be applied if " rule_string
+                  in
+                  Handler.print_guard_mvbdu parameters error kappa_handler
+                    bdu_handler mvbdu
+                )
               in
               let () =
                 Loggers.print_newline
@@ -354,13 +494,20 @@ module Domain = struct
     let error = print_dead_rule static dynamic error in
     error, dynamic, ()
 
-  let get_dead_rules _static dynamic parameters error r_id =
+  let get_dead_rules static dynamic parameters error r_id =
     match
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error r_id
         (get_dead_rule dynamic)
     with
     | error, None -> Exception.warn parameters error __POS__ Exit false
-    | error, Some b -> error, not b
+    | error, Some b ->
+      let error, _, is_false =
+        is_false_mvbdu (get_parameter static) error dynamic b
+      in
+      if is_false then
+        error, true
+      else
+        error, false
 
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
 end
