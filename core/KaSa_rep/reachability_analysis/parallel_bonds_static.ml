@@ -16,6 +16,21 @@
 
 let local_trace = false
 
+type agent_two_sites =
+  Ckappa_sig.c_agent_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_state
+  * Ckappa_sig.c_state
+
+type agent_id_two_sites =
+  Ckappa_sig.c_agent_id
+  * Ckappa_sig.c_agent_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_state
+  * Ckappa_sig.c_state
+
 type local_static_information = {
   (*rule has two bonds (parallel or not) on the lhs*)
   store_rule_double_bonds_lhs:
@@ -36,58 +51,16 @@ type local_static_information = {
     * Ckappa_sig.c_site_name
     * Ckappa_sig.c_state
     * Ckappa_sig.c_state
-    * ((Ckappa_sig.c_agent_name
-       * Ckappa_sig.c_site_name
-       * Ckappa_sig.c_site_name
-       * Ckappa_sig.c_state
-       * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_agent_name
-        * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_state
-        * Ckappa_sig.c_state))
-    * ((Ckappa_sig.c_agent_name
-       * Ckappa_sig.c_site_name
-       * Ckappa_sig.c_site_name
-       * Ckappa_sig.c_state
-       * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_agent_name
-        * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_state
-        * Ckappa_sig.c_state)))
+    * (agent_two_sites * agent_two_sites)
+    * (agent_two_sites * agent_two_sites))
     list
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
   store_fst_site_create_parallel_bonds_rhs:
-    ((Ckappa_sig.c_agent_id
-     * Ckappa_sig.c_agent_name
-     * Ckappa_sig.c_site_name
-     * Ckappa_sig.c_site_name
-     * Ckappa_sig.c_state
-     * Ckappa_sig.c_state)
-    * (Ckappa_sig.c_agent_id
-      * Ckappa_sig.c_agent_name
-      * Ckappa_sig.c_site_name
-      * Ckappa_sig.c_site_name
-      * Ckappa_sig.c_state
-      * Ckappa_sig.c_state))
-    list
+    (agent_id_two_sites * agent_id_two_sites) list
     Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.t
     Ckappa_sig.Rule_map_and_set.Map.t;
   store_snd_site_create_parallel_bonds_rhs:
-    ((Ckappa_sig.c_agent_id
-     * Ckappa_sig.c_agent_name
-     * Ckappa_sig.c_site_name
-     * Ckappa_sig.c_site_name
-     * Ckappa_sig.c_state
-     * Ckappa_sig.c_state)
-    * (Ckappa_sig.c_agent_id
-      * Ckappa_sig.c_agent_name
-      * Ckappa_sig.c_site_name
-      * Ckappa_sig.c_site_name
-      * Ckappa_sig.c_state
-      * Ckappa_sig.c_state))
-    list
+    (agent_id_two_sites * agent_id_two_sites) list
     Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.t
     Ckappa_sig.Rule_map_and_set.Map.t;
   (*A map from tuples -> sites (agent_type, site_name)*)
