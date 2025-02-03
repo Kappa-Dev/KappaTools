@@ -109,12 +109,8 @@ module Domain = struct
   let mvbdu_project_abstract_away_last_variable parameters bdu_handler error
       static mvbdu =
     let variable_name = get_last_mvbdu_variable (get_kappa_handler static) in
-    let error, bdu_handler, variable_list =
-      Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
-        [ variable_name ]
-    in
-    Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler
-      error mvbdu variable_list
+    Parallel_bonds_type.mvbdu_project_abstract_away_last_variable parameters
+      bdu_handler error variable_name mvbdu
 
   (*static information*)
 
@@ -1469,12 +1465,13 @@ module Domain = struct
             "------------------------------------------------------------\n"
         in
         let store_value = get_value dynamic in
+        let restriction_bdu = get_restriction_mvbdu static in
         let error, bdu_handler =
           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
             (fun tuple value (error, bdu_handler) ->
               Parallel_bonds_type.print_parallel_constraint ~verbose:true
                 ~sparse:true ~final_resul:true ~dump_any:true parameters error
-                kappa_handler tuple value bdu_handler)
+                kappa_handler tuple value bdu_handler restriction_bdu)
             store_value (error, bdu_handler)
         in
         error, bdu_handler

@@ -190,9 +190,82 @@ let add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
   Common_static.mvbdu_and_for_guards parameters bdu_handler error mvbdu
     is_parallel_bond_mvbdu
 
+let add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
+    value variable_name mvbdu =
+  match value with
+  | Usual_domains.Val bool ->
+    add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
+      variable_name mvbdu
+  | Usual_domains.Any -> error, bdu_handler, mvbdu
+  | Usual_domains.Undefined ->
+    Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+
+let mvbdu_project_abstract_away_last_variable parameters bdu_handler error
+    variable_name mvbdu =
+  let error, bdu_handler, variable_list =
+    Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+      [ variable_name ]
+  in
+  Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
+    mvbdu variable_list
+
+(* given the mvbdu that was computed by the analysis, find the four mvbdu that describes for which values of the guard variables:
+   - the double bonds are always parallel
+   - the double bonds are never parallel
+   - the double bonds could be either parallel or not
+   - undefined: there are no double bonds (or the analysis has not reached this value yet) *)
+let compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
+    error variable_name mvbdu restriction_bdu =
+  let error, bdu_handler, bdu_parallel =
+    add_parallel_bond_variable_to_mvbdu parameters bdu_handler error true
+      variable_name mvbdu
+  in
+  let error, bdu_handler, bdu_non_parallel =
+    add_parallel_bond_variable_to_mvbdu parameters bdu_handler error false
+      variable_name mvbdu
+  in
+  let error, bdu_handler, bdu_only_guards_parallel =
+    mvbdu_project_abstract_away_last_variable parameters bdu_handler error
+      variable_name bdu_parallel
+  in
+  let error, bdu_handler, bdu_only_guards_non_parallel =
+    mvbdu_project_abstract_away_last_variable parameters bdu_handler error
+      variable_name bdu_non_parallel
+  in
+  let error, bdu_handler, bdu_only_guards_parallel_negation =
+    Common_static.mvbdu_not_for_guards parameters bdu_handler error
+      bdu_only_guards_parallel restriction_bdu
+  in
+  let error, bdu_handler, bdu_only_guards_non_parallel_negation =
+    Common_static.mvbdu_not_for_guards parameters bdu_handler error
+      bdu_only_guards_non_parallel restriction_bdu
+  in
+  let error, bdu_handler, bdu_any_bond =
+    Common_static.mvbdu_and_for_guards parameters bdu_handler error
+      bdu_only_guards_parallel bdu_only_guards_non_parallel
+  in
+  let error, bdu_handler, bdu_only_parallel_bond =
+    Common_static.mvbdu_and_for_guards parameters bdu_handler error
+      bdu_only_guards_parallel bdu_only_guards_non_parallel_negation
+  in
+  let error, bdu_handler, bdu_only_non_parallel_bond =
+    Common_static.mvbdu_and_for_guards parameters bdu_handler error
+      bdu_only_guards_parallel_negation bdu_only_guards_non_parallel
+  in
+  let error, bdu_handler, bdu_undefined_bonds =
+    Common_static.mvbdu_and_for_guards parameters bdu_handler error
+      bdu_only_guards_parallel_negation bdu_only_guards_non_parallel_negation
+  in
+  ( error,
+    bdu_handler,
+    bdu_only_parallel_bond,
+    bdu_only_non_parallel_bond,
+    bdu_any_bond,
+    bdu_undefined_bonds )
+
 let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     ?final_resul:(final_result = false) ?(dump_any = false) parameters error
-    kappa_handler tuple value bdu_handler =
+    kappa_handler tuple value bdu_handler restriction_bdu =
   let last_variable =
     Ckappa_sig.guard_p_then_site_of_guard
       (Handler.get_nr_guard_parameters kappa_handler)
@@ -290,12 +363,17 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
   if sparse && compare site site' > 0 then
     error, bdu_handler
   else (
+    let ( error,
+          bdu_handler,
+          parallel_bond_mvbdu,
+          non_parallel_bond_mvbdu,
+          _any_bond_mvbdu,
+          _undefined_bond_mvbdu ) =
+      compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
+        error last_variable value restriction_bdu
+    in
     let error, bdu_handler =
       (*for which values of the guards are all double bonds parallel?*)
-      let error, bdu_handler, parallel_bond_mvbdu =
-        add_parallel_bond_variable_to_mvbdu parameters bdu_handler error true
-          last_variable value
-      in
       let error, bdu_handler, is_false =
         Common_static.mvbdu_is_false_for_guards parameters bdu_handler error
           parallel_bond_mvbdu
@@ -312,6 +390,10 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                 Site_graphs.KaSa_site_graph.print
                   (Remanent_parameters.get_logger parameters)
                   parameters error t_precondition
+              in
+              let error =
+                Handler.print_guard_mvbdu parameters error kappa_handler
+                  bdu_handler parallel_bond_mvbdu
               in
               let () =
                 Loggers.fprintf
@@ -371,65 +453,79 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     in
     let error, bdu_handler =
       (*for which values of the guards are all double bonds non-parallel?*)
-      match Remanent_parameters.get_backend_mode parameters with
-      | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-        let error, bdu_handler =
-          if verbose then (
-            let error =
-              Site_graphs.KaSa_site_graph.print
-                (Remanent_parameters.get_logger parameters)
-                parameters error t_precondition
-            in
-            let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
-            in
-            error, bdu_handler
-          ) else (
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
-                "%s"
-                (Remanent_parameters.get_prefix parameters)
-            in
-            error, bdu_handler
-          )
-        in
-        let error =
-          Site_graphs.KaSa_site_graph.print_list
-            (Remanent_parameters.get_logger parameters)
-            parameters error kappa_handler list_distinct
-        in
-        let () =
-          Loggers.print_newline (Remanent_parameters.get_logger parameters)
-        in
+      let error, bdu_handler, is_false =
+        Common_static.mvbdu_is_false_for_guards parameters bdu_handler error
+          non_parallel_bond_mvbdu
+      in
+      if is_false then
         error, bdu_handler
-      | Remanent_parameters_sig.Natural_language ->
-        let error, bdu_handler =
-          if verbose then (
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
-                "%sWhen the agent %s has its site %s bound to the site %s of a \
-                 %s, and its site %s bound to the site %s of a %s, then both \
-                 instances of %s %s  different."
-                prefix string_agent string_site string_site'' string_agent''
-                string_site' string_site''' string_agent'' string_agent''
-                modalite
-            in
-            error, bdu_handler
-          ) else (
-            let error =
-              Site_graphs.KaSa_site_graph.print
-                (Remanent_parameters.get_logger parameters)
-                parameters error t_distinct
-            in
-            error, bdu_handler
-          )
-        in
-        let () =
-          Loggers.print_newline (Remanent_parameters.get_logger parameters)
-        in
-        error, bdu_handler
+      else (
+        match Remanent_parameters.get_backend_mode parameters with
+        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+          let error, bdu_handler =
+            if verbose then (
+              let error =
+                Site_graphs.KaSa_site_graph.print
+                  (Remanent_parameters.get_logger parameters)
+                  parameters error t_precondition
+              in
+              let error =
+                Handler.print_guard_mvbdu parameters error kappa_handler
+                  bdu_handler non_parallel_bond_mvbdu
+              in
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  " => "
+              in
+              error, bdu_handler
+            ) else (
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "%s"
+                  (Remanent_parameters.get_prefix parameters)
+              in
+              error, bdu_handler
+            )
+          in
+          let error =
+            Site_graphs.KaSa_site_graph.print_list
+              (Remanent_parameters.get_logger parameters)
+              parameters error kappa_handler list_distinct
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          in
+          error, bdu_handler
+        | Remanent_parameters_sig.Natural_language ->
+          let error, bdu_handler =
+            if verbose then (
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "%sWhen the agent %s has its site %s bound to the site %s of \
+                   a %s, and its site %s bound to the site %s of a %s, then \
+                   both instances of %s %s  different."
+                  prefix string_agent string_site string_site'' string_agent''
+                  string_site' string_site''' string_agent'' string_agent''
+                  modalite
+              in
+              error, bdu_handler
+            ) else (
+              let error =
+                Site_graphs.KaSa_site_graph.print
+                  (Remanent_parameters.get_logger parameters)
+                  parameters error t_distinct
+              in
+              error, bdu_handler
+            )
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          in
+          error, bdu_handler
+      )
       (* for which values of the guards can the double bonds be both parallel and non-parallel? *)
     in
     let error, bdu_handler =
@@ -501,16 +597,6 @@ let add_value_lattice parameters error x value store_result =
     error, store_result
   )
 
-let add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
-    value variable_name mvbdu =
-  match value with
-  | Usual_domains.Val bool ->
-    add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
-      variable_name mvbdu
-  | Usual_domains.Any -> error, bdu_handler, mvbdu
-  | Usual_domains.Undefined ->
-    Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
-
 (*TODO merge with above*)
 let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
     restriction_mvbdu =
@@ -581,7 +667,7 @@ let add_value_and_event parameters error kappa_handler x value store_set
     let error, bdu_handler =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameters then
         print_parallel_constraint ~verbose:false ~dump_any:true parameters error
-          kappa_handler x value_mvbdu bdu_handler
+          kappa_handler x value_mvbdu bdu_handler restriction_mvbdu
       else
         error, bdu_handler
     in
