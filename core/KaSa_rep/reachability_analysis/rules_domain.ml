@@ -103,11 +103,11 @@ module Domain = struct
 
   let is_false_mvbdu parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
-    let error, bdu_handler, mvbdu_false =
-      Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+    let error, bdu_handler, is_false =
+      Common_static.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
-    error, dynamic, Ckappa_sig.Views_bdu.equal mvbdu mvbdu_false
+    error, dynamic, is_false
 
   let is_true_mvbdu parameters error dynamic mvbdu bdu_restriction =
     let bdu_handler = get_mvbdu_handler dynamic in

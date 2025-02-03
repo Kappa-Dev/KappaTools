@@ -271,6 +271,9 @@ let set_restriction_mvbdu restriction_mvbdu static =
 let get_guard_mvbdus static = static.global_guard_mvbdus
 let get_restriction_mvbdu static = static.global_restriction_mvbdu
 
+let get_nr_guard_parameters static =
+  (get_kappa_handler static).Cckappa_sig.nguard_params
+
 (*****************************************************************************)
 (*RULE*)
 (*****************************************************************************)

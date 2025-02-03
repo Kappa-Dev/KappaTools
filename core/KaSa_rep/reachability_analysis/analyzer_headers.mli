@@ -225,6 +225,9 @@ val get_guard_mvbdus :
 val get_restriction_mvbdu :
   global_static_information -> Ckappa_sig.Views_bdu.mvbdu
 
+val get_nr_guard_parameters :
+  global_static_information -> Ckappa_sig.c_guard_parameter
+
 val get_mvbdu_handler :
   global_dynamic_information -> Mvbdu_wrapper.Mvbdu.handler
 

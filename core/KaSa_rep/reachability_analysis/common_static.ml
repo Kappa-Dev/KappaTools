@@ -1130,6 +1130,12 @@ let mvbdu_is_true_for_guards parameters handler_bdu error mvbdu bdu_restriction
   in
   error, handler_bdu, Ckappa_sig.Views_bdu.equal inter_mvbdu bdu_restriction
 
+let mvbdu_is_false_for_guards parameters handler_bdu error mvbdu =
+  let error, handler_bdu, mvbdu_false =
+    Ckappa_sig.Views_bdu.mvbdu_false parameters handler_bdu error
+  in
+  error, handler_bdu, Ckappa_sig.Views_bdu.equal mvbdu mvbdu_false
+
 let compute_restriction_mvbdu parameters error mvbdu_handler kappa_handler =
   let n_guard_p = Handler.get_nr_guard_parameters kappa_handler in
   let guard_p_list = Ckappa_sig.get_list_of_guard_parameters n_guard_p in
