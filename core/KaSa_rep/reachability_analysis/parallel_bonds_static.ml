@@ -14,7 +14,7 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let local_trace = false
+let local_trace = true
 
 type local_static_information = {
   (*rule has two bonds (parallel or not) on the lhs*)
@@ -62,11 +62,13 @@ type local_static_information = {
   store_sites_to_tuple:
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t
     Parallel_bonds_type.AgentSite_map_and_set.Map.t;
+      (*the same as the global restriction mvbdu, but it contains one additional variable at the end.*)
+  restriction_mvbdu: Ckappa_sig.Views_bdu.mvbdu;
 }
 
 (*******************************************************************)
 
-let init_local_static =
+let init_local_static restriction_mvbdu =
   {
     store_tuples_of_interest =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty;
@@ -81,6 +83,7 @@ let init_local_static =
     store_closure =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
     store_sites_to_tuple = Parallel_bonds_type.AgentSite_map_and_set.Map.empty;
+    restriction_mvbdu;
   }
 
 (*******************************************************************)
@@ -170,12 +173,22 @@ let project_away_ag_id_gen f parameters error big_store acc =
       f parameters error (Parallel_bonds_type.project2 tuple) value acc)
     big_store (error, acc)
 
-let project_away_ag_id parameters _kappa_handler error big_store acc =
-  let f parameters error tuple value acc =
-    Parallel_bonds_type.add_value parameters error tuple
-      (Usual_domains.Val value) acc
+let project_away_ag_id_gen_bdu f parameters error big_store acc bdu_handler =
+  Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
+    (fun tuple value (error, (bdu_handler, acc)) ->
+      f parameters error
+        (Parallel_bonds_type.project2 tuple)
+        value acc bdu_handler)
+    big_store
+    (error, (bdu_handler, acc))
+
+let project_away_ag_id parameters _kappa_handler bdu_handler error big_store acc
+    mvbdu restriction_mvbdu last_variable =
+  let f parameters error tuple bool acc bdu_handler =
+    Parallel_bonds_type.add_value_bool parameters error tuple bdu_handler bool
+      acc mvbdu restriction_mvbdu last_variable
   in
-  project_away_ag_id_gen f parameters error big_store acc
+  project_away_ag_id_gen_bdu f parameters error big_store acc bdu_handler
 
 let project_away_ag_id_and_convert_into_set parameters error big_store acc =
   let f parameters error tuple _ acc =
