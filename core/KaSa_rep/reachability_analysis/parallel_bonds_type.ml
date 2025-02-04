@@ -263,6 +263,26 @@ let compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
     bdu_any_bond,
     bdu_undefined_bonds )
 
+let print_guard_parameters_natural_language parameters prefix error
+    kappa_handler bdu_handler is_true mvbdu =
+  if not is_true then (
+    let () =
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameters)
+        "%sFor the following values of the guard parameters: \n" prefix
+    in
+    let error =
+      Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
+    in
+    let () =
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameters)
+        "\nIt holds that: "
+    in
+    error
+  ) else
+    error
+
 let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     ?final_resul:(final_result = false) ?(dump_any = false) parameters error
     kappa_handler tuple value bdu_handler restriction_bdu =
@@ -367,18 +387,22 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
           bdu_handler,
           parallel_bond_mvbdu,
           non_parallel_bond_mvbdu,
-          _any_bond_mvbdu,
+          any_bond_mvbdu,
           _undefined_bond_mvbdu ) =
       compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
         error last_variable value restriction_bdu
     in
     let error, bdu_handler =
       (*for which values of the guards are all double bonds parallel?*)
-      let error, bdu_handler, is_false =
+      let error, bdu_handler, parallel_is_false =
         Common_static.mvbdu_is_false_for_guards parameters bdu_handler error
           parallel_bond_mvbdu
       in
-      if is_false then
+      let error, bdu_handler, parallel_is_true =
+        Common_static.mvbdu_is_true_for_guards parameters bdu_handler error
+          parallel_bond_mvbdu restriction_bdu
+      in
+      if parallel_is_false then
         error, bdu_handler
       else (
         match Remanent_parameters.get_backend_mode parameters with
@@ -421,19 +445,26 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
           in
           error, bdu_handler
         | Remanent_parameters_sig.Natural_language ->
-          if verbose then (
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
-                "%sWhen the agent %s has its site %s bound to the site %s of a \
-                 %s, and its site %s bound to the site %s of a %s, then both \
-                 instances of %s %s the same."
-                prefix string_agent string_site string_site'' string_agent''
-                string_site' string_site''' string_agent'' string_agent''
-                modalite
-            in
-            error, bdu_handler
-          ) else (
+          if verbose then
+            if not parallel_is_false then (
+              let error =
+                print_guard_parameters_natural_language parameters prefix error
+                  kappa_handler bdu_handler parallel_is_true parallel_bond_mvbdu
+              in
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "%sWhen the agent %s has its site %s bound to the site %s of \
+                   a %s, and its site %s bound to the site %s of a %s, then \
+                   both instances of %s %s the same.\n"
+                  prefix string_agent string_site string_site'' string_agent''
+                  string_site' string_site''' string_agent'' string_agent''
+                  modalite
+              in
+              error, bdu_handler
+            ) else
+              error, bdu_handler
+          else (
             let () =
               Loggers.fprintf
                 (Remanent_parameters.get_logger parameters)
@@ -453,11 +484,15 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     in
     let error, bdu_handler =
       (*for which values of the guards are all double bonds non-parallel?*)
-      let error, bdu_handler, is_false =
+      let error, bdu_handler, non_parallel_is_false =
         Common_static.mvbdu_is_false_for_guards parameters bdu_handler error
           non_parallel_bond_mvbdu
       in
-      if is_false then
+      let error, bdu_handler, non_parallel_is_true =
+        Common_static.mvbdu_is_true_for_guards parameters bdu_handler error
+          non_parallel_bond_mvbdu restriction_bdu
+      in
+      if non_parallel_is_false then
         error, bdu_handler
       else (
         match Remanent_parameters.get_backend_mode parameters with
@@ -500,19 +535,27 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
           error, bdu_handler
         | Remanent_parameters_sig.Natural_language ->
           let error, bdu_handler =
-            if verbose then (
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  "%sWhen the agent %s has its site %s bound to the site %s of \
-                   a %s, and its site %s bound to the site %s of a %s, then \
-                   both instances of %s %s  different."
-                  prefix string_agent string_site string_site'' string_agent''
-                  string_site' string_site''' string_agent'' string_agent''
-                  modalite
-              in
-              error, bdu_handler
-            ) else (
+            if verbose then
+              if not non_parallel_is_false then (
+                let error =
+                  print_guard_parameters_natural_language parameters prefix
+                    error kappa_handler bdu_handler non_parallel_is_true
+                    non_parallel_bond_mvbdu
+                in
+                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameters)
+                    "%sWhen the agent %s has its site %s bound to the site %s \
+                     of a %s, and its site %s bound to the site %s of a %s, \
+                     then both instances of %s %s  different."
+                    prefix string_agent string_site string_site'' string_agent''
+                    string_site' string_site''' string_agent'' string_agent''
+                    modalite
+                in
+                error, bdu_handler
+              ) else
+                error, bdu_handler
+            else (
               let error =
                 Site_graphs.KaSa_site_graph.print
                   (Remanent_parameters.get_logger parameters)
@@ -529,23 +572,44 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
       (* for which values of the guards can the double bonds be both parallel and non-parallel? *)
     in
     let error, bdu_handler =
-      let error =
+      let error, bdu_handler =
         if dump_any then
           if verbose then (
-            let () =
+            let error, bdu_handler, any_bond_is_false =
+              Common_static.mvbdu_is_false_for_guards parameters bdu_handler
+                error any_bond_mvbdu
+            in
+            let error, bdu_handler, any_bond_is_true =
+              Common_static.mvbdu_is_true_for_guards parameters bdu_handler
+                error any_bond_mvbdu restriction_bdu
+            in
+            let error, bdu_handler =
               match Remanent_parameters.get_backend_mode parameters with
               | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-                ()
+                error, bdu_handler
               | Remanent_parameters_sig.Natural_language ->
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  "%sWhen the agent %s has its site %s bound to the site %s of \
-                   a %s, and its site %s bound to the site %s of a %s, then \
-                   both instances of %s may be  different or not."
-                  prefix string_agent string_site string_site'' string_agent''
-                  string_site' string_site''' string_agent'' string_agent''
+                if not any_bond_is_false then (
+                  let error =
+                    print_guard_parameters_natural_language parameters prefix
+                      error kappa_handler bdu_handler any_bond_is_true
+                      any_bond_mvbdu
+                  in
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters)
+                      "%sWhen the agent %s has its site %s bound to the site \
+                       %s of a %s, and its site %s bound to the site %s of a \
+                       %s, then both instances of %s may be  different or not."
+                      prefix string_agent string_site string_site''
+                      string_agent'' string_site' string_site''' string_agent''
+                      string_agent''
+                  in
+                  error, bdu_handler
+                ) else
+                  error, bdu_handler
             in
-            error
+
+            error, bdu_handler
           ) else (
             let error =
               Site_graphs.KaSa_site_graph.print
@@ -563,10 +627,10 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
             let () =
               Loggers.print_newline (Remanent_parameters.get_logger parameters)
             in
-            error
+            error, bdu_handler
           )
         else
-          error
+          error, bdu_handler
       in
       let () =
         Loggers.print_newline (Remanent_parameters.get_logger parameters)
