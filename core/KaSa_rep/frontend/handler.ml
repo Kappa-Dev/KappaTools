@@ -694,44 +694,57 @@ let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
       handler_kappa agent_name s
   | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
 
-let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
+let print_guard_mvbdu parameters error kappa_handler bdu_handler
+    ?(with_comma = false) mvbdu =
   let nr_guard_parameters = get_nr_guard_parameters kappa_handler in
-  let error, _, mvbdu_extensional =
-    Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters bdu_handler error mvbdu
+  let error, bdu_handler, mvbdu_true =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
   in
-  let loggers = Remanent_parameters.get_logger parameters in
-  let () = Loggers.fprintf loggers "[ " in
-  let _, error =
-    List.fold_left
-      (fun (bool, error) valuations_list ->
-        if bool then Loggers.fprintf loggers " v ";
-        let _, error =
-          List.fold_left
-            (fun (bool, error) (guard_name, value) ->
-              let error, _ =
-                match
-                  Ckappa_sig.site_or_guard_p_of_guard_p_then_site guard_name
-                    nr_guard_parameters
-                with
-                | Ckappa_sig.Guard_p guard_name ->
-                  let error, guard_string =
-                    string_of_guard parameters guard_name kappa_handler
-                      ~state:value error
-                  in
-                  if bool then Loggers.fprintf loggers ", ";
-                  let () = Loggers.fprintf loggers "%s" guard_string in
-                  error, ()
-                | Ckappa_sig.Site _ ->
-                  Exception.warn parameters error __POS__ Exit ()
-              in
-              true, error)
-            (false, error) valuations_list
-        in
-        true, error)
-      (false, error) mvbdu_extensional
-  in
-  let () = Loggers.fprintf loggers " ]" in
-  error
+  if Ckappa_sig.Views_bdu.equal mvbdu mvbdu_true then
+    error
+  else (
+    let error, _, mvbdu_extensional =
+      Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters bdu_handler error
+        mvbdu
+    in
+    let () =
+      if with_comma then
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) ", "
+    in
+    let loggers = Remanent_parameters.get_logger parameters in
+    (* let () = Loggers.fprintf loggers "(" in *)
+    let _, error =
+      List.fold_left
+        (fun (add_or_sign, error) valuations_list ->
+          if add_or_sign then Loggers.fprintf loggers " v ";
+          let _, error =
+            List.fold_left
+              (fun (add_comma, error) (guard_name, value) ->
+                let error, _ =
+                  match
+                    Ckappa_sig.site_or_guard_p_of_guard_p_then_site guard_name
+                      nr_guard_parameters
+                  with
+                  | Ckappa_sig.Guard_p guard_name ->
+                    let error, guard_string =
+                      string_of_guard parameters guard_name kappa_handler
+                        ~state:value error
+                    in
+                    if add_comma then Loggers.fprintf loggers ", ";
+                    let () = Loggers.fprintf loggers "%s" guard_string in
+                    error, ()
+                  | Ckappa_sig.Site _ ->
+                    Exception.warn parameters error __POS__ Exit ()
+                in
+                true, error)
+              (false, error) valuations_list
+          in
+          true, error)
+        (false, error) mvbdu_extensional
+    in
+    (* let () = Loggers.fprintf loggers ")" in *)
+    error
+  )
 
 let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple in

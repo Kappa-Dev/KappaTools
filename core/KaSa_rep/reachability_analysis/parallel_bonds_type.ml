@@ -393,7 +393,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
               in
               let error =
                 Handler.print_guard_mvbdu parameters error kappa_handler
-                  bdu_handler parallel_bond_mvbdu
+                  bdu_handler ~with_comma:true parallel_bond_mvbdu
               in
               let () =
                 Loggers.fprintf
@@ -471,7 +471,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
               in
               let error =
                 Handler.print_guard_mvbdu parameters error kappa_handler
-                  bdu_handler non_parallel_bond_mvbdu
+                  bdu_handler ~with_comma:true non_parallel_bond_mvbdu
               in
               let () =
                 Loggers.fprintf
