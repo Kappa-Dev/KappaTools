@@ -250,8 +250,10 @@ let bool_of_state_index parameter error (a : c_state) =
   | _ -> Exception.warn parameter error __POS__ Exit false
 
 let string_of_guard_state parameter error (a : c_state) =
+  let open_par = Remanent_parameters.get_open_guard_parameter parameter in
+  let close_par = Remanent_parameters.get_close_guard_parameter parameter in
   let error, bool = bool_of_state_index parameter error a in
-  error, string_of_bool bool
+  error, open_par ^ string_of_bool bool ^ close_par
 
 let get_agent_shape n_sites parameters =
   Misc_sa.fetch_array (int_of_site_name n_sites)

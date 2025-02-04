@@ -774,11 +774,7 @@ module KaSa_site_graph = struct
           let () =
             match state_string_opt with
             | None -> ()
-            | Some state_string ->
-              Loggers.fprintf logger "%s%s%s"
-                (Remanent_parameters.get_open_guard_parameter parameter)
-                state_string
-                (Remanent_parameters.get_close_guard_parameter parameter)
+            | Some state_string -> Loggers.fprintf logger "%s" state_string
           in
           true)
         guard_map true
