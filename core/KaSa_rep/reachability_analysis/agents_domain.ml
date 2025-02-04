@@ -738,11 +738,15 @@ module Domain = struct
                      error
                    ) else (
                      let () =
-                       Loggers.fprintf loggers "%s can occur in the model if \n"
+                       Loggers.fprintf loggers "%s can occur in the model if "
                          agent_string
                      in
-                     Handler.print_guard_mvbdu parameters error handler
-                       bdu_handler mvbdu
+                     let error =
+                       Handler.print_guard_mvbdu parameters error handler
+                         bdu_handler mvbdu
+                     in
+                     let () = Loggers.fprintf loggers "." in
+                     error
                    )
                  in
                  let () = Loggers.print_newline loggers in

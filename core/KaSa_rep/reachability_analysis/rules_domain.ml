@@ -456,8 +456,16 @@ module Domain = struct
                       (Remanent_parameters.get_logger parameters)
                       "%s could be applied if " rule_string
                   in
-                  Handler.print_guard_mvbdu parameters error kappa_handler
-                    bdu_handler mvbdu
+                  let error =
+                    Handler.print_guard_mvbdu parameters error kappa_handler
+                      bdu_handler mvbdu
+                  in
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters)
+                      "."
+                  in
+                  error
                 )
               in
               let () =
