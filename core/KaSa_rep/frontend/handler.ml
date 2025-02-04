@@ -730,7 +730,7 @@ let print_guard_mvbdu parameters error kappa_handler bdu_handler
                       string_of_guard parameters guard_name kappa_handler
                         ~state:value error
                     in
-                    if add_comma then Loggers.fprintf loggers ", ";
+                    if add_comma then Loggers.fprintf loggers ",";
                     let () = Loggers.fprintf loggers "%s" guard_string in
                     error, ()
                   | Ckappa_sig.Site _ ->
