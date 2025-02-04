@@ -178,8 +178,8 @@ let dummy_agent =
   { agent_name = ""; ag_intf = EMPTY_INTF; agent_name_pos = Loc.dummy }
 
 let dummy_link_value = 1
-let fst_site = 1
-let snd_site = 2
+let fst_site nr_guard_p = 1 + nr_guard_p
+let snd_site nr_guard_p = 2 + nr_guard_p
 let string_of_agent_name (a : c_agent_name) : string = string_of_int a
 let int_of_agent_name (a : c_agent_name) : int = a
 let agent_name_of_int (a : int) : c_agent_name = a

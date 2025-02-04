@@ -167,6 +167,17 @@ let get_state_of_guard_parameters parameters handler error precondition =
 let set_state_of_guard_parameters precondition bdu =
   { precondition with state_of_guard_parameters = Some bdu }
 
+let update_state_of_guard_parameters parameters error bdu_handler precondition
+    state_guard_parameters =
+  let error, bdu_handler, old_state =
+    get_state_of_guard_parameters parameters bdu_handler error precondition
+  in
+  let error, bdu_handler, new_state =
+    Common_static.mvbdu_and_for_guards parameters bdu_handler error old_state
+      state_guard_parameters
+  in
+  error, bdu_handler, set_state_of_guard_parameters precondition new_state
+
 let dummy_precondition =
   {
     precondition_dummy = ();

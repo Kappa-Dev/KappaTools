@@ -83,10 +83,6 @@ module Domain = struct
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, state_guard_parameters
 
-  let set_state_of_guard_parameters precondition state_guard_parameters =
-    Communication.set_state_of_guard_parameters precondition
-      state_guard_parameters
-
   let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_guard =
@@ -238,10 +234,11 @@ module Domain = struct
           Common_static.mvbdu_and_for_guards parameters bdu_handler error
             guard_bdu_inter state_of_guard_parameters
         in
-        let dynamic = set_mvbdu_handler bdu_handler dynamic in
-        let precondition =
-          set_state_of_guard_parameters precondition guard_bdu_inter
+        let error, bdu_handler, precondition =
+          Communication.update_state_of_guard_parameters parameters error
+            bdu_handler precondition guard_bdu_inter
         in
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
         error, dynamic, Some precondition
       )
 

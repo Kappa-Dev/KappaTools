@@ -117,6 +117,16 @@ val get_state_of_guard_parameters :
 val set_state_of_guard_parameters :
   precondition -> Ckappa_sig.Views_bdu.mvbdu -> precondition
 
+val update_state_of_guard_parameters :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Ckappa_sig.Views_bdu.handler ->
+  precondition ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * precondition
+
 (*val get_state_of_site:
   Exception.exceptions_caught_and_uncaught ->
   Analyzer_headers.global_dynamic_information ->
