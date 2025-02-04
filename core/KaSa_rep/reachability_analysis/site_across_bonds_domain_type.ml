@@ -216,6 +216,22 @@ module PairAgentSite_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   let print _ _ = ()
 end))
 
+let fst_site kappa_handler =
+  let nr_guard_p = Handler.get_nr_guard_parameters kappa_handler in
+  Ckappa_sig.fst_site nr_guard_p
+
+let snd_site kappa_handler =
+  let nr_guard_p = Handler.get_nr_guard_parameters kappa_handler in
+  Ckappa_sig.snd_site nr_guard_p
+
+let mvbdu_project_abstract_away_sites parameters bdu_handler error kappa_handler
+    mvbdu =
+  let error, bdu_handler, variable_list =
+    Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+      [ fst_site kappa_handler; snd_site kappa_handler ]
+  in
+  Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
+    mvbdu variable_list
 (***************************************************************************)
 (*PRINT*)
 (***************************************************************************)
@@ -380,8 +396,8 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
               (fun (error, bool) l ->
                 match l with
                 | [ (siteone, state1); (sitetwo, state2) ]
-                  when siteone == Ckappa_sig.fst_site
-                       && sitetwo == Ckappa_sig.snd_site ->
+                  when siteone == fst_site kappa_handler
+                       && sitetwo == snd_site kappa_handler ->
                   let () =
                     Loggers.print_newline
                       (Remanent_parameters.get_logger parameters)
@@ -449,8 +465,8 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
           (fun (error, handler) l ->
             match l with
             | [ (siteone, statex); (sitetwo, statey) ]
-              when siteone == Ckappa_sig.fst_site
-                   && sitetwo == Ckappa_sig.snd_site ->
+              when siteone == fst_site kappa_handler
+                   && sitetwo == snd_site kappa_handler ->
               let error, (_, _, statex) =
                 convert_single parameters error kappa_handler
                   (agent_type1, site_type1, statex)
