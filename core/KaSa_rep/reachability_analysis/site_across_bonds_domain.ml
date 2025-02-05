@@ -346,6 +346,15 @@ module Domain = struct
           (get_global_dynamic_information dynamic);
     }
 
+  let get_state_of_guard_parameters parameters dynamic error precondition =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, state_guard_parameters =
+      Communication.get_state_of_guard_parameters parameters bdu_handler error
+        precondition
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, state_guard_parameters
+
   let get_local_dynamic_information dynamic = dynamic.local
   let set_local_dynamic_information local dynamic = { dynamic with local }
   let get_value dynamic = (get_local_dynamic_information dynamic).store_value
@@ -989,16 +998,20 @@ module Domain = struct
   (*there is an action binding in the domain of a rule*)
 
   let build_mvbdu_association_list parameters error bdu_false kappa_handler
-      dump_title bool modified_sites pair pair_list dynamic =
+      dump_title bool modified_sites pair pair_list dynamic guard_bdu =
     let store_result = get_value dynamic in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, mvbdu =
       Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters handler error
         pair_list
     in
+    let error, handler, mvbdu_with_guard =
+      Common_static.mvbdu_and_for_guards parameters handler error mvbdu
+        guard_bdu
+    in
     let error, bool, handler, modified_sites, store_result =
       Site_across_bonds_domain_type.add_link_and_check parameters error
-        bdu_false handler kappa_handler bool dump_title pair mvbdu
+        bdu_false handler kappa_handler bool dump_title pair mvbdu_with_guard
         modified_sites store_result
     in
     let dynamic = set_value store_result dynamic in
@@ -1010,6 +1023,9 @@ module Domain = struct
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    let error, dynamic, guard_bdu =
+      get_state_of_guard_parameters parameters dynamic error precondition
+    in
     (*------------------------------------------------------*)
     (*let store_created_bonds = get_created_bonds static in*)
     let store_created_bonds = get_action_binding static in
@@ -1124,7 +1140,7 @@ module Domain = struct
                           let error, bool, dynamic, modified_sites =
                             build_mvbdu_association_list parameters error
                               bdu_false kappa_handler dump_title bool
-                              modified_sites pair pair_list dynamic
+                              modified_sites pair pair_list dynamic guard_bdu
                           in
                           error, bool, dynamic, precondition, modified_sites)
                         (error, bool, dynamic, precondition, modified_sites)
@@ -1270,6 +1286,9 @@ module Domain = struct
       kappa_handler bool dump_title static dynamic rule_id rule precondition
       modified_set modified_sites =
     let store_partition_modified_map = get_partition_modified pos static in
+    let error, dynamic, guard_bdu =
+      get_state_of_guard_parameters parameters dynamic error precondition
+    in
     (*------------------------------------------------------*)
     Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
       (fun mod_tuple (error, bool, dynamic, precondition, modified_sites) ->
@@ -1436,7 +1455,7 @@ module Domain = struct
                     let error, bool, dynamic, modified_sites =
                       build_mvbdu_association_list parameters error bdu_false
                         kappa_handler dump_title bool modified_sites pair
-                        pair_list dynamic
+                        pair_list dynamic guard_bdu
                     in
                     error, bool, dynamic, precondition, modified_sites
                   ) else
@@ -1722,6 +1741,11 @@ module Domain = struct
               error, (handler, current_list)
             else (
               (*----------------------------------------------------*)
+              (*rTODO properly export, without ignoring the guards*)
+              let error, handler, mvbdu =
+                Site_across_bonds_domain_type.mvbdu_project_keep_only_sites
+                  parameters handler error kappa_handler mvbdu
+              in
               let error, handler, pair_list =
                 Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler
                   error mvbdu

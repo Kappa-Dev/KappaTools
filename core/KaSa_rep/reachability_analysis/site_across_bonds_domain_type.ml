@@ -232,6 +232,15 @@ let mvbdu_project_abstract_away_sites parameters bdu_handler error kappa_handler
   in
   Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
     mvbdu variable_list
+
+let mvbdu_project_keep_only_sites parameters bdu_handler error kappa_handler
+    mvbdu =
+  let error, bdu_handler, variable_list =
+    Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+      [ fst_site kappa_handler; snd_site kappa_handler ]
+  in
+  Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameters bdu_handler error
+    mvbdu variable_list
 (***************************************************************************)
 (*PRINT*)
 (***************************************************************************)
@@ -314,6 +323,8 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
     ?(final_result = false) ?dump_any:(_dump_any = false) parameters error
     kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
+  let nr_guard_p = Handler.get_nr_guard_parameters kappa_handler in
+  let log = Remanent_parameters.get_logger parameters in
   let ( (agent_type1, site_type1, site_type1', _),
         (agent_type2, site_type2, site_type2', _) ) =
     tuple
@@ -363,128 +374,138 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
           (*do not print the precondition if it is not the final result*)
           if final_result then (
             let error =
-              Site_graphs.KaSa_site_graph.print
-                (Remanent_parameters.get_logger parameters)
-                parameters error pattern
+              Site_graphs.KaSa_site_graph.print log parameters error pattern
             in
-            let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
-            in
+            let () = Loggers.fprintf log " => " in
             error
           ) else
             error
         in
         (match pair_list with
         | [] ->
-          let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters) ""
-          in
+          let () = Loggers.fprintf log "" in
           error, handler
         | _ :: _ ->
           let () =
             if final_result then (
-              let () =
-                Loggers.print_newline
-                  (Remanent_parameters.get_logger parameters)
-              in
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) "\t["
+              let () = Loggers.print_newline log in
+              Loggers.fprintf log "\t["
             ) else
               ()
           in
           let error, _ =
             List.fold_left
-              (fun (error, bool) l ->
-                match l with
-                | [ (siteone, state1); (sitetwo, state2) ]
-                  when siteone == fst_site kappa_handler
-                       && sitetwo == snd_site kappa_handler ->
-                  let () =
-                    Loggers.print_newline
-                      (Remanent_parameters.get_logger parameters)
-                  in
-                  let () =
-                    Loggers.fprintf
-                      (Remanent_parameters.get_logger parameters)
-                      (if bool then
-                         "\t\tv "
-                       else if final_result then
-                         "\t\t  "
-                       else
-                         "\t\t")
-                  in
-                  let error, pattern =
-                    Site_graphs.KaSa_site_graph.add_state parameters error
-                      kappa_handler agent_id1 site_type1' state1 pattern
-                  in
-                  let error, pattern =
-                    Site_graphs.KaSa_site_graph.add_state parameters error
-                      kappa_handler agent_id2 site_type2' state2 pattern
-                  in
-                  let error =
-                    Site_graphs.KaSa_site_graph.print
-                      (Remanent_parameters.get_logger parameters)
-                      parameters error pattern
-                  in
-                  error, true
-                | _ -> Exception.warn parameters error __POS__ Exit bool)
+              (fun (error, add_or) l ->
+                let () = Loggers.print_newline log in
+                let () =
+                  Loggers.fprintf log
+                    (if add_or then
+                       "\t\tv "
+                     else if final_result then
+                       "\t\t  "
+                     else
+                       "\t\t")
+                in
+                let error, add_comma, pattern =
+                  List.fold_left
+                    (fun (error, add_comma, pattern) (site_or_guard, state) ->
+                      let error, pattern =
+                        match
+                          Ckappa_sig.site_or_guard_p_of_guard_p_then_site
+                            site_or_guard nr_guard_p
+                        with
+                        | Ckappa_sig.Site _ ->
+                          if site_or_guard = Ckappa_sig.fst_site nr_guard_p then
+                            Site_graphs.KaSa_site_graph.add_state parameters
+                              error kappa_handler agent_id1 site_type1' state
+                              pattern
+                          else if site_or_guard = Ckappa_sig.snd_site nr_guard_p
+                          then
+                            Site_graphs.KaSa_site_graph.add_state parameters
+                              error kappa_handler agent_id2 site_type2' state
+                              pattern
+                          else
+                            Exception.warn parameters error __POS__ Exit pattern
+                        | Guard_p guardp ->
+                          let () = if add_comma then Loggers.fprintf log "," in
+                          let error, guard_string =
+                            Handler.string_of_guard parameters guardp
+                              kappa_handler ~state error
+                          in
+                          let () = Loggers.fprintf log "%s" guard_string in
+                          error, pattern
+                      in
+                      error, true, pattern)
+                    (error, false, pattern) l
+                in
+                let () = if add_comma then Loggers.fprintf log "," in
+                let error =
+                  Site_graphs.KaSa_site_graph.print log parameters error pattern
+                in
+                error, true)
               (error, false) pair_list
           in
           let () =
             if final_result then (
-              let () =
-                Loggers.print_newline
-                  (Remanent_parameters.get_logger parameters)
-              in
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  "\t]"
-              in
-              let () =
-                Loggers.print_newline
-                  (Remanent_parameters.get_logger parameters)
-              in
+              let () = Loggers.print_newline log in
+              let () = Loggers.fprintf log "\t]" in
+              let () = Loggers.print_newline log in
               ()
             )
           in
           error, handler)
       | Remanent_parameters_sig.Natural_language ->
         let () =
-          Loggers.fprintf
-            (Remanent_parameters.get_logger parameters)
+          Loggers.fprintf log
             "%sWhenever the site %s of %s and the site %s of %s are bound \
              together, then the site %s of %s and %s of %s can have the \
              following respective states:"
             prefix site1 agent1 site2 agent2 site1' agent1 site2' agent2
         in
-        let () =
-          Loggers.print_newline (Remanent_parameters.get_logger parameters)
-        in
+        let () = Loggers.print_newline log in
         let prefix = prefix ^ "\t" in
-        List.fold_left
-          (fun (error, handler) l ->
-            match l with
-            | [ (siteone, statex); (sitetwo, statey) ]
-              when siteone == fst_site kappa_handler
-                   && sitetwo == snd_site kappa_handler ->
-              let error, (_, _, statex) =
-                convert_single parameters error kappa_handler
-                  (agent_type1, site_type1, statex)
+        let error =
+          List.fold_left
+            (fun error l ->
+              let () = Loggers.fprintf log "%s" prefix in
+              let error, _ =
+                List.fold_left
+                  (fun (error, add_comma) (site_or_guard, state) ->
+                    let () = if add_comma then Loggers.fprintf log "," in
+                    let error, string =
+                      match
+                        Ckappa_sig.site_or_guard_p_of_guard_p_then_site
+                          site_or_guard nr_guard_p
+                      with
+                      | Ckappa_sig.Site _ ->
+                        if site_or_guard = Ckappa_sig.fst_site nr_guard_p then (
+                          let error, (_, _, statex) =
+                            convert_single parameters error kappa_handler
+                              (agent_type1, site_type1, state)
+                          in
+                          error, statex
+                        ) else if site_or_guard = Ckappa_sig.snd_site nr_guard_p
+                          then (
+                          let error, (_, _, statey) =
+                            convert_single parameters error kappa_handler
+                              (agent_type2, site_type2, state)
+                          in
+                          error, statey
+                        ) else
+                          Exception.warn parameters error __POS__ Exit ""
+                      | Guard_p guardp ->
+                        Handler.string_of_guard parameters guardp kappa_handler
+                          ~state error
+                    in
+                    let () = Loggers.fprintf log "%s" string in
+                    error, true)
+                  (error, false) l
               in
-              let error, (_, _, statey) =
-                convert_single parameters error kappa_handler
-                  (agent_type2, site_type2, statey)
-              in
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  "%s%s, %s\n" prefix statex statey
-              in
-              error, handler
-            | [] | _ :: _ ->
-              let error, () = Exception.warn parameters error __POS__ Exit () in
-              error, handler)
-          (error, handler) pair_list
+              let () = Loggers.print_newline log in
+              error)
+            error pair_list
+        in
+        error, handler
     )
   )
 
