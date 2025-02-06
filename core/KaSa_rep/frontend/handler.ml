@@ -709,7 +709,7 @@ let print_guard_mvbdu parameters error kappa_handler bdu_handler
     in
     let () =
       if with_comma then
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) ", "
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
     in
     let loggers = Remanent_parameters.get_logger parameters in
     (* let () = Loggers.fprintf loggers "(" in *)
