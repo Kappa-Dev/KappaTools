@@ -249,12 +249,6 @@ let bool_of_state_index parameter error (a : c_state) =
   | 1 -> error, true
   | _ -> Exception.warn parameter error __POS__ Exit false
 
-let string_of_guard_state parameter error (a : c_state) =
-  let open_par = Remanent_parameters.get_open_guard_parameter parameter in
-  let close_par = Remanent_parameters.get_close_guard_parameter parameter in
-  let error, bool = bool_of_state_index parameter error a in
-  error, open_par ^ string_of_bool bool ^ close_par
-
 let prefix_of_guard_state parameter error (a : c_state) =
   match a with
   | 0 -> error, "~"

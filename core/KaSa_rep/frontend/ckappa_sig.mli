@@ -103,12 +103,6 @@ val bool_of_state_index :
   c_state ->
   Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
-val string_of_guard_state :
-  Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  c_state ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * counter_name
-
 val prefix_of_guard_state :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
