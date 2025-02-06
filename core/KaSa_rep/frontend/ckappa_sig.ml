@@ -255,6 +255,12 @@ let string_of_guard_state parameter error (a : c_state) =
   let error, bool = bool_of_state_index parameter error a in
   error, open_par ^ string_of_bool bool ^ close_par
 
+let prefix_of_guard_state parameter error (a : c_state) =
+  match a with
+  | 0 -> error, "~"
+  | 1 -> error, ""
+  | _ -> Exception.warn parameter error __POS__ Exit ""
+
 let get_agent_shape n_sites parameters =
   Misc_sa.fetch_array (int_of_site_name n_sites)
     (Remanent_parameters.get_agent_shape_array parameters)

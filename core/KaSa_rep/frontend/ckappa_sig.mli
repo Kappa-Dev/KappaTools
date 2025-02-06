@@ -109,6 +109,12 @@ val string_of_guard_state :
   c_state ->
   Exception_without_parameter.exceptions_caught_and_uncaught * counter_name
 
+val prefix_of_guard_state :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  c_state ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * counter_name
+
 val int_of_rule_id : c_rule_id -> int
 val rule_id_of_int : int -> c_rule_id
 val string_of_rule_id : c_rule_id -> string

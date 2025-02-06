@@ -618,9 +618,9 @@ let string_of_guard parameters guardp kappa_handler ?state error =
   | None -> error, guard_param_name
   | Some s ->
     let error, guard_string =
-      Ckappa_sig.string_of_guard_state parameters error s
+      Ckappa_sig.prefix_of_guard_state parameters error s
     in
-    error, guard_param_name ^ guard_string
+    error, guard_string ^ guard_param_name
 
 let string_of_site_or_guard parameter error handler_kappa ?state
     ?(add_parentheses = false) agent_type site_int =

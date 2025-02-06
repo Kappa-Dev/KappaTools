@@ -453,9 +453,7 @@ module KaSa_site_graph = struct
         t
     | Some (agent_type, map) ->
       let error, site_string =
-        Handler.string_of_site_or_guard_contact_map ~ml_pos:(Some __POS__)
-          ~message:"undefined site" parameter error kappa_handler agent_type
-          (Ckappa_sig.guard_p_then_site_of_guard guardp)
+        Handler.string_of_guard parameter guardp kappa_handler ~state error
       in
       let error, ((agent_string, sitemap), guardmap) =
         Ckappa_sig.Agent_id_map_and_set.Map.find_default parameter error
@@ -466,21 +464,18 @@ module KaSa_site_graph = struct
       let error, state_bool =
         Ckappa_sig.bool_of_state_index parameter error state
       in
-      let error, state_string =
-        Ckappa_sig.string_of_guard_state parameter error state
-      in
       let error, old_asso =
         Ckappa_sig.GuardP_map_and_set.Map.find_option_without_logs parameter
           error guardp map
       in
-      let error, (new_map, state_string) =
+      let error, new_map =
         match old_asso with
         | None ->
           let error, map =
             Ckappa_sig.GuardP_map_and_set.Map.add parameter error guardp
               state_bool map
           in
-          error, (map, state_string)
+          error, map
         | Some old_bool ->
           if state_bool = old_bool then (
             let error, map =
@@ -491,10 +486,10 @@ module KaSa_site_graph = struct
               Exception.check_point Exception.warn parameter error error __POS__
                 Exit
             in
-            error, (map, state_string)
+            error, map
           ) else
             Exception.warn parameter error __POS__
-              ~message:"incompatible states" Exit (map, state_string)
+              ~message:"incompatible states" Exit map
       in
       let error, guard_params =
         Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite parameter error
@@ -502,7 +497,7 @@ module KaSa_site_graph = struct
       in
       let error, guardmap =
         Wrapped_modules.LoggedStringMap.add_or_overwrite parameter error
-          site_string (Some state_string) guardmap
+          site_string None guardmap
       in
       let error, string_version =
         Ckappa_sig.Agent_id_map_and_set.Map.overwrite parameter error agent_id
