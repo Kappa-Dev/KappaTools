@@ -222,17 +222,10 @@ module Domain = struct
         let error, dynamic, guard_bdu =
           get_bdu_guard parameters dynamic error guard_mvbdus rule_id
         in
-        let error, dynamic, state_of_guard_parameters =
-          get_state_of_guard_parameters parameters dynamic error precondition
-        in
         let bdu_handler = get_mvbdu_handler dynamic in
         let error, bdu_handler, guard_bdu_inter =
           Common_static.mvbdu_and_for_guards parameters bdu_handler error mvbdu
             guard_bdu
-        in
-        let error, bdu_handler, guard_bdu_inter =
-          Common_static.mvbdu_and_for_guards parameters bdu_handler error
-            guard_bdu_inter state_of_guard_parameters
         in
         let error, bdu_handler, precondition =
           Communication.update_state_of_guard_parameters parameters error
