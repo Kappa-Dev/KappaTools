@@ -775,14 +775,19 @@ module Domain = struct
     let error, bdu_handler, mvbdu_true =
       Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
     in
-    let error, bool, bdu_handler, _ =
+    let error, bool, bdu_handler, precondition_guard_mvbdu =
       common_scan parameters error bdu_handler static tuples_of_interest
         store_value list mvbdu_true
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
-    if bool then
+    if bool then (
+      let error, bdu_handler, precondition =
+        Communication.update_state_of_guard_parameters parameters error
+          bdu_handler precondition precondition_guard_mvbdu
+      in
+      let dynamic = set_mvbdu_handler bdu_handler dynamic in
       error, dynamic, Some precondition
-    else
+    ) else
       error, dynamic, None
 
   (***************************************************************)

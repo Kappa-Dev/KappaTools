@@ -564,7 +564,7 @@ module Domain = struct
       get_state_of_guard_parameters parameters dynamic error precondition
     in
     try
-      let error, (dynamic, _) =
+      let error, (dynamic, new_state_guard_parameters) =
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameters error
           (fun parameters error _agent_id agent (dynamic, current_mvbdu) ->
@@ -587,6 +587,10 @@ module Domain = struct
                 error, (dynamic, current_mvbdu))
           pattern.Cckappa_sig.views
           (dynamic, state_guard_parameters)
+      in
+      let error, dynamic, precondition =
+        update_state_of_guard_parameters parameters error dynamic precondition
+          new_state_guard_parameters
       in
       error, dynamic, Some precondition
     with False (error, dynamic) -> error, dynamic, None

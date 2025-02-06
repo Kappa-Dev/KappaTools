@@ -1073,11 +1073,11 @@ module Domain = struct
               project_bdu_keep_only_guard_parameters parameters error handler
                 bdu_inter nr_guard_parameters map1
             in
+            (* intersect result with the current guard bdu*)
             let error, handler, result_bdu_guard =
               Common_static.mvbdu_and_for_guards parameters handler error
                 result_bdu_guard bdu_proj_guard
             in
-            (* intersect result with the current guard bdu*)
             let dynamic = set_mvbdu_handler handler dynamic in
             error, dynamic, map, result_bdu_guard
           ))
@@ -2354,6 +2354,9 @@ module Domain = struct
     let site_correspondence = get_remanent_triple static in
     let site_correspondence_map = get_site_correspondence_array static in
     let store_covering_classes_id = get_covering_classes_id static in
+    let nr_guard_parameters =
+      Covering_classes_main.get_nr_guard_parameters kappa_handler
+    in
     (*---------------------------------------------------------*)
     (* Why an arbitrary patterns would be stored in that map *)
     (* For each view, you have to collect the set of sites *)
@@ -2364,19 +2367,19 @@ module Domain = struct
     (* Then, answer false *)
     (* Othewise keep on iterating *)
     try
-      let error, dynamic =
+      let error, (dynamic, result_bdu_guard) =
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameters error
-          (fun parameters error _agent_id agent dynamic ->
+          (fun parameters error _agent_id agent (dynamic, result_bdu_guard) ->
             match agent with
             | Cckappa_sig.Unknown_agent _ | Cckappa_sig.Ghost
             | Cckappa_sig.Dead_agent (_, _, _, _) ->
-              error, dynamic
+              error, (dynamic, result_bdu_guard)
             | Cckappa_sig.Agent agent ->
               let agent_type = agent.Cckappa_sig.agent_name in
               let interface = agent.Cckappa_sig.agent_interface in
               if Ckappa_sig.Site_map_and_set.Map.is_empty interface then
-                error, dynamic
+                error, (dynamic, result_bdu_guard)
               else (
                 let error, site_correspondence =
                   match
@@ -2392,12 +2395,12 @@ module Domain = struct
                     parameters error agent site_correspondence
                 in
                 (*build bdu_test*)
-                let error, dynamic =
+                let error, dynamic, result_bdu_guard =
                   List.fold_left
-                    (fun (error, dynamic) (cv_id, map_res) ->
+                    (fun (error, dynamic, result_bdu_guard) (cv_id, map_res) ->
                       if Ckappa_sig.GuardSite_map_and_set.Map.is_empty map_res
                       then
-                        error, dynamic
+                        error, dynamic, result_bdu_guard
                       else (
                         let error, pair_list =
                           Ckappa_sig.GuardSite_map_and_set.Map.fold
@@ -2410,6 +2413,11 @@ module Domain = struct
                               in
                               error, pair_list)
                             map_res (error, [])
+                        in
+                        let error, (map1, _) =
+                          get_list_of_sites_correspondence_map parameters error
+                            agent_type cv_id
+                            (get_site_correspondence_array static)
                         in
                         let handler = get_mvbdu_handler dynamic in
                         let error, handler, bdu_test =
@@ -2439,15 +2447,33 @@ module Domain = struct
                         (*check if it is overlap or not?*)
                         if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false then
                           raise (False (error, dynamic))
-                        else
+                        else (
                           (*continue to iterate*)
-                          error, dynamic
+                          (*project the resulting bdu to keep only the guard_parameters
+                            and rename the guard parameters to the original index*)
+                          let error, handler, bdu_proj_guard =
+                            project_bdu_keep_only_guard_parameters parameters
+                              error handler bdu_inter nr_guard_parameters map1
+                          in
+                          (* intersect result with the current guard bdu*)
+                          let error, handler, result_bdu_guard =
+                            Common_static.mvbdu_and_for_guards parameters
+                              handler error result_bdu_guard bdu_proj_guard
+                          in
+                          let dynamic = set_mvbdu_handler handler dynamic in
+                          error, dynamic, result_bdu_guard
+                        )
                       ))
-                    (error, dynamic) get_pair_list
+                    (error, dynamic, result_bdu_guard)
+                    get_pair_list
                 in
-                error, dynamic
+                error, (dynamic, result_bdu_guard)
               ))
-          pattern.Cckappa_sig.views dynamic
+          pattern.Cckappa_sig.views (dynamic, bdu_true)
+      in
+      let precondition =
+        Communication.set_state_of_guard_parameters precondition
+          result_bdu_guard
       in
       let precondition =
         Communication.refine_information_about_state_of_sites_in_precondition
