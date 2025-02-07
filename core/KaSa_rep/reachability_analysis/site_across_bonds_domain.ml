@@ -79,10 +79,6 @@ module Domain = struct
   let get_parameter static = lift Analyzer_headers.get_parameter static
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
-  let _get_restriction_mvbdu static =
-    (*rTODO*)
-    lift Analyzer_headers.get_restriction_mvbdu static
-
   let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
 
   let get_potential_side_effects static =
@@ -384,11 +380,6 @@ module Domain = struct
         bdu_handler precondition state_guard_parameters
     in
     error, set_mvbdu_handler bdu_handler dynamic, precondition
-
-  let _set_state_of_guard_parameters precondition state_guard_parameters =
-    (*rTODO*)
-    Communication.set_state_of_guard_parameters precondition
-      state_guard_parameters
 
   let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
     let handler = get_mvbdu_handler dynamic in

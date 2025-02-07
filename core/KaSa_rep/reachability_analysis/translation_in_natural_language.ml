@@ -851,11 +851,13 @@ let rec print ?beginning_of_sentence:(beggining = true)
                             site_type nr_guard_params
                         in
                         let error', site_string =
-                        match site_or_guard with
-                        | Ckappa_sig.Site s ->
-                          Handler.string_of_site parameters error handler_kappa                            agent_type s
-                        | Ckappa_sig.Guard_p g ->
-                          Handler.string_of_guard parameters g handler_kappa ~state error
+                          match site_or_guard with
+                          | Ckappa_sig.Site s ->
+                            Handler.string_of_site parameters error
+                              handler_kappa agent_type s
+                          | Ckappa_sig.Guard_p g ->
+                            Handler.string_of_guard parameters g handler_kappa
+                              ~state error
                         in
                         let error =
                           Exception.check_point Exception.warn parameters error
