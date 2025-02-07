@@ -62,6 +62,7 @@ type symbol_table = {
   counterdeltaplus_symbol: string;
   counterdeltaminus_symbol: string;
   counterval_symbol: string;
+  negation_guard_parameter: string;
 }
 
 val symbol_table_V4 : symbol_table

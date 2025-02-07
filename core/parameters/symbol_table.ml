@@ -62,6 +62,7 @@ type symbol_table = {
   counterdeltaplus_symbol: string;
   counterdeltaminus_symbol: string;
   counterval_symbol: string;
+  negation_guard_parameter: string;
 }
 
 let symbol_table_V3 =
@@ -127,6 +128,7 @@ let symbol_table_V3 =
     counterval_symbol = ":=";
     counterdeltaplus_symbol = "+";
     counterdeltaminus_symbol = "-";
+    negation_guard_parameter = "~";
   }
 
 let lighten symbol_table =
@@ -202,6 +204,7 @@ let symbol_table_V4 =
     counterval_symbol = ":=";
     counterdeltaplus_symbol = "+";
     counterdeltaminus_symbol = "-";
+    negation_guard_parameter = "~";
   }
 
 let not_breakable symbol_table = { symbol_table with breakable = false }

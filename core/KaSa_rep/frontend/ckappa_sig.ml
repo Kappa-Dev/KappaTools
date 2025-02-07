@@ -251,7 +251,7 @@ let bool_of_state_index parameter error (a : c_state) =
 
 let prefix_of_guard_state parameter error (a : c_state) =
   match a with
-  | 0 -> error, "~"
+  | 0 -> error, Remanent_parameters.get_negation_guard_parameter parameter
   | 1 -> error, ""
   | _ -> Exception.warn parameter error __POS__ Exit ""
 
