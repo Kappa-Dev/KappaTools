@@ -1087,9 +1087,18 @@ module Domain = struct
           Covering_classes_type.AgentIDCV_map_and_set.Map.empty,
           state_guard_parameters )
     in
-    let precondition =
-      Communication.set_state_of_guard_parameters precondition bdu_guard
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let log = Remanent_parameters.get_logger parameters in
+    let kappa_handler = get_kappa_handler static in
+    let () = Loggers.fprintf log "\n\t\tVIEWS_DOMAIN is_enabled:\n" in
+        let error =
+          Handler.print_guard_mvbdu parameters error kappa_handler
+            bdu_handler bdu_guard
+        in
+    let error, bdu_handler, precondition =
+      Communication.update_state_of_guard_parameters parameters error bdu_handler precondition bdu_guard
     in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, precondition
 
   (*****************************************************************)
@@ -2471,10 +2480,11 @@ module Domain = struct
               ))
           pattern.Cckappa_sig.views (dynamic, bdu_true)
       in
-      let precondition =
-        Communication.set_state_of_guard_parameters precondition
-          result_bdu_guard
-      in
+      let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, precondition =
+      Communication.update_state_of_guard_parameters parameters error bdu_handler precondition result_bdu_guard
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
       let precondition =
         Communication.refine_information_about_state_of_sites_in_precondition
           precondition

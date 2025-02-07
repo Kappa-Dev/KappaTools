@@ -13,7 +13,7 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let local_trace = false
+let local_trace = true
 
 module Domain = struct
   (* the type of the struct that contains all static information as in the
@@ -207,6 +207,16 @@ module Domain = struct
       let error, dynamic, is_false =
         is_false_mvbdu parameters error dynamic mvbdu
       in
+        let guard_mvbdus = get_guard_mvbdus static in
+        let error, dynamic, guard_bdu =
+          get_bdu_guard parameters dynamic error guard_mvbdus rule_id
+        in
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let error, bdu_handler, precondition =
+          Communication.update_state_of_guard_parameters parameters error
+            bdu_handler precondition guard_bdu
+        in
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
       if is_false then (
         let error, precondition =
           Communication.the_rule_is_applied_for_the_first_time
@@ -218,20 +228,6 @@ module Domain = struct
           Communication.the_rule_is_not_applied_for_the_first_time
             (get_parameter static) error precondition
         in
-        let guard_mvbdus = get_guard_mvbdus static in
-        let error, dynamic, guard_bdu =
-          get_bdu_guard parameters dynamic error guard_mvbdus rule_id
-        in
-        let bdu_handler = get_mvbdu_handler dynamic in
-        let error, bdu_handler, guard_bdu_inter =
-          Common_static.mvbdu_and_for_guards parameters bdu_handler error mvbdu
-            guard_bdu
-        in
-        let error, bdu_handler, precondition =
-          Communication.update_state_of_guard_parameters parameters error
-            bdu_handler precondition guard_bdu_inter
-        in
-        let dynamic = set_mvbdu_handler bdu_handler dynamic in
         error, dynamic, Some precondition
       )
 
