@@ -48,8 +48,6 @@ type ast_compiled_data = {
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)
-  nr_guard_params: int;
-      (** how many guard parameters are present in any guard in the code (numbered from 0 to guard_params - 1) *)
   result:
     ( Ast.agent,
       Ast.agent_sig,
@@ -62,15 +60,6 @@ type ast_compiled_data = {
      * are integers and not string, syntactic sugar on rules are expansed
      * (syntactic sugar on mixture are not) *)
 }
-
-val guard_param_to_string :
-  ('a -> int) -> string list -> 'a LKappa.guard -> string LKappa.guard
-
-val guard_params_to_int_option :
-  (int -> 'a) ->
-  string list ->
-  string LKappa.guard option ->
-  'a LKappa.guard option
 
 val compil_of_ast :
   warning:(pos:Loc.t -> (Format.formatter -> unit) -> unit) ->
@@ -112,3 +101,10 @@ val agent_sigs_of_agent_sigs_with_links_as_lists :
   site_sig_with_links_as_lists NamedDecls.t NamedDecls.t ->
   Signature.t NamedDecls.t
 (** Helper to build signatures: for each entry, translate [(string Loc.annoted * string Loc.annoted) list] into [bool array array option] *)
+
+val guard_param_conversion :
+  ('a -> 'b -> 'c -> 'b * 'd) ->
+  'b ->
+  'c ->
+  'a LKappa.guard ->
+  'b * 'd LKappa.guard

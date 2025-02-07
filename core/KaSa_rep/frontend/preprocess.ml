@@ -77,6 +77,7 @@ let empty_e_rule handler error =
       Cckappa_sig.e_rule_label = None;
       Cckappa_sig.e_rule_label_dot = None;
       Cckappa_sig.e_rule_initial_direction = Ckappa_sig.Direct;
+      Cckappa_sig.e_rule_guard_string = None;
       Cckappa_sig.e_rule_rule =
         {
           Ckappa_sig.position = Loc.dummy;
@@ -1161,25 +1162,6 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             dead_state_sites,
             dead_link_sites ) )
 
-let rec guard_param_conversion convert error guard_params g =
-  match g with
-  | LKappa.True -> error, LKappa.True
-  | LKappa.False -> error, LKappa.False
-  | LKappa.Param p ->
-    let error, conv_p = convert p error guard_params in
-    error, LKappa.Param conv_p
-  | LKappa.Not g1 ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    error, LKappa.Not conv_g1
-  | LKappa.And (g1, g2) ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
-    error, LKappa.And (conv_g1, conv_g2)
-  | LKappa.Or (g1, g2) ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
-    error, LKappa.Or (conv_g1, conv_g2)
-
 let translate_guard parameters error handler guard =
   let convert guard_p_name error (parameters, handler) =
     let error, (bool, output) =
@@ -1197,7 +1179,8 @@ let translate_guard parameters error handler guard =
   | None -> error, None
   | Some g ->
     let error, guard =
-      guard_param_conversion convert error (parameters, handler) g
+      LKappa_compiler.guard_param_conversion convert error (parameters, handler)
+        g
     in
     error, Some guard
 
@@ -1512,7 +1495,7 @@ let check_freeness parameters lhs source (error, half_release_set) =
           source half_release_set))
 
 let translate_rule parameters error handler rule =
-  let label, guard, (rule, position) = rule in
+  let label, guard_string, (rule, position) = rule in
   let direction = rule.Ckappa_sig.interprete_delta in
   let error, c_rule_lhs, question_marks_l, delta_l =
     translate_mixture parameters error handler ~creation:false
@@ -1523,6 +1506,7 @@ let translate_rule parameters error handler rule =
     translate_mixture parameters error handler ~creation:false ~lhs
       rule.Ckappa_sig.rhs
   in
+  let error, guard = translate_guard parameters error handler guard_string in
   let error, delta =
     Ckappa_sig.AgentsSite_map_and_set.Map.map2 parameters error
       (fun _parameters error i -> error, i)
@@ -2090,6 +2074,7 @@ let translate_rule parameters error handler rule =
       Cckappa_sig.e_rule_label = label;
       Cckappa_sig.e_rule_label_dot = label_dot;
       Cckappa_sig.e_rule_initial_direction = direction;
+      Cckappa_sig.e_rule_guard_string = guard_string;
       Cckappa_sig.e_rule_rule = rule;
       Cckappa_sig.e_rule_c_rule =
         {
@@ -2281,11 +2266,9 @@ let translate_c_compil parameters error handler compil =
         error, var :: list)
       (error, []) compil.Ast.variables
   in
-  let guard_params = Ast.get_list_of_guard_parameters compil.Ast.rules in
   let error, c_rules =
     List.fold_left
       (fun (error, list) (r1, guard, r2) ->
-        let error, guard = translate_guard parameters error handler guard in
         let error, c_rule =
           translate_rule parameters error handler (r1, guard, r2)
         in
@@ -2367,7 +2350,6 @@ let translate_c_compil parameters error handler compil =
       Cckappa_sig.observables = c_observables;
       Cckappa_sig.init = c_inits;
       Cckappa_sig.perturbations = c_perturbations;
-      Cckappa_sig.guard_params;
     } )
 
 let declare_agent parameters error ag sol =

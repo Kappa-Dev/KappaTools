@@ -1923,7 +1923,6 @@ type ast_compiled_data = {
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;
-  nr_guard_params: int;
   result:
     ( Ast.agent,
       Ast.agent_sig,
@@ -2531,41 +2530,24 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     },
     counter_conversion_info_map )
 
-let rec guard_param_conversion convert guard_params g =
+let rec guard_param_conversion convert error guard_params g =
   match g with
-  | LKappa.True -> LKappa.True
-  | LKappa.False -> LKappa.False
-  | Param p -> Param (convert p guard_params)
-  | Not g1 -> Not (guard_param_conversion convert guard_params g1)
-  | And (g1, g2) ->
-    And
-      ( guard_param_conversion convert guard_params g1,
-        guard_param_conversion convert guard_params g2 )
-  | Or (g1, g2) ->
-    Or
-      ( guard_param_conversion convert guard_params g1,
-        guard_param_conversion convert guard_params g2 )
-
-let guard_param_to_int f =
-  guard_param_conversion (fun p guard_params ->
-      match List.find_index (fun x -> String.equal p x) guard_params with
-      | Some i -> f i
-      | None ->
-        raise
-          (ExceptionDefn.Malformed_Decl ("Unknown guard parameter", Loc.dummy)))
-
-let guard_param_to_string f =
-  guard_param_conversion (fun p guard_params ->
-      List.nth guard_params (f p) (*rTODO error handling*))
-
-let guard_params_to_int_option f guard_params g =
-  Option.map (guard_param_to_int f guard_params) g
-
-let guard_params_to_int_in_rules guard_params rules =
-  List.map
-    (fun (r1, g, r2) ->
-      r1, guard_params_to_int_option (fun x -> x) guard_params g, r2)
-    rules
+  | LKappa.True -> error, LKappa.True
+  | LKappa.False -> error, LKappa.False
+  | LKappa.Param p ->
+    let error, conv_p = convert p error guard_params in
+    error, LKappa.Param conv_p
+  | LKappa.Not g1 ->
+    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
+    error, LKappa.Not conv_g1
+  | LKappa.And (g1, g2) ->
+    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
+    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
+    error, LKappa.And (conv_g1, conv_g2)
+  | LKappa.Or (g1, g2) ->
+    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
+    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
+    error, LKappa.Or (conv_g1, conv_g2)
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
@@ -2764,10 +2746,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     init_of_ast ~warning ~syntax_version agents_sig counters_info contact_map
       tokens_finder alg_vars_finder ast_compil.init
   in
-  let guard_params = Ast.get_list_of_guard_parameters ast_compil.rules in
-  (*rTODO this is never really used*)
-  let rules = guard_params_to_int_in_rules guard_params rules in
-
   {
     agents_sig;
     contact_map;
@@ -2775,7 +2753,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     token_names;
     alg_vars_finder;
     updated_alg_vars;
-    nr_guard_params = List.length guard_params;
     result =
       {
         filenames = ast_compil.filenames;

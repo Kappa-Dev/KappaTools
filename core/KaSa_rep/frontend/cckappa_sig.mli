@@ -177,6 +177,7 @@ type enriched_rule = {
   e_rule_label: (string * Ckappa_sig.position) option;
   e_rule_label_dot: (string * Ckappa_sig.position) option;
   e_rule_initial_direction: Ckappa_sig.direction;
+  e_rule_guard_string: string LKappa.guard option;
   e_rule_rule: Ckappa_sig.mixture Ckappa_sig.rule;
   e_rule_c_rule: rule;
 }
@@ -205,7 +206,6 @@ type compil = {
   (*initial graph declaration*)
   perturbations:
     (mixture, rule) Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t;
-  guard_params: string list; (*rTODO make this a Int_storage not a list*)
 }
 
 (*******************************************************)

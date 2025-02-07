@@ -195,6 +195,25 @@ let has_no_label parameters error compiled rule_id =
       | None -> true
       | Some _ -> false) )
 
+let string_of_guard parameters guardp kappa_handler ?state error =
+  let guard_p_dic = kappa_handler.Cckappa_sig.guard_parameters_dic in
+  let error, output =
+    Ckappa_sig.Dictionary_of_guards.translate parameters error guardp
+      guard_p_dic
+  in
+  let error, guard_param_name =
+    match output with
+    | None -> Exception.warn parameters error __POS__ Exit ""
+    | Some (guard_param_name, (), ()) -> error, guard_param_name
+  in
+  match state with
+  | None -> error, guard_param_name
+  | Some s ->
+    let error, guard_string =
+      Ckappa_sig.prefix_of_guard_state parameters error s
+    in
+    error, guard_string ^ guard_param_name
+
 let info_of_rule parameters ?(with_rates = false) ?(original = false) error
     compiled (rule_id : Ckappa_sig.c_rule_id) =
   let rules = compiled.Cckappa_sig.rules in
@@ -242,13 +261,7 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
       | false, true -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast
       | false, false -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast_no_rate
     in
-    let guard_params = compiled.Cckappa_sig.guard_params in
-    let guard =
-      Option.map
-        (LKappa_compiler.guard_param_to_string Ckappa_sig.int_of_guard_parameter
-           guard_params)
-        rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.guard
-    in
+    let guard = rule.Cckappa_sig.e_rule_guard_string in
     error, (label, position, direction, ast, guard, rule_id)
 
 let hide rule = { rule with Public_data.rule_hidden = true }
@@ -601,25 +614,6 @@ let string_of_site parameter error handler_kappa ?state
     string_of_site_aux parameter error handler_kappa ?state agent_type site_int
   in
   error, print_site parameter ?state ~add_parentheses site_type
-
-let string_of_guard parameters guardp kappa_handler ?state error =
-  let guard_p_dic = kappa_handler.Cckappa_sig.guard_parameters_dic in
-  let error, output =
-    Ckappa_sig.Dictionary_of_guards.translate parameters error guardp
-      guard_p_dic
-  in
-  let error, guard_param_name =
-    match output with
-    | None -> Exception.warn parameters error __POS__ Exit ""
-    | Some (guard_param_name, (), ()) -> error, guard_param_name
-  in
-  match state with
-  | None -> error, guard_param_name
-  | Some s ->
-    let error, guard_string =
-      Ckappa_sig.prefix_of_guard_state parameters error s
-    in
-    error, guard_string ^ guard_param_name
 
 let string_of_site_or_guard parameter error handler_kappa ?state
     ?(add_parentheses = false) agent_type site_int =

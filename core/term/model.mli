@@ -9,7 +9,9 @@
 (** Compiled representation of a full Kappa model *)
 
 type rule_with_label_and_guard =
-  string Loc.annoted option * int LKappa.guard option * LKappa.rule Loc.annoted
+  string Loc.annoted option
+  * string LKappa.guard option
+  * LKappa.rule Loc.annoted
 
 type t
 

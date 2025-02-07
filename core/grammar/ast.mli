@@ -157,7 +157,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
       (** pattern declaration for reusing as variable in perturbations or kinetic rate *)
   signatures: 'agent_sig list;  (** agent signature declarations *)
   rules:
-    (string Loc.annoted option * 'id LKappa.guard option * 'rule Loc.annoted)
+    (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
     list;
       (**rules (possibly named)*)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
