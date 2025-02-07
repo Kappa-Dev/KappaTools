@@ -15,9 +15,6 @@
 let trace = false
 let _ = trace
 
-let get_nr_guard_parameters kappa_handler =
-  kappa_handler.Cckappa_sig.nguard_params
-
 type token =
   | Range of Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state list
   | Equiv of
@@ -442,7 +439,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
       ""
   in
   let log = Remanent_parameters.get_logger parameters in
-  let nr_guard_params = get_nr_guard_parameters handler_kappa in
+  let nr_guard_params = Handler.get_nr_guard_parameters handler_kappa in
   let error, () =
     match translation with
     | Range (site_type, state_list) ->

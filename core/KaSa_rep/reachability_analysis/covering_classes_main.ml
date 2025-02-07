@@ -15,9 +15,6 @@
 let trace = false
 
 (*******************************************************************************)
-let get_nr_guard_parameters kappa_handler =
-  kappa_handler.Cckappa_sig.nguard_params
-
 let compare_unit_covering_class_id _ _ = Covering_classes_type.dummy_cv_id
 
 let collect_modified_map parameters error kappa_handler diff_reverse
@@ -477,7 +474,7 @@ let scan_rule_set_remanent parameters error handler rules =
         (*clean the covering classes, removed duplicate of covering classes*)
         let error, store_remanent_dic =
           clean_classes parameters error covering_class modified_map
-            (get_nr_guard_parameters handler)
+            (Handler.get_nr_guard_parameters handler)
         in
         (*---------------------------------------------------------------*)
         (*compute the number of covering classes*)
@@ -717,7 +714,7 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
         let error, last_site =
           Handler.last_site_of_agent parameters error handler_kappa ag
         in
-        let nr_guard_parameters = get_nr_guard_parameters handler_kappa in
+        let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
         let size_map1 =
           1
           + Ckappa_sig.int_of_site_name last_site

@@ -1042,7 +1042,7 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
     guard_mvbdus restriction_bdu =
   let error, init = init_bdu_analysis_static parameters error in
   let nr_guard_params =
-    Covering_classes_main.get_nr_guard_parameters handler_kappa
+    Handler.get_nr_guard_parameters handler_kappa
   in
   let error, (handler_bdu, store_guard_restriction_bdu) =
     collect_guard_restriction_bdu parameters handler_bdu error
