@@ -1088,13 +1088,6 @@ module Domain = struct
           state_guard_parameters )
     in
     let bdu_handler = get_mvbdu_handler dynamic in
-    let log = Remanent_parameters.get_logger parameters in
-    let kappa_handler = get_kappa_handler static in
-    let () = Loggers.fprintf log "\n\t\tVIEWS_DOMAIN is_enabled:\n" in
-        let error =
-          Handler.print_guard_mvbdu parameters error kappa_handler
-            bdu_handler bdu_guard
-        in
     let error, bdu_handler, precondition =
       Communication.update_state_of_guard_parameters parameters error bdu_handler precondition bdu_guard
     in
