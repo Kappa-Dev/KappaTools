@@ -714,7 +714,9 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
         let error, last_site =
           Handler.last_site_of_agent parameters error handler_kappa ag
         in
-        let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
+        let nr_guard_parameters =
+          Handler.get_nr_guard_parameters handler_kappa
+        in
         let size_map1 =
           1
           + Ckappa_sig.int_of_site_name last_site

@@ -1041,9 +1041,7 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
     store_potential_side_effects store_remanent_triple site_correspondence
     guard_mvbdus restriction_bdu =
   let error, init = init_bdu_analysis_static parameters error in
-  let nr_guard_params =
-    Handler.get_nr_guard_parameters handler_kappa
-  in
+  let nr_guard_params = Handler.get_nr_guard_parameters handler_kappa in
   let error, (handler_bdu, store_guard_restriction_bdu) =
     collect_guard_restriction_bdu parameters handler_bdu error
       site_correspondence nr_guard_params restriction_bdu

@@ -207,16 +207,16 @@ module Domain = struct
       let error, dynamic, is_false =
         is_false_mvbdu parameters error dynamic mvbdu
       in
-        let guard_mvbdus = get_guard_mvbdus static in
-        let error, dynamic, guard_bdu =
-          get_bdu_guard parameters dynamic error guard_mvbdus rule_id
-        in
-        let bdu_handler = get_mvbdu_handler dynamic in
-        let error, bdu_handler, precondition =
-          Communication.update_state_of_guard_parameters parameters error
-            bdu_handler precondition guard_bdu
-        in
-        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+      let guard_mvbdus = get_guard_mvbdus static in
+      let error, dynamic, guard_bdu =
+        get_bdu_guard parameters dynamic error guard_mvbdus rule_id
+      in
+      let bdu_handler = get_mvbdu_handler dynamic in
+      let error, bdu_handler, precondition =
+        Communication.update_state_of_guard_parameters parameters error
+          bdu_handler precondition guard_bdu
+      in
+      let dynamic = set_mvbdu_handler bdu_handler dynamic in
       if is_false then (
         let error, precondition =
           Communication.the_rule_is_applied_for_the_first_time

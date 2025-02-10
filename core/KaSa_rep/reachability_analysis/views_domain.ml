@@ -1023,9 +1023,7 @@ module Domain = struct
 
   let collect_bdu_enabled parameters error static dynamic bdu_false
       fixpoint_result proj_bdu_test_restriction precondition handler_kappa =
-    let nr_guard_parameters =
-      Handler.get_nr_guard_parameters handler_kappa
-    in
+    let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, state_guard_parameters =
       Communication.get_state_of_guard_parameters parameters bdu_handler error
@@ -1089,7 +1087,8 @@ module Domain = struct
     in
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, precondition =
-      Communication.update_state_of_guard_parameters parameters error bdu_handler precondition bdu_guard
+      Communication.update_state_of_guard_parameters parameters error
+        bdu_handler precondition bdu_guard
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, precondition
@@ -1221,9 +1220,7 @@ module Domain = struct
   let precondition_empty_step_list kappa_handler parameters error dynamic
       rule_id path store_agent_name bdu_false bdu_true store_covering_classes_id
       site_correspondence fixpoint_result proj_bdu_test_restriction =
-    let nr_guard_params =
-      Handler.get_nr_guard_parameters kappa_handler
-    in
+    let nr_guard_params = Handler.get_nr_guard_parameters kappa_handler in
     let error, agent_type =
       match
         Ckappa_sig.RuleAgent_map_and_set.Map.find_option_without_logs parameters
@@ -1417,9 +1414,7 @@ module Domain = struct
       where (agent_type_in, site_in) is the information of the last agent,
       and (agent_type', site_in) is the information of the agent of the pattern
     *)
-    let nr_guard_params =
-      Handler.get_nr_guard_parameters kappa_handler
-    in
+    let nr_guard_params = Handler.get_nr_guard_parameters kappa_handler in
     let to_guard_or_site s =
       Ckappa_sig.guard_p_then_site_of_site s nr_guard_params
     in
@@ -2210,9 +2205,7 @@ module Domain = struct
   let precondition_empty_aux parameters error path pattern kappa_handler dynamic
       bdu_false bdu_true site_correspondence site_correspondence_map
       fixpoint_result cv_list =
-    let nr_guard_params =
-      Handler.get_nr_guard_parameters kappa_handler
-    in
+    let nr_guard_params = Handler.get_nr_guard_parameters kappa_handler in
     let to_guard_or_site s =
       Ckappa_sig.guard_p_then_site_of_site s nr_guard_params
     in
@@ -2356,9 +2349,7 @@ module Domain = struct
     let site_correspondence = get_remanent_triple static in
     let site_correspondence_map = get_site_correspondence_array static in
     let store_covering_classes_id = get_covering_classes_id static in
-    let nr_guard_parameters =
-      Handler.get_nr_guard_parameters kappa_handler
-    in
+    let nr_guard_parameters = Handler.get_nr_guard_parameters kappa_handler in
     (*---------------------------------------------------------*)
     (* Why an arbitrary patterns would be stored in that map *)
     (* For each view, you have to collect the set of sites *)
@@ -2474,10 +2465,11 @@ module Domain = struct
           pattern.Cckappa_sig.views (dynamic, bdu_true)
       in
       let bdu_handler = get_mvbdu_handler dynamic in
-    let error, bdu_handler, precondition =
-      Communication.update_state_of_guard_parameters parameters error bdu_handler precondition result_bdu_guard
-    in
-    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+      let error, bdu_handler, precondition =
+        Communication.update_state_of_guard_parameters parameters error
+          bdu_handler precondition result_bdu_guard
+      in
+      let dynamic = set_mvbdu_handler bdu_handler dynamic in
       let precondition =
         Communication.refine_information_about_state_of_sites_in_precondition
           precondition
@@ -3061,9 +3053,7 @@ module Domain = struct
       parameters handler error handler_kappa
       (*store_new_index_pair_map*)
         site_correspondence result =
-    let nr_guard_params =
-      Handler.get_nr_guard_parameters handler_kappa
-    in
+    let nr_guard_params = Handler.get_nr_guard_parameters handler_kappa in
     let error', handler, mvbdu_true =
       Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
     in
@@ -3159,9 +3149,7 @@ module Domain = struct
   let stabilise_bdu_update_map_gen_decomposition decomposition ~smash
       ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
       handler_kappa site_correspondence result =
-    let nr_guard_parameters =
-      Handler.get_nr_guard_parameters handler_kappa
-    in
+    let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
     let log = Remanent_parameters.get_logger parameters in
     if smash then (
       let error', handler, output =
@@ -3600,9 +3588,7 @@ module Domain = struct
       let kappa_handler = get_kappa_handler static in
       let handler = get_mvbdu_handler dynamic in
       let parameters = get_parameter static in
-      let nr_guard_params =
-        Handler.get_nr_guard_parameters kappa_handler
-      in
+      let nr_guard_params = Handler.get_nr_guard_parameters kappa_handler in
       let contact_map = Preprocess.init_contact_map in
       (*-----------------------------------------------*)
       let error, (handler, contact_map) =

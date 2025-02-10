@@ -78,7 +78,6 @@ module Domain = struct
   let lift f x = f (get_global_static_information x)
   let get_parameter static = lift Analyzer_headers.get_parameter static
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
-
   let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
 
   let get_potential_side_effects static =
