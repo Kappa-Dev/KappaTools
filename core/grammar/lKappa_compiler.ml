@@ -2549,6 +2549,15 @@ let rec guard_param_conversion convert error guard_params g =
     let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
     error, LKappa.Or (conv_g1, conv_g2)
 
+  let conflicts_to_id agents_sig conflicts =
+    List.map (fun (agent, site1, site2) ->
+        let agent_id = Signature.num_of_agent agent agents_sig in
+        let site1_id = Signature.id_of_site agent site1 agents_sig in
+        let site2_id = Signature.id_of_site agent site2 agents_sig in
+        ((agent_id, snd agent), (site1_id, snd site1), (site2_id, snd site2))
+        )
+    conflicts
+
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
   (* TODO test this *)
@@ -2742,6 +2751,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       (List.rev ast_compil.observables)
   in
 
+  let conflicts = conflicts_to_id agents_sig ast_compil.conflicts in
+
   let init =
     init_of_ast ~warning ~syntax_version agents_sig counters_info contact_map
       tokens_finder alg_vars_finder ast_compil.init
@@ -2766,6 +2777,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         signatures = ast_compil.signatures;
         configurations = ast_compil.configurations;
         guard_param_values = ast_compil.guard_param_values;
-        conflicts = ast_compil.conflicts;
+        conflicts;
       };
   }

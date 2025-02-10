@@ -193,7 +193,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   volumes: (string * float * string) list;
   guard_param_values: (string Loc.annoted * bool) list;
       (** The guard parameters that have a defined value (true or false).*)
-  conflicts: (string Loc.annoted * string Loc.annoted * string Loc.annoted) list;
+  conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
       (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
 }
 
