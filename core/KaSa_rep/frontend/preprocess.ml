@@ -1162,6 +1162,25 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             dead_state_sites,
             dead_link_sites ) )
 
+let rec guard_param_conversion convert error guard_params g =
+  match g with
+  | LKappa.True -> error, LKappa.True
+  | LKappa.False -> error, LKappa.False
+  | LKappa.Param p ->
+    let error, conv_p = convert p error guard_params in
+    error, LKappa.Param conv_p
+  | LKappa.Not g1 ->
+    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
+    error, LKappa.Not conv_g1
+  | LKappa.And (g1, g2) ->
+    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
+    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
+    error, LKappa.And (conv_g1, conv_g2)
+  | LKappa.Or (g1, g2) ->
+    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
+    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
+    error, LKappa.Or (conv_g1, conv_g2)
+
 let translate_guard parameters error handler guard =
   let convert guard_p_name error (parameters, handler) =
     let error, (bool, output) =

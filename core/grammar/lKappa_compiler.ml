@@ -2530,32 +2530,13 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     },
     counter_conversion_info_map )
 
-let rec guard_param_conversion convert error guard_params g =
-  match g with
-  | LKappa.True -> error, LKappa.True
-  | LKappa.False -> error, LKappa.False
-  | LKappa.Param p ->
-    let error, conv_p = convert p error guard_params in
-    error, LKappa.Param conv_p
-  | LKappa.Not g1 ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    error, LKappa.Not conv_g1
-  | LKappa.And (g1, g2) ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
-    error, LKappa.And (conv_g1, conv_g2)
-  | LKappa.Or (g1, g2) ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
-    error, LKappa.Or (conv_g1, conv_g2)
-
-  let conflicts_to_id agents_sig conflicts =
-    List.map (fun (agent, site1, site2) ->
-        let agent_id = Signature.num_of_agent agent agents_sig in
-        let site1_id = Signature.id_of_site agent site1 agents_sig in
-        let site2_id = Signature.id_of_site agent site2 agents_sig in
-        ((agent_id, snd agent), (site1_id, snd site1), (site2_id, snd site2))
-        )
+let conflicts_to_id agents_sig conflicts =
+  List.map
+    (fun (agent, site1, site2) ->
+      let agent_id = Signature.num_of_agent agent agents_sig in
+      let site1_id = Signature.id_of_site agent site1 agents_sig in
+      let site2_id = Signature.id_of_site agent site2 agents_sig in
+      (agent_id, snd agent), (site1_id, snd site1), (site2_id, snd site2))
     conflicts
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil

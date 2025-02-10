@@ -101,10 +101,3 @@ val agent_sigs_of_agent_sigs_with_links_as_lists :
   site_sig_with_links_as_lists NamedDecls.t NamedDecls.t ->
   Signature.t NamedDecls.t
 (** Helper to build signatures: for each entry, translate [(string Loc.annoted * string Loc.annoted) list] into [bool array array option] *)
-
-val guard_param_conversion :
-  ('a -> 'b -> 'c -> 'b * 'd) ->
-  'b ->
-  'c ->
-  'a LKappa.guard ->
-  'b * 'd LKappa.guard
