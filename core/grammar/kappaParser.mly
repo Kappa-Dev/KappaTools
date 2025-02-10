@@ -100,6 +100,9 @@ start_rule:
 		      | Ast.GUARD_PARAM (param_name,b) ->
           {r with
 			  Ast.guard_param_values = (param_name,b)::r.Ast.guard_param_values}
+          | Ast.CONFLICT (a,s1,s2) ->
+          {r with
+			  Ast.conflicts = (a,s1,s2)::r.Ast.conflicts}
 		  }
     | error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}

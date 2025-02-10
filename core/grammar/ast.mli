@@ -145,6 +145,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
       * string LKappa.guard option
       * 'rule Loc.annoted)
   | GUARD_PARAM of (string Loc.annoted * bool)
+  | CONFLICT of (string Loc.annoted * string Loc.annoted * string Loc.annoted)
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -169,6 +170,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
   guard_param_values: (string Loc.annoted * bool) list;
+  conflicts: (string Loc.annoted * string Loc.annoted * string Loc.annoted) list;
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil

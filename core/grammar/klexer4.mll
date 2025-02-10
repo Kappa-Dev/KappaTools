@@ -91,6 +91,7 @@ rule token = parse
     | "def" -> CONFIG
     | "token" -> TOKEN
     | "guard_param" -> GUARD_PARAM
+    | "conflict" -> CONFLICT
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown directive: "^s,
        Loc.of_pos (Lexing.lexeme_start_p lexbuf)

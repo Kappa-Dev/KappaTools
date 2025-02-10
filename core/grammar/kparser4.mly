@@ -27,7 +27,7 @@
 %token SHARP UNDERSCORE PIPE RAR LRAR LAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
 %token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
-%token DO REPEAT ALARM RUN LET GUARD_PARAM SHARP_OP_BRA IF
+%token DO REPEAT ALARM RUN LET GUARD_PARAM SHARP_OP_BRA IF CONFLICT
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID LABEL STRING
@@ -828,6 +828,7 @@ an algebraic expression is expected")) }
   | CONFIG annoted STRING annoted value_list
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
   | GUARD_PARAM annoted ID annoted boolean annoted { add (Ast.GUARD_PARAM (($3,rhs_pos 3), $5)) }
+  | CONFLICT annoted ID annoted ID annoted ID annoted { add (Ast.CONFLICT (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
   ;
 
 model_body:

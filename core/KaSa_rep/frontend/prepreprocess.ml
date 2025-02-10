@@ -1008,4 +1008,5 @@ let translate_compil parameters error
       Ast.tokens = compil.Ast.tokens;
       Ast.volumes = compil.Ast.volumes;
       Ast.guard_param_values = compil.Ast.guard_param_values;
+      Ast.conflicts = compil.Ast.conflicts;
     } )

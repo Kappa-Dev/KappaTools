@@ -40,5 +40,7 @@ let append_to_ast_compil rev_instr compil =
         {
           r with
           Ast.guard_param_values = (params_sig, b) :: r.Ast.guard_param_values;
-        })
+        }
+      | Ast.CONFLICT (agent, site1, site2) ->
+        { r with Ast.conflicts = (agent, site1, site2) :: r.Ast.conflicts })
     compil (List.rev rev_instr)

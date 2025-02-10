@@ -2766,5 +2766,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         signatures = ast_compil.signatures;
         configurations = ast_compil.configurations;
         guard_param_values = ast_compil.guard_param_values;
+        conflicts = ast_compil.conflicts;
       };
   }

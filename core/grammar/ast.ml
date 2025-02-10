@@ -166,6 +166,7 @@ type ('agent, 'agent_id, 'pattern, 'mixture, 'id, 'rule) instruction =
       * string LKappa.guard option
       * 'rule Loc.annoted)
   | GUARD_PARAM of (string Loc.annoted * bool)
+  | CONFLICT of (string Loc.annoted * string Loc.annoted * string Loc.annoted)
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -192,6 +193,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   volumes: (string * float * string) list;
   guard_param_values: (string Loc.annoted * bool) list;
       (** The guard parameters that have a defined value (true or false).*)
+  conflicts: (string Loc.annoted * string Loc.annoted * string Loc.annoted) list;
+      (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -234,6 +237,7 @@ let empty_compil =
     tokens = [];
     volumes = [];
     guard_param_values = [];
+    conflicts = [];
   }
 
 (*
@@ -1122,7 +1126,7 @@ let print_perturbation f ((alarm, cond, modif, rep), _) =
     rep
 
 let print_parsing_compil_kappa f c =
-  Format.fprintf f "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@]@."
+  Format.fprintf f "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,%a@,@]@."
     (Pp.list Pp.space print_configuration)
     c.configurations
     (Pp.list Pp.space (fun f a ->
@@ -1153,6 +1157,9 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space (fun f ((s, _), b) ->
          Format.fprintf f "%%guard_param: %s -> %b" s b))
     c.guard_param_values
+    (Pp.list Pp.space (fun f ((a, _), (s1, _), (s2, _)) ->
+         Format.fprintf f "%%conflict: %s %s %s" a s1 s2))
+    c.conflicts
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
   JsonUtil.smart_assoc
@@ -1738,6 +1745,13 @@ let compil_to_json c =
              (Loc.string_annoted_to_json ~filenames)
              JsonUtil.of_bool)
           c.guard_param_values );
+      ( "conflicts",
+        JsonUtil.of_list
+          (JsonUtil.of_triple
+             (Loc.string_annoted_to_json ~filenames)
+             (Loc.string_annoted_to_json ~filenames)
+             (Loc.string_annoted_to_json ~filenames))
+          c.conflicts );
     ]
 
 let compil_of_json = function
@@ -1843,6 +1857,17 @@ let compil_of_json = function
                      (JsonUtil.exn_msg_cant_import_from_json
                         "AST guard_param_values boolean value")))
              (List.assoc "guard_param_values" l);
+         conflicts =
+           JsonUtil.to_list
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json "AST conflicts sig")
+             (JsonUtil.to_triple
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json "AST conflicts sig")
+                (Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames))
+             (List.assoc "conflicts" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST", x)))
