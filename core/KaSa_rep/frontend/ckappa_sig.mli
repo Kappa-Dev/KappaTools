@@ -298,6 +298,15 @@ val add_site :
   mixture ->
   Exception.exceptions_caught_and_uncaught * mixture
 
+val add_site1_if_site2_is_present :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  agent_name ->
+  site_name ->
+  site_name ->
+  mixture ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * (mixture * bool)
+
 val add_counter :
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->

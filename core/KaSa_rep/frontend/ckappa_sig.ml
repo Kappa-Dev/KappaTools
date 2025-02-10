@@ -588,44 +588,61 @@ let add_agent parameters error agent_id agent_name mixture =
   in
   aux k mixture
 
-let mod_agent_gen parameters error agent_id f mixture =
+let mod_agent_gen_with_condition parameters error agent_id condition f mixture =
   let k = int_of_agent_id agent_id in
   let rec aux k mixture =
     match mixture with
     | SKIP mixture' ->
-      if k = 0 then
-        Exception.warn parameters error __POS__ Exit mixture
+      if condition None k then
+        Exception.warn parameters error __POS__ Exit (mixture, false)
       else (
-        let error, mixture'' = aux (k - 1) mixture' in
-        error, SKIP mixture''
+        let error, (mixture'', was_modified) = aux (k - 1) mixture' in
+        error, (SKIP mixture'', was_modified)
       )
     | COMMA (agent, mixture') ->
-      if k = 0 then (
-        let error, agent = f parameters error agent in
-        error, COMMA (agent, mixture')
-      ) else (
-        let error, mixture'' = aux (k - 1) mixture' in
-        error, COMMA (agent, mixture'')
-      )
+      let error, (mixture'', was_modified) = aux (k - 1) mixture' in
+      let error, agent, was_modified =
+        if condition (Some agent) k then
+          f parameters error agent
+        else
+          error, agent, was_modified
+      in
+      error, (COMMA (agent, mixture''), was_modified)
     | DOT (id, agent, mixture') ->
-      if k = 0 then (
-        let error, agent = f parameters error agent in
-        error, DOT (id, agent, mixture')
-      ) else (
-        let error, mixture'' = aux (k - 1) mixture' in
-        error, DOT (id, agent, mixture'')
-      )
+      let error, (mixture'', was_modified) = aux (k - 1) mixture' in
+      let error, agent, was_modified =
+        if condition (Some agent) k then
+          f parameters error agent
+        else
+          error, agent, was_modified
+      in
+      error, (DOT (id, agent, mixture''), was_modified)
     | PLUS (id, agent, mixture') ->
-      if k = 0 then (
-        let error, agent = f parameters error agent in
-        error, PLUS (id, agent, mixture')
-      ) else (
-        let error, mixture'' = aux (k - 1) mixture' in
-        error, PLUS (id, agent, mixture'')
-      )
-    | EMPTY_MIX -> Exception.warn parameters error __POS__ Exit mixture
+      let error, (mixture'', was_modified) = aux (k - 1) mixture' in
+      let error, agent, was_modified =
+        if condition (Some agent) k then
+          f parameters error agent
+        else
+          error, agent, was_modified
+      in
+      error, (PLUS (id, agent, mixture''), was_modified)
+    | EMPTY_MIX -> error, (mixture, false)
   in
   aux k mixture
+
+let mod_agent_gen parameters error agent_id f mixture =
+  let error, (mixture, agent_id_exists) =
+    mod_agent_gen_with_condition parameters error agent_id
+      (fun _ k -> k = 0)
+      (fun parameters error agent ->
+        let error, mixture = f parameters error agent in
+        error, mixture, true)
+      mixture
+  in
+  if not agent_id_exists then
+    Exception.warn parameters error __POS__ Exit mixture
+  else
+    error, mixture
 
 let rec has_site x interface =
   match interface with
@@ -664,6 +681,31 @@ let add_site parameters error agent_id site_name mixture =
         let interface = PORT_SEP (port, agent.ag_intf) in
         error, { agent with ag_intf = interface }
       ))
+    mixture
+
+let add_site1_if_site2_is_present parameters error agent_name site1_name
+    site2_name mixture =
+  mod_agent_gen_with_condition parameters error dummy_agent_id
+    (fun agent_opt _ ->
+      match agent_opt with
+      | None -> false
+      | Some agent -> agent.agent_name = agent_name)
+    (fun _parameters error agent ->
+      if has_site site1_name agent.ag_intf then
+        error, agent, false
+      else if has_site site2_name agent.ag_intf then (
+        let port =
+          {
+            port_name = site1_name;
+            port_link = LNK_ANY Loc.dummy;
+            port_int = [];
+            port_free = Some true;
+          }
+        in
+        let interface = PORT_SEP (port, agent.ag_intf) in
+        error, { agent with ag_intf = interface }, true
+      ) else
+        error, agent, false)
     mixture
 
 let add_counter parameters error agent_id counter_name mixture =
