@@ -739,6 +739,142 @@ let dump_rule_no_rate rule =
   let () = Format.pp_print_flush fmt () in
   Buffer.contents buf
 
+(**Find all agents where site1 appears as a non-bound site on the lhs and as a bound site on the rhs.*)
+let add_conflict_site_to_rule parameters error agent site1 site2 rule =
+  let there_is_a_potential_conflict site1 site2 interface1 interface2 =
+    let conflict_between_sites site1 site2 =
+      Ckappa_sig.has_free_site site1 interface1
+      && Ckappa_sig.has_bound_site site1 interface2
+      && (not (Ckappa_sig.has_site site2 interface1))
+      && not (Ckappa_sig.has_site site2 interface2)
+    in
+    conflict_between_sites site1 site2 || conflict_between_sites site2 site1
+  in
+  let add_conflict_site_to_agents error agent1 agent2 site1 site2 =
+    let new_port_name =
+      if Ckappa_sig.has_site site1 agent1.Ckappa_sig.ag_intf then
+        site2
+      else
+        site1
+    in
+    let new_port =
+      {
+        Ckappa_sig.port_name = new_port_name;
+        Ckappa_sig.port_link = Ckappa_sig.FREE;
+        Ckappa_sig.port_int = [];
+        Ckappa_sig.port_free = Some true;
+      }
+    in
+    let interface1 =
+      Ckappa_sig.PORT_SEP (new_port, agent1.Ckappa_sig.ag_intf)
+    in
+    let interface2 =
+      Ckappa_sig.PORT_SEP (new_port, agent2.Ckappa_sig.ag_intf)
+    in
+    ( error,
+      { agent1 with Ckappa_sig.ag_intf = interface1 },
+      { agent2 with Ckappa_sig.ag_intf = interface2 } )
+  in
+  let rec aux lhs rhs =
+    match lhs, rhs with
+    | Ckappa_sig.SKIP lhs', Ckappa_sig.SKIP rhs' ->
+      let error, (lhs', rhs', was_changed) = aux lhs' rhs' in
+      error, (Ckappa_sig.SKIP lhs', Ckappa_sig.SKIP rhs', was_changed)
+    | Ckappa_sig.COMMA (agent1, lhs'), Ckappa_sig.COMMA (agent2, rhs')
+    | Ckappa_sig.DOT (_, agent1, lhs'), Ckappa_sig.DOT (_, agent2, rhs')
+    | Ckappa_sig.PLUS (_, agent1, lhs'), Ckappa_sig.PLUS (_, agent2, rhs')
+      when agent = agent1.Ckappa_sig.agent_name
+           && agent1.Ckappa_sig.agent_name = agent2.Ckappa_sig.agent_name ->
+      let error, (lhs', rhs', was_changed) = aux lhs' rhs' in
+      let (error, agent1, agent2), was_changed =
+        if
+          there_is_a_potential_conflict site1 site2 agent1.Ckappa_sig.ag_intf
+            agent2.Ckappa_sig.ag_intf
+        then
+          add_conflict_site_to_agents error agent1 agent2 site1 site2, true
+        else
+          (error, agent1, agent2), was_changed
+      in
+      ( error,
+        ( Ckappa_sig.modify_mixture (fun _ _ -> agent1, lhs') lhs,
+          Ckappa_sig.modify_mixture (fun _ _ -> agent2, rhs') rhs,
+          was_changed ) )
+    | Ckappa_sig.EMPTY_MIX, Ckappa_sig.EMPTY_MIX
+    | Ckappa_sig.SKIP _, _
+    | _, Ckappa_sig.SKIP _ ->
+      error, (lhs, rhs, false) (*rTODO add recursion for the skips*)
+    | Ckappa_sig.COMMA _, _
+    | Ckappa_sig.DOT _, _
+    | Ckappa_sig.PLUS _, _
+    | Ckappa_sig.EMPTY_MIX, _ ->
+      Exception.warn parameters error __POS__ Exit (lhs, rhs, false)
+  in
+  let error, (lhs, rhs, was_changed) =
+    aux rule.Ckappa_sig.lhs rule.Ckappa_sig.rhs
+  in
+  error, { rule with Ckappa_sig.lhs; Ckappa_sig.rhs }, was_changed
+
+let conflicts_guard_p_name agent site1 site2 =
+  "@co-" ^ agent ^ "-" ^ site1 ^ "-" ^ site2
+
+let add_conflict_to_guard guard_opt agent site1 site2 negate =
+  let guardp = LKappa.Param (conflicts_guard_p_name agent site1 site2) in
+  let guardp =
+    if negate then
+      LKappa.Not guardp
+    else
+      guardp
+  in
+  match guard_opt with
+  | None -> Some guardp
+  | Some guard -> Some (LKappa.And (guard, guardp))
+
+(**All the rules that were added because of conflicts have the same label as the original rule.
+  This function changes their name to rule', rule'' and so on.*)
+let rename_rules rules =
+  match rules with
+  | [] -> rules
+  | (rule_string_opt, _, _) :: _ ->
+    (match rule_string_opt with
+    | None -> rules
+    | Some _ ->
+      List.mapi
+        (fun i (rule_string_opt, guard, rule) ->
+          match rule_string_opt with
+          | None -> rule_string_opt, guard, rule
+          | Some (rule_string, p) ->
+            Some (rule_string ^ String.make i '\'', p), guard, rule)
+        rules)
+
+let add_rules_with_conflicts parameters error (rule_string, guard, (rule, p))
+    conflicts =
+  let error, new_rules =
+    List.fold_left
+      (fun (error, rules) ((agent, _), (site1, _), (site2, _)) ->
+        List.fold_left
+          (fun (error, rules) (id, guard, (rule, p)) ->
+            let error, new_rule, was_changed =
+              add_conflict_site_to_rule parameters error agent site1 site2 rule
+            in
+            if was_changed then (
+              let guard_new_rule =
+                add_conflict_to_guard guard agent site1 site2 false
+              in
+              let guard_og_rule =
+                add_conflict_to_guard guard agent site1 site2 true
+              in
+              ( error,
+                (id, guard_og_rule, (rule, p))
+                :: (id, guard_new_rule, (new_rule, p))
+                :: rules )
+            ) else
+              error, (id, guard, (rule, p)) :: rules)
+          (error, []) rules)
+      (error, [ rule_string, guard, (rule, p) ])
+      conflicts
+  in
+  error, rename_rules new_rules
+
 let translate_compil parameters error
     (compil :
       ( Ast.agent,
@@ -995,12 +1131,23 @@ let translate_compil parameters error
         error, ((alarm, b', List.rev m', o'), p) :: list, rules_rev')
       (error, [], rules_rev) compil.Ast.perturbations
   in
+  let error, rules =
+    List.fold_left
+      (fun (error, list) (rule_string, guard, (rule, p)) ->
+        let error, rules_with_conflicts =
+          add_rules_with_conflicts parameters error
+            (rule_string, guard, (rule, p))
+            compil.Ast.conflicts
+        in
+        error, rules_with_conflicts @ list)
+      (error, []) rules_rev
+  in
   ( error,
     {
       Ast.filenames = compil.Ast.filenames;
       Ast.variables = List.rev var_rev;
       Ast.signatures = List.rev signatures_rev;
-      Ast.rules = List.rev rules_rev;
+      Ast.rules;
       Ast.observables = List.rev observables_rev;
       Ast.init = List.rev init_rev;
       Ast.perturbations = List.rev perturbations_rev;

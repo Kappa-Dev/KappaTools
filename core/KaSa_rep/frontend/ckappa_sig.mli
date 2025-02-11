@@ -282,6 +282,13 @@ val join_mixture :
   mixture ->
   Exception.exceptions_caught_and_uncaught * mixture
 
+val has_site : counter_name -> 'a interface -> bool
+val has_free_site : counter_name -> 'a interface -> bool
+val has_bound_site : counter_name -> 'a interface -> bool
+
+val modify_mixture :
+  (agent option -> mixture -> agent * mixture) -> mixture -> mixture
+
 val add_agent :
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->

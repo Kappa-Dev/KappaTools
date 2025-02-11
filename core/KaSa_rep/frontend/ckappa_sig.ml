@@ -627,15 +627,23 @@ let mod_agent_gen parameters error agent_id f mixture =
   in
   aux k mixture
 
-let rec has_site x interface =
+let rec has_site_condition condition interface =
   match interface with
   | EMPTY_INTF -> false
-  | COUNTER_SEP (_, intf) -> has_site x intf
+  | COUNTER_SEP (_, intf) -> has_site_condition condition intf
   | PORT_SEP (p, intf) ->
-    if p.port_name = x then
+    if condition p then
       true
     else
-      has_site x intf
+      has_site_condition condition intf
+
+let has_site x = has_site_condition (fun p -> p.port_name = x)
+
+let has_free_site x =
+  has_site_condition (fun p -> p.port_name = x && p.port_free = Some true)
+
+let has_bound_site x =
+  has_site_condition (fun p -> p.port_name = x && p.port_free = Some false)
 
 let rec has_counter x interface =
   match interface with
@@ -665,6 +673,22 @@ let add_site parameters error agent_id site_name mixture =
         error, { agent with ag_intf = interface }
       ))
     mixture
+
+let modify_mixture f mixture =
+  match mixture with
+  | SKIP mixture' ->
+    let _, mixture'' = f None mixture' in
+    SKIP mixture''
+  | COMMA (agent, mixture') ->
+    let agent, mixture'' = f (Some agent) mixture' in
+    COMMA (agent, mixture'')
+  | DOT (id, agent, mixture') ->
+    let agent, mixture'' = f (Some agent) mixture' in
+    DOT (id, agent, mixture'')
+  | PLUS (id, agent, mixture') ->
+    let agent, mixture'' = f (Some agent) mixture' in
+    PLUS (id, agent, mixture'')
+  | EMPTY_MIX -> mixture
 
 let add_counter parameters error agent_id counter_name mixture =
   mod_agent_gen parameters error agent_id

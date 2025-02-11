@@ -1198,8 +1198,7 @@ let translate_guard parameters error handler guard =
   | None -> error, None
   | Some g ->
     let error, guard =
-      LKappa_compiler.guard_param_conversion convert error (parameters, handler)
-        g
+      guard_param_conversion convert error (parameters, handler) g
     in
     error, Some guard
 
