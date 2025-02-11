@@ -777,9 +777,18 @@ let add_conflict_site_to_rule parameters error agent site1 site2 rule =
   in
   let rec aux lhs rhs =
     match lhs, rhs with
-    | Ckappa_sig.SKIP lhs', Ckappa_sig.SKIP rhs' ->
+    | Ckappa_sig.SKIP lhs', Ckappa_sig.SKIP rhs'
+    | Ckappa_sig.SKIP lhs', Ckappa_sig.COMMA (_, rhs')
+    | Ckappa_sig.SKIP lhs', Ckappa_sig.DOT (_, _, rhs')
+    | Ckappa_sig.SKIP lhs', Ckappa_sig.PLUS (_, _, rhs')
+    | Ckappa_sig.COMMA (_, lhs'), Ckappa_sig.SKIP rhs'
+    | Ckappa_sig.DOT (_, _, lhs'), Ckappa_sig.SKIP rhs'
+    | Ckappa_sig.PLUS (_, _, lhs'), Ckappa_sig.SKIP rhs' ->
       let error, (lhs', rhs', was_changed) = aux lhs' rhs' in
-      error, (Ckappa_sig.SKIP lhs', Ckappa_sig.SKIP rhs', was_changed)
+      ( error,
+        ( Ckappa_sig.modify_mixture (fun _ _ -> None, lhs') lhs,
+          Ckappa_sig.modify_mixture (fun _ _ -> None, rhs') rhs,
+          was_changed ) )
     | Ckappa_sig.COMMA (agent1, lhs'), Ckappa_sig.COMMA (agent2, rhs')
     | Ckappa_sig.DOT (_, agent1, lhs'), Ckappa_sig.DOT (_, agent2, rhs')
     | Ckappa_sig.PLUS (_, agent1, lhs'), Ckappa_sig.PLUS (_, agent2, rhs')
@@ -787,22 +796,22 @@ let add_conflict_site_to_rule parameters error agent site1 site2 rule =
       let error, (lhs', rhs', was_changed) = aux lhs' rhs' in
       let (error, agent1, agent2), was_changed =
         if
-          agent = agent1.Ckappa_sig.agent_name &&
-          there_is_a_potential_conflict site1 site2 agent1.Ckappa_sig.ag_intf
-            agent2.Ckappa_sig.ag_intf
+          agent = agent1.Ckappa_sig.agent_name
+          && there_is_a_potential_conflict site1 site2 agent1.Ckappa_sig.ag_intf
+               agent2.Ckappa_sig.ag_intf
         then
           add_conflict_site_to_agents error agent1 agent2 site1 site2, true
         else
           (error, agent1, agent2), was_changed
       in
       ( error,
-        ( Ckappa_sig.modify_mixture (fun _ _ -> agent1, lhs') lhs,
-          Ckappa_sig.modify_mixture (fun _ _ -> agent2, rhs') rhs,
+        ( Ckappa_sig.modify_mixture (fun _ _ -> Some agent1, lhs') lhs,
+          Ckappa_sig.modify_mixture (fun _ _ -> Some agent2, rhs') rhs,
           was_changed ) )
     | Ckappa_sig.EMPTY_MIX, Ckappa_sig.EMPTY_MIX
     | Ckappa_sig.SKIP _, _
     | _, Ckappa_sig.SKIP _ ->
-      error, (lhs, rhs, false) (*rTODO add recursion for the skips*)
+      error, (lhs, rhs, false)
     | Ckappa_sig.COMMA _, _
     | Ckappa_sig.DOT _, _
     | Ckappa_sig.PLUS _, _

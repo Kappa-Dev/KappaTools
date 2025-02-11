@@ -675,19 +675,24 @@ let add_site parameters error agent_id site_name mixture =
     mixture
 
 let modify_mixture f mixture =
+  let get_agent new_agent old_agent =
+    match new_agent with
+    | None -> old_agent
+    | Some agent -> agent
+  in
   match mixture with
   | SKIP mixture' ->
     let _, mixture'' = f None mixture' in
     SKIP mixture''
   | COMMA (agent, mixture') ->
-    let agent, mixture'' = f (Some agent) mixture' in
-    COMMA (agent, mixture'')
+    let agent', mixture'' = f (Some agent) mixture' in
+    COMMA (get_agent agent' agent, mixture'')
   | DOT (id, agent, mixture') ->
-    let agent, mixture'' = f (Some agent) mixture' in
-    DOT (id, agent, mixture'')
+    let agent', mixture'' = f (Some agent) mixture' in
+    DOT (id, get_agent agent' agent, mixture'')
   | PLUS (id, agent, mixture') ->
-    let agent, mixture'' = f (Some agent) mixture' in
-    PLUS (id, agent, mixture'')
+    let agent', mixture'' = f (Some agent) mixture' in
+    PLUS (id, get_agent agent' agent, mixture'')
   | EMPTY_MIX -> mixture
 
 let add_counter parameters error agent_id counter_name mixture =

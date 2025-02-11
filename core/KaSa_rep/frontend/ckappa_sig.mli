@@ -287,7 +287,7 @@ val has_free_site : counter_name -> 'a interface -> bool
 val has_bound_site : counter_name -> 'a interface -> bool
 
 val modify_mixture :
-  (agent option -> mixture -> agent * mixture) -> mixture -> mixture
+  (agent option -> mixture -> agent option * mixture) -> mixture -> mixture
 
 val add_agent :
   Remanent_parameters_sig.parameters ->
