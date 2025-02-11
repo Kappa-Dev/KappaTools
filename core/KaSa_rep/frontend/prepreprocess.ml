@@ -783,11 +783,11 @@ let add_conflict_site_to_rule parameters error agent site1 site2 rule =
     | Ckappa_sig.COMMA (agent1, lhs'), Ckappa_sig.COMMA (agent2, rhs')
     | Ckappa_sig.DOT (_, agent1, lhs'), Ckappa_sig.DOT (_, agent2, rhs')
     | Ckappa_sig.PLUS (_, agent1, lhs'), Ckappa_sig.PLUS (_, agent2, rhs')
-      when agent = agent1.Ckappa_sig.agent_name
-           && agent1.Ckappa_sig.agent_name = agent2.Ckappa_sig.agent_name ->
+      when agent1.Ckappa_sig.agent_name = agent2.Ckappa_sig.agent_name ->
       let error, (lhs', rhs', was_changed) = aux lhs' rhs' in
       let (error, agent1, agent2), was_changed =
         if
+          agent = agent1.Ckappa_sig.agent_name &&
           there_is_a_potential_conflict site1 site2 agent1.Ckappa_sig.ag_intf
             agent2.Ckappa_sig.ag_intf
         then
