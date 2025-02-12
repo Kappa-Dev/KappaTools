@@ -173,7 +173,7 @@ let update_state_of_guard_parameters parameters error bdu_handler precondition
     get_state_of_guard_parameters parameters bdu_handler error precondition
   in
   let error, bdu_handler, new_state =
-    Common_static.mvbdu_and_for_guards parameters bdu_handler error old_state
+    Handler.mvbdu_and_for_guards parameters bdu_handler error old_state
       state_guard_parameters
   in
   error, bdu_handler, set_state_of_guard_parameters precondition new_state

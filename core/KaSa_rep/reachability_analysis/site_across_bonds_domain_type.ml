@@ -527,7 +527,7 @@ let print_site_across_domain_decompose ?(verbose = true) ?(sparse = false)
   List.fold_left
     (fun (error, handler) mvbdu ->
       let error, handler, is_true =
-        Common_static.mvbdu_is_true_for_guards parameters handler error mvbdu
+        Handler.mvbdu_is_true_for_guards parameters handler error mvbdu
           restriction_mvbdu
       in
       if not is_true then

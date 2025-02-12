@@ -124,7 +124,7 @@ module Domain = struct
   let is_false_mvbdu parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, is_false =
-      Common_static.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
+      Handler.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, is_false
@@ -132,7 +132,7 @@ module Domain = struct
   let is_true_mvbdu parameters error dynamic mvbdu bdu_restriction =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, is_true =
-      Common_static.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
+      Handler.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
         bdu_restriction
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
@@ -367,8 +367,8 @@ module Domain = struct
         let error, (bdu_handler, new_mvbdu) =
           let restriction_bdu = get_restriction_mvbdu static in
           let error, bdu_handler, new_mvbdu =
-            Common_static.mvbdu_or_for_guards parameters bdu_handler error
-              old_mvbdu bdu_guard restriction_bdu
+            Handler.mvbdu_or_for_guards parameters bdu_handler error old_mvbdu
+              bdu_guard restriction_bdu
           in
           error, (bdu_handler, new_mvbdu)
         in
@@ -493,7 +493,7 @@ module Domain = struct
       match mvbdu with
       | Some mvbdu ->
         let error, bdu_handler, bdu_inter =
-          Common_static.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+          Handler.mvbdu_and_for_guards parameters bdu_handler error mvbdu
             new_mvbdu
         in
         error, bdu_handler, bdu_inter
@@ -523,7 +523,7 @@ module Domain = struct
       get_bdu_guard parameters dynamic error guard_mvbdus rule_id
     in
     let error, handler, guard_bdu_inter =
-      Common_static.mvbdu_and_for_guards parameters
+      Handler.mvbdu_and_for_guards parameters
         (get_mvbdu_handler dynamic)
         error guard_bdu state_guard_parameters
     in

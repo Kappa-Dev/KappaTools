@@ -859,8 +859,8 @@ module Domain = struct
         in
         let bdu_handler = get_mvbdu_handler dynamic in
         let error, bdu_handler, mvbdu_value_with_guard =
-          Common_static.mvbdu_and_for_guards parameters bdu_handler error
-            mvbdu_value guard_bdu
+          Handler.mvbdu_and_for_guards parameters bdu_handler error mvbdu_value
+            guard_bdu
         in
         let dynamic = set_mvbdu_handler bdu_handler dynamic in
         let error, dynamic, new_mvbdu =
@@ -876,7 +876,7 @@ module Domain = struct
               parameters bdu_handler error kappa_handler new_mvbdu
           in
           let error, bdu_handler, bdu_inter =
-            Common_static.mvbdu_and_for_guards parameters bdu_handler error
+            Handler.mvbdu_and_for_guards parameters bdu_handler error
               precondition_bdu bdu_restricted_to_guards
           in
           let dynamic = set_mvbdu_handler bdu_handler dynamic in
@@ -1002,8 +1002,7 @@ module Domain = struct
         pair_list
     in
     let error, handler, mvbdu_with_guard =
-      Common_static.mvbdu_and_for_guards parameters handler error mvbdu
-        guard_bdu
+      Handler.mvbdu_and_for_guards parameters handler error mvbdu guard_bdu
     in
     let error, bool, handler, modified_sites, store_result =
       Site_across_bonds_domain_type.add_link_and_check parameters error

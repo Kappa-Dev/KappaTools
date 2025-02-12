@@ -483,8 +483,8 @@ module Domain = struct
         pair_list
     in
     let error, bdu_handler, result_restriction_bdu =
-      Common_static.mvbdu_and_for_guards parameters bdu_handler error
-        restriction_bdu additional_restriction_bdu
+      Handler.mvbdu_and_for_guards parameters bdu_handler error restriction_bdu
+        additional_restriction_bdu
     in
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, result_restriction_bdu
@@ -675,7 +675,7 @@ module Domain = struct
             parallel_or_not static next_mvbdu
         in
         let error, bdu_handler, is_false =
-          Common_static.mvbdu_is_false_for_guards parameters bdu_handler error
+          Handler.mvbdu_is_false_for_guards parameters bdu_handler error
             mvbdu_inter_parallel_or_not
         in
         if is_false then
@@ -686,11 +686,11 @@ module Domain = struct
               error static mvbdu_inter_parallel_or_not
           in
           let error, bdu_handler, precondition_guard_mvbdu =
-            Common_static.mvbdu_and_for_guards parameters bdu_handler error
+            Handler.mvbdu_and_for_guards parameters bdu_handler error
               precondition_guard_mvbdu next_guard_mvbdu
           in
           let error, bdu_handler, is_false =
-            Common_static.mvbdu_is_false_for_guards parameters bdu_handler error
+            Handler.mvbdu_is_false_for_guards parameters bdu_handler error
               precondition_guard_mvbdu
           in
           if is_false then
@@ -815,7 +815,7 @@ module Domain = struct
         static mvbdu
     in
     let error, bdu_handler, is_false =
-      Common_static.mvbdu_is_false_for_guards parameters bdu_handler error
+      Handler.mvbdu_is_false_for_guards parameters bdu_handler error
         can_be_non_parallel
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
@@ -1583,12 +1583,12 @@ module Domain = struct
             let bdu_handler = get_mvbdu_handler dynamic in
             let restriction_bdu = get_restriction_mvbdu static in
             let error, bdu_handler, is_false =
-              Common_static.mvbdu_is_false_for_guards parameters bdu_handler
-                error value
+              Handler.mvbdu_is_false_for_guards parameters bdu_handler error
+                value
             in
             let error, _bdu_handler, is_true =
-              Common_static.mvbdu_is_true_for_guards parameters bdu_handler
-                error value restriction_bdu
+              Handler.mvbdu_is_true_for_guards parameters bdu_handler error
+                value restriction_bdu
             in
             if is_true then (
               match Remanent_parameters.get_backend_mode parameters with
