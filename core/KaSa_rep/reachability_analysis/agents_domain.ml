@@ -677,7 +677,6 @@ module Domain = struct
     let parameters = get_parameter static in
     let result = get_seen_agent dynamic in
     let handler = get_kappa_handler static in
-    let bdu_handler = get_mvbdu_handler dynamic in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
       let error, bool =
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
@@ -739,24 +738,26 @@ module Domain = struct
                  let error, dynamic, is_false =
                    is_false_mvbdu parameters error dynamic mvbdu
                  in
-                 let error =
+                 let error, dynamic =
                    if is_false then (
                      let () =
                        Loggers.fprintf loggers "%s cannot occur in the model"
                          agent_string
                      in
-                     error
+                     error, dynamic
                    ) else (
                      let () =
                        Loggers.fprintf loggers "%s can occur in the model if "
                          agent_string
                      in
-                     let error =
-                       Handler.print_guard_mvbdu parameters error handler
-                         bdu_handler mvbdu
+                     let bdu_handler = get_mvbdu_handler dynamic in
+                     let error, bdu_handler =
+                       Handler.print_guard_mvbdu_decompose parameters error
+                         handler bdu_handler mvbdu restriction_bdu
                      in
+                     let dynamic = set_mvbdu_handler bdu_handler dynamic in
                      let () = Loggers.fprintf loggers "." in
-                     error
+                     error, dynamic
                    )
                  in
                  let () = Loggers.print_newline loggers in

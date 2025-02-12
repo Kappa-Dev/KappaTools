@@ -290,13 +290,13 @@ let scan_rule static error mvbdu_handler =
   in
   let static = set_common_views store_result static in
   let error, mvbdu_handler, restriction_mvbdu =
-    Common_static.compute_restriction_mvbdu parameters error mvbdu_handler
+    Handler.compute_restriction_mvbdu parameters error mvbdu_handler
       kappa_handler
   in
   let static = set_restriction_mvbdu restriction_mvbdu static in
   let error, mvbdu_handler, guard_mvbdus =
-    Common_static.collect_guard_mvbdus parameters error mvbdu_handler
-      compilation restriction_mvbdu
+    Handler.collect_guard_mvbdus parameters error mvbdu_handler compilation
+      restriction_mvbdu
   in
   let static = set_guard_mvbdus guard_mvbdus static in
   error, mvbdu_handler, static

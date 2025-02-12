@@ -361,6 +361,7 @@ module Domain = struct
     let compiled = get_compil static in
     let kappa_handler = get_kappa_handler static in
     let bdu_handler = get_mvbdu_handler dynamic in
+    let restriction_bdu = get_restriction_mvbdu static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
       let error, bool =
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
@@ -442,9 +443,9 @@ module Domain = struct
                       (Remanent_parameters.get_logger parameters)
                       "%s could be applied if " rule_string
                   in
-                  let error =
-                    Handler.print_guard_mvbdu parameters error kappa_handler
-                      bdu_handler mvbdu
+                  let error, _ =
+                    Handler.print_guard_mvbdu_decompose parameters error
+                      kappa_handler bdu_handler mvbdu restriction_bdu
                   in
                   let () =
                     Loggers.fprintf

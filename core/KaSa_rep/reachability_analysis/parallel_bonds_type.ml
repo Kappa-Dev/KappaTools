@@ -264,24 +264,25 @@ let compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
     bdu_undefined_bonds )
 
 let print_guard_parameters_natural_language parameters prefix error
-    kappa_handler bdu_handler is_true mvbdu =
+    kappa_handler bdu_handler is_true mvbdu restriction_bdu =
   if not is_true then (
     let () =
       Loggers.fprintf
         (Remanent_parameters.get_logger parameters)
         "%sFor the following values of the guard parameters: \n" prefix
     in
-    let error =
-      Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
+    let error, bdu_handler =
+      Handler.print_guard_mvbdu_decompose parameters error kappa_handler
+        bdu_handler mvbdu restriction_bdu
     in
     let () =
       Loggers.fprintf
         (Remanent_parameters.get_logger parameters)
         "\nIt holds that: "
     in
-    error
+    error, bdu_handler
   ) else
-    error
+    error, bdu_handler
 
 let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     ?final_resul:(final_result = false) ?(dump_any = false) parameters error
@@ -415,9 +416,10 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                   (Remanent_parameters.get_logger parameters)
                   parameters error t_precondition
               in
-              let error =
-                Handler.print_guard_mvbdu parameters error kappa_handler
-                  bdu_handler ~with_comma:true parallel_bond_mvbdu
+              let error, bdu_handler =
+                Handler.print_guard_mvbdu_decompose parameters error
+                  kappa_handler bdu_handler ~with_comma:true parallel_bond_mvbdu
+                  restriction_bdu
               in
               let () =
                 Loggers.fprintf
@@ -447,9 +449,10 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
         | Remanent_parameters_sig.Natural_language ->
           if verbose then
             if not parallel_is_false then (
-              let error =
+              let error, bdu_handler =
                 print_guard_parameters_natural_language parameters prefix error
                   kappa_handler bdu_handler parallel_is_true parallel_bond_mvbdu
+                  restriction_bdu
               in
               let () =
                 Loggers.fprintf
@@ -504,9 +507,10 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                   (Remanent_parameters.get_logger parameters)
                   parameters error t_precondition
               in
-              let error =
-                Handler.print_guard_mvbdu parameters error kappa_handler
-                  bdu_handler ~with_comma:true non_parallel_bond_mvbdu
+              let error, bdu_handler =
+                Handler.print_guard_mvbdu_decompose parameters error
+                  kappa_handler bdu_handler ~with_comma:true
+                  non_parallel_bond_mvbdu restriction_bdu
               in
               let () =
                 Loggers.fprintf
@@ -537,10 +541,10 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
           let error, bdu_handler =
             if verbose then
               if not non_parallel_is_false then (
-                let error =
+                let error, bdu_handler =
                   print_guard_parameters_natural_language parameters prefix
                     error kappa_handler bdu_handler non_parallel_is_true
-                    non_parallel_bond_mvbdu
+                    non_parallel_bond_mvbdu restriction_bdu
                 in
                 let () =
                   Loggers.fprintf
@@ -589,10 +593,10 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                 error, bdu_handler
               | Remanent_parameters_sig.Natural_language ->
                 if not any_bond_is_false then (
-                  let error =
+                  let error, bdu_handler =
                     print_guard_parameters_natural_language parameters prefix
                       error kappa_handler bdu_handler any_bond_is_true
-                      any_bond_mvbdu
+                      any_bond_mvbdu restriction_bdu
                   in
                   let () =
                     Loggers.fprintf
