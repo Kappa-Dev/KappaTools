@@ -839,7 +839,7 @@ let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
     Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition parameters
       bdu_handler error mvbdu
   in
-  let error, _, _ =
+  let error, bdu_handler, _ =
     List.fold_left
       (fun (error, bdu_handler, with_comma) mvbdu ->
         let error, bdu_handler =

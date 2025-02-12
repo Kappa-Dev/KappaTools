@@ -360,21 +360,20 @@ module Domain = struct
     let result = get_dead_rule dynamic in
     let compiled = get_compil static in
     let kappa_handler = get_kappa_handler static in
-    let bdu_handler = get_mvbdu_handler dynamic in
     let restriction_bdu = get_restriction_mvbdu static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
-      let error, bool =
+      let error, (bool, dynamic) =
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
-          (fun _parameters error _k mvbdu bool' ->
-            let error, _, is_true =
+          (fun _parameters error _k mvbdu (bool', dynamic) ->
+            let error, dynamic, is_true =
               is_true_mvbdu parameters error dynamic mvbdu
                 (get_restriction_mvbdu static)
             in
             if is_true then
-              error, bool'
+              error, (bool', dynamic)
             else
-              error, false)
-          result true
+              error, (false, dynamic))
+          result (true, dynamic)
       in
       if not bool then (
         let parameters = Remanent_parameters.update_prefix parameters "" in
@@ -405,14 +404,14 @@ module Domain = struct
         let () =
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
         in
-        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.iter parameters error
-          (fun parameters error k mvbdu ->
-            let error, _, is_true =
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+          (fun parameters error k mvbdu dynamic ->
+            let error, dynamic, is_true =
               is_true_mvbdu parameters error dynamic mvbdu
                 (get_restriction_mvbdu static)
             in
             if is_true then
-              error
+              error, dynamic
             else (
               let error', rule_string =
                 try
@@ -426,42 +425,44 @@ module Domain = struct
                 Exception.check_point Exception.warn parameters error error'
                   __POS__ Exit
               in
-              let error, _, is_false =
+              let error, dynamic, is_false =
                 is_false_mvbdu parameters error dynamic mvbdu
               in
-              let error =
+              let error, dynamic =
                 if is_false then (
                   let () =
                     Loggers.fprintf
                       (Remanent_parameters.get_logger parameters)
                       "%s will never be applied." rule_string
                   in
-                  error
+                  error, dynamic
                 ) else (
                   let () =
                     Loggers.fprintf
                       (Remanent_parameters.get_logger parameters)
                       "%s could be applied if " rule_string
                   in
-                  let error, _ =
+                  let bdu_handler = get_mvbdu_handler dynamic in
+                  let error, bdu_handler =
                     Handler.print_guard_mvbdu_decompose parameters error
                       kappa_handler bdu_handler mvbdu restriction_bdu
                   in
+                  let dynamic = set_mvbdu_handler bdu_handler dynamic in
                   let () =
                     Loggers.fprintf
                       (Remanent_parameters.get_logger parameters)
                       "."
                   in
-                  error
+                  error, dynamic
                 )
               in
               let () =
                 Loggers.print_newline
                   (Remanent_parameters.get_logger parameters)
               in
-              error
+              error, dynamic
             ))
-          result
+          result dynamic
       ) else (
         let () =
           Loggers.fprintf
@@ -479,14 +480,14 @@ module Domain = struct
         let () =
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
         in
-        error
+        error, dynamic
       )
     ) else
-      error
+      error, dynamic
 
   let print ?dead_rules static dynamic error _loggers =
     let _ = dead_rules in
-    let error = print_dead_rule static dynamic error in
+    let error, dynamic = print_dead_rule static dynamic error in
     error, dynamic, ()
 
   let get_dead_rules static dynamic parameters error r_id =
