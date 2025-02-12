@@ -91,6 +91,7 @@ rule token = parse
     | "def" -> CONFIG
     | "token" -> TOKEN
     | "guard_param" -> GUARD_PARAM
+    | "working_set" -> WORKING_SET
     | "conflict" -> CONFLICT
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown directive: "^s,
