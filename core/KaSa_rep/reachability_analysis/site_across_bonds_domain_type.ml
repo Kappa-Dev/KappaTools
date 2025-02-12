@@ -319,7 +319,7 @@ let project2 (x, y) = project x, project y
 (*PRINT*)
 (***************************************************************************)
 
-let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
+let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
     ?(final_result = false) ?dump_any:(_dump_any = false) parameters error
     kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
@@ -409,23 +409,31 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
                 let error, add_comma, pattern =
                   List.fold_left
                     (fun (error, add_comma, pattern) (site_or_guard, state) ->
-                      let error, pattern =
+                      let error, (pattern, add_comma) =
                         match
                           Ckappa_sig.site_or_guard_p_of_guard_p_then_site
                             site_or_guard nr_guard_p
                         with
                         | Ckappa_sig.Site _ ->
-                          if site_or_guard = Ckappa_sig.fst_site nr_guard_p then
-                            Site_graphs.KaSa_site_graph.add_state parameters
-                              error kappa_handler agent_id1 site_type1' state
-                              pattern
-                          else if site_or_guard = Ckappa_sig.snd_site nr_guard_p
-                          then
-                            Site_graphs.KaSa_site_graph.add_state parameters
-                              error kappa_handler agent_id2 site_type2' state
-                              pattern
-                          else
-                            Exception.warn parameters error __POS__ Exit pattern
+                          if site_or_guard = Ckappa_sig.fst_site nr_guard_p then (
+                            let error, pattern =
+                              Site_graphs.KaSa_site_graph.add_state parameters
+                                error kappa_handler agent_id1 site_type1' state
+                                pattern
+                            in
+                            error, (pattern, add_comma)
+                          ) else if
+                              site_or_guard = Ckappa_sig.snd_site nr_guard_p
+                            then (
+                            let error, pattern =
+                              Site_graphs.KaSa_site_graph.add_state parameters
+                                error kappa_handler agent_id2 site_type2' state
+                                pattern
+                            in
+                            error, (pattern, add_comma)
+                          ) else
+                            Exception.warn parameters error __POS__ Exit
+                              (pattern, add_comma)
                         | Guard_p guardp ->
                           let () = if add_comma then Loggers.fprintf log "," in
                           let error, guard_string =
@@ -433,9 +441,9 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
                               kappa_handler ~state error
                           in
                           let () = Loggers.fprintf log "%s" guard_string in
-                          error, pattern
+                          error, (pattern, true)
                       in
-                      error, true, pattern)
+                      error, add_comma, pattern)
                     (error, false, pattern) l
                 in
                 let () = if add_comma then Loggers.fprintf log "," in
@@ -509,6 +517,26 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
     )
   )
 
+let print_site_across_domain_decompose ?(verbose = true) ?(sparse = false)
+    ?(final_result = false) ?(dump_any = false) parameters error kappa_handler
+    handler tuple mvbdu restriction_mvbdu =
+  let error, handler, mvbdu_list =
+    Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition parameters handler
+      error mvbdu
+  in
+  List.fold_left
+    (fun (error, handler) mvbdu ->
+      let error, handler, is_true =
+        Common_static.mvbdu_is_true_for_guards parameters handler error mvbdu
+          restriction_mvbdu
+      in
+      if not is_true then
+        print_site_across_domain_mvbdu ~verbose ~sparse ~final_result ~dump_any
+          parameters error kappa_handler handler tuple mvbdu
+      else
+        error, handler)
+    (error, handler) mvbdu_list
+
 (***************************************************************************)
 (***************************************************************************)
 
@@ -524,7 +552,7 @@ let get_mvbdu_from_tuple_pair parameters error tuple bdu_false store_value =
   error, mvbdu_value
 
 let add_link parameter error bdu_false handler kappa_handler pair mvbdu
-    store_result =
+    store_result restriction_mvbdu =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameter error pair bdu_false store_result
   in
@@ -539,8 +567,8 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
       let parameter =
         Remanent_parameters.update_prefix parameter "                "
       in
-      print_site_across_domain ~verbose:false ~dump_any:true parameter error
-        kappa_handler handler pair mvbdu
+      print_site_across_domain_decompose ~verbose:false ~dump_any:true parameter
+        error kappa_handler handler pair mvbdu restriction_mvbdu
     ) else
       error, handler
   in
@@ -571,7 +599,7 @@ let check parameters error bdu_false handler pair mvbdu store_result =
     error, handler, true
 
 let add_link_and_check parameter error bdu_false handler kappa_handler bool
-    dump_title x mvbdu modified_sites store_result =
+    dump_title x mvbdu modified_sites store_result restriction_mvbdu =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameter error x bdu_false store_result
   in
@@ -597,8 +625,8 @@ let add_link_and_check parameter error bdu_false handler kappa_handler bool
           else
             dump_title ()
         in
-        print_site_across_domain ~verbose:false ~dump_any:true parameter error
-          kappa_handler handler x mvbdu
+        print_site_across_domain_decompose ~verbose:false ~dump_any:true
+          parameter error kappa_handler handler x mvbdu restriction_mvbdu
       ) else
         error, handler
     in
