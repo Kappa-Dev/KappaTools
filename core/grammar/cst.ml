@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 let add_working_set_guard guard k =
-  let guard_name = "@ws-rule-" ^ string_of_int k in
+  let guard_name = "@rule-" ^ string_of_int k in
   let guard_param = LKappa.Param guard_name in
   match guard with
   | None -> Some guard_param
