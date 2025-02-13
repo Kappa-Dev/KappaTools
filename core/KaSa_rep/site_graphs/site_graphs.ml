@@ -453,7 +453,7 @@ module KaSa_site_graph = struct
         t
     | Some (agent_type, map) ->
       let error, site_string =
-        Handler.string_of_guard parameter guardp kappa_handler ~state error
+        Handler.string_of_guard parameter guardp kappa_handler error
       in
       let error, ((agent_string, sitemap), guardmap) =
         Ckappa_sig.Agent_id_map_and_set.Map.find_default parameter error
@@ -463,6 +463,9 @@ module KaSa_site_graph = struct
       in
       let error, state_bool =
         Ckappa_sig.bool_of_state_index parameter error state
+      in
+      let error, state_string =
+        Ckappa_sig.prefix_of_guard_state parameter error state
       in
       let error, old_asso =
         Ckappa_sig.GuardP_map_and_set.Map.find_option_without_logs parameter
@@ -497,7 +500,7 @@ module KaSa_site_graph = struct
       in
       let error, guardmap =
         Wrapped_modules.LoggedStringMap.add_or_overwrite parameter error
-          site_string None guardmap
+          site_string (Some state_string) guardmap
       in
       let error, string_version =
         Ckappa_sig.Agent_id_map_and_set.Map.overwrite parameter error agent_id
@@ -649,7 +652,7 @@ module KaSa_site_graph = struct
       Exception.warn parameter error __POS__
         ~message:"incompatible binding states" Exit t
 
-  let print_agent logger parameter error agent_string site_map guard_map bool =
+  let print_agent logger parameter error agent_string site_map guardmap bool =
     let () =
       if bool then
         Loggers.fprintf logger "%s"
@@ -765,23 +768,23 @@ module KaSa_site_graph = struct
               Loggers.fprintf logger "%s"
                 (Remanent_parameters.get_site_sep_comma_symbol parameter)
           in
-          let () = Loggers.fprintf logger "%s" guard_string in
           let () =
             match state_string_opt with
             | None -> ()
             | Some state_string -> Loggers.fprintf logger "%s" state_string
           in
+          let () = Loggers.fprintf logger "%s" guard_string in
           true)
-        guard_map true
+        guardmap true
     in
     error
 
   let print logger parameter error t =
     let error, _ =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
-        (fun _ ((agent_string, site_map), guard_map) (error, bool) ->
+        (fun _ ((agent_string, site_map), guardmap) (error, bool) ->
           let error =
-            print_agent logger parameter error agent_string site_map guard_map
+            print_agent logger parameter error agent_string site_map guardmap
               bool
           in
           error, true)
