@@ -143,7 +143,9 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
   | RULE of
       (string Loc.annoted option
       * string LKappa.guard option
-      * 'rule Loc.annoted)
+      * 'rule Loc.annoted
+      * bool)
+    (*label, guard, rule, is_in_working_set*)
   | GUARD_PARAM of (string Loc.annoted * bool)
   | CONFLICT of (string Loc.annoted * string Loc.annoted * string Loc.annoted)
 
@@ -160,7 +162,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   rules:
     (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
     list;
-      (**rules (possibly named)*)
+      (** rules (possibly named, possibly with a guard)*)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statement list;
