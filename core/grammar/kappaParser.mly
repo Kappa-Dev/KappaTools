@@ -70,8 +70,8 @@ start_rule:
     | instruction newline
 		  { fun c -> let r = $2 c in
 		      match $1 with
-		      | Ast.RULE ru ->
-			 {r with Ast.rules = ru::r.Ast.rules}
+		      | Ast.RULE (label, guard, rule, _) ->
+			 {r with Ast.rules = (label, guard, rule)::r.Ast.rules}
 		      | Ast.SIG ag ->
 			 {r with Ast.signatures=ag::r.Ast.signatures}
 		      | Ast.TOKENSIG (str_pos) ->

@@ -802,12 +802,19 @@ perturbation_declaration:
           ($1,None,e,post) }
   ;
 
+working_set:
+  | LABEL annoted rule working_set
+    { add (let guard, rule = $3 in Ast.RULE(Some ($1, rhs_pos 1),guard, rule, true)) }
+  | rule working_set { let guard,rule = $1 in add (Ast.RULE (None, guard, rule, true)) }
+  | { }
+
 sentence:
   | LABEL annoted rule
-    { add (let guard, rule = $3 in Ast.RULE(Some ($1, rhs_pos 1),guard, rule)) }
+    { add (let guard, rule = $3 in Ast.RULE(Some ($1, rhs_pos 1),guard, rule, false)) }
   | LABEL annoted EQUAL annoted alg_expr
     { let (v,_,_) = $5 in add (Ast.DECLARE (($1,rhs_pos 1),v)) }
-  | rule { let guard,rule = $1 in add (Ast.RULE (None, guard, rule)) }
+  | rule { let guard,rule = $1 in add (Ast.RULE (None, guard, rule, false)) }
+  | WORKING_SET annoted OP_BRA annoted working_set CL_BRA annoted {}
   | SIGNATURE annoted agent_sig { let (a,_,_) = $3 in add (Ast.SIG a) }
   | SIGNATURE annoted error
     { raise
