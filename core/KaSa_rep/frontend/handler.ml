@@ -842,43 +842,40 @@ let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
   let error, bdu_handler, _ =
     List.fold_left
       (fun (error, bdu_handler, with_comma) mvbdu ->
-        let error, bdu_handler =
-          let error, bdu_handler, is_true =
-            mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
-              restriction_bdu
-          in
-          let error, bdu_handler, variables =
-            Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters bdu_handler
-              error mvbdu
-          in
-          let error, bdu_handler, nr_variables =
-            Ckappa_sig.Views_bdu.nbr_variables parameters bdu_handler error
-              variables
-          in
-          if is_true then
-            error, bdu_handler
-          else (
-            let () =
-              if with_comma then
-                Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
-            in
-
-            let () =
-              if nr_variables > 1 then
-                Loggers.fprintf (Remanent_parameters.get_logger parameters) "("
-            in
-            let error, bdu_handler =
-              print_guard_mvbdu parameters error kappa_handler bdu_handler
-                ~with_comma:false mvbdu
-            in
-            let () =
-              if nr_variables > 1 then
-                Loggers.fprintf (Remanent_parameters.get_logger parameters) ")"
-            in
-            error, bdu_handler
-          )
+        let error, bdu_handler, is_true =
+          mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
+            restriction_bdu
         in
-        error, bdu_handler, true)
+        let error, bdu_handler, variables =
+          Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters bdu_handler
+            error mvbdu
+        in
+        let error, bdu_handler, nr_variables =
+          Ckappa_sig.Views_bdu.nbr_variables parameters bdu_handler error
+            variables
+        in
+        if is_true then
+          error, bdu_handler, with_comma
+        else (
+          let () =
+            if with_comma then
+              Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
+          in
+
+          let () =
+            if nr_variables > 1 then
+              Loggers.fprintf (Remanent_parameters.get_logger parameters) "("
+          in
+          let error, bdu_handler =
+            print_guard_mvbdu parameters error kappa_handler bdu_handler
+              ~with_comma:false mvbdu
+          in
+          let () =
+            if nr_variables > 1 then
+              Loggers.fprintf (Remanent_parameters.get_logger parameters) ")"
+          in
+          error, bdu_handler, true
+        ))
       (error, bdu_handler, with_comma)
       mvbdu_list
   in
