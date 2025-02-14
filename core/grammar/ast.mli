@@ -154,6 +154,8 @@ type ('pattern, 'mixture, 'id, 'rule) command =
   | MODIFY of ('pattern, 'mixture, 'id, 'rule) modif_expr list
   | QUIT
 
+module StringMap : Map.S with type key = string
+
 type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
@@ -171,7 +173,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
-  guard_param_values: (string Loc.annoted * bool) list;
+  guard_param_values: bool StringMap.t;
   conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
 }
 

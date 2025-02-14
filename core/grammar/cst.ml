@@ -62,11 +62,11 @@ let append_to_ast_compil rev_instr compil =
                  (param_name, value_list) :: r.Ast.configurations;
              },
              k )
-         | Ast.GUARD_PARAM (params_sig, b) ->
+         | Ast.GUARD_PARAM ((params_sig, _), b) ->
            ( {
                r with
                Ast.guard_param_values =
-                 (params_sig, b) :: r.Ast.guard_param_values;
+                 Ast.StringMap.add params_sig b r.Ast.guard_param_values;
              },
              k )
          | Ast.CONFLICT (agent, site1, site2) ->

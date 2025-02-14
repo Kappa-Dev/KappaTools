@@ -175,6 +175,8 @@ type ('pattern, 'mixture, 'id, 'rule) command =
   | MODIFY of ('pattern, 'mixture, 'id, 'rule) modif_expr list
   | QUIT
 
+module StringMap = Map.Make (String)
+
 type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
@@ -193,7 +195,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
-  guard_param_values: (string Loc.annoted * bool) list;
+  guard_param_values: bool StringMap.t;
       (** The guard parameters that have a defined value (true or false).*)
   conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
       (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
@@ -238,7 +240,7 @@ let empty_compil =
     configurations = [];
     tokens = [];
     volumes = [];
-    guard_param_values = [];
+    guard_param_values = StringMap.empty;
     conflicts = [];
   }
 
@@ -1156,9 +1158,9 @@ let print_parsing_compil_kappa f c =
     c.perturbations
     (Pp.list Pp.space print_init)
     c.init
-    (Pp.list Pp.space (fun f ((s, _), b) ->
+    (Pp.list Pp.space (fun f (s, b) ->
          Format.fprintf f "%%guard_param: %s -> %b" s b))
-    c.guard_param_values
+    (StringMap.bindings c.guard_param_values)
     (Pp.list Pp.space (fun f ((a, _), (s1, _), (s2, _)) ->
          Format.fprintf f "%%conflict: %s %s %s" a s1 s2))
     c.conflicts
@@ -1743,10 +1745,8 @@ let compil_to_json c =
           c.configurations );
       ( "guard_param_values",
         JsonUtil.of_list
-          (JsonUtil.of_pair
-             (Loc.string_annoted_to_json ~filenames)
-             JsonUtil.of_bool)
-          c.guard_param_values );
+          (JsonUtil.of_pair JsonUtil.of_string JsonUtil.of_bool)
+          (StringMap.bindings c.guard_param_values) );
       ( "conflicts",
         JsonUtil.of_list
           (JsonUtil.of_triple
@@ -1845,20 +1845,24 @@ let compil_of_json = function
              (List.assoc "configurations" l);
          volumes = [];
          guard_param_values =
-           JsonUtil.to_list
-             ~error_msg:
-               (JsonUtil.exn_msg_cant_import_from_json
-                  "AST guard_param_values sig")
-             (JsonUtil.to_pair
+           StringMap.of_list
+             (JsonUtil.to_list
                 ~error_msg:
                   (JsonUtil.exn_msg_cant_import_from_json
                      "AST guard_param_values sig")
-                (Loc.string_annoted_of_json ~filenames)
-                (JsonUtil.to_bool
+                (JsonUtil.to_pair
                    ~error_msg:
                      (JsonUtil.exn_msg_cant_import_from_json
-                        "AST guard_param_values boolean value")))
-             (List.assoc "guard_param_values" l);
+                        "AST guard_param_values sig")
+                   (JsonUtil.to_string
+                      ~error_msg:
+                        (JsonUtil.exn_msg_cant_import_from_json
+                           "AST guard_param_values sig"))
+                   (JsonUtil.to_bool
+                      ~error_msg:
+                        (JsonUtil.exn_msg_cant_import_from_json
+                           "AST guard_param_values boolean value")))
+                (List.assoc "guard_param_values" l));
          conflicts =
            JsonUtil.to_list
              ~error_msg:
