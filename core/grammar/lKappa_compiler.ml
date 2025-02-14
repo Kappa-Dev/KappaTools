@@ -2539,23 +2539,40 @@ let conflicts_to_id agents_sig conflicts =
       (agent_id, snd agent), (site1_id, snd site1), (site2_id, snd site2))
     conflicts
 
+type bool_or_error = Value of bool | Error of Loc.t
+
 let evaluate_guard_opt guard guard_param_values =
   let rec evaluate_guard = function
-    | LKappa.True -> true
-    | LKappa.False -> false
+    | LKappa.True -> Value true
+    | LKappa.False -> Value false
     | LKappa.Param (p, pos) ->
-      (try Ast.StringMap.find p guard_param_values
-       with Not_found ->
-         raise
-           (ExceptionDefn.Malformed_Decl
-              ("Undefined value for guard parameter ", pos)))
-    | Not guard -> not (evaluate_guard guard)
-    | And (g1, g2) -> evaluate_guard g1 && evaluate_guard g2
-    | Or (g1, g2) -> evaluate_guard g1 || evaluate_guard g2
+      (match Ast.StringMap.find_opt p guard_param_values with
+      | None -> Error pos
+      | Some value -> Value value)
+    | Not guard ->
+      (match evaluate_guard guard with
+      | Value value -> Value (not value)
+      | Error pos -> Error pos)
+    | And (g1, g2) ->
+      (match evaluate_guard g1, evaluate_guard g2 with
+      | Value v1, Value v2 -> Value (v1 && v2)
+      | Value false, _ | _, Value false -> Value false
+      | Error pos, _ | _, Error pos -> Error pos)
+    | Or (g1, g2) ->
+      (match evaluate_guard g1, evaluate_guard g2 with
+      | Value v1, Value v2 -> Value (v1 || v2)
+      | Value true, _ | _, Value true -> Value true
+      | Error pos, _ | _, Error pos -> Error pos)
   in
   match guard with
   | None -> true
-  | Some guard -> evaluate_guard guard
+  | Some guard ->
+    (match evaluate_guard guard with
+    | Error pos ->
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ("Undefined value for guard parameter ", pos))
+    | Value value -> value)
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
