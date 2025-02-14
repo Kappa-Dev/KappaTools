@@ -805,7 +805,7 @@ let guard_to_bdu parameters error handler_bdu guard bdu_restriction =
       Ckappa_sig.Views_bdu.mvbdu_true parameters handler_bdu error
     | LKappa.False ->
       Ckappa_sig.Views_bdu.mvbdu_false parameters handler_bdu error
-    | LKappa.Param a ->
+    | LKappa.Param (a, _) ->
       let error, handler_bdu, association_list =
         Ckappa_sig.Views_bdu.build_association_list parameters handler_bdu error
           [

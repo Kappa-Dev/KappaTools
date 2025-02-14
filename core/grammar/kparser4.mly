@@ -505,7 +505,7 @@ small_guard_bool_expr:
   | OP_PAR annoted guard_bool_expr CL_PAR annoted { $3 }
   | TRUE annoted { LKappa.True }
   | FALSE annoted { LKappa.False }
-  | ID annoted { LKappa.Param $1 }
+  | ID annoted { LKappa.Param ($1, rhs_pos 1) }
   | NOT annoted small_guard_bool_expr
     { LKappa.Not $3 }
   ;

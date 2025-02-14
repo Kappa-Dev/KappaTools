@@ -39,7 +39,7 @@ type rule_mixture = rule_agent list
 type 'id guard =
   | True
   | False
-  | Param of 'id
+  | Param of 'id Loc.annoted
   | Not of 'id guard
   | And of 'id guard * 'id guard
   | Or of 'id guard * 'id guard
@@ -513,7 +513,7 @@ let rec string_of_guard g =
   match g with
   | True -> "TRUE"
   | False -> "FALSE"
-  | Param i -> i
+  | Param (i, _) -> i
   | And (a, b) -> string_of_guard a ^ " && " ^ string_of_guard b
   | Or (a, b) -> string_of_guard a ^ " || " ^ string_of_guard b
   | Not a -> "[not] " ^ string_of_guard a
@@ -522,7 +522,7 @@ let rec print_guard f g =
   match g with
   | True -> Format.fprintf f "TRUE"
   | False -> Format.fprintf f "FALSE"
-  | Param i -> Format.fprintf f "%s" i
+  | Param (i, _) -> Format.fprintf f "%s" i
   | And (a, b) -> Format.fprintf f "@[%a && %a@]" print_guard a print_guard b
   | Or (a, b) -> Format.fprintf f "@[(%a || %a)@]" print_guard a print_guard b
   | Not a -> Format.fprintf f "@[[not] %a@]" print_guard a

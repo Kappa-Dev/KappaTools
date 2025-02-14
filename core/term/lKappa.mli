@@ -54,7 +54,7 @@ type rule_mixture = rule_agent list
 type 'id guard =
   | True
   | False
-  | Param of 'id
+  | Param of 'id Loc.annoted
   | Not of 'id guard
   | And of 'id guard * 'id guard
   | Or of 'id guard * 'id guard

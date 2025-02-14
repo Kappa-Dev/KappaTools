@@ -1166,9 +1166,9 @@ let rec guard_param_conversion convert error guard_params g =
   match g with
   | LKappa.True -> error, LKappa.True
   | LKappa.False -> error, LKappa.False
-  | LKappa.Param p ->
+  | LKappa.Param (p, loc) ->
     let error, conv_p = convert p error guard_params in
-    error, LKappa.Param conv_p
+    error, LKappa.Param (conv_p, loc)
   | LKappa.Not g1 ->
     let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
     error, LKappa.Not conv_g1

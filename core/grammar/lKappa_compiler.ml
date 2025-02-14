@@ -2539,6 +2539,24 @@ let conflicts_to_id agents_sig conflicts =
       (agent_id, snd agent), (site1_id, snd site1), (site2_id, snd site2))
     conflicts
 
+let evaluate_guard_opt guard guard_param_values =
+  let rec evaluate_guard = function
+    | LKappa.True -> true
+    | LKappa.False -> false
+    | LKappa.Param (p, pos) ->
+      (try Ast.StringMap.find p guard_param_values
+       with Not_found ->
+         raise
+           (ExceptionDefn.Malformed_Decl
+              ("Undefined value for guard parameter ", pos)))
+    | Not guard -> not (evaluate_guard guard)
+    | And (g1, g2) -> evaluate_guard g1 && evaluate_guard g2
+    | Or (g1, g2) -> evaluate_guard g1 || evaluate_guard g2
+  in
+  match guard with
+  | None -> true
+  | Some guard -> evaluate_guard guard
+
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
   (* TODO test this *)
@@ -2704,14 +2722,19 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   in
 
   let rules =
-    List.rev_map
-      (fun (rule : rule_inter_rep) ->
-        ( rule.label_opt,
-          rule.guard,
-          ( assemble_rule ~warning ~syntax_version rule agents_sig counters_info
-              tokens_finder alg_vars_finder,
-            rule.pos ) ))
-      cleaned_rules
+    List.rev
+      (List.filter_map
+         (fun (rule : rule_inter_rep) ->
+           if evaluate_guard_opt rule.guard ast_compil.guard_param_values then
+             Some
+               ( rule.label_opt,
+                 rule.guard,
+                 ( assemble_rule ~warning ~syntax_version rule agents_sig
+                     counters_info tokens_finder alg_vars_finder,
+                   rule.pos ) )
+           else
+             None)
+         cleaned_rules)
   in
 
   let variables =

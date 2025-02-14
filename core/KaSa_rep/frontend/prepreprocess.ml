@@ -826,8 +826,8 @@ let add_conflict_site_to_rule parameters error agent site1 site2 rule =
 let conflicts_guard_p_name agent site1 site2 =
   "@co-" ^ agent ^ "-" ^ site1 ^ "-" ^ site2
 
-let add_conflict_to_guard guard_opt agent site1 site2 negate =
-  let guardp = LKappa.Param (conflicts_guard_p_name agent site1 site2) in
+let add_conflict_to_guard guard_opt agent site1 site2 negate loc =
+  let guardp = LKappa.Param (conflicts_guard_p_name agent site1 site2, loc) in
   let guardp =
     if negate then
       LKappa.Not guardp
@@ -867,10 +867,10 @@ let add_rules_with_conflicts parameters error (rule_string, guard, (rule, p))
             in
             if was_changed then (
               let guard_new_rule =
-                add_conflict_to_guard guard agent site1 site2 false
+                add_conflict_to_guard guard agent site1 site2 false p
               in
               let guard_og_rule =
-                add_conflict_to_guard guard agent site1 site2 true
+                add_conflict_to_guard guard agent site1 site2 true p
               in
               ( error,
                 (id, guard_og_rule, (rule, p))

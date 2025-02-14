@@ -6,9 +6,9 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let add_working_set_guard guard k =
+let add_working_set_guard guard k loc =
   let guard_name = "@rule-" ^ string_of_int k in
-  let guard_param = LKappa.Param guard_name in
+  let guard_param = LKappa.Param (guard_name, loc) in
   match guard with
   | None -> Some guard_param
   | Some guard -> Some (LKappa.And (guard_param, guard))
@@ -17,16 +17,18 @@ let append_to_ast_compil rev_instr compil =
   fst
   @@ List.fold_left
        (fun (r, k) -> function
-         | Ast.RULE (label, guard, rule, is_in_working_set) ->
+         | Ast.RULE (label, guard, (rule, loc), is_in_working_set) ->
            if is_in_working_set then
              ( {
                  r with
                  Ast.rules =
-                   (label, add_working_set_guard guard k, rule) :: r.Ast.rules;
+                   (label, add_working_set_guard guard k loc, (rule, loc))
+                   :: r.Ast.rules;
                },
                k + 1 )
            else
-             { r with Ast.rules = (label, guard, rule) :: r.Ast.rules }, k
+             ( { r with Ast.rules = (label, guard, (rule, loc)) :: r.Ast.rules },
+               k )
          | Ast.SIG ag -> { r with Ast.signatures = ag :: r.Ast.signatures }, k
          | Ast.TOKENSIG str_pos ->
            { r with Ast.tokens = str_pos :: r.Ast.tokens }, k

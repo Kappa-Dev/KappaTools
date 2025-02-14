@@ -1597,7 +1597,7 @@ let merge_guards g1 g2 =
 
 let rec guard_params_list_from_guard = function
   | LKappa.True | LKappa.False -> []
-  | Param id -> [ id ]
+  | Param (id, _) -> [ id ]
   | Not guard -> guard_params_list_from_guard guard
   | And (g1, g2) | Or (g1, g2) ->
     let gp1 = guard_params_list_from_guard g1 in
