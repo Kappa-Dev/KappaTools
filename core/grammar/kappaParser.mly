@@ -97,9 +97,9 @@ start_rule:
 		      | Ast.CONFIG (param_name,value_list) ->
 			 {r with
 			  Ast.configurations = (param_name,value_list)::r.Ast.configurations}
-		      | Ast.GUARD_PARAM (param_name,b) ->
+		      | Ast.GUARD_PARAM ((param_name,_),b) ->
           {r with
-			  Ast.guard_param_values = (param_name,b)::r.Ast.guard_param_values}
+			  Ast.guard_param_values = Ast.StringMap.add param_name b r.Ast.guard_param_values;}
           | Ast.CONFLICT (a,s1,s2) ->
           {r with
 			  Ast.conflicts = (a,s1,s2)::r.Ast.conflicts}
