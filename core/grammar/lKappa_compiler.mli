@@ -39,6 +39,7 @@ val init_of_ast :
   int Mods.StringMap.t ->
   int Mods.StringMap.t ->
   (Ast.mixture, Ast.mixture, string) Ast.init_statement list ->
+  bool Ast.StringMap.t ->
   (LKappa.rule_agent list, Raw_mixture.t, int) Ast.init_statement list
 
 type ast_compiled_data = {

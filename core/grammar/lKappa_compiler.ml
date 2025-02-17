@@ -1907,15 +1907,54 @@ let create_sigs (l : Ast.agent_sig list) : Signature.s =
   (* TODO see agent_sigs namings *)
   Signature.create ~counters_per_agent agent_sigs
 
+type bool_or_error = Value of bool | Error of Loc.t
+
+let evaluate_guard_opt guard guard_param_values =
+  let rec evaluate_guard = function
+    | LKappa.True -> Value true
+    | LKappa.False -> Value false
+    | LKappa.Param (p, pos) ->
+      (match Ast.StringMap.find_opt p guard_param_values with
+      | None -> Error pos
+      | Some value -> Value value)
+    | Not guard ->
+      (match evaluate_guard guard with
+      | Value value -> Value (not value)
+      | Error pos -> Error pos)
+    | And (g1, g2) ->
+      (match evaluate_guard g1, evaluate_guard g2 with
+      | Value v1, Value v2 -> Value (v1 && v2)
+      | Value false, _ | _, Value false -> Value false
+      | Error pos, _ | _, Error pos -> Error pos)
+    | Or (g1, g2) ->
+      (match evaluate_guard g1, evaluate_guard g2 with
+      | Value v1, Value v2 -> Value (v1 || v2)
+      | Value true, _ | _, Value true -> Value true
+      | Error pos, _ | _, Error pos -> Error pos)
+  in
+  match guard with
+  | None -> true
+  | Some guard ->
+    (match evaluate_guard guard with
+    | Error pos ->
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ("Undefined value for guard parameter ", pos))
+    | Value value -> value)
+
 let init_of_ast ~warning ~syntax_version sigs counters_info contact_map tok algs
-    inits =
-  List.map
-    (fun (g, (*rTODO*) expr, ini) ->
-      ( g,
-        alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
-          expr,
-        init_of_ast ~warning ~syntax_version sigs counters_info tok contact_map
-          ini ))
+    inits guard_param_values =
+  List.filter_map
+    (fun (guard, expr, ini) ->
+      if evaluate_guard_opt guard guard_param_values then
+        Some
+          ( guard,
+            alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
+              expr,
+            init_of_ast ~warning ~syntax_version sigs counters_info tok
+              contact_map ini )
+      else
+        None)
     inits
 
 type ast_compiled_data = {
@@ -2542,41 +2581,6 @@ let conflicts_to_id agents_sig conflicts =
       (agent_id, snd agent), (site1_id, snd site1), (site2_id, snd site2))
     conflicts
 
-type bool_or_error = Value of bool | Error of Loc.t
-
-let evaluate_guard_opt guard guard_param_values =
-  let rec evaluate_guard = function
-    | LKappa.True -> Value true
-    | LKappa.False -> Value false
-    | LKappa.Param (p, pos) ->
-      (match Ast.StringMap.find_opt p guard_param_values with
-      | None -> Error pos
-      | Some value -> Value value)
-    | Not guard ->
-      (match evaluate_guard guard with
-      | Value value -> Value (not value)
-      | Error pos -> Error pos)
-    | And (g1, g2) ->
-      (match evaluate_guard g1, evaluate_guard g2 with
-      | Value v1, Value v2 -> Value (v1 && v2)
-      | Value false, _ | _, Value false -> Value false
-      | Error pos, _ | _, Error pos -> Error pos)
-    | Or (g1, g2) ->
-      (match evaluate_guard g1, evaluate_guard g2 with
-      | Value v1, Value v2 -> Value (v1 || v2)
-      | Value true, _ | _, Value true -> Value true
-      | Error pos, _ | _, Error pos -> Error pos)
-  in
-  match guard with
-  | None -> true
-  | Some guard ->
-    (match evaluate_guard guard with
-    | Error pos ->
-      raise
-        (ExceptionDefn.Malformed_Decl
-           ("Undefined value for guard parameter ", pos))
-    | Value value -> value)
-
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
   (* TODO test this *)
@@ -2780,6 +2784,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   let init =
     init_of_ast ~warning ~syntax_version agents_sig counters_info contact_map
       tokens_finder alg_vars_finder ast_compil.init
+      ast_compil.guard_param_values
   in
   {
     agents_sig;
