@@ -589,7 +589,9 @@ let string_of_state_fully_deciphered_with_guard parameter error handler_kappa
   | Ckappa_sig.Site site_name ->
     string_of_state_gen print_state_fully_deciphered parameter error
       handler_kappa agent_name site_name state
-  | Ckappa_sig.Guard_p _ -> error, ""
+  | Ckappa_sig.Guard_p _ ->
+    let error, bool = Ckappa_sig.bool_of_state_index parameter error state in
+    error, string_of_bool bool
 
 let string_of_site_aux ?(ml_pos = None) ?(ka_pos = None) ?(message = "")
     parameter error handler_kappa ?state agent_name

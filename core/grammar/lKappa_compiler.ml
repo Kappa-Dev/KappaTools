@@ -2515,7 +2515,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   let init : (Ast.mixture, Ast.mixture, string) Ast.init_statement list =
     List.map
       (fun (guard, quantity_alg_expr, init_kind) ->
-        ( guard (*rTODO*),
+        ( guard,
           quantity_alg_expr,
           match init_kind with
           | Ast.INIT_TOK _ -> init_kind
