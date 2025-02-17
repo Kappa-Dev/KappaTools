@@ -240,7 +240,7 @@ let empty_compil =
     configurations = [];
     tokens = [];
     volumes = [];
-    guard_param_values = StringMap.empty;
+    guard_param_values = Mods.StringMap.empty;
     conflicts = [];
   }
 
@@ -1162,7 +1162,7 @@ let print_parsing_compil_kappa f c =
     c.init
     (Pp.list Pp.space (fun f (s, b) ->
          Format.fprintf f "%%guard_param: %s -> %b" s b))
-    (StringMap.bindings c.guard_param_values)
+    (Mods.StringMap.bindings c.guard_param_values)
     (Pp.list Pp.space (fun f ((a, _), (s1, _), (s2, _)) ->
          Format.fprintf f "%%conflict: %s %s %s" a s1 s2))
     c.conflicts
@@ -1749,7 +1749,7 @@ let compil_to_json c =
       ( "guard_param_values",
         JsonUtil.of_list
           (JsonUtil.of_pair JsonUtil.of_string JsonUtil.of_bool)
-          (StringMap.bindings c.guard_param_values) );
+          (Mods.StringMap.bindings c.guard_param_values) );
       ( "conflicts",
         JsonUtil.of_list
           (JsonUtil.of_triple
@@ -1849,24 +1849,16 @@ let compil_of_json = function
              (List.assoc "configurations" l);
          volumes = [];
          guard_param_values =
-           StringMap.of_list
-             (JsonUtil.to_list
+           Mods.StringMap.of_json
+             (JsonUtil.to_string
                 ~error_msg:
                   (JsonUtil.exn_msg_cant_import_from_json
-                     "AST guard_param_values sig")
-                (JsonUtil.to_pair
-                   ~error_msg:
-                     (JsonUtil.exn_msg_cant_import_from_json
-                        "AST guard_param_values sig")
-                   (JsonUtil.to_string
-                      ~error_msg:
-                        (JsonUtil.exn_msg_cant_import_from_json
-                           "AST guard_param_values sig"))
-                   (JsonUtil.to_bool
-                      ~error_msg:
-                        (JsonUtil.exn_msg_cant_import_from_json
-                           "AST guard_param_values boolean value")))
-                (List.assoc "guard_param_values" l));
+                     "AST guard_param_values sig"))
+             (JsonUtil.to_bool
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST guard_param_values boolean value"))
+             (List.assoc "guard_param_values" l);
          conflicts =
            JsonUtil.to_list
              ~error_msg:

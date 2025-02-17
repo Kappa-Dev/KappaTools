@@ -1914,7 +1914,7 @@ let evaluate_guard_opt guard guard_param_values =
     | LKappa.True -> Value true
     | LKappa.False -> Value false
     | LKappa.Param (p, pos) ->
-      (match Ast.StringMap.find_opt p guard_param_values with
+      (match Mods.StringMap.find_option p guard_param_values with
       | None -> Error pos
       | Some value -> Value value)
     | Not guard ->

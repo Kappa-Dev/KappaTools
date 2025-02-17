@@ -68,7 +68,7 @@ let append_to_ast_compil rev_instr compil =
            ( {
                r with
                Ast.guard_param_values =
-                 Ast.StringMap.add params_sig b r.Ast.guard_param_values;
+                 Mods.StringMap.add params_sig b r.Ast.guard_param_values;
              },
              k )
          | Ast.CONFLICT (agent, site1, site2) ->
