@@ -17,7 +17,7 @@
 
 (** Abstract domain to over-approximate the set of reachable views *)
 
-let local_trace = true
+let local_trace = false
 
 module Domain = struct
   (* the type of the struct that contains all static information as in the

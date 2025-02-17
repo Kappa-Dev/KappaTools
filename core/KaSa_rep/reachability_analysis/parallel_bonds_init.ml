@@ -28,8 +28,9 @@ let collect_parallel_or_not_bonds_init parameters kappa_handler bdu_handler
     Parallel_bonds_static.collect_double_bonds_in_pattern parameters error
       ?tuple_of_interest init_state.Cckappa_sig.e_init_c_mixture
   in
-  let error, bdu_handler, mvbdu_true =
-    Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+  let error, bdu_handler, mvbdu_guard =
+    Handler.guard_to_bdu_opt parameters error bdu_handler
+      init_state.Cckappa_sig.e_init_guard restriction_bdu
   in
   Parallel_bonds_static.project_away_ag_id parameters kappa_handler bdu_handler
-    error big_store store_result mvbdu_true restriction_bdu last_variable
+    error big_store store_result mvbdu_guard restriction_bdu last_variable
