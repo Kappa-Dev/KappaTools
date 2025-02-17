@@ -2151,9 +2151,11 @@ let lift_allowing_question_marks parameters handler error x =
   in
   clean_question_marks parameters a c b
 
-let translate_pert_init error (alg, _) (c_alg, _) mixture c_mixture _pos' =
+let translate_pert_init error guard (alg, _) (c_alg, _) mixture c_mixture _pos'
+    =
   ( error,
     {
+      Cckappa_sig.e_init_guard = guard;
       Cckappa_sig.e_init_factor = alg;
       Cckappa_sig.e_init_c_factor = c_alg;
       Cckappa_sig.e_init_mixture = mixture;
@@ -2162,33 +2164,25 @@ let translate_pert_init error (alg, _) (c_alg, _) mixture c_mixture _pos' =
 
 let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
-let translate_pert parameters error handler alg (mixture, pos') =
-  (*  let mixture = c_mixture.Cckappa_sig.c_mixture in*)
-  let error, c_mixture, _, _ =
-    translate_mixture parameters error handler ~creation:false mixture
-  in
-  let error, c_alg =
-    alg_with_pos_map (lift_allowing_question_marks parameters handler) error alg
-  in
-  translate_pert_init error alg c_alg mixture c_mixture pos'
-
 let translate_init parameters error handler
-    (_guard (*rTODO*), (alg, pos_alg), init_t) =
+    (guard_string, (alg, pos_alg), init_t) =
   let error, c_alg =
     Prepreprocess.alg_map
       (lift_allowing_question_marks parameters handler)
       error alg
   in
+  let error, guard = translate_guard parameters error handler guard_string in
   match init_t with
   | Ast.INIT_MIX (mixture, pos') ->
     let error, c_mixture, _, _ =
       translate_mixture parameters error handler ~creation:true mixture
     in
-    translate_pert_init error (alg, pos_alg) (c_alg, pos_alg) mixture c_mixture
-      pos'
+    translate_pert_init error guard (alg, pos_alg) (c_alg, pos_alg) mixture
+      c_mixture pos'
   | Ast.INIT_TOK _ ->
     (*TO DO*)
     let error, dft = Cckappa_sig.dummy_init parameters error in
+    let dft = { dft with Cckappa_sig.e_init_guard = guard } in
     (match Remanent_parameters.get_called_from parameters with
     | Remanent_parameters_sig.KaSa ->
       Exception.warn parameters error __POS__

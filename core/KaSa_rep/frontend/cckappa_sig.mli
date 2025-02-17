@@ -183,6 +183,7 @@ type enriched_rule = {
 }
 
 type enriched_init = {
+  e_init_guard: Ckappa_sig.c_guard_parameter LKappa.guard option;
   e_init_factor: (Ckappa_sig.mixture, string) Alg_expr.e;
   e_init_c_factor: (mixture, string) Alg_expr.e;
   e_init_mixture: Ckappa_sig.mixture;
