@@ -485,7 +485,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
     inits =
   let init_l, _ =
     List_util.fold_right_map
-      (fun (alg, init_t) preenv ->
+      (fun (_guard (*rTODO*), alg, init_t) preenv ->
         let () =
           if Alg_expr.has_mix ~var_decls:(Model.get_alg env) (fst alg) then
             raise

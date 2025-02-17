@@ -425,7 +425,7 @@ let scan_alg _parameters remanent _alg =
   remanent
 
 let scan_initial_states parameters =
-  List.fold_left (fun remanent ((alg, _pos), init_t) ->
+  List.fold_left (fun remanent (_ (*rTODO add guards*), (alg, _pos), init_t) ->
       let remanent = scan_alg parameters remanent alg in
       match init_t with
       | Ast.INIT_MIX (mixture, _pos') ->

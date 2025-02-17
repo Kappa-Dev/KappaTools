@@ -128,7 +128,9 @@ type ('mixture, 'id) init_t =
   | INIT_TOK of 'id Loc.annoted list
 
 type ('pattern, 'mixture, 'id) init_statement =
-  ('pattern, 'id) Alg_expr.e Loc.annoted * ('mixture, 'id) init_t
+  string LKappa.guard option
+  * ('pattern, 'id) Alg_expr.e Loc.annoted
+  * ('mixture, 'id) init_t
 
 type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent_sig

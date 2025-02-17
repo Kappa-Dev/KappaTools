@@ -148,14 +148,16 @@ type ('mixture, 'id) init_t =
 
 type ('pattern, 'mixture, 'id) init_statement =
   (*  string Loc.annoted option * (*volume*)*)
-  ('pattern, 'id) Alg_expr.e Loc.annoted * ('mixture, 'id) init_t
+  string LKappa.guard option
+  * ('pattern, 'id) Alg_expr.e Loc.annoted
+  * ('mixture, 'id) init_t
 
 type ('agent, 'agent_id, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent_id
   | TOKENSIG of string Loc.annoted
   | VOLSIG of string * float * string (* type, volume, parameter*)
   | INIT of ('pattern, 'mixture, 'id) init_statement
-  (*volume, init, position *)
+  (*guard, volume, init, position *)
   | DECLARE of ('pattern, 'id) variable_def
   | OBS of ('pattern, 'id) variable_def (*for backward compatibility*)
   | PLOT of ('pattern, 'id) Alg_expr.e Loc.annoted
@@ -1042,13 +1044,17 @@ let print_configuration f ((n, _), l) =
     (Pp.list Pp.space (fun f (x, _) -> Format.fprintf f "\"%s\"" x))
     l
 
+let print_guard = Pp.option ~with_space:false LKappa.print_guard
+
 let print_init f = function
-  | (n, _), INIT_MIX (m, _) ->
-    Format.fprintf f "@[%%init: @[%a@]@ @[%a@]@]" print_ast_alg_expr n
+  | g, (n, _), INIT_MIX (m, _) ->
+    Format.fprintf f "@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]" print_guard g
+      print_ast_alg_expr n
       (print_ast_mix ~print_counter)
       m
-  | (n, _), INIT_TOK t ->
-    Format.fprintf f "@[%%init: %a %a@]" print_ast_alg_expr n
+  | g, (n, _), INIT_TOK t ->
+    Format.fprintf f "@[%%init: @[%a@]@ %a %a@]" print_guard g
+      print_ast_alg_expr n
       (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
       t
 
@@ -1150,9 +1156,7 @@ let print_parsing_compil_kappa f c =
          Format.fprintf f "@[@[%a%a%a@]@]"
            (Pp.option ~with_space:false (fun f (s, _) ->
                 Format.fprintf f "'%s'@ " s))
-           s
-           (Pp.option ~with_space:false LKappa.print_guard)
-           guard print_ast_rule r))
+           s print_guard guard print_ast_rule r))
     c.rules
     (Pp.list Pp.space print_perturbation)
     c.perturbations
@@ -1558,8 +1562,8 @@ let merge_tokens =
 
 let sig_from_inits =
   List.fold_left (fun (ags, toks) -> function
-    | _, INIT_MIX (m, _) -> merge_agents ags m, toks
-    | na, INIT_TOK l -> ags, merge_tokens toks (List.map (fun x -> na, x) l))
+    | _, _, INIT_MIX (m, _) -> merge_agents ags m, toks
+    | _, na, INIT_TOK l -> ags, merge_tokens toks (List.map (fun x -> na, x) l))
 
 let sig_from_rule (ags, toks) r =
   match r.rewrite with
@@ -1711,7 +1715,8 @@ let compil_to_json c =
           c.observables );
       ( "init",
         JsonUtil.of_list
-          (JsonUtil.of_pair
+          (JsonUtil.of_triple
+             (JsonUtil.of_option (guard_to_json filenames))
              (Loc.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
              (init_to_json ~filenames mix_to_json var_to_json))
@@ -1807,7 +1812,8 @@ let compil_of_json = function
          init =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST init")
-             (JsonUtil.to_pair
+             (JsonUtil.to_triple
+                (JsonUtil.to_option (guard_of_json filenames))
                 (Loc.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
                 (init_of_json ~filenames mix_of_json var_of_json))

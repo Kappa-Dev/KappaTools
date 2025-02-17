@@ -2172,7 +2172,8 @@ let translate_pert parameters error handler alg (mixture, pos') =
   in
   translate_pert_init error alg c_alg mixture c_mixture pos'
 
-let translate_init parameters error handler ((alg, pos_alg), init_t) =
+let translate_init parameters error handler
+    (_guard (*rTODO*), (alg, pos_alg), init_t) =
   let error, c_alg =
     Prepreprocess.alg_map
       (lift_allowing_question_marks parameters handler)

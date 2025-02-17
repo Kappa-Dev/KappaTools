@@ -1068,12 +1068,12 @@ let translate_compil parameters error
   in
   let error, init_rev =
     List.fold_left
-      (fun (error, list) (alg_ex, init_t) ->
+      (fun (error, list) (guard, alg_ex, init_t) ->
         let error, alg =
           alg_with_pos_map (refine_mixture parameters) error alg_ex
         in
         let error, init = refine_init_t parameters error init_t in
-        error, (alg, init) :: list)
+        error, (guard, alg, init) :: list)
       (error, []) compil.Ast.init
   in
   let error, perturbations_rev, rules_rev =

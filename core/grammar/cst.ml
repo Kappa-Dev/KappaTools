@@ -35,8 +35,8 @@ let append_to_ast_compil rev_instr compil =
          | Ast.VOLSIG (vol_type, vol, vol_param) ->
            ( { r with Ast.volumes = (vol_type, vol, vol_param) :: r.Ast.volumes },
              k )
-         | Ast.INIT (alg, init_t) ->
-           { r with Ast.init = (alg, init_t) :: r.Ast.init }, k
+         | Ast.INIT (guard, alg, init_t) ->
+           { r with Ast.init = (guard, alg, init_t) :: r.Ast.init }, k
          | Ast.DECLARE var ->
            { r with Ast.variables = var :: r.Ast.variables }, k
          | Ast.OBS (((lbl, pos), _) as var) ->

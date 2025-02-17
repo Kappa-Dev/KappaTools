@@ -1910,8 +1910,10 @@ let create_sigs (l : Ast.agent_sig list) : Signature.s =
 let init_of_ast ~warning ~syntax_version sigs counters_info contact_map tok algs
     inits =
   List.map
-    (fun (expr, ini) ->
-      ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs expr,
+    (fun (g, (*rTODO*) expr, ini) ->
+      ( g,
+        alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
+          expr,
         init_of_ast ~warning ~syntax_version sigs counters_info tok contact_map
           ini ))
     inits
@@ -2028,7 +2030,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     counter_fold_in_expr f acc obs_def
   in
   let counter_fold_in_init f acc init =
-    let e, _ = init in
+    let _, e, _ = init in
     counter_fold_in_expr f acc e
   in
   let counter_fold_in_print f acc p =
@@ -2473,8 +2475,9 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
 
   let init : (Ast.mixture, Ast.mixture, string) Ast.init_statement list =
     List.map
-      (fun (quantity_alg_expr, init_kind) ->
-        ( quantity_alg_expr,
+      (fun (guard, quantity_alg_expr, init_kind) ->
+        ( guard (*rTODO*),
+          quantity_alg_expr,
           match init_kind with
           | Ast.INIT_TOK _ -> init_kind
           | INIT_MIX mix_ ->

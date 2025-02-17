@@ -522,8 +522,12 @@ guard_bool_expr:
     { LKappa.Or ($1, $4) }
   ;
 
+guard:
+  | SHARP_OP_BRA annoted guard_bool_expr CL_BRA {$3}
+  ;
+
 rule_guard_and_content:
-  | SHARP_OP_BRA annoted guard_bool_expr CL_BRA annoted rule_content {Some $3, $6 }
+  | guard annoted rule_content {Some $1, $3 }
   | rule_content { None, $1 }
   ;
 
@@ -599,6 +603,11 @@ init_declaration:
   | error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos 1 "Malformed initial condition")) }
+  ;
+
+init_with_guard:
+  | guard annoted init_declaration {let (alg,init) = $3 in (Some $1,alg,init)}
+  | init_declaration {let (alg,init) = $1 in (None,alg,init)}
   ;
 
 value_list:
@@ -829,8 +838,8 @@ an algebraic expression is expected")) }
   | LET annoted variable_declaration
     { let (i,v,_,_) = $3 in add (Ast.DECLARE (i,v)) }
   | OBS annoted variable_declaration { let (i,v,_,_) = $3 in add (Ast.OBS (i,v)) }
-  | INIT annoted init_declaration
-    { let (alg,init) = $3 in add (Ast.INIT (alg,init)) }
+  | INIT annoted init_with_guard
+    { let (guard,alg,init) = $3 in add (Ast.INIT (guard,alg,init)) }
   | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
   | CONFIG annoted STRING annoted value_list
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
