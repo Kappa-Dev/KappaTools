@@ -434,6 +434,7 @@ module Domain = struct
 
   let init_agents static dynamic error init_state event_list =
     let parameters = get_parameter static in
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, (dynamic, event_list) =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
         error
@@ -446,13 +447,14 @@ module Domain = struct
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let bdu_handler = get_mvbdu_handler dynamic in
-            let error, bdu_handler, mvbdu_true =
-              Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+            let error, bdu_handler, mvbdu_guard =
+              Handler.guard_to_bdu_opt parameters error bdu_handler
+                init_state.Cckappa_sig.e_init_guard restriction_bdu
             in
             let dynamic = set_mvbdu_handler bdu_handler dynamic in
             let error, (dynamic, event_list) =
               add_event_list static dynamic error agent_type event_list
-                mvbdu_true
+                mvbdu_guard
             in
             error, (dynamic, event_list))
         init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views

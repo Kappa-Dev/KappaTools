@@ -276,6 +276,16 @@ val guard_to_bdu :
   * Ckappa_sig.Views_bdu.handler
   * Ckappa_sig.Views_bdu.mvbdu
 
+val guard_to_bdu_opt :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.c_guard_parameter LKappa.guard option ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * Ckappa_sig.Views_bdu.mvbdu
+
 val collect_guard_mvbdus :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->

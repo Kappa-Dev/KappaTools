@@ -833,6 +833,11 @@ let guard_to_bdu parameters error handler_bdu guard bdu_restriction =
   in
   aux error handler_bdu guard
 
+let guard_to_bdu_opt parameters error handler_bdu guard bdu_restriction =
+  match guard with
+  | None -> Ckappa_sig.Views_bdu.mvbdu_true parameters handler_bdu error
+  | Some g -> guard_to_bdu parameters error handler_bdu g bdu_restriction
+
 let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
     ?(with_comma = false) mvbdu restriction_bdu =
   let error, bdu_handler, mvbdu_list =
