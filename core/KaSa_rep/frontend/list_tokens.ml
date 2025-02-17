@@ -410,7 +410,7 @@ let rec scan_mixture parameters remanent mixture =
     scan_mixture parameters remanent mixture
 
 let scan_token parameters remanent _alg =
-  (*TO DO*)
+  (*TODO*)
   match Remanent_parameters.get_called_from parameters with
   | Remanent_parameters_sig.KaSa ->
     let error, remanent = remanent in
@@ -421,11 +421,22 @@ let scan_token parameters remanent _alg =
     remanent
 
 let scan_alg _parameters remanent _alg =
-  (*TO DO*)
+  (*TODO*)
   remanent
 
+let scan_guard parameters (error, handler) guard =
+  match guard with
+  | None -> error, handler
+  | Some guard ->
+    let guard_parameters = Ast.guard_params_list_from_guard guard in
+    List.fold_left
+      (fun (error, handler) guardp ->
+        declare_guard_p parameters error handler guardp)
+      (error, handler) guard_parameters
+
 let scan_initial_states parameters =
-  List.fold_left (fun remanent (_ (*rTODO add guards*), (alg, _pos), init_t) ->
+  List.fold_left (fun remanent (guard, (alg, _pos), init_t) ->
+      let remanent = scan_guard parameters remanent guard in
       let remanent = scan_alg parameters remanent alg in
       match init_t with
       | Ast.INIT_MIX (mixture, _pos') ->
@@ -455,16 +466,6 @@ let scan_perts scan_mixt parameters =
           | Ast.PRINT _ | Ast.CFLOWLABEL _ | Ast.DINOFF _ | Ast.DIN _ ->
             remanent)
         remanent m)
-
-let scan_guard parameters (error, handler) guard =
-  match guard with
-  | None -> error, handler
-  | Some guard ->
-    let guard_parameters = Ast.guard_params_list_from_guard guard in
-    List.fold_left
-      (fun (error, handler) guardp ->
-        declare_guard_p parameters error handler guardp)
-      (error, handler) guard_parameters
 
 let scan_rules scan_mixt parameters a b =
   let _ =
