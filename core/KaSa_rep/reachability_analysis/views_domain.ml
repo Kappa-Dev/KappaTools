@@ -885,6 +885,54 @@ module Domain = struct
     error, dynamic, bdu_result
 
   (**************************************************************************)
+  let rename_guards_to_bdu_names parameters error handler bdu map1
+      nr_guard_parameters =
+    let guard_parameter_list =
+      Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
+    in
+    let error, renaming_list =
+      List.fold_left_map
+        (fun error g ->
+          let guard_parameter = Ckappa_sig.guard_p_then_site_of_guard g in
+          let error, renamed =
+            Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.get
+              parameters error guard_parameter map1
+          in
+          match renamed with
+          | None ->
+            Exception.warn parameters error __POS__ Exit
+              (guard_parameter, guard_parameter)
+          | Some renamed -> error, (guard_parameter, renamed))
+        error guard_parameter_list
+    in
+    (* rename bdu to new index *)
+    let error, handler, renaming_list =
+      Ckappa_sig.Views_bdu.build_renaming_list parameters handler error
+        renaming_list
+    in
+    let error, handler, bdu_guard_renamed =
+      Ckappa_sig.Views_bdu.mvbdu_rename parameters handler error bdu
+        renaming_list
+    in
+    error, handler, bdu_guard_renamed
+
+  (**************************************************************************)
+  let build_init_guard_bdu parameters error handler guard agent_type cv_id
+      static =
+    let original_restriction_bdu = get_restriction_mvbdu static in
+    let error, handler, guard_bdu =
+      Handler.guard_to_bdu_opt parameters error handler guard
+        original_restriction_bdu
+    in
+    let handler_kappa = get_kappa_handler static in
+    let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
+    let error, (map1, _) =
+      get_list_of_sites_correspondence_map parameters error agent_type cv_id
+        (get_site_correspondence_array static)
+    in
+    (* rename for this specific covering class *)
+    rename_guards_to_bdu_names parameters error handler guard_bdu map1
+      nr_guard_parameters
 
   let build_init_restriction static dynamic error init_state =
     let parameters = get_parameter static in
@@ -927,21 +975,21 @@ module Domain = struct
                       let error, dynamic, bdu_init =
                         bdu_build static dynamic error pair_list
                       in
-                      (*add all guard parameters with values true and false to the initial state*)
-                      let error, dynamic, restriction_bdu =
-                        get_restriction_bdu error static dynamic agent_type
-                          cv_id
-                      in
                       let handler = get_mvbdu_handler dynamic in
-                      let error, handler, bdu_init_with_guards =
+                      let error, handler, guard_bdu =
+                        build_init_guard_bdu parameters error handler
+                          init_state.Cckappa_sig.e_init_guard agent_type cv_id
+                          static
+                      in
+                      let error, handler, bdu_init_with_guard =
                         Handler.mvbdu_and_for_guards parameters handler error
-                          restriction_bdu bdu_init
+                          guard_bdu bdu_init
                       in
                       let dynamic = set_mvbdu_handler handler dynamic in
                       (*----------------------------------------------------*)
                       let error, dynamic, event_list =
                         add_link ~title:"Views in initial state:" error static
-                          dynamic (agent_type, cv_id) bdu_init_with_guards
+                          dynamic (agent_type, cv_id) bdu_init_with_guard
                           event_list
                       in
                       error, (dynamic, event_list))
@@ -2609,38 +2657,6 @@ module Domain = struct
       error, dynamic, None
 
   (***********************************************************)
-
-  let rename_guards_to_bdu_names parameters error handler bdu map1
-      nr_guard_parameters =
-    let guard_parameter_list =
-      Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
-    in
-    let error, renaming_list =
-      List.fold_left_map
-        (fun error g ->
-          let guard_parameter = Ckappa_sig.guard_p_then_site_of_guard g in
-          let error, renamed =
-            Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.get
-              parameters error guard_parameter map1
-          in
-          match renamed with
-          | None ->
-            Exception.warn parameters error __POS__ Exit
-              (guard_parameter, guard_parameter)
-          | Some renamed -> error, (guard_parameter, renamed))
-        error guard_parameter_list
-    in
-    (* rename bdu to new index *)
-    let error, handler, renaming_list =
-      Ckappa_sig.Views_bdu.build_renaming_list parameters handler error
-        renaming_list
-    in
-    let error, handler, bdu_guard_renamed =
-      Ckappa_sig.Views_bdu.mvbdu_rename parameters handler error bdu
-        renaming_list
-    in
-    error, handler, bdu_guard_renamed
-
   (*deal with views*)
 
   let compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X
