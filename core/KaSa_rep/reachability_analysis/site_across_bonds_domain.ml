@@ -795,6 +795,10 @@ module Domain = struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let handler = get_mvbdu_handler dynamic in
     let restriction_bdu = get_restriction_mvbdu static in
+    let error, handler, mvbdu_guard =
+      Handler.guard_to_bdu_opt parameters error handler
+        species.Cckappa_sig.e_init_guard restriction_bdu
+    in
     let error, tuple_init =
       Site_across_bonds_domain_static.build_potential_tuple_pair_set parameters
         error kappa_handler store_bonds_init store_views_init
@@ -802,7 +806,7 @@ module Domain = struct
     let error, handler, store_result =
       Site_across_bonds_domain_static.collect_potential_tuple_pair_init
         parameters error bdu_false handler kappa_handler tuple_init store_result
-        restriction_bdu
+        restriction_bdu mvbdu_guard
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     let dynamic = set_value store_result dynamic in
