@@ -57,10 +57,11 @@ val dummy_rule_id : c_rule_id
 val dummy_agent_id : c_agent_id
 val dummy_link_value : c_link_value
 val dummy_site_name_1 : c_site_name
+val dummy_site_name_2 : c_site_name
 val dummy_site_name_minus1 : c_site_name
 val next_link_value : c_link_value -> c_link_value
-val fst_site : c_guard_parameter -> c_guard_p_then_site
-val snd_site : c_guard_parameter -> c_guard_p_then_site
+val fst_site : c_guard_p_then_site
+val snd_site : c_guard_p_then_site
 val dummy_state_index_1 : c_state
 val string_of_agent_name : c_agent_name -> string
 val int_of_agent_name : c_agent_name -> int
@@ -77,19 +78,21 @@ val string_of_state_index : c_state -> string
 val guard_parameter_of_int : int -> c_guard_parameter
 val guard_p_then_site_of_int : int -> c_guard_p_then_site
 val int_of_guard_p_then_site : c_guard_p_then_site -> int
+val guard_p_then_site_of_site : c_site_name -> c_guard_p_then_site
 
-val guard_p_then_site_of_site :
-  c_site_name -> c_guard_parameter -> c_guard_p_then_site
-
-val guard_p_then_site_of_guard : c_guard_parameter -> c_guard_p_then_site
+val guard_p_then_site_of_guard :
+  c_guard_parameter -> c_site_name -> c_guard_p_then_site
 
 val guard_p_then_site_of_site_or_guard_p :
-  c_site_or_guard_p -> c_guard_parameter -> c_guard_p_then_site
+  c_site_or_guard_p -> c_site_name -> c_guard_p_then_site
 
 val int_of_guard_parameter : c_guard_parameter -> int
 
 val site_or_guard_p_of_guard_p_then_site :
-  c_guard_p_then_site -> c_guard_parameter -> c_site_or_guard_p
+  c_guard_p_then_site -> c_site_name -> c_site_or_guard_p
+
+val guard_p_then_site_change_nsites :
+  c_guard_p_then_site -> c_site_name -> c_site_name -> c_guard_p_then_site
 
 val string_of_state_index_option_min :
   Remanent_parameters_sig.parameters -> c_state option -> string

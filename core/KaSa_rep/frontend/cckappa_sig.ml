@@ -25,6 +25,7 @@ type kappa_handler = {
   nrules: int;
   nvars: int;
   nagents: Ckappa_sig.c_agent_name;
+  nsites: Ckappa_sig.c_site_name; (*highest number of sites of any agent*)
   nguard_params: Ckappa_sig.c_guard_parameter;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:

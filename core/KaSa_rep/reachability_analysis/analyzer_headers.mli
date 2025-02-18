@@ -228,6 +228,8 @@ val get_restriction_mvbdu :
 val get_nr_guard_parameters :
   global_static_information -> Ckappa_sig.c_guard_parameter
 
+val nsites : global_static_information -> Ckappa_sig.c_site_name
+
 val get_mvbdu_handler :
   global_dynamic_information -> Mvbdu_wrapper.Mvbdu.handler
 

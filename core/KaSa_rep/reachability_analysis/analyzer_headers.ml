@@ -274,6 +274,8 @@ let get_restriction_mvbdu static = static.global_restriction_mvbdu
 let get_nr_guard_parameters static =
   Handler.get_nr_guard_parameters (get_kappa_handler static)
 
+let nsites static = Handler.nsites (get_kappa_handler static)
+
 (*****************************************************************************)
 (*RULE*)
 (*****************************************************************************)

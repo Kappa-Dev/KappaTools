@@ -164,11 +164,9 @@ module KaSa_site_graph = struct
     | Ckappa_sig.Binding _ -> Exception.warn parameter error __POS__ Exit false
 
   let add_site_or_guard parameter error kappa_handler agent_id site t =
-    let nr_guard_parameters =
-      Kappa_kasa_frontend.Handler.get_nr_guard_parameters kappa_handler
-    in
+    let nsites = Handler.nsites kappa_handler in
     let site_or_guard =
-      Ckappa_sig.site_or_guard_p_of_guard_p_then_site site nr_guard_parameters
+      Ckappa_sig.site_or_guard_p_of_guard_p_then_site site nsites
     in
     let error, agent_op =
       Ckappa_sig.Agent_id_map_and_set.Map.find_option parameter error agent_id
@@ -511,12 +509,9 @@ module KaSa_site_graph = struct
 
   let add_state_or_guard parameter error kappa_handler agent_id site_or_guard
       state t =
-    let nr_guard_params =
-      Kappa_kasa_frontend.Handler.get_nr_guard_parameters kappa_handler
-    in
+    let nsites = Handler.nsites kappa_handler in
     match
-      Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_or_guard
-        nr_guard_params
+      Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_or_guard nsites
     with
     | Ckappa_sig.Site site_name ->
       add_state parameter error kappa_handler agent_id site_name state t

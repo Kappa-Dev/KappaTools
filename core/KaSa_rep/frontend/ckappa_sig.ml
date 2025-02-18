@@ -171,6 +171,7 @@ let dummy_state_index_false = 0
 let dummy_rule_id = 0
 let dummy_agent_id = 0
 let dummy_site_name_1 = 1
+let dummy_site_name_2 = 2
 let dummy_site_name_minus1 = -1 (*REMOVE:Use in views_domain*)
 let dummy_state_index_1 = 1
 
@@ -178,8 +179,8 @@ let dummy_agent =
   { agent_name = ""; ag_intf = EMPTY_INTF; agent_name_pos = Loc.dummy }
 
 let dummy_link_value = 1
-let fst_site nr_guard_p = 1 + nr_guard_p
-let snd_site nr_guard_p = 2 + nr_guard_p
+let fst_site = 1
+let snd_site = 2
 let string_of_agent_name (a : c_agent_name) : string = string_of_int a
 let int_of_agent_name (a : c_agent_name) : int = a
 let agent_name_of_int (a : int) : c_agent_name = a
@@ -203,27 +204,33 @@ let string_of_state_index (a : c_state) : string = string_of_int a
 let guard_parameter_of_int (a : int) : c_guard_parameter = a
 let guard_p_then_site_of_int (a : int) : c_guard_p_then_site = a
 let int_of_guard_p_then_site (a : c_guard_p_then_site) : int = a
+let guard_p_then_site_of_site (a : c_site_name) : c_guard_p_then_site = a
 
-let guard_p_then_site_of_site (a : c_site_name) (nr_guard_p : c_guard_parameter)
-    : c_guard_p_then_site =
-  a + nr_guard_p
-
-let guard_p_then_site_of_guard (a : c_guard_parameter) : c_guard_p_then_site = a
+let guard_p_then_site_of_guard (a : c_guard_parameter) (nsites : c_site_name) :
+    c_guard_p_then_site =
+  a + nsites
 
 let guard_p_then_site_of_site_or_guard_p (a : c_site_or_guard_p)
-    (nr_guard_p : c_guard_parameter) : c_guard_p_then_site =
+    (nsites : c_site_name) : c_guard_p_then_site =
   match a with
-  | Site s -> guard_p_then_site_of_site s nr_guard_p
-  | Guard_p s -> guard_p_then_site_of_guard s
+  | Site s -> guard_p_then_site_of_site s
+  | Guard_p s -> guard_p_then_site_of_guard s nsites
 
 let int_of_guard_parameter (a : c_guard_parameter) : int = a
 
 let site_or_guard_p_of_guard_p_then_site (a : c_guard_p_then_site)
-    (nr_guard_p : c_guard_parameter) : c_site_or_guard_p =
-  if a < nr_guard_p then
-    Guard_p a
+    (nsites : c_site_name) : c_site_or_guard_p =
+  if a < nsites then
+    Site a
   else
-    Site (a - nr_guard_p)
+    Guard_p (a - nsites)
+
+let guard_p_then_site_change_nsites (a : c_guard_p_then_site)
+    (old_nsites : c_site_name) (new_nsites : c_site_name) =
+  if a < old_nsites then
+    a
+  else
+    a - old_nsites + new_nsites
 
 let string_of_state_index_option_min parameters a =
   match a with
@@ -265,8 +272,8 @@ let get_agent_color n_sites parameters =
     (Remanent_parameters.get_agent_color_array parameters)
     (Remanent_parameters.get_agent_color_def parameters)
 
-let get_list_of_guard_parameters n_guard_p =
-  List.init (int_of_guard_parameter n_guard_p) guard_parameter_of_int
+let get_list_of_guard_parameters nr_guard_parameters =
+  List.init (int_of_guard_parameter nr_guard_parameters) guard_parameter_of_int
 
 (***************************************************************)
 (*RENAME*)

@@ -439,7 +439,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
       ""
   in
   let log = Remanent_parameters.get_logger parameters in
-  let nr_guard_params = Handler.get_nr_guard_parameters handler_kappa in
+  let nsites = Handler.nsites handler_kappa in
   let error, () =
     match translation with
     | Range (site_type, state_list) ->
@@ -845,7 +845,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
                       (fun (error, bool) (site_type, state) ->
                         let site_or_guard =
                           Ckappa_sig.site_or_guard_p_of_guard_p_then_site
-                            site_type nr_guard_params
+                            site_type nsites
                         in
                         let error', site_string =
                           match site_or_guard with
