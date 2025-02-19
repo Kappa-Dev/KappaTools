@@ -907,8 +907,8 @@ module Domain = struct
     error, dynamic, bdu_result
 
   (**************************************************************************)
-  let rename_guards_to_bdu_names parameters error handler bdu map1 nsites
-      nr_guard_parameters =
+  let rename_guards_to_bdu_names parameters error handler bdu map1
+      nr_guard_parameters nsites =
     let guard_parameter_list =
       Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
     in
@@ -955,8 +955,8 @@ module Domain = struct
         (get_site_correspondence_array static)
     in
     (* rename for this specific covering class *)
-    rename_guards_to_bdu_names parameters error handler guard_bdu map1 nsites
-      nr_guard_parameters
+    rename_guards_to_bdu_names parameters error handler guard_bdu map1
+      nr_guard_parameters nsites
 
   let build_init_restriction static dynamic error init_state =
     let parameters = get_parameter static in
@@ -1043,8 +1043,8 @@ module Domain = struct
     False of Exception.exceptions_caught_and_uncaught * dynamic_information
 
   (****************************************************************)
-  let project_bdu_keep_only_guard_parameters parameters error handler bdu nsites
-      nr_guard_parameters map1 =
+  let project_bdu_keep_only_guard_parameters parameters error handler bdu
+      nr_guard_parameters nsites map1 =
     let guard_parameter_list =
       Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
     in
@@ -1140,7 +1140,7 @@ module Domain = struct
               and rename the guard parameters to the original index*)
             let error, handler, bdu_proj_guard =
               project_bdu_keep_only_guard_parameters parameters error handler
-                bdu_inter nsites nr_guard_parameters map1
+                bdu_inter nr_guard_parameters nsites map1
             in
             (* intersect result with the current guard bdu*)
             let error, handler, result_bdu_guard =
@@ -2504,7 +2504,7 @@ module Domain = struct
                             and rename the guard parameters to the original index*)
                           let error, handler, bdu_proj_guard =
                             project_bdu_keep_only_guard_parameters parameters
-                              error handler bdu_inter nsites nr_guard_parameters
+                              error handler bdu_inter nr_guard_parameters nsites
                               map1
                           in
                           (* intersect result with the current guard bdu*)
@@ -2689,7 +2689,7 @@ module Domain = struct
     (* add guard information from the precondition*)
     let error, handler, renamed_precondition_guard_bdu =
       rename_guards_to_bdu_names parameters error handler precondition_guard_bdu
-        map1 nsites nr_guard_parameters
+        map1 nr_guard_parameters nsites
     in
     let error, handler, bdu_with_guard =
       Handler.mvbdu_and_for_guards parameter_views handler error bdu_redefine
@@ -2723,7 +2723,7 @@ module Domain = struct
     (* add guard information from the precondition*)
     let error, handler, renamed_precondition_guard_bdu =
       rename_guards_to_bdu_names parameters error handler precondition_guard_bdu
-        map1 nsites nr_guard_parameters
+        map1 nr_guard_parameters nsites
     in
     let error, handler, bdu_with_guard =
       Handler.mvbdu_and_for_guards parameters handler error bdu_creation
@@ -2758,7 +2758,7 @@ module Domain = struct
     (* add guard information from the precondition*)
     let error, handler, renamed_precondition_guard_bdu =
       rename_guards_to_bdu_names parameters error handler precondition_guard_bdu
-        map1 nsites nr_guard_parameters
+        map1 nr_guard_parameters nsites
     in
     let error, handler, bdu_with_guard =
       Handler.mvbdu_and_for_guards parameter_views handler error bdu_redefine
