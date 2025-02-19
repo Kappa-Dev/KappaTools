@@ -80,6 +80,9 @@ module Domain = struct
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
   let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
 
+  let get_nr_guard_parameters static =
+    lift Analyzer_headers.get_nr_guard_parameters static
+
   let get_potential_side_effects static =
     lift Analyzer_headers.get_potential_side_effects_per_rule static
 
@@ -341,14 +344,21 @@ module Domain = struct
           (get_global_dynamic_information dynamic);
     }
 
-  let get_state_of_guard_parameters parameters dynamic error precondition =
+  let get_state_of_guard_parameters parameters static dynamic error precondition
+      =
     let bdu_handler = get_mvbdu_handler dynamic in
+    let nr_guard_parameters = get_nr_guard_parameters static in
     let error, bdu_handler, state_guard_parameters =
       Communication.get_state_of_guard_parameters parameters bdu_handler error
         precondition
     in
+    let error, bdu_handler, bdu_renamed =
+      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
+        state_guard_parameters bdu_handler Communication.nsites
+        Site_across_bonds_domain_type.nsites nr_guard_parameters
+    in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
-    error, dynamic, state_guard_parameters
+    error, dynamic, bdu_renamed
 
   let get_local_dynamic_information dynamic = dynamic.local
   let set_local_dynamic_information local dynamic = { dynamic with local }
@@ -371,12 +381,18 @@ module Domain = struct
           (get_global_dynamic_information dynamic);
     }
 
-  let update_state_of_guard_parameters parameters error dynamic precondition
-      state_guard_parameters =
+  let update_state_of_guard_parameters parameters error static dynamic
+      precondition state_guard_parameters =
     let bdu_handler = get_mvbdu_handler dynamic in
+    let nr_guard_parameters = get_nr_guard_parameters static in
+    let error, bdu_handler, bdu_renamed =
+      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
+        state_guard_parameters bdu_handler Site_across_bonds_domain_type.nsites
+        Communication.nsites nr_guard_parameters
+    in
     let error, bdu_handler, precondition =
       Communication.update_state_of_guard_parameters parameters error
-        bdu_handler precondition state_guard_parameters
+        bdu_handler precondition bdu_renamed
     in
     error, set_mvbdu_handler bdu_handler dynamic, precondition
 
@@ -385,31 +401,26 @@ module Domain = struct
       lift Analyzer_headers.get_restriction_mvbdu static
     in
     let handler = get_mvbdu_handler dynamic in
-    let nr_guard_parameters =
-      Analyzer_headers.get_nr_guard_parameters
-        (get_global_static_information static)
-    in
+    let nr_guard_parameters = get_nr_guard_parameters static in
     let error, handler, bdu_restriction_renamed =
-      Bdu_static_views.rename_guards_in_mvbdu_offset parameters error
-        restriction_guard_mvbdu handler Site_across_bonds_domain_type.nsites
-        nr_guard_parameters
+      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
+        restriction_guard_mvbdu handler Communication.nsites
+        Site_across_bonds_domain_type.nsites nr_guard_parameters
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_restriction_renamed
 
   let get_bdu_guard parameters static dynamic error guard_mvbdus rule_id =
     let handler = get_mvbdu_handler dynamic in
-    let nr_guard_parameters =
-      Analyzer_headers.get_nr_guard_parameters
-        (get_global_static_information static)
-    in
+    let nr_guard_parameters = get_nr_guard_parameters static in
     let error, handler, bdu_guard =
       Bdu_static_views.get_bdu_guard_original_names guard_mvbdus rule_id
         parameters handler error
     in
     let error, handler, bdu_guard_renamed =
-      Bdu_static_views.rename_guards_in_mvbdu_offset parameters error bdu_guard
-        handler Site_across_bonds_domain_type.nsites nr_guard_parameters
+      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
+        bdu_guard handler Communication.nsites
+        Site_across_bonds_domain_type.nsites nr_guard_parameters
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_guard_renamed
@@ -914,7 +925,7 @@ module Domain = struct
     scan list dynamic error guard_bdu
 
   let whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      dynamic precondition guard_bdu =
+      static dynamic precondition guard_bdu =
     let list =
       Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set
       .elements tuple_set
@@ -925,8 +936,8 @@ module Domain = struct
       common_scan parameters error bdu_false dynamic store_value list guard_bdu
     in
     let error, dynamic, precondition =
-      update_state_of_guard_parameters parameters error dynamic precondition
-        precondition_bdu
+      update_state_of_guard_parameters parameters error static dynamic
+        precondition precondition_bdu
     in
     if bool then
       error, dynamic, Some precondition
@@ -950,7 +961,7 @@ module Domain = struct
         .empty store_potential_tuple_pair_lhs
     in
     whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      dynamic precondition guard_bdu
+      static dynamic precondition guard_bdu
 
   (***************************************************************************)
   (*MAY BE REACHABLE*)
@@ -987,7 +998,7 @@ module Domain = struct
         tuple_set
     in
     whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      dynamic precondition bdu_true
+      static dynamic precondition bdu_true
 
   (****************************************************************)
 
@@ -1045,7 +1056,7 @@ module Domain = struct
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let error, dynamic, guard_bdu =
-      get_state_of_guard_parameters parameters dynamic error precondition
+      get_state_of_guard_parameters parameters static dynamic error precondition
     in
     let error, dynamic, restriction_bdu =
       get_restriction_mvbdu parameters error static dynamic
@@ -1308,7 +1319,7 @@ module Domain = struct
       modified_set modified_sites =
     let store_partition_modified_map = get_partition_modified pos static in
     let error, dynamic, guard_bdu =
-      get_state_of_guard_parameters parameters dynamic error precondition
+      get_state_of_guard_parameters parameters static dynamic error precondition
     in
     let error, dynamic, restriction_bdu =
       get_restriction_mvbdu parameters error static dynamic
