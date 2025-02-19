@@ -272,6 +272,7 @@ val guard_to_bdu :
   Ckappa_sig.Views_bdu.handler ->
   Ckappa_sig.c_guard_parameter LKappa.guard ->
   Ckappa_sig.Views_bdu.mvbdu ->
+  Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.Views_bdu.handler
   * Ckappa_sig.Views_bdu.mvbdu
@@ -282,6 +283,7 @@ val guard_to_bdu_opt :
   Ckappa_sig.Views_bdu.handler ->
   Ckappa_sig.c_guard_parameter LKappa.guard option ->
   Ckappa_sig.Views_bdu.mvbdu ->
+  Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.Views_bdu.handler
   * Ckappa_sig.Views_bdu.mvbdu
@@ -305,6 +307,7 @@ val print_guard_mvbdu_decompose :
   ?with_comma:bool ->
   Ckappa_sig.Views_bdu.mvbdu ->
   Ckappa_sig.Views_bdu.mvbdu ->
+  Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.Views_bdu.handler
 
@@ -583,6 +586,8 @@ val nrules :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   int
+
+val nsites : Cckappa_sig.kappa_handler -> Ckappa_sig.c_site_name
 
 val get_nr_guard_parameters :
   Cckappa_sig.kappa_handler -> Ckappa_sig.c_guard_parameter
