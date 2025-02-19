@@ -271,9 +271,11 @@ let length_sorted (l : Ckappa_sig.c_site_name list list) :
 (******************************************************************************)
 (*CLEANING*)
 let store_remanent parameters error covering_class _modified_map remanent
-    nr_guard_params =
+    nr_guard_parameters =
   (*add each variable that occurs in a guard to each covering class*)
-  let guard_p_list = Ckappa_sig.get_list_of_guard_parameters nr_guard_params in
+  let guard_p_list =
+    Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
+  in
   let covering_class_with_guard_p =
     List.map (fun x -> Ckappa_sig.Guard_p x) guard_p_list
     @ List.map (fun x -> Ckappa_sig.Site x) covering_class
@@ -348,8 +350,8 @@ let store_remanent parameters error covering_class _modified_map remanent
   (0) inter (0,1) -> 0
 *)
 
-let clean_classes parameters error covering_classes modified_map nr_guard_params
-    =
+let clean_classes parameters error covering_classes modified_map
+    nr_guard_parameters =
   let error, init_pointer =
     Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters
       error 0
@@ -420,7 +422,7 @@ let clean_classes parameters error covering_classes modified_map nr_guard_params
             then (
               let error, result_covering_dic =
                 store_remanent parameters error covering_class modified_map
-                  remanent nr_guard_params
+                  remanent nr_guard_parameters
               in
               error, result_covering_dic
             ) else
@@ -433,7 +435,7 @@ let clean_classes parameters error covering_classes modified_map nr_guard_params
           (*if it is empty then store it to remanent*)
           let error, result_covering_dic =
             store_remanent parameters error covering_class modified_map remanent
-              nr_guard_params
+              nr_guard_parameters
           in
           error, result_covering_dic
         ) else
@@ -717,6 +719,7 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
         let nr_guard_parameters =
           Handler.get_nr_guard_parameters handler_kappa
         in
+        let nsites = Handler.get_nsites handler_kappa in
         let size_map1 =
           1
           + Ckappa_sig.int_of_site_name last_site
@@ -731,8 +734,7 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
                 | [] -> error, (map1, map2)
                 | h :: tl ->
                   let h_int =
-                    Ckappa_sig.guard_p_then_site_of_site_or_guard_p h
-                      nr_guard_parameters
+                    Ckappa_sig.guard_p_then_site_of_site_or_guard_p h nsites
                   in
                   let error, map1 =
                     Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.set

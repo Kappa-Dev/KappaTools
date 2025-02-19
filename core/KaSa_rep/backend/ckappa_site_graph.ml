@@ -190,13 +190,11 @@ let site_graph_list_to_list error list =
 
 let _pair_list_to_list parameters error kappa_handler pattern agent_id1
     site_type1' agent_id2 site_type2' pair_list =
-  let nr_guard_p = Handler.get_nr_guard_parameters kappa_handler in
   List.fold_left
     (fun (error, current_list) l ->
       match l with
       | [ (siteone, state1); (sitetwo, state2) ]
-        when siteone == Ckappa_sig.fst_site nr_guard_p
-             && sitetwo == Ckappa_sig.snd_site nr_guard_p ->
+        when siteone == Ckappa_sig.fst_site && sitetwo == Ckappa_sig.snd_site ->
         let error, pattern =
           Site_graphs.KaSa_site_graph.add_state parameters error kappa_handler
             agent_id1 site_type1' state1 pattern
@@ -215,13 +213,11 @@ let _pair_list_to_list parameters error kappa_handler pattern agent_id1
 
 let internal_pair_list_to_list parameters error kappa_handler pattern agent_id1
     site_type1' agent_id2 site_type2' pair_list =
-  let nr_guard_p = Handler.get_nr_guard_parameters kappa_handler in
   List.fold_left
     (fun (error, current_list) l ->
       match l with
       | [ (siteone, state1); (sitetwo, state2) ]
-        when siteone == Ckappa_sig.fst_site nr_guard_p
-             && sitetwo == Ckappa_sig.snd_site nr_guard_p ->
+        when siteone == Ckappa_sig.fst_site && sitetwo == Ckappa_sig.snd_site ->
         let error, pattern =
           Site_graphs.KaSa_site_graph.add_state parameters error kappa_handler
             agent_id1 site_type1' state1 pattern

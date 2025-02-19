@@ -439,7 +439,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
       ""
   in
   let log = Remanent_parameters.get_logger parameters in
-  let nsites = Handler.nsites handler_kappa in
+  let nsites = Handler.get_nsites handler_kappa in
   let error, () =
     match translation with
     | Range (site_type, state_list) ->
