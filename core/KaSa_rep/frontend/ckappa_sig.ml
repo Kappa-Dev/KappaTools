@@ -225,13 +225,6 @@ let site_or_guard_p_of_guard_p_then_site (a : c_guard_p_then_site)
   else
     Guard_p (a - nsites)
 
-let guard_p_then_site_change_nsites (a : c_guard_p_then_site)
-    (old_nsites : c_site_name) (new_nsites : c_site_name) =
-  if a < old_nsites then
-    a
-  else
-    a - old_nsites + new_nsites
-
 let string_of_state_index_option_min parameters a =
   match a with
   | Some a -> string_of_state_index a

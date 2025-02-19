@@ -51,7 +51,7 @@ module Domain = struct
   let get_parameter static = lift Analyzer_headers.get_parameter static
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
   let get_compil static = lift Analyzer_headers.get_cc_code static
-  let nsites = Ckappa_sig.dummy_site_name
+  let get_nsites static = lift Analyzer_headers.get_nsites static
 
   let get_restriction_mvbdu static =
     lift Analyzer_headers.get_restriction_mvbdu static
@@ -435,6 +435,7 @@ module Domain = struct
   let init_agents static dynamic error init_state event_list =
     let parameters = get_parameter static in
     let restriction_bdu = get_restriction_mvbdu static in
+    let nsites = get_nsites static in
     let error, (dynamic, event_list) =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
         error
@@ -755,7 +756,7 @@ module Domain = struct
                      let bdu_handler = get_mvbdu_handler dynamic in
                      let error, bdu_handler =
                        Handler.print_guard_mvbdu_decompose parameters error
-                         handler bdu_handler mvbdu restriction_bdu nsites
+                         handler bdu_handler mvbdu restriction_bdu
                      in
                      let dynamic = set_mvbdu_handler bdu_handler dynamic in
                      let () = Loggers.fprintf loggers "." in

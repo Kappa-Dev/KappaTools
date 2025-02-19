@@ -91,9 +91,6 @@ val int_of_guard_parameter : c_guard_parameter -> int
 val site_or_guard_p_of_guard_p_then_site :
   c_guard_p_then_site -> c_site_name -> c_site_or_guard_p
 
-val guard_p_then_site_change_nsites :
-  c_guard_p_then_site -> c_site_name -> c_site_name -> c_guard_p_then_site
-
 val string_of_state_index_option_min :
   Remanent_parameters_sig.parameters -> c_state option -> string
 

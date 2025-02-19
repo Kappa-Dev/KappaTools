@@ -69,7 +69,6 @@ let get_defined_in p = p.defined_in
 let get_agent_id p = p.path.agent_id
 let get_site p = p.path.site
 let get_relative_address p = p.path.relative_address
-let nsites = Ckappa_sig.dummy_site_name
 
 module type PathMap = sig
   type 'a t

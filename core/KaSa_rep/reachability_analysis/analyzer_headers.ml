@@ -274,7 +274,7 @@ let get_restriction_mvbdu static = static.global_restriction_mvbdu
 let get_nr_guard_parameters static =
   Handler.get_nr_guard_parameters (get_kappa_handler static)
 
-let nsites static = Handler.nsites (get_kappa_handler static)
+let get_nsites static = Handler.get_nsites (get_kappa_handler static)
 
 (*****************************************************************************)
 (*RULE*)
@@ -286,6 +286,7 @@ let set_log_info log_info dynamic = { dynamic with log_info }
 let scan_rule static error mvbdu_handler =
   let parameters = get_parameter static in
   let kappa_handler = get_kappa_handler static in
+  let nsites = get_nsites static in
   let compilation = get_cc_code static in
   let error, store_result =
     Common_static.scan_rule_set parameters error kappa_handler compilation
@@ -298,7 +299,7 @@ let scan_rule static error mvbdu_handler =
   let static = set_restriction_mvbdu restriction_mvbdu static in
   let error, mvbdu_handler, guard_mvbdus =
     Handler.collect_guard_mvbdus parameters error mvbdu_handler compilation
-      restriction_mvbdu
+      restriction_mvbdu nsites
   in
   let static = set_guard_mvbdus guard_mvbdus static in
   error, mvbdu_handler, static

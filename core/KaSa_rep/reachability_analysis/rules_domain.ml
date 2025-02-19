@@ -53,7 +53,6 @@ module Domain = struct
   let get_restriction_mvbdu static =
     lift Analyzer_headers.get_restriction_mvbdu static
 
-  let nsites = Ckappa_sig.dummy_site_name
   let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
 
   (*--------------------------------------------------------------------*)
@@ -446,7 +445,7 @@ module Domain = struct
                   let bdu_handler = get_mvbdu_handler dynamic in
                   let error, bdu_handler =
                     Handler.print_guard_mvbdu_decompose parameters error
-                      kappa_handler bdu_handler mvbdu restriction_bdu nsites
+                      kappa_handler bdu_handler mvbdu restriction_bdu
                   in
                   let dynamic = set_mvbdu_handler bdu_handler dynamic in
                   let () =

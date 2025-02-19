@@ -81,9 +81,6 @@ module Domain = struct
   let get_restriction_mvbdu static =
     static.local_static_information.restriction_mvbdu
 
-  let get_nr_guard_parameters static =
-    lift Analyzer_headers.get_nr_guard_parameters static
-
   let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
   let get_local_static_information static = static.local_static_information
 
@@ -226,51 +223,32 @@ module Domain = struct
           (get_global_dynamic_information dynamic);
     }
 
-  let get_state_of_guard_parameters parameters static dynamic error precondition
-      =
+  let get_state_of_guard_parameters parameters dynamic error precondition =
     let bdu_handler = get_mvbdu_handler dynamic in
-    let nr_guard_parameters = get_nr_guard_parameters static in
     let error, bdu_handler, state_guard_parameters =
       Communication.get_state_of_guard_parameters parameters bdu_handler error
         precondition
     in
-    let error, bdu_handler, bdu_renamed =
-      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
-        state_guard_parameters bdu_handler Communication.nsites
-        Parallel_bonds_type.nsites nr_guard_parameters
-    in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
-    error, dynamic, bdu_renamed
+    error, dynamic, state_guard_parameters
 
-  let update_state_of_guard_parameters parameters error static dynamic
-      precondition state_guard_parameters =
+  let update_state_of_guard_parameters parameters error dynamic precondition
+      state_guard_parameters =
     let bdu_handler = get_mvbdu_handler dynamic in
-    let nr_guard_parameters = get_nr_guard_parameters static in
-    let error, bdu_handler, bdu_renamed =
-      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
-        state_guard_parameters bdu_handler Parallel_bonds_type.nsites
-        Communication.nsites nr_guard_parameters
-    in
     let error, bdu_handler, precondition =
       Communication.update_state_of_guard_parameters parameters error
-        bdu_handler precondition bdu_renamed
+        bdu_handler precondition state_guard_parameters
     in
     error, set_mvbdu_handler bdu_handler dynamic, precondition
 
-  let get_bdu_guard parameters static dynamic error guard_mvbdus rule_id =
+  let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
     let handler = get_mvbdu_handler dynamic in
-    let nr_guard_parameters = get_nr_guard_parameters static in
     let error, handler, bdu_guard =
       Bdu_static_views.get_bdu_guard_original_names guard_mvbdus rule_id
         parameters handler error
     in
-    let error, handler, bdu_guard_renamed =
-      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
-        bdu_guard handler Communication.nsites Parallel_bonds_type.nsites
-        nr_guard_parameters
-    in
     let dynamic = set_mvbdu_handler handler dynamic in
-    error, dynamic, bdu_guard_renamed
+    error, dynamic, bdu_guard
 
   let get_value dynamic = (get_local_dynamic_information dynamic).store_value
 
@@ -493,7 +471,6 @@ module Domain = struct
     let parameters = Analyzer_headers.get_parameter static in
     let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
     let restriction_bdu = Analyzer_headers.get_restriction_mvbdu static in
-    let nr_guard_parameters = Analyzer_headers.get_nr_guard_parameters static in
     let first_variable = Parallel_bonds_type.first_variable in
     let pair_list =
       [
@@ -506,14 +483,9 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters bdu_handler error
         pair_list
     in
-    let error, bdu_handler, bdu_restriction_renamed =
-      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
-        restriction_bdu bdu_handler Communication.nsites
-        Parallel_bonds_type.nsites nr_guard_parameters
-    in
     let error, bdu_handler, result_restriction_bdu =
-      Handler.mvbdu_and_for_guards parameters bdu_handler error
-        bdu_restriction_renamed additional_restriction_bdu
+      Handler.mvbdu_and_for_guards parameters bdu_handler error restriction_bdu
+        additional_restriction_bdu
     in
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, result_restriction_bdu
@@ -753,8 +725,7 @@ module Domain = struct
     in
     (*-----------------------------------------------------------*)
     let error, dynamic, guard_bdu =
-      get_bdu_guard parameters static dynamic error (get_guard_mvbdus static)
-        rule_id
+      get_bdu_guard parameters dynamic error (get_guard_mvbdus static) rule_id
     in
     let store_value = get_value dynamic in
     let bdu_handler = get_mvbdu_handler dynamic in
@@ -765,8 +736,8 @@ module Domain = struct
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     if bool then (
       let error, dynamic, precondition =
-        update_state_of_guard_parameters parameters error static dynamic
-          precondition precondition_guard_mvbdu
+        update_state_of_guard_parameters parameters error dynamic precondition
+          precondition_guard_mvbdu
       in
       error, dynamic, Some precondition
     ) else
@@ -811,8 +782,8 @@ module Domain = struct
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     if bool then (
       let error, dynamic, precondition =
-        update_state_of_guard_parameters parameters error static dynamic
-          precondition precondition_guard_mvbdu
+        update_state_of_guard_parameters parameters error dynamic precondition
+          precondition_guard_mvbdu
       in
       error, dynamic, Some precondition
     ) else
@@ -1210,7 +1181,7 @@ module Domain = struct
     let parameters = get_parameter static in
     let event_list = [] in
     let error, dynamic, precondition_mvbdu =
-      get_state_of_guard_parameters parameters static dynamic error precondition
+      get_state_of_guard_parameters parameters dynamic error precondition
     in
     let bdu_handler = get_mvbdu_handler dynamic in
     let restriction_mvbdu = get_restriction_mvbdu static in

@@ -248,34 +248,21 @@ module Domain = struct
     let result_static = get_bdu_analysis_static static in
     result_static.Bdu_static_views.site_to_renamed_site_list
 
-  let get_state_of_guard_parameters parameters static dynamic error precondition
-      nsites =
+  let get_state_of_guard_parameters parameters dynamic error precondition =
     let bdu_handler = get_mvbdu_handler dynamic in
-    let nr_guard_parameters = get_nr_guard_parameters static in
     let error, bdu_handler, state_guard_parameters =
       Communication.get_state_of_guard_parameters parameters bdu_handler error
         precondition
     in
-    let error, bdu_handler, bdu_renamed =
-      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
-        state_guard_parameters bdu_handler Communication.nsites nsites
-        nr_guard_parameters
-    in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
-    error, dynamic, bdu_renamed
+    error, dynamic, state_guard_parameters
 
-  let update_state_of_guard_parameters parameters error static dynamic
-      precondition state_guard_parameters nsites =
+  let update_state_of_guard_parameters parameters error dynamic precondition
+      state_guard_parameters =
     let bdu_handler = get_mvbdu_handler dynamic in
-    let nr_guard_parameters = get_nr_guard_parameters static in
-    let error, bdu_handler, bdu_renamed =
-      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
-        state_guard_parameters bdu_handler nsites Communication.nsites
-        nr_guard_parameters
-    in
     let error, bdu_handler, precondition =
       Communication.update_state_of_guard_parameters parameters error
-        bdu_handler precondition bdu_renamed
+        bdu_handler precondition state_guard_parameters
     in
     error, set_mvbdu_handler bdu_handler dynamic, precondition
   (*--------------------------------------------------------------------*)
@@ -1113,8 +1100,7 @@ module Domain = struct
     let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
     let nsites = get_nsites static in
     let error, dynamic, state_guard_parameters =
-      get_state_of_guard_parameters parameters static dynamic error precondition
-        nsites
+      get_state_of_guard_parameters parameters dynamic error precondition
     in
     let error, dynamic, _, bdu_guard =
       Covering_classes_type.AgentsCV_setmap.Map.fold
@@ -1171,8 +1157,8 @@ module Domain = struct
           state_guard_parameters )
     in
     let error, dynamic, precondition =
-      update_state_of_guard_parameters parameters error static dynamic
-        precondition bdu_guard nsites
+      update_state_of_guard_parameters parameters error dynamic precondition
+        bdu_guard
     in
     error, dynamic, precondition
 
@@ -2421,7 +2407,7 @@ module Domain = struct
     let site_correspondence_map = get_site_correspondence_array static in
     let store_covering_classes_id = get_covering_classes_id static in
     let nr_guard_parameters = Handler.get_nr_guard_parameters kappa_handler in
-    let nsites = Handler.nsites kappa_handler in
+    let nsites = Handler.get_nsites kappa_handler in
     (*---------------------------------------------------------*)
     (* Why an arbitrary patterns would be stored in that map *)
     (* For each view, you have to collect the set of sites *)
@@ -2538,8 +2524,8 @@ module Domain = struct
           pattern.Cckappa_sig.views (dynamic, bdu_true)
       in
       let error, dynamic, precondition =
-        update_state_of_guard_parameters parameters error static dynamic
-          precondition result_bdu_guard nsites
+        update_state_of_guard_parameters parameters error dynamic precondition
+          result_bdu_guard
       in
       let precondition =
         Communication.refine_information_about_state_of_sites_in_precondition
@@ -2939,10 +2925,8 @@ module Domain = struct
   let compute_views_enabled static dynamic error rule_id precondition =
     (* get information about guard parameters from precondition *)
     let parameters = get_parameter static in
-    let nsites = get_nsites static in
     let error, dynamic, precondition_guard_bdu =
-      get_state_of_guard_parameters parameters static dynamic error precondition
-        nsites
+      get_state_of_guard_parameters parameters dynamic error precondition
     in
     (*-----------------------------------------------------------------------*)
     (*deal with views*)
@@ -2978,10 +2962,8 @@ module Domain = struct
   let apply_one_side_effect static dynamic error _rule_id
       (_, (agent_name, site, state)) precondition =
     let parameters = get_parameter static in
-    let nsites = get_nsites static in
     let error, dynamic, precondition_guard_bdu =
-      get_state_of_guard_parameters parameters static dynamic error precondition
-        nsites
+      get_state_of_guard_parameters parameters dynamic error precondition
     in
     let site = Ckappa_sig.guard_p_then_site_of_site site in
     let site_to_site_list = get_site_to_renamed_site_list static in
@@ -3615,7 +3597,7 @@ module Domain = struct
       let kappa_handler = get_kappa_handler static in
       let handler = get_mvbdu_handler dynamic in
       let parameters = get_parameter static in
-      let nsites = Handler.nsites kappa_handler in
+      let nsites = Handler.get_nsites kappa_handler in
       let contact_map = Preprocess.init_contact_map in
       (*-----------------------------------------------*)
       let error, (handler, contact_map) =

@@ -106,7 +106,6 @@ module AgentsSitesStates_map_and_set = Map_wrapper.Make (SetMap.Make (struct
 end))
 
 (*******************************************************************)
-let nsites = Ckappa_sig.dummy_site_name_1
 
 (**The first variable of the mvbdu represents the question "if there is a bond, is it parallel?"*)
 let first_variable = Ckappa_sig.dummy_site_or_guard_name
@@ -273,7 +272,7 @@ let print_guard_parameters_natural_language parameters prefix error
     in
     let error, bdu_handler =
       Handler.print_guard_mvbdu_decompose parameters error kappa_handler
-        bdu_handler mvbdu restriction_bdu nsites
+        bdu_handler mvbdu restriction_bdu
     in
     let () =
       Loggers.fprintf
@@ -415,7 +414,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
               let error, bdu_handler =
                 Handler.print_guard_mvbdu_decompose parameters error
                   kappa_handler bdu_handler ~with_comma:true parallel_bond_mvbdu
-                  restriction_bdu nsites
+                  restriction_bdu
               in
               let () =
                 Loggers.fprintf
@@ -506,7 +505,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
               let error, bdu_handler =
                 Handler.print_guard_mvbdu_decompose parameters error
                   kappa_handler bdu_handler ~with_comma:true
-                  non_parallel_bond_mvbdu restriction_bdu nsites
+                  non_parallel_bond_mvbdu restriction_bdu
               in
               let () =
                 Loggers.fprintf

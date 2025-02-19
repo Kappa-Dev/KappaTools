@@ -216,8 +216,6 @@ module PairAgentSite_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   let print _ _ = ()
 end))
 
-let nsites = Ckappa_sig.dummy_site_name_2
-
 let mvbdu_project_abstract_away_sites parameters bdu_handler error mvbdu =
   let error, bdu_handler, variable_list =
     Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
@@ -316,6 +314,7 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
     kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
   let log = Remanent_parameters.get_logger parameters in
+  let nsites = Handler.get_nsites kappa_handler in
   let ( (agent_type1, site_type1, site_type1', _),
         (agent_type2, site_type2, site_type2', _) ) =
     tuple

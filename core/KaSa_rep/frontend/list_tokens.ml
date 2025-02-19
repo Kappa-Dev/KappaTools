@@ -53,7 +53,7 @@ let empty_handler parameters error =
       Cckappa_sig.nvars = 0;
       Cckappa_sig.nagents = Ckappa_sig.dummy_agent_name;
       Cckappa_sig.nrules = 0;
-      Cckappa_sig.nsites = Ckappa_sig.dummy_site_name;
+      Cckappa_sig.nsites = Ckappa_sig.dummy_site_name_2;
       Cckappa_sig.nguard_params = Ckappa_sig.dummy_guard_parameter;
       Cckappa_sig.agents_dic = Ckappa_sig.Dictionary_of_agents.init ();
       Cckappa_sig.agents_annotation = agent_annotation;
@@ -208,10 +208,10 @@ let declare_site create parameters make_site make_state (error, handler)
         (handler, [], Ckappa_sig.dummy_site_name)
     | Some (k, _, _, sites) ->
       let nsites =
-        if Handler.nsites handler = k then
+        if Handler.get_nsites handler = k then
           Ckappa_sig.site_name_of_int (Ckappa_sig.int_of_site_name k + 1)
         else
-          Handler.nsites handler
+          Handler.get_nsites handler
       in
       let handler = { handler with Cckappa_sig.nsites } in
       let error, (states_dic, dic_states, handler) =

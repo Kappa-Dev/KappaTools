@@ -59,7 +59,6 @@ val get_defined_in : path_in_pattern -> path_defined_in
 val get_agent_id : path_in_pattern -> Ckappa_sig.c_agent_id
 val get_site : path_in_pattern -> Ckappa_sig.c_site_name
 val get_relative_address : path_in_pattern -> step list
-val nsites : Ckappa_sig.c_site_name
 
 module type PathMap = sig
   type 'a t
