@@ -13,7 +13,7 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let local_trace = false
+let local_trace = true
 
 module Domain = struct
   type static_information = {
@@ -27,8 +27,7 @@ module Domain = struct
   }
 
   (*--------------------------------------------------------------------*)
-  (* array that indicates whether an agent type is already discovered, or
-     not: from the beginning everything will be set to false*)
+  (* array that indicates for which values of the guard parameters an agent type is already discovered: from the beginning the mvbdu will be set to false*)
 
   (* This array is statically allocated *)
   (* Why do you use extensive arrays ? *)
@@ -52,6 +51,7 @@ module Domain = struct
   let get_parameter static = lift Analyzer_headers.get_parameter static
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
   let get_compil static = lift Analyzer_headers.get_cc_code static
+  let nsites = Ckappa_sig.dummy_site_name
 
   let get_restriction_mvbdu static =
     lift Analyzer_headers.get_restriction_mvbdu static
@@ -449,7 +449,7 @@ module Domain = struct
             let bdu_handler = get_mvbdu_handler dynamic in
             let error, bdu_handler, mvbdu_guard =
               Handler.guard_to_bdu_opt parameters error bdu_handler
-                init_state.Cckappa_sig.e_init_guard restriction_bdu
+                init_state.Cckappa_sig.e_init_guard restriction_bdu nsites
             in
             let dynamic = set_mvbdu_handler bdu_handler dynamic in
             let error, (dynamic, event_list) =
@@ -755,7 +755,7 @@ module Domain = struct
                      let bdu_handler = get_mvbdu_handler dynamic in
                      let error, bdu_handler =
                        Handler.print_guard_mvbdu_decompose parameters error
-                         handler bdu_handler mvbdu restriction_bdu
+                         handler bdu_handler mvbdu restriction_bdu nsites
                      in
                      let dynamic = set_mvbdu_handler bdu_handler dynamic in
                      let () = Loggers.fprintf loggers "." in
