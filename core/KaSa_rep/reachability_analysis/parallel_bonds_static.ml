@@ -183,10 +183,10 @@ let project_away_ag_id_gen_bdu f parameters error big_store acc bdu_handler =
     (error, (bdu_handler, acc))
 
 let project_away_ag_id parameters _kappa_handler bdu_handler error big_store acc
-    mvbdu restriction_mvbdu last_variable =
+    mvbdu restriction_mvbdu =
   let f parameters error tuple bool acc bdu_handler =
     Parallel_bonds_type.add_value_bool parameters error tuple bdu_handler bool
-      acc mvbdu restriction_mvbdu last_variable
+      acc mvbdu restriction_mvbdu
   in
   project_away_ag_id_gen_bdu f parameters error big_store acc bdu_handler
 

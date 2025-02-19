@@ -106,6 +106,10 @@ module AgentsSitesStates_map_and_set = Map_wrapper.Make (SetMap.Make (struct
 end))
 
 (*******************************************************************)
+let nsites = Ckappa_sig.dummy_site_name_1
+
+(**The first variable of the mvbdu represents the question "if there is a bond, is it parallel?"*)
+let first_variable = Ckappa_sig.dummy_site_or_guard_name
 
 let convert_pair parameters error kappa_handler pair =
   let agent, site = pair in
@@ -178,10 +182,9 @@ let cons_opt a l =
   | None -> l
   | Some a -> a :: l
 
-let add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
-    variable_name mvbdu =
+let add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu =
   let pair_list =
-    [ variable_name, Ckappa_sig.state_index_of_int (Bool.to_int bool) ]
+    [ first_variable, Ckappa_sig.state_index_of_int (Bool.to_int bool) ]
   in
   let error, bdu_handler, is_parallel_bond_mvbdu =
     Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters bdu_handler error
@@ -191,20 +194,19 @@ let add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
     is_parallel_bond_mvbdu
 
 let add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
-    value variable_name mvbdu =
+    value mvbdu =
   match value with
   | Usual_domains.Val bool ->
-    add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
-      variable_name mvbdu
+    add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu
   | Usual_domains.Any -> error, bdu_handler, mvbdu
   | Usual_domains.Undefined ->
     Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
 
-let mvbdu_project_abstract_away_last_variable parameters bdu_handler error
-    variable_name mvbdu =
+let mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+    mvbdu =
   let error, bdu_handler, variable_list =
     Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
-      [ variable_name ]
+      [ first_variable ]
   in
   Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
     mvbdu variable_list
@@ -215,22 +217,20 @@ let mvbdu_project_abstract_away_last_variable parameters bdu_handler error
    - the double bonds could be either parallel or not
    - undefined: there are no double bonds (or the analysis has not reached this value yet) *)
 let compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
-    error variable_name mvbdu restriction_bdu =
+    error mvbdu restriction_bdu =
   let error, bdu_handler, bdu_parallel =
-    add_parallel_bond_variable_to_mvbdu parameters bdu_handler error true
-      variable_name mvbdu
+    add_first_variable_to_mvbdu parameters bdu_handler error true mvbdu
   in
   let error, bdu_handler, bdu_non_parallel =
-    add_parallel_bond_variable_to_mvbdu parameters bdu_handler error false
-      variable_name mvbdu
+    add_first_variable_to_mvbdu parameters bdu_handler error false mvbdu
   in
   let error, bdu_handler, bdu_only_guards_parallel =
-    mvbdu_project_abstract_away_last_variable parameters bdu_handler error
-      variable_name bdu_parallel
+    mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+      bdu_parallel
   in
   let error, bdu_handler, bdu_only_guards_non_parallel =
-    mvbdu_project_abstract_away_last_variable parameters bdu_handler error
-      variable_name bdu_non_parallel
+    mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+      bdu_non_parallel
   in
   let error, bdu_handler, bdu_only_guards_parallel_negation =
     Handler.mvbdu_not_for_guards parameters bdu_handler error
@@ -273,7 +273,7 @@ let print_guard_parameters_natural_language parameters prefix error
     in
     let error, bdu_handler =
       Handler.print_guard_mvbdu_decompose parameters error kappa_handler
-        bdu_handler mvbdu restriction_bdu
+        bdu_handler mvbdu restriction_bdu nsites
     in
     let () =
       Loggers.fprintf
@@ -287,10 +287,6 @@ let print_guard_parameters_natural_language parameters prefix error
 let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     ?final_resul:(final_result = false) ?(dump_any = false) parameters error
     kappa_handler tuple value bdu_handler restriction_bdu =
-  let last_variable =
-    Ckappa_sig.guard_p_then_site_of_guard
-      (Handler.get_nr_guard_parameters kappa_handler)
-  in
   let modalite =
     if final_result then
       "are necessarily"
@@ -391,7 +387,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
           any_bond_mvbdu,
           _undefined_bond_mvbdu ) =
       compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
-        error last_variable value restriction_bdu
+        error value restriction_bdu
     in
     let error, bdu_handler =
       (*for which values of the guards are all double bonds parallel?*)
@@ -419,7 +415,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
               let error, bdu_handler =
                 Handler.print_guard_mvbdu_decompose parameters error
                   kappa_handler bdu_handler ~with_comma:true parallel_bond_mvbdu
-                  restriction_bdu
+                  restriction_bdu nsites
               in
               let () =
                 Loggers.fprintf
@@ -510,7 +506,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
               let error, bdu_handler =
                 Handler.print_guard_mvbdu_decompose parameters error
                   kappa_handler bdu_handler ~with_comma:true
-                  non_parallel_bond_mvbdu restriction_bdu
+                  non_parallel_bond_mvbdu restriction_bdu nsites
               in
               let () =
                 Loggers.fprintf
@@ -680,8 +676,8 @@ let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
     | error, Some old_mvbdu -> error, old_mvbdu
   in
   (* let error, bdu_handler, mvbdu_refined =
-     add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
-       last_variable mvbdu
+     add_first_variable_to_mvbdu parameters bdu_handler error bool
+        mvbdu
      in *)
   let error, bdu_handler, new_mvbdu =
     Handler.mvbdu_or_for_guards parameters bdu_handler error old_mvbdu mvbdu
@@ -696,19 +692,18 @@ let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
 
 (* add value used in parallel_bonds_static.ml, project_away_ag_id *)
 let add_value_bool parameters error x bdu_handler bool store_result mvbdu
-    restriction_mvbdu last_variable =
+    restriction_mvbdu =
   let error, bdu_handler, mvbdu_refined =
-    add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
-      last_variable mvbdu
+    add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu
   in
   add_value_mvbdu parameters error x bdu_handler store_result mvbdu_refined
     restriction_mvbdu
 
 let add_value_and_event parameters error kappa_handler x value store_set
-    store_result guard_mvbdu bdu_handler restriction_mvbdu last_variable =
+    store_result guard_mvbdu bdu_handler restriction_mvbdu =
   let error, bdu_handler, value_mvbdu =
     add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
-      value last_variable guard_mvbdu
+      value guard_mvbdu
   in
   let error, bdu_handler, mvbdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error

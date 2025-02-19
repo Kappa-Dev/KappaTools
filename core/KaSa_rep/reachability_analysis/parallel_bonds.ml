@@ -79,7 +79,10 @@ module Domain = struct
     lift Analyzer_headers.get_action_binding static
 
   let get_restriction_mvbdu static =
-    lift Analyzer_headers.get_restriction_mvbdu static
+    static.local_static_information.restriction_mvbdu
+
+  let get_nr_guard_parameters static =
+    lift Analyzer_headers.get_nr_guard_parameters static
 
   let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
   let get_local_static_information static = static.local_static_information
@@ -95,22 +98,14 @@ module Domain = struct
     in
     error, rule
 
-  (**The last variable of the mvbdu represents the question "if there is a bond, is it parallel?"*)
-  let get_last_mvbdu_variable kappa_handler =
-    Ckappa_sig.guard_p_then_site_of_guard
-      kappa_handler.Cckappa_sig.nguard_params
+  let add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu =
+    Parallel_bonds_type.add_first_variable_to_mvbdu parameters bdu_handler error
+      bool mvbdu
 
-  let add_parallel_bond_variable_to_mvbdu parameters bdu_handler error bool
-      static mvbdu =
-    let variable_name = get_last_mvbdu_variable (get_kappa_handler static) in
-    Parallel_bonds_type.add_parallel_bond_variable_to_mvbdu parameters
-      bdu_handler error bool variable_name mvbdu
-
-  let mvbdu_project_abstract_away_last_variable parameters bdu_handler error
-      static mvbdu =
-    let variable_name = get_last_mvbdu_variable (get_kappa_handler static) in
-    Parallel_bonds_type.mvbdu_project_abstract_away_last_variable parameters
-      bdu_handler error variable_name mvbdu
+  let mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+      mvbdu =
+    Parallel_bonds_type.mvbdu_project_abstract_away_first_variable parameters
+      bdu_handler error mvbdu
 
   (*static information*)
 
@@ -231,23 +226,51 @@ module Domain = struct
           (get_global_dynamic_information dynamic);
     }
 
-  let get_state_of_guard_parameters parameters dynamic error precondition =
+  let get_state_of_guard_parameters parameters static dynamic error precondition
+      =
     let bdu_handler = get_mvbdu_handler dynamic in
+    let nr_guard_parameters = get_nr_guard_parameters static in
     let error, bdu_handler, state_guard_parameters =
       Communication.get_state_of_guard_parameters parameters bdu_handler error
         precondition
     in
+    let error, bdu_handler, bdu_renamed =
+      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
+        state_guard_parameters bdu_handler Communication.nsites
+        Parallel_bonds_type.nsites nr_guard_parameters
+    in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
-    error, dynamic, state_guard_parameters
+    error, dynamic, bdu_renamed
 
-  let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
+  let update_state_of_guard_parameters parameters error static dynamic
+      precondition state_guard_parameters =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let nr_guard_parameters = get_nr_guard_parameters static in
+    let error, bdu_handler, bdu_renamed =
+      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
+        state_guard_parameters bdu_handler Parallel_bonds_type.nsites
+        Communication.nsites nr_guard_parameters
+    in
+    let error, bdu_handler, precondition =
+      Communication.update_state_of_guard_parameters parameters error
+        bdu_handler precondition bdu_renamed
+    in
+    error, set_mvbdu_handler bdu_handler dynamic, precondition
+
+  let get_bdu_guard parameters static dynamic error guard_mvbdus rule_id =
     let handler = get_mvbdu_handler dynamic in
+    let nr_guard_parameters = get_nr_guard_parameters static in
     let error, handler, bdu_guard =
       Bdu_static_views.get_bdu_guard_original_names guard_mvbdus rule_id
         parameters handler error
     in
+    let error, handler, bdu_guard_renamed =
+      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
+        bdu_guard handler Communication.nsites Parallel_bonds_type.nsites
+        nr_guard_parameters
+    in
     let dynamic = set_mvbdu_handler handler dynamic in
-    error, dynamic, bdu_guard
+    error, dynamic, bdu_guard_renamed
 
   let get_value dynamic = (get_local_dynamic_information dynamic).store_value
 
@@ -470,10 +493,11 @@ module Domain = struct
     let parameters = Analyzer_headers.get_parameter static in
     let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
     let restriction_bdu = Analyzer_headers.get_restriction_mvbdu static in
-    let last_variable = Analyzer_headers.get_nr_guard_parameters static in
+    let nr_guard_parameters = Analyzer_headers.get_nr_guard_parameters static in
+    let first_variable = Parallel_bonds_type.first_variable in
     let pair_list =
       [
-        ( Ckappa_sig.guard_p_then_site_of_guard last_variable,
+        ( first_variable,
           ( Some Ckappa_sig.dummy_state_index_false,
             Some Ckappa_sig.dummy_state_index_true ) );
       ]
@@ -482,9 +506,14 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters bdu_handler error
         pair_list
     in
+    let error, bdu_handler, bdu_restriction_renamed =
+      Bdu_static_views.rename_guards_in_mvbdu_change_nsites parameters error
+        restriction_bdu bdu_handler Communication.nsites
+        Parallel_bonds_type.nsites nr_guard_parameters
+    in
     let error, bdu_handler, result_restriction_bdu =
-      Handler.mvbdu_and_for_guards parameters bdu_handler error restriction_bdu
-        additional_restriction_bdu
+      Handler.mvbdu_and_for_guards parameters bdu_handler error
+        bdu_restriction_renamed additional_restriction_bdu
     in
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, result_restriction_bdu
@@ -623,13 +652,12 @@ module Domain = struct
     let kappa_handler = get_kappa_handler static in
     let bdu_handler = get_mvbdu_handler dynamic in
     let restriction_bdu = get_restriction_mvbdu static in
-    let last_variable = get_last_mvbdu_variable kappa_handler in
     (*value of parallel and non parallel bonds*)
     let store_result = get_value dynamic in
     let error, (bdu_handler, store_result) =
       Parallel_bonds_init.collect_parallel_or_not_bonds_init parameters
         kappa_handler bdu_handler error tuples_of_interest init_state
-        store_result restriction_bdu last_variable
+        store_result restriction_bdu
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     let dynamic = set_value store_result dynamic in
@@ -646,8 +674,8 @@ module Domain = struct
   (*************************************************************)
   (* if a parallel bound occurs on the lhs, check that this is possible *)
 
-  let common_scan parameters error bdu_handler static tuples_of_interest
-      store_value list guard_mvbdu =
+  let common_scan parameters error bdu_handler tuples_of_interest store_value
+      list guard_mvbdu =
     let rec scan list error bdu_handler precondition_guard_mvbdu =
       match list with
       | [] -> error, true, bdu_handler, precondition_guard_mvbdu
@@ -671,8 +699,8 @@ module Domain = struct
         in
         (*matching the value on the lhs*)
         let error, bdu_handler, mvbdu_inter_parallel_or_not =
-          add_parallel_bond_variable_to_mvbdu parameters bdu_handler error
-            parallel_or_not static next_mvbdu
+          add_first_variable_to_mvbdu parameters bdu_handler error
+            parallel_or_not next_mvbdu
         in
         let error, bdu_handler, is_false =
           Handler.mvbdu_is_false_for_guards parameters bdu_handler error
@@ -682,8 +710,8 @@ module Domain = struct
           error, false, bdu_handler, precondition_guard_mvbdu
         else (
           let error, bdu_handler, next_guard_mvbdu =
-            mvbdu_project_abstract_away_last_variable parameters bdu_handler
-              error static mvbdu_inter_parallel_or_not
+            mvbdu_project_abstract_away_first_variable parameters bdu_handler
+              error mvbdu_inter_parallel_or_not
           in
           let error, bdu_handler, precondition_guard_mvbdu =
             Handler.mvbdu_and_for_guards parameters bdu_handler error
@@ -725,20 +753,21 @@ module Domain = struct
     in
     (*-----------------------------------------------------------*)
     let error, dynamic, guard_bdu =
-      get_bdu_guard parameters dynamic error (get_guard_mvbdus static) rule_id
+      get_bdu_guard parameters static dynamic error (get_guard_mvbdus static)
+        rule_id
     in
     let store_value = get_value dynamic in
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bool, bdu_handler, precondition_guard_mvbdu =
-      common_scan parameters error bdu_handler static tuples_of_interest
-        store_value list guard_bdu
+      common_scan parameters error bdu_handler tuples_of_interest store_value
+        list guard_bdu
     in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     if bool then (
-      let error, bdu_handler, precondition =
-        Communication.update_state_of_guard_parameters parameters error
-          bdu_handler precondition precondition_guard_mvbdu
+      let error, dynamic, precondition =
+        update_state_of_guard_parameters parameters error static dynamic
+          precondition precondition_guard_mvbdu
       in
-      let dynamic = set_mvbdu_handler bdu_handler dynamic in
       error, dynamic, Some precondition
     ) else
       error, dynamic, None
@@ -776,16 +805,15 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
     in
     let error, bool, bdu_handler, precondition_guard_mvbdu =
-      common_scan parameters error bdu_handler static tuples_of_interest
-        store_value list mvbdu_true
+      common_scan parameters error bdu_handler tuples_of_interest store_value
+        list mvbdu_true
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     if bool then (
-      let error, bdu_handler, precondition =
-        Communication.update_state_of_guard_parameters parameters error
-          bdu_handler precondition precondition_guard_mvbdu
+      let error, dynamic, precondition =
+        update_state_of_guard_parameters parameters error static dynamic
+          precondition precondition_guard_mvbdu
       in
-      let dynamic = set_mvbdu_handler bdu_handler dynamic in
       error, dynamic, Some precondition
     ) else
       error, dynamic, None
@@ -808,11 +836,10 @@ module Domain = struct
          (idy, (y, x))
          map
 
-  let can_only_be_parallel_bond parameters error dynamic static mvbdu =
+  let can_only_be_parallel_bond parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, can_be_non_parallel =
-      add_parallel_bond_variable_to_mvbdu parameters bdu_handler error false
-        static mvbdu
+      add_first_variable_to_mvbdu parameters bdu_handler error false mvbdu
     in
     let error, bdu_handler, is_false =
       Handler.mvbdu_is_false_for_guards parameters bdu_handler error
@@ -1097,7 +1124,7 @@ module Domain = struct
                                                       is_parallel_bond ) =
                                                   can_only_be_parallel_bond
                                                     parameters error dynamic
-                                                    static mvbdu
+                                                    mvbdu
                                                 in
                                                 if is_parallel_bond then
                                                   error, true, dynamic
@@ -1183,7 +1210,7 @@ module Domain = struct
     let parameters = get_parameter static in
     let event_list = [] in
     let error, dynamic, precondition_mvbdu =
-      get_state_of_guard_parameters parameters dynamic error precondition
+      get_state_of_guard_parameters parameters static dynamic error precondition
     in
     let bdu_handler = get_mvbdu_handler dynamic in
     let restriction_mvbdu = get_restriction_mvbdu static in
@@ -1192,7 +1219,6 @@ module Domain = struct
     in
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
-    let last_variable = get_last_mvbdu_variable kappa_handler in
     let error, rule = get_rule parameters error static rule_id in
     match rule with
     | None ->
@@ -1333,17 +1359,17 @@ module Domain = struct
           (fun parameters error x value (bdu_handler, store_set, store_result) ->
             Parallel_bonds_type.add_value_and_event parameters error
               kappa_handler x value store_set store_result precondition_mvbdu
-              bdu_handler restriction_mvbdu last_variable)
+              bdu_handler restriction_mvbdu)
           (fun parameters error x value (bdu_handler, store_set, store_result) ->
             Parallel_bonds_type.add_value_and_event parameters error
               kappa_handler x value store_set store_result precondition_mvbdu
-              bdu_handler restriction_mvbdu last_variable)
+              bdu_handler restriction_mvbdu)
           (fun parameters error x value1 value2
                (bdu_handler, store_set, store_result) ->
             let new_value = Usual_domains.lub value1 value2 in
             Parallel_bonds_type.add_value_and_event parameters error
               kappa_handler x new_value store_set store_result
-              precondition_mvbdu bdu_handler restriction_mvbdu last_variable)
+              precondition_mvbdu bdu_handler restriction_mvbdu)
           map_value store_non_parallel
           ( bdu_handler,
             Parallel_bonds_type.PairAgentSite_map_and_set.Set.empty,
@@ -1394,7 +1420,7 @@ module Domain = struct
           (fun x value (error, (bdu_handler, store_set, store_result)) ->
             Parallel_bonds_type.add_value_and_event parameters error
               kappa_handler x value store_set store_result precondition_mvbdu
-              bdu_handler restriction_mvbdu last_variable)
+              bdu_handler restriction_mvbdu)
           store_parallel
           (*get the store_set from the previous result*)
           (error, (bdu_handler, store_set, store_result))
