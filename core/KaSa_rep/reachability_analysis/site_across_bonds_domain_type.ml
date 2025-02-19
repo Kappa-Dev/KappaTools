@@ -216,28 +216,20 @@ module PairAgentSite_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   let print _ _ = ()
 end))
 
-let fst_site kappa_handler =
-  let nr_guard_p = Handler.get_nr_guard_parameters kappa_handler in
-  Ckappa_sig.fst_site nr_guard_p
+let nsites = Ckappa_sig.dummy_site_name_2
 
-let snd_site kappa_handler =
-  let nr_guard_p = Handler.get_nr_guard_parameters kappa_handler in
-  Ckappa_sig.snd_site nr_guard_p
-
-let mvbdu_project_abstract_away_sites parameters bdu_handler error kappa_handler
-    mvbdu =
+let mvbdu_project_abstract_away_sites parameters bdu_handler error mvbdu =
   let error, bdu_handler, variable_list =
     Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
-      [ fst_site kappa_handler; snd_site kappa_handler ]
+      [ Ckappa_sig.fst_site; Ckappa_sig.snd_site ]
   in
   Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
     mvbdu variable_list
 
-let mvbdu_project_keep_only_sites parameters bdu_handler error kappa_handler
-    mvbdu =
+let mvbdu_project_keep_only_sites parameters bdu_handler error mvbdu =
   let error, bdu_handler, variable_list =
     Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
-      [ fst_site kappa_handler; snd_site kappa_handler ]
+      [ Ckappa_sig.fst_site; Ckappa_sig.snd_site ]
   in
   Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameters bdu_handler error
     mvbdu variable_list
@@ -323,7 +315,6 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
     ?(final_result = false) ?dump_any:(_dump_any = false) parameters error
     kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
-  let nr_guard_p = Handler.get_nr_guard_parameters kappa_handler in
   let log = Remanent_parameters.get_logger parameters in
   let ( (agent_type1, site_type1, site_type1', _),
         (agent_type2, site_type2, site_type2', _) ) =
@@ -412,19 +403,17 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
                       let error, (pattern, add_comma) =
                         match
                           Ckappa_sig.site_or_guard_p_of_guard_p_then_site
-                            site_or_guard nr_guard_p
+                            site_or_guard nsites
                         with
                         | Ckappa_sig.Site _ ->
-                          if site_or_guard = Ckappa_sig.fst_site nr_guard_p then (
+                          if site_or_guard = Ckappa_sig.fst_site then (
                             let error, pattern =
                               Site_graphs.KaSa_site_graph.add_state parameters
                                 error kappa_handler agent_id1 site_type1' state
                                 pattern
                             in
                             error, (pattern, add_comma)
-                          ) else if
-                              site_or_guard = Ckappa_sig.snd_site nr_guard_p
-                            then (
+                          ) else if site_or_guard = Ckappa_sig.snd_site then (
                             let error, pattern =
                               Site_graphs.KaSa_site_graph.add_state parameters
                                 error kappa_handler agent_id2 site_type2' state
@@ -483,17 +472,16 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
                     let error, string =
                       match
                         Ckappa_sig.site_or_guard_p_of_guard_p_then_site
-                          site_or_guard nr_guard_p
+                          site_or_guard nsites
                       with
                       | Ckappa_sig.Site _ ->
-                        if site_or_guard = Ckappa_sig.fst_site nr_guard_p then (
+                        if site_or_guard = Ckappa_sig.fst_site then (
                           let error, (_, _, statex) =
                             convert_single parameters error kappa_handler
                               (agent_type1, site_type1, state)
                           in
                           error, statex
-                        ) else if site_or_guard = Ckappa_sig.snd_site nr_guard_p
-                          then (
+                        ) else if site_or_guard = Ckappa_sig.snd_site then (
                           let error, (_, _, statey) =
                             convert_single parameters error kappa_handler
                               (agent_type2, site_type2, state)

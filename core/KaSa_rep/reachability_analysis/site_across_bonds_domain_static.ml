@@ -473,8 +473,8 @@ let collect_potential_tuple_pair_init parameters error bdu_false handler
       let agent_type', site_type1', site_type2', state1', pair_of_state2' = y in
       let pair_list =
         [
-          Site_across_bonds_domain_type.fst_site kappa_handler, pair_of_state2;
-          Site_across_bonds_domain_type.snd_site kappa_handler, pair_of_state2';
+          Ckappa_sig.fst_site, pair_of_state2;
+          Ckappa_sig.snd_site, pair_of_state2';
         ]
       in
       let error, handler, mvbdu =
