@@ -604,7 +604,7 @@ let store_bdu_potential_effect_restriction_map parameters handler error
   error, (handler, store_result)
 
 let collect_site_to_renamed_site_list parameters error store_remanent_triple
-    nr_guard_params output =
+    nsites output =
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
     error
     (fun parameters error agent_type' triple_list output ->
@@ -615,8 +615,7 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
             | [] -> error, output
             | h :: t ->
               let h =
-                Ckappa_sig.guard_p_then_site_of_site_or_guard_p h
-                  nr_guard_params
+                Ckappa_sig.guard_p_then_site_of_site_or_guard_p h nsites
               in
               let key = agent_type', h in
               let error, old =
@@ -638,8 +637,7 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
               aux error site' t output
           in
           aux error
-            (Ckappa_sig.guard_p_then_site_of_site Ckappa_sig.dummy_site_name_1
-               nr_guard_params)
+            (Ckappa_sig.guard_p_then_site_of_site Ckappa_sig.dummy_site_name_1)
             list output)
         (error, output) triple_list)
     store_remanent_triple output
@@ -862,19 +860,18 @@ let collect_proj_bdu_test_restriction parameters handler_kappa error rule_id
 
 (***************************************************************************)
 
-let rename_guards_in_mvbdu_to_cv_indexing parameters error bdu bdu_handler
-    nr_guard_parameters map1 =
+let rename_guards_in_mvbdu parameters error bdu bdu_handler rename
+    nr_guard_parameters =
   let guard_parameter_list =
     Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
   in
   let error, guard_parameter_renaming_list =
     List.fold_left
       (fun (error, renaming_list) g ->
-        let guard_parameter = Ckappa_sig.guard_p_then_site_of_guard g in
-        let error, renamed =
-          Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.get
-            parameters error guard_parameter map1
+        let guard_parameter =
+          Ckappa_sig.guard_p_then_site_of_guard g Ckappa_sig.dummy_site_name
         in
+        let error, renamed = rename parameters error guard_parameter in
         match renamed with
         | None ->
           Exception.warn parameters error __POS__ Exit
@@ -892,8 +889,32 @@ let rename_guards_in_mvbdu_to_cv_indexing parameters error bdu bdu_handler
   in
   error, handler, bdu_guard_renamed
 
+let rename_guards_in_mvbdu_to_cv_indexing parameters error bdu bdu_handler map1
+    nr_guard_parameters nsites =
+  let rename parameters error guard_parameter =
+    let guard_parameter =
+      Ckappa_sig.guard_p_then_site_change_nsites guard_parameter
+        Ckappa_sig.dummy_site_name nsites
+    in
+    Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.get parameters
+      error guard_parameter map1
+  in
+  rename_guards_in_mvbdu parameters error bdu bdu_handler rename
+    nr_guard_parameters
+
+let rename_guards_in_mvbdu_change_nsites parameters error bdu bdu_handler
+    old_nsites new_nsites nr_guard_parameters =
+  let rename _parameters _error guard_parameter =
+    ( error,
+      Some
+        (Ckappa_sig.guard_p_then_site_change_nsites guard_parameter old_nsites
+           new_nsites) )
+  in
+  rename_guards_in_mvbdu parameters error bdu bdu_handler rename
+    nr_guard_parameters
+
 let collect_bdu_by_agent_name_cv_id parameters handler_bdu error
-    site_correspondence nr_guard_p f =
+    site_correspondence nsites nr_guard_parameters f =
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
     error
     (fun parameters error agent site_correspondence (handler_bdu, map_guard_bdu) ->
@@ -904,7 +925,7 @@ let collect_bdu_by_agent_name_cv_id parameters handler_bdu error
             let error, handler_bdu, bdu = f parameters handler_bdu error in
             let error, handler_bdu, renamed_bdu =
               rename_guards_in_mvbdu_to_cv_indexing parameters error bdu
-                handler_bdu nr_guard_p map1
+                handler_bdu map1 nr_guard_parameters nsites
             in
             ( error,
               ( handler_bdu,
@@ -918,15 +939,15 @@ let collect_bdu_by_agent_name_cv_id parameters handler_bdu error
     (handler_bdu, Covering_classes_type.AgentCV_setmap.Map.empty)
 
 let collect_guard_restriction_bdu parameters handler_bdu error
-    site_correspondence nr_guard_p restriction_bdu =
+    site_correspondence nsites nr_guard_parameters restriction_bdu =
   collect_bdu_by_agent_name_cv_id parameters handler_bdu error
-    site_correspondence nr_guard_p (fun _ handler_bdu error ->
+    site_correspondence nsites nr_guard_parameters (fun _ handler_bdu error ->
       error, handler_bdu, restriction_bdu)
 
 let collect_guard_bdu parameters handler_bdu error rule_id site_correspondence
-    nr_guard_p guard_mvbdus =
+    nsites nr_guard_parameters guard_mvbdus =
   collect_bdu_by_agent_name_cv_id parameters handler_bdu error
-    site_correspondence nr_guard_p
+    site_correspondence nsites nr_guard_parameters
     (get_bdu_guard_original_names guard_mvbdus rule_id)
 
 (***************************************************************************)
@@ -975,7 +996,8 @@ let scan_rule_static parameters log_info error handler_bdu
     (rule_id : Ckappa_sig.c_rule_id) rule
     (*store_new_index_pair_map*)
       store_remanent_triple store_potential_side_effects _compil store_result
-    site_correspondence nr_guard_p guard_mvbdus guard_restriction_bdu =
+    site_correspondence nsites nr_guard_parameters guard_mvbdus
+    guard_restriction_bdu =
   (*-----------------------------------------------------------------------*)
   (*pre_static*)
   let error, log_info =
@@ -986,7 +1008,7 @@ let scan_rule_static parameters log_info error handler_bdu
   (*------------------------------------------------------------------------*)
   let error, (handler_bdu, current_guard_bdu) =
     collect_guard_bdu parameters handler_bdu error rule_id site_correspondence
-      nr_guard_p guard_mvbdus
+      nsites nr_guard_parameters guard_mvbdus
   in
   (*------------------------------------------------------------------------*)
   let (error, handler_bdu), store_proj_bdu_creation_restriction_map =
@@ -1039,10 +1061,11 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
     store_potential_side_effects store_remanent_triple site_correspondence
     guard_mvbdus restriction_bdu =
   let error, init = init_bdu_analysis_static parameters error in
-  let nr_guard_params = Handler.get_nr_guard_parameters handler_kappa in
+  let nsites = Handler.nsites handler_kappa in
+  let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
   let error, (handler_bdu, store_guard_restriction_bdu) =
     collect_guard_restriction_bdu parameters handler_bdu error
-      site_correspondence nr_guard_params restriction_bdu
+      site_correspondence nsites nr_guard_parameters restriction_bdu
   in
   let error, (handler_bdu, log_info, store_results) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
@@ -1051,7 +1074,7 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
           scan_rule_static parameters log_info error handler_bdu rule_id
             rule.Cckappa_sig.e_rule_c_rule store_remanent_triple
             store_potential_side_effects compiled store_result
-            site_correspondence nr_guard_params guard_mvbdus
+            site_correspondence nsites nr_guard_parameters guard_mvbdus
             store_guard_restriction_bdu
         in
         error, (handler_bdu, log_info, store_result))
@@ -1060,7 +1083,7 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
   in
   let error, site_to_renamed_site_list =
     collect_site_to_renamed_site_list parameters error store_remanent_triple
-      nr_guard_params store_results.site_to_renamed_site_list
+      nsites store_results.site_to_renamed_site_list
   in
   ( error,
     ( handler_bdu,
