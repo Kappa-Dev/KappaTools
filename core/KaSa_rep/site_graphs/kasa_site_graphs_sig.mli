@@ -40,7 +40,7 @@ module type Site_graph = sig
     Exception.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
-    Ckappa_sig.c_guard_p_then_site ->
+    Ckappa_sig.c_mvbdu_var ->
     t ->
     Exception.exceptions_caught_and_uncaught * t
 
@@ -59,7 +59,7 @@ module type Site_graph = sig
     Exception_without_parameter.exceptions_caught_and_uncaught ->
     Cckappa_sig.kappa_handler ->
     agent_id ->
-    Ckappa_sig.c_guard_p_then_site ->
+    Ckappa_sig.c_mvbdu_var ->
     Ckappa_sig.c_state ->
     t ->
     Exception_without_parameter.exceptions_caught_and_uncaught * t

@@ -166,7 +166,7 @@ module KaSa_site_graph = struct
   let add_site_or_guard parameter error kappa_handler agent_id site t =
     let nsites = Handler.get_nsites kappa_handler in
     let site_or_guard =
-      Ckappa_sig.site_or_guard_p_of_guard_p_then_site site nsites
+      Ckappa_sig.site_or_guard_p_of_mvbdu_var site nsites
     in
     let error, agent_op =
       Ckappa_sig.Agent_id_map_and_set.Map.find_option parameter error agent_id
@@ -511,7 +511,7 @@ module KaSa_site_graph = struct
       state t =
     let nsites = Handler.get_nsites kappa_handler in
     match
-      Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_or_guard nsites
+      Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard nsites
     with
     | Ckappa_sig.Site site_name ->
       add_state parameter error kappa_handler agent_id site_name state t

@@ -373,7 +373,7 @@ val string_of_site_or_guard_contact_map :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   Quark_type.agent_quark ->
-  Ckappa_sig.c_guard_p_then_site ->
+  Ckappa_sig.c_mvbdu_var ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
 val string_of_site_in_natural_language :
@@ -389,7 +389,7 @@ val string_of_site_or_guard_in_natural_language :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   Quark_type.agent_quark ->
-  Ckappa_sig.c_guard_p_then_site ->
+  Ckappa_sig.c_mvbdu_var ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
 val string_of_state :
@@ -415,7 +415,7 @@ val string_of_state_fully_deciphered_with_guard :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   Ckappa_sig.c_agent_name ->
-  Ckappa_sig.c_guard_p_then_site ->
+  Ckappa_sig.c_mvbdu_var ->
   Ckappa_sig.c_state ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 

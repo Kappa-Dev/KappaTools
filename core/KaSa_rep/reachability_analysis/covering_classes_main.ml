@@ -734,7 +734,7 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
                 | [] -> error, (map1, map2)
                 | h :: tl ->
                   let h_int =
-                    Ckappa_sig.guard_p_then_site_of_site_or_guard_p h nsites
+                    Ckappa_sig.mvbdu_var_of_site_or_guard_p h nsites
                   in
                   let error, map1 =
                     Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.set
@@ -745,8 +745,8 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
                       parameters error k h map2
                   in
                   aux tl
-                    (Ckappa_sig.guard_p_then_site_of_int
-                       (Ckappa_sig.int_of_guard_p_then_site k + 1))
+                    (Ckappa_sig.mvbdu_var_of_int
+                       (Ckappa_sig.int_of_mvbdu_var k + 1))
                     map1 map2 error
               in
               let error, map1 =
@@ -758,7 +758,7 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
                   parameters error size_map2
               in
               let error, (map1, map2) =
-                aux list (Ckappa_sig.guard_p_then_site_of_int 1) map1 map2 error
+                aux list (Ckappa_sig.mvbdu_var_of_int 1) map1 map2 error
               in
               Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.set
                 parameters error cv_id (map1, map2) array)

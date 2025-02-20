@@ -584,7 +584,7 @@ let string_of_state_fully_deciphered_with_guard parameter error handler_kappa
     agent_name site_or_guard state =
   let nsites = get_nsites handler_kappa in
   match
-    Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_or_guard nsites
+    Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard nsites
   with
   | Ckappa_sig.Site site_name ->
     string_of_state_gen print_state_fully_deciphered parameter error
@@ -646,10 +646,10 @@ let string_of_site_in_natural_language parameter error handler_kapp agent_type
   | Ckappa_sig.Counter x -> error, "the value of counter " ^ x
 
 let string_of_site_or_guard_in_natural_language parameter error handler_kapp
-    agent_type (site_or_guard_int : Ckappa_sig.c_guard_p_then_site) =
+    agent_type (site_or_guard_int : Ckappa_sig.c_mvbdu_var) =
   let nsites = get_nsites handler_kapp in
   match
-    Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_or_guard_int nsites
+    Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard_int nsites
   with
   | Ckappa_sig.Site site_int ->
     string_of_site_in_natural_language parameter error handler_kapp agent_type
@@ -680,7 +680,7 @@ let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
     ?(message = "") parameter error handler_kappa agent_name site_or_guard_int =
   let nsites = get_nsites handler_kappa in
   match
-    Ckappa_sig.site_or_guard_p_of_guard_p_then_site site_or_guard_int nsites
+    Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard_int nsites
   with
   | Ckappa_sig.Site s ->
     string_of_site_contact_map ~ml_pos ~ka_pos ~message parameter error
@@ -708,7 +708,7 @@ let print_guard_mvbdu parameters error kappa_handler bdu_handler
             (fun (add_comma, error) (guard_name, value) ->
               let error, _ =
                 match
-                  Ckappa_sig.site_or_guard_p_of_guard_p_then_site guard_name
+                  Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name
                     nsites
                 with
                 | Ckappa_sig.Guard_p guard_name ->
@@ -782,7 +782,7 @@ let compute_restriction_mvbdu parameters error mvbdu_handler kappa_handler =
   let pair_list =
     List.map
       (fun guard ->
-        ( Ckappa_sig.guard_p_then_site_of_guard guard nsites,
+        ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
           ( Some Ckappa_sig.dummy_state_index_false,
             Some Ckappa_sig.dummy_state_index_true ) ))
       guard_p_list
@@ -804,7 +804,7 @@ let guard_to_bdu parameters error handler_bdu guard bdu_restriction nsites =
       let error, handler_bdu, association_list =
         Ckappa_sig.Views_bdu.build_association_list parameters handler_bdu error
           [
-            ( Ckappa_sig.guard_p_then_site_of_guard a nsites,
+            ( Ckappa_sig.mvbdu_var_of_guard a nsites,
               Ckappa_sig.dummy_state_index_true );
           ]
       in

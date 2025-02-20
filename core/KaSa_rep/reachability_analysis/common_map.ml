@@ -220,13 +220,13 @@ let new_index_pair_map parameters error l =
         Ckappa_sig.GuardSite_map_and_set.Map.add parameters error k h map2
       in
       aux tl
-        (Ckappa_sig.guard_p_then_site_of_int
-           (Ckappa_sig.int_of_guard_p_then_site k + 1))
+        (Ckappa_sig.mvbdu_var_of_int
+           (Ckappa_sig.int_of_mvbdu_var k + 1))
         map1 map2 error
   in
   let error', (map1, map2) =
     aux l
-      (Ckappa_sig.guard_p_then_site_of_int 1)
+      (Ckappa_sig.mvbdu_var_of_int 1)
       Ckappa_sig.SiteOrGuard_map_and_set.Map.empty
       Ckappa_sig.GuardSite_map_and_set.Map.empty error
   in

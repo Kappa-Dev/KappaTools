@@ -75,7 +75,7 @@ module AgentsCV_setmap :
 module AgentSiteCV_setmap :
   SetMap.S
     with type elt =
-      Ckappa_sig.c_agent_name * Ckappa_sig.c_guard_p_then_site * cv_id
+      Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
 
 module AgentRuleCV_setmap :
   SetMap.S
@@ -93,7 +93,7 @@ module AgentSiteRuleCV_setmap :
   SetMap.S
     with type elt =
       Ckappa_sig.c_agent_name
-      * Ckappa_sig.c_guard_p_then_site
+      * Ckappa_sig.c_mvbdu_var
       * Ckappa_sig.c_rule_id
       * cv_id
 
@@ -110,14 +110,14 @@ module Project2bdu_potential :
   SetMap.Projection2
     with type elt_a =
       Ckappa_sig.c_agent_name
-      * Ckappa_sig.c_guard_p_then_site
+      * Ckappa_sig.c_mvbdu_var
       * Ckappa_sig.c_rule_id
       * cv_id
      and type elt_b = Ckappa_sig.c_rule_id
      and type 'a map_a = 'a AgentSiteRuleCV_setmap.Map.t
      and type 'a map_b = 'a Ckappa_sig.Rule_setmap.Map.t
      and type elt_c =
-      Ckappa_sig.c_agent_name * Ckappa_sig.c_guard_p_then_site * cv_id
+      Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
      and type 'a map_c = 'a AgentSiteCV_setmap.Map.t
 
 module Project2_bdu_views :
@@ -157,7 +157,7 @@ type predicate_covering_classes = {
     list
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
   site_correspondence:
-    (Ckappa_sig.c_guard_p_then_site
+    (Ckappa_sig.c_mvbdu_var
      Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.t
     * Ckappa_sig.c_site_or_guard_p
       Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.t)

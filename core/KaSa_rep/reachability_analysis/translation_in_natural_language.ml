@@ -16,23 +16,23 @@ let trace = false
 let _ = trace
 
 type token =
-  | Range of Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state list
+  | Range of Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state list
   | Equiv of
-      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
+      (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
+      * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
   | Imply of
-      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state)
+      (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
+      * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
   | Partition of
-      (Ckappa_sig.c_guard_p_then_site * (Ckappa_sig.c_state * token list) list)
+      (Ckappa_sig.c_mvbdu_var * (Ckappa_sig.c_state * token list) list)
   | No_known_translation of
-      (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state) list list
+      (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list list
 
 type rename_sites =
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
-  Ckappa_sig.c_guard_p_then_site ->
-  Exception.exceptions_caught_and_uncaught * Ckappa_sig.c_guard_p_then_site
+  Ckappa_sig.c_mvbdu_var ->
+  Exception.exceptions_caught_and_uncaught * Ckappa_sig.c_mvbdu_var
 
 (****************************************************************************)
 
@@ -844,7 +844,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
                     List.fold_left
                       (fun (error, bool) (site_type, state) ->
                         let site_or_guard =
-                          Ckappa_sig.site_or_guard_p_of_guard_p_then_site
+                          Ckappa_sig.site_or_guard_p_of_mvbdu_var
                             site_type nsites
                         in
                         let error', site_string =

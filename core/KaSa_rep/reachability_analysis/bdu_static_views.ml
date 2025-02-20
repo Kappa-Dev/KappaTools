@@ -56,7 +56,7 @@ type bdu_analysis_static = {
   store_guard_restriction_bdu:
     Ckappa_sig.Views_bdu.mvbdu Covering_classes_type.AgentCV_setmap.Map.t;
   site_to_renamed_site_list:
-    (Covering_classes_type.cv_id * Ckappa_sig.c_guard_p_then_site) list
+    (Covering_classes_type.cv_id * Ckappa_sig.c_mvbdu_var) list
     Ckappa_sig
     .Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
     .t;
@@ -615,7 +615,7 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
             | [] -> error, output
             | h :: t ->
               let h =
-                Ckappa_sig.guard_p_then_site_of_site_or_guard_p h nsites
+                Ckappa_sig.mvbdu_var_of_site_or_guard_p h nsites
               in
               let key = agent_type', h in
               let error, old =
@@ -637,7 +637,7 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
               aux error site' t output
           in
           aux error
-            (Ckappa_sig.guard_p_then_site_of_site Ckappa_sig.dummy_site_name_1)
+            (Ckappa_sig.mvbdu_var_of_site Ckappa_sig.dummy_site_name_1)
             list output)
         (error, output) triple_list)
     store_remanent_triple output
@@ -868,7 +868,7 @@ let rename_guards_in_mvbdu parameters error bdu bdu_handler rename
   let error, guard_parameter_renaming_list =
     List.fold_left
       (fun (error, renaming_list) g ->
-        let guard_parameter = Ckappa_sig.guard_p_then_site_of_guard g nsites in
+        let guard_parameter = Ckappa_sig.mvbdu_var_of_guard g nsites in
         let error, renamed = rename parameters error guard_parameter in
         match renamed with
         | None ->

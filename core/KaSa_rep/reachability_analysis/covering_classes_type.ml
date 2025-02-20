@@ -113,7 +113,7 @@ module AgentsCV_setmap = SetMap.Make (struct
 end)
 
 module AgentSiteCV_setmap = SetMap.Make (struct
-  type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_guard_p_then_site * cv_id
+  type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
 
   let compare = compare
   let print _ _ = ()
@@ -140,7 +140,7 @@ end)
 module AgentSiteRuleCV_setmap = SetMap.Make (struct
   type t =
     Ckappa_sig.c_agent_name
-    * Ckappa_sig.c_guard_p_then_site
+    * Ckappa_sig.c_mvbdu_var
     * Ckappa_sig.c_rule_id
     * cv_id
 
@@ -180,7 +180,7 @@ type predicate_covering_classes = {
     list
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
   site_correspondence:
-    (Ckappa_sig.c_guard_p_then_site
+    (Ckappa_sig.c_mvbdu_var
      Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.t
     * Ckappa_sig.c_site_or_guard_p
       Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.t)

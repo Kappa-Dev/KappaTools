@@ -44,5 +44,5 @@ val internal_pair_list_to_list :
   Ckappa_sig.c_site_name ->
   Site_graphs.KaSa_site_graph.agent_id ->
   Ckappa_sig.c_site_name ->
-  (Ckappa_sig.c_guard_p_then_site * Ckappa_sig.c_state) list list ->
+  (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list list ->
   Exception.exceptions_caught_and_uncaught * Site_graphs.KaSa_site_graph.t list

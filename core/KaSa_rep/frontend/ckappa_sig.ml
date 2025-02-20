@@ -35,7 +35,7 @@ type binding_state = Free | Lnk_type of agent_name * site_name
 type c_guard_parameter = int
 type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
 
-type c_guard_p_then_site =
+type c_mvbdu_var =
   int (*the first n elements are guards, the last ones are sites*)
 
 type mixture =
@@ -191,7 +191,7 @@ let site_name_of_int (a : int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
 let string_of_site_name (a : c_site_name) : string = string_of_int a
 
-let string_of_guard_p_then_site (a : c_guard_p_then_site) : string =
+let string_of_mvbdu_var (a : c_mvbdu_var) : string =
   string_of_int a
 
 let string_of_site_or_guard (a : c_site_or_guard_p) : string =
@@ -202,23 +202,23 @@ let state_index_of_int (a : int) : c_state = a
 let int_of_state_index (a : c_state) : int = a
 let string_of_state_index (a : c_state) : string = string_of_int a
 let guard_parameter_of_int (a : int) : c_guard_parameter = a
-let guard_p_then_site_of_int (a : int) : c_guard_p_then_site = a
-let int_of_guard_p_then_site (a : c_guard_p_then_site) : int = a
-let guard_p_then_site_of_site (a : c_site_name) : c_guard_p_then_site = a
+let mvbdu_var_of_int (a : int) : c_mvbdu_var = a
+let int_of_mvbdu_var (a : c_mvbdu_var) : int = a
+let mvbdu_var_of_site (a : c_site_name) : c_mvbdu_var = a
 
-let guard_p_then_site_of_guard (a : c_guard_parameter) (nsites : c_site_name) :
-    c_guard_p_then_site =
+let mvbdu_var_of_guard (a : c_guard_parameter) (nsites : c_site_name) :
+    c_mvbdu_var =
   a + nsites
 
-let guard_p_then_site_of_site_or_guard_p (a : c_site_or_guard_p)
-    (nsites : c_site_name) : c_guard_p_then_site =
+let mvbdu_var_of_site_or_guard_p (a : c_site_or_guard_p)
+    (nsites : c_site_name) : c_mvbdu_var =
   match a with
-  | Site s -> guard_p_then_site_of_site s
-  | Guard_p s -> guard_p_then_site_of_guard s nsites
+  | Site s -> mvbdu_var_of_site s
+  | Guard_p s -> mvbdu_var_of_guard s nsites
 
 let int_of_guard_parameter (a : c_guard_parameter) : int = a
 
-let site_or_guard_p_of_guard_p_then_site (a : c_guard_p_then_site)
+let site_or_guard_p_of_mvbdu_var (a : c_mvbdu_var)
     (nsites : c_site_name) : c_site_or_guard_p =
   if a < nsites then
     Site a
@@ -939,7 +939,7 @@ module GuardP_map_and_set = Map_wrapper.Make (SetMap.Make (struct
 end))
 
 module GuardSite_map_and_set = Map_wrapper.Make (SetMap.Make (struct
-  type t = c_guard_p_then_site
+  type t = c_mvbdu_var
 
   let compare = compare
   let print = Format.pp_print_int
@@ -1110,7 +1110,7 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
 
 module Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage
-    with type key = c_agent_name * c_guard_p_then_site
+    with type key = c_agent_name * c_mvbdu_var
      and type dimension = int * int =
   Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
 
@@ -1139,7 +1139,7 @@ module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
 (*guard parameters or site: the first n indexes are the guards, and the remaining are the sites*)
 module GuardPOrSite_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage
-    with type key = c_guard_p_then_site
+    with type key = c_mvbdu_var
      and type dimension = int =
   Int_storage.Nearly_inf_Imperatif
 
@@ -1371,7 +1371,7 @@ end))
 
 module Views_bdu :
   Mvbdu_wrapper.Mvbdu
-    with type key = c_guard_p_then_site
+    with type key = c_mvbdu_var
      and type value = c_state
     with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu =
   Mvbdu_wrapper.Mvbdu

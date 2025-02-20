@@ -12,7 +12,7 @@
     * en Automatique.  All rights reserved.  This file is distributed
     * under the terms of the GNU Library General Public License *)
 
-type variable = int (*Ckappa_sig.c_guard_p_then_site_name*)
+type variable = int (*Ckappa_sig.c_mvbdu_var*)
 type upper_bound = int
 type hash_key = int
 
