@@ -100,7 +100,7 @@ module Domain = struct
   let is_false_mvbdu parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, is_false =
-      Handler.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
+      Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, is_false
@@ -108,7 +108,7 @@ module Domain = struct
   let is_true_mvbdu parameters error dynamic mvbdu bdu_restriction =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, is_true =
-      Handler.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
+      Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
         bdu_restriction
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
@@ -265,7 +265,7 @@ module Domain = struct
         let restriction_mvbdu = get_restriction_mvbdu static in
         let bdu_handler = get_mvbdu_handler dynamic in
         let error, bdu_handler, bdu_union =
-          Handler.mvbdu_or_for_guards parameters bdu_handler error mvbdu
+          Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error mvbdu
             state_guard_parameters restriction_mvbdu
         in
         let dynamic = set_mvbdu_handler bdu_handler dynamic in

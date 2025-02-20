@@ -29,7 +29,7 @@ let collect_parallel_or_not_bonds_init parameters kappa_handler bdu_handler
       ?tuple_of_interest init_state.Cckappa_sig.e_init_c_mixture
   in
   let error, bdu_handler, mvbdu_guard =
-    Handler.guard_to_bdu_opt parameters error bdu_handler
+    Ckappa_sig.guard_to_bdu_opt parameters error bdu_handler
       init_state.Cckappa_sig.e_init_guard restriction_bdu nsites
   in
   Parallel_bonds_static.project_away_ag_id parameters kappa_handler bdu_handler

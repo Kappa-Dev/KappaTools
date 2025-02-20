@@ -482,7 +482,7 @@ let collect_potential_tuple_pair_init parameters error bdu_false handler
           pair_list
       in
       let error, handler, mvbdu_with_guard =
-        Handler.mvbdu_and_for_guards parameters handler error mvbdu guard_bdu
+        Ckappa_sig.mvbdu_and_for_guards parameters handler error mvbdu guard_bdu
       in
       let error, handler, store_result =
         Site_across_bonds_domain_type.add_link parameters error bdu_false

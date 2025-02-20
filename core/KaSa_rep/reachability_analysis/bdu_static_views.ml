@@ -123,7 +123,7 @@ let add_dependency_triple_bdu parameters handler error
     (agent_type, rule_id, cv_id) bdu store_result guard_bdu restriction_bdu =
   (*add guard information*)
   let error, handler, bdu =
-    Handler.mvbdu_and_for_guards parameters handler error bdu guard_bdu
+    Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu guard_bdu
   in
   let error, handler, bdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters handler error
@@ -135,7 +135,7 @@ let add_dependency_triple_bdu parameters handler error
   in
   (* In the case when the agent is created twice, we take the union *)
   let error, handler, bdu_new =
-    Handler.mvbdu_or_for_guards parameters handler error old_bdu bdu
+    Ckappa_sig.mvbdu_or_for_guards parameters handler error old_bdu bdu
       restriction_bdu
   in
   let store_result =
@@ -311,7 +311,7 @@ let collect_proj_bdu_creation_restriction_map parameters handler_bdu error
       bdu_true
       (fun parameters (error, handler_bdu) bdu bdu' ->
         let error, handler_bdu, bdu_union =
-          Handler.mvbdu_and_for_guards parameters handler_bdu error bdu bdu'
+          Ckappa_sig.mvbdu_and_for_guards parameters handler_bdu error bdu bdu'
         in
         (error, handler_bdu), bdu_union)
       store_bdu_creation_restriction_map
@@ -557,13 +557,14 @@ let store_bdu_potential_restriction_map_aux parameters handler error
                             bdu_true
                         in
                         let error, handler, bdu_potential_effect_with_guards =
-                          Handler.mvbdu_and_for_guards parameters handler error
-                            guard_bdu bdu_potential_effect
+                          Ckappa_sig.mvbdu_and_for_guards parameters handler
+                            error guard_bdu bdu_potential_effect
                         in
                         (*union of bdu and bdu effect*)
                         let error, handler, bdu =
-                          Handler.mvbdu_or_for_guards parameters handler error
-                            bdu bdu_potential_effect_with_guards restriction_bdu
+                          Ckappa_sig.mvbdu_or_for_guards parameters handler
+                            error bdu bdu_potential_effect_with_guards
+                            restriction_bdu
                         in
                         error, handler, bdu)
                       (error, handler, bdu_false)
@@ -614,9 +615,7 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
             match list with
             | [] -> error, output
             | h :: t ->
-              let h =
-                Ckappa_sig.mvbdu_var_of_site_or_guard_p h nsites
-              in
+              let h = Ckappa_sig.mvbdu_var_of_site_or_guard_p h nsites in
               let key = agent_type', h in
               let error, old =
                 match
@@ -804,7 +803,7 @@ let collect_bdu_test_restriction_map parameters handler error rule_id rule
                   get_bdu_guard store_guard_bdu agent_type cv_id bdu_true
                 in
                 let error, handler, bdu_test_with_guards =
-                  Handler.mvbdu_and_for_guards parameters handler error
+                  Ckappa_sig.mvbdu_and_for_guards parameters handler error
                     guard_bdu bdu_test
                 in
                 let error, store_result =
@@ -847,7 +846,7 @@ let collect_proj_bdu_test_restriction parameters handler_kappa error rule_id
       bdu_true
       (fun parameters (error, handler) bdu bdu' ->
         let error, handler, bdu_union =
-          Handler.mvbdu_and_for_guards parameters handler error bdu bdu'
+          Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu bdu'
         in
         (error, handler), bdu_union)
       store_bdu_test_restriction_map

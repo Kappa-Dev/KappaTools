@@ -401,8 +401,8 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
                     (fun (error, add_comma, pattern) (site_or_guard, state) ->
                       let error, (pattern, add_comma) =
                         match
-                          Ckappa_sig.site_or_guard_p_of_mvbdu_var
-                            site_or_guard nsites
+                          Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard
+                            nsites
                         with
                         | Ckappa_sig.Site _ ->
                           if site_or_guard = Ckappa_sig.fst_site then (
@@ -470,8 +470,8 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
                     let () = if add_comma then Loggers.fprintf log "," in
                     let error, string =
                       match
-                        Ckappa_sig.site_or_guard_p_of_mvbdu_var
-                          site_or_guard nsites
+                        Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard
+                          nsites
                       with
                       | Ckappa_sig.Site _ ->
                         if site_or_guard = Ckappa_sig.fst_site then (
@@ -514,7 +514,7 @@ let print_site_across_domain_decompose ?(verbose = true) ?(sparse = false)
   List.fold_left
     (fun (error, handler) mvbdu ->
       let error, handler, is_true =
-        Handler.mvbdu_is_true_for_guards parameters handler error mvbdu
+        Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
           restriction_mvbdu
       in
       if not is_true then

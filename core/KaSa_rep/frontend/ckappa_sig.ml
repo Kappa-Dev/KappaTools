@@ -190,9 +190,7 @@ let next_link_value (i : c_link_value) : c_link_value = i + 1
 let site_name_of_int (a : int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
 let string_of_site_name (a : c_site_name) : string = string_of_int a
-
-let string_of_mvbdu_var (a : c_mvbdu_var) : string =
-  string_of_int a
+let string_of_mvbdu_var (a : c_mvbdu_var) : string = string_of_int a
 
 let string_of_site_or_guard (a : c_site_or_guard_p) : string =
   match a with
@@ -210,16 +208,16 @@ let mvbdu_var_of_guard (a : c_guard_parameter) (nsites : c_site_name) :
     c_mvbdu_var =
   a + nsites
 
-let mvbdu_var_of_site_or_guard_p (a : c_site_or_guard_p)
-    (nsites : c_site_name) : c_mvbdu_var =
+let mvbdu_var_of_site_or_guard_p (a : c_site_or_guard_p) (nsites : c_site_name)
+    : c_mvbdu_var =
   match a with
   | Site s -> mvbdu_var_of_site s
   | Guard_p s -> mvbdu_var_of_guard s nsites
 
 let int_of_guard_parameter (a : c_guard_parameter) : int = a
 
-let site_or_guard_p_of_mvbdu_var (a : c_mvbdu_var)
-    (nsites : c_site_name) : c_site_or_guard_p =
+let site_or_guard_p_of_mvbdu_var (a : c_mvbdu_var) (nsites : c_site_name) :
+    c_site_or_guard_p =
   if a < nsites then
     Site a
   else
@@ -1138,9 +1136,7 @@ module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
 
 (*guard parameters or site: the first n indexes are the guards, and the remaining are the sites*)
 module GuardPOrSite_nearly_Inf_Int_storage_Imperatif :
-  Int_storage.Storage
-    with type key = c_mvbdu_var
-     and type dimension = int =
+  Int_storage.Storage with type key = c_mvbdu_var and type dimension = int =
   Int_storage.Nearly_inf_Imperatif
 
 (*state*)
@@ -1389,3 +1385,94 @@ let empty_side_effects =
     not_seen_yet = AgentsSiteState_map_and_set.Map.empty;
     seen = AgentSiteState_map_and_set.Set.empty;
   }
+
+(*****************************************************************************)
+(*MVBDU OF THE GUARDS*)
+(*****************************************************************************)
+
+(* bdu operations that restrict the values of the guards to 0 and 1*)
+(** Returns the disjunction of the two mvbdus but the values of each variable are restricted to the values 0 and 1.
+Used for the guard parameters, which model boolean values. *)
+
+let mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+    bdu_restriction =
+  let error, handler_bdu, or_bdu =
+    Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
+  in
+  (*all guard parameters must have value 0 or 1*)
+  Views_bdu.mvbdu_and parameters handler_bdu error or_bdu bdu_restriction
+
+let mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2 =
+  Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 mvbdu2
+
+let mvbdu_not_for_guards parameters handler_bdu error mvbdu bdu_restriction =
+  let error, handler_bdu, not_bdu =
+    Views_bdu.mvbdu_not parameters handler_bdu error mvbdu
+  in
+  (*all guard parameters must have value 0 or 1*)
+  Views_bdu.mvbdu_and parameters handler_bdu error not_bdu bdu_restriction
+
+let mvbdu_is_true_for_guards parameters handler_bdu error mvbdu bdu_restriction
+    =
+  let error, handler_bdu, inter_mvbdu =
+    Views_bdu.mvbdu_and parameters handler_bdu error mvbdu bdu_restriction
+  in
+  error, handler_bdu, Views_bdu.equal inter_mvbdu bdu_restriction
+
+let mvbdu_is_false_for_guards parameters handler_bdu error mvbdu =
+  let error, handler_bdu, mvbdu_false =
+    Views_bdu.mvbdu_false parameters handler_bdu error
+  in
+  error, handler_bdu, Views_bdu.equal mvbdu mvbdu_false
+
+(**Returns the bdu representation of the guard, and a bdu that maps each guard to 1 or 0.
+This second bdu is used to restrict the bdus that are calculated by using "or" and "not"
+to valid bdus where the values of the guards can only be 0 and 1. *)
+let guard_to_bdu parameters error handler_bdu guard bdu_restriction nsites =
+  let rec aux error handler_bdu guard =
+    match guard with
+    | LKappa.True -> Views_bdu.mvbdu_true parameters handler_bdu error
+    | LKappa.False -> Views_bdu.mvbdu_false parameters handler_bdu error
+    | LKappa.Param (a, _) ->
+      let error, handler_bdu, association_list =
+        Views_bdu.build_association_list parameters handler_bdu error
+          [ mvbdu_var_of_guard a nsites, dummy_state_index_true ]
+      in
+      Views_bdu.mvbdu_of_hconsed_asso parameters handler_bdu error
+        association_list
+    | LKappa.Not g1 ->
+      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
+      mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
+    | LKappa.And (g1, g2) ->
+      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
+      let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
+      mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+    | LKappa.Or (g1, g2) ->
+      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
+      let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
+      let error, handler, result =
+        mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+          bdu_restriction
+      in
+      error, handler, result
+  in
+  aux error handler_bdu guard
+
+let guard_to_bdu_opt parameters error handler_bdu guard bdu_restriction nsites =
+  match guard with
+  | None -> Views_bdu.mvbdu_true parameters handler_bdu error
+  | Some g -> guard_to_bdu parameters error handler_bdu g bdu_restriction nsites
+
+let compute_restriction_mvbdu parameters error mvbdu_handler nr_guard_parameters
+    nsites =
+  let guard_p_list = get_list_of_guard_parameters nr_guard_parameters in
+  let pair_list =
+    List.map
+      (fun guard ->
+        ( mvbdu_var_of_guard guard nsites,
+          (Some dummy_state_index_false, Some dummy_state_index_true) ))
+      guard_p_list
+  in
+  Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error pair_list
+
+(*****************************************************************************)

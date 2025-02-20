@@ -1,5 +1,5 @@
 (**
- * ckappa_sig.ml
+ * Ckappa_sig.ml
  * openkappa
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
@@ -79,9 +79,7 @@ val guard_parameter_of_int : int -> c_guard_parameter
 val mvbdu_var_of_int : int -> c_mvbdu_var
 val int_of_mvbdu_var : c_mvbdu_var -> int
 val mvbdu_var_of_site : c_site_name -> c_mvbdu_var
-
-val mvbdu_var_of_guard :
-  c_guard_parameter -> c_site_name -> c_mvbdu_var
+val mvbdu_var_of_guard : c_guard_parameter -> c_site_name -> c_mvbdu_var
 
 val mvbdu_var_of_site_or_guard_p :
   c_site_or_guard_p -> c_site_name -> c_mvbdu_var
@@ -561,9 +559,7 @@ module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_site_name and type dimension = int
 
 module GuardPOrSite_nearly_Inf_Int_storage_Imperatif :
-  Int_storage.Storage
-    with type key = c_mvbdu_var
-     and type dimension = int
+  Int_storage.Storage with type key = c_mvbdu_var and type dimension = int
 
 module State_index_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_state and type dimension = int
@@ -650,9 +646,7 @@ module AgentsSitePState_map_and_set :
     with type elt = c_agent_id * c_agent_name * c_site_name * pair_of_states
 
 module Views_bdu :
-  Mvbdu_wrapper.Mvbdu
-    with type key = c_mvbdu_var
-     and type value = c_state
+  Mvbdu_wrapper.Mvbdu with type key = c_mvbdu_var and type value = c_state
 
 module Views_intbdu :
   Mvbdu_wrapper.Internalized_mvbdu
@@ -687,3 +681,89 @@ type side_effects = {
 }
 
 val empty_side_effects : side_effects
+
+(*****************************************************************************)
+(*MVBDU OF THE GUARDS*)
+(*****************************************************************************)
+
+val mvbdu_or_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val mvbdu_and_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val mvbdu_not_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val mvbdu_is_true_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * bool
+
+val mvbdu_is_false_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * bool
+
+val compute_restriction_mvbdu :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.handler ->
+  c_guard_parameter ->
+  c_site_name ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val guard_to_bdu :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.handler ->
+  c_guard_parameter LKappa.guard ->
+  Views_bdu.mvbdu ->
+  c_site_name ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val guard_to_bdu_opt :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.handler ->
+  c_guard_parameter LKappa.guard option ->
+  Views_bdu.mvbdu ->
+  c_site_name ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu

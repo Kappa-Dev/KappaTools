@@ -189,7 +189,7 @@ let add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu =
     Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters bdu_handler error
       pair_list
   in
-  Handler.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+  Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
     is_parallel_bond_mvbdu
 
 let add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
@@ -232,27 +232,27 @@ let compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
       bdu_non_parallel
   in
   let error, bdu_handler, bdu_only_guards_parallel_negation =
-    Handler.mvbdu_not_for_guards parameters bdu_handler error
+    Ckappa_sig.mvbdu_not_for_guards parameters bdu_handler error
       bdu_only_guards_parallel restriction_bdu
   in
   let error, bdu_handler, bdu_only_guards_non_parallel_negation =
-    Handler.mvbdu_not_for_guards parameters bdu_handler error
+    Ckappa_sig.mvbdu_not_for_guards parameters bdu_handler error
       bdu_only_guards_non_parallel restriction_bdu
   in
   let error, bdu_handler, bdu_any_bond =
-    Handler.mvbdu_and_for_guards parameters bdu_handler error
+    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
       bdu_only_guards_parallel bdu_only_guards_non_parallel
   in
   let error, bdu_handler, bdu_only_parallel_bond =
-    Handler.mvbdu_and_for_guards parameters bdu_handler error
+    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
       bdu_only_guards_parallel bdu_only_guards_non_parallel_negation
   in
   let error, bdu_handler, bdu_only_non_parallel_bond =
-    Handler.mvbdu_and_for_guards parameters bdu_handler error
+    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
       bdu_only_guards_parallel_negation bdu_only_guards_non_parallel
   in
   let error, bdu_handler, bdu_undefined_bonds =
-    Handler.mvbdu_and_for_guards parameters bdu_handler error
+    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
       bdu_only_guards_parallel_negation bdu_only_guards_non_parallel_negation
   in
   ( error,
@@ -391,11 +391,11 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     let error, bdu_handler =
       (*for which values of the guards are all double bonds parallel?*)
       let error, bdu_handler, parallel_is_false =
-        Handler.mvbdu_is_false_for_guards parameters bdu_handler error
+        Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
           parallel_bond_mvbdu
       in
       let error, bdu_handler, parallel_is_true =
-        Handler.mvbdu_is_true_for_guards parameters bdu_handler error
+        Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
           parallel_bond_mvbdu restriction_bdu
       in
       if parallel_is_false then
@@ -483,11 +483,11 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     let error, bdu_handler =
       (*for which values of the guards are all double bonds non-parallel?*)
       let error, bdu_handler, non_parallel_is_false =
-        Handler.mvbdu_is_false_for_guards parameters bdu_handler error
+        Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
           non_parallel_bond_mvbdu
       in
       let error, bdu_handler, non_parallel_is_true =
-        Handler.mvbdu_is_true_for_guards parameters bdu_handler error
+        Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
           non_parallel_bond_mvbdu restriction_bdu
       in
       if non_parallel_is_false then
@@ -575,11 +575,11 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
         if dump_any then
           if verbose then (
             let error, bdu_handler, any_bond_is_false =
-              Handler.mvbdu_is_false_for_guards parameters bdu_handler error
+              Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
                 any_bond_mvbdu
             in
             let error, bdu_handler, any_bond_is_true =
-              Handler.mvbdu_is_true_for_guards parameters bdu_handler error
+              Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
                 any_bond_mvbdu restriction_bdu
             in
             let error, bdu_handler =
@@ -679,7 +679,7 @@ let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
         mvbdu
      in *)
   let error, bdu_handler, new_mvbdu =
-    Handler.mvbdu_or_for_guards parameters bdu_handler error old_mvbdu mvbdu
+    Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_mvbdu mvbdu
       restriction_mvbdu
   in
   let error, store_result =
@@ -719,7 +719,7 @@ let add_value_and_event parameters error kappa_handler x value store_set
   let proj' (a, _, c, _, _) = a, c in
   let pair (x, y) = proj x, proj' x, proj y, proj' y in
   let error, bdu_handler, new_value =
-    Handler.mvbdu_or_for_guards parameters bdu_handler error old_value
+    Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_value
       value_mvbdu restriction_mvbdu
   in
   if Ckappa_sig.Views_bdu.equal new_value old_value then

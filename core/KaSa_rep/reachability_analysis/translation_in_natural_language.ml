@@ -844,8 +844,8 @@ let rec print ?beginning_of_sentence:(beggining = true)
                     List.fold_left
                       (fun (error, bool) (site_type, state) ->
                         let site_or_guard =
-                          Ckappa_sig.site_or_guard_p_of_mvbdu_var
-                            site_type nsites
+                          Ckappa_sig.site_or_guard_p_of_mvbdu_var site_type
+                            nsites
                         in
                         let error', site_string =
                           match site_or_guard with

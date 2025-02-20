@@ -310,3 +310,14 @@ val build_address :
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   site_address
+
+val collect_guard_mvbdus :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Ckappa_sig.Views_bdu.handler ->
+  compil ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Ckappa_sig.c_site_name ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t

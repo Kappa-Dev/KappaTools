@@ -583,9 +583,7 @@ let string_of_state_fully_deciphered =
 let string_of_state_fully_deciphered_with_guard parameter error handler_kappa
     agent_name site_or_guard state =
   let nsites = get_nsites handler_kappa in
-  match
-    Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard nsites
-  with
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard nsites with
   | Ckappa_sig.Site site_name ->
     string_of_state_gen print_state_fully_deciphered parameter error
       handler_kappa agent_name site_name state
@@ -648,9 +646,7 @@ let string_of_site_in_natural_language parameter error handler_kapp agent_type
 let string_of_site_or_guard_in_natural_language parameter error handler_kapp
     agent_type (site_or_guard_int : Ckappa_sig.c_mvbdu_var) =
   let nsites = get_nsites handler_kapp in
-  match
-    Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard_int nsites
-  with
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard_int nsites with
   | Ckappa_sig.Site site_int ->
     string_of_site_in_natural_language parameter error handler_kapp agent_type
       site_int
@@ -679,9 +675,7 @@ let string_of_site_contact_map ?(ml_pos = None) ?(ka_pos = None) ?(message = "")
 let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
     ?(message = "") parameter error handler_kappa agent_name site_or_guard_int =
   let nsites = get_nsites handler_kappa in
-  match
-    Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard_int nsites
-  with
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard_int nsites with
   | Ckappa_sig.Site s ->
     string_of_site_contact_map ~ml_pos ~ka_pos ~message parameter error
       handler_kappa agent_name s
@@ -708,8 +702,7 @@ let print_guard_mvbdu parameters error kappa_handler bdu_handler
             (fun (add_comma, error) (guard_name, value) ->
               let error, _ =
                 match
-                  Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name
-                    nsites
+                  Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites
                 with
                 | Ckappa_sig.Guard_p guard_name ->
                   let error, guard_string =
@@ -731,108 +724,6 @@ let print_guard_mvbdu parameters error kappa_handler bdu_handler
   (* let () = Loggers.fprintf loggers ")" in *)
   error, bdu_handler
 
-(*****************************************************************************)
-(*MVBDU OF THE GUARDS*)
-(*****************************************************************************)
-
-(* bdu operations that restrict the values of the guards to 0 and 1*)
-(** Returns the disjunction of the two mvbdus but the values of each variable are restricted to the values 0 and 1.
-  Used for the guard parameters, which model boolean values. *)
-
-let mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-    bdu_restriction =
-  let error, handler_bdu, or_bdu =
-    Ckappa_sig.Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
-  in
-  (*all guard parameters must have value 0 or 1*)
-  Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error or_bdu
-    bdu_restriction
-
-let mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2 =
-  Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 mvbdu2
-
-let mvbdu_not_for_guards parameters handler_bdu error mvbdu bdu_restriction =
-  let error, handler_bdu, not_bdu =
-    Ckappa_sig.Views_bdu.mvbdu_not parameters handler_bdu error mvbdu
-  in
-  (*all guard parameters must have value 0 or 1*)
-  Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error not_bdu
-    bdu_restriction
-
-let mvbdu_is_true_for_guards parameters handler_bdu error mvbdu bdu_restriction
-    =
-  let error, handler_bdu, inter_mvbdu =
-    Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error mvbdu
-      bdu_restriction
-  in
-  error, handler_bdu, Ckappa_sig.Views_bdu.equal inter_mvbdu bdu_restriction
-
-let mvbdu_is_false_for_guards parameters handler_bdu error mvbdu =
-  let error, handler_bdu, mvbdu_false =
-    Ckappa_sig.Views_bdu.mvbdu_false parameters handler_bdu error
-  in
-  error, handler_bdu, Ckappa_sig.Views_bdu.equal mvbdu mvbdu_false
-
-let compute_restriction_mvbdu parameters error mvbdu_handler kappa_handler =
-  let nr_guard_parameters = get_nr_guard_parameters kappa_handler in
-  let nsites = get_nsites kappa_handler in
-  let guard_p_list =
-    Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
-  in
-  let pair_list =
-    List.map
-      (fun guard ->
-        ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
-          ( Some Ckappa_sig.dummy_state_index_false,
-            Some Ckappa_sig.dummy_state_index_true ) ))
-      guard_p_list
-  in
-  Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error
-    pair_list
-
-(**Returns the bdu representation of the guard, and a bdu that maps each guard to 1 or 0.
-  This second bdu is used to restrict the bdus that are calculated by using "or" and "not"
-  to valid bdus where the values of the guards can only be 0 and 1. *)
-let guard_to_bdu parameters error handler_bdu guard bdu_restriction nsites =
-  let rec aux error handler_bdu guard =
-    match guard with
-    | LKappa.True ->
-      Ckappa_sig.Views_bdu.mvbdu_true parameters handler_bdu error
-    | LKappa.False ->
-      Ckappa_sig.Views_bdu.mvbdu_false parameters handler_bdu error
-    | LKappa.Param (a, _) ->
-      let error, handler_bdu, association_list =
-        Ckappa_sig.Views_bdu.build_association_list parameters handler_bdu error
-          [
-            ( Ckappa_sig.mvbdu_var_of_guard a nsites,
-              Ckappa_sig.dummy_state_index_true );
-          ]
-      in
-      Ckappa_sig.Views_bdu.mvbdu_of_hconsed_asso parameters handler_bdu error
-        association_list
-    | LKappa.Not g1 ->
-      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
-      mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
-    | LKappa.And (g1, g2) ->
-      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
-      let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
-      mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-    | LKappa.Or (g1, g2) ->
-      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
-      let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
-      let error, handler, result =
-        mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-          bdu_restriction
-      in
-      error, handler, result
-  in
-  aux error handler_bdu guard
-
-let guard_to_bdu_opt parameters error handler_bdu guard bdu_restriction nsites =
-  match guard with
-  | None -> Ckappa_sig.Views_bdu.mvbdu_true parameters handler_bdu error
-  | Some g -> guard_to_bdu parameters error handler_bdu g bdu_restriction nsites
-
 let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
     ?(with_comma = false) mvbdu restriction_bdu =
   let error, bdu_handler, mvbdu_list =
@@ -843,7 +734,7 @@ let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
     List.fold_left
       (fun (error, bdu_handler, with_comma) mvbdu ->
         let error, bdu_handler, is_true =
-          mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
+          Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
             restriction_bdu
         in
         let error, bdu_handler, variables =
@@ -881,27 +772,6 @@ let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
   in
   error, bdu_handler
 
-let collect_guard_mvbdus parameters error mvbdu_handler compilation
-    bdu_restriction nsites =
-  let error, (mvbdu_handler, guard_mvbdus) =
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
-      (fun parameters error rule_id rule (mvbdu_handler, guard_mvbdus) ->
-        match rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.guard with
-        | None -> error, (mvbdu_handler, guard_mvbdus)
-        | Some guard ->
-          let error, mvbdu_handler, bdu =
-            guard_to_bdu parameters error mvbdu_handler guard bdu_restriction
-              nsites
-          in
-          ( error,
-            ( mvbdu_handler,
-              Ckappa_sig.Rule_setmap.Map.add rule_id bdu guard_mvbdus ) ))
-      compilation.Cckappa_sig.rules
-      (mvbdu_handler, Ckappa_sig.Rule_setmap.Map.empty)
-  in
-  error, mvbdu_handler, guard_mvbdus
-
-(*****************************************************************************)
 (*****************************************************************************)
 
 let print_labels parameters error handler couple =

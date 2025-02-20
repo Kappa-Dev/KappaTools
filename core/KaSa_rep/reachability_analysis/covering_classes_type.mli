@@ -74,8 +74,7 @@ module AgentsCV_setmap :
 
 module AgentSiteCV_setmap :
   SetMap.S
-    with type elt =
-      Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
+    with type elt = Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
 
 module AgentRuleCV_setmap :
   SetMap.S
@@ -116,8 +115,7 @@ module Project2bdu_potential :
      and type elt_b = Ckappa_sig.c_rule_id
      and type 'a map_a = 'a AgentSiteRuleCV_setmap.Map.t
      and type 'a map_b = 'a Ckappa_sig.Rule_setmap.Map.t
-     and type elt_c =
-      Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
+     and type elt_c = Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
      and type 'a map_c = 'a AgentSiteCV_setmap.Map.t
 
 module Project2_bdu_views :

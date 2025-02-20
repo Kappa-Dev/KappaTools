@@ -287,18 +287,19 @@ let scan_rule static error mvbdu_handler =
   let parameters = get_parameter static in
   let kappa_handler = get_kappa_handler static in
   let nsites = get_nsites static in
+  let nr_guard_parameters = get_nr_guard_parameters static in
   let compilation = get_cc_code static in
   let error, store_result =
     Common_static.scan_rule_set parameters error kappa_handler compilation
   in
   let static = set_common_views store_result static in
   let error, mvbdu_handler, restriction_mvbdu =
-    Handler.compute_restriction_mvbdu parameters error mvbdu_handler
-      kappa_handler
+    Ckappa_sig.compute_restriction_mvbdu parameters error mvbdu_handler
+      nr_guard_parameters nsites
   in
   let static = set_restriction_mvbdu restriction_mvbdu static in
   let error, mvbdu_handler, guard_mvbdus =
-    Handler.collect_guard_mvbdus parameters error mvbdu_handler compilation
+    Cckappa_sig.collect_guard_mvbdus parameters error mvbdu_handler compilation
       restriction_mvbdu nsites
   in
   let static = set_guard_mvbdus guard_mvbdus static in

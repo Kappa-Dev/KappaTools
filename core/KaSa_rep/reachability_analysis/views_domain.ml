@@ -335,7 +335,7 @@ module Domain = struct
     in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_or =
-      Handler.mvbdu_or_for_guards parameters handler error bdu1 bdu2
+      Ckappa_sig.mvbdu_or_for_guards parameters handler error bdu1 bdu2
         restriction_bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -915,9 +915,7 @@ module Domain = struct
     let error, renaming_list =
       List.fold_left_map
         (fun error g ->
-          let guard_parameter =
-            Ckappa_sig.mvbdu_var_of_guard g nsites
-          in
+          let guard_parameter = Ckappa_sig.mvbdu_var_of_guard g nsites in
           let error, renamed =
             Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.get
               parameters error guard_parameter map1
@@ -947,7 +945,7 @@ module Domain = struct
     let nsites = get_nsites static in
     let nr_guard_parameters = get_nr_guard_parameters static in
     let error, handler, guard_bdu =
-      Handler.guard_to_bdu_opt parameters error handler guard
+      Ckappa_sig.guard_to_bdu_opt parameters error handler guard
         original_restriction_bdu nsites
     in
     let error, (map1, _) =
@@ -1006,7 +1004,7 @@ module Domain = struct
                           static
                       in
                       let error, handler, bdu_init_with_guard =
-                        Handler.mvbdu_and_for_guards parameters handler error
+                        Ckappa_sig.mvbdu_and_for_guards parameters handler error
                           guard_bdu bdu_init
                       in
                       let dynamic = set_mvbdu_handler handler dynamic in
@@ -1051,9 +1049,7 @@ module Domain = struct
     let error, (guard_parameter_renamed_list, rename_back_list) =
       List.fold_left
         (fun (error, (renamed_list, rename_back_list)) g ->
-          let guard_parameter =
-            Ckappa_sig.mvbdu_var_of_guard g nsites
-          in
+          let guard_parameter = Ckappa_sig.mvbdu_var_of_guard g nsites in
           let error, renamed =
             Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.get
               parameters error guard_parameter map1
@@ -1126,7 +1122,8 @@ module Domain = struct
           (*bdu intersection*)
           let handler = get_mvbdu_handler dynamic in
           let error, handler, bdu_inter =
-            Handler.mvbdu_and_for_guards parameters handler error bdu_test bdu_X
+            Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu_test
+              bdu_X
           in
           let dynamic = set_mvbdu_handler handler dynamic in
           if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false then
@@ -1144,7 +1141,7 @@ module Domain = struct
             in
             (* intersect result with the current guard bdu*)
             let error, handler, result_bdu_guard =
-              Handler.mvbdu_and_for_guards parameters handler error
+              Ckappa_sig.mvbdu_and_for_guards parameters handler error
                 result_bdu_guard bdu_proj_guard
             in
             let dynamic = set_mvbdu_handler handler dynamic in
@@ -1232,7 +1229,8 @@ module Domain = struct
           (*Bdu_X and Bdu_test*)
           let handler = Analyzer_headers.get_mvbdu_handler dynamic in
           let error, handler, bdu_test_X =
-            Handler.mvbdu_and_for_guards parameters handler error bdu_X bdu_test
+            Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu_X
+              bdu_test
           in
           (* compute the projection over new_site_name *)
           let error, handler, singleton =
@@ -1254,7 +1252,7 @@ module Domain = struct
           in
           (* conjunction between bdu and bdu'*)
           let error, handler, bdu =
-            Handler.mvbdu_and_for_guards parameters handler error bdu
+            Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu
               bdu_renamed
           in
           let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
@@ -1581,8 +1579,8 @@ module Domain = struct
                         handler error
                         [ new_site_name_y, state ]
                     in
-                    Handler.mvbdu_and_for_guards parameters handler error bdu_X
-                      mvbdu_B_y
+                    Ckappa_sig.mvbdu_and_for_guards parameters handler error
+                      bdu_X mvbdu_B_y
                   ) else
                     error, handler, bdu_X
                 in
@@ -1600,7 +1598,7 @@ module Domain = struct
                     bdu_proj new_site_name_1
                 in
                 let error, handler, bdu =
-                  Handler.mvbdu_and_for_guards parameters handler error bdu
+                  Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu
                     bdu_renamed
                 in
                 let dynamic =
@@ -2298,7 +2296,7 @@ module Domain = struct
               in
               let handler = Analyzer_headers.get_mvbdu_handler dynamic in
               let error, handler, bdu_test_X =
-                Handler.mvbdu_and_for_guards parameters handler error bdu_X
+                Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu_X
                   bdu_test
               in
               let error, handler, singleton =
@@ -2321,7 +2319,7 @@ module Domain = struct
               in
               (* conjunction between bdu and bdu'*)
               let error, handler, bdu =
-                Handler.mvbdu_and_for_guards parameters handler error bdu
+                Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu
                   bdu_renamed
               in
               let dynamic =
@@ -2491,8 +2489,8 @@ module Domain = struct
                         (*if it does not overlap then answer false, otherwise
                           continue*)
                         let error, handler, bdu_inter =
-                          Handler.mvbdu_and_for_guards parameters handler error
-                            bdu_test bdu_X
+                          Ckappa_sig.mvbdu_and_for_guards parameters handler
+                            error bdu_test bdu_X
                         in
                         let dynamic = set_mvbdu_handler handler dynamic in
                         (*check if it is overlap or not?*)
@@ -2509,7 +2507,7 @@ module Domain = struct
                           in
                           (* intersect result with the current guard bdu*)
                           let error, handler, result_bdu_guard =
-                            Handler.mvbdu_and_for_guards parameters handler
+                            Ckappa_sig.mvbdu_and_for_guards parameters handler
                               error result_bdu_guard bdu_proj_guard
                           in
                           let dynamic = set_mvbdu_handler handler dynamic in
@@ -2679,7 +2677,8 @@ module Domain = struct
     in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_inter =
-      Handler.mvbdu_and_for_guards parameter_views handler error bdu_X bdu_test
+      Ckappa_sig.mvbdu_and_for_guards parameter_views handler error bdu_X
+        bdu_test
     in
     (*redefine with modification list*)
     let error, handler, bdu_redefine =
@@ -2692,7 +2691,7 @@ module Domain = struct
         map1 nr_guard_parameters nsites
     in
     let error, handler, bdu_with_guard =
-      Handler.mvbdu_and_for_guards parameter_views handler error bdu_redefine
+      Ckappa_sig.mvbdu_and_for_guards parameter_views handler error bdu_redefine
         renamed_precondition_guard_bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -2726,7 +2725,7 @@ module Domain = struct
         map1 nr_guard_parameters nsites
     in
     let error, handler, bdu_with_guard =
-      Handler.mvbdu_and_for_guards parameters handler error bdu_creation
+      Ckappa_sig.mvbdu_and_for_guards parameters handler error bdu_creation
         renamed_precondition_guard_bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -2748,7 +2747,8 @@ module Domain = struct
     in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_inter =
-      Handler.mvbdu_and_for_guards parameter_views handler error bdu_X bdu_test
+      Ckappa_sig.mvbdu_and_for_guards parameter_views handler error bdu_X
+        bdu_test
     in
     (*redefine with modification list*)
     let error, handler, bdu_redefine =
@@ -2761,7 +2761,7 @@ module Domain = struct
         map1 nr_guard_parameters nsites
     in
     let error, handler, bdu_with_guard =
-      Handler.mvbdu_and_for_guards parameter_views handler error bdu_redefine
+      Ckappa_sig.mvbdu_and_for_guards parameter_views handler error bdu_redefine
         renamed_precondition_guard_bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -3107,9 +3107,7 @@ module Domain = struct
                 (fun (error, list) i ->
                   let error, new_name = rename_site parameters error i in
                   ( error,
-                    ( i,
-                      Ckappa_sig.mvbdu_var_of_site_or_guard_p new_name
-                        nsites )
+                    (i, Ckappa_sig.mvbdu_var_of_site_or_guard_p new_name nsites)
                     :: list ))
                 (error, []) (List.rev list)
             in
@@ -3138,7 +3136,7 @@ module Domain = struct
               Ckappa_sig.Views_bdu.store_by_variables_list
                 Wrapped_modules.LoggedIntMap.find_default_without_logs
                 Wrapped_modules.LoggedIntMap.add_or_overwrite mvbdu_true
-                Handler.mvbdu_and_for_guards parameters handler error
+                Ckappa_sig.mvbdu_and_for_guards parameters handler error
                 hconsed_vars renamed_mvbdu cv_map
             in
             let error, output =
@@ -3272,9 +3270,7 @@ module Domain = struct
                           (Ckappa_sig.mvbdu_var_of_site
                              Ckappa_sig.dummy_site_name_minus1)
                       | error, Some i ->
-                        ( error,
-                          Ckappa_sig.mvbdu_var_of_site_or_guard_p i
-                            nsites )
+                        error, Ckappa_sig.mvbdu_var_of_site_or_guard_p i nsites
                     in
                     error, site_type
                   in
@@ -3617,8 +3613,7 @@ module Domain = struct
                 | [] -> error, (handler, contact_map)
                 | [ (site_type, _) ] :: _ ->
                   (match
-                     Ckappa_sig.site_or_guard_p_of_mvbdu_var site_type
-                       nsites
+                     Ckappa_sig.site_or_guard_p_of_mvbdu_var site_type nsites
                    with
                   | Ckappa_sig.Guard_p _ -> error, (handler, contact_map)
                   | Ckappa_sig.Site site_type ->
@@ -3638,8 +3633,7 @@ module Domain = struct
                             match l with
                             | [ (site_type', state) ]
                               when site_type'
-                                   = Ckappa_sig.mvbdu_var_of_site
-                                       site_type ->
+                                   = Ckappa_sig.mvbdu_var_of_site site_type ->
                               Preprocess.add_internal_state_in_contact_map
                                 parameters error (ag_type, site_type) state
                                 contact_map
@@ -3657,8 +3651,7 @@ module Domain = struct
                             match l with
                             | [ (site_type', state) ]
                               when site_type'
-                                   = Ckappa_sig.mvbdu_var_of_site
-                                       site_type ->
+                                   = Ckappa_sig.mvbdu_var_of_site site_type ->
                               if state = Ckappa_sig.state_index_of_int 0 then
                                 (* we ignore free sites *)
                                 error, contact_map
