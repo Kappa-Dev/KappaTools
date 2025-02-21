@@ -294,13 +294,13 @@ let scan_rule static error mvbdu_handler =
   in
   let static = set_common_views store_result static in
   let error, mvbdu_handler, restriction_mvbdu =
-    Ckappa_sig.compute_restriction_mvbdu parameters error mvbdu_handler
+    Common_static.compute_restriction_mvbdu parameters error mvbdu_handler
       nr_guard_parameters nsites
   in
   let static = set_restriction_mvbdu restriction_mvbdu static in
   let error, mvbdu_handler, guard_mvbdus =
-    Cckappa_sig.collect_guard_mvbdus parameters error mvbdu_handler compilation
-      restriction_mvbdu nsites
+    Common_static.collect_guard_mvbdus parameters error mvbdu_handler
+      compilation restriction_mvbdu nsites
   in
   let static = set_guard_mvbdus guard_mvbdus static in
   error, mvbdu_handler, static

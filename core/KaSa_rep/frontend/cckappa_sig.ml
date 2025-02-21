@@ -686,23 +686,3 @@ let add_agent_interface parameters error site agent_interface =
       ~message:"this agent interface is already used" Exit
   in
   error, agent_interface
-
-let collect_guard_mvbdus parameters error mvbdu_handler compilation
-    bdu_restriction nsites =
-  let error, (mvbdu_handler, guard_mvbdus) =
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
-      (fun parameters error rule_id rule (mvbdu_handler, guard_mvbdus) ->
-        match rule.e_rule_c_rule.guard with
-        | None -> error, (mvbdu_handler, guard_mvbdus)
-        | Some guard ->
-          let error, mvbdu_handler, bdu =
-            Ckappa_sig.guard_to_bdu parameters error mvbdu_handler guard
-              bdu_restriction nsites
-          in
-          ( error,
-            ( mvbdu_handler,
-              Ckappa_sig.Rule_setmap.Map.add rule_id bdu guard_mvbdus ) ))
-      compilation.rules
-      (mvbdu_handler, Ckappa_sig.Rule_setmap.Map.empty)
-  in
-  error, mvbdu_handler, guard_mvbdus

@@ -1463,16 +1463,4 @@ let guard_to_bdu_opt parameters error handler_bdu guard bdu_restriction nsites =
   | None -> Views_bdu.mvbdu_true parameters handler_bdu error
   | Some g -> guard_to_bdu parameters error handler_bdu g bdu_restriction nsites
 
-let compute_restriction_mvbdu parameters error mvbdu_handler nr_guard_parameters
-    nsites =
-  let guard_p_list = get_list_of_guard_parameters nr_guard_parameters in
-  let pair_list =
-    List.map
-      (fun guard ->
-        ( mvbdu_var_of_guard guard nsites,
-          (Some dummy_state_index_false, Some dummy_state_index_true) ))
-      guard_p_list
-  in
-  Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error pair_list
-
 (*****************************************************************************)

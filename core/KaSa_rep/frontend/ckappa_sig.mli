@@ -736,16 +736,6 @@ val mvbdu_is_false_for_guards :
   * Views_bdu.handler
   * bool
 
-val compute_restriction_mvbdu :
-  Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Views_bdu.handler ->
-  c_guard_parameter ->
-  c_site_name ->
-  Exception_without_parameter.exceptions_caught_and_uncaught
-  * Views_bdu.handler
-  * Views_bdu.mvbdu
-
 val guard_to_bdu :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
