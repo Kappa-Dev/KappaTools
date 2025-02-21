@@ -10,23 +10,28 @@ let add_working_set_guard guard k loc =
   let guard_name = "@rule-" ^ string_of_int k in
   let guard_param = LKappa.Param (guard_name, loc) in
   match guard with
-  | None -> Some guard_param
-  | Some guard -> Some (LKappa.And (guard_param, guard))
+  | None -> Some guard_param, guard_name
+  | Some guard -> Some (LKappa.And (guard_param, guard)), guard_name
 
 let append_to_ast_compil rev_instr compil =
   fst
   @@ List.fold_left
        (fun (r, k) -> function
          | Ast.RULE (label, guard, (rule, loc), is_in_working_set) ->
-           if is_in_working_set then
+           if is_in_working_set then (
+             let updated_guard, new_guard_p_name =
+               add_working_set_guard guard k loc
+             in
              ( {
                  r with
-                 Ast.rules =
-                   (label, add_working_set_guard guard k loc, (rule, loc))
-                   :: r.Ast.rules;
+                 Ast.rules = (label, updated_guard, (rule, loc)) :: r.Ast.rules;
+                 (* set the new guard to true *)
+                 Ast.guard_param_values =
+                   Mods.StringMap.add new_guard_p_name true
+                     r.Ast.guard_param_values;
                },
                k + 1 )
-           else
+           ) else
              ( { r with Ast.rules = (label, guard, (rule, loc)) :: r.Ast.rules },
                k )
          | Ast.SIG ag -> { r with Ast.signatures = ag :: r.Ast.signatures }, k
