@@ -13,7 +13,7 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let local_trace = true
+let local_trace = false
 
 module Domain = struct
   (* the type of the struct that contains all static information as in the
