@@ -150,6 +150,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
     (*label, guard, rule, is_in_working_set*)
   | GUARD_PARAM of (string Loc.annoted * bool)
   | CONFLICT of (string Loc.annoted * string Loc.annoted * string Loc.annoted)
+  | SEQUENTIAL_BOND of
+      (string Loc.annoted * string Loc.annoted * string Loc.annoted)
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -175,6 +177,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   volumes: (string * float * string) list;
   guard_param_values: bool Mods.StringMap.t;
   conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
+  sequential_bonds: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil

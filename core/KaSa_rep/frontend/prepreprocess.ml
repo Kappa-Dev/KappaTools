@@ -739,42 +739,32 @@ let dump_rule_no_rate rule =
   let () = Format.pp_print_flush fmt () in
   Buffer.contents buf
 
-(**Find all agents where site1 appears as a non-bound site on the lhs and as a bound site on the rhs.*)
-let add_conflict_site_to_rule parameters error agent site1 site2 rule =
-  let there_is_a_potential_conflict site1 site2 interface1 interface2 =
-    let conflict_between_sites site1 site2 =
-      Ckappa_sig.has_free_site site1 interface1
-      && Ckappa_sig.has_bound_site site1 interface2
-      && (not (Ckappa_sig.has_site site2 interface1))
-      && not (Ckappa_sig.has_site site2 interface2)
-    in
-    conflict_between_sites site1 site2 || conflict_between_sites site2 site1
+(*------------------------------------------------------------*)
+(*DUPLICATE RULES FOR POTENTAL CONFLICTS OR SEQUENTIAL BINDING**)
+
+let conflict_between_sites site1 site2 interface1 interface2 =
+  Ckappa_sig.has_free_site site1 interface1
+  && Ckappa_sig.has_bound_site site1 interface2
+  && (not (Ckappa_sig.has_site site2 interface1))
+  && not (Ckappa_sig.has_site site2 interface2)
+
+let add_conflict_site_to_agents new_port_name port_link error agent1 agent2 =
+  let new_port =
+    {
+      Ckappa_sig.port_name = new_port_name;
+      Ckappa_sig.port_link;
+      Ckappa_sig.port_int = [];
+      Ckappa_sig.port_free = Some true;
+    }
   in
-  let add_conflict_site_to_agents error agent1 agent2 site1 site2 =
-    let new_port_name =
-      if Ckappa_sig.has_site site1 agent1.Ckappa_sig.ag_intf then
-        site2
-      else
-        site1
-    in
-    let new_port =
-      {
-        Ckappa_sig.port_name = new_port_name;
-        Ckappa_sig.port_link = Ckappa_sig.FREE;
-        Ckappa_sig.port_int = [];
-        Ckappa_sig.port_free = Some true;
-      }
-    in
-    let interface1 =
-      Ckappa_sig.PORT_SEP (new_port, agent1.Ckappa_sig.ag_intf)
-    in
-    let interface2 =
-      Ckappa_sig.PORT_SEP (new_port, agent2.Ckappa_sig.ag_intf)
-    in
-    ( error,
-      { agent1 with Ckappa_sig.ag_intf = interface1 },
-      { agent2 with Ckappa_sig.ag_intf = interface2 } )
-  in
+  let interface1 = Ckappa_sig.PORT_SEP (new_port, agent1.Ckappa_sig.ag_intf) in
+  let interface2 = Ckappa_sig.PORT_SEP (new_port, agent2.Ckappa_sig.ag_intf) in
+  ( error,
+    { agent1 with Ckappa_sig.ag_intf = interface1 },
+    { agent2 with Ckappa_sig.ag_intf = interface2 } )
+
+let traverse_rule_and_add_site parameters error lhs rhs agent
+    there_is_a_potential_conflict add_conflict_site =
   let rec aux lhs rhs =
     match lhs, rhs with
     | Ckappa_sig.SKIP lhs', Ckappa_sig.SKIP rhs'
@@ -797,10 +787,10 @@ let add_conflict_site_to_rule parameters error agent site1 site2 rule =
       let (error, agent1, agent2), was_changed =
         if
           agent = agent1.Ckappa_sig.agent_name
-          && there_is_a_potential_conflict site1 site2 agent1.Ckappa_sig.ag_intf
+          && there_is_a_potential_conflict agent1.Ckappa_sig.ag_intf
                agent2.Ckappa_sig.ag_intf
         then
-          add_conflict_site_to_agents error agent1 agent2 site1 site2, true
+          add_conflict_site error agent1 agent2, true
         else
           (error, agent1, agent2), was_changed
       in
@@ -818,16 +808,49 @@ let add_conflict_site_to_rule parameters error agent site1 site2 rule =
     | Ckappa_sig.EMPTY_MIX, _ ->
       Exception.warn parameters error __POS__ Exit (lhs, rhs, false)
   in
+  aux lhs rhs
+
+(**Find all agents where site1 appears as a non-bound site on the lhs and as a bound site on the rhs.*)
+let add_conflict_site_to_rule parameters error agent site1 site2 rule =
+  let there_is_a_potential_conflict interface1 interface2 =
+    conflict_between_sites site1 site2 interface1 interface2
+    || conflict_between_sites site2 site1 interface1 interface2
+  in
+  let add_conflict_site error agent1 agent2 =
+    let new_port_name =
+      if Ckappa_sig.has_site site1 agent1.Ckappa_sig.ag_intf then
+        site2
+      else
+        site1
+    in
+    add_conflict_site_to_agents new_port_name Ckappa_sig.FREE error agent1
+      agent2
+  in
   let error, (lhs, rhs, was_changed) =
-    aux rule.Ckappa_sig.lhs rule.Ckappa_sig.rhs
+    traverse_rule_and_add_site parameters error rule.Ckappa_sig.lhs
+      rule.Ckappa_sig.rhs agent there_is_a_potential_conflict add_conflict_site
+  in
+  error, { rule with Ckappa_sig.lhs; Ckappa_sig.rhs }, was_changed
+
+(**Find all agents where site2 appears as a non-bound site on the lhs and as a bound site on the rhs.
+Add site1 as a bound site.*)
+let add_sequential_site_to_rule parameters error agent site1 site2 rule =
+  let error, (lhs, rhs, was_changed) =
+    traverse_rule_and_add_site parameters error rule.Ckappa_sig.lhs
+      rule.Ckappa_sig.rhs agent
+      (conflict_between_sites site2 site1)
+      (add_conflict_site_to_agents site1 (Ckappa_sig.LNK_SOME Loc.dummy))
   in
   error, { rule with Ckappa_sig.lhs; Ckappa_sig.rhs }, was_changed
 
 let conflicts_guard_p_name agent site1 site2 =
   "@co-" ^ agent ^ "-" ^ site1 ^ "-" ^ site2
 
-let add_conflict_to_guard guard_opt agent site1 site2 negate loc =
-  let guardp = LKappa.Param (conflicts_guard_p_name agent site1 site2, loc) in
+let sequential_guard_p_name agent site1 site2 =
+  "@sq-" ^ agent ^ "-" ^ site1 ^ "-" ^ site2
+
+let add_param_to_guard guard_opt agent site1 site2 negate loc guard_p_name =
+  let guardp = LKappa.Param (guard_p_name agent site1 site2, loc) in
   let guardp =
     if negate then
       LKappa.Not guardp
@@ -855,22 +878,22 @@ let rename_rules rules =
             Some (rule_string ^ String.make i '\'', p), guard, rule)
         rules)
 
-let add_rules_with_conflicts parameters error (rule_string, guard, (rule, p))
-    conflicts =
-  let error, new_rules =
+let add_rules_with_conflicts_and_sequential parameters error
+    (rule_string, guard, (rule, p)) conflicts sequential_bonds =
+  let add_rules error add_site_to_rule guard_p_name inital_rules modifications =
     List.fold_left
       (fun (error, rules) ((agent, _), (site1, _), (site2, _)) ->
         List.fold_left
           (fun (error, rules) (id, guard, (rule, p)) ->
             let error, new_rule, was_changed =
-              add_conflict_site_to_rule parameters error agent site1 site2 rule
+              add_site_to_rule parameters error agent site1 site2 rule
             in
             if was_changed then (
               let guard_new_rule =
-                add_conflict_to_guard guard agent site1 site2 false p
+                add_param_to_guard guard agent site1 site2 false p guard_p_name
               in
               let guard_og_rule =
-                add_conflict_to_guard guard agent site1 site2 true p
+                add_param_to_guard guard agent site1 site2 true p guard_p_name
               in
               ( error,
                 (id, guard_og_rule, (rule, p))
@@ -879,10 +902,19 @@ let add_rules_with_conflicts parameters error (rule_string, guard, (rule, p))
             ) else
               error, (id, guard, (rule, p)) :: rules)
           (error, []) rules)
-      (error, [ rule_string, guard, (rule, p) ])
+      (error, inital_rules) modifications
+  in
+  let error, new_rules =
+    add_rules error add_conflict_site_to_rule conflicts_guard_p_name
+      [ rule_string, guard, (rule, p) ]
       conflicts
   in
+  let error, new_rules =
+    add_rules error add_sequential_site_to_rule sequential_guard_p_name
+      new_rules sequential_bonds
+  in
   error, rename_rules new_rules
+(*------------------------------------------------------------*)
 
 let translate_compil parameters error
     (compil :
@@ -1144,9 +1176,9 @@ let translate_compil parameters error
     List.fold_left
       (fun (error, list) (rule_string, guard, (rule, p)) ->
         let error, rules_with_conflicts =
-          add_rules_with_conflicts parameters error
+          add_rules_with_conflicts_and_sequential parameters error
             (rule_string, guard, (rule, p))
-            compil.Ast.conflicts
+            compil.Ast.conflicts compil.Ast.sequential_bonds
         in
         error, rules_with_conflicts @ list)
       (error, []) rules_rev
@@ -1165,4 +1197,5 @@ let translate_compil parameters error
       Ast.volumes = compil.Ast.volumes;
       Ast.guard_param_values = compil.Ast.guard_param_values;
       Ast.conflicts = compil.Ast.conflicts;
+      Ast.sequential_bonds = compil.Ast.sequential_bonds;
     } )

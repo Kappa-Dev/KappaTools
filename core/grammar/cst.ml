@@ -78,5 +78,12 @@ let append_to_ast_compil rev_instr compil =
              k )
          | Ast.CONFLICT (agent, site1, site2) ->
            ( { r with Ast.conflicts = (agent, site1, site2) :: r.Ast.conflicts },
+             k )
+         | Ast.SEQUENTIAL_BOND (agent, site1, site2) ->
+           ( {
+               r with
+               Ast.sequential_bonds =
+                 (agent, site1, site2) :: r.Ast.sequential_bonds;
+             },
              k ))
        (compil, 0) (List.rev rev_instr)

@@ -103,6 +103,9 @@ start_rule:
           | Ast.CONFLICT (a,s1,s2) ->
           {r with
 			  Ast.conflicts = (a,s1,s2)::r.Ast.conflicts}
+          | Ast.SEQUENTIAL_BOND (a,s1,s2) ->
+          {r with
+			  Ast.sequential_bonds = (a,s1,s2)::r.Ast.sequential_bonds}
 		  }
     | error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}

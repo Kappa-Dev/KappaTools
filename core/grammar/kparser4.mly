@@ -28,6 +28,7 @@
 %token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
 %token DO REPEAT ALARM RUN LET GUARD_PARAM SHARP_OP_BRA IF CONFLICT WORKING_SET
+%token SEQUENTIAL_BOND
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID LABEL STRING
@@ -845,6 +846,7 @@ an algebraic expression is expected")) }
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
   | GUARD_PARAM annoted ID annoted boolean annoted { add (Ast.GUARD_PARAM (($3,rhs_pos 3), $5)) }
   | CONFLICT annoted ID annoted ID annoted ID annoted { add (Ast.CONFLICT (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
+  | SEQUENTIAL_BOND annoted ID annoted ID annoted ID annoted { add (Ast.SEQUENTIAL_BOND (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
   ;
 
 model_body:

@@ -93,6 +93,7 @@ rule token = parse
     | "guard_param" -> GUARD_PARAM
     | "working_set" -> WORKING_SET
     | "conflict" -> CONFLICT
+    | "sequential_bond" -> SEQUENTIAL_BOND
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown directive: "^s,
        Loc.of_pos (Lexing.lexeme_start_p lexbuf)

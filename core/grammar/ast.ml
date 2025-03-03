@@ -171,6 +171,8 @@ type ('agent, 'agent_id, 'pattern, 'mixture, 'id, 'rule) instruction =
     (*label, guard, rule, is_in_working_set*)
   | GUARD_PARAM of (string Loc.annoted * bool)
   | CONFLICT of (string Loc.annoted * string Loc.annoted * string Loc.annoted)
+  | SEQUENTIAL_BOND of
+      (string Loc.annoted * string Loc.annoted * string Loc.annoted)
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -199,6 +201,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
       (** The guard parameters that have a defined value (true or false).*)
   conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
       (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
+  sequential_bonds: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
+      (** sequential_bonds (A, s1, s2) states that the site s2 of the agent A may only be able to bind if s1 is already bound.*)
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -242,6 +246,7 @@ let empty_compil =
     volumes = [];
     guard_param_values = Mods.StringMap.empty;
     conflicts = [];
+    sequential_bonds = [];
   }
 
 (*
@@ -1134,7 +1139,8 @@ let print_perturbation f ((alarm, cond, modif, rep), _) =
     rep
 
 let print_parsing_compil_kappa f c =
-  Format.fprintf f "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,%a@,@]@."
+  Format.fprintf f
+    "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,%a@,%a@,@]@."
     (Pp.list Pp.space print_configuration)
     c.configurations
     (Pp.list Pp.space (fun f a ->
@@ -1166,6 +1172,9 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space (fun f ((a, _), (s1, _), (s2, _)) ->
          Format.fprintf f "%%conflict: %s %s %s" a s1 s2))
     c.conflicts
+    (Pp.list Pp.space (fun f ((a, _), (s1, _), (s2, _)) ->
+         Format.fprintf f "%%sequential_bond: %s %s %s" a s1 s2))
+    c.sequential_bonds
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
   JsonUtil.smart_assoc
@@ -1757,6 +1766,13 @@ let compil_to_json c =
              (Loc.string_annoted_to_json ~filenames)
              (Loc.string_annoted_to_json ~filenames))
           c.conflicts );
+      ( "sequential_bonds",
+        JsonUtil.of_list
+          (JsonUtil.of_triple
+             (Loc.string_annoted_to_json ~filenames)
+             (Loc.string_annoted_to_json ~filenames)
+             (Loc.string_annoted_to_json ~filenames))
+          c.sequential_bonds );
     ]
 
 let compil_of_json = function
@@ -1870,6 +1886,19 @@ let compil_of_json = function
                 (Loc.string_annoted_of_json ~filenames)
                 (Loc.string_annoted_of_json ~filenames))
              (List.assoc "conflicts" l);
+         sequential_bonds =
+           JsonUtil.to_list
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json
+                  "AST sequential_bonds sig")
+             (JsonUtil.to_triple
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST sequential_bonds sig")
+                (Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames))
+             (List.assoc "sequential_bonds" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST", x)))

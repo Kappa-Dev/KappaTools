@@ -2780,6 +2780,9 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   in
 
   let conflicts = conflicts_to_id agents_sig ast_compil.conflicts in
+  let sequential_bonds =
+    conflicts_to_id agents_sig ast_compil.sequential_bonds
+  in
 
   let init =
     init_of_ast ~warning ~syntax_version agents_sig counters_info contact_map
@@ -2807,5 +2810,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         configurations = ast_compil.configurations;
         guard_param_values = ast_compil.guard_param_values;
         conflicts;
+        sequential_bonds;
       };
   }
