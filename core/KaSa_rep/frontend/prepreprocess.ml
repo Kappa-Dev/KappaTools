@@ -764,7 +764,7 @@ let add_conflict_site_to_agents new_port_name port_link error agent1 agent2 =
     { agent2 with Ckappa_sig.ag_intf = interface2 } )
 
 let traverse_rule_and_add_site parameters error lhs rhs agent
-    there_is_a_potential_conflict add_conflict_site =
+    there_is_a_potential_conflict add_conflict_site is_not_allowed =
   let rec aux lhs rhs =
     match lhs, rhs with
     | Ckappa_sig.SKIP lhs', Ckappa_sig.SKIP rhs'
@@ -774,39 +774,46 @@ let traverse_rule_and_add_site parameters error lhs rhs agent
     | Ckappa_sig.COMMA (_, lhs'), Ckappa_sig.SKIP rhs'
     | Ckappa_sig.DOT (_, _, lhs'), Ckappa_sig.SKIP rhs'
     | Ckappa_sig.PLUS (_, _, lhs'), Ckappa_sig.SKIP rhs' ->
-      let error, (lhs', rhs', was_changed) = aux lhs' rhs' in
+      let error, (lhs', rhs', was_changed, not_allowed) = aux lhs' rhs' in
       ( error,
         ( Ckappa_sig.modify_mixture (fun _ _ -> None, lhs') lhs,
           Ckappa_sig.modify_mixture (fun _ _ -> None, rhs') rhs,
-          was_changed ) )
+          was_changed,
+          not_allowed ) )
     | Ckappa_sig.COMMA (agent1, lhs'), Ckappa_sig.COMMA (agent2, rhs')
     | Ckappa_sig.DOT (_, agent1, lhs'), Ckappa_sig.DOT (_, agent2, rhs')
     | Ckappa_sig.PLUS (_, agent1, lhs'), Ckappa_sig.PLUS (_, agent2, rhs')
       when agent1.Ckappa_sig.agent_name = agent2.Ckappa_sig.agent_name ->
-      let error, (lhs', rhs', was_changed) = aux lhs' rhs' in
-      let (error, agent1, agent2), was_changed =
+      let error, (lhs', rhs', was_changed, not_allowed) = aux lhs' rhs' in
+      let (error, agent1, agent2), was_changed, not_allowed =
         if
+          agent = agent1.Ckappa_sig.agent_name
+          && is_not_allowed agent2.Ckappa_sig.ag_intf
+        then
+          (error, agent1, agent2), was_changed, true
+        else if
           agent = agent1.Ckappa_sig.agent_name
           && there_is_a_potential_conflict agent1.Ckappa_sig.ag_intf
                agent2.Ckappa_sig.ag_intf
         then
-          add_conflict_site error agent1 agent2, true
+          add_conflict_site error agent1 agent2, true, not_allowed
         else
-          (error, agent1, agent2), was_changed
+          (error, agent1, agent2), was_changed, not_allowed
       in
       ( error,
         ( Ckappa_sig.modify_mixture (fun _ _ -> Some agent1, lhs') lhs,
           Ckappa_sig.modify_mixture (fun _ _ -> Some agent2, rhs') rhs,
-          was_changed ) )
+          was_changed,
+          not_allowed ) )
     | Ckappa_sig.EMPTY_MIX, Ckappa_sig.EMPTY_MIX
     | Ckappa_sig.SKIP _, _
     | _, Ckappa_sig.SKIP _ ->
-      error, (lhs, rhs, false)
+      error, (lhs, rhs, false, false)
     | Ckappa_sig.COMMA _, _
     | Ckappa_sig.DOT _, _
     | Ckappa_sig.PLUS _, _
     | Ckappa_sig.EMPTY_MIX, _ ->
-      Exception.warn parameters error __POS__ Exit (lhs, rhs, false)
+      Exception.warn parameters error __POS__ Exit (lhs, rhs, false, false)
   in
   aux lhs rhs
 
@@ -826,22 +833,42 @@ let add_conflict_site_to_rule parameters error agent site1 site2 rule =
     add_conflict_site_to_agents new_port_name Ckappa_sig.FREE error agent1
       agent2
   in
-  let error, (lhs, rhs, was_changed) =
+  (*is_not_allowed = true means that the rhs of the rule contains site1 bound and site2 bound.
+    This is not allowed to happen for conflicting sites.*)
+  let is_not_allowed interface =
+    Ckappa_sig.has_bound_site site1 interface
+    && Ckappa_sig.has_bound_site site2 interface
+  in
+  let error, (lhs, rhs, was_changed, is_not_allowed) =
     traverse_rule_and_add_site parameters error rule.Ckappa_sig.lhs
       rule.Ckappa_sig.rhs agent there_is_a_potential_conflict add_conflict_site
+      is_not_allowed
   in
-  error, { rule with Ckappa_sig.lhs; Ckappa_sig.rhs }, was_changed
+  ( error,
+    { rule with Ckappa_sig.lhs; Ckappa_sig.rhs },
+    was_changed,
+    is_not_allowed )
 
 (**Find all agents where site2 appears as a non-bound site on the lhs and as a bound site on the rhs.
 Add site1 as a bound site.*)
 let add_sequential_site_to_rule parameters error agent site1 site2 rule =
-  let error, (lhs, rhs, was_changed) =
+  (*is_not_allowed = true means that the rhs of the rule contains site1 free and site2 bound.
+    This is not allowed to happen for sequential bounds.*)
+  let is_not_allowed interface =
+    Ckappa_sig.has_free_site site1 interface
+    && Ckappa_sig.has_bound_site site2 interface
+  in
+  let error, (lhs, rhs, was_changed, is_not_allowed) =
     traverse_rule_and_add_site parameters error rule.Ckappa_sig.lhs
       rule.Ckappa_sig.rhs agent
       (conflict_between_sites site2 site1)
       (add_conflict_site_to_agents site1 (Ckappa_sig.LNK_SOME Loc.dummy))
+      is_not_allowed
   in
-  error, { rule with Ckappa_sig.lhs; Ckappa_sig.rhs }, was_changed
+  ( error,
+    { rule with Ckappa_sig.lhs; Ckappa_sig.rhs },
+    was_changed,
+    is_not_allowed )
 
 let conflicts_guard_p_name agent site1 site2 =
   "@co-" ^ agent ^ "-" ^ site1 ^ "-" ^ site2
@@ -878,22 +905,24 @@ let rename_rules rules =
             Some (rule_string ^ String.make i '\'', p), guard, rule)
         rules)
 
-let add_rules_with_conflicts_and_sequential parameters error
-    (rule_string, guard, (rule, p)) conflicts sequential_bonds =
+let add_rules_with_conflicts_and_sequential parameters error rule conflicts
+    sequential_bonds =
   let add_rules error add_site_to_rule guard_p_name inital_rules modifications =
     List.fold_left
       (fun (error, rules) ((agent, _), (site1, _), (site2, _)) ->
         List.fold_left
           (fun (error, rules) (id, guard, (rule, p)) ->
-            let error, new_rule, was_changed =
+            let error, new_rule, was_changed, is_not_allowed =
               add_site_to_rule parameters error agent site1 site2 rule
             in
-            if was_changed then (
+            let guard_og_rule =
+              add_param_to_guard guard agent site1 site2 true p guard_p_name
+            in
+            if is_not_allowed then
+              error, (id, guard_og_rule, (rule, p)) :: rules
+            else if was_changed then (
               let guard_new_rule =
                 add_param_to_guard guard agent site1 site2 false p guard_p_name
-              in
-              let guard_og_rule =
-                add_param_to_guard guard agent site1 site2 true p guard_p_name
               in
               ( error,
                 (id, guard_og_rule, (rule, p))
@@ -905,8 +934,7 @@ let add_rules_with_conflicts_and_sequential parameters error
       (error, inital_rules) modifications
   in
   let error, new_rules =
-    add_rules error add_conflict_site_to_rule conflicts_guard_p_name
-      [ rule_string, guard, (rule, p) ]
+    add_rules error add_conflict_site_to_rule conflicts_guard_p_name [ rule ]
       conflicts
   in
   let error, new_rules =

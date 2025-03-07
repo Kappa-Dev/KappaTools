@@ -638,7 +638,8 @@ let rec has_site_condition condition interface =
 let has_site x = has_site_condition (fun p -> p.port_name = x)
 
 let has_free_site x =
-  has_site_condition (fun p -> p.port_name = x && p.port_free = Some true)
+  has_site_condition (fun p ->
+      p.port_name = x && not (p.port_free = Some false))
 
 let has_bound_site x =
   has_site_condition (fun p -> p.port_name = x && p.port_free = Some false)
