@@ -1200,7 +1200,7 @@ let translate_compil parameters error
         error, ((alarm, b', List.rev m', o'), p) :: list, rules_rev')
       (error, [], rules_rev) compil.Ast.perturbations
   in
-  let error, rules =
+  let error, rules_rev =
     List.fold_left
       (fun (error, list) (rule_string, guard, (rule, p)) ->
         let error, rules_with_conflicts =
@@ -1216,7 +1216,7 @@ let translate_compil parameters error
       Ast.filenames = compil.Ast.filenames;
       Ast.variables = List.rev var_rev;
       Ast.signatures = List.rev signatures_rev;
-      Ast.rules;
+      Ast.rules = List.rev rules_rev;
       Ast.observables = List.rev observables_rev;
       Ast.init = List.rev init_rev;
       Ast.perturbations = List.rev perturbations_rev;
