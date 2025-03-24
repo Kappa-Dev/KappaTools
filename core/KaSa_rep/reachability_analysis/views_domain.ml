@@ -759,7 +759,7 @@ module Domain = struct
         return a pair: (bdu, and a pair of (site, state) list of list)*)
       let handler = get_mvbdu_handler dynamic in
       let error, handler, list =
-        Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler error ~threshold:3 (* TO DO *)
+        Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler error
           bdu_diff
       in
       let dynamic = set_mvbdu_handler handler dynamic in
@@ -767,7 +767,7 @@ module Domain = struct
       (*print function for extentional description*)
       let error =
         List.fold_left
-          (fun error (l,bdd) ->
+          (fun error l ->
             let error, bool =
               List.fold_left
                 (fun (error, bool) (site_type, state) ->
@@ -801,7 +801,6 @@ module Domain = struct
                   error, true)
                 (error, false) l
             in
-            let () = Ckappa_sig.Views_bdu.print parameters bdd in 
             (*-----------------------------------------------------------*)
             let () =
               if bool then (
