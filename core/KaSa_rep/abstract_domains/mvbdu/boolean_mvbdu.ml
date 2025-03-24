@@ -1417,6 +1417,9 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
               | Mvbdu_sig.Leaf true -> error, (handler, ([],bdd_true) :: output)
               | Mvbdu_sig.Leaf false -> error, (handler, output)
               | Mvbdu_sig.Node a ->
+                let id = a.Mvbdu_sig.variable in 
+                if id <= threshold 
+                then (* Recursion *)
                 let error, (handler, branch_true) =
                   aux1 parameters handler error ~threshold a.Mvbdu_sig.branch_true
                 in
@@ -1448,6 +1451,9 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
                 aux2 a.Mvbdu_sig.branch_false
                   (Some (a.Mvbdu_sig.variable, upper_bound))
                   handler error output
+              else (* threshold crossed, convert in bdd *)
+             (* let error, (handler, bdd) = memo_identity parameters handler error parameters a in*)
+                error, (handler, ([],mvbdu) :: output)
             in
             let error, (handler, output) = aux2 mvbdu None handler error [] in
             let error, memo =
