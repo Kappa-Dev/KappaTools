@@ -44,6 +44,14 @@ module type Mvbdu = sig
     Exception.exceptions_caught_and_uncaught ->
     'input ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
+    
+  type ('input, 'output) unary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught -> 
+    threshold:int -> 
+    'input ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
 
   type ('input1, 'input2, 'output) binary =
     Remanent_parameters_sig.parameters ->
@@ -196,6 +204,8 @@ module type Mvbdu = sig
     (hconsed_range_list, (key * (value option * value option)) list) unary
 
   val extensional_of_mvbdu : (mvbdu, (key * value) list list) unary
+  val parametric_conditions_of_mvbdu:   (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
+
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 
@@ -416,6 +426,15 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     'input ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
+    type ('input, 'output) unary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int -> 
+    'input ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
+
   type ('input1, 'input2, 'output) binary =
     Remanent_parameters_sig.parameters ->
     handler ->
@@ -563,6 +582,11 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let lift1__ _string f parameters handler error a =
     match f parameters handler error a with
     | error, (handler, a) -> error, handler, a
+
+  let lift1__with_threshold ~threshold _string f parameters handler error a =
+      match f parameters handler error ~threshold a with
+      | error, (handler, a) -> error, handler, a
+  
 
   let lift1four buildlist pos f parameters handler error a =
     match f parameters error handler a with
@@ -752,6 +776,10 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     lift1__ __POS__ Boolean_mvbdu.extensional_description_of_mvbdu parameters
       handler error mvbdu
 
+  let parametric_conditions_of_mvbdu parameters handler error ~threshold mvbdu = 
+    lift1__with_threshold ~threshold __POS__ Boolean_mvbdu.extensional_description_of_mvbdu_with_threshold parameters
+          handler error mvbdu
+    
   let print = Boolean_mvbdu.print_mvbdu
   let print_association_list = List_algebra.print_association_list
   let print_variables_list = List_algebra.print_variables_list

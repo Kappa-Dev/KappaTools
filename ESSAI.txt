@@ -1,0 +1,97 @@
+Parsing essai.ka...
+done
++ simulation parameters
++ Sanity checks
+START COMPIL OF AST 
+ELIMINATION of <= done  
+AGENT SIGNATURE INFERED 
+EQUALITY TESTS REMOVED 
+AGENT SIG 
+RULES ARE CLEANED  
+ALG VARS DONE 
+TOKEN DONE 
+START COUNTER PERTURBATION 
+MAX COUNTER min_value -2 max_value 3  
+LINK_INCR i:0 first:0 last_link:3 min_value:-2 delta:-1 
+LINK_INCR i:1 first:0 last_link:3 min_value:-2 delta:-1 
+LINK_INCR i:2 first:0 last_link:3 min_value:-2 delta:-1 
+LINK_INCR i:3 first:0 last_link:3 min_value:-2 delta:-1 
+LINK_INCR i:4 first:0 last_link:3 min_value:-2 delta:-1 
+BEFORE RULES 
+ASSEMBLE RULE 
+STEP 1 0 
+STEP 2 1 
+ LNK_NB 2 
+INCRCEQ (=-2) link:2 min_value:-2
+ADD_INCR i:0 first:2 last_link:2 min_value:-2 delta:1 
+BEFORE 2 
+AFTER FREE 
+ADD_INCR i:1 first:2 last_link:2 min_value:-2 delta:1 
+END INCR 
+STEP 3 
+COUNTER COMPILED 
+RULES DONE 
+MIXTURE_OF_AST 
+MIXTURE_OF_AST -> COUNTERS 
+STEP 1 0 
+LINK_INCR i:0 first:0 last_link:0 min_value:-2 delta:0 
+LINK_INCR i:1 first:0 last_link:0 min_value:-2 delta:0 
+STEP 2 1 
+STEP 3 
+VARIABLES DONE 
+OBS DONE 
+STEP 1 0 
+STEP 2 1 
+ LNK_NB 2 
+INCRCEQ (=-2) link:2 min_value:-2
+ADD_INCR i:0 first:2 last_link:2 min_value:-2 delta:1 
+BEFORE 2 
+AFTER FREE 
+ADD_INCR i:1 first:2 last_link:2 min_value:-2 delta:1 
+END INCR 
+STEP 3 
+INIT DONE 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+ADD AGENTS IN CC 
+link 0.0 1 
+LINK BETWEEN TWO AGENTS 
+ADD AGENTS IN CC 
+link 0.0 1 
+END 
+END SUCCESSFUL 
+	 -rules
+	 -interventions
+ADD AGENTS IN CC 
+link 0.0 1 
+LINK BETWEEN TWO AGENTS 
+ADD AGENTS IN CC 
+link 0.0 1 
+link 0.1 2 
+LINK BETWEEN TWO AGENTS 
+ADD AGENTS IN CC 
+link 0.0 2 
+link 0.1 3 
+LINK BETWEEN TWO AGENTS 
+ADD AGENTS IN CC 
+link 0.0 3 
+link 0.1 4 
+LINK BETWEEN TWO AGENTS 
+ADD AGENTS IN CC 
+link 0.0 4 
+END 
+END SUCCESSFUL 
+	 -observables
+	 -update_domain construction
+	 7 (sub)observables 0 navigation steps
+	 -initial conditions
++ Self seeding...
++ Building initial state (2 agents)
+Done
++ Command line to rerun is: 'KaSim' 'essai.ka' -seed 331919455
+______________________________________________________________________
+
+KaSim toplevel: type `$RUN (optionally followed by a pause criteria) ;` to launch the simulation or a intervention effect (followed by its `;`) to perform it
+> > ######################################################################
+Simulation ended
