@@ -758,13 +758,14 @@ module Domain = struct
       (*this is a function to convert a bdu of diff into a list.
         return a pair: (bdu, and a pair of (site, state) list of list)*)
       let handler = get_mvbdu_handler dynamic in
+      let nsites = Ckappa_sig.int_of_site_name (get_nsites static) in
       let error, handler, list =
         Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler error
           bdu_diff
       in
       let error, handler, split_list =
         Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
-          error ~threshold:3 (* TO DO *)
+          error ~threshold:nsites
           bdu_diff
       in
       let _ = split_list in
