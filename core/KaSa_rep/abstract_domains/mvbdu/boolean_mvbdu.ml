@@ -112,7 +112,10 @@ type memo_tables = {
   boolean_mvbdu_extensional_description_of_range_list:
     (int * (int option * int option)) list Hash_1.t;
   boolean_mvbdu_variables_of_mvbdu: unit List_sig.list Hash_1.t;
-  boolean_mvbdu_extensional_description_of_mvbdu: (int * int) list list Hash_1.t;
+  boolean_mvbdu_extensional_description_of_mvbdu:
+    (int * int) list list Hash_1.t;
+  boolean_mvbdu_extensional_description_of_mvbdu_with_threshold:
+    ((int * int) list * bool Mvbdu_sig.mvbdu) list Hash_2.t;
 }
 
 type mvbdu_dic =
@@ -338,6 +341,9 @@ let init_data parameters error =
   let error, mvbdu_extensional_description_of_mvbdu =
     Hash_1.create parameters error 0
   in
+  let error, mvbdu_extensional_description_of_mvbdu_with_threshold =
+    Hash_2.create parameters error (0, 0)
+  in
   let error, mvbdu_rename = Hash_2.create parameters error (0, 0) in
   ( error,
     {
@@ -376,6 +382,8 @@ let init_data parameters error =
       boolean_mvbdu_variables_of_mvbdu = mvbdu_variables_of;
       boolean_mvbdu_extensional_description_of_mvbdu =
         mvbdu_extensional_description_of_mvbdu;
+      boolean_mvbdu_extensional_description_of_mvbdu_with_threshold =
+        mvbdu_extensional_description_of_mvbdu_with_threshold;
     } )
 
 let init_remanent parameters error =
@@ -1392,6 +1400,91 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
             };
         },
         output ) )
+
+let extensional_description_of_mvbdu_with_threshold parameters handler error
+    ~threshold mvbdu =
+  let error, (handler, bdd_true) =
+    boolean_mvbdu_true parameters handler error parameters
+  in
+  match bdd_true with
+  | Some bdd_true ->
+    let rec aux1 parameters handler error ~threshold mvbdu =
+      match
+        Hash_2.unsafe_get parameters error
+          (threshold, mvbdu.Mvbdu_sig.id)
+          handler.Memo_sig.data
+            .boolean_mvbdu_extensional_description_of_mvbdu_with_threshold
+      with
+      | error, Some output -> error, (handler, output)
+      | error, None ->
+        let rec aux2 mvbdu remanent handler error output =
+          match mvbdu.Mvbdu_sig.value with
+          | Mvbdu_sig.Leaf true -> error, (handler, ([], bdd_true) :: output)
+          | Mvbdu_sig.Leaf false -> error, (handler, output)
+          | Mvbdu_sig.Node a ->
+            let id = a.Mvbdu_sig.variable in
+            if id <= threshold then (
+              (* Recursion *)
+              let error, (handler, branch_true) =
+                aux1 parameters handler error ~threshold a.Mvbdu_sig.branch_true
+              in
+              let upper_bound = a.Mvbdu_sig.upper_bound in
+              let error, (handler, output) =
+                match remanent, branch_true with
+                | _, [] -> error, (handler, output)
+                | None, _ ->
+                  Exception.warn parameters error __POS__ Exit (handler, [])
+                | Some (var, lower_bound), list ->
+                  let head_list =
+                    let rec aux3 k res =
+                      if k <= lower_bound then
+                        res
+                      else
+                        aux3 (k - 1) (k :: res)
+                    in
+                    aux3 upper_bound []
+                  in
+                  let output =
+                    List.fold_left
+                      (fun output head ->
+                        List.fold_left
+                          (fun output (tail, b) ->
+                            ((var, head) :: tail, b) :: output)
+                          output list)
+                      output head_list
+                  in
+                  error, (handler, output)
+              in
+              aux2 a.Mvbdu_sig.branch_false
+                (Some (a.Mvbdu_sig.variable, upper_bound))
+                handler error output
+            ) else
+              (* threshold crossed, convert in bdd *)
+              (* let error, (handler, bdd) = memo_identity parameters handler error parameters a in*)
+              error, (handler, ([], mvbdu) :: output)
+        in
+        let error, (handler, output) = aux2 mvbdu None handler error [] in
+        let error, memo =
+          Hash_2.set parameters error
+            (threshold, mvbdu.Mvbdu_sig.id)
+            output
+            handler.Memo_sig.data
+              .boolean_mvbdu_extensional_description_of_mvbdu_with_threshold
+        in
+        ( error,
+          ( {
+              handler with
+              Memo_sig.data =
+                {
+                  handler.Memo_sig.data with
+                  boolean_mvbdu_extensional_description_of_mvbdu_with_threshold =
+                    memo;
+                };
+            },
+            output ) )
+    in
+    aux1 parameters handler error ~threshold mvbdu
+  | None -> error, (handler, [])
 
 let print_boolean_mvbdu parameters
     (error : Exception.exceptions_caught_and_uncaught) =
