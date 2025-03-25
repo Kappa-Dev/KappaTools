@@ -1,0 +1,18 @@
+%agent: A(x{u p} y)
+%conflict: A x y
+// global boolean parameter
+// P
+%guard_param: B [false]
+%guard_param: P [true]
+%guard_param: C [false]
+%guard_param: x [true]
+%guard_param: y [true]
+
+
+#[P] . -> A(x{u}) @ 1
+'~namef' A(x{u}) -> A(x{p}) @ 1
+#[x && y] A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) @ 1
+#[B || C] A(y[.]), A(y[.]) -> A(y[1]), A(y[1]) @ 1
+
+
+%obs: 'Ap' |A(x{p})|

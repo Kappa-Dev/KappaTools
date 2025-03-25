@@ -1,0 +1,27 @@
+
+
+// Define agents
+%agent: A(a,b{u p})
+%agent: B(x,y{u p})
+%agent: C(z,k{u p})
+// global boolean parameter
+//%guard_param: P [true]
+
+// Initial conditions
+%init: 100 A(),B(),C()
+
+A(a[.]),B(x[.]) -> A(a[1]),B(x[1]) @ 1
+A(a[1],b{u}),B(x[1],y{u}) <-> A(a[1],b{p}),B(x[1],y{p}) @ 1
+#[P]
+A(a[.]),C(z[.],k{u}) -> A(a[1]),C(z[1],k{u}) @ 1
+#[Q || [not] J]
+A(a[1]),C(z[1],k{u}) -> A(a[.]),C(z[.],k{p}) @ 1
+#[J && Q]
+A(a[.]),C(z[.],k{p}) -> A(a[1]),C(z[1],k{p}) @ 1
+#[P || J || [not] Q]
+A(a[1],b{u}),C(z[1],k{p}) -> A(a[1],b{p}),C(z[1],k{p}) @ 1
+#[Q]
+A(a[1]),C(z[1]),B(x[.]) -> A(a[1]),C(z[.]),B(x[1]) @ 1
+
+'not_sym1' A(a[1],b{p}),B(x[1],y{u}) -> .,. @ 1
+'not_sym2' A(a[1],b{u}),B(x[1],y{p}) -> .,. @ 1

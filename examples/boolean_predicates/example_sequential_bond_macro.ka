@@ -1,0 +1,15 @@
+%agent: A(x{u p} y)
+%sequential_bond: A x y
+// global boolean parameter
+// P
+
+
+. -> A(x{u}) @ 1
+A(x{u}) -> A(x{p}) @ 1
+A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) @ 1
+A(y[.]), A(y[.]) -> A(y[1]), A(y[1]) @ 1
+A(x[.],y[.]), A(x[.],y[.]) -> A(x[.],y[1]), A(x[.],y[1]) @ 1
+
+
+
+%obs: 'Ap' |A(x{p})|

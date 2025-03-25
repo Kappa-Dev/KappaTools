@@ -1,0 +1,26 @@
+
+
+// Define agents
+%agent: A(x,y,z)
+// global boolean parameter
+%guard_param: P [true]
+// P = x and y are in conflict
+
+// Initial conditions
+%init: 100 A()
+
+A(x[.],y[.]), A(x[.],y[.]) -> A(x[.],y[1]), A(x[.],y[1]) @ 1
+A(x[.],y[.]), A(x[.],y[.]) -> A(x[1],y[.]), A(x[1],y[.]) @ 1
+
+// if there is no conflict
+#[[not] P] A(x[.]), A(x[.]) -> A(x[1]), A(x[1]) @ 1
+#[[not] P] A(y[.]), A(y[.]) -> A(y[1]), A(y[1]) @ 1
+
+// else
+#[P] A(x[1],y[.]), A(x[1],y[.]) -> A(x[2],y[1]), A(x[2],y[1]) @ 1
+#[P] A(x[.],y[1]), A(x[.],y[1]) -> A(x[1],y[2]), A(x[1],y[2]) @ 1
+
+// Measure amount of A double bonds
+%obs: 'Trimer' |A(x[1],y[2]),A(x[1],y[2])|
+
+// Static analysis must show that P => no double bonds

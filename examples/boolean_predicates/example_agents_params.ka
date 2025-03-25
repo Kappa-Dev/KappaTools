@@ -1,0 +1,9 @@
+%agent: A(x{u p})
+%agent: B()
+// global boolean parameter
+// P1, P2
+
+#[P1 && P2] . -> A(x{u}) @ 1
+#[P1 || P2] . -> B(x{u}) @ 1
+
+%obs: 'Ap' |A(x{p})|

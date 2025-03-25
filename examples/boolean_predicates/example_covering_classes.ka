@@ -1,0 +1,4 @@
+%init: 50 A(x{u},y{u},z{u})
+
+#[a] A(x{u}, y{u}) -> A(x{u},y{p}) @ 1
+#[a || b] A(y{u}, z{u}) -> A(y{u},z{p}) @ 1
