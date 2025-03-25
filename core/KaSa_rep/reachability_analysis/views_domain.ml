@@ -763,18 +763,18 @@ module Domain = struct
           bdu_diff
       in
       let error, handler, split_list =
-        Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler error
-          ~threshold:3 (* TO DO *)
-           bdu_diff
+        Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
+          error ~threshold:3 (* TO DO *)
+          bdu_diff
       in
-      let _ = split_list in 
-      
+      let _ = split_list in
+
       let dynamic = set_mvbdu_handler handler dynamic in
       (*----------------------------------------------------*)
       (*print function for extentional description*)
       let error =
         List.fold_left
-          (fun error l (* (l,bdd) *)->
+          (fun error l (* (l,bdd) *) ->
             let error, bool =
               List.fold_left
                 (fun (error, bool) (site_type, state) ->

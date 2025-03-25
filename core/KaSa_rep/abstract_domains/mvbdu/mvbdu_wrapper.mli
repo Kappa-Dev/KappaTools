@@ -47,11 +47,11 @@ module type Mvbdu = sig
     'input ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
-    type ('input, 'output) unary_with_threshold =
+  type ('input, 'output) unary_with_threshold =
     Remanent_parameters_sig.parameters ->
     handler ->
-    Exception.exceptions_caught_and_uncaught -> 
-    threshold:int -> 
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int ->
     'input ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
@@ -207,7 +207,8 @@ module type Mvbdu = sig
 
   val extensional_of_mvbdu : (mvbdu, (key * value) list list) unary
 
-  val parametric_conditions_of_mvbdu:   (mvbdu, ((key * value) list*mvbdu) list) unary_with_threshold
+  val parametric_conditions_of_mvbdu :
+    (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
 
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
