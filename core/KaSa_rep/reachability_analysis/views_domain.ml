@@ -765,8 +765,7 @@ module Domain = struct
       in
       let error, handler, split_list =
         Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
-          error ~threshold:nsites
-          bdu_diff
+          error ~threshold:nsites bdu_diff
       in
       let _ = split_list in
 
@@ -3164,7 +3163,7 @@ module Domain = struct
 
   let stabilise_bdu_update_map_gen_decomposition decomposition ~smash
       ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-      handler_kappa site_correspondence result =
+      handler_kappa site_correspondence result restriction_bdu =
     let nsites = Handler.get_nsites handler_kappa in
     let log = Remanent_parameters.get_logger parameters in
     if smash then (
@@ -3207,7 +3206,7 @@ module Domain = struct
                   Translation_in_natural_language.translate parameters handler
                     error
                     (fun _ e i -> e, i)
-                    mvbdu
+                    mvbdu nsites restriction_bdu
                 in
                 (*-------------------------------------------------------*)
                 ( error,
@@ -3243,7 +3242,7 @@ module Domain = struct
               )
             in
             (*------------------------------------------------------------*)
-            let error, (_, map2) =
+            let error, (map1, map2) =
               get_list_of_sites_correspondence_map parameters error agent_type
                 cv_id site_correspondence
             in
@@ -3282,9 +3281,25 @@ module Domain = struct
                     in
                     error, site_type
                   in
+                  let error, renamed_nsites =
+                    match
+                      Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif
+                      .get parameters error
+                        (Ckappa_sig.mvbdu_var_of_site nsites)
+                        map1
+                    with
+                    | error, None ->
+                      Exception.warn parameters error __POS__ Exit
+                        (Ckappa_sig.mvbdu_var_of_site
+                           Ckappa_sig.dummy_site_name_minus1)
+                    | error, Some i -> error, i
+                  in
                   let error, (handler, translation) =
                     Translation_in_natural_language.translate parameters handler
                       error rename_site mvbdu
+                      (Ckappa_sig.site_name_of_int
+                         (Ckappa_sig.int_of_mvbdu_var renamed_nsites))
+                      restriction_bdu
                   in
                   (*----------------------------------------------------*)
                   ( error,
@@ -3302,11 +3317,11 @@ module Domain = struct
 
   let print_bdu_update_map_gen_decomposition decomposition ~sort ~smash
       ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-      handler_kappa site_correspondence result =
+      handler_kappa site_correspondence result restriction_bdu =
     let error, handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition ~smash
         ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-        handler_kappa site_correspondence result
+        handler_kappa site_correspondence result restriction_bdu
     in
     let error, list =
       if sort then
@@ -3319,6 +3334,7 @@ module Domain = struct
                   handler_kappa agent_id x
               in
               error, (agent_string, x)
+            | Translation_in_natural_language.Valuations_with_guards _
             | Translation_in_natural_language.Equiv _
             | Translation_in_natural_language.No_known_translation _
             | Translation_in_natural_language.Partition _
@@ -3329,13 +3345,14 @@ module Domain = struct
         error, list
     in
 
-    let error =
+    let error, handler =
       List.fold_left
-        (fun error (agent_string, agent_type, _, translation) ->
+        (fun (error, handler) (agent_string, agent_type, _, translation) ->
           Translation_in_natural_language.print
             ~show_dep_with_dimmension_higher_than:dim_min parameters
-            handler_kappa error agent_string agent_type translation)
-        error list
+            handler_kappa handler restriction_bdu error agent_string agent_type
+            translation)
+        (error, handler) list
     in
     error, handler
 
@@ -3415,7 +3432,7 @@ module Domain = struct
 
   let print_result_fixpoint_aux parameters handler error handler_kappa
       (*store_new_index_pair_map*)
-        site_correspondence result =
+        site_correspondence result static =
     let log = Remanent_parameters.get_logger parameters in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
       let error =
@@ -3454,9 +3471,10 @@ module Domain = struct
           "------------------------------------------------------------"
       in
       let () = Loggers.print_newline log in
+      let og_restriction_bdu = get_restriction_mvbdu static in
       let error, handler =
         print_bdu_update_map_cartesian_abstraction parameters handler error
-          handler_kappa site_correspondence result
+          handler_kappa site_correspondence result og_restriction_bdu
       in
       let () = Loggers.print_newline log in
       let () =
@@ -3474,6 +3492,7 @@ module Domain = struct
       let error, handler =
         print_bdu_update_map_cartesian_decomposition ~sort:false parameters
           handler error handler_kappa site_correspondence result
+          og_restriction_bdu
       in
       error, handler
     ) else
@@ -3506,7 +3525,7 @@ module Domain = struct
         || Remanent_parameters.get_dump_reachability_analysis_result parameters
       then
         print_result_fixpoint_aux parameters handler error kappa_handler
-          site_correspondence fixpoint_result
+          site_correspondence fixpoint_result static
       else
         error, handler
     in
@@ -3700,13 +3719,13 @@ module Domain = struct
   let export_relation_properties_aux ~sort ~smash
       ~show_dep_with_dimmension_higher_than:dim_min decomposition domain_name
       parameters dynamic error handler_kappa site_correspondence fixpoint_result
-      kasa_state =
+      kasa_state restriction_bdu =
     let handler = get_mvbdu_handler dynamic in
     (*convert result to list*)
     let error', handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition ~smash
         ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-        handler_kappa site_correspondence fixpoint_result
+        handler_kappa site_correspondence fixpoint_result restriction_bdu
     in
     let error =
       Exception.check_point Exception.warn parameters error error' __POS__ Exit
@@ -3780,16 +3799,16 @@ module Domain = struct
       dynamic error handler_kappa
 
   let export_views_properties_aux parameters error handler_kappa
-      site_correspondence fixpoint_result dynamic kasa_state =
+      site_correspondence fixpoint_result dynamic kasa_state restriction_bdu =
     (*non relational properties*)
     let error, dynamic, kasa_state =
       export_non_relation_properties parameters dynamic error handler_kappa
-        site_correspondence fixpoint_result kasa_state
+        site_correspondence fixpoint_result kasa_state restriction_bdu
     in
     (*relational properties*)
     let error, dynamic, kasa_state =
       export_relation_properties parameters dynamic error handler_kappa
-        site_correspondence fixpoint_result kasa_state
+        site_correspondence fixpoint_result kasa_state restriction_bdu
     in
     error, dynamic, kasa_state
 
@@ -3798,9 +3817,11 @@ module Domain = struct
     let handler_kappa = get_kappa_handler static in
     let site_correspondence = get_site_correspondence_array static in
     let fixpoint_result = get_fixpoint_result dynamic in
+    let og_restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, kasa_state =
       export_views_properties_aux parameters error handler_kappa
         site_correspondence fixpoint_result dynamic kasa_state
+        og_restriction_bdu
     in
     error, dynamic, kasa_state
 

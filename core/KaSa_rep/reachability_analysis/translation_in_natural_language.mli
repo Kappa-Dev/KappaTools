@@ -22,6 +22,10 @@ type token =
       * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
   | Partition of
       (Ckappa_sig.c_mvbdu_var * (Ckappa_sig.c_state * token list) list)
+  | Valuations_with_guards of
+      ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
+      * Ckappa_sig.Views_bdu.mvbdu)
+      list
   | No_known_translation of
       (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list list
 
@@ -44,6 +48,8 @@ val translate :
   Exception.exceptions_caught_and_uncaught ->
   rename_sites ->
   Ckappa_sig.Views_bdu.mvbdu ->
+  Ckappa_sig.c_site_name ->
+  Ckappa_sig.Views_bdu.mvbdu ->
   Exception.exceptions_caught_and_uncaught
   * (Ckappa_sig.Views_bdu.handler * token)
 
@@ -54,11 +60,13 @@ val print :
   show_dep_with_dimmension_higher_than:int ->
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu ->
   Exception.exceptions_caught_and_uncaught ->
   string ->
   Ckappa_sig.c_agent_name ->
   token ->
-  Exception.exceptions_caught_and_uncaught
+  Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler
 
 val convert_views_internal_constraints_list :
   show_dep_with_dimmension_higher_than:int ->
