@@ -765,7 +765,7 @@ module Domain = struct
       in
       let error, handler, split_list =
         Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
-          error ~threshold:threshold bdu_diff
+          error ~threshold bdu_diff
       in
       let _ = split_list in
 
@@ -3190,32 +3190,36 @@ module Domain = struct
             (*-----------------------------------------------------------*)
             Wrapped_modules.LoggedIntMap.fold
               (fun _ mvbdu (error, (handler, list)) ->
-                let error, handler, is_true = Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu restriction_bdu in
+                let error, handler, is_true =
+                  Ckappa_sig.mvbdu_is_true_for_guards parameters handler error
+                    mvbdu restriction_bdu
+                in
                 if is_true then
-                  (error, (handler, list))
-              else
-                let error, handler =
-                  if local_trace || Remanent_parameters.get_trace parameters
-                  then (
-                    let () = Loggers.fprintf log "INTENSIONAL DESCRIPTION:" in
-                    let () = Loggers.print_newline log in
-                    let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
-                    let () = Loggers.fprintf log "EXTENSIONAL DESCRIPTION:" in
-                    let () = Loggers.print_newline log in
-                    error, handler
-                  ) else
-                    error, handler
-                in
-                let error, (handler, translation) =
-                  Translation_in_natural_language.translate parameters handler
-                    error
-                    (fun _ e i -> e, i)
-                    mvbdu nsites restriction_bdu
-                in
-                (*-------------------------------------------------------*)
-                ( error,
-                  ( handler,
-                    (agent_string, agent_type, mvbdu, translation) :: list ) ))
+                  error, (handler, list)
+                else (
+                  let error, handler =
+                    if local_trace || Remanent_parameters.get_trace parameters
+                    then (
+                      let () = Loggers.fprintf log "INTENSIONAL DESCRIPTION:" in
+                      let () = Loggers.print_newline log in
+                      let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
+                      let () = Loggers.fprintf log "EXTENSIONAL DESCRIPTION:" in
+                      let () = Loggers.print_newline log in
+                      error, handler
+                    ) else
+                      error, handler
+                  in
+                  let error, (handler, translation) =
+                    Translation_in_natural_language.translate parameters handler
+                      error
+                      (fun _ e i -> e, i)
+                      mvbdu nsites restriction_bdu
+                  in
+                  (*-------------------------------------------------------*)
+                  ( error,
+                    ( handler,
+                      (agent_string, agent_type, mvbdu, translation) :: list ) )
+                ))
               map
               (error, (handler, list)))
           output (handler, [])

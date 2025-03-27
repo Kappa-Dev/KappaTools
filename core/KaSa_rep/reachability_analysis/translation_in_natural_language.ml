@@ -295,12 +295,11 @@ let translate parameters handler error (rename_site_inverse : rename_sites)
       List.fold_left
         (fun (error, list) elt ->
           let error, elt = rename_site_inverse parameters error elt in
-        (* keep only the sites and not the guards, because the guards are contained in the mvbdu and all mvbdus are true *)
-        match Ckappa_sig.site_or_guard_p_of_mvbdu_var elt nsites with
-           | Site _ -> error, elt :: list
-           | Guard_p _ -> error, list)
-        (error, [])
-        (List.rev var_list)
+          (* keep only the sites and not the guards, because the guards are contained in the mvbdu and all mvbdus are true *)
+          match Ckappa_sig.site_or_guard_p_of_mvbdu_var elt nsites with
+          | Site _ -> error, elt :: list
+          | Guard_p _ -> error, list)
+        (error, []) (List.rev var_list)
     in
     match var_list with
     | [] -> error, (handler, No_known_translation list)
@@ -795,9 +794,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
       in
       error, bdu_handler
     | Valuations_with_guards valuations ->
-      let error =
-        Site_graphs.KaSa_site_graph.print log parameters error t
-      in
+      let error = Site_graphs.KaSa_site_graph.print log parameters error t in
       let () = Loggers.fprintf log " => " in
       let should_use_bracket =
         match valuations with
@@ -1127,7 +1124,8 @@ let rec convert_views_internal_constraints_list_aux
           (error, current_list) list
       in
       error, current_list
-    | Valuations_with_guards _ -> error, current_list (*rTODO convert to lemmas?*)
+    | Valuations_with_guards _ ->
+      error, current_list (*rTODO convert to lemmas?*)
     | No_known_translation list ->
       (match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
