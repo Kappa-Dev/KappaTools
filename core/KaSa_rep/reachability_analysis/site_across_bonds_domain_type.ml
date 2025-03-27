@@ -311,7 +311,7 @@ let project2 (x, y) = project x, project y
 
 let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
     ?(final_result = false) ?dump_any:(_dump_any = false) parameters error
-    kappa_handler handler tuple mvbdu =
+    kappa_handler handler tuple mvbdu restriction_bdu =
   let prefix = Remanent_parameters.get_prefix parameters in
   let log = Remanent_parameters.get_logger parameters in
   let nsites = Handler.get_nsites kappa_handler in
@@ -341,166 +341,192 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
       error, handler
     else (
       (*----------------------------------------------------*)
-      let error, handler, pair_list =
-        Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler error mvbdu
+      let error, handler, is_true =
+        Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
+          restriction_bdu
       in
-      (*----------------------------------------------------*)
-      match Remanent_parameters.get_backend_mode parameters with
-      | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-        let pattern = Site_graphs.KaSa_site_graph.empty in
-        let error, agent_id1, pattern =
-          Site_graphs.KaSa_site_graph.add_agent parameters error kappa_handler
-            agent_type1 pattern
+      if is_true then
+        error, handler
+      else (
+        let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
+        let error, handler, pair_list =
+          Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
+            error ~threshold mvbdu
         in
-        let error, agent_id2, pattern =
-          Site_graphs.KaSa_site_graph.add_agent parameters error kappa_handler
-            agent_type2 pattern
-        in
-        let error, pattern =
-          Site_graphs.KaSa_site_graph.add_bond parameters error kappa_handler
-            agent_id1 site_type1 agent_id2 site_type2 pattern
-        in
-        let error =
-          (*do not print the precondition if it is not the final result*)
-          if final_result then (
-            let error =
-              Site_graphs.KaSa_site_graph.print log parameters error pattern
-            in
-            let () = Loggers.fprintf log " => " in
-            error
-          ) else
-            error
-        in
-        (match pair_list with
-        | [] ->
-          let () = Loggers.fprintf log "" in
-          error, handler
-        | _ :: _ ->
-          let () =
-            if final_result then (
-              let () = Loggers.print_newline log in
-              Loggers.fprintf log "\t["
-            ) else
-              ()
+        (*----------------------------------------------------*)
+        match Remanent_parameters.get_backend_mode parameters with
+        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+          let pattern = Site_graphs.KaSa_site_graph.empty in
+          let error, agent_id1, pattern =
+            Site_graphs.KaSa_site_graph.add_agent parameters error kappa_handler
+              agent_type1 pattern
           in
-          let error, _ =
-            List.fold_left
-              (fun (error, add_or) l ->
+          let error, agent_id2, pattern =
+            Site_graphs.KaSa_site_graph.add_agent parameters error kappa_handler
+              agent_type2 pattern
+          in
+          let error, pattern =
+            Site_graphs.KaSa_site_graph.add_bond parameters error kappa_handler
+              agent_id1 site_type1 agent_id2 site_type2 pattern
+          in
+          let error =
+            (*do not print the precondition if it is not the final result*)
+            if final_result then (
+              let error =
+                Site_graphs.KaSa_site_graph.print log parameters error pattern
+              in
+              let () = Loggers.fprintf log " => " in
+              error
+            ) else
+              error
+          in
+          (match pair_list with
+          | [] ->
+            let () = Loggers.fprintf log "" in
+            error, handler
+          | _ :: _ ->
+            let () =
+              if final_result then (
                 let () = Loggers.print_newline log in
-                let () =
-                  Loggers.fprintf log
-                    (if add_or then
-                       "\t\tv "
-                     else if final_result then
-                       "\t\t  "
-                     else
-                       "\t\t")
-                in
-                let error, add_comma, pattern =
+                Loggers.fprintf log "\t["
+              ) else
+                ()
+            in
+            let error, handler, _ =
+              List.fold_left
+                (fun (error, handler, add_or) (l, mvbdu) ->
+                  let () = Loggers.print_newline log in
+                  let () =
+                    Loggers.fprintf log
+                      (if add_or then
+                         "\t\tv "
+                       else if final_result then
+                         "\t\t  "
+                       else
+                         "\t\t")
+                  in
+                  let error, add_comma, pattern =
+                    List.fold_left
+                      (fun (error, add_comma, pattern) (site_or_guard, state) ->
+                        let error, (pattern, add_comma) =
+                          match
+                            Ckappa_sig.site_or_guard_p_of_mvbdu_var
+                              site_or_guard nsites
+                          with
+                          | Ckappa_sig.Site _ ->
+                            if site_or_guard = Ckappa_sig.fst_site then (
+                              let error, pattern =
+                                Site_graphs.KaSa_site_graph.add_state parameters
+                                  error kappa_handler agent_id1 site_type1'
+                                  state pattern
+                              in
+                              error, (pattern, add_comma)
+                            ) else if site_or_guard = Ckappa_sig.snd_site then (
+                              let error, pattern =
+                                Site_graphs.KaSa_site_graph.add_state parameters
+                                  error kappa_handler agent_id2 site_type2'
+                                  state pattern
+                              in
+                              error, (pattern, add_comma)
+                            ) else
+                              Exception.warn parameters error __POS__ Exit
+                                (pattern, add_comma)
+                          | Guard_p _ ->
+                            (*this should not happen, because the guards are in the mvbdu and not in the list of variables*)
+                            Exception.warn parameters error __POS__ Exit
+                              (pattern, add_comma)
+                        in
+                        error, add_comma, pattern)
+                      (error, false, pattern) l
+                  in
+                  let () = if add_comma then Loggers.fprintf log "," in
+                  let error =
+                    Site_graphs.KaSa_site_graph.print log parameters error
+                      pattern
+                  in
+                  let error, handler =
+                    Handler.print_guard_mvbdu_decompose parameters error
+                      kappa_handler handler ~with_comma:true mvbdu
+                      restriction_bdu
+                  in
+                  error, handler, true)
+                (error, handler, false) pair_list
+            in
+            let () =
+              if final_result then (
+                let () = Loggers.print_newline log in
+                let () = Loggers.fprintf log "\t]" in
+                let () = Loggers.print_newline log in
+                ()
+              )
+            in
+            error, handler)
+        | Remanent_parameters_sig.Natural_language ->
+          let () =
+            Loggers.fprintf log
+              "%sWhenever the site %s of %s and the site %s of %s are bound \
+               together, then the site %s of %s and %s of %s can have the \
+               following respective states:"
+              prefix site1 agent1 site2 agent2 site1' agent1 site2' agent2
+          in
+          let () = Loggers.print_newline log in
+          let prefix = prefix ^ "\t" in
+          let error, handler =
+            List.fold_left
+              (fun (error, handler) (l, mvbdu) ->
+                let () = Loggers.fprintf log "%s" prefix in
+                let error, _ =
                   List.fold_left
-                    (fun (error, add_comma, pattern) (site_or_guard, state) ->
-                      let error, (pattern, add_comma) =
+                    (fun (error, add_comma) (site_or_guard, state) ->
+                      let () = if add_comma then Loggers.fprintf log "," in
+                      let error, string =
                         match
                           Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard
                             nsites
                         with
                         | Ckappa_sig.Site _ ->
                           if site_or_guard = Ckappa_sig.fst_site then (
-                            let error, pattern =
-                              Site_graphs.KaSa_site_graph.add_state parameters
-                                error kappa_handler agent_id1 site_type1' state
-                                pattern
+                            let error, (_, _, statex) =
+                              convert_single parameters error kappa_handler
+                                (agent_type1, site_type1, state)
                             in
-                            error, (pattern, add_comma)
+                            error, statex
                           ) else if site_or_guard = Ckappa_sig.snd_site then (
-                            let error, pattern =
-                              Site_graphs.KaSa_site_graph.add_state parameters
-                                error kappa_handler agent_id2 site_type2' state
-                                pattern
+                            let error, (_, _, statey) =
+                              convert_single parameters error kappa_handler
+                                (agent_type2, site_type2, state)
                             in
-                            error, (pattern, add_comma)
+                            error, statey
                           ) else
-                            Exception.warn parameters error __POS__ Exit
-                              (pattern, add_comma)
-                        | Guard_p guardp ->
-                          let () = if add_comma then Loggers.fprintf log "," in
-                          let error, guard_string =
-                            Handler.string_of_guard parameters guardp
-                              kappa_handler ~state error
-                          in
-                          let () = Loggers.fprintf log "%s" guard_string in
-                          error, (pattern, true)
-                      in
-                      error, add_comma, pattern)
-                    (error, false, pattern) l
-                in
-                let () = if add_comma then Loggers.fprintf log "," in
-                let error =
-                  Site_graphs.KaSa_site_graph.print log parameters error pattern
-                in
-                error, true)
-              (error, false) pair_list
-          in
-          let () =
-            if final_result then (
-              let () = Loggers.print_newline log in
-              let () = Loggers.fprintf log "\t]" in
-              let () = Loggers.print_newline log in
-              ()
-            )
-          in
-          error, handler)
-      | Remanent_parameters_sig.Natural_language ->
-        let () =
-          Loggers.fprintf log
-            "%sWhenever the site %s of %s and the site %s of %s are bound \
-             together, then the site %s of %s and %s of %s can have the \
-             following respective states:"
-            prefix site1 agent1 site2 agent2 site1' agent1 site2' agent2
-        in
-        let () = Loggers.print_newline log in
-        let prefix = prefix ^ "\t" in
-        let error =
-          List.fold_left
-            (fun error l ->
-              let () = Loggers.fprintf log "%s" prefix in
-              let error, _ =
-                List.fold_left
-                  (fun (error, add_comma) (site_or_guard, state) ->
-                    let () = if add_comma then Loggers.fprintf log "," in
-                    let error, string =
-                      match
-                        Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard
-                          nsites
-                      with
-                      | Ckappa_sig.Site _ ->
-                        if site_or_guard = Ckappa_sig.fst_site then (
-                          let error, (_, _, statex) =
-                            convert_single parameters error kappa_handler
-                              (agent_type1, site_type1, state)
-                          in
-                          error, statex
-                        ) else if site_or_guard = Ckappa_sig.snd_site then (
-                          let error, (_, _, statey) =
-                            convert_single parameters error kappa_handler
-                              (agent_type2, site_type2, state)
-                          in
-                          error, statey
-                        ) else
+                            Exception.warn parameters error __POS__ Exit ""
+                        | Guard_p _ ->
+                          (*this should not happen, because the guards are in the mvbdu and not in the list of variables*)
                           Exception.warn parameters error __POS__ Exit ""
-                      | Guard_p guardp ->
-                        Handler.string_of_guard parameters guardp kappa_handler
-                          ~state error
-                    in
-                    let () = Loggers.fprintf log "%s" string in
-                    error, true)
-                  (error, false) l
-              in
-              let () = Loggers.print_newline log in
-              error)
-            error pair_list
-        in
-        error, handler
+                      in
+                      let () = Loggers.fprintf log "%s" string in
+                      error, true)
+                    (error, false) l
+                in
+                let error, handler, is_true =
+                  Ckappa_sig.mvbdu_is_true_for_guards parameters handler error
+                    mvbdu restriction_bdu
+                in
+                let error, handler =
+                  if is_true then
+                    error, handler
+                  else (
+                    let () = Loggers.fprintf log " if " in
+                    Handler.print_guard_mvbdu_decompose parameters error
+                      kappa_handler handler ~with_comma:false mvbdu
+                      restriction_bdu
+                  )
+                in
+                let () = Loggers.print_newline log in
+                error, handler)
+              (error, handler) pair_list
+          in
+          error, handler
+      )
     )
   )
 
@@ -519,7 +545,7 @@ let print_site_across_domain_decompose ?(verbose = true) ?(sparse = false)
       in
       if not is_true then
         print_site_across_domain_mvbdu ~verbose ~sparse ~final_result ~dump_any
-          parameters error kappa_handler handler tuple mvbdu
+          parameters error kappa_handler handler tuple mvbdu restriction_mvbdu
       else
         error, handler)
     (error, handler) mvbdu_list
