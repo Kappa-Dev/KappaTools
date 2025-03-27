@@ -758,14 +758,14 @@ module Domain = struct
       (*this is a function to convert a bdu of diff into a list.
         return a pair: (bdu, and a pair of (site, state) list of list)*)
       let handler = get_mvbdu_handler dynamic in
-      let nsites = Ckappa_sig.int_of_site_name (get_nsites static) in
+      let threshold = Ckappa_sig.int_of_site_name (get_nsites static) - 1 in
       let error, handler, list =
         Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler error
           bdu_diff
       in
       let error, handler, split_list =
         Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
-          error ~threshold:nsites bdu_diff
+          error ~threshold:threshold bdu_diff
       in
       let _ = split_list in
 
@@ -3190,6 +3190,10 @@ module Domain = struct
             (*-----------------------------------------------------------*)
             Wrapped_modules.LoggedIntMap.fold
               (fun _ mvbdu (error, (handler, list)) ->
+                let error, handler, is_true = Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu restriction_bdu in
+                if is_true then
+                  (error, (handler, list))
+              else
                 let error, handler =
                   if local_trace || Remanent_parameters.get_trace parameters
                   then (
