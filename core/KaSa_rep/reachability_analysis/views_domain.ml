@@ -713,23 +713,25 @@ module Domain = struct
   let dump_view_diff static dynamic error (agent_type, cv_id) bdu_old bdu_union
       =
     let parameters = get_parameter static in
-    let handler_kappa = get_kappa_handler static in
+    let kappa_handler = get_kappa_handler static in
     let site_correspondence = get_site_correspondence_array static in
+    let error, dynamic, restriction_bdu =
+      get_restriction_bdu error static dynamic agent_type cv_id
+    in
+    let bdu_handler = get_mvbdu_handler dynamic in
     if
       local_trace
       || Remanent_parameters.get_dump_reachability_analysis_diff parameters
       || Remanent_parameters.get_trace parameters
     then (
       let prefix = Remanent_parameters.get_prefix parameters in
-      let handler = get_mvbdu_handler dynamic in
-      let error, handler, bdu_diff =
-        Ckappa_sig.Views_bdu.mvbdu_xor parameters handler error bdu_old
+      let error, bdu_handler, bdu_diff =
+        Ckappa_sig.Views_bdu.mvbdu_xor parameters bdu_handler error bdu_old
           bdu_union
       in
-      let dynamic = set_mvbdu_handler handler dynamic in
       (*-----------------------------------------------------------------*)
       let error, agent_string =
-        try Handler.string_of_agent parameters error handler_kappa agent_type
+        try Handler.string_of_agent parameters error kappa_handler agent_type
         with _ ->
           Exception.warn parameters error __POS__ Exit
             (Ckappa_sig.string_of_agent_name agent_type)
@@ -755,26 +757,17 @@ module Domain = struct
         ) else
           error, dynamic
       in
-      (*this is a function to convert a bdu of diff into a list.
-        return a pair: (bdu, and a pair of (site, state) list of list)*)
-      let handler = get_mvbdu_handler dynamic in
+      (*----------------------------------------------------*)
       let threshold = Ckappa_sig.int_of_site_name (get_nsites static) - 1 in
-      let error, handler, list =
-        Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler error
-          bdu_diff
+      let error, bdu_handler, split_list =
+        Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters
+          bdu_handler error ~threshold bdu_diff
       in
-      let error, handler, split_list =
-        Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
-          error ~threshold bdu_diff
-      in
-      let _ = split_list in
-
-      let dynamic = set_mvbdu_handler handler dynamic in
       (*----------------------------------------------------*)
       (*print function for extentional description*)
-      let error =
+      let error, bdu_handler =
         List.fold_left
-          (fun error l (* (l,bdd) *) ->
+          (fun (error, bdu_handler) (l, bdu) ->
             let error, bool =
               List.fold_left
                 (fun (error, bool) (site_type, state) ->
@@ -792,7 +785,7 @@ module Domain = struct
                   let error, site_string =
                     try
                       Handler.string_of_site_or_guard parameters error
-                        handler_kappa ~state agent_type site_type
+                        kappa_handler ~state agent_type site_type
                     with _ ->
                       Exception.warn parameters error __POS__ Exit
                         (Ckappa_sig.string_of_site_or_guard site_type)
@@ -809,21 +802,22 @@ module Domain = struct
                 (error, false) l
             in
             (*-----------------------------------------------------------*)
-            let () =
-              if bool then (
-                let () = Loggers.fprintf log ")" in
-                Loggers.print_newline log
-              )
+            let () = if bool then Loggers.fprintf log ")" in
+            let error, bdu_handler =
+              Handler.print_guard_mvbdu_decompose parameters error kappa_handler
+                bdu_handler ~with_comma:bool bdu restriction_bdu
             in
-            error)
-          error list
+            let () = if bool then Loggers.print_newline log in
+            error, bdu_handler)
+          (error, bdu_handler) split_list
       in
       let () =
-        if list = [] then
+        if split_list = [] then
           ()
         else
           Loggers.print_newline log
       in
+      let dynamic = set_mvbdu_handler bdu_handler dynamic in
       error, dynamic
     ) else
       error, dynamic
