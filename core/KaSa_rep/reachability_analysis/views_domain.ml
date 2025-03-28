@@ -710,11 +710,41 @@ module Domain = struct
 
   (***************************************************************)
 
+  let rename_bdu_to_original_names parameters error handler bdu map2 nsites =
+    let error, handler, mvbdu_var_list = Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters handler error bdu in
+    let error, handler, mvbdu_var_list = Ckappa_sig.Views_bdu.extensional_of_variables_list parameters handler error mvbdu_var_list in
+    let error, renaming_list =
+      List.fold_left
+        (fun (error, renaming_list) var ->
+          let error, renamed =
+            Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.get
+              parameters error var map2
+          in
+          match renamed with
+          | None -> error, renaming_list
+          | Some renamed ->
+            ( error,
+              (var, Ckappa_sig.mvbdu_var_of_site_or_guard_p renamed nsites)
+              :: renaming_list ))
+        (error, []) mvbdu_var_list
+    in
+    (* rename bdu to old index *)
+    let error, handler, renaming_list =
+      Ckappa_sig.Views_bdu.build_renaming_list parameters handler error
+        renaming_list
+    in
+    let error, handler, bdu_guard_renamed =
+      Ckappa_sig.Views_bdu.mvbdu_rename parameters handler error bdu
+        renaming_list
+    in
+    error, handler, bdu_guard_renamed
+
   let dump_view_diff static dynamic error (agent_type, cv_id) bdu_old bdu_union
       =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let site_correspondence = get_site_correspondence_array static in
+    let nsites = get_nsites static in
     let error, dynamic, restriction_bdu =
       get_restriction_bdu error static dynamic agent_type cv_id
     in
@@ -742,6 +772,11 @@ module Domain = struct
         get_list_of_sites_correspondence_map parameters error agent_type cv_id
           site_correspondence
       in
+      (*rename bdu to the original indexes*)
+      let error, bdu_handler, bdu_diff =
+        rename_bdu_to_original_names parameters error bdu_handler bdu_diff map2
+         nsites
+      in
       (*-------------------------------------------------------------------*)
       let log = Remanent_parameters.get_logger parameters in
       let error, dynamic =
@@ -758,7 +793,7 @@ module Domain = struct
           error, dynamic
       in
       (*----------------------------------------------------*)
-      let threshold = Ckappa_sig.int_of_site_name (get_nsites static) - 1 in
+      let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
       let error, bdu_handler, split_list =
         Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters
           bdu_handler error ~threshold bdu_diff
@@ -771,15 +806,8 @@ module Domain = struct
             let error, bool =
               List.fold_left
                 (fun (error, bool) (site_type, state) ->
-                  let error, site_type =
-                    match
-                      Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif
-                      .get parameters error site_type map2
-                    with
-                    | error, None ->
-                      Exception.warn parameters error __POS__ Exit
-                        (Ckappa_sig.Site Ckappa_sig.dummy_site_name)
-                    | error, Some i -> error, i
+                  let site_type =
+                    Ckappa_sig.site_or_guard_p_of_mvbdu_var site_type nsites
                   in
                   (*----------------------------------------------------*)
                   let error, site_string =
