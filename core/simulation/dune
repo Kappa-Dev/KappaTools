@@ -1,6 +1,6 @@
 (library
  (name kappa_runtime)
- (libraries kappa_terms)
+ (libraries kappa_terms kappa_connected)
  (public_name kappa-library.runtime)
  (flags
   (:standard
@@ -8,6 +8,8 @@
    @a
    -open
    Kappa_data_structures
+   -open 
+   Kappa_connected 
    -open
    Kappa_site_graphs
    -open
