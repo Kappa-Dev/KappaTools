@@ -63,9 +63,7 @@ type t = {
   size: int option Mods.DynArray.t;
       (* rep to the size of its equivalence class *)
   size_update: int Blackboard.t; (* change in siez in a buffer *)
-  to_check_bind: Mods.IntSet.t;
   to_check_unbind: Mods.IntSet.t;
-  to_check_fresh: Mods.IntSet.t;
   split: id Blackboard.t;
   threshold_update: Mods.IntSet.t Blackboard.t;
   threshold_old: Mods.IntSet.t Blackboard.t;
@@ -162,19 +160,9 @@ let print_update f t =
       (fun i j () -> Format.fprintf f "%i -> %i @." i j)
       t.size_update ()
   in
-  let () = Format.fprintf f "TO CHECK BIND @." in
-  let () =
-    Mods.IntSet.iter (fun j -> Format.fprintf f "%i," j) t.to_check_bind
-  in
-  let () = Format.fprintf f "@." in
   let () = Format.fprintf f "TO CHECK UNBIND @." in
   let () =
     Mods.IntSet.iter (fun j -> Format.fprintf f "%i," j) t.to_check_unbind
-  in
-  let () = Format.fprintf f "@." in
-  let () = Format.fprintf f "TO CHECK FRESH @." in
-  let () =
-    Mods.IntSet.iter (fun j -> Format.fprintf f "%i," j) t.to_check_fresh
   in
   let () = Format.fprintf f "@." in
   ()
@@ -191,9 +179,7 @@ let init =
     back_trans_update = Blackboard.create ();
     size = Mods.DynArray.create 0 None;
     size_update = Blackboard.create ();
-    to_check_bind = Mods.IntSet.empty;
     to_check_unbind = Mods.IntSet.empty;
-    to_check_fresh = Mods.IntSet.empty;
     split = Blackboard.create ();
     threshold_update = Blackboard.create ();
     threshold_old = Blackboard.create ();
@@ -269,8 +255,7 @@ let fresh t i =
   let back_trans_update =
     Blackboard.set t.back_trans_update i (Some (Mods.IntSet.singleton i))
   in
-  let to_check_fresh = Mods.IntSet.add i t.to_check_fresh in
-  { t with array_update; size_update; back_trans_update; to_check_fresh }
+  { t with array_update; size_update; back_trans_update }
 
 let join t i j =
   let t, repi = get_new_rep t i in
@@ -300,10 +285,7 @@ let join t i j =
     let back_trans_update =
       Blackboard.set back_trans_update repj (Some Mods.IntSet.empty)
     in
-    let to_check_bind =
-      Mods.IntSet.add repj (Mods.IntSet.add repi t.to_check_bind)
-    in
-    { t with size_update; array_update; back_trans_update; to_check_bind }
+    { t with size_update; array_update; back_trans_update }
   )
 
 let unbind t i j =
@@ -517,19 +499,8 @@ let flush ~neighbor ~threshold t =
   let threshold_old, () =
     Blackboard.fold_and_flush (fun _ _ () -> ()) threshold_old ()
   in
-  let to_check_bind = Mods.IntSet.empty in
-  let to_check_fresh = Mods.IntSet.empty in
   let to_check_unbind = Mods.IntSet.empty in
-  let t =
-    {
-      t with
-      to_check_bind;
-      to_check_fresh;
-      to_check_unbind;
-      threshold_update;
-      threshold_old;
-    }
-  in
+  let t = { t with to_check_unbind; threshold_update; threshold_old } in
   flush_updates t, updates
 
 (*let t = [|0;1;1;1;1;1;1;1;1;1;10;10;10;10|]
