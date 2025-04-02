@@ -1,11 +1,14 @@
 (library
  (name kappa_connected)
- (libraries unix yojson result logs stdlib-shims bigarray camlp-streams kappa-library.generic)
+ (libraries
+  unix
+  yojson
+  result
+  logs
+  stdlib-shims
+  bigarray
+  camlp-streams
+  kappa-library.generic)
  (public_name kappa-library.connected)
  (flags
-  (:standard
-   -w
-   @a
-   -open
-   Kappa_data_structures
-)))
+  (:standard -w @a -open Kappa_data_structures)))

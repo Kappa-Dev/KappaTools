@@ -8,8 +8,8 @@
    @a
    -open
    Kappa_data_structures
-   -open 
-   Kappa_connected 
+   -open
+   Kappa_connected
    -open
    Kappa_site_graphs
    -open

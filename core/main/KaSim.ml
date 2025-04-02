@@ -199,7 +199,7 @@ let () =
   let cli_args = Run_cli_args.default in
   let kasim_args = Kasim_args.default in
   let common_args = Common_args.default in
-  let () = Connected.do_it () in 
+  (*let () = Connected.do_it () in *)
   let options =
     Run_cli_args.options cli_args
     @ Kasim_args.options kasim_args
