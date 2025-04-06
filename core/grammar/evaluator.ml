@@ -90,12 +90,13 @@ let get_pause_criteria ~debug_mode ~outputs ~sharing ~syntax_version contact_map
 
 let find_all_embeddings ~debug_mode env tr =
   let domain = Model.domain env in
+  let with_thresholds = Model.thresholds env in
   let dummy_instances = Instances.empty env in
   let graph =
     List.fold_left
       (Rule_interpreter.apply_concrete_positive_transformation
          (Model.signatures env) ?mod_connectivity_store:None dummy_instances)
-      (Edges.empty ~with_connected_components:false)
+      (Edges.empty ~with_connected_components:false ~with_thresholds)
       tr
   in
   let out, _ =

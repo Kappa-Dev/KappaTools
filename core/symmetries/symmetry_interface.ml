@@ -268,11 +268,14 @@ let f ~debug_mode ren acc (i, _cc) em =
       p in
   (matc,mix)*)
 
+let with_thresholds = Array.make 0 0
+let with_connected_components = false
+
 let compose_embeddings_unary_binary compil p emb_list x =
   let mix, ren =
     add_fully_specified_to_graph ~debug_mode:compil.debug_mode
       (Model.signatures compil.environment)
-      (Edges.empty ~with_connected_components:false)
+      (Edges.empty ~with_connected_components ~with_thresholds)
       x
   in
   let cc_list = Tools.array_fold_lefti (fun i acc cc -> (i, cc) :: acc) [] p in
@@ -294,7 +297,7 @@ let disjoint_union_sigs ~debug_mode sigs l =
         i, Option_util.unsome Matching.empty (Matching.add_cc em i r''), mix')
       ( List.length l,
         Matching.empty,
-        Edges.empty ~with_connected_components:false )
+        Edges.empty ~with_connected_components ~with_thresholds )
       l
   in
   pat, em, mix

@@ -48,6 +48,7 @@ type ast_compiled_data = {
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)
+  thresholds: Mods.IntSet.t;
   result:
     ( Ast.agent,
       Ast.agent_sig,

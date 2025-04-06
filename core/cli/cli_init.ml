@@ -124,6 +124,7 @@ let get_pack_from_preprocessed_ast kasim_args ~(compile_mode_on : bool)
       ?overwrite_t0:preprocessed_ast.overwrite_t0 ~compile_mode_on
       preprocessed_ast.ast_compiled_data.agents_sig
       preprocessed_ast.ast_compiled_data.counters_info
+      preprocessed_ast.ast_compiled_data.thresholds
       preprocessed_ast.ast_compiled_data.token_names
       preprocessed_ast.ast_compiled_data.contact_map
       preprocessed_ast.ast_compiled_data.result

@@ -54,6 +54,7 @@ val maybe_iteri : (t -> 'a -> 'a option) -> 'a -> t -> 'a
 @return f (n - k) (... (f (n - 1) (f n x))) up to k < n <= k+1
 or [f] returns [None] *)
 
+val maybe_iteri_result2 : (t -> 'a -> bool * 'a) -> 'a -> t -> 'a
 val to_string : t -> string
 
 val of_string : string -> t

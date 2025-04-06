@@ -21,10 +21,12 @@ type t = {
   tokens_reverse_dependencies: Operator.DepSet.t array;
   contact_map: Contact_map.t;
   counters_info: Counters_info.t;
+  thresholds: int Array.t;
 }
 
 let init ~filenames domain tokens algs (deps_in_t, deps_in_e, tok_rd, alg_rd)
-    (ast_rules, rules) observables interventions contact_map counters_info =
+    (ast_rules, rules) observables interventions contact_map counters_info
+    thresholds =
   {
     filenames;
     domain;
@@ -40,6 +42,7 @@ let init ~filenames domain tokens algs (deps_in_t, deps_in_e, tok_rd, alg_rd)
     interventions;
     contact_map;
     counters_info;
+    thresholds;
   }
 
 let deconstruct env =
@@ -55,9 +58,11 @@ let deconstruct env =
     env.observables,
     env.interventions,
     env.contact_map,
-    env.counters_info )
+    env.counters_info,
+    env.thresholds )
 
 let domain env = env.domain
+let thresholds env = env.thresholds
 let get_obs env = env.observables
 let get_rules env = env.rules
 let new_domain domain env = { env with domain }
@@ -310,6 +315,7 @@ let propagate_constant ~warning ?max_time ?max_events ~updated_vars
     algs_reverse_dependencies = x.algs_reverse_dependencies;
     tokens_reverse_dependencies = x.tokens_reverse_dependencies;
     contact_map = x.contact_map;
+    thresholds = x.thresholds;
   }
 
 let kappa_instance_to_yojson =
@@ -372,6 +378,7 @@ let to_yojson env =
       ( "tokens_reverse_dependencies",
         JsonUtil.of_array Operator.depset_to_yojson
           env.tokens_reverse_dependencies );
+      "thresholds", JsonUtil.of_array JsonUtil.of_int env.thresholds;
     ]
 
 let kappa_instance_of_yojson =
@@ -450,6 +457,10 @@ let of_yojson = function
            JsonUtil.to_array Operator.depset_of_yojson
              (Yojson.Basic.Util.member "tokens_reverse_dependencies" x);
          contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
+         thresholds =
+           JsonUtil.to_array
+             (JsonUtil.to_int ~error_msg:"Not a correct threshold")
+             (List.assoc "thresholds" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Not a correct environment", x)))

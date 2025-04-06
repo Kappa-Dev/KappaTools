@@ -103,7 +103,7 @@ let do_modification ~debug_mode ~outputs env counter graph state extra
         modification
     in
     let graph' =
-      Nbr.maybe_iteri
+      Nbr.maybe_iteri_result2
         (fun _ g ->
           Rule_interpreter.force_rule ~debug_mode ~outputs env counter g
             (Trace.PERT text) r)
@@ -321,9 +321,10 @@ let initialize ~bind ~return ~debug_mode ~outputs env counter graph0 state0
                       Rule_interpreter.apply_given_rule ~debug_mode ~outputs env
                         counter s (Trace.INIT creations_sort) compiled_rule
                     with
-                    | Rule_interpreter.Success s -> s
-                    | Rule_interpreter.Clash | Rule_interpreter.Corrected
-                    | Rule_interpreter.Blocked ->
+                    | Rule_interpreter.Success, s -> s
+                    | ( ( Rule_interpreter.Clash | Rule_interpreter.Corrected
+                        | Rule_interpreter.Blocked ),
+                        _ ) ->
                       raise
                         (ExceptionDefn.Internal_Error
                            (Loc.annot_with_dummy "Bugged initial rule")))
@@ -578,14 +579,19 @@ let regular_loop_body ~debug_mode ~outputs ~maxConsecutiveClash env counter
   in
   if (not continue) || stop then
     true, graph', state'
-  else if
-    (not mix_changed)
-    || Rule_interpreter.is_correct_instance env graph' picked_instance
-  then
-    one_rule ~debug_mode ~outputs ~maxConsecutiveClash env counter graph' state'
-      picked_instance
-  else
-    Counter.one_time_correction_event counter, graph', state'
+  else (
+    let graph'', b =
+      if not mix_changed then
+        graph, true
+      else
+        Rule_interpreter.is_correct_instance env graph' picked_instance
+    in
+    if b then
+      one_rule ~debug_mode ~outputs ~maxConsecutiveClash env counter graph''
+        state' picked_instance
+    else
+      Counter.one_time_correction_event counter, graph', state'
+  )
 
 let a_loop ~debug_mode ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash env
     counter graph state =

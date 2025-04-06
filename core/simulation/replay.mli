@@ -17,7 +17,8 @@ type state = {
 
 type summary = { unary_distances: (int * int) option }
 
-val init_state : with_connected_components:bool -> state
+val init_state :
+  with_connected_components:bool -> with_thresholds:int Array.t -> state
 
 val do_step : Signature.s -> state -> Trace.step -> state * summary
 (** @return the new state and, if the step was an unary instance of a

@@ -31,6 +31,9 @@ val smart_map : ('a -> 'a) -> 'a list -> 'a list
 val remove_suffix_after_last_occurrence : ('a -> bool) -> 'a list -> 'a list
 val remove_consecutive_double : 'a list -> 'a list
 
+val fold_filter :
+  ('state -> 'a -> 'state * bool) -> 'state -> 'a list -> 'state * 'a list
+
 module Infix : sig
   val ( $$ ) : 'a option -> 'a list -> 'a list
   (** [cons_option] *)

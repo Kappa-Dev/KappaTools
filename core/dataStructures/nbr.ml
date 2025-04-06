@@ -166,6 +166,14 @@ let rec maybe_iteri f x n =
   ) else
     x
 
+let rec maybe_iteri_result2 f x n =
+  if is_strictly_positive n then (
+    match f n x with
+    | false, x -> x
+    | true, x' -> maybe_iteri_result2 f x' (pred n)
+  ) else
+    x
+
 let of_string x =
   try I (int_of_string x) with Failure _ -> F (float_of_string x)
 

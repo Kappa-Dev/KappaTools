@@ -8,6 +8,7 @@ module Blackboard = struct
   type 'a t = { array: 'a option Mods.DynArray.t; keys: id list }
 
   let create () = { array = Mods.DynArray.create 0 None; keys = [] }
+  let copy t = { array = Mods.DynArray.copy t.array; keys = t.keys }
   let get t i = Mods.DynArray.get t.array i
 
   let define t i j =
@@ -171,7 +172,7 @@ let print_all f t =
   print f t;
   print_update f t
 
-let init =
+let init () =
   {
     array = Mods.DynArray.create 0 None;
     array_update = Blackboard.create ();
@@ -183,6 +184,20 @@ let init =
     split = Blackboard.create ();
     threshold_update = Blackboard.create ();
     threshold_old = Blackboard.create ();
+  }
+
+let copy t =
+  {
+    array = Mods.DynArray.copy t.array;
+    array_update = Blackboard.copy t.array_update;
+    back_trans = Mods.DynArray.copy t.back_trans;
+    back_trans_update = Blackboard.copy t.back_trans_update;
+    size = Mods.DynArray.copy t.size;
+    size_update = Blackboard.copy t.size_update;
+    to_check_unbind = t.to_check_unbind;
+    split = Blackboard.copy t.split;
+    threshold_update = Blackboard.copy t.threshold_update;
+    threshold_old = Blackboard.copy t.threshold_old;
   }
 
 let lift t acc i =
@@ -297,7 +312,7 @@ let unbind t i j =
 let create = fresh
 let bind = join
 
-let degrade ~neightbor:f t i =
+let degrade ~neighbor:f t i =
   let list = f i in
   List.fold_left (fun t j -> unbind t i j) t list
 
@@ -317,7 +332,7 @@ let scan2 i l l' =
     let l', a = scan i l' in
     a, l, l'
 
-let flush ~neighbor ~threshold t =
+let flush ~neighbor ~thresholds t =
   let set = t.to_check_unbind in
   let l = Mods.IntSet.fold (fun i l -> (i, [ i ]) :: l) set [] in
   let rec aux to_visit to_visit_after t alias =
@@ -430,7 +445,7 @@ let flush ~neighbor ~threshold t =
       (fun rep (set_update : Mods.IntSet.t)
            (t, (threshold_update : Mods.IntSet.t Blackboard.t), threshold_old) ->
         let t, new_size = get_new_size_rep t rep in
-        let new_threshold = threshold new_size in
+        let new_threshold = thresholds new_size in
         let t, old_size =
           if old_exists t rep then
             get_old_size t rep
@@ -446,7 +461,7 @@ let flush ~neighbor ~threshold t =
         let old_threshold =
           match old_size with
           | None -> 0
-          | Some old_size -> threshold old_size
+          | Some old_size -> thresholds old_size
         in
         let threshold_update =
           match Blackboard.get threshold_update new_threshold with
@@ -488,7 +503,7 @@ let flush ~neighbor ~threshold t =
                 let t, size = get_old_size t id in
                 match size with
                 | None -> t, 0
-                | Some size -> t, threshold size
+                | Some size -> t, thresholds size
               ) else
                 t, 0
             in
@@ -571,8 +586,7 @@ let do_it () =
 
 let build_threshold s =
   if Mods.IntSet.is_empty s then
-    fun _ ->
-  0
+    Array.make 0 0
   else (
     let l = Mods.IntSet.fold (fun i l -> i :: l) s [] in
     let max =
@@ -594,14 +608,25 @@ let build_threshold s =
       )
     in
     let () = aux 0 l 0 in
-    let f i =
-      if i < max then
-        array.(i)
-      else
-        max
-    in
-    f
+    array
   )
+
+let eval_threshold array =
+  let max = Array.length array in
+  let f (i : id) =
+    if i < max then
+      array.(i)
+    else
+      max
+  in
+  f
+
+let size_of_cc = get_old_size
+
+let is_connected t id id' =
+  let t, rep = get_old_rep t id in
+  let t, rep' = get_old_rep t id' in
+  t, rep = rep'
 
 (*
   let do_it () = 

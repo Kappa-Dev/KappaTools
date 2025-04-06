@@ -12,7 +12,9 @@
    -open
    Kappa_terms
    -open
-   Kappa_runtime)))
+   Kappa_runtime
+   -open
+   Kappa_connected)))
 
 (ocamlyacc kparser4 kappaParser)
 

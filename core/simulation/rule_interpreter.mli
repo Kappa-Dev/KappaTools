@@ -1,6 +1,6 @@
 type t
 type instance
-type result = Clash | Corrected | Blocked | Success of t
+type result = Clash | Corrected | Blocked | Success
 
 val value_alg : Counter.t -> t -> Primitives.alg_expr -> Nbr.t
 
@@ -21,7 +21,7 @@ val force_rule :
   Trace.event_kind ->
   ?rule_id:int ->
   Primitives.elementary_rule ->
-  t option
+  bool * t
 
 val update_outdated_activities :
   debug_mode:bool ->
@@ -68,7 +68,7 @@ val apply_given_rule :
   t ->
   Trace.event_kind ->
   Primitives.elementary_rule ->
-  result
+  result * t
 
 val incorporate_extra_pattern :
   debug_mode:bool -> Pattern.Env.t -> t -> Pattern.id -> t
@@ -96,7 +96,7 @@ val apply_concrete_positive_transformation :
 
 val print : Model.t -> Format.formatter -> t -> unit
 val pick_an_instance : debug_mode:bool -> Kappa_terms.Model.t -> t -> instance
-val is_correct_instance : Kappa_terms.Model.t -> t -> instance -> bool
+val is_correct_instance : Kappa_terms.Model.t -> t -> instance -> t * bool
 val get_random_state : t -> Random.State.t
 
 val obs_from_transformations :

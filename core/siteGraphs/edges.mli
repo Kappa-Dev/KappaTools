@@ -8,9 +8,12 @@
 
 (** Concrete graph implementation *)
 
+module Edges_on_demand : Edges_sig.Edges
+module Edges_early : Edges_sig.Edges
+
 type t
 
-val empty : with_connected_components:bool -> t
+val empty : with_connected_components:bool -> with_thresholds:int Array.t -> t
 
 val copy : t -> t
 (** You'd better NOT use that on the state of a simulation *)
@@ -66,7 +69,7 @@ val get_internal : int -> int -> t -> int
 val get_sites : int -> t -> int
 val get_sort : int -> t -> int
 val get_connected_component : int -> t -> int option
-val in_same_connected_component : int -> int -> t -> bool
+val in_same_connected_component : int -> int -> t -> t * bool
 
 val iter_neighbors : (Agent.t -> unit) -> int -> t -> unit
 (** [iter_neighbors f ag graph] calls function [f] on all direct
@@ -83,7 +86,7 @@ val print_path : ?sigs:Signature.s -> Format.formatter -> path -> unit
 val is_valid_path : path -> t -> bool
 
 val are_connected :
-  ?max_distance:int -> t -> Agent.t list -> Agent.t list -> path option
+  ?max_distance:int -> t -> Agent.t list -> Agent.t list -> t * path option
 (** [are_connected ?max_distance graph nodes_x nodes_y] *)
 
 val species :
@@ -99,3 +102,4 @@ val build_user_snapshot :
   (int * User_graph.connected_component) list
 
 val debug_print : Format.formatter -> t -> unit
+val flush : thresholds:int Array.t -> t -> t * Connected.updates

@@ -18,7 +18,7 @@ module Make (Instances : Instances_sig.S) : sig
     | Clash
     | Corrected
     | Blocked
-    | Success of t
+    | Success
         (** Clash means rectangular approximation failure
       Corrected means molecular ambiguity failure *)
 
@@ -56,12 +56,12 @@ module Make (Instances : Instances_sig.S) : sig
     t ->
     Trace.event_kind ->
     Primitives.elementary_rule ->
-    result
+    result * t
   (** Returns the graph obtained by applying the rule.
       [rule_id] is mandatory if the rule has an unary rate.*)
 
   val pick_an_instance : debug_mode:bool -> Kappa_terms.Model.t -> t -> instance
-  val is_correct_instance : Model.t -> t -> instance -> bool
+  val is_correct_instance : Model.t -> t -> instance -> t * bool
 
   val apply_instance :
     debug_mode:bool ->
@@ -88,7 +88,7 @@ module Make (Instances : Instances_sig.S) : sig
     Trace.event_kind ->
     ?rule_id:int ->
     Primitives.elementary_rule ->
-    t option
+    bool * t
   (** Apply the rule for sure if it is possible. Try [apply_rule] but in
       case of null_event, it computes the exact injections of the left hand
       side to do apply the rule and returns the remaining exact injections. *)

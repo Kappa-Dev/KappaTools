@@ -1,6 +1,12 @@
 (library
  (name kappa_site_graphs)
- (libraries kappa_data_structures)
+ (libraries kappa_data_structures kappa_connected)
  (public_name kappa-library.mixtures)
  (flags
-  (:standard -w @a-40-42-48 -open Kappa_data_structures)))
+  (:standard
+   -w
+   @a-40-42-48
+   -open
+   Kappa_data_structures
+   -open
+   Kappa_connected)))

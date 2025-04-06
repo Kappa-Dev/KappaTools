@@ -157,3 +157,16 @@ let find_option (p : 'a -> bool) (l : 'a list) : 'a option =
 module Infix = struct
   let ( $$ ) = cons_option
 end
+
+let fold_filter p state list =
+  let rec aux p to_do state acc =
+    match to_do with
+    | [] -> state, List.rev acc
+    | h :: t ->
+      let state, b = p state h in
+      if b then
+        aux p t state (h :: acc)
+      else
+        aux p t state acc
+  in
+  aux p list state []

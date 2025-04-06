@@ -177,8 +177,8 @@ let parse ~patternSharing (parsing_compil : Ast.parsing_compil) var_overwrite
           ~return:Lwt.return ?rescale_init:None ?overwrite_t0:None
           ~compile_mode_on:false ~outputs ~sharing:patternSharing
           ast_compiled_data.agents_sig ast_compiled_data.counters_info
-          ast_compiled_data.token_names ast_compiled_data.contact_map
-          ast_compiled_data.result
+          ast_compiled_data.thresholds ast_compiled_data.token_names
+          ast_compiled_data.contact_map ast_compiled_data.result
         >>= fun (env, _with_trace, init_l) ->
         let counter =
           Counter.create

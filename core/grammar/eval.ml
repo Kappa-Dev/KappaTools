@@ -624,8 +624,8 @@ let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map
     Export_to_KaSim.flush_errors kasa_state
 *)
 let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
-    ?overwrite_init ?overwrite_t0 ?rescale_init sigs_nd counters_info tk_nd
-    contact_map result =
+    ?overwrite_init ?overwrite_t0 ?rescale_init sigs_nd counters_info
+    with_thresholds tk_nd contact_map result =
   let warning ~pos msg = outputs (Data.Warning (Some pos, msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
   let preenv = Pattern.PreEnv.empty sigs_nd counters_info in
@@ -670,10 +670,13 @@ let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
        ^ string_of_int dom_stats.Pattern.PreEnv.stat_nav_steps
        ^ " navigation steps"));
 
+  let with_thresholds = Connected.build_threshold with_thresholds in
+
   let env =
     Model.init ~filenames:result.filenames domain tk_nd alg_nd alg_deps''
       (Array.of_list result.rules, rule_nd)
       (Array.of_list obs) (Array.of_list pert) contact_map counters_info
+      with_thresholds
   in
 
   outputs (Data.Log "\t -initial conditions");

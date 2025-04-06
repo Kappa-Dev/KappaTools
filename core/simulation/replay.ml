@@ -15,9 +15,9 @@ type state = {
 
 type summary = { unary_distances: (int * int) option }
 
-let init_state ~with_connected_components =
+let init_state ~with_connected_components ~with_thresholds =
   {
-    graph = Edges.empty ~with_connected_components;
+    graph = Edges.empty ~with_connected_components ~with_thresholds;
     time = 0.;
     event = 0;
     connected_components =
@@ -190,13 +190,13 @@ let involved_agents l =
     l
 
 let store_distances r graph = function
-  | [] | [ _ ] | _ :: _ :: _ :: _ -> None
+  | [] | [ _ ] | _ :: _ :: _ :: _ -> graph, None
   | [ cc1; cc2 ] ->
     let cc1_ags = involved_agents cc1 in
     let cc2_ags = involved_agents cc2 in
     (match Edges.are_connected graph cc1_ags cc2_ags with
-    | None -> None
-    | Some path -> Some (r, List.length path))
+    | graph, None -> graph, None
+    | graph, Some path -> graph, Some (r, List.length path))
 
 let test_pass_on graph = function
   | Instantiation.Is_Here ag -> Edges.is_agent ag graph
@@ -256,11 +256,15 @@ let do_actions sigs st actions =
 let do_step sigs state = function
   | Trace.Subs _ -> state, { unary_distances = None }
   | Trace.Rule (kind, event, info) ->
-    let unary_distances =
+    let state, unary_distances =
       if state.connected_components = None then
-        None
-      else
-        store_distances kind state.graph event.Instantiation.tests
+        state, None
+      else (
+        let graph, rep =
+          store_distances kind state.graph event.Instantiation.tests
+        in
+        { state with graph }, rep
+      )
     in
     let pregraph, connected_components =
       do_actions sigs

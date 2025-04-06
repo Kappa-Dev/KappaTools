@@ -1912,6 +1912,7 @@ type ast_compiled_data = {
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;
+  thresholds: Mods.IntSet.t;
   result:
     ( Ast.agent,
       Ast.agent_sig,
@@ -2688,6 +2689,17 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       cleaned_rules
   in
 
+  let thresholds_of_rule _rule = [ 100 ] in
+  (* TO DO *)
+  let thresholds =
+    List.fold_left
+      (fun set rule ->
+        List.fold_left
+          (fun set elt -> Mods.IntSet.add elt set)
+          set (thresholds_of_rule rule))
+      Mods.IntSet.empty cleaned_rules
+  in
+
   let variables =
     Tools.array_fold_righti
       (fun i (lab, expr) acc ->
@@ -2718,6 +2730,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     token_names;
     alg_vars_finder;
     updated_alg_vars;
+    thresholds;
     result =
       {
         filenames = ast_compil.filenames;

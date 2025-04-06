@@ -25,6 +25,7 @@ val init :
   Primitives.perturbation array ->
   Contact_map.t ->
   Counters_info.counter_sig option array array ->
+  int Array.t ->
   t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
@@ -45,6 +46,7 @@ val deconstruct :
   * Primitives.perturbation array
   * Contact_map.t
   * Counters_info.counter_sig option array array
+  * int Array.t
 
 val nb_tokens : t -> int
 val nb_algs : t -> int
@@ -52,6 +54,7 @@ val nb_rules : t -> int
 val nb_syntactic_rules : t -> int
 val nb_perturbations : t -> int
 val domain : t -> Pattern.Env.t
+val thresholds : t -> int Array.t
 val get_obs : t -> Primitives.alg_expr Loc.annoted array
 val get_rules : t -> Primitives.elementary_rule array
 val new_domain : Pattern.Env.t -> t -> t
