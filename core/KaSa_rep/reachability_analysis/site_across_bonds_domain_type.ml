@@ -530,26 +530,6 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
     )
   )
 
-let print_site_across_domain_decompose ?(verbose = true) ?(sparse = false)
-    ?(final_result = false) ?(dump_any = false) parameters error kappa_handler
-    handler tuple mvbdu restriction_mvbdu =
-  let error, handler, mvbdu_list =
-    Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition parameters handler
-      error mvbdu
-  in
-  List.fold_left
-    (fun (error, handler) mvbdu ->
-      let error, handler, is_true =
-        Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
-          restriction_mvbdu
-      in
-      if not is_true then
-        print_site_across_domain_mvbdu ~verbose ~sparse ~final_result ~dump_any
-          parameters error kappa_handler handler tuple mvbdu restriction_mvbdu
-      else
-        error, handler)
-    (error, handler) mvbdu_list
-
 (***************************************************************************)
 (***************************************************************************)
 
@@ -580,7 +560,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
       let parameter =
         Remanent_parameters.update_prefix parameter "                "
       in
-      print_site_across_domain_decompose ~verbose:false ~dump_any:true parameter
+      print_site_across_domain_mvbdu ~verbose:false ~dump_any:true parameter
         error kappa_handler handler pair mvbdu restriction_mvbdu
     ) else
       error, handler
@@ -638,8 +618,8 @@ let add_link_and_check parameter error bdu_false handler kappa_handler bool
           else
             dump_title ()
         in
-        print_site_across_domain_decompose ~verbose:false ~dump_any:true
-          parameter error kappa_handler handler x mvbdu restriction_mvbdu
+        print_site_across_domain_mvbdu ~verbose:false ~dump_any:true parameter
+          error kappa_handler handler x mvbdu restriction_mvbdu
       ) else
         error, handler
     in

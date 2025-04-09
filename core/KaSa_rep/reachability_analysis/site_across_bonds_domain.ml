@@ -1825,7 +1825,7 @@ module Domain = struct
         let error, handler =
           Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->
-              Site_across_bonds_domain_type.print_site_across_domain_decompose
+              Site_across_bonds_domain_type.print_site_across_domain_mvbdu
                 ~verbose:true ~sparse:true ~final_result:true ~dump_any:true
                 parameters error kappa_handler handler (x, y) mvbdu
                 restriction_bdu)
