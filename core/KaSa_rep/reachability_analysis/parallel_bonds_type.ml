@@ -108,7 +108,7 @@ end))
 (*******************************************************************)
 
 (**The first variable of the mvbdu represents the question "if there is a bond, is it parallel?"*)
-let first_variable = Ckappa_sig.dummy_site_or_guard_name
+let first_variable = Ckappa_sig.dummy_mvbdu_var
 
 let convert_pair parameters error kappa_handler pair =
   let agent, site = pair in

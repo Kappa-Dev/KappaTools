@@ -110,8 +110,8 @@ module Domain = struct
   let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_guard =
-      Bdu_static_views.get_bdu_guard_original_names guard_mvbdus rule_id
-        parameters handler error
+      Bdu_static_views.get_bdu_guard guard_mvbdus rule_id parameters handler
+        error
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_guard

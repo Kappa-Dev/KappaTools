@@ -208,8 +208,11 @@ let declare_site create parameters make_site make_state (error, handler)
         (handler, [], Ckappa_sig.dummy_site_name)
     | Some (k, _, _, sites) ->
       let nsites =
-        if Handler.get_nsites handler = k then
-          Ckappa_sig.site_name_of_int (Ckappa_sig.int_of_site_name k + 1)
+        if
+          Ckappa_sig.int_of_site_name (Handler.get_nsites handler)
+          = Ckappa_sig.int_of_site_name k + 1
+        then
+          Ckappa_sig.site_name_of_int (Ckappa_sig.int_of_site_name k + 2)
         else
           Handler.get_nsites handler
       in

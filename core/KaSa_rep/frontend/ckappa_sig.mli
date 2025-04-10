@@ -49,7 +49,8 @@ val string_of_c_link_value : c_link_value -> string
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
 val dummy_guard_parameter : c_guard_parameter
-val dummy_site_or_guard_name : c_mvbdu_var
+val dummy_mvbdu_var : c_mvbdu_var
+val dummy_mvbdu_var_1 : c_mvbdu_var
 val dummy_state_index : c_state
 val dummy_state_index_true : c_state
 val dummy_state_index_false : c_state
@@ -558,7 +559,7 @@ module Site_type_nearly_Inf_Int_storage_Imperatif :
 module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_site_name and type dimension = int
 
-module GuardPOrSite_nearly_Inf_Int_storage_Imperatif :
+module Mvbdu_var_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_mvbdu_var and type dimension = int
 
 module State_index_nearly_Inf_Int_storage_Imperatif :

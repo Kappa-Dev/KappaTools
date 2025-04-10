@@ -164,7 +164,8 @@ let c_rule_id_of_string s =
 let dummy_agent_name = 0
 let dummy_site_name = 0
 let dummy_guard_parameter = 0
-let dummy_site_or_guard_name = 0
+let dummy_mvbdu_var = 0
+let dummy_mvbdu_var_1 = 1
 let dummy_state_index = 0
 let dummy_state_index_true = 1
 let dummy_state_index_false = 0
@@ -1136,7 +1137,7 @@ module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Quick_key_list (Site_type_nearly_Inf_Int_storage_Imperatif)
 
 (*guard parameters or site: the first n indexes are the guards, and the remaining are the sites*)
-module GuardPOrSite_nearly_Inf_Int_storage_Imperatif :
+module Mvbdu_var_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_mvbdu_var and type dimension = int =
   Int_storage.Nearly_inf_Imperatif
 

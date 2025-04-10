@@ -716,15 +716,7 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
         let error, last_site =
           Handler.last_site_of_agent parameters error handler_kappa ag
         in
-        let nr_guard_parameters =
-          Handler.get_nr_guard_parameters handler_kappa
-        in
-        let nsites = Handler.get_nsites handler_kappa in
-        let size_map1 =
-          1
-          + Ckappa_sig.int_of_site_name last_site
-          + Ckappa_sig.int_of_guard_parameter nr_guard_parameters
-        in
+        let size_map1 = 1 + Ckappa_sig.int_of_site_name last_site in
         let size_map2 = 1 + List.length list in
         let error, array =
           List.fold_left
@@ -732,16 +724,16 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
               let rec aux acc k map1 map2 error =
                 match acc with
                 | [] -> error, (map1, map2)
-                | h :: tl ->
-                  let h_int =
-                    Ckappa_sig.mvbdu_var_of_site_or_guard_p h nsites
-                  in
+                | Ckappa_sig.Guard_p _ :: _ ->
+                  (*only sites are converted to a new index*)
+                  error, (map1, map2)
+                | Ckappa_sig.Site h :: tl ->
                   let error, map1 =
-                    Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.set
-                      parameters error h_int k map1
+                    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.set
+                      parameters error h k map1
                   in
                   let error, map2 =
-                    Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.set
+                    Ckappa_sig.Mvbdu_var_nearly_Inf_Int_storage_Imperatif.set
                       parameters error k h map2
                   in
                   aux tl
@@ -750,15 +742,15 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
                     map1 map2 error
               in
               let error, map1 =
-                Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.create
+                Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create
                   parameters error size_map1
               in
               let error, map2 =
-                Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.create
+                Ckappa_sig.Mvbdu_var_nearly_Inf_Int_storage_Imperatif.create
                   parameters error size_map2
               in
               let error, (map1, map2) =
-                aux list (Ckappa_sig.mvbdu_var_of_int 1) map1 map2 error
+                aux list (Ckappa_sig.dummy_mvbdu_var_1) map1 map2 error
               in
               Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.set
                 parameters error cv_id (map1, map2) array)

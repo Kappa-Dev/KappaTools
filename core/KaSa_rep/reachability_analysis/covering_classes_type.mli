@@ -156,9 +156,9 @@ type predicate_covering_classes = {
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
   site_correspondence:
     (Ckappa_sig.c_mvbdu_var
-     Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.t
-    * Ckappa_sig.c_site_or_guard_p
-      Ckappa_sig.GuardPOrSite_nearly_Inf_Int_storage_Imperatif.t)
+     Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t
+    * Ckappa_sig.c_site_name
+      Ckappa_sig.Mvbdu_var_nearly_Inf_Int_storage_Imperatif.t)
     Cv_id_nearly_Inf_Int_storage_Imperatif.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
 }

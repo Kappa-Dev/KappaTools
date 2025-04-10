@@ -302,7 +302,9 @@ let translate parameters handler error (rename_site_inverse : rename_sites)
         (error, []) (List.rev var_list)
     in
     match var_list with
-    | [] -> error, (handler, No_known_translation list) (* indirectly checks if the mvbdu is true *)
+    | [] ->
+      error, (handler, No_known_translation list)
+      (* indirectly checks if the mvbdu is true *)
     | [ x ] ->
       let error, list =
         List.fold_left
