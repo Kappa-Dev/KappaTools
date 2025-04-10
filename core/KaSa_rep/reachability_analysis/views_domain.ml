@@ -692,7 +692,7 @@ module Domain = struct
       List.fold_left
         (fun (error, renaming_list) var ->
           match Ckappa_sig.site_or_guard_p_of_mvbdu_var var nsites with
-          | Ckappa_sig.Guard_p _ -> error, renaming_list
+          | Ckappa_sig.Guard_p _ -> error, (var, var) :: renaming_list
           | Ckappa_sig.Site _ ->
             let error, renamed =
               Ckappa_sig.Mvbdu_var_nearly_Inf_Int_storage_Imperatif.get
@@ -2960,48 +2960,16 @@ module Domain = struct
           get_list_of_sites_correspondence_map parameters error agent_type cv_id
             site_correspondence
         in
-        let rename_site parameters error site_type =
-          let error, site_type =
-            match
-              Ckappa_sig.Mvbdu_var_nearly_Inf_Int_storage_Imperatif.get
-                parameters error site_type map2
-            with
-            | error, None ->
-              Exception.warn parameters error __POS__ Exit
-                (Ckappa_sig.mvbdu_var_of_site Ckappa_sig.dummy_site_name_minus1)
-            | error, Some i -> error, Ckappa_sig.mvbdu_var_of_site i
-          in
-          error, site_type
-        in
         List.fold_left
           (fun (error, handler, output) bdu ->
-            let error, handler, lvar =
-              Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters handler
-                error bdu
-            in
-            (*list: ckappa_sig.c_site_name list*)
-            let error, handler, list =
-              Ckappa_sig.Views_bdu.extensional_of_variables_list parameters
-                handler error lvar
-            in
-            (*asso take (key * key) list *)
-            let error, asso =
-              List.fold_left
-                (fun (error, list) i ->
-                  match Ckappa_sig.site_or_guard_p_of_mvbdu_var i nsites with
-                  | Ckappa_sig.Guard_p _ -> error, list
-                  | Ckappa_sig.Site _ ->
-                    let error, new_name = rename_site parameters error i in
-                    error, (i, new_name) :: list)
-                (error, []) (List.rev list)
-            in
-            let error, handler, hconsed_asso =
-              Ckappa_sig.Views_bdu.build_renaming_list parameters handler error
-                asso
-            in
+            (* rename bdu to the original variable names *)
             let error, handler, renamed_mvbdu =
-              Ckappa_sig.Views_bdu.mvbdu_rename parameters handler error bdu
-                hconsed_asso
+              rename_bdu_to_original_names parameters error handler bdu map2
+                nsites
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error'
+                __POS__ Exit
             in
             let error, handler, hconsed_vars =
               Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters handler

@@ -750,7 +750,7 @@ let scan_predicate_covering_classes parameters error handler_kappa compil =
                   parameters error size_map2
               in
               let error, (map1, map2) =
-                aux list (Ckappa_sig.dummy_mvbdu_var_1) map1 map2 error
+                aux list Ckappa_sig.dummy_mvbdu_var_1 map1 map2 error
               in
               Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif.set
                 parameters error cv_id (map1, map2) array)
