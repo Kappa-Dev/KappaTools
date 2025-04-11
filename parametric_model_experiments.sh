@@ -64,14 +64,14 @@ for i in {0..35..5}; do
         echo >> "$OUTPUT_FILE"
         echo "Runtime with $i rules in the working set:" >> "$OUTPUT_FILE"
         { time "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
-        # without printing
-        echo >> "$OUTPUT_FILE"
-        echo "Runtime with $i rules and without printing:" >> "$OUTPUT_FILE"
-        { time "$KASA_BINARY" "$TEMP_FILE" --verbosity-level-for-reachability-analysis Mute ; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
-        # without the site-across-bonds analysis
-        echo >> "$OUTPUT_FILE"
-        echo "Runtime with $i rules, without the site-across-bonds analysis:" >> "$OUTPUT_FILE"
-        { time "$KASA_BINARY" "$TEMP_FILE" --no-sites-across-bonds-domain ; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+        # # without printing
+        # echo >> "$OUTPUT_FILE"
+        # echo "Runtime with $i rules and without printing:" >> "$OUTPUT_FILE"
+        # { time "$KASA_BINARY" "$TEMP_FILE" --verbosity-level-for-reachability-analysis Mute ; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+        # # without the views_domain
+        # echo >> "$OUTPUT_FILE"
+        # echo "Runtime with $i rules, without the views analysis:" >> "$OUTPUT_FILE"
+        # { time "$KASA_BINARY" "$TEMP_FILE" --no-views-domain ; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
     fi
 done
 
