@@ -1514,9 +1514,8 @@ let print_guard_mvbdu parameters handler error mvbdu convert_var_to_string =
           let aux2 error handler branch prefix =
             match aux1 parameters handler error branch with
             | error, (handler, "false", _) -> error, (handler, "")
-            | error, (handler, "", _) -> ( error,
-            ( handler,
-              prefix ^ variable_string ) )
+            | error, (handler, "", _) ->
+              error, (handler, prefix ^ variable_string)
             | error, (handler, branch_true_string, true) ->
               ( error,
                 ( handler,
@@ -1536,7 +1535,7 @@ let print_guard_mvbdu parameters handler error mvbdu convert_var_to_string =
             match branch_true_string, branch_false_string with
             | "", "" -> error, (handler, "", false)
             | "", s | s, "" -> error, (handler, s, false)
-            | s1, s2 -> error, (handler, s1 ^ "v" ^ s2, true)
+            | s1, s2 -> error, (handler, s1 ^ " v " ^ s2, true)
           in
           let error, memo =
             Hash_1.set parameters error mvbdu.Mvbdu_sig.id
