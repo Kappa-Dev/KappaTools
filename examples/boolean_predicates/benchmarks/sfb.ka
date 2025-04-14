@@ -1,0 +1,124 @@
+# kappa version of Schoeberl et al, 2002 with the negative feedback of Brightman & Fell, 2000
+# 5/05/07
+
+# phase -> activated dimers
+# external dimers:
+'EGF_EGFR'  EGF(r), EGFR(L,CR) <-> EGF(r!1), EGFR(L!1,CR)
+'EGFR_EGFR' EGFR(L!_,CR), EGFR(L!_,CR) <-> EGFR(L!_,CR!1), EGFR(L!_,CR!1)
+# simplified phos (internal or external)
+'EGFR@992'  EGFR(CR!_,Y992~u) -> EGFR(CR!_,Y992~p)
+'EGFR@1068' EGFR(CR!_,Y1068~u) -> EGFR(CR!_,Y1068~p)
+'EGFR@1148' EGFR(CR!_,Y1148~u) -> EGFR(CR!_,Y1148~p)
+# simplified dephos (internal or external)
+'992_op'    EGFR(Y992~p) -> EGFR(Y992~u)
+'1068_op'   EGFR(Y1068~p) -> EGFR(Y1068~u)
+'1148_op'   EGFR(Y1148~p) -> EGFR(Y1148~u)
+
+# phase -> internalization, degradation and recycling
+# internalization:
+'int_monomer'  EGF(r!1), EGFR(L!1,CR) -> EGF(r!1), EGFR(L!1,CR) @ 0.02
+'int_dimer'    EGF(r!1), EGFR(L!1,CR!2), EGF(r!3), EGFR(L!3,CR!2) -> \
+                EGF(r!1), EGFR(L!1,CR!2), EGF(r!3), EGFR(L!3,CR!2) @ 0.02
+# dissociation:
+'EGFR_EGFR_op' EGFR(L!_,CR!1), EGFR(L!_,CR!1) -> EGFR(L!_,CR), EGFR(L!_,CR)
+'EGF_EGFR_op'  EGF(r!1), EGFR(L!1,CR) -> EGF(r), EGFR(L,CR)
+# degradation:
+'deg_EGF'      EGF(r) -> 
+'deg_EGFR'     EGFR(L,CR) -> 
+# recycling:
+'rec_EGFR'     EGFR(L,Y992~u,Y1068~u,Y1148~u) -> EGFR(L,Y992~u,Y1068~u,Y1148~u)
+
+# phase -> SoS and RasGAP recruitment
+'EGFR_RasGAP'  EGFR(Y992~p), RasGAP(SH2) <-> EGFR(Y992~p!1), RasGAP(SH2!1) 
+'EGFR_Grb2'    EGFR(Y1068~p), Grb2(SH2) <-> EGFR(Y1068~p!1), Grb2(SH2!1)
+'Grb2_SoS'     Grb2(SH3), SoS(a,SS~u) -> Grb2(SH3!1), SoS(a!1,SS~u)
+'Grb2_SoS_op'  Grb2(SH3!1), SoS(a!1) -> Grb2(SH3), SoS(a)
+'EGFR_Shc'     EGFR(Y1148~p), Shc(PTB) <-> EGFR(Y1148~p!1), Shc(PTB!1)
+'Shc_Grb2'     Shc(Y318~p), Grb2(SH2) <-> Shc(Y318~p!1), Grb2(SH2!1)
+'Shc@318'      EGFR(CR!_,Y1148~p!1), Shc(PTB!1,Y318~u) -> EGFR(CR!_,Y1148~p!1), Shc(PTB!1,Y318~p)
+'Shc@318_op'   Shc(Y318~p) -> Shc(Y318~u)
+
+# phase -> active Ras
+# activate:
+'long arm SoS_Ras'  EGFR(Y1148~p!1), Shc(PTB!1,Y318~p!2), Grb2(SH2!2,SH3!3), SoS(a!3,b), Ras(S1S2~gdp) -> \
+                     EGFR(Y1148~p!1), Shc(PTB!1,Y318~p!2), Grb2(SH2!2,SH3!3), SoS(a!3,b!4), Ras(S1S2~gdp!4)
+'short arm SoS_Ras' EGFR(Y1068~p!1), Grb2(SH2!1,SH3!2), SoS(a!2,b), Ras(S1S2~gdp) -> \
+                     EGFR(Y1068~p!1), Grb2(SH2!1,SH3!2), SoS(a!2,b!3), Ras(S1S2~gdp!3)
+'Ras GTP'           SoS(b!1), Ras(S1S2~gdp!1) -> SoS(b!1), Ras(S1S2~gtp!1)
+'SoS_Ras_op'        SoS(b!1), Ras(S1S2!1) -> SoS(b), Ras(S1S2)
+# deactivate:
+'direct RasGAP_Ras' EGFR(Y992~p!1), RasGAP(SH2!1,s), Ras(S1S2~gtp) -> \
+                     EGFR(Y992~p!1), RasGAP(SH2!1,s!2), Ras(S1S2~gtp!2)
+'Ras GDP'           RasGAP(s!1), Ras(S1S2~gtp!1) -> RasGAP(s!1), Ras(S1S2~gdp!1)
+'RasGAP_Ras_op'     RasGAP(s!1), Ras(S1S2!1) -> RasGAP(s), Ras(S1S2)
+'intrinsic Ras GDP' Ras(S1S2~gtp) -> Ras(S1S2~gdp)
+
+# phase -> active Raf
+# activation:
+'Ras_Raf'      Ras(S1S2~gtp), Raf(x~u) -> Ras(S1S2~gtp!1), Raf(x~u!1)
+'Raf'          Ras(S1S2~gtp!1), Raf(x~u!1) -> Ras(S1S2~gtp!1), Raf(x~p!1)
+'Ras_Raf_op'   Ras(S1S2~gtp!1), Raf(x!1) -> Ras(S1S2~gtp), Raf(x)
+# deactivation:
+'PP2A1_Raf'    PP2A1(s), Raf(x~p) -> PP2A1(s!1), Raf(x~p!1)
+'Raf_op'       PP2A1(s!1), Raf(x~p!1) -> PP2A1(s!1), Raf(x~u!1)
+'PP2A1_Raf_op' PP2A1(s!1), Raf(x!1) -> PP2A1(s), Raf(x)
+
+# phase -> active MEK
+# activation:
+'Raf_MEK@222'      Raf(x~p), MEK(S222~u) -> Raf(x~p!1), MEK(S222~u!1)
+'MEK@222'          Raf(x~p!1), MEK(S222~u!1) -> Raf(x~p!1), MEK(S222~p!1)
+'Raf_MEK@222_op'   Raf(x~p!1), MEK(S222!1) -> Raf(x~p), MEK(S222)
+'Raf_MEK@218'      Raf(x~p), MEK(S218~u) -> Raf(x~p!1), MEK(S218~u!1)
+'MEK@218'          Raf(x~p!1), MEK(S218~u!1) -> Raf(x~p!1), MEK(S218~p!1)
+'Raf_MEK@218_op'   Raf(x~p!1), MEK(S218!1) -> Raf(x~p), MEK(S218)
+# deactivation:
+'PP2A2_MEK@222'    PP2A2(s), MEK(S222~p) -> PP2A2(s!1), MEK(S222~p!1)
+'MEK@222_op'       PP2A2(s!1), MEK(S222~p!1) -> PP2A2(s!1), MEK(S222~u!1)
+'PP2A2_MEK@222_op' PP2A2(s!1), MEK(S222!1) -> PP2A2(s), MEK(S222)
+'PP2A2_MEK@218'    PP2A2(s), MEK(S218~p) -> PP2A2(s!1), MEK(S218~p!1)
+'MEK@218_op'       PP2A2(s!1), MEK(S218~p!1) -> PP2A2(s!1), MEK(S218~u!1)
+'PP2A2_MEK@218_op' PP2A2(s!1), MEK(S218!1) -> PP2A2(s), MEK(S218)
+
+# phase -> active ERK
+# activation:
+'MEK_ERK@185'    MEK(s,S218~p,S222~p), ERK(T185~u) -> MEK(s!1,S218~p,S222~p), ERK(T185~u!1)
+'ERK@185'        MEK(s!1,S218~p,S222~p), ERK(T185~u!1) -> MEK(s!1,S218~p,S222~p), ERK(T185~p!1)
+'MEK_ERK@185_op' MEK(s!1), ERK(T185!1) -> MEK(s), ERK(T185)
+'MEK_ERK@187'    MEK(s,S218~p,S222~p), ERK(Y187~u) -> MEK(s!1,S218~p,S222~p), ERK(Y187~u!1)
+'ERK@187'        MEK(s!1,S218~p,S222~p), ERK(Y187~u!1) -> MEK(s!1,S218~p,S222~p), ERK(Y187~p!1)
+'MEK_ERK@187_op' MEK(s!1), ERK(Y187!1) -> MEK(s), ERK(Y187)
+# deactivation:
+'MKP_ERK@185'    MKP3(s), ERK(T185~p) -> MKP3(s!1), ERK(T185~p!1)
+'ERK@185_op'     MKP3(s!1), ERK(T185~p!1) -> MKP3(s!1), ERK(T185~u!1)
+'MKP_ERK@185_op' MKP3(s!1), ERK(T185!1) -> MKP3(s), ERK(T185)
+'MKP_ERK@187'    MKP3(s), ERK(Y187~p) -> MKP3(s!1), ERK(Y187~p!1)
+'ERK@187_op'     MKP3(s!1), ERK(Y187~p!1) -> MKP3(s!1), ERK(Y187~u!1)
+'MKP_ERK@187_op' MKP3(s!1), ERK(Y187!1) -> MKP3(s), ERK(Y187)
+
+# negative feedback
+'SoS_ERK'    SoS(SS~u), ERK(s,T185~p,Y187~p) -> SoS(SS~u!1), ERK(s!1,T185~p,Y187~p)
+'SoS_ERK_op' SoS(SS!1), ERK(s!1) -> SoS(SS), ERK(s)
+'SoS@SS'     SoS(SS~u!1), ERK(s!1,T185~p,Y187~p) -> SoS(SS~p!1), ERK(s!1,T185~p,Y187~p)
+'SoS@SS_op'  SoS(SS~p) -> SoS(SS~u) # rates here...
+
+# initial solution (much smaller, for basic testing)
+%init: 10*(EGF(r)) 
+%init: 100*(EGFR(L,CR,Y992~u,Y1068~u,Y1148~u))
+%init: 100*(Shc(PTB,Y318~u)) 
+%init: 100*(Grb2(SH2,SH3!1),SoS(a!1,b,SS~u)) 
+%init: 200*(RasGAP(SH2,s)) 
+%init: 100*(Ras(S1S2~gdp)) 
+%init: 100*(Raf(x~u)) 
+%init: 40*(PP2A1(s)) 
+%init: 50*(PP2A2(s)) 
+%init: 200*(MEK(s,S222~u,S218~u))
+%init: 200*(ERK(s,T185~u,Y187~u))
+%init: 50*(MKP3(s))
+
+#%obs: EGFR(Y992~p?,Y1068~p?,Y1148~p?)
+%obs: Ras(S1S2~gtp?)
+%obs: Raf(x~p?)
+%obs: MEK(S218~p?,S222~p?)
+%obs: ERK(T185~p?,Y187~p?)
+#%story: 'Ras GTP'
+%story: 'SoS_ERK'
