@@ -681,94 +681,23 @@ let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
       handler_kappa agent_name s
   | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
 
-let print_guard_mvbdu parameters error kappa_handler bdu_handler
-    ?(with_comma = false) mvbdu =
-  let nsites = get_nsites kappa_handler in
-  let error, bdu_handler, mvbdu_extensional =
-    Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters bdu_handler error mvbdu
-  in
-  let () =
-    if with_comma then
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
-  in
-  let loggers = Remanent_parameters.get_logger parameters in
-  (* let () = Loggers.fprintf loggers "(" in *)
-  let _, error =
-    List.fold_left
-      (fun (add_or_sign, error) valuations_list ->
-        if add_or_sign then Loggers.fprintf loggers " v ";
-        let _, error =
-          List.fold_left
-            (fun (add_comma, error) (guard_name, value) ->
-              let error, _ =
-                match
-                  Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites
-                with
-                | Ckappa_sig.Guard_p guard_name ->
-                  let error, guard_string =
-                    string_of_guard parameters guard_name kappa_handler
-                      ~state:value error
-                  in
-                  if add_comma then Loggers.fprintf loggers ",";
-                  let () = Loggers.fprintf loggers "%s" guard_string in
-                  error, ()
-                | Ckappa_sig.Site _ ->
-                  Exception.warn parameters error __POS__ Exit ()
-              in
-              true, error)
-            (false, error) valuations_list
-        in
-        true, error)
-      (false, error) mvbdu_extensional
-  in
-  (* let () = Loggers.fprintf loggers ")" in *)
-  error, bdu_handler
-
 let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
-    ?(with_comma = false) mvbdu restriction_bdu =
-  let error, bdu_handler, mvbdu_list =
-    Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition parameters
-      bdu_handler error mvbdu
+    ?(with_comma = false) mvbdu _restriction_bdu =
+  (* let () = Ckappa_sig.Views_bdu.print parameters mvbdu in *)
+  let () =
+     if with_comma then
+       Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
+   in
+  let nsites = get_nsites kappa_handler in
+  let convert_variable_to_string error guard_name =
+    match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
+    | Ckappa_sig.Guard_p guard_name ->
+      string_of_guard parameters guard_name kappa_handler error
+    | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
   in
-  let error, bdu_handler, _ =
-    List.fold_left
-      (fun (error, bdu_handler, with_comma) mvbdu ->
-        let error, bdu_handler, is_true =
-          Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
-            restriction_bdu
-        in
-        let error, bdu_handler, variables =
-          Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters bdu_handler
-            error mvbdu
-        in
-        let error, bdu_handler, nr_variables =
-          Ckappa_sig.Views_bdu.nbr_variables parameters bdu_handler error
-            variables
-        in
-        if is_true then
-          error, bdu_handler, with_comma
-        else (
-          let () =
-            if with_comma then
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
-          in
-
-          let () =
-            if nr_variables > 1 then
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) "("
-          in
-          let error, bdu_handler =
-            print_guard_mvbdu parameters error kappa_handler bdu_handler
-              ~with_comma:false mvbdu
-          in
-          let () =
-            if nr_variables > 1 then
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) ")"
-          in
-          error, bdu_handler, true
-        ))
-      (error, bdu_handler, with_comma)
-      mvbdu_list
+  let error, bdu_handler, () =
+    Ckappa_sig.Views_bdu.print_guard_mvbdu parameters bdu_handler error mvbdu
+      convert_variable_to_string
   in
   error, bdu_handler
 

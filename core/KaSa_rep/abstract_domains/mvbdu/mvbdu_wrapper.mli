@@ -210,6 +210,14 @@ module type Mvbdu = sig
   val parametric_conditions_of_mvbdu :
     (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
 
+  val print_guard_mvbdu :
+    ( mvbdu,
+      Exception.exceptions_caught_and_uncaught ->
+      key ->
+      Exception.exceptions_caught_and_uncaught * string,
+      unit )
+    binary
+
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 

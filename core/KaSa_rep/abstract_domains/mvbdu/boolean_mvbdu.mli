@@ -70,6 +70,7 @@ type memo_tables = {
     (int * int) list list Hash_1.t;
   boolean_mvbdu_extensional_description_of_mvbdu_with_threshold:
     ((int * int) list * bool Mvbdu_sig.mvbdu) list Hash_2.t;
+  boolean_mvbdu_printed_guard: (string * bool) Hash_1.t;
 }
 
 type unary_memoized_fun
@@ -128,6 +129,16 @@ val extensional_description_of_mvbdu_with_threshold :
   bool Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * ((int * int) list * bool Mvbdu_sig.mvbdu) list)
+
+val print_guard_mvbdu :
+  Remanent_parameters_sig.parameters ->
+  handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  bool Mvbdu_sig.mvbdu ->
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Mvbdu_sig.variable ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * handler * unit
 
 val extensional_description_of_range_list :
   'g ->

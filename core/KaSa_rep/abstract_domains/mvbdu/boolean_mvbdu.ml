@@ -116,6 +116,7 @@ type memo_tables = {
     (int * int) list list Hash_1.t;
   boolean_mvbdu_extensional_description_of_mvbdu_with_threshold:
     ((int * int) list * bool Mvbdu_sig.mvbdu) list Hash_2.t;
+  boolean_mvbdu_printed_guard: (string * bool) Hash_1.t;
 }
 
 type mvbdu_dic =
@@ -345,6 +346,7 @@ let init_data parameters error =
     Hash_2.create parameters error (0, 0)
   in
   let error, mvbdu_rename = Hash_2.create parameters error (0, 0) in
+  let error, mvbdu_printed_guard = Hash_1.create parameters error 0 in
   ( error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head;
@@ -384,6 +386,7 @@ let init_data parameters error =
         mvbdu_extensional_description_of_mvbdu;
       boolean_mvbdu_extensional_description_of_mvbdu_with_threshold =
         mvbdu_extensional_description_of_mvbdu_with_threshold;
+      boolean_mvbdu_printed_guard = mvbdu_printed_guard;
     } )
 
 let init_remanent parameters error =
@@ -1485,6 +1488,84 @@ let extensional_description_of_mvbdu_with_threshold parameters handler error
     in
     aux1 parameters handler error ~threshold mvbdu
   | None -> error, (handler, [])
+
+let print_guard_mvbdu parameters handler error mvbdu convert_var_to_string =
+  let rec aux1 parameters handler error mvbdu =
+    match
+      Hash_1.unsafe_get parameters error mvbdu.Mvbdu_sig.id
+        handler.Memo_sig.data.boolean_mvbdu_printed_guard
+    with
+    | error, Some (string, contains_or) -> error, (handler, string, contains_or)
+    | error, None ->
+      (match mvbdu.Mvbdu_sig.value with
+      | Mvbdu_sig.Leaf true -> error, (handler, "", false)
+      | Mvbdu_sig.Leaf false -> error, (handler, "false", false)
+      | Mvbdu_sig.Node a ->
+        let upper_bound = a.Mvbdu_sig.upper_bound in
+        (* true branch *)
+        (* Recursion *)
+        (match upper_bound with
+        | -1 -> aux1 parameters handler error a.Mvbdu_sig.branch_false
+        | 1 -> aux1 parameters handler error a.Mvbdu_sig.branch_true
+        | 0 ->
+          let error, variable_string =
+            convert_var_to_string error a.Mvbdu_sig.variable
+          in
+          let aux2 error handler branch prefix =
+            match aux1 parameters handler error branch with
+            | error, (handler, "false", _) -> error, (handler, "")
+            | error, (handler, "", _) -> ( error,
+            ( handler,
+              prefix ^ variable_string ) )
+            | error, (handler, branch_true_string, true) ->
+              ( error,
+                ( handler,
+                  prefix ^ variable_string ^ ",(" ^ branch_true_string ^ ")" ) )
+            | error, (handler, branch_true_string, false) ->
+              ( error,
+                ( handler,
+                  prefix ^ variable_string ^ "," ^ branch_true_string ^ "" ) )
+          in
+          let error, (handler, branch_true_string) =
+            aux2 error handler a.Mvbdu_sig.branch_true ""
+          in
+          let error, (handler, branch_false_string) =
+            aux2 error handler a.Mvbdu_sig.branch_false "~"
+          in
+          let error, (handler, output_string, contains_or) =
+            match branch_true_string, branch_false_string with
+            | "", "" -> error, (handler, "", false)
+            | "", s | s, "" -> error, (handler, s, false)
+            | s1, s2 -> error, (handler, s1 ^ "v" ^ s2, true)
+          in
+          let error, memo =
+            Hash_1.set parameters error mvbdu.Mvbdu_sig.id
+              (output_string, contains_or)
+              handler.Memo_sig.data.boolean_mvbdu_printed_guard
+          in
+          ( error,
+            ( {
+                handler with
+                Memo_sig.data =
+                  {
+                    handler.Memo_sig.data with
+                    boolean_mvbdu_printed_guard = memo;
+                  };
+              },
+              output_string,
+              contains_or ) )
+        | n ->
+          Exception.warn parameters error __POS__
+            ~message:
+              ("The mvbdu should only contain predicates. Upper bound: "
+             ^ string_of_int n)
+            Exit (handler, "", false)))
+  in
+  let error, (handler, output_string, _) =
+    aux1 parameters handler error mvbdu
+  in
+  let logger = Remanent_parameters.get_logger parameters in
+  error, handler, Loggers.fprintf logger "%s" output_string
 
 let print_boolean_mvbdu parameters
     (error : Exception.exceptions_caught_and_uncaught) =
