@@ -7,7 +7,9 @@ TEMP_FILE="temp_experiment.ka"
 ENSEMBLE_MODEL="examples/boolean_predicates/benchmarks/ensemble.ka"
 EGFR_MODEL="examples/boolean_predicates/benchmarks/causality_05_sos.ka"
 REPRESSILATOR_MODEL="examples/boolean_predicates/benchmarks/Repressilator.ka"
-AVAILABLE_MODELS="Available models: ENSEMBLE, EGFR, REPRESSILATOR"
+FGF_MODEL="examples/boolean_predicates/benchmarks/fgf.ka"
+SFB_MODEL="examples/boolean_predicates/benchmarks/sfb.ka"
+AVAILABLE_MODELS="Available models: ENSEMBLE, EGFR, REPRESSILATOR, FGF, SFB"
 
 # Generate a new output file name (the stderr output of time)
 mkdir -p output
@@ -42,6 +44,12 @@ case "${1^^}" in
         ;;
     REPRESSILATOR)
         EXAMPLE_MODEL="$REPRESSILATOR_MODEL"
+        ;;
+    FGF)
+        EXAMPLE_MODEL="$FGF_MODEL"
+        ;;
+    SFB)
+        EXAMPLE_MODEL="$SFB_MODEL"
         ;;
     *)
         echo "Invalid model: $1"
