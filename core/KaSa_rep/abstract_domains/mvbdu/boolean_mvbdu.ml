@@ -1527,10 +1527,10 @@ let print_guard_mvbdu parameters handler error mvbdu convert_var_to_string =
                   prefix ^ variable_string ^ "," ^ branch_true_string ^ "" ) )
           in
           let error, (handler, branch_true_string) =
-            aux2 error handler a.Mvbdu_sig.branch_true ""
+            aux2 error handler a.Mvbdu_sig.branch_true "~"
           in
           let error, (handler, branch_false_string) =
-            aux2 error handler a.Mvbdu_sig.branch_false "~"
+            aux2 error handler a.Mvbdu_sig.branch_false ""
           in
           let error, (handler, output_string, contains_or) =
             match branch_true_string, branch_false_string with
