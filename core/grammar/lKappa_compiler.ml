@@ -2865,9 +2865,11 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
             rule.pos ) ))
       cleaned_rules
   in
-
-  let thresholds_of_rule _rule = [ 5; 100 ] in
-  (* TO DO *)
+  let thresholds_of_rule rule =
+    match rule.threshold with
+    | None -> []
+    | Some t -> [ fst t ]
+  in
   let thresholds =
     List.fold_left
       (fun set rule ->
