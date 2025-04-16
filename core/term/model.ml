@@ -21,8 +21,8 @@ type t = {
   tokens_reverse_dependencies: Operator.DepSet.t array;
   contact_map: Contact_map.t;
   counters_info: Counters_info.t;
-  thresholds: Size_info.t ;
-  previous_threshold: Size_info.previous_threshold ; 
+  thresholds: Size_info.t;
+  previous_threshold: Size_info.previous_threshold;
 }
 
 let init ~filenames domain tokens algs (deps_in_t, deps_in_e, tok_rd, alg_rd)
@@ -61,7 +61,7 @@ let deconstruct env =
     env.interventions,
     env.contact_map,
     env.counters_info,
-    env.thresholds, 
+    env.thresholds,
     env.previous_threshold )
 
 let domain env = env.domain
@@ -77,7 +77,7 @@ let contact_map env = env.contact_map
 let num_of_agent nme env = Signature.num_of_agent nme (signatures env)
 let counters_info env = env.counters_info
 let counter_info env i j = (counters_info env).(i).(j)
-let previous_threshold env = env.previous_threshold 
+let previous_threshold env = env.previous_threshold
 
 let fold_rules f x env =
   Tools.array_fold_lefti (fun i x rule -> f i x rule) x env.rules
@@ -321,7 +321,7 @@ let propagate_constant ~warning ?max_time ?max_events ~updated_vars
     tokens_reverse_dependencies = x.tokens_reverse_dependencies;
     contact_map = x.contact_map;
     thresholds = x.thresholds;
-    previous_threshold = x.previous_threshold; 
+    previous_threshold = x.previous_threshold;
   }
 
 let kappa_instance_to_yojson =
@@ -384,8 +384,8 @@ let to_yojson env =
       ( "tokens_reverse_dependencies",
         JsonUtil.of_array Operator.depset_to_yojson
           env.tokens_reverse_dependencies );
-      "thresholds_info", Size_info.to_yojson ~filenames env.thresholds; 
-      "counters_info", Counters_info.to_yojson ~filenames env.counters_info; 
+      "thresholds_info", Size_info.to_yojson ~filenames env.thresholds;
+      "counters_info", Counters_info.to_yojson ~filenames env.counters_info;
     ]
 
 let kappa_instance_of_yojson =
@@ -408,15 +408,18 @@ let of_yojson = function
               Counters_info.of_yojson ~filenames (List.assoc "counters_info" l)
             with Not_found -> Pattern.Env.counters_info domain);
          thresholds =
-            (try
-               Size_info.of_yojson ~filenames (List.assoc "thresholds_info" l)
-             with Not_found -> Pattern.Env.thresholds_info domain);
-         previous_threshold =  
-         (try
-          JsonUtil.to_array 
-            (JsonUtil.to_int ?error_msg:(Some (JsonUtil.exn_msg_cant_import_from_json "previous_threshold")) 
-            )(List.assoc "previous_threshold" l)
-         with Not_found -> Pattern.Env.previous_threshold domain);
+           (try Size_info.of_yojson ~filenames (List.assoc "thresholds_info" l)
+            with Not_found -> Pattern.Env.thresholds_info domain);
+         previous_threshold =
+           (try
+              JsonUtil.to_array
+                (JsonUtil.to_int
+                   ?error_msg:
+                     (Some
+                        (JsonUtil.exn_msg_cant_import_from_json
+                           "previous_threshold")))
+                (List.assoc "previous_threshold" l)
+            with Not_found -> Pattern.Env.previous_threshold domain);
          tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
          algs =
            NamedDecls.of_json

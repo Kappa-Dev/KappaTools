@@ -57,26 +57,30 @@ let counter_sig_of_counter (c : counter) : Counters_info.counter_sig =
   }
 
 type threshold = {
-    threshold_name: string Loc.annoted;
-    threshold_value: internal ;
-    threshold : int  ;
+  threshold_name: string Loc.annoted;
+  threshold_value: internal;
+  threshold: int;
+}
+
+let threshold_sig_of_threshold t =
+  {
+    Size_info.threshold_sig_name = t.threshold_name;
+    threshold_sig_value = t.threshold_value;
+    threshold = t.threshold;
   }
 
-let threshold_sig_of_threshold t = 
-  {Size_info.threshold_sig_name = t.threshold_name; 
-   threshold_sig_value = t.threshold_value; 
-   threshold = t.threshold} 
-
-
-type ('threshold, 'counter) site = Port of port | Counter of 'counter | Size_predicate of 'threshold 
+type ('threshold, 'counter) site =
+  | Port of port
+  | Counter of 'counter
+  | Size_predicate of 'threshold
 
 let map_counters_in_site f = function
-  | (Port _ | Size_predicate _)  as x -> x
+  | (Port _ | Size_predicate _) as x -> x
   | Counter co -> Counter (f co)
 
 let map_size_predicates_in_site f = function
-  | (Port _ | Counter _ ) as x -> x 
-  | Size_predicate p  -> Size_predicate (f p)
+  | (Port _ | Counter _) as x -> x
+  | Size_predicate p -> Size_predicate (f p)
 
 type agent_mod = NoMod | Erase | Create
 
@@ -85,7 +89,9 @@ type ('threshold, 'counter) parametric_agent =
   | Absent of Loc.t
 
 type agent = (threshold, counter) parametric_agent
-type agent_sig = (Size_info.size_sig, Counters_info.counter_sig) parametric_agent
+
+type agent_sig =
+  (Size_info.size_sig, Counters_info.counter_sig) parametric_agent
 
 (* TODO: document why list list *)
 type mixture = agent list list
@@ -122,8 +128,8 @@ type rule = {
     * (mixture, string) Alg_expr.e Loc.annoted option)
     option;
       (*rate for backward rule*)
-  threshold: int Loc.annoted option; 
-  threshold_op: int Loc.annoted option; 
+  threshold: int Loc.annoted option;
+  threshold_op: int Loc.annoted option;
 }
 
 let flip_label str = str ^ "_op"
@@ -202,7 +208,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
-  thresholds: int list; 
+  thresholds: int list;
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -230,20 +236,20 @@ let no_more_site_on_right error left right =
                    snd p.port_name ))
         in
         false
-    | Size_predicate s -> 
-        List.exists 
-          (function 
-             | Counter _ | Port _ -> false
-             | Size_predicate s' -> fst (s.threshold_name)  = fst (s'.threshold_name))
-          left 
-          ||
+      | Size_predicate s ->
+        List.exists
+          (function
+            | Counter _ | Port _ -> false
+            | Size_predicate s' -> fst s.threshold_name = fst s'.threshold_name)
+          left
+        ||
         let () =
           if error then
             raise
               (ExceptionDefn.Malformed_Decl
                  ( "Site '" ^ fst s.threshold_name
                    ^ "' was not mentionned in the left-hand side.",
-                   snd s.threshold_name))
+                   snd s.threshold_name ))
         in
         false)
     right
@@ -344,14 +350,14 @@ let print_counter f c =
     (print_counter_delta c.counter_test)
     c.counter_delta
 
-let print_size_predicate f s = 
-   Format.fprintf f "%s{%a}" (fst s.threshold_name)
-   (print_ast_internal None) s.threshold_value 
-    
-let print_size_predicate_sig f s = 
-    Format.fprintf f "%s{%a}" (fst s.Size_info.threshold_sig_name) 
-    (print_ast_internal None) s.Size_info.threshold_sig_value
+let print_size_predicate f s =
+  Format.fprintf f "%s{%a}" (fst s.threshold_name) (print_ast_internal None)
+    s.threshold_value
 
+let print_size_predicate_sig f s =
+  Format.fprintf f "%s{%a}"
+    (fst s.Size_info.threshold_sig_name)
+    (print_ast_internal None) s.Size_info.threshold_sig_value
 
 let print_counter_sig f c =
   Format.fprintf f "%s{%a%a}%a"
@@ -366,7 +372,7 @@ let print_counter_sig f c =
 let print_ast_site ~print_counter ~print_size_predicate f = function
   | Port p -> print_ast_port f p
   | Counter c -> print_counter f c
-  | Size_predicate s -> print_size_predicate f s 
+  | Size_predicate s -> print_size_predicate f s
 
 let counter_test_to_json = function
   | CEQ x -> `Assoc [ "test", `String "eq"; "val", `Int x ]
@@ -482,50 +488,50 @@ let build_port_of_json filenames n i l =
       port_link_mod;
     }
 
-
-    let build_size_predicate_of_json filenames n i l =
-      (*let port_int, port_int_mod =
-        match i with
-        | `Assoc [] | `Null -> [], None
-        | `Assoc [ ("state", i) ] ->
-          JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) i, None
-        | `Assoc [ ("mod", m) ] -> [], mod_i m
-        | `Assoc [ ("state", i); ("mod", m) ] | `Assoc [ ("mod", m); ("state", i) ]
-          ->
-          JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) i, mod_i m
-        | _ -> raise (Yojson.Basic.Util.Type_error ("Not internal states", i))
-      in
-      let port_link, port_link_mod =
-        match l with
-        | `Assoc [] | `Null -> [], None
-        | `Assoc [ ("state", l) ] ->
-          ( JsonUtil.to_list
-              (Loc.annoted_of_yojson ~filenames
-                 (LKappa.link_of_json
-                    (fun _ -> Loc.string_annoted_of_json ~filenames)
-                    (Loc.string_annoted_of_json ~filenames)
-                    (fun _ -> ())))
-              l,
-            None )
-        | `Assoc [ ("mod", m) ] -> [], mod_l m
-        | `Assoc [ ("state", l); ("mod", m) ] | `Assoc [ ("mod", m); ("state", l) ]
-          ->
-          ( JsonUtil.to_list
-              (Loc.annoted_of_yojson ~filenames
-                 (LKappa.link_of_json
-                    (fun _ -> Loc.string_annoted_of_json ~filenames)
-                    (Loc.string_annoted_of_json ~filenames)
-                    (fun _ -> ())))
-              l,
-            mod_l m )
-        | _ -> raise (Yojson.Basic.Util.Type_error ("Not link states", i))
-      in*) 
-      Size_predicate 
-        {
-          threshold_name = Loc.string_annoted_of_json ~filenames n;
-          threshold = JsonUtil.to_int i; 
-          threshold_value =  JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames)  l;
-        }
+let build_size_predicate_of_json filenames n i l =
+  (*let port_int, port_int_mod =
+      match i with
+      | `Assoc [] | `Null -> [], None
+      | `Assoc [ ("state", i) ] ->
+        JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) i, None
+      | `Assoc [ ("mod", m) ] -> [], mod_i m
+      | `Assoc [ ("state", i); ("mod", m) ] | `Assoc [ ("mod", m); ("state", i) ]
+        ->
+        JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) i, mod_i m
+      | _ -> raise (Yojson.Basic.Util.Type_error ("Not internal states", i))
+    in
+    let port_link, port_link_mod =
+      match l with
+      | `Assoc [] | `Null -> [], None
+      | `Assoc [ ("state", l) ] ->
+        ( JsonUtil.to_list
+            (Loc.annoted_of_yojson ~filenames
+               (LKappa.link_of_json
+                  (fun _ -> Loc.string_annoted_of_json ~filenames)
+                  (Loc.string_annoted_of_json ~filenames)
+                  (fun _ -> ())))
+            l,
+          None )
+      | `Assoc [ ("mod", m) ] -> [], mod_l m
+      | `Assoc [ ("state", l); ("mod", m) ] | `Assoc [ ("mod", m); ("state", l) ]
+        ->
+        ( JsonUtil.to_list
+            (Loc.annoted_of_yojson ~filenames
+               (LKappa.link_of_json
+                  (fun _ -> Loc.string_annoted_of_json ~filenames)
+                  (Loc.string_annoted_of_json ~filenames)
+                  (fun _ -> ())))
+            l,
+          mod_l m )
+      | _ -> raise (Yojson.Basic.Util.Type_error ("Not link states", i))
+    in*)
+  Size_predicate
+    {
+      threshold_name = Loc.string_annoted_of_json ~filenames n;
+      threshold = JsonUtil.to_int i;
+      threshold_value =
+        JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) l;
+    }
 
 let site_sig_of_json filenames = function
   | `Assoc
@@ -761,13 +767,43 @@ let site_of_json filenames = function
   | `Assoc [ ("port_link", l); ("port_name", n) ] ->
     build_port_of_json filenames n `Null l
   | `Assoc [ ("port_name", n) ] -> build_port_of_json filenames n `Null `Null
-  | `Assoc [ ("size_predicate_name", name) ; ("size_value", value) ; ("size_threshold", threshold) ]
-  | `Assoc [ ("size_predicate_name", name) ; ("size_threshold", threshold) ; ("size_value", value) ;]
-  | `Assoc [ ("size_value", value) ; ("size_threshold", threshold) ; ("size_predicate_name", name) ;]
-  | `Assoc [ ("size_value", value) ; ("size_predicate_name", name) ; ("size_threshold", threshold) ; ]
-  | `Assoc [ ("size_threshold", threshold) ; ("size_predicate_name", name) ; ("size_value", value) ; ]
-  | `Assoc [ ("size_threshold", threshold) ; ("size_value", value) ; ("size_predicate_name", name) ; ] -> 
-   build_size_predicate_of_json filenames name value threshold 
+  | `Assoc
+      [
+        ("size_predicate_name", name);
+        ("size_value", value);
+        ("size_threshold", threshold);
+      ]
+  | `Assoc
+      [
+        ("size_predicate_name", name);
+        ("size_threshold", threshold);
+        ("size_value", value);
+      ]
+  | `Assoc
+      [
+        ("size_value", value);
+        ("size_threshold", threshold);
+        ("size_predicate_name", name);
+      ]
+  | `Assoc
+      [
+        ("size_value", value);
+        ("size_predicate_name", name);
+        ("size_threshold", threshold);
+      ]
+  | `Assoc
+      [
+        ("size_threshold", threshold);
+        ("size_predicate_name", name);
+        ("size_value", value);
+      ]
+  | `Assoc
+      [
+        ("size_threshold", threshold);
+        ("size_value", value);
+        ("size_predicate_name", name);
+      ] ->
+    build_size_predicate_of_json filenames name value threshold
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
 
 let counter_to_json ~filenames c =
@@ -783,31 +819,32 @@ let counter_to_json ~filenames c =
         Loc.yojson_of_annoted ~filenames JsonUtil.of_int c.counter_delta );
     ]
 
-let size_predicate_to_json ~filenames s = 
-  `Assoc 
-     [
-        ("size_predicate_name", 
-        Loc.yojson_of_annoted ~filenames JsonUtil.of_string s.threshold_name); 
-        ("size_value", 
-        JsonUtil.of_list 
-          (Loc.yojson_of_annoted ~filenames (JsonUtil.of_option JsonUtil.of_string)) 
-        s.threshold_value) ;
-        ("size_threshold", 
-          (JsonUtil.of_int s.threshold)); 
-     ]
+let size_predicate_to_json ~filenames s =
+  `Assoc
+    [
+      ( "size_predicate_name",
+        Loc.yojson_of_annoted ~filenames JsonUtil.of_string s.threshold_name );
+      ( "size_value",
+        JsonUtil.of_list
+          (Loc.yojson_of_annoted ~filenames
+             (JsonUtil.of_option JsonUtil.of_string))
+          s.threshold_value );
+      "size_threshold", JsonUtil.of_int s.threshold;
+    ]
 
-     let size_predicate_sig_to_json ~filenames s = 
-      `Assoc 
-         [
-            ("size_predicate_name", 
-            Loc.yojson_of_annoted ~filenames JsonUtil.of_string s.Size_info.threshold_sig_name); 
-            ("size_value", 
-            JsonUtil.of_list 
-              (Loc.yojson_of_annoted ~filenames (JsonUtil.of_option JsonUtil.of_string)) 
-            s.Size_info.threshold_sig_value) ;
-            ("size_threshold", 
-              (JsonUtil.of_int s.Size_info.threshold)); 
-         ]     
+let size_predicate_sig_to_json ~filenames s =
+  `Assoc
+    [
+      ( "size_predicate_name",
+        Loc.yojson_of_annoted ~filenames JsonUtil.of_string
+          s.Size_info.threshold_sig_name );
+      ( "size_value",
+        JsonUtil.of_list
+          (Loc.yojson_of_annoted ~filenames
+             (JsonUtil.of_option JsonUtil.of_string))
+          s.Size_info.threshold_sig_value );
+      "size_threshold", JsonUtil.of_int s.Size_info.threshold;
+    ]
 
 let counter_sig_to_json ~filenames c =
   `Assoc
@@ -831,7 +868,7 @@ let counter_sig_to_json ~filenames c =
 let site_to_json ~counter_to_json ~size_predicate_to_json filenames = function
   | Port p -> port_to_json filenames p
   | Counter c -> counter_to_json ~filenames c
-  | Size_predicate s -> size_predicate_to_json ~filenames s 
+  | Size_predicate s -> size_predicate_to_json ~filenames s
 
 let print_agent_mod f = function
   | Create -> Format.pp_print_string f "+"
@@ -842,7 +879,9 @@ let print_ast_agent ~print_counter ~print_size_predicate f = function
   | Absent _ -> Format.pp_print_string f "."
   | Present ((agent_name, _), l, m) ->
     Format.fprintf f "%s(%a)%a" agent_name
-      (Pp.list (fun f -> Format.fprintf f " ") (print_ast_site ~print_counter ~print_size_predicate))
+      (Pp.list
+         (fun f -> Format.fprintf f " ")
+         (print_ast_site ~print_counter ~print_size_predicate))
       l print_agent_mod m
 
 let agent_mod_to_yojson = function
@@ -863,7 +902,10 @@ let agent_to_json ~counter_to_json ~size_predicate_to_json filenames = function
     JsonUtil.smart_assoc
       [
         "name", Loc.yojson_of_annoted ~filenames JsonUtil.of_string na;
-        "sig", JsonUtil.of_list (site_to_json ~counter_to_json ~size_predicate_to_json filenames) l;
+        ( "sig",
+          JsonUtil.of_list
+            (site_to_json ~counter_to_json ~size_predicate_to_json filenames)
+            l );
         "mod", agent_mod_to_yojson m;
       ]
 
@@ -899,9 +941,12 @@ let agent_of_json ~site_of_json filenames = function
 let agent_sig_of_json = agent_of_json ~site_of_json:site_sig_of_json
 
 (* TO DO Transfer back inverted counters *)
-let agent_sig_to_json = agent_to_json ~counter_to_json:counter_sig_to_json ~size_predicate_to_json:size_predicate_sig_to_json 
-let agent_of_json = agent_of_json ~site_of_json 
-let agent_to_json = agent_to_json ~counter_to_json ~size_predicate_to_json 
+let agent_sig_to_json =
+  agent_to_json ~counter_to_json:counter_sig_to_json
+    ~size_predicate_to_json:size_predicate_sig_to_json
+
+let agent_of_json = agent_of_json ~site_of_json
+let agent_to_json = agent_to_json ~counter_to_json ~size_predicate_to_json
 
 let print_ast_mix =
   Pp.list
@@ -953,15 +998,19 @@ let to_dummy_user_site = function
       User_graph.site_type = User_graph.Counter (-1);
       (* TODO *)
     }
-  | Size_predicate 
-      {threshold_name; threshold_value; threshold} -> 
-        let _ = threshold_value, threshold in 
-        {
-          User_graph.site_name = fst threshold_name;
-          User_graph.site_type =
-            User_graph.Port {User_graph.port_links = to_dummy_user_link []; 
-            User_graph.port_states = to_dummy_user_internal [Some "true",Loc.dummy;Some "false",Loc.dummy];}; 
-        }
+  | Size_predicate { threshold_name; threshold_value; threshold } ->
+    let _ = threshold_value, threshold in
+    {
+      User_graph.site_name = fst threshold_name;
+      User_graph.site_type =
+        User_graph.Port
+          {
+            User_graph.port_links = to_dummy_user_link [];
+            User_graph.port_states =
+              to_dummy_user_internal
+                [ Some "true", Loc.dummy; Some "false", Loc.dummy ];
+          };
+    }
 
 let to_dummy_user_agent = function
   | Absent _ -> None
@@ -1081,9 +1130,7 @@ let print_tok pr_mix pr_tok pr_var f ((nb, _), (n, _)) =
   Format.fprintf f "%a %a" (Alg_expr.print pr_mix pr_tok pr_var) nb pr_tok n
 
 let print_one_size tk f mix =
-  Format.fprintf f "%a%t%a"
-    print_ast_mix 
-    mix
+  Format.fprintf f "%a%t%a" print_ast_mix mix
     (fun f ->
       match tk with
       | [] -> ()
@@ -1112,14 +1159,14 @@ let print_raw_rate pr_mix pr_tok pr_var op f (def, _) =
 
 let print_ast_alg_expr =
   Alg_expr.print
-    (fun f m -> Format.fprintf f "|%a|" print_ast_mix  m)
+    (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
     Format.pp_print_string
     (fun f x -> Format.fprintf f "'%s'" x)
 
 let print_rates_one_dir un f def =
   Format.fprintf f "%a%t"
     (print_raw_rate
-       (fun f m -> Format.fprintf f "|%a|" print_ast_mix  m)
+       (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
        Format.pp_print_string
        (fun f x -> Format.fprintf f "'%s'" x)
        None)
@@ -1162,8 +1209,7 @@ let print_configuration f ((n, _), l) =
 let print_init f = function
   | (n, _), INIT_MIX (m, _) ->
     Format.fprintf f "@[%%init: @[%a@]@ @[%a@]@]" print_ast_alg_expr n
-      print_ast_mix 
-      m
+      print_ast_mix m
   | (n, _), INIT_TOK t ->
     Format.fprintf f "@[%%init: %a %a@]" print_ast_alg_expr n
       (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
@@ -1171,7 +1217,7 @@ let print_init f = function
 
 let print_ast_bool_expr =
   Alg_expr.print_bool
-    (fun f m -> Format.fprintf f "|%a|" print_ast_mix  m)
+    (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
     Format.pp_print_string
     (fun f x -> Format.fprintf f "'%s'" x)
 
@@ -1210,9 +1256,7 @@ let print_modif f = function
        else
          "[false]")
   | CFLOWMIX (on, (p, _)) ->
-    Format.fprintf f "$TRACK @[%a@] %s;"
-      print_ast_mix 
-      p
+    Format.fprintf f "$TRACK @[%a@] %s;" print_ast_mix p
       (if on then
          "[true]"
        else
@@ -1225,9 +1269,7 @@ let print_modif f = function
         | Primitives.PROBABILITY -> Format.fprintf f "\"probability\" ")
   | DINOFF p -> Format.fprintf f "$DIN%a [false]" print_print_expr p
   | SPECIES_OF (on, p, (m, _)) ->
-    Format.fprintf f "$SPECIES_OF @[%a@] %s >%a;"
-      print_ast_mix 
-      m
+    Format.fprintf f "$SPECIES_OF @[%a@] %s >%a;" print_ast_mix m
       (if on then
          "[true]"
        else
@@ -1252,7 +1294,8 @@ let print_parsing_compil_kappa f c =
     c.configurations
     (Pp.list Pp.space (fun f a ->
          Format.fprintf f "@[%%agent:@ @[%a@]@]"
-           (print_ast_agent ~print_counter:print_counter_sig ~print_size_predicate:print_size_predicate_sig)
+           (print_ast_agent ~print_counter:print_counter_sig
+              ~print_size_predicate:print_size_predicate_sig)
            a))
     c.signatures
     (Pp.list Pp.space (fun f (s, _) -> Format.fprintf f "%%token: %s" s))
@@ -1382,8 +1425,10 @@ let rule_to_json filenames f_mix f_var r =
                 (Loc.yojson_of_annoted ~filenames
                    (Alg_expr.e_to_yojson ~filenames f_mix f_var))))
           r.k_un );
-      ( "size_max", 
-          JsonUtil.of_option (Loc.yojson_of_annoted ~filenames (JsonUtil.of_int)) r.threshold);
+      ( "size_max",
+        JsonUtil.of_option
+          (Loc.yojson_of_annoted ~filenames JsonUtil.of_int)
+          r.threshold );
       ( "k_op",
         JsonUtil.of_option
           (Loc.yojson_of_annoted ~filenames
@@ -1398,8 +1443,10 @@ let rule_to_json filenames f_mix f_var r =
                 (Loc.yojson_of_annoted ~filenames
                    (Alg_expr.e_to_yojson ~filenames f_mix f_var))))
           r.k_op_un );
-        ( "size_op_max", 
-        JsonUtil.of_option (Loc.yojson_of_annoted ~filenames (JsonUtil.of_int)) r.threshold_op);  
+      ( "size_op_max",
+        JsonUtil.of_option
+          (Loc.yojson_of_annoted ~filenames JsonUtil.of_int)
+          r.threshold_op );
     ]
 
 let rule_of_json filenames f_mix f_var = function
@@ -1439,14 +1486,24 @@ let rule_of_json filenames f_mix f_var = function
                    (Loc.annoted_of_yojson ~filenames
                       (Alg_expr.e_of_yojson ~filenames f_mix f_var))))
              (Yojson.Basic.Util.member "k_op_un" x);
-        threshold = 
-          JsonUtil.to_option 
-            (Loc.annoted_of_yojson ~filenames (JsonUtil.to_int ?error_msg:(Some (JsonUtil.exn_msg_cant_import_from_json "AST size threshold"))))
-                (Yojson.Basic.Util.member "size_max" x); 
-        threshold_op = 
-          JsonUtil.to_option 
-            (Loc.annoted_of_yojson ~filenames (JsonUtil.to_int ?error_msg:(Some (JsonUtil.exn_msg_cant_import_from_json "AST size threshold"))))
-                (Yojson.Basic.Util.member "size_max_op" x)
+         threshold =
+           JsonUtil.to_option
+             (Loc.annoted_of_yojson ~filenames
+                (JsonUtil.to_int
+                   ?error_msg:
+                     (Some
+                        (JsonUtil.exn_msg_cant_import_from_json
+                           "AST size threshold"))))
+             (Yojson.Basic.Util.member "size_max" x);
+         threshold_op =
+           JsonUtil.to_option
+             (Loc.annoted_of_yojson ~filenames
+                (JsonUtil.to_int
+                   ?error_msg:
+                     (Some
+                        (JsonUtil.exn_msg_cant_import_from_json
+                           "AST size threshold"))))
+             (Yojson.Basic.Util.member "size_max_op" x);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule", x)))
@@ -1610,8 +1667,8 @@ let rec merge_sites_counter c = function
     when fst c.Counters_info.counter_sig_name
          = fst c'.Counters_info.counter_sig_name ->
     l
-  | ((Size_predicate _ | Port _ | Counter _) as h) :: t -> h :: merge_sites_counter c t
-
+  | ((Size_predicate _ | Port _ | Counter _) as h) :: t ->
+    h :: merge_sites_counter c t
 
 let rec merge_sites_port p = function
   | [] -> [ Port { p with port_link = [] } ]
@@ -1625,24 +1682,30 @@ let rec merge_sites_port p = function
             p.port_int_mod;
       }
     :: t
-  | ((Size_predicate _ | Port _ | Counter _) as h) :: t -> h :: merge_sites_port p t
+  | ((Size_predicate _ | Port _ | Counter _) as h) :: t ->
+    h :: merge_sites_port p t
 
-let rec merge_sites_size_predicate p = function 
-  | [] -> [ Size_predicate p]
-  | Size_predicate h::_ as l  when fst p.Size_info.threshold_sig_name = fst h.Size_info.threshold_sig_name -> l 
- | ((Size_predicate _ | Port _ | Counter _) as h) :: t -> h :: merge_sites_size_predicate p t
+let rec merge_sites_size_predicate p = function
+  | [] -> [ Size_predicate p ]
+  | Size_predicate h :: _ as l
+    when fst p.Size_info.threshold_sig_name = fst h.Size_info.threshold_sig_name
+    ->
+    l
+  | ((Size_predicate _ | Port _ | Counter _) as h) :: t ->
+    h :: merge_sites_size_predicate p t
 
 let merge_sites =
   List.fold_left (fun acc -> function
     | Port p -> merge_sites_port p acc
     | Counter c -> merge_sites_counter (counter_sig_of_counter c) acc
-    | Size_predicate p -> merge_sites_size_predicate (threshold_sig_of_threshold p) acc) 
+    | Size_predicate p ->
+      merge_sites_size_predicate (threshold_sig_of_threshold p) acc)
 
 let merge_agents =
   List.fold_left
     (List.fold_left (fun (acc : agent_sig list) -> function
        | Absent _ -> acc
-       | Present (((na, _) as x), (s : (threshold,counter) site list), _) ->
+       | Present (((na, _) as x), (s : (threshold, counter) site list), _) ->
          let rec aux = function
            | [] ->
              [
@@ -1653,8 +1716,9 @@ let merge_agents =
                        | Port p -> Port { p with port_link = [] }
                        | Counter _ as x ->
                          map_counters_in_site counter_sig_of_counter x
-                      | Size_predicate _ as x -> 
-                        map_size_predicates_in_site threshold_sig_of_threshold x)
+                       | Size_predicate _ as x ->
+                         map_size_predicates_in_site threshold_sig_of_threshold
+                           x)
                      s,
                    NoMod );
              ]
@@ -1757,16 +1821,9 @@ let split_mixture m =
                               port_link_mod = None;
                             }
                           :: r )
-                      | Size_predicate s -> 
-                        (
-                          Size_predicate  s
-
-                         :: l, 
-                        Size_predicate  s
-
-                         :: r                       
-                        ) 
-                          | Counter c ->
+                      | Size_predicate s ->
+                        Size_predicate s :: l, Size_predicate s :: r
+                      | Counter c ->
                         ( Counter
                             { c with counter_delta = Loc.annot_with_dummy 0 }
                           :: l,
@@ -1852,8 +1909,7 @@ let compil_to_json c =
              (Loc.string_annoted_to_json ~filenames)
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
-      ( "thresholds", 
-        JsonUtil.of_list JsonUtil.of_int c.thresholds); 
+      "thresholds", JsonUtil.of_list JsonUtil.of_int c.thresholds;
     ]
 
 let compil_of_json = function
@@ -1943,13 +1999,14 @@ let compil_of_json = function
                 (JsonUtil.to_list (Loc.string_annoted_of_json ~filenames)))
              (List.assoc "configurations" l);
          volumes = [];
-         thresholds = 
-          JsonUtil.to_list 
-          ~error_msg:
-          (JsonUtil.exn_msg_cant_import_from_json "AST thresholds")
-          (JsonUtil.to_int ~error_msg:
-          (JsonUtil.exn_msg_cant_import_from_json "AST threshold"))
-          (List.assoc "thresholds" l); 
+         thresholds =
+           JsonUtil.to_list
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json "AST thresholds")
+             (JsonUtil.to_int
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json "AST threshold"))
+             (List.assoc "thresholds" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST", x)))

@@ -1802,7 +1802,7 @@ functor
                           Signature.internal_state = states';
                           links = Some binding';
                           counter_info = None;
-                          threshold = None; 
+                          threshold = None;
                         } )
                       :: acc ))
                   (state, []) interface
@@ -1818,7 +1818,10 @@ functor
           ~build_contact_map:true
           (NamedDecls.create_from_list l)
       in
-      let signature = Signature.create ~counters_per_agent:[] ~size_predicate_list:[] agent_sigs in
+      let signature =
+        Signature.create ~counters_per_agent:[] ~size_predicate_list:[]
+          agent_sigs
+      in
       Remanent_state.set_signature signature state, signature
 
     let get_signature = get_gen Remanent_state.get_signature compute_signature

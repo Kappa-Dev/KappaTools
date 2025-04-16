@@ -138,7 +138,8 @@ let build_link ?warn_on_swap sigs ?contact_map pos i ag_ty p_id switch
   )
 
 let annotate_dropped_agent ~warning ~syntax_version ~r_edit_style sigs
-    links_annot ((agent_name, _) as ag_ty) simple_port_list threshold_list counter_list =
+    links_annot ((agent_name, _) as ag_ty) simple_port_list threshold_list
+    counter_list =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -267,13 +268,15 @@ let annotate_dropped_agent ~warning ~syntax_version ~r_edit_style sigs
       ra_syntax = Some (Array.copy ports, Array.copy internals);
     }
   in
-  let ra'  = 
-  Size_compiler.annotate_dropped_size_predicates sign threshold_list  ra arity agent_name None in 
-  (Counters_compiler.annotate_dropped_counters sign counter_list ra' arity
+  let ra' =
+    Size_compiler.annotate_dropped_size_predicates sign threshold_list ra arity
+      agent_name None
+  in
+  ( Counters_compiler.annotate_dropped_counters sign counter_list ra' arity
       agent_name None,
     lannot )
 
-let annotate_created_agent ~warning ~syntax_version ~r_edit_style sigs  
+let annotate_created_agent ~warning ~syntax_version ~r_edit_style sigs
     ?contact_map rannot ((agent_name, _) as ag_ty) simple_port_list =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
@@ -367,7 +370,8 @@ let translate_modification ~warning sigs ?contact_map ag_id p_id ?warn_info
       LKappa.Linked j, (lhs_links, rhs_links'))
 
 let annotate_edit_agent ~warning ~syntax_version ~is_rule sigs ?contact_map
-    ((agent_name, _) as ag_ty) links_annot simple_port_list size_predicate_list counter_list =
+    ((agent_name, _) as ag_ty) links_annot simple_port_list size_predicate_list
+    counter_list =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -495,9 +499,11 @@ let annotate_edit_agent ~warning ~syntax_version ~is_rule sigs ?contact_map
       ra_syntax = Some (Array.copy ports, Array.copy internals);
     }
   in
-  let ra' = 
-    Size_compiler.annotate_edit_size_predicates sigs ag_ty size_predicate_list ra (add_link_contact_map ?contact_map)
-  in 
+  let ra' =
+    Size_compiler.annotate_edit_size_predicates sigs ag_ty size_predicate_list
+      ra
+      (add_link_contact_map ?contact_map)
+  in
   ( Counters_compiler.annotate_edit_counters sigs ag_ty counter_list ra'
       (add_link_contact_map ?contact_map),
     annoted' )
@@ -803,9 +809,9 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
       ra_syntax = Some (Array.copy ports, Array.copy internals);
     }
   in
-  let ra' = 
-    Size_compiler.annotate_size_predicates_with_diff sigs ag_ty ls rs ra 
-    (add_link_contact_map ?contact_map)
+  let ra' =
+    Size_compiler.annotate_size_predicates_with_diff sigs ag_ty ls rs ra
+      (add_link_contact_map ?contact_map)
   in
   ( Counters_compiler.annotate_counters_with_diff sigs ag_ty lc rc ra'
       (add_link_contact_map ?contact_map),
@@ -813,7 +819,9 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
 
 let refer_links_annot ?warning sigs links_annot mix =
   List.iter
-    (fun (ra_ : LKappa.rule_agent Size_compiler.with_size_predicates Counters_compiler.with_agent_counters) ->
+    (fun (ra_ :
+           LKappa.rule_agent Size_compiler.with_size_predicates
+           Counters_compiler.with_agent_counters) ->
       let ra = ra_.agent.agent in
       Array.iteri
         (fun i -> function
@@ -848,19 +856,22 @@ let refer_links_annot ?warning sigs links_annot mix =
     mix
 
 let separate_simple_ports_from_counters ls =
-  let a, b, c  =
+  let a, b, c =
     List.fold_left
       (fun (ps, ss, cs) -> function
-        | Ast.Size_predicate s -> ps, s::ss, cs 
+        | Ast.Size_predicate s -> ps, s :: ss, cs
         | Ast.Port p -> p :: ps, ss, cs
         | Ast.Counter c -> ps, ss, c :: cs)
       ([], [], []) ls
   in
-  List.rev a, List.rev b, c 
+  List.rev a, List.rev b, c
 
 let final_rule_sanity ?warning sigs
-    ((lhs_links_one, lhs_links_two), (rhs_links_one, _)) (mix:LKappa.rule_agent Size_compiler.with_size_predicates
-    Counters_compiler.with_agent_counters list) =
+    ((lhs_links_one, lhs_links_two), (rhs_links_one, _))
+    (mix :
+      LKappa.rule_agent Size_compiler.with_size_predicates
+      Counters_compiler.with_agent_counters
+      list) =
   let () =
     match Mods.IntMap.root lhs_links_one with
     | None -> ()
@@ -893,7 +904,9 @@ let annotate_lhs_with_diff_v3 ~warning sigs ?contact_map lhs rhs =
            && Ast.no_more_site_on_right true lag_s rag_s ->
       raise_if_modification_agent lpos lmod;
       raise_if_modification_agent rpos rmod;
-      let lag_p, (lag_s:Ast.threshold list), lag_c = separate_simple_ports_from_counters lag_s in
+      let lag_p, (lag_s : Ast.threshold list), lag_c =
+        separate_simple_ports_from_counters lag_s
+      in
       let rag_p, rag_s, rag_c = separate_simple_ports_from_counters rag_s in
       let ra, links_annot' =
         annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
@@ -959,11 +972,12 @@ let annotate_lhs_with_diff_v3 ~warning sigs ?contact_map lhs rhs =
                   ~r_edit_style:false sigs ?contact_map rannot agent_name
                   simple_port_list
               in
-              let x'' = 
-                Size_compiler.annotate_created_size_predicates sigs agent_name 
-                threshold_list (add_link_contact_map ?contact_map)
-                x'
-              in 
+              let x'' =
+                Size_compiler.annotate_created_size_predicates sigs agent_name
+                  threshold_list
+                  (add_link_contact_map ?contact_map)
+                  x'
+              in
               let x''' =
                 Counters_compiler.annotate_created_counters sigs agent_name
                   counter_list
@@ -996,7 +1010,8 @@ let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
       in
       let ra, lannot' =
         annotate_dropped_agent ~warning ~syntax_version ~r_edit_style:false sigs
-          (fst links_annot) agent_type simple_port_list size_predicate_list counter_list
+          (fst links_annot) agent_type simple_port_list size_predicate_list
+          counter_list
       in
       aux (lannot', snd links_annot) (ra :: mix) cmix lt rt
     | ( Ast.Absent _ :: lt,
@@ -1010,8 +1025,10 @@ let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
           ?contact_map (snd links_annot) agent_type simple_port_list
       in
       let x'' =
-        Size_compiler.annotate_created_size_predicates sigs agent_type size_predicate_list (add_link_contact_map ?contact_map)
-        x'
+        Size_compiler.annotate_created_size_predicates sigs agent_type
+          size_predicate_list
+          (add_link_contact_map ?contact_map)
+          x'
       in
       let x''' =
         Counters_compiler.annotate_created_counters sigs agent_type counter_list
@@ -1089,7 +1106,8 @@ let annotate_edit_mixture ~warning ~syntax_version ~is_rule sigs ?contact_map
            | Ast.NoMod ->
              let a, lannot' =
                annotate_edit_agent ~warning ~syntax_version ~is_rule sigs
-                 ?contact_map agent_type lannot simple_port_list size_predicate_list counter_list
+                 ?contact_map agent_type lannot simple_port_list
+                 size_predicate_list counter_list
              in
              lannot', a :: acc, news
            | Ast.Create ->
@@ -1099,12 +1117,16 @@ let annotate_edit_mixture ~warning ~syntax_version ~is_rule sigs ?contact_map
                  simple_port_list
              in
              let x'' =
-              Size_compiler.annotate_created_size_predicates sigs agent_type
-                size_predicate_list (add_link_contact_map ?contact_map) x'
+               Size_compiler.annotate_created_size_predicates sigs agent_type
+                 size_predicate_list
+                 (add_link_contact_map ?contact_map)
+                 x'
              in
              let x''' =
                Counters_compiler.annotate_created_counters sigs agent_type
-                 counter_list (add_link_contact_map ?contact_map) x''
+                 counter_list
+                 (add_link_contact_map ?contact_map)
+                 x''
              in
              (fst lannot, rannot'), acc, x''' :: news
            | Ast.Erase ->
@@ -1125,7 +1147,9 @@ let annotate_edit_mixture ~warning ~syntax_version ~is_rule sigs ?contact_map
 
 let annotate_created_mixture ~warning ~syntax_version sigs ?contact_map
     (m : Ast.mixture) :
-    Raw_mixture.agent Size_compiler.with_size_predicates Counters_compiler.with_agent_counters list =
+    Raw_mixture.agent Size_compiler.with_size_predicates
+    Counters_compiler.with_agent_counters
+    list =
   let (rhs_links_one, _), cmix =
     List.fold_left
       (List.fold_left (fun (rannot, news) -> function
@@ -1142,14 +1166,16 @@ let annotate_created_mixture ~warning ~syntax_version sigs ?contact_map
                sigs ?contact_map rannot agent_type simple_port_list
            in
            let x'' =
-            Size_compiler.annotate_created_size_predicates sigs agent_type
-            threshold_list (add_link_contact_map ?contact_map) x'
+             Size_compiler.annotate_created_size_predicates sigs agent_type
+               threshold_list
+               (add_link_contact_map ?contact_map)
+               x'
            in
            let x''' =
              Counters_compiler.annotate_created_counters sigs agent_type
                counter_list
                (add_link_contact_map ?contact_map)
-               x'' 
+               x''
            in
            rannot', x''' :: news))
       ((Mods.IntMap.empty, Mods.IntMap.empty), [])
@@ -1181,27 +1207,37 @@ let give_rule_label bidirectional (id, set) printer r = function
     ) else
       (id, set'), lab
 
-let mixture_of_ast ~warning ~syntax_version sigs counters_info thresholds_info i_opt 
-?contact_map (pos : Loc.t) (mix : Ast.mixture) =
+let mixture_of_ast ~warning ~syntax_version sigs counters_info thresholds_info
+    i_opt ?contact_map (pos : Loc.t) (mix : Ast.mixture) =
   match
     annotate_edit_mixture ~warning ~syntax_version ~is_rule:false sigs
       ?contact_map mix
   with
   | r, [] ->
-    let r, _  = Counters_compiler.compile_counter_in_rule sigs counters_info r [] in 
-    let r, _ = Size_compiler.compile_size_predicate_in_rule sigs thresholds_info r [] i_opt in 
-    r 
+    let r, _ =
+      Counters_compiler.compile_counter_in_rule sigs counters_info r []
+    in
+    let r, _ =
+      Size_compiler.compile_size_predicate_in_rule sigs thresholds_info r []
+        i_opt
+    in
+    r
   | _, _ ->
     raise (ExceptionDefn.Internal_Error ("A mixture cannot create agents", pos))
 
 let raw_mixture_of_ast ~warning ~syntax_version sigs
-    (counters_info : Counters_info.t) thresholds_info ?contact_map (mix : Ast.mixture) i_opt =
+    (counters_info : Counters_info.t) thresholds_info ?contact_map
+    (mix : Ast.mixture) i_opt =
   let b =
     annotate_created_mixture ~warning ~syntax_version sigs ?contact_map mix
   in
-  let _, r = Counters_compiler.compile_counter_in_rule sigs counters_info [] b in 
-  let _, r = Size_compiler.compile_size_predicate_in_rule sigs thresholds_info [] r i_opt in 
-  r 
+  let _, r =
+    Counters_compiler.compile_counter_in_rule sigs counters_info [] b
+  in
+  let _, r =
+    Size_compiler.compile_size_predicate_in_rule sigs thresholds_info [] r i_opt
+  in
+  r
 
 let convert_alg_var ?max_allowed_var algs lab pos =
   let i =
@@ -1228,88 +1264,97 @@ let convert_token_name tk_name tok pos =
     raise
       (ExceptionDefn.Malformed_Decl (tk_name ^ " is not a declared token", pos))
 
-let rec alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-    ?max_allowed_var (alg, pos) =
+let rec alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+    thresholds_info tok algs ?max_allowed_var (alg, pos) =
   ( (match alg with
     | Alg_expr.KAPPA_INSTANCE ast ->
       Alg_expr.KAPPA_INSTANCE
-        (mixture_of_ast ~warning ~syntax_version sigs counters_info thresholds_info None pos ast)
+        (mixture_of_ast ~warning ~syntax_version sigs counters_info
+           thresholds_info None pos ast)
     | Alg_expr.ALG_VAR lab ->
       Alg_expr.ALG_VAR (convert_alg_var ?max_allowed_var algs lab pos)
     | Alg_expr.TOKEN_ID tk_name ->
       Alg_expr.TOKEN_ID (convert_token_name tk_name tok pos)
     | Alg_expr.DIFF_KAPPA_INSTANCE (expr, ast) ->
       Alg_expr.DIFF_KAPPA_INSTANCE
-        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-            ?max_allowed_var expr,
-          mixture_of_ast ~warning ~syntax_version sigs counters_info thresholds_info None pos ast )
+        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var expr,
+          mixture_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info None pos ast )
     | Alg_expr.DIFF_TOKEN (expr, tk_name) ->
       Alg_expr.DIFF_TOKEN
-        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var expr,
+        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var expr,
           convert_token_name tk_name tok pos )
     | (Alg_expr.STATE_ALG_OP _ | Alg_expr.CONST _) as x -> x
     | Alg_expr.BIN_ALG_OP (op, a, b) ->
       Alg_expr.BIN_ALG_OP
         ( op,
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var a,
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var b )
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var a,
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var b )
     | Alg_expr.UN_ALG_OP (op, a) ->
       Alg_expr.UN_ALG_OP
         ( op,
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-            ?max_allowed_var a )
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var a )
     | Alg_expr.IF (cond, yes, no) ->
       Alg_expr.IF
-        ( bool_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-            ?max_allowed_var cond,
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-            ?max_allowed_var yes,
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-            ?max_allowed_var no )),
+        ( bool_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var cond,
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var yes,
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var no )),
     pos )
 
-and bool_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-    ?max_allowed_var = function
+and bool_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info
+    tok algs ?max_allowed_var = function
   | ((Alg_expr.TRUE | Alg_expr.FALSE), _) as x -> x
   | Alg_expr.BIN_BOOL_OP (op, x, y), pos ->
     ( Alg_expr.BIN_BOOL_OP
         ( op,
-          bool_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var x,
-          bool_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var y ),
+          bool_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var x,
+          bool_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var y ),
       pos )
   | Alg_expr.UN_BOOL_OP (op, x), pos ->
     ( Alg_expr.UN_BOOL_OP
         ( op,
-          bool_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var x ),
+          bool_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var x ),
       pos )
   | Alg_expr.COMPARE_OP (op, x, y), pos ->
     ( Alg_expr.COMPARE_OP
         ( op,
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var x,
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var y ),
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var x,
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var y ),
       pos )
 
-let print_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs =
-  function
+let print_expr_of_ast ~warning ~syntax_version sigs counters_info
+    thresholds_info tok algs = function
   | Primitives.Str_pexpr _ as x -> x
   | Primitives.Alg_pexpr x ->
     Primitives.Alg_pexpr
-      (alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs x)
+      (alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+         thresholds_info tok algs x)
 
 (* Intermediate representation for a rule, used between internal translations *)
 type rule_inter_rep = {
   label_opt: (string * Loc.t) option;
   bidirectional: bool; (* TODO check *)
-  mixture: LKappa.rule_agent Size_compiler.with_size_predicates Counters_compiler.with_agent_counters list;
-  created_mix: Raw_mixture.agent Size_compiler.with_size_predicates Counters_compiler.with_agent_counters list;
+  mixture:
+    LKappa.rule_agent Size_compiler.with_size_predicates
+    Counters_compiler.with_agent_counters
+    list;
+  created_mix:
+    Raw_mixture.agent Size_compiler.with_size_predicates
+    Counters_compiler.with_agent_counters
+    list;
   rm_token:
     (((Ast.mixture, string) Alg_expr.e * Loc.t) * (string * Loc.t)) list;
   add_token:
@@ -1320,57 +1365,59 @@ type rule_inter_rep = {
     * ((Ast.mixture, string) Alg_expr.e * Loc.t) option)
     option;
   pos: Loc.t;
-  threshold: (int * Loc.t) option; 
+  threshold: (int * Loc.t) option;
 }
 (** Intermediate representation for rule type *)
 
-let get_threshold_opt_of_rule_inter_rep r = r.threshold 
+let get_threshold_opt_of_rule_inter_rep r = r.threshold
 
 (** [assemble_rule] translates a rule_inter_rep into a LKappa.rule *)
 let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
-    (sigs : Signature.s) counters_info thresholds_info (tok : int Mods.StringMap.t)
-    (algs : int Mods.StringMap.t) : LKappa.rule =  
-  let threshold_opt = get_threshold_opt_of_rule_inter_rep rule in 
-  let r_mix = rule.mixture in 
-  let r_created = rule.created_mix in 
-  let (r_mix, r_created) :  LKappa.rule_agent Size_compiler.with_size_predicates list * Raw_mixture.agent Size_compiler.with_size_predicates list =
-    Counters_compiler.compile_counter_in_rule sigs counters_info r_mix
-      r_created 
+    (sigs : Signature.s) counters_info thresholds_info
+    (tok : int Mods.StringMap.t) (algs : int Mods.StringMap.t) : LKappa.rule =
+  let threshold_opt = get_threshold_opt_of_rule_inter_rep rule in
+  let r_mix = rule.mixture in
+  let r_created = rule.created_mix in
+  let (r_mix, r_created) :
+      LKappa.rule_agent Size_compiler.with_size_predicates list
+      * Raw_mixture.agent Size_compiler.with_size_predicates list =
+    Counters_compiler.compile_counter_in_rule sigs counters_info r_mix r_created
   in
-    let (r_mix, r_created) : LKappa.rule_mixture * Raw_mixture.t =
-    Size_compiler.compile_size_predicate_in_rule sigs thresholds_info  r_mix
-      r_created threshold_opt 
+  let (r_mix, r_created) : LKappa.rule_mixture * Raw_mixture.t =
+    Size_compiler.compile_size_predicate_in_rule sigs thresholds_info r_mix
+      r_created threshold_opt
   in
 
   let r_delta_tokens =
     List.rev_map
       (fun (al, (tk, pos)) ->
-        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
+        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs
             (Loc.annot_with_dummy (Alg_expr.UN_ALG_OP (Operator.UMINUS, al))),
           convert_token_name tk tok pos ))
       rule.rm_token
     |> List_util.rev_map_append
          (fun (al, (tk, pos)) ->
-           ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
-               algs al,
+           ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+               thresholds_info tok algs al,
              convert_token_name tk tok pos ))
          rule.add_token
     |> List.rev
   in
   let r_rate =
-    alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-      rule.k_def
+    alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info
+      tok algs rule.k_def
   in
   let r_un_rate =
     let r_dist d =
-      alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-        ?max_allowed_var:None d
+      alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+        thresholds_info tok algs ?max_allowed_var:None d
     in
     Option_util.map
       (fun (un_rate', dist) ->
         let un_rate'' =
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            ?max_allowed_var:None un_rate'
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs ?max_allowed_var:None un_rate'
         in
         match dist with
         | Some d -> un_rate'', Some (r_dist d)
@@ -1386,8 +1433,8 @@ let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
     r_un_rate;
   }
 
-let modif_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-    contact_map modif acc =
+let modif_expr_of_ast ~warning ~syntax_version sigs counters_info
+    thresholds_info tok algs contact_map modif acc =
   match modif with
   | Ast.APPLY (nb, (ast_rule, pos)) ->
     let rule : rule_inter_rep =
@@ -1428,9 +1475,10 @@ let modif_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_inf
         }
     in
     ( Ast.APPLY
-        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs nb,
-          ( assemble_rule ~warning ~syntax_version rule sigs counters_info thresholds_info tok
-              algs,
+        ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs nb,
+          ( assemble_rule ~warning ~syntax_version rule sigs counters_info
+              thresholds_info tok algs,
             pos ) ),
       acc )
   | Ast.UPDATE ((lab, pos), how) ->
@@ -1443,97 +1491,99 @@ let modif_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_inf
     in
     ( Ast.UPDATE
         ( (i, pos),
-          alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok algs
-            how ),
+          alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+            thresholds_info tok algs how ),
       i :: acc )
   | Ast.STOP p ->
     ( Ast.STOP
         (List.map
-           (print_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
-              algs)
+           (print_expr_of_ast ~warning ~syntax_version sigs counters_info
+              thresholds_info tok algs)
            p),
       acc )
   | Ast.SNAPSHOT (raw, p) ->
     ( Ast.SNAPSHOT
         ( raw,
           List.map
-            (print_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
-               algs)
+            (print_expr_of_ast ~warning ~syntax_version sigs counters_info
+               thresholds_info tok algs)
             p ),
       acc )
   | Ast.DIN (rel, p) ->
     ( Ast.DIN
         ( rel,
           List.map
-            (print_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
-               algs)
+            (print_expr_of_ast ~warning ~syntax_version sigs counters_info
+               thresholds_info tok algs)
             p ),
       acc )
   | Ast.DINOFF p ->
     ( Ast.DINOFF
         (List.map
-           (print_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
-              algs)
+           (print_expr_of_ast ~warning ~syntax_version sigs counters_info
+              thresholds_info tok algs)
            p),
       acc )
   | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_, _)) as x -> x, acc
   | Ast.PRINT (p, p') ->
     ( Ast.PRINT
         ( List.map
-            (print_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
-               algs)
+            (print_expr_of_ast ~warning ~syntax_version sigs counters_info
+               thresholds_info tok algs)
             p,
           List.map
-            (print_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
-               algs)
+            (print_expr_of_ast ~warning ~syntax_version sigs counters_info
+               thresholds_info tok algs)
             p' ),
       acc )
   | Ast.CFLOWMIX (b, (m, pos)) ->
     ( Ast.CFLOWMIX
         ( b,
-          (mixture_of_ast ~warning ~syntax_version sigs counters_info thresholds_info None pos m, pos)
-        ),
+          ( mixture_of_ast ~warning ~syntax_version sigs counters_info
+              thresholds_info None pos m,
+            pos ) ),
       acc )
   | Ast.SPECIES_OF (b, p, (m, pos)) ->
     ( Ast.SPECIES_OF
         ( b,
           List.map
-            (print_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
-               algs)
+            (print_expr_of_ast ~warning ~syntax_version sigs counters_info
+               thresholds_info tok algs)
             p,
-          (mixture_of_ast ~warning ~syntax_version sigs counters_info thresholds_info None pos m, pos)
-        ),
+          ( mixture_of_ast ~warning ~syntax_version sigs counters_info
+              thresholds_info None pos m,
+            pos ) ),
       acc )
 
-let perturbation_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-    contact_map ((alarm, pre, mods, post), pos) up_vars :
-    (_, _, _, _) Ast.perturbation * int list =
+let perturbation_of_ast ~warning ~syntax_version sigs counters_info
+    thresholds_info tok algs contact_map ((alarm, pre, mods, post), pos) up_vars
+    : (_, _, _, _) Ast.perturbation * int list =
   let mods', up_vars' =
     List_util.fold_right_map
-      (modif_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-         contact_map)
+      (modif_expr_of_ast ~warning ~syntax_version sigs counters_info
+         thresholds_info tok algs contact_map)
       mods up_vars
   in
   let max_allowed_var = None in
   ( ( ( alarm,
         Option_util.map
-          (bool_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-             ?max_allowed_var)
+          (bool_expr_of_ast ~warning ~syntax_version sigs counters_info
+             thresholds_info tok algs ?max_allowed_var)
           pre,
         mods',
         Option_util.map
-          (bool_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs
-             ?max_allowed_var)
+          (bool_expr_of_ast ~warning ~syntax_version sigs counters_info
+             thresholds_info tok algs ?max_allowed_var)
           post ),
       pos ),
     up_vars' )
 
-let init_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok contact_map =
-  function
+let init_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok
+    contact_map = function
   | Ast.INIT_MIX (who, pos) ->
     Ast.INIT_MIX
-      ( raw_mixture_of_ast ~warning ~syntax_version sigs counters_info thresholds_info 
-          ~contact_map who None,
+      ( raw_mixture_of_ast ~warning ~syntax_version sigs counters_info
+          thresholds_info ~contact_map who None,
         pos )
   | Ast.INIT_TOK lab ->
     Ast.INIT_TOK
@@ -1614,7 +1664,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
           k_def;
           k_un;
           pos = r_pos;
-          threshold = ast_rule.threshold; 
+          threshold = ast_rule.threshold;
         }
         :: acc.cleaned_rules;
     }
@@ -1634,7 +1684,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
         k_def;
         k_un;
         pos = r_pos;
-        threshold = ast_rule.threshold; 
+        threshold = ast_rule.threshold;
       }
       :: acc.cleaned_rules
     in
@@ -1662,7 +1712,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
             k_def = Loc.annot_with_dummy (Alg_expr.ALG_VAR rate_var);
             k_un = k_op_un;
             pos = r_pos;
-            threshold = ast_rule.threshold_op; 
+            threshold = ast_rule.threshold_op;
           }
           :: rules' )
       | true, Some rate ->
@@ -1686,7 +1736,7 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
             k_def = rate;
             k_un = k_op_un;
             pos = r_pos;
-            threshold = ast_rule.threshold_op; 
+            threshold = ast_rule.threshold_op;
           }
           :: rules' )
       | false, None -> acc'', rules'
@@ -1703,8 +1753,9 @@ type site_sig_with_links_as_lists =
 (** Temporary type to store site signature with list links instead of array array links *)
 
 (** [prepare_agent_sig ~sites evaluates to (site_sigs, counter_list) which describe data that can be used to create a Signature.t for a single agent*)
-let prepare_agent_sig ~(sites : (Size_info.size_sig, Counters_info.counter_sig) Ast.site list) 
-  ~(size_predicate_list : int list):
+let prepare_agent_sig
+    ~(sites : (Size_info.size_sig, Counters_info.counter_sig) Ast.site list)
+    ~(size_predicate_list : int list) :
     site_sig_with_links_as_lists NamedDecls.t * string Loc.annoted list =
   let ( (site_sigs_pre_nameddecls :
           (string Loc.annoted * site_sig_with_links_as_lists) list),
@@ -1744,7 +1795,7 @@ let prepare_agent_sig ~(sites : (Size_info.size_sig, Counters_info.counter_sig) 
                          | LKappa.LNK_TYPE (a, b), _ -> (a, b) :: acc_links')
                        [] p.port_link);
                 counter_info = None;
-                threshold = None; 
+                threshold = None;
               } )
             :: acc_site_sigs,
             acc_counter_names )
@@ -1760,15 +1811,15 @@ let prepare_agent_sig ~(sites : (Size_info.size_sig, Counters_info.counter_sig) 
                            raise
                              (ExceptionDefn.Malformed_Decl
                                 ( "Forbidden internal state inside signature \
-                                definition",
-                                pos )))
-                     s.Size_info.threshold_sig_value);
-              links = None ;
-              counter_info = None;
-              threshold = Some s.Size_info.threshold; 
-            } )
-          :: acc_site_sigs,
-          acc_counter_names )
+                                   definition",
+                                  pos )))
+                       s.Size_info.threshold_sig_value);
+                links = None;
+                counter_info = None;
+                threshold = Some s.Size_info.threshold;
+              } )
+            :: acc_site_sigs,
+            acc_counter_names )
         | Counter c ->
           (* We are reading here a signature, only CEQ tests are accepted *)
           ( ( c.Counters_info.counter_sig_name,
@@ -1795,35 +1846,36 @@ let prepare_agent_sig ~(sites : (Size_info.size_sig, Counters_info.counter_sig) 
                       counter_default_value =
                         c.Counters_info.counter_sig_default;
                     };
-                threshold = None; 
+                threshold = None;
               } )
             :: acc_site_sigs,
             c.counter_sig_name :: acc_counter_names ))
       sites ([], [])
   in
-  let site_sigs_pre_nameddecls =  
-    List.fold_right 
-      (fun threshold site_sigs_pre_nameddecls -> 
-        ((Format.sprintf "__is_lt_than_%i" threshold, Loc.dummy), 
-        {
-      Signature.internal_state = 
-       NamedDecls.create
-                    (Tools.array_map_of_list
-                       (function
-                         | Some x, pos -> (x, pos), ()
-                         | None, pos ->
-                           raise
-                             (ExceptionDefn.Malformed_Decl
-                                ( "Forbidden internal state inside signature \
-                                definition",
-                                pos )))
-                     [Some "true", Loc.dummy;Some "false", Loc.dummy]);
-                     links = Some []; 
-                     counter_info = None; 
-                     threshold = Some threshold ; 
-        })::site_sigs_pre_nameddecls 
-        ) size_predicate_list site_sigs_pre_nameddecls
-                         in 
+  let site_sigs_pre_nameddecls =
+    List.fold_right
+      (fun threshold site_sigs_pre_nameddecls ->
+        ( (Format.sprintf "__is_lt_than_%i" threshold, Loc.dummy),
+          {
+            Signature.internal_state =
+              NamedDecls.create
+                (Tools.array_map_of_list
+                   (function
+                     | Some x, pos -> (x, pos), ()
+                     | None, pos ->
+                       raise
+                         (ExceptionDefn.Malformed_Decl
+                            ( "Forbidden internal state inside signature \
+                               definition",
+                              pos )))
+                   [ Some "true", Loc.dummy; Some "false", Loc.dummy ]);
+            links = Some [];
+            counter_info = None;
+            threshold = Some threshold;
+          } )
+        :: site_sigs_pre_nameddecls)
+      size_predicate_list site_sigs_pre_nameddecls
+  in
   NamedDecls.create_from_list site_sigs_pre_nameddecls, counter_names
 
 (** [make_counter_agent_site_sigs counters_per_agent] evaluates to
@@ -1848,7 +1900,7 @@ let make_counter_agent_site_sigs
       Signature.internal_state = NamedDecls.create [||];
       links = Some [ b_port_name, counter_agent_name ];
       counter_info = None;
-      threshold = None; 
+      threshold = None;
     }
   in
   (* Port [b] can link to port a of agent of type counter agent
@@ -1869,7 +1921,7 @@ let make_counter_agent_site_sigs
       Signature.internal_state = NamedDecls.create [||];
       links = Some b_links;
       counter_info = None;
-      threshold = None; 
+      threshold = None;
     }
   in
   let site_sigs_counter_agent =
@@ -1877,7 +1929,6 @@ let make_counter_agent_site_sigs
   in
   counter_agent_name, site_sigs_counter_agent
 
-  
 let agent_sigs_of_agent_sigs_with_links_as_lists ~(build_contact_map : bool)
     (agent_sigs_pre : site_sig_with_links_as_lists NamedDecls.t NamedDecls.t) :
     Signature.t NamedDecls.t =
@@ -1941,8 +1992,7 @@ let create_sigs ~size_predicate_list (l : Ast.agent_sig list) : Signature.s =
           List.fold_left
             (fun acc1 site ->
               match site with
-              | Ast.Size_predicate _ 
-              | Ast.Counter _ -> acc1
+              | Ast.Size_predicate _ | Ast.Counter _ -> acc1
               | Ast.Port p ->
                 List.fold_left
                   (fun acc2 -> function
@@ -1963,15 +2013,16 @@ let create_sigs ~size_predicate_list (l : Ast.agent_sig list) : Signature.s =
   let ( (sigs_with_links_as_lists :
           (string Loc.annoted * site_sig_with_links_as_lists NamedDecls.t) list),
         (counters_per_agent :
-          (string Loc.annoted * string Loc.annoted list) list) ) 
-        =
+          (string Loc.annoted * string Loc.annoted list) list) ) =
     List.fold_right
       (fun agent (acc_sigs, acc_counters_per_agent) ->
         match agent with
         | Ast.Absent _ -> acc_sigs, acc_counters_per_agent
         | Ast.Present (agent_name, sites, _) ->
-          let site_sigs_nd, counters_agent = prepare_agent_sig ~sites ~size_predicate_list in
-          let counters' = 
+          let site_sigs_nd, counters_agent =
+            prepare_agent_sig ~sites ~size_predicate_list
+          in
+          let counters' =
             if counters_agent = [] then
               acc_counters_per_agent
             else
@@ -1986,7 +2037,7 @@ let create_sigs ~size_predicate_list (l : Ast.agent_sig list) : Signature.s =
        sigs_with_links_as_lists
      else
        make_counter_agent_site_sigs counters_per_agent
-       ::sigs_with_links_as_lists)
+       :: sigs_with_links_as_lists)
     |> NamedDecls.create_from_list
     |> agent_sigs_of_agent_sigs_with_links_as_lists ~build_contact_map
   in
@@ -1994,20 +2045,21 @@ let create_sigs ~size_predicate_list (l : Ast.agent_sig list) : Signature.s =
   (* TODO see agent_sigs namings *)
   Signature.create ~counters_per_agent ~size_predicate_list agent_sigs
 
-let init_of_ast ~warning ~syntax_version sigs counters_info thresholds_info contact_map tok algs
-    inits =
+let init_of_ast ~warning ~syntax_version sigs counters_info thresholds_info
+    contact_map tok algs inits =
   List.map
     (fun (expr, ini) ->
-      ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info  tok algs expr,
-        init_of_ast ~warning ~syntax_version sigs counters_info thresholds_info tok contact_map
-          ini ))
+      ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info
+          thresholds_info tok algs expr,
+        init_of_ast ~warning ~syntax_version sigs counters_info thresholds_info
+          tok contact_map ini ))
     inits
 
 type ast_compiled_data = {
   agents_sig: Signature.s;
   contact_map: Contact_map.t;
   counters_info: Counters_info.t;
-  size_info: Size_info.t; 
+  size_info: Size_info.t;
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;
@@ -2045,8 +2097,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
               List.fold_left
                 (fun acc4 site ->
                   match site with
-                  | Ast.Size_predicate _ 
-                  | Ast.Port _ -> acc4
+                  | Ast.Size_predicate _ | Ast.Port _ -> acc4
                   | Counter counter -> f acc4 (Loc.v agent_name) counter)
                 acc3 site_list)
           acc2 agent_list)
@@ -2220,8 +2271,9 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             Mods.StringMap.find_default Mods.StringSet.empty agent_name
               counters_with_clte_tests
           in
-          let (new_counter_sites : (Size_info.size_sig, Counters_info.counter_sig) Ast.site list), map
-              =
+          let ( (new_counter_sites :
+                  (Size_info.size_sig, Counters_info.counter_sig) Ast.site list),
+                map ) =
             Mods.StringSet.fold
               (fun counter_name (acc, map) ->
                 (* Find counter to invert *)
@@ -2229,8 +2281,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                   List.find_map
                     (fun site ->
                       match site with
-                      | Ast.Size_predicate _ 
-                      | Ast.Port _ -> None
+                      | Ast.Size_predicate _ | Ast.Port _ -> None
                       | Counter counter ->
                         if
                           Loc.v counter.Counters_info.counter_sig_name
@@ -2332,12 +2383,12 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
               in
               (* Add delta to counter as opposite deltas to counter_delta *)
               let (added_sites, site_list_with_opposite_deltas) :
-                  (Ast.threshold, Ast.counter) Ast.site list * (Ast.threshold, Ast.counter) Ast.site list =
+                  (Ast.threshold, Ast.counter) Ast.site list
+                  * (Ast.threshold, Ast.counter) Ast.site list =
                 List.fold_left_map
                   (fun acc site ->
                     match site with
-                    | Ast.Size_predicate _ 
-                    | Ast.Port _ -> acc, site
+                    | Ast.Size_predicate _ | Ast.Port _ -> acc, site
                     | Counter counter ->
                       (match
                          Mods.StringMap.find_option
@@ -2455,8 +2506,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                 List.fold_left
                   (fun acc site ->
                     match site with
-                    | Ast.Size_predicate _ 
-                    | Ast.Port _ -> acc
+                    | Ast.Size_predicate _ | Ast.Port _ -> acc
                     | Counter counter ->
                       (match
                          Mods.StringMap.find_option
@@ -2625,7 +2675,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   let ast_compil, _counter_conversion_info_map =
     translate_clte_into_cgte ast_compil
   in
-  let size_predicate_list = [100] in (* TO DO : extract from AST *)
+  let size_predicate_list = [ 100 ] in
+  (* TO DO : extract from AST *)
   let has_counters = Counters_compiler.has_counters ast_compil in
   let agent_sig_is_implicit =
     ast_compil.Ast.signatures = [] && ast_compil.Ast.tokens = []
@@ -2650,7 +2701,9 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       ast_compil
   in
 
-  let agents_sig : Signature.s = create_sigs ~size_predicate_list ast_compil.Ast.signatures in
+  let agents_sig : Signature.s =
+    create_sigs ~size_predicate_list ast_compil.Ast.signatures
+  in
   (* Set an empty contact map *)
   let counters_info =
     let size = Signature.size agents_sig in
@@ -2700,9 +2753,9 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
           List.iter
             (function
               | Ast.Port _ -> ()
-              | Ast.Size_predicate threshold_sig   ->  
-                 let site_name = threshold_sig.Size_info.threshold_sig_name in
-                 let site_id =
+              | Ast.Size_predicate threshold_sig ->
+                let site_name = threshold_sig.Size_info.threshold_sig_name in
+                let site_id =
                   Signature.id_of_site agent_name site_name agents_sig
                 in
                 size_predicates_info.(agent_id).(site_id) <- Some threshold_sig
@@ -2790,8 +2843,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
 
   let pertubations_without_counters, updated_alg_vars =
     List_util.fold_right_map
-      (perturbation_of_ast ~warning ~syntax_version agents_sig counters_info size_predicates_info 
-         tokens_finder alg_vars_finder contact_map)
+      (perturbation_of_ast ~warning ~syntax_version agents_sig counters_info
+         size_predicates_info tokens_finder alg_vars_finder contact_map)
       ast_compil.Ast.perturbations []
   in
   let perturbations =
@@ -2807,13 +2860,13 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     List.rev_map
       (fun (rule : rule_inter_rep) ->
         ( rule.label_opt,
-          ( assemble_rule ~warning ~syntax_version rule agents_sig counters_info size_predicates_info 
-              tokens_finder alg_vars_finder,
+          ( assemble_rule ~warning ~syntax_version rule agents_sig counters_info
+              size_predicates_info tokens_finder alg_vars_finder,
             rule.pos ) ))
       cleaned_rules
   in
 
-  let thresholds_of_rule _rule = [5; 100 ] in
+  let thresholds_of_rule _rule = [ 5; 100 ] in
   (* TO DO *)
   let thresholds =
     List.fold_left
@@ -2829,7 +2882,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       (fun i (lab, expr) acc ->
         ( lab,
           alg_expr_of_ast ~warning ~syntax_version ~max_allowed_var:(pred i)
-            agents_sig counters_info size_predicates_info tokens_finder alg_vars_finder expr )
+            agents_sig counters_info size_predicates_info tokens_finder
+            alg_vars_finder expr )
         :: acc)
       alg_vars_array []
   in
@@ -2843,15 +2897,16 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   in
 
   let init =
-    init_of_ast ~warning ~syntax_version agents_sig counters_info size_predicates_info  contact_map
-      tokens_finder alg_vars_finder ast_compil.init
+    init_of_ast ~warning ~syntax_version agents_sig counters_info
+      size_predicates_info contact_map tokens_finder alg_vars_finder
+      ast_compil.init
   in
 
   {
     agents_sig;
     contact_map;
     counters_info;
-    size_info=size_predicates_info; 
+    size_info = size_predicates_info;
     token_names;
     alg_vars_finder;
     updated_alg_vars;
@@ -2868,6 +2923,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         tokens = ast_compil.tokens;
         signatures = ast_compil.signatures;
         configurations = ast_compil.configurations;
-        thresholds = ast_compil.thresholds; 
+        thresholds = ast_compil.thresholds;
       };
   }

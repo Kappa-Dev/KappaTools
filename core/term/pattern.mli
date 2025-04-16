@@ -71,8 +71,8 @@ module Env : sig
 
   val signatures : t -> Signature.s
   val counters_info : t -> Counters_info.t
-  val thresholds_info: t -> Size_info.t 
-  val previous_threshold: t -> Size_info.previous_threshold 
+  val thresholds_info : t -> Size_info.t
+  val previous_threshold : t -> Size_info.previous_threshold
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
   val to_navigation : t -> id -> Navigation.abstract Navigation.t
   val print : noCounters:bool -> Format.formatter -> t -> unit
@@ -86,9 +86,16 @@ module PreEnv : sig
 
   val sigs : t -> Signature.s
   val counters_info : t -> Counters_info.t
-  val thresholds_info : t -> Size_info.t 
+  val thresholds_info : t -> Size_info.t
   val of_env : Env.t -> t
-  val empty : Signature.s -> Counters_info.t -> Size_info.t -> Size_info.previous_threshold -> t
+
+  val empty :
+    Signature.s ->
+    Counters_info.t ->
+    Size_info.t ->
+    Size_info.previous_threshold ->
+    t
+
   val debug_print : Format.formatter -> t -> unit
 end
 

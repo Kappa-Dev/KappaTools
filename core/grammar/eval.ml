@@ -555,7 +555,9 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
             (Alg_expr.CONST Nbr.one, compiled_rule), domain''
           | _, _, _ -> assert false))
       inits
-      (Pattern.PreEnv.empty (Model.signatures env) (Model.counters_info env) (Model.size_predicates_info env) (Model.previous_threshold env))
+      (Pattern.PreEnv.empty (Model.signatures env) (Model.counters_info env)
+         (Model.size_predicates_info env)
+         (Model.previous_threshold env))
   in
   init_l
 
@@ -624,11 +626,15 @@ let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map
     Export_to_KaSim.flush_errors kasa_state
 *)
 let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
-    ?overwrite_init ?overwrite_t0 ?rescale_init sigs_nd counters_info size_predicates_info with_thresholds tk_nd contact_map result =
+    ?overwrite_init ?overwrite_t0 ?rescale_init sigs_nd counters_info
+    size_predicates_info with_thresholds tk_nd contact_map result =
   let warning ~pos msg = outputs (Data.Warning (Some pos, msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
   let previous_threshold = Connected.build_threshold with_thresholds in
-  let preenv = Pattern.PreEnv.empty sigs_nd counters_info size_predicates_info previous_threshold in
+  let preenv =
+    Pattern.PreEnv.empty sigs_nd counters_info size_predicates_info
+      previous_threshold
+  in
   outputs (Data.Log "\t -variable declarations");
   let preenv', alg_a =
     compile_alg_vars ~debug_mode ~compile_mode_on contact_map preenv
@@ -673,8 +679,8 @@ let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
   let env =
     Model.init ~filenames:result.filenames domain tk_nd alg_nd alg_deps''
       (Array.of_list result.rules, rule_nd)
-      (Array.of_list obs) (Array.of_list pert) contact_map counters_info 
-      size_predicates_info previous_threshold 
+      (Array.of_list obs) (Array.of_list pert) contact_map counters_info
+      size_predicates_info previous_threshold
   in
 
   outputs (Data.Log "\t -initial conditions");

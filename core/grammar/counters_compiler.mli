@@ -13,7 +13,7 @@ type 'a with_agent_counters = {
 (** [with_agent_counters] annotates a agent type with rule agent counters if relevant. Used mainly with [rule_agent] and [Raw_mixture.agent].
  *
  * Usually in the code a trailing underscore in a variable name marks that we have this data added, such as [rule_agent_] with [rule_agent_.agent] being a [rule_agent] *)
- 
+
 type rule_mixture_with_agent_counters =
   LKappa.rule_agent Size_compiler.with_size_predicates with_agent_counters list
 
@@ -41,12 +41,19 @@ val compile_counter_in_rule :
   Counters_info.t ->
   LKappa.rule_agent Size_compiler.with_size_predicates with_agent_counters list ->
   Raw_mixture.agent Size_compiler.with_size_predicates with_agent_counters list ->
-  LKappa.rule_agent Size_compiler.with_size_predicates list * Raw_mixture.agent Size_compiler.with_size_predicates list
+  LKappa.rule_agent Size_compiler.with_size_predicates list
+  * Raw_mixture.agent Size_compiler.with_size_predicates list
 
 val counters_perturbations :
   Signature.s ->
   Ast.agent_sig list list ->
-  (*(rule_mixture_with_size_predicates, raw_mixture_with_size_predicates, int, LKappa.rule)*) (LKappa.rule_agent list, Raw_mixture.agent list, int, LKappa.rule) Ast.perturbation list
+  (*(rule_mixture_with_size_predicates, raw_mixture_with_size_predicates, int, LKappa.rule)*)
+  ( LKappa.rule_agent list,
+    Raw_mixture.agent list,
+    int,
+    LKappa.rule )
+  Ast.perturbation
+  list
 
 val annotate_dropped_counters :
   Signature.t ->
@@ -61,17 +68,17 @@ val annotate_edit_counters :
   Signature.s ->
   string Loc.annoted ->
   Ast.counter list ->
-  LKappa.rule_agent Size_compiler.with_size_predicates  ->
+  LKappa.rule_agent Size_compiler.with_size_predicates ->
   (int -> int -> int -> int -> unit) ->
-  LKappa.rule_agent Size_compiler.with_size_predicates  with_agent_counters
+  LKappa.rule_agent Size_compiler.with_size_predicates with_agent_counters
 
 val annotate_created_counters :
   Signature.s ->
   string Loc.annoted ->
   Ast.counter list ->
   (int -> int -> int -> int -> unit) ->
-  Raw_mixture.agent Size_compiler.with_size_predicates  ->
-  Raw_mixture.agent Size_compiler.with_size_predicates  with_agent_counters
+  Raw_mixture.agent Size_compiler.with_size_predicates ->
+  Raw_mixture.agent Size_compiler.with_size_predicates with_agent_counters
 
 val annotate_counters_with_diff :
   Signature.s ->

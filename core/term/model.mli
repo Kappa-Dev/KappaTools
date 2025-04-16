@@ -26,7 +26,7 @@ val init :
   Contact_map.t ->
   Counters_info.counter_sig option array array ->
   Size_info.t ->
-  Size_info.previous_threshold -> 
+  Size_info.previous_threshold ->
   t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
@@ -47,7 +47,8 @@ val deconstruct :
   * Primitives.perturbation array
   * Contact_map.t
   * Counters_info.counter_sig option array array
-  * Size_info.t  * Size_info.previous_threshold 
+  * Size_info.t
+  * Size_info.previous_threshold
 
 val nb_tokens : t -> int
 val nb_algs : t -> int
@@ -55,9 +56,9 @@ val nb_rules : t -> int
 val nb_syntactic_rules : t -> int
 val nb_perturbations : t -> int
 val domain : t -> Pattern.Env.t
-val size_predicates_info: t -> Size_info.t 
-val size_predicate_info: t -> int -> int -> Size_info.size_sig option 
-val previous_threshold: t -> Size_info.previous_threshold 
+val size_predicates_info : t -> Size_info.t
+val size_predicate_info : t -> int -> int -> Size_info.size_sig option
+val previous_threshold : t -> Size_info.previous_threshold
 val get_obs : t -> Primitives.alg_expr Loc.annoted array
 val get_rules : t -> Primitives.elementary_rule array
 val new_domain : Pattern.Env.t -> t -> t

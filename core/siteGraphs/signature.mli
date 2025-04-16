@@ -24,7 +24,7 @@ type 'links site_sig = {
   links: 'links option;
   counter_info: counter_info option;
       (** If relevant: counter CEQ value * counter delta *)
-  threshold: int option; 
+  threshold: int option;
 }
 
 type t = bool array array site_sig NamedDecls.t
@@ -50,7 +50,7 @@ type s
 (* TODO See what to be kept here? *)
 val create :
   counters_per_agent:(string Loc.annoted * string Loc.annoted list) list ->
-  size_predicate_list:(int list) -> 
+  size_predicate_list:int list ->
   t NamedDecls.t ->
   s
 
@@ -91,7 +91,7 @@ val allowed_link : int -> int -> int -> int -> s -> bool
 val is_counter_agent : s -> int -> bool
 val ports_if_counter_agent : s -> int -> (int * int) option
 val site_is_counter : s -> int -> int -> bool
-val site_is_size_predicate_site: s -> int -> int -> bool 
+val site_is_size_predicate_site : s -> int -> int -> bool
 
 type counter_agent_info = { id: int; arity: int; ports: int * int }
 
@@ -104,8 +104,8 @@ val inverted_counter_suffix : string
 val is_inverted_counter : string -> bool
 (** Tests if a counter is a inverted counter, and should be hidden from the user *)
 
-val n_thresholds: s -> int 
-val thresholds: s -> int list 
+val n_thresholds : s -> int
+val thresholds : s -> int list
 
 (** {2 I/O} *)
 
