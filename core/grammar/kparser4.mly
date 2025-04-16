@@ -506,28 +506,27 @@ alg_with_radius:
     { let (x,_,_) = $1 in let (y,_,_) = $4 in (x, Some y) }
   ;
 
-threshold: 
-  | OP_BRA annoted SMALLER EQUAL annoted INT annoted OP_BRA {Some ($6,Loc.of_pos (start_pos 1) (end_pos 7))}
+
 
 rate:
-  | threshold annoted OP_CUR annoted alg_with_radius CL_CUR annoted alg_expr
-    { let (b,pend,an) = $8 in (b,Some $5,pend,an,$1) }
-  | OP_CUR annoted alg_with_radius CL_CUR annoted threshold annoted  alg_expr
-    { let (b,pend,an) = $8 in (b,Some $3,pend,an,$6) }
-  | OP_CUR annoted alg_with_radius CL_CUR annoted  alg_expr annoted threshold 
-    { let (b,pend,an) = $6 in (b,Some $3,pend,an,$8)}
-  | OP_CUR annoted alg_with_radius CL_CUR annoted  alg_expr 
+    | OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted OP_CUR annoted alg_with_radius CL_CUR annoted alg_expr
+    { let (b,pend,an) = $16 in (b,Some $13,pend,an,Some ($7,Loc.of_pos (start_pos 1) (end_pos 9))) }
+    | OP_CUR annoted alg_with_radius CL_CUR annoted OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted  alg_expr
+    { let (b,pend,an) = $16 in (b,Some $3,pend,an,Some ($12,Loc.of_pos (start_pos 6) (end_pos 16))) }
+    | OP_CUR annoted alg_with_radius CL_CUR annoted  alg_expr OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted
+    { let (b,pend,an) = $6 in (b,Some $3,pend,an,Some ($13,Loc.of_pos (start_pos 7) (end_pos 15)))}
+    | OP_CUR annoted alg_with_radius CL_CUR annoted  alg_expr 
     { let (b,pend,an) = $6 in (b,Some $3,pend,an,None)}
-  | threshold annoted alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted
-    { let (x,_,_) = $3 in (x,Some $6,end_pos 7,$8,$1) }
-  | alg_expr threshold annoted OP_CUR annoted alg_with_radius CL_CUR annoted
-    { let (x,_,_) = $1 in (x,Some $6,end_pos 7,$8,$2) }
-  | alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted threshold annoted 
-    { let (x,_,_) = $1 in (x,Some $4,end_pos 5,$6,$7) }
+    | OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted
+    { let (x,_,_) = $11 in (x,Some $14,end_pos 15,$8,Some ($7,Loc.of_pos (start_pos 1) (end_pos 9))) }
+    | alg_expr OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted OP_CUR annoted alg_with_radius CL_CUR annoted
+    { let (x,_,_) = $1 in (x,Some $14,end_pos 15,$9,Some ($8,Loc.of_pos (start_pos 2) (end_pos 10))) }
+    | alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted 
+    { let (x,_,_) = $1 in (x,Some $4,end_pos 5,$6,Some ($13,Loc.of_pos (start_pos 7) (end_pos 15))) }
   | alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted
     { let (x,_,_) = $1 in (x,Some $4,end_pos 5,$6,None) }
-  | threshold annoted alg_expr { let (a,pend,an) = $3 in (a,None,pend,an,$1) }
-  | alg_expr threshold annoted { let (a,pend,an) = $1 in (a,None,pend,an,$2) }
+  | OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted alg_expr { let (a,pend,an) = $11 in (a,None,pend,an,Some ($7,Loc.of_pos (start_pos 1) (end_pos 9))) }
+  | alg_expr OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted { let (a,pend,an) = $1 in (a,None,pend,an,Some ($8,Loc.of_pos (start_pos 2) (end_pos 10))) }
   | alg_expr { let (a,pend,an) = $1 in (a,None,pend,an,None) }
   ;
 
@@ -548,7 +547,7 @@ rule:
         Ast.k_def; Ast.k_un; Ast.threshold ;Ast.k_op; Ast.k_op_un; Ast.threshold_op; 
       },Loc.of_pos (start_pos 1) pos_end) }
   | rule_content error
-    { raise (ExceptionDefn.Syntax_Error (add_pos 2 "rule rate expected")) }
+    { raise (ExceptionDefn.Syntax_Error (add_pos 2 "rule rate expected !")) }
   ;
 
 variable_declaration:
