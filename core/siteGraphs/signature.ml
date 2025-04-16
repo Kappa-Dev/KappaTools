@@ -16,7 +16,8 @@ type 'links site_sig = {
   internal_state: unit NamedDecls.t;
   links: 'links option;
   counter_info: counter_info option;
-}
+  threshold: int option; 
+ }
 
 type t = bool array array site_sig NamedDecls.t
 
@@ -50,6 +51,10 @@ let internal_state_of_site_id site_id val_id signature =
 
 let counter_of_site_id site_id signature =
   try (NamedDecls.elt_val signature site_id).counter_info
+  with Invalid_argument _ -> raise Not_found
+
+let predicate_of_site_id site_id signature = 
+  try (NamedDecls.elt_val signature site_id).threshold 
   with Invalid_argument _ -> raise Not_found
 
 let has_counter signature =
@@ -101,11 +106,25 @@ let one_to_json =
                     "default", `Int c.counter_default_value;
                   ])
               signature.counter_info );
+         ("threshold", 
+          JsonUtil.of_option 
+             (fun x -> `Int x) signature.threshold) ; 
+        (*  ( "size_predicates_info", 
+          JsonUtil.of_option 
+            (fun s -> 
+                `Assoc 
+                  [ 
+                    ( "thresholds", 
+                      JsonUtil.of_list (fun x -> `Int x) s.thresholds);
+                    ( "n_threshols", 
+                      `Int s.n_thresholds);
+                  ])
+                  signature.size_predicate_info)*)
         ])
 
 let one_of_json : Yojson.Basic.t -> bool array array site_sig NamedDecls.t =
   NamedDecls.of_json (function
-    | `Assoc [ ("internal_state", a); ("links", b); ("counter_info", c) ] ->
+    | `Assoc [ ("internal_state", a); ("links", b); ("counter_info", c); ("threshold", d)] ->
       {
         internal_state =
           NamedDecls.of_json
@@ -172,16 +191,51 @@ let one_of_json : Yojson.Basic.t -> bool array array site_sig NamedDecls.t =
                   (Yojson.Basic.Util.Type_error
                      ("Problematic agent signature", x)))
             c;
+
+        threshold =     
+          Yojson.Basic.Util.to_option 
+            (function `Int a -> a 
+                | x -> raise
+                  (Yojson.Basic.Util.Type_error
+                        ("Problematic threshold", x))
+            ) d 
+       (* size_predicate_info = 
+        Yojson.Basic.Util.to_option 
+               (function 
+                | `Assoc 
+                  [("thresholds", t); ("n_thresholds", n)] -> 
+                    {
+                      thresholds = JsonUtil.to_list (function `Int c -> c | x -> raise (Yojson.Basic.Util.Type_error
+                      ("Problematic threshold", x))) t; 
+                      n_thresholds = 
+                        match n with `Int n -> n 
+                        | x -> raise (Yojson.Basic.Util.Type_error
+                        ("Problematic number of thresholds", x)) n; 
+                    }) s*)
       }
     | x ->
       raise (Yojson.Basic.Util.Type_error ("Problematic agent signature", x)))
 
 type counter_agent_info = { id: int; arity: int; ports: int * int }
+type size_predicates_info = 
+{ n_thresholds: int; 
+  thresholds: int list}
 
 type s = {
   agent_sigs: t NamedDecls.t;
   counter_agent_info: counter_agent_info option;
+  size_predicates_info: size_predicates_info option; 
 }
+
+let thresholds s = 
+  match s.size_predicates_info with 
+    | None -> []
+    | Some l -> l.thresholds
+
+let n_thresholds s = 
+  match s.size_predicates_info with 
+    | None -> 0
+    | Some l -> l.n_thresholds
 
 let size sigs = NamedDecls.size sigs.agent_sigs
 let get sigs agent_id = NamedDecls.elt_val sigs.agent_sigs agent_id
@@ -238,7 +292,7 @@ let rec allowed_link ag1 s1 ag2 s2 sigs =
       invalid_arg "Signature.allowed_link: invalid site identifier"
   )
 
-let create ~counters_per_agent agent_sigs =
+let create ~counters_per_agent ~size_predicate_list agent_sigs =
   {
     agent_sigs;
     counter_agent_info =
@@ -247,6 +301,12 @@ let create ~counters_per_agent agent_sigs =
        else
          (* If there is a counter agent, we choose 0 for its agent id and 0 and 1 as its port ids *)
          Some { id = 0; arity = 2; ports = 0, 1 });
+   size_predicates_info = 
+      Some 
+        {
+         thresholds = size_predicate_list ; 
+         n_thresholds = List.length size_predicate_list ;    
+        }; 
   }
 
 let is_counter_agent sigs agent_id =
@@ -262,9 +322,13 @@ let ports_if_counter_agent sigs agent_id =
       Some agent_info.ports
     else
       None
-
+      
+let site_is_size_predicate_site sigs ag_ty id =
+  predicate_of_site_id id (get sigs ag_ty) <> None 
+  
 let site_is_counter sigs ag_ty id =
   counter_of_site_id id (get sigs ag_ty) <> None
+
 
 let get_counter_agent_info sigs =
   match sigs.counter_agent_info with
@@ -349,12 +413,28 @@ let print f sigs =
          Format.fprintf f "@[<h>%%agent: %s(%a)@]" n (print_one ~sigs i) si))
     sigs.agent_sigs
 
-let to_json sigs = NamedDecls.to_json one_to_json sigs.agent_sigs
+let to_json sigs = 
+  `Assoc ["agents_sigs", 
+  NamedDecls.to_json one_to_json sigs.agent_sigs ; 
+   "size_predicates_info", 
+   JsonUtil.of_option
+    (function size_predicates_info -> 
+   `Assoc ["thresholds", 
+    JsonUtil.of_list 
+       (fun a -> `Int a) 
+       size_predicates_info.thresholds; 
+   ("n_thresholds",`Int size_predicates_info.n_thresholds )]) 
+    sigs.size_predicates_info ]
 
 let of_json v =
-  let agent_sigs : 'a site_sig NamedDecls.t NamedDecls.t =
-    NamedDecls.of_json one_of_json v
+  match v with 
+  `Assoc ["agents_sigs", agents_sigs ; "size_predicates_info", size_predicates_info ] 
+   ->  
+  begin 
+    let agent_sigs : 'a site_sig NamedDecls.t NamedDecls.t =
+    NamedDecls.of_json one_of_json agents_sigs 
   in
+  let counter_agent_info = 
   match
     Mods.StringMap.find_option "__counter_agent" agent_sigs.NamedDecls.finder
   with
@@ -364,5 +444,23 @@ let of_json v =
       ( num_of_site ("a", Loc.dummy) agent_signature,
         num_of_site ("b", Loc.dummy) agent_signature )
     in
-    { agent_sigs; counter_agent_info = Some { id; arity = 2; ports } }
-  | None -> { agent_sigs; counter_agent_info = None }
+    Some { id; arity = 2; ports } 
+  | None -> None 
+  in 
+  let size_predicates_info = 
+    Yojson.Basic.Util.to_option 
+        (fun json -> 
+          match json with 
+          | `Assoc ["thresholds", thresholds; 
+            "n_thresholds", n_thresholds]  -> 
+              {thresholds = JsonUtil.to_list Yojson.Basic.Util.to_int thresholds; 
+                n_thresholds = Yojson.Basic.Util.to_int n_thresholds }
+          | x -> raise (Yojson.Basic.Util.Type_error ("Problematic size predicate infos", x) )) size_predicates_info
+      
+         
+  in 
+  { agent_sigs; counter_agent_info; size_predicates_info}
+
+end 
+| x ->
+  raise (Yojson.Basic.Util.Type_error ("Problematic model signature", x))

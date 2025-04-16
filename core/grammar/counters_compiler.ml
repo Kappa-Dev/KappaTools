@@ -12,10 +12,17 @@ type 'a with_agent_counters = {
 }
 
 type rule_mixture_with_agent_counters =
-  LKappa.rule_agent with_agent_counters list
+  LKappa.rule_agent Size_compiler.with_size_predicates with_agent_counters list
 
 type raw_mixture_with_agent_counters =
-  Raw_mixture.agent with_agent_counters list
+  Raw_mixture.agent Size_compiler.with_size_predicates with_agent_counters list
+
+type rule_mixture_with_size_predicates =
+  LKappa.rule_agent Size_compiler.with_size_predicates list
+
+type raw_mixture_with_size_predicates =
+  Raw_mixture.agent Size_compiler.with_size_predicates list
+
 
 type cvar_value = { name: string; value: int }
 
@@ -118,13 +125,13 @@ let prepare_agent rsites lsites =
       (match hd with
       | Ast.Counter c' when name_match c.Ast.counter_name c'.Ast.counter_name ->
         Ast.Counter { c' with Ast.counter_delta = c.Ast.counter_delta } :: tl
-      | Ast.Counter _ | Ast.Port _ -> hd :: prepare_site tl c)
+      | Ast.Counter _ | Ast.Port _ | Ast.Size_predicate _ -> hd :: prepare_site tl c)
   in
   let counters =
     List.fold_left
       (fun acc' rsite ->
         match rsite with
-        | Ast.Port _ -> acc'
+        | Ast.Port _ | Ast.Size_predicate _ -> acc'
         | Ast.Counter c -> c :: acc')
       [] rsites
   in
@@ -136,7 +143,8 @@ let prepare_counters rules =
   let check_syntax sites f error =
     List.iter
       (function
-        | Ast.Port _ -> ()
+        | Ast.Port _ 
+        | Ast.Size_predicate _ -> ()
         | Ast.Counter c ->
           if f c then
             raise
@@ -213,14 +221,15 @@ let counters_signature s agents =
       (fun acc s ->
         match s with
         | Ast.Counter c -> c :: acc
-        | Ast.Port _ -> acc)
+        | Ast.Port _ 
+        | Ast.Size_predicate _ -> acc)
       [] sites'
 
 (** [split_cvar_counter_in_rules_per_value var_name annot counter_delta counter_def] translates a counter CVAR whose value acts upon the rate expression into a rule per possible value, that are selected by a CEQ expression.
  * *)
 let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
     (counter_delta : int Loc.annoted) (counter_def : Counters_info.counter_sig)
-    : (Ast.counter Ast.site * cvar_value list) list =
+    : ((Ast.threshold, Ast.counter) Ast.site * cvar_value list) list =
   let (min_value, max_value) : int * int =
     match counter_def.counter_sig_min, counter_def.counter_sig_max with
     | Some (Some min_loc, _), Some (Some max_loc, _) -> min_loc, max_loc
@@ -232,7 +241,7 @@ let split_cvar_counter_in_rules_per_value (var_name : string) (annot : Loc.t)
   in
   (* Make CEQ counters with all possible values of variable *)
   let rec make_ceq_counters_from_var_values (value : int) :
-      (Ast.counter Ast.site * cvar_value list) list =
+      ((Ast.threshold, Ast.counter) Ast.site * cvar_value list) list =
     if value > max_value then
       []
     else if
@@ -260,7 +269,7 @@ let has_counters compil =
         List.exists
           (function
             | Ast.Counter _ -> true
-            | Ast.Port _ -> false)
+            | Ast.Port _ | Ast.Size_predicate _ -> false)
           sites)
     compil.Ast.signatures
 
@@ -268,6 +277,7 @@ let has_counters compil =
 let split_counter_variables_into_separate_rules ~warning rules signatures =
   let split_for_each_counter_var_value_site ids counter_defs = function
     | Ast.Port p -> [ Ast.Port p, [] ]
+    | Ast.Size_predicate p -> [Ast.Size_predicate p, []]
     | Ast.Counter c ->
       let counter_def : Counters_info.counter_sig =
         List.find
@@ -353,8 +363,8 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
 
   let rec split_for_each_counter_var_value_sites (ids : Mods.StringSet.t)
       (counter_defs : Counters_info.counter_sig list) :
-      Ast.counter Ast.site list ->
-      (Ast.counter Ast.site list * cvar_value list) list = function
+      (Ast.threshold, Ast.counter) Ast.site list ->
+      ((Ast.threshold, Ast.counter) Ast.site list * cvar_value list) list = function
     | [] -> [ [], [] ]
     | s :: t ->
       combinations_of_var_setup
@@ -464,6 +474,8 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
               k_un;
               k_op;
               k_op_un;
+              threshold = rule.threshold; 
+              threshold_op = rule.threshold_op;  
             },
             annot ) ))
       mixture_for_each_counter_var_value
@@ -499,7 +511,7 @@ let split_counter_variables_into_separate_rules ~warning ~debug_mode
   { compil with Ast.rules }
 
 let make_counter_agent sigs (is_first, (dst, ra_erased)) (is_last, equal) i j
-    loc (created : bool) : LKappa.rule_agent =
+    loc (created : bool) : LKappa.rule_agent Size_compiler.with_size_predicates =
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b, port_a = counter_agent_info.ports in
   let ra_type = counter_agent_info.id in
@@ -543,16 +555,17 @@ let make_counter_agent sigs (is_first, (dst, ra_erased)) (is_last, equal) i j
           LKappa.Maintained )
   in
   let ra_ints = Array.make counter_agent_info.arity LKappa.I_ANY in
-  {
+  {Size_compiler.agent= {
     LKappa.ra_type;
     ra_erased;
     ra_ports;
     ra_ints;
     ra_syntax = Some (Array.copy ra_ports, Array.copy ra_ints);
-  }
+  };
+  } 
 
 let raw_counter_agent (is_first, first_link) (is_last, last_link) i j sigs equal
-    : Raw_mixture.agent =
+    : Raw_mixture.agent Size_compiler.with_size_predicates =
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b, port_a = counter_agent_info.ports in
   let ports = Array.make counter_agent_info.arity Raw_mixture.FREE in
@@ -577,14 +590,16 @@ let raw_counter_agent (is_first, first_link) (is_last, last_link) i j sigs equal
   in
   let () = ports.(port_a) <- after in
   {
+  Size_compiler.agent =   {
     Raw_mixture.a_type = counter_agent_info.id;
     Raw_mixture.a_ports = ports;
     Raw_mixture.a_ints = internals;
+  } ; 
   }
 
 let rec add_incr (i : int) (first_link : int) (last_link : int)
     (min_value : int) (delta : int) (equal : bool) (sigs : Signature.s) :
-    Raw_mixture.agent list =
+    Raw_mixture.agent Size_compiler.with_size_predicates list =
   if i = delta then
     []
   else (
@@ -601,7 +616,7 @@ let rec add_incr (i : int) (first_link : int) (last_link : int)
 
 let rec link_incr (sigs : Signature.s) (i : int) (nb : int)
     (ag_info : (int * int) * bool) (equal : bool) (link : int) (loc : Loc.t)
-    (min_value : int) (delta : int) : LKappa.rule_mixture =
+    (min_value : int) (delta : int) : rule_mixture_with_size_predicates =
   if i = nb then
     []
   else (
@@ -615,21 +630,23 @@ let rec link_incr (sigs : Signature.s) (i : int) (nb : int)
     ra_agent :: link_incr sigs (i + 1) nb ag_info equal link loc min_value delta
   )
 
-let rec erase_incr (sigs : Signature.s) (i : int) (incrs : LKappa.rule_mixture)
-    (delta : int) (link : int) : LKappa.rule_mixture =
+let rec erase_incr (sigs : Signature.s) (i : int) (incrs : rule_mixture_with_size_predicates)
+    (delta : int) (link : int) : rule_mixture_with_size_predicates =
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b = fst counter_agent_info.ports in
   match incrs with
   | incr :: incr_s ->
+    let incr_ = incr.Size_compiler.agent in 
     if i = abs delta then (
-      let before, _ = incr.LKappa.ra_ports.(port_b) in
-      incr.LKappa.ra_ports.(port_b) <- before, LKappa.Linked link;
-      incr :: incr_s
+      let before, _ = incr_.LKappa.ra_ports.(port_b) in
+      incr_.LKappa.ra_ports.(port_b) <- before, LKappa.Linked link;
+      {(*incr with*) agent = incr_}:: incr_s
     ) else (
       Array.iteri
-        (fun i (a, _) -> incr.LKappa.ra_ports.(i) <- a, LKappa.Erased)
-        incr.LKappa.ra_ports;
-      let rule_agent = { incr with LKappa.ra_erased = true } in
+        (fun i (a, _) -> incr.Size_compiler.agent.LKappa.ra_ports.(i) <- a, LKappa.Erased)
+        incr.Size_compiler.agent.LKappa.ra_ports;
+      let agent = {incr.Size_compiler.agent with LKappa.ra_erased = true} in 
+      let rule_agent = { (*incr with*) Size_compiler.agent }  in
       rule_agent :: erase_incr sigs (i + 1) incr_s delta link
     )
   | [] -> []
@@ -639,7 +656,8 @@ let rec erase_incr (sigs : Signature.s) (i : int) (incrs : LKappa.rule_mixture)
 let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
     (port_id : int) (counter_def : Counters_info.counter_sig)
     (counter : Ast.counter) (start_link_nb : int) :
-    (LKappa.rule_mixture * Raw_mixture.t) * int =
+    (rule_mixture_with_size_predicates * 
+     raw_mixture_with_size_predicates) * int =
   (* Returns positive part of value *)
   let positive_part (i : int) : int =
     if i < 0 then
@@ -693,18 +711,18 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
     (port_id, ra.LKappa.ra_type), ra.LKappa.ra_erased
   in
 
-  let test_incr : LKappa.rule_mixture =
+  let test_incr : rule_mixture_with_size_predicates =
     link_incr sigs 0
       (test + 1 - min_value)
       ag_info equal start_link_nb loc min_value delta
   in
-  let adjust_delta : LKappa.rule_mixture =
+  let adjust_delta : rule_mixture_with_size_predicates =
     if delta < 0 then
       erase_incr sigs 0 test_incr delta link_for_erased
     else
       test_incr
   in
-  let created : Raw_mixture.t =
+  let created : raw_mixture_with_size_predicates = 
     if delta > 0 then
       add_incr 0 start_link_for_created start_link_nb min_value delta false sigs
     else
@@ -746,9 +764,9 @@ let counter_becomes_port (sigs : Signature.s) (ra : LKappa.rule_agent)
             the next link number to use *)
 let compile_counter_in_rule_agent (sigs : Signature.s)
     (counters_defs : Counters_info.counter_sig option Array.t)
-    (rule_agent_ : LKappa.rule_agent with_agent_counters) (lnk_nb : int) :
-    LKappa.rule_mixture * Raw_mixture.t * int =
-  let (incrs, lnk_nb') : (LKappa.rule_mixture * Raw_mixture.t) list * int =
+    (rule_agent_ : LKappa.rule_agent Size_compiler.with_size_predicates with_agent_counters ) (lnk_nb : int) :
+    rule_mixture_with_size_predicates * raw_mixture_with_size_predicates * int =
+  let (incrs, lnk_nb') : (rule_mixture_with_size_predicates * raw_mixture_with_size_predicates) list * int =
     Tools.array_fold_lefti
       (fun id (acc_incrs, lnk_nb) -> function
         | None -> acc_incrs, lnk_nb
@@ -770,14 +788,15 @@ let compile_counter_in_rule_agent (sigs : Signature.s)
                 counter_sig_default = 0;
               } in*)
             let new_incrs, new_lnk_nb =
-              counter_becomes_port sigs rule_agent_.agent id counter_sig counter
+              counter_becomes_port sigs rule_agent_.agent.Size_compiler.agent id counter_sig counter
                 lnk_nb
             in
             new_incrs :: acc_incrs, new_lnk_nb)
         (* JF: link ids were colliding after counter decrementations -> I do not think that we should add delta when negative *))
       ([], lnk_nb) rule_agent_.counters
   in
-  let (als, bls) : LKappa.rule_mixture * Raw_mixture.t =
+  let (als, bls) : 
+  rule_mixture_with_size_predicates * raw_mixture_with_size_predicates =
     List.fold_left (fun (als, bls) (a, b) -> a @ als, b @ bls) ([], []) incrs
   in
   als, bls, lnk_nb'
@@ -785,9 +804,9 @@ let compile_counter_in_rule_agent (sigs : Signature.s)
 (** Compiles the counter value change in the right hand side of a rule into dummy chain changes *)
 let compile_counter_in_raw_agent (sigs : Signature.s)
     (counters_info : Counters_info.t)
-    (raw_agent_ : Raw_mixture.agent with_agent_counters) (lnk_nb : int) :
-    Raw_mixture.agent list * int =
-  let raw_agent : Raw_mixture.agent = raw_agent_.agent in
+    (raw_agent_ : Raw_mixture.agent Size_compiler.with_size_predicates with_agent_counters ) (lnk_nb : int) :
+    Raw_mixture.agent Size_compiler.with_size_predicates list * int =
+  let raw_agent : Raw_mixture.agent = raw_agent_.agent.Size_compiler.agent in
   let ports : Raw_mixture.link array = raw_agent.Raw_mixture.a_ports in
   Tools.array_fold_lefti
     (fun port_id (acc, lnk_nb) -> function
@@ -861,10 +880,11 @@ let compile_counter_in_rule (sigs : Signature.s)
     (counters_info : Counters_info.counter_sig option Array.t Array.t)
     (mix : rule_mixture_with_agent_counters)
     (created : raw_mixture_with_agent_counters) :
-    LKappa.rule_mixture * Raw_mixture.t =
+    rule_mixture_with_size_predicates  * 
+    raw_mixture_with_size_predicates =
   let has_counters : bool =
     List.exists
-      (fun rule_agent_ -> rule_agent_has_counters rule_agent_.agent sigs)
+      (fun rule_agent_ -> rule_agent_has_counters rule_agent_.agent.Size_compiler.agent sigs)
       mix
     || List.exists (fun raw_agent_ -> raw_agent_has_counters raw_agent_) created
   in
@@ -872,14 +892,15 @@ let compile_counter_in_rule (sigs : Signature.s)
     let lnk_nb : int =
       List.fold_left
         (fun (m : int) rule_agent_ ->
-          max m (LKappa.max_link_id [ rule_agent_.agent ]))
+          max m (LKappa.max_link_id [ rule_agent_.agent.Size_compiler.agent ]))
         0 mix
     in
     let (incrs, incrs_created, lnk_nb') :
-        LKappa.rule_mixture * Raw_mixture.t * int =
+        rule_mixture_with_size_predicates 
+        * raw_mixture_with_size_predicates * int =
       List.fold_left
         (fun (mix_incr, created_incr, lnk_nb) rule_agent_ ->
-          let rule_agent : LKappa.rule_agent = rule_agent_.agent in
+          let rule_agent : LKappa.rule_agent = rule_agent_.agent.Size_compiler.agent in
           let counter_defs = counters_info.(rule_agent.LKappa.ra_type) in
           let mix_incr_new, created_incr_new, lnk_nb' =
             compile_counter_in_rule_agent sigs counter_defs rule_agent_ lnk_nb
@@ -889,7 +910,7 @@ let compile_counter_in_rule (sigs : Signature.s)
         mix
     in
 
-    let incrs_created' : Raw_mixture.t =
+    let incrs_created' : raw_mixture_with_size_predicates =
       List.fold_left
         (fun (created_incr, lnk_nb) raw_agent_ ->
           let created_incr_new, lnk_nb'' =
@@ -902,10 +923,10 @@ let compile_counter_in_rule (sigs : Signature.s)
       (* We drop the lnk_nb as we don't need in the following *)
     in
     (* Return initial mixtures with new agents in rule from counter compilation *)
-    let rule_agent_mix : LKappa.rule_mixture =
+    let rule_agent_mix : rule_mixture_with_size_predicates = 
       List_util.rev_map_append (fun rule_agent_ -> rule_agent_.agent) mix incrs
     in
-    let raw_mix : Raw_mixture.t =
+    let raw_mix : raw_mixture_with_size_predicates =
       List_util.rev_map_append
         (fun raw_agent_ -> raw_agent_.agent)
         created
@@ -917,7 +938,7 @@ let compile_counter_in_rule (sigs : Signature.s)
       List.rev_map (fun raw_agent_ -> raw_agent_.agent) (List.rev created) )
 
 let rule_agent_with_max_counter sigs c ((agent_name, loc_ag) as agent_type) :
-    LKappa.rule_mixture =
+    LKappa.rule_agent list =
   let ag_id = Signature.num_of_agent agent_type sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -925,6 +946,7 @@ let rule_agent_with_max_counter sigs c ((agent_name, loc_ag) as agent_type) :
     Array.make arity (Loc.annot_with_dummy LKappa.LNK_ANY, LKappa.Maintained)
   in
   let internals = Array.make arity LKappa.I_ANY in
+  (* TO DO : put the values of the thresholds *)
   let c_na = c.Counters_info.counter_sig_name in
   let c_id = Signature.num_of_site ~agent_name c_na sign in
   let max_val, loc =
@@ -954,18 +976,22 @@ let rule_agent_with_max_counter sigs c ((agent_name, loc_ag) as agent_type) :
       ((c_id, ag_id), false)
       false 1 loc min_value (-1)
   in
+  let incrs = 
+      List.rev_map 
+        (fun a -> a.Size_compiler.agent)
+        (List.rev incrs)
+  in 
   let counter_agent_info = Signature.get_counter_agent_info sigs in
   let port_b = fst counter_agent_info.ports in
   let p = LKappa.LNK_VALUE (1, (port_b, counter_agent_info.id)), loc in
   ports.(c_id) <- p, LKappa.Maintained;
-  let ra : LKappa.rule_agent =
-    {
-      LKappa.ra_type = ag_id;
+  let ra : LKappa.rule_agent  =
+     { LKappa.ra_type = ag_id;
       ra_ports = ports;
       ra_ints = internals;
       ra_erased = false;
       ra_syntax = Some (Array.copy ports, Array.copy internals);
-    }
+    } ; 
   in
   ra :: incrs
 
@@ -1006,6 +1032,7 @@ let counters_perturbations sigs ast_sigs =
          List.fold_left
            (fun acc' site ->
              match site with
+             | Ast.Size_predicate _ 
              | Ast.Port _ -> acc'
              | Ast.Counter c ->
                (counter_perturbation sigs c agent_type, Loc.get_annot agent_type)

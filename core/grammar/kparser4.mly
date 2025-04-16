@@ -506,29 +506,46 @@ alg_with_radius:
     { let (x,_,_) = $1 in let (y,_,_) = $4 in (x, Some y) }
   ;
 
+threshold: 
+  | OP_BRA annoted SMALLER EQUAL annoted INT annoted OP_BRA {Some ($6,Loc.of_pos (start_pos 1) (end_pos 7))}
+
 rate:
-  | OP_CUR annoted alg_with_radius CL_CUR annoted alg_expr
-    { let (b,pend,an) = $6 in (b,Some $3,pend,an) }
+  | threshold annoted OP_CUR annoted alg_with_radius CL_CUR annoted alg_expr
+    { let (b,pend,an) = $8 in (b,Some $5,pend,an,$1) }
+  | OP_CUR annoted alg_with_radius CL_CUR annoted threshold annoted  alg_expr
+    { let (b,pend,an) = $8 in (b,Some $3,pend,an,$6) }
+  | OP_CUR annoted alg_with_radius CL_CUR annoted  alg_expr annoted threshold 
+    { let (b,pend,an) = $6 in (b,Some $3,pend,an,$8)}
+  | OP_CUR annoted alg_with_radius CL_CUR annoted  alg_expr 
+    { let (b,pend,an) = $6 in (b,Some $3,pend,an,None)}
+  | threshold annoted alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted
+    { let (x,_,_) = $3 in (x,Some $6,end_pos 7,$8,$1) }
+  | alg_expr threshold annoted OP_CUR annoted alg_with_radius CL_CUR annoted
+    { let (x,_,_) = $1 in (x,Some $6,end_pos 7,$8,$2) }
+  | alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted threshold annoted 
+    { let (x,_,_) = $1 in (x,Some $4,end_pos 5,$6,$7) }
   | alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted
-    { let (x,_,_) = $1 in (x,Some $4,end_pos 5,$6) }
-  | alg_expr { let (a,pend,an) = $1 in (a,None,pend,an) }
+    { let (x,_,_) = $1 in (x,Some $4,end_pos 5,$6,None) }
+  | threshold annoted alg_expr { let (a,pend,an) = $3 in (a,None,pend,an,$1) }
+  | alg_expr threshold annoted { let (a,pend,an) = $1 in (a,None,pend,an,$2) }
+  | alg_expr { let (a,pend,an) = $1 in (a,None,pend,an,None) }
   ;
 
 birate:
-  | AT annoted rate { let (k2,k1,pend,an) = $3 in (k2,k1,None,None,pend,an) }
+  | AT annoted rate { let (k2,k1,pend,an,t) = $3 in (k2,k1,t,None,None,None,pend,an) }
   | AT annoted rate COMMA annoted rate
-    { let (k2,k1,_,_) = $3 in
-      let (kback,kback1,pend,an) = $6 in
-      (k2,k1,Some kback,kback1,pend,an) }
+    { let (k2,k1,_,_,t) = $3 in
+      let (kback,kback1,pend,an,tback) = $6 in
+      (k2,k1,t,Some kback,kback1,tback,pend,an) }
   ;
 
 rule:
   | rule_content birate
-    { let (k_def,k_un,k_op,k_op_un,pos_end,_annot) = $2 in
+    { let (k_def,k_un,threshold,k_op,k_op_un,threshold_op,pos_end,_annot) = $2 in
       let (rewrite,bidirectional,_,_) = $1 in
       ({
         Ast.rewrite;Ast.bidirectional;
-        Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
+        Ast.k_def; Ast.k_un; Ast.threshold ;Ast.k_op; Ast.k_op_un; Ast.threshold_op; 
       },Loc.of_pos (start_pos 1) pos_end) }
   | rule_content error
     { raise (ExceptionDefn.Syntax_Error (add_pos 2 "rule rate expected")) }
@@ -633,7 +650,8 @@ effect:
       Ast.APPLY(v,
                 ({ Ast.rewrite; Ast.bidirectional = false;
                    Ast.k_def=Alg_expr.const Nbr.zero;Ast.k_un=None;
-                   Ast.k_op=None; Ast.k_op_un=None},
+                   Ast.k_op=None; Ast.k_op_un=None; 
+                   Ast.threshold = None ; Ast.threshold_op = None},
                  Loc.of_pos (start_pos 3) pend)),
       pend,an
     }
@@ -646,7 +664,8 @@ effect:
                      Ast.delta_token=[];};
 		   Ast.bidirectional=false;
                    Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
-                   Ast.k_op=None; Ast.k_op_un=None},
+                   Ast.k_op=None; Ast.k_op_un=None; 
+                   Ast.threshold = None ; Ast.threshold_op = None},
                   Loc.of_pos (start_pos 4) pend)),
        pend,p) }
   | INTRO annoted error
@@ -662,7 +681,8 @@ effect:
                    Ast.delta_token=[];};
 		 Ast.bidirectional=false;
                  Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
-                 Ast.k_op=None; Ast.k_op_un=None},
+                 Ast.k_op=None; Ast.k_op_un=None; 
+                 Ast.threshold = None ; Ast.threshold_op = None},
                 Loc.of_pos (start_pos 4) pend)),
        pend,p) }
   | DELETE annoted error
@@ -696,8 +716,9 @@ idin:
                       [(Alg_expr.BIN_ALG_OP(Operator.MINUS,v,(Alg_expr.TOKEN_ID $1,rhs_pos 1)),rhs_pos 1),tk];
                     };
               Ast.bidirectional=false;
-              Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
-              Ast.k_op=None; Ast.k_op_un=None}, Loc.of_pos (start_pos  4) pend)),pend,p)
+              Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None; 
+              Ast.k_op=None; Ast.k_op_un=None; 
+              Ast.threshold = None ; Ast.threshold_op = None}, Loc.of_pos (start_pos  4) pend)),pend,p)
    }
 | ID annoted LAR error
      { raise (ExceptionDefn.Syntax_Error

@@ -38,15 +38,23 @@ type counter = {
 (*val make_inverted_counter_sig : Counters_info.counter_sig -> string Loc.annoted -> Counters_info.counter_sig*)
 
 (* Site type, with custom definition of counter type: used with `counter` and `counter_sig` *)
-type 'counter site = Port of port | Counter of 'counter
+
+type threshold = {
+  threshold_name: string Loc.annoted;
+  threshold_value: internal ;
+  threshold : int  
+    }
+
+
+type ('threshold, 'counter) site = Port of port | Counter of 'counter | Size_predicate of 'threshold 
 type agent_mod = NoMod | Erase | Create
 
-type 'counter parametric_agent =
-  | Present of string Loc.annoted * 'counter site list * agent_mod
+type ('threshold, 'counter) parametric_agent =
+  | Present of string Loc.annoted * ('threshold, 'counter) site list * agent_mod
   | Absent of Loc.t
 
-type agent = counter parametric_agent
-type agent_sig = Counters_info.counter_sig parametric_agent
+type agent = (threshold, counter) parametric_agent
+type agent_sig = (Size_info.size_sig, Counters_info.counter_sig) parametric_agent
 type mixture = agent list list
 
 val mixture_to_user_graph : mixture -> User_graph.connected_component
@@ -85,6 +93,8 @@ type rule = {
     * (mixture, string) Alg_expr.e Loc.annoted option)
     option;
       (*rate for backward rule*)
+  threshold: int Loc.annoted option; 
+  threshold_op: int Loc.annoted option; 
 }
 
 val flip_label : string -> string
@@ -162,6 +172,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
+  thresholds: int list; 
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -170,7 +181,7 @@ type parsing_instruction =
   (agent, agent_sig, mixture, mixture, string, rule) instruction
 
 val empty_compil : parsing_compil
-val no_more_site_on_right : bool -> 'a site list -> 'a site list -> bool
+val no_more_site_on_right : bool -> (threshold,'b) site list -> (threshold,'b) site list -> bool
 
 val split_mixture : mixture -> mixture * mixture
 (** @return (lhs,rhs) *)

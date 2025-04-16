@@ -191,7 +191,7 @@ effect:
 		   ({ Ast.rewrite = fst $3;
 		      Ast.bidirectional = false;
 		      Ast.k_def=Alg_expr.const Nbr.zero;Ast.k_un=None;
-		      Ast.k_op=None; Ast.k_op_un=None},rhs_pos 3))
+		      Ast.k_op=None; Ast.k_op_un=None; Ast.threshold = None; Ast.threshold_op = None},rhs_pos 3); )
 		 }
     | INTRO alg_expr non_empty_mixture
         { Ast.APPLY($2,
@@ -200,7 +200,7 @@ effect:
                   Ast.rhs=$3; Ast.add_token = [];};
 		  Ast.bidirectional=false;
                   Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
-                  Ast.k_op=None; Ast.k_op_un=None},rhs_pos 3))
+                  Ast.k_op=None; Ast.k_op_un=None; Ast.threshold = None; Ast.threshold_op = None},rhs_pos 3))
         }
     | INTRO error
        {raise (ExceptionDefn.Syntax_Error
@@ -212,7 +212,7 @@ effect:
                  Ast.rhs=[]; Ast.add_token = [];};
 		 Ast.bidirectional=false;
                  Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
-                 Ast.k_op=None; Ast.k_op_un=None},rhs_pos 3))
+                 Ast.k_op=None; Ast.k_op_un=None; Ast.threshold = None; Ast.threshold_op = None},rhs_pos 3))
        }
 
     | DELETE error
@@ -231,7 +231,7 @@ effect:
                   };
                  Ast.bidirectional=false;
                  Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
-                 Ast.k_op=None; Ast.k_op_un=None}))
+                 Ast.k_op=None; Ast.k_op_un=None; Ast.threshold = None; Ast.threshold_op = None}))
        }
     | SNAPSHOT print_expr {Ast.SNAPSHOT (false,$2)}
     | STOP print_expr {Ast.STOP $2}
@@ -324,11 +324,11 @@ rule_content:
 
 rule_expression:
   | rule_content birate
-    { let (k_def,k_un,k_op,k_op_un) = $2 in
+    { let (k_def,k_un,threshold,k_op,k_op_un,threshold_op) = $2 in
       let rewrite,bidirectional = $1 in
       add_pos {
         Ast.rewrite;Ast.bidirectional;
-        Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
+        Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un; Ast.threshold; Ast.threshold_op
       } };
 
 arrow:
@@ -390,22 +390,42 @@ alg_expr:
     | bool_expr THEN alg_expr ELSE small_alg_expr {add_pos (Alg_expr.IF($1,$3,$5))}
 
 birate:
-    | AT rate {let (k2,k1) = $2 in (k2,k1,None,None)}
-    | AT rate COMMA rate {let (k2,k1) = $2 in
-			  let (kback,kback1) = $4 in
-			  (k2,k1,Some kback,kback1)}
+    | AT rate {let (k2,k1,t) = $2 in (k2,k1,t,None,None,None)}
+    | AT rate COMMA rate {let (k2,k1,t) = $2 in
+			  let (kback,kback1,tback) = $4 in
+			  (k2,k1,t,Some kback,kback1,tback)}
     | error {raise (ExceptionDefn.Syntax_Error (add_pos "rule rate expected"))}
     ;
 
+threshold: OP_CUR SMALLER EQUAL INT CL_CUR {Some (add_pos $4)} 
+
 rate:
-    | alg_expr OP_CUR alg_with_radius CL_CUR {($1,Some $3)}
-    | alg_expr OP_PAR alg_with_radius CL_PAR { ($1,Some $3) }
-    | alg_expr {($1,None)}
-    | OP_CUR alg_with_radius CL_CUR
-      {(Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),Some $2)}
-    | alg_expr OP_CUR CL_CUR
-      {($1,Some (Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),None))}
-    | {raise (ExceptionDefn.Syntax_Error (add_pos "missing rule rate"))}
+   | alg_expr OP_CUR alg_with_radius CL_CUR {($1,Some $3,None)}
+   | threshold alg_expr OP_CUR alg_with_radius CL_CUR {($2,Some $4, $1)}
+   | alg_expr threshold OP_CUR alg_with_radius CL_CUR {($1,Some $4, $2)}
+   | alg_expr OP_CUR alg_with_radius CL_CUR threshold {($1,Some $3, $5)}
+   | alg_expr OP_PAR alg_with_radius CL_PAR { ($1,Some $3,None) }
+   | threshold alg_expr OP_PAR alg_with_radius CL_PAR { ($2,Some $4, $1) }
+   | alg_expr threshold OP_PAR alg_with_radius CL_PAR { ($1,Some $4, $2) }
+   | alg_expr OP_PAR alg_with_radius CL_PAR threshold { ($1,Some $3, $5) }
+   | alg_expr {($1,None,None)}
+   | threshold alg_expr {($2,None,$1)}
+   | alg_expr threshold {($1,None,$2)} 
+   | OP_CUR alg_with_radius CL_CUR
+      {(Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),Some $2,None)}
+   | threshold OP_CUR alg_with_radius CL_CUR
+      {(Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),Some $3, $1)}
+   | OP_CUR alg_with_radius CL_CUR threshold 
+      {(Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),Some $2, $4)}
+  | alg_expr OP_CUR CL_CUR
+      {($1,Some (Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),None), None)}
+  | threshold alg_expr OP_CUR CL_CUR
+      {($2,Some (Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),None), $1)}
+  | alg_expr threshold OP_CUR CL_CUR
+      {($1,Some (Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),None),$2)}
+  | alg_expr OP_CUR CL_CUR threshold 
+      {($1,Some (Loc.annot_with_dummy (Alg_expr.CONST Nbr.zero),None),$4)}  
+  | {raise (ExceptionDefn.Syntax_Error (add_pos "missing rule rate"))}
     ;
 
 alg_with_radius:

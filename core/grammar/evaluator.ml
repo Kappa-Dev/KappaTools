@@ -14,7 +14,7 @@ let do_interactive_directives ~debug_mode ~outputs ~sharing ~syntax_version
   let e', _ =
     List_util.fold_right_map
       (LKappa_compiler.modif_expr_of_ast ~warning ~syntax_version
-         (Model.signatures env) (Model.counters_info env)
+         (Model.signatures env) (Model.counters_info env) (Model.size_predicates_info env)
          (Model.tokens_finder env) (Model.algs_finder env) contact_map')
       e []
   in
@@ -59,7 +59,7 @@ let get_pause_criteria ~debug_mode ~outputs ~sharing ~syntax_version contact_map
   let cc_preenv = Pattern.PreEnv.of_env (Model.domain env) in
   let b' =
     LKappa_compiler.bool_expr_of_ast ~warning ~syntax_version
-      (Model.signatures env) (Model.counters_info env) (Model.tokens_finder env)
+      (Model.signatures env) (Model.counters_info env) (Model.size_predicates_info env) (Model.tokens_finder env)
       (Model.algs_finder env) b
   in
   let cc_preenv', ((b'', pos_b'') as bpos'') =
@@ -90,7 +90,7 @@ let get_pause_criteria ~debug_mode ~outputs ~sharing ~syntax_version contact_map
 
 let find_all_embeddings ~debug_mode env tr =
   let domain = Model.domain env in
-  let with_thresholds = Model.thresholds env in
+  let with_thresholds = Model.previous_threshold env in
   let dummy_instances = Instances.empty env in
   let graph =
     List.fold_left

@@ -11,6 +11,7 @@ val bool_expr_of_ast :
   syntax_version:Ast.syntax_version ->
   Signature.s ->
   Counters_info.t ->
+  Size_info.size_sig option array array ->
   int Mods.StringMap.t ->
   int Mods.StringMap.t ->
   ?max_allowed_var:int ->
@@ -22,6 +23,7 @@ val modif_expr_of_ast :
   syntax_version:Ast.syntax_version ->
   Signature.s ->
   Counters_info.t ->
+  Size_info.size_sig option array array ->
   int Mods.StringMap.t ->
   int Mods.StringMap.t ->
   Contact_map.t ->
@@ -35,6 +37,7 @@ val init_of_ast :
   syntax_version:Ast.syntax_version ->
   Signature.s ->
   Counters_info.t ->
+  Size_info.size_sig option array array ->
   Contact_map.t ->
   int Mods.StringMap.t ->
   int Mods.StringMap.t ->
@@ -45,6 +48,7 @@ type ast_compiled_data = {
   agents_sig: Signature.s;
   contact_map: Contact_map.t;
   counters_info: Counters_info.t;
+  size_info: Size_info.t; 
   token_names: unit NamedDecls.t;
   alg_vars_finder: int Mods.StringMap.t;
   updated_alg_vars: int list;  (** alg vars with forbidden constant prop *)

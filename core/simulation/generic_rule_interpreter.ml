@@ -135,7 +135,7 @@ module Make (Instances : Instances_sig.S) = struct
       let deps_in_t, deps_in_e, _, _ = Model.all_dependencies env in
       Operator.DepSet.union deps_in_t deps_in_e
     in
-    let with_thresholds = Model.thresholds env in
+    let with_thresholds = Model.previous_threshold env in
     let with_connected_components = not (Pattern.Set.is_empty unary_patterns) in
     let variables_overwrite = Array.make (Model.nb_algs env) None in
     let variables_cache = Array.make (Model.nb_algs env) Nbr.zero in

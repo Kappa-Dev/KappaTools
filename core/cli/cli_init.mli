@@ -17,10 +17,11 @@ type preprocessed_ast = {
   overwrite_t0: float option;
 }
 
-(* TODO contact map is also in env *)
+(* TODO contact map, counters info, size info  is also in env *)
 type compilation_result = {
   conf: Configuration.t;
   counters_info: Counters_info.t;
+  size_info: Size_info.t; 
   env: Model.t;
   contact_map: Contact_map.t;
   updated_alg_vars: int list;

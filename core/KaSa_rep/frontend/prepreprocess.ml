@@ -112,8 +112,11 @@ let pop_entry parameters error id (map, set) =
 let get_counter_name counter = fst counter.Ast.counter_name
 let get_counter_name_sig counter = fst counter.Counters_info.counter_sig_name
 
-let rec scan_interface ~get_counter_name parameters k agent interface
-    (((error, a), (set_sites, set_counters)) as remanent) =
+let get_size_predicate_name predicate = fst predicate.Ast.threshold_name 
+let get_size_predicate_name_sig predicate = fst predicate.Size_info.threshold_sig_name 
+
+let rec scan_interface ~get_counter_name ~get_size_predicate_name parameters k agent interface
+    (((error, a), (set_sites, set_counters, set_predicates)) as remanent) =
   match interface with
   | [] -> remanent
   | Ast.Counter counter :: interface ->
@@ -121,14 +124,21 @@ let rec scan_interface ~get_counter_name parameters k agent interface
       check_freshness parameters error "Counter" (get_counter_name counter)
         set_counters
     in
-    scan_interface ~get_counter_name parameters k agent interface
-      ((error, a), (set_sites, set_counters))
+    scan_interface ~get_counter_name ~get_size_predicate_name parameters k agent interface
+      ((error, a), (set_sites, set_counters, set_predicates))
+  | Ast.Size_predicate s :: interface -> 
+    let error, set_counters =
+    check_freshness parameters error "Size predicate" (get_size_predicate_name s)
+      set_predicates
+  in
+  scan_interface ~get_counter_name ~get_size_predicate_name parameters k agent interface
+    ((error, a), (set_sites, set_counters, set_predicates))
   | Ast.Port port :: interface ->
     let error, set_sites =
       check_freshness parameters error "Site" (fst port.Ast.port_name) set_sites
     in
     let remanent = error, a in
-    scan_interface ~get_counter_name parameters k agent interface
+    scan_interface ~get_counter_name ~get_size_predicate_name parameters k agent interface
       ( (match port.Ast.port_link with
         | [ (LKappa.LNK_VALUE (i, ()), _) ] ->
           add_entry_link parameters
@@ -141,18 +151,18 @@ let rec scan_interface ~get_counter_name parameters k agent interface
             _ )
           :: _ ->
           remanent),
-        (set_sites, set_counters) )
+        (set_sites, set_counters, set_predicates) )
 
-let scan_agent ~get_counter_name parameters k ag remanent =
+let scan_agent ~get_counter_name ~get_size_predicate_name parameters k ag remanent =
   match ag with
   | Ast.Absent _ -> remanent
   | Ast.Present ((name, _), intf, _modif) ->
     fst
-      (scan_interface ~get_counter_name parameters k name intf
-         (remanent, (Mods.StringSet.empty, Mods.StringSet.empty)))
+      (scan_interface ~get_counter_name ~get_size_predicate_name parameters k name intf
+         (remanent, (Mods.StringSet.empty, Mods.StringSet.empty, Mods.StringSet.empty)))
 
-let scan_agent_sig = scan_agent ~get_counter_name:get_counter_name_sig
-let scan_agent = scan_agent ~get_counter_name
+let scan_agent_sig = scan_agent ~get_counter_name:get_counter_name_sig ~get_size_predicate_name:get_size_predicate_name_sig 
+let scan_agent = scan_agent ~get_counter_name ~get_size_predicate_name  
 
 let rec collect_binding_label parameters mixture f k remanent =
   match mixture with
@@ -322,6 +332,12 @@ let rec translate_interface ~translate_counter parameters is_signature
         int_set_sites int_set_counters interface (error, a)
     in
     Ckappa_sig.COUNTER_SEP (counter, interface), remanent
+  | Ast.Size_predicate _ :: interface -> 
+    let interface, remanent =
+      translate_interface ~translate_counter parameters is_signature
+        int_set_sites int_set_counters interface remanent 
+    in 
+    interface, remanent 
   | Ast.Port port :: interface ->
     let port, remanent =
       translate_port is_signature parameters int_set_sites port remanent
@@ -416,7 +432,8 @@ let support_agent = function
         match intf with
         | [] -> List.sort compare list
         | Ast.Port port :: intf -> scan intf (fst port.Ast.port_name :: list)
-        | Ast.Counter _ :: intf -> scan intf list
+        | Ast.Counter _ :: intf 
+        | Ast.Size_predicate _ :: intf  -> scan intf list
       in
       scan intfs []
     in
@@ -879,6 +896,8 @@ let translate_compil parameters error
                 Ast.k_un = rule.Ast.k_op_un;
                 Ast.k_op_un = None;
                 Ast.k_op = None;
+                Ast.threshold = rule.Ast.threshold_op;
+                Ast.threshold_op = None;  
               }
             in
             let reverse_ast = dump_rule reverse_rule in
@@ -912,6 +931,7 @@ let translate_compil parameters error
                   Ckappa_sig.original_ast_no_rate =
                     direct.Ckappa_sig.original_ast_no_rate;
                   Ckappa_sig.from_a_biderectional_rule = rule.Ast.bidirectional;
+
                 } )
             in
             error, id_set, (id, (reverse, p)) :: (id, (direct, p)) :: list
@@ -1005,4 +1025,5 @@ let translate_compil parameters error
       Ast.configurations = compil.Ast.configurations;
       Ast.tokens = compil.Ast.tokens;
       Ast.volumes = compil.Ast.volumes;
+      Ast.thresholds = compil.Ast.thresholds; 
     } )

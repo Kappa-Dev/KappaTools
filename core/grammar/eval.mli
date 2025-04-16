@@ -60,6 +60,7 @@ val compile :
   ?rescale_init:float ->
   Signature.s ->
   Counters_info.t ->
+  Size_info.t -> 
   Mods.IntSet.t ->
   unit NamedDecls.t ->
   Contact_map.t ->
