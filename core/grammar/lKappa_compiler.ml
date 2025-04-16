@@ -2675,8 +2675,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   let ast_compil, _counter_conversion_info_map =
     translate_clte_into_cgte ast_compil
   in
-  let size_predicate_list = [ 100 ] in
-  (* TO DO : extract from AST *)
   let has_counters = Counters_compiler.has_counters ast_compil in
   let agent_sig_is_implicit =
     ast_compil.Ast.signatures = [] && ast_compil.Ast.tokens = []
@@ -2692,6 +2690,14 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     else
       ast_compil
   in
+  let ast_compil, size_predicate_set = 
+    Ast.compute_thresholds_list ast_compil 
+  in 
+  let size_predicate_list = ast_compil.Ast.thresholds  in
+  let () = Format.printf "THRESHOLD @." in 
+  let () = 
+    List.iter (Format.printf "THRESHOLD %i @.") size_predicate_list 
+  in 
   (* Remove counter equality test with a variable by splitting in one rule per variable value *)
   let ast_compil =
     if has_counters then
@@ -2865,19 +2871,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
             rule.pos ) ))
       cleaned_rules
   in
-  let thresholds_of_rule rule =
-    match rule.threshold with
-    | None -> []
-    | Some t -> [ fst t ]
-  in
-  let thresholds =
-    List.fold_left
-      (fun set rule ->
-        List.fold_left
-          (fun set elt -> Mods.IntSet.add elt set)
-          set (thresholds_of_rule rule))
-      Mods.IntSet.empty cleaned_rules
-  in
+
 
   let variables =
     Tools.array_fold_righti
@@ -2912,7 +2906,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     token_names;
     alg_vars_finder;
     updated_alg_vars;
-    thresholds;
+    thresholds=size_predicate_set; 
     result =
       {
         filenames = ast_compil.filenames;

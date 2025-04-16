@@ -489,42 +489,6 @@ let build_port_of_json filenames n i l =
     }
 
 let build_size_predicate_of_json filenames n i l =
-  (*let port_int, port_int_mod =
-      match i with
-      | `Assoc [] | `Null -> [], None
-      | `Assoc [ ("state", i) ] ->
-        JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) i, None
-      | `Assoc [ ("mod", m) ] -> [], mod_i m
-      | `Assoc [ ("state", i); ("mod", m) ] | `Assoc [ ("mod", m); ("state", i) ]
-        ->
-        JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) i, mod_i m
-      | _ -> raise (Yojson.Basic.Util.Type_error ("Not internal states", i))
-    in
-    let port_link, port_link_mod =
-      match l with
-      | `Assoc [] | `Null -> [], None
-      | `Assoc [ ("state", l) ] ->
-        ( JsonUtil.to_list
-            (Loc.annoted_of_yojson ~filenames
-               (LKappa.link_of_json
-                  (fun _ -> Loc.string_annoted_of_json ~filenames)
-                  (Loc.string_annoted_of_json ~filenames)
-                  (fun _ -> ())))
-            l,
-          None )
-      | `Assoc [ ("mod", m) ] -> [], mod_l m
-      | `Assoc [ ("state", l); ("mod", m) ] | `Assoc [ ("mod", m); ("state", l) ]
-        ->
-        ( JsonUtil.to_list
-            (Loc.annoted_of_yojson ~filenames
-               (LKappa.link_of_json
-                  (fun _ -> Loc.string_annoted_of_json ~filenames)
-                  (Loc.string_annoted_of_json ~filenames)
-                  (fun _ -> ())))
-            l,
-          mod_l m )
-      | _ -> raise (Yojson.Basic.Util.Type_error ("Not link states", i))
-    in*)
   Size_predicate
     {
       threshold_name = Loc.string_annoted_of_json ~filenames n;
@@ -1771,11 +1735,30 @@ let sig_from_perts =
             p)
         acc p)
 
+let thresholds_from_rules = 
+  List.fold_left (fun acc (_,((r:rule),_)) -> 
+    let acc =
+      match r.threshold with 
+      | None -> acc 
+      | Some (a,_) -> Mods.IntSet.add a acc
+    in 
+    let acc = 
+      match r.threshold_op with 
+      | None -> acc 
+      | Some (a,_) -> Mods.IntSet.add a acc
+    in 
+    acc)
+
 let infer_agent_signatures r =
   let acc = sig_from_inits (r.signatures, r.tokens) r.init in
   let acc' = sig_from_rules acc r.rules in
   let ags, toks = sig_from_perts acc' r.perturbations in
   { r with signatures = ags; tokens = toks }
+     
+  let compute_thresholds_list r = 
+  let thresholds_set = thresholds_from_rules Mods.IntSet.empty r.rules in 
+  let thresholds = Mods.IntSet.elements thresholds_set in 
+  {r with thresholds}, thresholds_set 
 
 let split_mixture m =
   List.fold_right
