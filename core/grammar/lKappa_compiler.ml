@@ -1855,7 +1855,7 @@ let prepare_agent_sig
   let site_sigs_pre_nameddecls =
     List.fold_right
       (fun threshold site_sigs_pre_nameddecls ->
-        ( (Format.sprintf "__is_lt_than_%i" threshold, Loc.dummy),
+        ( (Size_info.name_of_size_predicate threshold, Loc.dummy),
           {
             Signature.internal_state =
               NamedDecls.create
