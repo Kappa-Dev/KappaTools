@@ -5,7 +5,7 @@ type size_sig = {
 }
 
 type t = size_sig option array array
-type previous_threshold = int Array.t
+type previous_threshold = int Array.t 
 
 (*val print_size_predicate : t -> int -> int -> Format.formatter -> unit
 

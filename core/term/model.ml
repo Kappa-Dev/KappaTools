@@ -23,11 +23,12 @@ type t = {
   counters_info: Counters_info.t;
   thresholds: Size_info.t;
   previous_threshold: Size_info.previous_threshold;
+  matrix_between_thresholds: Connected.cache; 
 }
 
 let init ~filenames domain tokens algs (deps_in_t, deps_in_e, tok_rd, alg_rd)
     (ast_rules, rules) observables interventions contact_map counters_info
-    thresholds previous_threshold =
+    thresholds previous_threshold matrix_between_thresholds =
   {
     filenames;
     domain;
@@ -45,6 +46,7 @@ let init ~filenames domain tokens algs (deps_in_t, deps_in_e, tok_rd, alg_rd)
     counters_info;
     thresholds;
     previous_threshold;
+    matrix_between_thresholds; 
   }
 
 let deconstruct env =
@@ -62,7 +64,8 @@ let deconstruct env =
     env.contact_map,
     env.counters_info,
     env.thresholds,
-    env.previous_threshold )
+    env.previous_threshold, 
+    env.matrix_between_thresholds )
 
 let domain env = env.domain
 let size_predicates_info env = env.thresholds
@@ -78,6 +81,7 @@ let num_of_agent nme env = Signature.num_of_agent nme (signatures env)
 let counters_info env = env.counters_info
 let counter_info env i j = (counters_info env).(i).(j)
 let previous_threshold env = env.previous_threshold
+let threshold_cache env = env.matrix_between_thresholds
 
 let fold_rules f x env =
   Tools.array_fold_lefti (fun i x rule -> f i x rule) x env.rules
@@ -322,6 +326,7 @@ let propagate_constant ~warning ?max_time ?max_events ~updated_vars
     contact_map = x.contact_map;
     thresholds = x.thresholds;
     previous_threshold = x.previous_threshold;
+    matrix_between_thresholds = x.matrix_between_thresholds; 
   }
 
 let kappa_instance_to_yojson =
@@ -386,13 +391,16 @@ let to_yojson env =
           env.tokens_reverse_dependencies );
       "thresholds_info", Size_info.to_yojson ~filenames env.thresholds;
       "counters_info", Counters_info.to_yojson ~filenames env.counters_info;
+      "threshold_matrix",
+      Connected.json_of_cache 
+          env.matrix_between_thresholds; 
     ]
 
 let kappa_instance_of_yojson =
   JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson)
 
 let of_yojson = function
-  | `Assoc l as x when List.length l = 13 ->
+  | `Assoc l as x when List.length l = 16 ->
     (try
        let filenames =
          JsonUtil.to_array
@@ -477,6 +485,9 @@ let of_yojson = function
            JsonUtil.to_array Operator.depset_of_yojson
              (Yojson.Basic.Util.member "tokens_reverse_dependencies" x);
          contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
+         matrix_between_thresholds = 
+         Connected.cache_of_json 
+            (List.assoc "threshold_matrix" l) ;  
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Not a correct environment", x)))

@@ -197,8 +197,10 @@ val split_mixture : mixture -> mixture * mixture
 val infer_agent_signatures : parsing_compil -> parsing_compil
 (** Used when agent signatures is implicit: infer agent signatures and tokens from init, rules and perturbations *)
 
-val compute_thresholds_list : parsing_compil -> parsing_compil * Mods.IntSet.t 
+val compute_thresholds_list: parsing_compil ->
+  parsing_compil * Mods.IntSet.t
 (** {6 Printers} *)
+
 
 val print_counter : Format.formatter -> counter -> unit
 val print_ast_mix : Format.formatter -> mixture -> unit

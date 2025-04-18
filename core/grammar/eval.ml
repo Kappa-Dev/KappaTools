@@ -557,7 +557,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
       inits
       (Pattern.PreEnv.empty (Model.signatures env) (Model.counters_info env)
          (Model.size_predicates_info env)
-         (Model.previous_threshold env))
+         (Model.previous_threshold env) (Model.threshold_cache env))
   in
   init_l
 
@@ -631,9 +631,10 @@ let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
   let warning ~pos msg = outputs (Data.Warning (Some pos, msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
   let previous_threshold = Connected.build_threshold with_thresholds in
+  let cache_threshold = Size_compiler.compute_between_thresholds_matrix with_thresholds in 
   let preenv =
     Pattern.PreEnv.empty sigs_nd counters_info size_predicates_info
-      previous_threshold
+      previous_threshold cache_threshold 
   in
   outputs (Data.Log "\t -variable declarations");
   let preenv', alg_a =
@@ -680,7 +681,7 @@ let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
     Model.init ~filenames:result.filenames domain tk_nd alg_nd alg_deps''
       (Array.of_list result.rules, rule_nd)
       (Array.of_list obs) (Array.of_list pert) contact_map counters_info
-      size_predicates_info previous_threshold
+      size_predicates_info previous_threshold cache_threshold 
   in
 
   outputs (Data.Log "\t -initial conditions");

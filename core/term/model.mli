@@ -27,6 +27,7 @@ val init :
   Counters_info.counter_sig option array array ->
   Size_info.t ->
   Size_info.previous_threshold ->
+  Connected.cache -> 
   t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
@@ -49,6 +50,7 @@ val deconstruct :
   * Counters_info.counter_sig option array array
   * Size_info.t
   * Size_info.previous_threshold
+  * Connected.cache 
 
 val nb_tokens : t -> int
 val nb_algs : t -> int
@@ -59,6 +61,7 @@ val domain : t -> Pattern.Env.t
 val size_predicates_info : t -> Size_info.t
 val size_predicate_info : t -> int -> int -> Size_info.size_sig option
 val previous_threshold : t -> Size_info.previous_threshold
+val threshold_cache : t -> Connected.cache  
 val get_obs : t -> Primitives.alg_expr Loc.annoted array
 val get_rules : t -> Primitives.elementary_rule array
 val new_domain : Pattern.Env.t -> t -> t

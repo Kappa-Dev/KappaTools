@@ -120,3 +120,8 @@ let annotate_size_predicates_with_diff _sigs
 let annotate_created_size_predicates _sigs ((_agent_name, _) as _agent_type)
     _counter_list _add_link_contact_map ra =
   { agent = ra  }
+
+let compute_between_thresholds_matrix thresholds = 
+  let matrix = Connected.init_between_thresholds thresholds in 
+  matrix 
+  

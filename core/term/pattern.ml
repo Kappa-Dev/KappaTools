@@ -1234,13 +1234,14 @@ module Env : sig
   type t = {
     sig_decl: Signature.s;
     counters_info: Counters_info.t;
-    thresholds_info: Size_info.t;
+    thresholds_info: Size_info.t; 
     id_by_type: int list array;
     max_obs: int;
     domain: point array;
     elementaries: (Navigation.abstract Navigation.step * id) list array array;
     single_agent_points: (id * Operator.DepSet.t) option array;
-    previous_threshold: Size_info.previous_threshold;
+    previous_threshold: Size_info.previous_threshold ; 
+    thresholds_cache: Connected.cache ; 
   }
 
   val get : t -> id -> point
@@ -1257,8 +1258,9 @@ module Env : sig
 
   val signatures : t -> Signature.s
   val counters_info : t -> Counters_info.t
-  val thresholds_info : t -> Size_info.t
+  val thresholds_info :  t -> Size_info.t 
   val previous_threshold : t -> Size_info.previous_threshold
+  val threshold_cache: t -> Connected.cache
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
   val print : noCounters:bool -> Format.formatter -> t -> unit
   val to_yojson : t -> Yojson.Basic.t
@@ -1285,19 +1287,21 @@ end = struct
   type t = {
     sig_decl: Signature.s;
     counters_info: Counters_info.t;
-    thresholds_info: Size_info.t;
+    thresholds_info: Size_info.t; 
     id_by_type: int list array;
     max_obs: int;
     domain: point array;
     elementaries: (Navigation.abstract Navigation.step * id) list array array;
     single_agent_points: (id * Operator.DepSet.t) option array;
-    previous_threshold: Size_info.previous_threshold;
+    previous_threshold: Size_info.previous_threshold; 
+    thresholds_cache: Connected.cache ; 
   }
 
   let signatures env = env.sig_decl
   let counters_info env = env.counters_info
-  let thresholds_info env = env.thresholds_info
-  let previous_threshold env = env.previous_threshold
+  let thresholds_info env = env.thresholds_info 
+  let previous_threshold env = env.previous_threshold 
+  let threshold_cache env = env.thresholds_cache 
 
   let print ~noCounters f env =
     let pp_point p_id f p =
@@ -1427,8 +1431,9 @@ end = struct
          {
            sig_decl;
            counters_info = [||];
-           thresholds_info = [||];
-           previous_threshold = [||];
+           thresholds_info = [||]; 
+           previous_threshold = [||]; 
+           thresholds_cache = Connected.dummy_cache; 
            (* TO DO *)
            (* Si json le prendre, sinon le synthétiser avec l'ancien fonctionnement *)
            single_agent_points =
@@ -1544,8 +1549,9 @@ type prepoint = {
 type work = {
   sigs: Signature.s;
   counters: Counters_info.t;
-  thresholds: Size_info.t;
-  w_previous_threshold: Size_info.previous_threshold;
+  thresholds: Size_info.t; 
+  w_previous_threshold: Size_info.previous_threshold ; 
+  w_threshold_cache: Connected.cache ; 
   cc_env: prepoint list Mods.IntMap.t Mods.IntMap.t;
   reserved_id: int list array;
   used_id: int list array;
@@ -1558,8 +1564,9 @@ module PreEnv = struct
   type t = {
     sig_decl: Signature.s;
     counters_info: Counters_info.t;
-    thresholds_info: Size_info.t;
-    previous_threshold: Size_info.previous_threshold;
+    thresholds_info: Size_info.t;  
+    previous_threshold: Size_info.previous_threshold; 
+    thresholds_cache: Connected.cache; 
     id_by_type: int list array;
     nb_id: int;
     domain: prepoint list Mods.IntMap.t Mods.IntMap.t;
@@ -1569,25 +1576,24 @@ module PreEnv = struct
   type stat = { stat_nodes: int; stat_nav_steps: int }
 
   let counters_info preenv = preenv.counters_info
-  let thresholds_info preenv = preenv.thresholds_info
+  let thresholds_info preenv = preenv.thresholds_info 
 
-  let fresh sigs counters_info thresholds_info previous_threshold id_by_type
-      nb_id domain =
+  let fresh sigs counters_info thresholds_info previous_threshold thresholds_cache id_by_type nb_id domain =
     {
       sig_decl = sigs;
-      previous_threshold;
+      previous_threshold; 
       counters_info;
       thresholds_info;
+      thresholds_cache; 
       id_by_type;
       nb_id;
       domain;
       used_by_a_begin_new = false;
     }
 
-  let empty sigs counters_info thresholds_info previous_threshold =
+  let empty sigs counters_info thresholds_info previous_threshold thresholds_cache =
     let nbt' = Array.make (Signature.size sigs) [] in
-    fresh sigs counters_info thresholds_info previous_threshold nbt' 1
-      Mods.IntMap.empty
+    fresh sigs counters_info thresholds_info previous_threshold thresholds_cache nbt' 1 Mods.IntMap.empty
 
   let check_vitality env = assert (env.used_by_a_begin_new = false)
 
@@ -1597,8 +1603,9 @@ module PreEnv = struct
     {
       sigs = env.sig_decl;
       counters = env.counters_info;
-      thresholds = env.thresholds_info;
-      w_previous_threshold = env.previous_threshold;
+      thresholds = env.thresholds_info; 
+      w_previous_threshold = env.previous_threshold ; 
+      w_threshold_cache = env.thresholds_cache ; 
       cc_env = env.domain;
       reserved_id = env.id_by_type;
       used_id = Array.make (Array.length env.id_by_type) [];
@@ -1913,8 +1920,9 @@ module PreEnv = struct
     {
       sig_decl = env.Env.sig_decl;
       counters_info = Env.counters_info env;
-      thresholds_info = Env.thresholds_info env;
-      previous_threshold = Env.previous_threshold env;
+      thresholds_info = Env.thresholds_info env; 
+      previous_threshold = Env.previous_threshold env ; 
+      thresholds_cache = Env.threshold_cache env ;
       nb_id = succ (Array.fold_left (List.fold_left max) 0 env.Env.id_by_type);
       id_by_type = env.Env.id_by_type;
       domain = domain';
@@ -1968,8 +1976,7 @@ let raw_finish_new ~debug_mode ~toplevel ?origin wk =
     PreEnv.add_cc ~debug_mode ~toplevel ?origin wk.cc_env
       (fresh_cc_id wk.cc_env) cc_candidate
   in
-  ( PreEnv.fresh wk.sigs wk.counters wk.thresholds wk.w_previous_threshold
-      wk.reserved_id wk.free_id preenv,
+  ( PreEnv.fresh wk.sigs wk.counters wk.thresholds wk.w_previous_threshold wk.w_threshold_cache wk.reserved_id wk.free_id preenv,
     r,
     out,
     out_id )
@@ -2021,8 +2028,9 @@ let new_node wk type_id =
       {
         sigs = wk.sigs;
         counters = wk.counters;
-        thresholds = wk.thresholds;
-        w_previous_threshold = wk.w_previous_threshold;
+        thresholds = wk.thresholds; 
+        w_threshold_cache = wk.w_threshold_cache ; 
+        w_previous_threshold = wk.w_previous_threshold;  
         cc_env = wk.cc_env;
         reserved_id = wk.reserved_id;
         used_id = wk.used_id;
@@ -2041,8 +2049,9 @@ let new_node wk type_id =
       {
         sigs = wk.sigs;
         counters = wk.counters;
-        thresholds = wk.thresholds;
-        w_previous_threshold = wk.w_previous_threshold;
+        thresholds = wk.thresholds; 
+        w_previous_threshold = wk.w_previous_threshold; 
+        w_threshold_cache = wk.w_threshold_cache; 
         cc_env = wk.cc_env;
         reserved_id = wk.reserved_id;
         used_id = wk.used_id;
@@ -2197,8 +2206,9 @@ let finalize ~debug_mode ~sharing env contact_map =
   ( {
       Env.sig_decl = env.PreEnv.sig_decl;
       Env.counters_info = env.PreEnv.counters_info;
-      Env.thresholds_info = env.PreEnv.thresholds_info;
-      Env.previous_threshold = env.PreEnv.previous_threshold;
+      Env.thresholds_info = env.PreEnv.thresholds_info; 
+      Env.previous_threshold = env.PreEnv.previous_threshold ; 
+      Env.thresholds_cache = env.PreEnv.thresholds_cache ; 
       Env.id_by_type = env.PreEnv.id_by_type;
       Env.max_obs = fresh_cc_id env.PreEnv.domain;
       Env.domain;

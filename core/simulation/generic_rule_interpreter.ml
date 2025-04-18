@@ -782,9 +782,126 @@ module Make (Instances : Instances_sig.S) = struct
             pat root)
         new_obs
     in
+    let thresholds = Pattern.Env.previous_threshold domain in 
+    let cache = Pattern.Env.threshold_cache domain in 
+    let edges''', updates = Edges.flush ~thresholds edges'' in 
+    (* Size updates *)
+    let size_removed, size_inserted = 
+      List.fold_left 
+        (fun (size_removed, size_inserted) update -> 
+          let i, j = update.Connected.previous_threshold,update.Connected.current_threshold in 
+          let pos_neg = Connected.get_between_thresholds cache i j in 
+           let rem, ins  = 
+           Connected.get_negative_update pos_neg, 
+           Connected.get_positive_update pos_neg 
+          in 
+          let agent_id = update.Connected.id in 
+          let agent_type = Edges.get_sort agent_id edges''' in 
+          let agent = agent_id , agent_type in 
+          let size_removed = 
+            List.fold_left 
+             (fun size_removed (t,_) -> 
+              let site_name = Size_info.name_of_size_predicate t in 
+              let site_id = 
+                Signature.num_of_site (Loc.annot_with_dummy site_name) 
+                  (Signature.get sigs agent_type)
+              in   
+              (agent,site_id)::size_removed) 
+             size_removed rem 
+          in 
+          let size_inserted = 
+            List.fold_left 
+              (fun size_inserted (t,bool) -> 
+                let site_name = Size_info.name_of_size_predicate t in 
+                let dec = (Signature.get sigs agent_type) in 
+                let site_id = 
+                   Signature.num_of_site (Loc.annot_with_dummy site_name) 
+                     dec 
+                in  
+                let internal_state_id = 
+                  Signature.num_of_internal_state site_id 
+                    (Loc.annot_with_dummy (if bool then "true" else "false"))
+                    dec 
+                     in 
+                (agent,site_id,internal_state_id)::size_inserted)
+              size_inserted ins 
+          in 
+          size_removed, size_inserted      
+          )  ([],[]) updates
+    in 
+    let size_removed = 
+      List.rev_map 
+      (fun (agent,site_id) -> 
+        Primitives.Transformation.NegativeInternalized (agent,site_id)) 
+      (List.rev size_removed)
+     (* Primitives.Transformation.NegativeInternalized*) 
+    in 
+    let size_inserted = 
+      List.rev_map 
+      (fun (agent,site_id,state_id) ->   
+        Primitives.Transformation.PositiveInternalized (agent,site_id,state_id))
+         (List.rev size_inserted)
+     (* Primitives.Transformation.PositiveInternalized*)
+    in 
+    (*Negative update*)
+    let concrete_removed = size_removed in 
+    let (del_obs, del_deps), _ =
+      List.fold_left
+        (obs_from_transformation ~debug_mode domain edges''')
+        ((del_obs, del_deps), Matching.empty_cache)
+        concrete_removed
+    in
+    let side_effects, edges_after_neg' =
+      List.fold_left
+        (apply_negative_transformation ~mod_connectivity_store
+           state.imp.instances)
+        ([], edges''') concrete_removed
+    in
+    let () = assert (side_effects = []) in 
+    let () =
+      List.iter
+        (fun (pat, (root, _)) ->
+          Instances.update_roots state.imp.instances false
+            state.imp.precomputed.unary_patterns edges_after_neg'
+            mod_connectivity_store pat root)
+        del_obs
+    in
+    (*Positive update*)
+    let concrete_inserted = size_inserted in 
+    let edges'''' =
+      List.fold_left
+        (apply_concrete_positive_transformation 
+              (Pattern.Env.signatures domain)
+              ~mod_connectivity_store state.imp.instances )
+        (edges_after_neg')
+        concrete_inserted
+    in
+    let edges''''', concrete_inserted' =
+      List.fold_left
+        (fun (e, i) (((id, _) as nc), s) ->
+          Edges.add_free id s e, Primitives.Transformation.Freed (nc, s) :: i)
+        (edges'''', concrete_inserted)
+        remaining_side_effects
+    in
+    let (new_obs, new_deps), _ =
+      List.fold_left
+        (obs_from_transformation ~debug_mode domain edges''''')
+        ((new_obs, new_deps), Matching.empty_cache)
+        concrete_inserted'
+    in
+    let () =
+      List.iter
+        (fun (pat, (root, _)) ->
+          Instances.update_roots state.imp.instances true
+            state.imp.precomputed.unary_patterns edges''''' mod_connectivity_store
+            pat root)
+        new_obs
+    in
+    
+
     (*Store event*)
-    let edges''', new_tracked_obs_instances =
-      store_obs ~debug_mode domain edges'' state.imp.instances new_obs []
+    let edges'''''', new_tracked_obs_instances =
+      store_obs ~debug_mode domain edges''''' state.imp.instances new_obs []
         state.imp.story_machinery
     in
     let () =
@@ -794,7 +911,7 @@ module Make (Instances : Instances_sig.S) = struct
     in
     (*Print species*)
     let species =
-      get_species_obs ~debug_mode sigs edges''' new_obs [] state.imp.species
+      get_species_obs ~debug_mode sigs edges'''''' new_obs [] state.imp.species
     in
     let () =
       List.iter
@@ -812,7 +929,7 @@ module Make (Instances : Instances_sig.S) = struct
       matchings_of_rule = state.matchings_of_rule;
       unary_candidates = state.unary_candidates;
       nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc;
-      edges = edges''';
+      edges = edges'''''';
       outdated_elements = rev_deps;
       events_to_block = state.events_to_block;
     }

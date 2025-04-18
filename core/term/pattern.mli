@@ -73,6 +73,7 @@ module Env : sig
   val counters_info : t -> Counters_info.t
   val thresholds_info : t -> Size_info.t
   val previous_threshold : t -> Size_info.previous_threshold
+  val threshold_cache : t -> Connected.cache
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
   val to_navigation : t -> id -> Navigation.abstract Navigation.t
   val print : noCounters:bool -> Format.formatter -> t -> unit
@@ -94,6 +95,7 @@ module PreEnv : sig
     Counters_info.t ->
     Size_info.t ->
     Size_info.previous_threshold ->
+    Connected.cache -> 
     t
 
   val debug_print : Format.formatter -> t -> unit

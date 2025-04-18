@@ -4,6 +4,7 @@ type id = int
 type update = { id: id; previous_threshold: int; current_threshold: int }
 type updates = update list
 
+
 module Blackboard = struct
   type 'a t = { array: 'a option Mods.DynArray.t; keys: id list }
 
@@ -611,6 +612,73 @@ let build_threshold s =
     array
   )
 
+
+let compute_threshold_list_inc threshold_list i j = 
+  let rec aux2 thresholds acc = 
+    match thresholds with 
+    | h::t when h<=j -> aux2 t (h::acc)
+    | _::_ | [] -> List.rev acc 
+  in 
+  let rec aux1 thresholds = 
+    match thresholds with 
+    | h::t when h<i -> aux1 t 
+    | _::_ | [] -> aux2 thresholds []
+  in 
+  aux1 threshold_list 
+
+type 'a pos_neg = {negative_update: 'a list; positive_update : 'a list }  
+type cache = (id * bool) pos_neg  option array array * id list 
+
+let dummy_cache = [||], []
+
+
+let compute_threshold_list threshold_list i j = 
+  let b, min, max= 
+    if i < j then  
+      true, i,j
+    else 
+      false, j,i
+  in   
+  let list = compute_threshold_list_inc threshold_list min max in 
+  let list = 
+    if b then 
+      match list with _::t -> t | _ -> []
+    else 
+      match List.rev list with _::t -> List.rev t | _ -> [] 
+    in 
+  let l_true =  List.rev_map (fun a -> (a,true)) (List.rev list) in 
+  let l_false = List.rev_map (fun a -> (a,false)) (List.rev list) in 
+  if b 
+  then 
+    {negative_update = l_true ; positive_update = l_false}
+  else 
+    {negative_update = l_false ; positive_update = l_true}
+
+let get_positive_update a = a.positive_update 
+let get_negative_update a = a.negative_update 
+
+let get_matrix m i = Array.get (Array.get m i) 
+let set_matrix m i  = Array.set (Array.get m i)
+
+let init_between_thresholds threshold_set = 
+  let threshold_list = Mods.IntSet.elements threshold_set in
+  let max =
+    match threshold_list with
+    | t :: _ -> t
+    | [] -> assert false
+  in
+  Array.init (max+1) (fun _ -> Array.make (max+1) None), threshold_list 
+
+let get_between_thresholds (m,threshold_list) i j = 
+    match get_matrix m i j with 
+      | None -> 
+        let rep = compute_threshold_list threshold_list i j in 
+        let () = set_matrix m i j (Some rep) in 
+        rep 
+      | Some rep -> rep 
+    
+
+
 let eval_threshold array =
   let max = Array.length array in
   let f (i : id) =
@@ -628,6 +696,30 @@ let is_connected t id id' =
   let t, rep' = get_old_rep t id' in
   t, rep = rep'
 
+
+let json_of_pos_neg to_json pos_neg = 
+    `Assoc ["negative_update", JsonUtil.of_list to_json pos_neg.negative_update ; 
+            "positive_update", JsonUtil.of_list to_json pos_neg.positive_update]
+let pos_neg_of_json of_json = function
+| `Assoc l as x when List.length l = 2 ->
+  {negative_update = 
+  JsonUtil.to_list of_json 
+    (Yojson.Basic.Util.member "negative_update" x);
+    positive_update =
+    JsonUtil.to_list of_json 
+      (Yojson.Basic.Util.member "positive_update" x);}
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct pos_neg", x))
+
+let cache_of_json = 
+  JsonUtil.to_pair 
+   (JsonUtil.to_array (JsonUtil.to_array (JsonUtil.to_option (pos_neg_of_json (JsonUtil.to_pair (JsonUtil.to_int ?error_msg:None) (JsonUtil.to_bool ?error_msg:None))))))
+   (JsonUtil.to_list (JsonUtil.to_int ?error_msg:None))
+
+let json_of_cache cache = 
+  JsonUtil.of_pair 
+  (JsonUtil.of_array (JsonUtil.of_array (JsonUtil.of_option (json_of_pos_neg (JsonUtil.of_pair JsonUtil.of_int JsonUtil.of_bool)))))
+  (JsonUtil.of_list JsonUtil.of_int)
+  cache 
 (*
   let do_it () = 
     let s = Mods.IntSet.add 10 (Mods.IntSet.singleton 100) in 
@@ -636,3 +728,4 @@ let is_connected t id id' =
      List.iter (fun i -> Format.fprintf Format.std_formatter "%i -> %i @." i (f i)) 
       [1;2;3;9;10;11;99;100;104]
   in ()*)
+

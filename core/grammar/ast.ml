@@ -1755,10 +1755,10 @@ let infer_agent_signatures r =
   let ags, toks = sig_from_perts acc' r.perturbations in
   { r with signatures = ags; tokens = toks }
      
-  let compute_thresholds_list r = 
+let compute_thresholds_list r = 
   let thresholds_set = thresholds_from_rules Mods.IntSet.empty r.rules in 
   let thresholds = Mods.IntSet.elements thresholds_set in 
-  {r with thresholds}, thresholds_set 
+  {r with thresholds}, thresholds_set
 
 let split_mixture m =
   List.fold_right
