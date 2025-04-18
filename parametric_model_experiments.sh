@@ -2,102 +2,98 @@
 
 KASA_BINARY="./_build/install/default/bin/KaSa"
 TEMP_FILE="temp_experiment.ka"
+DEFAULT_TIMEOUT=1m
 
 # models
-ENSEMBLE_MODEL="examples/boolean_predicates/benchmarks/ensemble.ka"
-EGFR_MODEL="examples/boolean_predicates/benchmarks/causality_05_sos.ka"
-REPRESSILATOR_MODEL="examples/boolean_predicates/benchmarks/Repressilator.ka"
-FGF_MODEL="examples/boolean_predicates/benchmarks/fgf.ka"
-SFB_MODEL="examples/boolean_predicates/benchmarks/sfb.ka"
-AVAILABLE_MODELS="Available models: ENSEMBLE, EGFR, REPRESSILATOR, FGF, SFB"
+ENSEMBLE="examples/boolean_predicates/benchmarks/ensemble.ka"
+EGFR="examples/boolean_predicates/benchmarks/causality_05_sos.ka"
+REPRESSILATOR="examples/boolean_predicates/benchmarks/Repressilator.ka"
+FGF="examples/boolean_predicates/benchmarks/fgf.ka"
+SFB="examples/boolean_predicates/benchmarks/sfb.ka"
+
+# Array of models
+MODELS=("ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB")
+
+AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
+AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
 
 # Generate a new output file name (the stderr output of time)
 mkdir -p output
-OUTPUT_FILE="output/experiments_output"
-i=0
-while [ -e "$OUTPUT_FILE~$i.txt" ]; do
-    i=$((i + 1))
-done
-OUTPUT_FILE="$OUTPUT_FILE~$i.txt"
-#generate a new output file name for the stdout output of the analysis
-STDOUT_OUTPUT_FILE="output/analysis_output"
-i=0
-while [ -e "$STDOUT_OUTPUT_FILE~$i.txt" ]; do
-    i=$((i + 1))
-done
-STDOUT_OUTPUT_FILE="$STDOUT_OUTPUT_FILE~$i.txt"
 
-# Check if a model argument is provided
-if [ -z "$1" ]; then
-    echo "Usage: $0 <model>"
-    echo "$AVAILABLE_MODELS"
-    exit 1
+echo "Analyzing models: $AVAILABLE_MODELS"
+
+# Parse command-line arguments for timeout
+if [ -n "$1" ]; then
+    TIMEOUT=$1
+    echo "Using custom timeout: $TIMEOUT"
+else
+    TIMEOUT=$DEFAULT_TIMEOUT
+    echo "Using default timeout: $TIMEOUT"
 fi
 
-# Set the model based on the argument
-case "${1^^}" in
-    ENSEMBLE)
-        EXAMPLE_MODEL="$ENSEMBLE_MODEL"
-        ;;
-    EGFR)
-        EXAMPLE_MODEL="$EGFR_MODEL"
-        ;;
-    REPRESSILATOR)
-        EXAMPLE_MODEL="$REPRESSILATOR_MODEL"
-        ;;
-    FGF)
-        EXAMPLE_MODEL="$FGF_MODEL"
-        ;;
-    SFB)
-        EXAMPLE_MODEL="$SFB_MODEL"
-        ;;
-    *)
-        echo "Invalid model: $1"
-        echo "$AVAILABLE_MODELS"
-        exit 1
-        ;;
-esac
+# Analyze each model
+for MODEL in "${MODELS[@]}"; do
+    EXAMPLE_MODEL=${!MODEL}
 
-# Clear the output file
-> "$OUTPUT_FILE"
+    OUTPUT_FILE="output/${MODEL}_experiments_output"
+    i=0
+    while [ -e "$OUTPUT_FILE~$i.txt" ]; do
+        i=$((i + 1))
+    done
+    OUTPUT_FILE="$OUTPUT_FILE~$i.txt"
+    #generate a new output file name for the stdout output of the analysis
+    STDOUT_OUTPUT_FILE="output/${MODEL}_analysis_output"
+    i=0
+    while [ -e "$STDOUT_OUTPUT_FILE~$i.txt" ]; do
+        i=$((i + 1))
+    done
+    STDOUT_OUTPUT_FILE="$STDOUT_OUTPUT_FILE~$i.txt"
 
-echo "Starting the analysis..."
+    # Clear the output file
+    > "$OUTPUT_FILE"
 
-for i in {0..35..5}; do
-    # If the current file contains the annotation //i for the current i, then the analysis is executed
-    if grep -q "//$i" "$EXAMPLE_MODEL"; then
-        # Replace "//i" with "]//i" in the input file and replace "// working_set" with "%working_set:["
-        sed "s|// working_set|%working_set:[|g" "$EXAMPLE_MODEL" | sed "s|//$i|]|g" > "$TEMP_FILE"
-        # normal run
-        echo >> "$OUTPUT_FILE"
-        echo "Runtime with $i rules in the working set:" >> "$OUTPUT_FILE"
-        { time timeout 15m "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
-        # # without printing
-        # echo >> "$OUTPUT_FILE"
-        # echo "Runtime with $i rules and without printing:" >> "$OUTPUT_FILE"
-        # { time "$KASA_BINARY" "$TEMP_FILE" --verbosity-level-for-reachability-analysis Mute ; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
-        # # without the views_domain
-        # echo >> "$OUTPUT_FILE"
-        # echo "Runtime with $i rules, without the views analysis:" >> "$OUTPUT_FILE"
-        # { time "$KASA_BINARY" "$TEMP_FILE" --no-views-domain ; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+    echo
+    echo "Processing model: $MODEL"
+
+    for i in {0..30..5}; do
+        # If the current file contains the annotation //i for the current i, then the analysis is executed
+        if grep -q "//$i" "$EXAMPLE_MODEL"; then
+            # Replace "//i" with "]//i" in the input file and replace "// working_set" with "%working_set:["
+            sed "s|// working_set|%working_set:[|g" "$EXAMPLE_MODEL" | sed "s|//$i|]|g" > "$TEMP_FILE"
+            echo >> "$OUTPUT_FILE"
+            echo "Runtime with $i rules in the working set:" >> "$OUTPUT_FILE"
+            { time timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+             EXIT_STATUS=$?
+
+            # Check if the program was killed by timeout
+            if [ $EXIT_STATUS -eq 124 ]; then
+                echo "⚠️ Timeout occurred for $MODEL with $i rules." >> "$OUTPUT_FILE"
+                break
+            fi
+        fi
+    done
+
+    # Clean up temporary file
+    rm -f "$TEMP_FILE"
+
+    echo "✅ Completed: $MODEL"
+    echo "The results can be found in: $STDOUT_OUTPUT_FILE"
+    echo "The runtimes can be found in: $OUTPUT_FILE"
+
+    # Check for exceptions in STDOUT_OUTPUT_FILE
+    if grep -qi "exception:" "$STDOUT_OUTPUT_FILE"; then
+        echo "🚨 Exception raised during analysis of $MODEL."
+    else
+        echo "No exceptions during execution."
+    fi
+
+    # Check for exceptions in OUTPUT_FILE
+    if grep -qi "Killed" "$OUTPUT_FILE"; then
+        echo "⚠️ Some programs were killed (probably because they used too much memory)."
+    fi
+
+    # Check for timeouts
+    if grep -qi "Timeout occurred for" "$OUTPUT_FILE"; then
+        echo "⚠️ Some programs were killed by a timeout."
     fi
 done
-
-# Clean up temporary file
-rm -f "$TEMP_FILE"
-
-echo "Analysis completed."
-echo "Stderr output can be found in: $OUTPUT_FILE"
-echo "Stdout output can be found in: $STDOUT_OUTPUT_FILE"
-
-# Check for exceptions in STDOUT_OUTPUT_FILE
-if grep -qi "exception:" "$STDOUT_OUTPUT_FILE"; then
-    echo "Some exceptions have been raised."
-else
-    echo "Execution finished without any exception."
-fi
-
-# Check for exceptions in OUTPUT_FILE
-if grep -qi "Killed" "$OUTPUT_FILE"; then
-    echo "Some programs were killed (probably because they used too much memory)."
-fi
