@@ -71,7 +71,7 @@ for i in {0..35..5}; do
         # normal run
         echo >> "$OUTPUT_FILE"
         echo "Runtime with $i rules in the working set:" >> "$OUTPUT_FILE"
-        { time "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+        { time timeout 15m "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
         # # without printing
         # echo >> "$OUTPUT_FILE"
         # echo "Runtime with $i rules and without printing:" >> "$OUTPUT_FILE"
