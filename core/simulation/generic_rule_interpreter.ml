@@ -791,7 +791,7 @@ module Make (Instances : Instances_sig.S) = struct
         (fun (size_removed, size_inserted) update -> 
           let i, j = update.Connected.previous_threshold,update.Connected.current_threshold in 
           let pos_neg = Connected.get_between_thresholds cache i j in 
-           let rem, ins  = 
+          let rem, ins  = 
            Connected.get_negative_update pos_neg, 
            Connected.get_positive_update pos_neg 
           in 
@@ -813,6 +813,11 @@ module Make (Instances : Instances_sig.S) = struct
             List.fold_left 
               (fun size_inserted (t,bool) -> 
                 let site_name = Size_info.name_of_size_predicate t in 
+                let _ = 
+                  if debug_mode 
+                    then 
+                      Format.printf "Threshold: (%i,%i) %s -> %s @." agent_id agent_type site_name (if bool then "true" else "false") 
+                in 
                 let dec = (Signature.get sigs agent_type) in 
                 let site_id = 
                    Signature.num_of_site (Loc.annot_with_dummy site_name) 
@@ -923,7 +928,7 @@ module Make (Instances : Instances_sig.S) = struct
       Operator.DepSet.union state.outdated_elements
         (Operator.DepSet.union del_deps new_deps)
     in
-    {
+     {
       outdated = false;
       imp = state.imp;
       matchings_of_rule = state.matchings_of_rule;

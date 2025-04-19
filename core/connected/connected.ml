@@ -624,7 +624,7 @@ let compute_threshold_list_inc threshold_list i j =
     | h::t when h<i -> aux1 t 
     | _::_ | [] -> aux2 thresholds []
   in 
-  aux1 threshold_list 
+  aux1 treshold_list
 
 type 'a pos_neg = {negative_update: 'a list; positive_update : 'a list }  
 type cache = (id * bool) pos_neg  option array array * id list 
@@ -641,11 +641,12 @@ let compute_threshold_list threshold_list i j =
   in   
   let list = compute_threshold_list_inc threshold_list min max in 
   let list = 
-    if b then 
+    if i =0 || j = 0 then list else 
+      if b then 
       match list with _::t -> t | _ -> []
     else 
       match List.rev list with _::t -> List.rev t | _ -> [] 
-    in 
+  in
   let l_true =  List.rev_map (fun a -> (a,true)) (List.rev list) in 
   let l_false = List.rev_map (fun a -> (a,false)) (List.rev list) in 
   if b 
@@ -663,7 +664,7 @@ let set_matrix m i  = Array.set (Array.get m i)
 let init_between_thresholds threshold_set = 
   let threshold_list = Mods.IntSet.elements threshold_set in
   let max =
-    match threshold_list with
+    match List.rev threshold_list with
     | t :: _ -> t
     | [] -> assert false
   in
