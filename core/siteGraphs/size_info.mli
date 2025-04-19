@@ -4,14 +4,12 @@ type size_sig = {
   threshold: int;
 }
 
-type t = size_sig option array array 
-
-type previous_threshold = int array 
+type t = size_sig option array array
+type previous_threshold = int array
 
 val name_of_size_predicate : int -> string
-val get_size_predicate_site: int -> int -> Signature.s -> int
-val get_internal_state_true: int -> int -> Signature.s -> int 
-
+val get_size_predicate_site : int -> int -> Signature.s -> int
+val get_internal_state_true : int -> int -> Signature.s -> int
 val print_size_predicate : t -> int -> int -> Format.formatter -> unit
 
 val print_kappa :

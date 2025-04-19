@@ -95,7 +95,7 @@ module PreEnv : sig
     Counters_info.t ->
     Size_info.t ->
     Size_info.previous_threshold ->
-    Connected.cache -> 
+    Connected.cache ->
     t
 
   val debug_print : Format.formatter -> t -> unit

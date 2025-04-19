@@ -1735,30 +1735,30 @@ let sig_from_perts =
             p)
         acc p)
 
-let thresholds_from_rules = 
-  List.fold_left (fun acc (_,((r:rule),_)) -> 
-    let acc =
-      match r.threshold with 
-      | None -> acc 
-      | Some (a,_) -> Mods.IntSet.add a acc
-    in 
-    let acc = 
-      match r.threshold_op with 
-      | None -> acc 
-      | Some (a,_) -> Mods.IntSet.add a acc
-    in 
-    acc)
+let thresholds_from_rules =
+  List.fold_left (fun acc (_, ((r : rule), _)) ->
+      let acc =
+        match r.threshold with
+        | None -> acc
+        | Some (a, _) -> Mods.IntSet.add a acc
+      in
+      let acc =
+        match r.threshold_op with
+        | None -> acc
+        | Some (a, _) -> Mods.IntSet.add a acc
+      in
+      acc)
 
 let infer_agent_signatures r =
   let acc = sig_from_inits (r.signatures, r.tokens) r.init in
   let acc' = sig_from_rules acc r.rules in
   let ags, toks = sig_from_perts acc' r.perturbations in
   { r with signatures = ags; tokens = toks }
-     
-let compute_thresholds_list r = 
-  let thresholds_set = thresholds_from_rules Mods.IntSet.empty r.rules in 
-  let thresholds = Mods.IntSet.elements thresholds_set in 
-  {r with thresholds}, thresholds_set
+
+let compute_thresholds_list r =
+  let thresholds_set = thresholds_from_rules Mods.IntSet.empty r.rules in
+  let thresholds = Mods.IntSet.elements thresholds_set in
+  { r with thresholds }, thresholds_set
 
 let split_mixture m =
   List.fold_right

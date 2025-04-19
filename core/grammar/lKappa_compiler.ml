@@ -1404,6 +1404,7 @@ let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
          rule.add_token
     |> List.rev
   in
+
   let r_rate =
     alg_expr_of_ast ~warning ~syntax_version sigs counters_info thresholds_info
       tok algs rule.k_def
@@ -1424,6 +1425,7 @@ let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
         | None -> un_rate'', None)
       rule.k_un
   in
+
   {
     LKappa.r_mix;
     r_created;
@@ -2619,6 +2621,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
             INIT_MIX (Loc.map_annot add_inverted_counter_to_init_mixture mix_) ))
       ast_compil.init
   in
+
   let variables =
     List.rev_map (fun (a, b) -> a, map_expr b) (List.rev ast_compil.variables)
   in
@@ -2657,6 +2660,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
           ext ))
       (List.rev ast_compil.perturbations)
   in
+
   ( {
       ast_compil with
       signatures;
@@ -2667,7 +2671,6 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
       perturbations;
     },
     counter_conversion_info_map )
-
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
@@ -2691,14 +2694,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     else
       ast_compil
   in
-  let ast_compil, size_predicate_set = 
-    Ast.compute_thresholds_list ast_compil 
-  in 
-  let size_predicate_list = ast_compil.Ast.thresholds  in
-  let () = Format.printf "THRESHOLD @." in 
-  let () = 
-    List.iter (Format.printf "THRESHOLD %i @.") size_predicate_list 
-  in 
+  let ast_compil, size_predicate_set = Ast.compute_thresholds_list ast_compil in
+  let size_predicate_list = ast_compil.Ast.thresholds in
   (* Remove counter equality test with a variable by splitting in one rule per variable value *)
   let ast_compil =
     if has_counters then
@@ -2873,7 +2870,6 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       cleaned_rules
   in
 
-
   let variables =
     Tools.array_fold_righti
       (fun i (lab, expr) acc ->
@@ -2907,7 +2903,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     token_names;
     alg_vars_finder;
     updated_alg_vars;
-    thresholds=size_predicate_set; 
+    thresholds = size_predicate_set;
     result =
       {
         filenames = ast_compil.filenames;

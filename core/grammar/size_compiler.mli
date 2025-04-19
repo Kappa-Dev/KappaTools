@@ -62,5 +62,4 @@ val annotate_size_predicates_with_diff :
 (*val add_size_predicates_to_contact_map :
   Signature.s -> (int -> int -> int -> int -> unit) -> unit*)
 
-  val compute_between_thresholds_matrix: Mods.IntSet.t -> Connected.cache 
-  
+val compute_between_thresholds_matrix : Mods.IntSet.t -> Connected.cache

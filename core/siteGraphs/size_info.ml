@@ -5,7 +5,7 @@ type size_sig = {
 }
 
 type t = size_sig option array array
-type previous_threshold = int Array.t 
+type previous_threshold = int Array.t
 
 (*val print_size_predicate : t -> int -> int -> Format.formatter -> unit
 
@@ -128,13 +128,13 @@ let get_size_predicate_sites_sig ?except sigs c agent_id site_id =
   | Some int -> int
 
 let name_of_size_predicate i = Format.sprintf "__cc_size_leqt_%i" i
-let get_size_predicate_site agent_id threshold sigs = 
-  let () = Signature.print Format.std_formatter sigs in 
-  let site_name = name_of_size_predicate threshold in 
-  let s = Signature.get sigs agent_id in 
+
+let get_size_predicate_site agent_id threshold sigs =
+  let site_name = name_of_size_predicate threshold in
+  let s = Signature.get sigs agent_id in
   Signature.num_of_site (Loc.annot_with_dummy site_name) s
 
-let get_internal_state_true agent_id threshold sigs = 
-    let site_id = get_size_predicate_site agent_id threshold sigs in 
-    let s = Signature.get sigs agent_id in 
-    Signature.num_of_internal_state site_id (Loc.annot_with_dummy "true") s
+let get_internal_state_true agent_id threshold sigs =
+  let site_id = get_size_predicate_site agent_id threshold sigs in
+  let s = Signature.get sigs agent_id in
+  Signature.num_of_internal_state site_id (Loc.annot_with_dummy "true") s

@@ -27,36 +27,34 @@ let has_size_predicates compil = compil.Ast.thresholds <> []
    returns: agent with explicit counters; created incr agents;
             the next link number to use *)
 
-let add_test_in_rule_agent sigs (agent:LKappa.rule_agent) t = 
-  let agent_id = agent.LKappa.ra_type in 
-  let site = Size_info.get_size_predicate_site agent_id t sigs in 
+let add_test_in_rule_agent sigs (agent : LKappa.rule_agent) t =
+  let agent_id = agent.LKappa.ra_type in
+  let site = Size_info.get_size_predicate_site agent_id t sigs in
   let () =
-    Array.set (agent.LKappa.ra_ports) site 
+    Array.set agent.LKappa.ra_ports site
       ((LKappa.LNK_FREE, Loc.dummy), LKappa.Maintained)
-  in 
-  let int = Size_info.get_internal_state_true agent_id t sigs in 
-  let () = 
-    Array.set agent.LKappa.ra_ints site (LKappa.I_VAL_CHANGED (int,int))
-      
   in
+  let int = Size_info.get_internal_state_true agent_id t sigs in
+  let () =
+    Array.set agent.LKappa.ra_ints site (LKappa.I_VAL_CHANGED (int, int))
+  in
+
   agent
 
-
-  let compile_size_predicates_in_rule_agent (sigs : Signature.s)
+let compile_size_predicates_in_rule_agent (sigs : Signature.s)
     (_size_info : Size_info.t) (threshold : size_predicate_site option)
     (rule_agent : LKappa.rule_agent with_size_predicates) : LKappa.rule_agent =
-  match threshold with 
-  | None -> rule_agent.agent  
-  | Some (t, _) -> 
-    let agent = add_test_in_rule_agent sigs rule_agent.agent t in 
+  match threshold with
+  | None -> rule_agent.agent
+  | Some (t, _) ->
+    let agent = add_test_in_rule_agent sigs rule_agent.agent t in
     agent
-
 
 (** Compiles the counter value change in the right hand side of a rule into dummy chain changes *)
 let compile_size_predicates_in_raw_agent (_sigs : Signature.s)
     (_size_info : Size_info.t)
     (raw_agent_ : Raw_mixture.agent with_size_predicates) : Raw_mixture.agent =
-      raw_agent_.agent 
+  raw_agent_.agent
 
 (** [compile_counter_in_rule sigs mix created] takes the intial mixture from a rule [mix],
  * and the mixture obtained from the application of the rule [created],
@@ -76,6 +74,7 @@ let compile_size_predicate_in_rule (sigs : Signature.s)
       (compile_size_predicates_in_rule_agent sigs size_info t)
       (List.rev mix)
   in
+
   let raw_mix : Raw_mixture.t =
     List.rev_map
       (compile_size_predicates_in_raw_agent sigs size_info)
@@ -91,7 +90,6 @@ let make_size_predicate_site_sig i =
     threshold = i;
   }
 
-
 let make_size_predicate_site i =
   let name = Size_info.name_of_size_predicate i in
   {
@@ -103,15 +101,15 @@ let make_size_predicate_site i =
     threshold = i;
   }
 
-let _ = make_size_predicate_site, make_size_predicate_site_sig 
+let _ = make_size_predicate_site, make_size_predicate_site_sig
 
 let annotate_dropped_size_predicates _sign _ast_counters ra _arity _agent_name
     _aux =
-  { agent = ra  }
+  { agent = ra }
 
 let annotate_edit_size_predicates _sigs ((_agent_name, _) as _agent_type)
     _counters ra _add_link_contact_map =
-  { agent = ra  }
+  { agent = ra }
 
 let annotate_size_predicates_with_diff _sigs
     ((_agent_name, _loc) as _agent_type) _lc _rc ra _add_link_contact_map =
@@ -119,9 +117,8 @@ let annotate_size_predicates_with_diff _sigs
 
 let annotate_created_size_predicates _sigs ((_agent_name, _) as _agent_type)
     _counter_list _add_link_contact_map ra =
-  { agent = ra  }
+  { agent = ra }
 
-let compute_between_thresholds_matrix thresholds = 
-  let matrix = Connected.init_between_thresholds thresholds in 
-  matrix 
-  
+let compute_between_thresholds_matrix thresholds =
+  let matrix = Connected.init_between_thresholds thresholds in
+  matrix
