@@ -118,6 +118,7 @@ type memo_tables = {
   boolean_mvbdu_extensional_description_of_mvbdu_with_threshold:
     ((int * int) list * bool Mvbdu_sig.mvbdu) list Hash_2.t;
   boolean_mvbdu_printed_guard: (string * bool) Hash_1.t;
+  boolean_mvbdu_to_formula: int Logical_formulae.formula Hash_1.t;
 }
 
 type mvbdu_dic =
@@ -350,6 +351,7 @@ let init_data parameters error =
   in
   let error, mvbdu_rename = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_printed_guard = Hash_1.create parameters error 0 in
+  let error, mvbdu_to_formula = Hash_1.create parameters error 0 in 
   ( error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head;
@@ -391,6 +393,7 @@ let init_data parameters error =
       boolean_mvbdu_extensional_description_of_mvbdu_with_threshold =
         mvbdu_extensional_description_of_mvbdu_with_threshold;
       boolean_mvbdu_printed_guard = mvbdu_printed_guard;
+      boolean_mvbdu_to_formula = mvbdu_to_formula; 
     } )
 
 let init_remanent parameters error =
@@ -1539,6 +1542,72 @@ let extensional_description_of_mvbdu_with_threshold parameters handler error
     in
     aux1 parameters handler error ~threshold mvbdu
   | None -> error, (handler, [])
+
+let rec to_formula parameters handler error  mvbdu =
+    match
+      Hash_1.unsafe_get parameters error
+        mvbdu.Mvbdu_sig.id
+        handler.Memo_sig.data.boolean_mvbdu_to_formula 
+    with
+    | error, Some output -> error, (handler, output)
+    | error, None ->
+        let error, (handler, output) = 
+           match mvbdu.Mvbdu_sig.value with
+            | Mvbdu_sig.Leaf true -> error, (handler, Logical_formulae.True)
+            | Mvbdu_sig.Leaf false -> error, (handler, Logical_formulae.False )
+            | Mvbdu_sig.Node a ->
+              let upper_bound = a.Mvbdu_sig.upper_bound in
+              (* true branch *)
+              (* Recursion *)
+              (match upper_bound with
+              | -1 -> to_formula parameters handler error a.Mvbdu_sig.branch_false
+              | 1 -> to_formula parameters handler error a.Mvbdu_sig.branch_true
+              | 0 ->
+              let atom = Logical_formulae.P a.Mvbdu_sig.variable in 
+              let error, (handler, output_true) = 
+              to_formula parameters handler error 
+                a.Mvbdu_sig.branch_true 
+              in 
+              let error, (handler, output_false) = 
+              to_formula parameters handler error 
+                a.Mvbdu_sig.branch_false
+              in 
+              let imply_false = 
+                Logical_formulae.IMPLY 
+                  (Logical_formulae.NOT atom,
+                  output_true)
+              in 
+              let imply_true =
+                Logical_formulae.IMPLY 
+                  (atom,output_false)
+              in 
+              (error, (handler, Logical_formulae.AND (imply_false,imply_true)))
+              | n -> 
+                Exception.warn parameters error __POS__
+                ~message:
+                  ("The mvbdu should only contain predicates. Upper bound: "
+                 ^ string_of_int n)
+                Exit (handler, Logical_formulae.True ))
+                
+        in 
+        let error, memo =
+        Hash_1.set parameters error
+          (mvbdu.Mvbdu_sig.id)
+          output
+          handler.Memo_sig.data.boolean_mvbdu_to_formula 
+      in    
+      ( error,
+        ( {
+            handler with
+            Memo_sig.data =
+              {
+                handler.Memo_sig.data with
+                boolean_mvbdu_to_formula =
+                  memo;
+              };
+          },
+          output ) )
+  
 
 let print_guard_mvbdu parameters handler error mvbdu convert_var_to_string =
   let rec aux1 parameters handler error mvbdu =

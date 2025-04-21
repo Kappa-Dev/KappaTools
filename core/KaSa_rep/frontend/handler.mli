@@ -215,6 +215,16 @@ val print_guard_mvbdu_decompose :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.Views_bdu.handler
 
+val mvbdu_to_formula : 
+Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * Ckappa_sig.c_mvbdu_var Logical_formulae.formula
+
 val print_labels :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -495,3 +505,10 @@ val get_nsites : Cckappa_sig.kappa_handler -> Ckappa_sig.c_site_name
 
 val get_nr_guard_parameters :
   Cckappa_sig.kappa_handler -> Ckappa_sig.c_guard_parameter
+
+val print_formula : 
+Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.c_mvbdu_var Logical_formulae.formula ->
+  Exception_without_parameter.exceptions_caught_and_uncaught

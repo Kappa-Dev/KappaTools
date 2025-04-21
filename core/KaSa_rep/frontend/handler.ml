@@ -681,6 +681,22 @@ let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
       handler_kappa agent_name s
   | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
 
+let mvbdu_to_formula parameters error _kappa_handler bdu_handler mvbdu =
+    Ckappa_sig.Views_bdu.mvbdu_to_formula parameters bdu_handler error mvbdu
+
+let print_formula parameters error kappa_handler formula  =
+  let nsites = get_nsites kappa_handler in
+  let convert_variable_to_string error guard_name =
+    match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
+    | Ckappa_sig.Guard_p guard_name ->
+      string_of_guard parameters guard_name kappa_handler error
+    | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
+  in
+  let error =
+    Logical_formulae.print parameters error convert_variable_to_string formula 
+  in
+  error
+
 let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
     ?(with_comma = false) mvbdu _restriction_bdu =
   (* let () = Ckappa_sig.Views_bdu.print parameters mvbdu in *)

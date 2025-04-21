@@ -207,6 +207,8 @@ module type Mvbdu = sig
 
   val extensional_of_mvbdu : (mvbdu, (key * value) list list) unary
 
+  val mvbdu_to_formula : (mvbdu, key Logical_formulae.formula) unary 
+
   val parametric_conditions_of_mvbdu :
     (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
 
@@ -401,6 +403,8 @@ module type Internalized_mvbdu = sig
 
   val hash_of_association_list : hconsed_association_list -> int
   val hash_of_variables_list : hconsed_variables_list -> int
+
+  val mvbdu_to_formula : mvbdu -> int Logical_formulae.formula
 end
 
 module type Nul = sig end

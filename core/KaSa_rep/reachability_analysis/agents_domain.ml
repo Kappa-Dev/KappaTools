@@ -754,10 +754,11 @@ module Domain = struct
                          agent_string
                      in
                      let bdu_handler = get_mvbdu_handler dynamic in
-                     let error, bdu_handler =
-                       Handler.print_guard_mvbdu_decompose parameters error
-                         handler bdu_handler mvbdu restriction_bdu
+                     let error, bdu_handler, f =
+                       Handler.mvbdu_to_formula parameters error
+                         handler bdu_handler mvbdu (*restriction_bdu*)
                      in
+                     let error = Handler.print_formula parameters error handler f in 
                      let dynamic = set_mvbdu_handler bdu_handler dynamic in
                      let () = Loggers.fprintf loggers "." in
                      error, dynamic
