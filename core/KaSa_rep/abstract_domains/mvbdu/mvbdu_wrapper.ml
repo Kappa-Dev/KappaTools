@@ -143,7 +143,7 @@ module type Mvbdu = sig
 
   val mvbdu_full_cartesian_decomposition : (mvbdu, mvbdu list) unary
   val mvbdu_cartesian_abstraction : (mvbdu, mvbdu list) unary
-
+  val mvbdu_cartesian_abstraction_with_threshold : (mvbdu,  mvbdu list) unary_with_threshold 
   val build_association_list :
     ((key * value) list, hconsed_association_list) unary
 
@@ -592,6 +592,14 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     match f parameters handler error a with
     | error, (handler, a) -> error, handler, a
 
+  let lift1_with_threshold ~threshold pos f parameters handler error a =
+      match f parameters handler error ~threshold a with
+      | error, (handler, Some a) -> error, handler, a
+      | error, (handler, None) ->
+        let error, a = Exception.warn parameters error pos Exit a in
+        error, handler, a 
+  
+
   let lift1__with_threshold ~threshold _string f parameters handler error a =
     match f parameters handler error ~threshold a with
     | error, (handler, a) -> error, handler, a
@@ -798,6 +806,7 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let print_variables_list = List_algebra.print_variables_list
   let mvbdu_clean_head = lift1_ __POS__ Boolean_mvbdu.clean_head
   let mvbdu_keep_head_only = lift1_ __POS__ Boolean_mvbdu.keep_head_only
+  let mvbdu_keep_head_only_with_threshold = lift1_with_threshold __POS__ Boolean_mvbdu.keep_head_only_with_threshold
 
   let mvbdu_cartesian_abstraction parameters handler error bdu =
     let error, handler, bdd_true = mvbdu_true parameters handler error in
@@ -828,6 +837,41 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
       )
     in
     aux error handler bdu []
+
+   let mvbdu_cartesian_abstraction_with_threshold parameters handler error ~threshold bdu =
+      let error, handler, bdd_true = mvbdu_true parameters handler error in
+      (*let error = Exception.check_point
+            Exception.warn parameters error error' __POS__ Exit
+        in*)
+      let error, handler, bdd_false = mvbdu_false parameters handler error in
+      (*let error = Exception.check_point
+            Exception.warn parameters error error'' __POS__ Exit
+        in*)
+      let rec aux error handler bdu list =
+        if equal bdu bdd_true || equal bdu bdd_false then
+          error, handler, List.rev list
+        else (
+        match bdu.Mvbdu_sig.value with 
+        | Mvbdu_sig.Leaf _ -> error, handler, List.rev list
+        | Mvbdu_sig.Node precell when precell.Mvbdu_sig.variable > threshold -> error, handler, List.rev list
+        | Mvbdu_sig.Node _  -> 
+          let error, handler, head =
+            mvbdu_keep_head_only_with_threshold parameters error handler ~threshold bdu
+          in
+          (*let error = Exception.check_point
+                Exception.warn parameters error error' __POS__ Exit
+            in*)
+          let error, handler, tail =
+            mvbdu_clean_head parameters error handler bdu
+          in
+          (*let error = Exception.check_point
+                Exception.warn parameters error error'' __POS__ Exit
+            in*)
+          aux error handler tail (head :: list)
+        )
+      in
+      aux error handler bdu []
+
 
   let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
     Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu

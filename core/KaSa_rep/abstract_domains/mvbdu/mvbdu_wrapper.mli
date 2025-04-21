@@ -145,7 +145,7 @@ module type Mvbdu = sig
 
   val mvbdu_full_cartesian_decomposition : (mvbdu, mvbdu list) unary
   val mvbdu_cartesian_abstraction : (mvbdu, mvbdu list) unary
-
+  val mvbdu_cartesian_abstraction_with_threshold : (mvbdu, mvbdu list) unary_with_threshold 
   val build_association_list :
     ((key * value) list, hconsed_association_list) unary
 

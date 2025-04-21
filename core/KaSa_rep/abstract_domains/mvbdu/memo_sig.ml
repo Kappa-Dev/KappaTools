@@ -12,7 +12,7 @@
    * en Automatique.  All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'f, 'g) memoized_fun = {
+type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'f, 'g, 'h) memoized_fun = {
   f:
     Remanent_parameters_sig.parameters ->
     Exception.exceptions_caught_and_uncaught ->
@@ -22,7 +22,7 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'f, 'g) memoized_fun = {
     Exception.exceptions_caught_and_uncaught ->
     ('f, 'b, 'blist, 'rlist, 'vlist, 'a, 'g) handler ->
     'd ->
-    'a Mvbdu_sig.mvbdu ->
+    'h ->
     Exception.exceptions_caught_and_uncaught
     * ('f, 'b, 'blist, 'rlist, 'vlist, 'a, 'g) handler;
   get:
@@ -32,7 +32,7 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'f, 'g) memoized_fun = {
     'd ->
     Exception.exceptions_caught_and_uncaught
     * (('f, 'b, 'blist, 'rlist, 'vlist, 'a, 'g) handler
-      * 'a Mvbdu_sig.mvbdu option);
+      * 'h option);
 }
 
 and ('f, 'b, 'c, 'rlist, 'vlist, 'd, 'e) handler = {
@@ -61,8 +61,26 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_memoized_fun =
       Exception.exceptions_caught_and_uncaught * 'c),
     'a Mvbdu_sig.mvbdu,
     'd,
-    'e )
+    'e, 
+    'a Mvbdu_sig.mvbdu )
   memoized_fun
+
+  type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e, 'f) unary_with_threshold_memoized_fun =
+  ( 'a,
+    'b,
+    'blist,
+    'rlist,
+    'vlist,
+    'a ->
+    Exception.exceptions_caught_and_uncaught
+    * (Exception.exceptions_caught_and_uncaught ->
+      Exception.exceptions_caught_and_uncaught * 'c),
+    int * 'a Mvbdu_sig.mvbdu,
+    'd,
+    'e, 
+    'f)
+  memoized_fun
+
 
 type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) binary_memoized_fun =
   ( 'a,
@@ -76,7 +94,8 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) binary_memoized_fun =
     pair,
     'a Mvbdu_sig.mvbdu * 'a Mvbdu_sig.mvbdu,
     'd,
-    'e )
+    'e, 
+    'a Mvbdu_sig.mvbdu )
   memoized_fun
 
 type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_other_memoized_fun =
@@ -91,7 +110,8 @@ type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) unary_other_memoized_fun =
       Exception.exceptions_caught_and_uncaught * 'a Mvbdu_sig.cell),
     'd * 'a Mvbdu_sig.mvbdu,
     'c,
-    'e )
+    'e, 
+    'a Mvbdu_sig.mvbdu )
   memoized_fun
 
 type ('a, 'b, 'blist, 'rlist, 'vlist, 'c, 'd, 'e) reset = {
