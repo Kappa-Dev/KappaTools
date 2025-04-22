@@ -353,7 +353,7 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
           Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
             error ~threshold mvbdu
         in
-        let depends_on_parameters = 
+        let error, handler, depends_on_parameters = 
           let rec aux handler error pair_list = 
             match pair_list with 
             | (_,mvbdu)::tail -> 
@@ -363,8 +363,8 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
             then 
               aux handler error tail 
             else 
-              true 
-            | [] -> false 
+              error, handler, true 
+            | [] -> error, handler, false 
               in aux handler error pair_list    
             in 
         (*----------------------------------------------------*)

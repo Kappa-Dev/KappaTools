@@ -388,6 +388,30 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
       compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
         error value restriction_bdu
     in
+    let error, bdu_handler, depends_on_parameters = 
+     let rec aux bdu_handler error mvbdu_list = 
+      match mvbdu_list with 
+      | mvbdu::tail -> 
+        let error, bdu_handler, b = Ckappa_sig.mvbdu_is_true_for_guards  parameters bdu_handler error mvbdu restriction_bdu 
+      in 
+      if b
+      then 
+        aux bdu_handler error tail 
+      else 
+        error, bdu_handler, true 
+      | [] -> error, bdu_handler, false 
+        in aux bdu_handler error [parallel_bond_mvbdu;non_parallel_bond_mvbdu;any_bond_mvbdu]
+      in 
+    let error, bdu_handler, parallel_bond_mvbdu = 
+      Ckappa_sig.mvbdu_or_for_guards 
+      parameters bdu_handler error
+      parallel_bond_mvbdu any_bond_mvbdu restriction_bdu
+  in
+  let error, bdu_handler, non_parallel_bond_mvbdu = 
+  Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error
+  non_parallel_bond_mvbdu any_bond_mvbdu restriction_bdu 
+in
+
     let error, bdu_handler =
       (*for which values of the guards are all double bonds parallel?*)
       let error, bdu_handler, parallel_is_false =
@@ -403,6 +427,24 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
       else (
         match Remanent_parameters.get_backend_mode parameters with
         | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+          if depends_on_parameters 
+          then 
+            let error =
+              Site_graphs.KaSa_site_graph.print_list
+                (Remanent_parameters.get_logger parameters)
+                parameters error kappa_handler list_same
+            in
+            let error, bdu_handler =
+            Handler.print_guard_mvbdu_decompose parameters error
+              kappa_handler bdu_handler parallel_bond_mvbdu
+              restriction_bdu
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+            error, bdu_handler 
+          else 
+          begin 
           let error, bdu_handler =
             if verbose then (
               (*print hyp*)
@@ -441,6 +483,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
             Loggers.print_newline (Remanent_parameters.get_logger parameters)
           in
           error, bdu_handler
+        end 
         | Remanent_parameters_sig.Natural_language ->
           if verbose then
             if not parallel_is_false then (
@@ -495,6 +538,25 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
       else (
         match Remanent_parameters.get_backend_mode parameters with
         | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+          if depends_on_parameters 
+            then 
+            
+        let error =
+          Site_graphs.KaSa_site_graph.print_list
+            (Remanent_parameters.get_logger parameters)
+            parameters error kappa_handler list_distinct
+        in
+        let error, bdu_handler =
+          Handler.print_guard_mvbdu_decompose parameters error
+          kappa_handler bdu_handler non_parallel_bond_mvbdu restriction_bdu
+        in
+        let () =
+          Loggers.print_newline (Remanent_parameters.get_logger parameters)
+        in
+        error, bdu_handler
+
+            else 
+
           let error, bdu_handler =
             if verbose then (
               let error =
@@ -570,6 +632,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
       (* for which values of the guards can the double bonds be both parallel and non-parallel? *)
     in
     let error, bdu_handler =
+     if depends_on_parameters then error, bdu_handler else 
       let error, bdu_handler =
         if dump_any then
           if verbose then (
