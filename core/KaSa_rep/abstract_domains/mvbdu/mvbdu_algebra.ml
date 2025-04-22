@@ -314,7 +314,7 @@ let keep_head_only_with_threshold allocate memoized_fun union handler error para
         error, (handler, Some ( mvbdu))
         | Mvbdu_sig.Node precell when precell.Mvbdu_sig.variable > threshold  ->
            error, (handler, Some mvbdu)  
-        | Mvbdu_sig.Node _ ->   
+        | Mvbdu_sig.Node x ->   
           let error, (handler, b_true) =
             aux handler error x.Mvbdu_sig.branch_true
           in
