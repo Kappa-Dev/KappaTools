@@ -3207,6 +3207,13 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction parameters handler error
       handler_kappa
 
+  let print_bdu_update_map_cartesian_abstraction_with_threshold ~threshold parameters handler error
+      handler_kappa =
+    print_bdu_update_map_gen_decomposition ~sort:true ~smash:true
+      ~show_dep_with_dimmension_higher_than:1
+      (Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold ~threshold) parameters handler error
+      handler_kappa    
+
   (*****************************************************************)
   (*Print for relational properties*)
 
@@ -3304,8 +3311,9 @@ module Domain = struct
         Loggers.fprintf log
           "------------------------------------------------------------"
       in
+      let i = Ckappa_sig.int_of_guard_parameter (Handler.get_nr_guard_parameters handler_kappa) in 
       let () = Loggers.print_newline log in
-      let () = Loggers.fprintf log "* Non relational properties:" in
+      let () = Loggers.fprintf log "* Non relational properties: "  in
       let () = Loggers.print_newline log in
       let () =
         Loggers.fprintf log
@@ -3314,7 +3322,13 @@ module Domain = struct
       let () = Loggers.print_newline log in
       let og_restriction_bdu = get_restriction_mvbdu static in
       let error, handler =
-        print_bdu_update_map_cartesian_abstraction parameters handler error
+        if i = 0 then 
+          print_bdu_update_map_cartesian_abstraction parameters handler error
+          handler_kappa site_correspondence result og_restriction_bdu
+        else 
+          let nsites = Handler.get_nsites handler_kappa in
+          let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
+          print_bdu_update_map_cartesian_abstraction_with_threshold parameters handler error ~threshold 
           handler_kappa site_correspondence result og_restriction_bdu
       in
       let () = Loggers.print_newline log in

@@ -794,18 +794,17 @@ let rec print ?beginning_of_sentence:(beggining = true)
       in
       error, bdu_handler
     | Valuations_with_guards valuations ->
-      let error = Site_graphs.KaSa_site_graph.print log parameters error t in
+      (*let error = Site_graphs.KaSa_site_graph.print log parameters error t in
       let () = Loggers.fprintf log " => " in
       let should_use_bracket =
         match valuations with
         | [] | [ _ ] -> false
         | _ :: _ -> true
-      in
-      let () = if should_use_bracket then Loggers.fprintf log "[ " in
-      let error, _bool, bdu_handler =
+      in*)
+      (*let () = if should_use_bracket then Loggers.fprintf log "[ " in*)
+      let error, bdu_handler =
         List.fold_left
-          (fun (error, bool, bdu_handler) (sites, mvbdu) ->
-            let () = if bool then Loggers.fprintf log " v " in
+          (fun (error, bdu_handler) (sites, mvbdu) ->
             let error, agent_graph =
               List.fold_left
                 (fun (error, agent_graph) (site, state) ->
@@ -824,20 +823,21 @@ let rec print ?beginning_of_sentence:(beggining = true)
             let error =
               Site_graphs.KaSa_site_graph.print log parameters error agent_graph
             in
-            let error, bdu_handler, is_true =
+            (*let error, bdu_handler, is_true =
               Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
                 mvbdu restriction_bdu
-            in
-            let () = if not is_true then Loggers.fprintf log "," in
+            in*)
+            (*let () = if not is_true then Loggers.fprintf log "," in*)
             let error, bdu_handler =
               Handler.print_guard_mvbdu_decompose parameters error handler_kappa
                 bdu_handler mvbdu restriction_bdu
             in
-            error, true, bdu_handler)
-          (error, false, bdu_handler)
+            let () = Loggers.print_newline log in 
+            error, bdu_handler)
+          (error, bdu_handler)
           valuations
       in
-      let () = if should_use_bracket then Loggers.fprintf log " ]" in
+      (*let () = if should_use_bracket then Loggers.fprintf log " ]" in*)
       let () = Loggers.print_newline log in
       error, bdu_handler
     | No_known_translation list ->
