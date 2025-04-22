@@ -356,6 +356,8 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
         (*----------------------------------------------------*)
         match Remanent_parameters.get_backend_mode parameters with
         | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+          (*let () = Loggers.fprintf 
+          (Remanent_parameters.get_logger parameters) "HERE 1" in *)
           let pattern = Site_graphs.KaSa_site_graph.empty in
           let error, agent_id1, pattern =
             Site_graphs.KaSa_site_graph.add_agent parameters error kappa_handler

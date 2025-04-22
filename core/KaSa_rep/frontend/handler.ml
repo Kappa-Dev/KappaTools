@@ -702,19 +702,24 @@ let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler
   (* let () = Ckappa_sig.Views_bdu.print parameters mvbdu in *)
   let () =
     if with_comma then
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) " if "
   in
-  let nsites = get_nsites kappa_handler in
+  (*let nsites = get_nsites kappa_handler in
   let convert_variable_to_string error guard_name =
     match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
     | Ckappa_sig.Guard_p guard_name ->
       string_of_guard parameters guard_name kappa_handler error
     | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
-  in
-  let error, bdu_handler, () =
+  in*)
+  let error, bdu_handler, formula = 
+    mvbdu_to_formula 
+      parameters error kappa_handler bdu_handler mvbdu 
+  in 
+  let error = print_formula parameters error kappa_handler formula  in 
+(*  let error, bdu_handler, () =
     Ckappa_sig.Views_bdu.print_guard_mvbdu parameters bdu_handler error mvbdu
       convert_variable_to_string
-  in
+  in*)
   error, bdu_handler
 
 (*****************************************************************************)
