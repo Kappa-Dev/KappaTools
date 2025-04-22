@@ -1,6 +1,6 @@
 #!/bin/bash
 
-KASA_BINARY="./_build/install/default/bin/KaSa"
+KASA_BINARY="./bin/KaSa"
 TEMP_FILE="temp_experiment.ka"
 DEFAULT_TIMEOUT=1m
 
