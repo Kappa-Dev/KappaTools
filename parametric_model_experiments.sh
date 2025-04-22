@@ -55,7 +55,7 @@ for MODEL in "${MODELS[@]}"; do
     echo
     echo "Processing model: $MODEL"
 
-    for i in {0..30..5}; do
+    for i in {0 5 10 15 20 25 30}; do
         # If the current file contains the annotation //i for the current i, then the analysis is executed
         if grep -q "//$i" "$EXAMPLE_MODEL"; then
             # Replace "//i" with "]//i" in the input file and replace "// working_set" with "%working_set:["
