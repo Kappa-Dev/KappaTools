@@ -154,6 +154,9 @@ module type Mvbdu = sig
     (mvbdu, int, mvbdu option * mvbdu list) binary
 
   val mvbdu_full_cartesian_decomposition : (mvbdu, mvbdu list) unary
+
+  val mvbdu_full_cartesian_decomposition_with_threshold : (mvbdu, mvbdu list) unary_with_threshold 
+  
   val mvbdu_cartesian_abstraction : (mvbdu, mvbdu list) unary
   val mvbdu_cartesian_abstraction_with_threshold : (mvbdu, mvbdu list) unary_with_threshold 
   val build_association_list :

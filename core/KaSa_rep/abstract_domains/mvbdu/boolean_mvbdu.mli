@@ -217,6 +217,22 @@ val mvbdu_cartesian_decomposition_depth :
   int ->
   'c * 'b * ('d option * 'd list)
 
+val mvbdu_cartesian_decomposition_depth_with_threshold :
+  ('a -> 'b -> 'c -> threshold:int -> 'd -> 'e * 'f * 'g) ->
+  ('a -> 'f -> 'e -> 'g -> 'c * 'b * int list) ->
+  ('a -> 'b -> 'c -> int list -> 'h * 'i * 'j) ->
+  ('a -> 'i -> 'h -> threshold:int -> 'd -> 'j -> 'k * 'l * 'd) ->
+  ('a -> 'l -> 'k -> 'd -> 'j -> 'm * 'n * 'd) ->
+  ('a -> 'n -> 'm -> 'd -> 'd -> 'c * 'b * 'o) ->
+  ('o -> 'd -> bool) ->
+  'a ->
+  'b ->
+  'c ->
+  threshold:int -> 
+  'd ->
+  int ->
+  'c * 'b * ('d option * 'd list)
+
 val variables_of_mvbdu :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->

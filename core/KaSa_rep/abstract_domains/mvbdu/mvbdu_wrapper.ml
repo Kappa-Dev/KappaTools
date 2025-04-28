@@ -152,6 +152,7 @@ module type Mvbdu = sig
     (mvbdu, int, mvbdu option * mvbdu list) binary
 
   val mvbdu_full_cartesian_decomposition : (mvbdu, mvbdu list) unary
+  val mvbdu_full_cartesian_decomposition_with_threshold : (mvbdu, mvbdu list) unary_with_threshold 
   val mvbdu_cartesian_abstraction : (mvbdu, mvbdu list) unary
   val mvbdu_cartesian_abstraction_with_threshold : (mvbdu,  mvbdu list) unary_with_threshold 
   val build_association_list :
@@ -355,6 +356,7 @@ module type Internalized_mvbdu = sig
     mvbdu -> int -> mvbdu option * mvbdu list
 
   val mvbdu_full_cartesian_decomposition : mvbdu -> mvbdu list
+  
   val build_association_list : (key * value) list -> hconsed_association_list
 
   val build_sorted_association_list :
@@ -927,6 +929,11 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
       mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal
       parameters handler error bdu int
 
+  let mvbdu_cartesian_decomposition_depth_with_threshold  parameters handler error ~threshold bdu int =
+        Boolean_mvbdu.mvbdu_cartesian_decomposition_depth_with_threshold  variables_list_of_mvbdu_with_threshold
+          extensional_of_variables_list build_sorted_variables_list
+          mvbdu_project_keep_only_with_threshold mvbdu_project_abstract_away mvbdu_and equal
+          parameters handler error ~threshold bdu int    
   let mvbdu_full_cartesian_decomposition parameters handler error bdu =
     let error, handler, l =
       variables_list_of_mvbdu parameters handler error bdu
@@ -950,6 +957,32 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     match bdu_opt with
     | None -> error, handler, list
     | Some bdu -> error, handler, bdu :: list
+
+    let 
+    mvbdu_full_cartesian_decomposition_with_threshold
+   parameters handler error ~threshold bdu =
+      let error, handler, l =
+        variables_list_of_mvbdu_with_threshold parameters handler error ~threshold bdu
+      in
+      (*let error = Exception.check_point
+            Exception.warn parameters error error' __POS__ Exit
+        in*)
+      let error, handler, list =
+        extensional_of_variables_list parameters handler error l
+      in
+      (*let error = Exception.check_point
+            Exception.warn parameters error error'' __POS__ Exit
+        in*)
+      let size = List.length list in
+      let error, handler, (bdu_opt, list) =
+        mvbdu_cartesian_decomposition_depth_with_threshold  parameters handler error ~threshold bdu (size / 2)
+      in
+      (*let error = Exception.check_point
+            Exception.warn parameters error error_3 __POS__ Exit
+        in*)
+      match bdu_opt with
+      | None -> error, handler, list
+      | Some bdu -> error, handler, bdu :: list
 
   let mvbdu_to_formula parameters handler error mvbdu = 
     lift1__ __POS__ Boolean_mvbdu.to_formula parameters handler error mvbdu 
