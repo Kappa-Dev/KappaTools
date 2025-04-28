@@ -67,7 +67,7 @@ module type Mvbdu = sig
     Remanent_parameters_sig.parameters ->
     handler ->
     Exception.exceptions_caught_and_uncaught ->
-    threshold:int -> 
+    threshold:int ->
     'input1 ->
     'input2 ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
@@ -145,7 +145,9 @@ module type Mvbdu = sig
 
   val mvbdu_rename : (mvbdu, hconsed_renaming_list, mvbdu) binary
   val mvbdu_project_keep_only : (mvbdu, hconsed_variables_list, mvbdu) binary
-  val mvbdu_project_keep_only_with_threshold : (mvbdu, hconsed_variables_list, mvbdu) binary_with_threshold 
+
+  val mvbdu_project_keep_only_with_threshold :
+    (mvbdu, hconsed_variables_list, mvbdu) binary_with_threshold
 
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
@@ -155,10 +157,14 @@ module type Mvbdu = sig
 
   val mvbdu_full_cartesian_decomposition : (mvbdu, mvbdu list) unary
 
-  val mvbdu_full_cartesian_decomposition_with_threshold : (mvbdu, mvbdu list) unary_with_threshold 
-  
+  val mvbdu_full_cartesian_decomposition_with_threshold :
+    (mvbdu, mvbdu list) unary_with_threshold
+
   val mvbdu_cartesian_abstraction : (mvbdu, mvbdu list) unary
-  val mvbdu_cartesian_abstraction_with_threshold : (mvbdu, mvbdu list) unary_with_threshold 
+
+  val mvbdu_cartesian_abstraction_with_threshold :
+    (mvbdu, mvbdu list) unary_with_threshold
+
   val build_association_list :
     ((key * value) list, hconsed_association_list) unary
 
@@ -219,8 +225,7 @@ module type Mvbdu = sig
     (hconsed_range_list, (key * (value option * value option)) list) unary
 
   val extensional_of_mvbdu : (mvbdu, (key * value) list list) unary
-
-  val mvbdu_to_formula : (mvbdu, key Logical_formulae.formula) unary 
+  val mvbdu_to_formula : (mvbdu, key Logical_formulae.formula) unary
 
   val parametric_conditions_of_mvbdu :
     (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
@@ -235,8 +240,8 @@ module type Mvbdu = sig
 
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
 
-  val variables_list_of_mvbdu_with_threshold : (mvbdu, hconsed_variables_list) unary_with_threshold
-
+  val variables_list_of_mvbdu_with_threshold :
+    (mvbdu, hconsed_variables_list) unary_with_threshold
 
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 
@@ -410,7 +415,6 @@ module type Internalized_mvbdu = sig
 
   val extensional_of_mvbdu : mvbdu -> (key * value) list list
   val variables_list_of_mvbdu : mvbdu -> hconsed_variables_list
-  
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 
   val print_association_list :
@@ -421,7 +425,6 @@ module type Internalized_mvbdu = sig
 
   val hash_of_association_list : hconsed_association_list -> int
   val hash_of_variables_list : hconsed_variables_list -> int
-
   val mvbdu_to_formula : mvbdu -> int Logical_formulae.formula
 end
 

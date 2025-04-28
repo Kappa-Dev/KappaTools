@@ -443,10 +443,12 @@ module Domain = struct
                   in
                   let bdu_handler = get_mvbdu_handler dynamic in
                   let error, bdu_handler, f =
-                    Handler.mvbdu_to_formula parameters error
-                      kappa_handler bdu_handler mvbdu (*restriction_bdu*)
+                    Handler.mvbdu_to_formula parameters error kappa_handler
+                      bdu_handler mvbdu (*restriction_bdu*)
                   in
-                  let error = Handler.print_formula parameters error kappa_handler f in 
+                  let error =
+                    Handler.print_formula parameters error kappa_handler f
+                  in
                   let dynamic = set_mvbdu_handler bdu_handler dynamic in
                   let () =
                     Loggers.fprintf

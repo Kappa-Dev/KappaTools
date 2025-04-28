@@ -53,12 +53,12 @@ type memo_tables = {
   boolean_mvbdu_nsnd: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_clean_head: bool Mvbdu_sig.mvbdu Hash_1.t;
   boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
-  boolean_mvbdu_keep_head_only_with_threshold: (bool Mvbdu_sig.mvbdu) Hash_2.t;
+  boolean_mvbdu_keep_head_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine_range: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
-  boolean_mvbdu_project_keep_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_3.t; 
+  boolean_mvbdu_project_keep_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_3.t;
   boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_length_variables_list: int Hash_1.t;
   boolean_mvbdu_merge_variables_lists: unit List_sig.list Hash_2.t;
@@ -75,7 +75,7 @@ type memo_tables = {
   boolean_mvbdu_extensional_description_of_mvbdu_with_threshold:
     ((int * int) list * bool Mvbdu_sig.mvbdu) list Hash_2.t;
   boolean_mvbdu_printed_guard: (string * bool) Hash_1.t;
-  boolean_mvbdu_to_formula: (int Logical_formulae.formula) Hash_1.t; 
+  boolean_mvbdu_to_formula: int Logical_formulae.formula Hash_1.t;
 }
 
 type unary_memoized_fun
@@ -145,14 +145,14 @@ val print_guard_mvbdu :
   Exception_without_parameter.exceptions_caught_and_uncaught * string) ->
   Exception_without_parameter.exceptions_caught_and_uncaught * handler * unit
 
-val to_formula : 
-Remanent_parameters_sig.parameters ->
+val to_formula :
+  Remanent_parameters_sig.parameters ->
   handler ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   bool Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (handler * (Mvbdu_sig.variable Logical_formulae.formula))
-  
+  * (handler * Mvbdu_sig.variable Logical_formulae.formula)
+
 val extensional_description_of_range_list :
   'g ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -228,7 +228,7 @@ val mvbdu_cartesian_decomposition_depth_with_threshold :
   'a ->
   'b ->
   'c ->
-  threshold:int -> 
+  threshold:int ->
   'd ->
   int ->
   'c * 'b * ('d option * 'd list)
@@ -241,11 +241,11 @@ val variables_of_mvbdu :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * unit List_sig.list option)
 
-  val variables_of_mvbdu_with_threshold :
+val variables_of_mvbdu_with_threshold :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
-  threshold:int -> 
+  threshold:int ->
   'c Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * unit List_sig.list option)
@@ -270,19 +270,30 @@ val project_keep_only :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
 
-  val project_keep_only_with_threshold :
+val project_keep_only_with_threshold :
   Remanent_parameters_sig.parameters ->
-    Exception_without_parameter.exceptions_caught_and_uncaught ->
-    (memo_tables, mvbdu_dic, association_list_dic, range_list_dic,
-     variables_list_dic, bool, 'c)
-    Memo_sig.handler ->
-    threshold:int ->
-    bool Mvbdu_sig.mvbdu ->
-    'k List_sig.list ->
-    Exception_without_parameter.exceptions_caught_and_uncaught *
-    ((memo_tables, mvbdu_dic, association_list_dic, range_list_dic,
-      variables_list_dic, bool, 'c)
-     Memo_sig.handler * bool Mvbdu_sig.mvbdu option)
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ( memo_tables,
+    mvbdu_dic,
+    association_list_dic,
+    range_list_dic,
+    variables_list_dic,
+    bool,
+    'c )
+  Memo_sig.handler ->
+  threshold:int ->
+  bool Mvbdu_sig.mvbdu ->
+  'k List_sig.list ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (( memo_tables,
+       mvbdu_dic,
+       association_list_dic,
+       range_list_dic,
+       variables_list_dic,
+       bool,
+       'c )
+     Memo_sig.handler
+    * bool Mvbdu_sig.mvbdu option)
 
 val memo_keep_head_only :
   ( bool,
@@ -295,7 +306,7 @@ val memo_keep_head_only :
     'b )
   Memo_sig.unary_memoized_fun
 
-  val memo_keep_head_only_with_threshold :
+val memo_keep_head_only_with_threshold :
   ( bool,
     mvbdu_dic,
     association_list_dic,
@@ -303,11 +314,10 @@ val memo_keep_head_only :
     variables_list_dic,
     'a,
     memo_tables,
-    'b, 
+    'b,
     bool Mvbdu_sig.mvbdu )
   Memo_sig.unary_with_threshold_memoized_fun
 
-  
 val redefine :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -691,10 +701,10 @@ val keep_head_only_with_threshold :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
-  threshold:int -> 
+  threshold:int ->
   bool Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (handler * (bool Mvbdu_sig.mvbdu) option)
+  * (handler * bool Mvbdu_sig.mvbdu option)
 
 val merge_variables_lists :
   Remanent_parameters_sig.parameters ->

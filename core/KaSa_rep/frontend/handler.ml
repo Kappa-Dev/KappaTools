@@ -682,9 +682,9 @@ let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
   | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
 
 let mvbdu_to_formula parameters error _kappa_handler bdu_handler mvbdu =
-    Ckappa_sig.Views_bdu.mvbdu_to_formula parameters bdu_handler error mvbdu
+  Ckappa_sig.Views_bdu.mvbdu_to_formula parameters bdu_handler error mvbdu
 
-let print_formula parameters error kappa_handler formula  =
+let print_formula parameters error kappa_handler formula =
   let nsites = get_nsites kappa_handler in
   let convert_variable_to_string error guard_name =
     match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
@@ -693,42 +693,46 @@ let print_formula parameters error kappa_handler formula  =
     | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
   in
   let error =
-    Logical_formulae.print parameters error convert_variable_to_string formula 
+    Logical_formulae.print parameters error convert_variable_to_string formula
   in
   error
 
-let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu _restriction_bdu =
+let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu
+    _restriction_bdu =
   (* let () = Ckappa_sig.Views_bdu.print parameters mvbdu in *)
   (*let () =
-    if with_comma then
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) " if "
-  in*)
+      if with_comma then
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) " if "
+    in*)
   (*let nsites = get_nsites kappa_handler in
-  let convert_variable_to_string error guard_name =
-    match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
-    | Ckappa_sig.Guard_p guard_name ->
-      string_of_guard parameters guard_name kappa_handler error
-    | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
-  in*)
-  let error, bdu_handler, formula = 
-    mvbdu_to_formula 
-      parameters error kappa_handler bdu_handler mvbdu 
-  in 
-  match formula with 
-  | Logical_formulae.True -> 
-    error, bdu_handler
-  | Logical_formulae.False -> 
+    let convert_variable_to_string error guard_name =
+      match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
+      | Ckappa_sig.Guard_p guard_name ->
+        string_of_guard parameters guard_name kappa_handler error
+      | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
+    in*)
+  let error, bdu_handler, formula =
+    mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu
+  in
+  match formula with
+  | Logical_formulae.True -> error, bdu_handler
+  | Logical_formulae.False ->
     Exception.warn parameters error __POS__ Exit bdu_handler
-  | ( Logical_formulae.OR _ 
-  | Logical_formulae.P _| Logical_formulae.NOT _| Logical_formulae.IMPLY (_, _)| Logical_formulae.AND (_, _))-> 
-  let () =  Loggers.fprintf (Remanent_parameters.get_logger parameters) " [ if " in 
-  let error = print_formula parameters error kappa_handler formula  in
-  let () =   Loggers.fprintf (Remanent_parameters.get_logger parameters) " ] " in 
-(*  let error, bdu_handler, () =
-    Ckappa_sig.Views_bdu.print_guard_mvbdu parameters bdu_handler error mvbdu
-      convert_variable_to_string
-  in*)
-  error, bdu_handler
+  | Logical_formulae.OR _ | Logical_formulae.P _ | Logical_formulae.NOT _
+  | Logical_formulae.IMPLY (_, _)
+  | Logical_formulae.AND (_, _) ->
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) " [ if "
+    in
+    let error = print_formula parameters error kappa_handler formula in
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) " ] "
+    in
+    (* let error, bdu_handler, () =
+         Ckappa_sig.Views_bdu.print_guard_mvbdu parameters bdu_handler error mvbdu
+           convert_variable_to_string
+       in*)
+    error, bdu_handler
 
 (*****************************************************************************)
 

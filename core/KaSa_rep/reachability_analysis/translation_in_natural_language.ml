@@ -57,227 +57,40 @@ let non_relational parameters handler error mvbdu =
   in
   error, handler, Ckappa_sig.Views_bdu.equal mvbdu recomposition
 
-  let non_relational_with_threshold parameters handler error ~threshold mvbdu =
-    let error, handler, list =
-      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold  parameters handler error ~threshold 
-        mvbdu
-    in
-    let error, handler, mvbdu_true =
-      Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
-    in
-    let error, handler, recomposition =
-      List.fold_left
-        (fun (error, handler, conjunct) term ->
-          Ckappa_sig.Views_bdu.mvbdu_and parameters handler error conjunct term)
-        (error, handler, mvbdu_true)
-        list
-    in
-    error, handler, Ckappa_sig.Views_bdu.equal mvbdu recomposition  
-
-let try_partitioning parameters handler error handler_kappa
-    (rename_site_inverse : rename_sites) mvbdu =
-  let i = Ckappa_sig.int_of_guard_parameter (Handler.get_nr_guard_parameters handler_kappa) in 
-  if i = 0 then 
-  begin 
+let non_relational_with_threshold parameters handler error ~threshold mvbdu =
+  let error, handler, list =
+    Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold parameters
+      handler error ~threshold mvbdu
+  in
   let error, handler, mvbdu_true =
     Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
   in
-  let error, handler, var_hconsed_list =
-    Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters handler error mvbdu
+  let error, handler, recomposition =
+    List.fold_left
+      (fun (error, handler, conjunct) term ->
+        Ckappa_sig.Views_bdu.mvbdu_and parameters handler error conjunct term)
+      (error, handler, mvbdu_true)
+      list
   in
-  let error, handler, var_list =
-    Ckappa_sig.Views_bdu.extensional_of_variables_list parameters handler error
-      var_hconsed_list
+  error, handler, Ckappa_sig.Views_bdu.equal mvbdu recomposition
+
+let try_partitioning parameters handler error handler_kappa
+    (rename_site_inverse : rename_sites) mvbdu =
+  let i =
+    Ckappa_sig.int_of_guard_parameter
+      (Handler.get_nr_guard_parameters handler_kappa)
   in
-  let rec aux l (error, handler) =
-    match l with
-    | [] -> error, handler, None
-    | head :: tail ->
-      let error', handler, singleton =
-        Ckappa_sig.Views_bdu.build_variables_list parameters handler error
-          [ head ]
-      in
-      let error =
-        Exception.check_point Exception.warn parameters error error' __POS__
-          Exit
-      in
-      let error_2, handler, mvbdu_ref =
-        Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters handler
-          error mvbdu singleton
-      in
-      let error =
-        Exception.check_point Exception.warn parameters error error_2 __POS__
-          Exit
-      in
-      let error_3, handler, proj_in =
-        Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameters handler error
-          mvbdu singleton
-      in
-      let error =
-        Exception.check_point Exception.warn parameters error error_3 __POS__
-          Exit
-      in
-      let error_4, handler, list_asso =
-        Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler error
-          proj_in
-      in
-      let error =
-        Exception.check_point Exception.warn parameters error error_4 __POS__
-          Exit
-      in
-      let error_5, range =
-        let rec aux2 list (error, output) =
-          match list with
-          | [] -> error, output
-          | [ (x, i) ] :: tail when x = head -> aux2 tail (error, i :: output)
-          | _ :: tail ->
-            (*TODO: bdu_ex*)
-            aux2 tail (Exception.warn parameters error __POS__ Exit output)
-        in
-        aux2 list_asso (error, [])
-      in
-      let error =
-        Exception.check_point Exception.warn parameters error error_5 __POS__
-          Exit
-      in
-      let rec aux3 list (error, handler, output) =
-        match list with
-        | [] -> error, handler, Some output
-        | h :: t ->
-          let error_6, handler, select =
-            Ckappa_sig.Views_bdu.build_association_list parameters handler error
-              [ head, h ]
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error_6
-              __POS__ Exit
-          in
-          let error_7, handler, mvbdu_case =
-            Ckappa_sig.Views_bdu.mvbdu_redefine parameters handler error
-              mvbdu_true select
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error_7
-              __POS__ Exit
-          in
-          let error_8, handler, case =
-            Ckappa_sig.Views_bdu.mvbdu_and parameters handler error mvbdu_case
-              mvbdu
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error_8
-              __POS__ Exit
-          in
-          let error_9, handler, bool =
-            non_relational parameters handler error case
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error_9
-              __POS__ Exit
-          in
-          if bool then (
-            let error_10, handler, away =
-              Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters
-                handler error case singleton
-            in
-            let error =
-              Exception.check_point Exception.warn parameters error error_10
-                __POS__ Exit
-            in
-            if Ckappa_sig.Views_bdu.equal away mvbdu_ref then
-              aux3 t (error, handler, output)
-            else (
-              let error_11, handler, list =
-                Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction parameters
-                  handler error away
-              in
-              let error =
-                Exception.check_point Exception.warn parameters error error_11
-                  __POS__ Exit
-              in
-              let error, handler, list =
-                List.fold_left
-                  (fun (error, handler, list) elt ->
-                    let error, handler, mvbdu_test =
-                      Ckappa_sig.Views_bdu.mvbdu_and parameters handler error
-                        mvbdu_ref elt
-                    in
-                    if Ckappa_sig.Views_bdu.equal mvbdu_test mvbdu_ref then
-                      error, handler, list
-                    else (
-                      let error_12, handler, elt =
-                        Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters
-                          handler error elt
-                      in
-                      let error =
-                        Exception.check_point Exception.warn parameters error
-                          error_12 __POS__ Exit
-                      in
-                      let error, var_list_opt =
-                        match elt with
-                        | [] | [] :: _ | ((_, _) :: _ :: _) :: _ -> error, None
-                        | [ (a, b) ] :: q ->
-                          let rec aux4 q output =
-                            match q with
-                            | [] -> error, Some (a, output)
-                            | [ (c, d) ] :: q when c = a -> aux4 q (d :: output)
-                            | _ -> error, None
-                          in
-                          aux4 q [ b ]
-                      in
-                      match var_list_opt with
-                      | None ->
-                        let error, () =
-                          Exception.warn parameters error __POS__ Exit ()
-                        in
-                        error, handler, list
-                      | Some (a, l) ->
-                        let error', a' =
-                          rename_site_inverse parameters error a
-                        in
-                        let error =
-                          Exception.check_point Exception.warn parameters error
-                            error' __POS__ Exit
-                        in
-                        error, handler, Range (a', l) :: list
-                    ))
-                  (error, handler, []) (List.rev list)
-              in
-              aux3 t (error, handler, (h, list) :: output)
-            )
-          ) else
-            error, handler, None
-      in
-      let error_13, handler, output = aux3 range (error, handler, []) in
-      let error =
-        Exception.check_point Exception.warn parameters error error_13 __POS__
-          Exit
-      in
-      (match output with
-      | None -> aux tail (error, handler)
-      | Some l ->
-        let error_14, head = rename_site_inverse parameters error head in
-        let error =
-          Exception.check_point Exception.warn parameters error error_14 __POS__
-            Exit
-        in
-        error, handler, Some (head, l))
-  in
-  aux var_list (error, handler)
-end 
-else 
-  begin 
-    let nsites = Handler.get_nsites handler_kappa in
-    let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
+  if i = 0 then (
     let error, handler, mvbdu_true =
       Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
     in
     let error, handler, var_hconsed_list =
-      Ckappa_sig.Views_bdu.variables_list_of_mvbdu_with_threshold parameters handler error ~threshold mvbdu
+      Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters handler error
+        mvbdu
     in
     let error, handler, var_list =
-      Ckappa_sig.Views_bdu.extensional_of_variables_list parameters handler error
-        var_hconsed_list
+      Ckappa_sig.Views_bdu.extensional_of_variables_list parameters handler
+        error var_hconsed_list
     in
     let rec aux l (error, handler) =
       match l with
@@ -300,7 +113,7 @@ else
             Exit
         in
         let error_3, handler, proj_in =
-          Ckappa_sig.Views_bdu.mvbdu_project_keep_only_with_threshold  parameters handler error ~threshold 
+          Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameters handler error
             mvbdu singleton
         in
         let error =
@@ -308,7 +121,7 @@ else
             Exit
         in
         let error_4, handler, list_asso =
-          Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler error ~threshold 
+          Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters handler error
             proj_in
         in
         let error =
@@ -319,7 +132,7 @@ else
           let rec aux2 list (error, output) =
             match list with
             | [] -> error, output
-            | ([ (x, i) ], m) :: tail when x = head -> aux2 tail (error, (i,m) :: output)
+            | [ (x, i) ] :: tail when x = head -> aux2 tail (error, i :: output)
             | _ :: tail ->
               (*TODO: bdu_ex*)
               aux2 tail (Exception.warn parameters error __POS__ Exit output)
@@ -333,9 +146,10 @@ else
         let rec aux3 list (error, handler, output) =
           match list with
           | [] -> error, handler, Some output
-          | (h,m) :: t ->
+          | h :: t ->
             let error_6, handler, select =
-              Ckappa_sig.Views_bdu.build_association_list parameters handler error
+              Ckappa_sig.Views_bdu.build_association_list parameters handler
+                error
                 [ head, h ]
             in
             let error =
@@ -350,25 +164,218 @@ else
               Exception.check_point Exception.warn parameters error error_7
                 __POS__ Exit
             in
-            let error_8, handler, mvbdu_case_with_param = 
-              Ckappa_sig.Views_bdu.mvbdu_and 
-              parameters handler error 
-              mvbdu_case m 
-            in 
+            let error_8, handler, case =
+              Ckappa_sig.Views_bdu.mvbdu_and parameters handler error mvbdu_case
+                mvbdu
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error_8
+                __POS__ Exit
+            in
+            let error_9, handler, bool =
+              non_relational parameters handler error case
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error_9
+                __POS__ Exit
+            in
+            if bool then (
+              let error_10, handler, away =
+                Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters
+                  handler error case singleton
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error_10
+                  __POS__ Exit
+              in
+              if Ckappa_sig.Views_bdu.equal away mvbdu_ref then
+                aux3 t (error, handler, output)
+              else (
+                let error_11, handler, list =
+                  Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction parameters
+                    handler error away
+                in
+                let error =
+                  Exception.check_point Exception.warn parameters error error_11
+                    __POS__ Exit
+                in
+                let error, handler, list =
+                  List.fold_left
+                    (fun (error, handler, list) elt ->
+                      let error, handler, mvbdu_test =
+                        Ckappa_sig.Views_bdu.mvbdu_and parameters handler error
+                          mvbdu_ref elt
+                      in
+                      if Ckappa_sig.Views_bdu.equal mvbdu_test mvbdu_ref then
+                        error, handler, list
+                      else (
+                        let error_12, handler, elt =
+                          Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters
+                            handler error elt
+                        in
+                        let error =
+                          Exception.check_point Exception.warn parameters error
+                            error_12 __POS__ Exit
+                        in
+                        let error, var_list_opt =
+                          match elt with
+                          | [] | [] :: _ | ((_, _) :: _ :: _) :: _ ->
+                            error, None
+                          | [ (a, b) ] :: q ->
+                            let rec aux4 q output =
+                              match q with
+                              | [] -> error, Some (a, output)
+                              | [ (c, d) ] :: q when c = a ->
+                                aux4 q (d :: output)
+                              | _ -> error, None
+                            in
+                            aux4 q [ b ]
+                        in
+                        match var_list_opt with
+                        | None ->
+                          let error, () =
+                            Exception.warn parameters error __POS__ Exit ()
+                          in
+                          error, handler, list
+                        | Some (a, l) ->
+                          let error', a' =
+                            rename_site_inverse parameters error a
+                          in
+                          let error =
+                            Exception.check_point Exception.warn parameters
+                              error error' __POS__ Exit
+                          in
+                          error, handler, Range (a', l) :: list
+                      ))
+                    (error, handler, []) (List.rev list)
+                in
+                aux3 t (error, handler, (h, list) :: output)
+              )
+            ) else
+              error, handler, None
+        in
+        let error_13, handler, output = aux3 range (error, handler, []) in
+        let error =
+          Exception.check_point Exception.warn parameters error error_13 __POS__
+            Exit
+        in
+        (match output with
+        | None -> aux tail (error, handler)
+        | Some l ->
+          let error_14, head = rename_site_inverse parameters error head in
+          let error =
+            Exception.check_point Exception.warn parameters error error_14
+              __POS__ Exit
+          in
+          error, handler, Some (head, l))
+    in
+    aux var_list (error, handler)
+  ) else (
+    let nsites = Handler.get_nsites handler_kappa in
+    let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
+    let error, handler, mvbdu_true =
+      Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
+    in
+    let error, handler, var_hconsed_list =
+      Ckappa_sig.Views_bdu.variables_list_of_mvbdu_with_threshold parameters
+        handler error ~threshold mvbdu
+    in
+    let error, handler, var_list =
+      Ckappa_sig.Views_bdu.extensional_of_variables_list parameters handler
+        error var_hconsed_list
+    in
+    let rec aux l (error, handler) =
+      match l with
+      | [] -> error, handler, None
+      | head :: tail ->
+        let error', handler, singleton =
+          Ckappa_sig.Views_bdu.build_variables_list parameters handler error
+            [ head ]
+        in
+        let error =
+          Exception.check_point Exception.warn parameters error error' __POS__
+            Exit
+        in
+        let error_2, handler, mvbdu_ref =
+          Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters handler
+            error mvbdu singleton
+        in
+        let error =
+          Exception.check_point Exception.warn parameters error error_2 __POS__
+            Exit
+        in
+        let error_3, handler, proj_in =
+          Ckappa_sig.Views_bdu.mvbdu_project_keep_only_with_threshold parameters
+            handler error ~threshold mvbdu singleton
+        in
+        let error =
+          Exception.check_point Exception.warn parameters error error_3 __POS__
+            Exit
+        in
+        let error_4, handler, list_asso =
+          Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
+            error ~threshold proj_in
+        in
+        let error =
+          Exception.check_point Exception.warn parameters error error_4 __POS__
+            Exit
+        in
+        let error_5, range =
+          let rec aux2 list (error, output) =
+            match list with
+            | [] -> error, output
+            | ([ (x, i) ], m) :: tail when x = head ->
+              aux2 tail (error, (i, m) :: output)
+            | _ :: tail ->
+              (*TODO: bdu_ex*)
+              aux2 tail (Exception.warn parameters error __POS__ Exit output)
+          in
+          aux2 list_asso (error, [])
+        in
+        let error =
+          Exception.check_point Exception.warn parameters error error_5 __POS__
+            Exit
+        in
+        let rec aux3 list (error, handler, output) =
+          match list with
+          | [] -> error, handler, Some output
+          | (h, m) :: t ->
+            let error_6, handler, select =
+              Ckappa_sig.Views_bdu.build_association_list parameters handler
+                error
+                [ head, h ]
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error_6
+                __POS__ Exit
+            in
+            let error_7, handler, mvbdu_case =
+              Ckappa_sig.Views_bdu.mvbdu_redefine parameters handler error
+                mvbdu_true select
+            in
+            let error =
+              Exception.check_point Exception.warn parameters error error_7
+                __POS__ Exit
+            in
+            let error_8, handler, mvbdu_case_with_param =
+              Ckappa_sig.Views_bdu.mvbdu_and parameters handler error mvbdu_case
+                m
+            in
             let error =
               Exception.check_point Exception.warn parameters error error_8
                 __POS__ Exit
             in
             let error_9, handler, case_with_param =
-              Ckappa_sig.Views_bdu.mvbdu_and parameters handler error mvbdu_case_with_param
-                mvbdu
+              Ckappa_sig.Views_bdu.mvbdu_and parameters handler error
+                mvbdu_case_with_param mvbdu
             in
             let error =
               Exception.check_point Exception.warn parameters error error_9
                 __POS__ Exit
             in
             let error_10, handler, bool =
-              non_relational_with_threshold  parameters handler error ~threshold case_with_param 
+              non_relational_with_threshold parameters handler error ~threshold
+                case_with_param
             in
             let error =
               Exception.check_point Exception.warn parameters error error_10
@@ -387,8 +394,9 @@ else
                 aux3 t (error, handler, output)
               else (
                 let error_12, handler, list =
-                  Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold  parameters
-                    handler error ~threshold away
+                  Ckappa_sig.Views_bdu
+                  .mvbdu_cartesian_abstraction_with_threshold parameters handler
+                    error ~threshold away
                 in
                 let error =
                   Exception.check_point Exception.warn parameters error error_12
@@ -414,12 +422,14 @@ else
                         in
                         let error, var_list_opt =
                           match elt with
-                          | [] | [] :: _ | ((_, _) :: _ :: _) :: _ -> error, None
+                          | [] | [] :: _ | ((_, _) :: _ :: _) :: _ ->
+                            error, None
                           | [ (a, b) ] :: q ->
                             let rec aux4 q output =
                               match q with
                               | [] -> error, Some (a, output)
-                              | [ (c, d) ] :: q when c = a -> aux4 q (d :: output)
+                              | [ (c, d) ] :: q when c = a ->
+                                aux4 q (d :: output)
                               | _ -> error, None
                             in
                             aux4 q [ b ]
@@ -435,8 +445,8 @@ else
                             rename_site_inverse parameters error a
                           in
                           let error =
-                            Exception.check_point Exception.warn parameters error
-                              error' __POS__ Exit
+                            Exception.check_point Exception.warn parameters
+                              error error' __POS__ Exit
                           in
                           error, handler, Range (a', l) :: list
                       ))
@@ -457,18 +467,18 @@ else
         | Some l ->
           let error_15, head = rename_site_inverse parameters error head in
           let error =
-            Exception.check_point Exception.warn parameters error error_15 __POS__
-              Exit
+            Exception.check_point Exception.warn parameters error error_15
+              __POS__ Exit
           in
           error, handler, Some (head, l))
     in
     aux var_list (error, handler)
-  end 
+  )
 
 (****************************************************************************)
 
-let translate parameters handler error kappa_handler (rename_site_inverse : rename_sites)
-    mvbdu nsites restriction_bdu =
+let translate parameters handler error kappa_handler
+    (rename_site_inverse : rename_sites) mvbdu nsites restriction_bdu =
   let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
   let error, handler, list =
     Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler error
@@ -606,14 +616,16 @@ let translate parameters handler error kappa_handler (rename_site_inverse : rena
             (handler, No_known_translation list)
       | _ ->
         let error, handler, output =
-          try_partitioning parameters handler error kappa_handler rename_site_inverse mvbdu
+          try_partitioning parameters handler error kappa_handler
+            rename_site_inverse mvbdu
         in
         (match output with
         | None -> error, (handler, No_known_translation list)
         | Some (var, l) -> error, (handler, Partition (var, l))))
     | _ ->
       let error, handler, output =
-        try_partitioning parameters handler error kappa_handler rename_site_inverse mvbdu
+        try_partitioning parameters handler error kappa_handler
+          rename_site_inverse mvbdu
       in
       (match output with
       | None -> error, (handler, No_known_translation list)
@@ -1015,12 +1027,12 @@ let rec print ?beginning_of_sentence:(beggining = true)
       error, bdu_handler
     | Valuations_with_guards valuations ->
       (*let error = Site_graphs.KaSa_site_graph.print log parameters error t in
-      let () = Loggers.fprintf log " => " in
-      let should_use_bracket =
-        match valuations with
-        | [] | [ _ ] -> false
-        | _ :: _ -> true
-      in*)
+        let () = Loggers.fprintf log " => " in
+        let should_use_bracket =
+          match valuations with
+          | [] | [ _ ] -> false
+          | _ :: _ -> true
+        in*)
       (*let () = if should_use_bracket then Loggers.fprintf log "[ " in*)
       let error, bdu_handler =
         List.fold_left
@@ -1044,18 +1056,17 @@ let rec print ?beginning_of_sentence:(beggining = true)
               Site_graphs.KaSa_site_graph.print log parameters error agent_graph
             in
             (*let error, bdu_handler, is_true =
-              Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-                mvbdu restriction_bdu
-            in*)
+                Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+                  mvbdu restriction_bdu
+              in*)
             (*let () = if not is_true then Loggers.fprintf log "," in*)
             let error, bdu_handler =
               Handler.print_guard_mvbdu_decompose parameters error handler_kappa
                 bdu_handler mvbdu restriction_bdu
             in
-            let () = Loggers.print_newline log in 
+            let () = Loggers.print_newline log in
             error, bdu_handler)
-          (error, bdu_handler)
-          valuations
+          (error, bdu_handler) valuations
       in
       (*let () = if should_use_bracket then Loggers.fprintf log " ]" in*)
       let () = Loggers.print_newline log in
