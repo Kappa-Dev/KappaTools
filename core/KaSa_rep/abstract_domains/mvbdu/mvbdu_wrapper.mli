@@ -63,6 +63,15 @@ module type Mvbdu = sig
     'input2 ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
+  type ('input1, 'input2, 'output) binary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int -> 
+    'input1 ->
+    'input2 ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
   type ('input1, 'input2, 'input3, 'output) ternary =
     Remanent_parameters_sig.parameters ->
     handler ->
@@ -136,6 +145,7 @@ module type Mvbdu = sig
 
   val mvbdu_rename : (mvbdu, hconsed_renaming_list, mvbdu) binary
   val mvbdu_project_keep_only : (mvbdu, hconsed_variables_list, mvbdu) binary
+  val mvbdu_project_keep_only_with_threshold : (mvbdu, hconsed_variables_list, mvbdu) binary_with_threshold 
 
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
@@ -221,6 +231,10 @@ module type Mvbdu = sig
     binary
 
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
+
+  val variables_list_of_mvbdu_with_threshold : (mvbdu, hconsed_variables_list) unary_with_threshold
+
+
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 
   val print_association_list :
@@ -393,6 +407,7 @@ module type Internalized_mvbdu = sig
 
   val extensional_of_mvbdu : mvbdu -> (key * value) list list
   val variables_list_of_mvbdu : mvbdu -> hconsed_variables_list
+  
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 
   val print_association_list :

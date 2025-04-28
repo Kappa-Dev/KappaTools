@@ -32,6 +32,7 @@ module D_Variables_list_skeleton :
 module Hash_key : Set.OrderedType
 module Hash_1 : Int_storage.Storage
 module Hash_2 : Int_storage.Storage
+module Hash_3 : Int_storage.Storage
 
 type memo_tables = {
   boolean_mvbdu_identity: bool Mvbdu_sig.mvbdu Hash_1.t;
@@ -57,6 +58,7 @@ type memo_tables = {
   boolean_mvbdu_redefine_range: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
+  boolean_mvbdu_project_keep_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_3.t; 
   boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_length_variables_list: int Hash_1.t;
   boolean_mvbdu_merge_variables_lists: unit List_sig.list Hash_2.t;
@@ -67,6 +69,7 @@ type memo_tables = {
   boolean_mvbdu_extensional_description_of_range_list:
     (int * (int option * int option)) list Hash_1.t;
   boolean_mvbdu_variables_of_mvbdu: unit List_sig.list Hash_1.t;
+  boolean_mvbdu_variables_of_mvbdu_with_threshold: unit List_sig.list Hash_2.t;
   boolean_mvbdu_extensional_description_of_mvbdu:
     (int * int) list list Hash_1.t;
   boolean_mvbdu_extensional_description_of_mvbdu_with_threshold:
@@ -222,6 +225,15 @@ val variables_of_mvbdu :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * unit List_sig.list option)
 
+  val variables_of_mvbdu_with_threshold :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  handler ->
+  threshold:int -> 
+  'c Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (handler * unit List_sig.list option)
+
 val project_abstract_away :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -241,6 +253,20 @@ val project_keep_only :
   'b List_sig.list ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
+
+  val project_keep_only_with_threshold :
+  Remanent_parameters_sig.parameters ->
+    Exception_without_parameter.exceptions_caught_and_uncaught ->
+    (memo_tables, mvbdu_dic, association_list_dic, range_list_dic,
+     variables_list_dic, bool, 'c)
+    Memo_sig.handler ->
+    threshold:int ->
+    bool Mvbdu_sig.mvbdu ->
+    'k List_sig.list ->
+    Exception_without_parameter.exceptions_caught_and_uncaught *
+    ((memo_tables, mvbdu_dic, association_list_dic, range_list_dic,
+      variables_list_dic, bool, 'c)
+     Memo_sig.handler * bool Mvbdu_sig.mvbdu option)
 
 val memo_keep_head_only :
   ( bool,

@@ -3056,7 +3056,7 @@ module Domain = struct
                   in
                   let error, (handler, translation) =
                     Translation_in_natural_language.translate parameters handler
-                      error
+                      error handler_kappa 
                       (fun _ e i -> e, i)
                       mvbdu nsites restriction_bdu
                   in
@@ -3140,7 +3140,7 @@ module Domain = struct
                   in
                   let error, (handler, translation) =
                     Translation_in_natural_language.translate parameters handler
-                      error rename_site mvbdu nsites restriction_bdu
+                      error handler_kappa rename_site mvbdu nsites restriction_bdu
                   in
                   (*----------------------------------------------------*)
                   ( error,

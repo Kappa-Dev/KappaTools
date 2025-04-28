@@ -76,6 +76,8 @@ module D_Variables_list_skeleton :
 
 module Hash_1 = Int_storage.Nearly_inf_Imperatif (*site_type*)
 module Hash_2 = Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+module Hash_3 = Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
+
 
 type memo_unary = bool Mvbdu_sig.mvbdu Hash_1.t
 
@@ -103,6 +105,7 @@ type memo_tables = {
   boolean_mvbdu_redefine_range: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
+  boolean_mvbdu_project_keep_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_3.t;
   boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_length_variables_list: int Hash_1.t;
   boolean_mvbdu_merge_variables_lists: unit List_sig.list Hash_2.t;
@@ -113,6 +116,7 @@ type memo_tables = {
   boolean_mvbdu_extensional_description_of_range_list:
     (int * (int option * int option)) list Hash_1.t;
   boolean_mvbdu_variables_of_mvbdu: unit List_sig.list Hash_1.t;
+  boolean_mvbdu_variables_of_mvbdu_with_threshold: unit List_sig.list Hash_2.t;
   boolean_mvbdu_extensional_description_of_mvbdu:
     (int * int) list list Hash_1.t;
   boolean_mvbdu_extensional_description_of_mvbdu_with_threshold:
@@ -329,6 +333,7 @@ let init_data parameters error =
   let error, mvbdu_redefine = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_redefine_range = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_project_keep_only = Hash_2.create parameters error (0, 0) in
+  let error, mvbdu_project_keep_only_with_threshold = Hash_3.create parameters error (0,(0,0)) in 
   let error, mvbdu_project_abstract_away =
     Hash_2.create parameters error (0, 0)
   in
@@ -343,6 +348,7 @@ let init_data parameters error =
     Hash_1.create parameters error 0
   in
   let error, mvbdu_variables_of = Hash_1.create parameters error 0 in
+  let error, mvbdu_variables_of_with_threshold = Hash_2.create parameters error (0,0) in
   let error, mvbdu_extensional_description_of_mvbdu =
     Hash_1.create parameters error 0
   in
@@ -377,6 +383,7 @@ let init_data parameters error =
       boolean_mvbdu_redefine_range = mvbdu_redefine_range;
       boolean_mvbdu_monotonicaly_rename = mvbdu_rename;
       boolean_mvbdu_project_keep_only = mvbdu_project_keep_only;
+      boolean_mvbdu_project_keep_only_with_threshold = mvbdu_project_keep_only_with_threshold; 
       boolean_mvbdu_project_abstract_away = mvbdu_project_abstract_away;
       boolean_mvbdu_merge_variables_lists = mvbdu_merge;
       boolean_mvbdu_length_variables_list = mvbdu_length;
@@ -388,6 +395,7 @@ let init_data parameters error =
       boolean_mvbdu_extensional_description_of_range_list =
         mvbdu_extensional_range_list;
       boolean_mvbdu_variables_of_mvbdu = mvbdu_variables_of;
+      boolean_mvbdu_variables_of_mvbdu_with_threshold = mvbdu_variables_of_with_threshold; 
       boolean_mvbdu_extensional_description_of_mvbdu =
         mvbdu_extensional_description_of_mvbdu;
       boolean_mvbdu_extensional_description_of_mvbdu_with_threshold =
@@ -1045,6 +1053,46 @@ let gen_bin_mvbdu_list f get set parameters error handler mvbdu_input list_input
     (mvbdu_allocate parameters)
     memoized_fun error handler mvbdu_input list_input
 
+    let gen_bin_mvbdu_list_with_threshold 
+    (f:'x -> 'y -> Exception_without_parameter.exceptions_caught_and_uncaught ->
+      Remanent_parameters_sig.parameters ->
+      (memo_tables, mvbdu_dic, association_list_dic, range_list_dic,
+       variables_list_dic, bool, 'a)
+      Memo_sig.handler ->
+      threshold:int ->
+      bool Mvbdu_sig.mvbdu ->
+      'b List_sig.list ->
+      Exception_without_parameter.exceptions_caught_and_uncaught *
+      ((memo_tables, mvbdu_dic, association_list_dic, range_list_dic,
+        variables_list_dic, bool, 'a)
+       Memo_sig.handler * bool Mvbdu_sig.mvbdu option))
+     get set parameters error handler ~threshold mvbdu_input list_input
+    =
+  let memoized_fun =
+    Mvbdu_algebra.recursive_memoize_with_threshold 
+      (fun _parameters -> reset_handler)
+      get set
+      (fun parameters error handler (threshold,(mvbdu, list)) d ->
+        let a, b =
+          Hash_3.unsafe_get parameters error
+            (threshold, (Mvbdu_core.id_of_mvbdu mvbdu, List_core.id_of_list list))
+            d
+        in
+        a, (handler, b))
+      (fun parameters error _handler (threshold,(mvbdu, list)) ->
+        Hash_3.set parameters error
+          (threshold, (Mvbdu_core.id_of_mvbdu mvbdu, List_core.id_of_list list)))
+  in
+  f
+    (mvbdu_allocate parameters)
+    memoized_fun 
+    (error:Exception_without_parameter.exceptions_caught_and_uncaught) 
+    parameters 
+    (handler:(memo_tables, mvbdu_dic, association_list_dic, range_list_dic,
+    variables_list_dic, bool, 'a)
+   Memo_sig.handler)
+    ~threshold mvbdu_input list_input
+
 let redefine parameters error handler mvbdu_input list_input =
   gen_bin_mvbdu_list Mvbdu_algebra.redefine
     (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine)
@@ -1088,6 +1136,38 @@ let project_keep_only parameters error handler mvbdu_input list_input =
           { h.Memo_sig.data with boolean_mvbdu_project_keep_only = x };
       })
     parameters error handler mvbdu_input list_input
+
+    let project_keep_only_with_threshold parameters error handler ~threshold mvbdu_input list_input =
+      gen_bin_mvbdu_list_with_threshold 
+        (fun (a:Exception_without_parameter.exceptions_caught_and_uncaught ->
+          (bool Mvbdu_sig.cell -> bool Mvbdu_sig.cell -> int) ->
+          D_mvbdu_skeleton.value ->
+          bool Mvbdu_sig.cell ->
+          (int -> bool Mvbdu_sig.mvbdu) ->
+          ('a, mvbdu_dic, association_list_dic, range_list_dic,
+           variables_list_dic, 'b, 'c)
+          Memo_sig.handler ->
+          Exception_without_parameter.exceptions_caught_and_uncaught *
+          (int * bool Mvbdu_sig.cell * bool Mvbdu_sig.mvbdu *
+           ('a, mvbdu_dic, association_list_dic, range_list_dic,
+            variables_list_dic, 'b, 'c)
+           Memo_sig.handler)
+          option) 
+          (b:('aa, 'dd, 'ee, 'ff, 'gg,
+          (bool, mvbdu_dic, association_list_dic, range_list_dic,
+           variables_list_dic, ('h, bool) Mvbdu_sig.premvbdu, memo_tables,
+           'i)
+          Memo_sig.reset, int * ('j Mvbdu_sig.mvbdu * 'k List_sig.list), 'l,
+          'm, 'n)
+         Memo_sig.memoized_fun) -> Mvbdu_algebra.project_keep_only_with_threshold a b  boolean_mvbdu_true)
+        (fun x -> x.Memo_sig.data.boolean_mvbdu_project_keep_only_with_threshold)
+        (fun x h ->
+          {
+            h with
+            Memo_sig.data =
+              { h.Memo_sig.data with boolean_mvbdu_project_keep_only_with_threshold = x };
+          })
+        parameters error handler ~threshold mvbdu_input list_input
 
 let project_abstract_away parameters error handler mvbdu_input list_input =
   gen_bin_mvbdu_list Mvbdu_algebra.project_abstract_away
@@ -1323,6 +1403,78 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
           },
           Some output ) )
     | None -> Exception.warn parameters error __POS__ Exit (handler, None))
+
+    let rec variables_of_mvbdu_with_threshold parameters error handler ~threshold mvbdu =
+      match
+        Hash_2.unsafe_get parameters error (threshold,mvbdu.Mvbdu_sig.id)
+          handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu_with_threshold 
+      with
+      | error, Some output -> error, (handler, Some output)
+      | error, None ->
+        let error, (handler, output) =
+          match mvbdu.Mvbdu_sig.value with
+          | Mvbdu_sig.Leaf _ ->
+            let error, (handler, list) =
+              List_algebra.build_reversed_sorted_list
+                (variables_list_allocate parameters)
+                parameters error handler []
+            in
+            error, (handler, Some list)
+          | Mvbdu_sig.Node a ->
+            if a.Mvbdu_sig.variable <= threshold then 
+            let error, (handler, list_false) =
+              variables_of_mvbdu_with_threshold parameters error handler ~threshold a.Mvbdu_sig.branch_false
+            in
+            let error, (handler, list_true) =
+              variables_of_mvbdu_with_threshold  parameters error handler ~threshold a.Mvbdu_sig.branch_true
+            in
+            let error, (handler, singleton) =
+              List_algebra.build_reversed_sorted_list
+                (variables_list_allocate parameters)
+                parameters error handler
+                [ a.Mvbdu_sig.variable, () ]
+            in
+            (match list_false, list_true with
+            | Some list_f, Some list_t ->
+              let error, (handler, list_sibblings) =
+                merge_variables_lists parameters error handler list_f list_t
+              in
+              let error, (handler, output) =
+                match list_sibblings with
+                | Some list_s ->
+                  merge_variables_lists parameters error handler singleton list_s
+                | None ->
+                  Exception.warn parameters error __POS__ Exit (handler, None)
+              in
+              error, (handler, output)
+            | None, _ | _, None ->
+              Exception.warn parameters error __POS__ Exit (handler, None))
+            else 
+              let error, (handler, list) =
+              List_algebra.build_reversed_sorted_list
+                (variables_list_allocate parameters)
+                parameters error handler []
+            in
+            error, (handler, Some list)
+            in
+        (match output with
+        | Some output ->
+          let error, memo =
+            Hash_2.set parameters error (threshold, mvbdu.Mvbdu_sig.id) output
+              handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu_with_threshold
+          in
+          ( error,
+            ( {
+                handler with
+                Memo_sig.data =
+                  {
+                    handler.Memo_sig.data with
+                    boolean_mvbdu_variables_of_mvbdu_with_threshold = memo;
+                  };
+              },
+              Some output ) )
+        | None -> Exception.warn parameters error __POS__ Exit (handler, None))
+
 
 let mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu
     extensional_of_variables_list build_sorted_variables_list

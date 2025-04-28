@@ -61,6 +61,15 @@ module type Mvbdu = sig
     'input2 ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
+    type ('input1, 'input2, 'output) binary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int -> 
+    'input1 ->
+    'input2 ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
   type ('input1, 'input2, 'input3, 'output) ternary =
     Remanent_parameters_sig.parameters ->
     handler ->
@@ -134,6 +143,7 @@ module type Mvbdu = sig
 
   val mvbdu_rename : (mvbdu, hconsed_renaming_list, mvbdu) binary
   val mvbdu_project_keep_only : (mvbdu, hconsed_variables_list, mvbdu) binary
+  val mvbdu_project_keep_only_with_threshold : (mvbdu, hconsed_variables_list, mvbdu) binary_with_threshold
 
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
@@ -219,6 +229,8 @@ module type Mvbdu = sig
     binary
 
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
+  val variables_list_of_mvbdu_with_threshold : (mvbdu, hconsed_variables_list) unary_with_threshold 
+
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 
   val print_association_list :
@@ -457,6 +469,15 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     'input2 ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
+  type ('input1, 'input2, 'output) binary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int -> 
+    'input1 ->
+    'input2 ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
   type ('input1, 'input2, 'input3, 'output) ternary =
     Remanent_parameters_sig.parameters ->
     handler ->
@@ -618,6 +639,14 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
       let error, a = Exception.warn parameters error pos Exit list in
       error, handler, (a : unit List_sig.list)
 
+      let lift1four_with_threshold buildlist pos f parameters handler error ~threshold a =
+        match f parameters error handler ~threshold a with
+        | error, (handler, Some a) -> error, handler, a
+        | error, (handler, None) ->
+          let error, handler, list = buildlist parameters handler error [] in
+          let error, a = Exception.warn parameters error pos Exit list in
+          error, handler, (a : unit List_sig.list)
+
   let lift1five pos f parameters handler error a =
     match f parameters error parameters handler a with
     | error, (handler, Some a) -> error, handler, a
@@ -649,6 +678,13 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     | error, (handler, None) ->
       let error, a = Exception.warn parameters error pos Exit a in
       error, handler, a
+
+  let lift2ter_with_threshold pos ~threshold:int f parameters handler error a b =
+        match f parameters error handler ~threshold:int a b with
+        | error, (handler, Some a) -> error, handler, a
+        | error, (handler, None) ->
+          let error, a = Exception.warn parameters error pos Exit a in
+          error, handler, a    
 
   let lift2four pos f parameters handler error a b =
     match f parameters error handler a b with
@@ -695,6 +731,8 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let mvbdu_redefine_range = lift2bis __POS__ Boolean_mvbdu.redefine_range
   let mvbdu_rename = lift2bis __POS__ Boolean_mvbdu.monotonicaly_rename
   let mvbdu_project_keep_only = lift2ter __POS__ Boolean_mvbdu.project_keep_only
+  let mvbdu_project_keep_only_with_threshold parameters handler error ~threshold = lift2ter_with_threshold __POS__ Boolean_mvbdu.project_keep_only_with_threshold 
+  parameters handler error ~threshold
 
   let mvbdu_project_abstract_away =
     lift2ter __POS__ Boolean_mvbdu.project_abstract_away
@@ -781,6 +819,10 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let variables_list_of_mvbdu parameter handler error mvbdu =
     lift1four build_sorted_variables_list __POS__
       Boolean_mvbdu.variables_of_mvbdu parameter handler error mvbdu
+
+  let variables_list_of_mvbdu_with_threshold parameter handler error ~threshold mvbdu =
+        lift1four_with_threshold  build_sorted_variables_list __POS__
+          Boolean_mvbdu.variables_of_mvbdu_with_threshold parameter handler error ~threshold mvbdu
 
   let extensional_of_association_list parameters handler error l =
     lift1five __POS__ Boolean_mvbdu.extensional_description_of_association_list

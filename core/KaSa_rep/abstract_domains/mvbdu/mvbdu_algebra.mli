@@ -338,6 +338,52 @@ val project_keep_only :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
+  val project_keep_only_with_threshold :
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('a -> 'a -> int) ->
+  ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
+  'c Mvbdu_sig.cell ->
+  (int -> 'c Mvbdu_sig.mvbdu) ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (int
+    * 'c Mvbdu_sig.cell
+    * 'c Mvbdu_sig.mvbdu
+    * ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler)
+    option) ->
+  ( 'c,
+    'e,
+    'f,
+    'g,
+    'h,
+    ( 'c,
+      'e,
+      'f,
+      'g,
+      'h,
+      (('c Mvbdu_sig.mvbdu, 'c) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu,
+      'd,
+      'i )
+    Memo_sig.reset,
+    (int * ('c Mvbdu_sig.mvbdu * 'j List_sig.list)),
+    'd,
+    'i, 'c Mvbdu_sig.mvbdu )
+  Memo_sig.memoized_fun ->
+  (Remanent_parameters_sig.parameters ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  threshold:int -> 
+  'c Mvbdu_sig.mvbdu ->
+  'j List_sig.list ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
+
 val project_abstract_away :
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
@@ -474,6 +520,30 @@ val not_recursive_not_memoize_unary :
   ('c, 'h, 'i, 'j, 'k, 'd, 'a, 'g, 'l, 'c Mvbdu_sig.mvbdu) Memo_sig.memoized_fun
 
 val recursive_memoize :
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  'a) ->
+  (('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler -> 'i) ->
+  ('i ->
+  ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler ->
+  ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler) ->
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler ->
+  'j ->
+  'i ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler * 'k option)) ->
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler ->
+  'j ->
+  'k ->
+  'i ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'i) ->
+  ('g, 'c, 'd, 'e, 'f, 'a, 'j, 'b, 'h, 'k) Memo_sig.memoized_fun
+
+  val recursive_memoize_with_threshold :
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'a) ->

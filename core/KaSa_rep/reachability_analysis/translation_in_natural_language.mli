@@ -46,6 +46,7 @@ val translate :
   Remanent_parameters_sig.parameters ->
   Ckappa_sig.Views_bdu.handler ->
   Exception.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->   
   rename_sites ->
   Ckappa_sig.Views_bdu.mvbdu ->
   Ckappa_sig.c_site_name ->
