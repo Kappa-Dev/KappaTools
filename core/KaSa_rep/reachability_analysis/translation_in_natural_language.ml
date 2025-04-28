@@ -1037,9 +1037,9 @@ let rec print ?beginning_of_sentence:(beggining = true)
       let error, bdu_handler =
         List.fold_left
           (fun (error, bdu_handler) (sites, mvbdu) ->
-            let error, agent_graph =
+            let error, agent_graph, n =
               List.fold_left
-                (fun (error, agent_graph) (site, state) ->
+                (fun (error, agent_graph, n) (site, state) ->
                   let error, agent_graph =
                     Site_graphs.KaSa_site_graph.add_site_or_guard parameters
                       error handler_kappa agent_id site agent_graph
@@ -1048,10 +1048,17 @@ let rec print ?beginning_of_sentence:(beggining = true)
                     Site_graphs.KaSa_site_graph.add_state_or_guard parameters
                       error handler_kappa agent_id site state agent_graph
                   in
-
-                  error, agent_graph)
-                (error, t) sites
+                  let n = 
+                    match Ckappa_sig.site_or_guard_p_of_mvbdu_var site nsites 
+                  with 
+                  | Site _ -> n+1 
+                  | Guard_p _ -> n 
+                in 
+                  error, agent_graph, n)
+                (error, t, 0) sites
             in
+            if n >= dim_min
+            then 
             let error =
               Site_graphs.KaSa_site_graph.print log parameters error agent_graph
             in
@@ -1064,8 +1071,8 @@ let rec print ?beginning_of_sentence:(beggining = true)
               Handler.print_guard_mvbdu_decompose parameters error handler_kappa
                 bdu_handler mvbdu restriction_bdu
             in
-            let () = Loggers.print_newline log in
-            error, bdu_handler)
+            let () = Loggers.print_newline log  in 
+            error, bdu_handler else error, bdu_handler)
           (error, bdu_handler) valuations
       in
       (*let () = if should_use_bracket then Loggers.fprintf log " ]" in*)
