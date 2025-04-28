@@ -3487,6 +3487,19 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition parameters handler
       error handler_kappa
 
+  let print_bdu_update_map_cartesian_decomposition_with_threshold parameters handler error
+      handler_kappa =
+    print_bdu_update_map_gen_decomposition_with_threshold  ~smash:false 
+      ~show_dep_with_dimmension_higher_than:
+        (if
+           Remanent_parameters
+           .get_hide_one_d_relations_from_cartesian_decomposition parameters
+         then
+           2
+         else
+           1)
+      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition_with_threshold parameters handler
+      error handler_kappa
   (*****************************************************************)
   let print_separating_edges parameters handler error compil _handler_kappa list
       =
@@ -3603,7 +3616,13 @@ module Domain = struct
       in
       let () = Loggers.print_newline log in
       let error, handler =
-        print_bdu_update_map_cartesian_decomposition ~sort:false parameters
+      if i = 0 then
+        print_bdu_update_map_cartesian_decomposition ~sort:true parameters
+          handler error handler_kappa site_correspondence result
+          og_restriction_bdu
+
+      else 
+        print_bdu_update_map_cartesian_decomposition_with_threshold ~sort:false parameters
           handler error handler_kappa site_correspondence result
           og_restriction_bdu
       in
