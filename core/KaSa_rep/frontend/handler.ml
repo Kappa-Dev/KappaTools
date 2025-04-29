@@ -681,8 +681,10 @@ let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
       handler_kappa agent_name s
   | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
 
-let mvbdu_to_formula parameters error _kappa_handler bdu_handler mvbdu =
-  Ckappa_sig.Views_bdu.mvbdu_to_formula parameters bdu_handler error mvbdu
+let mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu =
+  let nr = get_nr_guard_parameters kappa_handler in 
+  let b = Ckappa_sig.int_of_guard_parameter nr < 12 in 
+  Ckappa_sig.Views_bdu.mvbdu_to_formula ~cartesian_decomposition:b parameters bdu_handler error mvbdu
 
 let print_formula parameters error kappa_handler formula =
   let nsites = get_nsites kappa_handler in
@@ -711,6 +713,7 @@ let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu
         string_of_guard parameters guard_name kappa_handler error
       | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
     in*)
+
   let error, bdu_handler, formula =
     mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu
   in

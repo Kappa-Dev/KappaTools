@@ -42,8 +42,25 @@ let rec simplify f =
     | OR (y, z), x when op x y -> AND (x, z)
     | x, OR (z, y) when op x y -> AND (x, z)
     | OR (z, y), x when op x y -> AND (x, z)
+   (* | OR (AND(a,b),c), OR(d,e) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR (AND(b,a),c), OR(d,e) when op c d && b = e-> simplify (AND(b,OR(c,a)))
+    | OR (c,AND(a,b)), OR(d,e) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR (c,AND(b,a)), OR(d,e) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR(d,e), OR (AND(a,b),c) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR(d,e),OR (AND(b,a),c) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR(d,e),OR (c,AND(a,b)) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR(d,e),OR (c,AND(b,a)) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR (AND(a,b),c), OR(e,d) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR (AND(b,a),c), OR(e,d) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR (c,AND(a,b)), OR(e,d) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR (c,AND(b,a)), OR(e,d) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR(e,d), OR (AND(a,b),c) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR(e,d),OR (AND(b,a),c) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR(e,d),OR (c,AND(a,b)) when op c d && b = e -> simplify (AND(b,OR(c,a)))
+    | OR(e,d),OR (c,AND(b,a)) when op c d && b = e -> simplify (AND(b,OR(c,a)))*)
     | ( (OR _ | AND _ | NOT _ | IMPLY _ | P _),
         (OR _ | AND _ | NOT _ | IMPLY _ | P _) ) ->
+        
       AND (x, y))
   | True | False | P _ -> f
 
