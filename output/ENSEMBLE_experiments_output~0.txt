@@ -1,0 +1,30 @@
+
+Runtime with 5 rules in the working set:
+
+real	0m0.798s
+user	0m0.358s
+sys	0m0.037s
+
+Runtime with 10 rules in the working set:
+
+real	0m1.048s
+user	0m0.947s
+sys	0m0.093s
+
+Runtime with 15 rules in the working set:
+
+real	0m1.342s
+user	0m1.207s
+sys	0m0.127s
+
+Runtime with 20 rules in the working set:
+
+real	0m1.705s
+user	0m1.529s
+sys	0m0.166s
+
+Runtime with 25 rules in the working set:
+
+real	0m3.022s
+user	0m2.670s
+sys	0m0.346s
