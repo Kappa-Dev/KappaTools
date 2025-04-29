@@ -57,23 +57,23 @@ let rec print parameter error string_of formula =
     error
   | NOT x ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "~" in
-    print_arg parameter error string_of x
+    print_arg parameter error string_of False x
   | OR (x1, x2) ->
-    let error = print_arg parameter error string_of x1 in
+    let error = print_arg parameter error string_of (OR (P (),P ())) x1 in
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameter) ".or."
     in
-    print_arg parameter error string_of x2
+    print_arg parameter error string_of (OR (P (),P ())) x2
   | AND (x1, x2) ->
-    let error = print_arg parameter error string_of x1 in
+    let error = print_arg parameter error string_of (AND(P (),P())) x1 in
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameter) ".and."
     in
-    print_arg parameter error string_of x2
+    print_arg parameter error string_of (AND(P (),P ())) x2
   | IMPLY (x1, x2) ->
-    let error = print_arg parameter error string_of x1 in
+    let error = print_arg parameter error string_of False x1 in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "=>" in
-    print_arg parameter error string_of x2
+    print_arg parameter error string_of False x2
   | True ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ".T." in
     error
@@ -81,10 +81,12 @@ let rec print parameter error string_of formula =
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ".F." in
     error
 
-and print_arg parameter error string_of formula =
-  match formula with
-  | P _ | True | False -> print parameter error string_of formula
-  | NOT _ | OR (_, _) | AND (_, _) | IMPLY (_, _) ->
+and print_arg parameter error string_of scheme formula =
+  match (formula, scheme)  with
+  | (P _ | True | False), _  -> print parameter error string_of formula
+  | OR(_,_), OR(_,_) -> print parameter error string_of formula
+  | AND(_,_), AND(_,_) -> print parameter error string_of formula
+  | (NOT _ | OR (_, _) | AND (_, _) | IMPLY (_, _)), _ ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "(" in
     let error = print parameter error string_of formula in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
