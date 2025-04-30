@@ -42,12 +42,6 @@ for MODEL in "${MODELS[@]}"; do
     done
     OUTPUT_FILE="$OUTPUT_FILE~$i.txt"
     #generate a new output file name for the stdout output of the analysis
-    STDOUT_OUTPUT_FILE="output/${MODEL}_analysis_output"
-    i=0
-    while [ -e "$STDOUT_OUTPUT_FILE~$i.txt" ]; do
-        i=$((i + 1))
-    done
-    STDOUT_OUTPUT_FILE="$STDOUT_OUTPUT_FILE~$i.txt"
 
     # Clear the output file
     > "$OUTPUT_FILE"
@@ -55,9 +49,18 @@ for MODEL in "${MODELS[@]}"; do
     echo
     echo "Processing model: $MODEL"
 
-    for i in {0 5 10 15 20 25 30}; do
+    for i in {0 5 10 15 20 25 30 35}; do
         # If the current file contains the annotation //i for the current i, then the analysis is executed
         if grep -q "//$i" "$EXAMPLE_MODEL"; then
+
+          STDOUT_OUTPUT_FILE="output/${MODEL}_analysis_output_$i"
+          j=0
+          while [ -e "$STDOUT_OUTPUT_FILE~$j.txt" ]; do
+              j=$((j + 1))
+          done
+          STDOUT_OUTPUT_FILE="$STDOUT_OUTPUT_FILE~$j.txt"
+
+
             # Replace "//i" with "]//i" in the input file and replace "// working_set" with "%working_set:["
             sed "s|// working_set|%working_set:[|g" "$EXAMPLE_MODEL" | sed "s|//$i|]|g" > "$TEMP_FILE"
             echo >> "$OUTPUT_FILE"

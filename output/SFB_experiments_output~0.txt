@@ -1,31 +1,36 @@
 
 Runtime with 5 rules in the working set:
 
-real	0m0.221s
-user	0m0.181s
-sys	0m0.016s
+real	0m0.122s
+user	0m0.110s
+sys	0m0.010s
 
 Runtime with 10 rules in the working set:
 
-real	0m0.296s
-user	0m0.272s
-sys	0m0.020s
+real	0m0.147s
+user	0m0.134s
+sys	0m0.011s
 
 Runtime with 15 rules in the working set:
 
-real	0m0.424s
-user	0m0.391s
-sys	0m0.027s
+real	0m0.184s
+user	0m0.167s
+sys	0m0.014s
 
 Runtime with 20 rules in the working set:
 
-real	0m2.494s
-user	0m2.214s
-sys	0m0.272s
+real	0m0.354s
+user	0m0.318s
+sys	0m0.030s
 
 Runtime with 25 rules in the working set:
-parametric_model_experiments.sh: line 58:  4327 Killed: 9               timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE"
 
-real	3m31.078s
-user	0m54.036s
-sys	0m57.828s
+real	0m0.568s
+user	0m0.504s
+sys	0m0.062s
+
+Runtime with 30 rules in the working set:
+
+real	0m0.811s
+user	0m0.714s
+sys	0m0.094s
