@@ -54,7 +54,7 @@
     %var: 'k3' 'c3'*'rF'
     %var: 'k4' 'c4'*'rF'
 // working_set
-//0
+//00//
     gTetR(lac1[.],lac2[.]) , pLacI(tet[.]) <-> gTetR(lac1[1],lac2[.]),pLacI(tet[1])        @'k0', 'k1'
     gTetR(lac2[.],lac1[.]) , pLacI(tet[.]) <-> gTetR(lac2[1],lac1[.]),pLacI(tet[1])        @'k0', 'k1'
 
@@ -63,7 +63,7 @@
     gTetR(lac2[_],lac1[.]) , pLacI(tet[.]) <-> gTetR(lac2[_],lac1[1]),pLacI(tet[1])    @'k0', 'k2'
 
     gTetR(lac1[.],lac2[.]),. -> gTetR(lac1[.],lac2[.]) , mTetR() @'k3'
-//5
+//05//
     gTetR(lac1[_]),. -> gTetR(lac1[_]) , mTetR() @'k4'
 
     gTetR(lac2[_]),. -> gTetR(lac2[_]) , mTetR() @'k4'
@@ -72,7 +72,7 @@
 
     mTetR() , Null() -> .,Null()                                           @'c6'{0}
     pTetR(cI[.]) , Null() -> .,Null()                                         @'c7'{0}
-//10
+//10//
 
     gCI(tet1[.],tet2[.]) , pTetR(cI[.]) <-> gCI(tet1[1],tet2[.]),pTetR(cI[1]) @'l0', 'l1'
 
@@ -82,7 +82,7 @@
 
     gCI(tet2[_],tet1[.]) , pTetR(cI[.]) <-> gCI(tet2[_],tet1[1]),pTetR(cI[1])          @'l0', 'l2'
     gCI(tet1[.],tet2[.]),. -> gCI(tet1[.],tet2[.]) ,mCI()                                 @'l3'
-//15
+//15//
     gCI(tet1[_]),. -> gCI(tet1[_]) , mCI()                                     @'l4'
     gCI(tet2[_]),. -> gCI(tet2[_]) , mCI()                                     @'l4'
 
@@ -90,7 +90,7 @@ mCI(),. -> mCI() , pCI(lac[.])                                            @'c5'/
 
 mCI() , Null() -> .,Null()                                             @'c6'{0}
 pCI(lac[.]) , Null() -> .,Null()                                          @'c7'{0}
-//20
+//20//
 gLacI(cI1[.],cI2[.]) , pCI(lac[.]) <-> gLacI(cI1[1],cI2[.]),pCI(lac[1])                 @'m0','m1'
 
 gLacI(cI2[.],cI1[.]) , pCI(lac[.]) <-> gLacI(cI2[1],cI1[.]),pCI(lac[1])                 @'m0','m1'
@@ -100,7 +100,7 @@ gLacI(cI1[_],cI2[.]) , pCI(lac[.]) <-> gLacI(cI1[_],cI2[1]),pCI(lac[1])         
 gLacI(cI2[_],cI1[.]) , pCI(lac[.]) <-> gLacI(cI2[_],cI1[1]),pCI(lac[1])            @'m0','m2'
 
 gLacI(cI1[.],cI2[.]),. -> gLacI(cI1[.],cI2[.]) , mLacI() @ 'm3'
-//25
+//25//
     gLacI(cI1[_]),. -> gLacI(cI1[_]), mLacI() @'m4'
 
     gLacI(cI2[_]),. -> gLacI(cI2[_]) , mLacI() @'m4'
@@ -108,4 +108,4 @@ gLacI(cI1[.],cI2[.]),. -> gLacI(cI1[.],cI2[.]) , mLacI() @ 'm3'
     mLacI(),. -> mLacI() , pLacI(tet[.])                                      @'c5'/'rF'*'pF'
     mLacI() , Null() -> .,Null()                                           @'c6'{0}
     pLacI(tet[.]) , Null() -> .,Null()                                        @'c7'{0}
-//30
+//30//

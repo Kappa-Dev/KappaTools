@@ -49,7 +49,7 @@ for MODEL in "${MODELS[@]}"; do
     echo
     echo "Processing model: $MODEL"
 
-    for i in {0 5 10 15 20 25 30 35}; do
+    for i in {00 05 10 15 20 25 30 40 42 50 60 75 76 77 78 79 80}; do
         # If the current file contains the annotation //i for the current i, then the analysis is executed
         if grep -q "//$i" "$EXAMPLE_MODEL"; then
 
@@ -62,7 +62,7 @@ for MODEL in "${MODELS[@]}"; do
 
 
             # Replace "//i" with "]//i" in the input file and replace "// working_set" with "%working_set:["
-            sed "s|// working_set|%working_set:[|g" "$EXAMPLE_MODEL" | sed "s|//$i|]|g" > "$TEMP_FILE"
+            sed "s|// working_set|%working_set:[|g" "$EXAMPLE_MODEL" | sed "s|//$i//|]|g" > "$TEMP_FILE"
             echo >> "$OUTPUT_FILE"
             echo "Runtime with $i rules in the working set:" >> "$OUTPUT_FILE"
             { time timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"

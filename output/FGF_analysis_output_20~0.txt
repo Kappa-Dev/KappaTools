@@ -1,0 +1,580 @@
+Kappa Static Analyzer (v4.1.3.1-175-g514ee1742) (without Tk interface)
+Analysis launched at 2025/04/30 12:55:53 (GMT+2) on MP983-PRO
+Parsing temp_experiment.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "temp_experiment.ka", line 131, characters 0-150: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19.
+rule File "temp_experiment.ka", line 125, characters 0-148: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19.
+rule File "temp_experiment.ka", line 103, characters 0-73: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19.
+rule File "temp_experiment.ka", line 96, characters 0-66: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17.
+rule File "temp_experiment.ka", line 95, characters 0-76: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-15.and.@rule-16.and.@rule-17.
+rule File "temp_experiment.ka", line 94, characters 0-76: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-14.and.@rule-16.and.@rule-17.
+rule File "temp_experiment.ka", line 93, characters 0-76: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-13.and.@rule-16.and.@rule-17.
+rule File "temp_experiment.ka", line 92, characters 0-76: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12.and.@rule-16.and.@rule-17.
+rule File "temp_experiment.ka", line 90, characters 0-76: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-11.and.@rule-16.and.@rule-17.
+rule File "temp_experiment.ka", line 89, characters 0-76: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.
+rule File "temp_experiment.ka", line 83, characters 0-66: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12.
+rule File "temp_experiment.ka", line 82, characters 0-66: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12.
+rule File "temp_experiment.ka", line 80, characters 0-64: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19.
+rule a (File "temp_experiment.ka", line 29, characters 0-56:) could be applied if @rule-0.
+rule File "temp_experiment.ka", line 30, characters 0-52: could be applied if @rule-0.and.@rule-1.
+rule File "temp_experiment.ka", line 34, characters 0-68: could be applied if @rule-0.and.@rule-2.
+rule File "temp_experiment.ka", line 35, characters 0-68: could be applied if @rule-0.and.@rule-3.
+rule File "temp_experiment.ka", line 41, characters 0-66: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.
+rule File "temp_experiment.ka", line 48, characters 0-64: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5.
+rule File "temp_experiment.ka", line 49, characters 0-64: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5.and.@rule-6.
+rule File "temp_experiment.ka", line 53, characters 0-73: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5.and.@rule-7.
+rule File "temp_experiment.ka", line 57, characters 0-54: could be applied if @rule-8.
+rule File "temp_experiment.ka", line 58, characters 0-54: could be applied if @rule-8.and.@rule-9.
+rule File "temp_experiment.ka", line 64, characters 0-102: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.
+rule File "temp_experiment.ka", line 65, characters 0-102: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-11.
+rule File "temp_experiment.ka", line 66, characters 0-102: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12.
+rule File "temp_experiment.ka", line 67, characters 0-102: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-13.
+rule File "temp_experiment.ka", line 68, characters 0-102: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-14.
+rule File "temp_experiment.ka", line 70, characters 0-102: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-15.
+rule File "temp_experiment.ka", line 71, characters 0-102: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.
+rule File "temp_experiment.ka", line 75, characters 0-66: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17.
+rule File "temp_experiment.ka", line 76, characters 0-66: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17.and.@rule-18.
+rule File "temp_experiment.ka", line 78, characters 0-64: could be applied if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+Src_FRS2_deg can occur in the model if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19.
+PLC_FGFR_deg can occur in the model if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5.and.@rule-7.
+
+------------------------------------------------------------
+* Non relational properties: 
+------------------------------------------------------------
+CBL(d) => [ CBL(d[.]) v CBL(d[Y55.Spry]) ]
+CBL(d) => CBL(d{u})
+FGF(r[l.FGFR]) [ if @rule-0 ] 
+FGF(r[.]) [ if .T. ] 
+
+FGFR(Y766{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y766{u}) [ if .T. ] 
+
+FGFR(Y766[d.PLC]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+FGFR(Y766[.]) [ if .T. ] 
+
+FGFR(f[r.FRS2]) [ if @rule-8 ] 
+FGFR(f[.]) [ if .T. ] 
+
+FGFR(Y766{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y766{u}) [ if .T. ] 
+
+FGFR(l[r.FGF]) [ if @rule-0 ] 
+FGFR(l[.]) [ if .T. ] 
+
+FGFR(Y766[d.PLC]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+FGFR(Y766[.]) [ if .T. ] 
+
+FGFR(Y654{p}) [ if @rule-0.and.@rule-3 ] 
+FGFR(Y654{u}) [ if .T. ] 
+
+FGFR(Y766{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y766{u}) [ if .T. ] 
+
+FGFR(Y766[d.PLC]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+FGFR(Y766[.]) [ if .T. ] 
+
+FGFR(Y653{p}) [ if @rule-0.and.@rule-2 ] 
+FGFR(Y653{u}) [ if .T. ] 
+
+FGFR(Y766{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y766{u}) [ if .T. ] 
+
+FGFR(Y766[d.PLC]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+FGFR(Y766[.]) [ if .T. ] 
+
+FGFR(Y653{p}) [ if @rule-0.and.@rule-2 ] 
+FGFR(Y653{u}) [ if .T. ] 
+
+FGFR(Y654{p}) [ if @rule-0.and.@rule-3 ] 
+FGFR(Y654{u}) [ if .T. ] 
+
+FGFR(Y766{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y766{u}) [ if .T. ] 
+
+FGFR(Y654{p}) [ if @rule-0.and.@rule-3 ] 
+FGFR(Y654{u}) [ if .T. ] 
+
+FGFR(l[r.FGF]) [ if @rule-0 ] 
+FGFR(l[.]) [ if .T. ] 
+
+FGFR(Y653{p}) [ if @rule-0.and.@rule-2 ] 
+FGFR(Y653{u}) [ if .T. ] 
+
+FGFR(l[r.FGF]) [ if @rule-0 ] 
+FGFR(l[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(r[f.FGFR]) [ if @rule-8 ] 
+FRS2(r[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y306[a.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+FRS2(Y471[.]) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(u{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(u{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y471{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16 ] 
+FRS2(Y471{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y290{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-11 ] 
+FRS2(Y290{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y306{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y382{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-13 ] 
+FRS2(Y382{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y392{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-14 ] 
+FRS2(Y392{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y196{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{u}) [ if .T. ] 
+
+FRS2(Y436{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-15 ] 
+FRS2(Y436{u}) [ if .T. ] 
+
+FRS2(Y196[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196[.]) [ if .T. ] 
+
+FRS2(Y471{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16 ] 
+FRS2(Y471{u}) [ if .T. ] 
+
+FRS2(Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+FRS2(Y471[.]) [ if .T. ] 
+
+FRS2(Y471{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16 ] 
+FRS2(Y471{u}) [ if .T. ] 
+
+FRS2(r[f.FGFR]) [ if @rule-8 ] 
+FRS2(r[.]) [ if .T. ] 
+
+FRS2(Y436{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-15 ] 
+FRS2(Y436{u}) [ if .T. ] 
+
+FRS2(r[f.FGFR]) [ if @rule-8 ] 
+FRS2(r[.]) [ if .T. ] 
+
+FRS2(Y392{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-14 ] 
+FRS2(Y392{u}) [ if .T. ] 
+
+FRS2(r[f.FGFR]) [ if @rule-8 ] 
+FRS2(r[.]) [ if .T. ] 
+
+FRS2(Y382{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-13 ] 
+FRS2(Y382{u}) [ if .T. ] 
+
+FRS2(r[f.FGFR]) [ if @rule-8 ] 
+FRS2(r[.]) [ if .T. ] 
+
+FRS2(Y306{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306{u}) [ if .T. ] 
+
+FRS2(r[f.FGFR]) [ if @rule-8 ] 
+FRS2(r[.]) [ if .T. ] 
+
+FRS2(Y290{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-11 ] 
+FRS2(Y290{u}) [ if .T. ] 
+
+FRS2(r[f.FGFR]) [ if @rule-8 ] 
+FRS2(r[.]) [ if .T. ] 
+
+FRS2(Y306{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306{u}) [ if .T. ] 
+
+FRS2(Y306[a.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306[.]) [ if .T. ] 
+
+FRS2(Y290{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-11 ] 
+FRS2(Y290{u}) [ if .T. ] 
+
+FRS2(Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+FRS2(Y471[.]) [ if .T. ] 
+
+FRS2(Y306{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306{u}) [ if .T. ] 
+
+FRS2(Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+FRS2(Y471[.]) [ if .T. ] 
+
+FRS2(Y382{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-13 ] 
+FRS2(Y382{u}) [ if .T. ] 
+
+FRS2(Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+FRS2(Y471[.]) [ if .T. ] 
+
+FRS2(Y392{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-14 ] 
+FRS2(Y392{u}) [ if .T. ] 
+
+FRS2(Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+FRS2(Y471[.]) [ if .T. ] 
+
+FRS2(Y436{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-15 ] 
+FRS2(Y436{u}) [ if .T. ] 
+
+FRS2(Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+FRS2(Y471[.]) [ if .T. ] 
+
+Grb2(a[Y306.FRS2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+Grb2(a[g.Spry]) [ if .T. ] 
+Grb2(a[.]) [ if .T. ] 
+
+Grb2(b) => [ Grb2(b[.]) v Grb2(b[d.Sos]) ]
+PLC(d[Y766.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+PLC(d[.]) [ if .T. ] 
+
+PLC_FGFR_deg(x{u}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5.and.@rule-7 ] 
+
+Shp2(d[Y471.FRS2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+Shp2(d[.]) [ if .T. ] 
+
+Sos(d) => [ Sos(d[.]) v Sos(d[b.Grb2]) ]
+Sos(d) => Sos(d{u})
+Spry(Y55) => [ Spry(Y55{u}) v Spry(Y55{p}) ]
+Spry(Y55) => [ Spry(Y55{u}) v Spry(Y55{p}) ]
+Spry(Y55) => [ Spry(Y55[.]) v Spry(Y55[d.CBL]) ]
+Spry(Y55) => [ Spry(Y55{u}) v Spry(Y55{p}) ]
+Spry(d) => [ Spry(d[.]) v Spry(d[e.Src]) ]
+Spry(g) => [ Spry(g[.]) v Spry(g[a.Grb2]) ]
+Src(d[Y196.FRS2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+Src(d[.]) [ if .T. ] 
+
+Src(e) => [ Src(e[.]) v Src(e[d.Spry]) ]
+Src_FRS2_deg(x{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+FGFR(Y766{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y766{p}[d.PLC]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+FGFR(Y766{u}[.]) [ if .T. ] 
+
+
+FGFR(Y766{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y766{p}[d.PLC]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+FGFR(Y766{u}[.]) [ if .T. ] 
+
+
+FGFR(Y654{p},Y766{u}[.]) [ if @rule-0.and.@rule-3 ] 
+FGFR(Y654{p},Y766{p}[d.PLC]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+FGFR(Y654{p},Y766{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y654{u},Y766{u}[.]) [ if .T. ] 
+
+FGFR(Y653{p},Y766{u}[.]) [ if @rule-0.and.@rule-2 ] 
+FGFR(Y653{p},Y766{p}[d.PLC]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4.and.@rule-5 ] 
+FGFR(Y653{p},Y766{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y653{u},Y766{u}[.]) [ if .T. ] 
+
+FGFR(Y653{p},Y654{u},Y766{u}) [ if @rule-0.and.@rule-2 ] 
+FGFR(Y653{p},Y654{p},Y766{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-4 ] 
+FGFR(Y653{p},Y654{p},Y766{u}) [ if @rule-0.and.@rule-2.and.@rule-3 ] 
+FGFR(Y653{u},Y654{u},Y766{u}) [ if .T. ] 
+FGFR(Y653{u},Y654{p},Y766{u}) [ if @rule-0.and.@rule-3 ] 
+
+FGFR(Y654{p},l[.]) [ if @rule-0.and.@rule-1.and.@rule-3 ] 
+FGFR(Y654{p},l[r.FGF]) [ if @rule-0.and.@rule-3 ] 
+FGFR(Y654{u},l[.]) [ if .T. ] 
+FGFR(Y654{u},l[r.FGF]) [ if @rule-0 ] 
+
+FGFR(Y653{p},l[.]) [ if @rule-0.and.@rule-1.and.@rule-2 ] 
+FGFR(Y653{p},l[r.FGF]) [ if @rule-0.and.@rule-2 ] 
+FGFR(Y653{u},l[.]) [ if .T. ] 
+FGFR(Y653{u},l[r.FGF]) [ if @rule-0 ] 
+
+FRS2(Y196{p}[.],r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[.],r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-10)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-10)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-10)).and.((~@rule-7).or.(@rule-8.and.@rule-10)))))) ] 
+FRS2(Y196{p}[d.Src],r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{p}[d.Src],r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-10.and.@rule-19)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-10.and.@rule-19)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-10.and.@rule-19)).and.((~@rule-7).or.(@rule-8.and.@rule-10.and.@rule-19)))))) ] 
+FRS2(Y196{u}[.],r[f.FGFR]) [ if @rule-8 ] 
+FRS2(Y196{u}[.],r[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src],r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+FRS2(Y196{u}[d.Src],r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19)).and.((~@rule-7).or.(@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19)))))) ] 
+
+FRS2(Y196{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{u}[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+
+FRS2(Y196{p}[d.Src],Y471[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{p}[.],Y471[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src],Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+FRS2(Y196{p}[.],Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17 ] 
+FRS2(Y196{u}[d.Src],Y471[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-18.and.@rule-19 ] 
+FRS2(Y196{u}[.],Y471[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src],Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+FRS2(Y196{u}[.],Y471[d.Shp2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16.and.@rule-17 ] 
+
+FRS2(Y196{p}[d.Src],u{u}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{p}[.],u{u}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src],u{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{p}[.],u{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{u}[d.Src],u{u}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+FRS2(Y196{u}[.],u{u}) [ if .T. ] 
+FRS2(Y196{u}[d.Src],u{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+FRS2(Y196{u}[.],u{p}) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+FRS2(Y196{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{u}[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+
+FRS2(Y196{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{u}[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+
+FRS2(Y196{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{u}[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+
+FRS2(Y196{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{u}[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+
+FRS2(Y196{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{u}[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+
+FRS2(Y196{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10 ] 
+FRS2(Y196{p}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-19 ] 
+FRS2(Y196{u}[.]) [ if .T. ] 
+FRS2(Y196{u}[d.Src]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+
+
+
+FRS2(Y471{p},r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-16)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-16)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-16)).and.((~@rule-7).or.(@rule-8.and.@rule-16)))))) ] 
+FRS2(Y471{p},r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-16 ] 
+FRS2(Y471{u},r[.]) [ if .T. ] 
+FRS2(Y471{u},r[f.FGFR]) [ if @rule-8 ] 
+
+FRS2(Y436{p},r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-15)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-15)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-15)).and.((~@rule-7).or.(@rule-8.and.@rule-15)))))) ] 
+FRS2(Y436{p},r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-15 ] 
+FRS2(Y436{u},r[.]) [ if .T. ] 
+FRS2(Y436{u},r[f.FGFR]) [ if @rule-8 ] 
+
+FRS2(Y392{p},r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-14)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-14)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-14)).and.((~@rule-7).or.(@rule-8.and.@rule-14)))))) ] 
+FRS2(Y392{p},r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-14 ] 
+FRS2(Y392{u},r[.]) [ if .T. ] 
+FRS2(Y392{u},r[f.FGFR]) [ if @rule-8 ] 
+
+FRS2(Y382{p},r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-13)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-13)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-13)).and.((~@rule-7).or.(@rule-8.and.@rule-13)))))) ] 
+FRS2(Y382{p},r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-13 ] 
+FRS2(Y382{u},r[.]) [ if .T. ] 
+FRS2(Y382{u},r[f.FGFR]) [ if @rule-8 ] 
+
+FRS2(Y306{p},r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-12)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-12)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-12)).and.((~@rule-7).or.(@rule-8.and.@rule-12)))))) ] 
+FRS2(Y306{p},r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306{u},r[.]) [ if .T. ] 
+FRS2(Y306{u},r[f.FGFR]) [ if @rule-8 ] 
+
+FRS2(Y290{p},r[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.(@rule-4.or.(@rule-8.and.@rule-9.and.@rule-11)).and.((~@rule-4).or.((@rule-5.or.(@rule-8.and.@rule-9.and.@rule-11)).and.((~@rule-5).or.((@rule-7.or.(@rule-8.and.@rule-9.and.@rule-11)).and.((~@rule-7).or.(@rule-8.and.@rule-11)))))) ] 
+FRS2(Y290{p},r[f.FGFR]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-11 ] 
+FRS2(Y290{u},r[.]) [ if .T. ] 
+FRS2(Y290{u},r[f.FGFR]) [ if @rule-8 ] 
+
+FRS2(Y306{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306{p}[a.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12 ] 
+FRS2(Y306{u}[.]) [ if .T. ] 
+FRS2(Y306{u}[a.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-12.and.@rule-16.and.@rule-17 ] 
+
+
+
+
+
+
+
+
+
+
+
+
+Spry(Y55{p}[.]) [ if .T. ] 
+Spry(Y55{p}[d.CBL]) [ if .T. ] 
+Spry(Y55{u}[.]) [ if .T. ] 
+Spry(Y55{u}[d.CBL]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+Spry(Y55{p},g[.]) [ if .T. ] 
+Spry(Y55{p},g[a.Grb2]) [ if .T. ] 
+Spry(Y55{u},g[.]) [ if .T. ] 
+Spry(Y55{u},g[a.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-3.and.@rule-8.and.@rule-10.and.@rule-16.and.@rule-17.and.@rule-19 ] 
+
+
+
+
+
+
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+
+
+FGFR(Y653{p},f[1]),FRS2(Y196{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{p},f[1]),FRS2(Y196{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{u},f[1]),FRS2(Y196{u},r[1]) [ if @rule-8 ] 
+FGFR(Y653{u},f[1]),FRS2(Y196{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y653{p},f[1]),FRS2(Y436{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{p},f[1]),FRS2(Y436{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{u},f[1]),FRS2(Y436{u},r[1]) [ if @rule-8 ] 
+FGFR(Y653{u},f[1]),FRS2(Y436{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y653{p},f[1]),FRS2(Y392{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{p},f[1]),FRS2(Y392{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{u},f[1]),FRS2(Y392{u},r[1]) [ if @rule-8 ] 
+FGFR(Y653{u},f[1]),FRS2(Y392{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y653{p},f[1]),FRS2(Y382{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{p},f[1]),FRS2(Y382{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{u},f[1]),FRS2(Y382{u},r[1]) [ if @rule-8 ] 
+FGFR(Y653{u},f[1]),FRS2(Y382{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y653{p},f[1]),FRS2(Y306{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{p},f[1]),FRS2(Y306{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{u},f[1]),FRS2(Y306{u},r[1]) [ if @rule-8 ] 
+FGFR(Y653{u},f[1]),FRS2(Y306{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y653{p},f[1]),FRS2(Y290{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{p},f[1]),FRS2(Y290{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{u},f[1]),FRS2(Y290{u},r[1]) [ if @rule-8 ] 
+FGFR(Y653{u},f[1]),FRS2(Y290{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y653{p},f[1]),FRS2(Y471{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{p},f[1]),FRS2(Y471{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-2.or.@rule-8) ] 
+FGFR(Y653{u},f[1]),FRS2(Y471{u},r[1]) [ if @rule-8 ] 
+FGFR(Y653{u},f[1]),FRS2(Y471{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y654{p},f[1]),FRS2(Y196{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{p},f[1]),FRS2(Y196{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{u},f[1]),FRS2(Y196{u},r[1]) [ if @rule-8 ] 
+FGFR(Y654{u},f[1]),FRS2(Y196{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y654{p},f[1]),FRS2(Y436{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{p},f[1]),FRS2(Y436{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{u},f[1]),FRS2(Y436{u},r[1]) [ if @rule-8 ] 
+FGFR(Y654{u},f[1]),FRS2(Y436{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y654{p},f[1]),FRS2(Y392{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{p},f[1]),FRS2(Y392{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{u},f[1]),FRS2(Y392{u},r[1]) [ if @rule-8 ] 
+FGFR(Y654{u},f[1]),FRS2(Y392{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y654{p},f[1]),FRS2(Y382{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{p},f[1]),FRS2(Y382{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{u},f[1]),FRS2(Y382{u},r[1]) [ if @rule-8 ] 
+FGFR(Y654{u},f[1]),FRS2(Y382{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y654{p},f[1]),FRS2(Y306{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{p},f[1]),FRS2(Y306{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{u},f[1]),FRS2(Y306{u},r[1]) [ if @rule-8 ] 
+FGFR(Y654{u},f[1]),FRS2(Y306{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y654{p},f[1]),FRS2(Y290{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{p},f[1]),FRS2(Y290{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{u},f[1]),FRS2(Y290{u},r[1]) [ if @rule-8 ] 
+FGFR(Y654{u},f[1]),FRS2(Y290{p},r[1]) [ if @rule-8 ] 
+
+
+FGFR(Y654{p},f[1]),FRS2(Y471{u},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{p},f[1]),FRS2(Y471{p},r[1]) [ if (@rule-0.or.@rule-8).and.((~@rule-0).or.@rule-3.or.@rule-8) ] 
+FGFR(Y654{u},f[1]),FRS2(Y471{u},r[1]) [ if @rule-8 ] 
+FGFR(Y654{u},f[1]),FRS2(Y471{p},r[1]) [ if @rule-8 ] 
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+execution finished without any exception

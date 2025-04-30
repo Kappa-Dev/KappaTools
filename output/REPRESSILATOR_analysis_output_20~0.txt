@@ -1,0 +1,88 @@
+Kappa Static Analyzer (v4.1.3.1-175-g514ee1742) (without Tk interface)
+Analysis launched at 2025/04/30 12:55:52 (GMT+2) on MP983-PRO
+Parsing temp_experiment.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "temp_experiment.ka", line 58, characters 4-102: could be applied if @rule-0.and.(@rule-1.or.@rule-2).and.((~@rule-1).or.@rule-2.or.@rule-3).
+rule File "temp_experiment.ka", line 58, characters 4-102: could be applied if @rule-0.and.(@rule-1.or.@rule-2).and.((~@rule-1).or.@rule-2.or.@rule-3).
+rule File "temp_experiment.ka", line 59, characters 4-102: could be applied if (@rule-0.or.(@rule-1.and.@rule-3)).and.((~@rule-0).or.(@rule-1.and.(@rule-2.or.@rule-3))).
+rule File "temp_experiment.ka", line 59, characters 4-102: could be applied if (@rule-0.or.(@rule-1.and.@rule-3)).and.((~@rule-0).or.(@rule-1.and.(@rule-2.or.@rule-3))).
+rule File "temp_experiment.ka", line 61, characters 4-98: could be applied if @rule-2.
+rule File "temp_experiment.ka", line 61, characters 4-98: could be applied if @rule-2.
+rule File "temp_experiment.ka", line 63, characters 4-98: could be applied if @rule-3.
+rule File "temp_experiment.ka", line 63, characters 4-98: could be applied if @rule-3.
+rule File "temp_experiment.ka", line 65, characters 4-70: could be applied if (@rule-0.or.(@rule-1.and.@rule-3.and.@rule-4)).and.((~@rule-0).or.((@rule-1.or.(@rule-2.and.@rule-4)).and.((~@rule-1).or.((@rule-2.or.(@rule-3.and.@rule-4)).and.((~@rule-2).or.@rule-4))))).
+rule File "temp_experiment.ka", line 67, characters 4-54: could be applied if @rule-5.
+rule File "temp_experiment.ka", line 69, characters 4-54: could be applied if @rule-6.
+rule File "temp_experiment.ka", line 71, characters 4-90: could be applied if @rule-7.
+rule File "temp_experiment.ka", line 73, characters 4-83: could be applied if @rule-8.
+rule File "temp_experiment.ka", line 74, characters 4-86: could be applied if @rule-9.
+rule File "temp_experiment.ka", line 77, characters 4-89: could be applied if @rule-10.and.(@rule-11.or.@rule-12).and.((~@rule-11).or.@rule-12.or.@rule-13).
+rule File "temp_experiment.ka", line 77, characters 4-89: could be applied if @rule-10.and.(@rule-11.or.@rule-12).and.((~@rule-11).or.@rule-12.or.@rule-13).
+rule File "temp_experiment.ka", line 79, characters 4-89: could be applied if (@rule-10.or.(@rule-11.and.@rule-13)).and.((~@rule-10).or.(@rule-11.and.(@rule-12.or.@rule-13))).
+rule File "temp_experiment.ka", line 79, characters 4-89: could be applied if (@rule-10.or.(@rule-11.and.@rule-13)).and.((~@rule-10).or.(@rule-11.and.(@rule-12.or.@rule-13))).
+rule File "temp_experiment.ka", line 81, characters 4-98: could be applied if @rule-12.
+rule File "temp_experiment.ka", line 81, characters 4-98: could be applied if @rule-12.
+rule File "temp_experiment.ka", line 83, characters 4-98: could be applied if @rule-13.
+rule File "temp_experiment.ka", line 83, characters 4-98: could be applied if @rule-13.
+rule File "temp_experiment.ka", line 84, characters 4-95: could be applied if (@rule-10.or.(@rule-11.and.@rule-13.and.@rule-14)).and.((~@rule-10).or.((@rule-11.or.(@rule-12.and.@rule-14)).and.((~@rule-11).or.((@rule-12.or.(@rule-13.and.@rule-14)).and.((~@rule-12).or.@rule-14))))).
+rule File "temp_experiment.ka", line 86, characters 4-84: could be applied if @rule-15.
+rule File "temp_experiment.ka", line 87, characters 4-84: could be applied if @rule-16.
+rule File "temp_experiment.ka", line 89, characters 0-89: could be applied if @rule-17.
+rule File "temp_experiment.ka", line 91, characters 0-79: could be applied if @rule-18.
+rule File "temp_experiment.ka", line 92, characters 0-82: could be applied if @rule-19.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties: 
+------------------------------------------------------------
+gCI(tet1[cI.pTetR]) [ if .T. ] 
+gCI(tet1[.]) [ if (@rule-10.or.@rule-13).and.((~@rule-10).or.@rule-12.or.@rule-13) ] 
+
+gCI(tet2[cI.pTetR]) [ if .T. ] 
+gCI(tet2[.]) [ if (@rule-11.or.@rule-12).and.((~@rule-11).or.@rule-12.or.@rule-13) ] 
+
+gLacI(cI1) => [ gLacI(cI1[.]) v gLacI(cI1[lac.pCI]) ]
+gLacI(cI2) => [ gLacI(cI2[.]) v gLacI(cI2[lac.pCI]) ]
+gTetR(lac1[tet.pLacI]) [ if .T. ] 
+gTetR(lac1[.]) [ if (@rule-0.or.@rule-3).and.((~@rule-0).or.@rule-2.or.@rule-3) ] 
+
+gTetR(lac2[tet.pLacI]) [ if .T. ] 
+gTetR(lac2[.]) [ if (@rule-1.or.@rule-2).and.((~@rule-1).or.@rule-2.or.@rule-3) ] 
+
+pCI(lac) => [ pCI(lac[.]) v pCI(lac[cI1.gLacI]) v pCI(lac[cI2.gLacI]) ]
+pLacI(tet) => [ pLacI(tet[.]) v pLacI(tet[lac1.gTetR]) v pLacI(tet[lac2.gTetR]) ]
+pTetR(cI) => [ pTetR(cI[.]) v pTetR(cI[tet1.gCI]) v pTetR(cI[tet2.gCI]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+gTetR(lac1[tet.pLacI],lac2[.]) [ if (@rule-0.or.@rule-2).and.((~@rule-0).or.((@rule-1.or.@rule-2).and.((~@rule-1).or.@rule-2.or.@rule-3))) ] 
+gTetR(lac1[tet.pLacI],lac2[tet.pLacI]) [ if .T. ] 
+gTetR(lac1[.],lac2[.]) [ if (@rule-0.or.(@rule-1.and.@rule-3)).and.((~@rule-0).or.((@rule-1.or.@rule-2).and.((~@rule-1).or.@rule-2.or.@rule-3))) ] 
+gTetR(lac1[.],lac2[tet.pLacI]) [ if (@rule-0.or.@rule-3).and.((~@rule-0).or.((@rule-1.or.@rule-3).and.((~@rule-1).or.@rule-2.or.@rule-3))) ] 
+
+gCI(tet1[cI.pTetR],tet2[.]) [ if (@rule-10.or.@rule-12).and.((~@rule-10).or.((@rule-11.or.@rule-12).and.((~@rule-11).or.@rule-12.or.@rule-13))) ] 
+gCI(tet1[cI.pTetR],tet2[cI.pTetR]) [ if .T. ] 
+gCI(tet1[.],tet2[.]) [ if (@rule-10.or.(@rule-11.and.@rule-13)).and.((~@rule-10).or.((@rule-11.or.@rule-12).and.((~@rule-11).or.@rule-12.or.@rule-13))) ] 
+gCI(tet1[.],tet2[cI.pTetR]) [ if (@rule-10.or.@rule-13).and.((~@rule-10).or.((@rule-11.or.@rule-13).and.((~@rule-11).or.@rule-12.or.@rule-13))) ] 
+
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+execution finished without any exception

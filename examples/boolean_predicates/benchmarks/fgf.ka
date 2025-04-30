@@ -21,7 +21,7 @@
 //--------------
 
 // working_set
-//0
+//00//
 
 //-------------- Rule List
 // 1. FGF(r):FGFR(l)
@@ -40,7 +40,7 @@ FGF(r[1]) , FGFR(l[1],Y654{u}) -> FGF(r[1]) , FGFR(l[1],Y654{p}) @ 1
 // FGFR mods (2 and 3) are never de-mod'ed; does that explain the need for removal ?
 FGFR(Y653{p},Y654{p},Y766{u}) -> FGFR(Y653{p},Y654{p},Y766{p}) @ 1
 
-//5
+//05//
 
 // 9. PLC(d):FGFR(Y766), PLC deg's FGFR
 // Y766 may not be phos'ed, which seems utterly strange --so i am changing that
@@ -56,7 +56,7 @@ PLC(d[1]) , FGFR(Y766{p}[1]),. -> PLC(d[.]) ,., PLC_FGFR_deg(x{u}[.]) @ 1
 // FRS2 and FGFR --bind --supp
 FGFR(f[.]) , FRS2(r[.]) -> FGFR(f[1]) , FRS2(r[1]) @ 1
 FGFR(f[1]) , FRS2(r[1]) -> FGFR(f[.]) , FRS2(r[.]) @ 1
-//10
+//10//
 
 // 5. FGFR mod FRS2 at Y196, Y306, Y471
 // FGFR:FRS2 --mod and FRS2 --supp
@@ -66,7 +66,7 @@ FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y290{u}) -> FGFR(Y653{p},Y654{p},f[1]) , 
 FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y306{u}) -> FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y306{p}) @ 1
 FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y382{u}) -> FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y382{p}) @ 1
 FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y392{u}) -> FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y392{p}) @ 1
-//15
+//15//
 FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y436{u}) -> FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y436{p}) @ 1
 FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y471{u}) -> FGFR(Y653{p},Y654{p},f[1]) , FRS2(r[1],Y471{p}) @ 1
 
@@ -76,7 +76,7 @@ Shp2(d[.]) , FRS2(Y471{p}[.]) -> Shp2(d[1]) , FRS2(Y471{p}[1]) @ 1
 Shp2(d[1]) , FRS2(Y471{p}[1]) -> Shp2(d[.]) , FRS2(Y471{p}[.]) @ 1
 
 Src(d[.]) , FRS2(Y196{p}[.]) -> Src(d[1]) , FRS2(Y196{p}[1]) @ 1
-//20
+//20//
 Src(d[1]) , FRS2(Y196{p}[1]) -> Src(d[.]) , FRS2(Y196{p}[.]) @ 1
 
 Grb2(a[.]) , FRS2(Y306{p}[.]) -> Grb2(a[1]) , FRS2(Y306{p}[1]) @ 1
@@ -88,13 +88,13 @@ Grb2(a[1]) , FRS2(Y306{p}[1]) -> Grb2(a[.]) , FRS2(Y306{p}[.]) @ 1
 // rules commented out by one // are causal dead-ends
 Shp2(d[1]) , FRS2(Y471[1],Y196{p}) -> Shp2(d[1]) , FRS2(Y471[1],Y196{u}) @ 1
 Shp2(d[1]) , FRS2(Y471[1],Y290{p}) -> Shp2(d[1]) , FRS2(Y471[1],Y290{u}) @ 1
-//25
+//25//
 Shp2(d[1]) , FRS2(Y471[1],Y306{p}) -> Shp2(d[1]) , FRS2(Y471[1],Y306{u}) @ 1
 Shp2(d[1]) , FRS2(Y471[1],Y382{p}) -> Shp2(d[1]) , FRS2(Y471[1],Y382{u}) @ 1
 Shp2(d[1]) , FRS2(Y471[1],Y392{p}) -> Shp2(d[1]) , FRS2(Y471[1],Y392{u}) @ 1
 Shp2(d[1]) , FRS2(Y471[1],Y436{p}) -> Shp2(d[1]) , FRS2(Y471[1],Y436{u}) @ 1
 Shp2(d[1]) , FRS2(Y471{p}[1]) -> Shp2(d[1]) , FRS2(Y471{u}[1]) @ 1
-//30
+//30//
 
 // 8. Src relocates (endocytosis/degradation) FRS2
 // FRS2 --del --supp and not FRS2(ubi{?})
@@ -114,7 +114,7 @@ Spry(d[1]) , Src(e[1]) -> Spry(d[.]) , Src(e[.]) @ 1
 Spry(d[1],Y55{u}) , Src(e[1]) -> Spry(d[1],Y55{p}) , Src(e[1]) @ 1
 // Spry --bind --supp and not Src
 Spry(Y55{p}[.]) , CBL(d[.]) -> Spry(Y55{p}[1]) , CBL(d[1]) @ 1
-//35
+//35//
 Spry(Y55{p}[1]) , CBL(d[1]) -> Spry(Y55{p}[.]) , CBL(d[.]) @ 1
 Spry(Y55{p},g[.]) , Grb2(a[.]) -> Spry(Y55{p},g[1]) , Grb2(a[1]) @ 1
 Spry(Y55{p},g[1]) , Grb2(a[1]) -> Spry(Y55{p},g[.]) , Grb2(a[.]) @ 1
@@ -129,11 +129,13 @@ CBL(d[0]) , Spry(Y55{p}[0],d[1]) , Src(e[1],d[2]) , FRS2(Y196[2],u{u}) -> CBL(d[
 // 13. Shp2 de-mods Spry(Y55) via FRS2:Src
 // FRS2 --del --supp and Shp2 --del --lens
 Shp2(d[0]) , FRS2(Y471[0],Y196[1]) , Src(d[1],e[2]) , Spry(d[2],Y55{p}) -> Shp2(d[0]) , FRS2(Y471[0],Y196[1]) , Src(d[1],e[2]) , Spry(d[2],Y55{u}) @ 1
+//40//
 
 // 14. Grb2 binds Sos
 // Grb2 --bind --supp
 Grb2(b[.]) , Sos(d[.]) -> Grb2(b[1]) , Sos(d[1]) @ 1
 Grb2(b[1]) , Sos(d[1]) -> Grb2(b[.]) , Sos(d[.]) @ 1
+// 42//
 
 //-------------- Inits and Obses
 // initial solutions
