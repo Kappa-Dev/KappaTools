@@ -49,7 +49,7 @@ for MODEL in "${MODELS[@]}"; do
     echo
     echo "Processing model: $MODEL"
 
-    for i in {00 05 10 15 20 25 30 40 42 50 60 75 76 77 78 79 80}; do
+    for i in {00 05 10 15 20 25 30 40 42 50 60 70 75}; do
         # If the current file contains the annotation //i for the current i, then the analysis is executed
         if grep -q "//$i" "$EXAMPLE_MODEL"; then
 
