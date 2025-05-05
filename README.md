@@ -12,6 +12,20 @@ a static analyser for Kappa models.
 Kappy is a python library to launch and analyse runs and outputs of
 Kappa models.
 
+## KaSa for Parametric models
+
+This branch updates KaSa to analyse parametric models.
+
+To use KaSa, clone the repository and run the script `./download_dependencies.sh`.
+It installs all the dependencies and builds the project.
+
+To run the same experiments as in the paper "Reachability Analysis for Parametric Rule-Based Models", run the script `./parametric_model_experiments.sh`.
+
+An example of how to analyse a (parametric or not parametric) Kappa model with KaSa:
+```bash
+ ./_build/install/default/bin/KaSa examples/boolean_predicates/example_conflict_macro.ka
+```
+
 
 ## Quick startup
 
@@ -96,8 +110,8 @@ are built for these platforms by the continuous integration tools.
 If you want or need your own build,
  - Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml
    package manager) and initialize it (by issuing `opam init`)
- - In the source directory, install all the dependencies by `opam install 
-   --deps-only pinned_libs/default` if your OS is OSX or linux, or `opam 
+ - In the source directory, install all the dependencies by `opam install
+   --deps-only pinned_libs/default` if your OS is OSX or linux, or `opam
    install --deps-only pinned_libs/windows` if your OS is Windows.
  - `dune build`
 
