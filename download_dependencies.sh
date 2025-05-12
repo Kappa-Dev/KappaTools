@@ -22,21 +22,15 @@ if [ ! -d "$HOME/.opam" ]; then
     eval $(opam env)
 fi
 
-# Check if dune is installed
-if ! command_exists dune; then
-    echo "🔧 Installing dune..."
-    opam install -y dune
-fi
-
 # Install dependencies
 echo "📥 Installing dependencies..."
-opam install . --deps-only -y --update-invariant
+opam install --deps-only kappa-binaries -y --update-invariant
 
 # Load opam environment
 eval $(opam env)
 
 # Build the project using dune
 echo "🏗️ Building the project..."
-dune build
+make all
 
 echo "✅ Build complete!"

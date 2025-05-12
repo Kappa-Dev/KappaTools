@@ -49,7 +49,7 @@ for MODEL in "${MODELS[@]}"; do
     echo
     echo "Processing model: $MODEL"
 
-    for i in {00 00 05 10 15 20 25 30 40 42 50 60 70 75}; do
+    for i in 00 05 10 15 20 25 30 40 42 50 60 70; do
         # If the current file contains the annotation //i for the current i, then the analysis is executed
         if grep -q "//$i" "$EXAMPLE_MODEL"; then
 
@@ -97,6 +97,6 @@ for MODEL in "${MODELS[@]}"; do
 
     # Check for timeouts
     if grep -qi "Timeout occurred for" "$OUTPUT_FILE"; then
-        echo "⚠️ Some programs were killed by a timeout."
+        echo "⚠️ Some programs were killed by a timeout or a memory overflow."
     fi
 done
