@@ -1048,31 +1048,34 @@ let rec print ?beginning_of_sentence:(beggining = true)
                     Site_graphs.KaSa_site_graph.add_state_or_guard parameters
                       error handler_kappa agent_id site state agent_graph
                   in
-                  let n = 
-                    match Ckappa_sig.site_or_guard_p_of_mvbdu_var site nsites 
-                  with 
-                  | Site _ -> n+1 
-                  | Guard_p _ -> n 
-                in 
+                  let n =
+                    match
+                      Ckappa_sig.site_or_guard_p_of_mvbdu_var site nsites
+                    with
+                    | Site _ -> n + 1
+                    | Guard_p _ -> n
+                  in
                   error, agent_graph, n)
                 (error, t, 0) sites
             in
-            if n >= dim_min
-            then 
-            let error =
-              Site_graphs.KaSa_site_graph.print log parameters error agent_graph
-            in
-            (*let error, bdu_handler, is_true =
-                Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-                  mvbdu restriction_bdu
-              in*)
-            (*let () = if not is_true then Loggers.fprintf log "," in*)
-            let error, bdu_handler =
-              Handler.print_guard_mvbdu_decompose parameters error handler_kappa
-                bdu_handler mvbdu restriction_bdu
-            in
-            let () = Loggers.print_newline log  in 
-            error, bdu_handler else error, bdu_handler)
+            if n >= dim_min then (
+              let error =
+                Site_graphs.KaSa_site_graph.print log parameters error
+                  agent_graph
+              in
+              (*let error, bdu_handler, is_true =
+                  Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+                    mvbdu restriction_bdu
+                in*)
+              (*let () = if not is_true then Loggers.fprintf log "," in*)
+              let error, bdu_handler =
+                Handler.print_guard_mvbdu_decompose parameters error
+                  handler_kappa bdu_handler mvbdu restriction_bdu
+              in
+              let () = Loggers.print_newline log in
+              error, bdu_handler
+            ) else
+              error, bdu_handler)
           (error, bdu_handler) valuations
       in
       (*let () = if should_use_bracket then Loggers.fprintf log " ]" in*)

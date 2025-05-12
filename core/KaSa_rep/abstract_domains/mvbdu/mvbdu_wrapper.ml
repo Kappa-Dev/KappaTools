@@ -223,7 +223,9 @@ module type Mvbdu = sig
     (hconsed_range_list, (key * (value option * value option)) list) unary
 
   val extensional_of_mvbdu : (mvbdu, (key * value) list list) unary
-val mvbdu_to_formula : cartesian_decomposition:bool -> (mvbdu, key Logical_formulae.formula) unary
+
+  val mvbdu_to_formula :
+    cartesian_decomposition:bool -> (mvbdu, key Logical_formulae.formula) unary
 
   val parametric_conditions_of_mvbdu :
     (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
@@ -423,7 +425,9 @@ module type Internalized_mvbdu = sig
 
   val hash_of_association_list : hconsed_association_list -> int
   val hash_of_variables_list : hconsed_variables_list -> int
-  val mvbdu_to_formula : cartesian_decomposition:bool -> mvbdu -> int Logical_formulae.formula
+
+  val mvbdu_to_formula :
+    cartesian_decomposition:bool -> mvbdu -> int Logical_formulae.formula
 end
 
 module type Nul = sig end
@@ -1007,19 +1011,21 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let mvbdu_to_formula parameters handler error mvbdu =
     lift1__ __POS__ Boolean_mvbdu.to_formula parameters handler error mvbdu
 
-  let mvbdu_to_formula ~cartesian_decomposition parameters handler error mvbdu = 
-    if cartesian_decomposition then 
-    let error, handler, list = 
-      mvbdu_full_cartesian_decomposition parameters handler error mvbdu in 
-      List.fold_left 
-        (fun (error, handler, formula) mvbdu -> 
-          let error, handler, f = 
-            mvbdu_to_formula parameters handler error mvbdu 
-        in 
-        error, handler, Logical_formulae.AND (formula, f) 
-          )  
-        (error, handler, Logical_formulae.True) list 
-      else mvbdu_to_formula parameters handler error mvbdu
+  let mvbdu_to_formula ~cartesian_decomposition parameters handler error mvbdu =
+    if cartesian_decomposition then (
+      let error, handler, list =
+        mvbdu_full_cartesian_decomposition parameters handler error mvbdu
+      in
+      List.fold_left
+        (fun (error, handler, formula) mvbdu ->
+          let error, handler, f =
+            mvbdu_to_formula parameters handler error mvbdu
+          in
+          error, handler, Logical_formulae.AND (formula, f))
+        (error, handler, Logical_formulae.True)
+        list
+    ) else
+      mvbdu_to_formula parameters handler error mvbdu
 
   let merge_variables_lists parameters handler error l1 l2 =
     lift2four __POS__ Boolean_mvbdu.merge_variables_lists parameters handler
@@ -1192,7 +1198,9 @@ module Internalize (M : Mvbdu with type key = int and type value = int) :
   let build_reverse_sorted_renaming_list =
     lift_unary __POS__ M.build_reverse_sorted_renaming_list
 
-  let mvbdu_to_formula ~cartesian_decomposition = lift_unary __POS__ (M.mvbdu_to_formula ~cartesian_decomposition)
+  let mvbdu_to_formula ~cartesian_decomposition =
+    lift_unary __POS__ (M.mvbdu_to_formula ~cartesian_decomposition)
+
   let empty_renaming_list () = build_renaming_list []
   let build_range_list = lift_unary __POS__ M.build_range_list
   let build_sorted_range_list = lift_unary __POS__ M.build_sorted_range_list
