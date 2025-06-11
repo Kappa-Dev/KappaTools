@@ -686,31 +686,33 @@ let rule_to_json ~filenames guard r =
 let rule_of_json ~filenames = function
   | `Assoc l as x when List.length l < 7 ->
     (try
-       Option.map guard_of_json (List.assoc_opt "guard" l), {
-         r_mix = rule_mixture_of_json filenames (List.assoc "mixture" l);
-         r_created = Raw_mixture.of_json (List.assoc "created" l);
-         r_delta_tokens =
-           JsonUtil.to_list
-             (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                (Loc.annoted_of_yojson ~filenames (lalg_expr_of_json filenames))
-                (JsonUtil.to_int ?error_msg:None))
-             (List.assoc "delta_tokens" l);
-         r_rate =
-           Loc.annoted_of_yojson ~filenames
-             (lalg_expr_of_json filenames)
-             (List.assoc "rate" l);
-         r_un_rate =
-           (try
-              JsonUtil.to_option
-                (JsonUtil.to_pair
-                   (Loc.annoted_of_yojson ~filenames
-                      (lalg_expr_of_json filenames))
-                   (JsonUtil.to_option
-                      (Loc.annoted_of_yojson (lalg_expr_of_json filenames))))
-                (List.assoc "unary_rate" l)
-            with Not_found -> None);
-         r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
-       }
+       ( Option.map guard_of_json (List.assoc_opt "guard" l),
+         {
+           r_mix = rule_mixture_of_json filenames (List.assoc "mixture" l);
+           r_created = Raw_mixture.of_json (List.assoc "created" l);
+           r_delta_tokens =
+             JsonUtil.to_list
+               (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
+                  (Loc.annoted_of_yojson ~filenames
+                     (lalg_expr_of_json filenames))
+                  (JsonUtil.to_int ?error_msg:None))
+               (List.assoc "delta_tokens" l);
+           r_rate =
+             Loc.annoted_of_yojson ~filenames
+               (lalg_expr_of_json filenames)
+               (List.assoc "rate" l);
+           r_un_rate =
+             (try
+                JsonUtil.to_option
+                  (JsonUtil.to_pair
+                     (Loc.annoted_of_yojson ~filenames
+                        (lalg_expr_of_json filenames))
+                     (JsonUtil.to_option
+                        (Loc.annoted_of_yojson (lalg_expr_of_json filenames))))
+                  (List.assoc "unary_rate" l)
+              with Not_found -> None);
+           r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
+         } )
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x))

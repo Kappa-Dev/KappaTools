@@ -1387,8 +1387,8 @@ let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
     in
     ( Ast.APPLY
         ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs nb,
-          ( assemble_rule ~warning ~syntax_version rule sigs counters_info
-              tok algs,
+          ( assemble_rule ~warning ~syntax_version rule sigs counters_info tok
+              algs,
             pos ) ),
       acc )
   | Ast.UPDATE ((lab, pos), how) ->

@@ -948,6 +948,6 @@ module Model = struct
         | Some (na, _), _, _ -> Format.pp_print_string f na
         | None, _guard, (r, _) ->
           LKappa.print_rule ~noCounters ~full:false sigs ?symbol_table
-            (Model.print_token ~env) (Model.print_alg ~env) f  r
+            (Model.print_token ~env) (Model.print_alg ~env) f r
       )
 end

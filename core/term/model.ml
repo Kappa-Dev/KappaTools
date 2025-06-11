@@ -205,8 +205,9 @@ let print_kappa ~noCounters pr_alg ?pr_rule pr_pert f env =
               (Pp.option ~with_space:false (fun f (na, _) ->
                    Format.fprintf f "'%s' " na))
               na
-              (fun f -> LKappa.print_rule ~noCounters ~full:true sigs counters_info
-                 (print_token ~env) (print_alg ~env) f guard)
+              (fun f ->
+                LKappa.print_rule ~noCounters ~full:true sigs counters_info
+                  (print_token ~env) (print_alg ~env) f guard)
               e)
           f env.ast_rules
       | Some pr_rule ->
@@ -429,11 +430,13 @@ let of_yojson = function
              Tools.array_map_of_list
                (function
                  | `List [ `Null; r ] ->
-                  let guard, rule = LKappa.rule_of_json ~filenames r in
-                   ( None, guard, Loc.annot_with_dummy rule)
+                   let guard, rule = LKappa.rule_of_json ~filenames r in
+                   None, guard, Loc.annot_with_dummy rule
                  | `List [ `String n; r ] ->
-                  let guard, rule = LKappa.rule_of_json ~filenames r in
-                   ( Some (Loc.annot_with_dummy n), guard, Loc.annot_with_dummy rule)
+                   let guard, rule = LKappa.rule_of_json ~filenames r in
+                   ( Some (Loc.annot_with_dummy n),
+                     guard,
+                     Loc.annot_with_dummy rule )
                  | _ -> raise Not_found)
                o
            | `Null -> [||]
