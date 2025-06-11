@@ -1,15 +1,16 @@
 #!/bin/bash
 
-KASA_BINARY="./bin/KaSa"
+KASA_BINARY="../../../bin/KaSa"
 TEMP_FILE="temp_experiment.ka"
 DEFAULT_TIMEOUT=1m
 
 # models
-ENSEMBLE="examples/boolean_predicates/benchmarks/ensemble.ka"
-EGFR="examples/boolean_predicates/benchmarks/causality_05_sos.ka"
-REPRESSILATOR="examples/boolean_predicates/benchmarks/Repressilator.ka"
-FGF="examples/boolean_predicates/benchmarks/fgf.ka"
-SFB="examples/boolean_predicates/benchmarks/sfb.ka"
+MODELS_DIRECTORY="models/"
+ENSEMBLE="${MODELS_DIRECTORY}ensemble.ka"
+EGFR="${MODELS_DIRECTORY}causality_05_sos.ka"
+REPRESSILATOR="${MODELS_DIRECTORY}Repressilator.ka"
+FGF="${MODELS_DIRECTORY}fgf.ka"
+SFB="${MODELS_DIRECTORY}sfb.ka"
 
 # Array of models
 MODELS=("ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB")
@@ -48,8 +49,8 @@ for MODEL in "${MODELS[@]}"; do
 
     echo
     echo "Processing model: $MODEL"
-
-    for i in 00 05 10 15 20 25 30 40 42 50 60 70; do
+# 20 25 30 40 42 50 60 70
+    for i in 00 05 10 15; do
         # If the current file contains the annotation //i for the current i, then the analysis is executed
         if grep -q "//$i" "$EXAMPLE_MODEL"; then
 
