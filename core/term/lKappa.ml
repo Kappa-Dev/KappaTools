@@ -684,7 +684,7 @@ let rule_to_json ~filenames guard r =
     ]
 
 let rule_of_json ~filenames = function
-  | `Assoc l as x when List.length l < 7 ->
+  | `Assoc l as x when List.length l < 8 ->
     (try
        ( Option.map guard_of_json (List.assoc_opt "guard" l),
          {
