@@ -54,7 +54,6 @@ type rule = {
     * (rule_mixture, int) Alg_expr.e Loc.annoted option)
     option;
   r_edit_style: bool;
-  r_guard: string guard option;
 }
 
 let print_link pr_port pr_type pr_annot f = function
@@ -529,10 +528,10 @@ let rec print_guard f g =
 
 let print_guard f g = Format.fprintf f "/*if*/ %a /*then*/@ " print_guard g
 
-let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
+let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f guard r =
   Format.fprintf f "@[<h>%t%t%t%a%t@]"
     (fun f ->
-      match r.r_guard with
+      match guard with
       | None -> ()
       | Some g -> print_guard f g)
     (fun f ->
@@ -659,7 +658,7 @@ let guard_of_json _j =
   (*rTODO*)
   True
 
-let rule_to_json ~filenames r =
+let rule_to_json ~filenames guard r =
   `Assoc
     [
       "mixture", rule_mixture_to_json filenames r.r_mix;
@@ -681,13 +680,13 @@ let rule_to_json ~filenames r =
                 (Loc.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))))
           r.r_un_rate );
       "edit_style", `Bool r.r_edit_style;
-      "guard", JsonUtil.of_option guard_to_json r.r_guard;
+      "guard", JsonUtil.of_option guard_to_json guard;
     ]
 
 let rule_of_json ~filenames = function
   | `Assoc l as x when List.length l < 7 ->
     (try
-       {
+       Option.map guard_of_json (List.assoc_opt "guard" l), {
          r_mix = rule_mixture_of_json filenames (List.assoc "mixture" l);
          r_created = Raw_mixture.of_json (List.assoc "created" l);
          r_delta_tokens =
@@ -711,7 +710,6 @@ let rule_of_json ~filenames = function
                 (List.assoc "unary_rate" l)
             with Not_found -> None);
          r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
-         r_guard = Option.map guard_of_json (List.assoc_opt "guard" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x)))

@@ -1294,7 +1294,7 @@ type rule_inter_rep = {
 (** Intermediate representation for rule type *)
 
 (** [assemble_rule] translates a rule_inter_rep into a LKappa.rule *)
-let assemble_rule ~warning ~syntax_version guard (rule : rule_inter_rep)
+let assemble_rule ~warning ~syntax_version (rule : rule_inter_rep)
     (sigs : Signature.s) counters_info (tok : int Mods.StringMap.t)
     (algs : int Mods.StringMap.t) : LKappa.rule =
   let (r_mix, r_created) : LKappa.rule_mixture * Raw_mixture.t =
@@ -1344,7 +1344,6 @@ let assemble_rule ~warning ~syntax_version guard (rule : rule_inter_rep)
     r_delta_tokens;
     r_rate;
     r_un_rate;
-    r_guard = guard;
   }
 
 let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
@@ -1388,7 +1387,7 @@ let modif_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
     in
     ( Ast.APPLY
         ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs nb,
-          ( assemble_rule ~warning ~syntax_version None rule sigs counters_info
+          ( assemble_rule ~warning ~syntax_version rule sigs counters_info
               tok algs,
             pos ) ),
       acc )
@@ -2749,7 +2748,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
              Some
                ( rule.label_opt,
                  guard,
-                 ( assemble_rule ~warning ~syntax_version guard rule agents_sig
+                 ( assemble_rule ~warning ~syntax_version rule agents_sig
                      counters_info tokens_finder alg_vars_finder,
                    rule.pos ) )
            else

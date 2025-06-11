@@ -70,8 +70,6 @@ type rule = {
     option;
   r_edit_style: bool;
       (** If rule was written in edit style, else it's rewrite style *)
-  r_guard: string guard option;
-      (** There could be a guard that defines if this rule is active or not. *)
 }
 
 val agent_to_erased : Signature.s -> rule_agent -> rule_agent
@@ -145,10 +143,11 @@ val print_rule :
   (Format.formatter -> int -> unit) ->
   (Format.formatter -> int -> unit) ->
   Format.formatter ->
+  string guard option ->
   rule ->
   unit
 
 val guard_to_json : string guard -> Yojson.Basic.t
 val guard_of_json : Yojson.Basic.t -> string guard
-val rule_to_json : filenames:int Mods.StringMap.t -> rule -> Yojson.Basic.t
-val rule_of_json : filenames:string array -> Yojson.Basic.t -> rule
+val rule_to_json : filenames:int Mods.StringMap.t -> string guard option -> rule -> Yojson.Basic.t
+val rule_of_json : filenames:string array -> Yojson.Basic.t -> string guard option * rule

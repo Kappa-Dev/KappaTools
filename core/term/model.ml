@@ -156,7 +156,6 @@ let print_token ?env f id =
   | Some env -> Format.fprintf f "%s" (NamedDecls.elt_name env.tokens id)
 
 let print_ast_rule ~noCounters ?env f i =
-  (*rTODO print guard*)
   match env with
   | None -> Format.fprintf f "__ast_rule_%i" i
   | Some env ->
@@ -167,9 +166,9 @@ let print_ast_rule ~noCounters ?env f i =
     else (
       match env.ast_rules.(pred i) with
       | Some (na, _), _guard, _ -> Format.pp_print_string f na
-      | None, _guard, (r, _) ->
+      | None, guard, (r, _) ->
         LKappa.print_rule ~noCounters ~full:false sigs counters_info
-          (print_token ~env) (print_alg ~env) f r
+          (print_token ~env) (print_alg ~env) f guard r
     )
 
 let print_rule ~noCounters ?env f id =
@@ -201,14 +200,13 @@ let print_kappa ~noCounters pr_alg ?pr_rule pr_pert f env =
       match pr_rule with
       | None ->
         Pp.array Pp.space ~trailing:Pp.space
-          (fun _ f (na, _guard, (e, _)) ->
-            (*rTODO print guard*)
+          (fun _ f (na, guard, (e, _)) ->
             Format.fprintf f "%a%a"
               (Pp.option ~with_space:false (fun f (na, _) ->
                    Format.fprintf f "'%s' " na))
               na
-              (LKappa.print_rule ~noCounters ~full:true sigs counters_info
-                 (print_token ~env) (print_alg ~env))
+              (fun f -> LKappa.print_rule ~noCounters ~full:true sigs counters_info
+                 (print_token ~env) (print_alg ~env) f guard)
               e)
           f env.ast_rules
       | Some pr_rule ->
@@ -357,14 +355,13 @@ let to_yojson env =
       ( "ast_rules",
         `List
           (Array.fold_right
-             (fun (n, _guard, (r, _)) l ->
-               (*rTODO add guard*)
+             (fun (n, guard, (r, _)) l ->
                `List
                  [
                    (match n with
                    | None -> `Null
                    | Some (n, _) -> `String n);
-                   LKappa.rule_to_json ~filenames r;
+                   LKappa.rule_to_json ~filenames guard r;
                  ]
                :: l)
              env.ast_rules []) );
@@ -432,13 +429,11 @@ let of_yojson = function
              Tools.array_map_of_list
                (function
                  | `List [ `Null; r ] ->
-                   ( None,
-                     None (*rTODO*),
-                     Loc.annot_with_dummy (LKappa.rule_of_json ~filenames r) )
+                  let guard, rule = LKappa.rule_of_json ~filenames r in
+                   ( None, guard, Loc.annot_with_dummy rule)
                  | `List [ `String n; r ] ->
-                   ( Some (Loc.annot_with_dummy n),
-                     None (*rTODO*),
-                     Loc.annot_with_dummy (LKappa.rule_of_json ~filenames r) )
+                  let guard, rule = LKappa.rule_of_json ~filenames r in
+                   ( Some (Loc.annot_with_dummy n), guard, Loc.annot_with_dummy rule)
                  | _ -> raise Not_found)
                o
            | `Null -> [||]
