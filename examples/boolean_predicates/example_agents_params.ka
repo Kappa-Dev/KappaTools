@@ -1,9 +1,13 @@
 %agent: A(x{u p})
-%agent: B()
+%agent: B(x{u p})
 // global boolean parameter
-// P1, P2
+%guard_param: P1 [true]
+%guard_param: P2 [false]
+
 
 #[P1 && P2] . -> A(x{u}) @ 1
 #[P1 || P2] . -> B(x{u}) @ 1
 
-%obs: 'Ap' |A(x{p})|
+%obs: 'Au' |A(x{u})|
+%obs: 'Bu' |B(x{u})|
+
