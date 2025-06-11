@@ -1342,14 +1342,6 @@ let rule_of_json filenames f_mix f_var = function
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule", x))
 
-let guard_to_json _filenames _g =
-  (*rTODO*)
-  `List []
-
-let guard_of_json _filenames _j =
-  (*rTODO*)
-  LKappa.True
-
 let modif_to_json filenames f_mix f_var = function
   | APPLY (alg, r) ->
     `List
@@ -1711,7 +1703,7 @@ let compil_to_json c =
         JsonUtil.of_list
           (JsonUtil.of_triple
              (JsonUtil.of_option (Loc.string_annoted_to_json ~filenames))
-             (JsonUtil.of_option (guard_to_json filenames))
+             (JsonUtil.of_option LKappa.guard_to_json)
              (Loc.yojson_of_annoted ~filenames
                 (rule_to_json filenames mix_to_json var_to_json)))
           c.rules );
@@ -1723,7 +1715,7 @@ let compil_to_json c =
       ( "init",
         JsonUtil.of_list
           (JsonUtil.of_triple
-             (JsonUtil.of_option (guard_to_json filenames))
+             (JsonUtil.of_option LKappa.guard_to_json)
              (Loc.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
              (init_to_json ~filenames mix_to_json var_to_json))
@@ -1812,7 +1804,7 @@ let compil_of_json = function
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST rules")
              (JsonUtil.to_triple
                 (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
-                (JsonUtil.to_option (guard_of_json filenames))
+                (JsonUtil.to_option LKappa.guard_of_json)
                 (Loc.annoted_of_yojson ~filenames
                    (rule_of_json filenames mix_of_json var_of_json)))
              (List.assoc "rules" l);
@@ -1827,7 +1819,7 @@ let compil_of_json = function
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST init")
              (JsonUtil.to_triple
-                (JsonUtil.to_option (guard_of_json filenames))
+                (JsonUtil.to_option LKappa.guard_of_json)
                 (Loc.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
                 (init_of_json ~filenames mix_of_json var_of_json))

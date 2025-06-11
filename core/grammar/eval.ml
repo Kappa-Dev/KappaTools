@@ -485,7 +485,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
     inits =
   let init_l, _ =
     List_util.fold_right_map
-      (fun (_guard (*rTODO*), alg, init_t) preenv ->
+      (fun (guard, alg, init_t) preenv ->
         let () =
           if Alg_expr.has_mix ~var_decls:(Model.get_alg env) (fst alg) then
             raise
@@ -513,7 +513,7 @@ let compile_inits ~debug_mode ~warning ?rescale ~compile_mode_on contact_map env
               LKappa.r_rate = Alg_expr.const Nbr.zero;
               LKappa.r_un_rate = None;
               LKappa.r_edit_style = true;
-              LKappa.r_guard = None;
+              LKappa.r_guard = guard;
             }
           in
           let preenv'', state' =
@@ -575,7 +575,7 @@ let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map
     domain rules =
   match
     List.fold_left
-      (fun (domain, syntax_ref, deps_machinery, acc) (_, _guard (*rTODO*), rule) ->
+      (fun (domain, syntax_ref, deps_machinery, acc) (_, _guard (*guard is ignored here*), rule) ->
         let domain', origin', cr =
           rules_of_ast ~debug_mode ~warning ?deps_machinery ~compile_mode_on
             contact_map domain ~syntax_ref rule

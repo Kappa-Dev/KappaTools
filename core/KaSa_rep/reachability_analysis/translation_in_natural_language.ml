@@ -1365,8 +1365,7 @@ let rec convert_views_internal_constraints_list_aux
           (error, current_list) list
       in
       error, current_list
-    | Valuations_with_guards _ ->
-      error, current_list (*rTODO convert to lemmas?*)
+    | Valuations_with_guards _ -> error, current_list
     | No_known_translation list ->
       (match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->

@@ -653,6 +653,12 @@ let lalg_expr_of_json filenames =
     (rule_mixture_of_json filenames)
     (JsonUtil.to_int ?error_msg:None)
 
+let guard_to_json g = `String (string_of_guard g)
+
+let guard_of_json _j =
+  (*rTODO*)
+  True
+
 let rule_to_json ~filenames r =
   `Assoc
     [
@@ -675,6 +681,7 @@ let rule_to_json ~filenames r =
                 (Loc.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))))
           r.r_un_rate );
       "edit_style", `Bool r.r_edit_style;
+      "guard", JsonUtil.of_option guard_to_json r.r_guard;
     ]
 
 let rule_of_json ~filenames = function
@@ -704,7 +711,7 @@ let rule_of_json ~filenames = function
                 (List.assoc "unary_rate" l)
             with Not_found -> None);
          r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
-         r_guard = None (*rTODO List.assoc_opt "guard" l;*);
+         r_guard = Option.map guard_of_json (List.assoc_opt "guard" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x)))
