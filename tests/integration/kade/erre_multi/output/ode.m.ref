@@ -408,9 +408,9 @@ var(1)=(y(7)+2*y(6)+y(5))/2; % dimmers
 jacvar(2,1)=1;
 jacvar(2,3)=1;
 jacvar(2,4)=1;
-jacvar(1,5)=2;
-jacvar(1,6)=2;
-jacvar(1,7)=2;
+jacvar(1,5)=2/4;
+jacvar(1,6)=1;
+jacvar(1,7)=2/4;
 
 
 jac=sparse(nodevar,nodevar);

@@ -127,7 +127,7 @@ jobs:
           path: |
             site
             viz
-      - name: Archive Javascript app
+      - name: Archive linux electron app
         uses: actions/upload-artifact@v4
         with:
           name: linux
@@ -193,7 +193,11 @@ jobs:
 
   webapp-playwright-test:
     needs: [cli-and-doc, webapp-ubuntu]
-    if: github.ref == 'refs/heads/master'
+    # run only on master OR when the PR is _not_ a draft
+    # TODO: improve this?
+    if: |
+      github.ref == 'refs/heads/master' ||
+      github.event.pull_request.draft == false
     timeout-minutes: 75
     runs-on: ubuntu-latest
     steps:
@@ -206,6 +210,7 @@ jobs:
         npm ci
         sudo apt-get update
         sudo apt-get install lighttpd
+        sudo apt-get install xvfb x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic x11-apps
         sudo npm install -D @playwright/test@latest
         npm install --save-dev @types/node @types/yauzl
     - name: Install Playwright Browsers
@@ -225,14 +230,36 @@ jobs:
           ' > lighttpd.conf
         lighttpd -f lighttpd.conf -D &
         sleep 10 && curl -i http://127.0.0.1:12345/index.html # test 
+    - name: Download electron app
+      uses: actions/download-artifact@v4
+      with:
+        name: linux
+    # - name: Setup electron app
+    #   run: |
+    #     tar xzf Kappapp.tar.gz
+    #     mkdir -p build
+    #     mv Kappapp ./build/
+    #     # pwd
+    #     # ls -R
+    #     # ls -R /home/runner/work/
+    #     Xvfb :99 -ac -screen 0 1920x1080x24 +extension GLX +render > xvfb_log.txt 2>&1 &
+    #     sleep 3
     - name: Run Playwright tests
-      run: DEBUG=pw:webserver npx playwright test --retries=3 --trace retain-on-first-failure 
+      run: |
+        # export DISPLAY=:99 # needed for electron
+        DEBUG=pw:browser* npx playwright test --retries=2 --trace retain-on-first-failure
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+    # - uses: actions/upload-artifact@v4
+    #   if: ${{ !cancelled() }}
+    #   with:
+    #     name: xvfb_log
+    #     path: xvfb_log.txt
+    #     retention-days: 30
 
   deploy:
     needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows, webapp-playwright-test]

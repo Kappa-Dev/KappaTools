@@ -1,0 +1,31 @@
+{
+  "name": "kappa-lang",
+  "displayName": "Kappa Lang",
+  "description": "Syntax highlighting for the Kappa language",
+  "publisher": "KappaTools",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "kappa",
+      "aliases": ["Kappa", "kappa"],
+      "extensions": [".ka"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "kappa",
+      "scopeName": "source.kappa",
+      "path": "./syntaxes/kappa.tmGrammar.json"
+    }]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kappa-Dev/KappaTools"
+  },
+  "license": "SEE LICENSE IN LGPL-LICENSE"
+}

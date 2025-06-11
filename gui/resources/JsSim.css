@@ -174,7 +174,7 @@ rect { stroke-width: 2; }
 }
 
 .plot-legend-swatch { stroke-width : 1; }
-.plot-tick-proof { }
+/* .plot-tick-proof { } */
 .contact-tooltip { position: fixed;
                    z-index: 10; padding: 2px;
                    border-style: solid;

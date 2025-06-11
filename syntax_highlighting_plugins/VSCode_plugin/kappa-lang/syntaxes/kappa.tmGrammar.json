@@ -1,0 +1,101 @@
+{
+  "scopeName": "source.kappa",
+  "patterns": [
+    {
+      "include": "#expression"
+    }
+  ],
+  "repository": {    
+    "expression": {       
+       
+      "patterns": [   
+        {
+          "begin": "\\/\\*",
+          "end": "\\*\\/",
+          "name": "comment"
+        }, 
+        {
+          "name": "comment.line.double-slash",
+          "match": "\\/\\/.*"
+        },
+        {
+          "include": "#paren-expression"
+        },        
+        {
+          "name": "string.quoted.double",
+            "match": "\"[^\"]*\""
+        },        
+        {
+          "name": "variable.other",
+            "match": "'[^']*'"
+        },
+        {
+          "name": "storage.type",
+          "match": "\\%agent:|\\%def:|\\%var:|\\%plot:|\\%obs:|\\%init:|\\%mod:|\\%token:"
+        },
+        {
+          "name": "keyword.control",
+          "match": "\\b(do|repeat|alarm)\\b"
+        },
+        {
+          "name": "entity.name.function",
+          "match": "(\\$ADD|\\$DEL|\\$SNAPSHOT|\\$STOP|\\$DIN|\\$TRACK|\\$UPDATE|\\$PRINT)\\b"
+        },
+        {
+          "name": "support.function",
+          "match": "(\\[not\\]|\\[log\\]|\\[sin\\]|\\[cos\\]|\\[tan\\]|\\[sqrt\\]|\\[mod\\]|\\[exp\\]|\\[int\\])"
+        },
+        {
+          "name": "variable.langage",
+          "match": "(\\[pi\\]|INF|inf|\\[pi\\]|\\[true\\]|\\[false\\])"
+        },
+        {
+          "name": "variable.langage",
+          "match": "(\\[E\\]|\\[E\\+\\]|\\[E\\-\\]|\\[Emax\\]|\\[T\\]|\\[Tsim\\]|\\[Tmax\\])"
+        },
+        {
+          "name": "variable.langage",
+          "match": "(\\[E\\]|\\[E\\+\\]|\\[E\\-\\]|\\[Emax\\]|\\[T\\]|\\[Tsim\\]|\\[Tmax\\])"
+        },
+        {
+          "contentName": "entity.name.tag",
+          "begin": "{",
+          "end": "}"
+        },
+        {
+          "contentName": "entity.other.attribute-name",          
+          "begin": "\\[",
+          "end": "\\]"
+        },
+        {
+          "name": "keyword.operator",
+          "match": "\\@|\\,|\\(|\\)|\\{|\\}|\\[|\\]|\\||\\.|\\+|\\*|\\-|\\^|\\/|\\<|\\>|\\=|\\%|\\:|\\#|\\;"
+        },
+        {
+          "name": "constant.numeric",
+          "match": "\\b(0x[a-f\\d]+|[-+]?(?:\\.\\d+|\\d+\\.?\\d*)(?:[eE][-+]?\\d+)?)\\b"
+        }
+      ]
+    },
+
+    "paren-expression": {
+      "begin": "\\(",
+      "end": "\\)",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.paren.open"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.paren.close"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#expression"
+        }
+      ]
+    }
+  }
+}

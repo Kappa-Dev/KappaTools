@@ -97,8 +97,7 @@ If you want or need your own build,
  - Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml
    package manager) and initialize it (by issuing `opam init`)
  - In the source directory, install all the dependencies by `opam install 
-   --deps-only pinned_libs/default` if your OS is OSX or linux, or `opam 
-   install --deps-only pinned_libs/windows` if your OS is Windows.
+   --deps-only .`
  - `dune build`
 
 You can be more fine grained if you only need the command-line tools

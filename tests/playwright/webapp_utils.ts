@@ -101,10 +101,28 @@ export async function input_in_editor_from_url(page: Page, url_protocol_relative
   await input_in_editor_from_str(page, model);
 }
 
-export async function open_app_with_model(page: Page, url_protocol_relative: string, paste_in_editor: boolean = false, timeout: number = 10000) {
-  if (paste_in_editor) {
-    // download the file and paste it in the editor
+export async function open_app_with_model_from_text(page: Page, model_text: string, run_in_electron: boolean, timeout: number = 10000) {
+  if (!run_in_electron) {
+    // load the app if not in electron
+    // if in electron, the page is already loaded, and we just need to enter the file in the editor
     await page.goto(url);
+  }
+  await wait_for_project_ready_status(page);
+  await input_in_editor_from_str(page, model_text);
+
+  // Note: if fails in input_in_editor_from_str, it won't wait for second timeout as expect is not expect.soft
+  await wait_for_file_load(page, { timeout: timeout });
+}
+
+// TODO: paste_in_editor is now always true, as default is true
+export async function open_app_with_model(page: Page, url_protocol_relative: string, run_in_electron: boolean, paste_in_editor: boolean = true, timeout: number = 10000) {
+  if (paste_in_editor || run_in_electron) {
+    // download the file and paste it in the editor
+    if (!run_in_electron) {
+      // load the app if not in electron
+      // if in electron, the page is already loaded, and we just need to enter the file in the editor
+      await page.goto(url);
+    }
     await wait_for_project_ready_status(page);
     await input_in_editor_from_url(page, url_protocol_relative);
   } else {
@@ -116,6 +134,7 @@ export async function open_app_with_model(page: Page, url_protocol_relative: str
 }
 
 export function get_error_field(page: Page) {
+  // Note: alternative emplacement, showing different info, in case it's relevant
   // return page.locator('#configuration_error_div');
   return page.locator('#configuration_alert_div');
 }
