@@ -1216,7 +1216,7 @@ let translate_compil parameters error
       Ast.filenames = compil.Ast.filenames;
       Ast.variables = List.rev var_rev;
       Ast.signatures = List.rev signatures_rev;
-      Ast.rules = List.rev rules_rev;
+      Ast.rules = rules_rev;
       Ast.observables = List.rev observables_rev;
       Ast.init = List.rev init_rev;
       Ast.perturbations = List.rev perturbations_rev;
