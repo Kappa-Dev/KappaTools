@@ -107,5 +107,3 @@ and print_arg parameter error string_of scheme formula =
     let error = print parameter error string_of formula in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
     error
-
-let print p e s f = print p e s (simplify f)

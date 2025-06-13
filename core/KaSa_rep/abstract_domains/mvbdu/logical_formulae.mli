@@ -13,3 +13,7 @@ val print :
   ('error -> 'a -> 'error * string) ->
   'a formula ->
   'error
+
+val simplify :
+  'a formula ->
+  'a formula
