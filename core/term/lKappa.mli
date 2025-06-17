@@ -147,8 +147,11 @@ val print_rule :
   rule ->
   unit
 
-val guard_to_json : string guard -> Yojson.Basic.t
-val guard_of_json : Yojson.Basic.t -> string guard
+val string_guard_option_to_json :
+  filenames:int Mods.StringMap.t -> string guard option -> Yojson.Basic.t
+
+val string_guard_option_of_json :
+  filenames:string array -> Yojson.Basic.t -> string guard option
 
 val rule_to_json :
   filenames:int Mods.StringMap.t ->

@@ -652,15 +652,77 @@ let lalg_expr_of_json filenames =
     (rule_mixture_of_json filenames)
     (JsonUtil.to_int ?error_msg:None)
 
-let guard_to_json g = `String (string_of_guard g)
+let rec guard_to_json ~filenames (f : 'a -> Yojson.Basic.t) (g : 'id guard) :
+    Yojson.Basic.t =
+  match g with
+  | True -> `Assoc [ "type", `String "True" ]
+  | False -> `Assoc [ "type", `String "False" ]
+  | Param value ->
+    `Assoc
+      [
+        "type", `String "Param";
+        "value", Loc.yojson_of_annoted ~filenames f value;
+      ]
+  | Not g1 ->
+    `Assoc [ "type", `String "Not"; "guard", guard_to_json ~filenames f g1 ]
+  | And (g1, g2) ->
+    `Assoc
+      [
+        "type", `String "And";
+        "left", guard_to_json ~filenames f g1;
+        "right", guard_to_json ~filenames f g2;
+      ]
+  | Or (g1, g2) ->
+    `Assoc
+      [
+        "type", `String "Or";
+        "left", guard_to_json ~filenames f g1;
+        "right", guard_to_json ~filenames f g2;
+      ]
 
-let guard_of_json _j =
-  (*rTODO*)
-  True
+let rec guard_of_json ~filenames (f : Yojson.Basic.t -> 'a)
+    (json : Yojson.Basic.t) : 'a guard =
+  match json with
+  | `Assoc fields ->
+    (match List.assoc "type" fields with
+    | `String "True" -> True
+    | `String "False" -> False
+    | `String "Param" ->
+      let value_json = List.assoc "value" fields in
+      Param (Loc.annoted_of_yojson ~filenames f value_json)
+    | `String "Not" ->
+      let guard_json = List.assoc "guard" fields in
+      Not (guard_of_json ~filenames f guard_json)
+    | `String "And" ->
+      let left_json = List.assoc "left" fields in
+      let right_json = List.assoc "right" fields in
+      And
+        ( guard_of_json ~filenames f left_json,
+          guard_of_json ~filenames f right_json )
+    | `String "Or" ->
+      let left_json = List.assoc "left" fields in
+      let right_json = List.assoc "right" fields in
+      Or
+        ( guard_of_json ~filenames f left_json,
+          guard_of_json ~filenames f right_json )
+    | `String unknown -> failwith ("Unknown guard type: " ^ unknown)
+    | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json)))
+  | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json))
+
+let string_guard_option_to_json ~filenames =
+  JsonUtil.of_option (guard_to_json ~filenames (fun s -> `String s))
+
+let string_guard_option_of_json ~filenames =
+  let string_of_json = function
+    | `String s -> s
+    | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct string", x))
+  in
+  JsonUtil.to_option (guard_of_json ~filenames string_of_json)
 
 let rule_to_json ~filenames guard r =
   `Assoc
     [
+      "guard", (string_guard_option_to_json ~filenames) guard;
       "mixture", rule_mixture_to_json filenames r.r_mix;
       "created", Raw_mixture.to_json r.r_created;
       ( "delta_tokens",
@@ -680,13 +742,12 @@ let rule_to_json ~filenames guard r =
                 (Loc.yojson_of_annoted ~filenames (lalg_expr_to_json filenames))))
           r.r_un_rate );
       "edit_style", `Bool r.r_edit_style;
-      "guard", JsonUtil.of_option guard_to_json guard;
     ]
 
 let rule_of_json ~filenames = function
   | `Assoc l as x when List.length l < 8 ->
     (try
-       ( Option.map guard_of_json (List.assoc_opt "guard" l),
+       ( (string_guard_option_of_json ~filenames) (List.assoc "guard" l),
          {
            r_mix = rule_mixture_of_json filenames (List.assoc "mixture" l);
            r_created = Raw_mixture.of_json (List.assoc "created" l);
